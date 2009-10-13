@@ -110,6 +110,12 @@ class MySqlTest extends \lithium\test\Unit {
 	public function testAbstractColumnResolution() {
 		
 	}
+
+	public function testExecuteException() {
+		$this->expectException();
+		$this->db->read('SELECT deliberate syntax error');
+	}
+
 }
 
 ?>

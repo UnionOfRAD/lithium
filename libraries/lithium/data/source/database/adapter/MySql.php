@@ -12,6 +12,8 @@
 
 namespace lithium\data\source\database\adapter;
 
+use \Exception;
+
 class MySql extends \lithium\data\source\Database {
 
 	/**
@@ -189,6 +191,18 @@ class MySql extends \lithium\data\source\Database {
 		return $result;
 	}
 
+	/**
+	 * Retrieves database error message and error code
+	 * 
+	 * @return array
+	 */
+	public function error() {
+		if (mysql_error($this->_connection)) {
+			return array(mysql_errno($this->_connection), mysql_error($this->_connection));
+		}
+		return null;
+	}
+
 	protected function _execute($sql, $options = array()) {
 		$params = compact('sql', 'options');
 		$conn =& $this->_connection;
@@ -198,7 +212,12 @@ class MySql extends \lithium\data\source\Database {
 			$defaults = array('buffered' => true);
 			$options += $defaults;
 			$func = ($options['buffered']) ? 'mysql_query' : 'mysql_unbuffered_query';
-			return $func($sql, $conn);
+			$resource = $func($sql, $conn);
+			if (!is_resource($resource)) {
+				list($code, $error) = $self->error();
+				throw new Exception("$sql: $error", $code);
+			}
+			return $resource;
 		});
 	}
 
