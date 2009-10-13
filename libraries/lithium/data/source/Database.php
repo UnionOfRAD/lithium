@@ -32,6 +32,8 @@ abstract class Database extends \lithium\data\Source {
 	abstract public function encoding($encoding = null);
 
 	abstract public function result($type, $resource, $context);
+	
+	abstract public function error();
 
 	public function __construct($config = array()) {
 		$defaults = array(
