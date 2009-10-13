@@ -1,0 +1,23 @@
+#!/bin/bash
+################################################################################
+#
+#
+# Lithium: the most rad php framework
+# Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+#
+# Licensed under The BSD License
+# Redistributions of files must retain the above copyright notice.
+#
+# @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+# @license       http://opensource.org/licenses/bsd-license.php The BSD License
+#
+#
+################################################################################
+clear
+
+LIB=${0/%li3/}
+APP=`pwd`
+
+exec php -q ${LIB}lithium.php -working "${APP}" "$@"
+
+exit $?;

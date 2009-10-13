@@ -1,0 +1,96 @@
+<?php
+/**
+ * Lithium: the most rad php framework
+ * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ *
+ * Licensed under The BSD License
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
+namespace lithium\tests\cases\util\socket;
+
+class CurlMock extends \lithium\util\socket\Curl {
+
+	public function resource() {
+		return $this->_resource;
+	}
+}
+
+class CurlTest extends \lithium\test\Unit {
+
+	protected $_testConfig = array(
+		'persistent' => false,
+		'protocol' => 'tcp',
+		'host' => 'localhost',
+		'login' => 'root',
+		'password' => '',
+		'port' => 80,
+		'timeout' => 2
+	);
+
+	public function testAllMethodsNoConnection() {
+		$stream = new CurlMock(array('protocol' => null));
+		$this->assertFalse($stream->open());
+		$this->assertTrue($stream->close());
+		$this->assertFalse($stream->timeout(2));
+		$this->assertFalse($stream->encoding('UTF-8'));
+		$this->assertFalse($stream->write(null));
+		$this->assertFalse($stream->read());
+	}
+
+	public function testOpen() {
+		$stream = new CurlMock($this->_testConfig);
+		$result = $stream->open();
+		$this->assertTrue($result);
+
+		$result = $stream->resource();
+		$this->assertTrue(is_resource($result));
+	}
+
+	public function testClose() {
+		$stream = new CurlMock($this->_testConfig);
+		$result = $stream->open();
+		$this->assertTrue($result);
+
+		$result = $stream->close();
+		$this->assertTrue($result);
+
+		$result = $stream->resource();
+		$this->assertFalse(is_resource($result));
+	}
+
+	public function testTimeout() {
+		$stream = new CurlMock($this->_testConfig);
+		$result = $stream->open();
+		$stream->timeout(10);
+		$result = $stream->resource();
+		$this->assertTrue(is_resource($result));
+	}
+
+	public function testEncoding() {
+		$stream = new CurlMock($this->_testConfig);
+		$result = $stream->open();
+		$stream->encoding('UTF-8');
+		$result = $stream->resource();
+		$this->assertTrue(is_resource($result));
+	}
+
+	public function testWriteAndRead() {
+		$stream = new CurlMock($this->_testConfig);
+		$result = $stream->open();
+		$this->assertTrue(is_resource($result));
+
+		$result = $stream->resource();
+		$this->assertTrue(is_resource($result));
+
+		$stream->set(CURLOPT_URL, 'http://localhost');
+		$this->assertTrue($stream->write(null));
+
+		$result = $stream->read();
+		$this->assertPattern("/^<!DOCTYPE/", $result);
+	}
+}
+?>

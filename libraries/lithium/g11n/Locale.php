@@ -1,0 +1,134 @@
+<?php
+/**
+ * Lithium: the most rad php framework
+ * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ *
+ * Licensed under The BSD License
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
+namespace lithium\g11n;
+
+use \BadMethodCallException;
+use \InvalidArgumentException;
+
+class Locale extends \lithium\core\StaticObject {
+
+	protected static $_tags = array(
+		'language' => array('formatter' => 'strtolower'),
+		'script' => array('formatter' => array('strtolower', 'ucfirst')),
+		'territory' => array('formatter' => 'strtoupper'),
+		'variant' => array('formatter' => 'strtoupper')
+	);
+
+	public static function __callStatic($method, $params = array()) {
+		$tags = static::invokeMethod('decompose', $params);
+
+		if (!array_key_exists($method, static::$_tags)) {
+			throw new BadMethodCallException("Invalid locale tag `{$method}`");
+		}
+		return isset($tags[$method]) ? $tags[$method] : null;
+	}
+
+	/**
+	 * Composes a locale from locale tags.
+	 *
+	 * @param array $tags An array as obtained from {@see decompose()}.
+	 * @return string|void A locale with tags separated by underscores or `null`
+	 *         if none of the passed tags could be used to compose a locale.
+	 */
+	public static function compose($tags) {
+		$result = array();
+
+		foreach (static::$_tags as $name => $tag) {
+			if (isset($tags[$name])) {
+				$result[] = $tags[$name];
+			}
+		}
+		if ($result) {
+			return implode('_', $result);
+		}
+	}
+
+	/**
+	 * Parses a locale into locale tags.  A valid locale has the structure and format
+	 * `language[_Script][_TERRITORY][_VARIANT]`. The language tag is an ISO 639-1 code,
+	 * where not available ISO 639-3 and ISO 639-5 codes are allowed too. The territory
+	 * tag is an ISO 3166-1 code.
+	 *
+	 * @param string $locale i.e. `'en'`, `'en_US'`or `'de_DE'`
+	 * @return array Parsed language, script, territory and variant tags.
+	 * @throws InvalidArgumentException
+	 */
+	public static function decompose($locale) {
+		$regex  = '(?P<language>[a-z]{2,3})';
+		$regex .= '(?:[_-](?P<script>[a-z]{4}))?';
+		$regex .= '(?:[_-](?P<territory>[a-z]{2}))?';
+		$regex .= '(?:[_-](?P<variant>[a-z]{5,}))?';
+
+		if (!preg_match("/^{$regex}$/i", $locale, $matches)) {
+			throw new InvalidArgumentException("Locale `{$locale}` could not be parsed");
+		}
+		return array_filter(array_intersect_key($matches, static::$_tags));
+	}
+
+	// public static function language($locale) {}
+
+	// public static function script($locale) {}
+
+	// public static function territory($locale) {}
+
+	// public static function variant($locale) {}
+
+	/**
+	 * Returns a locale in it's canonical form with tags formatted properly.
+	 *
+	 * @param string $locale
+	 * @return string
+	 */
+	public static function canonicalize($locale) {
+		$tags = static::decompose($locale);
+
+		foreach ($tags as $name => &$tag) {
+			foreach ((array)static::$_tags[$name]['formatter'] as $formatter) {
+				$tag = $formatter($tag);
+			}
+		}
+		return static::compose($tags);
+	}
+
+	/**
+	 * Cascades a locale.
+	 *
+	 * Usage:
+	 * {{{
+	 * Locale::cascade('en_US');
+	 * // returns array('en_US', 'en', 'root')
+	 *
+	 * Locale::cascade('zh_Hans_HK_REVISED');
+	 * // returns array('zh_Hans_HK_REVISED', 'zh_Hans_HK', 'zh_Hans', 'zh', 'root')
+	 * }}}
+	 *
+	 * @return array Indexed array of locales (starting with the most specific one).
+	 */
+	public static function cascade($locale) {
+		$locales[] = $locale;
+
+		if ($locale === 'root') {
+			return $locales;
+		}
+		$tags = static::decompose($locale);
+
+		while (count($tags) > 1) {
+			array_pop($tags);
+			$locales[] = static::compose($tags);
+		}
+		$locales[] = 'root';
+		return $locales;
+	}
+}
+
+?>

@@ -1,0 +1,126 @@
+<?php
+/**
+ * Lithium: the most rad php framework
+ * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ *
+ * Licensed under The BSD License
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
+namespace lithium\tests\cases\storage\cache\adapters;
+
+use \lithium\storage\cache\adapters\File;
+
+class FileTest extends \lithium\test\Unit {
+
+	public function setUp() {
+		$this->File = new File();
+	}
+
+	public function tearDown() {
+		unset($this->File);
+	}
+
+	public function testWrite() {
+		$key = 'key';
+		$data = 'data';
+		$expiry = '+1 minute';
+		$time = time() + 60;
+
+		$closure = $this->File->write($key, $data, $expiry);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key', 'data', 'expiry');
+		$result = $closure($this->File, $params, null);
+		$expected = 25;
+		$this->assertEqual($expected, $result);
+
+		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
+		$this->assertEqual(file_get_contents(LITHIUM_APP_PATH . "/tmp/cache/$key"), "{:expiry:$time}\ndata");
+
+		$this->assertTrue(unlink(LITHIUM_APP_PATH . "/tmp/cache/$key"));
+		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
+	}
+
+	public function testRead() {
+		$key = 'key';
+		$time = time() + 60;
+
+		$closure = $this->File->read($key);
+		$this->assertTrue(is_callable($closure));
+
+		file_put_contents(LITHIUM_APP_PATH . "/tmp/cache/$key", "{:expiry:$time}\ndata");
+		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
+
+		$params = compact('key');
+		$result = $closure($this->File, $params, null);
+		$expected = 'data';
+		$this->assertEqual($expected, $result);
+
+		$this->assertTrue(unlink(LITHIUM_APP_PATH . "/tmp/cache/$key"));
+		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
+
+		$key = 'non_existent';
+		$params = compact('key');
+		$closure = $this->File->read($key);
+		$this->assertTrue(is_callable($closure));
+
+		$result = $closure($this->File, $params, null);
+		$this->assertFalse($result);
+	}
+
+	public function testExpiredRead() {
+		$key = 'expired_key';
+		$time = time() + 1;
+
+		$closure = $this->File->read($key);
+		$this->assertTrue(is_callable($closure));
+
+		file_put_contents(LITHIUM_APP_PATH . "/tmp/cache/$key", "{:expiry:$time}\ndata");
+		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
+
+		sleep(2);
+		$params = compact('key');
+		$result = $closure($this->File, $params, null);
+		$this->assertFalse($result);
+
+	}
+
+	public function testDelete() {
+		$key = 'key_to_delete';
+		$time = time() + 1;
+
+		file_put_contents(LITHIUM_APP_PATH . "/tmp/cache/$key", "{:expiry:$time}\ndata");
+		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
+
+		$closure = $this->File->delete($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->File, $params, null);
+		$this->assertTrue($result);
+
+		$key = 'non_existent';
+		$params = compact('key');
+		$result = $closure($this->File, $params, null);
+		$this->assertFalse($result);
+	}
+
+	public function testClear() {
+		$key = 'key_to_clear';
+		$time = time() + 1;
+		file_put_contents(LITHIUM_APP_PATH . "/tmp/cache/$key", "{:expiry:$time}\ndata");
+
+		$result = $this->File->clear();
+		$this->assertTrue($result);
+		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
+
+	}
+
+
+}
+
+?>

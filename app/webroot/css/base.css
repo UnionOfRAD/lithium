@@ -1,0 +1,33 @@
+/**
+ * Lithium: the most rad php framework
+ * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ *
+ * Licensed under The BSD License
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background-color: #CCC;
+	font-family: Helvetica, Arial, sans-serif;
+	margin: 2em;
+}
+
+a {
+	color: #333;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+p {
+	margin-top: 1em;
+}

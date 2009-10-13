@@ -1,0 +1,281 @@
+/**
+ * Lithium: the most rad php framework
+ * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ *
+ * Licensed under The BSD License
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
+h1.test-dashboard {
+	padding: 8px 0 4px 14px;
+	background: #B5B4A4;
+}
+
+/*--- Benchmarking ---*/
+table.metrics {
+	border: 0;
+	border-top: 1px solid #ccc;
+}
+
+td.metric-name {
+	text-align: left;
+	white-space: nowrap;
+	padding: 6px 8px;
+	background: #f4f4f4;
+	width: 35%;	
+}
+td.metric {
+	border: 0;
+	font-family: 'Courier New', Courier;
+	font-weight: bold;
+	padding: 6px 8px;
+	text-align: right;
+	width: 65%;
+}
+
+ul.classes, ul.files {
+	list-style-type: none;
+	font-family: 'Andale Mono';
+}
+
+/*--- Test Results ---*/
+div.test-result {
+	margin: 0 0 15px 0;
+	padding: 8px 10px;
+	color: #FFFFFF;
+	border: 2px solid #000000;
+	font-family: Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	font-size: 16px;
+}
+
+div.test-result-success {
+	background-color: #33CC66;
+	border-color: #009933;
+}
+
+div.test-result-fail {
+	background-color: #CC0033;
+	border-color: #990000;
+}
+
+div.test-assert, div.test-exception {
+	margin: 4px 0;
+	padding: 4px 8px;
+	color: #000000;
+	border: 1px solid #000000;
+	font-family: 'Monaco', 'Andale Mono', Helvetica, Arial, sans-serif;
+	line-height: 20px;
+	font-size: 12px;
+}
+
+div.test-assert-passed {
+	border-color: #339966;
+	background-color: #D0F9E0;
+}
+
+div.test-assert-failed, div.test-exception {
+	border-color: #993366;
+	background-color: #F9D0E0;
+}
+
+div.test-assert span.content, div.test-exception span.content, div.test-exception span.trace {
+	display: block;
+	clear: both;
+	white-space: pre;
+}
+
+div.test-exception span.content {
+	font-style: italic;
+}
+
+div.test-exception span.trace {
+	padding: 0 0 0 5px;
+	margin: 2px 0 2px 3px;
+	border-left: 1px solid #C09090;
+}
+
+/*--- SQL Dumps ---*/
+.lithium-sql-log table {
+	background: #f4f4f4;
+}
+
+.lithium-sql-log td {
+	padding: 4px 8px;
+	text-align: left;
+}
+
+
+/*--- Debugger Dumps ---*/
+pre {
+	color: #000;
+	background: #f0f0f0;
+	padding: 1em;
+}
+
+pre.lithium-debug {
+	background: #ffcc00;
+	font-size: 120%;
+	line-height: 140%;
+	margin-top: 1em;
+	overflow: auto;
+	position: relative;
+}
+
+div.lithium-stack-trace {
+	background: #fff;
+	border: 4px dotted #ffcc00;
+	color: #333;
+	margin: 0px;
+	padding: 6px;
+	font-size: 120%;
+	line-height: 140%;
+	overflow: auto;
+	position: relative;
+}
+
+/*--- Code Highlighting ---*/
+div.lithium-code-dump pre {
+	position: relative;
+	overflow: auto;
+}
+
+div.lithium-stack-trace pre, div.lithium-code-dump pre {
+	color: #000;
+	background-color: #F0F0F0;
+	margin: 0px;
+	padding: 1em;
+	overflow: auto;
+}
+
+div.lithium-code-dump pre, div.lithium-code-dump pre code {
+	clear: both;
+	font-size: 12px;
+	line-height: 15px;
+	margin: 4px 2px;
+	padding: 4px;
+	overflow: auto;
+}
+
+div.lithium-code-dump span.code-highlight {
+	background-color: #ff0;
+	padding: 4px;
+}
+
+/*--- Code Coverage Analysis ---*/
+span.filters {
+	float: right;
+	margin-top: -17px;
+}
+
+div.code-coverage-results {
+	color: #000000;
+	font-size: 11px;
+	font-family: 'Andale Mono';
+	background-color: #F0F0F0;
+	border: 1px solid #CCCCCC;
+}
+
+h4.coverage {
+	color: #000000;
+	background-color: #FFFFFF;
+	font-family: Helvetica, Arial;
+	font-weight: bold;
+	margin: 6px 0 3px 3px;
+	padding: 0;
+}
+
+div.code-coverage-results h4.name {
+	color: #666;
+	background-color: #F0F0F0;
+	border-bottom: 1px solid #999;
+	padding: 3px 0;
+	font-size: 12px;
+}
+
+div.code-coverage-results div.code-line {
+	display: block;
+	float: none;
+	clear: both;
+	padding-left: 5px;
+	margin-left: 10px;
+}
+
+div.code-coverage-results span.content {
+	display: block;
+	clear: right;
+	white-space: pre;
+	line-height: 20px;
+}
+
+div.code-coverage-results div.uncovered span.content {
+	color: #B00;
+	background-color: #FEE;
+}
+
+div.code-coverage-results div.covered span.content {
+	color: #080;
+	background-color: #DFD;
+}
+
+div.code-coverage-results div.ignored span.content {
+	color: #aaa;
+}
+
+div.code-coverage-results span.line-num {
+	display: block;
+	float: left;
+	font-family: Helvetica, Arial, sans-serif;
+	width: 20px;
+	color: #A9A9A9;
+	text-align: right;
+	background-color: #ECECEC;
+	border-right: 1px solid #DDDDDD;
+	padding-right: 2px;
+	margin-right: 5px;
+	line-height: 20px;
+}
+
+div.code-coverage-results span.line-num strong {
+	color: #666;
+}
+
+div.code-coverage-results div.start {
+	margin-top: 30px;
+	padding-top: 5px;
+	border: 1px solid #aaa;
+	border-width: 1px 1px 0px 1px;
+}
+
+div.code-coverage-results div.end {
+	margin-bottom: 30px;
+	padding-bottom: 5px;
+	border: 1px solid #aaa;
+	border-width: 0px 1px 1px 1px;
+}
+
+div.code-coverage-results div.realstart {
+	margin-top: 0px;
+}
+
+div.code-coverage-results p.note {
+	color: #bbb;
+	padding: 5px;
+	margin: 5px 0 10px;
+	font-size: 10px;
+}
+
+div.code-coverage-results span.result-bad {
+	color: #a00;
+}
+
+div.code-coverage-results span.result-ok {
+	color: #fa0;
+}
+
+div.code-coverage-results span.result-good {
+	color: #0a0;
+}
