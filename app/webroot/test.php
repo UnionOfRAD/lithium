@@ -30,11 +30,11 @@ $stats = Dispatcher::process($testRun['results']);
 <!doctype html>
 <html>
 	<head>
-		<title>Lithium3 Unit Test Dashboard</title>
+		<title>Lithium Unit Test Dashboard</title>
 		<link rel="stylesheet" href="css/debug.css" />
 	</head>
 	<body class="test-dashboard">
-		<h1>Lithium3 Unit Test Dashboard</h1>
+		<h1>Lithium Unit Test Dashboard</h1>
 
 		<div style="float: left; padding: 10px 0 20px 20px; width: 20%;">
 			<h2><a href="?group=\">Tests</a></h2>
