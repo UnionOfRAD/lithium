@@ -8,8 +8,31 @@
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
+* {
+	margin: 0;
+	padding: 0;
+}
 
-h1.test-dashboard {
+body.test-dashboard {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 90%;
+	margin: 0;
+}
+
+body.test-dashboard a {
+	color: #333;
+}
+
+body.test-dashboard ul {
+	margin: 0.2em 0.5em;
+}
+
+body.test-dashboard li {
+	margin: 0.4em 1em;
+}
+
+body.test-dashboard h1 {
+	margin: 0;
 	padding: 8px 0 4px 14px;
 	background: #B5B4A4;
 }
@@ -25,7 +48,7 @@ td.metric-name {
 	white-space: nowrap;
 	padding: 6px 8px;
 	background: #f4f4f4;
-	width: 35%;	
+	width: 35%;
 }
 td.metric {
 	border: 0;
