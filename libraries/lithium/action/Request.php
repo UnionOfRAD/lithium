@@ -349,7 +349,9 @@ class Request extends \lithium\core\Object {
 	 */
 	protected function _base() {
 		$base = dirname($this->env('PHP_SELF'));
-
+		if ($base === '/') {
+			return null;
+		}
 		while (in_array(basename($base), array('app', 'webroot'))) {
 			$base = dirname($base);
 		}
