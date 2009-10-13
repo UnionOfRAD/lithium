@@ -33,6 +33,8 @@ $app = null;
 for ($dir = $current(); !$app && $dir; $dir = $up($dir)) {
 	if (is_dir($dir . '/config') && file_exists($dir . '/config/bootstrap.php')) {
 		$app = $dir;
+	} else if (is_dir($dir . '/app/config') && file_exists($dir . '/app/config/bootstrap.php')) {
+		$app = $dir . '/app';
 	}
 }
 
