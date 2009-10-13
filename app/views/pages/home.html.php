@@ -20,7 +20,7 @@
 	<a href="http://rad-dev.org/lithium/wiki">Lithium Wiki</a>
 </p>
 <p>
-	<a href="http://rad-dev.org/lithium3">Lithium Source</a>
+	<a href="http://rad-dev.org/lithium">Lithium Source</a>
 </p>
 <p>
 	<a href="http://groups.google.com/group/lithium">Lithium Google Group</a>
