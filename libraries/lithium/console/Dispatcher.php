@@ -92,8 +92,7 @@ class Dispatcher extends \lithium\core\Object {
 		$class = $request->params['command'] ?: '\lithium\console\Command';
 
 		if ($class[0] !== '\\') {
-			$command = Inflector::camelize($request->params['command']);
-			$class = Libraries::locate('commands', $command);
+			$class = Libraries::locate('commands', $request->params['command']);
 		}
 
 		$isRun = (
