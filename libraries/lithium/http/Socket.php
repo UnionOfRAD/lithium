@@ -1,10 +1,6 @@
 <?php
 /**
  * Lithium: the most rad php framework
- * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
- *
- * Licensed under The BSD License
- * Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
@@ -881,7 +877,7 @@ class Socket extends \lithium\core\Object {
 	 * @todo Test $chars parameter
 	 */
 	protected function unescapeToken($token, $chars = null) {
-		$regex = '/"(['.join('', $this->__tokenEscapeChars(true, $chars)).'])"/';
+		$regex = '/"(['.join('', $this->_tokenEscapeChars(true, $chars)).'])"/';
 		$token = preg_replace($regex, '\\1', $token);
 		return $token;
 	}
@@ -894,7 +890,7 @@ class Socket extends \lithium\core\Object {
 	 * @todo Test $chars parameter
 	 */
 	protected function escapeToken($token, $chars = null) {
-		$regex = '/(['.join('', $this->__tokenEscapeChars(true, $chars)).'])/';
+		$regex = '/(['.join('', $this->_tokenEscapeChars(true, $chars)).'])/';
 		$token = preg_replace($regex, '"\\1"', $token);
 		return $token;
 	}
@@ -904,10 +900,9 @@ class Socket extends \lithium\core\Object {
 	 *
 	 * @param boolean $hex true to get them as HEX values, false otherwise
 	 * @return array Escape chars
-	 * @access private
 	 * @todo Test $chars parameter
 	 */
-	public function __tokenEscapeChars($hex = true, $chars = null) {
+	protected function _tokenEscapeChars($hex = true, $chars = null) {
 		if (!empty($chars)) {
 			$escape = $chars;
 		} else {

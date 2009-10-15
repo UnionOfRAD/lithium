@@ -1,10 +1,6 @@
 <?php
 /**
  * Lithium: the most rad php framework
- * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
- *
- * Licensed under The BSD License
- * Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
@@ -81,7 +77,7 @@ Libraries::add('app');
 /**
  * Add some plugins
  */
-// Libraries::add('plugin', 'docs');
+// Libraries::add('plugin', 'lithium_docs');
 
 /**
  * This configures your session storage. The Cookie storage adapter must be connected first, since
