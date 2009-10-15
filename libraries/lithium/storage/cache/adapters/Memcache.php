@@ -36,7 +36,7 @@ class Memcache extends \lithium\core\Object {
 		$defaults = array(
 			'prefix' => '',
 			'servers' => array(
-				array('host' => '127.0.0.1', 'port' => 11211, 'weight' => 100)
+				array('127.0.0.1', 11211, 100)
 			)
 		);
 
@@ -47,10 +47,7 @@ class Memcache extends \lithium\core\Object {
 		$configuration = Set::merge($defaults, $config);
 		parent::__construct($configuration);
 
-		foreach ($this->_config['servers'] as $server) {
-			static::$_Memcached->addServer($server['host'], $server['port'], $server['weight']);
-		}
-
+		static::$_Memcached->addServers($this->_config['servers']);
 		return extension_loaded('memcached');
 	}
 
