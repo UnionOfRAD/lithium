@@ -149,6 +149,29 @@ class Form extends \lithium\template\Helper {
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
 	}
 
+	public function select($name, $options = array(), $htmlAttributes = array()) {
+		$output = $this->_render(__METHOD__, 'select-start', array(
+			'name' => $name,
+			'options' => $htmlAttributes
+		));
+
+		foreach ($options as $value => $content) {
+			$output .= $this->_render(__METHOD__, 'select-option', array(
+				'value'		=> $value,
+				'content'	=> $content,
+				'options'	=> ''
+			));
+		}
+
+		$output .= $this->_strings['select-end'];
+		return $output;
+	}
+
+	public function checkbox($name, $options = array()) {
+		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		return $this->_render(__METHOD__, $template, compact('name', 'options'));
+	}
+
 	public function password($name, $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
