@@ -156,10 +156,14 @@ class Form extends \lithium\template\Helper {
 		));
 
 		foreach ($options as $value => $content) {
+			$optionAttribites = array();
+			if (isset($htmlAttributes['value']) && $htmlAttributes['value'] == $value) {
+				$optionAttribites['selected'] = 'selected';
+			}
 			$output .= $this->_render(__METHOD__, 'select-option', array(
 				'value'		=> $value,
 				'content'	=> $content,
-				'options'	=> ''
+				'options'	=> $optionAttribites
 			));
 		}
 
