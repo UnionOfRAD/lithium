@@ -17,7 +17,7 @@ use \lithium\util\Collection;
 use \lithium\core\Libraries;
 
 class Connections extends \lithium\core\StaticObject {
-	
+
 	protected static $_configurations = null;
 
 	protected static $_connections = null;

@@ -8,7 +8,7 @@
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
- * 
+ *
  * @todo          fix encoding methods to use class query methods instead of sqlite3 natives
  */
 
@@ -64,7 +64,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	public function connect() {
 		$config = $this->_config;
 		$this->_isConnected = false;
-		
+
 		if ($this->_connection = new \SQLite3($config['database'], $config['flags'], $config['key'])) {
 			$this->_isConnected = true;
 		}
@@ -150,9 +150,9 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * In cases where the query is a raw string (as opposed to a `Query` object), to database must
 	 * determine the correct column names from the result resource.
 	 *
-	 * @param mixed $query 
-	 * @param resource $resource 
-	 * @param object $context 
+	 * @param mixed $query
+	 * @param resource $resource
+	 * @param object $context
 	 * @return array
 	 */
 	public function columns($query, $resource = null, $context = null) {
@@ -171,7 +171,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 
 	/**
 	 * Retrieves database error message and error code
-	 * 
+	 *
 	 * @return array
 	 */
 	public function error() {

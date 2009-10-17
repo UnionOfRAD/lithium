@@ -139,7 +139,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$result = Libraries::locate('adapters.storage.cache', 'File');
 		$expected = 'lithium\storage\cache\adapters\File';
 		$this->assertEqual($expected, $result);
-		
+
 		$result = Libraries::locate('sources', 'Http');
 		$expected = 'lithium\data\source\Http';
 		$this->assertEqual($expected, $result);

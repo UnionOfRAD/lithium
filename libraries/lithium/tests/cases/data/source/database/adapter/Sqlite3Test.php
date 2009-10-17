@@ -115,7 +115,7 @@ class Sqlite3Test extends \lithium\test\Unit {
 	}
 
 	public function testAbstractColumnResolution() {
-		
+
 	}
 
 	public function testExecuteException() {

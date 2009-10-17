@@ -32,7 +32,7 @@ abstract class Database extends \lithium\data\Source {
 	abstract public function encoding($encoding = null);
 
 	abstract public function result($type, $resource, $context);
-	
+
 	abstract public function error();
 
 	public function __construct($config = array()) {
@@ -78,14 +78,14 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	public function create($record, $options = array()) {
-		
+
 	}
 
 	/**
 	 * Reads records from a database using a `Query` object or raw SQL string.
 	 *
-	 * @param string $query 
-	 * @param string $options 
+	 * @param string $query
+	 * @param string $options
 	 * @return void
 	 */
 	public function read($query, $options = array()) {
@@ -120,11 +120,11 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	public function update($query, $options) {
-		
+
 	}
 
 	public function delete($query, $options) {
-		
+
 	}
 
 	public function renderCommand($type, $data, $context) {
@@ -476,7 +476,7 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Returns a fully-qualified table name (i.e. with prefix), quoted.
 	 *
-	 * @param string $entity 
+	 * @param string $entity
 	 * @return string
 	 */
 	protected function _entityName($entity) {
