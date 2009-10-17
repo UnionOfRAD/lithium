@@ -120,6 +120,24 @@ class Form extends \lithium\template\Helper {
 		);
 	}
 
+	public function create($modelName, $options = array()) {
+		list($name, $options, $template) = $this->_defaults('form', $name, $options);
+		return $this->_render(__METHOD__, $template, compact('name', 'options'));
+	}
+
+	public function submit($buttonText = null, $options = array()) {
+		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		return $this->_render(__METHOD__, $template, compact('name', 'options'));	    
+	}
+
+	public function end($submitButtonText = null) {
+	    $output = '';
+	    if ($submitButtonText !== null) {
+		$output = $this->submit($submitButtonText);
+	    }
+	    return $output.$this->_strings['form-end'];
+	}
+
 	public function text($name, $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
