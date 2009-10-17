@@ -138,6 +138,12 @@ class Form extends \lithium\template\Helper {
 	    return $output.$this->_strings['form-end'];
 	}
 
+	public function textarea($name, $options = array()) {
+		$content = isset($options['value'])?$options['value']:null;
+		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		return $this->_render(__METHOD__, $template, compact('name', 'options', 'content'));
+	}
+
 	public function text($name, $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
