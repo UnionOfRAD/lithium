@@ -61,7 +61,7 @@ class HttpMock extends \lithium\data\source\Http {
 class HttpTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
-		'adapter' => '\lithium\tests\cases\data\source\SocketMock',
+		'socket' => '\lithium\tests\cases\data\source\SocketMock',
 		'persistent' => false,
 		'protocol' => 'tcp',
 		'host' => 'localhost',

@@ -52,6 +52,12 @@ class Libraries {
 			'{:library}\extensions\sockets\{:name}',
 			'{:library}\{:class}\socket\{:name}' => array('libraries' => 'lithium')
 		),
+		'sources'    => array(
+			'{:library}\extensions\data\sources\{:class}\adapter\{:name}',
+			'{:library}\extensions\data\sources\{:name}',
+			'{:library}\data\source\{:class}\adapter\{:name}' => array('libraries' => 'lithium'),
+			'{:library}\data\source\{:name}' => array('libraries' => 'lithium')
+		),
 		'testFilters' => array(
 			'{:library}\tests\filters\{:name}',
 			'{:library}\test\filters\{:name}' => array('libraries' => 'lithium')

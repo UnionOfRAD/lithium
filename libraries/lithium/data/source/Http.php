@@ -65,6 +65,7 @@ class Http extends \lithium\data\Source {
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(
+			'socket'    => 'Stream',
 			'adapter'    => 'Stream',
 			'persistent' => false,
 			'protocol'   => 'tcp',
@@ -89,9 +90,9 @@ class Http extends \lithium\data\Source {
 	}
 
 	protected function _init() {
-		$socket = $this->_config['adapter'];
+		$socket = $this->_config['socket'];
 		if (!class_exists($socket)) {
-			$socket = Libraries::locate('sockets.util', $this->_config['adapter']);
+			$socket = Libraries::locate('sockets.util', $this->_config['socket']);
 		}
 		$this->_connection = new $socket($this->_config);
 		$this->request = new $this->_classes['request']($this->_config);
