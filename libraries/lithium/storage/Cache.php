@@ -1,10 +1,6 @@
 <?php
 /**
  * Lithium: the most rad php framework
- * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
- *
- * Licensed under The BSD License
- * Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
@@ -36,7 +32,6 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param array $data If a lambda/closure is used as a key and requires arguments,
 	 *                    pass them in here.
      * @return string     The generated cache key.
-	 * @access public
 	 */
 	public static function key($key, $data = array()) {
 		$key = is_object($key) ? $key($data) : $key;
@@ -52,7 +47,6 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param  mixed   $conditions Conditions for the write operation to proceed
 	 * @return boolean             True on successful cache write, false otherwise
 	 * @strategy
-	 * @access public
 	 */
 	public static function write($name, $key, $data, $expiry, $conditions = null) {
 		$settings = static::config();

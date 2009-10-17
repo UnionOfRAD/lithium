@@ -47,9 +47,7 @@ class Dispatcher extends \lithium\core\Object {
 	 * @see lithium\console\Dispatcher::config()
 	 * @see lithium\util\String::insert()
 	 */
-	protected static $_rules = array(
-		//'plugin' => array('command' => '{:plugin}.{:command}')
-	);
+	protected static $_rules = array();
 
 	/**
 	 * Used to set configuration parameters for the Dispatcher.
@@ -90,10 +88,11 @@ class Dispatcher extends \lithium\core\Object {
 		}
 		$router = static::$_classes['router'];
 		$request->params = static::_applyRules($router::parse($request));
+
 		$class = $request->params['command'] ?: '\lithium\console\Command';
 
 		if ($class[0] !== '\\') {
-			$class = Libraries::locate('commands', Inflector::camelize($class));
+			$class = Libraries::locate('commands', $request->params['command']);
 		}
 
 		$isRun = (
@@ -107,7 +106,9 @@ class Dispatcher extends \lithium\core\Object {
 		}
 
 		if (!class_exists($class)) {
-			throw new UnexpectedValueException("Command $class not found");
+			throw new UnexpectedValueException(
+				"Command {$request->params['command']} not found"
+			);
 		}
 
 		$command = new $class(compact('request'));

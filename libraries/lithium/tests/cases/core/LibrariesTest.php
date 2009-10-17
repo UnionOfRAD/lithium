@@ -30,6 +30,11 @@ class LibrariesTest extends \lithium\test\Unit {
 		$all = Libraries::find('lithium', array('recursive' => true));
 		$result = array_values(preg_grep('/^lithium\\\\tests\\\\cases\\\\/', $all));
 		$this->assertIdentical($tests, $result);
+
+		$tests = Libraries::find('app', array('recursive' => true, 'path' => '/tests/cases'));
+		$result = preg_grep('/^app\\\\tests\\\\cases\\\\/', $tests);
+		$this->assertIdentical($tests, $result);
+
 	}
 
 	/**
@@ -40,13 +45,14 @@ class LibrariesTest extends \lithium\test\Unit {
 	public function testLibraryConfigAccess() {
 		$result = Libraries::get('lithium');
 		$expected = array(
-			'loader' => 'lithium\\core\\Libraries::load',
 			'path' => LITHIUM_LIBRARY_PATH . '/lithium',
+			'loader' => 'lithium\\core\\Libraries::load',
 			'prefix' => 'lithium\\',
 			'suffix' => '.php',
 			'transform' => null,
 			'bootstrap' => null,
-			'defer' => true
+			'defer' => true,
+			'includePath' => false
 		);
 		$this->assertEqual($expected, $result);
 		$this->assertNull(Libraries::get('foo'));

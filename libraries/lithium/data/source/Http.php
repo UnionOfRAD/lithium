@@ -155,14 +155,7 @@ class Http extends \lithium\data\Source {
 			return false;
 		}
 		$this->request->method = 'POST';
-		if (!empty($data)) {
-			$this->request->headers(array(
-				'Content-Type' => 'application/x-www-form-urlencoded',
-			));
-			$this->request->body(
-				substr($this->request->queryString($data), 1)
-			);
-		}
+		$this->_prepare($data);
 		return $this->_send($path);
 	}
 
@@ -171,12 +164,13 @@ class Http extends \lithium\data\Source {
 	 *
 	 * @return string
 	 */
-	public function put($path = null, $params = array()) {
+	public function put($path = null, $data = array()) {
 		if ($this->connect() === false) {
 			return false;
 		}
 		$this->request->method = 'PUT';
-		return $this->_send($path, $params);
+		$this->_prepare($data);
+		return $this->_send($path);
 	}
 
 	/**
@@ -226,6 +220,26 @@ class Http extends \lithium\data\Source {
 	 */
 	public function delete($query, $options = array()) {
 		return $this->del();
+	}
+
+	/**
+	 * Prepares data for sending
+	 *
+	 * @return string
+	 *
+	 **/
+
+	protected function _prepare($data = array()) {
+		if (empty($data)) {
+			return null;
+		}
+		if (is_array($data)) {
+			$this->request->headers(array(
+				'Content-Type' => 'application/x-www-form-urlencoded',
+			));
+			$data = substr($this->request->queryString($data), 1);
+		}
+		return $this->request->body($data);
 	}
 
 	/**

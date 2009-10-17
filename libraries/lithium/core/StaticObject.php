@@ -1,10 +1,6 @@
 <?php
 /**
  * Lithium: the most rad php framework
- * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
- *
- * Licensed under The BSD License
- * Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
@@ -96,7 +92,6 @@ class StaticObject {
 	 * @param  string        $name     Name of cache configuration.
 	 * @param  string|array  $strategy Fully namespaced cache strategy identifier.
 	 * @return mixed                   See above description.
-	 * @access public
 	 */
 	public static function strategies($name = '', $strategy = null) {
 		if (empty($name)) {

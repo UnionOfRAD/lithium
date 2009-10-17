@@ -1,10 +1,6 @@
 <?php
 /**
  * Lithium: the most rad php framework
- * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
- *
- * Licensed under The BSD License
- * Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
@@ -269,7 +265,6 @@ class Request extends \lithium\core\Object {
 	 * @param string $default Default URL to use if HTTP_REFERER cannot be read from headers
 	 * @param boolean $local If true, restrict referring URLs to local server
 	 * @return string Referring URL
-	 * @access public
 	 * @todo Rewrite me to remove constant dependencies
 	 */
 	function referer($default = null, $local = false) {
@@ -349,9 +344,11 @@ class Request extends \lithium\core\Object {
 	 */
 	protected function _base() {
 		$base = dirname($this->env('PHP_SELF'));
-
+		if ($base === '/') {
+			return null;
+		}
 		while (in_array(basename($base), array('app', 'webroot'))) {
-			$base = dirname($base);
+			$base = ltrim(dirname($base), '.');
 		}
 		return $base;
 	}

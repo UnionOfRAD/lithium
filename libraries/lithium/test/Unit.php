@@ -543,6 +543,9 @@ class Unit extends \lithium\core\Object {
 					$data[] = $compare;
 				}
 			}
+			if (empty($data)) {
+				return compact('trace', 'expected', 'result');
+			}
 			return $data;
 		}
 

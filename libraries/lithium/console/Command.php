@@ -94,6 +94,9 @@ class Command extends \lithium\core\Object {
 		$this->header('Available Commands');
 
 		foreach (Libraries::locate('commands') as $command) {
+			if (preg_match("/commands\\\(.*?)\\\.*?/", $command)) {
+				continue;
+			}
 			$command = explode('\\', $command);
 			$this->out(' - ' . Inflector::underscore(array_pop($command)));
 		}

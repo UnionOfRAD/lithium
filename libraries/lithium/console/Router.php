@@ -59,8 +59,7 @@ class Router extends \lithium\core\Object {
 		}
 
 		if (!empty($params['passed'][0])) {
-			$params['action'] = $params['passed'][0];
-			unset($params['passed'][0]);
+			$params['action'] = array_shift($params['passed']);
 			$params['passed'] = array_values($params['passed']);
 		}
 		return $params;

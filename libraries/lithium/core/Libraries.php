@@ -1,10 +1,6 @@
 <?php
 /**
  * Lithium: the most rad php framework
- * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
- *
- * Licensed under The BSD License
- * Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
@@ -98,6 +94,8 @@ class Libraries {
 	 *                returns a file path as output.
 	 *              - 'defer': If true, indicates that, when locating classes, this library should
 	 *                defer to other libraries in order of preference.
+	 *              - 'includePath': If true, appends the absolutely-resolved value of `'path'` to
+	 *                the PHP include path.
 	 * @return array Returns the resulting set of options created for this library.
 	 */
 	public static function add($name, $config = array()) {
@@ -108,7 +106,8 @@ class Libraries {
 			'suffix' => '.php',
 			'transform' => null,
 			'bootstrap' => null,
-			'defer' => false
+			'defer' => false,
+			'includePath' => false
 		);
 
 		switch ($name) {
@@ -126,6 +125,11 @@ class Libraries {
 			return static::_addPlugins((array)$config);
 		}
 		static::$_configurations[$name] = ((array)$config += $defaults);
+
+		if ($config['includePath']) {
+			$path = ($config['includePath'] === true) ? $config['path'] : $config['includePath'];
+			set_include_path(get_include_path() . ':' . $path);
+		}
 
 		if (!empty($config['bootstrap'])) {
 			if ($config['bootstrap'] === true) {
