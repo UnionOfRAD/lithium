@@ -6,8 +6,6 @@ use \lithium\util\Inflector;
 
 class PagesController extends \lithium\action\Controller {
 
-	public $helpers = array('Html');
-
 	public function view() {
 		$path = func_get_args();
 
