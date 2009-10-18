@@ -31,7 +31,7 @@ class UnitTest extends \lithium\test\Unit {
 
 	public function testCompare() {
 		$expected = array('trace' => null, 'expected' => 'array', 'result' => 'string');
-		$result = $this->compare(array(), 'string');
+		$result = $this->compare('equal', array(), 'string');
 		$this->assertEqual($expected, $result);
 	}
 

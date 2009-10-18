@@ -230,6 +230,45 @@ class RouterTest extends \lithium\test\Unit {
 		$expected = '#top';
 		$this->assertEqual($expected, $result);
 	}
+
+
+	public function testWithWildcardString() {
+		Router::connect('/add/{:args}', array(
+			'controller' => 'tests', 'action' => 'add'
+		));
+
+		$expected = '/add';
+		$result = Router::match('/add');
+		$this->assertEqual($expected, $result);
+
+		$expected = '/add/alke';
+		$result = Router::match('/add/alke');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testWithWildcardArray() {
+		Router::connect('/add/{:args}', array(
+			'controller' => 'tests', 'action' => 'add'
+		));
+
+		$expected = '/add';
+		$result = Router::match(array(
+			'controller' => 'tests', 'action' => 'add'
+		));
+		$this->assertEqual($expected, $result);
+
+		$expected = '/add/alke';
+		$result = Router::match(array(
+			'controller' => 'tests', 'action' => 'add', 'alke'
+		));
+		$this->assertEqual($expected, $result);
+
+		$expected = '/add/alke/php';
+		$result = Router::match(array(
+			'controller' => 'tests', 'action' => 'add', 'alke', 'php'
+		));
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
