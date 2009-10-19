@@ -66,8 +66,7 @@ class Http extends \lithium\data\Source {
 	public function __construct($config = array()) {
 		$defaults = array(
 			'socket'    => 'Stream',
-			'adapter'    => 'Stream',
-			'socket'    => null,
+			'adapter'    => null,
 			'persistent' => false,
 			'protocol'   => 'tcp',
 			'host'       => 'localhost',
