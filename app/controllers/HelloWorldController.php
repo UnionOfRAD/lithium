@@ -4,8 +4,6 @@ namespace app\controllers;
 
 class HelloWorldController extends \lithium\action\Controller {
 
-	public $helpers = array();
-
 	public function index() {
 		$this->render(array('layout' => false));
 	}

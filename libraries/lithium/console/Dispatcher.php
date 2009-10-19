@@ -1,10 +1,6 @@
 <?php
 /**
  * Lithium: the most rad php framework
- * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
- *
- * Licensed under The BSD License
- * Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
@@ -47,7 +43,9 @@ class Dispatcher extends \lithium\core\Object {
 	 * @see lithium\console\Dispatcher::config()
 	 * @see lithium\util\String::insert()
 	 */
-	protected static $_rules = array();
+	protected static $_rules = array(
+		//'plugin' => array('command' => '{:plugin}.{:command}')
+	);
 
 	/**
 	 * Used to set configuration parameters for the Dispatcher.
@@ -88,11 +86,10 @@ class Dispatcher extends \lithium\core\Object {
 		}
 		$router = static::$_classes['router'];
 		$request->params = static::_applyRules($router::parse($request));
-
 		$class = $request->params['command'] ?: '\lithium\console\Command';
 
 		if ($class[0] !== '\\') {
-			$class = Libraries::locate('commands', $request->params['command']);
+			$class = Libraries::locate('commands', Inflector::camelize($class));
 		}
 
 		$isRun = (
@@ -106,9 +103,7 @@ class Dispatcher extends \lithium\core\Object {
 		}
 
 		if (!class_exists($class)) {
-			throw new UnexpectedValueException(
-				"Command {$request->params['command']} not found"
-			);
+			throw new UnexpectedValueException("Command $class not found");
 		}
 
 		$command = new $class(compact('request'));

@@ -494,11 +494,6 @@ class Unit extends \lithium\core\Object {
 	 * @return array Data with the keys `trace'`, `'expected'` and `'result'`.
 	 */
 	protected function _compare($type, $expected, $result = null, $trace = null) {
-		if ($result == null) {
-			$result = $expected;
-			$expected = $type;
-			$type = 'equal';
-		}
 		$types = array(
 			'trace' => $trace, 'expected' => gettype($expected), 'result' => gettype($result)
 		);
@@ -542,6 +537,9 @@ class Unit extends \lithium\core\Object {
 				if ($compare !== true) {
 					$data[] = $compare;
 				}
+			}
+			if (empty($data)) {
+				return compact('trace', 'expected', 'result');
 			}
 			return $data;
 		}
