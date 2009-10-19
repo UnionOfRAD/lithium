@@ -69,25 +69,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 				}
 				return $name;
 			};
-			$plugins = $tests($tests, LITHIUM_APP_PATH . '/libraries/plugins');
-			$pluginTests = array();
-			foreach ($plugins as $key => $plugin) {
-				if (is_array($plugin)) {
-					$plugin = key($plugin);
-					$pluginTestPath = LITHIUM_APP_PATH
-						. "/libraries/plugins/{$plugin}/tests/cases";
-					$results = $tests($tests, $pluginTestPath);
-					if (is_array($results)) {
-						$pluginTests[$plugin] = $results;
-					}
-				}
-			}
-
-			$data = array(
-				'app' => $tests($tests, LITHIUM_APP_PATH . '/tests/cases'),
-				'plugins' => $pluginTests,
-				'lithium' => $tests($tests, LITHIUM_LIBRARY_PATH . '/lithium/tests/cases'),
-			);
+			$data = $tests($tests, LITHIUM_LIBRARY_PATH . '/lithium/tests/cases');
 		}
 		$result = null;
 
@@ -96,7 +78,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 				if ($test == 'group') {
 					return '<li><a href="?group=%1$s">%2$s</a><ul>%3$s</ul></li>';
 				}
-				return '<li><a href="?case=%2$s\%1$s">%1$s</a></li>';
+				return '<li><a href="?case=\lithium\tests\cases%2$s\%1$s">%1$s</a></li>';
 			}
 
 			if ($type == 'txt') {
@@ -112,16 +94,9 @@ class Dispatcher extends \lithium\core\StaticObject {
 				if (is_array($row)) {
 					if (is_string($key)) {
 						$key = strtolower($key);
-						if ($parent == null || $key == 'lithium') {
-							$parent = '\\' . $key .'\tests\cases';
-						} else {
-							$parent = $parent . '\\' . $key;
-						}
-						if ($key == 'plugins') {
-							$parent = null;
-						}
-						$result .= sprintf($format('group'), $parent, $key,
-							static::menu($type, $row, $parent)
+						$parent = $parent . '\\' . $key;
+						$result = sprintf(
+							$format('group'), $parent, $key, static::menu($type, $row, $parent)
 						);
 					} else {
 						$result .= static::menu($type, $row, $parent);
