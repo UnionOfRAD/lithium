@@ -1,10 +1,6 @@
 <?php
 /**
  * Lithium: the most rad php framework
- * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
- *
- * Licensed under The BSD License
- * Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
@@ -99,7 +95,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 
 	public function testStreamConnection() {
 		$config = array(
-			'adapter' => 'Stream',
+			'socket' => 'Stream',
 			'host' => 'localhost',
 			'login' => 'root',
 			'password' => '',
@@ -108,7 +104,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 
 		Connections::add('stream-test', 'Http', $config);
 		$result = Connections::get('stream-test');
-		$this->assertTrue($result instanceof \lithium\data\source\http\adapter\Stream);
+		$this->assertTrue($result instanceof \lithium\data\source\Http);
 	}
 }
 

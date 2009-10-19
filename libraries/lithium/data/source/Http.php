@@ -67,6 +67,7 @@ class Http extends \lithium\data\Source {
 		$defaults = array(
 			'socket'    => 'Stream',
 			'adapter'    => 'Stream',
+			'socket'    => null,
 			'persistent' => false,
 			'protocol'   => 'tcp',
 			'host'       => 'localhost',
