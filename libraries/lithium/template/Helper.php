@@ -119,8 +119,10 @@ abstract class Helper extends \lithium\core\Object {
 		$value = (string)$value;
 
 		if (in_array($key, $this->_minimized)) {
-			$isMini = ($value === 1 || $value === true || $value === 'true' || $value == $key);
-			$value = $isMini ? $key : $value;
+			$isMini = ($value == 1 || $value === true || $value === 'true' || $value == $key);
+			if (!($value = $isMini ? $key : $value)) {
+				return null;
+			}
 		}
 
 		if ($options['escape']) {
