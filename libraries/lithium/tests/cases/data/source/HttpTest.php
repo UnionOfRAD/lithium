@@ -57,7 +57,7 @@ class HttpMock extends \lithium\data\source\Http {
 class HttpTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
-		'adapter' => '\lithium\tests\cases\data\source\SocketMock',
+		'socket' => '\lithium\tests\cases\data\source\SocketMock',
 		'persistent' => false,
 		'protocol' => 'tcp',
 		'host' => 'localhost',
@@ -127,7 +127,7 @@ class HttpTest extends \lithium\test\Unit {
 		$result = $http->response->charset;
 		$this->assertEqual($expected, $result);
 	}
-	
+
 	public function testGetPath() {
 		$http = new HttpMock($this->_testConfig);
 		$result = $http->get('search.json');
