@@ -146,6 +146,13 @@ class LibrariesTest extends \lithium\test\Unit {
 		$expected = 'lithium\storage\cache\adapters\File';
 		$this->assertEqual($expected, $result);
 
+		$result = Libraries::locate('dataSources', 'Database');
+		$expected = 'lithium\data\source\Database';
+		$this->assertEqual($expected, $result);
+
+		$result = Libraries::locate('dataSources.database', 'MySql');
+		$expected = 'lithium\data\source\database\adapter\MySql';
+		$this->assertEqual($expected, $result);
 	}
 }
 
