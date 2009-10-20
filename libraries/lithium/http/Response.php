@@ -105,37 +105,28 @@ class Response extends \lithium\http\Base {
 		}
 		if (!empty($config['message'])) {
 			$parts = explode("\r\n\r\n", $config['message'], 2);
-
-			if (empty($parts)) {
-				return false;
-			}
 			$headers = str_replace("\r", "", explode("\n", array_shift($parts)));
 
-			if (empty($headers)) {
-				return false;
+			if (array_filter($headers) == array()) {
+				return;
 			}
-			preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)\s+(\w+)/i',
-				array_shift($headers), $match
-			);
+			preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)\s+(\w+)/i', array_shift($headers), $match);
+
 			if (!empty($match)) {
-				list($line, $this->version,
-					$this->status['code'], $this->status['message']
-				) = $match;
+				list($line, $this->version, $code, $message) = $match;
+				$this->status = compact('code', 'message') + $this->status;
 			}
 			$this->protocol = "HTTP/{$this->version}";
-
 			$this->headers($headers);
 
 			if (!empty($this->headers['Content-Type'])) {
-				preg_match('/^(.*?);charset=(.+)/i',
-					$this->headers['Content-Type'], $match
-				);
+				preg_match('/^(.*?);charset=(.+)/i', $this->headers['Content-Type'], $match);
+
 				if (!empty($match)) {
 					$this->type = trim($match[1]);
 					$this->charset = trim($match[2]);
 				}
 			}
-
 			$this->body(array_shift($parts));
 		}
 	}
