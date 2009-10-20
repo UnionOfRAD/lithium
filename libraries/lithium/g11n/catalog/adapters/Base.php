@@ -10,8 +10,17 @@ namespace lithium\g11n\catalog\adapters;
 
 use \lithium\util\Set;
 
+/**
+ * Base class for all g11n catalog adapters.
+ */
 abstract class Base extends \lithium\core\Object {
 
+	/**
+	 * A cascade of categories supported. If re-defined in sub-classes
+	 * contents are being merged.
+	 *
+	 * @var array
+	 */
 	protected $_categories = array(
 		'inflection' => array(
 			'plural'            => array('read' => false, 'write' => false),
@@ -48,6 +57,13 @@ abstract class Base extends \lithium\core\Object {
 		$this->_categories = Set::merge($properties['_categories'], $this->_categories);
 	}
 
+	/**
+	 * Checks if an operation for a category is supported.
+	 *
+	 * @param string $category Dot-delimited category.
+	 * @param string $operation Operation to check for. Either `'read'` or `'write'`.
+	 * @return boolean True if operation is supported, otherwise false.
+	 */
 	public function isSupported($category, $operation) {
 		$category = explode('.', $category, 2);
 		return $this->_categories[$category[0]][$category[1]][$operation];
@@ -74,6 +90,13 @@ abstract class Base extends \lithium\core\Object {
 	 */
 	abstract public function write($category, $locale, $scope, $data);
 
+	/**
+	 * Formats a message item if neccessary.
+	 *
+	 * @param string $key The potential message ID.
+	 * @param string|array $value The message value.
+	 * @return array Message item formatted into internal/verbose format.
+	 */
 	protected function _formatMessageItem($key, $value) {
 		if (!is_array($value) || !isset($value['translated'])) {
 			return array('singularId' => $key, 'translated' => (array)$value);

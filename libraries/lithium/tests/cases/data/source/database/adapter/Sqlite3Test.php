@@ -1,6 +1,10 @@
 <?php
 /**
  * Lithium: the most rad php framework
+ * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ *
+ * Licensed under The BSD License
+ * Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
@@ -9,36 +13,36 @@
 namespace lithium\tests\cases\data\source\database\adapter;
 
 use \lithium\data\Connections;
-use \lithium\data\source\database\adapter\MySql;
+use \lithium\data\source\database\adapter\Sqlite3;
 
-class MySqlMock extends MySql {
+class SqliteMock extends Sqlite3 {
 
 	public function get($var) {
 		return $this->{$var};
 	}
 }
 
-class MySqlTest extends \lithium\test\Unit {
+class Sqlite3Test extends \lithium\test\Unit {
 
 	protected $_dbConfig = array();
 
 	public $db = null;
 
 	/**
-	 * Skip the test if a MySQL adapter configuration is unavailable.
+	 * Skip the test if a Sqlite adapter configuration is unavailable.
 	 *
 	 * @return void
 	 * @todo Tie into the Environment class to ensure that the test database is being used.
 	 */
 	public function skip() {
-		$this->_dbConfig = Connections::get('default', array('config' => true));
-		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'MySql');
-		$message = 'Test database is either unavailable, or not using a MySQL adapter';
+		$this->_dbConfig = Connections::get('sqlite3', array('config' => true));
+		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'Sqlite3');
+		$message = 'Test database is either unavailable, or not using a Sqlite adapter';
 		$this->skipIf(!$hasDb, $message);
 	}
 
 	public function setUp() {
-		$this->db = new MySql($this->_dbConfig);
+		$this->db = new Sqlite3($this->_dbConfig);
 	}
 
 	/**
@@ -47,11 +51,18 @@ class MySqlTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testConstructorDefaults() {
-		$db = new MySqlMock(array('autoConnect' => false));
+		$db = new SqliteMock(array('autoConnect' => false));
 		$result = $db->get('_config');
 		$expected = array(
-			'autoConnect' => false, 'port' => '3306', 'persistent' => true, 'host' => 'localhost',
-			'login' => 'root', 'password' => '', 'database' => 'lithium', 'init' => true
+		  'autoConnect' => false,
+		  'database' => '',
+		  'flags' => NULL,
+		  'key' => NULL,
+		  'persistent' => true,
+		  'host' => 'localhost',
+		  'login' => 'root',
+		  'password' => '',
+		  'init' => true,
 		);
 		$this->assertEqual($expected, $result);
 	}
@@ -63,7 +74,7 @@ class MySqlTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testDatabaseConnection() {
-		$db = new MySql(array('autoConnect' => false) + $this->_dbConfig);
+		$db = new Sqlite3(array('autoConnect' => false) + $this->_dbConfig);
 		$this->assertTrue($db->connect());
 		$this->assertTrue($db->isConnected());
 

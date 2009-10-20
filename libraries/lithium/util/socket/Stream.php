@@ -62,17 +62,14 @@ class Stream extends \lithium\util\Socket {
 			return false;
 		}
 		
+		$buffer = null;
 		if (is_null($length)) {
 			$buffer = stream_get_contents($this->_resource);
 		} else {
 			$buffer = stream_get_contents($this->_resource, $length, $offset);
 		}
 
-		$info = stream_get_meta_data($this->_resource);
-		if (empty($info['timed_out'])) {
-			return $buffer;
-		}
-		return false;
+		return $buffer;
 	}
 
 	public function write($data) {

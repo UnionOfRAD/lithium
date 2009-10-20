@@ -11,8 +11,21 @@ namespace lithium\g11n;
 use \BadMethodCallException;
 use \InvalidArgumentException;
 
+/**
+ * Locale class.
+ *
+ * @method string|void language(string $locale) Parses a locale and returns it's language tag.
+ * @method string|void script(string $locale) Parses a locale and returns it's script tag.
+ * @method string|void territory(string $locale) Parses a locale and returns it's territory tag.
+ * @method string|void variant(string $locale) Parses a locale and returns it's variant tag.
+ */
 class Locale extends \lithium\core\StaticObject {
 
+	/**
+	 * Properties for locale tags.
+	 *
+	 * @var array
+	 */
 	protected static $_tags = array(
 		'language' => array('formatter' => 'strtolower'),
 		'script' => array('formatter' => array('strtolower', 'ucfirst')),
@@ -20,6 +33,13 @@ class Locale extends \lithium\core\StaticObject {
 		'variant' => array('formatter' => 'strtoupper')
 	);
 
+	/**
+	 * Magic method enabling tag methods.
+	 *
+	 * @param string $method
+	 * @param array $params
+	 * @return string|void
+	 */
 	public static function __callStatic($method, $params = array()) {
 		$tags = static::invokeMethod('decompose', $params);
 
@@ -70,14 +90,6 @@ class Locale extends \lithium\core\StaticObject {
 		}
 		return array_filter(array_intersect_key($matches, static::$_tags));
 	}
-
-	// public static function language($locale) {}
-
-	// public static function script($locale) {}
-
-	// public static function territory($locale) {}
-
-	// public static function variant($locale) {}
 
 	/**
 	 * Returns a locale in it's canonical form with tags formatted properly.
