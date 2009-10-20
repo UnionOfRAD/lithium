@@ -31,7 +31,7 @@ use \lithium\util\String;
  *
  * You may then render CSV content from anywhere in your application. For example, in a controller
  * you may do the following:
- * 
+ *
  * {{{$this->render(array('csv', 'data' => Post::find('all')));}}}
  */
 class Media extends \lithium\core\Object {

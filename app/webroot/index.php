@@ -7,7 +7,7 @@
  */
 
 /**
- * Welcome to Lithium 3!  This front-controller file is the gateway to your application. It is
+ * Welcome to Lithium!  This front-controller file is the gateway to your application. It is
  * responsible for intercepting requests, and handing them off to the Dispatcher for processing.
  *
  * If you're sharing a single Lithium core install or other libraries among multiple
