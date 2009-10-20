@@ -1,6 +1,10 @@
 <?php
 /**
  * Lithium: the most rad php framework
+ * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ *
+ * Licensed under The BSD License
+ * Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
@@ -61,8 +65,8 @@ class Http extends \lithium\data\Source {
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(
-			'adapter'    => 'Stream',
-			'socket'    => null,
+			'socket'    => 'Stream',
+			'adapter'    => null,
 			'persistent' => false,
 			'protocol'   => 'tcp',
 			'host'       => 'localhost',
@@ -71,7 +75,7 @@ class Http extends \lithium\data\Source {
 			'login'      => 'root',
 			'password'   => '',
 			'port'       => 80,
-			'timeout'    => 30,
+			'timeout'    => 1,
 			'encoding'   => 'UTF-8'
 		);
 		$config = (array)$config + $defaults;
@@ -151,14 +155,7 @@ class Http extends \lithium\data\Source {
 			return false;
 		}
 		$this->request->method = 'POST';
-		if (!empty($data)) {
-			$this->request->headers(array(
-				'Content-Type' => 'application/x-www-form-urlencoded',
-			));
-			$this->request->body(
-				substr($this->request->queryString($data), 1)
-			);
-		}
+		$this->_prepare($data);
 		return $this->_send($path);
 	}
 
@@ -167,12 +164,13 @@ class Http extends \lithium\data\Source {
 	 *
 	 * @return string
 	 */
-	public function put($path = null, $params = array()) {
+	public function put($path = null, $data = array()) {
 		if ($this->connect() === false) {
 			return false;
 		}
 		$this->request->method = 'PUT';
-		return $this->_send($path, $params);
+		$this->_prepare($data);
+		return $this->_send($path);
 	}
 
 	/**
@@ -225,18 +223,40 @@ class Http extends \lithium\data\Source {
 	}
 
 	/**
+	 * Prepares data for sending
+	 *
+	 * @return string
+	 *
+	 **/
+
+	protected function _prepare($data = array()) {
+		if (empty($data)) {
+			return null;
+		}
+		if (is_array($data)) {
+			$this->request->headers(array(
+				'Content-Type' => 'application/x-www-form-urlencoded',
+			));
+			$data = substr($this->request->queryString($data), 1);
+		}
+		return $this->request->body($data);
+	}
+
+	/**
 	 * Send request and return response data
 	 *
 	 * @return string
 	 */
 	protected function _send($path = null) {
 		$this->request->path .= $path;
-
-		if ($this->_connection->write((string) $this->request)) {
+		$request = (string) $this->request;
+		if ($this->_connection->write($request)) {
 			$message = $this->_connection->read();
 			$this->response = new $this->_classes['response'](compact('message'));
+			$this->request = new $this->_classes['request']($this->_config);
 			return $this->response->body();
 		}
+		return null;
 	}
 }
 

@@ -98,25 +98,22 @@ class Response extends \lithium\http\Base {
 	 * @return void
 	 */
 	public function __construct($config = array()) {
-		foreach ($config as $key => $value) {
-			if (isset($this->{$key})) {
-				$this->{$key} = $value;
-			}
-		}
 		if (!empty($config['message'])) {
-			$parts = explode("\r\n\r\n", $config['message'], 2);
+			$parts = explode("\r\n\r\n", $config['message']);
 
 			if (empty($parts)) {
 				return false;
 			}
+
 			$headers = str_replace("\r", "", explode("\n", array_shift($parts)));
 
 			if (empty($headers)) {
 				return false;
 			}
-			preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)\s+(\w+)/i',
+			preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)\s+(.*)/i',
 				array_shift($headers), $match
 			);
+
 			if (!empty($match)) {
 				list($line, $this->version,
 					$this->status['code'], $this->status['message']
@@ -136,7 +133,18 @@ class Response extends \lithium\http\Base {
 				}
 			}
 
-			$this->body(array_shift($parts));
+			$body = implode("\r\n\r\n", $parts);
+			if (isset($this->headers['Transfer-Encoding'])) {
+				$body = $this->_chunkDecode($body);
+			}
+			$this->body($body);
+			unset($config['message']);
+		}
+
+		foreach ((array)$config as $key => $value) {
+			if (isset($this->{$key})) {
+				$this->{$key} = $value;
+			}
 		}
 	}
 
@@ -191,6 +199,40 @@ class Response extends \lithium\http\Base {
 
 		$message = join("\r\n", $response);
 		return $message;
+	}
+
+	/**
+	* Decodes chunked body
+	*
+	* @return string
+	*/
+	protected function _chunkDecode($in) {
+		$out = '';
+		while($in != '') {
+			$lf_pos = strpos($in, "\012");
+			if($lf_pos === false) {
+				$out .= $in;
+				break;
+			}
+			$chunk_hex = trim(substr($in, 0, $lf_pos));
+			$sc_pos = strpos($chunk_hex, ';');
+			if($sc_pos !== false) {
+				$chunk_hex = substr($chunk_hex, 0, $sc_pos);
+			}
+			if($chunk_hex == '') {
+				$out .= substr($in, 0, $lf_pos);
+				$in = substr($in, $lf_pos + 1);
+				continue;
+			}
+			$chunk_len = hexdec($chunk_hex);
+			if($chunk_len) {
+				$out .= substr($in, $lf_pos + 1, $chunk_len);
+				$in = substr($in, $lf_pos + 2 + $chunk_len);
+			} else {
+				$in = '';
+			}
+		}
+		return $out;
 	}
 }
 
