@@ -64,7 +64,7 @@ class Router extends \lithium\core\StaticObject {
 			if (strpos($path, '#') === 0 || strpos($path, 'mailto') === 0 || strpos($path, '://')) {
 				return $path;
 			}
-			$base = rtrim(isset($context) ? $context->env('base') : '', '/');
+			$base = isset($context) ? $context->env('base') : '';
 			$path = trim($path, '/');
 			return "{$base}/{$path}";
 		}
