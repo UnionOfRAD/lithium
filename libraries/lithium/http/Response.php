@@ -107,32 +107,28 @@ class Response extends \lithium\http\Base {
 
 			$headers = str_replace("\r", "", explode("\n", array_shift($parts)));
 
-			if (empty($headers)) {
-				return false;
+			if (array_filter($headers) == array()) {
+				return;
 			}
 			preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)\s+(.*)/i',
 				array_shift($headers), $match
 			);
 
 			if (!empty($match)) {
-				list($line, $this->version,
-					$this->status['code'], $this->status['message']
-				) = $match;
+				list($line, $this->version, $code, $message) = $match;
+				$this->status = compact('code', 'message') + $this->status;
 			}
 			$this->protocol = "HTTP/{$this->version}";
-
 			$this->headers($headers);
 
 			if (!empty($this->headers['Content-Type'])) {
-				preg_match('/^(.*?);charset=(.+)/i',
-					$this->headers['Content-Type'], $match
-				);
+				preg_match('/^(.*?);charset=(.+)/i', $this->headers['Content-Type'], $match);
+
 				if (!empty($match)) {
 					$this->type = trim($match[1]);
 					$this->charset = trim($match[2]);
 				}
 			}
-
 			$body = implode("\r\n\r\n", $parts);
 			if (isset($this->headers['Transfer-Encoding'])) {
 				$body = $this->_chunkDecode($body);

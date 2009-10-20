@@ -48,9 +48,16 @@ class SocketMock extends \lithium\util\Socket {
 
 class HttpMock extends \lithium\data\source\Http {
 
+	public $testRequest = null;
+
 	public function response($message) {
 		$this->response = new $this->_classes['response'](compact('message'));
 		return $this->_response->body;
+	}
+
+	protected function _send($path = null) {
+		$this->testRequest = $this->request;
+		return parent::_send($path);
 	}
 }
 
@@ -167,7 +174,7 @@ class HttpTest extends \lithium\test\Unit {
 			'Content-Length: 11',
 			'', 'status=cool'
 		));
-		$result = (string)$http->request;
+		$result = (string)$http->testRequest;
 		$this->assertEqual($expected, $result);
 	}
 
