@@ -37,10 +37,11 @@ class Message extends \lithium\core\StaticObject {
 	 * @param string $singular Either a single or the singular form of the message.
 	 *               Used as the message ID.
 	 * @param array $options Allowed keys are:
-	 *              - `'count'`: Used to determine the correct plural form.
 	 *              - `'plural'`: Used as a fall back if needed.
+	 *              - `'count'`: Used to determine the correct plural form.
 	 *              - `'replacements'`: An array with replacements for placeholders.
 	 *              - `'locale'`: The target locale, defaults to current locale.
+	 *              - `'scope'`: The scope of the message.
 	 * @return string
 	 */
 	public static function translate($singular, $options = array()) {
@@ -65,8 +66,9 @@ class Message extends \lithium\core\StaticObject {
 	 *
 	 * @param string $id The singular form of the message.
 	 * @param string $locale The target locale.
-	 * @param integer|void $count Used to determine the correct plural form (optional).
-	 * @return string|void The translated message or `null` if $singular is not
+	 * @param integer $count Used to determine the correct plural form (optional).
+	 * @param string $scope The scope of the message ID (optional).
+	 * @return string|void The translated message or `null` if `$singular` is not
 	 *         translateable or a plural rule couldn't be found.
 	 * @todo Message pages need caching.
 	 */
@@ -95,4 +97,4 @@ class Message extends \lithium\core\StaticObject {
 	}
 }
 
-?>
+?`>
