@@ -52,7 +52,7 @@ class Locale extends \lithium\core\StaticObject {
 	/**
 	 * Composes a locale from locale tags.
 	 *
-	 * @param array $tags An array as obtained from {@see decompose()}.
+	 * @param array $tags An array as obtained from `Locale::decompose()`.
 	 * @return string|void A locale with tags separated by underscores or `null`
 	 *         if none of the passed tags could be used to compose a locale.
 	 */
