@@ -37,18 +37,19 @@ class MyDatabaseComment extends \lithium\data\Model {
 
 class MyDatabase extends Database {
 
-	public function connect() {
-	}
+	public function connect() {}
 
 	public function disconnect() {}
 
 	public function entities($class = null) {}
 
+	public function describe($entity, $meta = array()) {}
+
 	public function encoding($encoding = null) {}
 
 	public function result($type, $resource, $context) {}
 
-	public function describe($entity, $meta = array()) {}
+	public function error() {}
 }
 
 class DatabaseTest extends \lithium\test\Unit {
