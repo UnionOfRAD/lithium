@@ -227,11 +227,8 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-
 	public function testWithWildcardString() {
-		Router::connect('/add/{:args}', array(
-			'controller' => 'tests', 'action' => 'add'
-		));
+		Router::connect('/add/{:args}', array('controller' => 'tests', 'action' => 'add'));
 
 		$expected = '/add';
 		$result = Router::match('/add');
@@ -243,25 +240,21 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	public function testWithWildcardArray() {
-		Router::connect('/add/{:args}', array(
-			'controller' => 'tests', 'action' => 'add'
-		));
+		Router::connect('/add/{:args}', array('controller' => 'tests', 'action' => 'add'));
 
 		$expected = '/add';
-		$result = Router::match(array(
-			'controller' => 'tests', 'action' => 'add'
-		));
+		$result = Router::match(array('controller' => 'tests', 'action' => 'add'));
 		$this->assertEqual($expected, $result);
 
 		$expected = '/add/alke';
 		$result = Router::match(array(
-			'controller' => 'tests', 'action' => 'add', 'alke'
+			'controller' => 'tests', 'action' => 'add', 'args' => array('alke')
 		));
 		$this->assertEqual($expected, $result);
 
 		$expected = '/add/alke/php';
 		$result = Router::match(array(
-			'controller' => 'tests', 'action' => 'add', 'alke', 'php'
+			'controller' => 'tests', 'action' => 'add', 'args' => array('alke', 'php')
 		));
 		$this->assertEqual($expected, $result);
 	}
