@@ -68,8 +68,7 @@ class Message extends \lithium\core\StaticObject {
 	 * @param integer|void $count Used to determine the correct plural form (optional).
 	 * @return string|void The translated message or `null` if $singular is not
 	 *         translateable or a plural rule couldn't be found.
-	 *
-	 * @todo Message pages need caching
+	 * @todo Message pages need caching.
 	 */
 	protected static function _translated($id, $locale, $count = null, $scope = null) {
 		$result = Catalog::read('message.page', $locale, compact('scope'));

@@ -62,7 +62,8 @@ abstract class Base extends \lithium\core\Object {
 	 *
 	 * @param string $category Dot-delimited category.
 	 * @param string $operation Operation to check for. Either `'read'` or `'write'`.
-	 * @return boolean True if operation is supported, otherwise false.
+	 * @return boolean `true` if operation is supported, otherwise `false`.
+	 * @see \lithium\g11n\catalog\adapters\Base::$_categories.
 	 */
 	public function isSupported($category, $operation) {
 		$category = explode('.', $category, 2);
@@ -72,21 +73,23 @@ abstract class Base extends \lithium\core\Object {
 	/**
 	 * Reads data.
 	 *
-	 * @param string $category For a list of all valid categories {@see $_categories}.
+	 * @param string $category Dot-delimited categoy.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current request.
 	 * @return mixed
+	 * @see \lithium\g11n\catalog\adapters\Base::$_categories.
 	 */
 	abstract public function read($category, $locale, $scope);
 
 	/**
 	 * Writes data.  Existing data is silently overwritten.
 	 *
-	 * @param string $category For a list of all valid categories {@see $_categories}.
+	 * @param string $category Dot-delimited category.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current request.
 	 * @param mixed $data The data to write.
-	 * @return void
+	 * @return boolean
+	 * @see \lithium\g11n\catalog\adapters\Base::$_categories.
 	 */
 	abstract public function write($category, $locale, $scope, $data);
 

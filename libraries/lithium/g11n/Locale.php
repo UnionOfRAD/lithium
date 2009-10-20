@@ -75,9 +75,10 @@ class Locale extends \lithium\core\StaticObject {
 	 * where not available ISO 639-3 and ISO 639-5 codes are allowed too. The territory
 	 * tag is an ISO 3166-1 code.
 	 *
-	 * @param string $locale i.e. `'en'`, `'en_US'`or `'de_DE'`
+	 * @param string $locale I.e. `'en'`, `'en_US'` or `'de_DE'`.
 	 * @return array Parsed language, script, territory and variant tags.
 	 * @throws InvalidArgumentException
+	 * @link http://www.rfc-editor.org/rfc/bcp/bcp47.txt
 	 */
 	public static function decompose($locale) {
 		$regex  = '(?P<language>[a-z]{2,3})';
@@ -94,8 +95,8 @@ class Locale extends \lithium\core\StaticObject {
 	/**
 	 * Returns a locale in it's canonical form with tags formatted properly.
 	 *
-	 * @param string $locale
-	 * @return string
+	 * @param string $locale A locale in an arbitrary form (i.e. `'ZH-HANS-HK_REVISED'`).
+	 * @return string A locale in it's canoncial form (i.e. `'zh_Hans_HK_REVISED'`).
 	 */
 	public static function canonicalize($locale) {
 		$tags = static::decompose($locale);
