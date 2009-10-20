@@ -38,7 +38,10 @@ abstract class Renderer extends \lithium\core\Object {
 	 * @var array
 	 * @see Renderer::$_handlers
 	 */
-	protected $_classes = array('router' => 'lithium\http\Router', 'media'  => 'lithium\http\Media');
+	protected $_classes = array(
+		'router' => 'lithium\http\Router',
+		'media'  => 'lithium\http\Media'
+	);
 
 	/**
 	 * Contains the list of helpers currently in use by this rendering context. Helpers are loaded
@@ -287,8 +290,8 @@ abstract class Renderer extends \lithium\core\Object {
 	/**
 	 * Returns the `Request` object associated with this rendering context.
 	 *
-	 * @return object Returns an instance of `lithium\action\Request`, which provides the context for
-	 *         URLs, etc. which are generated in any templates rendered by this context.
+	 * @return object Returns an instance of `lithium\action\Request`, which provides the context
+	 *         for URLs, etc. which are generated in any templates rendered by this context.
 	 */
 	public function request() {
 		return $this->_request;

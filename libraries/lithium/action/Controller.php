@@ -77,6 +77,7 @@ class Controller extends \lithium\core\Object {
 	 * @param array $options The dispatch options for this action.
 	 * @return object Returns the response object associated with this controller.
 	 * @todo Implement proper exception catching/throwing
+	 * @filter This method can be filtered.
 	 */
 	public function __invoke($request, $dispatchParams, $options = array()) {
 		$classes = $this->_classes;
@@ -185,6 +186,7 @@ class Controller extends \lithium\core\Object {
 	 * @param mixed $url
 	 * @param array $options
 	 * @return void
+	 * @filter This method can be filtered.
 	 */
 	public function redirect($url, $options = array()) {
 		$router = $this->_classes['router'];

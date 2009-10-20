@@ -8,6 +8,12 @@
 
 namespace lithium\template\helpers;
 
+/**
+ * A template helper that assists in generating HTML content. Accessible in templates via
+ * `$this->html`, which will auto-load this helper into the rendering context. For examples of how
+ * to use this helper, see the documentation for a specific method. For a list of the
+ * template strings this helper uses, see the `$_strings` property.
+ */
 class Html extends \lithium\template\Helper {
 
 	/**
@@ -115,16 +121,20 @@ class Html extends \lithium\template\Helper {
 	 * Returns a doctype string.
 	 *
 	 * Possible doctypes:
-	 *   + html4-strict:  HTML4 Strict.
-	 *   + html4-trans:  HTML4 Transitional.
-	 *   + html4-frame:  HTML4 Frameset.
-	 *   + xhtml-strict: XHTML1 Strict.
-	 *   + xhtml-trans: XHTML1 Transitional.
-	 *   + xhtml-frame: XHTML1 Frameset.
-	 *   + xhtml11: XHTML1.1.
 	 *
-	 * @param  string $type Doctype to use.
-	 * @return string Doctype.
+	 * - `html4-strict`: HTML4 Strict.
+	 * - `html4-trans`: HTML4 Transitional.
+	 * - `html4-frame`: HTML4 Frameset.
+	 * - `xhtml-strict`: XHTML1 Strict.
+	 * - `xhtml-trans`: XHTML1 Transitional.
+	 * - `xhtml-frame`: XHTML1 Frameset.
+	 * - `xhtml11`: XHTML1.1
+	 *
+	 * Note that the HTML5 doctype has been omitted, because the doctype tag is simply
+	 * `<!doctype html>`.
+	 *
+	 * @param string $type Doctype to use.
+	 * @return string An HTML doctype tag.
 	 */
 	public function docType($type = 'xhtml-trans') {
 		if (isset($this->_docTypes[$type])) {
@@ -145,18 +155,22 @@ class Html extends \lithium\template\Helper {
 	}
 
 	/**
-	 * Creates an HTML link.
+	 * Creates an HTML link (`<a />`) or a document meta-link (`<link />`).
 	 *
-	 * If $url starts with "http://" this is treated as an external link. Otherwise,
-	 * it is treated as a path to controller/action and parsed with the `Html::url()` method.
+	 * If `$url` starts with `"http://"` or `"https://"`, this is treated as an external link.
+	 * Otherwise, it is treated as a path to controller/action and parsed using
+	 * the `Router::match()` method (where `Router` is the routing class dependency specified by
+	 * the rendering context, i.e. `lithium\template\view\Renderer::$_classes`).
 	 *
-	 * If `$url` is empty, `$title` is used instead.
+	 * If `$url` is empty, `$title` is used in its place.
 	 *
-	 * @param string $title The content to be wrapped by an <a /> tag.
-	 * @param mixed $url Lithium-relative URL or array of URL parameters, or external URL
-	 *              (starts with http://)
+	 * @param string $title The content to be wrapped by an `<a />` tag.
+	 * @param mixed $url Can be a string representing a URL relative to the base of your Lithium
+	 *              applcation, an external URL (starts with `'http://'` or `'https://'`), an anchor
+	 *              name starting with `'#'` (i.e. `'#top'`), or an array defining a set of request
+	 *              parameters that should be matched against a route in `Router`.
 	 * @param array $options Array of HTML attributes.
-	 * @return string An <a /> element.
+	 * @return string Returns an `<a />` or `<link />` element.
 	 */
 	public function link($title, $url = null, $options = array()) {
 		$defaults = array('escape' => true);
@@ -175,9 +189,9 @@ class Html extends \lithium\template\Helper {
 	}
 
 	/**
-	 * Returns a JavaScript include tag (<script /> element).  If the filename is prefixed with "/",
-	 * the path will be relative to the base path of your application.  Otherwise, the path will
-	 * be relative to your JavaScript path, usually `webroot/js`.
+	 * Returns a JavaScript include tag (`<script />` element). If the filename is prefixed with
+	 * `"/"`, the path will be relative to the base path of your application.  Otherwise, the path
+	 * will be relative to your JavaScript path, usually `webroot/js`.
 	 *
 	 * @param mixed $path String path to JavaScript file, or an array of paths.
 	 * @param array $options
@@ -211,7 +225,7 @@ class Html extends \lithium\template\Helper {
 	 * @param boolean $inline If set to false, the generated tag appears in the head tag
 	 *                of the layout.
 	 * @return string CSS <link /> or <style /> tag, depending on the type of link.
-	 * @filter
+	 * @filter This method can be filtered.
 	 */
 	public function style($path, $options = array()) {
 		$defaults = array('type' => 'stylesheet', 'inline' => true);

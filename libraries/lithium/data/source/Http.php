@@ -1,10 +1,6 @@
 <?php
 /**
  * Lithium: the most rad php framework
- * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
- *
- * Licensed under The BSD License
- * Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
@@ -155,7 +151,14 @@ class Http extends \lithium\data\Source {
 			return false;
 		}
 		$this->request->method = 'POST';
-		$this->_prepare($data);
+		if (!empty($data)) {
+			$this->request->headers(array(
+				'Content-Type' => 'application/x-www-form-urlencoded',
+			));
+			$this->request->body(
+				substr($this->request->queryString($data), 1)
+			);
+		}
 		return $this->_send($path);
 	}
 
@@ -164,13 +167,12 @@ class Http extends \lithium\data\Source {
 	 *
 	 * @return string
 	 */
-	public function put($path = null, $data = array()) {
+	public function put($path = null, $params = array()) {
 		if ($this->connect() === false) {
 			return false;
 		}
 		$this->request->method = 'PUT';
-		$this->_prepare($data);
-		return $this->_send($path);
+		return $this->_send($path, $params);
 	}
 
 	/**
@@ -220,26 +222,6 @@ class Http extends \lithium\data\Source {
 	 */
 	public function delete($query, $options = array()) {
 		return $this->del();
-	}
-
-	/**
-	 * Prepares data for sending
-	 *
-	 * @return string
-	 *
-	 **/
-
-	protected function _prepare($data = array()) {
-		if (empty($data)) {
-			return null;
-		}
-		if (is_array($data)) {
-			$this->request->headers(array(
-				'Content-Type' => 'application/x-www-form-urlencoded',
-			));
-			$data = substr($this->request->queryString($data), 1);
-		}
-		return $this->request->body($data);
 	}
 
 	/**
