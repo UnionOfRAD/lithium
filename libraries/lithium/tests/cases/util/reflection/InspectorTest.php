@@ -39,6 +39,13 @@ class InspectorTest extends \lithium\test\Unit {
 	public function testMethodInspection() {
 		$result = Inspector::methods($this, null);
 		$this->assertTrue($result[0] instanceof ReflectionMethod);
+
+		$result = Inspector::info('lithium\core\Object::_init()');
+		$expected = '_init';
+		$this->assertEqual($expected, $result['name']);
+
+		$expected = 'void';
+		$this->assertEqual($expected, $result['tags']['return']);
 	}
 
 	/**
@@ -79,8 +86,8 @@ class InspectorTest extends \lithium\test\Unit {
 		$expected = array(__LINE__ - 2 => "\tpublic function testLineIntrospection() {");
 		$this->assertEqual($expected, $result);
 
-		$result = Inspector::lines(__CLASS__, array(20));
-		$expected = array(20 => 'class InspectorTest extends \lithium\test\Unit {');
+		$result = Inspector::lines(__CLASS__, array(16));
+		$expected = array(16 => 'class InspectorTest extends \lithium\test\Unit {');
 		$this->assertEqual($expected, $result);
 
 		$this->expectException('/Missing argument 2/');
@@ -162,7 +169,6 @@ class InspectorTest extends \lithium\test\Unit {
 		$this->assertNull(Inspector::info('\lithium\util\reflection\Inspector::$foo'));
 	}
 
-	
 	public function testClassDependencies() {
 		$expected = array(
 			'Exception', 'ReflectionClass', 'lithium\\core\\Libraries', 'lithium\\util\\Collection'
