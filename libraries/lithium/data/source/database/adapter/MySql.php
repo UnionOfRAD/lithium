@@ -43,10 +43,11 @@ class MySql extends \lithium\data\source\Database {
 	 * Constructs the MySQL adapter and sets the default port to 3306.
 	 *
 	 * @param array $config Configuration options for this class. For additional configuration,
-	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options defined by
-	 *        this class:
-	 *        -'port': Accepts a port number or Unix socket name to use when connecting to the
-	 *          database.  Defaults to '3306'.
+	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options
+	 *        defined by this class:
+	 *
+	 *	- `'port'`: Accepts a port number or Unix socket name to use when connecting to the
+	 *     database.  Defaults to `'3306'`.
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('port' => '3306');
@@ -91,6 +92,13 @@ class MySql extends \lithium\data\source\Database {
 		return true;
 	}
 
+	/**
+	 * Returns the list of tables in the currently-connected database.
+	 *
+	 * @param string $model The fully-namespaced class name of the model object making the request.
+	 * @return array Returns an array of objects to which models can connect.
+	 * @filter This method can be filtered.
+	 */
 	public function entities($model = null) {
 		$config = $this->_config;
 		$method = function($self, $params, $chain) use ($config) {
@@ -100,6 +108,19 @@ class MySql extends \lithium\data\source\Database {
 		return $this->_filter(__METHOD__, compact('model'), $method);
 	}
 
+	/**
+	 * Gets the column schema for a given MySQL table.
+	 *
+	 * @param mixed $entity Specifies the table name for which the schema should be returned, or the
+	 *              class name of the model object requesting the schema, in which case the model
+	 *              class will be queried for the correct table name.
+	 * @param array $meta
+	 * @return array Returns an associative array describing the given table's schema, where the
+	 *               array keys are the available fields, and the values are arrays describing each
+	 *               field, containing the following keys:
+	 *               -`'type'`: The field type name
+	 * @filter This method can be filtered.
+	 */
 	public function describe($entity, $meta = array()) {
 		$params = compact('entity', 'meta');
 		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) {
@@ -257,6 +278,13 @@ class MySql extends \lithium\data\source\Database {
 			break;
 		}
 		return $column;
+	}
+
+	protected function _entityName($entity) {
+		if (class_exists($entity, false) && method_exists($entity, 'meta')) {
+			$entity = $entity::meta('name');
+		}
+		return $entity;
 	}
 }
 
