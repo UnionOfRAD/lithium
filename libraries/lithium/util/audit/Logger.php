@@ -52,5 +52,4 @@ class Logger extends \lithium\core\Adaptable {
 	}
 }
 
-
 ?>
