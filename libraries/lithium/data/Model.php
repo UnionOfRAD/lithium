@@ -261,7 +261,7 @@ class Model extends \lithium\core\StaticObject {
 			$conn = $self->_classes['connections'];
 			$self->_schema = $conn::get($name)->describe($self->_meta['source'], $self->_meta);
 		}
-		if (!empty($field)) {
+		if (is_string($field) && !empty($field)) {
 			return isset($self->_schema[$field]) ? $self->_schema[$field] : null;
 		}
 		return $self->_schema;

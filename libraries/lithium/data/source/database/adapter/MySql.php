@@ -221,15 +221,17 @@ class MySql extends \lithium\data\source\Database {
 	}
 
 	protected function _execute($sql, $options = array()) {
+		$defaults = array('buffered' => true);
+		$options += $defaults;
+
 		$params = compact('sql', 'options');
 		$conn =& $this->_connection;
 
 		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use (&$conn) {
 			extract($params);
-			$defaults = array('buffered' => true);
-			$options += $defaults;
 			$func = ($options['buffered']) ? 'mysql_query' : 'mysql_unbuffered_query';
 			$resource = $func($sql, $conn);
+
 			if (!is_resource($resource)) {
 				list($code, $error) = $self->error();
 				throw new Exception("$sql: $error", $code);
