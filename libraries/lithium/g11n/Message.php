@@ -96,5 +96,4 @@ class Message extends \lithium\core\StaticObject {
 		}
 	}
 }
-
-?`>
+?>
