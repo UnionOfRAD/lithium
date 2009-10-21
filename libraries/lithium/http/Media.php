@@ -98,7 +98,7 @@ class Media extends \lithium\core\Object {
 	 * Contains default path settings for various asset types. For each type, the corresponding
 	 * array key maps to the general type name, i.e. `'js'` or `'image'`. Each type contains a set
 	 * of keys which define their locations and default behavior.
-	 * 
+	 *
 	 * - 'suffix': The standard file ending/extension (with the `.`), i.e. `'.js'` or `'.css'`.
 	 * - 'filter': The standard file ending/extension (with the `.`), i.e. `'.js'` or `'.css'`.
 	 *
@@ -245,9 +245,9 @@ class Media extends \lithium\core\Object {
 	 * Calculates the web-accessible path to a static asset, usually a JavaScript, CSS or image
 	 * file.
 	 *
-	 * @param string $path 
-	 * @param string $type 
-	 * @param array $options 
+	 * @param string $path
+	 * @param string $type
+	 * @param array $options
 	 * @return string
 	 */
 	public static function asset($path, $type, $options = array()) {
@@ -257,7 +257,7 @@ class Media extends \lithium\core\Object {
 		$type = isset(static::$_assets[$type]) ? $type : 'generic';
 
 		$defaults = array(
-			'base' => null, 'timestamp' => false, 'filter' => null, 
+			'base' => null, 'timestamp' => false, 'filter' => null,
 			'path' => array(), 'suffix' => null
 		);
 		$options += (static::$_assets[$type] + $defaults);
@@ -306,6 +306,7 @@ class Media extends \lithium\core\Object {
 			'layout' => null,
 			'view' => null
 		);
+
 		$options += array('type' => $response->type());
 		$type = $options['type'];
 		$result = null;
@@ -315,7 +316,7 @@ class Media extends \lithium\core\Object {
 		}
 
 		$h = array_key_exists($type, static::$_handlers) ? static::$_handlers[$type] : null;
-		$h = is_null($h) ? $defaults : array_filter($h) + static::$_handlers['default'] + $defaults;
+		$h = is_null($h) ? $defaults : $h + static::$_handlers['default'] + $defaults;
 
 		$response->body(static::_handle($h, $data, $options));
 		$response->headers('Content-type', current((array)static::$_types[$type]));
@@ -325,9 +326,9 @@ class Media extends \lithium\core\Object {
 	 * Called by `Media::render()` to render response content. Given a content handler and data,
 	 * calls the content handler and passes in the data, receiving back a rendered content string.
 	 *
-	 * @param array $handler 
-	 * @param array $data 
-	 * @param array $options 
+	 * @param array $handler
+	 * @param array $data
+	 * @param array $options
 	 * @return string
 	 */
 	protected static function _handle($handler, $data, $options) {
@@ -348,7 +349,7 @@ class Media extends \lithium\core\Object {
 				$result = is_string($method) ? $method($data) : $method($data, $handler);
 			break;
 			default:
-				
+
 			break;
 		}
 		return $result;

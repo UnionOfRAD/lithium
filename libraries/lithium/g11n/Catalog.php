@@ -44,13 +44,13 @@ class Catalog extends \lithium\core\StaticObject {
 	 * Catalog::read('validation.postalCode', 'en_US');
 	 * }}}
 	 *
-	 * @param string $category For a list of all valid categories
-	 *              please {@see catalog\adapters\Base::$_categories}.
+	 * @param string $category Dot-delimeted category.
 	 * @param string|array $locales One or multiple locales.
 	 * @param array $options Valid options are:
-	 *              - `'name'` One or multiple configuration names.
-	 *              - `'scope'` The scope to use.
+	 *              - `'name'`: One or multiple configuration names.
+	 *              - `'scope'`: The scope to use.
 	 * @return array|void If available the requested data, else `null`.
+	 * @see \lithium\g11n\catalog\adapters\Base::$_categories.
 	 */
 	public static function read($category, $locales, $options = array()) {
 		$defaults = array('name' => null, 'scope' => null);
@@ -99,13 +99,13 @@ class Catalog extends \lithium\core\StaticObject {
 	 * Catalog::write('message.page', $data, array('name' => 'runtime'));
 	 * }}}
 	 *
-	 * @param string $category For a list of all valid categories
-	 *              please {@see catalog\adapters\Base::$_categories}.
+	 * @param string $category Dot-delimeted category.
 	 * @param array Data keyed by locale.
 	 * @param array $options Valid options are:
-	 *              - `'name'` One or multiple configuration names.
-	 *              - `'scope'` The scope to use.
+	 *              - `'name'`: One or multiple configuration names.
+	 *              - `'scope'`: The scope to use.
 	 * @return boolean Success.
+	 * @see \lithium\g11n\catalog\adapters\Base::$_categories.
 	 */
 	public static function write($category, $data, $options = array()) {
 		$defaults = array('name' => null, 'scope' => null);

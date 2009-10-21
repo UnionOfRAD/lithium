@@ -13,9 +13,9 @@ class Set {
 	/**
 	 * Checks if a particular path is set in an array
 	 *
-	 * @param mixed $data Data to check on
-	 * @param mixed $path A dot-separated string.
-	 * @return boolean true if path is found, false otherwise
+	 * @param mixed $data Data to check on.
+	 * @param mixed $path A dot-delimited string.
+	 * @return boolean `true` if path is found, `false` otherwise.
 	 */
 	public static function check($data, $path = null) {
 		if (empty($path)) {
@@ -42,13 +42,13 @@ class Set {
 	}
 
 	/**
-	 * Counts the dimensions of an array. If $all is set to false (which is the default) it will
+	 * Counts the dimensions of an array. If `$all` is set to `false` (which is the default) it will
 	 * only consider the dimension of the first element in the array.
 	 *
-	 * @param array $array Array to count dimensions on
-	 * @param boolean $all true counts the dimension considering all elements in array
-	 * @param integer $count Start the depth count at this number
-	 * @return integer The number of dimensions in $array
+	 * @param array $array Array to count dimensions on.
+	 * @param boolean $all true counts the dimension considering all elements in array.
+	 * @param integer $count Start the depth count at this number.
+	 * @return integer The number of dimensions in `$array`.
 	 */
 	public static function depth($data, $options = array(), $count = 0) {
 		if (empty($data)) {
@@ -83,9 +83,9 @@ class Set {
 	 * array('0.Foo.Bar' => 'Far').
 	 *
 	 * @param array $data array to flatten
-	 * @param array $options
-	 *              - separator : string to separate array keys in path [default] .
-	 *              - path starting point [default] null
+	 * @param array $options Available options are:
+	 *              - `'separator'`: String to separate array keys in path (defaults to `'.'`).
+	 *              - `'path'`: Starting point (defaults to null).
 	 * @return array
 	 */
 	public static function flatten($data, $options = array()) {
@@ -116,27 +116,29 @@ class Set {
 	}
 
 	/**
-	 * Filters empty elements out of a route array, excluding '0'.
+	 * Filters empty elements out of an array, excluding `'0'`.  Also accepts
+	 * non array types.
 	 *
-	 * @param mixed $var Either an array to filter, or value when in callback
-	 * @return mixed Either filtered array, or true/false when in callback
+	 * @param mixed $data Either an array to filter, or an arbitrary value.
+	 * @return array Filtered array.
 	 */
-	public static function filter($var) {
-		if (!is_array($var)) {
-			$var = array($var);
+	public static function filter($data) {
+		if (!is_array($data)) {
+			$data = array($data);
 		}
-		return array_filter($var, function($var) {
-			return ($var === 0 || $var === '0' || !empty($var));
+		return array_filter($data, function($data) {
+			return ($data === 0 || $data === '0' || !empty($data));
 		});
 	}
 
 	/**
 	 * Returns a series of values extracted from an array, formatted in a format string.
 	 *
-	 * @param array $data Source array from which to extract the data
-	 * @param string $format Format string into which values will be inserted, see sprintf()
-	 * @param array $keys An array containing one or more Set::extract()-style key paths
-	 * @return array An array of strings extracted from $keys and formatted with $format
+	 * @param array $data Source array from which to extract the data.
+	 * @param string $format Format string into which values will be inserted using `sprintf()`.
+	 * @param array $keys An array containing one or more `Set::extract()`-style key paths.
+	 * @return array An array of strings extracted from `$keys` and formatted with `$format`.
+	 * @link http://php.net/sprintf
 	 */
 	public static function format($data, $format, $keys) {
 
@@ -187,10 +189,10 @@ class Set {
 	}
 
 	/**
-	 * Checks to see if all the values in the array are numeric
+	 * Checks to see if all the values in the array are numeric.
 	 *
-	 * @param array $array The array to check.  If null, the value of the current Set object
-	 * @return boolean true if values are numeric, false otherwise
+	 * @param array $array The array to check.  If null, the value of the current Set object.
+	 * @return boolean `true` if values are numeric, `false` otherwise.
 	 */
 	public static function isNumeric($array = null) {
 		if (empty($array)) {
@@ -215,10 +217,11 @@ class Set {
 	}
 
 	/**
-	 * This function can be used to see if a single item or a given XPath match certain conditions.
+	 * This function can be used to see if a single item or a given XPath
+	 * match certain conditions.
 	 *
-	 * @param mixed $conditions An array of condition strings or an XPath expression
-	 * @param array $data  An array of data to execute the match on
+	 * @param mixed $conditions An array of condition strings or an XPath expression.
+	 * @param array $data  An array of data to execute the match on.
 	 * @param integer $i Optional: The 'nth'-number of the item being matched.
 	 * @return boolean
 	 */
@@ -229,8 +232,6 @@ class Set {
 		if (is_string($conditions) || is_string($data)) {
 			return !!static::extract($data, $conditions);
 		}
-		// var_dump($conditions);
-		// 	var_dump($data);
 		foreach ($conditions as $condition) {
 			if ($condition === ':last') {
 				if ($i != $length) {
@@ -282,13 +283,13 @@ class Set {
 	}
 
 	/**
-	 * Maps the contents of the Set object to an object hierarchy.
-	 * Maintains numeric keys as arrays of objects
+	 * Maps the contents of the Set object to an object hierarchy.  Maintains numeric
+	 * keys as arrays of objects.
 	 *
-	 * @param array $data the array
-	 * @param string $class A class name of the type of object to map to
-	 * @param boolean $name whether the _name_ should be filled
-	 * @return object Hierarchical object
+	 * @param array $data The array.
+	 * @param string $class A class name of the type of object to map to.
+	 * @param boolean $name whether the _name_ should be filled.
+	 * @return object Hierarchical object.
 	 */
 	public static function map($data, $class = 'stdClass', $name = false) {
 		if (empty($data)) {
@@ -346,17 +347,17 @@ class Set {
 	}
 
 	/**
-	 * This function can be thought of as a hybrid between PHP's array_merge and
-	 * array_merge_recursive. The difference to the two is that if an array key contains another
-	 * array then the function behaves recursive (unlike array_merge) but does not do if for keys
-	 * containing strings (unlike array_merge_recursive). See the unit test for more information.
+	 * This function can be thought of as a hybrid between PHP's `array_merge()`
+	 * and `array_merge_recursive()`.  The difference to the two is that if an
+	 * array key contains another array then the function behaves recursive
+	 * (unlike `array_merge()`) but does not do if for keys containing strings
+	 * (unlike `array_merge_recursive()`).  Please note: This function will work
+	 * with an unlimited amount of arguments and typecasts non-array parameters
+	 * into arrays.
 	 *
-	 * Note: This function will work with an unlimited amount of arguments and typecasts non-array
-	 * parameters into arrays.
-	 *
-	 * @param array $arr1 Array to be merged
-	 * @param array $arr2 Array to merge with
-	 * @return array Merged array
+	 * @param array $arr1 Array to be merged.
+	 * @param array $arr2 Array to merge with.
+	 * @return array Merged array.
 	 */
 	public static function merge($arr1, $arr2 = null) {
 		$args = func_get_args();
@@ -380,11 +381,11 @@ class Set {
 	}
 
 	/**
-	 * Pushes the differences in $array2 onto the end of $array
+	 * Pushes the differences in `$array2` onto the end of `$array`.
 	 *
-	 * @param mixed $array Original array
-	 * @param mixed $array2 Differences to push
-	 * @return array Combined array
+	 * @param mixed $array Original array.
+	 * @param mixed $array2 Differences to push.
+	 * @return array Combined array.
 	 */
 	public static function pushDiff($array, $array2) {
 		if (empty($array) && !empty($array2)) {
@@ -405,36 +406,27 @@ class Set {
 	}
 
 	/**
-	 * Implements partial support for XPath 2.0. If $path is an array or $data is empty it the
-	 * call is delegated to Set::classicExtract.
+	 * Implements partial support for XPath 2.0.
 	 *
-	 * Currently implemented selectors:
-	 * - /User/id (similar to the classic {n}.User.id)
-	 * - /User[2]/name (selects the name of the second User)
-	 * - /User[id>2] (selects all Users with an id > 2)
-	 * - /User[id>2][<5] (selects all Users with an id > 2 but < 5)
-	 * - /Post/Comment[author_name=john]/../name (Selects the name of all Posts that have at least
-	 *   one Comment written by john)
-	 * - /Posts[name] (Selects all Posts that have a 'name' key)
-	 * - /Comment/.[1] (Selects the contents of the first comment)
-	 * - /Comment/.[:last] (Selects the last comment)
-	 * - /Comment/.[:first] (Selects the first comment)
-	 * - /Comment[text=/lithiumphp/i] (Selects the all comments that have a text matching
-	 * 		the regex /lithiumphp/i)
-	 * - /Comment/@* (Selects the all key names of all comments)
-	 *
-	 * Other limitations:
-	 * - Only absolute paths starting with a single '/' are supported right now
-	 *
-	 * Warning: Even so it has plenty of unit tests the XPath support has not gone through a lot of
-	 * real-world testing. Please report bugs as you find them. Suggestions for additional features
-	 * to implement are also very welcome!
-	 *
-	 * @param string $data An absolute XPath 2.0 path
-	 * @param string $path An array of data to extract from
-	 * @param string $options Currently only supports 'flatten' which can be disabled
-	 * 				for higher XPath-ness
-	 * @return array An array of matched items
+	 * @param string $path An absolute XPath 2.0 path. Only absolute paths starting with a
+	 *               single slash are supported right now. Implemented selectors:
+	 *               - `'/User/id'`: Similar to the classic {n}.User.id.
+	 *               - `'/User[2]/name'`: Selects the name of the second User.
+	 *               - `'/User[id>2]'`: Selects all Users with an id > 2.
+	 *               - `'/User[id>2][<5]'`: Selects all Users with an id > 2 but < 5.
+	 *               - `'/Post/Comment[author_name=John]/../name'`: Selects the name of
+	 *                 all posts that have at least one comment written by John.
+	 *               - `'/Posts[name]'`: Selects all Posts that have a `'name'` key.
+	 *               - `'/Comment/.[1]'`: Selects the contents of the first comment.
+	 *               - `'/Comment/.[:last]'`: Selects the last comment.
+	 *               - `'/Comment/.[:first]'`: Selects the first comment.
+	 *               - `'/Comment[text=/lithium/i]`': Selects the all comments that have
+	 *                 a text matching the regex `/lithium/i`.
+	 *               - `'/Comment/@*'`: Selects all key names of all comments.
+	 * @param string $path An array of data to extract from.
+	 * @param string $options Currently only supports `'flatten'` which can be
+	 *              disabled for higher XPath-ness.
+	 * @return array An array of matched items.
 	 */
 	public static function extract($data, $path = null, $options = array()) {
 		if (empty($data)) {
@@ -571,11 +563,11 @@ class Set {
 	}
 
 	/**
-	 * Inserts $data into an array as defined by $path.
+	 * Inserts `$data` into an array as defined by `$path`.
 	 *
-	 * @param mixed $list Where to insert into
-	 * @param mixed $path A dot-separated string.
-	 * @param array $data Data to insert
+	 * @param mixed $list Where to insert into.
+	 * @param mixed $path A dot-delimited string.
+	 * @param array $data Data to insert.
 	 * @return array
 	 */
 	public static function insert($list, $path, $data = null) {
@@ -601,11 +593,11 @@ class Set {
 	}
 
 	/**
-	 * Removes an element from a Set or array as defined by $path.
+	 * Removes an element from an array as defined by `$path`.
 	 *
-	 * @param mixed $list From where to remove
-	 * @param mixed $path A dot-separated string.
-	 * @return array Array with $path removed from its value
+	 * @param mixed $list From where to remove.
+	 * @param mixed $path A dot-delimited string.
+	 * @return array Array with `$path` removed from its value.
 	 */
 	public static function remove($list, $path = null) {
 		if (empty($path)) {
@@ -633,11 +625,11 @@ class Set {
 	}
 
 	/**
-	 * Computes the difference between a Set and an array, two Sets, or two arrays
+	 * Computes the difference between two arrays.
 	 *
-	 * @param mixed $val1 First value
-	 * @param mixed $val2 Second value
-	 * @return array Computed difference
+	 * @param mixed $val1 First value.
+	 * @param mixed $val2 Second value.
+	 * @return array Computed difference.
 	 */
 	public static function diff($val1, $val2 = null) {
 		if (empty($val1)) {
@@ -667,15 +659,13 @@ class Set {
 	}
 
 	/**
-	 * Determines if one Set or array contains the exact keys and values of another.
+	 * Determines if one array contains the exact keys and values of another.
 	 *
-	 * @param array $val1 First value
-	 * @param array $val2 Second value
-	 * @return boolean true if $val1 contains $val2, false otherwise
-	 * @access public
+	 * @param array $val1 First value.
+	 * @param array $val2 Second value.
+	 * @return boolean true if `$val1` contains `$val2`, `false` otherwise.
 	 */
 	public static function contains($val1, $val2 = null) {
-
 		if (empty($val1) || empty($val2)) {
 			return false;
 		}
@@ -695,10 +685,10 @@ class Set {
 	/**
 	 * Normalizes a string or array list.
 	 *
-	 * @param mixed $list List to normalize
-	 * @param boolean $assoc If true, $list will be converted to an associative array
-	 * @param string $sep If $list is a string, it will be split into an array with $sep
-	 * @param boolean $trim If true, separated strings will be trimmed
+	 * @param mixed $list List to normalize.
+	 * @param boolean $assoc If `true`, `$list` will be converted to an associative array.
+	 * @param string $sep If `$list` is a string, it will be split into an array with `$sep`.
+	 * @param boolean $trim If `true`, separated strings will be trimmed.
 	 * @return array
 	 */
 	public static function normalize($list, $assoc = true, $sep = ',', $trim = true) {
@@ -742,16 +732,16 @@ class Set {
 	}
 
 	/**
-	 * Creates an associative array using a $path1 as the path to build its keys, and optionally
-	 * $path2 as path to get the values. If $path2 is not specified, all values will be initialized
-	 * to null (useful for Set::merge). You can optionally group the values by what is obtained when
-	 * following the path specified in $groupPath.
+	 * Creates an associative array using a `$path1` as the path to build its keys, and optionally
+	 * `$path2` as path to get the values. If `$path2` is not specified, all values will be
+	 * initialized to `null` (useful for `Set::merge()`). You can optionally group the values by
+	 * what is obtained when following the path specified in `$groupPath`.
 	 *
-	 * @param array $data Array from where to extract keys and values
-	 * @param mixed $path1 As an array, or as a dot-separated string.
-	 * @param mixed $path2 As an array, or as a dot-separated string.
-	 * @param string $groupPath As an array, or as a dot-separated string.
-	 * @return array Combined array
+	 * @param array $data Array from where to extract keys and values.
+	 * @param mixed $path1 As an array, or as a dot-delimited string.
+	 * @param mixed $path2 As an array, or as a dot-delimited string.
+	 * @param string $groupPath As an array, or as a dot-delimited string.
+	 * @return array Combined array.
 	 */
 	public static function combine($data, $path1 = null, $path2 = null, $groupPath = null) {
 		if (empty($data)) {
@@ -802,10 +792,10 @@ class Set {
 	}
 
 	/**
-	 * Converts an object into an array. If $object is no object, reverse
+	 * Converts an object into an array. If `$object` is no object, reverse
 	 * will return the same value.
 	 *
-	 * @param object $object Object to reverse
+	 * @param object $object Object to reverse.
 	 * @return array
 	 */
 	public static function reverse($object) {
@@ -844,11 +834,11 @@ class Set {
 	}
 
 	/**
-	 * Sorts an array by any value, determined by a Set-compatible path
+	 * Sorts an array by any value, determined by a `Set`-compatible path.
 	 *
 	 * @param array $data
-	 * @param string $path A Set-compatible path to the array value
-	 * @param string $dir [optional] asc/desc [default] asc
+	 * @param string $path A `Set`-compatible path to the array value.
+	 * @param string $dir Either `'asc'` (the default) or `'desc'`.
 	 * @return array
 	 */
 	public static function sort($data, $path, $dir = 'asc') {

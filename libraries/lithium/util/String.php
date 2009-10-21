@@ -11,11 +11,15 @@ namespace lithium\util;
 class String {
 
 	/**
-	 * Generate a random UUID
+	 * Generates a random UUID.
 	 *
+	 * @param mixed $context Used to determine the values for `'SERVER_ADDR'`, `'HOST'`
+	 *              and `'HOSTNAME'`. Either a closure which is passed the requested
+	 *              context values, an object with properties for each value or an
+	 *              array keyed by requested context value.
+	 * @return string An RFC 4122-compliant UUID.
 	 * @link http://www.ietf.org/rfc/rfc4122.txt
-	 * @return string An RFC 4122-compliant UUID
-	 * @todo Fix method dependencies on old-school functions and request data access
+	 * @todo Fix method dependencies on old-school functions and request data access.
 	 */
 	public static function uuid($context) {
 		$val = function($value) use ($context) {
@@ -70,20 +74,19 @@ class String {
 
 		return sprintf(
 			"%08x-%04x-%04x-%02x%02x-%04x%08x",
-			(int)$timeLow, (int)substr($timeMid, 2) & 0xffff, mt_rand(0, 0xfff) | 0x4000,
+			(integer)$timeLow, (integer)substr($timeMid, 2) & 0xffff, mt_rand(0, 0xfff) | 0x4000,
 			mt_rand(0, 0x3f) | 0x80, mt_rand(0, 0xff), $pid, $node
 		);
 	}
 
 	/**
-	 * Create a hash from string using given method.
-	 * Fallback on next available method.
+	 * Create a hash from string using given method.  Fallback on next available method.
 	 *
-	 * @param string $string String to hash
-	 * @param string $type Method to use (sha1/sha256/md5, or any method supported by the `hash()`
-	 *               fucntion).
+	 * @param string $string String to hash.
+	 * @param string $type Method to use (sha1/sha256/md5, or any method supported
+	 *               by the `hash()` function).
 	 * @param string $salt
-	 * @return string Hash
+	 * @return string Hash.
 	 */
 	function hash($string, $type = null, $salt = null) {
 		$string = $salt . $string;
@@ -101,35 +104,34 @@ class String {
 	}
 
 	/**
-	 * Replaces variable placeholders inside a $str with any given $data. Each key in the $data
-	 * array corresponds to a variable placeholder name in $str. Example:
+	 * Replaces variable placeholders inside a string with any given data. Each key
+	 * in the `$data` array corresponds to a variable placeholder name in `$str`.
 	 *
-	 * Sample:
+	 * Usage:
 	 * {{{
 	 * String::insert(
 	 *     'My name is {:name} and I am {:age} years old.',
 	 *     array('name' => 'Bob', 'age' => '65')
-	 * );
+	 * ); // returns 'My name is Bob and I am 65 years old.'
 	 * }}}
-	 * Returns: My name is Bob and I am 65 years old.
 	 *
-	 * Available $options are:
-	 *     - before: The character or string in front of the name of the variable
-	 *               placeholder (Defaults to ':')
-	 *     - after: The character or string after the name of the variable placeholder
-	 *              (Defaults to null)
-	 *     - escape: The character or string used to escape the before character / string
-	 *               (Defaults to '\')
-	 *     - format: A regex to use for matching variable placeholders. Default is:
-	 *               `'/(?<!\\)\:%s/'` (Overwrites before, after, breaks escape / clean)
-	 *     - clean: A boolean or array with instructions for `String::clean()`
 	 *
-	 * @param string $str A string containing variable placeholders
-	 * @param string $data A key => val array where each key stands for a placeholder variable
-	 *                     name to be replaced with val
-	 * @param string $options An array of options, see description above
-	 * @todo Optimize this
+	 * @param string $str A string containing variable placeholders.
+	 * @param string $data A key, value array where each key stands for a placeholder variable
+	 *                     name to be replaced with value.
+	 * @param string $options Available options are:
+	 *               - `'before'`: The character or string in front of the name of
+	 *                 the variable placeholder (defaults to `':'`).
+	 *               - `'after'`: The character or string after the name of the
+	 *                  variable placeholder (defaults to `null`).
+	 *               - `'escape'`: The character or string used to escape the
+	 *                 before character or string (defaults to `'\'`).
+	 *               - `'format'`: A regular expression to use for matching variable
+	 *                 placeholders (defaults to `'/(?<!\\)\:%s/'`. Please note that this option
+	 *                 takes precedence over all other options except `'clean'`.
+	 *               - `'clean'`: A boolean or array with instructions for `String::clean()`.
 	 * @return string
+	 * @todo Optimize this
 	 */
 	public static function insert($str, $data, $options = array()) {
 		$defaults = array(
@@ -191,14 +193,21 @@ class String {
 	}
 
 	/**
-	 * Cleans up a `Set::insert()`-formatted string with given $options depending on the 'clean'
-	 * key in `$options`. The default method used is 'text' but 'html' is also available. The
-	 * goal of this function is to replace all whitespace and uneeded markup around placeholders
-	 * that did not get replaced by `Set::insert()`.
+	 * Cleans up a `Set::insert()`-formatted string with given `$options` depending
+	 * on the `'clean'` option. The goal of this function is to replace all whitespace
+	 * and uneeded markup around placeholders that did not get replaced by `Set::insert()`.
 	 *
-	 * @param string $str
-	 * @param string $options
-	 * @return string
+	 * @param string $str The string to clean.
+	 * @param string $options Available options are:
+	 *               - `'clean'`: `true` or an array of clean options:
+	 *                 - `'before'`:
+	 *                 - `'after'`:
+	 *                 - `'word'`: Regular expression matching words.
+	 *                 - `'gap'`: Regular expression matching gaps.
+	 *                 - `'andText'`: (defaults to `true`).
+	 *                 - `'replacement'`: String to use for cleaned substrings (defaults to `''`).
+	 *               - `'method'`: Either `'text'` or `'html'` (defaults to `'text'`).
+	 * @return string The cleaned string.
 	 */
 	public static function clean($str, $options = array()) {
 		if (!$options['clean']) {
@@ -242,12 +251,13 @@ class String {
 		}
 		return $str;
 	}
+
 	/**
-	 * Extract a part of a string based on a regular expression `$regex`
+	 * Extract a part of a string based on a regular expression `$regex`.
 	 *
-	 * @param string $regex The regular expression to use
-	 * @param string $str The string to run the extraction on
-	 * @param int $index The number of the part to return based on the regex
+	 * @param string $regex The regular expression to use.
+	 * @param string $str The string to run the extraction on.
+	 * @param integer $index The number of the part to return based on the regex.
 	 * @return mixed
 	 */
 	static function extract($regex, $str, $index = 0) {
@@ -261,8 +271,10 @@ class String {
 	 * Tokenizes a string using `$separator`, ignoring any instance of `$separator` that appears
 	 * between `$leftBound` and `$rightBound`.
 	 *
-	 * @param string $data The data to tokenize
-	 * @param string $separator The token to split the data on
+	 * @param string $data The data to tokenize.
+	 * @param string $separator The token to split the data on.
+	 * @param string $leftBound
+	 * @param string $rightBound
 	 * @return array
 	 */
 	public static function tokenize($data, $separator = ',', $leftBound = '(', $rightBound = ')') {
