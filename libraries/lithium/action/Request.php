@@ -118,6 +118,12 @@ class Request extends \lithium\core\Object {
 		}
 	}
 
+	public function __get($name) {
+		if (isset($this->params[$name])) {
+			return $this->params[$name];
+		}
+	}
+
 	/**
 	 * Queries PHP's environment settings, and provides an abstraction for standardizing expected
 	 * environment values across varying platforms, as well as specify custom environment flags.

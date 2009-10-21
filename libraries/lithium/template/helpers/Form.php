@@ -26,7 +26,7 @@ class Form extends \lithium\template\Helper {
 		'error'                => '<div{:options}>{:content}</div>',
 		'errors'               => '{:content}',
 		'file'                 => '<input type="file" name="{:name}"{:options} />',
-		'form'                 => '<form {:options}>',
+		'form'                 => '<form action="{:url}"{:options}>',
 		'form-end'             => '</form>',
 		'hidden'               => '<input type="hidden" name="{:name}"{:options} />',
 		'input'                => '<div{:wrap}>{:label}{:input}{:error}</div>',
@@ -76,11 +76,33 @@ class Form extends \lithium\template\Helper {
 	 * @var array
 	 * @see lithium\template\helpers\Form::config()
 	 */
-	protected $_templateMap = array();
+	protected $_templateMap = array(
+		'create' => 'form',
+		'end' => 'form-end'
+	);
+
+	/**
+	 * The data object or list of data objects to which the current form is bound. In order to
+	 * be a custom data object, a class must implement the following methods:
+	 *
+	 * - schema(): Returns an array defining the objects fields and their data types.
+	 * - data(): Returns an associative array of the data that this object represents.
+	 * - errors(): Returns an associatie array of validation errors for the current data set, where
+	 *             the keys match keys from `schema()`, and the values are either strings (in cases
+	 *             where a field only has one error) or an array (in case of multiple errors),
+	 *
+	 * For an example of how to implement these methods, see the `lithium\data\model\Record` object.
+	 *
+	 * @var mixed A single data object, a `Collection` of multiple data ovjects, or an array of data
+	 *            objects/`Collection`s.
+	 * @see lithium\data\model\Record
+	 * @see lithium\template\helpers\Form::create()
+	 */
+	protected $_binding = null;
 
 	public function __construct($config = array()) {
 		$defaults = array('base' => array(), 'text' => array(), 'textarea' => array());
-		parent::__construct($config + $defaults);
+		parent::__construct((array)$config + $defaults);
 	}
 
 	/**
@@ -116,9 +138,77 @@ class Form extends \lithium\template\Helper {
 		);
 	}
 
+	/**
+	 * Creates an HTML form, and optionally binds it to a data object which contains information on
+	 * how to render form fields, any data to pre-populate the form with, and any validation errors.
+	 * Typically, a data object will be a `Record` object returned from a `Model`, but you can
+	 * define your own custom objects as well. For more information on custom data objects, see
+	 * `lithium\template\helpers\Form::$_binding`.
+	 *
+	 * @param object $binding 
+	 * @param array $options 
+	 * @return string Returns a `<form />` open tag with the `action` attribute defined by either
+	 *         the `'action'` or `'url'` options (defaulting to the current page if none is
+	 *         specified), and any HTML attributes passed in `$options`.
+	 */
+	public function create($binding, $options = array()) {
+		$defaults = array(
+			'action' => $this->_context->request()->params['action'],
+			'type' => $binding ? ($binding->exists() ? 'post' : 'put') : 'post',
+			'url' => null
+		);
+		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, $options);
+		$options = (array)$options + $defaults;
+		$_binding =& $this->_binding;
+		$method = __METHOD__;
+
+		$filter = function($self, $params, $chain) use ($template, $_binding, $method, $defaults) {
+			extract($params);
+			$_binding = $binding;
+			$append = '';
+
+			if (!isset($options['method'])) {
+				switch (strtolower($options['type'])) {
+					case 'get':
+						$options['method'] = 'get';
+					break;
+					case 'file':
+						$options['enctype'] = 'multipart/form-data';
+						if ($options['type'] != 'post' && $options['type'] != 'put') {
+							$options['type'] = 'post';
+						}
+					case 'post':
+					case 'put':
+					case 'delete':
+						$append .= $self->hidden('_method', array(
+							'name' => '_method', 'value' => strtoupper($options['type'])
+						));
+					default:
+						$options['method'] = 'post';
+					break;
+				}
+			}
+
+			$url = $options['url'] ?: array('action' => $options['action']);
+			$options = array_diff_key($options, $defaults);
+
+			return $self->invokeMethod('_render', array(
+				$method, $template, compact('url', 'options')
+			));
+		};
+		return $this->_filter(__METHOD__, compact('binding', 'options'), $filter);
+	}
+
+	/**
+	 * Generates an HTML `<input type="submit" />` object.
+	 *
+	 * @param string $title The title of the submit button.
+	 * @param array $options 
+	 * @return string Returns a submit `<input />` tag with the given title and HTML attributes.
+	 */
 	public function submit($title = null, $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, null, $options);
-		return $this->_render(__METHOD__, $template, compact('title', 'options'));	    
+		return $this->_render(__METHOD__, $template, compact('title', 'options'));
 	}
 
 	public function textarea($name, $options = array()) {
@@ -154,9 +244,17 @@ class Form extends \lithium\template\Helper {
 	 * @return string Returns an HTML `<select />` element.
 	 */
 	public function select($name, $list = array(), $options = array()) {
+		$defaults = array('empty' => false);
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+
+		$options += $defaults;
 		$val = isset($options['value']) ? $options['value'] : null;
 		unset($options['value']);
+
+		if ($empty = $options['empty']) {
+			$list = array('' => ($empty === true) ? '' : $empty) + $list;
+		}
+		$options = array_diff_key($options, $defaults);
 
 		$output = $this->_render(__METHOD__, 'select-start', compact('name', 'options'));
 		$base = $options;
@@ -181,6 +279,11 @@ class Form extends \lithium\template\Helper {
 	}
 
 	public function password($name, $options = array()) {
+		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		return $this->_render(__METHOD__, $template, compact('name', 'options'));
+	}
+
+	public function hidden($name, $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
 	}
