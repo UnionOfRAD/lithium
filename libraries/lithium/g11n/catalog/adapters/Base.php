@@ -10,8 +10,17 @@ namespace lithium\g11n\catalog\adapters;
 
 use \lithium\util\Set;
 
+/**
+ * Base class for all g11n catalog adapters.
+ */
 abstract class Base extends \lithium\core\Object {
 
+	/**
+	 * A cascade of categories supported. If re-defined in sub-classes
+	 * contents are being merged.
+	 *
+	 * @var array
+	 */
 	protected $_categories = array(
 		'inflection' => array(
 			'plural'            => array('read' => false, 'write' => false),
@@ -48,6 +57,14 @@ abstract class Base extends \lithium\core\Object {
 		$this->_categories = Set::merge($properties['_categories'], $this->_categories);
 	}
 
+	/**
+	 * Checks if an operation for a category is supported.
+	 *
+	 * @param string $category Dot-delimited category.
+	 * @param string $operation Operation to check for. Either `'read'` or `'write'`.
+	 * @return boolean `true` if operation is supported, otherwise `false`.
+	 * @see \lithium\g11n\catalog\adapters\Base::$_categories.
+	 */
 	public function isSupported($category, $operation) {
 		$category = explode('.', $category, 2);
 		return $this->_categories[$category[0]][$category[1]][$operation];
@@ -56,24 +73,33 @@ abstract class Base extends \lithium\core\Object {
 	/**
 	 * Reads data.
 	 *
-	 * @param string $category For a list of all valid categories {@see $_categories}.
+	 * @param string $category Dot-delimited categoy.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current request.
 	 * @return mixed
+	 * @see \lithium\g11n\catalog\adapters\Base::$_categories.
 	 */
 	abstract public function read($category, $locale, $scope);
 
 	/**
 	 * Writes data.  Existing data is silently overwritten.
 	 *
-	 * @param string $category For a list of all valid categories {@see $_categories}.
+	 * @param string $category Dot-delimited category.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current request.
 	 * @param mixed $data The data to write.
-	 * @return void
+	 * @return boolean
+	 * @see \lithium\g11n\catalog\adapters\Base::$_categories.
 	 */
 	abstract public function write($category, $locale, $scope, $data);
 
+	/**
+	 * Formats a message item if neccessary.
+	 *
+	 * @param string $key The potential message ID.
+	 * @param string|array $value The message value.
+	 * @return array Message item formatted into internal/verbose format.
+	 */
 	protected function _formatMessageItem($key, $value) {
 		if (!is_array($value) || !isset($value['translated'])) {
 			return array('singularId' => $key, 'translated' => (array)$value);

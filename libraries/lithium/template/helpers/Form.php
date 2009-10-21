@@ -40,12 +40,12 @@ class Form extends \lithium\template\Helper {
 		'select-start'         => '<select name="{:name}"{:options}>',
 		'select-multi-start'   => '<select name="{:name}[]"{:options}>',
 		'select-empty'         => '<option value=""{:options}>&nbsp;</option>',
-		'select-option'        => '<option value="{:value}"{:options}>{:content}</option>',
+		'select-option'        => '<option value="{:value}"{:options}>{:title}</option>',
 		'select-end'           => '</select>',
-		'submit'               => '<input type="submit"{:options} />',
+		'submit'               => '<input type="submit" value="{:title}"{:options} />',
 		'submit-image'         => '<input type="image" src="{:url}"{:options} />',
 		'text'                 => '<input type="text" name="{:name}"{:options} />',
-		'textarea'             => '<textarea name="{:name}"{:options}>{:content}</textarea>',
+		'textarea'             => '<textarea name="{:name}"{:options}>{:value}</textarea>',
 		'fieldset'             => '<fieldset{:options}>{:content}</fieldset>',
 		'fieldset-start'       => '<fieldset><legend>{:content}</legend>',
 		'fieldset-end'         => '</fieldset>'
@@ -87,8 +87,8 @@ class Form extends \lithium\template\Helper {
 	 * Allows you to configure a default set of options which are included on a per-method basis,
 	 * and configure method template overrides.
 	 *
-	 * To force all `<label />` elements to have a default `class` attribute value of "foo"`, simply
-	 * do the following:
+	 * To force all `<label />` elements to have a default `class` attribute value of `"foo"`,
+	 * simply do the following:
 	 * 
 	 * {{{
 	 * $this->form->config(array('label' => array('class' => 'foo')));
@@ -116,8 +116,67 @@ class Form extends \lithium\template\Helper {
 		);
 	}
 
+	public function submit($title = null, $options = array()) {
+		list($name, $options, $template) = $this->_defaults(__FUNCTION__, null, $options);
+		return $this->_render(__METHOD__, $template, compact('title', 'options'));	    
+	}
+
+	public function textarea($name, $options = array()) {
+		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		$value = isset($options['value']) ? $options['value'] : '';
+		unset($options['value']);
+		return $this->_render(__METHOD__, $template, compact('name', 'options', 'value'));
+	}
+
 	public function text($name, $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		return $this->_render(__METHOD__, $template, compact('name', 'options'));
+	}
+
+	/**
+	 * Generates a `<select />` list using the `$list` parameter for the `<option />` tags. The
+	 * default selection will be set to the value of `$options['value']`, if specified.
+	 *
+	 * For example: {{{
+	 * $this->form->select('colors', array(1 => 'red', 2 => 'green', 3 => 'blue'), array(
+	 * 	'id' => 'Colors', 'value' => 2
+	 * ));
+	 * // Renders a '<select />' list with options 'red', 'green' and 'blue', with the 'green'
+	 * // option as the selection
+	 * }}}
+	 * 
+	 * @param string $name The `name` attribute of the `<select />` element.
+	 * @param array $list An associative array of key/value pairs, which will be used to render the
+	 *              list of options.
+	 * @param array $options Any HTML attributes that should be associated with the `<select />`
+	 *             element. If the `'value'` key is set, this will be the value of the option
+	 *             that is selected by default.
+	 * @return string Returns an HTML `<select />` element.
+	 */
+	public function select($name, $list = array(), $options = array()) {
+		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		$val = isset($options['value']) ? $options['value'] : null;
+		unset($options['value']);
+
+		$output = $this->_render(__METHOD__, 'select-start', compact('name', 'options'));
+		$base = $options;
+
+		foreach ($list as $value => $title) {
+			$options = ($val == $value) ? array('selected' => true) : array();
+			$output .= $this->_render(__METHOD__, 'select-option', compact(
+				'value', 'title', 'options'
+			));
+		}
+		return $output . $this->_context->strings('select-end');
+	}
+
+	public function checkbox($name, $options = array()) {
+		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+
+		if (!isset($options['checked'])) {
+			$options['checked'] = isset($options['value']) ? $options['value'] : false;
+		}
+		unset($options['value']);
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
 	}
 

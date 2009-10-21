@@ -139,7 +139,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @param string $type
 	 * @param string $options
 	 * @return void
-	 * @filter
+	 * @filter This method can be filtered.
 	 */
 	public static function find($type, $options = array()) {
 		$self = static::_instance();

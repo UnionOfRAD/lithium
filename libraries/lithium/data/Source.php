@@ -35,6 +35,14 @@ abstract class Source extends \lithium\core\Object {
 
 	abstract public function disconnect();
 
+	/**
+	 * Returns a list of objects (entities) that models can bind to, i.e. a list of tables in the
+	 * case of a database, or REST collections, in the case of a web service.
+	 *
+	 * @param string $model The fully-namespaced class name of the object making the request.
+	 * @return array Returns an array of objects to which models can connect.
+	 * @filter This method can be filtered.
+	 */
 	abstract public function entities($class = null);
 
 	abstract public function describe($entity, $meta = array());

@@ -88,6 +88,7 @@ class Inspector extends \lithium\core\StaticObject {
 				$setAccess = (
 					($type == 'method' || $type == 'property') &&
 					array_intersect($result['modifiers'], array('private', 'protected')) != array()
+					 && method_exists($inspector, 'setAccessible')
 				);
 
 				if ($setAccess) {

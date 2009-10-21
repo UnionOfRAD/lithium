@@ -11,8 +11,21 @@ namespace lithium\g11n;
 use \BadMethodCallException;
 use \InvalidArgumentException;
 
+/**
+ * Locale class.
+ *
+ * @method string|void language(string $locale) Parses a locale and returns it's language tag.
+ * @method string|void script(string $locale) Parses a locale and returns it's script tag.
+ * @method string|void territory(string $locale) Parses a locale and returns it's territory tag.
+ * @method string|void variant(string $locale) Parses a locale and returns it's variant tag.
+ */
 class Locale extends \lithium\core\StaticObject {
 
+	/**
+	 * Properties for locale tags.
+	 *
+	 * @var array
+	 */
 	protected static $_tags = array(
 		'language' => array('formatter' => 'strtolower'),
 		'script' => array('formatter' => array('strtolower', 'ucfirst')),
@@ -20,6 +33,13 @@ class Locale extends \lithium\core\StaticObject {
 		'variant' => array('formatter' => 'strtoupper')
 	);
 
+	/**
+	 * Magic method enabling tag methods.
+	 *
+	 * @param string $method
+	 * @param array $params
+	 * @return string|void
+	 */
 	public static function __callStatic($method, $params = array()) {
 		$tags = static::invokeMethod('decompose', $params);
 
@@ -32,7 +52,7 @@ class Locale extends \lithium\core\StaticObject {
 	/**
 	 * Composes a locale from locale tags.
 	 *
-	 * @param array $tags An array as obtained from {@see decompose()}.
+	 * @param array $tags An array as obtained from `Locale::decompose()`.
 	 * @return string|void A locale with tags separated by underscores or `null`
 	 *         if none of the passed tags could be used to compose a locale.
 	 */
@@ -55,9 +75,10 @@ class Locale extends \lithium\core\StaticObject {
 	 * where not available ISO 639-3 and ISO 639-5 codes are allowed too. The territory
 	 * tag is an ISO 3166-1 code.
 	 *
-	 * @param string $locale i.e. `'en'`, `'en_US'`or `'de_DE'`
+	 * @param string $locale I.e. `'en'`, `'en_US'` or `'de_DE'`.
 	 * @return array Parsed language, script, territory and variant tags.
 	 * @throws InvalidArgumentException
+	 * @link http://www.rfc-editor.org/rfc/bcp/bcp47.txt
 	 */
 	public static function decompose($locale) {
 		$regex  = '(?P<language>[a-z]{2,3})';
@@ -71,19 +92,11 @@ class Locale extends \lithium\core\StaticObject {
 		return array_filter(array_intersect_key($matches, static::$_tags));
 	}
 
-	// public static function language($locale) {}
-
-	// public static function script($locale) {}
-
-	// public static function territory($locale) {}
-
-	// public static function variant($locale) {}
-
 	/**
 	 * Returns a locale in it's canonical form with tags formatted properly.
 	 *
-	 * @param string $locale
-	 * @return string
+	 * @param string $locale A locale in an arbitrary form (i.e. `'ZH-HANS-HK_REVISED'`).
+	 * @return string A locale in it's canoncial form (i.e. `'zh_Hans_HK_REVISED'`).
 	 */
 	public static function canonicalize($locale) {
 		$tags = static::decompose($locale);

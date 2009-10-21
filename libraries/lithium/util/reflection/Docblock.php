@@ -26,7 +26,6 @@ class Docblock extends \lithium\core\StaticObject {
 			return compact('description', 'text', 'tags');
 		}
 		$tagContents = preg_split('/\n@\w+\s+/ms', $description);
-		ini_set('xdebug.var_display_max_data', 2048);
 
 		foreach (array_values(array_slice($tagContents, 1)) as $i => $desc) {
 			$description = trim(str_replace("@{$tagNames[1][$i]} {$desc}", '', $description));

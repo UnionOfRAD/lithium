@@ -1,10 +1,6 @@
 <?php
 /**
  * Lithium: the most rad php framework
- * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
- *
- * Licensed under The BSD License
- * Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
@@ -146,6 +142,13 @@ class LibrariesTest extends \lithium\test\Unit {
 		$expected = 'lithium\storage\cache\adapters\File';
 		$this->assertEqual($expected, $result);
 
+		$result = Libraries::locate('dataSources', 'Database');
+		$expected = 'lithium\data\source\Database';
+		$this->assertEqual($expected, $result);
+
+		$result = Libraries::locate('dataSources.database', 'MySql');
+		$expected = 'lithium\data\source\database\adapter\MySql';
+		$this->assertEqual($expected, $result);
 	}
 }
 

@@ -28,23 +28,33 @@ class Libraries {
 	 * @var array
 	 */
 	protected static $_classPaths = array(
-		'adapters'    => array(
+		'adapters' => array(
 			'{:library}\extensions\adapters\{:namespace}\{:class}\{:name}',
 			'{:library}\extensions\adapters\{:class}\{:name}',
 			'{:library}\{:namespace}\{:class}\adapters\{:name}' => array('libraries' => 'lithium')
 		),
-		'commands'    => array(
+		'commands' => array(
 			'{:library}\extensions\commands\{:class}\{:name}',
 			'{:library}\extensions\commands\{:name}',
 			'{:library}\console\commands\{:name}' => array('libraries' => 'lithium')
 		),
-		'controllers' => array('{:library}\controllers\{:name}Controller'),
-		'helpers'     => array(
+		'controllers' => array(
+			'{:library}\controllers\{:name}Controller'
+		),
+		'dataSources' => array(
+			'{:library}\extensions\data\source\{:class}\adapter\{:name}',
+			'{:library}\data\source\{:class}\adapter\{:name}' => array('libraries' => 'lithium'),
+			'{:library}\extensions\data\source\{:name}',
+			'{:library}\data\source\{:name}' => array('libraries' => 'lithium')
+		),
+		'helpers' => array(
 			'{:library}\extensions\helpers\{:name}',
 			'{:library}\template\helpers\{:name}' => array('libraries' => 'lithium')
 		),
-		'models'      => array('{:library}\models\{:name}'),
-		'sockets'      => array(
+		'models' => array(
+			'{:library}\models\{:name}'
+		),
+		'sockets' => array(
 			'{:library}\extensions\sockets\{:name}',
 			'{:library}\{:class}\socket\{:name}' => array('libraries' => 'lithium')
 		),

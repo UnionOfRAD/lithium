@@ -1,10 +1,6 @@
 <?php
 /**
  * Lithium: the most rad php framework
- * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
- *
- * Licensed under The BSD License
- * Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
@@ -43,7 +39,7 @@ class Stream {
 			return false;
 		}
 
-		$echo = '/\<\?=\s*([^(?:;\s*\?>)(?:\s*\?>)]+)\s*;?\s*\?>/';
+		$echo = '/\<\?=\s*(.+?)\s*;?\s*\?>/';
 		$this->_data = preg_replace('/\<\?=@/', '<?php echo ', $this->_data);
 		$this->_data = preg_replace($echo, '<?php echo $h($1); ?>', $this->_data);
 		return true;
