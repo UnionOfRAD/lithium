@@ -62,6 +62,13 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual($message, (string)$response);
 	}
 
+	public function testEmptyResponse() {
+		$response = new Response(array('message' => "\n"));
+		$result = trim((string)$response);
+		$expected = 'HTTP/1.1 200 OK';
+		$this->assertEqual($expected, $result);
+	}
+
 	function testToString() {
 		$expected = join("\r\n", array(
 			'HTTP/1.1 200 OK',

@@ -23,28 +23,45 @@ class Libraries {
 	protected static $_configurations = array();
 
 	/**
-	 * Contains a cascading list of path templates, indexed by object type.
+	 * Contains a cascading list of search path templates, indexed by base object type. Used by
+	 * `Libraries::locate()` to perform service location. This allows new types of objects (i.e.
+	 * models, helpers, cache adapters and data sources) to be automatically 'discovered' when you
+	 * register a new vendor library or plugin (using `Libraries::add()`).
+	 *
+	 * Because paths are checked in the order in which they appear, path templates should be
+	 * specified from most-specific to least-specific. See the `locate()` method for usage examples.
 	 *
 	 * @var array
+	 * @see lithium\core\Libraries::locate()
 	 */
 	protected static $_classPaths = array(
-		'adapters'    => array(
+		'adapters' => array(
 			'{:library}\extensions\adapters\{:namespace}\{:class}\{:name}',
 			'{:library}\extensions\adapters\{:class}\{:name}',
 			'{:library}\{:namespace}\{:class}\adapters\{:name}' => array('libraries' => 'lithium')
 		),
-		'commands'    => array(
+		'commands' => array(
 			'{:library}\extensions\commands\{:class}\{:name}',
 			'{:library}\extensions\commands\{:name}',
 			'{:library}\console\commands\{:name}' => array('libraries' => 'lithium')
 		),
-		'controllers' => array('{:library}\controllers\{:name}Controller'),
-		'helpers'     => array(
+		'controllers' => array(
+			'{:library}\controllers\{:name}Controller'
+		),
+		'dataSources' => array(
+			'{:library}\extensions\data\source\{:class}\adapter\{:name}',
+			'{:library}\data\source\{:class}\adapter\{:name}' => array('libraries' => 'lithium'),
+			'{:library}\extensions\data\source\{:name}',
+			'{:library}\data\source\{:name}' => array('libraries' => 'lithium')
+		),
+		'helpers' => array(
 			'{:library}\extensions\helpers\{:name}',
 			'{:library}\template\helpers\{:name}' => array('libraries' => 'lithium')
 		),
-		'models'      => array('{:library}\models\{:name}'),
-		'sockets'      => array(
+		'models' => array(
+			'{:library}\models\{:name}'
+		),
+		'sockets' => array(
 			'{:library}\extensions\sockets\{:name}',
 			'{:library}\{:class}\socket\{:name}' => array('libraries' => 'lithium')
 		),
@@ -52,6 +69,14 @@ class Libraries {
 			'{:library}\tests\filters\{:name}',
 			'{:library}\test\filters\{:name}' => array('libraries' => 'lithium')
 		)
+	);
+
+	/**
+	 * @todo Implement in add()
+	 */
+	protected static $_libraryPaths = array(
+		'{:app}/libraries/{:name}',
+		'{:root}/plugins/{:name}'
 	);
 
 	protected static $_pluginPaths = array(
@@ -274,7 +299,8 @@ class Libraries {
 	 *
 	 * @param string $type
 	 * @param string $name
-	 * @return void
+	 * @return string
+	 * @see lithium\core\Libraries::$_classPaths
 	 */
 	public static function locate($type, $name = null, $options = array()) {
 		if (strpos($name, '\\') !== false) {

@@ -11,6 +11,29 @@ namespace lithium\http;
 use \Exception;
 use \lithium\util\String;
 
+/**
+ * The `Media` class facilitates content-type mapping (mapping between content-types and file
+ * extensions), handling static assets and globally configuring how the framework handles output in
+ * different formats.
+ *
+ * Using the `Media` class, you can globally configure input and output of different types of
+ * content, i.e.:
+ * {{{Media::asset('csv', 'application/csv', array('encode' => function($data) {
+ *	ob_start();
+ *	$out = fopen('php://output', 'w');
+ *	foreach ($data as $record) {
+ *		fputcsv($out, $record->to('array'));
+ *	}
+ *	fclose($out);
+ *	$content = ob_get_clean();
+ *	return $content;
+ * }));}}}
+ *
+ * You may then render CSV content from anywhere in your application. For example, in a controller
+ * you may do the following:
+ *
+ * {{{$this->render(array('csv', 'data' => Post::find('all')));}}}
+ */
 class Media extends \lithium\core\Object {
 
 	/**
@@ -71,6 +94,16 @@ class Media extends \lithium\core\Object {
 		'text' => null
 	);
 
+	/**
+	 * Contains default path settings for various asset types. For each type, the corresponding
+	 * array key maps to the general type name, i.e. `'js'` or `'image'`. Each type contains a set
+	 * of keys which define their locations and default behavior.
+	 *
+	 * - 'suffix': The standard file ending/extension (with the `.`), i.e. `'.js'` or `'.css'`.
+	 * - 'filter': The standard file ending/extension (with the `.`), i.e. `'.js'` or `'.css'`.
+	 *
+	 * @var array
+	 */
 	protected static $_assets = array(
 		'js' => array('suffix' => '.js', 'filter' => null, 'path' => array(
 			'{:base}/{:library}/js/{:path}' => array('base', 'library', 'path'),
@@ -103,51 +136,106 @@ class Media extends \lithium\core\Object {
 	/**
 	 * Map an extension to a particular content-type (or types) with a set of options.
 	 *
-	 * @param string $type A file extension for the type, i.e. 'txt', 'js', or 'atom'
-	 * @param mixed $content Optional.  A string or array containing the content-type(s) that
+	 * Examples:
+	 * {{{//Get a list of all available media types:
+	 * Media::types(); // returns array('ai', 'amf', 'atom', ...);
+	 * }}}
+	 *
+	 * {{{//Add a custom media type:
+	 * Media::type('my', 'text/x-my', array('view' => '\my\custom\View', 'layout' => false));
+	 * }}}
+	 *
+	 * {{{//Remove a custom media type:
+	 * Media::type('my', false);
+	 * }}}
+	 *
+	 * @param string $type A file extension for the type, i.e. `'txt'`, `'js'`, or `'atom'`.
+	 * @param mixed $content Optional. A string or array containing the content-type(s) that
 	 *                    $type should map to.  If $type is an array of content-types, the first
 	 *                    one listed should be the "primary" type.
-	 * @param array $options Optional.  The handling options for this media type.
-	 * @return mixed If $content and $options are empty, returns an array with 'content' and
-	 *               'options' keys, where 'content' is the content-type(s) that correspond to
-	 *               $type (can be a string or array, if multiple content-types are available), and
-	 *               'options' is the array of options which define how this content-type should be
-	 *               handled.  If $content or $options are non-empty, returns null.
+	 * @param array $options Optional.  The handling options for this media type. Possible keys are:
+	 *
+	 *                       - view: Specifies the view class to use when rendering this content.
+	 *                       - template: Specifies a String::insert()-style path to use when
+	 *                         searching for template files.
+	 *                       - layout: Specifies a String::insert()-style path to use when searching
+	 *                         for layout files.
+	 *                       - encode: A (string) function name or (object) closure that handles
+	 *                         encoding or serializing content into this format.
+	 *                       - decode: A (string) function name or (object) closure that handles
+	 *                         decoding or unserializing content from this format.
+	 * @return mixed If `$content` and `$options` are empty, returns an array with `'content'` and
+	 *               `'options'` keys, where `'content'` is the content-type(s) that correspond to
+	 *               `$type` (can be a string or array, if multiple content-types are available),
+	 *               and `'options'` is the array of options which define how this content-type
+	 *               should be handled.  If `$content` or `$options` are non-empty, returns `null`.
 	 * @see lithium\http\Media::$_types
 	 * @see lithium\http\Media::$_handlers
+	 * @see lithium\util\String::insert()
 	 */
 	public static function type($type, $content = null, $options = array()) {
-		if (empty($content) && empty($options)) {
-			return array(
-				'content' => (isset(static::$_types[$type]) ? static::$_types[$type] : null),
-				'options' => (isset(static::$_handlers[$type]) ? static::$_handlers[$type] : null)
-			);
+		$defaults = array(
+			'view' => null,
+			'template' => null,
+			'layout' => null,
+			'encode' => null,
+			'decode' => null
+		);
+
+		if ($content === false) {
+			unset(static::$_types[$type], static::$_handlers[$type]);
 		}
+
+		if (empty($content) && empty($options)) {
+			$content = isset(static::$_types[$type]) ? static::$_types[$type] : null;
+			$options = isset(static::$_handlers[$type]) ? static::$_handlers[$type] : null;
+			return compact('content', 'options');
+		}
+
 		if (!empty($content)) {
 			static::$_types[$type] = $content;
 		}
 		if (!empty($options)) {
-			static::$_handlers[$type] = $options;
+			static::$_handlers[$type] = ((array)$options + $defaults);
 		}
 	}
 
 	/**
 	 * Gets or sets options for various asset types.
 	 *
-	 * @param string $type 
-	 * @param string $options 
-	 * @return void
+	 * @param string $type The name of the asset type, i.e. `'js'` or `'css'`.
+	 * @param array $options If registering a new asset type or modifying an existing asset type,
+	 *              contains settings for the asset type, where the available keys are as follows:
+	 *
+	 *              - 'suffix': The standard suffix for this content type, with leading dot ('.') if
+	 *                applicable.
+	 *              - 'filter': An array of key/value pairs representing simple string replacements
+	 *                to be done on a path once it is generated.
+	 *              - 'path': An array of key/value pairs where the keys are
+	 *                `String::insert()`-compatible paths, and the values are array lists of keys
+	 *                to be inserted into the path string.
+	 * @return array If `$type` is empty, an associative array of all registered types and all
+	 *               associated options is returned. If `$type` is a string and `$options` is empty,
+	 *               returns an associative array with the options for `$type`. If `$type` and
+	 *               `$options` are both non-empty, returns `null`.
+	 * @see lithium\util\String::insert()
 	 */
 	public static function assets($type = null, $options = array()) {
+		$defaults = array('suffix' => null, 'filter' => null, 'path' => array());
+
 		if (empty($type)) {
 			return static::$_assets;
+		}
+		if ($options === false) {
+			unset(static::$_assets[$type]);
 		}
 		if (empty($options)) {
 			return isset(static::$_assets[$type]) ? static::$_assets[$type] : null;
 		}
+		$options = (array)$options + $defaults;
 
 		if (isset(static::$_assets[$type])) {
-			static::$_assets[$type] = $options + static::$_assets[$type];
+			static::$_assets[$type] = array_filter((array)$options) + static::$_assets[$type];
 		} else {
 			static::$_assets[$type] = $options;
 		}
@@ -157,9 +245,9 @@ class Media extends \lithium\core\Object {
 	 * Calculates the web-accessible path to a static asset, usually a JavaScript, CSS or image
 	 * file.
 	 *
-	 * @param string $path 
-	 * @param string $type 
-	 * @param array $options 
+	 * @param string $path
+	 * @param string $type
+	 * @param array $options
 	 * @return string
 	 */
 	public static function asset($path, $type, $options = array()) {
@@ -169,7 +257,7 @@ class Media extends \lithium\core\Object {
 		$type = isset(static::$_assets[$type]) ? $type : 'generic';
 
 		$defaults = array(
-			'base' => null, 'timestamp' => false, 'filter' => null, 
+			'base' => null, 'timestamp' => false, 'filter' => null,
 			'path' => array(), 'suffix' => null
 		);
 		$options += (static::$_assets[$type] + $defaults);
@@ -188,8 +276,12 @@ class Media extends \lithium\core\Object {
 			}
 		}
 
-		if (is_array($options['filter']) && $options['filter']) {
-			$path = str_replace($options['filter'][0], $options['filter'][1], $path);
+		if (is_array($options['filter']) && !empty($options['filter'])) {
+			$path = str_replace(
+				array_keys($options['filter']),
+				array_values($options['filter']),
+				$path
+			);
 		}
 		return $path;
 	}
@@ -214,6 +306,7 @@ class Media extends \lithium\core\Object {
 			'layout' => null,
 			'view' => null
 		);
+
 		$options += array('type' => $response->type());
 		$type = $options['type'];
 		$result = null;
@@ -233,9 +326,9 @@ class Media extends \lithium\core\Object {
 	 * Called by `Media::render()` to render response content. Given a content handler and data,
 	 * calls the content handler and passes in the data, receiving back a rendered content string.
 	 *
-	 * @param array $handler 
-	 * @param array $data 
-	 * @param array $options 
+	 * @param array $handler
+	 * @param array $data
+	 * @param array $options
 	 * @return string
 	 */
 	protected static function _handle($handler, $data, $options) {
@@ -256,7 +349,7 @@ class Media extends \lithium\core\Object {
 				$result = is_string($method) ? $method($data) : $method($data, $handler);
 			break;
 			default:
-				
+
 			break;
 		}
 		return $result;

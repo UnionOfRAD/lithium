@@ -1,58 +1,58 @@
 <?php
 /**
  * Lithium: the most rad php framework
+ * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ *
+ * Licensed under The BSD License
+ * Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ *
+ * @todo          fix encoding methods to use class query methods instead of sqlite3 natives
  */
 
 namespace lithium\data\source\database\adapter;
 
 use \Exception;
 
-class MySql extends \lithium\data\source\Database {
+class Sqlite3 extends \lithium\data\source\Database {
 
 	/**
-	 * MySQL column type definitions.
+	 * Sqlite column type definitions.
 	 *
 	 * @var array
 	 */
 	protected $_columns = array(
-		'primary_key' => array('name' => 'NOT NULL AUTO_INCREMENT'),
-		'string' => array('name' => 'varchar', 'length' => 255),
+		'primary_key' => array('name' => 'integer primary key'),
+		'string' => array('name' => 'varchar', 'limit' => '255'),
 		'text' => array('name' => 'text'),
-		'integer' => array('name' => 'int', 'length' => 11, 'formatter' => 'intval'),
+		'integer' => array('name' => 'integer', 'limit' => 11, 'formatter' => 'intval'),
 		'float' => array('name' => 'float', 'formatter' => 'floatval'),
 		'datetime' => array('name' => 'datetime', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
-		'timestamp' => array(
-			'name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
-		),
+		'timestamp' => array('name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
 		'time' => array('name' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
 		'date' => array('name' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
 		'binary' => array('name' => 'blob'),
-		'boolean' => array('name' => 'tinyint', 'length' => 1)
+		'boolean' => array('name' => 'boolean')
 	);
 
 	/**
-	 * MySQL-specific value denoting whether or not table aliases should be used in DELETE and
-	 * UPDATE queries.
-	 *
-	 * @var boolean
-	 */
-	protected $_useAlias = true;
-
-	/**
-	 * Constructs the MySQL adapter and sets the default port to 3306.
+	 * Constructs the Sqlite adapter
 	 *
 	 * @param array $config Configuration options for this class. For additional configuration,
-	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options
-	 *        defined by this class:
-	 *
-	 *	- `'port'`: Accepts a port number or Unix socket name to use when connecting to the
-	 *     database.  Defaults to `'3306'`.
+	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options defined by
+	 *        this class:
+	 *        -'flags': Optional flags used to determine how to open the SQLite database. By default,
+	 *                  open uses SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE.
+	 *        -'key': An optional encryption key used when encrypting and decrypting an SQLite database.
 	 */
 	public function __construct($config = array()) {
-		$defaults = array('port' => '3306');
+		$defaults = array(
+			'database'   => '',
+			'flags'      => NULL,
+			'key'        => NULL
+		);
 		parent::__construct((array)$config + $defaults);
 	}
 
@@ -64,87 +64,47 @@ class MySql extends \lithium\data\source\Database {
 	public function connect() {
 		$config = $this->_config;
 		$this->_isConnected = false;
-		$host = $config['host'] . ':' . $config['port'];
 
-		if ($config['persistent']) {
-			$this->_connection = mysql_connect($host, $config['login'], $config['password'], true);
-		} else {
-			$this->_connection = mysql_pconnect($host, $config['login'], $config['password']);
-		}
-
-		if (mysql_select_db($config['database'], $this->_connection)) {
+		if ($this->_connection = new \SQLite3($config['database'], $config['flags'], $config['key'])) {
 			$this->_isConnected = true;
 		}
-
-		if (!empty($config['encoding'])) {
-			$this->encoding($config['encoding']);
-		}
-
-		$this->_useAlias = (bool)version_compare(
-			mysql_get_server_info($this->_connection), "4.1", ">="
-		);
 		return $this->_isConnected;
 	}
 
 	public function disconnect() {
 		if ($this->_isConnected) {
-			$this->_isConnected = !mysql_close($this->_connection);
+			$this->_isConnected = !$this->_connection->close();
 			return !$this->_isConnected;
 		}
 		return true;
 	}
 
-	/**
-	 * Returns the list of tables in the currently-connected database.
-	 *
-	 * @param string $model The fully-namespaced class name of the model object making the request.
-	 * @return array Returns an array of objects to which models can connect.
-	 * @filter This method can be filtered.
-	 */
 	public function entities($model = null) {
 		$config = $this->_config;
 		$method = function($self, $params, $chain) use ($config) {
-			$name = $this->name($self->config['database']);
-			return $self->query("SHOW TABLES FROM {$name};");
+			return $self->query("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;");
 		};
 		return $this->_filter(__METHOD__, compact('model'), $method);
 	}
 
-	/**
-	 * Gets the column schema for a given MySQL table.
-	 *
-	 * @param mixed $entity Specifies the table name for which the schema should be returned, or the
-	 *              class name of the model object requesting the schema, in which case the model
-	 *              class will be queried for the correct table name.
-	 * @param array $meta
-	 * @return array Returns an associative array describing the given table's schema, where the
-	 *               array keys are the available fields, and the values are arrays describing each
-	 *               field, containing the following keys:
-	 *               -`'type'`: The field type name
-	 * @filter This method can be filtered.
-	 */
 	public function describe($entity, $meta = array()) {
 		$params = compact('entity', 'meta');
 		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) {
 			extract($params);
 
 			$name = $self->invokeMethod('_entityName', array($entity));
-			$columns = $self->read("DESCRIBE {$name}", array('return' => 'array'));
+			$columns = $self->read("PRAGMA table_info({$name})", array('return' => 'array'));
 			$fields = array();
 
 			foreach ($columns as $column) {
-				preg_match('/(?P<type>\w+)(\((?P<length>\d+)\))?/', $column['Type'], $match);
-				$filtered = array_intersect_key($match, array('type' => null, 'length' => null));
-				$match = $filtered + array('length' => null);
-				// $match['type'] = $self->invokeMethod('_column', $match['type']);
-
-				$fields[$column['Field']] = $match + array(
-					'null'     => ($column['Null'] == 'YES' ? true : false),
-					'default'  => $column['Default'],
+				list($type, $length) = explode('(', $column['type']);
+				$length = trim($length, ')');
+				$fields[$column['name']] = array(
+					'type' => $type,
+					'length' => $length,
+					'null'     => ($column['notnull'] == 1 ? true : false),
+					'default'  => $column['dflt_value'],
 				);
-				//if (!empty($column['Key']) && isset($this->index[$column[0]['Key']])) {
-				//	$fields[$column['Field']]['key'] = $this->index[$column[0]['Key']];
-				//}
 			}
 			return $fields;
 		});
@@ -154,24 +114,25 @@ class MySql extends \lithium\data\source\Database {
 		$encodingMap = array('UTF-8' => 'utf8');
 
 		if (empty($encoding)) {
-			$encoding = mysql_client_encoding($this->_connection);
+			$encoding = $this->_connection->querySingle('PRAGMA encoding');
 			return ($key = array_search($encoding, $encodingMap)) ? $key : $encoding;
 		}
 		$encoding = isset($encodingMap[$encoding]) ? $encodingMap[$encoding] : $encoding;
-		return mysql_set_charset($encoding, $this->_connection);
+		$this->_connection->exec("PRAGMA encoding = \"{$encoding}\"");
+		return $this->_connection->querySingle("PRAGMA encoding");
 	}
 
 	public function result($type, $resource, $context) {
-		if (!is_resource($resource)) {
+		if (!($resource instanceof \SQLite3Result)) {
 			return null;
 		}
 
 		switch ($type) {
 			case 'next':
-				$result = mysql_fetch_row($resource);
+				$result = $resource->fetchArray(SQLITE3_ASSOC);
 			break;
 			case 'close':
-				mysql_free_result($resource);
+				$resource->finalize();
 				$result = null;
 			break;
 			default:
@@ -182,7 +143,7 @@ class MySql extends \lithium\data\source\Database {
 	}
 
 	public function value($value) {
-		return "'" . mysql_real_escape_string($value, $this->_connection) . "'";
+		return $this->_connection->escapeString($value);
 	}
 
 	/**
@@ -200,10 +161,10 @@ class MySql extends \lithium\data\source\Database {
 		}
 
 		$result = array();
-		$count = mysql_num_fields($resource);
+		$count = $resource->numColumns();
 
 		for ($i = 0; $i < $count; $i++) {
-			$result[] = mysql_field_name($resource, $i);
+			$result[] = $resource->columnName($i);
 		}
 		return $result;
 	}
@@ -214,46 +175,25 @@ class MySql extends \lithium\data\source\Database {
 	 * @return array
 	 */
 	public function error() {
-		if (mysql_error($this->_connection)) {
-			return array(mysql_errno($this->_connection), mysql_error($this->_connection));
+		if ($this->_connection->lastErrorMsg()) {
+			return array($this->_connection->lastErrorCode(), $this->_connection->lastErrorMsg());
 		}
 		return null;
 	}
 
 	protected function _execute($sql, $options = array()) {
-		$defaults = array('buffered' => true);
-		$options += $defaults;
-
 		$params = compact('sql', 'options');
 		$conn =& $this->_connection;
 
 		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use (&$conn) {
 			extract($params);
-			$func = ($options['buffered']) ? 'mysql_query' : 'mysql_unbuffered_query';
-			$resource = $func($sql, $conn);
-
-			if (!is_resource($resource)) {
+			$result = $conn->query($sql);
+			if ( !($result instanceof \SQLite3Result) ) {
 				list($code, $error) = $self->error();
 				throw new Exception("$sql: $error", $code);
 			}
-			return $resource;
+			return $result;
 		});
-	}
-
-	protected function _results($results) {
-		$numFields = mysql_num_fields($results);
-		$index = $j = 0;
-
-		while ($j < $numFields) {
-			$column = mysql_fetch_field($results, $j);
-
-			if (!empty($column->table)) {
-				$this->map[$index++] = array($column->table, $column->name);
-			} else {
-				$this->map[$index++] = array(0, $column->name);
-			}
-			$j++;
-		}
 	}
 
 	/**
@@ -299,13 +239,6 @@ class MySql extends \lithium\data\source\Database {
 			break;
 		}
 		return $column;
-	}
-
-	protected function _entityName($entity) {
-		if (class_exists($entity, false) && method_exists($entity, 'meta')) {
-			$entity = $entity::meta('name');
-		}
-		return $entity;
 	}
 }
 

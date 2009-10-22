@@ -109,7 +109,7 @@ class Request extends \lithium\http\Base {
 		if (!empty($config['params'])) {
 			$this->params = $config['params'];
 		}
-		if (!empty($config['auth'])) {
+		if (!empty($config['auth']['password'])) {
 			$this->headers('Authorization',
 				$config['auth']['method'] . ' '
 				. base64_encode(

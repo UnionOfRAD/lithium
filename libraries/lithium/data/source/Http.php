@@ -12,7 +12,7 @@
 
 namespace lithium\data\source;
 
-use lithium\core\Libraries;
+use \lithium\core\Libraries;
 
 /**
  * Http class to access data sources using Socket classes
@@ -65,7 +65,8 @@ class Http extends \lithium\data\Source {
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(
-			'adapter'    => 'Stream',
+			'socket'    => 'Stream',
+			'adapter'    => null,
 			'persistent' => false,
 			'protocol'   => 'tcp',
 			'host'       => 'localhost',
@@ -74,7 +75,7 @@ class Http extends \lithium\data\Source {
 			'login'      => 'root',
 			'password'   => '',
 			'port'       => 80,
-			'timeout'    => 30,
+			'timeout'    => 1,
 			'encoding'   => 'UTF-8'
 		);
 		$config = (array)$config + $defaults;
@@ -89,9 +90,9 @@ class Http extends \lithium\data\Source {
 	}
 
 	protected function _init() {
-		$socket = $this->_config['adapter'];
+		$socket = $this->_config['socket'];
 		if (!class_exists($socket)) {
-			$socket = Libraries::locate('sockets.util', $this->_config['adapter']);
+			$socket = Libraries::locate('sockets.util', $this->_config['socket']);
 		}
 		$this->_connection = new $socket($this->_config);
 		$this->request = new $this->_classes['request']($this->_config);
@@ -248,12 +249,14 @@ class Http extends \lithium\data\Source {
 	 */
 	protected function _send($path = null) {
 		$this->request->path .= $path;
-
-		if ($this->_connection->write((string) $this->request)) {
+		$request = (string) $this->request;
+		if ($this->_connection->write($request)) {
 			$message = $this->_connection->read();
 			$this->response = new $this->_classes['response'](compact('message'));
+			$this->request = new $this->_classes['request']($this->_config);
 			return $this->response->body();
 		}
+		return null;
 	}
 }
 

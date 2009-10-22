@@ -10,8 +10,9 @@ namespace lithium\data;
 
 use \lithium\util\String;
 use \lithium\util\Collection;
+use \lithium\core\Libraries;
 
-class Connections extends \lithium\core\Object {
+class Connections extends \lithium\core\StaticObject {
 
 	protected static $_configurations = null;
 
@@ -79,8 +80,14 @@ class Connections extends \lithium\core\Object {
 	 * @todo Refactor class paths into lithium\core\Libraries
 	 */
 	protected static function _build($config) {
-		$path = 'lithium\data\source\{:type}' . ($config['adapter'] ? '\adapter\{:adapter}' : '');
-		$class = String::insert($path, $config);
+		$class = $config['adapter'];
+		if (!class_exists($class)) {
+			if (empty($config['adapter'])) {
+				$config['adapter'] = $config['type'];
+				$config['type'] = null;
+			}
+			$class = Libraries::locate("dataSources.{$config['type']}", $config['adapter']);
+		}
 		return new $class($config);
 	}
 }

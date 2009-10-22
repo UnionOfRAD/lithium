@@ -95,7 +95,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 
 	public function testStreamConnection() {
 		$config = array(
-			'adapter' => 'Stream',
+			'socket' => 'Stream',
 			'host' => 'localhost',
 			'login' => 'root',
 			'password' => '',
@@ -104,7 +104,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 
 		Connections::add('stream-test', 'Http', $config);
 		$result = Connections::get('stream-test');
-		$this->assertTrue($result instanceof \lithium\data\source\http\adapter\Stream);
+		$this->assertTrue($result instanceof \lithium\data\source\Http);
 	}
 }
 

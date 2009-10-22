@@ -108,6 +108,73 @@ class FormTest extends \lithium\test\Unit {
 		));
 	}
 
+	public function testSubmitGeneration() {
+		$result = $this->form->submit('Continue >');
+		$this->assertTags($result, array('input' => array(
+			'type' => 'submit',
+			'value' => 'Continue &gt;'
+		)));
+
+		$result = $this->form->submit('Continue >', array('class' => 'special'));
+		$this->assertTags($result, array('input' => array(
+			'type' => 'submit',
+			'value' => 'Continue &gt;',
+			'class' => 'special'
+		)));
+	}
+
+	public function testTextareaGeneration() {
+		$result = $this->form->textarea('foo', array('value' => 'some content'));
+		$this->assertTags($result, array(
+			'textarea' => array('name' => 'foo'),
+			'some content',
+			'/textarea'
+		));
+	}
+
+	public function testCheckboxGeneration() {
+		$result = $this->form->checkbox('foo');
+		$this->assertTags($result, array('input' => array('type' => 'checkbox', 'name' => 'foo')));
+
+		$result = $this->form->checkbox('foo', array('checked' => false));
+		$this->assertTags($result, array('input' => array('type' => 'checkbox', 'name' => 'foo')));
+
+		$result = $this->form->checkbox('foo', array('checked' => true));
+		$this->assertTags($result, array('input' => array(
+			'type' => 'checkbox', 'name' => 'foo', 'checked' => 'checked'
+		)));
+
+		$result = $this->form->checkbox('foo', array('value' => true));
+		$this->assertTags($result, array('input' => array(
+			'type' => 'checkbox', 'name' => 'foo', 'checked' => 'checked'
+		)));
+	}
+
+	public function testSelectGeneration() {
+		$result = $this->form->select('foo');
+		$this->assertTags($result, array('select' => array('name' => 'foo'), '/select'));
+
+		$result = $this->form->select(
+			'colors',
+			array('r' => 'red', 'g' => 'green', 'b' => 'blue'),
+			array('id' => 'Colors', 'value' => 'g')
+		);
+
+		$this->assertTags($result, array(
+			'select' => array('name' => 'colors', 'id' => 'Colors'),
+			array('option' => array('value' => 'r')),
+			'red',
+			'/option',
+			array('option' => array('value' => 'g', 'selected' => 'selected')),
+			'green',
+			'/option',
+			array('option' => array('value' => 'b')),
+			'blue',
+			'/option',
+			'/select'
+		));
+	}
+
 	public function testTemplateRemapping() {
 		$result = $this->form->password('passwd');
 		$this->assertTags($result, array('input' => array(

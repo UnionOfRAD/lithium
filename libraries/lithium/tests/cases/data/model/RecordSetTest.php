@@ -41,6 +41,8 @@ class RecordDb extends \lithium\data\source\Database {
 
 	public function describe($entity, $meta = array()) {
 	}
+	
+	public function error() {}
 }
 
 class RecordSetTest extends \lithium\test\Unit {
