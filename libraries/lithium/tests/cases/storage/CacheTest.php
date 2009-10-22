@@ -215,6 +215,14 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testNonPortableCacheAdapterMethod() {
+		$config = array('default' => array('adapter' => 'Memory', 'filters' => array()));
+		$result = Cache::config($config);
+		$expected = new Collection(array('items' => $config));
+		$this->assertEqual($expected, $result);
+
+	}
+
 	public function testIntegrationFileAdapterCacheConfig() {
 		$result = Cache::config();
 		$this->assertEqual(new Collection(), $result);

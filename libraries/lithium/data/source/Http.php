@@ -12,7 +12,7 @@
 
 namespace lithium\data\source;
 
-use lithium\core\Libraries;
+use \lithium\core\Libraries;
 
 /**
  * Http class to access data sources using Socket classes
