@@ -57,6 +57,15 @@ class Router extends \lithium\core\StaticObject {
 		});
 	}
 
+	/**
+	 * Attempts to match an array of route parameters (i.e. `'controller'`, `'action'`, etc.)
+	 * against a connected `Route` object.
+	 *
+	 * @param array $options 
+	 * @param object $context 
+	 * @return string
+	 * @todo Implement full context support
+	 */
 	public static function match($options = array(), $context = null) {
 		if (is_string($options)) {
 			$path = $options;
@@ -64,11 +73,14 @@ class Router extends \lithium\core\StaticObject {
 			if (strpos($path, '#') === 0 || strpos($path, 'mailto') === 0 || strpos($path, '://')) {
 				return $path;
 			}
-			$base = isset($context) ? $context->env('base') : '';
+			$base = $context ? $context->env('base') : '';
 			$path = trim($path, '/');
 			return "{$base}/{$path}";
 		}
-		$defaults = array('action' => 'index');
+		$defaults = array_filter(array(
+			'action' => ($context && $context->action) ? $context->action : 'index',
+			'controller' => ($context && $context->action) ? $context->controller : null
+		));
 		$options += $defaults;
 		$base = isset($context) ? $context->env('base') : '';
 

@@ -9,19 +9,49 @@
 namespace lithium\tests\cases\template\helpers;
 
 use \lithium\http\Router;
+use \lithium\action\Request;
+use \lithium\data\model\Record;
 use \lithium\template\helpers\Form;
 use \lithium\template\view\Renderer;
 
-class MyFormRenderer extends Renderer {}
+class MyFormRenderer extends Renderer {
+
+	public function request() {
+		if (empty($this->_request)) {
+			$this->_request = new Request();
+			$this->_request->params += array('controller' => 'posts', 'action' => 'add');
+		}
+		return $this->_request;
+	}
+}
+
+class FormPost extends \lithium\data\Model {
+
+	protected $_schema = array(
+		'id' => array('type' => 'integer'),
+		'author_id' => array('type' => 'integer'),
+		'title' => array('type' => 'string'),
+		'body' => array('type' => 'text'),
+		'created' => array('type' => 'datetime'),
+		'updated' => array('type' => 'datetime')
+	);
+}
 
 class FormTest extends \lithium\test\Unit {
 
 	/**
-	 * Test object instance
+	 * Test object instance.
 	 *
 	 * @var object
 	 */
 	public $form = null;
+
+	/**
+	 * The rendering context object.
+	 *
+	 * @var object
+	 */
+	public $context = null;
 
 	protected $_routes = array();
 
@@ -33,10 +63,32 @@ class FormTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->_routes = Router::get();
 		Router::connect(null);
-		Router::connect('/{:controller}/{:action}/{:id}.{:type}');
-		Router::connect('/{:controller}/{:action}.{:type}');
+		Router::connect('/{:controller}/{:action}/{:id}.{:type}', array('id' => null));
+		Router::connect('/{:controller}/{:action}');
 
-		$this->form = new Form(array('context' => new MyFormRenderer()));
+		$this->context = new MyFormRenderer();
+		$this->form = new Form(array('context' => $this->context));
+	}
+
+	public function testFormCreationWithBinding() {
+		$record = new Record(array('model' => __NAMESPACE__ . '\FormPost', 'data' => array(
+			'id' => '5',
+			'author_id' => '2',
+			'title' => 'This is a saved post',
+			'body' => 'This is the body of the saved post'
+		)));
+
+		$result = $this->form->create($record);
+		$base = trim($this->context->request()->env('base'), '/');
+
+		$this->assertTags($result, array(
+			'form' => array('action' => "/{$base}/posts/add", 'method' => 'post')
+		));
+
+		$result = $this->form->create($record, array('type' => 'get'));
+		$this->assertTags($result, array(
+			'form' => array('action' => "/{$base}/posts/add", 'method' => 'get')
+		));
 	}
 
 	public function testTextBox() {
@@ -75,13 +127,14 @@ class FormTest extends \lithium\test\Unit {
 			'base' => array('class' => 'editable', 'maxlength' => 255),
 			'text' => array('class' => 'locked'),
 			'textarea' => array(),
-			'templates' => array()
+			'templates' => array('create' => 'form', 'end' => 'form-end')
 		);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testFormElementWithDefaultValue() {
 		$result = $this->form->text('foo', array('default' => 'Message here'));
+
 		$this->assertTags($result, array('input' => array(
 			'type' => 'text', 'name' => 'foo', 'value' => 'Message here'
 		)));
@@ -170,6 +223,43 @@ class FormTest extends \lithium\test\Unit {
 			'/option',
 			array('option' => array('value' => 'b')),
 			'blue',
+			'/option',
+			'/select'
+		));
+	}
+
+	public function testSelectWithEmptyOption() {
+		$result = $this->form->select('numbers', array('1' => 'first', '2' => 'second'), array(
+			'empty' => true
+		));
+
+		$this->assertTags($result, array(
+			'select' => array('name' => 'numbers'),
+			array('option' => array('value' => '', 'selected' => 'selected')),
+			'/option',
+			array('option' => array('value' => '1')),
+			'first',
+			'/option',
+			array('option' => array('value' => '2')),
+			'second',
+			'/option',
+			'/select'
+		));
+
+		$result = $this->form->select('numbers', array('1' => 'first', '2' => 'second'), array(
+			'empty' => '> Make a selection'
+		));
+
+		$this->assertTags($result, array(
+			'select' => array('name' => 'numbers'),
+			array('option' => array('value' => '', 'selected' => 'selected')),
+			'&gt; Make a selection',
+			'/option',
+			array('option' => array('value' => '1')),
+			'first',
+			'/option',
+			array('option' => array('value' => '2')),
+			'second',
 			'/option',
 			'/select'
 		));
