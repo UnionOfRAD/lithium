@@ -38,7 +38,8 @@ class Filters extends \lithium\util\Collection {
 	/**
 	 * Gets the method name associated with this filter chain.  This is the method being filtered.
 	 *
-	 * @return void
+	 * @param boolean $full Whether to return the method name including the class name or not.
+	 * @return string
 	 */
 	public function method($full = false) {
 		return $full ? $this->_class . '::' . $this->_method : $this->_method;
