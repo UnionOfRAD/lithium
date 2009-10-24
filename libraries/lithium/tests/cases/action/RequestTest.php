@@ -18,6 +18,21 @@ class RequestTest extends \lithium\test\Unit {
 		$this->request = new Request(array('init' => false));
 	}
 
+	/**
+	 * Tests that request parameters in the `$params` property are accessible as magic properties
+	 * through `__get()`.
+	 *
+	 * @return void
+	 */
+	public function testMagicParamsAccess() {
+		$this->assertNull($this->request->action);
+		$this->assertFalse(isset($this->request->params['action']));
+
+		$expected = $this->request->params['action'] = 'index';
+		$result = $this->request->action;
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testFilesNormalization() {
 		$result = $this->request->normalizeFiles(array(
 			'fileA' => array(
@@ -42,8 +57,6 @@ class RequestTest extends \lithium\test\Unit {
 				)
 			)
 		));
-
-		// print_r($result);
 	}
 }
 

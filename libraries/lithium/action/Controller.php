@@ -11,23 +11,29 @@ namespace lithium\action;
 use \Exception;
 
 /**
- * The bulk of the controller code in 1.2 that we need to be concerned with can be broken down
- * into these things:
+ * The `Controller` class is the fundamental building block of your application's request/response
+ * cycle. Controllers are organized around a single logical entity, usually one or more model
+ * classes (i.e. `lithium\data\Model`) and is tasked with performing operations against that entity.
  *
- *   - Merging inherited configuration.  We might possibly be able to handle this in a more
- *     generalized way and at a higher level.  It may be a good use-case for a generic way
- *     to handle object configuration
+ * Each controller has a series of 'actions' which are defined as class methods of the `Controller`
+ * classes. Each action has a specific responsibility, such as listing a set of objects, updating an
+ * object, or deleting an object.
  *
- *   - Interacting with the view.  This includes passing variables, determining formats and
- *     template/layout locations, and determining helpers.
+ * A controller object is instatiated by the `Dispatcher` (`lithium\http\Dispatcher`), and is given
+ * an instance of the `lithium\action\Request` class, which contains all necessary request state,
+ * including routing information, `GET` & `POST` data, and server variables. The controller is then
+ * invoked (using PHP's magic `__invoke()` syntax), and the proper action is called, according to
+ * the routing information stored in the `Request` object.
  *
- *   - Handling responses and flow control.  This includes rendering, redirecting, and
- *     callbacks.
+ * A controller then returns a response (i.e. using `redirect()` or `render()`) which includes HTTP
+ * headers, and/or a serialized data response (JSON or XML, etc.) or HTML webpage.
  *
- *   - Action-oriented caching.
+ * For more information on returning serialized data responses for web services, or manipulating
+ * template rendering from within your controllers, see the settings in `$_render` and the
+ * `lithium\http\Media` class.
  *
- *   - Pagination.  I don't know how I feel about this.  It kind of feels like it needs it's
- *     own object
+ * @see lithium\http\Media
+ * @see lithium\action\Controller::$_render
  */
 class Controller extends \lithium\core\Object {
 
@@ -44,6 +50,12 @@ class Controller extends \lithium\core\Object {
 		'hasRendered' => false
 	);
 
+	/**
+	 * Lists `Controller`'s class dependencies. For details on extending or replacing a class,
+	 * please refer to that class's API.
+	 *
+	 * @var array
+	 */
 	protected $_classes = array(
 		'media' => '\lithium\http\Media',
 		'router' => '\lithium\http\Router',

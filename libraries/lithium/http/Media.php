@@ -68,7 +68,7 @@ class Media extends \lithium\core\Object {
 		'xhtml'        => array('application/xhtml+xml', 'application/xhtml', 'text/xhtml'),
 		'xhtml-mobile' => 'application/vnd.wap.xhtml+xml',
 		'xml'          => array('application/xml', 'text/xml'),
-		'zip'          => 'application/x-zip',
+		'zip'          => 'application/x-zip'
 	);
 
 	/**

@@ -77,7 +77,7 @@ Libraries::add('app');
 /**
  * Add some plugins
  */
-// Libraries::add('plugin', 'lithium_docs');
+// Libraries::add('plugin', 'li3_docs');
 
 /**
  * This configures your session storage. The Cookie storage adapter must be connected first, since

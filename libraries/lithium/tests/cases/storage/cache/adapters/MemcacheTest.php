@@ -21,6 +21,13 @@ class MemcacheTest extends \lithium\test\Unit {
 		$extensionExists = extension_loaded('memcached');
 		$message = 'The libmemcached extension is not installed.';
 		$this->skipIf(!$extensionExists, $message);
+
+		$M = new \Memcached();
+		$M->addServer('127.0.0.1', 11211);
+		$message = 'The memcached daemon does not appear to be running on 127.0.0.1:11211';
+		$result = $M->getVersion();
+		$this->skipIf(empty($result), $message);
+
 	}
 
 	public function setUp() {
