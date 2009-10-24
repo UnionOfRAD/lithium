@@ -119,6 +119,20 @@ class Request extends \lithium\core\Object {
 	}
 
 	/**
+	 * Allows request parameters to be accessed as object properties, i.e. `$this->request->action`
+	 * instead of `$this->request->params['action']`.
+	 *
+	 * @param string $name The property name/parameter key to return.
+	 * @return mixed Returns the value of `$params[$name]` if it is set, otherwise returns null.
+	 * @see lithium\action\Request::$params
+	 */
+	public function __get($name) {
+		if (isset($this->params[$name])) {
+			return $this->params[$name];
+		}
+	}
+
+	/**
 	 * Queries PHP's environment settings, and provides an abstraction for standardizing expected
 	 * environment values across varying platforms, as well as specify custom environment flags.
 	 *

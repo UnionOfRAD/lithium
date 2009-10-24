@@ -33,6 +33,7 @@ use \Exception;
  * `lithium\http\Media` class.
  *
  * @see lithium\http\Media
+ * @see lithium\action\Controller::$_render
  */
 class Controller extends \lithium\core\Object {
 
