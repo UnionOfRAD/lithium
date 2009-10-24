@@ -86,12 +86,16 @@ class Media extends \lithium\core\Object {
 		),
 		'html' => array(),
 		'json' => array(
-			'view' => false,
+			'view'   => false,
 			'layout' => false,
 			'encode' => 'json_encode',
 			'decode' => 'json_decode'
 		),
-		'text' => null
+		'text' => array(
+			'view'     => false,
+			'layout'   => false,
+			'template' => false
+		)
 	);
 
 	/**
@@ -300,29 +304,23 @@ class Media extends \lithium\core\Object {
 	 * @todo Implement proper exception handling
 	 */
 	public static function render(&$response, $data = null, $options = array()) {
-		$defaults = array(
-			'encode' => function($data) { return print_r($data, true); },
-			'template' => null,
-			'layout' => null,
-			'view' => null
-		);
+		$defaults = array('encode' => null, 'template' => null, 'layout' => null, 'view' => null);
 
 		$options += array('type' => $response->type());
 		$type = $options['type'];
 		$result = null;
 
 		if (!array_key_exists($type, static::$_types)) {
-			throw new Exception("Unhandled type '$type'");
+			throw new Exception("Unhandled media type '$type'");
 		}
 
 		if (array_key_exists($type, static::$_handlers)) {
-			$h = static::$_handlers[$type];
+			$h = (array)static::$_handlers[$type] + (array)static::$_handlers['default'];
 		} else {
-			$h = $defaults;
+			$h = $options + $defaults;
 			$filter = function($v) { return $v !== null; };
 			$h = array_filter($h, $filter) + static::$_handlers['default'] + $defaults;
 		}
-
 		$response->body(static::_handle($h, $data, $options));
 		$response->headers('Content-type', current((array)static::$_types[$type]));
 	}
@@ -353,8 +351,11 @@ class Media extends \lithium\core\Object {
 				$view = new $handler['view']($handler);
 				$result = $view->render('all', $data, $options);
 			break;
+			case ($handler['template'] === false) && is_string($data):
+				$result = $data;
+			break;
 			default:
-
+				$result = print_r($data, true);
 			break;
 		}
 		return $result;
