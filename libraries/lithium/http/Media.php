@@ -175,11 +175,11 @@ class Media extends \lithium\core\Object {
 	 */
 	public static function type($type, $content = null, $options = array()) {
 		$defaults = array(
-			'view' => null,
-			'template' => null,
-			'layout' => null,
-			'encode' => null,
-			'decode' => null
+			'view' => false,
+			'template' => false,
+			'layout' => false,
+			'encode' => false,
+			'decode' => false
 		);
 
 		if ($content === false) {
@@ -315,8 +315,13 @@ class Media extends \lithium\core\Object {
 			throw new Exception("Unhandled type '$type'");
 		}
 
-		$h = array_key_exists($type, static::$_handlers) ? static::$_handlers[$type] : null;
-		$h = is_null($h) ? $defaults : $h + static::$_handlers['default'] + $defaults;
+		if (array_key_exists($type, static::$_handlers)) {
+			$h = static::$_handlers[$type];
+		} else {
+			$h = $defaults;
+			$filter = function($v) { return $v !== null; };
+			$h = array_filter($h, $filter) + static::$_handlers['default'] + $defaults;
+		}
 
 		$response->body(static::_handle($h, $data, $options));
 		$response->headers('Content-type', current((array)static::$_types[$type]));
@@ -340,13 +345,13 @@ class Media extends \lithium\core\Object {
 		}
 
 		switch (true) {
-			case $handler['view']:
-				$view = new $handler['view']($handler);
-				$result = $view->render('all', $data, $options);
-			break;
 			case $handler['encode']:
 				$method = $handler['encode'];
 				$result = is_string($method) ? $method($data) : $method($data, $handler);
+			break;
+			case $handler['view']:
+				$view = new $handler['view']($handler);
+				$result = $view->render('all', $data, $options);
 			break;
 			default:
 
