@@ -5,39 +5,40 @@
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
-
 namespace lithium\http;
+
 /**
-* Base class for Http Request and Response
-*
-*/
+ * Base class for `lithium\http\Request` and `lithium\http\Response`. Implements basic protocol
+ * handling for HTTP-based transactions.
+ */
 class Base {
+
 	/**
 	 * The full protocol: HTTP/1.1
 	 *
 	 * @var string
-	 **/
+	 */
 	public $protocol = 'HTTP/1.1';
 
 	/**
 	 * Specification version number
 	 *
 	 * @var string
-	 **/
+	 */
 	public $version = '1.1';
 
 	/**
 	 * headers
 	 *
 	 * @var array
-	 **/
+	 */
 	public $headers = array();
 
 	/**
 	 * body
 	 *
 	 * @var array
-	 **/
+	 */
 	public $body = array();
 
 	/**

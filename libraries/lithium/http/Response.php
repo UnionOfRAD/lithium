@@ -8,48 +8,51 @@
 
 namespace lithium\http;
 
+/**
+ * Parses and stores the status, headers and body of an HTTP response.
+ */
 class Response extends \lithium\http\Base {
 
 	/**
-	 * Status Code and Message
+	 * Status code and message.
 	 *
 	 * @var array
-	 **/
+	 */
 	public $status = array('code' => 200, 'message' => 'OK');
 
 	/**
 	 * headers
 	 *
 	 * @var array
-	 **/
+	 */
 	public $headers = array();
 
 	/**
 	 * Content Type
 	 *
 	 * @var string
-	 **/
+	 */
 	public $type = 'text/html';
 
 	/**
 	 * Character Set
 	 *
 	 * @var string
-	 **/
+	 */
 	public $charset = 'UTF-8';
 
 	/**
 	 * the body
 	 *
 	 * @var array
-	 **/
+	 */
 	public $body = array();
 
 	/**
-	* Status codes
-	*
-	* @var array
-	*/
+	 * Status codes
+	 *
+	 * @var array
+	 */
 	protected $_statuses = array(
 		100 => 'Continue',
 		101 => 'Switching Protocols',
@@ -110,9 +113,7 @@ class Response extends \lithium\http\Base {
 			if (array_filter($headers) == array()) {
 				return;
 			}
-			preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)\s+(.*)/i',
-				array_shift($headers), $match
-			);
+			preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)\s+(.*)/i', array_shift($headers), $match);
 
 			if (!empty($match)) {
 				list($line, $this->version, $code, $message) = $match;
@@ -148,8 +149,7 @@ class Response extends \lithium\http\Base {
 	 * undocumented function
 	 *
 	 * @return string
-	 *
-	 **/
+	 */
 	public function status($key = null, $data = null) {
 		if ($data === null) {
 			$data = $key;
@@ -157,15 +157,12 @@ class Response extends \lithium\http\Base {
 		if (!empty($data)) {
 			$this->status = array('code'=> null, 'message' => null);
 			if (is_numeric($data) && isset($this->_statuses[$data])) {
-				$this->status = array(
-					'code' => $data, 'message' => $this->_statuses[$data]
-				);
+				$this->status = array('code' => $data, 'message' => $this->_statuses[$data]);
 			} else {
 				$statuses = array_flip($this->_statuses);
+
 				if (isset($statuses[$data])) {
-					$this->status = array(
-						'code' => $statuses[$data], 'message' => $data
-					);
+					$this->status = array('code' => $statuses[$data], 'message' => $data);
 				}
 			}
 		}
@@ -175,8 +172,7 @@ class Response extends \lithium\http\Base {
 		if (isset($this->status[$key])) {
 			return $this->status[$key];
 		}
-		return "{$this->protocol}"
-			. " {$this->status['code']} {$this->status['message']}";
+		return "{$this->protocol} {$this->status['code']} {$this->status['message']}";
 	}
 
 	/**
@@ -185,16 +181,9 @@ class Response extends \lithium\http\Base {
 	* @return string
 	*/
 	public function __toString() {
-		$first = "{$this->protocol}"
-			. " {$this->status['code']} {$this->status['message']}";
-
-		$response = array(
-			$first, join("\r\n", $this->headers()),
-			"", $this->body()
-		);
-
-		$message = join("\r\n", $response);
-		return $message;
+		$first = "{$this->protocol} {$this->status['code']} {$this->status['message']}";
+		$response = array($first, join("\r\n", $this->headers()), "", $this->body());
+		return join("\r\n", $response);
 	}
 
 	/**
