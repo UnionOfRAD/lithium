@@ -298,8 +298,8 @@ class ValidatorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testEmailDomainCheck() {
-		$this->assertTrue(Validator::isEmail('abc.efg@lithiumphp.org', null, array('deep' => true)));
-		$this->assertFalse(Validator::isEmail('abc.efg@caphpkeinvalid.com', null, array(
+		$this->assertTrue(Validator::isEmail('abc.efg@rad-dev.org', null, array('deep' => true)));
+		$this->assertFalse(Validator::isEmail('abc.efg@invalidfoo.com', null, array(
 			'deep' => true
 		)));
 		$this->assertFalse(Validator::isEmail('abc@example.abcd', null, array('deep' => true)));

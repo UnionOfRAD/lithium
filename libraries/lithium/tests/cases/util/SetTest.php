@@ -946,12 +946,33 @@ class SetTest extends \lithium\test\Unit {
 		$b = array('users' => 'none');
 		$this->assertIdentical(Set::merge($a, $b), array('users' => 'none'));
 
-		$a = array('users' => array('lisa' => array('id' => 5, 'pw' => 'secret')), 'lithiumphp');
+		$a = array('users' => array('lisa' => array('id' => 5, 'pw' => 'secret')), 'lithium');
 		$b = array('users' => array('lisa' => array('pw' => 'new-pass', 'age' => 23)), 'ice-cream');
-		$this->assertIdentical(Set::merge($a, $b), array('users' => array('lisa' => array('id' => 5, 'pw' => 'new-pass', 'age' => 23)), 'lithiumphp', 'ice-cream'));
+		$this->assertIdentical(
+			Set::merge($a, $b),
+			array(
+				'users' => array('lisa' => array('id' => 5, 'pw' => 'new-pass', 'age' => 23)),
+				'lithium',
+				'ice-cream'
+			)
+		);
 
-		$c = array('users' => array('lisa' => array('pw' => 'you-will-never-guess', 'age' => 25, 'pet' => 'dog')), 'chocolate');
-		$expected = array('users' => array('lisa' => array('id' => 5, 'pw' => 'you-will-never-guess', 'age' => 25, 'pet' => 'dog')), 'lithiumphp', 'ice-cream', 'chocolate');
+		$c = array(
+			'users' => array(
+				'lisa' => array('pw' => 'you-will-never-guess', 'age' => 25, 'pet' => 'dog')
+			),
+			'chocolate'
+		);
+		$expected = array(
+			'users' => array(
+				'lisa' => array(
+					'id' => 5, 'pw' => 'you-will-never-guess', 'age' => 25, 'pet' => 'dog'
+				)
+			),
+			'lithium',
+			'ice-cream',
+			'chocolate'
+		);
 		$this->assertIdentical(Set::merge($a, $b, $c), $expected);
 
 		$this->assertIdentical(Set::merge($a, $b, array(), $c), $expected);

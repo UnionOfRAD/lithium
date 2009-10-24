@@ -381,7 +381,11 @@ class Unit extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _runTestMethod($method, $options) {
-		$this->setUp();
+		try {
+			$this->setUp();
+		} catch (Exception $e) {
+			$this->_handleException($e, __LINE__ - 2);
+		}
 		$params = compact('options', 'method');
 
 		$this->_filter(__CLASS__ . '::run', $params, function($self, $params, $chain) {
