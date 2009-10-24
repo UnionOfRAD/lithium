@@ -10,6 +10,7 @@ namespace lithium\tests\cases\http;
 
 use \lithium\http\Media;
 use \lithium\action\Request;
+use \lithium\action\Response;
 
 class MediaTest extends \lithium\test\Unit {
 
@@ -127,17 +128,110 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testRender() {
+		$response = new Response();
+		$response->type('json');
+		$data = array('something');
+		Media::render($response, $data);
+
+		$expected = array('Content-type: application/json');
+		$result = $response->headers();
+		$this->assertEqual($expected, $result);
+
+		$expected = json_encode($data);
+		$result = $response->body();
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testCustomEncodeHandler() {
-		Media::asset('csv', 'application/csv', array('encode' => function($data) {
-		 	ob_start();
-		 	$out = fopen('php://output', 'w');
-		 	foreach ($data as $record) {
-		 		fputcsv($out, $record->to('array'));
-		 	}
-		 	fclose($out);
-		 	$content = ob_get_clean();
-		 	return $content;
+		$response = new Response();
+		$response->type = 'csv';
+
+		Media::type('csv', 'application/csv', array('encode' => function($data) {
+			ob_start();
+			$out = fopen('php://output', 'w');
+			foreach ($data as $record) {
+				fputcsv($out, $record);
+			}
+			fclose($out);
+			$content = ob_get_clean();
+			return $content;
 		}));
+
+		$data = array(
+			array('John', 'Doe', '123 Main St.', 'Anytown, CA', '91724'),
+			array('Jane', 'Doe', '124 Main St.', 'Anytown, CA', '91724')
+		);
+
+		Media::render($response, $data);
+		$result = $response->body;
+		$expected = 'John,Doe,"123 Main St.","Anytown, CA",91724' . "\n";
+		$expected .= 'Jane,Doe,"124 Main St.","Anytown, CA",91724' . "\n";
+		$this->assertEqual(array($expected), $result);
+
+		$result = $response->headers['Content-type'];
+		$expected = 'application/csv';
+		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * Tests that rendering plain text correctly returns the render data as-is.
+	 *
+	 * @return void
+	 */
+	public function testPlainTextOutput() {
+		$response = new Response();
+		$response->type = 'text';
+		Media::render($response, "Hello, world!");
+
+		$expected = array("Hello, world!");
+		$result = $response->body;
+		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * Tests that an exception is thrown for cases where an attempt is made to render content for
+	 * a type which is not registered.
+	 *
+	 * @return void
+	 */
+	public function testUndhandledContent() {
+		$response = new Response();
+		$response->type = 'bad';
+
+		$this->expectException("Unhandled media type 'bad'");
+		Media::render($response, array('foo' => 'bar'));
+
+		$result = $response->body;
+		$this->assertNull($result);
+	}
+
+	/**
+	 * Tests handling content type manually using parameters to `Media::render()`, for content types
+	 * that are registered but have no default handler.
+	 *
+	 * @return void
+	 */
+	public function testManualContentHandling() {
+		Media::type('custom', 'text/x-custom');
+		$response = new Response();
+		$response->type = 'custom';
+
+		Media::render($response, 'Hello, world!', array(
+			'layout' => false,
+			'template' => false,
+			'encode' => function($data) { return "Message: {$data}"; }
+		));
+
+		$result = $response->body;
+		$expected = array("Message: Hello, world!");
+		$this->assertEqual($expected, $result);
+
+		$this->expectException("/Template not found/");
+		Media::render($response, 'Hello, world!');
+
+		$result = $response->body;
+		$this->assertNull($result);
 	}
 }
 

@@ -8,6 +8,44 @@
 
 namespace lithium\http;
 
+/**
+ * The `Route` class represents a single URL pattern which is matched against incoming requests, in
+ * order to determine the correct controller and action that an HTTP request should be dispatched
+ * to. Typically, `Route` objects are created and handled through the `lithium\http\Router` class,
+ * as follows:
+ *
+ * {{{// This instantiates a Route object behind the scenes, and adds it to Router's collection:
+ * Router::connect("/{:controller}/{:action}");
+ *
+ * // This matches a set of parameters against all Route objects contained in Router, and if a match
+ * // is found, returns a string URL with parameters inserted into the URL pattern:
+ * Router::match(array("controller" => "users", "action" => "login")); // returns "/users/login"
+ * }}}
+ *
+ * For more advanced routing, however, you can directly instantiate a `Route` object, a subclass,
+ * or any class that implements `parse()` and `match()` (see the documentation for each individual
+ * method) and configure it manually -- if, for example, you want the route to match different
+ * incoming URLs than it generates.
+ *
+ * {{{$route = new Route(array(
+ *		'template' => '/users/{:user}',
+ *		'pattern' => '@^/u(?:sers)?(?:/(?P<user>[^\/]+))$@',
+ *		'params' => array('controller' => 'users', 'action' => 'index'),
+ *		'match' => array('controller' => 'users', 'action' => 'index'),
+ *		'defaults' => array('controller' => 'users'),
+ *		'keys' => array('user' => 'user'),
+ *		'options' => array('compile' => false, 'wrap' => false)
+ * ));
+ * Router::connect($route); // this will match '/users/<username>' or '/u/<username>'.
+ * }}}
+ *
+ * For additional information on the `'options'` constructor key, see
+ * `lithium\http\Route::compile()`. To learn more about Lithium's routing system, see
+ * `lithium\http\Router`.
+ *
+ * @see lithium\http\Route::compile()
+ * @see lithium\http\Router
+ */
 class Route extends \lithium\core\Object {
 
 	/**
@@ -79,9 +117,7 @@ class Route extends \lithium\core\Object {
 		$url = '/' . trim($request->url, '/');
 
 		if (preg_match($this->_pattern, $url, $match)) {
-			$match['args'] = (isset($match['args']) ? 
-				explode('/', $match['args']) : array()
-			);
+			$match['args'] = isset($match['args']) ?  explode('/', $match['args']) : array();
 			$result = array_intersect_key($match, $this->_keys) + $this->_params + $this->_defaults;
 			$result['action'] = $result['action'] ?: 'index';
 			return $result;

@@ -68,7 +68,7 @@ class Media extends \lithium\core\Object {
 		'xhtml'        => array('application/xhtml+xml', 'application/xhtml', 'text/xhtml'),
 		'xhtml-mobile' => 'application/vnd.wap.xhtml+xml',
 		'xml'          => array('application/xml', 'text/xml'),
-		'zip'          => 'application/x-zip',
+		'zip'          => 'application/x-zip'
 	);
 
 	/**
@@ -86,12 +86,16 @@ class Media extends \lithium\core\Object {
 		),
 		'html' => array(),
 		'json' => array(
-			'view' => false,
+			'view'   => false,
 			'layout' => false,
 			'encode' => 'json_encode',
 			'decode' => 'json_decode'
 		),
-		'text' => null
+		'text' => array(
+			'view'     => false,
+			'layout'   => false,
+			'template' => false
+		)
 	);
 
 	/**
@@ -175,11 +179,11 @@ class Media extends \lithium\core\Object {
 	 */
 	public static function type($type, $content = null, $options = array()) {
 		$defaults = array(
-			'view' => null,
-			'template' => null,
-			'layout' => null,
-			'encode' => null,
-			'decode' => null
+			'view' => false,
+			'template' => false,
+			'layout' => false,
+			'encode' => false,
+			'decode' => false
 		);
 
 		if ($content === false) {
@@ -300,24 +304,23 @@ class Media extends \lithium\core\Object {
 	 * @todo Implement proper exception handling
 	 */
 	public static function render(&$response, $data = null, $options = array()) {
-		$defaults = array(
-			'encode' => function($data) { return print_r($data, true); },
-			'template' => null,
-			'layout' => null,
-			'view' => null
-		);
+		$defaults = array('encode' => null, 'template' => null, 'layout' => null, 'view' => null);
 
 		$options += array('type' => $response->type());
 		$type = $options['type'];
 		$result = null;
 
 		if (!array_key_exists($type, static::$_types)) {
-			throw new Exception("Unhandled type '$type'");
+			throw new Exception("Unhandled media type '$type'");
 		}
 
-		$h = array_key_exists($type, static::$_handlers) ? static::$_handlers[$type] : null;
-		$h = is_null($h) ? $defaults : $h + static::$_handlers['default'] + $defaults;
-
+		if (array_key_exists($type, static::$_handlers)) {
+			$h = (array)static::$_handlers[$type] + (array)static::$_handlers['default'];
+		} else {
+			$h = $options + $defaults;
+			$filter = function($v) { return $v !== null; };
+			$h = array_filter($h, $filter) + static::$_handlers['default'] + $defaults;
+		}
 		$response->body(static::_handle($h, $data, $options));
 		$response->headers('Content-type', current((array)static::$_types[$type]));
 	}
@@ -340,16 +343,19 @@ class Media extends \lithium\core\Object {
 		}
 
 		switch (true) {
-			case $handler['view']:
-				$view = new $handler['view']($handler);
-				$result = $view->render('all', $data, $options);
-			break;
 			case $handler['encode']:
 				$method = $handler['encode'];
 				$result = is_string($method) ? $method($data) : $method($data, $handler);
 			break;
+			case $handler['view']:
+				$view = new $handler['view']($handler);
+				$result = $view->render('all', $data, $options);
+			break;
+			case ($handler['template'] === false) && is_string($data):
+				$result = $data;
+			break;
 			default:
-
+				$result = print_r($data, true);
 			break;
 		}
 		return $result;

@@ -98,7 +98,7 @@ class GroupTest extends \lithium\test\Unit {
 
 	public function testQueryAllTests() {
 		$result = Group::all(array('library' => 'lithium'));
-		$this->assertEqual(54, count($result));
+		$this->assertEqual(60, count($result));
 	}
 }
 

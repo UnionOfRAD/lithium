@@ -312,6 +312,38 @@ class RouteTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result);
 	}
+
+	/**
+	 * Tests creating a route with a custom pattern that accepts URLs in two formats but only
+	 * generates them in one.
+	 *
+	 * @return void
+	 */
+	public function testRoutingMultipleMatch() {
+		$route = new Route(array(
+			'template' => '/users/{:user}',
+			'pattern' => '@^/u(?:sers)?(?:/(?P<user>[^\/]+))$@',
+			'params' => array('controller' => 'users', 'action' => 'index'),
+			'match' => array('controller' => 'users', 'action' => 'index'),
+			'defaults' => array('controller' => 'users'),
+			'keys' => array('user' => 'user'),
+			'options' => array('compile' => false, 'wrap' => false)
+		));
+		$result = $route->match(array('controller' => 'users', 'user' => 'alke'));
+		$expected = '/users/alke';
+		$this->assertEqual($expected, $result);
+
+		$request = new Request();
+		$request->url = '/users/alke';
+		$expected = array('controller' => 'users', 'action' => 'index', 'user' => 'alke');
+
+		$result = $route->parse($request);
+		$this->assertEqual($expected, $result);
+
+		$request->url = '/u/alke';
+		$result = $route->parse($request);
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
