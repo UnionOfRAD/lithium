@@ -169,7 +169,6 @@ class HttpTest extends \lithium\test\Unit {
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0 (Lithium)',
-			'Authorization: Basic cm9vdDo=',
 			'Content-Type: application/x-www-form-urlencoded',
 			'Content-Length: 11',
 			'', 'status=cool'
