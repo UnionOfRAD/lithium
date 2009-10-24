@@ -118,12 +118,6 @@ class Request extends \lithium\core\Object {
 		}
 	}
 
-	public function __get($name) {
-		if (isset($this->params[$name])) {
-			return $this->params[$name];
-		}
-	}
-
 	/**
 	 * Allows request parameters to be accessed as object properties, i.e. `$this->request->action`
 	 * instead of `$this->request->params['action']`.
