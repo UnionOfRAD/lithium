@@ -16,6 +16,19 @@ use \lithium\util\String;
  * requirement of having the gettext extension enabled or installed.  Moreover it doesn't
  * require the usage of the non thread safe `setlocale()`.
  *
+ * The adapter expects a the directory configured by the path options to be structured
+ * according to the following example.
+ * - `<path>`: This is the configured path.
+ *   - `<locale>`: The directory for the well-formed <locale> i.e `'fr' or `'en_US'`.
+ *     - `LC_MESSAGES`: The directory for the message category.
+ *       - `default.po`: The PO file.
+ *       - `default.mo`: The MO file.
+ *       - `<scope>.po`: The PO file for <scope>.
+ *       - `<scope>.mo`: The MO file for <scope>.
+ *   - `message_default.pot`: The message template.
+ *   - `message_<scope>.pot`: The message template for <scope>.
+ *
+ * @see \lithium\g11n\Locale
  * @link http://php.net/setlocale
  */
 class Gettext extends \lithium\g11n\catalog\adapters\Base {
