@@ -11,9 +11,43 @@ namespace lithium\storage;
 use \lithium\util\Inflector;
 
 /**
- * Maintains global cache configurations for the application.
+ * The `Cache` static class provides a consistent interface to configure and utilize
+ * the different cache adatpers included with Lithium, as well as your own adapters.
  *
- * @todo Perhaps re-implement using stream wrappers, and stream filters for strategies.
+ * The Cache layer of Lithium inherits from the common Adaptable class, which provides
+ * the generic configuration setting & retrieval logic, as well as the logic required
+ * to locate & instantiate the proper adapter class.
+ *
+ * In most cases, you will configure various named cache configurations in your
+ * bootstrap process, which will then be available to you in all other parts of your
+ * application.
+ *
+ * A simple example configuration:
+ *
+ * Cache::config(array(
+ *     'local' => array('adapter' => 'Apc'),
+ *     'distributed' => array(
+ *         'adapter' => 'Memcached',
+ *         'servers' => array('127.0.0.1', 11211),
+ *     ),
+ *     'default' => array('adapter' => 'File')
+ * ));
+ *
+ * Each adapter provides a consistent interface for the basic cache operations of
+ * `write`, `read`, `delete` and `clear`, which can be used interchangably between
+ * all adapters. Some adapters (e.g. Memcached) provide additional methods that
+ * are not consistently available across other adapters. To make use of these,
+ * it is always possible to call:
+ *
+ * Cache::adapter('named-configuration')->methodName($argument);
+ *
+ * This allows a very wide range of flexibility, at the cost of portability.
+ *
+ * For more information on Cache methods and specific adapters, please see their
+ * relevant documentation.
+ *
+ * @see lithium\Core\Adaptable
+ * @see lithium\storage\cache\adapters
  */
 class Cache extends \lithium\core\Adaptable {
 
