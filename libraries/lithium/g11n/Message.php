@@ -13,10 +13,24 @@ use \lithium\util\String;
 use \lithium\g11n\Locale;
 use \lithium\g11n\Catalog;
 
+/**
+ * The `Message` class is the interface for retrieving translations of static message
+ * strings throughout the framework. Internally the `Catalog` class is used to access
+ * translation data which must have been created in a 3 step process.
+ *  1. Prepare messages for translation. There are a few best practices making the
+ *     process a lot easier. Use entire English sentences (as it gives context) and
+ *     split paragraphs into multiple messages. Instead of string concatenation utilize
+ *     `String::insert()`-style format strings. Avoid to embed markup into the messages
+ *     and do not escape i.e. quotation marks where possible.
+ *  2. Extract messages from the source code and create a template for the translators.
+ *  3. Translate the messages and store the translations.
+ *
+ * @see \lithium\g11n\Catalog
+ */
 class Message extends \lithium\core\StaticObject {
 
 	/**
-	 * Returns the translation for a message ID.  Translates messages according to current locale.
+	 * Returns the translation of a message.  Translates messages according to current locale.
 	 * You can use this method either for translating a single message or for messages with a plural
 	 * form. The provided message will be used as a fall back if it isn't translateable. You may
 	 * also use `String::insert()`-style placeholders within message strings and provide
@@ -35,7 +49,6 @@ class Message extends \lithium\core\StaticObject {
 	 * }}}
 	 *
 	 * @param string $singular Either a single or the singular form of the message.
-	 *               Used as the message ID.
 	 * @param array $options Allowed keys are:
 	 *              - `'plural'`: Used as a fall back if needed.
 	 *              - `'count'`: Used to determine the correct plural form.
@@ -62,12 +75,13 @@ class Message extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Retrieves a translated message version of a message ID.
+	 * Retrieves the translation for a message ID.  Uses the `Catalog` class to
+	 * access translation data and determines the correct plural form (if necessary).
 	 *
-	 * @param string $id The singular form of the message.
+	 * @param string $id The message ID.
 	 * @param string $locale The target locale.
-	 * @param integer $count Used to determine the correct plural form (optional).
-	 * @param string $scope The scope of the message ID (optional).
+	 * @param integer $count Used to determine the correct plural form.
+	 * @param string $scope The scope of the message ID.
 	 * @return string|void The translated message or `null` if `$singular` is not
 	 *         translateable or a plural rule couldn't be found.
 	 * @todo Message pages need caching.
@@ -96,4 +110,5 @@ class Message extends \lithium\core\StaticObject {
 		}
 	}
 }
+
 ?>

@@ -11,19 +11,44 @@ namespace lithium\g11n\catalog\adapters;
 use \Exception;
 use \lithium\util\String;
 
+/**
+ * The `Gettext` class is an adapter for reading and writing PO and MO files without the
+ * requirement of having the gettext extension enabled or installed.  Moreover it doesn't
+ * require the usage of the non thread safe `setlocale()`.
+ *
+ * @link http://php.net/setlocale
+ */
 class Gettext extends \lithium\g11n\catalog\adapters\Base {
 
+	/**
+	 * Supported categories.
+	 *
+	 * @var array
+	 */
 	protected $_categories = array(
 		'message' => array(
 			'page' => array('read' => true, 'write' => true),
 			'template' => array('read' => true, 'write' => true)
 	));
 
+	/**
+	 * Constructor.
+	 *
+	 * @param array $config Available configuration options are:
+	 *        - `'path'`: The path to the directory holding the data.
+	 * @return void
+	 */
 	public function __construct($config = array()) {
 		$defaults = array('path' => null);
 		parent::__construct($config + $defaults);
 	}
 
+	/**
+	 * Initializer.  Checks if the configured path exists.
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
 	protected function _init() {
 		parent::_init();
 		if (!is_dir($this->_config['path'])) {
@@ -31,6 +56,14 @@ class Gettext extends \lithium\g11n\catalog\adapters\Base {
 		}
 	}
 
+	/**
+	 * Reads data.
+	 *
+	 * @param string $category Dot-delimited category.
+	 * @param string $locale A locale identifier.
+	 * @param string $scope The scope for the current operation.
+	 * @return mixed
+	 */
 	public function read($category, $locale, $scope) {
 		$files = $this->_files($category, $locale, $scope);
 
@@ -50,7 +83,14 @@ class Gettext extends \lithium\g11n\catalog\adapters\Base {
 	}
 
 	/**
-	 * @todo readd meta data support
+	 * Writes data.
+	 *
+	 * @param string $category Dot-delimited category.
+	 * @param string $locale A locale identifier.
+	 * @param string $scope The scope for the current operation.
+	 * @param mixed $data The data to write.
+	 * @return boolean
+	 * @todo In former incarnations of this adapter meta data was supported, needs to be readded.
 	 */
 	public function write($category, $locale, $scope, $data) {
 		$files = $this->_files($category, $locale, $scope);
@@ -159,7 +199,8 @@ class Gettext extends \lithium\g11n\catalog\adapters\Base {
 	}
 
 	/**
-	 * Parses machine object (MO) format.
+	 * Parses machine object (MO) format independent of the machine's endian it
+	 * was created on. Both 32bit and 64bit systems are supported.
 	 *
 	 * @param resource $stream
 	 * @return array

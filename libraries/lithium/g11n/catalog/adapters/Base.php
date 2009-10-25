@@ -11,7 +11,7 @@ namespace lithium\g11n\catalog\adapters;
 use \lithium\util\Set;
 
 /**
- * Base class for all g11n catalog adapters.
+ * The `Base` class is the foundation for all g11n catalog adapters.
  */
 abstract class Base extends \lithium\core\Object {
 
@@ -51,6 +51,11 @@ abstract class Base extends \lithium\core\Object {
 			'template'          => array('read' => false, 'write' => false)
 	));
 
+	/**
+	 * Initializer.  Merges redefined categories.
+	 *
+	 * @return void
+	 */
 	protected function _init() {
 		parent::_init();
 		$properties = get_class_vars(__CLASS__);
@@ -73,9 +78,9 @@ abstract class Base extends \lithium\core\Object {
 	/**
 	 * Reads data.
 	 *
-	 * @param string $category Dot-delimited categoy.
+	 * @param string $category Dot-delimited category.
 	 * @param string $locale A locale identifier.
-	 * @param string $scope The scope for the current request.
+	 * @param string $scope The scope for the current operation.
 	 * @return mixed
 	 * @see \lithium\g11n\catalog\adapters\Base::$_categories.
 	 */
@@ -86,7 +91,7 @@ abstract class Base extends \lithium\core\Object {
 	 *
 	 * @param string $category Dot-delimited category.
 	 * @param string $locale A locale identifier.
-	 * @param string $scope The scope for the current request.
+	 * @param string $scope The scope for the current operation.
 	 * @param mixed $data The data to write.
 	 * @return boolean
 	 * @see \lithium\g11n\catalog\adapters\Base::$_categories.

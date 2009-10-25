@@ -8,8 +8,18 @@
 
 namespace lithium\g11n\catalog\adapters;
 
+/**
+ * The `Memory` class is an adapter for reading and writing data during runtime.  Written data
+ * is stored in memory and lost after the end of the excution. The adapter is also very useful
+ * for testing.
+ */
 class Memory extends \lithium\g11n\catalog\adapters\Base {
 
+	/**
+	 * Supported categories.
+	 *
+	 * @var array
+	 */
 	protected $_categories = array(
 		'inflection' => array(
 			'plural'            => array('read' => true, 'write' => true),
@@ -40,14 +50,36 @@ class Memory extends \lithium\g11n\catalog\adapters\Base {
 			'template'          => array('read' => true, 'write' => true)
 	));
 
+	/**
+	 * Holds data during runtime.
+	 *
+	 * @var array
+	 */
 	protected $_data = array();
 
+	/**
+	 * Reads data.
+	 *
+	 * @param string $category Dot-delimited category.
+	 * @param string $locale A locale identifier.
+	 * @param string $scope The scope for the current operation.
+	 * @return mixed
+	 */
 	public function read($category, $locale, $scope) {
 		if (isset($this->_data[$scope][$category][$locale])) {
 			return $this->_data[$scope][$category][$locale];
 		}
 	}
 
+	/**
+	 * Writes data.
+	 *
+	 * @param string $category Dot-delimited category.
+	 * @param string $locale A locale identifier.
+	 * @param string $scope The scope for the current operation.
+	 * @param mixed $data The data to write.
+	 * @return boolean
+	 */
 	public function write($category, $locale, $scope, $data) {
 		switch ($category) {
 			case 'message.page':

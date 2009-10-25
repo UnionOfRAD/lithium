@@ -12,12 +12,32 @@ use \BadMethodCallException;
 use \InvalidArgumentException;
 
 /**
- * Locale class.
+ * The `Locale` class provides methods to deal with locale identifiers.  The locale
+ * (here: locale identifier) is used to distinguish among different sets of common
+ * preferences. The identifier used by Lithium is based in it's structure upon Unicode's
+ * language identifier and is compliant to BCP 47.
+ *
+ * `language[_Script][_TERRITORY][_VARIANT]`
+ *  - `language` The spoken language, here represented by an ISO 639-1 code,
+ *    where not available ISO 639-3 and ISO 639-5 codes are allowed too) tag.
+ *    The tag should  be lowercased and is required.
+ *  - `Script` The tag should have it's first character capitalized, all others
+ *    lowercased. The tag is optional.
+ *  - `TERRITORY` A geographical area, here represented by an ISO 3166-1 code.
+ *     Should be all uppercased and is optional.
+ *  - `VARIANT` Should be all uppercased and is optional.
+ *
+ * In order to avoid unnecessary overhead methods accepting a locale identifier require it to
+ * be well-formed according to the structue layed out above. For assuring the correct format
+ * use `Locale::canonicalize()` once on the input locale.
  *
  * @method string|void language(string $locale) Parses a locale and returns it's language tag.
  * @method string|void script(string $locale) Parses a locale and returns it's script tag.
  * @method string|void territory(string $locale) Parses a locale and returns it's territory tag.
  * @method string|void variant(string $locale) Parses a locale and returns it's variant tag.
+ * @link http://www.unicode.org/reports/tr35/tr35-12.html#Identifiers
+ * @link http://www.rfc-editor.org/rfc/bcp/bcp47.txt
+ * @link http://www.iana.org/assignments/language-subtag-registry
  */
 class Locale extends \lithium\core\StaticObject {
 
@@ -50,7 +70,7 @@ class Locale extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Composes a locale from locale tags.
+	 * Composes a locale from locale tags.  This is the pendant to `Locale::decompose()`.
 	 *
 	 * @param array $tags An array as obtained from `Locale::decompose()`.
 	 * @return string|void A locale with tags separated by underscores or `null`
@@ -70,15 +90,11 @@ class Locale extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Parses a locale into locale tags.  A valid locale has the structure and format
-	 * `language[_Script][_TERRITORY][_VARIANT]`. The language tag is an ISO 639-1 code,
-	 * where not available ISO 639-3 and ISO 639-5 codes are allowed too. The territory
-	 * tag is an ISO 3166-1 code.
+	 * Parses a locale into locale tags.  This is the pendant to `Locale::compose()``.
 	 *
-	 * @param string $locale I.e. `'en'`, `'en_US'` or `'de_DE'`.
+	 * @param string $locale A locale in it's canoncial form i.e. `'en'` or `'fr_CA'`.
 	 * @return array Parsed language, script, territory and variant tags.
 	 * @throws InvalidArgumentException
-	 * @link http://www.rfc-editor.org/rfc/bcp/bcp47.txt
 	 */
 	public static function decompose($locale) {
 		$regex  = '(?P<language>[a-z]{2,3})';
@@ -121,6 +137,7 @@ class Locale extends \lithium\core\StaticObject {
 	 * // returns array('zh_Hans_HK_REVISED', 'zh_Hans_HK', 'zh_Hans', 'zh', 'root')
 	 * }}}
 	 *
+	 * @param string $locale A locale in it's canoncial form i.e. `'en'` or `'fr_CA'`.
 	 * @return array Indexed array of locales (starting with the most specific one).
 	 */
 	public static function cascade($locale) {
