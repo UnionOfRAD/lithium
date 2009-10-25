@@ -13,8 +13,18 @@ use \InvalidArgumentException;
 
 /**
  * The `Locale` class provides methods to deal with locale identifiers.  The locale
- * (here: locale identifier) is used to distinguish among different sets of common
- * preferences. The identifier used by Lithium is based in it's structure upon Unicode's
+ * (here: _locale identifier_) is used to distinguish among different sets of common
+ * preferences.
+ *
+ * In order to avoid unnecessary overhead all methods throughout the framework accepting
+ * a locale require it to be well-formed according to the structue layed out below. For
+ * assuring the correct format use `Locale::canonicalize()` once on the locale.
+ *
+ * However the methods within this class will also work with not-so-well-formed locales.
+ * They accept both undercores and hyphens as separators between and don't care about the
+ * case of the indvidual tags.
+ *
+ * The identifier used by Lithium is based in it's structure upon Unicode's
  * language identifier and is compliant to BCP 47.
  *
  * `language[_Script][_TERRITORY][_VARIANT]`
@@ -26,10 +36,6 @@ use \InvalidArgumentException;
  *  - `TERRITORY` A geographical area, here represented by an ISO 3166-1 code.
  *     Should be all uppercased and is optional.
  *  - `VARIANT` Should be all uppercased and is optional.
- *
- * In order to avoid unnecessary overhead methods accepting a locale identifier require it to
- * be well-formed according to the structue layed out above. For assuring the correct format
- * use `Locale::canonicalize()` once on the input locale.
  *
  * @method string|void language(string $locale) Parses a locale and returns it's language tag.
  * @method string|void script(string $locale) Parses a locale and returns it's script tag.
@@ -92,7 +98,7 @@ class Locale extends \lithium\core\StaticObject {
 	/**
 	 * Parses a locale into locale tags.  This is the pendant to `Locale::compose()``.
 	 *
-	 * @param string $locale A locale in it's canoncial form i.e. `'en'` or `'fr_CA'`.
+	 * @param string $locale A locale in an arbitrary form (i.e. `'en_US'` or `'EN-US'`).
 	 * @return array Parsed language, script, territory and variant tags.
 	 * @throws InvalidArgumentException
 	 */
@@ -137,7 +143,7 @@ class Locale extends \lithium\core\StaticObject {
 	 * // returns array('zh_Hans_HK_REVISED', 'zh_Hans_HK', 'zh_Hans', 'zh', 'root')
 	 * }}}
 	 *
-	 * @param string $locale A locale in it's canoncial form i.e. `'en'` or `'fr_CA'`.
+	 * @param string $locale A locale in an arbitrary form (i.e. `'en_US'` or `'EN-US'`).
 	 * @return array Indexed array of locales (starting with the most specific one).
 	 */
 	public static function cascade($locale) {
