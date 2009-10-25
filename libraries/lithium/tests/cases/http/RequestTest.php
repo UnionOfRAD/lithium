@@ -88,9 +88,9 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = "?param:value;param1:value1";
-		$result = $this->request->queryString(array(
-			'param' => 'value', 'param1' => 'value1'
-		), "{:key}:{:value};");
+		$result = $this->request->queryString(
+			array('param' => 'value', 'param1' => 'value1'), "{:key}:{:value};"
+		);
 		$this->assertEqual($expected, $result);
 	}
 

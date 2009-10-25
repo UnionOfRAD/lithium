@@ -10,35 +10,39 @@ namespace lithium\http;
 
 use \lithium\util\String;
 
+/**
+ * Facilitates HTTP request creation by assembling connection and path info, `GET` and `POST` data,
+ * and authentication credentials in a single, stateful object.
+ */
 class Request extends \lithium\http\Base {
 
 	/**
 	 * The Host header value and authority
 	 *
 	 * @var string
-	 **/
+	 */
 	public $host = 'localhost';
 
 	/**
 	 * Port number
 	 *
 	 * @var string
-	 **/
+	 */
 	public $port = 80;
 
 	/**
-	 * the method of the request
-	 * GET, POST, PUT, DELETE, OPTIONS, HEAD, TRACE, CONNECT
+	 * The method of the request, typically one of the following: `GET`, `POST`, `PUT`, `DELETE`,
+	 * `OPTIONS`, `HEAD`, `TRACE` or `CONNECT`.
 	 *
 	 * @var string
-	 **/
+	 */
 	public $method = 'GET';
 
 	/**
 	 * absolute path of the request
 	 *
 	 * @var string
-	 **/
+	 */
 	public $path = '/';
 
 	/**

@@ -11,9 +11,10 @@ namespace lithium\storage;
 use \lithium\util\Inflector;
 
 /**
- * @todo Perhaps re-implement using stream wrappers, and stream filters for strategies.
+ * Maintains global cache configurations for the application.
  *
- **/
+ * @todo Perhaps re-implement using stream wrappers, and stream filters for strategies.
+ */
 class Cache extends \lithium\core\Adaptable {
 
 
