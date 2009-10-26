@@ -50,9 +50,9 @@ class Memcache extends \lithium\core\Object {
 	/**
 	 * Write value(s) to the cache
 	 *
-	 * @param string $key
-	 * @param string $value
-	 * @param object $conditions
+	 * @param string $key        The key to uniquely identify the cached item
+	 * @param mixed  $value      The value to be cached
+	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return boolean True on successful write, false otherwise
 	 */
 	public function write($key, $value, $expiry, $conditions = null) {
@@ -71,8 +71,8 @@ class Memcache extends \lithium\core\Object {
 	/**
 	 * Read value(s) from the cache
 	 *
-	 * @param string $key
-	 * @param object $conditions
+	 * @param string $key        The key to uniquely identify the cached item
+	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return mixed Cached value if successful, false otherwise
 	 * @todo Refactor to use RES_NOTFOUND for return value checks
 	 */
@@ -90,8 +90,8 @@ class Memcache extends \lithium\core\Object {
 	/**
 	 * Delete value from the cache
 	 *
-	 * @param string $key
-	 * @param object $conditions
+	 * @param string $key        The key to uniquely identify the cached item
+	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return mixed True on successful delete, false otherwise
 	 */
 	public function delete($key, $conditions = null) {
