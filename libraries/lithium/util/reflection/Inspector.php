@@ -35,10 +35,15 @@ class Inspector extends \lithium\core\StaticObject {
 	);
 
 	public static function type($identifier) {
+		$identifier = ltrim($identifier, '\\');
+
 		if (strpos($identifier, '::')) {
 			return (strpos($identifier, '$') !== false) ? 'property' : 'method';
 		}
-		return class_exists($identifier) ? 'class' : 'namespace';
+		if (class_exists($identifier) && in_array($identifier, get_declared_classes())) {
+			return 'class';
+		}
+		return 'namespace';
 	}
 
 	public static function info($identifier, $info = array()) {
