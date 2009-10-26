@@ -26,6 +26,18 @@ class Memory extends \lithium\core\Object {
 	protected $_cache = array();
 
 	/**
+	 * Magic method to provide an accessor (getter) to protected class variables.
+	 *
+	 * @param  string $variable The variable requested
+	 * @return mixed Variable if it exists, null otherwise.
+	 */
+	public function __get($variable) {
+		if (isset($this->{"_$variable"})) {
+			return $this->{"_$variable"};
+		}
+	}
+
+	/**
 	 * Read value(s) from the cache
 	 *
 	 * @param string $key        The key to uniquely identify the cached item
@@ -86,7 +98,9 @@ class Memory extends \lithium\core\Object {
 	 * @return mixed True on successful clear, false otherwise
 	 */
 	public function clear() {
-		unset($this->_cache);
+		foreach ($this->_cache as $key => &$value) {
+			unset($this->_cache[$key]);
+		}
 		return true;
 	}
 
