@@ -46,6 +46,7 @@ class Apc extends \lithium\core\Object {
 	 *
 	 * @param string $key        The key to uniquely identify the cached item
 	 * @param mixed  $value      The value to be cached
+	 * @param string $expiry     A strtotime() compatible cache time
 	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return boolean True on successful write, false otherwise
 	 */
