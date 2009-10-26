@@ -11,22 +11,61 @@ namespace lithium\storage\cache\adapters;
 use \lithium\util\Set;
 
 /**
- * libmemcached cache adapter implementation
+ * A Memcache (libmemcached) cache adapter implementation.
+ *
+ * The Memcache cache adapter is meant to be used through the `Cache` interface,
+ * which abstracts away key generation, adapter instantiation and filter
+ * implementation.
+ *
+ * A simple configuration of this adapter can be accomplished in app/config/bootstrap.php
+ * as follows:
+ *
+ * Cache::config(array(
+ *     'cache-config-name' => array(
+ *         'adapter' => 'Memcached',
+ *         'servers' => array(
+ *             array('127.0.0.1', 11211, 100)
+ *         )
+ *     )
+ * ));
+ *
+ * The 'servers' key accepts entries as arrays, where the format is array(server, port, <weight>),
+ * with the weight being optional.
+ *
+ * This Memcache adapter provides basic support for `write`, `read`, `delete`
+ * and `clear` cache functionality, as well as allowing the first four
+ * methods to be filtered as per the Lithium filtering system. Additionally,
+ * This adapter defines several methods that are _not_ implemented in other
+ * adapters, and are thus non-portable - see the documentation for `Cache`
+ * as to how these methods should be accessed.
+ *
+ * This adapter stores two keys for each written value - one which consists
+ * of the data to be cached, and the other being a cache of the expiration time.
+ *
+ * @see \lithium\storage\Cache::key()
+ * @see \lithium\storage\Cache::adapter()
  *
  */
 class Memcache extends \lithium\core\Object {
 
 	/**
-	 * Memcache object
+	 * Memcache object instance used by this adapter.
 	 *
 	 * @var object Memcache object
 	 */
 	protected static $_Memcached = null;
 
 	/**
-	 * Class constructor
+	 * Object constructor.
+	 * Instantiates the Memcached object, adds appropriate servers to the pool,
+	 * and configures any optional settings passed.
+	 *
+	 * @param  array $config Configuration parameters for this cache adapter.
+	 *                       These settings are indexed by name and queryable
+	 *                       through `Cache::config('name')`.
 	 *
 	 * @return void
+	 * @see \lithium\storage\Cache::config()
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(
