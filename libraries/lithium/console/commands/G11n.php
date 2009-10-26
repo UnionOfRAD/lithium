@@ -5,49 +5,58 @@ namespace lithium\console\commands;
 use \Exception;
 use \DateTime;
 use \lithium\g11n\Catalog;
+use \lithium\util\String;
 
+/**
+ * The `G11n` class is a command for extracting messages from files.
+ */
 class G11n extends \lithium\console\Command {
 
-	public function main() {
-		Console::out('G11n Script');
-		Console::hr('=', 2);
+	/**
+	 * The main method of the commad.
+	 *
+	 * @return void
+	 */
+	public function run() {
+		$this->out('G11n Command');
+		$this->hr();
 
 		$sourcePath = LITHIUM_APP_PATH;
-		$destinationPath = LITHIUM_APP_PATH . '/locales/po/';
+		$destinationPath = LITHIUM_APP_PATH . '/resources/po/';
 
-		Console::out('Extracting messages from source code.');
-		Console::hr('-', 2);
+		$this->out('Extracting messages from source code.');
+		$this->hr();
 		$timeStart = microtime(true);
 
 		$data = $this->_extract($sourcePath);
-
-		Console::nl();
-		Console::out('Yielded {:countItems} items taking {:duration} seconds.', array(
-			'countItems' => count($data),
+		$this->nl();
+		$this->out(String::insert('Yielded {:countItems} items taking {:duration} seconds.', array(
+			'countItems' => count($data['root']),
 			'duration' => round(microtime(true) - $timeStart, 4)
-		));
+		)));
 
-		Console::nl();
-		Console::out('Additional data.');
-		Console::hr('-', 2);
+		$this->nl();
+		$this->out('Additional data.');
+		$this->hr();
 
 		$meta = $this->_meta();
 
-		Console::nl();
-		Console::out('Messages template.');
-		Console::hr('-', 2);
+		$this->nl();
+		$this->out('Messages template.');
+		$this->hr();
 
 		$message  = 'Would you like to save the template now? ';
 		$message .= '(An existing template will be overwritten)';
-		if (Console::in($message, 'n', 'y/n') != 'y') {
-			Console::stop(1, 'Aborting upon user request.');
+
+		if ($this->in($message, array('choices' => array('y', 'n'), 'default' => 'n')) != 'y') {
+			$this->stop(1, 'Aborting upon user request.');
 		}
-		Console::nl();
+		$this->nl();
 
 		$this->_writeTemplate($data, $meta);
 
-		Console::nl();
-		Console::out('Done.');
+		$this->nl();
+		$this->out('Done.');
 	}
 
 	/**
@@ -56,7 +65,7 @@ class G11n extends \lithium\console\Command {
 	 * @param array $files Absolute paths to files
 	 * @return array
 	 */
-	function _extract($path) {
+	protected function _extract($path) {
 		Catalog::config(array(
 			'extract' => array('adapter' => 'Code', 'path' => $path)
 		));
@@ -71,11 +80,11 @@ class G11n extends \lithium\console\Command {
 	protected function _meta() {
 		$now = new DateTime();
 		return array(
-			'package' => Console::in('Package name:', null, 'app'),
-			'packageVersion' => Console::in('Package version:'),
-			'copyrightYear' => Console::in('Copyright year:', null, $now->format('Y')),
-			'copyright' => Console::in('Copyright holder:'),
-			'copyrightEmail' => Console::in('Copyright email address:'),
+			'package' => $this->in('Package name:', array('default' => 'app')),
+			'packageVersion' => $this->in('Package version:'),
+			'copyrightYear' => $this->in('Copyright year:', array('default' => $now->format('Y'))),
+			'copyright' => $this->in('Copyright holder:'),
+			'copyrightEmail' => $this->in('Copyright email address:'),
 			'templateCreationDate' => $now->format('Y-m-d H:iO'),
 		);
 	}
@@ -86,16 +95,13 @@ class G11n extends \lithium\console\Command {
 	 * @param array $data Data to save
 	 * @param array $meta Additional data to save
 	 * @return void
-	 * @todo readd meta data
 	 */
 	protected function _writeTemplate($data, $meta) {
-		$configs = array_keys(Catalog::config());
-
-		foreach ($configs as $key => $config) {
-			Console::out($key);
-		}
-		$key = Console::in('Please choose a config:');
-		$name = $configs[$key];
+		$configs = Catalog::config()->to('array');
+		$name = $this->in('Please choose a config:', array(
+			'choices' => array_keys($configs),
+			'default' => 'extract'
+		));
 
 		Catalog::write('message.template', 'root', compact('name'));
 	}

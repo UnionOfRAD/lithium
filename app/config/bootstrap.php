@@ -115,20 +115,6 @@ Libraries::add('app');
 // 	'plugin' => array('controller' => '{:plugin}.{:controller}')
 // )));
 
-/**
- * Uncomment to set globalization defaults. A locale consists of a language and
- * an optional territory code i.e. `'en_US'` or `'en'`. For timezone specify
- * a valid timezone identifier i.e. `'America/New_York'` or `'Etc/UTC'`. You may
- * also specify additional sources for retrieving translated and messages and
- * localized data or add rules, formats, messages or lists data right here.
- */
-// use \lithium\g11n\G11n;
-//
-// G11n::locale('en');
-// G11n::timezone('Etc/UTC');
-// G11n::sources(LITHIUM_APP_PATH . '/extensions/g11n');
-// G11n::rules('plural', array('en' => function($n) { return $n != 1 ? 1 : 0; }));
-
 /*
  * Inflector configuration example.  If your application has custom singular or plural rules, or
  * extra non-ASCII characters to transliterate, you can configure that by uncommenting the lines

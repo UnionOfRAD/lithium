@@ -13,14 +13,42 @@ use \lithium\util\String;
 use \lithium\g11n\Locale;
 use \lithium\g11n\Catalog;
 
+/**
+ * The `Message` class is concerned with aspects of the globalization of static
+ * message strings throughout the framework. Often the phrase of "translating a message"
+ * is  used for referring to globalization of messages which leads to the false assumption
+ * that this is a single step wheras it is a multi step process.
+ *
+ *  1. Marking messages as translateable.
+ *  2. Extracting marked messages, creating a message template.
+ *  3. Translating messages, storing the translation.
+ *  4. Retrieving the translation for a message.
+ *
+ * This class provides methods for the first and the last step of the process. The second
+ * one is dealt with by the `Catalog` class (see the description for `Message::translate()` for
+ * more information). The actual translation of messages by translators happens outside of the
+ * framework using external applications.
+ */
 class Message extends \lithium\core\StaticObject {
 
 	/**
-	 * Returns the translation for a message ID.  Translates messages according to current locale.
-	 * You can use this method either for translating a single message or for messages with a plural
-	 * form. The provided message will be used as a fall back if it isn't translateable. You may
-	 * also use `String::insert()`-style placeholders within message strings and provide
-	 * replacements as a separate option.
+	 * This method serves two purposes.
+	 *
+	 * For one it is used to mark transalateable messages, which can be extracted by the `Catalog`
+	 * class using the `Code` adapter for creating message template files. Since the marked messages
+	 * will be later translated by others it is important to keep a few best practices in mind.
+	 *
+	 *   1. Use entire English sentences (as it gives context).
+	 *   2. Split paragraphs into multiple messages.
+	 *   3. Instead of string concatenation utilize `String::insert()`-style format strings.
+	 *   4. Avoid to embed markup into the messages.
+	 *   5. Do not escape i.e. quotation marks where possible.
+	 *
+	 * The other purpose it serves is to return the translation of a message according to
+	 * the current or provided locale and (if applicable) plural form.  The method can be used for
+	 * both single message or messages with a plural form. The provided message will be used as a
+	 * fall back if it isn't translateable. You may also use `String::insert()`-style placeholders
+	 * within message strings and provide replacements as a separate option.
 	 *
 	 * Usage:
 	 * {{{
@@ -35,7 +63,6 @@ class Message extends \lithium\core\StaticObject {
 	 * }}}
 	 *
 	 * @param string $singular Either a single or the singular form of the message.
-	 *               Used as the message ID.
 	 * @param array $options Allowed keys are:
 	 *              - `'plural'`: Used as a fall back if needed.
 	 *              - `'count'`: Used to determine the correct plural form.
@@ -43,6 +70,9 @@ class Message extends \lithium\core\StaticObject {
 	 *              - `'locale'`: The target locale, defaults to current locale.
 	 *              - `'scope'`: The scope of the message.
 	 * @return string
+	 *
+	 * @see \lithium\console\commands\G11n
+	 * @see \lithium\g11n\catalog\adapters\Code
 	 */
 	public static function translate($singular, $options = array()) {
 		$defaults = array(
@@ -62,14 +92,16 @@ class Message extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Retrieves a translated message version of a message ID.
+	 * Retrieves the translation for a message ID.  Uses the `Catalog` class to
+	 * access translation data and determines the correct plural form (if applicable).
 	 *
-	 * @param string $id The singular form of the message.
+	 * @param string $id The message ID.
 	 * @param string $locale The target locale.
-	 * @param integer $count Used to determine the correct plural form (optional).
-	 * @param string $scope The scope of the message ID (optional).
+	 * @param integer $count Used to determine the correct plural form.
+	 * @param string $scope The scope of the message ID.
 	 * @return string|void The translated message or `null` if `$singular` is not
 	 *         translateable or a plural rule couldn't be found.
+	 * @see \lithium\g11n\Catalog
 	 * @todo Message pages need caching.
 	 */
 	protected static function _translated($id, $locale, $count = null, $scope = null) {
@@ -96,4 +128,5 @@ class Message extends \lithium\core\StaticObject {
 		}
 	}
 }
+
 ?>

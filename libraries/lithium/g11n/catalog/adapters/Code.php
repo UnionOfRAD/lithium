@@ -12,18 +12,45 @@ use \Exception;
 use \RecursiveIteratorIterator;
 use \RecursiveDirectoryIterator;
 
+/**
+ * The `Code` class is an adapter which treats files containing code as just another source
+ * of globalized data.  In fact it allows for extracting messages which are needed to build
+ * message catalog templates. Currently only code written in PHP is supported through a parser
+ * using the built-in tokenizer.
+ *
+ * @see \lithium\g11n\Message
+ */
 class Code extends \lithium\g11n\catalog\adapters\Base {
 
+	/**
+	 * Supported categories.
+	 *
+	 * @var array
+	 */
 	protected $_categories = array(
 		'message' => array(
 			'template' => array('read' => true)
 	));
 
+	/**
+	 * Constructor.
+	 *
+	 * @param array $config Available configuration options are:
+	 *        - `'path'`: The path to the directory holding the data.
+	 *        - `'scope'`: Scope to use.
+	 * @return void
+	 */
 	public function __construct($config = array()) {
 		$defaults = array('path' => null, 'scope' => null);
 		parent::__construct($config + $defaults);
 	}
 
+	/**
+	 * Initializer.  Checks if the configured path exists.
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
 	protected function _init() {
 		parent::_init();
 		if (!is_dir($this->_config['path'])) {
@@ -31,6 +58,14 @@ class Code extends \lithium\g11n\catalog\adapters\Base {
 		}
 	}
 
+	/**
+	 * Extracts data from files within configured path recursively.
+	 *
+	 * @param string $category Dot-delimited category.
+	 * @param string $locale A locale identifier.
+	 * @param string $scope The scope for the current operation.
+	 * @return mixed
+	 */
 	public function read($category, $locale, $scope) {
 		if ($scope !== $this->_config['scope']) {
 			return null;
@@ -55,6 +90,15 @@ class Code extends \lithium\g11n\catalog\adapters\Base {
 		}
 	}
 
+	/**
+	 * Writing is not supported.
+	 *
+	 * @param string $category Dot-delimited category.
+	 * @param string $locale A locale identifier.
+	 * @param string $scope The scope for the current operation.
+	 * @param mixed $data The data to write.
+	 * @return void
+	 */
 	public function write($category, $locale, $scope, $data) {}
 
 	/**

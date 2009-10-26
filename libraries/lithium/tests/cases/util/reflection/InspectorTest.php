@@ -179,6 +179,22 @@ class InspectorTest extends \lithium\test\Unit {
 		$result = Inspector::dependencies($this->subject(), array('type' => 'static'));
 		$this->assertEqual($expected, $result);
 	}
+
+	/**
+	 * Tests that class and namepace names which are equivalent in a case-insensitive search still
+	 * match properly.
+	 *
+	 * @return void
+	 */
+	public function testCaseSensitiveIdentifiers() {
+		$result = Inspector::type('lithium\storage\Cache');
+		$expected = 'class';
+		$this->assertEqual($expected, $result);
+
+		$result = Inspector::type('lithium\storage\cache');
+		$expected = 'namespace';
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

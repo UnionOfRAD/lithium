@@ -13,8 +13,17 @@ use \SimpleXmlElement;
 use \lithium\util\Inflector;
 use \lithium\g11n\Locale;
 
+/**
+ * The `Cldr` class is an adapter which allows reading from the Common Locale Data Repository
+ * maintained by the Unicode Consortium. Writing and deleting is not supported.
+ */
 class Cldr extends \lithium\g11n\catalog\adapters\Base {
 
+	/**
+	 * Supported categories.
+	 *
+	 * @var array
+	 */
 	protected $_categories = array(
 		'validation' => array(
 			'postalCode' => array('read' => true)
@@ -26,11 +35,25 @@ class Cldr extends \lithium\g11n\catalog\adapters\Base {
 			'currency' => array('read' => true)
 	));
 
+	/**
+	 * Constructor.
+	 *
+	 * @param array $config Available configuration options are:
+	 *        - `'path'`: The path to the directory holding the data.
+	 *        - `'scope'`: Scope to use.
+	 * @return void
+	 */
 	public function __construct($config = array()) {
 		$defaults = array('path' => null, 'scope' => null);
 		parent::__construct($config + $defaults);
 	}
 
+	/**
+	 * Initializer.  Checks if the configured path exists.
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
 	protected function _init() {
 		parent::_init();
 		if (!is_dir($this->_config['path'])) {
@@ -38,6 +61,14 @@ class Cldr extends \lithium\g11n\catalog\adapters\Base {
 		}
 	}
 
+	/**
+	 * Reads data.
+	 *
+	 * @param string $category Dot-delimited category.
+	 * @param string $locale A locale identifier.
+	 * @param string $scope The scope for the current operation.
+	 * @return mixed
+	 */
 	public function read($category, $locale, $scope) {
 		if ($scope !== $this->_config['scope']) {
 			return null;
@@ -97,7 +128,28 @@ class Cldr extends \lithium\g11n\catalog\adapters\Base {
 		return $this->_parseXml($file, $query, $yield, $post);
 	}
 
-	protected function _parseXml($file, $query, $yield, $post) {
+	/**
+	 * Writing is not supported.
+	 *
+	 * @param string $category Dot-delimited category.
+	 * @param string $locale A locale identifier.
+	 * @param string $scope The scope for the current operation.
+	 * @param mixed $data The data to write.
+	 * @return void
+	 */
+	public function write($category, $locale, $scope, $data) {}
+
+	/**
+	 * Parses a XML file and retrieves data from it using an XPATH query
+	 * and a given closure.
+	 *
+	 * @param string $file Absolute path to the XML file.
+	 * @param string $query An XPATH query to select items.
+	 * @param callback $yield A closure which is passed the data from the XPATH query.
+	 * @param callback $post A closure for applying formatting to the yielded results.
+	 * @return mixed
+	 */
+	protected function _parseXml($file, $query, $yield, $post = null) {
 		$document = new SimpleXmlElement($file, LIBXML_COMPACT, true);
 		$nodes = $document->xpath($query);
 
@@ -109,8 +161,6 @@ class Cldr extends \lithium\g11n\catalog\adapters\Base {
 		}
 		return $data;
 	}
-
-	public function write($category, $locale, $scope, $data) {}
 }
 
 ?>
