@@ -18,11 +18,31 @@ class Php extends \lithium\core\Object {
 		parent::__construct((array)$config + $defaults);
 	}
 
+	/**
+	 * Initialization of the session
+	 *
+	 */
 	protected function _init() {
-		if (!isset($_SESSION)) {
-			session_cache_limiter("must-revalidate");
-			session_start();
+		if (function_exists('session_write_close')) {
+			session_write_close();
 		}
+
+        if (headers_sent()) {
+            if (empty($_SESSION)) {
+                $_SESSION = array();
+            }
+            return false;
+        } elseif (!isset($_SESSION)) {
+            session_cache_limiter ("must-revalidate");
+            session_start();
+            header ('P3P: CP="NOI ADM DEV PSAi COM NAV OUR OTRo STP IND DEM"');
+            return true;
+        } else {
+            session_start();
+            return true;
+        }
+
+		$_SESSION['_timestamp'] = time();
 	}
 
 	public function isStarted() {
@@ -35,13 +55,13 @@ class Php extends \lithium\core\Object {
 
 	public function read($key, $options = array()) {
 		return function($self, $params, $chain) {
-			
+
 		};
 	}
 
 	public static function write($key, $value, $options = array()) {
 		return function($self, $params, $chain) {
-			
+
 		};
 	}
 }
