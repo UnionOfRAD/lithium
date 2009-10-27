@@ -98,3 +98,5 @@ class File extends \lithium\template\view\Renderer {
 		}
 	}
 }
+
+?>
