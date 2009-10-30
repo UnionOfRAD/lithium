@@ -12,18 +12,43 @@ use \lithium\util\String;
 use \lithium\util\Collection;
 use \lithium\core\Libraries;
 
+/**
+ *
+ *
+ *
+ */
 class Connections extends \lithium\core\StaticObject {
 
+	/**
+	 *
+	 * @var array
+	 */
 	protected static $_configurations = null;
 
+	/**
+	 *
+	 * @var array
+	 */
 	protected static $_connections = null;
 
+	/**
+	 *
+	 * @return void
+	 */
 	public static function __init() {
 		static::$_connections = new Collection();
 		static::$_configurations = new Collection();
 		require LITHIUM_APP_PATH . '/config/connections.php';
 	}
 
+	/**
+	 *
+	 *
+	 * @param string $name
+	 * @param string $type
+	 * @param array $config
+	 * @return array
+	 */
 	public static function add($name, $type = null, $config = array()) {
 		if (is_array($type)) {
 			list($config, $type) = array($type, null);
@@ -38,6 +63,13 @@ class Connections extends \lithium\core\StaticObject {
 		return static::$_configurations[$name] = (array)$config + $defaults;
 	}
 
+	/**
+	 *
+	 *
+	 * @param string $name
+	 * @param array $options
+	 * @return object
+	 */
 	public static function get($name = null, $options = array()) {
 		$defaults = array('config' => false, 'autoBuild' => true);
 		$options += $defaults;
@@ -75,9 +107,10 @@ class Connections extends \lithium\core\StaticObject {
 	/**
 	 * Constructs a DataSource object or adapter object instance from a configuration array.
 	 *
+	 * @todo Refactor class paths into lithium\core\Libraries
+	 *
 	 * @param array $config
 	 * @return object
-	 * @todo Refactor class paths into lithium\core\Libraries
 	 */
 	protected static function _build($config) {
 		$class = $config['adapter'];
