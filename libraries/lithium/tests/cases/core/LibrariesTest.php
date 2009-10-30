@@ -201,6 +201,12 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testServiceLocateApp() {
+		$result = Libraries::locate('controllers', 'HelloWorld');
+		$expected = 'app\controllers\HelloWorldController';
+		$this->assertEqual($expected, $result);
+	}
+
 }
 
 ?>

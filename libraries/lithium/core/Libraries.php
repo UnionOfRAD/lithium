@@ -243,96 +243,6 @@ class Libraries {
 		return array_values($libs);
 	}
 
-	protected static function _search($config, $options) {
-		$path = rtrim($config['path'] . $options['path'], '/');
-		$filter = '/^.+\/[A-Za-z0-9_]+$|^.*' . preg_quote($config['suffix'], '/') . '/';
-		$search = function($path) use ($config, $filter, $options) {
-			return preg_grep($filter, glob(
-				$path . '/*' . ($options['namespaces'] ? '' : $config['suffix'])
-			));
-		};
-
-		$libs = $search($path, $config);
-
-		if ($options['recursive']) {
-			$dirs = $queue = array_diff(glob($path . '/*', GLOB_ONLYDIR), $libs);
-			while ($queue) {
-				$dir = array_pop($queue);
-
-				if (!is_dir($dir)) {
-					continue;
-				}
-				$libs = array_merge($libs, $search($dir, $config));
-				$queue = array_merge($queue, array_diff(glob($dir . '/*', GLOB_ONLYDIR), $libs));
-			}
-		}
-
-		if (is_callable($options['format'])) {
-			foreach ($libs as $i => $file) {
-				$libs[$i] = $options['format']($file, $config);
-			}
-		}
-
-		if ($options['exclude']) {
-			$libs = preg_grep($options['exclude'], $libs, PREG_GREP_INVERT);
-		}
-		if ($options['filter']) {
-			$libs = preg_grep($options['filter'], $libs) ;
-		}
-
-		return $libs;
-	}
-
-	/**
-	 * Performs service location for an object of a specific type.
-	 *
-	 * @param string $type
-	 * @param string $name
-	 * @return string
-	 * @see lithium\core\Libraries::$_classPaths
-	 */
-	public static function locate($type, $name = null, $options = array()) {
-		if (strpos($name, '\\') !== false) {
-			return $name;
-		}
-		$ident = $name ? $type . '.' . $name : $type;
-
-		if (isset(static::$_cachedPaths[$ident])) {
-			return static::$_cachedPaths[$ident];
-		}
-
-		$params = static::_params($type, $name);
-		extract($params);
-
-		if (!isset(static::$_classPaths[$type])) {
-			return null;
-		}
-
-		if (is_null($name)) {
-			return static::_locateAll($params);
-		}
-
-		$params = compact('type', 'namespace', 'class', 'name');
-		$paths = static::$_classPaths[$type];
-
-		if (strpos($name, '.')) {
-			list($params['library'], $params['name']) = explode('.', $name);
-			$params['library'][0] = strtolower($params['library'][0]);
-
-			$result = static::_locateDeferred(null, $paths, $params, $options + array(
-				'library' => $params['library']
-			));
-			return static::$_cachedPaths[$ident] = $result;
-		}
-
-		if ($result = static::_locateDeferred(false, $paths, $params, $options)) {
-			return (static::$_cachedPaths[$ident] = $result);
-		}
-		if ($result = static::_locateDeferred(true, $paths, $params, $options)) {
-			return (static::$_cachedPaths[$ident] = $result);
-		}
-	}
-
 	/**
 	 * Loads the class definition specified by `$class`. Also calls the __init() method on the
 	 * class, if defined.  Looks through the list of libraries defined in $_configurations, which
@@ -365,20 +275,69 @@ class Libraries {
 		}
 		$class = ($class[0] == '\\') ? substr($class, 1) : $class;
 
-		foreach (static::$_configurations as $name => $params) {
-			$options += $params;
-			if (strpos($class, $options['prefix']) !== 0) {
+		foreach (static::$_configurations as $name => $config) {
+			$params = $options + $config;
+
+			if (strpos($class, $params['prefix']) !== 0) {
 				continue;
 			}
-			if (!empty($options['transform'])) {
-				if (is_callable($options['transform'])) {
-					return $options['transform']($class, $options);
+			if (!empty($params['transform'])) {
+				if (is_callable($params['transform'])) {
+					return $params['transform']($class, $params);
 				}
-				list($match, $replace) = $options['transform'];
+				list($match, $replace) = $params['transform'];
 				return preg_replace($match, $replace, $class);
 			}
-			$path = str_replace("\\", '/', substr($class, strlen($options['prefix'])));
-			return $options['path'] . '/' . $path . $options['suffix'];
+			$path = str_replace("\\", '/', substr($class, strlen($params['prefix'])));
+			return $params['path'] . '/' . $path . $params['suffix'];
+		}
+	}
+
+	/**
+	 * Performs service location for an object of a specific type.
+	 *
+	 * @param string $type
+	 * @param string $name
+	 * @return string
+	 * @see lithium\core\Libraries::$_classPaths
+	 */
+	public static function locate($type, $name = null, $options = array()) {
+		if (strpos($name, '\\') !== false) {
+			return $name;
+		}
+		$ident = $name ? $type . '.' . $name : $type;
+
+		if (isset(static::$_cachedPaths[$ident])) {
+			return static::$_cachedPaths[$ident];
+		}
+
+		$params = static::_params($type, $name);
+		extract($params);
+
+		if (!isset(static::$_classPaths[$type])) {
+			return null;
+		}
+
+		if (is_null($name)) {
+			return static::_locateAll($params);
+		}
+		$paths = static::$_classPaths[$type];
+
+		if (strpos($name, '.')) {
+			list($params['library'], $params['name']) = explode('.', $name);
+			$params['library'][0] = strtolower($params['library'][0]);
+
+			$result = static::_locateDeferred(null, $paths, $params, $options + array(
+				'library' => $params['library']
+			));
+			return static::$_cachedPaths[$ident] = $result;
+		}
+
+		if ($result = static::_locateDeferred(false, $paths, $params, $options)) {
+			return (static::$_cachedPaths[$ident] = $result);
+		}
+		if ($result = static::_locateDeferred(true, $paths, $params, $options)) {
+			return (static::$_cachedPaths[$ident] = $result);
 		}
 	}
 
@@ -484,6 +443,53 @@ class Libraries {
 			}
 		}
 		return $classes;
+	}
+
+	/**
+	 * Search file system
+	 *
+	 * @param string $config
+	 * @param string $options
+	 * @return array
+	 */
+	protected static function _search($config, $options) {
+		$path = rtrim($config['path'] . $options['path'], '/');
+		$filter = '/^.+\/[A-Za-z0-9_]+$|^.*' . preg_quote($config['suffix'], '/') . '/';
+		$search = function($path) use ($config, $filter, $options) {
+			return preg_grep($filter, glob(
+				$path . '/*' . ($options['namespaces'] ? '' : $config['suffix'])
+			));
+		};
+
+		$libs = $search($path, $config);
+
+		if ($options['recursive']) {
+			$dirs = $queue = array_diff(glob($path . '/*', GLOB_ONLYDIR), $libs);
+			while ($queue) {
+				$dir = array_pop($queue);
+
+				if (!is_dir($dir)) {
+					continue;
+				}
+				$libs = array_merge($libs, $search($dir, $config));
+				$queue = array_merge($queue, array_diff(glob($dir . '/*', GLOB_ONLYDIR), $libs));
+			}
+		}
+
+		if (is_callable($options['format'])) {
+			foreach ($libs as $i => $file) {
+				$libs[$i] = $options['format']($file, $config);
+			}
+		}
+
+		if ($options['exclude']) {
+			$libs = preg_grep($options['exclude'], $libs, PREG_GREP_INVERT);
+		}
+		if ($options['filter']) {
+			$libs = preg_grep($options['filter'], $libs) ;
+		}
+
+		return $libs;
 	}
 
 	/**
