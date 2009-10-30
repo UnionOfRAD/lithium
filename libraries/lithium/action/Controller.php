@@ -164,6 +164,12 @@ class Controller extends \lithium\core\Object {
 		return $this->_filter(__METHOD__, compact('dispatchParams', 'request', 'options'), $filter);
 	}
 
+	/**
+	 * This method is used to from pass along any data from the controller to the view and layout
+	 *
+	 * @param array $data sets of <variable name> => <variable value> to pass to view layer
+	 * @return void
+	 */
 	public function set($data = array()) {
 		$this->_render['data'] += (array)$data;
 	}
