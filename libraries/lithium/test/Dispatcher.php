@@ -36,7 +36,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 		if (!$group) {
 			return null;
 		}
-		$title = $options['case'] ?: '\lithium\tests\cases'. $options['group'];
+		$title = $options['case'] ?: $options['group'];
 		list($results, $filters) = static::_execute($group, Set::normalize($options['filters']));
 
 		if (is_null($options['base'])) {
@@ -48,7 +48,6 @@ class Dispatcher extends \lithium\core\StaticObject {
 
 	public static function menu($type) {
 		$classes = Libraries::locate('tests');
-
 		$data = array();
 
 		$assign = function(&$data, $class, $i = 0) use (&$assign) {
@@ -59,18 +58,13 @@ class Dispatcher extends \lithium\core\StaticObject {
 				$data[$class[$i]] = array();
 				unset($data[$offset]);
 			}
-			$class = array_values(array_filter($class, function ($var){
-				if ($var == 'tests' || $var == 'cases') {
-					return false;
-				}
-				return $var;
-			}));
 			$end ?: $assign($data[$class[$i]], $class, $i + 1);
 		};
 
 		foreach ($classes as $class) {
-			$assign($data, explode('\\', $class));
+			$assign($data, explode('\\', str_replace('\tests\cases', '', $class)));
 		}
+		ksort($data);
 
 		$format = function($test) use ($type) {
 			if ($type == 'html') {
@@ -102,23 +96,26 @@ class Dispatcher extends \lithium\core\StaticObject {
 
 		$menu = function ($data, $parent = null) use (&$menu, $format, $result) {
 			foreach ($data as $key => $row) {
-				if (is_array($row)) {
-					if (is_string($key)) {
-						$key = strtolower($key);
-						$parent = $parent . '\\' . $key;
-						$result .= sprintf(
-							$format('group'), $parent, $key, $menu($row, $parent)
-						);
-					} else {
-						$result .= $menu($row, $parent);
-					}
+				if (is_array($row) && is_string($key)) {
+					$key = strtolower($key);
+					$next = $parent . '\\' . $key;
+					$result .= sprintf(
+						$format('group'), $next, $key, $menu($row, $next)
+					);
 				} else {
+					$next = $parent . '\\' . $key;
 					$result .= sprintf($format('case'), $row, $parent);
 				}
 			}
 			return $format($result);
 		};
-		return $menu($data);
+		foreach ($data as $library => $tests) {
+			$group = "\\{$library}\\tests\cases";
+			$result .= $format(sprintf(
+				$format('group'), $group, $library, $menu($tests, $group)
+			));
+		}
+		return $result;
 	}
 
 	public static function process($results) {
