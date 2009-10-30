@@ -10,7 +10,7 @@ namespace lithium\core;
 
 use \Exception;
 use \RecursiveIteratorIterator;
-use \RecursiveDirectoryIterator;
+use \lithium\util\iterator\LibrariesFilter;
 use \lithium\util\String;
 
 class Libraries {
@@ -68,6 +68,9 @@ class Libraries {
 		'testFilters' => array(
 			'{:library}\tests\filters\{:name}',
 			'{:library}\test\filters\{:name}' => array('libraries' => 'lithium')
+		),
+		'tests' => array(
+			'{:library}\tests\cases\{:namespace}\{:name}Test'
 		)
 	);
 
@@ -79,6 +82,9 @@ class Libraries {
 		'{:root}/plugins/{:name}'
 	);
 
+	/**
+	 * @todo Implement in add()
+	 */
 	protected static $_pluginPaths = array(
 		'{:app}/libraries/plugins/{:name}',
 		'{:root}/plugins/{:name}'
@@ -138,10 +144,9 @@ class Libraries {
 				$defaults['loader'] = 'lithium\core\Libraries::load';
 				$defaults['defer'] = true;
 			break;
-		}
-
-		if ($name === 'plugin') {
-			return static::_addPlugins((array)$config);
+			case 'plugin':
+				return static::_addPlugins((array)$config);
+			break;
 		}
 		static::$_configurations[$name] = ((array)$config += $defaults);
 
@@ -163,6 +168,12 @@ class Libraries {
 		return $config;
 	}
 
+	/**
+	 * Returns configuration for given name
+	 *
+	 * @param string $name
+	 * @return array
+	 */
 	public static function get($name = null) {
 		if (empty($name)) {
 			return static::$_configurations;
@@ -198,21 +209,17 @@ class Libraries {
 	 * @return array
 	 */
 	public static function find($library, $options = array()) {
-		if ($library === true) {
-			$libs = array();
-
-			foreach (array_keys(static::$_configurations) as $library) {
-				$libs = array_merge($libs, static::find($library, $options));
-			}
-			return $libs;
-		}
-
 		$defaults = array(
 			'recursive' => false,
 			'filter' => '/^(\w+)?(\\\\[a-z0-9_]+)+\\\\[A-Z][a-zA-Z0-9]+$/',
 			'exclude' => '',
 			'path' => '',
-			'format' => false,
+			'format' => function ($file, $config) {
+				$trim = array(strlen($config['path']) + 1, strlen($config['suffix']));
+				$rTrim = strpos($file, $config['suffix']) !== false ? -$trim[1] : 9999;
+				$file = preg_split('/[\/\\\\]/', substr($file, $trim[0], $rTrim));
+				return $config['prefix'] . join('\\', $file);
+			},
 			'namespaces' => false
 		);
 		$options += $defaults;
@@ -221,77 +228,59 @@ class Libraries {
 			$options['filter'] = false;
 		}
 
+		if ($library === true) {
+			$libs = array();
+			foreach (array_keys(static::$_configurations) as $library) {
+				$libs = array_merge($libs, static::find($library, $options));
+			}
+			return $libs;
+		}
 		if (!isset(static::$_configurations[$library])) {
 			return null;
 		}
 		$config = static::$_configurations[$library];
+		$libs = static::_search($config, $options);
+		return array_values($libs);
+	}
+
+	protected static function _search($config, $options) {
 		$path = rtrim($config['path'] . $options['path'], '/');
 		$filter = '/^.+\/[A-Za-z0-9_]+$|^.*' . preg_quote($config['suffix'], '/') . '/';
-
-		$search = function($path) use ($filter, $options, $config) {
+		$search = function($path) use ($config, $filter, $options) {
 			return preg_grep($filter, glob(
 				$path . '/*' . ($options['namespaces'] ? '' : $config['suffix'])
 			));
 		};
-		$libs = $search($path);
+
+		$libs = $search($path, $config);
 
 		if ($options['recursive']) {
 			$dirs = $queue = array_diff(glob($path . '/*', GLOB_ONLYDIR), $libs);
-
 			while ($queue) {
 				$dir = array_pop($queue);
 
 				if (!is_dir($dir)) {
 					continue;
 				}
-				$libs = array_merge($libs, $search($dir));
+				$libs = array_merge($libs, $search($dir, $config));
 				$queue = array_merge($queue, array_diff(glob($dir . '/*', GLOB_ONLYDIR), $libs));
 			}
 		}
-		$trim = array(strlen($config['path']) + 1, strlen($config['suffix']));
 
-		if ($options['format'] != 'files') {
+		if (is_callable($options['format'])) {
 			foreach ($libs as $i => $file) {
-				$rTrim = strpos($file, $config['suffix']) !== false ? -$trim[1] : 9999;
-				$file = preg_split('/[\/\\\\]/', substr($file, $trim[0], $rTrim));
-				$libs[$i] = $config['prefix'] . join('\\', $file);
+				$libs[$i] = $options['format']($file, $config);
 			}
 		}
 
-		$exclude = $options['exclude'];
-		$libs = $exclude ? preg_grep($exclude, $libs, PREG_GREP_INVERT) : $libs;
-		$libs = $options['filter'] ? preg_grep($options['filter'], $libs) : $libs;
-		return array_values($libs);
-	}
-
-	/**
-	 * Get the corresponding physical file path for a class name.
-	 *
-	 * @param string $class
-	 * @param string $options
-	 * @return array
-	 */
-	public static function path($class, $options = array()) {
-		if (array_key_exists($class, static::$_cachedPaths)) {
-			return static::$_cachedPaths[$class];
+		if ($options['exclude']) {
+			$libs = preg_grep($options['exclude'], $libs, PREG_GREP_INVERT);
 		}
-		$class = ($class[0] == '\\') ? substr($class, 1) : $class;
-
-		foreach (static::$_configurations as $name => $options) {
-			if (strpos($class, $options['prefix']) !== 0) {
-				continue;
-			}
-
-			if (!empty($options['transform'])) {
-				if (is_object($options['transform'])) {
-					return $options['transform']($class, $options);
-				}
-				list($match, $replace) = $options['transform'];
-				return preg_replace($match, $replace, $class);
-			}
-			$path = str_replace("\\", '/', substr($class, strlen($options['prefix'])));
-			return $options['path'] . '/' . $path . $options['suffix'];
+		if ($options['filter']) {
+			$libs = preg_grep($options['filter'], $libs) ;
 		}
+
+		return $libs;
 	}
 
 	/**
@@ -312,31 +301,15 @@ class Libraries {
 			return static::$_cachedPaths[$ident];
 		}
 
-		if (strpos($type, '.')) {
-			$parts = explode('.', $type);
-			$type = array_shift($parts);
-
-			switch (count($parts)) {
-				case 1:
-					list($class) = $parts;
-				break;
-				case 1:
-				case 2:
-					list($namespace, $class) = $parts;
-				break;
-				default:
-					$class = array_pop($parts);
-					$namespace = join('\\', $parts);
-				break;
-			}
-		}
+		$params = static::_params($type, $name);
+		extract($params);
 
 		if (!isset(static::$_classPaths[$type])) {
 			return null;
 		}
 
 		if (is_null($name)) {
-			return static::_locateAll($type);
+			return static::_locateAll($params);
 		}
 
 		$params = compact('type', 'namespace', 'class', 'name');
@@ -379,51 +352,34 @@ class Libraries {
 		}
 	}
 
-	protected static function _locateAll($type, $options = array()) {
-		$defaults = array('libraries' => null);
-		$options += $defaults;
-		$type = explode('.', $type);
-
-		$paths = $classes = array();
-		$pathTemplates = static::$_classPaths[current($type)];
-		$libraries = $options['libraries'] ?: array_keys(static::$_configurations);
-
-		foreach ($libraries as $library) {
-			$config = static::$_configurations[$library];
-
-			foreach ($pathTemplates as $template => $tplOpts) {
-				if (is_int($template)) {
-					$template = $tplOpts;
-					$tplOpts = array();
-				}
-				$scope = $options['libraries'] ? (array)$options['libraries'] : null;
-
-				if ($scope && !in_array($library, $scope)) {
-					continue;
-				}
-				$params['library'] = $config['path'];
-				$path = str_replace('\\', '/', preg_replace('/\\\{:\w+}/', '', String::insert(
-					$template, $params, array('escape' => '/')
-				)));
-
-				if (is_dir($path)) {
-					$paths[$path] = $library;
-				}
-			}
+	/**
+	 * Get the corresponding physical file path for a class name.
+	 *
+	 * @param string $class
+	 * @param string $options
+	 * @return array
+	 */
+	public static function path($class, $options = array()) {
+		if (array_key_exists($class, static::$_cachedPaths)) {
+			return static::$_cachedPaths[$class];
 		}
+		$class = ($class[0] == '\\') ? substr($class, 1) : $class;
 
-		foreach ($paths as $path => $library) {
-			$config = static::$_configurations[$library];
-			$suffix = '/' . preg_quote($config['suffix'], '/') . '$/';
-			foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path)) as $i) {
-				if ($i->isFile() && preg_match($suffix, $i->getFilename())) {
-					$trim = array(strlen($config['path']) + 1, strlen($config['suffix']));
-					$file = substr($i->getPathname(), $trim[0], -$trim[1]);
-					$classes[] = $config['prefix'] . str_replace('/', '\\', $file);
-				}
+		foreach (static::$_configurations as $name => $params) {
+			$options += $params;
+			if (strpos($class, $options['prefix']) !== 0) {
+				continue;
 			}
+			if (!empty($options['transform'])) {
+				if (is_callable($options['transform'])) {
+					return $options['transform']($class, $options);
+				}
+				list($match, $replace) = $options['transform'];
+				return preg_replace($match, $replace, $class);
+			}
+			$path = str_replace("\\", '/', substr($class, strlen($options['prefix'])));
+			return $options['path'] . '/' . $path . $options['suffix'];
 		}
-		return $classes;
 	}
 
 	/**
@@ -433,8 +389,8 @@ class Libraries {
 	 * @param boolean $defer A boolean flag indicating which libraries to search, either the ones
 	 *                with the `'defer'` flag set, or the ones without.
 	 * @param array $paths The list of paths to be searched for the given service (class).  These
-	 *              are defined in `lithium\core\Libraries::$_classPaths`, and are organized by class
-	 *              type.
+	 *              are defined in `lithium\core\Libraries::$_classPaths`, and are organized by
+	 *              class type.
 	 * @param array $params The list of insert parameters to be injected into each path format
 	 *              string when searching for classes.
 	 * @param array $options
@@ -480,6 +436,57 @@ class Libraries {
 	}
 
 	/**
+	 * Locates all possible classes for given params
+	 *
+	 * @param string $params
+	 * @param string $options
+	 * @return void
+	 */
+	protected static function _locateAll($params, $options = array()) {
+		$defaults = array(
+			'libraries' => null,
+			'recursive' => true,
+			'namespaces' => false,
+			'filter' => false,
+			'exclude' => false,
+			'format' => function ($file, $config) {
+				$trim = array(strlen($config['path']) + 1, strlen($config['suffix']));
+				$file = substr($file, $trim[0], -$trim[1]);
+				return $config['prefix'] . str_replace('/', '\\', $file);
+			}
+		);
+		$options += $defaults;
+		$classPaths = static::$_classPaths[$params['type']];
+		$libraries = $options['libraries'] ?: array_keys(static::$_configurations);
+
+		$paths = $classes = array();
+
+		foreach ($libraries as $library) {
+			$config = static::$_configurations[$library];
+
+			foreach ($classPaths as $template => $tplOpts) {
+				if (is_int($template)) {
+					$template = $tplOpts;
+					$tplOpts = array();
+				}
+				$scope = $options['libraries'] ? (array)$options['libraries'] : null;
+
+				if ($scope && !in_array($library, $scope)) {
+					continue;
+				}
+				$params['library'] = "";
+				$path = String::insert($template, $params, array('escape' => '/'));
+				$path = str_replace('/*', '', str_replace('\\', '/', $path));
+				if (is_dir($config['path']. '/' . $path)) {
+					$options['path'] = $path;
+					$classes = array_merge($classes, static::_search($config, $options));
+				}
+			}
+		}
+		return $classes;
+	}
+
+	/**
 	 * Register a Lithium plugin
 	 *
 	 * @param string $plugins
@@ -516,6 +523,35 @@ class Libraries {
 			$result[$name] = $plugin;
 		}
 		return $result;
+	}
+
+	/**
+	 * Get params from type
+	 *
+	 * @param string $type
+	 * @param string $name default: null
+	 * @return array type, namespace, class, name
+	 */
+	protected static function _params($type, $name = null) {
+		$namespace = $class = '*';
+		if (strpos($type, '.')) {
+			$parts = explode('.', $type);
+			$type = array_shift($parts);
+
+			switch (count($parts)) {
+				case 1:
+					list($class) = $parts;
+				break;
+				case 2:
+					list($namespace, $class) = $parts;
+				break;
+				default:
+					$class = array_pop($parts);
+					$namespace = join('\\', $parts);
+				break;
+			}
+		}
+		return compact('type', 'namespace', 'class', 'name');
 	}
 }
 
