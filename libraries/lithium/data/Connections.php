@@ -15,7 +15,7 @@ use \lithium\core\Libraries;
 /**
  * Connections class is a static class that handles the configurations and
  * building of your datasource connections. The normal way to interact with it
- * is through the /app/config/connections.php file where you add connection-
+ * is through the `/app/config/connections.php` file where you add connection-
  * configurations to your app.
  *
  * @package lithium.data
@@ -51,7 +51,7 @@ class Connections extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Add connection configurations to your app in /app/config/connections.php
+	 * Add connection configurations to your app in `/app/config/connections.php`
 	 *
 	 * @example {{{
      *              Connections::add('database', 'Database', array(
@@ -145,7 +145,7 @@ class Connections extends \lithium\core\StaticObject {
 	/**
 	 * Constructs a DataSource object or adapter object instance from a configuration array.
 	 *
-	 * @todo Refactor class paths into lithium\core\Libraries
+	 * @todo Refactor class paths into `lithium\core\Libraries`
 	 * @param array $config
 	 * @return object
 	 */
