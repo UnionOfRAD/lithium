@@ -9,7 +9,6 @@
 namespace lithium\core;
 
 use \Exception;
-use \RecursiveIteratorIterator;
 use \lithium\util\iterator\LibrariesFilter;
 use \lithium\util\String;
 
