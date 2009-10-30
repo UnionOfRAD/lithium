@@ -13,7 +13,7 @@ use \lithium\util\collection\Filters;
 /**
  * Base class in Lithium hierarchy, from which all other dynamic classes inherit.
  *
- * @package Lithium
+ * @package lithium.core
  */
 class Object {
 

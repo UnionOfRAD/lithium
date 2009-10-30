@@ -13,6 +13,12 @@ use \RecursiveIteratorIterator;
 use \lithium\util\iterator\LibrariesFilter;
 use \lithium\util\String;
 
+/**
+ *
+ *
+ * @package lithium.core
+ *
+ */
 class Libraries {
 
 	/**

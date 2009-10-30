@@ -10,6 +10,12 @@ namespace lithium\action;
 
 use \lithium\util\Validator;
 
+/**
+ *
+ *
+ * @package lithium.action
+ * 
+ */
 class Request extends \lithium\core\Object {
 
 	public $url = null;

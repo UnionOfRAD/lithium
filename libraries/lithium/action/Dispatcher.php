@@ -14,6 +14,11 @@ use \lithium\util\Inflector;
 use \lithium\core\Libraries;
 use \lithium\core\Environment;
 
+/**
+ *
+ * @package lithium.action
+ * 
+ */
 class Dispatcher extends \lithium\core\StaticObject {
 
 	/**

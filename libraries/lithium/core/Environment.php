@@ -10,6 +10,12 @@ namespace lithium\core;
 
 use \lithium\util\Set;
 
+/**
+ * Environment 
+ *
+ * @package lithium.core
+ *
+ */
 class Environment {
 
 	protected static $_configurations = array(

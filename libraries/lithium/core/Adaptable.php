@@ -10,6 +10,12 @@ namespace lithium\core;
 
 use \lithium\util\Collection;
 
+/**
+ *
+ *
+ * @package lithium.core
+ *
+ */
 class Adaptable extends \lithium\core\StaticObject {
 
 	/**

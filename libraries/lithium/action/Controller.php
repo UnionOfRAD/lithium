@@ -34,6 +34,7 @@ use \Exception;
  *
  * @see lithium\http\Media
  * @see lithium\action\Controller::$_render
+ * @package lithium.action
  */
 class Controller extends \lithium\core\Object {
 

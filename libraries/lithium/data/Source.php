@@ -8,6 +8,11 @@
 
 namespace lithium\data;
 
+/**
+ *
+ * @package lithium.data
+ *
+ */
 abstract class Source extends \lithium\core\Object {
 
 	protected $_connection = null;
