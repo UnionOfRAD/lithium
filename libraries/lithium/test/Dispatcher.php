@@ -51,6 +51,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$data = array();
 
 		$assign = function(&$data, $class, $i = 0) use (&$assign) {
+			ksort($data);
 			isset($data[$class[$i]]) ?: $data[] = $class[$i];
 			$end = (count($class) <= $i + 1);
 
