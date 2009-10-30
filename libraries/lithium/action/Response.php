@@ -10,12 +10,6 @@ namespace lithium\action;
 
 use \Exception;
 
-/**
- *
- *
- * @package lithium.action
- * 
- */
 class Response extends \lithium\http\Response {
 
 	protected $_config = array();

@@ -14,7 +14,6 @@ use \SplStack;
 /**
  * Alternative base class in Lithium hierarchy, from which all (and only) static classes inherit.
  *
- * @package lithium.core
  */
 class StaticObject {
 

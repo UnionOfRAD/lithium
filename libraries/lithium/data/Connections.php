@@ -17,9 +17,6 @@ use \lithium\core\Libraries;
  * building of your datasource connections. The normal way to interact with it
  * is through the `/app/config/connections.php` file where you add connection-
  * configurations to your app.
- *
- * @package lithium.data
- *
  */
 class Connections extends \lithium\core\StaticObject {
 

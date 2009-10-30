@@ -19,7 +19,6 @@ use \lithium\core\Libraries;
  * For more information about implementing your own template loaders or renderers, see the
  * `lithium\template\View` class.
  *
- * @package lithium.template.view.adapters
  * @see lithium\template\View
  * @see lithium\template\view\Stream
  */

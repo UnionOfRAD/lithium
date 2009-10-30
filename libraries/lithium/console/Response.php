@@ -10,7 +10,6 @@ namespace lithium\console;
 /**
  * Holds current request from console
  *
- * @package lithium.console
  *
  **/
 class Response extends \lithium\core\Object {

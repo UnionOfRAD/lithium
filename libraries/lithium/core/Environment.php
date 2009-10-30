@@ -13,8 +13,6 @@ use \lithium\util\Set;
 /**
  * Environment 
  *
- * @package lithium.core
- *
  */
 class Environment {
 
