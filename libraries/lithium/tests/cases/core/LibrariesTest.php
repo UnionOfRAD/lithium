@@ -174,6 +174,9 @@ class LibrariesTest extends \lithium\test\Unit {
 		);
 		$result = Libraries::locate('adapters.template.view');
 		$this->assertEqual($expected, $result);
+
+		$result = Libraries::locate('tests');
+		$this->assertTrue(count($result) > 30);
 	}
 
 	/**

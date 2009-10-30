@@ -432,11 +432,11 @@ class Libraries {
 				if ($scope && !in_array($library, $scope)) {
 					continue;
 				}
-				$params['library'] = "";
 				$path = String::insert($template, $params, array('escape' => '/'));
-				$path = str_replace('/*', '', str_replace('\\', '/', $path));
-				if (is_dir($config['path']. '/' . $path)) {
-					$options['path'] = $path;
+				$options['path'] = preg_replace(
+					'/(\/\*)|(\/(?:[A-Z][a-z0-9_]*))|({:\w+})/', '', str_replace('\\', '/', $path)
+				);
+				if (is_dir("{$config['path']}/{$options['path']}")) {
 					$classes = array_merge($classes, static::_search($config, $options));
 				}
 			}
