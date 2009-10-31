@@ -88,11 +88,14 @@ class Cache extends \lithium\core\Adaptable {
 			return false;
 		}
 
+		if (is_callable($conditions)) {
+			if (!$conditions()) return false;
+		}
 		$key = static::key($key);
 		$method = static::adapter($name)->write($key, $data, $expiry, $conditions);
-
 		$params = compact('key', 'data', 'expiry', 'conditions');
 		$filters = $settings[$name]['filters'];
+
 		return static::_filter('write', $params, $method, $filters);
 	}
 
@@ -112,11 +115,14 @@ class Cache extends \lithium\core\Adaptable {
 			return false;
 		}
 
+		if (is_callable($conditions)) {
+			if (!$conditions()) return false;
+		}
 		$key = static::key($key);
 		$method = static::adapter($name)->read($key, $conditions);
-
 		$params = compact('key', 'conditions');
 		$filters = $settings[$name]['filters'];
+
 		return static::_filter('read', $params, $method, $filters);
 	}
 
@@ -135,11 +141,14 @@ class Cache extends \lithium\core\Adaptable {
 			return false;
 		}
 
+		if (is_callable($conditions)) {
+			if (!$conditions()) return false;
+		}
 		$key = static::key($key);
 		$method = static::adapter($name)->delete($key, $conditions);
-
 		$params = compact('key', 'conditions');
 		$filters = $settings[$name]['filters'];
+
 		return static::_filter('delete', $params, $method, $filters);
 	}
 
