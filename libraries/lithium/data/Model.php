@@ -14,9 +14,8 @@ use \lithium\util\Inflector;
 /**
  * Model class
  *
- * @package default
  * @todo Methods: bind(), and 'bind' option for find() et al., create(), save(), delete(),
- * validate()
+ *       validate()
  */
 class Model extends \lithium\core\StaticObject {
 

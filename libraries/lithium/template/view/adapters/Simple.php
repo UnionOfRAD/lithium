@@ -10,7 +10,6 @@ use \lithium\util\String;
  * This view adapter renders content using simple string substitution, and is only useful for very
  * simple templates (no conditionals or looping) or testing.
  *
- * @package lithium.template.view.adapters
  */
 class Simple extends \lithium\template\view\Renderer {
 

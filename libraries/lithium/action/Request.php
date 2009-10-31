@@ -10,6 +10,11 @@ namespace lithium\action;
 
 use \lithium\util\Validator;
 
+/**
+ * Request is responsible for identifying and storing all the information about the http request.
+ *
+ * @see lithium\action\Dispatcher
+ */
 class Request extends \lithium\core\Object {
 
 	public $url = null;

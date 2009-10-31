@@ -12,18 +12,66 @@ use \lithium\util\String;
 use \lithium\util\Collection;
 use \lithium\core\Libraries;
 
+/**
+ * Connections class is a static class that handles the configurations and
+ * building of your datasource connections. The normal way to interact with it
+ * is through the `/app/config/connections.php` file where you add connection-
+ * configurations to your app.
+ */
 class Connections extends \lithium\core\StaticObject {
 
+	/**
+	 * A Collection of the configurations you add through Connections::add()
+	 *
+	 * @var Collection
+	 */
 	protected static $_configurations = null;
 
+	/**
+	 * As each connection is built, a reference to the instance is stored in
+	 * this Collection under the name it was given when configuration was added.
+	 *
+	 * @var Collection
+	 */
 	protected static $_connections = null;
 
+	/**
+	 * Initialization of static class
+	 * Starts static properties and includes the app connections.php file
+	 *
+	 * @return void
+	 */
 	public static function __init() {
 		static::$_connections = new Collection();
 		static::$_configurations = new Collection();
 		require LITHIUM_APP_PATH . '/config/connections.php';
 	}
 
+	/**
+	 * Add connection configurations to your app in `/app/config/connections.php`
+	 *
+	 * @example {{{
+     *              Connections::add('database', 'Database', array(
+	 *                  'adapter' => 'MySql',
+	 *                  'host' => 'localhost',
+	 *                  'login' => 'root',
+	 *                  'password' => '',
+	 *                  'database' => 'lithium-blog'
+	 *               ));
+     *           }}}
+	 *           {{{
+	 *               Connections::add(couch', 'http', array(
+	 *                   'adapter' => 'Couch','host' => '127.0.0.1', 'port' => 5984
+	 *               ));
+	 *           }}}
+	 *           {{{
+	 *               Connections::add('sql', $config);
+	 *           }}}
+	 * @param string $name
+	 * @param string $type
+	 * @param array $config
+	 * @return array
+	 */
 	public static function add($name, $type = null, $config = array()) {
 		if (is_array($type)) {
 			list($config, $type) = array($type, null);
@@ -38,6 +86,25 @@ class Connections extends \lithium\core\StaticObject {
 		return static::$_configurations[$name] = (array)$config + $defaults;
 	}
 
+	/**
+	 * Read the configuration or access the connections you have set up.
+	 *
+	 * @example  {{{
+	 *               $configurations = Connections::get();
+	 *           }}}
+	 *           {{{
+	 *               $config = Connections::get('db', array('config' => true));
+	 *           }}}
+	 *           {{{
+	 *               $dbConnection = Connection::get('db', array('autoBuild' => true));
+	 *           }}}
+	 *           {{{
+	 *               $dbConnection = Connection::get('db');
+	 *           }}}
+	 * @param string $name
+	 * @param array $options
+	 * @return object
+	 */
 	public static function get($name = null, $options = array()) {
 		$defaults = array('config' => false, 'autoBuild' => true);
 		$options += $defaults;
@@ -63,7 +130,7 @@ class Connections extends \lithium\core\StaticObject {
 	}
 
 	/**
-	* clear connections and configurations
+	* Hard reset of connections and configurations, clearing out any currently configured or built
 	*
 	* @return void
 	*/
@@ -75,9 +142,9 @@ class Connections extends \lithium\core\StaticObject {
 	/**
 	 * Constructs a DataSource object or adapter object instance from a configuration array.
 	 *
+	 * @todo Refactor class paths into `lithium\core\Libraries`
 	 * @param array $config
 	 * @return object
-	 * @todo Refactor class paths into lithium\core\Libraries
 	 */
 	protected static function _build($config) {
 		$class = $config['adapter'];
