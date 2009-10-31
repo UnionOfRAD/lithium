@@ -53,7 +53,6 @@ class LibrariesTest extends \lithium\test\Unit {
 		$tests = Libraries::find('app', array('recursive' => true, 'path' => '/tests/cases'));
 		$result = preg_grep('/^app\\\\tests\\\\cases\\\\/', $tests);
 		$this->assertIdentical($tests, $result);
-
 	}
 
 	/**
@@ -186,6 +185,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testServiceLocation() {
+		$this->assertNull(Libraries::locate('adapters', 'File'));
 		$this->assertNull(Libraries::locate('adapters.view', 'File'));
 
 		$result = Libraries::locate('adapters.template.view', 'File');
