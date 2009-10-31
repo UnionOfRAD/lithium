@@ -36,7 +36,7 @@ class SessionTest extends \lithium\test\Unit {
 		$store2 = new Memory();
 		$config = array(
 			'store1' => array('adapter' => &$store1, 'filters' => array()),
-			'store1' => array('adapter' => &$store1, 'filters' => array())
+			'store2' => array('adapter' => &$store2, 'filters' => array())
 		);
 
 		$result = Session::config($config);

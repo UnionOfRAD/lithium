@@ -10,12 +10,35 @@ namespace lithium\tests\cases\core;
 
 use \lithium\core\Libraries;
 
+class MockLibraries extends \lithium\core\Libraries {
+
+	public static function paths($type, $libraries, $params = array(), $options = array()) {
+		return static::_paths($type, $libraries, $params, $options);
+	}
+
+	public static function search($paths, $options = array()) {
+		return static::_search($paths, $options);
+	}
+}
+
 class LibrariesTest extends \lithium\test\Unit {
 
 	public function testNamespaceToFileTranslation() {
 		$result = Libraries::path('\lithium\core\Libraries');
 		$this->assertTrue(strpos($result, '/lithium/core/Libraries.php'));
 		$this->assertTrue(file_exists($result));
+	}
+
+	public function testPathTransform() {
+		$expected = 'Library/Class/Separated/By/Underscore';
+		$result = Libraries::path('Library_Class_Separated_By_Underscore', array(
+			'prefix' => 'Library_',
+			'transform' => function ($class, $options) {
+				return str_replace('_', '/', $class);
+			}
+		));
+		$this->assertEqual($expected, $result);
+
 	}
 
 	public function testPathFiltering() {
@@ -126,6 +149,36 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertNull($result);
 	}
 
+
+	public function testFindingClassesWithExclude() {
+		$expected = array();
+		$options = array(
+			'recursive' => true,
+			'filter' => false,
+			'exclude' => '/\w+Test$|webroot|index$|^app\\\\config|^\w+\\\\views\/|\./'
+		);
+		$classes = Libraries::find('lithium', $options);
+		$result = preg_grep('/\w+Test/', $classes);
+		$this->assertEqual($expected, $result);
+
+		$expected = Libraries::find('lithium', array(
+			'filter' => '/\w+Test$/', 'recursive' => true
+		));
+		$result = preg_grep('/\w+Test/', $expected);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testServiceLocateAll() {
+		$expected = array(
+			'lithium\template\view\adapters\File', 'lithium\template\view\adapters\Simple'
+		);
+		$result = Libraries::locate('adapters.template.view');
+		$this->assertEqual($expected, $result);
+
+		$result = Libraries::locate('tests');
+		$this->assertTrue(count($result) > 30);
+	}
+
 	/**
 	 * Tests locating service objects.  These tests may fail if not run on a stock install, as other
 	 * objects may preceed the core objects in load order.
@@ -150,6 +203,13 @@ class LibrariesTest extends \lithium\test\Unit {
 		$expected = 'lithium\data\source\database\adapter\MySql';
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testServiceLocateApp() {
+		$result = Libraries::locate('controllers', 'HelloWorld');
+		$expected = 'app\controllers\HelloWorldController';
+		$this->assertEqual($expected, $result);
+	}
+
 }
 
 ?>

@@ -3,7 +3,8 @@
  * Lithium: the most rad php framework
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ *                Copyright 2009, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @license       http://opensource.org/licenses/mit-license.php The MIT License
  */
 
 namespace lithium\util;
@@ -183,6 +184,27 @@ class Inflector {
 	protected static $_pluralized = array();
 
 	/**
+	 * Contains a cache map of previously camelized words.
+	 *
+	 * @var array
+	 */
+	protected static $_camelized = array();
+
+	/**
+	 * Contains a cache map of previously underscored words.
+	 *
+	 * @var array
+	 */
+	protected static $_underscored = array();
+
+	/**
+	 * Contains a cache map of previously humanize words.
+	 *
+	 * @var array
+	 */
+	protected static $_humanized = array();
+
+	/**
 	 * Populates `Inflector::$_singular['irregular']` as
 	 * an inversion of `Inflector::$_plural['irregular']`.
 	 *
@@ -336,6 +358,7 @@ class Inflector {
 	 */
 	public static function clear() {
 		static::$_singularized = static::$_pluralized = array();
+		static::$_camelized = static::$_underscored = array();
 		static::$_plural['regexUninflected'] = static::$_singular['regexUninflected'] = null;
 		static::$_plural['regexIrregular'] = static::$_singular['regexIrregular'] = null;
 	}
@@ -347,7 +370,12 @@ class Inflector {
 	 * @return string Camel-cased version of the word (i.e. `'RedBike'`).
 	 */
 	public static function camelize($word) {
-		return str_replace(" ", "", ucwords(str_replace("_", " ", $word)));
+		if (array_key_exists($word, static::$_camelized)) {
+			return static::$_camelized[$word];
+		}
+		return static::$_camelized[$word] = str_replace(
+			" ", "", ucwords(str_replace("_", " ", $word))
+		);
 	}
 
 	/**
@@ -357,7 +385,12 @@ class Inflector {
 	 * @return string Underscore-syntaxed version of the workd (i.e. `'red_bike'`).
 	 */
 	public static function underscore($word) {
-		return strtolower(preg_replace('/(?<=\\w)([A-Z])/', '_\\1', $word));
+		if (array_key_exists($word, static::$_underscored)) {
+			return static::$_underscored[$word];
+		}
+		return static::$_underscored[$word] = strtolower(
+			preg_replace('/(?<=\\w)([A-Z])/', '_\\1', $word)
+		);
 	}
 
 	/**
@@ -369,7 +402,10 @@ class Inflector {
 	 * @return string Human-readable version of the word (i.e. `'Red Bike'`).
 	 */
 	public static function humanize($word, $separator = '_') {
-		return ucwords(str_replace($separator, " ", $word));
+		if (array_key_exists($word . $separator, static::$_humanized)) {
+			return static::$_humanized[$word . $separator];
+		}
+		return static::$_humanized[$word . $separator] = ucwords(str_replace($separator, " ", $word));
 	}
 
 	/**

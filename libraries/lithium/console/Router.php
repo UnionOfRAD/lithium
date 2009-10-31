@@ -62,3 +62,5 @@ class Router extends \lithium\core\Object {
 		return $params;
 	}
 }
+
+?>
