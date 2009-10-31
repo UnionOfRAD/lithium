@@ -27,16 +27,13 @@ class MemcacheTest extends \lithium\test\Unit {
 		$message = 'The memcached daemon does not appear to be running on 127.0.0.1:11211';
 		$result = $M->getVersion();
 		$this->skipIf(empty($result), $message);
-
+		unset($M);
 	}
 
 	public function setUp() {
 		$this->server = array('host' => '127.0.0.1', 'port' => 11211, 'weight' => 100);
-
-
 		$this->_Memcached = new \Memcached();
 		$this->_Memcached->addServer($this->server['host'], $this->server['port'], $this->server['weight']);
-
 		$this->Memcache = new Memcache();
 	}
 
