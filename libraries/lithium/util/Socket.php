@@ -107,3 +107,5 @@ abstract class Socket extends \lithium\core\Object {
 		return $this->_resource;
 	}
 }
+
+?>

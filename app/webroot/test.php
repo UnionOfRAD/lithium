@@ -100,11 +100,15 @@ $stats = Dispatcher::process($testRun['results']);
 				foreach ((array)$testRun['filters'] as $class => $data) {
 					echo $class::output('html', $data);
 				}
-
+				$classes = array();
 				$tests = Group::all(array('transform' => true));
-				$exclude = '/\w+Test$|webroot|index$|^app\\\\config|^\w+\\\\views\/|\./';
-				$options = compact('exclude') + array('recursive' => true);
-				$classes = array_diff(Libraries::find('lithium', $options), $tests);
+				$options = array(
+					'recursive' => true,
+					'filter' => false,
+					'exclude' => '/\w+Test$|webroot|index$|^app\\\\config|^\w+\\\\views\/|\./'
+				);
+				$none = Libraries::find('lithium', $options);
+				$classes = array_diff($none, $tests);
 				sort($classes);
 			?>
 			<h3>Classes with no test case (<?php echo count($classes); ?>)</h3>

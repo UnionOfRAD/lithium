@@ -88,5 +88,6 @@ class Base {
 		$this->body = array_merge((array)$this->body, (array)$data);
 		return join("\r\n", $this->body);
 	}
-
 }
+
+?>

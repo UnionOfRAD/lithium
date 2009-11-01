@@ -36,7 +36,7 @@ class Logger extends \lithium\core\Adaptable {
 		foreach ($methods as $name => $method) {
 			$params = compact('type', 'message');
 			$filters = $settings[$name]['filters'];
-			$result = $result || static::_filter('write', $params, $method, $filters);
+			$result = $result || static::_filter(__METHOD__, $params, $method, $filters);
 		}
 		return $result;
 	}

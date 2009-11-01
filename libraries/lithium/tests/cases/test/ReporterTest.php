@@ -15,3 +15,5 @@ class ReporterTest extends \lithium\test\Unit {
 		
 	}
 }
+
+?>

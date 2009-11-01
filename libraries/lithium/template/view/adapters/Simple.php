@@ -59,3 +59,5 @@ class Simple extends \lithium\template\view\Renderer {
 		return isset($options[$type]) ? $options[$type] : '';
 	}
 }
+
+?>

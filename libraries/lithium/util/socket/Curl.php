@@ -85,3 +85,5 @@ class Curl extends \lithium\util\Socket {
 		$this->options += $flags;
 	}
 }
+
+?>

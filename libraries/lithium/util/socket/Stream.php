@@ -95,3 +95,5 @@ class Stream extends \lithium\util\Socket {
 		}
 	}
 }
+
+?>
