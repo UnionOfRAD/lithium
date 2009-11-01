@@ -70,6 +70,51 @@ class FormTest extends \lithium\test\Unit {
 		$this->form = new Form(array('context' => $this->context));
 	}
 
+	public function testFormCreation() {
+		$base = trim($this->context->request()->env('base'), '/') . '/';
+		$base = ($base == '/') ? $base : '/' . $base;
+
+		$result = $this->form->create();
+		$this->assertTags($result, array(
+			'form' => array('action' => "{$base}posts/add", 'method' => 'POST')
+		));
+
+		$result = $this->form->create(null, array('method' => 'get'));
+		$this->assertTags($result, array(
+			'form' => array('action' => "{$base}posts/add", 'method' => 'GET')
+		));
+
+		$result = $this->form->create(null, array('type' => 'file'));
+		$this->assertTags($result, array('form' => array(
+			'action' => "{$base}posts/add", 'method' => 'POST', 'enctype' => 'multipart/form-data'
+		)));
+
+		$result = $this->form->create(null, array('method' => 'GET', 'type' => 'file'));
+		$this->assertTags($result, array('form' => array(
+			'action' => "{$base}posts/add", 'method' => 'POST', 'enctype' => 'multipart/form-data'
+		)));
+	}
+
+	/**
+	 * Tests creating forms with non-browser compatible HTTP methods, required for REST interfaces.
+	 *
+	 * @return void
+	 */
+	public function testRestFormCreation() {
+		$base = trim($this->context->request()->env('base'), '/') . '/';
+		$base = ($base == '/') ? $base : '/' . $base;
+
+		$result = $this->form->create(null, array('action' => 'delete', 'method' => 'delete'));
+		$this->assertTags($result, array('form' => array(
+			'action' => "{$base}posts/delete", 'method' => 'DELETE'
+		)));
+
+		$result = $this->form->create(null, array('method' => 'put', 'type' => 'file'));
+		$this->assertTags($result, array('form' => array(
+			'action' => "{$base}posts/add", 'method' => 'PUT', 'enctype' => 'multipart/form-data'
+		)));
+	}
+
 	public function testFormCreationWithBinding() {
 		$record = new Record(array('model' => __NAMESPACE__ . '\FormPost', 'data' => array(
 			'id' => '5',
@@ -79,16 +124,33 @@ class FormTest extends \lithium\test\Unit {
 		)));
 
 		$result = $this->form->create($record);
-		$base = trim($this->context->request()->env('base'), '/');
+	}
 
+	public function testFormDataBinding() {
+		$record = new Record(array('model' => __NAMESPACE__ . '\FormPost', 'data' => array(
+			'id' => '5',
+			'author_id' => '2',
+			'title' => 'This is a saved post',
+			'body' => 'This is the body of the saved post'
+		)));
+		$base = trim($this->context->request()->env('base'), '/') . '/';
+		$base = ($base == '/') ? $base : '/' . $base;
+
+		$result = $this->form->create($record);
 		$this->assertTags($result, array(
-			'form' => array('action' => "/{$base}/posts/add", 'method' => 'post')
+			'form' => array('action' => "{$base}posts/add", 'method' => 'POST')
 		));
 
-		$result = $this->form->create($record, array('type' => 'get'));
-		$this->assertTags($result, array(
-			'form' => array('action' => "/{$base}/posts/add", 'method' => 'get')
-		));
+		$result = $this->form->text('title');
+		$this->assertTags($result, array('input' => array(
+			'type' => 'text', 'name' => 'title', 'value' => 'This is a saved post'
+		)));
+
+		$result = $this->form->end();
+		$this->assertTags($result, array('/form'));
+
+		$result = $this->form->text('title');
+		$this->assertTags($result, array('input' => array('type' => 'text', 'name' => 'title')));
 	}
 
 	public function testTextBox() {

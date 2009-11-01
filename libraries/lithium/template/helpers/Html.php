@@ -200,6 +200,7 @@ class Html extends \lithium\template\Helper {
 	public function script($path, $options = array()) {
 		$defaults = array('inline' => true);
 		$options += $defaults;
+		$m = __METHOD__;
 
 		if (is_array($path)) {
 			$result = join("\n\t", array_map(array(&$this, __FUNCTION__), $path));
@@ -207,8 +208,8 @@ class Html extends \lithium\template\Helper {
 		}
 		$params = compact('path') + array('options' => array_diff_key($options, $defaults));
 
-		$script = $this->_filter(__METHOD__, $params, function($self, $params, $chain) {
-			return $self->invokeMethod('_render', array($chain->method(true), 'js-link', $params));
+		$script = $this->_filter(__METHOD__, $params, function($self, $params, $chain) use ($m) {
+			return $self->invokeMethod('_render', array($m, 'js-link', $params));
 		});
 
 		if ($options['inline']) {
@@ -230,6 +231,7 @@ class Html extends \lithium\template\Helper {
 	public function style($path, $options = array()) {
 		$defaults = array('type' => 'stylesheet', 'inline' => true);
 		$options += $defaults;
+		$m = __METHOD__;
 
 		if (is_array($path)) {
 			$result = join("\n\t", array_map(array(&$this, __FUNCTION__), $path));
@@ -237,7 +239,7 @@ class Html extends \lithium\template\Helper {
 		}
 		$params = compact('path', 'options');
 
-		$filter = function($self, $params, $chain) use ($defaults) {
+		$filter = function($self, $params, $chain) use ($defaults, $m) {
 			extract($params);
 
 			$type = $options['type'];
@@ -245,7 +247,7 @@ class Html extends \lithium\template\Helper {
 			$template = ($type == 'import') ? 'style-import' : 'style-link';
 			$params = compact('type', 'path', 'options');
 
-			return $self->invokeMethod('_render', array($chain->method(true), $template, $params));
+			return $self->invokeMethod('_render', array($m, $template, $params));
 		};
 		return $this->_filter(__METHOD__, $params, $filter);
 	}
