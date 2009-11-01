@@ -88,8 +88,8 @@ class Command extends \lithium\core\Object {
 	 */
 	public function run() {
 		$this->header('Available Commands');
-
-		foreach (Libraries::locate('commands') as $command) {
+		$classes = array_unique(Libraries::locate('commands', null, array('recursive' => false)));
+		foreach ($classes as $command) {
 			$command = explode('\\', $command);
 			$this->out(' - ' . Inflector::underscore(array_pop($command)));
 		}

@@ -318,7 +318,7 @@ class Libraries {
 		}
 
 		if (is_null($name)) {
-			return static::_locateAll($params);
+			return static::_locateAll($params, $options);
 		}
 		$paths = static::$_classPaths[$type];
 
