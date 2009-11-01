@@ -136,6 +136,7 @@ class Object {
 	 * @param Closure $callback The method's implementation, wrapped in a closure.
 	 * @param array $filters Additional filters to apply to the method for this call only
 	 * @return mixed
+	 * @see lithium\util\collection\Filters
 	 */
 	protected function _filter($method, $params, $callback, $filters = array()) {
 		list($class, $method) = explode('::', $method);
