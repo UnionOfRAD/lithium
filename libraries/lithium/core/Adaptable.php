@@ -58,7 +58,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @return object         Collection of configurations
 	 */
 	public static function config($config = null) {
-		$default = array('adapter' => null, 'filters' => array());
+		$default = array('adapter' => null, 'filters' => array(), 'strategies' => array());
 
 		if ($config) {
 			$items = array_map(function($i) use ($default) { return $i + $default; }, $config);
@@ -110,6 +110,5 @@ class Adaptable extends \lithium\core\StaticObject {
 
 		return $settings[$name]['adapter'];
 	}
-
 }
 ?>
