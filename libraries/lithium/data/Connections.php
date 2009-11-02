@@ -12,6 +12,22 @@ use \lithium\util\String;
 use \lithium\util\Collection;
 use \lithium\core\Libraries;
 
+/**
+ * The `Connections` class manages a list of named configurations that connect to external
+ * resources. Connections are usually comprised of a type (i.e. `'Database'` or `'Http'`), a
+ * reference to an adapter class (i.e. `'MySql'` or `'MongoDb'`), and authentication credentials.
+ *
+ * While connections can be added and removed dynamically during the course of your application
+ * (using `Connections::add()`), it is most typical to define all connections at once, in
+ * `app/config/connections.php`.
+ *
+ * `Connections` handles adapter classes efficiently by only loading adapter classes and creating
+ * instances when they are requested (using `Connections::get()`).
+ *
+ * Adapters are usually subclasses of `lithium\data\Source`.
+ *
+ * @see lithium\data\Source
+ */
 class Connections extends \lithium\core\StaticObject {
 
 	protected static $_configurations = null;
@@ -73,14 +89,14 @@ class Connections extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Constructs a DataSource object or adapter object instance from a configuration array.
+	 * Constructs a data source or adapter object instance from a configuration array.
 	 *
 	 * @param array $config
 	 * @return object
-	 * @todo Refactor class paths into lithium\core\Libraries
 	 */
 	protected static function _build($config) {
 		$class = $config['adapter'];
+
 		if (!class_exists($class)) {
 			if (empty($config['adapter'])) {
 				$config['adapter'] = $config['type'];
