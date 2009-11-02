@@ -116,7 +116,7 @@ class Query extends \lithium\core\Object {
 		}
 		$results['table'] = $dataSource->name($this->_table);
 
-		foreach (array('comment', 'model') as $item) {
+		foreach (array('comment', 'model', 'page') as $item) {
 			$results[$item] = $this->{'_' . $item};
 		}
 		return $results;

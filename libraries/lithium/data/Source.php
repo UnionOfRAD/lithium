@@ -8,10 +8,32 @@
 
 namespace lithium\data;
 
+/**
+ * This is the base class for Lithium's data abstraction layer. In addition to utility methods and
+ * standardized properties, it defines the implementation tasks for all Lithium classes that work
+ * with external data, such as connections to remote resources (`connect()` and `disconnect()`),
+ * introspecting available data objects (`entities()` and `describe()`), and a standard read/write
+ * interface (`create()`, `read()`, `update()` and `delete()`).
+ *
+ * Subclasses may implement any other non-standard functionality, but the above methods define the
+ * requirements for interacting with `Model` objects, and other classes within `lithium\data`.
+ */
 abstract class Source extends \lithium\core\Object {
 
+	/**
+	 * Stores a connection to a remote resource. Usually a database connection (`resource` type),
+	 * or an HTTP connection object ('object' type).
+	 *
+	 * @var mixed
+	 */
 	protected $_connection = null;
 
+	/**
+	 * Stores the status of this object's connection. Updated when `connect()` or `disconnect()` are
+	 * called, or if an error occurs that closes the object's connection.
+	 *
+	 * @var boolean
+	 */
 	protected $_isConnected = false;
 
 	public function __construct($config = array()) {
@@ -29,6 +51,29 @@ abstract class Source extends \lithium\core\Object {
 		if ($this->_config['autoConnect']) {
 			$this->connect();
 		}
+	}
+
+	/**
+	 * Checks the connection status of this data source. If the `'autoConnect'` option is set to
+	 * true and the source connection is not currently active, a connection attempt will be made
+	 * before returning the result of the connection status.
+	 *
+	 * @param array $options The options available for this method:
+	 *              - 'autoConnect': If true, and the connection is not currently active, calls
+	 *                `connect()` on this object. Defaults to `false`.
+	 * @return boolean Returns the current value of `$_isConnected`, indicating whether or not
+	 *         the object's connection is currently active.  This value may not always be accurate,
+	 *         as the connection could have timed out or otherwise been dropped by the remote
+	 *         resource during the course of the request.
+	 */
+	public function isConnected($options = array()) {
+		$defaults = array('autoConnect' => false);
+		$options += $defaults;
+
+		if (!$this->_isConnected && $options['autoConnect']) {
+			$this->connect();
+		}
+		return $this->_isConnected;
 	}
 
 	abstract public function connect();
