@@ -113,7 +113,6 @@ class FileTest extends \lithium\test\Unit {
 		$result = $this->File->clear();
 		$this->assertTrue($result);
 		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
-
 	}
 
 
