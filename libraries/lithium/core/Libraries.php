@@ -262,7 +262,7 @@ class Libraries {
 	}
 
 	/**
-	 * Get the corresponding physical file path for a class name.
+	 * Get the corresponding physical file path for a class or namespace name.
 	 *
 	 * @param string $class
 	 * @param string $options
@@ -272,10 +272,13 @@ class Libraries {
 		if (array_key_exists($class, static::$_cachedPaths)) {
 			return static::$_cachedPaths[$class];
 		}
+		$defaults = array('dirs' => false);
+		$options += $defaults;
 		$class = ($class[0] == '\\') ? substr($class, 1) : $class;
 
 		foreach (static::$_configurations as $name => $config) {
 			$params = $options + $config;
+			$suffix = $params['suffix'];
 
 			if (strpos($class, $params['prefix']) !== 0) {
 				continue;
@@ -288,7 +291,16 @@ class Libraries {
 				return preg_replace($match, $replace, $class);
 			}
 			$path = str_replace("\\", '/', substr($class, strlen($params['prefix'])));
-			return $params['path'] . '/' . $path . $params['suffix'];
+			$fullPath = "{$params['path']}/{$path}";
+			$list = array_map(
+				function($i) use ($suffix) { return str_replace('\\', '/', $i . $suffix); },
+				glob(dirname($fullPath) . '/*')
+			);
+
+			if (in_array($fullPath . $suffix, $list)) {
+				return (is_dir($fullPath) && $options['dirs']) ? $fullPath : null;
+			}
+			return $fullPath . $suffix;
 		}
 	}
 

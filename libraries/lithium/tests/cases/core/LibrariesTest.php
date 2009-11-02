@@ -210,6 +210,32 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testCaseSensitivePathLookups() {
+		$library = Libraries::get('lithium');
+		$base = $library['path'] . '/';
+
+		$result = Libraries::path('\lithium\template\view');
+		$this->assertNull($result);
+
+		$result = Libraries::path('lithium\template\view');
+		$this->assertNull($result);
+
+		$expected = $base . 'template/View.php';
+
+		$result = Libraries::path('\lithium\template\View');
+		$this->assertEqual($expected, $result);
+
+		$result = Libraries::path('lithium\template\View');
+		$this->assertEqual($expected, $result);
+
+		$expected = $base . 'template/view';
+
+		$result = Libraries::path('\lithium\template\view', array('dirs' => true));
+		$this->assertEqual($expected, $result);
+
+		$result = Libraries::path('lithium\template\view', array('dirs' => true));
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
