@@ -159,7 +159,7 @@ class Memcache extends \lithium\core\Object {
 	public function decrement($key, $offset = 1) {
 		$Memcached =& static::$_Memcached;
 
-		return function($self, $params, $chain) use (&$Memcached) {
+		return function($self, $params, $chain) use (&$Memcached, $offset) {
 			extract($params);
 			return $Memcached->decrement($key, $offset);
 		};
@@ -179,7 +179,7 @@ class Memcache extends \lithium\core\Object {
 	public function increment($key, $offset = 1) {
 		$Memcached =& static::$_Memcached;
 
-		return function($self, $params, $chain) use (&$Memcached) {
+		return function($self, $params, $chain) use (&$Memcached, $offset) {
 			extract($params);
 			return $Memcached->increment($key, $offset);
 		};

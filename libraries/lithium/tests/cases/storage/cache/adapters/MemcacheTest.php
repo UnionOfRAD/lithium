@@ -260,6 +260,81 @@ class MemcacheTest extends \lithium\test\Unit {
 		$this->assertFalse($this->_Memcached->get('key'));
 		$this->assertFalse($this->_Memcached->get('another_key'));
 	}
+
+	public function testDecrement() {
+		$time = strtotime('+1 minute');
+		$key = 'decrement';
+		$value = 10;
+
+		$result = $this->_Memcached->set($key, $value, $time);
+		$this->assertTrue($result);
+
+		$closure = $this->Memcache->decrement($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Memcache, $params, null);
+		$this->assertEqual($value - 1, $result);
+
+		$result = $this->_Memcached->get($key);
+		$this->assertEqual($value - 1, $result);
+
+	}
+
+	public function testDecrementNonIntegerValue() {
+		$time = strtotime('+1 minute');
+		$key = 'non_integer';
+		$value = 'no';
+
+		$result = $this->_Memcached->set($key, $value, $time);
+		$this->assertTrue($result);
+
+		$closure = $this->Memcache->decrement($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Memcache, $params, null);
+
+		$result = $this->_Memcached->get($key);
+		$this->assertEqual(0, $result);
+	}
+
+	public function testIncrement() {
+		$time = strtotime('+1 minute');
+		$key = 'increment';
+		$value = 10;
+
+		$result = $this->_Memcached->set($key, $value, $time);
+		$this->assertTrue($result);
+
+		$closure = $this->Memcache->increment($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Memcache, $params, null);
+		$this->assertEqual($value + 1, $result);
+
+		$result = $this->_Memcached->get($key);
+		$this->assertEqual($value + 1, $result);
+	}
+
+	public function testIncrementNonIntegerValue() {
+		$time = strtotime('+1 minute');
+		$key = 'non_integer_increment';
+		$value = 'yes';
+
+		$result = $this->_Memcached->set($key, $value, $time);
+		$this->assertTrue($result);
+
+		$closure = $this->Memcache->increment($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Memcache, $params, null);
+
+		$result = $this->_Memcached->get($key);
+		$this->assertEqual(0, $result);
+	}
 }
 
 ?>
