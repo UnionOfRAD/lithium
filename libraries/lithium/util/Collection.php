@@ -116,8 +116,17 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 
 				foreach ($state as $key => $value) {
 					if (is_object($value)) {
-						$value = method_exists($value, 'to') ? $value->to('array') : $value;
-						$value = is_array($value) ? $value :  get_object_vars($value);
+						switch (true) {
+							case method_exists($value, 'to'):
+								$value = $value->to('array');
+							break;
+							case (is_object($value) && $vars = get_object_vars($value)):
+								$value = $vars;
+							break;
+							case method_exists($value, '__toString'):
+								$value = $value->__toString();
+							break;
+						}
 					}
 					$result[$key] = $value;
 				}
