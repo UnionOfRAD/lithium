@@ -318,13 +318,15 @@ class Libraries {
 			}
 			$path = str_replace("\\", '/', substr($class, strlen($params['prefix'])));
 			$fullPath = "{$params['path']}/{$path}";
-			$list = array_map(
-				function($i) use ($suffix) { return str_replace('\\', '/', $i . $suffix); },
-				glob(dirname($fullPath) . '/*')
-			);
 
-			if (in_array($fullPath . $suffix, $list)) {
-				return (is_dir($fullPath) && $options['dirs']) ? $fullPath : null;
+			if ($options['dirs']) {
+				$list = glob(dirname($fullPath) . '/*');
+				$list = array_map(function($i) { return str_replace('\\', '/', $i); }, $list);
+
+				if (in_array($fullPath . $suffix, $list)) {
+					return $fullPath . $suffix;
+				}
+				return is_dir($fullPath) ? $fullPath : null;
 			}
 			return $fullPath . $suffix;
 		}
