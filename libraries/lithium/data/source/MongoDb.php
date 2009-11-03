@@ -3,6 +3,7 @@
 namespace lithium\data\source;
 
 use \Mongo;
+use \MongoId;
 
 class MongoDb extends \lithium\data\Source {
 
@@ -24,6 +25,23 @@ class MongoDb extends \lithium\data\Source {
 			unset($this->_db);
 			unset($this->_connection);
 		}
+	}
+
+	/**
+	 * Configures a model class by overriding the default dependencies for `'recordSet'` and
+	 * `'record'` , and sets the primary key to `'_id'`, in keeping with Mongo's conventions.
+	 *
+	 * @param string $class The fully-namespaced model class name to be configured.
+	 * @return Returns an array containing keys `'classes'` and `'meta'`, which will be merged with
+	 *         their respective properties in `Model`.
+	 * @see lithium\data\Model::$_meta
+	 * @see lithium\data\Model::$_classes
+	 */
+	public function configureClass($class) {
+		return array('meta' => array('key' => '_id'), 'classes' => array(
+			'record' => '\lithium\data\model\Document',
+			'recordSet' => '\lithium\data\model\Document'
+		));
 	}
 
 	public function connect() {
@@ -58,10 +76,6 @@ class MongoDb extends \lithium\data\Source {
 		return $name;
 	}
 
-	public function create($record, $options = array()) {
-		return true;
-	}
-
 	/**
 	 * A method dispatcher that allows direct calls to native methods in PHP's `Mongo` object. Read
 	 * more here: http://php.net/manual/class.mongo.php
@@ -75,9 +89,26 @@ class MongoDb extends \lithium\data\Source {
 	 *        class methods.
 	 * @param array $params A list of parameters to be passed to the native method.
 	 * @return mixed Returns the value of the native method specified in `$method`.
+	 * @todo Recursively normalize '_id' fields to compare input and output
 	 */
 	public function __call($method, $params) {
 		return call_user_func_array(array(&$this->_connection, $method), $params);
+	}
+
+	public function create($query, $options = array()) {
+		$params = compact('query', 'options');
+		$conn =& $this->_connection;
+		$db =& $this->_db;
+
+		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, &$db) {
+			extract($params);
+			$params = $query->export($self);
+			$data = $query->data();
+
+			$result = $db->selectCollection($params['table'])->insert($data, true);
+			$id = is_object($data['_id']) ? $data['_id']->__toString() : null;
+			$query->record()->invokeMethod('_update', array($id));
+		});
 	}
 
 	public function read($query, $options = array()) {
@@ -87,14 +118,19 @@ class MongoDb extends \lithium\data\Source {
 		$conn =& $this->_connection;
 		$db =& $this->_db;
 
-		$filter = function($self, $params, $chain) use (&$conn, &$db) {
+		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, &$db) {
 			extract($params);
-			extract($query->export($self), EXTR_OVERWRITE);
+			$query = $query->export($self);
+			extract($query, EXTR_OVERWRITE);
 
 			$result = $db->selectCollection($table)->find($conditions, $fields);
 			return $result->sort($order)->limit($limit)->skip($page * $limit);
-		};
-		return $this->_filter(__METHOD__, $params, $filter);
+		});
+	}
+
+	public function delete($query, $options) {
+		extract($query->export($this), EXTR_OVERWRITE);
+		return $this->_db->selectCollection($table)->remove($conditions);
 	}
 
 	public function result($type, $resource, $context) {
@@ -118,15 +154,17 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	public function update($query, $options) {
-		return true;
-	}
-
-	public function delete($query, $options) {
-		return true;
+		return false;
 	}
 
 	public function conditions($conditions, $context) {
-		return $conditions ?: array();
+		if ($conditions) {
+			if (isset($conditions['_id']) && !is_object($conditions['_id'])) {
+				$conditions['_id'] = new MongoId($conditions['_id']);
+			}
+			return $conditions;
+		}
+		return array();
 	}
 
 	public function fields($fields, $context) {
