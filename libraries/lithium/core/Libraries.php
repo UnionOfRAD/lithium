@@ -171,7 +171,7 @@ class Libraries {
 
 		if ($config['includePath']) {
 			$path = ($config['includePath'] === true) ? $config['path'] : $config['includePath'];
-			set_include_path(get_include_path() . ':' . $path);
+			set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 		}
 
 		if (!empty($config['bootstrap'])) {
