@@ -104,7 +104,8 @@ class Model extends \lithium\core\StaticObject {
 		$backendDefaults = array('classes' => array(), 'meta' => array(), 'finders' => array());
 		$backendConfig = $conn::get($meta['connection'])->configureClass($class) + $backendDefaults;
 
-		$self->_classes = ($self->_classes + $backendConfig['classes'] + $base['_classes']);
+		$classes = array_diff_assoc($self->_classes, $base['_classes']);
+		$self->_classes = ($classes + $backendConfig['classes'] + $base['_classes']);
 		$meta = ($self->_meta + $backendConfig['meta'] + $base['_meta']);
 		$self->_meta = ($options + compact('class') + array('name' => static::_name()) + $meta);
 
@@ -166,12 +167,12 @@ class Model extends \lithium\core\StaticObject {
 		$meta = array('meta' => $self->_meta, 'name' => get_called_class());
 		$params = compact('type', 'options');
 
-		$filter = function($self, $params, $chain) use ($meta) {
+		$filter = function($self, $params) use ($meta) {
 			$options = $params['options'] + array('model' => $meta['name']);
 			$connections = $options['classes']['connections'];
 			$name = $meta['meta']['connection'];
 
-			$query = new $options['classes']['query']($options);
+			$query = new $options['classes']['query'](array('type' => 'read') + $options);
 			$connection = $connections::get($name);
 
 			return new $options['classes']['recordSet'](array(
@@ -343,9 +344,11 @@ class Model extends \lithium\core\StaticObject {
 			if ($options['validate'] && !$record->validates()) {
 			}
 
-			$connections = $options['classes']['connections'];
-			$query = new $options['classes']['query']($options + $meta + compact('record'));
 			$name = $meta['connection'];
+			$connections = $options['classes']['connections'];
+			$query = new $options['classes']['query'](
+				array('type' => 'read') + $options + $meta + compact('record')
+			);
 
 			if (!$record->exists()) {
 				return $connections::get($name)->create($query, $options);

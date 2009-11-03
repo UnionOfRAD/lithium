@@ -69,7 +69,8 @@ class Record extends \lithium\core\Object {
 	public function __call($method, $params) {
 		$model = $this->_model;
 		array_unshift($params, $this);
-		return $model::invokeMethod($method, $params);
+		$class = $model::invokeMethod('_instance');
+		return call_user_func_array(array(&$class, $method), $params);
 	}
 
 	public function exists() {

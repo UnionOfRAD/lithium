@@ -10,6 +10,8 @@ namespace lithium\data\model;
 
 class Query extends \lithium\core\Object {
 
+	protected $_type = null;
+
 	protected $_model = null;
 
 	protected $_table = null;
@@ -42,6 +44,10 @@ class Query extends \lithium\core\Object {
 				$this->{$key}($val);
 			}
 		}
+	}
+
+	public function type() {
+		return $this->_type;
 	}
 
 	public function model($model = null) {

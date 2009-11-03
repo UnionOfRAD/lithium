@@ -74,7 +74,7 @@ class Document extends \lithium\util\Collection {
 	protected $_hasInitialized = false;
 
 	protected $_autoConfig = array(
-		'items', 'classes' => 'merge', 'handle', 'model', 'result', 'query', 'parent'
+		'items', 'classes' => 'merge', 'handle', 'model', 'result', 'query', 'parent', 'exists'
 	);
 
 	public function __construct($config = array()) {
@@ -177,7 +177,8 @@ class Document extends \lithium\util\Collection {
 	protected function _record($class, $items) {
 		$parent = $this;
 		$model = $this->_model;
-		return new $class(compact('model', 'items', 'parent'));
+		$exists = true;
+		return new $class(compact('model', 'items', 'parent', 'exists'));
 	}
 
 	/**

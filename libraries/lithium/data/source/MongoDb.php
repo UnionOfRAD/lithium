@@ -104,10 +104,14 @@ class MongoDb extends \lithium\data\Source {
 			extract($params);
 			$params = $query->export($self);
 			$data = $query->data();
-
 			$result = $db->selectCollection($params['table'])->insert($data, true);
-			$id = is_object($data['_id']) ? $data['_id']->__toString() : null;
-			$query->record()->invokeMethod('_update', array($id));
+
+			if ($result['ok'] === 1.0) {
+				$id = is_object($data['_id']) ? $data['_id']->__toString() : null;
+				$query->record()->invokeMethod('_update', array($id));
+				return true;
+			}
+			return false;
 		});
 	}
 
@@ -128,8 +132,27 @@ class MongoDb extends \lithium\data\Source {
 		});
 	}
 
+	public function update($query, $options = array()) {
+		$params = compact('query', 'options');
+		$conn =& $this->_connection;
+		$db =& $this->_db;
+
+		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, &$db) {
+			extract($params);
+			$params = $query->export($self);
+			$data = $query->data();
+
+			if ($db->selectCollection($params['table'])->update($params['conditions'], $data)) {
+				$query->record()->invokeMethod('_update');
+				return true;
+			}
+			return false;
+		});
+	}
+
 	public function delete($query, $options) {
-		extract($query->export($this), EXTR_OVERWRITE);
+		$query = $query->export($this);
+		extract($query, EXTR_OVERWRITE);
 		return $this->_db->selectCollection($table)->remove($conditions);
 	}
 
@@ -153,18 +176,14 @@ class MongoDb extends \lithium\data\Source {
 		return $result;
 	}
 
-	public function update($query, $options) {
-		return false;
-	}
-
 	public function conditions($conditions, $context) {
-		if ($conditions) {
+		if ($conditions && ($context->type() == 'create' || $context->type() == 'update')) {
 			if (isset($conditions['_id']) && !is_object($conditions['_id'])) {
 				$conditions['_id'] = new MongoId($conditions['_id']);
 			}
 			return $conditions;
 		}
-		return array();
+		return $conditions ?: array();
 	}
 
 	public function fields($fields, $context) {
