@@ -364,6 +364,25 @@ class Model extends \lithium\core\StaticObject {
 		});
 	}
 
+	public function delete($record, $options = array()) {
+		$self = static::_instance();
+		$classes = $self->_classes;
+
+		$meta = array('model' => get_called_class()) + $self->_meta;
+		$params = compact('record', 'options');
+
+		return static::_filter(__METHOD__, $params, function($self, $params) use ($meta, $classes) {
+			extract($params);
+			$options += array('model' => $meta['model']) + compact('record');
+			$connections = $classes['connections'];
+			$name = $meta['connection'];
+
+			$query = new $classes['query']($options);
+			$connection = $connections::get($name);
+			return $connection->delete($query, $options);
+		});
+	}
+
 	protected static function _name() {
 		static $name;
 		return $name ?: $name = join('', array_slice(explode("\\", get_called_class()), -1));
