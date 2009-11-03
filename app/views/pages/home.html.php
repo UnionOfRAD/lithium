@@ -19,5 +19,5 @@
 	<a href="http://rad-dev.org/lithium">Lithium Source</a>
 </p>
 <p>
-	<li><a href="irc://irc.freenode.net/#li3">#li3 irc channel</a></li>
+	<a href="irc://irc.freenode.net/#li3">#li3 irc channel</a>
 </p>
