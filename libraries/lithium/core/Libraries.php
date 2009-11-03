@@ -263,9 +263,9 @@ class Libraries {
 	}
 
 	/**
-	 * Loads the class definition specified by `$class`. Also calls the __init() method on the
-	 * class, if defined.  Looks through the list of libraries defined in $_configurations, which
-	 * are added through lithium\core\Libraries::add().
+	 * Loads the class definition specified by `$class`. Also calls the `__init()` method on the
+	 * class, if defined.  Looks through the list of libraries defined in `$_configurations`, which
+	 * are added through `lithium\core\Libraries::add()`.
 	 *
 	 * @param string $class The fully-namespaced (where applicable) name of the class to load.
 	 * @see lithium\core\Libraries::add()
@@ -273,7 +273,10 @@ class Libraries {
 	 * @return void
 	 */
 	public static function load($class, $require = false) {
-		if (($path = static::path($class)) && is_readable($path) && include $path) {
+		$path = isset(static::$_cachedPaths[$class]) ? static::$_cachedPaths[$class] : null;
+		$path = $path ?: static::path($class);
+
+		if ($path && include $path) {
 			static::$_cachedPaths[$class] = $path;
 			method_exists($class, '__init') ? $class::__init() : null;
 		} elseif ($require) {
