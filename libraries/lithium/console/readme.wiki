@@ -1,0 +1,122 @@
+#### Command line overview
+
+Lithium ships with a command line tool called `li3`. This tool can be useful
+for creating new projects, pieces of a project (controllers, models, views etc)
+or integrating your Lithim application with some command line routines of your
+own.
+
+#### Getting started with li3
+
+To begin using `li3`, it is first recommended that you add to your system `$PATH`
+(or `%PATH%` for Windows users) the location of where the `li3` tool is.
+
+**Configuring your $PATH on *nix**
+
+On *nix systems this is almost always achievable on a per-user basis through
+the user's `~/.profile`. Try opening `.profile` which is normally located in
+your home directory and add the following line:
+{{{
+export PATH=/path/to/libraries/lithium/console:$PATH
+}}}
+This assumes the `li3` tool exists in `/path/to/libraries/lithium/console`. Also
+make sure that the `li3` tool is executable, which can be done with the
+following command:
+{{{
+chmod +x /path/to/libraries/lithium/console/li3
+}}}
+
+Once you've followed these steps, save your modified `.profile`, open a new
+shell and that's it. Alternatively, if you are running Bash as your shell, you
+can use `~/.bash_profile` to hold you path changes.
+
+**Configuring your %PATH% on Windows**
+
+Guide for Windows will be added soon.
+
+#### Using built-in commands
+
+Now that you've got the command added to your path, you should be able to use it
+from the command-line just by executing the `li3` command.
+
+More documentation will be placed here as the built-in commands become more
+usable and finalized.
+
+#### Creating custom commands
+
+Creating your own commands is very easy.
+
+**Fundamentals**
+
+- All commands inherit from `lithium\console\Command`.
+- Commands are normally placed in your application or plugin's `exentesions/commands` directory.
+
+Here's an example command:
+{{{<?php
+
+namespace app\extensions\commands;
+
+class HelloWorld extends \lithium\console\Command {
+
+	public function run() {
+		$this->header('Welcome to the Hello World command!');
+		$this->out('Hello, World!');
+	}
+
+}
+
+?>}}}
+
+If you would like to try this command, create an application or use an existing
+application, and place the command into the application's `extensions/commands`
+directory and save it as `HelloWorld.php`. After doing so, open a shell and
+change directory to your application's directory and run the following command:
+{{{
+li3 hello_world
+}}}
+
+Although it's probably obvious, when this command runs it will output a nice
+header with the text "Welcome to the Hello World command!" and some regular
+text "Hello, World!" after it.
+
+The public method `run()` is called on your command instance every time your
+command has been requested to run. From this method you can add your own command
+logic.
+
+#### Parsing command options
+
+Parsing commands should be easy. In fact, the parsing is already done for you.
+Command line options in the form of `--option=value` are automatically parsed
+and exposed to your command instance through its properties.
+
+Let's look at an example, going back to the `hello_world` command from earlier:
+{{{<?php
+
+namespace app\extensions\commands;
+
+class HelloWorld extends \lithium\console\Command {
+
+	public $recipient;
+
+	public function run() {
+		$this->header('Welcome to the Hello World command!');
+		if ($this->recipient) {
+			$this->out('Hello, ' . $this->recipient . '!');
+		} else {
+			$this->out('Hello, World!');
+		}
+	}
+
+}
+
+?>}}}
+
+Notice the additional property `$recipient`? Great! Now when `--recipient` is
+passed to the `hello_world` command, the recipient property on your command
+instance will be set to whatever was passed into the command at runtime.
+
+Try it out with the following command:
+{{{
+li3 hello_world --recipient=AwesomeGuy
+}}}
+
+You should get a special greeting from our good old `hello_world` command.
