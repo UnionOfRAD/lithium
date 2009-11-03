@@ -101,12 +101,11 @@ class Media extends \lithium\core\Object {
 	/**
 	 * Contains default path settings for various asset types. For each type, the corresponding
 	 * array key maps to the general type name, i.e. `'js'` or `'image'`. Each type contains a set
-	 * of keys which define their locations and default behavior.
-	 *
-	 * - 'suffix': The standard file ending/extension (with the `.`), i.e. `'.js'` or `'.css'`.
-	 * - 'filter': The standard file ending/extension (with the `.`), i.e. `'.js'` or `'.css'`.
+	 * of keys which define their locations and default behavior. For more information how each key
+	 * works, see `Media::assets()`.
 	 *
 	 * @var array
+	 * @see lithium\http\Media::assets()
 	 */
 	protected static $_assets = array(
 		'js' => array('suffix' => '.js', 'filter' => null, 'path' => array(
@@ -323,6 +322,25 @@ class Media extends \lithium\core\Object {
 		}
 		$response->body(static::_handle($h, $data, $options));
 		$response->headers('Content-type', current((array)static::$_types[$type]));
+	}
+
+	/**
+	 * For media types registered in `$_handlers` which include an `'encode'` setting, encodes data
+	 * according to the specified media type.
+	 *
+	 * @param string $type Specifies the media type into which `$data` will be encoded. This media
+	 *        type must have an `'encode'` setting specified in `Media::$_handlers`.
+	 * @param mixed $data Arbitrary data you wish to encode. Note that some encoders can only handle
+	 *              arrays or objects.
+	 * @param array $options Handler-specific options.
+	 * @return mixed
+	 */
+	public static function encode($type, $data, $options = array()) {
+		if (!array_key_exists($type, static::$_handlers)) {
+			return null;
+		}
+		$method = static::$_handlers[$type]['encode'];
+		return is_string($method) ? $method($data) : $method($data, $handler + $options);
 	}
 
 	/**

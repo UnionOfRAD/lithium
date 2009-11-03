@@ -66,7 +66,7 @@ class File extends \lithium\template\view\Renderer {
 	 * @param string $type 
 	 * @param string $options 
 	 * @return void
-	 * @todo Replace me with include_path search and move to File adapter
+	 * @todo Replace me with include_path search?
 	 */
 	public function template($type, $options) {
 		if (!isset($this->_config[$type])) {

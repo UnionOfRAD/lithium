@@ -13,6 +13,6 @@
 	<title><?=$this->title; ?></title>
 </head>
 <body>
-	<?=@$this->content; ?>
+	<?php echo $this->content; ?>
 </body>
 </html>

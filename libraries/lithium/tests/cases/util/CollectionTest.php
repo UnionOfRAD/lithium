@@ -237,6 +237,17 @@ class CollectionTest extends \lithium\test\Unit {
 		$collection = new Collection(array('items' => array('foo', 'bar', 'baz' => 'dib')));
 		$this->assertEqual(array(0, 1, 'baz'), $collection->keys());
 	}
+
+	public function testCollectionFormatConversion() {
+		$items = array('hello', 'goodbye', 'foo' => array('bar', 'baz' => 'dib'));
+		$collection = new Collection(compact('items'));
+
+		$expected = json_encode($items);
+		$result = $collection->to('json');
+		$this->assertEqual($result, $expected);
+
+		$this->assertNull($collection->to('badness'));
+	}
 }
 
 ?>

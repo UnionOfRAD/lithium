@@ -136,21 +136,17 @@ class Object {
 	 * @param Closure $callback The method's implementation, wrapped in a closure.
 	 * @param array $filters Additional filters to apply to the method for this call only
 	 * @return mixed
+	 * @see lithium\util\collection\Filters
 	 */
 	protected function _filter($method, $params, $callback, $filters = array()) {
-		$class = null;
-
-		if (strpos($method, '::')) {
-			list($class, $method) = explode('::', $method);
-		}
-		$items = array($callback);
+		list($class, $method) = explode('::', $method);
 
 		if (empty($this->_methodFilters[$method]) && empty($filters)) {
-			$chain = new Filters(compact('items', 'class', 'method'));
-			return $callback->__invoke($this, $params, $chain);
+			return $callback->__invoke($this, $params, null);
 		}
 
-		$items = array_merge($this->_methodFilters[$method], $filters, array($callback));
+		$f = isset($this->_methodFilters[$method]) ? $this->_methodFilters[$method] : array();
+		$items = array_merge($f, $filters, array($callback));
 		$chain = new Filters(compact('items', 'class', 'method'));
 
 		$start = $chain->rewind();

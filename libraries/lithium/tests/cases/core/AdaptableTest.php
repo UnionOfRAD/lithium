@@ -71,9 +71,9 @@ class AdaptableTest extends \lithium\test\Unit {
 	}
 
 	public function testAdapter() {
-		$Adapter = new MockAdapter();
+		$adapter = new MockAdapter();
 
-		$result = $Adapter::adapter('non_existent_config');
+		$result = $adapter::adapter('non_existent_config');
 		$this->assertNull($result);
 
 		$items = array('default' => array(
@@ -81,31 +81,31 @@ class AdaptableTest extends \lithium\test\Unit {
 			'filters' => array(),
 			'strategies' => array()
 		));
-		$result = $Adapter::config($items);
+		$result = $adapter::config($items);
 		$expected = new Collection(compact('items'));
 		$this->assertEqual($expected, $result);
 
-		$result = $Adapter::adapter('default');
+		$result = $adapter::adapter('default');
 		$expected = new Memory($items['default']);
 		$this->assertEqual($expected, $result);
 
 		// Will use last configured adapter
-		$result = $Adapter::adapter(null);
+		$result = $adapter::adapter(null);
 		$expected = new Memory($items['default']);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testNonExistentAdapter() {
-		$Adapter = new MockAdapter();
+		$adapter = new MockAdapter();
 
 		$items = array('default' => array(
 			'adapter' => 'NonExistent', 'filters' => array(), 'strategies' => array()
 		));
-		$result = $Adapter::config($items);
+		$result = $adapter::config($items);
 		$expected = new Collection(compact('items'));
 		$this->assertEqual($expected, $result);
 
-		$result = $Adapter::adapter('default');
+		$result = $adapter::adapter('default');
 		$this->assertNull($result);
 	}
 

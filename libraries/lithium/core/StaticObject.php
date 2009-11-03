@@ -158,26 +158,21 @@ class StaticObject {
 	 * @param Closure $callback The method's implementation, wrapped in a closure.
 	 * @param array $filters Additional filters to apply to the method for this call only
 	 * @return mixed
+	 * @see lithium\util\collection\Filters
 	 */
 	protected static function _filter($method, $params, $callback, $filters = array()) {
-		$class = null;
-
-		if (strpos($method, '::')) {
-			list($class, $method) = explode('::', $method);
-		}
+		list($class, $method) = explode('::', $method);
 
 		if (empty(static::$_methodFilters[$method]) && empty($filters)) {
-			return $callback->__invoke(get_called_class(), $params, null);
+			return $callback->__invoke($class, $params, null);
 		}
 
-		$chain = new Filters(array(
-			'items' => array_merge(static::$_methodFilters[$method], $filters, array($callback)),
-			'class'  => $class,
-			'method' => $method
-		));
+		$f = isset(static::$_methodFilters[$method]) ? static::$_methodFilters[$method] : array();
+		$items = array_merge($f, $filters, array($callback));
+		$chain = new Filters(compact('items', 'class', 'method'));
 
 		$start = $chain->rewind();
-		return $start(get_called_class(), $params, $chain);
+		return $start($class, $params, $chain);
 	}
 
 	/**

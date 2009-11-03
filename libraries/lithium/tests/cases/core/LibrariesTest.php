@@ -53,7 +53,6 @@ class LibrariesTest extends \lithium\test\Unit {
 		$tests = Libraries::find('app', array('recursive' => true, 'path' => '/tests/cases'));
 		$result = preg_grep('/^app\\\\tests\\\\cases\\\\/', $tests);
 		$this->assertIdentical($tests, $result);
-
 	}
 
 	/**
@@ -186,6 +185,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testServiceLocation() {
+		$this->assertNull(Libraries::locate('adapters', 'File'));
 		$this->assertNull(Libraries::locate('adapters.view', 'File'));
 
 		$result = Libraries::locate('adapters.template.view', 'File');
@@ -210,6 +210,33 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testCaseSensitivePathLookups() {
+		$library = Libraries::get('lithium');
+		$base = $library['path'] . '/';
+
+		$expected = $base . 'template/view.php';
+		$result = Libraries::path('\lithium\template\view');
+		$this->assertEqual($expected, $result);
+
+		$result = Libraries::path('lithium\template\view');
+		$this->assertEqual($expected, $result);
+
+		$expected = $base . 'template/View.php';
+
+		$result = Libraries::path('\lithium\template\View');
+		$this->assertEqual($expected, $result);
+
+		$result = Libraries::path('lithium\template\View');
+		$this->assertEqual($expected, $result);
+
+		$expected = $base . 'template/view';
+
+		$result = Libraries::path('\lithium\template\view', array('dirs' => true));
+		$this->assertEqual($expected, $result);
+
+		$result = Libraries::path('lithium\template\view', array('dirs' => true));
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

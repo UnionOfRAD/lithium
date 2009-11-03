@@ -233,6 +233,16 @@ class MediaTest extends \lithium\test\Unit {
 		$result = $response->body;
 		$this->assertNull($result);
 	}
+
+	public function testMediaEncoding() {
+		$data = array('hello', 'goodbye', 'foo' => array('bar', 'baz' => 'dib'));
+		$expected = json_encode($data);
+		$result = Media::encode('json', $data);
+		$this->assertEqual($expected, $result);
+
+		$result = Media::encode('badness', $data);
+		$this->assertNull($result);
+	}
 }
 
 ?>
