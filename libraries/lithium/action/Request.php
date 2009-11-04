@@ -188,8 +188,7 @@ class Request extends \lithium\core\Object {
 				return substr($fileName, 0, $offset);
 			break;
 			case 'PHP_SELF':
-				// Hack until I know whether lines 155 - 158 can be changed
-				return $_SERVER['SCRIPT_NAME'];
+				return $this->env('SCRIPT_NAME');
 			break;
 			case 'CGI':
 			case 'CGI_MODE':
