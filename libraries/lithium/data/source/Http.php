@@ -19,20 +19,21 @@ use \lithium\core\Libraries;
  */
 class Http extends \lithium\data\Source {
 
+	protected $_autoConfig = array('classes' => 'merge');
+
 	/**
 	 * Fully-namespaced class references
 	 *
 	 * @var array
 	 */
 	protected $_classes = array(
-		'request' => '\lithium\http\Request',
-		'response' => '\lithium\http\Response'
+		'service' => '\lithium\http\Service',
 	);
 
 	/**
-	 * Socket connection
+	 * Service connection
 	 *
-	 * @var object lithium\util\Socket
+	 * @var object lithium\http\Service
 	 */
 	protected $_connection = null;
 
@@ -65,7 +66,7 @@ class Http extends \lithium\data\Source {
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(
-			'socket'    => 'Stream',
+			'classes'    => array(),
 			'adapter'    => null,
 			'persistent' => false,
 			'protocol'   => 'tcp',
@@ -85,17 +86,28 @@ class Http extends \lithium\data\Source {
 			'username' => $config['login'],
 			'password' => $config['password']
 		);
-
+		$this->_classes = $config['classes'] + $this->_classes;
 		parent::__construct($config);
 	}
 
 	protected function _init() {
-		$socket = $this->_config['socket'];
-		if (!class_exists($socket)) {
-			$socket = Libraries::locate('sockets.util', $this->_config['socket']);
+		$service = $this->_classes['service'];
+		if (!class_exists($service)) {
+			$service = Libraries::locate('http', $this->_classes['service']);
 		}
-		$this->_connection = new $socket($this->_config);
-		$this->request = new $this->_classes['request']($this->_config);
+		$this->_connection = new $service($this->_config);
+	}
+
+	public function __get($property) {
+		return $this->_connection->{$property};
+	}
+
+	public function __set($proerty, $value) {
+		return $this->_connection->{$property} = $value;
+	}
+
+	public function __call($method, $params) {
+		return $this->_connection->invokeMethod($method, $params);
 	}
 
 	/**
@@ -104,159 +116,87 @@ class Http extends \lithium\data\Source {
 	 * @return boolean
 	 */
 	public function connect() {
-		if (!$this->_isConnected && $this->_connection->open()) {
+		if (!$this->_isConnected && $this->_connection->connect()) {
 			$this->_isConnected = true;
 		}
 		return $this->_isConnected;
 	}
 
 	/**
-	 * Disconnect from datasource
+	 * Disconnect from socket
 	 *
 	 * @return boolean
 	 */
 	public function disconnect() {
 		if ($this->_isConnected) {
-			if ($this->_connection->close()) {
+			if ($this->_connection->disconnect()) {
 				$this->_isConnected = false;
 			}
 		}
 		return !$this->_isConnected;
 	}
 
+	/**
+	 * entities
+	 *
+	 * @param object $class
+	 * @return array
+	 */
 	public function entities($class = null) {
 		return array();
 	}
 
+	/**
+	 * Describe data source
+	 *
+	 * @param string $entity
+	 * @param string $meta
+	 * @return void
+	 */
 	public function describe($entity, $meta = array()) {
 	}
 
 	/**
-	 * Send GET request
+	 * undocumented function
 	 *
-	 * @return string
-	 */
-	public function get($path = null, $params = array()) {
-		if ($this->connect() === false) {
-			return false;
-		}
-		$this->request->method = 'GET';
-		$this->request->params = $params;
-		return $this->_send($path);
-	}
-
-	/**
-	 * Send POST request
-	 *
-	 * @return string
-	 */
-	public function post($path = null, $data = array()) {
-		if ($this->connect() === false) {
-			return false;
-		}
-		$this->request->method = 'POST';
-		$this->_prepare($data);
-		return $this->_send($path);
-	}
-
-	/**
-	 * Send PUT request
-	 *
-	 * @return string
-	 */
-	public function put($path = null, $data = array()) {
-		if ($this->connect() === false) {
-			return false;
-		}
-		$this->request->method = 'PUT';
-		$this->_prepare($data);
-		return $this->_send($path);
-	}
-
-	/**
-	 * Send DELETE request
-	 *
-	 * @return string
-	 */
-	public function del($path = null, $params = array()) {
-		if ($this->connect() === false) {
-			return false;
-		}
-		$this->request->method = 'DELETE';
-		return $this->_send($path, $params);
-	}
-
-	/**
-	 * Create used by model to POST
-	 *
-	 * @return string
+	 * @param object $record
+	 * @param string $options
+	 * @return void
 	 */
 	public function create($record, $options = array()) {
-		return $this->post();
+		return $this->_connection->post();
 	}
-
 	/**
 	 * Read used by model to GET
 	 *
+	 * @param object query
+	 * @param array options
 	 * @return string
 	 */
 	public function read($query = array(), $options = array()) {
-		return $this->get();
+		return $this->_connection->get();
 	}
 
 	/**
 	 * Update used by model to PUT
 	 *
+	 * @param object query
+	 * @param array options
 	 * @return string
 	 */
 	public function update($query, $options = array()) {
-		return $this->put();
+		return $this->_connection->put();
 	}
 
 	/**
 	 * Used by model to DELETE
 	 *
+	 * @param object query
+	 * @param array options
 	 * @return string
 	 */
 	public function delete($query, $options = array()) {
-		return $this->del();
-	}
-
-	/**
-	 * Prepares data for sending
-	 *
-	 * @return string
-	 *
-	 **/
-
-	protected function _prepare($data = array()) {
-		if (empty($data)) {
-			return null;
-		}
-		if (is_array($data)) {
-			$this->request->headers(array(
-				'Content-Type' => 'application/x-www-form-urlencoded',
-			));
-			$data = substr($this->request->queryString($data), 1);
-		}
-		return $this->request->body($data);
-	}
-
-	/**
-	 * Send request and return response data
-	 *
-	 * @return string
-	 */
-	protected function _send($path = null) {
-		$this->request->path .= $path;
-		$request = (string) $this->request;
-		if ($this->_connection->write($request)) {
-			$message = $this->_connection->read();
-			$this->response = new $this->_classes['response'](compact('message'));
-			$this->request = new $this->_classes['request']($this->_config);
-			return $this->response->body();
-		}
-		return null;
+		return $this->_connection->delete();
 	}
 }
 

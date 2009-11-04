@@ -1,20 +1,15 @@
 <?php
-/**
- * Lithium: the most rad php framework
- *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
- */
 
-namespace lithium\tests\cases\data\source;
+namespace lithium\tests\cases\http;
 
-use \lithium\data\source\Http;
+use \lithium\tests\mocks\http\MockService;
 
-class HttpTest extends \lithium\test\Unit {
+class ServiceTest extends \lithium\test\Unit {
+
+	public $request = null;
 
 	protected $_testConfig = array(
 		'classes' => array(
-			'service' => 'lithium\tests\mocks\http\MockService',
 			'socket' => '\lithium\tests\mocks\socket\MockSocket'
 		),
 		'persistent' => false,
@@ -27,7 +22,7 @@ class HttpTest extends \lithium\test\Unit {
 	);
 
 	public function testAllMethodsNoConnection() {
-		$http = new Http(array('protocol' => null));
+		$http = new MockService(array('protocol' => null));
 		$this->assertFalse($http->connect());
 		$this->assertTrue($http->disconnect());
 		$this->assertFalse($http->get());
@@ -37,13 +32,13 @@ class HttpTest extends \lithium\test\Unit {
 	}
 
 	public function testConnect() {
-		$http = new Http($this->_testConfig);
+		$http = new MockService($this->_testConfig);
 		$result = $http->connect();
 		$this->assertTrue($result);
 	}
 
 	public function testDisconnect() {
-		$http = new Http($this->_testConfig);
+		$http = new MockService($this->_testConfig);
 		$result = $http->connect();
 		$this->assertTrue($result);
 
@@ -51,18 +46,8 @@ class HttpTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
-	public function testEntities() {
-		$http = new Http($this->_testConfig);
-		$result = $http->entities();
-	}
-
-	public function testDescribe() {
-		$http = new Http($this->_testConfig);
-		$result = $http->describe(null, null);
-	}
-
 	public function testGet() {
-		$http = new Http($this->_testConfig);
+		$http = new MockService($this->_testConfig);
 		$result = $http->get();
 		$this->assertEqual('Test!', $result);
 
@@ -88,7 +73,7 @@ class HttpTest extends \lithium\test\Unit {
 	}
 
 	public function testGetPath() {
-		$http = new Http($this->_testConfig);
+		$http = new MockService($this->_testConfig);
 		$result = $http->get('search.json');
 		$this->assertEqual('Test!', $result);
 
@@ -114,7 +99,7 @@ class HttpTest extends \lithium\test\Unit {
 	}
 
 	public function testPost() {
-		$http = new Http($this->_testConfig);
+		$http = new MockService($this->_testConfig);
 		$http->post('update.xml', array('status' => 'cool'));
 		$expected = join("\r\n", array(
 			'POST /update.xml HTTP/1.1',
@@ -127,36 +112,6 @@ class HttpTest extends \lithium\test\Unit {
 		));
 		$result = (string)$http->testRequest;
 		$this->assertEqual($expected, $result);
-	}
-
-	public function testPut() {
-		$http = new Http($this->_testConfig);
-		$result = $http->put();
-		$this->assertEqual('Test!', $result);
-	}
-
-	public function testDelete() {
-		$http = new Http($this->_testConfig);
-		$result = $http->delete(null);
-		$this->assertEqual('Test!', $result);
-	}
-
-	public function testCreate() {
-		$http = new Http($this->_testConfig);
-		$result = $http->create(null);
-		$this->assertEqual('Test!', $result);
-	}
-
-	public function testRead() {
-		$http = new Http($this->_testConfig);
-		$result = $http->read(null);
-		$this->assertEqual('Test!', $result);
-	}
-
-	public function testUpdate() {
-		$http = new Http($this->_testConfig);
-		$result = $http->update(null);
-		$this->assertEqual('Test!', $result);
 	}
 }
 
