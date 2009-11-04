@@ -92,7 +92,7 @@ abstract class Source extends \lithium\core\Object {
 
 	abstract public function describe($entity, $meta = array());
 
-	abstract public function create($record, $options);
+	abstract public function create($query, $options);
 
 	abstract public function read($query, $options);
 
@@ -109,6 +109,22 @@ abstract class Source extends \lithium\core\Object {
 	abstract public function update($query, $options);
 
 	abstract public function delete($query, $options);
+
+	/**
+	 * A method which can be optionally implemented to configure a model class.
+	 *
+	 * @param string $class The name of the model class to be configured
+	 * @return array This method should return an array one or more of the following keys: `'meta'`,
+	 *         `'classes'` or `'finders'`. These keys maps to the three corresponding properties in
+	 *         `lithium\data\Model`, and are used to override the base-level default settings and
+	 *         dependencies.
+	 * @see lithium\data\Model::$_meta
+	 * @see lithium\data\Model::$_finders
+	 * @see lithium\data\Model::$_classes
+	 */
+	public function configureClass($class) {
+		return array();
+	}
 }
 
 ?>

@@ -10,6 +10,8 @@ namespace lithium\data\model;
 
 class Query extends \lithium\core\Object {
 
+	protected $_type = null;
+
 	protected $_model = null;
 
 	protected $_table = null;
@@ -44,6 +46,10 @@ class Query extends \lithium\core\Object {
 		}
 	}
 
+	public function type() {
+		return $this->_type;
+	}
+
 	public function model($model = null) {
 		if (empty($model)) {
 			return $this->_model;
@@ -54,7 +60,7 @@ class Query extends \lithium\core\Object {
 
 	public function conditions($conditions = null) {
 		if (empty($conditions)) {
-			return $this->_conditions;
+			return $this->_conditions ?: $this->_recordConditions();
 		}
 		$this->_conditions = array_merge($this->_conditions, (array)$conditions);
 	}
@@ -108,6 +114,21 @@ class Query extends \lithium\core\Object {
 		$this->_comment = " /* {$comment} */";
 	}
 
+	public function &record(&$record = null) {
+		if (empty($record)) {
+			return $this->_record;
+		}
+		$this->_record = $record;
+		return $this->_record;
+	}
+
+	public function data($data = array()) {
+		if ($data) {
+			return $this->_record ? $this->_record->set($data) : null;
+		}
+		return $this->_record ? $this->_record->data() : array();
+	}
+
 	public function export($dataSource) {
 		$results = array();
 
@@ -120,6 +141,15 @@ class Query extends \lithium\core\Object {
 			$results[$item] = $this->{'_' . $item};
 		}
 		return $results;
+	}
+
+	protected function _recordConditions() {
+		if (!$this->_record) {
+			return;
+		}
+		$model = $this->_model;
+		$key = $model::meta('key');
+		return array($key => $this->_record->{$key});
 	}
 }
 

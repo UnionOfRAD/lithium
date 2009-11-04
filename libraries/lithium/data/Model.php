@@ -85,43 +85,43 @@ class Model extends \lithium\core\StaticObject {
 	protected $_finders = array();
 
 	/**
-	 * Sets default connection options and connect default finders.
+	 * Sets default connection options and connects default finders.
 	 *
 	 * @return void
 	 * @todo Merge in inherited config from AppModel and other parent classes.
 	 */
 	public static function __init($options = array()) {
-		if (get_called_class() == __CLASS__) {
+		if (($class = get_called_class()) == __CLASS__) {
 			return;
 		}
 		$self = static::_instance();
 
-		$self->_finders += array(
+		$base = get_class_vars(__CLASS__);
+		$meta = $self->_meta + $base['_meta'];
+		$classes = $self->_classes + $base['_classes'];
+
+		$conn = $classes['connections'];
+		$backendDefaults = array('classes' => array(), 'meta' => array(), 'finders' => array());
+		$backendConfig = $conn::get($meta['connection'])->configureClass($class) + $backendDefaults;
+
+		$classes = array_diff_assoc($self->_classes, $base['_classes']);
+		$self->_classes = ($classes + $backendConfig['classes'] + $base['_classes']);
+		$meta = ($self->_meta + $backendConfig['meta'] + $base['_meta']);
+		$self->_meta = ($options + compact('class') + array('name' => static::_name()) + $meta);
+
+		if ($self->_meta['source'] === null) {
+			$self->_meta['source'] = Inflector::tableize($self->_meta['name']);
+		}
+
+		$titleKeys = array('title', 'name', $self->_meta['key']);
+		$self->_meta['title'] = $self->_meta['title'] ?: static::hasField($titleKeys);
+
+		$self->_finders += $backendConfig['finders'] + array(
 			'first' => function($self, $params, $chain) {
 				$params['options']['limit'] = 1;
 				return $chain->next($self, $params, $chain)->rewind();
 			}
 		);
-
-		$vars = get_class_vars(__CLASS__);
-		$base = $self->_meta + $vars['_meta'];
-		$self->_classes += $vars['_classes'];
-		$self->_meta = (
-			$options + array('class' => get_called_class(), 'name' => static::_name()) + $base
-		);
-
-		if (empty($self->_meta['source']) && $self->_meta['source'] !== false) {
-			$self->_meta['source'] = Inflector::tableize($self->_meta['name']);
-		}
-
-		if (empty($meta['title'])) {
-			foreach (array('title', 'name', $self->_meta['key']) as $field) {
-				if (static::schema($field)) {
-					$self->_meta['title'] = $field;
-					break;
-				}
-			}
-		}
 		static::_instance()->_relations = static::_relations();
 	}
 
@@ -167,12 +167,12 @@ class Model extends \lithium\core\StaticObject {
 		$meta = array('meta' => $self->_meta, 'name' => get_called_class());
 		$params = compact('type', 'options');
 
-		$filter = function($self, $params, $chain) use ($meta) {
+		$filter = function($self, $params) use ($meta) {
 			$options = $params['options'] + array('model' => $meta['name']);
 			$connections = $options['classes']['connections'];
 			$name = $meta['meta']['connection'];
 
-			$query = new $options['classes']['query']($options);
+			$query = new $options['classes']['query'](array('type' => 'read') + $options);
 			$connection = $connections::get($name);
 
 			return new $options['classes']['recordSet'](array(
@@ -255,8 +255,7 @@ class Model extends \lithium\core\StaticObject {
 
 	/**
 	 * Lazy-initialize the schema for this Model object, if it is not already manually set in the
-	 * object. You can declare `protected static $_schema = array(...)` to define the schema
-	 * manually.
+	 * object. You can declare `protected $_schema = array(...)` to define the schema manually.
 	 *
 	 * @param string $field Optional. You may pass a field name to get schema information for just
 	 *        one field. Otherwise, an array with containing all fields is returned.
@@ -289,8 +288,102 @@ class Model extends \lithium\core\StaticObject {
 		return (!empty($schema) && isset($schema[$field]));
 	}
 
-	public static function save($data, $options = array()) {
-		
+	/**
+	 * Instantiates a new record object, initialized with any data passed in. For example:
+	 *
+	 * {{{$post = Post::create(array("title" => "New post"));
+	 * echo $post->title; // echoes "New post"
+	 * $post->save();}}}
+	 *
+	 * @param array $data Any data that this record should be populated with initially.
+	 * @return object Returns a new, un-saved record object.
+	 */
+	public static function create($data = array()) {
+		$class = static::_instance()->_classes['record'];
+		$model = get_called_class();
+		return new $class(compact('model', 'data'));
+	}
+
+	/**
+	 * An instance method (called on record and document objects) to create or update the record or
+	 * document in the database that corresponds to `$record`. For example:
+	 *
+	 * {{{$post = Post::create();
+	 * $post->title = "My post";
+	 * $post->save(array('validate' => false));}}}
+	 *
+	 * @param object $record The record or document object to be saved in the database.
+	 * @param array $options Options:
+	 *
+	 *        -'force': If `true`, forces the record to write to the database, even if no fields are
+	 *         reported as having been modified. Defaults to `false`.
+	 *        -'validate': If `false`, validation will be skipped, and the record will be
+	 *         immediately saved. Defaults to `true`.
+	 *        -'whitelist': An array of fields that are allowed to be saved to this record.
+	 *        -'callbacks': If `false`, all callbacks will be disabled before executing. Defaults to
+	 *         `true`.
+	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
+	 */
+	public function save($record, $options = array()) {
+		$self = static::_instance();
+		$classes = $self->_classes;
+		$meta = array('model' => get_called_class()) + $self->_meta;
+
+		$defaults = array(
+			'force' => false,
+			'validate' => true,
+			'whitelist' => null,
+			'callbacks' => true
+		);
+		$options += $defaults + compact('classes');
+		$params = compact('record', 'options');
+
+		$filter = function($self, $params) use ($meta) {
+			extract($params);
+
+			if ($options['validate'] && !$record->validates()) {
+			}
+
+			$name = $meta['connection'];
+			$connections = $options['classes']['connections'];
+			$query = new $options['classes']['query'](
+				array('type' => 'read') + $options + $meta + compact('record')
+			);
+
+			if (!$record->exists()) {
+				return $connections::get($name)->create($query, $options);
+			}
+			return $connections::get($name)->update($query, $options);
+		};
+
+		if (!$options['callbacks']) {
+			return $filter->__invoke($record, $options);
+		}
+		return static::_filter(__METHOD__, $params, $filter);
+	}
+
+	public function validates($record, $options = array()) {
+		return static::_filter(__METHOD__, compact('record', 'options'), function($self, $params) {
+		});
+	}
+
+	public function delete($record, $options = array()) {
+		$self = static::_instance();
+		$classes = $self->_classes;
+
+		$meta = array('model' => get_called_class()) + $self->_meta;
+		$params = compact('record', 'options');
+
+		return static::_filter(__METHOD__, $params, function($self, $params) use ($meta, $classes) {
+			extract($params);
+			$options += array('model' => $meta['model']) + compact('record');
+			$connections = $classes['connections'];
+			$name = $meta['connection'];
+
+			$query = new $classes['query']($options);
+			$connection = $connections::get($name);
+			return $connection->delete($query, $options);
+		});
 	}
 
 	protected static function _name() {
