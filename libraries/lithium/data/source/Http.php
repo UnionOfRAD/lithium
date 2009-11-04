@@ -76,11 +76,8 @@ class Http extends \lithium\data\Source {
 	}
 
 	protected function _init() {
-		$service = $this->_classes['service'];
-		if (!class_exists($service)) {
-			$service = Libraries::locate('http', $this->_classes['service']);
-		}
-		$this->_connection = new $service($this->_config);
+		$this->_connection = new $this->_classes['service']($this->_config);
+		parent::_init();
 	}
 
 	/**

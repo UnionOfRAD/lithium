@@ -37,7 +37,7 @@ class HttpTest extends \lithium\test\Unit {
 	}
 
 	public function testConnect() {
-		$http = new Http($this->_testConfig);
+		$http = new Http();
 		$result = $http->connect();
 		$this->assertTrue($result);
 	}
