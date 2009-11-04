@@ -15,8 +15,40 @@ use \lithium\core\Libraries;
  */
 class Service extends \lithium\core\Object {
 
+	/**
+	 * Request Object
+	 *
+	 * @var object
+	 */
+	public $request =  null;
+
+	/**
+	 * Holds all parameters of the request
+	 * Cast to object in the constructor
+	 *
+	 * @var object
+	 */
+	public $response = null;
+
+	/**
+	 * Holds the request and response used by _send
+	 *
+	 * @var object
+	 */
+	public $last = null;
+
+	/**
+	 * auto config
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array('classes' => 'merge');
 
+	/**
+	 * isConnected
+	 *
+	 * @var boolean
+	 */
 	protected $_isConnected = false;
 
 	/**
@@ -30,13 +62,6 @@ class Service extends \lithium\core\Object {
 		'response' => '\lithium\http\Response',
 		'socket'   => 'lithium\util\socket\Stream',
 	);
-
-	/**
-	 * Holds the request and response used by _send
-	 *
-	 * @var object
-	 */
-	public $last = null;
 
 	/**
 	 * Constructor

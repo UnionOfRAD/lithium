@@ -15,7 +15,7 @@ namespace lithium\data\source;
 use \lithium\core\Libraries;
 
 /**
- * Http class to access data sources using Socket classes
+ * Http class to access data sources using \lithium\http\Service
  */
 class Http extends \lithium\data\Source {
 
@@ -43,21 +43,6 @@ class Http extends \lithium\data\Source {
 	 * @var boolean
 	 */
 	protected $_isConnected = false;
-
-	/**
-	 * Request Object
-	 *
-	 * @var object
-	 */
-	public $request =  null;
-
-	/**
-	 * Holds all parameters of the request
-	 * Cast to object in the constructor
-	 *
-	 * @var object
-	 */
-	public $response = null;
 
 	/**
 	 * Constructor
@@ -98,14 +83,23 @@ class Http extends \lithium\data\Source {
 		$this->_connection = new $service($this->_config);
 	}
 
+	/**
+	 * Pass properties to service connection
+	 *
+	 * @param string $property
+	 * @return mixed
+	 */
 	public function __get($property) {
 		return $this->_connection->{$property};
 	}
 
-	public function __set($proerty, $value) {
-		return $this->_connection->{$property} = $value;
-	}
-
+	/**
+	 * Pass methods to service connection
+	 *
+	 * @param string $method
+	 * @param array $params
+	 * @return mixed
+	 */
 	public function __call($method, $params) {
 		return $this->_connection->invokeMethod($method, $params);
 	}
@@ -163,7 +157,7 @@ class Http extends \lithium\data\Source {
 	 * @param string $options
 	 * @return void
 	 */
-	public function create($record, $options = array()) {
+	public function create($record = null, $options = array()) {
 		return $this->_connection->post();
 	}
 	/**
@@ -173,7 +167,7 @@ class Http extends \lithium\data\Source {
 	 * @param array options
 	 * @return string
 	 */
-	public function read($query = array(), $options = array()) {
+	public function read($query = null, $options = array()) {
 		return $this->_connection->get();
 	}
 
@@ -184,7 +178,7 @@ class Http extends \lithium\data\Source {
 	 * @param array options
 	 * @return string
 	 */
-	public function update($query, $options = array()) {
+	public function update($query = null, $options = array()) {
 		return $this->_connection->put();
 	}
 
@@ -195,7 +189,7 @@ class Http extends \lithium\data\Source {
 	 * @param array options
 	 * @return string
 	 */
-	public function delete($query, $options = array()) {
+	public function delete($query = null, $options = array()) {
 		return $this->_connection->delete();
 	}
 }

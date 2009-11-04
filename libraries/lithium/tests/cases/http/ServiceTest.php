@@ -113,6 +113,35 @@ class ServiceTest extends \lithium\test\Unit {
 		$result = (string)$http->testRequest;
 		$this->assertEqual($expected, $result);
 	}
-}
 
+	public function testPut() {
+		$http = new MockService($this->_testConfig);
+		$http->put('update.xml', array('status' => 'cool'));
+		$expected = join("\r\n", array(
+			'PUT /update.xml HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0 (Lithium)',
+			'Content-Type: application/x-www-form-urlencoded',
+			'Content-Length: 11',
+			'', 'status=cool'
+		));
+		$result = (string)$http->testRequest;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testDelete() {
+		$http = new MockService($this->_testConfig);
+		$http->delete('posts/1');
+		$expected = join("\r\n", array(
+			'DELETE /posts/1 HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0 (Lithium)',
+			'', ''
+		));
+		$result = (string)$http->testRequest;
+		$this->assertEqual($expected, $result);
+	}
+}
 ?>
