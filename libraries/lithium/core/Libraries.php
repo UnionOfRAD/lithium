@@ -171,7 +171,7 @@ class Libraries {
 
 		if ($config['includePath']) {
 			$path = ($config['includePath'] === true) ? $config['path'] : $config['includePath'];
-			set_include_path(get_include_path() . ':' . $path);
+			set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 		}
 
 		if (!empty($config['bootstrap'])) {
@@ -276,7 +276,7 @@ class Libraries {
 		$path = isset(static::$_cachedPaths[$class]) ? static::$_cachedPaths[$class] : null;
 		$path = $path ?: static::path($class);
 
-		if ($path && include $path) {
+		if ($path && is_readable($path) && include $path) {
 			static::$_cachedPaths[$class] = $path;
 			method_exists($class, '__init') ? $class::__init() : null;
 		} elseif ($require) {
@@ -321,13 +321,15 @@ class Libraries {
 			}
 			$path = str_replace("\\", '/', substr($class, strlen($params['prefix'])));
 			$fullPath = "{$params['path']}/{$path}";
-			$list = array_map(
-				function($i) use ($suffix) { return str_replace('\\', '/', $i . $suffix); },
-				glob(dirname($fullPath) . '/*')
-			);
 
-			if (in_array($fullPath . $suffix, $list)) {
-				return (is_dir($fullPath) && $options['dirs']) ? $fullPath : null;
+			if ($options['dirs']) {
+				$list = glob(dirname($fullPath) . '/*');
+				$list = array_map(function($i) { return str_replace('\\', '/', $i); }, $list);
+
+				if (in_array($fullPath . $suffix, $list)) {
+					return $fullPath . $suffix;
+				}
+				return is_dir($fullPath) ? $fullPath : null;
 			}
 			return $fullPath . $suffix;
 		}
