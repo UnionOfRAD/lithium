@@ -229,7 +229,7 @@ class Service extends \lithium\core\Object {
 	 * @return string
 	 */
 	protected function _send($path = null) {
-		$this->request->path .= $path;
+		$this->request->path = str_replace('//', '/', "/{$path}");
 		$request = (string) $this->request;
 		if ($this->_connection->write($request)) {
 			$message = $this->_connection->read();
