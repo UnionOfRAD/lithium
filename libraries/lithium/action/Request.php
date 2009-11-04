@@ -68,14 +68,15 @@ class Request extends \lithium\core\Object {
 		$m .= 'Windows CE|Xiino)/i';
 		$this->_detectors['mobile'][1] ?: $m;
 
-		$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
-		$env = php_sapi_name();
-		$this->_env['PLATFORM'] = array_key_exists($env, $envs) ? $envs[$env] : null;
-		$this->_base = $this->_base ?: $this->_base();
-
 		$this->url = isset($_GET['url']) ? rtrim($_GET['url'], '/') : '';
 		$this->url = $this->url ?: '/';
 		$this->_env = (array)$_SERVER + (array)$_ENV;
+
+		$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
+		$env = php_sapi_name();
+		$this->_env['PLATFORM'] = array_key_exists($env, $envs) ? $envs[$env] : null;
+
+		$this->_base = $this->_base ?: $this->_base();
 
 		if (!empty($_POST)) {
 			$this->data = $_POST;
