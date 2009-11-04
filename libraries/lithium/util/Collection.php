@@ -154,14 +154,21 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	}
 
 	/**
-	 * Returns the first non-empty value in the collection after a filter is applied.
+	 * Returns the first non-empty value in the collection after a filter is applied, or rewinds the
+	 * collection and returns the first value.
 	 *
 	 * @param callback $filter A closure through which collection values will be
 	 *                 passed. If the return value of this function is non-empty,
-	 *                 it will be returned as the result of the method call.
+	 *                 it will be returned as the result of the method call. If `null`, the
+	 *                 collection is rewound (see `rewind()`) and the first item is returned.
 	 * @return mixed Returns the first non-empty collection value returned from `$filter`.
+	 * @see lithium\util\Collection::rewind()
 	 */
-	public function first($filter) {
+	public function first($filter = null) {
+		if (empty($filter)) {
+			return $this->rewind();
+		}
+
 		foreach ($this->_items as $item) {
 			if ($value = $filter($item)) {
 				return $value;

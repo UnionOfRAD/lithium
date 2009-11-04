@@ -6,6 +6,6 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-echo $content_for_layout;
+echo $this->content;
 
 ?>

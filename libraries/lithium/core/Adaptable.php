@@ -10,6 +10,28 @@ namespace lithium\core;
 
 use \lithium\util\Collection;
 
+/**
+ * The `Adaptable` static class is the base class from which all adapter implementations
+ * extend.
+ *
+ * `Adaptable` provides the logic necessary for generic configuration of named adapter
+ * configurations (such as the ones used in Cache, as well as a unified method of
+ * locating and obtaining an instance to a specified adapter.
+ *
+ * All immediate subclasses to `Adaptable` must implement the `adapter` method,
+ * and must also define the protected `$_configurations` as a class attribute. The
+ * latter is where all local adapter named configurations will be stored, as a
+ * Collection of named configuration settings.
+ *
+ * This static class should never be called explicitly.
+ *
+ * @see \lithium\storage\Cache
+ * @see \lithium\storage\Session
+ * @see \lithium\util\audit\Logger
+ *
+ * @todo Implement as abtract class with abstract method `adapter` when
+ *       Inspector has been fixed.
+ */
 class Adaptable extends \lithium\core\StaticObject {
 
 	/**

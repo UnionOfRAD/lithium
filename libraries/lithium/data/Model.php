@@ -85,27 +85,27 @@ class Model extends \lithium\core\StaticObject {
 	protected $_finders = array();
 
 	/**
-	 * Called when a model class is loaded.  Used to call the default initialization routine.
-	 *
-	 * @return void
-	 */
-	public static function __init() {
-		if (get_called_class() == __CLASS__) {
-			return;
-		}
-		static::init();
-	}
-
-	/**
 	 * Sets default connection options and connect default finders.
 	 *
 	 * @return void
 	 * @todo Merge in inherited config from AppModel and other parent classes.
 	 */
-	public static function init($options = array()) {
+	public static function __init($options = array()) {
+		if (get_called_class() == __CLASS__) {
+			return;
+		}
 		$self = static::_instance();
+
+		$self->_finders += array(
+			'first' => function($self, $params, $chain) {
+				$params['options']['limit'] = 1;
+				return $chain->next($self, $params, $chain)->rewind();
+			}
+		);
+
 		$vars = get_class_vars(__CLASS__);
 		$base = $self->_meta + $vars['_meta'];
+		$self->_classes += $vars['_classes'];
 		$self->_meta = (
 			$options + array('class' => get_called_class(), 'name' => static::_name()) + $base
 		);
@@ -126,6 +126,15 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	public static function __callStatic($method, $params) {
+		$self = static::_instance();
+
+		if ($method == 'all' || isset($self->_finders[$method])) {
+			if (isset($params[0]) && !is_array($params[0])) {
+				$params[0] = array('conditions' => array($self->_meta['key'] => $params[0]));
+			}
+			return $self::find($method, $params ? $params[0] : array());
+		}
+
 		if (preg_match('/^find(?P<type>\w+)By(?P<fields>\w+)/', $method, $match)) {
 			$match['type'][0] = strtolower($match['type'][0]);
 			$type = $match['type'];
@@ -150,17 +159,15 @@ class Model extends \lithium\core\StaticObject {
 		);
 
 		if (is_numeric($type) || $classes['validator']::isUuid($type)) {
-			$options['conditions'] = array(
-				"{$self->_meta['name']}.{$self->_meta['key']}" => $type
-			);
+			$options['conditions'] = array($self->_meta['key'] => $type);
 			$type = 'first';
 		}
 
-		$options += ($self->_query + $defaults + compact('classes'));
+		$options += ((array)$self->_query + (array)$defaults + compact('classes'));
 		$meta = array('meta' => $self->_meta, 'name' => get_called_class());
 		$params = compact('type', 'options');
 
-		return static::_filter(__METHOD__, $params, function($self, $params, $chain) use ($meta) {
+		$filter = function($self, $params, $chain) use ($meta) {
 			$options = $params['options'] + array('model' => $meta['name']);
 			$connections = $options['classes']['connections'];
 			$name = $meta['meta']['connection'];
@@ -173,9 +180,11 @@ class Model extends \lithium\core\StaticObject {
 				'model'    => $options['model'],
 				'handle'   => &$connection,
 				'classes'  => $options['classes'],
-				'resource' => $connection->read($query, array('return' => 'resource') + $options)
+				'result'   => $connection->read($query, $options)
 			));
-		});
+		};
+		$finder = isset($self->_finders[$type]) ? array($self->_finders[$type]) : array();
+		return static::_filter(__METHOD__, $params, $filter, $finder);
 	}
 
 	/**
@@ -280,66 +289,17 @@ class Model extends \lithium\core\StaticObject {
 		return (!empty($schema) && isset($schema[$field]));
 	}
 
+	public static function save($data, $options = array()) {
+		
+	}
+
 	protected static function _name() {
 		static $name;
 		return $name ?: $name = join('', array_slice(explode("\\", get_called_class()), -1));
 	}
 
 	/**
-	 * This is pretty much completely broken right now
-	 *
-	 * @param string $type
-	 * @param string $data
-	 * @param string $altType
-	 * @param string $r
-	 * @param string $root
-	 * @return void
-	 */
-	protected static function _normalize($type, $data, $altType = null, $r = array(), $root = true) {
-
-		foreach ((array)$data as $name => $children) {
-			if (is_numeric($name)) {
-				$name = $children;
-				$children = array();
-			}
-
-			if (strpos($name, '.') !== false) {
-				$chain = explode('.', $name);
-				$name = array_shift($chain);
-				$children = array(join('.', $chain) => $children);
-			}
-
-			if (!empty($children)) {
-				if (get_called_class() == $name) {
-					$r = array_merge($r, static::_normalize($type, $children, $altType, $r, false));
-				} else {
-					if (!$_this->getAssociated($name)) {
-						$r[$altType][$name] = $children;
-					} else {
-						$r[$name] = static::_normalize($type, $children, $altType, @$r[$name], $_this->{$name});
-					}
-				}
-			} else {
-				if ($_this->getAssociated($name)) {
-					$r[$name] = array($type => null);
-				} else {
-					if ($altType != null) {
-						$r[$type][] = $name;
-					} else {
-						$r[$type] = $name;
-					}
-				}
-			}
-		}
-
-		if ($root) {
-			return array($this->name => $r);
-		}
-		return $r;
-	}
-
-	/**
-	 * Re-implements `applyFilter()` from `StaticObject` to account for object instances.
+	 * Wraps `StaticObject::applyFilter()` to account for object instances.
 	 *
 	 * @see lithium\core\StaticObject::applyFilter()
 	 */
@@ -352,11 +312,14 @@ class Model extends \lithium\core\StaticObject {
 		}
 	}
 
+	/**
+	 * Wraps `StaticObject::_filter()` to account for object instances.
+	 *
+	 * @see lithium\core\StaticObject::_filter()
+	 */
 	protected static function _filter($method, $params, $callback, $filters = array()) {
-		$m = $method;
-		if (strpos($method, '::') !== false) {
-			list(, $m) = explode('::', $method, 2);
-		}
+		list($class, $m) = explode('::', $method, 2);
+
 		if (isset(static::_instance()->_instanceFilters[$m])) {
 			$filters = array_merge(static::_instance()->_instanceFilters[$m], $filters);
 		}

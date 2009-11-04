@@ -9,10 +9,10 @@
 namespace lithium\console\commands;
 
 use \lithium\console\commands\docs\Generator;
+
 /**
- * Adds headers and docblocks to classes and methods
- *
- **/
+ * Adds headers and docblocks to classes and methods.
+ */
 class Docs extends \lithium\console\Command {
 	
 	public function run() {
@@ -24,4 +24,5 @@ class Docs extends \lithium\console\Command {
 		return $generator->run();
 	}
 }
+
 ?>
