@@ -73,7 +73,7 @@ class Request extends \lithium\core\Object {
 		$this->url = $this->url ?: '/';
 		$this->_env = (array)$_SERVER + (array)$_ENV;
 
-		$envs = array('isapi' => 'IIS', 'cgi' => 'cgi');
+		$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
 		$env = php_sapi_name();
 		$this->_env['PLATFORM'] = array_key_exists($env, $envs) ? $envs[$env] : null;
 
