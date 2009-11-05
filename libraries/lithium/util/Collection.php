@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -24,6 +24,11 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @see \lithium\util\Collection::valid()
 	 */
 	protected $_valid = false;
+
+	protected $_classes = array(
+		'record' => '\lithium\model\Record',
+		'media' => '\lithium\http\Media'
+	);
 
 	protected $_autoConfig = array('items');
 
@@ -92,27 +97,39 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * Converts the Collection object to another type of object, or a simple type such as an array.
 	 *
 	 * @param string $format Currently only `'array'` is supported.
+	 * @param $options Options for converting this collection:
+	 *        - 'internal': Boolean indicating whether the current internal representation of the
+	 *          collection should be exported. Defaults to `false`, which uses the standard iterator
+	 *          interfaces. This is useful for exporting record sets, where records are lazy-loaded,
+	 *          and the collection must be iterated in order to fetch all objects.
 	 * @return mixed The converted object.
 	 */
 	public function to($format, $options = array()) {
+		$defaults = array('internal' => false);
+		$options += $defaults;
+		$state = $options['internal'] ? $this->_items : $this;
+		$result = null;
+
 		switch ($format) {
 			case 'array':
 				$result = array();
 
-				foreach ($this->_items as $key => $value) {
+				foreach ($state as $key => $value) {
 					if (is_object($value)) {
-						if (method_exists($value, 'to')) {
-							$value = $value->to('array');
-						}
-						if (!is_array($value)) {
-							$value = get_object_vars($value);
-						}
+						$value = method_exists($value, 'to') ? $value->to('array') : $value;
+						$value = is_array($value) ? $value :  get_object_vars($value);
 					}
 					$result[$key] = $value;
 				}
+				return $result;
+			default:
+				$media = $this->_classes['media'];
+
+				if (in_array($format, $media::types())) {
+					return $media::encode($format, $this->to('array', $options));
+				}
 			break;
 		}
-		return $result;
 	}
 
 	/**

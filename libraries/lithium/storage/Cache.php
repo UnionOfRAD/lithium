@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -95,7 +95,7 @@ class Cache extends \lithium\core\Adaptable {
 		foreach ($methods as $name => $method) {
 			$params = compact('key', 'data', 'expiry', 'conditions');
 			$filters = $settings[$name]['filters'];
-			$result = $result || static::_filter('write', $params, $method, $filters);
+			$result = $result || static::_filter(__METHOD__, $params, $method, $filters);
 		}
 		return $result;
 	}
@@ -123,7 +123,7 @@ class Cache extends \lithium\core\Adaptable {
 		foreach ($methods as $name => $method) {
 			$params = compact('key', 'conditions');
 			$filters = $settings[$name]['filters'];
-			$result = $result || static::_filter('read', $params, $method, $filters);
+			$result = $result || static::_filter(__METHOD__, $params, $method, $filters);
 		}
 		return $result;
 	}
@@ -150,7 +150,7 @@ class Cache extends \lithium\core\Adaptable {
 		foreach ($methods as $name => $method) {
 			$params = compact('key', 'conditions');
 			$filters = $settings[$name]['filters'];
-			$result = $result || static::_filter('delete', $params, $method, $filters);
+			$result = $result || static::_filter(__METHOD__, $params, $method, $filters);
 		}
 		return $result;
 	}

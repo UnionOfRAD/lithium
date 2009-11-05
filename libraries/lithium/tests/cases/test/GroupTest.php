@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -15,7 +15,7 @@ class GroupTest extends \lithium\test\Unit {
 
 	public function testAdd() {
 		$group = new Group();
-		$result = $group->add('\g11n');
+		$result = $group->add('g11n');
 		$expected = array(
 		  'lithium\tests\cases\g11n\CatalogTest',
 		  'lithium\tests\cases\g11n\LocaleTest',
@@ -98,7 +98,7 @@ class GroupTest extends \lithium\test\Unit {
 
 	public function testQueryAllTests() {
 		$result = Group::all(array('library' => 'lithium'));
-		$this->assertEqual(60, count($result));
+		$this->assertTrue(count($result) >= 60);
 	}
 }
 

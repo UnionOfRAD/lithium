@@ -2,14 +2,13 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
 namespace lithium\core;
 
 use \Exception;
-use \RecursiveIteratorIterator;
 use \lithium\util\iterator\LibrariesFilter;
 use \lithium\util\String;
 
@@ -319,7 +318,7 @@ class Libraries {
 		}
 
 		if (is_null($name)) {
-			return static::_locateAll($params);
+			return static::_locateAll($params, $options);
 		}
 		$paths = static::$_classPaths[$type];
 
@@ -433,11 +432,11 @@ class Libraries {
 				if ($scope && !in_array($library, $scope)) {
 					continue;
 				}
-				$params['library'] = "";
 				$path = String::insert($template, $params, array('escape' => '/'));
-				$path = str_replace('/*', '', str_replace('\\', '/', $path));
-				if (is_dir($config['path']. '/' . $path)) {
-					$options['path'] = $path;
+				$options['path'] = preg_replace(
+					'/(\/\*)|(\/(?:[A-Z][a-z0-9_]*))|({:\w+})/', '', str_replace('\\', '/', $path)
+				);
+				if (is_dir("{$config['path']}/{$options['path']}")) {
 					$classes = array_merge($classes, static::_search($config, $options));
 				}
 			}
@@ -563,6 +562,10 @@ class Libraries {
 
 if (!defined('LITHIUM_LIBRARY_PATH')) {
 	define('LITHIUM_LIBRARY_PATH', dirname(dirname(__DIR__)));
+}
+
+if (!defined('LITHIUM_APP_PATH')) {
+	define('LITHIUM_APP_PATH', dirname(LITHIUM_LIBRARY_PATH) . '/app');
 }
 
 ?>

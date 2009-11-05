@@ -1,21 +1,20 @@
 <?php
 /**
  * Lithium: the most rad php framework
- * Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  *
- * Licensed under The BSD License
- * Redistributions of files must retain the above copyright notice.
- *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  *
- * @todo          fix encoding methods to use class query methods instead of sqlite3 natives
  */
 
 namespace lithium\data\source\database\adapter;
 
 use \Exception;
-
+/*
+* Sqlit daatbase driver
+*
+* @todo fix encoding methods to use class query methods instead of sqlite3 natives
+*/
 class Sqlite3 extends \lithium\data\source\Database {
 
 	/**

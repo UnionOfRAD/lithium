@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -53,7 +53,6 @@ class LibrariesTest extends \lithium\test\Unit {
 		$tests = Libraries::find('app', array('recursive' => true, 'path' => '/tests/cases'));
 		$result = preg_grep('/^app\\\\tests\\\\cases\\\\/', $tests);
 		$this->assertIdentical($tests, $result);
-
 	}
 
 	/**
@@ -174,6 +173,9 @@ class LibrariesTest extends \lithium\test\Unit {
 		);
 		$result = Libraries::locate('adapters.template.view');
 		$this->assertEqual($expected, $result);
+
+		$result = Libraries::locate('tests');
+		$this->assertTrue(count($result) > 30);
 	}
 
 	/**
@@ -183,6 +185,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testServiceLocation() {
+		$this->assertNull(Libraries::locate('adapters', 'File'));
 		$this->assertNull(Libraries::locate('adapters.view', 'File'));
 
 		$result = Libraries::locate('adapters.template.view', 'File');
