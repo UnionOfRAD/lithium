@@ -88,16 +88,15 @@ class Cache extends \lithium\core\Adaptable {
 			return false;
 		}
 
-		$key = static::key($key);
-		$methods = array($name => static::adapter($name)->write($key, $data, $expiry, $conditions));
-		$result = false;
-
-		foreach ($methods as $name => $method) {
-			$params = compact('key', 'data', 'expiry', 'conditions');
-			$filters = $settings[$name]['filters'];
-			$result = $result || static::_filter(__METHOD__, $params, $method, $filters);
+		if (is_callable($conditions)) {
+			if (!$conditions()) return false;
 		}
-		return $result;
+		$key = static::key($key);
+		$method = static::adapter($name)->write($key, $data, $expiry, $conditions);
+		$params = compact('key', 'data', 'expiry', 'conditions');
+		$filters = $settings[$name]['filters'];
+
+		return static::_filter(__METHOD__, $params, $method, $filters);
 	}
 
 
@@ -116,16 +115,15 @@ class Cache extends \lithium\core\Adaptable {
 			return false;
 		}
 
-		$key = static::key($key);
-		$methods = array($name => static::adapter($name)->read($key, $conditions));
-		$result = false;
-
-		foreach ($methods as $name => $method) {
-			$params = compact('key', 'conditions');
-			$filters = $settings[$name]['filters'];
-			$result = $result || static::_filter(__METHOD__, $params, $method, $filters);
+		if (is_callable($conditions)) {
+			if (!$conditions()) return false;
 		}
-		return $result;
+		$key = static::key($key);
+		$method = static::adapter($name)->read($key, $conditions);
+		$params = compact('key', 'conditions');
+		$filters = $settings[$name]['filters'];
+
+		return static::_filter(__METHOD__, $params, $method, $filters);
 	}
 
 	/**
@@ -143,16 +141,15 @@ class Cache extends \lithium\core\Adaptable {
 			return false;
 		}
 
-		$key = static::key($key);
-		$methods = array($name => static::adapter($name)->delete($key, $conditions));
-		$result = false;
-
-		foreach ($methods as $name => $method) {
-			$params = compact('key', 'conditions');
-			$filters = $settings[$name]['filters'];
-			$result = $result || static::_filter(__METHOD__, $params, $method, $filters);
+		if (is_callable($conditions)) {
+			if (!$conditions()) return false;
 		}
-		return $result;
+		$key = static::key($key);
+		$method = static::adapter($name)->delete($key, $conditions);
+		$params = compact('key', 'conditions');
+		$filters = $settings[$name]['filters'];
+
+		return static::_filter(__METHOD__, $params, $method, $filters);
 	}
 
 	/**
@@ -163,12 +160,7 @@ class Cache extends \lithium\core\Adaptable {
 	 */
 	public static function clean($name) {
 		$settings = static::config();
-
-		if (!isset($settings[$name])) {
-			return false;
-		}
-
-		return static::adapter($name)->clean();
+		return (isset($settings[$name])) ? static::adapter($name)->clean() : false;
 	}
 
 	/**
@@ -179,12 +171,7 @@ class Cache extends \lithium\core\Adaptable {
 	 */
 	public static function clear($name) {
 		$settings = static::config();
-
-		if (!isset($settings[$name])) {
-			return false;
-		}
-
-		return static::adapter($name)->clear();
+		return (isset($settings[$name])) ? static::adapter($name)->clear() : false;
 	}
 
 	/**

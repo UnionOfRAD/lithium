@@ -58,7 +58,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @return object         Collection of configurations
 	 */
 	public static function config($config = null) {
-		$default = array('adapter' => null, 'filters' => array());
+		$default = array('adapter' => null, 'filters' => array(), 'strategies' => array());
 
 		if ($config) {
 			$items = array_map(function($i) use ($default) { return $i + $default; }, $config);
@@ -82,7 +82,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @param  string $library Dot-delimited location of library, in a format
 	 *                         compatible with Libraries::locate().
 	 * @param  string $name    Classname of adapter to load
-	 * @return string          Adapter object
+	 * @return object          Adapter object
 	 */
 	protected static function _adapter($library, $name = null) {
 		$settings = static::$_configurations;
@@ -110,6 +110,5 @@ class Adaptable extends \lithium\core\StaticObject {
 
 		return $settings[$name]['adapter'];
 	}
-
 }
 ?>

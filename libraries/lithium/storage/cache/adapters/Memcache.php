@@ -92,10 +92,9 @@ class Memcache extends \lithium\core\Object {
 	 * @param string $key        The key to uniquely identify the cached item
 	 * @param mixed  $value      The value to be cached
 	 * @param string $expiry     A strtotime() compatible cache time
-	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return boolean True on successful write, false otherwise
 	 */
-	public function write($key, $value, $expiry, $conditions = null) {
+	public function write($key, $value, $expiry) {
 		$Memcached =& static::$_Memcached;
 
 		return function($self, $params, $chain) use (&$Memcached) {
@@ -112,11 +111,10 @@ class Memcache extends \lithium\core\Object {
 	 * Read value(s) from the cache
 	 *
 	 * @param string $key        The key to uniquely identify the cached item
-	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return mixed Cached value if successful, false otherwise
 	 * @todo Refactor to use RES_NOTFOUND for return value checks
 	 */
-	public function read($key, $conditions = null) {
+	public function read($key) {
 		$Memcached =& static::$_Memcached;
 
 		return function($self, $params, $chain) use (&$Memcached) {
@@ -131,16 +129,56 @@ class Memcache extends \lithium\core\Object {
 	 * Delete value from the cache
 	 *
 	 * @param string $key        The key to uniquely identify the cached item
-	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return mixed True on successful delete, false otherwise
 	 */
-	public function delete($key, $conditions = null) {
+	public function delete($key) {
 		$Memcached =& static::$_Memcached;
 
 		return function($self, $params, $chain) use (&$Memcached) {
 			extract($params);
 			$Memcached->delete($key . '_expires');
 			return $Memcached->delete($key);
+		};
+	}
+
+	/**
+	 * Performs an atomic decrement operation on specified numeric cache item.
+	 *
+	 * Note that, as per the Memcached specification:
+	 * "If the item's value is not numeric, it is treated as if the value were 0.
+	 * If the operation would decrease the value below 0, the new value will be 0."
+	 * (see http://www.php.net/manual/memcached.decrement.php)
+	 *
+	 * @param string  $key    Key of numeric cache item to decrement
+	 * @param integer $offset Offset to decrement - defaults to 1.
+	 * @return mixed  Item's new value on successful decrement, false otherwise
+	 */
+	public function decrement($key, $offset = 1) {
+		$Memcached =& static::$_Memcached;
+
+		return function($self, $params, $chain) use (&$Memcached, $offset) {
+			extract($params);
+			return $Memcached->decrement($key, $offset);
+		};
+	}
+
+	/**
+	 * Performs an atomic increment operation on specified numeric cache item.
+	 *
+	 * Note that, as per the Memcached specification:
+	 * "If the item's value is not numeric, it is treated as if the value were 0."
+	 * (see http://www.php.net/manual/memcached.decrement.php)
+	 *
+	 * @param string  $key    Key of numeric cache item to increment
+	 * @param integer $offset Offset to increment - defaults to 1.
+	 * @return mixed  Item's new value on successful increment, false otherwise
+	 */
+	public function increment($key, $offset = 1) {
+		$Memcached =& static::$_Memcached;
+
+		return function($self, $params, $chain) use (&$Memcached, $offset) {
+			extract($params);
+			return $Memcached->increment($key, $offset);
 		};
 	}
 

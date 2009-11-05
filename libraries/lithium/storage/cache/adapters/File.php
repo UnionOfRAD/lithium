@@ -44,10 +44,9 @@ class File extends \lithium\core\Object {
 	 * @param string $key        The key to uniquely identify the cached item
 	 * @param mixed  $value      The value to be cached
 	 * @param string $expiry     A strtotime() compatible cache time
-	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return boolean True on successful write, false otherwise
 	 */
-	public function write($key, $data, $expiry, $conditions = null) {
+	public function write($key, $data, $expiry) {
 		$path = $this->_config['path'];
 
 		return function($self, $params, $chain) use (&$path) {
@@ -65,10 +64,9 @@ class File extends \lithium\core\Object {
 	 * Read value(s) from the cache
 	 *
 	 * @param string $key        The key to uniquely identify the cached item
-	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return mixed Cached value if successful, false otherwise
 	 */
-	public function read($key, $conditions = null) {
+	public function read($key) {
 		$path = $this->_config['path'];
 
 		return function($self, $params, $chain) use (&$path) {
@@ -98,10 +96,9 @@ class File extends \lithium\core\Object {
 	 * Delete value from the cache
 	 *
 	 * @param string $key        The key to uniquely identify the cached item
-	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return mixed True on successful delete, false otherwise
 	 */
-	public function delete($key, $conditions = null) {
+	public function delete($key) {
 		$path = $this->_config['path'];
 
 		return function($self, $params, $chain) use (&$path) {
