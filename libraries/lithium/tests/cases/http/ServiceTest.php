@@ -110,7 +110,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'Content-Length: 11',
 			'', 'status=cool'
 		));
-		$result = (string)$http->testRequest;
+		$result = (string)$http->last->request;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -126,7 +126,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'Content-Length: 11',
 			'', 'status=cool'
 		));
-		$result = (string)$http->testRequest;
+		$result = (string)$http->last->request;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -140,7 +140,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'User-Agent: Mozilla/5.0 (Lithium)',
 			'', ''
 		));
-		$result = (string)$http->testRequest;
+		$result = (string)$http->last->request;
 		$this->assertEqual($expected, $result);
 	}
 }

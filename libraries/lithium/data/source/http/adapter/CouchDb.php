@@ -43,16 +43,15 @@ class CouchDb extends \lithium\data\source\Http {
 	public function __call($method, $params = array()) {
 		$path = array_shift($params);
 		$data = array_shift($params);
-		$this->_connection->request->headers('Content-Type', 'application/json');
-		if (!empty($data)) {
-			$data = json_encode($data);
-		}
+		$path = $path ?: '/';
+		$data = (!empty($data)) ? json_encode($data) : null;
 		$params = array_filter(array($path, $data));
+		$this->_connection->request->headers('Content-Type', 'application/json');
 		return json_decode($this->_connection->invokeMethod($method, $params));
 	}
 
 	public function entities($class = null) {
-		return $this->get();
+		//return $this->get();
 	}
 
 	public function describe($entity, $meta = array()) {
@@ -60,7 +59,6 @@ class CouchDb extends \lithium\data\source\Http {
 			$result = $this->get($entity);
 			if ($result->error == 'not_found') {
 				$result = $this->put($entity);
-				var_dump($result);
 			}
 			$this->_db = true;
 		}
@@ -79,14 +77,14 @@ class CouchDb extends \lithium\data\source\Http {
 			$params = $query->export($self);
 			$data = $query->data();
 			$id = null;
-			if ($data['id']) {
+			if (!empty($data['id'])) {
 				$id = '/' . $data['id'];
 				$data += array('_id' => (string)$data['id']);
 				unset($data['id']);
 			}
 			$result = $self->put($params['table'] . $id, $data);
 
-			if ($result && $result->ok === true) {
+			if (isset($result->ok) && $result->ok === true) {
 				$query->record()->invokeMethod('_update', array($result->id));
 				return true;
 			}
@@ -104,7 +102,7 @@ class CouchDb extends \lithium\data\source\Http {
 			$query = $query->export($self);
 			extract($query, EXTR_OVERWRITE);
 			$id = null;
-			if ($conditions['id']) {
+			if (!empty($conditions['id'])) {
 				$id = '/' . $conditions['id'];
 				unset($conditions['id']);
 			}
@@ -123,7 +121,14 @@ class CouchDb extends \lithium\data\source\Http {
 			$params = $query->export($self);
 			$data = $query->data();
 
-			if ($self->put($params['table'], $params['conditions'] + $data)) {
+			$id = null;
+			if (!empty($conditions['id'])) {
+				$id = '/' . $conditions['id'];
+				unset($conditions['id']);
+			}
+			$self->put($params['table'] . $id, $params['conditions'] + $data);
+
+			if (isset($result->ok) && $result->ok === true) {
 				$query->record()->invokeMethod('_update');
 				return true;
 			}
@@ -134,7 +139,7 @@ class CouchDb extends \lithium\data\source\Http {
 	public function delete($query, $options) {
 		$query = $query->export($this);
 		extract($query, EXTR_OVERWRITE);
-		if ($conditions['id']) {
+		if (!empty($conditions['id'])) {
 			$id = '/' . $conditions['id'];
 			unset($conditions['id']);
 		}

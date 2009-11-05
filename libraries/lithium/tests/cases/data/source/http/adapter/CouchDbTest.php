@@ -10,6 +10,10 @@ namespace lithium\tests\cases\data\source\http\adapter;
 
 use \lithium\data\source\http\adapter\CouchDb;
 
+use \lithium\data\Model;
+use \lithium\data\model\Query;
+use \lithium\data\model\Record;
+
 class CouchDbTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
@@ -26,6 +30,17 @@ class CouchDbTest extends \lithium\test\Unit {
 		'timeout' => 2
 	);
 
+	public function setUp() {
+		$this->query = new Query(array(
+			'model' => '\lithium\data\Model',
+			'record' => new Record()
+		));
+	}
+
+	public function tearDown() {
+		unset($this->query);
+	}
+
 	public function testAllMethodsNoConnection() {
 		$couchdb = new CouchDb(array('protocol' => null));
 		$this->assertFalse($couchdb->connect());
@@ -33,7 +48,6 @@ class CouchDbTest extends \lithium\test\Unit {
 		$this->assertFalse($couchdb->get());
 		$this->assertFalse($couchdb->post());
 		$this->assertFalse($couchdb->put());
-		$this->assertFalse($couchdb->delete());
 	}
 
 	public function testConnect() {
@@ -58,13 +72,14 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	public function testDescribe() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$result = $couchdb->describe(null, null);
+		//$result = $couchdb->describe('companies');
 	}
 
 	public function testGet() {
 		$couchdb = new CouchDb($this->_testConfig);
+		$expected = (object) array('some' => 'json');
 		$result = $couchdb->get();
-		$this->assertEqual('Test!', $result);
+		$this->assertEqual($expected, $result);
 
 		$expected = 'HTTP/1.1';
 		$result = $couchdb->response->protocol;
@@ -121,43 +136,38 @@ class CouchDbTest extends \lithium\test\Unit {
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0 (Lithium)',
-			'Content-Type: application/x-www-form-urlencoded',
-			'Content-Length: 11',
-			'', 'status=cool'
+			'Content-Type: application/json',
+			'Content-Length: 17',
+			'', '{"status":"cool"}'
 		));
-		$result = (string)$couchdb->testRequest;
+		$result = (string)$couchdb->last->request;
 		$this->assertEqual($expected, $result);
-	}
-
-	public function testPut() {
-		$couchdb = new CouchDb($this->_testConfig);
-		$result = $couchdb->put();
-		$this->assertEqual('Test!', $result);
-	}
-
-	public function testDelete() {
-		$couchdb = new CouchDb($this->_testConfig);
-		$result = $couchdb->delete(null);
-		$this->assertEqual('Test!', $result);
 	}
 
 	public function testCreate() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$result = $couchdb->create(null);
+		$result = $couchdb->create($this->query);
 		$this->assertEqual('Test!', $result);
 	}
 
 	public function testRead() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$result = $couchdb->read(null);
+		$result = $couchdb->read($this->query);
 		$this->assertEqual('Test!', $result);
 	}
 
 	public function testUpdate() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$result = $couchdb->update(null);
+		$result = $couchdb->update($this->query);
 		$this->assertEqual('Test!', $result);
 	}
+
+	public function testDelete() {
+		$couchdb = new CouchDb($this->_testConfig);
+		$result = $couchdb->delete($this->query, array());
+		$this->assertEqual('Test!', $result);
+	}
+
 }
 
 ?>
