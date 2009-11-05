@@ -318,7 +318,6 @@ class Inspector extends \lithium\core\StaticObject {
 	/**
 	 * Gets the static and dynamic dependencies for a class or group of classes.
 	 *
-	 * @package default
 	 */
 	public static function dependencies($classes, $options = array()) {
 		$defaults = array('type' => null);
