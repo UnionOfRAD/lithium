@@ -70,7 +70,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$format = function($test) use ($type) {
 			if ($type == 'html') {
 				if ($test == 'group') {
-					return '<li><a href="?group=%1$s">%2$s</a><ul>%3$s</ul></li>';
+					return '<li><a href="?group=%1$s">%2$s</a>%3$s</li>';
 				}
 				if ($test == 'case') {
 					return '<li><a href="?case=%2$s\%1$s">%1$s</a></li>';
