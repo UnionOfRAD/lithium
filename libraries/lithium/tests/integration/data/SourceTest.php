@@ -53,7 +53,8 @@ class SourceTest extends \lithium\test\Unit {
 
 		$result = $new->to('array');
 		$expected = array($key => 12345, 'name' => 'Acme, Inc.');
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected[$key], $result[$key]);
+		$this->assertEqual($expected['name'], $result['name']);
 
 		$this->assertFalse($new->exists());
 		$this->assertTrue($new->save());
@@ -61,7 +62,8 @@ class SourceTest extends \lithium\test\Unit {
 
 		$existing = CompanyIntegration::find(12345);
 		$result = $existing->to('array');
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected[$key], $result[$key]);
+		$this->assertEqual($expected['name'], $result['name']);
 		$this->assertTrue($existing->exists());
 
 		$existing->name = 'Big Brother and the Holding Company';

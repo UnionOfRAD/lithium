@@ -57,10 +57,14 @@ class CouchDb extends \lithium\data\source\Http {
 	public function describe($entity, $meta = array()) {
 		if (!$this->_db) {
 			$result = $this->get($entity);
-			if ($result->error == 'not_found') {
-				$result = $this->put($entity);
+			if (isset($result->error)) {
+				if ($result->error == 'not_found') {
+					$result = $this->put($entity);
+				}
 			}
-			$this->_db = true;
+			if (isset($result->ok)) {
+				$this->_db = true;
+			}
 		}
 	}
 
@@ -70,18 +74,17 @@ class CouchDb extends \lithium\data\source\Http {
 
 	public function create($query, $options = array()) {
 		$params = compact('query', 'options');
-		$conn =& $this->_connection;
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			extract($params);
 			$params = $query->export($self);
 			$data = $query->data();
 			$id = null;
-			if (!empty($data['id'])) {
-				$id = '/' . $data['id'];
-				$data += array('_id' => (string)$data['id']);
-				unset($data['id']);
+			if (!empty($data['_id'])) {
+				$id = '/' . $data['_id'];
+				$data['_id'] = (string) $data['_id'];
 			}
+
 			$result = $self->put($params['table'] . $id, $data);
 
 			if (isset($result->ok) && $result->ok === true) {
@@ -102,9 +105,9 @@ class CouchDb extends \lithium\data\source\Http {
 			$query = $query->export($self);
 			extract($query, EXTR_OVERWRITE);
 			$id = null;
-			if (!empty($conditions['id'])) {
-				$id = '/' . $conditions['id'];
-				unset($conditions['id']);
+			if (!empty($conditions['_id'])) {
+				$id = '/' . $conditions['_id'];
+				unset($conditions['_id']);
 			}
 			$result = $self->get($table . $id, array_filter($conditions));
 			return $result;
@@ -122,9 +125,9 @@ class CouchDb extends \lithium\data\source\Http {
 			$data = $query->data();
 
 			$id = null;
-			if (!empty($conditions['id'])) {
-				$id = '/' . $conditions['id'];
-				unset($conditions['id']);
+			if (!empty($conditions['_id'])) {
+				$id = '/' . $conditions['_id'];
+				unset($conditions['_id']);
 			}
 			$self->put($params['table'] . $id, $params['conditions'] + $data);
 
@@ -139,9 +142,9 @@ class CouchDb extends \lithium\data\source\Http {
 	public function delete($query, $options) {
 		$query = $query->export($this);
 		extract($query, EXTR_OVERWRITE);
-		if (!empty($conditions['id'])) {
-			$id = '/' . $conditions['id'];
-			unset($conditions['id']);
+		if (!empty($conditions['_id'])) {
+			$id = '/' . $conditions['_id'];
+			unset($conditions['_id']);
 		}
 		return $this->_connection->delete($table, $conditions);
 	}
@@ -150,20 +153,7 @@ class CouchDb extends \lithium\data\source\Http {
 		if (!is_object($resource)) {
 			return null;
 		}
-
-		switch ($type) {
-			case 'next':
-				$result = $context->valid() ? $context->next() : null;
-			break;
-			case 'close':
-				unset($resource);
-				$result = null;
-			break;
-			default:
-				$result = parent::result($type, $resource, $context);
-			break;
-		}
-		return $result;
+		return (array)$resource;
 	}
 
 	public function conditions($conditions, $context) {
