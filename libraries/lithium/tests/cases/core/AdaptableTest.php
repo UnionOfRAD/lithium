@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -14,11 +14,11 @@ use \lithium\storage\cache\adapters\Memory;
 
 class MockAdapter extends \lithium\core\Adaptable {
 
-	protected static $_configurations = null;
+       protected static $_configurations = null;
 
-	public static function adapter($name) {
-		return static::_adapter('adapters.storage.cache', $name);
-	}
+       public static function adapter($name) {
+               return static::_adapter('adapters.storage.cache', $name);
+       }
 
 }
 
@@ -34,14 +34,31 @@ class AdaptableTest extends \lithium\test\Unit {
 		$Collection = new Collection();
 		$this->assertEqual($Collection, $this->Adaptable->config());
 
-		$items = array(array('adapter' => '\some\adapter', 'filters' => array('filter1', 'filter2')));
+		$items = array(array(
+			'adapter' => '\some\adapter',
+			'filters' => array('filter1', 'filter2'),
+			'strategies' => array()
+		));
+		$result = $this->Adaptable->config($items);
+		$expected = new Collection(compact('items'));
+		$this->assertEqual($expected, $result);
+
+		$items = array(array(
+			'adapter' => '\some\adapter',
+			'filters' => array('filter1', 'filter2'),
+			'strategies' => array('strategy1', 'strategy2')
+		));
 		$result = $this->Adaptable->config($items);
 		$expected = new Collection(compact('items'));
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testReset() {
-		$items = array(array('adapter' => '\some\adapter', 'filters' => array('filter1', 'filter2')));
+		$items = array(array(
+			'adapter' => '\some\adapter',
+			'filters' => array('filter1', 'filter2'),
+			'strategies' => array('strategy1', 'strategy2')
+		));
 		$result = $this->Adaptable->config($items);
 		$expected = new Collection(compact('items'));
 		$this->assertEqual($expected, $result);
@@ -54,36 +71,46 @@ class AdaptableTest extends \lithium\test\Unit {
 	}
 
 	public function testAdapter() {
-		$Adapter = new MockAdapter();
+		$adapter = new MockAdapter();
 
-		$result = $Adapter::adapter('non_existent_config');
+		$result = $adapter::adapter('non_existent_config');
 		$this->assertNull($result);
 
-		$items = array('default' => array('adapter' => 'Memory', 'filters' => array()));
-		$result = $Adapter::config($items);
+		$items = array('default' => array(
+			'adapter' => 'Memory',
+			'filters' => array(),
+			'strategies' => array()
+		));
+		$result = $adapter::config($items);
 		$expected = new Collection(compact('items'));
 		$this->assertEqual($expected, $result);
 
-		$result = $Adapter::adapter('default');
-		$expected = new Memory();
+		$result = $adapter::adapter('default');
+		$expected = new Memory($items['default']);
 		$this->assertEqual($expected, $result);
 
 		// Will use last configured adapter
-		$result = $Adapter::adapter(null);
-		$expected = new Memory();
+		$result = $adapter::adapter(null);
+		$expected = new Memory($items['default']);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testNonExistentAdapter() {
-		$Adapter = new MockAdapter();
+		$adapter = new MockAdapter();
 
-		$items = array('default' => array('adapter' => 'NonExistent', 'filters' => array()));
-		$result = $Adapter::config($items);
+		$items = array('default' => array(
+			'adapter' => 'NonExistent', 'filters' => array(), 'strategies' => array()
+		));
+		$result = $adapter::config($items);
 		$expected = new Collection(compact('items'));
 		$this->assertEqual($expected, $result);
 
-		$result = $Adapter::adapter('default');
+		$result = $adapter::adapter('default');
 		$this->assertNull($result);
+	}
+
+	public function testApplyStrategies() {
+
 	}
 
 }

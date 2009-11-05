@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -10,6 +10,11 @@ namespace lithium\action;
 
 use \lithium\util\Validator;
 
+/**
+ * Request is responsible for identifying and storing all the information about the http request.
+ *
+ * @see lithium\action\Dispatcher
+ */
 class Request extends \lithium\core\Object {
 
 	public $url = null;

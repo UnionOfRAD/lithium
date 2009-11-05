@@ -1,0 +1,28 @@
+#### Special syntax
+
+Views have a special syntax for outputting escaped text. The standard way to
+output escaped text in your views from Lithium is as follows: {{{
+<?=$variable;?>
+}}}
+
+This is where a lot of confusion comes in because it is commonly misunderstood
+that Lithium depends on `short_open_tags`, however, that's not the case. The
+contents of a view is processed through a [ stream](template/view/Stream) before
+it is included by PHP. See the PHP [ manual](http://www.php.net/streams) to learn
+more about streams.
+
+The stream wrapper reads the file and searches for anything that looks like
+`<?=...?>` and replaces it with `<?php echo $h(...); ?>`.
+
+The design decision behind using PHP's short echo syntax is because it's a
+familiar syntax and it helps developers focus more on what data _should not_ be
+escaped vs. what data _needs_ to be escaped.
+
+**Note:** `$h()` is the HTML escape function used in views.
+
+**Note:** To output regular, unescaped text, use plain old `<?php echo ...; ?>`.
+
+**Other useful information:**
+
+- [Introduction to PHP streams](http://www.php.net/intro.stream)
+- [Stream examples](http://www.php.net/stream.examples)

@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -27,16 +27,13 @@ class MemcacheTest extends \lithium\test\Unit {
 		$message = 'The memcached daemon does not appear to be running on 127.0.0.1:11211';
 		$result = $M->getVersion();
 		$this->skipIf(empty($result), $message);
-
+		unset($M);
 	}
 
 	public function setUp() {
 		$this->server = array('host' => '127.0.0.1', 'port' => 11211, 'weight' => 100);
-
-
 		$this->_Memcached = new \Memcached();
 		$this->_Memcached->addServer($this->server['host'], $this->server['port'], $this->server['weight']);
-
 		$this->Memcache = new Memcache();
 	}
 
@@ -262,6 +259,81 @@ class MemcacheTest extends \lithium\test\Unit {
 
 		$this->assertFalse($this->_Memcached->get('key'));
 		$this->assertFalse($this->_Memcached->get('another_key'));
+	}
+
+	public function testDecrement() {
+		$time = strtotime('+1 minute');
+		$key = 'decrement';
+		$value = 10;
+
+		$result = $this->_Memcached->set($key, $value, $time);
+		$this->assertTrue($result);
+
+		$closure = $this->Memcache->decrement($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Memcache, $params, null);
+		$this->assertEqual($value - 1, $result);
+
+		$result = $this->_Memcached->get($key);
+		$this->assertEqual($value - 1, $result);
+
+	}
+
+	public function testDecrementNonIntegerValue() {
+		$time = strtotime('+1 minute');
+		$key = 'non_integer';
+		$value = 'no';
+
+		$result = $this->_Memcached->set($key, $value, $time);
+		$this->assertTrue($result);
+
+		$closure = $this->Memcache->decrement($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Memcache, $params, null);
+
+		$result = $this->_Memcached->get($key);
+		$this->assertEqual(0, $result);
+	}
+
+	public function testIncrement() {
+		$time = strtotime('+1 minute');
+		$key = 'increment';
+		$value = 10;
+
+		$result = $this->_Memcached->set($key, $value, $time);
+		$this->assertTrue($result);
+
+		$closure = $this->Memcache->increment($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Memcache, $params, null);
+		$this->assertEqual($value + 1, $result);
+
+		$result = $this->_Memcached->get($key);
+		$this->assertEqual($value + 1, $result);
+	}
+
+	public function testIncrementNonIntegerValue() {
+		$time = strtotime('+1 minute');
+		$key = 'non_integer_increment';
+		$value = 'yes';
+
+		$result = $this->_Memcached->set($key, $value, $time);
+		$this->assertTrue($result);
+
+		$closure = $this->Memcache->increment($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Memcache, $params, null);
+
+		$result = $this->_Memcached->get($key);
+		$this->assertEqual(0, $result);
 	}
 }
 

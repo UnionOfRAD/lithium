@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -113,7 +113,6 @@ class FileTest extends \lithium\test\Unit {
 		$result = $this->File->clear();
 		$this->assertTrue($result);
 		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
-
 	}
 
 

@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -36,7 +36,7 @@ class SessionTest extends \lithium\test\Unit {
 		$store2 = new Memory();
 		$config = array(
 			'store1' => array('adapter' => &$store1, 'filters' => array()),
-			'store1' => array('adapter' => &$store1, 'filters' => array())
+			'store2' => array('adapter' => &$store2, 'filters' => array())
 		);
 
 		$result = Session::config($config);

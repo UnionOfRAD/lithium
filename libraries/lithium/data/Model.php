@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -14,9 +14,8 @@ use \lithium\util\Inflector;
 /**
  * Model class
  *
- * @package default
  * @todo Methods: bind(), and 'bind' option for find() et al., create(), save(), delete(),
- * validate()
+ *       validate()
  */
 class Model extends \lithium\core\StaticObject {
 

@@ -2,17 +2,17 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
 namespace lithium\template\view;
 
 /**
- * Stream wrapper implementation based on the example provided at 
+ * Stream wrapper implementation based on the example provided at
  * http://us3.php.net/manual/en/stream.streamwrapper.example-1.php, and inspired by the work of
  * Paul M. Jones (http://paul-m-jones.com/) and Mike Naberezny (http://mikenaberezny.com/).
- * 
+ *
  * Enables pure PHP template files to auto-escape output and implement custom content filtering.
  */
 class Stream {
@@ -40,7 +40,6 @@ class Stream {
 		}
 
 		$echo = '/\<\?=\s*(.+?)\s*;?\s*\?>/';
-		$this->_data = preg_replace('/\<\?=@/', '<?php echo ', $this->_data);
 		$this->_data = preg_replace($echo, '<?php echo $h($1); ?>', $this->_data);
 		return true;
 	}

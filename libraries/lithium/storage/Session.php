@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -70,7 +70,7 @@ class Session extends \lithium\core\Adaptable {
 			}
 		}
 		$filters = $settings[$name]['filters'];
-		return static::_filter('read', compact('key', 'options'), $method, $filters);
+		return static::_filter(__METHOD__, compact('key', 'options'), $method, $filters);
 	}
 
 	/**
@@ -106,7 +106,7 @@ class Session extends \lithium\core\Adaptable {
 		foreach ($methods as $name => $method) {
 			$params = compact('key', 'value', 'options');
 			$filters = $settings[$name]['filters'];
-			$result = $result || static::_filter('write', $params, $method, $filters);
+			$result = $result || static::_filter(__METHOD__, $params, $method, $filters);
 		}
 		return $result;
 	}

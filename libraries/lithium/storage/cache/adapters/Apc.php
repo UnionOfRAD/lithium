@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -47,10 +47,9 @@ class Apc extends \lithium\core\Object {
 	 * @param string $key        The key to uniquely identify the cached item
 	 * @param mixed  $value      The value to be cached
 	 * @param string $expiry     A strtotime() compatible cache time
-	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return boolean True on successful write, false otherwise
 	 */
-	public function write($key, $data, $expiry, $conditions = null) {
+	public function write($key, $data, $expiry) {
 		return function($self, $params, $chain) {
 			extract($params);
 			$cachetime = strtotime($expiry);
@@ -66,10 +65,9 @@ class Apc extends \lithium\core\Object {
 	 * Read value(s) from the cache
 	 *
 	 * @param string $key        The key to uniquely identify the cached item
-	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return mixed Cached value if successful, false otherwise
 	 */
-	public function read($key, $conditions = null) {
+	public function read($key) {
 		return function($self, $params, $chain) {
 			extract($params);
 			$cachetime = intval(apc_fetch($key . '_expires'));
@@ -82,10 +80,9 @@ class Apc extends \lithium\core\Object {
 	 * Delete value from the cache
 	 *
 	 * @param string $key        The key to uniquely identify the cached item
-	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return mixed True on successful delete, false otherwise
 	 */
-	public function delete($key, $conditions = null) {
+	public function delete($key) {
 		return function($self, $params, $chain) {
 			extract($params);
 			apc_delete($key . '_expires');

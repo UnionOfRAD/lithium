@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -10,6 +10,23 @@ namespace lithium\template\helpers;
 
 use \lithium\util\Set;
 
+/**
+ * A helper class to facilitate generating, processing and securing HTML forms. By default, `Form`
+ * will simply generate HTML forms and widgets, but by creating a form with a _binding object_,
+ * the helper can pre-fill form input values, render error messages, and introspect column types.
+ *
+ * For example:
+ * {{{// In controller code:
+ * $post = Post::find(1);
+ * return compact('post');
+ *
+ * // In view code:
+ * <?=@$this->form->create($post); // Echoes a <form> tag and binds the helper to $post ?>
+ * <?=@$this->form->text('title'); // Echoes an <input /> element, pre-filled with $post's title ?>
+ * <?=@$this->form->submit('Update'); // Echoes a submit button with the title 'Update' ?>
+ * <?=@$this->form->end(); // Echoes a </form> tag & unbinds the form ?>
+ * }}}
+ */
 class Form extends \lithium\template\Helper {
 
 	/**
@@ -149,54 +166,65 @@ class Form extends \lithium\template\Helper {
 	 * @param array $options 
 	 * @return string Returns a `<form />` open tag with the `action` attribute defined by either
 	 *         the `'action'` or `'url'` options (defaulting to the current page if none is
-	 *         specified), and any HTML attributes passed in `$options`.
+	 *         specified), the HTTP method is defined by the `'type'` option, and any HTML
+	 *         attributes passed in `$options`.
 	 */
-	public function create($binding, $options = array()) {
+	public function create($binding = null, $options = array()) {
 		$defaults = array(
+			'url' => null,
+			'type' => null,
 			'action' => $this->_context->request()->params['action'],
-			'type' => $binding ? ($binding->exists() ? 'post' : 'put') : 'post',
-			'url' => null
+			'method' => $binding ? ($binding->exists() ? 'put' : 'post') : 'post'
 		);
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, $options);
 		$options = (array)$options + $defaults;
 		$_binding =& $this->_binding;
 		$method = __METHOD__;
 
-		$filter = function($self, $params, $chain) use ($template, $_binding, $method, $defaults) {
+		$filter = function($self, $params, $chain) use ($template, $method, $defaults, &$_binding) {
 			extract($params);
 			$_binding = $binding;
 			$append = '';
 
-			if (!isset($options['method'])) {
-				switch (strtolower($options['type'])) {
-					case 'get':
-						$options['method'] = 'get';
-					break;
-					case 'file':
-						$options['enctype'] = 'multipart/form-data';
-						if ($options['type'] != 'post' && $options['type'] != 'put') {
-							$options['type'] = 'post';
-						}
-					case 'post':
-					case 'put':
-					case 'delete':
-						$append .= $self->hidden('_method', array(
-							'name' => '_method', 'value' => strtoupper($options['type'])
-						));
-					default:
-						$options['method'] = 'post';
-					break;
+			if ($options['type'] == 'file') {
+				if (strtolower($options['method']) == 'get') {
+					$options['method'] = 'post';
 				}
+				$options['enctype'] = 'multipart/form-data';
+			}
+			unset($options['type']);
+
+			if (!in_array(strtolower($options['method']), array('get', 'post'))) {
+				$append .= $self->hidden('_method', array(
+					'name' => '_method', 'value' => strtoupper($options['method'])
+				));
 			}
 
 			$url = $options['url'] ?: array('action' => $options['action']);
-			$options = array_diff_key($options, $defaults);
+			unset($options['url'], $options['action']);
+			$options['method'] = strtoupper($options['method']);
 
 			return $self->invokeMethod('_render', array(
 				$method, $template, compact('url', 'options')
 			));
 		};
 		return $this->_filter(__METHOD__, compact('binding', 'options'), $filter);
+	}
+
+	public function end() {
+		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, array());
+		$params = compact('options', 'template');
+		$_binding =& $this->_binding;
+		$_context =& $this->_context;
+
+		$filter = function($self, $params, $chain) use (&$_binding, &$_context) {
+			unset($_binding);
+			return $_context->strings('form-end');
+		};
+		$result = $this->_filter(__METHOD__, $params, $filter);
+		unset($this->_binding);
+		$this->_binding = null;
+		return $result;
 	}
 
 	/**
@@ -297,8 +325,12 @@ class Form extends \lithium\template\Helper {
 		$methodConfig = isset($this->_config[$method]) ? $this->_config[$method] : array();
 		$options += $methodConfig + $this->_config['base'];
 
+		if ($name && $this->_binding && (!isset($options['value']) || empty($options['value']))) {
+			$options['value'] = $this->_binding->data($name);
+		}
+
 		if (isset($options['default'])) {
-			$options['value'] = isset($options['value']) ? $options['value'] : $options['default'];
+			$options['value'] = !empty($options['value']) ? $options['value'] : $options['default'];
 			unset($options['default']);
 		}
 		$template = isset($this->_templateMap[$method]) ? $this->_templateMap[$method] : $method;

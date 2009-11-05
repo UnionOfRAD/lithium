@@ -2,29 +2,42 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
 namespace lithium\test;
 
 use \lithium\core\Libraries;
-use \lithium\util\Inflector;
 use \lithium\util\Collection;
 
+/**
+ * Group Test Collection
+ *
+ * @package lithium.test
+ */
 class Group extends \lithium\util\Collection {
 
+	/**
+	 * auto init for setting up items passed into constructor
+	 *
+	 * @return void
+	 */
 	protected function _init() {
 		parent::_init();
-
 		$items = $this->_items;
 		$this->_items = array();
-
 		foreach ($items as $item) {
 			$this->add($item);
 		}
 	}
 
+	/**
+	 * Get all tests
+	 *
+	 * @param string $options
+	 * @return array
+	 */
 	public static function all($options = array()) {
 		$defaults = array('transform' => false, 'library' => true);
 		$options += $defaults;
@@ -37,21 +50,35 @@ class Group extends \lithium\util\Collection {
 		return $options['transform'] ? array_map($filter, $classes) : $classes;
 	}
 
+	/**
+	 * Add a tests to the group
+	 *
+	 * @param string $test
+	 * @param string $options
+	 * @return array
+	 */
 	public function add($test = null, $options = array()) {
 		$callback = function($test) {
 			if (empty($test)) {
 				return array();
 			}
-
 			if (is_object($test) && $test instanceof \lithium\test\Unit) {
-				$test = get_class($test);
-			} elseif (is_string($test) && $test[0] == '\\') {
-				$test = Libraries::find(true, array(
+				return array(get_class($test));
+			}
+			if (is_string($test)) {
+				if ($test[0] != '\\') {
+					$test = "lithium\\tests\cases\\{$test}";
+				}
+				if (preg_match("/Test/", $test)) {
+					return array($test);
+				}
+				$parts = array_filter(explode("\\", $test));
+				$library = array_shift($parts);
+				$test = Libraries::find($library, array(
 					'recursive' => true,
-					'path' => '/tests/cases' . str_replace("\\", "/", $test)
+					'path' => '/' . join('/', $parts)
 				));
-			} elseif (is_string($test)) {
-				$test = array("lithium\\tests\cases\\$test");
+				return (array)$test;
 			}
 			return (array)$test;
 		};
@@ -65,6 +92,13 @@ class Group extends \lithium\util\Collection {
 		return $this->_items = array_merge($this->_items, $callback($test));
 	}
 
+	/**
+	 * Get the collection of tests
+	 *
+	 * @param string $params
+	 * @param string $options
+	 * @return lithium\util\Collection
+	 */
 	public function tests($params = array(), $options = array()) {
 		$tests = new Collection();
 		array_map(function($test) use ($tests) { $tests[] = new $test; }, $this->_items);

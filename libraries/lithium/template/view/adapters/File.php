@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -19,7 +19,6 @@ use \lithium\core\Libraries;
  * For more information about implementing your own template loaders or renderers, see the
  * `lithium\template\View` class.
  *
- * @package lithium.template.view.adapters
  * @see lithium\template\View
  * @see lithium\template\view\Stream
  */
@@ -66,7 +65,7 @@ class File extends \lithium\template\view\Renderer {
 	 * @param string $type 
 	 * @param string $options 
 	 * @return void
-	 * @todo Replace me with include_path search and move to File adapter
+	 * @todo Replace me with include_path search?
 	 */
 	public function template($type, $options) {
 		if (!isset($this->_config[$type])) {
@@ -98,3 +97,5 @@ class File extends \lithium\template\view\Renderer {
 		}
 	}
 }
+
+?>

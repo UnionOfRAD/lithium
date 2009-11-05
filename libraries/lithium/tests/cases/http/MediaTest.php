@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -231,6 +231,16 @@ class MediaTest extends \lithium\test\Unit {
 		Media::render($response, 'Hello, world!');
 
 		$result = $response->body;
+		$this->assertNull($result);
+	}
+
+	public function testMediaEncoding() {
+		$data = array('hello', 'goodbye', 'foo' => array('bar', 'baz' => 'dib'));
+		$expected = json_encode($data);
+		$result = Media::encode('json', $data);
+		$this->assertEqual($expected, $result);
+
+		$result = Media::encode('badness', $data);
 		$this->assertNull($result);
 	}
 }

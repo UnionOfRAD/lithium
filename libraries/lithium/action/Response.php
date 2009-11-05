@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -10,6 +10,13 @@ namespace lithium\action;
 
 use \Exception;
 
+/**
+ * The `Response` instance is what the `Controller` returns to the `Dispatcher` as the product
+ * of the view layer. See related classes for more details.
+ *
+ * @see lithium\action\Dispatcher
+ * @see lithium\action\Controller
+ */
 class Response extends \lithium\http\Response {
 
 	protected $_config = array();

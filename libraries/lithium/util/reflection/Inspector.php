@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -318,7 +318,6 @@ class Inspector extends \lithium\core\StaticObject {
 	/**
 	 * Gets the static and dynamic dependencies for a class or group of classes.
 	 *
-	 * @package default
 	 */
 	public static function dependencies($classes, $options = array()) {
 		$defaults = array('type' => null);
