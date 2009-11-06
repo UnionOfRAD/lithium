@@ -132,8 +132,7 @@ class PhpTest extends \lithium\test\Unit {
 
 		$params = compact('key');
 		$result = $closure($this->Php, $params, null);
-
-		$this->assertEqual($value, $result);
+		$this->assertIdentical($value, $result);
 
 		$key = 'non-existent';
 
