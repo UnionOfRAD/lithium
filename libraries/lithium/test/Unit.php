@@ -147,10 +147,11 @@ class Unit extends \lithium\core\Object {
 	}
 
 	public function assertIdentical($expected, $result, $message = '{:message}') {
+		$data = null;
 		if ($expected !== $result) {
 			$data = $this->_compare('identical', $expected, $result);
 		}
-		$this->assert($expected === $result, $message);
+		$this->assert($expected === $result, $message, $data);
 	}
 
 	public function assertTrue($result, $message = '{:message}') {
