@@ -41,7 +41,52 @@ class PhpTest extends \lithium\test\Unit {
 		$result = $_SESSION['_timestamp'];
 		$expected = time();
 		$this->assertEqual($expected, $result);
+	}
 
+	public function testDefaultConfiguration() {
+		$result = ini_get('session.name');
+		$this->assertEqual('', $result);
+
+		$result = ini_get('session.cookie_lifetime');
+		$this->assertEqual(strtotime('+1 day') - time(), (int)$result);
+
+		$result = ini_get('session.save_path');
+		$this->assertEqual('/tmp', $result);
+
+		$result = ini_get('session.cookie_domain');
+		$this->assertEqual('', $result);
+
+		$result = ini_get('session.cookie_secure');
+		$this->assertFalse($result);
+
+		$result = ini_get('session.cookie_httponly');
+		$this->assertFalse($result);
+	}
+
+	public function testCustomConfiguration() {
+		$config = array(
+			'name' => 'awesome_name', 'cookie_lifetime' => 1200, 'cookie_domain' => 'awesome.domain',
+		);
+
+		$adapter = new Php($config);
+
+		$result = ini_get('session.name');
+		$this->assertEqual($config['name'], $result);
+
+		$result = ini_get('session.cookie_lifetime');
+		$this->assertEqual($config['cookie_lifetime'], (int)$result);
+
+		$result = ini_get('session.save_path');
+		$this->assertEqual('/tmp', $result);
+
+		$result = ini_get('session.cookie_domain');
+		$this->assertEqual($config['cookie_domain'], $result);
+
+		$result = ini_get('session.cookie_secure');
+		$this->assertFalse($result);
+
+		$result = ini_get('session.cookie_httponly');
+		$this->assertFalse($result);
 	}
 
 	public function testIsStarted() {
@@ -51,6 +96,78 @@ class PhpTest extends \lithium\test\Unit {
 		unset($_SESSION);
 
 		$result = $this->Php->isStarted();
+		$this->assertFalse($result);
+	}
+
+	public function testKey() {
+		$result = $this->Php->key();
+		$this->assertEqual(session_id(), $result);
+
+		session_destroy();
+		$result = $this->Php->key();
+		$this->assertNull($result);
+	}
+
+	public function testWrite() {
+		$key = 'write-test';
+		$value = 'value to be written';
+
+		$closure = $this->Php->write($key, $value);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key', 'value');
+		$result = $closure($this->Php, $params, null);
+
+		$this->assertEqual($_SESSION[$key], $value);
+	}
+
+	public function testRead() {
+		$key = 'read_test';
+		$value = 'value to be read';
+
+		$_SESSION[$key] = $value;
+
+		$closure = $this->Php->read($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Php, $params, null);
+
+		$this->assertEqual($value, $result);
+
+		$key = 'non-existent';
+
+		$closure = $this->Php->read($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Php, $params, null);
+
+		$this->assertNull($result);
+	}
+
+	public function testDelete() {
+		$key = 'delete_test';
+		$value = 'value to be deleted';
+
+		$_SESSION[$key] = $value;
+
+		$closure = $this->Php->delete($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Php, $params, null);
+
+		$this->assertTrue($result);
+
+		$key = 'non-existent';
+
+		$closure = $this->Php->delete($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Php, $params, null);
+
 		$this->assertFalse($result);
 
 	}

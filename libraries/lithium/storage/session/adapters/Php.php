@@ -12,8 +12,8 @@ class Php extends \lithium\core\Object {
 
 	public function __construct($config = array()) {
 		$defaults = array(
-			'name' => '', 'expires' => '+1 day', 'domain' => '',
-			'path' => '/', 'secure' => false, 'http' => false
+			'name' => '', 'cookie_lifetime' => '86400', 'cookie_domain' => '',
+			'save_path' => '/tmp', 'cookie_secure' => false, 'cookie_httponly' => false
 		);
 		parent::__construct((array)$config + $defaults);
 	}
@@ -31,18 +31,18 @@ class Php extends \lithium\core\Object {
             if (empty($_SESSION)) {
                 $_SESSION = array();
             }
-            return false;
         } elseif (!isset($_SESSION)) {
-            session_cache_limiter ("must-revalidate");
-            session_start();
-            header ('P3P: CP="NOI ADM DEV PSAi COM NAV OUR OTRo STP IND DEM"');
-            return true;
-        } else {
-            session_start();
-            return true;
+            session_cache_limiter("must-revalidate");
         }
+		session_start();
 
-		$_SESSION['_timestamp'] = time();
+		foreach ($this->_config as $key => &$config) {
+			if ($config == 'init') continue;
+			ini_set("session.$key", $config);
+		}
+
+		$now = time();
+		$_SESSION['_timestamp'] = $now;
 	}
 
 	public function isStarted() {
@@ -55,13 +55,28 @@ class Php extends \lithium\core\Object {
 
 	public function read($key, $options = array()) {
 		return function($self, $params, $chain) {
-
+			extract($params);
+			return (isset($_SESSION[$key])) ?: null;
 		};
 	}
 
 	public static function write($key, $value, $options = array()) {
 		return function($self, $params, $chain) {
+			extract($params);
+			$_SESSION[$key] = $value;
+		};
+	}
 
+	public static function delete($key, $options = array()) {
+		return function($self, $params, $chain) {
+			extract($params);
+
+			if (isset($_SESSION[$key])) {
+				unset($_SESSION[$key]);
+				return true;
+			} else {
+				return false;
+			}
 		};
 	}
 }
