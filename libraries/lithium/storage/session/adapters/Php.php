@@ -23,16 +23,13 @@ class Php extends \lithium\core\Object {
 	 *
 	 */
 	protected function _init() {
-		if (function_exists('session_write_close')) {
-			session_write_close();
-		}
+		session_write_close();
 
         if (headers_sent()) {
-            if (empty($_SESSION)) {
-                $_SESSION = array();
-            }
+			$_SESSION = (empty($_SESSION)) ?: array();
+
         } elseif (!isset($_SESSION)) {
-            session_cache_limiter("must-revalidate");
+            session_cache_limiter("nocache");
         }
 		session_start();
 
@@ -41,8 +38,7 @@ class Php extends \lithium\core\Object {
 			ini_set("session.$key", $config);
 		}
 
-		$now = time();
-		$_SESSION['_timestamp'] = $now;
+		$_SESSION['_timestamp'] = time();
 	}
 
 	public function isStarted() {

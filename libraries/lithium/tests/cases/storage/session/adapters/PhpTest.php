@@ -36,7 +36,7 @@ class PhpTest extends \lithium\test\Unit {
 	public function testInit() {
 		$id = session_id();
 		$this->assertTrue(!empty($id));
-		$this->assertEqual(session_cache_limiter(), "must-revalidate");
+		$this->assertEqual(session_cache_limiter(), "nocache");
 
 		$result = $_SESSION['_timestamp'];
 		$expected = time();
