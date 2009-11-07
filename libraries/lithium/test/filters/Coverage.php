@@ -19,8 +19,7 @@ use \lithium\util\reflection\Inspector;
 class Coverage extends \lithium\core\StaticObject {
 
 	/**
-	 * Collects coverage analysis results from 
-	 *
+	 * Collects coverage analysis results from Xdebug.
 	 */
 	protected static $_results = array();
 
