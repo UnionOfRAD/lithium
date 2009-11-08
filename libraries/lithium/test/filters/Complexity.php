@@ -77,7 +77,10 @@ class Complexity extends \lithium\core\StaticObject {
 		echo '<h3>Cyclomatic Complexity</h3>';
 		echo '<table class="metrics"><tbody>';
 
-		foreach (array_slice($data['max'], 0, 5) as $method => $count) {
+		foreach (array_slice($data['max'], 0, 10) as $method => $count) {
+			if ($count <= 7) {
+				continue;
+			}
 			echo '<tr>';
 			echo '<td class="metric-name">Worst Offender</th>';
 			echo '<td class="metric">' . $method . ' - ' . $count . '</td>';

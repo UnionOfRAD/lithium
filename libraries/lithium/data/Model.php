@@ -309,13 +309,12 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * {{{$post = Post::create();
 	 * $post->title = "My post";
-	 * $post->save(array('validate' => false));}}}
+	 * $post->save(null, array('validate' => false));}}}
 	 *
 	 * @param object $record The record or document object to be saved in the database.
+	 * @param array $data Any data that should be assigned to the record before it is saved.
 	 * @param array $options Options:
 	 *
-	 *        -'force': If `true`, forces the record to write to the database, even if no fields are
-	 *         reported as having been modified. Defaults to `false`.
 	 *        -'validate': If `false`, validation will be skipped, and the record will be
 	 *         immediately saved. Defaults to `true`.
 	 *        -'whitelist': An array of fields that are allowed to be saved to this record.
@@ -323,31 +322,30 @@ class Model extends \lithium\core\StaticObject {
 	 *         `true`.
 	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
 	 */
-	public function save($record, $options = array()) {
+	public function save($record, $data = null, $options = array()) {
 		$self = static::_instance();
 		$classes = $self->_classes;
 		$meta = array('model' => get_called_class()) + $self->_meta;
 
-		$defaults = array(
-			'force' => false,
-			'validate' => true,
-			'whitelist' => null,
-			'callbacks' => true
-		);
+		$defaults = array('validate' => true, 'whitelist' => null, 'callbacks' => true);
 		$options += $defaults + compact('classes');
-		$params = compact('record', 'options');
+		$params = compact('record', 'data', 'options');
 
 		$filter = function($self, $params) use ($meta) {
 			extract($params);
+
+			if ($data) {
+				$record->set($data);
+			}
 
 			if ($options['validate'] && !$record->validates()) {
 			}
 
 			$name = $meta['connection'];
 			$connections = $options['classes']['connections'];
-			$query = new $options['classes']['query'](
-				array('type' => 'read') + $options + $meta + compact('record')
-			);
+
+			$queryOptions = array('type' => 'read') + $options + $meta + compact('record');
+			$query = new $options['classes']['query']($queryOptions);
 
 			if (!$record->exists()) {
 				return $connections::get($name)->create($query, $options);

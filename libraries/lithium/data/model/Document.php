@@ -99,7 +99,15 @@ class Document extends \lithium\util\Collection {
 		return $this->_items[$name];
 	}
 
-	public function __set($name, $value) {
+	public function set($name, $value = null) {
+		$this->__set($name, $value);
+	}
+
+	public function __set($name, $value = null) {
+		if (is_array($name) && empty($value)) {
+			$this->_items = $name + $this->_items;
+			return;
+		}
 		if (is_array($value)) {
 			$class = get_class($this);
 			$value = new $class(array('items' => $value));

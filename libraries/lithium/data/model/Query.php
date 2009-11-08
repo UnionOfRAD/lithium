@@ -16,6 +16,8 @@ class Query extends \lithium\core\Object {
 
 	protected $_table = null;
 
+	protected $_record = null;
+
 	/**
 	 * The set of conditions that define the query's scope.
 	 *
