@@ -208,20 +208,5 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);	
 	}
 
-	public function testExplicitGet() {
-		$doc = DocumentPost::find('first');
-		
-		$expected = 2;
-		$result = $doc->get('id');
-		$this->assertEqual($expected, $result);
-		
-		$expected = 'Two';
-		$result = $doc->get('name');
-		$this->assertEqual($expected, $result);
-		
-		$expected = 'Lorem ipsum two';
-		$result = $doc->get('content');
-		$this->assertEqual($expected, $result);		
-	}
 }
 ?>
