@@ -14,6 +14,13 @@ class DocumentPost extends \lithium\data\Model {
 
 	public static function find($type = 'all', $options = array()) {
 		switch ($type) {
+			case 'first' : {
+				return new Document(array('items' =>
+					array(
+						array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two')
+					)
+				));
+			}
 			case 'all':
 			default :
 				return new Document(array('items' =>
@@ -22,7 +29,7 @@ class DocumentPost extends \lithium\data\Model {
 						array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
 						array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
 					)
-				));			
+				));
 			break;		
 		}
 	
@@ -32,10 +39,9 @@ class DocumentPost extends \lithium\data\Model {
 
 class DocumentTest extends \lithium\test\Unit {
 	
-	public function testTesting() {
+	public function testFindAllAndIterate() {
 	
 		$document = DocumentPost::find('all');
-		
 		
 		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');			
 		$result = $document->current();
@@ -55,6 +61,33 @@ class DocumentTest extends \lithium\test\Unit {
 					
 		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');		
 		$result = $document->rewind();		
+		$this->assertEqual($expected, $result);
+		
+	}
+	
+	public function testFindOne() {
+		
+		$document = DocumentPost::find('first');
+	
+		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
+		$result = $document->current();
+		$this->assertEqual($expected, $result);
+	}
+	
+	public function testGetFields() {
+	
+		$document = DocumentPost::find('first');	
+		
+		$expected = 2;
+		$result = $document->id;
+		$this->assertEqual($expected, $result);
+		
+		$expected = 'Two';
+		$result = $document->name;
+		$this->assertEqual($expected, $result);
+		
+		$expected = 'Lorem ipsum two';
+		$result = $document->content;
 		$this->assertEqual($expected, $result);
 		
 	}
