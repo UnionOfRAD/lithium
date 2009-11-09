@@ -207,6 +207,27 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $doc->rewind();
 		$this->assertEqual($expected, $result);	
 	}
+	
+	public function testCreating() {
+		$doc = new Document(array(
+			'model' => __NAMESPACE__ .'\DocumentPost'
+		));
+		$expected = 'id';
+		$result = DocumentPost::meta('key');
+		$this->assertEqual($expected, $result);
+		
+		$doc->id = 3;
+		$this->assertFalse($doc->exists());		
+		
+		
+		$doc->invokeMethod('_update',array(12));
+		
+		$this->assertTrue($doc->exists());
+		
+		$expected = 12;
+		$result = $doc->id;
+		$this->assertEqual($expected, $result);			
+	}	
 
 }
 ?>
