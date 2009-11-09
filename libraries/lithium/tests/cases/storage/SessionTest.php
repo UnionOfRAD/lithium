@@ -75,6 +75,13 @@ class SessionTest extends \lithium\test\Unit {
 		$this->assertFalse(Session::write('key', 'value'));
 	}
 
+	public function testKey() {
+		$result = Session::key();
+		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/";
+		$match = preg_match($pattern, $result);
+		$this->assertTrue($match);
+	}
+
 	/**
 	 * Tests a scenario where no session handler is available that matches the passed parameters.
 	 *
