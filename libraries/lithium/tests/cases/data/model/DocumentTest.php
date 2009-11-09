@@ -158,6 +158,30 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $doc->next();
 		$this->assertEqual($expected, $result);	
 	}
+	
+	public function testSetNested() {
+		$doc = new Document();
+		$doc->id = 123;
+		$doc->type = 'father';
+		$doc->set('children', array(
+			array('id' => 124, 'type' => 'child', 'children' => null),
+			array('id' => 125, 'type' => 'child', 'children' => null)
+		));
+		
+		$this->assertEqual('father', $doc->type);
+		
+		$this->assertTrue(is_object($doc->children), 'children is not an object');
+		$this->assertTrue(is_a($doc->children,'\lithium\data\model\Document'), 'Children is not of the type Document');
+		$this->skipIf(!is_a($doc->children,'\lithium\data\model\Document'),'Children is not of the type Document');
+
+		$expected = array('id' => 124, 'type' => 'child', 'children' => null);			
+		$result = $doc->children->current();
+		$this->assertEqual($expected, $result);
+		
+		$expected = array('id' => 125, 'type' => 'child', 'children' => null);
+		$result = $doc->children->next();
+		$this->assertEqual($expected, $result);		
+	}
 
 }
 ?>
