@@ -16,9 +16,7 @@ class DocumentPost extends \lithium\data\Model {
 		switch ($type) {
 			case 'first' : {
 				return new Document(array('items' =>
-					array(
-						array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two')
-					)
+					array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two')					
 				));
 			}
 			case 'all':
@@ -70,7 +68,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$document = DocumentPost::find('first');
 	
 		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
-		$result = $document->current();
+		$result = $document->data();
 		$this->assertEqual($expected, $result);
 	}
 	
