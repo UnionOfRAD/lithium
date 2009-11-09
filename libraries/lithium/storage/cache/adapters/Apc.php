@@ -98,6 +98,16 @@ class Apc extends \lithium\core\Object {
 	public function clear() {
 		return apc_clear_cache('user');
 	}
+
+	/**
+	 * Determines if the APC extension has been installed and
+	 * if the userspace cache is available.
+	 *
+	 * return boolean True if enabled, false otherwise
+	 */
+	public function enabled() {
+		return (extension_loaded('apc') && apc_cache_info('user'));
+	}
 }
 
 ?>

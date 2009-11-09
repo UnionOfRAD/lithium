@@ -20,6 +20,10 @@ class MemoryTest extends \lithium\test\Unit {
 		unset($this->Memory);
 	}
 
+	public function testEnabled() {
+		$this->assertTrue($this->Memory->enabled());
+	}
+
 	public function testWriteAndRead() {
 		$key = 'key';
 		$data = 'data';
