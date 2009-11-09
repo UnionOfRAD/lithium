@@ -68,6 +68,10 @@ class Record extends \lithium\core\Object {
 
 	public function __call($method, $params) {
 		$model = $this->_model;
+
+		if (!$model) {
+			return null;
+		}
 		array_unshift($params, $this);
 		$class = $model::invokeMethod('_instance');
 		return call_user_func_array(array(&$class, $method), $params);
