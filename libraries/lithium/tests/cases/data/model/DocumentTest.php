@@ -72,8 +72,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 	
-	public function testGetFields() {
-	
+	public function testGetFields() {	
 		$document = DocumentPost::find('first');	
 		
 		$expected = 2;
@@ -86,8 +85,22 @@ class DocumentTest extends \lithium\test\Unit {
 		
 		$expected = 'Lorem ipsum two';
 		$result = $document->content;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result);		
+	}
+	
+	public function testSetField() {
+		$doc = new Document();
+		$doc->id = 4;
+		$doc->name = 'Four';
+		$doc->content = 'Lorem ipsum four';
 		
+		$expected = array(
+			'id' => 4,
+			'name' => 'Four',
+			'content' => 'Lorem ipsum four'		
+		);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
 	}
 	
 }
