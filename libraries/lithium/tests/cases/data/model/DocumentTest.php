@@ -143,6 +143,21 @@ class DocumentTest extends \lithium\test\Unit {
 	
 	}
 	
-	
+	public function testSetMultiple() {
+		$doc = new Document();
+		$doc->set(array(
+						array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
+						array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
+						array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
+					));
+		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');			
+		$result = $doc->current();
+		$this->assertEqual($expected, $result);
+		
+		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
+		$result = $doc->next();
+		$this->assertEqual($expected, $result);	
+	}
+
 }
 ?>
