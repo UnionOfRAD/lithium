@@ -103,5 +103,46 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 	
+	public function testNoItems() {
+		$doc = new Document(array('items' => array()));
+		$result = $doc->id;
+		$this->assertFalse($result);	
+	}
+	
+	public function testWithData() {
+		$doc = new Document(array('data' =>
+					array(
+						array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
+						array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
+						array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
+					)
+				));
+			
+		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');			
+		$result = $doc->current();
+		$this->assertEqual($expected, $result);
+		
+		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
+		$result = $doc->next();
+		$this->assertEqual($expected, $result);			
+	}				
+	
+	public function testExplicitSet() {
+		$doc = new Document();
+		$doc->set('id', 4);
+		$doc->set('name', 'Four');
+		$doc->set('content',  'Lorem ipsum four');
+		
+		$expected = array(
+			'id' => 4,
+			'name' => 'Four',
+			'content' => 'Lorem ipsum four'		
+		);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+	
+	}
+	
+	
 }
 ?>
