@@ -50,6 +50,15 @@ class Memory extends \lithium\core\Object {
 	public function delete($key, $options = array()) {
 		unset($this->_session[$key]);
 	}
+
+	/**
+	 * This adapter is always enabled, as it has no external dependencies.
+	 *
+	 * @return boolean True
+	 */
+	public function enabled() {
+		return true;
+	}
 }
 
 ?>

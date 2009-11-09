@@ -110,5 +110,23 @@ class Adaptable extends \lithium\core\StaticObject {
 
 		return $settings[$name]['adapter'];
 	}
+
+	/**
+	 * Determines if the adapter specified in the named configuration
+	 * is enabled.
+	 *
+	 * `Enabled` can mean various things, e.g. having a PECL memcached
+	 * extension compiled & loaded, as well as having the memcache server
+	 * up & available.
+	 *
+	 * @param  string  $name The cache configuration whose adapter will be checked
+	 * @return mixed         True if adapter is enabled, false if not. This method
+	 *                       will return null if no configuration under the given $name
+	 *                       exists.
+	 */
+	public static function enabled($name) {
+		$settings = static::config();
+		return (isset($settings[$name])) ? static::adapter($name)->enabled() : null;
+	}
 }
 ?>
