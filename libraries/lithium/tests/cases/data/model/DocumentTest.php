@@ -184,6 +184,36 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $doc->children->next();
 		$this->assertEqual($expected, $result);		
 	}
-
+	
+	public function testRewindNoData() {
+		$doc = new Document();
+		
+		$this->assertFalse($doc->_hasInitialized);
+		
+		$expected = null;
+		$result = $doc->rewind();
+		$this->assertEqual($expected, $result);	
+		
+		$this->assertTrue($doc->_hasInitialized); /* @todo or should be false? */
+	}
+	
+	public function testRewindData() {
+		$doc = new Document(array(
+			'items' => array(						
+				array('id' => 1, 'name' => 'One'),
+				array('id' => 2, 'name' => 'Two'),
+				array('id' => 3, 'name' => 'Three')
+			)
+		));
+		
+		$this->assertFalse($doc->_hasInitialized);
+		
+		$expected = array('id' => 1, 'name' => 'One');
+		$result = $doc->rewind();
+		$this->assertEqual($expected, $result);	
+		
+		$this->assertTrue($doc->_hasInitialized);
+	}
+	
 }
 ?>
