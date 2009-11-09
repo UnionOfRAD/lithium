@@ -29,7 +29,7 @@ class Memory extends \lithium\core\Object {
 
 	public function read($key, $options = array()) {
 		$session = $this->_session;
-		
+
 		return function($self, $params, $chain) use ($session) {
 			extract($params);
 			return isset($session[$key]) ? $session[$key] : null;
@@ -47,6 +47,15 @@ class Memory extends \lithium\core\Object {
 
 	public function delete($key, $options = array()) {
 		unset($this->_session[$key]);
+	}
+
+	/**
+	 * This adapter is always enabled, as it has no external dependencies.
+	 *
+	 * @return boolean True
+	 */
+	public function enabled() {
+		return true;
 	}
 }
 

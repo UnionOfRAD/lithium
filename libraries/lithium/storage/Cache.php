@@ -183,6 +183,7 @@ class Cache extends \lithium\core\Adaptable {
 	public static function adapter($name) {
 		return static::_adapter('adapters.storage.cache', $name);
 	}
+
 }
 
 ?>
