@@ -131,6 +131,10 @@ class Document extends \lithium\util\Collection {
 
 	public function __call($method, $params = array()) {
 		$model = $this->_model;
+
+		if (!$model) {
+			return null;
+		}
 		array_unshift($params, $this);
 		$class = $model::invokeMethod('_instance');
 		return call_user_func_array(array(&$class, $method), $params);
