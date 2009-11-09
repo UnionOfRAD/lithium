@@ -42,7 +42,7 @@ class Php extends \lithium\core\Object {
 		$_SESSION['_timestamp'] = time();
 	}
 
-	public function isStarted() {		
+	public function isStarted() {
 		return (isset($_SESSION) && isset($_SESSION['_timestamp']));
 	}
 
@@ -52,7 +52,7 @@ class Php extends \lithium\core\Object {
 
 	public function read($key, $options = array()) {
 		return function($self, $params, $chain) {
-			extract($params);			
+			extract($params);
 			return isset($_SESSION[$key]) ? $_SESSION[$key] : null;
 		};
 	}
@@ -75,6 +75,15 @@ class Php extends \lithium\core\Object {
 				return false;
 			}
 		};
+	}
+
+	/**
+	 * Determines if PHP sessions are enabled.
+	 *
+	 * return boolean True if enabled, false otherwise
+	 */
+	public function enabled() {
+		return (bool) session_id();
 	}
 }
 

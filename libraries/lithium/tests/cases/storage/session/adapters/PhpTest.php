@@ -33,6 +33,10 @@ class PhpTest extends \lithium\test\Unit {
 
 	}
 
+	public function testEnabled() {
+		$this->assertTrue($this->Php->enabled());
+	}
+
 	public function testInit() {
 		$id = session_id();
 		$this->assertTrue(!empty($id));
