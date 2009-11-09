@@ -55,7 +55,7 @@ class Document extends \lithium\util\Collection {
 	protected $_parent = null;
 
 	/**
-	 * Indicates whether this document has already been created in teh database.
+	 * Indicates whether this document has already been created in the database.
 	 *
 	 * @var boolean
 	 */
