@@ -10,12 +10,13 @@ namespace lithium\storage\session\adapters;
 
 class Php extends \lithium\core\Object {
 
+	protected $_defaults = array(
+		'name' => '', 'cookie_lifetime' => '86400', 'cookie_domain' => '',
+		'save_path' => '/tmp', 'cookie_secure' => false, 'cookie_httponly' => false
+	);
+
 	public function __construct($config = array()) {
-		$defaults = array(
-			'name' => '', 'cookie_lifetime' => '86400', 'cookie_domain' => '',
-			'save_path' => '/tmp', 'cookie_secure' => false, 'cookie_httponly' => false
-		);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array)$config + $this->_defaults);
 	}
 
 	/**
@@ -27,21 +28,21 @@ class Php extends \lithium\core\Object {
 
         if (headers_sent()) {
 			$_SESSION = (empty($_SESSION)) ?: array();
-
         } elseif (!isset($_SESSION)) {
             session_cache_limiter("nocache");
         }
 		session_start();
 
-		foreach ($this->_config as $key => &$config) {
-			if ($config == 'init') continue;
-			ini_set("session.$key", $config);
+		foreach ($this->_defaults as $key => $config) {
+			if (isset($this->_config[$key])) {
+				ini_set("session.$key", $this->_config[$key]);
+			}
 		}
 
 		$_SESSION['_timestamp'] = time();
 	}
 
-	public function isStarted() {
+	public function isStarted() {		
 		return (isset($_SESSION) && isset($_SESSION['_timestamp']));
 	}
 
@@ -51,8 +52,8 @@ class Php extends \lithium\core\Object {
 
 	public function read($key, $options = array()) {
 		return function($self, $params, $chain) {
-			extract($params);
-			return (isset($_SESSION[$key])) ?: null;
+			extract($params);			
+			return isset($_SESSION[$key]) ? $_SESSION[$key] : null;
 		};
 	}
 
