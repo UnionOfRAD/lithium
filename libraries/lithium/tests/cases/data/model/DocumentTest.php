@@ -12,9 +12,52 @@ use \lithium\data\model\Document;
 
 class DocumentPost extends \lithium\data\Model {
 
+	public static function find($type = 'all', $options = array()) {
+		switch ($type) {
+			case 'all':
+			default :
+				return new Document(array('items' =>
+					array(
+						array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
+						array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
+						array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
+					)
+				));			
+			break;		
+		}
+	
+	}
+
 }
 
 class DocumentTest extends \lithium\test\Unit {
+	
+	public function testTesting() {
+	
+		$document = DocumentPost::find('all');
+		
+		
+		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');			
+		$result = $document->current();
+		$this->assertEqual($expected, $result);
+		
+		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
+		$result = $document->next();
+		$this->assertEqual($expected, $result);
+		
+		$expected = array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three');
+		$document->next();
+		$result = $document->current();
+		$this->assertEqual($expected, $result);
+		
+		$result = $document->next();
+		$this->assertTrue(empty($result));
+					
+		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');		
+		$result = $document->rewind();		
+		$this->assertEqual($expected, $result);
+		
+	}
 	
 }
 ?>
