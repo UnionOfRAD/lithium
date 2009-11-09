@@ -118,7 +118,7 @@ class DocumentTest extends \lithium\test\Unit {
 					)
 				));
 			
-		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');			
+		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
 		$result = $doc->current();
 		$this->assertEqual($expected, $result);
 		
@@ -150,7 +150,7 @@ class DocumentTest extends \lithium\test\Unit {
 						array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
 						array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
 					));
-		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');			
+		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
 		$result = $doc->current();
 		$this->assertEqual($expected, $result);
 		
@@ -171,10 +171,12 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual('father', $doc->type);
 		
 		$this->assertTrue(is_object($doc->children), 'children is not an object');
-		$this->assertTrue(is_a($doc->children,'\lithium\data\model\Document'), 'Children is not of the type Document');
-		$this->skipIf(!is_a($doc->children,'\lithium\data\model\Document'),'Children is not of the type Document');
+		$this->assertTrue(is_a($doc->children,'\lithium\data\model\Document'), 
+			'Children is not of the type Document');
+		$this->skipIf(!is_a($doc->children,'\lithium\data\model\Document'),
+			'Children is not of the type Document');
 
-		$expected = array('id' => 124, 'type' => 'child', 'children' => null);			
+		$expected = array('id' => 124, 'type' => 'child', 'children' => null);
 		$result = $doc->children->current();
 		$this->assertEqual($expected, $result);
 		
