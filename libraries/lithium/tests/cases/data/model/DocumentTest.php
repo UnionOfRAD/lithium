@@ -187,14 +187,11 @@ class DocumentTest extends \lithium\test\Unit {
 	
 	public function testRewindNoData() {
 		$doc = new Document();
-		
-		$this->assertFalse($doc->_hasInitialized);
-		
+				
 		$expected = null;
 		$result = $doc->rewind();
 		$this->assertEqual($expected, $result);	
 		
-		$this->assertTrue($doc->_hasInitialized); /* @todo or should be false? */
 	}
 	
 	public function testRewindData() {
@@ -206,13 +203,9 @@ class DocumentTest extends \lithium\test\Unit {
 			)
 		));
 		
-		$this->assertFalse($doc->_hasInitialized);
-		
 		$expected = array('id' => 1, 'name' => 'One');
 		$result = $doc->rewind();
 		$this->assertEqual($expected, $result);	
-		
-		$this->assertTrue($doc->_hasInitialized);
 	}
 	
 }
