@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 ?>
@@ -19,5 +19,5 @@
 	<a href="http://rad-dev.org/lithium">Lithium Source</a>
 </p>
 <p>
-	<a href="http://groups.google.com/group/lithium">Lithium Google Group</a>
+	<a href="irc://irc.freenode.net/#li3">#li3 irc channel</a>
 </p>

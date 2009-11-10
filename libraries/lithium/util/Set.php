@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  *                Copyright 2009, Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @license       http://opensource.org/licenses/mit-license.php The MIT License
  */

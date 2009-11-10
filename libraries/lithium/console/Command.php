@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -88,8 +88,8 @@ class Command extends \lithium\core\Object {
 	 */
 	public function run() {
 		$this->header('Available Commands');
-
-		foreach (Libraries::locate('commands') as $command) {
+		$classes = array_unique(Libraries::locate('commands', null, array('recursive' => false)));
+		foreach ($classes as $command) {
 			$command = explode('\\', $command);
 			$this->out(' - ' . Inflector::underscore(array_pop($command)));
 		}

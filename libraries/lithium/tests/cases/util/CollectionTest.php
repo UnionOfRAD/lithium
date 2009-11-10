@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -236,6 +236,17 @@ class CollectionTest extends \lithium\test\Unit {
 	public function testInternalKeys() {
 		$collection = new Collection(array('items' => array('foo', 'bar', 'baz' => 'dib')));
 		$this->assertEqual(array(0, 1, 'baz'), $collection->keys());
+	}
+
+	public function testCollectionFormatConversion() {
+		$items = array('hello', 'goodbye', 'foo' => array('bar', 'baz' => 'dib'));
+		$collection = new Collection(compact('items'));
+
+		$expected = json_encode($items);
+		$result = $collection->to('json');
+		$this->assertEqual($result, $expected);
+
+		$this->assertNull($collection->to('badness'));
 	}
 }
 

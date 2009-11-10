@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -318,7 +318,7 @@ class Libraries {
 		}
 
 		if (is_null($name)) {
-			return static::_locateAll($params);
+			return static::_locateAll($params, $options);
 		}
 		$paths = static::$_classPaths[$type];
 
@@ -562,6 +562,10 @@ class Libraries {
 
 if (!defined('LITHIUM_LIBRARY_PATH')) {
 	define('LITHIUM_LIBRARY_PATH', dirname(dirname(__DIR__)));
+}
+
+if (!defined('LITHIUM_APP_PATH')) {
+	define('LITHIUM_APP_PATH', dirname(LITHIUM_LIBRARY_PATH) . '/app');
 }
 
 ?>
