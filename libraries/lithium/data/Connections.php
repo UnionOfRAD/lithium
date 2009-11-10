@@ -87,7 +87,7 @@ class Connections extends \lithium\core\StaticObject {
 			list($config, $type) = array($type, null);
 		}
 		$defaults = array(
-			'type'     => $type ?: 'Database',
+			'type'     => $type ?: 'database',
 			'adapter'  => null,
 			'host'     => 'localhost',
 			'login'    => '',
