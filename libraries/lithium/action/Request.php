@@ -67,7 +67,6 @@ class Request extends \lithium\core\Object {
 	 */
 	protected function _init() {
 		parent::_init();
-		$this->_base = $this->_base ?: $this->_base();
 
 		$m  = '/(iPhone|MIDP|AvantGo|BlackBerry|J2ME|Opera Mini|DoCoMo|NetFront|Nokia|PalmOS|';
 		$m .= 'PalmSource|portalmmm|Plucker|ReqwirelessWeb|SonyEricsson|Symbian|UP\.Browser|';
@@ -78,9 +77,10 @@ class Request extends \lithium\core\Object {
 		$this->url = $this->url ?: '/';
 		$this->_env = (array)$_SERVER + (array)$_ENV;
 
-		$envs = array('isapi' => 'IIS', 'cgi' => 'cgi');
+		$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
 		$env = php_sapi_name();
 		$this->_env['PLATFORM'] = array_key_exists($env, $envs) ? $envs[$env] : null;
+		$this->_base = $this->_base ?: $this->_base();
 
 		if (!empty($_POST)) {
 			$this->data = $_POST;
