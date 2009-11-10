@@ -344,6 +344,26 @@ class RouteTest extends \lithium\test\Unit {
 		$result = $route->parse($request);
 		$this->assertEqual($expected, $result);
 	}
+
+    /**
+     * Tests creating a route with a custom regex sub-pattern in a template
+     *
+     * @return void
+     */
+    public function testCustomSubPattern() {
+        $route = new Route(array('template' => '/{:controller}/{:action}/{:user:\d+}'));
+
+        $request = new Request();
+        $request->url = '/users/view/10';
+        $expected = array('controller' => 'users', 'action' => 'view', 'user' => '10');
+
+        $result = $route->parse($request);
+        $this->assertEqual($expected, $result);
+
+        $request->url = '/users/view/my_login';
+        $result = $route->parse($request);
+        $this->assertFalse($result);
+    }
 }
 
 ?>
