@@ -83,7 +83,6 @@ class Memcache extends \lithium\core\Object {
 		parent::__construct($configuration);
 
 		static::$_Memcached->addServers($this->_config['servers']);
-		return extension_loaded('memcached');
 	}
 
 	/**
@@ -189,6 +188,25 @@ class Memcache extends \lithium\core\Object {
 	 */
 	public function clear() {
 		return static::$_Memcached->flush();
+	}
+
+	/**
+	 * Determines if the Memcached extension has been installed and
+	 * properly started.
+	 *
+	 * @todo make this a bit smarter.
+	 * return boolean True if enabled, false otherwise
+	 */
+	public function enabled() {
+		if (!extension_loaded('memcached')) {
+			return false;
+		}
+		$version = static::$_Memcached->getVersion();
+
+		if (empty($version)) {
+			return false;
+		}
+		return true;
 	}
 }
 

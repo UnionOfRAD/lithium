@@ -105,6 +105,15 @@ class Memory extends \lithium\core\Object {
 	}
 
 	/**
+	 * This adapter is always enabled, as it has no external dependencies.
+	 *
+	 * @return boolean True
+	 */
+	public function enabled() {
+		return true;
+	}
+
+	/**
 	 * Garbage collection (GC) is not enabled for this adapter
 	 *
 	 * @return boolean False

@@ -135,6 +135,8 @@ class Coverage extends \lithium\core\StaticObject {
 
 		foreach ($runs as $run) {
 			foreach ($run as $file => $coverage) {
+				$file = str_replace('\\', '/', $file);
+
 				if (!empty($classMap)) {
 					if (!$class = array_search($file, $classMap)) {
 						continue;

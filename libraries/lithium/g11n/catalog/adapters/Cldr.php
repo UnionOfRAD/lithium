@@ -70,7 +70,7 @@ class Cldr extends \lithium\g11n\catalog\adapters\Base {
 	 * @return mixed
 	 */
 	public function read($category, $locale, $scope) {
-		if ($scope !== $this->_config['scope']) {
+		if ($scope != $this->_config['scope']) {
 			return null;
 		}
 		$path = $this->_config['path'];

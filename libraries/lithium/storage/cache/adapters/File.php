@@ -131,6 +131,18 @@ class File extends \lithium\core\Object {
 
 	}
 
+	/**
+	 * Determines if the File adapter can read and write
+	 * to the configured path.
+	 *
+	 * return boolean True if enabled, false otherwise
+	 */
+	public function enabled() {
+		$directory = new SplFileInfo($this->_config['path']);
+
+		return ($directory->isDir() && $directory->isReadable() && $directory->isWritable());
+	}
+
 }
 
 ?>

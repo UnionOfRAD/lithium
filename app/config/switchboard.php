@@ -10,23 +10,10 @@
  * Welcome to the switchboard. This file contains a series of method filters that allow you to
  * intercept different parts of Lithium's request cycle as they happen.  You can apply filters to
  * any object method that has a `@filter` flag in its API documentation.
- * 
- * When applying a filter, you need the name of the method you want to call, along with a *closure*,
- * that defines what you want the filter to do.  All filters take the same 3 parameters: `$self`,
- * `$params`, and `$chain`.
- * 
- * - `$self`: If the filter is applied on an object instance, then `$self` will be that instance. If
- * applied to a static class, then `$self` will be a string containing the fully-namespaced class
- * name.
- * 
- * - `$params`: Contains an associative array of the parameters that are passed into the method. You
- * can modify or inspect these parameters before allowing the method to continue.
- * 
- * - `$chain`: Finally, `$chain` contains the list of filters in line to be executed.  At the bottom
- * of `$chain` is the method itself.  This is why most filters contain a line that looks like
- * `return $chain->next($self, $params, $chain);`.  This passes control to the next filter in the
- * chain, and finally, to the method itself.  This allows you to interact with the return value as
- * well as the parameters.
+ *
+ * For more information on in the filters system, see `lithium\util\collection\Filters`.
+ *
+ * @see lithium\util\collection\Filters
  */
 
 use \lithium\http\Router;

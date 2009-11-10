@@ -27,6 +27,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$result = Libraries::path('\lithium\core\Libraries');
 		$this->assertTrue(strpos($result, '/lithium/core/Libraries.php'));
 		$this->assertTrue(file_exists($result));
+		$this->assertFalse(strpos($result, '\\'));
 	}
 
 	public function testPathTransform() {
@@ -38,7 +39,6 @@ class LibrariesTest extends \lithium\test\Unit {
 			}
 		));
 		$this->assertEqual($expected, $result);
-
 	}
 
 	public function testPathFiltering() {
