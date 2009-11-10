@@ -167,7 +167,10 @@ class Libraries {
 				return static::_addPlugins((array)$config);
 			break;
 		}
-		static::$_configurations[$name] = ((array)$config += $defaults);
+
+		$config = (array)$config + $defaults;
+		$config['path'] = str_replace('\\', '/', $config['path']);
+		static::$_configurations[$name] = $config;
 
 		if ($config['includePath']) {
 			$path = ($config['includePath'] === true) ? $config['path'] : $config['includePath'];
@@ -178,7 +181,7 @@ class Libraries {
 			if ($config['bootstrap'] === true) {
 				$config['bootstrap'] = 'config/bootstrap.php';
 			}
-			require $config['path'] . '/' . $config['bootstrap'];
+			require "{$config['path']}/{$config['bootstrap']}";
 		}
 
 		if (!empty($config['loader'])) {
