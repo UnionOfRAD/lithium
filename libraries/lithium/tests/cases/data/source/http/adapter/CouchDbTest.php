@@ -18,7 +18,7 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
 		'classes' => array(
-			'service' => 'lithium\tests\mocks\http\MockService',
+			'service' => 'lithium\tests\mocks\http\MockCouchService',
 			'socket' => '\lithium\tests\mocks\socket\MockSocket'
 		),
 		'persistent' => false,
@@ -72,12 +72,12 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	public function testDescribe() {
 		$couchdb = new CouchDb($this->_testConfig);
-		//$result = $couchdb->describe('companies');
+		$result = $couchdb->describe('companies');
 	}
 
 	public function testGet() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$expected = (object) array('some' => 'json');
+		$expected = (object) array('ok' => true, 'id' => '12345', 'body' => 'something');
 		$result = $couchdb->get();
 		$this->assertEqual($expected, $result);
 
@@ -105,7 +105,8 @@ class CouchDbTest extends \lithium\test\Unit {
 	public function testGetPath() {
 		$couchdb = new CouchDb($this->_testConfig);
 		$result = $couchdb->get('search.json');
-		$this->assertEqual('Test!', $result);
+		$expected = (object) array('ok' => true, 'id' => '12345', 'body' => 'something');
+		$this->assertEqual($expected, $result);
 
 		$expected = 'HTTP/1.1';
 		$result = $couchdb->response->protocol;
@@ -146,26 +147,30 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	public function testCreate() {
 		$couchdb = new CouchDb($this->_testConfig);
+		$expected = true;
 		$result = $couchdb->create($this->query);
-		$this->assertEqual('Test!', $result);
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testRead() {
 		$couchdb = new CouchDb($this->_testConfig);
+		$expected = true;
 		$result = $couchdb->read($this->query);
-		$this->assertEqual('Test!', $result);
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testUpdate() {
 		$couchdb = new CouchDb($this->_testConfig);
+		$expected = true;
 		$result = $couchdb->update($this->query);
-		$this->assertEqual('Test!', $result);
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testDelete() {
 		$couchdb = new CouchDb($this->_testConfig);
+		$expected = true;
 		$result = $couchdb->delete($this->query, array());
-		$this->assertEqual('Test!', $result);
+		$this->assertEqual($expected, $result);
 	}
 
 }

@@ -1,9 +1,26 @@
 <?php
+/**
+ * Lithium: the most rad php framework
+ *
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
 namespace lithium\data\source\http\adapter;
 
+/**
+ * CouchDb adapter
+ *
+ */
 class CouchDb extends \lithium\data\source\Http {
 
+	/**
+	 * True if Database exists
+	 *
+	 * @var boolean
+	 */
 	protected $_db = false;
+
 	/**
 	 * Constructor
 	 *
@@ -15,10 +32,15 @@ class CouchDb extends \lithium\data\source\Http {
 		parent::__construct($config);
 	}
 
+	/**
+	 * Deconstruct
+	 *
+	 * @return void
+	 */
 	public function __destruct() {
 		if ($this->_isConnected) {
 			$this->disconnect();
-			unset($this->_db);
+			$this->_db = false;
 			unset($this->_connection);
 		}
 	}
@@ -40,6 +62,13 @@ class CouchDb extends \lithium\data\source\Http {
 		));
 	}
 
+	/**
+	 * Magic for passing methods to http service
+	 *
+	 * @param string $method
+	 * @param string $params
+	 * @return void
+	 */
 	public function __call($method, $params = array()) {
 		$path = array_shift($params);
 		$data = array_shift($params);
@@ -50,10 +79,23 @@ class CouchDb extends \lithium\data\source\Http {
 		return json_decode($this->_connection->invokeMethod($method, $params));
 	}
 
+	/**
+	 * entities
+	 *
+	 * @param object $class
+	 * @return void
+	 */
 	public function entities($class = null) {
-		//return $this->get();
+
 	}
 
+	/**
+	 * Describe database, create if it does not exist
+	 *
+	 * @param string $entity
+	 * @param string $meta
+	 * @return void
+	 */
 	public function describe($entity, $meta = array()) {
 		if (!$this->_db) {
 			$result = $this->get($entity);
@@ -68,10 +110,23 @@ class CouchDb extends \lithium\data\source\Http {
 		}
 	}
 
+	/**
+	 * name
+	 *
+	 * @param string $name
+	 * @return string
+	 */
 	public function name($name) {
 		return $name;
 	}
 
+	/**
+	 * Create new document
+	 *
+	 * @param string $query
+	 * @param string $options
+	 * @return boolean
+	 */
 	public function create($query, $options = array()) {
 		$params = compact('query', 'options');
 
@@ -95,6 +150,13 @@ class CouchDb extends \lithium\data\source\Http {
 		});
 	}
 
+	/**
+	 * Read from document
+	 *
+	 * @param string $query
+	 * @param string $options
+	 * @return object
+	 */
 	public function read($query, $options = array()) {
 		$defaults = array('return' => 'resource');
 		$options += $defaults;
@@ -114,6 +176,13 @@ class CouchDb extends \lithium\data\source\Http {
 		});
 	}
 
+	/**
+	 * Update document
+	 *
+	 * @param string $query
+	 * @param string $options
+	 * @return boolean
+	 */
 	public function update($query, $options = array()) {
 		$params = compact('query', 'options');
 		$conn =& $this->_connection;
@@ -129,7 +198,7 @@ class CouchDb extends \lithium\data\source\Http {
 				$id = '/' . $conditions['_id'];
 				unset($conditions['_id']);
 			}
-			$self->put($params['table'] . $id, $params['conditions'] + $data);
+			$result = $self->put($params['table'] . $id, $params['conditions'] + $data);
 
 			if (isset($result->ok) && $result->ok === true) {
 				$query->record()->invokeMethod('_update');
@@ -139,6 +208,13 @@ class CouchDb extends \lithium\data\source\Http {
 		});
 	}
 
+	/**
+	 * Delete document
+	 *
+	 * @param string $query
+	 * @param string $options
+	 * @return boolean
+	 */
 	public function delete($query, $options) {
 		$query = $query->export($this);
 		extract($query, EXTR_OVERWRITE);
@@ -149,6 +225,14 @@ class CouchDb extends \lithium\data\source\Http {
 		return $this->_connection->delete($table, $conditions);
 	}
 
+	/**
+	 * get result
+	 *
+	 * @param string $type
+	 * @param string $resource
+	 * @param string $context
+	 * @return array
+	 */
 	public function result($type, $resource, $context) {
 		if (!is_object($resource)) {
 			return null;
@@ -156,6 +240,13 @@ class CouchDb extends \lithium\data\source\Http {
 		return (array)$resource;
 	}
 
+	/**
+	 * handle conditions
+	 *
+	 * @param string $conditions
+	 * @param string $context
+	 * @return array
+	 */
 	public function conditions($conditions, $context) {
 		if ($conditions && ($context->type() == 'create' || $context->type() == 'update')) {
 			return $conditions;
@@ -163,17 +254,37 @@ class CouchDb extends \lithium\data\source\Http {
 		return $conditions ?: array();
 	}
 
+	/**
+	 * fields for query
+	 *
+	 * @param string $fields
+	 * @param string $context
+	 * @return array
+	 */
 	public function fields($fields, $context) {
 		return $fields ?: array();
 	}
 
+	/**
+	 * limit for query
+	 *
+	 * @param string $limit
+	 * @param string $context
+	 * @return array
+	 */
 	public function limit($limit, $context) {
 		return $limit ?: array();
 	}
 
+	/**
+	 * order for query
+	 *
+	 * @param string $order
+	 * @param string $context
+	 * @return array
+	 */
 	function order($order, $context) {
 		return $order ?: array();
 	}
 }
-
 ?>
