@@ -1,3 +1,6 @@
+The console package contains a set of libraries designed for simplifying console
+based interaction with users.
+
 #### Command line overview
 
 Lithium ships with a command line tool called `li3`. This tool can be useful
