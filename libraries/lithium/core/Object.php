@@ -146,10 +146,7 @@ class Object {
 
 		$f = isset($this->_methodFilters[$method]) ? $this->_methodFilters[$method] : array();
 		$items = array_merge($f, $filters, array($callback));
-		$chain = new Filters(compact('items', 'class', 'method'));
-
-		$start = $chain->rewind();
-		return $start($this, $params, $chain);
+		return Filters::run($this, $params, compact('items', 'class', 'method'));
 	}
 
 	protected static function _parents() {
