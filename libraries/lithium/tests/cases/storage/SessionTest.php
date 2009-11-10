@@ -75,13 +75,6 @@ class SessionTest extends \lithium\test\Unit {
 		$this->assertFalse(Session::write('key', 'value'));
 	}
 
-	public function testKey() {
-		$result = Session::key();
-		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/";
-		$match = preg_match($pattern, $result);
-		$this->assertTrue($match);
-	}
-
 	/**
 	 * Tests a scenario where no session handler is available that matches the passed parameters.
 	 *
@@ -144,20 +137,16 @@ class SessionTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests querying session keys from the primary adapter.  The memory adapter simply returns
-	 * the HTTP request ID.
+	 * Tests querying session keys from the primary adapter.
+	 * The memory adapter returns a UUID based on a server variable for portability.
 	 *
 	 * @return void
 	 */
-	public function testSessionKey() {
-		$this->skipIf(!isset($_SERVER['UNIQUE_ID']));
 
-		$expected = $_SERVER['UNIQUE_ID'];
+	public function testKey() {
 		$result = Session::key();
-		$this->assertEqual($expected, $result);
-
-		Session::clear();
-		$this->assertNull(Session::key());
+		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/";
+		$this->assertPattern($pattern, $result);
 	}
 
 	public function testConfigNoAdapters() {
