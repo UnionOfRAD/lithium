@@ -257,7 +257,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);	
 	}
 			
-	public function testArrayValue() {
+	public function testArrayValueGet() {
 		$doc = new Document(array('model' => __NAMESPACE__ .'\DocumentPost',
 			'items' => array('id' => 12, 'name' => 'Joe', 'sons' => array('Moe','Greg')),
 
@@ -275,6 +275,24 @@ class DocumentTest extends \lithium\test\Unit {
 		
 		$expected = array('Moe','Greg');
 		$result = $doc->sons;
+		$this->assertEqual($expected, $result);	
+	}	
+	
+	public function testArrayValueSet() {
+		$doc = new Document();
+
+		$doc->id = 12;
+		$doc->name = 'Joe';
+		$doc->sons = array('Moe','Greg');
+		$doc->set('daughters', array('Susan', 'Tinkerbell'));
+		
+		$expected = array(
+			'id' => 12,
+			'name' => 'Joe',
+			'sons' => array('Moe','Greg'),
+			'daughters' => array('Susan', 'Tinkerbell')
+		);
+		$result = $doc->data();
 		$this->assertEqual($expected, $result);	
 	}
 		

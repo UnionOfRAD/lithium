@@ -110,7 +110,8 @@ class Document extends \lithium\util\Collection {
 			$this->_items = $name + $this->_items;
 			return;
 		}
-		if (is_array($value)) {
+		if (is_array($value) && 
+        (array_keys($value) != range(0, count($value) - 1))) {
 			$class = get_class($this);
 			$value = new $class(array('items' => $value));
 		}
