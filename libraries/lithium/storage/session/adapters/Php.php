@@ -25,7 +25,7 @@ class Php extends \lithium\core\Object {
 	 */
 	protected $_defaults = array(
 		'name' => '', 'cookie_lifetime' => '86400', 'cookie_domain' => '',
-		'save_path' => '/tmp', 'cookie_secure' => false, 'cookie_httponly' => false
+		'cookie_secure' => false, 'cookie_httponly' => false
 	);
 
 	/**
