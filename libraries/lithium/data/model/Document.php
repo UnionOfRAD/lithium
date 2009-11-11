@@ -85,6 +85,13 @@ class Document extends \lithium\util\Collection {
 		parent::__construct($config);
 	}
 
+	/**
+	 * Magic php method used when asking for field as property on document
+	 * 
+	 * @example $doc->id
+	 * @param $name field name
+	 * @return mixed
+	 */
 	public function __get($name) {
 		if (!isset($this->_items[$name])) {
 			return null;
@@ -106,10 +113,26 @@ class Document extends \lithium\util\Collection {
 		return $this->_items[$name];
 	}
 
+	/**
+	 * Set a value to $name
+	 *
+	 * @example $doc->set('title', 'Lorem Ipsum');
+	 * @param $name field
+	 * @param $value 
+	 * @return void
+	 */	 
 	public function set($name, $value = null) {
 		$this->__set($name, $value);
 	}
 
+	/**
+	 * Magical method called by setting a property on the document instance
+	 *
+	 * @example $document->title = 'Lorem Ipsum';
+	 * @param $name field
+	 * @param $value 
+	 * @return void
+	 */
 	public function __set($name, $value = null) {
 		if (is_array($name) && empty($value)) {
 			$this->_items = $name + $this->_items;
@@ -124,6 +147,11 @@ class Document extends \lithium\util\Collection {
 		$this->_items[$name] = $value;
 	}
 
+	/**
+	 * Return pointer to first item and return it's data as an array
+	 *
+	 * @return array of values of current item
+	 */	
 	public function rewind() {
 		$this->_valid = (reset($this->_items) !== false);
 
@@ -138,6 +166,14 @@ class Document extends \lithium\util\Collection {
 		return current($this->_items);
 	}
 
+	/**
+	 * Magic php methoed used when model method is called on document instance
+	 * return null also if no model is set
+	 *
+	 * @param $method
+	 * @param $params 
+	 * return mixed
+	 */
 	public function __call($method, $params = array()) {
 		if (!$model = $this->_model) {
 			return null;
@@ -161,6 +197,11 @@ class Document extends \lithium\util\Collection {
 		return $this->_valid ? $this->current() : null;
 	}
 
+	/**
+	 * Returns value of _exists, assumed boolean for datasource key exists
+	 *
+	 * return boolean
+	 */
 	public function exists() {
 		return $this->_exists;
 	}
@@ -174,6 +215,11 @@ class Document extends \lithium\util\Collection {
 		return $this->to('array');
 	}
 
+	/**
+	 *
+	 * @param $id
+	 * @return void
+	 */
 	protected function _update($id = null) {
 		if ($id) {
 			$model = $this->_model;
@@ -183,6 +229,12 @@ class Document extends \lithium\util\Collection {
 		$this->_exists = true;
 	}
 
+	/**
+	 *
+	 * @param $items
+	 * @param $key
+	 * @return array
+	 */
 	protected function _populate($items = null, $key = null) {
 		if ($this->_closed() || !$this->_handle) {
 			return;
@@ -193,6 +245,12 @@ class Document extends \lithium\util\Collection {
 		return ($this->_items[] = ($record = $this->_record($this->_classes['record'], $items)));
 	}
 
+	/**
+	 *
+	 * @param $class
+	 * @param $items
+	 * @return object
+	 */
 	protected function _record($class, $items) {
 		$parent = $this;
 		$model = $this->_model;
