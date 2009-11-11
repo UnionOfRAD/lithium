@@ -625,5 +625,4 @@ if (!defined('LITHIUM_LIBRARY_PATH')) {
 if (!defined('LITHIUM_APP_PATH')) {
 	define('LITHIUM_APP_PATH', dirname(LITHIUM_LIBRARY_PATH) . '/app');
 }
-
 ?>

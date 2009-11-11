@@ -17,13 +17,40 @@ use \lithium\util\Validator;
  */
 class Request extends \lithium\core\Object {
 
+	/**
+	 * current url of request
+	 *
+	 * @var string
+	 */
 	public $url = null;
 
+	/**
+	 * params for request
+	 *
+	 * @var array
+	 */
 	public $params = array();
 
+	/**
+	 * POST data
+	 *
+	 * @var data
+	 */
 	public $data = array();
 
+	/**
+	 * GET data
+	 *
+	 * @var string
+	 */
 	public $query = array();
+
+	/**
+	 * base path
+	 *
+	 * @var string
+	 */
+	protected $_base = null;
 
 	/**
 	 * Holds the environment variables for the request. Retrieved with env().
@@ -33,12 +60,25 @@ class Request extends \lithium\core\Object {
 	 */
 	protected $_env = array();
 
+	/**
+	 * request type
+	 *
+	 * @var string
+	 */
 	protected $_type = 'html';
 
-	protected $_base = null;
-
+	/**
+	 * classes used
+	 *
+	 * @var array
+	 */
 	protected $_classes = array('media' => '\lithium\http\Media');
 
+	/**
+	 * options used to detect request type
+	 *
+	 * @var string
+	 */
 	protected $_detectors = array(
 		'mobile'  => array('HTTP_USER_AGENT', null),
 		'ajax'    => array('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest'),
@@ -55,6 +95,11 @@ class Request extends \lithium\core\Object {
 	 */
 	protected $_acceptTypes = array();
 
+	/**
+	 * auto configuration properties
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array('classes' => 'merge', 'detectors' => 'merge', 'base', 'type');
 
 	/**
@@ -71,15 +116,14 @@ class Request extends \lithium\core\Object {
 		$m  = '/(iPhone|MIDP|AvantGo|BlackBerry|J2ME|Opera Mini|DoCoMo|NetFront|Nokia|PalmOS|';
 		$m .= 'PalmSource|portalmmm|Plucker|ReqwirelessWeb|SonyEricsson|Symbian|UP\.Browser|';
 		$m .= 'Windows CE|Xiino)/i';
-		$this->_detectors['mobile'][1] ?: $m;
+		$this->_detectors['mobile'][1] = $m;
 
 		$this->url = isset($_GET['url']) ? rtrim($_GET['url'], '/') : '';
 		$this->url = $this->url ?: '/';
 		$this->_env = (array)$_SERVER + (array)$_ENV;
 
 		$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
-		$env = php_sapi_name();
-		$this->_env['PLATFORM'] = array_key_exists($env, $envs) ? $envs[$env] : null;
+		$this->_env['PLATFORM'] = array_key_exists(PHP_SAPI, $envs) ? $envs[$env] : null;
 		$this->_base = $this->_base ?: $this->_base();
 
 		if (!empty($_POST)) {
@@ -90,36 +134,47 @@ class Request extends \lithium\core\Object {
 			}
 
 			if (isset($this->data['_method'])) {
-				if (isset($_SERVER) && !empty($_SERVER)) {
-					$_SERVER['REQUEST_METHOD'] = $params['data']['_method'];
+				if (!empty($_SERVER)) {
+					$_SERVER['REQUEST_METHOD'] = $this->data['_method'];
 				} else {
-					$_ENV['REQUEST_METHOD'] = $params['data']['_method'];
+					$_ENV['REQUEST_METHOD'] = $this->data['_method'];
 				}
-				unset($this->params['form']['_method']);
+				unset($this->data['_method']);
 			}
 		}
 
 		if (!empty($_FILES)) {
-			foreach ($_FILES as $name => $data) {
-				if ($name != 'data') {
-					$params['form'][$name] = $data;
-				}
-			}
-
-			// Replace this:
-			if (isset($_FILES['data'])) {
-				foreach ($_FILES['data'] as $key => $data) {
-					foreach ($data as $model => $fields) {
-						foreach ($fields as $field => $value) {
-							if (is_array($value)) {
-								$params['data'][$model][$field][key($value)][$key] = current($value);
-							} else {
-								$params['data'][$model][$field][$key] = $value;
-							}
+			$result = array();
+			$normalize = function($key, $value) use ($result, &$normalize){
+				foreach ($value as $param => $content) {
+					foreach ($content as $num => $val) {
+						if (is_numeric($num)) {
+							$result[$key][$num][$param] = $val;
+							continue;
 						}
+						if (is_array($val)) {
+							foreach ($val as $next => $one) {
+								$result[$key][$num][$next][$param] = $one;
+							}
+							continue;
+						}
+						$result[$key][$num][$param] = $val;
+					}
+				}
+				return $result;
+			};
+			foreach ($_FILES as $key => $value) {
+				if (isset($value['name'])) {
+					if (is_string($value['name'])) {
+						$result[$key] = $value;
+						continue;
+					}
+					if (is_array($value['name'])) {
+						$result += $normalize($key, $value);
 					}
 				}
 			}
+			$this->data += $result;
 		}
 	}
 
@@ -151,8 +206,8 @@ class Request extends \lithium\core\Object {
 		}
 
 		if ($key == 'HTTPS') {
-			if (array_key_exists($this->_env['HTTPS'])) {
-				return (isset($this->_env['HTTPS']) && $this->_env['HTTPS'] == 'on');
+			if (array_key_exists('HTTPS', $this->_env)) {
+				return (!empty($this->_env['HTTPS']) && $this->_env['HTTPS'] !== 'off');
 			}
 			return (strpos($this->_env['SCRIPT_URI'], 'https://') === 0);
 		}
@@ -165,7 +220,7 @@ class Request extends \lithium\core\Object {
 		$val = null;
 
 		if (!array_key_exists($key, $this->_env)) {
-			$val = getenv($key);
+			$val = $this->_env[$key] = getenv($key);
 		} else {
 			$val = $this->_env[$key];
 		}
@@ -185,23 +240,20 @@ class Request extends \lithium\core\Object {
 				if ($this->_env['PLATFORM'] == 'IIS') {
 					return str_replace('\\\\', '\\', $this->env('PATH_TRANSLATED'));
 				}
-			break;
 			case 'DOCUMENT_ROOT':
 				$fileName = $this->env('SCRIPT_FILENAME');
 				$offset = (!strpos($this->env('SCRIPT_NAME'), '.php')) ? 4 : 0;
 				$offset = strlen($fileName) - (strlen($this->env('SCRIPT_NAME')) + $offset);
-				return substr($fileName, 0, $offset);
-			break;
+			return substr($fileName, 0, $offset);
 			case 'PHP_SELF':
-				return str_replace($this->env('DOCUMENT_ROOT'), '', $this->env('SCRIPT_FILENAME'));
-			break;
+				return '/' . str_replace(
+					$this->env('DOCUMENT_ROOT'), '', $this->env('SCRIPT_FILENAME')
+				);
 			case 'CGI':
 			case 'CGI_MODE':
 				return ($this->_env['PLATFORM'] == 'CGI');
-			break;
 			case 'HTTP_BASE':
 				return preg_replace ('/^([^.])*/i', null, $this->_env['HTTP_HOST']);
-			break;
 		}
 		return null;
 	}
@@ -217,11 +269,9 @@ class Request extends \lithium\core\Object {
 
 		switch (true) {
 			case in_array($var, array('params', 'data', 'query')):
-				return isset($this->{$key[0]}[$key[1]]) ? $this->{$key[0]}[$key[1]] : null;
-			break;
+				return isset($this->{$var}[$key]) ? $this->{$var}[$key] : null;
 			case ($var == 'env'):
 				return $this->env($key);
-			break;
 		}
 		return null;
 	}
@@ -235,16 +285,15 @@ class Request extends \lithium\core\Object {
 	 */
 	public function is($flag) {
 		$flag = strtolower($flag);
-		$content = array('xml', 'rss', 'atom');
 
-		if (array_key_exists($flag, $this->_detectors)) {
+		if (isset($flag, $this->_detectors)) {
 			$detector = $this->_detectors[$flag];
 
 			if (is_array($detector)) {
 				if (is_string($detector[1]) && Validator::isRegex($detector[1])) {
 					return (bool)preg_match($detector[1], $this->env($detector[0]));
 				}
-				return ($this->env($detector[0]) == $detectors[1]);
+				return ($this->env($detector[0]) == $detector[1]);
 			} elseif (is_object($detector)) {
 				return $detector($this);
 			}
@@ -288,73 +337,15 @@ class Request extends \lithium\core\Object {
 	 */
 	function referer($default = null, $local = false) {
 		$ref = $this->env('HTTP_REFERER');
-		if (!empty($ref) && defined('FULL_BASE_URL')) {
-			$base = FULL_BASE_URL . $this->webroot;
-			if (strpos($ref, $base) === 0) {
-				$return =  substr($ref, strlen($base));
-				if ($return[0] != '/') {
-					$return = '/'.$return;
-				}
-				return $return;
-			} elseif (!$local) {
+		if (!empty($ref)) {
+			if (!$local) {
+				return $ref;
+			}
+			if (strpos($ref, '://') == false) {
 				return $ref;
 			}
 		}
 		return ($default != null) ? $default : '/';
-	}
-
-	public function normalizeFiles($original) {
-		$r = array();
-
-		$files = array();
-
-		foreach ($original as $file) {
-			if (!is_array($file['name'])) {
-				$files[] = $file;
-				continue;
-			}
-			$nested = array();
-
-			foreach ($file as $key => $items) {
-				while (is_array(current($items))) {
-					$items = $items[key($items)];
-				}
-				$items = array_values($items);
-
-				foreach ($items as $i => $item) {
-					$nested[$i][$key] = $item;
-				}
-			}
-			$files = array_merge($files, $nested);
-		}
-		return $files;
-
-		foreach ($files as $field => $values) {
-			if (!is_array($values['name'])) {
-				$r[$field] = $values;
-				continue;
-			}
-			foreach ($values as $key => $fields) {
-				while ($fields) {
-					foreach ($fields as $tmpField => $val) {
-						unset($fields[$tmpField]);
-						if (!is_array($val)) {
-							$tmpField = preg_replace('/(^[^\[]+)(.*)/', '[\\1]\\2', $tmpField);
-							$r[$field . $tmpField][$key] = $val;
-							continue;
-						}
-						foreach ($val as $subField => $subVal) {
-							$fields[$tmpField . '[' . $subField . ']'] = $subVal;
-						}
-					}
-				}
-			}
-		}
-
-		foreach ($r as $field => $values) {
-			$r[$field] = compact('field') + $values;
-		}
-		return array_values($r);
 	}
 
 	/**
