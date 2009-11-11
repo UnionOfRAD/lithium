@@ -218,8 +218,7 @@ class DocumentTest extends \lithium\test\Unit {
 		
 		$doc->id = 3;
 		$this->assertFalse($doc->exists());		
-		
-		
+				
 		$doc->invokeMethod('_update',array(12));
 		
 		$this->assertTrue($doc->exists());
@@ -228,6 +227,35 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $doc->id;
 		$this->assertEqual($expected, $result);			
 	}	
+	
+	public function testArrayValue() {
+		$doc = new Document(array('model' => __NAMESPACE__ .'\DocumentPost',
+			'items' => array('id' => 12, 'arr' => array('id' => 33, 'name' => 'stone'), 'name' => 'bird'),
 
+		));
+
+		$expected = 12;
+		$result = $doc->id;
+		$this->assertEqual($expected, $result);	
+
+		$expected = 'bird';
+		$result = $doc->name;
+		$this->assertEqual($expected, $result);	
+
+		$this->assertTrue(is_object($doc->arr), 'arr is not an object');
+		$this->assertTrue(is_a($doc->arr,'\lithium\data\model\Document'), 
+			'arr is not of the type Document');
+		$this->skipIf(!is_a($doc->arr,'\lithium\data\model\Document'),
+			'arr is not of the type Document');
+
+		$expected = 33;
+		$result = $doc->arr->id;
+		$this->assertEqual($expected, $result);	
+
+		$expected = 'stone';
+		$result = $doc->arr->name;
+		$this->assertEqual($expected, $result);	
+	}
+	
 }
 ?>
