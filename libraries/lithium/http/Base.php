@@ -74,6 +74,7 @@ class Base {
 			}
 		}
 		$headers = array();
+
 		foreach ($this->headers as $key => $value) {
 			$headers[] = "{$key}: {$value}";
 		}
