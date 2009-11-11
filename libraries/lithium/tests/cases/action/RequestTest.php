@@ -16,6 +16,7 @@ class IisRequest extends \lithium\action\Request {
 		parent::_init();
 		$this->_env = array(
 			'PLATFORM' => 'IIS',
+			'SCRIPT_NAME' => '\index.php',
 			'SCRIPT_FILENAME' => false,
 			'DOCUMENT_ROOT' => false,
 			'PATH_TRANSLATED' => '\lithium\app\webroot\index.php',
@@ -138,7 +139,7 @@ class RequestTest extends \lithium\test\Unit {
 	public function testDocumentRootTranslatedForIIS() {
 		$request = new IisRequest();
 
-		$expected = '\\lithium\\app\\webroot\\';
+		$expected = '\\lithium\\app\\webroot';
 		$result = $request->env('DOCUMENT_ROOT');
 		$this->assertEqual($expected, $result);
 	}
