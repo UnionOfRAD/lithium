@@ -246,9 +246,9 @@ class Request extends \lithium\core\Object {
 				$offset = strlen($fileName) - (strlen($this->env('SCRIPT_NAME')) + $offset);
 			return substr($fileName, 0, $offset);
 			case 'PHP_SELF':
-				return '/' . str_replace(
+				return str_replace('\\', '/', str_replace(
 					$this->env('DOCUMENT_ROOT'), '', $this->env('SCRIPT_FILENAME')
-				);
+				));
 			case 'CGI':
 			case 'CGI_MODE':
 				return ($this->_env['PLATFORM'] == 'CGI');
