@@ -164,10 +164,10 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc = new Document();
 		$doc->id = 123;
 		$doc->type = 'father';
-		$doc->set('children', array(
+		$doc->set('children', array('items' => array(
 			array('id' => 124, 'type' => 'child', 'children' => null),
 			array('id' => 125, 'type' => 'child', 'children' => null)
-		));
+		)));
 
 		$this->assertEqual('father', $doc->type);
 

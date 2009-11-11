@@ -139,7 +139,10 @@ class Document extends \lithium\util\Collection {
 			return;
 		}
 		if (is_array($value)) {
-			if (array_keys($value) != range(0, count($value) - 1)) {
+			if (isset($value['items'])) {
+				$class = get_class($this);
+				$value = new $class(array('items' => $value['items']));			
+			} elseif (array_keys($value) != range(0, count($value) - 1)) {
 				$class = get_class($this);
 				$value = new $class(array('items' => $value));
 			}
