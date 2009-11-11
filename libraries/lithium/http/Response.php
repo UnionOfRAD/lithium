@@ -132,7 +132,7 @@ class Response extends \lithium\http\Base {
 			}
 			$body = implode("\r\n\r\n", $parts);
 			if (isset($this->headers['Transfer-Encoding'])) {
-				$body = $this->_chunkDecode($body);
+				$body = $this->_decode($body);
 			}
 			$this->body($body);
 			unset($config['message']);
@@ -187,37 +187,42 @@ class Response extends \lithium\http\Base {
 	}
 
 	/**
-	* Decodes chunked body
+	* Decodes based on transfer encoding body
 	*
+	* @todo replace with stream wrapper dechunk
 	* @return string
 	*/
-	protected function _chunkDecode($in) {
-		$out = '';
-		while($in != '') {
-			$lf_pos = strpos($in, "\012");
-			if($lf_pos === false) {
-				$out .= $in;
-				break;
+	protected function _decode($body) {
+		if (stripos($this->headers['Transfer-Encoding'], 'chunked') !== false) {
+			$decoded = null;
+			while($body != '') {
+				$left = strpos($body, "\012");
+				if($left === false) {
+					$decoded .= $body;
+					break;
+				}
+				$chunk = substr($body, 0, $left);
+				$next = strpos($chunk, ';');
+				if($next !== false) {
+					$chunk = substr($chunk, 0, $next);
+				}
+				if($chunk == '') {
+					$decoded .= substr($body, 0, $left);
+					$body = substr($body, $left + 1);
+					continue;
+				}
+				$length = hexdec($chunk);
+				if($length) {
+					$decoded .= substr($body, $left + 1, $length);
+					$body = substr($body, $left + 2 + $length);
+				} else {
+					$body = '';
+				}
 			}
-			$chunk_hex = trim(substr($in, 0, $lf_pos));
-			$sc_pos = strpos($chunk_hex, ';');
-			if($sc_pos !== false) {
-				$chunk_hex = substr($chunk_hex, 0, $sc_pos);
-			}
-			if($chunk_hex == '') {
-				$out .= substr($in, 0, $lf_pos);
-				$in = substr($in, $lf_pos + 1);
-				continue;
-			}
-			$chunk_len = hexdec($chunk_hex);
-			if($chunk_len) {
-				$out .= substr($in, $lf_pos + 1, $chunk_len);
-				$in = substr($in, $lf_pos + 2 + $chunk_len);
-			} else {
-				$in = '';
-			}
+			return $decoded;
 		}
-		return $out;
+
+		return $body;
 	}
 }
 
