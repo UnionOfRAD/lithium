@@ -73,7 +73,9 @@ class CouchDb extends \lithium\data\source\Http {
 		$path = array_shift($params);
 		$data = array_shift($params);
 		$path = $path ?: '/';
-		$data = (!empty($data)) ? json_encode($data) : null;
+		if ($method == 'post' || $method == 'put') {
+			$data = json_encode($data);
+		}
 		$params = array_filter(array($path, $data));
 		$this->_connection->request->headers('Content-Type', 'application/json');
 		return json_decode($this->_connection->invokeMethod($method, $params));
