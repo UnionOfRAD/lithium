@@ -83,7 +83,13 @@ class Request extends \lithium\core\Object {
 		'mobile'  => array('HTTP_USER_AGENT', null),
 		'ajax'    => array('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest'),
 		'flash'   => array('HTTP_USER_AGENT', 'Shockwave Flash'),
-		'ssl'     => 'HTTPS'
+		'ssl'     => 'HTTPS',
+		'get'     => array('REQUEST_METHOD', 'GET'),
+		'post'    => array('REQUEST_METHOD', 'POST'),
+		'put'     => array('REQUEST_METHOD', 'PUT'),
+		'delete'  => array('REQUEST_METHOD', 'DELETE'),
+		'head'    => array('REQUEST_METHOD', 'HEAD'),
+		'options' => array('REQUEST_METHOD', 'OPTIONS')
 	);
 
 	/**
@@ -100,7 +106,9 @@ class Request extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('classes' => 'merge', 'detectors' => 'merge', 'base', 'type');
+	protected $_autoConfig = array(
+		'classes' => 'merge', 'env' => 'merge', 'detectors' => 'merge', 'base', 'type'
+	);
 
 	/**
 	 * Pulls request data from superglobals.
@@ -120,30 +128,24 @@ class Request extends \lithium\core\Object {
 
 		$this->url = isset($_GET['url']) ? rtrim($_GET['url'], '/') : '';
 		$this->url = $this->url ?: '/';
-		$this->_env = (array)$_SERVER + (array)$_ENV;
+		$this->_env += (array)$_SERVER + (array)$_ENV;
 
 		$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
-		$this->_env['PLATFORM'] = array_key_exists(PHP_SAPI, $envs) ? $envs[$env] : null;
+		$this->_env['PLATFORM'] = isset($envs[PHP_SAPI]) ? $envs[PHP_SAPI] : null;
 		$this->_base = $this->_base ?: $this->_base();
+		$this->data = isset($_POST) ? $_POST : array();
 
-		if (!empty($_POST)) {
-			$this->data = $_POST;
-
-			if (!empty($this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
-				$this->data['_method'] = $this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'];
-			}
-
-			if (isset($this->data['_method'])) {
-				if (!empty($_SERVER)) {
-					$_SERVER['REQUEST_METHOD'] = $this->data['_method'];
-				} else {
-					$_ENV['REQUEST_METHOD'] = $this->data['_method'];
-				}
-				unset($this->data['_method']);
-			}
+		if (isset($this->data['_method'])) {
+			$this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'] = $this->data['_method'];
+			unset($this->data['_method']);
 		}
 
-		if (!empty($_FILES)) {
+		if (isset($this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
+			$this->_env['REQUEST_METHOD'] = $this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'];
+		}
+
+
+		if (isset($_FILES)) {
 			$result = array();
 			$normalize = function($key, $value) use ($result, &$normalize){
 				foreach ($value as $param => $content) {
@@ -206,7 +208,7 @@ class Request extends \lithium\core\Object {
 		}
 
 		if ($key == 'HTTPS') {
-			if (array_key_exists('HTTPS', $this->_env)) {
+			if (isset($this->_env['HTTPS'])) {
 				return (!empty($this->_env['HTTPS']) && $this->_env['HTTPS'] !== 'off');
 			}
 			return (strpos($this->_env['SCRIPT_URI'], 'https://') === 0);
@@ -217,18 +219,12 @@ class Request extends \lithium\core\Object {
 				$key = 'SCRIPT_URL';
 			}
 		}
-		$val = null;
 
-		if (isset($this->_env[$key])) {
-			$val = $this->_env[$key];
-		} else if (!array_key_exists($key, $this->_env)) {
-			$val = $this->_env[$key] = getenv($key);
-		}
+		$val = array_key_exists($key, $this->_env) ? $this->_env[$key] : getenv($key);
+		$this->_env[$key] = $val;
 
 		if ($key == 'REMOTE_ADDR' && $val == $this->env('SERVER_ADDR')) {
-			if (($addr = $this->env('HTTP_PC_REMOTE_ADDR')) != null) {
-				$val = $addr;
-			}
+			$val = ($addr = $this->env('HTTP_PC_REMOTE_ADDR')) ? $addr : $val;
 		}
 
 		if ($val !== null && $val !== false) {
@@ -256,7 +252,6 @@ class Request extends \lithium\core\Object {
 			case 'HTTP_BASE':
 				return preg_replace ('/^([^.])*/i', null, $this->_env['HTTP_HOST']);
 		}
-		return null;
 	}
 
 	/**
