@@ -34,7 +34,11 @@ class LoggerTest extends \lithium\test\Unit {
 
 	public function testConfig() {
 		$test = new Test();
-		$config = array('logger' => array('adapter' => $test, 'filters' => array()));
+		$config = array('logger' => array(
+			'adapter' => $test,
+			'filters' => array(),
+			'strategies' => array()
+		));
 
 		$result = Logger::config($config);
 		$expected = new Collection(array('items' => $config));

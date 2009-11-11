@@ -9,8 +9,13 @@
 namespace lithium\tests\cases\data;
 
 use \lithium\data\Model;
+use \lithium\data\model\Query;
+use \lithium\data\model\Record;
+use \lithium\data\model\RecordSet;
 
 class Post extends Model {
+
+	public $hasMany = array('Comment');
 
 	public static function resetSchema() {
 		static::_instance()->_schema = array();
@@ -23,7 +28,37 @@ class Post extends Model {
 
 class Comment extends Model {
 
+	public $belongsTo = array('Post');
+
 	protected $_meta = array('key' => 'comment_id');
+
+	public static function find($type, $options = array()) {
+		$defaults = array(
+			'conditions' => null, 'fields' => null, 'order' => null, 'limit' => null, 'page' => 1
+		);
+		$options += $defaults;
+		$params = compact('type', 'options');
+		$self = static::_instance();
+
+		$filter = function($self, $params) {
+			extract($params);
+			$query = new Query(array('type' => 'read') + $options);
+
+			return new RecordSet(array(
+				'query'    => $query,
+				'items'    => array_map(
+					function($data) { return new Record(compact('data')); },
+					array(
+						array('comment_id' => 1, 'author_id' => 123, 'text' => 'First comment'),
+						array('comment_id' => 2, 'author_id' => 241, 'text' => 'Second comment'),
+						array('comment_id' => 3, 'author_id' => 451, 'text' => 'Third comment')
+					)
+				)
+			));
+		};
+		$finder = isset($self->_finders[$type]) ? array($self->_finders[$type]) : array();
+		return static::_filter(__METHOD__, $params, $filter, $finder);
+	}
 }
 
 class Tag extends Model {
@@ -51,13 +86,13 @@ class ModelTest extends \lithium\test\Unit {
 
 		$this->assertEqual('posts', Post::meta('source'));
 
-		Post::init(array('source' => 'post'));
+		Post::__init(array('source' => 'post'));
 		$this->assertEqual('post', Post::meta('source'));
 
-		Post::init(array('source' => false));
+		Post::__init(array('source' => false));
 		$this->assertIdentical(false, Post::meta('source'));
 
-		Post::init(array('source' => null));
+		Post::__init(array('source' => null));
 		$this->assertIdentical('posts', Post::meta('source'));
 	}
 
@@ -99,10 +134,70 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual($result, Post::schema());
 	}
 
+	public function testFieldIntrospection() {
+		$this->assertTrue(Comment::hasField('comment_id'));
+		$this->assertFalse(Comment::hasField('foo'));
+		$this->assertEqual('comment_id', Comment::hasField(array('comment_id')));
+	}
+
+	/**
+	 * Tests introspecting the relationship settings for the model as a whole, various relationship
+	 * types, and individual relationships.
+	 *
+	 * @todo Some tests will need to change when full relationship support is built out.
+	 * @return void
+	 */
+	public function testRelationshipIntrospection() {
+		$result = Post::relations();
+		$expected = array('Comment');
+		$this->assertEqual($expected, $result);
+
+		$result = Post::relations('hasMany');
+		$this->assertEqual($expected, $result);
+
+		$result = Comment::relations();
+		$expected = array('Post');
+		$this->assertEqual($expected, $result);
+
+		$result = Comment::relations('belongsTo');
+		$this->assertEqual($expected, $result);
+
+		$this->assertFalse(Comment::relations('hasMany'));
+		$this->assertFalse(Post::relations('belongsTo'));
+
+		$this->assertNull(Comment::relations('Post'));
+		$this->assertNull(Post::relations('Comment'));
+	}
+
+	public function testSimpleRecordCreation() {
+		$comment = Comment::create(array(
+			'author_id' => 451,
+			'text' => 'Do you ever read any of the books you burn?'
+		));
+
+		$this->assertFalse($comment->exists());
+		$this->assertNull($comment->comment_id);
+
+		$expected = 'Do you ever read any of the books you burn?';
+		$this->assertEqual($expected, $comment->text);
+	}
+
 	public function testSimpleFind() {
-		$result = Post::find('all', array('limit' => 5));
+		$result = Post::find('all');
 		$this->assertTrue($result instanceof \lithium\data\model\RecordSet);
-		//$this->assertEqual(5, count($result));
+	}
+
+	/**
+	 * Tests the find 'first' filter on a simple record set.
+	 *
+	 * @return void
+	 */
+	public function testSimpleFindFirst() {
+		$result = Comment::first();
+		$this->assertTrue($result instanceof Record);
+
+		$expected = 'First comment';
+		$this->assertEqual($expected, $result->text);
 	}
 
 	public function testFilteredFind() {

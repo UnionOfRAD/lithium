@@ -8,6 +8,7 @@
 
 namespace lithium\data;
 
+use \Exception;
 use \lithium\util\String;
 use \lithium\util\Collection;
 use \lithium\core\Libraries;
@@ -165,7 +166,10 @@ class Connections extends \lithium\core\StaticObject {
 			}
 			$class = Libraries::locate("dataSources.{$config['type']}", $config['adapter']);
 		}
-		return new $class($config);
+		if (class_exists($class)) {
+			return new $class($config);
+		}
+		throw new Exception("{$config['adapter']} adapter could not be found");
 	}
 }
 
