@@ -89,14 +89,19 @@ class Document extends \lithium\util\Collection {
 		if (!isset($this->_items[$name])) {
 			return null;
 		}
-		
-		if (is_array($this->_items[$name]) && 
-        (array_keys($this->_items[$name]) != range(0, count($this->_items[$name]) - 1))) {
-			$class = get_class($this);
-			$items = $this->_items[$name];
-			$model = $this->_model;
-			$parent = $this;
-			return ($this->_items[$name] = $this->_record(get_class($this), $this->_items[$name]));
+
+		if (is_array($this->_items[$name])) {
+			if ((array_keys($this->_items[$name]) != range(0, count($this->_items[$name]) - 1))) {
+				$class = get_class($this);
+				$items = $this->_items[$name];
+				$model = $this->_model;
+				$parent = $this;
+
+				return ($this->_items[$name] = $this->_record(
+					get_class($this),
+					$this->_items[$name]
+				));
+			}
 		}
 		return $this->_items[$name];
 	}
@@ -110,10 +115,11 @@ class Document extends \lithium\util\Collection {
 			$this->_items = $name + $this->_items;
 			return;
 		}
-		if (is_array($value) && 
-        (array_keys($value) != range(0, count($value) - 1))) {
-			$class = get_class($this);
-			$value = new $class(array('items' => $value));
+		if (is_array($value)) {
+			if (array_keys($value) != range(0, count($value) - 1)) {
+				$class = get_class($this);
+				$value = new $class(array('items' => $value));
+			}
 		}
 		$this->_items[$name] = $value;
 	}
@@ -133,9 +139,7 @@ class Document extends \lithium\util\Collection {
 	}
 
 	public function __call($method, $params = array()) {
-		$model = $this->_model;
-
-		if (!$model) {
+		if (!$model = $this->_model) {
 			return null;
 		}
 		array_unshift($params, $this);
