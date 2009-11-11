@@ -8,6 +8,8 @@
 
 namespace lithium\data\model;
 
+use \Iterator;
+
 /**
  * `Document` is an alternative to `model\RecordSet`, which is optimized for organizing collections
  * of records from document-oriented databases such as CouchDB or MongoDB.
@@ -67,8 +69,9 @@ class Document extends \lithium\util\Collection {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'record' => '\lithium\model\Record',
-		'media' => '\lithium\http\Media'
+		'media' => '\lithium\http\Media',
+		'record' => '\lithium\data\model\Document',
+		'recordSet' => '\lithium\data\model\Document'
 	);
 
 	protected $_hasInitialized = false;
@@ -87,7 +90,7 @@ class Document extends \lithium\util\Collection {
 
 	/**
 	 * Magic php method used when asking for field as property on document
-	 * 
+	 *
 	 * @example $doc->id
 	 * @param $name field name
 	 * @return mixed
@@ -96,19 +99,12 @@ class Document extends \lithium\util\Collection {
 		if (!isset($this->_items[$name])) {
 			return null;
 		}
+		$items = $this->_items[$name];
 
-		if (is_array($this->_items[$name])) {
-			if ((array_keys($this->_items[$name]) != range(0, count($this->_items[$name]) - 1))) {
-				$class = get_class($this);
-				$items = $this->_items[$name];
-				$model = $this->_model;
-				$parent = $this;
-
-				return ($this->_items[$name] = $this->_record(
-					get_class($this),
-					$this->_items[$name]
-				));
-			}
+		if ($this->_isComplexType($items) && !$items instanceof Iterator) {
+			$model = $this->_model;
+			$parent = $this;
+			$this->_items[$name] = $this->_record('recordSet', $this->_items[$name]);
 		}
 		return $this->_items[$name];
 	}
@@ -138,11 +134,8 @@ class Document extends \lithium\util\Collection {
 			$this->_items = $name + $this->_items;
 			return;
 		}
-		if (is_array($value)) {
-			if (array_keys($value) != range(0, count($value) - 1)) {
-				$class = get_class($this);
-				$value = new $class(array('items' => $value));
-			}
+		if ($this->_isComplexType($value) && !$value instanceof Iterator) {
+			$value = $this->_record('recordSet', $value);
 		}
 		$this->_items[$name] = $value;
 	}
@@ -171,8 +164,8 @@ class Document extends \lithium\util\Collection {
 	 * return null also if no model is set
 	 *
 	 * @param $method
-	 * @param $params 
-	 * return mixed
+	 * @param $params
+	 * @return mixed
 	 */
 	public function __call($method, $params = array()) {
 		if (!$model = $this->_model) {
@@ -215,6 +208,20 @@ class Document extends \lithium\util\Collection {
 		return $this->to('array');
 	}
 
+	public function _isComplexType($data) {
+		if (is_scalar($data) || !$data) {
+			return false;
+		}
+		if (is_array($data)) {
+			if (array_keys($data) == range(0, count($data) - 1)) {
+				if (array_filter($data, 'is_scalar') == array_filter($data)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	/**
 	 *
 	 * @param $id
@@ -242,7 +249,7 @@ class Document extends \lithium\util\Collection {
 		if (!$items = $items ?: $this->_handle->result('next', $this->_result, $this)) {
 			return $this->_close();
 		}
-		return ($this->_items[] = ($record = $this->_record($this->_classes['record'], $items)));
+		return $this->_items[] = $record = $this->_record('record', $items);
 	}
 
 	/**
@@ -251,11 +258,11 @@ class Document extends \lithium\util\Collection {
 	 * @param $items
 	 * @return object
 	 */
-	protected function _record($class, $items) {
+	protected function _record($classType, $items) {
 		$parent = $this;
 		$model = $this->_model;
 		$exists = true;
-		return new $class(compact('model', 'items', 'parent', 'exists'));
+		return new $this->_classes[$classType](compact('model', 'items', 'parent', 'exists'));
 	}
 
 	/**

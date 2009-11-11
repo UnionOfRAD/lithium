@@ -46,9 +46,8 @@ class DocumentPost extends \lithium\data\Model {
 }
 
 class DocumentTest extends \lithium\test\Unit {
-	
-	public function testFindAllAndIterate() {
 
+	public function testFindAllAndIterate() {
 		$document = DocumentPost::find('all');
 
 		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');			
@@ -172,6 +171,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual('father', $doc->type);
 
 		$this->assertTrue(is_object($doc->children), 'children is not an object');
+
 		$this->assertTrue(
 			is_a($doc->children,'\lithium\data\model\Document'), 
 			'Children is not of the type Document'
