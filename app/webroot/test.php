@@ -105,7 +105,7 @@ $stats = Dispatcher::process($testRun['results']);
 				$options = array(
 					'recursive' => true,
 					'filter' => false,
-					'exclude' => '/\w+Test$|webroot|index$|^app\\\\config|^\w+\\\\views\/|\./'
+					'exclude' => '/\w+Test$|Mock+\w|webroot|index$|^app\\\\config|^\w+\\\\views\/|\./'
 				);
 				$none = Libraries::find('lithium', $options);
 				$classes = array_diff($none, $tests);

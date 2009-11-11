@@ -36,7 +36,7 @@ class Parser extends \lithium\core\StaticObject {
 	}
 
 	public static function tokenize($code, $options = array()) {
-		$defaults = array('wrap' => true, 'ignore' => array());
+		$defaults = array('wrap' => true, 'ignore' => array(), 'include' => array());
 		$options += $defaults;
 		$tokens = array();
 		$line = 1;
@@ -50,13 +50,19 @@ class Parser extends \lithium\core\StaticObject {
 			list($id, $content, $line) = $token;
 			$name = $id ? token_name($id) : $content;
 
+			if (!empty($options['include'])) {
+				if (!in_array($name, $options['include']) && !in_array($id, $options['include'])) {
+					continue;
+				}
+			}
+
 			if (in_array($name, $options['ignore']) || in_array($id, $options['ignore'])) {
 				continue;
 			}
 			$tokens[] = compact('id', 'name', 'content', 'line');
 		}
 
-		if ($options['wrap']) {
+		if ($options['wrap'] && empty($options['include'])) {
 			$tokens = array_slice($tokens, 1, count($tokens) - 2);
 		}
 		return $tokens;

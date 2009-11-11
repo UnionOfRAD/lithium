@@ -95,6 +95,16 @@ class Request extends \lithium\http\Base {
 	 * @return void
 	 */
 	public function __construct($config = array()) {
+		$this->build($config);
+	}
+
+	/**
+	 * Build the request object
+	 *
+	 * @param string $config
+	 * @return void
+	 */
+	public function build($config) {
 		foreach ($config as $key => $value) {
 			if (isset($this->{$key}) && !is_array($this->{$key})) {
 				$this->{$key} = $value;

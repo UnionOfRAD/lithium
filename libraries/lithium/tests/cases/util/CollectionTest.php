@@ -130,6 +130,10 @@ class CollectionTest extends \lithium\test\Unit {
 		$collection = new Collection(array('items' => array('', 'Hello', 'Goodbye')));
 		$result = $collection->first(function($value) { return $value; });
 		$this->assertEqual('Hello', $result);
+
+		$collection = new Collection(array('items' => array('', 'Hello', 'Goodbye')));
+		$result = $collection->first();
+		$this->assertEqual('', $result);
 	}
 
 	/**
