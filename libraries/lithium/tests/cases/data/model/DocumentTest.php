@@ -12,6 +12,20 @@ use \lithium\data\model\Document;
 
 class DocumentPost extends \lithium\data\Model {
 
+	public function ret($record, $param1 = null, $param2 = null) {
+		if ($param2) {
+			return $param2;
+		} 
+		if ($param1) {
+			return $param1;
+		} 
+		return null;
+	}
+	
+	public function medicin($record) {
+		return 'lithium';
+	}
+	
 	public static function find($type = 'all', $options = array()) {
 		switch ($type) {
 			case 'first' : {
@@ -289,6 +303,32 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $doc->data();
 		$this->assertEqual($expected, $result);	
 	}
+
+	public function testCall() {
+		$doc = new Document();
+		
+		$result = $doc->medicin();
+		$this->assertNull($result);	
+		
+		$doc = new Document(array('model' => __NAMESPACE__ .'\DocumentPost'));
+		
+		$expected = 'lithium';
+		$result = $doc->medicin();
+		$this->assertEqual($expected, $result);	
+		
+		$result = $doc->ret();
+		$this->assertNull($result);	
+		
+		$expected = 'nose';
+		$result = $doc->ret('nose');
+		$this->assertEqual($expected, $result);	
+		
+		$expected = 'job';
+		$result = $doc->ret('nose','job');
+		$this->assertEqual($expected, $result);			
+	
+	}
+
 }
 
 ?>
