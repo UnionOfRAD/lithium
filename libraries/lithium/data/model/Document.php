@@ -89,7 +89,9 @@ class Document extends \lithium\util\Collection {
 		if (!isset($this->_items[$name])) {
 			return null;
 		}
-		if (is_array($this->_items[$name])) {
+		
+		if (is_array($this->_items[$name]) && 
+        (array_keys($this->_items[$name]) != range(0, count($this->_items[$name]) - 1))) {
 			$class = get_class($this);
 			$items = $this->_items[$name];
 			$model = $this->_model;
