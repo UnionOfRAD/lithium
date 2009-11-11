@@ -219,10 +219,10 @@ class Request extends \lithium\core\Object {
 		}
 		$val = null;
 
-		if (!array_key_exists($key, $this->_env)) {
-			$val = $this->_env[$key] = getenv($key);
-		} else {
+		if (isset($this->_env[$key])) {
 			$val = $this->_env[$key];
+		} else if (!array_key_exists($key, $this->_env)) {
+			$val = $this->_env[$key] = getenv($key);
 		}
 
 		if ($key == 'REMOTE_ADDR' && $val == $this->env('SERVER_ADDR')) {
@@ -240,11 +240,12 @@ class Request extends \lithium\core\Object {
 				if ($this->_env['PLATFORM'] == 'IIS') {
 					return str_replace('\\\\', '\\', $this->env('PATH_TRANSLATED'));
 				}
+				return $this->env('PHP_SELF');
 			case 'DOCUMENT_ROOT':
 				$fileName = $this->env('SCRIPT_FILENAME');
 				$offset = (!strpos($this->env('SCRIPT_NAME'), '.php')) ? 4 : 0;
 				$offset = strlen($fileName) - (strlen($this->env('SCRIPT_NAME')) + $offset);
-			return substr($fileName, 0, $offset);
+				return substr($fileName, 0, $offset);
 			case 'PHP_SELF':
 				return str_replace('\\', '/', str_replace(
 					$this->env('DOCUMENT_ROOT'), '', $this->env('SCRIPT_FILENAME')
@@ -259,9 +260,9 @@ class Request extends \lithium\core\Object {
 	}
 
 	/**
-	 * undocumented function
+	 * Get params, data, query or env
 	 *
-	 * @param string $key
+	 * @param string $key data:title, env:base
 	 * @return void
 	 */
 	public function get($key) {
