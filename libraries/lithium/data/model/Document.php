@@ -249,7 +249,7 @@ class Document extends \lithium\util\Collection {
 		if (!$items = $items ?: $this->_handle->result('next', $this->_result, $this)) {
 			return $this->_close();
 		}
-		return $this->_items[] = $record = $this->_record('record', $items);
+		return $this->_items[] = $items; 
 	}
 
 	/**

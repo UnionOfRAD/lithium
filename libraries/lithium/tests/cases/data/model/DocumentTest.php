@@ -10,6 +10,51 @@ namespace lithium\tests\cases\data\model;
 
 use \lithium\data\model\Document;
 
+class DocumentSource extends \lithium\data\Source {
+	
+	public function connect() {	}
+	public function disconnect() {}
+	public function entities($class = null) {}
+	public function describe($entity, $meta = array()) { }
+	public function create($query, $options) {	}
+	public function update($query, $options) {	}
+	public function delete($query, $options) {	}
+	
+	protected $point = 0;
+	protected $result = null;
+	
+	public function read($query = null, $options = null) {	
+		$this->point = 0;
+		$this->result = array(
+			array('id' => 1, 'name' => 'Joe'),
+			array('id' => 2, 'name' => 'Moe'),
+			array('id' => 3, 'name' => 'Roe')
+		);	
+	} 
+	public function hasNext() {
+		return (is_array($this->result) && sizeof($this->result) > $this->point);
+	}
+	public function getNext() {
+		return $this->result[$this->point++];
+	}
+	
+	public function result($type, $resource, $context) {
+		switch ($type) {
+			case 'next':
+				$result = $resource->hasNext() ? $resource->getNext() : null;
+			break;
+			case 'close':
+				unset($resource);
+				$result = null;
+				break;
+		
+		}
+		return $result;
+	}
+
+
+}
+
 class DocumentPost extends \lithium\data\Model {
 
 	public function ret($record, $param1 = null, $param2 = null) {
@@ -317,13 +362,13 @@ class DocumentTest extends \lithium\test\Unit {
 
 		$doc->id = 12;
 		$doc->name = 'Joe';
-		$doc->sons = array('Moe', 'Greg');
+		$doc->sons = array('Moe', 'Greg',12, 0.3);
 		$doc->set('daughters', array('Susan', 'Tinkerbell'));
 
 		$expected = array(
 			'id' => 12,
 			'name' => 'Joe',
-			'sons' => array('Moe', 'Greg'),
+			'sons' => array('Moe', 'Greg', 12, 0.3),
 			'daughters' => array('Susan', 'Tinkerbell')
 		);
 		$result = $doc->data();
@@ -353,6 +398,31 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $doc->ret('nose','job');
 		$this->assertEqual($expected, $result);			
 	
+	}
+
+	public function testPopulateResourceClose() {	
+		$resource = new DocumentSource();
+		$resource->read();
+		$doc = new Document(array(
+			'model' => __NAMESPACE__ .'\DocumentPost',
+			'handle' => new DocumentSource(),
+			'result' => $resource
+		));
+		
+		$expected = array('id' => 1, 'name' => 'Joe');
+		$result = $doc->rewind();
+		$this->assertTrue($result);	
+				
+		$expected = array('id' => 2, 'name' => 'Moe');
+		$result = $doc->next();
+		$this->assertEqual($expected, $result);	
+		
+		$expected = array('id' => 3, 'name' => 'Roe');
+		$result = $doc->next();
+		$this->assertEqual($expected, $result);	
+		
+		$result = $doc->next();
+		$this->assertNull($result);	
 	}
 
 }
