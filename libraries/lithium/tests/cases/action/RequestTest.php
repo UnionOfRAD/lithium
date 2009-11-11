@@ -86,12 +86,10 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testInitMethodOverrideWithEmptyServer() {
-		$_POST['Article']['title'] = 'cool';
-		$_ENV['HTTP_X_HTTP_METHOD_OVERRIDE'] = 'POST';
-		$_SERVER = null;
-		$request = new Request();
+		$request = new Request(array('env' => array('HTTP_X_HTTP_METHOD_OVERRIDE' => 'POST')));
+		$request->data = array('Article' => array('title' => 'cool'));
 
-		$expected = 'GET';
+		$expected = 'POST';
 		$result = $request->env('REQUEST_METHOD');
 		$this->assertEqual($expected, $result);
 
@@ -103,8 +101,9 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testScriptFilename() {
-		$_SERVER['SCRIPT_FILENAME'] = '/lithium/app/webroot/index.php';
-		$request = new Request();
+		$request = new Request(array('env' => array(
+			'SCRIPT_FILENAME' => '/lithium/app/webroot/index.php'
+		)));
 
 		$expected = '/lithium/app/webroot/index.php';
 		$result = $request->env('SCRIPT_FILENAME');
@@ -729,5 +728,22 @@ class RequestTest extends \lithium\test\Unit {
 
 		unset($_FILES, $request);
 	}
+
+	public function testRequestTypeAccessors() {
+		$request = new Request(array('env' => array('REQUEST_METHOD' => 'GET')));
+		$this->assertTrue($request->is('get'));
+		$this->assertFalse($request->is('post'));
+
+		$request = new Request(array('env' => array('REQUEST_METHOD' => 'POST')));
+		$this->assertTrue($request->is('post'));
+		$this->assertFalse($request->is('get'));
+		$this->assertFalse($request->is('put'));
+
+		$request = new Request(array('env' => array('REQUEST_METHOD' => 'PUT')));
+		$this->assertTrue($request->is('put'));
+		$this->assertFalse($request->is('get'));
+		$this->assertFalse($request->is('post'));
+	}
 }
+
 ?>
