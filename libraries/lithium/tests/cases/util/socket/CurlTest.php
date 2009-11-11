@@ -27,6 +27,17 @@ class CurlTest extends \lithium\test\Unit {
 		'timeout' => 2
 	);
 
+	/**
+	 * Skip the test if curl is not available in your PHP installation.
+	 *
+	 * @return void
+	 */
+	public function skip() {
+		$extensionExists = function_exists('curl_init');
+		$message = 'Your PHP installation was not compiled with curl support.';
+		$this->skipIf(!$extensionExists, $message);
+	}
+
 	public function testAllMethodsNoConnection() {
 		$stream = new CurlMock(array('protocol' => null));
 		$this->assertFalse($stream->open());
