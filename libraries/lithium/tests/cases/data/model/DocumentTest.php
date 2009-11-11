@@ -228,7 +228,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);			
 	}	
 	
-	public function testArrayValue() {
+	public function testArrayValueNestedDocument() {
 		$doc = new Document(array('model' => __NAMESPACE__ .'\DocumentPost',
 			'items' => array('id' => 12, 'arr' => array('id' => 33, 'name' => 'stone'), 'name' => 'bird'),
 
@@ -256,6 +256,28 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $doc->arr->name;
 		$this->assertEqual($expected, $result);	
 	}
-	
+			
+	public function testArrayValue() {
+		$doc = new Document(array('model' => __NAMESPACE__ .'\DocumentPost',
+			'items' => array('id' => 12, 'name' => 'Joe', 'sons' => array('Moe','Greg')),
+
+		));
+
+		$expected = 12;
+		$result = $doc->id;
+		$this->assertEqual($expected, $result);	
+
+		$expected = 'Joe';
+		$result = $doc->name;
+		$this->assertEqual($expected, $result);	
+
+		$this->assertTrue(is_array($doc->sons), 'arr is not an array');
+		
+		$expected = array('Moe','Greg');
+		$result = $doc->sons;
+		$this->assertEqual($expected, $result);	
+	}
+		
+
 }
 ?>
