@@ -240,7 +240,7 @@ class CouchDb extends \lithium\data\source\Http {
 				$conditions['rev'] = $data['_rev'];
 			}
 
-			$result = $conn->delete($table . $id, $conditions);
+			$result = json_decode($conn->delete($table . $id, $conditions));
 
 			if (isset($result->ok) && $result->ok === true) {
 				return true;
