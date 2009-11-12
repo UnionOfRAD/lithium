@@ -180,7 +180,7 @@ class LibrariesTest extends \lithium\test\Unit {
 
 	public function testServiceLocateAllCommands() {
 		$result = Libraries::locate('commands');
-		$this->assertTrue(count($result) > 11);
+		$this->assertTrue(count($result) > 10);
 
 		$expected = array(
 			'lithium\console\commands\docs\Generator', 'lithium\console\commands\docs\Todo'
