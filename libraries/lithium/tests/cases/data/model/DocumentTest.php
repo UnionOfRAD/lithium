@@ -260,6 +260,16 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $doc->child->name;
 		$this->assertEqual($expected, $result);		
 	}
+	
+	public function testNestedSingle() {
+		$doc = new Document();
+		
+		$doc->arr1 = array('something' => 'else');
+		$doc->arr2 = array('some' => 'noses', 'have' => 'it');
+		
+		$this->assertTrue(is_a($doc->arr1, '\lithium\data\model\Document'));
+		$this->assertTrue(is_a($doc->arr2, '\lithium\data\model\Document'));   		
+	}
 
 	public function testRewindNoData() {
 		$doc = new Document();
@@ -422,9 +432,42 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);	
 		
 		$result = $doc->next();
-		$this->assertNull($result);	
+		$this->assertNull($result);
 	}
 
+	public function testEmptyValues() {
+		$doc = new Document(array(
+			'model' => __NAMESPACE__ .'\DocumentPost',
+			'data' => array(
+				'title' => 'Post',
+				'content' => 'Lorem Ipsum',
+				'parsed' => null,
+				'permanent' => false,
+			)
+		));
+		
+		$expected = array(
+			'title' => 'Post',
+			'content' => 'Lorem Ipsum',
+			'parsed' => null,
+			'permanent' => false,
+		);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+	}
+	
+	public function testBooleanValues() {
+		$doc = new Document();
+
+		$doc->tall = false;
+		$doc->fat = true;
+		$doc->set('hair', true);
+		$doc->set('fast', false);
+
+		$expected = array('tall','fat','hair','fast');
+		$result = array_keys($doc->data());
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
