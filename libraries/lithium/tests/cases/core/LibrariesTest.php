@@ -221,6 +221,12 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testServiceLocateCommand() {
+		$result = Libraries::locate('commands.docs', 'Generator');
+		$expected = 'lithium\console\commands\docs\Generator';
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testCaseSensitivePathLookups() {
 		$library = Libraries::get('lithium');
 		$base = $library['path'] . '/';

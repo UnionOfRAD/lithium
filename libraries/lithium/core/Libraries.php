@@ -444,7 +444,7 @@ class Libraries {
 					continue;
 				}
 				$params['library'] = $library;
-				$classPath = String::insert($pathTemplate, $params);
+				$classPath = str_replace('\\*', '', String::insert($pathTemplate, $params));
 
 				if (file_exists(Libraries::path($classPath))) {
 					return $classPath;
