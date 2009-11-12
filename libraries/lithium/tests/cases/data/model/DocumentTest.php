@@ -432,9 +432,42 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);	
 		
 		$result = $doc->next();
-		$this->assertNull($result);	
+		$this->assertNull($result);
 	}
 
+	public function testEmptyValues() {
+		$doc = new Document(array(
+			'model' => __NAMESPACE__ .'\DocumentPost',
+			'data' => array(
+				'title' => 'Post',
+				'content' => 'Lorem Ipsum',
+				'parsed' => null,
+				'permanent' => false,
+			)
+		));
+		
+		$expected = array(
+			'title' => 'Post',
+			'content' => 'Lorem Ipsum',
+			'parsed' => null,
+			'permanent' => false,
+		);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+	}
+	
+	public function testBooleanValues() {
+		$doc = new Document();
+
+		$doc->tall = false;
+		$doc->fat = true;
+		$doc->set('hair', true);
+		$doc->set('fast', false);
+
+		$expected = array('tall','fat','hair','fast');
+		$result = array_keys($doc->data());
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
