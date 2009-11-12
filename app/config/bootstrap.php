@@ -84,24 +84,10 @@ Libraries::add('app');
  * it intercepts any writes where the `'expires'` key is set in the options array.  When creating a
  * new application, it is suggested that you change the value of `'key'` below.
  */
-
-/**
-* Session configuration
-*/
 // use \lithium\storage\Session;
 //
 // Session::config(array(
-// 	'cookie' => array(
-// 		'adapter' => 'Cookie',
-// 		'name'    => 'AppCookieName',
-// 		'expires' => '+5 days',
-// 		'domain'  => '',
-// 		'path'    => '/',
-// 		'filters' => array(
-// 			// 'Encryption' => array('key' => '0409448a5206980ab15682c3281c1a3b1fb10c55')
-// 		)
-// 	),
-// 	'default' => array('adapter' => 'Php', 'filters' => array())
+// 	'default' => array('adapter' => 'Php')
 // ));
 
 /*

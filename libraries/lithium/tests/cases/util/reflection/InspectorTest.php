@@ -171,7 +171,8 @@ class InspectorTest extends \lithium\test\Unit {
 
 	public function testClassDependencies() {
 		$expected = array(
-			'Exception', 'ReflectionClass', 'lithium\\core\\Libraries', 'lithium\\util\\Collection'
+			'Exception', 'ReflectionClass', 'ReflectionException',
+			'lithium\\core\\Libraries', 'lithium\\util\\Collection'
 		);
 		$result = Inspector::dependencies($this->subject());
 		$this->assertEqual($expected, $result);

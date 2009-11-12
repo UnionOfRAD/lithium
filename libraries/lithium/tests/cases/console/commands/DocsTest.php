@@ -6,14 +6,13 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-use \lithium\data\Connections;
+namespace lithium\tests\cases\console\commands;
 
-Connections::add('default', 'database', array(
-	'adapter' => 'MySql',
-	'host' => 'localhost',
-	'login' => 'root',
-	'password' => '',
-	'database' => 'lithium-blog'
-));
+use \lithium\console\commands\Docs;
+
+class DocsTest extends \lithium\test\Unit {
+	
+	
+}
 
 ?>

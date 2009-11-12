@@ -59,7 +59,7 @@ class Object {
 				$flag = null;
 			}
 
-			if (!array_key_exists($key, $this->_config)) {
+			if (!isset($this->_config[$key])) {
 				continue;
 			}
 

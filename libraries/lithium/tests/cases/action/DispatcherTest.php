@@ -6,14 +6,10 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-use \lithium\data\Connections;
+namespace lithium\tests\cases\action;
 
-Connections::add('default', 'database', array(
-	'adapter' => 'MySql',
-	'host' => 'localhost',
-	'login' => 'root',
-	'password' => '',
-	'database' => 'lithium-blog'
-));
+use \lithium\action\Dispatcher;
 
-?>
+class DispatcherTest extends \lithium\test\Unit {
+	
+}

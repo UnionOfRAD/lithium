@@ -54,26 +54,24 @@ class Request extends \lithium\http\Base {
 
 	/**
 	 * headers
-	 *
+	 * {{{
+	 *     array(
+	 *          'Host' => $this->host . ":" . $this->port,
+	 *          'Connection' => 'Close', 'User-Agent' => 'Mozilla/5.0 (Lithium)'
+	 *     )
+	 * }}}
 	 * @var array
 	 */
-	public $headers = array(
-		'Host' => 'localhost:80',
-		'Connection' => 'Close',
-		'User-Agent' => 'Mozilla/5.0 (Lithium)'
-	);
+	public $headers = array();
 
 	/**
 	 * The authentication/authorization information
-	 *
+	 * {{{
+	 *     array('method' => 'Basic', 'username' => 'lithium', 'password' => 'rad')
+	 * }}}
 	 * @var array
 	 */
-	public $auth = array(
-	/*	'method' => 'Basic',
-		'username' => null,
-		'password' => null,
-	*/
-	);
+	public $auth = array();
 
 	/**
 	 * cookies
@@ -95,24 +93,23 @@ class Request extends \lithium\http\Base {
 	 * @return void
 	 */
 	public function __construct($config = array()) {
+		$defaults = array(
+			'host' => 'localhost', 'port' => 80, 'method' => 'GET', 'path' => '/',
+			'headers' => array(), 'body' => array(), 'params' => array()
+		);
+		$config += $defaults;
 		foreach ($config as $key => $value) {
-			if (isset($this->{$key}) && !is_array($this->{$key})) {
-				$this->{$key} = $value;
-			}
+			$this->{$key} = $value;
 		}
+
 		$this->protocol = "HTTP/{$this->version}";
 
-		$this->headers('Host', $this->host . ":" . $this->port);
+		$this->headers = array(
+			'Host' => $this->host . ":" . $this->port,
+			'Connection' => 'Close', 'User-Agent' => 'Mozilla/5.0 (Lithium)'
+		);
+		$this->headers($config['headers']);
 
-		if (!empty($config['headers'])) {
-			$this->headers($config['headers']);
-		}
-		if (!empty($config['body'])) {
-			$this->body($config['body']);
-		}
-		if (!empty($config['params'])) {
-			$this->params = $config['params'];
-		}
 		if (!empty($config['auth']['password'])) {
 			$this->headers('Authorization',
 				$config['auth']['method'] . ' '
