@@ -254,7 +254,7 @@ class RecordSet extends \lithium\util\Collection {
 		return $result;
 	}
 
-	public function __desctruct() {
+	public function __destruct() {
 		$this->_close();
 	}
 
