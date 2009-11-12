@@ -260,6 +260,16 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $doc->child->name;
 		$this->assertEqual($expected, $result);		
 	}
+	
+	public function testNestedSingle() {
+		$doc = new Document();
+		
+		$doc->arr1 = array('something' => 'else');
+		$doc->arr2 = array('some' => 'noses', 'have' => 'it');
+		
+		$this->assertTrue(is_a($doc->arr1, '\lithium\data\model\Document'));
+		$this->assertTrue(is_a($doc->arr2, '\lithium\data\model\Document'));   		
+	}
 
 	public function testRewindNoData() {
 		$doc = new Document();
