@@ -188,7 +188,8 @@ class Service extends \lithium\core\Object {
 			return false;
 		}
 		$this->request->method = 'DELETE';
-		return $this->_send($path, $params);
+		$this->request->params = $params;
+		return $this->_send($path);
 	}
 
 	/**
@@ -198,7 +199,7 @@ class Service extends \lithium\core\Object {
 	 */
 	public function reset() {
 		$this->last = (object)array('request' => $this->request, 'response' => $this->response);
-		$this->request->build($this->_config);
+		$this->request = new $this->_classes['request']($this->_config);
 		$this->disconnect();
 		return $this->last;
 	}

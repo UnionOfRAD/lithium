@@ -72,7 +72,8 @@ class SourceTest extends \lithium\test\Unit {
 		$existing = CompanyIntegration::find(12345);
 		$result = $existing->to('array');
 		$expected['name'] = 'Big Brother and the Holding Company';
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected[$key], $result[$key]);
+		$this->assertEqual($expected['name'], $result['name']);
 
 		$existing->delete();
 	}
