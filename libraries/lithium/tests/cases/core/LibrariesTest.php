@@ -168,14 +168,25 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testServiceLocateAll() {
+		$result = Libraries::locate('tests');
+		$this->assertTrue(count($result) > 30);
+
 		$expected = array(
 			'lithium\template\view\adapters\File', 'lithium\template\view\adapters\Simple'
 		);
 		$result = Libraries::locate('adapters.template.view');
 		$this->assertEqual($expected, $result);
+	}
 
-		$result = Libraries::locate('tests');
-		$this->assertTrue(count($result) > 30);
+	public function testServiceLocateAllCommands() {
+		$result = Libraries::locate('commands');
+		$this->assertTrue(count($result) > 11);
+
+		$expected = array(
+			'lithium\console\commands\docs\Generator', 'lithium\console\commands\docs\Todo'
+		);
+		$result = Libraries::locate('commands.docs');
+		$this->assertEqual($expected, $result);
 	}
 
 	/**

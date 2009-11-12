@@ -60,9 +60,11 @@ class Libraries {
 			'{:library}\{:namespace}\{:class}\adapters\{:name}' => array('libraries' => 'lithium')
 		),
 		'commands' => array(
+			'{:library}\extensions\commands\{:namespace}\{:class}\{:name}',
 			'{:library}\extensions\commands\{:class}\{:name}',
-			'{:library}\extensions\commands\{:name}',
-			'{:library}\console\commands\{:name}' => array('libraries' => 'lithium')
+			'{:library}\console\commands\{:namespace}\{:class}\{:name}' => array(
+				'libraries' => 'lithium'
+			),
 		),
 		'controllers' => array(
 			'{:library}\controllers\{:name}Controller'
@@ -494,6 +496,7 @@ class Libraries {
 				$options['path'] = preg_replace(
 					'/(\/\*)|(\/(?:[A-Z][a-z0-9_]*))|({:\w+})/', '', str_replace('\\', '/', $path)
 				);
+
 				if (is_dir("{$config['path']}/{$options['path']}")) {
 					$classes = array_merge($classes, static::_search($config, $options));
 				}
