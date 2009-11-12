@@ -532,7 +532,9 @@ class Libraries {
 					continue;
 				}
 				$libs = array_merge($libs, $search($dir, $config));
-				$queue = array_merge($queue, array_diff((array)glob($dir . '/*', GLOB_ONLYDIR), $libs));
+				$queue = array_merge(
+					$queue, array_diff((array)glob($dir . '/*', GLOB_ONLYDIR), $libs)
+				);
 			}
 		}
 
@@ -628,4 +630,5 @@ if (!defined('LITHIUM_LIBRARY_PATH')) {
 if (!defined('LITHIUM_APP_PATH')) {
 	define('LITHIUM_APP_PATH', dirname(LITHIUM_LIBRARY_PATH) . '/app');
 }
+
 ?>
