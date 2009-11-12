@@ -1,14 +1,55 @@
 <?php
+/**
+ * Lithium: the most rad php framework
+ *
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
 
 namespace lithium\data\source;
 
 use \Mongo;
 use \MongoId;
 
+/**
+ * A data source adapter which allows you to connect to the MongoDB database engine. MongoDB is an
+ * Open Source distributed document database which bridges the gap between key/value stores and
+ * relational databases. To learn more about MongoDB, see here:
+ * [http://www.mongodb.org/](http://www.mongodb.org/).
+ *
+ * Rather than operating on records and record sets, queries against MongoDB will return nested sets
+ * of `Document` objects. A `Document`'s fields can contain both simple and complex data types
+ * (i.e. arrays) including other `Document` objects.
+ *
+ * After installing MongoDB, you can connect to it as follows:
+ * {{{//app/config/connections.php:
+ * Connections::add('default', 'MongoDb', array('database' => 'myDb'));}}}
+ *
+ * By default, it will attempt to connect to a Mongo instance running on `localhost` on port
+ * 27017. See `__construct()` for details on how to change this.
+ *
+ * @see lithium\data\model\Document
+ * @see lithium\data\Connections::add()
+ * @see lithium\data\source\MongoDb::__construct()
+ */
 class MongoDb extends \lithium\data\Source {
 
 	protected $_db = null;
 
+	/**
+	 * Instantiates the MongoDB adapter with the default connection information.
+	 *
+	 * @param array $config All information required to connect to the database, including:
+	 *
+	 *              -'database': The name of the database to connect to. Defaults to 'lithium'.
+	 *              -'host': The IP or machine name where Mongo is running. Defaults to 'localhost'.
+	 *              -'port': The port number Mongo is listening on. The default is '27017'.
+	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
+	 * list of active connections.
+	 *
+	 * @see lithium\data\Connections::add()
+	 * @return void
+	 */
 	public function __construct($config = array()) {
 		$defaults = array(
 			'persistent' => true,
@@ -19,11 +60,15 @@ class MongoDb extends \lithium\data\Source {
 		parent::__construct((array)$config + $defaults);
 	}
 
+	/**
+	 * Ensures that the server connection is closed and resources are freed when the adapter
+	 * instance is destroyed.
+	 *
+	 * @return void
+	 */
 	public function __destruct() {
 		if ($this->_isConnected) {
 			$this->disconnect();
-			unset($this->_db);
-			unset($this->_connection);
 		}
 	}
 
@@ -60,6 +105,8 @@ class MongoDb extends \lithium\data\Source {
 	public function disconnect() {
 		if ($this->_isConnected) {
 			$this->_isConnected = !$this->_connection->close();
+			unset($this->_db);
+			unset($this->_connection);
 			return !$this->_isConnected;
 		}
 		return true;

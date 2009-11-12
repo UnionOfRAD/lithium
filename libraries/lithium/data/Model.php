@@ -75,6 +75,7 @@ class Model extends \lithium\core\StaticObject {
 		'key' => 'id',
 		'name' => null,
 		'title' => null,
+		'class' => null,
 		'source' => null,
 		'connection' => 'default'
 	);
