@@ -31,7 +31,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testConfigWithClasses() {
 		Dispatcher::config(array(
 			'classes' => array(
-				'request' => '\lithium\tests\mocks\console\MockRequestForDispatcher'
+				'request' => '\lithium\tests\mocks\console\MockDispatcherRequest'
 			)
 		));
 		$expected = 'test run';
@@ -42,7 +42,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testRunWithCommand() {
 		$result = Dispatcher::run(new Request(array(
 			'args' => array(
-				'\lithium\tests\mocks\console\MockCommandForDispatcher'
+				'\lithium\tests\mocks\console\MockDispatcherCommand'
 			)
 		)));
 		$expected = 'test run';
@@ -52,7 +52,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testRunWithPassed() {
 		$result = Dispatcher::run(new Request(array(
 			'args' => array(
-				'\lithium\tests\mocks\console\MockCommandForDispatcher',
+				'\lithium\tests\mocks\console\MockDispatcherCommand',
 				' with param'
 			)
 		)));
@@ -63,7 +63,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testRunWithAction() {
 		$result = Dispatcher::run(new Request(array(
 			'args' => array(
-				'\lithium\tests\mocks\console\MockCommandForDispatcher',
+				'\lithium\tests\mocks\console\MockDispatcherCommand',
 				'testAction'
 			)
 		)));

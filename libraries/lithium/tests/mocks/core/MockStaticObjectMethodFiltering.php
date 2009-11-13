@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\core;
 
-class MockStaticMethodFiltering extends \lithium\core\StaticObject {
+class MockStaticObjectMethodFiltering extends \lithium\core\StaticObject {
 
 	public static function method($data) {
 		$data[] = 'Starting outer method call';

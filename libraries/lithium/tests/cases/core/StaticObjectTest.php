@@ -13,7 +13,7 @@ use \lithium\core\StaticObject;
 class StaticObjectTest extends \lithium\test\Unit {
 
 	public function testMethodFiltering() {
-		$class = 'lithium\tests\mocks\core\MockStaticMethodFiltering';
+		$class = 'lithium\tests\mocks\core\MockStaticObjectMethodFiltering';
 
 		$result = $class::method(array('Starting test'));
 		$expected = array(
@@ -69,7 +69,7 @@ class StaticObjectTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testMethodInvokationWithParameters() {
-		$class = '\lithium\tests\mocks\core\MockStaticMethodFiltering';
+		$class = '\lithium\tests\mocks\core\MockStaticObjectMethodFiltering';
 
 		$this->assertEqual($class::invokeMethod('foo'), array());
 		$this->assertEqual($class::invokeMethod('foo', array('bar')), array('bar'));

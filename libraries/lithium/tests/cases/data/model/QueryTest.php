@@ -9,35 +9,14 @@
 namespace lithium\tests\cases\data\model;
 
 use \lithium\data\model\Query;
-
-class QueryPost extends \lithium\data\Model {
-
-	protected $_schema = array(
-		'id' => array('type' => 'integer', 'key' => 'primary'),
-		'author_id' => array('type' => 'integer'),
-		'title' => array('type' => 'string', 'length' => 255),
-		'body' => array('type' => 'text'),
-		'created' => array('type' => 'datetime'),
-		'updated' => array('type' => 'datetime')
-	);
-}
-
-class QueryComment extends \lithium\data\Model {
-
-	protected $_schema = array(
-		'id' => array('type' => 'integer', 'key' => 'primary'),
-		'author_id' => array('type' => 'integer'),
-		'comment' => array('type' => 'text'),
-		'created' => array('type' => 'datetime'),
-		'updated' => array('type' => 'datetime')
-	);
-}
+use \lithium\tests\mocks\data\model\MockQueryPost;
+use \lithium\tests\mocks\data\model\MockQueryComment;
 
 class QueryTest extends \lithium\test\Unit {
 
 	public function setUp() {
-		QueryPost::init();
-		QueryComment::init();
+		MockQueryPost::init();
+		MockQueryComment::init();
 	}
 
 	/**
