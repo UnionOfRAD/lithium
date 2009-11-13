@@ -53,13 +53,30 @@ class Model extends \lithium\core\StaticObject {
 		)
 	);
 
+	/**
+	 * Specifies all meta-information for this model class, including the name of the data source it
+	 * connects to, how it interacts with that class, and how its data structure is defined.
+	 *
+	 * - `key`: The primary key or identifier key for records / documents this model produces,
+	 *   i.e. `'id'` or `array('_id', '_rev')`. Defaults to `'id'`.
+	 * - `name`: The canonical name of this model. Defaults to the class name.
+	 * - `title`: The field or key used as the title for each record. Defaults to `'title'` or
+	 *   `'name'`, if those fields are available.
+	 * - `source`: The name of the database table or document collection to bind to. Defaults to the
+	 *   lower-cased and underscored name of the class, i.e. `class UserProfile` maps to
+	 *   `'user_profiles'`.
+	 * - `connection`: The name of the connection (as defined in `Connections::add()`) to which the
+	 *   model should bind
+	 *
+	 * @var array
+	 * @see lithium\data\Connections::add()
+	 */
 	protected $_meta = array(
 		'key' => 'id',
 		'name' => null,
-		'class' => null,
 		'title' => null,
+		'class' => null,
 		'source' => null,
-		'prefix' => null,
 		'connection' => 'default'
 	);
 

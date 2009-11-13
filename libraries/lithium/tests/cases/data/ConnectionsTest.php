@@ -86,7 +86,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$result = Connections::get('conn-test');
 		$this->assertTrue($result instanceof \lithium\data\source\database\adapter\MySql);
 
-		$this->assertNull(Connections::get('conn-test-2', array('autoBuild' => false)));
+		$this->assertNull(Connections::get('conn-test-2', array('autoCreate' => false)));
 	}
 
 	public function testInvalidConnection() {
