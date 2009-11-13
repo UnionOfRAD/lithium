@@ -20,8 +20,8 @@ class Inflector {
 	 * extended or added to using `Inflector::rules()`.
 	 *
 	 * @var array
-	 * @see \lithium\util\Inflector::slug()
-	 * @see \lithium\util\Inflector::rules()
+	 * @see lithium\util\Inflector::slug()
+	 * @see lithium\util\Inflector::rules()
 	 */
 	protected static $_transliterations = array(
 		'/à|á|å|â/' => 'a',
@@ -45,7 +45,7 @@ class Inflector {
 	 * rules to this list using `Inflector::rules()`.
 	 *
 	 * @var array
-	 * @see \lithium\util\Inflector::rules()
+	 * @see lithium\util\Inflector::rules()
 	 */
 	protected static $_uninflected = array(
 		'Amoyese', 'bison', 'Borghese', 'bream', 'breeches', 'britches', 'buffalo', 'cantus',
@@ -73,7 +73,7 @@ class Inflector {
 	 *   - `'irregular'`: Contains key-value pairs of specific words which are not inflected
 	 *     according to the rules. This is populated from `Inflector::$_plural` when the class
 	 *     is loaded.
-	 * @see \lithium\util\Inflector::rules()
+	 * @see lithium\util\Inflector::rules()
 	 */
 	protected static $_singular = array(
 		'rules' => array(
@@ -133,7 +133,7 @@ class Inflector {
 	 *     inflected (i.e. singular and plural are the same).
 	 *   - `'irregular'`: Contains key-value pairs of specific words which are not inflected
 	 *     according to the rules.
-	 * @see \lithium\util\Inflector::rules()
+	 * @see lithium\util\Inflector::rules()
 	 */
 	protected static $_plural = array(
 		'rules' => array(
@@ -450,7 +450,7 @@ class Inflector {
 	 * @param string $string An arbitrary string to convert.
 	 * @param string $replacement The replacement to use for spaces.
 	 * @return string The converted string.
-	 * @see \lithium\util\Inflector::rules()
+	 * @see lithium\util\Inflector::rules()
 	 */
 	public static function slug($string, $replacement = '_') {
 		$map = static::$_transliterations + array(
