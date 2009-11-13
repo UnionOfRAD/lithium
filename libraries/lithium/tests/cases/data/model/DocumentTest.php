@@ -419,9 +419,8 @@ class DocumentTest extends \lithium\test\Unit {
 			'result' => $resource
 		));
 
-		$expected = array('id' => 1, 'name' => 'Joe');
 		$result = $doc->rewind();
-		$this->assertTrue($result);
+		$this->assertTrue(is_a($result,'\lithium\data\model\Document'));	
 
 		$expected = array('id' => 2, 'name' => 'Moe');
 		$result = $doc->next()->to('array');
