@@ -129,7 +129,6 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function create($query, $options = array()) {
 		$params = compact('query', 'options');
-
 		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			extract($params);
 			$params = $query->export($self);
@@ -138,9 +137,10 @@ class CouchDb extends \lithium\data\source\Http {
 			if (!empty($data['_id'])) {
 				$id = '/' . $data['_id'];
 				$data['_id'] = (string) $data['_id'];
+				$result = $self->put($params['table'].$id, $data);
+			} else {
+				$result = $self->post($params['table'], $data);
 			}
-
-			$result = $self->put($params['table'] . $id, $data);
 
 			if (isset($result->ok) && $result->ok === true) {
 				$query->record()->invokeMethod('_update', array($result->id));
