@@ -11,6 +11,8 @@ namespace lithium\tests\mocks\data\model;
 use \lithium\data\model\Document;
 
 class MockDocumentPost extends \lithium\data\Model {
+	
+	public static function __init($options = array()) {}
 
 	public function ret($record, $param1 = null, $param2 = null) {
 		if ($param2) {
@@ -28,11 +30,11 @@ class MockDocumentPost extends \lithium\data\Model {
 
 	public static function find($type = 'all', $options = array()) {
 		switch ($type) {
-			case 'first' : {
+			case 'first':
 				return new Document(array('items' =>
 					array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two')
 				));
-			}
+			break;
 			case 'all':
 			default :
 				return new Document(array('items' => array(
