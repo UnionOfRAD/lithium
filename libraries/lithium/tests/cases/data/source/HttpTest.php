@@ -14,8 +14,7 @@ class HttpTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
 		'classes' => array(
-			'service' => 'lithium\tests\mocks\http\MockService',
-			'socket' => '\lithium\tests\mocks\socket\MockSocket'
+			'socket' => '\lithium\tests\mocks\data\source\http\adapter\MockSocket'
 		),
 		'persistent' => false,
 		'protocol' => 'tcp',

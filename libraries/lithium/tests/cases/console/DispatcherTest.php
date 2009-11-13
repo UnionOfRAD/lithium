@@ -11,24 +11,6 @@ namespace lithium\tests\cases\console;
 use \lithium\console\Dispatcher;
 use \lithium\console\Request;
 
-class TestCommandForDispatcherTest extends \lithium\console\Command {
-
-	public function run($param = null) {
-		return 'test run' . $param;
-	}
-
-	public function testAction() {
-		return 'test action';
-	}
-}
-
-class TestRequestForDispatcherTest extends \lithium\console\Request {
-
-	public $params = array(
-		'command' => '\lithium\tests\cases\console\TestCommandForDispatcherTest'
-	);
-}
-
 class DispatcherTest extends \lithium\test\Unit {
 
 	public function setUp() {
@@ -49,7 +31,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testConfigWithClasses() {
 		Dispatcher::config(array(
 			'classes' => array(
-				'request' => '\lithium\tests\cases\console\TestRequestForDispatcherTest'
+				'request' => '\lithium\tests\mocks\console\MockRequestForDispatcher'
 			)
 		));
 		$expected = 'test run';
@@ -60,7 +42,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testRunWithCommand() {
 		$result = Dispatcher::run(new Request(array(
 			'args' => array(
-				'\lithium\tests\cases\console\TestCommandForDispatcherTest'
+				'\lithium\tests\mocks\console\MockCommandForDispatcher'
 			)
 		)));
 		$expected = 'test run';
@@ -70,7 +52,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testRunWithPassed() {
 		$result = Dispatcher::run(new Request(array(
 			'args' => array(
-				'\lithium\tests\cases\console\TestCommandForDispatcherTest',
+				'\lithium\tests\mocks\console\MockCommandForDispatcher',
 				' with param'
 			)
 		)));
@@ -81,7 +63,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testRunWithAction() {
 		$result = Dispatcher::run(new Request(array(
 			'args' => array(
-				'\lithium\tests\cases\console\TestCommandForDispatcherTest',
+				'\lithium\tests\mocks\console\MockCommandForDispatcher',
 				'testAction'
 			)
 		)));

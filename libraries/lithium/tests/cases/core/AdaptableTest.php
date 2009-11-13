@@ -11,17 +11,7 @@ namespace lithium\tests\cases\core;
 use \lithium\util\Collection;
 use \lithium\core\Adaptable;
 use \lithium\storage\cache\adapters\Memory;
-
-class MockAdapter extends \lithium\core\Adaptable {
-
-       protected static $_configurations = null;
-
-       public static function adapter($name) {
-               return static::_adapter('adapters.storage.cache', $name);
-       }
-
-}
-
+use \lithium\tests\mocks\core\MockAdapter;
 
 class AdaptableTest extends \lithium\test\Unit {
 

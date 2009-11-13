@@ -10,13 +10,7 @@ namespace lithium\tests\cases\data\source\database\adapter;
 
 use \lithium\data\Connections;
 use \lithium\data\source\database\adapter\Sqlite3;
-
-class SqliteMock extends Sqlite3 {
-
-	public function get($var) {
-		return $this->{$var};
-	}
-}
+use \lithium\tests\mocks\data\source\database\adapter\MockSqlite3;
 
 class Sqlite3Test extends \lithium\test\Unit {
 
@@ -47,7 +41,7 @@ class Sqlite3Test extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testConstructorDefaults() {
-		$db = new SqliteMock(array('autoConnect' => false));
+		$db = new MockSqlite3(array('autoConnect' => false));
 		$result = $db->get('_config');
 		$expected = array(
 		  'autoConnect' => false,

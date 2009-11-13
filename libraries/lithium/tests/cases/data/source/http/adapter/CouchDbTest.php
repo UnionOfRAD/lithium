@@ -18,8 +18,8 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
 		'classes' => array(
-			'service' => 'lithium\tests\mocks\http\MockCouchService',
-			'socket' => '\lithium\tests\mocks\socket\MockSocket'
+			'service' => 'lithium\tests\mocks\data\source\http\adapter\MockService',
+			'socket' => '\lithium\tests\mocks\data\source\http\adapter\MockSocket'
 		),
 		'persistent' => false,
 		'protocol' => 'tcp',

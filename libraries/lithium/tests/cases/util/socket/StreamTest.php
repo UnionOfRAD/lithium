@@ -8,12 +8,7 @@
 
 namespace lithium\tests\cases\util\socket;
 
-class StreamMock extends \lithium\util\socket\Stream {
-
-	public function resource() {
-		return $this->_resource;
-	}
-}
+use \lithium\tests\mocks\util\socket\MockStream;
 
 class StreamTest extends \lithium\test\Unit {
 
@@ -28,7 +23,7 @@ class StreamTest extends \lithium\test\Unit {
 	);
 
 	public function testAllMethodsNoConnection() {
-		$stream = new StreamMock(array('protocol' => null));
+		$stream = new MockStream(array('protocol' => null));
 		$this->assertFalse($stream->open());
 		$this->assertTrue($stream->close());
 		$this->assertFalse($stream->timeout(2));
@@ -38,7 +33,7 @@ class StreamTest extends \lithium\test\Unit {
 	}
 
 	public function testOpen() {
-		$stream = new StreamMock($this->_testConfig);
+		$stream = new MockStream($this->_testConfig);
 		$result = $stream->open();
 		$this->assertTrue($result);
 
@@ -47,7 +42,7 @@ class StreamTest extends \lithium\test\Unit {
 	}
 
 	public function testClose() {
-		$stream = new StreamMock($this->_testConfig);
+		$stream = new MockStream($this->_testConfig);
 		$result = $stream->open();
 		$this->assertTrue($result);
 
@@ -59,7 +54,7 @@ class StreamTest extends \lithium\test\Unit {
 	}
 
 	public function testTimeout() {
-		$stream = new StreamMock($this->_testConfig);
+		$stream = new MockStream($this->_testConfig);
 		$result = $stream->open();
 		$stream->timeout(10);
 		$result = $stream->resource();
@@ -67,15 +62,15 @@ class StreamTest extends \lithium\test\Unit {
 	}
 
 	public function testEncoding() {
-		$stream = new StreamMock($this->_testConfig);
+		$stream = new MockStream($this->_testConfig);
 		$result = $stream->open();
 		$stream->encoding('UTF-8');
 		$result = $stream->resource();
 		$this->assertTrue(is_resource($result));
 	}
-	
+
 	public function testWriteAndRead() {
-		$stream = new StreamMock($this->_testConfig);
+		$stream = new MockStream($this->_testConfig);
 		$result = $stream->open();
 		$data = "GET / HTTP/1.1\r\n";
 		$data .= "Host: localhost\r\n";

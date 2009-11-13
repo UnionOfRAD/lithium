@@ -10,7 +10,7 @@ class ServiceTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
 		'classes' => array(
-			'socket' => '\lithium\tests\mocks\socket\MockSocket'
+			'socket' => '\lithium\tests\mocks\http\MockSocket'
 		),
 		'persistent' => false,
 		'protocol' => 'tcp',

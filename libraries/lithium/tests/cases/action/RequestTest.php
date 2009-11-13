@@ -9,34 +9,8 @@
 namespace lithium\tests\cases\action;
 
 use \lithium\action\Request;
-
-class IisRequest extends \lithium\action\Request {
-
-	protected function _init() {
-		parent::_init();
-		$this->_env = array(
-			'PLATFORM' => 'IIS',
-			'SCRIPT_NAME' => '\index.php',
-			'SCRIPT_FILENAME' => false,
-			'DOCUMENT_ROOT' => false,
-			'PATH_TRANSLATED' => '\lithium\app\webroot\index.php',
-			'HTTP_PC_REMOTE_ADDR' => '123.456.789.000'
-		);
-	}
-}
-
-class CgiRequest extends \lithium\action\Request {
-
-	protected function _init() {
-		parent::_init();
-		$this->_env = array(
-			'PLATFORM' => 'CGI',
-			'SCRIPT_FILENAME' => false,
-			'DOCUMENT_ROOT' => false,
-			'SCRIPT_URL' => '/lithium/app/webroot/index.php',
-		);
-	}
-}
+use \lithium\tests\mocks\action\MockIisRequest;
+use \lithium\tests\mocks\action\MockCgiRequest;
 
 class RequestTest extends \lithium\test\Unit {
 
@@ -111,7 +85,7 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testPlatform() {
-		$request = new IisRequest();
+		$request = new MockIisRequest();
 
 		$expected = 'IIS';
 		$result = $request->env('PLATFORM');
@@ -119,7 +93,7 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testScriptFilenameTranslatedForIIS() {
-		$request = new IisRequest();
+		$request = new MockIisRequest();
 
 		$expected = '\\lithium\\app\\webroot\\index.php';
 		$result = $request->env('SCRIPT_FILENAME');
@@ -136,7 +110,7 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testDocumentRootTranslatedForIIS() {
-		$request = new IisRequest();
+		$request = new MockIisRequest();
 
 		$expected = '\\lithium\\app\\webroot';
 		$result = $request->env('DOCUMENT_ROOT');
@@ -180,7 +154,7 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testRemoteAddrFromHttpPcRemoteAddr() {
-		$request = new IisRequest();
+		$request = new MockIisRequest();
 
 		$expected = '123.456.789.000';
 		$result = $request->env('REMOTE_ADDR');
@@ -215,7 +189,7 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testPhpSelfTranslatedForIIS() {
-		$request = new IisRequest();
+		$request = new MockIisRequest();
 
 		$expected = '/index.php';
 		$result = $request->env('PHP_SELF');
@@ -232,7 +206,7 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testCgiPlatform() {
-		$request = new CgiRequest();
+		$request = new MockCgiRequest();
 
 		$expected = true;
 		$result = $request->env('CGI_MODE');
@@ -240,7 +214,7 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testCgiScriptUrl() {
-		$request = new CgiRequest();
+		$request = new MockCgiRequest();
 
 		$expected = '/lithium/app/webroot/index.php';
 		$result = $request->env('SCRIPT_NAME');

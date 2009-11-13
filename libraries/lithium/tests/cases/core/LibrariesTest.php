@@ -10,17 +10,6 @@ namespace lithium\tests\cases\core;
 
 use \lithium\core\Libraries;
 
-class MockLibraries extends \lithium\core\Libraries {
-
-	public static function paths($type, $libraries, $params = array(), $options = array()) {
-		return static::_paths($type, $libraries, $params, $options);
-	}
-
-	public static function search($paths, $options = array()) {
-		return static::_search($paths, $options);
-	}
-}
-
 class LibrariesTest extends \lithium\test\Unit {
 
 	public function testNamespaceToFileTranslation() {

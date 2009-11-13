@@ -9,28 +9,8 @@
 namespace lithium\tests\cases\action;
 
 use \lithium\action\Response;
-
-class TestRequestType extends \lithium\action\Request {
-
-	public function type() {
-		return 'foo';
-	}
-}
-
-class MockResponse extends Response {
-
-	public $testHeaders = array();
-
-	public function render() {
-		$this->testHeaders = array();
-		parent::render();
-		$this->headers = array();
-	}
-
-	protected function _writeHeader($header, $code = null) {
-		$this->testHeaders[] = $header;
-	}
-}
+use \lithium\tests\mocks\action\MockRequestType;
+use \lithium\tests\mocks\action\MockResponse;
 
 class ResponseTest extends \lithium\test\Unit {
 
@@ -41,7 +21,7 @@ class ResponseTest extends \lithium\test\Unit {
 	}
 
 	public function testDefaultTypeInitialization() {
-		$this->response = new Response(array('request' => new TestRequestType()));
+		$this->response = new Response(array('request' => new MockRequestType()));
 		$this->assertEqual('foo', $this->response->type());
 	}
 
