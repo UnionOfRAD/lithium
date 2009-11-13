@@ -215,7 +215,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param string $options
 	 * @return boolean
 	 */
-	public function delete($query, $options) {
+	public function delete($query, $options = array()) {
 		$query = $query->export($this);
 		extract($query, EXTR_OVERWRITE);
 		if (!empty($conditions['_id'])) {
