@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\console;
 
-class MockCommandForDispatcher extends \lithium\console\Command {
+class MockDispatcherCommand extends \lithium\console\Command {
 
 	public function run($param = null) {
 		return 'test run' . $param;

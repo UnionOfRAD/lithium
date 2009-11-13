@@ -9,91 +9,13 @@
 namespace lithium\tests\cases\data\model;
 
 use \lithium\data\model\Document;
-
-class DocumentSource extends \lithium\data\Source {
-	
-	public function connect() {	}
-	public function disconnect() {}
-	public function entities($class = null) {}
-	public function describe($entity, $meta = array()) { }
-	public function create($query, $options) {	}
-	public function update($query, $options) {	}
-	public function delete($query, $options) {	}
-	
-	protected $point = 0;
-	protected $result = null;
-	
-	public function read($query = null, $options = null) {	
-		$this->point = 0;
-		$this->result = array(
-			array('id' => 1, 'name' => 'Joe'),
-			array('id' => 2, 'name' => 'Moe'),
-			array('id' => 3, 'name' => 'Roe')
-		);	
-	} 
-	public function hasNext() {
-		return (is_array($this->result) && sizeof($this->result) > $this->point);
-	}
-	public function getNext() {
-		return $this->result[$this->point++];
-	}
-	
-	public function result($type, $resource, $context) {
-		switch ($type) {
-			case 'next':
-				$result = $resource->hasNext() ? $resource->getNext() : null;
-			break;
-			case 'close':
-				unset($resource);
-				$result = null;
-				break;
-		
-		}
-		return $result;
-	}
-
-
-}
-
-class DocumentPost extends \lithium\data\Model {
-
-	public function ret($record, $param1 = null, $param2 = null) {
-		if ($param2) {
-			return $param2;
-		} 
-		if ($param1) {
-			return $param1;
-		} 
-		return null;
-	}
-	
-	public function medicin($record) {
-		return 'lithium';
-	}
-	
-	public static function find($type = 'all', $options = array()) {
-		switch ($type) {
-			case 'first' : {
-				return new Document(array('items' =>
-					array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two')
-				));
-			}
-			case 'all':
-			default :
-				return new Document(array('items' => array(
-					array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
-					array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
-					array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
-				)));
-			break;
-		}
-	}
-}
+use lithium\tests\mocks\data\model\MockDocumentPost;
+use lithium\tests\mocks\data\model\MockDocumentSource;
 
 class DocumentTest extends \lithium\test\Unit {
 
 	public function testFindAllAndIterate() {
-		$document = DocumentPost::find('all');
+		$document = MockDocumentPost::find('all');
 
 		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');			
 		$result = $document->current();
@@ -117,7 +39,7 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 	
 	public function testFindOne() {
-		$document = DocumentPost::find('first');
+		$document = MockDocumentPost::find('first');
 
 		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
 		$result = $document->data();
@@ -125,7 +47,7 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 
 	public function testGetFields() {	
-		$document = DocumentPost::find('first');	
+		$document = MockDocumentPost::find('first');	
 
 		$expected = 2;
 		$result = $document->id;
@@ -293,10 +215,10 @@ class DocumentTest extends \lithium\test\Unit {
 
 	public function testCreating() {
 		$doc = new Document(array(
-			'model' => __NAMESPACE__ .'\DocumentPost'
+			'model' => 'lithium\tests\mocks\data\model\MockDocumentPost',
 		));
 		$expected = 'id';
-		$result = DocumentPost::meta('key');
+		$result = MockDocumentPost::meta('key');
 		$this->assertEqual($expected, $result);
 
 		$doc->id = 3;
@@ -313,7 +235,7 @@ class DocumentTest extends \lithium\test\Unit {
 	
 	public function testArrayValueNestedDocument() {
 		$doc = new Document(array(
-			'model' => __NAMESPACE__ .'\DocumentPost',
+			'model' => 'lithium\tests\mocks\data\model\MockDocumentPost',
 			'items' => array(
 				'id' => 12, 'arr' => array('id' => 33, 'name' => 'stone'), 'name' => 'bird'
 			)
@@ -348,7 +270,7 @@ class DocumentTest extends \lithium\test\Unit {
 
 	public function testArrayValueGet() {
 		$doc = new Document(array(
-			'model' => __NAMESPACE__ .'\DocumentPost',
+			'model' => 'lithium\tests\mocks\data\model\MockDocumentPost',
 			'items' => array('id' => 12, 'name' => 'Joe', 'sons' => array('Moe', 'Greg'))
 		));
 
@@ -391,7 +313,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $doc->medicin();
 		$this->assertNull($result);	
 		
-		$doc = new Document(array('model' => __NAMESPACE__ .'\DocumentPost'));
+		$doc = new Document(array('model' => 'lithium\tests\mocks\data\model\MockDocumentPost'));
 		
 		$expected = 'lithium';
 		$result = $doc->medicin();
@@ -411,11 +333,11 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 
 	public function testPopulateResourceClose() {	
-		$resource = new DocumentSource();
+		$resource = new MockDocumentSource();
 		$resource->read();
 		$doc = new Document(array(
-			'model' => __NAMESPACE__ .'\DocumentPost',
-			'handle' => new DocumentSource(),
+			'model' => 'lithium\tests\mocks\data\model\MockDocumentPost',
+			'handle' => new MockDocumentSource(),
 			'result' => $resource
 		));
 
@@ -436,7 +358,7 @@ class DocumentTest extends \lithium\test\Unit {
 
 	public function testEmptyValues() {
 		$doc = new Document(array(
-			'model' => __NAMESPACE__ .'\DocumentPost',
+			'model' => 'lithium\tests\mocks\data\model\MockDocumentPost',
 			'data' => array(
 				'title' => 'Post',
 				'content' => 'Lorem Ipsum',

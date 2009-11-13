@@ -9,133 +9,78 @@
 namespace lithium\tests\cases\data;
 
 use \lithium\data\Model;
-use \lithium\data\model\Query;
-use \lithium\data\model\Record;
-use \lithium\data\model\RecordSet;
-
-class Post extends Model {
-
-	public $hasMany = array('Comment');
-
-	public static function resetSchema() {
-		static::_instance()->_schema = array();
-	}
-
-	public static function instances() {
-		return array_keys(static::$_instances);
-	}
-}
-
-class Comment extends Model {
-
-	public $belongsTo = array('Post');
-
-	protected $_meta = array('key' => 'comment_id');
-
-	public static function find($type, $options = array()) {
-		$defaults = array(
-			'conditions' => null, 'fields' => null, 'order' => null, 'limit' => null, 'page' => 1
-		);
-		$options += $defaults;
-		$params = compact('type', 'options');
-		$self = static::_instance();
-
-		$filter = function($self, $params) {
-			extract($params);
-			$query = new Query(array('type' => 'read') + $options);
-
-			return new RecordSet(array(
-				'query'    => $query,
-				'items'    => array_map(
-					function($data) { return new Record(compact('data')); },
-					array(
-						array('comment_id' => 1, 'author_id' => 123, 'text' => 'First comment'),
-						array('comment_id' => 2, 'author_id' => 241, 'text' => 'Second comment'),
-						array('comment_id' => 3, 'author_id' => 451, 'text' => 'Third comment')
-					)
-				)
-			));
-		};
-		$finder = isset($self->_finders[$type]) ? array($self->_finders[$type]) : array();
-		return static::_filter(__METHOD__, $params, $filter, $finder);
-	}
-}
-
-class Tag extends Model {
-}
-
-class Tagging extends Model {
-
-	protected $_meta = array('source' => 'posts_tags', 'key' => array('post_id', 'tag_id'));
-}
+use \lithium\tests\mocks\data\MockPost;
+use \lithium\tests\mocks\data\MockComment;
+use \lithium\tests\mocks\data\MockTag;
+use \lithium\tests\mocks\data\MockTagging;
 
 class ModelTest extends \lithium\test\Unit {
 
 	public function setUp() {
-		Post::__init();
-		Comment::__init();
+		MockPost::__init();
+		MockComment::__init();
 	}
 
 	public function testClassInitialization() {
-		$expected = Post::instances();
-		Post::__init();
-		$this->assertEqual($expected, Post::instances());
+		$expected = MockPost::instances();
+		MockPost::__init();
+		$this->assertEqual($expected, MockPost::instances());
 
 		Model::__init();
-		$this->assertEqual($expected, Post::instances());
+		$this->assertEqual($expected, MockPost::instances());
 
-		$this->assertEqual('posts', Post::meta('source'));
+		$this->assertEqual('mock_posts', MockPost::meta('source'));
 
-		Post::__init(array('source' => 'post'));
-		$this->assertEqual('post', Post::meta('source'));
+		MockPost::__init(array('source' => 'post'));
+		$this->assertEqual('post', MockPost::meta('source'));
 
-		Post::__init(array('source' => false));
-		$this->assertIdentical(false, Post::meta('source'));
+		MockPost::__init(array('source' => false));
+		$this->assertIdentical(false, MockPost::meta('source'));
 
-		Post::__init(array('source' => null));
-		$this->assertIdentical('posts', Post::meta('source'));
+		MockPost::__init(array('source' => null));
+		$this->assertIdentical('mock_posts', MockPost::meta('source'));
 	}
 
 	public function testMetaInformation() {
 		$expected = array(
-			'class'       => __NAMESPACE__ . '\Post',
-			'name'       => 'Post',
+			'class'       => 'lithium\tests\mocks\data\MockPost',
+			'name'       => 'MockPost',
 			'key'        => 'id',
 			'title'      => 'title',
-			'source'     => 'posts',
+			'source'     => 'mock_posts',
 			'connection' => 'default'
 		);
-		$this->assertEqual($expected, Post::meta());
+		$this->assertEqual($expected, MockPost::meta());
 
 		$expected = array(
-			'class'       => __NAMESPACE__ . '\Comment',
-			'name'       => 'Comment',
+			'class'       => 'lithium\tests\mocks\data\MockComment',
+			'name'       => 'MockComment',
 			'key'        => 'comment_id',
 			'title'      => 'comment_id',
-			'source'     => 'comments',
+			'source'     => 'mock_comments',
 			'connection' => 'default'
 		);
-		$this->assertEqual($expected, Comment::meta());
+		$this->assertEqual($expected, MockComment::meta());
 
 		$expected += array('foo' => 'bar');
-		$this->assertEqual($expected, Comment::meta('foo', 'bar'));
+		$this->assertEqual($expected, MockComment::meta('foo', 'bar'));
 
 		$expected += array('bar' => true, 'baz' => false);
-		$this->assertEqual($expected, Comment::meta(array('bar' => true, 'baz' => false)));
+		$this->assertEqual($expected, MockComment::meta(array('bar' => true, 'baz' => false)));
 	}
 
 	public function testSchemaLoading() {
-		$result = Post::schema();
+		$result = MockPost::schema();
 		$this->assertTrue($result);
 
-		Post::resetSchema();
-		$this->assertEqual($result, Post::schema());
+		MockPost::resetSchema();
+		$this->assertEqual($result, MockPost::schema());
 	}
 
 	public function testFieldIntrospection() {
-		$this->assertTrue(Comment::hasField('comment_id'));
-		$this->assertFalse(Comment::hasField('foo'));
-		$this->assertEqual('comment_id', Comment::hasField(array('comment_id')));
+		$this->assertTrue(MockComment::hasField('comment_id'));
+		$this->assertFalse(MockComment::hasField('foo'));
+		$this->assertEqual('comment_id', MockComment::hasField(array('comment_id')));
 	}
 
 	/**
@@ -146,29 +91,29 @@ class ModelTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testRelationshipIntrospection() {
-		$result = Post::relations();
-		$expected = array('Comment');
+		$result = MockPost::relations();
+		$expected = array('MockComment');
 		$this->assertEqual($expected, $result);
 
-		$result = Post::relations('hasMany');
+		$result = MockPost::relations('hasMany');
 		$this->assertEqual($expected, $result);
 
-		$result = Comment::relations();
-		$expected = array('Post');
+		$result = MockComment::relations();
+		$expected = array('MockPost');
 		$this->assertEqual($expected, $result);
 
-		$result = Comment::relations('belongsTo');
+		$result = MockComment::relations('belongsTo');
 		$this->assertEqual($expected, $result);
 
-		$this->assertFalse(Comment::relations('hasMany'));
-		$this->assertFalse(Post::relations('belongsTo'));
+		$this->assertFalse(MockComment::relations('hasMany'));
+		$this->assertFalse(MockPost::relations('belongsTo'));
 
-		$this->assertNull(Comment::relations('Post'));
-		$this->assertNull(Post::relations('Comment'));
+		$this->assertNull(MockComment::relations('MockPost'));
+		$this->assertNull(MockPost::relations('MockComment'));
 	}
 
 	public function testSimpleRecordCreation() {
-		$comment = Comment::create(array(
+		$comment = MockComment::create(array(
 			'author_id' => 451,
 			'text' => 'Do you ever read any of the books you burn?'
 		));
@@ -181,7 +126,7 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testSimpleFind() {
-		$result = Post::find('all');
+		$result = MockPost::find('all');
 		$this->assertTrue($result instanceof \lithium\data\model\RecordSet);
 	}
 
@@ -191,15 +136,15 @@ class ModelTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testSimpleFindFirst() {
-		$result = Comment::first();
-		$this->assertTrue($result instanceof Record);
+		$result = MockComment::first();
+		$this->assertTrue($result instanceof \lithium\data\model\Record);
 
 		$expected = 'First comment';
 		$this->assertEqual($expected, $result->text);
 	}
 
 	public function testFilteredFind() {
-		Post::applyFilter('find', function($self, $params, $chain) {
+		MockPost::applyFilter('find', function($self, $params, $chain) {
 			$result = $chain->next($self, $params, $chain);
 			return $result;
 		});
@@ -207,22 +152,22 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testCustomFinder() {
 		$finder = function() {};
-		Post::finder('custom', $finder);
-		$this->assertIdentical($finder, Post::finder('custom'));
+		MockPost::finder('custom', $finder);
+		$this->assertIdentical($finder, MockPost::finder('custom'));
 	}
 
 	public function testCustomFindMethods() {
-		print_r(Post::findFirstById());
+		print_r(MockPost::findFirstById());
 	}
 
 	public function testKeyGeneration() {
-		$this->assertEqual('comment_id', Comment::key());
-		$this->assertEqual(array('post_id', 'tag_id'), Tagging::key());
+		$this->assertEqual('comment_id', MockComment::key());
+		$this->assertEqual(array('post_id', 'tag_id'), MockTagging::key());
 
-		$result = Comment::key(array('comment_id' => 5, 'body' => 'This is a comment'));
+		$result = MockComment::key(array('comment_id' => 5, 'body' => 'This is a comment'));
 		$this->assertEqual(5, $result);
 
-		$result = Tagging::key(array(
+		$result = MockTagging::key(array(
 			'post_id' => 2,
 			'tag_id' => 5,
 			'created' => '2009-06-16 10:00:00'
@@ -231,7 +176,7 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testRelations() {
-		
+
 	}
 }
 

@@ -6,13 +6,10 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\mocks\console;
+namespace lithium\tests\mocks\data;
 
-class MockRequestForDispatcher extends \lithium\console\Request {
+class MockTag extends \lithium\data\Model {
 
-	public $params = array(
-		'command' => '\lithium\tests\mocks\console\MockCommandForDispatcher'
-	);
 }
 
 ?>
