@@ -71,8 +71,8 @@ class Message extends \lithium\core\StaticObject {
 	 *              - `'scope'`: The scope of the message.
 	 * @return string
 	 *
-	 * @see \lithium\console\commands\g11n\Extract
-	 * @see \lithium\g11n\catalog\adapters\Code
+	 * @see lithium\console\commands\g11n\Extract
+	 * @see lithium\g11n\catalog\adapters\Code
 	 */
 	public static function translate($singular, $options = array()) {
 		$defaults = array(
@@ -101,7 +101,7 @@ class Message extends \lithium\core\StaticObject {
 	 * @param string $scope The scope of the message ID.
 	 * @return string|void The translated message or `null` if `$singular` is not
 	 *         translateable or a plural rule couldn't be found.
-	 * @see \lithium\g11n\Catalog
+	 * @see lithium\g11n\Catalog
 	 * @todo Message pages need caching.
 	 */
 	protected static function _translated($id, $locale, $count = null, $scope = null) {

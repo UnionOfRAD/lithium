@@ -15,7 +15,7 @@ use \lithium\util\Collection;
  * extend.
  *
  * `Adaptable` provides the logic necessary for generic configuration of named adapter
- * configurations (such as the ones used in Cache, as well as a unified method of
+ * configurations (such as the ones used in `Cache`, as well as a unified method of
  * locating and obtaining an instance to a specified adapter.
  *
  * All immediate subclasses to `Adaptable` must implement the `adapter` method,
@@ -25,9 +25,9 @@ use \lithium\util\Collection;
  *
  * This static class should never be called explicitly.
  *
- * @see \lithium\storage\Cache
- * @see \lithium\storage\Session
- * @see \lithium\util\audit\Logger
+ * @see lithium\storage\Cache
+ * @see lithium\storage\Session
+ * @see lithium\util\audit\Logger
  *
  * @todo Implement as abtract class with abstract method `adapter` when
  *       Inspector has been fixed.

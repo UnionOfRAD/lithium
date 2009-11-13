@@ -21,7 +21,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * Indicates whether the current position is valid or not.
 	 *
 	 * @var boolean
-	 * @see \lithium\util\Collection::valid()
+	 * @see lithium\util\Collection::valid()
 	 */
 	protected $_valid = false;
 

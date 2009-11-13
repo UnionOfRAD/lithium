@@ -18,7 +18,7 @@ use \RecursiveDirectoryIterator;
  * message catalog templates. Currently only code written in PHP is supported through a parser
  * using the built-in tokenizer.
  *
- * @see \lithium\g11n\Message
+ * @see lithium\g11n\Message
  */
 class Code extends \lithium\g11n\catalog\adapters\Base {
 

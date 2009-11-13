@@ -25,9 +25,9 @@ namespace lithium\storage\cache\adapters;
  * adapters, since APC cache expirations are only evaluated on requests subsequent
  * to their initial storage.
  *
- * @see \lithium\storage\Cache::key()
- * @link http://php.net/manual/en/book.apc.php PHP APC
+ * Learn more about APC in the [PHP APC manual](http://php.net/manual/en/book.apc.php).
  *
+ * @see lithium\storage\Cache::key()
  */
 class Apc extends \lithium\core\Object {
 

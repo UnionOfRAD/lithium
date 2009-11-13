@@ -10,6 +10,51 @@ namespace lithium\tests\cases\data\model;
 
 use \lithium\data\model\Document;
 
+class DocumentSource extends \lithium\data\Source {
+	
+	public function connect() {	}
+	public function disconnect() {}
+	public function entities($class = null) {}
+	public function describe($entity, $meta = array()) { }
+	public function create($query, $options) {	}
+	public function update($query, $options) {	}
+	public function delete($query, $options) {	}
+	
+	protected $point = 0;
+	protected $result = null;
+	
+	public function read($query = null, $options = null) {	
+		$this->point = 0;
+		$this->result = array(
+			array('id' => 1, 'name' => 'Joe'),
+			array('id' => 2, 'name' => 'Moe'),
+			array('id' => 3, 'name' => 'Roe')
+		);	
+	} 
+	public function hasNext() {
+		return (is_array($this->result) && sizeof($this->result) > $this->point);
+	}
+	public function getNext() {
+		return $this->result[$this->point++];
+	}
+	
+	public function result($type, $resource, $context) {
+		switch ($type) {
+			case 'next':
+				$result = $resource->hasNext() ? $resource->getNext() : null;
+			break;
+			case 'close':
+				unset($resource);
+				$result = null;
+				break;
+		
+		}
+		return $result;
+	}
+
+
+}
+
 class DocumentPost extends \lithium\data\Model {
 
 	public function ret($record, $param1 = null, $param2 = null) {
@@ -134,9 +179,9 @@ class DocumentTest extends \lithium\test\Unit {
 	
 	public function testExplicitSet() {
 		$doc = new Document();
-		$doc->set('id', 4);
-		$doc->set('name', 'Four');
-		$doc->set('content',  'Lorem ipsum four');
+		$doc->set(array('id' => 4));
+		$doc->set(array('name' => 'Four'));
+		$doc->set(array('content' => 'Lorem ipsum four'));
 
 		$expected = array('id' => 4, 'name' => 'Four', 'content' => 'Lorem ipsum four');
 		$result = $doc->data();
@@ -163,10 +208,10 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc = new Document();
 		$doc->id = 123;
 		$doc->type = 'father';
-		$doc->set('children', array(
+		$doc->set(array('children' => array(
 			array('id' => 124, 'type' => 'child', 'children' => null),
 			array('id' => 125, 'type' => 'child', 'children' => null)
-		));
+		)));
 
 		$this->assertEqual('father', $doc->type);
 
@@ -194,7 +239,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc = new Document();
 		$doc->id = 123;
 		$doc->name = 'father';
-		$doc->set('child', array('id' => 124, 'name' => 'child'));
+		$doc->set(array('child' => array('id' => 124, 'name' => 'child')));
 
 		$this->assertEqual('father', $doc->name);
 
@@ -214,6 +259,16 @@ class DocumentTest extends \lithium\test\Unit {
 		$expected = 'child';
 		$result = $doc->child->name;
 		$this->assertEqual($expected, $result);		
+	}
+	
+	public function testNestedSingle() {
+		$doc = new Document();
+
+		$doc->arr1 = array('something' => 'else');
+		$doc->arr2 = array('some' => 'noses', 'have' => 'it');
+
+		$this->assertTrue(is_a($doc->arr1, '\lithium\data\model\Document'));
+		$this->assertTrue(is_a($doc->arr2, '\lithium\data\model\Document'));
 	}
 
 	public function testRewindNoData() {
@@ -317,13 +372,13 @@ class DocumentTest extends \lithium\test\Unit {
 
 		$doc->id = 12;
 		$doc->name = 'Joe';
-		$doc->sons = array('Moe', 'Greg');
-		$doc->set('daughters', array('Susan', 'Tinkerbell'));
+		$doc->sons = array('Moe', 'Greg',12, 0.3);
+		$doc->set(array('daughters' => array('Susan', 'Tinkerbell')));
 
 		$expected = array(
 			'id' => 12,
 			'name' => 'Joe',
-			'sons' => array('Moe', 'Greg'),
+			'sons' => array('Moe', 'Greg', 12, 0.3),
 			'daughters' => array('Susan', 'Tinkerbell')
 		);
 		$result = $doc->data();
@@ -355,6 +410,62 @@ class DocumentTest extends \lithium\test\Unit {
 	
 	}
 
+	public function testPopulateResourceClose() {	
+		$resource = new DocumentSource();
+		$resource->read();
+		$doc = new Document(array(
+			'model' => __NAMESPACE__ .'\DocumentPost',
+			'handle' => new DocumentSource(),
+			'result' => $resource
+		));
+
+		$result = $doc->rewind();
+		$this->assertTrue(is_a($result,'\lithium\data\model\Document'));	
+
+		$expected = array('id' => 2, 'name' => 'Moe');
+		$result = $doc->next()->to('array');
+		$this->assertEqual($expected, $result);	
+
+		$expected = array('id' => 3, 'name' => 'Roe');
+		$result = $doc->next()->to('array');
+		$this->assertEqual($expected, $result);	
+
+		$result = $doc->next();
+		$this->assertNull($result);
+	}
+
+	public function testEmptyValues() {
+		$doc = new Document(array(
+			'model' => __NAMESPACE__ .'\DocumentPost',
+			'data' => array(
+				'title' => 'Post',
+				'content' => 'Lorem Ipsum',
+				'parsed' => null,
+				'permanent' => false,
+			)
+		));
+
+		$expected = array(
+			'title' => 'Post',
+			'content' => 'Lorem Ipsum',
+			'parsed' => null,
+			'permanent' => false,
+		);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testBooleanValues() {
+		$doc = new Document();
+
+		$doc->tall = false;
+		$doc->fat = true;
+		$doc->set(array('hair' => true, 'fast' => false));
+
+		$expected = array('hair', 'fast', 'tall', 'fat');
+		$result = array_keys($doc->data());
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

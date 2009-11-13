@@ -17,9 +17,10 @@ use \lithium\util\Set;
  * which abstracts away key generation, adapter instantiation and filter
  * implementation.
  *
- * A simple configuration of this adapter can be accomplished in app/config/bootstrap.php
+ * A simple configuration of this adapter can be accomplished in `app/config/bootstrap.php`
  * as follows:
  *
+ * {{{
  * Cache::config(array(
  *     'cache-config-name' => array(
  *         'adapter' => 'Memcached',
@@ -28,8 +29,9 @@ use \lithium\util\Set;
  *         )
  *     )
  * ));
+ * }}}
  *
- * The 'servers' key accepts entries as arrays, where the format is array(server, port, <weight>),
+ * The 'servers' key accepts entries as arrays, where the format is `array(server, port, [weight])`,
  * with the weight being optional.
  *
  * This Memcache adapter provides basic support for `write`, `read`, `delete`
@@ -42,8 +44,8 @@ use \lithium\util\Set;
  * This adapter stores two keys for each written value - one which consists
  * of the data to be cached, and the other being a cache of the expiration time.
  *
- * @see \lithium\storage\Cache::key()
- * @see \lithium\storage\Cache::adapter()
+ * @see lithium\storage\Cache::key()
+ * @see lithium\storage\Cache::adapter()
  *
  */
 class Memcache extends \lithium\core\Object {
@@ -65,7 +67,7 @@ class Memcache extends \lithium\core\Object {
 	 *                       through `Cache::config('name')`.
 	 *
 	 * @return void
-	 * @see \lithium\storage\Cache::config()
+	 * @see lithium\storage\Cache::config()
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(

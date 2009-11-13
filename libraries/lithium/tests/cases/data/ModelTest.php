@@ -103,7 +103,6 @@ class ModelTest extends \lithium\test\Unit {
 			'key'        => 'id',
 			'title'      => 'title',
 			'source'     => 'posts',
-			'prefix'     => '',
 			'connection' => 'default'
 		);
 		$this->assertEqual($expected, Post::meta());
@@ -114,7 +113,6 @@ class ModelTest extends \lithium\test\Unit {
 			'key'        => 'comment_id',
 			'title'      => 'comment_id',
 			'source'     => 'comments',
-			'prefix'     => '',
 			'connection' => 'default'
 		);
 		$this->assertEqual($expected, Comment::meta());

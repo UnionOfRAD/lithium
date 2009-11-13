@@ -351,18 +351,18 @@ class RouteTest extends \lithium\test\Unit {
      * @return void
      */
     public function testCustomSubPattern() {
-        $route = new Route(array('template' => '/{:controller}/{:action}/{:user:\d+}'));
+		$route = new Route(array('template' => '/{:controller}/{:action}/{:user:\d+}'));
 
-        $request = new Request();
-        $request->url = '/users/view/10';
-        $expected = array('controller' => 'users', 'action' => 'view', 'user' => '10');
+		$request = new Request();
+		$request->url = '/users/view/10';
+		$expected = array('controller' => 'users', 'action' => 'view', 'user' => '10');
 
-        $result = $route->parse($request);
-        $this->assertEqual($expected, $result);
+		$result = $route->parse($request);
+		$this->assertEqual($expected, $result);
 
-        $request->url = '/users/view/my_login';
-        $result = $route->parse($request);
-        $this->assertFalse($result);
+		$request->url = '/users/view/my_login';
+		$result = $route->parse($request);
+		$this->assertFalse($result);
     }
 }
 
