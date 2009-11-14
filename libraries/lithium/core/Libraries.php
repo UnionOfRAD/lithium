@@ -300,15 +300,17 @@ class Libraries {
 	 *        - 'dirs': Defaults to `false`. If true, will attempt to case-sensitively look up
 	 *          directories in addition to files (in which case `$class` is assumed to actually be a
 	 *          namespace).
-	 * @return array
+	 * @return string Returns the absolute path to the file containing `$class`, or `null` if the
+	 *         file cannot be found.
 	 */
 	public static function path($class, $options = array()) {
+		$defaults = array('dirs' => false);
+		$options += $defaults;
+		$class = ltrim($class, '\\');
+
 		if (array_key_exists($class, static::$_cachedPaths)) {
 			return static::$_cachedPaths[$class];
 		}
-		$defaults = array('dirs' => false);
-		$options += $defaults;
-		$class = ($class[0] == '\\') ? substr($class, 1) : $class;
 
 		foreach (static::$_configurations as $name => $config) {
 			$params = $options + $config;
@@ -361,7 +363,7 @@ class Libraries {
 	 * @see lithium\core\Libraries::add()
 	 */
 	public static function locate($type, $name = null, $options = array()) {
-		if (strpos($name, '\\') !== false) {
+		if (is_object($name) || strpos($name, '\\') !== false) {
 			return $name;
 		}
 		$ident = $name ? $type . '.' . $name : $type;
