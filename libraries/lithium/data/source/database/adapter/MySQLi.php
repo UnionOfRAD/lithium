@@ -9,11 +9,39 @@ namespace lithium\data\source\database\adapter;
 
 use \Exception;
 
-class MySQLi extends \lithium\data\source\Database\MySql {
+class MySQLi extends \lithium\data\source\Database {
+
+	/**
+	 * MySQLi column type definitions.
+	 *
+	 * @var array
+	 */
+	protected $_columns = array(
+		'primary_key'	=> array('name' => 'NOT NULL AUTO_INCREMENT'),
+		'string' 		=> array('name' => 'varchar', 'length' => 255),
+		'text' 			=> array('name' => 'text'),
+		'integer' 		=> array('name' => 'int', 'length' => 11, 'formatter' => 'intval'),
+		'float' 		=> array('name' => 'float', 'formatter' => 'floatval'),
+		'datetime' 		=> array('name' => 'datetime', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
+		'timestamp' 	=> array('name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
+		),
+		'time' => array('name' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
+		'date' => array('name' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
+		'binary' => array('name' => 'blob'),
+		'boolean' => array('name' => 'tinyint', 'length' => 1)
+	);
+
+	/**
+	 * MySQLi-specific value denoting whether or not table aliases should be used in DELETE and
+	 * UPDATE queries.
+	 *
+	 * @var boolean
+	 */
+	protected $_useAlias = true;
 
 
 	/**
-	 * Constructs the MySQLi adapter and sets the default port to 3306.
+	 * Constructs the MySQLi adapter and default the port to 3306.
 	 *
 	 * @param array $config Configuration options for this class. For additional configuration,
 	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options
@@ -24,7 +52,7 @@ class MySQLi extends \lithium\data\source\Database\MySql {
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('port' => '3306');
-		parent::__construct();
+		parent::__construct((array)$config + $defaults);
 	}
 
 	/**
@@ -45,6 +73,24 @@ class MySQLi extends \lithium\data\source\Database\MySql {
 	 * @return boolean True if the database could be connected, else false
 	 */
 	public function connect() {
+		$config = $this->_config;
+		$this->_isConnected = false;
+
+		$host = $config['persistent'] ? 'p:' : '';
+		$host .= $config['host'];
+
+		$this->_connection = new mysqli($host, $config['login'], $config['password'], $config['database'], $config['port']);
+		if ($this->_connection !== false) {
+			$this->_isConnected = true;
+
+			$this->_encoding($config['encoding']);
+
+			$this->_useAlias = (bool)version_compare(
+				$this->_connection->server_info(), "4.1", ">="
+			);
+		}
+
+		return $this->_isConnected;
 	}
 
 	/**
@@ -64,9 +110,25 @@ class MySQLi extends \lithium\data\source\Database\MySql {
 	}
 
 	public function disconnect() {
+		if ($this->_isConnected) {
+			;
+		}
 	}
 
+	/**
+	 * Gets/sets the encoding for the connection
+	 * @param $encoding
+	 * @return mixed
+	 */
 	public function encoding($encoding = null) {
+		$encodingMap = array('UTF-8' => 'utf8');
+
+		if (empty($encoding)) {
+			$encoding = $this->_connection->get_charset();
+			return ($key = array_search($encoding, $encodingMap)) ? $key : $encoding;
+		}
+		$encoding = isset($encodingMap[$encoding]) ? $encodingMap[$encoding] : $encoding;
+		return $this->_connection->set_charset($encoding);
 	}
 
 	/**
