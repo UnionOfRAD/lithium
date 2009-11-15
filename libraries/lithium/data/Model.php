@@ -174,7 +174,7 @@ class Model extends \lithium\core\StaticObject {
 			'conditions' => null, 'fields' => null, 'order' => null, 'limit' => null, 'page' => 1
 		);
 
-		if (is_numeric($type) || $classes['validator']::isUuid($type)) {
+		if ($type != 'all' && !isset($self->_finders[$type])) {
 			$options['conditions'] = array($self->_meta['key'] => $type);
 			$type = 'first';
 		}
@@ -196,7 +196,8 @@ class Model extends \lithium\core\StaticObject {
 				'model'    => $options['model'],
 				'handle'   => &$connection,
 				'classes'  => $options['classes'],
-				'result'   => $connection->read($query, $options)
+				'result'   => $connection->read($query, $options),
+				'exists'   => true
 			));
 		};
 		$finder = isset($self->_finders[$type]) ? array($self->_finders[$type]) : array();
