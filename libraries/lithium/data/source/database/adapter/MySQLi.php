@@ -168,6 +168,23 @@ class MySQLi extends \lithium\data\source\Database {
 	}
 
 	protected function _execute($sql, $options = array()) {
+		$defaults = array('buffered' => true);
+		$options += $defaults;
+
+		$params = compact('sql', 'options');
+		$conn =& $this->_connection;
+
+		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use (&$conn) {
+			extract($params);
+			$mode = ($options['buffered']) ? MYSQLI_STORE_RESULT : MYSQLI_STORE_RESULT;
+			$result = mysqli_query($sql, $conn);
+
+			if (mysqli_error() > 0) {
+				list($code, $error) = $self->error();
+				throw new Exception("$sql: $error", $code);
+			}
+			return $resource;
+		});
 	}
 
 	protected function _results($results) {
