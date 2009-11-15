@@ -259,8 +259,11 @@ class Document extends \lithium\util\Collection {
 		return $this->to('array');
 	}
 
-	public function _isComplexType($data) {
+	protected function _isComplexType($data) {
 		if (is_scalar($data) || !$data) {
+			return false;
+		}
+		if (is_object($data) && (array)$data === array()) {
 			return false;
 		}
 		if (is_array($data)) {
@@ -332,7 +335,6 @@ class Document extends \lithium\util\Collection {
 	protected function _close() {
 		if (!$this->_closed()) {
 			$this->_result = $this->_handle->result('close', $this->_result, $this);
-			unset($this->_handle);
 			$this->_handle = null;
 		}
 	}

@@ -77,6 +77,35 @@ class SourceTest extends \lithium\test\Unit {
 
 		$existing->delete();
 	}
+
+	public function testReadWriteMultiple() {
+		$companyData = array(
+			array('name' => 'BigBoxMart'),
+			array('name' => 'Mom \'n Pop Shop')
+		);
+		$companies = array();
+		$key = CompanyIntegration::meta('key');
+
+		foreach ($companyData as $data) {
+			$companies[] = CompanyIntegration::create($data);
+			$this->assertTrue($companies[count($companies) - 1]->save());
+			$this->assertTrue($companies[count($companies) - 1]->{$key});
+		}
+
+		$all = CompanyIntegration::all();
+		$expected = count($companyData);
+		$this->assertTrue($all->to('array'));
+
+		$this->assertEqual($expected, count($all));
+		$this->assertEqual($expected, $all->count());
+
+		$id = "" . $all->first()->{$key};
+		$this->assertTrue(strlen($id) > 0);
+
+		foreach ($companies as $company) {
+			$this->assertTrue($company->delete());
+		}
+	}
 }
 
 ?>
