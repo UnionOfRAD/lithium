@@ -200,6 +200,12 @@ class MongoDb extends \lithium\data\Source {
 	public function delete($query, $options) {
 		$query = $query->export($this);
 		extract($query, EXTR_OVERWRITE);
+
+		if (isset($conditions['_id']) && is_string($conditions['_id'])) {
+			if (preg_match('/^[0-9a-f]{24}$/', $conditions['_id'])) {
+				$conditions['_id'] = new MongoId($conditions['_id']);
+			}
+		}
 		return $this->_db->selectCollection($table)->remove($conditions);
 	}
 
