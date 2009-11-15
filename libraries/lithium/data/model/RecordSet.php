@@ -271,9 +271,10 @@ class RecordSet extends \lithium\util\Collection {
 
 		foreach ($this->_columns as $model => $fields) {
 			$data = array_combine($fields, array_slice($data, 0, count($fields)));
+			$exists = true;
 
 			$class = $this->_classes['record'];
-			$this->_items[] = ($record = new $class(compact('model', 'data')));
+			$this->_items[] = ($record = new $class(compact('model', 'data', 'exists')));
 			$this->_index[] = $recordKey;
 			return $record;
 		}

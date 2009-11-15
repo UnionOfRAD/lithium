@@ -263,6 +263,9 @@ class Document extends \lithium\util\Collection {
 		if (is_scalar($data) || !$data) {
 			return false;
 		}
+		if (is_object($data) && (array)$data === array()) {
+			return false;
+		}
 		if (is_array($data)) {
 			if (array_keys($data) === range(0, count($data) - 1)) {
 				if (array_filter($data, 'is_scalar') == array_filter($data)) {
@@ -332,7 +335,6 @@ class Document extends \lithium\util\Collection {
 	protected function _close() {
 		if (!$this->_closed()) {
 			$this->_result = $this->_handle->result('close', $this->_result, $this);
-			unset($this->_handle);
 			$this->_handle = null;
 		}
 	}
