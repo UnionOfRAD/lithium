@@ -461,6 +461,9 @@ class Unit extends \lithium\core\Object {
 			if (isset($scopedFrame)) {
 				break;
 			}
+			if (!class_exists('lithium\util\reflection\Inspector')) {
+				continue;
+			}
 			if (isset($frame['class']) && in_array($frame['class'], Inspector::parents($this))) {
 				$scopedFrame = $frame;
 			}
