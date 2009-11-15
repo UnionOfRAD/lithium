@@ -27,7 +27,7 @@ class HttpTest extends \lithium\test\Unit {
 
 	public function testAllMethodsNoConnection() {
 		$http = new Http(array('protocol' => null));
-		$this->assertFalse($http->connect());
+		$this->assertTrue($http->connect());
 		$this->assertTrue($http->disconnect());
 		$this->assertFalse($http->get());
 		$this->assertFalse($http->post());
@@ -66,23 +66,23 @@ class HttpTest extends \lithium\test\Unit {
 		$this->assertEqual('Test!', $result);
 
 		$expected = 'HTTP/1.1';
-		$result = $http->response->protocol;
+		$result = $http->last->response->protocol;
 		$this->assertEqual($expected, $result);
 
 		$expected = '200';
-		$result = $http->response->status['code'];
+		$result = $http->last->response->status['code'];
 		$this->assertEqual($expected, $result);
 
 		$expected = 'OK';
-		$result = $http->response->status['message'];
+		$result = $http->last->response->status['message'];
 		$this->assertEqual($expected, $result);
 
 		$expected = 'text/html';
-		$result = $http->response->type;
+		$result = $http->last->response->type;
 		$this->assertEqual($expected, $result);
 
 		$expected = 'UTF-8';
-		$result = $http->response->charset;
+		$result = $http->last->response->charset;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -92,23 +92,23 @@ class HttpTest extends \lithium\test\Unit {
 		$this->assertEqual('Test!', $result);
 
 		$expected = 'HTTP/1.1';
-		$result = $http->response->protocol;
+		$result = $http->last->response->protocol;
 		$this->assertEqual($expected, $result);
 
 		$expected = '200';
-		$result = $http->response->status['code'];
+		$result = $http->last->response->status['code'];
 		$this->assertEqual($expected, $result);
 
 		$expected = 'OK';
-		$result = $http->response->status['message'];
+		$result = $http->last->response->status['message'];
 		$this->assertEqual($expected, $result);
 
 		$expected = 'text/html';
-		$result = $http->response->type;
+		$result = $http->last->response->type;
 		$this->assertEqual($expected, $result);
 
 		$expected = 'UTF-8';
-		$result = $http->response->charset;
+		$result = $http->last->response->charset;
 		$this->assertEqual($expected, $result);
 	}
 
