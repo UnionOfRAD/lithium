@@ -259,7 +259,7 @@ class Document extends \lithium\util\Collection {
 		return $this->to('array');
 	}
 
-	public function _isComplexType($data) {
+	protected function _isComplexType($data) {
 		if (is_scalar($data) || !$data) {
 			return false;
 		}
