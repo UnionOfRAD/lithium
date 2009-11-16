@@ -223,7 +223,7 @@ class MySQLi extends \lithium\data\source\Database {
 		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use (&$conn) {
 			extract($params);
 			$mode = ($options['buffered']) ? MYSQLI_STORE_RESULT : MYSQLI_STORE_RESULT;
-			$mysqliResult = $conn->query($sql);
+			$mysqliResult = $conn->query($sql, $mode);
 
 			if (mysqli_errno() > 0) {
 				list($code, $message) = $self->error();
