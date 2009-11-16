@@ -48,10 +48,6 @@ class Query extends \lithium\core\Object {
 		}
 	}
 
-	public function type() {
-		return $this->_type;
-	}
-
 	public function model($model = null) {
 		if (empty($model)) {
 			return $this->_model;

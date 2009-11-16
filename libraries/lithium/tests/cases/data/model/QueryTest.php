@@ -44,13 +44,6 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual($query->conditions(), array('foo'));
 	}
 
-	public function testType() {
-		$q = new Query($this->_queryArr);
-		$expected = 'read';
-		$result = $q->type();
-		$this->assertEqual($expected, $result);
-	}
-
 	public function testModel() {
 		$q = new Query($this->_queryArr);
 
