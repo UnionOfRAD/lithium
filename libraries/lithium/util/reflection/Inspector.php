@@ -14,8 +14,20 @@ use \ReflectionException;
 use \lithium\core\Libraries;
 use \lithium\util\Collection;
 
+/**
+ * General source code inspector
+ *
+ * This inspector provides a simple interface to the PHP Reflection API that
+ * can be used to gather information about any PHP source file for purposes of
+ * test metrics, static analysis or any number of possible use cases.
+ */
 class Inspector extends \lithium\core\StaticObject {
 
+	/**
+	 * classes used
+	 *
+	 * @var array
+	 */
 	protected static $_classes = array(
 		'collection' => '\lithium\util\Collection'
 	);
@@ -35,6 +47,13 @@ class Inspector extends \lithium\core\StaticObject {
 		'shortName' => 'getShortName'
 	);
 
+	/**
+	 * Determines if a given $identifier is a class property, a class method, a class itself,
+	 * or a namespace identifier.
+	 *
+	 * @param string $identifier The identifier to be analyzed
+	 * @return string Identifier type. One of `property`, `method`, `class` or `namespace`.
+	 */
 	public static function type($identifier) {
 		$identifier = ltrim($identifier, '\\');
 
@@ -47,6 +66,20 @@ class Inspector extends \lithium\core\StaticObject {
 		return 'namespace';
 	}
 
+	/**
+	 * Detailed source code identifier analysis
+	 *
+	 * Analyzes a passed $identifier for more detailed information such
+	 * as method/property modifiers (e.g. `public`, `private`, `abstract`)
+	 *
+	 * @param string $identifier The identifier to be analyzed
+	 * @param array $info Optionally restrict or expand the default information
+	 *        returned from the `info` method. By default, the information returned
+	 *        is the same as the array keys contained in the `$_methodMap` property of
+	 *        Inspector.
+	 * @return array An array of the parsed meta-data information of the given identifier.
+	 * @see lithium\util\reflection\Inspector
+	 */
 	public static function info($identifier, $info = array()) {
 		$info = $info ?: array_keys(static::$_methodMap);
 		$type = static::type($identifier);
@@ -173,13 +206,13 @@ class Inspector extends \lithium\core\StaticObject {
 	 *
 	 * @param mixed $class A string class name or an object instance, from which to get methods.
 	 * @param string $format The type and format of data to return. Available options are:
-	 *               -null: Returns a `Collection` object containing a `ReflectionMethod` instance
-	 *                for each method.
-	 *               -'extents': Returns a two-dimensional array with method names as keys, and
-	 *                an array with starting and ending line numbers as values.
-	 *               -'ranges': Returns a two-dimensional array where each key is a method name,
-	 *                and each value is an array of line numbers which are contained in the method.
-	 * @param array $options 
+	 *        -null: Returns a `Collection` object containing a `ReflectionMethod` instance
+	 *         for each method.
+	 *        -'extents': Returns a two-dimensional array with method names as keys, and
+	 *         an array with starting and ending line numbers as values.
+	 *        -'ranges': Returns a two-dimensional array where each key is a method name,
+	 *         and each value is an array of line numbers which are contained in the method.
+	 * @param array $options
 	 */
 	public static function methods($class, $format = null, $options = array()) {
 		$defaults = array('methods' => array(), 'group' => true, 'self' => true);
@@ -235,13 +268,13 @@ class Inspector extends \lithium\core\StaticObject {
 	 * be read.
 	 *
 	 * @param string $data If `$data` contains newlines, it will be read from directly, and have
-	 *               its own lines returned.  If `$data` is a physical file path, that file will be
-	 *               read and have its lines returned.  If `$data` is a class name, it will be
-	 *               converted into a physical file path and read.
+	 *        its own lines returned.  If `$data` is a physical file path, that file will be
+	 *        read and have its lines returned.  If `$data` is a class name, it will be
+	 *        converted into a physical file path and read.
 	 * @param array $lines The array of lines to read. If a given line is not present in the data,
-	 *              it will be silently ignored.
+	 *        it will be silently ignored.
 	 * @return array Returns an array where the keys are matching `$lines`, and the values are the
-	 *               corresponding line numbers in `$data`.
+	 *         corresponding line numbers in `$data`.
 	 * @todo Add an $options parameter with a 'context' flag, to pull in n lines of context.
 	 */
 	public static function lines($data, $lines) {
@@ -265,8 +298,12 @@ class Inspector extends \lithium\core\StaticObject {
 	/**
 	 * Gets the full inheritance list for the given class.
 	 *
-	 * @param string $class
-	 * @param array $options
+	 * @param string $class Class whose inheritance chain will be returned
+	 * @param array $options Option consists of:
+	 *        -'autoLoad': Whether or not to call __autoload by default. Defaults to true.
+	 * @return array An array of the name of the parent classes of the passed `$class` parameter,
+	 *         or false on error.
+	 * @see http://php.net/manual/en/function.class-parents.php
 	 */
 	public static function parents($class, $options = array()) {
 		$defaults = array('autoLoad' => false);
@@ -284,12 +321,13 @@ class Inspector extends \lithium\core\StaticObject {
 	 * returns the classes it defines.
 	 *
 	 * @param array $options
-	 * @return array
+	 * @return array Associative of classes and their corresponding definition files
+	 * @todo Document valid options
 	 */
 	public static function classes($options = array()) {
 		$defaults = array('group' => 'classes', 'file' => null);
 		$options += $defaults;
-		
+
 		$list = get_declared_classes();
 		$classes = array();
 
@@ -323,6 +361,11 @@ class Inspector extends \lithium\core\StaticObject {
 	/**
 	 * Gets the static and dynamic dependencies for a class or group of classes.
 	 *
+	 * @param mixed $classes Either a string specifying a class, or a numerically indexed array
+	 *        of classes
+	 * @param array $options
+	 * @return array An array of the static and dynamic class dependencies
+	 * @todo Document valid options
 	 */
 	public static function dependencies($classes, $options = array()) {
 		$defaults = array('type' => null);
@@ -363,6 +406,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 *
 	 * @param ReflectionClass $class A reflection class instance from which to fetch.
 	 * @param array $options The options used to filter the resulting method list.
+	 * @return object
 	 */
 	protected static function _methods($class, $options) {
 		$defaults = array('methods' => array(), 'self' => true, 'public' => true);
