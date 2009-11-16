@@ -58,7 +58,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @see lithium\data\Model::$_classes
 	 */
 	public function configureClass($class) {
-		return array('meta' => array('key' => array('_id', '_rev')), 'classes' => array(
+		return array('meta' => array('key' => '_id'), 'classes' => array(
 			'record' => '\lithium\data\model\Document',
 			'recordSet' => '\lithium\data\model\Document'
 		));
@@ -155,7 +155,7 @@ class CouchDb extends \lithium\data\source\Http {
 			$result = is_string($result) ? json_decode($result) : $result;
 
 			if ($success = (isset($result->ok) && $result->ok === true)) {
-				$query->record()->invokeMethod('_update', array(array($result->id, $result->rev)));
+				$query->record()->invokeMethod('_update', array($result->id));
 			}
 			return $success;
 		});
@@ -184,11 +184,7 @@ class CouchDb extends \lithium\data\source\Http {
 				$id = '/' . $conditions['_id'];
 				unset($conditions['_id']);
 			}
-			if ($conditions == null) {
-				$id = '/_all_docs';
-			}
-
-			return json_decode($conn->get($table . $id, array_filter($conditions + $limit)));
+			return json_decode($conn->get($table . $id, array_filter($conditions)));
 		});
 	}
 
@@ -270,22 +266,9 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function result($type, $resource, $context) {
 		if (!is_object($resource)) {
-			return null;
+			return array();
 		}
-		if (isset($resource->rows)) {
-			if (!isset($context->i)){
-				$context->i = 0;
-			}
-			if (isset($resource->rows[$context->i])) {
-				$result = array(
-					'id' => $resource->rows[$context->i]->id,
-					'rev' => $resource->rows[$context->i]->value->rev
-				);
-				$context->i++;
-				return $result;
-			}
-		}
-		return null;
+		return (array) $resource;
 	}
 
 	/**
