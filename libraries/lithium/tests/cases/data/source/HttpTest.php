@@ -27,7 +27,7 @@ class HttpTest extends \lithium\test\Unit {
 
 	public function testAllMethodsNoConnection() {
 		$http = new Http(array('protocol' => null));
-		$this->assertTrue($http->connect());
+		$this->assertFalse($http->connect());
 		$this->assertTrue($http->disconnect());
 		$this->assertFalse($http->get());
 		$this->assertFalse($http->post());

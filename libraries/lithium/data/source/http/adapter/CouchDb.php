@@ -8,6 +8,8 @@
 
 namespace lithium\data\source\http\adapter;
 
+use \Exception;
+
 /**
  * CouchDb adapter
  *
@@ -106,6 +108,11 @@ class CouchDb extends \lithium\data\source\Http {
 				$this->_db = true;
 			}
 		}
+		if (!$this->_db) {
+			throw new Exception("{$entity} is not available.");
+		}
+
+		return array('_id' => array(), '_rev' => array());
 	}
 
 	/**
@@ -140,11 +147,11 @@ class CouchDb extends \lithium\data\source\Http {
 			if (!empty($data['_id'])) {
 				$id = '/' . $data['_id'];
 				$data['_id'] = (string) $data['_id'];
-				$result = $self->put($params['table'].$id, $data);
+				$result = $conn->put($table . $id, json_encode($data));
 			} else {
-				$result = $self->post($params['table'], $data);
+				$result = $conn->post($table . $id, json_encode($data));
 			}
-			$result = $conn->post($table . $id, $data);
+
 			$result = is_string($result) ? json_decode($result) : $result;
 
 			if ($success = (isset($result->ok) && $result->ok === true)) {
@@ -177,7 +184,7 @@ class CouchDb extends \lithium\data\source\Http {
 				$id = '/' . $conditions['_id'];
 				unset($conditions['_id']);
 			}
-			return $conn->get($table . $id, array_filter($conditions));
+			return json_decode($conn->get($table . $id, array_filter($conditions)));
 		});
 	}
 
@@ -203,12 +210,17 @@ class CouchDb extends \lithium\data\source\Http {
 				$id = '/' . $conditions['_id'];
 				unset($conditions['_id']);
 			}
-			$result = $conn->put($table . $id, $conditions + $data);
+
+			$result = $conn->put($table . $id, json_encode($conditions + $data));
 			$result = is_string($result) ? json_decode($result) : $result;
 
 			if (isset($result->ok) && $result->ok === true) {
 				$query->record()->invokeMethod('_update');
 				return true;
+			}
+
+			if (isset($result->error) && $result->error === 'conflict') {
+				return $this->read($query, $options);
 			}
 			return false;
 		});
@@ -254,9 +266,9 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function result($type, $resource, $context) {
 		if (!is_object($resource)) {
-			return null;
+			return array();
 		}
-		return (array)$resource;
+		return (array) $resource;
 	}
 
 	/**

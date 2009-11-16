@@ -44,6 +44,11 @@ class Service extends \lithium\core\Object {
 	 */
 	protected $_autoConfig = array('classes' => 'merge');
 
+	/**
+	 * The `Socket` instance used to send `Service` calls
+	 *
+	 * @var \lithium\util\Socket
+	 */
 	protected $_connection = null;
 
 	/**
@@ -52,7 +57,7 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @var boolean
 	 */
-	protected $_isConnected = true;
+	protected $_isConnected = false;
 
 	/**
 	 * Fully-namespaced class references to `Service` class dependencies.
@@ -70,7 +75,7 @@ class Service extends \lithium\core\Object {
 	 * Initializes a new `Service` instance with the default HTTP request settings and
 	 * transport- and format-handling classes.
 	 *
-	 * @param array $config 
+	 * @param array $config
 	 * @return void
 	 */
 	public function __construct($config = array()) {
@@ -201,9 +206,9 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @param string $method The HTTP method of the request, i.e. `'GET'`, `'HEAD'`, `'OPTIONS'`,
 	 *               etc. Can be passed in upper- or lowercase.
-	 * @param string $path The 
-	 * @param string $data 
-	 * @param string $options 
+	 * @param string $path The
+	 * @param string $data
+	 * @param string $options
 	 * @return object Returns an instance of `http\Request`, configured with an HTTP method, query
 	 *         string or POST/PUT data, and URL.
 	 */

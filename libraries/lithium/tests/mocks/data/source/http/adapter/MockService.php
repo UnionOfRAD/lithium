@@ -20,6 +20,7 @@ class MockService extends \lithium\http\Service {
 		$response->body = json_encode(array(
 			'ok' => true,
 			'id' => '12345',
+			'rev' => '1-2',
 			'body' => 'something'
 		));
 		return ($options['return'] == 'body') ? $response->body() : $response;

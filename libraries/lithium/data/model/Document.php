@@ -159,7 +159,7 @@ class Document extends \lithium\util\Collection {
 	 *
 	 * @param $values An associative array of fields and values to assign to the `Document`.
 	 * @return void
-	 */	 
+	 */
 	public function set($values) {
 		$this->__set($values);
 	}
@@ -188,7 +188,7 @@ class Document extends \lithium\util\Collection {
 	 * Rewinds the collection of sub-`Document`s to the beginning and returns the first one found.
 	 *
 	 * @return object Returns the first `Document` object instance in the collection.
-	 */	
+	 */
 	public function rewind() {
 		$this->_valid = (reset($this->_items) !== false);
 
@@ -286,9 +286,12 @@ class Document extends \lithium\util\Collection {
 	 */
 	protected function _update($id = null) {
 		if ($id) {
+			$id = (array) $id;
 			$model = $this->_model;
-			$key = $model::meta('key');
-			$this->__set($key, $id);
+			$keys = (array) $model::meta('key');
+			foreach ($keys as $i => $key) {
+				$this->__set($key, $id[$i]);
+			}
 		}
 		$this->_exists = true;
 	}
