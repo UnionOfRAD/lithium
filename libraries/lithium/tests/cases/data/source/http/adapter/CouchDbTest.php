@@ -18,7 +18,7 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
 		'classes' => array(
-			'service' => 'lithium\tests\mocks\data\source\http\adapter\MockService',
+			'service' => '\lithium\tests\mocks\data\source\http\adapter\MockService',
 			'socket' => '\lithium\tests\mocks\data\source\http\adapter\MockSocket'
 		),
 		'persistent' => false,
@@ -31,7 +31,10 @@ class CouchDbTest extends \lithium\test\Unit {
 	);
 
 	public function setUp() {
-		$this->query = new Query(array('model' => '\lithium\data\Model', 'record' => new Record()));
+		$this->query = new Query(array(
+			'model' => '\lithium\tests\mocks\data\source\http\adapter\MockCouchPost',
+			'record' => new Record()
+		));
 	}
 
 	public function tearDown() {
@@ -155,18 +158,69 @@ class CouchDbTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testRead() {
+	public function testReadNoConditions() {
 		$couchdb = new CouchDb($this->_testConfig);
 		$expected = true;
 		$result = $couchdb->read($this->query);
+		$this->assertEqual($expected, $result);
+
+		$expected = '/posts/_all_docs';
+		$result = $couchdb->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$expected = array();
+		$result = $couchdb->last->request->params;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testReadWithConditions() {
+		$couchdb = new CouchDb($this->_testConfig);
+		$expected = true;
+		$this->query->conditions(array('_id' => 12345));
+		$result = $couchdb->read($this->query);
+		$this->assertEqual($expected, $result);
+
+		$expected = '/posts/12345';
+		$result = $couchdb->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$expected = array();
+		$result = $couchdb->last->request->params;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testReadWithViewConditions() {
+		$couchdb = new CouchDb($this->_testConfig);
+		$expected = true;
+		$this->query->conditions(array('design' => 'latest', 'view' => 'all'));
+		$result = $couchdb->read($this->query);
+		$this->assertEqual($expected, $result);
+
+		$expected = '/posts/_design/latest/_view/all';
+		$result = $couchdb->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$expected = array();
+		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testUpdate() {
 		$couchdb = new CouchDb($this->_testConfig);
+		$this->query->data(array('id' => 12345, 'rev' => '1-1', 'title' => 'One'));
+
 		$expected = true;
 		$result = $couchdb->update($this->query);
 		$this->assertEqual($expected, $result);
+
+		$expected = '/posts/12345';
+		$result = $couchdb->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$expected = array();
+		$result = $couchdb->last->request->params;
+		$this->assertEqual($expected, $result);
+
 	}
 
 	public function testDelete() {

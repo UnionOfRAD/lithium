@@ -129,8 +129,8 @@ class Route extends \lithium\core\Object {
 	 * Matches a set of parameters against the route, and returns a URL string if the route matches
 	 * the parameters, or false if it does not match.
 	 *
-	 * @param string $options 
-	 * @param string $context 
+	 * @param string $options
+	 * @param string $context
 	 * @return mixed
 	 */
 	public function match($options = array(), $context = null) {
@@ -172,7 +172,7 @@ class Route extends \lithium\core\Object {
 			$rpl = "{:{$key}}";
 			$len = -strlen($rpl);
 
-			if ($trimmed && array_key_exists($key, $defaults) && $value == $defaults[$key]) {
+			if ($trimmed && isset($defaults[$key]) && $value == $defaults[$key]) {
 				if (substr($template, $len) == $rpl) {
 					$template = rtrim(substr($template, 0, $len), '/');
 					continue;
