@@ -65,8 +65,8 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertNull(Libraries::get('foo'));
 
 		$result = Libraries::get();
-		$this->assertTrue(array_key_exists('lithium', $result));
-		$this->assertTrue(array_key_exists('app', $result));
+		$this->assertTrue(isset($result['lithium']));
+		$this->assertTrue(isset($result['app']));
 		$this->assertEqual($expected, $result['lithium']);
 	}
 

@@ -21,7 +21,7 @@ class Record extends \lithium\core\Object {
 	protected $_data = array();
 
 	/**
-	* Validation errors 
+	* Validation errors
 	*/
 	protected $_errors = array();
 

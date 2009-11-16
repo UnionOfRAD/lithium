@@ -314,11 +314,11 @@ class Media extends \lithium\core\Object {
 		$type = $options['type'];
 		$result = null;
 
-		if (!array_key_exists($type, static::$_types)) {
+		if (!isset(static::$_types[$type])) {
 			throw new Exception("Unhandled media type '$type'");
 		}
 
-		if (array_key_exists($type, static::$_handlers)) {
+		if (isset(static::$_handlers[$type])) {
 			$h = (array)static::$_handlers[$type] + (array)static::$_handlers['default'];
 		} else {
 			$h = $options + $defaults;
@@ -341,7 +341,7 @@ class Media extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public static function encode($type, $data, $options = array()) {
-		if (!array_key_exists($type, static::$_handlers)) {
+		if (!isset(static::$_handlers[$type])) {
 			return null;
 		}
 		$method = static::$_handlers[$type]['encode'];

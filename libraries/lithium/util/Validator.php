@@ -250,7 +250,7 @@ class Validator extends \lithium\core\StaticObject {
 	 * `Validator::isEmail('foo@bar.com')`.
 	 *
 	 * @param string $method The name of the method called, i.e. `'isEmail'` or `'isCreditCard'`.
-	 * @param array $args 
+	 * @param array $args
 	 * @return boolean
 	 */
 	public static function __callStatic($method, $args = array()) {
@@ -266,12 +266,12 @@ class Validator extends \lithium\core\StaticObject {
 
 	/**
 	 * Checks a set of values against a specified rules list.
-	 * 
+	 *
 	 * This method may be used to validate any arbitrary array data against a set of validation
-	 * rules.  
+	 * rules.
 	 *
 	 * @param string $values An array of key/value pairs, where the values are to be checked.
-	 * @param string $rules 
+	 * @param string $rules
 	 * @return mixed When all validation rules pass
 	 * @todo Bring over validation loop from Model, determine formats/options, implement.
 	 */
@@ -281,14 +281,14 @@ class Validator extends \lithium\core\StaticObject {
 	/**
 	 * Adds to or replaces built-in validation rules specified in `Validator::$_rules`.  Any new
 	 * validation rules created are automatically callable as validation methods.
-	 * 
+	 *
 	 * For example:
 	 * {{{
 	 * Validator::add('zeroToNine', '/^[0-9]$/');
 	 * $isValid = Validator::isZeroToNine("5"); // true
 	 * $isValid = Validator::isZeroToNine("20"); // false
 	 * }}}
-	 * 
+	 *
 	 * Alternatively, the first parameter may be an array of rules expressed as key/value pairs,
 	 * as in the following:
 	 * {{{
@@ -297,7 +297,7 @@ class Validator extends \lithium\core\StaticObject {
 	 * 	'tenToNineteen' => '/^1[0-9]$/',
 	 * ));
 	 * }}}
-	 * 
+	 *
 	 * @param mixed $name The name of the validation rule (string), or an array of key/value pairs
 	 *              of names and rules.
 	 * @param string $rule If $name is a string, this should be a string regular expression, or a
@@ -368,10 +368,10 @@ class Validator extends \lithium\core\StaticObject {
 	/**
 	 * Checks a single value against a single validation rule in one or more formats.
 	 *
-	 * @param string $rule 
-	 * @param mixed $value 
-	 * @param string $format 
-	 * @param string $options 
+	 * @param string $rule
+	 * @param mixed $value
+	 * @param string $format
+	 * @param string $options
 	 * @return boolean
 	 * @todo Write tests for pre- and post-filtering
 	 */
@@ -412,15 +412,15 @@ class Validator extends \lithium\core\StaticObject {
 
 	/**
 	 * Runs pre- or post-filters for a given rule and returns the result.
-	 * 
+	 *
 	 * If a pre-filter returns true or false, the validation immediately succeeds.  If a pre-filter
 	 * returns null, validation continues.  If a pre-filter returns any other value, the value to be
 	 * validated is modified, and all subsequent filters and validation rules will run against this
 	 * new value.
-	 * 
+	 *
 	 * If a post-filter returns any true value, validation succeeds, or continues to the next
 	 * filter.  If a post-filter returns any false value, validation immediately fails.
-	 * 
+	 *
 	 * Both pre- and post-filters take the same 3 parameters:
 	 * - `$value`: The value to be validated.
 	 * - `$format`: The format or list of formats against which this rule is being validated,
@@ -588,7 +588,7 @@ class Validator extends \lithium\core\StaticObject {
 			'===' => ($value1 === $value2)
 		);
 
-		if (array_key_exists($operator, $values)) {
+		if (isset($values[$operator])) {
 			return $values[$operator];
 		}
 		return false;
@@ -805,7 +805,7 @@ class Validator extends \lithium\core\StaticObject {
 
 	/**
 	 * Luhn algorithm
-	 * 
+	 *
 	 * Checks that a credit card number is a valid Luhn sequence.
 	 *
 	 * @param mixed $value A string or integer representing a credit card number.
