@@ -60,7 +60,7 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $q->model();
 		$this->assertEqual($expected, $result);
 
-		$result = $q->model('\lithium\tests\mocks\data\model\MockQueryComment');
+		$q->model('\lithium\tests\mocks\data\model\MockQueryComment');
 
 		$expected = '\lithium\tests\mocks\data\model\MockQueryComment';
 		$result = $q->model();
@@ -101,7 +101,7 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $q->limit();
 		$this->assertEqual($expected, $result);
 
-		$result = $q->limit(5);
+		$q->limit(5);
 
 		$expected = 5;
 		$result = $q->limit();
@@ -115,12 +115,13 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $q->page();
 		$this->assertEqual($expected, $result);
 
-		$result = $q->page(5);
+		$q->page(5);
 
 		$expected = 5;
 		$result = $q->page();
 		$this->assertEqual($expected, $result);
 	}
+
 }
 
 ?>
