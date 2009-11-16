@@ -70,7 +70,7 @@ class Service extends \lithium\core\Object {
 	 * Initializes a new `Service` instance with the default HTTP request settings and
 	 * transport- and format-handling classes.
 	 *
-	 * @param array $config 
+	 * @param array $config
 	 * @return void
 	 */
 	public function __construct($config = array()) {
@@ -107,10 +107,7 @@ class Service extends \lithium\core\Object {
 			$socket = Libraries::locate('sockets.util', $this->_classes['socket']);
 			$this->_connection = new $socket($this->_config);
 		}
-		if (!$this->_isConnected && $this->_connection->open()) {
-			$this->_isConnected = true;
-		}
-		return $this->_isConnected;
+		return $this->_isConnected = $this->_connection->open();
 	}
 
 	/**
@@ -182,6 +179,7 @@ class Service extends \lithium\core\Object {
 		if ($this->connect() === false) {
 			return false;
 		}
+
 		$request = $this->_request($method, $path, $data, $options);
 
 		if ($this->_connection->write((string)$request)) {
@@ -201,9 +199,10 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @param string $method The HTTP method of the request, i.e. `'GET'`, `'HEAD'`, `'OPTIONS'`,
 	 *               etc. Can be passed in upper- or lowercase.
-	 * @param string $path The 
-	 * @param string $data 
-	 * @param string $options 
+	 * @param string $path The relative path to call on remote host
+	 * @param string $data Data for the body of the request
+	 * @param string $options Extra options for the request
+	 *               - `'type'`: content type of request encode by the media class
 	 * @return object Returns an instance of `http\Request`, configured with an HTTP method, query
 	 *         string or POST/PUT data, and URL.
 	 */
