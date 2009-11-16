@@ -20,7 +20,7 @@ class QueryTest extends \lithium\test\Unit {
 		'order' => 'created DESC',
 		'limit' => 10,
 		'page' => 1,
-		'fields' => array('id','author_id','title','body','created'),
+		'fields' => array('id','author_id','title'),
 		'conditions' => array('author_id' => 12)
 	);
 
@@ -66,6 +66,34 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $q->model();
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testFields() {
+		$q = new Query($this->_queryArr);
+
+		$expected = array('id','author_id','title');
+		$result = $q->fields();
+		$this->assertEqual($expected, $result);
+
+		$q->fields('content');
+
+		$expected = array('id','author_id','title','content');
+		$result = $q->fields();
+		$this->assertEqual($expected, $result);
+
+		$q->fields(array('updated','created'));
+
+		$expected = array('id','author_id','title','content','updated','created');
+		$result = $q->fields();
+		$this->assertEqual($expected, $result);
+
+		$q->fields(false);
+		$q->fields(array('id', 'title'));
+
+		$expected = array('id','title');
+		$result = $q->fields();
+		$this->assertEqual($expected, $result);
+	}
+
 }
 
 ?>
