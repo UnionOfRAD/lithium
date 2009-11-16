@@ -8,15 +8,23 @@
 
 namespace lithium\tests\mocks\data\source\http\adapter;
 
+use \lithium\http\Response;
+
 class MockService extends \lithium\http\Service {
 
-	public function reset() {
-		parent::reset();
-		$this->response->body = json_encode(array(
+	public function send($method, $path = null, $data = array(), $options = array()) {
+		$defaults = array('return' => 'body');
+		$options += $defaults;
+		$response = new Response();
+
+		$response->body = json_encode(array(
 			'ok' => true,
 			'id' => '12345',
+			'rev' => '1-2',
 			'body' => 'something'
 		));
+		return ($options['return'] == 'body') ? $response->body() : $response;
 	}
 }
+
 ?>

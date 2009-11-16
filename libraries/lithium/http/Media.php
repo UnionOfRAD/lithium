@@ -95,6 +95,11 @@ class Media extends \lithium\core\Object {
 			'view'     => false,
 			'layout'   => false,
 			'template' => false
+		),
+		'form' => array(
+			'view'   => false,
+			'layout' => false,
+			'encode' => 'http_build_query'
 		)
 	);
 

@@ -31,10 +31,7 @@ class CouchDbTest extends \lithium\test\Unit {
 	);
 
 	public function setUp() {
-		$this->query = new Query(array(
-			'model' => '\lithium\data\Model',
-			'record' => new Record()
-		));
+		$this->query = new Query(array('model' => '\lithium\data\Model', 'record' => new Record()));
 	}
 
 	public function tearDown() {
@@ -76,62 +73,68 @@ class CouchDbTest extends \lithium\test\Unit {
 	}
 
 	public function testGet() {
+		$this->skipIf(true, 'HTTP methods no longer callable from Couch adapter');
+
 		$couchdb = new CouchDb($this->_testConfig);
-		$expected = (object) array('ok' => true, 'id' => '12345', 'body' => 'something');
+		$expected = (object)array('ok' => true, 'id' => '12345', 'body' => 'something');
 		$result = $couchdb->get();
 		$this->assertEqual($expected, $result);
 
 		$expected = 'HTTP/1.1';
-		$result = $couchdb->response->protocol;
+		$result = $couchdb->last->response->protocol;
 		$this->assertEqual($expected, $result);
 
 		$expected = '200';
-		$result = $couchdb->response->status['code'];
+		$result = $couchdb->last->response->status['code'];
 		$this->assertEqual($expected, $result);
 
 		$expected = 'OK';
-		$result = $couchdb->response->status['message'];
+		$result = $couchdb->last->response->status['message'];
 		$this->assertEqual($expected, $result);
 
 		$expected = 'text/html';
-		$result = $couchdb->response->type;
+		$result = $couchdb->last->response->type;
 		$this->assertEqual($expected, $result);
 
 		$expected = 'UTF-8';
-		$result = $couchdb->response->charset;
+		$result = $couchdb->last->response->charset;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testGetPath() {
+		$this->skipIf(true, 'HTTP methods no longer callable from Couch adapter');
+
 		$couchdb = new CouchDb($this->_testConfig);
 		$result = $couchdb->get('search.json');
 		$expected = (object) array('ok' => true, 'id' => '12345', 'body' => 'something');
 		$this->assertEqual($expected, $result);
 
 		$expected = 'HTTP/1.1';
-		$result = $couchdb->response->protocol;
+		$result = $couchdb->last->response->protocol;
 		$this->assertEqual($expected, $result);
 
 		$expected = '200';
-		$result = $couchdb->response->status['code'];
+		$result = $couchdb->last->response->status['code'];
 		$this->assertEqual($expected, $result);
 
 		$expected = 'OK';
-		$result = $couchdb->response->status['message'];
+		$result = $couchdb->last->response->status['message'];
 		$this->assertEqual($expected, $result);
 
 		$expected = 'text/html';
-		$result = $couchdb->response->type;
+		$result = $couchdb->last->response->type;
 		$this->assertEqual($expected, $result);
 
 		$expected = 'UTF-8';
-		$result = $couchdb->response->charset;
+		$result = $couchdb->last->response->charset;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testPost() {
+		$this->skipIf(true, 'HTTP methods no longer callable from Couch adapter');
+
 		$couchdb = new CouchDb($this->_testConfig);
-		$couchdb->post('update.xml', array('status' => 'cool'));
+		$couchdb->post('update.json', array('status' => 'cool'));
 		$expected = join("\r\n", array(
 			'POST /update.xml HTTP/1.1',
 			'Host: localhost:80',
@@ -169,10 +172,9 @@ class CouchDbTest extends \lithium\test\Unit {
 	public function testDelete() {
 		$couchdb = new CouchDb($this->_testConfig);
 		$expected = true;
-		$result = $couchdb->delete($this->query, array());
+		$result = $couchdb->delete($this->query);
 		$this->assertEqual($expected, $result);
 	}
-
 }
 
 ?>

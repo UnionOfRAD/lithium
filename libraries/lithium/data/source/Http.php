@@ -23,7 +23,7 @@ class Http extends \lithium\data\Source {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'service' => '\lithium\http\Service',
+		'service' => '\lithium\http\Service'
 	);
 
 	/**
@@ -150,9 +150,10 @@ class Http extends \lithium\data\Source {
 	 * @param string $options
 	 * @return void
 	 */
-	public function create($record = null, $options = array()) {
+	public function create($query, $options = array()) {
 		return $this->_connection->post();
 	}
+
 	/**
 	 * Read used by model to GET
 	 *
@@ -160,7 +161,7 @@ class Http extends \lithium\data\Source {
 	 * @param array options
 	 * @return string
 	 */
-	public function read($query = null, $options = array()) {
+	public function read($query, $options = array()) {
 		return $this->_connection->get();
 	}
 
@@ -171,7 +172,7 @@ class Http extends \lithium\data\Source {
 	 * @param array options
 	 * @return string
 	 */
-	public function update($query = null, $options = array()) {
+	public function update($query, $options = array()) {
 		return $this->_connection->put();
 	}
 

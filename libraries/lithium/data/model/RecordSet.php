@@ -166,6 +166,12 @@ class RecordSet extends \lithium\util\Collection {
 		unset($this->_items[$index]);
 	}
 
+	/**
+	* Reset the set's iterator and return the first record in the set.
+	* The next call of `current()` will get the first record in the set.
+	*
+	* @return `Record`
+	*/
 	public function rewind() {
 		$this->_pointer = 0;
 		$this->_valid = (reset($this->_items) !== false && reset($this->_index));
@@ -181,10 +187,20 @@ class RecordSet extends \lithium\util\Collection {
 		return $this->_items[$this->_pointer];
 	}
 
+	/**
+	* Returns the currently pointed to record in the set.
+	*
+	* @return `Record`
+	*/
 	public function current() {
 		return $this->_items[$this->_pointer];
 	}
 
+	/**
+	* Returns the currently pointed to record's unique key.
+	*
+	* @return mixed
+	*/
 	public function key() {
 		return $this->_index[$this->_pointer];
 	}
@@ -228,8 +244,8 @@ class RecordSet extends \lithium\util\Collection {
 	/**
 	 * Converts the data in the record set to a different format, i.e. an array.
 	 *
-	 * @param string $format 
-	 * @param array $options 
+	 * @param string $format
+	 * @param array $options
 	 * @return mixed
 	 */
 	public function to($format, $options = array()) {
@@ -254,10 +270,21 @@ class RecordSet extends \lithium\util\Collection {
 		return $result;
 	}
 
+	/**
+	* Magic alias for _close().
+	*/
 	public function __destruct() {
 		$this->_close();
 	}
 
+	/**
+	 * Lazy-loads records from a query using a reference to a database adapter and a query
+	 * result resource.
+	 *
+	 * @param array $data
+	 * @param mixed $key
+	 * @return array
+	 */
 	protected function _populate($data = null, $key = null) {
 		if ($this->_closed()) {
 			return;
@@ -271,9 +298,10 @@ class RecordSet extends \lithium\util\Collection {
 
 		foreach ($this->_columns as $model => $fields) {
 			$data = array_combine($fields, array_slice($data, 0, count($fields)));
+			$exists = true;
 
 			$class = $this->_classes['record'];
-			$this->_items[] = ($record = new $class(compact('model', 'data')));
+			$this->_items[] = ($record = new $class(compact('model', 'data', 'exists')));
 			$this->_index[] = $recordKey;
 			return $record;
 		}

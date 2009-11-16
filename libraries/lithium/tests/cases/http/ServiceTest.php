@@ -58,23 +58,23 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual('Test!', $result);
 
 		$expected = 'HTTP/1.1';
-		$result = $http->response->protocol;
+		$result = $http->last->response->protocol;
 		$this->assertEqual($expected, $result);
 
 		$expected = '200';
-		$result = $http->response->status['code'];
+		$result = $http->last->response->status['code'];
 		$this->assertEqual($expected, $result);
 
 		$expected = 'OK';
-		$result = $http->response->status['message'];
+		$result = $http->last->response->status['message'];
 		$this->assertEqual($expected, $result);
 
 		$expected = 'text/html';
-		$result = $http->response->type;
+		$result = $http->last->response->type;
 		$this->assertEqual($expected, $result);
 
 		$expected = 'UTF-8';
-		$result = $http->response->charset;
+		$result = $http->last->response->charset;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -84,23 +84,23 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual('Test!', $result);
 
 		$expected = 'HTTP/1.1';
-		$result = $http->response->protocol;
+		$result = $http->last->response->protocol;
 		$this->assertEqual($expected, $result);
 
 		$expected = '200';
-		$result = $http->response->status['code'];
+		$result = $http->last->response->status['code'];
 		$this->assertEqual($expected, $result);
 
 		$expected = 'OK';
-		$result = $http->response->status['message'];
+		$result = $http->last->response->status['message'];
 		$this->assertEqual($expected, $result);
 
 		$expected = 'text/html';
-		$result = $http->response->type;
+		$result = $http->last->response->type;
 		$this->assertEqual($expected, $result);
 
 		$expected = 'UTF-8';
-		$result = $http->response->charset;
+		$result = $http->last->response->charset;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -149,5 +149,22 @@ class ServiceTest extends \lithium\test\Unit {
 		$result = (string)$http->last->request;
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testJsonPost() {
+		$http = new MockService($this->_testConfig);
+		$http->post('update.xml', array('status' => 'cool'), array('type' => 'json'));
+		$expected = join("\r\n", array(
+			'POST /update.xml HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0 (Lithium)',
+			'Content-Type: application/json',
+			'Content-Length: 17',
+			'', '{"status":"cool"}'
+		));
+		$result = (string)$http->last->request;
+		$this->assertEqual($expected, $result);
+	}
 }
+
 ?>

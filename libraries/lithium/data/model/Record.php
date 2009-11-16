@@ -10,10 +10,19 @@ namespace lithium\data\model;
 
 class Record extends \lithium\core\Object {
 
+	/**
+	* Namespaced name of model that this record is linked to.
+	*/
 	protected $_model = null;
 
+	/**
+	* Associative array of the records fields with values
+	*/
 	protected $_data = array();
 
+	/**
+	* Validation errors 
+	*/
 	protected $_errors = array();
 
 	/**
@@ -56,16 +65,41 @@ class Record extends \lithium\core\Object {
 		return array_key_exists($name, $this->_data);
 	}
 
+	/**
+	 * Allows several properties to be assigned at once, i.e.:
+	 * {{{
+	 * $record->set(array('title' => 'Lorem Ipsum', 'value' => 42));
+	 * }}}
+	 *
+	 * @param $values An associative array of fields and values to assign to the `Record`.
+	 * @return void
+	 */
 	public function set($values) {
 		foreach ($values as $name => $value) {
 			$this->__set($name, $value);
 		}
 	}
 
+	/**
+	* Access the data fields of the record. Can also access a $named field;
+	*
+	* @param string $name optionally include field name, returns entire data array if left empty
+	* @return array
+	*/
 	public function data($name = null) {
 		return empty($name) ? $this->_data : $this->__get($name);
 	}
 
+	/**
+	* Magic method that allows calling of model methods on this record instance, i.e.:
+	* {{{
+	* $record->validates();
+	* }}}
+	*
+	* @param string $method
+	* @param array $params
+	* return mixed
+	*/
 	public function __call($method, $params) {
 		$model = $this->_model;
 
@@ -77,10 +111,22 @@ class Record extends \lithium\core\Object {
 		return call_user_func_array(array(&$class, $method), $params);
 	}
 
+	/**
+	* A flag indicating whether or not this record exists.
+	*
+	* @return boolean True if record is from db, or after a save.
+	*/
 	public function exists() {
 		return $this->_exists;
 	}
 
+	/**
+	 * Converts the data in the record set to a different format, i.e. an array.
+	 *
+	 * @param string $format currently only `array`
+	 * @param array $options
+	 * @return mixed
+	 */
 	public function to($format, $options = array()) {
 		switch ($format) {
 			case 'array':

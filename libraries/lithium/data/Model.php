@@ -174,7 +174,7 @@ class Model extends \lithium\core\StaticObject {
 			'conditions' => null, 'fields' => null, 'order' => null, 'limit' => null, 'page' => 1
 		);
 
-		if (is_numeric($type) || $classes['validator']::isUuid($type)) {
+		if ($type != 'all' && !isset($self->_finders[$type])) {
 			$options['conditions'] = array($self->_meta['key'] => $type);
 			$type = 'first';
 		}
@@ -196,7 +196,8 @@ class Model extends \lithium\core\StaticObject {
 				'model'    => $options['model'],
 				'handle'   => &$connection,
 				'classes'  => $options['classes'],
-				'result'   => $connection->read($query, $options)
+				'result'   => $connection->read($query, $options),
+				'exists'   => true
 			));
 		};
 		$finder = isset($self->_finders[$type]) ? array($self->_finders[$type]) : array();
@@ -291,6 +292,16 @@ class Model extends \lithium\core\StaticObject {
 		return $self->_schema;
 	}
 
+	/**
+	 * Checks to see if a particular field exists in a model's schema. Can check a single field, or
+	 * return the first field found in an array of multiple options.
+	 *
+	 * @param mixed $field A single field (string) or list of fields (array) to check the existence
+	 *              of.
+	 * @return mixed If `$field` is a string, returns a boolean indicating whether or not that field
+	 *         exists. If `$field` is an array, returns the first field found, or `false` if none of
+	 *         the fields in the list are found.
+	 */
 	public static function hasField($field) {
 		if (is_array($field)) {
 			foreach ($field as $f) {
@@ -400,6 +411,12 @@ class Model extends \lithium\core\StaticObject {
 		});
 	}
 
+	/**
+	 * Gets just the class name portion of a fully-namespaced class name, i.e.
+	 * `app\models\Post::_name()` returns `'Post'`.
+	 *
+	 * @return string
+	 */
 	protected static function _name() {
 		static $name;
 		return $name ?: $name = join('', array_slice(explode("\\", get_called_class()), -1));
