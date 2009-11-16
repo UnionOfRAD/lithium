@@ -122,6 +122,21 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testOrder() {
+		$q = new Query($this->_queryArr);
+
+		$expected = 'created DESC';
+		$result = $q->order();
+		$this->assertEqual($expected, $result);
+
+		$q->order('updated ASC');
+
+		$expected = 'updated ASC';
+		$result = $q->order();
+		$this->assertEqual($expected, $result);
+	}
+
+
 }
 
 ?>
