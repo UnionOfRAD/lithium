@@ -11,11 +11,11 @@ namespace lithium\tests\mocks\data\model;
 use \lithium\data\model\Document;
 
 class MockDocumentMultipleKey extends \lithium\data\Model {
-	
+
 	protected $_meta = array(
 		'key' => array('id', 'rev')
 	);
-	
+
 	public static function __init($options = array()) {}
 
 	public function ret($record, $param1 = null, $param2 = null) {
