@@ -258,7 +258,7 @@ class Model extends \lithium\core\StaticObject {
 			return array_keys($self->_relations);
 		}
 
-		if (array_key_exists($name, $self->_relationTypes)) {
+		if (isset($self->_relationTypes[$name])) {
 			return $self->$name;
 		}
 

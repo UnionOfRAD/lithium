@@ -21,7 +21,7 @@ class Parser extends \lithium\core\StaticObject {
 	 * present in the string, only the first is returned.
 	 *
 	 * @param string $string String of PHP code to get the token name of, i.e. `'=>'` or `'static'`.
-	 * @param string $options 
+	 * @param string $options
 	 * @return mixed
 	 */
 	public static function token($string, $options = array()) {
@@ -71,8 +71,8 @@ class Parser extends \lithium\core\StaticObject {
 	/**
 	 * Finds a pattern in a block of code.
 	 *
-	 * @param string $code 
-	 * @param string $pattern 
+	 * @param string $code
+	 * @param string $pattern
 	 * @param array $options The list of options to be used when parsing / matching `$code`:
 	 *              - 'ignore': An array of token names to ignore while parsing, defaults to
 	 *               `array('T_WHITESPACE')`
