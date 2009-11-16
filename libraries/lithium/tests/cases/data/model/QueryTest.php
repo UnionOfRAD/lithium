@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\data\model;
 
+use \lithium\data\model\Record;
 use \lithium\data\model\Query;
 use \lithium\tests\mocks\data\model\MockQueryPost;
 use \lithium\tests\mocks\data\model\MockQueryComment;
@@ -21,7 +22,8 @@ class QueryTest extends \lithium\test\Unit {
 		'limit' => 10,
 		'page' => 1,
 		'fields' => array('id','author_id','title'),
-		'conditions' => array('author_id' => 12)
+		'conditions' => array('author_id' => 12),
+		'comment' => 'Find all posts by author 12'
 	);
 
 	public function setUp() {
@@ -136,7 +138,68 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testRecord() {
+		$q = new Query($this->_queryArr);
 
+		$result = $q->record();
+		$this->assertNull($result);
+
+		$record = (object) array('id' => 12);
+		$record->title = 'Lorem Ipsum';
+
+		$q->record($record);
+
+		$query_record = $q->record();
+
+		$expected = 12;
+		$result = $query_record->id;
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Lorem Ipsum';
+		$result = $query_record->title;
+		$this->assertEqual($expected, $result);
+
+		$this->assertTrue($record == $q->record());
+	}
+
+	public function testComment() {
+		$q = new Query($this->_queryArr);
+
+		$expected = 'Find all posts by author 12';
+		$result = $q->comment();
+		$this->assertEqual($expected, $result);
+
+		$q->comment('Comment lorem');
+
+		$expected = 'Comment lorem';
+		$result = $q->comment();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testData() {
+		$q = new Query($this->_queryArr);
+
+		$expected = array();
+		$result = $q->data();
+		$this->assertEqual($expected, $result);
+
+		$record = new Record();
+		$record->id = 12;
+		$record->title = 'Lorem Ipsum';
+
+		$q->record($record);
+
+		$expected = array('id' => 12, 'title' => 'Lorem Ipsum');
+		$result = $q->data();
+		$this->assertEqual($expected, $result);
+
+		$q->data(array('id' => 35, 'title' => 'Nix', 'body' => 'Prix'));
+
+		$expected = array('id' => 35, 'title' => 'Nix', 'body' => 'Prix');
+		$result = $q->data();
+		$this->assertEqual($expected, $result);
+
+	}
 }
 
 ?>
