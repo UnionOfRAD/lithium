@@ -60,9 +60,11 @@ class Libraries {
 			'{:library}\{:namespace}\{:class}\adapters\{:name}' => array('libraries' => 'lithium')
 		),
 		'commands' => array(
+			'{:library}\extensions\commands\{:namespace}\{:class}\{:name}',
 			'{:library}\extensions\commands\{:class}\{:name}',
-			'{:library}\extensions\commands\{:name}',
-			'{:library}\console\commands\{:name}' => array('libraries' => 'lithium')
+			'{:library}\console\commands\{:namespace}\{:class}\{:name}' => array(
+				'libraries' => 'lithium'
+			),
 		),
 		'controllers' => array(
 			'{:library}\controllers\{:name}Controller'
@@ -167,7 +169,10 @@ class Libraries {
 				return static::_addPlugins((array)$config);
 			break;
 		}
-		static::$_configurations[$name] = ((array)$config += $defaults);
+
+		$config = (array)$config + $defaults;
+		$config['path'] = str_replace('\\', '/', $config['path']);
+		static::$_configurations[$name] = $config;
 
 		if ($config['includePath']) {
 			$path = ($config['includePath'] === true) ? $config['path'] : $config['includePath'];
@@ -178,7 +183,7 @@ class Libraries {
 			if ($config['bootstrap'] === true) {
 				$config['bootstrap'] = 'config/bootstrap.php';
 			}
-			require $config['path'] . '/' . $config['bootstrap'];
+			require "{$config['path']}/{$config['bootstrap']}";
 		}
 
 		if (!empty($config['loader'])) {
@@ -295,15 +300,17 @@ class Libraries {
 	 *        - 'dirs': Defaults to `false`. If true, will attempt to case-sensitively look up
 	 *          directories in addition to files (in which case `$class` is assumed to actually be a
 	 *          namespace).
-	 * @return array
+	 * @return string Returns the absolute path to the file containing `$class`, or `null` if the
+	 *         file cannot be found.
 	 */
 	public static function path($class, $options = array()) {
-		if (array_key_exists($class, static::$_cachedPaths)) {
-			return static::$_cachedPaths[$class];
-		}
 		$defaults = array('dirs' => false);
 		$options += $defaults;
-		$class = ($class[0] == '\\') ? substr($class, 1) : $class;
+		$class = ltrim($class, '\\');
+
+		if (isset(static::$_cachedPaths[$class])) {
+			return static::$_cachedPaths[$class];
+		}
 
 		foreach (static::$_configurations as $name => $config) {
 			$params = $options + $config;
@@ -356,7 +363,7 @@ class Libraries {
 	 * @see lithium\core\Libraries::add()
 	 */
 	public static function locate($type, $name = null, $options = array()) {
-		if (strpos($name, '\\') !== false) {
+		if (is_object($name) || strpos($name, '\\') !== false) {
 			return $name;
 		}
 		$ident = $name ? $type . '.' . $name : $type;
@@ -439,7 +446,7 @@ class Libraries {
 					continue;
 				}
 				$params['library'] = $library;
-				$classPath = String::insert($pathTemplate, $params);
+				$classPath = str_replace('\\*', '', String::insert($pathTemplate, $params));
 
 				if (file_exists(Libraries::path($classPath))) {
 					return $classPath;
@@ -491,6 +498,7 @@ class Libraries {
 				$options['path'] = preg_replace(
 					'/(\/\*)|(\/(?:[A-Z][a-z0-9_]*))|({:\w+})/', '', str_replace('\\', '/', $path)
 				);
+
 				if (is_dir("{$config['path']}/{$options['path']}")) {
 					$classes = array_merge($classes, static::_search($config, $options));
 				}
@@ -510,7 +518,7 @@ class Libraries {
 		$path = rtrim($config['path'] . $options['path'], '/');
 		$filter = '/^.+\/[A-Za-z0-9_]+$|^.*' . preg_quote($config['suffix'], '/') . '/';
 		$search = function($path) use ($config, $filter, $options) {
-			return preg_grep($filter, glob(
+			return preg_grep($filter, (array)glob(
 				$path . '/*' . ($options['namespaces'] ? '' : $config['suffix'])
 			));
 		};
@@ -518,7 +526,7 @@ class Libraries {
 		$libs = $search($path, $config);
 
 		if ($options['recursive']) {
-			$dirs = $queue = array_diff(glob($path . '/*', GLOB_ONLYDIR), $libs);
+			$dirs = $queue = array_diff((array)glob($path . '/*', GLOB_ONLYDIR), $libs);
 			while ($queue) {
 				$dir = array_pop($queue);
 
@@ -526,7 +534,9 @@ class Libraries {
 					continue;
 				}
 				$libs = array_merge($libs, $search($dir, $config));
-				$queue = array_merge($queue, array_diff(glob($dir . '/*', GLOB_ONLYDIR), $libs));
+				$queue = array_merge(
+					$queue, array_diff((array)glob($dir . '/*', GLOB_ONLYDIR), $libs)
+				);
 			}
 		}
 

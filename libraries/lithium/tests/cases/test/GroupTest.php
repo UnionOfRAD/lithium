@@ -77,9 +77,9 @@ class GroupTest extends \lithium\test\Unit {
 
 	public function testTestsRun() {
 		$group = new Group();
-		$result = $group->add('test\MockTestInGroupTest');
+		$result = $group->add('\lithium\tests\mocks\test\MockUnitTest');
 		$expected = array(
-			'lithium\tests\cases\test\MockTestInGroupTest',
+			'\lithium\tests\mocks\test\MockUnitTest',
 		);
 		$this->assertEqual($expected, $result);
 
@@ -87,25 +87,30 @@ class GroupTest extends \lithium\test\Unit {
 		$this->assertTrue(is_a($results, '\lithium\util\Collection'));
 
 		$results = $group->tests();
-		$this->assertTrue(is_a($results->current(), 'lithium\tests\cases\test\MockTestInGroupTest'));
+		$this->assertTrue(is_a($results->current(), 'lithium\tests\mocks\test\MockUnitTest'));
 
 		$results = $group->tests()->run();
-		$this->assertEqual($results[0][0]['result'], 'pass');
-		$this->assertEqual($results[0][0]['method'], 'testNothing');
-		$this->assertEqual($results[0][0]['file'], __FILE__);
-		$this->assertEqual($results[0][0]['class'], 'lithium\tests\cases\test\MockTestInGroupTest');
+
+		$expected = 'pass';
+		$result = $results[0][0]['result'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'testNothing';
+		$result = $results[0][0]['method'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'lithium\tests\mocks\test\MockUnitTest';
+		$result = $results[0][0]['class'];
+		$this->assertEqual($expected, $result);
+
+		$expected = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/MockUnitTest.php';
+		$result = $results[0][0]['file'];
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testQueryAllTests() {
 		$result = Group::all(array('library' => 'lithium'));
 		$this->assertTrue(count($result) >= 60);
-	}
-}
-
-class MockTestInGroupTest extends \lithium\test\Unit {
-
-	public function testNothing() {
-		$this->assertTrue(true);
 	}
 }
 

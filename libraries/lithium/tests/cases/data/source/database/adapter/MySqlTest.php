@@ -10,13 +10,7 @@ namespace lithium\tests\cases\data\source\database\adapter;
 
 use \lithium\data\Connections;
 use \lithium\data\source\database\adapter\MySql;
-
-class MySqlMock extends MySql {
-
-	public function get($var) {
-		return $this->{$var};
-	}
-}
+use \lithium\tests\mocks\data\source\database\adapter\MockMySql;
 
 class MySqlTest extends \lithium\test\Unit {
 
@@ -47,7 +41,7 @@ class MySqlTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testConstructorDefaults() {
-		$db = new MySqlMock(array('autoConnect' => false));
+		$db = new MockMySql(array('autoConnect' => false));
 		$result = $db->get('_config');
 		$expected = array(
 			'autoConnect' => false, 'port' => '3306', 'persistent' => true, 'host' => 'localhost',

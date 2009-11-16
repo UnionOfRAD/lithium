@@ -19,7 +19,7 @@ use \DirectoryIterator;
  * methods to be filtered as per the Lithium filtering system.
  *
  * The path that the cached files will be written to defaults to
- * LITHIUM_APP_PATH/tmp/cache, but is user-configurable on cache configuration.
+ * `LITHIUM_APP_PATH/tmp/cache`, but is user-configurable on cache configuration.
  *
  * Note that the cache expiration time is stored within the first few bytes
  * of the cached data, and is transparently added and/or removed when values
@@ -129,6 +129,18 @@ class File extends \lithium\core\Object {
 		}
 		return true;
 
+	}
+
+	/**
+	 * Determines if the File adapter can read and write
+	 * to the configured path.
+	 *
+	 * return boolean True if enabled, false otherwise
+	 */
+	public function enabled() {
+		$directory = new SplFileInfo($this->_config['path']);
+
+		return ($directory->isDir() && $directory->isReadable() && $directory->isWritable());
 	}
 
 }

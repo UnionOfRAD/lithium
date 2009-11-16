@@ -77,8 +77,8 @@ class Profiler extends \lithium\core\StaticObject {
 	/**
 	 * Add, remove, or modify a profiler check.
 	 *
-	 * @param mixed $name 
-	 * @param string $value 
+	 * @param mixed $name
+	 * @param string $value
 	 * @see lithium\test\Profiler::$_metrics
 	 * @return mixed
 	 */
@@ -150,7 +150,7 @@ class Profiler extends \lithium\core\StaticObject {
 		$metrics = array();
 
 		foreach ($results as $testCase) {
-			foreach ($testCase as $assertion) {
+			foreach ((array)$testCase as $assertion) {
 				if ($assertion['result'] != 'pass' && $assertion['result'] != 'fail') {
 					continue;
 				}

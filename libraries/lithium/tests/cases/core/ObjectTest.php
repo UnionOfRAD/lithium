@@ -9,57 +9,14 @@
 namespace lithium\tests\cases\core;
 
 use \lithium\core\Object;
-
-class TestMethodFiltering extends \lithium\core\Object {
-
-	public function method($data) {
-		$data[] = 'Starting outer method call';
-		$result = $this->_filter(__METHOD__, compact('data'), function($self, $params, $chain) {
-			$params['data'][] = 'Inside method implementation';
-			return $params['data'];
-		});
-		$result[] = 'Ending outer method call';
-		return $result;
-	}
-
-	public function method2() {
-		$filters =& $this->_methodFilters;
-		$method = function($self, $params, $chain) use (&$filters) {
-			return $filters;
-		};
-		return $this->_filter(__METHOD__, array(), $method);
-	}
-}
-
-class Exposed extends \lithium\core\Object {
-
-	protected $_internal = 'secret';
-
-	public function tamper() {
-		$internal =& $this->_internal;
-
-		return $this->_filter(__METHOD__, array(), function() use (&$internal) {
-			$internal = 'tampered';
-			return true;
-		});
-	}
-
-	public function get() {
-		return $this->_internal;
-	}
-}
-
-class Callable extends \lithium\core\Object {
-	
-	public function __call($method, $params = array()) {
-		return $params;
-	}
-}
+use \lithium\tests\mocks\core\MockMethodFiltering;
+use \lithium\tests\mocks\core\MockExposed;
+use \lithium\tests\mocks\core\MockCallable;
 
 class ObjectTest extends \lithium\test\Unit {
 
 	public function testMethodFiltering() {
-		$test = new TestMethodFiltering();
+		$test = new MockMethodFiltering();
 		$result = $test->method(array('Starting test'));
 		$expected = array(
 			'Starting test',
@@ -113,7 +70,7 @@ class ObjectTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	function testFilteringWithProtectedAccess() {
-		$object = new Exposed();
+		$object = new MockExposed();
 		$this->assertEqual($object->get(), 'secret');
 		$this->assertTrue($object->tamper());
 		$this->assertEqual($object->get(), 'tampered');
@@ -125,7 +82,7 @@ class ObjectTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	function testMultipleMethodFiltering() {
-		$object = new TestMethodFiltering();
+		$object = new MockMethodFiltering();
 		$this->assertIdentical($object->method2(), array());
 
 		$object->applyFilter(array('method', 'method2'), function($self, $params, $chain) {
@@ -141,7 +98,7 @@ class ObjectTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testMethodInvokationWithParameters() {
-		$callable = new Callable();
+		$callable = new MockCallable();
 
 		$this->assertEqual($callable->invokeMethod('foo'), array());
 		$this->assertEqual($callable->invokeMethod('foo', array('bar')), array('bar'));

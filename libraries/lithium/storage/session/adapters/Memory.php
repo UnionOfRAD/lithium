@@ -8,6 +8,8 @@
 
 namespace lithium\storage\session\adapters;
 
+use \lithium\util\String;
+
 /**
  * Simple memory session storage engine. Used for testing.
  */
@@ -16,7 +18,7 @@ class Memory extends \lithium\core\Object {
 	public $_session = array();
 
 	public function key() {
-		return $_SERVER['UNIQUE_ID'];
+		return String::uuid(function($value) { return $_SERVER[$value]; });
 	}
 
 	public function isStarted() {

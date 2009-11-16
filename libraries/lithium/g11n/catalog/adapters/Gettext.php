@@ -28,7 +28,7 @@ use \lithium\util\String;
  *   - `message_default.pot`: The message template.
  *   - `message_<scope>.pot`: The message template for <scope>.
  *
- * @see \lithium\g11n\Locale
+ * @see lithium\g11n\Locale
  * @link http://php.net/setlocale
  */
 class Gettext extends \lithium\g11n\catalog\adapters\Base {

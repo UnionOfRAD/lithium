@@ -59,7 +59,7 @@ class Base {
 				return $this->headers;
 			}
 		}
-	
+
 		if (!empty($value)) {
 			$this->headers = array_merge($this->headers, array($key => $value));
 		} else {
@@ -74,6 +74,7 @@ class Base {
 			}
 		}
 		$headers = array();
+
 		foreach ($this->headers as $key => $value) {
 			$headers[] = "{$key}: {$value}";
 		}
@@ -87,7 +88,7 @@ class Base {
 	 */
 	public function body($data = null) {
 		$this->body = array_merge((array)$this->body, (array)$data);
-		return join("\r\n", $this->body);
+		return trim(join("\r\n", $this->body));
 	}
 }
 

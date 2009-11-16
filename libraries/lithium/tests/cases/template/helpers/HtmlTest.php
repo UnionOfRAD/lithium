@@ -10,9 +10,7 @@ namespace lithium\tests\cases\template\helpers;
 
 use \lithium\http\Router;
 use \lithium\template\helpers\Html;
-use \lithium\template\view\Renderer;
-
-class MyHtmlRenderer extends Renderer {}
+use \lithium\tests\mocks\template\helpers\MockHtmlRenderer;
 
 class HtmlTest extends \lithium\test\Unit {
 
@@ -36,7 +34,7 @@ class HtmlTest extends \lithium\test\Unit {
 		Router::connect('/{:controller}/{:action}/{:id}.{:type}');
 		Router::connect('/{:controller}/{:action}.{:type}');
 
-		$this->html = new Html(array('context' => new MyHtmlRenderer()));
+		$this->html = new Html(array('context' => new MockHtmlRenderer()));
 	}
 
 	/**
@@ -160,11 +158,11 @@ class HtmlTest extends \lithium\test\Unit {
 		$result = $this->html->link('/home');
 		$expected = array('a' => array('href' => '/home'), 'preg:/\/home/', '/a');
 		$this->assertTags($result, $expected);
-		
+
 		$result = $this->html->link('Next >', '#');
 		$expected = array('a' => array('href' => '#'), 'Next &gt;', '/a');
 		$this->assertTags($result, $expected);
-		
+
 		$result = $this->html->link('Next >', '#', array('escape' => true));
 		$expected = array(
 			'a' => array('href' => '#'),
@@ -172,7 +170,7 @@ class HtmlTest extends \lithium\test\Unit {
 			'/a'
 		);
 		$this->assertTags($result, $expected);
-		
+
 		$result = $this->html->link('Next >', '#', array('escape' => 'utf-8'));
 		$expected = array(
 			'a' => array('href' => '#'),
@@ -180,7 +178,7 @@ class HtmlTest extends \lithium\test\Unit {
 			'/a'
 		);
 		$this->assertTags($result, $expected);
-		
+
 		$result = $this->html->link('Next >', '#', array('escape' => false));
 		$expected = array('a' => array('href' => '#'), 'Next >', '/a');
 		$this->assertTags($result, $expected);
@@ -219,7 +217,7 @@ class HtmlTest extends \lithium\test\Unit {
 		// $this->assertTags($result, $expected);
 
 		// Configure::write('Asset.timestamp', false);
-		// 
+		//
 		// $result = $this->html->link($this->html->image('test.gif'), '#', array());
 		// $expected = array(
 		// 	'a' => array('href' => '#'),
@@ -227,7 +225,7 @@ class HtmlTest extends \lithium\test\Unit {
 		// 	'/a'
 		// );
 		// $this->assertTags($result, $expected);
-		// 
+		//
 		// $result = $this->html->image('test.gif', array('url' => '#'));
 		// $expected = array(
 		// 	'a' => array('href' => '#'),
@@ -235,7 +233,7 @@ class HtmlTest extends \lithium\test\Unit {
 		// 	'/a'
 		// );
 		// $this->assertTags($result, $expected);
-		// 
+		//
 		// Configure::write('Asset.timestamp', true);
 	}
 
@@ -371,53 +369,53 @@ class HtmlTest extends \lithium\test\Unit {
 // 		$expected['link']['href'] = 'preg:/.*ccss\/lithium\.generic\.css/';
 // 		$this->assertTags($result, $expected);
 // 		Configure::write('Asset.filter.css', false);
-// 
+//
 // 		$result = explode("\n", trim($this->html->style(array('lithium.generic', 'vendor.generic'))));
 // 		$expected['link']['href'] = 'preg:/.*css\/lithium\.generic\.css/';
 // 		$this->assertTags($result[0], $expected);
 // 		$expected['link']['href'] = 'preg:/.*css\/vendor\.generic\.css/';
 // 		$this->assertTags($result[1], $expected);
 // 		$this->assertEqual(count($result), 2);
-// 
+//
 // 		Configure::write('Asset.timestamp', true);
-// 
+//
 // 		Configure::write('Asset.filter.css', 'css.php');
 // 		$result = $this->html->style('lithium.generic');
 // 		$expected['link']['href'] = 'preg:/.*ccss\/lithium\.generic\.css\?[0-9]+/';
 // 		$this->assertTags($result, $expected);
 // 		Configure::write('Asset.filter.css', false);
-// 
+//
 // 		$result = $this->html->style('lithium.generic');
 // 		$expected['link']['href'] = 'preg:/.*css\/lithium\.generic\.css\?[0-9]+/';
 // 		$this->assertTags($result, $expected);
-// 
+//
 // 		$debug = Configure::read('debug');
 // 		Configure::write('debug', 0);
-// 
+//
 // 		$result = $this->html->style('lithium.generic');
 // 		$expected['link']['href'] = 'preg:/.*css\/lithium\.generic\.css/';
 // 		$this->assertTags($result, $expected);
-// 
+//
 // 		Configure::write('Asset.timestamp', 'force');
-// 
+//
 // 		$result = $this->html->style('lithium.generic');
 // 		$expected['link']['href'] = 'preg:/.*css\/lithium\.generic\.css\?[0-9]+/';
 // 		$this->assertTags($result, $expected);
-// 
+//
 // 		$webroot = $this->html->webroot;
 // 		$this->html->webroot = '/testing/';
 // 		$result = $this->html->style('lithium.generic');
 // 		$expected['link']['href'] = 'preg:/\/testing\/css\/lithium\.generic\.css\?/';
 // 		$this->assertTags($result, $expected);
 // 		$this->html->webroot = $webroot;
-// 
+//
 // 		$webroot = $this->html->webroot;
 // 		$this->html->webroot = '/testing/longer/';
 // 		$result = $this->html->style('lithium.generic');
 // 		$expected['link']['href'] = 'preg:/\/testing\/longer\/css\/lithium\.generic\.css\?/';
 // 		$this->assertTags($result, $expected);
 // 		$this->html->webroot = $webroot;
-// 
+//
 // 		Configure::write('debug', $debug);
 	}
 

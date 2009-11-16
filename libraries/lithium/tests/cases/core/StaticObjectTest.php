@@ -10,36 +10,10 @@ namespace lithium\tests\cases\core;
 
 use \lithium\core\StaticObject;
 
-class TestMethodFilteringStatic extends \lithium\core\StaticObject {
-
-	public static function method($data) {
-		$data[] = 'Starting outer method call';
-		$result = static::_filter(__METHOD__, compact('data'), function($self, $params, $chain) {
-			$params['data'][] = 'Inside method implementation of ' . $self;
-			return $params['data'];
-		});
-		$result[] = 'Ending outer method call';
-		return $result;
-	}
-
-	public static function method2() {
-		$filters =& static::$_methodFilters;
-		$method = function($self, $params, $chain) use (&$filters) {
-			return $filters;
-		};
-		return static::_filter(__METHOD__, array(), $method);
-	}
-
-	public static function foo() {
-		$args = func_get_args();
-		return $args;
-	}
-}
-
 class StaticObjectTest extends \lithium\test\Unit {
 
 	public function testMethodFiltering() {
-		$class = __NAMESPACE__ . '\TestMethodFilteringStatic';
+		$class = 'lithium\tests\mocks\core\MockStaticObjectMethodFiltering';
 
 		$result = $class::method(array('Starting test'));
 		$expected = array(
@@ -95,7 +69,7 @@ class StaticObjectTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testMethodInvokationWithParameters() {
-		$class = __NAMESPACE__ . '\TestMethodFilteringStatic';
+		$class = '\lithium\tests\mocks\core\MockStaticObjectMethodFiltering';
 
 		$this->assertEqual($class::invokeMethod('foo'), array());
 		$this->assertEqual($class::invokeMethod('foo', array('bar')), array('bar'));
