@@ -170,7 +170,31 @@ class MySQLi extends \lithium\data\source\Database {
 		return null;
 	}
 
-	public function result($type, $resource, $context) {
+	/**
+	 *
+	 * @param string $type
+	 * @param mysqli_result object $mysqliResult
+	 * @param unknown_type $context
+	 * @return array|null
+	 */
+	public function result($type, $mysqliResult, $context) {
+		if (!($resource instanceof  mysqli_result)) {
+			return null;
+		}
+
+		switch ($type) {
+			case 'next':
+				$result = $mysqliResult->fetch_row();
+			break;
+			case 'close':
+				$mysqliResult->close();
+				$result = null;
+			break;
+			default:
+				$result = parent::result($type, $mysqliResult, $context);
+			break;
+		}
+		return $result;
 	}
 
 	public function value($value) {
