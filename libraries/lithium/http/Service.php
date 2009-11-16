@@ -44,6 +44,11 @@ class Service extends \lithium\core\Object {
 	 */
 	protected $_autoConfig = array('classes' => 'merge');
 
+	/**
+	 * The `Socket` instance used to send `Service` calls
+	 *
+	 * @var \lithium\util\Socket
+	 */
 	protected $_connection = null;
 
 	/**
@@ -52,7 +57,7 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @var boolean
 	 */
-	protected $_isConnected = true;
+	protected $_isConnected = false;
 
 	/**
 	 * Fully-namespaced class references to `Service` class dependencies.
@@ -107,7 +112,10 @@ class Service extends \lithium\core\Object {
 			$socket = Libraries::locate('sockets.util', $this->_classes['socket']);
 			$this->_connection = new $socket($this->_config);
 		}
-		return $this->_isConnected = $this->_connection->open();
+		if (!$this->_isConnected && $this->_connection->open()) {
+			$this->_isConnected = true;
+		}
+		return $this->_isConnected;
 	}
 
 	/**
@@ -179,7 +187,6 @@ class Service extends \lithium\core\Object {
 		if ($this->connect() === false) {
 			return false;
 		}
-
 		$request = $this->_request($method, $path, $data, $options);
 
 		if ($this->_connection->write((string)$request)) {
@@ -199,10 +206,9 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @param string $method The HTTP method of the request, i.e. `'GET'`, `'HEAD'`, `'OPTIONS'`,
 	 *               etc. Can be passed in upper- or lowercase.
-	 * @param string $path The relative path to call on remote host
-	 * @param string $data Data for the body of the request
-	 * @param string $options Extra options for the request
-	 *               - `'type'`: content type of request encode by the media class
+	 * @param string $path The
+	 * @param string $data
+	 * @param string $options
 	 * @return object Returns an instance of `http\Request`, configured with an HTTP method, query
 	 *         string or POST/PUT data, and URL.
 	 */

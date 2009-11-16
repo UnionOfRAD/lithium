@@ -124,15 +124,21 @@ class Request extends \lithium\http\Base {
 	/**
 	 * Set queryString
 	 *
+	 * @param array $params
+	 * @param string $format
 	 * @return array
 	 */
 	public function queryString($params = array(), $format = "{:key}={:value}&") {
-		$query = null;
-		if (is_string($params)) {
-			list($format, $params) = func_get_args();
+		if (empty($params)) {
+			if (is_string($this->params)) {
+				return "?" . $this->params;
+			}
+			$params = $this->params;
+		} elseif (is_array($this->params)) {
+			$params = array_merge($this->params, $params);
 		}
-		$params = array_merge((array)$this->params, $params);
-		foreach ((array) $params as $key => $value) {
+		$query = null;
+		foreach ($params as $key => $value) {
 			$query .= String::insert($format, array(
 				'key' => urlencode($key), 'value' => urlencode($value)
 			));
@@ -140,7 +146,7 @@ class Request extends \lithium\http\Base {
 		if (empty($query)) {
 			return null;
 		}
-		return "?" . substr($query, 0, -1);
+		return "?" . $this->params = substr($query, 0, -1);
 	}
 
 	/**
