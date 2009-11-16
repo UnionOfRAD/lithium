@@ -40,7 +40,7 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	public function testAllMethodsNoConnection() {
 		$couchdb = new CouchDb(array('protocol' => null));
-		$this->assertTrue($couchdb->connect());
+		$this->assertFalse($couchdb->connect());
 		$this->assertTrue($couchdb->disconnect());
 		$this->assertFalse($couchdb->get());
 		$this->assertFalse($couchdb->post());

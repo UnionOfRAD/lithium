@@ -8,6 +8,8 @@
 
 namespace lithium\data\source\http\adapter;
 
+use \Exception;
+
 /**
  * CouchDb adapter
  *
@@ -56,7 +58,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @see lithium\data\Model::$_classes
 	 */
 	public function configureClass($class) {
-		return array('meta' => array('key' => '_id'), 'classes' => array(
+		return array('meta' => array('key' => array('_id', '_rev')), 'classes' => array(
 			'record' => '\lithium\data\model\Document',
 			'recordSet' => '\lithium\data\model\Document'
 		));
@@ -106,6 +108,11 @@ class CouchDb extends \lithium\data\source\Http {
 				$this->_db = true;
 			}
 		}
+		if (!$this->_db) {
+			throw new Exception("{$entity} is not available.");
+		}
+
+		return array('_id' => array(), '_rev' => array());
 	}
 
 	/**
@@ -140,15 +147,15 @@ class CouchDb extends \lithium\data\source\Http {
 			if (!empty($data['_id'])) {
 				$id = '/' . $data['_id'];
 				$data['_id'] = (string) $data['_id'];
-				$result = $self->put($params['table'].$id, $data);
+				$result = $conn->put($table . $id, json_encode($data));
 			} else {
-				$result = $self->post($params['table'], $data);
+				$result = $conn->post($table . $id, json_encode($data));
 			}
-			$result = $conn->post($table . $id, $data);
+
 			$result = is_string($result) ? json_decode($result) : $result;
 
 			if ($success = (isset($result->ok) && $result->ok === true)) {
-				$query->record()->invokeMethod('_update', array($result->id));
+				$query->record()->invokeMethod('_update', array(array($result->id, $result->rev)));
 			}
 			return $success;
 		});
@@ -177,7 +184,11 @@ class CouchDb extends \lithium\data\source\Http {
 				$id = '/' . $conditions['_id'];
 				unset($conditions['_id']);
 			}
-			return $conn->get($table . $id, array_filter($conditions));
+			if ($conditions == null) {
+				$id = '/_all_docs';
+			}
+
+			return json_decode($conn->get($table . $id, array_filter($conditions + $limit)));
 		});
 	}
 
@@ -203,12 +214,17 @@ class CouchDb extends \lithium\data\source\Http {
 				$id = '/' . $conditions['_id'];
 				unset($conditions['_id']);
 			}
-			$result = $conn->put($table . $id, $conditions + $data);
+
+			$result = $conn->put($table . $id, json_encode($conditions + $data));
 			$result = is_string($result) ? json_decode($result) : $result;
 
 			if (isset($result->ok) && $result->ok === true) {
 				$query->record()->invokeMethod('_update');
 				return true;
+			}
+
+			if (isset($result->error) && $result->error === 'conflict') {
+				return $this->read($query, $options);
 			}
 			return false;
 		});
@@ -256,7 +272,20 @@ class CouchDb extends \lithium\data\source\Http {
 		if (!is_object($resource)) {
 			return null;
 		}
-		return (array)$resource;
+		if (isset($resource->rows)) {
+			if (!isset($context->i)){
+				$context->i = 0;
+			}
+			if (isset($resource->rows[$context->i])) {
+				$result = array(
+					'id' => $resource->rows[$context->i]->id,
+					'rev' => $resource->rows[$context->i]->value->rev
+				);
+				$context->i++;
+				return $result;
+			}
+		}
+		return null;
 	}
 
 	/**
