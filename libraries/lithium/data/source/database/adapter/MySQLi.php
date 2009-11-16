@@ -161,9 +161,13 @@ class MySQLi extends \lithium\data\source\Database {
 	/**
 	 * Retrieves database error message and error code
 	 *
-	 * @return array
+	 * @return array|null
 	 */
 	public function error() {
+		if ($this->_connection->errno) {
+			return array($this->_connection->errno(), $this->_connection->error);
+		}
+		return null;
 	}
 
 	public function result($type, $resource, $context) {
