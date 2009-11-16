@@ -68,6 +68,10 @@ class Query extends \lithium\core\Object {
 	}
 
 	public function fields($fields = null) {
+		if ($fields === false) {
+			$this->_fields = array();
+			return;
+		}
 		if (empty($fields)) {
 			return $this->_fields;
 		}
@@ -75,7 +79,9 @@ class Query extends \lithium\core\Object {
 		if (is_array($fields)) {
 			$this->_fields = array_merge($this->_fields, $fields);
 		} else {
-			$this->_fields[] = $fields;
+			if (!isset($this->_fields[$fields])) {
+				$this->_fields[] = $fields;
+			}
 		}
 	}
 
