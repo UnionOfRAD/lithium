@@ -165,7 +165,7 @@ class MySQLi extends \lithium\data\source\Database {
 	 */
 	public function error() {
 		if ($this->_connection->errno) {
-			return array($this->_connection->errno(), $this->_connection->error);
+			return array($this->_connection->errno, $this->_connection->error);
 		}
 		return null;
 	}
@@ -223,13 +223,13 @@ class MySQLi extends \lithium\data\source\Database {
 		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use (&$conn) {
 			extract($params);
 			$mode = ($options['buffered']) ? MYSQLI_STORE_RESULT : MYSQLI_STORE_RESULT;
-			$result = mysqli_query($sql, $conn);
+			$mysqliResult = $conn->query($sql);
 
-			if (mysqli_error() > 0) {
-				list($code, $error) = $self->error();
-				throw new Exception("$sql: $error", $code);
+			if (mysqli_errno() > 0) {
+				list($code, $message) = $self->error();
+				throw new Exception("$sql: $message", $code);
 			}
-			return $resource;
+			return $mysqliResult;
 		});
 	}
 
