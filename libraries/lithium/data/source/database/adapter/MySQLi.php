@@ -119,10 +119,17 @@ class MySQLi extends \lithium\data\source\Database {
 	public function describe($entity, $meta = array()) {
 	}
 
+	/**
+	 * Disconnects the connection to the database.
+	 *
+	 * @return boolean True on success, else false.
+	 */
 	public function disconnect() {
 		if ($this->_isConnected) {
-			;
+			$this->_isConnected = !$this->_connection->close();
+			return !$this->_isConnected;
 		}
+		return true;
 	}
 
 	/**
