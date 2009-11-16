@@ -17,6 +17,13 @@ use \Exception;
 class CouchDb extends \lithium\data\source\Http {
 
 	/**
+	 * increment value of current result set loop
+	 * used by `result` to handle rows of json responses
+	 *
+	 * @var string
+	 */
+	protected $_iterator = 0;
+	/**
 	 * True if Database exists
 	 *
 	 * @var boolean
@@ -149,12 +156,14 @@ class CouchDb extends \lithium\data\source\Http {
 				$data['_id'] = (string) $data['_id'];
 				$result = $conn->put($table . $id, json_encode($data));
 			} else {
-				$result = $conn->post($table . $id, json_encode($data));
+				$result = $conn->post($table, json_encode($data));
 			}
 
 			$result = is_string($result) ? json_decode($result) : $result;
 
 			if ($success = (isset($result->ok) && $result->ok === true)) {
+				$results = array('id' => $result->id, 'rev' => $result->rev, '_rev' => $result->rev);
+				$query->data($data + $results);
 				$query->record()->invokeMethod('_update', array($result->id));
 			}
 			return $success;
@@ -178,13 +187,11 @@ class CouchDb extends \lithium\data\source\Http {
 			extract($params);
 			$options = $query->export($self);
 			extract($options, EXTR_OVERWRITE);
-			$id = null;
-
-			if (!empty($conditions['_id'])) {
-				$id = '/' . $conditions['_id'];
-				unset($conditions['_id']);
+			extract($conditions, EXTR_OVERWRITE);
+			if (empty($path) && empty($conditions)) {
+				$path = '/_all_docs';
 			}
-			return json_decode($conn->get($table . $id, array_filter($conditions)));
+			return json_decode($conn->get($table . $path, $conditions));
 		});
 	}
 
@@ -203,15 +210,9 @@ class CouchDb extends \lithium\data\source\Http {
 			extract($params);
 			$options = $query->export($self);
 			extract($options, EXTR_OVERWRITE);
+			extract($conditions, EXTR_OVERWRITE);
 			$data = $query->data();
-			$id = null;
-
-			if (!empty($conditions['_id'])) {
-				$id = '/' . $conditions['_id'];
-				unset($conditions['_id']);
-			}
-
-			$result = $conn->put($table . $id, json_encode($conditions + $data));
+			$result = $conn->put($table . $path, json_encode($conditions + $data));
 			$result = is_string($result) ? json_decode($result) : $result;
 
 			if (isset($result->ok) && $result->ok === true) {
@@ -241,17 +242,13 @@ class CouchDb extends \lithium\data\source\Http {
 			extract($params);
 			$options = $query->export($self);
 			extract($options, EXTR_OVERWRITE);
+			extract($conditions, EXTR_OVERWRITE);
 			$data = $query->data();
-			$id = null;
 
-			if (!empty($conditions['_id'])) {
-				$id = '/' . $conditions['_id'];
-				unset($conditions['_id']);
-			}
 			if (!empty($data['_rev'])) {
 				$conditions['rev'] = $data['_rev'];
 			}
-			$result = json_decode($conn->delete($table . $id, $conditions));
+			$result = json_decode($conn->delete($table . $path, $conditions));
 			return (isset($result->ok) && $result->ok === true);
 		});
 	}
@@ -266,9 +263,38 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function result($type, $resource, $context) {
 		if (!is_object($resource)) {
-			return array();
+			return null;
 		}
-		return (array) $resource;
+		$result = null;
+
+		switch ($type) {
+			case 'next':
+				if (isset($resource->rows)) {
+					if (isset($resource->rows[$this->_iterator])) {
+						$result = array(
+							'id' => $resource->rows[$this->_iterator]->id,
+							'_id' => $resource->rows[$this->_iterator]->id,
+							'_rev' => $resource->rows[$this->_iterator]->value->rev,
+							'rev' => $resource->rows[$this->_iterator]->value->rev
+						);
+						$this->_iterator++;
+					} else {
+						$this->_iterator = 0;
+						$result = null;
+					}
+				} else {
+					$result = (array) $resource;
+				}
+			break;
+			case 'close':
+				unset($resource);
+				$result = null;
+			break;
+			default:
+				$result = parent::result($type, $resource, $context);
+			break;
+		}
+		return $result;
 	}
 
 	/**
@@ -279,10 +305,22 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return array
 	 */
 	public function conditions($conditions, $context) {
-		if ($conditions && ($context->type() == 'create' || $context->type() == 'update')) {
-			return $conditions;
+		$path = null;
+		$paths = array('design', 'view');
+		foreach ($paths as $element) {
+			if (isset($conditions[$element])) {
+				$path .= "/_{$element}/$conditions[$element]";
+				unset($conditions[$element]);
+			}
 		}
-		return $conditions ?: array();
+		if (isset($conditions['_id'])) {
+			$path = "/{$conditions['_id']}";
+			unset($conditions['_id']);
+		} elseif (isset($conditions['id'])) {
+			$path = "/{$conditions['id']}";
+		}
+		$conditions = array_filter((array) $conditions);
+		return compact('path', 'conditions');
 	}
 
 	/**
