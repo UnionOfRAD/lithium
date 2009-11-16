@@ -9,6 +9,14 @@
 namespace lithium\tests\cases\template;
 
 use \lithium\template\View;
+use \lithium\template\view\adapters\Simple;
+
+class TestViewClass extends \lithium\template\View {
+
+	public function renderer() {
+		return $this->_config['renderer'];
+	}
+}
 
 class ViewTest extends \lithium\test\Unit {
 
@@ -19,7 +27,10 @@ class ViewTest extends \lithium\test\Unit {
 	}
 
 	public function testInitialization() {
-		$this->_view = new View();
+		$expected = new Simple();
+		$this->_view = new TestViewClass(array('renderer' => $expected));
+		$result = $this->_view->renderer();
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testInitializationWithBadClasses() {
@@ -27,6 +38,13 @@ class ViewTest extends \lithium\test\Unit {
 		new View(array('loader' => 'Badness'));
 		$this->expectException('Template adapter Badness not found');
 		new View(array('renderer' => 'Badness'));
+	}
+
+	public function testOutputFilters() {
+		$h = $this->_view->outputFilters['h'];
+		$expected = '&lt;p&gt;Foo, Bar &amp; Baz&lt;/p&gt;';
+		$result = $h('<p>Foo, Bar & Baz</p>');
+		$this->assertEqual($expected, $result);
 	}
 }
 
