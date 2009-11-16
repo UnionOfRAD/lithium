@@ -40,12 +40,23 @@ class Query extends \lithium\core\Object {
 
 	protected $_comment = null;
 
+	protected $_autoCondig = array("type");
+
 	protected function _init() {
 		foreach ($this->_config as $key => $val) {
 			if (method_exists($this, $key)) {
 				$this->{$key}($val);
 			}
 		}
+	}
+
+	/**
+	* Get method of type, ie 'read', 'update', 'create', 'delete'
+	*
+	* @return string
+	*/
+	public function type() {
+		return $this->_type;
 	}
 
 	/**
