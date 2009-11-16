@@ -56,19 +56,29 @@ class MySQLi extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * In cases where the query is a raw string (as opposed to a `Query` object), to database must
+	 * In cases where the query is a raw string (as opposed to a `Query` object), the database must
 	 * determine the correct column names from the result resource.
 	 *
 	 * @param mixed $query
-	 * @param resource $resource
+	 * @param mysqli_result object $mysqliResult
 	 * @param object $context
-	 * @return array
+	 * @return array Field names
 	 */
-	public function columns($query, $resource = null, $context = null) {
+	public function columns($query, $mysqliResult = null, $context = null) {
+		if (is_object($query)) {
+			return parent::columns($query, $mysqliResult, $context);
+		}
+
+		$result = array();
+		while ($fieldInfo = $mysqliResult->fetch_field()) {
+			$result[] = $finfo->name;
+		}
+		return $result;
 	}
 
 	/**
-	 * Connects to the database using options provided to the class constructor.
+	 * Connects to the database and sets the connection encoding,
+	 * using options provided to the class constructor.
 	 *
 	 * @return boolean True if the database could be connected, else false
 	 */
