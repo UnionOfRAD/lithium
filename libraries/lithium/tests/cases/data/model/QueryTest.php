@@ -194,8 +194,35 @@ class QueryTest extends \lithium\test\Unit {
 		$expected = array('id' => 35, 'title' => 'Nix', 'body' => 'Prix');
 		$result = $q->data();
 		$this->assertEqual($expected, $result);
-
 	}
+
+	public function testConditions() {
+		$q = new Query($this->_queryArr);
+
+		$expected = array('author_id' => 12);
+		$result = $q->conditions();
+		$this->assertEqual($expected, $result);
+
+		$q->conditions(array('author_id' => 13, 'title LIKE' => 'Lorem%'));
+
+		$expected = array('author_id' => 13, 'title LIKE' => 'Lorem%');
+		$result = $q->conditions();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testConditionFromRecor() {
+		$r = new Record();
+		$r->id = 12;
+		$q = new Query(array(
+			'model' => '\lithium\tests\mocks\data\model\MockQueryPost',
+			'record' => $r
+		));
+
+		$expected = array('id' => 12);
+		$result = $q->conditions();
+		$this->assertEqual($expected, $result);
+	}
+
 }
 
 ?>
