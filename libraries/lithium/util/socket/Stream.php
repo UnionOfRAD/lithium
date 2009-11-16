@@ -11,15 +11,21 @@ namespace lithium\util\socket;
 use \Exception;
 
 /**
- * Socket Stream class
+ * A PHP stream-based socket adapter
  *
+ * This stream adapter provides the required method implementations of the abstract Socket class
+ * for `open`, `close`, `read`, `write`, `timeout` `eof` and `encoding`.
+ *
+ * @see http://www.php.net/manual/en/book.stream.php
+ * @see lithium\util\socket\Stream
  */
 class Stream extends \lithium\util\Socket {
 
 	/**
-	 * open the connection
+	 * Opens a socket and initializes the internal resource handle.
 	 *
-	 * @return resource
+	 * @return mixed False if the Socket configuration does not contain the
+	 *		   'protocol' or 'host' settings,  socket resource otherwise.
 	 */
 	public function open() {
 		$config = $this->_config;
@@ -50,9 +56,9 @@ class Stream extends \lithium\util\Socket {
 	}
 
 	/**
-	 * Close the connection
+	 * Closes the stream
 	 *
-	 * @return boolean
+	 * @return boolean True on closed connection
 	 */
 	public function close() {
 		if (!is_resource($this->_resource)) {
@@ -66,9 +72,9 @@ class Stream extends \lithium\util\Socket {
 	}
 
 	/**
-	 * end of file pointer
+	 * Determines if the socket resource is at EOF.
 	 *
-	 * @return boolean
+	 * @return boolean True if resource pointer is at EOF, false otherwise.
 	 */
 	public function eof() {
 		if (!is_resource($this->_resource)) {
@@ -78,11 +84,12 @@ class Stream extends \lithium\util\Socket {
 	}
 
 	/**
-	 * read from stream resource
+	 * Reads data from the stream resource
 	 *
-	 * @param integer $length
-	 * @param integer $offset
-	 * @return string
+	 * @param integer $length If specified, will read up to $length bytes from the stream.
+	 *        If no value is specified, all remaining bytes in the buffer will be read.
+	 * @param integer $offset Seek to the specified byte offset before reading.
+	 * @return string Returns string read from stream resource on success, false otherwise.
 	 */
 	public function read($length = null, $offset = null) {
 		if (!is_resource($this->_resource)) {
@@ -100,10 +107,10 @@ class Stream extends \lithium\util\Socket {
 	}
 
 	/**
-	 * write to stream
+	 * writes data to the stream resource
 	 *
-	 * @param string $data
-	 * @return boolean
+	 * @param string $data The string to be written.
+	 * @return mixed False on error, number of bytes written otherwise.
 	 */
 	public function write($data) {
 		if (!is_resource($this->_resource)) {
@@ -113,30 +120,34 @@ class Stream extends \lithium\util\Socket {
 	}
 
 	/**
-	 * set the timeout
+	 * Set timeout period on a stream
 	 *
-	 * @param integer $time
+	 * @param integer $time The timeout value in seconds.
 	 * @return void
+	 * @see http://www.php.net/manual/en/function.stream-set-timeout.php
 	 */
 	public function timeout($time) {
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
-		stream_set_timeout($this->_resource, $time);
+		return stream_set_timeout($this->_resource, $time);
 	}
 
 	/**
-	 * set the encoding
+	 * Sets the character set for stream encoding
 	 *
+	 * Note: This function only exists in PHP 6. For PHP < 6, this method will return void.
 	 * @param string $charset
-	 * @return void
+	 * @return mixed Returns void if `stream_encoding` method does not exist, boolean
+	 *         result of `stream_encoding` otherwise.
+	 * @see http://www.php.net/manual/en/function.stream-encoding.php
 	 */
 	public function encoding($charset) {
 		if (function_exists('stream_encoding')) {
 			if (!is_resource($this->_resource)) {
 				return false;
 			}
-			stream_encoding($this->_resource, $charset);
+			return stream_encoding($this->_resource, $charset);
 		}
 	}
 }
