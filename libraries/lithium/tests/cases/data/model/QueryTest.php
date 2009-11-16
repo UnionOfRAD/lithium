@@ -243,6 +243,10 @@ class QueryTest extends \lithium\test\Unit {
 		$expected = 'id, author_id, title';
 		$result = $export['fields'];
 		$this->assertEqual($expected, $result);
+
+		$expected = MockQueryPost::meta('source');
+		$result = $export['table'];
+		$this->assertEqual($expected, $result);
 	}
 
 }
