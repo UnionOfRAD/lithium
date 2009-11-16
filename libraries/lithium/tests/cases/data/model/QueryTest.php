@@ -14,6 +14,16 @@ use \lithium\tests\mocks\data\model\MockQueryComment;
 
 class QueryTest extends \lithium\test\Unit {
 
+	protected $_queryArr = array(
+		'mode' => '\lithium\tests\mocks\data\model\MockQueryPost',
+		'type' => 'read',
+		'order' => 'created DESC',
+		'limit' => 10,
+		'page' => 1,
+		'fields' => array('id','author_id','title','body','created'),
+		'conditions' => array('author_id' => 12)
+	);
+
 	public function setUp() {
 		MockQueryPost::init();
 		MockQueryComment::init();
@@ -34,6 +44,27 @@ class QueryTest extends \lithium\test\Unit {
 
 	public function testQueryExport() {
 		$query = new Query();
+	}
+
+	public function testType() {
+		$q = new Query($this->_queryArr);
+		$expected = 'read';
+		$result = $q->type();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testModel() {
+		$q = new Query($this->_queryArr);
+
+		$expected = '\lithium\tests\mocks\data\model\MockQueryPost';
+		$result = $q->model();
+		$this->assertEqual($expected, $result);
+
+		$result = $q->model('\lithium\tests\mocks\data\model\MockQueryComment');
+
+		$expected = '\lithium\tests\mocks\data\model\MockQueryComment';
+		$result = $q->model();
+		$this->assertEqual($expected, $result);
 	}
 }
 
