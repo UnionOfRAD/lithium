@@ -107,6 +107,20 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $q->limit();
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testPage() {
+		$q = new Query($this->_queryArr);
+
+		$expected = 1;
+		$result = $q->page();
+		$this->assertEqual($expected, $result);
+
+		$result = $q->page(5);
+
+		$expected = 5;
+		$result = $q->page();
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
