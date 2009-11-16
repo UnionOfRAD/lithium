@@ -12,11 +12,19 @@ use \lithium\util\reflection\Parser;
 
 /**
  * Runs documentation coverage analysis for classes, properties and methods.
+ *
+ * Note: Currently unimplemented
  */
 class Coverage extends \lithium\core\Object {
 
+	/**
+	 * Currently unimplemented
+	 *
+	 * @param string $class
+	 * @return void
+	 */
 	function check($class) {
-		
+
 	}
 }
 
