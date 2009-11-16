@@ -23,19 +23,19 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
-		$result = $document->next();
+		$result = $document->next()->to('array');
 		$this->assertEqual($expected, $result);
 
 		$expected = array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three');
 		$document->next();
-		$result = $document->current();
+		$result = $document->current()->to('array');
 		$this->assertEqual($expected, $result);
 
 		$result = $document->next();
 		$this->assertTrue(empty($result));
 
 		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
-		$result = $document->rewind();
+		$result = $document->rewind()->to('array');
 		$this->assertEqual($expected, $result);
 	}
 
@@ -96,7 +96,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
-		$result = $doc->next();
+		$result = $doc->next()->to('array');
 		$this->assertEqual($expected, $result);
 	}
 
@@ -123,7 +123,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
-		$result = $doc->next();
+		$result = $doc->next()->to('array');
 		$this->assertEqual($expected, $result);
 	}
 
@@ -154,7 +154,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array('id' => 125, 'type' => 'child', 'children' => null);
-		$result = $doc->children->next();
+		$result = $doc->children->next()->to('array');
 		$this->assertEqual($expected, $result);
 	}
 
@@ -210,7 +210,7 @@ class DocumentTest extends \lithium\test\Unit {
 		)));
 
 		$expected = array('id' => 1, 'name' => 'One');
-		$result = $doc->rewind();
+		$result = $doc->rewind()->to('array');
 		$this->assertEqual($expected, $result);
 	}
 
