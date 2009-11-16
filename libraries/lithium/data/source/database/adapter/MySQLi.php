@@ -71,7 +71,7 @@ class MySQLi extends \lithium\data\source\Database {
 
 		$result = array();
 		while ($fieldInfo = $mysqliResult->fetch_field()) {
-			$result[] = $finfo->name;
+			$result[] = $fieldInfo->name;
 		}
 		return $result;
 	}
