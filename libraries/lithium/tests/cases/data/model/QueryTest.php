@@ -16,7 +16,7 @@ use \lithium\tests\mocks\data\model\MockQueryComment;
 class QueryTest extends \lithium\test\Unit {
 
 	protected $_queryArr = array(
-		'mode' => '\lithium\tests\mocks\data\model\MockQueryPost',
+		'model' => '\lithium\tests\mocks\data\model\MockQueryPost',
 		'type' => 'read',
 		'order' => 'created DESC',
 		'limit' => 10,
@@ -42,10 +42,6 @@ class QueryTest extends \lithium\test\Unit {
 
 		$query = new Query(array('conditions' => 'foo', 'fields' => array('id')));
 		$this->assertEqual($query->conditions(), array('foo'));
-	}
-
-	public function testQueryExport() {
-		$query = new Query();
 	}
 
 	public function testType() {
