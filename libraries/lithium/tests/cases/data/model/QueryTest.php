@@ -10,6 +10,7 @@ namespace lithium\tests\cases\data\model;
 
 use \lithium\data\model\Record;
 use \lithium\data\model\Query;
+use \lithium\tests\mocks\data\model\MockDatabase;
 use \lithium\tests\mocks\data\model\MockQueryPost;
 use \lithium\tests\mocks\data\model\MockQueryComment;
 
@@ -203,7 +204,7 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testConditionFromRecor() {
+	public function testConditionFromRecord() {
 		$r = new Record();
 		$r->id = 12;
 		$q = new Query(array(
@@ -213,6 +214,34 @@ class QueryTest extends \lithium\test\Unit {
 
 		$expected = array('id' => 12);
 		$result = $q->conditions();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testExport() {
+		$q = new Query($this->_queryArr);
+
+		$ds = new MockDatabase();
+
+		$export = $q->export($ds);
+
+		$this->assertTrue(is_array($export));
+		$this->skipIf(!is_array($export), '`Query`::export() does not return an array');
+
+		$expected = array(
+			'conditions',
+			'fields',
+			'order',
+			'limit',
+			'table',
+			'comment',
+			'model',
+			'page'
+		);
+		$result = array_keys($export);
+		$this->assertEqual($expected, $result);
+
+		$expected = 'id, author_id, title';
+		$result = $export['fields'];
 		$this->assertEqual($expected, $result);
 	}
 
