@@ -31,9 +31,9 @@ class Set {
 				$key = intval($key);
 			}
 			if ($i === count($path) - 1) {
-				return (is_array($data) && array_key_exists($key, $data));
+				return (is_array($data) && isset($data[$key]));
 			} else {
-				if (!is_array($data) || !array_key_exists($key, $data)) {
+				if (!is_array($data) || !isset($data[$key])) {
 					return false;
 				}
 				$data =& $data[$key];
@@ -252,7 +252,7 @@ class Set {
 					}
 				} elseif (preg_match_all('/(?:^[0-9]+|(?<=,)[0-9]+)/', $condition, $matches)) {
 					return in_array($i, $matches[0]);
-				} elseif (!array_key_exists($condition, $data)) {
+				} elseif (!isset($data[$condition])) {
 					return false;
 				}
 				continue;
@@ -394,7 +394,7 @@ class Set {
 		}
 		if (!empty($array) && !empty($array2)) {
 			foreach ($array2 as $key => $value) {
-				if (!array_key_exists($key, $array)) {
+				if (!isset($array[$key])) {
 					$array[$key] = $value;
 				} else {
 					if (is_array($value)) {
@@ -485,7 +485,7 @@ class Set {
 						'key' => $key,
 						'item' => array_keys($context['item']),
 					);
-				} elseif (is_array($context['item']) && array_key_exists($token, $context['item'])) {
+				} elseif (is_array($context['item']) && isset($context['item'][$token])) {
 					$items = $context['item'][$token];
 					if (!is_array($items)) {
 						$items = array($items);
@@ -641,7 +641,7 @@ class Set {
 		$out = array();
 
 		foreach ($val1 as $key => $val) {
-			$exists = array_key_exists($key, $val2);
+			$exists = isset($val2[$key]);
 
 			if ($exists && $val2[$key] != $val) {
 				$out[$key] = $val;
@@ -652,7 +652,7 @@ class Set {
 		}
 
 		foreach ($val2 as $key => $val) {
-			if (!array_key_exists($key, $out)) {
+			if (!isset($out[$key])) {
 				$out[$key] = $val;
 			}
 		}

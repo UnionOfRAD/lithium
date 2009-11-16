@@ -308,7 +308,7 @@ class Libraries {
 		$options += $defaults;
 		$class = ltrim($class, '\\');
 
-		if (array_key_exists($class, static::$_cachedPaths)) {
+		if (isset(static::$_cachedPaths[$class])) {
 			return static::$_cachedPaths[$class];
 		}
 

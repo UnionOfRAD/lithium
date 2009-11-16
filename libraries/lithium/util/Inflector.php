@@ -283,7 +283,7 @@ class Inflector {
 	 * @return string Word in plural form.
 	 */
 	public static function pluralize($word) {
-		if (array_key_exists($word, static::$_pluralized)) {
+		if (isset(static::$_pluralized[$word])) {
 			return static::$_pluralized[$word];
 		}
 		extract(static::$_plural);
@@ -319,7 +319,7 @@ class Inflector {
 	 * @return string Word in singular form.
 	 */
 	public static function singularize($word) {
-		if (array_key_exists($word, static::$_singularized)) {
+		if (isset(static::$_singularized[$word])) {
 			return static::$_singularized[$word];
 		}
 		extract(static::$_singular);
@@ -344,7 +344,7 @@ class Inflector {
 			}
 		}
 
-		if (!array_key_exists($word, static::$_singularized)) {
+		if (!isset(static::$_singularized[$word])) {
 			static::$_singularized[$word] = $word;
 		}
 		return static::$_singularized[$word];
@@ -370,7 +370,7 @@ class Inflector {
 	 * @return string Camel-cased version of the word (i.e. `'RedBike'`).
 	 */
 	public static function camelize($word) {
-		if (array_key_exists($word, static::$_camelized)) {
+		if (isset(static::$_camelized[$word])) {
 			return static::$_camelized[$word];
 		}
 		return static::$_camelized[$word] = str_replace(
@@ -385,7 +385,7 @@ class Inflector {
 	 * @return string Underscore-syntaxed version of the workd (i.e. `'red_bike'`).
 	 */
 	public static function underscore($word) {
-		if (array_key_exists($word, static::$_underscored)) {
+		if (isset(static::$_underscored[$word])) {
 			return static::$_underscored[$word];
 		}
 		return static::$_underscored[$word] = strtolower(
@@ -402,7 +402,7 @@ class Inflector {
 	 * @return string Human-readable version of the word (i.e. `'Red Bike'`).
 	 */
 	public static function humanize($word, $separator = '_') {
-		if (array_key_exists($word . $separator, static::$_humanized)) {
+		if (isset(static::$_humanized[$word . $separator])) {
 			return static::$_humanized[$word . $separator];
 		}
 		return static::$_humanized[$word . $separator] = ucwords(str_replace($separator, " ", $word));
