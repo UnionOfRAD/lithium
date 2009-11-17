@@ -25,9 +25,9 @@ namespace lithium\storage\cache\adapters;
  * adapters, since APC cache expirations are only evaluated on requests subsequent
  * to their initial storage.
  *
- * @see \lithium\storage\Cache::key()
- * @link http://php.net/manual/en/book.apc.php PHP APC
+ * Learn more about APC in the [PHP APC manual](http://php.net/manual/en/book.apc.php).
  *
+ * @see lithium\storage\Cache::key()
  */
 class Apc extends \lithium\core\Object {
 
@@ -46,10 +46,10 @@ class Apc extends \lithium\core\Object {
 	 *
 	 * @param string $key        The key to uniquely identify the cached item
 	 * @param mixed  $value      The value to be cached
-	 * @param object $conditions Conditions under which the operation should proceed
+	 * @param string $expiry     A strtotime() compatible cache time
 	 * @return boolean True on successful write, false otherwise
 	 */
-	public function write($key, $data, $expiry, $conditions = null) {
+	public function write($key, $data, $expiry) {
 		return function($self, $params, $chain) {
 			extract($params);
 			$cachetime = strtotime($expiry);
@@ -65,10 +65,9 @@ class Apc extends \lithium\core\Object {
 	 * Read value(s) from the cache
 	 *
 	 * @param string $key        The key to uniquely identify the cached item
-	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return mixed Cached value if successful, false otherwise
 	 */
-	public function read($key, $conditions = null) {
+	public function read($key) {
 		return function($self, $params, $chain) {
 			extract($params);
 			$cachetime = intval(apc_fetch($key . '_expires'));
@@ -81,10 +80,9 @@ class Apc extends \lithium\core\Object {
 	 * Delete value from the cache
 	 *
 	 * @param string $key        The key to uniquely identify the cached item
-	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return mixed True on successful delete, false otherwise
 	 */
-	public function delete($key, $conditions = null) {
+	public function delete($key) {
 		return function($self, $params, $chain) {
 			extract($params);
 			apc_delete($key . '_expires');
@@ -99,6 +97,16 @@ class Apc extends \lithium\core\Object {
 	 */
 	public function clear() {
 		return apc_clear_cache('user');
+	}
+
+	/**
+	 * Determines if the APC extension has been installed and
+	 * if the userspace cache is available.
+	 *
+	 * return boolean True if enabled, false otherwise
+	 */
+	public function enabled() {
+		return (extension_loaded('apc') && apc_cache_info('user'));
 	}
 }
 

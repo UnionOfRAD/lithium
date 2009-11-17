@@ -14,7 +14,6 @@ use \SplStack;
 /**
  * Alternative base class in Lithium hierarchy, from which all (and only) static classes inherit.
  *
- * @package Lithium
  */
 class StaticObject {
 
@@ -169,10 +168,7 @@ class StaticObject {
 
 		$f = isset(static::$_methodFilters[$method]) ? static::$_methodFilters[$method] : array();
 		$items = array_merge($f, $filters, array($callback));
-		$chain = new Filters(compact('items', 'class', 'method'));
-
-		$start = $chain->rewind();
-		return $start($class, $params, $chain);
+		return Filters::run($class, $params, compact('items', 'class', 'method'));
 	}
 
 	/**

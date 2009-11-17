@@ -35,8 +35,8 @@ class SessionTest extends \lithium\test\Unit {
 		$store1 = new Memory();
 		$store2 = new Memory();
 		$config = array(
-			'store1' => array('adapter' => &$store1, 'filters' => array()),
-			'store2' => array('adapter' => &$store2, 'filters' => array())
+			'store1' => array('adapter' => &$store1, 'filters' => array(), 'strategies' => array()),
+			'store2' => array('adapter' => &$store2, 'filters' => array(), 'strategies' => array())
 		);
 
 		$result = Session::config($config);
@@ -137,20 +137,16 @@ class SessionTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests querying session keys from the primary adapter.  The memory adapter simply returns
-	 * the HTTP request ID.
+	 * Tests querying session keys from the primary adapter.
+	 * The memory adapter returns a UUID based on a server variable for portability.
 	 *
 	 * @return void
 	 */
-	public function testSessionKey() {
-		$this->skipIf(!isset($_SERVER['UNIQUE_ID']));
 
-		$expected = $_SERVER['UNIQUE_ID'];
+	public function testKey() {
 		$result = Session::key();
-		$this->assertEqual($expected, $result);
-
-		Session::clear();
-		$this->assertNull(Session::key());
+		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/";
+		$this->assertPattern($pattern, $result);
 	}
 
 	public function testConfigNoAdapters() {

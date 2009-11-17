@@ -9,8 +9,22 @@
 namespace lithium\tests\cases\storage\cache\adapters;
 
 use \lithium\storage\cache\adapters\File;
+use \SplFileInfo;
 
 class FileTest extends \lithium\test\Unit {
+
+	/**
+	 * Skip the test if the default File adapter read/write path
+	 * is not read/write-able.
+	 *
+	 * @return void
+	 */
+	public function skip() {
+		$directory = new SplFileInfo(LITHIUM_APP_PATH . "/tmp/cache/");
+		$accessible = ($directory->isDir() && $directory->isReadable() && $directory->isWritable());
+		$message = 'The File cache adapter path does not have the proper permissions.';
+		$this->skipIf(!$accessible, $message);
+	}
 
 	public function setUp() {
 		$this->File = new File();
@@ -18,6 +32,10 @@ class FileTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		unset($this->File);
+	}
+
+	public function testEnabled() {
+		$this->assertTrue($this->File->enabled());
 	}
 
 	public function testWrite() {
@@ -113,7 +131,6 @@ class FileTest extends \lithium\test\Unit {
 		$result = $this->File->clear();
 		$this->assertTrue($result);
 		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
-
 	}
 
 

@@ -33,6 +33,10 @@ class ApcTest extends \lithium\test\Unit {
 		unset($this->Apc);
 	}
 
+	public function testEnabled() {
+		$this->assertTrue($this->Apc->enabled());
+	}
+
 	public function testSimpleWrite() {
 		$key = 'key';
 		$data = 'value';

@@ -4,19 +4,7 @@ namespace lithium\tests\cases\util\audit;
 
 use \lithium\util\audit\Logger;
 use \lithium\util\Collection;
-
-/**
- * Mock class used for testing Logger adapter
- *
- */
-class Test extends \lithium\core\Object {
-
-	public function write($name, $value) {
-		return function($self, $params, $chain) {
-			return true;
-		};
-	}
-}
+use \lithium\tests\mocks\util\audit\MockLoggerAdapter;
 
 /**
  * Logger adapter test case
@@ -25,7 +13,7 @@ class Test extends \lithium\core\Object {
 class LoggerTest extends \lithium\test\Unit {
 
 	public function setUp() {
-		Logger::config(array('default' => array('adapter' => new Test())));
+		Logger::config(array('default' => array('adapter' => new MockLoggerAdapter())));
 	}
 
 	public function tearDown() {
@@ -33,8 +21,12 @@ class LoggerTest extends \lithium\test\Unit {
 	}
 
 	public function testConfig() {
-		$test = new Test();
-		$config = array('logger' => array('adapter' => $test, 'filters' => array()));
+		$test = new MockLoggerAdapter();
+		$config = array('logger' => array(
+			'adapter' => $test,
+			'filters' => array(),
+			'strategies' => array()
+		));
 
 		$result = Logger::config($config);
 		$expected = new Collection(array('items' => $config));
@@ -43,7 +35,7 @@ class LoggerTest extends \lithium\test\Unit {
 	}
 
 	public function testReset() {
-		$test = new Test();
+		$test = new MockLoggerAdapter();
 		$config = array('logger' => array('adapter' => $test, 'filters' => array()));
 
 		$result = Logger::config($config);

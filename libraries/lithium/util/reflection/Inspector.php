@@ -10,6 +10,7 @@ namespace lithium\util\reflection;
 
 use \Exception;
 use \ReflectionClass;
+use \ReflectionException;
 use \lithium\core\Libraries;
 use \lithium\util\Collection;
 
@@ -185,7 +186,11 @@ class Inspector extends \lithium\core\StaticObject {
 		$options += $defaults;
 
 		if (!(is_object($class) && $class instanceof ReflectionClass)) {
-			$class = new ReflectionClass($class);
+			try {
+				$class = new ReflectionClass($class);
+			} catch (ReflectionException $e) {
+				return null;
+			}
 		}
 		$methods = static::_methods($class, $options);
 		$result = array();
@@ -318,7 +323,6 @@ class Inspector extends \lithium\core\StaticObject {
 	/**
 	 * Gets the static and dynamic dependencies for a class or group of classes.
 	 *
-	 * @package default
 	 */
 	public static function dependencies($classes, $options = array()) {
 		$defaults = array('type' => null);

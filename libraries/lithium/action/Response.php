@@ -10,6 +10,13 @@ namespace lithium\action;
 
 use \Exception;
 
+/**
+ * The `Response` instance is what the `Controller` returns to the `Dispatcher` as the product
+ * of the view layer. See related classes for more details.
+ *
+ * @see lithium\action\Dispatcher
+ * @see lithium\action\Controller
+ */
 class Response extends \lithium\http\Response {
 
 	protected $_config = array();

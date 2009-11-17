@@ -21,7 +21,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * Indicates whether the current position is valid or not.
 	 *
 	 * @var boolean
-	 * @see \lithium\util\Collection::valid()
+	 * @see lithium\util\Collection::valid()
 	 */
 	protected $_valid = false;
 
@@ -116,8 +116,17 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 
 				foreach ($state as $key => $value) {
 					if (is_object($value)) {
-						$value = method_exists($value, 'to') ? $value->to('array') : $value;
-						$value = is_array($value) ? $value :  get_object_vars($value);
+						switch (true) {
+							case method_exists($value, 'to'):
+								$value = $value->to('array');
+							break;
+							case (is_object($value) && $vars = get_object_vars($value)):
+								$value = $vars;
+							break;
+							case method_exists($value, '__toString'):
+								$value = $value->__toString();
+							break;
+						}
 					}
 					$result[$key] = $value;
 				}
@@ -154,14 +163,21 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	}
 
 	/**
-	 * Returns the first non-empty value in the collection after a filter is applied.
+	 * Returns the first non-empty value in the collection after a filter is applied, or rewinds the
+	 * collection and returns the first value.
 	 *
 	 * @param callback $filter A closure through which collection values will be
 	 *                 passed. If the return value of this function is non-empty,
-	 *                 it will be returned as the result of the method call.
+	 *                 it will be returned as the result of the method call. If `null`, the
+	 *                 collection is rewound (see `rewind()`) and the first item is returned.
 	 * @return mixed Returns the first non-empty collection value returned from `$filter`.
+	 * @see lithium\util\Collection::rewind()
 	 */
-	public function first($filter) {
+	public function first($filter = null) {
+		if (empty($filter)) {
+			return $this->rewind();
+		}
+
 		foreach ($this->_items as $item) {
 			if ($value = $filter($item)) {
 				return $value;

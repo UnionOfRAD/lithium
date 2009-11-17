@@ -9,9 +9,29 @@
 namespace lithium\core;
 
 use \Exception;
-use \lithium\util\iterator\LibrariesFilter;
 use \lithium\util\String;
 
+/**
+ * Manages all aspects of class and file location, naming and mapping. Implements auto-loading for
+ * the Lithium core, as well as all applications, plugins and vendor libraries registered.
+ * Typically, libraries and plugins are registered in `app/config/bootstrap.php`.
+ *
+ * By convention, vendor libraries are typically located in `app/libraries` or `/libraries`, and
+ * plugins are located in `app/libraries/plugins` or `/libraries/plugins`. By default, `Libraries`
+ * will use its own autoloader for all plugins and vendor libraries, but can be configured to use
+ * others on a case-by-case basis.
+ *
+ * `Libraries` also handles service location. Various 'types' of classes can be defined by name,
+ * using 'class patterns', which define conventions for organizing classes, i.e. `'models'` is
+ * `'{:library}\models\{:name}'`, which will find a model class in any registered app, plugin or
+ * vendor library that follows that path convention. You can find classes by name (see `locate()`
+ * for more information on class-locating precedence), or find all models in all registered
+ * libraries (apps/plugins/vendor libs, etc).
+ *
+ * @see lithium\core\Libraries::add()
+ * @see lithium\core\Libraries::locate()
+ * @see lithium\core\Libraries::$_classPaths
+ */
 class Libraries {
 
 	/**
@@ -40,9 +60,11 @@ class Libraries {
 			'{:library}\{:namespace}\{:class}\adapters\{:name}' => array('libraries' => 'lithium')
 		),
 		'commands' => array(
+			'{:library}\extensions\commands\{:namespace}\{:class}\{:name}',
 			'{:library}\extensions\commands\{:class}\{:name}',
-			'{:library}\extensions\commands\{:name}',
-			'{:library}\console\commands\{:name}' => array('libraries' => 'lithium')
+			'{:library}\console\commands\{:namespace}\{:class}\{:name}' => array(
+				'libraries' => 'lithium'
+			),
 		),
 		'controllers' => array(
 			'{:library}\controllers\{:name}Controller'
@@ -147,18 +169,21 @@ class Libraries {
 				return static::_addPlugins((array)$config);
 			break;
 		}
-		static::$_configurations[$name] = ((array)$config += $defaults);
+
+		$config = (array)$config + $defaults;
+		$config['path'] = str_replace('\\', '/', $config['path']);
+		static::$_configurations[$name] = $config;
 
 		if ($config['includePath']) {
 			$path = ($config['includePath'] === true) ? $config['path'] : $config['includePath'];
-			set_include_path(get_include_path() . ':' . $path);
+			set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 		}
 
 		if (!empty($config['bootstrap'])) {
 			if ($config['bootstrap'] === true) {
 				$config['bootstrap'] = 'config/bootstrap.php';
 			}
-			require $config['path'] . '/' . $config['bootstrap'];
+			require "{$config['path']}/{$config['bootstrap']}";
 		}
 
 		if (!empty($config['loader'])) {
@@ -243,9 +268,9 @@ class Libraries {
 	}
 
 	/**
-	 * Loads the class definition specified by `$class`. Also calls the __init() method on the
-	 * class, if defined.  Looks through the list of libraries defined in $_configurations, which
-	 * are added through lithium\core\Libraries::add().
+	 * Loads the class definition specified by `$class`. Also calls the `__init()` method on the
+	 * class, if defined.  Looks through the list of libraries defined in `$_configurations`, which
+	 * are added through `lithium\core\Libraries::add()`.
 	 *
 	 * @param string $class The fully-namespaced (where applicable) name of the class to load.
 	 * @see lithium\core\Libraries::add()
@@ -253,7 +278,10 @@ class Libraries {
 	 * @return void
 	 */
 	public static function load($class, $require = false) {
-		if (($path = static::path($class)) && is_readable($path) && include $path) {
+		$path = isset(static::$_cachedPaths[$class]) ? static::$_cachedPaths[$class] : null;
+		$path = $path ?: static::path($class);
+
+		if ($path && is_readable($path) && include $path) {
 			static::$_cachedPaths[$class] = $path;
 			method_exists($class, '__init') ? $class::__init() : null;
 		} elseif ($require) {
@@ -262,20 +290,31 @@ class Libraries {
 	}
 
 	/**
-	 * Get the corresponding physical file path for a class name.
+	 * Get the corresponding physical file path for a class or namespace name.
 	 *
-	 * @param string $class
-	 * @param string $options
-	 * @return array
+	 * @param string $class The class name to locate the physical file for. If `$options['dirs`]` is
+	 *        set to `true`, `$class` may also be a namespace name, in which case the corresponding
+	 *        directory will be located.
+	 * @param array $options Options for converting `$class` to a phyiscal path:
+	 *
+	 *        - 'dirs': Defaults to `false`. If true, will attempt to case-sensitively look up
+	 *          directories in addition to files (in which case `$class` is assumed to actually be a
+	 *          namespace).
+	 * @return string Returns the absolute path to the file containing `$class`, or `null` if the
+	 *         file cannot be found.
 	 */
 	public static function path($class, $options = array()) {
-		if (array_key_exists($class, static::$_cachedPaths)) {
+		$defaults = array('dirs' => false);
+		$options += $defaults;
+		$class = ltrim($class, '\\');
+
+		if (isset(static::$_cachedPaths[$class])) {
 			return static::$_cachedPaths[$class];
 		}
-		$class = ($class[0] == '\\') ? substr($class, 1) : $class;
 
 		foreach (static::$_configurations as $name => $config) {
 			$params = $options + $config;
+			$suffix = $params['suffix'];
 
 			if (strpos($class, $params['prefix']) !== 0) {
 				continue;
@@ -288,20 +327,43 @@ class Libraries {
 				return preg_replace($match, $replace, $class);
 			}
 			$path = str_replace("\\", '/', substr($class, strlen($params['prefix'])));
-			return $params['path'] . '/' . $path . $params['suffix'];
+			$fullPath = "{$params['path']}/{$path}";
+
+			if ($options['dirs']) {
+				$list = glob(dirname($fullPath) . '/*');
+				$list = array_map(function($i) { return str_replace('\\', '/', $i); }, $list);
+
+				if (in_array($fullPath . $suffix, $list)) {
+					return $fullPath . $suffix;
+				}
+				return is_dir($fullPath) ? $fullPath : null;
+			}
+			return $fullPath . $suffix;
 		}
 	}
 
 	/**
-	 * Performs service location for an object of a specific type.
+	 * Performs service location for an object of a specific type. If `$name` is a string, finds the
+	 * first instance of a class with the given name in any registered library (i.e. apps, plugins
+	 * or vendor libraries registered via `Libraries::add()`), based on each library's order of
+	 * precedence.
+	 *
+	 * Order of precedence is usually based on the order in which the library was registered (via
+	 * `Libraries::add()`), unless the library was registered with the `'defer'` option set to
+	 * `true`. All libraries with the `'defer'` option set will be searched in
+	 * registration-order **after** searching all libraries **without** `'defer'` set.
+	 *
+	 * If `$name` is not specified, `locate()` returns an array with all classes of the specified
+	 * type which can be found. By default, `locate()` searches all registered libraries.
 	 *
 	 * @param string $type
 	 * @param string $name
-	 * @return string
+	 * @return mixed
 	 * @see lithium\core\Libraries::$_classPaths
+	 * @see lithium\core\Libraries::add()
 	 */
 	public static function locate($type, $name = null, $options = array()) {
-		if (strpos($name, '\\') !== false) {
+		if (is_object($name) || strpos($name, '\\') !== false) {
 			return $name;
 		}
 		$ident = $name ? $type . '.' . $name : $type;
@@ -384,7 +446,7 @@ class Libraries {
 					continue;
 				}
 				$params['library'] = $library;
-				$classPath = String::insert($pathTemplate, $params);
+				$classPath = str_replace('\\*', '', String::insert($pathTemplate, $params));
 
 				if (file_exists(Libraries::path($classPath))) {
 					return $classPath;
@@ -436,6 +498,7 @@ class Libraries {
 				$options['path'] = preg_replace(
 					'/(\/\*)|(\/(?:[A-Z][a-z0-9_]*))|({:\w+})/', '', str_replace('\\', '/', $path)
 				);
+
 				if (is_dir("{$config['path']}/{$options['path']}")) {
 					$classes = array_merge($classes, static::_search($config, $options));
 				}
@@ -455,7 +518,7 @@ class Libraries {
 		$path = rtrim($config['path'] . $options['path'], '/');
 		$filter = '/^.+\/[A-Za-z0-9_]+$|^.*' . preg_quote($config['suffix'], '/') . '/';
 		$search = function($path) use ($config, $filter, $options) {
-			return preg_grep($filter, glob(
+			return preg_grep($filter, (array)glob(
 				$path . '/*' . ($options['namespaces'] ? '' : $config['suffix'])
 			));
 		};
@@ -463,7 +526,7 @@ class Libraries {
 		$libs = $search($path, $config);
 
 		if ($options['recursive']) {
-			$dirs = $queue = array_diff(glob($path . '/*', GLOB_ONLYDIR), $libs);
+			$dirs = $queue = array_diff((array)glob($path . '/*', GLOB_ONLYDIR), $libs);
 			while ($queue) {
 				$dir = array_pop($queue);
 
@@ -471,7 +534,9 @@ class Libraries {
 					continue;
 				}
 				$libs = array_merge($libs, $search($dir, $config));
-				$queue = array_merge($queue, array_diff(glob($dir . '/*', GLOB_ONLYDIR), $libs));
+				$queue = array_merge(
+					$queue, array_diff((array)glob($dir . '/*', GLOB_ONLYDIR), $libs)
+				);
 			}
 		}
 

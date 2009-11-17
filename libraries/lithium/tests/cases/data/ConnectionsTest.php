@@ -38,8 +38,8 @@ class ConnectionsTest extends \lithium\test\Unit {
 	}
 
 	public function testConnectionCreate() {
-		$result = Connections::add('conn-test', 'Database', $this->config);
-		$expected = $this->config + array('type' => 'Database');
+		$result = Connections::add('conn-test', 'database', $this->config);
+		$expected = $this->config + array('type' => 'database');
 		$this->assertEqual($expected, $result);
 
 		$this->expectException('/mysql_get_server_info/');
@@ -63,7 +63,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 		Connections::add('conn-test-2', $this->config);
 		$this->assertEqual(array('conn-test', 'conn-test-2'), Connections::get());
 
-		$expected = $this->config + array('type' => 'Database');
+		$expected = $this->config + array('type' => 'database');
 		$this->assertEqual($expected, Connections::get('conn-test', array('config' => true)));
 
 		$this->assertNull(Connections::clear());
@@ -86,7 +86,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$result = Connections::get('conn-test');
 		$this->assertTrue($result instanceof \lithium\data\source\database\adapter\MySql);
 
-		$this->assertNull(Connections::get('conn-test-2', array('autoBuild' => false)));
+		$this->assertNull(Connections::get('conn-test-2', array('autoCreate' => false)));
 	}
 
 	public function testInvalidConnection() {

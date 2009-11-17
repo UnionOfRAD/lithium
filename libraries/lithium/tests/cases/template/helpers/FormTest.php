@@ -9,33 +9,10 @@
 namespace lithium\tests\cases\template\helpers;
 
 use \lithium\http\Router;
-use \lithium\action\Request;
 use \lithium\data\model\Record;
 use \lithium\template\helpers\Form;
-use \lithium\template\view\Renderer;
-
-class MyFormRenderer extends Renderer {
-
-	public function request() {
-		if (empty($this->_request)) {
-			$this->_request = new Request();
-			$this->_request->params += array('controller' => 'posts', 'action' => 'add');
-		}
-		return $this->_request;
-	}
-}
-
-class FormPost extends \lithium\data\Model {
-
-	protected $_schema = array(
-		'id' => array('type' => 'integer'),
-		'author_id' => array('type' => 'integer'),
-		'title' => array('type' => 'string'),
-		'body' => array('type' => 'text'),
-		'created' => array('type' => 'datetime'),
-		'updated' => array('type' => 'datetime')
-	);
-}
+use \lithium\tests\mocks\template\helpers\MockFormPost;
+use \lithium\tests\mocks\template\helpers\MockFormRenderer;
 
 class FormTest extends \lithium\test\Unit {
 
@@ -66,7 +43,7 @@ class FormTest extends \lithium\test\Unit {
 		Router::connect('/{:controller}/{:action}/{:id}.{:type}', array('id' => null));
 		Router::connect('/{:controller}/{:action}');
 
-		$this->context = new MyFormRenderer();
+		$this->context = new MockFormRenderer();
 		$this->form = new Form(array('context' => $this->context));
 	}
 
@@ -116,23 +93,29 @@ class FormTest extends \lithium\test\Unit {
 	}
 
 	public function testFormCreationWithBinding() {
-		$record = new Record(array('model' => __NAMESPACE__ . '\FormPost', 'data' => array(
-			'id' => '5',
-			'author_id' => '2',
-			'title' => 'This is a saved post',
-			'body' => 'This is the body of the saved post'
-		)));
+		$record = new Record(array(
+			'model' => 'lithium\tests\mocks\template\helpers\MockFormPost',
+			'data' => array(
+				'id' => '5',
+				'author_id' => '2',
+				'title' => 'This is a saved post',
+				'body' => 'This is the body of the saved post'
+			)
+		));
 
 		$result = $this->form->create($record);
 	}
 
 	public function testFormDataBinding() {
-		$record = new Record(array('model' => __NAMESPACE__ . '\FormPost', 'data' => array(
-			'id' => '5',
-			'author_id' => '2',
-			'title' => 'This is a saved post',
-			'body' => 'This is the body of the saved post'
-		)));
+		$record = new Record(array(
+			'model' => 'lithium\tests\mocks\template\helpers\FormPost',
+			'data' => array(
+				'id' => '5',
+				'author_id' => '2',
+				'title' => 'This is a saved post',
+				'body' => 'This is the body of the saved post'
+			)
+		));
 		$base = trim($this->context->request()->env('base'), '/') . '/';
 		$base = ($base == '/') ? $base : '/' . $base;
 
@@ -162,7 +145,7 @@ class FormTest extends \lithium\test\Unit {
 
 	public function testElementsWithDefaultConfiguration() {
 		$this->form = new Form(array(
-			'context' => new MyFormRenderer(), 'base' => array('class' => 'editable')
+			'context' => new MockFormRenderer(), 'base' => array('class' => 'editable')
 		));
 
 		$result = $this->form->text('foo');

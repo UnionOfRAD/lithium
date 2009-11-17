@@ -19,7 +19,7 @@ use \DirectoryIterator;
  * methods to be filtered as per the Lithium filtering system.
  *
  * The path that the cached files will be written to defaults to
- * LITHIUM_APP_PATH/tmp/cache, but is user-configurable on cache configuration.
+ * `LITHIUM_APP_PATH/tmp/cache`, but is user-configurable on cache configuration.
  *
  * Note that the cache expiration time is stored within the first few bytes
  * of the cached data, and is transparently added and/or removed when values
@@ -43,10 +43,10 @@ class File extends \lithium\core\Object {
 	 *
 	 * @param string $key        The key to uniquely identify the cached item
 	 * @param mixed  $value      The value to be cached
-	 * @param object $conditions Conditions under which the operation should proceed
+	 * @param string $expiry     A strtotime() compatible cache time
 	 * @return boolean True on successful write, false otherwise
 	 */
-	public function write($key, $data, $expiry, $conditions = null) {
+	public function write($key, $data, $expiry) {
 		$path = $this->_config['path'];
 
 		return function($self, $params, $chain) use (&$path) {
@@ -64,10 +64,9 @@ class File extends \lithium\core\Object {
 	 * Read value(s) from the cache
 	 *
 	 * @param string $key        The key to uniquely identify the cached item
-	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return mixed Cached value if successful, false otherwise
 	 */
-	public function read($key, $conditions = null) {
+	public function read($key) {
 		$path = $this->_config['path'];
 
 		return function($self, $params, $chain) use (&$path) {
@@ -97,10 +96,9 @@ class File extends \lithium\core\Object {
 	 * Delete value from the cache
 	 *
 	 * @param string $key        The key to uniquely identify the cached item
-	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return mixed True on successful delete, false otherwise
 	 */
-	public function delete($key, $conditions = null) {
+	public function delete($key) {
 		$path = $this->_config['path'];
 
 		return function($self, $params, $chain) use (&$path) {
@@ -131,6 +129,18 @@ class File extends \lithium\core\Object {
 		}
 		return true;
 
+	}
+
+	/**
+	 * Determines if the File adapter can read and write
+	 * to the configured path.
+	 *
+	 * return boolean True if enabled, false otherwise
+	 */
+	public function enabled() {
+		$directory = new SplFileInfo($this->_config['path']);
+
+		return ($directory->isDir() && $directory->isReadable() && $directory->isWritable());
 	}
 
 }

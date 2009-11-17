@@ -9,13 +9,7 @@
 namespace lithium\tests\cases\core;
 
 use \lithium\core\Environment;
-
-class MockRequest extends \lithium\core\Object {
-
-	public function env($key) {
-		return $this->_config[$key];
-	}
-}
+use \lithium\tests\mocks\core\MockRequest;
 
 class EnvironmentTest extends \lithium\test\Unit {
 
@@ -33,7 +27,7 @@ class EnvironmentTest extends \lithium\test\Unit {
 		$this->assertNull(Environment::get('foo'));
 		$this->assertTrue(is_array(Environment::get('development')));
 	}
-	
+
 	/**
 	 * Tests modifying environment configuration.
 	 *
@@ -43,7 +37,7 @@ class EnvironmentTest extends \lithium\test\Unit {
 		$expected = array('inherit' => 'development', 'foo' => 'bar');
 		Environment::set('test', array('foo' => 'bar'));
 		$this->assertEqual($expected, Environment::get('test'));
-		
+
 		$expected = array('inherit' => 'production', 'foo' => 'bar', 'baz' => 'qux');
 		Environment::set('test', array('inherit' => 'production', 'baz' => 'qux'));
 		$this->assertEqual($expected, Environment::get('test'));

@@ -54,26 +54,24 @@ class Request extends \lithium\http\Base {
 
 	/**
 	 * headers
-	 *
+	 * {{{
+	 *     array(
+	 *          'Host' => $this->host . ":" . $this->port,
+	 *          'Connection' => 'Close', 'User-Agent' => 'Mozilla/5.0 (Lithium)'
+	 *     )
+	 * }}}
 	 * @var array
 	 */
-	public $headers = array(
-		'Host' => 'localhost:80',
-		'Connection' => 'Close',
-		'User-Agent' => 'Mozilla/5.0 (Lithium)'
-	);
+	public $headers = array();
 
 	/**
 	 * The authentication/authorization information
-	 *
+	 * {{{
+	 *     array('method' => 'Basic', 'username' => 'lithium', 'password' => 'rad')
+	 * }}}
 	 * @var array
 	 */
-	public $auth = array(
-	/*	'method' => 'Basic',
-		'username' => null,
-		'password' => null,
-	*/
-	);
+	public $auth = array();
 
 	/**
 	 * cookies
@@ -95,24 +93,23 @@ class Request extends \lithium\http\Base {
 	 * @return void
 	 */
 	public function __construct($config = array()) {
+		$defaults = array(
+			'host' => 'localhost', 'port' => 80, 'method' => 'GET', 'path' => '/',
+			'headers' => array(), 'body' => array(), 'params' => array()
+		);
+		$config += $defaults;
 		foreach ($config as $key => $value) {
-			if (isset($this->{$key}) && !is_array($this->{$key})) {
-				$this->{$key} = $value;
-			}
+			$this->{$key} = $value;
 		}
+
 		$this->protocol = "HTTP/{$this->version}";
 
-		$this->headers('Host', $this->host . ":" . $this->port);
+		$this->headers = array(
+			'Host' => $this->host . ":" . $this->port,
+			'Connection' => 'Close', 'User-Agent' => 'Mozilla/5.0 (Lithium)'
+		);
+		$this->headers($config['headers']);
 
-		if (!empty($config['headers'])) {
-			$this->headers($config['headers']);
-		}
-		if (!empty($config['body'])) {
-			$this->body($config['body']);
-		}
-		if (!empty($config['params'])) {
-			$this->params = $config['params'];
-		}
 		if (!empty($config['auth']['password'])) {
 			$this->headers('Authorization',
 				$config['auth']['method'] . ' '
@@ -127,15 +124,21 @@ class Request extends \lithium\http\Base {
 	/**
 	 * Set queryString
 	 *
+	 * @param array $params
+	 * @param string $format
 	 * @return array
 	 */
 	public function queryString($params = array(), $format = "{:key}={:value}&") {
-		$query = null;
-		if (is_string($params)) {
-			list($format, $params) = func_get_args();
+		if (empty($params)) {
+			if (is_string($this->params)) {
+				return "?" . $this->params;
+			}
+			$params = $this->params;
+		} elseif (is_array($this->params)) {
+			$params = array_merge($this->params, $params);
 		}
-		$params = array_merge((array)$this->params, $params);
-		foreach ((array) $params as $key => $value) {
+		$query = null;
+		foreach ($params as $key => $value) {
 			$query .= String::insert($format, array(
 				'key' => urlencode($key), 'value' => urlencode($value)
 			));
@@ -143,7 +146,7 @@ class Request extends \lithium\http\Base {
 		if (empty($query)) {
 			return null;
 		}
-		return "?" . substr($query, 0, -1);
+		return "?" . $this->params = substr($query, 0, -1);
 	}
 
 	/**

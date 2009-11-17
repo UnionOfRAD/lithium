@@ -91,6 +91,20 @@ class ParserTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testFilteredTokenization() {
+		$code = 'while (isset($countRugen)) { if ($inigoMontoya->is("alive")) { ' . "\n";
+		$code .= '$inigoMontoya->say(array("hello", "name", "accusation", "die")); ' . "\n";
+		$code .= 'try { $inigoMontoya->kill($countRugen); } catch (Exception $e) { continue; } } }';
+
+		$result = Parser::tokenize($code, array('include' => array('T_IF', 'T_WHILE', 'T_CATCH')));
+		$expected = array(
+			array('id' => 318, 'name' => 'T_WHILE', 'content' => 'while', 'line' => 1),
+			array('id' => 301, 'name' => 'T_IF', 'content' => 'if', 'line' => 1),
+			array('id' => 338, 'name' => 'T_CATCH', 'content' => 'catch', 'line' => 3)
+		);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testFindingTokenPatterns() {
 		$code = file_get_contents(\lithium\core\Libraries::path('lithium\util\reflection\Parser'));
 

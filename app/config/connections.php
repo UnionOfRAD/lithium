@@ -8,7 +8,7 @@
 
 use \lithium\data\Connections;
 
-Connections::add('default', 'Database', array(
+Connections::add('default', 'database', array(
 	'adapter' => 'MySql',
 	'host' => 'localhost',
 	'login' => 'root',

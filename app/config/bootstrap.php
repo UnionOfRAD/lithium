@@ -38,12 +38,6 @@ if (!include LITHIUM_LIBRARY_PATH . '/lithium/core/Libraries.php') {
 }
 
 /**
- * Add the Lithium core library.  This sets default paths and initializes the autoloader.  You
- * generally should not need to override any settings.
- */
-Libraries::add('lithium');
-
-/**
  * Optimize default request cycle by loading common classes.  If you're implementing custom
  * request/response or dispatch classes, you can safely remove these.  Actually, you can safely
  * remove them anyway, they're just there to give slightly you better out-of-the-box performance.
@@ -69,6 +63,12 @@ require LITHIUM_LIBRARY_PATH . '/lithium/template/View.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/template/view/Renderer.php';
 
 /**
+ * Add the Lithium core library.  This sets default paths and initializes the autoloader.  You
+ * generally should not need to override any settings.
+ */
+Libraries::add('lithium');
+
+/**
  * Add the application.  You can pass a `'path'` key here if this bootstrap file is outside of
  * your main application, but generally you should not need to change any settings.
  */
@@ -84,36 +84,11 @@ Libraries::add('app');
  * it intercepts any writes where the `'expires'` key is set in the options array.  When creating a
  * new application, it is suggested that you change the value of `'key'` below.
  */
-
-/**
-* Session configuration
-*/
 // use \lithium\storage\Session;
 //
 // Session::config(array(
-// 	'cookie' => array(
-// 		'adapter' => 'Cookie',
-// 		'name'    => 'AppCookieName',
-// 		'expires' => '+5 days',
-// 		'domain'  => '',
-// 		'path'    => '/',
-// 		'filters' => array(
-// 			// 'Encryption' => array('key' => '0409448a5206980ab15682c3281c1a3b1fb10c55')
-// 		)
-// 	),
-// 	'default' => array('adapter' => 'Php', 'filters' => array())
+// 	'default' => array('adapter' => 'Php')
 // ));
-
-/**
- * To enable admin or plugin routing, uncomment the following lines, and see `app/config/routes.php`
- * to enable the admin routing namespace.
- */
-// use \lithium\action\Dispatcher;
-//
-// Dispatcher::config(array('rules' => array(
-// 	'admin' => array('action' => 'admin_{:action}'),
-// 	'plugin' => array('controller' => '{:plugin}.{:controller}')
-// )));
 
 /*
  * Inflector configuration example.  If your application has custom singular or plural rules, or

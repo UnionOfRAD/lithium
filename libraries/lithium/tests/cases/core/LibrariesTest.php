@@ -10,23 +10,13 @@ namespace lithium\tests\cases\core;
 
 use \lithium\core\Libraries;
 
-class MockLibraries extends \lithium\core\Libraries {
-
-	public static function paths($type, $libraries, $params = array(), $options = array()) {
-		return static::_paths($type, $libraries, $params, $options);
-	}
-
-	public static function search($paths, $options = array()) {
-		return static::_search($paths, $options);
-	}
-}
-
 class LibrariesTest extends \lithium\test\Unit {
 
 	public function testNamespaceToFileTranslation() {
 		$result = Libraries::path('\lithium\core\Libraries');
 		$this->assertTrue(strpos($result, '/lithium/core/Libraries.php'));
 		$this->assertTrue(file_exists($result));
+		$this->assertFalse(strpos($result, '\\'));
 	}
 
 	public function testPathTransform() {
@@ -38,7 +28,6 @@ class LibrariesTest extends \lithium\test\Unit {
 			}
 		));
 		$this->assertEqual($expected, $result);
-
 	}
 
 	public function testPathFiltering() {
@@ -76,8 +65,8 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertNull(Libraries::get('foo'));
 
 		$result = Libraries::get();
-		$this->assertTrue(array_key_exists('lithium', $result));
-		$this->assertTrue(array_key_exists('app', $result));
+		$this->assertTrue(isset($result['lithium']));
+		$this->assertTrue(isset($result['app']));
 		$this->assertEqual($expected, $result['lithium']);
 	}
 
@@ -168,14 +157,25 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testServiceLocateAll() {
+		$result = Libraries::locate('tests');
+		$this->assertTrue(count($result) > 30);
+
 		$expected = array(
 			'lithium\template\view\adapters\File', 'lithium\template\view\adapters\Simple'
 		);
 		$result = Libraries::locate('adapters.template.view');
 		$this->assertEqual($expected, $result);
+	}
 
-		$result = Libraries::locate('tests');
-		$this->assertTrue(count($result) > 30);
+	public function testServiceLocateAllCommands() {
+		$result = Libraries::locate('commands');
+		$this->assertTrue(count($result) > 10);
+
+		$expected = array(
+			'lithium\console\commands\docs\Generator', 'lithium\console\commands\docs\Todo'
+		);
+		$result = Libraries::locate('commands.docs');
+		$this->assertEqual($expected, $result);
 	}
 
 	/**
@@ -210,6 +210,39 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testServiceLocateCommand() {
+		$result = Libraries::locate('commands.docs', 'Generator');
+		$expected = 'lithium\console\commands\docs\Generator';
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testCaseSensitivePathLookups() {
+		$library = Libraries::get('lithium');
+		$base = $library['path'] . '/';
+
+		$expected = $base . 'template/view.php';
+		$result = Libraries::path('\lithium\template\view');
+		$this->assertEqual($expected, $result);
+
+		$result = Libraries::path('lithium\template\view');
+		$this->assertEqual($expected, $result);
+
+		$expected = $base . 'template/View.php';
+
+		$result = Libraries::path('\lithium\template\View');
+		$this->assertEqual($expected, $result);
+
+		$result = Libraries::path('lithium\template\View');
+		$this->assertEqual($expected, $result);
+
+		$expected = $base . 'template/view';
+
+		$result = Libraries::path('\lithium\template\view', array('dirs' => true));
+		$this->assertEqual($expected, $result);
+
+		$result = Libraries::path('lithium\template\view', array('dirs' => true));
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

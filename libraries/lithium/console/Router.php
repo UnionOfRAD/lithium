@@ -11,7 +11,6 @@ namespace lithium\console;
 /**
  * Router parses incoming request
  *
- * @package lithium.console
  *
  **/
 class Router extends \lithium\core\Object {

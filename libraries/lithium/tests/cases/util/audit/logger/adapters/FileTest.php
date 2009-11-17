@@ -1,6 +1,6 @@
 <?php
 
-namespace lithium\tests\cases\util\audit\adapters;
+namespace lithium\tests\cases\util\audit\logger\adapters;
 
 use \lithium\audit\logger\adapters\File;
 

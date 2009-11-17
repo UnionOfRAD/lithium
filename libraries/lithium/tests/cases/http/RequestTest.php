@@ -82,15 +82,22 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testQueryStringFormat() {
 		$expected = "?param:value;param1:value1";
-		$result = $this->request->queryString("{:key}:{:value};", array(
-			'param' => 'value', 'param1' => 'value1'
-		));
-		$this->assertEqual($expected, $result);
-
-		$expected = "?param:value;param1:value1";
 		$result = $this->request->queryString(
 			array('param' => 'value', 'param1' => 'value1'), "{:key}:{:value};"
 		);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testQueryStringSetup() {
+		$expected = "?param=value";
+		$result = $this->request->queryString(array('param' => 'value'));
+		$this->assertEqual($expected, $result);
+
+		$result = $this->request->queryString();
+		$this->assertEqual($expected, $result);
+
+		$expected = "?param2=value2";
+		$result = $this->request->queryString(array('param2' => 'value2'));
 		$this->assertEqual($expected, $result);
 	}
 
