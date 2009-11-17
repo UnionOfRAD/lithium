@@ -275,9 +275,12 @@ class CouchDb extends \lithium\data\source\Http {
 			case 'next':
 				if (isset($resource->rows)) {
 					if (isset($resource->rows[$this->_iterator])) {
-						$result = (array) $resource->rows[$this->_iterator]->value;
+						$result = (array)$resource->rows[$this->_iterator]->value;
 						$result['id'] = $result['_id'] =
 						 	$resource->rows[$this->_iterator]->id;
+						if (isset($resource->rows[$this->_iterator]->key)) {
+							$result['key'] = $resource->rows[$this->_iterator]->key;
+						}
 						if (isset($result['rev'])) {
 							$result['_rev'] = $result['rev'];
 						}
