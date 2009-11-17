@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\data\source\database\adapter;
 
-class MockMysql extends \lithium\data\source\database\adapter\Mysql {
+class MockMysql extends \lithium\data\source\database\adapter\MySql {
 
 	public function get($var) {
 		return $this->{$var};
