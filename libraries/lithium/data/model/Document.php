@@ -153,6 +153,17 @@ class Document extends \lithium\util\Collection {
 	}
 
 	/**
+	 * PHP magic method used to check the presence of a field as document properties, i.e.
+	 * `$document->_id`.
+	 *
+	 * @param $name The field name, as specified with an object property.
+	 * @return bool True if the field specified in `$name` exists, false otherwise.
+	 */
+	public function __isset($name) {
+		return isset($this->_items[$name]);
+	}
+
+	/**
 	 * Allows several properties to be assigned at once, i.e.:
 	 * {{{
 	 * $doc->set(array('title' => 'Lorem Ipsum', 'value' => 42));
