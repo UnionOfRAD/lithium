@@ -26,3 +26,18 @@ escaped vs. what data _needs_ to be escaped.
 
 - [Introduction to PHP streams](http://www.php.net/intro.stream)
 - [Stream examples](http://www.php.net/stream.examples)
+
+#### Using helpers
+
+Helpers are lazy-loaded by the current renderer. To use a helper, you can
+reference it by its name like this: {{{
+echo $this->html->link('Google', 'http://www.google.com');
+}}}
+
+In a template, `$this` refers to the `Renderer` object. By using `$this->html`
+for the first time, the renderer will create an instance of the helper and store
+it so that the next time the helper is invoked the renderer will not have to
+re-instanciate the helper.
+
+Using such an approach, helpers can easily be loaded as needed without any
+performance impact.
