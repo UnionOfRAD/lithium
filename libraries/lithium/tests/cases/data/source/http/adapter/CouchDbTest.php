@@ -75,10 +75,35 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->describe('companies');
 	}
 
-	public function testCreate() {
+	public function testCreateNoId() {
 		$couchdb = new CouchDb($this->_testConfig);
+		$this->query->data(array('name' => 'Acme Inc.'));
 		$expected = true;
 		$result = $couchdb->create($this->query);
+		$this->assertEqual($expected, $result);
+
+		$expected = '/posts';
+		$result = $couchdb->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$expected = array();
+		$result = $couchdb->last->request->params;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testCreateWithId() {
+		$couchdb = new CouchDb($this->_testConfig);
+		$this->query->data(array('id' => 12345, 'name' => 'Acme Inc.'));
+		$expected = true;
+		$result = $couchdb->create($this->query);
+		$this->assertEqual($expected, $result);
+
+		$expected = '/posts/12345';
+		$result = $couchdb->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$expected = array();
+		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -100,7 +125,7 @@ class CouchDbTest extends \lithium\test\Unit {
 	public function testReadWithConditions() {
 		$couchdb = new CouchDb($this->_testConfig);
 		$expected = true;
-		$this->query->conditions(array('_id' => 12345));
+		$this->query->conditions(array('id' => 12345));
 		$result = $couchdb->read($this->query);
 		$this->assertEqual($expected, $result);
 
@@ -131,37 +156,14 @@ class CouchDbTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testUpdate() {
-		$couchdb = new CouchDb($this->_testConfig);
-		$this->query->data(array('id' => 12345, 'rev' => '1-1', 'title' => 'One'));
-
-		$expected = true;
-		$result = $couchdb->update($this->query);
-		$this->assertEqual($expected, $result);
-
-		$expected = '/posts/12345';
-		$result = $couchdb->last->request->path;
-		$this->assertEqual($expected, $result);
-
-		$expected = array();
-		$result = $couchdb->last->request->params;
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testDelete() {
-		$couchdb = new CouchDb($this->_testConfig);
-		$expected = true;
-		$result = $couchdb->delete($this->query);
-		$this->assertEqual($expected, $result);
-	}
-
 	public function testFlatResult() {
 		$couchdb = new CouchDb($this->_testConfig);
 		$rows = (object) array(
-			'id' => 'a1', '_id' => 'a1', 'author' => 'author 1', 'body' => 'body 1'
+			'_id' => 'a1', '_rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1'
 		);
 		$expected = array(
-			'id' => 'a1', '_id' => 'a1', 'author' => 'author 1', 'body' => 'body 1'
+			'id' => 'a1', 'rev' => '1-2',
+			'author' => 'author 1', 'body' => 'body 1'
 		);
 		$result = $couchdb->result('next', $rows, $this->query);
 		$this->assertEqual($expected, $result);
@@ -185,15 +187,49 @@ class CouchDbTest extends \lithium\test\Unit {
 			))
 		));
 		$expected = array(
-			'id' => 'a1', '_id' => 'a1', 'author' => 'author 1', 'body' => 'body 1'
+			'id' => 'a1', 'author' => 'author 1', 'body' => 'body 1'
 		);
 		$result = $couchdb->result('next', $rows, $this->query);
 		$this->assertEqual($expected, $result);
 
 		$expected = array(
-			'id' => 'a2', '_id' => 'a2', 'author' => 'author 2', 'body' => 'body 2'
+			'id' => 'a2', 'author' => 'author 2', 'body' => 'body 2'
 		);
 		$result = $couchdb->result('next', $rows, $this->query);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testUpdate() {
+		$couchdb = new CouchDb($this->_testConfig);
+		$this->query->data(array('id' => 12345, 'rev' => '1-1', 'title' => 'One'));
+
+		$expected = true;
+		$result = $couchdb->update($this->query);
+		$this->assertEqual($expected, $result);
+
+		$expected = '/posts/12345';
+		$result = $couchdb->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$expected = array();
+		$result = $couchdb->last->request->params;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testDelete() {
+		$couchdb = new CouchDb($this->_testConfig);
+		$this->query->data(array('id' => 12345, 'rev'=> '1-1', 'name' => 'Acme Inc'));
+
+		$expected = true;
+		$result = $couchdb->delete($this->query);
+		$this->assertEqual($expected, $result);
+
+		$expected = '/posts/12345';
+		$result = $couchdb->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$expected = 'rev=1-1';
+		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
 	}
 }
