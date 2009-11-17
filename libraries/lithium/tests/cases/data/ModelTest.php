@@ -144,10 +144,15 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testFilteredFind() {
-		MockPost::applyFilter('find', function($self, $params, $chain) {
+		MockTag::applyFilter('find', function($self, $params, $chain) {
 			$result = $chain->next($self, $params, $chain);
+			if ($result != null) {
+				$result->filtered = true;
+			}
 			return $result;
 		});
+		$result = MockTag::first();
+		$this->assertTrue($result->filtered);
 	}
 
 	public function testCustomFinder() {
