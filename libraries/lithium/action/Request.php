@@ -349,14 +349,8 @@ class Request extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _base() {
-		$base = dirname($this->env('PHP_SELF'));
-		if ($base === '/') {
-			return null;
-		}
-		while (in_array(basename($base), array('app', 'webroot'))) {
-			$base = ltrim(dirname($base), '.');
-		}
-		return rtrim($base, '/');
+		$base = str_replace('\\', '/', dirname($this->env('PHP_SELF')));
+		return rtrim(str_replace(array('/app/webroot', '/webroot'), '', $base), '/');
 	}
 }
 
