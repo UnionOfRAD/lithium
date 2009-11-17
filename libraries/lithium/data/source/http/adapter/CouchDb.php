@@ -195,7 +195,7 @@ class CouchDb extends \lithium\data\source\Http {
 			if (isset($ret->error) && $ret->read = 'missing') {
 				return null;
 			}
-			return $ret;		
+			return $ret;
 		});
 	}
 
@@ -278,9 +278,11 @@ class CouchDb extends \lithium\data\source\Http {
 						$result = array(
 							'id' => $resource->rows[$this->_iterator]->id,
 							'_id' => $resource->rows[$this->_iterator]->id,
-							'_rev' => $resource->rows[$this->_iterator]->value->rev,
-							'rev' => $resource->rows[$this->_iterator]->value->rev
 						);
+						if (isset($resource->rows[$this->_iterator]->value->_rev)) {
+							$result['_rev'] = $result['_rev'] =
+								$resource->rows[$this->_iterator]->value->_rev;
+						}
 						$this->_iterator++;
 					} else {
 						$this->_iterator = 0;
