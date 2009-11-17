@@ -10,38 +10,8 @@ namespace lithium\tests\cases\util;
 
 use \stdClass;
 use \lithium\util\Collection;
-
-class DispatchTest {
-
-	public $marker = false;
-
-	public $data = 'foo';
-
-	public function mark() {
-		$this->marker = true;
-		return true;
-	}
-
-	function mapArray() {
-		return array('foo');
-	}
-}
-
-class CoreDispatchTest extends \lithium\core\Object {
-
-	public $data = array(1 => 2);
-
-	public function invokeMethod($method, $params = array()) {
-		return $method;
-	}
-
-	public function to($format, $options = array()) {
-		switch ($format) {
-			case 'array':
-				return $this->data + array(2 => 3);
-		}
-	}
-}
+use \lithium\tests\mocks\util\MockCollectionMarker;
+use \lithium\tests\mocks\util\MockCollectionObject;
 
 class CollectionTest extends \lithium\test\Unit {
 
@@ -60,7 +30,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$collection = new Collection();
 
 		for ($i = 0; $i < 10; $i++) {
-			$collection[] = new DispatchTest();
+			$collection[] = new MockCollectionMarker();
 		}
 		$result = $collection->mark();
 		$this->assertEqual($result, array_fill(0, 10, true));
@@ -71,7 +41,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$result = $collection->invoke('mapArray', array(), array('merge' => true));
 		$this->assertEqual($result, array_fill(0, 10, 'foo'));
 
-		$collection = new Collection(array('items' => array_fill(0, 10, new CoreDispatchTest())));
+		$collection = new Collection(array('items' => array_fill(0, 10, new MockCollectionObject())));
 		$result = $collection->testFoo();
 		$this->assertEqual($result, array_fill(0, 10, 'testFoo'));
 
@@ -81,12 +51,12 @@ class CollectionTest extends \lithium\test\Unit {
 	}
 
 	public function testObjectCasting() {
-		$collection = new Collection(array('items' => array_fill(0, 10, new CoreDispatchTest())));
+		$collection = new Collection(array('items' => array_fill(0, 10, new MockCollectionObject())));
 		$result = $collection->to('array');
 		$expected = array_fill(0, 10, array(1 => 2, 2 => 3));
 		$this->assertEqual($expected, $result);
 
-		$collection = new Collection(array('items' => array_fill(0, 10, new DispatchTest())));
+		$collection = new Collection(array('items' => array_fill(0, 10, new MockCollectionMarker())));
 		$result = $collection->to('array');
 		$expected = array_fill(0, 10, array('marker' => false, 'data' => 'foo'));
 		$this->assertEqual($expected, $result);
@@ -130,6 +100,10 @@ class CollectionTest extends \lithium\test\Unit {
 		$collection = new Collection(array('items' => array('', 'Hello', 'Goodbye')));
 		$result = $collection->first(function($value) { return $value; });
 		$this->assertEqual('Hello', $result);
+
+		$collection = new Collection(array('items' => array('', 'Hello', 'Goodbye')));
+		$result = $collection->first();
+		$this->assertEqual('', $result);
 	}
 
 	/**

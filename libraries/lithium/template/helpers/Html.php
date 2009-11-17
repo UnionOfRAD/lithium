@@ -223,8 +223,6 @@ class Html extends \lithium\template\Helper {
 	 * @param mixed $path The name of a CSS style sheet in /app/webroot/css, or an array
 	 *              containing names of CSS stylesheets in that directory.
 	 * @param array $options Array of HTML attributes.
-	 * @param boolean $inline If set to false, the generated tag appears in the head tag
-	 *                of the layout.
 	 * @return string CSS <link /> or <style /> tag, depending on the type of link.
 	 * @filter This method can be filtered.
 	 */
@@ -276,7 +274,6 @@ class Html extends \lithium\template\Helper {
 	 * @param string $text String content that will appear inside the div element.
 	 *   If null, only a start tag will be printed
 	 * @param array $attributes Additional HTML attributes of the DIV tag
-	 * @param boolean $escape If true, $text will be HTML-escaped
 	 * @return string The formatted tag element
 	 */
 	function tag($name, $content = null, $options = array()) {
@@ -293,7 +290,6 @@ class Html extends \lithium\template\Helper {
 	 * @param string $text String content that will appear inside the div element.
 	 *   If null, only a start tag will be printed
 	 * @param array $attributes Additional HTML attributes of the DIV tag
-	 * @param boolean $escape If true, $text will be HTML-escaped
 	 * @return string The formatted DIV element
 	 */
 	function block($class = null, $content = null, $options = array()) {
@@ -309,7 +305,6 @@ class Html extends \lithium\template\Helper {
 	 * @param string $class CSS class name of the p element.
 	 * @param string $text String content that will appear inside the p element.
 	 * @param array $attributes Additional HTML attributes of the P tag
-	 * @param boolean $escape If true, $text will be HTML-escaped
 	 * @return string The formatted P element
 	 */
 	function para($class, $content, $options = array()) {

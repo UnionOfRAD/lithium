@@ -8,12 +8,7 @@
 
 namespace lithium\tests\cases\util\socket;
 
-class CurlMock extends \lithium\util\socket\Curl {
-
-	public function resource() {
-		return $this->_resource;
-	}
-}
+use \lithium\tests\mocks\util\socket\MockCurl;
 
 class CurlTest extends \lithium\test\Unit {
 
@@ -27,8 +22,19 @@ class CurlTest extends \lithium\test\Unit {
 		'timeout' => 2
 	);
 
+	/**
+	 * Skip the test if curl is not available in your PHP installation.
+	 *
+	 * @return void
+	 */
+	public function skip() {
+		$extensionExists = function_exists('curl_init');
+		$message = 'Your PHP installation was not compiled with curl support.';
+		$this->skipIf(!$extensionExists, $message);
+	}
+
 	public function testAllMethodsNoConnection() {
-		$stream = new CurlMock(array('protocol' => null));
+		$stream = new MockCurl(array('protocol' => null));
 		$this->assertFalse($stream->open());
 		$this->assertTrue($stream->close());
 		$this->assertFalse($stream->timeout(2));
@@ -38,7 +44,7 @@ class CurlTest extends \lithium\test\Unit {
 	}
 
 	public function testOpen() {
-		$stream = new CurlMock($this->_testConfig);
+		$stream = new MockCurl($this->_testConfig);
 		$result = $stream->open();
 		$this->assertTrue($result);
 
@@ -47,7 +53,7 @@ class CurlTest extends \lithium\test\Unit {
 	}
 
 	public function testClose() {
-		$stream = new CurlMock($this->_testConfig);
+		$stream = new MockCurl($this->_testConfig);
 		$result = $stream->open();
 		$this->assertTrue($result);
 
@@ -59,7 +65,7 @@ class CurlTest extends \lithium\test\Unit {
 	}
 
 	public function testTimeout() {
-		$stream = new CurlMock($this->_testConfig);
+		$stream = new MockCurl($this->_testConfig);
 		$result = $stream->open();
 		$stream->timeout(10);
 		$result = $stream->resource();
@@ -67,7 +73,7 @@ class CurlTest extends \lithium\test\Unit {
 	}
 
 	public function testEncoding() {
-		$stream = new CurlMock($this->_testConfig);
+		$stream = new MockCurl($this->_testConfig);
 		$result = $stream->open();
 		$stream->encoding('UTF-8');
 		$result = $stream->resource();
@@ -75,7 +81,7 @@ class CurlTest extends \lithium\test\Unit {
 	}
 
 	public function testWriteAndRead() {
-		$stream = new CurlMock($this->_testConfig);
+		$stream = new MockCurl($this->_testConfig);
 		$result = $stream->open();
 		$this->assertTrue(is_resource($result));
 

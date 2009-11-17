@@ -147,10 +147,11 @@ class Unit extends \lithium\core\Object {
 	}
 
 	public function assertIdentical($expected, $result, $message = '{:message}') {
+		$data = null;
 		if ($expected !== $result) {
 			$data = $this->_compare('identical', $expected, $result);
 		}
-		$this->assert($expected === $result, $message);
+		$this->assert($expected === $result, $message, $data);
 	}
 
 	public function assertTrue($result, $message = '{:message}') {
@@ -459,6 +460,9 @@ class Unit extends \lithium\core\Object {
 		foreach ($exception['trace'] as $frame) {
 			if (isset($scopedFrame)) {
 				break;
+			}
+			if (!class_exists('lithium\util\reflection\Inspector')) {
+				continue;
 			}
 			if (isset($frame['class']) && in_array($frame['class'], Inspector::parents($this))) {
 				$scopedFrame = $frame;

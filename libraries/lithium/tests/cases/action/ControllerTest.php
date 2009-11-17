@@ -10,76 +10,8 @@ namespace lithium\tests\cases\action;
 
 use \Exception;
 use \lithium\action\Controller;
-
-class TestMediaClass extends \lithium\http\Media {
-
-	public static function render(&$response, $data = null, $options = array()) {
-		$response->options = $options;
-		$response->data = $data;
-	}
-}
-
-class PostsController extends Controller {
-
-	public $stopped = false;
-
-	public function index($test = false) {
-		if ($test) {
-			return array('foo' => 'bar');
-		}
-		return 'List of posts';
-	}
-
-	public function delete($id = null) {
-		if (empty($id)) {
-			return $this->redirect('/posts', array('exit' => false));
-		}
-		return "Deleted {$id}";
-	}
-
-	public function send() {
-		$this->redirect('/posts');
-	}
-
-	public function view($id = null) {
-		if (!empty($id)) {
-			// throw new NotFoundException();
-		}
-		$this->render(array('text', 'data' => 'This is a post'));
-	}
-
-	public function view2($id = null) {
-		$this->render('view');
-	}
-
-	public function view3($id = null) {
-		$this->render(array('layout' => false, 'template' => 'view'));
-	}
-
-	protected function _safe() {
-		throw new Exception('Something wrong happened');
-	}
-
-	public function access($var) {
-		return $this->{$var};
-	}
-
-	protected function _stop() {
-		$this->stopped = true;
-	}
-}
-
-class ControllerRequest extends \lithium\action\Request {
-}
-
-class ControllerResponse extends \lithium\action\Response {
-
-	public $hasRendered = false;
-
-	public function render() {
-		$this->hasRendered = true;
-	}
-}
+use \lithium\tests\mocks\action\MockPostsController;
+use \lithium\tests\mocks\action\MockControllerRequest;
 
 class ControllerTest extends \lithium\test\Unit {
 
@@ -90,7 +22,7 @@ class ControllerTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testConstructionWithCustomProperties() {
-		$postsController = new PostsController();
+		$postsController = new MockPostsController();
 
 		$result = $postsController->access('_render');
 		$this->assertIdentical($result['layout'], 'default');
@@ -98,7 +30,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = $postsController->access('_classes');
 		$this->assertIdentical($result['response'], '\lithium\action\Response');
 
-		$postsController = new PostsController(array(
+		$postsController = new MockPostsController(array(
 			'render' => array('layout' => false),
 			'classes' => array('response' => '\app\extensions\http\Response')
 		));
@@ -116,10 +48,10 @@ class ControllerTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testConstructionWithCustomRequest() {
-		$request = new ControllerRequest();
-		$postsController = new PostsController(compact('request'));
+		$request = new MockControllerRequest();
+		$postsController = new MockPostsController(compact('request'));
 		$result = get_class($postsController->request);
-		$this->assertEqual($result, 'lithium\tests\cases\action\ControllerRequest');
+		$this->assertEqual($result, 'lithium\tests\mocks\action\MockControllerRequest');
 	}
 
 	/**
@@ -130,7 +62,7 @@ class ControllerTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testMethodInvokation() {
-		$postsController = new PostsController();
+		$postsController = new MockPostsController();
 		$result = $postsController->__invoke(null, array('action' => 'index', 'args' => array()));
 
 		$this->assertTrue(is_a($result, 'lithium\action\Response'));
@@ -142,7 +74,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$result2 = $postsController(null, array('action' => 'index', 'args' => array()));
 		$this->assertEqual($result2, $result);
 
-		$postsController = new PostsController();
+		$postsController = new MockPostsController();
 		$this->expectException('/Template not found/');
 		$result = $postsController->__invoke(null, array(
 			'action' => 'index', 'args' => array(true)
@@ -157,7 +89,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = $postsController->access('_render');
 		$this->assertEqual($result['data'], array('foo' => 'bar'));
 
-		$postsController = new PostsController();
+		$postsController = new MockPostsController();
 		$result = $postsController(null, array('action' => 'view', 'args' => array('2')));
 
 		$this->assertTrue(is_a($result, 'lithium\action\Response'));
@@ -177,7 +109,7 @@ class ControllerTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testRedirectResponse() {
-		$postsController = new PostsController();
+		$postsController = new MockPostsController();
 
 		$result = $postsController->__invoke(null, array('action' => 'delete'));
 		$this->assertEqual($result->body(), '');
@@ -185,14 +117,14 @@ class ControllerTest extends \lithium\test\Unit {
 		$headers = array('Location' => '/posts');
 		$this->assertEqual($result->headers, $headers);
 
-		$postsController = new PostsController();
+		$postsController = new MockPostsController();
 		$result = $postsController(null, array('action' => 'delete', 'args' => array('5')));
 
 		$this->assertEqual($result->body(), 'Deleted 5');
 		$this->assertFalse($postsController->stopped);
 
-		$postsController = new PostsController(array('classes' => array(
-			'response' => __NAMESPACE__ . '\ControllerResponse'
+		$postsController = new MockPostsController(array('classes' => array(
+			'response' => '\lithium\tests\mocks\action\MockControllerResponse'
 		)));
 		$this->assertFalse($postsController->stopped);
 
@@ -216,8 +148,8 @@ class ControllerTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testRenderWithAlternateTemplate() {
-		$postsController = new PostsController(array('classes' => array(
-			'media' => __NAMESPACE__ . '\TestMediaClass'
+		$postsController = new MockPostsController(array('classes' => array(
+			'media' => '\lithium\tests\mocks\action\MockMediaClass'
 		)));
 
 		$result = $postsController(null, array('action' => 'view2'));
@@ -236,14 +168,14 @@ class ControllerTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testProtectedMethodAccessAttempt() {
-		$postsController = new PostsController();
+		$postsController = new MockPostsController();
 		$this->expectException('/^Private/');
 		$result = $postsController->__invoke(null, array('action' => 'redirect'));
 
 		$this->assertEqual($result->body, null);
 		$this->assertEqual($result->headers(), array());
 
-		$postsController = new PostsController();
+		$postsController = new MockPostsController();
 		$this->expectException('/^Private/');
 		$result = $postsController->invoke('_safe');
 

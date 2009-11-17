@@ -9,13 +9,7 @@
 namespace lithium\tests\cases\util;
 
 use \lithium\util\String;
-
-class StringInsertData {
-
-	public function __toString() {
-		return 'custom object';
-	}
-}
+use \lithium\tests\mocks\util\MockStringObject;
 
 class StringTest extends \lithium\test\Unit {
 
@@ -245,7 +239,7 @@ class StringTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testInsertWithObject() {
-		$foo = new StringInsertData();
+		$foo = new MockStringObject();
 		$result = String::insert('This is a {:foo}', compact('foo'));
 		$expected = 'This is a custom object';
 		$this->assertEqual($expected, $result);

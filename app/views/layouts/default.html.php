@@ -9,17 +9,17 @@
 <!doctype html>
 <html>
 <head>
-	<?=@$this->html->charset(); ?>
+	<?php echo $this->html->charset(); ?>
 	<title><?=$title; ?></title>
-	<?=@$this->html->style('base'); ?>
-	<?=@$this->scripts(); ?>
-	<?=@$this->html->link('Icon', null, array('type' => 'icon')); ?>
+	<?php echo $this->html->style('base'); ?>
+	<?php echo $this->scripts(); ?>
+	<?php echo $this->html->link('Icon', null, array('type' => 'icon')); ?>
 </head>
 <body>
 	<div id="container">
 		<div id="header"></div>
 		<div id="content">
-			<?=@$this->content; ?>
+			<?php echo $this->content; ?>
 		</div>
 		<div id="footer"></div>
 	</div>

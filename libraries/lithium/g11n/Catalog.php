@@ -69,7 +69,7 @@ class Catalog extends \lithium\core\StaticObject {
 	 *              - `'name'`: One or multiple configuration names.
 	 *              - `'scope'`: The scope to use.
 	 * @return array|void If available the requested data, else `null`.
-	 * @see \lithium\g11n\catalog\adapters\Base::$_categories.
+	 * @see lithium\g11n\catalog\adapters\Base::$_categories.
 	 */
 	public static function read($category, $locales, $options = array()) {
 		$defaults = array('name' => null, 'scope' => null);
@@ -124,7 +124,7 @@ class Catalog extends \lithium\core\StaticObject {
 	 *              - `'name'`: One or multiple configuration names.
 	 *              - `'scope'`: The scope to use.
 	 * @return boolean Success.
-	 * @see \lithium\g11n\catalog\adapters\Base::$_categories.
+	 * @see lithium\g11n\catalog\adapters\Base::$_categories.
 	 */
 	public static function write($category, $data, $options = array()) {
 		$defaults = array('name' => null, 'scope' => null);

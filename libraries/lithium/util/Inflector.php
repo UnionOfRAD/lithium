@@ -20,8 +20,8 @@ class Inflector {
 	 * extended or added to using `Inflector::rules()`.
 	 *
 	 * @var array
-	 * @see \lithium\util\Inflector::slug()
-	 * @see \lithium\util\Inflector::rules()
+	 * @see lithium\util\Inflector::slug()
+	 * @see lithium\util\Inflector::rules()
 	 */
 	protected static $_transliterations = array(
 		'/à|á|å|â/' => 'a',
@@ -45,7 +45,7 @@ class Inflector {
 	 * rules to this list using `Inflector::rules()`.
 	 *
 	 * @var array
-	 * @see \lithium\util\Inflector::rules()
+	 * @see lithium\util\Inflector::rules()
 	 */
 	protected static $_uninflected = array(
 		'Amoyese', 'bison', 'Borghese', 'bream', 'breeches', 'britches', 'buffalo', 'cantus',
@@ -73,7 +73,7 @@ class Inflector {
 	 *   - `'irregular'`: Contains key-value pairs of specific words which are not inflected
 	 *     according to the rules. This is populated from `Inflector::$_plural` when the class
 	 *     is loaded.
-	 * @see \lithium\util\Inflector::rules()
+	 * @see lithium\util\Inflector::rules()
 	 */
 	protected static $_singular = array(
 		'rules' => array(
@@ -133,7 +133,7 @@ class Inflector {
 	 *     inflected (i.e. singular and plural are the same).
 	 *   - `'irregular'`: Contains key-value pairs of specific words which are not inflected
 	 *     according to the rules.
-	 * @see \lithium\util\Inflector::rules()
+	 * @see lithium\util\Inflector::rules()
 	 */
 	protected static $_plural = array(
 		'rules' => array(
@@ -283,7 +283,7 @@ class Inflector {
 	 * @return string Word in plural form.
 	 */
 	public static function pluralize($word) {
-		if (array_key_exists($word, static::$_pluralized)) {
+		if (isset(static::$_pluralized[$word])) {
 			return static::$_pluralized[$word];
 		}
 		extract(static::$_plural);
@@ -319,7 +319,7 @@ class Inflector {
 	 * @return string Word in singular form.
 	 */
 	public static function singularize($word) {
-		if (array_key_exists($word, static::$_singularized)) {
+		if (isset(static::$_singularized[$word])) {
 			return static::$_singularized[$word];
 		}
 		extract(static::$_singular);
@@ -344,7 +344,7 @@ class Inflector {
 			}
 		}
 
-		if (!array_key_exists($word, static::$_singularized)) {
+		if (!isset(static::$_singularized[$word])) {
 			static::$_singularized[$word] = $word;
 		}
 		return static::$_singularized[$word];
@@ -370,7 +370,7 @@ class Inflector {
 	 * @return string Camel-cased version of the word (i.e. `'RedBike'`).
 	 */
 	public static function camelize($word) {
-		if (array_key_exists($word, static::$_camelized)) {
+		if (isset(static::$_camelized[$word])) {
 			return static::$_camelized[$word];
 		}
 		return static::$_camelized[$word] = str_replace(
@@ -385,7 +385,7 @@ class Inflector {
 	 * @return string Underscore-syntaxed version of the workd (i.e. `'red_bike'`).
 	 */
 	public static function underscore($word) {
-		if (array_key_exists($word, static::$_underscored)) {
+		if (isset(static::$_underscored[$word])) {
 			return static::$_underscored[$word];
 		}
 		return static::$_underscored[$word] = strtolower(
@@ -402,7 +402,7 @@ class Inflector {
 	 * @return string Human-readable version of the word (i.e. `'Red Bike'`).
 	 */
 	public static function humanize($word, $separator = '_') {
-		if (array_key_exists($word . $separator, static::$_humanized)) {
+		if (isset(static::$_humanized[$word . $separator])) {
 			return static::$_humanized[$word . $separator];
 		}
 		return static::$_humanized[$word . $separator] = ucwords(str_replace($separator, " ", $word));
@@ -450,7 +450,7 @@ class Inflector {
 	 * @param string $string An arbitrary string to convert.
 	 * @param string $replacement The replacement to use for spaces.
 	 * @return string The converted string.
-	 * @see \lithium\util\Inflector::rules()
+	 * @see lithium\util\Inflector::rules()
 	 */
 	public static function slug($string, $replacement = '_') {
 		$map = static::$_transliterations + array(

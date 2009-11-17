@@ -10,72 +10,81 @@ namespace lithium\data\model;
 
 class RecordSet extends \lithium\util\Collection {
 
-	protected
+	/**
+	 * The fully-namespaced class name of the model object to which this record set is bound. This
+	 * is usually the model that executed the query which created this object.
+	 *
+	 * @var string
+	 */
+	protected $_model = null;
 
-		/**
-		 * The fully-namespaced class name of the model object to which this record set is bound.
-		 * This is usually the model that executed the query which created this object.
-		 *
-		 * @var string
-		 */
-		$_model = null,
+	/**
+	 * An array containing each record's unique key. This allows, for example, lookups of records
+	 * with composite keys, i.e.:
+	 *
+	 * {{{
+	 * $payment = $records[array('client_id' => 42, 'invoice_id' => 21)];
+	 * }}}
+	 *
+	 * @var array
+	 */
+	protected $_index = array();
 
-		/**
-		 * An array containing each record's unique key. This allows, for example, lookups of
-		 * records with composite keys, i.e.:
-		 * 
-		 * {{{
-		 * $payment = $records[array('client_id' => 42, 'invoice_id' => 21)];
-		 * }}}
-		 *
-		 * @var array
-		 */
-		$_index = array(),
+	protected $_pointer = 0;
 
-		$_pointer = 0,
+	/**
+	 * A reference to the object that originated this record set; usually an instance of
+	 * `lithium\data\Source` or `lithium\data\source\Database`. Used to load column definitions and
+	 * lazy-load records.
+	 *
+	 * @var object
+	 */
+	protected $_handle = null;
 
-		/**
-		 * A reference to the object that originated this record set; usually an instance of
-		 * `lithium\data\Source` or `lithium\data\source\Database`. Used to load column definitions and
-		 * lazy-load records.
-		 *
-		 * @var object
-		 */
-		$_handle = null,
+	/**
+	 * A reference to the query object that originated this record set; usually an instance of
+	 * `lithium\data\model\Query`.
+	 *
+	 * @var object
+	 */
+	protected $_query = null;
 
-		/**
-		 * A reference to the query object that originated this record set; usually an instance of
-		 * `lithium\data\model\Query`.
-		 *
-		 * @var object
-		 */
-		$_query = null,
+	/**
+	 * A pointer or resource that is used to load records from the object (`$_handle`) that
+	 * originated this record set.
+	 *
+	 * @var resource
+	 */
+	protected $_result = null;
 
-		/**
-		 * A pointer or resource that is used to load records from the object (`$_handle`) that
-		 * originated this record set.
-		 *
-		 * @var resource
-		 */
-		$_resource = null,
+	/**
+	 * A 2D array of column-mapping information, where the top-level key is the fully-namespaced
+	 * model name, and the sub-arrays are column names.
+	 *
+	 * @var array
+	 */
+	protected $_columns = array();
 
-		/**
-		 * A 2D array of 
-		 *
-		 * @var array
-		 */
-		$_columns = array(),
+	protected $_classes = array(
+		'record' => '\lithium\model\Record',
+		'media' => '\lithium\http\Media'
+	);
 
-		$_classes = array(
-			'record' => '\lithium\model\Record',
-			'media' => '\lithium\http\Media'
-		),
+	protected $_valid = true;
 
-		$_valid = true,
+	/**
+	 * By default, query results are not fetched until the record set is iterated. Set to true when
+	 * the record set has begun iterating and fetching records.
+	 *
+	 * @var boolean
+	 * @see lithium\data\model\RecordSet::rewind()
+	 * @see lithium\data\model\RecordSet::_populate()
+	 */
+	protected $_hasInitialized = false;
 
-		$_hasInitialized = false,
-
-		$_autoConfig = array('items', 'classes' => 'merge', 'handle', 'model', 'resource', 'query');
+	protected $_autoConfig = array(
+		'items', 'classes' => 'merge', 'handle', 'model', 'result', 'query'
+	);
 
 	/**
 	 * Initializes the record set and uses the database handle to get the column list contained in
@@ -89,8 +98,8 @@ class RecordSet extends \lithium\util\Collection {
 	protected function _init() {
 		parent::_init();
 
-		if ($this->_handle && $this->_resource) {
-			$this->_columns = $this->_handle->columns($this->_query, $this->_resource, $this);
+		if ($this->_handle && $this->_result) {
+			$this->_columns = $this->_handle->columns($this->_query, $this->_result, $this);
 		}
 	}
 
@@ -157,6 +166,12 @@ class RecordSet extends \lithium\util\Collection {
 		unset($this->_items[$index]);
 	}
 
+	/**
+	* Reset the set's iterator and return the first record in the set.
+	* The next call of `current()` will get the first record in the set.
+	*
+	* @return `Record`
+	*/
 	public function rewind() {
 		$this->_pointer = 0;
 		$this->_valid = (reset($this->_items) !== false && reset($this->_index));
@@ -172,10 +187,20 @@ class RecordSet extends \lithium\util\Collection {
 		return $this->_items[$this->_pointer];
 	}
 
+	/**
+	* Returns the currently pointed to record in the set.
+	*
+	* @return `Record`
+	*/
 	public function current() {
 		return $this->_items[$this->_pointer];
 	}
 
+	/**
+	* Returns the currently pointed to record's unique key.
+	*
+	* @return mixed
+	*/
 	public function key() {
 		return $this->_index[$this->_pointer];
 	}
@@ -219,8 +244,8 @@ class RecordSet extends \lithium\util\Collection {
 	/**
 	 * Converts the data in the record set to a different format, i.e. an array.
 	 *
-	 * @param string $format 
-	 * @param array $options 
+	 * @param string $format
+	 * @param array $options
 	 * @return mixed
 	 */
 	public function to($format, $options = array()) {
@@ -245,15 +270,26 @@ class RecordSet extends \lithium\util\Collection {
 		return $result;
 	}
 
-	public function __desctruct() {
+	/**
+	* Magic alias for _close().
+	*/
+	public function __destruct() {
 		$this->_close();
 	}
 
+	/**
+	 * Lazy-loads records from a query using a reference to a database adapter and a query
+	 * result resource.
+	 *
+	 * @param array $data
+	 * @param mixed $key
+	 * @return array
+	 */
 	protected function _populate($data = null, $key = null) {
 		if ($this->_closed()) {
 			return;
 		}
-		$data = $data ?: $this->_handle->result('next', $this->_resource, $this);
+		$data = $data ?: $this->_handle->result('next', $this->_result, $this);
 
 		if (!$data) {
 			return $this->_close();
@@ -262,9 +298,10 @@ class RecordSet extends \lithium\util\Collection {
 
 		foreach ($this->_columns as $model => $fields) {
 			$data = array_combine($fields, array_slice($data, 0, count($fields)));
+			$exists = true;
 
 			$class = $this->_classes['record'];
-			$this->_items[] = ($record = new $class(compact('model', 'data')));
+			$this->_items[] = ($record = new $class(compact('model', 'data', 'exists')));
 			$this->_index[] = $recordKey;
 			return $record;
 		}
@@ -278,7 +315,7 @@ class RecordSet extends \lithium\util\Collection {
 	 */
 	protected function _close() {
 		if (!$this->_closed()) {
-			$this->_resource = $this->_handle->result('close', $this->_resource, $this);
+			$this->_result = $this->_handle->result('close', $this->_result, $this);
 			unset($this->_handle);
 			$this->_handle = null;
 		}
@@ -292,7 +329,7 @@ class RecordSet extends \lithium\util\Collection {
 	 *         freed, otherwise returns false.
 	 */
 	protected function _closed() {
-		return (empty($this->_resource) || empty($this->_handle));
+		return (empty($this->_result) || empty($this->_handle));
 	}
 }
 

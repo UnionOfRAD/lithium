@@ -129,8 +129,8 @@ class Route extends \lithium\core\Object {
 	 * Matches a set of parameters against the route, and returns a URL string if the route matches
 	 * the parameters, or false if it does not match.
 	 *
-	 * @param string $options 
-	 * @param string $context 
+	 * @param string $options
+	 * @param string $context
 	 * @return mixed
 	 */
 	public function match($options = array(), $context = null) {
@@ -172,7 +172,7 @@ class Route extends \lithium\core\Object {
 			$rpl = "{:{$key}}";
 			$len = -strlen($rpl);
 
-			if ($trimmed && array_key_exists($key, $defaults) && $value == $defaults[$key]) {
+			if ($trimmed && isset($defaults[$key]) && $value == $defaults[$key]) {
 				if (substr($template, $len) == $rpl) {
 					$template = rtrim(substr($template, 0, $len), '/');
 					continue;
@@ -238,20 +238,20 @@ class Route extends \lithium\core\Object {
 		}
 
 		foreach ($keys['params'] as $i => $param) {
-			$_param = preg_quote($param, '@');
+			$paramName = $param;
 
 			if (strpos($param, ':')) {
-				list($param, $pattern) = explode(':', $param, 2);
-				$this->_subPatterns[$param] = $pattern;
-				$shortKeys[$i] = $param;
+				list($paramName, $pattern) = explode(':', $param, 2);
+				$this->_subPatterns[$paramName] = $pattern;
+				$shortKeys[$i] = $paramName;
 			} else {
 				$pattern = '[^\/]+';
 			}
-			$req = (array_key_exists($param, $this->_params) ? '?' : '');
+			$req = (array_key_exists($paramName, $this->_params) ? '?' : '');
 
-			$regex = "(?P<{$param}>{$pattern}){$req}";
-			$this->_pattern = str_replace("/{:{$_param}}", "(?:/{$regex}){$req}", $this->_pattern);
-			$this->_pattern = str_replace("{:{$_param}}", $regex, $this->_pattern);
+			$regex = "(?P<{$paramName}>{$pattern}){$req}";
+			$this->_pattern = str_replace("/{:{$param}}", "(?:/{$regex}){$req}", $this->_pattern);
+			$this->_pattern = str_replace("{:{$param}}", $regex, $this->_pattern);
 		}
 		$shortKeys += $keys['params'];
 		ksort($shortKeys);

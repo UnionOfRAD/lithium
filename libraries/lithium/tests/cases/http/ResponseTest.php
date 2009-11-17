@@ -94,6 +94,41 @@ class ResponseTest extends \lithium\test\Unit {
 		$response = new Response($config);
 		$this->assertEqual($expected, (string)$response);
 	}
+
+	function testTransferEncodingChunkedDecode()  {
+		$message = join("\r\n", array(
+			'HTTP/1.1 200 OK',
+			'Server: CouchDB/0.10.0 (Erlang OTP/R13B)',
+			'Etag: "DWGTHR79JLSOGACPLVIZBJUBP"',
+			'Date: Wed, 11 Nov 2009 19:49:41 GMT',
+			'Content-Type: text/plain;charset=utf-8',
+			'Cache-Control: must-revalidate',
+			'Transfer-Encoding: chunked',
+			'Connection: Keep-alive',
+			'',
+			'b7',
+			'{"total_rows":1,"offset":0,"rows":[',
+			'{"id":"88989cafcd81b09f81078eb523832e8e","key":"gwoo","value":{"author":"gwoo","language":"php","preview":"test","created":"2009-10-27 12:14:12"}}',
+			'4',
+			'',
+			']}',
+			'1',
+			'',
+			'',
+			'0',
+			'',
+			'',
+		));
+		$response = new Response(compact('message'));
+
+		$expected = join("\r\n", array(
+			'{"total_rows":1,"offset":0,"rows":[',
+			'{"id":"88989cafcd81b09f81078eb523832e8e","key":"gwoo","value":{"author":"gwoo","language":"php","preview":"test","created":"2009-10-27 12:14:12"}}',
+			']}',
+		));
+		$result = $response->body();
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

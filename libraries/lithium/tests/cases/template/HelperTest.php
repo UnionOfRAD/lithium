@@ -10,27 +10,13 @@ namespace lithium\tests\cases\template;
 
 use \stdClass;
 use \lithium\template\Helper;
-use \lithium\template\view\Renderer;
-
-class MyHelper extends Helper {
-
-	/**
-	 * Hack to expose protected properties for testing.
-	 *
-	 * @param string $property 
-	 * @return mixed
-	 */
-	public function __get($property) {
-		return isset($this->{$property}) ? $this->{$property} : null;
-	}
-}
-
-class MyRenderer extends Renderer {}
+use \lithium\tests\mocks\template\MockHelper;
+use \lithium\tests\mocks\template\MockRenderer;
 
 class HelperTest extends \lithium\test\Unit {
 
 	public function setUp() {
-		$this->helper = new MyHelper();
+		$this->helper = new MockHelper();
 	}
 
 	/**
@@ -42,10 +28,10 @@ class HelperTest extends \lithium\test\Unit {
 		$this->assertNull($this->helper->_context);
 
 		$params = array(
-			'context' => new MyRenderer(),
+			'context' => new MockRenderer(),
 			'handlers' => array('content' => function($value) { return "\n{$value}\n"; })
 		);
-		$this->helper = new MyHelper($params);
+		$this->helper = new MockHelper($params);
 
 		$this->assertEqual($this->helper->_context, $params['context']);
 	}

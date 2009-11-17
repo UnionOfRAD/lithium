@@ -9,10 +9,10 @@
 namespace lithium\template\view;
 
 /**
- * Stream wrapper implementation based on the example provided at 
+ * Stream wrapper implementation based on the example provided at
  * http://us3.php.net/manual/en/stream.streamwrapper.example-1.php, and inspired by the work of
  * Paul M. Jones (http://paul-m-jones.com/) and Mike Naberezny (http://mikenaberezny.com/).
- * 
+ *
  * Enables pure PHP template files to auto-escape output and implement custom content filtering.
  */
 class Stream {
@@ -25,7 +25,7 @@ class Stream {
 
 	protected $_path = null;
 
-	function stream_open($path, $mode, $options, &$opened_path) {
+	public function stream_open($path, $mode, $options, &$opened_path) {
 		$path = str_replace('lithium.template://', '', $path);
 
 		if (empty($path)) {
@@ -39,27 +39,29 @@ class Stream {
 			return false;
 		}
 
+		$escEcho = '/\<\?=\s*\$this->(.+?)\s*;?\s*\?>/';
+		$this->_data = preg_replace($escEcho, '<?php echo $this->$1; ?>', $this->_data);
+
 		$echo = '/\<\?=\s*(.+?)\s*;?\s*\?>/';
-		$this->_data = preg_replace('/\<\?=@/', '<?php echo ', $this->_data);
 		$this->_data = preg_replace($echo, '<?php echo $h($1); ?>', $this->_data);
 		return true;
 	}
 
-	function stream_read($count) {
+	public function stream_read($count) {
 		$result = substr($this->_data, $this->_position, $count);
 		$this->_position += strlen($result);
 		return $result;
 	}
 
-	function stream_tell() {
+	public function stream_tell() {
 		return $this->_position;
 	}
 
-	function stream_eof() {
+	public function stream_eof() {
 		return ($this->_position >= strlen($this->_data));
 	}
 
-	function stream_seek($offset, $whence) {
+	public function stream_seek($offset, $whence) {
 		switch ($whence) {
 			case SEEK_SET:
 				if ($offset < strlen($this->_data) && $offset >= 0) {

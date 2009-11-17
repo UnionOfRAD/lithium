@@ -44,7 +44,7 @@ class Group extends \lithium\util\Collection {
 
 		$m = '/\\\\tests\\\\cases\\\\(.+)Test$/';
 		$filter = function($class) use ($m) { return preg_replace($m, '\\\\\1', $class); };
-		$classes = Libraries::find($options['library'], array(
+		$classes = Libraries::locate('tests', null, $options + array(
 			'filter' => '/\w+Test$/', 'recursive' => true
 		));
 		return $options['transform'] ? array_map($filter, $classes) : $classes;

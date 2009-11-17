@@ -8,6 +8,8 @@
 
 namespace lithium\storage\session\adapters;
 
+use \lithium\util\String;
+
 /**
  * Simple memory session storage engine. Used for testing.
  */
@@ -16,7 +18,7 @@ class Memory extends \lithium\core\Object {
 	public $_session = array();
 
 	public function key() {
-		return $_SERVER['UNIQUE_ID'];
+		return String::uuid(function($value) { return $_SERVER[$value]; });
 	}
 
 	public function isStarted() {
@@ -29,7 +31,7 @@ class Memory extends \lithium\core\Object {
 
 	public function read($key, $options = array()) {
 		$session = $this->_session;
-		
+
 		return function($self, $params, $chain) use ($session) {
 			extract($params);
 			return isset($session[$key]) ? $session[$key] : null;
@@ -47,6 +49,15 @@ class Memory extends \lithium\core\Object {
 
 	public function delete($key, $options = array()) {
 		unset($this->_session[$key]);
+	}
+
+	/**
+	 * This adapter is always enabled, as it has no external dependencies.
+	 *
+	 * @return boolean True
+	 */
+	public function enabled() {
+		return true;
 	}
 }
 
