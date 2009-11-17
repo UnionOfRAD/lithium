@@ -302,7 +302,7 @@ class RecordSet extends \lithium\util\Collection {
 
 			$class = $this->_classes['record'];
 			$this->_items[] = ($record = new $class(compact('model', 'data', 'exists')));
-			$this->_index[] = $recordKey;
+			$this->_index[] = $key;
 			return $record;
 		}
 	}
