@@ -22,6 +22,8 @@ $core = dirname(dirname(__DIR__)) . '/libraries/lithium';
 $testRun = Dispatcher::run(null, $_GET);
 $stats = Dispatcher::process($testRun['results']);
 
+$show_included_files  = isset($_GET['files']) ? $_GET['files']: false;
+$show_no_test_classes = isset($_GET['classes']) ? $_GET['classes'] : false;
 ?>
 <!doctype html>
 <html>
@@ -46,18 +48,20 @@ $stats = Dispatcher::process($testRun['results']);
 				<?php
 					$filters = Libraries::locate('testFilters');
 					$base = $_SERVER['REQUEST_URI'];
-
+					if (!strpos($base,'?')){
+						$base .= '?';
+					}
 					foreach ($filters as $i => $class) {
 						$url = $base . "&amp;filters[]={$class}";
 						$name = join('', array_slice(explode("\\", $class), -1));
 						$key = Inflector::underscore($name);
 
 						echo "<a class=\"{$key}\" href=\"{$url}\">{$name}</a>";
-
-						if ($i < count($filters) - 1) {
-							echo ' | ';
-						}
+						echo ' | ';
 					}
+					echo "<a href=\"{$base}&amp;files=".($show_included_files?0:1)."\">Included files</a>";
+					echo ' | ';
+					echo "<a href=\"{$base}&amp;classes=".($show_no_test_classes?0:1)."\">No Test Classes</a>";
 				?>
 			</span>
 
@@ -110,7 +114,8 @@ $stats = Dispatcher::process($testRun['results']);
 				$none = Libraries::find('lithium', $options);
 				$classes = array_diff($none, $tests);
 				sort($classes);
-			?>
+
+			if ($show_no_test_classes) : ?>
 			<h3>Classes with no test case (<?php echo count($classes); ?>)</h3>
 			<ul class="classes">
 			<?php
@@ -119,7 +124,10 @@ $stats = Dispatcher::process($testRun['results']);
 				}
 			?>
 			</ul>
-
+			<?php
+				endif;
+				if ($show_included_files) :
+			?>
 			<h3>Included files (<?php echo count(get_included_files()); ?>)</h3>
 			<ul class="files">
 				<?php
@@ -132,6 +140,7 @@ $stats = Dispatcher::process($testRun['results']);
 					}
 				?>
 			</ul>
+			<?php endif; ?>
 		</div>
 		<div style="clear:both"></div>
 	</body>
