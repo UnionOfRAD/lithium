@@ -175,9 +175,30 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual(array('post_id' => 2, 'tag_id' => 5), $result);
 	}
 
-	public function testRelations() {
+	public function testFindAll() {
+	    $tags = MockTag::find('all', array('conditions' => array('id' => 2)));
+
+		$this->assertTrue($tags instanceof \lithium\data\model\RecordSet);
+		$this->assertEqual(1, $tags->count());
+		$tag = $tags->rewind();
+		$this->assertTrue($tag instanceof \lithium\data\model\Record);
+
+		$tags2 = MockTag::find('all', array('conditions' => array('id' => 3)));
+
+		$this->assertEqual(0, $tags2->count());
+	}
+
+	public function testFindFirst() {
+	    $tag = MockTag::find('first', array('conditions' => array('id' => 2)));
+
+		$this->assertTrue($tag instanceof \lithium\data\model\Record);
+
+		$tag2 = MockTag::find('first', array('conditions' => array('id' => 3)));
+
+		$this->assertNull($tag2);
 
 	}
+
 }
 
 ?>
