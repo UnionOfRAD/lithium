@@ -93,13 +93,13 @@ class SourceTest extends \lithium\test\Unit {
 		}
 
 		$all = CompanyIntegration::all();
-		$expected = count($companyData);
 		$this->assertTrue($all->to('array'));
 
+		$expected = count($companyData);
 		$this->assertEqual($expected, count($all));
 		$this->assertEqual($expected, $all->count());
 
-		$id = "" . $all->first()->{$key};
+		$id = (string) $all->first()->{$key};
 		$this->assertTrue(strlen($id) > 0);
 
 		foreach ($companies as $company) {

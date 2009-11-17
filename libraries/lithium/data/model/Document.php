@@ -200,7 +200,7 @@ class Document extends \lithium\util\Collection {
 				return $record;
 			}
 		}
-		return current($this->_items);
+		return $this->__get(key($this->_items));
 	}
 
 	/**
@@ -237,7 +237,7 @@ class Document extends \lithium\util\Collection {
 			$this->_valid = true;
 		}
 		$this->_valid = $this->_valid ?: !is_null($this->_populate());
-		return $this->_valid ? $this->current() : null;
+		return $this->_valid ? $this->__get(key($this->_items)) : null;
 	}
 
 	/**
