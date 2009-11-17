@@ -356,7 +356,7 @@ class Request extends \lithium\core\Object {
 		while (in_array(basename($base), array('app', 'webroot'))) {
 			$base = ltrim(dirname($base), '.');
 		}
-		return rtrim($base, '/');
+		return rtrim($base, '/\\');
 	}
 }
 
