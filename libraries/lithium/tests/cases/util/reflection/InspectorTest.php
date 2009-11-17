@@ -150,7 +150,7 @@ class InspectorTest extends \lithium\test\Unit {
 		$this->assertNull(Inspector::info('\lithium\util'));
 
 		$result = Inspector::info('\lithium\util\reflection\Inspector');
-		$this->assertTrue(strpos($result['file'], 'lithium/util/reflection/Inspector.php'));
+		$this->assertTrue(strpos(str_replace('\\', '/', $result['file']), 'lithium/util/reflection/Inspector.php'));
 		$this->assertEqual('lithium\util\reflection', $result['namespace']);
 		$this->assertEqual('Inspector', $result['shortName']);
 
