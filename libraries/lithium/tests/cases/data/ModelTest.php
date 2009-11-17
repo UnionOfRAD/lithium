@@ -192,8 +192,18 @@ class ModelTest extends \lithium\test\Unit {
 	    $tag = MockTag::find('first', array('conditions' => array('id' => 2)));
 
 		$this->assertTrue($tag instanceof \lithium\data\model\Record);
+		$this->assertEqual('2', $tag->id);
 
 		$tag2 = MockTag::find('first', array('conditions' => array('id' => 3)));
+
+		$this->assertNull($tag2);
+
+		$tag = MockTag::find(2);
+
+		$this->assertTrue($tag instanceof \lithium\data\model\Record);
+		$this->assertEqual('2', $tag->id);
+
+		$tag2 = MockTag::find(3);
 
 		$this->assertNull($tag2);
 
