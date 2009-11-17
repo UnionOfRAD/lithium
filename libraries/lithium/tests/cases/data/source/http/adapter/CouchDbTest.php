@@ -146,7 +146,6 @@ class CouchDbTest extends \lithium\test\Unit {
 		$expected = array();
 		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
-
 	}
 
 	public function testDelete() {
@@ -155,15 +154,18 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->delete($this->query);
 		$this->assertEqual($expected, $result);
 	}
-	// 
-	// public function testFlatResult() {
-	// 	$couchdb = new CouchDb($this->_testConfig);
-	// 	$expected = array(
-	// 		'id' => 'a1', '_id' => 'a1', 'author' => 'author 1', 'body' => 'body 1'
-	// 	);
-	// 	$result = $couchdb->result('next', $rows, $this->query);
-	// 	$this->assertEqual($expected, $result);
-	// }
+
+	public function testFlatResult() {
+		$couchdb = new CouchDb($this->_testConfig);
+		$rows = (object) array(
+			'id' => 'a1', '_id' => 'a1', 'author' => 'author 1', 'body' => 'body 1'
+		);
+		$expected = array(
+			'id' => 'a1', '_id' => 'a1', 'author' => 'author 1', 'body' => 'body 1'
+		);
+		$result = $couchdb->result('next', $rows, $this->query);
+		$this->assertEqual($expected, $result);
+	}
 
 	public function testRowsResult() {
 		$couchdb = new CouchDb($this->_testConfig);

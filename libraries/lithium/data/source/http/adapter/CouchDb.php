@@ -273,24 +273,21 @@ class CouchDb extends \lithium\data\source\Http {
 
 		switch ($type) {
 			case 'next':
-				if (isset($resource->rows)) {
-					if (isset($resource->rows[$this->_iterator])) {
-						$result = (array)$resource->rows[$this->_iterator]->value;
-						$result['id'] = $result['_id'] =
-						 	$resource->rows[$this->_iterator]->id;
-						if (isset($resource->rows[$this->_iterator]->key)) {
-							$result['key'] = $resource->rows[$this->_iterator]->key;
-						}
-						if (isset($result['rev'])) {
-							$result['_rev'] = $result['rev'];
-						}
-						$this->_iterator++;
-					} else {
-						$this->_iterator = 0;
-						$result = null;
-					}
-				} else {
+				if (!isset($resource->rows)) {
 					$result = (array) $resource;
+				} elseif (isset($resource->rows[$this->_iterator])) {
+					$result = (array)$resource->rows[$this->_iterator]->value;
+					$result['_id'] = $resource->rows[$this->_iterator]->id;
+					if (isset($resource->rows[$this->_iterator]->key)) {
+						$result['key'] = $resource->rows[$this->_iterator]->key;
+					}
+					$this->_iterator++;
+				} else {
+					$this->_iterator = 0;
+				}
+				$result['id'] = $result['_id'];
+				if (isset($result['rev'])) {
+					$result['_rev'] = $result['rev'];
 				}
 			break;
 			case 'close':
