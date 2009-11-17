@@ -280,7 +280,7 @@ class CouchDb extends \lithium\data\source\Http {
 							'_id' => $resource->rows[$this->_iterator]->id,
 						);
 						if (isset($resource->rows[$this->_iterator]->value->_rev)) {
-							$result['_rev'] = $result['_rev'] =
+							$result['_rev'] = $result['rev'] =
 								$resource->rows[$this->_iterator]->value->_rev;
 						}
 						$this->_iterator++;
