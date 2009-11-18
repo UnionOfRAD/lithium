@@ -91,7 +91,7 @@ class Libraries {
 			'{:library}\test\filters\{:name}' => array('libraries' => 'lithium')
 		),
 		'tests' => array(
-			'{:library}\tests\cases\{:namespace}\{:name}Test'
+			'{:library}\tests\{:namespace}\{:class}\{:name}Test'
 		)
 	);
 

@@ -81,7 +81,9 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @return string Formatted menu
 	 */
 	public static function menu($type) {
-		$classes = Libraries::locate('tests');
+		$classes = Libraries::locate('tests', null, array(
+			'filter' => '/cases|integration|functional/'
+		));
 		$data = array();
 
 		$assign = function(&$data, $class, $i = 0) use (&$assign) {
@@ -97,7 +99,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 		};
 
 		foreach ($classes as $class) {
-			$assign($data, explode('\\', str_replace('\tests\cases', '', $class)));
+			$assign($data, explode('\\', str_replace('\tests', '', $class)));
 		}
 		ksort($data);
 
@@ -145,7 +147,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			return $format($result);
 		};
 		foreach ($data as $library => $tests) {
-			$group = "\\{$library}\\tests\cases";
+			$group = "\\{$library}\\tests";
 			$result .= $format(sprintf(
 				$format('group'), $group, $library, $menu($tests, $group)
 			));
