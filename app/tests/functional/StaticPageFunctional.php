@@ -19,4 +19,5 @@ class StaticPageFunctional extends \lithium\test\Unit {
 	}
 
 }
+
 ?>
