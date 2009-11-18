@@ -12,7 +12,6 @@ class ConnectionIntegration extends \lithium\test\Unit {
 			!($conn instanceof \lithium\data\source\database\adapter\MySql));
 
 		$this->assertTrue($conn->connect(), 'Unable to connect to MySQL');
-
 	}
 
 }
