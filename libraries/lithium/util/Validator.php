@@ -239,7 +239,10 @@ class Validator extends \lithium\core\StaticObject {
 			}
 
 			if (preg_match('/@(' . $host . ')$/i', $value, $regs)) {
-				return is_array(gethostbynamel($regs[1]));
+				if (getmxrr($regs[1], $mxhosts)) {
+					return is_array($mxhosts);
+				}
+				return false;
 			}
 		});
 	}

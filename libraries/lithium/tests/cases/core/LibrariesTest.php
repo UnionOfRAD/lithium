@@ -52,7 +52,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	public function testLibraryConfigAccess() {
 		$result = Libraries::get('lithium');
 		$expected = array(
-			'path' => LITHIUM_LIBRARY_PATH . '/lithium',
+			'path' => str_replace('\\', '/', LITHIUM_LIBRARY_PATH) . '/lithium',
 			'loader' => 'lithium\\core\\Libraries::load',
 			'prefix' => 'lithium\\',
 			'suffix' => '.php',

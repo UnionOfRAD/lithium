@@ -214,6 +214,12 @@ class Request extends \lithium\core\Object {
 			return (strpos($this->_env['SCRIPT_URI'], 'https://') === 0);
 		}
 
+		if ($key == 'SCRIPT_NAME') {
+			if ($this->_env['PLATFORM'] == 'CGI' || isset($this->_env['SCRIPT_URL'])) {
+				$key = 'SCRIPT_URL';
+			}
+		}
+
 		$val = array_key_exists($key, $this->_env) ? $this->_env[$key] : getenv($key);
 		$this->_env[$key] = $val;
 
@@ -343,14 +349,8 @@ class Request extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _base() {
-		$base = dirname($this->env('PHP_SELF'));
-		if ($base === '/') {
-			return null;
-		}
-		while (in_array(basename($base), array('app', 'webroot'))) {
-			$base = ltrim(dirname($base), '.');
-		}
-		return rtrim($base, '/\\');
+		$base = str_replace('\\', '/', dirname($this->env('PHP_SELF')));
+		return rtrim(str_replace(array('/app/webroot', '/webroot'), '', $base), '/');
 	}
 }
 

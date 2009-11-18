@@ -65,7 +65,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @see lithium\data\Model::$_classes
 	 */
 	public function configureClass($class) {
-		return array('meta' => array('key' => '_id'), 'classes' => array(
+		return array('meta' => array('key' => 'id'), 'classes' => array(
 			'record' => '\lithium\data\model\Document',
 			'recordSet' => '\lithium\data\model\Document'
 		));
@@ -151,9 +151,9 @@ class CouchDb extends \lithium\data\source\Http {
 
 			$id = null;
 
-			if (!empty($data['_id'])) {
-				$id = '/' . $data['_id'];
-				$data['_id'] = (string) $data['_id'];
+			if (!empty($data['id'])) {
+				$id = '/' . $data['id'];
+				$data['_id'] = (string) $data['id'];
 				$result = $conn->put($table . $id, json_encode($data));
 			} else {
 				$result = $conn->post($table, json_encode($data));
@@ -162,8 +162,7 @@ class CouchDb extends \lithium\data\source\Http {
 			$result = is_string($result) ? json_decode($result) : $result;
 
 			if ($success = (isset($result->ok) && $result->ok === true)) {
-				$results = array('id' => $result->id, 'rev' => $result->rev, '_rev' => $result->rev);
-				$query->data($data + $results);
+				$query->data($data + (array)$self->result('next', $result, $query));
 				$query->record()->invokeMethod('_update', array($result->id));
 			}
 			return $success;
@@ -191,7 +190,11 @@ class CouchDb extends \lithium\data\source\Http {
 			if (empty($path) && empty($conditions)) {
 				$path = '/_all_docs';
 			}
-			return json_decode($conn->get($table . $path, $conditions));
+			$ret = json_decode($conn->get($table . $path, $conditions));
+			if (isset($ret->error) && $ret->read = 'missing') {
+				return null;
+			}
+			return $ret;
 		});
 	}
 
@@ -212,6 +215,11 @@ class CouchDb extends \lithium\data\source\Http {
 			extract($options, EXTR_OVERWRITE);
 			extract($conditions, EXTR_OVERWRITE);
 			$data = $query->data();
+			if (empty($data['_id']) && !empty($data['id'])) {
+				$data['_id'] = $data['id'];
+				$data['_rev'] = $data['rev'];
+				unset($data['id'], $data['rev']);
+			}
 			$result = $conn->put($table . $path, json_encode($conditions + $data));
 			$result = is_string($result) ? json_decode($result) : $result;
 
@@ -221,7 +229,7 @@ class CouchDb extends \lithium\data\source\Http {
 			}
 
 			if (isset($result->error) && $result->error === 'conflict') {
-				return $this->read($query, $options);
+				return $self->read($query, $options);
 			}
 			return false;
 		});
@@ -245,8 +253,8 @@ class CouchDb extends \lithium\data\source\Http {
 			extract($conditions, EXTR_OVERWRITE);
 			$data = $query->data();
 
-			if (!empty($data['_rev'])) {
-				$conditions['rev'] = $data['_rev'];
+			if (!empty($data['rev'])) {
+				$conditions['rev'] = $data['rev'];
 			}
 			$result = json_decode($conn->delete($table . $path, $conditions));
 			return (isset($result->ok) && $result->ok === true);
@@ -269,21 +277,25 @@ class CouchDb extends \lithium\data\source\Http {
 
 		switch ($type) {
 			case 'next':
-				if (isset($resource->rows)) {
-					if (isset($resource->rows[$this->_iterator])) {
-						$result = array(
-							'id' => $resource->rows[$this->_iterator]->id,
-							'_id' => $resource->rows[$this->_iterator]->id,
-							'_rev' => $resource->rows[$this->_iterator]->value->rev,
-							'rev' => $resource->rows[$this->_iterator]->value->rev
-						);
-						$this->_iterator++;
-					} else {
-						$this->_iterator = 0;
-						$result = null;
-					}
-				} else {
+				if (!isset($resource->rows)) {
 					$result = (array) $resource;
+				} elseif (isset($resource->rows[$this->_iterator])) {
+					$result = (array)$resource->rows[$this->_iterator]->value;
+					$result['id'] = $resource->rows[$this->_iterator]->id;
+					if (isset($resource->rows[$this->_iterator]->key)) {
+						$result['key'] = $resource->rows[$this->_iterator]->key;
+					}
+					$this->_iterator++;
+				} else {
+					$this->_iterator = 0;
+				}
+				if (isset($result['_id'])) {
+					$result['id'] = $result['_id'];
+					unset($result['_id']);
+					if (isset($result['_rev'])) {
+						$result['rev'] = $result['_rev'];
+						unset($result['_rev']);
+					}
 				}
 			break;
 			case 'close':
@@ -313,11 +325,12 @@ class CouchDb extends \lithium\data\source\Http {
 				unset($conditions[$element]);
 			}
 		}
-		if (isset($conditions['_id'])) {
+		if (isset($conditions['id'])) {
+			$path = "/{$conditions['id']}";
+			unset($conditions['id']);
+		} elseif (isset($conditions['_id'])) {
 			$path = "/{$conditions['_id']}";
 			unset($conditions['_id']);
-		} elseif (isset($conditions['id'])) {
-			$path = "/{$conditions['id']}";
 		}
 		$conditions = array_filter((array) $conditions);
 		return compact('path', 'conditions');

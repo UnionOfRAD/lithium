@@ -75,86 +75,35 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->describe('companies');
 	}
 
-	public function testGet() {
-		$this->skipIf(true, 'HTTP methods no longer callable from Couch adapter');
-
+	public function testCreateNoId() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$expected = (object)array('ok' => true, 'id' => '12345', 'body' => 'something');
-		$result = $couchdb->get();
-		$this->assertEqual($expected, $result);
-
-		$expected = 'HTTP/1.1';
-		$result = $couchdb->last->response->protocol;
-		$this->assertEqual($expected, $result);
-
-		$expected = '200';
-		$result = $couchdb->last->response->status['code'];
-		$this->assertEqual($expected, $result);
-
-		$expected = 'OK';
-		$result = $couchdb->last->response->status['message'];
-		$this->assertEqual($expected, $result);
-
-		$expected = 'text/html';
-		$result = $couchdb->last->response->type;
-		$this->assertEqual($expected, $result);
-
-		$expected = 'UTF-8';
-		$result = $couchdb->last->response->charset;
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testGetPath() {
-		$this->skipIf(true, 'HTTP methods no longer callable from Couch adapter');
-
-		$couchdb = new CouchDb($this->_testConfig);
-		$result = $couchdb->get('search.json');
-		$expected = (object) array('ok' => true, 'id' => '12345', 'body' => 'something');
-		$this->assertEqual($expected, $result);
-
-		$expected = 'HTTP/1.1';
-		$result = $couchdb->last->response->protocol;
-		$this->assertEqual($expected, $result);
-
-		$expected = '200';
-		$result = $couchdb->last->response->status['code'];
-		$this->assertEqual($expected, $result);
-
-		$expected = 'OK';
-		$result = $couchdb->last->response->status['message'];
-		$this->assertEqual($expected, $result);
-
-		$expected = 'text/html';
-		$result = $couchdb->last->response->type;
-		$this->assertEqual($expected, $result);
-
-		$expected = 'UTF-8';
-		$result = $couchdb->last->response->charset;
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testPost() {
-		$this->skipIf(true, 'HTTP methods no longer callable from Couch adapter');
-
-		$couchdb = new CouchDb($this->_testConfig);
-		$couchdb->post('update.json', array('status' => 'cool'));
-		$expected = join("\r\n", array(
-			'POST /update.xml HTTP/1.1',
-			'Host: localhost:80',
-			'Connection: Close',
-			'User-Agent: Mozilla/5.0 (Lithium)',
-			'Content-Type: application/json',
-			'Content-Length: 17',
-			'', '{"status":"cool"}'
-		));
-		$result = (string)$couchdb->last->request;
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testCreate() {
-		$couchdb = new CouchDb($this->_testConfig);
+		$this->query->data(array('name' => 'Acme Inc.'));
 		$expected = true;
 		$result = $couchdb->create($this->query);
+		$this->assertEqual($expected, $result);
+
+		$expected = '/posts';
+		$result = $couchdb->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$expected = array();
+		$result = $couchdb->last->request->params;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testCreateWithId() {
+		$couchdb = new CouchDb($this->_testConfig);
+		$this->query->data(array('id' => 12345, 'name' => 'Acme Inc.'));
+		$expected = true;
+		$result = $couchdb->create($this->query);
+		$this->assertEqual($expected, $result);
+
+		$expected = '/posts/12345';
+		$result = $couchdb->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$expected = array();
+		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -176,7 +125,7 @@ class CouchDbTest extends \lithium\test\Unit {
 	public function testReadWithConditions() {
 		$couchdb = new CouchDb($this->_testConfig);
 		$expected = true;
-		$this->query->conditions(array('_id' => 12345));
+		$this->query->conditions(array('id' => 12345));
 		$result = $couchdb->read($this->query);
 		$this->assertEqual($expected, $result);
 
@@ -192,7 +141,9 @@ class CouchDbTest extends \lithium\test\Unit {
 	public function testReadWithViewConditions() {
 		$couchdb = new CouchDb($this->_testConfig);
 		$expected = true;
-		$this->query->conditions(array('design' => 'latest', 'view' => 'all'));
+		$this->query->conditions(array(
+			'design' => 'latest', 'view' => 'all', 'limit' => 10, 'descending' => 'true'
+		));
 		$result = $couchdb->read($this->query);
 		$this->assertEqual($expected, $result);
 
@@ -200,8 +151,51 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
 
-		$expected = array();
+		$expected = 'limit=10&descending=true';
 		$result = $couchdb->last->request->params;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testFlatResult() {
+		$couchdb = new CouchDb($this->_testConfig);
+		$rows = (object) array(
+			'_id' => 'a1', '_rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1'
+		);
+		$expected = array(
+			'id' => 'a1', 'rev' => '1-2',
+			'author' => 'author 1', 'body' => 'body 1'
+		);
+		$result = $couchdb->result('next', $rows, $this->query);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testRowsResult() {
+		$couchdb = new CouchDb($this->_testConfig);
+
+		$rows = (object) array('total_rows' => 11, 'offset' => 0, 'rows' => array(
+			(object) array('id' => 'a1', 'key' => null, 'value' => array(
+				'author' => 'author 1',
+				'body' => 'body 1'
+			)),
+			(object) array('id' => 'a2', 'key' => null, 'value' => array(
+				'author' => 'author 2',
+				'body' => 'body 2'
+			)),
+			(object) array('id' => 'a3', 'key' => null, 'value' => array(
+				'author' => 'author 3',
+				'body' => 'body 3'
+			))
+		));
+		$expected = array(
+			'id' => 'a1', 'author' => 'author 1', 'body' => 'body 1'
+		);
+		$result = $couchdb->result('next', $rows, $this->query);
+		$this->assertEqual($expected, $result);
+
+		$expected = array(
+			'id' => 'a2', 'author' => 'author 2', 'body' => 'body 2'
+		);
+		$result = $couchdb->result('next', $rows, $this->query);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -220,13 +214,22 @@ class CouchDbTest extends \lithium\test\Unit {
 		$expected = array();
 		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
-
 	}
 
 	public function testDelete() {
 		$couchdb = new CouchDb($this->_testConfig);
+		$this->query->data(array('id' => 12345, 'rev'=> '1-1', 'name' => 'Acme Inc'));
+
 		$expected = true;
 		$result = $couchdb->delete($this->query);
+		$this->assertEqual($expected, $result);
+
+		$expected = '/posts/12345';
+		$result = $couchdb->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$expected = 'rev=1-1';
+		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
 	}
 }
