@@ -76,8 +76,10 @@ class Group extends \lithium\util\Collection {
 				$library = array_shift($parts);
 				$test = Libraries::find($library, array(
 					'recursive' => true,
-					'path' => '/' . join('/', $parts)
+					'path' => '/' . join('/', $parts),
+					'filter' => '/cases|intergration|functional/'
 				));
+
 				return (array)$test;
 			}
 			return (array)$test;
