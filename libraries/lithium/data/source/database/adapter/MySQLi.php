@@ -93,7 +93,9 @@ class MySQLi extends \lithium\data\source\Database {
 		if ($this->_connection !== false) {
 			$this->_isConnected = true;
 
+		if (!empty($config['encoding'])) {
 			$this->_encoding($config['encoding']);
+		}
 
 			$this->_useAlias = (bool)version_compare(
 				$this->_connection->server_info(), "4.1", ">="
