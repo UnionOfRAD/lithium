@@ -31,6 +31,23 @@ class Report extends \lithium\core\Object {
 	protected function _init() {
 		$this->_startTime = microtime(true);
 	}
+	
+	protected function create($group) {
+		$tests = $group->tests();
+		$filterResults = array();
+
+		foreach ($filters as $filter => $options) {
+			$options = isset($options['apply']) ? $options['apply'] : array();
+			$tests = $filter::apply($tests, $options);
+		}
+		$results = $tests->run();
+
+		foreach ($filters as $filter => $options) {
+			$options = isset($options['analyze']) ? $options['analyze'] : array();
+			$filterResults[$filter] = $filter::analyze($results, $options);
+		}
+		return array($results, $filterResults);
+	}
 }
 
 ?>
