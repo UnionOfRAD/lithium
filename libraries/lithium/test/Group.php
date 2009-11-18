@@ -41,13 +41,12 @@ class Group extends \lithium\util\Collection {
 	public static function all($options = array()) {
 		$defaults = array('transform' => false, 'library' => true);
 		$options += $defaults;
-
 		$m = '/\\\\tests\\\\cases\\\\(.+)Test$/';
-		$filter = function($class) use ($m) { return preg_replace($m, '\\\\\1', $class); };
+		$transform = function($class) use ($m) { return preg_replace($m, '\\\\\1', $class); };
 		$classes = Libraries::locate('tests', null, $options + array(
-			'filter' => '/\w+Test$/', 'recursive' => true
+			'filter' => '/cases|integration|functional/', 'recursive' => true
 		));
-		return $options['transform'] ? array_map($filter, $classes) : $classes;
+		return $options['transform'] ? array_map($transform, $classes) : $classes;
 	}
 
 	/**
