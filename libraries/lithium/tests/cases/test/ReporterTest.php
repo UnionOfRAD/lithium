@@ -12,8 +12,10 @@ use \lithium\test\Reporter;
 
 class ReporterTest extends \lithium\test\Unit {
 	
-	public function testRender() {
-		
+	public function testMenu() {
+		$expected = "\n-case lithium\core\Object\n-case lithium\core\Libraries\n\n";
+		$result = Reporter::menu(array('lithium\core\Object', 'lithium\core\Libraries'));
+		$this->assertEqual($expected, $result);
 	}
 }
 

@@ -46,7 +46,7 @@ $show_no_test_classes = isset($_GET['classes']) ? $_GET['classes'] : false;
 
 			<span class="filters">
 				<?php
-					$filters = Libraries::locate('testFilters');
+					$filters = Libraries::locate('test.filters');
 					$base = $_SERVER['REQUEST_URI'];
 					if (!strpos($base,'?')){
 						$base .= '?';

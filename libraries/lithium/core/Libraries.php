@@ -86,9 +86,9 @@ class Libraries {
 			'{:library}\extensions\sockets\{:name}',
 			'{:library}\{:class}\socket\{:name}' => array('libraries' => 'lithium')
 		),
-		'testFilters' => array(
-			'{:library}\tests\filters\{:name}',
-			'{:library}\test\filters\{:name}' => array('libraries' => 'lithium')
+		'test' => array(
+			'{:library}\extensions\test\{:namespace}\{:class}\{:name}',
+			'{:library}\test\{:namespace}\{:class}\{:name}' => array('libraries' => 'lithium')
 		),
 		'tests' => array(
 			'{:library}\tests\{:namespace}\{:class}\{:name}Test'
