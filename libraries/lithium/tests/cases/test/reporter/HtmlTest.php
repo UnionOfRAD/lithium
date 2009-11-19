@@ -11,30 +11,33 @@ namespace lithium\tests\cases\test\reporter;
 use \lithium\test\reporter\Html;
 
 class HtmlTest extends \lithium\test\Unit {
-	
+
 	public function setUp() {
 		$this->html = new Html();
 	}
-	
-	public function testFormatWithoutData() {
+
+	public function testMenuWithoutData() {
 		$expected = '<ul></ul>';
-		$result = $this->html->format(null);
+		$result = $this->html->menu(array(), array('format' => 'html'));
 		$this->assertEqual($expected, $result);
 	}
-	
+
 	public function testFormatGroup() {
-		$expected = '<li><a href="?group=lithium">Lithium</a></li>';
-		$result = Html::format('group', array(
-			'namespace' => 'lithium', 'name' => 'Lithium', 'menu' => null
+		$expected = '<ul><li><a href="?group=\lithium\tests">lithium</a>';
+		$expected .= '<ul><li><a href="?group=\lithium\tests\cases">cases</a>';
+		$expected .= '<ul><li><a href="?group=\lithium\tests\cases\core">core</a>';
+		$expected .= '<ul><li><a href="?case=\lithium\tests\cases\core\LibrariesTest">LibrariesTest</a></li>';
+		$expected .= '</ul></li></ul></li></ul></li></ul>';
+		$result = $this->html->menu(array('lithium\tests\cases\core\LibrariesTest'), array(
+			'format' => 'html', 'tree' => true
 		));
 		$this->assertEqual($expected, $result);
 	}
-	
+
 	public function testFormatCase() {
-		$expected = '<li><a href="?case=lithium\tests\cases\test\reporter\HtmlTest">HtmlTest</a></li>';
-		$result = $this->html->format('case', array(
-			'namespace' => 'lithium\tests\cases\test\reporter', 'name' => 'HtmlTest', 'menu' => null
-		));
+		$tests = array('\lithium\tests\cases\test\reporter\HtmlTest');
+		$expected = '<ul><li><a href="?case=\lithium\tests\cases\test\reporter\HtmlTest">HtmlTest</a></li></ul>';
+		$result = $this->html->menu($tests, array('format' => 'html'));
 		$this->assertEqual($expected, $result);
 	}
 }

@@ -8,6 +8,7 @@
 
 namespace lithium\test;
 
+use \lithium\core\Libraries;
 use \lithium\util\Inflector;
 
 /**
@@ -24,6 +25,13 @@ class Report extends \lithium\core\Object {
 	 * @var object
 	 */
 	public $group = null;
+
+	/**
+	 * Contains an instance of `lithium\test\Reporter`, which contains the format to be displayed
+	 *
+	 * @var object
+	 */
+	public $reporter = null;
 
 	/**
 	 * An array of fully-namespaced class names representing the filters to be applied to this test
@@ -53,7 +61,7 @@ class Report extends \lithium\core\Object {
 	 * @var array
 	 */
 	public $timer = array('start' => null, 'end' => null);
-	
+
 	/**
 	 * Construct Report Object
 	 *
@@ -67,6 +75,7 @@ class Report extends \lithium\core\Object {
 			'case' => null,
 			'group' => null,
 			'filters' => array(),
+			'reporter' => 'text'
 		);
 		parent::__construct((array) $config + $defaults);
 	}
@@ -77,6 +86,12 @@ class Report extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _init() {
+		$class = Inflector::camelize($this->_config['reporter']);
+		$reporter = Libraries::locate('test.reporter', $class);
+		if (!$reporter) {
+			throw new Exception("{$format} is not a valid reporter");
+		}
+		$this->reporter = new $reporter();
 		$this->timer['start'] = microtime(true);
 		$this->group = $this->_config['group'];
 		$this->filters = $this->_config['filters'];
@@ -110,9 +125,9 @@ class Report extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function stats() {
-		$results = (array)$this->results['group'];
+		$results = (array) $this->results['group'];
 		return $this->reporter->stats(array_reduce($results, function($stats, $result) {
-			$stats = (array)$stats + array(
+			$stats = (array) $stats + array(
 				'asserts' => 0,
 				'passes' => array(),
 				'fails' => array(),
@@ -142,7 +157,7 @@ class Report extends \lithium\core\Object {
 			return $stats;
 		}));
 	}
-	
+
 	/**
 	 * undocumented function
 	 *

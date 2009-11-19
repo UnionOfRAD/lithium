@@ -17,29 +17,26 @@ use \lithium\core\Libraries;
  *
  */
 class Controller extends \lithium\core\Object {
-	
+
 	/**
 	 * undocumented function
 	 *
-	 * @param string $request 
-	 * @param string $params 
-	 * @param string $options 
+	 * @param string $request
+	 * @param string $params
+	 * @param string $options
 	 * @return void
 	 */
 	public function __invoke($request, $params, $options = array()) {
 		error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
-		$report = Reporter::run(
-			Dispatcher::run(null, $request->query),
-			array('format' => 'html')
-		);
+		$report = Dispatcher::run(null, $request->query + array('reporter' => 'html'));
 		$filters = Libraries::locate('test.filters');
 		$classes = Libraries::locate('tests', null, array(
 			'filter' => '/cases|integration|functional/'
 		));
-		$menu = Reporter::menu($classes, array('format' => 'html', 'tree' => true));
-		
+		$menu = $report->reporter->menu($classes, array('format' => 'html', 'tree' => true));
+
 		$template = Libraries::locate('test.reporter.templates', 'layout', array(
-			'filter' => false, 'format' => 'file', 'suffix' => '.html.php', 
+			'filter' => false, 'type' => 'file', 'suffix' => '.html.php',
 		));
 		include($template);
 	}

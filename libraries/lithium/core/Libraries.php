@@ -363,6 +363,9 @@ class Libraries {
 	 * @see lithium\core\Libraries::add()
 	 */
 	public static function locate($type, $name = null, $options = array()) {
+		$defaults = array('type' => 'class');
+		$options += $defaults;
+
 		if (is_object($name) || strpos($name, '\\') !== false) {
 			return $name;
 		}
@@ -449,12 +452,8 @@ class Libraries {
 				}
 				$params['library'] = $library;
 				$class = str_replace('\\*', '', String::insert($pathTemplate, $params));
-				$file = Libraries::path($class, $options);
-				if (file_exists($file)) {
-					if (isset($options['format']) && $options['format'] == 'file') {
-						return $file;
-					}
-					return $class;
+				if (file_exists($file = Libraries::path($class, $options))) {
+					return ($options['type'] === 'file') ? $file : $class;
 				}
 			}
 		}

@@ -14,65 +14,67 @@ use lithium\util\String;
  * Html Reporter
  *
  */
-class Html extends \lithium\core\Object {
-	
+class Html extends \lithium\test\Reporter {
+
 	/**
 	 * undocumented function
 	 *
-	 * @param object $report \lithium\test\Report
-	 * @return void
+	 * @param array $stats
+	 * @return string
 	 */
-	public function stats($stats) {
-		$passes = count($stats['passes']);
-		$fails = count($stats['fails']);
-		$errors = count($stats['errors']);
-		$exceptions = count($stats['exceptions']);
-		$success = ($passes === $stats['asserts'] && $errors === 0);
-
+	protected function _result($stats) {
 		$result = array(
-			'<div class="test-result test-result-' . ($success ? 'success' : 'fail') . '">',
-			"{$passes} / {$stats['asserts']} passes, {$fails} ",
-			((intval($stats['fails']) == 1) ? 'fail' : 'fails') . " and {$exceptions} ",
-			((intval($exceptions) == 1) ? 'exceptions' : 'exceptions'),
+			'<div class="test-result test-result-' . ($stats['success'] ? 'success' : 'fail') . '">',
+			"{$stats['passes']} / {$stats['asserts']} passes, {$stats['fails']} ",
+			((intval($stats['fails']) == 1) ? 'fail' : 'fails') . " and {$stats['exceptions']} ",
+			((intval($stats['exceptions']) == 1) ? 'exceptions' : 'exceptions'),
 			'</div>'
 		);
-
-		foreach ((array)$stats['errors'] as $error) {
-			switch ($error['result']) {
-				case 'fail':
-					$error += array('class' => 'unknown', 'method' => 'unknown');
-					$fail = array(
-						'<div class="test-assert test-assert-failed">',
-						"Assertion '{$error['assertion']}' failed in ",
-						"{$error['class']}::{$error['method']}() on line ",
-						"{$error['line']}: ",
-						"<span class=\"content\">{$error['message']}</span>",
-						'</div>'
-					);
-					$result[] = join("\n", $fail);
-				break;
-				case 'exception':
-					$exception = array(
-						'<div class="test-exception">',
-						"Exception thrown in  {$error['class']}::{$error['method']}() ",
-						"on line {$error['line']}: ",
-						"<span class=\"content\">{$error['message']}</span>",
-					);
-					if (isset($error['trace']) && !empty($error['trace'])) {
-						$exception[] = "Trace:<span class=\"trace\">{$error['trace']}</span>";
-					}
-					$exception[] = '</div>';
-					$result[] = join("\n", $exception);
-				break;
-			}
-		}
 		return join("\n", $result);
 	}
-	
+
 	/**
 	 * undocumented function
 	 *
-	 * @param string $filters 
+	 * @param array $error
+	 * @return string
+	 */
+	protected function _fail($error) {
+		$fail = array(
+			'<div class="test-assert test-assert-failed">',
+			"Assertion '{$error['assertion']}' failed in ",
+			"{$error['class']}::{$error['method']}() on line ",
+			"{$error['line']}: ",
+			"<span class=\"content\">{$error['message']}</span>",
+			'</div>'
+		);
+		return join("\n", $fail);
+	}
+
+	/**
+	 * undocumented function
+	 *
+	 * @param array $error
+	 * @return string
+	 */
+	protected function _exception($error) {
+		$exception = array(
+			'<div class="test-exception">',
+			"Exception thrown in  {$error['class']}::{$error['method']}() ",
+			"on line {$error['line']}: ",
+			"<span class=\"content\">{$error['message']}</span>",
+		);
+		if (isset($error['trace']) && !empty($error['trace'])) {
+			$exception[] = "Trace:<span class=\"trace\">{$error['trace']}</span>";
+		}
+		$exception[] = '</div>';
+		return join("\n", $exception);
+	}
+
+	/**
+	 * undocumented function
+	 *
+	 * @param string $filters
 	 * @return void
 	 */
 	public function filters($filters) {
@@ -82,18 +84,18 @@ class Html extends \lithium\core\Object {
 		}
 		return join("\n", $result);
 	}
-	
+
 	/**
 	 * Renders a menu item
 	 *
 	 * @param string $type group, case or null
-	 * @param string $params 
+	 * @param string $params
 	 *               - namespace
 	 *               - name
 	 *               - menu
 	 * @return void
 	 */
-	public function menu($type, $params = array()) {
+	protected function _item($type, $params = array()) {
 		$defaults = array(
 			'namespace' => null, 'name' => null, 'menu' => null
 		);

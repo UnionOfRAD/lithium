@@ -50,7 +50,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			'case' => null,
 			'group' => null,
 			'filters' => array(),
-			'reporter' => 'html'
+			'reporter' => 'text'
 		);
 		$options += $defaults;
 
@@ -58,47 +58,6 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$options['filters'] = Set::normalize($options['filters']);
 		$report = static::_report($options);
 		return $report;
-	}
-
-	/**
-	 * Processes the aggregated results from the test cases and compiles some
-	 * basic statistics.
-	 *
-	 * @param  array $results An array of results as returned by Dispatcher::run().
-	 * @return array Array of results. Data includes aggregated values for
-	 *         passes, fails, exceptions, errors, and assertions.
-	 */
-	public static function process($results) {
-		return array_reduce((array)$results, function($stats, $result) {
-			$stats = (array)$stats + array(
-				'asserts' => 0,
-				'passes' => array(),
-				'fails' => array(),
-				'exceptions' => array(),
-				'errors' => array()
-			);
-			$result = empty($result[0]) ? array($result) : $result;
-
-			foreach ($result as $response) {
-				if (empty($response['result'])) {
-					continue;
-				}
-				$result = $response['result'];
-
-				if (in_array($result, array('fail', 'exception'))) {
-					$stats['errors'][] = $response;
-				}
-				unset($response['file'], $response['result']);
-
-				if (in_array($result, array('pass', 'fail'))) {
-					$stats['asserts']++;
-				}
-				if (in_array($result, array('pass', 'fail', 'exception'))) {
-					$stats[Inflector::pluralize($result)][] = $response;
-				}
-			}
-			return $stats;
-		});
 	}
 
 	/**
@@ -122,30 +81,6 @@ class Dispatcher extends \lithium\core\StaticObject {
 		return $report;
 	}
 
-	/**
-	 * Runs the given tests through the applicable filters.
-	 *
-	 * @param object $group The test Group object, which contains the test cases.
-	 * @param array $filters The filters to be applied to the test cases.
-	 * @return array An array of two elements, the first being the results of the test
-	 *         run, the second being the results of the filtered test run.
-	 */
-	protected static function _execute($group, $filters) {
-		$tests = $group->tests();
-		$filterResults = array();
-
-		foreach ($filters as $filter => $options) {
-			$options = isset($options['apply']) ? $options['apply'] : array();
-			$tests = $filter::apply($tests, $options);
-		}
-		$results = $tests->run();
-
-		foreach ($filters as $filter => $options) {
-			$options = isset($options['analyze']) ? $options['analyze'] : array();
-			$filterResults[$filter] = $filter::analyze($results, $options);
-		}
-		return array($results, $filterResults);
-	}
 }
 
 ?>

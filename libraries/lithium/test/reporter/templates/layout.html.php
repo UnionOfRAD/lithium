@@ -1,7 +1,7 @@
 <?php
 	use \lithium\util\Inflector;
 	// /var_dump($request);
-	
+
 ?>
 <!doctype html>
 <html>
@@ -21,7 +21,7 @@
 			<h2>Stats for <?php echo $report->title; ?></h2>
 
 			<h3>Test results</h3>
-					
+
 			<span class="filters">
 				<?php
 					foreach ($filters as $i => $class) {
@@ -34,9 +34,9 @@
 					}
 				?>
 			</span>
-			
+
 			<?php echo $report->stats(); ?>
-			
+
 			<?php echo $report->filters();?>
 
 		</div>

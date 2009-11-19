@@ -17,22 +17,43 @@ use \lithium\util\Inflector;
  *
  * @param class \lithium\test\Report
  */
-class Reporter extends \lithium\core\StaticObject {
+class Reporter extends \lithium\core\Object {
 
 	/**
 	 * undocumented function
 	 *
-	 * @param string $report
-	 * @param string $options
+	 * @param object $report \lithium\test\Report
 	 * @return void
 	 */
-	public static function run($report, $options = array()) {
-		$defaults = array('format' => 'text');
-		$options += $defaults;
-		$report->reporter = static::_reporter($options['format']);
-		return $report;
-	}
+	public function stats($stats) {
+		$defaults = array(
+			'asserts' => null, 'passes' => array(), 'fails' => array(),
+			'errors' => array(), 'exceptions' => array(),
+		);
+		$stats += $defaults;
 
+		$asserts = $stats['asserts'];
+		$passes = count($stats['passes']);
+		$fails = count($stats['fails']);
+		$errors = count($stats['errors']);
+		$exceptions = count($stats['exceptions']);
+		$success = ($passes === $asserts && $errors === 0);
+		$aggregate = compact('asserts', 'passes', 'fails', 'errors', 'exceptions', 'success');
+		$result = array($this->_result($aggregate));
+
+		foreach ((array)$stats['errors'] as $error) {
+			switch ($error['result']) {
+				case 'fail':
+					$error += array('class' => 'unknown', 'method' => 'unknown');
+					$result[] = $this->_fail($error);
+				break;
+				case 'exception':
+					$result[] = $this->_exception($error);
+				break;
+			}
+		}
+		return join("\n", $result);
+	}
 	/**
 	 * return menu as a string to be used as render
 	 *
@@ -40,7 +61,7 @@ class Reporter extends \lithium\core\StaticObject {
 	 *               - format: type of reporter class. eg: html default: text
 	 *               - tree: true to convert classes to tree structure
 	 */
-	public static function menu($classes, $options = array()) {
+	public function menu($classes, $options = array()) {
 		$defaults = array('format' => 'text', 'tree' => false);
 		$options += $defaults;
 
@@ -66,29 +87,30 @@ class Reporter extends \lithium\core\StaticObject {
 		ksort($classes);
 
 		$result = null;
-		$reporter = static::_reporter($options['format']);
 
 		if ($options['tree']) {
-			$menu = function ($data, $parent = null) use (&$menu, &$reporter, $result) {
+			$self = $this;
+			$menu = function ($data, $parent = null) use (&$menu, &$self, $result) {
 				foreach ($data as $key => $row) {
 					if (is_array($row) && is_string($key)) {
 						$key = strtolower($key);
 						$next = $parent . '\\' . $key;
-						$result .= $reporter->menu('group', array(
+						$result .= $self->invokeMethod('_item', array('group', array(
 							'namespace' => $next, 'name' => $key, 'menu' => $menu($row, $next)
-						));
+						)));
 					} else {
 						$next = $parent . '\\' . $key;
-						$result .= $reporter->menu('case', array(
+						$result .= $self->invokeMethod('_item', array('case', array(
 							'namespace' => $parent, 'name' => $row,
-						));
+						)));
 					}
 				}
-				return $reporter->menu(null, array('menu' => $result));
+				return $self->invokeMethod('_item', array(null, array('menu' => $result)));
 			};
+
 			foreach ($classes as $library => $tests) {
 				$group = "\\{$library}\\tests";
-				$result .= $reporter->menu(null, array('menu' => $reporter->menu('group', array(
+				$result .= $this->_item(null, array('menu' => $this->_item('group', array(
 					'namespace' => $group, 'name' => $library, 'menu' => $menu($tests, $group)
 				))));
 			}
@@ -99,24 +121,62 @@ class Reporter extends \lithium\core\StaticObject {
 			$parts = explode('\\', $test);
 			$name = array_pop($parts);
 			$namespace = join('\\', $parts);
-			$result .= $reporter->menu('case', compact('namespace', 'name'));
+			$result .= $this->_item('case', compact('namespace', 'name'));
 		}
-		return $reporter->menu(null, array('menu' => $result));
+		return $this->_item(null, array('menu' => $result));
 	}
-	
+
 	/**
 	 * undocumented function
 	 *
-	 * @param string $format 
+	 * @param string $filters
 	 * @return void
 	 */
-	protected static function _reporter($format) {
-		$reporter = Libraries::locate('test.reporter', Inflector::camelize($format));
-		if (!$reporter) {
-			throw new Exception("{$format} is not a valid reporter");
-		}
-		return new $reporter();
+	public function filters($filters) {
+
 	}
+
+	/**
+	 * undocumented function
+	 *
+	 * @param array $data
+	 * @return void
+	 */
+	protected function _result($data) {
+
+	}
+
+	/**
+	 * undocumented function
+	 *
+	 * @param array $data
+	 * @return void
+	 */
+	protected function _fails($data) {
+
+	}
+
+	/**
+	 * undocumented function
+	 *
+	 * @param array $data
+	 * @return void
+	 */
+	protected function _exception($data) {
+
+	}
+
+	/**
+	 * undocumented function
+	 *
+	 * @param array $data
+	 * @return void
+	 */
+	protected function _item($data) {
+
+	}
+
+
 }
 
 ?>

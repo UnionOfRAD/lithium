@@ -67,12 +67,10 @@ class Test extends \lithium\console\Command {
 				str_replace('lithium.tests.cases.', '', $this->group)
 			);
 		}
-		$testRun = Dispatcher::run(null, array(
+		$report = Dispatcher::run(null, array(
 			'case' => $this->case, 'group' => $this->group,
 			'filters' => $this->filters
 		));
-
-		$stats = Dispatcher::process($testRun['results']);
 
 		$this->header('Included Files');
 		$base = dirname(dirname(dirname(dirname(__DIR__))));
@@ -80,29 +78,11 @@ class Test extends \lithium\console\Command {
 		sort($files);
 		$this->out($files);
 
-		$passes = count($stats['passes']);
-		$fails = count($stats['fails']);
-		$exceptions = count($stats['exceptions']);
+		$this->header($report->title);
 
-		$this->header($testRun['title']);
-		$this->out("{$passes} / {$stats['asserts']} passes");
-		$this->out(($stats['fails'] === 1) ? "{$fails} fail" : "{$fails} fails");
-		$this->out("{$exceptions} exceptions");
+		$this->out($report->stats());
 
-		foreach ((array)$stats['fails'] as $fail) {
-			$this->out("Assertion '{$fail['assertion']}' failed in");
-			$this->out("{$fail['class']}::{$fail['method']}() on line {$fail['line']}");
-			$this->out($fail['message']);
-		}
-
-		foreach ((array)$testRun['filters'] as $class => $data) {
-			$this->out($class::output('text', $data));
-		}
-
-		$this->header('Benchmarking');
-		$this->out("Time: " . number_format(microtime(true) - $startBenchmark, 4) . 's');
-		$this->out("Peak Memory: " . number_format((memory_get_peak_usage() / 1024), 3) . 'k');
-		$this->out("Current Memory: " . number_format((memory_get_usage() / 1024), 3) . 'k');
+		$this->out($report->filters());
 
 		$again = $this->in("Would you like to run this test again?", array(
 			'choices' => array('y', 'n'),
@@ -145,7 +125,9 @@ class Test extends \lithium\console\Command {
 	 */
 	protected function _getTests() {
 		while (empty($this->case) && empty($this->group)) {
-			$tests = Libraries::find(true, array('filter' => '/\w+Test$/', 'recursive' => true));
+			$tests = Libraries::locate('tests', null, array(
+				'filter' => '/cases|integration|functional/'
+			));
 			$tests = str_replace('\\', '.',
 				str_replace('lithium\tests\cases\\', '', $tests)
 			);
