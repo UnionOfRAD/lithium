@@ -182,18 +182,15 @@ class Connections extends \lithium\core\StaticObject {
 	 */
 	protected static function _build($config) {
 		$class = $config['adapter'];
-
-		if (!class_exists($class)) {
-			if (empty($config['adapter'])) {
-				$config['adapter'] = $config['type'];
-				$config['type'] = null;
-			}
-			$class = Libraries::locate("dataSources.{$config['type']}", $config['adapter']);
+		if (empty($config['adapter'])) {
+			$config['adapter'] = $config['type'];
+			$config['type'] = null;
 		}
-		if (class_exists($class)) {
-			return new $class($config);
+		$class = Libraries::locate("dataSources.{$config['type']}", $config['adapter']);
+		if (!$class) {
+			throw new Exception("{$config['type']} adapter {$config['adapter']} could not be found");
 		}
-		throw new Exception("{$config['adapter']} adapter could not be found");
+		return new $class($config);
 	}
 }
 
