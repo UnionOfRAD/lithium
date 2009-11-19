@@ -8,6 +8,13 @@
 
 namespace lithium\test;
 
+use \lithium\util\Inflector;
+
+/**
+ * Report object for running group tests holding results
+ *
+ * @package default
+ */
 class Report extends \lithium\core\Object {
 
 	/**
@@ -26,27 +33,123 @@ class Report extends \lithium\core\Object {
 	 */
 	public $filters = array();
 
-	protected $_startTime = null;
+	/**
+	 * Title of the group being run
+	 *
+	 * @var string
+	 */
+	public $title = null;
 
-	protected function _init() {
-		$this->_startTime = microtime(true);
-	}
+	/**
+	 * group and filter results
+	 *
+	 * @var array
+	 */
+	public $results = array('group' => array(), 'filters' => array());
+
+	/**
+	 * start and end timers
+	 *
+	 * @var array
+	 */
+	public $timer = array('start' => null, 'end' => null);
 	
-	protected function create($group) {
-		$tests = $group->tests();
-		$filterResults = array();
+	/**
+	 * Construct Report Object
+	 *
+	 * @param array $config Options array for the test run. Valid options are:
+	 *		  - 'case': The fully namespaced test case to be run.
+	 *        - 'group': The fully namespaced test group to be run.
+	 *		  - 'filters': An array of filters that the test output should be run through.
+	 */
+	public function __construct($config = array()) {
+		$defaults = array(
+			'case' => null,
+			'group' => null,
+			'filters' => array(),
+		);
+		parent::__construct((array) $config + $defaults);
+	}
 
-		foreach ($filters as $filter => $options) {
+	/**
+	 * undocumented function
+	 *
+	 * @return void
+	 */
+	protected function _init() {
+		$this->timer['start'] = microtime(true);
+		$this->group = $this->_config['group'];
+		$this->filters = $this->_config['filters'];
+		$this->title = $this->_config['title'] ?: $this->_config['title'];
+		$this->run();
+		$this->timer['end'] = microtime(true);
+	}
+
+	/**
+	 * undocumented function
+	 *
+	 * @return void
+	 */
+	public function run() {
+		$tests = $this->group->tests();
+		foreach ($this->filters as $filter => $options) {
 			$options = isset($options['apply']) ? $options['apply'] : array();
 			$tests = $filter::apply($tests, $options);
 		}
-		$results = $tests->run();
+		$this->results['group'] = $tests->run();
 
-		foreach ($filters as $filter => $options) {
+		foreach ($this->filters as $filter => $options) {
 			$options = isset($options['analyze']) ? $options['analyze'] : array();
-			$filterResults[$filter] = $filter::analyze($results, $options);
+			$this->results['filters'][$filter] = $filter::analyze($this->results['group'], $options);
 		}
-		return array($results, $filterResults);
+	}
+
+	/**
+	 * undocumented function
+	 *
+	 * @return void
+	 */
+	public function stats() {
+		$results = (array)$this->results['group'];
+		return $this->reporter->stats(array_reduce($results, function($stats, $result) {
+			$stats = (array)$stats + array(
+				'asserts' => 0,
+				'passes' => array(),
+				'fails' => array(),
+				'exceptions' => array(),
+				'errors' => array()
+			);
+			$result = empty($result[0]) ? array($result) : $result;
+
+			foreach ($result as $response) {
+				if (empty($response['result'])) {
+					continue;
+				}
+				$result = $response['result'];
+
+				if (in_array($result, array('fail', 'exception'))) {
+					$stats['errors'][] = $response;
+				}
+				unset($response['file'], $response['result']);
+
+				if (in_array($result, array('pass', 'fail'))) {
+					$stats['asserts']++;
+				}
+				if (in_array($result, array('pass', 'fail', 'exception'))) {
+					$stats[Inflector::pluralize($result)][] = $response;
+				}
+			}
+			return $stats;
+		}));
+	}
+	
+	/**
+	 * undocumented function
+	 *
+	 * @return void
+	 */
+	public function filters() {
+		return $this->reporter->filters((array) $this->results['filters']);
 	}
 }
 

@@ -435,21 +435,26 @@ class Libraries {
 				continue;
 			}
 
-			foreach ($paths as $pathTemplate => $options) {
+			foreach ($paths as $pathTemplate => $pathOptions) {
 				if (is_int($pathTemplate)) {
-					$pathTemplate = $options;
-					$options = array();
+					$pathTemplate = $pathOptions;
+					$pathOptions = array();
 				}
+				$options += $pathOptions;
+
 				$scope = isset($options['libraries']) ? (array)$options['libraries'] : null;
 
 				if ($scope && !in_array($library, $scope)) {
 					continue;
 				}
 				$params['library'] = $library;
-				$classPath = str_replace('\\*', '', String::insert($pathTemplate, $params));
-
-				if (file_exists(Libraries::path($classPath))) {
-					return $classPath;
+				$class = str_replace('\\*', '', String::insert($pathTemplate, $params));
+				$file = Libraries::path($class, $options);
+				if (file_exists($file)) {
+					if (isset($options['format']) && $options['format'] == 'file') {
+						return $file;
+					}
+					return $class;
 				}
 			}
 		}

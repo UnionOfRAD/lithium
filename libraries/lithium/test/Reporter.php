@@ -8,6 +8,7 @@
 
 namespace lithium\test;
 
+use \Exception;
 use \lithium\core\Libraries;
 use \lithium\util\Inflector;
 
@@ -16,7 +17,7 @@ use \lithium\util\Inflector;
  *
  * @param class \lithium\test\Report
  */
-class Reporter extends \lithium\core\Object {
+class Reporter extends \lithium\core\StaticObject {
 
 	/**
 	 * undocumented function
@@ -28,13 +29,8 @@ class Reporter extends \lithium\core\Object {
 	public static function run($report, $options = array()) {
 		$defaults = array('format' => 'text');
 		$options += $defaults;
-		$reporter = Libraries::locate('test.reporter', Inflector::camelize($options['format']));
-		$reporter = new $reporter();
-		$classes = Libraries::locate('tests', null, array(
-			'filter' => '/cases|integration|functional/'
-		));
-		$menu = static::menu($classes);
-		return $reporter->render(compact('report', 'menu', 'classes'));
+		$report->reporter = static::_reporter($options['format']);
+		return $report;
 	}
 
 	/**
@@ -42,12 +38,13 @@ class Reporter extends \lithium\core\Object {
 	 *
 	 * @params array options
 	 *               - format: type of reporter class. eg: html default: text
-	 *               - recursive: if true organizes and renders as hierarchy
+	 *               - tree: true to convert classes to tree structure
 	 */
 	public static function menu($classes, $options = array()) {
-		$defaults = array('format' => 'text', 'recursive' => false);
+		$defaults = array('format' => 'text', 'tree' => false);
 		$options += $defaults;
-		if ($options['recursive']) {
+
+		if ($options['tree']) {
 			$data = array();
 			$assign = function(&$data, $class, $i = 0) use (&$assign) {
 				isset($data[$class[$i]]) ?: $data[] = $class[$i];
@@ -69,42 +66,56 @@ class Reporter extends \lithium\core\Object {
 		ksort($classes);
 
 		$result = null;
-		$reporter = Libraries::locate('test.reporter', Inflector::camelize($options['format']));
-		$reporter = new $reporter();
+		$reporter = static::_reporter($options['format']);
 
-		if ($options['recursive']) {
+		if ($options['tree']) {
 			$menu = function ($data, $parent = null) use (&$menu, &$reporter, $result) {
 				foreach ($data as $key => $row) {
 					if (is_array($row) && is_string($key)) {
 						$key = strtolower($key);
 						$next = $parent . '\\' . $key;
-						$result .= $reporter->format('group', array(
+						$result .= $reporter->menu('group', array(
 							'namespace' => $next, 'name' => $key, 'menu' => $menu($row, $next)
 						));
 					} else {
 						$next = $parent . '\\' . $key;
-						$result .= $reporter->format('case', array(
+						$result .= $reporter->menu('case', array(
 							'namespace' => $parent, 'name' => $row,
 						));
 					}
 				}
-				return $format($result);
+				return $reporter->menu(null, array('menu' => $result));
 			};
 			foreach ($classes as $library => $tests) {
 				$group = "\\{$library}\\tests";
-				$result .= $report->format(null, array('menu' => $report->format('group', array(
+				$result .= $reporter->menu(null, array('menu' => $reporter->menu('group', array(
 					'namespace' => $group, 'name' => $library, 'menu' => $menu($tests, $group)
 				))));
 			}
 			return $result;
 		}
+
 		foreach ($classes as $test) {
 			$parts = explode('\\', $test);
 			$name = array_pop($parts);
 			$namespace = join('\\', $parts);
-			$result .= $reporter->format('case', compact('namespace', 'name'));
+			$result .= $reporter->menu('case', compact('namespace', 'name'));
 		}
-		return $reporter->format(null, array('menu' => $result));
+		return $reporter->menu(null, array('menu' => $result));
+	}
+	
+	/**
+	 * undocumented function
+	 *
+	 * @param string $format 
+	 * @return void
+	 */
+	protected static function _reporter($format) {
+		$reporter = Libraries::locate('test.reporter', Inflector::camelize($format));
+		if (!$reporter) {
+			throw new Exception("{$format} is not a valid reporter");
+		}
+		return new $reporter();
 	}
 }
 
