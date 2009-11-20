@@ -128,6 +128,7 @@ class Document extends \lithium\util\Collection {
 			unset($config['data']);
 		}
 		parent::__construct($config);
+		$this->_items = (array) $this->_items;
 	}
 
 	/**
@@ -149,6 +150,17 @@ class Document extends \lithium\util\Collection {
 			$this->_items[$name] = $this->_record('recordSet', $this->_items[$name]);
 		}
 		return $this->_items[$name];
+	}
+
+	/**
+	 * PHP magic method used to check the presence of a field as document properties, i.e.
+	 * `$document->_id`.
+	 *
+	 * @param $name The field name, as specified with an object property.
+	 * @return bool True if the field specified in `$name` exists, false otherwise.
+	 */
+	public function __isset($name) {
+		return isset($this->_items[$name]);
 	}
 
 	/**

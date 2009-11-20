@@ -404,6 +404,32 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	/**
+	 * Tests that `Document`s with embedded objects are cast to arrays so as not to cause fatal
+	 * errors when traversing via array interfaces.
+	 *
+	 * @return void
+	 */
+	public function testObjectIteration() {
+		$doc = new Document(array('data' => array(
+			(object) array('foo' => 'bar'),
+			(object) array('bar' => 'foo')
+		)));
+		$result = $doc->first()->foo;
+		$expected = 'bar';
+		$this->assertEqual($expected, $result);
+
+		$result = $doc->next()->bar;
+		$expected = 'foo';
+		$this->assertEqual($expected, $result);
+
+		$doc = new Document(array('data' => (object) array(
+			'first' => array('foo' => 'bar'),
+			'second' => array('bar' => 'foo')
+		)));
+		$result = $doc->first->foo;
+	}
+
 	public function testBooleanValues() {
 		$doc = new Document();
 
