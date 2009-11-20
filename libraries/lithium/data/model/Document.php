@@ -128,6 +128,7 @@ class Document extends \lithium\util\Collection {
 			unset($config['data']);
 		}
 		parent::__construct($config);
+		$this->_items = (array) $this->_items;
 	}
 
 	/**
