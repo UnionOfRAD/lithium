@@ -21,7 +21,7 @@ use \lithium\util\reflection\Inspector;
  * Most assertions take an expected result, a received result, and a message (to describe the
  * failure) as parameters.
  *
- * Available assertions are (see `assert&lt;assertion-name&gt;` methods for details): Equal, False, Identical,
+ * Available assertions are (see `assert<assertion-name>` methods for details): Equal, False, Identical,
  * NoPattern, NotEqual, Null, Pattern, Tags, True.
  *
  * If an assertion is expected to produce an exception, the `expectException` method should be
