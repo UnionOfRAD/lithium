@@ -24,17 +24,24 @@ class MySQLi extends \lithium\data\source\Database {
 	 */
 	protected $_columns = array(
 		'primary_key'	=> array('name' => 'NOT NULL AUTO_INCREMENT'),
+		'binary' => array('name' => 'blob'),
+		'bit' => array('version' => '< 5.0.3', 'name' => 'tinyint', 'length' => 1),
+		'bool' => array('name' => 'tinyint', 'length' => 1),
+		'boolean' => array('name' => 'tinyint', 'length' => 1),
+		'date' => array('name' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
+		'datetime' => array(
+			'name' => 'datetime',
+			'format' => 'Y-m-d H:i:s',
+			'formatter' => 'date'),
+		'float' 		=> array('name' => 'float', 'formatter' => 'floatval'),
+		'integer' 		=> array('name' => 'int', 'length' => 11, 'formatter' => 'intval'),
 		'string' 		=> array('name' => 'varchar', 'length' => 255),
 		'text' 			=> array('name' => 'text'),
-		'integer' 		=> array('name' => 'int', 'length' => 11, 'formatter' => 'intval'),
-		'float' 		=> array('name' => 'float', 'formatter' => 'floatval'),
-		'datetime' 		=> array('name' => 'datetime', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
-		'timestamp' 	=> array('name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
-		),
 		'time' => array('name' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
-		'date' => array('name' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
-		'binary' => array('name' => 'blob'),
-		'boolean' => array('name' => 'tinyint', 'length' => 1)
+		'timestamp' 	=> array(
+			'name' => 'timestamp',
+			'format' => 'Y-m-d H:i:s',
+			'formatter' => 'date')
 	);
 
 	/**
@@ -58,8 +65,7 @@ class MySQLi extends \lithium\data\source\Database {
 	 *        see `lithium\data\source\Database` and `lithium\data\Source`.
 	 *
 	 * Options defined by this class:
-	 *
-	 * **'port'** `integer|string` Accepts a port number or Unix socket name to use when connecting
+	 *  - 'port' `integer|string`: Accepts a port number or Unix socket name to use when connecting
 	 *  to the database.  Defaults to `'3306'`.
 	 */
 	public function __construct($config = array()) {
@@ -175,9 +181,11 @@ class MySQLi extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Gets/sets the encoding for the connection
+	 * Gets or sets the encoding for the connection.
+	 *
 	 * @param $encoding
-	 * @return mixed
+	 * @return mixed If setting the encoding; returns true on success, else false.
+	 *               When getting, returns the encoding.
 	 */
 	public function encoding($encoding = null) {
 		$encodingMap = array('UTF-8' => 'utf8');
