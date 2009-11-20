@@ -8,6 +8,8 @@
 
 namespace lithium\tests\cases\data;
 
+use \lithium\util\reflection\Inspector;
+use \lithium\data\Connections;
 use \lithium\data\Model;
 use \lithium\tests\mocks\data\MockPost;
 use \lithium\tests\mocks\data\MockComment;
@@ -16,9 +18,37 @@ use \lithium\tests\mocks\data\MockTagging;
 
 class ModelTest extends \lithium\test\Unit {
 
-	public function setUp() {
-		MockPost::__init();
-		MockComment::__init();
+	public function _init() {
+		if (!Connections::get('test')) {
+			Connections::add('test', 'database', array(
+				'adapter' => 'MockAdapter',
+				'host' => 'localhost'
+			));
+		}
+		$deps = Inspector::dependencies(get_class($this));
+		$models = array_filter($deps, function($class) { return is_subclass_of($class, "lithium\data\Model"); });
+		foreach ($models as $m) {
+			$class = '\\'.$m;
+			$class::__init(array('connection' => 'test'));
+		}
+	}
+
+	public function testOverrideMeta() {
+		MockTag::__init(array('source' => 'test'));
+
+		$meta = MockTag::meta(array('id' => 'key'));
+
+		$expected = 'test';
+		$result = $meta['connection'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'test';
+		$result = $meta['source'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'key';
+		$result = $meta['id'];
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testClassInitialization() {
@@ -29,7 +59,7 @@ class ModelTest extends \lithium\test\Unit {
 		Model::__init();
 		$this->assertEqual($expected, MockPost::instances());
 
-		$this->assertEqual('mock_posts', MockPost::meta('source'));
+		$this->assertEqual('mock_posts', \lithium\tests\mocks\data\MockPost::meta('source'));
 
 		MockPost::__init(array('source' => 'post'));
 		$this->assertEqual('post', MockPost::meta('source'));
@@ -48,7 +78,7 @@ class ModelTest extends \lithium\test\Unit {
 			'key'        => 'id',
 			'title'      => 'title',
 			'source'     => 'mock_posts',
-			'connection' => 'default'
+			'connection' => 'test'
 		);
 		$this->assertEqual($expected, MockPost::meta());
 
@@ -58,7 +88,7 @@ class ModelTest extends \lithium\test\Unit {
 			'key'        => 'comment_id',
 			'title'      => 'comment_id',
 			'source'     => 'mock_comments',
-			'connection' => 'default'
+			'connection' => 'test'
 		);
 		$this->assertEqual($expected, MockComment::meta());
 
@@ -179,10 +209,10 @@ class ModelTest extends \lithium\test\Unit {
 		));
 		$this->assertEqual(array('post_id' => 2, 'tag_id' => 5), $result);
 	}
-	
+
 	/*
 	* @todo create proper mock objects for the following test
-	* 
+	*
 	public function testFindAll() {
 	    $tags = MockTag::find('all', array('conditions' => array('id' => 2)));
 
