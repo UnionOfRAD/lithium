@@ -2,6 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -9,6 +10,11 @@ namespace lithium\data\source\database\adapter;
 
 use \Exception;
 
+/**
+ * Adapater class for MySQL improved extension. Implements the methods connecting higher level abstractions
+ * to the specifics of the MySQL improved extension.
+ *
+ */
 class MySQLi extends \lithium\data\source\Database {
 
 	/**
@@ -32,8 +38,13 @@ class MySQLi extends \lithium\data\source\Database {
 	);
 
 	/**
-	 * MySQLi-specific value denoting whether or not table aliases should be used in DELETE and
-	 * UPDATE queries.
+	 * MySQLi result object.
+	 */
+	protected $_mysqliResult;
+
+	/**
+	 * MySQLi-specific value denoting whether or not table aliases can be used in DELETE and
+	 * UPDATE queries. This is dependant on mysql cerver version.
 	 *
 	 * @var boolean
 	 */
@@ -41,14 +52,15 @@ class MySQLi extends \lithium\data\source\Database {
 
 
 	/**
-	 * Constructs the MySQLi adapter and default the port to 3306.
+	 * Constructs the MySQLi adapter and defaults the port to 3306.
 	 *
 	 * @param array $config Configuration options for this class. For additional configuration,
-	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options
-	 *        defined by this class:
+	 *        see `lithium\data\source\Database` and `lithium\data\Source`.
 	 *
-	 *	- `'port'`: Accepts a port number or Unix socket name to use when connecting to the
-	 *     database.  Defaults to `'3306'`.
+	 * Options defined by this class:
+	 *
+	 * **'port'** `integer|string` Accepts a port number or Unix socket name to use when connecting
+	 *  to the database.  Defaults to `'3306'`.
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('port' => '3306');
@@ -89,7 +101,11 @@ class MySQLi extends \lithium\data\source\Database {
 		$host = $config['persistent'] ? 'p:' : '';
 		$host .= $config['host'];
 
-		$this->_connection = new mysqli($host, $config['login'], $config['password'], $config['database'], $config['port']);
+		try {
+			$this->_connection = new \mysqli($host, $config['login'], $config['password'], $config['database'], $config['port']);
+		} catch (exception $e) {
+			throw new \RuntimeException($e->error);
+		}
 		if ($this->_connection !== false) {
 			$this->_isConnected = true;
 
@@ -98,7 +114,7 @@ class MySQLi extends \lithium\data\source\Database {
 		}
 
 			$this->_useAlias = (bool)version_compare(
-				$this->_connection->server_info(), "4.1", ">="
+				$this->_connection->server_info, "4.1", ">="
 			);
 		}
 
@@ -119,6 +135,30 @@ class MySQLi extends \lithium\data\source\Database {
 	 * @filter This method can be filtered.
 	 */
 	public function describe($entity, $meta = array()) {
+		$params = compact('entity', 'meta');
+		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) {
+			extract($params);
+
+			$name = $self->invokeMethod('_entityName', array($entity));
+			$columns = $self->read("DESCRIBE {$name}", array('return' => 'array'));
+			$fields = array();
+
+			foreach ($columns as $column) {
+				preg_match('/(?P<type>\w+)(\((?P<length>\d+)\))?/', $column['Type'], $match);
+				$filtered = array_intersect_key($match, array('type' => null, 'length' => null));
+				$match = $filtered + array('length' => null);
+				// $match['type'] = $self->invokeMethod('_column', $match['type']);
+
+				$fields[$column['Field']] = $match + array(
+					'null'     => ($column['Null'] == 'YES' ? true : false),
+					'default'  => $column['Default'],
+				);
+				//if (!empty($column['Key']) && isset($this->index[$column[0]['Key']])) {
+				//	$fields[$column['Field']]['key'] = $this->index[$column[0]['Key']];
+				//}
+			}
+			return $fields;
+		});
 	}
 
 	/**
@@ -144,7 +184,7 @@ class MySQLi extends \lithium\data\source\Database {
 
 		if (empty($encoding)) {
 			$encoding = $this->_connection->get_charset();
-			return ($key = array_search($encoding, $encodingMap)) ? $key : $encoding;
+			return ($key = array_search($encoding->charset, $encodingMap)) ? $key : $encoding['charset'];
 		}
 		$encoding = isset($encodingMap[$encoding]) ? $encodingMap[$encoding] : $encoding;
 		return $this->_connection->set_charset($encoding);
@@ -180,7 +220,7 @@ class MySQLi extends \lithium\data\source\Database {
 	 * @return array|null
 	 */
 	public function result($type, $mysqliResult, $context) {
-		if (!($resource instanceof  mysqli_result)) {
+		if (!($mysqliResult instanceof  \mysqli_result)) {
 			return null;
 		}
 
@@ -210,9 +250,49 @@ class MySQLi extends \lithium\data\source\Database {
 	 * @return string Abstract column type (i.e. "string")
 	 */
 	protected function _column($real) {
+		if (is_array($real)) {
+			return $real['type'] . (isset($real['length']) ? "({$real['length']})" : '');
+		}
+
+		if (!preg_match('/(?P<type>[^(]+)(?:\((?P<length>[^)]+)\))?/', $real, $column)) {
+			return $real;
+		}
+		$column = array_intersect_key($column, array('type' => null, 'length' => null));
+
+		switch (true) {
+			case in_array($column['type'], array('date', 'time', 'datetime', 'timestamp')):
+				return $column;
+			case ($column['type'] == 'tinyint' && $column['length'] == '1'):
+			case ($column['type'] == 'boolean'):
+				return array('type' => 'boolean');
+			break;
+			case (strpos($column['type'], 'int') !== false):
+				$column['type'] = 'integer';
+			break;
+			case (strpos($column['type'], 'char') !== false || $column['type'] == 'tinytext'):
+				$column['type'] = 'string';
+			break;
+			case (strpos($column['type'], 'text') !== false):
+				$column['type'] = 'text';
+			break;
+			case (strpos($column['type'], 'blob') !== false || $column['type'] == 'binary'):
+				$column['type'] = 'binary';
+			break;
+			case preg_match('/float|double|decimal/', $column['type']):
+				$column['type'] = 'float';
+			break;
+			default:
+				$column['type'] = 'text';
+			break;
+		}
+		return $column;
 	}
 
 	protected function _entityName($entity) {
+		if (class_exists($entity, false) && method_exists($entity, 'meta')) {
+			$entity = $entity::meta('name');
+		}
+		return $entity;
 	}
 
 	protected function _execute($sql, $options = array()) {
@@ -224,18 +304,31 @@ class MySQLi extends \lithium\data\source\Database {
 
 		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use (&$conn) {
 			extract($params);
-			$mode = ($options['buffered']) ? MYSQLI_STORE_RESULT : MYSQLI_STORE_RESULT;
-			$mysqliResult = $conn->query($sql, $mode);
+			$mode = ($options['buffered']) ? MYSQLI_STORE_RESULT : MYSQLI_USE_RESULT;
+			$conn->_mysqliResult = $conn->query($sql, $mode);
 
-			if (mysqli_errno() > 0) {
+			if ($conn->errno > 0) {
 				list($code, $message) = $self->error();
 				throw new Exception("$sql: $message", $code);
 			}
-			return $mysqliResult;
+			return $conn->_mysqliResult;
 		});
 	}
 
-	protected function _results($results) {
+	protected function _results($mysqliResult) {
+		$numFields = $mysqliResult->field_count;
+		$index = $j = 0;
+
+		while ($j < $numFields) {
+			$column = $mysqliResult->fetch_field($j);
+
+			if (!empty($column->table)) {
+				$this->map[$index++] = array($column->table, $column->name);
+			} else {
+				$this->map[$index++] = array(0, $column->name);
+			}
+			$j++;
+		}
 	}
 }
 
