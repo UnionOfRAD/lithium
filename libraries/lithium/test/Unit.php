@@ -276,6 +276,7 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
+	 * Tests a for result that does NOT match the expected regular expression pattern
 	 *
 	 * @param mixed $expected
 	 * @param mixed $result
@@ -286,6 +287,7 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
+	 * Tests a for result match in the expected regular expression pattern
 	 *
 	 * @param mixed $expected
 	 * @param mixed $result
@@ -364,7 +366,7 @@ class Unit extends \lithium\core\Object {
 					continue;
 				}
 
-				if (!empty($tags) && preg_match('/^preg\:\/(.+)\/$/i', $tags, $matches)) {
+				if (!empty($tags) && preg_match('/^regex\:\/(.+)\/$/i', $tags, $matches)) {
 					$tags = $matches[1];
 					$type = 'Regex matches';
 				} else {
@@ -387,7 +389,7 @@ class Unit extends \lithium\core\Object {
 				$explanations = array();
 
 				foreach ($attributes as $attr => $val) {
-					if (is_numeric($attr) && preg_match('/^preg\:\/(.+)\/$/i', $val, $matches)) {
+					if (is_numeric($attr) && preg_match('/^regex\:\/(.+)\/$/i', $val, $matches)) {
 						$attrs[] = $matches[1];
 						$explanations[] = sprintf('Regex "%s" matches', $matches[1]);
 						continue;
@@ -398,7 +400,7 @@ class Unit extends \lithium\core\Object {
 							$attr = $val;
 							$val = '.+?';
 							$explanations[] = sprintf('Attribute "%s" present', $attr);
-						} elseif (!empty($val) && preg_match('/^preg\:\/(.+)\/$/i', $val, $matches)) {
+						} elseif (!empty($val) && preg_match('/^regex\:\/(.+)\/$/i', $val, $matches)) {
 							$quotes = '"?';
 							$val = $matches[1];
 							$explanations[] = sprintf('Attribute "%s" matches "%s"', $attr, $val);
