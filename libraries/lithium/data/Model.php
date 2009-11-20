@@ -191,12 +191,17 @@ class Model extends \lithium\core\StaticObject {
 			$query = new $options['classes']['query'](array('type' => 'read') + $options);
 			$connection = $connections::get($name);
 
+			$result = $connection->read($query, $options);
+			if ($result === null) {
+				return null;
+			}
+
 			return new $options['classes']['recordSet'](array(
 				'query'    => $query,
 				'model'    => $options['model'],
 				'handle'   => &$connection,
 				'classes'  => $options['classes'],
-				'result'   => $connection->read($query, $options),
+				'result'   => &$result,
 				'exists'   => true
 			));
 		};

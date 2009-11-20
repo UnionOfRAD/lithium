@@ -8,13 +8,21 @@
 
 namespace lithium\util\reflection;
 
+/**
+ * A source code doc block parser.
+ *
+ * This parser may be used as the basis for a variety of secondary tools, including
+ * a reflection-based API generator, a code metrics analyzer, and various other possible
+ * use cases.
+ */
 class Docblock extends \lithium\core\StaticObject {
 
 	/**
-	 * undocumented function
+	 * Parses a doc block into its major components of `description`, `text` and `tags`.
 	 *
-	 * @param string $description 
-	 * @return array
+	 * @param string $description The doc block string to be parsed
+	 * @return array An associative array of the parsed comment, whose keys are `description`,
+	 *         `text` and `tags`
 	 * @todo Implement text
 	 */
 	public static function comment($description) {
@@ -70,11 +78,15 @@ class Docblock extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * undocumented function
+	 * Parses @<tagname> and their descriptions from a doc block.
 	 *
-	 * @param string $str 
-	 * @param string $options 
-	 * @return array
+	 * Currently supported tags are `todo`, `discuss`, `fix` and `important`.
+	 *
+	 * @param string $str The string to be parsed for tags
+	 * @param string $options Options array.
+	 * @return array A numerically indexed array of a associative arrays, with `type`, `text`
+	 *         and `line` keys.
+	 * @todo Actually implement useful $options
 	 */
 	public static function parse($str, $options = array()) {
 		$tagTypes = array('todo', 'discuss', 'fix', 'important');

@@ -1,3 +1,4 @@
 .DS_Store
 app/libraries/plugins/*
 app/tmp/*
+test.php

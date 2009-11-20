@@ -214,6 +214,12 @@ class Request extends \lithium\core\Object {
 			return (strpos($this->_env['SCRIPT_URI'], 'https://') === 0);
 		}
 
+		if ($key == 'SCRIPT_NAME') {
+			if ($this->_env['PLATFORM'] == 'CGI' || isset($this->_env['SCRIPT_URL'])) {
+				$key = 'SCRIPT_URL';
+			}
+		}
+
 		$val = array_key_exists($key, $this->_env) ? $this->_env[$key] : getenv($key);
 		$this->_env[$key] = $val;
 
