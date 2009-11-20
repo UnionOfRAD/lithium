@@ -7,4 +7,3 @@
 #
 clear
 exec php -q ${0/%li3/}lithium.php -working "$(pwd)" "$@"
-exit $?;
