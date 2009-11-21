@@ -102,28 +102,31 @@ class Code extends \lithium\g11n\catalog\adapters\Base {
 	public function write($category, $locale, $scope, $data) {}
 
 	/**
-	 * Parses a PHP file for translateable strings wrapped in `$t()` calls.
+	 * Parses a PHP file for messages marked as translatable.  Recognized as message
+	 * marking are `$t()` and `$tn()` which are implemented in the `View` class. This
+	 * is a rather simple and stupid parser but also fast and easy to grasp. It doesn't
+	 * actively attempt to detect and work around syntax errors in marker functions.
 	 *
 	 * @param string $file Absolute path to a PHP file.
 	 * @return array
-	 * @todo How should invalid entries be handled?
+	 * @see lithium\template\View
 	 */
 	protected function _parsePhp($file) {
 		$contents = file_get_contents($file);
-
-		if (strpos($contents, '$t(') === false) {
-			return array();
-		}
 
 		$defaults = array(
 			'singularId' => null,
 			'pluralId' => null,
 			'open' => false,
-			'concat' => false,
+			'position' => 0,
 			'occurrence' => array('file' => $file, 'line' => null)
 		);
 		extract($defaults);
 		$data = array();
+
+		if (strpos($contents, '$t(') === false && strpos($contents, '$tn(') == false) {
+			return $data;
+		}
 
 		$tokens = token_get_all($contents);
 		unset($contents);
@@ -133,28 +136,29 @@ class Code extends \lithium\g11n\catalog\adapters\Base {
 				$token = array(0 => null, 1 => $token, 2 => null);
 			}
 
-			if (!$open) {
-				if ($token[1] === '$t' && isset($tokens[$key + 1]) && $tokens[$key + 1] === '(') {
-					$open = true;
-					$occurrence['line'] = $token[2];
+			if ($open) {
+				if ($position >= ($open === 'singular' ? 1 : 2)) {
+					$this->_mergeMessageItem($data, array(
+						'singularId' => $singularId,
+						'pluralId' => $pluralId,
+						'occurrences' => array($occurrence),
+					));
+					extract($defaults, EXTR_OVERWRITE);
+				} elseif ($token[0] === T_CONSTANT_ENCAPSED_STRING) {
+					$type = isset($singularId) ? 'pluralId' : 'singularId';
+					$$type = $this->_formatMessage($token[1]);
+					$position++;
 				}
 			} else {
-				if ($token[1] === '.') {
-					$concat = true;
-				} elseif ($token[1] === ',') {
-					$concat = false;
-				} elseif ($token[0] === T_CONSTANT_ENCAPSED_STRING && !isset($pluralId)) {
-					$type = isset($singularId) ? 'pluralId' : 'singularId';
-					$$type = ($concat ? $$type : null) . $this->_formatMessage($token[1]);
-				} elseif ($token[0] !== T_WHITESPACE && $token[1] !== '(') {
-					if (isset($singularId)) {
-						$this->_mergeMessageItem($data, array(
-							'singularId' => $singularId,
-							'pluralId' => $pluralId,
-							'occurrences' => array($occurrence),
-						));
+				if (isset($tokens[$key + 1]) && $tokens[$key + 1] === '(') {
+					if ($token[1] === '$t') {
+						$open = 'singular';
+					} elseif ($token[1] === '$tn') {
+						$open = 'plural';
+					} else {
+						continue;
 					}
-					extract($defaults, EXTR_OVERWRITE);
+					$occurrence['line'] = $token[2];
 				}
 			}
 		}

@@ -11,25 +11,34 @@ namespace lithium\tests\cases\g11n\catalog\adapters;
 use \lithium\g11n\catalog\adapters\Code;
 
 if (false) {
-	$t('message 1');
-	$t('message 2', array('a' => 'b'));
+	$t('simple 1');
+
+	$t('options 1', null, array('locale' => 'en'));
+
+	$t('replace 1 {:a}', array('a' => 'b'));
 
 	$t($test['invalid']);
 	$t(32203);
-	$t('message 3', $test['invalid']);
-	$t('message 4', 32203);
+	$t('invalid 1', $test['invalid']);
+	$t('invalid 2', 32203);
+	$t('invalid 3', 'invalid 3b');
 
-	$t('message\n5');
-	$t("message\n6");
-	$t("message\r\n7");
-	$t('message
-	8');
+	$t('escaping\n1');
+	$t("escaping\n2");
+	$t("escaping\r\n3");
+	$t('escaping
+	4');
 
-	$t('singular 1', 'plural 1');
-	$t('singular 2', 'plural 2', array('a' => 'b'));
+	$tn('singular simple 1', 'plural simple 1', 3);
+	$tn('singular simple 2', 'plural simple 2');
 
 	$t('mixed 1');
-	$t('mixed 1', 'plural 3');
+	$tn('mixed 1', 'plural mixed 1', 3);
+
+	$t('mixed 2');
+	$tn('mixed 2', 'plural mixed 2', 3);
+	$t('mixed 2');
+	$t('plural mixed 2');
 }
 
 class CodeTest extends \lithium\test\Unit {
@@ -41,50 +50,128 @@ class CodeTest extends \lithium\test\Unit {
 		$this->adapter = new Code(compact('path'));
 	}
 
-	/**
-	 * Tests message string parsing, invalid values must be skipped.
-	 *
-	 * @return void
-	 */
-	public function testReadMessageTemplate() {
-		$result = $this->adapter->read('message.template', 'root', null);
+	public function testReadMessageTemplateTSimple() {
+		$results = $this->adapter->read('message.template', 'root', null);
 
-		/* Simple */
+		$expected = 'simple 1';
+		$result = $results['simple 1']['singularId'];
+		$this->assertEqual($expected, $result);
 
-		$this->assertEqual('message 1', $result['message 1']['singularId']);
-		$this->assertFalse($result['message 1']['pluralId']);
+		$result = $results['simple 1']['pluralId'];
+		$this->assertFalse($result);
+	}
 
-		$this->assertEqual('message 2', $result['message 2']['singularId']);
-		$this->assertFalse($result['message 2']['pluralId']);
+	public function testReadMessageTemplateTOptions() {
+		$results = $this->adapter->read('message.template', 'root', null);
 
-		$this->assertFalse(isset($result['32203']));
-		$this->assertFalse(isset($result[32203]));
+		$expected = 'options 1';
+		$result = $results['options 1']['singularId'];
+		$this->assertEqual($expected, $result);
 
-		$this->assertEqual('message 3', $result['message 3']['singularId']);
-		$this->assertFalse($result['message 3']['pluralId']);
+		$result = $results['options 1']['pluralId'];
+		$this->assertFalse($result);
+	}
 
-		$this->assertEqual('message 4', $result['message 4']['singularId']);
-		$this->assertFalse($result['message 4']['pluralId']);
+	public function testReadMessageTemplateTReplace() {
+		$results = $this->adapter->read('message.template', 'root', null);
 
-		/* Escaping */
+		$expected = 'replace 1 {:a}';
+		$result = $results['replace 1 {:a}']['singularId'];
+		$this->assertEqual($expected, $result);
 
-		$this->assertEqual('message\\\n5', $result['message\\\n5']['singularId']);
-		$this->assertEqual('message\n6', $result['message\n6']['singularId']);
-		$this->assertEqual('message\n7', $result['message\n7']['singularId']);
-		$this->assertEqual('message\n\t8', $result['message\n\t8']['singularId']);
+		$result = $results['replace 1 {:a}']['pluralId'];
+		$this->assertFalse($result);
+	}
 
-		/* Plurals */
+	public function testReadMessageTemplateTInvalid() {
+		$results = $this->adapter->read('message.template', 'root', null);
 
-		$this->assertEqual('singular 1', $result['singular 1']['singularId']);
-		$this->assertEqual('plural 1', $result['singular 1']['pluralId']);
+		$result = isset($results['32203']);
+		$this->assertFalse($result);
 
-		$this->assertEqual('singular 2', $result['singular 2']['singularId']);
-		$this->assertEqual('plural 2', $result['singular 2']['pluralId']);
+		$result = isset($results[32203]);
+		$this->assertFalse($result);
 
-		/* Merging simple and plural message strings */
+		$expected = 'invalid 1';
+		$result = $results['invalid 1']['singularId'];
+		$this->assertEqual($expected, $result);
 
-		$this->assertEqual('mixed 1', $result['mixed 1']['singularId'], 'mixed 1');
-		$this->assertEqual('plural 3', $result['mixed 1']['pluralId'], 'plural 3');
+		$result = $results['invalid 1']['pluralId'];
+		$this->assertFalse($result);
+
+		$expected = 'invalid 2';
+		$result = $results['invalid 2']['singularId'];
+		$this->assertEqual($expected, $result);
+
+		$result = $results['invalid 2']['pluralId'];
+		$this->assertFalse($result);
+
+		$expected = 'invalid 3';
+		$result = $results['invalid 3']['singularId'];
+		$this->assertEqual($expected, $result);
+
+		$result = $results['invalid 3']['pluralId'];
+		$this->assertFalse($result);
+	}
+
+	public function testReadMessageTemplateTEscaping() {
+		$results = $this->adapter->read('message.template', 'root', null);
+
+		$expected = 'escaping\\\n1';
+		$result = $results['escaping\\\n1']['singularId'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'escaping\n2';
+		$result = $results['escaping\n2']['singularId'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'escaping\n3';
+		$result = $results['escaping\n3']['singularId'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'escaping\n\t4';
+		$result = $results['escaping\n\t4']['singularId'];
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testReadMessageTemplateTnSimple() {
+		$results = $this->adapter->read('message.template', 'root', null);
+
+		$expected = 'singular simple 1';
+		$result = $results['singular simple 1']['singularId'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'plural simple 1';
+		$result = $results['singular simple 1']['pluralId'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'singular simple 2';
+		$result = $results['singular simple 2']['singularId'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'plural simple 2';
+		$result = $results['singular simple 2']['pluralId'];
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testReadMessageTemplateTnT() {
+		$results = $this->adapter->read('message.template', 'root', null);
+
+		$expected = 'mixed 1';
+		$result = $results['mixed 1']['singularId'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'plural mixed 1';
+		$result = $results['mixed 1']['pluralId'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'mixed 2';
+		$result = $results['mixed 2']['singularId'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'plural mixed 2';
+		$result = $results['mixed 2']['pluralId'];
+		$this->assertEqual($expected, $result);
 	}
 }
 
