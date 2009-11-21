@@ -259,6 +259,15 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
+	 * Clears the entire screen.
+	 *
+	 * @return void
+	 */
+	public function clear() {
+		passthru(substr(PHP_OS, 0, 3) == 'WIN' ? 'cls' : 'clear');
+	}
+
+	/**
 	 * Stop execution with exit
 	 *
 	 * @param integer $status

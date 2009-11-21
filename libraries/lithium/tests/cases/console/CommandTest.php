@@ -146,7 +146,6 @@ class CommandTest extends \lithium\test\Unit {
 		$expected = "What up dog?  \n > ";
 		$result = $command->response->output;
 		$this->assertEqual($expected, $result);
-
 	}
 
 	public function testInWithDefaultOption() {
@@ -161,7 +160,6 @@ class CommandTest extends \lithium\test\Unit {
 		$expected = "What up dog?  \n [y] > ";
 		$result = $command->response->output;
 		$this->assertEqual($expected, $result);
-
 	}
 
 	public function testInWithOptions() {
@@ -176,7 +174,6 @@ class CommandTest extends \lithium\test\Unit {
 		$expected = "Everything Cool? (y/n) \n > ";
 		$result = $command->response->output;
 		$this->assertEqual($expected, $result);
-
 	}
 }
 
