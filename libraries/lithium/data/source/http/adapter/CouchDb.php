@@ -190,11 +190,7 @@ class CouchDb extends \lithium\data\source\Http {
 			if (empty($path) && empty($conditions)) {
 				$path = '/_all_docs';
 			}
-			$ret = json_decode($conn->get($table . $path, $conditions));
-			if (isset($ret->error) && $ret->read = 'missing') {
-				return null;
-			}
-			return $ret;
+			return json_decode($conn->get($table . $path, $conditions));
 		});
 	}
 
