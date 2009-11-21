@@ -60,7 +60,7 @@ class MessageTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Häuser';
-		$result = Message::translate('house', array('count' => 5));
+		$result = Message::translate('house', null, array('count' => 5));
 		$this->assertEqual($expected, $result);
 	}
 }

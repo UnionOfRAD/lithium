@@ -60,10 +60,14 @@ class View extends \lithium\core\Object {
 		$h = function($data) use (&$h) {
 			return is_array($data) ? array_map($h, $data) : htmlspecialchars((string)$data);
 		};
-		$t = function($singular, $options = array()) {
-			return Message::translate($singular, $options);
+		$t = function($message, $replace = array(), $options = array()) {
+			return Message::translate($singular, $replace, $options);
 		};
-		$this->outputFilters += compact('h', 't');
+		$tn = function($message, $plural, $count, $replace = array(), $options = array()) {
+			$options += compact('plural',  'count');
+			return Message::translate($singular, $replace, $options);
+		};
+		$this->outputFilters += compact('h', 't', 'tn');
 	}
 
 	public function render($type, $data = array(), $options = array()) {

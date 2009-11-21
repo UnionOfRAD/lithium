@@ -14,40 +14,45 @@ use \lithium\g11n\Locale;
 use \lithium\g11n\Catalog;
 
 /**
- * The `Message` class is concerned with aspects of the globalization of static
- * message strings throughout the framework. Often the phrase of "translating a message"
- * is  used for referring to globalization of messages which leads to the false assumption
- * that this is a single step wheras it is a multi step process.
+ * The `Message` class is concerned with an aspect of globalizing static message strings
+ * throughout the framework and applications.  When referring to message globalization the
+ * phrase of _translating messages_ is widely used. This leads to the assumption that it's
+ * a single step process wheras it' a multi step one. A short description of each step is
+ * given here in order to help understanding the purpose of this class through the context
+ * of the process as a whole.
  *
- *  1. Marking messages as translateable.
- *  2. Extracting marked messages, creating a message template.
- *  3. Translating messages, storing the translation.
- *  4. Retrieving the translation for a message.
+ *  1. Marking messages as translateable.  `$t()` and `$tn()` (implemented in the `View`
+ *     class) are recognized as message marking and picked up by the extraction parser.
  *
- * This class provides methods for the first and the last step of the process. The second
- * one is dealt with by the `Catalog` class (see the description for `Message::translate()` for
- * more information). The actual translation of messages by translators happens outside of the
- * framework using external applications.
+ *  2. Extracting marked messages.  Messages can be extracted through the `g11n`
+ *     command which in turn utilizes the `Catalog` class with the builtin `Code`
+ *     adapter or other custom adapters which are concerned with extracting
+ *     translatable content.
+ *
+ *  3. Creating a message template from extracted messages.  Templates are created
+ *     by the `g11n` command using the `Catalog` class with an adapter for a format
+ *     you prefer.
+ *
+ *  4. Translating messages.  The actual translation of messages by translators
+ *     happens outside using external applications.
+ *
+ *  5. Storing translated messages.  Translations are most often stored by the external
+ *     applications itself.
+ *
+ *  6. Retrieving the translation for a message. See description for `Message::translate()`.
+ *
+ * @see lithium\template\View
+ * @see lithium\g11n\Catalog
+ * @see lithium\console\commands\G11n
+ * @see lithium\g11n\catalog\adapters\Code
  */
 class Message extends \lithium\core\StaticObject {
 
 	/**
-	 * This method serves two purposes.
-	 *
-	 * For one it is used to mark transalateable messages, which can be extracted by the `Catalog`
-	 * class using the `Code` adapter for creating message template files. Since the marked messages
-	 * will be later translated by others it is important to keep a few best practices in mind.
-	 *
-	 *   1. Use entire English sentences (as it gives context).
-	 *   2. Split paragraphs into multiple messages.
-	 *   3. Instead of string concatenation utilize `String::insert()`-style format strings.
-	 *   4. Avoid to embed markup into the messages.
-	 *   5. Do not escape i.e. quotation marks where possible.
-	 *
-	 * The other purpose it serves is to return the translation of a message according to
-	 * the current or provided locale and (if applicable) plural form.  The method can be used for
-	 * both single message or messages with a plural form. The provided message will be used as a
-	 * fall back if it isn't translateable. You may also use `String::insert()`-style placeholders
+	 * Returns the translation of a message according to the current or provided locale
+	 * and (if applicable) plural form.  The method can be used for both single message
+	 * or messages with a plural form. The provided message will be used as a fall back
+	 * if it isn't translateable. You may also use `String::insert()`-style placeholders
 	 * within message strings and provide replacements as a separate option.
 	 *
 	 * Usage:
@@ -57,28 +62,24 @@ class Message extends \lithium\core\StaticObject {
 	 * 	'plural' => 'houses', 'count' => 23
 	 * ));
 	 * Message::translate('Your {:color} paintings are looking just great.', array(
-	 * 	'replacements' => array('color' => 'silver'),
+	 * 	'replace' => array('color' => 'silver'),
 	 * 	'locale' => 'de'
 	 * ));
 	 * }}}
 	 *
 	 * @param string $singular Either a single or the singular form of the message.
+	 * @param array $replace An array with replacements for placeholders.
 	 * @param array $options Allowed keys are:
 	 *              - `'plural'`: Used as a fall back if needed.
 	 *              - `'count'`: Used to determine the correct plural form.
-	 *              - `'replacements'`: An array with replacements for placeholders.
 	 *              - `'locale'`: The target locale, defaults to current locale.
 	 *              - `'scope'`: The scope of the message.
 	 * @return string
-	 *
-	 * @see lithium\console\commands\g11n\Extract
-	 * @see lithium\g11n\catalog\adapters\Code
 	 */
-	public static function translate($singular, $options = array()) {
+	public static function translate($singular, $replace = array(), $options = array()) {
 		$defaults = array(
 			'plural' => null,
 			'count' => 1,
-			'replacements' => array(),
 			// 'locale' => Environment::get('G11n.locale')
 			'locale' => 'de',
 			'scope' => null
@@ -88,7 +89,7 @@ class Message extends \lithium\core\StaticObject {
 		if (!$translated = static::_translated($singular, $locale, $count, $scope)) {
 			$translated = $count == 1 ? $singular : $plural;
 		}
-		return String::insert($translated, $replacements);
+		return String::insert($translated, $replace);
 	}
 
 	/**
