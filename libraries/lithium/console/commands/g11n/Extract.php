@@ -11,55 +11,50 @@ namespace lithium\console\commands\g11n;
 use \Exception;
 use \DateTime;
 use \lithium\g11n\Catalog;
-use \lithium\util\String;
 
 /**
  * The `Extract` class is a command for extracting messages from files.
  */
 class Extract extends \lithium\console\Command {
 
+	public $source;
+
+	public $destination;
+
+	public $scope;
+
+	public function _init() {
+		parent::_init();
+		$this->source = $this->source ?: LITHIUM_APP_PATH;
+		$this->destination = $this->destination ?: LITHIUM_APP_PATH . '/extensions/g11n/data';
+	}
+
 	/**
-	 * The main method of the commad.
+	 * The main method of the command.
 	 *
 	 * @return void
 	 */
 	public function run() {
-		$sourcePath = LITHIUM_APP_PATH;
-		$destinationPath = LITHIUM_APP_PATH . '/resources/po/';
+		$this->header('Message Extraction');
 
-		$this->out('Extracting messages from source code.');
-		$this->hr();
-		$timeStart = microtime(true);
-
-		$data = $this->_extract($sourcePath);
-		$this->nl();
-		$this->out(String::insert('Yielded {:countItems} items taking {:duration} seconds.', array(
-			'countItems' => count($data['root']),
-			'duration' => round(microtime(true) - $timeStart, 4)
-		)));
-
-		$this->nl();
-		$this->out('Additional data.');
-		$this->hr();
-
-		$meta = $this->_meta();
-
-		$this->nl();
-		$this->out('Messages template.');
-		$this->hr();
-
-		$message  = 'Would you like to save the template now? ';
-		$message .= '(An existing template will be overwritten)';
-
-		if ($this->in($message, array('choices' => array('y', 'n'), 'default' => 'n')) != 'y') {
-			$this->stop(1, 'Aborting upon user request.');
+		if ($data = $this->_extract()) {
+			$count = count($data['root']);
+			$this->out("Yielded {$count} items.");
+		} else {
+			$this->err('Yielded no items.');
+			return 1;
 		}
 		$this->nl();
 
-		$this->_writeTemplate($data, $meta);
+		$this->header('Message Template Creation');
 
+		$meta = $this->_meta();
 		$this->nl();
-		$this->out('Done.');
+
+		$this->_writeTemplate($data, $meta);
+		$this->nl();
+
+		return 0;
 	}
 
 	/**
@@ -68,11 +63,46 @@ class Extract extends \lithium\console\Command {
 	 * @param array $files Absolute paths to files
 	 * @return array
 	 */
-	protected function _extract($path) {
-		Catalog::config(array(
-			'extract' => array('adapter' => 'Code', 'path' => $path)
-		));
-		return Catalog::read('message.template', 'root', array('name' => 'extract'));
+	protected function _extract() {
+		$message[] = 'A `Catalog` class configuration with an adapter that is capable of';
+		$message[] = 'handling read requests for the `message.template` category is needed';
+		$message[] = 'in order to proceed.';
+		$message[] = '';
+		$message[] = 'All such configurations (i.e. the ones already setup in the boostrap file)';
+		$message[] = 'will be used for the extraction process. If you are missing one or want to';
+		$message[] = 'add an extra one you can do this now.';
+		$this->out($message);
+		$this->nl();
+
+		$this->out('Available `Catalog` Configurations:');
+		foreach (array_keys(Catalog::config()->to('array')) as $name) {
+			$this->out("- {$name}");
+		}
+		$this->nl();
+
+		$message = 'Would you like to add a configuration?';
+		$add = $this->in($message, array('choices' => array('y', 'n'), 'default' => 'y')) == 'y';
+		$config = array();
+
+		while ($add) {
+			$adapter = $this->in('Adapter:', array(
+				'default' => 'Code'
+			));
+			$path = $this->in('Path:', array(
+				'default' => $this->source
+			));
+			$scope = $this->in('Scope:', array(
+				'default' => $this->scope
+			));
+			$config['runtime' . uniqid()] = compact('adapter', 'path', 'scope');
+
+			$message = 'Would you like to add another configuration?';
+			if ($this->in($message, array('choices' => array('y', 'n'), 'default' => 'n')) != 'y') {
+				break;
+			}
+		}
+		Catalog::config($config);
+		return Catalog::read('message.template', 'root');
 	}
 
 	/**
@@ -81,6 +111,11 @@ class Extract extends \lithium\console\Command {
 	 * @return array
 	 */
 	protected function _meta() {
+		$message[] = 'Please provide some data which is used when creating the';
+		$message[] = 'template.';
+		$this->out($message);
+		$this->nl();
+
 		$now = new DateTime();
 		return array(
 			'package' => $this->in('Package name:', array('default' => 'app')),
@@ -100,13 +135,51 @@ class Extract extends \lithium\console\Command {
 	 * @return void
 	 */
 	protected function _writeTemplate($data, $meta) {
-		$configs = Catalog::config()->to('array');
-		$name = $this->in('Please choose a config:', array(
-			'choices' => array_keys($configs),
-			'default' => 'extract'
+		$message[] = 'In order to proceed you need to choose a `Catalog` configuration';
+		$message[] = 'which is used for writing the template. The adapter for the configuration';
+		$message[] = 'should be capable of handling write requests for the `message.template`';
+		$message[] = 'category.';
+		$this->out($message);
+		$this->nl();
+
+		$names = array_keys((array)Catalog::config()->to('array'));
+
+		$this->out('Available `Catalog` Configurations:');
+		foreach ($names as $name) {
+			$this->out("- {$name}");
+		}
+		$this->nl();
+
+		$name = $this->in('Please choose a configuration or hit [enter] to add one:', array(
+			'choices' => $names
 		));
 
-		Catalog::write('message.template', 'root', compact('name'));
+		if (!$name) {
+			$adapter = $this->in('Adapter:', array(
+				'default' => 'Gettext'
+			));
+			$path = $this->in('Path:', array(
+				'default' => $this->destination
+			));
+			$scope = $this->in('Scope:', array(
+				'default' => $this->scope
+			));
+			$name =	'runtime' . uniqid();
+			$config[$name] = compact('adapter', 'path', 'scope');
+			Catalog::config($config);
+		}
+
+		$message = array();
+		$message[] = 'The template is now ready to be saved.';
+		$message[] = 'Please note that an existing template will be overwritten.';
+		$this->out($message);
+		$this->nl();
+
+		if ($this->in('Save?', array('choices' => array('y', 'n'), 'default' => 'n')) != 'y') {
+			$this->out('Aborting upon user request.');
+			$this->stop(1);
+		}
+		Catalog::write('message.template', $data, compact('name'));
 	}
 }
 

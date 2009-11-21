@@ -18,6 +18,7 @@ use \lithium\util\String;
  *
  * The adapter expects a the directory configured by the path options to be structured
  * according to the following example.
+ *
  * - `<path>`: This is the configured path.
  *   - `<locale>`: The directory for the well-formed <locale> i.e `'fr' or `'en_US'`.
  *     - `LC_MESSAGES`: The directory for the message category.
@@ -352,25 +353,26 @@ class Gettext extends \lithium\g11n\catalog\adapters\Base {
 			$item = $this->_formatMessageItem($key, $item);
 
 			foreach ($item['occurrences'] as $occurrence) {
-				$output[] = '#: ' . $occurrence['file'] . ':' . $occurrence['line'];
+				$output[] = "#: {$occurrence['file']}:{$occurrence['line']}";
 			}
 			foreach ($item['comments'] as $comment) {
-				$output[] = '#. ' . $comment;
+				$output[] = "#. {$comment}";
 			}
 			if ($item['fuzzy']) {
-				$output[] = '#, fuzzy';
+				$output[] = "#, fuzzy";
 			}
 
-			$output[] = 'msgid "' . $item['singularId'] . '"';
+			$output[] = "msgid \"{$item['singularId']}\"";
 
-			if (!isset($item['pluralId'])) {
-				$output[] = 'msgstr "' . $item['translated'] . '"';
-			} else {
-				$output[] = 'msgid_plural "' . $item['pluralId'] . '"';
+			if (isset($item['pluralId'])) {
+				$output[] = "msgid_plural \"{$item['pluralId']}\"";
 
-				foreach ($item['translated'] as $key => $value) {
-					$output[] = 'msgstr[' . $key . '] "' . $value . '"';
+				foreach ($item['translated'] ?: array(null, null) as $key => $value) {
+					$output[] = "msgstr[{$key}] \"{$value}\"";
 				}
+			} else {
+				$value = array_pop($item['translated']);
+				$output[] = "msgstr \"{$value}\"";
 			}
 			$output[] = '';
 			$output = implode("\n", $output) . "\n";

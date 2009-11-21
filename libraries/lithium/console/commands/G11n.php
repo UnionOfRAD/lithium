@@ -17,7 +17,7 @@ use \lithium\console\commands\g11n\Extract;
 class G11n extends \lithium\console\Command {
 
 	/**
-	 * The main method of the commad.
+	 * The main method of the command.
 	 *
 	 * @return void
 	 */
