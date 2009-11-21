@@ -68,7 +68,6 @@ class Service extends \lithium\core\Object {
 		'media'    => 'lithium\http\Media',
 		'request'  => '\lithium\http\Request',
 		'response' => '\lithium\http\Response',
-		'socket'   => 'lithium\util\socket\Stream'
 	);
 
 	/**
@@ -108,11 +107,7 @@ class Service extends \lithium\core\Object {
 	 * @return boolean
 	 */
 	public function connect() {
-		if (!$this->_connection) {
-			$socket = Libraries::locate('sockets.util', $this->_classes['socket']);
-			$this->_connection = new $socket($this->_config);
-		}
-		if (!$this->_isConnected && $this->_connection->open()) {
+		if (!$this->_isConnected && !empty($this->_config['protocol'])) {
 			$this->_isConnected = true;
 		}
 		return $this->_isConnected;
@@ -125,7 +120,7 @@ class Service extends \lithium\core\Object {
 	 */
 	public function disconnect() {
 		if ($this->_isConnected) {
-			$this->_isConnected = !$this->_connection->close();
+			$this->_isConnected = false;
 		}
 		return !$this->_isConnected;
 	}
@@ -188,16 +183,25 @@ class Service extends \lithium\core\Object {
 			return false;
 		}
 		$request = $this->_request($method, $path, $data, $options);
-
-		if ($this->_connection->write((string)$request)) {
-			$message = $this->_connection->read();
-			$response = new $this->_classes['response'](compact('message'));
-
+		$defaults = array(
+			'method' => null, 'content' => null,
+			'ignore_errors' => true, 'timeout' => 1,
+		);
+		$path = "http://{$this->_config['host']}:{$this->_config['port']}"
+			. $request->path . $request->queryString();
+		$context = stream_context_create(array('http' => $request->to('array') + $defaults));
+		$resource = fopen($path, 'r', false, $context);
+		if (is_resource($resource)) {
+			$meta = stream_get_meta_data($resource);
+			$headers = !empty($meta['wrapper_data']) ? $meta['wrapper_data'] : array();
+			$message = !empty($headers[0]) ? $headers[0] : null;
+			$body = stream_get_contents($resource);
+			$response = new $this->_classes['response'](compact('headers', 'body', 'message'));
 			$this->last = (object)compact('request', 'response');
-			$this->disconnect();
-
+			fclose($resource);
 			return ($options['return'] == 'body') ? $response->body() : $response;
 		}
+		return null;
 	}
 
 	/**
@@ -217,14 +221,15 @@ class Service extends \lithium\core\Object {
 		$request->path = str_replace('//', '/', "/{$path}");
 		$request->method = $method = strtoupper($method);
 		$media = $this->_classes['media'];
+		$type = null;
 
-		if ($data && !is_string($data) && in_array($options['type'], $media::types())) {
+		if (in_array($options['type'], $media::types()) && $data && !is_string($data)) {
 			$type = $media::type($options['type']);
 			$contentType = (array)$type['content'];
-
 			$request->headers(array('Content-Type' => current($contentType)));
 			$data = Media::encode($options['type'], $data, $options);
 		}
+
 		in_array($method, array('POST', 'PUT')) ? $request->body($data) : $request->params = $data;
 		return $request;
 	}

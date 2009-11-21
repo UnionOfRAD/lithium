@@ -34,13 +34,15 @@ class Stream extends \lithium\util\Socket {
 			return false;
 		}
 
-		$host = "{$config['protocol']}://{$config['host']}";
+		$host = "{$config['protocol']}://{$config['host']}:{$config['port']}";
+		$flags = STREAM_CLIENT_CONNECT;
 
 		if ($config['persistent']) {
-			$this->_resource = pfsockopen($host, $config['port'], $errorCode, $errorMessage);
-		} else {
-			$this->_resource = fsockopen($host, $config['port'], $errorCode, $errorMessage);
+			$flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT;
 		}
+		$this->_resource = stream_socket_client(
+			$host, $errorCode, $errorMessage, $config['timeout'], $flags
+		);
 
 		if (!empty($errorCode) || !empty($errorMessage)) {
 			throw new Exception($errorMessage, $errorCode);

@@ -149,6 +149,17 @@ class Request extends \lithium\http\Base {
 		return "?" . $this->params = substr($query, 0, -1);
 	}
 
+	public function to($type = 'string') {
+		if ($type == 'array') {
+			return array(
+				'method' => $this->method,
+				'content' => $this->body(),
+				'header' => $this->headers()
+			);
+		}
+		return (string) $this;
+	}
+
 	/**
 	 * magic method to convert object to string
 	 *
