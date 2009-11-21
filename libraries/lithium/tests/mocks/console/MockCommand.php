@@ -21,6 +21,8 @@ class MockCommand extends \lithium\console\Command {
 	public function testRun() {
 		return 'test run';
 	}
+
+	public function clear() {}
 }
 
 ?>
