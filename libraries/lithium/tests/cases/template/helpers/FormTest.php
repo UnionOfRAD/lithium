@@ -114,7 +114,7 @@ class FormTest extends \lithium\test\Unit {
 
 	public function testFormDataBinding() {
 		$record = new Record(array(
-			'model' => 'lithium\tests\mocks\template\helpers\FormPost',
+			'model' => 'lithium\tests\mocks\template\helpers\MockFormPost',
 			'data' => array(
 				'id' => '5',
 				'author_id' => '2',
