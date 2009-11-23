@@ -17,10 +17,9 @@ class CookieTest extends \lithium\test\Unit {
 		$value = preg_quote(urlencode($expected['value']), '/');
 		$expires = preg_quote(gmdate('D, d-M-Y H:i:s \G\M\T', strtotime($expected['expires'])), '/');
 		$path = preg_quote($expected['path'], '/');
-
 		$pattern = "/^Set\-Cookie:\sli3\[$key\]=$value;\sexpires=$expires;\spath=$path/";
-
 		$match = false;
+
 		foreach ($headers as $header) {
 			if (preg_match($pattern, $header)) {
 				$match = true;
@@ -84,6 +83,37 @@ class CookieTest extends \lithium\test\Unit {
 		$result = $closure($this->Cookie, $params, null);
 
 		$this->assertCookie(compact('key', 'value', 'expires', 'path'), headers_list());
+	}
+
+	public function testWriteArrayOfValues() {
+
+	}
+
+	public function testRead() {
+		$key = 'read';
+		$value = 'value to be read';
+		$_COOKIE[$key] = $value;
+
+		$closure = $this->Cookie->read($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Cookie, $params, null);
+
+		$this->assertEqual($value, $result);
+
+		$key = 'does_not_exist';
+		$closure = $this->Cookie->read($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Cookie, $params, null);
+
+		$this->assertNull($result);
+	}
+
+	public function testReadArrayOfValues() {
+
 	}
 
 }
