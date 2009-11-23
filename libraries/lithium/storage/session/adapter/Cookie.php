@@ -45,8 +45,11 @@ class Cookie extends \lithium\core\Object {
 	}
 
 	public function read($key, $options = array()) {
-		return function($self, $params, $chain) {
+		$config = $options + $this->_config;
 
+		return function($self, $params, $chain) use (&$config) {
+			extract($params);
+			return (isset($_COOKIE[$key])) ?: null;
 		};
 	}
 
