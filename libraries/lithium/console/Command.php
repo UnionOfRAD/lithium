@@ -69,6 +69,13 @@ class Command extends \lithium\core\Object {
 	public function _init() {
 		$config = (array)$this->_config['response'] + array('request' => $this->request);
 		$this->response = new $this->_classes['response']($config);
+
+		if ($this->request) {
+			foreach ((array)$this->request->params['named'] as $key => $param) {
+				$this->{$key} = $param;
+			}
+		}
+		$this->initialize();
 	}
 
 	/**
@@ -108,10 +115,6 @@ class Command extends \lithium\core\Object {
 		$result = null;
 
 		try {
-			foreach ((array)$this->request->params['named'] as $key => $param) {
-				$this->{$key} = $param;
-			}
-			$this->initialize();
 			$result = $this->invokeMethod($action, $passed);
 		} catch (Exception $e) {
 			// See todo

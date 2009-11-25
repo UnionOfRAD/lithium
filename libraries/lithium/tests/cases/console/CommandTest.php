@@ -27,6 +27,12 @@ class CommandTest extends \lithium\test\Unit {
 		$expected = array('working' => $this->working);
 		$result = $command->request->env;
 		$this->assertEqual($expected, $result);
+
+		$this->request->params['named'] = array(
+			'case' => 'lithium.tests.cases.console.CommandTest'
+		);
+		$command = new MockCommand(array('request' => $this->request));
+		$this->assertTrue(!empty($command->case));
 	}
 
 	public function testInvoke() {
@@ -34,13 +40,6 @@ class CommandTest extends \lithium\test\Unit {
 		$expected = 'test run';
 		$result = $command('testRun');
 		$this->assertEqual($expected, $result);
-
-		$command->request->params['named'] = array(
-			'case' => 'lithium.tests.cases.console.CommandTest'
-		);
-		$expected = 'test run';
-		$command('testRun');
-		$this->assertTrue(!empty($command->case));
 	}
 
 	public function testOut() {
