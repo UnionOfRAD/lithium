@@ -32,7 +32,7 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testTranslate() {
 		$data = array(
-			'de' => function($n) { return $n == 1 ? 0 : 1; }
+			'root' => function($n) { return $n == 1 ? 0 : 1; }
 		);
 		Catalog::write('message.plural', $data, array('name' => 'runtime'));
 
@@ -44,15 +44,15 @@ class MessageTest extends \lithium\test\Unit {
 		Catalog::write('message.page', $data, array('name' => 'runtime'));
 
 		$expected = 'Kuchen';
-		$result = Message::translate('lithium', null, array('locale' => 'de'));
+		$result = Message::translate('lithium', array('locale' => 'de'));
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Haus';
-		$result = Message::translate('house', null, array('locale' => 'de'));
+		$result = Message::translate('house', array('locale' => 'de'));
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Häuser';
-		$result = Message::translate('house', null, array('locale' => 'de', 'count' => 5));
+		$result = Message::translate('house', array('locale' => 'de', 'count' => 5));
 		$this->assertEqual($expected, $result);
 	}
 }

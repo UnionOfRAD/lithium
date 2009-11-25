@@ -9,7 +9,6 @@
 namespace lithium\g11n;
 
 use \lithium\core\Environment;
-use \lithium\util\String;
 use \lithium\g11n\Locale;
 use \lithium\g11n\Catalog;
 
@@ -49,83 +48,66 @@ use \lithium\g11n\Catalog;
 class Message extends \lithium\core\StaticObject {
 
 	/**
-	 * Returns the translation of a message according to the current or provided locale
-	 * and (if applicable) plural form.  The method can be used for both single message
-	 * or messages with a plural form. The provided message will be used as a fall back
-	 * if it isn't translateable. You may also use `String::insert()`-style placeholders
-	 * within message strings and provide replacements as a separate option.
+	 * Translates a message according to the current or provided locale
+	 * and into it's correct plural form.
 	 *
 	 * Usage:
 	 * {{{
 	 * Message::translate('Mind the gap.');
-	 * Message::translate('house', array(
-	 * 	'plural' => 'houses', 'count' => 23
-	 * ));
-	 * Message::translate('Your {:color} paintings are looking just great.', array(
-	 * 	'replace' => array('color' => 'silver'),
-	 * 	'locale' => 'de'
-	 * ));
+	 * Message::translate('house', array('count' => 23));
 	 * }}}
 	 *
-	 * @param string $singular Either a single or the singular form of the message.
-	 * @param array $replace An array with replacements for placeholders.
-	 * @param array $options Allowed keys are:
-	 *              - `'plural'`: Used as a fall back if needed.
+	 * @param string $id The id to use when looking up the translation.
+	 * @param array $options Valid options are:
 	 *              - `'count'`: Used to determine the correct plural form.
 	 *              - `'locale'`: The target locale, defaults to current locale.
 	 *              - `'scope'`: The scope of the message.
-	 * @return string
+	 * @return string|void The translation or `null` if none could be found.
+	 * @filter
 	 */
-	public static function translate($singular, $replace = array(), $options = array()) {
+	public static function translate($id, $options = array()) {
+		$params = array($id, $options);
+		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
+			return $self::invokeMethod('_translated', $params);
+		});
+	}
+
+	/**
+	 * Retrieves translations through the `Catalog` class by using `$id` as the lookup
+	 * key and taking the current or - if specified - the provided locale as well as the
+	 * scope into account.  Hereupon the correct plural form is determined by passing the
+	 * value of the `'count'` option to a closure.
+	 *
+	 * @param string $id The lookup key.
+	 * @param array $options Valid options are:
+	 *              - `'count'`: Used to determine the correct plural form.
+	 *              - `'locale'`: The target locale, defaults to current locale.
+	 *              - `'scope'`: The scope of the message.
+	 * @return string|void The translation or `null` if none could be found or the plural
+	 *         form could not be determined.
+	 * @see lithium\g11n\Catalog
+	 * @todo Message pages need caching.
+	 */
+	protected static function _translated($id, $options = array()) {
 		$defaults = array(
-			'plural' => null,
 			'count' => 1,
-			// 'locale' => Environment::get('G11n.locale')
-			'locale' => 'de',
+			// 'locale' => Environment::get('g11n.locale'),
+			'locale' => null,
 			'scope' => null
 		);
 		extract($options + $defaults);
 
-		if (!$translated = static::_translated($singular, $locale, $count, $scope)) {
-			$translated = $count == 1 ? $singular : $plural;
-		}
-		return String::insert($translated, $replace);
-	}
+		$page = Catalog::read('message.page', $locale, compact('scope'));
+		$plural = Catalog::read('message.plural', $locale);
 
-	/**
-	 * Retrieves the translation for a message ID.  Uses the `Catalog` class to
-	 * access translation data and determines the correct plural form (if applicable).
-	 *
-	 * @param string $id The message ID.
-	 * @param string $locale The target locale.
-	 * @param integer $count Used to determine the correct plural form.
-	 * @param string $scope The scope of the message ID.
-	 * @return string|void The translated message or `null` if `$singular` is not
-	 *         translateable or a plural rule couldn't be found.
-	 * @see lithium\g11n\Catalog
-	 * @todo Message pages need caching.
-	 */
-	protected static function _translated($id, $locale, $count = null, $scope = null) {
-		$result = Catalog::read('message.page', $locale, compact('scope'));
-
-		if (empty($result[$locale][$id]['translated'])) {
+		if (empty($page[$locale][$id]['translated']) || !isset($plural[$locale])) {
 			return null;
 		}
-		$translated = $result[$locale][$id]['translated'];
+		$translated = $page[$locale][$id]['translated'];
+		$key = $plural[$locale]($count);
 
-		if (isset($count)) {
-			$result = Catalog::read('message.plural', $locale);
-
-			if (!isset($result[$locale])) {
-				return null;
-			}
-			$key = $result[$locale]($count);
-
-			if (isset($translated[$key])) {
-				return $translated[$key];
-			}
-		} else {
-			return array_shift($translated);
+		if (isset($translated[$key])) {
+			return $translated[$key];
 		}
 	}
 }
