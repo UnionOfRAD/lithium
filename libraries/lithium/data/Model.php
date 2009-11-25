@@ -10,7 +10,6 @@ namespace lithium\data;
 
 use \lithium\util\Set;
 use \lithium\util\Inflector;
-use \lithium\util\Validator;
 
 /**
  * Model class
@@ -397,16 +396,18 @@ class Model extends \lithium\core\StaticObject {
 
 	public function validates($record, $options = array()) {
 		$self = static::_instance();
+		$validator = $self->_classes['validator'];
 		$params = compact('record', 'options');
-		return static::_filter(__METHOD__, $params, function($parent, $params) use ($self) {
+		$filter = function($parent, $params) use ($self, $validator) {
 			extract($params);
-			$errors = Validator::check($record->data(), $self->validates, $options);
+			$errors = $validator::check($record->data(), $self->validates, $options);
 			if (empty($errors)) {
 				return true;
 			}
 			$record->errors($errors);
 			return false;
-		});
+		};
+		return static::_filter(__METHOD__, $params, $filter);
 	}
 
 	public function delete($record, $options = array()) {
