@@ -140,7 +140,7 @@ Libraries::add('app');
  * Globalization runtime data.  You can add globalized data during runtime utilizing a
  * configuration set up to use the _memory_ adapter.
  */
-// $data = array('en' => function($n) { return $n != 1 ? 1 : 0; });
+// $data = array('root' => function($n) { return $n != 1 ? 1 : 0; });
 // Catalog::write('message.plural', $data, array('name' => 'runtime'));
 
 /**
