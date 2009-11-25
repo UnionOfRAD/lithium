@@ -99,7 +99,7 @@ class Service extends \lithium\core\Object {
 			$this->_connection = new $class($this->_config['transportOptions']);
 		}
 		if (!$this->_isConnected && $this->_config['protocol']) {
-			$this->_isConnected = $this->_connection->connect();
+			$this->_isConnected = $this->_connection->open();
 		}
 		return $this->_isConnected;
 	}

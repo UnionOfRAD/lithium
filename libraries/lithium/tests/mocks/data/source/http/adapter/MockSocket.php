@@ -46,5 +46,9 @@ class MockSocket extends \lithium\util\Socket {
 	public function encoding($charset) {
 		return true;
 	}
+	
+	public function send() {
+		
+	}
 }
 ?>
