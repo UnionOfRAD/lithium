@@ -22,11 +22,11 @@ use \lithium\util\String;
  * others on a case-by-case basis.
  *
  * `Libraries` also handles service location. Various 'types' of classes can be defined by name,
- * using 'class patterns', which define conventions for organizing classes, i.e. `'models'` is
+ * using _class patterns_, which define conventions for organizing classes, i.e. `'models'` is
  * `'{:library}\models\{:name}'`, which will find a model class in any registered app, plugin or
- * vendor library that follows that path convention. You can find classes by name (see `locate()`
- * for more information on class-locating precedence), or find all models in all registered
- * libraries (apps/plugins/vendor libs, etc).
+ * vendor library that follows that path (namespace) convention. You can find classes by name (see
+ * `locate()` for more information on class-locating precedence), or find all models in all
+ * registered libraries (apps / plugins / vendor libraries, etc).
  *
  * @see lithium\core\Libraries::add()
  * @see lithium\core\Libraries::locate()
@@ -112,7 +112,7 @@ class Libraries {
 	);
 
 	/**
-	 * Holds cached class paths generated and used by lithium\core\Libraries::load().
+	 * Holds cached class paths generated and used by `lithium\core\Libraries::load()`.
 	 *
 	 * @var array
 	 * @see lithium\core\Libraries::load()
@@ -122,26 +122,27 @@ class Libraries {
 	/**
 	 * Adds a class library from which files can be loaded
 	 *
-	 * @param string $name Library name, i.e. 'app', 'lithium', 'pear' or 'solar'.
+	 * @param string $name Library name, i.e. `'app'`, `'lithium'`, `'pear'` or `'solar'`.
 	 * @param array $options Specifies where the library is in the filesystem, and how classes
 	 *              should be loaded from it.  Allowed keys are:
-	 *              - 'path': The directory containing the library.
-	 *              - 'loader': An auto-loader method associated with the library, if any
-	 *              - 'bootstrap': A file path (relative to 'path') to a bootstrap script that
+	 *              - `'path'`: The directory containing the library.
+	 *              - `'loader'`: An auto-loader method associated with the library, if any
+	 *              - `'bootstrap'`: A file path (relative to `'path'`) to a bootstrap script that
 	 *                should be run when the library is added.
-	 *              - 'prefix': The class prefix this library uses, i.e. 'lithium\', 'Zend_'
-	 *                or 'Solar_'.
-	 *              - 'suffix': Gets tacked on to the end of the file name.  For example, most
-	 *                libraries end classes in '.php', but some use '.class.php', or '.inc.php'.
-	 *              - 'transform': Defines a custom way to transform a class name into its
+	 *              - `'prefix'`: The class prefix this library uses, i.e. `'lithium\'`, `'Zend_'`
+	 *                or `'Solar_'`.
+	 *              - `'suffix'`: Gets appended to the end of the file name. For example, most
+	 *                libraries end classes in `'.php'`, but some use `'.class.php'`, or
+	 *                `'.inc.php'`.
+	 *              - `'transform'`: Defines a custom way to transform a class name into its
 	 *                corresponding file path.  Accepts either an array of two strings which
 	 *                are interpreted as the pattern and replacement for a regex, or an
 	 *                anonymous function, which receives the class name as a parameter, and
 	 *                returns a file path as output.
-	 *              - 'defer': If true, indicates that, when locating classes, this library should
+	 *              - `'defer'`: If true, indicates that, when locating classes, this library should
 	 *                defer to other libraries in order of preference.
-	 *              - 'includePath': If true, appends the absolutely-resolved value of `'path'` to
-	 *                the PHP include path.
+	 *              - `'includePath'`: If `true`, appends the absolutely-resolved value of `'path'`
+	 *                to the PHP include path.
 	 * @return array Returns the resulting set of options created for this library.
 	 */
 	public static function add($name, $config = array()) {
@@ -292,12 +293,11 @@ class Libraries {
 	/**
 	 * Get the corresponding physical file path for a class or namespace name.
 	 *
-	 * @param string $class The class name to locate the physical file for. If `$options['dirs`]` is
+	 * @param string $class The class name to locate the physical file for. If `$options['dirs']` is
 	 *        set to `true`, `$class` may also be a namespace name, in which case the corresponding
 	 *        directory will be located.
 	 * @param array $options Options for converting `$class` to a phyiscal path:
-	 *
-	 *        - 'dirs': Defaults to `false`. If true, will attempt to case-sensitively look up
+	 *        - `'dirs'`: Defaults to `false`. If `true`, will attempt to case-sensitively look up
 	 *          directories in addition to files (in which case `$class` is assumed to actually be a
 	 *          namespace).
 	 * @return string Returns the absolute path to the file containing `$class`, or `null` if the
