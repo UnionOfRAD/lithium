@@ -13,17 +13,14 @@ use \lithium\data\source\Http;
 class HttpTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
-		'classes' => array(
-			'service' => '\lithium\http\service\adapter\Socket',
-			'socket' => '\lithium\tests\mocks\data\source\http\adapter\MockSocket'
-		),
 		'persistent' => false,
 		'protocol' => 'tcp',
 		'host' => 'localhost',
 		'login' => 'root',
 		'password' => '',
 		'port' => 80,
-		'timeout' => 2
+		'timeout' => 2,
+		'transport' => '\lithium\tests\mocks\data\source\http\adapter\MockSocket'
 	);
 
 	public function testAllMethodsNoConnection() {
