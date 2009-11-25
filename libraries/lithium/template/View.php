@@ -9,7 +9,6 @@
 namespace lithium\template;
 
 use \RuntimeException;
-use \lithium\util\String;
 use \lithium\core\Libraries;
 use \lithium\g11n\Message;
 
@@ -60,12 +59,15 @@ class View extends \lithium\core\Object {
 		$h = function($data) use (&$h) {
 			return is_array($data) ? array_map($h, $data) : htmlspecialchars((string)$data);
 		};
-		$t = function($message, $replace = array(), $options = array()) {
-			return Message::translate($singular, $replace, $options);
+		$t = function($message, $options = array()) {
+			return Message::translate($message, $options + array(
+				'default' => $message
+			));
 		};
-		$tn = function($message, $plural, $count, $replace = array(), $options = array()) {
-			$options += compact('plural',  'count');
-			return Message::translate($singular, $replace, $options);
+		$tn = function($message1, $message2, $count, $options = array()) {
+			return Message::translate($message1, $options + compact('count') + array(
+				'default' => $count == 1 ? $message1 : $message2
+			));
 		};
 		$this->outputFilters += compact('h', 't', 'tn');
 	}
