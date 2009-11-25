@@ -97,15 +97,9 @@ class Stream extends \lithium\util\Socket {
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
-
-		$buffer = null;
-		if (is_null($length)) {
-			$buffer = stream_get_contents($this->_resource);
-		} else {
-			$buffer = stream_get_contents($this->_resource, $length, $offset);
-		}
-
-		return $buffer;
+		return is_null($length) ? stream_get_contents($this->_resource) : stream_get_contents(
+			$this->_resource, $length, $offset
+		);
 	}
 
 	/**
@@ -145,12 +139,10 @@ class Stream extends \lithium\util\Socket {
 	 * @see http://www.php.net/manual/en/function.stream-encoding.php
 	 */
 	public function encoding($charset) {
-		if (function_exists('stream_encoding')) {
-			if (!is_resource($this->_resource)) {
-				return false;
-			}
-			return stream_encoding($this->_resource, $charset);
+		if (!function_exists('stream_encoding')) {
+			return false;
 		}
+		return is_resource($this->_resource) ? stream_encoding($this->_resource, $charset) : false;
 	}
 }
 
