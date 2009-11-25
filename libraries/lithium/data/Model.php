@@ -377,11 +377,13 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * @param object $record The record or document object to be saved in the database.
 	 * @param array $data Any data that should be assigned to the record before it is saved.
-	 *        -'callbacks': If `false`, all callbacks will be disabled before executing. Defaults to
-	 *         `true`.
-	 *        -'validate': If `false`, validation will be skipped, and the record will be
-	 *         immediately saved. Defaults to `true`.
-	 *        -'whitelist': An array of fields that are allowed to be saved to this record.
+	 * @param array $options Options:
+	 *      - 'callbacks': If `false`, all callbacks will be disabled before executing. Defaults to
+	 *       `true`.
+	 *      - 'validate': If `false`, validation will be skipped, and the record will be immediately
+	 *        saved. Defaults to `true`.
+	 *      - 'whitelist': An array of fields that are allowed to be saved to this record.
+	 *
 	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
 	 */
 	public function save($record, $data = null, $options = array()) {
