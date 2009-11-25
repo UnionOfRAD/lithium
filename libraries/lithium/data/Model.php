@@ -61,16 +61,16 @@ class Model extends \lithium\core\StaticObject {
 	 * Specifies all meta-information for this model class, including the name of the data source it
 	 * connects to, how it interacts with that class, and how its data structure is defined.
 	 *
+	 * - `connection`: The name of the connection (as defined in `Connections::add()`) to which the
+	 *   model should bind
 	 * - `key`: The primary key or identifier key for records / documents this model produces,
 	 *   i.e. `'id'` or `array('_id', '_rev')`. Defaults to `'id'`.
 	 * - `name`: The canonical name of this model. Defaults to the class name.
-	 * - `title`: The field or key used as the title for each record. Defaults to `'title'` or
-	 *   `'name'`, if those fields are available.
 	 * - `source`: The name of the database table or document collection to bind to. Defaults to the
 	 *   lower-cased and underscored name of the class, i.e. `class UserProfile` maps to
 	 *   `'user_profiles'`.
-	 * - `connection`: The name of the connection (as defined in `Connections::add()`) to which the
-	 *   model should bind
+	 * - `title`: The field or key used as the title for each record. Defaults to `'title'` or
+	 *   `'name'`, if those fields are available.
 	 *
 	 * @var array
 	 * @see lithium\data\Connections::add()
@@ -379,11 +379,11 @@ class Model extends \lithium\core\StaticObject {
 	 * @param array $data Any data that should be assigned to the record before it is saved.
 	 * @param array $options Options:
 	 *
+	 *        -'callbacks': If `false`, all callbacks will be disabled before executing. Defaults to
+	 *         `true`.
 	 *        -'validate': If `false`, validation will be skipped, and the record will be
 	 *         immediately saved. Defaults to `true`.
 	 *        -'whitelist': An array of fields that are allowed to be saved to this record.
-	 *        -'callbacks': If `false`, all callbacks will be disabled before executing. Defaults to
-	 *         `true`.
 	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
 	 */
 	public function save($record, $data = null, $options = array()) {
