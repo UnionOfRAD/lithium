@@ -16,21 +16,6 @@ use \lithium\core\Libraries;
 class Service extends \lithium\core\Object {
 
 	/**
-	 * Request Object
-	 *
-	 * @var object
-	 */
-	public $request =  null;
-
-	/**
-	 * Holds all parameters of the request
-	 * Cast to object in the constructor
-	 *
-	 * @var object
-	 */
-	public $response = null;
-
-	/**
 	 * Holds the request and response used by send
 	 *
 	 * @var object
@@ -65,7 +50,7 @@ class Service extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'media'    => 'lithium\http\Media',
+		'media'    => '\lithium\http\Media',
 		'request'  => '\lithium\http\Request',
 		'response' => '\lithium\http\Response',
 	);
@@ -89,7 +74,9 @@ class Service extends \lithium\core\Object {
 			'port'       => 80,
 			'timeout'    => 1,
 			'encoding'   => 'UTF-8',
-			'classes'    => array()
+			'classes'    => array(),
+			'transport'  => 'Context',
+			'transportOptions' => array()
 		);
 		$config = (array)$config + $defaults;
 
@@ -107,8 +94,12 @@ class Service extends \lithium\core\Object {
 	 * @return boolean
 	 */
 	public function connect() {
-		if (!$this->_isConnected && !empty($this->_config['protocol'])) {
-			$this->_isConnected = true;
+		if (!$this->_connection) {
+			$class = Libraries::locate('sockets.util', $this->_config['transport']);
+			$this->_connection = new $class($this->_config['transportOptions']);
+		}
+		if (!$this->_isConnected && $this->_config['protocol']) {
+			$this->_isConnected = $this->_connection->connect();
 		}
 		return $this->_isConnected;
 	}
@@ -179,29 +170,17 @@ class Service extends \lithium\core\Object {
 		$defaults = array('type' => 'form', 'return' => 'body');
 		$options += $defaults;
 
-		if ($this->connect() === false) {
-			return false;
+		if (!$this->connect()) {
+			return;
 		}
 		$request = $this->_request($method, $path, $data, $options);
-		$defaults = array(
-			'method' => null, 'content' => null,
-			'ignore_errors' => true, 'timeout' => 1,
-		);
-		$path = "http://{$this->_config['host']}:{$this->_config['port']}"
-			. $request->path . $request->queryString();
-		$context = stream_context_create(array('http' => $request->to('array') + $defaults));
-		$resource = fopen($path, 'r', false, $context);
-		if (is_resource($resource)) {
-			$meta = stream_get_meta_data($resource);
-			$headers = !empty($meta['wrapper_data']) ? $meta['wrapper_data'] : array();
-			$message = !empty($headers[0]) ? $headers[0] : null;
-			$body = stream_get_contents($resource);
-			$response = new $this->_classes['response'](compact('headers', 'body', 'message'));
+		$sendOptions = array('responseClass' => $this->_classes['response']);
+
+		if ($response = $this->_connection->send($request, $sendOptions)) {
 			$this->last = (object)compact('request', 'response');
-			fclose($resource);
+			$this->disconnect();
 			return ($options['return'] == 'body') ? $response->body() : $response;
 		}
-		return null;
 	}
 
 	/**
