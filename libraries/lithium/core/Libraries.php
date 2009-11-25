@@ -86,12 +86,12 @@ class Libraries {
 			'{:library}\extensions\sockets\{:name}',
 			'{:library}\{:class}\socket\{:name}' => array('libraries' => 'lithium')
 		),
-		'testFilters' => array(
-			'{:library}\tests\filters\{:name}',
-			'{:library}\test\filters\{:name}' => array('libraries' => 'lithium')
+		'test' => array(
+			'{:library}\extensions\test\{:namespace}\{:class}\{:name}',
+			'{:library}\test\{:namespace}\{:class}\{:name}' => array('libraries' => 'lithium')
 		),
 		'tests' => array(
-			'{:library}\tests\cases\{:namespace}\{:name}Test'
+			'{:library}\tests\{:namespace}\{:class}\{:name}Test'
 		)
 	);
 
@@ -363,6 +363,9 @@ class Libraries {
 	 * @see lithium\core\Libraries::add()
 	 */
 	public static function locate($type, $name = null, $options = array()) {
+		$defaults = array('type' => 'class');
+		$options += $defaults;
+
 		if (is_object($name) || strpos($name, '\\') !== false) {
 			return $name;
 		}
@@ -435,21 +438,22 @@ class Libraries {
 				continue;
 			}
 
-			foreach ($paths as $pathTemplate => $options) {
+			foreach ($paths as $pathTemplate => $pathOptions) {
 				if (is_int($pathTemplate)) {
-					$pathTemplate = $options;
-					$options = array();
+					$pathTemplate = $pathOptions;
+					$pathOptions = array();
 				}
+				$options += $pathOptions;
+
 				$scope = isset($options['libraries']) ? (array)$options['libraries'] : null;
 
 				if ($scope && !in_array($library, $scope)) {
 					continue;
 				}
 				$params['library'] = $library;
-				$classPath = str_replace('\\*', '', String::insert($pathTemplate, $params));
-
-				if (file_exists(Libraries::path($classPath))) {
-					return $classPath;
+				$class = str_replace('\\*', '', String::insert($pathTemplate, $params));
+				if (file_exists($file = Libraries::path($class, $options))) {
+					return ($options['type'] === 'file') ? $file : $class;
 				}
 			}
 		}

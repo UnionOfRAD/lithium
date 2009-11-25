@@ -6,13 +6,16 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\mocks\test;
+namespace lithium\tests\cases\test;
 
-class MockUnitTest extends \lithium\test\Unit {
+use \lithium\test\Controller;
 
-	public function testNothing() {
-		$this->assertTrue(true);
+class ControllerTest extends \lithium\test\Unit {
+
+	public function setUp() {
+		$this->controller = new Controller();
 	}
+
 }
 
 ?>
