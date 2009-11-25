@@ -9,6 +9,7 @@
 namespace lithium\test\reporter;
 
 use lithium\util\String;
+use lithium\http\Router;
 
 /**
  * Html Reporter
@@ -91,27 +92,31 @@ class Html extends \lithium\test\Reporter {
 	 *
 	 * @param string $type group, case or null
 	 * @param string $params
-	 *               - namespace
-	 *               - name
-	 *               - menu
+	 *               - request: a request object
+	 *               - namespace: namespace for test case
+	 *               - name: test case class name
+	 *               - menu: current menu string for recursive construction
 	 * @return void
 	 */
 	protected function _item($type, $params = array()) {
 		$defaults = array(
-			'namespace' => null, 'name' => null, 'menu' => null
+			'request' => null, 'namespace' => null, 'name' => null, 'menu' => null
 		);
 		$params += $defaults;
+		extract($params);
+
+		$controller = array('controller' => '\lithium\test\Controller');
+
 		if ($type == 'group') {
-			return '<li><a href="?'. String::insert(
-				'group={:namespace}">{:name}</a>{:menu}</li>', $params
-			);
+			$url = Router::match($controller + array('args' => $namespace) ?: '', $request);
+			return "<li><a href=\"{$url}\">{$name}</a>{$menu}</li>";
 		}
+
 		if ($type == 'case') {
-			return '<li><a href="?'. String::insert(
-				'case={:namespace}\{:name}">{:name}</a></li>', $params
-			);
+			$url = Router::match($controller + array('args' =>"{$namespace}/{$name}") ?: '', $request);
+			return "<li><a href=\"{$url}\">{$name}</a></li>";
 		}
-		return String::insert('<ul>{:menu}</ul>', $params);
+		return "<ul>{$menu}</ul>";
 	}
 }
 

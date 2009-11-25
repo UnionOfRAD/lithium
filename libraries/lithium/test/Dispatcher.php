@@ -41,23 +41,41 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *		  - 'case': The fully namespaced test case to be run.
 	 *        - 'group': The fully namespaced test group to be run.
 	 *		  - 'filters': An array of filters that the test output should be run through.
-	 * @return array A compactified array of the title, an array of the results, as well
-	 *         as an additional array of the restults after the $options['filters']
+	 * @return array A compact array of the title, an array of the results, as well
+	 *         as an additional array of the results after the $options['filters']
 	 *         have been applied.
 	 */
 	public static function run($group = null, $options = array()) {
 		$defaults = array(
-			'case' => null,
-			'group' => null,
+			'title' => $group,
 			'filters' => array(),
 			'reporter' => 'text'
 		);
 		$options += $defaults;
 
-		$options['title'] = $options['case'] ?: $options['group'];
+		$items = (array) $group;
+		$isCase = preg_match('/Test$/', $group);
+
+		if ($isCase) {
+			$items = array(new $group());
+		}
 		$options['filters'] = Set::normalize($options['filters']);
-		$report = static::_report($options);
+		$group = static::_group($items);
+		$report = static::_report($group, $options);
 		return $report;
+	}
+
+	/**
+	 * Creates the group class based
+	 *
+	 * @param array $items array of cases or groups
+	 * @return object Group object constructed with $items
+	 * @see \lithium\test\Dispatcher::$_classes
+	 */
+	protected static function _group($items) {
+		$group = Libraries::locate('test', static::$_classes['group']);
+		$class = new $group(compact('items'));
+		return $class;
 	}
 
 	/**
@@ -69,16 +87,10 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @return object Group object constructed with the test case or group passed in $options.
 	 * @see \lithium\test\Dispatcher::$_classes
 	 */
-	protected static function _report($options) {
-		if (!empty($options['case'])) {
-			$items = array(new $options['case']);
-		} elseif (isset($options['group'])) {
-			$items = (array)$options['group'];
-		}
-
-		$group = new static::$_classes['group'](compact('items'));
-		$report = new static::$_classes['report'](compact('group') + $options);
-		return $report;
+	protected static function _report($group, $options) {
+		$report = Libraries::locate('test', static::$_classes['report']);
+		$class = new $report(compact('group') + $options);
+		return $class;
 	}
 
 }

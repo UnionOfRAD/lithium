@@ -9,6 +9,8 @@
 namespace lithium\tests\cases\test\reporter;
 
 use \lithium\test\reporter\Html;
+use \lithium\action\Request;
+
 
 class HtmlTest extends \lithium\test\Unit {
 
@@ -23,21 +25,21 @@ class HtmlTest extends \lithium\test\Unit {
 	}
 
 	public function testFormatGroup() {
-		$expected = '<ul><li><a href="?group=\lithium\tests">lithium</a>';
-		$expected .= '<ul><li><a href="?group=\lithium\tests\cases">cases</a>';
-		$expected .= '<ul><li><a href="?group=\lithium\tests\cases\core">core</a>';
-		$expected .= '<ul><li><a href="?case=\lithium\tests\cases\core\LibrariesTest">LibrariesTest</a></li>';
+		$expected = '<ul><li><a href="/test/lithium/tests">lithium</a>';
+		$expected .= '<ul><li><a href="/test/lithium/tests/cases">cases</a>';
+		$expected .= '<ul><li><a href="/test/lithium/tests/cases/core">core</a>';
+		$expected .= '<ul><li><a href="/test/lithium/tests/cases/core/LibrariesTest">LibrariesTest</a></li>';
 		$expected .= '</ul></li></ul></li></ul></li></ul>';
 		$result = $this->html->menu(array('lithium\tests\cases\core\LibrariesTest'), array(
-			'format' => 'html', 'tree' => true
+			'format' => 'html', 'tree' => true, 'request' => new Request()
 		));
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testFormatCase() {
-		$tests = array('\lithium\tests\cases\test\reporter\HtmlTest');
-		$expected = '<ul><li><a href="?case=\lithium\tests\cases\test\reporter\HtmlTest">HtmlTest</a></li></ul>';
-		$result = $this->html->menu($tests, array('format' => 'html'));
+		$tests = array('lithium\tests\cases\test\reporter\HtmlTest');
+		$expected = '<ul><li><a href="/test/lithium/tests/cases/test/reporter/HtmlTest">HtmlTest</a></li></ul>';
+		$result = $this->html->menu($tests, array('format' => 'html', 'request' => new Request()));
 		$this->assertEqual($expected, $result);
 	}
 }

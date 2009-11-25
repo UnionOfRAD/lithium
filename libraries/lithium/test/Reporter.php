@@ -54,6 +54,7 @@ class Reporter extends \lithium\core\Object {
 		}
 		return join("\n", $result);
 	}
+
 	/**
 	 * return menu as a string to be used as render
 	 *
@@ -62,7 +63,7 @@ class Reporter extends \lithium\core\Object {
 	 *               - tree: true to convert classes to tree structure
 	 */
 	public function menu($classes, $options = array()) {
-		$defaults = array('format' => 'text', 'tree' => false);
+		$defaults = array('request' => '/', 'format' => 'text', 'tree' => false);
 		$options += $defaults;
 
 		if ($options['tree']) {
@@ -90,18 +91,19 @@ class Reporter extends \lithium\core\Object {
 
 		if ($options['tree']) {
 			$self = $this;
-			$menu = function ($data, $parent = null) use (&$menu, &$self, $result) {
+			$menu = function ($data, $parent = null) use (&$menu, &$self, $result, $options) {
 				foreach ($data as $key => $row) {
 					if (is_array($row) && is_string($key)) {
 						$key = strtolower($key);
-						$next = $parent . '\\' . $key;
+						$next = $parent . '/' . $key;
 						$result .= $self->invokeMethod('_item', array('group', array(
-							'namespace' => $next, 'name' => $key, 'menu' => $menu($row, $next)
+							'request' => $options['request'], 'namespace' => $next,
+							'name' => $key, 'menu' => $menu($row, $next)
 						)));
 					} else {
-						$next = $parent . '\\' . $key;
+						$next = $parent . '/' . $key;
 						$result .= $self->invokeMethod('_item', array('case', array(
-							'namespace' => $parent, 'name' => $row,
+							'request' => $options['request'], 'namespace' => $parent, 'name' => $row,
 						)));
 					}
 				}
@@ -109,9 +111,10 @@ class Reporter extends \lithium\core\Object {
 			};
 
 			foreach ($classes as $library => $tests) {
-				$group = "\\{$library}\\tests";
+				$group = "{$library}/tests";
 				$result .= $this->_item(null, array('menu' => $this->_item('group', array(
-					'namespace' => $group, 'name' => $library, 'menu' => $menu($tests, $group)
+					'request' => $options['request'], 'namespace' => $group,
+					'name' => $library, 'menu' => $menu($tests, $group)
 				))));
 			}
 			return $result;
@@ -119,9 +122,10 @@ class Reporter extends \lithium\core\Object {
 
 		foreach ($classes as $test) {
 			$parts = explode('\\', $test);
-			$name = array_pop($parts);
-			$namespace = join('\\', $parts);
-			$result .= $this->_item('case', compact('namespace', 'name'));
+			$result .= $this->_item('case', array(
+				'request' => $options['request'], 'name' => array_pop($parts),
+				'namespace' => join('/', $parts)
+			));
 		}
 		return $this->_item(null, array('menu' => $result));
 	}

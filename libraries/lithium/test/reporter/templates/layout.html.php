@@ -23,7 +23,7 @@
 			<span class="filters">
 				<?php echo join(' | ', array_map(
 					function($class) use ($request) {
-						$url = $request->env('REQUEST_URI') . "&amp;filters[]={$class}";
+						$url = "?filters[]={$class}";
 						$name = join('', array_slice(explode("\\", $class), -1));
 						$key = Inflector::underscore($name);
 						return "<a class=\"{$key}\" href=\"{$url}\">{$name}</a>";

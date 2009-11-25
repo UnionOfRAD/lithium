@@ -78,7 +78,6 @@ class Group extends \lithium\util\Collection {
 					'path' => '/' . join('/', $parts),
 					'filter' => '/cases|intergration|functional/'
 				));
-
 				return (array)$test;
 			}
 			return (array)$test;

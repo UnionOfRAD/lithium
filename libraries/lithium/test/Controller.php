@@ -28,14 +28,17 @@ class Controller extends \lithium\core\Object {
 	 */
 	public function __invoke($request, $params, $options = array()) {
 		error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
-		$report = Dispatcher::run(null, $request->query + array(
-			'reporter' => 'html', 'group' => '\\' . join('\\', $request->args)
+		$group = '\\' . join('\\', $request->args);
+		$report = Dispatcher::run($group , $request->query + array(
+			'reporter' => 'html'
 		));
 		$filters = Libraries::locate('test.filters');
 		$classes = Libraries::locate('tests', null, array(
 			'filter' => '/cases|integration|functional/'
 		));
-		$menu = $report->reporter->menu($classes, array('format' => 'html', 'tree' => true));
+		$menu = $report->reporter->menu($classes, array(
+			'request' => $request, 'format' => 'html', 'tree' => true
+		));
 
 		$template = Libraries::locate('test.reporter.templates', 'layout', array(
 			'filter' => false, 'type' => 'file', 'suffix' => '.html.php',
