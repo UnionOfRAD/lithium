@@ -1,7 +1,5 @@
 <?php
 	use \lithium\util\Inflector;
-	// /var_dump($request);
-
 ?>
 <!doctype html>
 <html>
@@ -13,7 +11,7 @@
 		<h1>Lithium Unit Test Dashboard</h1>
 
 		<div style="float: left; padding: 10px 0 20px 20px; width: 20%;">
-			<h2><a href="?group=\">Tests</a></h2>
+			<h2><a href="/test/">Tests</a></h2>
 			<?php echo $menu ?>
 		</div>
 
@@ -23,22 +21,20 @@
 			<h3>Test results</h3>
 
 			<span class="filters">
-				<?php
-					foreach ($filters as $i => $class) {
+				<?php echo join(' | ', array_map(
+					function($class) use ($request) {
 						$url = $request->env('REQUEST_URI') . "&amp;filters[]={$class}";
 						$name = join('', array_slice(explode("\\", $class), -1));
 						$key = Inflector::underscore($name);
-
-						echo "<a class=\"{$key}\" href=\"{$url}\">{$name}</a>";
-						echo ' | ';
-					}
-				?>
+						return "<a class=\"{$key}\" href=\"{$url}\">{$name}</a>";
+					},
+					$filters
+				)); ?>
 			</span>
-
-			<?php echo $report->stats(); ?>
-
-			<?php echo $report->filters();?>
-
+			<?php
+				echo $report->stats();
+				echo $report->filters();
+			?>
 		</div>
 		<div style="clear:both"></div>
 	</body>

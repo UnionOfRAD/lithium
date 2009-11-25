@@ -28,7 +28,9 @@ class Controller extends \lithium\core\Object {
 	 */
 	public function __invoke($request, $params, $options = array()) {
 		error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
-		$report = Dispatcher::run(null, $request->query + array('reporter' => 'html'));
+		$report = Dispatcher::run(null, $request->query + array(
+			'reporter' => 'html', 'group' => '\\' . join('\\', $request->args)
+		));
 		$filters = Libraries::locate('test.filters');
 		$classes = Libraries::locate('tests', null, array(
 			'filter' => '/cases|integration|functional/'

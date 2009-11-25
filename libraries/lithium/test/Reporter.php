@@ -30,7 +30,7 @@ class Reporter extends \lithium\core\Object {
 			'asserts' => null, 'passes' => array(), 'fails' => array(),
 			'errors' => array(), 'exceptions' => array(),
 		);
-		$stats += $defaults;
+		$stats = (array) $stats + $defaults;
 
 		$asserts = $stats['asserts'];
 		$passes = count($stats['passes']);

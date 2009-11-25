@@ -23,8 +23,9 @@ class Html extends \lithium\test\Reporter {
 	 * @return string
 	 */
 	protected function _result($stats) {
+		$class = ($stats['success'] ? 'success' : 'fail');
 		$result = array(
-			'<div class="test-result test-result-' . ($stats['success'] ? 'success' : 'fail') . '">',
+			"<div class=\"test-result test-result-{$class}\">",
 			"{$stats['passes']} / {$stats['asserts']} passes, {$stats['fails']} ",
 			((intval($stats['fails']) == 1) ? 'fail' : 'fails') . " and {$stats['exceptions']} ",
 			((intval($stats['exceptions']) == 1) ? 'exceptions' : 'exceptions'),
