@@ -12,6 +12,7 @@ use \lithium\core\Object;
 use \lithium\tests\mocks\core\MockMethodFiltering;
 use \lithium\tests\mocks\core\MockExposed;
 use \lithium\tests\mocks\core\MockCallable;
+use \lithium\tests\mocks\core\MockObjectForParents;
 
 class ObjectTest extends \lithium\test\Unit {
 
@@ -126,6 +127,17 @@ class ObjectTest extends \lithium\test\Unit {
 			'long', 'then', 'UR', 'DOIN', 'IT', 'RONG'
 		);
 		$this->assertEqual($callable->invokeMethod('foo', $params), $params);
+	}
+
+	public function testParents() {
+		$expected = array('lithium\\core\\Object' => 'lithium\\core\\Object');
+
+		$result = MockObjectForParents::parents();
+		$this->assertEqual($expected, $result);
+
+		// For caching
+		$result = MockObjectForParents::parents();
+		$this->assertEqual($expected, $result);
 	}
 }
 
