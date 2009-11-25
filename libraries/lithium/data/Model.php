@@ -19,6 +19,8 @@ use \lithium\util\Inflector;
  */
 class Model extends \lithium\core\StaticObject {
 
+	public $validates = array();
+
 	public $hasOne = array();
 
 	public $hasMany = array();
@@ -393,8 +395,19 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	public function validates($record, $options = array()) {
-		return static::_filter(__METHOD__, compact('record', 'options'), function($self, $params) {
-		});
+		$self = static::_instance();
+		$validator = $self->_classes['validator'];
+		$params = compact('record', 'options');
+		$filter = function($parent, $params) use ($self, $validator) {
+			extract($params);
+			$errors = $validator::check($record->data(), $self->validates, $options);
+			if (empty($errors)) {
+				return true;
+			}
+			$record->errors($errors);
+			return false;
+		};
+		return static::_filter(__METHOD__, $params, $filter);
 	}
 
 	public function delete($record, $options = array()) {

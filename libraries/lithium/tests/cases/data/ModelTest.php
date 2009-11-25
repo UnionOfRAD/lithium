@@ -12,6 +12,7 @@ use \lithium\util\reflection\Inspector;
 use \lithium\data\Connections;
 use \lithium\data\Model;
 use \lithium\tests\mocks\data\MockPost;
+use \lithium\tests\mocks\data\MockPostForValidates;
 use \lithium\tests\mocks\data\MockComment;
 use \lithium\tests\mocks\data\MockTag;
 use \lithium\tests\mocks\data\MockTagging;
@@ -208,6 +209,63 @@ class ModelTest extends \lithium\test\Unit {
 			'created' => '2009-06-16 10:00:00'
 		));
 		$this->assertEqual(array('post_id' => 2, 'tag_id' => 5), $result);
+	}
+
+	public function testValidatesFalse() {
+		$post = MockPostForValidates::create();
+
+		$result = $post->validates();
+		$this->assertTrue($result === false);
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
+
+		$expected = array(
+			'title' => 'please enter a title',
+			'email' => array('email is empty', 'email is not valid')
+		);
+		$result = $post->errors();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testValidatesTitle() {
+		$post = MockPostForValidates::create(array('title' => 'new post'));
+
+		$result = $post->validates();
+		$this->assertTrue($result === false);
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
+
+		$expected = array(
+			'email' => array('email is empty', 'email is not valid')
+		);
+		$result = $post->errors();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testValidatesEmailIsNotEmpty() {
+		$post = MockPostForValidates::create(array('title' => 'new post', 'email' => 'something'));
+
+		$result = $post->validates();
+		$this->assertTrue($result === false);
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
+
+		$expected = array(
+			'email' => array('email is not valid')
+		);
+		$result = $post->errors();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testValidatesEmailIsValid() {
+		$post = MockPostForValidates::create(array(
+			'title' => 'new post', 'email' => 'something@test.com'
+		));
+
+		$result = $post->validates();
+		$this->assertTrue($result === true);
+		$result = $post->errors();
+		$this->assertTrue(empty($result));
 	}
 
 	/*
