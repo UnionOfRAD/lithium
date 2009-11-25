@@ -70,5 +70,15 @@ class DispatcherTest extends \lithium\test\Unit {
 		$expected = 'test action';
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testInvalidCommand() {
+		$this->expectException('Command \\this\\command\\is\\fake not found');
+		$result = Dispatcher::run(new Request(array(
+			'args' => array(
+				'\this\command\is\fake',
+				'testAction'
+			)
+		)));
+	}
 }
 ?>
