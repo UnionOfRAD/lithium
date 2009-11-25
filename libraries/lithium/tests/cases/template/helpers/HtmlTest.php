@@ -101,7 +101,7 @@ class HtmlTest extends \lithium\test\Unit {
 		);
 
 		$this->assertTags($result, array('link' => array(
-			'href' => 'preg:/.*\/posts\/index\.rss/',
+			'href' => 'regex:/.*\/posts\/index\.rss/',
 			'type' => 'application/rss+xml',
 			'rel' => 'alternate',
 			'title' => 'RSS Feed'
@@ -111,7 +111,7 @@ class HtmlTest extends \lithium\test\Unit {
 			'Atom Feed', array('controller' => 'posts', 'type' => 'xml'), array('type' => 'atom')
 		);
 		$this->assertTags($result, array('link' => array(
-			'href' => 'preg:/.*\/posts\/index\.xml/',
+			'href' => 'regex:/.*\/posts\/index\.xml/',
 			'type' => 'application/atom+xml',
 			'title' => 'Atom Feed',
 			'rel' => 'alternate'
@@ -119,13 +119,13 @@ class HtmlTest extends \lithium\test\Unit {
 
 		$result = $this->html->link('No-existy', '/posts.xmp', array('type' => 'rong'));
 		$this->assertTags($result, array('link' => array(
-			'href' => 'preg:/.*\/posts\.xmp/',
+			'href' => 'regex:/.*\/posts\.xmp/',
 			'title' => 'No-existy',
 		)));
 
 		$result = $this->html->link('No-existy', '/posts.xpp', array('type' => 'atom'));
 		$this->assertTags($result, array('link' => array(
-			'href' => 'preg:/.*\/posts\.xpp/',
+			'href' => 'regex:/.*\/posts\.xpp/',
 			'type' => 'application/atom+xml',
 			'title' => 'No-existy',
 			'rel' => 'alternate'
@@ -134,13 +134,13 @@ class HtmlTest extends \lithium\test\Unit {
 		$result = $this->html->link('Favicon', array(), array('type' => 'icon'));
 		$expected = array(
 			'link' => array(
-				'href' => 'preg:/.*favicon\.ico/',
+				'href' => 'regex:/.*favicon\.ico/',
 				'type' => 'image/x-icon',
 				'rel' => 'icon',
 				'title' => 'Favicon'
 			),
 			array('link' => array(
-				'href' => 'preg:/.*favicon\.ico/',
+				'href' => 'regex:/.*favicon\.ico/',
 				'type' => 'image/x-icon',
 				'rel' => 'shortcut icon',
 				'title' => 'Favicon'
@@ -156,7 +156,7 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public function testLink() {
 		$result = $this->html->link('/home');
-		$expected = array('a' => array('href' => '/home'), 'preg:/\/home/', '/a');
+		$expected = array('a' => array('href' => '/home'), 'regex:/\/home/', '/a');
 		$this->assertTags($result, $expected);
 
 		$result = $this->html->link('Next >', '#');
@@ -311,7 +311,7 @@ class HtmlTest extends \lithium\test\Unit {
 		$result = $this->html->image('test.gif', array('url' => '#'));
 		$expected = array(
 			'a' => array('href' => '#'),
-			'img' => array('src' => 'preg:/img\/test\.gif\?\d*/', 'alt' => ''),
+			'img' => array('src' => 'regex:/img\/test\.gif\?\d*/', 'alt' => ''),
 			'/a'
 		);
 		$this->assertTags($result, $expected);
@@ -349,7 +349,7 @@ class HtmlTest extends \lithium\test\Unit {
 	public function testStyleLink() {
 		$result = $this->html->style('screen');
 		$expected = array('link' => array(
-			'rel' => 'stylesheet', 'type' => 'text/css', 'href' => 'preg:/.*css\/screen\.css/'
+			'rel' => 'stylesheet', 'type' => 'text/css', 'href' => 'regex:/.*css\/screen\.css/'
 		));
 		$this->assertTags($result, $expected);
 
@@ -357,23 +357,23 @@ class HtmlTest extends \lithium\test\Unit {
 		$this->assertTags($result, $expected);
 
 		$result = $this->html->style('screen.css?1234');
-		$expected['link']['href'] = 'preg:/.*css\/screen\.css\?1234/';
+		$expected['link']['href'] = 'regex:/.*css\/screen\.css\?1234/';
 		$this->assertTags($result, $expected);
 
 		$result = $this->html->style('http://whatever.com/screen.css?1234');
-		$expected['link']['href'] = 'preg:/http:\/\/.*\/screen\.css\?1234/';
+		$expected['link']['href'] = 'regex:/http:\/\/.*\/screen\.css\?1234/';
 		$this->assertTags($result, $expected);
 
 // 		Configure::write('Asset.filter.css', 'css.php');
 // 		$result = $this->html->style('lithium.generic');
-// 		$expected['link']['href'] = 'preg:/.*ccss\/lithium\.generic\.css/';
+// 		$expected['link']['href'] = 'regex:/.*ccss\/lithium\.generic\.css/';
 // 		$this->assertTags($result, $expected);
 // 		Configure::write('Asset.filter.css', false);
 //
 // 		$result = explode("\n", trim($this->html->style(array('lithium.generic', 'vendor.generic'))));
-// 		$expected['link']['href'] = 'preg:/.*css\/lithium\.generic\.css/';
+// 		$expected['link']['href'] = 'regex:/.*css\/lithium\.generic\.css/';
 // 		$this->assertTags($result[0], $expected);
-// 		$expected['link']['href'] = 'preg:/.*css\/vendor\.generic\.css/';
+// 		$expected['link']['href'] = 'regex:/.*css\/vendor\.generic\.css/';
 // 		$this->assertTags($result[1], $expected);
 // 		$this->assertEqual(count($result), 2);
 //
@@ -381,38 +381,38 @@ class HtmlTest extends \lithium\test\Unit {
 //
 // 		Configure::write('Asset.filter.css', 'css.php');
 // 		$result = $this->html->style('lithium.generic');
-// 		$expected['link']['href'] = 'preg:/.*ccss\/lithium\.generic\.css\?[0-9]+/';
+// 		$expected['link']['href'] = 'regex:/.*ccss\/lithium\.generic\.css\?[0-9]+/';
 // 		$this->assertTags($result, $expected);
 // 		Configure::write('Asset.filter.css', false);
 //
 // 		$result = $this->html->style('lithium.generic');
-// 		$expected['link']['href'] = 'preg:/.*css\/lithium\.generic\.css\?[0-9]+/';
+// 		$expected['link']['href'] = 'regex:/.*css\/lithium\.generic\.css\?[0-9]+/';
 // 		$this->assertTags($result, $expected);
 //
 // 		$debug = Configure::read('debug');
 // 		Configure::write('debug', 0);
 //
 // 		$result = $this->html->style('lithium.generic');
-// 		$expected['link']['href'] = 'preg:/.*css\/lithium\.generic\.css/';
+// 		$expected['link']['href'] = 'regex:/.*css\/lithium\.generic\.css/';
 // 		$this->assertTags($result, $expected);
 //
 // 		Configure::write('Asset.timestamp', 'force');
 //
 // 		$result = $this->html->style('lithium.generic');
-// 		$expected['link']['href'] = 'preg:/.*css\/lithium\.generic\.css\?[0-9]+/';
+// 		$expected['link']['href'] = 'regex:/.*css\/lithium\.generic\.css\?[0-9]+/';
 // 		$this->assertTags($result, $expected);
 //
 // 		$webroot = $this->html->webroot;
 // 		$this->html->webroot = '/testing/';
 // 		$result = $this->html->style('lithium.generic');
-// 		$expected['link']['href'] = 'preg:/\/testing\/css\/lithium\.generic\.css\?/';
+// 		$expected['link']['href'] = 'regex:/\/testing\/css\/lithium\.generic\.css\?/';
 // 		$this->assertTags($result, $expected);
 // 		$this->html->webroot = $webroot;
 //
 // 		$webroot = $this->html->webroot;
 // 		$this->html->webroot = '/testing/longer/';
 // 		$result = $this->html->style('lithium.generic');
-// 		$expected['link']['href'] = 'preg:/\/testing\/longer\/css\/lithium\.generic\.css\?/';
+// 		$expected['link']['href'] = 'regex:/\/testing\/longer\/css\/lithium\.generic\.css\?/';
 // 		$this->assertTags($result, $expected);
 // 		$this->html->webroot = $webroot;
 //
@@ -428,12 +428,12 @@ class HtmlTest extends \lithium\test\Unit {
 		$result = $this->html->style(array('base', 'layout'));
 		$expected = array(
 			'link' => array(
-				'rel' => 'stylesheet', 'type' => 'text/css', 'href' => 'preg:/.*css\/base\.css/'
+				'rel' => 'stylesheet', 'type' => 'text/css', 'href' => 'regex:/.*css\/base\.css/'
 			),
 			array(
 				'link' => array(
 					'rel' => 'stylesheet', 'type' => 'text/css',
-					'href' => 'preg:/.*css\/layout\.css/'
+					'href' => 'regex:/.*css\/layout\.css/'
 				)
 			)
 		);

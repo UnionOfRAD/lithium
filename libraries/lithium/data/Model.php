@@ -280,7 +280,7 @@ class Model extends \lithium\core\StaticObject {
 	 * object. You can declare `protected $_schema = array(...)` to define the schema manually.
 	 *
 	 * @param string $field Optional. You may pass a field name to get schema information for just
-	 *        one field. Otherwise, an array with containing all fields is returned.
+	 *        one field. Otherwise, an array containing all fields is returned.
 	 * @return array
 	 */
 	public static function schema($field = null) {
