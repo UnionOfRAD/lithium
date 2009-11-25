@@ -181,13 +181,14 @@ class ModelTest extends \lithium\test\Unit {
 
 		$result = $post->validates();
 		$this->assertTrue($result === false);
-		$this->assertFalse(empty($post->errors));
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
 
 		$expected = array(
 			'title' => 'please enter a title',
 			'email' => array('email is empty', 'email is not valid')
 		);
-		$result = $post->errors;
+		$result = $post->errors();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -196,12 +197,13 @@ class ModelTest extends \lithium\test\Unit {
 
 		$result = $post->validates();
 		$this->assertTrue($result === false);
-		$this->assertFalse(empty($post->errors));
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
 
 		$expected = array(
 			'email' => array('email is empty', 'email is not valid')
 		);
-		$result = $post->errors;
+		$result = $post->errors();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -210,12 +212,13 @@ class ModelTest extends \lithium\test\Unit {
 
 		$result = $post->validates();
 		$this->assertTrue($result === false);
-		$this->assertFalse(empty($post->errors));
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
 
 		$expected = array(
 			'email' => array('email is not valid')
 		);
-		$result = $post->errors;
+		$result = $post->errors();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -226,7 +229,8 @@ class ModelTest extends \lithium\test\Unit {
 
 		$result = $post->validates();
 		$this->assertTrue($result === true);
-		$this->assertTrue(empty($post->errors));
+		$result = $post->errors();
+		$this->assertTrue(empty($result));
 	}
 	/*
 	* @todo create proper mock objects for the following test

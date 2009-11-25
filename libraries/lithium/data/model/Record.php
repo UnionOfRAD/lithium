@@ -91,6 +91,30 @@ class Record extends \lithium\core\Object {
 	}
 
 	/**
+	* Access the errors of the record.
+	*
+	* @param mixed $field if array will overwrite `$this->_errors`, if string and value, sets
+	* @param string $value
+	* @return string
+	*/
+	public function errors($field = null, $value = null) {
+		if ($field === null) {
+			return $this->_errors;
+		}
+		if (is_array($field)) {
+			$this->_errors = $field;
+			return $this->_errors;
+		}
+		if ($value === null && isset($this->_errors[$field])) {
+			return $this->_errors[$field];
+		}
+		if ($value !== null) {
+			return $this->_errors[$field] = $value;
+		}
+		return $value;
+	}
+
+	/**
 	* Magic method that allows calling of model methods on this record instance, i.e.:
 	* {{{
 	* $record->validates();
