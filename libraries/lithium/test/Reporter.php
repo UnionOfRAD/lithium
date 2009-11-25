@@ -63,7 +63,7 @@ class Reporter extends \lithium\core\Object {
 	 *               - tree: true to convert classes to tree structure
 	 */
 	public function menu($classes, $options = array()) {
-		$defaults = array('request' => '/', 'format' => 'text', 'tree' => false);
+		$defaults = array('request' => '/', 'tree' => false);
 		$options += $defaults;
 
 		if ($options['tree']) {

@@ -66,13 +66,12 @@ class Report extends \lithium\core\Object {
 	 * Construct Report Object
 	 *
 	 * @param array $config Options array for the test run. Valid options are:
-	 *		  - 'case': The fully namespaced test case to be run.
-	 *        - 'group': The fully namespaced test group to be run.
+	 *        - 'group': The test group with items to be run.
 	 *		  - 'filters': An array of filters that the test output should be run through.
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(
-			'case' => null,
+			'title' => null,
 			'group' => null,
 			'filters' => array(),
 			'reporter' => 'text'
@@ -92,12 +91,10 @@ class Report extends \lithium\core\Object {
 			throw new Exception("{$format} is not a valid reporter");
 		}
 		$this->reporter = new $reporter();
-		$this->timer['start'] = microtime(true);
 		$this->group = $this->_config['group'];
 		$this->filters = $this->_config['filters'];
 		$this->title = $this->_config['title'] ?: $this->_config['title'];
 		$this->run();
-		$this->timer['end'] = microtime(true);
 	}
 
 	/**
@@ -106,6 +103,7 @@ class Report extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function run() {
+		$this->timer['start'] = microtime(true);
 		$tests = $this->group->tests();
 		foreach ($this->filters as $filter => $options) {
 			$options = isset($options['apply']) ? $options['apply'] : array();
@@ -117,6 +115,7 @@ class Report extends \lithium\core\Object {
 			$options = isset($options['analyze']) ? $options['analyze'] : array();
 			$this->results['filters'][$filter] = $filter::analyze($this->results['group'], $options);
 		}
+		$this->timer['end'] = microtime(true);
 	}
 
 	/**

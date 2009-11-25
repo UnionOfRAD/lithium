@@ -37,7 +37,7 @@ class Controller extends \lithium\core\Object {
 			'filter' => '/cases|integration|functional/'
 		));
 		$menu = $report->reporter->menu($classes, array(
-			'request' => $request, 'format' => 'html', 'tree' => true
+			'request' => $request, 'tree' => true
 		));
 
 		$template = Libraries::locate('test.reporter.templates', 'layout', array(

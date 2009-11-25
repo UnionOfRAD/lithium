@@ -9,11 +9,38 @@
 namespace lithium\tests\cases\test;
 
 use \lithium\test\Report;
+use \lithium\test\Group;
 
 class ReportTest extends \lithium\test\Unit {
 
-	public function setUp() {
+	public function testInit() {
+		$report = new Report(array(
+			'title' => '\lithium\tests\mocks\test\MockUnitTest',
+			'group' => new Group(array('items' => array('\lithium\tests\mocks\test\MockUnitTest')))
+		));
 
+		$expected = '\lithium\tests\mocks\test\MockUnitTest';
+		$result = $report->title;
+		$this->assertEqual($expected, $result);
+
+		$expected = 'testNothing';
+		$result = $report->results['group'][0][0]['method'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'pass';
+		$result = $report->results['group'][0][0]['result'];
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testStats() {
+		$report = new Report(array(
+			'title' => '\lithium\tests\mocks\test\MockUnitTest',
+			'group' => new Group(array('items' => array('\lithium\tests\mocks\test\MockUnitTest')))
+		));
+
+		$expected = "1 / 1 passes\n0 fails and 0 exceptions";
+		$result = $report->stats();
+		$this->assertEqual($expected, $result);
 	}
 
 }
