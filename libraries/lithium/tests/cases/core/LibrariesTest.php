@@ -2,8 +2,8 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * @copyright	 Copyright 2009, Union of RAD (http://union-of-rad.org)
+ * @license	   http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
 namespace lithium\tests\cases\core;
@@ -26,6 +26,13 @@ class LibrariesTest extends \lithium\test\Unit {
 			'transform' => function ($class, $options) {
 				return str_replace('_', '/', $class);
 			}
+		));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Library/Class/Separated/By/Nothing';
+		$result = Libraries::path('LibraryClassSeparatedByNothing', array(
+			'prefix' => 'Library',
+			'transform' => array('/([a-z])([A-Z])/', '$1/$2')
 		));
 		$this->assertEqual($expected, $result);
 	}
@@ -95,6 +102,16 @@ class LibrariesTest extends \lithium\test\Unit {
 
 		$result = Libraries::add('app', array('bootstrap' => null) + $app);
 		$this->assertEqual(array('bootstrap' => null) + $app, $result);
+	}
+
+	/**
+	 * Tests the loading of libraries
+	 *
+	 * @return void
+	 */
+	public function testLibraryLoad() {
+		$this->expectException('Failed to load SomeInvalidLibrary from ');
+		Libraries::load('SomeInvalidLibrary', true);
 	}
 
 	/**
@@ -187,6 +204,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	public function testServiceLocation() {
 		$this->assertNull(Libraries::locate('adapters', 'File'));
 		$this->assertNull(Libraries::locate('adapters.view', 'File'));
+		$this->assertNull(Libraries::locate('invalid_package', 'InvalidClass'));
 
 		$result = Libraries::locate('adapters.template.view', 'File');
 		$this->assertEqual('lithium\template\view\adapters\File', $result);
@@ -202,11 +220,23 @@ class LibrariesTest extends \lithium\test\Unit {
 		$result = Libraries::locate('dataSources.database', 'MySql');
 		$expected = 'lithium\data\source\database\adapter\MySql';
 		$this->assertEqual($expected, $result);
+
+		$result = Libraries::locate(null, '\lithium\data\source\Database');
+		$expected = '\lithium\data\source\Database';
+		$this->assertEqual($expected, $result);
+
+		$expected = new \stdClass();
+		$result = Libraries::locate(null, $expected);
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testServiceLocateApp() {
 		$result = Libraries::locate('controllers', 'HelloWorld');
 		$expected = 'app\controllers\HelloWorldController';
+		$this->assertEqual($expected, $result);
+
+		// Tests caching of paths
+		$result = Libraries::locate('controllers', 'HelloWorld');
 		$this->assertEqual($expected, $result);
 	}
 
@@ -242,6 +272,18 @@ class LibrariesTest extends \lithium\test\Unit {
 
 		$result = Libraries::path('lithium\template\view', array('dirs' => true));
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testPathDirectoryLookups() {
+		$library = Libraries::get('lithium');
+		$base = $library['path'] . '/';
+
+		$result = Libraries::path('lithium\template\View', array('dirs' => true));
+		$expected = $base.'template/View.php';
+		$this->assertEqual($expected, $result);
+
+		$result = Libraries::path('lithium\template\views', array('dirs' => true));
+		$this->assertNull($result);
 	}
 }
 
