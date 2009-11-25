@@ -15,7 +15,12 @@ class CookieTest extends \lithium\test\Unit {
 	public function assertCookie($expected, $headers) {
 		$key = $expected['key'];
 		$value = preg_quote(urlencode($expected['value']), '/');
-		$expires = preg_quote(gmdate('D, d-M-Y H:i:s \G\M\T', strtotime($expected['expires'])), '/');
+
+		if (isset($expected['expires'])) {
+			$expires = preg_quote(gmdate('D, d-M-Y H:i:s \G\M\T', strtotime($expected['expires'])), '/');
+		} else {
+			$expires = ".+?";
+		}
 		$path = preg_quote($expected['path'], '/');
 		$pattern = "/^Set\-Cookie:\sli3\[$key\]=$value;\sexpires=$expires;\spath=$path/";
 		$match = false;
@@ -99,7 +104,6 @@ class CookieTest extends \lithium\test\Unit {
 
 		$params = compact('key');
 		$result = $closure($this->Cookie, $params, null);
-
 		$this->assertEqual($value, $result);
 
 		$key = 'does_not_exist';
@@ -114,6 +118,21 @@ class CookieTest extends \lithium\test\Unit {
 
 	public function testReadArrayOfValues() {
 
+	}
+
+	public function testDeleteNonExistentValue() {
+		$key = 'delete';
+		$value = 'deleted';
+		$path = '/';
+
+		$closure = $this->Cookie->delete($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Cookie, $params, null);
+		$this->assertNull($result);
+
+		$this->assertCookie(compact('key', 'value', 'path'), headers_list());
 	}
 
 }

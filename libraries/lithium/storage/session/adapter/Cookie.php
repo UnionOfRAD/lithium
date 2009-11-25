@@ -49,7 +49,10 @@ class Cookie extends \lithium\core\Object {
 
 		return function($self, $params, $chain) use (&$config) {
 			extract($params);
-			return (isset($_COOKIE[$key])) ?: null;
+			if (!isset($_COOKIE[$key])) {
+				return null;
+			}
+			return $_COOKIE[$key];
 		};
 	}
 
@@ -73,6 +76,29 @@ class Cookie extends \lithium\core\Object {
 					$name = (array_shift($name) . '[' . join('][', $name) . ']');
 				}
 				setcookie($name, $val, strtotime($config['expire']), $config['path'],
+					$config['domain'], $config['secure'], $config['httponly']
+				);
+			}
+		};
+	}
+
+	public function delete($key, $options = array()) {
+		$config = $options + $this->_config;
+
+		return function($self, $params, $chain) use (&$config) {
+			extract($params);
+			$key = is_array($key) ? Set::flatten($key) : array($key);
+
+			foreach ($key as $name) {
+				$name = explode('.', $name);
+				$name = $config['name'] ? array_merge(array($config['name']), $name) : $name;
+
+				if (count($name) == 1) {
+					$name = current($name);
+				} else {
+					$name = (array_shift($name) . '[' . join('][', $name) . ']');
+				}
+				setcookie($name, "", time() - 1, $config['path'],
 					$config['domain'], $config['secure'], $config['httponly']
 				);
 			}
