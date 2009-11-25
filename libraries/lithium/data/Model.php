@@ -10,6 +10,7 @@ namespace lithium\data;
 
 use \lithium\util\Set;
 use \lithium\util\Inflector;
+use \lithium\util\Validator;
 
 /**
  * Model class
@@ -18,6 +19,8 @@ use \lithium\util\Inflector;
  *       validate()
  */
 class Model extends \lithium\core\StaticObject {
+
+	public $validates = array();
 
 	public $hasOne = array();
 
@@ -393,7 +396,52 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	public function validates($record, $options = array()) {
-		return static::_filter(__METHOD__, compact('record', 'options'), function($self, $params) {
+		$self = static::_instance();
+		$params = compact('record', 'options');
+		return static::_filter(__METHOD__, $params, function($parent, $params) use ($self) {
+			extract($params);
+			$rule = 'isNotEmpty';
+			$__filter = function($field, $params) use ($record, $rule, &$__filter) {
+				$data = array();
+				$errors = array();
+				if (is_array($params)) {
+					if (!empty($params[0])) {
+						$multiple = array();
+						foreach ($params as $param) {
+							$multiple[] = $__filter($field, $param);
+						}
+						return array_values(array_filter($multiple));
+					} else if (!empty($params['rule'])) {
+						if (is_string($params['rule'])) {
+							$rule = $params['rule'];
+						} else {
+							$rule = array_shift((array) $params['rule']);
+							$data = $params['rule'];
+						}
+					}
+				}
+				$data = array($record->{$field}) + $data;
+				if (Validator::invokeMethod($rule, $data) !== true) {
+					if (is_string($params)) {
+						return $params;
+					}
+					if (!empty($params['message'])) {
+						return $params['message'];
+					}
+					return "{$field} is invalid.";
+				}
+				return null;
+			};
+			$errors = array();
+			foreach ($self->validates as $field => $params) {
+				$errors[$field] = $__filter($field, $params);
+			}
+			$errors = array_filter($errors);
+			if (empty($errors)) {
+				return true;
+			}
+			$record->set(compact('errors'));
+			return false;
 		});
 	}
 
