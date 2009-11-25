@@ -32,7 +32,7 @@ class Html extends \lithium\test\Reporter {
 			((intval($stats['exceptions']) == 1) ? 'exceptions' : 'exceptions'),
 			'</div>'
 		);
-		return join("\n", $result);
+		return join("", $result);
 	}
 
 	/**
@@ -50,7 +50,7 @@ class Html extends \lithium\test\Reporter {
 			"<span class=\"content\">{$error['message']}</span>",
 			'</div>'
 		);
-		return join("\n", $fail);
+		return join("", $fail);
 	}
 
 	/**
@@ -62,15 +62,15 @@ class Html extends \lithium\test\Reporter {
 	protected function _exception($error) {
 		$exception = array(
 			'<div class="test-exception">',
-			"Exception thrown in  {$error['class']}::{$error['method']}() ",
+			"Exception thrown in {$error['class']}::{$error['method']}() ",
 			"on line {$error['line']}: ",
 			"<span class=\"content\">{$error['message']}</span>",
 		);
 		if (isset($error['trace']) && !empty($error['trace'])) {
-			$exception[] = "Trace:<span class=\"trace\">{$error['trace']}</span>";
+			$exception[] = "Trace: <span class=\"trace\">{$error['trace']}</span>";
 		}
 		$exception[] = '</div>';
-		return join("\n", $exception);
+		return join("", $exception);
 	}
 
 	/**

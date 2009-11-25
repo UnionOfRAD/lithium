@@ -8,14 +8,18 @@
 
 namespace lithium\tests\cases\test\reporter;
 
-use \lithium\test\reporter\Html;
+use \lithium\http\Router;
 use \lithium\action\Request;
-
+use \lithium\test\reporter\Html;
+use \lithium\tests\mocks\test\reporter\MockHtml;
 
 class HtmlTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->html = new Html();
+		$this->mock = new MockHtml();
+		Router::connect('/test/{:args}', array('controller' => '\lithium\test\Controller'));
+		Router::connect('/test', array('controller' => '\lithium\test\Controller'));
 	}
 
 	public function testMenuWithoutData() {
@@ -40,6 +44,48 @@ class HtmlTest extends \lithium\test\Unit {
 		$tests = array('lithium\tests\cases\test\reporter\HtmlTest');
 		$expected = '<ul><li><a href="/test/lithium/tests/cases/test/reporter/HtmlTest">HtmlTest</a></li></ul>';
 		$result = $this->html->menu($tests, array('format' => 'html', 'request' => new Request()));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testResult() {
+		$stats = array(
+			'success' => false,
+			'passes' => 1, 'asserts' => 2, 'fails' => 1, 'exceptions' => 0
+		);
+		$expected = "<div class=\"test-result test-result-fail\">";
+		$expected .= "1 / 2 passes, 1 fail and 0 exceptions";
+		$expected .= "</div>";
+		$result = $this->mock->result($stats);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testFail() {
+		$fail = array(
+			'assertion' => 'assertEqual',
+			'class' => 'MockTest', 'method' => 'testNothing', 'line' => 8,
+			'message' => 'the message',
+		);
+		$expected = "<div class=\"test-assert test-assert-failed\">";
+		$expected .= "Assertion 'assertEqual' failed in MockTest::testNothing() on line 8: ";
+		$expected .= "<span class=\"content\">the message</span>";
+		$expected .= "</div>";
+		$result = $this->mock->fail($fail);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testException() {
+		$exception = array(
+			'class' => 'MockTest', 'method' => 'testNothing', 'line' => 8,
+			'message' => 'the message', 'trace' => 'the trace'
+		);
+
+		$expected = "<div class=\"test-exception\">";
+		$expected .= "Exception thrown in MockTest::testNothing() on line 8: ";
+		$expected .= "<span class=\"content\">the message</span>";
+		$expected .= "Trace: <span class=\"trace\">the trace</span>";
+		$expected .= "</div>";
+
+		$result = $this->mock->exception($exception);
 		$this->assertEqual($expected, $result);
 	}
 }
