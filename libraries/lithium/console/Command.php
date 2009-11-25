@@ -15,38 +15,39 @@ use \lithium\util\reflection\Docblock;
 use \lithium\core\Libraries;
 
 /**
- * The base class to inherit when writing Console scripts in Lithium.
- *
+ * The base class to inherit when writing console scripts in Lithium.
  */
 class Command extends \lithium\core\Object {
 
 	/**
-	 * A Request object
+	 * A Request object.
 	 *
-	 * @var lithium\console\Request
+	 * @var object
+	 * @see lithium\console\Request
 	 */
 	public $request;
 
 	/**
-	 * A Response object
+	 * A Response object.
 	 *
-	 * @var lithium\console\Response
+	 * @var object
+	 * @see lithium\console\Response
 	 */
 	public $response;
 
 	/**
-	 * classes used by Command
+	 * Dynamic dependencies.
 	 *
-	 * @var string
+	 * @var array
 	 */
 	protected $_classes = array(
 		'response' => '\lithium\console\Response'
 	);
 
 	/**
-	 * Constrcutor
+	 * Constructor.
 	 *
-	 * @param array config
+	 * @param array $config
 	 * @return void
 	 */
 	public function __construct($config = array()) {
@@ -66,6 +67,13 @@ class Command extends \lithium\core\Object {
 		parent::__construct($config);
 	}
 
+	/**
+	 * Initializer.  Populates the `response` property with a new instance of the `Response`
+	 * class passing it configuration and assignes the values from named parameters of the
+	 * request (if applicable) to properties of the command.
+	 *
+	 * @return void
+	 */
 	public function _init() {
 		$config = (array)$this->_config['response'] + array('request' => $this->request);
 		$this->response = new $this->_classes['response']($config);
@@ -78,14 +86,14 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * base method, shows list of available commands
-	 * override in subclasses
+	 * Base method, shows a list of available commands.  Override in subclasses as needed.
 	 *
 	 * @return void
 	 */
 	public function run() {
 		$this->header('Available Commands');
 		$classes = array_unique(Libraries::locate('commands', null, array('recursive' => false)));
+
 		foreach ($classes as $command) {
 			$command = explode('\\', $command);
 			$this->out(' - ' . Inflector::underscore(array_pop($command)));
@@ -93,11 +101,14 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Called by the Dispatcher class to invoke an action
+	 * Called by the Dispatcher class to invoke an action.
 	 *
 	 * @param string $action
-	 * @param array $params
-	 * @return object Returns the response object associated with this controller
+	 * @param array $passed
+	 * @param array $options
+	 * @return object The response object associated with this command.
+	 * @see lithium\console\Dispatcher
+	 * @see lithium\console\Response
 	 * @todo Implement proper exception catching/throwing
 	 * @todo Implement filters
 	 */
@@ -113,11 +124,11 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Writes string to output stream
+	 * Writes string to output stream.
 	 *
 	 * @param string $str
 	 * @param integer $newlines
-	 * @return boolean
+	 * @return integer|void
 	 */
 	public function out($str = null, $newlines = 1) {
 		if (is_array($str)) {
@@ -133,11 +144,11 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Writes string to error stream
+	 * Writes string to error stream.
 	 *
 	 * @param string $str
 	 * @param integer $newlines
-	 * @return boolean
+	 * @return integer|void
 	 */
 	public function err($str = null, $newlines = 1) {
 		if (is_array($str)) {
@@ -153,12 +164,11 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Handles input. Will continue to loop until
-	 * options['quit'] or result is part of options['options']
+	 * Handles input. Will continue to loop until `$options['quit']` or
+	 * result is part of `$options['options']`.
 	 *
 	 * @param string $prompt
 	 * @param string $options
-	 * @param string $default
 	 * @return string
 	 */
 	public function in($prompt = null, $options = array()) {
@@ -191,11 +201,11 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Add text with horizontal line before and after stream
+	 * Add text with horizontal line before and after stream.
 	 *
-	 * @param integer $length
-	 * @param integer $newlines
-	 * @return string
+	 * @param string $text
+	 * @param integer $line
+	 * @return void
 	 */
 	public function header($text, $line = 80) {
 		$this->hr($line);
@@ -204,11 +214,11 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Writes rows of columns
+	 * Writes rows of columns.
 	 *
 	 * @param array $rows
-	 * @param string $separator (default "\t")
-	 * @return string
+	 * @param string $separator Defaults to `"\t"`.
+	 * @return void
 	 */
 	public function columns($rows, $separator = "\t") {
 		$lengths = array_reduce($rows, function($columns, $row) {
@@ -231,10 +241,10 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Add new lines to output stream
+	 * Add new lines to output stream.
 	 *
 	 * @param integer $number
-	 * @return string
+	 * @return integer
 	 */
 	public function nl($number = 1) {
 		return $this->out(null, $number);
@@ -245,7 +255,7 @@ class Command extends \lithium\core\Object {
 	 *
 	 * @param integer $length
 	 * @param integer $newlines
-	 * @return string
+	 * @return integer
 	 */
 	public function hr($length = 80, $newlines = 1) {
 		return $this->out(str_repeat('-', $length), $newlines);
@@ -261,11 +271,11 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Stop execution with exit
+	 * Stop execution with by exiting the script.
 	 *
 	 * @param integer $status
 	 * @param boolean $message
-	 * @return string
+	 * @return void
 	 */
 	public function stop($status = 0, $message = null) {
 		if (!is_null($message)) {
