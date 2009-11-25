@@ -279,14 +279,14 @@ class Validator extends \lithium\core\StaticObject {
 	 */
 	public static function check($values, $rules, $options = array()) {
 		$rule = 'isNotEmpty';
-		$__filter = function($field, $rules) use ($values, $rule, &$__filter) {
+		$__check = function($field, $rules) use ($values, $rule, &$__check) {
 			$data = isset($values[$field]) ? array($values[$field]) : array();
 			$errors = array();
 			if (is_array($rules)) {
 				if (!empty($rules[0])) {
 					$multiple = array();
 					foreach ($rules as $rule) {
-						$multiple[] = $__filter($field, $rule);
+						$multiple[] = $__check($field, $rule);
 					}
 					return array_values(array_filter($multiple));
 				} else if (!empty($rules['rule'])) {
@@ -312,7 +312,7 @@ class Validator extends \lithium\core\StaticObject {
 		};
 		$errors = array();
 		foreach ($rules as $field => $rules) {
-			$errors[$field] = $__filter($field, $rules);
+			$errors[$field] = $__check($field, $rules);
 		}
 		return array_filter($errors);
 	}
