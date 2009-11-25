@@ -67,9 +67,10 @@ class Test extends \lithium\console\Command {
 				str_replace('lithium.tests.cases.', '', $this->group)
 			);
 		}
-		$report = Dispatcher::run(null, array(
-			'case' => $this->case, 'group' => $this->group,
-			'filters' => $this->filters
+		$run = $this->case ?: $this->group;
+
+		$report = Dispatcher::run($run, array(
+			'filters' => $this->filters, 'reporter' => 'text'
 		));
 
 		$this->header('Included Files');
