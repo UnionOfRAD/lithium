@@ -131,9 +131,17 @@ Libraries::add('app');
 // use lithium\g11n\Catalog;
 //
 // Catalog::config(array(
-// 	'runtime' => array('adapter' => 'Memory'),
-// 	'app' => array('adapter' => 'Gettext', 'path' => LITHIUM_APP_PATH . '/resources/po'),
-// 	'lithium' => array('adapter' => 'Gettext', 'path' => LITHIUM_LIBRARY_PATH . '/lithium/resources/po')
+// 	'runtime' => array(
+// 		'adapter' => 'Memory'
+// 	),
+// 	'app' => array(
+// 		'adapter' => 'Gettext',
+// 		'path' => LITHIUM_APP_PATH . '/extensions/g11n/data'
+// 	),
+// 	'lithium' => array(
+// 		'adapter' => 'Gettext',
+// 		'path' => LITHIUM_LIBRARY_PATH . '/lithium/g11n/data'
+// 	)
 // ));
 
 /**
