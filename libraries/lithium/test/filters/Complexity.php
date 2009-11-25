@@ -63,7 +63,7 @@ class Complexity extends \lithium\core\StaticObject {
 				continue;
 			}
 			$metrics['class'][$class] = array_sum($methods) / count($methods);
-			
+
 			foreach ($methods as $method => $count) {
 				$metrics['max']["{$class}::{$method}()"] = $count;
 			}

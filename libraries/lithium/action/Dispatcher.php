@@ -128,7 +128,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			if (class_exists($class)) {
 				return new $class(compact('request'));
 			}
-			throw new Exception("Controller {$class} not found");
+			throw new Exception("Controller {$controller} not found");
 		});
 	}
 

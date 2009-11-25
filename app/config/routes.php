@@ -27,6 +27,12 @@ Router::connect('/', array('controller' => 'pages', 'action' => 'view', 'home'))
 Router::connect('/pages/*', array('controller' => 'pages', 'action' => 'view'));
 
 /**
+ * Connect the testing routes.
+ */
+Router::connect('/test/{:args}', array('controller' => '\lithium\test\Controller'));
+Router::connect('/test', array('controller' => '\lithium\test\Controller'));
+
+/**
  * Finally, connect the default routes.
  */
 Router::connect('/{:controller}/{:action}/{:id:[0-9]+}.{:type}', array('id' => null));

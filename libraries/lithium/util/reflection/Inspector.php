@@ -206,11 +206,11 @@ class Inspector extends \lithium\core\StaticObject {
 	 *
 	 * @param mixed $class A string class name or an object instance, from which to get methods.
 	 * @param string $format The type and format of data to return. Available options are:
-	 *        -null: Returns a `Collection` object containing a `ReflectionMethod` instance
+	 *        - `null`: Returns a `Collection` object containing a `ReflectionMethod` instance
 	 *         for each method.
-	 *        -'extents': Returns a two-dimensional array with method names as keys, and
+	 *        - `'extents'`: Returns a two-dimensional array with method names as keys, and
 	 *         an array with starting and ending line numbers as values.
-	 *        -'ranges': Returns a two-dimensional array where each key is a method name,
+	 *        - `'ranges'`: Returns a two-dimensional array where each key is a method name,
 	 *         and each value is an array of line numbers which are contained in the method.
 	 * @param array $options
 	 */
