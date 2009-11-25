@@ -75,16 +75,6 @@ class Command extends \lithium\core\Object {
 				$this->{$key} = $param;
 			}
 		}
-		$this->initialize();
-	}
-
-	/**
-	 * initialize callback
-	 *
-	 * @return void
-	 */
-	public function initialize() {
-
 	}
 
 	/**
