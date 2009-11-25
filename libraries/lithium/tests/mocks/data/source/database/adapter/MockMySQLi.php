@@ -6,12 +6,12 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\mocks\test;
+namespace lithium\tests\mocks\data\source\database\adapter;
 
-class MockUnitTest extends \lithium\test\Unit {
+class MockMySQLi extends \lithium\data\source\database\adapter\MySQLi {
 
-	public function testNothing() {
-		$this->assertTrue(true);
+	public function get($var) {
+		return $this->{$var};
 	}
 }
 

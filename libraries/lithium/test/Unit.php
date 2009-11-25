@@ -15,6 +15,19 @@ use \lithium\util\Validator;
 use \lithium\util\audit\Debugger;
 use \lithium\util\reflection\Inspector;
 
+/**
+ * This is the base class for all test cases. Test are performed using an assertion method. If the
+ * assertion is correct, the test passes, otherwise it fails.
+ * Most assertions take an expected result, a received result, and a message (to describe the
+ * failure) as parameters.
+ *
+ * Available assertions are (see `assert&lt;assertion-name&gt;` methods for details): Equal, False, Identical,
+ * NoPattern, NotEqual, Null, Pattern, Tags, True.
+ *
+ * If an assertion is expected to produce an exception, the `expectException` method should be
+ * called before it.
+ *
+ */
 class Unit extends \lithium\core\Object {
 
 	protected $_results = array();
@@ -94,9 +107,36 @@ class Unit extends \lithium\core\Object {
 	public function tearDown() {
 	}
 
+	/**
+	 * Subclasses should use this method to set conditions that, if failed, terminate further
+	 * testing.
+	 *
+	 * For example:
+	 * {{{
+	 * public function skip() {
+	 *	$this->_dbConfig = Connections::get('default', array('config' => true));
+	 *	$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'MySql');
+	 *	$message = 'Test database is either unavailable, or not using a MySQL adapter';
+	 *	$this->skipIf(!$hasDb, $message);
+	 * }
+	 * }}}
+	 *
+	 * @return void
+	 */
 	public function skip() {
 	}
 
+	/**
+	 * Skips test(s) if the condition is met.
+	 *
+	 * When used within a subclass' `skip` method, all tests are ignored if the condition is met,
+	 * otherwise processing continues as normal.
+	 * For other methods, only the remainder of the method is skipped, when the condition is met.
+	 *
+	 * @param boolean $condition
+	 * @param string $message Message to pass if the condition is met.
+	 * @return mixed
+	 */
 	public function skipIf($condition, $message = 'Skipped test {:class}::{:function}()') {
 		if (!$condition) {
 			return;
@@ -134,6 +174,14 @@ class Unit extends \lithium\core\Object {
 		return $expression;
 	}
 
+	/**
+	 * Checks that the actual result is equal, but not neccessarily identical, to the expected
+	 * result.
+	 *
+	 * @param mixed $expected
+	 * @param mixed $result
+	 * @param string $message
+	 */
 	public function assertEqual($expected, $result, $message = '{:message}') {
 		$data = null;
 		if ($expected != $result) {
@@ -142,10 +190,24 @@ class Unit extends \lithium\core\Object {
 		$this->assert($expected == $result, $message, $data);
 	}
 
+	/**
+	 * Checks that the actual result and the expected result are not equal to each other.
+	 *
+	 * @param mixed $expected
+	 * @param mixed $result
+	 * @param string $message
+	 */
 	public function assertNotEqual($expected, $result, $message = '{:message}') {
 		$this->assert($result != $expected, $message, compact('expected', 'result'));
 	}
 
+	/**
+	 * Checks that the actual result and the expected result are identical.
+	 *
+	 * @param mixed $expected
+	 * @param mixed $result
+	 * @param string $message
+	 */
 	public function assertIdentical($expected, $result, $message = '{:message}') {
 		$data = null;
 		if ($expected !== $result) {
@@ -154,25 +216,83 @@ class Unit extends \lithium\core\Object {
 		$this->assert($expected === $result, $message, $data);
 	}
 
+	/**
+	 * Checks that the result evalutes to true.
+	 *
+	 * For example:
+	 * {{{
+	 * $this->assertTrue('false', 'String has content');
+	 * }}}
+	 * {{{
+	 * $this->assertTrue(10, 'Non-Zero value');
+	 * }}}
+	 * {{{
+	 * $this->assertTrue(true, 'Boolean true');
+	 * }}}
+	 * all evaluate to true.
+	 *
+	 * @param mixed $result
+	 * @param string $message
+	 */
 	public function assertTrue($result, $message = '{:message}') {
 		$expected = true;
 		$this->assert(!empty($result), $message, compact('expected', 'result'));
 	}
 
+	/**
+	 * Checks that the result evalutes to false.
+	 *
+	 * For example:
+	 * {{{
+	 * $this->assertFalse('', 'String is empty');
+	 * }}}
+	 *
+	 * {{{
+	 * $this->assertFalse(0, 'Zero value');
+	 * }}}
+	 *
+	 * {{{
+	 * $this->assertFalse(false, 'Zero value');
+	 * }}}
+	 * all evaluate to false.
+	 *
+	 * @param mixed $result
+	 * @param string $message
+	 */
 	public function assertFalse($result, $message = '{:message}') {
 		$expected = false;
 		$this->assert(empty($result), $message, compact('expected', 'result'));
 	}
 
+	/**
+	 * Checks if the result is null.
+	 *
+	 * @param mixed $result
+	 * @param string $message
+	 */
 	public function assertNull($result, $message = '{:message}') {
 		$expected = null;
 		$this->assert($result === null, $message, compact('expected', 'result'));
 	}
 
+	/**
+	 * Tests a for result that does NOT match the expected regular expression pattern
+	 *
+	 * @param mixed $expected
+	 * @param mixed $result
+	 * @param string $message
+	 */
 	public function assertNoPattern($expected, $result, $message = '{:message}') {
 		$this->assert(!preg_match($expected, $result), $message, compact('expected', 'result'));
 	}
 
+	/**
+	 * Tests a for result match in the expected regular expression pattern
+	 *
+	 * @param mixed $expected
+	 * @param mixed $result
+	 * @param string $message
+	 */
 	public function assertPattern($expected, $result, $message = '{:message}') {
 		$this->assert(!!preg_match($expected, $result), $message, compact('expected', 'result'));
 	}
@@ -246,7 +366,7 @@ class Unit extends \lithium\core\Object {
 					continue;
 				}
 
-				if (!empty($tags) && preg_match('/^preg\:\/(.+)\/$/i', $tags, $matches)) {
+				if (!empty($tags) && preg_match('/^regex\:\/(.+)\/$/i', $tags, $matches)) {
 					$tags = $matches[1];
 					$type = 'Regex matches';
 				} else {
@@ -269,7 +389,7 @@ class Unit extends \lithium\core\Object {
 				$explanations = array();
 
 				foreach ($attributes as $attr => $val) {
-					if (is_numeric($attr) && preg_match('/^preg\:\/(.+)\/$/i', $val, $matches)) {
+					if (is_numeric($attr) && preg_match('/^regex\:\/(.+)\/$/i', $val, $matches)) {
 						$attrs[] = $matches[1];
 						$explanations[] = sprintf('Regex "%s" matches', $matches[1]);
 						continue;
@@ -280,7 +400,7 @@ class Unit extends \lithium\core\Object {
 							$attr = $val;
 							$val = '.+?';
 							$explanations[] = sprintf('Attribute "%s" present', $attr);
-						} elseif (!empty($val) && preg_match('/^preg\:\/(.+)\/$/i', $val, $matches)) {
+						} elseif (!empty($val) && preg_match('/^regex\:\/(.+)\/$/i', $val, $matches)) {
 							$quotes = '"?';
 							$val = $matches[1];
 							$explanations[] = sprintf('Attribute "%s" matches "%s"', $attr, $val);

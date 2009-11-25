@@ -26,7 +26,6 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	protected $_valid = false;
 
 	protected $_classes = array(
-		'record' => '\lithium\model\Record',
 		'media' => '\lithium\http\Media'
 	);
 
