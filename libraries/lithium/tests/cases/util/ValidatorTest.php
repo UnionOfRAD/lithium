@@ -849,7 +849,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$rules = array(
 			'title' => 'please enter a title',
 		);
-		$data = (object) array('title' => 'new title');
+		$data = array('title' => 'new title');
 		$result = Validator::check($data, $rules);
 		$this->assertTrue(empty($result));
 	}
@@ -880,7 +880,7 @@ class ValidatorTest extends \lithium\test\Unit {
 				array('rule' => 'isEmail', 'message' => 'email is not valid'),
 			)
 		);
-		$data = (object) array('email' => 'something');
+		$data = array('email' => 'something');
 		$result = Validator::check($data, $rules);
 		$this->assertFalse(empty($result));
 
@@ -899,7 +899,7 @@ class ValidatorTest extends \lithium\test\Unit {
 				array('rule' => 'isEmail', 'message' => 'email is not valid'),
 			)
 		);
-		$data = (object) array('title' => 'new title', 'email' => 'something');
+		$data = array('title' => 'new title', 'email' => 'something');
 		$result = Validator::check($data, $rules);
 		$this->assertFalse(empty($result));
 
@@ -917,7 +917,7 @@ class ValidatorTest extends \lithium\test\Unit {
 				array('rule' => 'isEmail', 'message' => 'email is not valid'),
 			)
 		);
-		$data = (object) array('title' => 'new title', 'email' => 'something@test.com');
+		$data = array('title' => 'new title', 'email' => 'something@test.com');
 		$result = Validator::check($data, $rules);
 		$this->assertTrue(empty($result));
 

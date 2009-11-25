@@ -400,7 +400,7 @@ class Model extends \lithium\core\StaticObject {
 		$params = compact('record', 'options');
 		return static::_filter(__METHOD__, $params, function($parent, $params) use ($self) {
 			extract($params);
-			$errors = Validator::check($record, $self->validates, $options);
+			$errors = Validator::check($record->data(), $self->validates, $options);
 			if (empty($errors)) {
 				return true;
 			}

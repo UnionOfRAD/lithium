@@ -272,15 +272,15 @@ class Validator extends \lithium\core\StaticObject {
 	 * This method may be used to validate any arbitrary array data against a set of validation
 	 * rules.
 	 *
-	 * @param object $data An object of with property values to check.
+	 * @param object $values An array of key/value pairs, where the values are to be checked.
 	 * @param string $rules array of rules to check against object properties
 	 * @return mixed When all validation rules pass
 	 * @todo Bring over validation loop from Model, determine formats/options, implement.
 	 */
-	public static function check($record, $rules, $options = array()) {
+	public static function check($values, $rules, $options = array()) {
 		$rule = 'isNotEmpty';
-		$__filter = function($field, $rules) use ($record, $rule, &$__filter) {
-			$data = isset($record->{$field}) ? array($record->{$field}) : array();
+		$__filter = function($field, $rules) use ($values, $rule, &$__filter) {
+			$data = isset($values[$field]) ? array($values[$field]) : array();
 			$errors = array();
 			if (is_array($rules)) {
 				if (!empty($rules[0])) {
