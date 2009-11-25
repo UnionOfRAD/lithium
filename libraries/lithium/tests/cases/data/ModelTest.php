@@ -16,6 +16,7 @@ use \lithium\tests\mocks\data\MockPostForValidates;
 use \lithium\tests\mocks\data\MockComment;
 use \lithium\tests\mocks\data\MockTag;
 use \lithium\tests\mocks\data\MockTagging;
+use \lithium\tests\mocks\data\MockCreator;
 
 class ModelTest extends \lithium\test\Unit {
 
@@ -266,6 +267,39 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertTrue($result === true);
 		$result = $post->errors();
 		$this->assertTrue(empty($result));
+	}
+
+	public function testDefaultValuesFromSchema() {
+		$creator = MockCreator::create();
+		$expected = array(
+			'name' => 'Moe',
+			'sign' => 'bar',
+			'age' =>  0
+		);
+		$result = $creator->data();
+		$this->assertEqual($expected, $result);
+
+		$creator = MockCreator::create(array('name' => 'Homer'));
+		$expected = array(
+			'name' => 'Homer',
+			'sign' => 'bar',
+			'age' =>  0
+		);
+		$result = $creator->data();
+		$this->assertEqual($expected, $result);
+
+		$creator = MockCreator::create(array(
+			'sign' => 'Beer', 'skin' => 'yellow', 'age' => 12, 'hair' => false
+		));
+		$expected = array(
+			'name' => 'Moe',
+			'sign' => 'Beer',
+			'skin' => 'yellow',
+			'age' =>  12,
+			'hair' => false
+		);
+		$result = $creator->data();
+		$this->assertEqual($expected, $result);
 	}
 
 	/*
