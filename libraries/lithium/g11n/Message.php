@@ -66,9 +66,9 @@ class Message extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	public static function translate($id, $options = array()) {
-		$params = array($id, $options);
+		$params = compact('id', 'options');
 		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
-			return $self::invokeMethod('_translated', $params);
+			return $self::invokeMethod('_translated', array($params['id'], $params['options']));
 		});
 	}
 
