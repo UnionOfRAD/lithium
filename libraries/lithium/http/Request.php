@@ -17,6 +17,14 @@ use \lithium\util\String;
 class Request extends \lithium\http\Base {
 
 	/**
+	 * The protocol scheme to be used in the request. Used when calculating the target URL of this
+	 * request's endpoint.
+	 *
+	 * @var string
+	 */
+	public $scheme = 'http';
+
+	/**
 	 * The Host header value and authority
 	 *
 	 * @var string
@@ -94,30 +102,33 @@ class Request extends \lithium\http\Base {
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(
-			'host' => 'localhost', 'port' => 80, 'method' => 'GET', 'path' => '/',
-			'headers' => array(), 'body' => array(), 'params' => array()
+			'scheme' => 'http',
+			'host' => 'localhost',
+			'port' => 80,
+			'method' => 'GET',
+			'path' => '/',
+			'headers' => array(),
+			'body' => array(),
+			'params' => array()
 		);
 		$config += $defaults;
+
 		foreach ($config as $key => $value) {
 			$this->{$key} = $value;
 		}
-
 		$this->protocol = "HTTP/{$this->version}";
 
 		$this->headers = array(
 			'Host' => $this->host . ":" . $this->port,
-			'Connection' => 'Close', 'User-Agent' => 'Mozilla/5.0 (Lithium)'
+			'Connection' => 'Close',
+			'User-Agent' => 'Mozilla/5.0 (Lithium)'
 		);
 		$this->headers($config['headers']);
 
 		if (!empty($config['auth']['password'])) {
-			$this->headers('Authorization',
-				$config['auth']['method'] . ' '
-				. base64_encode(
-					$config['auth']['username'] . ':'
-					. $config['auth']['password']
-				)
-			);
+			$this->headers('Authorization', $config['auth']['method'] . ' ' . base64_encode(
+				$config['auth']['username'] . ':' . $config['auth']['password']
+			));
 		}
 	}
 
@@ -138,6 +149,7 @@ class Request extends \lithium\http\Base {
 			$params = array_merge($this->params, $params);
 		}
 		$query = null;
+
 		foreach ($params as $key => $value) {
 			$query .= String::insert($format, array(
 				'key' => urlencode($key), 'value' => urlencode($value)
@@ -147,6 +159,28 @@ class Request extends \lithium\http\Base {
 			return null;
 		}
 		return "?" . $this->params = substr($query, 0, -1);
+	}
+
+	public function to($format, $options = array()) {
+		switch ($format) {
+			case 'array':
+				return array(
+					'method' => $this->method,
+					'content' => $this->body(),
+					'header' => $this->headers()
+				);
+			case 'url':
+				$query = $this->queryString();
+				return "{$this->scheme}://{$this->host}:{$this->port}{$this->path}{$query}";
+			case 'context':
+				return array($this->scheme => $options + $this->to('array') + array(
+					'method' => null, 'content' => null,
+					'ignore_errors' => true, 'timeout' => 1
+				));
+			case 'string':
+			default:
+				return (string) $this;
+		}
 	}
 
 	/**
