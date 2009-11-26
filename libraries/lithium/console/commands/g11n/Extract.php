@@ -162,11 +162,9 @@ class Extract extends \lithium\console\Command {
 				'default' => $this->scope
 			));
 			$name =	'runtime' . uniqid();
-			$config[$name] = compact('adapter', 'path', 'scope');
-			Catalog::config($config);
+			$configs[$name] = compact('adapter', 'path', 'scope');
+			Catalog::config($configs);
 		}
-
-		$configs = Catalog::config()->to('array');
 		$scope = $configs[$name]['scope'];
 
 		$message = array();
