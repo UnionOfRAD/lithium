@@ -6,10 +6,8 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\console\commands\bake;
+namespace lithium\console\commands\generate;
 
-class Component {
-	
-}
+class Component extends \lithium\console\Command {}
 
 ?>
