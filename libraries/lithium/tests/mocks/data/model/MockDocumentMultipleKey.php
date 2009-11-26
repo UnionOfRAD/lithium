@@ -13,10 +13,20 @@ use \lithium\data\model\Document;
 class MockDocumentMultipleKey extends \lithium\data\Model {
 
 	protected $_meta = array(
-		'key' => array('id', 'rev')
+		'key' => array('id', 'rev'),
+		'name' => null,
+		'title' => null,
+		'class' => null,
+		'source' => null,
+		'connection' => 'test',
+		'initialized' => false
 	);
 
 	public static function __init($options = array()) {}
+
+	public static function schema($field = null) {
+		return array();
+	}
 
 	public function ret($record, $param1 = null, $param2 = null) {
 		if ($param2) {

@@ -36,7 +36,7 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testOverrideMeta() {
-		MockTag::__init(array('source' => 'test'));
+		MockTag::__init(array('connection' => 'test'));
 
 		$meta = MockTag::meta(array('id' => 'key'));
 
@@ -44,7 +44,7 @@ class ModelTest extends \lithium\test\Unit {
 		$result = $meta['connection'];
 		$this->assertEqual($expected, $result);
 
-		$expected = 'test';
+		$expected = 'mock_tags';
 		$result = $meta['source'];
 		$this->assertEqual($expected, $result);
 
@@ -179,14 +179,14 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testFilteredFind() {
-		MockTag::applyFilter('find', function($self, $params, $chain) {
+		MockComment::applyFilter('find', function($self, $params, $chain) {
 			$result = $chain->next($self, $params, $chain);
 			if ($result != null) {
 				$result->filtered = true;
 			}
 			return $result;
 		});
-		$result = MockTag::first();
+		$result = MockComment::first();
 		$this->assertTrue($result->filtered);
 	}
 
