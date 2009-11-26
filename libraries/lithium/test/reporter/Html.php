@@ -108,12 +108,13 @@ class Html extends \lithium\test\Reporter {
 		$controller = array('controller' => '\lithium\test\Controller');
 
 		if ($type == 'group') {
-			$url = Router::match($controller + array('args' => $namespace) ?: '', $request);
+			$url = Router::match($controller + array('args' => $namespace), $request);
 			return "<li><a href=\"{$url}\">{$name}</a>{$menu}</li>";
 		}
 
 		if ($type == 'case') {
-			$url = Router::match($controller + array('args' =>"{$namespace}/{$name}") ?: '', $request);
+			$args = array('args' => "{$namespace}/{$name}");
+			$url = Router::match($controller + $args, $request);
 			return "<li><a href=\"{$url}\">{$name}</a></li>";
 		}
 		return "<ul>{$menu}</ul>";

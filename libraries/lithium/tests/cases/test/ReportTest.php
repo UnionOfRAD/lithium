@@ -18,6 +18,7 @@ class ReportTest extends \lithium\test\Unit {
 			'title' => '\lithium\tests\mocks\test\MockUnitTest',
 			'group' => new Group(array('items' => array('\lithium\tests\mocks\test\MockUnitTest')))
 		));
+		$report->run();
 
 		$expected = '\lithium\tests\mocks\test\MockUnitTest';
 		$result = $report->title;
@@ -37,6 +38,7 @@ class ReportTest extends \lithium\test\Unit {
 			'title' => '\lithium\tests\mocks\test\MockUnitTest',
 			'group' => new Group(array('items' => array('\lithium\tests\mocks\test\MockUnitTest')))
 		));
+		$report->run();
 
 		$expected = "1 / 1 passes\n0 fails and 0 exceptions";
 		$result = $report->stats();

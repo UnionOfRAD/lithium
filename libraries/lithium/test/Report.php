@@ -88,13 +88,12 @@ class Report extends \lithium\core\Object {
 		$class = Inflector::camelize($this->_config['reporter']);
 		$reporter = Libraries::locate('test.reporter', $class);
 		if (!$reporter) {
-			throw new Exception("{$format} is not a valid reporter");
+			throw new Exception("{$class} is not a valid reporter");
 		}
 		$this->reporter = new $reporter();
 		$this->group = $this->_config['group'];
 		$this->filters = $this->_config['filters'];
 		$this->title = $this->_config['title'] ?: $this->_config['title'];
-		$this->run();
 	}
 
 	/**

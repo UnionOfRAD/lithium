@@ -62,6 +62,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$options['filters'] = Set::normalize($options['filters']);
 		$group = static::_group($items);
 		$report = static::_report($group, $options);
+		$report->run();
 		return $report;
 	}
 
