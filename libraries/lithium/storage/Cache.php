@@ -64,7 +64,7 @@ class Cache extends \lithium\core\Adaptable {
 	 *                    that will be used as the cache key.
 	 * @param array $data If a lambda/closure is used as a key and requires arguments,
 	 *                    pass them in here.
-     * @return string     The generated cache key.
+	 * @return string	The generated cache key.
 	 */
 	public static function key($key, $data = array()) {
 		$key = is_object($key) ? $key($data) : $key;

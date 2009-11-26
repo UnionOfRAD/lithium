@@ -29,7 +29,7 @@ class PhpTest extends \lithium\test\Unit {
 			session_destroy();
 		}
 		/* Revert to original garbage collection probability */
-        ini_set('session.gc_divisor', $this->_gc_divisor);
+		ini_set('session.gc_divisor', $this->_gc_divisor);
 
 	}
 

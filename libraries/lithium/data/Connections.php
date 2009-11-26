@@ -63,14 +63,14 @@ class Connections extends \lithium\core\StaticObject {
 	 *
 	 * For example:
 	 * {{{
-     * Connections::add('default', 'database', array(
+	 * Connections::add('default', 'database', array(
 	 *     'adapter' => 'MySql',
 	 *     'host' => 'localhost',
 	 *     'login' => 'root',
 	 *     'password' => '',
 	 *     'database' => 'my_blog'
 	 * ));
-     * }}}
+	 * }}}
 	 *
 	 * or
 	 *

@@ -49,11 +49,11 @@ class Php extends \lithium\core\Object {
 	protected function _init() {
 		session_write_close();
 
-        if (headers_sent()) {
+		if (headers_sent()) {
 			$_SESSION = (empty($_SESSION)) ?: array();
-        } elseif (!isset($_SESSION)) {
-            session_cache_limiter("nocache");
-        }
+		} elseif (!isset($_SESSION)) {
+			session_cache_limiter("nocache");
+		}
 		session_start();
 
 		foreach ($this->_defaults as $key => $config) {
