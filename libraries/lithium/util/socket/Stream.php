@@ -108,7 +108,7 @@ class Stream extends \lithium\util\Socket {
 	 * @param string $data The string to be written.
 	 * @return mixed False on error, number of bytes written otherwise.
 	 */
-	public function write($data) {
+	public function write($data) {		
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
@@ -156,7 +156,7 @@ class Stream extends \lithium\util\Socket {
 	 * @return boolean response string or object like `\lithium\http\Response`
 	 */
 	public function send($message, $options = array()) {
-		if ($this->write((string) $request)) {
+		if ($this->write((string) $message)) {
 			$message = $this->read();
 			$response = new $options['classes']['response'](compact('message'));
 			return $response;
