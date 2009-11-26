@@ -65,8 +65,8 @@ class MySQLi extends \lithium\data\source\Database {
 	 *        see `lithium\data\source\Database` and `lithium\data\Source`.
 	 *
 	 * Options defined by this class:
-	 *  - 'port' `integer|string`: Accepts a port number or Unix socket name to use when connecting
-	 *  to the database.  Defaults to `'3306'`.
+	 * - 'port' `integer|string`: Accepts a port number or Unix socket name to use when connecting
+	 *   to the database.  Defaults to `'3306'`.
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('port' => '3306');
