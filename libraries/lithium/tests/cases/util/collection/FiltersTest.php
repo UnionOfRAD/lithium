@@ -11,7 +11,6 @@ namespace lithium\tests\cases\util\collection;
 use \lithium\util\collection\Filters;
 
 class FiltersTest extends \lithium\test\Unit {
-
 	public function testRun() {
 		$options = array('method' => __FUNCTION__, 'class' => __CLASS__, 'items' => array(
 			function($self, $params, $chain) {
@@ -31,6 +30,18 @@ class FiltersTest extends \lithium\test\Unit {
 		$expected .= ' lithium\tests\cases\util\collection\FiltersTest class.';
 		$this->assertEqual($expected, $result);
 	}
+
+    public function testRunWithoutChain() {
+        $options = array('method' => __FUNCTION__, 'class' => __CLASS__, 'items' => array(
+            function($self, $params, $chain) {
+                return $chain->next($self, $params, null);
+            },
+            'This is a filter chain that calls $chain->next() without the $chain argument.'
+        ));
+        $result = Filters::run(__CLASS__, array(), $options);
+        $expected = 'This is a filter chain that calls $chain->next() without the $chain argument.';
+        $this->assertEqual($expected, $result);
+    }
 }
 
 ?>
