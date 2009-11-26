@@ -39,10 +39,10 @@ class Stream {
 			return false;
 		}
 
-		$escEcho = '/\<\?=\s*\$this->(.+?)\s*;?\s*\?>/';
+		$escEcho = '/\<\?=\s*\$this->(.+?)\s*;?\s*\?>/ms';
 		$this->_data = preg_replace($escEcho, '<?php echo $this->$1; ?>', $this->_data);
 
-		$echo = '/\<\?=\s*(.+?)\s*;?\s*\?>/';
+		$echo = '/\<\?=\s*(.+?)\s*;?\s*\?>/ms';
 		$this->_data = preg_replace($echo, '<?php echo $h($1); ?>', $this->_data);
 		return true;
 	}

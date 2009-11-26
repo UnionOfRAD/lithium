@@ -6,8 +6,16 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\console\commands\generate;
+namespace lithium\tests\cases\test\filters;
 
-class View extends \lithium\console\Command {}
+use \lithium\test\filters\Complexity;
+
+class ComplexityTest extends \lithium\test\Unit {
+
+	public function setUp() {
+
+	}
+
+}
 
 ?>

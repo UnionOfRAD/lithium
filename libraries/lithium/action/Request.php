@@ -133,6 +133,7 @@ class Request extends \lithium\core\Object {
 		$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
 		$this->_env['PLATFORM'] = isset($envs[PHP_SAPI]) ? $envs[PHP_SAPI] : null;
 		$this->_base = $this->_base ?: $this->_base();
+		$this->query = isset($_GET) ? $_GET : array();
 		$this->data = isset($_POST) ? $_POST : array();
 
 		if (isset($this->data['_method'])) {
@@ -143,7 +144,6 @@ class Request extends \lithium\core\Object {
 		if (isset($this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
 			$this->_env['REQUEST_METHOD'] = $this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'];
 		}
-
 
 		if (isset($_FILES)) {
 			$result = array();
