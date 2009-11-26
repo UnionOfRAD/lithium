@@ -69,42 +69,37 @@ class Extract extends \lithium\console\Command {
 		$message[] = 'A `Catalog` class configuration with an adapter that is capable of';
 		$message[] = 'handling read requests for the `message.template` category is needed';
 		$message[] = 'in order to proceed.';
-		$message[] = '';
-		$message[] = 'All such configurations (i.e. the ones already setup in the boostrap file)';
-		$message[] = 'will be used for the extraction process. If you are missing one or want to';
-		$message[] = 'add an extra one you can do this now.';
 		$this->out($message);
 		$this->nl();
 
+		$configs = (array)Catalog::config()->to('array');
+
 		$this->out('Available `Catalog` Configurations:');
-		foreach (array_keys(Catalog::config()->to('array')) as $name) {
+		foreach ($configs as $name => $config) {
 			$this->out(" - {$name}");
 		}
 		$this->nl();
 
-		$message = 'Would you like to add a configuration?';
-		$add = $this->in($message, array('choices' => array('y', 'n'), 'default' => 'y')) == 'y';
-		$config = array();
+		$name = $this->in('Please choose a configuration or hit [enter] to add one:', array(
+			'choices' => array_keys($configs)
+		));
 
-		while ($add) {
+		if (!$name) {
 			$adapter = $this->in('Adapter:', array(
-				'default' => 'Code'
+				'default' => 'Gettext'
 			));
 			$path = $this->in('Path:', array(
-				'default' => $this->source
+				'default' => $this->destination
 			));
 			$scope = $this->in('Scope:', array(
 				'default' => $this->scope
 			));
-			$config['runtime' . uniqid()] = compact('adapter', 'path', 'scope');
-
-			$message = 'Would you like to add another configuration?';
-			if ($this->in($message, array('choices' => array('y', 'n'), 'default' => 'n')) != 'y') {
-				break;
-			}
+			$name =	'runtime' . uniqid();
+			$configs[$name] = compact('adapter', 'path', 'scope');
 		}
-		Catalog::config($config);
-		return Catalog::read('message.template', 'root');
+		Catalog::config($configs);
+		$scope = $configs[$name]['scope'];
+		return Catalog::read('message.template', 'root', compact('name', 'scope'));
 	}
 
 	/**
@@ -144,16 +139,16 @@ class Extract extends \lithium\console\Command {
 		$this->out($message);
 		$this->nl();
 
-		$names = array_keys((array)Catalog::config()->to('array'));
+		$configs = (array)Catalog::config()->to('array');
 
 		$this->out('Available `Catalog` Configurations:');
-		foreach ($names as $name) {
+		foreach ($configs as $name => $config) {
 			$this->out(" - {$name}");
 		}
 		$this->nl();
 
 		$name = $this->in('Please choose a configuration or hit [enter] to add one:', array(
-			'choices' => $names
+			'choices' => array_keys($configs)
 		));
 
 		if (!$name) {
