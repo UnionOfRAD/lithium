@@ -31,3 +31,5 @@ class MockObjectConfiguration extends \lithium\core\Object {
 		);
 	}
 }
+
+?>

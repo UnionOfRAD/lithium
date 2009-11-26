@@ -13,3 +13,5 @@ class MockObjectForParents extends \lithium\core\Object {
 		return static::_parents();
 	}
 }
+
+?>
