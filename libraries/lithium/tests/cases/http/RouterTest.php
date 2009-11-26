@@ -14,9 +14,20 @@ use \lithium\action\Request;
 
 class RouterTest extends \lithium\test\Unit {
 
+	public $request = null;
+
+	protected $_routes = array();
+
 	public function setUp() {
 		$this->request = new Request();
+		$this->_routes = Router::get();
 		Router::connect(null);
+	}
+
+	public function tearDown() {
+		foreach ($this->_routes as $route) {
+			Router::connect($route);
+		}
 	}
 
 	public function testBasicRouteConnection() {
