@@ -76,12 +76,14 @@ class ModelTest extends \lithium\test\Unit {
 	public function testMetaInformation() {
 		$expected = array(
 			'class'       => 'lithium\tests\mocks\data\MockPost',
-			'name'       => 'MockPost',
-			'key'        => 'id',
-			'title'      => 'title',
-			'source'     => 'mock_posts',
-			'connection' => 'test'
+			'name'        => 'MockPost',
+			'key'         => 'id',
+			'title'       => 'title',
+			'source'      => 'mock_posts',
+			'connection'  => 'test',
+			'initialized' => true
 		);
+		MockPost::__init();
 		$this->assertEqual($expected, MockPost::meta());
 
 		$expected = array(
@@ -90,7 +92,8 @@ class ModelTest extends \lithium\test\Unit {
 			'key'        => 'comment_id',
 			'title'      => 'comment_id',
 			'source'     => 'mock_comments',
-			'connection' => 'test'
+			'connection' => 'test',
+			'initialized' => true
 		);
 		$this->assertEqual($expected, MockComment::meta());
 

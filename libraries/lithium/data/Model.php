@@ -10,6 +10,8 @@ namespace lithium\data;
 
 use \lithium\util\Set;
 use \lithium\util\Inflector;
+use \RuntimeException;
+use \UnexpectedValueException;
 
 /**
  * Model class
@@ -79,7 +81,8 @@ class Model extends \lithium\core\StaticObject {
 		'title' => null,
 		'class' => null,
 		'source' => null,
-		'connection' => 'default'
+		'connection' => 'default',
+		'initialized' => false
 	);
 
 	protected $_schema = array();
@@ -126,21 +129,31 @@ class Model extends \lithium\core\StaticObject {
 		$self->_classes = ($classes + $backendConfig['classes'] + $base['_classes']);
 		$meta = ($self->_meta + $backendConfig['meta'] + $base['_meta']);
 		$self->_meta = ($options + compact('class') + array('name' => static::_name()) + $meta);
+		$self->_meta['initialized'] = false;
 
-		if ($self->_meta['source'] === null) {
-			$self->_meta['source'] = Inflector::tableize($self->_meta['name']);
-		}
+		$self->_finders += $backendConfig['finders'] + $self->_findFilters();
+		static::_instance()->_relations = static::_relations();
+	}
 
-		$titleKeys = array('title', 'name', $self->_meta['key']);
-		$self->_meta['title'] = $self->_meta['title'] ?: static::hasField($titleKeys);
-
-		$self->_finders += $backendConfig['finders'] + array(
+	protected static function _findFilters() {
+		return array(
 			'first' => function($self, $params, $chain) {
 				$params['options']['limit'] = 1;
 				return $chain->next($self, $params, $chain)->rewind();
+			},
+			'list' => function($self, $params, $chain) {
+				$result = array();
+				$meta = $self::meta();
+
+				array_map(
+					function($record) use (&$result, $meta) {
+						$result[$record->{$meta['key']}] = $record->{$meta['title']};
+					},
+					$chain->next($self, $params, $chain)
+				);
+				return $result;
 			}
 		);
-		static::_instance()->_relations = static::_relations();
 	}
 
 	public static function __callStatic($method, $params) {
@@ -192,8 +205,8 @@ class Model extends \lithium\core\StaticObject {
 
 			$query = new $options['classes']['query'](array('type' => 'read') + $options);
 			$connection = $connections::get($name);
-
 			$result = $connection->read($query, $options);
+
 			if ($result === null) {
 				return null;
 			}
@@ -208,7 +221,7 @@ class Model extends \lithium\core\StaticObject {
 			));
 		};
 		$finder = isset($self->_finders[$type]) ? array($self->_finders[$type]) : array();
-		return static::_filter(__METHOD__, $params, $filter, $finder);
+		return static::_filter(get_called_class() . '::' . __FUNCTION__, $params, $filter, $finder);
 	}
 
 	/**
@@ -230,6 +243,16 @@ class Model extends \lithium\core\StaticObject {
 
 	public static function meta($key = null, $value = null) {
 		$self = static::_instance();
+
+		if (!$self->_meta['initialized']) {
+			if ($self->_meta['source'] === null) {
+				$self->_meta['source'] = Inflector::tableize($self->_meta['name']);
+			}
+
+			$titleKeys = array('title', 'name', $self->_meta['key']);
+			$self->_meta['title'] = $self->_meta['title'] ?: static::hasField($titleKeys);
+			$self->_meta['initialized'] = true;
+		}
 
 		if (!empty($value)) {
 			$self->_meta[$key] = $value;
@@ -289,9 +312,7 @@ class Model extends \lithium\core\StaticObject {
 		$self = static::_instance();
 
 		if (empty($self->_schema)) {
-			$name = $self->_meta['connection'];
-			$conn = $self->_classes['connections'];
-			$self->_schema = $conn::get($name)->describe($self->_meta['source'], $self->_meta);
+			$self->_schema = $self->_connection()->describe($self->_meta['source'], $self->_meta);
 		}
 		if (is_string($field) && !empty($field)) {
 			return isset($self->_schema[$field]) ? $self->_schema[$field] : null;
@@ -374,7 +395,7 @@ class Model extends \lithium\core\StaticObject {
 		$options += $defaults + compact('classes');
 		$params = compact('record', 'data', 'options');
 
-		$filter = function($self, $params) use ($meta) {
+		$filter = function($class, $params) use (&$self, $meta) {
 			extract($params);
 
 			if ($data) {
@@ -382,58 +403,49 @@ class Model extends \lithium\core\StaticObject {
 			}
 
 			if ($options['validate'] && !$record->validates()) {
+				return false;
 			}
-
-			$name = $meta['connection'];
-			$connections = $options['classes']['connections'];
 
 			$queryOptions = array('type' => 'read') + $options + $meta + compact('record');
 			$query = new $options['classes']['query']($queryOptions);
+			$method = $record->exists() ? 'update' : 'create';
 
-			if (!$record->exists()) {
-				return $connections::get($name)->create($query, $options);
-			}
-			return $connections::get($name)->update($query, $options);
+			return $self->invokeMethod('_connection')->{$method}($query, $options);
 		};
 
 		if (!$options['callbacks']) {
 			return $filter->__invoke($record, $options);
 		}
-		return static::_filter(__METHOD__, $params, $filter);
+		return static::_filter(get_called_class() . '::' . __FUNCTION__, $params, $filter);
 	}
 
 	public function validates($record, $options = array()) {
 		$self = static::_instance();
 		$validator = $self->_classes['validator'];
 		$params = compact('record', 'options');
-		$filter = function($parent, $params) use ($self, $validator) {
+
+		$filter = function($parent, $params) use (&$self, $validator) {
 			extract($params);
-			$errors = $validator::check($record->data(), $self->validates, $options);
-			if (empty($errors)) {
-				return true;
+
+			if ($errors = $validator::check($record->data(), $self->validates, $options)) {
+				$record->errors($errors);
 			}
-			$record->errors($errors);
-			return false;
+			return empty($errors);
 		};
-		return static::_filter(__METHOD__, $params, $filter);
+		return static::_filter(get_called_class() . '::' . __FUNCTION__, $params, $filter);
 	}
 
 	public function delete($record, $options = array()) {
 		$self = static::_instance();
-		$classes = $self->_classes;
-
-		$meta = array('model' => get_called_class()) + $self->_meta;
+		$query = $self->_classes['query'];
+		$model = get_called_class();
 		$params = compact('record', 'options');
+		$method = "{$model}::delete";
 
-		return static::_filter(__METHOD__, $params, function($self, $params) use ($meta, $classes) {
+		return static::_filter($method, $params, function($self, $params) use ($model, $query) {
 			extract($params);
-			$options += array('model' => $meta['model']) + compact('record');
-			$connections = $classes['connections'];
-			$name = $meta['connection'];
-
-			$query = new $classes['query']($options);
-			$connection = $connections::get($name);
-			return $connection->delete($query, $options);
+			$options += compact('record', 'model');
+			return $self::invokeMethod('_connection')->delete(new $query($options), $options);
 		});
 	}
 
@@ -446,6 +458,27 @@ class Model extends \lithium\core\StaticObject {
 	protected static function _name() {
 		static $name;
 		return $name ?: $name = join('', array_slice(explode("\\", get_called_class()), -1));
+	}
+
+	/**
+	 * Gets the connection object to which this model is bound. Throws exceptions if a connection
+	 * isn't set, or if the connection named isn't configured.
+	 *
+	 * @return object Returns an instance of `lithium\data\Source` from the connection configuration
+	 *         to which this model is bound.
+	 */
+	protected static function &_connection() {
+		$self = static::_instance();
+		$connections = $self->_classes['connections'];
+		$name = isset($self->_meta['connection']) ? $self->_meta['connection'] : null;
+
+		if (!$name) {
+			throw new UnexpectedValueException("Connection name not defined");
+		}
+		if ($conn = $connections::get($name)) {
+			return $conn;
+		}
+		throw new RuntimeException("The data connection {$name} is not configured");
 	}
 
 	/**
