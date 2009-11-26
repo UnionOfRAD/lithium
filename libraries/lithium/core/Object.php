@@ -13,6 +13,10 @@ use \lithium\util\collection\Filters;
 /**
  * Base class in Lithium hierarchy, from which all other dynamic classes inherit.
  *
+ * Options defined:
+ *  - 'init' `boolean` Controls constructor behaviour for calling the _init method. If false the
+ *    method is not called, otherwise it is. Defaults to true.
+ *
  */
 class Object {
 
@@ -24,6 +28,11 @@ class Object {
 	 */
 	protected $_config = array();
 
+	/**
+	 * Holds an array of values that should be processed on initialisation.
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array();
 
 	protected $_methodFilters = array();
@@ -32,6 +41,11 @@ class Object {
 
 	protected static $_parents = array();
 
+	/**
+	 * Initialises properties, unless supplied configuration options change the default behaviour.
+	 *
+	 * @return object
+	 */
 	public function __construct($config = array()) {
 		$defaults = array('init' => true);
 		$this->_config = (array)$config + $defaults;

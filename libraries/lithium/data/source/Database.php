@@ -25,12 +25,40 @@ abstract class Database extends \lithium\data\Source {
 		'join'   => "{:type} JOIN {:table} {:constraint}"
 	);
 
+	/**
+	 * Abstract. Must be defined by child class.
+	 * Getter/Setter for the connection's encoding
+	 *
+	 * @param mixed $encoding
+	 * @return mixed.
+	 */
 	abstract public function encoding($encoding = null);
 
+	/**
+	 * Abstract. Must be defined by child class.
+	*/
 	abstract public function result($type, $resource, $context);
 
+	/**
+	 * Abstract. Must be defined by child class.
+	*/
 	abstract public function error();
 
+	/**
+	 * Creates the database object and set default values for it.
+	 *
+	 * Options defined:
+	 *
+	 *  - 'database' _string_ Name of the database to use. Defaults to 'lithium'.
+	 *  - 'host' _string_ Name/address of server to connect to. Defaults to 'localhost'.
+	 *  - 'login' _string_ Username to use when connecting to server. Defaults to 'root'.
+	 *  - 'password' _string_ Password to use when connecting to server. Defaults to none.
+	 *  - 'persistent' _boolean_ If true a persistent connection will be attempted, provided the
+	 *    adapter supports it. Defaults to true.
+	 *
+	 * @param $config array Array of configuration options.
+	 * @return Database object.
+	 */
 	public function __construct($config = array()) {
 		$defaults = array(
 			'persistent' => true,

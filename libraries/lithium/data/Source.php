@@ -36,11 +36,23 @@ abstract class Source extends \lithium\core\Object {
 	 */
 	protected $_isConnected = false;
 
+	/**
+	 * Constructor. Sets defaults and returns object.
+	 *
+	 * Options defined.
+	 *
+	 * - 'autoConnect' `boolean` If true, a connection is made on initialisation. Defaults to true.
+	 *
+	 * @return Source object
+	 */
 	public function __construct($config = array()) {
 		$defaults = array('autoConnect' => true);
 		parent::__construct((array)$config + $defaults);
 	}
 
+	/**
+	 * Ensures the connection is closed, before the object is destroyed.
+	 */
 	public function __destruct() {
 		if ($this->_isConnected) {
 			$this->disconnect();
@@ -76,8 +88,14 @@ abstract class Source extends \lithium\core\Object {
 		return $this->_isConnected;
 	}
 
+	/**
+	 * Abstract. Must be defined by child classes.
+	 */
 	abstract public function connect();
 
+	/**
+	 * Abstract. Must be defined by child classes.
+	 */
 	abstract public function disconnect();
 
 	/**
@@ -92,8 +110,22 @@ abstract class Source extends \lithium\core\Object {
 
 	abstract public function describe($entity, $meta = array());
 
+	/**
+	 * Abstract. Must be defined by child classes.
+	 *
+	 * @param mixed $query
+	 * @param array $options
+	 * @return boolean Returns true if the operation was a success, otherwise false.
+	 */
 	abstract public function create($query, $options);
 
+	/**
+	 * Abstract. Must be defined by child classes.
+	 *
+	 * @param mixed $query
+	 * @param array $options
+	 * @return boolean Returns true if the operation was a success, otherwise false.
+	 */
 	abstract public function read($query, $options);
 
 	/**
@@ -108,6 +140,13 @@ abstract class Source extends \lithium\core\Object {
 	 */
 	abstract public function update($query, $options);
 
+	/**
+	 * Abstract. Must be defined by child classes.
+	 *
+	 * @param mixed $query
+	 * @param array $options
+	 * @return boolean Returns true if the operation was a success, otherwise false.
+	 */
 	abstract public function delete($query, $options);
 
 	/**
