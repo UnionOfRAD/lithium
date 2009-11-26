@@ -171,6 +171,9 @@ class Extract extends \lithium\console\Command {
 			Catalog::config($config);
 		}
 
+		$configs = Catalog::config()->to('array');
+		$scope = $configs[$name]['scope'];
+
 		$message = array();
 		$message[] = 'The template is now ready to be saved.';
 		$message[] = 'Please note that an existing template will be overwritten.';
@@ -181,7 +184,7 @@ class Extract extends \lithium\console\Command {
 			$this->out('Aborting upon user request.');
 			$this->stop(1);
 		}
-		return Catalog::write('message.template', $data, compact('name'));
+		return Catalog::write('message.template', $data, compact('name', 'scope'));
 	}
 }
 
