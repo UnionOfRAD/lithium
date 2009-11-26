@@ -105,6 +105,8 @@ class Document extends \lithium\util\Collection {
 	 */
 	protected $_exists = false;
 
+	protected $_errors = array();
+
 	/**
 	 * The class dependencies for `Document`.
 	 *
@@ -260,6 +262,30 @@ class Document extends \lithium\util\Collection {
 	 */
 	public function exists() {
 		return $this->_exists;
+	}
+
+	/**
+	* Access the errors of the record.
+	*
+	* @param mixed $field if array will overwrite `$this->_errors`, if string and value, sets
+	* @param string $value
+	* @return string
+	*/
+	public function errors($field = null, $value = null) {
+		if ($field === null) {
+			return $this->_errors;
+		}
+		if (is_array($field)) {
+			$this->_errors = $field;
+			return $this->_errors;
+		}
+		if ($value === null && isset($this->_errors[$field])) {
+			return $this->_errors[$field];
+		}
+		if ($value !== null) {
+			return $this->_errors[$field] = $value;
+		}
+		return $value;
 	}
 
 	/**

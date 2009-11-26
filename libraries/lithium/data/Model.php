@@ -333,6 +333,14 @@ class Model extends \lithium\core\StaticObject {
 	 * @return object Returns a new, un-saved record object.
 	 */
 	public static function create($data = array()) {
+		$schema = static::schema();
+		if (!empty($schema)) {
+			foreach ($schema as $field => $settings ) {
+				if (!isset($data[$field]) && array_key_exists('default',$settings)) {
+					$data[$field] = $settings['default'];
+				}
+			}
+		}
 		$class = static::_instance()->_classes['record'];
 		$model = get_called_class();
 		return new $class(compact('model', 'data'));
