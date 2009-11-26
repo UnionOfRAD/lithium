@@ -165,7 +165,7 @@ class Extract extends \lithium\console\Command {
 			$configs[$name] = compact('adapter', 'path', 'scope');
 			Catalog::config($configs);
 		}
-		$scope = $configs[$name]['scope'];
+		$scope = $configs[$name]['scope'] ?: $this->in('Scope:', array('default' => $this->scope));
 
 		$message = array();
 		$message[] = 'The template is now ready to be saved.';
