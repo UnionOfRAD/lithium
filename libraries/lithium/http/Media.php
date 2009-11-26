@@ -18,21 +18,12 @@ use \lithium\util\String;
  *
  * Using the `Media` class, you can globally configure input and output of different types of
  * content, i.e.:
- * {{{Media::asset('csv', 'application/csv', array('encode' => function($data) {
- *	ob_start();
- *	$out = fopen('php://output', 'w');
- *	foreach ($data as $record) {
- *		fputcsv($out, $record->to('array'));
- *	}
- *	fclose($out);
- *	$content = ob_get_clean();
- *	return $content;
- * }));}}}
+ * {{{ embed:lithium\tests\cases\http\MediaTest::testCustomEncodeHandler(4-13) }}}
  *
  * You may then render CSV content from anywhere in your application. For example, in a controller
  * you may do the following:
  *
- * {{{$this->render(array('csv', 'data' => Post::find('all')));}}}
+ * {{{	$this->render(array('csv', 'data' => Post::find('all')));}}}
  */
 class Media extends \lithium\core\Object {
 
