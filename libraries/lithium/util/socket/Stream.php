@@ -144,6 +144,24 @@ class Stream extends \lithium\util\Socket {
 		}
 		return is_resource($this->_resource) ? stream_encoding($this->_resource, $charset) : false;
 	}
+
+	/**
+	 * Aggregates read and write methods into a coherent request response
+	 *
+	 * @param mixed $request array or object like `\lithium\http\Request`
+	 * @params array $options
+	 *                - path: path for the current request
+	 *                - classes: array of classes to use
+	 *                    - response: a class to use for the response
+	 * @return boolean response string or object like `\lithium\http\Response`
+	 */
+	public function send($message, $options = array()) {
+		if ($this->write((string) $request)) {
+			$message = $this->read();
+			$response = new $options['classes']['response'](compact('message'));
+			return $response;
+		}
+	}
 }
 
 ?>

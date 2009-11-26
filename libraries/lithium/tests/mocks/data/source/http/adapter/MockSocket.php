@@ -46,9 +46,13 @@ class MockSocket extends \lithium\util\Socket {
 	public function encoding($charset) {
 		return true;
 	}
-	
-	public function send() {
-		
+
+	public function send($message, $options = array()) {
+		if ($this->write($message)) {
+			$message = $this->read();
+			$response = new $options['classes']['response'](compact('message'));
+			return $response;
+		}
 	}
 }
 ?>

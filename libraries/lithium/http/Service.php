@@ -53,6 +53,7 @@ class Service extends \lithium\core\Object {
 		'media'    => '\lithium\http\Media',
 		'request'  => '\lithium\http\Request',
 		'response' => '\lithium\http\Response',
+		'socket'   => '\lithium\util\socket\Context'
 	);
 
 	/**
@@ -64,8 +65,9 @@ class Service extends \lithium\core\Object {
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(
+			'autoConnect' => true,
 			'persistent' => false,
-			'protocol'   => 'tcp',
+			'protocol'   => 'http',
 			'host'       => 'localhost',
 			'version'    => '1.1',
 			'auth'       => 'Basic',
@@ -74,9 +76,6 @@ class Service extends \lithium\core\Object {
 			'port'       => 80,
 			'timeout'    => 1,
 			'encoding'   => 'UTF-8',
-			'classes'    => array(),
-			'transport'  => 'Context',
-			'transportOptions' => array()
 		);
 		$config = (array)$config + $defaults;
 
@@ -88,17 +87,21 @@ class Service extends \lithium\core\Object {
 		parent::__construct($config);
 	}
 
+	protected function _init() {
+		parent::_init();
+		$class = Libraries::locate('sockets.util', $this->_classes['socket']);
+		if (is_string($class)) {
+			$this->_connection = new $class($this->_config);
+		}
+	}
+
 	/**
 	 * Connect to datasource
 	 *
 	 * @return boolean
 	 */
 	public function connect() {
-		if (!$this->_connection) {
-			$class = Libraries::locate('sockets.util', $this->_config['transport']);
-			$this->_connection = new $class($this->_config['transportOptions']);
-		}
-		if (!$this->_isConnected && $this->_config['protocol']) {
+		if (!$this->_isConnected && $this->_connection) {
 			$this->_isConnected = $this->_connection->open();
 		}
 		return $this->_isConnected;
@@ -111,7 +114,7 @@ class Service extends \lithium\core\Object {
 	 */
 	public function disconnect() {
 		if ($this->_isConnected) {
-			$this->_isConnected = false;
+			$this->_isConnected = !$this->_connection->close();;
 		}
 		return !$this->_isConnected;
 	}
@@ -174,10 +177,10 @@ class Service extends \lithium\core\Object {
 			return;
 		}
 		$request = $this->_request($method, $path, $data, $options);
-		$sendOptions = array('responseClass' => $this->_classes['response']);
+		$response = $this->_connection->send($request, array('classes' => $this->_classes));
 
-		if ($response = $this->_connection->send($request, $sendOptions)) {
-			$this->last = (object)compact('request', 'response');
+		if ($response) {
+			$this->last = (object) compact('request', 'response');
 			$this->disconnect();
 			return ($options['return'] == 'body') ? $response->body() : $response;
 		}

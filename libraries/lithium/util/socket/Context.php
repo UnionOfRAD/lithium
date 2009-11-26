@@ -21,7 +21,7 @@ class Context extends \lithium\util\Socket {
 
 	public function close() {
 		if (is_resource($this->_connection)) {
-			fclose($this->_connection);
+			return fclose($this->_connection);
 		}
 		return true;
 	}
@@ -47,50 +47,32 @@ class Context extends \lithium\util\Socket {
 	}
 
 	/**
-	 * Connect to datasource
-	 *
-	 * @return boolean
-	 */
-	public function connect() {
-		return true;
-	}
-
-	/**
-	 * Disconnect from socket
-	 *
-	 * @return boolean
-	 */
-	public function disconnect() {
-		return $this->close();
-	}
-
-	/**
 	 * Send request and return response data
 	 *
 	 * @param string path
 	 * @return string
 	 */
 	public function send($message, $options = array()) {
-		$defaults = array('path' => null, 'responseClass' => null);
+		$defaults = array('path' => null, 'classes' => array('response' => null));
 		$options += $defaults;
 
-		if ($this->connect() === false) {
+		if ($this->open() === false) {
 			return false;
 		}
-		$path = is_object($message) ? $message->to('link') : $options['path'];
+		$url = is_object($message) ? $message->to('url') : $options['path'];
 		$message = is_object($message) ? $message->to('context') : $message;
 
-		if ($this->_connection = fopen($path, 'r', false, stream_context_create($message))) {
+		if ($this->_connection = fopen($url, 'r', false, stream_context_create($message))) {
 			$meta = stream_get_meta_data($this->_connection);
 			$headers = $meta['wrapper_data'] ?: array();
-			$message = $headers[0] ?: null;
+			$message = isset($headers[0]) ? $headers[0] : null;
 			$body = stream_get_contents($this->_connection);
 			$this->close();
 
-			if (!$options['responseClass']) {
+			if (!$options['classes']['response']) {
 				return $body;
 			}
-			return new $options['responseClass'](compact('headers', 'body', 'message'));
+			return new $options['classes']['response'](compact('headers', 'body', 'message'));
 		}
 	}
 }

@@ -10,6 +10,11 @@ namespace lithium\util;
 
 abstract class Socket extends \lithium\core\Object {
 
+	/**
+	 * the resource for the current connection
+	 *
+	 * @var resource
+	 */
 	protected $_resource = null;
 
 	/**
@@ -73,6 +78,18 @@ abstract class Socket extends \lithium\core\Object {
 	 * @return boolean `true` if data has been succesfully written, `false` otherwise.
 	 */
 	abstract public function write($data);
+
+	/**
+	 * Aggregates read and write methods into a coherent request response
+	 *
+	 * @param mixed $request array or object like `\lithium\http\Request`
+	 * @params array $options
+	 *                - path: path for the current request
+	 *                - classes: array of classes to use
+	 *                    - response: a class to use for the response
+	 * @return boolean response string or object like `\lithium\http\Response`
+	 */
+	abstract public function send($message, $options = array());
 
 	/**
 	 * Sets the timeout on the socket *connection*.
