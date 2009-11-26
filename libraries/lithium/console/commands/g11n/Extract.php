@@ -37,13 +37,12 @@ class Extract extends \lithium\console\Command {
 	public function run() {
 		$this->header('Message Extraction');
 
-		if ($data = $this->_extract()) {
-			$count = count($data['root']);
-			$this->out("Yielded {$count} items.");
-		} else {
+		if (!$data = $this->_extract()) {
 			$this->err('Yielded no items.');
 			return 1;
 		}
+		$count = count($data['root']);
+		$this->out("Yielded {$count} items.");
 		$this->nl();
 
 		$this->header('Message Template Creation');
@@ -51,7 +50,10 @@ class Extract extends \lithium\console\Command {
 		$meta = $this->_meta();
 		$this->nl();
 
-		$this->_writeTemplate($data, $meta);
+		if (!$this->_writeTemplate($data, $meta)) {
+			$this->err('Failed to write template.');
+			return 1;
+		}
 		$this->nl();
 
 		return 0;
@@ -76,7 +78,7 @@ class Extract extends \lithium\console\Command {
 
 		$this->out('Available `Catalog` Configurations:');
 		foreach (array_keys(Catalog::config()->to('array')) as $name) {
-			$this->out("- {$name}");
+			$this->out(" - {$name}");
 		}
 		$this->nl();
 
@@ -146,7 +148,7 @@ class Extract extends \lithium\console\Command {
 
 		$this->out('Available `Catalog` Configurations:');
 		foreach ($names as $name) {
-			$this->out("- {$name}");
+			$this->out(" - {$name}");
 		}
 		$this->nl();
 
@@ -179,7 +181,7 @@ class Extract extends \lithium\console\Command {
 			$this->out('Aborting upon user request.');
 			$this->stop(1);
 		}
-		Catalog::write('message.template', $data, compact('name'));
+		return Catalog::write('message.template', $data, compact('name'));
 	}
 }
 
