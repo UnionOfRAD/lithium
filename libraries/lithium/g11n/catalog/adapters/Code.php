@@ -146,7 +146,7 @@ class Code extends \lithium\g11n\catalog\adapters\Base {
 					extract($defaults, EXTR_OVERWRITE);
 				} elseif ($token[0] === T_CONSTANT_ENCAPSED_STRING) {
 					$type = isset($singularId) ? 'pluralId' : 'singularId';
-					$$type = $this->_formatMessage($token[1]);
+					$$type = $token[1];
 					$position++;
 				}
 			} else {
@@ -166,23 +166,24 @@ class Code extends \lithium\g11n\catalog\adapters\Base {
 	}
 
 	/**
-	 * Formats a string to be added as a message.
+	 * Merges a message item into given data and removes quotation marks
+	 * from the beginning and end of message strings.
 	 *
-	 * @param string $string
-	 * @return string
+	 * @param array $data Data to merge item into.
+	 * @param array $item Item to merge into $data.
+	 * @return void
+	 * @see lithium\g11n\catalog\adapter\Base::_mergeMessageItem()
 	 */
-	function _formatMessage($string) {
-		$quote = substr($string, 0, 1);
-		$string = substr($string, 1, -1);
+    protected function _mergeMessageItem(&$data, $item) {
+		$fields = array('singularId', 'pluralId');
 
-		if ($quote === '"') {
-			$string = stripcslashes($string);
-		} else {
-			$string = strtr($string, array("\\'" => "'", "\\\\" => "\\"));
+		foreach ($fields as $field) {
+			if (isset($item[$field])) {
+				$item[$field] = substr($item[$field], 1, -1);
+			}
 		}
-		$string = str_replace("\r\n", "\n", $string);
-		return addcslashes($string, "\0..\37\\\"");
-	}
+        return parent::_mergeMessageItem($data, $item);
+    }
 }
 
 ?>

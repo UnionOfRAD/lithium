@@ -39,7 +39,7 @@ class GettextTest extends \lithium\test\Unit {
 		}
 	}
 
-	function testWriteReadMessageTemplate() {
+	public function testWriteReadMessageTemplate() {
 		$data = array(
 			'singular 1' => array(
 				'singularId' => 'singular 1',

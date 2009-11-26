@@ -114,23 +114,23 @@ class CodeTest extends \lithium\test\Unit {
 		$this->assertFalse($result);
 	}
 
-	public function testReadMessageTemplateTEscaping() {
+	public function testReadMessageTemplateTNoEscaping() {
 		$results = $this->adapter->read('message.template', 'root', null);
 
-		$expected = 'escaping\\\n1';
-		$result = $results['escaping\\\n1']['singularId'];
+		$expected = 'escaping\n1';
+		$result = $results['escaping\n1']['singularId'];
 		$this->assertEqual($expected, $result);
 
 		$expected = 'escaping\n2';
 		$result = $results['escaping\n2']['singularId'];
 		$this->assertEqual($expected, $result);
 
-		$expected = 'escaping\n3';
-		$result = $results['escaping\n3']['singularId'];
+		$expected = 'escaping\r\n3';
+		$result = $results['escaping\r\n3']['singularId'];
 		$this->assertEqual($expected, $result);
 
-		$expected = 'escaping\n\t4';
-		$result = $results['escaping\n\t4']['singularId'];
+		$expected = "escaping\n\t4";
+		$result = $results["escaping\n\t4"]['singularId'];
 		$this->assertEqual($expected, $result);
 	}
 
