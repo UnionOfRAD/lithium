@@ -8,6 +8,14 @@
 
 namespace lithium\data\model;
 
+/**
+ * `Record` class. Represents data such as a row from a database. Records have fields (often known
+ *  as columns in databases).
+ *
+ *  Option defined:
+ *   - 'data' `array` Data to enter into the record. Defaults to an empty array.
+ *   - 'model' `string` Name of class that provides the data-source for this record. Default: `null`.
+ */
 class Record extends \lithium\core\Object {
 
 	/**
@@ -47,6 +55,11 @@ class Record extends \lithium\core\Object {
 
 	protected $_hasValidated = false;
 
+	/**
+	 * Creates default values.
+	 *
+	 * @return Record object.
+	 */
 	public function __construct($config = array()) {
 		$defaults = array('model' => null, 'data' => array());
 		parent::__construct((array)$config + $defaults);
@@ -81,9 +94,9 @@ class Record extends \lithium\core\Object {
 	}
 
 	/**
-	* Access the data fields of the record. Can also access a $named field;
+	* Access the data fields of the record. Can also access a $named field.
 	*
-	* @param string $name optionally include field name, returns entire data array if left empty
+	* @param string $name optionally included field name, returns entire data array if left empty.
 	* @return array
 	*/
 	public function data($name = null) {
@@ -122,7 +135,7 @@ class Record extends \lithium\core\Object {
 	*
 	* @param string $method
 	* @param array $params
-	* return mixed
+	* @return mixed
 	*/
 	public function __call($method, $params) {
 		$model = $this->_model;
@@ -138,7 +151,8 @@ class Record extends \lithium\core\Object {
 	/**
 	* A flag indicating whether or not this record exists.
 	*
-	* @return boolean True if record is from db, or after a save.
+	* @return boolean True if record was `read` from the db, or has been `create`d and `save`d. False
+	*                 otherwise.
 	*/
 	public function exists() {
 		return $this->_exists;

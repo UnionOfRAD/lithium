@@ -50,7 +50,7 @@ use \Iterator;
  *
  * {{{echo $acme->name; // echoes 'Acme, Inc.'}}}
  *
- * However, accessing a field containing a data sets will return that data set wrapped in a
+ * However, accessing a field containing a data set will return that data set wrapped in a
  * sub-`Document` object., i.e.:
  *
  * {{{$employees = $acme->employees;

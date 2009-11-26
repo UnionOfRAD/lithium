@@ -351,7 +351,7 @@ class Model extends \lithium\core\StaticObject {
 	 * $post->save();}}}
 	 *
 	 * @param array $data Any data that this record should be populated with initially.
-	 * @return object Returns a new, un-saved record object.
+	 * @return object Returns a new, **un-saved** record object.
 	 */
 	public static function create($data = array()) {
 		$schema = static::schema();

@@ -8,6 +8,9 @@
 
 namespace lithium\data\model;
 
+/**
+ * Query class
+ */
 class Query extends \lithium\core\Object {
 
 	protected $_type = null;
@@ -75,8 +78,9 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	* Set and get method for conditions
-	* If no conditions is set in query, it will ask the record for findById condition array
+	* Set and get method for conditions.
+	*
+	* If no conditions are set in query, it will ask the record for findById condition array.
 	*
 	* @param array $conditions
 	* @return array
@@ -139,7 +143,7 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	* Set and get method for query's offset, ie which records to get
+	* Set and get method for query's offset, i.e. which records to get
 	*
 	* @param int $offset
 	* @return int
@@ -169,7 +173,7 @@ class Query extends \lithium\core\Object {
 	* Set and get method for the query's order specification
 	*
 	* @param mixed $order array or string
-	* $return mixed
+	* @return mixed
 	*/
 	public function order($order = null) {
 		if (empty($order)) {
@@ -179,9 +183,9 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	* Set and get method for current query's comment
-	* Comment will have no effect on query, but will be passed along so datasource
-	* can log it.
+	* Set and get method for current query's comment.
+	*
+	* Comment will have no effect on query, but will be passed along so datasource can log it.
 	*
 	* @param string
 	* @return string
@@ -222,7 +226,7 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	* Convert the query's properties to the datasources syntax and return it as an array
+	* Convert the query's properties to the datasources' syntax and return it as an array
 	*
 	* @param object instance of the datasource to use for conversion
 	* @return array of converted properties
@@ -242,7 +246,7 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	* Will retrun a find first condition on the associated model if a record is connected.
+	* Will return a find first condition on the associated model if a record is connected.
 	* Called by conditions when it is called as a get and no condition is set.
 	*
 	* @return array([model's primary key'] => [that key set in the record])
