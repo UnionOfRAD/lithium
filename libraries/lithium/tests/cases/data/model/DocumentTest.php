@@ -450,6 +450,17 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertFalse($doc->invokeMethod('_isComplexType',array(new stdClass())));
 	}
 
+	public function testIsset() {
+		$doc = new Document(array('data' => array(
+				'title' => 'Post',
+				'content' => 'Lorem Ipsum',
+		)));
+
+		$this->assertTrue(isset($doc->title));
+		$this->assertTrue(isset($doc->content));
+		$this->assertFalse(isset($doc->body));
+
+	}
 }
 
 ?>

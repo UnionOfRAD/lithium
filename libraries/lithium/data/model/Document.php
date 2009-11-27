@@ -293,7 +293,7 @@ class Document extends \lithium\util\Collection {
 	 *
 	 * @return array Returns a raw array of `Document` data.
 	 */
-	public function data() {
+	public function data($field = null) {
 		return $this->to('array');
 	}
 
