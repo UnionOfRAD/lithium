@@ -1,6 +1,6 @@
 <?php
 
-namespace app\tests\cases;
+namespace app\tests\cases\extensions\data;
 
 use \lithium\data\Connections;
 

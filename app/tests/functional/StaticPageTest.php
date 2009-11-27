@@ -6,9 +6,10 @@ use \lithium\action\Request;
 use \lithium\action\Dispatcher;
 use \app\controllers\PagesController;
 
-class StaticPageFunctional extends \lithium\test\Unit {
+class StaticPageTest extends \lithium\test\Unit {
 
 	public function testRendingHome() {
+		$_GET['url'] =  '/';
 		$result = Dispatcher::run(new Request(array(
 			'controller' => 'pages',
 			'action' => 'view',

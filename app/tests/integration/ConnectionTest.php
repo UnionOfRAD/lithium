@@ -4,7 +4,7 @@ namespace app\tests\integration;
 
 use \lithium\data\Connections;
 
-class ConnectionIntegration extends \lithium\test\Unit {
+class ConnectionTest extends \lithium\test\Unit {
 
 	public function testMySql() {
 		$conn = Connections::get('default');
