@@ -291,13 +291,9 @@ class Document extends \lithium\util\Collection {
 	/**
 	 * Gets the raw data associated with this `Document`.
 	 *
-	 * @param string $field if fieldname supplied will return just that value
 	 * @return array Returns a raw array of `Document` data.
 	 */
 	public function data($field = null) {
-		if ($field) {
-			return $this->__get($field);
-		}
 		return $this->to('array');
 	}
 
