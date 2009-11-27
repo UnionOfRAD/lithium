@@ -10,11 +10,11 @@
 namespace lithium\data\source\database\adapter;
 
 use \Exception;
-/*
-* Sqlit daatbase driver
-*
-* @todo fix encoding methods to use class query methods instead of sqlite3 natives
-*/
+/**
+ * Sqlite database driver
+ *
+ * @todo fix encoding methods to use class query methods instead of sqlite3 natives
+ */
 class Sqlite3 extends \lithium\data\source\Database {
 
 	/**
@@ -42,9 +42,10 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @param array $config Configuration options for this class. For additional configuration,
 	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options defined by
 	 *        this class:
-	 *        -'flags': Optional flags used to determine how to open the SQLite database. By default,
+	 *        - 'database'  _string_: database name. Defaults to none
+	 *        - 'flags' _integer_: Optional flags used to determine how to open the SQLite database. By default,
 	 *                  open uses SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE.
-	 *        -'key': An optional encryption key used when encrypting and decrypting an SQLite database.
+	 *        - 'key' _string_: An optional encryption key used when encrypting and decrypting an SQLite database.
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(
