@@ -1,4 +1,10 @@
 <?php
+/**
+ * Lithium: the most rad php framework
+ *
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
 
 namespace lithium\util\audit\logger\adapter;
 
@@ -29,10 +35,8 @@ class File extends \lithium\core\Object {
 
 		return function($self, $params, $chain) use (&$path) {
 			extract($params);
-			$message .= "\n";
-			return file_put_contents("$path/$type.log", $message, FILE_APPEND);
+			return file_put_contents("$path/$type.log", "{$message}\n", FILE_APPEND);
 		};
-
 	}
 }
 
