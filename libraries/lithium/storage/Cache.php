@@ -88,15 +88,14 @@ class Cache extends \lithium\core\Adaptable {
 			return false;
 		}
 
-		if (is_callable($conditions)) {
-			if (!$conditions()) return false;
+		if (is_callable($conditions) && !$conditions()) {
+			return false;
 		}
+
 		$key = static::key($key);
 		$method = static::adapter($name)->write($key, $data, $expiry, $conditions);
 		$params = compact('key', 'data', 'expiry', 'conditions');
-		$filters = $settings[$name]['filters'];
-
-		return static::_filter(__METHOD__, $params, $method, $filters);
+		return static::_filter(__METHOD__, $params, $method, $settings[$name]['filters']);
 	}
 
 
