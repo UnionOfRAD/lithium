@@ -30,7 +30,6 @@ class Html extends \lithium\template\Helper {
 		'image'            => '<img src="{:path}"{:options} />',
 		'js-block'         => '<script type="text/javascript"{:options}>{:content}</script>',
 		'js-end'           => '</script>',
-		'js-link'          => '<script type="text/javascript" src="{:path}"{:options}></script>',
 		'js-start'         => '<script type="text/javascript"{:options}>',
 		'link'             => '<a href="{:url}"{:options}>{:title}</a>',
 		'list'             => '<ul{:options}>{:content}</ul>',
@@ -39,6 +38,7 @@ class Html extends \lithium\template\Helper {
 		'meta-link'        => '<link href="{:url}"{:options} />',
 		'para'             => '<p{:options}>{:content}</p>',
 		'para-start'       => '<p{:options}>',
+		'script'           => '<script type="text/javascript" src="{:path}"{:options}></script>',
 		'style'            => '<style type="text/css"{:options}>{:content}</style>',
 		'style-import'     => '<style type="text/css"{:options}>@import url({:url});</style>',
 		'style-link'       => '<link rel="{:type}" type="text/css" href="{:path}"{:options} />',
@@ -109,6 +109,7 @@ class Html extends \lithium\template\Helper {
 	 * Used by output handlers to calculate asset paths in conjunction with the `Media` class.
 	 *
 	 * @var array
+	 * @see lithium\http\Media
 	 */
 	public $contentMap = array(
 		'script' => 'js',
@@ -209,7 +210,7 @@ class Html extends \lithium\template\Helper {
 		$params = compact('path') + array('options' => array_diff_key($options, $defaults));
 
 		$script = $this->_filter(__METHOD__, $params, function($self, $params, $chain) use ($m) {
-			return $self->invokeMethod('_render', array($m, 'js-link', $params));
+			return $self->invokeMethod('_render', array($m, 'script', $params));
 		});
 
 		if ($options['inline']) {
@@ -220,7 +221,7 @@ class Html extends \lithium\template\Helper {
 	/**
 	 * Creates a link element for CSS stylesheets.
 	 *
-	 * @param mixed $path The name of a CSS style sheet in /app/webroot/css, or an array
+	 * @param mixed $path The name of a CSS style sheet in `/app/webroot/css`, or an array
 	 *              containing names of CSS stylesheets in that directory.
 	 * @param array $options Array of HTML attributes.
 	 * @return string CSS <link /> or <style /> tag, depending on the type of link.
@@ -229,23 +230,21 @@ class Html extends \lithium\template\Helper {
 	public function style($path, $options = array()) {
 		$defaults = array('type' => 'stylesheet', 'inline' => true);
 		$options += $defaults;
-		$m = __METHOD__;
 
 		if (is_array($path)) {
 			$result = join("\n\t", array_map(array(&$this, __FUNCTION__), $path));
 			return ($options['inline']) ? $result . "\n" : null;
 		}
 		$params = compact('path', 'options');
+		$method = __METHOD__;
 
-		$filter = function($self, $params, $chain) use ($defaults, $m) {
+		$filter = function($self, $params, $chain) use ($defaults, $method) {
 			extract($params);
-
 			$type = $options['type'];
 			$options = array_diff_key($options, $defaults);
 			$template = ($type == 'import') ? 'style-import' : 'style-link';
 			$params = compact('type', 'path', 'options');
-
-			return $self->invokeMethod('_render', array($m, $template, $params));
+			return $self->invokeMethod('_render', array($method, $template, $params));
 		};
 		return $this->_filter(__METHOD__, $params, $filter);
 	}
@@ -260,11 +259,13 @@ class Html extends \lithium\template\Helper {
 	public function image($path, $options = array()) {
 		$defaults = array('alt' => '');
 		$options += $defaults;
+		$path = is_array($path) ? $this->_context->url($path) : $path;
+		$params = compact('path', 'options');
+		$method = __METHOD__;
 
-		if (is_array($path)) {
-			$path = $this->_context->url($path);
-		}
-		return $this->_render(__METHOD__, 'image', compact('path', 'options'));
+		return $this->_filter($method, $params, function($self, $params, $chain) use ($method) {
+			return $self->invokeMethod('_render', array($method, 'image', $params));
+		});
 	}
 
 	/**

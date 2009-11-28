@@ -8,6 +8,7 @@
 
 namespace lithium\test;
 
+use \Exception;
 use \lithium\core\Libraries;
 use \lithium\util\Inflector;
 
@@ -86,8 +87,8 @@ class Report extends \lithium\core\Object {
 	 */
 	protected function _init() {
 		$class = Inflector::camelize($this->_config['reporter']);
-		$reporter = Libraries::locate('test.reporter', $class);
-		if (!$reporter) {
+
+		if (!$reporter = Libraries::locate('test.reporter', $class)) {
 			throw new Exception("{$class} is not a valid reporter");
 		}
 		$this->reporter = new $reporter();
