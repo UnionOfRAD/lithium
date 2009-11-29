@@ -57,7 +57,7 @@ class Request extends \lithium\core\Object {
 	 *              - args array
 	 *               [default] empty
 	 *              - env array
-	 *               [default] working => LITHIUM_APP_PATH
+	 *               [default] working => current working directory
 	 *              - input stream
 	 *
 	 * @return void
@@ -74,20 +74,11 @@ class Request extends \lithium\core\Object {
 		if (!empty($_SERVER['argv'])) {
 			$this->args += $_SERVER['argv'];
 		}
-
 		$this->args += $config['argv'];
 
-		$this->env['working'] = LITHIUM_APP_PATH;
+		$this->env['working'] = getcwd() ?: null;
+		$this->env['script'] = array_shift($this->args);
 
-		if (!empty($_SERVER['PWD'])) {
-			$this->env['working'] = $_SERVER['PWD'];
-		}
-		$working = array_search('-working', $this->args);
-
-		if ($working && !empty($this->args[$working])) {
-			$this->env['working'] = $this->args[$working + 1];
-			$this->args = array_slice($this->args, 3);
-		}
 		$this->args = $config['args'] + $this->args;
 		$this->env = $config['env'] + $this->env;
 		$this->input = $config['input'];

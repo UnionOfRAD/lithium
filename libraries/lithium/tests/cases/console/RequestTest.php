@@ -12,16 +12,17 @@ use \lithium\console\Request;
 
 class RequestTest extends \lithium\test\Unit {
 
+	public $streams;
+
+	protected $_backups = array();
+
 	public function setUp() {
 		$this->streams = array(
 			'input' => LITHIUM_APP_PATH . '/tmp/input.txt',
 		);
 
-		$this->working = LITHIUM_APP_PATH;
-		if (!empty($_SERVER['PWD'])) {
-			$this->working = $_SERVER['PWD'];
-		}
-		$this->server = $_SERVER;
+		$this->_backups['cwd'] = getcwd();
+		$this->_backups['_SERVER'] = $_SERVER;
 		$_SERVER['argv'] = array();
 	}
 
@@ -31,55 +32,68 @@ class RequestTest extends \lithium\test\Unit {
 				unlink($path);
 			}
 		}
-		$_SERVER = $this->server;
+		$_SERVER = $this->_backups['_SERVER'];
+		chdir($this->_backups['cwd']);
 	}
 
 	public function testConstructWithoutConfig() {
 		$request = new Request();
-		$expected = array();
-		$this->assertEqual($expected, $request->args);
 
-		$expected = array('working' => $this->working);
-		$this->assertEqual($expected, $request->env);
+		$expected = array();
+		$result = $request->args;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testEnvWorking() {
+		chdir(LITHIUM_APP_PATH . '/tmp');
+		$request = new Request();
+
+		$result = isset($request->env['working']);
+		$this->assertTrue($result);
+
+		$expected = LITHIUM_APP_PATH . '/tmp';
+		$result = $request->env['working'];
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testEnvScript() {
+		$request = new Request(array(
+			'argv' => array('/path/to/lithium.php', 'hello')
+		));
+
+		$result = isset($request->env['script']);
+		$this->assertTrue($result);
+
+		$expected = '/path/to/lithium.php';
+		$result = $request->env['script'];
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testConstructWithServer() {
-		$_SERVER['PWD'] = '/path/to/console';
+		$_SERVER['argv'] = array('/path/to/lithium.php','one', 'two');
 		$request = new Request();
-		$expected = array();
-		$this->assertEqual($expected, $request->args);
 
-		$expected = array('working' => '/path/to/console');
-		$this->assertEqual($expected, $request->env);
-
-		$_SERVER['argv'] = array('one', 'two');
-		$request = new Request();
 		$expected = array('one', 'two');
-		$this->assertEqual($expected, $request->args);
-
-		$expected = array('working' => '/path/to/console');
-		$this->assertEqual($expected, $request->env);
+		$result = $request->args;
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testConstructWithConfigArgv() {
 		$request = new Request(array(
-			'argv' => array('wrong')
+			'argv' => array('/path/to/lithium.php', 'wrong')
 		));
-		$expected = array('wrong');
-		$this->assertEqual($expected, $request->args);
 
-		$expected = array('working' => $this->working);
-		$this->assertEqual($expected, $request->env);
+		$expected = array('wrong');
+		$result = $request->args;
+		$this->assertEqual($expected, $result);
 
 		$request = new Request(array(
-			'argv' => array('lithium.php', '-working', '/path/to/console', 'one', 'two')
+			'argv' => array('/path/to/lithium.php', 'one', 'two')
 		));
 
 		$expected = array('one', 'two');
-		$this->assertEqual($expected, $request->args);
-
-		$expected = array('working' => '/path/to/console');
-		$this->assertEqual($expected, $request->env);
+		$result = $request->args;
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testConstructWithConfigArgs() {
@@ -91,23 +105,21 @@ class RequestTest extends \lithium\test\Unit {
 
 		$request = new Request(array(
 			'args' => array('ok'),
-			'argv' => array('one', 'two', 'three', 'four')
+			'argv' => array('/path/to/lithium.php', 'one', 'two', 'three', 'four')
 		));
 		$expected = array('ok', 'two', 'three', 'four');
 		$this->assertEqual($expected, $request->args);
-
-		$expected = array('working' => $this->working);
-		$this->assertEqual($expected, $request->env);
 	}
 
 	public function testConstructWithEnv() {
-		$_SERVER['PWD'] = '/dont/use/this/';
+		chdir(LITHIUM_APP_PATH . '/tmp');
 		$request = new Request(array(
 			'env' => array('working' => '/some/other/path')
 		));
 
-		$expected = array('working' => '/some/other/path');
-		$this->assertEqual($expected, $request->env);
+		$expected = '/some/other/path';
+		$result = $request->env['working'];
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testInput() {
