@@ -22,9 +22,9 @@ use \lithium\core\Environment;
  * `Controller` and passes it the `Request` object. When the `Controller` returns a `Response`,
  * `Dispatcher`, where the headers and content are rendered and sent to the browser.
  *
- * @see lithium\action\request
- * @see lithium\action\response
- * @see lithium\action\controller
+ * @see lithium\action\Request
+ * @see lithium\action\Response
+ * @see lithium\action\Controller
  */
 class Dispatcher extends \lithium\core\StaticObject {
 
@@ -62,8 +62,8 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * Used to set configuration parameters for the Dispatcher.
 	 *
 	 * @param array $config
-	 * @return array|void If no parameters are passed, returns an associative array with the
-	 *         current configuration, otherwise returns null.
+	 * @return array If no parameters are passed, returns an associative array with the current
+	 *         configuration, otherwise returns `null`.
 	 */
 	public static function config($config = array()) {
 		if (empty($config)) {
@@ -83,9 +83,11 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * `'request'` key in the `$_classes` array.
 	 *
 	 * @param object $request An instance of a request object with HTTP request information.  If
-	 *        null, an instance will be created.
+	 *        `null`, an instance will be created.
 	 * @param array $options
-	 * @return object
+	 * @return mixed Returns the value returned from the callable object retrieved from
+	 *         `Dispatcher::_callable()`, which is either a string or an instance of
+	 *         `lithium\action\Response`.
 	 * @todo Add exception-handling/error page rendering
 	 */
 	public static function run($request = null, $options = array()) {
@@ -93,9 +95,9 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$options += $defaults;
 		$classes = static::$_classes;
 		$params = compact('request', 'options');
-		$m = __METHOD__;
+		$method = __METHOD__;
 
-		return static::_filter($m, $params, function($self, $params, $chain) use ($classes) {
+		return static::_filter($method, $params, function($self, $params, $chain) use ($classes) {
 			extract($params);
 
 			$router = $classes['router'];
@@ -128,15 +130,14 @@ class Dispatcher extends \lithium\core\StaticObject {
 			if (class_exists($class)) {
 				return new $class(compact('request'));
 			}
-			throw new Exception("Controller {$class} not found");
+			throw new Exception("Controller {$controller} not found");
 		});
 	}
 
 	protected static function _call($callable, $request, $params) {
 		$params = compact('callable', 'request', 'params');
 		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
-			$callable = $params['callable'];
-			if (is_callable($callable)) {
+			if (is_callable($callable = $params['callable'])) {
 				return $callable($params['request'], $params['params']);
 			}
 			throw new Exception('Result not callable');
@@ -150,7 +151,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * matching a rule is present unless the rule check passes.
 	 *
 	 * @param array $params An array of route parameters to which rules will be applied.
-	 * @return array Returns the $params array with formatting rules applied to array values.
+	 * @return array Returns the `$params` array with formatting rules applied to array values.
 	 */
 	protected static function _applyRules($params) {
 		$result = array();

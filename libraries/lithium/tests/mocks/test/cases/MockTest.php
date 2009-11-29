@@ -6,8 +6,13 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\console\commands\generate;
+namespace lithium\tests\mocks\test\cases;
 
-class View extends \lithium\console\Command {}
+class MockTest extends \lithium\test\Unit {
+
+	public function testNothing() {
+		$this->assertTrue(true);
+	}
+}
 
 ?>

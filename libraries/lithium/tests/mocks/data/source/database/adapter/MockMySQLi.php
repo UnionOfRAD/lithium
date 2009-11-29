@@ -6,8 +6,13 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\console\commands\generate;
+namespace lithium\tests\mocks\data\source\database\adapter;
 
-class View extends \lithium\console\Command {}
+class MockMySQLi extends \lithium\data\source\database\adapter\MySQLi {
+
+	public function get($var) {
+		return $this->{$var};
+	}
+}
 
 ?>
