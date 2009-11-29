@@ -13,18 +13,15 @@ use \lithium\tests\mocks\console\MockCommand;
 
 class CommandTest extends \lithium\test\Unit {
 
+	public $request;
+
 	public function setUp() {
 		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
-
-		$this->working = LITHIUM_APP_PATH;
-		if (!empty($_SERVER['PWD'])) {
-			$this->working = $_SERVER['PWD'];
-		}
 	}
 
 	public function testConstruct() {
 		$command = new MockCommand(array('request' => $this->request));
-		$expected = array('working' => $this->working);
+		$expected = $this->request->env;
 		$result = $command->request->env;
 		$this->assertEqual($expected, $result);
 

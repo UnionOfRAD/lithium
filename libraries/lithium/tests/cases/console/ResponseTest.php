@@ -13,16 +13,13 @@ use \lithium\console\Request;
 
 class ResponseTest extends \lithium\test\Unit {
 
+	public $streams;
+
 	public function setUp() {
 		$this->streams = array(
 			'output' => LITHIUM_APP_PATH . '/tmp/output.txt',
 			'error' => LITHIUM_APP_PATH . '/tmp/error.txt'
 		);
-
-		$this->working = LITHIUM_APP_PATH;
-		if (!empty($_SERVER['PWD'])) {
-			$this->working = $_SERVER['PWD'];
-		}
 	}
 
 	public function tearDown() {
@@ -49,9 +46,6 @@ class ResponseTest extends \lithium\test\Unit {
 		));
 		$expected = new Request();
 		$this->assertEqual($expected->env, $response->request->env);
-
-		$expected = array('working' => $this->working);
-		$this->assertEqual($expected, $response->request->env);
 	}
 
 	public function testConstructWithConfigOutput() {
