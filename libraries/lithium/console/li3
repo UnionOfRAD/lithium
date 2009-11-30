@@ -5,4 +5,4 @@
 # @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
 # @license       http://opensource.org/licenses/bsd-license.php The BSD License
 #
-exec php -q ${0/%li3/}lithium.php "$@"
+php -f ${0/%li3/}lithium.php "$@"
