@@ -11,8 +11,12 @@ namespace lithium\tests\mocks\data\model;
 use \lithium\data\model\Document;
 
 class MockDocumentPost extends \lithium\data\Model {
-	
+
 	public static function __init($options = array()) {}
+
+	public static function schema($field = null) {
+		return array();
+	}
 
 	public function ret($record, $param1 = null, $param2 = null) {
 		if ($param2) {

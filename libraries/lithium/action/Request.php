@@ -56,7 +56,7 @@ class Request extends \lithium\core\Object {
 	 * Holds the environment variables for the request. Retrieved with env().
 	 *
 	 * @var array
-	 * @see lithium\http\Request::env()
+	 * @see lithium\action\Request::env()
 	 */
 	protected $_env = array();
 
@@ -276,7 +276,7 @@ class Request extends \lithium\core\Object {
 	 * Detects properties of the request and returns a boolean response
 	 *
 	 * @return boolean
-	 * @see lithium\http\Request::detect()
+	 * @see lithium\action\Request::detect()
 	 * @todo Remove $content and refer to Media class instead
 	 */
 	public function is($flag) {
@@ -313,7 +313,7 @@ class Request extends \lithium\core\Object {
 	 * to determine something about a request.
 	 *
 	 * @return void
-	 * @see lithium\http\Request::is()
+	 * @see lithium\action\Request::is()
 	 */
 	public function detect($flag, $detector = null) {
 		if (is_array($flag)) {

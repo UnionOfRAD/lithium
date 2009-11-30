@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\http;
 
 class MockSocket extends \lithium\util\Socket {
 
-	protected $_data = null;
+	public $data = null;
 
 	public function open() {
 		return true;
@@ -36,7 +36,15 @@ class MockSocket extends \lithium\util\Socket {
 	}
 
 	public function write($data) {
-		return $this->_data = $data;
+		return $this->data = $data;
+	}
+
+	public function send($message, $options = array()) {
+		if ($this->write($message)) {
+			$message = $this->read();
+			$response = new $options['classes']['response'](compact('message'));
+			return $response;
+		}
 	}
 
 	public function timeout($time) {

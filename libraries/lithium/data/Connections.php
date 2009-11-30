@@ -131,13 +131,13 @@ class Connections extends \lithium\core\StaticObject {
 	 * $dbConnection = Connection::get('db', array('autoCreate' => false));
 	 * }}}
 	 *
-	 * @param string $name The name of the connection to get, as defned in the first parameter of
+	 * @param string $name The name of the connection to get, as defined in the first parameter of
 	 *               `add()`, when the connection was initially created.
 	 * @param array $options Options to use when returning the connection:
-	 *              - `'config'`: If `true`, returns an array representing the connection's internal
-	 *                 configuration, instead of the connection itself.
-	 *              - `'autoCreate'`: If `false`, the connection object is only returned if it has
-	 *                already been instanted by a previous call.
+	 *        - `'autoCreate'`: If `false`, the connection object is only returned if it has
+	 *          already been instantiated by a previous call.
+	 *        - `'config'`: If `true`, returns an array representing the connection's internal
+	 *          configuration, instead of the connection itself.
 	 * @return mixed A configured instance of the connection, or an array of the configuration used.
 	 */
 	public static function get($name = null, $options = array()) {

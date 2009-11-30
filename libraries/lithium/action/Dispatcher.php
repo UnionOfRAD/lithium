@@ -16,7 +16,7 @@ use \lithium\core\Environment;
 
 /**
  * `Dispatcher` is the outermost layer of the framework (including app), responsible for both
- * recieving the initial http request and sending back the response at the end of the cycle.
+ * receiving the initial http request and sending back the response at the end of the cycle.
  *
  * After interpreting the request and making a `Request` instance, it initiates the correct
  * `Controller` and passes it the `Request` object. When the `Controller` returns a `Response`,

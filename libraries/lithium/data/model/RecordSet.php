@@ -70,6 +70,13 @@ class RecordSet extends \lithium\util\Collection {
 		'media' => '\lithium\http\Media'
 	);
 
+	/**
+	 * Indicates whether the current position is valid or not. This overrides the default value of
+	 * the parent class.
+	 *
+	 * @var boolean
+	 * @see lithium\util\Collection::valid()
+	 */
 	protected $_valid = true;
 
 	/**
@@ -125,10 +132,10 @@ class RecordSet extends \lithium\util\Collection {
 	 * typing, integer keys can be accessed using strings and vice-versa. For record sets with
 	 * composite keys, records may be accessed using arrays as array keys. Note that the order of
 	 * the keys in the array does not matter.
-	 * 
+	 *
 	 * Because record data in `RecordSet` is lazy-loaded from the database, new records are fetched
 	 * until one with a matching key is found.
-	 * 
+	 *
 	 * @param mixed $offset The offset, or ID (index) of the record you wish to load.  If
 	 *                      `$offset` is `null`, all records are loaded into the record set, and
 	 *                      `offsetGet` returns `null`.

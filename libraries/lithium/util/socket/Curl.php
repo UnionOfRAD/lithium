@@ -17,7 +17,7 @@ namespace lithium\util\socket;
  * Your PHP installation must have been compiled with the `--with-curl[=DIR]` directive. If this
  * is not the case, you must either recompile PHP with the proper configuration flags to enable
  * curl, or you may use the `Stream` adapter that is also included with the Lithium core.
-
+ *
  * @see http://www.php.net/manual/en/curl.installation.php
  * @see lithium\util\socket\Stream
  */
@@ -76,6 +76,7 @@ class Curl extends \lithium\util\Socket {
 			return true;
 		}
 		curl_close($this->_resource);
+
 		if (is_resource($this->_resource)) {
 			$this->close();
 		}
@@ -93,7 +94,7 @@ class Curl extends \lithium\util\Socket {
 	/**
 	 * Reads data from the curl connection.
 	 * The `read` method will utilize the curl options that have been set.
-
+	 *
 	 * @return mixed Boolean false if the resource handle is unavailable, and the result
 	 *         of `curl_exec` otherwise.
 	 * @see http://php.net/manual/en/function.curl-exec.php
@@ -109,7 +110,7 @@ class Curl extends \lithium\util\Socket {
 	/**
 	 * Reads data from the curl connection.
 	 * The `read` method will utilize the curl options that have been set.
-
+	 *
 	 * @return mixed Boolean false if the resource handle is unavailable, and the result
 	 *         of `curl_exec` otherwise.
 	 * @see http://php.net/manual/en/function.curl-exec.php
@@ -162,6 +163,24 @@ class Curl extends \lithium\util\Socket {
 			$flags = array($flags => $value);
 		}
 		$this->options += $flags;
+	}
+	
+	/**
+	 * Aggregates read and write methods into a coherent request response
+	 *
+	 * @param mixed $request array or object like `\lithium\http\Request`
+	 * @params array $options
+	 *                - path: path for the current request
+	 *                - classes: array of classes to use
+	 *                    - response: a class to use for the response
+	 * @return boolean response string or object like `\lithium\http\Response`
+	 */
+	public function send($message, $options = array()) {
+		if ($this->write((string) $message)) {
+			$message = $this->read();
+			$response = new $options['classes']['response'](compact('message'));
+			return $response;
+		}
 	}
 }
 

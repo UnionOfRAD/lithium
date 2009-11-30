@@ -12,6 +12,7 @@ use \stdClass;
 use \lithium\util\Collection;
 use \lithium\tests\mocks\util\MockCollectionMarker;
 use \lithium\tests\mocks\util\MockCollectionObject;
+use \lithium\tests\mocks\util\MockCollectionStringCast;
 
 class CollectionTest extends \lithium\test\Unit {
 
@@ -59,6 +60,11 @@ class CollectionTest extends \lithium\test\Unit {
 		$collection = new Collection(array('items' => array_fill(0, 10, new MockCollectionMarker())));
 		$result = $collection->to('array');
 		$expected = array_fill(0, 10, array('marker' => false, 'data' => 'foo'));
+		$this->assertEqual($expected, $result);
+
+		$collection = new Collection(array('items' => array_fill(0, 10, new MockCollectionStringCast())));
+		$result = $collection->to('array');
+		$expected = array_fill(0, 10, json_encode(array(1 => 2, 2 => 3)));
 		$this->assertEqual($expected, $result);
 	}
 

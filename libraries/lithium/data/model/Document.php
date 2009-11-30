@@ -50,7 +50,7 @@ use \Iterator;
  *
  * {{{echo $acme->name; // echoes 'Acme, Inc.'}}}
  *
- * However, accessing a field containing a data sets will return that data set wrapped in a
+ * However, accessing a field containing a data set will return that data set wrapped in a
  * sub-`Document` object., i.e.:
  *
  * {{{$employees = $acme->employees;
@@ -105,6 +105,8 @@ class Document extends \lithium\util\Collection {
 	 */
 	protected $_exists = false;
 
+	protected $_errors = array();
+
 	/**
 	 * The class dependencies for `Document`.
 	 *
@@ -128,6 +130,7 @@ class Document extends \lithium\util\Collection {
 			unset($config['data']);
 		}
 		parent::__construct($config);
+		$this->_items = (array) $this->_items;
 	}
 
 	/**
@@ -149,6 +152,17 @@ class Document extends \lithium\util\Collection {
 			$this->_items[$name] = $this->_record('recordSet', $this->_items[$name]);
 		}
 		return $this->_items[$name];
+	}
+
+	/**
+	 * PHP magic method used to check the presence of a field as document properties, i.e.
+	 * `$document->_id`.
+	 *
+	 * @param $name The field name, as specified with an object property.
+	 * @return bool True if the field specified in `$name` exists, false otherwise.
+	 */
+	public function __isset($name) {
+		return isset($this->_items[$name]);
 	}
 
 	/**
@@ -248,6 +262,30 @@ class Document extends \lithium\util\Collection {
 	 */
 	public function exists() {
 		return $this->_exists;
+	}
+
+	/**
+	* Access the errors of the record.
+	*
+	* @param mixed $field if array will overwrite `$this->_errors`, if string and value, sets
+	* @param string $value
+	* @return string
+	*/
+	public function errors($field = null, $value = null) {
+		if ($field === null) {
+			return $this->_errors;
+		}
+		if (is_array($field)) {
+			$this->_errors = $field;
+			return $this->_errors;
+		}
+		if ($value === null && isset($this->_errors[$field])) {
+			return $this->_errors[$field];
+		}
+		if ($value !== null) {
+			return $this->_errors[$field] = $value;
+		}
+		return $value;
 	}
 
 	/**
