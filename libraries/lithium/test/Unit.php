@@ -88,24 +88,34 @@ class Unit extends \lithium\core\Object {
 	 * Returns the class name that is the subject under test for this test case.
 	 *
 	 * @return string
-	 * @todo This clearly needs refactoring to remove $map
 	 */
 	public function subject() {
-		$map = array('lithium\tests\cases' => 'lithium', 'app\tests\cases' => 'app');
-		$class = str_replace(array_keys($map), array_values($map), get_class($this));
-		return preg_replace('/Test$/', '', $class);
+		return preg_replace('/Test$/', '', str_replace('tests\\cases\\', '', get_class($this)));
 	}
-
+	
+	/**
+	 * Return test methods to run
+	 *
+	 * @return array
+	 */
 	public function methods() {
 		static $methods;
 		return $methods ?: $methods = array_values(preg_grep('/^test/', get_class_methods($this)));
 	}
-
-	public function setUp() {
-	}
-
-	public function tearDown() {
-	}
+	
+	/**
+	 * Setup method run before every test method. override in subclasses
+	 *
+	 * @return void
+	 */
+	public function setUp() {}
+	
+	/**
+	 * Teardown method run after every test method. override in subclasses
+	 *
+	 * @return void
+	 */
+	public function tearDown() {}
 
 	/**
 	 * Subclasses should use this method to set conditions that, if failed, terminate further
@@ -443,10 +453,6 @@ class Unit extends \lithium\core\Object {
 				$this->assert(false, sprintf(
 					'{:message} - Item #%d / regex #%d failed: %s', $itemNum, $i, $description
 				));
-				// if ($fullDebug) {
-				// 	debug($string, true);
-				// 	debug($regex, true);
-				// }
 				return false;
 			}
 		}
