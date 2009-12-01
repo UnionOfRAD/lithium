@@ -43,7 +43,14 @@ class Command extends \lithium\core\Object {
 	protected $_classes = array(
 		'response' => '\lithium\console\Response'
 	);
-
+	
+	/**
+	 * Auto configuration
+	 *
+	 * @var array
+	 */
+	protected $_autoConfig = array('classes' => 'merge');
+	
 	/**
 	 * Constructor.
 	 *
@@ -55,15 +62,6 @@ class Command extends \lithium\core\Object {
 			'request' => null, 'response' => array(), 'classes' => array()
 		);
 		$config += $defaults;
-
-		if (!empty($config['request'])) {
-			$this->request = $config['request'];
-		}
-
-		if (!empty($config['classes'])) {
-			$this->{'_' . $key} = (array)$config[$key] + $this->{'_' . $key};
-		}
-
 		parent::__construct($config);
 	}
 
@@ -74,9 +72,10 @@ class Command extends \lithium\core\Object {
 	 *
 	 * @return void
 	 */
-	public function _init() {
-		$config = (array)$this->_config['response'] + array('request' => $this->request);
-		$this->response = new $this->_classes['response']($config);
+	protected function _init() {
+		parent::_init();
+		$this->request = $this->_config['request'];
+		$this->response = new $this->_classes['response']($this->_config['response']);
 
 		if ($this->request) {
 			foreach ((array)$this->request->params['named'] as $key => $param) {
@@ -150,10 +149,10 @@ class Command extends \lithium\core\Object {
 	 * @param integer $newlines
 	 * @return integer|void
 	 */
-	public function err($str = null, $newlines = 1) {
+	public function error($str = null, $newlines = 1) {
 		if (is_array($str)) {
 			foreach ($str as $string) {
-				$this->err($string, $newlines);
+				$this->error($string, $newlines);
 			}
 			return;
 		}

@@ -32,20 +32,9 @@ class ResponseTest extends \lithium\test\Unit {
 
 	public function testConstructWithoutConfig() {
 		$response = new Response();
-		$expected = null;
-		$this->assertEqual($expected, $response->request);
-
 		$this->assertTrue(is_resource($response->output));
 
 		$this->assertTrue(is_resource($response->error));
-	}
-
-	public function testConstructWithConfigRequest() {
-		$response = new Response(array(
-			'request' => new Request()
-		));
-		$expected = new Request();
-		$this->assertEqual($expected->env, $response->request->env);
 	}
 
 	public function testConstructWithConfigOutput() {
