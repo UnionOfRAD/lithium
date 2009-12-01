@@ -58,14 +58,14 @@ class CommandTest extends \lithium\test\Unit {
 	public function testErr() {
 		$command = new MockCommand(array('request' => $this->request));
 		$expected = "ok\n";
-		$result = $command->err('ok');
+		$result = $command->error('ok');
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testErrArray() {
 		$command = new MockCommand(array('request' => $this->request));
 		$expected = "line 1\nline 2\n";
-		$command->err(array('line 1', 'line 2'));
+		$command->error(array('line 1', 'line 2'));
 		$result = $command->response->error;
 		$this->assertEqual($expected, $result);
 	}
