@@ -114,38 +114,57 @@ class Request extends \lithium\core\Object {
 	 * Pulls request data from superglobals.
 	 *
 	 * @return void
-	 * @todo Replace $_FILES loops with Felix's code (or Marc's?)
-	 * @todo Consider disabling magic quotes stripping, or only having it explicitly enabled, since
-	 *       it's deprecated now.
 	 */
 	protected function _init() {
 		parent::_init();
-
-		$m  = '/(iPhone|MIDP|AvantGo|BlackBerry|J2ME|Opera Mini|DoCoMo|NetFront|Nokia|PalmOS|';
-		$m .= 'PalmSource|portalmmm|Plucker|ReqwirelessWeb|SonyEricsson|Symbian|UP\.Browser|';
-		$m .= 'Windows CE|Xiino)/i';
-		$this->_detectors['mobile'][1] = $m;
-
-		$this->url = isset($_GET['url']) ? rtrim($_GET['url'], '/') : '';
-		$this->url = $this->url ?: '/';
+		$mobile = array(
+			'iPhone', 'MIDP', 'AvantGo', 'BlackBerry', 'J2ME', 'Opera Mini', 'DoCoMo', 'NetFront',
+			'Nokia', 'PalmOS', 'PalmSource', 'portalmmm', 'Plucker', 'ReqwirelessWeb',
+			'SonyEricsson', 'Symbian', 'UP\.Browser', 'Windows CE', 'Xiino'
+		);
+		if (!empty($this->_config['detectors']['mobile'][1])) {
+			$mobile = array_merge($mobile, (array) $this->_config['detectors']['mobile'][1]);
+		}
+		$this->_detectors['mobile'][1] = $mobile;
 		$this->_env += (array)$_SERVER + (array)$_ENV;
-
 		$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
 		$this->_env['PLATFORM'] = isset($envs[PHP_SAPI]) ? $envs[PHP_SAPI] : null;
 		$this->_base = $this->_base ?: $this->_base();
-		$this->query = isset($_GET) ? $_GET : array();
-		$this->data = isset($_POST) ? $_POST : array();
+		$this->url = '/';
 
-		if (isset($this->data['_method'])) {
-			$this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'] = $this->data['_method'];
+		if (!empty($this->_config['url'])) {
+			$this->url = rtrim($this->_config['url'], '/');
+		} elseif (!empty($_GET['url']) ) {
+			$this->url = rtrim($_GET['url'], '/');
+			unset($_GET['url']);
+		}
+
+		$this->query = $this->data = array();
+
+		if (!empty($this->_config['query'])) {
+			$this->query = $this->_config['query'];
+		}
+		if (!empty($_GET) ) {
+			$this->query += $_GET;
+		}
+
+		if (!empty($this->_config['data'])) {
+			$this->data = $this->_config['data'];
+		}
+		if (!empty($_POST) ) {
+			$this->data += $_POST;
+		}
+
+		if (!empty($this->data['_method'])) {
+			$this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'] = strtoupper($this->data['_method']);
 			unset($this->data['_method']);
 		}
 
-		if (isset($this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
+		if (!empty($this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
 			$this->_env['REQUEST_METHOD'] = $this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'];
 		}
 
-		if (isset($_FILES)) {
+		if (!empty($_FILES)) {
 			$result = array();
 			$normalize = function($key, $value) use ($result, &$normalize){
 				foreach ($value as $param => $content) {
@@ -282,15 +301,20 @@ class Request extends \lithium\core\Object {
 	public function is($flag) {
 		$flag = strtolower($flag);
 
-		if (isset($flag, $this->_detectors)) {
+		if (!empty($this->_detectors[$flag])) {
 			$detector = $this->_detectors[$flag];
 
 			if (is_array($detector)) {
-				if (is_string($detector[1]) && Validator::isRegex($detector[1])) {
-					return (bool)preg_match($detector[1], $this->env($detector[0]));
+				list($key, $check) = $detector + array('', '');
+				if (is_array($check)) {
+					$check = '/' .join('|', $check) . '/i';
 				}
-				return ($this->env($detector[0]) == $detector[1]);
-			} elseif (is_object($detector)) {
+				if (Validator::isRegex($check)) {
+					return (bool)preg_match($check, $this->env($key));
+				}
+				return ($this->env($key) == $check);
+			}
+			if (is_callable($detector)) {
 				return $detector($this);
 			}
 			return (bool)$this->env($detector);
