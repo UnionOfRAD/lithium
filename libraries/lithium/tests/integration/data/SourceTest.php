@@ -93,7 +93,6 @@ class SourceTest extends \lithium\test\Unit {
 		}
 
 		$all = CompanyIntegration::all();
-		$this->assertTrue($all->to('array'));
 
 		$expected = count($companyData);
 		$this->assertEqual($expected, count($all));
@@ -101,6 +100,7 @@ class SourceTest extends \lithium\test\Unit {
 
 		$id = (string) $all->first()->{$key};
 		$this->assertTrue(strlen($id) > 0);
+        $this->assertTrue($all->to('array'));
 
 		foreach ($companies as $company) {
 			$this->assertTrue($company->delete());
