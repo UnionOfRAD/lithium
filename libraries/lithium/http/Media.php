@@ -10,7 +10,6 @@ namespace lithium\http;
 
 use \Exception;
 use \lithium\util\String;
-use \lithium\core\Libraries;
 
 /**
  * The `Media` class facilitates content-type mapping (mapping between content-types and file
