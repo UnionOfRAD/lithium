@@ -347,7 +347,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return integer Number of items.
 	 */
 	public function count() {
-		return count($this->_items);
+		return iterator_count($this);
 	}
 
 	/**
