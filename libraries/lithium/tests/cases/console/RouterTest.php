@@ -66,7 +66,7 @@ class RouterTest extends \lithium\test\Unit {
 		);
 		$result = Router::parse(new Request(array(
 			'args' => array(
-				'test',
+				'test', 'run',
 				'--case=lithium.tests.cases.console.RouterTest'
 			)
 		)));
