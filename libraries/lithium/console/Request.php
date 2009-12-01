@@ -77,7 +77,7 @@ class Request extends \lithium\core\Object {
 		$this->args += $config['argv'];
 
 		$this->env['working'] = getcwd() ?: null;
-		$this->env['script'] = array_shift($this->args);
+		$this->env['command'] = array_shift($this->args);
 
 		$this->args = $config['args'] + $this->args;
 		$this->env = $config['env'] + $this->env;

@@ -58,26 +58,18 @@ class Test extends \lithium\console\Command {
 		error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
 
 		if (!empty($this->case)) {
-			$this->case = 'lithium\tests\cases\\' . str_replace('.', '\\',
-				str_replace('lithium.tests.cases.', '', $this->case)
-			);
+			$this->case = '\\' . str_replace('.', '\\', $this->case);
 		}
+
 		if (!empty($this->group)) {
-			$this->group = '\\' . str_replace('.', '\\',
-				str_replace('lithium.tests.cases.', '', $this->group)
-			);
+			$this->group = '\\' . str_replace('.', '\\', $this->group);
 		}
+		var_Dump($this->group);
 		$run = $this->case ?: $this->group;
 
 		$report = Dispatcher::run($run, array(
 			'filters' => $this->filters, 'reporter' => 'text'
 		));
-
-		$this->header('Included Files');
-		$base = dirname(dirname(dirname(dirname(__DIR__))));
-		$files = str_replace($base, '', get_included_files());
-		sort($files);
-		$this->out($files);
 
 		$this->header($report->title);
 
@@ -118,6 +110,19 @@ class Test extends \lithium\console\Command {
 		sort($classes);
 		$this->out($classes);
 	}
+	
+	/**
+	 * Show included files
+	 *
+	 * @return void
+	 */
+	public function included() {
+		$this->header('Included Files');
+		$base = dirname(dirname(dirname(dirname(__DIR__))));
+		$files = str_replace($base, '', get_included_files());
+		sort($files);
+		$this->out($files);
+	}
 
 	/**
 	 * Provide a list of test cases and accept input as case to run
@@ -129,9 +134,8 @@ class Test extends \lithium\console\Command {
 			$tests = Libraries::locate('tests', null, array(
 				'filter' => '/cases|integration|functional/'
 			));
-			$tests = str_replace('\\', '.',
-				str_replace('lithium\tests\cases\\', '', $tests)
-			);
+			$tests = str_replace('\\', '.', $tests);
+			
 			foreach ($tests as $key => $test) {
 				$this->out(++$key . ". " . $test);
 			}

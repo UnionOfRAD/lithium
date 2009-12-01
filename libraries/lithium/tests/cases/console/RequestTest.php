@@ -61,11 +61,11 @@ class RequestTest extends \lithium\test\Unit {
 			'argv' => array('/path/to/lithium.php', 'hello')
 		));
 
-		$result = isset($request->env['script']);
+		$result = isset($request->env['command']);
 		$this->assertTrue($result);
 
 		$expected = '/path/to/lithium.php';
-		$result = $request->env['script'];
+		$result = $request->env['command'];
 		$this->assertEqual($expected, $result);
 	}
 
