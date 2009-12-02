@@ -21,8 +21,8 @@ class CommandTest extends \lithium\test\Unit {
 
 	public function testConstruct() {
 		$command = new MockCommand(array('request' => $this->request));
-		$expected = $this->request->env;
-		$result = $command->request->env;
+		$expected = $this->request->env();
+		$result = $command->request->env();
 		$this->assertEqual($expected, $result);
 
 		$this->request->params['named'] = array(

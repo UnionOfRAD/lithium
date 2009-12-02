@@ -48,30 +48,18 @@ class RequestTest extends \lithium\test\Unit {
 		chdir(LITHIUM_APP_PATH . '/tmp');
 		$request = new Request();
 
-		$result = isset($request->env['working']);
-		$this->assertTrue($result);
-
 		$expected = LITHIUM_APP_PATH . '/tmp';
-		$result = $request->env['working'];
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testEnvScript() {
-		$request = new Request(array(
-			'argv' => array('/path/to/lithium.php', 'hello')
-		));
-
-		$result = isset($request->env['command']);
-		$this->assertTrue($result);
-
-		$expected = '/path/to/lithium.php';
-		$result = $request->env['command'];
+		$result = $request->env('working');
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testConstructWithServer() {
 		$_SERVER['argv'] = array('/path/to/lithium.php','one', 'two');
 		$request = new Request();
+		
+		$expected = '/path/to/lithium.php';
+		$result = $request->env('script');
+		$this->assertEqual($expected, $result);
 
 		$expected = array('one', 'two');
 		$result = $request->args;
@@ -80,16 +68,21 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testConstructWithConfigArgv() {
 		$request = new Request(array(
-			'argv' => array('/path/to/lithium.php', 'wrong')
+			'args' => array('/path/to/lithium.php', 'wrong')
 		));
 
-		$expected = array('wrong');
+		$expected = array('/path/to/lithium.php', 'wrong');
 		$result = $request->args;
 		$this->assertEqual($expected, $result);
 
+		$_SERVER['argv'] = array('/path/to/lithium.php');
 		$request = new Request(array(
-			'argv' => array('/path/to/lithium.php', 'one', 'two')
+			'args' => array('one', 'two')
 		));
+
+		$expected = '/path/to/lithium.php';
+		$result = $request->env('script');
+		$this->assertEqual($expected, $result);
 
 		$expected = array('one', 'two');
 		$result = $request->args;
@@ -104,10 +97,15 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $request->args);
 
 		$request = new Request(array(
-			'args' => array('ok'),
-			'argv' => array('/path/to/lithium.php', 'one', 'two', 'three', 'four')
+			'env' => array('script' => '/path/to/lithium.php'),
+			'args' => array('one', 'two', 'three', 'four')
 		));
-		$expected = array('ok', 'two', 'three', 'four');
+		
+		$expected = '/path/to/lithium.php';
+		$result = $request->env('script');
+		$this->assertEqual($expected, $result);
+		
+		$expected = array('one', 'two', 'three', 'four');
 		$this->assertEqual($expected, $request->args);
 	}
 
@@ -118,7 +116,7 @@ class RequestTest extends \lithium\test\Unit {
 		));
 
 		$expected = '/some/other/path';
-		$result = $request->env['working'];
+		$result = $request->env('working');
 		$this->assertEqual($expected, $result);
 	}
 

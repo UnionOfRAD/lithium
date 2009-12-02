@@ -16,15 +16,6 @@ namespace lithium\console;
 class Request extends \lithium\core\Object {
 
 	/**
-	 * Enviroment variables
-	 *  - pwd path to where script is running
-	 *  - working current directory
-	 *
-	 * @var array
-	 **/
-	public $env = array();
-
-	/**
 	 * Arguments from the console
 	 *
 	 * @var array
@@ -49,11 +40,25 @@ class Request extends \lithium\core\Object {
 	public $input = null;
 
 	/**
+	 * Enviroment variables
+	 *  - pwd path to where script is running
+	 *  - working current directory
+	 *
+	 * @var array
+	 **/
+	protected $_env = array();
+
+	/**
+	 * Auto configuration
+	 *
+	 * @var array
+	 */
+	protected $_autoConfig = array('env' => 'merge');
+
+	/**
 	 * Construct Request object
 	 *
 	 * @param array $config
-	 *              - init boolean runs _init method
-	 *               [default] false
 	 *              - args array
 	 *               [default] empty
 	 *              - env array
@@ -63,31 +68,45 @@ class Request extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function __construct($config = array()) {
-		$config += array(
-			'init' => false,
-			'argv' => array(),
-			'args' => array(),
-			'env' => array(),
-			'input' => null,
-		);
-
-		if (!empty($_SERVER['argv'])) {
-			$this->args += $_SERVER['argv'];
-		}
-		$this->args += $config['argv'];
-
-		$this->env['working'] = getcwd() ?: null;
-		$this->env['command'] = array_shift($this->args);
-
-		$this->args = $config['args'] + $this->args;
-		$this->env = $config['env'] + $this->env;
-		$this->input = $config['input'];
-
-		if (!is_resource($this->input)) {
-			$this->input = fopen('php://stdin', 'r');
-		}
+		$defaults = array('args' => array(), 'input' => null);
+		$config += $defaults;
+		parent::__construct($config);
 	}
 
+	/**
+	 * Initialize request object
+	 *
+	 * @return void
+	 */
+	protected function _init() {
+		$this->_env += (array)$_SERVER + (array)$_ENV;
+		$this->_env['working'] = getcwd() ?: null;
+		$argv = (array) $this->env('argv');
+		$this->_env['script'] = array_shift($argv);
+		$this->args += $argv + (array) $this->_config['args'];
+		$this->input = $this->_config['input'];
+
+		if (!is_resource($this->_config['input'])) {
+			$this->input = fopen('php://stdin', 'r');
+		}
+		parent::_init();
+	}
+
+	/**
+	 * get environment variabels
+	 *
+	 * @param string $key
+	 * @return void
+	 */
+	public function env($key = null) {
+		if (!empty($this->_env[$key])) {
+			return $this->_env[$key];
+		}
+		if ($key === null) {
+			return $this->_env;
+		}
+		return null;
+	}
 	/**
 	 * Return input
 	 *
