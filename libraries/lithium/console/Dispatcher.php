@@ -13,7 +13,7 @@ use \lithium\core\Libraries;
 use \lithium\util\String;
 use \lithium\util\Inflector;
 
-class Dispatcher extends \lithium\core\Object {
+class Dispatcher extends \lithium\core\StaticObject {
 
 	/**
 	 * Fully-namespaced router class reference.  Class must implement a `parse()` method,
@@ -78,38 +78,60 @@ class Dispatcher extends \lithium\core\Object {
 	 * @todo Add exception-handling/error page rendering
 	 */
 	public static function run($request = null, $options = array()) {
-		$defaults = array();
+		$defaults = array('request' => array());
 		$options += $defaults;
+		$classes = static::$_classes;
+		$params = compact('request', 'options');
 
-		if (empty($request)) {
-			$request = new static::$_classes['request']($options);
-		}
-		$router = static::$_classes['router'];
-		$request->params = static::_applyRules($router::parse($request));
-		$class = $request->params['command'] ?: '\lithium\console\Command';
+		return static::_filter(__METHOD__, $params, function($self, $params, $chain) use ($classes) {
+			extract($params);
 
-		if ($class[0] !== '\\') {
-			$class = Libraries::locate('commands', Inflector::camelize($class));
-		}
+			$router = $classes['router'];
+			$request = $request ?: new $classes['request']($options['request']);
+			$request->params = $router::parse($request);
+			$params = $self::invokeMethod('_applyRules', array($request->params));
+			$callable = $self::invokeMethod('_callable', array($request, $params, $options));
+			return $self::invokeMethod('_call', array($callable, $request, $params));
+		});
+	}
+	
+	protected static function _callable($request, $params, $options) {
+		$params = compact('request', 'params', 'options');
+		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
+			extract($params, EXTR_OVERWRITE);
+			$class = $params['command'] ?: '\lithium\console\Command';
 
-		$isRun = (
-			$request->params['action'] != 'run'
-			&& !method_exists($class, $request->params['action'])
-		);
-
-		if ($isRun) {
-			array_unshift($request->params['passed'], $request->params['action']);
-			$request->params['action'] = 'run';
-		}
-
-		if (!class_exists($class)) {
-			throw new UnexpectedValueException("Command $class not found");
-		}
-
-		$command = new $class(compact('request'));
-		return $command($request->params['action'], $request->params['passed']);
+			if ($class[0] !== '\\') {
+				$class = Libraries::locate('commands', Inflector::camelize($class));
+			}
+			
+			if (class_exists($class)) {
+				return new $class(compact('request'));
+			}
+			throw new UnexpectedValueException("Command {$class} not found");
+		});
 	}
 
+	protected static function _call($callable, $request, $params) {
+		$params = compact('callable', 'request', 'params');
+		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
+			if (is_callable($callable = $params['callable'])) {
+				$request = $params['request'];
+				$isRun = (
+					$request->params['action'] != 'run'
+					&& !method_exists($callable, $request->params['action'])
+				);
+
+				if ($isRun) {
+					array_unshift($request->params['passed'], $request->params['action']);
+					$request->params['action'] = 'run';
+				}
+				return $callable($request->params['action'], $request->params['passed']);
+			}
+			throw new UnexpectedValueException("{$callable} not callable");
+		});
+	}
+	
 	/**
 	 * Attempts to apply a set of formatting rules from `$_rules` to a `$params` array, where each
 	 * formatting rule is applied if the key of the rule in `$_rules` is present and not empty in

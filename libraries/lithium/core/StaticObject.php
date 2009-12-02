@@ -42,11 +42,12 @@ class StaticObject {
 	 * @see lithium\util\collection\Filters
 	 */
 	public static function applyFilter($method, $closure = null) {
+		$class = get_called_class();
 		foreach ((array)$method as $m) {
-			if (!isset(static::$_methodFilters[$m])) {
-				static::$_methodFilters[$m] = array();
+			if (!isset(static::$_methodFilters[$class][$m])) {
+				static::$_methodFilters[$class][$m] = array();
 			}
-			static::$_methodFilters[$m][] = $closure;
+			static::$_methodFilters[$class][$m][] = $closure;
 		}
 	}
 
@@ -162,11 +163,12 @@ class StaticObject {
 	protected static function _filter($method, $params, $callback, $filters = array()) {
 		list($class, $method) = explode('::', $method);
 
-		if (empty(static::$_methodFilters[$method]) && empty($filters)) {
+		if (empty(static::$_methodFilters[$class][$method]) && empty($filters)) {
 			return $callback->__invoke($class, $params, null);
 		}
 
-		$f = isset(static::$_methodFilters[$method]) ? static::$_methodFilters[$method] : array();
+		$f = isset(static::$_methodFilters[$class][$method])
+			? static::$_methodFilters[$class][$method] : array();
 		$items = array_merge($f, $filters, array($callback));
 		return Filters::run($class, $params, compact('items', 'class', 'method'));
 	}

@@ -9,7 +9,6 @@
 namespace lithium\test;
 
 use \Exception;
-use \lithium\util\Set;
 use \lithium\util\String;
 use \lithium\util\Validator;
 use \lithium\util\audit\Debugger;
@@ -92,7 +91,7 @@ class Unit extends \lithium\core\Object {
 	public function subject() {
 		return preg_replace('/Test$/', '', str_replace('tests\\cases\\', '', get_class($this)));
 	}
-	
+
 	/**
 	 * Return test methods to run
 	 *
@@ -102,14 +101,14 @@ class Unit extends \lithium\core\Object {
 		static $methods;
 		return $methods ?: $methods = array_values(preg_grep('/^test/', get_class_methods($this)));
 	}
-	
+
 	/**
 	 * Setup method run before every test method. override in subclasses
 	 *
 	 * @return void
 	 */
 	public function setUp() {}
-	
+
 	/**
 	 * Teardown method run after every test method. override in subclasses
 	 *
@@ -155,7 +154,18 @@ class Unit extends \lithium\core\Object {
 		throw new Exception(String::insert($message, $trace));
 	}
 
+	/**
+	 * undocumented function
+	 *
+	 * @param string $expression
+	 * @param string $message
+	 * @param string $data
+	 * @return void
+	 */
 	public function assert($expression, $message = '{:message}', $data = array()) {
+		if (!is_string($message)) {
+			$message = '{:message}';
+		}
 		$trace = Debugger::trace(array('start' => 1, 'format' => 'array'));
 		$methods = $this->methods();
 		$i = 1;
