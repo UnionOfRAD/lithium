@@ -42,6 +42,13 @@ class RequestTest extends \lithium\test\Unit {
 		$expected = array();
 		$result = $request->args;
 		$this->assertEqual($expected, $result);
+
+		$result = $request->env();
+		$this->assertTrue(!empty($result));
+
+		$expected = getcwd();
+		$result = $result['working'];
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testEnvWorking() {
@@ -56,7 +63,7 @@ class RequestTest extends \lithium\test\Unit {
 	public function testConstructWithServer() {
 		$_SERVER['argv'] = array('/path/to/lithium.php','one', 'two');
 		$request = new Request();
-		
+
 		$expected = '/path/to/lithium.php';
 		$result = $request->env('script');
 		$this->assertEqual($expected, $result);
@@ -100,11 +107,11 @@ class RequestTest extends \lithium\test\Unit {
 			'env' => array('script' => '/path/to/lithium.php'),
 			'args' => array('one', 'two', 'three', 'four')
 		));
-		
+
 		$expected = '/path/to/lithium.php';
 		$result = $request->env('script');
 		$this->assertEqual($expected, $result);
-		
+
 		$expected = array('one', 'two', 'three', 'four');
 		$this->assertEqual($expected, $request->args);
 	}
