@@ -54,13 +54,13 @@ class Libraries {
 	 * @see lithium\core\Libraries::locate()
 	 */
 	protected static $_classPaths = array(
-		'adapters' => array(
-			'{:library}\extensions\adapters\{:namespace}\{:class}\{:name}',
-			'{:library}\{:namespace}\{:class}\adapters\{:name}' => array('libraries' => 'lithium')
+		'adapter' => array(
+			'{:library}\extensions\adapter\{:namespace}\{:class}\{:name}',
+			'{:library}\{:namespace}\{:class}\adapter\{:name}' => array('libraries' => 'lithium')
 		),
-		'commands' => array(
-			'{:library}\extensions\commands\{:namespace}\{:class}\{:name}',
-			'{:library}\console\commands\{:namespace}\{:class}\{:name}' => array(
+		'command' => array(
+			'{:library}\extensions\command\{:namespace}\{:class}\{:name}',
+			'{:library}\console\command\{:namespace}\{:class}\{:name}' => array(
 				'libraries' => 'lithium'
 			),
 		),
@@ -71,14 +71,14 @@ class Libraries {
 			'{:library}\extensions\data\{:namespace}\{:class}\{:name}',
 			'{:library}\data\{:namespace}\{:class}\{:name}' => array('libraries' => 'lithium')
 		),
-		'helpers' => array(
-			'{:library}\extensions\helpers\{:name}',
-			'{:library}\template\helpers\{:name}' => array('libraries' => 'lithium')
+		'helper' => array(
+			'{:library}\extensions\helper\{:name}',
+			'{:library}\template\helper\{:name}' => array('libraries' => 'lithium')
 		),
 		'models' => array(
 			'{:library}\models\{:name}'
 		),
-		'sockets' => array(
+		'socket' => array(
 			'{:library}\extensions\sockets\{:name}',
 			'{:library}\{:class}\socket\{:name}' => array('libraries' => 'lithium')
 		),

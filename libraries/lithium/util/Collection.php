@@ -8,6 +8,10 @@
 
 namespace lithium\util;
 
+/**
+ * Collection class to implement ArrayAccess, Iterator, and Countable
+ *
+ */
 class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator, \Countable {
 
 	/**
@@ -25,12 +29,27 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 */
 	protected $_valid = false;
 
+	/**
+	 * undocumented variable
+	 *
+	 * @var array
+	 */
 	protected $_classes = array(
 		'media' => '\lithium\http\Media'
 	);
 
+	/**
+	 * undocumented variable
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array('items');
 
+	/**
+	 * undocumented function
+	 *
+	 * @return void
+	 */
 	protected function _init() {
 		parent::_init();
 		unset($this->_config['items']);
@@ -347,7 +366,9 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return integer Number of items.
 	 */
 	public function count() {
-		return iterator_count($this);
+		$count = iterator_count($this);
+		$this->rewind();
+		return $count;
 	}
 
 	/**

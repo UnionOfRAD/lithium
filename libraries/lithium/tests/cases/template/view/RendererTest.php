@@ -10,8 +10,8 @@ namespace lithium\tests\cases\template\view;
 
 use \lithium\action\Request;
 use \lithium\template\Helper;
-use \lithium\template\helpers\Html;
-use \lithium\template\view\adapters\Simple;
+use \lithium\template\helper\Html;
+use \lithium\template\view\adapter\Simple;
 
 class RendererTest extends \lithium\test\Unit {
 

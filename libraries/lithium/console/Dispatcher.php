@@ -110,10 +110,10 @@ class Dispatcher extends \lithium\core\StaticObject {
 
 			if ($class[0] !== '\\') {
 				$name = Inflector::camelize($class);
-				$class = Libraries::locate('commands', $name);
+				$class = Libraries::locate('command', $name);
 			}
 
-			if ($class) {
+			if (class_exists($class)) {
 				return new $class(compact('request'));
 			}
 			throw new UnexpectedValueException("Command `{$name}` not found");

@@ -71,8 +71,8 @@ class Message extends \lithium\core\StaticObject {
 	 *              - `'scope'`: The scope of the message.
 	 * @return string
 	 *
-	 * @see lithium\console\commands\g11n\Extract
-	 * @see lithium\g11n\catalog\adapters\Code
+	 * @see lithium\console\command\g11n\Extract
+	 * @see lithium\g11n\catalog\adapter\Code
 	 */
 	public static function translate($singular, $options = array()) {
 		$defaults = array(

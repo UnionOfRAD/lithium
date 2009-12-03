@@ -185,7 +185,7 @@ class Connections extends \lithium\core\StaticObject {
 		if (empty($config['adapter'])) {
 			$class = Libraries::locate("data.source", $config['type']);
 		} else {
-			$class = Libraries::locate("adapters.data.source.{$config['type']}", $config['adapter']);
+			$class = Libraries::locate("adapter.data.source.{$config['type']}", $config['adapter']);
 		}
 		if (!$class) {
 			throw new Exception("{$config['type']} adapter {$config['adapter']} could not be found");

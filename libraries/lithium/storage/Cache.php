@@ -45,7 +45,7 @@ use \lithium\util\Inflector;
  * documentation.
  *
  * @see lithium\core\Adaptable
- * @see lithium\storage\cache\adapters
+ * @see lithium\storage\cache\adapter
  */
 class Cache extends \lithium\core\Adaptable {
 
@@ -64,7 +64,7 @@ class Cache extends \lithium\core\Adaptable {
 	 *                    that will be used as the cache key.
 	 * @param array $data If a lambda/closure is used as a key and requires arguments,
 	 *                    pass them in here.
-	 * @return string	The generated cache key.
+     * @return string     The generated cache key.
 	 */
 	public static function key($key, $data = array()) {
 		$key = is_object($key) ? $key($data) : $key;
@@ -181,7 +181,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @return object       Adapter for named configuration
 	 */
 	public static function adapter($name) {
-		return static::_adapter('adapters.storage.cache', $name);
+		return static::_adapter('adapter.storage.cache', $name);
 	}
 
 }
