@@ -58,7 +58,6 @@ class Dispatcher extends \lithium\core\StaticObject {
 		if (empty($config)) {
 			return array('rules' => static::$_rules);
 		}
-
 		foreach ($config as $key => $val) {
 			if (isset(static::${'_' . $key})) {
 				static::${'_' . $key} = $val + static::${'_' . $key};
@@ -90,25 +89,34 @@ class Dispatcher extends \lithium\core\StaticObject {
 			$request = $request ?: new $classes['request']($options['request']);
 			$request->params = $router::parse($request);
 			$params = $self::invokeMethod('_applyRules', array($request->params));
-			$callable = $self::invokeMethod('_callable', array($request, $params, $options));
-			return $self::invokeMethod('_call', array($callable, $request, $params));
+			try {
+				$callable = $self::invokeMethod('_callable', array($request, $params, $options));
+				try {
+					return $self::invokeMethod('_call', array($callable, $request, $params));
+				} catch (\UnexpectedValueException $e) {
+					echo($e->getMessage() . "\n");
+				}
+			} catch (\UnexpectedValueException $e) {
+				echo($e->getMessage() . "\n");
+			}
 		});
 	}
-	
+
 	protected static function _callable($request, $params, $options) {
 		$params = compact('request', 'params', 'options');
 		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
 			extract($params, EXTR_OVERWRITE);
-			$class = $params['command'] ?: '\lithium\console\Command';
+			$name = $class = $params['command'] ?: '\lithium\console\Command';
 
 			if ($class[0] !== '\\') {
-				$class = Libraries::locate('commands', Inflector::camelize($class));
+				$name = Inflector::camelize($class);
+				$class = Libraries::locate('commands', $name);
 			}
-			
-			if (class_exists($class)) {
+
+			if ($class) {
 				return new $class(compact('request'));
 			}
-			throw new UnexpectedValueException("Command {$class} not found");
+			throw new UnexpectedValueException("Command `{$name}` not found");
 		});
 	}
 
@@ -131,7 +139,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			throw new UnexpectedValueException("{$callable} not callable");
 		});
 	}
-	
+
 	/**
 	 * Attempts to apply a set of formatting rules from `$_rules` to a `$params` array, where each
 	 * formatting rule is applied if the key of the rule in `$_rules` is present and not empty in
