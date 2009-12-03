@@ -233,17 +233,6 @@ class RecordSet extends \lithium\util\Collection {
 		return $this->_valid ? $this->current() : null;
 	}
 
-	/**
-	 * Fetches all available records in the set, and returns the count.
-	 *
-	 * @return int Returns the number of records in the set, after all have been loaded from the
-	 *             resource.
-	 */
-	public function count() {
-		$this->offsetGet(null);
-		return parent::count();
-	}
-
 	public function meta() {
 		return array('model' => $this->_model);
 	}

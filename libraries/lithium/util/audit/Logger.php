@@ -48,7 +48,7 @@ class Logger extends \lithium\core\Adaptable {
 	 * @return object       Adapter for named configuration
 	 */
 	public static function adapter($name) {
-		return static::_adapter('adapters.util.audit.logger', $name);
+		return static::_adapter('adapter.util.audit.logger', $name);
 	}
 }
 

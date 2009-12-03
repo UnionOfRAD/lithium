@@ -172,7 +172,7 @@ class Session extends \lithium\core\Adaptable {
 	 * @return object       Adapter for named configuration
 	 */
 	public static function adapter($name) {
-		return static::_adapter('adapters.storage.session', $name);
+		return static::_adapter('adapter.storage.session', $name);
 	}
 }
 

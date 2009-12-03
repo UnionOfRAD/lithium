@@ -91,7 +91,7 @@ class Command extends \lithium\core\Object {
 	 */
 	public function run() {
 		$this->header('Available Commands');
-		$classes = array_unique(Libraries::locate('commands', null, array('recursive' => false)));
+		$classes = array_unique(Libraries::locate('command', null, array('recursive' => false)));
 
 		foreach ($classes as $command) {
 			$command = explode('\\', $command);

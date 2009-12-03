@@ -10,7 +10,7 @@ namespace lithium\tests\cases\storage;
 
 use \lithium\storage\Session;
 use \lithium\util\Collection;
-use \lithium\storage\session\adapters\Memory;
+use \lithium\storage\session\adapter\Memory;
 
 class SessionStorageConditional extends Memory {
 
@@ -44,7 +44,7 @@ class SessionTest extends \lithium\test\Unit {
 
 		Session::clear();
 		Session::config(array('store1' => array(
-			'adapter' => 'lithium\storage\session\adapters\Memory',
+			'adapter' => 'lithium\storage\session\adapter\Memory',
 			'filters' => array()
 		)));
 		$this->assertTrue(Session::write('key', 'value'));
