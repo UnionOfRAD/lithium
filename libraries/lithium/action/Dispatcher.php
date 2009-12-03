@@ -127,7 +127,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			$controller = $library . Inflector::camelize($params['controller']);
 			$class = Libraries::locate('controllers', $controller);
 
-			if (class_exists($class)) {
+			if ($class) {
 				return new $class(compact('request'));
 			}
 			throw new Exception("Controller {$controller} not found");
