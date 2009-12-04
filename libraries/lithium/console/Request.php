@@ -9,40 +9,42 @@
 namespace lithium\console;
 
 /**
- * Holds current request from console
+ * The `Request` class reprents a console request and holds information about it's
+ * environment as well as passed arguments.
  *
- *
- **/
+ * @see lithium\console\Dispatcher
+ */
 class Request extends \lithium\core\Object {
 
 	/**
-	 * Arguments from the console
+	 * Arguments for the request.
 	 *
 	 * @var array
-	 **/
+	 */
 	public $args = array();
 
 	/**
-	 * Params from router
+	 * Parameters parsed from arguments.
 	 *
 	 * @var array
-	 **/
+	 * @see lithium\console\Router
+	 */
 	public $params = array(
-		'command' => null, 'action' => 'run',
-		'passed' => array(), 'named' => array()
+		'command' => null,
+		'action' => 'run',
+		'passed' => array(),
+		'named' => array()
 	);
 
 	/**
-	 * Input stream, STDIN
+	 * Input (STDIN).
 	 *
-	 * @var stream
-	 **/
-	public $input = null;
+	 * @var resource
+	 */
+	public $input;
 
 	/**
-	 * Enviroment variables
-	 *  - pwd path to where script is running
-	 *  - working current directory
+	 * Enviroment variables.
 	 *
 	 * @var array
 	 **/
@@ -55,18 +57,6 @@ class Request extends \lithium\core\Object {
 	 */
 	protected $_autoConfig = array('env' => 'merge');
 
-	/**
-	 * Construct Request object
-	 *
-	 * @param array $config
-	 *              - args array
-	 *               [default] empty
-	 *              - env array
-	 *               [default] working => current working directory
-	 *              - input stream
-	 *
-	 * @return void
-	 */
 	public function __construct($config = array()) {
 		$defaults = array('args' => array(), 'input' => null);
 		$config += $defaults;
@@ -93,10 +83,10 @@ class Request extends \lithium\core\Object {
 	}
 
 	/**
-	 * get environment variabels
+	 * Get environment variables.
 	 *
 	 * @param string $key
-	 * @return void
+	 * @return string|void
 	 */
 	public function env($key = null) {
 		if (!empty($this->_env[$key])) {
@@ -107,24 +97,25 @@ class Request extends \lithium\core\Object {
 		}
 		return null;
 	}
+
 	/**
-	 * Return input
+	 * Reads a line from input.
 	 *
-	 * @return void
-	 *
-	 **/
+	 * @return string
+	 */
 	public function input() {
 		return fgets($this->input);
 	}
 
 	/**
-	 * Destructor to close streams
+	 * Return input
+	 * Destructor. Closes input.
 	 *
 	 * @return void
-	 *
-	 **/
+	 */
 	public function __destruct() {
 		fclose($this->input);
 	}
 }
+
 ?>
