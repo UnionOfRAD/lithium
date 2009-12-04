@@ -48,7 +48,6 @@ abstract class Database extends \lithium\data\Source {
 	 * Creates the database object and set default values for it.
 	 *
 	 * Options defined:
-	 *
 	 *  - 'database' _string_ Name of the database to use. Defaults to 'lithium'.
 	 *  - 'host' _string_ Name/address of server to connect to. Defaults to 'localhost'.
 	 *  - 'login' _string_ Username to use when connecting to server. Defaults to 'root'.
@@ -169,23 +168,6 @@ abstract class Database extends \lithium\data\Source {
 		}
 		return $result;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	function generateAssociationQuery(&$model, &$linkModel, $type, $association = null, $assocData = array(), &$queryData, $external = false, &$resultSet) {
 		if (empty($queryData['fields'])) {
