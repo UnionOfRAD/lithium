@@ -89,13 +89,10 @@ class Dispatcher extends \lithium\core\StaticObject {
 			$request = $request ?: new $classes['request']($options['request']);
 			$request->params = $router::parse($request);
 			$params = $self::invokeMethod('_applyRules', array($request->params));
+
 			try {
 				$callable = $self::invokeMethod('_callable', array($request, $params, $options));
-				try {
-					return $self::invokeMethod('_call', array($callable, $request, $params));
-				} catch (\UnexpectedValueException $e) {
-					echo($e->getMessage() . "\n");
-				}
+				return $self::invokeMethod('_call', array($callable, $request, $params));
 			} catch (\UnexpectedValueException $e) {
 				echo($e->getMessage() . "\n");
 			}
