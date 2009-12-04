@@ -118,8 +118,10 @@ class Form extends \lithium\template\Helper {
 	protected $_binding = null;
 
 	public function __construct($config = array()) {
-		$defaults = array('base' => array(), 'text' => array(), 
-			'textarea' => array(), 'select' => array('multiple' => false));
+		$defaults = array(
+			'base' => array(), 'text' => array(), 'textarea' => array(), 
+			'select' => array('multiple' => false)
+		);
 		parent::__construct((array)$config + $defaults);
 	}
 
