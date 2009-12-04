@@ -329,6 +329,44 @@ class FormTest extends \lithium\test\Unit {
 			'type' => 'text', 'name' => 'passwd'
 		)));
 	}
+	
+	public function testMultiSelect() {
+		$expected = array(
+			'select' => array('name' => 'numbers[]', 'multiple' => 'multiple'),
+			array('option' => array('value' => '', 'selected' => 'selected')),
+			'&gt; Make a selection',
+			'/option',
+			array('option' => array('value' => '1')),
+			'first',
+			'/option',
+			array('option' => array('value' => '2')),
+			'second',
+			'/option',
+			'/select'
+		);
+		$result = $this->form->select('numbers', array('1' => 'first', '2' => 'second'), array(
+			'empty' => '> Make a selection',
+			'multiple' => true
+		));
+		$this->assertTags($result, $expected);
+		
+		$expected = array(
+			'select' => array('name' => 'numbers[]', 'multiple' => 'multiple', 'size' => 5),
+			array('option' => array('value' => '1')),
+			'first',
+			'/option',
+			array('option' => array('value' => '2')),
+			'second',
+			'/option',
+			'/select'
+		);
+		$result = $this->form->select('numbers', array('1' => 'first', '2' => 'second'), array(
+			'multiple' => true,
+			'size' => 5
+		));
+		$this->assertTags($result, $expected);
+		
+	}
 }
 
 ?>
