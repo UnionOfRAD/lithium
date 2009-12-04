@@ -34,8 +34,54 @@ class CommandTest extends \lithium\test\Unit {
 
 	public function testInvoke() {
 		$command = new MockCommand(array('request' => $this->request));
-		$expected = 'test run';
-		$result = $command('testRun');
+		$response = $command('testRun');
+
+		$result = $response;
+		$expected = 'lithium\console\Response';
+		$this->assertTrue(is_a($result, $expected));
+
+		$expected = 'testRun';
+		$result = $response->testAction;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testInvokeSettingResponseStatus() {
+		$command = new MockCommand(array('request' => $this->request));
+
+		$expected = 0;
+		$result = $command('testReturnNull')->status;
+		$this->assertEqual($expected, $result);
+
+		$expected = 0;
+		$result = $command('testReturnTrue')->status;
+		$this->assertEqual($expected, $result);
+
+		$expected = 1;
+		$result = $command('testReturnFalse')->status;
+		$this->assertEqual($expected, $result);
+
+		$expected = -1;
+		$result = $command('testReturnNegative1')->status;
+		$this->assertEqual($expected, $result);
+
+		$expected = 1;
+		$result = $command('testReturn1')->status;
+		$this->assertEqual($expected, $result);
+
+		$expected = 3;
+		$result = $command('testReturn3')->status;
+		$this->assertEqual($expected, $result);
+
+		$expected = 'this is a string';
+		$result = $command('testReturnString')->status;
+		$this->assertEqual($expected, $result);
+
+		$expected = 1;
+		$result = $command('testReturnEmptyArray')->status;
+		$this->assertEqual($expected, $result);
+
+		$expected = 0;
+		$result = $command('testReturnArray')->status;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -55,14 +101,14 @@ class CommandTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testErr() {
+	public function testError() {
 		$command = new MockCommand(array('request' => $this->request));
 		$expected = "ok\n";
 		$result = $command->error('ok');
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testErrArray() {
+	public function testErrorArray() {
 		$command = new MockCommand(array('request' => $this->request));
 		$expected = "line 1\nline 2\n";
 		$command->error(array('line 1', 'line 2'));

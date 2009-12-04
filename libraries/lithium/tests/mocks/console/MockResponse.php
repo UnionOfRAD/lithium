@@ -10,6 +10,10 @@ namespace lithium\tests\mocks\console;
 
 class MockResponse extends \lithium\console\Response {
 
+	public $testAction;
+
+	public $testParam;
+
 	public function __construct($config = array()) {
 		parent::__construct($config);
 		$this->output = null;

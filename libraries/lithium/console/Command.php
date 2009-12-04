@@ -43,14 +43,14 @@ class Command extends \lithium\core\Object {
 	protected $_classes = array(
 		'response' => '\lithium\console\Response'
 	);
-	
+
 	/**
 	 * Auto configuration
 	 *
 	 * @var array
 	 */
 	protected $_autoConfig = array('classes' => 'merge');
-	
+
 	/**
 	 * Constructor.
 	 *
@@ -112,14 +112,20 @@ class Command extends \lithium\core\Object {
 	 * @todo Implement filters
 	 */
 	public function __invoke($action, $passed = array(), $options = array()) {
-		$result = null;
-
 		try {
 			$result = $this->invokeMethod($action, $passed);
+
+			if (is_int($result)) {
+				$this->response->status = $result;
+			} elseif ($result || $result === null) {
+				$this->response->status = 0;
+			} else {
+				$this->response->status = 1;
+			}
 		} catch (Exception $e) {
-			// See todo
+			$this->response->status = 1;
 		}
-		return $result;
+		return $this->response;
 	}
 
 	/**

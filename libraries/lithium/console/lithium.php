@@ -46,6 +46,6 @@ if ($app) {
 	Libraries::add('lithium');
 }
 
-exit(Dispatcher::run());
+exit(Dispatcher::run()->status);
 
 ?>

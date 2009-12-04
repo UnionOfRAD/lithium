@@ -30,6 +30,17 @@ class Response extends \lithium\core\Object {
 	public $error = null;
 
 	/**
+	 * Status code, most often used for setting an exit status.
+	 *
+	 * It should be expected that only status codes in the range of 0-255
+	 * can be properly evalutated.
+	 *
+	 * @var integer
+	 * @see lithium\console\Command
+	 */
+	public $status = 0;
+
+	/**
 	 * Construct Request object
 	 *
 	 * @param array $config
@@ -49,7 +60,7 @@ class Response extends \lithium\core\Object {
 		}
 
 		$this->error = $config['error'];
-		
+
 		if (!is_resource($this->error)) {
 			$this->error = fopen('php://stderr', 'r');;
 		}
