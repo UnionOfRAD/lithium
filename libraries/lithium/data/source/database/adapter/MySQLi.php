@@ -11,7 +11,7 @@ namespace lithium\data\source\database\adapter;
 use \Exception;
 
 /**
-* Adapater class for MySQL improved extension.
+* Adapter class for MySQL improved extension.
 *
 * Implements the methods connecting higher level abstractions to the specifics of the MySQL
 * improved extension.
@@ -105,8 +105,8 @@ class MySQLi extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Connects to the database and sets the connection encoding,
-	 * using options provided to the class constructor.
+	 * Connects to the database and sets the connection encoding, using options provided
+	 * to the class constructor.
 	 *
 	 * @return boolean True if the database could be connected, else false.
 	 */
@@ -147,7 +147,7 @@ class MySQLi extends \lithium\data\source\Database {
 	 * @return array Returns an associative array describing the given table's schema, where the
 	 *         array keys are the available fields, and the values are arrays describing each
 	 *         field, containing the following keys:
-	 *         -`'type'`: The field type name.
+	 *         - `'type'`: The field type name.
 	 * @filter This method can be filtered.
 	 */
 	public function describe($entity, $meta = array()) {
@@ -211,7 +211,7 @@ class MySQLi extends \lithium\data\source\Database {
 	/**
 	 * Returns the list of tables in the currently-connected database.
 	 *
-	 * @param string $model The fully-namespaced class name of the model object making the request.
+	 * @param string $model The fully-name-spaced class name of the model object making the request.
 	 * @return array Returns an array of objects to which models can connect.
 	 * @filter This method can be filtered.
 	 */
@@ -231,9 +231,21 @@ class MySQLi extends \lithium\data\source\Database {
 	}
 
 	/**
+	 * Quotes identifiers.
+	 *
+	 * Currently, this method simply returns the identifier.
+	 *
+	 * @param string $name The identifier to quote.
+	 * @return string The quoted identifier.
+	 */
+	public function name($name) {
+		return $name;
+	}
+
+	/**
 	 *
 	 * @param string $type
-	 * @param mysqli_result object $mysqliResult
+	 * @param object $mysqliResult
 	 * @param unknown_type $context
 	 * @return array|null
 	 */
@@ -262,10 +274,10 @@ class MySQLi extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Converts database-layer column types to basic types
+	 * Converts database-layer column types to basic types.
 	 *
-	 * @param string $real Real database-layer column type (i.e. "varchar(255)")
-	 * @return string Abstract column type (i.e. "string")
+	 * @param string $real Real database-layer column type (i.e. "varchar(255)").
+	 * @return string Abstract column type (i.e. "string").
 	 */
 	protected function _column($real) {
 		if (is_array($real)) {
