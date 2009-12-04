@@ -230,7 +230,7 @@ class Query extends \lithium\core\Object {
 	/**
 	* Convert the query's properties to the data-sources' syntax and return it as an array.
 	*
-	* @param object Instance of the data-source to use for conversion.
+	* @param object $dataSource Instance of the data-source to use for conversion.
 	* @return array Converted properties.
 	*/
 	public function export($dataSource) {
