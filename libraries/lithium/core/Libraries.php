@@ -79,7 +79,7 @@ class Libraries {
 			'{:library}\models\{:name}'
 		),
 		'socket' => array(
-			'{:library}\extensions\sockets\{:name}',
+			'{:library}\extensions\socket\{:name}',
 			'{:library}\{:class}\socket\{:name}' => array('libraries' => 'lithium')
 		),
 		'test' => array(
@@ -226,10 +226,9 @@ class Libraries {
 	 */
 	public static function find($library, $options = array()) {
 		$defaults = array(
-			'recursive' => false,
+			'path' => '', 'recursive' => false,
 			'filter' => '/^(\w+)?(\\\\[a-z0-9_]+)+\\\\[A-Z][a-zA-Z0-9]+$/',
 			'exclude' => '',
-			'path' => '',
 			'format' => function ($file, $config) {
 				$trim = array(strlen($config['path']) + 1, strlen($config['suffix']));
 				$rTrim = strpos($file, $config['suffix']) !== false ? -$trim[1] : 9999;
@@ -455,11 +454,8 @@ class Libraries {
 	 */
 	protected static function _locateAll($params, $options = array()) {
 		$defaults = array(
-			'libraries' => null,
-			'recursive' => true,
-			'namespaces' => false,
-			'filter' => false,
-			'exclude' => false,
+			'libraries' => null, 'recursive' => true, 'namespaces' => false,
+			'filter' => false, 'exclude' => false,
 			'format' => function ($file, $config) {
 				$trim = array(strlen($config['path']) + 1, strlen($config['suffix']));
 				$file = substr($file, $trim[0], -$trim[1]);

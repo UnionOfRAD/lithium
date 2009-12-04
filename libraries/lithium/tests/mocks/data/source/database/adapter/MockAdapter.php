@@ -8,6 +8,18 @@ class MockAdapter extends \lithium\data\source\Database {
 		parent::__construct($config);
 	}
 
+	public function connect() {
+		return true;
+	}
+
+	public function disconnect() {
+		return true;
+	}
+
+	public function entities($class = null) {
+
+	}
+
 	public function encoding($encoding = null) {
 		if (empty($encoding)) {
 			return '';
@@ -15,25 +27,8 @@ class MockAdapter extends \lithium\data\source\Database {
 		return $encoding;
 	}
 
-	public function describe($source, $contect) {
-		var_dump($source);
-		return null;
-	}
-
-	public function result($type, $resource, $context) {
-		return true;
-	}
-
-	public function error() {
-		return false;
-	}
-
-	public function name($name) {
-		return $name;
-	}
-
-	public function value($value) {
-		return $value;
+	public function  describe($entity, $meta = array()) {
+		return array();
 	}
 
 	public function create($record, $options = array()) {
@@ -50,6 +45,22 @@ class MockAdapter extends \lithium\data\source\Database {
 
 	public function delete($query, $options) {
 		return true;
+	}
+
+	public function result($type, $resource, $context) {
+		return true;
+	}
+
+	public function error() {
+		return false;
+	}
+
+	public function name($name) {
+		return $name;
+	}
+
+	public function value($value) {
+		return $value;
 	}
 
 	public function columns($query, $resource = null, $context = null) {
@@ -74,7 +85,7 @@ class MockAdapter extends \lithium\data\source\Database {
 		return $limit;
 	}
 
-	function order($order, $context) {
+	public function order($order, $context) {
 		if (empty($order)) {
 			return '';
 		}
