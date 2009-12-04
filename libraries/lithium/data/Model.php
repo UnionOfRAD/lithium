@@ -325,7 +325,7 @@ class Model extends \lithium\core\StaticObject {
 	 * return the first field found in an array of multiple options.
 	 *
 	 * @param mixed $field A single field (string) or list of fields (array) to check the existence
-	 *              of.
+	 *        of.
 	 * @return mixed If `$field` is a string, returns a boolean indicating whether or not that field
 	 *         exists. If `$field` is an array, returns the first field found, or `false` if none of
 	 *         the fields in the list are found.
@@ -345,10 +345,11 @@ class Model extends \lithium\core\StaticObject {
 
 	/**
 	 * Instantiates a new record object, initialized with any data passed in. For example:
-	 *
-	 * {{{$post = Post::create(array("title" => "New post"));
+	 * {{{
+	 * $post = Post::create(array("title" => "New post"));
 	 * echo $post->title; // echoes "New post"
-	 * $post->save();}}}
+	 * $post->save();
+	 * }}}
 	 *
 	 * @param array $data Any data that this record should be populated with initially.
 	 * @return object Returns a new, **un-saved** record object.
@@ -370,19 +371,20 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * An instance method (called on record and document objects) to create or update the record or
 	 * document in the database that corresponds to `$record`. For example:
-	 *
-	 * {{{$post = Post::create();
+	 * {{{
+	 * $post = Post::create();
 	 * $post->title = "My post";
-	 * $post->save(null, array('validate' => false));}}}
+	 * $post->save(null, array('validate' => false));
+	 * }}}
 	 *
 	 * @param object $record The record or document object to be saved in the database.
 	 * @param array $data Any data that should be assigned to the record before it is saved.
 	 * @param array $options Options:
-	 *      - 'callbacks': If `false`, all callbacks will be disabled before executing. Defaults to
-	 *       `true`.
-	 *      - 'validate': If `false`, validation will be skipped, and the record will be immediately
+	 *        - 'callbacks': If `false`, all callbacks will be disabled before executing. Defaults to
+	 *        `true`.
+	 *        - 'validate': If `false`, validation will be skipped, and the record will be immediately
 	 *        saved. Defaults to `true`.
-	 *      - 'whitelist': An array of fields that are allowed to be saved to this record.
+	 *        - 'whitelist': An array of fields that are allowed to be saved to this record.
 	 *
 	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
 	 */
@@ -450,7 +452,7 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Gets just the class name portion of a fully-namespaced class name, i.e.
+	 * Gets just the class name portion of a fully-name-spaced class name, i.e.
 	 * `app\models\Post::_name()` returns `'Post'`.
 	 *
 	 * @return string
