@@ -118,7 +118,10 @@ class Form extends \lithium\template\Helper {
 	protected $_binding = null;
 
 	public function __construct($config = array()) {
-		$defaults = array('base' => array(), 'text' => array(), 'textarea' => array());
+		$defaults = array(
+			'base' => array(), 'text' => array(), 'textarea' => array(), 
+			'select' => array('multiple' => false)
+		);
 		parent::__construct((array)$config + $defaults);
 	}
 
@@ -284,7 +287,12 @@ class Form extends \lithium\template\Helper {
 		}
 		$options = array_diff_key($options, $defaults);
 
-		$output = $this->_render(__METHOD__, 'select-start', compact('name', 'options'));
+		$select_start_template = 'select-start';
+		if ($options['multiple']) {
+			$select_start_template = 'select-multi-start';
+		}
+		
+		$output = $this->_render(__METHOD__, $select_start_template, compact('name', 'options'));
 		$base = $options;
 
 		foreach ($list as $value => $title) {
