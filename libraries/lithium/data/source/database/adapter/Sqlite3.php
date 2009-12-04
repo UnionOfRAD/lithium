@@ -44,7 +44,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 *        this class:
 	 *        - 'database' _string_: database name. Defaults to none
 	 *        - 'flags' _integer_: Optional flags used to determine how to open the SQLite database. By default,
-	 *                  open uses SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE.
+	 *          open uses SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE.
 	 *        - 'key' _string_: An optional encryption key used when encrypting and decrypting an SQLite database.
 	 *
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
@@ -178,7 +178,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Retrieves database error message and error code
+	 * Retrieves database error message and error code.
 	 *
 	 * @return array
 	 */
@@ -217,7 +217,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Converts database-layer column types to basic types
+	 * Converts database-layer column types to basic types.
 	 *
 	 * @param string $real Real database-layer column type (i.e. "varchar(255)")
 	 * @return string Abstract column type (i.e. "string")
