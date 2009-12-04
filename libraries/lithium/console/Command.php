@@ -85,18 +85,13 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Base method, shows a list of available commands.  Override in subclasses as needed.
+	 * Base method, shows help. Override in subclasses as needed.
 	 *
 	 * @return void
 	 */
 	public function run() {
-		$this->header('Available Commands');
-		$classes = array_unique(Libraries::locate('command', null, array('recursive' => false)));
-
-		foreach ($classes as $command) {
-			$command = explode('\\', $command);
-			$this->out(' - ' . Inflector::underscore(array_pop($command)));
-		}
+		$this->help();
+		return false;
 	}
 
 	/**
@@ -294,45 +289,78 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Will show basic help for the command
+	 * Show help generated from the documented code of the command.
 	 *
-	 * @return void
+	 * @return boolean
 	 */
 	public function help() {
 		$parent = new ReflectionClass("\lithium\console\Command");
 		$class = new ReflectionClass(get_class($this));
-
-		$params = array();
 		$template = $class->newInstance();
-		$properties = array_diff($class->getProperties(), $parent->getProperties());
-		$propertyFilter = function($prop) {
+
+		$filter = function($prop) {
 			return $prop->isPublic() && !preg_match('/^[A-Z]/', $prop->getName());
 		};
+		$properties = array_diff($class->getProperties(), $parent->getProperties());
+		$properties = array_filter($properties, $filter);
 
-		foreach ((array)array_filter($properties, $propertyFilter) as $property) {
-			$hint = null;
-			$val = $property->getValue($template);
+		$params = array();
 
-			if (!is_bool($val)) {
-				$hint = '=val';
-				$comment = Docblock::comment($property->getDocComment());
-				if (isset($comment['tags']['var'])) {
-					$hint = '=' . strtoupper($comment['tags']['var']);
-				}
-			}
+		foreach ($properties as $property) {
 			$name = str_replace('_', '-', Inflector::underscore($property->getName()));
-			$params[] = sprintf('[--%s%s]', $name, $hint);
+			$default = $property->getValue($template);
+
+			$comment = Docblock::comment($property->getDocComment());
+			$description = str_replace("\n", ' ', $comment['description']);
+			$type = isset($comment['tags']['var']) ? strtok($comment['tags']['var'], ' ') : null;
+
+			$usage = $type == 'boolean' ? "--{$name}" : "--{$name}=" . strtoupper($name);
+
+			$params[] = compact('name', 'default', 'description', 'type', 'usage');
 		}
 
-		// Show parameters as well
-		$className = explode("\\", $class->getName());
-		$command = array_pop($className);
-		$this->out(sprintf(
-			'usage: lithium %s %s', $command, join(' ', $params)
-		), 2);
+		$this->out('USAGE');
+		$this->out(sprintf("    li3 %s%s [ARGS]",
+			$this->request->params['command'] ?: 'COMMAND',
+			array_reduce($params, function($a, $b) { return "{$a} {$b['usage']}"; })
+		));
 
+		$this->nl();
+		$this->out('DESCRIPTION');
 		$comment = Docblock::comment($class->getDocComment());
-		$this->out($comment['description']);
+		$this->out("    {$comment['description']}");
+
+		if ($params) {
+			$this->nl();
+			$this->out('OPTIONS');
+
+			foreach ($params as $param) {
+				$this->out("    {$param['usage']}");
+
+				if ($param['description']) {
+					$this->out("        {$param['description']}");
+				}
+				$this->nl();
+			}
+		}
+		if (!$this->request->params['command']) {
+			$this->nl();
+			$this->out('COMMANDS');
+			$commands = Libraries::locate('command', null, array('recursive' => false));
+			$commands = array_unique($commands);
+
+			foreach ($commands as $command) {
+				$class = new ReflectionClass($command);
+				$comment = Docblock::comment($class->getDocComment());
+				$command = explode('\\', $command);
+
+				$this->out("    " .	Inflector::underscore(array_pop($command)));
+				$this->out("        " . str_replace("\n", ' ', $comment['description']));
+			}
+			$this->nl();
+			$this->out('See `li3 COMMAND help` for more information on a specific command.');
+		}
+		return true;
 	}
 }
 

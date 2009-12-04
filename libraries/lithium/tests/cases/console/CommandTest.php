@@ -149,31 +149,31 @@ class CommandTest extends \lithium\test\Unit {
 
 	public function testHelp() {
 		$command = new MockCommand(array('request' => $this->request));
-		$expected = preg_quote("usage: lithium MockCommand [--case=val]\n\n");
-		$command->help();
+		$return = $command->help();
+
+		$this->assertTrue($return);
+
+		$expected = "li3 COMMAND --case=CASE --face=FACE --mace=MACE --race=RACE --lace [ARGS]";
+		$expected = preg_quote($expected);
 		$result = $command->response->output;
-		$this->assertPattern("/^{$expected}/", $result);
+		$this->assertPattern("/{$expected}/", $result);
+
+		$command = new MockCommand(array('request' => $this->request));
+		$command->help();
+
+		$expected = "COMMANDS\n(\s{4}[a-z0-9\_]+\n)";
+		$this->assertPattern("/{$expected}/m", $result);
 	}
 
 	public function testRun() {
 		$command = new MockCommand(array('request' => $this->request));
-		$expected = array(
-			'--------------------------------------------------------------------------------',
-			'Available Commands',
-			'--------------------------------------------------------------------------------',
-			''
-		);
-		$command->run();
-		$result = explode("\n", $command->response->output);
+		$return = $command->run();
 
-		$this->assertEqual($expected[0], $result[0]);
-		$this->assertEqual($expected[1], $result[1]);
-		$this->assertEqual($expected[2], $result[2]);
-		$this->assertEqual(end($expected), end($result));
+		$this->assertFalse($return);
 
-		for ($i = 3; $i < count($result) - 1; $i++) {
-			$this->assertPattern('/^\s-\s[A-Za-z0-9\\_]+$/', $result[$i]);
-		}
+		$expected = "USAGE";
+		$result = $command->response->output;
+		$this->assertPattern("/{$expected}/m", $result);
 	}
 
 	public function testIn() {

@@ -12,6 +12,24 @@ class MockCommand extends \lithium\console\Command {
 
 	public $case = null;
 
+	public $face = true;
+
+	/**
+	 * Mace.
+	 *
+	 * @var string Describe value of mace.
+	 */
+	public $mace = 'test';
+
+	public $race;
+
+	/**
+	 * Lace.
+	 *
+	 * @var boolean Describe value of lace.
+	 */
+	public $lace;
+
 	protected $_dontShow = null;
 
 	protected $_classes = array(
