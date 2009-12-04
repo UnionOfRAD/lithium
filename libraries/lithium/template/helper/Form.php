@@ -74,7 +74,7 @@ class Form extends \lithium\template\Helper {
 	 *
 	 * For example, if all text input fields should be wrapped in `<span />` tags, you can configure
 	 * the template string mappings per the following:
-	 * 
+	 *
 	 * {{{
 	 * $this->form->config(array('templates' => array(
 	 * 	'text' => '<span><input type="text" name="{:name}"{:options} /></span>'
@@ -84,12 +84,12 @@ class Form extends \lithium\template\Helper {
 	 * Alternatively, you can re-map one type as another. This is useful if, for example, you
 	 * include your own helper with custom form template strings which do not match the default
 	 * template string names.
-	 * 
+	 *
 	 * {{{
 	 * // Renders all password fields as text fields
 	 * $this->form->config(array('templates' => array('password' => 'text')));
 	 * }}}
-	 * 
+	 *
 	 * @var array
 	 * @see lithium\template\helper\Form::config()
 	 */
@@ -119,7 +119,7 @@ class Form extends \lithium\template\Helper {
 
 	public function __construct($config = array()) {
 		$defaults = array(
-			'base' => array(), 'text' => array(), 'textarea' => array(), 
+			'base' => array(), 'text' => array(), 'textarea' => array(),
 			'select' => array('multiple' => false)
 		);
 		parent::__construct((array)$config + $defaults);
@@ -131,11 +131,11 @@ class Form extends \lithium\template\Helper {
 	 *
 	 * To force all `<label />` elements to have a default `class` attribute value of `"foo"`,
 	 * simply do the following:
-	 * 
+	 *
 	 * {{{
 	 * $this->form->config(array('label' => array('class' => 'foo')));
 	 * }}}
-	 * 
+	 *
 	 * @param array $config An associative array where the keys are `Form` method names, and the
 	 *              values are arrays of configuration options to be included in the `$options`
 	 *              parameter of each method specified.
@@ -165,8 +165,8 @@ class Form extends \lithium\template\Helper {
 	 * define your own custom objects as well. For more information on custom data objects, see
 	 * `lithium\template\helper\Form::$_binding`.
 	 *
-	 * @param object $binding 
-	 * @param array $options 
+	 * @param object $binding
+	 * @param array $options
 	 * @return string Returns a `<form />` open tag with the `action` attribute defined by either
 	 *         the `'action'` or `'url'` options (defaulting to the current page if none is
 	 *         specified), the HTTP method is defined by the `'type'` option, and any HTML
@@ -234,7 +234,7 @@ class Form extends \lithium\template\Helper {
 	 * Generates an HTML `<input type="submit" />` object.
 	 *
 	 * @param string $title The title of the submit button.
-	 * @param array $options 
+	 * @param array $options
 	 * @return string Returns a submit `<input />` tag with the given title and HTML attributes.
 	 */
 	public function submit($title = null, $options = array()) {
@@ -265,7 +265,7 @@ class Form extends \lithium\template\Helper {
 	 * // Renders a '<select />' list with options 'red', 'green' and 'blue', with the 'green'
 	 * // option as the selection
 	 * }}}
-	 * 
+	 *
 	 * @param string $name The `name` attribute of the `<select />` element.
 	 * @param array $list An associative array of key/value pairs, which will be used to render the
 	 *              list of options.
@@ -275,25 +275,24 @@ class Form extends \lithium\template\Helper {
 	 * @return string Returns an HTML `<select />` element.
 	 */
 	public function select($name, $list = array(), $options = array()) {
-		$defaults = array('empty' => false);
+		$defaults = array('empty' => false, 'value' => null);
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 
 		$options += $defaults;
-		$val = isset($options['value']) ? $options['value'] : null;
-		unset($options['value']);
+		$val = $options['value'];
+		$empty = $options['empty'];
+		unset($options['value'], $options['empty']);
 
-		if ($empty = $options['empty']) {
+		if ($empty) {
 			$list = array('' => ($empty === true) ? '' : $empty) + $list;
 		}
-		$options = array_diff_key($options, $defaults);
+		$template = 'select-start';
 
-		$select_start_template = 'select-start';
 		if ($options['multiple']) {
-			$select_start_template = 'select-multi-start';
+			$template = 'select-multi-start';
 		}
-		
-		$output = $this->_render(__METHOD__, $select_start_template, compact('name', 'options'));
-		$base = $options;
+
+		$output = $this->_render(__METHOD__, $template, compact('name', 'options'));
 
 		foreach ($list as $value => $title) {
 			$options = ($val == $value) ? array('selected' => true) : array();
