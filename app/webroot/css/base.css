@@ -1,12 +1,11 @@
-/*
- Lithium: the most rad php framework
+/*-------------------------------------------------------------------------------------------------
+   Lithium: the most rad php framework
 
- @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
- @license       http://opensource.org/licenses/bsd-license.php The BSD License
-*/
+   @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
+   @license       http://opensource.org/licenses/bsd-license.php The BSD License
+-------------------------------------------------------------------------------------------------*/
 
-/* Reset */
-
+/*--- Reset ---*/
 * {
 	margin: 0;
 	padding: 0;
@@ -23,8 +22,7 @@ html, body {
 	min-height: 100%;
 }
 
-/* Layout */
-
+/*--- Layout ---*/
 body {
 	background-color: #FFF;
 	color: #0D0D0D;
@@ -41,8 +39,7 @@ body {
 	padding: 60px 20px 0 0;
 }
 
-/* Basics */
-
+/*--- Basics ---*/
 h1,h2,h3,h4,h5,h6 { font-weight: normal; color: #111; line-height: 1;}
 
 h1 { font-size: 36px; margin: 0.5em 0; }
@@ -89,8 +86,7 @@ a:visited:hover {
 	color:#ff59ff;
 }
 
-/* Header */
-
+/*--- Header ---*/
 #header h1 {
 	margin: .1em 0;
 	font-size: 35px;
@@ -103,8 +99,7 @@ a:visited:hover {
 	width: 70%;
 }
 
-/* Navigation: Crumbs */
-
+/*--- Navigation: Crumbs ---*/
 .crumbs {
 	font-size: 28px;
 	color: #666;
@@ -116,8 +111,7 @@ a:visited:hover {
 	content: ' / ';
 }
 
-/* Navigation: Paging */
-
+/*--- Navigation: Paging ---*/
 .paging {
 	display: block;
 	margin-top: 2em;
@@ -140,8 +134,7 @@ a:visited:hover {
 	display: block;
 }
 
-/* Tables */
-
+/*--- Tables ---*/
 table {
 	width: 100%;
 	border: 3px solid #f0f0f0;
@@ -163,8 +156,7 @@ tr:nth-child(even) {
 	background: #fff;
 }
 
-/* Forms */
-
+/*--- Forms ---*/
 form {
     display: block;
     clear: both;
