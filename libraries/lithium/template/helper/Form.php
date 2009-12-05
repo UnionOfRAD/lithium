@@ -296,7 +296,13 @@ class Form extends \lithium\template\Helper {
 		$base = $options;
 
 		foreach ($list as $value => $title) {
-			$options = ($val == $value) ? array('selected' => true) : array();
+			$selected = false;
+			if (is_array($val) && in_array($value, $val)) {
+				$selected = true;
+			} elseif ($val == $value) {
+				$selected = true;
+			}
+			$options = $selected ? array('selected' => true) : array();
 			$output .= $this->_render(__METHOD__, 'select-option', compact(
 				'value', 'title', 'options'
 			));

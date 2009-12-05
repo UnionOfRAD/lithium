@@ -367,6 +367,32 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, $expected);
 		
 	}
+	
+	public function testMultiselected() {		
+		$expected = array(
+			'select' => array('name' => 'numbers[]', 'multiple' => 'multiple'),
+			array('option' => array('value' => '1', 'selected' => 'selected')),
+			'first',
+			'/option',
+			array('option' => array('value' => '2')),
+			'second',
+			'/option',
+			array('option' => array('value' => '3', 'selected' => 'selected')),
+			'third',
+			'/option',
+			array('option' => array('value' => '4', 'selected' => 'selected')),
+			'fourth',
+			'/option',
+			'/select'
+		);
+		$result = $this->form->select('numbers', array(
+			1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth'		
+		),array(
+			'value' => array(1,3,4),
+			'multiple' => true
+		));
+		$this->assertTags($result, $expected);
+	}
 }
 
 ?>
