@@ -450,6 +450,36 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertFalse($doc->invokeMethod('_isComplexType',array(new stdClass())));
 	}
 
+	public function testData() {
+		$doc = new Document(array(
+			'data' => array(
+				'title' => 'Post',
+				'content' => 'Lorem Ipsum',
+				'parsed' => null,
+				'permanent' => false
+			)
+		));
+		
+		$expected = array(
+			'title' => 'Post',
+			'content' => 'Lorem Ipsum',
+			'parsed' => null,
+			'permanent' => false
+		);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+		
+		$expected = 'Post';
+		$result = $doc->data('title');
+		$this->assertEqual($expected, $result);
+		
+		$expected = false;
+		$result = $doc->data('permanent');
+		$this->assertEqual($expected, $result);
+		
+		$doc = new Document();
+		$this->assertNull($doc->data('field'));
+	}
 }
 
 ?>

@@ -289,12 +289,18 @@ class Document extends \lithium\util\Collection {
 	}
 
 	/**
-	 * Gets the raw data associated with this `Document`.
+	 * Gets the raw data associated with this `Document`, or single item if '$field` is defined
 	 *
+	 * @param string $field if included will only return the named item
 	 * @return array Returns a raw array of `Document` data.
 	 */
-	public function data() {
-		return $this->to('array');
+	public function data($field = null) {
+		if (is_null($field)) {
+			return $this->to('array');
+		} elseif (isset($this->_items[$field])) {
+			return $this->_items[$field];
+		}
+		return null;
 	}
 
 	protected function _isComplexType($data) {
