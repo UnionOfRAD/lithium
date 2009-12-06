@@ -48,7 +48,7 @@ h3 { font-size: 24px; color:#00a8e6; margin: 1.5em 0 0.5em 0; }
 h4 { font-size: 20px; margin: 1.5em 0 0.5em 0; font-weight: bold;}
 
 p {
-	margin-bottom: 1.5em;
+	margin-bottom: 0.5em;
 }
 
 pre > code {
@@ -101,8 +101,9 @@ a:visited:hover {
 
 /*--- Navigation: Crumbs ---*/
 .crumbs {
-	font-size: 28px;
 	color: #666;
+	/* color:#00A8E6; */
+	font-size:24px;
 }
 .crumbs li {
 	display: inline;
@@ -148,7 +149,7 @@ tr td, tr th {
 tr th {
 	font-size: 14px;
 	font-weight:bold;
-	color:#999;
+	color: #999;
 	background: #e6e6e6;
 	text-align: left;
 }
@@ -173,7 +174,7 @@ legend {
 	padding: .5em 1em;
 	background: #fff;
 	border: 3px solid #f0f0f0;
-	font-size: 26px;
+	font-size: 22px;
 }
 label {
 	padding: 0 1em 0 0;
@@ -185,6 +186,7 @@ input, textarea {
 	border: 1px solid #e5e5e5;
 	line-height: 18px;
 	color: #454545;
+	font-size: 14px;
 	-moz-box-shadow: inset 1px 1px 6px #a6a6a6;
 	-webkit-box-shadow: inset 1px 1px 6px #a6a6a6;
 	box-shadow: inset 1px 1px 6px #a6a6a6;
@@ -215,7 +217,7 @@ input[type=submit] {
 	background: #e6e6e6;
 	border: none;
 	padding: .5em 1em;
-	margin: 1em auto;
+	margin: 1em inherit;
 	font-size: 16px;
 	font-weight: bold;
 	color: #000;
