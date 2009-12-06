@@ -1,26 +1,17 @@
 /*-------------------------------------------------------------------------------------------------
-   Lithium: the most rad php framework
+Lithium: the most rad php framework
 
-   @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
-   @license       http://opensource.org/licenses/bsd-license.php The BSD License
+@copyright Copyright 2009, Union of RAD (http://union-of-rad.org)
+@license http://opensource.org/licenses/bsd-license.php The BSD License
 -------------------------------------------------------------------------------------------------*/
 
 /*--- Reset ---*/
-* {
-	margin: 0;
-	padding: 0;
-}
-
-table { border-collapse: separate; border-spacing: 0; clear:both; }
+* { margin: 0; padding: 0; }
+table { border-collapse: separate; border-spacing: 0; clear: both; }
 caption, th, td { text-align: left; font-weight: normal; }
 table, td, th { vertical-align: middle; }
-
 a img { border: none; }
-
-html, body {
-	height: 100%;
-	min-height: 100%;
-}
+html, body { height: 100%; min-height: 100%; }
 
 /*--- Layout ---*/
 body {
@@ -40,17 +31,20 @@ body {
 }
 
 /*--- Basics ---*/
-h1,h2,h3,h4,h5,h6 { font-weight: normal; color: #111; line-height: 1;}
-
-h1 { font-size: 36px; margin: 0.5em 0; }
+h1, h2, h3, h4, h5, h6 { font-weight:normal; color:#111; line-height:1; }
+h1 { font-size:36px; margin: 0.5em 0; }
 h2 { font-size: 28px; color:#666; margin: 1em 0 0.5em 0; }
-h3 { font-size: 24px; color:#00a8e6; margin: 1.5em 0 0.5em 0; }
-h4 { font-size: 20px; margin: 1.5em 0 0.5em 0; font-weight: bold;}
+h3 { font-size:24px; color:#00a8e6; margin:1.5em 0 0.5em 0; }
+h4 { font-size:20px; margin:1.5em 0 0.5em 0; font-weight:bold; }
+p { margin-bottom:0.5em; }
+strong { font-weight: bold; }
+em { font-style: italic; }
+a { text-decoration: none; color: #0d0d0d; }
+a, h1 a, h2 a { text-decoration: none; }
+a:hover { color: #00bbff; }
+a:visited:hover { color: #ff59ff; }
 
-p {
-	margin-bottom: 0.5em;
-}
-
+/*--- Code ---*/
 pre > code {
 	display: block;
 }
@@ -63,27 +57,6 @@ code {
 	background: #fafafa;
 	padding: .2em .25em !important;
 	border: 1px solid #f0f0f0;
-}
-
-strong {
-	font-weight: bold;
-}
-em {
-	font-style: italic;
-}
-
-a {
-	text-decoration: none;
-	color: #0d0d0d;
-}
-a, h1 a, h2 a {
-	text-decoration: none;
-}
-a:hover {
-	color: #00bbff;
-}
-a:visited:hover {
-	color:#ff59ff;
 }
 
 /*--- Header ---*/
@@ -102,8 +75,7 @@ a:visited:hover {
 /*--- Navigation: Crumbs ---*/
 .crumbs {
 	color: #666;
-	/* color:#00A8E6; */
-	font-size:24px;
+	font-size: 24px;
 }
 .crumbs li {
 	display: inline;
@@ -148,7 +120,7 @@ tr td, tr th {
 }
 tr th {
 	font-size: 14px;
-	font-weight:bold;
+	font-weight: bold;
 	color: #999;
 	background: #e6e6e6;
 	text-align: left;
@@ -159,16 +131,16 @@ tr:nth-child(even) {
 
 /*--- Forms ---*/
 form {
-    display: block;
-    clear: both;
-    background: #fafafa;
-    padding: 1em 2em 2em 2em;
+	display: block;
+	clear: both;
+	background: #fafafa;
+	padding: 1em 2em 2em 2em;
 }
 fieldset {
 	border: none;
 	background: #f0f0f0;
 	padding: 2em;
-	margin:0 0 1em 0;
+	margin: 0 0 1em 0;
 }
 legend {
 	padding: .5em 1em;
@@ -178,7 +150,7 @@ legend {
 }
 label {
 	padding: 0 1em 0 0;
-    color: #454545;
+	color: #454545;
 	font-weight: normal;
 }
 input, textarea {
@@ -207,11 +179,11 @@ select {
 	margin: .5em 0 1em 0;
 }
 div.checkbox {
-    clear: both;
-    padding: 1em 0;
+	clear: both;
+	padding: 1em 0;
 }
 .checkbox label {
-    display: inline;
+	display: inline;
 }
 input[type=submit] {
 	background: #e6e6e6;
@@ -223,6 +195,6 @@ input[type=submit] {
 	color: #000;
 }
 input[type=submit]:hover {
-    color: #00bbff;
+	color: #00bbff;
 }
 
