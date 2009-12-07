@@ -7,42 +7,37 @@
 
 /*--- Reset ---*/
 * { margin: 0; padding: 0; }
-table { border-collapse: separate; border-spacing: 0; clear: both; }
-caption, th, td { text-align: left; font-weight: normal; }
-table, td, th { vertical-align: middle; }
-a img { border: none; }
 html, body { height: 100%; min-height: 100%; }
 
 /*--- Layout ---*/
 body {
-	background-color: #FFF;
-	color: #0D0D0D;
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 14px;
 	line-height: 150%;
+	color: #0d0d0d;
+	background-color: #fff;
 }
-
 #container {
+	position: relative;
 	width: 950px;
 	margin: 0 auto;
-	position: relative;
-	z-index: 1000;
 	padding: 60px 20px 0 0;
 }
 
 /*--- Basics ---*/
 h1, h2, h3, h4, h5, h6 { font-weight:normal; color:#111; line-height:1; }
-h1 { font-size:36px; margin: 0.5em 0; }
-h2 { font-size: 28px; color:#666; margin: 1em 0 0.5em 0; }
-h3 { font-size:24px; color:#00a8e6; margin:1.5em 0 0.5em 0; }
-h4 { font-size:20px; margin:1.5em 0 0.5em 0; font-weight:bold; }
-p { margin-bottom:0.5em; }
+h1 { font-size: 36px; margin: 0.5em 0; }
+h2 { font-size: 28px; color: #666; margin: 1em 0 0.5em 0; }
+h3 { font-size: 24px; color: #00a8e6; margin: 1.5em 0 0.5em 0; }
+h4 { font-size: 20px; margin: 1.5em 0 0.5em 0; font-weight:bold; }
+p { margin-bottom: 0.5em; }
 strong { font-weight: bold; }
 em { font-style: italic; }
 a { text-decoration: none; color: #0d0d0d; }
 a, h1 a, h2 a { text-decoration: none; }
 a:hover { color: #00bbff; }
 a:visited:hover { color: #ff59ff; }
+a img { border: none; }
 
 /*--- Code ---*/
 pre > code {
@@ -54,10 +49,14 @@ code, pre, .fixed {
 	font-size: 12px;
 }
 code {
-	background: #fafafa;
 	padding: .2em .25em !important;
 	border: 1px solid #f0f0f0;
+	background: #fafafa;
 }
+
+/*--- Lists ---*/
+li ul, li ol { margin: 0; }
+ul, ol { margin: 0 0 1em 1.5em; }
 
 /*--- Header ---*/
 #header h1 {
@@ -65,19 +64,21 @@ code {
 	font-size: 35px;
 }
 #header h2 {
+	width: 70%;
 	margin: .5em .5em 2em 0;
 	color: #666;
 	font-size: 22px;
 	line-height: 28px;
-	width: 70%;
 }
 
 /*--- Navigation: Crumbs ---*/
 .crumbs {
+	margin: 0;
 	color: #666;
 	font-size: 24px;
 }
 .crumbs li {
+	padding: 0;
 	display: inline;
 }
 .crumbs li + li:before {
@@ -96,11 +97,10 @@ code {
 	margin: 0 .25em 0 0;
 	background-color: #f0f0f0;
 }
-
 .paging .current {
-	font-weight: bold;
 	padding: .5em 1em;
 	color: #00E5FF;
+	font-weight: bold;
 }
 .paging .prev, .paging .next {
 	float: left;
@@ -109,21 +109,26 @@ code {
 
 /*--- Tables ---*/
 table {
+	clear: both;
 	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
 	border: 3px solid #f0f0f0;
-	border-width: 2px;
 	background: #fafafa;
 }
-tr td, tr th {
+td, th {
 	padding: .25em .75em;
 	border: 1px solid #f0f0f0;
+	vertical-align: middle;
+	text-align: left;
+	font-weight: normal;
 }
 tr th {
+	text-align: left;
 	font-size: 14px;
 	font-weight: bold;
 	color: #999;
 	background: #e6e6e6;
-	text-align: left;
 }
 tr:nth-child(even) {
 	background: #fff;
@@ -137,15 +142,15 @@ form {
 	padding: 1em 2em 2em 2em;
 }
 fieldset {
-	border: none;
-	background: #f0f0f0;
 	padding: 2em;
 	margin: 0 0 1em 0;
+	border: none;
+	background: #f0f0f0;
 }
 legend {
 	padding: .5em 1em;
-	background: #fff;
 	border: 3px solid #f0f0f0;
+	background: #fff;
 	font-size: 22px;
 }
 label {
@@ -156,9 +161,9 @@ label {
 input, textarea {
 	padding: 2px 4px;
 	border: 1px solid #e5e5e5;
-	line-height: 18px;
 	color: #454545;
 	font-size: 14px;
+	line-height: 18px;
 	-moz-box-shadow: inset 1px 1px 6px #a6a6a6;
 	-webkit-box-shadow: inset 1px 1px 6px #a6a6a6;
 	box-shadow: inset 1px 1px 6px #a6a6a6;
@@ -186,13 +191,13 @@ div.checkbox {
 	display: inline;
 }
 input[type=submit] {
-	background: #e6e6e6;
-	border: none;
 	padding: .5em 1em;
 	margin: 1em inherit;
+	border: none;
+	color: #000;
+	background: #e6e6e6;
 	font-size: 16px;
 	font-weight: bold;
-	color: #000;
 }
 input[type=submit]:hover {
 	color: #00bbff;
