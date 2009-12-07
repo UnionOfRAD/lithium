@@ -53,6 +53,9 @@ code {
 	border: 1px solid #f0f0f0;
 	background: #fafafa;
 }
+pre {
+	padding-bottom: 0.5em;
+}
 
 /*--- Lists ---*/
 li ul, li ol { margin: 0; }
@@ -201,5 +204,8 @@ input[type=submit] {
 }
 input[type=submit]:hover {
 	color: #00bbff;
+}
+input[type=text]:focus, input[type=password]:focus, textarea:focus, select:focus {
+	border-color: #00a8e6;
 }
 
