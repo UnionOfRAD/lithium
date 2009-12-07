@@ -480,6 +480,45 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc = new Document();
 		$this->assertNull($doc->data('field'));
 	}
+	
+	public function testUnset() {
+		$doc = new Document(array(
+			'data' => array(
+				'title' => 'Post',
+				'content' => 'Lorem Ipsum',
+				'parsed' => null,
+				'permanent' => false
+			)
+		));
+		
+		
+		$expected = array(
+			'title' => 'Post',
+			'content' => 'Lorem Ipsum',
+			'parsed' => null,
+			'permanent' => false
+		);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+		
+		unset($expected['title']);		
+		unset($doc->title);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+		
+		unset($expected['parsed']);		
+		unset($doc->parsed);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+		
+		unset($expected['permanent']);		
+		unset($doc->permanent);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+		
+		unset($doc->none);
+	}	
+		
 }
 
 ?>
