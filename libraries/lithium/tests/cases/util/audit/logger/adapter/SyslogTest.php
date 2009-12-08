@@ -1,9 +1,9 @@
 <?php
 
-namespace lithium\tests\cases\util\audit\logger\adapters;
+namespace lithium\tests\cases\util\audit\logger\adapter;
 
 use \lithium\util\audit\Logger;
-use \lithium\util\audit\logger\adapters\Syslog;
+use \lithium\util\audit\logger\adapter\Syslog;
 
 /**
  * Syslog adapter test.

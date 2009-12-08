@@ -6,9 +6,9 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\storage\session\adapters;
+namespace lithium\tests\cases\storage\session\adapter;
 
-use \lithium\storage\session\adapters\Cookie;
+use \lithium\storage\session\adapter\Cookie;
 
 class CookieTest extends \lithium\test\Unit {
 
