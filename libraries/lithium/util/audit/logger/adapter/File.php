@@ -19,7 +19,7 @@ class File extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function __construct($config = array()) {
-		$defaults = array('path' => LITHIUM_APP_PATH . '/tmp/logs');
+		$defaults = array('path' => LITHIUM_APP_PATH . '/resources/tmp/logs');
 		parent::__construct($config + $defaults);
 	}
 
