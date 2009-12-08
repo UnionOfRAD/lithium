@@ -1,4 +1,10 @@
 <?php
+/**
+ * Lithium: the most rad php framework
+ *
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
 
 namespace lithium\util\audit;
 
@@ -48,7 +54,7 @@ class Logger extends \lithium\core\Adaptable {
 	 * @return object       Adapter for named configuration
 	 */
 	public static function adapter($name) {
-		return static::_adapter('adapters.util.audit.logger', $name);
+		return static::_adapter('adapter.util.audit.logger', $name);
 	}
 }
 

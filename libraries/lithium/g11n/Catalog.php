@@ -12,12 +12,12 @@ use \lithium\core\Libraries;
 use \lithium\util\Collection;
 
 /**
- * Globalization data is not just translated messages, it's validation rules, formats and a lot
+ * Globalization data is not just translated messages, it is validation rules, formats and a lot
  * more, too. Data is grouped into 4 different kinds of categories: inflection, validation, message
  * and list.
  *
  * Generally speaking is the `Catalog` class allowing us to retrieve and store globalized
- * data, providing low-level functionality to other classes. It's interface is similar to classes
+ * data, providing low-level functionality to other classes. Its interface is similar to classes
  * like Session or Cache and like those extensible through adapters.
  *
  * We need to deal with different kinds of sources for this data, but we don't want differing
@@ -42,13 +42,13 @@ class Catalog extends \lithium\core\Adaptable {
 	}
 
 	/**
-	 * Reads data.  Data can be obtained for one or multiple configurations
-	 * and locales. The results for list-like categories are aggregated by
-	 * querying all requested configurations for the requested locale and then
-	 * repeating this process for all locales down the locale cascade. This allows
-	 * for sparse data which is complemented by data from other sources or
-	 * for more generic locales. Aggregation can be controlled by either specifying
-	 * the configurations or a scope to use.
+	 * Reads data.  Data can be obtained for one or multiple configurations and locales.
+	 *
+	 * The results for list-like categories are aggregated by querying all requested
+	 * configurations for the requested locale and then repeating this process for all locales down
+	 * the locale cascade. This allows for sparse data which is complemented by data from other
+	 * sources or for more generic locales. Aggregation can be controlled by either specifying the
+	 * configurations or a scope to use.
 	 *
 	 * Usage:
 	 * {{{
@@ -59,10 +59,10 @@ class Catalog extends \lithium\core\Adaptable {
 	 * @param string $category Dot-delimeted category.
 	 * @param string|array $locales One or multiple locales.
 	 * @param array $options Valid options are:
-	 *              - `'name'`: One or multiple configuration names.
-	 *              - `'scope'`: The scope to use.
+	 *        - `'name'`: One or multiple configuration names.
+	 *        - `'scope'`: The scope to use.
 	 * @return array|void If available the requested data, else `null`.
-	 * @see lithium\g11n\catalog\adapters\Base::$_categories.
+	 * @see lithium\g11n\catalog\adapter\Base::$_categories.
 	 */
 	public static function read($category, $locales, $options = array()) {
 		$defaults = array('name' => null, 'scope' => null);
@@ -114,10 +114,10 @@ class Catalog extends \lithium\core\Adaptable {
 	 * @param string $category Dot-delimeted category.
 	 * @param array Data keyed by locale.
 	 * @param array $options Valid options are:
-	 *              - `'name'`: One or multiple configuration names.
-	 *              - `'scope'`: The scope to use.
+	 *        - `'name'`: One or multiple configuration names.
+	 *        - `'scope'`: The scope to use.
 	 * @return boolean Success.
-	 * @see lithium\g11n\catalog\adapters\Base::$_categories.
+	 * @see lithium\g11n\catalog\adapter\Base::$_categories.
 	 */
 	public static function write($category, $data, $options = array()) {
 		$defaults = array('name' => null, 'scope' => null);
@@ -142,7 +142,7 @@ class Catalog extends \lithium\core\Adaptable {
 	}
 
 	public static function adapter($name) {
-		return static::_adapter('adapters.g11n.catalog', $name);
+		return static::_adapter('adapter.g11n.catalog', $name);
 	}
 }
 

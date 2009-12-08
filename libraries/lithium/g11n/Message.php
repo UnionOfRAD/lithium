@@ -15,7 +15,7 @@ use \lithium\g11n\Catalog;
 /**
  * The `Message` class is concerned with an aspect of globalizing static message strings
  * throughout the framework and applications.  When referring to message globalization the
- * phrase of _translating messages_ is widely used. This leads to the assumption that it's
+ * phrase of ""translating a message" is widely used. This leads to the assumption that it's
  * a single step process wheras it' a multi step one. A short description of each step is
  * given here in order to help understanding the purpose of this class through the context
  * of the process as a whole.
@@ -42,8 +42,8 @@ use \lithium\g11n\Catalog;
  *
  * @see lithium\template\View
  * @see lithium\g11n\Catalog
- * @see lithium\console\commands\G11n
- * @see lithium\g11n\catalog\adapters\Code
+ * @see lithium\console\command\G11n
+ * @see lithium\g11n\catalog\adapter\Code
  */
 class Message extends \lithium\core\StaticObject {
 

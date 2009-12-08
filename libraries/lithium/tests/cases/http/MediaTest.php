@@ -11,6 +11,7 @@ namespace lithium\tests\cases\http;
 use \lithium\http\Media;
 use \lithium\action\Request;
 use \lithium\action\Response;
+use \lithium\core\Libraries;
 
 class MediaTest extends \lithium\test\Unit {
 
@@ -105,6 +106,29 @@ class MediaTest extends \lithium\test\Unit {
 		$expected = '/js/subpath/file.js';
 		$this->assertEqual($expected, $result);
 
+		$result = Media::asset('this.file.should.not.exist', 'css', array('check' => true));
+		$this->assertFalse($result);
+
+		$result = Media::asset('base', 'css', array('check' => 'true', 'library' => 'app'));
+		$expected = '/css/base.css';
+		$this->assertEqual($expected, $result);
+
+		$result = Media::asset('base', 'css', array('timestamp' => true));
+		$this->assertPattern('%^/css/base\.css\?\d+$%', $result);
+
+		$result = Media::asset('base.css?type=test', 'css', array(
+			'check' => 'true', 'base' => 'foo'
+		));
+		$expected = 'foo/css/base.css?type=test';
+		$this->assertEqual($expected, $result);
+
+		$result = Media::asset('base.css?type=test', 'css', array(
+			'check' => 'true', 'base' => 'foo', 'timestamp' => true
+		));
+		$this->assertPattern('%^foo/css/base\.css\?type=test&\d+$%', $result);
+	}
+
+	public function testCustomAssetPathGeneration() {
 		Media::assets('my', array('suffix' => '.my', 'path' => array(
 			'{:base}/my/{:path}' => array('base', 'path')
 		)));
@@ -125,6 +149,49 @@ class MediaTest extends \lithium\test\Unit {
 
 		$result = Media::asset('subpath/file', 'my', array('base' => '/app/path/'));
 		$expected = '/app/path//your/subpath/file.my';
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testMultiLibraryAssetPaths() {
+		$result = Media::asset('path/file', 'js', array('library' => 'app', 'base' => '/app/base'));
+		$expected = '/app/base/js/path/file.js';
+		$this->assertEqual($expected, $result);
+
+		Libraries::add('plugin', array('li3_foo_blog' => array(
+			'path' => LITHIUM_APP_PATH . '/libraries/plugins/blog',
+			'bootstrap' => false,
+			'route' => false
+		)));
+
+		$result = Media::asset('path/file', 'js', array(
+			'library' => 'li3_foo_blog', 'base' => '/app/base'
+		));
+		$expected = '/app/base/blog/js/path/file.js';
+		$this->assertEqual($expected, $result);
+
+		Libraries::remove('li3_foo_blog');
+	}
+
+	public function testManualAssetPaths() {
+		$result = Media::asset('/path/file', 'js', array('base' => '/base'));
+		$expected = '/base/path/file.js';
+		$this->assertEqual($expected, $result);
+
+		$result = Media::asset('/foo/bar', 'js', array('base' => '/base', 'check' => true));
+		$this->assertFalse($result);
+
+		$result = Media::asset('/css/base', 'css', array('base' => '/base', 'check' => true));
+		$expected = '/base/css/base.css';
+		$this->assertEqual($expected, $result);
+
+		$result = Media::asset('/css/base.css', 'css', array('base' => '/base', 'check' => true));
+		$expected = '/base/css/base.css';
+		$this->assertEqual($expected, $result);
+
+		$result = Media::asset('/css/base.css?foo', 'css', array(
+			'base' => '/base', 'check' => true
+		));
+		$expected = '/base/css/base.css?foo';
 		$this->assertEqual($expected, $result);
 	}
 

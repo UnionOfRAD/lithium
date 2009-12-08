@@ -8,17 +8,49 @@
 
 namespace lithium\tests\cases\data;
 
+use \lithium\util\reflection\Inspector;
+use \lithium\data\Connections;
 use \lithium\data\Model;
 use \lithium\tests\mocks\data\MockPost;
+use \lithium\tests\mocks\data\MockPostForValidates;
 use \lithium\tests\mocks\data\MockComment;
 use \lithium\tests\mocks\data\MockTag;
 use \lithium\tests\mocks\data\MockTagging;
+use \lithium\tests\mocks\data\MockCreator;
 
 class ModelTest extends \lithium\test\Unit {
 
-	public function setUp() {
-		MockPost::__init();
-		MockComment::__init();
+	public function _init() {
+		if (!Connections::get('test')) {
+			Connections::add('test', 'database', array(
+				'adapter' => '\lithium\tests\mocks\data\source\database\adapter\MockAdapter',
+				'host' => 'localhost'
+			));
+		}
+		$deps = Inspector::dependencies(get_class($this));
+		$models = array_filter($deps, function($class) { return is_subclass_of($class, "lithium\data\Model"); });
+		foreach ($models as $m) {
+			$class = '\\'.$m;
+			$class::__init(array('connection' => 'test'));
+		}
+	}
+
+	public function testOverrideMeta() {
+		MockTag::__init(array('connection' => 'test'));
+
+		$meta = MockTag::meta(array('id' => 'key'));
+
+		$expected = 'test';
+		$result = $meta['connection'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'mock_tags';
+		$result = $meta['source'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'key';
+		$result = $meta['id'];
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testClassInitialization() {
@@ -29,7 +61,7 @@ class ModelTest extends \lithium\test\Unit {
 		Model::__init();
 		$this->assertEqual($expected, MockPost::instances());
 
-		$this->assertEqual('mock_posts', MockPost::meta('source'));
+		$this->assertEqual('mock_posts', \lithium\tests\mocks\data\MockPost::meta('source'));
 
 		MockPost::__init(array('source' => 'post'));
 		$this->assertEqual('post', MockPost::meta('source'));
@@ -44,12 +76,14 @@ class ModelTest extends \lithium\test\Unit {
 	public function testMetaInformation() {
 		$expected = array(
 			'class'       => 'lithium\tests\mocks\data\MockPost',
-			'name'       => 'MockPost',
-			'key'        => 'id',
-			'title'      => 'title',
-			'source'     => 'mock_posts',
-			'connection' => 'default'
+			'name'        => 'MockPost',
+			'key'         => 'id',
+			'title'       => 'title',
+			'source'      => 'mock_posts',
+			'connection'  => 'test',
+			'initialized' => true
 		);
+		MockPost::__init();
 		$this->assertEqual($expected, MockPost::meta());
 
 		$expected = array(
@@ -58,7 +92,8 @@ class ModelTest extends \lithium\test\Unit {
 			'key'        => 'comment_id',
 			'title'      => 'comment_id',
 			'source'     => 'mock_comments',
-			'connection' => 'default'
+			'connection' => 'test',
+			'initialized' => true
 		);
 		$this->assertEqual($expected, MockComment::meta());
 
@@ -144,10 +179,15 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testFilteredFind() {
-		MockPost::applyFilter('find', function($self, $params, $chain) {
+		MockComment::applyFilter('find', function($self, $params, $chain) {
 			$result = $chain->next($self, $params, $chain);
+			if ($result != null) {
+				$result->filtered = true;
+			}
 			return $result;
 		});
+		$result = MockComment::first();
+		$this->assertTrue($result->filtered);
 	}
 
 	public function testCustomFinder() {
@@ -174,10 +214,100 @@ class ModelTest extends \lithium\test\Unit {
 		));
 		$this->assertEqual(array('post_id' => 2, 'tag_id' => 5), $result);
 	}
-	
+
+	public function testValidatesFalse() {
+		$post = MockPostForValidates::create();
+
+		$result = $post->validates();
+		$this->assertTrue($result === false);
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
+
+		$expected = array(
+			'title' => 'please enter a title',
+			'email' => array('email is empty', 'email is not valid')
+		);
+		$result = $post->errors();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testValidatesTitle() {
+		$post = MockPostForValidates::create(array('title' => 'new post'));
+
+		$result = $post->validates();
+		$this->assertTrue($result === false);
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
+
+		$expected = array(
+			'email' => array('email is empty', 'email is not valid')
+		);
+		$result = $post->errors();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testValidatesEmailIsNotEmpty() {
+		$post = MockPostForValidates::create(array('title' => 'new post', 'email' => 'something'));
+
+		$result = $post->validates();
+		$this->assertTrue($result === false);
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
+
+		$expected = array(
+			'email' => array('email is not valid')
+		);
+		$result = $post->errors();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testValidatesEmailIsValid() {
+		$post = MockPostForValidates::create(array(
+			'title' => 'new post', 'email' => 'something@test.com'
+		));
+
+		$result = $post->validates();
+		$this->assertTrue($result === true);
+		$result = $post->errors();
+		$this->assertTrue(empty($result));
+	}
+
+	public function testDefaultValuesFromSchema() {
+		$creator = MockCreator::create();
+		$expected = array(
+			'name' => 'Moe',
+			'sign' => 'bar',
+			'age' =>  0
+		);
+		$result = $creator->data();
+		$this->assertEqual($expected, $result);
+
+		$creator = MockCreator::create(array('name' => 'Homer'));
+		$expected = array(
+			'name' => 'Homer',
+			'sign' => 'bar',
+			'age' =>  0
+		);
+		$result = $creator->data();
+		$this->assertEqual($expected, $result);
+
+		$creator = MockCreator::create(array(
+			'sign' => 'Beer', 'skin' => 'yellow', 'age' => 12, 'hair' => false
+		));
+		$expected = array(
+			'name' => 'Moe',
+			'sign' => 'Beer',
+			'skin' => 'yellow',
+			'age' =>  12,
+			'hair' => false
+		);
+		$result = $creator->data();
+		$this->assertEqual($expected, $result);
+	}
+
 	/*
 	* @todo create proper mock objects for the following test
-	* 
+	*
 	public function testFindAll() {
 	    $tags = MockTag::find('all', array('conditions' => array('id' => 2)));
 

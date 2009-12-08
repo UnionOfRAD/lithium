@@ -8,6 +8,9 @@
 
 namespace lithium\data\model;
 
+/**
+ * Query class
+ */
 class Query extends \lithium\core\Object {
 
 	protected $_type = null;
@@ -51,7 +54,7 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	* Get method of type, ie 'read', 'update', 'create', 'delete'
+	* Get method of type, i.e. 'read', 'update', 'create', 'delete'
 	*
 	* @return string
 	*/
@@ -61,7 +64,7 @@ class Query extends \lithium\core\Object {
 
 	/**
 	* Set and get method for the model associated with the Query.
-	* Will also set the source table, ie : $this->_table
+	* Will also set the source table, i.e. $this->_table
 	*
 	* @param string $model
 	* @return string
@@ -75,8 +78,9 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	* Set and get method for conditions
-	* If no conditions is set in query, it will ask the record for findById condition array
+	* Set and get method for conditions.
+	*
+	* If no conditions are set in query, it will ask the record for findById condition array.
 	*
 	* @param array $conditions
 	* @return array
@@ -90,6 +94,8 @@ class Query extends \lithium\core\Object {
 
 	/**
 	* Set, get or reset fields option for query.
+	*
+	* Usage:
 	* {{{
 	*	// to add a field
 	*   $query->fields('created');
@@ -101,11 +107,11 @@ class Query extends \lithium\core\Object {
 	* {{{
 	*	// to reset fields to none
 	*   $query->fields(false);
-	*   // should be follwed by a 2nd call to fields with required fields
+	*   // should be followed by a 2nd call to fields with required fields
 	* }}}
 	*
 	* @param mixed $limit string, array or `false`
-	* @return array
+	* @return array|void
 	*/
 	public function fields($fields = null) {
 		if ($fields === false) {
@@ -128,8 +134,8 @@ class Query extends \lithium\core\Object {
 	/**
 	* Set and get method for query's limit of amount of records to return
 	*
-	* @param int $limit
-	* @return int
+	* @param integer $limit
+	* @return integer
 	*/
 	public function limit($limit = null) {
 		if (empty($limit)) {
@@ -139,10 +145,10 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	* Set and get method for query's offset, ie which records to get
+	* Set and get method for query's offset, i.e. which records to get
 	*
-	* @param int $offset
-	* @return int
+	* @param integer $offset
+	* @return integer
 	*/
 	public function offset($offset = null) {
 		if (empty($offset)) {
@@ -154,8 +160,8 @@ class Query extends \lithium\core\Object {
 	/**
 	* Set and get method for page, in relation to limit, of which records to get
 	*
-	* @param int $page
-	* @return int
+	* @param integer $page
+	* @return integer
 	*/
 	public function page($page = null) {
 		if (empty($page)) {
@@ -168,8 +174,8 @@ class Query extends \lithium\core\Object {
 	/**
 	* Set and get method for the query's order specification
 	*
-	* @param mixed $order array or string
-	* $return mixed
+	* @param array|string $order
+	* @return mixed
 	*/
 	public function order($order = null) {
 		if (empty($order)) {
@@ -179,9 +185,9 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	* Set and get method for current query's comment
-	* Comment will have no effect on query, but will be passed along so datasource
-	* can log it.
+	* Set and get method for current query's comment.
+	*
+	* Comment will have no effect on query, but will be passed along so data source can log it.
 	*
 	* @param string
 	* @return string
@@ -211,8 +217,8 @@ class Query extends \lithium\core\Object {
 	/**
 	* Set and get method for the query's record's data.
 	*
-	* @param array $data if set, will set given array
-	* @return empty array if no data, array of data if the record has it
+	* @param array $data if set, will set given array.
+	* @return array Empty array if no data, array of data if the record has it.
 	*/
 	public function data($data = array()) {
 		if ($data) {
@@ -222,10 +228,10 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	* Convert the query's properties to the datasources syntax and return it as an array
+	* Convert the query's properties to the data-sources' syntax and return it as an array.
 	*
-	* @param object instance of the datasource to use for conversion
-	* @return array of converted properties
+	* @param object $dataSource Instance of the data-source to use for conversion.
+	* @return array Converted properties.
 	*/
 	public function export($dataSource) {
 		$results = array();
@@ -242,10 +248,10 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	* Will retrun a find first condition on the associated model if a record is connected.
+	* Will return a find first condition on the associated model if a record is connected.
 	* Called by conditions when it is called as a get and no condition is set.
 	*
-	* @return array([model's primary key'] => [that key set in the record])
+	* @return array ([model's primary key'] => [that key set in the record]).
 	*/
 	protected function _recordConditions() {
 		if (!$this->_record) {

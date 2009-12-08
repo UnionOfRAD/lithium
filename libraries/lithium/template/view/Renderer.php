@@ -181,7 +181,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 * @return object
 	 */
 	public function helper($name, $config = array()) {
-		if ($class = Libraries::locate('helpers', ucfirst($name))) {
+		if ($class = Libraries::locate('helper', ucfirst($name))) {
 			return $this->_helpers[$name] = new $class($config + array('context' => $this));
 		}
 		throw new RuntimeException("Helper $name not found");

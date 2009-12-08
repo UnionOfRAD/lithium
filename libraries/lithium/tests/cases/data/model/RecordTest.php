@@ -59,6 +59,31 @@ class RecordTest extends \lithium\test\Unit {
 		$result = $this->record->to('foo');
 		$this->assertEqual($this->record, $result);
 	}
+
+	public function testErrorsPropertyAccess() {
+		$errors = array(
+			'title' => 'please enter a title',
+			'email' => array('email is empty', 'email is not valid')
+		);
+
+		$record = new Record();
+		$result = $record->errors($errors);
+		$this->assertEqual($errors, $result);
+
+		$result = $record->errors();
+		$this->assertEqual($errors, $result);
+
+		$expected = 'please enter a title';
+		$result = $record->errors('title');
+		$this->assertEqual($expected, $result);
+
+		$expected = array('email is empty', 'email is not valid');
+		$result = $record->errors('email');
+		$this->assertEqual($expected, $result);
+
+		$result = $record->errors('not_a_field');
+		$this->assertNull($result);
+	}
 }
 
 ?>

@@ -263,7 +263,6 @@ class Validator extends \lithium\core\StaticObject {
 		$args += array(1 => 'any', 2 => array());
 		$rule = preg_replace("/^is([A-Z][A-Za-z0-9]+)$/", '$1', $method);
 		$rule[0] = strtolower($rule[0]);
-
 		return static::rule($rule, $args[0], $args[1], $args[2]);
 	}
 
@@ -273,12 +272,49 @@ class Validator extends \lithium\core\StaticObject {
 	 * This method may be used to validate any arbitrary array data against a set of validation
 	 * rules.
 	 *
-	 * @param string $values An array of key/value pairs, where the values are to be checked.
-	 * @param string $rules
+	 * @param object $values An array of key/value pairs, where the values are to be checked.
+	 * @param string $rules array of rules to check against object properties
 	 * @return mixed When all validation rules pass
 	 * @todo Bring over validation loop from Model, determine formats/options, implement.
 	 */
 	public static function check($values, $rules, $options = array()) {
+		$rule = 'isNotEmpty';
+		$__check = function($field, $rules) use ($values, $rule, &$__check) {
+			$data = isset($values[$field]) ? array($values[$field]) : array();
+			$errors = array();
+			if (is_array($rules)) {
+				if (!empty($rules[0])) {
+					$multiple = array();
+					foreach ($rules as $rule) {
+						$multiple[] = $__check($field, $rule);
+					}
+					return array_values(array_filter($multiple));
+				} else if (!empty($rules['rule'])) {
+					if (is_string($rules['rule'])) {
+						$rule = $rules['rule'];
+					} else {
+						$rule = array_shift((array) $rules['rule']);
+						$data += $rules['rule'];
+					}
+				}
+			}
+
+			if (Validator::invokeMethod($rule, $data) !== true) {
+				if (is_string($rules)) {
+					return $rules;
+				}
+				if (!empty($rules['message'])) {
+					return $rules['message'];
+				}
+				return "{$field} is invalid.";
+			}
+			return null;
+		};
+		$errors = array();
+		foreach ($rules as $field => $rules) {
+			$errors[$field] = $__check($field, $rules);
+		}
+		return array_filter($errors);
 	}
 
 	/**
@@ -406,7 +442,6 @@ class Validator extends \lithium\core\StaticObject {
 			$formats = (array)$format;
 			$all = true;
 		}
-
 		if (static::_checkFormats($ruleCheck, $formats, $value, $all, $options)) {
 			return (bool)static::_filters('after', $rule, compact('value', 'format', 'options'));
 		}

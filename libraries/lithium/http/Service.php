@@ -10,42 +10,27 @@ namespace lithium\http;
 use \lithium\core\Libraries;
 
 /**
- * Basic Http Service
+ * Basic Http Service.
  *
  */
 class Service extends \lithium\core\Object {
 
 	/**
-	 * Request Object
-	 *
-	 * @var object
-	 */
-	public $request =  null;
-
-	/**
-	 * Holds all parameters of the request
-	 * Cast to object in the constructor
-	 *
-	 * @var object
-	 */
-	public $response = null;
-
-	/**
-	 * Holds the request and response used by send
+	 * Holds the request and response used by send.
 	 *
 	 * @var object
 	 */
 	public $last = null;
 
 	/**
-	 * auto config
+	 * Auto config
 	 *
 	 * @var array
 	 */
 	protected $_autoConfig = array('classes' => 'merge');
 
 	/**
-	 * The `Socket` instance used to send `Service` calls
+	 * The `Socket` instance used to send `Service` calls.
 	 *
 	 * @var \lithium\util\Socket
 	 */
@@ -60,15 +45,15 @@ class Service extends \lithium\core\Object {
 	protected $_isConnected = false;
 
 	/**
-	 * Fully-namespaced class references to `Service` class dependencies.
+	 * Fully-name-spaced class references to `Service` class dependencies.
 	 *
 	 * @var array
 	 */
 	protected $_classes = array(
-		'media'    => 'lithium\http\Media',
+		'media'    => '\lithium\http\Media',
 		'request'  => '\lithium\http\Request',
 		'response' => '\lithium\http\Response',
-		'socket'   => 'lithium\util\socket\Stream'
+		'socket'   => '\lithium\util\socket\Context'
 	);
 
 	/**
@@ -80,8 +65,9 @@ class Service extends \lithium\core\Object {
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(
+			'autoConnect' => true,
 			'persistent' => false,
-			'protocol'   => 'tcp',
+			'protocol'   => 'http',
 			'host'       => 'localhost',
 			'version'    => '1.1',
 			'auth'       => 'Basic',
@@ -90,7 +76,6 @@ class Service extends \lithium\core\Object {
 			'port'       => 80,
 			'timeout'    => 1,
 			'encoding'   => 'UTF-8',
-			'classes'    => array()
 		);
 		$config = (array)$config + $defaults;
 
@@ -102,36 +87,40 @@ class Service extends \lithium\core\Object {
 		parent::__construct($config);
 	}
 
+	protected function _init() {
+		parent::_init();
+		$class = Libraries::locate('socket.util', $this->_classes['socket']);
+		if (is_string($class)) {
+			$this->_connection = new $class($this->_config);
+		}
+	}
+
 	/**
-	 * Connect to datasource
+	 * Connect to data source.
 	 *
 	 * @return boolean
 	 */
 	public function connect() {
-		if (!$this->_connection) {
-			$socket = Libraries::locate('sockets.util', $this->_classes['socket']);
-			$this->_connection = new $socket($this->_config);
-		}
-		if (!$this->_isConnected && $this->_connection->open()) {
-			$this->_isConnected = true;
+		if (!$this->_isConnected && $this->_connection) {
+			$this->_isConnected = $this->_connection->open();
 		}
 		return $this->_isConnected;
 	}
 
 	/**
-	 * Disconnect from socket
+	 * Disconnect from socket.
 	 *
 	 * @return boolean
 	 */
 	public function disconnect() {
 		if ($this->_isConnected) {
-			$this->_isConnected = !$this->_connection->close();
+			$this->_isConnected = !$this->_connection->close();;
 		}
 		return !$this->_isConnected;
 	}
 
 	/**
-	 * Send GET request
+	 * Send GET request.
 	 *
 	 * @param string $path
 	 * @param array $data
@@ -142,10 +131,10 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
-	 * Send POST request
+	 * Send POST request.
 	 *
-	 * @param string path
-	 * @param array data
+	 * @param string $path
+	 * @param array $data
 	 * @return string
 	 */
 	public function post($path = null, $data = array(), $options = array()) {
@@ -153,10 +142,10 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
-	 * Send PUT request
+	 * Send PUT request.
 	 *
-	 * @param string path
-	 * @param array data
+	 * @param string $path
+	 * @param array $data
 	 * @return string
 	 */
 	public function put($path = null, $data = array(), $options = array()) {
@@ -164,10 +153,11 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
-	 * Send DELETE request
+	 * Send DELETE request.
 	 *
-	 * @param string path
-	 * @param array params
+	 * @param string $path
+	 * @param array $data
+	 * @param array $options
 	 * @return string
 	 */
 	public function delete($path = null, $data = array(), $options = array()) {
@@ -175,27 +165,27 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
-	 * Send request and return response data
+	 * Send request and return response data.
 	 *
-	 * @param string path
+	 * @param string $method
+	 * @param string $path
+	 * @param array $data
+	 * @param array $options
 	 * @return string
 	 */
 	public function send($method, $path = null, $data = null, $options = array()) {
 		$defaults = array('type' => 'form', 'return' => 'body');
 		$options += $defaults;
 
-		if ($this->connect() === false) {
-			return false;
+		if (!$this->connect()) {
+			return;
 		}
 		$request = $this->_request($method, $path, $data, $options);
+		$response = $this->_connection->send($request, array('classes' => $this->_classes));
 
-		if ($this->_connection->write((string)$request)) {
-			$message = $this->_connection->read();
-			$response = new $this->_classes['response'](compact('message'));
-
-			$this->last = (object)compact('request', 'response');
+		if ($response) {
+			$this->last = (object) compact('request', 'response');
 			$this->disconnect();
-
 			return ($options['return'] == 'body') ? $response->body() : $response;
 		}
 	}
@@ -205,7 +195,7 @@ class Service extends \lithium\core\Object {
 	 * properties based on the request type and data to be sent.
 	 *
 	 * @param string $method The HTTP method of the request, i.e. `'GET'`, `'HEAD'`, `'OPTIONS'`,
-	 *               etc. Can be passed in upper- or lowercase.
+	 *        etc. Can be passed in upper- or lower-case.
 	 * @param string $path The
 	 * @param string $data
 	 * @param string $options
@@ -217,14 +207,15 @@ class Service extends \lithium\core\Object {
 		$request->path = str_replace('//', '/', "/{$path}");
 		$request->method = $method = strtoupper($method);
 		$media = $this->_classes['media'];
+		$type = null;
 
-		if ($data && !is_string($data) && in_array($options['type'], $media::types())) {
+		if (in_array($options['type'], $media::types()) && $data && !is_string($data)) {
 			$type = $media::type($options['type']);
 			$contentType = (array)$type['content'];
-
 			$request->headers(array('Content-Type' => current($contentType)));
 			$data = Media::encode($options['type'], $data, $options);
 		}
+
 		in_array($method, array('POST', 'PUT')) ? $request->body($data) : $request->params = $data;
 		return $request;
 	}

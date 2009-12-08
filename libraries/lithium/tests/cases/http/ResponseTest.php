@@ -60,6 +60,14 @@ class ResponseTest extends \lithium\test\Unit {
 
 		$response = new Response(compact('message'));
 		$this->assertEqual($message, (string)$response);
+
+		$message = 'Invalid Message';
+		$expected = join("\r\n", array(
+			'HTTP/1.1 200 OK',
+			'', '', ''
+		));
+		$response = new Response(compact('message'));
+		$this->assertEqual($expected, (string)$response);
 	}
 
 	public function testEmptyResponse() {
@@ -96,7 +104,7 @@ class ResponseTest extends \lithium\test\Unit {
 	}
 
 	function testTransferEncodingChunkedDecode()  {
-		$message = join("\r\n", array(
+		$headers = join("\r\n", array(
 			'HTTP/1.1 200 OK',
 			'Server: CouchDB/0.10.0 (Erlang OTP/R13B)',
 			'Etag: "DWGTHR79JLSOGACPLVIZBJUBP"',
@@ -106,6 +114,10 @@ class ResponseTest extends \lithium\test\Unit {
 			'Transfer-Encoding: chunked',
 			'Connection: Keep-alive',
 			'',
+			'',
+		));
+
+		$message = $headers.join("\r\n", array(
 			'b7',
 			'{"total_rows":1,"offset":0,"rows":[',
 			'{"id":"88989cafcd81b09f81078eb523832e8e","key":"gwoo","value":{"author":"gwoo","language":"php","preview":"test","created":"2009-10-27 12:14:12"}}',
@@ -126,6 +138,37 @@ class ResponseTest extends \lithium\test\Unit {
 			'{"id":"88989cafcd81b09f81078eb523832e8e","key":"gwoo","value":{"author":"gwoo","language":"php","preview":"test","created":"2009-10-27 12:14:12"}}',
 			']}',
 		));
+		$result = $response->body();
+		$this->assertEqual($expected, $result);
+
+		$message = $headers.join("\r\n", array(
+			'body'
+		));
+		$expected = 'body';
+		$response = new Response(compact('message'));
+		$result = $response->body();
+		$this->assertEqual($expected, $result);
+
+		$message = $headers.join("\r\n", array(
+			'[part one];',
+			'[part two]'
+		));
+		$expected = '[part two]';
+		$response = new Response(compact('message'));
+		$result = $response->body();
+		$this->assertEqual($expected, $result);
+
+		$message = join("\r\n", array(
+			'HTTP/1.1 200 OK',
+			'Header: Value',
+			'Connection: close',
+			'Content-Type: text/html;charset=UTF-8',
+			'Transfer-Encoding: text',
+			'',
+			'Test!'
+		));
+		$expected = 'Test!';
+		$response = new Response(compact('message'));
 		$result = $response->body();
 		$this->assertEqual($expected, $result);
 	}

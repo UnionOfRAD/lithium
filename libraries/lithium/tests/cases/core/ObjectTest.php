@@ -12,6 +12,8 @@ use \lithium\core\Object;
 use \lithium\tests\mocks\core\MockMethodFiltering;
 use \lithium\tests\mocks\core\MockExposed;
 use \lithium\tests\mocks\core\MockCallable;
+use \lithium\tests\mocks\core\MockObjectForParents;
+use \lithium\tests\mocks\core\MockObjectConfiguration;
 
 class ObjectTest extends \lithium\test\Unit {
 
@@ -126,6 +128,43 @@ class ObjectTest extends \lithium\test\Unit {
 			'long', 'then', 'UR', 'DOIN', 'IT', 'RONG'
 		);
 		$this->assertEqual($callable->invokeMethod('foo', $params), $params);
+	}
+
+	public function testParents() {
+		$expected = array('lithium\\core\\Object' => 'lithium\\core\\Object');
+
+		$result = MockObjectForParents::parents();
+		$this->assertEqual($expected, $result);
+
+		// For caching
+		$result = MockObjectForParents::parents();
+		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * Test configuration handling
+	 *
+	 * @return void
+	 */
+	public function testObjectConfiguration() {
+		$expected = array('testScalar' => 'default', 'testArray' => array('default'));
+		$config = new MockObjectConfiguration();
+		$this->assertEqual($expected, $config->getConfig());
+
+		$config = new MockObjectConfiguration(array('autoConfig' => array('testInvalid')));
+		$this->assertEqual($expected, $config->getConfig());
+
+		$expected = array('testScalar' => 'override', 'testArray' => array('override'));
+		$config = new MockObjectConfiguration(array('autoConfig' => true) + $expected);
+		$this->assertEqual($expected, $config->getConfig());
+
+		$expected = array('testScalar' => 'override', 'testArray' => array('default', 'override'));
+		$config = new MockObjectConfiguration(array('autoConfig' => array('testScalar', 'testArray' => 'merge')) + $expected);
+		$this->assertEqual($expected, $config->getConfig());
+
+		$expected = array('testScalar' => 'called', 'testArray' => array('default'));
+		$config = new MockObjectConfiguration(array('autoConfig' => array('testScalar' => 'call')) + $expected);
+		$this->assertEqual($expected, $config->getConfig());
 	}
 }
 

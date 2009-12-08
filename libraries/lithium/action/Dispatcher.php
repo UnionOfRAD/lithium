@@ -16,7 +16,7 @@ use \lithium\core\Environment;
 
 /**
  * `Dispatcher` is the outermost layer of the framework (including app), responsible for both
- * recieving the initial http request and sending back the response at the end of the cycle.
+ * receiving the initial http request and sending back the response at the end of the cycle.
  *
  * After interpreting the request and making a `Request` instance, it initiates the correct
  * `Controller` and passes it the `Request` object. When the `Controller` returns a `Response`,
@@ -42,6 +42,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 
 	/**
 	 * Contains pre-process format strings for changing Dispatcher's behavior based on 'rules'.
+	 *
 	 * Each key in the array represents a 'rule'; if a key that matches the rule is present (and
 	 * not empty) in a route, (i.e. the result of `lithium\http\Router::parse()`) then the rule's
 	 * value will be applied to the route before it is dispatched.  When applying a rule, any array
@@ -78,7 +79,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Dispatches a request based on a request object (an instance of `lithium\http\Request`).  If
+	 * Dispatches a request based on a request object (an instance of `lithium\http\Request`). If
 	 * `$request` is null, a new request object is instantiated based on the value of the
 	 * `'request'` key in the `$_classes` array.
 	 *

@@ -17,14 +17,22 @@ use \lithium\util\String;
 class Request extends \lithium\http\Base {
 
 	/**
-	 * The Host header value and authority
+	 * The protocol scheme to be used in the request. Used when calculating the target URL of this
+	 * request's end point.
+	 *
+	 * @var string
+	 */
+	public $scheme = 'http';
+
+	/**
+	 * The Host header value and authority.
 	 *
 	 * @var string
 	 */
 	public $host = 'localhost';
 
 	/**
-	 * Port number
+	 * Port number.
 	 *
 	 * @var string
 	 */
@@ -39,26 +47,28 @@ class Request extends \lithium\http\Base {
 	public $method = 'GET';
 
 	/**
-	 * absolute path of the request
+	 * Absolute path of the request.
 	 *
 	 * @var string
 	 */
 	public $path = '/';
 
 	/**
-	 * Used to build query string
+	 * Used to build query string.
 	 *
 	 * @var array
 	 */
 	public $params = array();
 
 	/**
-	 * headers
+	 * Headers.
+	 *
+	 * For example:
 	 * {{{
-	 *     array(
-	 *          'Host' => $this->host . ":" . $this->port,
-	 *          'Connection' => 'Close', 'User-Agent' => 'Mozilla/5.0 (Lithium)'
-	 *     )
+	 * 	array(
+	 * 		'Host' => $this->host . ":" . $this->port,
+	 * 		'Connection' => 'Close', 'User-Agent' => 'Mozilla/5.0 (Lithium)'
+	 * 	)
 	 * }}}
 	 * @var array
 	 */
@@ -66,6 +76,8 @@ class Request extends \lithium\http\Base {
 
 	/**
 	 * The authentication/authorization information
+	 *
+	 * For example:
 	 * {{{
 	 *     array('method' => 'Basic', 'username' => 'lithium', 'password' => 'rad')
 	 * }}}
@@ -74,14 +86,14 @@ class Request extends \lithium\http\Base {
 	public $auth = array();
 
 	/**
-	 * cookies
+	 * Cookies.
 	 *
 	 * @var array
 	 */
 	public $cookies = array();
 
 	/**
-	 * body
+	 * Body.
 	 *
 	 * @var array
 	 */
@@ -90,39 +102,42 @@ class Request extends \lithium\http\Base {
 	/**
 	 * Constructor
 	 *
-	 * @return void
+	 * @return object
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(
-			'host' => 'localhost', 'port' => 80, 'method' => 'GET', 'path' => '/',
-			'headers' => array(), 'body' => array(), 'params' => array()
+			'scheme' => 'http',
+			'host' => 'localhost',
+			'port' => 80,
+			'method' => 'GET',
+			'path' => '/',
+			'headers' => array(),
+			'body' => array(),
+			'params' => array()
 		);
 		$config += $defaults;
+
 		foreach ($config as $key => $value) {
 			$this->{$key} = $value;
 		}
-
 		$this->protocol = "HTTP/{$this->version}";
 
 		$this->headers = array(
 			'Host' => $this->host . ":" . $this->port,
-			'Connection' => 'Close', 'User-Agent' => 'Mozilla/5.0 (Lithium)'
+			'Connection' => 'Close',
+			'User-Agent' => 'Mozilla/5.0 (Lithium)'
 		);
 		$this->headers($config['headers']);
 
 		if (!empty($config['auth']['password'])) {
-			$this->headers('Authorization',
-				$config['auth']['method'] . ' '
-				. base64_encode(
-					$config['auth']['username'] . ':'
-					. $config['auth']['password']
-				)
-			);
+			$this->headers('Authorization', $config['auth']['method'] . ' ' . base64_encode(
+				$config['auth']['username'] . ':' . $config['auth']['password']
+			));
 		}
 	}
 
 	/**
-	 * Set queryString
+	 * Set queryString.
 	 *
 	 * @param array $params
 	 * @param string $format
@@ -138,6 +153,7 @@ class Request extends \lithium\http\Base {
 			$params = array_merge($this->params, $params);
 		}
 		$query = null;
+
 		foreach ($params as $key => $value) {
 			$query .= String::insert($format, array(
 				'key' => urlencode($key), 'value' => urlencode($value)
@@ -149,8 +165,30 @@ class Request extends \lithium\http\Base {
 		return "?" . $this->params = substr($query, 0, -1);
 	}
 
+	public function to($format, $options = array()) {
+		switch ($format) {
+			case 'array':
+				return array(
+					'method' => $this->method,
+					'content' => $this->body(),
+					'header' => $this->headers()
+				);
+			case 'url':
+				$query = $this->queryString();
+				return "{$this->scheme}://{$this->host}:{$this->port}{$this->path}{$query}";
+			case 'context':
+				return array($this->scheme => $options + $this->to('array') + array(
+					'method' => null, 'content' => null,
+					'ignore_errors' => true, 'timeout' => 1
+				));
+			case 'string':
+			default:
+				return (string) $this;
+		}
+	}
+
 	/**
-	 * magic method to convert object to string
+	 * Magic method to convert object to string.
 	 *
 	 * @return string
 	 */

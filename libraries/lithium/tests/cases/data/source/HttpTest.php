@@ -22,11 +22,11 @@ class HttpTest extends \lithium\test\Unit {
 		'login' => 'root',
 		'password' => '',
 		'port' => 80,
-		'timeout' => 2
+		'timeout' => 2,
 	);
 
 	public function testAllMethodsNoConnection() {
-		$http = new Http(array('protocol' => null));
+		$http = new Http(array('classes' => array('socket' => false)));
 		$this->assertFalse($http->connect());
 		$this->assertTrue($http->disconnect());
 		$this->assertFalse($http->get());
