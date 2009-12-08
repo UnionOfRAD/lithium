@@ -20,7 +20,7 @@ class FileTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function skip() {
-		$directory = new SplFileInfo(LITHIUM_APP_PATH . "/tmp/cache/");
+		$directory = new SplFileInfo(LITHIUM_APP_PATH . "/resources/tmp/cache/");
 		$accessible = ($directory->isDir() && $directory->isReadable() && $directory->isWritable());
 		$message = 'The File cache adapter path does not have the proper permissions.';
 		$this->skipIf(!$accessible, $message);
@@ -52,11 +52,11 @@ class FileTest extends \lithium\test\Unit {
 		$expected = 25;
 		$this->assertEqual($expected, $result);
 
-		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
-		$this->assertEqual(file_get_contents(LITHIUM_APP_PATH . "/tmp/cache/$key"), "{:expiry:$time}\ndata");
+		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
+		$this->assertEqual(file_get_contents(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"), "{:expiry:$time}\ndata");
 
-		$this->assertTrue(unlink(LITHIUM_APP_PATH . "/tmp/cache/$key"));
-		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
+		$this->assertTrue(unlink(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
+		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
 	}
 
 	public function testRead() {
@@ -66,16 +66,16 @@ class FileTest extends \lithium\test\Unit {
 		$closure = $this->File->read($key);
 		$this->assertTrue(is_callable($closure));
 
-		file_put_contents(LITHIUM_APP_PATH . "/tmp/cache/$key", "{:expiry:$time}\ndata");
-		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
+		file_put_contents(LITHIUM_APP_PATH . "/resources/tmp/cache/$key", "{:expiry:$time}\ndata");
+		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
 
 		$params = compact('key');
 		$result = $closure($this->File, $params, null);
 		$expected = 'data';
 		$this->assertEqual($expected, $result);
 
-		$this->assertTrue(unlink(LITHIUM_APP_PATH . "/tmp/cache/$key"));
-		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
+		$this->assertTrue(unlink(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
+		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
 
 		$key = 'non_existent';
 		$params = compact('key');
@@ -93,8 +93,8 @@ class FileTest extends \lithium\test\Unit {
 		$closure = $this->File->read($key);
 		$this->assertTrue(is_callable($closure));
 
-		file_put_contents(LITHIUM_APP_PATH . "/tmp/cache/$key", "{:expiry:$time}\ndata");
-		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
+		file_put_contents(LITHIUM_APP_PATH . "/resources/tmp/cache/$key", "{:expiry:$time}\ndata");
+		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
 
 		sleep(2);
 		$params = compact('key');
@@ -107,8 +107,8 @@ class FileTest extends \lithium\test\Unit {
 		$key = 'key_to_delete';
 		$time = time() + 1;
 
-		file_put_contents(LITHIUM_APP_PATH . "/tmp/cache/$key", "{:expiry:$time}\ndata");
-		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
+		file_put_contents(LITHIUM_APP_PATH . "/resources/tmp/cache/$key", "{:expiry:$time}\ndata");
+		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
 
 		$closure = $this->File->delete($key);
 		$this->assertTrue(is_callable($closure));
@@ -126,13 +126,13 @@ class FileTest extends \lithium\test\Unit {
 	public function testClear() {
 		$key = 'key_to_clear';
 		$time = time() + 1;
-		file_put_contents(LITHIUM_APP_PATH . "/tmp/cache/$key", "{:expiry:$time}\ndata");
+		file_put_contents(LITHIUM_APP_PATH . "/resources/tmp/cache/$key", "{:expiry:$time}\ndata");
 
 		$result = $this->File->clear();
 		$this->assertTrue($result);
-		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/tmp/cache/$key"));
+		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
 
-		$result = touch(LITHIUM_APP_PATH . "/tmp/cache/empty");
+		$result = touch(LITHIUM_APP_PATH . "/resources/tmp/cache/empty");
 		$this->assertTrue($result);
 	}
 
