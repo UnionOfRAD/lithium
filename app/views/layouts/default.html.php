@@ -19,7 +19,7 @@
 	<div id="container">
 		<div id="header">
 			<h1>Application</h1>
-			<h2>Powered by Lithium.</h2>
+			<h2>Powered by <?=$this->html->link('Lithium', 'http://li3.rad-dev.org'); ?>.</h2>
 		</div>
 		<div id="content">
 			<?php echo $this->content; ?>

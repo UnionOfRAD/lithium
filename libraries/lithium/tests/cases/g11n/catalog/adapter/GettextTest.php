@@ -17,7 +17,7 @@ class GettextTest extends \lithium\test\Unit {
 	public $adapter;
 
 	public function setUp() {
-		$this->_path = $path = LITHIUM_APP_PATH . '/tmp/tests';
+		$this->_path = $path = LITHIUM_APP_PATH . '/resources/tmp/tests/g11n';
 		mkdir($this->_path . '/en/LC_MESSAGES', 0755, true);
 		mkdir($this->_path . '/de/LC_MESSAGES', 0755, true);
 
@@ -37,6 +37,7 @@ class GettextTest extends \lithium\test\Unit {
 				unlink($path);
 			}
 		}
+		rmdir($this->_path);
 	}
 
 	public function testWriteReadMessageTemplate() {

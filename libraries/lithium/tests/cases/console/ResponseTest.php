@@ -17,8 +17,8 @@ class ResponseTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->streams = array(
-			'output' => LITHIUM_APP_PATH . '/tmp/output.txt',
-			'error' => LITHIUM_APP_PATH . '/tmp/error.txt'
+			'output' => LITHIUM_APP_PATH . '/resources/tmp/output.txt',
+			'error' => LITHIUM_APP_PATH . '/resources/tmp/error.txt'
 		);
 	}
 
