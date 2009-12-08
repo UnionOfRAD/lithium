@@ -23,7 +23,7 @@ class ModelTest extends \lithium\test\Unit {
 	public function _init() {
 		if (!Connections::get('test')) {
 			Connections::add('test', 'database', array(
-				'adapter' => 'MockAdapter',
+				'adapter' => '\lithium\tests\mocks\data\source\database\adapter\MockAdapter',
 				'host' => 'localhost'
 			));
 		}

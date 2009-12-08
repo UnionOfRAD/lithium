@@ -95,8 +95,8 @@ class Object {
 	 * Apply a closure to a method of the current object instance.
 	 *
 	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
-	 *              method name as a string, or an array of method names.
-	 * @param closure $closure The clousure that is used to filter the method(s).
+	 *        method name as a string, or an array of method names.
+	 * @param closure $closure The closure that is used to filter the method(s).
 	 * @return void
 	 * @see lithium\core\Object::_filter()
 	 * @see lithium\util\collection\Filters
@@ -144,7 +144,7 @@ class Object {
 	 * called statically on any class that extends `Object` to return an instance of it.
 	 *
 	 * @param array $data An array of properties and values with which to re-instantiate the object.
-	 *              These properties can be both public and protected.
+	 *        These properties can be both public and protected.
 	 * @return object Returns an instance of the requested object with the given properties set.
 	 */
 	public static function __set_state($data) {
@@ -166,7 +166,7 @@ class Object {
 	 * @param array $params An associative array containing all the parameters passed into
 	 *        the method.
 	 * @param Closure $callback The method's implementation, wrapped in a closure.
-	 * @param array $filters Additional filters to apply to the method for this call only
+	 * @param array $filters Additional filters to apply to the method for this call only.
 	 * @return mixed
 	 * @see lithium\util\collection\Filters
 	 */

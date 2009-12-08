@@ -10,11 +10,7 @@ namespace lithium\data\model;
 
 /**
  * `Record` class. Represents data such as a row from a database. Records have fields (often known
- *  as columns in databases).
- *
- *  Option defined:
- *   - 'data' `array` Data to enter into the record. Defaults to an empty array.
- *   - 'model' `string` Name of class that provides the data-source for this record. Default: `null`.
+ * as columns in databases).
  */
 class Record extends \lithium\core\Object {
 
@@ -56,9 +52,14 @@ class Record extends \lithium\core\Object {
 	protected $_hasValidated = false;
 
 	/**
-	 * Creates default values.
+	 * Creates a new record object with default values.
 	 *
-	 * @return Record object.
+	 * Options defined:
+	 * - 'data' _array_: Data to enter into the record. Defaults to an empty array.
+	 * - 'model' _string_: Class name that provides the data-source for this record.
+	 *   Defaults to `null`.
+	 *
+	 * @return object Record object.
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('model' => null, 'data' => array());
@@ -96,8 +97,9 @@ class Record extends \lithium\core\Object {
 	/**
 	* Access the data fields of the record. Can also access a $named field.
 	*
-	* @param string $name optionally included field name, returns entire data array if left empty.
-	* @return array
+	* @param string $name Optionally included field name.
+	* @return array|string Entire data array if $name is empty, otherwise the value from the named
+	*         field.
 	*/
 	public function data($name = null) {
 		return empty($name) ? $this->_data : $this->__get($name);
@@ -106,9 +108,10 @@ class Record extends \lithium\core\Object {
 	/**
 	* Access the errors of the record.
 	*
-	* @param mixed $field if array will overwrite `$this->_errors`, if string and value, sets
-	* @param string $value
-	* @return string
+	* @param array|string $field If an array, overwrites `$this->_errors`. If a string, and $value
+	*        is not null, sets the corresponding key in $this->_errors to $value
+	* @param string $value Value to set.
+	* @return array|string Either the $this->_errors array, or single value from it.
 	*/
 	public function errors($field = null, $value = null) {
 		if ($field === null) {
@@ -151,8 +154,8 @@ class Record extends \lithium\core\Object {
 	/**
 	* A flag indicating whether or not this record exists.
 	*
-	* @return boolean True if record was `read` from the db, or has been `create`d and `save`d. False
-	*                 otherwise.
+	* @return boolean `True` if the record was `read` from the data-source, or has been `create`d
+	*         and `save`d. Otherwise `false`.
 	*/
 	public function exists() {
 		return $this->_exists;

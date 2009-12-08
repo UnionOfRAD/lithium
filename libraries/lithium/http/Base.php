@@ -43,7 +43,7 @@ class Base extends \lithium\core\Object {
 	public $body = array();
 
 	/**
-	 * Add a header to rendered output, or return a single header or full header list
+	 * Add a header to rendered output, or return a single header or full header list.
 	 *
 	 * @param string $key
 	 * @param string $value
@@ -82,7 +82,7 @@ class Base extends \lithium\core\Object {
 	}
 
 	/**
-	 * Add body parts
+	 * Add body parts.
 	 *
 	 * @return array
 	 */

@@ -14,10 +14,12 @@ use \lithium\g11n\Locale;
 use \lithium\g11n\Catalog;
 
 /**
- * The `Message` class is concerned with aspects of the globalization of static
- * message strings throughout the framework. Often the phrase of "translating a message"
- * is  used for referring to globalization of messages which leads to the false assumption
- * that this is a single step wheras it is a multi step process.
+ * The `Message` class is concerned with aspects of the globalization of static message strings
+ * throughout the framework.
+ *
+ * Often the phrase of "translating a message" is  used for referring to globalization of messages
+ * which leads to the false assumption that this is a single step, whereas it is a multi-step
+ * process.
  *
  *  1. Marking messages as translateable.
  *  2. Extracting marked messages, creating a message template.
@@ -47,7 +49,7 @@ class Message extends \lithium\core\StaticObject {
 	 * The other purpose it serves is to return the translation of a message according to
 	 * the current or provided locale and (if applicable) plural form.  The method can be used for
 	 * both single message or messages with a plural form. The provided message will be used as a
-	 * fall back if it isn't translateable. You may also use `String::insert()`-style placeholders
+	 * fall back if it isn't translateable. You may also use `String::insert()`-style place holders
 	 * within message strings and provide replacements as a separate option.
 	 *
 	 * Usage:
@@ -64,11 +66,11 @@ class Message extends \lithium\core\StaticObject {
 	 *
 	 * @param string $singular Either a single or the singular form of the message.
 	 * @param array $options Allowed keys are:
-	 *              - `'plural'`: Used as a fall back if needed.
-	 *              - `'count'`: Used to determine the correct plural form.
-	 *              - `'replacements'`: An array with replacements for placeholders.
-	 *              - `'locale'`: The target locale, defaults to current locale.
-	 *              - `'scope'`: The scope of the message.
+	 *        - `'count'`: Used to determine the correct plural form.
+	 *        - `'locale'`: The target locale, defaults to current locale.
+	 *        - `'plural'`: Used as a fall back if needed.
+	 *        - `'replacements'`: An array with replacements for place holders.
+	 *        - `'scope'`: The scope of the message.
 	 * @return string
 	 *
 	 * @see lithium\console\command\g11n\Extract

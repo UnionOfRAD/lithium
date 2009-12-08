@@ -47,9 +47,19 @@ class MySql extends \lithium\data\source\Database {
 	 * @param array $config Configuration options for this class. For additional configuration,
 	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options
 	 *        defined by this class:
+	 *        - `'database'`: The name of the database to connect to. Defaults to 'lithium'.
+	 *        - `'host'`: The IP or machine name where MySQL is running. Defaults to 'localhost'.
+	 *        - `'persistent'`: If a persistent connection (if available) should be made.
+	 *          Defaults to true.
+	 *        - `'port'`: The port number MySQL is listening on. The default is '3306'.
 	 *
-	 *	- `'port'`: Accepts a port number or Unix socket name to use when connecting to the
-	 *     database.  Defaults to `'3306'`.
+	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
+	 * list of active connections.
+	 * @return The adapter instance.
+	 *
+	 * @see lithium\data\source\Database::__construct()
+	 * @see lithium\data\Source::__construct()
+	 * @see lithium\data\Connections::add()
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('port' => '3306');
@@ -57,9 +67,9 @@ class MySql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Connects to the database using options provided to the class constructor.
+	 * Connects to the database using the options provided to the class constructor.
 	 *
-	 * @return boolean True if the database could be connected, else false
+	 * @return boolean True if the database could be connected, else false.
 	 */
 	public function connect() {
 		$config = $this->_config;
@@ -86,6 +96,11 @@ class MySql extends \lithium\data\source\Database {
 		return $this->_isConnected;
 	}
 
+	/**
+	 * Disconnects the adapter from the database.
+	 *
+	 * @return boolean True on success, else false.
+	 */
 	public function disconnect() {
 		if ($this->_isConnected) {
 			$this->_isConnected = !mysql_close($this->_connection);
@@ -97,7 +112,7 @@ class MySql extends \lithium\data\source\Database {
 	/**
 	 * Returns the list of tables in the currently-connected database.
 	 *
-	 * @param string $model The fully-namespaced class name of the model object making the request.
+	 * @param string $model The fully-name-spaced class name of the model object making the request.
 	 * @return array Returns an array of objects to which models can connect.
 	 * @filter This method can be filtered.
 	 */
@@ -113,14 +128,14 @@ class MySql extends \lithium\data\source\Database {
 	/**
 	 * Gets the column schema for a given MySQL table.
 	 *
-	 * @param mixed $entity Specifies the table name for which the schema should be returned, or the
-	 *              class name of the model object requesting the schema, in which case the model
-	 *              class will be queried for the correct table name.
+	 * @param mixed $entity Specifies the table name for which the schema should be returned, or
+	 *        the class name of the model object requesting the schema, in which case the model
+	 *        class will be queried for the correct table name.
 	 * @param array $meta
 	 * @return array Returns an associative array describing the given table's schema, where the
-	 *               array keys are the available fields, and the values are arrays describing each
-	 *               field, containing the following keys:
-	 *               -`'type'`: The field type name
+	 *         array keys are the available fields, and the values are arrays describing each
+	 *         field, containing the following keys:
+	 *         - `'type'`: The field type name
 	 * @filter This method can be filtered.
 	 */
 	public function describe($entity, $meta = array()) {
@@ -150,6 +165,13 @@ class MySql extends \lithium\data\source\Database {
 		});
 	}
 
+	/**
+	 * Gets or sets the encoding for the connection.
+	 *
+	 * @param $encoding
+	 * @return boolean|string If setting the encoding; returns true on success, else false.
+	 *         When getting, returns the encoding.
+	 */
 	public function encoding($encoding = null) {
 		$encodingMap = array('UTF-8' => 'utf8');
 
@@ -209,7 +231,7 @@ class MySql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Retrieves database error message and error code
+	 * Retrieves database error message and error code.
 	 *
 	 * @return array
 	 */
@@ -218,6 +240,18 @@ class MySql extends \lithium\data\source\Database {
 			return array(mysql_errno($this->_connection), mysql_error($this->_connection));
 		}
 		return null;
+	}
+
+	/**
+	 * Quotes identifiers.
+	 *
+	 * Currently, this method simply returns the identifier.
+	 *
+	 * @param string $name The identifier to quote.
+	 * @return string The quoted identifier.
+	 */
+	public function name($name) {
+		return $name;
 	}
 
 	protected function _execute($sql, $options = array()) {
@@ -257,7 +291,7 @@ class MySql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Converts database-layer column types to basic types
+	 * Converts database-layer column types to basic types.
 	 *
 	 * @param string $real Real database-layer column type (i.e. "varchar(255)")
 	 * @return string Abstract column type (i.e. "string")

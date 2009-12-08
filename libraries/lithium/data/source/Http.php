@@ -11,7 +11,7 @@ namespace lithium\data\source;
 use \lithium\core\Libraries;
 
 /**
- * Http class to access data sources using \lithium\http\Service
+ * Http class to access data sources using \lithium\http\Service.
  */
 class Http extends \lithium\data\Source {
 
@@ -87,7 +87,7 @@ class Http extends \lithium\data\Source {
 	}
 
 	/**
-	 * Pass methods to service connection
+	 * Pass methods to service connection.
 	 *
 	 * @param string $method
 	 * @param array $params
@@ -98,7 +98,7 @@ class Http extends \lithium\data\Source {
 	}
 
 	/**
-	 * Connect to datasource
+	 * Connect to the data-source.
 	 *
 	 * @return boolean
 	 */
@@ -110,7 +110,7 @@ class Http extends \lithium\data\Source {
 	}
 
 	/**
-	 * Disconnect from socket
+	 * Disconnect from socket.
 	 *
 	 * @return boolean
 	 */
@@ -134,7 +134,7 @@ class Http extends \lithium\data\Source {
 	}
 
 	/**
-	 * Describe data source
+	 * Describe data source.
 	 *
 	 * @param string $entity
 	 * @param string $meta
@@ -155,7 +155,7 @@ class Http extends \lithium\data\Source {
 	}
 
 	/**
-	 * Read used by model to GET
+	 * Read used by model to GET.
 	 *
 	 * @param object query
 	 * @param array options
@@ -166,7 +166,7 @@ class Http extends \lithium\data\Source {
 	}
 
 	/**
-	 * Update used by model to PUT
+	 * Update used by model to PUT.
 	 *
 	 * @param object query
 	 * @param array options
@@ -177,7 +177,7 @@ class Http extends \lithium\data\Source {
 	}
 
 	/**
-	 * Used by model to DELETE
+	 * Used by model to DELETE.
 	 *
 	 * @param object query
 	 * @param array options

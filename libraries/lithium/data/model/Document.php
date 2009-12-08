@@ -36,7 +36,8 @@ use \Iterator;
  *
  * {{{print_r($acme->to('array'));
  *
- * // Yields: array(
+ * // Yields:
+ * //	array(
  * //	'_id' => 12345,
  * //	'name' => 'Acme, Inc.',
  * //	'employees' => array(
@@ -159,14 +160,16 @@ class Document extends \lithium\util\Collection {
 	 * `$document->_id`.
 	 *
 	 * @param $name The field name, as specified with an object property.
-	 * @return bool True if the field specified in `$name` exists, false otherwise.
+	 * @return boolean True if the field specified in `$name` exists, false otherwise.
 	 */
 	public function __isset($name) {
 		return isset($this->_items[$name]);
 	}
 
 	/**
-	 * Allows several properties to be assigned at once, i.e.:
+	 * Allows several properties to be assigned at once.
+	 *
+	 * For example:
 	 * {{{
 	 * $doc->set(array('title' => 'Lorem Ipsum', 'value' => 42));
 	 * }}}
@@ -183,7 +186,7 @@ class Document extends \lithium\util\Collection {
 	 * `$document->title = 'Lorem Ipsum'`. If `$value` is a complex data type (i.e. associative
 	 * array), it is wrapped in a sub-`Document` object before being appended.
 	 *
-	 * @param $name The name of the field/property to write to, i.e. `title` in the above.
+	 * @param $name The name of the field/property to write to, i.e. `title` in the above example.
 	 * @param $value The value to write, i.e. `'Lorem Ipsum'`.
 	 * @return void
 	 */
@@ -230,8 +233,8 @@ class Document extends \lithium\util\Collection {
 	}
 
 	/**
-	 * Magic php methoed used when model method is called on document instance
-	 * return null also if no model is set
+	 * Magic php method used when model method is called on document instance.
+	 * If no model is set returns null.
 	 *
 	 * @param $method
 	 * @param $params
@@ -247,12 +250,12 @@ class Document extends \lithium\util\Collection {
 	}
 
 	/**
-	 * Returns the next record in the set, and advances the object's internal pointer. If the end of
-	 * the set is reached, a new record will be fetched from the data source connection handle
+	 * Returns the next record in the set, and advances the object's internal pointer. If the end
+	 * of the set is reached, a new record will be fetched from the data source connection handle
 	 * (`$_handle`). If no more records can be fetched, returns `null`.
 	 *
-	 * @return object Returns the next record in the set, or `null`, if no more records are
-	 *                available.
+	 * @return object|null Returns the next record in the set, or `null`, if no more records are
+	 *         available.
 	 */
 	public function next() {
 		$prev = key($this->_items);
@@ -279,9 +282,10 @@ class Document extends \lithium\util\Collection {
 	/**
 	* Access the errors of the record.
 	*
-	* @param mixed $field if array will overwrite `$this->_errors`, if string and value, sets
-	* @param string $value
-	* @return string
+	* @param array|string $field If an array, overwrites `$this->_errors`. If a string, and $value
+	*        is not null, sets the corresponding key in $this->_errors to $value
+	* @param string $value Value to set.
+	* @return array|string Either the $this->_errors array, or single value from it.
 	*/
 	public function errors($field = null, $value = null) {
 		if ($field === null) {

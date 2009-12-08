@@ -93,9 +93,9 @@ class Request extends \lithium\core\Object {
 	);
 
 	/**
-	 * Content-types accepted by the client.  If extension parsing is enabled in the
-	 * Router, and an extension is detected, the corresponding content-type will be
-	 * used as the overriding primary content-type accepted.
+	 * Content-types accepted by the client. If extension parsing is enabled in the Router, and an
+	 * extension is detected, the corresponding content-type will be used as the overriding primary
+	 * content-type accepted.
 	 *
 	 * @var array
 	 */
@@ -217,8 +217,8 @@ class Request extends \lithium\core\Object {
 	 * Queries PHP's environment settings, and provides an abstraction for standardizing expected
 	 * environment values across varying platforms, as well as specify custom environment flags.
 	 *
-	 * @param string $key
-	 * @return void
+	 * @param string $key The environment variable required.
+	 * @return string The requested variables value.
 	 * @todo Refactor to lazy-load environment settings
 	 */
 	public function env($key) {
