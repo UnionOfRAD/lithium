@@ -19,14 +19,14 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->_backups['catalogConfig'] = Catalog::config()->to('array');
-		Catalog::clear();
+		Catalog::reset();
 		Catalog::config(array(
 			'runtime' => array('adapter' => new Memory())
 		));
 	}
 
 	public function tearDown() {
-		Catalog::clear();
+		Catalog::reset();
 		Catalog::config($this->_backups['catalogConfig']);
 	}
 

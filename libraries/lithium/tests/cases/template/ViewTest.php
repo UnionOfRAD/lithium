@@ -51,7 +51,7 @@ class ViewTest extends \lithium\test\Unit {
 
 	public function testTranslationOutputFilters() {
 		$backup = Catalog::config()->to('array');
-		Catalog::clear();
+		Catalog::reset();
 		Catalog::config(array(
 			'runtime' => array('adapter' => new Memory())
 		));
@@ -81,7 +81,7 @@ class ViewTest extends \lithium\test\Unit {
 		$result = $tn('house', 'houses', 3, array('locale' => 'de'));
 		$this->assertEqual($expected, $result);
 
-		Catalog::clear();
+		Catalog::reset();
 		Catalog::config($backup);
 	}
 }

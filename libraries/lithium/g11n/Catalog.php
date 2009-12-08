@@ -27,25 +27,18 @@ use \lithium\util\Collection;
  *
  * The class is able to aggregate data from different sources which allows to complement sparse
  * data. Not all categories must be supported by an individual adapter.
- *
- * @todo Extend \lithium\core\Adaptable.
  */
-class Catalog extends \lithium\core\StaticObject {
+class Catalog extends \lithium\core\Adaptable {
 
 	protected static $_configurations = null;
 
-	public static function __init() {
-		static::$_configurations = new Collection();
-	}
-
 	public static function config($config = null) {
-		$default = array('adapter' => null, 'scope' => null);
+		$default = array('scope' => null);
 
 		if ($config) {
-			$items = array_map(function($i) use ($default) { return $i + $default; }, $config);
-			static::$_configurations = new Collection(compact('items'));
+			$config = array_map(function($i) use ($default) { return $i + $default; }, $config);
 		}
-		return static::$_configurations;
+		return parent::config($config);
 	}
 
 	/**
@@ -148,28 +141,8 @@ class Catalog extends \lithium\core\StaticObject {
 		return false;
 	}
 
-	public static function clear() {
-		static::__init();
-	}
-
-	public static function _adapter($name = null) {
-		if (empty($name)) {
-			$names = static::$_configurations->keys();
-			if (empty($names)) {
-				return;
-			}
-			$name = end($names);
-		}
-		if (!isset(static::$_configurations[$name])) {
-			return;
-		}
-		if (is_string(static::$_configurations[$name]['adapter'])) {
-			$config = static::$_configurations[$name];
-			$class = Libraries::locate('adapters.g11n.catalog', $config['adapter']);
-			$conf = array('adapter' => new $class($config)) + static::$_configurations[$name];
-			static::$_configurations[$name] = $conf;
-		}
-		return static::$_configurations[$name]['adapter'];
+	public static function adapter($name) {
+		return static::_adapter('adapters.g11n.catalog', $name);
 	}
 }
 
