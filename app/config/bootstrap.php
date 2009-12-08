@@ -136,11 +136,11 @@ Libraries::add('app');
 // 	),
 // 	'app' => array(
 // 		'adapter' => 'Gettext',
-// 		'path' => LITHIUM_APP_PATH . '/extensions/g11n/data'
+// 		'path' => LITHIUM_APP_PATH . '/resources/g11n'
 // 	),
 // 	'lithium' => array(
 // 		'adapter' => 'Gettext',
-// 		'path' => LITHIUM_LIBRARY_PATH . '/lithium/g11n/data'
+// 		'path' => LITHIUM_LIBRARY_PATH . '/lithium/g11n/resources'
 // 	)
 // ));
 
