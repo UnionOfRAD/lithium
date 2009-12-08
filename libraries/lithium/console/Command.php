@@ -15,38 +15,46 @@ use \lithium\util\reflection\Docblock;
 use \lithium\core\Libraries;
 
 /**
- * The base class to inherit when writing Console scripts in Lithium.
- *
+ * The base class to inherit when writing console scripts in Lithium.
  */
 class Command extends \lithium\core\Object {
 
 	/**
-	 * A Request object
+	 * A Request object.
 	 *
-	 * @var lithium\console\Request
+	 * @var object
+	 * @see lithium\console\Request
 	 */
 	public $request;
 
 	/**
-	 * A Response object
+	 * A Response object.
 	 *
-	 * @var lithium\console\Response
+	 * @var object
+	 * @see lithium\console\Response
 	 */
 	public $response;
 
 	/**
-	 * classes used by Command
+	 * Dynamic dependencies.
 	 *
-	 * @var string
+	 * @var array
 	 */
 	protected $_classes = array(
 		'response' => '\lithium\console\Response'
 	);
 
 	/**
-	 * Constrcutor
+	 * Auto configuration
 	 *
-	 * @param array config
+	 * @var array
+	 */
+	protected $_autoConfig = array('classes' => 'merge');
+
+	/**
+	 * Constructor.
+	 *
+	 * @param array $config
 	 * @return void
 	 */
 	public function __construct($config = array()) {
@@ -54,77 +62,73 @@ class Command extends \lithium\core\Object {
 			'request' => null, 'response' => array(), 'classes' => array()
 		);
 		$config += $defaults;
-
-		if (!empty($config['request'])) {
-			$this->request = $config['request'];
-		}
-
-		if (!empty($config['classes'])) {
-			$this->{'_' . $key} = (array)$config[$key] + $this->{'_' . $key};
-		}
-
 		parent::__construct($config);
 	}
 
-	public function _init() {
-		$config = (array)$this->_config['response'] + array('request' => $this->request);
-		$this->response = new $this->_classes['response']($config);
-	}
-
 	/**
-	 * initialize callback
+	 * Initializer.  Populates the `response` property with a new instance of the `Response`
+	 * class passing it configuration and assignes the values from named parameters of the
+	 * request (if applicable) to properties of the command.
 	 *
 	 * @return void
 	 */
-	public function initialize() {
+	protected function _init() {
+		parent::_init();
+		$this->request = $this->_config['request'];
+		$this->response = new $this->_classes['response']($this->_config['response']);
 
+		if ($this->request) {
+			foreach ((array)$this->request->params['named'] as $key => $param) {
+				$this->{$key} = $param;
+			}
+		}
 	}
 
 	/**
-	 * base method, shows list of available commands
-	 * override in subclasses
+	 * Base method, shows help. Override in subclasses as needed.
 	 *
 	 * @return void
 	 */
 	public function run() {
-		$this->header('Available Commands');
-		$classes = array_unique(Libraries::locate('commands', null, array('recursive' => false)));
-		foreach ($classes as $command) {
-			$command = explode('\\', $command);
-			$this->out(' - ' . Inflector::underscore(array_pop($command)));
-		}
+		$this->help();
+		return false;
 	}
 
 	/**
-	 * Called by the Dispatcher class to invoke an action
+	 * Called by the Dispatcher class to invoke an action.
 	 *
 	 * @param string $action
-	 * @param array $params
-	 * @return object Returns the response object associated with this controller
+	 * @param array $passed
+	 * @param array $options
+	 * @return object The response object associated with this command.
+	 * @see lithium\console\Dispatcher
+	 * @see lithium\console\Response
 	 * @todo Implement proper exception catching/throwing
 	 * @todo Implement filters
 	 */
 	public function __invoke($action, $passed = array(), $options = array()) {
-		$result = null;
-
 		try {
-			foreach ((array)$this->request->params['named'] as $key => $param) {
-				$this->{$key} = $param;
-			}
-			$this->initialize();
 			$result = $this->invokeMethod($action, $passed);
+
+			if (is_int($result)) {
+				$this->response->status = $result;
+			} elseif ($result || $result === null) {
+				$this->response->status = 0;
+			} else {
+				$this->response->status = 1;
+			}
 		} catch (Exception $e) {
-			// See todo
+			$this->response->status = 1;
 		}
-		return $result;
+		return $this->response;
 	}
 
 	/**
-	 * Writes string to output stream
+	 * Writes string to output stream.
 	 *
 	 * @param string $str
 	 * @param integer $newlines
-	 * @return boolean
+	 * @return integer|void
 	 */
 	public function out($str = null, $newlines = 1) {
 		if (is_array($str)) {
@@ -140,16 +144,16 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Writes string to error stream
+	 * Writes string to error stream.
 	 *
 	 * @param string $str
 	 * @param integer $newlines
-	 * @return boolean
+	 * @return integer|void
 	 */
-	public function err($str = null, $newlines = 1) {
+	public function error($str = null, $newlines = 1) {
 		if (is_array($str)) {
 			foreach ($str as $string) {
-				$this->err($string, $newlines);
+				$this->error($string, $newlines);
 			}
 			return;
 		}
@@ -160,12 +164,11 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Handles input. Will continue to loop until
-	 * options['quit'] or result is part of options['options']
+	 * Handles input. Will continue to loop until `$options['quit']` or
+	 * result is part of `$options['options']`.
 	 *
 	 * @param string $prompt
 	 * @param string $options
-	 * @param string $default
 	 * @return string
 	 */
 	public function in($prompt = null, $options = array()) {
@@ -198,11 +201,11 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Add text with horizontal line before and after stream
+	 * Add text with horizontal line before and after stream.
 	 *
-	 * @param integer $length
-	 * @param integer $newlines
-	 * @return string
+	 * @param string $text
+	 * @param integer $line
+	 * @return void
 	 */
 	public function header($text, $line = 80) {
 		$this->hr($line);
@@ -211,11 +214,11 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Writes rows of columns
+	 * Writes rows of columns.
 	 *
 	 * @param array $rows
-	 * @param string $separator (default "\t")
-	 * @return string
+	 * @param string $separator Defaults to `"\t"`.
+	 * @return void
 	 */
 	public function columns($rows, $separator = "\t") {
 		$lengths = array_reduce($rows, function($columns, $row) {
@@ -238,10 +241,10 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Add new lines to output stream
+	 * Add new lines to output stream.
 	 *
 	 * @param integer $number
-	 * @return string
+	 * @return integer
 	 */
 	public function nl($number = 1) {
 		return $this->out(null, $number);
@@ -252,18 +255,27 @@ class Command extends \lithium\core\Object {
 	 *
 	 * @param integer $length
 	 * @param integer $newlines
-	 * @return string
+	 * @return integer
 	 */
 	public function hr($length = 80, $newlines = 1) {
 		return $this->out(str_repeat('-', $length), $newlines);
 	}
 
 	/**
-	 * Stop execution with exit
+	 * Clears the entire screen.
+	 *
+	 * @return void
+	 */
+	public function clear() {
+		passthru(substr(PHP_OS, 0, 3) == 'WIN' ? 'cls' : 'clear');
+	}
+
+	/**
+	 * Stop execution with by exiting the script.
 	 *
 	 * @param integer $status
 	 * @param boolean $message
-	 * @return string
+	 * @return void
 	 */
 	public function stop($status = 0, $message = null) {
 		if (!is_null($message)) {
@@ -277,45 +289,78 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Will show basic help for the command
+	 * Show help generated from the documented code of the command.
 	 *
-	 * @return void
+	 * @return boolean
 	 */
 	public function help() {
 		$parent = new ReflectionClass("\lithium\console\Command");
 		$class = new ReflectionClass(get_class($this));
-
-		$params = array();
 		$template = $class->newInstance();
-		$properties = array_diff($class->getProperties(), $parent->getProperties());
-		$propertyFilter = function($prop) {
+
+		$filter = function($prop) {
 			return $prop->isPublic() && !preg_match('/^[A-Z]/', $prop->getName());
 		};
+		$properties = array_diff($class->getProperties(), $parent->getProperties());
+		$properties = array_filter($properties, $filter);
 
-		foreach ((array)array_filter($properties, $propertyFilter) as $property) {
-			$hint = null;
-			$val = $property->getValue($template);
+		$params = array();
 
-			if (!is_bool($val)) {
-				$hint = '=val';
-				$comment = Docblock::comment($property->getDocComment());
-				if (isset($comment['tags']['var'])) {
-					$hint = '=' . strtoupper($comment['tags']['var']);
-				}
-			}
+		foreach ($properties as $property) {
 			$name = str_replace('_', '-', Inflector::underscore($property->getName()));
-			$params[] = sprintf('[--%s%s]', $name, $hint);
+			$default = $property->getValue($template);
+
+			$comment = Docblock::comment($property->getDocComment());
+			$description = str_replace("\n", ' ', $comment['description']);
+			$type = isset($comment['tags']['var']) ? strtok($comment['tags']['var'], ' ') : null;
+
+			$usage = $type == 'boolean' ? "--{$name}" : "--{$name}=" . strtoupper($name);
+
+			$params[] = compact('name', 'default', 'description', 'type', 'usage');
 		}
 
-		// Show parameters as well
-		$className = explode("\\", $class->getName());
-		$command = array_pop($className);
-		$this->out(sprintf(
-			'usage: lithium %s %s', $command, join(' ', $params)
-		), 2);
+		$this->out('USAGE');
+		$this->out(sprintf("    li3 %s%s [ARGS]",
+			$this->request->params['command'] ?: 'COMMAND',
+			array_reduce($params, function($a, $b) { return "{$a} {$b['usage']}"; })
+		));
 
+		$this->nl();
+		$this->out('DESCRIPTION');
 		$comment = Docblock::comment($class->getDocComment());
-		$this->out($comment['description']);
+		$this->out("    {$comment['description']}");
+
+		if ($params) {
+			$this->nl();
+			$this->out('OPTIONS');
+
+			foreach ($params as $param) {
+				$this->out("    {$param['usage']}");
+
+				if ($param['description']) {
+					$this->out("        {$param['description']}");
+				}
+				$this->nl();
+			}
+		}
+		if (!$this->request->params['command']) {
+			$this->nl();
+			$this->out('COMMANDS');
+			$commands = Libraries::locate('command', null, array('recursive' => false));
+			$commands = array_unique($commands);
+
+			foreach ($commands as $command) {
+				$class = new ReflectionClass($command);
+				$comment = Docblock::comment($class->getDocComment());
+				$command = explode('\\', $command);
+
+				$this->out("    " .	Inflector::underscore(array_pop($command)));
+				$this->out("        " . str_replace("\n", ' ', $comment['description']));
+			}
+			$this->nl();
+			$this->out('See `li3 COMMAND help` for more information on a specific command.');
+		}
+		return true;
 	}
 }
 

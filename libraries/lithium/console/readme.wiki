@@ -56,7 +56,7 @@ Creating your own commands is very easy.
 Here's an example command:
 {{{<?php
 
-namespace app\extensions\commands;
+namespace app\extensions\command;
 
 class HelloWorld extends \lithium\console\Command {
 
@@ -94,7 +94,7 @@ and exposed to your command instance through its properties.
 Let's look at an example, going back to the `hello_world` command from earlier:
 {{{<?php
 
-namespace app\extensions\commands;
+namespace app\extensions\command;
 
 class HelloWorld extends \lithium\console\Command {
 

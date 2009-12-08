@@ -32,7 +32,7 @@ class Controller extends \lithium\core\Object {
 		$report = Dispatcher::run($group , $request->query + array(
 			'reporter' => 'html'
 		));
-		$filters = Libraries::locate('test.filters');
+		$filters = Libraries::locate('test.filter');
 		$classes = Libraries::locate('tests', null, array(
 			'filter' => '/cases|integration|functional/'
 		));
@@ -40,7 +40,7 @@ class Controller extends \lithium\core\Object {
 			'request' => $request, 'tree' => true
 		));
 
-		$template = Libraries::locate('test.reporter.templates', 'layout', array(
+		$template = Libraries::locate('test.reporter.template', 'layout', array(
 			'filter' => false, 'type' => 'file', 'suffix' => '.html.php',
 		));
 		include($template);

@@ -39,9 +39,9 @@ class GroupTest extends \lithium\test\Unit {
 		  'lithium\tests\cases\g11n\CatalogTest',
 		  'lithium\tests\cases\g11n\LocaleTest',
 		  'lithium\tests\cases\g11n\MessageTest',
-		  'lithium\tests\cases\g11n\catalog\adapters\CldrTest',
-		  'lithium\tests\cases\g11n\catalog\adapters\CodeTest',
-		  'lithium\tests\cases\g11n\catalog\adapters\GettextTest',
+		  'lithium\tests\cases\g11n\catalog\adapter\CldrTest',
+		  'lithium\tests\cases\g11n\catalog\adapter\CodeTest',
+		  'lithium\tests\cases\g11n\catalog\adapter\GettextTest',
 		);
 		$this->assertEqual($expected, $result);
 
@@ -50,9 +50,9 @@ class GroupTest extends \lithium\test\Unit {
 		  'lithium\tests\cases\g11n\CatalogTest',
 		  'lithium\tests\cases\g11n\LocaleTest',
 		  'lithium\tests\cases\g11n\MessageTest',
-		  'lithium\tests\cases\g11n\catalog\adapters\CldrTest',
-		  'lithium\tests\cases\g11n\catalog\adapters\CodeTest',
-		  'lithium\tests\cases\g11n\catalog\adapters\GettextTest',
+		  'lithium\tests\cases\g11n\catalog\adapter\CldrTest',
+		  'lithium\tests\cases\g11n\catalog\adapter\CodeTest',
+		  'lithium\tests\cases\g11n\catalog\adapter\GettextTest',
 		  'lithium\tests\cases\data\ModelTest'
 		);
 		$this->assertEqual($expected, $result);

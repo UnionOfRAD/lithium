@@ -16,13 +16,6 @@ namespace lithium\console;
 class Response extends \lithium\core\Object {
 
 	/**
-	 * A Request object
-	 *
-	 * @var lithium\console\Request
-	 **/
-	public $request;
-
-	/**
 	 * Output stream, STDOUT
 	 *
 	 * @var stream
@@ -37,6 +30,17 @@ class Response extends \lithium\core\Object {
 	public $error = null;
 
 	/**
+	 * Status code, most often used for setting an exit status.
+	 *
+	 * It should be expected that only status codes in the range of 0-255
+	 * can be properly evalutated.
+	 *
+	 * @var integer
+	 * @see lithium\console\Command
+	 */
+	public $status = 0;
+
+	/**
 	 * Construct Request object
 	 *
 	 * @param array $config
@@ -46,21 +50,17 @@ class Response extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function __construct($config = array()) {
-		$defaults = array(
-			'request' => null, 'output' => null, 'error' => null
-		);
+		$defaults = array('output' => null, 'error' => null);
 		$config += $defaults;
 
-		if (!empty($config['request'])) {
-			$this->request = $config['request'];
-		}
-
 		$this->output = $config['output'];
+
 		if (!is_resource($this->output)) {
 			$this->output = fopen('php://stdout', 'r');;
 		}
 
 		$this->error = $config['error'];
+
 		if (!is_resource($this->error)) {
 			$this->error = fopen('php://stderr', 'r');;
 		}

@@ -178,20 +178,20 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertTrue(count($result) > 30);
 
 		$expected = array(
-			'lithium\template\view\adapters\File', 'lithium\template\view\adapters\Simple'
+			'lithium\template\view\adapter\File', 'lithium\template\view\adapter\Simple'
 		);
-		$result = Libraries::locate('adapters.template.view');
+		$result = Libraries::locate('adapter.template.view');
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testServiceLocateAllCommands() {
-		$result = Libraries::locate('commands');
+		$result = Libraries::locate('command');
 		$this->assertTrue(count($result) > 10);
 
 		$expected = array(
-			'lithium\console\commands\docs\Generator', 'lithium\console\commands\docs\Todo'
+			'lithium\console\command\docs\Generator', 'lithium\console\command\docs\Todo'
 		);
-		$result = Libraries::locate('commands.docs');
+		$result = Libraries::locate('command.docs');
 		$this->assertEqual($expected, $result);
 	}
 
@@ -202,22 +202,22 @@ class LibrariesTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testServiceLocation() {
-		$this->assertNull(Libraries::locate('adapters', 'File'));
-		$this->assertNull(Libraries::locate('adapters.view', 'File'));
+		$this->assertNull(Libraries::locate('adapter', 'File'));
+		$this->assertNull(Libraries::locate('adapter.view', 'File'));
 		$this->assertNull(Libraries::locate('invalid_package', 'InvalidClass'));
 
-		$result = Libraries::locate('adapters.template.view', 'File');
-		$this->assertEqual('lithium\template\view\adapters\File', $result);
+		$result = Libraries::locate('adapter.template.view', 'File');
+		$this->assertEqual('lithium\template\view\adapter\File', $result);
 
-		$result = Libraries::locate('adapters.storage.cache', 'File');
-		$expected = 'lithium\storage\cache\adapters\File';
+		$result = Libraries::locate('adapter.storage.cache', 'File');
+		$expected = 'lithium\storage\cache\adapter\File';
 		$this->assertEqual($expected, $result);
 
-		$result = Libraries::locate('dataSources', 'Database');
+		$result = Libraries::locate('data.source', 'Database');
 		$expected = 'lithium\data\source\Database';
 		$this->assertEqual($expected, $result);
 
-		$result = Libraries::locate('dataSources.database', 'MySql');
+		$result = Libraries::locate('adapter.data.source.database', 'MySql');
 		$expected = 'lithium\data\source\database\adapter\MySql';
 		$this->assertEqual($expected, $result);
 
@@ -241,8 +241,8 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testServiceLocateCommand() {
-		$result = Libraries::locate('commands.docs', 'Generator');
-		$expected = 'lithium\console\commands\docs\Generator';
+		$result = Libraries::locate('command.docs', 'Generator');
+		$expected = 'lithium\console\command\docs\Generator';
 		$this->assertEqual($expected, $result);
 	}
 

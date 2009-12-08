@@ -13,6 +13,10 @@ use \lithium\util\collection\Filters;
 /**
  * Base class in Lithium hierarchy, from which all other dynamic classes inherit.
  *
+ * Options defined:
+ *  - 'init' `boolean` Controls constructor behaviour for calling the _init method. If false the
+ *    method is not called, otherwise it is. Defaults to true.
+ *
  */
 class Object {
 
@@ -24,6 +28,11 @@ class Object {
 	 */
 	protected $_config = array();
 
+	/**
+	 * Holds an array of values that should be processed on initialisation.
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array();
 
 	protected $_methodFilters = array();
@@ -32,6 +41,11 @@ class Object {
 
 	protected static $_parents = array();
 
+	/**
+	 * Initialises properties, unless supplied configuration options change the default behaviour.
+	 *
+	 * @return object
+	 */
 	public function __construct($config = array()) {
 		$defaults = array('init' => true);
 		$this->_config = (array)$config + $defaults;
@@ -122,6 +136,25 @@ class Object {
 			default:
 				return call_user_func_array(array(&$this, $method), $params);
 		}
+	}
+
+	/**
+	 * PHP magic method used in conjunction with `var_export()` to allow objects to be
+	 * re-instantiated with their pre-existing properties and values intact. This method can be
+	 * called statically on any class that extends `Object` to return an instance of it.
+	 *
+	 * @param array $data An array of properties and values with which to re-instantiate the object.
+	 *              These properties can be both public and protected.
+	 * @return object Returns an instance of the requested object with the given properties set.
+	 */
+	public static function __set_state($data) {
+		$class = get_called_class();
+		$object = new $class();
+
+		foreach ($data as $property => $value) {
+			$object->{$property} = $value;
+		}
+		return $object;
 	}
 
 	/**

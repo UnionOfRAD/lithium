@@ -9,112 +9,113 @@
 namespace lithium\console;
 
 /**
- * Holds current request from console
+ * The `Request` class reprents a console request and holds information about it's
+ * environment as well as passed arguments.
  *
- *
- **/
+ * @see lithium\console\Dispatcher
+ */
 class Request extends \lithium\core\Object {
 
 	/**
-	 * Enviroment variables
-	 *  - pwd path to where script is running
-	 *  - working current directory
+	 * Arguments for the request.
 	 *
 	 * @var array
-	 **/
-	public $env = array();
-
-	/**
-	 * Arguments from the console
-	 *
-	 * @var array
-	 **/
+	 */
 	public $args = array();
 
 	/**
-	 * Params from router
+	 * Parameters parsed from arguments.
 	 *
 	 * @var array
-	 **/
+	 * @see lithium\console\Router
+	 */
 	public $params = array(
-		'command' => null, 'action' => 'run',
-		'passed' => array(), 'named' => array()
+		'command' => null,
+		'action' => 'run',
+		'passed' => array(),
+		'named' => array()
 	);
 
 	/**
-	 * Input stream, STDIN
+	 * Input (STDIN).
 	 *
-	 * @var stream
-	 **/
-	public $input = null;
+	 * @var resource
+	 */
+	public $input;
 
 	/**
-	 * Construct Request object
+	 * Enviroment variables.
 	 *
-	 * @param array $config
-	 *              - init boolean runs _init method
-	 *               [default] false
-	 *              - args array
-	 *               [default] empty
-	 *              - env array
-	 *               [default] working => LITHIUM_APP_PATH
-	 *              - input stream
+	 * @var array
+	 **/
+	protected $_env = array();
+
+	/**
+	 * Auto configuration
 	 *
-	 * @return void
+	 * @var array
 	 */
+	protected $_autoConfig = array('env' => 'merge');
+
 	public function __construct($config = array()) {
-		$config += array(
-			'init' => false,
-			'argv' => array(),
-			'args' => array(),
-			'env' => array(),
-			'input' => null,
-		);
-
-		if (!empty($_SERVER['argv'])) {
-			$this->args += $_SERVER['argv'];
-		}
-
-		$this->args += $config['argv'];
-
-		$this->env['working'] = LITHIUM_APP_PATH;
-
-		if (!empty($_SERVER['PWD'])) {
-			$this->env['working'] = $_SERVER['PWD'];
-		}
-		$working = array_search('-working', $this->args);
-
-		if ($working && !empty($this->args[$working])) {
-			$this->env['working'] = $this->args[$working + 1];
-			$this->args = array_slice($this->args, 3);
-		}
-		$this->args = $config['args'] + $this->args;
-		$this->env = $config['env'] + $this->env;
-		$this->input = $config['input'];
-
-		if (!is_resource($this->input)) {
-			$this->input = fopen('php://stdin', 'r');
-		}
+		$defaults = array('args' => array(), 'input' => null);
+		$config += $defaults;
+		parent::__construct($config);
 	}
 
 	/**
-	 * Return input
+	 * Initialize request object
 	 *
 	 * @return void
+	 */
+	protected function _init() {
+		$this->_env += (array)$_SERVER + (array)$_ENV;
+		$this->_env['working'] = getcwd() ?: null;
+		$argv = (array) $this->env('argv');
+		$this->_env['script'] = array_shift($argv);
+		$this->args += $argv + (array) $this->_config['args'];
+		$this->input = $this->_config['input'];
+
+		if (!is_resource($this->_config['input'])) {
+			$this->input = fopen('php://stdin', 'r');
+		}
+		parent::_init();
+	}
+
+	/**
+	 * Get environment variables.
 	 *
-	 **/
+	 * @param string $key
+	 * @return string|void
+	 */
+	public function env($key = null) {
+		if (!empty($this->_env[$key])) {
+			return $this->_env[$key];
+		}
+		if ($key === null) {
+			return $this->_env;
+		}
+		return null;
+	}
+
+	/**
+	 * Reads a line from input.
+	 *
+	 * @return string
+	 */
 	public function input() {
 		return fgets($this->input);
 	}
 
 	/**
-	 * Destructor to close streams
+	 * Return input
+	 * Destructor. Closes input.
 	 *
 	 * @return void
-	 *
-	 **/
+	 */
 	public function __destruct() {
 		fclose($this->input);
 	}
 }
+
 ?>

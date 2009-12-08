@@ -51,7 +51,7 @@ class View extends \lithium\core\Object {
 				continue;
 			}
 
-			if (!$class = Libraries::locate('adapters.template.view', $this->_config[$key])) {
+			if (!$class = Libraries::locate('adapter.template.view', $this->_config[$key])) {
 				throw new RuntimeException("Template adapter {$this->_config[$key]} not found");
 			}
 			$this->{'_' . $key} = new $class($this->_config);

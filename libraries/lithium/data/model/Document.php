@@ -50,7 +50,7 @@ use \Iterator;
  *
  * {{{echo $acme->name; // echoes 'Acme, Inc.'}}}
  *
- * However, accessing a field containing a data sets will return that data set wrapped in a
+ * However, accessing a field containing a data set will return that data set wrapped in a
  * sub-`Document` object., i.e.:
  *
  * {{{$employees = $acme->employees;
@@ -199,6 +199,18 @@ class Document extends \lithium\util\Collection {
 	}
 
 	/**
+	 * PHP magic method used when unset() is called on a `Document` instance. 
+	 * Use case for this would be when you wish to edit a document and remove a field, ie. :
+	 * {{{ $doc = Post::find($id); unset($doc->fieldName); $doc->save(); }}}
+	 * 
+	 * @param unknown_type $name
+	 * @return unknown_type
+	 */
+	public function __unset($name) {
+		unset($this->_items[$name]);
+	}
+	
+	/**
 	 * Rewinds the collection of sub-`Document`s to the beginning and returns the first one found.
 	 *
 	 * @return object Returns the first `Document` object instance in the collection.
@@ -289,11 +301,15 @@ class Document extends \lithium\util\Collection {
 	}
 
 	/**
-	 * Gets the raw data associated with this `Document`.
+	 * Gets the raw data associated with this `Document`, or single item if '$field` is defined.
 	 *
-	 * @return array Returns a raw array of `Document` data.
+	 * @param string $field if included will only return the named item
+	 * @return array Returns a raw array of `Document` data, or individual field value
 	 */
 	public function data($field = null) {
+		if ($field) {
+			return isset($this->_items[$field]) ? $this->_items[$field] : null;
+		}
 		return $this->to('array');
 	}
 

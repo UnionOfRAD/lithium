@@ -63,14 +63,14 @@ class Connections extends \lithium\core\StaticObject {
 	 *
 	 * For example:
 	 * {{{
-     * Connections::add('default', 'database', array(
+	 * Connections::add('default', 'database', array(
 	 *     'adapter' => 'MySql',
 	 *     'host' => 'localhost',
 	 *     'login' => 'root',
 	 *     'password' => '',
 	 *     'database' => 'my_blog'
 	 * ));
-     * }}}
+	 * }}}
 	 *
 	 * or
 	 *
@@ -131,13 +131,13 @@ class Connections extends \lithium\core\StaticObject {
 	 * $dbConnection = Connection::get('db', array('autoCreate' => false));
 	 * }}}
 	 *
-	 * @param string $name The name of the connection to get, as defned in the first parameter of
+	 * @param string $name The name of the connection to get, as defined in the first parameter of
 	 *               `add()`, when the connection was initially created.
 	 * @param array $options Options to use when returning the connection:
-	 *              - `'config'`: If `true`, returns an array representing the connection's internal
-	 *                 configuration, instead of the connection itself.
-	 *              - `'autoCreate'`: If `false`, the connection object is only returned if it has
-	 *                already been instanted by a previous call.
+	 *        - `'autoCreate'`: If `false`, the connection object is only returned if it has
+	 *          already been instantiated by a previous call.
+	 *        - `'config'`: If `true`, returns an array representing the connection's internal
+	 *          configuration, instead of the connection itself.
 	 * @return mixed A configured instance of the connection, or an array of the configuration used.
 	 */
 	public static function get($name = null, $options = array()) {
@@ -183,12 +183,14 @@ class Connections extends \lithium\core\StaticObject {
 	protected static function _build($config) {
 		$class = $config['adapter'];
 		if (empty($config['adapter'])) {
-			$config['adapter'] = $config['type'];
-			$config['type'] = null;
+			$class = Libraries::locate("data.source", $config['type']);
+		} else {
+			$class = Libraries::locate("adapter.data.source.{$config['type']}", $config['adapter']);
 		}
-		$class = Libraries::locate("dataSources.{$config['type']}", $config['adapter']);
 		if (!$class) {
-			throw new Exception("{$config['type']} adapter {$config['adapter']} could not be found");
+			throw new Exception(
+				"{$config['type']} adapter {$config['adapter']} could not be found"
+			);
 		}
 		return new $class($config);
 	}

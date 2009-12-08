@@ -718,6 +718,81 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertFalse($request->is('get'));
 		$this->assertFalse($request->is('post'));
 	}
+
+	public function testRequestTypeIsMobile() {
+		$request = new Request(array('env' => array(
+			'HTTP_USER_AGENT' => 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en)'
+		)));
+		$this->assertTrue($request->is('mobile'));
+	}
+
+	public function testUrlFromGet() {
+		$_GET['url'] = 'posts/1';
+		$request = new Request();
+
+		$expected = 'posts/1';
+		$result = $request->url;
+		$this->assertEqual($expected, $result);
+
+		unset($_GET);
+	}
+
+	public function testUrlFromConstructor() {
+		$request = new Request(array('url' => 'posts/1'));
+
+		$expected = 'posts/1';
+		$result = $request->url;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testDataFromConstructor() {
+		$request = new Request(array('data' => array('name' => 'bob')));
+
+		$expected = array('name' => 'bob');
+		$result = $request->data;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testQueryFromConstructor() {
+		$request = new Request(array('query' => array('page' => 1)));
+
+		$expected = array('page' => 1);
+		$result = $request->query;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testMethodOverrideFromData() {
+		$_POST['_method'] = 'put';
+		$request = new Request();
+
+		$result = $request->is('put');
+		$this->assertTrue($result);
+
+		unset($_POST);
+
+		$request = new Request(array('data' => array('_method' => 'put')));
+
+		$result = $request->is('put');
+		$this->assertTrue($result);
+	}
+	
+	public function testMergeMobileDetectors() {
+		$request = new Request(array(
+			'env' => array('HTTP_USER_AGENT' => 'testMobile'),
+			'detectors' => array('mobile' => array('HTTP_USER_AGENT', array('testMobile')))
+		));
+		
+		$result = $request->is('mobile');
+		$this->assertTrue($result);
+		
+		$request = new Request(array(
+			'env' => array('HTTP_USER_AGENT' => 'iPhone'),
+			'detectors' => array('mobile' => array('HTTP_USER_AGENT', array('testMobile')))
+		));
+		
+		$result = $request->is('mobile');
+		$this->assertTrue($result);
+	}
 }
 
 ?>
