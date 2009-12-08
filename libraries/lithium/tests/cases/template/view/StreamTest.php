@@ -16,7 +16,7 @@ class StreamTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->_path = str_replace('\\', '/', LITHIUM_APP_PATH);
-		file_put_contents($this->_path . '/tmp/tests/template.html.php', "
+		file_put_contents($this->_path . '/resources/tmp/tests/template.html.php', "
 			<?php echo 'this is unescaped content'; ?" . ">
 			<?='this is escaped content'; ?" . ">
 			<?=\$alsoEscaped; ?" . ">
@@ -33,7 +33,7 @@ class StreamTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
-		unlink($this->_path . '/tmp/tests/template.html.php');
+		unlink($this->_path . '/resources/tmp/tests/template.html.php');
 	}
 
 	public function testPathFailure() {
@@ -46,7 +46,7 @@ class StreamTest extends \lithium\test\Unit {
 	public function testStreamContentRewriting() {
 		$stream = new Stream();
 		$null = null;
-		$path = 'lithium.template://' . $this->_path . '/tmp/tests/template.html.php';
+		$path = 'lithium.template://' . $this->_path . '/resources/tmp/tests/template.html.php';
 
 		$stream->stream_open($path, null, null, $null);
 		$result = array_map('trim', explode("\n", trim($stream->stream_read(999))));

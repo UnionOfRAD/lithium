@@ -197,9 +197,7 @@ class CouchDb extends \lithium\data\source\Http {
 			if (empty($path) && empty($conditions)) {
 				$path = '/_all_docs';
 			}
-
-			$result = json_decode($conn->get($table . $path, $conditions));
-			return !(isset($ret->error) && $ret->read = 'missing') ? $result : null;
+			return json_decode($conn->get($table . $path, $conditions + $limit + $order));
 		});
 	}
 
@@ -360,7 +358,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return array
 	 */
 	public function limit($limit, $context) {
-		return $limit ?: array();
+		return compact('limit') ?: array();
 	}
 
 	/**
@@ -371,7 +369,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return array
 	 */
 	function order($order, $context) {
-		return $order ?: array();
+		return (array) $order ?: array();
 	}
 }
 ?>

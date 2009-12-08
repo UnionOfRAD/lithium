@@ -94,7 +94,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 				$callable = $self::invokeMethod('_callable', array($request, $params, $options));
 				return $self::invokeMethod('_call', array($callable, $request, $params));
 			} catch (\UnexpectedValueException $e) {
-				echo($e->getMessage() . "\n");
+				return (object) array('status' => $e->getMessage() . "\n");
 			}
 		});
 	}
