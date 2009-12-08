@@ -38,7 +38,7 @@ class Code extends \lithium\g11n\catalog\adapter\Base {
 	 * @param array $config Available configuration options are:
 	 *        - `'path'`: The path to the directory holding the data.
 	 *        - `'scope'`: Scope to use.
-	 * @return void
+	 * @return object
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('path' => null, 'scope' => null);

@@ -10,12 +10,21 @@ namespace lithium\tests\mocks\console;
 
 class MockDispatcherCommand extends \lithium\console\Command {
 
+	protected $_classes = array(
+		'response' => '\lithium\tests\mocks\console\MockResponse'
+	);
+
+	public function testRun() {
+		$this->response->testAction = __FUNCTION__;
+	}
+
 	public function run($param = null) {
-		return 'test run' . $param;
+		$this->response->testAction = __FUNCTION__;
+		$this->response->testParam = $param;
 	}
 
 	public function testAction() {
-		return 'test action';
+		$this->response->testAction = __FUNCTION__;
 	}
 }
 

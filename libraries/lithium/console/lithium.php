@@ -39,13 +39,13 @@ if ($app) {
 
 	if (!include LITHIUM_LIBRARY_PATH . '/lithium/core/Libraries.php') {
 		$message  = "Lithium core could not be found.  Check the value of `LITHIUM_LIBRARY_PATH` ";
-		$message .= "in config/bootstrap.php. It should point to the directory containing your ";
-		$message .= "/libraries directory.";
+		$message .= "in `config/bootstrap.php`. It should point to the directory containing your ";
+		$message .= "`/libraries` directory.";
 		trigger_error($message, E_USER_ERROR);
 	}
 	Libraries::add('lithium');
 }
 
-exit(Dispatcher::run());
+exit(Dispatcher::run()->status);
 
 ?>

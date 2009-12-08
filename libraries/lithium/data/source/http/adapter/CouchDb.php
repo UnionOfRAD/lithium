@@ -44,6 +44,9 @@ class CouchDb extends \lithium\data\source\Http {
 	/**
 	 * Deconstruct
 	 *
+	 * Ensures that the server connection is closed and resources are freed when the adapter
+	 * instance is destroyed.
+	 *
 	 * @return void
 	 */
 	public function __destruct() {
@@ -125,12 +128,14 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * name
+	 * Quotes identifiers.
 	 *
-	 * @param string $name
-	 * @return string
+	 * CouchDb does not need identifiers quoted, so this method simply returns the identifier.
+	 *
+	 * @param string $name The identifier to quote.
+	 * @return string The quoted identifier.
 	 */
-	public function name($name) {
+		public function name($name) {
 		return $name;
 	}
 

@@ -8,10 +8,10 @@
 
 namespace lithium\util\audit\logger\adapter;
 
-use \SplFileInfo;
-use \DirectoryIterator;
+use \lithium\util\String;
+use \lithium\storage\Cache as Writer;
 
-class File extends \lithium\core\Object {
+class Cache extends \lithium\core\Object {
 
 	/**
 	 * Class constructor
@@ -19,23 +19,29 @@ class File extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function __construct($config = array()) {
-		$defaults = array('path' => LITHIUM_APP_PATH . '/tmp/logs');
+		$defaults = array(
+			'config' => null,
+			'expiry' => '+999 days',
+			'key' => 'log_{:type}_{:timestamp}'
+		);
 		parent::__construct($config + $defaults);
 	}
 
 	/**
-	 * Appends $data to file $type.
+	 * Appends `$data` to file `$type`.
 	 *
 	 * @param string $type
 	 * @param string $message
 	 * @return boolean True on successful write, false otherwise
 	 */
 	public function write($type, $message) {
-		$path = $this->_config['path'];
+		$config = $this->_config;
 
-		return function($self, $params, $chain) use (&$path) {
-			extract($params);
-			return file_put_contents("$path/$type.log", "{$message}\n", FILE_APPEND);
+		return function($self, $params, $chain) use ($config) {
+			$params += array('timestamp' => strtotime('now'));
+			$key = $config['key'];
+			$key = is_callable($key) ? $key($params) : String::insert($key, $params);
+			Writer::write($config['config'], $key, $params['message'], $config['expiry']);
 		};
 	}
 }

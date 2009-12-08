@@ -154,7 +154,9 @@ class CacheTest extends \lithium\test\Unit {
 		$expected = new Collection(array('items' => $config));
 		$this->assertEqual($expected, $result);
 
-		$result = Cache::write('default', 'some_key', 'some_data', '+1 minute', function() { return false; });
+		$result = Cache::write('default', 'some_key', 'some_data', '+1 minute', function() {
+			return false;
+		});
 		$this->assertFalse($result);
 
 		$anonymous = function() use (&$config) {

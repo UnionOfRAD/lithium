@@ -121,10 +121,14 @@ class Libraries {
 	 * @param string $name Library name, i.e. `'app'`, `'lithium'`, `'pear'` or `'solar'`.
 	 * @param array $options Specifies where the library is in the filesystem, and how classes
 	 *              should be loaded from it.  Allowed keys are:
-	 *              - `'path'`: The directory containing the library.
-	 *              - `'loader'`: An auto-loader method associated with the library, if any
 	 *              - `'bootstrap'`: A file path (relative to `'path'`) to a bootstrap script that
 	 *                should be run when the library is added.
+	 *              - `'defer'`: If true, indicates that, when locating classes, this library should
+	 *                defer to other libraries in order of preference.
+	 *              - `'includePath'`: If `true`, appends the absolutely-resolved value of `'path'`
+	 *                to the PHP include path.
+	 *              - `'loader'`: An auto-loader method associated with the library, if any
+	 *              - `'path'`: The directory containing the library.
 	 *              - `'prefix'`: The class prefix this library uses, i.e. `'lithium\'`, `'Zend_'`
 	 *                or `'Solar_'`.
 	 *              - `'suffix'`: Gets appended to the end of the file name. For example, most
@@ -135,10 +139,6 @@ class Libraries {
 	 *                are interpreted as the pattern and replacement for a regex, or an
 	 *                anonymous function, which receives the class name as a parameter, and
 	 *                returns a file path as output.
-	 *              - `'defer'`: If true, indicates that, when locating classes, this library should
-	 *                defer to other libraries in order of preference.
-	 *              - `'includePath'`: If `true`, appends the absolutely-resolved value of `'path'`
-	 *                to the PHP include path.
 	 * @return array Returns the resulting set of options created for this library.
 	 */
 	public static function add($name, $config = array()) {

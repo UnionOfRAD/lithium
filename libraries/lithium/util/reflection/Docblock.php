@@ -28,7 +28,7 @@ class Docblock extends \lithium\core\StaticObject {
 	public static function comment($description) {
 		$text = null;
 		$tags = array();
-		$description = trim(preg_replace('/^(\s*\/\*\*|\s*\*\/|\s+\* ?)/m', '', $description));
+		$description = trim(preg_replace('/^(\s*\/\*\*|\s*\*\/|\s*\* ?)/m', '', $description));
 
 		if (!(preg_match_all('/\n@(\w+)\s+/', $description, $tagNames))) {
 			return compact('description', 'text', 'tags');

@@ -46,7 +46,7 @@ class FormTest extends \lithium\test\Unit {
 		$this->context = new MockFormRenderer();
 		$this->form = new Form(array('context' => $this->context));
 	}
-	
+
 	public function tearDown() {
 		foreach ($this->_routes as $route) {
 			Router::connect($route);
@@ -329,7 +329,7 @@ class FormTest extends \lithium\test\Unit {
 			'type' => 'text', 'name' => 'passwd'
 		)));
 	}
-	
+
 	public function testMultiSelect() {
 		$expected = array(
 			'select' => array('name' => 'numbers[]', 'multiple' => 'multiple'),
@@ -349,7 +349,7 @@ class FormTest extends \lithium\test\Unit {
 			'multiple' => true
 		));
 		$this->assertTags($result, $expected);
-		
+
 		$expected = array(
 			'select' => array('name' => 'numbers[]', 'multiple' => 'multiple', 'size' => 5),
 			array('option' => array('value' => '1')),
@@ -365,7 +365,6 @@ class FormTest extends \lithium\test\Unit {
 			'size' => 5
 		));
 		$this->assertTags($result, $expected);
-		
 	}
 	
 	public function testMultiselected() {		

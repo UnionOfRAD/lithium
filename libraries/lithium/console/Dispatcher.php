@@ -73,7 +73,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @param object $request An instance of a request object with HTTP request information.  If
 	 *        null, an instance will be created.
 	 * @param array $options
-	 * @return object
+	 * @return object The command action result which is an instance of `lithium\console\Response`.
 	 * @todo Add exception-handling/error page rendering
 	 */
 	public static function run($request = null, $options = array()) {
@@ -89,13 +89,10 @@ class Dispatcher extends \lithium\core\StaticObject {
 			$request = $request ?: new $classes['request']($options['request']);
 			$request->params = $router::parse($request);
 			$params = $self::invokeMethod('_applyRules', array($request->params));
+
 			try {
 				$callable = $self::invokeMethod('_callable', array($request, $params, $options));
-				try {
-					return $self::invokeMethod('_call', array($callable, $request, $params));
-				} catch (\UnexpectedValueException $e) {
-					echo($e->getMessage() . "\n");
-				}
+				return $self::invokeMethod('_call', array($callable, $request, $params));
 			} catch (\UnexpectedValueException $e) {
 				echo($e->getMessage() . "\n");
 			}
