@@ -37,6 +37,7 @@ class GettextTest extends \lithium\test\Unit {
 				unlink($path);
 			}
 		}
+		rmdir($this->_path);
 	}
 
 	function testWriteReadMessageTemplate() {
