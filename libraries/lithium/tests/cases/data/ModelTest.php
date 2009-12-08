@@ -224,7 +224,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertTrue(!empty($result));
 
 		$expected = array(
-			'title' => 'please enter a title',
+			'title' => array('please enter a title'),
 			'email' => array('email is empty', 'email is not valid')
 		);
 		$result = $post->errors();
@@ -250,13 +250,12 @@ class ModelTest extends \lithium\test\Unit {
 		$post = MockPostForValidates::create(array('title' => 'new post', 'email' => 'something'));
 
 		$result = $post->validates();
-		$this->assertTrue($result === false);
-		$result = $post->errors();
-		$this->assertTrue(!empty($result));
+		$this->assertIdentical(false, $result);
 
-		$expected = array(
-			'email' => array('email is not valid')
-		);
+		$result = $post->errors();
+		$this->assertTrue($result);
+
+		$expected = array('email' => array('email is not valid'));
 		$result = $post->errors();
 		$this->assertEqual($expected, $result);
 	}
