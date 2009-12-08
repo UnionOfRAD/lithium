@@ -346,8 +346,7 @@ class Document extends \lithium\util\Collection {
 		if ($id) {
 			$id = (array) $id;
 			$model = $this->_model;
-			$keys = (array) $model::meta('key');
-			foreach ($keys as $i => $key) {
+			foreach ((array) $model::meta('key') as $i => $key) {
 				$this->__set($key, $id[$i]);
 			}
 		}
@@ -378,13 +377,15 @@ class Document extends \lithium\util\Collection {
 	 *
 	 * @param string $classType The type of class to create, either `'record'` or `'recordSet'`.
 	 * @param array $items
+	 * @param array $options
 	 * @return object Returns a new `Document` object instance.
 	 */
-	protected function _record($classType, $items) {
+	protected function _record($classType, $items, $options = array()) {
 		$parent = $this;
 		$model = $this->_model;
 		$exists = $this->_exists;
-		return new $this->_classes[$classType](compact('model', 'items', 'parent', 'exists'));
+		$options += compact('model', 'items', 'parent', 'exists');
+		return new $this->_classes[$classType]($options);
 	}
 
 	/**
