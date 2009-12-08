@@ -286,11 +286,8 @@ class Form extends \lithium\template\Helper {
 		if ($empty) {
 			$list = array('' => ($empty === true) ? '' : $empty) + $list;
 		}
-
-		$options = array_diff_key($options, $defaults);
 		$startTemplate = ($options['multiple']) ? 'select-multi-start' : 'select-start';
 		$output = $this->_render(__METHOD__, $startTemplate, compact('name', 'options'));
-		$base = $options;
 
 		foreach ($list as $value => $title) {
 			$selected = false;
