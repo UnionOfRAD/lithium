@@ -66,11 +66,28 @@ class RouterTest extends \lithium\test\Unit {
 		);
 		$result = Router::parse(new Request(array(
 			'args' => array(
-				'test',
+				'test', 'run',
 				'--case=lithium.tests.cases.console.RouterTest'
 			)
 		)));
+		$this->assertEqual($expected, $result);
 
+		$expected = array(
+			'command' => 'test',
+			'action' => 'run',
+			'passed' => array(),
+			'named' => array(
+				'case' => 'lithium.tests.cases.console.RouterTest',
+				'phase' => 'drowning'
+			)
+		);
+		$result = Router::parse(new Request(array(
+			'args' => array(
+				'test',
+				'--case=lithium.tests.cases.console.RouterTest',
+				'--phase=drowning'
+			)
+		)));
 		$this->assertEqual($expected, $result);
 	}
 }

@@ -21,35 +21,35 @@ class Response extends \lithium\http\Base {
 	public $status = array('code' => 200, 'message' => 'OK');
 
 	/**
-	 * headers
+	 * Headers.
 	 *
 	 * @var array
 	 */
 	public $headers = array();
 
 	/**
-	 * Content Type
+	 * Content Type.
 	 *
 	 * @var string
 	 */
 	public $type = 'text/html';
 
 	/**
-	 * Character Set
+	 * Character Set.
 	 *
 	 * @var string
 	 */
 	public $charset = 'UTF-8';
 
 	/**
-	 * the body
+	 * The body.
 	 *
 	 * @var array
 	 */
 	public $body = array();
 
 	/**
-	 * Status codes
+	 * Status codes.
 	 *
 	 * @var array
 	 */
@@ -96,9 +96,9 @@ class Response extends \lithium\http\Base {
 	);
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 *
-	 * @return void
+	 * @return object
 	 */
 	public function __construct($config = array()) {
 		if (!empty($config['message'])) {
@@ -176,7 +176,7 @@ class Response extends \lithium\http\Base {
 	}
 
 	/**
-	* Return the response as a string
+	* Return the response as a string.
 	*
 	* @return string
 	*/
@@ -187,7 +187,7 @@ class Response extends \lithium\http\Base {
 	}
 
 	/**
-	* Decodes based on transfer encoding body
+	* Decodes based on transfer encoding body.
 	*
 	* @todo replace with stream wrapper dechunk
 	* @return string

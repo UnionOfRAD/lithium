@@ -14,3 +14,5 @@ class MockUnitTest extends \lithium\test\Unit {
 		$this->assertTrue(true);
 	}
 }
+
+?>

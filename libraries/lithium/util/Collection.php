@@ -8,6 +8,10 @@
 
 namespace lithium\util;
 
+/**
+ * Collection class to implement ArrayAccess, Iterator, and Countable
+ *
+ */
 class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator, \Countable {
 
 	/**
@@ -25,13 +29,27 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 */
 	protected $_valid = false;
 
+	/**
+	 * undocumented variable
+	 *
+	 * @var array
+	 */
 	protected $_classes = array(
-		'record' => '\lithium\model\Record',
 		'media' => '\lithium\http\Media'
 	);
 
+	/**
+	 * undocumented variable
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array('items');
 
+	/**
+	 * undocumented function
+	 *
+	 * @return void
+	 */
 	protected function _init() {
 		parent::_init();
 		unset($this->_config['items']);
@@ -44,10 +62,10 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @param array $parameters
 	 * @param array $options Specifies options for how to run the given method against the object
 	 *              collection. The available options are:
+	 *              - `'collect'`: If `true`, the results of this method call will be returned
+	 *                wrapped in a new Collection object or subclass.
 	 *              - `'merge'`: Used primarily if the method being invoked returns an array.  If
 	 *                set to `true`, merges all results arrays into one.
-	 *              - `'collect'`: If `true`, the results of this method call will be returned
-	 *              wrapped in a new Collection object or subclass.
 	 * @todo Implement filtering.
 	 * @return mixed
 	 */
@@ -348,7 +366,9 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return integer Number of items.
 	 */
 	public function count() {
-		return count($this->_items);
+		$count = iterator_count($this);
+		$this->rewind();
+		return $count;
 	}
 
 	/**

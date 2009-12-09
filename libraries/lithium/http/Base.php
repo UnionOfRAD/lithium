@@ -12,7 +12,7 @@ namespace lithium\http;
  * Base class for `lithium\http\Request` and `lithium\http\Response`. Implements basic protocol
  * handling for HTTP-based transactions.
  */
-class Base {
+class Base extends \lithium\core\Object {
 
 	/**
 	 * The full protocol: HTTP/1.1
@@ -43,7 +43,7 @@ class Base {
 	public $body = array();
 
 	/**
-	 * Add a header to rendered output, or return a single header or full header list
+	 * Add a header to rendered output, or return a single header or full header list.
 	 *
 	 * @param string $key
 	 * @param string $value
@@ -82,7 +82,7 @@ class Base {
 	}
 
 	/**
-	 * Add body parts
+	 * Add body parts.
 	 *
 	 * @return array
 	 */

@@ -9,7 +9,7 @@
 namespace lithium\tests\cases\template;
 
 use \lithium\template\View;
-use \lithium\template\view\adapters\Simple;
+use \lithium\template\view\adapter\Simple;
 
 class TestViewClass extends \lithium\template\View {
 

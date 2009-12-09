@@ -10,7 +10,7 @@ namespace lithium\tests\cases\core;
 
 use \lithium\util\Collection;
 use \lithium\core\Adaptable;
-use \lithium\storage\cache\adapters\Memory;
+use \lithium\storage\cache\adapter\Memory;
 use \lithium\tests\mocks\core\MockAdapter;
 
 class AdaptableTest extends \lithium\test\Unit {

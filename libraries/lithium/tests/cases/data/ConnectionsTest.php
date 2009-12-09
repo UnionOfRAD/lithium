@@ -106,6 +106,22 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$result = Connections::get('stream-test');
 		$this->assertTrue($result instanceof \lithium\data\source\Http);
 	}
+/*
+	public function testErrorExceptions() {
+		$config = array(
+			'adapter' => 'None',
+			'type' => 'Error'
+		);
+		Connections::add('NoConnection', 'Error', $config);
+		$result = false;
+		try {
+			Connections::get('NoConnection');
+		} catch(Exception $e) {
+			$result = true;
+		}
+		$this->assertTrue($result, 'Exception is not thrown');
+	}
+*/
 }
 
 ?>

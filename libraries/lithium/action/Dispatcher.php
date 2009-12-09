@@ -16,15 +16,15 @@ use \lithium\core\Environment;
 
 /**
  * `Dispatcher` is the outermost layer of the framework (including app), responsible for both
- * recieving the initial http request and sending back the response at the end of the cycle.
+ * receiving the initial http request and sending back the response at the end of the cycle.
  *
  * After interpreting the request and making a `Request` instance, it initiates the correct
  * `Controller` and passes it the `Request` object. When the `Controller` returns a `Response`,
  * `Dispatcher`, where the headers and content are rendered and sent to the browser.
  *
- * @see lithium\action\request
- * @see lithium\action\response
- * @see lithium\action\controller
+ * @see lithium\action\Request
+ * @see lithium\action\Response
+ * @see lithium\action\Controller
  */
 class Dispatcher extends \lithium\core\StaticObject {
 
@@ -42,6 +42,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 
 	/**
 	 * Contains pre-process format strings for changing Dispatcher's behavior based on 'rules'.
+	 *
 	 * Each key in the array represents a 'rule'; if a key that matches the rule is present (and
 	 * not empty) in a route, (i.e. the result of `lithium\http\Router::parse()`) then the rule's
 	 * value will be applied to the route before it is dispatched.  When applying a rule, any array
@@ -62,8 +63,8 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * Used to set configuration parameters for the Dispatcher.
 	 *
 	 * @param array $config
-	 * @return array|void If no parameters are passed, returns an associative array with the
-	 *         current configuration, otherwise returns null.
+	 * @return array If no parameters are passed, returns an associative array with the current
+	 *         configuration, otherwise returns `null`.
 	 */
 	public static function config($config = array()) {
 		if (empty($config)) {
@@ -78,14 +79,16 @@ class Dispatcher extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Dispatches a request based on a request object (an instance of `lithium\http\Request`).  If
+	 * Dispatches a request based on a request object (an instance of `lithium\http\Request`). If
 	 * `$request` is null, a new request object is instantiated based on the value of the
 	 * `'request'` key in the `$_classes` array.
 	 *
 	 * @param object $request An instance of a request object with HTTP request information.  If
-	 *        null, an instance will be created.
+	 *        `null`, an instance will be created.
 	 * @param array $options
-	 * @return object
+	 * @return mixed Returns the value returned from the callable object retrieved from
+	 *         `Dispatcher::_callable()`, which is either a string or an instance of
+	 *         `lithium\action\Response`.
 	 * @todo Add exception-handling/error page rendering
 	 */
 	public static function run($request = null, $options = array()) {
@@ -93,9 +96,9 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$options += $defaults;
 		$classes = static::$_classes;
 		$params = compact('request', 'options');
-		$m = __METHOD__;
+		$method = __METHOD__;
 
-		return static::_filter($m, $params, function($self, $params, $chain) use ($classes) {
+		return static::_filter($method, $params, function($self, $params, $chain) use ($classes) {
 			extract($params);
 
 			$router = $classes['router'];
@@ -128,15 +131,14 @@ class Dispatcher extends \lithium\core\StaticObject {
 			if (class_exists($class)) {
 				return new $class(compact('request'));
 			}
-			throw new Exception("Controller {$class} not found");
+			throw new Exception("Controller {$controller} not found");
 		});
 	}
 
 	protected static function _call($callable, $request, $params) {
 		$params = compact('callable', 'request', 'params');
 		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
-			$callable = $params['callable'];
-			if (is_callable($callable)) {
+			if (is_callable($callable = $params['callable'])) {
 				return $callable($params['request'], $params['params']);
 			}
 			throw new Exception('Result not callable');
@@ -150,7 +152,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * matching a rule is present unless the rule check passes.
 	 *
 	 * @param array $params An array of route parameters to which rules will be applied.
-	 * @return array Returns the $params array with formatting rules applied to array values.
+	 * @return array Returns the `$params` array with formatting rules applied to array values.
 	 */
 	protected static function _applyRules($params) {
 		$result = array();

@@ -9,7 +9,6 @@
 namespace lithium\test;
 
 use \Exception;
-use \lithium\util\Set;
 use \lithium\util\String;
 use \lithium\util\Validator;
 use \lithium\util\audit\Debugger;
@@ -21,7 +20,7 @@ use \lithium\util\reflection\Inspector;
  * Most assertions take an expected result, a received result, and a message (to describe the
  * failure) as parameters.
  *
- * Available assertions are (see `assert&lt;assertion-name&gt;` methods for details): Equal, False, Identical,
+ * Available assertions are (see `assert<assertion-name>` methods for details): Equal, False, Identical,
  * NoPattern, NotEqual, Null, Pattern, Tags, True.
  *
  * If an assertion is expected to produce an exception, the `expectException` method should be
@@ -88,24 +87,34 @@ class Unit extends \lithium\core\Object {
 	 * Returns the class name that is the subject under test for this test case.
 	 *
 	 * @return string
-	 * @todo This clearly needs refactoring to remove $map
 	 */
 	public function subject() {
-		$map = array('lithium\tests\cases' => 'lithium', 'app\tests\cases' => 'app');
-		$class = str_replace(array_keys($map), array_values($map), get_class($this));
-		return preg_replace('/Test$/', '', $class);
+		return preg_replace('/Test$/', '', str_replace('tests\\cases\\', '', get_class($this)));
 	}
 
+	/**
+	 * Return test methods to run
+	 *
+	 * @return array
+	 */
 	public function methods() {
 		static $methods;
 		return $methods ?: $methods = array_values(preg_grep('/^test/', get_class_methods($this)));
 	}
 
-	public function setUp() {
-	}
+	/**
+	 * Setup method run before every test method. override in subclasses
+	 *
+	 * @return void
+	 */
+	public function setUp() {}
 
-	public function tearDown() {
-	}
+	/**
+	 * Teardown method run after every test method. override in subclasses
+	 *
+	 * @return void
+	 */
+	public function tearDown() {}
 
 	/**
 	 * Subclasses should use this method to set conditions that, if failed, terminate further
@@ -145,7 +154,18 @@ class Unit extends \lithium\core\Object {
 		throw new Exception(String::insert($message, $trace));
 	}
 
+	/**
+	 * undocumented function
+	 *
+	 * @param string $expression
+	 * @param string $message
+	 * @param string $data
+	 * @return void
+	 */
 	public function assert($expression, $message = '{:message}', $data = array()) {
+		if (!is_string($message)) {
+			$message = '{:message}';
+		}
 		$trace = Debugger::trace(array('start' => 1, 'format' => 'array'));
 		$methods = $this->methods();
 		$i = 1;
@@ -252,7 +272,7 @@ class Unit extends \lithium\core\Object {
 	 * }}}
 	 *
 	 * {{{
-	 * $this->assertFalse(false, 'Zero value');
+	 * $this->assertFalse(false, 'Boolean false');
 	 * }}}
 	 * all evaluate to false.
 	 *
@@ -276,7 +296,7 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Tests a for result that does NOT match the expected regular expression pattern
+	 * Checks that the regular expression `$expected` is not matched in the result.
 	 *
 	 * @param mixed $expected
 	 * @param mixed $result
@@ -287,7 +307,7 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Tests a for result match in the expected regular expression pattern
+	 * Checks that the regular expression `$expected` is matched in the result.
 	 *
 	 * @param mixed $expected
 	 * @param mixed $result
@@ -443,10 +463,6 @@ class Unit extends \lithium\core\Object {
 				$this->assert(false, sprintf(
 					'{:message} - Item #%d / regex #%d failed: %s', $itemNum, $i, $description
 				));
-				// if ($fullDebug) {
-				// 	debug($string, true);
-				// 	debug($regex, true);
-				// }
 				return false;
 			}
 		}

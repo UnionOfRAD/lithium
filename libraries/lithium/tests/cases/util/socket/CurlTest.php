@@ -92,7 +92,7 @@ class CurlTest extends \lithium\test\Unit {
 		$this->assertTrue($stream->write(null));
 
 		$result = $stream->read();
-		$this->assertPattern("/^<!DOCTYPE/", $result);
+		$this->assertPattern("/^<!doctype/i", $result);
 	}
 }
 ?>

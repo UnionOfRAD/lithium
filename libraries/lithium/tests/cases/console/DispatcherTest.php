@@ -13,13 +13,15 @@ use \lithium\console\Request;
 
 class DispatcherTest extends \lithium\test\Unit {
 
+	protected $_backups = array();
+
 	public function setUp() {
-		$this->server = $_SERVER;
+		$this->_backups['_SERVER'] = $_SERVER;
 		$_SERVER['argv'] = array();
 	}
 
 	public function tearDown() {
-		$_SERVER = $this->server;
+		$_SERVER = $this->_backups['_SERVER'];
 	}
 
 	public function testEmptyConfigReturnRules() {
@@ -34,41 +36,62 @@ class DispatcherTest extends \lithium\test\Unit {
 				'request' => '\lithium\tests\mocks\console\MockDispatcherRequest'
 			)
 		));
-		$expected = 'test run';
-		$result = Dispatcher::run();
+		$expected = 'run';
+		$result = Dispatcher::run()->testAction;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testRunWithCommand() {
-		$result = Dispatcher::run(new Request(array(
+		$response = Dispatcher::run(new Request(array(
 			'args' => array(
 				'\lithium\tests\mocks\console\MockDispatcherCommand'
 			)
 		)));
-		$expected = 'test run';
+		$expected = 'run';
+		$result = $response->testAction;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testRunWithPassed() {
-		$result = Dispatcher::run(new Request(array(
+		$response = Dispatcher::run(new Request(array(
 			'args' => array(
 				'\lithium\tests\mocks\console\MockDispatcherCommand',
-				' with param'
+				'with param'
 			)
 		)));
-		$expected = 'test run with param';
+
+		$expected = 'run';
+		$result = $response->testAction;
+		$this->assertEqual($expected, $result);
+
+		$expected = 'with param';
+		$result = $response->testParam;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testRunWithAction() {
-		$result = Dispatcher::run(new Request(array(
+		$response = Dispatcher::run(new Request(array(
 			'args' => array(
 				'\lithium\tests\mocks\console\MockDispatcherCommand',
 				'testAction'
 			)
 		)));
-		$expected = 'test action';
+		$expected = 'testAction';
+		$result = $response->testAction;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testInvalidCommand() {
+		$expected = (object) array('status' => "Command `\\this\\command\\is\\fake` not found\n");
+		$result = Dispatcher::run(new Request(array(
+			'args' => array(
+				'\this\command\is\fake',
+				'testAction'
+			)
+		)));
+		
 		$this->assertEqual($expected, $result);
 	}
 }
+
 ?>

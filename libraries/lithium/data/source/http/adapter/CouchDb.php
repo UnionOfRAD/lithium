@@ -42,7 +42,8 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * Deconstruct
+	 * Ensures that the server connection is closed and resources are freed when the adapter
+	 * instance is destroyed.
 	 *
 	 * @return void
 	 */
@@ -106,29 +107,33 @@ class CouchDb extends \lithium\data\source\Http {
 			if (isset($result->db_name)) {
 				$this->_db = true;
 			}
-			if (isset($result->error)) {
-				if ($result->error == 'not_found') {
-					$result = $this->put($entity);
+			if (!$this->_db) {
+				if (isset($result->error)) {
+					if ($result->error == 'not_found') {
+						$result = $this->put($entity);
+					}
 				}
-			}
-			if (isset($result->ok)) {
-				$this->_db = true;
+				if (isset($result->ok) || isset($result->db_name)) {
+					$this->_db = true;
+				}
 			}
 		}
 		if (!$this->_db) {
 			throw new Exception("{$entity} is not available.");
 		}
 
-		return array('_id' => array(), '_rev' => array());
+		return array('id' => array(), 'rev' => array());
 	}
 
 	/**
-	 * name
+	 * Quotes identifiers.
 	 *
-	 * @param string $name
-	 * @return string
+	 * CouchDb does not need identifiers quoted, so this method simply returns the identifier.
+	 *
+	 * @param string $name The identifier to quote.
+	 * @return string The quoted identifier.
 	 */
-	public function name($name) {
+		public function name($name) {
 		return $name;
 	}
 
@@ -154,15 +159,15 @@ class CouchDb extends \lithium\data\source\Http {
 			if (!empty($data['id'])) {
 				$id = '/' . $data['id'];
 				$data['_id'] = (string) $data['id'];
-				$result = $conn->put($table . $id, json_encode($data));
+				$result = $conn->put($table . $id, $data, array('type' => 'json'));
 			} else {
-				$result = $conn->post($table, json_encode($data));
+				$result = $conn->post($table, $data, array('type' => 'json'));
 			}
-
 			$result = is_string($result) ? json_decode($result) : $result;
+			$result = (object) $self->result('next', $result, $query);
 
-			if ($success = (isset($result->ok) && $result->ok === true)) {
-				$query->data($data + (array)$self->result('next', $result, $query));
+			if ($success = (isset($result->id) || (isset($result->ok) && $result->ok === true))) {
+				$query->data($data + (array) $result);
 				$query->record()->invokeMethod('_update', array($result->id));
 			}
 			return $success;
@@ -185,16 +190,14 @@ class CouchDb extends \lithium\data\source\Http {
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn) {
 			extract($params);
 			$options = $query->export($self);
+
 			extract($options, EXTR_OVERWRITE);
 			extract($conditions, EXTR_OVERWRITE);
+
 			if (empty($path) && empty($conditions)) {
 				$path = '/_all_docs';
 			}
-			$ret = json_decode($conn->get($table . $path, $conditions));
-			if (isset($ret->error) && $ret->read = 'missing') {
-				return null;
-			}
-			return $ret;
+			return json_decode($conn->get($table . $path, $conditions + $limit + $order));
 		});
 	}
 
@@ -220,10 +223,10 @@ class CouchDb extends \lithium\data\source\Http {
 				$data['_rev'] = $data['rev'];
 				unset($data['id'], $data['rev']);
 			}
-			$result = $conn->put($table . $path, json_encode($conditions + $data));
+			$result = $conn->put($table . $path, $conditions + $data, array('type' => 'json'));
 			$result = is_string($result) ? json_decode($result) : $result;
 
-			if (isset($result->ok) && $result->ok === true) {
+			if ($success = (isset($result->_id) || (isset($result->ok) && $result->ok === true))) {
 				$query->record()->invokeMethod('_update');
 				return true;
 			}
@@ -355,7 +358,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return array
 	 */
 	public function limit($limit, $context) {
-		return $limit ?: array();
+		return compact('limit') ?: array();
 	}
 
 	/**
@@ -366,7 +369,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return array
 	 */
 	function order($order, $context) {
-		return $order ?: array();
+		return (array) $order ?: array();
 	}
 }
 ?>

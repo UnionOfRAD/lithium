@@ -34,13 +34,15 @@ class Stream extends \lithium\util\Socket {
 			return false;
 		}
 
-		$host = "{$config['protocol']}://{$config['host']}";
+		$host = "{$config['protocol']}://{$config['host']}:{$config['port']}";
+		$flags = STREAM_CLIENT_CONNECT;
 
 		if ($config['persistent']) {
-			$this->_resource = pfsockopen($host, $config['port'], $errorCode, $errorMessage);
-		} else {
-			$this->_resource = fsockopen($host, $config['port'], $errorCode, $errorMessage);
+			$flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT;
 		}
+		$this->_resource = stream_socket_client(
+			$host, $errorCode, $errorMessage, $config['timeout'], $flags
+		);
 
 		if (!empty($errorCode) || !empty($errorMessage)) {
 			throw new Exception($errorMessage, $errorCode);
@@ -95,15 +97,9 @@ class Stream extends \lithium\util\Socket {
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
-
-		$buffer = null;
-		if (is_null($length)) {
-			$buffer = stream_get_contents($this->_resource);
-		} else {
-			$buffer = stream_get_contents($this->_resource, $length, $offset);
-		}
-
-		return $buffer;
+		return is_null($length) ? stream_get_contents($this->_resource) : stream_get_contents(
+			$this->_resource, $length, $offset
+		);
 	}
 
 	/**
@@ -112,7 +108,7 @@ class Stream extends \lithium\util\Socket {
 	 * @param string $data The string to be written.
 	 * @return mixed False on error, number of bytes written otherwise.
 	 */
-	public function write($data) {
+	public function write($data) {		
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
@@ -143,11 +139,27 @@ class Stream extends \lithium\util\Socket {
 	 * @see http://www.php.net/manual/en/function.stream-encoding.php
 	 */
 	public function encoding($charset) {
-		if (function_exists('stream_encoding')) {
-			if (!is_resource($this->_resource)) {
-				return false;
-			}
-			return stream_encoding($this->_resource, $charset);
+		if (!function_exists('stream_encoding')) {
+			return false;
+		}
+		return is_resource($this->_resource) ? stream_encoding($this->_resource, $charset) : false;
+	}
+
+	/**
+	 * Aggregates read and write methods into a coherent request response
+	 *
+	 * @param mixed $request array or object like `\lithium\http\Request`
+	 * @params array $options
+	 *                - path: path for the current request
+	 *                - classes: array of classes to use
+	 *                    - response: a class to use for the response
+	 * @return boolean response string or object like `\lithium\http\Response`
+	 */
+	public function send($message, $options = array()) {
+		if ($this->write((string) $message)) {
+			$message = $this->read();
+			$response = new $options['classes']['response'](compact('message'));
+			return $response;
 		}
 	}
 }

@@ -13,16 +13,13 @@ use \lithium\console\Request;
 
 class ResponseTest extends \lithium\test\Unit {
 
+	public $streams;
+
 	public function setUp() {
 		$this->streams = array(
-			'output' => LITHIUM_APP_PATH . '/tmp/output.txt',
-			'error' => LITHIUM_APP_PATH . '/tmp/error.txt'
+			'output' => LITHIUM_APP_PATH . '/resources/tmp/output.txt',
+			'error' => LITHIUM_APP_PATH . '/resources/tmp/error.txt'
 		);
-
-		$this->working = LITHIUM_APP_PATH;
-		if (!empty($_SERVER['PWD'])) {
-			$this->working = $_SERVER['PWD'];
-		}
 	}
 
 	public function tearDown() {
@@ -35,23 +32,9 @@ class ResponseTest extends \lithium\test\Unit {
 
 	public function testConstructWithoutConfig() {
 		$response = new Response();
-		$expected = null;
-		$this->assertEqual($expected, $response->request);
-
 		$this->assertTrue(is_resource($response->output));
 
 		$this->assertTrue(is_resource($response->error));
-	}
-
-	public function testConstructWithConfigRequest() {
-		$response = new Response(array(
-			'request' => new Request()
-		));
-		$expected = new Request();
-		$this->assertEqual($expected->env, $response->request->env);
-
-		$expected = array('working' => $this->working);
-		$this->assertEqual($expected, $response->request->env);
 	}
 
 	public function testConstructWithConfigOutput() {

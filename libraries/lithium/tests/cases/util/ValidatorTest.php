@@ -234,7 +234,7 @@ class ValidatorTest extends \lithium\test\Unit {
 
 		/**
 		 * All ICANN TLDs
-		 */ 
+		 */
 		$this->assertTrue(Validator::isEmail('abc@example.aero'));
 		$this->assertTrue(Validator::isEmail('abc@example.asia'));
 		$this->assertTrue(Validator::isEmail('abc@example.biz'));
@@ -830,6 +830,91 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertFalse(Validator::isLuhn(null));
 		$this->assertFalse(Validator::isLuhn(''));
 		$this->assertFalse(Validator::isLuhn(true));
+	}
+
+	public function testCheckHasErrors() {
+		$rules = array('title' => array('please enter a title'));
+		$result = Validator::check(null, $rules);
+		$this->assertFalse(empty($result));
+
+		$expected = array('title' => array('please enter a title'));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testCheckPasses() {
+		$rules = array('title' => 'please enter a title');
+		$data = array('title' => 'new title');
+		$result = Validator::check($data, $rules);
+		$this->assertTrue(empty($result));
+	}
+
+	public function testCheckMultipleHasErrors() {
+		$rules = array(
+			'title' => 'please enter a title',
+			'email' => array(
+				array('notEmpty', 'message' => 'email is empty'),
+				array('email', 'message' => 'email is not valid')
+			)
+		);
+		$result = Validator::check(null, $rules);
+		$this->assertFalse(empty($result));
+
+		$expected = array(
+			'title' => array('please enter a title'),
+			'email' => array('email is empty', 'email is not valid')
+		);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testCheckMultipleHasFirstError() {
+		$rules = array(
+			'title' => 'please enter a title',
+			'email' => array(
+				array('notEmpty', 'message' => 'email is empty'),
+				array('email', 'message' => 'email is not valid'),
+			)
+		);
+		$data = array('email' => 'something');
+		$result = Validator::check($data, $rules);
+		$this->assertFalse(empty($result));
+
+		$expected = array(
+			'title' => array('please enter a title'),
+			'email' => array('email is not valid')
+		);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testCheckMultipleHasOneError() {
+		$rules = array(
+			'title' => 'please enter a title',
+			'email' => array(
+				array('notEmpty', 'message' => 'email is empty'),
+				array('email', 'message' => 'email is not valid'),
+			)
+		);
+		$data = array('title' => 'new title', 'email' => 'something');
+		$result = Validator::check($data, $rules);
+		$this->assertFalse(empty($result));
+
+		$expected = array('email' => array('email is not valid'));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testCheckMultiplePasses() {
+		$rules = array(
+			'title' => 'please enter a title',
+			'email' => array(
+				array('notEmpty', 'message' => 'email is empty'),
+				array('email', 'message' => 'email is not valid'),
+			)
+		);
+		$data = array('title' => 'new title', 'email' => 'something@test.com');
+		$result = Validator::check($data, $rules);
+		$this->assertTrue(empty($result));
+
+		$expected = array();
+		$this->assertEqual($expected, $result);
 	}
 }
 

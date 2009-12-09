@@ -42,7 +42,7 @@ class CouchDbTest extends \lithium\test\Unit {
 	}
 
 	public function testAllMethodsNoConnection() {
-		$couchdb = new CouchDb(array('protocol' => null));
+		$couchdb = new CouchDb(array('classes' => array('socket' => false)));
 		$this->assertFalse($couchdb->connect());
 		$this->assertTrue($couchdb->disconnect());
 		$this->assertFalse($couchdb->get());
@@ -117,7 +117,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
 
-		$expected = array();
+		$expected = '';
 		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
 	}
@@ -132,8 +132,8 @@ class CouchDbTest extends \lithium\test\Unit {
 		$expected = '/posts/12345';
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
-
-		$expected = array();
+		
+		$expected = '';
 		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
 	}

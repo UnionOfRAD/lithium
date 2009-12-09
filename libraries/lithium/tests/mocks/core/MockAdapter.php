@@ -13,7 +13,7 @@ class MockAdapter extends \lithium\core\Adaptable {
        protected static $_configurations = null;
 
        public static function adapter($name) {
-               return static::_adapter('adapters.storage.cache', $name);
+               return static::_adapter('adapter.storage.cache', $name);
        }
 
 }

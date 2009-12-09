@@ -8,10 +8,11 @@
 
 namespace lithium\tests\cases\data\model;
 
+use \stdClass;
 use \lithium\data\model\Document;
-use lithium\tests\mocks\data\model\MockDocumentPost;
-use lithium\tests\mocks\data\model\MockDocumentSource;
-use lithium\tests\mocks\data\model\MockDocumentMultipleKey;
+use \lithium\tests\mocks\data\model\MockDocumentPost;
+use \lithium\tests\mocks\data\model\MockDocumentSource;
+use \lithium\tests\mocks\data\model\MockDocumentMultipleKey;
 
 class DocumentTest extends \lithium\test\Unit {
 
@@ -403,6 +404,32 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	/**
+	 * Tests that `Document`s with embedded objects are cast to arrays so as not to cause fatal
+	 * errors when traversing via array interfaces.
+	 *
+	 * @return void
+	 */
+	public function testObjectIteration() {
+		$doc = new Document(array('data' => array(
+			(object) array('foo' => 'bar'),
+			(object) array('bar' => 'foo')
+		)));
+		$result = $doc->first()->foo;
+		$expected = 'bar';
+		$this->assertEqual($expected, $result);
+
+		$result = $doc->next()->bar;
+		$expected = 'foo';
+		$this->assertEqual($expected, $result);
+
+		$doc = new Document(array('data' => (object) array(
+			'first' => array('foo' => 'bar'),
+			'second' => array('bar' => 'foo')
+		)));
+		$result = $doc->first->foo;
+	}
+
 	public function testBooleanValues() {
 		$doc = new Document();
 
@@ -413,6 +440,93 @@ class DocumentTest extends \lithium\test\Unit {
 		$expected = array('hair', 'fast', 'tall', 'fat');
 		$result = array_keys($doc->data());
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testComplexTypes() {
+		$doc = new Document();
+		$this->assertFalse($doc->invoke('isComplexType', array(null)));
+		$this->assertFalse($doc->invoke('isComplexType', array('')));
+		$this->assertFalse($doc->invoke('isComplexType', array(array())));
+		$this->assertFalse($doc->invokeMethod('_isComplexType',array(new stdClass())));
+	}
+
+	public function testIsset() {
+		$doc = new Document(array('data' => array(
+				'title' => 'Post',
+				'content' => 'Lorem Ipsum',
+		)));
+
+		$this->assertTrue(isset($doc->title));
+		$this->assertTrue(isset($doc->content));
+		$this->assertFalse(isset($doc->body));
+	}
+
+	public function testData() {
+		$doc = new Document(array(
+			'data' => array(
+				'title' => 'Post',
+				'content' => 'Lorem Ipsum',
+				'parsed' => null,
+				'permanent' => false
+			)
+		));
+		
+		$expected = array(
+			'title' => 'Post',
+			'content' => 'Lorem Ipsum',
+			'parsed' => null,
+			'permanent' => false
+		);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+		
+		$expected = 'Post';
+		$result = $doc->data('title');
+		$this->assertEqual($expected, $result);
+		
+		$expected = false;
+		$result = $doc->data('permanent');
+		$this->assertEqual($expected, $result);
+		
+		$doc = new Document();
+		$this->assertNull($doc->data('field'));
+	}
+	
+	public function testUnset() {
+		$doc = new Document(array(
+			'data' => array(
+				'title' => 'Post',
+				'content' => 'Lorem Ipsum',
+				'parsed' => null,
+				'permanent' => false
+			)
+		));
+
+		$expected = array(
+			'title' => 'Post',
+			'content' => 'Lorem Ipsum',
+			'parsed' => null,
+			'permanent' => false
+		);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+
+		unset($expected['title']);
+		unset($doc->title);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+		
+		unset($expected['parsed']);		
+		unset($doc->parsed);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+		
+		unset($expected['permanent']);		
+		unset($doc->permanent);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+		
+		unset($doc->none);
 	}
 }
 

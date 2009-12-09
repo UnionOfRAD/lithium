@@ -10,6 +10,27 @@ namespace lithium\tests\mocks\http;
 
 class MockService extends \lithium\http\Service {
 
+	public function get($path = null, $data = array(), $options = array()) {
+		$defaults = array('type' => 'form', 'return' => 'body');
+		$options += $defaults;
+		if ($this->connect() === false) {
+			return false;
+		}
+		$request = $this->_request('get', $path, $data, $options);
+		$message = join("\r\n", array(
+			'HTTP/1.1 200 OK',
+			'Header: Value',
+			'Connection: close',
+			'Content-Type: text/html;charset=UTF-8',
+			'',
+			'Test!'
+		));
+		$response = new $this->_classes['response'](compact('message'));
+		$this->last = (object)compact('request', 'response');
+		return ($options['return'] == 'body') ? $response->body() : $response;
+
+	}
+
 	public function reset() {
 		parent::reset();
 		$isJson = (

@@ -45,7 +45,7 @@ use \lithium\util\Inflector;
  * documentation.
  *
  * @see lithium\core\Adaptable
- * @see lithium\storage\cache\adapters
+ * @see lithium\storage\cache\adapter
  */
 class Cache extends \lithium\core\Adaptable {
 
@@ -88,15 +88,14 @@ class Cache extends \lithium\core\Adaptable {
 			return false;
 		}
 
-		if (is_callable($conditions)) {
-			if (!$conditions()) return false;
+		if (is_callable($conditions) && !$conditions()) {
+			return false;
 		}
+
 		$key = static::key($key);
 		$method = static::adapter($name)->write($key, $data, $expiry, $conditions);
 		$params = compact('key', 'data', 'expiry', 'conditions');
-		$filters = $settings[$name]['filters'];
-
-		return static::_filter(__METHOD__, $params, $method, $filters);
+		return static::_filter(__METHOD__, $params, $method, $settings[$name]['filters']);
 	}
 
 
@@ -181,7 +180,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @return object       Adapter for named configuration
 	 */
 	public static function adapter($name) {
-		return static::_adapter('adapters.storage.cache', $name);
+		return static::_adapter('adapter.storage.cache', $name);
 	}
 
 }
