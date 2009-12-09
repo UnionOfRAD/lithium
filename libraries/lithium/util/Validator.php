@@ -302,7 +302,7 @@ class Validator extends \lithium\core\StaticObject {
 					}
 					continue;
 				}
-				if (empty($values[$field]) && $rules['skipEmpty']) {
+				if (empty($values[$field]) && $rule['skipEmpty']) {
 					continue;
 				}
 				if (!static::rule($name, $values[$field], $rule['format'], $rule)) {
