@@ -53,6 +53,13 @@ class Session extends \lithium\core\Adaptable {
 
 	}
 
+	/**
+	 * Reads a value from a persistent session store.
+	 *
+	 * @param string $key Key to be read
+	 * @param array $options Optional parameters that this method accepts
+	 * @return mixed Read result on successful session read, null otherwise
+	 */
 	public static function read($key, $options = array()) {
 		$defaults = array('name' => null);
 		$options += $defaults;
@@ -76,10 +83,10 @@ class Session extends \lithium\core\Adaptable {
 	/**
 	 * Writes a persistent value to one or more session stores.
 	 *
-	 * @param string $key
-	 * @param mixed $value
-	 * @param array $options
-	 * @return boolean
+	 * @param string $key Key to be read
+	 * @param mixed $value Data to be stored
+	 * @param array $options Optional parameters that this method accepts
+	 * @return boolean True on successful write, false otherwise
 	 */
 	public static function write($key, $value = null, $options = array()) {
 		$settings = static::config();
