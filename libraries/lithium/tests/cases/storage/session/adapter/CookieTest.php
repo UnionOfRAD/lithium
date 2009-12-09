@@ -47,14 +47,12 @@ class CookieTest extends \lithium\test\Unit {
 		$this->assertTrue($this->Cookie->isEnabled());
 	}
 
-	public function testStarted() {
-		$this->assertTrue($this->Cookie->isStarted());
-		unset($_COOKIE);
-		$this->assertFalse($this->Cookie->isStarted());
-	}
-
 	public function testKey() {
 		$this->assertEqual('li3', $this->Cookie->key());
+	}
+
+	public function testIsStarted() {
+		$this->assertTrue($this->Cookie->isStarted());
 	}
 
 	public function testWriteDefaultParameters() {
