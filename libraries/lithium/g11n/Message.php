@@ -9,124 +9,105 @@
 namespace lithium\g11n;
 
 use \lithium\core\Environment;
-use \lithium\util\String;
 use \lithium\g11n\Locale;
 use \lithium\g11n\Catalog;
 
 /**
- * The `Message` class is concerned with aspects of the globalization of static message strings
- * throughout the framework.
+ * The `Message` class is concerned with an aspect of globalizing static message strings
+ * throughout the framework and applications.  When referring to message globalization the
+ * phrase of ""translating a message" is widely used. This leads to the assumption that it's
+ * a single step process wheras it' a multi step one. A short description of each step is
+ * given here in order to help understanding the purpose of this class through the context
+ * of the process as a whole.
  *
- * Often the phrase of "translating a message" is  used for referring to globalization of messages
- * which leads to the false assumption that this is a single step, whereas it is a multi-step
- * process.
+ *  1. Marking messages as translateable.  `$t()` and `$tn()` (implemented in the `View`
+ *     class) are recognized as message marking and picked up by the extraction parser.
  *
- *  1. Marking messages as translateable.
- *  2. Extracting marked messages, creating a message template.
- *  3. Translating messages, storing the translation.
- *  4. Retrieving the translation for a message.
+ *  2. Extracting marked messages.  Messages can be extracted through the `g11n`
+ *     command which in turn utilizes the `Catalog` class with the builtin `Code`
+ *     adapter or other custom adapters which are concerned with extracting
+ *     translatable content.
  *
- * This class provides methods for the first and the last step of the process. The second
- * one is dealt with by the `Catalog` class (see the description for `Message::translate()` for
- * more information). The actual translation of messages by translators happens outside of the
- * framework using external applications.
+ *  3. Creating a message template from extracted messages.  Templates are created
+ *     by the `g11n` command using the `Catalog` class with an adapter for a format
+ *     you prefer.
+ *
+ *  4. Translating messages.  The actual translation of messages by translators
+ *     happens outside using external applications.
+ *
+ *  5. Storing translated messages.  Translations are most often stored by the external
+ *     applications itself.
+ *
+ *  6. Retrieving the translation for a message. See description for `Message::translate()`.
+ *
+ * @see lithium\template\View
+ * @see lithium\g11n\Catalog
+ * @see lithium\console\command\G11n
+ * @see lithium\g11n\catalog\adapter\Code
  */
 class Message extends \lithium\core\StaticObject {
 
 	/**
-	 * This method serves two purposes.
-	 *
-	 * For one it is used to mark transalateable messages, which can be extracted by the `Catalog`
-	 * class using the `Code` adapter for creating message template files. Since the marked messages
-	 * will be later translated by others it is important to keep a few best practices in mind.
-	 *
-	 *   1. Use entire English sentences (as it gives context).
-	 *   2. Split paragraphs into multiple messages.
-	 *   3. Instead of string concatenation utilize `String::insert()`-style format strings.
-	 *   4. Avoid to embed markup into the messages.
-	 *   5. Do not escape i.e. quotation marks where possible.
-	 *
-	 * The other purpose it serves is to return the translation of a message according to
-	 * the current or provided locale and (if applicable) plural form.  The method can be used for
-	 * both single message or messages with a plural form. The provided message will be used as a
-	 * fall back if it isn't translateable. You may also use `String::insert()`-style place holders
-	 * within message strings and provide replacements as a separate option.
+	 * Translates a message according to the current or provided locale
+	 * and into it's correct plural form.
 	 *
 	 * Usage:
 	 * {{{
 	 * Message::translate('Mind the gap.');
-	 * Message::translate('house', array(
-	 * 	'plural' => 'houses', 'count' => 23
-	 * ));
-	 * Message::translate('Your {:color} paintings are looking just great.', array(
-	 * 	'replacements' => array('color' => 'silver'),
-	 * 	'locale' => 'de'
-	 * ));
+	 * Message::translate('house', array('count' => 23));
 	 * }}}
 	 *
-	 * @param string $singular Either a single or the singular form of the message.
-	 * @param array $options Allowed keys are:
-	 *        - `'count'`: Used to determine the correct plural form.
-	 *        - `'locale'`: The target locale, defaults to current locale.
-	 *        - `'plural'`: Used as a fall back if needed.
-	 *        - `'replacements'`: An array with replacements for place holders.
-	 *        - `'scope'`: The scope of the message.
-	 * @return string
-	 *
-	 * @see lithium\console\command\g11n\Extract
-	 * @see lithium\g11n\catalog\adapter\Code
+	 * @param string $id The id to use when looking up the translation.
+	 * @param array $options Valid options are:
+	 *              - `'count'`: Used to determine the correct plural form.
+	 *              - `'locale'`: The target locale, defaults to current locale.
+	 *              - `'scope'`: The scope of the message.
+	 * @return string|void The translation or `null` if none could be found.
+	 * @filter
 	 */
-	public static function translate($singular, $options = array()) {
+	public static function translate($id, $options = array()) {
+		$params = compact('id', 'options');
+		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
+			return $self::invokeMethod('_translated', array($params['id'], $params['options']));
+		});
+	}
+
+	/**
+	 * Retrieves translations through the `Catalog` class by using `$id` as the lookup
+	 * key and taking the current or - if specified - the provided locale as well as the
+	 * scope into account.  Hereupon the correct plural form is determined by passing the
+	 * value of the `'count'` option to a closure.
+	 *
+	 * @param string $id The lookup key.
+	 * @param array $options Valid options are:
+	 *              - `'count'`: Used to determine the correct plural form.
+	 *              - `'locale'`: The target locale, defaults to current locale.
+	 *              - `'scope'`: The scope of the message.
+	 * @return string|void The translation or `null` if none could be found or the plural
+	 *         form could not be determined.
+	 * @see lithium\g11n\Catalog
+	 * @todo Message pages need caching.
+	 */
+	protected static function _translated($id, $options = array()) {
 		$defaults = array(
-			'plural' => null,
 			'count' => 1,
-			'replacements' => array(),
-			// 'locale' => Environment::get('G11n.locale')
-			'locale' => 'de',
+			// 'locale' => Environment::get('g11n.locale'),
+			'locale' => null,
 			'scope' => null
 		);
 		extract($options + $defaults);
 
-		if (!$translated = static::_translated($singular, $locale, $count, $scope)) {
-			$translated = $count == 1 ? $singular : $plural;
-		}
-		return String::insert($translated, $replacements);
-	}
+		$page = Catalog::read('message.page', $locale, compact('scope'));
+		$plural = Catalog::read('message.plural', $locale);
 
-	/**
-	 * Retrieves the translation for a message ID.  Uses the `Catalog` class to
-	 * access translation data and determines the correct plural form (if applicable).
-	 *
-	 * @param string $id The message ID.
-	 * @param string $locale The target locale.
-	 * @param integer $count Used to determine the correct plural form.
-	 * @param string $scope The scope of the message ID.
-	 * @return string|void The translated message or `null` if `$singular` is not
-	 *         translateable or a plural rule couldn't be found.
-	 * @see lithium\g11n\Catalog
-	 * @todo Message pages need caching.
-	 */
-	protected static function _translated($id, $locale, $count = null, $scope = null) {
-		$result = Catalog::read('message.page', $locale, compact('scope'));
-
-		if (empty($result[$locale][$id]['translated'])) {
+		if (empty($page[$locale][$id]['translated']) || !isset($plural[$locale])) {
 			return null;
 		}
-		$translated = $result[$locale][$id]['translated'];
+		$translated = $page[$locale][$id]['translated'];
+		$key = $plural[$locale]($count);
 
-		if (isset($count)) {
-			$result = Catalog::read('message.plural', $locale);
-
-			if (!isset($result[$locale])) {
-				return null;
-			}
-			$key = $result[$locale]($count);
-
-			if (isset($translated[$key])) {
-				return $translated[$key];
-			}
-		} else {
-			return array_shift($translated);
+		if (isset($translated[$key])) {
+			return $translated[$key];
 		}
 	}
 }

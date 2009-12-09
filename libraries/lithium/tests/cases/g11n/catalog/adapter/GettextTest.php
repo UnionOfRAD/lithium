@@ -40,7 +40,7 @@ class GettextTest extends \lithium\test\Unit {
 		rmdir($this->_path);
 	}
 
-	function testWriteReadMessageTemplate() {
+	public function testWriteReadMessageTemplate() {
 		$data = array(
 			'singular 1' => array(
 				'singularId' => 'singular 1',
