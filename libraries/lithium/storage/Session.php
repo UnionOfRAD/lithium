@@ -11,6 +11,26 @@ namespace lithium\storage;
 use \lithium\core\Libraries;
 use \lithium\util\Collection;
 
+/**
+ * The `Session` static class provides a consistent interface to configure and utilize the different
+ * persistent storage adatpers included with Lithium, as well as your own adapters.
+ *
+ * The Session layer of Lithium inherits from the common `Adaptable` class, which provides the generic
+ * configuration setting & retrieval logic, as well as the logic required to locate & instantiate
+ * the proper adapter class.
+ *
+ * In most cases, you will configure various named session configurations in your bootstrap process,
+ * which will then be available to you in all other parts of your application.
+ *
+ * Each adapter provides a consistent interface for the basic cache operations of `write`, `read`
+ * and `delete`, which can be used interchangably between all adapters. ty.
+ *
+ * For more information on `Session` methods and specific adapters, please see their relevant
+ * documentation.
+ *
+ * @see lithium\core\Adaptable
+ * @see lithium\storage\session\adapter
+ */
 class Session extends \lithium\core\Adaptable {
 
 	/**
@@ -24,8 +44,8 @@ class Session extends \lithium\core\Adaptable {
 	/**
 	 * Returns key to be used in session read, write and delete operations
 	 *
-	 * @param  mixed $name Named session configuration
-	 * @return string      Key
+	 * @param mixed $name Named session configuration
+	 * @return string Value of key
 	 */
 	public static function key($name = null) {
 		return is_object($adapter = static::adapter($name)) ? $adapter->key() : null;
