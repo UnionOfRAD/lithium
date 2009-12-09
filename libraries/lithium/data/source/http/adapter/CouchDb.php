@@ -42,8 +42,6 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * Deconstruct
-	 *
 	 * Ensures that the server connection is closed and resources are freed when the adapter
 	 * instance is destroyed.
 	 *
@@ -192,6 +190,7 @@ class CouchDb extends \lithium\data\source\Http {
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn) {
 			extract($params);
 			$options = $query->export($self);
+
 			extract($options, EXTR_OVERWRITE);
 			extract($conditions, EXTR_OVERWRITE);
 

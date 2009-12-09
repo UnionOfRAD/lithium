@@ -28,7 +28,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 				$this->_preserved[$conn] = Connections::get($conn, array('config' => true));
 			}
 		}
-		Connections::clear();
+		Connections::reset();
 	}
 
 	public function tearDown() {
@@ -66,7 +66,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$expected = $this->config + array('type' => 'database');
 		$this->assertEqual($expected, Connections::get('conn-test', array('config' => true)));
 
-		$this->assertNull(Connections::clear());
+		$this->assertNull(Connections::reset());
 		$this->assertFalse(Connections::get());
 
 		Connections::__init();

@@ -55,10 +55,6 @@ class CookieTest extends \lithium\test\Unit {
 		$this->assertTrue($this->Cookie->isStarted());
 	}
 
-	public function testIsValid() {
-		$this->assertTrue($this->Cookie->isValid());
-	}
-
 	public function testWriteDefaultParameters() {
 		$key = 'write';
 		$value = 'value to be written';

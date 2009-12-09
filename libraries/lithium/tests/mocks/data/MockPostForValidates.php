@@ -15,8 +15,8 @@ class MockPostForValidates extends \lithium\data\Model {
 	public $validates = array(
 		'title' => 'please enter a title',
 		'email' => array(
-			array('rule' => 'isNotEmpty', 'message' => 'email is empty'),
-			array('rule' => 'email', 'message' => 'email is not valid'),
+			array('notEmpty', 'message' => 'email is empty'),
+			array('email', 'message' => 'email is not valid'),
 		)
 	);
 }
