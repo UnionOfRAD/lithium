@@ -10,10 +10,14 @@ namespace lithium\tests\mocks\data\source\http\adapter;
 
 class MockCouchPost extends \lithium\data\Model {
 
-	protected $_meta = array(
-		'source' => 'posts'
+	protected $_classes = array(
+		'connections' => 'lithium\tests\mocks\data\MockConnections'
 	);
-	
+
+	protected $_meta = array(
+		'source' => 'posts',
+	);
+
 	protected $_schema = array(
 		'id' => array('type' => 'integer', 'key' => 'primary'),
 		'author_id' => array('type' => 'integer'),
@@ -23,5 +27,7 @@ class MockCouchPost extends \lithium\data\Model {
 		'updated' => array('type' => 'datetime')
 	);
 }
+
+
 
 ?>
