@@ -42,10 +42,11 @@ class Libraries {
 	protected static $_configurations = array();
 
 	/**
-	 * Contains a cascading list of search path templates, indexed by base object type. Used by
-	 * `Libraries::locate()` to perform service location. This allows new types of objects (i.e.
-	 * models, helpers, cache adapters and data sources) to be automatically 'discovered' when you
-	 * register a new vendor library or plugin (using `Libraries::add()`).
+	 * Contains a cascading list of search path templates, indexed by base object type.
+	 *
+	 * Used by `Libraries::locate()` to perform service location. This allows new types of
+	 * objects (i.e. models, helpers, cache adapters and data sources) to be automatically
+	 * 'discovered' when you register a new vendor library or plugin (using `Libraries::add()`).
 	 *
 	 * Because paths are checked in the order in which they appear, path templates should be
 	 * specified from most-specific to least-specific. See the `locate()` method for usage examples.
@@ -120,25 +121,23 @@ class Libraries {
 	 *
 	 * @param string $name Library name, i.e. `'app'`, `'lithium'`, `'pear'` or `'solar'`.
 	 * @param array $config Specifies where the library is in the filesystem, and how classes
-	 *              should be loaded from it.  Allowed keys are:
-	 *              - `'bootstrap'`: A file path (relative to `'path'`) to a bootstrap script that
-	 *                should be run when the library is added.
-	 *              - `'defer'`: If true, indicates that, when locating classes, this library should
-	 *                defer to other libraries in order of preference.
-	 *              - `'includePath'`: If `true`, appends the absolutely-resolved value of `'path'`
-	 *                to the PHP include path.
-	 *              - `'loader'`: An auto-loader method associated with the library, if any
-	 *              - `'path'`: The directory containing the library.
-	 *              - `'prefix'`: The class prefix this library uses, i.e. `'lithium\'`, `'Zend_'`
-	 *                or `'Solar_'`.
-	 *              - `'suffix'`: Gets appended to the end of the file name. For example, most
-	 *                libraries end classes in `'.php'`, but some use `'.class.php'`, or
-	 *                `'.inc.php'`.
-	 *              - `'transform'`: Defines a custom way to transform a class name into its
-	 *                corresponding file path.  Accepts either an array of two strings which
-	 *                are interpreted as the pattern and replacement for a regex, or an
-	 *                anonymous function, which receives the class name as a parameter, and
-	 *                returns a file path as output.
+	 *        should be loaded from it.  Allowed keys are:
+	 *        - `'bootstrap'`: A file path (relative to `'path'`) to a bootstrap script that should
+	 *          be run when the library is added.
+	 *        - `'defer'`: If true, indicates that, when locating classes, this library should
+	 *          defer to other libraries in order of preference.
+	 *        - `'includePath'`: If `true`, appends the absolutely-resolved value of `'path'` to
+	 *          the PHP include path.
+	 *        - `'loader'`: An auto-loader method associated with the library, if any.
+	 *        - `'path'`: The directory containing the library.
+	 *        - `'prefix'`: The class prefix this library uses, i.e. `'lithium\'`, `'Zend_'` or
+	 *          `'Solar_'`.
+	 *        - `'suffix'`: Gets appended to the end of the file name. For example, most libraries
+	 *          end classes in `'.php'`, but some use `'.class.php'`, or `'.inc.php'`.
+	 *        - `'transform'`: Defines a custom way to transform a class name into its
+	 *          corresponding file path.  Accepts either an array of two strings which are
+	 *          interpreted as the pattern and replacement for a regex, or an anonymous function,
+	 *          which receives the class name as a parameter, and returns a file path as output.
 	 * @return array Returns the resulting set of options created for this library.
 	 */
 	public static function add($name, $config = array()) {
@@ -189,10 +188,10 @@ class Libraries {
 	}
 
 	/**
-	 * Returns configuration for given name
+	 * Returns configuration for given name.
 	 *
-	 * @param string $name
-	 * @return array
+	 * @param string $name Registered library to retrieve configuration for.
+	 * @return array Retrieved configuration.
 	 */
 	public static function get($name = null) {
 		if (empty($name)) {
@@ -205,8 +204,7 @@ class Libraries {
 	 * Removes a registered library, and unregister's the library's autoloader, if it has one.
 	 *
 	 * @param mixed $name A string or array of library names indicating the libraries you wish to
-	 *              remove, i.e. `'app'` or `'lithium'`.  This can also be used to unload plugins by
-	 *              name.
+	 *        remove, i.e. `'app'` or `'lithium'`.  This can also be used to unload plugins by name.
 	 * @return void
 	 */
 	public static function remove($name) {
@@ -268,6 +266,7 @@ class Libraries {
 	 *
 	 * @see lithium\core\Libraries::add()
 	 * @see lithium\core\Libraries::path()
+	 *
 	 * @param string $class The fully-namespaced (where applicable) name of the class to load.
 	 * @param mixed $require
 	 * @return void
@@ -422,15 +421,14 @@ class Libraries {
 	 * Libraries with `'defer'` set to `true` will be searched last when looking up services.
 	 *
 	 * @param boolean $defer A boolean flag indicating which libraries to search, either the ones
-	 *                with the `'defer'` flag set, or the ones without.
+	 *        with the `'defer'` flag set, or the ones without.
 	 * @param array $paths The list of paths to be searched for the given service (class).  These
-	 *              are defined in `lithium\core\Libraries::$_classPaths`, and are organized by
-	 *              class type.
+	 *        are defined in `lithium\core\Libraries::$_classPaths`, and are organized by class type.
 	 * @param array $params The list of insert parameters to be injected into each path format
-	 *              string when searching for classes.
+	 *        string when searching for classes.
 	 * @param array $options
 	 * @return string Returns a class path as a string if a given class is found, or null if no
-	 *                class in any path matching any of the parameters is located.
+	 *         class in any path matching any of the parameters is located.
 	 * @see lithium\core\Libraries::$_classPaths
 	 * @see lithium\core\Libraries::locate()
 	 */
