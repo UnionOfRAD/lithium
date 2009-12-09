@@ -45,11 +45,12 @@ class Syslog extends \lithium\core\Object {
 	 */
 	public function write($type, $message) {
 		if (static::$_lastOpenedBy != $type) {
-			closelog(); // Close previously opened log (doesn't matter if none opened)
-			openlog($this->_config['identity'], $this->_config['options'], $this->_config['facility']);
+			closelog();
+			openlog(
+				$this->_config['identity'], $this->_config['options'], $this->_config['facility']
+			);
 			static::$_lastOpenedBy = $type;
 		}
-
 		$priority = $this->_config['priority'];
 
 		return function($self, $params, $chain) use ($priority) {
