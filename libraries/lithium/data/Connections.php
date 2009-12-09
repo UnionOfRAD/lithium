@@ -29,7 +29,7 @@ use \lithium\core\Libraries;
  *
  * @see lithium\data\Source
  */
-class Connections extends \lithium\core\StaticObject {
+class Connections extends \lithium\core\Adaptable {
 
 	/**
 	 * A Collection of the configurations you add through Connections::add().
@@ -53,8 +53,8 @@ class Connections extends \lithium\core\StaticObject {
 	 * @return void
 	 */
 	public static function __init() {
+		parent::__init();
 		static::$_connections = new Collection();
-		static::$_configurations = new Collection();
 		require LITHIUM_APP_PATH . '/config/connections.php';
 	}
 
@@ -145,21 +145,22 @@ class Connections extends \lithium\core\StaticObject {
 	public static function get($name = null, $options = array()) {
 		$defaults = array('config' => false, 'autoCreate' => true);
 		$options += $defaults;
+		$settings = static::config();
 
 		if (empty($name)) {
-			return static::$_configurations->keys();
+			return $settings->keys();
 		}
 
-		if (!isset(static::$_configurations[$name])) {
+		if (!isset($settings[$name])) {
 			return null;
 		}
 
 		if ($options['config']) {
-			return static::$_configurations[$name];
+			return $settings[$name];
 		}
 
 		if (!isset(static::$_connections[$name]) && $options['autoCreate']) {
-			return static::$_connections[$name] = static::_build(static::$_configurations[$name]);
+			return static::$_connections[$name] = static::_build($settings[$name]);
 		} elseif (!$options['autoCreate']) {
 			return null;
 		}
@@ -171,9 +172,9 @@ class Connections extends \lithium\core\StaticObject {
 	*
 	* @return void
 	*/
-	public static function clear() {
+	public static function reset() {
+		parent::reset();
 		static::$_connections = new Collection();
-		static::$_configurations = new Collection();
 	}
 
 	/**
