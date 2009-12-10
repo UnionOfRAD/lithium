@@ -131,7 +131,7 @@ class Document extends \lithium\util\Collection {
 			unset($config['data']);
 		}
 		parent::__construct($config);
-		$this->_items = (array) $this->_items;
+		$this->_items = (array)$this->_items;
 	}
 
 	/**
@@ -202,17 +202,17 @@ class Document extends \lithium\util\Collection {
 	}
 
 	/**
-	 * PHP magic method used when unset() is called on a `Document` instance. 
+	 * PHP magic method used when unset() is called on a `Document` instance.
 	 * Use case for this would be when you wish to edit a document and remove a field, ie. :
 	 * {{{ $doc = Post::find($id); unset($doc->fieldName); $doc->save(); }}}
-	 * 
+	 *
 	 * @param unknown_type $name
 	 * @return unknown_type
 	 */
 	public function __unset($name) {
 		unset($this->_items[$name]);
 	}
-	
+
 	/**
 	 * Rewinds the collection of sub-`Document`s to the beginning and returns the first one found.
 	 *
@@ -344,9 +344,9 @@ class Document extends \lithium\util\Collection {
 	 */
 	protected function _update($id = null) {
 		if ($id) {
-			$id = (array) $id;
+			$id = (array)$id;
 			$model = $this->_model;
-			foreach ((array) $model::meta('key') as $i => $key) {
+			foreach ((array)$model::meta('key') as $i => $key) {
 				$this->__set($key, $id[$i]);
 			}
 		}

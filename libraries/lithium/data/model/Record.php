@@ -59,6 +59,7 @@ class Record extends \lithium\core\Object {
 	 * - 'model' _string_: Class name that provides the data-source for this record.
 	 *   Defaults to `null`.
 	 *
+	 * @param array $config
 	 * @return object Record object.
 	 */
 	public function __construct($config = array()) {

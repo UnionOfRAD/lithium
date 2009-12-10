@@ -108,6 +108,7 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Sets default connection options and connects default finders.
 	 *
+	 * @param array $options
 	 * @return void
 	 * @todo Merge in inherited config from AppModel and other parent classes.
 	 */
@@ -487,6 +488,8 @@ class Model extends \lithium\core\StaticObject {
 	 * Wraps `StaticObject::applyFilter()` to account for object instances.
 	 *
 	 * @see lithium\core\StaticObject::applyFilter()
+	 * @param string $method
+	 * @param mixed $closure
 	 */
 	public static function applyFilter($method, $closure = null) {
 		foreach ((array)$method as $m) {
@@ -501,6 +504,11 @@ class Model extends \lithium\core\StaticObject {
 	 * Wraps `StaticObject::_filter()` to account for object instances.
 	 *
 	 * @see lithium\core\StaticObject::_filter()
+	 * @param string $method
+	 * @param array $params
+	 * @param mixed $callback
+	 * @param array $fiters
+	 * @return object
 	 */
 	protected static function _filter($method, $params, $callback, $filters = array()) {
 		list($class, $m) = explode('::', $method, 2);
