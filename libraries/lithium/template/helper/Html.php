@@ -253,7 +253,7 @@ class Html extends \lithium\template\Helper {
 	 * Creates a formatted <img /> element.
 	 *
 	 * @param string $path Path to the image file, relative to the app/webroot/img/ directory.
-	 * @param array	$options Array of HTML attributes.
+	 * @param array $options Array of HTML attributes.
 	 * @return string
 	 */
 	public function image($path, $options = array()) {
@@ -272,9 +272,9 @@ class Html extends \lithium\template\Helper {
 	 * Returns a formatted block tag, i.e <div />, <span />, <p />.
 	 *
 	 * @param string $name Tag name.
-	 * @param string $text String content that will appear inside the div element.
+	 * @param string $content String content that will appear inside the div element.
 	 *   If null, only a start tag will be printed
-	 * @param array $attributes Additional HTML attributes of the DIV tag
+	 * @param array $options Additional HTML attributes of the DIV tag
 	 * @return string The formatted tag element
 	 */
 	function tag($name, $content = null, $options = array()) {
@@ -288,9 +288,9 @@ class Html extends \lithium\template\Helper {
 	 * Returns a formatted DIV tag for HTML FORMs.
 	 *
 	 * @param string $class CSS class name of the div element.
-	 * @param string $text String content that will appear inside the div element.
+	 * @param string $content String content that will appear inside the div element.
 	 *   If null, only a start tag will be printed
-	 * @param array $attributes Additional HTML attributes of the DIV tag
+	 * @param array $options Additional HTML attributes of the DIV tag
 	 * @return string The formatted DIV element
 	 */
 	function block($class = null, $content = null, $options = array()) {
@@ -304,8 +304,8 @@ class Html extends \lithium\template\Helper {
 	 * Returns a formatted P tag.
 	 *
 	 * @param string $class CSS class name of the p element.
-	 * @param string $text String content that will appear inside the p element.
-	 * @param array $attributes Additional HTML attributes of the P tag
+	 * @param string $content String content that will appear inside the p element.
+	 * @param array $options Additional HTML attributes of the P tag
 	 * @return string The formatted P element
 	 */
 	function para($class, $content, $options = array()) {

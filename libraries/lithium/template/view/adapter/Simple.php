@@ -23,10 +23,10 @@ class Simple extends \lithium\template\view\Renderer {
 	/**
 	 * Renders content from a template file provided by `template()`.
 	 *
-	 * @param string $template 
-	 * @param array $data 
-	 * @param array $context 
-	 * @param array $options 
+	 * @param string $template
+	 * @param array $data
+	 * @param array $context
+	 * @param array $options
 	 * @return string
 	 */
 	public function render($template, $data = array(), $context = array(), $options = array()) {
@@ -50,8 +50,8 @@ class Simple extends \lithium\template\view\Renderer {
 	/**
 	 * Returns a template string
 	 *
-	 * @param string $type 
-	 * @param array $options 
+	 * @param string $type
+	 * @param array $options
 	 * @return string
 	 */
 	public function template($type, $options) {

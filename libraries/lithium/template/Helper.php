@@ -69,6 +69,8 @@ abstract class Helper extends \lithium\core\Object {
 	 * non-HTML/XML contexts should override this method accordingly.
 	 *
 	 * @param string $value
+	 * @param mixed $method
+	 * @param array $options
 	 * @return mixed
 	 */
 	public function escape($value, $method = null, $options = array()) {
