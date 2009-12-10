@@ -9,7 +9,7 @@
 namespace lithium\console\command;
 
 class Generate {
-	
+
 }
 
 ?>

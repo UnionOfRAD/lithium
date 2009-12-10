@@ -16,13 +16,13 @@ use \lithium\util\reflection\Inspector;
  *
  **/
 class Generator extends \lithium\console\Command {
-	
+
 	public function run() {
 		$classes = Libraries::find(true, array(
-			'exclude' => "/webroot|index$|^app\\\\config|^app\\\\views/", 
+			'exclude' => "/webroot|index$|^app\\\\config|^app\\\\views/",
 			'recursive' => true
 		));
-		
+
 		foreach($classes as $class) {
 			$path = Libraries::path($class);
 			$contents = explode("\n", file_get_contents($path));
@@ -33,17 +33,18 @@ class Generator extends \lithium\console\Command {
 		}
 		
 	}
-	
+
 	protected function _header($contents) {
 		if (strpos($contents[1], '*') === false) {
 			$header = explode("\n", file_get_contents(
 				dirname(dirname(__DIR__)) . '/templates/docs/header.txt.php')
 			);
 			$one = array_shift($contents);
-			$contents = array_merge($header, $contents);	
+			$contents = array_merge($header, $contents);
 			array_unshift($contents, $one);
 		}
 		return $contents;
 	}
 }
+
 ?>
