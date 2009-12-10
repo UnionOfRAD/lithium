@@ -119,7 +119,7 @@ class Libraries {
 	 * Adds a class library from which files can be loaded
 	 *
 	 * @param string $name Library name, i.e. `'app'`, `'lithium'`, `'pear'` or `'solar'`.
-	 * @param array $options Specifies where the library is in the filesystem, and how classes
+	 * @param array $config Specifies where the library is in the filesystem, and how classes
 	 *              should be loaded from it.  Allowed keys are:
 	 *              - `'bootstrap'`: A file path (relative to `'path'`) to a bootstrap script that
 	 *                should be run when the library is added.
@@ -263,6 +263,7 @@ class Libraries {
 	 * are added through `lithium\core\Libraries::add()`.
 	 *
 	 * @param string $class The fully-namespaced (where applicable) name of the class to load.
+	 * @param $mixed $require
 	 * @see lithium\core\Libraries::add()
 	 * @see lithium\core\Libraries::path()
 	 * @return void
@@ -346,6 +347,7 @@ class Libraries {
 	 *
 	 * @param string $type
 	 * @param string $name
+	 * @param.array $options
 	 * @return mixed
 	 * @see lithium\core\Libraries::$_classPaths
 	 * @see lithium\core\Libraries::add()
@@ -430,7 +432,7 @@ class Libraries {
 				}
 				$opts = $options + $pathOptions;
 
-				if (isset($opts['libraries']) && !in_array($library, (array) $opts['libraries'])) {
+				if (isset($opts['libraries']) && !in_array($library, (array)$opts['libraries'])) {
 					unset($opts['libraries']);
 					continue;
 				}
@@ -477,7 +479,7 @@ class Libraries {
 				}
 				$opts = $options + $tplOpts;
 
-				if (isset($opts['libraries']) && !in_array($library, (array) $opts['libraries'])) {
+				if (isset($opts['libraries']) && !in_array($library, (array)$opts['libraries'])) {
 					unset($opts['libraries']);
 					continue;
 				}

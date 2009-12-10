@@ -44,6 +44,7 @@ class Object {
 	/**
 	 * Initialises properties, unless supplied configuration options change the default behaviour.
 	 *
+	 * @param array $config
 	 * @return object
 	 */
 	public function __construct($config = array()) {

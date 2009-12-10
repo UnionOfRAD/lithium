@@ -53,8 +53,8 @@ class StaticObject {
 	/**
 	 * Applies the configured strategies to a method of the current static object.
 	 *
-	 * @param  string $method The strategy method to be called.
-	 * @param  array  $params Parameters that are used by the strategy $method.
+	 * @param string $method The strategy method to be called.
+	 * @param array $params Parameters that are used by the strategy $method.
 	 * @return mixed  Data that has been modified by the configured strategies.
 	 **/
 	public static function applyStrategies($method, $params = array()) {
@@ -85,8 +85,8 @@ class StaticObject {
 	 * - If $name and $strategy are not set, then the full indexed strategies array is returned
 	 *   (note: the strategies are wrapped in \SplStack).
 	 *
-	 * @param  string        $name     Name of cache configuration.
-	 * @param  string|array  $strategy Fully namespaced cache strategy identifier.
+	 * @param string $name Name of cache configuration.
+	 * @param mixed $strategy Fully namespaced cache strategy identifier. String or array
 	 * @return mixed                   See above description.
 	 */
 	public static function strategies($name = '', $strategy = null) {
