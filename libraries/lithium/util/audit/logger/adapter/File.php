@@ -16,6 +16,7 @@ class File extends \lithium\core\Object {
 	/**
 	 * Class constructor
 	 *
+	 * @param array $config
 	 * @return void
 	 */
 	public function __construct($config = array()) {

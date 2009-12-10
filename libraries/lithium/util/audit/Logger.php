@@ -25,9 +25,9 @@ class Logger extends \lithium\core\Adaptable {
 	 * Writes $message to the log specified by the $name
 	 * configuration.
 	 *
-	 * @param  string $name    Configuration to be used for writing
-	 * @param  string $message Message to be written
-	 * @return boolean         True on successful write, false otherwise
+	 * @param string $type Configuration to be used for writing
+	 * @param string $message Message to be written
+	 * @return boolean True on successful write, false otherwise
 	 */
 	public static function write($type, $message) {
 		$settings = static::config();

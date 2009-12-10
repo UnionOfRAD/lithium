@@ -46,8 +46,8 @@ class Set {
 	 * Counts the dimensions of an array. If `$all` is set to `false` (which is the default) it will
 	 * only consider the dimension of the first element in the array.
 	 *
-	 * @param array $array Array to count dimensions on.
-	 * @param boolean $all true counts the dimension considering all elements in array.
+	 * @param array $data Array to count dimensions on.
+	 * @param array $options
 	 * @param integer $count Start the depth count at this number.
 	 * @return integer The number of dimensions in `$array`.
 	 */
@@ -222,8 +222,9 @@ class Set {
 	 * match certain conditions.
 	 *
 	 * @param mixed $conditions An array of condition strings or an XPath expression.
-	 * @param array $data  An array of data to execute the match on.
+	 * @param array $data An array of data to execute the match on.
 	 * @param integer $i Optional: The 'nth'-number of the item being matched.
+	 * @param integer $length
 	 * @return boolean
 	 */
 	public static function matches($conditions, $data = array(), $i = null, $length = null) {
@@ -409,6 +410,7 @@ class Set {
 	/**
 	 * Implements partial support for XPath 2.0.
 	 *
+	 * @param array $data An array of data to extract from.
 	 * @param string $path An absolute XPath 2.0 path. Only absolute paths starting with a
 	 *               single slash are supported right now. Implemented selectors:
 	 *               - `'/User/id'`: Similar to the classic {n}.User.id.
@@ -424,8 +426,7 @@ class Set {
 	 *               - `'/Comment[text=/lithium/i]`': Selects the all comments that have
 	 *                 a text matching the regex `/lithium/i`.
 	 *               - `'/Comment/@*'`: Selects all key names of all comments.
-	 * @param string $path An array of data to extract from.
-	 * @param string $options Currently only supports `'flatten'` which can be
+	 * @param array $options Currently only supports `'flatten'` which can be
 	 *              disabled for higher XPath-ness.
 	 * @return array An array of matched items.
 	 */
