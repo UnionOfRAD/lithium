@@ -128,7 +128,8 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 * Returns absolute paths to files according to configuration.
 	 *
 	 * @param string $category
-	 * @param string|void $locale
+	 * @param string $locale
+	 * @param string $scope
 	 * @return array
 	 */
 	protected function _files($category, $locale, $scope) {

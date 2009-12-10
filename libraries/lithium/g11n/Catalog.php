@@ -112,7 +112,7 @@ class Catalog extends \lithium\core\Adaptable {
 	 * }}}
 	 *
 	 * @param string $category Dot-delimeted category.
-	 * @param array Data keyed by locale.
+	 * @param array $data Data keyed by locale.
 	 * @param array $options Valid options are:
 	 *        - `'name'`: One or multiple configuration names.
 	 *        - `'scope'`: The scope to use.
