@@ -134,7 +134,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param string $name The identifier to quote.
 	 * @return string The quoted identifier.
 	 */
-		public function name($name) {
+	public function name($name) {
 		return $name;
 	}
 
