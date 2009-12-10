@@ -25,8 +25,9 @@ class Router extends \lithium\core\StaticObject {
 	/**
 	 * Connects a new route and returns the current routes array.
 	 *
-	 * @param string $route An empty string, or a route string "/"
+	 * @param string $template An empty string, or a route string "/"
 	 * @param array $params An array describing the default or required elements of the route
+	 * @param array $options
 	 * @return array Array of routes
 	 * @see lithium\http\Router::parse()
 	 */

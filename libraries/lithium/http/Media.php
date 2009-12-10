@@ -401,7 +401,7 @@ class Media extends \lithium\core\StaticObject {
 		$result = '';
 
 		if (isset($options['request'])) {
-			$options += (array) $options['request']->params;
+			$options += (array)$options['request']->params;
 			$handler['request'] = $options['request'];
 		}
 

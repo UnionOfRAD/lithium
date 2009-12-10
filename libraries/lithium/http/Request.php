@@ -102,6 +102,7 @@ class Request extends \lithium\http\Base {
 	/**
 	 * Constructor
 	 *
+	 * @param array $config
 	 * @return object
 	 */
 	public function __construct($config = array()) {

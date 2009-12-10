@@ -124,6 +124,7 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @param string $path
 	 * @param array $data
+	 * @param array $options
 	 * @return string
 	 */
 	public function get($path = null, $data = array(), $options = array()) {
@@ -135,6 +136,7 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @param string $path
 	 * @param array $data
+	 * @param array $options
 	 * @return string
 	 */
 	public function post($path = null, $data = array(), $options = array()) {
@@ -146,6 +148,7 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @param string $path
 	 * @param array $data
+	 * @param array $options
 	 * @return string
 	 */
 	public function put($path = null, $data = array(), $options = array()) {

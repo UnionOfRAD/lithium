@@ -84,6 +84,7 @@ class Base extends \lithium\core\Object {
 	/**
 	 * Add body parts.
 	 *
+	 * @param mixed $data
 	 * @return array
 	 */
 	public function body($data = null) {

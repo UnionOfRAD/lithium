@@ -98,6 +98,7 @@ class Response extends \lithium\http\Base {
 	/**
 	 * Constructor.
 	 *
+	 * @param array $config
 	 * @return object
 	 */
 	public function __construct($config = array()) {
@@ -148,6 +149,8 @@ class Response extends \lithium\http\Base {
 	/**
 	 * undocumented function
 	 *
+	 * @param string $key
+	 * @param string $data
 	 * @return string
 	 */
 	public function status($key = null, $data = null) {
@@ -190,6 +193,7 @@ class Response extends \lithium\http\Base {
 	* Decodes based on transfer encoding body.
 	*
 	* @todo replace with stream wrapper dechunk
+	* @param string $body
 	* @return string
 	*/
 	protected function _decode($body) {
