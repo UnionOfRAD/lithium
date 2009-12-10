@@ -15,5 +15,4 @@ class MockCurl extends \lithium\util\socket\Curl {
 	}
 }
 
-
 ?>

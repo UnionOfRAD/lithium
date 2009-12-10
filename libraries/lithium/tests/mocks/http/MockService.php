@@ -42,4 +42,5 @@ class MockService extends \lithium\http\Service {
 		}
 	}
 }
+
 ?>

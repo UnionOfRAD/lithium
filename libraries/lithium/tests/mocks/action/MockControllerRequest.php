@@ -9,7 +9,6 @@
 namespace lithium\tests\mocks\action;
 
 class MockControllerRequest extends \lithium\action\Request {
-
 }
 
 ?>

@@ -13,7 +13,7 @@ class MockCouchPost extends \lithium\data\Model {
 	protected $_meta = array(
 		'source' => 'posts'
 	);
-	
+
 	protected $_schema = array(
 		'id' => array('type' => 'integer', 'key' => 'primary'),
 		'author_id' => array('type' => 'integer'),

@@ -9,7 +9,6 @@
 namespace lithium\tests\mocks\data;
 
 class MockTag extends \lithium\data\Model {
-
 }
 
 ?>
