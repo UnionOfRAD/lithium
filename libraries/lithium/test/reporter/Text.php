@@ -88,7 +88,7 @@ class Text extends \lithium\test\Reporter {
 		);
 		$params += $defaults;
 		$params['namespace'] = str_replace('/', '.', $params['namespace']);
-		
+
 		if ($type == 'group') {
 			return String::insert(
 				"-group {:namespace}\n{:menu}\n", $params

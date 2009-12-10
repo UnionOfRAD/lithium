@@ -77,7 +77,7 @@ class Report extends \lithium\core\Object {
 			'filters' => array(),
 			'reporter' => 'text'
 		);
-		parent::__construct((array) $config + $defaults);
+		parent::__construct((array)$config + $defaults);
 	}
 
 	/**
@@ -124,9 +124,9 @@ class Report extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function stats() {
-		$results = (array) $this->results['group'];
+		$results = (array)$this->results['group'];
 		return $this->reporter->stats(array_reduce($results, function($stats, $result) {
-			$stats = (array) $stats + array(
+			$stats = (array)$stats + array(
 				'asserts' => 0,
 				'passes' => array(),
 				'fails' => array(),
@@ -163,7 +163,7 @@ class Report extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function filters() {
-		return $this->reporter->filters((array) $this->results['filters']);
+		return $this->reporter->filters((array)$this->results['filters']);
 	}
 }
 

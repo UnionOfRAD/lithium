@@ -20,8 +20,8 @@ use \lithium\util\reflection\Inspector;
  * Most assertions take an expected result, a received result, and a message (to describe the
  * failure) as parameters.
  *
- * Available assertions are (see `assert<assertion-name>` methods for details): Equal, False, Identical,
- * NoPattern, NotEqual, Null, Pattern, Tags, True.
+ * Available assertions are (see `assert<assertion-name>` methods for details): Equal, False,
+ * Identical, NoPattern, NotEqual, Null, Pattern, Tags, True.
  *
  * If an assertion is expected to produce an exception, the `expectException` method should be
  * called before it.
@@ -347,14 +347,14 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param string $string An HTML/XHTML/XML string
 	 * @param array $expected An array, see above
-	 * @param string $message SimpleTest failure output string
+	 * @param boolean $fullDebug
 	 * @access public
 	 */
 	function assertTags($string, $expected, $fullDebug = false) {
 		$regex = array();
 		$normalized = array();
 
-		foreach ((array) $expected as $key => $val) {
+		foreach ((array)$expected as $key => $val) {
 			if (!is_numeric($key)) {
 				$normalized[] = array($key => $val);
 			} else {
@@ -588,6 +588,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param object $exception The exception object to report on. Statistics are gathered and
 	 *               added to the reporting stack contained in `Unit::$_results`.
+	 * @param string $lineFlag
 	 * @return void
 	 * @todo Refactor so that reporters handle trace formatting.
 	 */
@@ -727,6 +728,7 @@ class Unit extends \lithium\core\Object {
 	 * Generates all permutation of an array $items and returns them in a new array.
 	 *
 	 * @param array $items An array of items
+	 * @param array $perms
 	 * @return array
 	 */
 	protected function _arrayPermute($items, $perms = array()) {

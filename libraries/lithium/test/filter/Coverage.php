@@ -83,6 +83,7 @@ class Coverage extends \lithium\core\StaticObject {
 	/**
 	 * Analyzes code coverage results collected from XDebug, and performs coverage density analysis.
 	 *
+	 * @param array $results
 	 * @param array $classes Optional. A list of classes to analyze coverage on.  By default, gets
 	 *              all defined subclasses of lithium\test\Unit which are currently in memory.
 	 * @return array Returns an array indexed by file and line, showing the number of instances
@@ -122,7 +123,7 @@ class Coverage extends \lithium\core\StaticObject {
 	 * Reduces the results of multiple XDebug code coverage runs into a single 2D array of the
 	 * aggregate line coverage density per file.
 	 *
-	 * @param array $results An array containing multiple runs of raw XDebug coverage data, where
+	 * @param array $runs An array containing multiple runs of raw XDebug coverage data, where
 	 *              each array key is a file name, and it's value is XDebug's coverage
 	 *              data for that file.
 	 * @param array $classMap An optional map with class names as array keys and corresponding file
@@ -158,12 +159,12 @@ class Coverage extends \lithium\core\StaticObject {
 		}
 		return $results;
 	}
-	
+
 	/**
 	 * Outputs the coverage analysis to a specific format
 	 *
 	 * @param string $format [required] html,txt
-	 * @param array $data [required] from Coverage::analysis()
+	 * @param array $analysis [required] from Coverage::analysis()
 	 * @return string
 	 */
 	public static function output($format, $analysis) {
@@ -211,7 +212,8 @@ class Coverage extends \lithium\core\StaticObject {
 							'data' => $contents[$i + 1]
 						);
 					}
-				} elseif (isset($out[$i - 1]) && $out[$i - 1]['data'] !== '...' && !isset($out[$i]) && !isset($out[$i + 1])) {
+				} elseif (isset($out[$i - 1]) && $out[$i - 1]['data'] !== '...'
+						&& !isset($out[$i]) && !isset($out[$i + 1])) {
 					$out[$i] = array(
 						'class' => 'ignored',
 						'data' => '...'

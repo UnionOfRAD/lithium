@@ -37,7 +37,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *
 	 * @param string $group If set, this test group is run. If not set, a group test may
 	 *        also be run by passing the 'group' option to the $options parameter.
-	 * @param array  $options Options array for the test run. Valid options are:
+	 * @param array $options Options array for the test run. Valid options are:
 	 *		  - 'case': The fully namespaced test case to be run.
 	 *        - 'group': The fully namespaced test group to be run.
 	 *		  - 'filters': An array of filters that the test output should be run through.
@@ -53,7 +53,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 		);
 		$options += $defaults;
 
-		$items = (array) $group;
+		$items = (array)$group;
 		$isCase = preg_match('/Test$/', $group);
 
 		if ($isCase) {
@@ -83,6 +83,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * Creates the test report class based on either the passed test case or the
 	 * passed test group.
 	 *
+	 * @param string $group
 	 * @param array $options Options array passed from Dispatcher::run(). Should contain
 	 *        one of 'case' or 'group' keys.
 	 * @return object Group object constructed with the test case or group passed in $options.
@@ -93,7 +94,6 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$class = new $report(compact('group') + $options);
 		return $class;
 	}
-
 }
 
 ?>
