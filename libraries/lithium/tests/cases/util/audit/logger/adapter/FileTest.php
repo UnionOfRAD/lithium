@@ -10,7 +10,6 @@ class FileTest extends \lithium\test\Unit {
 		$this->path = LITHIUM_APP_PATH . '/resources/tmp/logs/';
 		$this->Adapter = new File(array('path' => $this->path));
 	}
-
 }
 
 ?>

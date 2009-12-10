@@ -33,7 +33,9 @@ class MemcacheTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->server = array('host' => '127.0.0.1', 'port' => 11211, 'weight' => 100);
 		$this->_Memcached = new \Memcached();
-		$this->_Memcached->addServer($this->server['host'], $this->server['port'], $this->server['weight']);
+		$this->_Memcached->addServer(
+			$this->server['host'], $this->server['port'], $this->server['weight']
+		);
 		$this->Memcache = new Memcache();
 	}
 

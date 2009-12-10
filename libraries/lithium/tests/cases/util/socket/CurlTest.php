@@ -95,4 +95,5 @@ class CurlTest extends \lithium\test\Unit {
 		$this->assertPattern("/^<!doctype/i", $result);
 	}
 }
+
 ?>

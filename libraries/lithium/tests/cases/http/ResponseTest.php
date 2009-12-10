@@ -120,7 +120,8 @@ class ResponseTest extends \lithium\test\Unit {
 		$message = $headers.join("\r\n", array(
 			'b7',
 			'{"total_rows":1,"offset":0,"rows":[',
-			'{"id":"88989cafcd81b09f81078eb523832e8e","key":"gwoo","value":{"author":"gwoo","language":"php","preview":"test","created":"2009-10-27 12:14:12"}}',
+			'{"id":"88989cafcd81b09f81078eb523832e8e","key":"gwoo","value":'.
+			'{"author":"gwoo","language":"php","preview":"test","created":"2009-10-27 12:14:12"}}',
 			'4',
 			'',
 			']}',
@@ -135,7 +136,8 @@ class ResponseTest extends \lithium\test\Unit {
 
 		$expected = join("\r\n", array(
 			'{"total_rows":1,"offset":0,"rows":[',
-			'{"id":"88989cafcd81b09f81078eb523832e8e","key":"gwoo","value":{"author":"gwoo","language":"php","preview":"test","created":"2009-10-27 12:14:12"}}',
+			'{"id":"88989cafcd81b09f81078eb523832e8e","key":"gwoo","value":'.
+			'{"author":"gwoo","language":"php","preview":"test","created":"2009-10-27 12:14:12"}}',
 			']}',
 		));
 		$result = $response->body();

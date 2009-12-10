@@ -11,5 +11,7 @@ namespace lithium\tests\cases\action;
 use \lithium\action\Dispatcher;
 
 class DispatcherTest extends \lithium\test\Unit {
-	
+
 }
+
+?>

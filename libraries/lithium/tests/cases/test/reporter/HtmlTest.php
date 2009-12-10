@@ -36,7 +36,8 @@ class HtmlTest extends \lithium\test\Unit {
 		$expected = '<ul><li><a href="/test/lithium/tests">lithium</a>';
 		$expected .= '<ul><li><a href="/test/lithium/tests/cases">cases</a>';
 		$expected .= '<ul><li><a href="/test/lithium/tests/cases/core">core</a>';
-		$expected .= '<ul><li><a href="/test/lithium/tests/cases/core/LibrariesTest">LibrariesTest</a></li>';
+		$expected .= '<ul><li><a href="/test/lithium/tests/cases/core/LibrariesTest">'
+			.'LibrariesTest</a></li>';
 		$expected .= '</ul></li></ul></li></ul></li></ul>';
 
 		$result = $this->html->menu(array('lithium\tests\cases\core\LibrariesTest'), array(
@@ -47,7 +48,8 @@ class HtmlTest extends \lithium\test\Unit {
 
 	public function testFormatCase() {
 		$tests = array('lithium\tests\cases\test\reporter\HtmlTest');
-		$expected = '<ul><li><a href="/test/lithium/tests/cases/test/reporter/HtmlTest">HtmlTest</a></li></ul>';
+		$expected = '<ul><li><a href="/test/lithium/tests/cases/test/reporter/HtmlTest">'
+			.'HtmlTest</a></li></ul>';
 		$result = $this->html->menu($tests, array('request' => $this->request));
 		$this->assertEqual($expected, $result);
 	}
@@ -56,7 +58,8 @@ class HtmlTest extends \lithium\test\Unit {
 		$this->request->params = array('args' => array('lithium', 'tests', 'cases'));
 
 		$tests = array('lithium\tests\cases\test\reporter\HtmlTest');
-		$expected = '<ul><li><a href="/test/lithium/tests/cases/test/reporter/HtmlTest">HtmlTest</a></li></ul>';
+		$expected = '<ul><li><a href="/test/lithium/tests/cases/test/reporter/HtmlTest">'
+			.'HtmlTest</a></li></ul>';
 		$result = $this->html->menu($tests, array('request' => $this->request));
 		$this->assertEqual($expected, $result);
 	}

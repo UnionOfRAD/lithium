@@ -22,7 +22,7 @@ class SetTest extends \lithium\test\Unit {
 		$result = Set::depth($data);
 		$this->assertEqual($result, 0);
 	}
-	
+
 	/**
 	 * testDepthOneLevelWithDefaults method
 	 *
@@ -32,7 +32,7 @@ class SetTest extends \lithium\test\Unit {
 		$data = array();
 		$result = Set::depth($data);
 		$this->assertEqual($result, 0);
-		
+
 		$data = array('one', '2', 'three');
 		$result = Set::depth($data);
 		$this->assertEqual($result, 1);
@@ -111,7 +111,10 @@ class SetTest extends \lithium\test\Unit {
 		$result = Set::depth($data, true);
 		$this->assertEqual($result, 5);
 
-		$data = array('1' => array('1.1' => '1.1.1'), array('2' => array('2.1' => array('2.1.1' => array('2.1.1.1' => '2.1.1.1.1')))), '3' => array('3.1' => array('3.1.1' => '3.1.1.1')));
+		$data = array('1' => array('1.1' => '1.1.1'), array(
+			'2' => array('2.1' => array('2.1.1' => array('2.1.1.1' => '2.1.1.1.1')))),
+			'3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
+		);
 		$result = Set::depth($data, true);
 		$this->assertEqual($result, 5);
 	}
@@ -122,7 +125,10 @@ class SetTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testDepthFourLevelsWithAll() {
-		$data = array('1' => array('1.1' => '1.1.1'), array('2' => array('2.1' => array('2.1.1' => '2.1.1.1'))), '3' => array('3.1' => array('3.1.1' => '3.1.1.1')));
+		$data = array('1' => array('1.1' => '1.1.1'), array(
+			'2' => array('2.1' => array('2.1.1' => '2.1.1.1'))), 
+			'3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
+		);
 		$result = Set::depth($data, true);
 		$this->assertEqual($result, 4);
 	}
@@ -134,11 +140,17 @@ class SetTest extends \lithium\test\Unit {
 	 */
 	public function testDepthFiveLevelsWithAll() {
 
-		$data = array('1' => array('1.1' => '1.1.1'), array('2' => array('2.1' => array('2.1.1' => array('2.1.1.1')))), '3' => array('3.1' => array('3.1.1' => '3.1.1.1')));
+		$data = array('1' => array('1.1' => '1.1.1'), array(
+			'2' => array('2.1' => array('2.1.1' => array('2.1.1.1')))), 
+			'3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
+		);
 		$result = Set::depth($data, true);
 		$this->assertEqual($result, 5);
 
-		$data = array('1' => array('1.1' => '1.1.1'), array('2' => array('2.1' => array('2.1.1' => array('2.1.1.1' => '2.1.1.1.1')))), '3' => array('3.1' => array('3.1.1' => '3.1.1.1')));
+		$data = array('1' => array('1.1' => '1.1.1'), array(
+			'2' => array('2.1' => array('2.1.1' => array('2.1.1.1' => '2.1.1.1.1')))), 
+			'3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
+		);
 		$result = Set::depth($data, true);
 		$this->assertEqual($result, 5);
 	}
@@ -170,15 +182,21 @@ class SetTest extends \lithium\test\Unit {
 				'Author' => array('id' => '1', 'user' => 'nate', 'password' => 'foo'),
 			),
 			array(
-				'Post' => array('id' => '2', 'author_id' => '3', 'title' => 'Second Post', 'body' => 'Second Post Body'),
+				'Post' => array(
+					'id' => '2',
+					'author_id' => '3',
+					'title' => 'Second Post',
+					'body' => 'Second Post Body'
+				),
 				'Author' => array('id' => '3', 'user' => 'larry', 'password' => null),
 			)
 		);
 
 		$expected = array(
-			'0.Post.id' => '1', '0.Post.author_id' => '1', '0.Post.title' => 'First Post', '0.Author.id' => '1',
-			'0.Author.user' => 'nate', '0.Author.password' => 'foo', '1.Post.id' => '2', '1.Post.author_id' => '3',
-			'1.Post.title' => 'Second Post', '1.Post.body' => 'Second Post Body', '1.Author.id' => '3',
+			'0.Post.id' => '1', '0.Post.author_id' => '1', '0.Post.title' => 'First Post',
+			'0.Author.id' => '1', '0.Author.user' => 'nate', '0.Author.password' => 'foo',
+			'1.Post.id' => '2', '1.Post.author_id' => '3', '1.Post.title' => 'Second Post',
+			'1.Post.body' => 'Second Post Body', '1.Author.id' => '3',
 			'1.Author.user' => 'larry', '1.Author.password' => null
 		);
 		$result = Set::flatten($data);
@@ -188,7 +206,7 @@ class SetTest extends \lithium\test\Unit {
 		$expected = array('Post/id' => '1', 'Post/author_id' => '1', 'Post/title' => 'First Post');
 		$this->assertEqual($expected, $result);
 	}
-	
+
 	/**
 	 * testFilter method
 	 *
@@ -198,12 +216,16 @@ class SetTest extends \lithium\test\Unit {
 		$expected = array('one');
 		$result = Set::filter('one');
 		$this->assertIdentical($expected, $result);
-		
-		$expected = array('0', 2 => true, 3 => 0, 4 => array('one thing', 'I can tell you', 'is you got to be', false));
-		$result = Set::filter(array('0', false, true, 0, array('one thing', 'I can tell you', 'is you got to be', false)));
+
+		$expected = array('0', 2 => true, 3 => 0, 4 => array(
+			'one thing', 'I can tell you', 'is you got to be', false
+		));
+		$result = Set::filter(array('0', false, true, 0, array(
+			'one thing', 'I can tell you', 'is you got to be', false
+		)));
 		$this->assertIdentical($expected, $result);
 	}
-	
+
 	/**
 	 * testFormatmethod
 	 *
@@ -211,9 +233,19 @@ class SetTest extends \lithium\test\Unit {
 	 */
 	public function testFormat() {
 		$data = array(
-			array('Person' => array('first_name' => 'Nate', 'last_name' => 'Abele', 'city' => 'Boston', 'state' => 'MA', 'something' => '42')),
-			array('Person' => array('first_name' => 'Larry', 'last_name' => 'Masters', 'city' => 'Boondock', 'state' => 'TN', 'something' => '{0}')),
-			array('Person' => array('first_name' => 'Garrett', 'last_name' => 'Woodworth', 'city' => 'Venice Beach', 'state' => 'CA', 'something' => '{1}')));
+			array('Person' => array(
+				'first_name' => 'Nate', 'last_name' => 'Abele',
+				'city' => 'Boston', 'state' => 'MA', 'something' => '42'
+			)),
+			array('Person' => array(
+				'first_name' => 'Larry', 'last_name' => 'Masters',
+				'city' => 'Boondock', 'state' => 'TN', 'something' => '{0}'
+			)),
+			array('Person' => array(
+				'first_name' => 'Garrett', 'last_name' => 'Woodworth',
+				'city' => 'Venice Beach', 'state' => 'CA', 'something' => '{1}'
+			))
+		);
 
 		$result = Set::format($data, '{1}, {0}', array('/Person/first_name', '/Person/last_name'));
 		$expected = array('Abele, Nate', 'Masters, Larry', 'Woodworth, Garrett');
@@ -230,27 +262,37 @@ class SetTest extends \lithium\test\Unit {
 		$expected = array('{Boston, MA}', '{Boondock, TN}', '{Venice Beach, CA}');
 		$this->assertEqual($expected, $result);
 
-		$result = Set::format($data, '{{0}, {1}}', array('/Person/something', '/Person/something'));
+		$result = Set::format($data, '{{0}, {1}}', array(
+			'/Person/something', '/Person/something'
+		));
 		$expected = array('{42, 42}', '{{0}, {0}}', '{{1}, {1}}');
 		$this->assertEqual($expected, $result);
 
-		$result = Set::format($data, '{%2$d, %1$s}', array('/Person/something', '/Person/something'));
+		$result = Set::format($data, '{%2$d, %1$s}', array(
+			'/Person/something', '/Person/something'
+		));
 		$expected = array('{42, 42}', '{0, {0}}', '{0, {1}}');
 		$this->assertEqual($expected, $result);
 
-		$result = Set::format($data, '{%1$s, %1$s}', array('/Person/something', '/Person/something'));
+		$result = Set::format($data, '{%1$s, %1$s}', array(
+			'/Person/something', '/Person/something'
+		));
 		$expected = array('{42, 42}', '{{0}, {0}}', '{{1}, {1}}');
 		$this->assertEqual($expected, $result);
 
-		$result = Set::format($data, '%2$d, %1$s', array('/Person/first_name', '/Person/something'));
+		$result = Set::format($data, '%2$d, %1$s', array(
+			'/Person/first_name', '/Person/something'
+		));
 		$expected = array('42, Nate', '0, Larry', '0, Garrett');
 		$this->assertEqual($expected, $result);
 
-		$result = Set::format($data, '%1$s, %2$d', array('/Person/first_name', '/Person/something'));
+		$result = Set::format($data, '%1$s, %2$d', array(
+			'/Person/first_name', '/Person/something'
+		));
 		$expected = array('Nate, 42', 'Larry, 0', 'Garrett, 0');
 		$this->assertEqual($expected, $result);
 	}
-	
+
 	/**
 	 * testMatches first, because extract and others depend on it.
 	 *
@@ -371,7 +413,11 @@ class SetTest extends \lithium\test\Unit {
 	public function testExtract() {
 		$a = array(
 			array(
-				'Article' => array('id' => '1', 'user_id' => '1', 'title' => 'First Article', 'body' => 'First Article Body', 'published' => 'Y', 'created' => '2007-03-18 10:39:23', 'updated' => '2007-03-18 10:41:31'),
+				'Article' => array(
+					'id' => '1', 'user_id' => '1', 'title' => 'First Article',
+					'body' => 'First Article Body', 'published' => 'Y',
+					'created' => '2007-03-18 10:39:23', 'updated' => '2007-03-18 10:41:31'
+				),
 				'User' => array(
 					'id' => '1', 'user' => 'mariano',
 					'password' => '5f4dcc3b5aa765d61d8327deb882cf99',
@@ -409,33 +455,65 @@ class SetTest extends \lithium\test\Unit {
 				)
 			),
 			array(
-				'Article' => array('id' => '3', 'user_id' => '1', 'title' => 'Third Article', 'body' => 'Third Article Body', 'published' => 'Y', 'created' => '2007-03-18 10:43:23', 'updated' => '2007-03-18 10:45:31'),
-				'User' => array('id' => '2', 'user' => 'mariano', 'password' => '5f4dcc3b5aa765d61d8327deb882cf99', 'created' => '2007-03-17 01:16:23', 'updated' => '2007-03-17 01:18:31'),
+				'Article' => array(
+					'id' => '3', 'user_id' => '1', 'title' => 'Third Article',
+					'body' => 'Third Article Body', 'published' => 'Y',
+					'created' => '2007-03-18 10:43:23', 'updated' => '2007-03-18 10:45:31'
+				),
+				'User' => array(
+					'id' => '2', 'user' => 'mariano',
+					'password' => '5f4dcc3b5aa765d61d8327deb882cf99',
+					'created' => '2007-03-17 01:16:23', 'updated' => '2007-03-17 01:18:31'
+				),
 				'Comment' => array(),
 				'Tag' => array()
 			),
 			array(
-				'Article' => array('id' => '3', 'user_id' => '1', 'title' => 'Third Article', 'body' => 'Third Article Body', 'published' => 'Y', 'created' => '2007-03-18 10:43:23', 'updated' => '2007-03-18 10:45:31'),
-				'User' => array('id' => '3', 'user' => 'mariano', 'password' => '5f4dcc3b5aa765d61d8327deb882cf99', 'created' => '2007-03-17 01:16:23', 'updated' => '2007-03-17 01:18:31'),
+				'Article' => array(
+					'id' => '3', 'user_id' => '1', 'title' => 'Third Article',
+					'body' => 'Third Article Body', 'published' => 'Y',
+					'created' => '2007-03-18 10:43:23', 'updated' => '2007-03-18 10:45:31'
+				),
+				'User' => array(
+					'id' => '3', 'user' => 'mariano',
+					'password' => '5f4dcc3b5aa765d61d8327deb882cf99',
+					'created' => '2007-03-17 01:16:23', 'updated' => '2007-03-17 01:18:31'
+				),
 				'Comment' => array(),
 				'Tag' => array()
 			),
 			array(
-				'Article' => array('id' => '3', 'user_id' => '1', 'title' => 'Third Article', 'body' => 'Third Article Body', 'published' => 'Y', 'created' => '2007-03-18 10:43:23', 'updated' => '2007-03-18 10:45:31'),
-				'User' => array('id' => '4', 'user' => 'mariano', 'password' => '5f4dcc3b5aa765d61d8327deb882cf99', 'created' => '2007-03-17 01:16:23', 'updated' => '2007-03-17 01:18:31'),
+				'Article' => array(
+					'id' => '3', 'user_id' => '1', 'title' => 'Third Article',
+					'body' => 'Third Article Body', 'published' => 'Y',
+					'created' => '2007-03-18 10:43:23', 'updated' => '2007-03-18 10:45:31'
+				),
+				'User' => array(
+					'id' => '4', 'user' => 'mariano',
+					'password' => '5f4dcc3b5aa765d61d8327deb882cf99',
+					'created' => '2007-03-17 01:16:23', 'updated' => '2007-03-17 01:18:31'
+				),
 				'Comment' => array(),
 				'Tag' => array()
 			),
 			array(
-				'Article' => array('id' => '3', 'user_id' => '1', 'title' => 'Third Article', 'body' => 'Third Article Body', 'published' => 'Y', 'created' => '2007-03-18 10:43:23', 'updated' => '2007-03-18 10:45:31'),
-				'User' => array('id' => '5', 'user' => 'mariano', 'password' => '5f4dcc3b5aa765d61d8327deb882cf99', 'created' => '2007-03-17 01:16:23', 'updated' => '2007-03-17 01:18:31'),
+				'Article' => array(
+					'id' => '3', 'user_id' => '1', 'title' => 'Third Article',
+					'body' => 'Third Article Body', 'published' => 'Y',
+					'created' => '2007-03-18 10:43:23', 'updated' => '2007-03-18 10:45:31'
+				),
+				'User' => array(
+					'id' => '5', 'user' => 'mariano',
+					'password' => '5f4dcc3b5aa765d61d8327deb882cf99',
+					'created' => '2007-03-17 01:16:23', 'updated' => '2007-03-17 01:18:31'
+				),
 				'Comment' => array(),
 				'Tag' => array()
 			)
 		);
-		
+
 		$b = array('Deep' => $a[0]['Deep']);
-		
+
 		$c = array(
 			array('a' => array('I' => array('a' => 1))),
 			array('a' => array(2)),
@@ -1278,27 +1356,60 @@ class SetTest extends \lithium\test\Unit {
 				14 => 'Larry E. Masters'));
 		$this->assertIdentical($expected, $result);
 
-		$result = Set::combine($a, '/User/id', array('{0}: {1}', '/User/Data/user', '/User/Data/name'), '/User/group_id');
+		$result = Set::combine(
+			$a,
+			'/User/id',
+			array('{0}: {1}', '/User/Data/user', '/User/Data/name'),
+			'/User/group_id'
+		);
 		$expected = array(
 			1 => array(2 => 'mariano.iglesias: Mariano Iglesias', 25 => 'gwoo: The Gwoo'),
 			2 => array(14 => 'phpnut: Larry E. Masters')
 		);
 		$this->assertIdentical($expected, $result);
 
-		$result = Set::combine($a, array('{0}: {1}', '/User/Data/user', '/User/Data/name'), '/User/id');
-		$expected = array('mariano.iglesias: Mariano Iglesias' => 2, 'phpnut: Larry E. Masters' => 14, 'gwoo: The Gwoo' => 25);
+		$result = Set::combine(
+			$a,
+			array('{0}: {1}', '/User/Data/user', '/User/Data/name'),
+			'/User/id'
+		);
+		$expected = array(
+			'mariano.iglesias: Mariano Iglesias' => 2,
+			'phpnut: Larry E. Masters' => 14,
+			'gwoo: The Gwoo' => 25
+		);
 		$this->assertIdentical($expected, $result);
 
-		$result = Set::combine($a, array('{1}: {0}', '/User/Data/user', '/User/Data/name'), '/User/id');
-		$expected = array('Mariano Iglesias: mariano.iglesias' => 2, 'Larry E. Masters: phpnut' => 14, 'The Gwoo: gwoo' => 25);
+		$result = Set::combine(
+			$a, 
+			array('{1}: {0}', '/User/Data/user', '/User/Data/name'), 
+			'/User/id'
+		);
+		$expected = array(
+			'Mariano Iglesias: mariano.iglesias' => 2,
+			'Larry E. Masters: phpnut' => 14,
+			'The Gwoo: gwoo' => 25
+		);
 		$this->assertIdentical($expected, $result);
 
-		$result = Set::combine($a, array('%1$s: %2$d', '/User/Data/user', '/User/id'), '/User/Data/name');
-		$expected = array('mariano.iglesias: 2' => 'Mariano Iglesias', 'phpnut: 14' => 'Larry E. Masters', 'gwoo: 25' => 'The Gwoo');
+		$result = Set::combine($a, array(
+			'%1$s: %2$d', '/User/Data/user', '/User/id'), '/User/Data/name'
+		);
+		$expected = array(
+			'mariano.iglesias: 2' => 'Mariano Iglesias',
+			'phpnut: 14' => 'Larry E. Masters',
+			'gwoo: 25' => 'The Gwoo'
+		);
 		$this->assertIdentical($expected, $result);
 
-		$result = Set::combine($a, array('%2$d: %1$s', '/User/Data/user', '/User/id'), '/User/Data/name');
-		$expected = array('2: mariano.iglesias' => 'Mariano Iglesias', '14: phpnut' => 'Larry E. Masters', '25: gwoo' => 'The Gwoo');
+		$result = Set::combine($a, array(
+			'%2$d: %1$s', '/User/Data/user', '/User/id'), '/User/Data/name'
+		);
+		$expected = array(
+			'2: mariano.iglesias' => 'Mariano Iglesias',
+			'14: phpnut' => 'Larry E. Masters',
+			'25: gwoo' => 'The Gwoo'
+		);
 		$this->assertIdentical($expected, $result);
 
 		$b = new \stdClass();
@@ -1340,18 +1451,48 @@ class SetTest extends \lithium\test\Unit {
 				'Array1Data1' => 'Array1Data1 value 1', 'Array1Data2' => 'Array1Data2 value 2'
 			),
 			'Array2' => array(
-				array('Array2Data1' => 1, 'Array2Data2' => 'Array2Data2 value 2', 'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'),
-				array('Array2Data1' => 2, 'Array2Data2' => 'Array2Data2 value 2', 'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'),
-				array('Array2Data1' => 3, 'Array2Data2' => 'Array2Data2 value 2', 'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'),
-				array('Array2Data1' => 4, 'Array2Data2' => 'Array2Data2 value 2', 'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'),
-				array('Array2Data1' => 5, 'Array2Data2' => 'Array2Data2 value 2', 'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4')
+				array(
+					'Array2Data1' => 1, 'Array2Data2' => 'Array2Data2 value 2',
+					'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'
+				),
+				array(
+					'Array2Data1' => 2, 'Array2Data2' => 'Array2Data2 value 2',
+					'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'
+				),
+				array(
+					'Array2Data1' => 3, 'Array2Data2' => 'Array2Data2 value 2',
+					'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'
+				),
+				array(
+					'Array2Data1' => 4, 'Array2Data2' => 'Array2Data2 value 2',
+					'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'
+				),
+				array(
+					'Array2Data1' => 5, 'Array2Data2' => 'Array2Data2 value 2',
+					'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'
+				)
 			),
 			'Array3' => array(
-				array('Array3Data1' => 1, 'Array3Data2' => 'Array3Data2 value 2', 'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'),
-				array('Array3Data1' => 2, 'Array3Data2' => 'Array3Data2 value 2', 'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'),
-				array('Array3Data1' => 3, 'Array3Data2' => 'Array3Data2 value 2', 'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'),
-				array('Array3Data1' => 4, 'Array3Data2' => 'Array3Data2 value 2', 'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'),
-				array('Array3Data1' => 5, 'Array3Data2' => 'Array3Data2 value 2', 'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4')
+				array(
+					'Array3Data1' => 1, 'Array3Data2' => 'Array3Data2 value 2',
+					'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'
+				),
+				array(
+					'Array3Data1' => 2, 'Array3Data2' => 'Array3Data2 value 2',
+					'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'
+				),
+				array(
+					'Array3Data1' => 3, 'Array3Data2' => 'Array3Data2 value 2',
+					'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'
+				),
+				array(
+					'Array3Data1' => 4, 'Array3Data2' => 'Array3Data2 value 2',
+					'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'
+				),
+				array(
+					'Array3Data1' => 5, 'Array3Data2' => 'Array3Data2 value 2',
+					'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'
+				)
 			)
 		);
 		$map = Set::map($expected, true);
@@ -1381,25 +1522,57 @@ class SetTest extends \lithium\test\Unit {
 
 		$expected = array(
 			'Array1' => array(
-				'Array1Data1' => 'Array1Data1 value 1', 'Array1Data2' => 'Array1Data2 value 2', 'Array1Data3' => 'Array1Data3 value 3','Array1Data4' => 'Array1Data4 value 4',
-				'Array1Data5' => 'Array1Data5 value 5', 'Array1Data6' => 'Array1Data6 value 6', 'Array1Data7' => 'Array1Data7 value 7', 'Array1Data8' => 'Array1Data8 value 8'
+				'Array1Data1' => 'Array1Data1 value 1', 'Array1Data2' => 'Array1Data2 value 2',
+				'Array1Data3' => 'Array1Data3 value 3','Array1Data4' => 'Array1Data4 value 4',
+				'Array1Data5' => 'Array1Data5 value 5', 'Array1Data6' => 'Array1Data6 value 6',
+				'Array1Data7' => 'Array1Data7 value 7', 'Array1Data8' => 'Array1Data8 value 8'
 			),
 			'string' => 1,
 			'another' => 'string',
 			'some' => 'thing else',
 			'Array2' => array(
-				array('Array2Data1' => 1, 'Array2Data2' => 'Array2Data2 value 2', 'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'),
-				array('Array2Data1' => 2, 'Array2Data2' => 'Array2Data2 value 2', 'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'),
-				array('Array2Data1' => 3, 'Array2Data2' => 'Array2Data2 value 2', 'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'),
-				array('Array2Data1' => 4, 'Array2Data2' => 'Array2Data2 value 2', 'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'),
-				array('Array2Data1' => 5, 'Array2Data2' => 'Array2Data2 value 2', 'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4')
+				array(
+					'Array2Data1' => 1, 'Array2Data2' => 'Array2Data2 value 2',
+					'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'
+				),
+				array(
+					'Array2Data1' => 2, 'Array2Data2' => 'Array2Data2 value 2',
+					'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'
+				),
+				array(
+					'Array2Data1' => 3, 'Array2Data2' => 'Array2Data2 value 2',
+					'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'
+				),
+				array(
+					'Array2Data1' => 4, 'Array2Data2' => 'Array2Data2 value 2',
+					'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'
+				),
+				array(
+					'Array2Data1' => 5, 'Array2Data2' => 'Array2Data2 value 2',
+					'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'
+				)
 			),
 			'Array3' => array(
-				array('Array3Data1' => 1, 'Array3Data2' => 'Array3Data2 value 2', 'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'),
-				array('Array3Data1' => 2, 'Array3Data2' => 'Array3Data2 value 2', 'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'),
-				array('Array3Data1' => 3, 'Array3Data2' => 'Array3Data2 value 2', 'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'),
-				array('Array3Data1' => 4, 'Array3Data2' => 'Array3Data2 value 2', 'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'),
-				array('Array3Data1' => 5, 'Array3Data2' => 'Array3Data2 value 2', 'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4')
+				array(
+					'Array3Data1' => 1, 'Array3Data2' => 'Array3Data2 value 2',
+					'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'
+				),
+				array(
+					'Array3Data1' => 2, 'Array3Data2' => 'Array3Data2 value 2',
+					'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'
+				),
+				array(
+					'Array3Data1' => 3, 'Array3Data2' => 'Array3Data2 value 2',
+					'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'
+				),
+				array(
+					'Array3Data1' => 4, 'Array3Data2' => 'Array3Data2 value 2',
+					'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'
+				),
+				array(
+					'Array3Data1' => 5, 'Array3Data2' => 'Array3Data2 value 2',
+					'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'
+				)
 			)
 		);
 		$map = Set::map($expected, true);
@@ -1408,28 +1581,60 @@ class SetTest extends \lithium\test\Unit {
 
 		$expected = array(
 			'Array1' => array(
-				'Array1Data1' => 'Array1Data1 value 1', 'Array1Data2' => 'Array1Data2 value 2', 'Array1Data3' => 'Array1Data3 value 3','Array1Data4' => 'Array1Data4 value 4',
-				'Array1Data5' => 'Array1Data5 value 5', 'Array1Data6' => 'Array1Data6 value 6', 'Array1Data7' => 'Array1Data7 value 7', 'Array1Data8' => 'Array1Data8 value 8'
+				'Array1Data1' => 'Array1Data1 value 1', 'Array1Data2' => 'Array1Data2 value 2',
+				'Array1Data3' => 'Array1Data3 value 3','Array1Data4' => 'Array1Data4 value 4',
+				'Array1Data5' => 'Array1Data5 value 5', 'Array1Data6' => 'Array1Data6 value 6',
+				'Array1Data7' => 'Array1Data7 value 7', 'Array1Data8' => 'Array1Data8 value 8'
 			),
 			'string' => 1,
 			'another' => 'string',
 			'some' => 'thing else',
 			'Array2' => array(
-				array('Array2Data1' => 1, 'Array2Data2' => 'Array2Data2 value 2', 'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'),
-				array('Array2Data1' => 2, 'Array2Data2' => 'Array2Data2 value 2', 'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'),
-				array('Array2Data1' => 3, 'Array2Data2' => 'Array2Data2 value 2', 'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'),
-				array('Array2Data1' => 4, 'Array2Data2' => 'Array2Data2 value 2', 'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'),
-				array('Array2Data1' => 5, 'Array2Data2' => 'Array2Data2 value 2', 'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4')
+				array(
+					'Array2Data1' => 1, 'Array2Data2' => 'Array2Data2 value 2',
+					'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'
+				),
+				array(
+					'Array2Data1' => 2, 'Array2Data2' => 'Array2Data2 value 2',
+					'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'
+				),
+				array(
+					'Array2Data1' => 3, 'Array2Data2' => 'Array2Data2 value 2',
+					'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'
+				),
+				array(
+					'Array2Data1' => 4, 'Array2Data2' => 'Array2Data2 value 2',
+					'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'
+				),
+				array(
+					'Array2Data1' => 5, 'Array2Data2' => 'Array2Data2 value 2',
+					'Array2Data3' => 'Array2Data3 value 2', 'Array2Data4' => 'Array2Data4 value 4'
+				)
 			),
 			'string2' => 1,
 			'another2' => 'string',
 			'some2' => 'thing else',
 			'Array3' => array(
-				array('Array3Data1' => 1, 'Array3Data2' => 'Array3Data2 value 2', 'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'),
-				array('Array3Data1' => 2, 'Array3Data2' => 'Array3Data2 value 2', 'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'),
-				array('Array3Data1' => 3, 'Array3Data2' => 'Array3Data2 value 2', 'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'),
-				array('Array3Data1' => 4, 'Array3Data2' => 'Array3Data2 value 2', 'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'),
-				array('Array3Data1' => 5, 'Array3Data2' => 'Array3Data2 value 2', 'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4')
+				array(
+					'Array3Data1' => 1, 'Array3Data2' => 'Array3Data2 value 2',
+					'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'
+				),
+				array(
+					'Array3Data1' => 2, 'Array3Data2' => 'Array3Data2 value 2',
+					'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'
+				),
+				array(
+					'Array3Data1' => 3, 'Array3Data2' => 'Array3Data2 value 2',
+					'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'
+				),
+				array(
+					'Array3Data1' => 4, 'Array3Data2' => 'Array3Data2 value 2',
+					'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'
+				),
+				array(
+					'Array3Data1' => 5, 'Array3Data2' => 'Array3Data2 value 2',
+					'Array3Data3' => 'Array3Data3 value 2', 'Array3Data4' => 'Array3Data4 value 4'
+				)
 			),
 			'string3' => 1,
 			'another3' => 'string',
@@ -1453,7 +1658,12 @@ class SetTest extends \lithium\test\Unit {
 		$result = Set::reverse($class);
 		$this->assertIdentical($expected, $result);
 
-		$expected = array('User' => array('psword'=> 'whatever', 'Icon' => array('id' => 851), 'Profile' => array('name' => 'Some Name', 'address' => 'Some Address')));
+		$expected = array(
+			'User' => array(
+				'psword'=> 'whatever', 'Icon' => array('id' => 851), 
+				'Profile' => array('name' => 'Some Name', 'address' => 'Some Address')
+			)
+		);
 		$class = new \stdClass;
 		$class->User = new \stdClass;
 		$class->User->psword = 'whatever';
@@ -1466,12 +1676,23 @@ class SetTest extends \lithium\test\Unit {
 		$result = Set::reverse($class);
 		$this->assertIdentical($expected, $result);
 
-		$expected = array('User' => array('psword'=> 'whatever',
-						'Icon' => array('id'=> 851),
-						'Profile' => array('name' => 'Some Name', 'address' => 'Some Address'),
-						'Comment' => array(
-								array('id' => 1, 'article_id' => 1, 'user_id' => 1, 'comment' => 'First Comment for First Article', 'published' => 'Y', 'created' => '2007-03-18 10:47:23', 'updated' => '2007-03-18 10:49:31'),
-								array('id' => 2, 'article_id' => 1, 'user_id' => 2, 'comment' => 'Second Comment for First Article', 'published' => 'Y', 'created' => '2007-03-18 10:47:23', 'updated' => '2007-03-18 10:49:31'))));
+		$expected = array('User' => array(
+			'psword'=> 'whatever',
+			'Icon' => array('id'=> 851),
+			'Profile' => array('name' => 'Some Name', 'address' => 'Some Address'),
+			'Comment' => array(
+				array(
+					'id' => 1, 'article_id' => 1, 'user_id' => 1,
+					'comment' => 'First Comment for First Article', 'published' => 'Y',
+					'created' => '2007-03-18 10:47:23', 'updated' => '2007-03-18 10:49:31'
+				),
+				array(
+					'id' => 2, 'article_id' => 1, 'user_id' => 2,
+					'comment' => 'Second Comment for First Article', 'published' => 'Y',
+					'created' => '2007-03-18 10:47:23', 'updated' => '2007-03-18 10:49:31'
+				)
+			)
+		));
 
 		$class = new \stdClass;
 		$class->User = new \stdClass;

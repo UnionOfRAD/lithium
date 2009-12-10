@@ -44,7 +44,6 @@ class ReportTest extends \lithium\test\Unit {
 		$result = $report->stats();
 		$this->assertEqual($expected, $result);
 	}
-
 }
 
 ?>

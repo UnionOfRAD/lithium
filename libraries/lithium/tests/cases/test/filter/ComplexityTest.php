@@ -15,7 +15,6 @@ class ComplexityTest extends \lithium\test\Unit {
 	public function setUp() {
 
 	}
-
 }
 
 ?>

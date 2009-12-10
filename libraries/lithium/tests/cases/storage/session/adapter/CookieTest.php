@@ -130,7 +130,6 @@ class CookieTest extends \lithium\test\Unit {
 
 		$this->assertCookie(compact('key', 'value', 'path'), headers_list());
 	}
-
 }
 
 ?>
