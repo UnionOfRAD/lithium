@@ -31,6 +31,7 @@ class File extends \lithium\core\Object {
 	/**
 	 * Class constructor
 	 *
+	 * @param array $config
 	 * @return void
 	 */
 	public function __construct($config = array()) {
@@ -41,9 +42,9 @@ class File extends \lithium\core\Object {
 	/**
 	 * Write value(s) to the cache
 	 *
-	 * @param string $key        The key to uniquely identify the cached item
-	 * @param mixed  $value      The value to be cached
-	 * @param string $expiry     A strtotime() compatible cache time
+	 * @param string $key The key to uniquely identify the cached item
+	 * @param mixed $data The value to be cached
+	 * @param string $expiry A strtotime() compatible cache time
 	 * @return boolean True on successful write, false otherwise
 	 */
 	public function write($key, $data, $expiry) {
@@ -142,7 +143,6 @@ class File extends \lithium\core\Object {
 
 		return ($directory->isDir() && $directory->isReadable() && $directory->isWritable());
 	}
-
 }
 
 ?>

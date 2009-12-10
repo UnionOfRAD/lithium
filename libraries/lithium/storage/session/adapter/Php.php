@@ -34,6 +34,7 @@ class Php extends \lithium\core\Object {
 	 * Takes care of setting appropriate configurations for
 	 * this object.
 	 *
+	 * @param array $config
 	 * @return void
 	 */
 	public function __construct($config = array()) {
@@ -86,9 +87,9 @@ class Php extends \lithium\core\Object {
 	/**
 	 * Read value from the session
 	 *
-	 * @param string $key        Key of the entry to be read
-	 * @param array  $options    Options array
-	 * @return mixed             Data in the session if successful, false otherwise
+	 * @param string $key Key of the entry to be read
+	 * @param array $options Options array
+	 * @return mixed Data in the session if successful, false otherwise
 	 */
 	public function read($key, $options = array()) {
 		return function($self, $params, $chain) {
@@ -100,10 +101,10 @@ class Php extends \lithium\core\Object {
 	/**
 	 * Write value to the session
 	 *
-	 * @param  string $key        Key of the item to be stored
-	 * @param  mixed  $value      The value to be stored
-	 * @param  array  $options    Options array
-	 * @return boolean            True on successful write, false otherwise
+	 * @param string $key Key of the item to be stored
+	 * @param mixed $value The value to be stored
+	 * @param array $options Options array
+	 * @return boolean True on successful write, false otherwise
 	 */
 	public static function write($key, $value, $options = array()) {
 		return function($self, $params, $chain) {
@@ -115,9 +116,9 @@ class Php extends \lithium\core\Object {
 	/**
 	 * Delete value from the session
 	 *
-	 * @param  string  $key		The key to be deleted
-	 * @param  array   $options Options array
-	 * @return boolean          True on successful delete, false otherwise
+	 * @param string $key The key to be deleted
+	 * @param array $options Options array
+	 * @return boolean True on successful delete, false otherwise
 	 */
 	public static function delete($key, $options = array()) {
 		return function($self, $params, $chain) {
@@ -138,7 +139,7 @@ class Php extends \lithium\core\Object {
 	 * return boolean True if enabled, false otherwise
 	 */
 	public function enabled() {
-		return (bool) session_id();
+		return (boolean)session_id();
 	}
 }
 

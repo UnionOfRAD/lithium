@@ -57,8 +57,8 @@ class Memory extends \lithium\core\Object {
 	/**
 	 * Write value(s) to the cache
 	 *
-	 * @param string $key        The key to uniquely identify the cached item
-	 * @param mixed  $value      The value to be cached
+	 * @param string $key The key to uniquely identify the cached item
+	 * @param mixed $data The value to be cached
 	 * @param object $conditions Conditions under which the operation should proceed
 	 * @return boolean True on successful write, false otherwise
 	 */
@@ -67,7 +67,7 @@ class Memory extends \lithium\core\Object {
 
 		return function($self, $params, $chain) use (&$cache) {
 			extract($params);
-			return (bool)($cache[$key] = $data);
+			return (boolean)($cache[$key] = $data);
 		};
 	}
 
@@ -121,6 +121,6 @@ class Memory extends \lithium\core\Object {
 	public function clean() {
 		return false;
 	}
-
 }
+
 ?>
