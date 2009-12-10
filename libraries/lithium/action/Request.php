@@ -294,9 +294,10 @@ class Request extends \lithium\core\Object {
 	/**
 	 * Detects properties of the request and returns a boolean response
 	 *
-	 * @return boolean
 	 * @see lithium\action\Request::detect()
 	 * @todo Remove $content and refer to Media class instead
+	 * @param string $flag
+	 * @return boolean
 	 */
 	public function is($flag) {
 		$flag = strtolower($flag);
@@ -317,7 +318,7 @@ class Request extends \lithium\core\Object {
 			if (is_callable($detector)) {
 				return $detector($this);
 			}
-			return (bool)$this->env($detector);
+			return (boolean)$this->env($detector);
 		}
 		return false;
 	}
@@ -336,8 +337,10 @@ class Request extends \lithium\core\Object {
 	 * Creates a 'detector' used with Request::is().  A detector is a boolean check that is created
 	 * to determine something about a request.
 	 *
-	 * @return void
 	 * @see lithium\action\Request::is()
+	 * @param string $flag
+	 * @param boolean $detector
+	 * @return void
 	 */
 	public function detect($flag, $detector = null) {
 		if (is_array($flag)) {
