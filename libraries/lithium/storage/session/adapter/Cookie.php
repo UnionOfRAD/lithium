@@ -101,7 +101,7 @@ class Cookie extends \lithium\core\Object {
 	 * @return boolean True on successful write, false otherwise
 	 */
 	public function write($key, $value = null, $options = array()) {
-		if (!isset($options['expire']) && empty($this->_config['expire']) 
+		if (!isset($options['expire']) && empty($this->_config['expire'])
 				&& $key != $this->_config['name']) {
 			return null;
 		}

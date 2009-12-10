@@ -45,7 +45,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 *        - 'database' _string_: database name. Defaults to none
 	 *        - 'flags' _integer_: Optional flags used to determine how to open the SQLite database.
 	 *          By default, open uses SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE.
-	 *        - 'key' _string_: An optional encryption key used when encrypting and 
+	 *        - 'key' _string_: An optional encryption key used when encrypting and
 	 *          decrypting an SQLite database.
 	 *
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the

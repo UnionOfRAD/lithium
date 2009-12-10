@@ -28,8 +28,8 @@ class ModelTest extends \lithium\test\Unit {
 			));
 		}
 		$deps = Inspector::dependencies(get_class($this));
-		$models = array_filter($deps, function($class) { 
-			return is_subclass_of($class, "lithium\data\Model"); 
+		$models = array_filter($deps, function($class) {
+			return is_subclass_of($class, "lithium\data\Model");
 		});
 		foreach ($models as $m) {
 			$class = '\\'.$m;

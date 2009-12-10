@@ -9,7 +9,6 @@
 namespace lithium\tests\cases\data;
 
 class SourceTest extends \lithium\test\Unit {
-
 }
 
 ?>

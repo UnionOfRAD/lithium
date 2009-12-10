@@ -126,7 +126,7 @@ class SetTest extends \lithium\test\Unit {
 	 */
 	public function testDepthFourLevelsWithAll() {
 		$data = array('1' => array('1.1' => '1.1.1'), array(
-			'2' => array('2.1' => array('2.1.1' => '2.1.1.1'))), 
+			'2' => array('2.1' => array('2.1.1' => '2.1.1.1'))),
 			'3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
 		);
 		$result = Set::depth($data, true);
@@ -141,14 +141,14 @@ class SetTest extends \lithium\test\Unit {
 	public function testDepthFiveLevelsWithAll() {
 
 		$data = array('1' => array('1.1' => '1.1.1'), array(
-			'2' => array('2.1' => array('2.1.1' => array('2.1.1.1')))), 
+			'2' => array('2.1' => array('2.1.1' => array('2.1.1.1')))),
 			'3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
 		);
 		$result = Set::depth($data, true);
 		$this->assertEqual($result, 5);
 
 		$data = array('1' => array('1.1' => '1.1.1'), array(
-			'2' => array('2.1' => array('2.1.1' => array('2.1.1.1' => '2.1.1.1.1')))), 
+			'2' => array('2.1' => array('2.1.1' => array('2.1.1.1' => '2.1.1.1.1')))),
 			'3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
 		);
 		$result = Set::depth($data, true);
@@ -1381,8 +1381,8 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertIdentical($expected, $result);
 
 		$result = Set::combine(
-			$a, 
-			array('{1}: {0}', '/User/Data/user', '/User/Data/name'), 
+			$a,
+			array('{1}: {0}', '/User/Data/user', '/User/Data/name'),
 			'/User/id'
 		);
 		$expected = array(
@@ -1660,7 +1660,7 @@ class SetTest extends \lithium\test\Unit {
 
 		$expected = array(
 			'User' => array(
-				'psword'=> 'whatever', 'Icon' => array('id' => 851), 
+				'psword'=> 'whatever', 'Icon' => array('id' => 851),
 				'Profile' => array('name' => 'Some Name', 'address' => 'Some Address')
 			)
 		);

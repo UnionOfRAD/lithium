@@ -111,7 +111,7 @@ class Curl extends \lithium\util\Socket {
 	 * Reads data from the curl connection.
 	 * The `read` method will utilize the curl options that have been set.
 	 *
-	 * @pararm array $data
+	 * @param array $data
 	 * @return mixed Boolean false if the resource handle is unavailable, and the result
 	 *         of `curl_exec` otherwise.
 	 * @see http://php.net/manual/en/function.curl-exec.php

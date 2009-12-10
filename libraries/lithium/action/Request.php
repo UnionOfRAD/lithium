@@ -311,7 +311,7 @@ class Request extends \lithium\core\Object {
 					$check = '/' .join('|', $check) . '/i';
 				}
 				if (Validator::isRegex($check)) {
-					return (bool)preg_match($check, $this->env($key));
+					return (boolean)preg_match($check, $this->env($key));
 				}
 				return ($this->env($key) == $check);
 			}

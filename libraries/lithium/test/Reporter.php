@@ -59,7 +59,7 @@ class Reporter extends \lithium\core\Object {
 	 * return menu as a string to be used as render
 	 *
 	 * @param array $classes
-	 * @param array options
+	 * @param array $options
 	 *               - format: type of reporter class. eg: html default: text
 	 *               - tree: true to convert classes to tree structure
 	 */

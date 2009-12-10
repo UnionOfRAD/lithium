@@ -31,7 +31,6 @@ class Generator extends \lithium\console\Command {
 				$this->out($path . ' written');
 			}
 		}
-		
 	}
 
 	protected function _header($contents) {

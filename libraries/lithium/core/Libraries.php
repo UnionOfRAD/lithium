@@ -262,10 +262,10 @@ class Libraries {
 	 * class, if defined.  Looks through the list of libraries defined in `$_configurations`, which
 	 * are added through `lithium\core\Libraries::add()`.
 	 *
-	 * @param string $class The fully-namespaced (where applicable) name of the class to load.
-	 * @param $mixed $require
 	 * @see lithium\core\Libraries::add()
 	 * @see lithium\core\Libraries::path()
+	 * @param string $class The fully-namespaced (where applicable) name of the class to load.
+	 * @param mixed $require
 	 * @return void
 	 */
 	public static function load($class, $require = false) {
@@ -345,12 +345,12 @@ class Libraries {
 	 * If `$name` is not specified, `locate()` returns an array with all classes of the specified
 	 * type which can be found. By default, `locate()` searches all registered libraries.
 	 *
-	 * @param string $type
-	 * @param string $name
-	 * @param.array $options
-	 * @return mixed
 	 * @see lithium\core\Libraries::$_classPaths
 	 * @see lithium\core\Libraries::add()
+	 * @param string $type
+	 * @param string $name
+	 * @param array $options
+	 * @return mixed
 	 */
 	public static function locate($type, $name = null, $options = array()) {
 		$defaults = array('type' => 'class');

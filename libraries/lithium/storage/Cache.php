@@ -64,7 +64,7 @@ class Cache extends \lithium\core\Adaptable {
 	 *                    that will be used as the cache key.
 	 * @param array $data If a lambda/closure is used as a key and requires arguments,
 	 *                    pass them in here.
-     * @return string The generated cache key.
+	 * @return string The generated cache key.
 	 */
 	public static function key($key, $data = array()) {
 		$key = is_object($key) ? $key($data) : $key;
@@ -77,6 +77,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param string $name Configuration to be used for writing
 	 * @param mixed $key Key to uniquely identify the cache entry
 	 * @param mixed $data Data to be cached
+	 * @param mixed $expiry
 	 * @param mixed $conditions Conditions for the write operation to proceed
 	 * @return boolean True on successful cache write, false otherwise
 	 * @strategy

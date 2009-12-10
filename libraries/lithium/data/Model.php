@@ -507,7 +507,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @param string $method
 	 * @param array $params
 	 * @param mixed $callback
-	 * @param array $fiters
+	 * @param array $filters
 	 * @return object
 	 */
 	protected static function _filter($method, $params, $callback, $filters = array()) {
