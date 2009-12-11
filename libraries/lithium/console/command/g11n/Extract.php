@@ -59,7 +59,7 @@ class Extract extends \lithium\console\Command {
 	/**
 	 * Extracts translatable strings from multiple files.
 	 *
-	 * @param array $files Absolute paths to files
+	 * @param array $files Absolute paths to files.
 	 * @return array
 	 */
 	protected function _extract() {
@@ -105,7 +105,7 @@ class Extract extends \lithium\console\Command {
 	/**
 	 * Prompts for data source and writes template.
 	 *
-	 * @param array $data Data to save
+	 * @param array $data Data to save.
 	 * @return void
 	 */
 	protected function _writeTemplate($data) {
