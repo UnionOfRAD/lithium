@@ -14,39 +14,53 @@ use \lithium\test\Dispatcher;
 use \lithium\analysis\Inspector;
 
 /**
- * Runs a given set unit tests and outputs the results.
+ * Runs a given set of unit tests and outputs the results.
  */
 class Test extends \lithium\console\Command {
 
 	/**
-	 * path to test case in dot notation
-	 * example: lithium test -case console.CommandTest
+	 * Path to test case in dot notation.
+	 *
+	 * For example:
+	 * {{{
+	 * lithium test -case console.CommandTest
+	 * }}}
 	 *
 	 * @var string
 	 */
 	public $case = null;
 
 	/**
-	 * path to test group in dot notation
-	 * example: lithium test -group console
+	 * Path to test group in dot notation.
+	 *
+	 * For example:
+	 * {{{
+	 * lithium test -group console
+	 * }}}
 	 *
 	 * @var string
 	 */
 	public $group = null;
 
 	/**
-	 * filters
+	 * Filters.
 	 *
 	 * @var string
 	 */
 	public $filters = array();
 
 	/**
-	 * Runs tests. Will provide a list of available tests if none are give
+	 * Runs tests. Will provide a list of available tests if none are given.
 	 * Test cases should be given in dot notation.
 	 *
-	 * case example: lithium test --case=lithium.tests.cases.core.ObjectTest
-	 * group example: lithium test --group=lithium.tests.cases.core
+	 * Case usage:
+	 * {{{
+	 * lithium test -case lithium.tests.cases.core.ObjectTest
+	 * }}}
+	 * {{{
+	 * Group usage:
+	 * lithium test -group lithium.tests.cases.core
+	 * }}}
 	 *
 	 * @return void
 	 */
@@ -79,7 +93,7 @@ class Test extends \lithium\console\Command {
 	}
 
 	/**
-	 * Shows which classes are un-tested
+	 * Shows which classes are un-tested.
 	 *
 	 * @return void
 	 */
@@ -96,7 +110,7 @@ class Test extends \lithium\console\Command {
 	}
 
 	/**
-	 * Show included files
+	 * Show included files.
 	 *
 	 * @return void
 	 */
@@ -109,7 +123,7 @@ class Test extends \lithium\console\Command {
 	}
 
 	/**
-	 * Provide a list of test cases and accept input as case to run
+	 * Provide a list of test cases and accept input as case to run.
 	 *
 	 * @return void
 	 */
