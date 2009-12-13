@@ -10,6 +10,8 @@ namespace lithium\tests\mocks\data;
 
 class MockCreator extends \lithium\data\Model {
 
+	protected $_meta = array('connection' => 'mock-source');
+
 	protected $_schema = array(
 		'name' => array(
 			'default' => 'Moe',

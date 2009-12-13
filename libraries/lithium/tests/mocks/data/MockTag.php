@@ -10,6 +10,8 @@ namespace lithium\tests\mocks\data;
 
 class MockTag extends \lithium\data\Model {
 
+	protected $_meta = array('connection' => 'mock-source');
+
 }
 
 ?>

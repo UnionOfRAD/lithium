@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\data;
 
 class MockPostForValidates extends \lithium\data\Model {
 
-	protected $_meta = array('source' => 'mock_posts');
+	protected $_meta = array('source' => 'mock_posts', 'connection' => 'mock-source');
 
 	public $validates = array(
 		'title' => 'please enter a title',

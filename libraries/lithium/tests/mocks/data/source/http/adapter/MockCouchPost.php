@@ -10,10 +10,6 @@ namespace lithium\tests\mocks\data\source\http\adapter;
 
 class MockCouchPost extends \lithium\data\Model {
 
-	protected $_classes = array(
-		'connections' => 'lithium\tests\mocks\data\MockConnections'
-	);
-
 	protected $_meta = array(
 		'source' => 'posts',
 	);

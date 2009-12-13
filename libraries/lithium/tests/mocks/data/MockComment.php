@@ -16,7 +16,9 @@ class MockComment extends \lithium\data\Model {
 
 	public $belongsTo = array('MockPost');
 
-	protected $_meta = array('key' => 'comment_id');
+	protected $_meta = array(
+		'connection' => 'mock-source', 'key' => 'comment_id'
+	);
 
 	public static function find($type, $options = array()) {
 		$defaults = array(
