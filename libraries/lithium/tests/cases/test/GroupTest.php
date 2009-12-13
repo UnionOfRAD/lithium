@@ -22,7 +22,7 @@ class GroupTest extends \lithium\test\Unit {
 	}
 
 	public function testAddCaseThroughConstructor() {
-		$items = (array)"\lithium\\tests\mocks\\test";
+		$items = (array) "\lithium\\tests\mocks\\test";
 		$group = new Group(compact('items'));
 
 		$expected = new Collection(array(

@@ -89,7 +89,7 @@ class Query extends \lithium\core\Object {
 		if (empty($conditions)) {
 			return $this->_conditions ?: $this->_recordConditions();
 		}
-		$this->_conditions = array_merge($this->_conditions, (array)$conditions);
+		$this->_conditions = array_merge($this->_conditions, (array) $conditions);
 	}
 
 	/**

@@ -134,7 +134,7 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $q->record();
 		$this->assertNull($result);
 
-		$record = (object)array('id' => 12);
+		$record = (object) array('id' => 12);
 		$record->title = 'Lorem Ipsum';
 
 		$q->record($record);

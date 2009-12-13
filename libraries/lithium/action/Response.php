@@ -28,7 +28,7 @@ class Response extends \lithium\http\Response {
 		if (!empty($config['request']) && is_object($config['request'])) {
 			$this->type = $config['request']->type();
 		}
-		$this->_config = (array)$config + $defaults;
+		$this->_config = (array) $config + $defaults;
 		parent::__construct($this->_config);
 	}
 
@@ -96,7 +96,7 @@ class Response extends \lithium\http\Response {
 				$this->_writeHeader("{$name}: {$value}");
 			}
 		}
-		$chunked = str_split(join("\r\n", (array)$this->body), $this->_config['buffer']);
+		$chunked = str_split(join("\r\n", (array) $this->body), $this->_config['buffer']);
 
 		foreach ($chunked as $chunk) {
 			echo $chunk;

@@ -43,7 +43,7 @@ class Memory extends \lithium\core\Object {
 
 		return function($self, $params, $chain) use (&$session) {
 			extract($params);
-			return (boolean)($session[$key] = $value);
+			return (boolean) ($session[$key] = $value);
 		};
 	}
 

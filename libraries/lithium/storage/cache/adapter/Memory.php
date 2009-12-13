@@ -67,7 +67,7 @@ class Memory extends \lithium\core\Object {
 
 		return function($self, $params, $chain) use (&$cache) {
 			extract($params);
-			return (boolean)($cache[$key] = $data);
+			return (boolean) ($cache[$key] = $data);
 		};
 	}
 

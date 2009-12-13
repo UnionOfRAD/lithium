@@ -34,7 +34,7 @@ class Simple extends \lithium\template\view\Renderer {
 			switch (true) {
 				case is_object($val):
 					try {
-						$data[$key] = (string)$val;
+						$data[$key] = (string) $val;
 					} catch (Exception $e) {
 						$data[$key] = '';
 					}

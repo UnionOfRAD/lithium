@@ -30,7 +30,7 @@ class Reporter extends \lithium\core\Object {
 			'asserts' => null, 'passes' => array(), 'fails' => array(),
 			'errors' => array(), 'exceptions' => array(),
 		);
-		$stats = (array)$stats + $defaults;
+		$stats = (array) $stats + $defaults;
 
 		$asserts = $stats['asserts'];
 		$passes = count($stats['passes']);
@@ -41,7 +41,7 @@ class Reporter extends \lithium\core\Object {
 		$aggregate = compact('asserts', 'passes', 'fails', 'errors', 'exceptions', 'success');
 		$result = array($this->_result($aggregate));
 
-		foreach ((array)$stats['errors'] as $error) {
+		foreach ((array) $stats['errors'] as $error) {
 			switch ($error['result']) {
 				case 'fail':
 					$error += array('class' => 'unknown', 'method' => 'unknown');

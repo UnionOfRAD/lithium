@@ -42,7 +42,7 @@ class Cookie extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function __construct($config = array()) {
-		parent::__construct((array)$config + $this->_defaults);
+		parent::__construct((array) $config + $this->_defaults);
 	}
 
 	/**

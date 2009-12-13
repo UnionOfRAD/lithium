@@ -126,7 +126,7 @@ class Request extends \lithium\core\Object {
 			$mobile = array_merge($mobile, (array) $this->_config['detectors']['mobile'][1]);
 		}
 		$this->_detectors['mobile'][1] = $mobile;
-		$this->_env += (array)$_SERVER + (array)$_ENV;
+		$this->_env += (array) $_SERVER + (array) $_ENV;
 		$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
 		$this->_env['PLATFORM'] = isset($envs[PHP_SAPI]) ? $envs[PHP_SAPI] : null;
 		$this->_base = $this->_base ?: $this->_base();
@@ -311,14 +311,14 @@ class Request extends \lithium\core\Object {
 					$check = '/' .join('|', $check) . '/i';
 				}
 				if (Validator::isRegex($check)) {
-					return (boolean)preg_match($check, $this->env($key));
+					return (boolean) preg_match($check, $this->env($key));
 				}
 				return ($this->env($key) == $check);
 			}
 			if (is_callable($detector)) {
 				return $detector($this);
 			}
-			return (boolean)$this->env($detector);
+			return (boolean) $this->env($detector);
 		}
 		return false;
 	}

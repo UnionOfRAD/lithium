@@ -69,11 +69,11 @@ class Request extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _init() {
-		$this->_env += (array)$_SERVER + (array)$_ENV;
+		$this->_env += (array) $_SERVER + (array) $_ENV;
 		$this->_env['working'] = getcwd() ?: null;
-		$argv = (array)$this->env('argv');
+		$argv = (array) $this->env('argv');
 		$this->_env['script'] = array_shift($argv);
-		$this->args += $argv + (array)$this->_config['args'];
+		$this->args += $argv + (array) $this->_config['args'];
 		$this->input = $this->_config['input'];
 
 		if (!is_resource($this->_config['input'])) {

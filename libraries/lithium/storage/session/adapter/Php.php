@@ -38,7 +38,7 @@ class Php extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function __construct($config = array()) {
-		parent::__construct((array)$config + $this->_defaults);
+		parent::__construct((array) $config + $this->_defaults);
 	}
 
 	/**
@@ -139,7 +139,7 @@ class Php extends \lithium\core\Object {
 	 * return boolean True if enabled, false otherwise
 	 */
 	public function enabled() {
-		return (boolean)session_id();
+		return (boolean) session_id();
 	}
 }
 

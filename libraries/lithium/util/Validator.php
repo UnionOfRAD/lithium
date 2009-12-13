@@ -165,7 +165,7 @@ class Validator extends \lithium\core\StaticObject {
 
 				$precision = '+(?:[eE][-+]?[0-9]+)?';
 				$precision = $options['precision'] ? '{' . $options['precision'] . '}' : $precision;
-				return (boolean)preg_match("/^[-+]?[0-9]*\\.{1}[0-9]{$precision}$/", (string)$value);
+				return (boolean) preg_match("/^[-+]?[0-9]*\\.{1}[0-9]{$precision}$/", (string) $value);
 			},
 			'inList' => function($value, $format, $options) {
 				$options += array('list' => array());
@@ -435,11 +435,11 @@ class Validator extends \lithium\core\StaticObject {
 			$formats = array_keys($ruleCheck);
 			$all = ($format == 'all');
 		} else {
-			$formats = (array)$format;
+			$formats = (array) $format;
 			$all = true;
 		}
 		if (static::_checkFormats($ruleCheck, $formats, $value, $all, $options)) {
-			return (boolean)static::_filters('after', $rule, compact('value', 'format', 'options'));
+			return (boolean) static::_filters('after', $rule, compact('value', 'format', 'options'));
 		}
 		return false;
 	}
@@ -758,7 +758,7 @@ class Validator extends \lithium\core\StaticObject {
 	public static function multiple($value, $options = array()) {
 		$defaults = array('in' => null, 'max' => null, 'min' => null);
 		$options += $defaults;
-		$value = array_filter((array)$value);
+		$value = array_filter((array) $value);
 
 		if (empty($value)) {
 			return false;

@@ -106,7 +106,7 @@ class Controller extends \lithium\core\Object {
 
 		foreach (array('render', 'classes') as $key) {
 			if (!empty($config[$key])) {
-				$this->{'_' . $key} = (array)$config[$key] + $this->{'_' . $key};
+				$this->{'_' . $key} = (array) $config[$key] + $this->{'_' . $key};
 			}
 		}
 		parent::__construct($config);
@@ -171,7 +171,7 @@ class Controller extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function set($data = array()) {
-		$this->_render['data'] += (array)$data;
+		$this->_render['data'] += (array) $data;
 	}
 
 	/**

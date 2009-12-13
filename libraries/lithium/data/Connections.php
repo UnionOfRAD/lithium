@@ -110,7 +110,7 @@ class Connections extends \lithium\core\Adaptable {
 			'login'    => '',
 			'password' => ''
 		);
-		return static::$_configurations[$name] = (array)$config + $defaults;
+		return static::$_configurations[$name] = (array) $config + $defaults;
 	}
 
 	/**

@@ -195,7 +195,7 @@ class Model extends \lithium\core\StaticObject {
 			$type = 'first';
 		}
 
-		$options += ((array)$self->_query + (array)$defaults + compact('classes'));
+		$options += ((array) $self->_query + (array) $defaults + compact('classes'));
 		$meta = array('meta' => $self->_meta, 'name' => get_called_class());
 		$params = compact('type', 'options');
 
@@ -492,7 +492,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @param mixed $closure
 	 */
 	public static function applyFilter($method, $closure = null) {
-		foreach ((array)$method as $m) {
+		foreach ((array) $method as $m) {
 			if (!isset(static::_instance()->_instanceFilters[$m])) {
 				static::_instance()->_instanceFilters[$m] = array();
 			}
@@ -547,7 +547,7 @@ class Model extends \lithium\core\StaticObject {
 					'fields' => true,
 					'key' => $key . '_id'
 				);
-				$relations[$name] = (array)$options + $defaults;
+				$relations[$name] = (array) $options + $defaults;
 			}
 		}
 		return $relations;

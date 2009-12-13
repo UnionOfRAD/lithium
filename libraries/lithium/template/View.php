@@ -57,7 +57,7 @@ class View extends \lithium\core\Object {
 		}
 
 		$h = function($data) use (&$h) {
-			return is_array($data) ? array_map($h, $data) : htmlspecialchars((string)$data);
+			return is_array($data) ? array_map($h, $data) : htmlspecialchars((string) $data);
 		};
 		$t = function($message, $options = array()) {
 			return Message::translate($message, $options + array(
@@ -88,7 +88,7 @@ class View extends \lithium\core\Object {
 			case 'template':
 			case 'layout':
 				$template = $this->_loader->template($type, $options);
-				$data = (array)$data + $this->outputFilters;
+				$data = (array) $data + $this->outputFilters;
 				return $this->_renderer->render($template, $data, $options);
 		}
 	}

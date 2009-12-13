@@ -158,7 +158,7 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	public function testFlatResult() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$rows = (object)array(
+		$rows = (object) array(
 			'_id' => 'a1', '_rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1'
 		);
 		$expected = array(
@@ -172,16 +172,16 @@ class CouchDbTest extends \lithium\test\Unit {
 	public function testRowsResult() {
 		$couchdb = new CouchDb($this->_testConfig);
 
-		$rows = (object)array('total_rows' => 11, 'offset' => 0, 'rows' => array(
-			(object)array('id' => 'a1', 'key' => null, 'value' => array(
+		$rows = (object) array('total_rows' => 11, 'offset' => 0, 'rows' => array(
+			(object) array('id' => 'a1', 'key' => null, 'value' => array(
 				'author' => 'author 1',
 				'body' => 'body 1'
 			)),
-			(object)array('id' => 'a2', 'key' => null, 'value' => array(
+			(object) array('id' => 'a2', 'key' => null, 'value' => array(
 				'author' => 'author 2',
 				'body' => 'body 2'
 			)),
-			(object)array('id' => 'a3', 'key' => null, 'value' => array(
+			(object) array('id' => 'a3', 'key' => null, 'value' => array(
 				'author' => 'author 3',
 				'body' => 'body 3'
 			))

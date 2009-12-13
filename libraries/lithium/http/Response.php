@@ -139,7 +139,7 @@ class Response extends \lithium\http\Base {
 			unset($config['message']);
 		}
 
-		foreach ((array)$config as $key => $value) {
+		foreach ((array) $config as $key => $value) {
 			if (isset($this->{$key})) {
 				$this->{$key} = $value;
 			}

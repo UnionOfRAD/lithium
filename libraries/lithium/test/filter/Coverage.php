@@ -93,7 +93,7 @@ class Coverage extends \lithium\core\StaticObject {
 		$classes = $classes ?: array_filter(get_declared_classes(), function($class) {
 			return (!is_subclass_of($class, 'lithium\test\Unit'));
 		});
-		$classes = array_values(array_intersect((array)$classes, array_keys(static::$_results)));
+		$classes = array_values(array_intersect((array) $classes, array_keys(static::$_results)));
 		$densities = $result = array();
 
 		foreach ($classes as $class) {

@@ -61,7 +61,7 @@ class Http extends \lithium\data\Source {
 			'timeout'    => 1,
 			'encoding'   => 'UTF-8'
 		);
-		$config = (array)$config + $defaults;
+		$config = (array) $config + $defaults;
 
 		$config['auth'] = array(
 			'method' => $config['auth'],

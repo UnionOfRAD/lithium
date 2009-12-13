@@ -38,7 +38,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('port' => 5984);
-		$config = (array)$config + $defaults;
+		$config = (array) $config + $defaults;
 		parent::__construct($config);
 	}
 
@@ -168,7 +168,7 @@ class CouchDb extends \lithium\data\source\Http {
 			$result = (object) $self->result('next', $result, $query);
 
 			if ($success = (isset($result->id) || (isset($result->ok) && $result->ok === true))) {
-				$query->data($data + (array)$result);
+				$query->data($data + (array) $result);
 				$query->record()->invokeMethod('_update', array($result->id));
 			}
 			return $success;
@@ -282,9 +282,9 @@ class CouchDb extends \lithium\data\source\Http {
 		switch ($type) {
 			case 'next':
 				if (!isset($resource->rows)) {
-					$result = (array)$resource;
+					$result = (array) $resource;
 				} elseif (isset($resource->rows[$this->_iterator])) {
-					$result = (array)$resource->rows[$this->_iterator]->value;
+					$result = (array) $resource->rows[$this->_iterator]->value;
 					$result['id'] = $resource->rows[$this->_iterator]->id;
 					if (isset($resource->rows[$this->_iterator]->key)) {
 						$result['key'] = $resource->rows[$this->_iterator]->key;
@@ -336,7 +336,7 @@ class CouchDb extends \lithium\data\source\Http {
 			$path = "/{$conditions['_id']}";
 			unset($conditions['_id']);
 		}
-		$conditions = array_filter((array)$conditions);
+		$conditions = array_filter((array) $conditions);
 		return compact('path', 'conditions');
 	}
 
@@ -370,7 +370,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return array
 	 */
 	function order($order, $context) {
-		return (array)$order ?: array();
+		return (array) $order ?: array();
 	}
 }
 

@@ -83,7 +83,7 @@ abstract class Renderer extends \lithium\core\Object {
 				'content' => '', 'title' => '', 'scripts' => array(), 'styles' => array()
 			)
 		);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	/**

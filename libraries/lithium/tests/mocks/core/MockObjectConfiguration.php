@@ -14,7 +14,7 @@ class MockObjectConfiguration extends \lithium\core\Object {
 
 	public function __construct($config = array()) {
 		if (isset($config['autoConfig'])) {
-			$this->_autoConfig = (array)$config['autoConfig'];
+			$this->_autoConfig = (array) $config['autoConfig'];
 			unset($config['autoConfig']);
 		}
 		parent::__construct($config);

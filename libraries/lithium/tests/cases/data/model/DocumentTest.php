@@ -412,8 +412,8 @@ class DocumentTest extends \lithium\test\Unit {
 	 */
 	public function testObjectIteration() {
 		$doc = new Document(array('data' => array(
-			(object)array('foo' => 'bar'),
-			(object)array('bar' => 'foo')
+			(object) array('foo' => 'bar'),
+			(object) array('bar' => 'foo')
 		)));
 		$result = $doc->first()->foo;
 		$expected = 'bar';
@@ -423,7 +423,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$expected = 'foo';
 		$this->assertEqual($expected, $result);
 
-		$doc = new Document(array('data' => (object)array(
+		$doc = new Document(array('data' => (object) array(
 			'first' => array('foo' => 'bar'),
 			'second' => array('bar' => 'foo')
 		)));

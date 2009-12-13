@@ -68,10 +68,10 @@ class Catalog extends \lithium\core\Adaptable {
 		$defaults = array('name' => null, 'scope' => null);
 		$options += $defaults;
 
-		$names = (array)$options['name'] ?: static::$_configurations->keys();
+		$names = (array) $options['name'] ?: static::$_configurations->keys();
 		$results = null;
 
-		foreach ((array)$locales as $locale) {
+		foreach ((array) $locales as $locale) {
 			foreach (Locale::cascade($locale) as $cascaded) {
 				foreach ($names as $name) {
 					$adapter = static::_adapter($name);
@@ -123,7 +123,7 @@ class Catalog extends \lithium\core\Adaptable {
 		$defaults = array('name' => null, 'scope' => null);
 		$options += $defaults;
 
-		$names = (array)$options['name'] ?: static::$_configurations->keys();
+		$names = (array) $options['name'] ?: static::$_configurations->keys();
 
 		foreach ($names as $name) {
 			$adapter = static::_adapter($name);

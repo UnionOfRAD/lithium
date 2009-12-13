@@ -42,7 +42,7 @@ class StaticObject {
 	 */
 	public static function applyFilter($method, $closure = null) {
 		$class = get_called_class();
-		foreach ((array)$method as $m) {
+		foreach ((array) $method as $m) {
 			if (!isset(static::$_methodFilters[$class][$m])) {
 				static::$_methodFilters[$class][$m] = array();
 			}

@@ -59,7 +59,7 @@ class ResponseTest extends \lithium\test\Unit {
 		));
 
 		$response = new Response(compact('message'));
-		$this->assertEqual($message, (string)$response);
+		$this->assertEqual($message, (string) $response);
 
 		$message = 'Invalid Message';
 		$expected = join("\r\n", array(
@@ -67,12 +67,12 @@ class ResponseTest extends \lithium\test\Unit {
 			'', '', ''
 		));
 		$response = new Response(compact('message'));
-		$this->assertEqual($expected, (string)$response);
+		$this->assertEqual($expected, (string) $response);
 	}
 
 	public function testEmptyResponse() {
 		$response = new Response(array('message' => "\n"));
-		$result = trim((string)$response);
+		$result = trim((string) $response);
 		$expected = 'HTTP/1.1 200 OK';
 		$this->assertEqual($expected, $result);
 	}
@@ -100,7 +100,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'body' => 'Test!'
 		);
 		$response = new Response($config);
-		$this->assertEqual($expected, (string)$response);
+		$this->assertEqual($expected, (string) $response);
 	}
 
 	function testTransferEncodingChunkedDecode()  {

@@ -196,12 +196,12 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = Cache::write(
-			'default', 'another', (object)array('data' => 'take two'), '+1 minute'
+			'default', 'another', (object) array('data' => 'take two'), '+1 minute'
 		);
 		$this->assertTrue($result);
 
 		$result = Cache::read('default', 'another');
-		$expected = (object)array('data' => 'take two');
+		$expected = (object) array('data' => 'take two');
 		$this->assertEqual($expected, $result);
 	}
 

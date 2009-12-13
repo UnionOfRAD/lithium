@@ -72,7 +72,7 @@ class Extract extends \lithium\console\Command {
 		$this->out($message);
 		$this->nl();
 
-		$configs = (array)Catalog::config()->to('array');
+		$configs = (array) Catalog::config()->to('array');
 
 		$this->out('Available `Catalog` Configurations:');
 		foreach ($configs as $name => $config) {
@@ -139,7 +139,7 @@ class Extract extends \lithium\console\Command {
 		$this->out($message);
 		$this->nl();
 
-		$configs = (array)Catalog::config()->to('array');
+		$configs = (array) Catalog::config()->to('array');
 
 		$this->out('Available `Catalog` Configurations:');
 		foreach ($configs as $name => $config) {

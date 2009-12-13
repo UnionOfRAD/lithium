@@ -158,11 +158,11 @@ class Libraries {
 				$defaults['defer'] = true;
 			break;
 			case 'plugin':
-				return static::_addPlugins((array)$config);
+				return static::_addPlugins((array) $config);
 			break;
 		}
 
-		$config = (array)$config + $defaults;
+		$config = (array) $config + $defaults;
 		$config['path'] = str_replace('\\', '/', $config['path']);
 		static::$_configurations[$name] = $config;
 
@@ -206,7 +206,7 @@ class Libraries {
 	 * @return void
 	 */
 	public static function remove($name) {
-		foreach ((array)$name as $library) {
+		foreach ((array) $name as $library) {
 			if (isset(static::$_configurations[$library])) {
 				if (static::$_configurations[$library]['loader']) {
 					spl_autoload_unregister(static::$_configurations[$library]['loader']);
@@ -411,7 +411,7 @@ class Libraries {
 	 */
 	protected static function _locateDeferred($defer, $paths, $params, $options = array()) {
 		if (isset($options['library'])) {
-			$libraries = (array)$options['library'];
+			$libraries = (array) $options['library'];
 			$libraries = array_intersect_key(
 				static::$_configurations,
 				array_combine($libraries, array_fill(0, count($libraries), null))
@@ -432,7 +432,7 @@ class Libraries {
 				}
 				$opts = $options + $pathOptions;
 
-				if (isset($opts['libraries']) && !in_array($library, (array)$opts['libraries'])) {
+				if (isset($opts['libraries']) && !in_array($library, (array) $opts['libraries'])) {
 					unset($opts['libraries']);
 					continue;
 				}
@@ -479,7 +479,7 @@ class Libraries {
 				}
 				$opts = $options + $tplOpts;
 
-				if (isset($opts['libraries']) && !in_array($library, (array)$opts['libraries'])) {
+				if (isset($opts['libraries']) && !in_array($library, (array) $opts['libraries'])) {
 					unset($opts['libraries']);
 					continue;
 				}
@@ -506,14 +506,14 @@ class Libraries {
 		$path = rtrim($config['path'] . $options['path'], '/');
 		$filter = '/^.+\/[A-Za-z0-9_]+$|^.*' . preg_quote($config['suffix'], '/') . '/';
 		$search = function($path) use ($config, $filter, $options) {
-			return preg_grep($filter, (array)glob(
+			return preg_grep($filter, (array) glob(
 				$path . '/*' . ($options['namespaces'] ? '' : $config['suffix'])
 			));
 		};
 		$libs = $search($path, $config);
 
 		if ($options['recursive']) {
-			$dirs = $queue = array_diff((array)glob($path . '/*', GLOB_ONLYDIR), $libs);
+			$dirs = $queue = array_diff((array) glob($path . '/*', GLOB_ONLYDIR), $libs);
 			while ($queue) {
 				$dir = array_pop($queue);
 
@@ -522,7 +522,7 @@ class Libraries {
 				}
 				$libs = array_merge($libs, $search($dir, $config));
 				$queue = array_merge(
-					$queue, array_diff((array)glob($dir . '/*', GLOB_ONLYDIR), $libs)
+					$queue, array_diff((array) glob($dir . '/*', GLOB_ONLYDIR), $libs)
 				);
 			}
 		}

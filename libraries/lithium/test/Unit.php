@@ -354,7 +354,7 @@ class Unit extends \lithium\core\Object {
 		$regex = array();
 		$normalized = array();
 
-		foreach ((array)$expected as $key => $val) {
+		foreach ((array) $expected as $key => $val) {
 			if (!is_numeric($key)) {
 				$normalized[] = array($key => $val);
 			} else {
@@ -451,7 +451,7 @@ class Unit extends \lithium\core\Object {
 			list($description, $expressions, $itemNum) = $assertation;
 			$matches = false;
 
-			foreach ((array)$expressions as $expression) {
+			foreach ((array) $expressions as $expression) {
 				if (preg_match(sprintf('/^%s/s', $expression), $string, $match)) {
 					$matches = true;
 					$string = substr($string, strlen($match[0]));
@@ -647,8 +647,8 @@ class Unit extends \lithium\core\Object {
 
 		if (is_object($expected)) {
 			$isObject = true;
-			$expected = (array)$expected;
-			$result = (array)$result;
+			$expected = (array) $expected;
+			$result = (array) $result;
 		}
 
 		if (is_array($expected)) {
@@ -716,7 +716,7 @@ class Unit extends \lithium\core\Object {
 		}
 
 		$defaults = array('trace' => null, 'expected' => null, 'result' => null);
-		$data = (array)$data + $defaults;
+		$data = (array) $data + $defaults;
 		return sprintf("trace: %s\nexpected: %s\nresult: %s\n",
 			$data['trace'],
 			var_export($data['expected'], true),

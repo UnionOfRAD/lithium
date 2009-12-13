@@ -81,7 +81,7 @@ class File extends \lithium\template\view\Renderer {
 		$library = Libraries::get($options['library']);
 		$options['library'] = $library['path'];
 
-		foreach ((array)$this->_config[$type] as $path) {
+		foreach ((array) $this->_config[$type] as $path) {
 			if (file_exists($path = String::insert($path, $options))) {
 				return $path;
 			}

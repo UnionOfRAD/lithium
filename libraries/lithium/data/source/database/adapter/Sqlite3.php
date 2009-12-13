@@ -62,7 +62,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 			'flags'      => NULL,
 			'key'        => NULL
 		);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	/**

@@ -131,7 +131,7 @@ class Document extends \lithium\util\Collection {
 			unset($config['data']);
 		}
 		parent::__construct($config);
-		$this->_items = (array)$this->_items;
+		$this->_items = (array) $this->_items;
 	}
 
 	/**
@@ -321,7 +321,7 @@ class Document extends \lithium\util\Collection {
 		if (is_scalar($data) || !$data) {
 			return false;
 		}
-		if (is_object($data) && (array)$data === array()) {
+		if (is_object($data) && (array) $data === array()) {
 			return false;
 		}
 		if (is_array($data)) {
@@ -344,9 +344,9 @@ class Document extends \lithium\util\Collection {
 	 */
 	protected function _update($id = null) {
 		if ($id) {
-			$id = (array)$id;
+			$id = (array) $id;
 			$model = $this->_model;
-			foreach ((array)$model::meta('key') as $i => $key) {
+			foreach ((array) $model::meta('key') as $i => $key) {
 				$this->__set($key, $id[$i]);
 			}
 		}

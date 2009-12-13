@@ -99,7 +99,7 @@ class Route extends \lithium\core\Object {
 			'keys' => array(),
 			'options' => array()
 		);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	protected function _init() {

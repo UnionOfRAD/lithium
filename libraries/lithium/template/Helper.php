@@ -114,7 +114,7 @@ abstract class Helper extends \lithium\core\Object {
 		$options += $defaults;
 
 		$format = '%s="%s"';
-		$value = (string)$value;
+		$value = (string) $value;
 
 		if (in_array($key, $this->_minimized)) {
 			$isMini = ($value == 1 || $value === true || $value === 'true' || $value == $key);

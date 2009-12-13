@@ -53,7 +53,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 		);
 		$options += $defaults;
 
-		$items = (array)$group;
+		$items = (array) $group;
 		$isCase = preg_match('/Test$/', $group);
 
 		if ($isCase) {

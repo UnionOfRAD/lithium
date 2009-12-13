@@ -109,7 +109,7 @@ class RequestTest extends \lithium\test\Unit {
 			'User-Agent: Mozilla/5.0 (Lithium)',
 			'', ''
 		));
-		$result = (string)$this->request;
+		$result = (string) $this->request;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -126,7 +126,7 @@ class RequestTest extends \lithium\test\Unit {
 			'Authorization: Basic ' . base64_encode('root:something'),
 			'', ''
 		));
-		$result = (string)$request;
+		$result = (string) $request;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -140,7 +140,7 @@ class RequestTest extends \lithium\test\Unit {
 			'', 'status=cool'
 		));
 		$this->request->body(array('status=cool'));
-		$result = (string)$this->request;
+		$result = (string) $this->request;
 		$this->assertEqual($expected, $result);
 	}
 }

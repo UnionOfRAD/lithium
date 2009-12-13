@@ -24,7 +24,7 @@ class MockService extends \lithium\http\Service {
 			'rev' => '1-2',
 			'body' => 'something'
 		));
-		$this->last = (object)compact('request', 'response');
+		$this->last = (object) compact('request', 'response');
 		return ($options['return'] == 'body') ? $response->body() : $response;
 	}
 }

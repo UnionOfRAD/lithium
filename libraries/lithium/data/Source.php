@@ -49,7 +49,7 @@ abstract class Source extends \lithium\core\Object {
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('autoConnect' => true);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	/**

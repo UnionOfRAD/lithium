@@ -82,7 +82,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	}
 
 	public function testInvalidCommand() {
-		$expected = (object)array('status' => "Command `\\this\\command\\is\\fake` not found\n");
+		$expected = (object) array('status' => "Command `\\this\\command\\is\\fake` not found\n");
 		$result = Dispatcher::run(new Request(array(
 			'args' => array(
 				'\this\command\is\fake',
