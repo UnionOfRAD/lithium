@@ -43,7 +43,7 @@ class Controller extends \lithium\core\Object {
 		$template = Libraries::locate('test.reporter.template', 'layout', array(
 			'filter' => false, 'type' => 'file', 'suffix' => '.html.php',
 		));
-		include($template);
+		include $template;
 	}
 }
 

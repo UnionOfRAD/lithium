@@ -322,7 +322,7 @@ class Html extends \lithium\template\Helper {
 	 *
 	 * @param string $type The title of the external resource
 	 * @param mixed $url The address of the external resource or string for content attribute
-	 * @param array $attributes Other attributes for the generated tag. If the type attribute
+	 * @param array $options Other attributes for the generated tag. If the type attribute
 	 *               is 'html', 'rss', 'atom', or 'icon', the mime-type is returned.
 	 * @return string
 	 */

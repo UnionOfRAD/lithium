@@ -359,7 +359,7 @@ class Media extends \lithium\core\StaticObject {
 		}
 
 		if (isset(static::$_handlers[$type])) {
-			$h = (array)static::$_handlers[$type] + (array) static::$_handlers['default'];
+			$h = (array) static::$_handlers[$type] + (array) static::$_handlers['default'];
 		} else {
 			$h = $options + $defaults;
 			$filter = function($v) { return $v !== null; };
