@@ -202,17 +202,17 @@ class Document extends \lithium\util\Collection {
 	}
 
 	/**
-	 * PHP magic method used when unset() is called on a `Document` instance. 
+	 * PHP magic method used when unset() is called on a `Document` instance.
 	 * Use case for this would be when you wish to edit a document and remove a field, ie. :
 	 * {{{ $doc = Post::find($id); unset($doc->fieldName); $doc->save(); }}}
-	 * 
+	 *
 	 * @param unknown_type $name
 	 * @return unknown_type
 	 */
 	public function __unset($name) {
 		unset($this->_items[$name]);
 	}
-	
+
 	/**
 	 * Rewinds the collection of sub-`Document`s to the beginning and returns the first one found.
 	 *
@@ -299,7 +299,7 @@ class Document extends \lithium\util\Collection {
 			return $this->_errors[$field];
 		}
 		if ($value !== null) {
-			return $this->_errors[$field] = $value;
+			$this->_errors[$field] = $value;
 		}
 		return $value;
 	}

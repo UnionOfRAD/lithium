@@ -470,7 +470,7 @@ class DocumentTest extends \lithium\test\Unit {
 				'permanent' => false
 			)
 		));
-		
+
 		$expected = array(
 			'title' => 'Post',
 			'content' => 'Lorem Ipsum',
@@ -479,19 +479,19 @@ class DocumentTest extends \lithium\test\Unit {
 		);
 		$result = $doc->data();
 		$this->assertEqual($expected, $result);
-		
+
 		$expected = 'Post';
 		$result = $doc->data('title');
 		$this->assertEqual($expected, $result);
-		
+
 		$expected = false;
 		$result = $doc->data('permanent');
 		$this->assertEqual($expected, $result);
-		
+
 		$doc = new Document();
 		$this->assertNull($doc->data('field'));
 	}
-	
+
 	public function testUnset() {
 		$doc = new Document(array(
 			'data' => array(
@@ -515,18 +515,47 @@ class DocumentTest extends \lithium\test\Unit {
 		unset($doc->title);
 		$result = $doc->data();
 		$this->assertEqual($expected, $result);
-		
-		unset($expected['parsed']);		
+
+		unset($expected['parsed']);
 		unset($doc->parsed);
 		$result = $doc->data();
 		$this->assertEqual($expected, $result);
-		
-		unset($expected['permanent']);		
+
+		unset($expected['permanent']);
 		unset($doc->permanent);
 		$result = $doc->data();
 		$this->assertEqual($expected, $result);
-		
+
 		unset($doc->none);
+	}
+
+	public function testErrors() {
+		$doc = new Document(array(
+			'data' => array(
+				'title' => 'Post',
+				'content' => 'Lorem Ipsum',
+				'parsed' => null,
+				'permanent' => false
+			)
+		));
+
+		$expected = array(
+			'title' => 'Too short',
+			'parsed' => 'Empty'
+		);
+		$doc->errors($expected);
+		$result = $doc->errors();
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Too short';
+		$result = $doc->errors('title');
+		$this->assertEqual($expected, $result);
+
+
+		$result = $doc->errors('title', 'Too generic');
+		$expected = 'Too generic';
+		$result = $doc->errors('title');
+		$this->assertEqual($expected, $result);
 	}
 }
 
