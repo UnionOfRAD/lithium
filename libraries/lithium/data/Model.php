@@ -116,22 +116,23 @@ class Model extends \lithium\core\StaticObject {
 			return;
 		}
 		$self = static::_instance();
-
 		$base = get_class_vars(__CLASS__);
-		$meta = $self->_meta + $base['_meta'];
+		$meta =  $self->_meta + $base['_meta'];
 		$classes = $self->_classes + $base['_classes'];
-
-		$conn = $classes['connections'];
-		$backendDefaults = array('classes' => array(), 'meta' => array(), 'finders' => array());
-		$backendConfig = $conn::get($meta['connection'])->configureClass($class) + $backendDefaults;
-
+		$classConfig = array();
+		$classDefaults = array('classes' => array(), 'meta' => array(), 'finders' => array());
+		$conn = $classes['connections']::get($meta['connection']);
+		if ($conn) {
+			$classConfig = $conn->configureClass($class);
+		}
+		$classConfig += $classDefaults;
 		$classes = array_diff_assoc($self->_classes, $base['_classes']);
-		$self->_classes = ($classes + $backendConfig['classes'] + $base['_classes']);
-		$meta = ($self->_meta + $backendConfig['meta'] + $base['_meta']);
+		$self->_classes = ($classes + $classConfig['classes'] + $base['_classes']);
+		$meta = ($self->_meta + $classConfig['meta'] + $base['_meta']);
 		$self->_meta = ($options + compact('class') + array('name' => static::_name()) + $meta);
 		$self->_meta['initialized'] = false;
 
-		$self->_finders += $backendConfig['finders'] + $self->_findFilters();
+		$self->_finders += $classConfig['finders'] + $self->_findFilters();
 		static::_instance()->_relations = static::_relations();
 	}
 

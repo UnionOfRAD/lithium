@@ -10,7 +10,10 @@ namespace lithium\tests\mocks\data;
 
 class MockTagging extends \lithium\data\Model {
 
-	protected $_meta = array('source' => 'posts_tags', 'key' => array('post_id', 'tag_id'));
+	protected $_meta = array(
+		'connection' => 'mock-source',
+		'source' => 'posts_tags', 'key' => array('post_id', 'tag_id')
+	);
 
 }
 

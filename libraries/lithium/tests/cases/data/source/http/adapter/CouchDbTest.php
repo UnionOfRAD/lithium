@@ -132,7 +132,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$expected = '/posts/12345';
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
-		
+
 		$expected = '';
 		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
