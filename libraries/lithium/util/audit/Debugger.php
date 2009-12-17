@@ -108,7 +108,7 @@ class Debugger extends \lithium\core\Object {
 			$replace = array(" (", " )", "  ", " )", "=> \n\t");
 			$with = array("(", ")", "\t", "\t)", "=> ");
 			$export = str_replace($replace, $with, $export);
-		)
+		}
 		return $export;
 	}
 }
