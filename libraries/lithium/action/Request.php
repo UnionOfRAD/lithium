@@ -233,7 +233,7 @@ class Request extends \lithium\core\Object {
 			return (strpos($this->_env['SCRIPT_URI'], 'https://') === 0);
 		}
 
-		if ($key == 'SCRIPT_NAME') {
+		if ($key == 'SCRIPT_NAME' && !isset($this->_env['SCRIPT_NAME'])) {
 			if ($this->_env['PLATFORM'] == 'CGI' || isset($this->_env['SCRIPT_URL'])) {
 				$key = 'SCRIPT_URL';
 			}
@@ -269,7 +269,7 @@ class Request extends \lithium\core\Object {
 			case 'CGI_MODE':
 				return ($this->_env['PLATFORM'] == 'CGI');
 			case 'HTTP_BASE':
-				return preg_replace ('/^([^.])*/i', null, $this->_env['HTTP_HOST']);
+				return preg_replace('/^([^.])*/i', null, $this->_env['HTTP_HOST']);
 		}
 	}
 
