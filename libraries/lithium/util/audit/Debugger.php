@@ -97,13 +97,19 @@ class Debugger extends \lithium\core\Object {
 	}
 
 	/**
-	 * Returns a parseable string represantation of a variable..
+	 * Returns a parseable string representation of a variable..
 	 *
 	 * @param mixed $var The variable to export.
 	 * @return string The exported contents.
 	 */
 	public static function export($var) {
-		return var_export($var, true);
+		$export = var_export($var, true);
+		if (is_array($var)) {
+			$replace = array(" (", " )", "  ", " )", "=> \n\t");
+			$with = array("(", ")", "\t", "\t)", "=> ");
+			$export = str_replace($replace, $with, $export);
+		)
+		return $export;
 	}
 }
 
