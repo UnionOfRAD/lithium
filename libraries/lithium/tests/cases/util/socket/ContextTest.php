@@ -9,7 +9,6 @@
 namespace lithium\tests\cases\util\socket;
 
 class ContextTest extends \lithium\test\Unit {
-
 }
 
 ?>

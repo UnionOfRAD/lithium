@@ -115,7 +115,6 @@ class MemoryTest extends \lithium\test\Unit {
 		$result = $this->Memory->clean();
 		$this->assertFalse($result);
 	}
-
 }
 
 ?>

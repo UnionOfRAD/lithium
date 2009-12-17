@@ -17,7 +17,7 @@ class MockService extends \lithium\http\Service {
 		$options += $defaults;
 		$request = $this->_request($method, $path, $data, $options);
 		$response = new Response();
-		
+
 		$response->body = json_encode(array(
 			'ok' => true,
 			'id' => '12345',

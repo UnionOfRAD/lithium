@@ -15,7 +15,6 @@ class CoverageTest extends \lithium\test\Unit {
 	public function setUp() {
 
 	}
-
 }
 
 ?>

@@ -248,7 +248,6 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $export['table'];
 		$this->assertEqual($expected, $result);
 	}
-
 }
 
 ?>

@@ -40,7 +40,7 @@ abstract class Socket extends \lithium\core\Object {
 			'port'       => 80,
 			'timeout'    => 30
 		);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	/**

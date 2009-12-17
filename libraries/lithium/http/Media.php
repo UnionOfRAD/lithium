@@ -198,7 +198,7 @@ class Media extends \lithium\core\StaticObject {
 			static::$_types[$type] = $content;
 		}
 		if (!empty($options)) {
-			static::$_handlers[$type] = ((array)$options + $defaults);
+			static::$_handlers[$type] = ((array) $options + $defaults);
 		}
 	}
 
@@ -233,10 +233,10 @@ class Media extends \lithium\core\StaticObject {
 		if (empty($options)) {
 			return isset(static::$_assets[$type]) ? static::$_assets[$type] : null;
 		}
-		$options = (array)$options + $defaults;
+		$options = (array) $options + $defaults;
 
 		if (isset(static::$_assets[$type])) {
-			static::$_assets[$type] = array_filter((array)$options) + static::$_assets[$type];
+			static::$_assets[$type] = array_filter((array) $options) + static::$_assets[$type];
 		} else {
 			static::$_assets[$type] = $options;
 		}
@@ -359,14 +359,14 @@ class Media extends \lithium\core\StaticObject {
 		}
 
 		if (isset(static::$_handlers[$type])) {
-			$h = (array)static::$_handlers[$type] + (array)static::$_handlers['default'];
+			$h = (array) static::$_handlers[$type] + (array) static::$_handlers['default'];
 		} else {
 			$h = $options + $defaults;
 			$filter = function($v) { return $v !== null; };
 			$h = array_filter($h, $filter) + static::$_handlers['default'] + $defaults;
 		}
 		$response->body(static::_handle($h, $data, $options));
-		$response->headers('Content-type', current((array)static::$_types[$type]));
+		$response->headers('Content-type', current((array) static::$_types[$type]));
 	}
 
 	/**

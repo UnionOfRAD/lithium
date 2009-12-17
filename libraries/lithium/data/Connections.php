@@ -110,7 +110,7 @@ class Connections extends \lithium\core\Adaptable {
 			'login'    => '',
 			'password' => ''
 		);
-		return static::$_configurations[$name] = (array)$config + $defaults;
+		return static::$_configurations[$name] = (array) $config + $defaults;
 	}
 
 	/**
@@ -140,7 +140,7 @@ class Connections extends \lithium\core\Adaptable {
 	 *          already been instantiated by a previous call.
 	 *        - `'config'`: If `true`, returns an array representing the connection's internal
 	 *          configuration, instead of the connection itself.
-	 * @return object|array A configured instance of the connection, or an array of the configuration used.
+	 * @return mixed A configured instance of the connection, or an array of the configuration used.
 	 */
 	public static function get($name = null, $options = array()) {
 		$defaults = array('config' => false, 'autoCreate' => true);

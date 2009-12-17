@@ -44,11 +44,12 @@ class Object {
 	/**
 	 * Initialises properties, unless supplied configuration options change the default behaviour.
 	 *
+	 * @param array $config
 	 * @return object
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('init' => true);
-		$this->_config = (array)$config + $defaults;
+		$this->_config = (array) $config + $defaults;
 
 		if ($this->_config['init']) {
 			$this->_init();
@@ -102,7 +103,7 @@ class Object {
 	 * @see lithium\util\collection\Filters
 	 */
 	public function applyFilter($method, $closure = null) {
-		foreach ((array)$method as $m) {
+		foreach ((array) $method as $m) {
 			if (!isset($this->_methodFilters[$m])) {
 				$this->_methodFilters[$m] = array();
 			}

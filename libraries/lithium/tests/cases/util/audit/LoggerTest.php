@@ -72,8 +72,6 @@ class LoggerTest extends \lithium\test\Unit {
 
 		unlink(LITHIUM_APP_PATH . '/resources/tmp/logs/default.log');
 	}
-
 }
-
 
 ?>

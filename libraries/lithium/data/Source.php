@@ -44,11 +44,12 @@ abstract class Source extends \lithium\core\Object {
 	 * Options defined:
 	 * - 'autoConnect' `boolean` If true, a connection is made on initialisation. Defaults to true.
 	 *
+	 * @param array $config
 	 * @return Source object
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('autoConnect' => true);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	/**

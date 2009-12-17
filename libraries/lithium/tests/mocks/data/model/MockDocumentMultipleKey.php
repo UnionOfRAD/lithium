@@ -56,3 +56,5 @@ class MockDocumentMultipleKey extends \lithium\data\Model {
 		}
 	}
 }
+
+?>

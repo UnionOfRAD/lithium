@@ -99,7 +99,7 @@ class Route extends \lithium\core\Object {
 			'keys' => array(),
 			'options' => array()
 		);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	protected function _init() {
@@ -209,6 +209,7 @@ class Route extends \lithium\core\Object {
 	 * Compiles URL templates into regular expression patterns for matching against request URLs,
 	 * and extracts template parameters into match-parameter arrays.
 	 *
+	 * @param array $options
 	 * @return void
 	 */
 	public function compile($options = array()) {

@@ -126,7 +126,7 @@ class Request extends \lithium\core\Object {
 			$mobile = array_merge($mobile, (array) $this->_config['detectors']['mobile'][1]);
 		}
 		$this->_detectors['mobile'][1] = $mobile;
-		$this->_env += (array)$_SERVER + (array)$_ENV;
+		$this->_env += (array) $_SERVER + (array) $_ENV;
 		$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
 		$this->_env['PLATFORM'] = isset($envs[PHP_SAPI]) ? $envs[PHP_SAPI] : null;
 		$this->_base = $this->_base ?: $this->_base();
@@ -294,9 +294,10 @@ class Request extends \lithium\core\Object {
 	/**
 	 * Detects properties of the request and returns a boolean response
 	 *
-	 * @return boolean
 	 * @see lithium\action\Request::detect()
 	 * @todo Remove $content and refer to Media class instead
+	 * @param string $flag
+	 * @return boolean
 	 */
 	public function is($flag) {
 		$flag = strtolower($flag);
@@ -310,14 +311,14 @@ class Request extends \lithium\core\Object {
 					$check = '/' .join('|', $check) . '/i';
 				}
 				if (Validator::isRegex($check)) {
-					return (bool)preg_match($check, $this->env($key));
+					return (boolean) preg_match($check, $this->env($key));
 				}
 				return ($this->env($key) == $check);
 			}
 			if (is_callable($detector)) {
 				return $detector($this);
 			}
-			return (bool)$this->env($detector);
+			return (boolean) $this->env($detector);
 		}
 		return false;
 	}
@@ -336,8 +337,10 @@ class Request extends \lithium\core\Object {
 	 * Creates a 'detector' used with Request::is().  A detector is a boolean check that is created
 	 * to determine something about a request.
 	 *
-	 * @return void
 	 * @see lithium\action\Request::is()
+	 * @param string $flag
+	 * @param boolean $detector
+	 * @return void
 	 */
 	public function detect($flag, $detector = null) {
 		if (is_array($flag)) {

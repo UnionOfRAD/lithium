@@ -66,7 +66,7 @@ abstract class Database extends \lithium\data\Source {
 			'password'   => '',
 			'database'   => 'lithium',
 		);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	public function name($name) {

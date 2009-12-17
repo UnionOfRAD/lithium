@@ -59,7 +59,7 @@ class MongoDb extends \lithium\data\Source {
 			'database'   => 'lithium',
 			'port'       => '27017',
 		);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	/**

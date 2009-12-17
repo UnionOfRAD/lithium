@@ -89,7 +89,7 @@ class Query extends \lithium\core\Object {
 		if (empty($conditions)) {
 			return $this->_conditions ?: $this->_recordConditions();
 		}
-		$this->_conditions = array_merge($this->_conditions, (array)$conditions);
+		$this->_conditions = array_merge($this->_conditions, (array) $conditions);
 	}
 
 	/**
@@ -110,7 +110,7 @@ class Query extends \lithium\core\Object {
 	*   // should be followed by a 2nd call to fields with required fields
 	* }}}
 	*
-	* @param mixed $limit string, array or `false`
+	* @param mixed $fields string, array or `false`
 	* @return array|void
 	*/
 	public function fields($fields = null) {
@@ -189,7 +189,7 @@ class Query extends \lithium\core\Object {
 	*
 	* Comment will have no effect on query, but will be passed along so data source can log it.
 	*
-	* @param string
+	* @param string $comment
 	* @return string
 	*/
 	public function comment($comment = null) {
@@ -203,7 +203,7 @@ class Query extends \lithium\core\Object {
 	/**
 	* Set and get method for the query's record instance
 	*
-	* @param object reference to the query's current record
+	* @param object $record reference to the query's current record
 	* @return object reference to the query's current record
 	*/
 	public function &record(&$record = null) {

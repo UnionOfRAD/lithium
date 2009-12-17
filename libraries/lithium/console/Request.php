@@ -69,7 +69,7 @@ class Request extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _init() {
-		$this->_env += (array)$_SERVER + (array)$_ENV;
+		$this->_env += (array) $_SERVER + (array) $_ENV;
 		$this->_env['working'] = getcwd() ?: null;
 		$argv = (array) $this->env('argv');
 		$this->_env['script'] = array_shift($argv);

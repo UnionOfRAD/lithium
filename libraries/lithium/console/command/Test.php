@@ -110,7 +110,7 @@ class Test extends \lithium\console\Command {
 		sort($classes);
 		$this->out($classes);
 	}
-	
+
 	/**
 	 * Show included files
 	 *
@@ -135,7 +135,7 @@ class Test extends \lithium\console\Command {
 				'filter' => '/cases|integration|functional/'
 			));
 			$tests = str_replace('\\', '.', $tests);
-			
+
 			foreach ($tests as $key => $test) {
 				$this->out(++$key . ". " . $test);
 			}

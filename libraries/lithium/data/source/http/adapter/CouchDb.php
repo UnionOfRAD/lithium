@@ -33,11 +33,12 @@ class CouchDb extends \lithium\data\source\Http {
 	/**
 	 * Constructor
 	 *
+	 * @param array $config
 	 * @return void
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('port' => 5984);
-		$config = (array)$config + $defaults;
+		$config = (array) $config + $defaults;
 		parent::__construct($config);
 	}
 
@@ -133,7 +134,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param string $name The identifier to quote.
 	 * @return string The quoted identifier.
 	 */
-		public function name($name) {
+	public function name($name) {
 		return $name;
 	}
 
@@ -283,7 +284,7 @@ class CouchDb extends \lithium\data\source\Http {
 				if (!isset($resource->rows)) {
 					$result = (array) $resource;
 				} elseif (isset($resource->rows[$this->_iterator])) {
-					$result = (array)$resource->rows[$this->_iterator]->value;
+					$result = (array) $resource->rows[$this->_iterator]->value;
 					$result['id'] = $resource->rows[$this->_iterator]->id;
 					if (isset($resource->rows[$this->_iterator]->key)) {
 						$result['key'] = $resource->rows[$this->_iterator]->key;
@@ -372,4 +373,5 @@ class CouchDb extends \lithium\data\source\Http {
 		return (array) $order ?: array();
 	}
 }
+
 ?>

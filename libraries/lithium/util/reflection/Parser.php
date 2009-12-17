@@ -210,13 +210,13 @@ class Parser extends \lithium\core\StaticObject {
 			$param = $parameters[$token['name']];
 
 			if (isset($param['before']) && $i > 0) {
-				if (!in_array($tokens[$i - 1]['name'], (array)$param['before'])) {
+				if (!in_array($tokens[$i - 1]['name'], (array) $param['before'])) {
 					continue;
 				}
 			}
 
 			if (isset($param['after']) && $i + 1 < count($tokens)) {
-				 if (!in_array($tokens[$i + 1]['name'], (array)$param['after'])) {
+				 if (!in_array($tokens[$i + 1]['name'], (array) $param['after'])) {
 					continue;
 				}
 			}
@@ -260,7 +260,7 @@ class Parser extends \lithium\core\StaticObject {
 					}
 					$items = array();
 
-					foreach ((array)$scope[$key] as $item) {
+					foreach ((array) $scope[$key] as $item) {
 						$items[] = (strpos($item, 'T_') !== 0)  ? static::token($item) : $item;
 					}
 					$scope[$key] = $items;

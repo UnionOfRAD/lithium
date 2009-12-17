@@ -61,7 +61,7 @@ class Profiler extends \lithium\core\StaticObject {
 	 */
 	public static function __init() {
 		foreach (static::$_metrics as $name => $check) {
-			$function = current((array)$check['function']);
+			$function = current((array) $check['function']);
 
 			if (is_string($check['function']) && !function_exists($check['function'])) {
 				unset(static::$_metrics[$name]);
@@ -150,7 +150,7 @@ class Profiler extends \lithium\core\StaticObject {
 		$metrics = array();
 
 		foreach ($results as $testCase) {
-			foreach ((array)$testCase as $assertion) {
+			foreach ((array) $testCase as $assertion) {
 				if ($assertion['result'] != 'pass' && $assertion['result'] != 'fail') {
 					continue;
 				}

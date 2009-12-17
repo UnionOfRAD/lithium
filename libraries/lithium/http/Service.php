@@ -77,7 +77,7 @@ class Service extends \lithium\core\Object {
 			'timeout'    => 1,
 			'encoding'   => 'UTF-8',
 		);
-		$config = (array)$config + $defaults;
+		$config = (array) $config + $defaults;
 
 		$config['auth'] = array(
 			'method'   => $config['auth'],
@@ -124,6 +124,7 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @param string $path
 	 * @param array $data
+	 * @param array $options
 	 * @return string
 	 */
 	public function get($path = null, $data = array(), $options = array()) {
@@ -135,6 +136,7 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @param string $path
 	 * @param array $data
+	 * @param array $options
 	 * @return string
 	 */
 	public function post($path = null, $data = array(), $options = array()) {
@@ -146,6 +148,7 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @param string $path
 	 * @param array $data
+	 * @param array $options
 	 * @return string
 	 */
 	public function put($path = null, $data = array(), $options = array()) {
@@ -211,7 +214,7 @@ class Service extends \lithium\core\Object {
 
 		if (in_array($options['type'], $media::types()) && $data && !is_string($data)) {
 			$type = $media::type($options['type']);
-			$contentType = (array)$type['content'];
+			$contentType = (array) $type['content'];
 			$request->headers(array('Content-Type' => current($contentType)));
 			$data = Media::encode($options['type'], $data, $options);
 		}

@@ -40,7 +40,7 @@ class Docblock extends \lithium\core\StaticObject {
 			$tag = $tagNames[1][$i];
 
 			if (isset($tags[$tag])) {
-				$tags[$tag] = (array)$tags[$tag];
+				$tags[$tag] = (array) $tags[$tag];
 				$tags[$tag][] = $desc;
 			} else {
 				$tags[$tag] = $desc;
@@ -51,7 +51,7 @@ class Docblock extends \lithium\core\StaticObject {
 			$params = $tags['param'];
 			$tags['params'] = array();
 
-			foreach ((array)$params as $param) {
+			foreach ((array) $params as $param) {
 				$param = explode(' ', $param, 3);
 				$type = $name = $text = null;
 

@@ -89,7 +89,7 @@ class DispatcherTest extends \lithium\test\Unit {
 				'testAction'
 			)
 		)));
-		
+
 		$this->assertEqual($expected, $result);
 	}
 }

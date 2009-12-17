@@ -11,8 +11,8 @@ namespace lithium\tests\cases\console\command;
 use \lithium\console\command\Test;
 
 class TestTest extends \lithium\test\Unit {
-	
-	
+
+
 }
 
 ?>

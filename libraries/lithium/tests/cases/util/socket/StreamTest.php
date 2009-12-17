@@ -81,4 +81,5 @@ class StreamTest extends \lithium\test\Unit {
 		$this->assertPattern("/^HTTP/", $result);
 	}
 }
+
 ?>

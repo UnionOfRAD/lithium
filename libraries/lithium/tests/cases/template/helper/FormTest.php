@@ -366,8 +366,8 @@ class FormTest extends \lithium\test\Unit {
 		));
 		$this->assertTags($result, $expected);
 	}
-	
-	public function testMultiselected() {		
+
+	public function testMultiselected() {
 		$expected = array(
 			'select' => array('name' => 'numbers[]', 'multiple' => 'multiple'),
 			array('option' => array('value' => '1', 'selected' => 'selected')),
@@ -385,7 +385,7 @@ class FormTest extends \lithium\test\Unit {
 			'/select'
 		);
 		$result = $this->form->select('numbers', array(
-			1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth'		
+			1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth'
 		),array(
 			'value' => array(1,3,4),
 			'multiple' => true

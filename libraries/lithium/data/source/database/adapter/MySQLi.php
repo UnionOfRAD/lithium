@@ -80,7 +80,7 @@ class MySQLi extends \lithium\data\source\Database {
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('port' => '3306');
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	/**
@@ -118,7 +118,9 @@ class MySQLi extends \lithium\data\source\Database {
 		$host .= $config['host'];
 
 		try {
-			$this->_connection = new \mysqli($host, $config['login'], $config['password'], $config['database'], $config['port']);
+			$this->_connection = new \mysqli(
+				$host, $config['login'], $config['password'], $config['database'], $config['port']
+			);
 		} catch (exception $e) {
 			throw new \RuntimeException($e->error);
 		}
@@ -129,7 +131,7 @@ class MySQLi extends \lithium\data\source\Database {
 			$this->_encoding($config['encoding']);
 		}
 
-			$this->_useAlias = (bool)version_compare(
+			$this->_useAlias = (boolean) version_compare(
 				$this->_connection->server_info, "4.1", ">="
 			);
 		}

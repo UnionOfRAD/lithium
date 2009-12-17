@@ -122,7 +122,7 @@ class Form extends \lithium\template\Helper {
 			'base' => array(), 'text' => array(), 'textarea' => array(),
 			'select' => array('multiple' => false)
 		);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	/**
@@ -180,7 +180,7 @@ class Form extends \lithium\template\Helper {
 			'method' => $binding ? ($binding->exists() ? 'put' : 'post') : 'post'
 		);
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, $options);
-		$options = (array)$options + $defaults;
+		$options = (array) $options + $defaults;
 		$_binding =& $this->_binding;
 		$method = __METHOD__;
 

@@ -52,7 +52,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * Sets configurations for a particular adaptable implementation, or returns
 	 * the current configuration settings.
 	 *
-	 * @param  array  $config Configurations, indexed by name
+	 * @param array $config Configurations, indexed by name
 	 * @return object         Collection of configurations
 	 */
 	public static function config($config = null) {
@@ -115,7 +115,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * `Enabled` can mean various things, e.g. having a PECL memcached extension compiled
 	 * & loaded, as well as having the memcache server up & available.
 	 *
-	 * @param  string  $name The cache configuration whose adapter will be checked
+	 * @param string $name The cache configuration whose adapter will be checked
 	 * @return boolean|null  True if adapter is enabled, false if not. This method will return
 	 *         null if no configuration under the given $name exists.
 	 */
@@ -124,4 +124,5 @@ class Adaptable extends \lithium\core\StaticObject {
 		return (isset($settings[$name])) ? static::adapter($name)->enabled() : null;
 	}
 }
+
 ?>

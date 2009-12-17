@@ -40,12 +40,13 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * Constructs the Sqlite adapter
 	 *
 	 * @param array $config Configuration options for this class. For additional configuration,
-	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options defined by
-	 *        this class:
+	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options
+	 *        defined by this class:
 	 *        - 'database' _string_: database name. Defaults to none
-	 *        - 'flags' _integer_: Optional flags used to determine how to open the SQLite database. By default,
-	 *          open uses SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE.
-	 *        - 'key' _string_: An optional encryption key used when encrypting and decrypting an SQLite database.
+	 *        - 'flags' _integer_: Optional flags used to determine how to open the SQLite database.
+	 *          By default, open uses SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE.
+	 *        - 'key' _string_: An optional encryption key used when encrypting and
+	 *          decrypting an SQLite database.
 	 *
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
@@ -61,7 +62,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 			'flags'      => NULL,
 			'key'        => NULL
 		);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	/**

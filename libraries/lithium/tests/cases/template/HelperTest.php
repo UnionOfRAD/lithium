@@ -53,7 +53,7 @@ class HelperTest extends \lithium\test\Unit {
 		$expected = '<script>//alert("XSS!");</script>';
 		$this->assertEqual($expected, $result);
 	}
-	
+
 	/**
 	 * Tests unescaped values passed through the escape() method. Unescaped values
 	 * should be returned exactly the same as the original value.

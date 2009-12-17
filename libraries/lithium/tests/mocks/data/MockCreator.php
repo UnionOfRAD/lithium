@@ -29,7 +29,6 @@ class MockCreator extends \lithium\data\Model {
 			'null' => false
 		)
 	);
-
 }
 
 ?>

@@ -78,7 +78,7 @@ class Command extends \lithium\core\Object {
 		$this->response = new $this->_classes['response']($this->_config['response']);
 
 		if ($this->request) {
-			foreach ((array)$this->request->params['named'] as $key => $param) {
+			foreach ((array) $this->request->params['named'] as $key => $param) {
 				$this->{$key} = $param;
 			}
 		}
@@ -222,7 +222,7 @@ class Command extends \lithium\core\Object {
 	 */
 	public function columns($rows, $separator = "\t") {
 		$lengths = array_reduce($rows, function($columns, $row) {
-			foreach ((array)$row as $key => $val) {
+			foreach ((array) $row as $key => $val) {
 				if (!isset($columns[$key]) || strlen($val) > $columns[$key]) {
 					$columns[$key] = strlen($val);
 				}
@@ -231,7 +231,7 @@ class Command extends \lithium\core\Object {
 		});
 		$rows = array_reduce($rows, function($rows, $row) use ($lengths, $separator) {
 			$text = '';
-			foreach ((array)$row as $key => $val) {
+			foreach ((array) $row as $key => $val) {
 				$text = $text . str_pad($val, $lengths[$key]) . $separator;
 			}
 			$rows[] = $text;

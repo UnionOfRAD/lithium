@@ -80,7 +80,7 @@ class Response extends \lithium\core\Object {
 	/**
 	 * Writes string to error stream
 	 *
-	 * @param string $str
+	 * @param string $string
 	 * @return mixed
 	 */
 	public function error($string) {
@@ -98,4 +98,5 @@ class Response extends \lithium\core\Object {
 		fclose($this->error);
 	}
 }
+
 ?>

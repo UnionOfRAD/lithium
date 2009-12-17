@@ -124,7 +124,7 @@ class Locale extends \lithium\core\StaticObject {
 		$tags = static::decompose($locale);
 
 		foreach ($tags as $name => &$tag) {
-			foreach ((array)static::$_tags[$name]['formatter'] as $formatter) {
+			foreach ((array) static::$_tags[$name]['formatter'] as $formatter) {
 				$tag = $formatter($tag);
 			}
 		}

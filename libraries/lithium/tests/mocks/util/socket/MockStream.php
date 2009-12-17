@@ -15,5 +15,4 @@ class MockStream extends \lithium\util\socket\Stream {
 	}
 }
 
-
 ?>

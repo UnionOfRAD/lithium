@@ -374,7 +374,7 @@ class Inspector extends \lithium\core\StaticObject {
 		$trim = function($c) { return trim(trim($c, '\\')); };
 		$join = function ($i) { return join('', $i); };
 
-		foreach ((array)$classes as $class) {
+		foreach ((array) $classes as $class) {
 			$data = file_get_contents(Libraries::path($class));
 			$classes = array_map($join, Parser::find($data, 'use *;', array(
 				'return'      => 'content',
@@ -415,7 +415,7 @@ class Inspector extends \lithium\core\StaticObject {
 
 		if (!empty($options['methods'])) {
 			$methods = array_filter($methods, function($method) use ($options) {
-				return in_array($method->getName(), (array)$options['methods']);
+				return in_array($method->getName(), (array) $options['methods']);
 			});
 		}
 

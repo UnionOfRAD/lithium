@@ -38,6 +38,7 @@ class Cookie extends \lithium\core\Object {
 	 * Takes care of setting appropriate configurations for
 	 * this object.
 	 *
+	 * @param array $config
 	 * @return void
 	 */
 	public function __construct($config = array()) {
@@ -100,7 +101,8 @@ class Cookie extends \lithium\core\Object {
 	 * @return boolean True on successful write, false otherwise
 	 */
 	public function write($key, $value = null, $options = array()) {
-		if (!isset($options['expire']) && empty($this->_config['expire']) && $key != $this->_config['name']) {
+		if (!isset($options['expire']) && empty($this->_config['expire'])
+				&& $key != $this->_config['name']) {
 			return null;
 		}
 		$config = $options + $this->_config;

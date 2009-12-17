@@ -63,7 +63,7 @@ class MySql extends \lithium\data\source\Database {
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('port' => '3306');
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	/**
@@ -90,7 +90,7 @@ class MySql extends \lithium\data\source\Database {
 			$this->encoding($config['encoding']);
 		}
 
-		$this->_useAlias = (bool)version_compare(
+		$this->_useAlias = (boolean) version_compare(
 			mysql_get_server_info($this->_connection), "4.1", ">="
 		);
 		return $this->_isConnected;

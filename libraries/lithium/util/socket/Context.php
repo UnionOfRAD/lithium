@@ -49,7 +49,8 @@ class Context extends \lithium\util\Socket {
 	/**
 	 * Send request and return response data
 	 *
-	 * @param string path
+	 * @param string $message
+	 * @param array $options
 	 * @return string
 	 */
 	public function send($message, $options = array()) {

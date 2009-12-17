@@ -9,7 +9,6 @@
 namespace lithium\tests\mocks\template;
 
 class MockRenderer extends \lithium\template\view\Renderer {
-
 }
 
 ?>

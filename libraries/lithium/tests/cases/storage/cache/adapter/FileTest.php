@@ -53,7 +53,10 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
-		$this->assertEqual(file_get_contents(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"), "{:expiry:$time}\ndata");
+		$this->assertEqual(
+			file_get_contents(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"),
+			"{:expiry:$time}\ndata"
+		);
 
 		$this->assertTrue(unlink(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
 		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
