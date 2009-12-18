@@ -144,9 +144,13 @@ class Libraries {
 	public static function add($name, $config = array()) {
 		$defaults = array(
 			'path' => LITHIUM_LIBRARY_PATH . '/' . $name,
-			'prefix' => $name . "\\", 'suffix' => '.php',
-			'loader' => null, 'includePath' => false,
-			'transform' => null, 'bootstrap' => null, 'defer' => false,
+			'prefix' => $name . "\\",
+			'suffix' => '.php',
+			'loader' => null,
+			'includePath' => false,
+			'transform' => null,
+			'bootstrap' => null,
+			'defer' => false
 		);
 		switch ($name) {
 			case 'app':
@@ -549,7 +553,7 @@ class Libraries {
 	 * @return void
 	 */
 	protected static function _addPlugins($plugins) {
-		$defaults = array('bootstrap' => null, 'route' => true);
+		$defaults = array('bootstrap' => true, 'route' => true);
 		$params = array('app' => LITHIUM_APP_PATH, 'root' => LITHIUM_LIBRARY_PATH);
 		$result = array();
 
