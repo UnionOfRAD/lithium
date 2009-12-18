@@ -207,7 +207,7 @@ class Service extends \lithium\core\Object {
 	 */
 	protected function _request($method, $path, $data, $options) {
 		$request = new $this->_classes['request']($this->_config + $options);
-		$request->path = str_replace('//', '/', "/{$path}");
+		$request->path = str_replace('//', '/', "{$request->path}/{$path}");
 		$request->method = $method = strtoupper($method);
 		$media = $this->_classes['media'];
 		$type = null;
@@ -218,7 +218,6 @@ class Service extends \lithium\core\Object {
 			$request->headers(array('Content-Type' => current($contentType)));
 			$data = Media::encode($options['type'], $data, $options);
 		}
-
 		in_array($method, array('POST', 'PUT')) ? $request->body($data) : $request->params = $data;
 		return $request;
 	}

@@ -85,16 +85,6 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Base method, shows help. Override in subclasses as needed.
-	 *
-	 * @return void
-	 */
-	public function run() {
-		$this->help();
-		return false;
-	}
-
-	/**
 	 * Called by the Dispatcher class to invoke an action.
 	 *
 	 * @param string $action

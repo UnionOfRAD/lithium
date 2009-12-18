@@ -14,7 +14,6 @@ class MockTagging extends \lithium\data\Model {
 		'connection' => 'mock-source',
 		'source' => 'posts_tags', 'key' => array('post_id', 'tag_id')
 	);
-
 }
 
 ?>

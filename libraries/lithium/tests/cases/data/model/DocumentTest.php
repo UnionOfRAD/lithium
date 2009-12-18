@@ -539,18 +539,19 @@ class DocumentTest extends \lithium\test\Unit {
 			)
 		));
 
-		$doc->errors($expected);
-		$expected = array(
+		$errors = array(
 			'title' => 'Too short',
 			'parsed' => 'Empty'
 		);
+		$doc->errors($errors);
+
+		$expected = $errors;
 		$result = $doc->errors();
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Too short';
 		$result = $doc->errors('title');
 		$this->assertEqual($expected, $result);
-
 
 		$doc->errors('title', 'Too generic');
 		$expected = 'Too generic';
