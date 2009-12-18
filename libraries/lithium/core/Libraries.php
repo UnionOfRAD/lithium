@@ -553,7 +553,7 @@ class Libraries {
 	 * @return void
 	 */
 	protected static function _addPlugins($plugins) {
-		$defaults = array('bootstrap' => true, 'route' => true);
+		$defaults = array('bootstrap' => null, 'route' => true);
 		$params = array('app' => LITHIUM_APP_PATH, 'root' => LITHIUM_LIBRARY_PATH);
 		$result = array();
 
@@ -571,6 +571,9 @@ class Libraries {
 						break;
 					}
 				}
+			}
+			if (is_null($plugin['bootstrap'])) {
+				$options['bootstrap'] = file_exists($options['path'] . '/config/bootstrap.php');
 			}
 			$plugin = static::add($name, $options + $defaults);
 
