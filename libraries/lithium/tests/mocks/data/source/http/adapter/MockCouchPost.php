@@ -24,6 +24,4 @@ class MockCouchPost extends \lithium\data\Model {
 	);
 }
 
-
-
 ?>

@@ -165,17 +165,6 @@ class CommandTest extends \lithium\test\Unit {
 		$this->assertPattern("/{$expected}/m", $result);
 	}
 
-	public function testRun() {
-		$command = new MockCommand(array('request' => $this->request));
-		$return = $command->run();
-
-		$this->assertFalse($return);
-
-		$expected = "USAGE";
-		$result = $command->response->output;
-		$this->assertPattern("/{$expected}/m", $result);
-	}
-
 	public function testIn() {
 		$command = new MockCommand(array('request' => $this->request));
 		fwrite($command->request->input, 'nada mucho');
