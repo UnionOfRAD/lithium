@@ -138,7 +138,7 @@ class Request extends \lithium\http\Base {
 		if (strpos($this->host, '/') !== false) {
 			$parts = explode('/', $this->host, 2);
 			$this->host = $parts[0];
-			$this->path = $parts[1];
+			$this->path = str_replace('//', '/', "/{$parts[1]}/");
 		}
 	}
 

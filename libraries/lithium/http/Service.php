@@ -207,7 +207,7 @@ class Service extends \lithium\core\Object {
 	 */
 	protected function _request($method, $path, $data, $options) {
 		$request = new $this->_classes['request']($this->_config + $options);
-		$request->path = str_replace('//', '/', "{$request->path}/{$path}");
+		$request->path = str_replace('//', '/', "{$request->path}{$path}");
 		$request->method = $method = strtoupper($method);
 		$media = $this->_classes['media'];
 		$type = null;

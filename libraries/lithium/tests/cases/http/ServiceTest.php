@@ -52,6 +52,36 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testPath() {
+		$http = new MockService(array('host' => 'localhost') + $this->_testConfig);
+		$result = $http->get();
+
+		$expected = '/';
+		$result = $http->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$http = new MockService(array('host' => 'localhost/base/path/') + $this->_testConfig);
+		$result = $http->get();
+
+		$expected = '/base/path/';
+		$result = $http->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$http = new MockService(array('host' => 'localhost/base/path') + $this->_testConfig);
+		$result = $http->get('/somewhere');
+
+		$expected = '/base/path/somewhere';
+		$result = $http->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$http = new MockService(array('host' => 'localhost/base/path/') + $this->_testConfig);
+		$result = $http->get('/somewhere');
+
+		$expected = '/base/path/somewhere';
+		$result = $http->last->request->path;
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testGet() {
 		$http = new MockService($this->_testConfig);
 		$result = $http->get();
@@ -165,6 +195,7 @@ class ServiceTest extends \lithium\test\Unit {
 		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
 	}
+
 }
 
 ?>
