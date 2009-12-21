@@ -96,7 +96,7 @@ class Cache extends \lithium\core\Adaptable {
 		$key = static::key($key);
 		$method = static::adapter($name)->write($key, $data, $expiry, $conditions);
 		$params = compact('key', 'data', 'expiry', 'conditions');
-		return static::_filter(__METHOD__, $params, $method, $settings[$name]['filters']);
+		return static::_filter(__FUNCTION__, $params, $method, $settings[$name]['filters']);
 	}
 
 
@@ -123,7 +123,7 @@ class Cache extends \lithium\core\Adaptable {
 		$params = compact('key', 'conditions');
 		$filters = $settings[$name]['filters'];
 
-		return static::_filter(__METHOD__, $params, $method, $filters);
+		return static::_filter(__FUNCTION__, $params, $method, $filters);
 	}
 
 	/**
@@ -149,7 +149,7 @@ class Cache extends \lithium\core\Adaptable {
 		$params = compact('key', 'conditions');
 		$filters = $settings[$name]['filters'];
 
-		return static::_filter(__METHOD__, $params, $method, $filters);
+		return static::_filter(__FUNCTION__, $params, $method, $filters);
 	}
 
 	/**

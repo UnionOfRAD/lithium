@@ -283,7 +283,7 @@ class Media extends \lithium\core\StaticObject {
 		$type = isset(static::$_assets[$type]) ? $type : 'generic';
 		$params = compact('path', 'type', 'options');
 
-		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
+		return static::_filter(__FUNCTION__, $params, function($self, $params, $chain) {
 			extract($params);
 
 			if (preg_match('/^[a-z0-9-]+:\/\//i', $path)) {

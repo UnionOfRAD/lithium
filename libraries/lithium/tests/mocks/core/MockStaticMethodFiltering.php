@@ -8,11 +8,11 @@
 
 namespace lithium\tests\mocks\core;
 
-class MockStaticObjectMethodFiltering extends \lithium\core\StaticObject {
+class MockStaticMethodFiltering extends \lithium\core\StaticObject {
 
 	public static function method($data) {
 		$data[] = 'Starting outer method call';
-		$result = static::_filter(__METHOD__, compact('data'), function($self, $params, $chain) {
+		$result = static::_filter(__FUNCTION__, compact('data'), function($self, $params, $chain) {
 			$params['data'][] = 'Inside method implementation of ' . $self;
 			return $params['data'];
 		});
@@ -25,7 +25,13 @@ class MockStaticObjectMethodFiltering extends \lithium\core\StaticObject {
 		$method = function($self, $params, $chain) use (&$filters) {
 			return $filters;
 		};
-		return static::_filter(__METHOD__, array(), $method);
+		return static::_filter(__FUNCTION__, array(), $method);
+	}
+
+	public static function callSubclassMethod() {
+		return static::_filter(__FUNCTION__, array(), function($self, $params, $chain) {
+			return $self::childMethod();
+		});
 	}
 
 	public static function foo() {
