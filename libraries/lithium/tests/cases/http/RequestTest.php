@@ -72,7 +72,7 @@ class RequestTest extends \lithium\test\Unit {
 		$result = $request->body();
 		$this->assertEqual($expected, $result);
 	}
-	
+
 	public function testConstructWithPath() {
 		$request = new Request(array(
 			'host' => 'localhost/base/path',
@@ -81,7 +81,7 @@ class RequestTest extends \lithium\test\Unit {
 			'body' => array('Part 1'),
 			'params' => array('param' => 'value')
 		));
-		
+
 		$expected = '/base/path/';
 		$result = $request->path;
 		$this->assertEqual($expected, $result);
@@ -155,7 +155,7 @@ class RequestTest extends \lithium\test\Unit {
 		$this->request->body(array('status=cool'));
 		$result = (string) $this->request;
 		$this->assertEqual($expected, $result);
-	}	
+	}
 }
 
 ?>

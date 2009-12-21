@@ -195,7 +195,6 @@ class ServiceTest extends \lithium\test\Unit {
 		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
 	}
-
 }
 
 ?>
