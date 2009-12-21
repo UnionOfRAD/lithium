@@ -562,20 +562,20 @@ class Libraries {
 				$name = $options;
 				$options = array();
 			}
-			$params = compact('name') + $params;
+			$options += $defaults;
 
 			if (!isset($options['path'])) {
 				foreach (static::$_pluginPaths as $path) {
-					if (is_dir($dir = String::insert($path, $params))) {
+					if (is_dir($dir = String::insert($path, compact('name') + $params))) {
 						$options['path'] = $dir;
 						break;
 					}
 				}
 			}
-			if (is_null($plugin['bootstrap'])) {
-				$options['bootstrap'] = file_exists($options['path'] . '/config/bootstrap.php');
+			if (is_null($options['bootstrap'])) {
+				$options['bootstrap'] = file_exists($plugin['path'] . '/config/bootstrap.php');
 			}
-			$plugin = static::add($name, $options + $defaults);
+			$plugin = static::add($name, $options);
 
 			if ($plugin['route']) {
 				$defaultRoutes = $plugin['path'] . '/config/routes.php';
