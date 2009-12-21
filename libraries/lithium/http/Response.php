@@ -21,35 +21,35 @@ class Response extends \lithium\http\Base {
 	public $status = array('code' => 200, 'message' => 'OK');
 
 	/**
-	 * headers
+	 * Headers.
 	 *
 	 * @var array
 	 */
 	public $headers = array();
 
 	/**
-	 * Content Type
+	 * Content Type.
 	 *
 	 * @var string
 	 */
 	public $type = 'text/html';
 
 	/**
-	 * Character Set
+	 * Character Set.
 	 *
 	 * @var string
 	 */
 	public $charset = 'UTF-8';
 
 	/**
-	 * the body
+	 * The body.
 	 *
 	 * @var array
 	 */
 	public $body = array();
 
 	/**
-	 * Status codes
+	 * Status codes.
 	 *
 	 * @var array
 	 */
@@ -96,9 +96,10 @@ class Response extends \lithium\http\Base {
 	);
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 *
-	 * @return void
+	 * @param array $config
+	 * @return object
 	 */
 	public function __construct($config = array()) {
 		if (!empty($config['message'])) {
@@ -138,7 +139,7 @@ class Response extends \lithium\http\Base {
 			unset($config['message']);
 		}
 
-		foreach ((array)$config as $key => $value) {
+		foreach ((array) $config as $key => $value) {
 			if (isset($this->{$key})) {
 				$this->{$key} = $value;
 			}
@@ -148,6 +149,8 @@ class Response extends \lithium\http\Base {
 	/**
 	 * undocumented function
 	 *
+	 * @param string $key
+	 * @param string $data
 	 * @return string
 	 */
 	public function status($key = null, $data = null) {
@@ -176,7 +179,7 @@ class Response extends \lithium\http\Base {
 	}
 
 	/**
-	* Return the response as a string
+	* Return the response as a string.
 	*
 	* @return string
 	*/
@@ -187,9 +190,10 @@ class Response extends \lithium\http\Base {
 	}
 
 	/**
-	* Decodes based on transfer encoding body
+	* Decodes based on transfer encoding body.
 	*
 	* @todo replace with stream wrapper dechunk
+	* @param string $body
 	* @return string
 	*/
 	protected function _decode($body) {

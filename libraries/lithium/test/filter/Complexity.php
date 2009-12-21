@@ -46,7 +46,7 @@ class Complexity extends \lithium\core\StaticObject {
 
 			foreach (Inspector::methods($class, 'ranges') as $method => $lines) {
 				$lines = Inspector::lines($class, $lines);
-				$branches = Parser::tokenize(join("\n", (array)$lines), array(
+				$branches = Parser::tokenize(join("\n", (array) $lines), array(
 					'include' => static::$_include
 				));
 				static::$_results[$class][$method] = count($branches) + 1;

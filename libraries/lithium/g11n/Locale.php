@@ -17,25 +17,25 @@ use \InvalidArgumentException;
  * preferences.
  *
  * In order to avoid unnecessary overhead all methods throughout the framework accepting
- * a locale require it to be well-formed according to the structue layed out below. For
+ * a locale require it to be well-formed according to the structure laid out below. For
  * assuring the correct format use `Locale::canonicalize()` once on the locale.
  *
  * However the methods within this class will also work with not-so-well-formed locales.
- * They accept both undercores and hyphens as separators between and don't care about the
- * case of the indvidual tags.
+ * They accept both underscores and hyphens as separators between and don't care about the
+ * case of the individual tags.
  *
- * The identifier used by Lithium is based in it's structure upon Unicode's
+ * The identifier used by Lithium is based in its structure upon Unicode's
  * language identifier and is compliant to BCP 47.
  *
  * `language[_Script][_TERRITORY][_VARIANT]`
  *  - `language` The spoken language, here represented by an ISO 639-1 code,
  *    where not available ISO 639-3 and ISO 639-5 codes are allowed too) tag.
- *    The tag should  be lowercased and is required.
+ *    The tag should  be lower-cased and is required.
  *  - `Script` The tag should have it's first character capitalized, all others
- *    lowercased. The tag is optional.
+ *    lower-cased. The tag is optional.
  *  - `TERRITORY` A geographical area, here represented by an ISO 3166-1 code.
- *     Should be all uppercased and is optional.
- *  - `VARIANT` Should be all uppercased and is optional.
+ *     Should be all upper-cased and is optional.
+ *  - `VARIANT` Should be all upper-cased and is optional.
  *
  * @method string|void language(string $locale) Parses a locale and returns it's language tag.
  * @method string|void script(string $locale) Parses a locale and returns it's script tag.
@@ -115,7 +115,7 @@ class Locale extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Returns a locale in it's canonical form with tags formatted properly.
+	 * Returns a locale in its canonical form with tags formatted properly.
 	 *
 	 * @param string $locale A locale in an arbitrary form (i.e. `'ZH-HANS-HK_REVISED'`).
 	 * @return string A locale in it's canoncial form (i.e. `'zh_Hans_HK_REVISED'`).
@@ -124,7 +124,7 @@ class Locale extends \lithium\core\StaticObject {
 		$tags = static::decompose($locale);
 
 		foreach ($tags as $name => &$tag) {
-			foreach ((array)static::$_tags[$name]['formatter'] as $formatter) {
+			foreach ((array) static::$_tags[$name]['formatter'] as $formatter) {
 				$tag = $formatter($tag);
 			}
 		}

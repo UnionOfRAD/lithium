@@ -9,7 +9,6 @@
 namespace lithium\template;
 
 use \RuntimeException;
-use \lithium\util\String;
 use \lithium\core\Libraries;
 use \lithium\g11n\Message;
 
@@ -58,12 +57,19 @@ class View extends \lithium\core\Object {
 		}
 
 		$h = function($data) use (&$h) {
-			return is_array($data) ? array_map($h, $data) : htmlspecialchars((string)$data);
+			return is_array($data) ? array_map($h, $data) : htmlspecialchars((string) $data);
 		};
-		$t = function($singular, $options = array()) {
-			return Message::translate($singular, $options);
+		$t = function($message, $options = array()) {
+			return Message::translate($message, $options + array(
+				'default' => $message
+			));
 		};
-		$this->outputFilters += compact('h', 't');
+		$tn = function($message1, $message2, $count, $options = array()) {
+			return Message::translate($message1, $options + compact('count') + array(
+				'default' => $count == 1 ? $message1 : $message2
+			));
+		};
+		$this->outputFilters += compact('h', 't', 'tn');
 	}
 
 	public function render($type, $data = array(), $options = array()) {
@@ -82,7 +88,7 @@ class View extends \lithium\core\Object {
 			case 'template':
 			case 'layout':
 				$template = $this->_loader->template($type, $options);
-				$data = (array)$data + $this->outputFilters;
+				$data = (array) $data + $this->outputFilters;
 				return $this->_renderer->render($template, $data, $options);
 		}
 	}

@@ -22,7 +22,7 @@ class Reporter extends \lithium\core\Object {
 	/**
 	 * undocumented function
 	 *
-	 * @param object $report \lithium\test\Report
+	 * @param object $stats \lithium\test\Report
 	 * @return void
 	 */
 	public function stats($stats) {
@@ -41,7 +41,7 @@ class Reporter extends \lithium\core\Object {
 		$aggregate = compact('asserts', 'passes', 'fails', 'errors', 'exceptions', 'success');
 		$result = array($this->_result($aggregate));
 
-		foreach ((array)$stats['errors'] as $error) {
+		foreach ((array) $stats['errors'] as $error) {
 			switch ($error['result']) {
 				case 'fail':
 					$error += array('class' => 'unknown', 'method' => 'unknown');
@@ -58,7 +58,8 @@ class Reporter extends \lithium\core\Object {
 	/**
 	 * return menu as a string to be used as render
 	 *
-	 * @params array options
+	 * @param array $classes
+	 * @param array $options
 	 *               - format: type of reporter class. eg: html default: text
 	 *               - tree: true to convert classes to tree structure
 	 */

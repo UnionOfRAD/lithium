@@ -111,6 +111,7 @@ class Curl extends \lithium\util\Socket {
 	 * Reads data from the curl connection.
 	 * The `read` method will utilize the curl options that have been set.
 	 *
+	 * @param array $data
 	 * @return mixed Boolean false if the resource handle is unavailable, and the result
 	 *         of `curl_exec` otherwise.
 	 * @see http://php.net/manual/en/function.curl-exec.php
@@ -144,6 +145,8 @@ class Curl extends \lithium\util\Socket {
 	/**
 	 * encoding() is currently unimplemented for this socket adapter
 	 *
+	 * @todo implement Curl::encoding($charset)
+	 * @param string $charset
 	 */
 	public function encoding($charset) {
 	}
@@ -164,12 +167,12 @@ class Curl extends \lithium\util\Socket {
 		}
 		$this->options += $flags;
 	}
-	
+
 	/**
 	 * Aggregates read and write methods into a coherent request response
 	 *
-	 * @param mixed $request array or object like `\lithium\http\Request`
-	 * @params array $options
+	 * @param mixed $message array or object like `\lithium\http\Request`
+	 * @param array $options
 	 *                - path: path for the current request
 	 *                - classes: array of classes to use
 	 *                    - response: a class to use for the response

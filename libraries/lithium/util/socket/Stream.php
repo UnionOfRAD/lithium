@@ -108,7 +108,7 @@ class Stream extends \lithium\util\Socket {
 	 * @param string $data The string to be written.
 	 * @return mixed False on error, number of bytes written otherwise.
 	 */
-	public function write($data) {		
+	public function write($data) {
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
@@ -148,8 +148,8 @@ class Stream extends \lithium\util\Socket {
 	/**
 	 * Aggregates read and write methods into a coherent request response
 	 *
-	 * @param mixed $request array or object like `\lithium\http\Request`
-	 * @params array $options
+	 * @param mixed $message array or object like `\lithium\http\Request`
+	 * @param array $options
 	 *                - path: path for the current request
 	 *                - classes: array of classes to use
 	 *                    - response: a class to use for the response

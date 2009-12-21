@@ -83,7 +83,7 @@ abstract class Renderer extends \lithium\core\Object {
 				'content' => '', 'title' => '', 'scripts' => array(), 'styles' => array()
 			)
 		);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	/**
@@ -145,7 +145,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 *
 	 * @param string $method The method name to call, usually either a rendering context value or a
 	 *               content handler.
-	 * @param array $params 
+	 * @param array $params
 	 * @return mixed
 	 * @see lithium\template\view\Renderer::$_context
 	 * @see lithium\template\view\Renderer::$_handlers
@@ -177,7 +177,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 * they are not available.
 	 *
 	 * @param string $name Helper name
-	 * @param array $config 
+	 * @param array $config
 	 * @return object
 	 */
 	public function helper($name, $config = array()) {
@@ -258,8 +258,8 @@ abstract class Renderer extends \lithium\core\Object {
 	 * - a closure, which takes the value as the first parameter, an array containing an instance of
 	 *   the calling helper and the calling method name as the second, and `$options` as the third.
 	 * In all cases, handlers should return the transformed version of `$value`.
-	 * 
-	 * @param object $helper The instance of the object (usually a helper) that is invoking 
+	 *
+	 * @param object $helper The instance of the object (usually a helper) that is invoking
 	 * @param string $method The object (helper) method which is applying the handler to the content
 	 * @param string $name The name of the value to which the handler is applied, i.e. `'url'`,
 	 *               `'path'` or `'title'`.

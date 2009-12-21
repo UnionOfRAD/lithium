@@ -11,10 +11,11 @@ namespace lithium\data\source\database\adapter;
 use \Exception;
 
 /**
- * Adapater class for MySQL improved extension. Implements the methods connecting higher level abstractions
- * to the specifics of the MySQL improved extension.
- *
- */
+* Adapter class for MySQL improved extension.
+*
+* Implements the methods connecting higher level abstractions to the specifics of the MySQL
+* improved extension.
+*/
 class MySQLi extends \lithium\data\source\Database {
 
 	/**
@@ -51,7 +52,7 @@ class MySQLi extends \lithium\data\source\Database {
 
 	/**
 	 * MySQLi-specific value denoting whether or not table aliases can be used in DELETE and
-	 * UPDATE queries. This is dependant on mysql cerver version.
+	 * UPDATE queries. This is dependent on the MySQL server version.
 	 *
 	 * @var boolean
 	 */
@@ -63,22 +64,31 @@ class MySQLi extends \lithium\data\source\Database {
 	 *
 	 * @param array $config Configuration options for this class. For additional configuration,
 	 *        see `lithium\data\source\Database` and `lithium\data\Source`.
+	 *        - `'database'`: The name of the database to connect to. Defaults to 'lithium'.
+	 *        - `'host'`: The IP or machine name where MySQL is running. Defaults to 'localhost'.
+	 *        - `'persistent'`: If supported, should a persistent connection be made. Defaults to true.
+	 *        - `'port'`: The port number MySQL is listening on. The default is '3306'.
 	 *
-	 * Options defined by this class:
-	 * - 'port' `integer|string`: Accepts a port number or Unix socket name to use when connecting
-	 *   to the database.  Defaults to `'3306'`.
+	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
+	 * list of active connections.
+	 *
+	 * @return object The adapter instance.
+	 *
+	 * @see lithium\data\source\Database::__construct()
+	 * @see lithium\data\Source::__construct()
+	 * @see lithium\data\Connections::add()
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('port' => '3306');
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	/**
 	 * In cases where the query is a raw string (as opposed to a `Query` object), the database must
 	 * determine the correct column names from the result resource.
 	 *
-	 * @param mixed $query
-	 * @param mysqli_result object $mysqliResult
+	 * @param object|string $query
+	 * @param object $mysqliResult
 	 * @param object $context
 	 * @return array Field names
 	 */
@@ -95,10 +105,10 @@ class MySQLi extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Connects to the database and sets the connection encoding,
-	 * using options provided to the class constructor.
+	 * Connects to the database and sets the connection encoding, using options provided
+	 * to the class constructor.
 	 *
-	 * @return boolean True if the database could be connected, else false
+	 * @return boolean True if the database could be connected, else false.
 	 */
 	public function connect() {
 		$config = $this->_config;
@@ -108,7 +118,9 @@ class MySQLi extends \lithium\data\source\Database {
 		$host .= $config['host'];
 
 		try {
-			$this->_connection = new \mysqli($host, $config['login'], $config['password'], $config['database'], $config['port']);
+			$this->_connection = new \mysqli(
+				$host, $config['login'], $config['password'], $config['database'], $config['port']
+			);
 		} catch (exception $e) {
 			throw new \RuntimeException($e->error);
 		}
@@ -119,7 +131,7 @@ class MySQLi extends \lithium\data\source\Database {
 			$this->_encoding($config['encoding']);
 		}
 
-			$this->_useAlias = (bool)version_compare(
+			$this->_useAlias = (boolean) version_compare(
 				$this->_connection->server_info, "4.1", ">="
 			);
 		}
@@ -130,14 +142,14 @@ class MySQLi extends \lithium\data\source\Database {
 	/**
 	 * Gets the column schema for a given MySQL table.
 	 *
-	 * @param mixed $entity Specifies the table name for which the schema should be returned, or the
-	 *              class name of the model object requesting the schema, in which case the model
-	 *              class will be queried for the correct table name.
+	 * @param mixed $entity Specifies the table name for which the schema should be returned, or
+	 *        the class name of the model object requesting the schema, in which case the model
+	 *        class will be queried for the correct table name.
 	 * @param array $meta
 	 * @return array Returns an associative array describing the given table's schema, where the
-	 *               array keys are the available fields, and the values are arrays describing each
-	 *               field, containing the following keys:
-	 *               -`'type'`: The field type name
+	 *         array keys are the available fields, and the values are arrays describing each
+	 *         field, containing the following keys:
+	 *         - `'type'`: The field type name.
 	 * @filter This method can be filtered.
 	 */
 	public function describe($entity, $meta = array()) {
@@ -168,7 +180,7 @@ class MySQLi extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Disconnects the connection to the database.
+	 * Disconnects the adapter from the database.
 	 *
 	 * @return boolean True on success, else false.
 	 */
@@ -184,8 +196,8 @@ class MySQLi extends \lithium\data\source\Database {
 	 * Gets or sets the encoding for the connection.
 	 *
 	 * @param $encoding
-	 * @return mixed If setting the encoding; returns true on success, else false.
-	 *               When getting, returns the encoding.
+	 * @return boolean|string If setting the encoding; returns true on success, else false.
+	 *         When getting, returns the encoding.
 	 */
 	public function encoding($encoding = null) {
 		$encodingMap = array('UTF-8' => 'utf8');
@@ -201,7 +213,7 @@ class MySQLi extends \lithium\data\source\Database {
 	/**
 	 * Returns the list of tables in the currently-connected database.
 	 *
-	 * @param string $model The fully-namespaced class name of the model object making the request.
+	 * @param string $model The fully-name-spaced class name of the model object making the request.
 	 * @return array Returns an array of objects to which models can connect.
 	 * @filter This method can be filtered.
 	 */
@@ -221,9 +233,21 @@ class MySQLi extends \lithium\data\source\Database {
 	}
 
 	/**
+	 * Quotes identifiers.
+	 *
+	 * Currently, this method simply returns the identifier.
+	 *
+	 * @param string $name The identifier to quote.
+	 * @return string The quoted identifier.
+	 */
+	public function name($name) {
+		return $name;
+	}
+
+	/**
 	 *
 	 * @param string $type
-	 * @param mysqli_result object $mysqliResult
+	 * @param object $mysqliResult
 	 * @param unknown_type $context
 	 * @return array|null
 	 */
@@ -252,10 +276,10 @@ class MySQLi extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Converts database-layer column types to basic types
+	 * Converts database-layer column types to basic types.
 	 *
-	 * @param string $real Real database-layer column type (i.e. "varchar(255)")
-	 * @return string Abstract column type (i.e. "string")
+	 * @param string $real Real database-layer column type (i.e. "varchar(255)").
+	 * @return string Abstract column type (i.e. "string").
 	 */
 	protected function _column($real) {
 		if (is_array($real)) {

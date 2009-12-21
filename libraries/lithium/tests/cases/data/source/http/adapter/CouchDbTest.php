@@ -117,7 +117,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
 
-		$expected = array();
+		$expected = '';
 		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
 	}
@@ -133,7 +133,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
 
-		$expected = array();
+		$expected = '';
 		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
 	}

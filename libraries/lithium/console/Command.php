@@ -78,20 +78,10 @@ class Command extends \lithium\core\Object {
 		$this->response = new $this->_classes['response']($this->_config['response']);
 
 		if ($this->request) {
-			foreach ((array)$this->request->params['named'] as $key => $param) {
+			foreach ((array) $this->request->params['named'] as $key => $param) {
 				$this->{$key} = $param;
 			}
 		}
-	}
-
-	/**
-	 * Base method, shows help. Override in subclasses as needed.
-	 *
-	 * @return void
-	 */
-	public function run() {
-		$this->help();
-		return false;
 	}
 
 	/**
@@ -222,7 +212,7 @@ class Command extends \lithium\core\Object {
 	 */
 	public function columns($rows, $separator = "\t") {
 		$lengths = array_reduce($rows, function($columns, $row) {
-			foreach ((array)$row as $key => $val) {
+			foreach ((array) $row as $key => $val) {
 				if (!isset($columns[$key]) || strlen($val) > $columns[$key]) {
 					$columns[$key] = strlen($val);
 				}
@@ -231,7 +221,7 @@ class Command extends \lithium\core\Object {
 		});
 		$rows = array_reduce($rows, function($rows, $row) use ($lengths, $separator) {
 			$text = '';
-			foreach ((array)$row as $key => $val) {
+			foreach ((array) $row as $key => $val) {
 				$text = $text . str_pad($val, $lengths[$key]) . $separator;
 			}
 			$rows[] = $text;
@@ -298,47 +288,46 @@ class Command extends \lithium\core\Object {
 		$class = new ReflectionClass(get_class($this));
 		$template = $class->newInstance();
 
-		$filter = function($prop) {
-			return $prop->isPublic() && !preg_match('/^[A-Z]/', $prop->getName());
-		};
 		$properties = array_diff($class->getProperties(), $parent->getProperties());
-		$properties = array_filter($properties, $filter);
+		$properties = array_filter($properties, function($p) { return $p->isPublic(); });
 
-		$params = array();
-
-		foreach ($properties as $property) {
-			$name = str_replace('_', '-', Inflector::underscore($property->getName()));
-			$default = $property->getValue($template);
-
+		foreach ($properties as &$property) {
 			$comment = Docblock::comment($property->getDocComment());
-			$description = str_replace("\n", ' ', $comment['description']);
+			$description = $comment['description'];
 			$type = isset($comment['tags']['var']) ? strtok($comment['tags']['var'], ' ') : null;
 
+			$name = str_replace('_', '-', Inflector::underscore($property->getName()));
 			$usage = $type == 'boolean' ? "--{$name}" : "--{$name}=" . strtoupper($name);
 
-			$params[] = compact('name', 'default', 'description', 'type', 'usage');
+			$property = compact('name', 'description', 'type', 'usage');
 		}
 
+		$pad = function($message, $level = 1) {
+			$padding = str_repeat(' ', $level * 4);
+			return $padding . str_replace("\n", "\n{$padding}", $message);
+		};
+
 		$this->out('USAGE');
-		$this->out(sprintf("    li3 %s%s [ARGS]",
+		$this->out($pad(sprintf("li3 %s%s [ARGS]",
 			$this->request->params['command'] ?: 'COMMAND',
-			array_reduce($params, function($a, $b) { return "{$a} {$b['usage']}"; })
-		));
+			array_reduce($properties, function($a, $b) { return "{$a} {$b['usage']}"; })
+		)));
 
-		$this->nl();
-		$this->out('DESCRIPTION');
-		$comment = Docblock::comment($class->getDocComment());
-		$this->out("    {$comment['description']}");
-
-		if ($params) {
+		if ($this->request->params['command']) {
+			$this->nl();
+			$this->out('DESCRIPTION');
+			$comment = Docblock::comment($class->getDocComment());
+			$this->out($pad($comment['description']));
+		}
+		if ($properties) {
 			$this->nl();
 			$this->out('OPTIONS');
 
-			foreach ($params as $param) {
-				$this->out("    {$param['usage']}");
+			foreach ($properties as $param) {
+				$this->out($pad($param['usage']));
 
 				if ($param['description']) {
-					$this->out("        {$param['description']}");
+					$this->out($pad($param['description'], 2));
 				}
 				$this->nl();
 			}
@@ -347,17 +336,16 @@ class Command extends \lithium\core\Object {
 			$this->nl();
 			$this->out('COMMANDS');
 			$commands = Libraries::locate('command', null, array('recursive' => false));
-			$commands = array_unique($commands);
 
 			foreach ($commands as $command) {
 				$class = new ReflectionClass($command);
 				$comment = Docblock::comment($class->getDocComment());
 				$command = explode('\\', $command);
 
-				$this->out("    " .	Inflector::underscore(array_pop($command)));
-				$this->out("        " . str_replace("\n", ' ', $comment['description']));
+				$this->out($pad(Inflector::underscore(end($command))));
+				$this->out($pad($comment['description'], 2));
+				$this->nl();
 			}
-			$this->nl();
 			$this->out('See `li3 COMMAND help` for more information on a specific command.');
 		}
 		return true;

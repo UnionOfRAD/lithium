@@ -40,15 +40,17 @@ class MongoDb extends \lithium\data\Source {
 	 * Instantiates the MongoDB adapter with the default connection information.
 	 *
 	 * @param array $config All information required to connect to the database, including:
+	 *        - `'database'`: The name of the database to connect to. Defaults to 'lithium'.
+	 *        - `'host'`: The IP or machine name where Mongo is running. Defaults to 'localhost'.
+	 *        - `'persistent'`: If a persistent connection (if available) should be made. Defaults
+	 *            to true.
+	 *        - `'port'`: The port number Mongo is listening on. The default is '27017'.
 	 *
-	 *              -'database': The name of the database to connect to. Defaults to 'lithium'.
-	 *              -'host': The IP or machine name where Mongo is running. Defaults to 'localhost'.
-	 *              -'port': The port number Mongo is listening on. The default is '27017'.
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
+	 * @return object The adapter instance.
 	 *
 	 * @see lithium\data\Connections::add()
-	 * @return void
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(
@@ -57,7 +59,7 @@ class MongoDb extends \lithium\data\Source {
 			'database'   => 'lithium',
 			'port'       => '27017',
 		);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	/**
@@ -119,6 +121,14 @@ class MongoDb extends \lithium\data\Source {
 	public function describe($entity, $meta = array()) {
 	}
 
+	/**
+	 * Quotes identifiers.
+	 *
+	 * MongoDb does not need identifiers quoted, so this method simply returns the identifier.
+	 *
+	 * @param string $name The identifier to quote.
+	 * @return string The quoted identifier.
+	 */
 	public function name($name) {
 		return $name;
 	}
@@ -135,8 +145,9 @@ class MongoDb extends \lithium\data\Source {
 	 * @param string $method The name of native method to call. See the link above for available
 	 *        class methods.
 	 * @param array $params A list of parameters to be passed to the native method.
-	 * @return mixed Returns the value of the native method specified in `$method`.
-	 * @todo Recursively normalize '_id' fields to compare input and output
+	 * @return mixed The return value of the native method specified in `$method`.
+	 *
+	 * @todo Recursively normalize '_id' fields to compare input and output.
 	 */
 	public function __call($method, $params) {
 		return call_user_func_array(array(&$this->_connection, $method), $params);

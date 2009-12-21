@@ -21,10 +21,10 @@ use \lithium\util\Set;
  * return compact('post');
  *
  * // In view code:
- * <?=@$this->form->create($post); // Echoes a <form> tag and binds the helper to $post ?>
- * <?=@$this->form->text('title'); // Echoes an <input /> element, pre-filled with $post's title ?>
- * <?=@$this->form->submit('Update'); // Echoes a submit button with the title 'Update' ?>
- * <?=@$this->form->end(); // Echoes a </form> tag & unbinds the form ?>
+ * <?=$this->form->create($post); // Echoes a <form> tag and binds the helper to $post ?>
+ * <?=$this->form->text('title'); // Echoes an <input /> element, pre-filled with $post's title ?>
+ * <?=$this->form->submit('Update'); // Echoes a submit button with the title 'Update' ?>
+ * <?=$this->form->end(); // Echoes a </form> tag & unbinds the form ?>
  * }}}
  */
 class Form extends \lithium\template\Helper {
@@ -122,7 +122,7 @@ class Form extends \lithium\template\Helper {
 			'base' => array(), 'text' => array(), 'textarea' => array(),
 			'select' => array('multiple' => false)
 		);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	/**
@@ -180,7 +180,7 @@ class Form extends \lithium\template\Helper {
 			'method' => $binding ? ($binding->exists() ? 'put' : 'post') : 'post'
 		);
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, $options);
-		$options = (array)$options + $defaults;
+		$options = (array) $options + $defaults;
 		$_binding =& $this->_binding;
 		$method = __METHOD__;
 
@@ -286,16 +286,19 @@ class Form extends \lithium\template\Helper {
 		if ($empty) {
 			$list = array('' => ($empty === true) ? '' : $empty) + $list;
 		}
-		$template = 'select-start';
-
-		if ($options['multiple']) {
-			$template = 'select-multi-start';
-		}
-
-		$output = $this->_render(__METHOD__, $template, compact('name', 'options'));
+		$startTemplate = ($options['multiple']) ? 'select-multi-start' : 'select-start';
+		$output = $this->_render(__METHOD__, $startTemplate, compact('name', 'options'));
 
 		foreach ($list as $value => $title) {
-			$options = ($val == $value) ? array('selected' => true) : array();
+			$selected = false;
+
+			if (is_array($val) && in_array($value, $val)) {
+				$selected = true;
+			} elseif ($val == $value) {
+				$selected = true;
+			}
+			$options = $selected ? array('selected' => true) : array();
+
 			$output .= $this->_render(__METHOD__, 'select-option', compact(
 				'value', 'title', 'options'
 			));

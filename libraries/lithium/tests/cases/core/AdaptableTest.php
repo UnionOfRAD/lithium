@@ -123,7 +123,6 @@ class AdaptableTest extends \lithium\test\Unit {
 	public function testApplyStrategies() {
 
 	}
-
 }
 
 ?>

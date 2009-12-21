@@ -28,13 +28,14 @@ class Response extends \lithium\http\Response {
 		if (!empty($config['request']) && is_object($config['request'])) {
 			$this->type = $config['request']->type();
 		}
-		$this->_config = (array)$config + $defaults;
+		$this->_config = (array) $config + $defaults;
 		parent::__construct($this->_config);
 	}
 
 	/**
 	 * Content Type
 	 *
+	 * @param string $type
 	 * @return string
 	 */
 	public function type($type = null) {
@@ -95,7 +96,7 @@ class Response extends \lithium\http\Response {
 				$this->_writeHeader("{$name}: {$value}");
 			}
 		}
-		$chunked = str_split(join("\r\n", (array)$this->body), $this->_config['buffer']);
+		$chunked = str_split(join("\r\n", (array) $this->body), $this->_config['buffer']);
 
 		foreach ($chunked as $chunk) {
 			echo $chunk;
@@ -106,7 +107,7 @@ class Response extends \lithium\http\Response {
 	 * Casts the Response object to a string.  This doesn't actually return a string, but does
 	 * a direct render and returns null.
 	 *
-	 * @return void
+	 * @return string An empty string.
 	 */
 	public function __toString() {
 		$this->render();
@@ -117,11 +118,10 @@ class Response extends \lithium\http\Response {
 	 * Writes raw headers to output.
 	 *
 	 * @param mixed $header Either a raw header string, or an array of header strings. Use an array
-	 *              if a single header must be written multiple times with different values.
-	 *              Otherwise, subsequent values with non-unique header names will overwrite
-	 *              previous values.
-	 * @param int $code Optional. If present, forces a specific HTTP response code.  Used primarily
-	 *            in conjunction with the 'Location' header.
+	 *        if a single header must be written multiple times with different values. Otherwise,
+	 *        subsequent values with non-unique header names will overwrite previous values.
+	 * @param integer $code Optional. If present, forces a specific HTTP response code.  Used
+	 *        primarily in conjunction with the 'Location' header.
 	 * @return void
 	 */
 	protected function _writeHeader($header, $code = null) {

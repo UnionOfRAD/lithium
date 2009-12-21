@@ -105,7 +105,6 @@ class MySqlTest extends \lithium\test\Unit {
 		$this->expectException();
 		$this->db->read('SELECT deliberate syntax error');
 	}
-
 }
 
 ?>

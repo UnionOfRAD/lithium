@@ -107,7 +107,7 @@ abstract class Base extends \lithium\core\Object {
 	 */
 	protected function _formatMessageItem($key, $value) {
 		if (!is_array($value) || !isset($value['translated'])) {
-			return array('singularId' => $key, 'translated' => (array)$value);
+			return array('singularId' => $key, 'translated' => (array) $value);
 		}
 		return $value;
 	}

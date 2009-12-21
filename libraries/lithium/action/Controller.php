@@ -106,7 +106,7 @@ class Controller extends \lithium\core\Object {
 
 		foreach (array('render', 'classes') as $key) {
 			if (!empty($config[$key])) {
-				$this->{'_' . $key} = (array)$config[$key] + $this->{'_' . $key};
+				$this->{'_' . $key} = (array) $config[$key] + $this->{'_' . $key};
 			}
 		}
 		parent::__construct($config);
@@ -165,13 +165,13 @@ class Controller extends \lithium\core\Object {
 	}
 
 	/**
-	 * This method is used to from pass along any data from the controller to the view and layout
+	 * This method is used to pass along any data from the controller to the view and layout
 	 *
 	 * @param array $data sets of <variable name> => <variable value> to pass to view layer
 	 * @return void
 	 */
 	public function set($data = array()) {
-		$this->_render['data'] += (array)$data;
+		$this->_render['data'] += (array) $data;
 	}
 
 	/**
@@ -179,16 +179,16 @@ class Controller extends \lithium\core\Object {
 	 * a Response object.
 	 *
 	 * @param mixed $options A string template name (see the 'template' option below), or an array
-	 *              of options, as follows:
-	 *              - 'template': The name of a template, which usually matches the name of the
-	 *                action. By default, this template is looked for in the views directory of the
-	 *                current controller, i.e. given a `PostsController` object, if template is set
-	 *                to `'view'`, the template path would be `views/posts/view.html.php`. Defaults
-	 *                to the name of the action being rendered.
-	 *              - 'head': If true, only renders the headers of the response, not the body.
-	 *                Defaults to false.
-	 *              - 'data': An associative array of variables to be assigned to the template.
-	 *                These are merged on top of any variables set in `Controller::set()`.
+	 *        of options, as follows:
+	 *        - 'data': An associative array of variables to be assigned to the template. These are
+	 *           merged on top of any variables set in `Controller::set()`.
+	 *        - 'head': If true, only renders the headers of the response, not the body. Defaults
+	 *          to false.
+	 *        - 'template': The name of a template, which usually matches the name of the action.
+	 *          By default, this template is looked for in the views directory of the current
+	 *          controller, i.e. given a `PostsController` object, if template is set to `'view'`,
+	 *          the template path would be `views/posts/view.html.php`. Defaults to the name of the
+	 *          action being rendered.
 	 * @return void
 	 */
 	public function render($options = array()) {

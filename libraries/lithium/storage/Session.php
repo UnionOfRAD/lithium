@@ -11,6 +11,26 @@ namespace lithium\storage;
 use \lithium\core\Libraries;
 use \lithium\util\Collection;
 
+/**
+ * The `Session` static class provides a consistent interface to configure and utilize the
+ * different persistent storage adatpers included with Lithium, as well as your own adapters.
+ *
+ * The Session layer of Lithium inherits from the common `Adaptable` class, which provides
+ * the generic configuration setting & retrieval logic, as well as the logic required to
+ * locate & instantiate the proper adapter class.
+ *
+ * In most cases, you will configure various named session configurations in your bootstrap
+ * process, which will then be available to you in all other parts of your application.
+ *
+ * Each adapter provides a consistent interface for the basic cache operations of `write`, `read`
+ * and `delete`, which can be used interchangably between all adapters. ty.
+ *
+ * For more information on `Session` methods and specific adapters, please see their relevant
+ * documentation.
+ *
+ * @see lithium\core\Adaptable
+ * @see lithium\storage\session\adapter
+ */
 class Session extends \lithium\core\Adaptable {
 
 	/**
@@ -24,8 +44,8 @@ class Session extends \lithium\core\Adaptable {
 	/**
 	 * Returns key to be used in session read, write and delete operations
 	 *
-	 * @param  mixed $name Named session configuration
-	 * @return string      Key
+	 * @param mixed $name Named session configuration
+	 * @return string Value of key
 	 */
 	public static function key($name = null) {
 		return is_object($adapter = static::adapter($name)) ? $adapter->key() : null;
@@ -35,6 +55,7 @@ class Session extends \lithium\core\Adaptable {
 	 * Indicates whether the the current request includes information on a previously started
 	 * session.
 	 *
+	 * @param string $name
 	 * @return boolean Returns true if a the request includes a key from a previously created
 	 *         session.
 	 */
@@ -47,12 +68,20 @@ class Session extends \lithium\core\Adaptable {
 	 * comparing the session start time to the expiration time set in the configuration, and any
 	 * security settings.
 	 *
+	 * @param string $name
 	 * @return boolean Returns true if the current session is active and valid.
 	 */
 	public static function isValid($name = null) {
 
 	}
 
+	/**
+	 * Reads a value from a persistent session store.
+	 *
+	 * @param string $key Key to be read
+	 * @param array $options Optional parameters that this method accepts
+	 * @return mixed Read result on successful session read, null otherwise
+	 */
 	public static function read($key, $options = array()) {
 		$defaults = array('name' => null);
 		$options += $defaults;
@@ -76,10 +105,10 @@ class Session extends \lithium\core\Adaptable {
 	/**
 	 * Writes a persistent value to one or more session stores.
 	 *
-	 * @param string $key
-	 * @param mixed $value
-	 * @param array $options
-	 * @return boolean
+	 * @param string $key Key to be read
+	 * @param mixed $value Data to be stored
+	 * @param array $options Optional parameters that this method accepts
+	 * @return boolean True on successful write, false otherwise
 	 */
 	public static function write($key, $value = null, $options = array()) {
 		$settings = static::config();

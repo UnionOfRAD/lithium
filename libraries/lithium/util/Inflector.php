@@ -248,11 +248,11 @@ class Inflector {
 				);
 			break;
 			case 'uninflected':
-				static::$_uninflected = array_merge(static::$_uninflected, (array)$config);
+				static::$_uninflected = array_merge(static::$_uninflected, (array) $config);
 				static::$_plural['regexUninflected'] = null;
 				static::$_singular['regexUninflected'] = null;
 
-				foreach ((array)$config as $word) {
+				foreach ((array) $config as $word) {
 					unset(static::$_singularized[$word], static::$_pluralized[$word]);
 				}
 			break;

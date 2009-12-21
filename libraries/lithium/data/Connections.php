@@ -29,10 +29,10 @@ use \lithium\core\Libraries;
  *
  * @see lithium\data\Source
  */
-class Connections extends \lithium\core\StaticObject {
+class Connections extends \lithium\core\Adaptable {
 
 	/**
-	 * A Collection of the configurations you add through Connections::add()
+	 * A Collection of the configurations you add through Connections::add().
 	 *
 	 * @var Collection
 	 */
@@ -48,13 +48,13 @@ class Connections extends \lithium\core\StaticObject {
 
 	/**
 	 * Initialization of static class
-	 * Starts static properties and includes the app connections.php file
+	 * Starts static properties and includes the app Connections.php file.
 	 *
 	 * @return void
 	 */
 	public static function __init() {
+		parent::__init();
 		static::$_connections = new Collection();
-		static::$_configurations = new Collection();
 		require LITHIUM_APP_PATH . '/config/connections.php';
 	}
 
@@ -81,22 +81,22 @@ class Connections extends \lithium\core\StaticObject {
 	 * }}}
 	 *
 	 * @param string $name The name by which this connection is referenced. Use this name to
-	 *               retrieve the connection again using `Connections::get()`, or to bind a model
-	 *               to it using `Model::$_meta['connection']`.
+	 *        retrieve the connection again using `Connections::get()`, or to bind a model to it
+	 *        using `Model::$_meta['connection']`.
 	 * @param string $type The type of data source that defines this connection; typically a class
-	 *               or namespace name. Relational database data sources, use `'database'`, while
-	 *               CouchDB and other HTTP-related data sources use `'http'`, etc. For classes
-	 *               which directly extend `lithium\data\Source`, and do not use an adapter, simply
-	 *               use the name of the class, i.e. `'MongoDb'`.
+	 *        or name-space name. Relational database data sources, use `'database'`, while CouchDB
+	 *        and other HTTP-related data sources use `'http'`, etc. For classes which directly
+	 *        extend `lithium\data\Source`, and do not use an adapter, simply use the name of the
+	 *        class, i.e. `'MongoDb'`.
 	 * @param array $config Contains all additional configuration information used by the
-	 *              connection, including the name of the adapter class where applicable (i.e.
-	 *              `MySql`), the server name and port or socket to connect to, and (typically)
-	 *              the name of the database or other entity to use. Each adapter has its own
-	 *              specific configuration settings for handling things like connection persistence,
-	 *              data encoding, etc. See the individual adapter or data source class for more
-	 *              information on what configuration settings it supports.
+	 *        connection, including the name of the adapter class where applicable (i.e. `MySql`),
+	 *        the server name and port or socket to connect to, and (typically) the name of the
+	 *        database or other entity to use. Each adapter has its own specific configuration
+	 *        settings for handling things like connection persistence, data encoding, etc. See the
+	 *        individual adapter or data source class for more information on what configuration
+	 *        settings it supports.
 	 * @return array Returns the final post-processed connection information, as stored in the
-	 *               internal configuration array used by `Connections`.
+	 *         internal configuration array used by `Connections`.
 	 * @see lithium\data\Model::$_meta
 	 */
 	public static function add($name, $type = null, $config = array()) {
@@ -110,29 +110,31 @@ class Connections extends \lithium\core\StaticObject {
 			'login'    => '',
 			'password' => ''
 		);
-		return static::$_configurations[$name] = (array)$config + $defaults;
+		return static::$_configurations[$name] = (array) $config + $defaults;
 	}
 
 	/**
 	 * Read the configuration or access the connections you have set up.
 	 *
-	 * {{{// Gets the names of all available configurations
-	 * $configurations = Connections::get();}}}
+	 * Usage:
+	 * {{{
+	 * // Gets the names of all available configurations
+	 * $configurations = Connections::get();
 	 *
-	 * {{{// Gets the configuration array for the connection named 'db'
+	 * // Gets the configuration array for the connection named 'db'
 	 * $config = Connections::get('db', array('config' => true));
 	 *
 	 * // Gets the instance of the connection object, configured with the settings defined for
 	 * // this object in Connections::add()
 	 * $dbConnection = Connection::get('db');
 	 *
-	 * // Gets the connection object, but only if it has already been
-	 * // built. Otherwise returns null.
+	 * // Gets the connection object, but only if it has already been built.
+	 * // Otherwise returns null.
 	 * $dbConnection = Connection::get('db', array('autoCreate' => false));
 	 * }}}
 	 *
 	 * @param string $name The name of the connection to get, as defined in the first parameter of
-	 *               `add()`, when the connection was initially created.
+	 *        `add()`, when the connection was initially created.
 	 * @param array $options Options to use when returning the connection:
 	 *        - `'autoCreate'`: If `false`, the connection object is only returned if it has
 	 *          already been instantiated by a previous call.
@@ -143,21 +145,22 @@ class Connections extends \lithium\core\StaticObject {
 	public static function get($name = null, $options = array()) {
 		$defaults = array('config' => false, 'autoCreate' => true);
 		$options += $defaults;
+		$settings = static::config();
 
 		if (empty($name)) {
-			return static::$_configurations->keys();
+			return $settings->keys();
 		}
 
-		if (!isset(static::$_configurations[$name])) {
+		if (!isset($settings[$name])) {
 			return null;
 		}
 
 		if ($options['config']) {
-			return static::$_configurations[$name];
+			return $settings[$name];
 		}
 
 		if (!isset(static::$_connections[$name]) && $options['autoCreate']) {
-			return static::$_connections[$name] = static::_build(static::$_configurations[$name]);
+			return static::$_connections[$name] = static::_build($settings[$name]);
 		} elseif (!$options['autoCreate']) {
 			return null;
 		}
@@ -165,13 +168,13 @@ class Connections extends \lithium\core\StaticObject {
 	}
 
 	/**
-	* Hard reset of connections and configurations, clearing out any currently configured or built
+	* Hard reset of connections and configurations, clearing out any currently configured or built.
 	*
 	* @return void
 	*/
-	public static function clear() {
+	public static function reset() {
+		parent::reset();
 		static::$_connections = new Collection();
-		static::$_configurations = new Collection();
 	}
 
 	/**
@@ -188,7 +191,9 @@ class Connections extends \lithium\core\StaticObject {
 			$class = Libraries::locate("adapter.data.source.{$config['type']}", $config['adapter']);
 		}
 		if (!$class) {
-			throw new Exception("{$config['type']} adapter {$config['adapter']} could not be found");
+			throw new Exception(
+				"{$config['type']} adapter {$config['adapter']} could not be found"
+			);
 		}
 		return new $class($config);
 	}

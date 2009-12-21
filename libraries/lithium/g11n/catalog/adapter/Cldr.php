@@ -41,7 +41,7 @@ class Cldr extends \lithium\g11n\catalog\adapter\Base {
 	 * @param array $config Available configuration options are:
 	 *        - `'path'`: The path to the directory holding the data.
 	 *        - `'scope'`: Scope to use.
-	 * @return void
+	 * @return object
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('path' => null, 'scope' => null);
@@ -86,7 +86,7 @@ class Cldr extends \lithium\g11n\catalog\adapter\Base {
 				$query .= "/postCodeRegex[@territoryId=\"{$territory}\"]";
 
 				$yield = function($nodes) {
-					return (string)current($nodes);
+					return (string) current($nodes);
 				};
 				$post =	function($data) {
 					return "/^{$data}$/";
@@ -105,7 +105,7 @@ class Cldr extends \lithium\g11n\catalog\adapter\Base {
 					$data = null;
 
 					foreach ($nodes as $node) {
-						$data[(string)$node['type']] = (string)$node;
+						$data[(string) $node['type']] = (string) $node;
 					}
 					return $data;
 				};
@@ -119,7 +119,7 @@ class Cldr extends \lithium\g11n\catalog\adapter\Base {
 
 					foreach ($nodes as $node) {
 						$displayNames = $node->xpath('displayName');
-						$data[(string)$node['type']] = (string)current($displayNames);
+						$data[(string) $node['type']] = (string) current($displayNames);
 					}
 					return $data;
 				};

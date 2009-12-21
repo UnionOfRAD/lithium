@@ -15,7 +15,6 @@ class ControllerTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->controller = new Controller();
 	}
-
 }
 
 ?>

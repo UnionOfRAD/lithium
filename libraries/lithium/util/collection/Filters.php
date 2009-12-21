@@ -95,7 +95,7 @@ class Filters extends \lithium\util\Collection {
 	 */
 	public static function run($class, $params, $options = array()) {
 		$defaults = array('class' => null, 'method' => null, 'items' => array());
-		$chain = new Filters((array)$options + $defaults);
+		$chain = new Filters((array) $options + $defaults);
 		return $chain->rewind()->__invoke($class, $params, $chain);
 	}
 

@@ -14,4 +14,5 @@ class MockRequest extends \lithium\core\Object {
 		return $this->_config[$key];
 	}
 }
+
 ?>

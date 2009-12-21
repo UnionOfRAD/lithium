@@ -18,7 +18,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->streams = array(
-			'input' => LITHIUM_APP_PATH . '/tmp/input.txt',
+			'input' => LITHIUM_APP_PATH . '/resources/tmp/input.txt',
 		);
 
 		$this->_backups['cwd'] = getcwd();
@@ -52,10 +52,10 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testEnvWorking() {
-		chdir(LITHIUM_APP_PATH . '/tmp');
+		chdir(LITHIUM_APP_PATH . '/resources/tmp');
 		$request = new Request();
 
-		$expected = LITHIUM_APP_PATH . '/tmp';
+		$expected = LITHIUM_APP_PATH . '/resources/tmp';
 		$result = $request->env('working');
 		$this->assertEqual($expected, $result);
 	}
@@ -117,7 +117,7 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testConstructWithEnv() {
-		chdir(LITHIUM_APP_PATH . '/tmp');
+		chdir(LITHIUM_APP_PATH . '/resources/tmp');
 		$request = new Request(array(
 			'env' => array('working' => '/some/other/path')
 		));
@@ -146,4 +146,5 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 }
+
 ?>

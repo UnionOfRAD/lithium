@@ -13,7 +13,6 @@ use \SplStack;
 
 /**
  * Alternative base class in Lithium hierarchy, from which all (and only) static classes inherit.
- *
  */
 class StaticObject {
 
@@ -35,15 +34,15 @@ class StaticObject {
 	 * Apply a closure to a method of the current static object.
 	 *
 	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
-	 *              method name as a string, or an array of method names.
-	 * @param closure $closure The clousure that is used to filter the method.
+	 *        method name as a string, or an array of method names.
+	 * @param closure $closure The closure that is used to filter the method.
 	 * @return void
 	 * @see lithium\core\StaticObject::_filter()
 	 * @see lithium\util\collection\Filters
 	 */
 	public static function applyFilter($method, $closure = null) {
 		$class = get_called_class();
-		foreach ((array)$method as $m) {
+		foreach ((array) $method as $m) {
 			if (!isset(static::$_methodFilters[$class][$m])) {
 				static::$_methodFilters[$class][$m] = array();
 			}
@@ -54,9 +53,9 @@ class StaticObject {
 	/**
 	 * Applies the configured strategies to a method of the current static object.
 	 *
-	 * @param  string $method The strategy method to be called.
-	 * @param  array  $params Parameters that are used by the strategy $method.
-	 * @return mixed          Data that has been modified by the configured strategies.
+	 * @param string $method The strategy method to be called.
+	 * @param array $params Parameters that are used by the strategy $method.
+	 * @return mixed  Data that has been modified by the configured strategies.
 	 **/
 	public static function applyStrategies($method, $params = array()) {
 		$strategies = self::strategies($params['name']);
@@ -81,16 +80,13 @@ class StaticObject {
 	/**
 	 * Allows setting & querying of static object strategies.
 	 *
-	 *
 	 * - If $name is set, returns the strategies attached to the current static object.
-	 * - If $name and $strategy are set, $strategy is added to the strategy
-	 * stack denoted by $name.
-	 * - If $name and $strategy are not set, then the full
-	 * indexed strategies array is returned (note: the strategies are wraped in
-	 * \SplStack).
+	 * - If $name and $strategy are set, $strategy is added to the strategy stack denoted by $name.
+	 * - If $name and $strategy are not set, then the full indexed strategies array is returned
+	 *   (note: the strategies are wrapped in \SplStack).
 	 *
-	 * @param  string        $name     Name of cache configuration.
-	 * @param  string|array  $strategy Fully namespaced cache strategy identifier.
+	 * @param string $name Name of cache configuration.
+	 * @param mixed $strategy Fully namespaced cache strategy identifier. String or array
 	 * @return mixed                   See above description.
 	 */
 	public static function strategies($name = '', $strategy = null) {
@@ -120,9 +116,8 @@ class StaticObject {
 		return static::$_strategies[$name];
 	}
 	/**
-	 * Calls a method on this object with the given parameters. Provides an OO wrapper
-	 * for call_user_func_array, and improves performance by using straight method calls
-	 * in most cases.
+	 * Calls a method on this object with the given parameters. Provides an OO wrapper for
+	 * call_user_func_array, and improves performance by using straight method calls in most cases.
 	 *
 	 * @param string $method  Name of the method to call
 	 * @param array $params  Parameter list to use when calling $method
@@ -156,7 +151,7 @@ class StaticObject {
 	 * @param array $params An associative array containing all the parameters passed into
 	 *        the method.
 	 * @param Closure $callback The method's implementation, wrapped in a closure.
-	 * @param array $filters Additional filters to apply to the method for this call only
+	 * @param array $filters Additional filters to apply to the method for this call only.
 	 * @return mixed
 	 * @see lithium\util\collection\Filters
 	 */
@@ -174,7 +169,7 @@ class StaticObject {
 	}
 
 	/**
-	 * Exit immediately.  Primarily used for overrides during testing.
+	 * Exit immediately. Primarily used for overrides during testing.
 	 *
 	 * @return void
 	 */

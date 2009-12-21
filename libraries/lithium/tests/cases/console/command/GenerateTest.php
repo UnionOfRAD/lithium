@@ -11,8 +11,8 @@ namespace lithium\tests\cases\console\command;
 use \lithium\console\command\Generate;
 
 class GenerateTest extends \lithium\test\Unit {
-	
-	
+
+
 }
 
 ?>

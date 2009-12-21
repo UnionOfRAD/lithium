@@ -119,12 +119,16 @@ class Libraries {
 	 * Adds a class library from which files can be loaded
 	 *
 	 * @param string $name Library name, i.e. `'app'`, `'lithium'`, `'pear'` or `'solar'`.
-	 * @param array $options Specifies where the library is in the filesystem, and how classes
+	 * @param array $config Specifies where the library is in the filesystem, and how classes
 	 *              should be loaded from it.  Allowed keys are:
-	 *              - `'path'`: The directory containing the library.
-	 *              - `'loader'`: An auto-loader method associated with the library, if any
 	 *              - `'bootstrap'`: A file path (relative to `'path'`) to a bootstrap script that
 	 *                should be run when the library is added.
+	 *              - `'defer'`: If true, indicates that, when locating classes, this library should
+	 *                defer to other libraries in order of preference.
+	 *              - `'includePath'`: If `true`, appends the absolutely-resolved value of `'path'`
+	 *                to the PHP include path.
+	 *              - `'loader'`: An auto-loader method associated with the library, if any
+	 *              - `'path'`: The directory containing the library.
 	 *              - `'prefix'`: The class prefix this library uses, i.e. `'lithium\'`, `'Zend_'`
 	 *                or `'Solar_'`.
 	 *              - `'suffix'`: Gets appended to the end of the file name. For example, most
@@ -135,18 +139,18 @@ class Libraries {
 	 *                are interpreted as the pattern and replacement for a regex, or an
 	 *                anonymous function, which receives the class name as a parameter, and
 	 *                returns a file path as output.
-	 *              - `'defer'`: If true, indicates that, when locating classes, this library should
-	 *                defer to other libraries in order of preference.
-	 *              - `'includePath'`: If `true`, appends the absolutely-resolved value of `'path'`
-	 *                to the PHP include path.
 	 * @return array Returns the resulting set of options created for this library.
 	 */
 	public static function add($name, $config = array()) {
 		$defaults = array(
 			'path' => LITHIUM_LIBRARY_PATH . '/' . $name,
-			'prefix' => $name . "\\", 'suffix' => '.php',
-			'loader' => null, 'includePath' => false,
-			'transform' => null, 'bootstrap' => null, 'defer' => false,
+			'prefix' => $name . "\\",
+			'suffix' => '.php',
+			'loader' => null,
+			'includePath' => false,
+			'transform' => null,
+			'bootstrap' => null,
+			'defer' => false
 		);
 		switch ($name) {
 			case 'app':
@@ -158,11 +162,11 @@ class Libraries {
 				$defaults['defer'] = true;
 			break;
 			case 'plugin':
-				return static::_addPlugins((array)$config);
+				return static::_addPlugins((array) $config);
 			break;
 		}
 
-		$config = (array)$config + $defaults;
+		$config = (array) $config + $defaults;
 		$config['path'] = str_replace('\\', '/', $config['path']);
 		static::$_configurations[$name] = $config;
 
@@ -206,7 +210,7 @@ class Libraries {
 	 * @return void
 	 */
 	public static function remove($name) {
-		foreach ((array)$name as $library) {
+		foreach ((array) $name as $library) {
 			if (isset(static::$_configurations[$library])) {
 				if (static::$_configurations[$library]['loader']) {
 					spl_autoload_unregister(static::$_configurations[$library]['loader']);
@@ -262,9 +266,10 @@ class Libraries {
 	 * class, if defined.  Looks through the list of libraries defined in `$_configurations`, which
 	 * are added through `lithium\core\Libraries::add()`.
 	 *
-	 * @param string $class The fully-namespaced (where applicable) name of the class to load.
 	 * @see lithium\core\Libraries::add()
 	 * @see lithium\core\Libraries::path()
+	 * @param string $class The fully-namespaced (where applicable) name of the class to load.
+	 * @param mixed $require
 	 * @return void
 	 */
 	public static function load($class, $require = false) {
@@ -344,11 +349,12 @@ class Libraries {
 	 * If `$name` is not specified, `locate()` returns an array with all classes of the specified
 	 * type which can be found. By default, `locate()` searches all registered libraries.
 	 *
-	 * @param string $type
-	 * @param string $name
-	 * @return mixed
 	 * @see lithium\core\Libraries::$_classPaths
 	 * @see lithium\core\Libraries::add()
+	 * @param string $type
+	 * @param string $name
+	 * @param array $options
+	 * @return mixed
 	 */
 	public static function locate($type, $name = null, $options = array()) {
 		$defaults = array('type' => 'class');
@@ -409,7 +415,7 @@ class Libraries {
 	 */
 	protected static function _locateDeferred($defer, $paths, $params, $options = array()) {
 		if (isset($options['library'])) {
-			$libraries = (array)$options['library'];
+			$libraries = (array) $options['library'];
 			$libraries = array_intersect_key(
 				static::$_configurations,
 				array_combine($libraries, array_fill(0, count($libraries), null))
@@ -504,14 +510,14 @@ class Libraries {
 		$path = rtrim($config['path'] . $options['path'], '/');
 		$filter = '/^.+\/[A-Za-z0-9_]+$|^.*' . preg_quote($config['suffix'], '/') . '/';
 		$search = function($path) use ($config, $filter, $options) {
-			return preg_grep($filter, (array)glob(
+			return preg_grep($filter, (array) glob(
 				$path . '/*' . ($options['namespaces'] ? '' : $config['suffix'])
 			));
 		};
 		$libs = $search($path, $config);
 
 		if ($options['recursive']) {
-			$dirs = $queue = array_diff((array)glob($path . '/*', GLOB_ONLYDIR), $libs);
+			$dirs = $queue = array_diff((array) glob($path . '/*', GLOB_ONLYDIR), $libs);
 			while ($queue) {
 				$dir = array_pop($queue);
 
@@ -520,7 +526,7 @@ class Libraries {
 				}
 				$libs = array_merge($libs, $search($dir, $config));
 				$queue = array_merge(
-					$queue, array_diff((array)glob($dir . '/*', GLOB_ONLYDIR), $libs)
+					$queue, array_diff((array) glob($dir . '/*', GLOB_ONLYDIR), $libs)
 				);
 			}
 		}

@@ -21,26 +21,13 @@ use \lithium\tests\mocks\data\MockCreator;
 class ModelTest extends \lithium\test\Unit {
 
 	public function _init() {
-		if (!Connections::get('test')) {
-			Connections::add('test', 'database', array(
-				'adapter' => 'MockAdapter',
-				'host' => 'localhost'
-			));
-		}
-		$deps = Inspector::dependencies(get_class($this));
-		$models = array_filter($deps, function($class) { return is_subclass_of($class, "lithium\data\Model"); });
-		foreach ($models as $m) {
-			$class = '\\'.$m;
-			$class::__init(array('connection' => 'test'));
-		}
+		Connections::add('mock-source', '\lithium\tests\mocks\data\MockSource');
 	}
 
 	public function testOverrideMeta() {
-		MockTag::__init(array('connection' => 'test'));
-
 		$meta = MockTag::meta(array('id' => 'key'));
 
-		$expected = 'test';
+		$expected = 'mock-source';
 		$result = $meta['connection'];
 		$this->assertEqual($expected, $result);
 
@@ -80,7 +67,7 @@ class ModelTest extends \lithium\test\Unit {
 			'key'         => 'id',
 			'title'       => 'title',
 			'source'      => 'mock_posts',
-			'connection'  => 'test',
+			'connection'  => 'mock-source',
 			'initialized' => true
 		);
 		MockPost::__init();
@@ -92,7 +79,7 @@ class ModelTest extends \lithium\test\Unit {
 			'key'        => 'comment_id',
 			'title'      => 'comment_id',
 			'source'     => 'mock_comments',
-			'connection' => 'test',
+			'connection' => 'mock-source',
 			'initialized' => true
 		);
 		$this->assertEqual($expected, MockComment::meta());
@@ -224,7 +211,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertTrue(!empty($result));
 
 		$expected = array(
-			'title' => 'please enter a title',
+			'title' => array('please enter a title'),
 			'email' => array('email is empty', 'email is not valid')
 		);
 		$result = $post->errors();
@@ -250,13 +237,12 @@ class ModelTest extends \lithium\test\Unit {
 		$post = MockPostForValidates::create(array('title' => 'new post', 'email' => 'something'));
 
 		$result = $post->validates();
-		$this->assertTrue($result === false);
-		$result = $post->errors();
-		$this->assertTrue(!empty($result));
+		$this->assertIdentical(false, $result);
 
-		$expected = array(
-			'email' => array('email is not valid')
-		);
+		$result = $post->errors();
+		$this->assertTrue($result);
+
+		$expected = array('email' => array('email is not valid'));
 		$result = $post->errors();
 		$this->assertEqual($expected, $result);
 	}

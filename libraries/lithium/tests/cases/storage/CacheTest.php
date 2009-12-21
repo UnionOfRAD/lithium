@@ -154,7 +154,9 @@ class CacheTest extends \lithium\test\Unit {
 		$expected = new Collection(array('items' => $config));
 		$this->assertEqual($expected, $result);
 
-		$result = Cache::write('default', 'some_key', 'some_data', '+1 minute', function() { return false; });
+		$result = Cache::write('default', 'some_key', 'some_data', '+1 minute', function() {
+			return false;
+		});
 		$this->assertFalse($result);
 
 		$anonymous = function() use (&$config) {
@@ -193,7 +195,9 @@ class CacheTest extends \lithium\test\Unit {
 		$expected = array('data' => 'take two');
 		$this->assertEqual($expected, $result);
 
-		$result = Cache::write('default', 'another', (object) array('data' => 'take two'), '+1 minute');
+		$result = Cache::write(
+			'default', 'another', (object) array('data' => 'take two'), '+1 minute'
+		);
 		$this->assertTrue($result);
 
 		$result = Cache::read('default', 'another');
@@ -221,7 +225,9 @@ class CacheTest extends \lithium\test\Unit {
 		$result = Cache::write('default', 'keyed', 'some data', '+1 minute', $anonymous);
 		$this->assertTrue($result);
 
-		$result = Cache::write('default', 'keyed', 'some data', '+1 minute', function() { return false; });
+		$result = Cache::write(
+			'default', 'keyed', 'some data', '+1 minute', function() { return false; }
+		);
 		$this->assertFalse($result);
 	}
 
@@ -347,7 +353,7 @@ class CacheTest extends \lithium\test\Unit {
 	public function testIntegrationFileAdapterWrite() {
 		$config = array('default' => array(
 			'adapter' => 'File',
-			'path' => LITHIUM_APP_PATH . '/tmp/cache',
+			'path' => LITHIUM_APP_PATH . '/resources/tmp/cache',
 			'filters' => array(),
 			'strategies' => array()
 		));
@@ -357,15 +363,14 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$time = time() + 60;
-		$result = file_get_contents(LITHIUM_APP_PATH . '/tmp/cache/key');
+		$result = file_get_contents(LITHIUM_APP_PATH . '/resources/tmp/cache/key');
 		$expected = "{:expiry:$time}\nvalue";
 		$this->assertEqual($result, $expected);
 
-		$result = unlink(LITHIUM_APP_PATH . '/tmp/cache/key');
+		$result = unlink(LITHIUM_APP_PATH . '/resources/tmp/cache/key');
 		$this->assertTrue($result);
-		$this->assertFalse(file_exists(LITHIUM_APP_PATH . '/tmp/cache/key'));
+		$this->assertFalse(file_exists(LITHIUM_APP_PATH . '/resources/tmp/cache/key'));
 	}
-
 }
 
 ?>

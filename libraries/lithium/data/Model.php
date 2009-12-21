@@ -108,6 +108,7 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Sets default connection options and connects default finders.
 	 *
+	 * @param array $options
 	 * @return void
 	 * @todo Merge in inherited config from AppModel and other parent classes.
 	 */
@@ -116,22 +117,23 @@ class Model extends \lithium\core\StaticObject {
 			return;
 		}
 		$self = static::_instance();
-
 		$base = get_class_vars(__CLASS__);
-		$meta = $self->_meta + $base['_meta'];
+		$meta =  $self->_meta + $base['_meta'];
 		$classes = $self->_classes + $base['_classes'];
-
-		$conn = $classes['connections'];
-		$backendDefaults = array('classes' => array(), 'meta' => array(), 'finders' => array());
-		$backendConfig = $conn::get($meta['connection'])->configureClass($class) + $backendDefaults;
-
+		$classConfig = array();
+		$classDefaults = array('classes' => array(), 'meta' => array(), 'finders' => array());
+		$conn = $classes['connections']::get($meta['connection']);
+		if ($conn) {
+			$classConfig = $conn->configureClass($class);
+		}
+		$classConfig += $classDefaults;
 		$classes = array_diff_assoc($self->_classes, $base['_classes']);
-		$self->_classes = ($classes + $backendConfig['classes'] + $base['_classes']);
-		$meta = ($self->_meta + $backendConfig['meta'] + $base['_meta']);
+		$self->_classes = ($classes + $classConfig['classes'] + $base['_classes']);
+		$meta = ($self->_meta + $classConfig['meta'] + $base['_meta']);
 		$self->_meta = ($options + compact('class') + array('name' => static::_name()) + $meta);
 		$self->_meta['initialized'] = false;
 
-		$self->_finders += $backendConfig['finders'] + $self->_findFilters();
+		$self->_finders += $classConfig['finders'] + $self->_findFilters();
 		static::_instance()->_relations = static::_relations();
 	}
 
@@ -194,7 +196,7 @@ class Model extends \lithium\core\StaticObject {
 			$type = 'first';
 		}
 
-		$options += ((array)$self->_query + (array)$defaults + compact('classes'));
+		$options += ((array) $self->_query + (array) $defaults + compact('classes'));
 		$meta = array('meta' => $self->_meta, 'name' => get_called_class());
 		$params = compact('type', 'options');
 
@@ -325,7 +327,7 @@ class Model extends \lithium\core\StaticObject {
 	 * return the first field found in an array of multiple options.
 	 *
 	 * @param mixed $field A single field (string) or list of fields (array) to check the existence
-	 *              of.
+	 *        of.
 	 * @return mixed If `$field` is a string, returns a boolean indicating whether or not that field
 	 *         exists. If `$field` is an array, returns the first field found, or `false` if none of
 	 *         the fields in the list are found.
@@ -345,10 +347,11 @@ class Model extends \lithium\core\StaticObject {
 
 	/**
 	 * Instantiates a new record object, initialized with any data passed in. For example:
-	 *
-	 * {{{$post = Post::create(array("title" => "New post"));
+	 * {{{
+	 * $post = Post::create(array("title" => "New post"));
 	 * echo $post->title; // echoes "New post"
-	 * $post->save();}}}
+	 * $post->save();
+	 * }}}
 	 *
 	 * @param array $data Any data that this record should be populated with initially.
 	 * @return object Returns a new, **un-saved** record object.
@@ -370,19 +373,20 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * An instance method (called on record and document objects) to create or update the record or
 	 * document in the database that corresponds to `$record`. For example:
-	 *
-	 * {{{$post = Post::create();
+	 * {{{
+	 * $post = Post::create();
 	 * $post->title = "My post";
-	 * $post->save(null, array('validate' => false));}}}
+	 * $post->save(null, array('validate' => false));
+	 * }}}
 	 *
 	 * @param object $record The record or document object to be saved in the database.
 	 * @param array $data Any data that should be assigned to the record before it is saved.
 	 * @param array $options Options:
-	 *      - 'callbacks': If `false`, all callbacks will be disabled before executing. Defaults to
-	 *       `true`.
-	 *      - 'validate': If `false`, validation will be skipped, and the record will be immediately
+	 *        - 'callbacks': If `false`, all callbacks will be disabled before executing. Defaults to
+	 *        `true`.
+	 *        - 'validate': If `false`, validation will be skipped, and the record will be immediately
 	 *        saved. Defaults to `true`.
-	 *      - 'whitelist': An array of fields that are allowed to be saved to this record.
+	 *        - 'whitelist': An array of fields that are allowed to be saved to this record.
 	 *
 	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
 	 */
@@ -450,7 +454,7 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Gets just the class name portion of a fully-namespaced class name, i.e.
+	 * Gets just the class name portion of a fully-name-spaced class name, i.e.
 	 * `app\models\Post::_name()` returns `'Post'`.
 	 *
 	 * @return string
@@ -485,9 +489,11 @@ class Model extends \lithium\core\StaticObject {
 	 * Wraps `StaticObject::applyFilter()` to account for object instances.
 	 *
 	 * @see lithium\core\StaticObject::applyFilter()
+	 * @param string $method
+	 * @param mixed $closure
 	 */
 	public static function applyFilter($method, $closure = null) {
-		foreach ((array)$method as $m) {
+		foreach ((array) $method as $m) {
 			if (!isset(static::_instance()->_instanceFilters[$m])) {
 				static::_instance()->_instanceFilters[$m] = array();
 			}
@@ -499,6 +505,11 @@ class Model extends \lithium\core\StaticObject {
 	 * Wraps `StaticObject::_filter()` to account for object instances.
 	 *
 	 * @see lithium\core\StaticObject::_filter()
+	 * @param string $method
+	 * @param array $params
+	 * @param mixed $callback
+	 * @param array $filters
+	 * @return object
 	 */
 	protected static function _filter($method, $params, $callback, $filters = array()) {
 		list($class, $m) = explode('::', $method, 2);
@@ -537,7 +548,7 @@ class Model extends \lithium\core\StaticObject {
 					'fields' => true,
 					'key' => $key . '_id'
 				);
-				$relations[$name] = (array)$options + $defaults;
+				$relations[$name] = (array) $options + $defaults;
 			}
 		}
 		return $relations;

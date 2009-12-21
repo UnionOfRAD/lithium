@@ -94,17 +94,29 @@ class Dispatcher extends \lithium\core\StaticObject {
 				$callable = $self::invokeMethod('_callable', array($request, $params, $options));
 				return $self::invokeMethod('_call', array($callable, $request, $params));
 			} catch (\UnexpectedValueException $e) {
-				echo($e->getMessage() . "\n");
+				return (object) array('status' => $e->getMessage() . "\n");
 			}
 		});
 	}
 
+	/**
+	 * Determines Command to use for current request. If
+	 *
+	 * @param string $request
+	 * @param string $params
+	 * @param string $options
+	 * @return class \lithium\console\COmmand
+	 */
 	protected static function _callable($request, $params, $options) {
 		$params = compact('request', 'params', 'options');
 		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
 			extract($params, EXTR_OVERWRITE);
-			$name = $class = $params['command'] ?: '\lithium\console\Command';
+			$name = $class = $params['command'];
 
+			if (!$name) {
+				$name = $class = '\lithium\console\Command';
+				$request->params['action'] = 'help';
+			}
 			if ($class[0] !== '\\') {
 				$name = Inflector::camelize($class);
 				$class = Libraries::locate('command', $name);
@@ -117,19 +129,26 @@ class Dispatcher extends \lithium\core\StaticObject {
 		});
 	}
 
+	/**
+	 * Call class method
+	 *
+	 * @param string $callable
+	 * @param string $request
+	 * @param string $params
+	 * @return void
+	 */
 	protected static function _call($callable, $request, $params) {
 		$params = compact('callable', 'request', 'params');
 		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
 			if (is_callable($callable = $params['callable'])) {
 				$request = $params['request'];
-				$isRun = (
-					$request->params['action'] != 'run'
-					&& !method_exists($callable, $request->params['action'])
-				);
 
-				if ($isRun) {
+				if (!method_exists($callable, $request->params['action'])) {
 					array_unshift($request->params['passed'], $request->params['action']);
 					$request->params['action'] = 'run';
+				}
+				if (!method_exists($callable, $request->params['action'])) {
+					$request->params['action'] = 'help';
 				}
 				return $callable($request->params['action'], $request->params['passed']);
 			}

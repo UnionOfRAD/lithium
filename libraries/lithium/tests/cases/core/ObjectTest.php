@@ -159,11 +159,15 @@ class ObjectTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $config->getConfig());
 
 		$expected = array('testScalar' => 'override', 'testArray' => array('default', 'override'));
-		$config = new MockObjectConfiguration(array('autoConfig' => array('testScalar', 'testArray' => 'merge')) + $expected);
+		$config = new MockObjectConfiguration(array('autoConfig' => array(
+			'testScalar', 'testArray' => 'merge'
+		)) + $expected);
 		$this->assertEqual($expected, $config->getConfig());
 
 		$expected = array('testScalar' => 'called', 'testArray' => array('default'));
-		$config = new MockObjectConfiguration(array('autoConfig' => array('testScalar' => 'call')) + $expected);
+		$config = new MockObjectConfiguration(array('autoConfig' => array(
+			'testScalar' => 'call'
+		)) + $expected);
 		$this->assertEqual($expected, $config->getConfig());
 	}
 }

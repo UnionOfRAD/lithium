@@ -17,14 +17,14 @@ class MockService extends \lithium\http\Service {
 		$options += $defaults;
 		$request = $this->_request($method, $path, $data, $options);
 		$response = new Response();
-		
+
 		$response->body = json_encode(array(
 			'ok' => true,
 			'id' => '12345',
 			'rev' => '1-2',
 			'body' => 'something'
 		));
-		$this->last = (object)compact('request', 'response');
+		$this->last = (object) compact('request', 'response');
 		return ($options['return'] == 'body') ? $response->body() : $response;
 	}
 }

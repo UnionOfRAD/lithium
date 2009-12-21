@@ -69,7 +69,7 @@ class Text extends \lithium\test\Reporter {
 	 */
 	public function filters($filters) {
 		$result = array();
-		foreach ((array)$filters as $class => $data) {
+		foreach ((array) $filters as $class => $data) {
 			$result[] = $class::output('text', $data);
 		}
 		return join("\n", $result);
@@ -88,7 +88,7 @@ class Text extends \lithium\test\Reporter {
 		);
 		$params += $defaults;
 		$params['namespace'] = str_replace('/', '.', $params['namespace']);
-		
+
 		if ($type == 'group') {
 			return String::insert(
 				"-group {:namespace}\n{:menu}\n", $params

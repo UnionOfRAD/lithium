@@ -11,7 +11,7 @@ namespace lithium\core;
 use \lithium\util\Set;
 
 /**
- * Environment 
+ * Environment
  *
  */
 class Environment {

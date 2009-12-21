@@ -18,21 +18,21 @@ class Request extends \lithium\http\Base {
 
 	/**
 	 * The protocol scheme to be used in the request. Used when calculating the target URL of this
-	 * request's endpoint.
+	 * request's end point.
 	 *
 	 * @var string
 	 */
 	public $scheme = 'http';
 
 	/**
-	 * The Host header value and authority
+	 * The Host header value and authority.
 	 *
 	 * @var string
 	 */
 	public $host = 'localhost';
 
 	/**
-	 * Port number
+	 * Port number.
 	 *
 	 * @var string
 	 */
@@ -47,26 +47,28 @@ class Request extends \lithium\http\Base {
 	public $method = 'GET';
 
 	/**
-	 * absolute path of the request
+	 * Absolute path of the request.
 	 *
 	 * @var string
 	 */
 	public $path = '/';
 
 	/**
-	 * Used to build query string
+	 * Used to build query string.
 	 *
 	 * @var array
 	 */
 	public $params = array();
 
 	/**
-	 * headers
+	 * Headers.
+	 *
+	 * For example:
 	 * {{{
-	 *     array(
-	 *          'Host' => $this->host . ":" . $this->port,
-	 *          'Connection' => 'Close', 'User-Agent' => 'Mozilla/5.0 (Lithium)'
-	 *     )
+	 * 	array(
+	 * 		'Host' => $this->host . ":" . $this->port,
+	 * 		'Connection' => 'Close', 'User-Agent' => 'Mozilla/5.0 (Lithium)'
+	 * 	)
 	 * }}}
 	 * @var array
 	 */
@@ -74,6 +76,8 @@ class Request extends \lithium\http\Base {
 
 	/**
 	 * The authentication/authorization information
+	 *
+	 * For example:
 	 * {{{
 	 *     array('method' => 'Basic', 'username' => 'lithium', 'password' => 'rad')
 	 * }}}
@@ -82,14 +86,14 @@ class Request extends \lithium\http\Base {
 	public $auth = array();
 
 	/**
-	 * cookies
+	 * Cookies.
 	 *
 	 * @var array
 	 */
 	public $cookies = array();
 
 	/**
-	 * body
+	 * Body.
 	 *
 	 * @var array
 	 */
@@ -98,7 +102,8 @@ class Request extends \lithium\http\Base {
 	/**
 	 * Constructor
 	 *
-	 * @return void
+	 * @param array $config
+	 * @return object
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(
@@ -130,10 +135,15 @@ class Request extends \lithium\http\Base {
 				$config['auth']['username'] . ':' . $config['auth']['password']
 			));
 		}
+		if (strpos($this->host, '/') !== false) {
+			$parts = explode('/', $this->host, 2);
+			$this->host = $parts[0];
+			$this->path = $parts[1];
+		}
 	}
 
 	/**
-	 * Set queryString
+	 * Set queryString.
 	 *
 	 * @param array $params
 	 * @param string $format
@@ -184,7 +194,7 @@ class Request extends \lithium\http\Base {
 	}
 
 	/**
-	 * magic method to convert object to string
+	 * Magic method to convert object to string.
 	 *
 	 * @return string
 	 */

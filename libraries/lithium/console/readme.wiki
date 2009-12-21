@@ -1,4 +1,4 @@
-The console package contains a set of libraries designed for simplifying console
+﻿The console package contains a set of libraries designed for simplifying console
 based interaction with users.
 
 #### Command line overview
@@ -34,7 +34,20 @@ can use `~/.bash_profile` to hold you path changes.
 
 **Configuring your %PATH% on Windows**
 
-Guide for Windows will be added soon.
+Please note that if you're on  Windows you've additionally got to add the PHP directory to 
+the `%PATH%` environment variable. As we are going to edit that variable for adding 
+the location of where the `li3` tool is anyway, we can kill two birds with one stone.
+
+ - Open _System_ from within the _Control Panel_.
+ - Open the _Advanced_ tab.
+ - Clicking the _Environment Variables_ button open a dialog where you can edit the variables.
+ - Double click the _PATH_ entry in order to edit it.
+ - Add `;C:\path\to\php;C:\path\to\libraries\lithium\console` to the end of the value.
+
+You should get a nice prompt if you now open up the console and type:
+{{{
+li3.bat
+}}}
 
 #### Using built-in commands
 
