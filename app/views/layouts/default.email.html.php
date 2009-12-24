@@ -10,9 +10,9 @@
 
 <html>
 <head>
-	<title><?=$this->title; ?></title>
+	<title><?=$this->title;?></title>
 </head>
 <body>
-	<?php echo $this->content; ?>
+	<?=$this->content;?>
 </body>
 </html>
