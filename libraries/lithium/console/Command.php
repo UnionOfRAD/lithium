@@ -272,7 +272,7 @@ class Command extends \lithium\core\Object {
 			if ($status == 0) {
 				$this->out($message);
 			} else {
-				$this->err($message);
+				$this->error($message);
 			}
 		}
 		exit($status);
