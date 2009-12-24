@@ -37,8 +37,8 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *
 	 * For example, to implement action prefixes (i.e. `admin_index()`), set a rule named 'admin',
 	 * with a value array containing a modifier key for the `action` element of a route, i.e.:
-	 * `array('action' => 'admin_{:action}')`.  See `lithium\console\Dispatcher::config()` for examples
-	 * on setting rules.
+	 * `array('action' => 'admin_{:action}')`.  See `lithium\console\Dispatcher::config()` for
+	 * examples on setting rules.
 	 *
 	 * @see lithium\console\Dispatcher::config()
 	 * @see lithium\util\String::insert()
@@ -66,12 +66,12 @@ class Dispatcher extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Dispatches a request based on a request object (an instance of `lithium\console\Request`).  If
-	 * `$request` is null, a new request object is instantiated based on the value of the
+	 * Dispatches a request based on a request object (an instance of `lithium\console\Request`).
+	 *  If `$request` is `null`, a new request object is instantiated based on the value of the
 	 * `'request'` key in the `$_classes` array.
 	 *
 	 * @param object $request An instance of a request object with HTTP request information.  If
-	 *        null, an instance will be created.
+	 *        `null`, an instance will be created.
 	 * @param array $options
 	 * @return object The command action result which is an instance of `lithium\console\Response`.
 	 * @todo Add exception-handling/error page rendering
@@ -81,8 +81,9 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$options += $defaults;
 		$classes = static::$_classes;
 		$params = compact('request', 'options');
+		$method = __FUNCTION__;
 
-		return static::_filter(__METHOD__, $params, function($self, $params, $chain) use ($classes) {
+		return static::_filter($method, $params, function($self, $params, $chain) use ($classes) {
 			extract($params);
 
 			$router = $classes['router'];
@@ -93,7 +94,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			try {
 				$callable = $self::invokeMethod('_callable', array($request, $params, $options));
 				return $self::invokeMethod('_call', array($callable, $request, $params));
-			} catch (\UnexpectedValueException $e) {
+			} catch (UnexpectedValueException $e) {
 				return (object) array('status' => $e->getMessage() . "\n");
 			}
 		});
@@ -109,7 +110,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 */
 	protected static function _callable($request, $params, $options) {
 		$params = compact('request', 'params', 'options');
-		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
+		return static::_filter(__FUNCTION__, $params, function($self, $params, $chain) {
 			extract($params, EXTR_OVERWRITE);
 			$name = $class = $params['command'];
 
@@ -139,7 +140,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 */
 	protected static function _call($callable, $request, $params) {
 		$params = compact('callable', 'request', 'params');
-		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
+		return static::_filter(__FUNCTION__, $params, function($self, $params, $chain) {
 			if (is_callable($callable = $params['callable'])) {
 				$request = $params['request'];
 

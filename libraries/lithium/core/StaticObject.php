@@ -156,6 +156,9 @@ class StaticObject {
 	 * @see lithium\util\collection\Filters
 	 */
 	protected static function _filter($method, $params, $callback, $filters = array()) {
+		if (!strpos($method, '::')) {
+			$method = get_called_class() . '::' . $method;
+		}
 		list($class, $method) = explode('::', $method);
 
 		if (empty(static::$_methodFilters[$class][$method]) && empty($filters)) {

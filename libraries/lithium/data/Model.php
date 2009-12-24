@@ -223,7 +223,7 @@ class Model extends \lithium\core\StaticObject {
 			));
 		};
 		$finder = isset($self->_finders[$type]) ? array($self->_finders[$type]) : array();
-		return static::_filter(get_called_class() . '::' . __FUNCTION__, $params, $filter, $finder);
+		return static::_filter(__FUNCTION__, $params, $filter, $finder);
 	}
 
 	/**
@@ -420,7 +420,7 @@ class Model extends \lithium\core\StaticObject {
 		if (!$options['callbacks']) {
 			return $filter->__invoke($record, $options);
 		}
-		return static::_filter(get_called_class() . '::' . __FUNCTION__, $params, $filter);
+		return static::_filter(__FUNCTION__, $params, $filter);
 	}
 
 	public function validates($record, $options = array()) {
@@ -436,7 +436,7 @@ class Model extends \lithium\core\StaticObject {
 			}
 			return empty($errors);
 		};
-		return static::_filter(get_called_class() . '::' . __FUNCTION__, $params, $filter);
+		return static::_filter(__FUNCTION__, $params, $filter);
 	}
 
 	public function delete($record, $options = array()) {
@@ -444,7 +444,7 @@ class Model extends \lithium\core\StaticObject {
 		$query = $self->_classes['query'];
 		$model = get_called_class();
 		$params = compact('record', 'options');
-		$method = "{$model}::delete";
+		$method = __FUNCTION__;
 
 		return static::_filter($method, $params, function($self, $params) use ($model, $query) {
 			extract($params);
@@ -512,6 +512,9 @@ class Model extends \lithium\core\StaticObject {
 	 * @return object
 	 */
 	protected static function _filter($method, $params, $callback, $filters = array()) {
+		if (!strpos($method, '::')) {
+			$method = get_called_class() . '::' . $method;
+		}
 		list($class, $m) = explode('::', $method, 2);
 
 		if (isset(static::_instance()->_instanceFilters[$m])) {
