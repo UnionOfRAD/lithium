@@ -42,7 +42,7 @@ class Build extends \lithium\console\Command {
 	/**
 	 * Class Constrcutor
 	 *
-	 * @param string $config 
+	 * @param string $config
 	 */
 	public function __construct($config = array()) {
 		$this->path = dirname(LITHIUM_APP_PATH);
