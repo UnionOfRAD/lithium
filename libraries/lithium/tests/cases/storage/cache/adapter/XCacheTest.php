@@ -251,6 +251,9 @@ class XCacheTest extends \lithium\test\Unit {
 	}
 
 	public function testClear() {
+		$admin = (ini_get('xcache.admin.enable_auth') === "On");
+		$this->skipIf($admin, "XCache::clear() test skipped due to authentication.");
+
 		$key1 = 'key_clear_1';
 		$key2 = 'key_clear_2';
 		$time = strtotime('+1 minute');
