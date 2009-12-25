@@ -130,15 +130,45 @@ class XCache extends \lithium\core\Object {
 
 
 	/**
-	 * Clears user-space cache
+	 * Clears user-space cache.
 	 *
-	 * @return mixed True on successful clear, false otherwise
+	 * This method requires valid xcache admin credentials to be set when the
+	 * adapter was configured, due to the use of the xcache_clear_cache admin method.
+	 *
+	 * If the xcache.admin.enable_auth ini setting is set to "Off", no credentials
+	 * required.
+	 *
+	 * @return mixed True on successful clear, false otherwise.
 	 */
 	public function clear() {
+		$admin = (ini_get('xcache.admin.enable_auth') === "On");
+		if ($admin && (!isset($this->_config['username']) || !isset($this->_config['password']))) {
+			return false;
+		}
+		$credentials = array();
+
+		if (isset($_SERVER['PHP_AUTH_USER'])) {
+			$credentials['username'] = $_SERVER['PHP_AUTH_USER'];
+			$_SERVER['PHP_AUTH_USER'] = $this->_config['username'];
+		}
+		if (isset($_SERVER['PHP_AUTH_PW'])) {
+			$credentials['password'] = $_SERVER['PHP_AUTH_PW'];
+			$_SERVER['PHP_AUTH_PW'] = $this->_config['pass'];
+		}
+
 		for ($i = 0, $max = xcache_count(XC_TYPE_VAR); $i < $max; $i++) {
 			if (xcache_clear_cache(XC_TYPE_VAR, $i) === false) {
 				return false;
 			}
+		}
+
+		if (isset($_SERVER['PHP_AUTH_USER'])) {
+			$_SERVER['PHP_AUTH_USER'] =
+				($credentials['username'] !== null) ? $credentials['username'] : null;
+		}
+		if (isset($_SERVER['PHP_AUTH_PW'])) {
+			$_SERVER['PHP_AUTH_PW'] =
+				($credentials['password'] !== null) ? $credentials['password'] : null;
 		}
 		return true;
 	}
