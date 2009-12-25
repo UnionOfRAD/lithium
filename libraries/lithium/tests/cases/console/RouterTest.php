@@ -90,6 +90,34 @@ class RouterTest extends \lithium\test\Unit {
 		)));
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testParseWithParam() {
+		$expected = array(
+			'command' => 'test',
+			'action' => 'action',
+			'passed' => array(),
+			'named' => array('i' => true)
+		);
+		$result = Router::parse(new Request(array(
+			'args' => array(
+				'test', 'action', '-i'
+			)
+		)));
+		$this->assertEqual($expected, $result);
+
+		$expected = array(
+			'command' => 'test',
+			'action' => 'action',
+			'passed' => array(),
+			'named' => array('i' => 'something')
+		);
+		$result = Router::parse(new Request(array(
+			'args' => array(
+				'test', 'action', '-i', 'something'
+			)
+		)));
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
