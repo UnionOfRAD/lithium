@@ -99,6 +99,21 @@ class Request extends \lithium\core\Object {
 	}
 
 	/**
+	 * Moves params up a level. Sets command to action, action to passed[0], and so on.
+	 *
+	 * @param int $num how many times to shift
+	 * @return self
+	 */
+	public function shift($num = 1) {
+		for ($i = $num; $i > 1; $i--) {
+			$this->shift(--$i);
+		}
+		$this->params['command'] = $this->params['action'];
+		$this->params['action'] = array_shift($this->params['passed']);
+		return $this;
+	}
+
+	/**
 	 * Reads a line from input.
 	 *
 	 * @return string
