@@ -25,7 +25,7 @@ class CommandTest extends \lithium\test\Unit {
 		$result = $command->request->env();
 		$this->assertEqual($expected, $result);
 
-		$this->request->params['named'] = array(
+		$this->request->params = array(
 			'case' => 'lithium.tests.cases.console.CommandTest'
 		);
 		$command = new MockCommand(array('request' => $this->request));

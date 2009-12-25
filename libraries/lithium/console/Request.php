@@ -30,10 +30,7 @@ class Request extends \lithium\core\Object {
 	 * @see lithium\console\Router
 	 */
 	public $params = array(
-		'command' => null,
-		'action' => 'run',
-		'passed' => array(),
-		'named' => array()
+		'command' => null, 'action' => 'run', 'args' => array()
 	);
 
 	/**
@@ -57,6 +54,11 @@ class Request extends \lithium\core\Object {
 	 */
 	protected $_autoConfig = array('env' => 'merge');
 
+	/**
+	 * Class Constructor
+	 *
+	 * @param array $config
+	 */
 	public function __construct($config = array()) {
 		$defaults = array('args' => array(), 'input' => null);
 		$config += $defaults;
@@ -101,7 +103,7 @@ class Request extends \lithium\core\Object {
 	/**
 	 * Moves params up a level. Sets command to action, action to passed[0], and so on.
 	 *
-	 * @param int $num how many times to shift
+	 * @param integer $num how many times to shift
 	 * @return self
 	 */
 	public function shift($num = 1) {
@@ -109,7 +111,7 @@ class Request extends \lithium\core\Object {
 			$this->shift(--$i);
 		}
 		$this->params['command'] = $this->params['action'];
-		$this->params['action'] = array_shift($this->params['passed']);
+		$this->params['action'] = array_shift($this->params['args']);
 		return $this;
 	}
 
