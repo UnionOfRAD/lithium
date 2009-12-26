@@ -92,6 +92,42 @@ class Apc extends \lithium\core\Object {
 	}
 
 	/**
+	 * Performs an atomic decrement operation on specified numeric cache item.
+	 *
+	 * Note that, as per the APC specification:
+	 * If the item's value is not numeric, the decrement operation has no effect
+	 * on the key - it retains it's original non-integer value.
+	 *
+	 * @param string $key Key of numeric cache item to decrement
+	 * @param integer $offset Offset to decrement - defaults to 1.
+	 * @return mixed Item's new value on successful decrement, false otherwise
+	 */
+	public function decrement($key, $offset = 1) {
+		return function($self, $params, $chain) use ($offset) {
+			extract($params);
+			return apc_dec($key, $offset);
+		};
+	}
+
+	/**
+	 * Performs an atomic increment operation on specified numeric cache item.
+	 *
+	 * Note that, as per the APC specification:
+	 * If the item's value is not numeric, the increment operation has no effect
+	 * on the key - it retains it's original non-integer value.
+	 *
+	 * @param string $key Key of numeric cache item to increment
+	 * @param integer $offset Offset to increment - defaults to 1.
+	 * @return mixed Item's new value on successful increment, false otherwise
+	 */
+	public function increment($key, $offset = 1) {
+		return function($self, $params, $chain) use ($offset) {
+			extract($params);
+			return apc_inc($key, $offset);
+		};
+	}
+
+	/**
 	 * Clears user-space cache
 	 *
 	 * @return mixed True on successful clear, false otherwise

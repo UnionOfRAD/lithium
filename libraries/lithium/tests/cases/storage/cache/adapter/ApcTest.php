@@ -258,6 +258,92 @@ class ApcTest extends \lithium\test\Unit {
 		$this->assertFalse(apc_fetch($key1));
 		$this->assertFalse(apc_fetch($key2));
 	}
+
+	public function testDecrement() {
+		$time = strtotime('+1 minute');
+		$key = 'decrement';
+		$value = 10;
+
+		$result = apc_store($key, $value, $time);
+		$this->assertTrue($result);
+
+		$closure = $this->Apc->decrement($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Apc, $params, null);
+		$this->assertEqual($value - 1, $result);
+
+		$result = apc_fetch($key);
+		$this->assertEqual($value - 1, $result);
+
+		$result = apc_delete($key);
+		$this->assertTrue($result);
+	}
+
+	public function testDecrementNonIntegerValue() {
+		$time = strtotime('+1 minute');
+		$key = 'non_integer';
+		$value = 'no';
+
+		$result = apc_store($key, $value, $time);
+		$this->assertTrue($result);
+
+		$closure = $this->Apc->decrement($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Apc, $params, null);
+
+		$result = apc_fetch($key);
+		$this->assertEqual('no', $result);
+
+		$result = apc_delete($key);
+		$this->assertTrue($result);
+	}
+
+	public function testIncrement() {
+		$time = strtotime('+1 minute');
+		$key = 'increment';
+		$value = 10;
+
+		$result = apc_store($key, $value, $time);
+		$this->assertTrue($result);
+
+		$closure = $this->Apc->increment($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Apc, $params, null);
+		$this->assertEqual($value + 1, $result);
+
+		$result = apc_fetch($key);
+		$this->assertEqual($value + 1, $result);
+
+		$result = apc_delete($key);
+		$this->assertTrue($result);
+	}
+
+	public function testIncrementNonIntegerValue() {
+		$time = strtotime('+1 minute');
+		$key = 'non_integer_increment';
+		$value = 'yes';
+
+		$result = apc_store($key, $value, $time);
+		$this->assertTrue($result);
+
+		$closure = $this->Apc->increment($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Apc, $params, null);
+
+		$result = apc_fetch($key);
+		$this->assertEqual('yes', $result);
+
+		$result = apc_delete($key);
+		$this->assertTrue($result);
+	}
 }
 
 ?>
