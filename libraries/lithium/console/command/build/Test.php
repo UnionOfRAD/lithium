@@ -9,6 +9,7 @@
 namespace lithium\console\command\build;
 
 use \lithium\core\Libraries;
+use \lithium\util\reflection\Inspector;
 
 /**
  * Builds Test cases
@@ -33,7 +34,7 @@ class Test extends \lithium\console\command\Build {
 
 		if (class_exists($use)) {
 			$methods = array();
-			foreach ((array) get_class_methods($use) as $method) {
+			foreach (array_keys(Inspector::methods($use, 'extents')) as $method) {
 				$methods[] = "\tpublic function test" . ucwords($method)."() {}";
 			}
 		}
