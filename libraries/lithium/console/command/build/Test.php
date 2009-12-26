@@ -21,12 +21,12 @@ class Test extends \lithium\console\command\Build {
 
 	}
 
-	public function __call($method, $params) {
+	public function __call($type, $params) {
 		$library = Libraries::get($this->library);
 		if (empty($library['prefix'])) {
 			return false;
 		}
-		$namespace = $this->_namespace($method);
+		$namespace = $this->_namespace($type);
 		$name = array_shift($params);
 		$use = "\\{$library['prefix']}{$namespace}\\{$name}";
 		$methods =  array();
@@ -45,7 +45,7 @@ class Test extends \lithium\console\command\Build {
 		);
 		if ($this->_save($this->template, $params)) {
 			$this->out(
-				"{$params['class']} created for {$method} {$name} in {$params['namespace']}."
+				"{$params['class']} created for {$name} in {$params['namespace']}."
 			);
 			return true;
 		}
@@ -65,7 +65,7 @@ class Test extends \lithium\console\command\Build {
 			'methods' => null
 		);
 		if ($this->_save('mock', $params)) {
-			$this->out("{$params['class']} created for {$type} {$name} in {$params['namespace']}.");
+			$this->out("{$params['class']} created for {$name} in {$params['namespace']}.");
 			return true;
 		}
 		return false;

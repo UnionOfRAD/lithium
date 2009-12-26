@@ -54,7 +54,7 @@ class TestTest extends \lithium\test\Unit {
 		));
 		$test->path = $this->_testPath;
 		$test->model('Post');
-		$expected = "PostTest created for model Post in build_test\\tests\\cases\\models.\n";
+		$expected = "PostTest created for Post in build_test\\tests\\cases\\models.\n";
 		$result = $test->response->output;
 		$this->assertEqual($expected, $result);
 
@@ -89,7 +89,7 @@ test;
 		));
 		$test->path = $this->_testPath;
 		$test->mock('model', 'Post');
-		$expected = "MockPost created for model Post in build_test\\tests\\mocks\\models.\n";
+		$expected = "MockPost created for Post in build_test\\tests\\mocks\\models.\n";
 		$result = $test->response->output;
 		$this->assertEqual($expected, $result);
 
