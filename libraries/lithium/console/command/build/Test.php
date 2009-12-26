@@ -8,7 +8,7 @@
 
 namespace lithium\console\command\build;
 
-use \lithium\util\Inflector;
+use \lithium\core\Libraries;
 
 /**
  * Builds Test cases
@@ -22,9 +22,13 @@ class Test extends \lithium\console\command\Build {
 	}
 
 	public function __call($method, $params) {
+		$library = Libraries::get($this->library);
+		if (empty($library['prefix'])) {
+			return false;
+		}
 		$namespace = $this->_namespace($method);
 		$name = array_shift($params);
-		$use = "\\app\\{$namespace}\\{$name}";
+		$use = "\\{$library['prefix']}{$namespace}\\{$name}";
 		$methods =  array();
 
 		if (class_exists($use)) {
@@ -34,28 +38,34 @@ class Test extends \lithium\console\command\Build {
 			}
 		}
 		$params = array(
-			'namespace' => "app\\tests\\cases\\{$namespace}",
+			'namespace' => "{$library['prefix']}tests\\cases\\{$namespace}",
 			'use' => $use,
 			'class' => "{$name}Test",
 			'methods' => join("\n", $methods),
 		);
 		if ($this->_save($this->template, $params)) {
-			$this->out("{$params['class']} created for {$method} {$name}.");
+			$this->out(
+				"{$params['class']} created for {$method} {$name} in {$params['namespace']}."
+			);
 			return true;
 		}
 		return false;
 	}
 
 	public function mock($type = null, $name) {
+		$library = Libraries::get($this->library);
+		if (empty($library['prefix'])) {
+			return false;
+		}
 		$namespace = $this->_namespace($type);
 		$params = array(
-			'namespace' => "app\\tests\\mocks\\{$namespace}",
+			'namespace' => "{$library['prefix']}tests\\mocks\\{$namespace}",
 			'class' => "Mock{$name}",
-			'parent' => "\\app\\{$namespace}\\{$name}",
+			'parent' => "\\{$library['prefix']}{$namespace}\\{$name}",
 			'methods' => null
 		);
 		if ($this->_save('mock', $params)) {
-			$this->out("{$params['class']} created for {$type} {$name}.");
+			$this->out("{$params['class']} created for {$type} {$name} in {$params['namespace']}.");
 			return true;
 		}
 		return false;
