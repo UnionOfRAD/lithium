@@ -34,8 +34,8 @@ use \lithium\util\Inflector;
  *
  * Each adapter provides a consistent interface for the basic cache operations of `write`, `read`,
  * `delete` and `clear`, which can be used interchangably between all adapters. Some adapters (e.g.
- * Memcached) provide additional methods that are not consistently available across other adapters.
- * To make use of these, it is always possible to call:
+ * Memcached, Apc) provide additional methods that are not consistently available across
+ * other adapters. To make use of these, it is always possible to call:
  *
  * {{{Cache::adapter('named-configuration')->methodName($argument);}}}
  *

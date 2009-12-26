@@ -15,9 +15,21 @@ namespace lithium\storage\cache\adapter;
  * which abstracts away key generation, adapter instantiation and filter
  * implementation.
  *
+ * A simple configuration of this adapter can be accomplished in `app/config/bootstrap.php`
+ * as follows:
+ *
+ * {{{
+ * Cache::config(array(
+ *     'cache-config-name' => array('adapter' => 'Apc')
+ * ));
+ * }}}
+ *
  * This APC adapter provides basic support for `write`, `read`, `delete`
  * and `clear` cache functionality, as well as allowing the first four
- * methods to be filtered as per the Lithium filtering system.
+ * methods to be filtered as per the Lithium filtering system. Additionally,
+ * This adapter defines several methods that are _not_ implemented in other
+ * adapters, and are thus non-portable - see the documentation for `Cache`
+ * as to how these methods should be accessed.
  *
  * This adapter stores two keys for each written value - one which consists
  * of the data to be cached, and the other being a cache of the expiration time.
