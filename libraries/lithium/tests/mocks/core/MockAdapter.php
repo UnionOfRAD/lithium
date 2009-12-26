@@ -10,11 +10,9 @@ namespace lithium\tests\mocks\core;
 
 class MockAdapter extends \lithium\core\Adaptable {
 
-       protected static $_configurations = null;
+	protected static $_configurations = null;
 
-       public static function adapter($name) {
-               return static::_adapter('adapter.storage.cache', $name);
-       }
-
+	protected static $_adapters = 'adapter.storage.cache';
 }
+
 ?>

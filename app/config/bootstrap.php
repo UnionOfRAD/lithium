@@ -8,8 +8,8 @@
 
 namespace lithium;
 
-use \lithium\core\Environment;
 use \lithium\core\Libraries;
+use \lithium\core\Environment;
 
 /**
  * This is the path to the class libraries used by your application, and must contain a copy of the

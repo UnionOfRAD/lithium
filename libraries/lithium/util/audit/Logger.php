@@ -15,18 +15,18 @@ class Logger extends \lithium\core\Adaptable {
 	 */
 	protected static $_configurations = null;
 
+	protected static $_adapters = 'adapter.util.audit.logger';
+
 	/**
 	 * Writes $message to the log specified by the $name
 	 * configuration.
 	 *
-	 * @param  string $name    Configuration to be used for writing
-	 * @param  string $message Message to be written
-	 * @return boolean         True on successful write, false otherwise
+	 * @param string $name Configuration to be used for writing
+	 * @param string $message Message to be written
+	 * @return boolean `True` on successful write, `false` otherwise
 	 */
 	public static function write($type, $message) {
-		$settings = static::config();
-
-		if (!isset($settings[$type]) || !$settings->count()) {
+		if (!$config = static::_config($type)) {
 			return false;
 		}
 
@@ -35,20 +35,10 @@ class Logger extends \lithium\core\Adaptable {
 
 		foreach ($methods as $name => $method) {
 			$params = compact('type', 'message');
-			$filters = $settings[$name]['filters'];
-			$result = $result || static::_filter(__METHOD__, $params, $method, $filters);
+			$config = static::_config($name);
+			$result = $result || static::_filter(__METHOD__, $params, $method, $config['filters']);
 		}
 		return $result;
-	}
-
-	/**
-	 * Returns adapter for given named configuration
-	 *
-	 * @param  string $name Cache configuration name
-	 * @return object       Adapter for named configuration
-	 */
-	public static function adapter($name) {
-		return static::_adapter('adapter.util.audit.logger', $name);
 	}
 }
 

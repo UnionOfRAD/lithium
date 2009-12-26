@@ -49,13 +49,14 @@ use \lithium\util\Inflector;
  */
 class Cache extends \lithium\core\Adaptable {
 
-
 	/**
 	 * Stores configurations for cache adapters
 	 *
 	 * @var object Collection of cache configurations
 	 */
 	protected static $_configurations = null;
+
+	protected static $_adapters = 'adapter.storage.cache';
 
 	/**
 	 * Generates the cache key.
@@ -173,17 +174,6 @@ class Cache extends \lithium\core\Adaptable {
 		$settings = static::config();
 		return (isset($settings[$name])) ? static::adapter($name)->clear() : false;
 	}
-
-	/**
-	 * Returns adapter for given named configuration
-	 *
-	 * @param  string $name Name of configuration
-	 * @return object       Adapter for named configuration
-	 */
-	public static function adapter($name) {
-		return static::_adapter('adapter.storage.cache', $name);
-	}
-
 }
 
 ?>

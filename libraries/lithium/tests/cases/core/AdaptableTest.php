@@ -17,20 +17,22 @@ class AdaptableTest extends \lithium\test\Unit {
 
 
 	public function setUp() {
-		$this->Adaptable = new Adaptable();
+		$this->adaptable = new Adaptable();
 	}
 
 	public function testConfig() {
-		$Collection = new Collection();
-		$this->assertEqual($Collection, $this->Adaptable->config());
+		$this->assertFalse($this->adaptable->config());
 
 		$items = array(array(
 			'adapter' => '\some\adapter',
 			'filters' => array('filter1', 'filter2'),
 			'strategies' => array()
 		));
-		$result = $this->Adaptable->config($items);
-		$expected = new Collection(compact('items'));
+		$result = $this->adaptable->config($items);
+		$this->assertNull($result);
+
+		$expected = $items;
+		$result = $this->adaptable->config();
 		$this->assertEqual($expected, $result);
 
 		$items = array(array(
@@ -38,8 +40,9 @@ class AdaptableTest extends \lithium\test\Unit {
 			'filters' => array('filter1', 'filter2'),
 			'strategies' => array('strategy1', 'strategy2')
 		));
-		$result = $this->Adaptable->config($items);
-		$expected = new Collection(compact('items'));
+		$this->adaptable->config($items);
+		$result = $this->adaptable->config();
+		$expected = $items;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -49,38 +52,36 @@ class AdaptableTest extends \lithium\test\Unit {
 			'filters' => array('filter1', 'filter2'),
 			'strategies' => array('strategy1', 'strategy2')
 		));
-		$result = $this->Adaptable->config($items);
-		$expected = new Collection(compact('items'));
+		$this->adaptable->config($items);
+		$result = $this->adaptable->config();
+		$expected = $items;
 		$this->assertEqual($expected, $result);
 
-		$result = $this->Adaptable->reset();
+		$result = $this->adaptable->reset();
 		$this->assertNull($result);
+		$this->assertFalse($this->adaptable->config());
+	}
 
-		$Collection = new Collection();
-		$this->assertEqual($Collection, $this->Adaptable->config());
+	public function testNonExistentConfig() {
+		$adapter = new MockAdapter();
+		$this->expectException('Adapter configuration non_existent_config has not been defined');
+		$result = $adapter::adapter('non_existent_config');
+		$this->assertNull($result);
 	}
 
 	public function testAdapter() {
 		$adapter = new MockAdapter();
-
-		$result = $adapter::adapter('non_existent_config');
-		$this->assertNull($result);
-
 		$items = array('default' => array(
 			'adapter' => 'Memory',
 			'filters' => array(),
 			'strategies' => array()
 		));
-		$result = $adapter::config($items);
-		$expected = new Collection(compact('items'));
+		$adapter::config($items);
+		$result = $adapter::config();
+		$expected = $items;
 		$this->assertEqual($expected, $result);
 
 		$result = $adapter::adapter('default');
-		$expected = new Memory($items['default']);
-		$this->assertEqual($expected, $result);
-
-		// Will use last configured adapter
-		$result = $adapter::adapter(null);
 		$expected = new Memory($items['default']);
 		$this->assertEqual($expected, $result);
 	}
@@ -93,8 +94,9 @@ class AdaptableTest extends \lithium\test\Unit {
 			'filters' => array(),
 			'strategies' => array()
 		));
-		$result = $adapter::config($items);
-		$expected = new Collection(compact('items'));
+		$adapter::config($items);
+		$result = $adapter::config();
+		$expected = $items;
 		$this->assertEqual($expected, $result);
 
 		$result = $adapter::adapter('default');
@@ -105,25 +107,52 @@ class AdaptableTest extends \lithium\test\Unit {
 		$this->assertNull($adapter::enabled('non-existent'));
 	}
 
-
 	public function testNonExistentAdapter() {
 		$adapter = new MockAdapter();
 
 		$items = array('default' => array(
 			'adapter' => 'NonExistent', 'filters' => array(), 'strategies' => array()
 		));
-		$result = $adapter::config($items);
-		$expected = new Collection(compact('items'));
+		$adapter::config($items);
+		$result = $adapter::config();
+		$expected = $items;
 		$this->assertEqual($expected, $result);
 
+		$this->expectException('Could not find adapter NonExistent for configuration default');
 		$result = $adapter::adapter('default');
 		$this->assertNull($result);
 	}
 
-	public function testApplyStrategies() {
+	public function testEnvironmentSpecificConfiguration() {
+		$adapter = new MockAdapter();
+		$config = array('adapter' => 'Memory', 'filters' => array(), 'strategies' => array());
+		$items = array('default' => array(
+			'development' => $config, 'test' => $config, 'production' => $config
+		));
+		$adapter::config($items);
+		$result = $adapter::config();
+		$expected = array('default' => $config);
+		$this->assertEqual($expected, $result);
 
+		$result = $adapter::config('default');
+		$expected = $config;
+		$this->assertEqual($expected, $result);
+
+		$result = $adapter::adapter('default');
+		$expected = new Memory($config);
+		$this->assertEqual($expected, $result);
 	}
 
+	public function testConfigurationNoAdapter() {
+		$adapter = new MockAdapter();
+		$items = array('default' => array('filters' => array(), 'strategies' => array()));
+		$adapter::config($items);
+		$this->expectException('No adapter set for configuration default');
+		$result = $adapter::adapter('default');
+	}
+
+	public function testApplyStrategies() {
+	}
 }
 
 ?>

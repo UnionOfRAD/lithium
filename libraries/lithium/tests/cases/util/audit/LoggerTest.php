@@ -29,8 +29,10 @@ class LoggerTest extends \lithium\test\Unit {
 		));
 
 		$result = Logger::config($config);
-		$expected = new Collection(array('items' => $config));
+		$this->assertNull($result);
 
+		$result = Logger::config();
+		$expected = $config;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -44,7 +46,7 @@ class LoggerTest extends \lithium\test\Unit {
 		$this->assertNull($result);
 
 		$result = Logger::config();
-		$this->assertEqual(new Collection(), $result);
+		$this->assertFalse($result);
 	}
 
 	public function testWrite() {

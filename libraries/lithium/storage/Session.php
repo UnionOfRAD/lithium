@@ -20,6 +20,7 @@ class Session extends \lithium\core\Adaptable {
 	 */
 	protected static $_configurations = null;
 
+	protected static $_adapters = 'adapter.storage.session';
 
 	/**
 	 * Returns key to be used in session read, write and delete operations
@@ -57,10 +58,10 @@ class Session extends \lithium\core\Adaptable {
 		$defaults = array('name' => null);
 		$options += $defaults;
 		$method = ($name = $options['name']) ? static::_adapter($name)->read($key, $options) : null;
-		$settings = static::config();
+		$settings = static::_config($name);
 
 		if (!$method) {
-			foreach ($settings->keys() as $name) {
+			foreach (static::$_configurations->keys() as $name) {
 				if ($method = static::adapter($name)->read($key, $options)) {
 					break;
 				}
@@ -69,7 +70,7 @@ class Session extends \lithium\core\Adaptable {
 				return null;
 			}
 		}
-		$filters = $settings[$name]['filters'];
+		$filters = $settings['filters'];
 		return static::_filter(__METHOD__, compact('key', 'options'), $method, $filters);
 	}
 
@@ -82,12 +83,10 @@ class Session extends \lithium\core\Adaptable {
 	 * @return boolean
 	 */
 	public static function write($key, $value = null, $options = array()) {
-		$settings = static::config();
-
 		$defaults = array('name' => null);
 		$options += $defaults;
 
-		if (is_resource($value) || !$settings->count()) {
+		if (is_resource($value) || !static::$_configurations->count()) {
 			return false;
 		}
 		$methods = array();
@@ -95,17 +94,18 @@ class Session extends \lithium\core\Adaptable {
 		if ($name = $options['name']) {
 			$methods = array($name => static::adapter($name)->write($key, $value, $options));
 		} else {
-			foreach ($settings->keys() as $name) {
+			foreach (static::$_configurations->keys() as $name) {
 				if ($method = static::adapter($name)->write($key, $value, $options)) {
 					$methods[$name] = $method;
 				}
 			}
 		}
 		$result = false;
+		$settings = static::_config($name);
 
 		foreach ($methods as $name => $method) {
 			$params = compact('key', 'value', 'options');
-			$filters = $settings[$name]['filters'];
+			$filters = $settings['filters'];
 			$result = $result || static::_filter(__METHOD__, $params, $method, $filters);
 		}
 		return $result;
@@ -122,12 +122,11 @@ class Session extends \lithium\core\Adaptable {
 	public static function delete($key, $options = array()) {
 		$defaults = array('name' => null);
 		$options += $defaults;
-		$settings = static::config();
 
 		if ($options['name']) {
 			return static::adapter($options['name'])->delete($key, $options);
 		}
-		foreach ($settings->keys() as $name) {
+		foreach (static::$_configurations->keys() as $name) {
 			static::adapter($name)->delete($key, $options);
 		}
 	}
@@ -143,12 +142,11 @@ class Session extends \lithium\core\Adaptable {
 	public static function check($key, $options = array()) {
 		$defaults = array('name' => null);
 		$options += $defaults;
-		$settings = static::config();
 
 		if ($options['name']) {
 			return static::adapter($options['name'])->check($key, $options);
 		}
-		foreach ($settings->keys() as $name) {
+		foreach (static::$_configurations->keys() as $name) {
 			if (static::adapter($name)->check($key, $options)) {
 				return true;
 			}
@@ -156,23 +154,14 @@ class Session extends \lithium\core\Adaptable {
 		return false;
 	}
 
-	/**
-	 * Clears all named session configurations
-	 *
-	 * @return void
-	 */
-	public static function clear() {
-		return static::reset();
-	}
-
-	/**
-	 * Returns adapter for given named configuration
-	 *
-	 * @param  string $name
-	 * @return object       Adapter for named configuration
-	 */
-	public static function adapter($name) {
-		return static::_adapter('adapter.storage.session', $name);
+	public static function adapter($name = null) {
+		if (empty($name)) {
+			if (!$names = static::$_configurations->keys()) {
+				return;
+			}
+			$name = end($names);
+		}
+		return parent::adapter($name);
 	}
 }
 

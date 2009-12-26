@@ -19,13 +19,16 @@ class CacheTest extends \lithium\test\Unit {
 
 	public function testBasicCacheConfig() {
 		$result = Cache::config();
-		$this->assertEqual(new Collection(), $result);
+		$this->assertFalse($result);
 
 		$config = array('default' => array(
 			'adapter' => '\some\adapter', 'filters' => array(), 'strategies' => array()
 		));
 		$result = Cache::config($config);
-		$expected = new Collection(array('items' => $config));
+		$this->assertNull($result);
+
+		$expected = $config;
+		$result = Cache::config();
 		$this->assertEqual($expected, $result);
 
 		$result = Cache::reset();
@@ -36,8 +39,10 @@ class CacheTest extends \lithium\test\Unit {
 			'strategies' => array('Strategy1', 'Strategy2'),
 			'filters' => array()
 		));
-		$result = Cache::config($config);
-		$expected = new Collection(array('items' => $config));
+		Cache::config($config);
+
+		$result = Cache::config();
+		$expected = $config;
 		$this->assertEqual($expected, $result);
 
 		$result = Cache::reset();
@@ -48,8 +53,9 @@ class CacheTest extends \lithium\test\Unit {
 			'strategies' => array('Strategy1', 'Strategy2'),
 			'filters' => array('Filter1', 'Filter2')
 		));
-		$result = Cache::config($config);
-		$expected = new Collection(array('items' => $config));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -135,8 +141,9 @@ class CacheTest extends \lithium\test\Unit {
 		$config = array('default' => array(
 			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
 		));
-		$result = Cache::config($config);
-		$expected = new Collection(array('items' => $config));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
 		$this->assertEqual($expected, $result);
 
 		$result = Cache::write('default', 'some_key', 'some_data', '+1 minute');
@@ -150,11 +157,14 @@ class CacheTest extends \lithium\test\Unit {
 		$config = array('default' => array(
 			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
 		));
-		$result = Cache::config($config);
-		$expected = new Collection(array('items' => $config));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
 		$this->assertEqual($expected, $result);
 
-		$result = Cache::write('default', 'some_key', 'some_data', '+1 minute', function() { return false; });
+		$result = Cache::write('default', 'some_key', 'some_data', '+1 minute', function() {
+			return false;
+		});
 		$this->assertFalse($result);
 
 		$anonymous = function() use (&$config) {
@@ -172,8 +182,9 @@ class CacheTest extends \lithium\test\Unit {
 		$config = array('default' => array(
 			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
 		));
-		$result = Cache::config($config);
-		$expected = new Collection(array('items' => $config));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
 		$this->assertEqual($expected, $result);
 
 		$result = Cache::read('non_existing', 'key_value');
@@ -193,7 +204,9 @@ class CacheTest extends \lithium\test\Unit {
 		$expected = array('data' => 'take two');
 		$this->assertEqual($expected, $result);
 
-		$result = Cache::write('default', 'another', (object) array('data' => 'take two'), '+1 minute');
+		$result = Cache::write(
+			'default', 'another', (object) array('data' => 'take two'), '+1 minute'
+		);
 		$this->assertTrue($result);
 
 		$result = Cache::read('default', 'another');
@@ -205,8 +218,9 @@ class CacheTest extends \lithium\test\Unit {
 		$config = array('default' => array(
 			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
 		));
-		$result = Cache::config($config);
-		$expected = new Collection(array('items' => $config));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
 		$this->assertEqual($expected, $result);
 
 		$anonymous = function() use (&$config) {
@@ -221,7 +235,9 @@ class CacheTest extends \lithium\test\Unit {
 		$result = Cache::write('default', 'keyed', 'some data', '+1 minute', $anonymous);
 		$this->assertTrue($result);
 
-		$result = Cache::write('default', 'keyed', 'some data', '+1 minute', function() { return false; });
+		$result = Cache::write('default', 'keyed', 'some data', '+1 minute', function() {
+			return false;
+		});
 		$this->assertFalse($result);
 	}
 
@@ -229,8 +245,9 @@ class CacheTest extends \lithium\test\Unit {
 		$config = array('default' => array(
 			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
 		));
-		$result = Cache::config($config);
-		$expected = new Collection(array('items' => $config));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
 		$this->assertEqual($expected, $result);
 
 		$result = Cache::delete('non_existing', 'key_value');
@@ -248,8 +265,9 @@ class CacheTest extends \lithium\test\Unit {
 		$config = array('default' => array(
 			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
 		));
-		$result = Cache::config($config);
-		$expected = new Collection(array('items' => $config));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
 		$this->assertEqual($expected, $result);
 
 		$anonymous = function() use (&$config) {
@@ -272,8 +290,9 @@ class CacheTest extends \lithium\test\Unit {
 		$config = array('default' => array(
 			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
 		));
-		$result = Cache::config($config);
-		$expected = new Collection(array('items' => $config));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
 		$this->assertEqual($expected, $result);
 
 		$result = Cache::clear('non_existing');
@@ -294,8 +313,9 @@ class CacheTest extends \lithium\test\Unit {
 		$config = array('default' => array(
 			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
 		));
-		$result = Cache::config($config);
-		$expected = new Collection(array('items' => $config));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
 		$this->assertEqual($expected, $result);
 
 		$result = Cache::clean('non_existing');
@@ -310,37 +330,38 @@ class CacheTest extends \lithium\test\Unit {
 		$config = array('default' => array(
 			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
 		));
-		$result = Cache::config($config);
-		$expected = new Collection(array('items' => $config));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
 		$this->assertEqual($expected, $result);
 
 		$result = Cache::reset();
 		$this->assertNull($result);
 
 		$result = Cache::config();
-		$expected = new Collection();
-		$this->assertEqual($expected, $result);
+		$this->assertFalse($result);
 	}
 
 	public function testNonPortableCacheAdapterMethod() {
 		$config = array('default' => array(
 			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
 		));
-		$result = Cache::config($config);
-		$expected = new Collection(array('items' => $config));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
 		$this->assertEqual($expected, $result);
-
 	}
 
 	public function testIntegrationFileAdapterCacheConfig() {
 		$result = Cache::config();
-		$this->assertEqual(new Collection(), $result);
+		$this->assertFalse($result);
 
 		$config = array('default' => array(
 			'adapter' => 'File', 'filters' => array(), 'strategies' => array()
 		));
-		$result = Cache::config($config);
-		$expected = new Collection(array('items' => $config));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
 		$this->assertEqual($expected, $result);
 	}
 
