@@ -285,6 +285,8 @@ class MemcacheTest extends \lithium\test\Unit {
 		$result = $this->_Memcached->get($key);
 		$this->assertEqual($value - 1, $result);
 
+		$result = $this->_Memcached->delete($key);
+		$this->assertTrue($result);
 	}
 
 	public function testDecrementNonIntegerValue() {
@@ -303,6 +305,9 @@ class MemcacheTest extends \lithium\test\Unit {
 
 		$result = $this->_Memcached->get($key);
 		$this->assertEqual(0, $result);
+
+		$result = $this->_Memcached->delete($key);
+		$this->assertTrue($result);
 	}
 
 	public function testIncrement() {
@@ -322,6 +327,9 @@ class MemcacheTest extends \lithium\test\Unit {
 
 		$result = $this->_Memcached->get($key);
 		$this->assertEqual($value + 1, $result);
+
+		$result = $this->_Memcached->delete($key);
+		$this->assertTrue($result);
 	}
 
 	public function testIncrementNonIntegerValue() {
@@ -340,6 +348,9 @@ class MemcacheTest extends \lithium\test\Unit {
 
 		$result = $this->_Memcached->get($key);
 		$this->assertEqual(0, $result);
+
+		$result = $this->_Memcached->delete($key);
+		$this->assertTrue($result);
 	}
 }
 
