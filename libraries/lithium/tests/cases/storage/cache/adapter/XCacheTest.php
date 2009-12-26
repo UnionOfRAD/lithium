@@ -289,6 +289,8 @@ class XCacheTest extends \lithium\test\Unit {
 		$result = xcache_get($key);
 		$this->assertEqual($value - 1, $result);
 
+		$result = xcache_unset($key);
+		$this->assertTrue($result);
 	}
 
 	public function testDecrementNonIntegerValue() {
@@ -316,6 +318,9 @@ class XCacheTest extends \lithium\test\Unit {
 
 		$result = xcache_get($key);
 		$this->assertEqual(-2, $result);
+
+		$result = xcache_unset($key);
+		$this->assertTrue($result);
 	}
 
 	public function testIncrement() {
@@ -335,6 +340,9 @@ class XCacheTest extends \lithium\test\Unit {
 
 		$result = xcache_get($key);
 		$this->assertEqual($value + 1, $result);
+
+		$result = xcache_unset($key);
+		$this->assertTrue($result);
 	}
 
 	public function testIncrementNonIntegerValue() {
@@ -362,6 +370,9 @@ class XCacheTest extends \lithium\test\Unit {
 
 		$result = xcache_get($key);
 		$this->assertEqual(2, $result);
+
+		$result = xcache_unset($key);
+		$this->assertTrue($result);
 	}
 }
 
