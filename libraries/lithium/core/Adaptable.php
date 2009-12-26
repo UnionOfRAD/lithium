@@ -93,7 +93,6 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @return object Adapter object
 	 */
 	public static function adapter($name = null) {
-		$classes = static::$_adapters;
 		$config = static::_config($name);
 
 		if ($config === null) {
@@ -103,16 +102,10 @@ class Adaptable extends \lithium\core\StaticObject {
 		if (isset($config['adapter']) && is_object($config['adapter'])) {
 			return $config['adapter'];
 		}
-
-		if (!$config['adapter']) {
-			throw new Exception("No adapter set for configuration {$name}");
-		}
-		if (!$class = Libraries::locate($classes, $config['adapter'])) {
-			$message = "Could not find adapter {$config['adapter']} for configuration {$name}";
-			throw new Exception($message);
-		}
+		$class = static::_class($config, static::$_adapters);
 		$settings = static::$_configurations[$name];
 		$settings[0]['adapter'] = new $class($config);
+
 		static::$_configurations[$name] = $settings;
 		return static::$_configurations[$name][0]['adapter'];
 	}
@@ -131,6 +124,26 @@ class Adaptable extends \lithium\core\StaticObject {
 	 */
 	public static function enabled($name) {
 		return is_null(static::_config($name)) ? null : static::adapter($name)->enabled();
+	}
+
+	/**
+	 * Looks up an adapter class by name, using the `$_adapters` property set by a subclass of
+	 * `Adaptable`.
+	 *
+	 * @param string $name The class name of the adapter to locate.
+	 * @return string Returns a fully-namespaced class reference to the adapter class.
+	 */
+	protected static function _class($config, $paths = array()) {
+		$self = get_called_class();
+		if (!$name = $config['adapter']) {
+			throw new Exception("No adapter set for configuration in class {$self}");
+		}
+		foreach ((array) $paths as $path) {
+			if ($class = Libraries::locate($path, $name)) {
+				return $class;
+			}
+		}
+		throw new Exception("Could not find adapter {$name} in class {$self}");
 	}
 
 	/**

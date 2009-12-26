@@ -29,7 +29,7 @@ use \lithium\core\Libraries;
  *
  * @see lithium\data\Source
  */
-class Connections extends \lithium\core\StaticObject {
+class Connections extends \lithium\core\Adaptable {
 
 	/**
 	 * A Collection of the configurations you add through Connections::add()
@@ -38,13 +38,7 @@ class Connections extends \lithium\core\StaticObject {
 	 */
 	protected static $_configurations = null;
 
-	/**
-	 * As each connection is built, a reference to the instance is stored in
-	 * this Collection under the name it was given when configuration was added.
-	 *
-	 * @var Collection
-	 */
-	protected static $_connections = null;
+	protected static $_adapters = 'data.source';
 
 	/**
 	 * Initialization of static class
@@ -53,8 +47,7 @@ class Connections extends \lithium\core\StaticObject {
 	 * @return void
 	 */
 	public static function __init() {
-		static::$_connections = new Collection();
-		static::$_configurations = new Collection();
+		parent::__init();
 		require LITHIUM_APP_PATH . '/config/connections.php';
 	}
 
@@ -147,31 +140,20 @@ class Connections extends \lithium\core\StaticObject {
 		if (empty($name)) {
 			return static::$_configurations->keys();
 		}
-
 		if (!isset(static::$_configurations[$name])) {
 			return null;
 		}
-
 		if ($options['config']) {
-			return static::$_configurations[$name];
+			return static::_config($name);
 		}
+		$settings = static::$_configurations[$name];
 
-		if (!isset(static::$_connections[$name]) && $options['autoCreate']) {
-			return static::$_connections[$name] = static::_build(static::$_configurations[$name]);
-		} elseif (!$options['autoCreate']) {
-			return null;
+		if (!isset($settings[0]['adapter']) || !is_object($settings[0]['adapter'])) {
+			if (!$options['autoCreate']) {
+				return null;
+			}
 		}
-		return static::$_connections[$name];
-	}
-
-	/**
-	* Hard reset of connections and configurations, clearing out any currently configured or built
-	*
-	* @return void
-	*/
-	public static function clear() {
-		static::$_connections = new Collection();
-		static::$_configurations = new Collection();
+		return static::adapter($name);
 	}
 
 	/**
@@ -180,17 +162,13 @@ class Connections extends \lithium\core\StaticObject {
 	 * @param array $config
 	 * @return object
 	 */
-	protected static function _build($config) {
-		$class = $config['adapter'];
-		if (empty($config['adapter'])) {
-			$class = Libraries::locate("data.source", $config['type']);
+	protected static function _class($config, $paths = array()) {
+		if (!$config['adapter']) {
+			$config['adapter'] = $config['type'];
 		} else {
-			$class = Libraries::locate("adapter.data.source.{$config['type']}", $config['adapter']);
+			$paths = array_merge(array("adapter.data.source.{$config['type']}"), (array) $paths);
 		}
-		if (!$class) {
-			throw new Exception("{$config['type']} adapter {$config['adapter']} could not be found");
-		}
-		return new $class($config);
+		return parent::_class($config, $paths);
 	}
 }
 

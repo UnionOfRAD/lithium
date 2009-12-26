@@ -118,7 +118,9 @@ class AdaptableTest extends \lithium\test\Unit {
 		$expected = $items;
 		$this->assertEqual($expected, $result);
 
-		$this->expectException('Could not find adapter NonExistent for configuration default');
+		$this->expectException(
+			'Could not find adapter NonExistent in class lithium\tests\mocks\core\MockAdapter'
+		);
 		$result = $adapter::adapter('default');
 		$this->assertNull($result);
 	}
@@ -147,7 +149,9 @@ class AdaptableTest extends \lithium\test\Unit {
 		$adapter = new MockAdapter();
 		$items = array('default' => array('filters' => array(), 'strategies' => array()));
 		$adapter::config($items);
-		$this->expectException('No adapter set for configuration default');
+		$this->expectException(
+			'No adapter set for configuration in class lithium\tests\mocks\core\MockAdapter'
+		);
 		$result = $adapter::adapter('default');
 	}
 
