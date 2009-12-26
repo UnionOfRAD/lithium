@@ -28,10 +28,10 @@ class Build extends \lithium\console\Command {
 	public $i = false;
 
 	/**
-	 * Paths to save generated files
+	 * Name of library to use
 	 *
 	 */
-	public $path = null;
+	public $library = 'app';
 
 	/**
 	 * The template to use to generate the file
@@ -42,10 +42,9 @@ class Build extends \lithium\console\Command {
 	/**
 	 * Class Constrcutor
 	 *
-	 * @param string $config 
+	 * @param string $config
 	 */
 	public function __construct($config = array()) {
-		$this->path = dirname(LITHIUM_APP_PATH);
 		$this->template = strtolower(join('', array_slice(explode("\\", get_class($this)), -1)));
 		parent::__construct($config);
 	}
@@ -113,11 +112,15 @@ class Build extends \lithium\console\Command {
 
 		$contents = file_get_contents($file);
 		$result = String::insert($contents, $params);
+		$library = Libraries::get($this->library);
 
-		if ($this->path && is_dir($this->path)) {
-			$path = str_replace('\\', '/', $params['namespace'] . "\\" . $params['class']);
-			$file = str_replace('//', '/', "{$this->path}/{$path}.php");
+		if (!empty($library['path'])) {
+			$path = dirname($library['path']) . str_replace('\\', '/',
+				"\\{$params['namespace']}\\{$params['class']}"
+			);
+			$file = str_replace('//', '/', "{$path}.php");
 			$directory = dirname($file);
+
 			if (!is_dir($directory)) {
 				if (!mkdir($directory, 0755, true)) {
 					return false;

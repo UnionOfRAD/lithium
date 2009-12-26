@@ -10,6 +10,7 @@ namespace lithium\tests\cases\console\command;
 
 use \lithium\tests\mocks\console\command\MockBuild;
 use \lithium\console\Request;
+use \lithium\core\Libraries;
 
 class BuildTest extends \lithium\test\Unit {
 
@@ -17,15 +18,17 @@ class BuildTest extends \lithium\test\Unit {
 
 	protected $_backup = array();
 
-	protected $_paths = array();
-
+	protected $_testPath = null;
 
 	public function setUp() {
-		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
 		$this->_backup['cwd'] = getcwd();
 		$this->_backup['_SERVER'] = $_SERVER;
 		$_SERVER['argv'] = array();
-		$this->_paths['tests'] = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
+
+		Libraries::add('build_test', array('path' => $this->_testPath .'/build_test'));
+		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
+		$this->request->params = array('library' => 'build_test');
 	}
 
 	public function tearDown() {
@@ -43,22 +46,29 @@ class BuildTest extends \lithium\test\Unit {
 			}
 			return false;
 		};
-		$rmdir($this->_paths['tests'] . '/app');
+		$rmdir($this->_testPath . '/build_test');
+	}
+
+	public function testConstruct() {
+		$build = new MockBuild(array('request' => $this->request));
+
+		$expected = 'build_test';
+		$result = $build->library;
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testSave() {
-		chdir($this->_paths['tests']);
+		chdir($this->_testPath);
 		$build = new MockBuild(array('request' => $this->request));
-		$build->path = $this->_paths['tests'];
 		$result = $build->save('test', array(
-			'namespace' => 'app\tests\cases\models',
-			'use' => 'app\models\Post',
+			'namespace' => 'build_test\tests\cases\models',
+			'use' => 'build_test\models\Post',
 			'class' => 'PostTest',
 			'methods' => "\tpublic function testCreate() {\n\n\t}\n",
 		));
 		$this->assertTrue($result);
 
-		$result = $this->_paths['tests'] . '/app/tests/cases/models/PostTest.php';
+		$result = $this->_testPath . '/build_test/tests/cases/models/PostTest.php';
 		$this->assertTrue(file_exists($result));
 
 		$this->_cleanup();
@@ -75,7 +85,7 @@ class BuildTest extends \lithium\test\Unit {
 	public function testRunWithModelCommand() {
 		$build = new MockBuild(array('request' => $this->request));
 
-		$this->request->params = array(
+		$this->request->params += array(
 			'command' => 'build', 'action' => 'run', 'args' => array('model')
 		);
 		$build->run('model');
@@ -89,13 +99,9 @@ class BuildTest extends \lithium\test\Unit {
 		$this->request->params = array(
 			'command' => 'build', 'action' => 'run',
 			'args' => array('test', 'model', 'Post'),
-			'path' => $this->_paths['tests']
+			'library' => 'build_test'
 		);
 		$build = new MockBuild(array('request' => $this->request));
-
-		$expected = $this->_paths['tests'];
-		$result = $build->path;
-		$this->assertEqual($expected, $result);
 
 		$build->run('test', 'model');
 
@@ -103,7 +109,7 @@ class BuildTest extends \lithium\test\Unit {
 		$result = $build->request->params['command'];
 		$this->assertEqual($expected, $result);
 
-		$result = $this->_paths['tests'] . '/app/tests/cases/models/PostTest.php';
+		$result = $this->_testPath . '/build_test/tests/cases/models/PostTest.php';
 		$this->assertTrue(file_exists($result));
 	}
 
@@ -112,7 +118,7 @@ class BuildTest extends \lithium\test\Unit {
 		$this->request->params = array(
 			'command' => 'build', 'action' => 'run',
 			'args' => array('test', 'something', 'Post'),
-			'path' => $this->_paths['tests']
+			'library' => 'build_test'
 		);
 		$build->run('test', 'something');
 
@@ -120,7 +126,7 @@ class BuildTest extends \lithium\test\Unit {
 		$result = $build->request->params['command'];
 		$this->assertEqual($expected, $result);
 
-		$result = $this->_paths['tests'] . '/app/tests/cases/something/PostTest.php';
+		$result = $this->_testPath . '/build_test/tests/cases/something/PostTest.php';
 		$this->assertTrue(file_exists($result));
 	}
 }
