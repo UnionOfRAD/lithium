@@ -1,0 +1,3998 @@
+#
+# Lithium: the most rad php framework
+#
+# @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
+# @license       http://opensource.org/licenses/bsd-license.php The BSD License
+#
+"Project-Id-Version: lithium 0.3\n"
+"POT-Creation-Date: DATE\n"
+"PO-Revision-Date: DATE\n"
+"Last-Translator: NAME <EMAIL>\n"
+"Language-Team: LOCALE <EMAIL>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=NUMBER; plural=EXPRESSION;\n"
+
+#. lithium\util\Collection
+msgid "Lithium: the most rad php framework"
+msgstr ""
+
+#. lithium\util\Collection
+msgid "@copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)\n@license       http://opensource.org/licenses/bsd-license.php The BSD License"
+msgstr ""
+
+#. lithium\util\Collection::invoke()
+msgid "Handles dispatching of methods against all items in the collection."
+msgstr ""
+
+#. lithium\util\Collection::invoke()
+#. lithium\util\Collection::__call()
+#. lithium\util\Collection::to()
+#. lithium\util\Collection::find()
+#. lithium\util\Collection::first()
+#. lithium\util\Collection::each()
+#. lithium\util\Collection::map()
+#. lithium\util\Collection::offsetExists()
+#. lithium\util\Collection::offsetGet()
+#. lithium\util\Collection::offsetSet()
+#. lithium\util\Collection::offsetUnset()
+#. lithium\util\Collection::rewind()
+#. lithium\util\Collection::end()
+#. lithium\util\Collection::valid()
+#. lithium\util\Collection::current()
+#. lithium\util\Collection::key()
+#. lithium\util\Collection::prev()
+#. lithium\util\Collection::next()
+#. lithium\util\Collection::append()
+#. lithium\util\Collection::count()
+#. lithium\util\Collection::keys()
+#. lithium\util\Collection::__construct()
+#. lithium\util\Collection::__construct()
+#. lithium\util\Collection::applyFilter()
+#. lithium\util\Collection::invokeMethod()
+#. lithium\util\Collection::_filter()
+#. lithium\util\Collection::_parents()
+#. lithium\util\Collection::_parents()
+#. lithium\util\Collection::_stop()
+#. lithium\util\Collection::$_config
+#. lithium\util\Collection::$_methodFilters
+#. lithium\util\Collection::$_methodFilters
+#. lithium\util\Collection::$_extendMethodFilters
+#. lithium\util\Collection::$_extendMethodFilters
+#. lithium\util\Collection::$_parents
+#. lithium\util\Collection::$_parents
+msgid ""
+msgstr ""
+
+#. lithium\util\Collection::invoke()
+#. lithium\util\Collection::__call()
+#. lithium\util\Collection::_filter()
+msgid "mixed"
+msgstr ""
+
+#. lithium\util\Collection::invoke()
+msgid "Specifies options for how to run the given method against the object\n             collection. The available options are:\n\n - `'merge'`: Used primarily if the method being invoked returns an array.  If\n               set to `true`, merges all results arrays into one.\n\n - `'collect'`: If `true`, the results of this method call will be returned\n             wrapped in a new Collection object or subclass."
+msgstr ""
+
+#. lithium\util\Collection::__call()
+msgid "Hook to handle dispatching of methods against all items in the collection."
+msgstr ""
+
+#. lithium\util\Collection::to()
+msgid "Converts the Collection object to another type of object, or a simple type such as an array."
+msgstr ""
+
+#. lithium\util\Collection::to()
+msgid "mixed The converted object."
+msgstr ""
+
+#. lithium\util\Collection::to()
+msgid "Currently only `'array'` is supported."
+msgstr ""
+
+#. lithium\util\Collection::to()
+msgid "for converting this collection:\n\n - 'internal': Boolean indicating whether the current internal representation of the\n         collection should be exported. Defaults to `false`, which uses the standard iterator\n         interfaces. This is useful for exporting record sets, where records are lazy-loaded,\n         and the collection must be iterated in order to fetch all objects."
+msgstr ""
+
+#. lithium\util\Collection::find()
+msgid "Filters a copy of the items in the collection."
+msgstr ""
+
+#. lithium\util\Collection::find()
+#. lithium\util\Collection::map()
+msgid "array|object The filtered items."
+msgstr ""
+
+#. lithium\util\Collection::find()
+msgid "Callback to use for filtering."
+msgstr ""
+
+#. lithium\util\Collection::find()
+#. lithium\util\Collection::map()
+msgid "The available options are:\n\n - `'collect'`: If `true`, the results will be returned wrapped\n             in a new Collection object or subclass."
+msgstr ""
+
+#. lithium\util\Collection::first()
+msgid "Returns the first non-empty value in the collection after a filter is applied, or rewinds the\ncollection and returns the first value."
+msgstr ""
+
+#. lithium\util\Collection::first()
+msgid "mixed Returns the first non-empty collection value returned from `$filter`."
+msgstr ""
+
+#. lithium\util\Collection::each()
+msgid "Applies a callback to all items in the collection."
+msgstr ""
+
+#. lithium\util\Collection::each()
+msgid "object This collection instance."
+msgstr ""
+
+#. lithium\util\Collection::map()
+msgid "Applies a callback to a copy of all items in the collection\nand returns the result."
+msgstr ""
+
+#. lithium\util\Collection::map()
+msgid "The filter to apply."
+msgstr ""
+
+#. lithium\util\Collection::offsetExists()
+msgid "Checks whether or not an offset exists."
+msgstr ""
+
+#. lithium\util\Collection::offsetExists()
+msgid "boolean `true` if offset exists, `false` otherwise."
+msgstr ""
+
+#. lithium\util\Collection::offsetGet()
+msgid "Returns the value at specified offset."
+msgstr ""
+
+#. lithium\util\Collection::offsetGet()
+msgid "mixed Value at offset."
+msgstr ""
+
+#. lithium\util\Collection::offsetSet()
+msgid "Assigns a value to the specified offset."
+msgstr ""
+
+#. lithium\util\Collection::offsetSet()
+msgid "mixed The value which was set."
+msgstr ""
+
+#. lithium\util\Collection::offsetSet()
+msgid "The offset to assign the value to."
+msgstr ""
+
+#. lithium\util\Collection::offsetSet()
+msgid "The value to set."
+msgstr ""
+
+#. lithium\util\Collection::offsetUnset()
+msgid "Unsets an offset."
+msgstr ""
+
+#. lithium\util\Collection::offsetUnset()
+#. lithium\util\Collection::append()
+#. lithium\util\Collection::applyFilter()
+#. lithium\util\Collection::_stop()
+msgid "void"
+msgstr ""
+
+#. lithium\util\Collection::rewind()
+msgid "Rewinds to the first item."
+msgstr ""
+
+#. lithium\util\Collection::rewind()
+msgid "mixed The current item after rewinding."
+msgstr ""
+
+#. lithium\util\Collection::end()
+msgid "Moves forward to the last item."
+msgstr ""
+
+#. lithium\util\Collection::end()
+#. lithium\util\Collection::prev()
+msgid "mixed The current item after moving."
+msgstr ""
+
+#. lithium\util\Collection::valid()
+msgid "Checks if current position is valid."
+msgstr ""
+
+#. lithium\util\Collection::valid()
+msgid "boolean `true` if valid, `false` otherwise."
+msgstr ""
+
+#. lithium\util\Collection::current()
+msgid "Returns the current item."
+msgstr ""
+
+#. lithium\util\Collection::current()
+msgid "mixed The current item."
+msgstr ""
+
+#. lithium\util\Collection::key()
+msgid "Returns the key of the current item."
+msgstr ""
+
+#. lithium\util\Collection::key()
+msgid "scalar Scalar on success `0` on failure."
+msgstr ""
+
+#. lithium\util\Collection::prev()
+msgid "Moves backward to the previous item.  If already at the first item,\nmoves to the last one."
+msgstr ""
+
+#. lithium\util\Collection::next()
+msgid "Move forwards to the next item."
+msgstr ""
+
+#. lithium\util\Collection::next()
+msgid "The current item after moving."
+msgstr ""
+
+#. lithium\util\Collection::append()
+msgid "Appends an item."
+msgstr ""
+
+#. lithium\util\Collection::count()
+msgid "Counts the items of the object."
+msgstr ""
+
+#. lithium\util\Collection::count()
+msgid "integer Number of items."
+msgstr ""
+
+#. lithium\util\Collection::keys()
+msgid "Returns the item keys."
+msgstr ""
+
+#. lithium\util\Collection::keys()
+msgid "array The keys of the items."
+msgstr ""
+
+#. lithium\util\Collection::applyFilter()
+msgid "Apply a closure to a method of the current object instance."
+msgstr ""
+
+#. lithium\util\Collection::applyFilter()
+msgid "The name of the method to apply the closure to. Can either be a single\n             method name as a string, or an array of method names."
+msgstr ""
+
+#. lithium\util\Collection::applyFilter()
+msgid "The clousure that is used to filter the method(s)."
+msgstr ""
+
+#. lithium\util\Collection::invokeMethod()
+msgid "Calls a method on this object with the given parameters. Provides an OO wrapper\nfor call_user_func_array, and improves performance by using straight method calls\nin most cases."
+msgstr ""
+
+#. lithium\util\Collection::invokeMethod()
+msgid "mixed  Returns the result of the method call"
+msgstr ""
+
+#. lithium\util\Collection::invokeMethod()
+msgid " Name of the method to call"
+msgstr ""
+
+#. lithium\util\Collection::invokeMethod()
+msgid " Parameter list to use when calling $method"
+msgstr ""
+
+#. lithium\util\Collection::_filter()
+msgid "Executes a set of filters against a method by taking a method's main implementation as a\ncallback, and iteratively wrapping the filters around it."
+msgstr ""
+
+#. lithium\util\Collection::_filter()
+msgid "The name of the method being executed, or an array containing\n       the name of the class that defined the method, and the method name."
+msgstr ""
+
+#. lithium\util\Collection::_filter()
+msgid "An associative array containing all the parameters passed into\n       the method."
+msgstr ""
+
+#. lithium\util\Collection::_filter()
+msgid "The method's implementation, wrapped in a closure."
+msgstr ""
+
+#. lithium\util\Collection::_filter()
+msgid "Additional filters to apply to the method for this call only"
+msgstr ""
+
+#. lithium\util\Collection::_stop()
+msgid "Exit immediately.  Primarily used for overrides during testing."
+msgstr ""
+
+#. lithium\util\Collection::$_config
+msgid "Stores configuration information for object instances at time of construction.\n**Do not override.** Pass any additional variables to `parent::__construct()`."
+msgstr ""
+
+#. lithium\util\Inflector
+msgid "Pluralize and singularize English words.  Inflector pluralizes and singularizes English\nnouns. Used by Lithium's naming conventions throughout the framework."
+msgstr ""
+
+#. lithium\util\Inflector::__init()
+msgid "Populates `Inflector::$_singular['irregular']` as\nan inversion of `Inflector::$_plural['irregular']`."
+msgstr ""
+
+#. lithium\util\Inflector::rules()
+msgid "Gets or adds inflection and transliteration rules."
+msgstr ""
+
+#. lithium\util\Inflector::rules()
+msgid "array|void If `$config` is empty, returns the rules list specified\n        by `$type`, otherwise returns `null`."
+msgstr ""
+
+#. lithium\util\Inflector::rules()
+msgid "Either `'transliterations'`, `'uninflected'`, `'singular'` or `'plural'`."
+msgstr ""
+
+#. lithium\util\Inflector::pluralize()
+msgid "Changes the form of a word from singular to plural."
+msgstr ""
+
+#. lithium\util\Inflector::pluralize()
+msgid "string Word in plural form."
+msgstr ""
+
+#. lithium\util\Inflector::singularize()
+msgid "Changes the form of a word from plural to singular."
+msgstr ""
+
+#. lithium\util\Inflector::singularize()
+msgid "string Word in singular form."
+msgstr ""
+
+#. lithium\util\Inflector::clear()
+msgid "Clears local in-memory caches.  Can be used to force a full-cache clear when updating\ninflection rules mid-way through request execution."
+msgstr ""
+
+#. lithium\util\Inflector::camelize()
+msgid "Takes a underscore-syntaxed version of a word and turns it into a camel-cased one."
+msgstr ""
+
+#. lithium\util\Inflector::camelize()
+msgid "string Camel-cased version of the word (i.e. `'RedBike'`)."
+msgstr ""
+
+#. lithium\util\Inflector::underscore()
+msgid "Takes a camel-cased version of a word and turns it into an underscore-syntaxed one."
+msgstr ""
+
+#. lithium\util\Inflector::underscore()
+msgid "string Underscore-syntaxed version of the workd (i.e. `'red_bike'`)."
+msgstr ""
+
+#. lithium\util\Inflector::humanize()
+msgid "Takes an underscore-syntaxed version of a word and turns it into an human-readable one\nby replacing underscores with a space, and by upper-casing the initial characters."
+msgstr ""
+
+#. lithium\util\Inflector::humanize()
+msgid "string Human-readable version of the word (i.e. `'Red Bike'`)."
+msgstr ""
+
+#. lithium\util\Inflector::humanize()
+msgid "Underscore-syntaxed version of a word (i.e. `'red_bike'`)."
+msgstr ""
+
+#. lithium\util\Inflector::humanize()
+msgid "The separator character used in the initial string."
+msgstr ""
+
+#. lithium\util\Inflector::tableize()
+msgid "Takes a camel-cased class name and returns corresponding undescore-syntaxed table name."
+msgstr ""
+
+#. lithium\util\Inflector::tableize()
+msgid "string Name of the table (i.e. `'posts'`)."
+msgstr ""
+
+#. lithium\util\Inflector::classify()
+msgid "Takes a underscore-syntaxed table name and returns corresponding class name."
+msgstr ""
+
+#. lithium\util\Inflector::classify()
+msgid "string Name of a class (i.e. `'Post'`)."
+msgstr ""
+
+#. lithium\util\Inflector::variable()
+msgid "Takes a camel-cased or underscore-syntaxed variable name and returns the camel-backed\nversion of it."
+msgstr ""
+
+#. lithium\util\Inflector::variable()
+msgid "string Camel-backed version of the string (i.e. `'redBike'`)."
+msgstr ""
+
+#. lithium\util\Inflector::slug()
+msgid "Returns a string with all spaces converted to given replacement and\nnon word characters removed.  Maps special characters to ASCII using\n`Inflector::$_transliterations`, which can be updated using `Inflector::rules()`."
+msgstr ""
+
+#. lithium\util\Inflector::slug()
+msgid "string The converted string."
+msgstr ""
+
+#. lithium\util\Inflector::slug()
+msgid "An arbitrary string to convert."
+msgstr ""
+
+#. lithium\util\Inflector::slug()
+msgid "The replacement to use for spaces."
+msgstr ""
+
+#. lithium\util\Set
+msgid "@copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)\n               Copyright 2009, Cake Software Foundation, Inc. (http://cakefoundation.org)\n@license       http://opensource.org/licenses/mit-license.php The MIT License"
+msgstr ""
+
+#. lithium\util\Set::check()
+msgid "Checks if a particular path is set in an array"
+msgstr ""
+
+#. lithium\util\Set::check()
+msgid "boolean `true` if path is found, `false` otherwise."
+msgstr ""
+
+#. lithium\util\Set::check()
+msgid "Data to check on."
+msgstr ""
+
+#. lithium\util\Set::check()
+#. lithium\util\Set::insert()
+#. lithium\util\Set::remove()
+msgid "A dot-delimited string."
+msgstr ""
+
+#. lithium\util\Set::depth()
+msgid "Counts the dimensions of an array. If `$all` is set to `false` (which is the default) it will\nonly consider the dimension of the first element in the array."
+msgstr ""
+
+#. lithium\util\Set::depth()
+msgid "integer The number of dimensions in `$array`."
+msgstr ""
+
+#. lithium\util\Set::depth()
+msgid "Array to count dimensions on."
+msgstr ""
+
+#. lithium\util\Set::depth()
+msgid "true counts the dimension considering all elements in array."
+msgstr ""
+
+#. lithium\util\Set::depth()
+msgid "Start the depth count at this number."
+msgstr ""
+
+#. lithium\util\Set::flatten()
+msgid "Collapses a multi-dimensional array into a single dimension, using a delimited array path\nfor each array element's key, i.e. array(array('Foo' => array('Bar' => 'Far'))) becomes\narray('0.Foo.Bar' => 'Far')."
+msgstr ""
+
+#. lithium\util\Set::flatten()
+#. lithium\util\Set::insert()
+#. lithium\util\Set::normalize()
+#. lithium\util\Set::reverse()
+#. lithium\util\Set::sort()
+msgid "array"
+msgstr ""
+
+#. lithium\util\Set::flatten()
+msgid "array to flatten"
+msgstr ""
+
+#. lithium\util\Set::flatten()
+msgid "Available options are:\n\n - `'separator'`: String to separate array keys in path (defaults to `'.'`).\n\n - `'path'`: Starting point (defaults to null)."
+msgstr ""
+
+#. lithium\util\Set::filter()
+msgid "Filters empty elements out of an array, excluding `'0'`.  Also accepts\nnon array types."
+msgstr ""
+
+#. lithium\util\Set::filter()
+msgid "array Filtered array."
+msgstr ""
+
+#. lithium\util\Set::format()
+msgid "Returns a series of values extracted from an array, formatted in a format string."
+msgstr ""
+
+#. lithium\util\Set::format()
+msgid "array An array of strings extracted from `$keys` and formatted with `$format`."
+msgstr ""
+
+#. lithium\util\Set::format()
+msgid "Source array from which to extract the data."
+msgstr ""
+
+#. lithium\util\Set::format()
+msgid "Format string into which values will be inserted using `sprintf()`."
+msgstr ""
+
+#. lithium\util\Set::format()
+msgid "An array containing one or more `Set::extract()`-style key paths."
+msgstr ""
+
+#. lithium\util\Set::isNumeric()
+msgid "Checks to see if all the values in the array are numeric."
+msgstr ""
+
+#. lithium\util\Set::isNumeric()
+msgid "boolean `true` if values are numeric, `false` otherwise."
+msgstr ""
+
+#. lithium\util\Set::matches()
+msgid "This function can be used to see if a single item or a given XPath\nmatch certain conditions."
+msgstr ""
+
+#. lithium\util\Set::matches()
+msgid "boolean"
+msgstr ""
+
+#. lithium\util\Set::matches()
+msgid "An array of condition strings or an XPath expression."
+msgstr ""
+
+#. lithium\util\Set::matches()
+msgid " An array of data to execute the match on."
+msgstr ""
+
+#. lithium\util\Set::matches()
+msgid "Optional: The 'nth'-number of the item being matched."
+msgstr ""
+
+#. lithium\util\Set::map()
+msgid "Maps the contents of the Set object to an object hierarchy.  Maintains numeric\nkeys as arrays of objects."
+msgstr ""
+
+#. lithium\util\Set::map()
+msgid "object Hierarchical object."
+msgstr ""
+
+#. lithium\util\Set::map()
+msgid "The array."
+msgstr ""
+
+#. lithium\util\Set::map()
+msgid "A class name of the type of object to map to."
+msgstr ""
+
+#. lithium\util\Set::map()
+msgid "whether the _name_ should be filled."
+msgstr ""
+
+#. lithium\util\Set::merge()
+msgid "This function can be thought of as a hybrid between PHP's `array_merge()`\nand `array_merge_recursive()`.  The difference to the two is that if an\narray key contains another array then the function behaves recursive\n(unlike `array_merge()`) but does not do if for keys containing strings\n(unlike `array_merge_recursive()`).  Please note: This function will work\nwith an unlimited amount of arguments and typecasts non-array parameters\ninto arrays."
+msgstr ""
+
+#. lithium\util\Set::merge()
+msgid "array Merged array."
+msgstr ""
+
+#. lithium\util\Set::merge()
+msgid "Array to be merged."
+msgstr ""
+
+#. lithium\util\Set::merge()
+msgid "Array to merge with."
+msgstr ""
+
+#. lithium\util\Set::pushDiff()
+msgid "Pushes the differences in `$array2` onto the end of `$array`."
+msgstr ""
+
+#. lithium\util\Set::pushDiff()
+#. lithium\util\Set::combine()
+msgid "array Combined array."
+msgstr ""
+
+#. lithium\util\Set::pushDiff()
+msgid "Original array."
+msgstr ""
+
+#. lithium\util\Set::pushDiff()
+msgid "Differences to push."
+msgstr ""
+
+#. lithium\util\Set::extract()
+msgid "Implements partial support for XPath 2.0."
+msgstr ""
+
+#. lithium\util\Set::extract()
+msgid "array An array of matched items."
+msgstr ""
+
+#. lithium\util\Set::extract()
+msgid "An array of data to extract from."
+msgstr ""
+
+#. lithium\util\Set::extract()
+msgid "Currently only supports `'flatten'` which can be\n             disabled for higher XPath-ness."
+msgstr ""
+
+#. lithium\util\Set::insert()
+msgid "Inserts `$data` into an array as defined by `$path`."
+msgstr ""
+
+#. lithium\util\Set::insert()
+msgid "Where to insert into."
+msgstr ""
+
+#. lithium\util\Set::insert()
+msgid "Data to insert."
+msgstr ""
+
+#. lithium\util\Set::remove()
+msgid "Removes an element from an array as defined by `$path`."
+msgstr ""
+
+#. lithium\util\Set::remove()
+msgid "array Array with `$path` removed from its value."
+msgstr ""
+
+#. lithium\util\Set::remove()
+msgid "From where to remove."
+msgstr ""
+
+#. lithium\util\Set::diff()
+msgid "Computes the difference between two arrays."
+msgstr ""
+
+#. lithium\util\Set::diff()
+msgid "array Computed difference."
+msgstr ""
+
+#. lithium\util\Set::diff()
+#. lithium\util\Set::contains()
+msgid "First value."
+msgstr ""
+
+#. lithium\util\Set::diff()
+#. lithium\util\Set::contains()
+msgid "Second value."
+msgstr ""
+
+#. lithium\util\Set::contains()
+msgid "Determines if one array contains the exact keys and values of another."
+msgstr ""
+
+#. lithium\util\Set::contains()
+msgid "boolean true if `$val1` contains `$val2`, `false` otherwise."
+msgstr ""
+
+#. lithium\util\Set::normalize()
+msgid "Normalizes a string or array list."
+msgstr ""
+
+#. lithium\util\Set::normalize()
+msgid "List to normalize."
+msgstr ""
+
+#. lithium\util\Set::normalize()
+msgid "If `true`, `$list` will be converted to an associative array."
+msgstr ""
+
+#. lithium\util\Set::normalize()
+msgid "If `$list` is a string, it will be split into an array with `$sep`."
+msgstr ""
+
+#. lithium\util\Set::normalize()
+msgid "If `true`, separated strings will be trimmed."
+msgstr ""
+
+#. lithium\util\Set::combine()
+msgid "Creates an associative array using a `$path1` as the path to build its keys, and optionally\n`$path2` as path to get the values. If `$path2` is not specified, all values will be\ninitialized to `null` (useful for `Set::merge()`). You can optionally group the values by\nwhat is obtained when following the path specified in `$groupPath`."
+msgstr ""
+
+#. lithium\util\Set::combine()
+msgid "Array from where to extract keys and values."
+msgstr ""
+
+#. lithium\util\Set::combine()
+#. lithium\util\Set::combine()
+#. lithium\util\Set::combine()
+msgid "As an array, or as a dot-delimited string."
+msgstr ""
+
+#. lithium\util\Set::reverse()
+msgid "Converts an object into an array. If `$object` is no object, reverse\nwill return the same value."
+msgstr ""
+
+#. lithium\util\Set::sort()
+msgid "Sorts an array by any value, determined by a `Set`-compatible path."
+msgstr ""
+
+#. lithium\util\Set::sort()
+msgid "A `Set`-compatible path to the array value."
+msgstr ""
+
+#. lithium\util\Set::sort()
+msgid "Either `'asc'` (the default) or `'desc'`."
+msgstr ""
+
+#. lithium\util\Socket::__construct()
+msgid "Constructor."
+msgstr ""
+
+#. lithium\util\Socket::open()
+msgid "Opens the socket and sets `Socket::$_resource`."
+msgstr ""
+
+#. lithium\util\Socket::open()
+msgid "booelan|resource The open resource on success, `false` otherwise."
+msgstr ""
+
+#. lithium\util\Socket::close()
+msgid "Closes the socket and unsets `Socket::$_resource`."
+msgstr ""
+
+#. lithium\util\Socket::close()
+msgid "boolean `true` on success, `false` otherwise."
+msgstr ""
+
+#. lithium\util\Socket::eof()
+msgid "Test for the end-of-file on the socket."
+msgstr ""
+
+#. lithium\util\Socket::eof()
+msgid "boolean `true` if end has been reached, `false` otherwise."
+msgstr ""
+
+#. lithium\util\Socket::read()
+msgid "Reads from the socket."
+msgstr ""
+
+#. lithium\util\Socket::read()
+msgid "mixed The read contents, or `false` if reading failed."
+msgstr ""
+
+#. lithium\util\Socket::write()
+msgid "Writes data to the socket."
+msgstr ""
+
+#. lithium\util\Socket::write()
+msgid "boolean `true` if data has been succesfully written, `false` otherwise."
+msgstr ""
+
+#. lithium\util\Socket::timeout()
+msgid "Sets the timeout on the socket *connection*."
+msgstr ""
+
+#. lithium\util\Socket::timeout()
+msgid "booelan `true` if timeout has been set, `false` otherwise."
+msgstr ""
+
+#. lithium\util\Socket::encoding()
+msgid "Sets the encoding of the socket connection."
+msgstr ""
+
+#. lithium\util\Socket::encoding()
+msgid "boolean `true` if encoding has been set, `false` otherwise."
+msgstr ""
+
+#. lithium\util\Socket::__destruct()
+msgid "Destructor."
+msgstr ""
+
+#. lithium\util\Socket::resource()
+msgid "Returns the resource."
+msgstr ""
+
+#. lithium\util\Socket::resource()
+msgid "resource|void"
+msgstr ""
+
+#. lithium\util\Socket::_init()
+msgid "Initializer function. Called by constructor unless constructor `'init'` flag set to false.\nMay be used for testing purposes, where objects need to be manipulated in an un-initialized\nstate."
+msgstr ""
+
+#. lithium\util\String::uuid()
+msgid "Generates a random UUID."
+msgstr ""
+
+#. lithium\util\String::uuid()
+msgid "string An RFC 4122-compliant UUID."
+msgstr ""
+
+#. lithium\util\String::hash()
+msgid "Create a hash from string using given method.  Fallback on next available method."
+msgstr ""
+
+#. lithium\util\String::hash()
+msgid "string Hash."
+msgstr ""
+
+#. lithium\util\String::hash()
+msgid "String to hash."
+msgstr ""
+
+#. lithium\util\String::hash()
+msgid "Method to use (sha1/sha256/md5, or any method supported\n              by the `hash()` function)."
+msgstr ""
+
+#. lithium\util\String::insert()
+msgid "Replaces variable placeholders inside a string with any given data. Each key\nin the `$data` array corresponds to a variable placeholder name in `$str`."
+msgstr ""
+
+#. lithium\util\String::insert()
+msgid "Usage:\n{{{\nString::insert(\n    'My name is {:name} and I am {:age} years old.',\n    array('name' => 'Bob', 'age' => '65')\n); // returns 'My name is Bob and I am 65 years old.'\n}}}"
+msgstr ""
+
+#. lithium\util\String::insert()
+msgid "string"
+msgstr ""
+
+#. lithium\util\String::insert()
+msgid "A string containing variable placeholders."
+msgstr ""
+
+#. lithium\util\String::insert()
+msgid "A key, value array where each key stands for a placeholder variable\n                    name to be replaced with value."
+msgstr ""
+
+#. lithium\util\String::insert()
+msgid "Available options are:\n\n - `'before'`: The character or string in front of the name of\n                the variable placeholder (defaults to `':'`).\n\n - `'after'`: The character or string after the name of the\n                 variable placeholder (defaults to `null`).\n\n - `'escape'`: The character or string used to escape the\n                before character or string (defaults to `''`).\n\n - `'format'`: A regular expression to use for matching variable\n                placeholders (defaults to `'/(?<!\\)\\:%s/'`. Please note that this option\n                takes precedence over all other options except `'clean'`.\n\n - `'clean'`: A boolean or array with instructions for `String::clean()`."
+msgstr ""
+
+#. lithium\util\String::clean()
+msgid "Cleans up a `Set::insert()`-formatted string with given `$options` depending\non the `'clean'` option. The goal of this function is to replace all whitespace\nand uneeded markup around placeholders that did not get replaced by `Set::insert()`."
+msgstr ""
+
+#. lithium\util\String::clean()
+msgid "string The cleaned string."
+msgstr ""
+
+#. lithium\util\String::clean()
+msgid "The string to clean."
+msgstr ""
+
+#. lithium\util\String::clean()
+msgid "Available options are:\n\n - `'clean'`: `true` or an array of clean options:\n\n - `'before'`:\n\n - `'after'`:\n\n - `'word'`: Regular expression matching words.\n\n - `'gap'`: Regular expression matching gaps.\n\n - `'andText'`: (defaults to `true`).\n\n - `'replacement'`: String to use for cleaned substrings (defaults to `''`).\n\n - `'method'`: Either `'text'` or `'html'` (defaults to `'text'`)."
+msgstr ""
+
+#. lithium\util\String::extract()
+msgid "Extract a part of a string based on a regular expression `$regex`."
+msgstr ""
+
+#. lithium\util\String::extract()
+msgid "The regular expression to use."
+msgstr ""
+
+#. lithium\util\String::extract()
+msgid "The string to run the extraction on."
+msgstr ""
+
+#. lithium\util\String::extract()
+msgid "The number of the part to return based on the regex."
+msgstr ""
+
+#. lithium\util\String::tokenize()
+msgid "Tokenizes a string using `$separator`, ignoring any instance of `$separator` that appears\nbetween `$leftBound` and `$rightBound`."
+msgstr ""
+
+#. lithium\util\String::tokenize()
+msgid "The data to tokenize."
+msgstr ""
+
+#. lithium\util\String::tokenize()
+msgid "The token to split the data on."
+msgstr ""
+
+#. lithium\util\Validator::__init()
+msgid "Initializes the list of default validation rules."
+msgstr ""
+
+#. lithium\util\Validator::__callStatic()
+msgid "Maps method calls to validation rule names.  For example, a validation rule that would\nnormally be called as `Validator::rule('email', 'foo@bar.com')` can also be called as\n`Validator::isEmail('foo@bar.com')`."
+msgstr ""
+
+#. lithium\util\Validator::__callStatic()
+msgid "The name of the method called, i.e. `'isEmail'` or `'isCreditCard'`."
+msgstr ""
+
+#. lithium\util\Validator::check()
+msgid "Checks a set of values against a specified rules list."
+msgstr ""
+
+#. lithium\util\Validator::check()
+msgid "This method may be used to validate any arbitrary array data against a set of validation\nrules."
+msgstr ""
+
+#. lithium\util\Validator::check()
+msgid "mixed When all validation rules pass"
+msgstr ""
+
+#. lithium\util\Validator::check()
+msgid "An array of key/value pairs, where the values are to be checked."
+msgstr ""
+
+#. lithium\util\Validator::add()
+msgid "Adds to or replaces built-in validation rules specified in `Validator::$_rules`.  Any new\nvalidation rules created are automatically callable as validation methods."
+msgstr ""
+
+#. lithium\util\Validator::add()
+msgid "For example:\n{{{\nValidator::add('zeroToNine', '/^[0-9]$/');\n$isValid = Validator::isZeroToNine(\"5\"); // true\n$isValid = Validator::isZeroToNine(\"20\"); // false\n}}}\n\nAlternatively, the first parameter may be an array of rules expressed as key/value pairs,\nas in the following:\n{{{\nValidator::add(array(\n\t'zeroToNine' => '/^[0-9]$/',\n\t'tenToNineteen' => '/^1[0-9]$/',\n));\n}}}"
+msgstr ""
+
+#. lithium\util\Validator::add()
+msgid "The name of the validation rule (string), or an array of key/value pairs\n             of names and rules."
+msgstr ""
+
+#. lithium\util\Validator::add()
+msgid "If $name is a string, this should be a string regular expression, or a\n              closure that returns a boolean indicating success. Should be left blank if\n              `$name` is an array."
+msgstr ""
+
+#. lithium\util\Validator::add()
+msgid "The default options for validating this rule. An option which applies\n             to all regular expression rules is `'contains'` which, if set to true, allows\n             validated values to simply _contain_ a match to a rule, rather than exactly\n             matching it in whole."
+msgstr ""
+
+#. lithium\util\Validator::filter()
+msgid "Adds, removes, or gets pre- or post-filters which are executed on a value before a validation\nis attempted, and after a validation succeeds, respectively. Each pre-filter (closure)\ntransforms the value before it is passed on to the validation rule for checking. Each\npost-filter takes a value that has already passed validation, and performs additional\nvalidation on it."
+msgstr ""
+
+#. lithium\util\Validator::filter()
+msgid "mixed If filter is null, returns an array containing all the filters assigned to\n        `$rule`.  Otherwise, returns null."
+msgstr ""
+
+#. lithium\util\Validator::filter()
+msgid "Specifies which type of filter to work with, either `'before'` for\n              pre-filters, or `'after'` for post-filters."
+msgstr ""
+
+#. lithium\util\Validator::filter()
+msgid "The name of the rule for which this filter will be added.  For example,\n       to add a filter for `Validator::isAlphaNumeric()`, use `'alphaNumeric'`."
+msgstr ""
+
+#. lithium\util\Validator::filter()
+msgid "A closure which should accept 3 parameters:\n\n - `$value`: The value to be validated.\n\n - `$format`: The specific format of the validation rule.\n\n - `$options`: An array of options specifying how the validation will be performed.\n       For pre-filters, `$filter` should return the newly-transformed value, which will be\n       checked against the validation rule. Null return values are ignored. True values\n       automatically succeed, and false values automatically fail. For post-filters,\n       `$filter` should return a boolean value, indicating whether the filter's additional\n       validation checking succeeded. If `$filter` is set to `false`, all filters assigned\n       to `$rule` (either pre or post, depending on `$type`) are removed."
+msgstr ""
+
+#. lithium\util\Validator::rule()
+msgid "Checks a single value against a single validation rule in one or more formats."
+msgstr ""
+
+#. lithium\util\Validator::compare()
+msgid "Used to compare 2 numeric values."
+msgstr ""
+
+#. lithium\util\Validator::compare()
+#. lithium\util\Validator::hasMinLength()
+#. lithium\util\Validator::hasMaxLength()
+#. lithium\util\Validator::isMoney()
+#. lithium\util\Validator::multiple()
+#. lithium\util\Validator::isInRange()
+msgid "boolean Success"
+msgstr ""
+
+#. lithium\util\Validator::compare()
+msgid "If string is passed for a string must also be passed for $value2\n             used as an array it must be passed as\n             {{{array('check1' => value, 'operator' => 'value', 'check2' => value)}}}"
+msgstr ""
+
+#. lithium\util\Validator::compare()
+msgid "Can be either a word or operand\n\n - is greater >, is less <, greater or equal >=\n\n - less or equal <=, is less <, equal to ==, not equal !="
+msgstr ""
+
+#. lithium\util\Validator::compare()
+msgid "only needed if $value1 is a string"
+msgstr ""
+
+#. lithium\util\Validator::hasMinLength()
+msgid "Checks whether the length of a string is greater or equal to a minimal length."
+msgstr ""
+
+#. lithium\util\Validator::hasMinLength()
+#. lithium\util\Validator::hasMaxLength()
+msgid "The string to test"
+msgstr ""
+
+#. lithium\util\Validator::hasMinLength()
+msgid "The minimal string length"
+msgstr ""
+
+#. lithium\util\Validator::hasMaxLength()
+msgid "Checks whether the length of a string is smaller or equal to a maximal length.."
+msgstr ""
+
+#. lithium\util\Validator::hasMaxLength()
+msgid "The maximal string length"
+msgstr ""
+
+#. lithium\util\Validator::isMoney()
+msgid "Checks that a value is a monetary amount."
+msgstr ""
+
+#. lithium\util\Validator::isMoney()
+#. lithium\util\Validator::multiple()
+#. lithium\util\Validator::isInRange()
+msgid "Value to check"
+msgstr ""
+
+#. lithium\util\Validator::isMoney()
+msgid "Where symbol is located (left/right)"
+msgstr ""
+
+#. lithium\util\Validator::multiple()
+msgid "Validate a multiple select."
+msgstr ""
+
+#. lithium\util\Validator::multiple()
+msgid "Options for the check.\n\tValid options\n\t  in => provide a list of choices that selections must be made from\n\t  max => maximun number of non-zero choices that can be made\n\t  min => minimum number of non-zero choices that can be made"
+msgstr ""
+
+#. lithium\util\Validator::isInRange()
+msgid "Validate that a number is in specified range.\nif $lower and $upper are not set, will return true if\n$value is a legal finite on this platform"
+msgstr ""
+
+#. lithium\util\Validator::isInRange()
+msgid "Lower limit"
+msgstr ""
+
+#. lithium\util\Validator::isInRange()
+msgid "Upper limit"
+msgstr ""
+
+#. lithium\util\Validator::applyFilter()
+msgid "Apply a closure to a method of the current static object."
+msgstr ""
+
+#. lithium\util\Validator::applyFilter()
+msgid "The clousure that is used to filter the method."
+msgstr ""
+
+#. lithium\util\Validator::applyStrategies()
+msgid "Applies the configured strategies to a method of the current static object."
+msgstr ""
+
+#. lithium\util\Validator::applyStrategies()
+msgid "@param  string $method The strategy method to be called.\n@param  array  $params Parameters that are used by the strategy $method."
+msgstr ""
+
+#. lithium\util\Validator::applyStrategies()
+msgid "mixed          Data that has been modified by the configured strategies.\n*/"
+msgstr ""
+
+#. lithium\util\Validator::strategies()
+msgid "Allows setting & querying of static object strategies."
+msgstr ""
+
+#. lithium\util\Validator::strategies()
+msgid "- If $name is set, returns the strategies attached to the current static object.\n- If $name and $strategy are set, $strategy is added to the strategy\nstack denoted by $name.\n- If $name and $strategy are not set, then the full\nindexed strategies array is returned (note: the strategies are wraped in\n\\SplStack).\n\n@param  string        $name     Name of cache configuration.\n@param  string|array  $strategy Fully namespaced cache strategy identifier."
+msgstr ""
+
+#. lithium\util\Validator::strategies()
+msgid "mixed                   See above description."
+msgstr ""
+
+#. lithium\util\socket\Curl
+msgid "A Curl-based socket adapter"
+msgstr ""
+
+#. lithium\util\socket\Curl
+msgid "This curl adapter provides the required method implementations of the abstract Socket class\nfor `open`, `close`, `read`, `write`, `timeout` `eof` and `encoding`.\n\nYour PHP installation must have been compiled with the `--with-curl[=DIR]` directive. If this\nis not the case, you must either recompile PHP with the proper configuration flags to enable\ncurl, or you may use the `Stream` adapter that is also included with the Lithium core."
+msgstr ""
+
+#. lithium\util\socket\Curl::open()
+msgid "Opens a curl connection and initializes the internal resource handle"
+msgstr ""
+
+#. lithium\util\socket\Curl::open()
+msgid "mixed False if the Socket configuration does not contain the\n\t\t   'protocol' or 'host' settings, curl resource otherwise."
+msgstr ""
+
+#. lithium\util\socket\Curl::close()
+msgid "Closes the curl connection."
+msgstr ""
+
+#. lithium\util\socket\Curl::close()
+msgid "boolean True on closed connection"
+msgstr ""
+
+#. lithium\util\socket\Curl::eof()
+msgid "EOF is unimplemented for this socket adapter"
+msgstr ""
+
+#. lithium\util\socket\Curl::read()
+#. lithium\util\socket\Curl::write()
+msgid "Reads data from the curl connection.\nThe `read` method will utilize the curl options that have been set."
+msgstr ""
+
+#. lithium\util\socket\Curl::read()
+#. lithium\util\socket\Curl::write()
+msgid "mixed Boolean false if the resource handle is unavailable, and the result\n        of `curl_exec` otherwise."
+msgstr ""
+
+#. lithium\util\socket\Curl::timeout()
+msgid "A convenience method to set the curl CURLOPT_CONNECTTIMEOUT\nsetting for the current connection. This determines the number\nof seconds to wait while trying to connect."
+msgstr ""
+
+#. lithium\util\socket\Curl::timeout()
+msgid "Note: A value of 0 may be used to specify an indefinite wait time."
+msgstr ""
+
+#. lithium\util\socket\Curl::timeout()
+msgid "boolean False if the resource handle is unavailable or the\n        option could not be set, true otherwise."
+msgstr ""
+
+#. lithium\util\socket\Curl::encoding()
+msgid "encoding() is currently unimplemented for this socket adapter"
+msgstr ""
+
+#. lithium\util\socket\Curl::set()
+msgid "Sets the options to be used in subsequent curl requests."
+msgstr ""
+
+#. lithium\util\socket\Curl::set()
+msgid "If $values is an array, $flags will be used as the\n       keys to an associative array of curl options. If $values is not set,\n       then $flags will be used as the associative array."
+msgstr ""
+
+#. lithium\util\socket\Curl::set()
+msgid "If set, this array becomes the values for the\n       associative array of curl options."
+msgstr ""
+
+#. lithium\util\socket\Curl::$options
+msgid "Contains options that will be passed to curl_setopt_array before\n`read` and `write` operations. These options should be set by\nusing the `set` method."
+msgstr ""
+
+#. lithium\util\socket\Stream
+msgid "A PHP stream-based socket adapter"
+msgstr ""
+
+#. lithium\util\socket\Stream
+msgid "This stream adapter provides the required method implementations of the abstract Socket class\nfor `open`, `close`, `read`, `write`, `timeout` `eof` and `encoding`."
+msgstr ""
+
+#. lithium\util\socket\Stream::open()
+msgid "Opens a socket and initializes the internal resource handle."
+msgstr ""
+
+#. lithium\util\socket\Stream::open()
+msgid "mixed False if the Socket configuration does not contain the\n\t\t   'protocol' or 'host' settings,  socket resource otherwise."
+msgstr ""
+
+#. lithium\util\socket\Stream::close()
+msgid "Closes the stream"
+msgstr ""
+
+#. lithium\util\socket\Stream::eof()
+msgid "Determines if the socket resource is at EOF."
+msgstr ""
+
+#. lithium\util\socket\Stream::eof()
+msgid "boolean True if resource pointer is at EOF, false otherwise."
+msgstr ""
+
+#. lithium\util\socket\Stream::read()
+msgid "Reads data from the stream resource"
+msgstr ""
+
+#. lithium\util\socket\Stream::read()
+msgid "string Returns string read from stream resource on success, false otherwise."
+msgstr ""
+
+#. lithium\util\socket\Stream::read()
+msgid "If specified, will read up to $length bytes from the stream.\n       If no value is specified, all remaining bytes in the buffer will be read."
+msgstr ""
+
+#. lithium\util\socket\Stream::read()
+msgid "Seek to the specified byte offset before reading."
+msgstr ""
+
+#. lithium\util\socket\Stream::write()
+msgid "writes data to the stream resource"
+msgstr ""
+
+#. lithium\util\socket\Stream::write()
+msgid "mixed False on error, number of bytes written otherwise."
+msgstr ""
+
+#. lithium\util\socket\Stream::timeout()
+msgid "Set timeout period on a stream"
+msgstr ""
+
+#. lithium\util\socket\Stream::encoding()
+msgid "Sets the character set for stream encoding"
+msgstr ""
+
+#. lithium\util\socket\Stream::encoding()
+msgid "Note: This function only exists in PHP 6. For PHP < 6, this method will return void."
+msgstr ""
+
+#. lithium\util\socket\Stream::encoding()
+msgid "mixed Returns void if `stream_encoding` method does not exist, boolean\n        result of `stream_encoding` otherwise."
+msgstr ""
+
+#. lithium\util\reflection\Coverage
+msgid "Runs documentation coverage analysis for classes, properties and methods.\n\nNote: Currently unimplemented"
+msgstr ""
+
+#. lithium\util\reflection\Coverage::check()
+msgid "Currently unimplemented"
+msgstr ""
+
+#. lithium\util\reflection\Docblock
+msgid "A source code doc block parser.\n\nThis parser may be used as the basis for a variety of secondary tools, including\na reflection-based API generator, a code metrics analyzer, and various other possible\nuse cases."
+msgstr ""
+
+#. lithium\util\reflection\Docblock::comment()
+msgid "Parses a doc block into its major components of `description`, `text` and `tags`."
+msgstr ""
+
+#. lithium\util\reflection\Docblock::comment()
+msgid "array An associative array of the parsed comment, whose keys are `description`,\n        `text` and `tags`"
+msgstr ""
+
+#. lithium\util\reflection\Docblock::parse()
+msgid "Parses @<tagname> and their descriptions from a doc block."
+msgstr ""
+
+#. lithium\util\reflection\Docblock::parse()
+msgid "Currently supported tags are `todo`, `discuss`, `fix` and `important`."
+msgstr ""
+
+#. lithium\util\reflection\Docblock::parse()
+msgid "array A numerically indexed array of a associative arrays, with `type`, `text`\n        and `line` keys."
+msgstr ""
+
+#. lithium\util\reflection\Docblock::parse()
+msgid "The string to be parsed for tags"
+msgstr ""
+
+#. lithium\util\reflection\Docblock::parse()
+msgid "Options array."
+msgstr ""
+
+#. lithium\util\reflection\Inspector
+msgid "General source code inspector\n\nThis inspector provides a simple interface to the PHP Reflection API that\ncan be used to gather information about any PHP source file for purposes of\ntest metrics, static analysis or any number of possible use cases."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::type()
+msgid "Determines if a given $identifier is a class property, a class method, a class itself,\nor a namespace identifier."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::type()
+msgid "string Identifier type. One of `property`, `method`, `class` or `namespace`."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::info()
+msgid "Detailed source code identifier analysis"
+msgstr ""
+
+#. lithium\util\reflection\Inspector::info()
+msgid "Analyzes a passed $identifier for more detailed information such\nas method/property modifiers (e.g. `public`, `private`, `abstract`)"
+msgstr ""
+
+#. lithium\util\reflection\Inspector::info()
+msgid "array An array of the parsed meta-data information of the given identifier."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::info()
+msgid "The identifier to be analyzed"
+msgstr ""
+
+#. lithium\util\reflection\Inspector::info()
+msgid "Optionally restrict or expand the default information\n       returned from the `info` method. By default, the information returned\n       is the same as the array keys contained in the `$_methodMap` property of\n       Inspector."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::executable()
+msgid "Gets the executable lines of a class, by examining the start and end lines of each method."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::executable()
+msgid "array Returns an array of the executable line numbers of the class."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::executable()
+msgid "Class name as a string or object instance."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::executable()
+msgid "Set of options:\n       -'self': If true (default), only returns lines of methods defined in `$class`,\n        excluding methods from inherited classes.\n       -'methods': An arbitrary list of methods to search, as a string (single method name)\n        or array of method names.\n       -'filter': If true, filters out lines containing only whitespace or braces. Note: for\n        some reason, the Zend engine does not report `switch` and `try` statements as\n        executable lines, as well as parts of multi-line assignment statements, so they are\n        filtered out as well."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::methods()
+msgid "Returns various information on the methods of an object, in different formats."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::methods()
+msgid "A string class name or an object instance, from which to get methods."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::methods()
+msgid "The type and format of data to return. Available options are:\n\n - `null`: Returns a `Collection` object containing a `ReflectionMethod` instance\n        for each method.\n\n - `'extents'`: Returns a two-dimensional array with method names as keys, and\n        an array with starting and ending line numbers as values.\n\n - `'ranges'`: Returns a two-dimensional array where each key is a method name,\n        and each value is an array of line numbers which are contained in the method."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::lines()
+msgid "Returns an array of lines from a file, class, or arbitrary string, where $data is the data\nto read the lines from and $lines is an array of line numbers specifying which lines should\nbe read."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::lines()
+msgid "array Returns an array where the keys are matching `$lines`, and the values are the\n        corresponding line numbers in `$data`."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::lines()
+msgid "If `$data` contains newlines, it will be read from directly, and have\n       its own lines returned.  If `$data` is a physical file path, that file will be\n       read and have its lines returned.  If `$data` is a class name, it will be\n       converted into a physical file path and read."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::lines()
+msgid "The array of lines to read. If a given line is not present in the data,\n       it will be silently ignored."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::parents()
+msgid "Gets the full inheritance list for the given class."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::parents()
+msgid "array An array of the name of the parent classes of the passed `$class` parameter,\n        or false on error."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::parents()
+msgid "Class whose inheritance chain will be returned"
+msgstr ""
+
+#. lithium\util\reflection\Inspector::parents()
+msgid "Option consists of:\n       -'autoLoad': Whether or not to call __autoload by default. Defaults to true."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::classes()
+msgid "Gets an array of classes and their corresponding definition files, or examines a file and\nreturns the classes it defines."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::classes()
+msgid "array Associative of classes and their corresponding definition files"
+msgstr ""
+
+#. lithium\util\reflection\Inspector::dependencies()
+msgid "Gets the static and dynamic dependencies for a class or group of classes."
+msgstr ""
+
+#. lithium\util\reflection\Inspector::dependencies()
+msgid "array An array of the static and dynamic class dependencies"
+msgstr ""
+
+#. lithium\util\reflection\Inspector::dependencies()
+msgid "Either a string specifying a class, or a numerically indexed array\n       of classes"
+msgstr ""
+
+#. lithium\util\reflection\Parser::token()
+msgid "Convenience method to get the token name of a PHP code string. If multiple tokens are\npresent in the string, only the first is returned."
+msgstr ""
+
+#. lithium\util\reflection\Parser::token()
+msgid "String of PHP code to get the token name of, i.e. `'=>'` or `'static'`."
+msgstr ""
+
+#. lithium\util\reflection\Parser::find()
+msgid "Finds a pattern in a block of code."
+msgstr ""
+
+#. lithium\util\reflection\Parser::find()
+msgid "The list of options to be used when parsing / matching `$code`:\n\n - 'ignore': An array of token names to ignore while parsing, defaults to\n              `array('T_WHITESPACE')`\n\n - 'lineBreaks': If true, all tokens in a single pattern match must appear on the\n               same line of code, defaults to false\n\n - 'startOfLine': If true, the pattern must match starting with the beginning of\n               the line of code to be matched, defaults to false"
+msgstr ""
+
+#. lithium\util\collection\Filters
+msgid "The `Filters` class is the basis of Lithium's method filtering system: an efficient way to enable\nevent-driven communication between classes without tight coupling and without depending on a\ncentralized publish/subscribe system."
+msgstr ""
+
+#. lithium\util\collection\Filters
+msgid "In Lithium itself, when creating a method that can be filtered, a method is implemented as a\n[ closure](http://us2.php.net/manual/en/functions.anonymous.php) and is passed to either\n`Object::_filter()` or `StaticObject::_filter()`. Each object internally maintains its own list\nof filters, which are applied in these methods and passed to `Filters::run()`.\n\nWhen implementing a custom filter system outside of Lithium, you can create your own list of\nfilters, and pass it to `$options['items']` in the `run()` method.\n\nWhen creating a filter to apply to a method, you need the name of the method you want to call,\nalong with a **closure**, that defines what you want the filter to do.  All filters take the same\n3 parameters: `$self`,`$params`, and `$chain`.\n\n - `$self`: If the filter is applied on an object instance, then `$self` will be that instance. If\napplied to a static class, then `$self` will be a string containing the fully-namespaced class\nname.\n\n - `$params`: Contains an associative array of the parameters that are passed into the method. You\ncan modify or inspect these parameters before allowing the method to continue.\n\n - `$chain`: Finally, `$chain` contains the list of filters in line to be executed (as an\ninstance of the `Filters` class).  At the bottom of `$chain` is the method itself.  This is why\nmost filters contain a line that looks like this:\n\n{{{return $chain->next($self, $params, $chain);}}}\n\nThis passes control to the next filter in the chain, and finally, to the method itself.  This\nallows you to interact with the return value as well as the parameters.\n\nWithin the framework, you can call `applyFilter()` on any object (static or instantiated) and\npass the name of the method you would like to filter, along with the filter itself. For example:\n\n{{{use \\lithium\\action\\Dispatcher;\n\nDispatcher::applyFilter('run', function($self, $params, $chain) {\n\t// Custom pre-dispatch logic goes here\n\t$response = $chain->next($self, $params, $chain);\n\n\t// $response now contains a Response object with the result of the dispatched request,\n\t// and can be modified as appropriate\n\t// ...\n\treturn $response;\n});}}}\n\nThe logic in the closure will now be executed on every call to `Dispatcher::run()`, and\n`$response` will always be modified by any custom logic present before being returned from\n`run()`."
+msgstr ""
+
+#. lithium\util\collection\Filters::run()
+msgid "Collects a set of filters to iterate. Creates a filter chain for the given class/method,\nexecutes it, and returns the value."
+msgstr ""
+
+#. lithium\util\collection\Filters::run()
+msgid "Returns the value returned by the first closure in `$options['items`]`."
+msgstr ""
+
+#. lithium\util\collection\Filters::run()
+msgid "The class for which this filter chain is being created. If this is the\n       result of a static method call, `$class` should be a string. Otherwise, it should\n       be the instance of the object making the call."
+msgstr ""
+
+#. lithium\util\collection\Filters::run()
+msgid "An associative array of the given method's parameters."
+msgstr ""
+
+#. lithium\util\collection\Filters::run()
+msgid "The configuration options with which to create the filter chain.\n       Mainly, these options allow the `Filters` object to be queried for details such as\n       which class / method initiated it. Available keys:\n\n       -'class': The name of the class that initiated the filter chain.\n       -'method': The name of the method that initiated the filter chain.\n       -'items': An array of callable objects (usually closures) to be iterated through.\n         By default, execution will be nested such that the first item will be executed\n         first, and will be the last to return."
+msgstr ""
+
+#. lithium\util\collection\Filters::next()
+msgid "Provides short-hand convenience syntax for filter chaining."
+msgstr ""
+
+#. lithium\util\collection\Filters::next()
+msgid "mixed Returns the return value of the next filter in the chain."
+msgstr ""
+
+#. lithium\util\collection\Filters::next()
+msgid "The object instance that owns the filtered method."
+msgstr ""
+
+#. lithium\util\collection\Filters::next()
+msgid "An associative array containing the parameters passed to the filtered\n             method."
+msgstr ""
+
+#. lithium\util\collection\Filters::next()
+msgid "The Filters object instance containing this chain of filters."
+msgstr ""
+
+#. lithium\util\collection\Filters::method()
+msgid "Gets the method name associated with this filter chain.  This is the method being filtered."
+msgstr ""
+
+#. lithium\util\audit\Debugger::trace()
+msgid "Outputs a stack trace based on the supplied options."
+msgstr ""
+
+#. lithium\util\audit\Debugger::trace()
+msgid "string|array Stack trace formatted according to `'format'` option."
+msgstr ""
+
+#. lithium\util\audit\Debugger::export()
+msgid "Returns a parseable string represantation of a variable.."
+msgstr ""
+
+#. lithium\util\audit\Debugger::export()
+msgid "string The exported contents."
+msgstr ""
+
+#. lithium\util\audit\Logger::write()
+msgid "Writes $message to the log specified by the $name\nconfiguration."
+msgstr ""
+
+#. lithium\util\audit\Logger::write()
+msgid "@param  string $name    Configuration to be used for writing\n@param  string $message Message to be written"
+msgstr ""
+
+#. lithium\util\audit\Logger::write()
+msgid "boolean         True on successful write, false otherwise"
+msgstr ""
+
+#. lithium\util\audit\Logger::write()
+msgid "   Configuration to be used for writing"
+msgstr ""
+
+#. lithium\util\audit\Logger::write()
+msgid "Message to be written"
+msgstr ""
+
+#. lithium\util\audit\Logger::adapter()
+msgid "Returns adapter for given named configuration"
+msgstr ""
+
+#. lithium\util\audit\Logger::adapter()
+msgid "@param  string $name Cache configuration name"
+msgstr ""
+
+#. lithium\util\audit\Logger::adapter()
+msgid "object       Adapter for named configuration"
+msgstr ""
+
+#. lithium\util\audit\Logger::__init()
+msgid "Initialization of static class"
+msgstr ""
+
+#. lithium\util\audit\Logger::config()
+msgid "Sets configurations for a particular adaptable implementation, or returns\nthe current configuration settings."
+msgstr ""
+
+#. lithium\util\audit\Logger::config()
+msgid "@param  array  $config Configurations, indexed by name"
+msgstr ""
+
+#. lithium\util\audit\Logger::config()
+msgid "object         Collection of configurations"
+msgstr ""
+
+#. lithium\util\audit\Logger::reset()
+msgid "Clears configurations"
+msgstr ""
+
+#. lithium\util\audit\Logger::enabled()
+msgid "Determines if the adapter specified in the named configuration\nis enabled."
+msgstr ""
+
+#. lithium\util\audit\Logger::enabled()
+msgid "`Enabled` can mean various things, e.g. having a PECL memcached\nextension compiled & loaded, as well as having the memcache server\nup & available.\n\n@param  string  $name The cache configuration whose adapter will be checked"
+msgstr ""
+
+#. lithium\util\audit\Logger::enabled()
+msgid "mixed         True if adapter is enabled, false if not. This method\n                      will return null if no configuration under the given $name\n                      exists."
+msgstr ""
+
+#. lithium\util\audit\logger\adapters\File::__construct()
+msgid "Class constructor"
+msgstr ""
+
+#. lithium\util\audit\logger\adapters\File::write()
+msgid "Appends $data to file $type."
+msgstr ""
+
+#. lithium\util\audit\logger\adapters\File::write()
+msgid "boolean True on successful write, false otherwise"
+msgstr ""
+
+#. lithium\test\Controller
+msgid "Controller for reporting test results in html"
+msgstr ""
+
+#. lithium\test\Controller::__invoke()
+msgid "undocumented function"
+msgstr ""
+
+#. lithium\test\Dispatcher
+msgid "The Lithium Test Dispatcher\n\nThis Dispatcher is used exclusively for the purpose of running, organizing and compiling\nstatistics for the built-in Lithium test suite."
+msgstr ""
+
+#. lithium\test\Dispatcher::run()
+msgid "Runs a test group or a specific test file based on the passed\nparameters."
+msgstr ""
+
+#. lithium\test\Dispatcher::run()
+msgid "array A compact array of the title, an array of the results, as well\n        as an additional array of the results after the $options['filters']\n        have been applied."
+msgstr ""
+
+#. lithium\test\Group
+msgid "Group Test Collection"
+msgstr ""
+
+#. lithium\test\Group::all()
+msgid "Get all tests"
+msgstr ""
+
+#. lithium\test\Group::add()
+msgid "Add a tests to the group"
+msgstr ""
+
+#. lithium\test\Group::tests()
+msgid "Get the collection of tests"
+msgstr ""
+
+#. lithium\test\Group::tests()
+msgid "lithium\\util\\Collection"
+msgstr ""
+
+#. lithium\test\Report
+msgid "Report object for running group tests holding results"
+msgstr ""
+
+#. lithium\test\Report::__construct()
+msgid "Construct Report Object"
+msgstr ""
+
+#. lithium\test\Report::$group
+msgid "Contains an instance of `lithium\\test\\Group`, which contains all unit tests to be executed\nthis test run."
+msgstr ""
+
+#. lithium\test\Report::$reporter
+msgid "Contains an instance of `lithium\\test\\Reporter`, which contains the format to be displayed"
+msgstr ""
+
+#. lithium\test\Report::$filters
+msgid "An array of fully-namespaced class names representing the filters to be applied to this test\ngroup."
+msgstr ""
+
+#. lithium\test\Report::$title
+msgid "Title of the group being run"
+msgstr ""
+
+#. lithium\test\Report::$results
+msgid "group and filter results"
+msgstr ""
+
+#. lithium\test\Report::$timer
+msgid "start and end timers"
+msgstr ""
+
+#. lithium\test\Reporter
+msgid "Reporter class to handle test report output"
+msgstr ""
+
+#. lithium\test\Reporter::menu()
+msgid "return menu as a string to be used as render"
+msgstr ""
+
+#. lithium\test\Unit
+msgid "This is the base class for all test cases. Test are performed using an assertion method. If the\nassertion is correct, the test passes, otherwise it fails.\nMost assertions take an expected result, a received result, and a message (to describe the\nfailure) as parameters.\n\nAvailable assertions are (see `assert&lt;assertion-name&gt;` methods for details): Equal, False, Identical,\nNoPattern, NotEqual, Null, Pattern, Tags, True.\n\nIf an assertion is expected to produce an exception, the `expectException` method should be\ncalled before it."
+msgstr ""
+
+#. lithium\test\Unit::run()
+msgid "Runs the test methods in this test case, with the given options."
+msgstr ""
+
+#. lithium\test\Unit::subject()
+msgid "Returns the class name that is the subject under test for this test case."
+msgstr ""
+
+#. lithium\test\Unit::skip()
+msgid "Subclasses should use this method to set conditions that, if failed, terminate further\ntesting."
+msgstr ""
+
+#. lithium\test\Unit::skip()
+msgid "For example:\n{{{\npublic function skip() {\n\t$this->_dbConfig = Connections::get('default', array('config' => true));\n\t$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'MySql');\n\t$message = 'Test database is either unavailable, or not using a MySQL adapter';\n\t$this->skipIf(!$hasDb, $message);\n}\n}}}"
+msgstr ""
+
+#. lithium\test\Unit::skipIf()
+msgid "Skips test(s) if the condition is met."
+msgstr ""
+
+#. lithium\test\Unit::skipIf()
+msgid "When used within a subclass' `skip` method, all tests are ignored if the condition is met,\notherwise processing continues as normal.\nFor other methods, only the remainder of the method is skipped, when the condition is met."
+msgstr ""
+
+#. lithium\test\Unit::skipIf()
+msgid "Message to pass if the condition is met."
+msgstr ""
+
+#. lithium\test\Unit::assertEqual()
+msgid "Checks that the actual result is equal, but not neccessarily identical, to the expected\nresult."
+msgstr ""
+
+#. lithium\test\Unit::assertNotEqual()
+msgid "Checks that the actual result and the expected result are not equal to each other."
+msgstr ""
+
+#. lithium\test\Unit::assertIdentical()
+msgid "Checks that the actual result and the expected result are identical."
+msgstr ""
+
+#. lithium\test\Unit::assertTrue()
+msgid "Checks that the result evalutes to true."
+msgstr ""
+
+#. lithium\test\Unit::assertTrue()
+msgid "For example:\n{{{\n$this->assertTrue('false', 'String has content');\n}}}\n{{{\n$this->assertTrue(10, 'Non-Zero value');\n}}}\n{{{\n$this->assertTrue(true, 'Boolean true');\n}}}\nall evaluate to true."
+msgstr ""
+
+#. lithium\test\Unit::assertFalse()
+msgid "Checks that the result evalutes to false."
+msgstr ""
+
+#. lithium\test\Unit::assertFalse()
+msgid "For example:\n{{{\n$this->assertFalse('', 'String is empty');\n}}}\n\n{{{\n$this->assertFalse(0, 'Zero value');\n}}}\n\n{{{\n$this->assertFalse(false, 'Zero value');\n}}}\nall evaluate to false."
+msgstr ""
+
+#. lithium\test\Unit::assertNull()
+msgid "Checks if the result is null."
+msgstr ""
+
+#. lithium\test\Unit::assertNoPattern()
+msgid "Tests a for result that does NOT match the expected regular expression pattern"
+msgstr ""
+
+#. lithium\test\Unit::assertPattern()
+msgid "Tests a for result match in the expected regular expression pattern"
+msgstr ""
+
+#. lithium\test\Unit::assertTags()
+msgid "Takes an array $expected and generates a regex from it to match the provided $string.\nSamples for $expected:"
+msgstr ""
+
+#. lithium\test\Unit::assertTags()
+msgid "Checks for an input tag with a name attribute (contains any non-empty value) and an id\nattribute that contains 'my-input':\n\tarray('input' => array('name', 'id' => 'my-input'))\n\nChecks for two p elements with some text in them:\n\tarray(\n\t\tarray('p' => true),\n\t\t'textA',\n\t\t'/p',\n\t\tarray('p' => true),\n\t\t'textB',\n\t\t'/p'\n\t)\n\nYou can also specify a pattern expression as part of the attribute values, or the tag\nbeing defined, if you prepend the value with preg: and enclose it with slashes, like so:\n\tarray(\n \tarray('input' => array('name', 'id' => 'preg:/FieldName\\d+/')),\n \t'preg:/My\\s+field/'\n\t)\n\nImportant: This function is very forgiving about whitespace and also accepts any\npermutation of attribute order. It will also allow whitespaces between specified tags."
+msgstr ""
+
+#. lithium\test\Unit::assertTags()
+msgid "An HTML/XHTML/XML string"
+msgstr ""
+
+#. lithium\test\Unit::assertTags()
+msgid "An array, see above"
+msgstr ""
+
+#. lithium\test\Unit::assertTags()
+msgid "SimpleTest failure output string"
+msgstr ""
+
+#. lithium\test\Unit::expectException()
+msgid "Used before a call to `assert*()` if you expect the test assertion to generate an exception\nor PHP error.  If no error or exception is thrown, a test failure will be reported.  Can\nbe called multiple times per assertion, if more than one error is expected."
+msgstr ""
+
+#. lithium\test\reporter\Html
+msgid "Html Reporter"
+msgstr ""
+
+#. lithium\test\filters\Complexity
+msgid "Calculates the cyclomatic complexity of class methods, and shows worst-offenders and statistics."
+msgstr ""
+
+#. lithium\test\filters\Complexity::apply()
+msgid "Takes an instance of `test\\Group` containing one or more test cases introspects the test\nsubject classes to extract cyclomatic complexity data."
+msgstr ""
+
+#. lithium\test\filters\Complexity::apply()
+msgid "object Returns the value of the `$object` parameter."
+msgstr ""
+
+#. lithium\test\filters\Complexity::apply()
+msgid "Instance of `Group` containing instances of `lithium\\test\\Unit`."
+msgstr ""
+
+#. lithium\test\filters\Complexity::apply()
+msgid "Not implemented"
+msgstr ""
+
+#. lithium\test\filters\Coverage
+msgid "Runs code coverage analysis for the executed tests."
+msgstr ""
+
+#. lithium\test\filters\Coverage::apply()
+msgid "Takes an instance of an object (usually a Collection object) containing unit test case\ninstances.  Attaches code coverage filtering to test cases."
+msgstr ""
+
+#. lithium\test\filters\Coverage::apply()
+msgid "object Returns the instance of $object with code coverage analysis triggers applied."
+msgstr ""
+
+#. lithium\test\filters\Coverage::apply()
+msgid "Instance of Collection containing instances of lithium\\test\\Unit"
+msgstr ""
+
+#. lithium\test\filters\Coverage::apply()
+msgid "Options for how code coverage should be applied. These options are\n             also passed to `Coverage::collect()` to determine how to aggregate results. See\n             the documentation for `collect()` for further options.  Options affecting this\n             method are:\n             -'method': The name of method to attach to, defaults to 'run'."
+msgstr ""
+
+#. lithium\test\filters\Coverage::collect()
+msgid "Collects code coverage analysis results from `xdebug_get_code_coverage()`."
+msgstr ""
+
+#. lithium\test\filters\Coverage::collect()
+msgid "Class name that these test results correspond to."
+msgstr ""
+
+#. lithium\test\filters\Coverage::collect()
+msgid "A results array from `xdebug_get_code_coverage()`."
+msgstr ""
+
+#. lithium\test\filters\Coverage::collect()
+msgid "Set of options defining how results should be collected."
+msgstr ""
+
+#. lithium\test\filters\Coverage::analyze()
+msgid "Analyzes code coverage results collected from XDebug, and performs coverage density analysis."
+msgstr ""
+
+#. lithium\test\filters\Coverage::analyze()
+msgid "array Returns an array indexed by file and line, showing the number of instances\n              each line was called."
+msgstr ""
+
+#. lithium\test\filters\Coverage::output()
+msgid "Outputs the coverage analysis to a specific format"
+msgstr ""
+
+#. lithium\test\filters\Coverage::output()
+#. lithium\test\filters\Coverage::stats()
+msgid "[required] html,txt"
+msgstr ""
+
+#. lithium\test\filters\Coverage::output()
+msgid "[required] from Coverage::analysis()"
+msgstr ""
+
+#. lithium\test\filters\Coverage::stats()
+msgid "Returns header for stats"
+msgstr ""
+
+#. lithium\test\filters\Coverage::stats()
+msgid "[required] class name"
+msgstr ""
+
+#. lithium\test\filters\Coverage::stats()
+msgid "[required] from output"
+msgstr ""
+
+#. lithium\test\filters\Profiler::__init()
+msgid "Verifies that the corresponding function exists for each built-in profiler check.\nInitializes display formatters."
+msgstr ""
+
+#. lithium\test\filters\Profiler::check()
+msgid "Add, remove, or modify a profiler check."
+msgstr ""
+
+#. lithium\template\Helper::escape()
+msgid "Escapes values according to the output type of the rendering context. Helpers that output to\nnon-HTML/XML contexts should override this method accordingly."
+msgstr ""
+
+#. lithium\template\Helper::$contentMap
+msgid "Maps helper method names to content types as defined by the `Media` class, where key are\nmethod names, and values are the content type that the method name outputs a link to."
+msgstr ""
+
+#. lithium\template\view\Renderer::__call()
+msgid "Dispatches method calls for (a) rendering context values or (b) applying handlers to pieces\nof content. If `$method` is a key in `Renderer::$_context`, the corresponding context value\nwill be returned (with the value run through a matching handler if one is available). If\n`$method` is a key in `Renderer::$_handlers`, the value passed as the first parameter in the\nmethod call will be passed through the handler and returned."
+msgstr ""
+
+#. lithium\template\view\Renderer::__call()
+msgid "The method name to call, usually either a rendering context value or a\n              content handler."
+msgstr ""
+
+#. lithium\template\view\Renderer::helper()
+msgid "Brokers access to helpers attached to this rendering context, and loads helpers on-demand if\nthey are not available."
+msgstr ""
+
+#. lithium\template\view\Renderer::helper()
+msgid "object"
+msgstr ""
+
+#. lithium\template\view\Renderer::helper()
+msgid "Helper name"
+msgstr ""
+
+#. lithium\template\view\Renderer::strings()
+msgid "Manages template strings."
+msgstr ""
+
+#. lithium\template\view\Renderer::context()
+msgid "Returns either one or all context values for this rendering context. Context values persist\nacross all templates rendered in the current context, and are usually outputted in a layout\ntemplate."
+msgstr ""
+
+#. lithium\template\view\Renderer::context()
+msgid "mixed A string or array, depending on whether `$property` is specified."
+msgstr ""
+
+#. lithium\template\view\Renderer::handlers()
+msgid "Gets or adds content handlers from/to this rendering context, depending on the value of\n`$handlers`.  For more on how to implement handlers and the various types, see\n`applyHandler()`."
+msgstr ""
+
+#. lithium\template\view\Renderer::handlers()
+msgid "mixed Returns an array of handlers or a single handler reference, depending on the\n              value of `$handlers`."
+msgstr ""
+
+#. lithium\template\view\Renderer::applyHandler()
+msgid "Filters a piece of content through a content handler.  A handler can be:\n- a string containing the name of a method defined in `$helper`. The method is called with 3\n  parameters: the value to be handled, the helper method called (`$method`) and the\n  `$options` that were passed into `applyHandler`.\n- an array where the first element is an object reference, and the second element is a method\n  name.  The method name given will be called on the object with the same parameters as\n  above.\n- a closure, which takes the value as the first parameter, an array containing an instance of\n  the calling helper and the calling method name as the second, and `$options` as the third.\nIn all cases, handlers should return the transformed version of `$value`."
+msgstr ""
+
+#. lithium\template\view\Renderer::applyHandler()
+msgid "mixed The transformed value of `$value`, after it has been processed by a handler."
+msgstr ""
+
+#. lithium\template\view\Renderer::applyHandler()
+msgid "The instance of the object (usually a helper) that is invoking "
+msgstr ""
+
+#. lithium\template\view\Renderer::applyHandler()
+msgid "The object (helper) method which is applying the handler to the content"
+msgstr ""
+
+#. lithium\template\view\Renderer::applyHandler()
+msgid "The name of the value to which the handler is applied, i.e. `'url'`,\n              `'path'` or `'title'`."
+msgstr ""
+
+#. lithium\template\view\Renderer::applyHandler()
+msgid "The value to be transformed by the handler, which is ultimately returned."
+msgstr ""
+
+#. lithium\template\view\Renderer::applyHandler()
+msgid "Any options which should be passed to the handler used in this call."
+msgstr ""
+
+#. lithium\template\view\Renderer::request()
+msgid "Returns the `Request` object associated with this rendering context."
+msgstr ""
+
+#. lithium\template\view\Renderer::request()
+msgid "object Returns an instance of `lithium\\action\\Request`, which provides the context\n        for URLs, etc. which are generated in any templates rendered by this context."
+msgstr ""
+
+#. lithium\template\view\Stream
+msgid "Stream wrapper implementation based on the example provided at\nhttp://us3.php.net/manual/en/stream.streamwrapper.example-1.php, and inspired by the work of\nPaul M. Jones (http://paul-m-jones.com/) and Mike Naberezny (http://mikenaberezny.com/).\n\nEnables pure PHP template files to auto-escape output and implement custom content filtering."
+msgstr ""
+
+#. lithium\template\view\adapters\File
+msgid "The File adapter implements both template loading and rendering, and uses the `view\\Stream` class\nto auto-escape template output with short tags (i.e. <?=)."
+msgstr ""
+
+#. lithium\template\view\adapters\File
+msgid "For more information about implementing your own template loaders or renderers, see the\n`lithium\\template\\View` class."
+msgstr ""
+
+#. lithium\template\view\adapters\File::render()
+msgid "Renders content from a template file provided by `template()`."
+msgstr ""
+
+#. lithium\template\view\adapters\File::template()
+msgid "Returns a template file name"
+msgstr ""
+
+#. lithium\template\view\adapters\Simple
+msgid "This view adapter renders content using simple string substitution, and is only useful for very\nsimple templates (no conditionals or looping) or testing."
+msgstr ""
+
+#. lithium\template\view\adapters\Simple::template()
+msgid "Returns a template string"
+msgstr ""
+
+#. lithium\template\helpers\Form
+msgid "A helper class to facilitate generating, processing and securing HTML forms. By default, `Form`\nwill simply generate HTML forms and widgets, but by creating a form with a _binding object_,\nthe helper can pre-fill form input values, render error messages, and introspect column types.\n\nFor example:\n{{{// In controller code:\n$post = Post::find(1);\nreturn compact('post');\n\n// In view code:\n<?=@$this->form->create($post); // Echoes a <form> tag and binds the helper to $post ?>\n<?=@$this->form->text('title'); // Echoes an <input /> element, pre-filled with $post's title ?>\n<?=@$this->form->submit('Update'); // Echoes a submit button with the title 'Update' ?>\n<?=@$this->form->end(); // Echoes a </form> tag & unbinds the form ?>\n}}}"
+msgstr ""
+
+#. lithium\template\helpers\Form::config()
+msgid "Allows you to configure a default set of options which are included on a per-method basis,\nand configure method template overrides."
+msgstr ""
+
+#. lithium\template\helpers\Form::config()
+msgid "To force all `<label />` elements to have a default `class` attribute value of `\"foo\"`,\nsimply do the following:\n\n{{{\n$this->form->config(array('label' => array('class' => 'foo')));\n}}}"
+msgstr ""
+
+#. lithium\template\helpers\Form::config()
+msgid "array Returns an array containing the currently set per-method configurations, and\n        an array of the currently set template overrides (in the `'templates'` array key)."
+msgstr ""
+
+#. lithium\template\helpers\Form::create()
+msgid "Creates an HTML form, and optionally binds it to a data object which contains information on\nhow to render form fields, any data to pre-populate the form with, and any validation errors.\nTypically, a data object will be a `Record` object returned from a `Model`, but you can\ndefine your own custom objects as well. For more information on custom data objects, see\n`lithium\\template\\helpers\\Form::$_binding`."
+msgstr ""
+
+#. lithium\template\helpers\Form::create()
+msgid "string Returns a `<form />` open tag with the `action` attribute defined by either\n        the `'action'` or `'url'` options (defaulting to the current page if none is\n        specified), the HTTP method is defined by the `'type'` option, and any HTML\n        attributes passed in `$options`."
+msgstr ""
+
+#. lithium\template\helpers\Form::submit()
+msgid "Generates an HTML `<input type=\"submit\" />` object."
+msgstr ""
+
+#. lithium\template\helpers\Form::submit()
+msgid "string Returns a submit `<input />` tag with the given title and HTML attributes."
+msgstr ""
+
+#. lithium\template\helpers\Form::submit()
+msgid "The title of the submit button."
+msgstr ""
+
+#. lithium\template\helpers\Form::select()
+msgid "Generates a `<select />` list using the `$list` parameter for the `<option />` tags. The\ndefault selection will be set to the value of `$options['value']`, if specified."
+msgstr ""
+
+#. lithium\template\helpers\Form::select()
+msgid "For example: {{{\n$this->form->select('colors', array(1 => 'red', 2 => 'green', 3 => 'blue'), array(\n\t'id' => 'Colors', 'value' => 2\n));\n// Renders a '<select />' list with options 'red', 'green' and 'blue', with the 'green'\n// option as the selection\n}}}"
+msgstr ""
+
+#. lithium\template\helpers\Form::select()
+msgid "string Returns an HTML `<select />` element."
+msgstr ""
+
+#. lithium\template\helpers\Form::select()
+msgid "The `name` attribute of the `<select />` element."
+msgstr ""
+
+#. lithium\template\helpers\Form::select()
+msgid "An associative array of key/value pairs, which will be used to render the\n             list of options."
+msgstr ""
+
+#. lithium\template\helpers\Form::select()
+msgid "Any HTML attributes that should be associated with the `<select />`\n            element. If the `'value'` key is set, this will be the value of the option\n            that is selected by default."
+msgstr ""
+
+#. lithium\template\helpers\Html
+msgid "A template helper that assists in generating HTML content. Accessible in templates via\n`$this->html`, which will auto-load this helper into the rendering context. For examples of how\nto use this helper, see the documentation for a specific method. For a list of the\ntemplate strings this helper uses, see the `$_strings` property."
+msgstr ""
+
+#. lithium\template\helpers\Html::docType()
+msgid "Returns a doctype string."
+msgstr ""
+
+#. lithium\template\helpers\Html::docType()
+msgid "Possible doctypes:\n\n - `html4-strict`: HTML4 Strict.\n- `html4-trans`: HTML4 Transitional.\n- `html4-frame`: HTML4 Frameset.\n- `xhtml-strict`: XHTML1 Strict.\n- `xhtml-trans`: XHTML1 Transitional.\n- `xhtml-frame`: XHTML1 Frameset.\n- `xhtml11`: XHTML1.1\n\nNote that the HTML5 doctype has been omitted, because the doctype tag is simply\n`<!doctype html>`."
+msgstr ""
+
+#. lithium\template\helpers\Html::docType()
+msgid "string An HTML doctype tag."
+msgstr ""
+
+#. lithium\template\helpers\Html::charset()
+msgid "Returns a charset meta-tag."
+msgstr ""
+
+#. lithium\template\helpers\Html::charset()
+msgid "string A meta tag containing the specified character set."
+msgstr ""
+
+#. lithium\template\helpers\Html::link()
+msgid "Creates an HTML link (`<a />`) or a document meta-link (`<link />`)."
+msgstr ""
+
+#. lithium\template\helpers\Html::link()
+msgid "If `$url` starts with `\"http://\"` or `\"https://\"`, this is treated as an external link.\nOtherwise, it is treated as a path to controller/action and parsed using\nthe `Router::match()` method (where `Router` is the routing class dependency specified by\nthe rendering context, i.e. `lithium\\template\\view\\Renderer::$_classes`).\n\nIf `$url` is empty, `$title` is used in its place."
+msgstr ""
+
+#. lithium\template\helpers\Html::link()
+msgid "string Returns an `<a />` or `<link />` element."
+msgstr ""
+
+#. lithium\template\helpers\Html::link()
+msgid "The content to be wrapped by an `<a />` tag."
+msgstr ""
+
+#. lithium\template\helpers\Html::link()
+msgid "Can be a string representing a URL relative to the base of your Lithium\n             applcation, an external URL (starts with `'http://'` or `'https://'`), an anchor\n             name starting with `'#'` (i.e. `'#top'`), or an array defining a set of request\n             parameters that should be matched against a route in `Router`."
+msgstr ""
+
+#. lithium\template\helpers\Html::link()
+#. lithium\template\helpers\Html::style()
+msgid "Array of HTML attributes."
+msgstr ""
+
+#. lithium\template\helpers\Html::script()
+msgid "Returns a JavaScript include tag (`<script />` element). If the filename is prefixed with\n`\"/\"`, the path will be relative to the base path of your application.  Otherwise, the path\nwill be relative to your JavaScript path, usually `webroot/js`."
+msgstr ""
+
+#. lithium\template\helpers\Html::script()
+msgid "String path to JavaScript file, or an array of paths."
+msgstr ""
+
+#. lithium\template\helpers\Html::style()
+msgid "Creates a link element for CSS stylesheets."
+msgstr ""
+
+#. lithium\template\helpers\Html::style()
+msgid "string CSS <link /> or <style /> tag, depending on the type of link."
+msgstr ""
+
+#. lithium\template\helpers\Html::style()
+msgid "The name of a CSS style sheet in /app/webroot/css, or an array\n             containing names of CSS stylesheets in that directory."
+msgstr ""
+
+#. lithium\template\helpers\Html::image()
+msgid "Creates a formatted <img /> element."
+msgstr ""
+
+#. lithium\template\helpers\Html::image()
+msgid "Path to the image file, relative to the app/webroot/img/ directory."
+msgstr ""
+
+#. lithium\template\helpers\Html::image()
+msgid "of HTML attributes."
+msgstr ""
+
+#. lithium\template\helpers\Html::tag()
+msgid "Returns a formatted block tag, i.e <div />, <span />, <p />."
+msgstr ""
+
+#. lithium\template\helpers\Html::tag()
+msgid "string The formatted tag element"
+msgstr ""
+
+#. lithium\template\helpers\Html::tag()
+msgid "Tag name."
+msgstr ""
+
+#. lithium\template\helpers\Html::tag()
+#. lithium\template\helpers\Html::block()
+msgid "String content that will appear inside the div element.\n  If null, only a start tag will be printed"
+msgstr ""
+
+#. lithium\template\helpers\Html::tag()
+#. lithium\template\helpers\Html::block()
+msgid "Additional HTML attributes of the DIV tag"
+msgstr ""
+
+#. lithium\template\helpers\Html::block()
+msgid "Returns a formatted DIV tag for HTML FORMs."
+msgstr ""
+
+#. lithium\template\helpers\Html::block()
+msgid "string The formatted DIV element"
+msgstr ""
+
+#. lithium\template\helpers\Html::block()
+msgid "CSS class name of the div element."
+msgstr ""
+
+#. lithium\template\helpers\Html::para()
+msgid "Returns a formatted P tag."
+msgstr ""
+
+#. lithium\template\helpers\Html::para()
+msgid "string The formatted P element"
+msgstr ""
+
+#. lithium\template\helpers\Html::para()
+msgid "CSS class name of the p element."
+msgstr ""
+
+#. lithium\template\helpers\Html::para()
+msgid "String content that will appear inside the p element."
+msgstr ""
+
+#. lithium\template\helpers\Html::para()
+msgid "Additional HTML attributes of the P tag"
+msgstr ""
+
+#. lithium\template\helpers\Html::$contentMap
+msgid "Used by output handlers to calculate asset paths in conjunction with the `Media` class."
+msgstr ""
+
+#. lithium\storage\Cache
+msgid "The `Cache` static class provides a consistent interface to configure and utilize the different\ncache adatpers included with Lithium, as well as your own adapters."
+msgstr ""
+
+#. lithium\storage\Cache
+msgid "The Cache layer of Lithium inherits from the common `Adaptable` class, which provides the generic\nconfiguration setting & retrieval logic, as well as the logic required to locate & instantiate\nthe proper adapter class.\n\nIn most cases, you will configure various named cache configurations in your bootstrap process,\nwhich will then be available to you in all other parts of your application.\n\nA simple example configuration:\n\n{{{Cache::config(array(\n    'local' => array('adapter' => 'Apc'),\n    'distributed' => array(\n        'adapter' => 'Memcached',\n        'servers' => array('127.0.0.1', 11211),\n    ),\n    'default' => array('adapter' => 'File')\n));}}}\n\nEach adapter provides a consistent interface for the basic cache operations of `write`, `read`,\n`delete` and `clear`, which can be used interchangably between all adapters. Some adapters (e.g.\nMemcached) provide additional methods that are not consistently available across other adapters.\nTo make use of these, it is always possible to call:\n\n{{{Cache::adapter('named-configuration')->methodName($argument);}}}\n\nThis allows a very wide range of flexibility, at the cost of portability.\n\nFor more information on `Cache` methods and specific adapters, please see their relevant\ndocumentation."
+msgstr ""
+
+#. lithium\storage\Cache::key()
+msgid "Generates the cache key."
+msgstr ""
+
+#. lithium\storage\Cache::key()
+msgid "string     The generated cache key."
+msgstr ""
+
+#. lithium\storage\Cache::key()
+msgid " A string (or lambda/closure that evaluates to a string)\n                   that will be used as the cache key."
+msgstr ""
+
+#. lithium\storage\Cache::key()
+msgid "If a lambda/closure is used as a key and requires arguments,\n                   pass them in here."
+msgstr ""
+
+#. lithium\storage\Cache::write()
+msgid "Writes to the specified cache configuration."
+msgstr ""
+
+#. lithium\storage\Cache::write()
+msgid "@param  string  $name       Configuration to be used for writing\n@param  mixed   $key        Key to uniquely identify the cache entry\n@param  mixed   $data       Data to be cached\n@param  mixed   $conditions Conditions for the write operation to proceed"
+msgstr ""
+
+#. lithium\storage\Cache::write()
+msgid "boolean             True on successful cache write, false otherwise\n@strategy"
+msgstr ""
+
+#. lithium\storage\Cache::read()
+msgid "Reads from the specified cache configuration"
+msgstr ""
+
+#. lithium\storage\Cache::read()
+msgid "@param  string  $name       Configuration to be used for reading\n@param  mixed   $key        Key to be retrieved\n@param  mixed   $conditions Conditions for the read operation to proceed"
+msgstr ""
+
+#. lithium\storage\Cache::read()
+msgid "mixed               Read results on successful cache read, null otherwise"
+msgstr ""
+
+#. lithium\storage\Cache::delete()
+msgid "Delete a value from the specified cache configuration"
+msgstr ""
+
+#. lithium\storage\Cache::delete()
+msgid "@param  string  $name       The cache configuration to delete from\n@param  mixed   $key        Key to be deleted\n@param  mixed   $conditions Conditions for the delete operation to proceed"
+msgstr ""
+
+#. lithium\storage\Cache::delete()
+msgid "boolean             True on successful deletion, false otherwise"
+msgstr ""
+
+#. lithium\storage\Cache::clean()
+msgid "Perform garbage collection on specified cache configuration."
+msgstr ""
+
+#. lithium\storage\Cache::clean()
+msgid "@param  string  $name The cache configuration to be cleaned"
+msgstr ""
+
+#. lithium\storage\Cache::clean()
+msgid "boolean       True on successful clean, false otherwise"
+msgstr ""
+
+#. lithium\storage\Cache::clear()
+msgid "Remove all cache keys from specified confiuration."
+msgstr ""
+
+#. lithium\storage\Cache::clear()
+msgid "@param  string  $name The cache configuration to be cleared"
+msgstr ""
+
+#. lithium\storage\Cache::clear()
+msgid "boolean       True on successful clearing, false otherwise"
+msgstr ""
+
+#. lithium\storage\Cache::adapter()
+msgid "@param  string $name Name of configuration"
+msgstr ""
+
+#. lithium\storage\Session::key()
+msgid "Returns key to be used in session read, write and delete operations"
+msgstr ""
+
+#. lithium\storage\Session::key()
+msgid "@param  mixed $name Named session configuration"
+msgstr ""
+
+#. lithium\storage\Session::key()
+msgid "string      Key"
+msgstr ""
+
+#. lithium\storage\Session::isStarted()
+msgid "Indicates whether the the current request includes information on a previously started\nsession."
+msgstr ""
+
+#. lithium\storage\Session::isStarted()
+msgid "boolean Returns true if a the request includes a key from a previously created\n        session."
+msgstr ""
+
+#. lithium\storage\Session::isValid()
+msgid "Checks the validity of a previously-started session by running several checks, including\ncomparing the session start time to the expiration time set in the configuration, and any\nsecurity settings."
+msgstr ""
+
+#. lithium\storage\Session::isValid()
+msgid "boolean Returns true if the current session is active and valid."
+msgstr ""
+
+#. lithium\storage\Session::write()
+msgid "Writes a persistent value to one or more session stores."
+msgstr ""
+
+#. lithium\storage\Session::delete()
+msgid "Deletes a named key from a single adapter (if a `'name'` option is specified) or all\nsession adapters."
+msgstr ""
+
+#. lithium\storage\Session::delete()
+msgid "The name of the session key to delete"
+msgstr ""
+
+#. lithium\storage\Session::check()
+msgid "Checks if a session key is set in any adapter, or if a particular adapter configuration is\nspecified (via `'name'` in `$options`), only that configuration is checked."
+msgstr ""
+
+#. lithium\storage\Session::check()
+msgid "The session key to check."
+msgstr ""
+
+#. lithium\storage\Session::clear()
+msgid "Clears all named session configurations"
+msgstr ""
+
+#. lithium\storage\Session::adapter()
+msgid "@param  string $name"
+msgstr ""
+
+#. lithium\storage\session\adapters\Memory
+msgid "Simple memory session storage engine. Used for testing."
+msgstr ""
+
+#. lithium\storage\session\adapters\Memory::enabled()
+msgid "This adapter is always enabled, as it has no external dependencies."
+msgstr ""
+
+#. lithium\storage\session\adapters\Memory::enabled()
+msgid "boolean True"
+msgstr ""
+
+#. lithium\storage\session\adapters\Php
+msgid "A minimal adapter to interface with native PHP sessions.\n\nThis adapter provides basic support for `write`, `read` and `delete`\nsession handling, as well as allowing these three methods to be filtered as\nper the Lithium filtering system."
+msgstr ""
+
+#. lithium\storage\session\adapters\Php::__construct()
+msgid "Takes care of setting appropriate configurations for\nthis object."
+msgstr ""
+
+#. lithium\storage\session\adapters\Php::isStarted()
+msgid "Obtain the status of the session"
+msgstr ""
+
+#. lithium\storage\session\adapters\Php::isStarted()
+msgid "boolean True if $_SESSION is accessible and if a '_timestamp' key\n                has been set, false otherwise."
+msgstr ""
+
+#. lithium\storage\session\adapters\Php::key()
+msgid "Obtain the session id"
+msgstr ""
+
+#. lithium\storage\session\adapters\Php::key()
+msgid "mixed Session id, or null if the session has not been started."
+msgstr ""
+
+#. lithium\storage\session\adapters\Php::read()
+msgid "Read value from the session"
+msgstr ""
+
+#. lithium\storage\session\adapters\Php::read()
+msgid "mixed             Data in the session if successful, false otherwise"
+msgstr ""
+
+#. lithium\storage\session\adapters\Php::write()
+msgid "Write value to the session"
+msgstr ""
+
+#. lithium\storage\session\adapters\Php::write()
+msgid "@param  string $key        Key of the item to be stored\n@param  mixed  $value      The value to be stored\n@param  array  $options    Options array"
+msgstr ""
+
+#. lithium\storage\session\adapters\Php::write()
+msgid "boolean            True on successful write, false otherwise"
+msgstr ""
+
+#. lithium\storage\session\adapters\Php::delete()
+msgid "Delete value from the session"
+msgstr ""
+
+#. lithium\storage\session\adapters\Php::delete()
+msgid "@param  string  $key\t\tThe key to be deleted\n@param  array   $options Options array"
+msgstr ""
+
+#. lithium\storage\session\adapters\Php::delete()
+msgid "boolean          True on successful delete, false otherwise"
+msgstr ""
+
+#. lithium\storage\session\adapters\Php::enabled()
+msgid "Determines if PHP sessions are enabled.\n\nreturn boolean True if enabled, false otherwise"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Apc
+msgid "An Alternative PHP Cache (APC) cache adapter implementation."
+msgstr ""
+
+#. lithium\storage\cache\adapters\Apc
+msgid "The APC cache adapter is meant to be used through the `Cache` interface,\nwhich abstracts away key generation, adapter instantiation and filter\nimplementation.\n\nThis APC adapter provides basic support for `write`, `read`, `delete`\nand `clear` cache functionality, as well as allowing the first four\nmethods to be filtered as per the Lithium filtering system.\n\nThis adapter stores two keys for each written value - one which consists\nof the data to be cached, and the other being a cache of the expiration time.\nThis is to unify the behavior of the APC adapter to be in line with the other\nadapters, since APC cache expirations are only evaluated on requests subsequent\nto their initial storage.\n\nLearn more about APC in the [PHP APC manual](http://php.net/manual/en/book.apc.php)."
+msgstr ""
+
+#. lithium\storage\cache\adapters\Apc::write()
+msgid "Write value(s) to the cache"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Apc::write()
+msgid "       The key to uniquely identify the cached item"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Apc::write()
+msgid "    A strtotime() compatible cache time"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Apc::read()
+msgid "Read value(s) from the cache"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Apc::read()
+msgid "mixed Cached value if successful, false otherwise"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Apc::delete()
+msgid "Delete value from the cache"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Apc::delete()
+msgid "mixed True on successful delete, false otherwise"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Apc::clear()
+msgid "Clears user-space cache"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Apc::clear()
+msgid "mixed True on successful clear, false otherwise"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Apc::enabled()
+msgid "Determines if the APC extension has been installed and\nif the userspace cache is available.\n\nreturn boolean True if enabled, false otherwise"
+msgstr ""
+
+#. lithium\storage\cache\adapters\File
+msgid "A minimal file-based cache.\n\nThis File adapter provides basic support for `write`, `read`, `delete`\nand `clear` cache functionality, as well as allowing the first four\nmethods to be filtered as per the Lithium filtering system.\n\nThe path that the cached files will be written to defaults to\n`LITHIUM_APP_PATH/tmp/cache`, but is user-configurable on cache configuration.\n\nNote that the cache expiration time is stored within the first few bytes\nof the cached data, and is transparently added and/or removed when values\nare stored and/or retrieved from the cache."
+msgstr ""
+
+#. lithium\storage\cache\adapters\File::enabled()
+msgid "Determines if the File adapter can read and write\nto the configured path.\n\nreturn boolean True if enabled, false otherwise"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memcache
+msgid "A Memcache (libmemcached) cache adapter implementation."
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memcache
+msgid "The Memcache cache adapter is meant to be used through the `Cache` interface,\nwhich abstracts away key generation, adapter instantiation and filter\nimplementation.\n\nA simple configuration of this adapter can be accomplished in `app/config/bootstrap.php`\nas follows:\n\n{{{\nCache::config(array(\n    'cache-config-name' => array(\n        'adapter' => 'Memcached',\n        'servers' => array(\n            array('127.0.0.1', 11211, 100)\n        )\n    )\n));\n}}}\n\nThe 'servers' key accepts entries as arrays, where the format is `array(server, port, [weight])`,\nwith the weight being optional.\n\nThis Memcache adapter provides basic support for `write`, `read`, `delete`\nand `clear` cache functionality, as well as allowing the first four\nmethods to be filtered as per the Lithium filtering system. Additionally,\nThis adapter defines several methods that are _not_ implemented in other\nadapters, and are thus non-portable - see the documentation for `Cache`\nas to how these methods should be accessed.\n\nThis adapter stores two keys for each written value - one which consists\nof the data to be cached, and the other being a cache of the expiration time."
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memcache::__construct()
+msgid "Object constructor.\nInstantiates the Memcached object, adds appropriate servers to the pool,\nand configures any optional settings passed."
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memcache::__construct()
+msgid "@param  array $config Configuration parameters for this cache adapter.\n                      These settings are indexed by name and queryable\n                      through `Cache::config('name')`."
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memcache::decrement()
+msgid "Performs an atomic decrement operation on specified numeric cache item."
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memcache::decrement()
+msgid "Note that, as per the Memcached specification:\n\"If the item's value is not numeric, it is treated as if the value were 0.\nIf the operation would decrease the value below 0, the new value will be 0.\"\n(see http://www.php.net/manual/memcached.decrement.php)"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memcache::decrement()
+msgid "mixed  Item's new value on successful decrement, false otherwise"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memcache::increment()
+msgid "Performs an atomic increment operation on specified numeric cache item."
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memcache::increment()
+msgid "Note that, as per the Memcached specification:\n\"If the item's value is not numeric, it is treated as if the value were 0.\"\n(see http://www.php.net/manual/memcached.decrement.php)"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memcache::increment()
+msgid "mixed  Item's new value on successful increment, false otherwise"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memcache::enabled()
+msgid "Determines if the Memcached extension has been installed and\nproperly started."
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memory
+msgid "A minimal in-memory cache.\n\nThis Memory adapter provides basic support for `write`, `read`, `delete`\nand `clear` cache functionality, as well as allowing the first four\nmethods to be filtered as per the Lithium filtering system.\n\nThis cache adapter does not implement any expiry-based cache invalidation\nlogic, as the cached data will only persist for the lifetime of the current request.\n\nAs a result, this cache adapter is best suited for generic memoization of data, and\nshould not be used for for anything that must persist longer than the current\nrequest cycle."
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memory::__get()
+msgid "Magic method to provide an accessor (getter) to protected class variables."
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memory::__get()
+msgid "@param  string $variable The variable requested"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memory::__get()
+msgid "mixed Variable if it exists, null otherwise."
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memory::read()
+#. lithium\storage\cache\adapters\Memory::write()
+#. lithium\storage\cache\adapters\Memory::delete()
+msgid "Conditions under which the operation should proceed"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memory::clean()
+msgid "Garbage collection (GC) is not enabled for this adapter"
+msgstr ""
+
+#. lithium\storage\cache\adapters\Memory::clean()
+msgid "boolean False"
+msgstr ""
+
+#. lithium\http\Base
+msgid "Base class for `lithium\\http\\Request` and `lithium\\http\\Response`. Implements basic protocol\nhandling for HTTP-based transactions."
+msgstr ""
+
+#. lithium\http\Base::headers()
+msgid "Add a header to rendered output, or return a single header or full header list"
+msgstr ""
+
+#. lithium\http\Base::body()
+msgid "Add body parts"
+msgstr ""
+
+#. lithium\http\Base::$protocol
+msgid "The full protocol: HTTP/1.1"
+msgstr ""
+
+#. lithium\http\Base::$version
+msgid "Specification version number"
+msgstr ""
+
+#. lithium\http\Base::$headers
+msgid "headers"
+msgstr ""
+
+#. lithium\http\Base::$body
+msgid "body"
+msgstr ""
+
+#. lithium\http\Media
+msgid "The `Media` class facilitates content-type mapping (mapping between content-types and file\nextensions), handling static assets and globally configuring how the framework handles output in\ndifferent formats.\n\nUsing the `Media` class, you can globally configure input and output of different types of\ncontent, i.e.:\n{{{ embed:lithium\\tests\\cases\\http\\MediaTest::testCustomEncodeHandler(4-13) }}}\n\nYou may then render CSV content from anywhere in your application. For example, in a controller\nyou may do the following:\n\n{{{\t$this->render(array('csv', 'data' => Post::find('all')));}}}"
+msgstr ""
+
+#. lithium\http\Media::types()
+msgid "Returns the list of registered media types.  New types can be set with the `type()` method."
+msgstr ""
+
+#. lithium\http\Media::types()
+msgid "array Returns an array of media type extensions or short-names, which comprise the\n              list of types handled."
+msgstr ""
+
+#. lithium\http\Media::type()
+msgid "Map an extension to a particular content-type (or types) with a set of options."
+msgstr ""
+
+#. lithium\http\Media::type()
+msgid "Examples:\n{{{//Get a list of all available media types:\nMedia::types(); // returns array('ai', 'amf', 'atom', ...);\n}}}\n\n{{{//Add a custom media type:\nMedia::type('my', 'text/x-my', array('view' => '\\my\\custom\\View', 'layout' => false));\n}}}\n\n{{{//Remove a custom media type:\nMedia::type('my', false);\n}}}"
+msgstr ""
+
+#. lithium\http\Media::type()
+msgid "mixed If `$content` and `$options` are empty, returns an array with `'content'` and\n              `'options'` keys, where `'content'` is the content-type(s) that correspond to\n              `$type` (can be a string or array, if multiple content-types are available),\n              and `'options'` is the array of options which define how this content-type\n              should be handled.  If `$content` or `$options` are non-empty, returns `null`."
+msgstr ""
+
+#. lithium\http\Media::type()
+msgid "A file extension for the type, i.e. `'txt'`, `'js'`, or `'atom'`."
+msgstr ""
+
+#. lithium\http\Media::type()
+msgid "Optional. A string or array containing the content-type(s) that\n                   $type should map to.  If $type is an array of content-types, the first\n                   one listed should be the \"primary\" type."
+msgstr ""
+
+#. lithium\http\Media::type()
+msgid "Optional.  The handling options for this media type. Possible keys are:\n\n - view: Specifies the view class to use when rendering this content.\n\n - template: Specifies a String::insert()-style path to use when\n                        searching for template files.\n\n - layout: Specifies a String::insert()-style path to use when searching\n                        for layout files.\n\n - encode: A (string) function name or (object) closure that handles\n                        encoding or serializing content into this format.\n\n - decode: A (string) function name or (object) closure that handles\n                        decoding or unserializing content from this format."
+msgstr ""
+
+#. lithium\http\Media::assets()
+msgid "Gets or sets options for various asset types."
+msgstr ""
+
+#. lithium\http\Media::assets()
+msgid "array If `$type` is empty, an associative array of all registered types and all\n              associated options is returned. If `$type` is a string and `$options` is empty,\n              returns an associative array with the options for `$type`. If `$type` and\n              `$options` are both non-empty, returns `null`."
+msgstr ""
+
+#. lithium\http\Media::assets()
+msgid "The name of the asset type, i.e. `'js'` or `'css'`."
+msgstr ""
+
+#. lithium\http\Media::assets()
+msgid "If registering a new asset type or modifying an existing asset type,\n             contains settings for the asset type, where the available keys are as follows:\n\n - 'suffix': The standard suffix for this content type, with leading dot ('.') if\n               applicable.\n\n - 'filter': An array of key/value pairs representing simple string replacements\n               to be done on a path once it is generated.\n\n - 'path': An array of key/value pairs where the keys are\n               `String::insert()`-compatible paths, and the values are array lists of keys\n               to be inserted into the path string."
+msgstr ""
+
+#. lithium\http\Media::asset()
+msgid "Calculates the web-accessible path to a static asset, usually a JavaScript, CSS or image\nfile."
+msgstr ""
+
+#. lithium\http\Media::render()
+msgid "Renders data (usually the result of a controller action) and generates a string\nrepresentation of it, based on the type of expected output."
+msgstr ""
+
+#. lithium\http\Media::render()
+msgid "A reference to a Response object into which the operation will be\n              rendered. The content of the render operation will be assigned to the `$body`\n              property of the object, and the `'Content-type'` header will be set\n              accordingly."
+msgstr ""
+
+#. lithium\http\Media::encode()
+msgid "For media types registered in `$_handlers` which include an `'encode'` setting, encodes data\naccording to the specified media type."
+msgstr ""
+
+#. lithium\http\Media::encode()
+msgid "Specifies the media type into which `$data` will be encoded. This media\n       type must have an `'encode'` setting specified in `Media::$_handlers`."
+msgstr ""
+
+#. lithium\http\Media::encode()
+msgid "Arbitrary data you wish to encode. Note that some encoders can only handle\n             arrays or objects."
+msgstr ""
+
+#. lithium\http\Media::encode()
+msgid "Handler-specific options."
+msgstr ""
+
+#. lithium\http\Request
+msgid "Facilitates HTTP request creation by assembling connection and path info, `GET` and `POST` data,\nand authentication credentials in a single, stateful object."
+msgstr ""
+
+#. lithium\http\Request::__construct()
+msgid "Constructor"
+msgstr ""
+
+#. lithium\http\Request::queryString()
+msgid "Set queryString"
+msgstr ""
+
+#. lithium\http\Request::__toString()
+msgid "magic method to convert object to string"
+msgstr ""
+
+#. lithium\http\Request::$host
+msgid "The Host header value and authority"
+msgstr ""
+
+#. lithium\http\Request::$port
+msgid "Port number"
+msgstr ""
+
+#. lithium\http\Request::$method
+msgid "The method of the request, typically one of the following: `GET`, `POST`, `PUT`, `DELETE`,\n`OPTIONS`, `HEAD`, `TRACE` or `CONNECT`."
+msgstr ""
+
+#. lithium\http\Request::$path
+msgid "absolute path of the request"
+msgstr ""
+
+#. lithium\http\Request::$params
+msgid "Used to build query string"
+msgstr ""
+
+#. lithium\http\Request::$headers
+msgid "headers\n{{{\n    array(\n         'Host' => $this->host . \":\" . $this->port,\n         'Connection' => 'Close', 'User-Agent' => 'Mozilla/5.0 (Lithium)'\n    )\n}}}"
+msgstr ""
+
+#. lithium\http\Request::$auth
+msgid "The authentication/authorization information\n{{{\n    array('method' => 'Basic', 'username' => 'lithium', 'password' => 'rad')\n}}}"
+msgstr ""
+
+#. lithium\http\Request::$cookies
+msgid "cookies"
+msgstr ""
+
+#. lithium\http\Response
+msgid "Parses and stores the status, headers and body of an HTTP response."
+msgstr ""
+
+#. lithium\http\Response::__toString()
+msgid "Return the response as a string"
+msgstr ""
+
+#. lithium\http\Response::$status
+msgid "Status code and message."
+msgstr ""
+
+#. lithium\http\Response::$type
+msgid "Content Type"
+msgstr ""
+
+#. lithium\http\Response::$charset
+msgid "Character Set"
+msgstr ""
+
+#. lithium\http\Response::$body
+msgid "the body"
+msgstr ""
+
+#. lithium\http\Route
+msgid "The `Route` class represents a single URL pattern which is matched against incoming requests, in\norder to determine the correct controller and action that an HTTP request should be dispatched\nto. Typically, `Route` objects are created and handled through the `lithium\\http\\Router` class,\nas follows:"
+msgstr ""
+
+#. lithium\http\Route
+msgid "{{{// This instantiates a Route object behind the scenes, and adds it to Router's collection:\nRouter::connect(\"/{:controller}/{:action}\");\n\n// This matches a set of parameters against all Route objects contained in Router, and if a match\n// is found, returns a string URL with parameters inserted into the URL pattern:\nRouter::match(array(\"controller\" => \"users\", \"action\" => \"login\")); // returns \"/users/login\"\n}}}\n\nFor more advanced routing, however, you can directly instantiate a `Route` object, a subclass,\nor any class that implements `parse()` and `match()` (see the documentation for each individual\nmethod) and configure it manually -- if, for example, you want the route to match different\nincoming URLs than it generates.\n\n{{{$route = new Route(array(\n\t\t'template' => '/users/{:user}',\n\t\t'pattern' => '@^/u(?:sers)?(?:/(?P<user>[^\\/]+))$@',\n\t\t'params' => array('controller' => 'users', 'action' => 'index'),\n\t\t'match' => array('controller' => 'users', 'action' => 'index'),\n\t\t'defaults' => array('controller' => 'users'),\n\t\t'keys' => array('user' => 'user'),\n\t\t'options' => array('compile' => false, 'wrap' => false)\n));\nRouter::connect($route); // this will match '/users/<username>' or '/u/<username>'.\n}}}\n\nFor additional information on the `'options'` constructor key, see\n`lithium\\http\\Route::compile()`. To learn more about Lithium's routing system, see\n`lithium\\http\\Router`."
+msgstr ""
+
+#. lithium\http\Route::parse()
+msgid "Attempts to parse a request object and determine its execution details."
+msgstr ""
+
+#. lithium\http\Route::parse()
+msgid "mixed If this route matches `$request`, returns an array of the execution details\n        contained in the route, otherwise returns false."
+msgstr ""
+
+#. lithium\http\Route::match()
+msgid "Matches a set of parameters against the route, and returns a URL string if the route matches\nthe parameters, or false if it does not match."
+msgstr ""
+
+#. lithium\http\Route::export()
+msgid "Exports the properties that make up the route to an array, for debugging, caching or\nintrospection purposes."
+msgstr ""
+
+#. lithium\http\Route::export()
+msgid "array An array containing the properties of the route object, such as URL templates\n        and parameter lists."
+msgstr ""
+
+#. lithium\http\Route::compile()
+msgid "Compiles URL templates into regular expression patterns for matching against request URLs,\nand extracts template parameters into match-parameter arrays."
+msgstr ""
+
+#. lithium\http\Router::connect()
+msgid "Connects a new route and returns the current routes array."
+msgstr ""
+
+#. lithium\http\Router::connect()
+msgid "array Array of routes"
+msgstr ""
+
+#. lithium\http\Router::connect()
+msgid "An empty string, or a route string \"/\""
+msgstr ""
+
+#. lithium\http\Router::connect()
+msgid "An array describing the default or required elements of the route"
+msgstr ""
+
+#. lithium\http\Router::parse()
+msgid "Takes an instance of lithium\\http\\Request (or a subclass) and matches it against each\nroute, in the order that the routes are connected."
+msgstr ""
+
+#. lithium\http\Router::match()
+msgid "Attempts to match an array of route parameters (i.e. `'controller'`, `'action'`, etc.)\nagainst a connected `Route` object."
+msgstr ""
+
+#. lithium\http\Service
+msgid "Basic Http Service"
+msgstr ""
+
+#. lithium\http\Service::__construct()
+msgid "Initializes a new `Service` instance with the default HTTP request settings and\ntransport- and format-handling classes."
+msgstr ""
+
+#. lithium\http\Service::connect()
+msgid "Connect to datasource"
+msgstr ""
+
+#. lithium\http\Service::disconnect()
+msgid "Disconnect from socket"
+msgstr ""
+
+#. lithium\http\Service::get()
+msgid "Send GET request"
+msgstr ""
+
+#. lithium\http\Service::post()
+msgid "Send POST request"
+msgstr ""
+
+#. lithium\http\Service::put()
+msgid "Send PUT request"
+msgstr ""
+
+#. lithium\http\Service::delete()
+msgid "Send DELETE request"
+msgstr ""
+
+#. lithium\http\Service::send()
+msgid "Send request and return response data"
+msgstr ""
+
+#. lithium\http\Service::$request
+msgid "Request Object"
+msgstr ""
+
+#. lithium\http\Service::$response
+msgid "Holds all parameters of the request\nCast to object in the constructor"
+msgstr ""
+
+#. lithium\http\Service::$last
+msgid "Holds the request and response used by send"
+msgstr ""
+
+#. lithium\g11n\Catalog
+msgid "Globalization data is not just translated messages, it's validation rules, formats and a lot\nmore, too. Data is grouped into 4 different kinds of categories: inflection, validation, message\nand list."
+msgstr ""
+
+#. lithium\g11n\Catalog
+msgid "Generally speaking is the `Catalog` class allowing us to retrieve and store globalized\ndata, providing low-level functionality to other classes. It's interface is similar to classes\nlike Session or Cache and like those extensible through adapters.\n\nWe need to deal with different kinds of sources for this data, but we don't want differing\nresults depending on the adapter in use. This is why results are kept in a neutral inter-\nchangeable format. You can rely on getting the same format of obtained results independent\nfrom the adapter they're coming from.\n\nThe class is able to aggregate data from different sources which allows to complement sparse\ndata. Not all categories must be supported by an individual adapter."
+msgstr ""
+
+#. lithium\g11n\Catalog::read()
+msgid "Reads data.  Data can be obtained for one or multiple configurations\nand locales. The results for list-like categories are aggregated by\nquerying all requested configurations for the requested locale and then\nrepeating this process for all locales down the locale cascade. This allows\nfor sparse data which is complemented by data from other sources or\nfor more generic locales. Aggregation can be controlled by either specifying\nthe configurations or a scope to use."
+msgstr ""
+
+#. lithium\g11n\Catalog::read()
+msgid "Usage:\n{{{\nCatalog::read('message.page', array('zh', 'en'));\nCatalog::read('validation.postalCode', 'en_US');\n}}}"
+msgstr ""
+
+#. lithium\g11n\Catalog::read()
+msgid "array|void If available the requested data, else `null`."
+msgstr ""
+
+#. lithium\g11n\Catalog::read()
+#. lithium\g11n\Catalog::write()
+msgid "Dot-delimeted category."
+msgstr ""
+
+#. lithium\g11n\Catalog::read()
+msgid "One or multiple locales."
+msgstr ""
+
+#. lithium\g11n\Catalog::read()
+#. lithium\g11n\Catalog::write()
+msgid "Valid options are:\n\n - `'name'`: One or multiple configuration names.\n\n - `'scope'`: The scope to use."
+msgstr ""
+
+#. lithium\g11n\Catalog::write()
+msgid "Writes data."
+msgstr ""
+
+#. lithium\g11n\Catalog::write()
+msgid "Usage:\n{{{\n$data = array(\n  'pl' => array(\n     'color' => 'Kolor'\n  )\n  'ja' => array(\n     'color' => '色'\n));\nCatalog::write('message.page', $data, array('name' => 'runtime'));\n}}}"
+msgstr ""
+
+#. lithium\g11n\Catalog::write()
+msgid "boolean Success."
+msgstr ""
+
+#. lithium\g11n\Catalog::write()
+msgid "keyed by locale."
+msgstr ""
+
+#. lithium\g11n\Locale
+msgid "The `Locale` class provides methods to deal with locale identifiers.  The locale\n(here: _locale identifier_) is used to distinguish among different sets of common\npreferences."
+msgstr ""
+
+#. lithium\g11n\Locale
+msgid "In order to avoid unnecessary overhead all methods throughout the framework accepting\na locale require it to be well-formed according to the structue layed out below. For\nassuring the correct format use `Locale::canonicalize()` once on the locale.\n\nHowever the methods within this class will also work with not-so-well-formed locales.\nThey accept both undercores and hyphens as separators between and don't care about the\ncase of the indvidual tags.\n\nThe identifier used by Lithium is based in it's structure upon Unicode's\nlanguage identifier and is compliant to BCP 47.\n\n`language[_Script][_TERRITORY][_VARIANT]`\n\n - `language` The spoken language, here represented by an ISO 639-1 code,\n   where not available ISO 639-3 and ISO 639-5 codes are allowed too) tag.\n   The tag should  be lowercased and is required.\n\n - `Script` The tag should have it's first character capitalized, all others\n   lowercased. The tag is optional.\n\n - `TERRITORY` A geographical area, here represented by an ISO 3166-1 code.\n    Should be all uppercased and is optional.\n\n - `VARIANT` Should be all uppercased and is optional."
+msgstr ""
+
+#. lithium\g11n\Locale::__callStatic()
+msgid "Magic method enabling tag methods."
+msgstr ""
+
+#. lithium\g11n\Locale::__callStatic()
+msgid "string|void"
+msgstr ""
+
+#. lithium\g11n\Locale::compose()
+msgid "Composes a locale from locale tags.  This is the pendant to `Locale::decompose()`."
+msgstr ""
+
+#. lithium\g11n\Locale::compose()
+msgid "string|void A locale with tags separated by underscores or `null`\n        if none of the passed tags could be used to compose a locale."
+msgstr ""
+
+#. lithium\g11n\Locale::decompose()
+msgid "Parses a locale into locale tags.  This is the pendant to `Locale::compose()``."
+msgstr ""
+
+#. lithium\g11n\Locale::decompose()
+msgid "array Parsed language, script, territory and variant tags."
+msgstr ""
+
+#. lithium\g11n\Locale::canonicalize()
+msgid "Returns a locale in it's canonical form with tags formatted properly."
+msgstr ""
+
+#. lithium\g11n\Locale::canonicalize()
+msgid "string A locale in it's canoncial form (i.e. `'zh_Hans_HK_REVISED'`)."
+msgstr ""
+
+#. lithium\g11n\Locale::cascade()
+msgid "Cascades a locale."
+msgstr ""
+
+#. lithium\g11n\Locale::cascade()
+msgid "Usage:\n{{{\nLocale::cascade('en_US');\n// returns array('en_US', 'en', 'root')\n\nLocale::cascade('zh_Hans_HK_REVISED');\n// returns array('zh_Hans_HK_REVISED', 'zh_Hans_HK', 'zh_Hans', 'zh', 'root')\n}}}"
+msgstr ""
+
+#. lithium\g11n\Locale::cascade()
+msgid "array Indexed array of locales (starting with the most specific one)."
+msgstr ""
+
+#. lithium\g11n\Message
+msgid "The `Message` class is concerned with an aspect of globalizing static message strings\nthroughout the framework and applications.  When referring to message globalization the\nphrase of _translating messages_ is widely used. This leads to the assumption that it's\na single step process wheras it' a multi step one. A short description of each step is\ngiven here in order to help understanding the purpose of this class through the context\nof the process as a whole."
+msgstr ""
+
+#. lithium\g11n\Message
+msgid "1. Marking messages as translateable.  `$t()` and `$tn()` (implemented in the `View`\n    class) are recognized as message marking and picked up by the extraction parser.\n\n 2. Extracting marked messages.  Messages can be extracted through the `g11n`\n    command which in turn utilizes the `Catalog` class with the builtin `Code`\n    adapter or other custom adapters which are concerned with extracting\n    translatable content.\n\n 3. Creating a message template from extracted messages.  Templates are created\n    by the `g11n` command using the `Catalog` class with an adapter for a format\n    you prefer.\n\n 4. Translating messages.  The actual translation of messages by translators\n    happens outside using external applications.\n\n 5. Storing translated messages.  Translations are most often stored by the external\n    applications itself.\n\n 6. Retrieving the translation for a message. See description for `Message::translate()`."
+msgstr ""
+
+#. lithium\g11n\Message::translate()
+msgid "Translates a message according to the current or provided locale\nand into it's correct plural form."
+msgstr ""
+
+#. lithium\g11n\Message::translate()
+msgid "Usage:\n{{{\nMessage::translate('Mind the gap.');\nMessage::translate('house', array('count' => 23));\n}}}"
+msgstr ""
+
+#. lithium\g11n\Message::translate()
+msgid "string|void The translation or `null` if none could be found.\n@filter"
+msgstr ""
+
+#. lithium\g11n\Message::translate()
+msgid "The id to use when looking up the translation."
+msgstr ""
+
+#. lithium\g11n\Message::translate()
+msgid "Valid options are:\n\n - `'count'`: Used to determine the correct plural form.\n\n - `'locale'`: The target locale, defaults to current locale.\n\n - `'scope'`: The scope of the message."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base
+msgid "The `Base` class is the foundation for all g11n catalog adapters."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::_init()
+msgid "Initializer.  Merges redefined categories."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::isSupported()
+msgid "Checks if an operation for a category is supported."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::isSupported()
+msgid "boolean `true` if operation is supported, otherwise `false`."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::isSupported()
+#. lithium\g11n\catalog\adapters\Base::read()
+#. lithium\g11n\catalog\adapters\Base::write()
+msgid "Dot-delimited category."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::isSupported()
+msgid "Operation to check for. Either `'read'` or `'write'`."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::read()
+msgid "Reads data."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::read()
+#. lithium\g11n\catalog\adapters\Base::write()
+msgid "A locale identifier."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::read()
+#. lithium\g11n\catalog\adapters\Base::write()
+msgid "The scope for the current operation."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::write()
+msgid "Writes data.  Existing data is silently overwritten."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::write()
+msgid "The data to write."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::_formatMessageItem()
+msgid "Formats a message item if neccessary."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::_formatMessageItem()
+msgid "array Message item formatted into internal/verbose format."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::_formatMessageItem()
+msgid "The potential message ID."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::_formatMessageItem()
+msgid "The message value."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::_mergeMessageItem()
+msgid "Merges a message item into given data."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::_mergeMessageItem()
+msgid "Data to merge item into."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::_mergeMessageItem()
+msgid "Item to merge into $data."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Base::$_categories
+msgid "A cascade of categories supported. If re-defined in sub-classes\ncontents are being merged."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Cldr
+msgid "The `Cldr` class is an adapter which allows reading from the Common Locale Data Repository\nmaintained by the Unicode Consortium. Writing and deleting is not supported."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Cldr::write()
+msgid "Writing is not supported."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Code
+msgid "The `Code` class is an adapter which treats files containing code as just another source\nof globalized data.  In fact it allows for extracting messages which are needed to build\nmessage catalog templates. Currently only code written in PHP is supported through a parser\nusing the built-in tokenizer."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Code::read()
+msgid "Extracts data from files within configured path recursively."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Gettext
+msgid "The `Gettext` class is an adapter for reading and writing PO and MO files without the\nrequirement of having the gettext extension enabled or installed.  Moreover it doesn't\nrequire the usage of the non thread safe `setlocale()`."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Gettext
+msgid "The adapter expects a the directory configured by the path options to be structured\naccording to the following example.\n\n - `<path>`: This is the configured path.\n\n - `<locale>`: The directory for the well-formed <locale> i.e `'fr' or `'en_US'`.\n\n - `LC_MESSAGES`: The directory for the message category.\n\n - `default.po`: The PO file.\n\n - `default.mo`: The MO file.\n\n - `<scope>.po`: The PO file for <scope>.\n\n - `<scope>.mo`: The MO file for <scope>.\n\n - `message_default.pot`: The message template.\n\n - `message_<scope>.pot`: The message template for <scope>."
+msgstr ""
+
+#. lithium\g11n\catalog\adapters\Memory
+msgid "The `Memory` class is an adapter for reading and writing data during runtime.  Written data\nis stored in memory and lost after the end of the excution. The adapter is also very useful\nfor testing."
+msgstr ""
+
+#. lithium\data\Connections
+msgid "The `Connections` class manages a list of named configurations that connect to external\nresources. Connections are usually comprised of a type (i.e. `'Database'` or `'Http'`), a\nreference to an adapter class (i.e. `'MySql'` or `'MongoDb'`), and authentication credentials."
+msgstr ""
+
+#. lithium\data\Connections
+msgid "While connections can be added and removed dynamically during the course of your application\n(using `Connections::add()`), it is most typical to define all connections at once, in\n`app/config/connections.php`.\n\n`Connections` handles adapter classes efficiently by only loading adapter classes and creating\ninstances when they are requested (using `Connections::get()`).\n\nAdapters are usually subclasses of `lithium\\data\\Source`."
+msgstr ""
+
+#. lithium\data\Connections::__init()
+msgid "Initialization of static class\nStarts static properties and includes the app connections.php file"
+msgstr ""
+
+#. lithium\data\Connections::add()
+msgid "Add connection configurations to your app in `/app/config/connections.php`"
+msgstr ""
+
+#. lithium\data\Connections::add()
+msgid "For example:\n{{{\nConnections::add('default', 'database', array(\n    'adapter' => 'MySql',\n    'host' => 'localhost',\n    'login' => 'root',\n    'password' => '',\n    'database' => 'my_blog'\n));\n}}}\n\nor\n\n{{{\nConnections::add('couch', 'http', array(\n    'adapter' => 'Couch','host' => '127.0.0.1', 'port' => 5984\n));\n}}}"
+msgstr ""
+
+#. lithium\data\Connections::add()
+msgid "array Returns the final post-processed connection information, as stored in the\n              internal configuration array used by `Connections`."
+msgstr ""
+
+#. lithium\data\Connections::add()
+msgid "The name by which this connection is referenced. Use this name to\n              retrieve the connection again using `Connections::get()`, or to bind a model\n              to it using `Model::$_meta['connection']`."
+msgstr ""
+
+#. lithium\data\Connections::add()
+msgid "The type of data source that defines this connection; typically a class\n              or namespace name. Relational database data sources, use `'database'`, while\n              CouchDB and other HTTP-related data sources use `'http'`, etc. For classes\n              which directly extend `lithium\\data\\Source`, and do not use an adapter, simply\n              use the name of the class, i.e. `'MongoDb'`."
+msgstr ""
+
+#. lithium\data\Connections::add()
+msgid "Contains all additional configuration information used by the\n             connection, including the name of the adapter class where applicable (i.e.\n             `MySql`), the server name and port or socket to connect to, and (typically)\n             the name of the database or other entity to use. Each adapter has its own\n             specific configuration settings for handling things like connection persistence,\n             data encoding, etc. See the individual adapter or data source class for more\n             information on what configuration settings it supports."
+msgstr ""
+
+#. lithium\data\Connections::get()
+msgid "Read the configuration or access the connections you have set up."
+msgstr ""
+
+#. lithium\data\Connections::get()
+msgid "{{{// Gets the names of all available configurations\n$configurations = Connections::get();}}}\n\n{{{// Gets the configuration array for the connection named 'db'\n$config = Connections::get('db', array('config' => true));\n\n// Gets the instance of the connection object, configured with the settings defined for\n// this object in Connections::add()\n$dbConnection = Connection::get('db');\n\n// Gets the connection object, but only if it has already been\n// built. Otherwise returns null.\n$dbConnection = Connection::get('db', array('autoCreate' => false));\n}}}"
+msgstr ""
+
+#. lithium\data\Connections::get()
+msgid "mixed A configured instance of the connection, or an array of the configuration used."
+msgstr ""
+
+#. lithium\data\Connections::get()
+msgid "The name of the connection to get, as defned in the first parameter of\n              `add()`, when the connection was initially created."
+msgstr ""
+
+#. lithium\data\Connections::get()
+msgid "Options to use when returning the connection:\n\n - `'config'`: If `true`, returns an array representing the connection's internal\n                configuration, instead of the connection itself.\n\n - `'autoCreate'`: If `false`, the connection object is only returned if it has\n               already been instanted by a previous call."
+msgstr ""
+
+#. lithium\data\Connections::clear()
+msgid "Hard reset of connections and configurations, clearing out any currently configured or built"
+msgstr ""
+
+#. lithium\data\Model
+msgid "Model class"
+msgstr ""
+
+#. lithium\data\Model::__init()
+msgid "Sets default connection options and connects default finders."
+msgstr ""
+
+#. lithium\data\Model::finder()
+msgid "Gets or sets a finder by name.  This can be an array of default query options,\nor a closure that accepts an array of query options, and a closure to execute."
+msgstr ""
+
+#. lithium\data\Model::schema()
+msgid "Lazy-initialize the schema for this Model object, if it is not already manually set in the\nobject. You can declare `protected $_schema = array(...)` to define the schema manually."
+msgstr ""
+
+#. lithium\data\Model::hasField()
+msgid "Checks to see if a particular field exists in a model's schema. Can check a single field, or\nreturn the first field found in an array of multiple options."
+msgstr ""
+
+#. lithium\data\Model::hasField()
+msgid "mixed If `$field` is a string, returns a boolean indicating whether or not that field\n        exists. If `$field` is an array, returns the first field found, or `false` if none of\n        the fields in the list are found."
+msgstr ""
+
+#. lithium\data\Model::create()
+msgid "Instantiates a new record object, initialized with any data passed in. For example:"
+msgstr ""
+
+#. lithium\data\Model::create()
+msgid "{{{$post = Post::create(array(\"title\" => \"New post\"));\necho $post->title; // echoes \"New post\"\n$post->save();}}}"
+msgstr ""
+
+#. lithium\data\Model::create()
+msgid "object Returns a new, un-saved record object."
+msgstr ""
+
+#. lithium\data\Model::save()
+msgid "An instance method (called on record and document objects) to create or update the record or\ndocument in the database that corresponds to `$record`. For example:"
+msgstr ""
+
+#. lithium\data\Model::save()
+msgid "{{{$post = Post::create();\n$post->title = \"My post\";\n$post->save(null, array('validate' => false));}}}"
+msgstr ""
+
+#. lithium\data\Model::save()
+msgid "boolean Returns `true` on a successful save operation, `false` on failure."
+msgstr ""
+
+#. lithium\data\Model::save()
+msgid "The record or document object to be saved in the database."
+msgstr ""
+
+#. lithium\data\Model::save()
+msgid "Any data that should be assigned to the record before it is saved."
+msgstr ""
+
+#. lithium\data\Model::save()
+msgid "Options:\n\n       -'validate': If `false`, validation will be skipped, and the record will be\n        immediately saved. Defaults to `true`.\n       -'whitelist': An array of fields that are allowed to be saved to this record.\n       -'callbacks': If `false`, all callbacks will be disabled before executing. Defaults to\n        `true`."
+msgstr ""
+
+#. lithium\data\Model::applyFilter()
+msgid "Wraps `StaticObject::applyFilter()` to account for object instances."
+msgstr ""
+
+#. lithium\data\Source
+msgid "This is the base class for Lithium's data abstraction layer. In addition to utility methods and\nstandardized properties, it defines the implementation tasks for all Lithium classes that work\nwith external data, such as connections to remote resources (`connect()` and `disconnect()`),\nintrospecting available data objects (`entities()` and `describe()`), and a standard read/write\ninterface (`create()`, `read()`, `update()` and `delete()`).\n\nSubclasses may implement any other non-standard functionality, but the above methods define the\nrequirements for interacting with `Model` objects, and other classes within `lithium\\data`."
+msgstr ""
+
+#. lithium\data\Source::isConnected()
+msgid "Checks the connection status of this data source. If the `'autoConnect'` option is set to\ntrue and the source connection is not currently active, a connection attempt will be made\nbefore returning the result of the connection status."
+msgstr ""
+
+#. lithium\data\Source::isConnected()
+msgid "boolean Returns the current value of `$_isConnected`, indicating whether or not\n        the object's connection is currently active.  This value may not always be accurate,\n        as the connection could have timed out or otherwise been dropped by the remote\n        resource during the course of the request."
+msgstr ""
+
+#. lithium\data\Source::entities()
+msgid "Returns a list of objects (entities) that models can bind to, i.e. a list of tables in the\ncase of a database, or REST collections, in the case of a web service."
+msgstr ""
+
+#. lithium\data\Source::entities()
+msgid "array Returns an array of objects to which models can connect."
+msgstr ""
+
+#. lithium\data\Source::update()
+msgid "Updates a set of records in a concrete data store."
+msgstr ""
+
+#. lithium\data\Source::update()
+msgid "boolean Returns true if the update operation was a success, otherwise false."
+msgstr ""
+
+#. lithium\data\Source::update()
+msgid "An object which defines the update operation(s) that should be performed\n              against the data store.  This can be a `Query`, a `RecordSet`, a `Record`, or a\n              subclass of one of the three. Alternatively, `$query` can be an\n              adapter-specific query string."
+msgstr ""
+
+#. lithium\data\Source::update()
+msgid "Options to execute, which are defined by the concrete implementation."
+msgstr ""
+
+#. lithium\data\Source::configureClass()
+msgid "A method which can be optionally implemented to configure a model class."
+msgstr ""
+
+#. lithium\data\Source::configureClass()
+msgid "array This method should return an array one or more of the following keys: `'meta'`,\n        `'classes'` or `'finders'`. These keys maps to the three corresponding properties in\n        `lithium\\data\\Model`, and are used to override the base-level default settings and\n        dependencies."
+msgstr ""
+
+#. lithium\data\source\Database::read()
+msgid "Reads records from a database using a `Query` object or raw SQL string."
+msgstr ""
+
+#. lithium\data\source\Http
+msgid "Http class to access data sources using \\lithium\\http\\Service"
+msgstr ""
+
+#. lithium\data\source\Http::__get()
+msgid "Pass properties to service connection"
+msgstr ""
+
+#. lithium\data\source\Http::__call()
+msgid "Pass methods to service connection"
+msgstr ""
+
+#. lithium\data\source\Http::entities()
+msgid "entities"
+msgstr ""
+
+#. lithium\data\source\Http::describe()
+msgid "Describe data source"
+msgstr ""
+
+#. lithium\data\source\Http::read()
+msgid "Read used by model to GET"
+msgstr ""
+
+#. lithium\data\source\Http::update()
+msgid "Update used by model to PUT"
+msgstr ""
+
+#. lithium\data\source\Http::delete()
+msgid "Used by model to DELETE"
+msgstr ""
+
+#. lithium\data\source\MongoDb
+msgid "A data source adapter which allows you to connect to the MongoDB database engine. MongoDB is an\nOpen Source distributed document database which bridges the gap between key/value stores and\nrelational databases. To learn more about MongoDB, see here:\n[http://www.mongodb.org/](http://www.mongodb.org/)."
+msgstr ""
+
+#. lithium\data\source\MongoDb
+msgid "Rather than operating on records and record sets, queries against MongoDB will return nested sets\nof `Document` objects. A `Document`'s fields can contain both simple and complex data types\n(i.e. arrays) including other `Document` objects.\n\nAfter installing MongoDB, you can connect to it as follows:\n{{{//app/config/connections.php:\nConnections::add('default', 'MongoDb', array('database' => 'myDb'));}}}\n\nBy default, it will attempt to connect to a Mongo instance running on `localhost` on port\n27017. See `__construct()` for details on how to change this."
+msgstr ""
+
+#. lithium\data\source\MongoDb::__construct()
+msgid "Instantiates the MongoDB adapter with the default connection information."
+msgstr ""
+
+#. lithium\data\source\MongoDb::__destruct()
+msgid "Ensures that the server connection is closed and resources are freed when the adapter\ninstance is destroyed."
+msgstr ""
+
+#. lithium\data\source\MongoDb::configureClass()
+msgid "Configures a model class by overriding the default dependencies for `'recordSet'` and\n`'record'` , and sets the primary key to `'_id'`, in keeping with Mongo's conventions."
+msgstr ""
+
+#. lithium\data\source\MongoDb::configureClass()
+msgid "Returns an array containing keys `'classes'` and `'meta'`, which will be merged with\n        their respective properties in `Model`."
+msgstr ""
+
+#. lithium\data\source\MongoDb::__call()
+msgid "A method dispatcher that allows direct calls to native methods in PHP's `Mongo` object. Read\nmore here: http://php.net/manual/class.mongo.php"
+msgstr ""
+
+#. lithium\data\source\MongoDb::__call()
+msgid "For example (assuming this instance is stored in `Connections` as `'mongo'`):\n{{{// Manually repairs a MongoDB instance\nConnections::get('mongo')->repairDB($db); // returns null\n}}}"
+msgstr ""
+
+#. lithium\data\source\MongoDb::__call()
+msgid "mixed Returns the value of the native method specified in `$method`."
+msgstr ""
+
+#. lithium\data\source\MongoDb::__call()
+msgid "The name of native method to call. See the link above for available\n       class methods."
+msgstr ""
+
+#. lithium\data\source\MongoDb::__call()
+msgid "A list of parameters to be passed to the native method."
+msgstr ""
+
+#. lithium\data\source\http\adapter\CouchDb
+msgid "CouchDb adapter"
+msgstr ""
+
+#. lithium\data\source\http\adapter\CouchDb::__destruct()
+msgid "Deconstruct"
+msgstr ""
+
+#. lithium\data\source\http\adapter\CouchDb::configureClass()
+msgid "Configures a model class by overriding the default dependencies for `'recordSet'` and\n`'record'` , and sets the primary key to `'_id'`, in keeping with CouchDb conventions."
+msgstr ""
+
+#. lithium\data\source\http\adapter\CouchDb::__call()
+msgid "Magic for passing methods to http service"
+msgstr ""
+
+#. lithium\data\source\http\adapter\CouchDb::describe()
+msgid "Describe database, create if it does not exist"
+msgstr ""
+
+#. lithium\data\source\http\adapter\CouchDb::name()
+msgid "name"
+msgstr ""
+
+#. lithium\data\source\http\adapter\CouchDb::create()
+msgid "Create new document"
+msgstr ""
+
+#. lithium\data\source\http\adapter\CouchDb::read()
+msgid "Read from document"
+msgstr ""
+
+#. lithium\data\source\http\adapter\CouchDb::update()
+msgid "Update document"
+msgstr ""
+
+#. lithium\data\source\http\adapter\CouchDb::delete()
+msgid "Delete document"
+msgstr ""
+
+#. lithium\data\source\http\adapter\CouchDb::result()
+msgid "get result"
+msgstr ""
+
+#. lithium\data\source\http\adapter\CouchDb::conditions()
+msgid "handle conditions"
+msgstr ""
+
+#. lithium\data\source\http\adapter\CouchDb::fields()
+msgid "fields for query"
+msgstr ""
+
+#. lithium\data\source\http\adapter\CouchDb::limit()
+msgid "limit for query"
+msgstr ""
+
+#. lithium\data\source\http\adapter\CouchDb::order()
+msgid "order for query"
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi
+msgid "Adapater class for MySQL improved extension. Implements the methods connecting higher level abstractions\nto the specifics of the MySQL improved extension."
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::__construct()
+msgid "Constructs the MySQLi adapter and defaults the port to 3306."
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::columns()
+msgid "In cases where the query is a raw string (as opposed to a `Query` object), the database must\ndetermine the correct column names from the result resource."
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::columns()
+msgid "array Field names"
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::columns()
+#. lithium\data\source\database\adapter\MySQLi::result()
+msgid "$mysqliResult"
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::connect()
+msgid "Connects to the database and sets the connection encoding,\nusing options provided to the class constructor."
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::connect()
+msgid "boolean True if the database could be connected, else false"
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::describe()
+msgid "Gets the column schema for a given MySQL table."
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::describe()
+msgid "array Returns an associative array describing the given table's schema, where the\n              array keys are the available fields, and the values are arrays describing each\n              field, containing the following keys:\n              -`'type'`: The field type name"
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::describe()
+msgid "Specifies the table name for which the schema should be returned, or the\n             class name of the model object requesting the schema, in which case the model\n             class will be queried for the correct table name."
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::disconnect()
+msgid "Disconnects the connection to the database."
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::disconnect()
+msgid "boolean True on success, else false."
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::encoding()
+msgid "Gets or sets the encoding for the connection."
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::encoding()
+msgid "mixed If setting the encoding; returns true on success, else false.\n              When getting, returns the encoding."
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::entities()
+msgid "Returns the list of tables in the currently-connected database."
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::error()
+msgid "Retrieves database error message and error code"
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::error()
+#. lithium\data\source\database\adapter\MySQLi::result()
+msgid "array|null"
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySQLi::result()
+msgid "@param string $type"
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySql::__construct()
+msgid "Constructs the MySQL adapter and sets the default port to 3306."
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySql::connect()
+msgid "Connects to the database using options provided to the class constructor."
+msgstr ""
+
+#. lithium\data\source\database\adapter\MySql::columns()
+msgid "In cases where the query is a raw string (as opposed to a `Query` object), to database must\ndetermine the correct column names from the result resource."
+msgstr ""
+
+#. lithium\data\source\database\adapter\Sqlite3::__construct()
+msgid "Constructs the Sqlite adapter"
+msgstr ""
+
+#. lithium\data\model\Document
+msgid "`Document` is an alternative to the `model\\RecordSet` class, which is optimized for organizing\ncollections of records from document-oriented databases such as CouchDB or MongoDB. A `Document`\nobject's fields can represent a collection of both simple and complex data types, as well as\nother `Document` objects. Given the following data (document) structure:\n\n{{{\n{\n\t_id: 12345.\n\tname: 'Acme, Inc.',\n\temployees: {\n\t\t'Larry': { email: 'larry@acme.com' },\n\t\t'Curly': { email: 'curly@acme.com' },\n\t\t'Moe': { email: 'moe@acme.com' }\n\t}\n}\n}}}\n\nYou can query the object as follows:\n\n{{{$acme = Company::find(12345);}}}\n\nThis returns a `Document` object, populated with the raw representation of the data.\n\n{{{print_r($acme->to('array'));\n\n// Yields: array(\n//\t'_id' => 12345,\n//\t'name' => 'Acme, Inc.',\n//\t'employees' => array(\n//\t\t'Larry' => array('email' => 'larry@acme.com'),\n//\t\t'Curly' => array('email' => 'curly@acme.com'),\n//\t\t'Moe' => array('email' => 'moe@acme.com')\n//\t)\n//)}}}\n\nAs with other database objects, a `Document` exposes its fields as object properties, like so:\n\n{{{echo $acme->name; // echoes 'Acme, Inc.'}}}\n\nHowever, accessing a field containing a data sets will return that data set wrapped in a\nsub-`Document` object., i.e.:\n\n{{{$employees = $acme->employees;\n// returns a Document object with the data in 'employees'}}}"
+msgstr ""
+
+#. lithium\data\model\Document::__get()
+msgid "PHP magic method used when accessing fields as document properties, i.e. `$document->_id`."
+msgstr ""
+
+#. lithium\data\model\Document::__get()
+msgid "mixed Returns the value of the field specified in `$name`, and wraps complex data\n        types in sub-`Document` objects."
+msgstr ""
+
+#. lithium\data\model\Document::set()
+msgid "Allows several properties to be assigned at once, i.e.:\n{{{\n$doc->set(array('title' => 'Lorem Ipsum', 'value' => 42));\n}}}"
+msgstr ""
+
+#. lithium\data\model\Document::__set()
+msgid "PHP magic method used when setting properties on the `Document` instance, i.e.\n`$document->title = 'Lorem Ipsum'`. If `$value` is a complex data type (i.e. associative\narray), it is wrapped in a sub-`Document` object before being appended."
+msgstr ""
+
+#. lithium\data\model\Document::rewind()
+msgid "Rewinds the collection of sub-`Document`s to the beginning and returns the first one found."
+msgstr ""
+
+#. lithium\data\model\Document::rewind()
+msgid "object Returns the first `Document` object instance in the collection."
+msgstr ""
+
+#. lithium\data\model\Document::__call()
+msgid "Magic php methoed used when model method is called on document instance\nreturn null also if no model is set"
+msgstr ""
+
+#. lithium\data\model\Document::next()
+msgid "Returns the next record in the set, and advances the object's internal pointer. If the end of\nthe set is reached, a new record will be fetched from the data source connection handle\n(`$_handle`). If no more records can be fetched, returns `null`."
+msgstr ""
+
+#. lithium\data\model\Document::next()
+msgid "object Returns the next record in the set, or `null`, if no more records are\n               available."
+msgstr ""
+
+#. lithium\data\model\Document::exists()
+msgid "Returns `true` if the `Document` object already exists in the database, or `false` if this\nobject is newly-instantiated (i.e. holds a record that has not yet been saved)."
+msgstr ""
+
+#. lithium\data\model\Document::data()
+msgid "Gets the raw data associated with this `Document`."
+msgstr ""
+
+#. lithium\data\model\Document::data()
+msgid "array Returns a raw array of `Document` data."
+msgstr ""
+
+#. lithium\data\model\Query::type()
+msgid "Get method of type, ie 'read', 'update', 'create', 'delete'"
+msgstr ""
+
+#. lithium\data\model\Query::model()
+msgid "Set and get method for the model associated with the Query.\nWill also set the source table, ie : $this->_table"
+msgstr ""
+
+#. lithium\data\model\Query::conditions()
+msgid "Set and get method for conditions\nIf no conditions is set in query, it will ask the record for findById condition array"
+msgstr ""
+
+#. lithium\data\model\Query::fields()
+msgid "Set, get or reset fields option for query.\n{{{\n\t// to add a field\n  $query->fields('created');\n}}}\n{{{\n\t// to add several fields\n  $query->fields(array('title','body','modified'));\n}}}\n{{{\n\t// to reset fields to none\n  $query->fields(false);\n  // should be follwed by a 2nd call to fields with required fields\n}}}"
+msgstr ""
+
+#. lithium\data\model\Query::limit()
+msgid "Set and get method for query's limit of amount of records to return"
+msgstr ""
+
+#. lithium\data\model\Query::limit()
+#. lithium\data\model\Query::offset()
+#. lithium\data\model\Query::page()
+msgid "int"
+msgstr ""
+
+#. lithium\data\model\Query::offset()
+msgid "Set and get method for query's offset, ie which records to get"
+msgstr ""
+
+#. lithium\data\model\Query::page()
+msgid "Set and get method for page, in relation to limit, of which records to get"
+msgstr ""
+
+#. lithium\data\model\Query::order()
+msgid "Set and get method for the query's order specification"
+msgstr ""
+
+#. lithium\data\model\Query::comment()
+msgid "Set and get method for current query's comment\nComment will have no effect on query, but will be passed along so datasource\ncan log it."
+msgstr ""
+
+#. lithium\data\model\Query::record()
+msgid "Set and get method for the query's record instance"
+msgstr ""
+
+#. lithium\data\model\Query::record()
+msgid "object reference to the query's current record"
+msgstr ""
+
+#. lithium\data\model\Query::data()
+msgid "Set and get method for the query's record's data."
+msgstr ""
+
+#. lithium\data\model\Query::data()
+msgid "empty array if no data, array of data if the record has it"
+msgstr ""
+
+#. lithium\data\model\Query::export()
+msgid "Convert the query's properties to the datasources syntax and return it as an array"
+msgstr ""
+
+#. lithium\data\model\Query::export()
+msgid "array of converted properties"
+msgstr ""
+
+#. lithium\data\model\Record::set()
+msgid "Allows several properties to be assigned at once, i.e.:\n{{{\n$record->set(array('title' => 'Lorem Ipsum', 'value' => 42));\n}}}"
+msgstr ""
+
+#. lithium\data\model\Record::data()
+msgid "Access the data fields of the record. Can also access a $named field;"
+msgstr ""
+
+#. lithium\data\model\Record::__call()
+msgid "Magic method that allows calling of model methods on this record instance, i.e.:\n{{{\n$record->validates();\n}}}"
+msgstr ""
+
+#. lithium\data\model\Record::exists()
+msgid "A flag indicating whether or not this record exists."
+msgstr ""
+
+#. lithium\data\model\Record::exists()
+msgid "boolean True if record is from db, or after a save."
+msgstr ""
+
+#. lithium\data\model\Record::to()
+msgid "Converts the data in the record set to a different format, i.e. an array."
+msgstr ""
+
+#. lithium\data\model\Record::to()
+msgid "currently only `array`"
+msgstr ""
+
+#. lithium\data\model\RecordSet::offsetExists()
+msgid "Checks to see if a record with the given index key is in the record set. If the record\ncannot be found, and not all records have been loaded into the set, it will continue loading\nrecords until either all available records have been loaded, or a matching key has been\nfound."
+msgstr ""
+
+#. lithium\data\model\RecordSet::offsetExists()
+msgid "boolean Returns true if the record's ID is found in the set, otherwise false."
+msgstr ""
+
+#. lithium\data\model\RecordSet::offsetGet()
+msgid "Gets a record from the record set using PHP's array syntax, i.e. `$records[5]`. Using loose\ntyping, integer keys can be accessed using strings and vice-versa. For record sets with\ncomposite keys, records may be accessed using arrays as array keys. Note that the order of\nthe keys in the array does not matter."
+msgstr ""
+
+#. lithium\data\model\RecordSet::offsetGet()
+msgid "Because record data in `RecordSet` is lazy-loaded from the database, new records are fetched\nuntil one with a matching key is found."
+msgstr ""
+
+#. lithium\data\model\RecordSet::offsetGet()
+msgid "object Returns a `Record` object if a record is found with a key that matches the\n               value of `$offset`, otheriwse returns `null`."
+msgstr ""
+
+#. lithium\data\model\RecordSet::rewind()
+msgid "Reset the set's iterator and return the first record in the set.\nThe next call of `current()` will get the first record in the set."
+msgstr ""
+
+#. lithium\data\model\RecordSet::rewind()
+#. lithium\data\model\RecordSet::current()
+msgid "`Record`"
+msgstr ""
+
+#. lithium\data\model\RecordSet::current()
+msgid "Returns the currently pointed to record in the set."
+msgstr ""
+
+#. lithium\data\model\RecordSet::key()
+msgid "Returns the currently pointed to record's unique key."
+msgstr ""
+
+#. lithium\data\model\RecordSet::count()
+msgid "Fetches all available records in the set, and returns the count."
+msgstr ""
+
+#. lithium\data\model\RecordSet::count()
+msgid "int Returns the number of records in the set, after all have been loaded from the\n            resource."
+msgstr ""
+
+#. lithium\data\model\RecordSet::__destruct()
+msgid "Magic alias for _close()."
+msgstr ""
+
+#. lithium\core\Adaptable
+msgid "The `Adaptable` static class is the base class from which all adapter implementations\nextend."
+msgstr ""
+
+#. lithium\core\Adaptable
+msgid "`Adaptable` provides the logic necessary for generic configuration of named adapter\nconfigurations (such as the ones used in `Cache`, as well as a unified method of\nlocating and obtaining an instance to a specified adapter.\n\nAll immediate subclasses to `Adaptable` must implement the `adapter` method,\nand must also define the protected `$_configurations` as a class attribute. The\nlatter is where all local adapter named configurations will be stored, as a\nCollection of named configuration settings.\n\nThis static class should never be called explicitly."
+msgstr ""
+
+#. lithium\core\Environment
+msgid "Environment"
+msgstr ""
+
+#. lithium\core\Environment::set()
+msgid "Creates, modifies or switches to an existing configuration."
+msgstr ""
+
+#. lithium\core\Libraries
+msgid "Manages all aspects of class and file location, naming and mapping. Implements auto-loading for\nthe Lithium core, as well as all applications, plugins and vendor libraries registered.\nTypically, libraries and plugins are registered in `app/config/bootstrap.php`."
+msgstr ""
+
+#. lithium\core\Libraries
+msgid "By convention, vendor libraries are typically located in `app/libraries` or `/libraries`, and\nplugins are located in `app/libraries/plugins` or `/libraries/plugins`. By default, `Libraries`\nwill use its own autoloader for all plugins and vendor libraries, but can be configured to use\nothers on a case-by-case basis.\n\n`Libraries` also handles service location. Various 'types' of classes can be defined by name,\nusing _class patterns_, which define conventions for organizing classes, i.e. `'models'` is\n`'{:library}\\models\\{:name}'`, which will find a model class in any registered app, plugin or\nvendor library that follows that path (namespace) convention. You can find classes by name (see\n`locate()` for more information on class-locating precedence), or find all models in all\nregistered libraries (apps / plugins / vendor libraries, etc)."
+msgstr ""
+
+#. lithium\core\Libraries::add()
+msgid "Adds a class library from which files can be loaded"
+msgstr ""
+
+#. lithium\core\Libraries::add()
+msgid "array Returns the resulting set of options created for this library."
+msgstr ""
+
+#. lithium\core\Libraries::add()
+msgid "Library name, i.e. `'app'`, `'lithium'`, `'pear'` or `'solar'`."
+msgstr ""
+
+#. lithium\core\Libraries::add()
+msgid "Specifies where the library is in the filesystem, and how classes\n             should be loaded from it.  Allowed keys are:\n\n - `'path'`: The directory containing the library.\n\n - `'loader'`: An auto-loader method associated with the library, if any\n\n - `'bootstrap'`: A file path (relative to `'path'`) to a bootstrap script that\n               should be run when the library is added.\n\n - `'prefix'`: The class prefix this library uses, i.e. `'lithium'`, `'Zend_'`\n               or `'Solar_'`.\n\n - `'suffix'`: Gets appended to the end of the file name. For example, most\n               libraries end classes in `'.php'`, but some use `'.class.php'`, or\n               `'.inc.php'`.\n\n - `'transform'`: Defines a custom way to transform a class name into its\n               corresponding file path.  Accepts either an array of two strings which\n               are interpreted as the pattern and replacement for a regex, or an\n               anonymous function, which receives the class name as a parameter, and\n               returns a file path as output.\n\n - `'defer'`: If true, indicates that, when locating classes, this library should\n               defer to other libraries in order of preference.\n\n - `'includePath'`: If `true`, appends the absolutely-resolved value of `'path'`\n               to the PHP include path."
+msgstr ""
+
+#. lithium\core\Libraries::get()
+msgid "Returns configuration for given name"
+msgstr ""
+
+#. lithium\core\Libraries::remove()
+msgid "Removes a registered library, and unregister's the library's autoloader, if it has one."
+msgstr ""
+
+#. lithium\core\Libraries::find()
+msgid "Finds the classes in a library/namespace/folder"
+msgstr ""
+
+#. lithium\core\Libraries::load()
+msgid "Loads the class definition specified by `$class`. Also calls the `__init()` method on the\nclass, if defined.  Looks through the list of libraries defined in `$_configurations`, which\nare added through `lithium\\core\\Libraries::add()`."
+msgstr ""
+
+#. lithium\core\Libraries::path()
+msgid "Get the corresponding physical file path for a class or namespace name."
+msgstr ""
+
+#. lithium\core\Libraries::path()
+msgid "string Returns the absolute path to the file containing `$class`, or `null` if the\n        file cannot be found."
+msgstr ""
+
+#. lithium\core\Libraries::path()
+msgid "The class name to locate the physical file for. If `$options['dirs']` is\n       set to `true`, `$class` may also be a namespace name, in which case the corresponding\n       directory will be located."
+msgstr ""
+
+#. lithium\core\Libraries::path()
+msgid "Options for converting `$class` to a phyiscal path:\n\n - `'dirs'`: Defaults to `false`. If `true`, will attempt to case-sensitively look up\n         directories in addition to files (in which case `$class` is assumed to actually be a\n         namespace)."
+msgstr ""
+
+#. lithium\core\Libraries::locate()
+msgid "Performs service location for an object of a specific type. If `$name` is a string, finds the\nfirst instance of a class with the given name in any registered library (i.e. apps, plugins\nor vendor libraries registered via `Libraries::add()`), based on each library's order of\nprecedence."
+msgstr ""
+
+#. lithium\core\Libraries::locate()
+msgid "Order of precedence is usually based on the order in which the library was registered (via\n`Libraries::add()`), unless the library was registered with the `'defer'` option set to\n`true`. All libraries with the `'defer'` option set will be searched in\nregistration-order **after** searching all libraries **without** `'defer'` set.\n\nIf `$name` is not specified, `locate()` returns an array with all classes of the specified\ntype which can be found. By default, `locate()` searches all registered libraries."
+msgstr ""
+
+#. lithium\core\Object
+msgid "Base class in Lithium hierarchy, from which all other dynamic classes inherit."
+msgstr ""
+
+#. lithium\core\StaticObject
+msgid "Alternative base class in Lithium hierarchy, from which all (and only) static classes inherit."
+msgstr ""
+
+#. lithium\console\Command
+msgid "The base class to inherit when writing Console scripts in Lithium."
+msgstr ""
+
+#. lithium\console\Command::__construct()
+msgid "Constrcutor"
+msgstr ""
+
+#. lithium\console\Command::initialize()
+msgid "initialize callback"
+msgstr ""
+
+#. lithium\console\Command::run()
+msgid "base method, shows list of available commands\noverride in subclasses"
+msgstr ""
+
+#. lithium\console\Command::__invoke()
+msgid "Called by the Dispatcher class to invoke an action"
+msgstr ""
+
+#. lithium\console\Command::__invoke()
+msgid "object Returns the response object associated with this controller"
+msgstr ""
+
+#. lithium\console\Command::out()
+msgid "Writes string to output stream"
+msgstr ""
+
+#. lithium\console\Command::err()
+msgid "Writes string to error stream"
+msgstr ""
+
+#. lithium\console\Command::in()
+msgid "Handles input. Will continue to loop until\noptions['quit'] or result is part of options['options']"
+msgstr ""
+
+#. lithium\console\Command::header()
+msgid "Add text with horizontal line before and after stream"
+msgstr ""
+
+#. lithium\console\Command::columns()
+msgid "Writes rows of columns"
+msgstr ""
+
+#. lithium\console\Command::columns()
+msgid "(default \"\\t\")"
+msgstr ""
+
+#. lithium\console\Command::nl()
+msgid "Add new lines to output stream"
+msgstr ""
+
+#. lithium\console\Command::hr()
+msgid "Add horizontal line to output stream"
+msgstr ""
+
+#. lithium\console\Command::stop()
+msgid "Stop execution with exit"
+msgstr ""
+
+#. lithium\console\Command::help()
+msgid "Will show basic help for the command"
+msgstr ""
+
+#. lithium\console\Command::$request
+msgid "A Request object"
+msgstr ""
+
+#. lithium\console\Command::$response
+msgid "A Response object"
+msgstr ""
+
+#. lithium\console\Dispatcher::config()
+msgid "Used to set configuration parameters for the Dispatcher."
+msgstr ""
+
+#. lithium\console\Dispatcher::config()
+msgid "array|void If no parameters are passed, returns an associative array with the\n        current configuration, otherwise returns null."
+msgstr ""
+
+#. lithium\console\Dispatcher::run()
+msgid "Dispatches a request based on a request object (an instance of `lithium\\console\\Request`).  If\n`$request` is null, a new request object is instantiated based on the value of the\n`'request'` key in the `$_classes` array."
+msgstr ""
+
+#. lithium\console\Dispatcher::run()
+msgid "An instance of a request object with HTTP request information.  If\n       null, an instance will be created."
+msgstr ""
+
+#. lithium\console\Request
+msgid "Holds current request from console\n\n\n*/"
+msgstr ""
+
+#. lithium\console\Request::__construct()
+msgid "Construct Request object"
+msgstr ""
+
+#. lithium\console\Request::input()
+msgid "Return input"
+msgstr ""
+
+#. lithium\console\Request::input()
+#. lithium\console\Request::__destruct()
+msgid "void\n\n*/"
+msgstr ""
+
+#. lithium\console\Request::__destruct()
+msgid "Destructor to close streams"
+msgstr ""
+
+#. lithium\console\Request::$env
+msgid "Enviroment variables\n\n - pwd path to where script is running\n\n - working current directory"
+msgstr ""
+
+#. lithium\console\Request::$args
+msgid "Arguments from the console"
+msgstr ""
+
+#. lithium\console\Request::$params
+msgid "Params from router"
+msgstr ""
+
+#. lithium\console\Request::$input
+msgid "Input stream, STDIN"
+msgstr ""
+
+#. lithium\console\Response::$output
+msgid "Output stream, STDOUT"
+msgstr ""
+
+#. lithium\console\Response::$error
+msgid "Error stream, STDERR"
+msgstr ""
+
+#. lithium\console\Router
+msgid "Router parses incoming request\n\n\n*/"
+msgstr ""
+
+#. lithium\console\Router::parse()
+msgid "Parse incoming request from console"
+msgstr ""
+
+#. lithium\console\Router::parse()
+msgid "array command, passed, named\n\n*/"
+msgstr ""
+
+#. lithium\console\commands\Docs
+msgid "Adds headers and docblocks to classes and methods."
+msgstr ""
+
+#. lithium\console\commands\G11n
+msgid "The `G11n` set of commands deals with the extraction and merging of\nmessage templates."
+msgstr ""
+
+#. lithium\console\commands\G11n::run()
+msgid "The main method of the command."
+msgstr ""
+
+#. lithium\console\commands\G11n::extract()
+msgid "Runs the `Extract` command."
+msgstr ""
+
+#. lithium\console\commands\Test
+msgid "Runs a given set unit tests and outputs the results."
+msgstr ""
+
+#. lithium\console\commands\Test::run()
+msgid "Runs tests. Will provide a list of available tests if none are give\nTest cases should be given in dot notation.\ncase example: lithium test -case lithium.tests.cases.core.ObjectTest\ngroup example: lithium test -group lithium.tests.cases.core"
+msgstr ""
+
+#. lithium\console\commands\Test::missing()
+msgid "Shows which classes are un-tested"
+msgstr ""
+
+#. lithium\console\commands\Test::$case
+msgid "path to test case in dot notation\nexample: lithium test -case console.CommandTest"
+msgstr ""
+
+#. lithium\console\commands\Test::$group
+msgid "path to test group in dot notation\nexample: lithium test -group console"
+msgstr ""
+
+#. lithium\console\commands\Test::$filters
+msgid "filters"
+msgstr ""
+
+#. lithium\console\commands\g11n\Extract
+msgid "The `Extract` class is a command for extracting messages from files."
+msgstr ""
+
+#. lithium\console\commands\docs\Generator
+msgid "Adds headers and docblocks to classes and methods\n\n*/"
+msgstr ""
+
+#. lithium\console\commands\docs\Todo
+msgid "Searches and displays @todo, @discuss, @fix and @important comments in your code."
+msgstr ""
+
+#. lithium\console\commands\docs\Todo::$show
+msgid "undocumented variable"
+msgstr ""
+
+#. lithium\action\Controller
+msgid "The `Controller` class is the fundamental building block of your application's request/response\ncycle. Controllers are organized around a single logical entity, usually one or more model\nclasses (i.e. `lithium\\data\\Model`) and is tasked with performing operations against that entity."
+msgstr ""
+
+#. lithium\action\Controller
+msgid "Each controller has a series of 'actions' which are defined as class methods of the `Controller`\nclasses. Each action has a specific responsibility, such as listing a set of objects, updating an\nobject, or deleting an object.\n\nA controller object is instatiated by the `Dispatcher` (`lithium\\http\\Dispatcher`), and is given\nan instance of the `lithium\\action\\Request` class, which contains all necessary request state,\nincluding routing information, `GET` & `POST` data, and server variables. The controller is then\ninvoked (using PHP's magic `__invoke()` syntax), and the proper action is called, according to\nthe routing information stored in the `Request` object.\n\nA controller then returns a response (i.e. using `redirect()` or `render()`) which includes HTTP\nheaders, and/or a serialized data response (JSON or XML, etc.) or HTML webpage.\n\nFor more information on returning serialized data responses for web services, or manipulating\ntemplate rendering from within your controllers, see the settings in `$_render` and the\n`lithium\\http\\Media` class."
+msgstr ""
+
+#. lithium\action\Controller::__invoke()
+msgid "Called by the Dispatcher class to invoke an action."
+msgstr ""
+
+#. lithium\action\Controller::__invoke()
+msgid "object Returns the response object associated with this controller."
+msgstr ""
+
+#. lithium\action\Controller::__invoke()
+msgid "The request object with URL and HTTP info for dispatching this action."
+msgstr ""
+
+#. lithium\action\Controller::__invoke()
+msgid "The array of parameters that will be passed to the action."
+msgstr ""
+
+#. lithium\action\Controller::__invoke()
+msgid "The dispatch options for this action."
+msgstr ""
+
+#. lithium\action\Controller::set()
+msgid "This method is used to from pass along any data from the controller to the view and layout"
+msgstr ""
+
+#. lithium\action\Controller::render()
+msgid "Uses results (typically coming from a controller action) to generate content and headers for\na Response object."
+msgstr ""
+
+#. lithium\action\Controller::redirect()
+msgid "Creates a redirect response."
+msgstr ""
+
+#. lithium\action\Dispatcher
+msgid "`Dispatcher` is the outermost layer of the framework (including app), responsible for both\nrecieving the initial http request and sending back the response at the end of the cycle."
+msgstr ""
+
+#. lithium\action\Dispatcher
+msgid "After interpreting the request and making a `Request` instance, it initiates the correct\n`Controller` and passes it the `Request` object. When the `Controller` returns a `Response`,\n`Dispatcher`, where the headers and content are rendered and sent to the browser."
+msgstr ""
+
+#. lithium\action\Dispatcher::config()
+msgid "array If no parameters are passed, returns an associative array with the current\n        configuration, otherwise returns `null`."
+msgstr ""
+
+#. lithium\action\Dispatcher::run()
+msgid "Dispatches a request based on a request object (an instance of `lithium\\http\\Request`).  If\n`$request` is null, a new request object is instantiated based on the value of the\n`'request'` key in the `$_classes` array."
+msgstr ""
+
+#. lithium\action\Dispatcher::run()
+msgid "mixed Returns the value returned from the callable object retrieved from\n        `Dispatcher::_callable()`, which is either a string or an instance of\n        `lithium\\action\\Response`."
+msgstr ""
+
+#. lithium\action\Dispatcher::run()
+msgid "An instance of a request object with HTTP request information.  If\n       `null`, an instance will be created."
+msgstr ""
+
+#. lithium\action\Request
+msgid "Request is responsible for identifying and storing all the information about the http request."
+msgstr ""
+
+#. lithium\action\Request::__get()
+msgid "Allows request parameters to be accessed as object properties, i.e. `$this->request->action`\ninstead of `$this->request->params['action']`."
+msgstr ""
+
+#. lithium\action\Request::__get()
+msgid "mixed Returns the value of `$params[$name]` if it is set, otherwise returns null."
+msgstr ""
+
+#. lithium\action\Request::env()
+msgid "Queries PHP's environment settings, and provides an abstraction for standardizing expected\nenvironment values across varying platforms, as well as specify custom environment flags."
+msgstr ""
+
+#. lithium\action\Request::get()
+msgid "Get params, data, query or env"
+msgstr ""
+
+#. lithium\action\Request::is()
+msgid "Detects properties of the request and returns a boolean response"
+msgstr ""
+
+#. lithium\action\Request::type()
+msgid "Returns the content type of the response."
+msgstr ""
+
+#. lithium\action\Request::type()
+msgid "string A simple content type name, i.e. `'html'`, `'xml'`, `'json'`, etc., depending\n        on the content type of the request."
+msgstr ""
+
+#. lithium\action\Request::detect()
+msgid "Creates a 'detector' used with Request::is().  A detector is a boolean check that is created\nto determine something about a request."
+msgstr ""
+
+#. lithium\action\Request::referer()
+msgid "Gets the referring URL of this request"
+msgstr ""
+
+#. lithium\action\Request::referer()
+msgid "string Referring URL"
+msgstr ""
+
+#. lithium\action\Request::referer()
+msgid "Default URL to use if HTTP_REFERER cannot be read from headers"
+msgstr ""
+
+#. lithium\action\Request::referer()
+msgid "If true, restrict referring URLs to local server"
+msgstr ""
+
+#. lithium\action\Request::$url
+msgid "current url of request"
+msgstr ""
+
+#. lithium\action\Request::$params
+msgid "params for request"
+msgstr ""
+
+#. lithium\action\Request::$data
+msgid "POST data"
+msgstr ""
+
+#. lithium\action\Request::$query
+msgid "GET data"
+msgstr ""
+
+#. lithium\action\Response
+msgid "The `Response` instance is what the `Controller` returns to the `Dispatcher` as the product\nof the view layer. See related classes for more details."
+msgstr ""
+
+#. lithium\action\Response::disableCache()
+msgid "Disables HTTP caching for web clients and proxies."
+msgstr ""
+
+#. lithium\action\Response::render()
+msgid "Render a response by writing headers and output. Output is echoed in chunks because of an\nissue where `echo` time increases exponentially on long message bodies."
+msgstr ""
+
+#. lithium\action\Response::__toString()
+msgid "Casts the Response object to a string.  This doesn't actually return a string, but does\na direct render and returns null."
+msgstr ""
+

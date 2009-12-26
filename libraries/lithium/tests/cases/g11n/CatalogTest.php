@@ -16,37 +16,17 @@ class CatalogTest extends \lithium\test\Unit {
 	protected $_backups = array();
 
 	public function setUp() {
-		$this->_backups['catalogConfig'] = Catalog::config()->to('array');
-		Catalog::clear();
+		$this->_backups['catalogConfig'] = Catalog::config();
+		Catalog::reset();
 		Catalog::config(array(
 			'runtime' => array('adapter' => new Memory())
 		));
 	}
 
 	public function tearDown() {
-		Catalog::clear();
+		Catalog::reset();
 		Catalog::config($this->_backups['catalogConfig']);
 	}
-
-	/**
-	 * Tests configuration.
-	 *
-	 * @return void
-	 */
-	public function testConfig() {}
-
-	/**
-	 * Tests if configurations are cleared.
-	 *
-	 * @return void
-	 */
-	public function testClear() {
-		$this->assertTrue(Catalog::config()->count());
-		Catalog::clear();
-		$this->assertFalse(Catalog::config()->count());
-	}
-
-	public function testDescribe() {}
 
 	/**
 	 * Tests for values returned by `read()`.
@@ -322,7 +302,7 @@ class CatalogTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testWriteReadMergeConfigurations() {
-		Catalog::clear();
+		Catalog::reset();
 		Catalog::config(array(
 			'runtime0' => array('adapter' => new Memory()),
 			'runtime1' => array('adapter' => new Memory())
@@ -343,7 +323,7 @@ class CatalogTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result);
 
-		Catalog::clear();
+		Catalog::reset();
 		Catalog::config(array(
 			'runtime0' => array('adapter' => new Memory()),
 			'runtime1' => array('adapter' => new Memory())

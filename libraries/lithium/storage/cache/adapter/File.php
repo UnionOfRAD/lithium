@@ -19,7 +19,7 @@ use \DirectoryIterator;
  * methods to be filtered as per the Lithium filtering system.
  *
  * The path that the cached files will be written to defaults to
- * `LITHIUM_APP_PATH/tmp/cache`, but is user-configurable on cache configuration.
+ * `LITHIUM_APP_PATH/resources/tmp/cache`, but is user-configurable on cache configuration.
  *
  * Note that the cache expiration time is stored within the first few bytes
  * of the cached data, and is transparently added and/or removed when values
@@ -31,19 +31,20 @@ class File extends \lithium\core\Object {
 	/**
 	 * Class constructor
 	 *
+	 * @param array $config
 	 * @return void
 	 */
 	public function __construct($config = array()) {
-		$defaults = array('path' => LITHIUM_APP_PATH . '/tmp/cache');
+		$defaults = array('path' => LITHIUM_APP_PATH . '/resources/tmp/cache');
 		parent::__construct($config + $defaults);
 	}
 
 	/**
 	 * Write value(s) to the cache
 	 *
-	 * @param string $key        The key to uniquely identify the cached item
-	 * @param mixed  $value      The value to be cached
-	 * @param string $expiry     A strtotime() compatible cache time
+	 * @param string $key The key to uniquely identify the cached item
+	 * @param mixed $data The value to be cached
+	 * @param string $expiry A strtotime() compatible cache time
 	 * @return boolean True on successful write, false otherwise
 	 */
 	public function write($key, $data, $expiry) {
@@ -142,7 +143,6 @@ class File extends \lithium\core\Object {
 
 		return ($directory->isDir() && $directory->isReadable() && $directory->isWritable());
 	}
-
 }
 
 ?>

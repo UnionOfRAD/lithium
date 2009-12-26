@@ -1,3 +1,3 @@
 .DS_Store
 app/libraries/plugins/*
-app/tmp/*
+app/resources/tmp/*

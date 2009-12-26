@@ -78,9 +78,9 @@ class Group extends \lithium\util\Collection {
 					'path' => '/' . join('/', $parts),
 					'filter' => '/cases|intergration|functional/'
 				));
-				return (array)$test;
+				return (array) $test;
 			}
-			return (array)$test;
+			return (array) $test;
 		};
 
 		if (is_array($test)) {

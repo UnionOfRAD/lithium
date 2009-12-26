@@ -42,6 +42,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 
 	/**
 	 * Contains pre-process format strings for changing Dispatcher's behavior based on 'rules'.
+	 *
 	 * Each key in the array represents a 'rule'; if a key that matches the rule is present (and
 	 * not empty) in a route, (i.e. the result of `lithium\http\Router::parse()`) then the rule's
 	 * value will be applied to the route before it is dispatched.  When applying a rule, any array
@@ -78,7 +79,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Dispatches a request based on a request object (an instance of `lithium\http\Request`).  If
+	 * Dispatches a request based on a request object (an instance of `lithium\http\Request`). If
 	 * `$request` is null, a new request object is instantiated based on the value of the
 	 * `'request'` key in the `$_classes` array.
 	 *
@@ -95,7 +96,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$options += $defaults;
 		$classes = static::$_classes;
 		$params = compact('request', 'options');
-		$method = __METHOD__;
+		$method = __FUNCTION__;
 
 		return static::_filter($method, $params, function($self, $params, $chain) use ($classes) {
 			extract($params);
@@ -116,7 +117,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 
 	protected static function _callable($request, $params, $options) {
 		$params = compact('request', 'params', 'options');
-		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
+		return static::_filter(__FUNCTION__, $params, function($self, $params, $chain) {
 			extract($params, EXTR_OVERWRITE);
 			$library = '';
 
@@ -136,7 +137,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 
 	protected static function _call($callable, $request, $params) {
 		$params = compact('callable', 'request', 'params');
-		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
+		return static::_filter(__FUNCTION__, $params, function($self, $params, $chain) {
 			if (is_callable($callable = $params['callable'])) {
 				return $callable($params['request'], $params['params']);
 			}

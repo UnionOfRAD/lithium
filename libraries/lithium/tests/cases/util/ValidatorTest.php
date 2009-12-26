@@ -833,22 +833,16 @@ class ValidatorTest extends \lithium\test\Unit {
 	}
 
 	public function testCheckHasErrors() {
-		$rules = array(
-			'title' => 'please enter a title',
-		);
+		$rules = array('title' => array('please enter a title'));
 		$result = Validator::check(null, $rules);
 		$this->assertFalse(empty($result));
 
-		$expected = array(
-			'title' => 'please enter a title',
-		);
+		$expected = array('title' => array('please enter a title'));
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testCheckPasses() {
-		$rules = array(
-			'title' => 'please enter a title',
-		);
+		$rules = array('title' => 'please enter a title');
 		$data = array('title' => 'new title');
 		$result = Validator::check($data, $rules);
 		$this->assertTrue(empty($result));
@@ -858,15 +852,15 @@ class ValidatorTest extends \lithium\test\Unit {
 		$rules = array(
 			'title' => 'please enter a title',
 			'email' => array(
-				array('rule' => 'isNotEmpty', 'message' => 'email is empty'),
-				array('rule' => 'isEmail', 'message' => 'email is not valid'),
+				array('notEmpty', 'message' => 'email is empty'),
+				array('email', 'message' => 'email is not valid')
 			)
 		);
 		$result = Validator::check(null, $rules);
 		$this->assertFalse(empty($result));
 
 		$expected = array(
-			'title' => 'please enter a title',
+			'title' => array('please enter a title'),
 			'email' => array('email is empty', 'email is not valid')
 		);
 		$this->assertEqual($expected, $result);
@@ -876,8 +870,8 @@ class ValidatorTest extends \lithium\test\Unit {
 		$rules = array(
 			'title' => 'please enter a title',
 			'email' => array(
-				array('rule' => 'isNotEmpty', 'message' => 'email is empty'),
-				array('rule' => 'isEmail', 'message' => 'email is not valid'),
+				array('notEmpty', 'message' => 'email is empty'),
+				array('email', 'message' => 'email is not valid'),
 			)
 		);
 		$data = array('email' => 'something');
@@ -885,7 +879,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertFalse(empty($result));
 
 		$expected = array(
-			'title' => 'please enter a title',
+			'title' => array('please enter a title'),
 			'email' => array('email is not valid')
 		);
 		$this->assertEqual($expected, $result);
@@ -895,17 +889,15 @@ class ValidatorTest extends \lithium\test\Unit {
 		$rules = array(
 			'title' => 'please enter a title',
 			'email' => array(
-				array('rule' => 'isNotEmpty', 'message' => 'email is empty'),
-				array('rule' => 'isEmail', 'message' => 'email is not valid'),
+				array('notEmpty', 'message' => 'email is empty'),
+				array('email', 'message' => 'email is not valid'),
 			)
 		);
 		$data = array('title' => 'new title', 'email' => 'something');
 		$result = Validator::check($data, $rules);
 		$this->assertFalse(empty($result));
 
-		$expected = array(
-			'email' => array('email is not valid')
-		);
+		$expected = array('email' => array('email is not valid'));
 		$this->assertEqual($expected, $result);
 	}
 
@@ -913,8 +905,8 @@ class ValidatorTest extends \lithium\test\Unit {
 		$rules = array(
 			'title' => 'please enter a title',
 			'email' => array(
-				array('rule' => 'isNotEmpty', 'message' => 'email is empty'),
-				array('rule' => 'isEmail', 'message' => 'email is not valid'),
+				array('notEmpty', 'message' => 'email is empty'),
+				array('email', 'message' => 'email is not valid'),
 			)
 		);
 		$data = array('title' => 'new title', 'email' => 'something@test.com');

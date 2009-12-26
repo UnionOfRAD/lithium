@@ -40,12 +40,21 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * Constructs the Sqlite adapter
 	 *
 	 * @param array $config Configuration options for this class. For additional configuration,
-	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options defined by
-	 *        this class:
-	 *        - 'database'  _string_: database name. Defaults to none
-	 *        - 'flags' _integer_: Optional flags used to determine how to open the SQLite database. By default,
-	 *                  open uses SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE.
-	 *        - 'key' _string_: An optional encryption key used when encrypting and decrypting an SQLite database.
+	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options
+	 *        defined by this class:
+	 *        - 'database' _string_: database name. Defaults to none
+	 *        - 'flags' _integer_: Optional flags used to determine how to open the SQLite database.
+	 *          By default, open uses SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE.
+	 *        - 'key' _string_: An optional encryption key used when encrypting and
+	 *          decrypting an SQLite database.
+	 *
+	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
+	 * list of active connections.
+	 * @return The adapter instance.
+	 *
+	 * @see lithium\data\source\Database::__construct()
+	 * @see lithium\data\Source::__construct()
+	 * @see lithium\data\Connections::add()
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(
@@ -53,7 +62,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 			'flags'      => NULL,
 			'key'        => NULL
 		);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	/**
@@ -170,7 +179,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Retrieves database error message and error code
+	 * Retrieves database error message and error code.
 	 *
 	 * @return array
 	 */
@@ -179,6 +188,18 @@ class Sqlite3 extends \lithium\data\source\Database {
 			return array($this->_connection->lastErrorCode(), $this->_connection->lastErrorMsg());
 		}
 		return null;
+	}
+
+	/**
+	 * Quotes identifiers.
+	 *
+	 * Currently, this method simply returns the identifier.
+	 *
+	 * @param string $name The identifier to quote.
+	 * @return string The quoted identifier.
+	 */
+	public function name($name) {
+		return $name;
 	}
 
 	protected function _execute($sql, $options = array()) {
@@ -197,7 +218,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Converts database-layer column types to basic types
+	 * Converts database-layer column types to basic types.
 	 *
 	 * @param string $real Real database-layer column type (i.e. "varchar(255)")
 	 * @return string Abstract column type (i.e. "string")

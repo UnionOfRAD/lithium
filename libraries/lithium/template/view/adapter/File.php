@@ -15,7 +15,7 @@ use \lithium\core\Libraries;
 /**
  * The File adapter implements both template loading and rendering, and uses the `view\Stream` class
  * to auto-escape template output with short tags (i.e. <?=).
- * 
+ *
  * For more information about implementing your own template loaders or renderers, see the
  * `lithium\template\View` class.
  *
@@ -42,9 +42,9 @@ class File extends \lithium\template\view\Renderer {
 	/**
 	 * Renders content from a template file provided by `template()`.
 	 *
-	 * @param string $template 
-	 * @param string $data 
-	 * @param string $context 
+	 * @param string $template
+	 * @param string $data
+	 * @param array $options
 	 * @return string
 	 */
 	public function render($template, $data = array(), $options = array()) {
@@ -62,8 +62,8 @@ class File extends \lithium\template\view\Renderer {
 	/**
 	 * Returns a template file name
 	 *
-	 * @param string $type 
-	 * @param string $options 
+	 * @param string $type
+	 * @param string $options
 	 * @return void
 	 * @todo Replace me with include_path search?
 	 */
@@ -81,7 +81,7 @@ class File extends \lithium\template\view\Renderer {
 		$library = Libraries::get($options['library']);
 		$options['library'] = $library['path'];
 
-		foreach ((array)$this->_config[$type] as $path) {
+		foreach ((array) $this->_config[$type] as $path) {
 			if (file_exists($path = String::insert($path, $options))) {
 				return $path;
 			}

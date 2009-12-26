@@ -10,7 +10,7 @@ namespace lithium\g11n\catalog\adapter;
 
 /**
  * The `Memory` class is an adapter for reading and writing data during runtime.  Written data
- * is stored in memory and lost after the end of the excution. The adapter is also very useful
+ * is stored in memory and lost after the end of the execution. The adapter is also very useful
  * for testing.
  */
 class Memory extends \lithium\g11n\catalog\adapter\Base {

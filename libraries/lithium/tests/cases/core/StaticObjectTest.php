@@ -13,7 +13,7 @@ use \lithium\core\StaticObject;
 class StaticObjectTest extends \lithium\test\Unit {
 
 	public function testMethodFiltering() {
-		$class = 'lithium\tests\mocks\core\MockStaticObjectMethodFiltering';
+		$class = 'lithium\tests\mocks\core\MockStaticMethodFiltering';
 
 		$result = $class::method(array('Starting test'));
 		$expected = array(
@@ -63,13 +63,13 @@ class StaticObjectTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests that the correct parameters are always passed in StaticObject::invokeMethod(),
+	 * Tests that the correct parameters are always passed in `StaticObject::invokeMethod()`,
 	 * regardless of the number.
 	 *
 	 * @return void
 	 */
 	public function testMethodInvokationWithParameters() {
-		$class = '\lithium\tests\mocks\core\MockStaticObjectMethodFiltering';
+		$class = '\lithium\tests\mocks\core\MockStaticMethodFiltering';
 
 		$this->assertEqual($class::invokeMethod('foo'), array());
 		$this->assertEqual($class::invokeMethod('foo', array('bar')), array('bar'));
@@ -97,6 +97,16 @@ class StaticObjectTest extends \lithium\test\Unit {
 			'long', 'then', 'UR', 'DOIN', 'IT', 'RONG'
 		);
 		$this->assertEqual($class::invokeMethod('foo', $params), $params);
+	}
+
+	/**
+	 * Tests that filtered methods in parent classes can call methods in subclasses.
+	 *
+	 * @return void
+	 */
+	public function testCallingSubclassMethodsInFilteredMethods() {
+		$class = '\lithium\tests\mocks\core\MockStaticFilteringExtended';
+		$this->assertEqual('Working', $class::callSubclassMethod());
 	}
 }
 

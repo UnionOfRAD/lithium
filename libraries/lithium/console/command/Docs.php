@@ -14,11 +14,11 @@ use \lithium\console\command\docs\Generator;
  * Adds headers and docblocks to classes and methods.
  */
 class Docs extends \lithium\console\Command {
-	
+
 	public function run() {
-		
+
 	}
-	
+
 	public function generator() {
 		$generator = new Generator(array('request' => $this->request));
 		return $generator->run();

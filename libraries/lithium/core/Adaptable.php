@@ -17,13 +17,12 @@ use \lithium\core\Environment;
  * extend.
  *
  * `Adaptable` provides the logic necessary for generic configuration of named adapter
- * configurations (such as the ones used in `Cache`, as well as a unified method of
- * locating and obtaining an instance to a specified adapter.
+ * configurations (such as the ones used in `Cache`, as well as a unified method of locating and
+ * obtaining an instance to a specified adapter.
  *
- * All immediate subclasses to `Adaptable` must implement the `adapter` method,
- * and must also define the protected `$_configurations` as a class attribute. The
- * latter is where all local adapter named configurations will be stored, as a
- * Collection of named configuration settings.
+ * All immediate subclasses to `Adaptable` must implement the `adapter` method, and must also
+ * define the protected `$_configurations` as a class attribute. The latter is where all local
+ * adapter named configurations will be stored, as a Collection of named configuration settings.
  *
  * This static class should never be called explicitly.
  *
@@ -31,8 +30,7 @@ use \lithium\core\Environment;
  * @see lithium\storage\Session
  * @see lithium\util\audit\Logger
  *
- * @todo Implement as abtract class with abstract method `adapter` when
- *       Inspector has been fixed.
+ * @todo Implement as abtract class with abstract method `adapter` when Inspector has been fixed.
  */
 class Adaptable extends \lithium\core\StaticObject {
 
@@ -78,7 +76,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Clears configurations
+	 * Clears configurations.
 	 *
 	 * @return void
 	 */
@@ -89,8 +87,8 @@ class Adaptable extends \lithium\core\StaticObject {
 	/**
 	 * Returns adapter class name for given `$name` configuration.
 	 *
-	 * @param  string $name Classname of adapter to load
-	 * @return object Adapter object
+	 * @param  string $name Class name of adapter to load.
+	 * @return object  Adapter object.
 	 */
 	public static function adapter($name = null) {
 		$config = static::_config($name);
@@ -111,12 +109,10 @@ class Adaptable extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Determines if the adapter specified in the named configuration
-	 * is enabled.
+	 * Determines if the adapter specified in the named configuration is enabled.
 	 *
-	 * `Enabled` can mean various things, e.g. having a PECL memcached
-	 * extension compiled & loaded, as well as having the memcache server
-	 * up & available.
+	 * `Enabled` can mean various things, e.g. having a PECL memcached extension compiled
+	 * & loaded, as well as having the memcache server up & available.
 	 *
 	 * @param string $name The cache configuration whose adapter will be checked
 	 * @return mixed `True` if adapter is enabled, `false` if not. This method

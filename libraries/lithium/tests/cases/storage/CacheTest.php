@@ -368,7 +368,7 @@ class CacheTest extends \lithium\test\Unit {
 	public function testIntegrationFileAdapterWrite() {
 		$config = array('default' => array(
 			'adapter' => 'File',
-			'path' => LITHIUM_APP_PATH . '/tmp/cache',
+			'path' => LITHIUM_APP_PATH . '/resources/tmp/cache',
 			'filters' => array(),
 			'strategies' => array()
 		));
@@ -378,15 +378,14 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$time = time() + 60;
-		$result = file_get_contents(LITHIUM_APP_PATH . '/tmp/cache/key');
+		$result = file_get_contents(LITHIUM_APP_PATH . '/resources/tmp/cache/key');
 		$expected = "{:expiry:$time}\nvalue";
 		$this->assertEqual($result, $expected);
 
-		$result = unlink(LITHIUM_APP_PATH . '/tmp/cache/key');
+		$result = unlink(LITHIUM_APP_PATH . '/resources/tmp/cache/key');
 		$this->assertTrue($result);
-		$this->assertFalse(file_exists(LITHIUM_APP_PATH . '/tmp/cache/key'));
+		$this->assertFalse(file_exists(LITHIUM_APP_PATH . '/resources/tmp/cache/key'));
 	}
-
 }
 
 ?>

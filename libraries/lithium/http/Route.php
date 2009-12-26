@@ -11,7 +11,9 @@ namespace lithium\http;
 /**
  * The `Route` class represents a single URL pattern which is matched against incoming requests, in
  * order to determine the correct controller and action that an HTTP request should be dispatched
- * to. Typically, `Route` objects are created and handled through the `lithium\http\Router` class,
+ * to.
+ *
+ * Typically, `Route` objects are created and handled through the `lithium\http\Router` class,
  * as follows:
  *
  * {{{// This instantiates a Route object behind the scenes, and adds it to Router's collection:
@@ -49,21 +51,23 @@ namespace lithium\http;
 class Route extends \lithium\core\Object {
 
 	/**
-	 * The URL template string that the route matches. This string can contain fixed elements, i.e.
-	 * `"/admin"`, capture elements, i.e. `"/{:controller}"`, capture elements optionally paired
-	 * with regular expressions or named regular expression patterns, i.e. `"/{:id:\d+}"` or
-	 * `"/{:id:ID}"`, wildcard captures i.e. `"**"`, or any combination thereof, i.e.
-	 * `"/admin/{:controller}/{:id:ID}/**"`.
+	 * The URL template string that the route matches.
+	 *
+	 * This string can contain fixed elements, i.e. `"/admin"`, capture elements,
+	 * i.e. `"/{:controller}"`, capture elements optionally paired with regular expressions or
+	 * named regular expression patterns, i.e. `"/{:id:\d+}"` or `"/{:id:ID}"`, wildcard captures
+	 * i.e. `"**"`, or any combination thereof, i.e. `"/admin/{:controller}/{:id:ID}/**"`.
 	 *
 	 * @var string
 	 */
 	protected $_template = '';
 
 	/**
-	 * The regular expression used to match URLs.  This regular expression is typically 'compiled'
-	 * down from the higher-level syntax used in `$_template`, but can be set manually with
-	 * compilation turned off in the constructor for extra control or if you are using pre-compiled
-	 * `Route` objects
+	 * The regular expression used to match URLs.
+	 *
+	 * This regular expression is typically 'compiled' down from the higher-level syntax used in
+	 * `$_template`, but can be set manually with compilation turned off in the constructor for
+	 * extra control or if you are using pre-compiled `Route` objects.
 	 *
 	 * @var string
 	 * @see lithium\http\Route::$_template
@@ -95,7 +99,7 @@ class Route extends \lithium\core\Object {
 			'keys' => array(),
 			'options' => array()
 		);
-		parent::__construct((array)$config + $defaults);
+		parent::__construct((array) $config + $defaults);
 	}
 
 	protected function _init() {
@@ -157,7 +161,7 @@ class Route extends \lithium\core\Object {
 	 *
 	 * @param array $options The options to write to this route, with defaults pre-merged.
 	 * @param array $defaults The default template options for this route (contains hard-coded
-	 *              default values).
+	 *        default values).
 	 * @return string Returns the route template string with option values inserted.
 	 */
 	protected function _write($options, $defaults) {
@@ -205,6 +209,7 @@ class Route extends \lithium\core\Object {
 	 * Compiles URL templates into regular expression patterns for matching against request URLs,
 	 * and extracts template parameters into match-parameter arrays.
 	 *
+	 * @param array $options
 	 * @return void
 	 */
 	public function compile($options = array()) {

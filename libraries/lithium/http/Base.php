@@ -43,7 +43,7 @@ class Base extends \lithium\core\Object {
 	public $body = array();
 
 	/**
-	 * Add a header to rendered output, or return a single header or full header list
+	 * Add a header to rendered output, or return a single header or full header list.
 	 *
 	 * @param string $key
 	 * @param string $value
@@ -63,7 +63,7 @@ class Base extends \lithium\core\Object {
 		if (!empty($value)) {
 			$this->headers = array_merge($this->headers, array($key => $value));
 		} else {
-			foreach ((array)$key as $header => $value) {
+			foreach ((array) $key as $header => $value) {
 				if (!is_string($header)) {
 					if (preg_match('/(.*?):(.+)/i', $value, $match)) {
 						$this->headers[$match[1]] = trim($match[2]);
@@ -82,12 +82,13 @@ class Base extends \lithium\core\Object {
 	}
 
 	/**
-	 * Add body parts
+	 * Add body parts.
 	 *
+	 * @param mixed $data
 	 * @return array
 	 */
 	public function body($data = null) {
-		$this->body = array_merge((array)$this->body, (array)$data);
+		$this->body = array_merge((array) $this->body, (array) $data);
 		return trim(join("\r\n", $this->body));
 	}
 }

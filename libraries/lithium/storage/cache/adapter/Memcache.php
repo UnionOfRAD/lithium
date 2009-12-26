@@ -90,9 +90,9 @@ class Memcache extends \lithium\core\Object {
 	/**
 	 * Write value(s) to the cache
 	 *
-	 * @param string $key        The key to uniquely identify the cached item
-	 * @param mixed  $value      The value to be cached
-	 * @param string $expiry     A strtotime() compatible cache time
+	 * @param string $key The key to uniquely identify the cached item
+	 * @param mixed $value The value to be cached
+	 * @param string $expiry A strtotime() compatible cache time
 	 * @return boolean True on successful write, false otherwise
 	 */
 	public function write($key, $value, $expiry) {
@@ -150,9 +150,9 @@ class Memcache extends \lithium\core\Object {
 	 * If the operation would decrease the value below 0, the new value will be 0."
 	 * (see http://www.php.net/manual/memcached.decrement.php)
 	 *
-	 * @param string  $key    Key of numeric cache item to decrement
+	 * @param string $key Key of numeric cache item to decrement
 	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return mixed  Item's new value on successful decrement, false otherwise
+	 * @return mixed Item's new value on successful decrement, false otherwise
 	 */
 	public function decrement($key, $offset = 1) {
 		$Memcached =& static::$_Memcached;
@@ -170,9 +170,9 @@ class Memcache extends \lithium\core\Object {
 	 * "If the item's value is not numeric, it is treated as if the value were 0."
 	 * (see http://www.php.net/manual/memcached.decrement.php)
 	 *
-	 * @param string  $key    Key of numeric cache item to increment
+	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return mixed  Item's new value on successful increment, false otherwise
+	 * @return mixed Item's new value on successful increment, false otherwise
 	 */
 	public function increment($key, $offset = 1) {
 		$Memcached =& static::$_Memcached;

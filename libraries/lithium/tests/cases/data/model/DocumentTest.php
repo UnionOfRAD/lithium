@@ -450,6 +450,114 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertFalse($doc->invokeMethod('_isComplexType',array(new stdClass())));
 	}
 
+	public function testIsset() {
+		$doc = new Document(array('data' => array(
+				'title' => 'Post',
+				'content' => 'Lorem Ipsum',
+		)));
+
+		$this->assertTrue(isset($doc->title));
+		$this->assertTrue(isset($doc->content));
+		$this->assertFalse(isset($doc->body));
+	}
+
+	public function testData() {
+		$doc = new Document(array(
+			'data' => array(
+				'title' => 'Post',
+				'content' => 'Lorem Ipsum',
+				'parsed' => null,
+				'permanent' => false
+			)
+		));
+
+		$expected = array(
+			'title' => 'Post',
+			'content' => 'Lorem Ipsum',
+			'parsed' => null,
+			'permanent' => false
+		);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Post';
+		$result = $doc->data('title');
+		$this->assertEqual($expected, $result);
+
+		$expected = false;
+		$result = $doc->data('permanent');
+		$this->assertEqual($expected, $result);
+
+		$doc = new Document();
+		$this->assertNull($doc->data('field'));
+	}
+
+	public function testUnset() {
+		$doc = new Document(array(
+			'data' => array(
+				'title' => 'Post',
+				'content' => 'Lorem Ipsum',
+				'parsed' => null,
+				'permanent' => false
+			)
+		));
+
+		$expected = array(
+			'title' => 'Post',
+			'content' => 'Lorem Ipsum',
+			'parsed' => null,
+			'permanent' => false
+		);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+
+		unset($expected['title']);
+		unset($doc->title);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+
+		unset($expected['parsed']);
+		unset($doc->parsed);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+
+		unset($expected['permanent']);
+		unset($doc->permanent);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+
+		unset($doc->none);
+	}
+
+	public function testErrors() {
+		$doc = new Document(array(
+			'data' => array(
+				'title' => 'Post',
+				'content' => 'Lorem Ipsum',
+				'parsed' => null,
+				'permanent' => false
+			)
+		));
+
+		$errors = array(
+			'title' => 'Too short',
+			'parsed' => 'Empty'
+		);
+		$doc->errors($errors);
+
+		$expected = $errors;
+		$result = $doc->errors();
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Too short';
+		$result = $doc->errors('title');
+		$this->assertEqual($expected, $result);
+
+		$doc->errors('title', 'Too generic');
+		$expected = 'Too generic';
+		$result = $doc->errors('title');
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

@@ -775,21 +775,21 @@ class RequestTest extends \lithium\test\Unit {
 		$result = $request->is('put');
 		$this->assertTrue($result);
 	}
-	
+
 	public function testMergeMobileDetectors() {
 		$request = new Request(array(
 			'env' => array('HTTP_USER_AGENT' => 'testMobile'),
 			'detectors' => array('mobile' => array('HTTP_USER_AGENT', array('testMobile')))
 		));
-		
+
 		$result = $request->is('mobile');
 		$this->assertTrue($result);
-		
+
 		$request = new Request(array(
 			'env' => array('HTTP_USER_AGENT' => 'iPhone'),
 			'detectors' => array('mobile' => array('HTTP_USER_AGENT', array('testMobile')))
 		));
-		
+
 		$result = $request->is('mobile');
 		$this->assertTrue($result);
 	}

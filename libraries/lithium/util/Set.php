@@ -46,8 +46,8 @@ class Set {
 	 * Counts the dimensions of an array. If `$all` is set to `false` (which is the default) it will
 	 * only consider the dimension of the first element in the array.
 	 *
-	 * @param array $array Array to count dimensions on.
-	 * @param boolean $all true counts the dimension considering all elements in array.
+	 * @param array $data Array to count dimensions on.
+	 * @param array $options
 	 * @param integer $count Start the depth count at this number.
 	 * @return integer The number of dimensions in `$array`.
 	 */
@@ -105,7 +105,7 @@ class Set {
 
 		foreach ($data as $key => $val) {
 			if (is_array($val)) {
-				$result += (array)static::flatten($val, array(
+				$result += (array) static::flatten($val, array(
 					'separator' => $options['separator'],
 					'path' => $options['path'] . $key
 				));
@@ -222,8 +222,9 @@ class Set {
 	 * match certain conditions.
 	 *
 	 * @param mixed $conditions An array of condition strings or an XPath expression.
-	 * @param array $data  An array of data to execute the match on.
+	 * @param array $data An array of data to execute the match on.
 	 * @param integer $i Optional: The 'nth'-number of the item being matched.
+	 * @param integer $length
 	 * @return boolean
 	 */
 	public static function matches($conditions, $data = array(), $i = null, $length = null) {
@@ -364,11 +365,11 @@ class Set {
 		$args = func_get_args();
 
 		if (!isset($r)) {
-			$r = (array)current($args);
+			$r = (array) current($args);
 		}
 
 		while (($arg = next($args)) !== false) {
-			foreach ((array)$arg as $key => $val)	 {
+			foreach ((array) $arg as $key => $val)	 {
 				if (is_array($val) && isset($r[$key]) && is_array($r[$key])) {
 					$r[$key] = static::merge($r[$key], $val);
 				} elseif (is_int($key)) {
@@ -409,6 +410,7 @@ class Set {
 	/**
 	 * Implements partial support for XPath 2.0.
 	 *
+	 * @param array $data An array of data to extract from.
 	 * @param string $path An absolute XPath 2.0 path. Only absolute paths starting with a
 	 *               single slash are supported right now. Implemented selectors:
 	 *               - `'/User/id'`: Similar to the classic {n}.User.id.
@@ -424,8 +426,7 @@ class Set {
 	 *               - `'/Comment[text=/lithium/i]`': Selects the all comments that have
 	 *                 a text matching the regex `/lithium/i`.
 	 *               - `'/Comment/@*'`: Selects all key names of all comments.
-	 * @param string $path An array of data to extract from.
-	 * @param string $options Currently only supports `'flatten'` which can be
+	 * @param array $options Currently only supports `'flatten'` which can be
 	 *              disabled for higher XPath-ness.
 	 * @return array An array of matched items.
 	 */
@@ -481,7 +482,7 @@ class Set {
 				$match = false;
 				if ($token === '@*' && is_array($context['item'])) {
 					$matches[] = array(
-						'trace' => array_merge($context['trace'], (array)$key),
+						'trace' => array_merge($context['trace'], (array) $key),
 						'key' => $key,
 						'item' => array_keys($context['item']),
 					);
@@ -634,9 +635,9 @@ class Set {
 	 */
 	public static function diff($val1, $val2 = null) {
 		if (empty($val1)) {
-			return (array)$val2;
+			return (array) $val2;
 		} elseif (empty($val2)) {
-			return (array)$val1;
+			return (array) $val1;
 		}
 		$out = array();
 
@@ -845,7 +846,7 @@ class Set {
 	public static function sort($data, $path, $dir = 'asc') {
 		$flatten = function($flatten, $results, $key = null) {
 			$stack = array();
-			foreach ((array)$results as $k => $r) {
+			foreach ((array) $results as $k => $r) {
 				$id = $k;
 				if (!is_null($key)) {
 					$id = $key;

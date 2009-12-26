@@ -75,7 +75,7 @@ class String {
 
 		return sprintf(
 			"%08x-%04x-%04x-%02x%02x-%04x%08x",
-			(integer)$timeLow, (integer)substr($timeMid, 2) & 0xffff, mt_rand(0, 0xfff) | 0x4000,
+			(integer) $timeLow, (integer) substr($timeMid, 2) & 0xffff, mt_rand(0, 0xfff) | 0x4000,
 			mt_rand(0, 0x3f) | 0x80, mt_rand(0, 0xff), $pid, $node
 		);
 	}
@@ -140,7 +140,7 @@ class String {
 		);
 		$options += $defaults;
 		$format = $options['format'];
-		$data = (array)$data;
+		$data = (array) $data;
 
 		if ($format == 'regex' || (empty($format) && !empty($options['escape']))) {
 			$format = sprintf(

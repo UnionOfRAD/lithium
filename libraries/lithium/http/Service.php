@@ -10,27 +10,27 @@ namespace lithium\http;
 use \lithium\core\Libraries;
 
 /**
- * Basic Http Service
+ * Basic Http Service.
  *
  */
 class Service extends \lithium\core\Object {
 
 	/**
-	 * Holds the request and response used by send
+	 * Holds the request and response used by send.
 	 *
 	 * @var object
 	 */
 	public $last = null;
 
 	/**
-	 * auto config
+	 * Auto config
 	 *
 	 * @var array
 	 */
 	protected $_autoConfig = array('classes' => 'merge');
 
 	/**
-	 * The `Socket` instance used to send `Service` calls
+	 * The `Socket` instance used to send `Service` calls.
 	 *
 	 * @var \lithium\util\Socket
 	 */
@@ -45,7 +45,7 @@ class Service extends \lithium\core\Object {
 	protected $_isConnected = false;
 
 	/**
-	 * Fully-namespaced class references to `Service` class dependencies.
+	 * Fully-name-spaced class references to `Service` class dependencies.
 	 *
 	 * @var array
 	 */
@@ -77,7 +77,7 @@ class Service extends \lithium\core\Object {
 			'timeout'    => 1,
 			'encoding'   => 'UTF-8',
 		);
-		$config = (array)$config + $defaults;
+		$config = (array) $config + $defaults;
 
 		$config['auth'] = array(
 			'method'   => $config['auth'],
@@ -96,7 +96,7 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
-	 * Connect to datasource
+	 * Connect to data source.
 	 *
 	 * @return boolean
 	 */
@@ -108,7 +108,7 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
-	 * Disconnect from socket
+	 * Disconnect from socket.
 	 *
 	 * @return boolean
 	 */
@@ -120,10 +120,11 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
-	 * Send GET request
+	 * Send GET request.
 	 *
 	 * @param string $path
 	 * @param array $data
+	 * @param array $options
 	 * @return string
 	 */
 	public function get($path = null, $data = array(), $options = array()) {
@@ -131,10 +132,11 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
-	 * Send POST request
+	 * Send POST request.
 	 *
-	 * @param string path
-	 * @param array data
+	 * @param string $path
+	 * @param array $data
+	 * @param array $options
 	 * @return string
 	 */
 	public function post($path = null, $data = array(), $options = array()) {
@@ -142,10 +144,11 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
-	 * Send PUT request
+	 * Send PUT request.
 	 *
-	 * @param string path
-	 * @param array data
+	 * @param string $path
+	 * @param array $data
+	 * @param array $options
 	 * @return string
 	 */
 	public function put($path = null, $data = array(), $options = array()) {
@@ -153,10 +156,11 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
-	 * Send DELETE request
+	 * Send DELETE request.
 	 *
-	 * @param string path
-	 * @param array params
+	 * @param string $path
+	 * @param array $data
+	 * @param array $options
 	 * @return string
 	 */
 	public function delete($path = null, $data = array(), $options = array()) {
@@ -164,9 +168,12 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
-	 * Send request and return response data
+	 * Send request and return response data.
 	 *
-	 * @param string path
+	 * @param string $method
+	 * @param string $path
+	 * @param array $data
+	 * @param array $options
 	 * @return string
 	 */
 	public function send($method, $path = null, $data = null, $options = array()) {
@@ -191,7 +198,7 @@ class Service extends \lithium\core\Object {
 	 * properties based on the request type and data to be sent.
 	 *
 	 * @param string $method The HTTP method of the request, i.e. `'GET'`, `'HEAD'`, `'OPTIONS'`,
-	 *               etc. Can be passed in upper- or lowercase.
+	 *        etc. Can be passed in upper- or lower-case.
 	 * @param string $path The
 	 * @param string $data
 	 * @param string $options
@@ -200,18 +207,17 @@ class Service extends \lithium\core\Object {
 	 */
 	protected function _request($method, $path, $data, $options) {
 		$request = new $this->_classes['request']($this->_config + $options);
-		$request->path = str_replace('//', '/', "/{$path}");
+		$request->path = str_replace('//', '/', "{$request->path}{$path}");
 		$request->method = $method = strtoupper($method);
 		$media = $this->_classes['media'];
 		$type = null;
 
 		if (in_array($options['type'], $media::types()) && $data && !is_string($data)) {
 			$type = $media::type($options['type']);
-			$contentType = (array)$type['content'];
+			$contentType = (array) $type['content'];
 			$request->headers(array('Content-Type' => current($contentType)));
 			$data = Media::encode($options['type'], $data, $options);
 		}
-
 		in_array($method, array('POST', 'PUT')) ? $request->body($data) : $request->params = $data;
 		return $request;
 	}

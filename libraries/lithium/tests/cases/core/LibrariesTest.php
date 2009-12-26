@@ -279,11 +279,23 @@ class LibrariesTest extends \lithium\test\Unit {
 		$base = $library['path'] . '/';
 
 		$result = Libraries::path('lithium\template\View', array('dirs' => true));
-		$expected = $base.'template/View.php';
+		$expected = $base . 'template/View.php';
 		$this->assertEqual($expected, $result);
 
 		$result = Libraries::path('lithium\template\views', array('dirs' => true));
 		$this->assertNull($result);
+	}
+
+	public function testAddingMulitplePlugins() {
+		$plugins = Libraries::add('plugin', array(
+			'li3_foo_blog' => array('bootstrap' => false),
+			'li3_foo_forum'
+		));
+		$expected = array('li3_foo_blog', 'li3_foo_forum');
+		$this->assertEqual($expected, array_keys($plugins));
+
+		$this->assertIdentical(false, $plugins['li3_foo_blog']['bootstrap']);
+		$this->assertIdentical(false, $plugins['li3_foo_forum']['bootstrap']);
 	}
 }
 

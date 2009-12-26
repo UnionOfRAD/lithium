@@ -52,7 +52,6 @@ class DocblockTest extends \lithium\test\Unit {
 		$result = Docblock::comment($comment);
 		$this->assertEqual($expected, $result);
 	}
-
 }
 
 ?>

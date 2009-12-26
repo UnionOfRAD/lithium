@@ -44,11 +44,12 @@ class Object {
 	/**
 	 * Initialises properties, unless supplied configuration options change the default behaviour.
 	 *
+	 * @param array $config
 	 * @return object
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('init' => true);
-		$this->_config = (array)$config + $defaults;
+		$this->_config = (array) $config + $defaults;
 
 		if ($this->_config['init']) {
 			$this->_init();
@@ -95,14 +96,14 @@ class Object {
 	 * Apply a closure to a method of the current object instance.
 	 *
 	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
-	 *              method name as a string, or an array of method names.
-	 * @param closure $closure The clousure that is used to filter the method(s).
+	 *        method name as a string, or an array of method names.
+	 * @param closure $closure The closure that is used to filter the method(s).
 	 * @return void
 	 * @see lithium\core\Object::_filter()
 	 * @see lithium\util\collection\Filters
 	 */
 	public function applyFilter($method, $closure = null) {
-		foreach ((array)$method as $m) {
+		foreach ((array) $method as $m) {
 			if (!isset($this->_methodFilters[$m])) {
 				$this->_methodFilters[$m] = array();
 			}
@@ -144,7 +145,7 @@ class Object {
 	 * called statically on any class that extends `Object` to return an instance of it.
 	 *
 	 * @param array $data An array of properties and values with which to re-instantiate the object.
-	 *              These properties can be both public and protected.
+	 *        These properties can be both public and protected.
 	 * @return object Returns an instance of the requested object with the given properties set.
 	 */
 	public static function __set_state($data) {
@@ -166,7 +167,7 @@ class Object {
 	 * @param array $params An associative array containing all the parameters passed into
 	 *        the method.
 	 * @param Closure $callback The method's implementation, wrapped in a closure.
-	 * @param array $filters Additional filters to apply to the method for this call only
+	 * @param array $filters Additional filters to apply to the method for this call only.
 	 * @return mixed
 	 * @see lithium\util\collection\Filters
 	 */

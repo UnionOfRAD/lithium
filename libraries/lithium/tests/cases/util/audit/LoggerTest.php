@@ -59,23 +59,21 @@ class LoggerTest extends \lithium\test\Unit {
 		Logger::config($config);
 
 		$result = Logger::write('default', 'Message line 1');
-		$this->assertTrue(file_exists(LITHIUM_APP_PATH . '/tmp/logs/default.log'));
+		$this->assertTrue(file_exists(LITHIUM_APP_PATH . '/resources/tmp/logs/default.log'));
 
 		$expected = "Message line 1\n";
-		$result = file_get_contents(LITHIUM_APP_PATH . '/tmp/logs/default.log');
+		$result = file_get_contents(LITHIUM_APP_PATH . '/resources/tmp/logs/default.log');
 		$this->assertEqual($expected, $result);
 
 		$result = Logger::write('default', 'Message line 2');
 		$this->assertTrue($result);
 
 		$expected = "Message line 1\nMessage line 2\n";
-		$result = file_get_contents(LITHIUM_APP_PATH . '/tmp/logs/default.log');
+		$result = file_get_contents(LITHIUM_APP_PATH . '/resources/tmp/logs/default.log');
 		$this->assertEqual($expected, $result);
 
-		unlink(LITHIUM_APP_PATH . '/tmp/logs/default.log');
+		unlink(LITHIUM_APP_PATH . '/resources/tmp/logs/default.log');
 	}
-
 }
-
 
 ?>

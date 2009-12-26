@@ -19,7 +19,7 @@ class RecordSetTest extends \lithium\test\Unit {
 	}
 
 	public function testColumnIntrospection() {
-		
+
 	}
 }
 

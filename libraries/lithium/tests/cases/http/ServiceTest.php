@@ -52,6 +52,36 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testPath() {
+		$http = new MockService(array('host' => 'localhost') + $this->_testConfig);
+		$result = $http->get();
+
+		$expected = '/';
+		$result = $http->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$http = new MockService(array('host' => 'localhost/base/path/') + $this->_testConfig);
+		$result = $http->get();
+
+		$expected = '/base/path/';
+		$result = $http->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$http = new MockService(array('host' => 'localhost/base/path') + $this->_testConfig);
+		$result = $http->get('/somewhere');
+
+		$expected = '/base/path/somewhere';
+		$result = $http->last->request->path;
+		$this->assertEqual($expected, $result);
+
+		$http = new MockService(array('host' => 'localhost/base/path/') + $this->_testConfig);
+		$result = $http->get('/somewhere');
+
+		$expected = '/base/path/somewhere';
+		$result = $http->last->request->path;
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testGet() {
 		$http = new MockService($this->_testConfig);
 		$result = $http->get();
@@ -116,7 +146,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'Content-Length: 11',
 			'', 'status=cool'
 		));
-		$result = (string)$http->last->request;
+		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -132,7 +162,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'Content-Length: 11',
 			'', 'status=cool'
 		));
-		$result = (string)$http->last->request;
+		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -146,7 +176,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'User-Agent: Mozilla/5.0 (Lithium)',
 			'', ''
 		));
-		$result = (string)$http->last->request;
+		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -162,7 +192,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'Content-Length: 17',
 			'', '{"status":"cool"}'
 		));
-		$result = (string)$http->last->request;
+		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
 	}
 }

@@ -131,16 +131,24 @@ Libraries::add('app');
 // use lithium\g11n\Catalog;
 //
 // Catalog::config(array(
-// 	'runtime' => array('adapter' => 'Memory'),
-// 	'app' => array('adapter' => 'Gettext', 'path' => LITHIUM_APP_PATH . '/resources/po'),
-// 	'lithium' => array('adapter' => 'Gettext', 'path' => LITHIUM_LIBRARY_PATH . '/lithium/resources/po')
+// 	'runtime' => array(
+// 		'adapter' => 'Memory'
+// 	),
+// 	'app' => array(
+// 		'adapter' => 'Gettext',
+// 		'path' => LITHIUM_APP_PATH . '/resources/g11n'
+// 	),
+// 	'lithium' => array(
+// 		'adapter' => 'Gettext',
+// 		'path' => LITHIUM_LIBRARY_PATH . '/lithium/g11n/resources'
+// 	)
 // ));
 
 /**
  * Globalization runtime data.  You can add globalized data during runtime utilizing a
  * configuration set up to use the _memory_ adapter.
  */
-// $data = array('en' => function($n) { return $n != 1 ? 1 : 0; });
+// $data = array('root' => function($n) { return $n != 1 ? 1 : 0; });
 // Catalog::write('message.plural', $data, array('name' => 'runtime'));
 
 /**
@@ -161,5 +169,4 @@ Libraries::add('app');
 /**
  * Your custom code goes here.
  */
-
 ?>

@@ -81,7 +81,7 @@ class Html extends \lithium\test\Reporter {
 	 */
 	public function filters($filters) {
 		$result = array();
-		foreach ((array)$filters as $class => $data) {
+		foreach ((array) $filters as $class => $data) {
 			$result[] = $class::output('html', $data);
 		}
 		return join("\n", $result);

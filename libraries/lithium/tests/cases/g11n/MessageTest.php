@@ -17,30 +17,22 @@ class MessageTest extends \lithium\test\Unit {
 
 	protected $_backups = array();
 
-	protected $_locale;
-
-	protected $_connection;
-
 	public function setUp() {
-		// $this->_backups['locale'] = Environment::get('G11n.locale');
-		$this->_backups['catalogConfig'] = Catalog::config()->to('array');
-		Catalog::clear();
+		$this->_backups['catalogConfig'] = Catalog::config();
+		Catalog::reset();
 		Catalog::config(array(
 			'runtime' => array('adapter' => new Memory())
 		));
 	}
 
 	public function tearDown() {
-		Catalog::clear();
+		Catalog::reset();
 		Catalog::config($this->_backups['catalogConfig']);
-		// Environment::set('G11n.locale', $this->_backup['locale']);
 	}
 
 	public function testTranslate() {
-		// Environment::set('G11n.locale', 'de');
-
 		$data = array(
-			'de' => function($n) { return $n == 1 ? 0 : 1; }
+			'root' => function($n) { return $n == 1 ? 0 : 1; }
 		);
 		Catalog::write('message.plural', $data, array('name' => 'runtime'));
 
@@ -52,15 +44,15 @@ class MessageTest extends \lithium\test\Unit {
 		Catalog::write('message.page', $data, array('name' => 'runtime'));
 
 		$expected = 'Kuchen';
-		$result = Message::translate('lithium');
+		$result = Message::translate('lithium', array('locale' => 'de'));
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Haus';
-		$result = Message::translate('house');
+		$result = Message::translate('house', array('locale' => 'de'));
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Häuser';
-		$result = Message::translate('house', array('count' => 5));
+		$result = Message::translate('house', array('locale' => 'de', 'count' => 5));
 		$this->assertEqual($expected, $result);
 	}
 }

@@ -55,4 +55,5 @@ class MockSocket extends \lithium\util\Socket {
 		}
 	}
 }
+
 ?>

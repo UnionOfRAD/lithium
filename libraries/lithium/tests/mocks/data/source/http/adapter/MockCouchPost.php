@@ -11,9 +11,9 @@ namespace lithium\tests\mocks\data\source\http\adapter;
 class MockCouchPost extends \lithium\data\Model {
 
 	protected $_meta = array(
-		'source' => 'posts'
+		'source' => 'posts',
 	);
-	
+
 	protected $_schema = array(
 		'id' => array('type' => 'integer', 'key' => 'primary'),
 		'author_id' => array('type' => 'integer'),

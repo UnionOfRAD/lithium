@@ -165,7 +165,7 @@ class Validator extends \lithium\core\StaticObject {
 
 				$precision = '+(?:[eE][-+]?[0-9]+)?';
 				$precision = $options['precision'] ? '{' . $options['precision'] . '}' : $precision;
-				return (bool)preg_match("/^[-+]?[0-9]*\\.{1}[0-9]{$precision}$/", (string)$value);
+				return (boolean) preg_match("/^[-+]?[0-9]*\\.{1}[0-9]{$precision}$/", (string) $value);
 			},
 			'inList' => function($value, $format, $options) {
 				$options += array('list' => array());
@@ -275,44 +275,40 @@ class Validator extends \lithium\core\StaticObject {
 	 * @param object $values An array of key/value pairs, where the values are to be checked.
 	 * @param string $rules array of rules to check against object properties
 	 * @return mixed When all validation rules pass
-	 * @todo Bring over validation loop from Model, determine formats/options, implement.
 	 */
-	public static function check($values, $rules, $options = array()) {
-		$rule = 'isNotEmpty';
-		$__check = function($field, $rules) use ($values, $rule, &$__check) {
-			$data = isset($values[$field]) ? array($values[$field]) : array();
-			$errors = array();
-			if (is_array($rules)) {
-				if (!empty($rules[0])) {
-					$multiple = array();
-					foreach ($rules as $rule) {
-						$multiple[] = $__check($field, $rule);
-					}
-					return array_values(array_filter($multiple));
-				} else if (!empty($rules['rule'])) {
-					if (is_string($rules['rule'])) {
-						$rule = $rules['rule'];
-					} else {
-						$rule = array_shift((array) $rules['rule']);
-						$data += $rules['rule'];
-					}
-				}
-			}
-
-			if (Validator::invokeMethod($rule, $data) !== true) {
-				if (is_string($rules)) {
-					return $rules;
-				}
-				if (!empty($rules['message'])) {
-					return $rules['message'];
-				}
-				return "{$field} is invalid.";
-			}
-			return null;
-		};
+	public static function check($values, $rules) {
+		$defaults = array(
+			'notEmpty',
+			'message' => null,
+			'required' => true,
+			'skipEmpty' => false,
+			'format' => 'any',
+			'last' => false
+		);
 		$errors = array();
+
 		foreach ($rules as $field => $rules) {
-			$errors[$field] = $__check($field, $rules);
+			$rules = is_string($rules) ? array('message' => $rules) : $rules;
+			$rules = is_array(current($rules)) ? $rules : array($rules);
+			$errors[$field] = array();
+
+			foreach ($rules as $key => $rule) {
+				$rule += $defaults;
+				list($name) = $rule;
+
+				if (!isset($values[$field])) {
+					if ($rule['required']) {
+						$errors[$field][] = $rule['message'] ?: $key;
+					}
+					continue;
+				}
+				if (empty($values[$field]) && $rule['skipEmpty']) {
+					continue;
+				}
+				if (!static::rule($name, $values[$field], $rule['format'], $rule)) {
+					$errors[$field][] = $rule['message'] ?: $key;
+				}
+			}
 		}
 		return array_filter($errors);
 	}
@@ -439,13 +435,30 @@ class Validator extends \lithium\core\StaticObject {
 			$formats = array_keys($ruleCheck);
 			$all = ($format == 'all');
 		} else {
-			$formats = (array)$format;
+			$formats = (array) $format;
 			$all = true;
 		}
 		if (static::_checkFormats($ruleCheck, $formats, $value, $all, $options)) {
-			return (bool)static::_filters('after', $rule, compact('value', 'format', 'options'));
+			return (boolean) static::_filters('after', $rule, compact('value', 'format', 'options'));
 		}
 		return false;
+	}
+
+	/**
+	 * Returns a list of available validation rules, or the configuration details of a single rule.
+	 *
+	 * @param string $name Optional name of a rule to get the details of. If not specified, an array
+	 *               of all available rule names is returned. Otherwise, returns the details of a
+	 *               single rule. This can be a regular expression string, a closure object, or an
+	 *               array of available rule formats made up of string regular expressions,
+	 *               closures, or both.
+	 * @return mixed Returns either an single array of rule names, or the details of a single rule.
+	 */
+	public static function rules($name = null) {
+		if (!$name) {
+			return array_keys(static::$_rules);
+		}
+		return isset(static::$_rules[$name]) ? static::$_rules[$name] : null;
 	}
 
 	/**
@@ -724,7 +737,7 @@ class Validator extends \lithium\core\StaticObject {
 	 * Checks that a value is a monetary amount.
 	 *
 	 * @param string $value Value to check
-	 * @param string $symbolPosition Where symbol is located (left/right)
+	 * @param string $format Where symbol is located (left/right)
 	 * @return boolean Success
 	 */
 	public static function isMoney($value, $format = 'left') {
@@ -745,7 +758,7 @@ class Validator extends \lithium\core\StaticObject {
 	public static function multiple($value, $options = array()) {
 		$defaults = array('in' => null, 'max' => null, 'min' => null);
 		$options += $defaults;
-		$value = array_filter((array)$value);
+		$value = array_filter((array) $value);
 
 		if (empty($value)) {
 			return false;

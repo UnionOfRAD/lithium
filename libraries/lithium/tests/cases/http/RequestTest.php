@@ -71,7 +71,20 @@ class RequestTest extends \lithium\test\Unit {
 		$expected = 'Part 1';
 		$result = $request->body();
 		$this->assertEqual($expected, $result);
+	}
 
+	public function testConstructWithPath() {
+		$request = new Request(array(
+			'host' => 'localhost/base/path',
+			'port' => 443,
+			'headers' => array('Header' => 'Value'),
+			'body' => array('Part 1'),
+			'params' => array('param' => 'value')
+		));
+
+		$expected = '/base/path/';
+		$result = $request->path;
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testQueryStringDefault() {
@@ -109,7 +122,7 @@ class RequestTest extends \lithium\test\Unit {
 			'User-Agent: Mozilla/5.0 (Lithium)',
 			'', ''
 		));
-		$result = (string)$this->request;
+		$result = (string) $this->request;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -126,7 +139,7 @@ class RequestTest extends \lithium\test\Unit {
 			'Authorization: Basic ' . base64_encode('root:something'),
 			'', ''
 		));
-		$result = (string)$request;
+		$result = (string) $request;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -140,7 +153,7 @@ class RequestTest extends \lithium\test\Unit {
 			'', 'status=cool'
 		));
 		$this->request->body(array('status=cool'));
-		$result = (string)$this->request;
+		$result = (string) $this->request;
 		$this->assertEqual($expected, $result);
 	}
 }

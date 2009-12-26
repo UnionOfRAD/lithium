@@ -72,7 +72,6 @@ class DispatcherTest extends \lithium\test\Unit {
 		$result = $report->results['group'][0][0]['result'];
 		$this->assertEqual($expected, $result);
 	}
-
 }
 
 ?>

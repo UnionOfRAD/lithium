@@ -67,10 +67,9 @@ class Todo extends \lithium\console\Command {
 	 * undocumented
 	 *
 	 */
-}
-
 // if (1) {
 // 	Request::dispatch(new Request(compact('argv')), new Todo());
 // }
+}
 
 ?>

@@ -20,8 +20,8 @@ use \lithium\util\reflection\Inspector;
  * Most assertions take an expected result, a received result, and a message (to describe the
  * failure) as parameters.
  *
- * Available assertions are (see `assert<assertion-name>` methods for details): Equal, False, Identical,
- * NoPattern, NotEqual, Null, Pattern, Tags, True.
+ * Available assertions are (see `assert<assertion-name>` methods for details): Equal, False,
+ * Identical, NoPattern, NotEqual, Null, Pattern, Tags, True.
  *
  * If an assertion is expected to produce an exception, the `expectException` method should be
  * called before it.
@@ -272,7 +272,7 @@ class Unit extends \lithium\core\Object {
 	 * }}}
 	 *
 	 * {{{
-	 * $this->assertFalse(false, 'Zero value');
+	 * $this->assertFalse(false, 'Boolean false');
 	 * }}}
 	 * all evaluate to false.
 	 *
@@ -296,7 +296,7 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Tests a for result that does NOT match the expected regular expression pattern
+	 * Checks that the regular expression `$expected` is not matched in the result.
 	 *
 	 * @param mixed $expected
 	 * @param mixed $result
@@ -307,7 +307,7 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Tests a for result match in the expected regular expression pattern
+	 * Checks that the regular expression `$expected` is matched in the result.
 	 *
 	 * @param mixed $expected
 	 * @param mixed $result
@@ -347,7 +347,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param string $string An HTML/XHTML/XML string
 	 * @param array $expected An array, see above
-	 * @param string $message SimpleTest failure output string
+	 * @param boolean $fullDebug
 	 * @access public
 	 */
 	function assertTags($string, $expected, $fullDebug = false) {
@@ -451,7 +451,7 @@ class Unit extends \lithium\core\Object {
 			list($description, $expressions, $itemNum) = $assertation;
 			$matches = false;
 
-			foreach ((array)$expressions as $expression) {
+			foreach ((array) $expressions as $expression) {
 				if (preg_match(sprintf('/^%s/s', $expression), $string, $match)) {
 					$matches = true;
 					$string = substr($string, strlen($match[0]));
@@ -588,6 +588,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param object $exception The exception object to report on. Statistics are gathered and
 	 *               added to the reporting stack contained in `Unit::$_results`.
+	 * @param string $lineFlag
 	 * @return void
 	 * @todo Refactor so that reporters handle trace formatting.
 	 */
@@ -646,8 +647,8 @@ class Unit extends \lithium\core\Object {
 
 		if (is_object($expected)) {
 			$isObject = true;
-			$expected = (array)$expected;
-			$result = (array)$result;
+			$expected = (array) $expected;
+			$result = (array) $result;
 		}
 
 		if (is_array($expected)) {
@@ -715,7 +716,7 @@ class Unit extends \lithium\core\Object {
 		}
 
 		$defaults = array('trace' => null, 'expected' => null, 'result' => null);
-		$data = (array)$data + $defaults;
+		$data = (array) $data + $defaults;
 		return sprintf("trace: %s\nexpected: %s\nresult: %s\n",
 			$data['trace'],
 			var_export($data['expected'], true),
@@ -727,6 +728,7 @@ class Unit extends \lithium\core\Object {
 	 * Generates all permutation of an array $items and returns them in a new array.
 	 *
 	 * @param array $items An array of items
+	 * @param array $perms
 	 * @return array
 	 */
 	protected function _arrayPermute($items, $perms = array()) {

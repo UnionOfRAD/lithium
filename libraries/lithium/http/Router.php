@@ -25,10 +25,11 @@ class Router extends \lithium\core\StaticObject {
 	/**
 	 * Connects a new route and returns the current routes array.
 	 *
-	 * @param string $route An empty string, or a route string "/"
+	 * @param string $template An empty string, or a route string "/"
 	 * @param array $params An array describing the default or required elements of the route
-	 * @see lithium\http\Router::parse()
+	 * @param array $options
 	 * @return array Array of routes
+	 * @see lithium\http\Router::parse()
 	 */
 	public static function connect($template, $params = array(), $options = array()) {
 		if ($template === null) {
@@ -47,7 +48,7 @@ class Router extends \lithium\core\StaticObject {
 	 * Takes an instance of lithium\http\Request (or a subclass) and matches it against each
 	 * route, in the order that the routes are connected.
 	 *
-	 * @param object $request A request object containing URL and environment data
+	 * @param object $request A request object containing URL and environment data.
 	 * @return array
 	 * @see lithium\http\Router::connect()
 	 */
@@ -61,8 +62,8 @@ class Router extends \lithium\core\StaticObject {
 	 * Attempts to match an array of route parameters (i.e. `'controller'`, `'action'`, etc.)
 	 * against a connected `Route` object.
 	 *
-	 * @param array $options 
-	 * @param object $context 
+	 * @param array $options
+	 * @param object $context
 	 * @return string
 	 * @todo Implement full context support
 	 */
