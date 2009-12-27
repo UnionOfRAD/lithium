@@ -24,18 +24,12 @@ class Logger extends \lithium\core\Adaptable {
 	protected static $_adapters = 'adapter.util.audit.logger';
 
 	/**
-	 * Writes $message to the log specified by the $name
+	 * Writes `$message` to the log specified by the `$type`
 	 * configuration.
 	 *
-<<<<<<< HEAD
-	 * @param string $name Configuration to be used for writing
-	 * @param string $message Message to be written
-	 * @return boolean `True` on successful write, `false` otherwise
-=======
-	 * @param string $type Configuration to be used for writing
-	 * @param string $message Message to be written
-	 * @return boolean True on successful write, false otherwise
->>>>>>> 0.4
+	 * @param string $type Configuration to be used for writing.
+	 * @param string $message Message to be written.
+	 * @return boolean `True` on successful write, `false` otherwise.
 	 */
 	public static function write($type, $message) {
 		if (!$config = static::_config($type)) {
