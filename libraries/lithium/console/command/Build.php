@@ -62,6 +62,11 @@ class Build extends \lithium\console\Command {
 		}
 		$class = Libraries::locate('command.build', $command);
 		$command = new $class(array('request' => $this->request->shift(2)));
+
+		if (!method_exists($command, $method)) {
+			array_unshift($command->request->params['args'], $method);
+			$method = 'run';
+		}
 		return $command->invokeMethod($method, $command->request->params['args']);
 	}
 

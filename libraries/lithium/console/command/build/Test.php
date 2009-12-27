@@ -21,14 +21,20 @@ class Test extends \lithium\console\command\Build {
 	public function interactive() {
 
 	}
-
-	public function __call($type, $params) {
+	
+	/**
+	 * Generate test cases for given namespace
+	 *
+	 * @param string $type name or dot-separated for namespace of the class
+	 * @param string $name name of class to test
+	 * @return void
+	 */
+	public function run($type = null, $name = null) {
 		$library = Libraries::get($this->library);
 		if (empty($library['prefix'])) {
 			return false;
 		}
 		$namespace = $this->_namespace($type);
-		$name = array_shift($params);
 		$use = "\\{$library['prefix']}{$namespace}\\{$name}";
 		$methods =  array();
 
@@ -44,6 +50,7 @@ class Test extends \lithium\console\command\Build {
 			'class' => "{$name}Test",
 			'methods' => join("\n", $methods),
 		);
+
 		if ($this->_save($this->template, $params)) {
 			$this->out(
 				"{$params['class']} created for {$name} in {$params['namespace']}."
@@ -52,7 +59,14 @@ class Test extends \lithium\console\command\Build {
 		}
 		return false;
 	}
-
+	
+	/**
+	 * generate a mock class
+	 *
+	 * @param string $type 
+	 * @param string $name 
+	 * @return void
+	 */
 	public function mock($type = null, $name) {
 		$library = Libraries::get($this->library);
 		if (empty($library['prefix'])) {

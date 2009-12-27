@@ -56,7 +56,7 @@ class TestTest extends \lithium\test\Unit {
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$test->path = $this->_testPath;
-		$test->model('Post');
+		$test->run('model', 'Post');
 		$expected = "PostTest created for Post in build_test\\tests\\cases\\models.\n";
 		$result = $test->response->output;
 		$this->assertEqual($expected, $result);
