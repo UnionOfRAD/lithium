@@ -66,7 +66,7 @@ class LibraryTest extends \lithium\test\Unit {
 		$app = new Library(array('request' => $this->request, 'classes' => $this->classes));
 
 		$expected = true;
-		$result = $app->run($this->_testPath . '/new', $this->_testPath . '/app');
+		$result = $app->run($this->_testPath . '/new', $this->_testPath . '/app.phar.gz');
 		$this->assertEqual($expected, $result);
 
 		$this->assertTrue(file_exists($this->_testPath . '/new'));
