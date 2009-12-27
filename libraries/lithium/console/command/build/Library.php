@@ -12,17 +12,16 @@ use \Phar;
 use \lithium\core\Libraries;
 
 /**
- * Generate directory structure
+ * Generate and extract Phar::GZ archives. Requires zlib extension.
  *
- * @package default
  */
 class Library extends \lithium\console\command\Build {
 
 	/**
 	 * Extract an archive into a path
 	 *
-	 * @param string $new
-	 * @param string $copy
+	 * @param string $new the name of or path to the library to create `from` phar
+	 * @param string $from the name of or path to the phar.gz to copy
 	 * @return boolean
 	 */
 	public function run($new = 'new', $from = 'app') {
@@ -48,10 +47,10 @@ class Library extends \lithium\console\command\Build {
 	}
 
 	/**
-	 * create an archive to use compressed with gz
+	 * Create the Phar::GZ archive
 	 *
-	 * @param string $name
-	 * @param string $from
+	 * @param string $name the name of or path the archive
+	 * @param string $from the name of or path to directory to compress
 	 * @return boolean
 	 */
 	public function archive($name = 'app', $from = null) {
