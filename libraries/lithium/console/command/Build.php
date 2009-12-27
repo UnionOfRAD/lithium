@@ -56,15 +56,12 @@ class Build extends \lithium\console\Command {
 	 * @param string $method
 	 * @return void
 	 */
-	public function run($command = null, $method = null) {
+	public function run($command = null, $method = 'run') {
 		if (!$command) {
 			return $this->interactive();
 		}
 		$class = Libraries::locate('command.build', $command);
 		$command = new $class(array('request' => $this->request->shift(2)));
-		if (!$method) {
-			return $command->interactive();
-		}
 		return $command->invokeMethod($method, $command->request->params['args']);
 	}
 

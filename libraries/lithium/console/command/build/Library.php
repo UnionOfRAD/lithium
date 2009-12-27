@@ -19,22 +19,31 @@ use \lithium\core\Libraries;
 class Library extends \lithium\console\command\Build {
 
 	/**
-	 * Runs current command
+	 * Extract an archive into a path
 	 *
-	 * @return void
+	 * @param string $new
+	 * @param string $copy
+	 * @return boolean
 	 */
-	public function run($new = 'new', $copy = null) {
+	public function run($new = 'new', $from = 'app') {
 		$new = $this->_toPath($new);
-		$copy = $this->_toPath($copy);
 
-		if (file_exists("{$copy}.phar.gz")) {
-			$archive = new Phar("{$copy}.phar.gz");
+		if ($from[0] !== '/') {
+			$from = Libraries::locate('command.build.template', $from, array(
+				'filter' => false, 'type' => 'file', 'suffix' => '.phar.gz',
+			));
+			if (!$from || is_array($from)) {
+				return false;
+			}
+		}
+		if (file_exists("{$from}")) {
+			$archive = new Phar("{$from}");
 			if ($archive->extractTo($new)) {
 				$this->out(basename($new) . " created in " . dirname($new));
 				return true;
 			}
 		}
-		$this->error("Could not extract {$copy}.phar.gz");
+		$this->error("Could not extract {$from}");
 		return false;
 	}
 
@@ -43,13 +52,13 @@ class Library extends \lithium\console\command\Build {
 	 *
 	 * @param string $name
 	 * @param string $from
-	 * @return void
+	 * @return boolean
 	 */
 	public function archive($name = 'app', $from = null) {
 		$path = $this->_toPath($name);
 		$archive = new Phar("{$path}.phar");
 		$from = $from !== null ? $this->_toPath($from) :  LITHIUM_APP_PATH;
-		$result = (bool) $archive->buildFromDirectory($from);
+		$result = (boolean) $archive->buildFromDirectory($from);
 		if ($result) {
 			$archive->compress(Phar::GZ);
 			$this->out(basename($path) . " created in " . dirname($path));
@@ -62,7 +71,7 @@ class Library extends \lithium\console\command\Build {
 	 * Take a name and return the path
 	 *
 	 * @param string $name
-	 * @return void
+	 * @return string
 	 */
 	protected function _toPath($name) {
 		$library = Libraries::get($this->library);

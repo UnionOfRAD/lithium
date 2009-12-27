@@ -38,7 +38,7 @@ class TestTest extends \lithium\test\Unit {
 		chdir($this->_backup['cwd']);
 
 		$rmdir = function($value) use( &$rmdir) {
-			if(is_dir($value) && $dir = @opendir($value)) {
+			if(is_dir($value) && $dir = opendir($value)) {
 				while (($path = readdir($dir)) !== false) {
 					if ($path === '.' || $path === '..') continue;
 					$result = is_dir($value . '/' . $path) ? $rmdir($value . '/' . $path) : null;
