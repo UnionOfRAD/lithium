@@ -8,7 +8,9 @@
 
 namespace lithium\core;
 
+use \Exception;
 use \lithium\util\Collection;
+use \lithium\core\Environment;
 
 /**
  * The `Adaptable` static class is the base class from which all adapter implementations
@@ -39,6 +41,8 @@ class Adaptable extends \lithium\core\StaticObject {
 	 */
 	protected static $_configurations = null;
 
+	protected static $_adapters = null;
+
 	/**
 	 * Initialization of static class
 	 *
@@ -49,20 +53,26 @@ class Adaptable extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Sets configurations for a particular adaptable implementation, or returns
-	 * the current configuration settings.
+	 * Sets configurations for a particular adaptable implementation, or returns the current
+	 * configuration settings.
 	 *
 	 * @param array $config Configurations, indexed by name
-	 * @return object         Collection of configurations
+	 * @return object `Collection` of configurations
 	 */
 	public static function config($config = null) {
-		$default = array('adapter' => null, 'filters' => array(), 'strategies' => array());
-
-		if ($config) {
-			$items = array_map(function($i) use ($default) { return $i + $default; }, $config);
-			static::$_configurations = new Collection(compact('items'));
+		if ($config && is_array($config)) {
+			static::$_configurations = new Collection(array('items' => $config));
+			return;
 		}
-		return static::$_configurations;
+		if ($config) {
+			return static::_config($config);
+		}
+		$result = array();
+
+		foreach (static::$_configurations->keys() as $key) {
+			$result[$key] = static::_config($key);
+		}
+		return $result;
 	}
 
 	/**
@@ -75,38 +85,27 @@ class Adaptable extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Returns adapter class name for given $name configuration.
+	 * Returns adapter class name for given `$name` configuration.
 	 *
-	 * @param  string $library Dot-delimited location of library, in a format compatible
-	 *         with Libraries::locate().
-	 * @param  string $name  Classname of adapter to load.
+	 * @param  string $name Class name of adapter to load.
 	 * @return object  Adapter object.
 	 */
-	protected static function _adapter($library, $name = null) {
-		$settings = static::$_configurations;
+	public static function adapter($name = null) {
+		$config = static::_config($name);
 
-		if (empty($name)) {
-			$names = $settings->keys();
-			if (empty($names)) {
-				return;
-			}
-			$name = end($names);
+		if ($config === null) {
+			throw new Exception("Adapter configuration {$name} has not been defined");
 		}
 
-		if (!isset($settings[$name])) {
-			return;
+		if (isset($config['adapter']) && is_object($config['adapter'])) {
+			return $config['adapter'];
 		}
+		$class = static::_class($config, static::$_adapters);
+		$settings = static::$_configurations[$name];
+		$settings[0]['adapter'] = new $class($config);
 
-		if (is_string($settings[$name]['adapter'])) {
-			$config = $settings[$name];
-
-			if (!$class = Libraries::locate($library, $config['adapter'])) {
-				return null;
-			}
-			$settings[$name] = array('adapter' => new $class($config)) + $settings[$name];
-		}
-
-		return $settings[$name]['adapter'];
+		static::$_configurations[$name] = $settings;
+		return static::$_configurations[$name][0]['adapter'];
 	}
 
 	/**
@@ -116,12 +115,55 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * & loaded, as well as having the memcache server up & available.
 	 *
 	 * @param string $name The cache configuration whose adapter will be checked
-	 * @return boolean|null  True if adapter is enabled, false if not. This method will return
-	 *         null if no configuration under the given $name exists.
+	 * @return mixed `True` if adapter is enabled, `false` if not. This method
+	 *         will return `null` if no configuration under the given `$name` exists.
 	 */
 	public static function enabled($name) {
-		$settings = static::config();
-		return (isset($settings[$name])) ? static::adapter($name)->enabled() : null;
+		return is_null(static::_config($name)) ? null : static::adapter($name)->enabled();
+	}
+
+	/**
+	 * Looks up an adapter class by name, using the `$_adapters` property set by a subclass of
+	 * `Adaptable`.
+	 *
+	 * @param string $name The class name of the adapter to locate.
+	 * @return string Returns a fully-namespaced class reference to the adapter class.
+	 */
+	protected static function _class($config, $paths = array()) {
+		$self = get_called_class();
+		if (!$name = $config['adapter']) {
+			throw new Exception("No adapter set for configuration in class {$self}");
+		}
+		foreach ((array) $paths as $path) {
+			if ($class = Libraries::locate($path, $name)) {
+				return $class;
+			}
+		}
+		throw new Exception("Could not find adapter {$name} in class {$self}");
+	}
+
+	/**
+	 * Gets an array of settings for the given named configuration. 
+	 *
+	 * @param string $name 
+	 * @return array
+	 */
+	protected static function _config($name) {
+		$defaults = array('adapter' => null, 'filters' => array(), 'strategies' => array());
+
+		if (!isset(static::$_configurations[$name])) {
+			return null;
+		}
+		$settings = static::$_configurations[$name];
+
+		if (isset($settings[0])) {
+			return $settings[0];
+		}
+		$env = Environment::get();
+		$config = isset($settings[$env]) ? $settings[$env] : $settings;
+
+		static::$_configurations[$name] = array((array) $config + $defaults) + $settings;
+		return static::$_configurations[$name][0];
 	}
 }
 

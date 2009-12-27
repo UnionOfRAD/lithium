@@ -38,13 +38,7 @@ class Connections extends \lithium\core\Adaptable {
 	 */
 	protected static $_configurations = null;
 
-	/**
-	 * As each connection is built, a reference to the instance is stored in
-	 * this Collection under the name it was given when configuration was added.
-	 *
-	 * @var Collection
-	 */
-	protected static $_connections = null;
+	protected static $_adapters = 'data.source';
 
 	/**
 	 * Initialization of static class
@@ -54,7 +48,6 @@ class Connections extends \lithium\core\Adaptable {
 	 */
 	public static function __init() {
 		parent::__init();
-		static::$_connections = new Collection();
 		require LITHIUM_APP_PATH . '/config/connections.php';
 	}
 
@@ -145,36 +138,25 @@ class Connections extends \lithium\core\Adaptable {
 	public static function get($name = null, $options = array()) {
 		$defaults = array('config' => false, 'autoCreate' => true);
 		$options += $defaults;
-		$settings = static::config();
 
 		if (empty($name)) {
-			return $settings->keys();
+			return static::$_configurations->keys();
 		}
 
-		if (!isset($settings[$name])) {
+		if (!isset(static::$_configurations[$name])) {
 			return null;
 		}
-
 		if ($options['config']) {
-			return $settings[$name];
+			return static::_config($name);
 		}
+		$settings = static::$_configurations[$name];
 
-		if (!isset(static::$_connections[$name]) && $options['autoCreate']) {
-			return static::$_connections[$name] = static::_build($settings[$name]);
-		} elseif (!$options['autoCreate']) {
-			return null;
+		if (!isset($settings[0]['adapter']) || !is_object($settings[0]['adapter'])) {
+			if (!$options['autoCreate']) {
+				return null;
+			}
 		}
-		return static::$_connections[$name];
-	}
-
-	/**
-	* Hard reset of connections and configurations, clearing out any currently configured or built.
-	*
-	* @return void
-	*/
-	public static function reset() {
-		parent::reset();
-		static::$_connections = new Collection();
+		return static::adapter($name);
 	}
 
 	/**
@@ -183,19 +165,13 @@ class Connections extends \lithium\core\Adaptable {
 	 * @param array $config
 	 * @return object
 	 */
-	protected static function _build($config) {
-		$class = $config['adapter'];
-		if (empty($config['adapter'])) {
-			$class = Libraries::locate("data.source", $config['type']);
+	protected static function _class($config, $paths = array()) {
+		if (!$config['adapter']) {
+			$config['adapter'] = $config['type'];
 		} else {
-			$class = Libraries::locate("adapter.data.source.{$config['type']}", $config['adapter']);
+			$paths = array_merge(array("adapter.data.source.{$config['type']}"), (array) $paths);
 		}
-		if (!$class) {
-			throw new Exception(
-				"{$config['type']} adapter {$config['adapter']} could not be found"
-			);
-		}
-		return new $class($config);
+		return parent::_class($config, $paths);
 	}
 }
 

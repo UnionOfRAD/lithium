@@ -20,7 +20,6 @@ class GettextTest extends \lithium\test\Unit {
 		$this->_path = $path = LITHIUM_APP_PATH . '/resources/tmp/tests/g11n';
 		mkdir($this->_path . '/en/LC_MESSAGES', 0755, true);
 		mkdir($this->_path . '/de/LC_MESSAGES', 0755, true);
-
 		$this->adapter = new Gettext(compact('path'));
 	}
 

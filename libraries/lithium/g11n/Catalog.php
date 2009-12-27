@@ -32,6 +32,8 @@ class Catalog extends \lithium\core\Adaptable {
 
 	protected static $_configurations = null;
 
+	protected static $_adapters = 'adapter.g11n.catalog';
+
 	public static function config($config = null) {
 		$default = array('scope' => null);
 
@@ -74,7 +76,7 @@ class Catalog extends \lithium\core\Adaptable {
 		foreach ((array) $locales as $locale) {
 			foreach (Locale::cascade($locale) as $cascaded) {
 				foreach ($names as $name) {
-					$adapter = static::_adapter($name);
+					$adapter = static::adapter($name);
 
 					if (!$adapter->isSupported($category, __FUNCTION__)) {
 						continue;
@@ -126,7 +128,7 @@ class Catalog extends \lithium\core\Adaptable {
 		$names = (array) $options['name'] ?: static::$_configurations->keys();
 
 		foreach ($names as $name) {
-			$adapter = static::_adapter($name);
+			$adapter = static::adapter($name);
 
 			if (!$adapter->isSupported($category, __FUNCTION__)) {
 				continue;
@@ -139,10 +141,6 @@ class Catalog extends \lithium\core\Adaptable {
 			return true;
 		}
 		return false;
-	}
-
-	public static function adapter($name) {
-		return static::_adapter('adapter.g11n.catalog', $name);
 	}
 }
 
