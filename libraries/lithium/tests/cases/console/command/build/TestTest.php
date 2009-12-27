@@ -38,14 +38,17 @@ class TestTest extends \lithium\test\Unit {
 		chdir($this->_backup['cwd']);
 
 		$rmdir = function($value) use( &$rmdir) {
-			$result = is_file($value) ? unlink($value) : null;
-			if ($result == null && is_dir($value)) {
-				$result = array_filter(glob($value . '/*'), $rmdir);
+			if(is_dir($value) && $dir = @opendir($value)) {
+				while (($path = readdir($dir)) !== false) {
+					if ($path === '.' || $path === '..') continue;
+					$result = is_dir($value . '/' . $path) ? $rmdir($value . '/' . $path) : null;
+					$result = is_file($value . '/' . $path) ? unlink($value . '/' . $path) : null;
+				}
+				closedir($dir);
 				rmdir($value);
 			}
-			return false;
 		};
-		$rmdir($this->_testPath . '/app');
+		$rmdir($this->_testPath . '/build_test');
 	}
 
 	public function testModel() {
