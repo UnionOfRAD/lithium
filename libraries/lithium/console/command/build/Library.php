@@ -57,7 +57,8 @@ class Library extends \lithium\console\command\Build {
 		$path = $this->_toPath($name);
 		$archive = new Phar("{$path}.phar");
 		$from = $from !== null ? $this->_toPath($from) :  LITHIUM_APP_PATH;
-		$result = (boolean) $archive->buildFromDirectory($from);
+		$filter = '/^(?(?=\.)\.(htaccess|gitignore|gitmodules)|.*)$/i';
+		$result = (boolean) $archive->buildFromDirectory($from, $filter);
 		if ($result) {
 			$archive->compress(Phar::GZ);
 			$this->out(basename($path) . " created in " . dirname($path));
