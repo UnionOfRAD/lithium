@@ -50,7 +50,7 @@ class ViewTest extends \lithium\test\Unit {
 	}
 
 	public function testTranslationOutputFilters() {
-		$backup = Catalog::config()->to('array');
+		$backup = Catalog::config();
 		Catalog::reset();
 		Catalog::config(array(
 			'runtime' => array('adapter' => new Memory())
