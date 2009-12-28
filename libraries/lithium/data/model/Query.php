@@ -246,6 +246,13 @@ class Query extends \lithium\core\Object {
 		return $this->_binding ? $this->_binding->data() : array();
 	}
 
+	public function join($join = null) {
+		if ($join) {
+			$this->_join = array_merge($this->_join, (array) $join);
+		}
+		return $this->_join;
+	}
+
 	/**
 	 * Convert the query's properties to the data-sources' syntax and return it as an array.
 	 *
