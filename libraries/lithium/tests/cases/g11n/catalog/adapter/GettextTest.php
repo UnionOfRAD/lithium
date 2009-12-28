@@ -24,19 +24,7 @@ class GettextTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
-		$base = new RecursiveDirectoryIterator($this->_path);
-		$iterator = new RecursiveIteratorIterator($base, RecursiveIteratorIterator::CHILD_FIRST);
-
-		foreach ($iterator as $item) {
-			$path = $item->getPathname();
-
-			if ($item->isDir()) {
-				rmdir($path);
-			} else {
-				unlink($path);
-			}
-		}
-		rmdir($this->_path);
+		$this->_cleanUp();
 	}
 
 	public function testWriteReadMessageTemplate() {
