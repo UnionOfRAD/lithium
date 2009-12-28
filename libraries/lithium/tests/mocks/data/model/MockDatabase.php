@@ -24,19 +24,6 @@ class MockDatabase extends \lithium\data\source\Database {
 
 	public function error() {}
 
-	public function conditions($cond, $context) {
-		if (!is_array($cond)){
-			return '';
-		}
-		$ret = ' WHERE ';
-		foreach ($cond as $field => $value) {
-		    $ret .= '`' . $context->model() . '`.';
-			$ret .= '`' . $field . "`=\'" . $value . "\',";
-		}
-		$ret = substr($ret,0,-1);
-		return $ret;
-	}
-
 	public function order($value, $context) {
 		if (empty($value)) return '';
 		$ret = ' ORDER BY ';

@@ -10,6 +10,10 @@ namespace lithium\tests\mocks\data\model;
 
 class MockQueryComment extends \lithium\data\Model {
 
+	protected $_meta = array(
+		'source' => false
+	);
+
 	protected $_schema = array(
 		'id' => array('type' => 'integer', 'key' => 'primary'),
 		'author_id' => array('type' => 'integer'),

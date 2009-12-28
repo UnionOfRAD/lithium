@@ -11,8 +11,10 @@ namespace lithium\tests\cases\data\source;
 use \lithium\data\model\Query;
 use \lithium\data\source\Database;
 use \lithium\tests\mocks\data\model\MockDatabase;
+use \lithium\tests\mocks\data\model\MockDatabaseTag;
 use \lithium\tests\mocks\data\model\MockDatabasePost;
 use \lithium\tests\mocks\data\model\MockDatabaseComment;
+use \lithium\tests\mocks\data\model\MockDatabaseTagging;
 
 class DatabaseTest extends \lithium\test\Unit {
 
@@ -34,7 +36,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$query = new Query(array(
-			'model' =>  'lithium\tests\mocks\data\model\MockDatabasePost', 'fields' => array('*')
+			'model' =>  'lithium\tests\mocks\data\model\MockDatabasePost', 'fields' => '*'
 		));
 		$result = $this->db->columns($query);
 		$this->assertEqual($expected, $result);
@@ -50,6 +52,56 @@ class DatabaseTest extends \lithium\test\Unit {
 			)
 		);
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testSimpleQueryRender() {
+		$result = $this->db->renderCommand(new Query(array(
+			'type' => 'read',
+			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost',
+			'fields' => array('id', 'title', 'created')
+		)));
+		$expected = 'SELECT id, title, created From mock_database_posts  ;';
+		$this->assertEqual($expected, $result);
+
+		$result = $this->db->renderCommand(new Query(array(
+			'type' => 'read',
+			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost',
+			'fields' => array('id', 'title', 'created'),
+			'limit' => 1
+		)));
+		$expected = 'SELECT id, title, created From mock_database_posts  LIMIT 1;';
+		$this->assertEqual($expected, $result);
+
+		$result = $this->db->renderCommand(new Query(array(
+			'type' => 'read',
+			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost',
+			'fields' => array('id', 'title', 'created'),
+			'limit' => 1,
+			'conditions' => 'Post.id = 2'
+		)));
+		$expected = 'SELECT id, title, created From mock_database_posts WHERE Post.id = 2';
+		$expected .= '  LIMIT 1;';
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testNestedQueryConditions() {
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => '\lithium\tests\mocks\data\model\MockDatabasePost',
+			'fields' => array('MockDatabasePost.title', 'MockDatabasePost.body'),
+			'conditions' => array('Post.id' => new Query(array(
+				'type' => 'read',
+				'fields' => array('post_id'),
+				'model' => '\lithium\tests\mocks\data\model\MockDatabaseTagging',
+				'conditions' => array('MockDatabaseTag.tag' => array('foo', 'bar', 'baz')),
+				'join' => new Query(array(
+					'type' => 'read',
+					'model' => '\lithium\tests\mocks\data\model\MockDatabaseTag',
+					'conditions' => 'MockDatabaseTagging.tag_id = MockDatabaseTag.id'
+				))
+			)))
+		));
+		$this->db->renderCommand($query);
 	}
 }
 

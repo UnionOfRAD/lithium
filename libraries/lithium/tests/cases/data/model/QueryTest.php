@@ -28,8 +28,8 @@ class QueryTest extends \lithium\test\Unit {
 	);
 
 	public function setUp() {
-		MockQueryPost::init();
-		MockQueryComment::init();
+		MockQueryPost::__init();
+		MockQueryComment::__init();
 	}
 
 	/**
@@ -46,100 +46,100 @@ class QueryTest extends \lithium\test\Unit {
 	}
 
 	public function testModel() {
-		$q = new Query($this->_queryArr);
+		$query = new Query($this->_queryArr);
 
 		$expected = '\lithium\tests\mocks\data\model\MockQueryPost';
-		$result = $q->model();
+		$result = $query->model();
 		$this->assertEqual($expected, $result);
 
-		$q->model('\lithium\tests\mocks\data\model\MockQueryComment');
+		$query->model('\lithium\tests\mocks\data\model\MockQueryComment');
 
 		$expected = '\lithium\tests\mocks\data\model\MockQueryComment';
-		$result = $q->model();
+		$result = $query->model();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testFields() {
-		$q = new Query($this->_queryArr);
+		$query = new Query($this->_queryArr);
 
 		$expected = array('id','author_id','title');
-		$result = $q->fields();
+		$result = $query->fields();
 		$this->assertEqual($expected, $result);
 
-		$q->fields('content');
+		$query->fields('content');
 
 		$expected = array('id','author_id','title','content');
-		$result = $q->fields();
+		$result = $query->fields();
 		$this->assertEqual($expected, $result);
 
-		$q->fields(array('updated','created'));
+		$query->fields(array('updated','created'));
 
 		$expected = array('id','author_id','title','content','updated','created');
-		$result = $q->fields();
+		$result = $query->fields();
 		$this->assertEqual($expected, $result);
 
-		$q->fields(false);
-		$q->fields(array('id', 'title'));
+		$query->fields(false);
+		$query->fields(array('id', 'title'));
 
 		$expected = array('id','title');
-		$result = $q->fields();
+		$result = $query->fields();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testLimit() {
-		$q = new Query($this->_queryArr);
+		$query = new Query($this->_queryArr);
 
 		$expected = 10;
-		$result = $q->limit();
+		$result = $query->limit();
 		$this->assertEqual($expected, $result);
 
-		$q->limit(5);
+		$query->limit(5);
 
 		$expected = 5;
-		$result = $q->limit();
+		$result = $query->limit();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testPage() {
-		$q = new Query($this->_queryArr);
+		$query = new Query($this->_queryArr);
 
 		$expected = 1;
-		$result = $q->page();
+		$result = $query->page();
 		$this->assertEqual($expected, $result);
 
-		$q->page(5);
+		$query->page(5);
 
 		$expected = 5;
-		$result = $q->page();
+		$result = $query->page();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testOrder() {
-		$q = new Query($this->_queryArr);
+		$query = new Query($this->_queryArr);
 
 		$expected = 'created DESC';
-		$result = $q->order();
+		$result = $query->order();
 		$this->assertEqual($expected, $result);
 
-		$q->order('updated ASC');
+		$query->order('updated ASC');
 
 		$expected = 'updated ASC';
-		$result = $q->order();
+		$result = $query->order();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testRecord() {
-		$q = new Query($this->_queryArr);
+		$query = new Query($this->_queryArr);
 
-		$result = $q->record();
+		$result = $query->record();
 		$this->assertNull($result);
 
 		$record = (object) array('id' => 12);
 		$record->title = 'Lorem Ipsum';
 
-		$q->record($record);
+		$query->record($record);
 
-		$query_record = $q->record();
+		$query_record = $query->record();
 
 		$expected = 12;
 		$result = $query_record->id;
@@ -149,83 +149,81 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $query_record->title;
 		$this->assertEqual($expected, $result);
 
-		$this->assertTrue($record == $q->record());
+		$this->assertTrue($record == $query->record());
 	}
 
 	public function testComment() {
-		$q = new Query($this->_queryArr);
+		$query = new Query($this->_queryArr);
 
 		$expected = 'Find all posts by author 12';
-		$result = $q->comment();
+		$result = $query->comment();
 		$this->assertEqual($expected, $result);
 
-		$q->comment('Comment lorem');
+		$query->comment('Comment lorem');
 
 		$expected = 'Comment lorem';
-		$result = $q->comment();
+		$result = $query->comment();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testData() {
-		$q = new Query($this->_queryArr);
+		$query = new Query($this->_queryArr);
 
 		$expected = array();
-		$result = $q->data();
+		$result = $query->data();
 		$this->assertEqual($expected, $result);
 
 		$record = new Record();
 		$record->id = 12;
 		$record->title = 'Lorem Ipsum';
 
-		$q->record($record);
+		$query->record($record);
 
 		$expected = array('id' => 12, 'title' => 'Lorem Ipsum');
-		$result = $q->data();
+		$result = $query->data();
 		$this->assertEqual($expected, $result);
 
-		$q->data(array('id' => 35, 'title' => 'Nix', 'body' => 'Prix'));
+		$query->data(array('id' => 35, 'title' => 'Nix', 'body' => 'Prix'));
 
 		$expected = array('id' => 35, 'title' => 'Nix', 'body' => 'Prix');
-		$result = $q->data();
+		$result = $query->data();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testConditions() {
-		$q = new Query($this->_queryArr);
+		$query = new Query($this->_queryArr);
 
 		$expected = array('author_id' => 12);
-		$result = $q->conditions();
+		$result = $query->conditions();
 		$this->assertEqual($expected, $result);
 
-		$q->conditions(array('author_id' => 13, 'title LIKE' => 'Lorem%'));
+		$query->conditions(array('author_id' => 13, 'title LIKE' => 'Lorem%'));
 
 		$expected = array('author_id' => 13, 'title LIKE' => 'Lorem%');
-		$result = $q->conditions();
+		$result = $query->conditions();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testConditionFromRecord() {
 		$r = new Record();
 		$r->id = 12;
-		$q = new Query(array(
+		$query = new Query(array(
 			'model' => '\lithium\tests\mocks\data\model\MockQueryPost',
 			'record' => $r
 		));
 
 		$expected = array('id' => 12);
-		$result = $q->conditions();
+		$result = $query->conditions();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testExport() {
-		$q = new Query($this->_queryArr);
-
+		$query = new Query($this->_queryArr);
 		$ds = new MockDatabase();
-
-		$export = $q->export($ds);
+		$export = $query->export($ds);
 
 		$this->assertTrue(is_array($export));
-		$this->skipIf(!is_array($export), '`Query`::export() does not return an array');
+		$this->skipIf(!is_array($export), 'Query::export() does not return an array');
 
 		$expected = array(
 			'conditions',

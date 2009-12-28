@@ -13,8 +13,8 @@ use \InvalidArgumentException;
 
 abstract class Database extends \lithium\data\Source {
 
-	protected $_queries = array(
-		'select' => "
+	protected $_strings = array(
+		'read' => "
 			SELECT {:fields} From {:table}
 			{:joins} {:conditions} {:group} {:order} {:limit};{:comment}
 		",
@@ -97,7 +97,7 @@ abstract class Database extends \lithium\data\Source {
 			extract($params);
 
 			if (!is_string($query)) {
-				$query = $self->renderCommand('select', $query->export($self), $query);
+				$query = $self->renderCommand($query);
 			}
 			$result = $self->invokeMethod('_execute', array($query));
 
@@ -120,18 +120,22 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	public function update($query, array $options = array()) {
-
 	}
 
 	public function delete($query, array $options = array()) {
 
 	}
 
-	public function renderCommand($type, $data, $context) {
-		if (!isset($this->_queries[$type])) {
+	public function renderCommand($type, $data = null, $context = null) {
+		if (is_object($type)) {
+			$context = $type;
+			$data = $type->export($this);
+			$type = $type->type();
+		}
+		if (!isset($this->_strings[$type])) {
 			throw new InvalidArgumentException("Invalid query type '{$type}'");
 		}
-		return String::insert($this->_queries[$type], $data, array('clean' => true));
+		return trim(String::insert($this->_strings[$type], $data, array('clean' => true)));
 	}
 
 	public function columns($query, $resource = null, $context = null) {
@@ -169,10 +173,35 @@ abstract class Database extends \lithium\data\Source {
 		return $result;
 	}
 
-	public function conditions($conditions, $context) {
-		if (empty($conditions)) {
-			return '';
+	public function conditions($conditions, $context, $options = array()) {
+		$defaults = array('prepend' => true);
+		$options += $defaults;
+
+		switch (true) {
+			case empty($conditions):
+				return '';
+			case is_string($conditions):
+				return ($options['prepend']) ? "WHERE {$conditions}" : $conditions;
+			case !is_array($conditions):
+				return null;
 		}
+
+		$result = array();
+		$boolean = 'AND';
+
+		foreach ($conditions as $key => $value) {
+			switch (true) {
+				case (is_numeric($key) && is_string($value)):
+					$result[] = $value;
+				break;
+				case (is_string($key) && is_object($value)):
+					$value = trim(rtrim($this->renderCommand($value), ';'));
+					$result[] = "{$key} IN ({$value})";
+				break;
+			}
+		}
+		$result = join(" {$boolean} ", $result);
+		return ($options['prepend'] && !empty($result)) ? "WHERE {$result}" : $result;
 	}
 
 	public function fields($fields, $context) {
