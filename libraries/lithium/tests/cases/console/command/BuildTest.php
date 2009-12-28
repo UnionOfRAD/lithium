@@ -34,19 +34,7 @@ class BuildTest extends \lithium\test\Unit {
 	public function tearDown() {
 		$_SERVER = $this->_backup['_SERVER'];
 		chdir($this->_backup['cwd']);
-		$this->_cleanup();
-	}
-
-	protected function _cleanup() {
-		$rmdir = function($value) use( &$rmdir) {
-			$result = is_file($value) ? unlink($value) : null;
-			if ($result == null && is_dir($value)) {
-				$result = array_filter(glob($value . '/*'), $rmdir);
-				rmdir($value);
-			}
-			return false;
-		};
-		$rmdir($this->_testPath . '/build_test');
+		$this->_cleanUp();
 	}
 
 	public function testConstruct() {
@@ -71,7 +59,7 @@ class BuildTest extends \lithium\test\Unit {
 		$result = $this->_testPath . '/build_test/tests/cases/models/PostTest.php';
 		$this->assertTrue(file_exists($result));
 
-		$this->_cleanup();
+		$this->_cleanUp();
 	}
 
 	public function testRunWithoutCommand() {

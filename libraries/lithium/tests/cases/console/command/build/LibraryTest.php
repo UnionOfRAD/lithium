@@ -29,21 +29,7 @@ class LibraryTest extends \lithium\test\Unit {
 	public function tearDown() {
 		$_SERVER = $this->_backup['_SERVER'];
 		chdir($this->_backup['cwd']);
-
-		$rmdir = function($value) use( &$rmdir) {
-			if(is_dir($value) && $dir = opendir($value)) {
-				while (($path = readdir($dir)) !== false) {
-					if ($path === '.' || $path === '..') continue;
-					$result = is_dir($value . '/' . $path) ? $rmdir($value . '/' . $path) : null;
-					$result = is_file($value . '/' . $path) ? unlink($value . '/' . $path) : null;
-				}
-				closedir($dir);
-				rmdir($value);
-			}
-		};
-
-		$rmdir($this->_testPath . '/build_test');
-		$rmdir($this->_testPath . '/new');
+		$this->_cleanUp();
 	}
 
 	public function testArchive() {
