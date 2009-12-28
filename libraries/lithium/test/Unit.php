@@ -13,6 +13,8 @@ use \lithium\util\String;
 use \lithium\util\Validator;
 use \lithium\util\audit\Debugger;
 use \lithium\util\reflection\Inspector;
+use \RecursiveDirectoryIterator;
+use \RecursiveIteratorIterator;
 
 /**
  * This is the base class for all test cases. Test are performed using an assertion method. If the
@@ -29,10 +31,25 @@ use \lithium\util\reflection\Inspector;
  */
 class Unit extends \lithium\core\Object {
 
-	protected $_results = array();
-
+	/**
+	 * The Reference to the \test\Reporter class.
+	 *
+	 * @var string
+	 */
 	protected $_reporter = null;
 
+	/**
+	 * The list of test results.
+	 *
+	 * @var string
+	 */
+	protected $_results = array();
+
+	/**
+	 * The list of expected exceptions.
+	 *
+	 * @var string
+	 */
 	protected $_expected = array();
 
 	/**
@@ -751,6 +768,25 @@ class Unit extends \lithium\core\Object {
 				$this->_arrayPermute($newItems, $newPerms);
 			}
 			return $permuted;
+		}
+	}
+
+	/**
+	 * Removes everything from `resources/tmp/tests` directory.
+	 * Call from inside of your test method or `tearDown()`.
+	 *
+	 * @param string $path path to directory of contents to remove
+	 *               if first character is NOT `/` prepend `LITHIUM_APP_PATH/resources/tmp/`
+	 * @return void
+	 */
+	protected function _cleanUp($path = null) {
+		$path = $path ?: LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$path = $path[0] !== '/' ? LITHIUM_APP_PATH . '/resources/tmp/'. $path : $path;
+		$dirs = new RecursiveDirectoryIterator($path);
+		$iterator = new RecursiveIteratorIterator($dirs, RecursiveIteratorIterator::CHILD_FIRST);
+		foreach ($iterator as $item) {
+			if ($item->getFilename() === 'empty') continue;
+			($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname());
 		}
 	}
 }
