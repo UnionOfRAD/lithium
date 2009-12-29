@@ -29,7 +29,6 @@ class LibraryTest extends \lithium\test\Unit {
 	public function tearDown() {
 		$_SERVER = $this->_backup['_SERVER'];
 		chdir($this->_backup['cwd']);
-		$this->_cleanUp();
 	}
 
 	public function testArchive() {
@@ -62,6 +61,7 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		Phar::unlinkArchive($this->_testPath . '/app.phar.gz');
+		$this->_cleanUp();
 	}
 }
 
