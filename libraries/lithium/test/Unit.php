@@ -757,18 +757,18 @@ class Unit extends \lithium\core\Object {
 
 		if (empty($items)) {
 			$permuted[] = $perms;
-		} else {
-			$numItems = count($items) - 1;
-
-			for ($i = $numItems; $i >= 0; --$i) {
-				$newItems = $items;
-				$newPerms = $perms;
-				list($tmp) = array_splice($newItems, $i, 1);
-				array_unshift($newPerms, $tmp);
-				$this->_arrayPermute($newItems, $newPerms);
-			}
-			return $permuted;
+			return;
 		}
+		$numItems = count($items) - 1;
+
+		for ($i = $numItems; $i >= 0; --$i) {
+			$newItems = $items;
+			$newPerms = $perms;
+			list($tmp) = array_splice($newItems, $i, 1);
+			array_unshift($newPerms, $tmp);
+			$this->_arrayPermute($newItems, $newPerms);
+		}
+		return $permuted;
 	}
 
 	/**
@@ -782,10 +782,13 @@ class Unit extends \lithium\core\Object {
 	protected function _cleanUp($path = null) {
 		$path = $path ?: LITHIUM_APP_PATH . '/resources/tmp/tests';
 		$path = $path[0] !== '/' ? LITHIUM_APP_PATH . '/resources/tmp/'. $path : $path;
+		if (!is_dir($path)) {
+			return;
+		}
 		$dirs = new RecursiveDirectoryIterator($path);
 		$iterator = new RecursiveIteratorIterator($dirs, RecursiveIteratorIterator::CHILD_FIRST);
 		foreach ($iterator as $item) {
-			if ($item->getFilename() === 'empty') continue;
+			if ($item->getPathname() === "{$path}/empty") continue;
 			($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname());
 		}
 	}

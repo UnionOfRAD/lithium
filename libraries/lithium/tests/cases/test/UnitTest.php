@@ -97,6 +97,7 @@ class UnitTest extends \lithium\test\Unit {
 		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
 		$this->assertTrue(mkdir("{$base}/cleanup_test"));
 		$this->assertTrue(touch("{$base}/cleanup_test/file"));
+		$this->assertTrue(touch("{$base}/cleanup_test/.hideme"));
 
 		$this->_cleanUp();
 		$this->assertFalse(file_exists("{$base}/cleanup_test"));
@@ -106,10 +107,12 @@ class UnitTest extends \lithium\test\Unit {
 		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
 		$this->assertTrue(mkdir("{$base}/cleanup_test"));
 		$this->assertTrue(touch("{$base}/cleanup_test/file"));
+		$this->assertTrue(touch("{$base}/cleanup_test/.hideme"));
 
 		$this->_cleanUp("{$base}/cleanup_test");
 		$this->assertTrue(file_exists("{$base}/cleanup_test"));
 		$this->assertFalse(file_exists("{$base}/cleanup_test/file"));
+		$this->assertFalse(file_exists("{$base}/cleanup_test/.hideme"));
 
 		$this->_cleanUp();
 	}
@@ -118,10 +121,12 @@ class UnitTest extends \lithium\test\Unit {
 		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
 		$this->assertTrue(mkdir("{$base}/cleanup_test"));
 		$this->assertTrue(touch("{$base}/cleanup_test/file"));
+		$this->assertTrue(touch("{$base}/cleanup_test/.hideme"));
 
 		$this->_cleanUp("tests/cleanup_test");
 		$this->assertTrue(file_exists("{$base}/cleanup_test"));
 		$this->assertFalse(file_exists("{$base}/cleanup_test/file"));
+		$this->assertFalse(file_exists("{$base}/cleanup_test/.hideme"));
 
 		$this->_cleanUp();
 	}
