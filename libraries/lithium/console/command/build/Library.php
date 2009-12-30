@@ -19,6 +19,8 @@ class Library extends \lithium\console\command\Build {
 
 	/**
 	 * Extract an archive into a path
+	 * `li3 build library myapp`
+	 * `li3 build library myapp another_archive`
 	 *
 	 * @param string $new the name of or path to the library to create `from` phar
 	 * @param string $from the name of or path to the phar.gz to copy
@@ -48,13 +50,15 @@ class Library extends \lithium\console\command\Build {
 
 	/**
 	 * Create the Phar::GZ archive
+	 * `li3 build library archive my_archive`
+	 * `li3 build library archive my_archive myapp`
 	 *
-	 * @param string $name the name of or path the archive
+	 * @param string $to the name of or path the archive
 	 * @param string $from the name of or path to directory to compress
 	 * @return boolean
 	 */
-	public function archive($name = null, $from = null) {
-		$path = $this->_toPath($name);
+	public function archive($to = null, $from = null) {
+		$path = $this->_toPath($to);
  		$archive = new Phar("{$path}.phar");
 		$from = $this->_toPath($from);
 		$filter = '/^(?(?=\.)\.(htaccess|gitignore|gitmodules)|.*)$/i';
