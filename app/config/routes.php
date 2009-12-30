@@ -24,7 +24,7 @@ Router::connect('/', array('controller' => 'pages', 'action' => 'view', 'home'))
 /**
  * ...and connect the rest of 'Pages' controller's urls.
  */
-Router::connect('/pages/*', array('controller' => 'pages', 'action' => 'view'));
+Router::connect('/pages/{:args}', array('controller' => 'pages', 'action' => 'view'));
 
 /**
  * Connect the testing routes.
