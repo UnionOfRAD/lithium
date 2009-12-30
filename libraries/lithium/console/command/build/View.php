@@ -6,13 +6,8 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\console\command;
+namespace lithium\console\command\build;
 
-use \lithium\console\command\Generate;
-
-class GenerateTest extends \lithium\test\Unit {
-
-
-}
+class View extends \lithium\console\command\Build {}
 
 ?>

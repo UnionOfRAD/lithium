@@ -145,13 +145,13 @@ class Dispatcher extends \lithium\core\StaticObject {
 				$request = $params['request'];
 
 				if (!method_exists($callable, $request->params['action'])) {
-					array_unshift($request->params['passed'], $request->params['action']);
+					array_unshift($request->params['args'], $request->params['action']);
 					$request->params['action'] = 'run';
 				}
 				if (!method_exists($callable, $request->params['action'])) {
 					$request->params['action'] = 'help';
 				}
-				return $callable($request->params['action'], $request->params['passed']);
+				return $callable($request->params['action'], $request->params['args']);
 			}
 			throw new UnexpectedValueException("{$callable} not callable");
 		});
