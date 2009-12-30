@@ -53,15 +53,15 @@ class Library extends \lithium\console\command\Build {
 	 * @param string $from the name of or path to directory to compress
 	 * @return boolean
 	 */
-	public function archive($name = 'app', $from = null) {
+	public function archive($name = null, $from = null) {
 		$path = $this->_toPath($name);
-		$archive = new Phar("{$path}.phar");
-		$from = $from !== null ? $this->_toPath($from) :  LITHIUM_APP_PATH;
+ 		$archive = new Phar("{$path}.phar");
+		$from = $this->_toPath($from);
 		$filter = '/^(?(?=\.)\.(htaccess|gitignore|gitmodules)|.*)$/i';
 		$result = (boolean) $archive->buildFromDirectory($from, $filter);
 		if ($result) {
 			$archive->compress(Phar::GZ);
-			$this->out(basename($path) . " created in " . dirname($path));
+			$this->out(basename($path) . ".phar.gz created in " . dirname($path));
 			return true;
 		}
 		return false;
@@ -74,8 +74,16 @@ class Library extends \lithium\console\command\Build {
 	 * @return string
 	 */
 	protected function _toPath($name) {
+		$path = $this->request->env('working');
 		$library = Libraries::get($this->library);
-		$name = ($name[0] !== '/') ? dirname($library['path']) . "/{$name}" : $name;
+
+		if (!empty($library['path'])) {
+			$path = dirname($library['path']);
+		}
+		if (!$name) {
+			return $path;
+		}
+		$name = ($name[0] !== '/') ? "{$path}/{$name}" : $name;
 		return $name;
 	}
 }
