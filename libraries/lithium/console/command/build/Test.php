@@ -12,20 +12,17 @@ use \lithium\core\Libraries;
 use \lithium\util\reflection\Inspector;
 
 /**
- * Builds Test cases
+ * Build test cases or mocks in a namespace for a class.
  *
- * @package default
  */
 class Test extends \lithium\console\command\Build {
 
-	public function interactive() {
-
-	}
-	
 	/**
-	 * Generate test cases for given namespace
+	 * Generate test cases in the given namespace.
+	 * `li3 build test model Post`
+	 * `li3 build test --library=li3_plugin model Post`
 	 *
-	 * @param string $type name or dot-separated for namespace of the class
+	 * @param string $type namespace of the class (eg: model, controller, some.name.space)
 	 * @param string $name name of class to test
 	 * @return void
 	 */
@@ -59,15 +56,17 @@ class Test extends \lithium\console\command\Build {
 		}
 		return false;
 	}
-	
+
 	/**
-	 * generate a mock class
+	 * Generate a Mock that extends the name of the given class in the given namespace.
+	 * `li3 build test mock model Post`
+	 * `li3 build test --library=li3_plugin mock model Post`
 	 *
-	 * @param string $type 
-	 * @param string $name 
+	 * @param string $type namespace of the class (eg: model, controller, some.name.space)
+	 * @param string $name class name to extend with the mock
 	 * @return void
 	 */
-	public function mock($type = null, $name) {
+	public function mock($type = null, $name = null) {
 		$library = Libraries::get($this->library);
 		if (empty($library['prefix'])) {
 			return false;
@@ -84,6 +83,10 @@ class Test extends \lithium\console\command\Build {
 			return true;
 		}
 		return false;
+	}
+
+	public function interactive() {
+
 	}
 }
 
