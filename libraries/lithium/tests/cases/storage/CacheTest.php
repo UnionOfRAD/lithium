@@ -342,6 +342,44 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertFalse($result);
 	}
 
+	public function testIncrement() {
+		$config = array('default' => array(
+			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
+		));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
+		$this->assertEqual($expected, $result);
+
+		$result = Cache::write('default', 'increment', 5, '+1 minute');
+		$this->assertTrue($result);
+
+		$result = Cache::increment('default', 'increment');
+		$this->assertTrue($result);
+
+		$result = Cache::read('default', 'increment');
+		$this->assertEqual(6, $result);
+	}
+
+	public function testDecrement() {
+		$config = array('default' => array(
+			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
+		));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
+		$this->assertEqual($expected, $result);
+
+		$result = Cache::write('default', 'decrement', 5, '+1 minute');
+		$this->assertTrue($result);
+
+		$result = Cache::decrement('default', 'decrement');
+		$this->assertTrue($result);
+
+		$result = Cache::read('default', 'decrement');
+		$this->assertEqual(4, $result);
+	}
+
 	public function testNonPortableCacheAdapterMethod() {
 		$config = array('default' => array(
 			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()

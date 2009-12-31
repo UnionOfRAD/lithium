@@ -64,7 +64,7 @@ class File extends \lithium\core\Object {
 	/**
 	 * Read value(s) from the cache
 	 *
-	 * @param string $key        The key to uniquely identify the cached item
+	 * @param string $key The key to uniquely identify the cached item
 	 * @return mixed Cached value if successful, false otherwise
 	 */
 	public function read($key) {
@@ -96,7 +96,7 @@ class File extends \lithium\core\Object {
 	/**
 	 * Delete value from the cache
 	 *
-	 * @param string $key        The key to uniquely identify the cached item
+	 * @param string $key The key to uniquely identify the cached item
 	 * @return mixed True on successful delete, false otherwise
 	 */
 	public function delete($key) {
@@ -113,6 +113,36 @@ class File extends \lithium\core\Object {
 
 			return false;
 		};
+	}
+
+	/**
+	 * The File adapter does not provide any facilities for atomic incrementing
+	 * of cache items. If you need this functionality, please use a cache adapter
+	 * which provides native support for atomic increment.
+	 *
+	 * This method is not implemented, and will simply return false.
+	 *
+	 * @param string $key Key of numeric cache item to increment
+	 * @param integer $offset Offset to increment - defaults to 1.
+	 * @return boolean False - this method is not implemented
+	 */
+	public function increment($key, $offset = 1) {
+		return false;
+	}
+
+	/**
+	 * The File adapter does not provide any facilities for atomic decrementing
+	 * of cache items. If you need this functionality, please use a cache adapter
+	 * which provides native support for atomic decrement.
+	 *
+	 * This method is not implemented, and will simply return false.
+	 *
+	 * @param string $key Key of numeric cache item to decrement
+	 * @param integer $offset Offset to increment - defaults to 1.
+	 * @return boolean False - this method is not implemented
+	 */
+	public function decrement($key, $offset = 1) {
+		return false;
 	}
 
 	/**

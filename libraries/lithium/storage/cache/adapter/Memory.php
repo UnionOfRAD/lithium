@@ -99,6 +99,38 @@ class Memory extends \lithium\core\Object {
 	}
 
 	/**
+	 * Performs a decrement operation on specified numeric cache item.
+	 *
+	 * @param string $key Key of numeric cache item to decrement
+	 * @param integer $offset Offset to decrement - defaults to 1.
+	 * @return mixed Item's new value on successful decrement, false otherwise
+	 */
+	public function decrement($key, $offset = 1) {
+		$cache =& $this->_cache;
+
+		return function($self, $params, $chain) use (&$cache, $offset) {
+			extract($params);
+			return $cache[$key] -= 1;
+		};
+	}
+
+	/**
+	 * Performs an increment operation on specified numeric cache item.
+	 *
+	 * @param string $key Key of numeric cache item to increment
+	 * @param integer $offset Offset to increment - defaults to 1.
+	 * @return mixed Item's new value on successful increment, false otherwise
+	 */
+	public function increment($key, $offset = 1) {
+		$cache =& $this->_cache;
+
+		return function($self, $params, $chain) use (&$cache, $offset) {
+			extract($params);
+			return $cache[$key] += 1;
+		};
+	}
+
+	/**
 	 * Clears user-space cache
 	 *
 	 * @return mixed True on successful clear, false otherwise
