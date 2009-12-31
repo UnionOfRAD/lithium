@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\util\audit\logger\adapter;
+namespace lithium\analysis\logger\adapter;
 
 /**
  * The Syslog adapter facilitates logging messages to a syslogd backend.

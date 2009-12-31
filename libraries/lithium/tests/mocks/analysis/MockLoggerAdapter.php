@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\mocks\util\audit;
+namespace lithium\tests\mocks\analysis;
 
 class MockLoggerAdapter extends \lithium\core\Object {
 

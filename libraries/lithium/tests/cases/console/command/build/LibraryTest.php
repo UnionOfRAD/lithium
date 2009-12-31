@@ -48,6 +48,11 @@ class LibraryTest extends \lithium\test\Unit {
 	}
 
 	public function testArchive() {
+		$this->skipIf(
+			ini_get('phar.readonly') == '1',
+			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+		);
+		
 		$this->request->params['library'] = 'build_test';
 		$app = new Library(array('request' => $this->request, 'classes' => $this->classes));
 
@@ -65,6 +70,10 @@ class LibraryTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithFullPaths() {
+		$this->skipIf(
+			!file_exists($this->_testPath . '/build_test.phar.gz'),
+			'Skipped test {:class}::{:function}() - depends on {:class}::testArchive()'
+		);
 		$this->request->params['library'] = 'build_test';
 		$app = new Library(array('request' => $this->request, 'classes' => $this->classes));
 
@@ -83,6 +92,11 @@ class LibraryTest extends \lithium\test\Unit {
 	}
 
 	public function testArchiveNoLibrary() {
+		$this->skipIf(
+			ini_get('phar.readonly') == '1',
+			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+		);
+
 		chdir('new');
 		$request = new Request(array('input' => fopen('php://temp', 'w+')));
 		$request->params['library'] = 'does_not_exist';

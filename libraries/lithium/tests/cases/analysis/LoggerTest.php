@@ -6,11 +6,11 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\util\audit;
+namespace lithium\tests\cases\analysis;
 
-use \lithium\util\audit\Logger;
+use \lithium\analysis\Logger;
 use \lithium\util\Collection;
-use \lithium\tests\mocks\util\audit\MockLoggerAdapter;
+use \lithium\tests\mocks\analysis\MockLoggerAdapter;
 
 /**
  * Logger adapter test case

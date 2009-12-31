@@ -11,7 +11,7 @@ namespace lithium\test;
 use \Exception;
 use \lithium\util\String;
 use \lithium\util\Validator;
-use \lithium\util\audit\Debugger;
+use \lithium\analysis\Debugger;
 use \lithium\util\reflection\Inspector;
 use \RecursiveDirectoryIterator;
 use \RecursiveIteratorIterator;
