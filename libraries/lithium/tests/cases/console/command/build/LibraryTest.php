@@ -32,6 +32,11 @@ class LibraryTest extends \lithium\test\Unit {
 	}
 
 	public function testArchive() {
+		$this->skipIf(
+			ini_get('phar.readonly') == '1',
+			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+		);
+
 		$this->request->params['library'] = 'app';
 		$app = new Library(array('request' => $this->request, 'classes' => $this->classes));
 
@@ -64,6 +69,11 @@ class LibraryTest extends \lithium\test\Unit {
 	}
 
 	public function testArchiveNoLibrary() {
+		$this->skipIf(
+			ini_get('phar.readonly') == '1',
+			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+		);
+
 		chdir('new');
 		$request = new Request(array('input' => fopen('php://temp', 'w+')));
 		$request->params['library'] = 'does_not_exist';
