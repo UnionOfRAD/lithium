@@ -19,43 +19,37 @@ class Router extends \lithium\core\Object {
 	 * Parse incoming request from console
 	 *
 	 * @param object $request \lithium\console\Request
-	 * @return array command, passed, named
+	 * @return array $params
 	 *
 	 **/
 	public static function parse($request = null) {
 		$params = array(
-			'command' => null, 'action' => 'run',
-			'passed' => array(), 'named' => array()
+			'command' => null, 'action' => 'run', 'args' => array()
 		);
-
 		if (!empty($request->params)) {
 			$params = $request->params + $params;
 		}
-
 		if (!empty($request->args)) {
 			$args = $request->args;
-			if (!isset($request->params['command'])) {
+			if (empty($params['command'])) {
 				$params['command'] = array_shift($args);
 			}
-
 			while ($arg = array_shift($args)) {
+
 				if (preg_match('/^-(?P<key>[a-zA-Z0-9]+)$/', $arg, $match)) {
-					$arg = array_shift($args);
-					$params['named'][$match['key']] = $arg;
+					$params[$match['key']] = true;
 					continue;
 				}
 				if (preg_match('/^--(?P<key>[a-z0-9-]+)(?:=(?P<val>.+))?$/', $arg, $match)) {
-					$params['named'][$match['key']] = !isset($match['val']) ? true : $match['val'];
+					$params[$match['key']] = !isset($match['val']) ? true : $match['val'];
 					continue;
 				}
-				$params['passed'][] = $arg;
+				$params['args'][] = $arg;
 			}
 		}
 
-		if (!empty($params['passed'][0])) {
-			$params['action'] = $params['passed'][0];
-			unset($params['passed'][0]);
-			$params['passed'] = array_values($params['passed']);
+		if (!empty($params['args'])) {
+			$params['action'] = array_shift($params['args']);
 		}
 		return $params;
 	}

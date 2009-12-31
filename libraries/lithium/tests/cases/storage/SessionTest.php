@@ -39,10 +39,11 @@ class SessionTest extends \lithium\test\Unit {
 			'store2' => array('adapter' => &$store2, 'filters' => array(), 'strategies' => array())
 		);
 
-		$result = Session::config($config);
-		$this->assertEqual(new Collection(array('items' => $config)), $result);
+		Session::config($config);
+		$result = Session::config();
+		$this->assertEqual($config, $result);
 
-		Session::clear();
+		Session::reset();
 		Session::config(array('store1' => array(
 			'adapter' => 'lithium\storage\session\adapter\Memory',
 			'filters' => array()
@@ -59,7 +60,7 @@ class SessionTest extends \lithium\test\Unit {
 		$this->assertTrue(Session::write('key', 'value'));
 		$this->assertEqual(Session::read('key'), 'value');
 
-		Session::clear();
+		Session::reset();
 		$this->assertNull(Session::read('key'));
 		$this->assertIdentical(false, Session::write('key', 'value'));
 	}
@@ -68,8 +69,8 @@ class SessionTest extends \lithium\test\Unit {
 		$this->assertTrue(Session::write('key', 'value'));
 		$this->assertEqual(Session::read('key'), 'value');
 
-		Session::clear();
-		$this->assertFalse(Session::config()->count());
+		Session::reset();
+		$this->assertFalse(Session::config());
 
 		$this->assertFalse(Session::read('key'));
 		$this->assertFalse(Session::write('key', 'value'));
@@ -161,10 +162,18 @@ class SessionTest extends \lithium\test\Unit {
 	public function testSessionState() {
 		$this->assertTrue(Session::isStarted());
 		$this->assertTrue(Session::isStarted('default'));
+		$this->expectException('Adapter configuration invalid has not been defined');
 		$this->assertFalse(Session::isStarted('invalid'));
+	}
 
-		Session::clear();
+	public function testSessionStateReset() {
+		Session::reset();
 		$this->assertFalse(Session::isStarted());
+	}
+
+	public function testSessionStateResetNamed() {
+		Session::reset();
+		$this->expectException('Adapter configuration default has not been defined');
 		$this->assertFalse(Session::isStarted('default'));
 	}
 }

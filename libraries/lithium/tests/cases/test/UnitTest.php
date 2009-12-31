@@ -87,9 +87,48 @@ class UnitTest extends \lithium\test\Unit {
 		$expected = array(
 			'testBaseAssertions', 'testCompare', 'testAssertEqualNumeric',
 			'testAssertEqualNumericFail', 'testAssertEqualAssociativeArray',
-			'testAssertEqualThreeDFail', 'testAssertIdentical', 'testTestMethods'
+			'testAssertEqualThreeDFail', 'testAssertIdentical', 'testTestMethods',
+			'testCleanUp', 'testCleanUpWithFullPath', 'testCleanUpWithRelativePath'
 		);
 		$this->assertEqual($expected, $this->methods());
+	}
+
+	public function testCleanUp() {
+		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->assertTrue(mkdir("{$base}/cleanup_test"));
+		$this->assertTrue(touch("{$base}/cleanup_test/file"));
+		$this->assertTrue(touch("{$base}/cleanup_test/.hideme"));
+
+		$this->_cleanUp();
+		$this->assertFalse(file_exists("{$base}/cleanup_test"));
+	}
+
+	public function testCleanUpWithFullPath() {
+		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->assertTrue(mkdir("{$base}/cleanup_test"));
+		$this->assertTrue(touch("{$base}/cleanup_test/file"));
+		$this->assertTrue(touch("{$base}/cleanup_test/.hideme"));
+
+		$this->_cleanUp("{$base}/cleanup_test");
+		$this->assertTrue(file_exists("{$base}/cleanup_test"));
+		$this->assertFalse(file_exists("{$base}/cleanup_test/file"));
+		$this->assertFalse(file_exists("{$base}/cleanup_test/.hideme"));
+
+		$this->_cleanUp();
+	}
+
+	public function testCleanUpWithRelativePath() {
+		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->assertTrue(mkdir("{$base}/cleanup_test"));
+		$this->assertTrue(touch("{$base}/cleanup_test/file"));
+		$this->assertTrue(touch("{$base}/cleanup_test/.hideme"));
+
+		$this->_cleanUp("tests/cleanup_test");
+		$this->assertTrue(file_exists("{$base}/cleanup_test"));
+		$this->assertFalse(file_exists("{$base}/cleanup_test/file"));
+		$this->assertFalse(file_exists("{$base}/cleanup_test/.hideme"));
+
+		$this->_cleanUp();
 	}
 }
 

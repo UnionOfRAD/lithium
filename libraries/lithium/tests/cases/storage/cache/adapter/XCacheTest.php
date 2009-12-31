@@ -8,43 +8,41 @@
 
 namespace lithium\tests\cases\storage\cache\adapter;
 
-use \lithium\storage\cache\adapter\Memcache;
+use \lithium\storage\cache\adapter\XCache;
 
-class MemcacheTest extends \lithium\test\Unit {
+class XCacheTest extends \lithium\test\Unit {
 
 	/**
-	 * Skip the test if Memcached extension is unavailable.
+	 * Skip the test if XCache extension is unavailable.
 	 *
 	 * @return void
 	 */
 	public function skip() {
-		$extensionExists = extension_loaded('memcached');
-		$message = 'The libmemcached extension is not installed.';
+		$extensionExists = (extension_loaded('xcache') && (ini_get('xcache.var_size') !== 0));
+		$message = 'The XCache extension is not installed or not configured for userspace caching.';
 		$this->skipIf(!$extensionExists, $message);
-
-		$M = new \Memcached();
-		$M->addServer('127.0.0.1', 11211);
-		$message = 'The memcached daemon does not appear to be running on 127.0.0.1:11211';
-		$result = $M->getVersion();
-		$this->skipIf(empty($result), $message);
-		unset($M);
 	}
 
+	/**
+	 * Clear the userspace cache
+	 *
+	 * @return void
+	 */
 	public function setUp() {
-		$this->server = array('host' => '127.0.0.1', 'port' => 11211, 'weight' => 100);
-		$this->_Memcached = new \Memcached();
-		$this->_Memcached->addServer(
-			$this->server['host'], $this->server['port'], $this->server['weight']
-		);
-		$this->Memcache = new Memcache();
+		for ($i = 0, $max = xcache_count(XC_TYPE_VAR); $i < $max; $i++) {
+			if (xcache_clear_cache(XC_TYPE_VAR, $i) === false) {
+				return false;
+			}
+		}
+		$this->XCache = new XCache();
 	}
 
 	public function tearDown() {
-		$this->_Memcached->flush();
+		unset($this->XCache);
 	}
 
 	public function testEnabled() {
-		$this->assertTrue($this->Memcache->enabled());
+		$this->assertTrue($this->XCache->enabled());
 	}
 
 	public function testSimpleWrite() {
@@ -53,21 +51,21 @@ class MemcacheTest extends \lithium\test\Unit {
 		$expiry = '+5 seconds';
 		$time = strtotime($expiry);
 
-		$closure = $this->Memcache->write($key, $data, $expiry);
+		$closure = $this->XCache->write($key, $data, $expiry);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key', 'data', 'expiry');
-		$result = $closure($this->Memcache, $params, null);
+		$result = $closure($this->XCache, $params, null);
 		$expected = $data;
 		$this->assertEqual($expected, $result);
 
-		$result = $this->_Memcached->get($key);
+		$result = xcache_get($key);
 		$this->assertEqual($expected, $result);
 
-		$result = $this->_Memcached->get($key . '_expires');
+		$result = xcache_get($key . '_expires');
 		$this->assertEqual($time, $result);
 
-		$result = $this->_Memcached->delete($key);
+		$result = xcache_unset($key);
 		$this->assertTrue($result);
 
 		$key = 'another_key';
@@ -75,24 +73,25 @@ class MemcacheTest extends \lithium\test\Unit {
 		$expiry = '+1 minute';
 		$time = strtotime($expiry);
 
-		$closure = $this->Memcache->write($key, $data, $expiry);
+		$closure = $this->XCache->write($key, $data, $expiry);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key', 'data', 'expiry');
-		$result = $closure($this->Memcache, $params, null);
+		$result = $closure($this->XCache, $params, null);
 		$expected = $data;
 		$this->assertEqual($expected, $result);
 
-		$result = $this->_Memcached->get($key);
+
+		$result = xcache_get($key);
 		$this->assertEqual($expected, $result);
 
-		$result = $this->_Memcached->get($key . '_expires');
+		$result = xcache_get($key . '_expires');
 		$this->assertEqual($time, $result);
 
-		$result = $this->_Memcached->delete($key);
+		$result = xcache_unset($key);
 		$this->assertTrue($result);
 
-		$result = $this->_Memcached->delete($key . '_expires');
+		$result = xcache_unset($key . '_expires');
 		$this->assertTrue($result);
 	}
 
@@ -101,58 +100,58 @@ class MemcacheTest extends \lithium\test\Unit {
 		$data = 'read data';
 		$time = strtotime('+1 minute');
 
-		$result = $this->_Memcached->set($key . '_expires', $time, $time);
+		$result = xcache_set($key . '_expires', $time, 60);
 		$this->assertTrue($result);
 
-		$result = $this->_Memcached->set($key, $data, $time);
+		$result = xcache_set($key, $data, 60);
 		$this->assertTrue($result);
 
-		$closure = $this->Memcache->read($key);
+		$closure = $this->XCache->read($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Memcache, $params, null);
+		$result = $closure($this->XCache, $params, null);
 		$expected = $data;
 		$this->assertEqual($expected, $result);
 
-		$result = $this->_Memcached->delete($key);
+		$result = xcache_unset($key);
 		$this->assertTrue($result);
 
-		$result = $this->_Memcached->delete($key . '_expires');
+		$result = xcache_unset($key . '_expires');
 		$this->assertTrue($result);
 
 		$key = 'another_read_key';
 		$data = 'read data';
 		$time = strtotime('+1 minute');
 
-		$result = $this->_Memcached->set($key, $data, $time);
+		$result = xcache_set($key, $data, 60);
 		$this->assertTrue($result);
 
-		$result = $this->_Memcached->set($key . '_expires', $time, $time);
+		$result = xcache_set($key . '_expires', $time, 60);
 		$this->assertTrue($result);
 
-		$closure = $this->Memcache->read($key);
+		$closure = $this->XCache->read($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Memcache, $params, null);
+		$result = $closure($this->XCache, $params, null);
 		$expected = $data;
 		$this->assertEqual($expected, $result);
 
-		$result = $this->_Memcached->delete($key);
+		$result = xcache_unset($key);
 		$this->assertTrue($result);
 
-		$result = $this->_Memcached->delete($key . '_expires');
+		$result = xcache_unset($key . '_expires');
 		$this->assertTrue($result);
 	}
 
 	public function testReadKeyThatDoesNotExist() {
 		$key = 'does_not_exist';
-		$closure = $this->Memcache->read($key);
+		$closure = $this->XCache->read($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Memcache, $params, null);
+		$result = $closure($this->XCache, $params, null);
 		$this->assertFalse($result);
 
 	}
@@ -162,21 +161,21 @@ class MemcacheTest extends \lithium\test\Unit {
 		$data = 'data to delete';
 		$time = strtotime('+1 minute');
 
-		$result = $this->_Memcached->set($key, $data, $time);
+		$result = xcache_set($key, $data, 60);
 		$this->assertTrue($result);
 
-		$result = $this->_Memcached->set($key . '_expires', $time, $time);
+		$result = xcache_set($key . '_expires', $time, 60);
 		$this->assertTrue($result);
 
-		$closure = $this->Memcache->delete($key);
+		$closure = $this->XCache->delete($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Memcache, $params, null);
+		$result = $closure($this->XCache, $params, null);
 		$this->assertTrue($result);
 
-		$this->assertFalse($this->_Memcached->delete($key));
-		$this->assertFalse($this->_Memcached->delete($key . '_expires'));
+		$this->assertFalse(xcache_unset($key));
+		$this->assertFalse(xcache_unset($key . '_expires'));
 	}
 
 	public function testDeleteNonExistentKey() {
@@ -184,11 +183,11 @@ class MemcacheTest extends \lithium\test\Unit {
 		$data = 'data to delete';
 		$time = strtotime('+1 minute');
 
-		$closure = $this->Memcache->delete($key);
+		$closure = $this->XCache->delete($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Memcache, $params, null);
+		$result = $closure($this->XCache, $params, null);
 		$this->assertFalse($result);
 	}
 
@@ -198,37 +197,37 @@ class MemcacheTest extends \lithium\test\Unit {
 		$expiry = '+5 seconds';
 		$time = strtotime($expiry);
 
-		$closure = $this->Memcache->write($key, $data, $expiry);
+		$closure = $this->XCache->write($key, $data, $expiry);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key', 'data', 'expiry');
-		$result = $closure($this->Memcache, $params, null);
+		$result = $closure($this->XCache, $params, null);
 		$expected = $data;
 		$this->assertEqual($expected, $result);
 
-		$result = $this->_Memcached->get($key);
+		$result = xcache_get($key);
 		$this->assertEqual($expected, $result);
 
-		$result = $this->_Memcached->get($key . '_expires');
+		$result = xcache_get($key . '_expires');
 		$this->assertEqual($time, $result);
 
-		$closure = $this->Memcache->read($key);
+		$closure = $this->XCache->read($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Memcache, $params, null);
+		$result = $closure($this->XCache, $params, null);
 		$expected = $data;
 		$this->assertEqual($expected, $result);
 
-		$closure = $this->Memcache->delete($key);
+		$closure = $this->XCache->delete($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Memcache, $params, null);
+		$result = $closure($this->XCache, $params, null);
 		$this->assertTrue($result);
 
-		$this->assertFalse($this->_Memcached->get($key));
-		$this->assertFalse($this->_Memcached->get($key . '_expires'));
+		$this->assertFalse(xcache_get($key));
+		$this->assertFalse(xcache_get($key . '_expires'));
 	}
 
 	public function testExpiredRead() {
@@ -236,35 +235,40 @@ class MemcacheTest extends \lithium\test\Unit {
 		$data = 'expired data';
 		$time = strtotime('+1 second');
 
-		$result = $this->_Memcached->set($key . '_expires', $time, $time);
+		$result = xcache_set($key . '_expires', $time, 1);
 		$this->assertTrue($result);
 
-		$result = $this->_Memcached->set($key, $data, $time);
+		$result = xcache_set($key, $data, 1);
 		$this->assertTrue($result);
 
 		sleep(2);
-		$closure = $this->Memcache->read($key);
+		$closure = $this->XCache->read($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Memcache, $params, null);
+		$result = $closure($this->XCache, $params, null);
 		$this->assertFalse($result);
 	}
 
 	public function testClear() {
+		$admin = (ini_get('xcache.admin.enable_auth') === "On");
+		$this->skipIf($admin, "XCache::clear() test skipped due to authentication.");
+
+		$key1 = 'key_clear_1';
+		$key2 = 'key_clear_2';
 		$time = strtotime('+1 minute');
 
-		$result = $this->_Memcached->set('key', 'value', $time);
+		$result = xcache_set($key1, 'data that will no longer exist', $time);
 		$this->assertTrue($result);
 
-		$result = $this->_Memcached->set('another_key', 'value', $time);
+		$result = xcache_set($key2, 'more dead data', $time);
 		$this->assertTrue($result);
 
-		$result = $this->Memcache->clear();
+		$result = $this->XCache->clear();
 		$this->assertTrue($result);
 
-		$this->assertFalse($this->_Memcached->get('key'));
-		$this->assertFalse($this->_Memcached->get('another_key'));
+		$this->assertFalse(xcache_get($key1));
+		$this->assertFalse(xcache_get($key2));
 	}
 
 	public function testDecrement() {
@@ -272,20 +276,20 @@ class MemcacheTest extends \lithium\test\Unit {
 		$key = 'decrement';
 		$value = 10;
 
-		$result = $this->_Memcached->set($key, $value, $time);
+		$result = xcache_set($key, $value, $time);
 		$this->assertTrue($result);
 
-		$closure = $this->Memcache->decrement($key);
+		$closure = $this->XCache->decrement($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Memcache, $params, null);
+		$result = $closure($this->XCache, $params, null);
 		$this->assertEqual($value - 1, $result);
 
-		$result = $this->_Memcached->get($key);
+		$result = xcache_get($key);
 		$this->assertEqual($value - 1, $result);
 
-		$result = $this->_Memcached->delete($key);
+		$result = xcache_unset($key);
 		$this->assertTrue($result);
 	}
 
@@ -294,19 +298,28 @@ class MemcacheTest extends \lithium\test\Unit {
 		$key = 'non_integer';
 		$value = 'no';
 
-		$result = $this->_Memcached->set($key, $value, $time);
+		$result = xcache_set($key, $value, $time);
 		$this->assertTrue($result);
 
-		$closure = $this->Memcache->decrement($key);
+		$closure = $this->XCache->decrement($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Memcache, $params, null);
+		$result = $closure($this->XCache, $params, null);
 
-		$result = $this->_Memcached->get($key);
-		$this->assertEqual(0, $result);
+		$result = xcache_get($key);
+		$this->assertEqual(-1, $result);
 
-		$result = $this->_Memcached->delete($key);
+		$closure = $this->XCache->decrement($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->XCache, $params, null);
+
+		$result = xcache_get($key);
+		$this->assertEqual(-2, $result);
+
+		$result = xcache_unset($key);
 		$this->assertTrue($result);
 	}
 
@@ -315,20 +328,20 @@ class MemcacheTest extends \lithium\test\Unit {
 		$key = 'increment';
 		$value = 10;
 
-		$result = $this->_Memcached->set($key, $value, $time);
+		$result = xcache_set($key, $value, $time);
 		$this->assertTrue($result);
 
-		$closure = $this->Memcache->increment($key);
+		$closure = $this->XCache->increment($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Memcache, $params, null);
+		$result = $closure($this->XCache, $params, null);
 		$this->assertEqual($value + 1, $result);
 
-		$result = $this->_Memcached->get($key);
+		$result = xcache_get($key);
 		$this->assertEqual($value + 1, $result);
 
-		$result = $this->_Memcached->delete($key);
+		$result = xcache_unset($key);
 		$this->assertTrue($result);
 	}
 
@@ -337,19 +350,28 @@ class MemcacheTest extends \lithium\test\Unit {
 		$key = 'non_integer_increment';
 		$value = 'yes';
 
-		$result = $this->_Memcached->set($key, $value, $time);
+		$result = xcache_set($key, $value, $time);
 		$this->assertTrue($result);
 
-		$closure = $this->Memcache->increment($key);
+		$closure = $this->XCache->increment($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Memcache, $params, null);
+		$result = $closure($this->XCache, $params, null);
 
-		$result = $this->_Memcached->get($key);
-		$this->assertEqual(0, $result);
+		$result = xcache_get($key);
+		$this->assertEqual(1, $result);
 
-		$result = $this->_Memcached->delete($key);
+		$closure = $this->XCache->increment($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->XCache, $params, null);
+
+		$result = xcache_get($key);
+		$this->assertEqual(2, $result);
+
+		$result = xcache_unset($key);
 		$this->assertTrue($result);
 	}
 }

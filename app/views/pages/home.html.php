@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 ?>
-<h2>Home</h2>
+<h2><?=$this->title('Home');?></h2>
 <p>
 	Temporary home page that will eventually be filled with configuration checks.
 </p>

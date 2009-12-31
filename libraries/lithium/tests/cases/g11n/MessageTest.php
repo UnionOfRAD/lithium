@@ -18,7 +18,7 @@ class MessageTest extends \lithium\test\Unit {
 	protected $_backups = array();
 
 	public function setUp() {
-		$this->_backups['catalogConfig'] = Catalog::config()->to('array');
+		$this->_backups['catalogConfig'] = Catalog::config();
 		Catalog::reset();
 		Catalog::config(array(
 			'runtime' => array('adapter' => new Memory())

@@ -9,20 +9,20 @@
 <!doctype html>
 <html>
 <head>
-	<?php echo $this->html->charset(); ?>
-	<title><?=$title; ?></title>
-	<?php echo $this->html->style('base'); ?>
-	<?php echo $this->scripts(); ?>
-	<?php echo $this->html->link('Icon', null, array('type' => 'icon')); ?>
+	<?=$this->html->charset();?>
+	<title>Application > <?=$this->title?></title>
+	<?=$this->html->style('base');?>
+	<?=$this->scripts();?>
+	<?=$this->html->link('Icon', null, array('type' => 'icon'));?>
 </head>
 <body class="app">
 	<div id="container">
 		<div id="header">
 			<h1>Application</h1>
-			<h2>Powered by <?=$this->html->link('Lithium', 'http://li3.rad-dev.org'); ?>.</h2>
+			<h2>Powered by <?=$this->html->link('Lithium', 'http://li3.rad-dev.org');?>.</h2>
 		</div>
 		<div id="content">
-			<?php echo $this->content; ?>
+			<?=$this->content;?>
 		</div>
 	</div>
 </body>

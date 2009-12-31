@@ -34,8 +34,8 @@ use \lithium\util\Inflector;
  *
  * Each adapter provides a consistent interface for the basic cache operations of `write`, `read`,
  * `delete` and `clear`, which can be used interchangably between all adapters. Some adapters (e.g.
- * Memcached) provide additional methods that are not consistently available across other adapters.
- * To make use of these, it is always possible to call:
+ * Memcached, Apc) provide additional methods that are not consistently available across
+ * other adapters. To make use of these, it is always possible to call:
  *
  * {{{Cache::adapter('named-configuration')->methodName($argument);}}}
  *
@@ -49,13 +49,14 @@ use \lithium\util\Inflector;
  */
 class Cache extends \lithium\core\Adaptable {
 
-
 	/**
 	 * Stores configurations for cache adapters
 	 *
 	 * @var object Collection of cache configurations
 	 */
 	protected static $_configurations = null;
+
+	protected static $_adapters = 'adapter.storage.cache';
 
 	/**
 	 * Generates the cache key.
@@ -172,16 +173,6 @@ class Cache extends \lithium\core\Adaptable {
 	public static function clear($name) {
 		$settings = static::config();
 		return (isset($settings[$name])) ? static::adapter($name)->clear() : false;
-	}
-
-	/**
-	 * Returns adapter for given named configuration
-	 *
-	 * @param string $name Name of configuration
-	 * @return object Adapter for named configuration
-	 */
-	public static function adapter($name) {
-		return static::_adapter('adapter.storage.cache', $name);
 	}
 }
 

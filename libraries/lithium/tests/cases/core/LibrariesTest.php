@@ -186,12 +186,10 @@ class LibrariesTest extends \lithium\test\Unit {
 
 	public function testServiceLocateAllCommands() {
 		$result = Libraries::locate('command');
-		$this->assertTrue(count($result) > 10);
+		$this->assertTrue(count($result) > 7);
 
-		$expected = array(
-			'lithium\console\command\docs\Generator', 'lithium\console\command\docs\Todo'
-		);
-		$result = Libraries::locate('command.docs');
+		$expected = array('lithium\console\command\g11n\Extract');
+		$result = Libraries::locate('command.g11n');
 		$this->assertEqual($expected, $result);
 	}
 
@@ -241,8 +239,8 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testServiceLocateCommand() {
-		$result = Libraries::locate('command.docs', 'Generator');
-		$expected = 'lithium\console\command\docs\Generator';
+		$result = Libraries::locate('command.g11n', 'Extract');
+		$expected = 'lithium\console\command\g11n\Extract';
 		$this->assertEqual($expected, $result);
 	}
 

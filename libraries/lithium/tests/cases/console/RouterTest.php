@@ -15,8 +15,7 @@ class RouterTest extends \lithium\test\Unit {
 
 	public function testParseNoOptions() {
 		$expected = array(
-			'command' => null, 'action' => 'run',
-			'passed' => array(), 'named' => array()
+			'command' => null, 'action' => 'run', 'args' => array()
 		);
 		$result = Router::parse();
 		$this->assertEqual($expected, $result);
@@ -24,32 +23,24 @@ class RouterTest extends \lithium\test\Unit {
 
 	public function testParseWithPassed() {
 		$expected = array(
-			'command' => 'test',
-			'action' => 'action',
-			'passed' => array('param'),
-			'named' => array()
+			'command' => 'test', 'action' => 'action',
+			'args' => array('param')
 		);
 		$result = Router::parse(new Request(array(
-			'args' => array(
-				'test', 'action', 'param'
-			)
+			'args' => array('test', 'action', 'param')
 		)));
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testParseWithNamed() {
 		$expected = array(
-			'command' => 'test',
-			'action' => 'run',
-			'passed' => array(),
-			'named' => array(
-				'case' => 'lithium.tests.cases.console.RouterTest'
-			)
+			'command' => 'test', 'action' => 'lithium.tests.cases.console.RouterTest',
+			'args' => array(),
+			'case' => true
 		);
 		$result = Router::parse(new Request(array(
 			'args' => array(
-				'test',
-				'-case', 'lithium.tests.cases.console.RouterTest'
+				'test', '-case', 'lithium.tests.cases.console.RouterTest'
 			)
 		)));
 		$this->assertEqual($expected, $result);
@@ -57,12 +48,8 @@ class RouterTest extends \lithium\test\Unit {
 
 	public function testParseWithDoubleNamed() {
 		$expected = array(
-			'command' => 'test',
-			'action' => 'run',
-			'passed' => array(),
-			'named' => array(
-				'case' => 'lithium.tests.cases.console.RouterTest'
-			)
+			'command' => 'test', 'action' => 'run', 'args' => array(),
+			'case' => 'lithium.tests.cases.console.RouterTest'
 		);
 		$result = Router::parse(new Request(array(
 			'args' => array(
@@ -73,13 +60,9 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array(
-			'command' => 'test',
-			'action' => 'run',
-			'passed' => array(),
-			'named' => array(
-				'case' => 'lithium.tests.cases.console.RouterTest',
-				'phase' => 'drowning'
-			)
+			'command' => 'test', 'action' => 'run', 'args' => array(),
+			'case' => 'lithium.tests.cases.console.RouterTest',
+			'phase' => 'drowning'
 		);
 		$result = Router::parse(new Request(array(
 			'args' => array(
@@ -87,6 +70,26 @@ class RouterTest extends \lithium\test\Unit {
 				'--case=lithium.tests.cases.console.RouterTest',
 				'--phase=drowning'
 			)
+		)));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testParseWithParam() {
+		$expected = array(
+			'command' => 'test', 'action' => 'action', 'args' => array(),
+			'i' => true,
+		);
+		$result = Router::parse(new Request(array(
+			'args' => array('test', 'action', '-i')
+		)));
+		$this->assertEqual($expected, $result);
+
+		$expected = array(
+			'command' => 'test', 'action' => 'action', 'args' => array('something'),
+			'i' => true,
+		);
+		$result = Router::parse(new Request(array(
+			'args' => array('test', 'action', '-i', 'something')
 		)));
 		$this->assertEqual($expected, $result);
 	}

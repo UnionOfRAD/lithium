@@ -6,8 +6,13 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\console\command\generate;
+namespace lithium\tests\mocks\console\command;
 
-class Component extends \lithium\console\Command {}
+class MockBuild extends \lithium\console\command\Build {
+
+	public function save($template, $params = array()) {
+		return $this->_save($template, $params);
+	}
+}
 
 ?>

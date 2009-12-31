@@ -12,10 +12,10 @@ use \lithium\core\Environment;
 <!doctype html>
 <html>
 <head>
-	<?php echo $this->html->charset(); ?>
-	<title><?php echo $page_title; ?></title>
+	<?=$this->html->charset();?>
+	<title><?=$this->title;?></title>
 	<?php if (Environment::is('production')) { ?>
-		<meta http-equiv="Refresh" content="<?=$pause?>;url=<?=$url?>"/>
+		<meta http-equiv="Refresh" content="<?=$pause;?>;url=<?=$url;?>"/>
 	<?php } ?>
 	<style>
 		p { text-align:center; font:bold 1.1em sans-serif }
@@ -24,6 +24,6 @@ use \lithium\core\Environment;
 	</style>
 </head>
 <body>
-	<p><a href="<?=$url; ?>"><?=$message; ?></a></p>
+	<p><a href="<?=$url;?>"><?=$message;?></a></p>
 </body>
 </html>

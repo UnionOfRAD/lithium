@@ -1,4 +1,10 @@
 <?php
+/**
+ * Lithium: the most rad php framework
+ *
+ * @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
 
 namespace lithium\tests\cases\util\audit;
 
@@ -29,8 +35,10 @@ class LoggerTest extends \lithium\test\Unit {
 		));
 
 		$result = Logger::config($config);
-		$expected = new Collection(array('items' => $config));
+		$this->assertNull($result);
 
+		$result = Logger::config();
+		$expected = $config;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -44,7 +52,7 @@ class LoggerTest extends \lithium\test\Unit {
 		$this->assertNull($result);
 
 		$result = Logger::config();
-		$this->assertEqual(new Collection(), $result);
+		$this->assertFalse($result);
 	}
 
 	public function testWrite() {

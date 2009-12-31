@@ -74,11 +74,15 @@ class Command extends \lithium\core\Object {
 	 */
 	protected function _init() {
 		parent::_init();
+
 		$this->request = $this->_config['request'];
 		$this->response = new $this->_classes['response']($this->_config['response']);
 
-		if ($this->request) {
-			foreach ((array) $this->request->params['named'] as $key => $param) {
+		if (!empty($this->request->params)) {
+			$params = (array) array_diff_key(
+				$this->request->params, array('command' => null, 'action' => null, 'args' => null)
+			);
+			foreach ($params as $key => $param) {
 				$this->{$key} = $param;
 			}
 		}
@@ -272,7 +276,7 @@ class Command extends \lithium\core\Object {
 			if ($status == 0) {
 				$this->out($message);
 			} else {
-				$this->err($message);
+				$this->error($message);
 			}
 		}
 		exit($status);
