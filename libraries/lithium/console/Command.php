@@ -18,7 +18,7 @@ use \lithium\analysis\Docblock;
  * The base class to inherit when writing console scripts in Lithium.
  */
 class Command extends \lithium\core\Object {
-	
+
 	/**
 	 * If -h or --help param exists a help screen will be returned.
 	 *
@@ -110,7 +110,7 @@ class Command extends \lithium\core\Object {
 	public function __invoke($action, $args = array(), $options = array()) {
 		try {
 			$this->response->status = 1;
-			$result = $this->invokeMethod($action, $args);			
+			$result = $this->invokeMethod($action, $args);
 			if (is_int($result)) {
 				$this->response->status = $result;
 			} elseif ($result || $result === null) {
@@ -293,24 +293,49 @@ class Command extends \lithium\core\Object {
 	 * @return boolean
 	 */
 	protected function _help() {
-		
-		var_dump(Inspector::info(get_class($this)));
-		
-		$methods = array_keys(Inspector::methods($class, 'extents'));
-		var_dump($methods);
-		$parent = new ReflectionClass("\lithium\console\Command");
-		$class = new ReflectionClass(get_class($this));
-		$template = $class->newInstance();
 
-		$properties = array_diff($class->getProperties(), $parent->getProperties());
-		$properties = array_filter($properties, function($p) { return $p->isPublic(); });
+		$class = get_class($this);
+		$methods = Inspector::methods($class)->map(
+			function($item) {
+				$modifiers = array_values(Inspector::invokeMethod('_modifiers', array($item)));
+				$setAccess = (
+					array_intersect($modifiers, array('private', 'protected')) != array()
+				);
+				if ($setAccess) {
+					$item->setAccessible(true);
+				}
+				$result = compact('modifiers') + array(
+					'docComment' => $item->getDocComment(),
+					'name' => $item->getName(),
+				);
+				if ($setAccess) {
+					$item->setAccessible(false);
+				}
+				return $result;
+			},
+			array('collect' => false)
+		);
+		foreach ($methods as &$method) {
+			$comment = Docblock::comment($method['docComment']);
+			$name = $method['name'];
+			$command = $method['name'] === 'run' ? null : $method['name'];
+			$description = $method['name'] === 'run' ? null : $comment['description'];
+			$args = isset($comment['tags']['params']) ? join(' ', array_keys($comment['tags']['params'])) : null;
+			$return = isset($comment['tags']['return']) ? strtok($comment['tags']['return'], ' ') : null;
+			$usage = trim("{$command} {$args}");
+
+			$method = compact('name', 'description', 'return', 'usage');
+		}
+
+		$properties = Inspector::properties(get_class($this));
 
 		foreach ($properties as &$property) {
-			$comment = Docblock::comment($property->getDocComment());
+			var_dump($property);
+			$comment = Docblock::comment($property['docComment']);
 			$description = $comment['description'];
 			$type = isset($comment['tags']['var']) ? strtok($comment['tags']['var'], ' ') : null;
 
-			$name = str_replace('_', '-', Inflector::underscore($property->getName()));
+			$name = str_replace('_', '-', Inflector::underscore($property['name']));
 			$usage = $type == 'boolean' ? "-{$name}" : "--{$name}=" . strtoupper($name);
 
 			$property = compact('name', 'description', 'type', 'usage');
@@ -327,11 +352,11 @@ class Command extends \lithium\core\Object {
 			array_reduce($properties, function($a, $b) { return "{$a} {$b['usage']}"; })
 		)));
 
-		if ($this->request->params['command']) {
+		if ($this->request->command) {
 			$this->nl();
 			$this->out('DESCRIPTION');
-			$comment = Docblock::comment($class->getDocComment());
-			$this->out($pad($comment['description']));
+			$info =Inspector::info($class);
+			$this->out($pad($info['description']));
 		}
 		if ($properties) {
 			$this->nl();
@@ -346,18 +371,31 @@ class Command extends \lithium\core\Object {
 				$this->nl();
 			}
 		}
+		if ($methods) {
+			$this->nl();
+			$this->out('tasks');
+
+			foreach ($methods as $param) {
+				if (empty($param['usage'])) {
+					continue;
+				}
+				$this->out($pad($param['usage']));
+
+				if ($param['description']) {
+					$this->out($pad($param['description'], 2));
+				}
+				$this->nl();
+			}
+		}
 		if (!$this->request->command) {
 			$this->nl();
 			$this->out('COMMANDS');
 			$commands = Libraries::locate('command', null, array('recursive' => false));
 
 			foreach ($commands as $command) {
-				$class = new ReflectionClass($command);
-				$comment = Docblock::comment($class->getDocComment());
-				$command = explode('\\', $command);
-
-				$this->out($pad(Inflector::underscore(end($command))));
-				$this->out($pad($comment['description'], 2));
+				$info =Inspector::info($command);
+				$this->out($pad(Inflector::underscore($info['shortName'])));
+				$this->out($pad($info['description'], 2));
 				$this->nl();
 			}
 			$this->out('See `li3 COMMAND help` for more information on a specific command.');

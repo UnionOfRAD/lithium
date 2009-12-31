@@ -19,7 +19,7 @@ class MockCommandHelp extends \lithium\console\Command {
 	 *
 	 * @var string
 	 */
-	public $long = null;
+	public $long = 'default';
 
 	/**
 	 * This is a short param.
@@ -53,7 +53,7 @@ class MockCommandHelp extends \lithium\console\Command {
 	 * @param string $arg2
 	 * @return boolean
 	 */
-	public function taskWithRequiredArgs($arg1, $arg2) {
+	public function sampleTaskWithRequiredArgs($arg1, $arg2) {
 		return true;
 	}
 
@@ -64,8 +64,17 @@ class MockCommandHelp extends \lithium\console\Command {
 	 * @param string $arg2
 	 * @return boolean
 	 */
-	public function taskWithOptionalArgs($arg1 = null, $arg2 = nill) {
+	public function sampleTaskWithOptionalArgs($arg1 = null, $arg2 = nill) {
 		return true;
+	}
+	
+	/**
+	 * Don't show in the help
+	 *
+	 * @return void
+	 */
+	protected function _sampleHelper() {
+		
 	}
 }
 
