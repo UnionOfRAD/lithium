@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\util\audit;
+namespace lithium\analysis;
 
 use \lithium\util\String;
 use \lithium\core\Libraries;
@@ -21,7 +21,7 @@ class Logger extends \lithium\core\Adaptable {
 	 */
 	protected static $_configurations = null;
 
-	protected static $_adapters = 'adapter.util.audit.logger';
+	protected static $_adapters = 'adapter.analysis.logger';
 
 	/**
 	 * Writes `$message` to the log specified by the `$type`

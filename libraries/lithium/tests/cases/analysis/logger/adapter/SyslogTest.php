@@ -6,10 +6,10 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\util\audit\logger\adapter;
+namespace lithium\tests\cases\analysis\logger\adapter;
 
-use \lithium\util\audit\Logger;
-use \lithium\util\audit\logger\adapter\Syslog;
+use \lithium\analysis\Logger;
+use \lithium\analysis\logger\adapter\Syslog;
 
 /**
  * Syslog adapter test.
