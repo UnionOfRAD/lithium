@@ -15,6 +15,12 @@ use \lithium\core\Libraries;
 
 class InspectorTest extends \lithium\test\Unit {
 
+	public $test = 'foo';
+
+	public static $test2 = 'bar';
+
+	protected $_test = 'baz';
+
 	/**
 	 * Tests that basic method lists and information are queried properly.
 	 *
@@ -197,6 +203,44 @@ class InspectorTest extends \lithium\test\Unit {
 
 		$result = Inspector::type('lithium\storage\cache');
 		$expected = 'namespace';
+		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * Tests getting static and non-static properties from various types of classes.
+	 *
+	 * @return void
+	 */
+	public function testGetClassProperties() {
+		$result = array_map(
+			function($property) { return $property['name']; },
+			Inspector::properties(__CLASS__)
+		);
+		$expected = array('test', 'test2');
+		$this->assertEqual($expected, $result);
+
+		$result = array_map(
+			function($property) { return $property['name']; },
+			Inspector::properties(__CLASS__, array('public' => false))
+		);
+		$expected = array('test', 'test2', '_test');
+		$this->assertEqual($expected, $result);
+
+		$result = Inspector::properties(__CLASS__);
+		$expected = array(
+			array(
+				'modifiers' => array('public'),
+				'docComment' => false,
+				'name' => 'test',
+				'value' => null
+			),
+			array(
+				'modifiers' => array('public', 'static'),
+				'docComment' => false,
+				'name' => 'test2',
+				'value' => 'bar'
+			)
+		);
 		$this->assertEqual($expected, $result);
 	}
 }

@@ -145,6 +145,32 @@ class RequestTest extends \lithium\test\Unit {
 		$result = $request->input();
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testShiftDefaultOne() {
+		$request = new Request();
+		$request->params = array(
+			'command' => 'one', 'action' => 'two',
+			'args' => array('three', 'four', 'five')
+		);
+		$request->shift();
+
+		$expected = array('command' => 'two', 'action' => 'three', 'args' => array('four', 'five'));
+		$result = $request->params;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testShiftTwo() {
+		$request = new Request();
+		$request->params = array(
+			'command' => 'one', 'action' => 'two',
+			'args' => array('three', 'four', 'five')
+		);
+		$request->shift(2);
+
+		$expected = array('command' => 'three', 'action' => 'four', 'args' => array('five'));
+		$result = $request->params;
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

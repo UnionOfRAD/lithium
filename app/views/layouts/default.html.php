@@ -10,7 +10,7 @@
 <html>
 <head>
 	<?=$this->html->charset();?>
-	<title><?=$this->title;?></title>
+	<title>Application > <?=$this->title?></title>
 	<?=$this->html->style('base');?>
 	<?=$this->scripts();?>
 	<?=$this->html->link('Icon', null, array('type' => 'icon'));?>

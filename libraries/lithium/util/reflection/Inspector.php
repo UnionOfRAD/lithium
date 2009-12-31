@@ -90,9 +90,6 @@ class Inspector extends \lithium\core\StaticObject {
 			list($class, $identifier) = explode('::', $identifier);
 			$classInspector = new ReflectionClass($class);
 
-			$modifiers = array('public', 'private', 'protected', 'abstract', 'final', 'static');
-			$result['modifiers'] = array();
-
 			if ($type == 'property') {
 				$identifier = substr($identifier, 1);
 				$accessor = 'getProperty';
@@ -106,13 +103,7 @@ class Inspector extends \lithium\core\StaticObject {
 			} catch (Exception $e) {
 				return null;
 			}
-
-			foreach ($modifiers as $mod) {
-				$m = 'is' . ucfirst($mod);
-				if (method_exists($inspector, $m) && $inspector->{$m}()) {
-					$result['modifiers'][] = $mod;
-				}
-			}
+			$result['modifiers'] = static::_modifiers($inspector);
 		} elseif ($type == 'class') {
 			$inspector = new ReflectionClass($identifier);
 		} else {
@@ -225,7 +216,8 @@ class Inspector extends \lithium\core\StaticObject {
 				return null;
 			}
 		}
-		$methods = static::_methods($class, $options);
+		$options += array('names' => $options['methods']);
+		$methods = static::_items($class, 'getMethods', $options);
 		$result = array();
 
 		switch ($format) {
@@ -260,6 +252,43 @@ class Inspector extends \lithium\core\StaticObject {
 
 		array_map(function($ln) use (&$result) { $result = array_merge($result, $ln); }, $tmp);
 		return $result;
+	}
+
+	public static function properties($class, $options = array()) {
+		$defaults = array('properties' => array(), 'self' => true);
+		$options += $defaults;
+
+		if (!(is_object($class) && $class instanceof ReflectionClass)) {
+			try {
+				$class = new ReflectionClass($class);
+			} catch (ReflectionException $e) {
+				return null;
+			}
+		}
+		$options += array('names' => $options['properties']);
+
+		return static::_items($class, 'getProperties', $options)->map(
+			function($item) {
+				$class = __CLASS__;
+				$modifiers = array_values($class::invokeMethod('_modifiers', array($item)));
+				$setAccess = (
+					array_intersect($modifiers, array('private', 'protected')) != array()
+				);
+				if ($setAccess) {
+					$item->setAccessible(true);
+				}
+				$result = compact('modifiers') + array(
+					'docComment' => $item->getDocComment(),
+					'name' => $item->getName(),
+					'value' => $item->getValue($item->getDeclaringClass())
+				);
+				if ($setAccess) {
+					$item->setAccessible(false);
+				}
+				return $result;
+			},
+			array('collect' => false)
+		);
 	}
 
 	/**
@@ -303,7 +332,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 *        -'autoLoad': Whether or not to call __autoload by default. Defaults to true.
 	 * @return array An array of the name of the parent classes of the passed `$class` parameter,
 	 *         or false on error.
-	 * @see http://php.net/manual/en/function.class-parents.php
+	 * @link http://php.net/manual/en/function.class-parents.php
 	 */
 	public static function parents($class, $options = array()) {
 		$defaults = array('autoLoad' => false);
@@ -401,34 +430,46 @@ class Inspector extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Helper method to get an array of `ReflectionMethod` objects, wrapped in a `Collection`
-	 * object, and filtered based on a set of options.
+	 * Helper method to get an array of `ReflectionMethod` or `ReflectionProperty` objects, wrapped
+	 * in a `Collection` object, and filtered based on a set of options.
 	 *
 	 * @param ReflectionClass $class A reflection class instance from which to fetch.
+	 * @param string $method A getter method to call on the `ReflectionClass` instance, which will
+	 *               return an array of items, i.e. `'getProperties'` or `'getMethods'`.
 	 * @param array $options The options used to filter the resulting method list.
-	 * @return object
+	 * @return object Returns a `Collection` object instance containing the results of the items
+	 *         returned from the call to the method specified in `$method`, after being passed
+	 *         through the filters specified in `$options`.
 	 */
-	protected static function _methods($class, $options) {
-		$defaults = array('methods' => array(), 'self' => true, 'public' => true);
+	protected static function _items($class, $method, $options) {
+		$defaults = array('names' => array(), 'self' => true, 'public' => true);
 		$options += $defaults;
-		$methods = $class->getMethods();
+		$items = $class->{$method}();
 
-		if (!empty($options['methods'])) {
-			$methods = array_filter($methods, function($method) use ($options) {
-				return in_array($method->getName(), (array) $options['methods']);
+		if (!empty($options['names'])) {
+			$items = array_filter($items, function($item) use ($options) {
+				return in_array($item->getName(), (array) $options['names']);
 			});
 		}
 
 		if ($options['self']) {
-			$methods = array_filter($methods, function($method) use ($class) {
-				return ($method->getDeclaringClass()->getName() == $class->getName());
+			$items = array_filter($items, function($item) use ($class) {
+				return ($item->getDeclaringClass()->getName() == $class->getName());
 			});
 		}
 
 		if ($options['public']) {
-			$methods = array_filter($methods, function($method) { return $method->isPublic(); });
+			$items = array_filter($items, function($item) { return $item->isPublic(); });
 		}
-		return new static::$_classes['collection'](array('items' => $methods));
+		return new static::$_classes['collection'](compact('items'));
+	}
+
+	protected static function _modifiers($inspector, $list = array()) {
+		$list = $list ?: array('public', 'private', 'protected', 'abstract', 'final', 'static');
+		return array_filter($list, function($modifier) use ($inspector) {
+			$method = 'is' . ucfirst($modifier);
+			return (method_exists($inspector, $method) && $inspector->{$method}());
+		});
 	}
 }
 

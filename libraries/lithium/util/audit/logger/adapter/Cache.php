@@ -9,9 +9,12 @@
 namespace lithium\util\audit\logger\adapter;
 
 use \lithium\util\String;
-use \lithium\storage\Cache as Writer;
 
 class Cache extends \lithium\core\Object {
+
+	protected $_classes = array(
+		'cache' => '\lithium\storage\Cache'
+	);
 
 	/**
 	 * Class constructor
@@ -42,7 +45,9 @@ class Cache extends \lithium\core\Object {
 			$params += array('timestamp' => strtotime('now'));
 			$key = $config['key'];
 			$key = is_callable($key) ? $key($params) : String::insert($key, $params);
-			Writer::write($config['config'], $key, $params['message'], $config['expiry']);
+
+			$cache = $this->_classes['cache'];
+			$cache::write($config['config'], $key, $params['message'], $config['expiry']);
 		};
 	}
 }
