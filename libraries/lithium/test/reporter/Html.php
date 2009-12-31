@@ -9,13 +9,16 @@
 namespace lithium\test\reporter;
 
 use lithium\util\String;
-use lithium\http\Router;
 
 /**
  * Html Reporter
  *
  */
 class Html extends \lithium\test\Reporter {
+
+	protected $_classes = array(
+		'router' => '\lithium\http\Router'
+	);
 
 	/**
 	 * undocumented function
@@ -29,7 +32,7 @@ class Html extends \lithium\test\Reporter {
 			"<div class=\"test-result test-result-{$class}\">",
 			"{$stats['passes']} / {$stats['asserts']} passes, {$stats['fails']} ",
 			((intval($stats['fails']) == 1) ? 'fail' : 'fails') . " and {$stats['exceptions']} ",
-			((intval($stats['exceptions']) == 1) ? 'exceptions' : 'exceptions'),
+			((intval($stats['exceptions']) == 1) ? 'exception' : 'exceptions'),
 			'</div>'
 		);
 		return join("", $result);
@@ -91,30 +94,29 @@ class Html extends \lithium\test\Reporter {
 	 * Renders a menu item
 	 *
 	 * @param string $type group, case or null
-	 * @param string $params
+	 * @param string $options
 	 *               - request: a request object
 	 *               - namespace: namespace for test case
 	 *               - name: test case class name
 	 *               - menu: current menu string for recursive construction
 	 * @return void
 	 */
-	protected function _item($type, $params = array()) {
-		$defaults = array(
-			'request' => null, 'namespace' => null, 'name' => null, 'menu' => null
-		);
-		$params += $defaults;
-		extract($params);
+	protected function _item($type, $options = array()) {
+		$defaults = array('request' => null, 'namespace' => null, 'name' => null, 'menu' => null);
+		$options += $defaults;
+		$router = $this->_classes['router'];
+		extract($options);
 
-		$controller = array('controller' => '\lithium\test\Controller');
+		$url = array('controller' => '\lithium\test\Controller');
 
 		if ($type == 'group') {
-			$url = Router::match($controller + array('args' => $namespace), $request);
+			$url = $router::match($url + array('args' => $namespace), $request);
 			return "<li><a href=\"{$url}\">{$name}</a>{$menu}</li>";
 		}
 
 		if ($type == 'case') {
 			$args = array('args' => "{$namespace}/{$name}");
-			$url = Router::match($controller + $args, $request);
+			$url = $router::match($url + $args, $request);
 			return "<li><a href=\"{$url}\">{$name}</a></li>";
 		}
 		return "<ul>{$menu}</ul>";
