@@ -10,6 +10,7 @@ namespace lithium\tests\cases\console;
 
 use \lithium\console\Request;
 use \lithium\tests\mocks\console\MockCommand;
+use \lithium\tests\mocks\console\command\MockCommandHelp;
 
 class CommandTest extends \lithium\test\Unit {
 
@@ -149,7 +150,7 @@ class CommandTest extends \lithium\test\Unit {
 
 	public function testHelp() {
 		$command = new MockCommand(array('request' => $this->request));
-		$return = $command->help();
+		$return = $command->__invoke('_help');
 
 		$this->assertTrue($return);
 
@@ -159,10 +160,19 @@ class CommandTest extends \lithium\test\Unit {
 		$this->assertPattern("/{$expected}/", $result);
 
 		$command = new MockCommand(array('request' => $this->request));
-		$command->help();
+		$return = $command->__invoke('_help');
 
 		$expected = "COMMANDS\n(\s{4}[a-z0-9\_]+\n)";
+		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/m", $result);
+	}
+
+	public function testAdvancedHelp() {
+		$this->request->params['command'] = 'mock_command_help';
+		$command = new MockCommandHelp(array('request' => $this->request));
+		$return = $command->__invoke('_help');
+		
+		var_dump($command->response->output);
 	}
 
 	public function testIn() {

@@ -18,6 +18,13 @@ use \lithium\analysis\Docblock;
  * The base class to inherit when writing console scripts in Lithium.
  */
 class Command extends \lithium\core\Object {
+	
+	/**
+	 * If -h or --help param exists a help screen will be returned.
+	 *
+	 * @var boolean
+	 */
+	public $help = false;
 
 	/**
 	 * A Request object.
@@ -100,16 +107,14 @@ class Command extends \lithium\core\Object {
 	 * @todo Implement proper exception catching/throwing.
 	 * @todo Implement filters.
 	 */
-	public function __invoke($action, $passed = array(), $options = array()) {
+	public function __invoke($action, $args = array(), $options = array()) {
 		try {
-			$result = $this->invokeMethod($action, $passed);
-
+			$this->response->status = 1;
+			$result = $this->invokeMethod($action, $args);			
 			if (is_int($result)) {
 				$this->response->status = $result;
 			} elseif ($result || $result === null) {
 				$this->response->status = 0;
-			} else {
-				$this->response->status = 1;
 			}
 		} catch (Exception $e) {
 			$this->response->status = 1;
@@ -287,7 +292,12 @@ class Command extends \lithium\core\Object {
 	 *
 	 * @return boolean
 	 */
-	public function help() {
+	protected function _help() {
+		
+		var_dump(Inspector::info(get_class($this)));
+		
+		$methods = array_keys(Inspector::methods($class, 'extents'));
+		var_dump($methods);
 		$parent = new ReflectionClass("\lithium\console\Command");
 		$class = new ReflectionClass(get_class($this));
 		$template = $class->newInstance();
@@ -301,7 +311,7 @@ class Command extends \lithium\core\Object {
 			$type = isset($comment['tags']['var']) ? strtok($comment['tags']['var'], ' ') : null;
 
 			$name = str_replace('_', '-', Inflector::underscore($property->getName()));
-			$usage = $type == 'boolean' ? "--{$name}" : "--{$name}=" . strtoupper($name);
+			$usage = $type == 'boolean' ? "-{$name}" : "--{$name}=" . strtoupper($name);
 
 			$property = compact('name', 'description', 'type', 'usage');
 		}
@@ -336,7 +346,7 @@ class Command extends \lithium\core\Object {
 				$this->nl();
 			}
 		}
-		if (!$this->request->params['command']) {
+		if (!$this->request->command) {
 			$this->nl();
 			$this->out('COMMANDS');
 			$commands = Libraries::locate('command', null, array('recursive' => false));

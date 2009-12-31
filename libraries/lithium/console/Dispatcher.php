@@ -116,7 +116,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 
 			if (!$name) {
 				$name = $class = '\lithium\console\Command';
-				$request->params['action'] = 'help';
+				$request->params['action'] = '_help';
 			}
 			if ($class[0] !== '\\') {
 				$name = Inflector::camelize($class);
@@ -148,8 +148,12 @@ class Dispatcher extends \lithium\core\StaticObject {
 					array_unshift($request->params['args'], $request->params['action']);
 					$request->params['action'] = 'run';
 				}
-				if (!method_exists($callable, $request->params['action'])) {
-					$request->params['action'] = 'help';
+				$isHelp = (
+					!empty($request->params['help']) || !empty($request->params['h'])
+					|| !method_exists($callable, $request->params['action'])
+				);
+				if ($isHelp) {
+					$request->params['action'] = '_help';
 				}
 				return $callable($request->params['action'], $request->params['args']);
 			}
