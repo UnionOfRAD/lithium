@@ -22,45 +22,64 @@ class LibraryTest extends \lithium\test\Unit {
 		$_SERVER['argv'] = array();
 		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
 		chdir($this->_testPath);
-		Libraries::add('build_test', array('path' => $this->_testPath .'/build_test'));
+		Libraries::add('build_test', array('path' => $this->_testPath . '/build_test'));
 		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
 	}
 
 	public function tearDown() {
 		$_SERVER = $this->_backup['_SERVER'];
 		chdir($this->_backup['cwd']);
-	}
-
-	public function testArchive() {
-		$this->request->params['library'] = 'app';
-		$app = new Library(array('request' => $this->request, 'classes' => $this->classes));
-
-		$expected = true;
-		$result = $app->archive($this->_testPath . '/app', 'app');
-		$this->assertEqual($expected, $result);
-
-		$expected = "app.phar.gz created in " . LITHIUM_APP_PATH . "/resources/tmp/tests\n";
-		$result = $app->response->output;
-		$this->assertEqual($expected, $result);
-
-		Phar::unlinkArchive($this->_testPath . '/app.phar');
+		Libraries::remove('build_test');
+		unset($this->request);
 	}
 
 	public function testRun() {
-		$this->request->params['library'] = 'app';
+		$this->request->params['library'] = 'build_test';
 		$app = new Library(array('request' => $this->request, 'classes' => $this->classes));
 
 		$expected = true;
-		$result = $app->run($this->_testPath . '/new', $this->_testPath . '/app.phar.gz');
+		$result = $app->run($this->_testPath . '/build_test');
+		$this->assertEqual($expected, $result);
+
+		$expected = "build_test created in {$this->_testPath} from ";
+		$expected .= LITHIUM_LIBRARY_PATH . "/lithium/console/command/build/template/app.phar.gz\n";
+		$result = $app->response->output;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testArchive() {
+		$this->request->params['library'] = 'build_test';
+		$app = new Library(array('request' => $this->request, 'classes' => $this->classes));
+
+		$expected = true;
+		$result = $app->archive($this->_testPath . '/build_test', $this->_testPath . '/build_test');
+		$this->assertEqual($expected, $result);
+
+		$expected = "build_test.phar.gz created in {$this->_testPath} from ";
+		$expected .= "{$this->_testPath}/build_test\n";
+
+		$result = $app->response->output;
+		$this->assertEqual($expected, $result);
+
+		Phar::unlinkArchive($this->_testPath . '/build_test.phar');
+	}
+
+	public function testRunWithFullPaths() {
+		$this->request->params['library'] = 'build_test';
+		$app = new Library(array('request' => $this->request, 'classes' => $this->classes));
+
+		$expected = true;
+		$result = $app->run($this->_testPath . '/new', $this->_testPath . '/build_test.phar.gz');
 		$this->assertEqual($expected, $result);
 
 		$this->assertTrue(file_exists($this->_testPath . '/new'));
 
-		$expected = "new created in " . LITHIUM_APP_PATH . "/resources/tmp/tests\n";
+		$expected = "new created in {$this->_testPath} from ";
+		$expected .= "{$this->_testPath}/build_test.phar.gz\n";
 		$result = $app->response->output;
 		$this->assertEqual($expected, $result);
 
-		Phar::unlinkArchive($this->_testPath . '/app.phar.gz');
+		Phar::unlinkArchive($this->_testPath . '/build_test.phar.gz');
 	}
 
 	public function testArchiveNoLibrary() {
@@ -73,7 +92,8 @@ class LibraryTest extends \lithium\test\Unit {
 		$result = $app->archive();
 		$this->assertEqual($expected, $result);
 
-		$expected = "new.phar.gz created in {$this->_testPath}\n";
+		$expected = "new.phar.gz created in {$this->_testPath} from ";
+		$expected .= "{$this->_testPath}/new\n";
 		$result = $app->response->output;
 		$this->assertEqual($expected, $result);
 
@@ -95,7 +115,8 @@ class LibraryTest extends \lithium\test\Unit {
 
 		$this->assertTrue(file_exists($this->_testPath . '/new'));
 
-		$expected = "new created in {$this->_testPath}\n";
+		$expected = "new created in {$this->_testPath} from ";
+		$expected .= LITHIUM_LIBRARY_PATH . "/lithium/console/command/build/template/app.phar.gz\n";
 		$result = $app->response->output;
 		$this->assertEqual($expected, $result);
 
