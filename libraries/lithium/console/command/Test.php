@@ -76,24 +76,8 @@ class Test extends \lithium\console\Command {
 		$this->out($report->stats());
 
 		$this->out($report->filters());
-
-		$again = $this->in("Would you like to run this test again?", array(
-			'choices' => array('y', 'n'),
-			'default' => 'y'
-		));
-		if ($again == 'y') {
-			return $this->run();
-		}
-
-		$another = $this->in("Would you like to run another test?", array(
-			'choices' => array('y', 'n'),
-			'default' => 'y'
-		));
-		if ($another == 'y') {
-			$this->case = $this->group = null;
-			return $this->run();
-		}
 	}
+
 	/**
 	 * Shows which classes are un-tested
 	 *
@@ -132,7 +116,8 @@ class Test extends \lithium\console\Command {
 	protected function _getTests() {
 		while (empty($this->case) && empty($this->group)) {
 			$tests = Libraries::locate('tests', null, array(
-				'filter' => '/cases|integration|functional/'
+				'filter' => '/cases|integration|functional/',
+				'exclude' => '/mocks/'
 			));
 			$tests = str_replace('\\', '.', $tests);
 
