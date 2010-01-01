@@ -19,7 +19,7 @@ use \lithium\core\Libraries;
 class Controller extends \lithium\core\Object {
 
 	/**
-	 * undocumented function
+	 * Invoke the _data and _render methods inside of a method filter
 	 *
 	 * @param string $request
 	 * @param string $params
@@ -28,22 +28,56 @@ class Controller extends \lithium\core\Object {
 	 */
 	public function __invoke($request, $params, $options = array()) {
 		error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
+		$filter = function($self, $params, $chain) {
+			try {
+				$result = $self->invokeMethod('_data', $params);
+				return $self->invokeMethod('_render', array('layout', $result));
+			} catch (Exception $e) {
+				throw $e;
+			}
+		};
+		echo $this->_filter(__METHOD__, array($request, $params, $options), $filter);
+	}
+
+	/**
+	 * Base method for gathering data
+	 *
+	 * @param string $request
+	 * @param string $params
+	 * @param string $options
+	 * @return array request, group, report, filters, classes, menu
+	 */
+	protected function _data($request, $params, $options) {
 		$group = '\\' . join('\\', $request->args);
 		$report = Dispatcher::run($group , $request->query + array(
 			'reporter' => 'html'
 		));
 		$filters = Libraries::locate('test.filter');
 		$classes = Libraries::locate('tests', null, array(
-			'filter' => '/cases|integration|functional/'
+			'filter' => '/cases|integration|functional/',
+			'exclude' => '/mocks/'
 		));
 		$menu = $report->reporter->menu($classes, array(
 			'request' => $request, 'tree' => true
 		));
+		return compact('request', 'group', 'report', 'filters', 'classes', 'menu');
+	}
 
-		$template = Libraries::locate('test.reporter.template', 'layout', array(
+	/**
+	 * Grab a the `layout.html.php` template and return output
+	 *
+	 * @param string $template name of the template (eg: layout)
+	 * @param string $data array from _data() method
+	 * @return string
+	 */
+	protected function _render($template, $data) {
+		$template = Libraries::locate('test.reporter.template', $template, array(
 			'filter' => false, 'type' => 'file', 'suffix' => '.html.php',
 		));
+		extract($data);
+		ob_start();
 		include $template;
+		return ob_get_clean();
 	}
 }
 
