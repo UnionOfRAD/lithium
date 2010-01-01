@@ -95,8 +95,8 @@ class Cache extends \lithium\core\Adaptable {
 		}
 
 		$key = static::key($key);
-		$method = static::adapter($name)->write($key, $data, $expiry, $conditions);
-		$params = compact('key', 'data', 'expiry', 'conditions');
+		$method = static::adapter($name)->write($key, $data, $expiry);
+		$params = compact('key', 'data', 'expiry');
 		return static::_filter(__FUNCTION__, $params, $method, $settings[$name]['filters']);
 	}
 
@@ -116,12 +116,13 @@ class Cache extends \lithium\core\Adaptable {
 			return false;
 		}
 
-		if (is_callable($conditions)) {
-			if (!$conditions()) return false;
+		if (is_callable($conditions) && !$conditions()) {
+			return false;
 		}
+
 		$key = static::key($key);
-		$method = static::adapter($name)->read($key, $conditions);
-		$params = compact('key', 'conditions');
+		$method = static::adapter($name)->read($key);
+		$params = compact('key');
 		$filters = $settings[$name]['filters'];
 
 		return static::_filter(__FUNCTION__, $params, $method, $filters);
@@ -142,12 +143,13 @@ class Cache extends \lithium\core\Adaptable {
 			return false;
 		}
 
-		if (is_callable($conditions)) {
-			if (!$conditions()) return false;
+		if (is_callable($conditions) && !$conditions()) {
+			return false;
 		}
+
 		$key = static::key($key);
-		$method = static::adapter($name)->delete($key, $conditions);
-		$params = compact('key', 'conditions');
+		$method = static::adapter($name)->delete($key);
+		$params = compact('key');
 		$filters = $settings[$name]['filters'];
 
 		return static::_filter(__FUNCTION__, $params, $method, $filters);
@@ -168,9 +170,10 @@ class Cache extends \lithium\core\Adaptable {
 			return false;
 		}
 
-		if (is_callable($conditions)) {
-			if (!$conditions()) return false;
+		if (is_callable($conditions) && !$conditions()) {
+			return false;
 		}
+
 		$key = static::key($key);
 		$method = static::adapter($name)->increment($key, $offset);
 		$params = compact('key', 'offset');
@@ -194,9 +197,10 @@ class Cache extends \lithium\core\Adaptable {
 			return false;
 		}
 
-		if (is_callable($conditions)) {
-			if (!$conditions()) return false;
+		if (is_callable($conditions) && !$conditions()) {
+			return false;
 		}
+
 		$key = static::key($key);
 		$method = static::adapter($name)->decrement($key, $offset);
 		$params = compact('key', 'offset');
@@ -208,6 +212,8 @@ class Cache extends \lithium\core\Adaptable {
 	/**
 	 * Perform garbage collection on specified cache configuration.
 	 *
+	 * This method is non-filterable.
+	 *
 	 * @param string $name The cache configuration to be cleaned
 	 * @return boolean True on successful clean, false otherwise
 	 */
@@ -218,6 +224,8 @@ class Cache extends \lithium\core\Adaptable {
 
 	/**
 	 * Remove all cache keys from specified confiuration.
+	 *
+	 * This method is non-filterable.
 	 *
 	 * @param string $name The cache configuration to be cleared
 	 * @return boolean True on successful clearing, false otherwise
