@@ -19,7 +19,7 @@ use \lithium\core\Libraries;
 class Controller extends \lithium\core\Object {
 
 	/**
-	 * Invoke the _data and _render methods inside of a method filter
+	 * Invoke the `_data()` and `_render()` methods inside of a method filter
 	 *
 	 * @param string $request
 	 * @param string $params
@@ -67,7 +67,7 @@ class Controller extends \lithium\core\Object {
 	 * Grab a the `layout.html.php` template and return output
 	 *
 	 * @param string $template name of the template (eg: layout)
-	 * @param string $data array from _data() method
+	 * @param string $data array from `_data()` method
 	 * @return string
 	 */
 	protected function _render($template, $data) {
