@@ -191,7 +191,7 @@ class RecordSet extends \lithium\util\Collection {
 				return $record;
 			}
 		}
-		return $this->_items[$this->_pointer];
+ 		return $this->_items[$this->_pointer];
 	}
 
 	/**
@@ -254,7 +254,6 @@ class RecordSet extends \lithium\util\Collection {
 		switch ($format) {
 			case 'array':
 				$result = array_map(function($r) { return $r->to('array'); }, $this->_items);
-
 				if (is_scalar(current($this->_index)) && $options['indexed']) {
 					$result = array_combine($this->_index, $result);
 				}
@@ -292,7 +291,7 @@ class RecordSet extends \lithium\util\Collection {
 		}
 		$result = null;
 
-		foreach ($this->_columns as $model => $fields) {
+		foreach ((array) $this->_columns as $model => $fields) {
 			$data = array_combine($fields, array_slice($data, 0, count($fields)));
 			$exists = true;
 
