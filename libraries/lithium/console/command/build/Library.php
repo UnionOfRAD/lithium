@@ -40,7 +40,7 @@ class Library extends \lithium\console\command\Build {
 		if (file_exists("{$from}")) {
 			$archive = new Phar("{$from}");
 			if ($archive->extractTo($new)) {
-				$this->out(basename($new) . " created in " . dirname($new));
+				$this->out(basename($new) . " created in " . dirname($new) . " from {$from}");
 				return true;
 			}
 		}
@@ -65,7 +65,7 @@ class Library extends \lithium\console\command\Build {
 		$result = (boolean) $archive->buildFromDirectory($from, $filter);
 		if ($result) {
 			$archive->compress(Phar::GZ);
-			$this->out(basename($path) . ".phar.gz created in " . dirname($path));
+			$this->out(basename($path) . ".phar.gz created in " . dirname($path) . " from {$from}");
 			return true;
 		}
 		return false;

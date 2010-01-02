@@ -28,7 +28,7 @@ use \lithium\core\Environment;
  *
  * @see lithium\storage\Cache
  * @see lithium\storage\Session
- * @see lithium\util\audit\Logger
+ * @see lithium\analysis\Logger
  *
  * @todo Implement as abtract class with abstract method `adapter` when Inspector has been fixed.
  */

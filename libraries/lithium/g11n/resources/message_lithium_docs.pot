@@ -1418,95 +1418,95 @@ msgstr ""
 msgid "Gets the method name associated with this filter chain.  This is the method being filtered."
 msgstr ""
 
-#. lithium\util\audit\Debugger::trace()
+#. lithium\analysis\Debugger::trace()
 msgid "Outputs a stack trace based on the supplied options."
 msgstr ""
 
-#. lithium\util\audit\Debugger::trace()
+#. lithium\analysis\Debugger::trace()
 msgid "string|array Stack trace formatted according to `'format'` option."
 msgstr ""
 
-#. lithium\util\audit\Debugger::export()
+#. lithium\analysis\Debugger::export()
 msgid "Returns a parseable string represantation of a variable.."
 msgstr ""
 
-#. lithium\util\audit\Debugger::export()
+#. lithium\analysis\Debugger::export()
 msgid "string The exported contents."
 msgstr ""
 
-#. lithium\util\audit\Logger::write()
+#. lithium\analysis\Logger::write()
 msgid "Writes $message to the log specified by the $name\nconfiguration."
 msgstr ""
 
-#. lithium\util\audit\Logger::write()
+#. lithium\analysis\Logger::write()
 msgid "@param  string $name    Configuration to be used for writing\n@param  string $message Message to be written"
 msgstr ""
 
-#. lithium\util\audit\Logger::write()
+#. lithium\analysis\Logger::write()
 msgid "boolean         True on successful write, false otherwise"
 msgstr ""
 
-#. lithium\util\audit\Logger::write()
+#. lithium\analysis\Logger::write()
 msgid "   Configuration to be used for writing"
 msgstr ""
 
-#. lithium\util\audit\Logger::write()
+#. lithium\analysis\Logger::write()
 msgid "Message to be written"
 msgstr ""
 
-#. lithium\util\audit\Logger::adapter()
+#. lithium\analysis\Logger::adapter()
 msgid "Returns adapter for given named configuration"
 msgstr ""
 
-#. lithium\util\audit\Logger::adapter()
+#. lithium\analysis\Logger::adapter()
 msgid "@param  string $name Cache configuration name"
 msgstr ""
 
-#. lithium\util\audit\Logger::adapter()
+#. lithium\analysis\Logger::adapter()
 msgid "object       Adapter for named configuration"
 msgstr ""
 
-#. lithium\util\audit\Logger::__init()
+#. lithium\analysis\Logger::__init()
 msgid "Initialization of static class"
 msgstr ""
 
-#. lithium\util\audit\Logger::config()
+#. lithium\analysis\Logger::config()
 msgid "Sets configurations for a particular adaptable implementation, or returns\nthe current configuration settings."
 msgstr ""
 
-#. lithium\util\audit\Logger::config()
+#. lithium\analysis\Logger::config()
 msgid "@param  array  $config Configurations, indexed by name"
 msgstr ""
 
-#. lithium\util\audit\Logger::config()
+#. lithium\analysis\Logger::config()
 msgid "object         Collection of configurations"
 msgstr ""
 
-#. lithium\util\audit\Logger::reset()
+#. lithium\analysis\Logger::reset()
 msgid "Clears configurations"
 msgstr ""
 
-#. lithium\util\audit\Logger::enabled()
+#. lithium\analysis\Logger::enabled()
 msgid "Determines if the adapter specified in the named configuration\nis enabled."
 msgstr ""
 
-#. lithium\util\audit\Logger::enabled()
+#. lithium\analysis\Logger::enabled()
 msgid "`Enabled` can mean various things, e.g. having a PECL memcached\nextension compiled & loaded, as well as having the memcache server\nup & available.\n\n@param  string  $name The cache configuration whose adapter will be checked"
 msgstr ""
 
-#. lithium\util\audit\Logger::enabled()
+#. lithium\analysis\Logger::enabled()
 msgid "mixed         True if adapter is enabled, false if not. This method\n                      will return null if no configuration under the given $name\n                      exists."
 msgstr ""
 
-#. lithium\util\audit\logger\adapters\File::__construct()
+#. lithium\analysis\logger\adapters\File::__construct()
 msgid "Class constructor"
 msgstr ""
 
-#. lithium\util\audit\logger\adapters\File::write()
+#. lithium\analysis\logger\adapters\File::write()
 msgid "Appends $data to file $type."
 msgstr ""
 
-#. lithium\util\audit\logger\adapters\File::write()
+#. lithium\analysis\logger\adapters\File::write()
 msgid "boolean True on successful write, false otherwise"
 msgstr ""
 
