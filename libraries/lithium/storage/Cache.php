@@ -8,8 +8,6 @@
 
 namespace lithium\storage;
 
-use \lithium\util\Inflector;
-
 /**
  * The `Cache` static class provides a consistent interface to configure and utilize the different
  * cache adatpers included with Lithium, as well as your own adapters.
@@ -68,8 +66,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @return string The generated cache key.
 	 */
 	public static function key($key, $data = array()) {
-		$key = is_object($key) ? $key($data) : $key;
-		return Inflector::slug($key);
+		return is_object($key) ? $key($data) : $key;
 	}
 
 	/**

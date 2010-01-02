@@ -63,13 +63,13 @@ class CacheTest extends \lithium\test\Unit {
 		$key = 'this is a cache key';
 
 		$result = Cache::key($key);
-		$expected = 'this_is_a_cache_key';
+		$expected = 'this is a cache key';
 		$this->assertIdentical($expected, $result);
 
 		$key = '1120-cache éë';
 
 		$result = Cache::key($key);
-		$expected = '1120_cache_ee';
+		$expected = '1120-cache éë';
 		$this->assertIdentical($expected, $result);
 	}
 
@@ -87,7 +87,7 @@ class CacheTest extends \lithium\test\Unit {
 		};
 
 		$result = Cache::key($key);
-		$expected = 'lambda_key';
+		$expected = 'lambda key';
 		$this->assertIdentical($expected, $result);
 
 		$key = function($data = array()) {
@@ -109,7 +109,7 @@ class CacheTest extends \lithium\test\Unit {
 		};
 
 		$result = Cache::key($key);
-		$expected = 'closure_key_5';
+		$expected = 'closure key 5';
 		$this->assertIdentical($expected, $result);
 
 		$reference = 'mutable';
@@ -120,7 +120,7 @@ class CacheTest extends \lithium\test\Unit {
 		};
 
 		$result = Cache::key($key);
-		$expected = 'mutable_key';
+		$expected = 'mutable key';
 		$this->assertIdentical($expected, $result);
 		$this->assertIdentical('mutable key', $reference);
 	}
@@ -133,7 +133,7 @@ class CacheTest extends \lithium\test\Unit {
 		};
 
 		$result = Cache::key($key($value));
-		$expected = 'closure_argument';
+		$expected = 'closure argument';
 		$this->assertIdentical($expected, $result);
 	}
 
