@@ -204,7 +204,7 @@ class Libraries {
 	 * Removes a registered library, and unregister's the library's autoloader, if it has one.
 	 *
 	 * @param mixed $name A string or array of library names indicating the libraries you wish to
-	 *        remove, i.e. `'app'` or `'lithium'`.  This can also be used to unload plugins by name.
+	 *        remove, i.e. `'app'` or `'lithium'`. This can also be used to unload plugins by  name.
 	 * @return void
 	 */
 	public static function remove($name) {
@@ -225,6 +225,7 @@ class Libraries {
 	 * @param string $library
 	 * @param string $options
 	 * @return array
+	 * @todo Tie this into how path() is implemented.
 	 */
 	public static function find($library, $options = array()) {
 		$defaults = array(
@@ -268,7 +269,8 @@ class Libraries {
 	 * @see lithium\core\Libraries::path()
 	 *
 	 * @param string $class The fully-namespaced (where applicable) name of the class to load.
-	 * @param mixed $require
+	 * @param boolean $require Specifies whether the class must be loaded or considered an
+	 *        exception. Defaults to `false`.
 	 * @return void
 	 */
 	public static function load($class, $require = false) {
@@ -422,8 +424,8 @@ class Libraries {
 	 *
 	 * @param boolean $defer A boolean flag indicating which libraries to search, either the ones
 	 *        with the `'defer'` flag set, or the ones without.
-	 * @param array $paths The list of paths to be searched for the given service (class).  These
-	 *        are defined in `lithium\core\Libraries::$_classPaths`, and are organized by class type.
+	 * @param array $paths List of paths to be searched for the given service (class).  These are
+	 *        defined in `lithium\core\Libraries::$_classPaths`, and are organized by class type.
 	 * @param array $params The list of insert parameters to be injected into each path format
 	 *        string when searching for classes.
 	 * @param array $options
@@ -519,7 +521,7 @@ class Libraries {
 	}
 
 	/**
-	 * Search file system
+	 * Search file system.
 	 *
 	 * @param string $config
 	 * @param string $options
@@ -576,7 +578,7 @@ class Libraries {
 	}
 
 	/**
-	 * Register a Lithium plugin
+	 * Register a Lithium plugin.
 	 *
 	 * @param string $plugins
 	 * @param string $options
@@ -618,7 +620,7 @@ class Libraries {
 	}
 
 	/**
-	 * Get params from type
+	 * Get params from type.
 	 *
 	 * @param string $type
 	 * @param string $name default: null
