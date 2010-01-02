@@ -124,8 +124,8 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * & loaded, as well as having the memcache server up & available.
 	 *
 	 * @param string $name The named configuration whose adapter will be checked.
-	 * @return mixed `True` if adapter is enabled, `false` if not. This method
-	 *         will return `null` if no configuration under the given `$name` exists.
+	 * @return boolean|null  True if adapter is enabled, false if not. This method will return
+	 *         null if no configuration under the given $name exists.
 	 */
 	public static function enabled($name) {
 		return is_null(static::_config($name)) ? null : static::adapter($name)->enabled();
