@@ -27,8 +27,9 @@ class MemoryTest extends \lithium\test\Unit {
 	public function testWriteAndRead() {
 		$key = 'key';
 		$data = 'data';
+		$expiry = null;
 
-		$closure = $this->Memory->write($key, $data);
+		$closure = $this->Memory->write($key, $data, $expiry);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key', 'data');
@@ -48,8 +49,9 @@ class MemoryTest extends \lithium\test\Unit {
 	public function testWriteAndDelete() {
 		$key = 'key_to_delete';
 		$data = 'some data to be deleted';
+		$expiry = null;
 
-		$closure = $this->Memory->write($key, $data);
+		$closure = $this->Memory->write($key, $data, $expiry);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key', 'data');
@@ -73,8 +75,9 @@ class MemoryTest extends \lithium\test\Unit {
 	public function testWriteAndClear() {
 		$key = 'key_to_clear';
 		$data = 'data to be cleared';
+		$expiry = null;
 
-		$closure = $this->Memory->write($key, $data);
+		$closure = $this->Memory->write($key, $data, $expiry);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key', 'data');
@@ -85,7 +88,7 @@ class MemoryTest extends \lithium\test\Unit {
 		$key2 = 'key2_to_clear';
 		$data2 = 'data to be cleared';
 
-		$closure = $this->Memory->write($key2, $data2);
+		$closure = $this->Memory->write($key2, $data2, $expiry);
 		$this->assertTrue(is_callable($closure));
 
 		$params = array('key' => $key2, 'data' => $data2);
@@ -97,7 +100,7 @@ class MemoryTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 		$this->assertEqual(array(), $this->Memory->cache);
 
-		$closure = $this->Memory->write($key, $data);
+		$closure = $this->Memory->write($key, $data, $expiry);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key', 'data');

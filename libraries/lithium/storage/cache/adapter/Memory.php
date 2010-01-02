@@ -34,7 +34,7 @@ class Memory extends \lithium\core\Object {
 	/**
 	 * Magic method to provide an accessor (getter) to protected class variables.
 	 *
-	 * @param  string $variable The variable requested
+	 * @param string $variable The variable requested.
 	 * @return mixed Variable if it exists, null otherwise.
 	 */
 	public function __get($variable) {
@@ -46,12 +46,11 @@ class Memory extends \lithium\core\Object {
 	/**
 	 * Read value(s) from the cache
 	 *
-	 * @param string $key        The key to uniquely identify the cached item
-	 * @param object $conditions Conditions under which the operation should proceed
-	 * @return mixed Cached value if successful, false otherwise
-	 * @todo Refactor to use RES_NOTFOUND for return value checks
+	 * @param string $key The key to uniquely identify the cached item.
+	 * @return mixed Cached value if successful, false otherwise.
+	 * @todo Refactor to use RES_NOTFOUND for return value checks.
 	 */
-	public function read($key, $conditions = null) {
+	public function read($key) {
 		$cache =& $this->_cache;
 
 		return function($self, $params, $chain) use (&$cache) {
@@ -63,12 +62,12 @@ class Memory extends \lithium\core\Object {
 	/**
 	 * Write value(s) to the cache
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @param mixed $data The value to be cached
-	 * @param object $conditions Conditions under which the operation should proceed
-	 * @return boolean True on successful write, false otherwise
+	 * @param string $key The key to uniquely identify the cached item.
+	 * @param mixed $data The value to be cached.
+	 * @param string $expiry A strtotime() compatible cache time.
+	 * @return boolean True on successful write, false otherwise.
 	 */
-	public function write($key, $data, $conditions = null) {
+	public function write($key, $data, $expiry) {
 		$cache =& $this->_cache;
 
 		return function($self, $params, $chain) use (&$cache) {
@@ -80,11 +79,10 @@ class Memory extends \lithium\core\Object {
 	/**
 	 * Delete value from the cache
 	 *
-	 * @param string $key        The key to uniquely identify the cached item
-	 * @param object $conditions Conditions under which the operation should proceed
-	 * @return mixed True on successful delete, false otherwise
+	 * @param string $key The key to uniquely identify the cached item.
+	 * @return mixed True on successful delete, false otherwise.
 	 */
-	public function delete($key, $conditions = null) {
+	public function delete($key) {
 		$cache =& $this->_cache;
 
 		return function($self, $params, $chain) use (&$cache) {
@@ -101,9 +99,9 @@ class Memory extends \lithium\core\Object {
 	/**
 	 * Performs a decrement operation on specified numeric cache item.
 	 *
-	 * @param string $key Key of numeric cache item to decrement
+	 * @param string $key Key of numeric cache item to decrement.
 	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return mixed Item's new value on successful decrement, false otherwise
+	 * @return mixed Item's new value on successful decrement, false otherwise.
 	 */
 	public function decrement($key, $offset = 1) {
 		$cache =& $this->_cache;
@@ -117,9 +115,9 @@ class Memory extends \lithium\core\Object {
 	/**
 	 * Performs an increment operation on specified numeric cache item.
 	 *
-	 * @param string $key Key of numeric cache item to increment
+	 * @param string $key Key of numeric cache item to increment.
 	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return mixed Item's new value on successful increment, false otherwise
+	 * @return mixed Item's new value on successful increment, false otherwise.
 	 */
 	public function increment($key, $offset = 1) {
 		$cache =& $this->_cache;
@@ -133,7 +131,7 @@ class Memory extends \lithium\core\Object {
 	/**
 	 * Clears user-space cache
 	 *
-	 * @return mixed True on successful clear, false otherwise
+	 * @return mixed True on successful clear, false otherwise.
 	 */
 	public function clear() {
 		foreach ($this->_cache as $key => &$value) {
