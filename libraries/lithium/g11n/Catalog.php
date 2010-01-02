@@ -99,7 +99,7 @@ class Catalog extends \lithium\core\Adaptable {
 	 * Catalog::write('message', 'ja', $data, array('name' => 'runtime'));
 	 * }}}
 	 *
-	 * @param string $category A (dot-delimeted) category.
+	 * @param string $category A (dot-delimited) category.
 	 * @param string $locale A locale identifier.
 	 * @param array $data
 	 * @param array $options Valid options are:
