@@ -9,10 +9,6 @@
 namespace lithium\console;
 
 use \Exception;
-use \ReflectionClass;
-use \lithium\core\Libraries;
-use \lithium\util\Inflector;
-use \lithium\analysis\Docblock;
 
 /**
  * The base class to inherit when writing console scripts in Lithium.
@@ -98,8 +94,8 @@ class Command extends \lithium\core\Object {
 	/**
 	 * Called by the Dispatcher class to invoke an action.
 	 *
-	 * @param string $action
-	 * @param array $passed
+	 * @param string $action name of the method to run
+	 * @param array $args the args from the request
 	 * @param array $options
 	 * @return object The response object associated with this command.
 	 * @see lithium\console\Dispatcher
