@@ -46,6 +46,9 @@ class Memory extends \lithium\core\Object {
 	/**
 	 * Read value(s) from the cache
 	 *
+	 * Note: When using an array of keys in $key for multi-read,
+	 * note that this is not an atomic operation.
+	 *
 	 * @param string $key The key to uniquely identify the cached item.
 	 * @return mixed Cached value if successful, false otherwise.
 	 * @todo Refactor to use RES_NOTFOUND for return value checks.
@@ -55,12 +58,26 @@ class Memory extends \lithium\core\Object {
 
 		return function($self, $params, $chain) use (&$cache) {
 			extract($params);
+
+			if (is_array($key)) {
+				$results = array();
+
+				foreach($key as $k => &$v) {
+					if (isset($cache[$k])) {
+						$results[$k] = $cache[$k];
+					}
+				}
+				return $results;
+			}
 			return isset($cache[$key]) ? $cache[$key] : null;
 		};
 	}
 
 	/**
-	 * Write value(s) to the cache
+	 * Write value(s) to the cache.
+	 *
+	 * Note: When using an array of keys => values in $key for multi-write,
+	 * note that this is not an atomic operation.
 	 *
 	 * @param string $key The key to uniquely identify the cached item.
 	 * @param mixed $data The value to be cached.
@@ -72,6 +89,13 @@ class Memory extends \lithium\core\Object {
 
 		return function($self, $params, $chain) use (&$cache) {
 			extract($params);
+
+			if (is_array($key)) {
+				foreach ($key as $k => &$v) {
+					$cache[$k] = $v;
+				}
+				return true;
+			}
 			return (boolean) ($cache[$key] = $data);
 		};
 	}

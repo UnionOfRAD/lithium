@@ -32,7 +32,7 @@ class MemoryTest extends \lithium\test\Unit {
 		$closure = $this->Memory->write($key, $data, $expiry);
 		$this->assertTrue(is_callable($closure));
 
-		$params = compact('key', 'data');
+		$params = compact('key', 'data', 'expiry');
 		$result = $closure($this->Memory, $params, null);
 		$this->assertTrue($result);
 		$this->assertEqual($this->Memory->cache, $result);
@@ -44,6 +44,27 @@ class MemoryTest extends \lithium\test\Unit {
 		$result = $closure($this->Memory, $params, null);
 		$this->assertEqual($data, $result);
 		$this->assertEqual($this->Memory->cache, array($key => $data));
+	}
+
+	public function testMultiWriteAndRead() {
+		$key = array('write1' => 'value1', 'write2' => 'value2');
+		$data = null;
+		$expiry = null;
+
+		$closure = $this->Memory->write($key, $data, $expiry);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key', 'data', 'expiry');
+		$result = $closure($this->Memory, $params, null);
+		$this->assertTrue($result);
+		$this->assertEqual($this->Memory->cache, $result);
+
+		$closure = $this->Memory->read(array_keys($key));
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Memory, $params, null);
+		$this->assertEqual($key, $result);
 	}
 
 	public function testWriteAndDelete() {
