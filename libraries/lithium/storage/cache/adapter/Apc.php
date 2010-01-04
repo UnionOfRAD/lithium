@@ -77,7 +77,7 @@ class Apc extends \lithium\core\Object {
 	/**
 	 * Read value(s) from the cache
 	 *
-	 * @param string $key        The key to uniquely identify the cached item
+	 * @param string $key The key to uniquely identify the cached item
 	 * @return mixed Cached value if successful, false otherwise
 	 */
 	public function read($key) {
@@ -92,7 +92,7 @@ class Apc extends \lithium\core\Object {
 	/**
 	 * Delete value from the cache
 	 *
-	 * @param string $key        The key to uniquely identify the cached item
+	 * @param string $key The key to uniquely identify the cached item
 	 * @return mixed True on successful delete, false otherwise
 	 */
 	public function delete($key) {

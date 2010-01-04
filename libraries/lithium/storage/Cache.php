@@ -75,11 +75,11 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param string $name Configuration to be used for writing
 	 * @param mixed $key Key to uniquely identify the cache entry
 	 * @param mixed $data Data to be cached
-	 * @param mixed $expiry
+	 * @param string $expiry A strtotime() compatible cache time
 	 * @param mixed $conditions Conditions for the write operation to proceed
 	 * @return boolean True on successful cache write, false otherwise
 	 */
-	public static function write($name, $key, $data, $expiry, $conditions = null) {
+	public static function write($name, $key, $data, $expiry = null, $conditions = null) {
 		$settings = static::config();
 
 		if (!isset($settings[$name])) {
@@ -89,8 +89,12 @@ class Cache extends \lithium\core\Adaptable {
 		if (is_callable($conditions) && !$conditions()) {
 			return false;
 		}
-
 		$key = static::key($key);
+
+		if (is_array($key)) {
+			$expiry = $data;
+			$data = null;
+		}
 		$method = static::adapter($name)->write($key, $data, $expiry);
 		$params = compact('key', 'data', 'expiry');
 		return static::_filter(__FUNCTION__, $params, $method, $settings[$name]['filters']);
@@ -115,7 +119,6 @@ class Cache extends \lithium\core\Adaptable {
 		if (is_callable($conditions) && !$conditions()) {
 			return false;
 		}
-
 		$key = static::key($key);
 		$method = static::adapter($name)->read($key);
 		$params = compact('key');
