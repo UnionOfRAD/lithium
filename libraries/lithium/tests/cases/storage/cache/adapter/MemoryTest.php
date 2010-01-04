@@ -114,6 +114,46 @@ class MemoryTest extends \lithium\test\Unit {
 
 	}
 
+	public function testIncrement() {
+		$key = 'incremental';
+		$data = 5;
+		$expiry = null;
+
+		$closure = $this->Memory->write($key, $data, $expiry);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key', 'data');
+		$result = $closure($this->Memory, $params, null);
+		$this->assertTrue($result);
+		$this->assertEqual($this->Memory->cache, $result);
+
+		$closure = $this->Memory->increment($key);
+		$params = compact('key');
+
+		$result = $closure($this->Memory, $params, null);
+		$this->assertEqual($data + 1, $result);
+	}
+
+	public function testDecrement() {
+		$key = 'decrement';
+		$data = 5;
+		$expiry = null;
+
+		$closure = $this->Memory->write($key, $data, $expiry);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key', 'data');
+		$result = $closure($this->Memory, $params, null);
+		$this->assertTrue($result);
+		$this->assertEqual($this->Memory->cache, $result);
+
+		$closure = $this->Memory->decrement($key);
+		$params = compact('key');
+
+		$result = $closure($this->Memory, $params, null);
+		$this->assertEqual($data - 1, $result);
+	}
+
 	public function testClean() {
 		$result = $this->Memory->clean();
 		$this->assertFalse($result);
