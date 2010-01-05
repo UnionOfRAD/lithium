@@ -39,11 +39,11 @@ class Model extends \lithium\core\StaticObject {
 	 * @var array
 	 */
 	protected $_classes = array(
+		'connections' => '\lithium\data\Connections',
 		'query' => '\lithium\data\model\Query',
 		'record' => '\lithium\data\model\Record',
-		'validator' => '\lithium\util\Validator',
 		'recordSet' => '\lithium\data\model\RecordSet',
-		'connections' => '\lithium\data\Connections'
+		'validator' => '\lithium\util\Validator',
 	);
 
 	protected $_relations = array();
@@ -116,24 +116,23 @@ class Model extends \lithium\core\StaticObject {
 		if (($class = get_called_class()) == __CLASS__) {
 			return;
 		}
+		$name = static::_name();
 		$self = static::_instance();
 		$base = get_class_vars(__CLASS__);
-		$meta =  $self->_meta + $base['_meta'];
+
+		$meta =  $options + $self->_meta + $base['_meta'];
 		$classes = $self->_classes + $base['_classes'];
-		$classConfig = array();
-		$classDefaults = array('classes' => array(), 'meta' => array(), 'finders' => array());
+
 		$conn = $classes['connections']::get($meta['connection']);
-		if ($conn) {
-			$classConfig = $conn->configureClass($class);
-		}
-		$classConfig += $classDefaults;
-		$classes = array_diff_assoc($self->_classes, $base['_classes']);
-		$self->_classes = ($classes + $classConfig['classes'] + $base['_classes']);
-		$meta = ($self->_meta + $classConfig['meta'] + $base['_meta']);
-		$self->_meta = ($options + compact('class') + array('name' => static::_name()) + $meta);
+		$config = ($conn) ? $conn->configureClass($class) : array();
+		$defaults = array('classes' => array(), 'meta' => array(), 'finders' => array());
+		$config += $defaults;
+
+		$self->_classes = ($config['classes'] + $classes);
+		$self->_meta = (compact('class', 'name') + $config['meta'] + $meta);
 		$self->_meta['initialized'] = false;
 
-		$self->_finders += $classConfig['finders'] + $self->_findFilters();
+		$self->_finders += $config['finders'] + $self->_findFilters();
 		static::_instance()->_relations = static::_relations();
 	}
 
@@ -212,7 +211,6 @@ class Model extends \lithium\core\StaticObject {
 			if ($result === null) {
 				return null;
 			}
-
 			return new $options['classes']['recordSet'](array(
 				'query'    => $query,
 				'model'    => $options['model'],
@@ -246,24 +244,21 @@ class Model extends \lithium\core\StaticObject {
 	public static function meta($key = null, $value = null) {
 		$self = static::_instance();
 
-		if (!$self->_meta['initialized']) {
-			if ($self->_meta['source'] === null) {
-				$self->_meta['source'] = Inflector::tableize($self->_meta['name']);
-			}
-
-			$titleKeys = array('title', 'name', $self->_meta['key']);
-			$self->_meta['title'] = $self->_meta['title'] ?: static::hasField($titleKeys);
-			$self->_meta['initialized'] = true;
-		}
-
 		if (!empty($value)) {
 			$self->_meta[$key] = $value;
-			return $self->_meta;
 		}
 		if (is_array($key)) {
 			$self->_meta = $key + $self->_meta;
 		}
-		if (is_array($key) || empty($key)) {
+		if (!$self->_meta['initialized']) {
+			if ($self->_meta['source'] === null) {
+				$self->_meta['source'] = Inflector::tableize($self->_meta['name']);
+			}
+			$titleKeys = array('title', 'name', $self->_meta['key']);
+			$self->_meta['title'] = $self->_meta['title'] ?: static::hasField($titleKeys);
+			$self->_meta['initialized'] = true;
+		}
+		if (is_array($key) || empty($key) || !empty($value)) {
 			return $self->_meta;
 		}
 		return isset($self->_meta[$key]) ? $self->_meta[$key] : null;
@@ -312,7 +307,6 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function schema($field = null) {
 		$self = static::_instance();
-
 		if (empty($self->_schema)) {
 			$self->_schema = $self->_connection()->describe($self->_meta['source'], $self->_meta);
 		}
@@ -359,8 +353,8 @@ class Model extends \lithium\core\StaticObject {
 	public static function create($data = array()) {
 		$schema = static::schema();
 		if (!empty($schema)) {
-			foreach ($schema as $field => $settings ) {
-				if (!isset($data[$field]) && array_key_exists('default',$settings)) {
+			foreach ($schema as $field => $settings) {
+				if (!isset($data[$field]) && array_key_exists('default', $settings)) {
 					$data[$field] = $settings['default'];
 				}
 			}

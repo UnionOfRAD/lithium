@@ -148,8 +148,6 @@ class Document extends \lithium\util\Collection {
 		$items = $this->_items[$name];
 
 		if ($this->_isComplexType($items) && !$items instanceof Iterator) {
-			$model = $this->_model;
-			$parent = $this;
 			$this->_items[$name] = $this->_record('recordSet', $this->_items[$name]);
 		}
 		return $this->_items[$name];
@@ -318,10 +316,10 @@ class Document extends \lithium\util\Collection {
 	}
 
 	protected function _isComplexType($data) {
-		if (is_scalar($data) || !$data) {
+		if (is_object($data) && (array) $data === array()) {
 			return false;
 		}
-		if (is_object($data) && (array) $data === array()) {
+		if (is_scalar($data) || !$data) {
 			return false;
 		}
 		if (is_array($data)) {
@@ -365,7 +363,8 @@ class Document extends \lithium\util\Collection {
 		if ($this->_closed() || !$this->_handle) {
 			return;
 		}
-		if (!$items = $items ?: $this->_handle->result('next', $this->_result, $this)) {
+		$items = $items ?: $this->_handle->result('next', $this->_result, $this);
+		if (!isset($items)) {
 			return $this->_close();
 		}
 		return $this->_items[] = $this->_record('record', $items);

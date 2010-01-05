@@ -58,7 +58,7 @@ abstract class Source extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function __destruct() {
-		if ($this->_isConnected) {
+		if ($this->isConnected()) {
 			$this->disconnect();
 		}
 	}
