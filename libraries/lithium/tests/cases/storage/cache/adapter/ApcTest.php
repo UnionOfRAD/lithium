@@ -49,7 +49,7 @@ class ApcTest extends \lithium\test\Unit {
 		$params = compact('key', 'data', 'expiry');
 		$result = $closure($this->Apc, $params, null);
 		$expected = $data;
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 
 		$result = apc_fetch($key);
 		$this->assertEqual($expected, $result);
@@ -71,7 +71,7 @@ class ApcTest extends \lithium\test\Unit {
 		$params = compact('key', 'data', 'expiry');
 		$result = $closure($this->Apc, $params, null);
 		$expected = $data;
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 
 		$result = apc_fetch($key);
 		$this->assertEqual($expected, $result);
@@ -84,6 +84,41 @@ class ApcTest extends \lithium\test\Unit {
 
 		$result = apc_delete($key . '_expires');
 		$this->assertTrue($result);
+	}
+
+	public function testWriteMulti() {
+		$expiry = '+1 minute';
+		$time = strtotime($expiry);
+		$key = array(
+			'key1' => 'data1',
+			'key2' => 'data2',
+			'key3' => 'data3'
+		);
+		$data = null;
+
+		$closure = $this->Apc->write($key, $data, $expiry);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key', 'data', 'expiry');
+		$result = $closure($this->Apc, $params, null);
+
+		$this->assertEqual(array(), $result);
+
+		$result = apc_fetch(array_keys($key));
+		$this->assertEqual($key, $result);
+
+		$expiryKeys = array_map(function($v) {
+			return $v . '_expires';
+		}, array_keys($key));
+
+		$result = apc_fetch($expiryKeys);
+		$this->assertEqual(array_fill_keys($expiryKeys, $time), $result);
+
+		$result = apc_delete($expiryKeys);
+		$this->assertEqual(array(), $result);
+
+		$result = apc_delete(array_keys($key));
+		$this->assertEqual(array(), $result);
 	}
 
 	public function testSimpleRead() {
@@ -194,7 +229,7 @@ class ApcTest extends \lithium\test\Unit {
 		$params = compact('key', 'data', 'expiry');
 		$result = $closure($this->Apc, $params, null);
 		$expected = $data;
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 
 		$result = apc_fetch($key);
 		$this->assertEqual($expected, $result);

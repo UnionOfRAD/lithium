@@ -68,6 +68,11 @@ class Apc extends \lithium\core\Object {
 			$cachetime = strtotime($expiry);
 			$duration = $cachetime - time();
 
+			if (is_array($key)) {
+				$expiryKeys = array_map(function($v) { return $v . '_expires'; }, array_keys($key));
+				$result = apc_store(array_fill_keys($expiryKeys, $cachetime), $duration);
+				return apc_store($key, $cachetime);
+			}
 			apc_store($key . '_expires', $cachetime, $duration);
 			return apc_store($key, $data, $cachetime);
 
