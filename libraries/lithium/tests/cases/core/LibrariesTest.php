@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\core;
 
+use \SplFileInfo;
 use \lithium\core\Libraries;
 
 class LibrariesTest extends \lithium\test\Unit {
@@ -294,6 +295,39 @@ class LibrariesTest extends \lithium\test\Unit {
 
 		$this->assertIdentical(false, $plugins['li3_foo_blog']['bootstrap']);
 		$this->assertIdentical(false, $plugins['li3_foo_forum']['bootstrap']);
+	}
+
+	public function testFindingClassesWithCallableFilters() {
+		$result = Libraries::find('lithium', array(
+			'recursive' => true, 'path' => '/tests/cases',
+			'format' => function($file, $config) {
+				return new SplFileInfo($file);
+			},
+			'filter' =>  function($file) {
+				if ($file->getFilename() === 'LibrariesTest.php') {
+					return $file;
+				}
+			}
+		));
+		$this->assertEqual(1, count($result));
+		$this->assertIdentical(__FILE__, $result[0]->getPathname());
+	}
+
+	public function testFindingClassesWithCallableExcludes() {
+		$result = Libraries::find('lithium', array(
+			'recursive' => true, 'path' => '/tests/cases',
+			'format' => function($file, $config) {
+				return new SplFileInfo($file);
+			},
+			'filter' => null,
+			'exclude' =>  function($file) {
+				if ($file->getFilename() == 'LibrariesTest.php') {
+					return true;
+				}
+			}
+		));
+		$this->assertEqual(1, count($result));
+		$this->assertIdentical(__FILE__, $result[0]->getPathname());
 	}
 }
 

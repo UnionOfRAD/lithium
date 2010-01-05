@@ -508,11 +508,10 @@ class Libraries {
 	 */
 	protected static function _search($config, $options) {
 		$path = rtrim($config['path'] . $options['path'], '/');
-		$filter = '/^.+\/[A-Za-z0-9_]+$|^.*' . preg_quote($config['suffix'], '/') . '/';
-		$search = function($path) use ($config, $filter, $options) {
-			return preg_grep($filter, (array) glob(
+		$search = function($path) use ($config, $options) {
+			return (array) glob(
 				$path . '/*' . ($options['namespaces'] ? '' : $config['suffix'])
-			));
+			);
 		};
 		$libs = $search($path, $config);
 
@@ -535,13 +534,20 @@ class Libraries {
 				$libs[$i] = $options['format']($file, $config);
 			}
 		}
-		if ($options['exclude']) {
-			$libs = preg_grep($options['exclude'], $libs, PREG_GREP_INVERT);
+		if ($exclude = $options['exclude']) {
+			if (is_string($exclude)) {
+				$libs = preg_grep($exclude, $libs, PREG_GREP_INVERT);
+			} else if (is_callable($exclude)){
+				$libs = array_values(array_filter($libs, $exclude));
+			}
 		}
-		if ($options['filter']) {
-			$libs = preg_grep($options['filter'], $libs) ;
+		if ($filter = $options['filter']) {
+			if (is_string($filter)) {
+				$libs = preg_grep($filter, $libs) ;
+			} else if (is_callable($filter)){
+				$libs = array_filter(array_map($filter, $libs));
+			}
 		}
-
 		return $libs;
 	}
 
