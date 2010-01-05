@@ -15,9 +15,8 @@ class String {
 	 * Generates a random UUID.
 	 *
 	 * @param mixed $context Used to determine the values for `'SERVER_ADDR'`, `'HOST'`
-	 *              and `'HOSTNAME'`. Either a closure which is passed the requested
-	 *              context values, an object with properties for each value or an
-	 *              array keyed by requested context value.
+	 *        and `'HOSTNAME'`. Either a closure which is passed the requested context values, an
+	 *        object with properties for each value or an array keyed by requested context value.
 	 * @return string An RFC 4122-compliant UUID.
 	 * @link http://www.ietf.org/rfc/rfc4122.txt
 	 * @todo Fix method dependencies on old-school functions and request data access.
@@ -85,7 +84,7 @@ class String {
 	 *
 	 * @param string $string String to hash.
 	 * @param string $type Method to use (sha1/sha256/md5, or any method supported
-	 *               by the `hash()` function).
+	 *        by the `hash()` function).
 	 * @param string $salt
 	 * @return string Hash.
 	 */
@@ -105,8 +104,8 @@ class String {
 	}
 
 	/**
-	 * Replaces variable placeholders inside a string with any given data. Each key
-	 * in the `$data` array corresponds to a variable placeholder name in `$str`.
+	 * Replaces variable place-holders inside a string with any given data. Each key
+	 * in the `$data` array corresponds to a variable place-holder name in `$str`.
 	 *
 	 * Usage:
 	 * {{{
@@ -116,21 +115,20 @@ class String {
 	 * ); // returns 'My name is Bob and I am 65 years old.'
 	 * }}}
 	 *
-	 *
-	 * @param string $str A string containing variable placeholders.
-	 * @param string $data A key, value array where each key stands for a placeholder variable
+	 * @param string $str A string containing variable place-holders.
+	 * @param string $data A key, value array where each key stands for a place-holder variable
 	 *                     name to be replaced with value.
 	 * @param string $options Available options are:
-	 *               - `'before'`: The character or string in front of the name of
-	 *                 the variable placeholder (defaults to `':'`).
-	 *               - `'after'`: The character or string after the name of the
-	 *                  variable placeholder (defaults to `null`).
-	 *               - `'escape'`: The character or string used to escape the
-	 *                 before character or string (defaults to `'\'`).
-	 *               - `'format'`: A regular expression to use for matching variable
-	 *                 placeholders (defaults to `'/(?<!\\)\:%s/'`. Please note that this option
-	 *                 takes precedence over all other options except `'clean'`.
-	 *               - `'clean'`: A boolean or array with instructions for `String::clean()`.
+	 *        - `'after'`: The character or string after the name of the variable place-holder
+	 *          (defaults to `null`).
+	 *        - `'before'`: The character or string in front of the name of the variable place-holder
+	 *          (defaults to `':'`).
+	 *        - `'clean'`: A boolean or array with instructions for `String::clean()`.
+	 *        - `'escape'`: The character or string used to escape the before character or string
+	 *          (defaults to `'\'`).
+	 *        - `'format'`: A regular expression to use for matching variable place-holders
+	 *          (defaults to `'/(?<!\\)\:%s/'`. Please note that this option takes precedence over
+	 *          all other options except `'clean'`.
 	 * @return string
 	 * @todo Optimize this
 	 */
@@ -194,20 +192,20 @@ class String {
 	}
 
 	/**
-	 * Cleans up a `Set::insert()`-formatted string with given `$options` depending
+	 * Cleans up a `Set::insert()` formatted string with given `$options` depending
 	 * on the `'clean'` option. The goal of this function is to replace all whitespace
-	 * and uneeded markup around placeholders that did not get replaced by `Set::insert()`.
+	 * and unneeded mark-up around place-holders that did not get replaced by `Set::insert()`.
 	 *
 	 * @param string $str The string to clean.
 	 * @param string $options Available options are:
-	 *               - `'clean'`: `true` or an array of clean options:
-	 *                 - `'before'`:
-	 *                 - `'after'`:
-	 *                 - `'word'`: Regular expression matching words.
-	 *                 - `'gap'`: Regular expression matching gaps.
-	 *                 - `'andText'`: (defaults to `true`).
-	 *                 - `'replacement'`: String to use for cleaned substrings (defaults to `''`).
-	 *               - `'method'`: Either `'text'` or `'html'` (defaults to `'text'`).
+	 *        - `'after'`: characters marking the end of targeted substring.
+	 *        - `'andText'`: (defaults to `true`).
+	 *        - `'before'`: characters marking the start of targeted substring.
+	 *        - `'clean'`: `true` or an array of clean options:
+	 *        - `'gap'`: Regular expression matching gaps.
+	 *        - `'method'`: Either `'text'` or `'html'` (defaults to `'text'`).
+	 *        - `'replacement'`: String to use for cleaned substrings (defaults to `''`).
+	 *        - `'word'`: Regular expression matching words.
 	 * @return string The cleaned string.
 	 */
 	public static function clean($str, $options = array()) {
