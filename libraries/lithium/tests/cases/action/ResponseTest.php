@@ -30,6 +30,8 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual('html', $this->response->type('html'));
 		$this->assertEqual('json', $this->response->type('json'));
 		$this->assertEqual('json', $this->response->type());
+		$this->assertEqual(false, $this->response->type(false));
+		$this->assertEqual(false, $this->response->type());
 	}
 
 	public function testResponseRendering() {
@@ -119,6 +121,18 @@ class ResponseTest extends \lithium\test\Unit {
 		ob_end_clean();
 
 		$headers = array('HTTP/1.1 302 Found', 'Location: /');
+		$this->assertEqual($headers, $this->response->testHeaders);
+	}
+
+	public function testLocationHeaderStatus() {
+		$this->response = new MockResponse();
+		$this->response->status(301);
+		$this->response->headers('location', '/');
+		ob_start();
+		$this->response->render();
+		ob_end_clean();
+
+		$headers = array('HTTP/1.1 301 Moved Permanently', 'Location: /');
 		$this->assertEqual($headers, $this->response->testHeaders);
 	}
 }
