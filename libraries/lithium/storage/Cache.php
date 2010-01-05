@@ -160,7 +160,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to 1.
 	 * @param mixed $conditions
-	 * @return mixed Item's new value on successful increment, false otherwise
+	 * @return inter|boolean Item's new value on successful increment, false otherwise
 	 */
 	public static function increment($name, $key, $offset = 1, $conditions = null) {
 		$settings = static::config();
@@ -186,10 +186,10 @@ class Cache extends \lithium\core\Adaptable {
 	 * from the given cache configuration.
 	 *
 	 * @param string $name
-	 * @param string $key Key of numeric cache item to derecement
+	 * @param string $key Key of numeric cache item to dercrement
 	 * @param integer $offset Offset to decrement - defaults to 1.
 	 * @param mixed $conditions
-	 * @return mixed Item's new value on successful decrement, false otherwise
+	 * @return integer|boolean Item's new value on successful decrement, false otherwise
 	 */
 	public static function decrement($name, $key, $offset = 1, $conditions = null) {
 		$settings = static::config();
@@ -213,7 +213,7 @@ class Cache extends \lithium\core\Adaptable {
 	/**
 	 * Perform garbage collection on specified cache configuration.
 	 *
-	 * This method is non-filterable.
+	 * This method is not filterable.
 	 *
 	 * @param string $name The cache configuration to be cleaned
 	 * @return boolean True on successful clean, false otherwise
