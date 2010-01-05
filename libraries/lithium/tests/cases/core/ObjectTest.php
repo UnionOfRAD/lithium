@@ -99,7 +99,7 @@ class ObjectTest extends \lithium\test\Unit {
 	 *
 	 * @return void
 	 */
-	public function testMethodInvokationWithParameters() {
+	public function testMethodInvocationWithParameters() {
 		$callable = new MockCallable();
 
 		$this->assertEqual($callable->invokeMethod('foo'), array());

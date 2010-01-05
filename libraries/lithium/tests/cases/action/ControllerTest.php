@@ -61,7 +61,7 @@ class ControllerTest extends \lithium\test\Unit {
 	 *
 	 * @return void
 	 */
-	public function testMethodInvokation() {
+	public function testMethodInvocation() {
 		$postsController = new MockPostsController();
 		$result = $postsController->__invoke(null, array('action' => 'index', 'args' => array()));
 

@@ -68,7 +68,7 @@ class StaticObjectTest extends \lithium\test\Unit {
 	 *
 	 * @return void
 	 */
-	public function testMethodInvokationWithParameters() {
+	public function testMethodInvocationWithParameters() {
 		$class = '\lithium\tests\mocks\core\MockStaticMethodFiltering';
 
 		$this->assertEqual($class::invokeMethod('foo'), array());
