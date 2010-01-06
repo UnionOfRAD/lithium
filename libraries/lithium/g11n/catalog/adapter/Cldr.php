@@ -107,12 +107,12 @@ class Cldr extends \lithium\g11n\catalog\adapter\Base {
 		$query  = "/supplementalData/postalCodeData";
 		$query .= "/postCodeRegex[@territoryId=\"{$territory}\"]";
 
-		$regex = $this->_parseXml($file, $query, function($nodes) {
-			return (string)current($nodes);
-		});
+		$nodes = $this->_parseXml($file, $query);
+		$regex =  (string)current($nodes);
+
 		return $this->_merge($data, array(
 			'id' => 'postalCode',
-			'translated' => "/^{$data}$/"
+			'translated' => "/^{$regex}$/"
 		));
 	}
 
@@ -122,36 +122,34 @@ class Cldr extends \lithium\g11n\catalog\adapter\Base {
 		$file = "{$path}/main/{$locale}.xml";
 		$query = "/ldml/localeDisplayNames/{$plural}/{$category}";
 
-		return $this->_parseXml($file, $query, function($nodes) {
-			$data = array();
+		$nodes = $this->_parseXml($file, $query);
+		$data = array();
 
-			foreach ($nodes as $node) {
-				$data = $this->_merge($data, array(
-					'id' => (string)$node['type'],
-					'translated' => (string)$node
-				));
-			}
-			return $data;
-		});
+		foreach ($nodes as $node) {
+			$data = $this->_merge($data, array(
+				'id' => (string)$node['type'],
+				'translated' => (string)$node
+			));
+		}
+		return $data;
 	}
 
 	protected function _readCurrency($path, $locale) {
 		$file = "{$path}/main/{$locale}.xml";
 		$query = "/ldml/numbers/currencies/currency";
 
-		return $this->_parseXml($file, $query, function($nodes) {
-			$data = array();
+		$nodes = $this->_parseXml($file, $query);
+		$data = array();
 
-			foreach ($nodes as $node) {
-				$displayNames = $node->xpath('displayName');
+		foreach ($nodes as $node) {
+			$displayNames = $node->xpath('displayName');
 
-				$data = $this->_merge($data, array(
-					'id' => (string)$node['type'],
-					'translated' => (string)current($displayNames)
-				));
-			}
-			return $data;
-		});
+			$data = $this->_merge($data, array(
+				'id' => (string)$node['type'],
+				'translated' => (string)current($displayNames)
+			));
+		}
+		return $data;
 	}
 
 	/**
@@ -160,17 +158,11 @@ class Cldr extends \lithium\g11n\catalog\adapter\Base {
 	 *
 	 * @param string $file Absolute path to the XML file.
 	 * @param string $query An XPATH query to select items.
-	 * @param callback $yield A closure which is passed the data from the XPATH query.
 	 * @return array
 	 */
-	protected function _parseXml($file, $query, $yield) {
+	protected function _parseXml($file, $query) {
 		$document = new SimpleXmlElement($file, LIBXML_COMPACT, true);
-		$nodes = $document->xpath($query);
-
-		if (!$data = $yield($nodes)) {
-			return null;
-		}
-		return $data;
+		return $document->xpath($query);
 	}
 }
 

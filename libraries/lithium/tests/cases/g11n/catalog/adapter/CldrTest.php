@@ -21,42 +21,41 @@ class CldrTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function skip() {
-		$available = is_dir(LITHIUM_APP_PATH . '/resources/cldr');
+		$available = is_dir(LITHIUM_APP_PATH . '/resources/g11n/cldr');
 		$this->skipIf(!$available, 'The data for needed by the cldr adapter cannot be found.');
 	}
 
 	public function setUp() {
-		$path = LITHIUM_APP_PATH . '/resources/cldr';
+		$path = LITHIUM_APP_PATH . '/resources/g11n/cldr';
 		$this->adapter = new Cldr(compact('path'));
 	}
 
 	public function testRead() {
-		$result = $this->adapter->read('list.language', 'de', null);
-		$this->assertEqual($result['be'], 'Weißrussisch');
-		$this->assertEqual($result['en'], 'Englisch');
-		$this->assertEqual($result['fr'], 'Französisch');
+		$result = $this->adapter->read('language', 'de', null);
 
-		$result = $this->adapter->read('list.language', 'de_CH', null);
-		$this->assertEqual($result['be'], 'Weissrussisch');
+		$this->assertEqual($result['be']['translated'], 'Weißrussisch');
+		$this->assertEqual($result['en']['translated'], 'Englisch');
+		$this->assertEqual($result['fr']['translated'], 'Französisch');
 
-		$result = $this->adapter->read('list.script', 'de', null);
-		$this->assertEqual($result['Cher'], 'Cherokee');
-		$this->assertEqual($result['Hans'], 'Vereinfachte Chinesische Schrift');
+		$result = $this->adapter->read('language', 'de_CH', null);
+		$this->assertEqual($result['be']['translated'], 'Weissrussisch');
 
-		$result = $this->adapter->read('list.territory', 'de', null);
-		$this->assertEqual($result['US'], 'Vereinigte Staaten');
-		$this->assertEqual($result['FR'], 'Frankreich');
+		$result = $this->adapter->read('script', 'de', null);
+		$this->assertEqual($result['Cher']['translated'], 'Cherokee');
+		$this->assertEqual($result['Hans']['translated'], 'Vereinfachte Chinesische Schrift');
 
-		$result = $this->adapter->read('list.currency', 'de', null);
-		$this->assertEqual($result['DKK'], 'Dänische Krone');
-		$this->assertEqual($result['USD'], 'US-Dollar');
-		$this->assertEqual($result['EUR'], 'Euro');
+		$result = $this->adapter->read('territory', 'de', null);
+		$this->assertEqual($result['US']['translated'], 'Vereinigte Staaten');
+		$this->assertEqual($result['FR']['translated'], 'Frankreich');
 
-		$result = $this->adapter->read('validation.postalCode', 'en_CA', null);
-		$this->assertEqual('/^[ABCEGHJKLMNPRSTVXY]\d[A-Z][ ]?\d[A-Z]\d$/', $result);
+		$result = $this->adapter->read('currency', 'de', null);
+		$this->assertEqual($result['DKK']['translated'], 'Dänische Krone');
+		$this->assertEqual($result['USD']['translated'], 'US-Dollar');
+		$this->assertEqual($result['EUR']['translated'], 'Euro');
 
-		$result = $this->adapter->read('validation.postalCode', 'en', null);
-		$this->assertNull($result);
+		$result = $this->adapter->read('validation', 'en_CA', null);
+		$expected = '/^[ABCEGHJKLMNPRSTVXY]\d[A-Z][ ]?\d[A-Z]\d$/';
+		$this->assertEqual($result['postalCode']['translated'], $expected);
 	}
 }
 
