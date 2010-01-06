@@ -107,7 +107,6 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 * @param string $scope The scope for the current operation.
 	 * @param mixed $data The data to write.
 	 * @return boolean
-	 * @todo In former incarnations of this adapter meta data was supported, needs to be restored.
 	 */
 	public function write($category, $locale, $scope, $data) {
 		$files = $this->_files($category, $locale, $scope);
@@ -118,7 +117,7 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 			if (!$stream = fopen($file, 'wb')) {
 				return false;
 			}
-			$this->invokeMethod($method, array($stream, $data, array()));
+			$this->invokeMethod($method, array($stream, $data));
 			fclose($stream);
 		}
 		return true;
@@ -306,50 +305,31 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	/**
 	 * Compiles data into portable object (PO) format.
 	 *
+	 * To improve portability accross libraries the header is generated according
+	 * to the format of the output of `xgettext`. This means using the same names for
+	 * placeholders as well as including an empty fuzzy entry. The only difference
+	 * in the header format is the initial header which just features one line of text.
+	 *
 	 * @param resource $stream
 	 * @param array $data
-	 * @param array $meta
 	 * @return boolean
 	 */
-	protected function _compilePo($stream, $data, $meta) {
-		$defaults =  array(
-			'locale' => 'LOCALE',
-			'package' => 'NAME',
-			'packageVersion' => 'VERSION',
-			'copyright' => 'NAME',
-			'copyrightYear' => 'YEAR',
-			'copyrightEmail' => 'EMAIL',
-			'templateCreationDate' => 'DATE',
-			'revisionDate' => 'DATE',
-			'lastTranslator' => 'NAME',
-			'lastTranslatorEmail' => 'EMAIL',
-			'reportBugsTo' => 'EMAIL',
-			'languageTeamEmail' => 'EMAIL',
-			'pluralFormNumber' => 'NUMBER',
-			'pluralFormRule' => 'EXPRESSION',
-			'mimeVersion' => '1.0',
-			'contentType' => 'text/plain',
-			'contentTypeCharset' => 'UTF-8',
-			'contentTypeEncoding' => '8bit',
-		);
-		$meta += $defaults;
-
-		$output = array();
-		$output[] = '# {:locale} translation of {:package} messages.';
-		$output[] = '# Copyright {:copyrightYear} {:copyright} <{:copyrightEmail}>';
-		$output[] = '# This file is distributed under the same license as the {:package} package.';
+	protected function _compilePo($stream, $data) {
+		$output[] = '# This file is distributed under the same license as the PACKAGE package.';
 		$output[] = '#';
-		$output[] = '"Project-Id-Version: {:package} {:packageVersion}\n"';
-		$output[] = '"POT-Creation-Date: {:templateCreationDate}\n"';
-		$output[] = '"PO-Revision-Date: {:revisionDate}\n"';
-		$output[] = '"Last-Translator: {:lastTranslator} <{:lastTranslatorEmail}>\n"';
-		$output[] = '"Language-Team: {:locale} <{:languageTeamEmail}>\n"';
-		$output[] = '"MIME-Version: {:mimeVersion}\n"';
-		$output[] = '"Content-Type: {:contentType}; charset={:contentTypeCharset}\n"';
-		$output[] = '"Content-Transfer-Encoding: {:contentTypeEncoding}\n"';
-		$output[] = '"Plural-Forms: nplurals={:pluralFormNumber}; plural={:pluralFormRule};\n"';
+		$output[] = '#, fuzzy';
+		$output[] = 'msgid ""';
+		$output[] = 'msgstr ""';
+		$output[] = '"Project-Id-Version: PACKAGE VERSION\n"';
+		$output[] = '"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"';
+		$output[] = '"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"';
+		$output[] = '"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"';
+		$output[] = '"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"';
+		$output[] = '"MIME-Version: 1.0\n"';
+		$output[] = '"Content-Type: text/plain; charset=CHARSET\n"';
+		$output[] = '"Content-Transfer-Encoding: 8bit\n"';
 		$output[] = '';
-		$output = String::insert(implode("\n", $output) . "\n", $meta);
+		$output = implode("\n", $output) . "\n";
 		fwrite($stream, $output);
 
 		foreach ($data as $key => $item) {
@@ -393,8 +373,8 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 * @param array $meta
 	 * @return boolean Success.
 	 */
-	protected function _compilePot($stream, $data, $meta) {
-		return $this->_compilePo($stream, $data, $meta);
+	protected function _compilePot($stream, $data) {
+		return $this->_compilePo($stream, $data);
 	}
 
 	/**
@@ -405,7 +385,7 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 * @param array $meta
 	 * @return void
 	 */
-	protected function _compileMo($stream, $data, $meta) {}
+	protected function _compileMo($stream, $data) {}
 
 	/**
 	 * Formats a message item if neccessary and escapes fields.

@@ -47,10 +47,7 @@ class Extract extends \lithium\console\Command {
 
 		$this->header('Message Template Creation');
 
-		$meta = $this->_meta();
-		$this->nl();
-
-		if (!$this->_writeTemplate($data, $meta)) {
+		if (!$this->_writeTemplate($data)) {
 			$this->err('Failed to write template.');
 			return 1;
 		}
@@ -102,36 +99,15 @@ class Extract extends \lithium\console\Command {
 		return Catalog::read('message.template', 'root', compact('name', 'scope'));
 	}
 
-	/**
-	 * Prompts for addtional data.
-	 *
-	 * @return array
-	 */
-	protected function _meta() {
-		$message[] = 'Please provide some data which is used when creating the';
-		$message[] = 'template.';
-		$this->out($message);
-		$this->nl();
-
-		$now = new DateTime();
-		return array(
-			'package' => $this->in('Package name:', array('default' => 'app')),
-			'packageVersion' => $this->in('Package version:'),
-			'copyrightYear' => $this->in('Copyright year:', array('default' => $now->format('Y'))),
-			'copyright' => $this->in('Copyright holder:'),
-			'copyrightEmail' => $this->in('Copyright email address:'),
-			'templateCreationDate' => $now->format('Y-m-d H:iO'),
-		);
 	}
 
 	/**
 	 * Prompts for data source and writes template.
 	 *
 	 * @param array $data Data to save
-	 * @param array $meta Additional data to save
 	 * @return void
 	 */
-	protected function _writeTemplate($data, $meta) {
+	protected function _writeTemplate($data) {
 		$message[] = 'In order to proceed you need to choose a `Catalog` configuration';
 		$message[] = 'which is used for writing the template. The adapter for the configuration';
 		$message[] = 'should be capable of handling write requests for the `message.template`';
