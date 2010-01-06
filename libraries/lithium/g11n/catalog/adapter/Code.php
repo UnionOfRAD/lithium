@@ -91,17 +91,6 @@ class Code extends \lithium\g11n\catalog\adapter\Base {
 	}
 
 	/**
-	 * Writing is not supported.
-	 *
-	 * @param string $category Dot-delimited category.
-	 * @param string $locale A locale identifier.
-	 * @param string $scope The scope for the current operation.
-	 * @param mixed $data The data to write.
-	 * @return void
-	 */
-	public function write($category, $locale, $scope, $data) {}
-
-	/**
 	 * Parses a PHP file for messages marked as translatable.  Recognized as message
 	 * marking are `$t()` and `$tn()` which are implemented in the `View` class. This
 	 * is a rather simple and stupid parser but also fast and easy to grasp. It doesn't

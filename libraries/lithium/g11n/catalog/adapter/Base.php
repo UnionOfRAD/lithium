@@ -13,7 +13,7 @@ use \lithium\util\Set;
 /**
  * The `Base` class is the foundation for all g11n catalog adapters.
  */
-abstract class Base extends \lithium\core\Object {
+class Base extends \lithium\core\Object {
 
 	/**
 	 * A cascade of categories supported. If re-defined in sub-classes
@@ -78,25 +78,39 @@ abstract class Base extends \lithium\core\Object {
 	/**
 	 * Reads data.
 	 *
-	 * @param string $category Dot-delimited category.
+	 * Override this method in subclasses if you want the adapter
+	 * to have read support. The method is expected to return `null`
+	 * if the passed category is not supported.
+	 *
+	 * @param string $category A category.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
-	 * @return mixed
+	 * @return array|void
 	 * @see lithium\g11n\catalog\adapter\Base::$_categories.
 	 */
-	abstract public function read($category, $locale, $scope);
+	public function read($category, $locale, $scope) {
+		return null;
+	}
 
 	/**
-	 * Writes data.  Existing data is silently overwritten.
+	 * Writes data.
 	 *
-	 * @param string $category Dot-delimited category.
+	 * Override this method in subclasses if you want the adapter
+	 * to have write support. The method is expected to return `false`
+	 * if the passed category is not supported.
+	 *
+	 * Please note that existing data is silently overwritten.
+	 *
+	 * @param string $category A category.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
 	 * @param mixed $data The data to write.
 	 * @return boolean
 	 * @see lithium\g11n\catalog\adapter\Base::$_categories.
 	 */
-	abstract public function write($category, $locale, $scope, $data);
+	public function write($category, $locale, $scope, $data) {
+		return false;
+	}
 
 	/**
 	 * Formats a message item if neccessary.

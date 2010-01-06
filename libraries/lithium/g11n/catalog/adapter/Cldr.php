@@ -129,17 +129,6 @@ class Cldr extends \lithium\g11n\catalog\adapter\Base {
 	}
 
 	/**
-	 * Writing is not supported.
-	 *
-	 * @param string $category Dot-delimited category.
-	 * @param string $locale A locale identifier.
-	 * @param string $scope The scope for the current operation.
-	 * @param mixed $data The data to write.
-	 * @return void
-	 */
-	public function write($category, $locale, $scope, $data) {}
-
-	/**
 	 * Parses a XML file and retrieves data from it using an XPATH query
 	 * and a given closure.
 	 *
