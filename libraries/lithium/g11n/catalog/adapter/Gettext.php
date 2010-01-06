@@ -411,6 +411,9 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 				$item[$field] = $filter($item[$field]);
 			}
 		}
+		if (!isset($item['ids']['singular'])) {
+			$item['id']['singular'] =& $item['id'];
+		}
 		return parent::_prepareForWrite($item);
 	}
 
