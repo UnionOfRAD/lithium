@@ -17,20 +17,21 @@ use \lithium\core\Environment;
  * extend.
  *
  * `Adaptable` provides the logic necessary for generic configuration of named adapter
- * configurations (such as the ones used in `Cache`, as well as a unified method of locating and
+ * configurations (such as the ones used in `Cache`) as well as a unified method of locating and
  * obtaining an instance to a specified adapter.
  *
- * All immediate subclasses to `Adaptable` must implement the `adapter` method, and must also
- * define the protected `$_configurations` as a class attribute. The latter is where all local
- * adapter named configurations will be stored, as a Collection of named configuration settings.
+ * All immediate subclasses to `Adaptable` must define the protected attributes `$_configurations`
+ * and `$_adapters`. The former is where all local adapter named configurations will be
+ * stored (as a Collection of named configuration settings), and the latter must contain the
+ * Libraries::locate() compatible path string.
  *
- * This static class should never be called explicitly.
+ * This static class should **never** be called explicitly.
  *
  * @see lithium\storage\Cache
  * @see lithium\storage\Session
  * @see lithium\analysis\Logger
  *
- * @todo Implement as abtract class with abstract method `adapter` when Inspector has been fixed.
+ * @todo Implement as abstract class with abstract method `adapter` when Inspector has been fixed.
  */
 class Adaptable extends \lithium\core\StaticObject {
 
@@ -41,6 +42,14 @@ class Adaptable extends \lithium\core\StaticObject {
 	 */
 	protected static $_configurations = null;
 
+	/**
+	 * To be re-defined in sub-classes.
+	 *
+	 * Holds the Libraries::locate() compatible path string where the adapter in question
+	 * may be found.
+	 *
+	 * @var string Path string.
+	 */
 	protected static $_adapters = null;
 
 	/**
@@ -56,8 +65,8 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * Sets configurations for a particular adaptable implementation, or returns the current
 	 * configuration settings.
 	 *
-	 * @param array $config Configurations, indexed by name
-	 * @return object `Collection` of configurations
+	 * @param array $config Configurations, indexed by name.
+	 * @return object `Collection` of configurations.
 	 */
 	public static function config($config = null) {
 		if ($config && is_array($config)) {
@@ -76,7 +85,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Clears configurations.
+	 * Clears all configurations.
 	 *
 	 * @return void
 	 */
@@ -87,8 +96,8 @@ class Adaptable extends \lithium\core\StaticObject {
 	/**
 	 * Returns adapter class name for given `$name` configuration.
 	 *
-	 * @param  string $name Class name of adapter to load.
-	 * @return object  Adapter object.
+	 * @param string $name Class name of adapter to load.
+	 * @return object Adapter object.
 	 */
 	public static function adapter($name = null) {
 		$config = static::_config($name);
@@ -114,7 +123,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * `Enabled` can mean various things, e.g. having a PECL memcached extension compiled
 	 * & loaded, as well as having the memcache server up & available.
 	 *
-	 * @param string $name The cache configuration whose adapter will be checked
+	 * @param string $name The named configuration whose adapter will be checked.
 	 * @return mixed `True` if adapter is enabled, `false` if not. This method
 	 *         will return `null` if no configuration under the given `$name` exists.
 	 */
@@ -126,8 +135,9 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * Looks up an adapter class by name, using the `$_adapters` property set by a subclass of
 	 * `Adaptable`.
 	 *
-	 * @param array $config 
-	 * @param array $paths
+	 * @see lithium\core\libraries::locate()
+	 * @param string $config The configuration array of the adapter to be located.
+	 * @param array $paths Optional array of search paths that will be checked.
 	 * @return string Returns a fully-namespaced class reference to the adapter class.
 	 */
 	protected static function _class($config, $paths = array()) {
@@ -144,10 +154,17 @@ class Adaptable extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Gets an array of settings for the given named configuration.
+	 * Gets an array of settings for the given named configuration in the current
+	 * Environment.
 	 *
-	 * @param string $name
-	 * @return array
+	 * The default types of settings for all adapters will contain keys for:
+	 * `adapter` - The class name of the adapter
+	 * `filters` - An array of filters to be applied to the adapter methods
+	 * `strategies` - An array of strategies to be applied to the adapter methods (un-implemented)
+	 *
+	 * @see lithium\core\Environment
+	 * @param string $name Named configuration.
+	 * @return array Settings for the named configuration.
 	 */
 	protected static function _config($name) {
 		$defaults = array('adapter' => null, 'filters' => array(), 'strategies' => array());
