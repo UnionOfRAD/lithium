@@ -92,7 +92,7 @@ class Message extends \lithium\core\StaticObject {
 		$defaults = array(
 			'count' => 1,
 			// 'locale' => Environment::get('g11n.locale'),
-			'locale' => null,
+			'locale' => 'root',
 			'scope' => null
 		);
 		extract($options + $defaults);
