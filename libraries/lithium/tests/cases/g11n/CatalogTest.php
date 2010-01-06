@@ -250,7 +250,7 @@ class CatalogTest extends \lithium\test\Unit {
 		$expected = array(
 			'house'	=> array(
 				'id' => 'house',
-				'ids' => array('singular' => 'house'),
+				'ids' => array(),
 				'translated' => 'Haus',
 				'flags' => array(),
 				'comments' => array(),
@@ -261,7 +261,7 @@ class CatalogTest extends \lithium\test\Unit {
 		$data = array(
 			'house'	=> array(
 				'id' => 'house',
-				'ids' => array('singular' => 'house'),
+				'ids' => array(),
 				'translated' => 'Haus',
 				'flags' => array(),
 				'comments' => array(),
@@ -272,7 +272,7 @@ class CatalogTest extends \lithium\test\Unit {
 		$expected = array(
 			'house'	=> array(
 				'id' => 'house',
-				'ids' => array('singular' => 'house'),
+				'ids' => array(),
 				'translated' => 'Haus',
 				'flags' => array(),
 				'comments' => array(),
