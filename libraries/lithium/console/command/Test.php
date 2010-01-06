@@ -64,7 +64,6 @@ class Test extends \lithium\console\Command {
 		if (!empty($this->group)) {
 			$this->group = '\\' . str_replace('.', '\\', $this->group);
 		}
-		var_Dump($this->group);
 		$run = $this->case ?: $this->group;
 
 		$report = Dispatcher::run($run, array(
