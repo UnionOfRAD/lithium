@@ -119,7 +119,7 @@ class Catalog extends \lithium\core\Adaptable {
 		}
 
 		array_walk($data, function(&$value, $key) {
-			if (!is_array($value) || !isset($value['translated'])) {
+			if (!is_array($value) || !array_key_exists('translated', $value)) {
 				$value = array('id' => $key, 'translated' => $value);
 			}
 		});
