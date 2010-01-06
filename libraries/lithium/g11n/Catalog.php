@@ -23,6 +23,8 @@ class Catalog extends \lithium\core\Adaptable {
 
 	protected static $_configurations = null;
 
+	protected static $_adapters = 'adapter.g11n.catalog';
+
 	public static function config($config = null) {
 		$default = array('scope' => null);
 
@@ -133,10 +135,6 @@ class Catalog extends \lithium\core\Adaptable {
 			return $adapter->write($category, $locale, $options['scope'], $data);
 		}
 		return false;
-	}
-
-	public static function adapter($name) {
-		return static::_adapter('adapter.g11n.catalog', $name);
 	}
 }
 
