@@ -321,7 +321,7 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Tests a for result that does NOT match the expected regular expression pattern
+	 * Checks that the regular expression `$expected` is not matched in the result.
 	 *
 	 * @param mixed $expected
 	 * @param mixed $result
@@ -332,7 +332,7 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Tests a for result match in the expected regular expression pattern
+	 * Checks that the regular expression `$expected` is matched in the result.
 	 *
 	 * @param mixed $expected
 	 * @param mixed $result
