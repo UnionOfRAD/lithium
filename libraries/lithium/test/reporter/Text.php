@@ -72,7 +72,20 @@ class Text extends \lithium\test\Reporter {
 		foreach ((array) $filters as $class => $data) {
 			$result[] = $class::output('text', $data);
 		}
-		return join("\n", $result);
+		$output = array();
+		foreach ($result as $level) {
+			if (is_array($level)) {
+				foreach ($level as $title => $value) {
+					if (is_array($value)) {
+						$output[] = "{$value['title']}: {$value['value']}";
+					} else {
+						$output[] = "{$title}: {$value}";
+					}
+				}
+			}
+
+		}
+		return join("\n", $output);
 	}
 
 	/**

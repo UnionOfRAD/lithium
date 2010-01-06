@@ -185,20 +185,34 @@ class Profiler extends \lithium\core\StaticObject {
 				$totals[$title] += $value;
 			}
 		}
-		echo '<h3>Benchmarks</h3>';
-		echo '<table class="metrics"><tbody>';
+		$results = array();
 
-		foreach ($totals as $title => $value) {
-			if (!isset(static::$_metrics[$title])) {
-				continue;
+		if ($format == 'html') {
+			echo '<h3>Benchmarks</h3>';
+			echo '<table class="metrics"><tbody>';
+
+			foreach ($totals as $title => $value) {
+				if (!isset(static::$_metrics[$title])) {
+					continue;
+				}
+				$formatter = static::$_formatters[static::$_metrics[$title]['format']];
+				echo '<tr>';
+				 echo '<td class="metric-name">' . $title . '</th>';
+				echo '<td class="metric">' . $formatter($value) . '</td>';
+				echo '</tr>';
 			}
-			$formatter = static::$_formatters[static::$_metrics[$title]['format']];
-			echo '<tr>';
- 			echo '<td class="metric-name">' . $title . '</th>';
-			echo '<td class="metric">' . $formatter($value) . '</td>';
-			echo '</tr>';
+			echo '</tbody></table>';
+
+		} else if ($format == 'text') {
+			foreach ($totals as $title => $value) {
+				if (!isset(static::$_metrics[$title])) {
+					continue;
+				}
+				$formatter = static::$_formatters[static::$_metrics[$title]['format']];
+				$results[] = array('title' => $title, 'value' => $formatter($value));
+			}
+			return $results;
 		}
-		echo '</tbody></table>';
 	}
 }
 
