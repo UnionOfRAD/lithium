@@ -19,9 +19,9 @@ use \lithium\util\String;
 class Build extends \lithium\console\Command {
 
 	/**
-	 * Controls the interactive nature of the command
-	 * When true, the command will ask questions and expect answers to generate the result
-	 * When false, the command will do it's best to determine the result to generate
+	 * Controls the interactive nature of the command.
+	 * When true, the command will ask questions and expect answers to generate the result.
+	 * When false, the command will do its best to determine the result to generate.
 	 *
 	 * @var boolean
 	 */
@@ -34,13 +34,13 @@ class Build extends \lithium\console\Command {
 	public $library = 'app';
 
 	/**
-	 * The template to use to generate the file
+	 * The template to use to generate the file.
 	 *
 	 */
 	public $template = null;
 
 	/**
-	 * Class Constrcutor
+	 * Class Constrcutor.
 	 *
 	 * @param string $config
 	 */
@@ -71,7 +71,7 @@ class Build extends \lithium\console\Command {
 	}
 
 	/**
-	 * Ask questions and use answers to build
+	 * Ask questions and use answers to build.
 	 *
 	 * @return void
 	 */
@@ -80,7 +80,7 @@ class Build extends \lithium\console\Command {
 	}
 
 	/**
-	 * Get the namespace
+	 * Get the namespace.
 	 *
 	 * @param string $name
 	 * @return string
@@ -98,7 +98,7 @@ class Build extends \lithium\console\Command {
 	}
 
 	/**
-	 * Save a template with the current params. Writes file to `Build::$path`
+	 * Save a template with the current params. Writes file to `Build::$path`.
 	 *
 	 * @param string $template
 	 * @param string $params

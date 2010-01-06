@@ -36,7 +36,7 @@ class Cache extends \lithium\core\Object {
 	 *
 	 * @param string $type
 	 * @param string $message
-	 * @return boolean True on successful write, false otherwise
+	 * @return boolean True on successful write, false otherwise.
 	 */
 	public function write($type, $message) {
 		$config = $this->_config;

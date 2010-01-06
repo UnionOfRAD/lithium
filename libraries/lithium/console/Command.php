@@ -45,7 +45,7 @@ class Command extends \lithium\core\Object {
 	);
 
 	/**
-	 * Auto configuration
+	 * Auto configuration.
 	 *
 	 * @var array
 	 */
@@ -67,7 +67,7 @@ class Command extends \lithium\core\Object {
 
 	/**
 	 * Initializer.  Populates the `response` property with a new instance of the `Response`
-	 * class passing it configuration and assignes the values from named parameters of the
+	 * class passing it configuration and assigns the values from named parameters of the
 	 * request (if applicable) to properties of the command.
 	 *
 	 * @return void
@@ -97,8 +97,8 @@ class Command extends \lithium\core\Object {
 	 * @return object The response object associated with this command.
 	 * @see lithium\console\Dispatcher
 	 * @see lithium\console\Response
-	 * @todo Implement proper exception catching/throwing
-	 * @todo Implement filters
+	 * @todo Implement proper exception catching/throwing.
+	 * @todo Implement filters.
 	 */
 	public function __invoke($action, $passed = array(), $options = array()) {
 		try {
@@ -235,7 +235,7 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Add new lines to output stream.
+	 * Add newlines ("\n") to output stream.
 	 *
 	 * @param integer $number
 	 * @return integer
@@ -265,7 +265,7 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Stop execution with by exiting the script.
+	 * Stop execution, by exiting the script.
 	 *
 	 * @param integer $status
 	 * @param boolean $message

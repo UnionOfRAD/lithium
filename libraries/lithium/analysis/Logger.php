@@ -15,9 +15,9 @@ use \lithium\util\Collection;
 class Logger extends \lithium\core\Adaptable {
 
 	/**
-	 * Stores configurations for cache adapters
+	 * Stores configurations for cache adapters.
 	 *
-	 * @var object Collection of logger configurations
+	 * @var object `Collection` of logger configurations.
 	 */
 	protected static $_configurations = null;
 

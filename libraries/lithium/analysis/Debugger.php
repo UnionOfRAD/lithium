@@ -97,7 +97,7 @@ class Debugger extends \lithium\core\Object {
 	}
 
 	/**
-	 * Returns a parseable string representation of a variable..
+	 * Returns a parseable string representation of a variable.
 	 *
 	 * @param mixed $var The variable to export.
 	 * @return string The exported contents.

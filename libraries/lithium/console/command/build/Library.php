@@ -22,8 +22,8 @@ class Library extends \lithium\console\command\Build {
 	 * `li3 build library myapp`
 	 * `li3 build library myapp another_archive`
 	 *
-	 * @param string $new the name of or path to the library to create `from` phar
-	 * @param string $from the name of or path to the phar.gz to copy
+	 * @param string $new the name of or path to the library to create `from` phar.
+	 * @param string $from the name of or path to the phar.gz to copy.
 	 * @return boolean
 	 */
 	public function run($new = 'new', $from = 'app') {
@@ -49,12 +49,12 @@ class Library extends \lithium\console\command\Build {
 	}
 
 	/**
-	 * Create the Phar::GZ archive
+	 * Create the Phar::GZ archive.
 	 * `li3 build library archive my_archive`
 	 * `li3 build library archive my_archive myapp`
 	 *
-	 * @param string $to the name of or path the archive
-	 * @param string $from the name of or path to directory to compress
+	 * @param string $to The name of or path to the archive.
+	 * @param string $from The name of or path to the directory to compress.
 	 * @return boolean
 	 */
 	public function archive($to = null, $from = null) {
@@ -73,7 +73,7 @@ class Library extends \lithium\console\command\Build {
 	}
 
 	/**
-	 * Take a name and return the path
+	 * Take a name and return the path.
 	 *
 	 * @param string $name
 	 * @return string

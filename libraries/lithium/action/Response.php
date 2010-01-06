@@ -35,7 +35,7 @@ class Response extends \lithium\http\Response {
 	}
 
 	/**
-	 * Content Type
+	 * Content Type.
 	 *
 	 * @param string $type
 	 * @return string

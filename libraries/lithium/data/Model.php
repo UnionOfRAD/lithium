@@ -498,15 +498,11 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Wraps `StaticObject::_filter()` to account for object instances.
 	 *
-	 * @param string $method
-	 * @param array $params
-	 * @param string $callback
-	 * @param array $filters Defaults to empty array.
 	 * @see lithium\core\StaticObject::_filter()
 	 * @param string $method
 	 * @param array $params
 	 * @param mixed $callback
-	 * @param array $filters
+	 * @param array $filters Defaults to empty array.
 	 * @return object
 	 */
 	protected static function _filter($method, $params, $callback, $filters = array()) {

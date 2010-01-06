@@ -19,7 +19,7 @@ use \Exception;
  * classes. Each action has a specific responsibility, such as listing a set of objects, updating an
  * object, or deleting an object.
  *
- * A controller object is instatiated by the `Dispatcher` (`lithium\http\Dispatcher`), and is given
+ * A controller object is instanciated by the `Dispatcher` (`lithium\http\Dispatcher`), and is given
  * an instance of the `lithium\action\Request` class, which contains all necessary request state,
  * including routing information, `GET` & `POST` data, and server variables. The controller is then
  * invoked (using PHP's magic `__invoke()` syntax), and the proper action is called, according to
@@ -168,7 +168,7 @@ class Controller extends \lithium\core\Object {
 	/**
 	 * This method is used to pass along any data from the controller to the view and layout
 	 *
-	 * @param array $data sets of <variable name> => <variable value> to pass to view layer
+	 * @param array $data sets of <variable name> => <variable value> to pass to view layer.
 	 * @return void
 	 */
 	public function set($data = array()) {

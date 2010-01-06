@@ -19,7 +19,7 @@ use \lithium\analysis\Inspector;
 class Test extends \lithium\console\Command {
 
 	/**
-	 * Path to test case in dot notation.
+	 * Path to the test case, in dot notation.
 	 *
 	 * For example:
 	 * {{{

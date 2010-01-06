@@ -42,7 +42,7 @@ class Syslog extends \lithium\core\Object {
 	 *
 	 * @param string $type
 	 * @param string $message
-	 * @return boolean True on successful write, false otherwise
+	 * @return boolean `True` on successful write, `false` otherwise.
 	 */
 	public function write($type, $message) {
 		if (static::$_lastOpenedBy != $type) {

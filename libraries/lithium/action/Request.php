@@ -111,7 +111,7 @@ class Request extends \lithium\core\Object {
 	protected $_acceptTypes = array();
 
 	/**
-	 * auto configuration properties
+	 * Auto configuration properties.
 	 *
 	 * @var array
 	 */
@@ -301,7 +301,7 @@ class Request extends \lithium\core\Object {
 	}
 
 	/**
-	 * Detects properties of the request and returns a boolean response
+	 * Detects properties of the request and returns a boolean response.
 	 *
 	 * @see lithium\action\Request::detect()
 	 * @todo Remove $content and refer to Media class instead
@@ -360,12 +360,12 @@ class Request extends \lithium\core\Object {
 	}
 
 	/**
-	 * Gets the referring URL of this request
+	 * Gets the referring URL of this request.
 	 *
-	 * @param string $default Default URL to use if HTTP_REFERER cannot be read from headers
-	 * @param boolean $local If true, restrict referring URLs to local server
-	 * @return string Referring URL
-	 * @todo Rewrite me to remove constant dependencies
+	 * @param string $default Default URL to use if HTTP_REFERER cannot be read from headers.
+	 * @param boolean $local If true, restrict referring URLs to local server.
+	 * @return string Referring URL.
+	 * @todo Rewrite me to remove constant dependencies.
 	 */
 	function referer($default = null, $local = false) {
 		$ref = $this->env('HTTP_REFERER');
@@ -381,7 +381,7 @@ class Request extends \lithium\core\Object {
 	}
 
 	/**
-	 * @todo Replace string directory names with configuration
+	 * @todo Replace string directory names with configuration.
 	 * @return void
 	 */
 	protected function _base() {

@@ -22,8 +22,8 @@ class Test extends \lithium\console\command\Build {
 	 * `li3 build test model Post`
 	 * `li3 build test --library=li3_plugin model Post`
 	 *
-	 * @param string $type namespace of the class (eg: model, controller, some.name.space)
-	 * @param string $name name of class to test
+	 * @param string $type namespace of the class (e.g. model, controller, some.name.space).
+	 * @param string $name Name of class to test.
 	 * @return void
 	 */
 	public function run($type = null, $name = null) {
@@ -62,8 +62,8 @@ class Test extends \lithium\console\command\Build {
 	 * `li3 build test mock model Post`
 	 * `li3 build test --library=li3_plugin mock model Post`
 	 *
-	 * @param string $type namespace of the class (eg: model, controller, some.name.space)
-	 * @param string $name class name to extend with the mock
+	 * @param string $type namespace of the class (e.g. model, controller, some.name.space).
+	 * @param string $name Class name to extend with the mock.
 	 * @return void
 	 */
 	public function mock($type = null, $name = null) {
