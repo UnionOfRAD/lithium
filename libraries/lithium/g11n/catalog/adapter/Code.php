@@ -95,9 +95,7 @@ class Code extends \lithium\g11n\catalog\adapter\Base {
 				break;
 			}
 		}
-		if ($data) {
-			return $data;
-		}
+		return $data;
 	}
 
 	/**
