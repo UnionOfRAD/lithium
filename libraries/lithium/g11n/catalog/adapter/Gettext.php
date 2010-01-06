@@ -9,7 +9,7 @@
 namespace lithium\g11n\catalog\adapter;
 
 use \Exception;
-use \lithium\util\String;
+use \lithium\util\Inflector;
 
 /**
  * The `Gettext` class is an adapter for reading and writing PO and MO files without the
@@ -35,17 +35,6 @@ use \lithium\util\String;
  * @link http://php.net/setlocale
  */
 class Gettext extends \lithium\g11n\catalog\adapter\Base {
-
-	/**
-	 * Supported categories.
-	 *
-	 * @var array
-	 */
-	protected $_categories = array(
-		'message' => array(
-			'page' => array('read' => true, 'write' => true),
-			'template' => array('read' => true, 'write' => true)
-	));
 
 	/**
 	 * Constructor.
@@ -75,10 +64,10 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	/**
 	 * Reads data.
 	 *
-	 * @param string $category Dot-delimited category.
+	 * @param string $category A category.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
-	 * @return mixed
+	 * @return array|void
 	 */
 	public function read($category, $locale, $scope) {
 		$files = $this->_files($category, $locale, $scope);
@@ -102,7 +91,7 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	/**
 	 * Writes data.
 	 *
-	 * @param string $category Dot-delimited category.
+	 * @param string $category A category.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
 	 * @param mixed $data The data to write.
@@ -133,19 +122,25 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 */
 	protected function _files($category, $locale, $scope) {
 		$path = $this->_config['path'];
-		$files = array();
 		$scope = $scope ?: 'default';
 
-		switch ($category) {
-			case 'message.page':
-				$files[] = "{$path}/{$locale}/LC_MESSAGES/{$scope}.mo";
-				$files[] = "{$path}/{$locale}/LC_MESSAGES/{$scope}.po";
-			break;
-			case 'message.template':
-				$files[] = "{$path}/message_{$scope}.pot";
-			break;
+		if (($pos = strpos($category, 'Template')) !== false) {
+			$category = substr($category, 0, $pos);
+
+			return array(
+				"{$path}/{$category}_{$scope}.pot"
+			);
 		}
-		return $files;
+
+		if ($category == 'message') {
+			$category = Inflector::pluralize($category);
+		}
+		$category = strtoupper($category);
+
+		return array(
+			"{$path}/{$locale}/LC_{$category}/{$scope}.mo",
+			"{$path}/{$locale}/LC_{$category}/{$scope}.po"
+		);
 	}
 
 	/**
@@ -156,10 +151,10 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 */
 	protected function _parsePo($stream) {
 		$defaults = array(
-			'singularId' => null,
-			'pluralId' => null,
+			'id' => null,
+			'ids' => array('singular' => null, 'plural' => null),
 			'translated' => array(),
-			'fuzzy' => false,
+			'flags' => array(),
 			'comments' => array(),
 			'occurrences' => array()
 		);
@@ -173,23 +168,23 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 				continue;
 			}
 
-			if (preg_match('/^#\,\sfuzzy$/', $line)) {
-				$fuzzy = true;
+			if (preg_match('/^#\,\s(\w+)$/', $line, $matches)) {
+				$flags[$matches[1]] = true;
 			} elseif (preg_match('/^#\.\s(.+)$/', $line, $matches)) {
 				$comments[] = $matches[1];
 			} elseif (preg_match('/^#\:\s(.+):([0-9]+)$/', $line, $matches)) {
 				$occurrences[] = array('file' => $matches[1], 'line' => $matches[2]);
 			} elseif (preg_match('/^msgid\s"(.+)"$/', $line, $matches)) {
-				if ($singularId) {
-					$this->_mergeMessageItem($data, compact(
-						'singularId', 'pluralId', 'translated',
-						'fuzzy', 'occurrences', 'comments'
+				if ($id) {
+					$data = $this->_merge($data, compact(
+						'id', 'ids', 'translated',
+						'flags', 'occurrences', 'comments'
 					));
 					extract($defaults, EXTR_OVERWRITE);
 				}
-				$singularId = $matches[1];
+				$id = $ids['singular'] = $matches[1];
 			} elseif (preg_match('/^msgid_plural\s"(.+)"$/', $line, $matches)) {
-				$pluralId = $matches[1];
+				$ids['plural'] = $matches[1];
 			} elseif (preg_match('/^msgstr\s"(.+)"$/', $line, $matches)) {
 				$translated[0] = $matches[1];
 			} elseif (preg_match('/^msgstr\[(\d+)\]\s"(.+)"$/', $line, $matches)) {
@@ -198,11 +193,10 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 				$translated[key($translated)] .= $matches[1];
 			}
 		}
-		$this->_mergeMessageItem($data, compact(
-			'singularId', 'pluralId', 'translated',
-			'fuzzy', 'occurrences', 'comments'
+		return $this->_merge($data, compact(
+			'id', 'ids', 'translated',
+			'flags', 'occurrences', 'comments'
 		));
-		return $data;
 	}
 
 	/**
@@ -275,15 +269,12 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 
 			fseek($stream, $offset);
 			$translated = fread($stream, $length);
+			$translated = explode("\000", $translated);
 
-			if (strpos($translated, "\000") !== false) {
-				$translated = explode("\000", $translated);
-			} else {
-				$translated = array($translated);
-			}
-
-			$this->_mergeMessageItem($data,  compact(
-				'singularId', 'pluralId', 'translated'
+			$data = $this->_merge($data, array(
+				'id' => $singularId,
+				'ids' => array('singular' => $singularId, 'plural' => $pluralId),
+				'translated' => $translated
 			));
 		}
 		return $data;
@@ -334,7 +325,7 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 
 		foreach ($data as $key => $item) {
 			$output = array();
-			$item = $this->_formatMessageItem($key, $item);
+			$item = $this->_prepareForWrite($item);
 
 			foreach ($item['occurrences'] as $occurrence) {
 				$output[] = "#: {$occurrence['file']}:{$occurrence['line']}";
@@ -342,21 +333,22 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 			foreach ($item['comments'] as $comment) {
 				$output[] = "#. {$comment}";
 			}
-			if ($item['fuzzy']) {
-				$output[] = "#, fuzzy";
+			foreach ($item['flags'] as $flag => $value) {
+				$output[] = "#, {$flag}";
 			}
+			$output[] = "msgid \"{$item['ids']['singular']}\"";
 
-			$output[] = "msgid \"{$item['singularId']}\"";
+			if (isset($item['ids']['plural'])) {
+				$output[] = "msgid_plural \"{$item['ids']['plural']}\"";
 
-			if (isset($item['pluralId'])) {
-				$output[] = "msgid_plural \"{$item['pluralId']}\"";
-
-				foreach ($item['translated'] ?: array(null, null) as $key => $value) {
+				foreach ((array) $item['translated'] ?: array(null, null) as $key => $value) {
 					$output[] = "msgstr[{$key}] \"{$value}\"";
 				}
 			} else {
-				$value = array_pop($item['translated']);
-				$output[] = "msgstr \"{$value}\"";
+				if (is_array($item['translated'])) {
+					$value = array_pop($item['translated']);
+				}
+				$output[] = "msgstr \"{$item['translated']}\"";
 			}
 			$output[] = '';
 			$output = implode("\n", $output) . "\n";
@@ -388,15 +380,14 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	protected function _compileMo($stream, $data) {}
 
 	/**
-	 * Formats a message item if neccessary and escapes fields.
+	 * Prepares an item before it is being written and escapes fields.
 	 *
-	 * @param string $key The potential message ID.
-	 * @param string|array $value The message value.
-	 * @return array Message item formatted into internal/verbose format.
-	 * @see lithium\g11n\catalog\adapter\Base::_formatMessageItem()
+	 * @param mixed $item
+	 * @return mixed
+	 * @see lithium\g11n\catalog\adapter\Base::_prepareForWrite()
 	 */
-	protected function _formatMessageItem($key, $value) {
-		$escape = function ($value) use (&$escape) {
+	protected function _prepareForWrite($item) {
+		$filter = function ($value) use (&$escape) {
 			if (is_array($value)) {
 				return array_map($escape, $value);
 			}
@@ -405,40 +396,45 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 			$value = addcslashes($value, "\0..\37\\\"");
 			return $value;
 		};
-		$fields = array('singularId', 'pluralId', 'translated');
-		$item = parent::_formatMessageItem($key, $value);
+		$fields = array('id', 'ids', 'translated');
 
 		foreach ($fields as $field) {
 			if (isset($item[$field])) {
-				$item[$field] = $escape($item[$field]);
+				$item[$field] = $filter($item[$field]);
 			}
 		}
-		return $item;
+		return parent::_prepareForWrite($item);
 	}
 
 	/**
-	 * Merges a message item into given data and unescapes fields.
+	 * Merges an item into given data and unescapes fields.
+	 *
+	 * Please note that items with an id containing exclusively whitespace characters
+	 * are **not** being merged. Whitespace characters are space, tab, vertical tab,
+	 * line feed, carriage return and form feed.
 	 *
 	 * @param array $data Data to merge item into.
 	 * @param array $item Item to merge into $data.
-	 * @return void
-	 * @see lithium\g11n\catalog\adapter\Base::_mergeMessageItem()
+	 * @return array The merged data.
+	 * @see lithium\g11n\catalog\adapter\Base::_merge()
 	 */
-	protected function _mergeMessageItem(&$data, $item) {
-		$unescape = function ($value) use (&$unescape) {
+	protected function _merge($data, $item) {
+		$filter = function ($value) use (&$unescape) {
 			if (is_array($value)) {
 				return array_map($unescape, $value);
 			}
-			return stripcslashes($value);
+			$value = stripcslashes($value);
+			$value = ctype_space($item) ? null : $value;
+			return $value;
 		};
-		$fields = array('singularId', 'pluralId', 'translated');
+		$fields = array('id', 'ids', 'translated');
 
 		foreach ($fields as $field) {
 			if (isset($item[$field])) {
-				$item[$field] = $unescape($item[$field]);
+				$item[$field] = $filter($item[$field]);
 			}
 		}
-        return parent::_mergeMessageItem($data, $item);
+        return parent::_merge($data, $item);
     }
 }
 

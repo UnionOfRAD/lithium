@@ -20,22 +20,6 @@ use \lithium\g11n\Locale;
 class Cldr extends \lithium\g11n\catalog\adapter\Base {
 
 	/**
-	 * Supported categories.
-	 *
-	 * @var array
-	 */
-	protected $_categories = array(
-		'validation' => array(
-			'postalCode' => array('read' => true)
-		),
-		'lists' => array(
-			'language' => array('read' => true),
-			'script' => array('read' => true),
-			'territory' => array('read' => true),
-			'currency' => array('read' => true)
-	));
-
-	/**
 	 * Constructor.
 	 *
 	 * @param array $config Available configuration options are:
@@ -64,68 +48,95 @@ class Cldr extends \lithium\g11n\catalog\adapter\Base {
 	/**
 	 * Reads data.
 	 *
-	 * @param string $category Dot-delimited category.
+	 * @param string $category A category. The following categories are supported:
+	 *               - `'currency'`
+	 *               - `'language'`
+	 *               - `'script'`
+	 *               - `'territory'`
+	 *               - `'validation'`
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
-	 * @return mixed
+	 * @return array|void
 	 */
 	public function read($category, $locale, $scope) {
 		if ($scope != $this->_config['scope']) {
 			return null;
 		}
 		$path = $this->_config['path'];
-		$file = $query = $yield = $post = null;
 
 		switch ($category) {
-			case 'validation.postalCode':
-				if (!$territory = Locale::territory($locale)) {
-					return null;
-				}
-				$file = "{$path}/supplemental/postalCodeData.xml";
-				$query  = "/supplementalData/postalCodeData";
-				$query .= "/postCodeRegex[@territoryId=\"{$territory}\"]";
-
-				$yield = function($nodes) {
-					return (string) current($nodes);
-				};
-				$post =	function($data) {
-					return "/^{$data}$/";
-				};
+			case 'currency':
+				$data = $this->_readCurrency($path, $locale);
 			break;
-			case 'list.language':
-			case 'list.script':
-			case 'list.territory':
-				list(, $singular) = explode('.', $category, 2);
-				$plural = Inflector::pluralize($singular);
-
-				$file = "{$path}/main/{$locale}.xml";
-				$query = "/ldml/localeDisplayNames/{$plural}/{$singular}";
-
-				$yield = function($nodes) {
-					$data = null;
-
-					foreach ($nodes as $node) {
-						$data[(string) $node['type']] = (string) $node;
-					}
-					return $data;
-				};
+			case 'language':
+			case 'script':
+			case 'territory':
+				$data = $this->_readList($path, $category, $locale);
 			break;
-			case 'list.currency':
-				$file = "{$path}/main/{$locale}.xml";
-				$query = "/ldml/numbers/currencies/currency";
-
-				$yield = function($nodes) {
-					$data = null;
-
-					foreach ($nodes as $node) {
-						$displayNames = $node->xpath('displayName');
-						$data[(string) $node['type']] = (string) current($displayNames);
-					}
-					return $data;
-				};
+			case 'validation':
+				$data = $this->_readValidation($path, $locale);
 			break;
+			default:
+				return null;
 		}
-		return $this->_parseXml($file, $query, $yield, $post);
+		return $data;
+	}
+
+	protected function _readValidation($path, $locale) {
+		if (!$territory = Locale::territory($locale)) {
+			return null;
+		}
+		$data = array();
+
+		$file = "{$path}/supplemental/postalCodeData.xml";
+		$query  = "/supplementalData/postalCodeData";
+		$query .= "/postCodeRegex[@territoryId=\"{$territory}\"]";
+
+		$regex = $this->_parseXml($file, $query, function($nodes) {
+			return (string)current($nodes);
+		});
+		return $this->_merge($data, array(
+			'id' => 'postalCode',
+			'translated' => "/^{$data}$/"
+		));
+	}
+
+	protected function _readList($path, $category, $locale) {
+		$plural = Inflector::pluralize($category);
+
+		$file = "{$path}/main/{$locale}.xml";
+		$query = "/ldml/localeDisplayNames/{$plural}/{$category}";
+
+		return $this->_parseXml($file, $query, function($nodes) {
+			$data = array();
+
+			foreach ($nodes as $node) {
+				$data = $this->_merge($data, array(
+					'id' => (string)$node['type'],
+					'translated' => (string)$node
+				));
+			}
+			return $data;
+		});
+	}
+
+	protected function _readCurrency($path, $locale) {
+		$file = "{$path}/main/{$locale}.xml";
+		$query = "/ldml/numbers/currencies/currency";
+
+		return $this->_parseXml($file, $query, function($nodes) {
+			$data = array();
+
+			foreach ($nodes as $node) {
+				$displayNames = $node->xpath('displayName');
+
+				$data = $this->_merge($data, array(
+					'id' => (string)$node['type'],
+					'translated' => (string)current($displayNames)
+				));
+			}
+			return $data;
+		});
 	}
 
 	/**
@@ -135,18 +146,14 @@ class Cldr extends \lithium\g11n\catalog\adapter\Base {
 	 * @param string $file Absolute path to the XML file.
 	 * @param string $query An XPATH query to select items.
 	 * @param callback $yield A closure which is passed the data from the XPATH query.
-	 * @param callback $post A closure for applying formatting to the yielded results.
-	 * @return mixed
+	 * @return array
 	 */
-	protected function _parseXml($file, $query, $yield, $post = null) {
+	protected function _parseXml($file, $query, $yield) {
 		$document = new SimpleXmlElement($file, LIBXML_COMPACT, true);
 		$nodes = $document->xpath($query);
 
 		if (!$data = $yield($nodes)) {
 			return null;
-		}
-		if ($post) {
-			return $post($data);
 		}
 		return $data;
 	}

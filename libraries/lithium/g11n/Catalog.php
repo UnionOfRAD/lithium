@@ -32,8 +32,6 @@ class Catalog extends \lithium\core\Adaptable {
 
 	protected static $_configurations = null;
 
-	protected static $_adapters = 'adapter.g11n.catalog';
-
 	public static function config($config = null) {
 		$default = array('scope' => null);
 
@@ -44,58 +42,57 @@ class Catalog extends \lithium\core\Adaptable {
 	}
 
 	/**
-	 * Reads data.  Data can be obtained for one or multiple configurations and locales.
+	 * Reads data.
 	 *
-	 * The results for list-like categories are aggregated by querying all requested
-	 * configurations for the requested locale and then repeating this process for all locales down
-	 * the locale cascade. This allows for sparse data which is complemented by data from other
-	 * sources or for more generic locales. Aggregation can be controlled by either specifying the
-	 * configurations or a scope to use.
+	 * Results are aggregated by querying all requested configurations for the requested
+	 * locale then repeating this process for all locales down the locale cascade. This
+	 * allows for sparse data which is complemented by data from other sources or for more
+	 * generic locales. Aggregation can be controlled by either specifying the configurations
+	 * or a scope to use.
 	 *
 	 * Usage:
 	 * {{{
-	 * Catalog::read('message.page', array('zh', 'en'));
+	 * Catalog::read('message', 'zh');
 	 * Catalog::read('validation.postalCode', 'en_US');
 	 * }}}
 	 *
-	 * @param string $category Dot-delimeted category.
-	 * @param string|array $locales One or multiple locales.
+	 * @param string $category A (dot-delimeted) category.
+	 * @param string $locale A locale identifier.
 	 * @param array $options Valid options are:
 	 *        - `'name'`: One or multiple configuration names.
 	 *        - `'scope'`: The scope to use.
+	 *        - `'lossy'`: Whether or not to use the compact and lossy format, defaults to `true`.
 	 * @return array|void If available the requested data, else `null`.
-	 * @see lithium\g11n\catalog\adapter\Base::$_categories.
 	 */
-	public static function read($category, $locales, $options = array()) {
-		$defaults = array('name' => null, 'scope' => null);
+	public static function read($category, $locale, $options = array()) {
+		$defaults = array('name' => null, 'scope' => null, 'lossy' => true);
 		$options += $defaults;
 
+		$category = strtok($category, '.');
+		$id = strtok('.');
+
 		$names = (array) $options['name'] ?: static::$_configurations->keys();
-		$results = null;
+		$results = array();
 
-		foreach ((array) $locales as $locale) {
-			foreach (Locale::cascade($locale) as $cascaded) {
-				foreach ($names as $name) {
-					$adapter = static::adapter($name);
+		foreach (Locale::cascade($locale) as $cascaded) {
+			foreach ($names as $name) {
+				$adapter = static::adapter($name);
 
-					if (!$adapter->isSupported($category, __FUNCTION__)) {
-						continue;
-					}
-					if (!$result = $adapter->read($category, $cascaded, $options['scope'])) {
-						continue;
-					}
-					if (!is_array($result)) {
-						$results[$locale] = $result;
-						break 2;
-					}
-					if (!isset($results[$locale])) {
-						$results[$locale] = array();
-					}
-					$results[$locale] += $result;
+				if ($result = $adapter->read($category, $cascaded, $options['scope'])) {
+					$results += $result;
 				}
 			}
 		}
-		return $results;
+		if ($options['lossy']) {
+			array_walk($results, function(&$value) {
+				$value = $value['translated'];
+			});
+		}
+
+		if ($id) {
+			return isset($results[$id]) ? $results[$id] : null;
+		}
+		return $results ?: null;
 	}
 
 	/**
@@ -104,43 +101,51 @@ class Catalog extends \lithium\core\Adaptable {
 	 * Usage:
 	 * {{{
 	 * $data = array(
-	 *   'pl' => array(
-	 *      'color' => 'Kolor'
-	 *   )
-	 *   'ja' => array(
-	 *      'color' => '色'
-	 * ));
-	 * Catalog::write('message.page', $data, array('name' => 'runtime'));
+	 * 	'color' => '色'
+	 * );
+	 * Catalog::write('message', 'ja', $data, array('name' => 'runtime'));
 	 * }}}
 	 *
-	 * @param string $category Dot-delimeted category.
-	 * @param array $data Data keyed by locale.
+	 * @param string $category A (dot-delimeted) category.
+	 * @param string $locale A locale identifier.
+	 * @param array $data
 	 * @param array $options Valid options are:
 	 *        - `'name'`: One or multiple configuration names.
 	 *        - `'scope'`: The scope to use.
 	 * @return boolean Success.
-	 * @see lithium\g11n\catalog\adapter\Base::$_categories.
 	 */
-	public static function write($category, $data, $options = array()) {
+	public static function write($category, $locale, $data, $options = array()) {
 		$defaults = array('name' => null, 'scope' => null);
 		$options += $defaults;
+
+		$category = strtok($category, '.');
+		$id = strtok('.');
+
+		if ($id) {
+			$data = array($id => $data);
+		}
+
+		array_walk($data, function(&$value, $key) {
+			if (!is_array($value) || !isset($value['translated'])) {
+				$value = array(
+					'id' => $key,
+					'ids' => array('singular' => $key),
+					'translated' => $value
+				);
+			}
+		});
 
 		$names = (array) $options['name'] ?: static::$_configurations->keys();
 
 		foreach ($names as $name) {
 			$adapter = static::adapter($name);
-
-			if (!$adapter->isSupported($category, __FUNCTION__)) {
-				continue;
-			}
-			foreach ($data as $locale => $item) {
-				if (!$adapter->write($category, $locale, $options['scope'], $item)) {
-					return false;
-				}
-			}
-			return true;
+			return $adapter->write($category, $locale, $options['scope'], $data);
 		}
 		return false;
+	}
+
+	public static function adapter($name) {
+		return static::_adapter('adapter.g11n.catalog', $name);
 	}
 }
 

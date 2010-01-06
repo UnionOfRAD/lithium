@@ -14,23 +14,16 @@ use \RecursiveDirectoryIterator;
 
 /**
  * The `Code` class is an adapter which treats files containing code as just another source
- * of globalized data.  In fact it allows for extracting messages which are needed to build
+ * of globalized data.
+ *
+ * In fact it allows for extracting messages which are needed to build
  * message catalog templates. Currently only code written in PHP is supported through a parser
  * using the built-in tokenizer.
  *
  * @see lithium\g11n\Message
+ * @see lithium\template\View
  */
 class Code extends \lithium\g11n\catalog\adapter\Base {
-
-	/**
-	 * Supported categories.
-	 *
-	 * @var array
-	 */
-	protected $_categories = array(
-		'message' => array(
-			'template' => array('read' => true)
-	));
 
 	/**
 	 * Constructor.
@@ -59,19 +52,36 @@ class Code extends \lithium\g11n\catalog\adapter\Base {
 	}
 
 	/**
-	 * Extracts data from files within configured path recursively.
+	 * Reads data.
 	 *
-	 * @param string $category Dot-delimited category.
+	 * @param string $category A category. `'messageTemplate'` is the only category supported.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
-	 * @return mixed
+	 * @return array|null
 	 */
 	public function read($category, $locale, $scope) {
 		if ($scope != $this->_config['scope']) {
 			return null;
 		}
 		$path = $this->_config['path'];
+		$data = array();
 
+		switch ($category) {
+			case 'messageTemplate':
+				return $this->_readMessageTemplate($path);
+			break;
+			default:
+				return null;
+		}
+	}
+
+	/**
+	 * Extracts data from files within configured path recursively.
+	 *
+	 * @param string $path Base path to start extracting from.
+	 * @return array
+	 */
+	protected function _readMessageTemplate($path) {
 		$base = new RecursiveDirectoryIterator($path);
 		$iterator = new RecursiveIteratorIterator($base);
 		$data = array();
@@ -104,8 +114,7 @@ class Code extends \lithium\g11n\catalog\adapter\Base {
 		$contents = file_get_contents($file);
 
 		$defaults = array(
-			'singularId' => null,
-			'pluralId' => null,
+			'ids' => array(),
 			'open' => false,
 			'position' => 0,
 			'occurrence' => array('file' => $file, 'line' => null)
@@ -127,15 +136,14 @@ class Code extends \lithium\g11n\catalog\adapter\Base {
 
 			if ($open) {
 				if ($position >= ($open === 'singular' ? 1 : 2)) {
-					$this->_mergeMessageItem($data, array(
-						'singularId' => $singularId,
-						'pluralId' => $pluralId,
+					$data = $this->_merge($data, array(
+						'id' => &$ids['singular'],
+						'ids' => $ids,
 						'occurrences' => array($occurrence),
 					));
 					extract($defaults, EXTR_OVERWRITE);
 				} elseif ($token[0] === T_CONSTANT_ENCAPSED_STRING) {
-					$type = isset($singularId) ? 'pluralId' : 'singularId';
-					$$type = $token[1];
+					$ids[$ids ? 'plural' : 'singular'] = $token[1];
 					$position++;
 				}
 			} else {
@@ -155,23 +163,19 @@ class Code extends \lithium\g11n\catalog\adapter\Base {
 	}
 
 	/**
-	 * Merges a message item into given data and removes quotation marks
+	 * Merges an item into given data and removes quotation marks
 	 * from the beginning and end of message strings.
 	 *
 	 * @param array $data Data to merge item into.
 	 * @param array $item Item to merge into $data.
-	 * @return void
-	 * @see lithium\g11n\catalog\adapter\Base::_mergeMessageItem()
+	 * @return array The merged data.
+	 * @see lithium\g11n\catalog\adapter\Base::_merge()
 	 */
-    protected function _mergeMessageItem(&$data, $item) {
-		$fields = array('singularId', 'pluralId');
-
-		foreach ($fields as $field) {
-			if (isset($item[$field])) {
-				$item[$field] = substr($item[$field], 1, -1);
-			}
-		}
-        return parent::_mergeMessageItem($data, $item);
+    protected function _merge($data, $item) {
+		array_walk($item['ids'], function(&$value) {
+			$value = substr($value, 1, -1);
+		});
+        return parent::_merge($data, $item);
     }
 }
 

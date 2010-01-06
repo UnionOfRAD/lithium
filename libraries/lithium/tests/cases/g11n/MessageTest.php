@@ -31,17 +31,14 @@ class MessageTest extends \lithium\test\Unit {
 	}
 
 	public function testTranslate() {
-		$data = array(
-			'root' => function($n) { return $n == 1 ? 0 : 1; }
-		);
-		Catalog::write('message.plural', $data, array('name' => 'runtime'));
+		$data = function($n) { return $n == 1 ? 0 : 1; };
+		Catalog::write('message.plural', 'root', $data, array('name' => 'runtime'));
 
 		$data = array(
-			'de' => array(
-				'lithium' => 'Kuchen',
-				'house' => array('Haus', 'Häuser')
-		));
-		Catalog::write('message.page', $data, array('name' => 'runtime'));
+			'lithium' => 'Kuchen',
+			'house' => array('Haus', 'Häuser')
+		);
+		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
 
 		$expected = 'Kuchen';
 		$result = Message::translate('lithium', array('locale' => 'de'));

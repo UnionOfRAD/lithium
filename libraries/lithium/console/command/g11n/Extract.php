@@ -41,7 +41,7 @@ class Extract extends \lithium\console\Command {
 			$this->err('Yielded no items.');
 			return 1;
 		}
-		$count = count($data['root']);
+		$count = count($data);
 		$this->out("Yielded {$count} items.");
 		$this->nl();
 
@@ -95,10 +95,11 @@ class Extract extends \lithium\console\Command {
 			$configs[$name] = compact('adapter', 'path', 'scope');
 		}
 		Catalog::config($configs);
-		$scope = $configs[$name]['scope'];
-		return Catalog::read('message.template', 'root', compact('name', 'scope'));
-	}
 
+		return Catalog::read('messageTemplate', 'root', compact('name') + array(
+			'scope' => $configs[$name]['scope'],
+			'lossy' => false
+		));
 	}
 
 	/**
@@ -153,7 +154,7 @@ class Extract extends \lithium\console\Command {
 			$this->out('Aborting upon user request.');
 			$this->stop(1);
 		}
-		return Catalog::write('message.template', $data, compact('name', 'scope'));
+		return Catalog::write('messageTemplate', 'root', $data, compact('name', 'scope'));
 	}
 }
 

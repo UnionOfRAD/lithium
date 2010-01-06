@@ -97,14 +97,17 @@ class Message extends \lithium\core\StaticObject {
 		);
 		extract($options + $defaults);
 
-		$page = Catalog::read('message.page', $locale, compact('scope'));
-		$plural = Catalog::read('message.plural', $locale);
+		$page = Catalog::read('message', $locale, compact('scope'));
 
-		if (empty($page[$locale][$id]['translated']) || !isset($plural[$locale])) {
+		if (!isset($page[$id])) {
 			return null;
 		}
-		$translated = $page[$locale][$id]['translated'];
-		$key = $plural[$locale]($count);
+		$translated = (array) $page[$id];
+
+		if (!isset($page['plural']) || !is_callable($page['plural'])) {
+			return null;
+		}
+		$key = $page['plural']($count);
 
 		if (isset($translated[$key])) {
 			return $translated[$key];

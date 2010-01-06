@@ -30,8 +30,9 @@ class GettextTest extends \lithium\test\Unit {
 	public function testWriteReadMessageTemplate() {
 		$data = array(
 			'singular 1' => array(
-				'singularId' => 'singular 1',
-				'pluralId' => 'plural 1',
+				'id' => 'singular 1',
+				'ids' => array('singular' => 'singular 1', 'plural' => 'plural 1'),
+				'flags' => array('fuzzy' => true),
 				'translated' => array(),
 				'occurrences' => array(
 					array('file' => 'test.php', 'line' => 1)
@@ -39,15 +40,14 @@ class GettextTest extends \lithium\test\Unit {
 				'comments' => array(
 					'comment 1'
 				),
-				'fuzzy' => true,
 			)
 		);
 		$meta = array();
 
-		$this->adapter->write('message.template', 'root', null, $data);
+		$this->adapter->write('messageTemplate', 'root', null, $data);
 		$this->assertTrue(file_exists($this->_path . '/message_default.pot'));
 
-		$result = $this->adapter->read('message.template', 'root', null);
+		$result = $this->adapter->read('messageTemplate', 'root', null);
 		$this->assertEqual($data, $result);
 	}
 }

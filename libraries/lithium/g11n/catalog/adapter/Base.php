@@ -8,72 +8,10 @@
 
 namespace lithium\g11n\catalog\adapter;
 
-use \lithium\util\Set;
-
 /**
  * The `Base` class is the foundation for all g11n catalog adapters.
  */
 class Base extends \lithium\core\Object {
-
-	/**
-	 * A cascade of categories supported. If re-defined in sub-classes
-	 * contents are being merged.
-	 *
-	 * @var array
-	 */
-	protected $_categories = array(
-		'inflection' => array(
-			'plural'            => array('read' => false, 'write' => false),
-			'singular'          => array('read' => false, 'write' => false),
-			'uninflectedPlural' => array('read' => false, 'write' => false),
-			'irregularPluar'    => array('read' => false, 'write' => false),
-			'transliteration'   => array('read' => false, 'write' => false),
-			'template'          => array('read' => false, 'write' => false)
-		),
-		'list'       => array(
-			'language'          => array('read' => false, 'write' => false),
-			'script'            => array('read' => false, 'write' => false),
-			'territory'         => array('read' => false, 'write' => false),
-			'timezone'          => array('read' => false, 'write' => false),
-			'currency'          => array('read' => false, 'write' => false),
-			'template'          => array('read' => false, 'write' => false)
-		),
-		'message'    => array(
-			'page'              => array('read' => false, 'write' => false),
-			'plural'            => array('read' => false, 'write' => false),
-			'direction'         => array('read' => false, 'write' => false),
-			'template'          => array('read' => false, 'write' => false)
-		),
-		'validation' => array(
-			'phone'             => array('read' => false, 'write' => false),
-			'postalCode'        => array('read' => false, 'write' => false),
-			'ssn'               => array('read' => false, 'write' => false),
-			'template'          => array('read' => false, 'write' => false)
-	));
-
-	/**
-	 * Initializer.  Merges redefined categories.
-	 *
-	 * @return void
-	 */
-	protected function _init() {
-		parent::_init();
-		$properties = get_class_vars(__CLASS__);
-		$this->_categories = Set::merge($properties['_categories'], $this->_categories);
-	}
-
-	/**
-	 * Checks if an operation for a category is supported.
-	 *
-	 * @param string $category Dot-delimited category.
-	 * @param string $operation Operation to check for. Either `'read'` or `'write'`.
-	 * @return boolean `true` if operation is supported, otherwise `false`.
-	 * @see lithium\g11n\catalog\adapter\Base::$_categories.
-	 */
-	public function isSupported($category, $operation) {
-		$category = explode('.', $category, 2);
-		return $this->_categories[$category[0]][$category[1]][$operation];
-	}
 
 	/**
 	 * Reads data.
@@ -86,7 +24,6 @@ class Base extends \lithium\core\Object {
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
 	 * @return array|void
-	 * @see lithium\g11n\catalog\adapter\Base::$_categories.
 	 */
 	public function read($category, $locale, $scope) {
 		return null;
@@ -106,41 +43,41 @@ class Base extends \lithium\core\Object {
 	 * @param string $scope The scope for the current operation.
 	 * @param mixed $data The data to write.
 	 * @return boolean
-	 * @see lithium\g11n\catalog\adapter\Base::$_categories.
 	 */
 	public function write($category, $locale, $scope, $data) {
 		return false;
 	}
 
 	/**
-	 * Formats a message item if neccessary.
+	 * Prepares an item before it is being written.
 	 *
-	 * @param string $key The potential message ID.
-	 * @param string|array $value The message value.
-	 * @return array Message item formatted into internal/verbose format.
+	 * Override this method in sublcasses if you need to
+	 * i.e. escape the item's values.
+	 *
+	 * @param mixed $item
+	 * @return mixed
 	 */
-	protected function _formatMessageItem($key, $value) {
-		if (!is_array($value) || !isset($value['translated'])) {
-			return array('singularId' => $key, 'translated' => (array) $value);
-		}
-		return $value;
+	protected function _prepareForWrite($item) {
+		return $item;
 	}
 
 	/**
-	 * Merges a message item into given data.
+	 * Merges an item into given data.
 	 *
 	 * @param array $data Data to merge item into.
-	 * @param array $item Item to merge into $data.
-	 * @return void
+	 * @param array $item Item to merge into $data. The item must have an `'id'` key.
+	 * @return array The merged data.
 	 */
-	protected function _mergeMessageItem(&$data, $item) {
-		$id = $item['singularId'];
+	protected function _merge($data, $item) {
+		if (!isset($item['id'])) {
+			return $data;
+		}
+		$id = $item['id'];
 
 		$defaults = array(
-			'singularId' => null,
-			'pluralId' => null,
-			'translated' => array(),
-			'fuzzy' => false,
+			'ids' => array(),
+			'translated' => null,
+			'flags' => array(),
 			'comments' => array(),
 			'occurrences' => array()
 		);
@@ -148,19 +85,17 @@ class Base extends \lithium\core\Object {
 
 		if (!isset($data[$id])) {
 			$data[$id] = $item;
-			return;
+			return $data;
 		}
-
-		if ($data[$id]['pluralId'] === null) {
-			$data[$id]['singularId'] = $item['singularId'];
-			$data[$id]['pluralId'] = $item['pluralId'];
-			$data[$id]['translated'] += $item['translated'];
+		foreach (array('ids', 'flags', 'comments', 'occurrences') as $field) {
+			$data[$id][$field] = array_merge($data[$id][$field], $item[$field]);
 		}
-		if ($data[$id]['fuzzy'] === false) {
-			$data[$id]['fuzzy'] = $item['fuzzy'];
+		if (is_array($item['translated'])) {
+			$data[$id]['translated'] = (array) $data[$id]['translated'] + $item['translated'];
+		} elseif (!isset($data[$id]['translated'])) {
+			$data[$id]['translated'] = $item['translated'];
 		}
-		$data[$id]['comments'] = array_merge($data[$id]['comments'], $item['comments']);
-		$data[$id]['occurrences'] = array_merge($data[$id]['occurrences'], $item['occurrences']);
+		return $data;
 	}
 }
 

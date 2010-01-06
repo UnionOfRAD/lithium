@@ -148,8 +148,8 @@ Libraries::add('app');
  * Globalization runtime data.  You can add globalized data during runtime utilizing a
  * configuration set up to use the _memory_ adapter.
  */
-// $data = array('root' => function($n) { return $n != 1 ? 1 : 0; });
-// Catalog::write('message.plural', $data, array('name' => 'runtime'));
+// $data = function($n) { return $n != 1 ? 1 : 0; };
+// Catalog::write('message.plural', 'root', $data, array('name' => 'runtime'));
 
 /**
  * Enabling globalization integration.  Classes in the framework are designed with
@@ -159,12 +159,8 @@ Libraries::add('app');
 // use lithium\util\Validator;
 // use lithium\util\Inflector;
 //
-// Validator::add('postalCode',
-// 	Catalog::read('validation.postalCode', array('en_US'))
-// );
-// Inflector::rules('transliterations',
-// 	Catalog::read('inflection.transliteration', array('en'))
-// );
+// Validator::add('phone', Catalog::read('validation.phone', 'en_US'));
+// Inflector::rules('transliterations', Catalog::read('inflection.transliterations', 'en'));
 
 /**
  * Your custom code goes here.
