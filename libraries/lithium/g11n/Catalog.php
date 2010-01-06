@@ -13,17 +13,8 @@ use \lithium\util\Collection;
 
 /**
  * Globalization data is not just translated messages, it is validation rules, formats and a lot
- * more, too. Data is grouped into 4 different kinds of categories: inflection, validation, message
- * and list.
- *
- * Generally speaking is the `Catalog` class allowing us to retrieve and store globalized
- * data, providing low-level functionality to other classes. Its interface is similar to classes
- * like Session or Cache and like those extensible through adapters.
- *
- * We need to deal with different kinds of sources for this data, but we don't want differing
- * results depending on the adapter in use. This is why results are kept in a neutral inter-
- * changeable format. You can rely on getting the same format of obtained results independent
- * from the adapter they're coming from.
+ * more. Generally speaking is the `Catalog` class allowing us to retrieve and store globalized
+ * data, providing low-level functionality to other classes.
  *
  * The class is able to aggregate data from different sources which allows to complement sparse
  * data. Not all categories must be supported by an individual adapter.
