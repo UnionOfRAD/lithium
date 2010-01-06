@@ -15,7 +15,22 @@ use \lithium\g11n\Locale;
 
 /**
  * The `Cldr` class is an adapter which allows reading from the Common Locale Data Repository
- * maintained by the Unicode Consortium. Writing and deleting is not supported.
+ * maintained by the Unicode Consortium.
+ *
+ * The directory the `'path'` configuration setting is pointing to should contain the contents
+ * from the CLDR as distributed with i.e. `core.zip` which can be downloaded from the unicode site.
+ *
+ * The directory as configured by the `'path'` setting which equals the `commons` directory
+ * from `core.zip` should be structured according to the following example.
+ *
+ * {{{
+ * | - `main`
+ * | - `supplemental`
+ * | - ...
+ * }}}
+ *
+ * @link http://unicode.org/cldr
+ * @link http://unicode.org/Public/cldr/1.7.0/core.zip
  */
 class Cldr extends \lithium\g11n\catalog\adapter\Base {
 

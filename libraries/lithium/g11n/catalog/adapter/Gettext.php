@@ -13,22 +13,30 @@ use \lithium\util\Inflector;
 
 /**
  * The `Gettext` class is an adapter for reading and writing PO and MO files without the
- * requirement of having the gettext extension enabled or installed.  Moreover it doesn't
+ * requirement of having the gettext extension enabled or installed. Moreover it doesn't
  * require the usage of the non thread safe `setlocale()`.
  *
- * The adapter expects a directory configured by the path options to be structured
- * according to the following example.
+ * The adapter works with the directory structure below. The example shows the structure
+ * for the directory as given by the `'path'` configuration setting. It closely ressembles
+ * the standard gettext directory structure with a few slight adjustments to the way
+ * templates are being named.
  *
  * {{{
- * | - `<path>`: This is the configured path.
- *   | - `<locale>`: The directory for the well-formed <locale> i.e `'fr' or `'en_US'`.
- *   | | - `LC_MESSAGES`: The directory for the message category.
- *   |   | - `default.po`: The PO file.
- *   |   | - `default.mo`: The MO file.
- *   |   | - `<scope>.po`: The PO file for <scope>.
- *   |   | - `<scope>.mo`: The MO file for <scope>.
- *   | - `message_default.pot`: The message template.
- *   | - `message_<scope>.pot`: The message template for <scope>.
+ * | - `<locale>`
+ * | | - `LC_MESSAGES`
+ * |   | - `default.po`
+ * |   | - `default.mo`
+ * |   | - `<scope>.po`
+ * |   | - `<scope>.mo`
+ * | | - `LC_VALIDATION`
+ * |   | - ...
+ * | - ...
+ * | - `message_default.pot`
+ * | - `message_<scope>.pot`
+ * | - `validation_default.pot`
+ * | - `validation_<scope>.pot`
+ * | - ...
+ * - ...
  * }}}
  *
  * @see lithium\g11n\Locale
