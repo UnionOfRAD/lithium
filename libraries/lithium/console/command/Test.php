@@ -44,8 +44,9 @@ class Test extends \lithium\console\Command {
 	/**
 	 * Runs tests. Will provide a list of available tests if none are give
 	 * Test cases should be given in dot notation.
-	 * case example: lithium test -case lithium.tests.cases.core.ObjectTest
-	 * group example: lithium test -group lithium.tests.cases.core
+	 *
+	 * case example: lithium test --case=lithium.tests.cases.core.ObjectTest
+	 * group example: lithium test --group=lithium.tests.cases.core
 	 *
 	 * @return void
 	 */
