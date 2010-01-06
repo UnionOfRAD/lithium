@@ -387,9 +387,9 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 * @see lithium\g11n\catalog\adapter\Base::_prepareForWrite()
 	 */
 	protected function _prepareForWrite($item) {
-		$filter = function ($value) use (&$escape) {
+		$filter = function ($value) use (&$filter) {
 			if (is_array($value)) {
-				return array_map($escape, $value);
+				return array_map($filter, $value);
 			}
 			$value = strtr($value, array("\\'" => "'", "\\\\" => "\\"));
 			$value = str_replace("\r\n", "\n", $value);
@@ -419,12 +419,12 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 * @see lithium\g11n\catalog\adapter\Base::_merge()
 	 */
 	protected function _merge($data, $item) {
-		$filter = function ($value) use (&$unescape) {
+		$filter = function ($value) use (&$filter) {
 			if (is_array($value)) {
-				return array_map($unescape, $value);
+				return array_map($filter, $value);
 			}
 			$value = stripcslashes($value);
-			$value = ctype_space($item) ? null : $value;
+			$value = ctype_space($value) ? null : $value;
 			return $value;
 		};
 		$fields = array('id', 'ids', 'translated');
