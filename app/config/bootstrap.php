@@ -125,8 +125,8 @@ Libraries::add('app');
  *     which holds the data.
  *
  *   - `'scope'` If you plan on using scoping i.e. for accessing plugin data separately you
- *     need to specify a scope for each configuration, except for those using the _memory_ or
- *     _gettext_ adapter which handle this internally.
+ *     need to specify a scope for each configuration, except for those using the _memory_,
+ *     _php_ or _gettext_ adapter which handle this internally.
  */
 // use lithium\g11n\Catalog;
 //
