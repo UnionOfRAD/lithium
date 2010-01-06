@@ -64,12 +64,12 @@ class Extract extends \lithium\console\Command {
 	 */
 	protected function _extract() {
 		$message[] = 'A `Catalog` class configuration with an adapter that is capable of';
-		$message[] = 'handling read requests for the `message.template` category is needed';
+		$message[] = 'handling read requests for the `messageTemplate` category is needed';
 		$message[] = 'in order to proceed.';
 		$this->out($message);
 		$this->nl();
 
-		$configs = (array) Catalog::config()->to('array');
+		$configs = (array) Catalog::config();
 
 		$this->out('Available `Catalog` Configurations:');
 		foreach ($configs as $name => $config) {
@@ -116,7 +116,7 @@ class Extract extends \lithium\console\Command {
 		$this->out($message);
 		$this->nl();
 
-		$configs = (array) Catalog::config()->to('array');
+		$configs = (array) Catalog::config();
 
 		$this->out('Available `Catalog` Configurations:');
 		foreach ($configs as $name => $config) {
