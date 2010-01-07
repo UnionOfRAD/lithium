@@ -30,10 +30,6 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isUrl('google.com', 'loose'));
 		$this->assertTrue(Validator::isUrl('google.com'));
 		$this->assertFalse(Validator::isUrl('google.com', 'strict'));
-
-		$this->assertTrue(Validator::isSsn('478364120'));
-		$this->assertTrue(Validator::isSsn('478-36-4120'));
-		$this->assertFalse(Validator::isSsn('478-36-41200'));
 	}
 
 	/**
@@ -75,19 +71,15 @@ class ValidatorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testAddCustomRegexFormats() {
-		$this->assertTrue(Validator::isPostalCode('11201'));
-		$this->assertTrue(Validator::isPostalCode('11201-0456'));
+		$this->assertTrue(Validator::isPhone('1234567890'));
+		$this->assertTrue(Validator::isPhone('+1234567890'));
 
-		$this->assertTrue(Validator::isPostalCode('11201', 'us'));
-		$this->assertTrue(Validator::isPostalCode('11201-0456', 'us'));
+		$this->assertFalse(Validator::isPhone('0800-LITHIUM'));
+		Validator::add(array('phone' => array('foo' => '/^0800-[A-Z]+$/')));
 
-		$this->assertFalse(Validator::isPostalCode('foo-bar'));
-		Validator::add(array('postalCode' => array('foo' => '/^foo-bar$/')));
-
-		$this->assertTrue(Validator::isPostalCode('foo-bar'));
-		$this->assertTrue(Validator::isPostalCode('foo-bar', 'foo'));
-		$this->assertTrue(Validator::isPostalCode('foo-bar', 'any'));
-		$this->assertFalse(Validator::isPostalCode('foo-bar', 'us'));
+		$this->assertTrue(Validator::isPhone('0800-LITHIUM'));
+		$this->assertTrue(Validator::isPhone('0800-LITHIUM', 'foo'));
+		$this->assertTrue(Validator::isPhone('0800-LITHIUM', 'any'));
 	}
 
 	public function testPrefilterMethodAccess() {

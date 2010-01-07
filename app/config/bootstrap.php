@@ -139,8 +139,8 @@ Libraries::add('app');
 // 		'path' => LITHIUM_APP_PATH . '/resources/g11n'
 // 	),
 // 	'lithium' => array(
-// 		'adapter' => 'Gettext',
-// 		'path' => LITHIUM_LIBRARY_PATH . '/lithium/g11n/resources'
+// 		'adapter' => 'Php',
+// 		'path' => LITHIUM_LIBRARY_PATH . '/lithium/g11n/resources/php'
 // 	)
 // ));
 
