@@ -289,6 +289,10 @@ class ModelTest extends \lithium\test\Unit {
 		);
 		$result = $creator->data();
 		$this->assertEqual($expected, $result);
+
+		$expected = 'mock_creators';
+		$result = MockCreator::meta('source');
+		$this->assertEqual($expected, $result);
 	}
 
 	/*

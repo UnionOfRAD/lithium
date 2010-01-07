@@ -251,12 +251,12 @@ class Model extends \lithium\core\StaticObject {
 			$self->_meta = $key + $self->_meta;
 		}
 		if (!$self->_meta['initialized']) {
+			$self->_meta['initialized'] = true;
 			if ($self->_meta['source'] === null) {
 				$self->_meta['source'] = Inflector::tableize($self->_meta['name']);
 			}
 			$titleKeys = array('title', 'name', $self->_meta['key']);
 			$self->_meta['title'] = $self->_meta['title'] ?: static::hasField($titleKeys);
-			$self->_meta['initialized'] = true;
 		}
 		if (is_array($key) || empty($key) || !empty($value)) {
 			return $self->_meta;
@@ -308,7 +308,7 @@ class Model extends \lithium\core\StaticObject {
 	public static function schema($field = null) {
 		$self = static::_instance();
 		if (empty($self->_schema)) {
-			$self->_schema = $self->_connection()->describe($self->_meta['source'], $self->_meta);
+			$self->_schema = $self->_connection()->describe($self::meta('source'), $self->_meta);
 		}
 		if (is_string($field) && !empty($field)) {
 			return isset($self->_schema[$field]) ? $self->_schema[$field] : null;
