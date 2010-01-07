@@ -24,8 +24,7 @@ class Logger extends \lithium\core\Adaptable {
 	protected static $_adapters = 'adapter.analysis.logger';
 
 	/**
-	 * Writes `$message` to the log specified by the `$type`
-	 * configuration.
+	 * Writes `$message` to the log specified by the `$type` configuration.
 	 *
 	 * @param string $type Configuration to be used for writing.
 	 * @param string $message Message to be written.

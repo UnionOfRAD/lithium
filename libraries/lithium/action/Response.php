@@ -118,9 +118,9 @@ class Response extends \lithium\http\Response {
 	/**
 	 * Writes raw headers to output.
 	 *
-	 * @param mixed $header Either a raw header string, or an array of header strings. Use an array
-	 *        if a single header must be written multiple times with different values. Otherwise,
-	 *        subsequent values with non-unique header names will overwrite previous values.
+	 * @param string|array $header Either a raw header string, or an array of header strings. Use
+	 *        an array if a single header must be written multiple times with different values.
+	 *        Otherwise, additional values for duplicate headers will overwrite previous values.
 	 * @param integer $code Optional. If present, forces a specific HTTP response code.  Used
 	 *        primarily in conjunction with the 'Location' header.
 	 * @return void

@@ -179,13 +179,13 @@ class Controller extends \lithium\core\Object {
 	 * Uses results (typically coming from a controller action) to generate content and headers for
 	 * a Response object.
 	 *
-	 * @param mixed $options A string template name (see the 'template' option below), or an array
-	 *        of options, as follows:
-	 *        - 'data': An associative array of variables to be assigned to the template. These are
-	 *           merged on top of any variables set in `Controller::set()`.
-	 *        - 'head': If true, only renders the headers of the response, not the body. Defaults
+	 * @param string|array $options A string template name (see the 'template' option below), or an
+	 *        array of options, as follows:
+	 *        - `'data'`: An associative array of variables to be assigned to the template. These
+	 *          are merged on top of any variables set in `Controller::set()`.
+	 *        - `'head'`: If true, only renders the headers of the response, not the body. Defaults
 	 *          to false.
-	 *        - 'template': The name of a template, which usually matches the name of the action.
+	 *        - `'template'`: The name of a template, which usually matches the name of the action.
 	 *          By default, this template is looked for in the views directory of the current
 	 *          controller, i.e. given a `PostsController` object, if template is set to `'view'`,
 	 *          the template path would be `views/posts/view.html.php`. Defaults to the name of the

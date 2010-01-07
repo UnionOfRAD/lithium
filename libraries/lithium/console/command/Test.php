@@ -53,12 +53,12 @@ class Test extends \lithium\console\Command {
 	 * Runs tests. Will provide a list of available tests if none are given.
 	 * Test cases should be given in dot notation.
 	 *
-	 * Case usage:
+	 * Case example:
 	 * {{{
 	 * lithium test -case lithium.tests.cases.core.ObjectTest
 	 * }}}
+	 * Group example:
 	 * {{{
-	 * Group usage:
 	 * lithium test -group lithium.tests.cases.core
 	 * }}}
 	 *

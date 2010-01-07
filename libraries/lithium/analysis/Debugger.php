@@ -16,14 +16,14 @@ class Debugger extends \lithium\core\Object {
 	 * Outputs a stack trace based on the supplied options.
 	 *
 	 * @param array $options Format for outputting stack trace. Available options are:
-	 *              - `'depth'`: The maximum depth of the trace.
-	 *              - `'format'`: Either `null`, `'points'` or `'array'`.
-	 *              - `'args'`: A boolean indicating if arguments should be included.
-	 *              - `'start'`: The depth to start with.
-	 *              - `'scope'`: Scope for items to include.
-	 *              - `'trace'`: A trace to use instead of generating one.
-	 *              - `'includeScope'`: A boolean indicating if items within scope
-	 *                should be included.
+	 *        - `'args'`: A boolean indicating if arguments should be included.
+	 *        - `'depth'`: The maximum depth of the trace.
+	 *        - `'format'`: Either `null`, `'points'` or `'array'`.
+	 *        - `'includeScope'`: A boolean indicating if items within scope
+	 *           should be included.
+	 *        - `'scope'`: Scope for items to include.
+	 *        - `'start'`: The depth to start with.
+	 *        - `'trace'`: A trace to use instead of generating one.
 	 * @return string|array Stack trace formatted according to `'format'` option.
 	 */
 	public static function trace($options = array()) {

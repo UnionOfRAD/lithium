@@ -13,8 +13,7 @@ use \lithium\util\Collection;
 use \lithium\core\Environment;
 
 /**
- * The `Adaptable` static class is the base class from which all adapter implementations
- * extend.
+ * The `Adaptable` static class is the base class from which all adapter implementations extend.
  *
  * `Adaptable` provides the logic necessary for generic configuration of named adapter
  * configurations (such as the ones used in `Cache`) as well as a unified method of locating and
@@ -38,7 +37,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	/**
 	 * To be re-defined in sub-classes.
 	 *
-	 * @var object Collection of configurations, indexed by name.
+	 * @var object `Collection` of configurations, indexed by name.
 	 */
 	protected static $_configurations = null;
 
@@ -53,7 +52,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	protected static $_adapters = null;
 
 	/**
-	 * Initialization of static class
+	 * Initialization of static class.
 	 *
 	 * @return void
 	 */
@@ -66,7 +65,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * configuration settings.
 	 *
 	 * @param array $config Configurations, indexed by name.
-	 * @return object `Collection` of configurations.
+	 * @return object|void `Collection` of configurations or void if setting configurations.
 	 */
 	public static function config($config = null) {
 		if ($config && is_array($config)) {
@@ -123,6 +122,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * `Enabled` can mean various things, e.g. having a PECL memcached extension compiled
 	 * & loaded, as well as having the memcache server up & available.
 	 *
+
 	 * @param string $name The named configuration whose adapter will be checked.
 	 * @return boolean|null  True if adapter is enabled, false if not. This method will return
 	 *         null if no configuration under the given $name exists.

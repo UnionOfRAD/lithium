@@ -225,7 +225,6 @@ class Libraries {
 	 * @param string $library
 	 * @param string $options
 	 * @return array
-	 * @todo Tie this into how path() is implemented.
 	 */
 	public static function find($library, $options = array()) {
 		$defaults = array(
