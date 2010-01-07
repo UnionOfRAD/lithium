@@ -174,7 +174,7 @@ class Route extends \lithium\core\Object {
 
 		foreach (array_reverse($options + array('args' => ''), true) as $key => $value) {
 			$rpl = "{:{$key}}";
-			$len = -strlen($rpl);
+			$len = - strlen($rpl);
 
 			if ($trimmed && isset($defaults[$key]) && $value == $defaults[$key]) {
 				if (substr($template, $len) == $rpl) {

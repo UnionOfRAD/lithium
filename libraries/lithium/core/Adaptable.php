@@ -126,7 +126,8 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * Looks up an adapter class by name, using the `$_adapters` property set by a subclass of
 	 * `Adaptable`.
 	 *
-	 * @param string $name The class name of the adapter to locate.
+	 * @param array $config 
+	 * @param array $paths
 	 * @return string Returns a fully-namespaced class reference to the adapter class.
 	 */
 	protected static function _class($config, $paths = array()) {
@@ -143,9 +144,9 @@ class Adaptable extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Gets an array of settings for the given named configuration. 
+	 * Gets an array of settings for the given named configuration.
 	 *
-	 * @param string $name 
+	 * @param string $name
 	 * @return array
 	 */
 	protected static function _config($name) {

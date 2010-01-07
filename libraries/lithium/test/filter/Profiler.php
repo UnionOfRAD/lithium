@@ -182,7 +182,7 @@ class Profiler extends \lithium\core\StaticObject {
 		foreach ($data as $class => $metrics) {
 			foreach ($metrics as $title => $value) {
 				$totals[$title] = isset($totals[$title]) ? $totals[$title] : 0;
-				$totals[$title]+= $value;
+				$totals[$title] += $value;
 			}
 		}
 		echo '<h3>Benchmarks</h3>';

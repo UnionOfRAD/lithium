@@ -26,7 +26,7 @@ class BuildTest extends \lithium\test\Unit {
 		$_SERVER['argv'] = array();
 		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
 
-		Libraries::add('build_test', array('path' => $this->_testPath .'/build_test'));
+		Libraries::add('build_test', array('path' => $this->_testPath . '/build_test'));
 		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
 		$this->request->params = array('library' => 'build_test');
 	}

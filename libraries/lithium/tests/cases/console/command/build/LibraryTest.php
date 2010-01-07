@@ -52,7 +52,7 @@ class LibraryTest extends \lithium\test\Unit {
 			ini_get('phar.readonly') == '1',
 			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
 		);
-		
+
 		$this->request->params['library'] = 'build_test';
 		$app = new Library(array('request' => $this->request, 'classes' => $this->classes));
 

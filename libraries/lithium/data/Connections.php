@@ -163,6 +163,7 @@ class Connections extends \lithium\core\Adaptable {
 	 * Constructs a data source or adapter object instance from a configuration array.
 	 *
 	 * @param array $config
+	 * @param array $paths
 	 * @return object
 	 */
 	protected static function _class($config, $paths = array()) {

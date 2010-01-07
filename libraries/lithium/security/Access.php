@@ -16,7 +16,6 @@ class Access extends \lithium\core\Adaptable {
 	 * @var object `Collection` of access control configurations.
 	 */
 	protected static $_configurations;
-
 }
 
 ?>

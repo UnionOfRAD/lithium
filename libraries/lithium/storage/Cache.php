@@ -156,8 +156,10 @@ class Cache extends \lithium\core\Adaptable {
 	 * Performs an atomic increment operation on specified numeric cache item
 	 * from the given cache configuration.
 	 *
+	 * @param string $name
 	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to 1.
+	 * @param mixed $conditions
 	 * @return mixed Item's new value on successful increment, false otherwise
 	 */
 	public static function increment($name, $key, $offset = 1, $conditions = null) {
@@ -183,8 +185,10 @@ class Cache extends \lithium\core\Adaptable {
 	 * Performs an atomic decrement operation on specified numeric cache item
 	 * from the given cache configuration.
 	 *
+	 * @param string $name
 	 * @param string $key Key of numeric cache item to derecement
 	 * @param integer $offset Offset to decrement - defaults to 1.
+	 * @param mixed $conditions
 	 * @return mixed Item's new value on successful decrement, false otherwise
 	 */
 	public static function decrement($name, $key, $offset = 1, $conditions = null) {

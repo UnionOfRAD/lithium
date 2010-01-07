@@ -781,7 +781,7 @@ class Unit extends \lithium\core\Object {
 	 */
 	protected function _cleanUp($path = null) {
 		$path = $path ?: LITHIUM_APP_PATH . '/resources/tmp/tests';
-		$path = $path[0] !== '/' ? LITHIUM_APP_PATH . '/resources/tmp/'. $path : $path;
+		$path = $path[0] !== '/' ? LITHIUM_APP_PATH . '/resources/tmp/' . $path : $path;
 		if (!is_dir($path)) {
 			return;
 		}

@@ -30,8 +30,8 @@ class MockDatabase extends \lithium\data\source\Database {
 		}
 		$ret = ' WHERE ';
 		foreach ($cond as $field => $value) {
-		    $ret .= '`'.$context->model().'`.';
-			$ret .= '`'.$field."`=\'".$value."\',";
+		    $ret .= '`' . $context->model() . '`.';
+			$ret .= '`' . $field . "`=\'" . $value . "\',";
 		}
 		$ret = substr($ret,0,-1);
 		return $ret;

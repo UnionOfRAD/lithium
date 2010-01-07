@@ -308,7 +308,7 @@ class Request extends \lithium\core\Object {
 			if (is_array($detector)) {
 				list($key, $check) = $detector + array('', '');
 				if (is_array($check)) {
-					$check = '/' .join('|', $check) . '/i';
+					$check = '/' . join('|', $check) . '/i';
 				}
 				if (Validator::isRegex($check)) {
 					return (boolean) preg_match($check, $this->env($key));

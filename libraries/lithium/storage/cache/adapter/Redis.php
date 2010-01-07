@@ -141,7 +141,7 @@ class Redis extends \lithium\core\Object {
 
 		return function($self, $params, $chain) use (&$Redis) {
 			extract($params);
-			return (boolean)$Redis->delete($key);
+			return (boolean) $Redis->delete($key);
 		};
 	}
 

@@ -104,7 +104,7 @@ class ValidatorTest extends \lithium\test\Unit {
 	public function testNotEmptyRule() {
 		$this->assertTrue(Validator::isNotEmpty('abcdefg'));
 		$this->assertTrue(Validator::isNotEmpty('fasdf '));
-		$this->assertTrue(Validator::isNotEmpty('fooo'.chr(243).'blabla'));
+		$this->assertTrue(Validator::isNotEmpty('fooo' . chr(243) . 'blabla'));
 		$this->assertTrue(Validator::isNotEmpty('abçďĕʑʘπй'));
 		$this->assertTrue(Validator::isNotEmpty('José'));
 		$this->assertTrue(Validator::isNotEmpty('é'));

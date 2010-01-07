@@ -16,7 +16,6 @@ class Auth extends \lithium\core\Adaptable {
 	 * @var object `Collection` of authentication configurations.
 	 */
 	protected static $_configurations;
-
 }
 
 ?>
