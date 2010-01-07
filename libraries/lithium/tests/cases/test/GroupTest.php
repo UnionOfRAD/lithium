@@ -42,6 +42,7 @@ class GroupTest extends \lithium\test\Unit {
 		  'lithium\tests\cases\g11n\catalog\adapter\CldrTest',
 		  'lithium\tests\cases\g11n\catalog\adapter\CodeTest',
 		  'lithium\tests\cases\g11n\catalog\adapter\GettextTest',
+		  'lithium\tests\cases\g11n\catalog\adapter\PhpTest',
 		);
 		$this->assertEqual($expected, $result);
 
@@ -53,6 +54,7 @@ class GroupTest extends \lithium\test\Unit {
 		  'lithium\tests\cases\g11n\catalog\adapter\CldrTest',
 		  'lithium\tests\cases\g11n\catalog\adapter\CodeTest',
 		  'lithium\tests\cases\g11n\catalog\adapter\GettextTest',
+		  'lithium\tests\cases\g11n\catalog\adapter\PhpTest',
 		  'lithium\tests\cases\data\ModelTest'
 		);
 		$this->assertEqual($expected, $result);
