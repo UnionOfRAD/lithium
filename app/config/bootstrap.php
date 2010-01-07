@@ -8,8 +8,6 @@
 
 namespace lithium;
 
-use \lithium\core\Environment;
-
 /**
  * This is the path to the class libraries used by your application, and must contain a copy of the
  * Lithium core.  By default, this directory is named 'libraries', and resides in the same
@@ -60,6 +58,5 @@ require __DIR__ . '/bootstrap/g11n.php';
 // Session::config(array(
 // 	'default' => array('adapter' => 'Php')
 // ));
-
 
 ?>
