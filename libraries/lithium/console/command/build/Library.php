@@ -68,6 +68,7 @@ class Library extends \lithium\console\command\Build {
 			$this->out(basename($path) . ".phar.gz created in " . dirname($path) . " from {$from}");
 			return true;
 		}
+		$this->error("Could not create archive from {$from}");
 		return false;
 	}
 

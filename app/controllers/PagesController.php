@@ -2,8 +2,6 @@
 
 namespace app\controllers;
 
-use \lithium\util\Inflector;
-
 class PagesController extends \lithium\action\Controller {
 
 	public function view() {
