@@ -6,6 +6,38 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
+use \lithium\g11n\Message;
+use \lithium\util\String;
+
+/**
+ * Implements logic for handling cases where `Message::translate()` returns without a result.
+ * The  message specified for the `'default'` option will be used as a fall back. By
+ * default the value for the options is the message passed to the method.
+ */
+Message::applyFilter('translate', function($self, $params, $chain) {
+	$params['options'] += array('default' => $params['id']);
+	return $chain->next($self, $params, $chain) ?: $params['options']['default'];
+});
+
+/**
+ * Placeholders in translated messages.  Adds support for `String::insert()`-style placeholders
+ * to translated messages.  Placeholders may be used within the message and replacements provided
+ * directly within the `options` argument.
+ *
+ * Usage:
+ * {{{
+ * Message::translate('Your {:color} paintings are looking just great.', array(
+ * 	'color' => 'silver',
+ * 	'locale' => 'fr'
+ * ));
+ * }}}
+ *
+ * @see lithium\util\String::insert()
+ */
+Message::applyFilter('translate', function($self, $params, $chain) {
+	return String::insert($chain->next($self, $params, $chain), $params['options']);
+});
+
 /*
  * Inflector configuration example.  If your application has custom singular or plural rules, or
  * extra non-ASCII characters to transliterate, you can configure that by uncommenting the lines
