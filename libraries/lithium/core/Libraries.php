@@ -51,8 +51,9 @@ class Libraries {
 	 * Because paths are checked in the order in which they appear, path templates should be
 	 * specified from most-specific to least-specific. See the `locate()` method for usage examples.
 	 *
-	 * @var array
 	 * @see lithium\core\Libraries::locate()
+	 *
+	 * @var array
 	 */
 	protected static $_classPaths = array(
 		'adapter' => array(
