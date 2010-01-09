@@ -106,6 +106,26 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that non-class files are always filtered out of `find()` results unless an alternate
+	 * filter is specified.
+	 *
+	 * @return void
+	 */
+	public function testExcludeNonClassFiles() {
+		$result = Libraries::find('lithium');
+		$this->assertFalse($result);
+
+		$result = Libraries::find('lithium', array('namespaces' => true));
+
+		$this->assertTrue(in_array('lithium\action', $result));
+		$this->assertTrue(in_array('lithium\core', $result));
+		$this->assertTrue(in_array('lithium\util', $result));
+
+		$this->assertFalse(in_array('lithium\LICENSE.txt', $result));
+		$this->assertFalse(in_array('lithium\readme.wiki', $result));
+	}
+
+	/**
 	 * Tests the loading of libraries
 	 *
 	 * @return void
