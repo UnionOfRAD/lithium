@@ -508,6 +508,7 @@ class Libraries {
 	 */
 	protected static function _search($config, $options) {
 		$path = rtrim($config['path'] . $options['path'], '/');
+
 		$search = function($path) use ($config, $options) {
 			return (array) glob(
 				$path . '/*' . ($options['namespaces'] ? '' : $config['suffix'])
@@ -515,6 +516,10 @@ class Libraries {
 		};
 		$libs = $search($path, $config);
 
+		if ($options['namespaces'] === true) {
+			$filter = '/^.+\/[A-Za-z0-9_]+$|^.*' . preg_quote($config['suffix'], '/') . '/';
+			$libs = preg_grep($filter, $libs);
+		}
 		if ($options['recursive']) {
 			$dirs = $queue = array_diff((array) glob($path . '/*', GLOB_ONLYDIR), $libs);
 			while ($queue) {
