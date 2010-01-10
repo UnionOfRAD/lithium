@@ -302,7 +302,7 @@ class Libraries {
 		$options += $defaults;
 		$class = ltrim($class, '\\');
 
-		if (isset(static::$_cachedPaths[$class])) {
+		if (isset(static::$_cachedPaths[$class]) && !$options['dirs']) {
 			return static::$_cachedPaths[$class];
 		}
 		foreach (static::$_configurations as $name => $config) {
@@ -327,11 +327,11 @@ class Libraries {
 				$list = array_map(function($i) { return str_replace('\\', '/', $i); }, $list);
 
 				if (in_array($fullPath . $suffix, $list)) {
-					return $fullPath . $suffix;
+					return static::$_cachedPaths[$class] = $fullPath . $suffix;
 				}
 				return is_dir($fullPath) ? $fullPath : null;
 			}
-			return $fullPath . $suffix;
+			return static::$_cachedPaths[$class] = $fullPath . $suffix;
 		}
 	}
 
@@ -394,6 +394,27 @@ class Libraries {
 		if ($result = static::_locateDeferred(true, $paths, $params, $options)) {
 			return (static::$_cachedPaths[$ident] = $result);
 		}
+	}
+
+	/**
+	 * Returns or sets the the class path cache used for mapping class names to file paths, or
+	 * locating classes using `Libraries::locate()`.
+	 *
+	 * @param array $cache An array of keys and values to use when pre-populating the cache. Keys
+	 *              are either class names (which match to file paths as values), or dot-separated
+	 *              lookup paths used by `locate()` (which matches to either a single class or an
+	 *              array of classes). If `false`, the cache is cleared.
+	 * @return array Returns an array of cached class lookups, formatted per the description for
+	 *         `$cache`.
+	 */
+	public static function cache($cache = null) {
+		if ($cache === false) {
+			static::$_cachedPaths = array();
+		}
+		if (is_array($cache)) {
+			static::$_cachedPaths += $cache;
+		}
+		return static::$_cachedPaths;
 	}
 
 	/**

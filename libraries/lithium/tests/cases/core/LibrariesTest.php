@@ -141,9 +141,12 @@ class LibrariesTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testPathCaching() {
+		$this->assertFalse(Libraries::cache(false));
 		$path = Libraries::path(__CLASS__);
-		$result = Libraries::path(__CLASS__);
-		$this->assertEqual($path, $result);
+		$this->assertEqual(__FILE__, $path);
+
+		$result = Libraries::cache();
+		$this->assertEqual($result[__CLASS__], __FILE__);
 	}
 
 	/**
@@ -266,6 +269,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testCaseSensitivePathLookups() {
+		Libraries::cache(false);
 		$library = Libraries::get('lithium');
 		$base = $library['path'] . '/';
 
