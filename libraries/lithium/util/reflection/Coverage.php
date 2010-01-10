@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\util\reflection;
+namespace lithium\analysis;
 
 use \lithium\util\reflection\Parser;
 

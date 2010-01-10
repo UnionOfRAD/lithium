@@ -1201,171 +1201,163 @@ msgstr ""
 msgid "mixed Returns void if `stream_encoding` method does not exist, boolean\n        result of `stream_encoding` otherwise."
 msgstr ""
 
-#. lithium\util\reflection\Coverage
-msgid "Runs documentation coverage analysis for classes, properties and methods.\n\nNote: Currently unimplemented"
-msgstr ""
-
-#. lithium\util\reflection\Coverage::check()
-msgid "Currently unimplemented"
-msgstr ""
-
-#. lithium\util\reflection\Docblock
+#. lithium\analysis\Docblock
 msgid "A source code doc block parser.\n\nThis parser may be used as the basis for a variety of secondary tools, including\na reflection-based API generator, a code metrics analyzer, and various other possible\nuse cases."
 msgstr ""
 
-#. lithium\util\reflection\Docblock::comment()
+#. lithium\analysis\Docblock::comment()
 msgid "Parses a doc block into its major components of `description`, `text` and `tags`."
 msgstr ""
 
-#. lithium\util\reflection\Docblock::comment()
+#. lithium\analysis\Docblock::comment()
 msgid "array An associative array of the parsed comment, whose keys are `description`,\n        `text` and `tags`"
 msgstr ""
 
-#. lithium\util\reflection\Docblock::parse()
+#. lithium\analysis\Docblock::parse()
 msgid "Parses @<tagname> and their descriptions from a doc block."
 msgstr ""
 
-#. lithium\util\reflection\Docblock::parse()
+#. lithium\analysis\Docblock::parse()
 msgid "Currently supported tags are `todo`, `discuss`, `fix` and `important`."
 msgstr ""
 
-#. lithium\util\reflection\Docblock::parse()
+#. lithium\analysis\Docblock::parse()
 msgid "array A numerically indexed array of a associative arrays, with `type`, `text`\n        and `line` keys."
 msgstr ""
 
-#. lithium\util\reflection\Docblock::parse()
+#. lithium\analysis\Docblock::parse()
 msgid "The string to be parsed for tags"
 msgstr ""
 
-#. lithium\util\reflection\Docblock::parse()
+#. lithium\analysis\Docblock::parse()
 msgid "Options array."
 msgstr ""
 
-#. lithium\util\reflection\Inspector
+#. lithium\analysis\Inspector
 msgid "General source code inspector\n\nThis inspector provides a simple interface to the PHP Reflection API that\ncan be used to gather information about any PHP source file for purposes of\ntest metrics, static analysis or any number of possible use cases."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::type()
+#. lithium\analysis\Inspector::type()
 msgid "Determines if a given $identifier is a class property, a class method, a class itself,\nor a namespace identifier."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::type()
+#. lithium\analysis\Inspector::type()
 msgid "string Identifier type. One of `property`, `method`, `class` or `namespace`."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::info()
+#. lithium\analysis\Inspector::info()
 msgid "Detailed source code identifier analysis"
 msgstr ""
 
-#. lithium\util\reflection\Inspector::info()
+#. lithium\analysis\Inspector::info()
 msgid "Analyzes a passed $identifier for more detailed information such\nas method/property modifiers (e.g. `public`, `private`, `abstract`)"
 msgstr ""
 
-#. lithium\util\reflection\Inspector::info()
+#. lithium\analysis\Inspector::info()
 msgid "array An array of the parsed meta-data information of the given identifier."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::info()
+#. lithium\analysis\Inspector::info()
 msgid "The identifier to be analyzed"
 msgstr ""
 
-#. lithium\util\reflection\Inspector::info()
+#. lithium\analysis\Inspector::info()
 msgid "Optionally restrict or expand the default information\n       returned from the `info` method. By default, the information returned\n       is the same as the array keys contained in the `$_methodMap` property of\n       Inspector."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::executable()
+#. lithium\analysis\Inspector::executable()
 msgid "Gets the executable lines of a class, by examining the start and end lines of each method."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::executable()
+#. lithium\analysis\Inspector::executable()
 msgid "array Returns an array of the executable line numbers of the class."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::executable()
+#. lithium\analysis\Inspector::executable()
 msgid "Class name as a string or object instance."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::executable()
+#. lithium\analysis\Inspector::executable()
 msgid "Set of options:\n       -'self': If true (default), only returns lines of methods defined in `$class`,\n        excluding methods from inherited classes.\n       -'methods': An arbitrary list of methods to search, as a string (single method name)\n        or array of method names.\n       -'filter': If true, filters out lines containing only whitespace or braces. Note: for\n        some reason, the Zend engine does not report `switch` and `try` statements as\n        executable lines, as well as parts of multi-line assignment statements, so they are\n        filtered out as well."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::methods()
+#. lithium\analysis\Inspector::methods()
 msgid "Returns various information on the methods of an object, in different formats."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::methods()
+#. lithium\analysis\Inspector::methods()
 msgid "A string class name or an object instance, from which to get methods."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::methods()
+#. lithium\analysis\Inspector::methods()
 msgid "The type and format of data to return. Available options are:\n\n - `null`: Returns a `Collection` object containing a `ReflectionMethod` instance\n        for each method.\n\n - `'extents'`: Returns a two-dimensional array with method names as keys, and\n        an array with starting and ending line numbers as values.\n\n - `'ranges'`: Returns a two-dimensional array where each key is a method name,\n        and each value is an array of line numbers which are contained in the method."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::lines()
+#. lithium\analysis\Inspector::lines()
 msgid "Returns an array of lines from a file, class, or arbitrary string, where $data is the data\nto read the lines from and $lines is an array of line numbers specifying which lines should\nbe read."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::lines()
+#. lithium\analysis\Inspector::lines()
 msgid "array Returns an array where the keys are matching `$lines`, and the values are the\n        corresponding line numbers in `$data`."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::lines()
+#. lithium\analysis\Inspector::lines()
 msgid "If `$data` contains newlines, it will be read from directly, and have\n       its own lines returned.  If `$data` is a physical file path, that file will be\n       read and have its lines returned.  If `$data` is a class name, it will be\n       converted into a physical file path and read."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::lines()
+#. lithium\analysis\Inspector::lines()
 msgid "The array of lines to read. If a given line is not present in the data,\n       it will be silently ignored."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::parents()
+#. lithium\analysis\Inspector::parents()
 msgid "Gets the full inheritance list for the given class."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::parents()
+#. lithium\analysis\Inspector::parents()
 msgid "array An array of the name of the parent classes of the passed `$class` parameter,\n        or false on error."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::parents()
+#. lithium\analysis\Inspector::parents()
 msgid "Class whose inheritance chain will be returned"
 msgstr ""
 
-#. lithium\util\reflection\Inspector::parents()
+#. lithium\analysis\Inspector::parents()
 msgid "Option consists of:\n       -'autoLoad': Whether or not to call __autoload by default. Defaults to true."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::classes()
+#. lithium\analysis\Inspector::classes()
 msgid "Gets an array of classes and their corresponding definition files, or examines a file and\nreturns the classes it defines."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::classes()
+#. lithium\analysis\Inspector::classes()
 msgid "array Associative of classes and their corresponding definition files"
 msgstr ""
 
-#. lithium\util\reflection\Inspector::dependencies()
+#. lithium\analysis\Inspector::dependencies()
 msgid "Gets the static and dynamic dependencies for a class or group of classes."
 msgstr ""
 
-#. lithium\util\reflection\Inspector::dependencies()
+#. lithium\analysis\Inspector::dependencies()
 msgid "array An array of the static and dynamic class dependencies"
 msgstr ""
 
-#. lithium\util\reflection\Inspector::dependencies()
+#. lithium\analysis\Inspector::dependencies()
 msgid "Either a string specifying a class, or a numerically indexed array\n       of classes"
 msgstr ""
 
-#. lithium\util\reflection\Parser::token()
+#. lithium\analysis\Parser::token()
 msgid "Convenience method to get the token name of a PHP code string. If multiple tokens are\npresent in the string, only the first is returned."
 msgstr ""
 
-#. lithium\util\reflection\Parser::token()
+#. lithium\analysis\Parser::token()
 msgid "String of PHP code to get the token name of, i.e. `'=>'` or `'static'`."
 msgstr ""
 
-#. lithium\util\reflection\Parser::find()
+#. lithium\analysis\Parser::find()
 msgid "Finds a pattern in a block of code."
 msgstr ""
 
-#. lithium\util\reflection\Parser::find()
+#. lithium\analysis\Parser::find()
 msgid "The list of options to be used when parsing / matching `$code`:\n\n - 'ignore': An array of token names to ignore while parsing, defaults to\n              `array('T_WHITESPACE')`\n\n - 'lineBreaks': If true, all tokens in a single pattern match must appear on the\n               same line of code, defaults to false\n\n - 'startOfLine': If true, the pattern must match starting with the beginning of\n               the line of code to be matched, defaults to false"
 msgstr ""
 

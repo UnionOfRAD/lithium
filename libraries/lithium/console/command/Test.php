@@ -11,7 +11,7 @@ namespace lithium\console\command;
 use \lithium\core\Libraries;
 use \lithium\test\Group;
 use \lithium\test\Dispatcher;
-use \lithium\util\reflection\Inspector;
+use \lithium\analysis\Inspector;
 
 /**
  * Runs a given set unit tests and outputs the results.

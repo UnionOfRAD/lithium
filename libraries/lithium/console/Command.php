@@ -10,9 +10,9 @@ namespace lithium\console;
 
 use \Exception;
 use \ReflectionClass;
-use \lithium\util\Inflector;
-use \lithium\util\reflection\Docblock;
 use \lithium\core\Libraries;
+use \lithium\util\Inflector;
+use \lithium\analysis\Docblock;
 
 /**
  * The base class to inherit when writing console scripts in Lithium.
