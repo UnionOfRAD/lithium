@@ -364,22 +364,22 @@ class Set {
 	public static function merge($arr1, $arr2 = null) {
 		$args = func_get_args();
 
-		if (!isset($r)) {
-			$r = (array) current($args);
+		if (!isset($result)) {
+			$result = (array) current($args);
 		}
 
 		while (($arg = next($args)) !== false) {
-			foreach ((array) $arg as $key => $val)	 {
-				if (is_array($val) && isset($r[$key]) && is_array($r[$key])) {
-					$r[$key] = static::merge($r[$key], $val);
+			foreach ((array) $arg as $key => $val) {
+				if (is_array($val) && isset($result[$key]) && is_array($result[$key])) {
+					$result[$key] = static::merge($result[$key], $val);
 				} elseif (is_int($key)) {
-					$r[] = $val;
+					$result[] = $val;
 				} else {
-					$r[$key] = $val;
+					$result[$key] = $val;
 				}
 			}
 		}
-		return $r;
+		return $result;
 	}
 
 	/**
