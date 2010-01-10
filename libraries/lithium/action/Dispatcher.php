@@ -15,13 +15,18 @@ use \lithium\core\Libraries;
 use \lithium\core\Environment;
 
 /**
- * `Dispatcher` is the outermost layer of the framework (including app), responsible for both
- * receiving the initial http request and sending back the response at the end of the cycle.
+ * `Dispatcher` is the outermost layer of the framework, responsible for both receiving the initial
+ * HTTP request and sending back a response at the end of the request's life cycle.
  *
- * After interpreting the request and making a `Request` instance, it initiates the correct
- * `Controller` and passes it the `Request` object. When the `Controller` returns a `Response`,
+ * After either receiving or instantiating a `Request` object instance, the `Dispatcher` passes that
+ * instance to the `Router`, which produces the parameters necessary to dispatch the request
+ * (unless no route matches, in which case an exception is thrown).
+ *
+ * Using these parameters, the `Dispatcher` loads and instantiates the correct `Controller` object,
+ * and passes it the `Request` object instance. The `Controller` returns a `Response` object to the
  * `Dispatcher`, where the headers and content are rendered and sent to the browser.
  *
+ * @see lithium\http\Router
  * @see lithium\action\Request
  * @see lithium\action\Response
  * @see lithium\action\Controller

@@ -11,9 +11,18 @@ namespace lithium\action;
 use \lithium\util\Validator;
 
 /**
- * Request is responsible for identifying and storing all the information about the http request.
+ * A `Request` object is passed into or instantiated by the `Dispatcher`, and is responsible for
+ * identifying and storing all the information about an HTTP request made to an application,
+ * including status, headers, and any GET, POST or PUT data, as well as any data returned from the
+ * `Router`, after the `Request` object has been matched against a `Route`. Includes a property
+ * accessor method (`__get()`) which allows any parameters returned from routing to be accessed as
+ * properties of the `Request` object.
  *
  * @see lithium\action\Dispatcher
+ * @see lithium\action\Controller
+ * @see lithium\http\Router
+ * @see lithium\http\Route
+ * @see lithium\action\Request::__get()
  */
 class Request extends \lithium\core\Object {
 
