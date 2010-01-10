@@ -117,22 +117,6 @@ class Set {
 	}
 
 	/**
-	 * Filters empty elements out of an array, excluding `'0'`.  Also accepts
-	 * non array types.
-	 *
-	 * @param mixed $data Either an array to filter, or an arbitrary value.
-	 * @return array Filtered array.
-	 */
-	public static function filter($data) {
-		if (!is_array($data)) {
-			$data = array($data);
-		}
-		return array_filter($data, function($data) {
-			return ($data === 0 || $data === '0' || !empty($data));
-		});
-	}
-
-	/**
 	 * Returns a series of values extracted from an array, formatted in a format string.
 	 *
 	 * @param array $data Source array from which to extract the data.
@@ -434,17 +418,23 @@ class Set {
 		if (empty($data)) {
 			return array();
 		}
+
 		if (is_string($data)) {
 			$tmp = $path;
 			$path = $data;
 			$data = $tmp;
 			unset($tmp);
 		}
+
 		if ($path === '/') {
-			return static::filter($data);
+			return array_filter($data, function($data) {
+				return ($data === 0 || $data === '0' || !empty($data));
+			});
 		}
+
 		$contexts = $data;
 		$options = array_merge(array('flatten' => true), $options);
+
 		if (!isset($contexts[0])) {
 			$contexts = array($data);
 		}
