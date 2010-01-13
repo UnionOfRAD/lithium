@@ -6,9 +6,9 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\util\reflection;
+namespace lithium\tests\cases\analysis;
 
-use \lithium\util\reflection\Docblock;
+use \lithium\analysis\Docblock;
 
 class DocblockTest extends \lithium\test\Unit {
 

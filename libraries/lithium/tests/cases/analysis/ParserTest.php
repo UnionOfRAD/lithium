@@ -6,9 +6,9 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\util\reflection;
+namespace lithium\tests\cases\analysis;
 
-use \lithium\util\reflection\Parser;
+use \lithium\analysis\Parser;
 
 class ParserTest extends \lithium\test\Unit {
 
@@ -106,7 +106,7 @@ class ParserTest extends \lithium\test\Unit {
 	}
 
 	public function testFindingTokenPatterns() {
-		$code = file_get_contents(\lithium\core\Libraries::path('lithium\util\reflection\Parser'));
+		$code = file_get_contents(\lithium\core\Libraries::path('lithium\analysis\Parser'));
 
 		$expected = array('tokenize', 'matchToken', '_prepareMatchParams', 'token');
 		$results = array_values(array_unique(array_map(function($i) { return $i[0]; }, Parser::find(

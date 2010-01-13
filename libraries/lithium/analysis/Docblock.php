@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\util\reflection;
+namespace lithium\analysis;
 
 /**
  * A source code doc block parser.
@@ -78,7 +78,7 @@ class Docblock extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Parses @<tagname> and their descriptions from a doc block.
+	 * Parses `@<tagname>` docblock tags and their descriptions from a docblock.
 	 *
 	 * Currently supported tags are `todo`, `discuss`, `fix` and `important`.
 	 *

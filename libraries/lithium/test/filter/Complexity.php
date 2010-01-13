@@ -8,8 +8,8 @@
 
 namespace lithium\test\filter;
 
-use \lithium\util\reflection\Parser;
-use \lithium\util\reflection\Inspector;
+use \lithium\analysis\Parser;
+use \lithium\analysis\Inspector;
 
 /**
  * Calculates the cyclomatic complexity of class methods, and shows worst-offenders and statistics.

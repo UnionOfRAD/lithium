@@ -6,12 +6,12 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\util\reflection;
+namespace lithium\tests\cases\analysis;
 
 use \ReflectionClass;
 use \ReflectionMethod;
-use \lithium\util\reflection\Inspector;
 use \lithium\core\Libraries;
+use \lithium\analysis\Inspector;
 
 class InspectorTest extends \lithium\test\Unit {
 
@@ -27,7 +27,7 @@ class InspectorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testBasicMethodInspection() {
-		$class = '\lithium\util\reflection\Inspector';
+		$class = '\lithium\analysis\Inspector';
 		$parent = '\lithium\core\StaticObject';
 
 		$expected = array_diff(get_class_methods($class), get_class_methods($parent));
@@ -136,8 +136,8 @@ class InspectorTest extends \lithium\test\Unit {
 	 */
 	public function testTypeDetection() {
 		$this->assertEqual('namespace', Inspector::type('\lithium\util'));
-		$this->assertEqual('namespace', Inspector::type('\lithium\util\reflection'));
-		$this->assertEqual('class', Inspector::type('\lithium\util\reflection\Inspector'));
+		$this->assertEqual('namespace', Inspector::type('\lithium\analysis'));
+		$this->assertEqual('class', Inspector::type('\lithium\analysis\Inspector'));
 		$this->assertEqual('property', Inspector::type('Inspector::$_classes'));
 		$this->assertEqual('method', Inspector::type('Inspector::type'));
 		$this->assertEqual('method', Inspector::type('Inspector::type()'));
@@ -155,27 +155,27 @@ class InspectorTest extends \lithium\test\Unit {
 
 		$this->assertNull(Inspector::info('\lithium\util'));
 
-		$result = Inspector::info('\lithium\util\reflection\Inspector');
+		$result = Inspector::info('\lithium\analysis\Inspector');
 		$this->assertTrue(strpos(
 			str_replace('\\', '/', $result['file']),
-			'lithium/util/reflection/Inspector.php'
+			'lithium/analysis/Inspector.php'
 		));
-		$this->assertEqual('lithium\util\reflection', $result['namespace']);
+		$this->assertEqual('lithium\analysis', $result['namespace']);
 		$this->assertEqual('Inspector', $result['shortName']);
 
-		$result = Inspector::info('\lithium\util\reflection\Inspector::$_methodMap');
+		$result = Inspector::info('\lithium\analysis\Inspector::$_methodMap');
 		$this->assertEqual('_methodMap', $result['name']);
 
 		$expected = 'Maps reflect method names to result array keys.';
 		$this->assertEqual($expected, $result['description']);
 		$this->assertEqual(array('var' => 'array'), $result['tags']);
 
-		$result = Inspector::info('\lithium\util\reflection\Inspector::info()', array(
+		$result = Inspector::info('\lithium\analysis\Inspector::info()', array(
 			'modifiers', 'namespace', 'foo'
 		));
 		$this->assertEqual(array('modifiers', 'namespace'), array_keys($result));
 
-		$this->assertNull(Inspector::info('\lithium\util\reflection\Inspector::$foo'));
+		$this->assertNull(Inspector::info('\lithium\analysis\Inspector::$foo'));
 	}
 
 	public function testClassDependencies() {

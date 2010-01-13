@@ -9,7 +9,7 @@
 namespace lithium\console\command\build;
 
 use \lithium\core\Libraries;
-use \lithium\util\reflection\Inspector;
+use \lithium\analysis\Inspector;
 
 /**
  * Build test cases or mocks in a namespace for a class.

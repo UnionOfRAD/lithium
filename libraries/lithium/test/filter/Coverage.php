@@ -11,7 +11,7 @@ namespace lithium\test\filter;
 use \lithium\core\Libraries;
 use \lithium\util\String;
 use \lithium\util\Collection;
-use \lithium\util\reflection\Inspector;
+use \lithium\analysis\Inspector;
 
 /**
  * Runs code coverage analysis for the executed tests.

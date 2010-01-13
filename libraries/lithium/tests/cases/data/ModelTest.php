@@ -8,15 +8,15 @@
 
 namespace lithium\tests\cases\data;
 
-use \lithium\util\reflection\Inspector;
-use \lithium\data\Connections;
 use \lithium\data\Model;
+use \lithium\data\Connections;
+use \lithium\analysis\Inspector;
 use \lithium\tests\mocks\data\MockPost;
-use \lithium\tests\mocks\data\MockPostForValidates;
 use \lithium\tests\mocks\data\MockComment;
 use \lithium\tests\mocks\data\MockTag;
 use \lithium\tests\mocks\data\MockTagging;
 use \lithium\tests\mocks\data\MockCreator;
+use \lithium\tests\mocks\data\MockPostForValidates;
 
 class ModelTest extends \lithium\test\Unit {
 

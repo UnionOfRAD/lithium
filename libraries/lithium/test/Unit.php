@@ -12,7 +12,7 @@ use \Exception;
 use \lithium\util\String;
 use \lithium\util\Validator;
 use \lithium\analysis\Debugger;
-use \lithium\util\reflection\Inspector;
+use \lithium\analysis\Inspector;
 use \RecursiveDirectoryIterator;
 use \RecursiveIteratorIterator;
 
@@ -615,7 +615,7 @@ class Unit extends \lithium\core\Object {
 			if (isset($scopedFrame)) {
 				break;
 			}
-			if (!class_exists('lithium\util\reflection\Inspector')) {
+			if (!class_exists('lithium\analysis\Inspector')) {
 				continue;
 			}
 			if (isset($frame['class']) && in_array($frame['class'], Inspector::parents($this))) {
