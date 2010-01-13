@@ -117,22 +117,6 @@ class Set {
 	}
 
 	/**
-	 * Filters empty elements out of an array, excluding `'0'`.  Also accepts
-	 * non array types.
-	 *
-	 * @param mixed $data Either an array to filter, or an arbitrary value.
-	 * @return array Filtered array.
-	 */
-	public static function filter($data) {
-		if (!is_array($data)) {
-			$data = array($data);
-		}
-		return array_filter($data, function($data) {
-			return ($data === 0 || $data === '0' || !empty($data));
-		});
-	}
-
-	/**
 	 * Returns a series of values extracted from an array, formatted in a format string.
 	 *
 	 * @param array $data Source array from which to extract the data.
@@ -364,22 +348,22 @@ class Set {
 	public static function merge($arr1, $arr2 = null) {
 		$args = func_get_args();
 
-		if (!isset($r)) {
-			$r = (array) current($args);
+		if (!isset($result)) {
+			$result = (array) current($args);
 		}
 
 		while (($arg = next($args)) !== false) {
-			foreach ((array) $arg as $key => $val)	 {
-				if (is_array($val) && isset($r[$key]) && is_array($r[$key])) {
-					$r[$key] = static::merge($r[$key], $val);
+			foreach ((array) $arg as $key => $val) {
+				if (is_array($val) && isset($result[$key]) && is_array($result[$key])) {
+					$result[$key] = static::merge($result[$key], $val);
 				} elseif (is_int($key)) {
-					$r[] = $val;
+					$result[] = $val;
 				} else {
-					$r[$key] = $val;
+					$result[$key] = $val;
 				}
 			}
 		}
-		return $r;
+		return $result;
 	}
 
 	/**
@@ -434,17 +418,23 @@ class Set {
 		if (empty($data)) {
 			return array();
 		}
+
 		if (is_string($data)) {
 			$tmp = $path;
 			$path = $data;
 			$data = $tmp;
 			unset($tmp);
 		}
+
 		if ($path === '/') {
-			return static::filter($data);
+			return array_filter($data, function($data) {
+				return ($data === 0 || $data === '0' || !empty($data));
+			});
 		}
+
 		$contexts = $data;
 		$options = array_merge(array('flatten' => true), $options);
+
 		if (!isset($contexts[0])) {
 			$contexts = array($data);
 		}

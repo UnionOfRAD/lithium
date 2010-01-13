@@ -188,7 +188,7 @@ class SetTest extends \lithium\test\Unit {
 					'title' => 'Second Post',
 					'body' => 'Second Post Body'
 				),
-				'Author' => array('id' => '3', 'user' => 'larry', 'password' => null),
+				'Author' => array('id' => '3', 'user' => 'joel', 'password' => null),
 			)
 		);
 
@@ -197,7 +197,7 @@ class SetTest extends \lithium\test\Unit {
 			'0.Author.id' => '1', '0.Author.user' => 'nate', '0.Author.password' => 'foo',
 			'1.Post.id' => '2', '1.Post.author_id' => '3', '1.Post.title' => 'Second Post',
 			'1.Post.body' => 'Second Post Body', '1.Author.id' => '3',
-			'1.Author.user' => 'larry', '1.Author.password' => null
+			'1.Author.user' => 'joel', '1.Author.password' => null
 		);
 		$result = Set::flatten($data);
 		$this->assertEqual($expected, $result);
@@ -205,25 +205,6 @@ class SetTest extends \lithium\test\Unit {
 		$result = Set::flatten(array('Post' => $data[0]['Post']), '/');
 		$expected = array('Post/id' => '1', 'Post/author_id' => '1', 'Post/title' => 'First Post');
 		$this->assertEqual($expected, $result);
-	}
-
-	/**
-	 * testFilter method
-	 *
-	 * @return void
-	 */
-	public function testFilter() {
-		$expected = array('one');
-		$result = Set::filter('one');
-		$this->assertIdentical($expected, $result);
-
-		$expected = array('0', 2 => true, 3 => 0, 4 => array(
-			'one thing', 'I can tell you', 'is you got to be', false
-		));
-		$result = Set::filter(array('0', false, true, 0, array(
-			'one thing', 'I can tell you', 'is you got to be', false
-		)));
-		$this->assertIdentical($expected, $result);
 	}
 
 	/**
@@ -235,11 +216,11 @@ class SetTest extends \lithium\test\Unit {
 		$data = array(
 			array('Person' => array(
 				'first_name' => 'Nate', 'last_name' => 'Abele',
-				'city' => 'Boston', 'state' => 'MA', 'something' => '42'
+				'city' => 'Queens', 'state' => 'NY', 'something' => '42'
 			)),
 			array('Person' => array(
-				'first_name' => 'Larry', 'last_name' => 'Masters',
-				'city' => 'Boondock', 'state' => 'TN', 'something' => '{0}'
+				'first_name' => 'Joel', 'last_name' => 'Perras',
+				'city' => 'Montreal', 'state' => 'Quebec', 'something' => '{0}'
 			)),
 			array('Person' => array(
 				'first_name' => 'Garrett', 'last_name' => 'Woodworth',
@@ -248,18 +229,18 @@ class SetTest extends \lithium\test\Unit {
 		);
 
 		$result = Set::format($data, '{1}, {0}', array('/Person/first_name', '/Person/last_name'));
-		$expected = array('Abele, Nate', 'Masters, Larry', 'Woodworth, Garrett');
+		$expected = array('Abele, Nate', 'Perras, Joel', 'Woodworth, Garrett');
 		$this->assertEqual($expected, $result);
 
 		$result = Set::format($data, '{0}, {1}', array('/Person/last_name', '/Person/first_name'));
 		$this->assertEqual($expected, $result);
 
 		$result = Set::format($data, '{0}, {1}', array('/Person/city', '/Person/state'));
-		$expected = array('Boston, MA', 'Boondock, TN', 'Venice Beach, CA');
+		$expected = array('Queens, NY', 'Montreal, Quebec', 'Venice Beach, CA');
 		$this->assertEqual($expected, $result);
 
 		$result = Set::format($data, '{{0}, {1}}', array('/Person/city', '/Person/state'));
-		$expected = array('{Boston, MA}', '{Boondock, TN}', '{Venice Beach, CA}');
+		$expected = array('{Queens, NY}', '{Montreal, Quebec}', '{Venice Beach, CA}');
 		$this->assertEqual($expected, $result);
 
 		$result = Set::format($data, '{{0}, {1}}', array(
@@ -283,13 +264,13 @@ class SetTest extends \lithium\test\Unit {
 		$result = Set::format($data, '%2$d, %1$s', array(
 			'/Person/first_name', '/Person/something'
 		));
-		$expected = array('42, Nate', '0, Larry', '0, Garrett');
+		$expected = array('42, Nate', '0, Joel', '0, Garrett');
 		$this->assertEqual($expected, $result);
 
 		$result = Set::format($data, '%1$s, %2$d', array(
 			'/Person/first_name', '/Person/something'
 		));
-		$expected = array('Nate, 42', 'Larry, 0', 'Garrett, 0');
+		$expected = array('Nate, 42', 'Joel, 0', 'Garrett, 0');
 		$this->assertEqual($expected, $result);
 	}
 
@@ -1313,7 +1294,7 @@ class SetTest extends \lithium\test\Unit {
 			array('User' => array('id' => 2, 'group_id' => 1,
 				'Data' => array('user' => 'mariano.iglesias','name' => 'Mariano Iglesias'))),
 			array('User' => array('id' => 14, 'group_id' => 2,
-				'Data' => array('user' => 'phpnut', 'name' => 'Larry E. Masters'))),
+				'Data' => array('user' => 'jperras', 'name' => 'Joel Perras'))),
 			array('User' => array('id' => 25, 'group_id' => 1,
 				'Data' => array('user' => 'gwoo','name' => 'The Gwoo'))));
 		$result = Set::combine($a, '/User/id');
@@ -1327,14 +1308,14 @@ class SetTest extends \lithium\test\Unit {
 		$result = Set::combine($a, '/User/id', '/User/Data/.');
 		$expected = array(
 			2 => array('user' => 'mariano.iglesias', 'name' => 'Mariano Iglesias'),
-			14 => array('user' => 'phpnut',	'name' => 'Larry E. Masters'),
-			25 => array('user' => 'gwoo',	'name' => 'The Gwoo'));
+			14 => array('user' => 'jperras', 'name' => 'Joel Perras'),
+			25 => array('user' => 'gwoo', 'name' => 'The Gwoo'));
 		$this->assertIdentical($expected, $result);
 
 		$result = Set::combine($a, '/User/id', '/User/Data/name/.');
 		$expected = array(
 			2 => 'Mariano Iglesias',
-			14 => 'Larry E. Masters',
+			14 => 'Joel Perras',
 			25 => 'The Gwoo');
 		$this->assertIdentical($expected, $result);
 
@@ -1344,7 +1325,7 @@ class SetTest extends \lithium\test\Unit {
 				2 => array('user' => 'mariano.iglesias', 'name' => 'Mariano Iglesias'),
 				25 => array('user' => 'gwoo', 'name' => 'The Gwoo')),
 			2 => array(
-				14 => array('user' => 'phpnut', 'name' => 'Larry E. Masters')));
+				14 => array('user' => 'jperras', 'name' => 'Joel Perras')));
 		$this->assertIdentical($expected, $result);
 
 		$result = Set::combine($a, '/User/id', '/User/Data/name/.', '/User/group_id');
@@ -1353,7 +1334,7 @@ class SetTest extends \lithium\test\Unit {
 				2 => 'Mariano Iglesias',
 				25 => 'The Gwoo'),
 			2 => array(
-				14 => 'Larry E. Masters'));
+				14 => 'Joel Perras'));
 		$this->assertIdentical($expected, $result);
 
 		$result = Set::combine(
@@ -1364,7 +1345,7 @@ class SetTest extends \lithium\test\Unit {
 		);
 		$expected = array(
 			1 => array(2 => 'mariano.iglesias: Mariano Iglesias', 25 => 'gwoo: The Gwoo'),
-			2 => array(14 => 'phpnut: Larry E. Masters')
+			2 => array(14 => 'jperras: Joel Perras')
 		);
 		$this->assertIdentical($expected, $result);
 
@@ -1375,7 +1356,7 @@ class SetTest extends \lithium\test\Unit {
 		);
 		$expected = array(
 			'mariano.iglesias: Mariano Iglesias' => 2,
-			'phpnut: Larry E. Masters' => 14,
+			'jperras: Joel Perras' => 14,
 			'gwoo: The Gwoo' => 25
 		);
 		$this->assertIdentical($expected, $result);
@@ -1387,7 +1368,7 @@ class SetTest extends \lithium\test\Unit {
 		);
 		$expected = array(
 			'Mariano Iglesias: mariano.iglesias' => 2,
-			'Larry E. Masters: phpnut' => 14,
+			'Joel Perras: jperras' => 14,
 			'The Gwoo: gwoo' => 25
 		);
 		$this->assertIdentical($expected, $result);
@@ -1397,7 +1378,7 @@ class SetTest extends \lithium\test\Unit {
 		);
 		$expected = array(
 			'mariano.iglesias: 2' => 'Mariano Iglesias',
-			'phpnut: 14' => 'Larry E. Masters',
+			'jperras: 14' => 'Joel Perras',
 			'gwoo: 25' => 'The Gwoo'
 		);
 		$this->assertIdentical($expected, $result);
@@ -1407,7 +1388,7 @@ class SetTest extends \lithium\test\Unit {
 		);
 		$expected = array(
 			'2: mariano.iglesias' => 'Mariano Iglesias',
-			'14: phpnut' => 'Larry E. Masters',
+			'14: jperras' => 'Joel Perras',
 			'25: gwoo' => 'The Gwoo'
 		);
 		$this->assertIdentical($expected, $result);
@@ -1420,7 +1401,7 @@ class SetTest extends \lithium\test\Unit {
 				)
 			)),
 			array('User' => array('id' => 14, 'group_id' => 2, 'Data' => array(
-				'user' => 'phpnut', 'name' => 'Larry E. Masters'
+				'user' => 'jperras', 'name' => 'Joel Perras'
 			))),
 			array('User' => array('id' => 25, 'group_id' => 1, 'Data' => array(
 				'user' => 'gwoo','name' => 'The Gwoo'
@@ -1957,7 +1938,7 @@ class SetTest extends \lithium\test\Unit {
 					'updated' => '2007-03-18 10:43:31'
 				),
 				'Author' => array(
-					'id' => '3', 'user' => 'larry',
+					'id' => '3', 'user' => 'joel',
 					'password' => '5f4dcc3b5aa765d61d8327deb882cf99',
 					'created' => '2007-03-17 01:20:23',
 					'updated' => '2007-03-17 01:22:31',
@@ -1997,7 +1978,7 @@ class SetTest extends \lithium\test\Unit {
 
 		$expected2->Author = new \stdClass;
 		$expected2->Author->id = '3';
-		$expected2->Author->user = 'larry';
+		$expected2->Author->user = 'joel';
 		$expected2->Author->password = '5f4dcc3b5aa765d61d8327deb882cf99';
 		$expected2->Author->created = "2007-03-17 01:20:23";
 		$expected2->Author->updated = "2007-03-17 01:22:31";

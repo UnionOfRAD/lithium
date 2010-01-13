@@ -11,8 +11,12 @@ namespace lithium\action;
 use \Exception;
 
 /**
- * The `Response` instance is what the `Controller` returns to the `Dispatcher` as the product
- * of the view layer. See related classes for more details.
+ * A `Response` object is typically instantiated automatically by the `Controller`. It is assigned
+ * any headers set in the course of the request, as well as any content rendered by the
+ * `Controller`. Once completed, the `Controller` returns the `Response` object to the `Dispatcher`.
+ *
+ * The `Response` object is responsible for writing its body content to output, and writing any
+ * headers to the browser.
  *
  * @see lithium\action\Dispatcher
  * @see lithium\action\Controller
@@ -72,9 +76,7 @@ class Response extends \lithium\http\Response {
 		if (isset($this->headers['location']) && $this->status['code'] === 200) {
 			$code = 302;
 		}
-		$status = $this->status($code);
-
-		if (!$status) {
+		if (!$status = $this->status($code)) {
 			throw new Exception('Invalid status code');
 		}
 
@@ -82,12 +84,11 @@ class Response extends \lithium\http\Response {
 
 		foreach ($this->headers as $name => $value) {
 			$key = strtolower($name);
+
 			if ($key == 'location') {
 				$this->_writeHeader("Location: {$value}", $this->status['code']);
 			} elseif ($key == 'download') {
-				$tmp = 'Content-Disposition: attachment;'
-				 	. ' filename="' . $value . '"';
-				$this->_writeHeader($tmp);
+				$this->_writeHeader('Content-Disposition: attachment; filename="' . $value . '"');
 			} elseif (is_array($value)) {
 				$this->_writeHeader(
 					array_map(function($v) use ($name) { return "{$name}: {$v}"; }, $value)
