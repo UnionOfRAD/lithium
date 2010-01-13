@@ -156,7 +156,7 @@ Libraries::add('app');
 // use lithium\util\Inflector;
 //
 // Validator::add('phone', Catalog::read('validation.phone', 'en_US'));
-// Inflector::rules('transliterations', Catalog::read('inflection.transliterations', 'en'));
+// Inflector::rules('transliteration', Catalog::read('inflection.transliterations', 'en'));
 
 /**
  * Your custom code goes here.
