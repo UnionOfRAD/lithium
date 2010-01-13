@@ -42,7 +42,7 @@ class CatalogInflectorTest extends \lithium\test\Unit {
 		Inflector::rules('transliterations', Catalog::read('inflection.transliterations', 'en'));
 
 		$result = Inflector::slug('this & that');
-		$expected = 'this_and_that';
+		$expected = 'this-and-that';
 		$this->assertEqual($expected, $result);
 
 		$data = array(
@@ -56,7 +56,7 @@ class CatalogInflectorTest extends \lithium\test\Unit {
 		Inflector::rules('transliterations', Catalog::read('inflection.transliterations', 'de'));
 
 		$result = Inflector::slug('this & that');
-		$expected = 'dhis_und_dhad';
+		$expected = 'dhis-und-dhad';
 		$this->assertEqual($expected, $result);
 	}
 }
