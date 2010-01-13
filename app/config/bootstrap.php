@@ -91,26 +91,22 @@ Libraries::add('app');
 // ));
 
 /*
- * Inflector configuration example.  If your application has custom singular or plural rules, or
+ * Inflector configuration examples.  If your application has custom singular or plural rules, or
  * extra non-ASCII characters to transliterate, you can configure that by uncommenting the lines
  * below.
  */
 // use lithium\util\Inflector;
 //
-// Inflector::rules("plural", array(
-// 	'/(s)tatus$/i' => '\1\2tatuses',
-// 	'/^(ox)$/i' => '\1\2en',
-// 	'/([m|l])ouse$/i' => '\1ice'
-// ));
+// Inflector::rules('singular', array('rules' => array('/rata/' => '\1ratus')));
+// Inflector::rules('singular', array('irregular' => array('foo' => 'bar')));
 //
-// Inflector::rules("uninflectedPlural", array('.*[nrlm]ese', '.*deer', '.*ois', '.*pox'));
+// Inflector::rules('plural', array('rules' => array('/rata/' => '\1ratum')));
+// Inflector::rules('plural', array('irregular' => array('bar' => 'foo')));
 //
-// Inflector::rules("irregularPlural", array('atlas' => 'atlases', 'brother' => 'brothers'));
+// Inflector::rules('transliteration', array('/É|Ê/' => 'E'));
 //
-// Inflector::rules("singular", array(
-// 	'/(s)tatuses$/i' => '\1\2tatus',
-// 	'/(matr)ices$/i' =>'\1ix','/(vert|ind)ices$/i'
-// ));
+// Inflector::rules('uninflected', 'bord');
+// Inflector::rules('uninflected', array('bord', 'baird'));
 
 /**
  * Globalization (g11n) catalog configuration.  The catalog allows for obtaining and
@@ -165,5 +161,5 @@ Libraries::add('app');
 /**
  * Your custom code goes here.
  */
- 
+
 ?>
