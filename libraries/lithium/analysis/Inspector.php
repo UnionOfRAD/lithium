@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\util\reflection;
+namespace lithium\analysis;
 
 use \Exception;
 use \ReflectionClass;
@@ -78,7 +78,6 @@ class Inspector extends \lithium\core\StaticObject {
 	 *        is the same as the array keys contained in the `$_methodMap` property of
 	 *        Inspector.
 	 * @return array An array of the parsed meta-data information of the given identifier.
-	 * @see lithium\util\reflection\Inspector
 	 */
 	public static function info($identifier, $info = array()) {
 		$info = $info ?: array_keys(static::$_methodMap);
@@ -131,6 +130,11 @@ class Inspector extends \lithium\core\StaticObject {
 					$setAccess = false;
 				}
 			}
+		}
+
+		if ($type == 'property') {
+			$inspector->setAccessible(true);
+			$result['value'] = $inspector->getValue($classInspector->newInstance());
 		}
 
 		if (isset($result['start']) && isset($result['end'])) {
