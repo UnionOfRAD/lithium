@@ -44,9 +44,10 @@ require __DIR__ . '/bootstrap/libraries.php';
 
 /**
  * This file contains your application's globalization rules, including inflections,
- * transliterations, localized validation, and how localized text should be loaded.
+ * transliterations, localized validation, and how localized text should be loaded. Uncomment this
+ * line if you plan to globalize your site.
  */
-require __DIR__ . '/bootstrap/g11n.php';
+// require __DIR__ . '/bootstrap/g11n.php';
 
 /**
  * This configures your session storage. The Cookie storage adapter must be connected first, since

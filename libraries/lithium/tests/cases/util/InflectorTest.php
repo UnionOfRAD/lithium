@@ -12,8 +12,8 @@ use \lithium\util\Inflector;
 
 class InflectorTest extends \lithium\test\Unit {
 
-	public function setUp() {
-		Inflector::__init();
+	public function tearDown() {
+		Inflector::reset();
 	}
 
 	/**
@@ -107,7 +107,7 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertNull(Inflector::rules('plural', array('/rata/' => '\1ratum')));
 		$this->assertEqual(Inflector::pluralize('errata'), $result);
 
-		Inflector::clear();
+		Inflector::reset();
 		$this->assertNotEqual(Inflector::pluralize('errata'), $result);
 	}
 
@@ -116,32 +116,32 @@ class InflectorTest extends \lithium\test\Unit {
 	 *
 	 * @return void
 	 */
-	public function testInflectorSlug() {
+	public function testInflectorReplace() {
 		$result = Inflector::slug('Foo Bar: Not just for breakfast any-more');
+		$expected = 'Foo-Bar-Not-just-for-breakfast-any-more';
+		$this->assertEqual($expected, $result);
+
+		$result = Inflector::slug('Foo Bar: Not just for breakfast any-more', '_');
 		$expected = 'Foo_Bar_Not_just_for_breakfast_any_more';
 		$this->assertEqual($expected, $result);
 
-		$result = Inflector::slug('this/is/a/path');
+		$result = Inflector::slug('this/is/a/path', '_');
 		$expected = 'this_is_a_path';
-		$this->assertEqual($expected, $result);
-
-		$result = Inflector::slug('Foo Bar: Not just for breakfast any-more', "-");
-		$expected = 'Foo-Bar-Not-just-for-breakfast-any-more';
 		$this->assertEqual($expected, $result);
 
 		$result = Inflector::slug('Foo Bar: Not just for breakfast any-more', "+");
 		$expected = 'Foo+Bar+Not+just+for+breakfast+any+more';
 		$this->assertEqual($expected, $result);
 
-		$result = Inflector::slug('Äpfel Über Öl grün ärgert groß öko', '-');
+		$result = Inflector::slug('Äpfel Über Öl grün ärgert groß öko');
 		$expected = 'Aepfel-Ueber-Oel-gruen-aergert-gross-oeko';
 		$this->assertEqual($expected, $result);
 
-		$result = Inflector::slug('The truth - and- more- news', '-');
+		$result = Inflector::slug('The truth - and- more- news');
 		$expected = 'The-truth-and-more-news';
 		$this->assertEqual($expected, $result);
 
-		$result = Inflector::slug('The truth: and more news', '-');
+		$result = Inflector::slug('The truth: and more news');
 		$expected = 'The-truth-and-more-news';
 		$this->assertEqual($expected, $result);
 
@@ -150,15 +150,15 @@ class InflectorTest extends \lithium\test\Unit {
 		$expected = 'La-langue-francaise-est-un-attribut-de-souverainete-en-France';
 		$this->assertEqual($expected, $result);
 
-		$result = Inflector::slug('!@$#exciting stuff! - what !@-# was that?', '-');
+		$result = Inflector::slug('!@$#exciting stuff! - what !@-# was that?');
 		$expected = 'exciting-stuff-what-was-that';
 		$this->assertEqual($expected, $result);
 
-		$result = Inflector::slug('20% of profits went to me!', '-');
+		$result = Inflector::slug('20% of profits went to me!');
 		$expected = '20-of-profits-went-to-me';
 		$this->assertEqual($expected, $result);
 
-		$result = Inflector::slug('#this melts your face1#2#3', '-');
+		$result = Inflector::slug('#this melts your face1#2#3');
 		$expected = 'this-melts-your-face1-2-3';
 		$this->assertEqual($expected, $result);
 	}
@@ -167,13 +167,13 @@ class InflectorTest extends \lithium\test\Unit {
 		$before = array(
 			Inflector::rules('singular'),
 			Inflector::rules('plural'),
-			Inflector::rules('transliterations')
+			Inflector::rules('transliteration')
 		);
 		$this->assertNull(Inflector::rules('foo'));
 		$this->assertIdentical($before, array(
 			Inflector::rules('singular'),
 			Inflector::rules('plural'),
-			Inflector::rules('transliterations')
+			Inflector::rules('transliteration')
 		));
 	}
 
@@ -183,7 +183,7 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertNull(Inflector::rules('singular', array('/rata/' => '\1ratus')));
 		$this->assertEqual(Inflector::singularize('errata'), $result);
 
-		Inflector::clear();
+		Inflector::reset();
 		$this->assertNotEqual(Inflector::singularize('errata'), $result);
 
 		$after = Inflector::rules('singular');
@@ -240,10 +240,10 @@ class InflectorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testVariableNaming() {
-		$this->assertEqual(Inflector::variable('test_field'), 'testField');
-		$this->assertEqual(Inflector::variable('test_fieLd'), 'testFieLd');
-		$this->assertEqual(Inflector::variable('test field'), 'testField');
-		$this->assertEqual(Inflector::variable('Test_field'), 'testField');
+		$this->assertEqual(Inflector::camelize('test_field', false), 'testField');
+		$this->assertEqual(Inflector::camelize('test_fieLd', false), 'testFieLd');
+		$this->assertEqual(Inflector::camelize('test field', false), 'testField');
+		$this->assertEqual(Inflector::camelize('Test_field', false), 'testField');
 	}
 
 	/**
@@ -286,24 +286,23 @@ class InflectorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testAddTransliterations() {
-		Inflector::__init();
 		$this->assertEqual(Inflector::slug('Montréal'), 'Montreal');
 		$this->assertNotEqual(Inflector::slug('Écaussines'), 'Ecaussines');
 
-		Inflector::rules('transliterations', array('/É|Ê/' => 'E'));
-		$this->assertEqual(Inflector::slug('Écaussines-d\'Enghien', '-'), 'Ecaussines-d-Enghien');
+		Inflector::rules('transliteration', array('/É|Ê/' => 'E'));
+		$this->assertEqual(Inflector::slug('Écaussines-d\'Enghien'), 'Ecaussines-d-Enghien');
 
 		$this->assertNotEqual(Inflector::slug('JØRGEN'), 'JORGEN');
-		Inflector::rules('transliterations', array('/Ø/' => 'O'));
+		Inflector::rules('transliteration', array('/Ø/' => 'O'));
 		$this->assertEqual(Inflector::slug('JØRGEN'), 'JORGEN');
 
 		$this->assertNotEqual(Inflector::slug('ÎÍ'), 'II');
-		Inflector::rules('transliterations', array('/Î|Í/' => 'I'));
+		Inflector::rules('transliteration', array('/Î|Í/' => 'I'));
 		$this->assertEqual(Inflector::slug('ÎÍ'), 'II');
 
 		$this->assertEqual(Inflector::slug('ABc'), 'ABc');
-		Inflector::rules('transliterations', array('AB' => 'a'));
-		Inflector::clear();
+		Inflector::rules('transliteration', array('AB' => 'a'));
+		Inflector::reset();
 		$this->assertEqual(Inflector::slug('ABc'), 'aac');
 	}
 

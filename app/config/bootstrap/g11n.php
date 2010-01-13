@@ -39,26 +39,22 @@ Message::applyFilter('translate', function($self, $params, $chain) {
 });
 
 /*
- * Inflector configuration example.  If your application has custom singular or plural rules, or
+ * Inflector configuration examples.  If your application has custom singular or plural rules, or
  * extra non-ASCII characters to transliterate, you can configure that by uncommenting the lines
  * below.
  */
 // use lithium\util\Inflector;
 //
-// Inflector::rules("plural", array(
-// 	'/(s)tatus$/i' => '\1\2tatuses',
-// 	'/^(ox)$/i' => '\1\2en',
-// 	'/([m|l])ouse$/i' => '\1ice'
-// ));
+// Inflector::rules('singular', array('rules' => array('/rata/' => '\1ratus')));
+// Inflector::rules('singular', array('irregular' => array('foo' => 'bar')));
 //
-// Inflector::rules("uninflectedPlural", array('.*[nrlm]ese', '.*deer', '.*ois', '.*pox'));
+// Inflector::rules('plural', array('rules' => array('/rata/' => '\1ratum')));
+// Inflector::rules('plural', array('irregular' => array('bar' => 'foo')));
 //
-// Inflector::rules("irregularPlural", array('atlas' => 'atlases', 'brother' => 'brothers'));
+// Inflector::rules('transliteration', array('/É|Ê/' => 'E'));
 //
-// Inflector::rules("singular", array(
-// 	'/(s)tatuses$/i' => '\1\2tatus',
-// 	'/(matr)ices$/i' =>'\1ix','/(vert|ind)ices$/i'
-// ));
+// Inflector::rules('uninflected', 'bord');
+// Inflector::rules('uninflected', array('bord', 'baird'));
 
 /**
  * Globalization (g11n) catalog configuration.  The catalog allows for obtaining and
@@ -73,8 +69,8 @@ Message::applyFilter('translate', function($self, $params, $chain) {
  *     which holds the data.
  *
  *   - `'scope'` If you plan on using scoping i.e. for accessing plugin data separately you
- *     need to specify a scope for each configuration, except for those using the _memory_ or
- *     _gettext_ adapter which handle this internally.
+ *     need to specify a scope for each configuration, except for those using the _memory_,
+ *     _php_ or _gettext_ adapter which handle this internally.
  */
 // use lithium\g11n\Catalog;
 //
@@ -87,8 +83,8 @@ Message::applyFilter('translate', function($self, $params, $chain) {
 // 		'path' => LITHIUM_APP_PATH . '/resources/g11n'
 // 	),
 // 	'lithium' => array(
-// 		'adapter' => 'Gettext',
-// 		'path' => LITHIUM_LIBRARY_PATH . '/lithium/g11n/resources'
+// 		'adapter' => 'Php',
+// 		'path' => LITHIUM_LIBRARY_PATH . '/lithium/g11n/resources/php'
 // 	)
 // ));
 
@@ -96,8 +92,8 @@ Message::applyFilter('translate', function($self, $params, $chain) {
  * Globalization runtime data.  You can add globalized data during runtime utilizing a
  * configuration set up to use the _memory_ adapter.
  */
-// $data = array('root' => function($n) { return $n != 1 ? 1 : 0; });
-// Catalog::write('message.plural', $data, array('name' => 'runtime'));
+// $data = function($n) { return $n != 1 ? 1 : 0; };
+// Catalog::write('message.plural', 'root', $data, array('name' => 'runtime'));
 
 /**
  * Enabling globalization integration.  Classes in the framework are designed with
@@ -107,11 +103,7 @@ Message::applyFilter('translate', function($self, $params, $chain) {
 // use lithium\util\Validator;
 // use lithium\util\Inflector;
 //
-// Validator::add('postalCode',
-// 	Catalog::read('validation.postalCode', array('en_US'))
-// );
-// Inflector::rules('transliterations',
-// 	Catalog::read('inflection.transliteration', array('en'))
-// );
+// Validator::add('phone', Catalog::read('validation.phone', 'en_US'));
+// Inflector::rules('transliteration', Catalog::read('inflection.transliterations', 'en'));
 
 ?>
