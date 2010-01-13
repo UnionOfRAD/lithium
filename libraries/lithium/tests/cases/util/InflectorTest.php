@@ -13,7 +13,7 @@ use \lithium\util\Inflector;
 class InflectorTest extends \lithium\test\Unit {
 
 	public function tearDown() {
-		Inflector::clear();
+		Inflector::reset();
 	}
 
 	/**
@@ -107,7 +107,7 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertNull(Inflector::rules('plural', array('/rata/' => '\1ratum')));
 		$this->assertEqual(Inflector::pluralize('errata'), $result);
 
-		Inflector::clear();
+		Inflector::reset();
 		$this->assertNotEqual(Inflector::pluralize('errata'), $result);
 	}
 
@@ -167,13 +167,13 @@ class InflectorTest extends \lithium\test\Unit {
 		$before = array(
 			Inflector::rules('singular'),
 			Inflector::rules('plural'),
-			Inflector::rules('transliterations')
+			Inflector::rules('transliteration')
 		);
 		$this->assertNull(Inflector::rules('foo'));
 		$this->assertIdentical($before, array(
 			Inflector::rules('singular'),
 			Inflector::rules('plural'),
-			Inflector::rules('transliterations')
+			Inflector::rules('transliteration')
 		));
 	}
 
@@ -183,7 +183,7 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertNull(Inflector::rules('singular', array('/rata/' => '\1ratus')));
 		$this->assertEqual(Inflector::singularize('errata'), $result);
 
-		Inflector::clear();
+		Inflector::reset();
 		$this->assertNotEqual(Inflector::singularize('errata'), $result);
 
 		$after = Inflector::rules('singular');
@@ -289,20 +289,20 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertEqual(Inflector::slug('Montréal'), 'Montreal');
 		$this->assertNotEqual(Inflector::slug('Écaussines'), 'Ecaussines');
 
-		Inflector::rules('transliterations', array('/É|Ê/' => 'E'));
+		Inflector::rules('transliteration', array('/É|Ê/' => 'E'));
 		$this->assertEqual(Inflector::slug('Écaussines-d\'Enghien'), 'Ecaussines-d-Enghien');
 
 		$this->assertNotEqual(Inflector::slug('JØRGEN'), 'JORGEN');
-		Inflector::rules('transliterations', array('/Ø/' => 'O'));
+		Inflector::rules('transliteration', array('/Ø/' => 'O'));
 		$this->assertEqual(Inflector::slug('JØRGEN'), 'JORGEN');
 
 		$this->assertNotEqual(Inflector::slug('ÎÍ'), 'II');
-		Inflector::rules('transliterations', array('/Î|Í/' => 'I'));
+		Inflector::rules('transliteration', array('/Î|Í/' => 'I'));
 		$this->assertEqual(Inflector::slug('ÎÍ'), 'II');
 
 		$this->assertEqual(Inflector::slug('ABc'), 'ABc');
-		Inflector::rules('transliterations', array('AB' => 'a'));
-		Inflector::clear();
+		Inflector::rules('transliteration', array('AB' => 'a'));
+		Inflector::reset();
 		$this->assertEqual(Inflector::slug('ABc'), 'aac');
 	}
 

@@ -25,7 +25,7 @@ class Inflector {
 	 * @see lithium\util\Inflector::rules()
 	 * @var array
 	 */
-	protected static $_transliterations = array(
+	protected static $_transliteration = array(
 		'/à|á|å|â/' => 'a', '/è|é|ê|ẽ|ë/' => 'e', '/ì|í|î/' => 'i', '/ò|ó|ô|ø/' => 'o',
 		'/ù|ú|ů|û/' => 'u', '/ç/' => 'c', '/ñ/' => 'n', '/ä|æ/' => 'ae', '/ö/' => 'oe',
 		'/ü/' => 'ue', '/Ä/' => 'Ae', '/Ü/' => 'Ue', '/Ö/' => 'Oe', '/ß/' => 'ss'
@@ -198,7 +198,7 @@ class Inflector {
 	/**
 	 * Gets or adds inflection and transliteration rules.
 	 *
-	 * @param string $type Either `'transliterations'`, `'uninflected'`, `'singular'` or `'plural'`.
+	 * @param string $type Either `'transliteration'`, `'uninflected'`, `'singular'` or `'plural'`.
 	 * @param array $config
 	 * @return array|void If `$config` is empty, returns the rules list specified
 	 *         by `$type`, otherwise returns `null`.
@@ -213,7 +213,7 @@ class Inflector {
 			return static::${$var};
 		}
 		switch ($type) {
-			case 'transliterations':
+			case 'transliteration':
 				$_config = array();
 
 				foreach ($config as $key => $val) {
@@ -222,8 +222,8 @@ class Inflector {
 					}
 					$_config[$key] = $val;
 				}
-				static::$_transliterations = array_merge(
-					$_config, static::$_transliterations, $_config
+				static::$_transliteration = array_merge(
+					$_config, static::$_transliteration, $_config
 				);
 			break;
 			case 'uninflected':
@@ -328,7 +328,7 @@ class Inflector {
 	 *
 	 * @return void
 	 */
-	public static function clear() {
+	public static function reset() {
 		static::$_singularized = static::$_pluralized = array();
 		static::$_camelized = static::$_underscored = array();
 		static::$_plural['regexUninflected'] = static::$_singular['regexUninflected'] = null;
@@ -409,7 +409,7 @@ class Inflector {
 	/**
 	 * Returns a string with all spaces converted to given replacement and
 	 * non word characters removed.  Maps special characters to ASCII using
-	 * `Inflector::$_transliterations`, which can be updated using `Inflector::rules()`.
+	 * `Inflector::$_transliteration`, which can be updated using `Inflector::rules()`.
 	 *
 	 * @see lithium\util\Inflector::rules()
 	 * @param string $string An arbitrary string to convert.
@@ -417,7 +417,7 @@ class Inflector {
 	 * @return string The converted string.
 	 */
 	public static function slug($string, $replacement = '-') {
-		$map = static::$_transliterations + array(
+		$map = static::$_transliteration + array(
 			'/[^\w\s]/' => ' ', '/\\s+/' => $replacement,
 			str_replace(':rep', preg_quote($replacement, '/'), '/^[:rep]+|[:rep]+$/') => '',
 		);

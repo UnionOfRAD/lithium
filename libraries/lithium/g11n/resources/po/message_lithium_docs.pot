@@ -329,7 +329,7 @@ msgid "array|void If `$config` is empty, returns the rules list specified\n     
 msgstr ""
 
 #. lithium\util\Inflector::rules()
-msgid "Either `'transliterations'`, `'uninflected'`, `'singular'` or `'plural'`."
+msgid "Either `'transliteration'`, `'uninflected'`, `'singular'` or `'plural'`."
 msgstr ""
 
 #. lithium\util\Inflector::pluralize()
@@ -409,7 +409,7 @@ msgid "string Camel-backed version of the string (i.e. `'redBike'`)."
 msgstr ""
 
 #. lithium\util\Inflector::slug()
-msgid "Returns a string with all spaces converted to given replacement and\nnon word characters removed.  Maps special characters to ASCII using\n`Inflector::$_transliterations`, which can be updated using `Inflector::rules()`."
+msgid "Returns a string with all spaces converted to given replacement and\nnon word characters removed.  Maps special characters to ASCII using\n`Inflector::$_transliteration`, which can be updated using `Inflector::rules()`."
 msgstr ""
 
 #. lithium\util\Inflector::slug()

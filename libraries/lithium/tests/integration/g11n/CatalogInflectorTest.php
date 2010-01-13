@@ -32,28 +32,28 @@ class CatalogInflectorTest extends \lithium\test\Unit {
 
 	public function testTransliterations() {
 		$data = array(
-			'transliterations' => array(
+			'transliteration' => array(
 				'\$' => 'dollar',
 				'&' => 'and'
 			)
 		);
 		Catalog::write('inflection', 'en', $data, array('name' => 'runtime'));
 
-		Inflector::rules('transliterations', Catalog::read('inflection.transliterations', 'en'));
+		Inflector::rules('transliteration', Catalog::read('inflection.transliteration', 'en'));
 
 		$result = Inflector::slug('this & that');
 		$expected = 'this-and-that';
 		$this->assertEqual($expected, $result);
 
 		$data = array(
-			'transliterations' => array(
+			'transliteration' => array(
 				't' => 'd',
 				'&' => 'und'
 			)
 		);
 		Catalog::write('inflection', 'de', $data, array('name' => 'runtime'));
 
-		Inflector::rules('transliterations', Catalog::read('inflection.transliterations', 'de'));
+		Inflector::rules('transliteration', Catalog::read('inflection.transliteration', 'de'));
 
 		$result = Inflector::slug('this & that');
 		$expected = 'dhis-und-dhad';
