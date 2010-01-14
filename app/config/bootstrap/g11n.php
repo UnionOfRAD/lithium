@@ -104,6 +104,6 @@ Message::applyFilter('translate', function($self, $params, $chain) {
 // use lithium\util\Inflector;
 //
 // Validator::add('phone', Catalog::read('validation.phone', 'en_US'));
-// Inflector::rules('transliteration', Catalog::read('inflection.transliterations', 'en'));
+// Inflector::rules('transliteration', Catalog::read('inflection.transliteration', 'en'));
 
 ?>

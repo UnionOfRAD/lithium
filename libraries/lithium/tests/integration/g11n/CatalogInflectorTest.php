@@ -30,7 +30,7 @@ class CatalogInflectorTest extends \lithium\test\Unit {
 		Catalog::config($this->_backups['catalogConfig']);
 	}
 
-	public function testTransliterations() {
+	public function testTransliteration() {
 		$data = array(
 			'transliteration' => array(
 				'\$' => 'dollar',
