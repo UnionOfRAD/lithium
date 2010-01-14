@@ -8,6 +8,19 @@
 
 namespace lithium\console\command\build;
 
-class Controller extends \lithium\console\command\Build {}
+use \lithium\core\Libraries;
+use \lithium\util\Inflector;
+
+class Controller extends \lithium\console\command\Build {
+
+	public function run($name = null, $null = null) {
+		$library = Libraries::get($this->library);
+		if (empty($library['prefix'])) {
+			return false;
+		}
+		$model = Inflector::classify($name);
+		$use = "\\{$library['prefix']}\\models\\{$model}";
+	}
+}
 
 ?>
