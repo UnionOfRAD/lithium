@@ -93,6 +93,14 @@ class Command extends \lithium\core\Object {
 		}
 	}
 
+	/**
+	 * Returns Bash/Windows terminal color codes for colored console output.
+	 *
+	 * @param string $color Possible values: black, red, green, yellow, blue, purple, cyan, white, and end.
+	 * @param string $modifier Possible values: bold and underline.
+	 * @return void
+	 * @author John David Anderson
+	 */
 	protected function _colorCode($color, $modifier = null) {
 		$modifier = null;
 		$colorCode = null;
