@@ -104,55 +104,52 @@ class Command extends \lithium\core\Object {
 		$modifier = null;
 		$colorCode = null;
 		$output = "";
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-			//Todo
+
+		switch($modifier) {
+			case 'bold':
+				$modifier = 1;
+				break;
+			case 'underline':
+				$modifier = 4;
+				break;
+			default:
+				$modifier = 0;
+				break;
+		}
+		switch ($color) {
+			case 'black':
+				$colorCode = 30;
+				break;
+			case 'red':
+				$colorCode = 31;
+				break;
+			case 'green':
+				$colorCode = 32;
+				break;
+			case 'yellow':
+				$colorCode = 33;
+				break;
+			case 'blue':
+				$colorCode = 34;
+				break;
+			case 'purple':
+				$colorCode = 35;
+				break;
+			case 'cyan':
+				$colorCode = 36;
+				break;
+			case 'white':
+				$colorCode = 37;
+				break;
+			case 'end':
+				$colorCode = 0;
+				break;
+		}
+		
+		if($color != 'end') {
+			return "\033[" . $modifier . ';' . $colorCode . 'm';
 		} else {
-			switch($modifier) {
-				case 'bold':
-					$modifier = 1;
-					break;
-				case 'underline':
-					$modifier = 4;
-					break;
-				default:
-					$modifier = 0;
-					break;
-			}
-			switch ($color) {
-				case 'black':
-					$colorCode = 30;
-					break;
-				case 'red':
-					$colorCode = 31;
-					break;
-				case 'green':
-					$colorCode = 32;
-					break;
-				case 'yellow':
-					$colorCode = 33;
-					break;
-				case 'blue':
-					$colorCode = 34;
-					break;
-				case 'purple':
-					$colorCode = 35;
-					break;
-				case 'cyan':
-					$colorCode = 36;
-					break;
-				case 'white':
-					$colorCode = 37;
-					break;
-				case 'end':
-					$colorCode = 0;
-					break;
-			}
-			
-			if($color != 'end') {
-				return "\033[" . $modifier . ';' . $colorCode . 'm';
-			} else {
-				return "\033[" . $colorCode . 'm';
-			}
+			return "\033[" . $colorCode . 'm';
 		}
 	}
 	/**
