@@ -93,6 +93,61 @@ class Command extends \lithium\core\Object {
 		}
 	}
 
+	protected function _colorCode($color, $modifier = null) {
+		$modifier = null;
+		$colorCode = null;
+		$output = "";
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+			//Todo
+		} else {
+			switch($modifier) {
+				case 'bold':
+					$modifier = 1;
+					break;
+				case 'underline':
+					$modifier = 4;
+					break;
+				default:
+					$modifier = 0;
+					break;
+			}
+			switch ($color) {
+				case 'black':
+					$colorCode = 30;
+					break;
+				case 'red':
+					$colorCode = 31;
+					break;
+				case 'green':
+					$colorCode = 32;
+					break;
+				case 'yellow':
+					$colorCode = 33;
+					break;
+				case 'blue':
+					$colorCode = 34;
+					break;
+				case 'purple':
+					$colorCode = 35;
+					break;
+				case 'cyan':
+					$colorCode = 36;
+					break;
+				case 'white':
+					$colorCode = 37;
+					break;
+				case 'end':
+					$colorCode = 0;
+					break;
+			}
+			
+			if($color != 'end') {
+				return "\033[" . $modifier . ';' . $colorCode . 'm';
+			} else {
+				return "\033[" . $colorCode . 'm';
+			}
+		}
+	}
 	/**
 	 * Called by the Dispatcher class to invoke an action.
 	 *
@@ -290,11 +345,72 @@ class Command extends \lithium\core\Object {
 	 *
 	 * @return boolean
 	 */
-	protected function _help() {
-		$help = new Help($this->_config);
-		$result = $help->run(get_class($this));
-		$this->response = $help->response;
-		return $result;
+	public function help() {
+		$parent = new ReflectionClass("\lithium\console\Command");
+		$class = new ReflectionClass(get_class($this));
+		$template = $class->newInstance();
+
+		$properties = array_diff($class->getProperties(), $parent->getProperties());
+		$properties = array_filter($properties, function($p) { return $p->isPublic(); });
+
+		foreach ($properties as &$property) {
+			$comment = Docblock::comment($property->getDocComment());
+			$description = $comment['description'];
+			$type = isset($comment['tags']['var']) ? strtok($comment['tags']['var'], ' ') : null;
+
+			$name = str_replace('_', '-', Inflector::underscore($property->getName()));
+			$usage = $type == 'boolean' ? "--{$name}" : "--{$name}=" . strtoupper($name);
+
+			$property = compact('name', 'description', 'type', 'usage');
+		}
+
+		$pad = function($message, $level = 1) {
+			$padding = str_repeat(' ', $level * 4);
+			return $padding . str_replace("\n", "\n{$padding}", $message);
+		};
+
+		$this->out($this->_colorCode('purple') . 'USAGE' . $this->_colorCode('end'));
+		$this->out($pad(sprintf("li3 %s%s [ARGS]",
+			$this->request->params['command'] ?: 'COMMAND',
+			array_reduce($properties, function($a, $b) { return "{$a} {$b['usage']}"; })
+		)));
+
+		if ($this->request->params['command']) {
+			$this->nl();
+			$this->out('DESCRIPTION');
+			$comment = Docblock::comment($class->getDocComment());
+			$this->out($pad($comment['description']));
+		}
+		if ($properties) {
+			$this->nl();
+			$this->out('OPTIONS');
+
+			foreach ($properties as $param) {
+				$this->out($pad($param['usage']));
+
+				if ($param['description']) {
+					$this->out($pad($param['description'], 2));
+				}
+				$this->nl();
+			}
+		}
+		if (!$this->request->params['command']) {
+			$this->nl();
+			$this->out($this->_colorCode('blue') . 'COMMANDS' . $this->_colorCode('end'));
+			$commands = Libraries::locate('command', null, array('recursive' => false));
+
+			foreach ($commands as $command) {
+				$class = new ReflectionClass($command);
+				$comment = Docblock::comment($class->getDocComment());
+				$command = explode('\\', $command);
+
+				$this->out($this->_colorCode('cyan') . $pad(Inflector::underscore(end($command))) . $this->_colorCode('end'));
+				$this->out($pad($comment['description'], 2));
+				$this->nl();
+			}
+			$this->out('See `' . $this->_colorCode('green') . 'li3 COMMAND help' . $this->_colorCode('end') . '` for more information on a specific command.');
+		}
+		return true;
 	}
 }
 
