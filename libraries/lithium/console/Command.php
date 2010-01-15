@@ -98,8 +98,7 @@ class Command extends \lithium\core\Object {
 	 *
 	 * @param string $color Possible values: black, red, green, yellow, blue, purple, cyan, white, and end.
 	 * @param string $modifier Possible values: bold and underline.
-	 * @return void
-	 * @author John David Anderson
+	 * @return string
 	 */
 	protected function _colorCode($color, $modifier = null) {
 		$modifier = null;
