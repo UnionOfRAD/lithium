@@ -99,8 +99,15 @@ class Command extends \lithium\core\Object {
 	 * @param string $color Possible values: black, red, green, yellow, blue, purple, cyan, white, and end.
 	 * @param string $modifier Possible values: bold and underline.
 	 * @return string
+	 * @todo Figure out Windows/DOS terminal color escape sequences.
 	 */
 	protected function _colorCode($color, $modifier = null) {
+		
+		//Windows
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+		    return;
+		}
+		
 		$modifier = null;
 		$colorCode = null;
 		$output = "";
