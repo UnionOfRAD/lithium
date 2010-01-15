@@ -377,16 +377,16 @@ class Command extends \lithium\core\Object {
 
 		if ($this->request->params['command']) {
 			$this->nl();
-			$this->out('DESCRIPTION');
+			$this->out($this->_colorCode('blue') . 'DESCRIPTION' . $this->_colorCode('end'));
 			$comment = Docblock::comment($class->getDocComment());
 			$this->out($pad($comment['description']));
 		}
 		if ($properties) {
 			$this->nl();
-			$this->out('OPTIONS');
+			$this->out($this->_colorCode('cyan') . 'OPTIONS' . $this->_colorCode('end'));
 
 			foreach ($properties as $param) {
-				$this->out($pad($param['usage']));
+				$this->out($this->_colorCode('green') . $pad($param['usage']) . $this->_colorCode('end'));
 
 				if ($param['description']) {
 					$this->out($pad($param['description'], 2));
