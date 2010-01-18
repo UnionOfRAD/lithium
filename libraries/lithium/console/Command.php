@@ -94,17 +94,17 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Returns Bash/Windows terminal color codes for colored console output.
+	 * Returns ANSI-style terminal color codes for colored console output.
 	 *
 	 * @param string $color Possible values: black, red, green, yellow, blue, purple, cyan, white, and end.
 	 * @param string $modifier Possible values: bold and underline.
 	 * @return string
-	 * @todo Figure out Windows/DOS terminal color escape sequences.
 	 */
 	protected function _colorCode($color, $modifier = null) {
 		
-		//Windows
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+		//Abandon if the system is Windows-based, and 
+		//forcing color has not been enabled.
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && !$this->color) {
 		    return;
 		}
 		
