@@ -19,7 +19,24 @@ class Controller extends \lithium\console\command\Build {
 			return false;
 		}
 		$model = Inflector::classify($name);
-		$use = "\\{$library['prefix']}\\models\\{$model}";
+		$use = "\\{$library['prefix']}models\\{$model}";
+
+		$params = array(
+			'namespace' => "{$library['prefix']}controllers",
+			'use' => $use,
+			'class' => "{$name}Controller",
+			'model' => $model,
+			'singular' => Inflector::singularize(Inflector::underscore($name)),
+			'plural' => Inflector::pluralize(Inflector::underscore($name))
+		);
+
+		if ($this->_save($this->template, $params)) {
+			$this->out(
+				"{$params['class']} created in {$params['namespace']}."
+			);
+			return true;
+		}
+		return false;
 	}
 }
 

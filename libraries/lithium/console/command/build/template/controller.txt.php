@@ -31,6 +31,18 @@ class {:class} extends \lithium\action\Controller {
 	}
 
 	public function edit($id = null) {
-
+		${:singular} = {:model}::find($id);
+		if (empty(${:singular})) {
+			$this->redirect(array('controller' => '{:plural}', 'action' => 'index'));
+		}
+		if (!empty($this->request->data)) {
+			if (${:singular}->save($this->request->data)) {
+				$this->redirect(array(
+					'controller' => '{:plural}', 'action' => 'view',
+					'args' => array(${:singular}->id)
+				));
+			}
+		}
+		return compact('{:singular}');
 	}
 }

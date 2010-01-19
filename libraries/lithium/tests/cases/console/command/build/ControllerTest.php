@@ -55,10 +55,49 @@ namespace build_test\controllers;
 
 use \build_test\models\Post;
 
-class PostsController extends \lithium\test\Unit {
+class PostsController extends \lithium\action\Controller {
 
+	public function index() {
+		$posts = Post::all();
+		return compact('posts');
+	}
 
+	public function view($id = null) {
+		$post = Post::find($id);
+		return compact('post');
+	}
 
+	public function add() {
+		if (!empty($this->request->data)) {
+			$post = Post::create($this->request->data);
+			if ($post->save()) {
+				$this->redirect(array(
+					'controller' => 'posts', 'action' => 'view',
+					'args' => array($post->id)
+				));
+			}
+		}
+		if (empty($post)) {
+			$post = Post::create();
+		}
+		return compact('post');
+	}
+
+	public function edit($id = null) {
+		$post = Post::find($id);
+		if (empty($post)) {
+			$this->redirect(array('controller' => 'posts', 'action' => 'index'));
+		}
+		if (!empty($this->request->data)) {
+			if ($post->save($this->request->data)) {
+				$this->redirect(array(
+					'controller' => 'posts', 'action' => 'view',
+					'args' => array($post->id)
+				));
+			}
+		}
+		return compact('post');
+	}
 }
 
 
