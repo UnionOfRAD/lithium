@@ -66,7 +66,6 @@ test;
 		);
 		$this->assertEqual($expected, $result);
 	}
-
 }
 
 ?>

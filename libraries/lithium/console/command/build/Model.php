@@ -11,7 +11,7 @@ namespace lithium\console\command\build;
 use \lithium\core\Libraries;
 
 class Model extends \lithium\console\command\Build {
-	
+
 	public function run($name = null, $null = null) {
 		$library = Libraries::get($this->library);
 		if (empty($library['prefix'])) {
