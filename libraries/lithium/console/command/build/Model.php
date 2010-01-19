@@ -8,6 +8,28 @@
 
 namespace lithium\console\command\build;
 
-class Model extends \lithium\console\command\Build {}
+use \lithium\core\Libraries;
+
+class Model extends \lithium\console\command\Build {
+	
+	public function run($name = null, $null = null) {
+		$library = Libraries::get($this->library);
+		if (empty($library['prefix'])) {
+			return false;
+		}
+		$params = array(
+			'namespace' => "{$library['prefix']}models",
+			'class' => "{$name}",
+		);
+
+		if ($this->_save($this->template, $params)) {
+			$this->out(
+				"{$params['class']} created in {$params['namespace']}."
+			);
+			return true;
+		}
+		return false;
+	}
+}
 
 ?>
