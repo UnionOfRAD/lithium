@@ -46,7 +46,7 @@ class MockSource extends \lithium\data\Source {
 		return compact('query', 'options');
 	}
 
-	public function columns($query, $resource = null, $context = null) {
+	public function schema($query, $resource = null, $context = null) {
 
 	}
 

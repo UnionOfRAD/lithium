@@ -216,9 +216,9 @@ class MySql extends \lithium\data\source\Database {
 	 * @param object $context
 	 * @return array
 	 */
-	public function columns($query, $resource = null, $context = null) {
+	public function schema($query, $resource = null, $context = null) {
 		if (is_object($query)) {
-			return parent::columns($query, $resource, $context);
+			return parent::schema($query, $resource, $context);
 		}
 
 		$result = array();

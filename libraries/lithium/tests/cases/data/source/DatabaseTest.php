@@ -27,7 +27,7 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testColumnMapping() {
-		$result = $this->db->columns(new Query(array(
+		$result = $this->db->schema(new Query(array(
 			'model' =>  'lithium\tests\mocks\data\model\MockDatabasePost'
 		)));
 		$expected = array(
@@ -38,14 +38,14 @@ class DatabaseTest extends \lithium\test\Unit {
 		$query = new Query(array(
 			'model' =>  'lithium\tests\mocks\data\model\MockDatabasePost', 'fields' => '*'
 		));
-		$result = $this->db->columns($query);
+		$result = $this->db->schema($query);
 		$this->assertEqual($expected, $result);
 
 		$fields = array('MockDatabaseComment');
 		$query = new Query(array(
 			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost', 'fields' => $fields
 		));
-		$result = $this->db->columns($query);
+		$result = $this->db->schema($query);
 		$expected = array(
 			'lithium\tests\mocks\data\model\MockDatabaseComment' => array_keys(
 				MockDatabaseComment::schema()

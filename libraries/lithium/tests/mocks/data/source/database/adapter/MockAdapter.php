@@ -69,7 +69,7 @@ class MockAdapter extends \lithium\data\source\Database {
 		return $value;
 	}
 
-	public function columns($query, $resource = null, $context = null) {
+	public function schema($query, $resource = null, $context = null) {
 		return true;
 	}
 

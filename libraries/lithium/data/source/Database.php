@@ -105,7 +105,7 @@ abstract class Database extends \lithium\data\Source {
 				case 'resource':
 				break;
 				case 'array':
-					$columns = $self->columns($query, $result);
+					$columns = $self->schema($query, $result);
 					$records = array();
 
 					while ($data = $self->result('next', $result, null)) {
@@ -138,7 +138,7 @@ abstract class Database extends \lithium\data\Source {
 		return trim(String::insert($this->_strings[$type], $data, array('clean' => true)));
 	}
 
-	public function columns($query, $resource = null, $context = null) {
+	public function schema($query, $resource = null, $context = null) {
 		$model = $query->model();
 		$fields = $query->fields();
 		$relations = $model::relations();

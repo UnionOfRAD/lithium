@@ -99,14 +99,14 @@ class RecordSet extends \lithium\util\Collection {
 	 *
 	 * @return void
 	 * @see lithium\data\model\RecordSet::$_columns
-	 * @todo The part that uses _handle->columns() should be rewritten so that the column list
+	 * @todo The part that uses _handle->schema() should be rewritten so that the column list
 	 *       is coming from the query object.
 	 */
 	protected function _init() {
 		parent::_init();
 
 		if ($this->_handle && $this->_result) {
-			$this->_columns = $this->_handle->columns($this->_query, $this->_result, $this);
+			$this->_columns = $this->_handle->schema($this->_query, $this->_result, $this);
 		}
 	}
 
