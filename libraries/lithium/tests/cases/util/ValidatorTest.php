@@ -908,6 +908,76 @@ class ValidatorTest extends \lithium\test\Unit {
 		$expected = array();
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testCompare() {
+		$result = Validator::compare(1, '>', 0);
+		$this->assertTrue($result);
+
+		$result = Validator::compare(0, '<', 1);
+		$this->assertTrue($result);
+
+		$result = Validator::compare(1, '>=', 1);
+		$this->assertTrue($result);
+
+		$result = Validator::compare(1, '<=', 1);
+		$this->assertTrue($result);
+
+		$result = Validator::compare(1, '==', 1);
+		$this->assertTrue($result);
+
+		$result = Validator::compare(1, '==', '1');
+		$this->assertTrue($result);
+
+		$result = Validator::compare(1, '!=', 0);
+		$this->assertTrue($result);
+
+		$result = Validator::compare(1, '!=', '1');
+		$this->assertFalse($result);
+
+		$result = Validator::compare(1, '===', 1);
+		$this->assertTrue($result);
+
+		$result = Validator::compare(1, '===', '1');
+		$this->assertFalse($result);
+	}
+
+	public function testHasMinLength() {
+		$string = 'hello world';
+		$minLength = 1;
+		$result = Validator::hasMinLength($string, $minLength);
+		$this->assertTrue($result);
+
+		$minLength = 20;
+		$result = Validator::hasMinLength($string, $minLength);
+		$this->assertFalse($result);
+	}
+
+	public function testHasMaxLength() {
+		$string = 'hello world';
+		$maxLength = 1;
+		$result = Validator::hasMaxLength($string, $maxLength);
+		$this->assertFalse($result);
+
+		$maxLength = 20;
+		$result = Validator::hasMaxLength($string, $maxLength);
+		$this->assertTrue($result);
+	}
+
+	public function testIsInRange() {
+		$value = 5;
+		$lower = 1;
+		$upper = 10;
+		$result = Validator::isInRange($value, $lower, $upper);
+		$this->assertTrue($result);
+
+		$value = 0;
+		$result = Validator::isInRange($value, $lower, $upper);
+		$this->assertFalse($result);
+
+		$value = 11;
+		$result = Validator::isInRange($value, $lower, $upper);
+		$this->assertFalse($result);
+	}
 }
 
 ?>
