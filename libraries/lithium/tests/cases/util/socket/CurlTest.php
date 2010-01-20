@@ -78,6 +78,11 @@ class CurlTest extends \lithium\test\Unit {
 		$stream->encoding('UTF-8');
 		$result = $stream->resource();
 		$this->assertTrue(is_resource($result));
+
+		$stream = new MockCurl($this->_testConfig + array('encoding' => 'UTF-8'));
+		$result = $stream->open();
+		$result = $stream->resource();
+		$this->assertTrue(is_resource($result));
 	}
 
 	public function testWriteAndRead() {
