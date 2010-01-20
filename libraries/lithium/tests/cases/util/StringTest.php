@@ -366,6 +366,14 @@ class StringTest extends \lithium\test\Unit {
 		$result = String::tokenize('tagA "single tag" tagB', ' ', '"', '"');
 		$expected = array('tagA', '"single tag"', 'tagB');
 		$this->assertEqual($expected, $result);
+
+		$result = String::tokenize(array());
+		$expected = array();
+		$this->assertEqual($expected, $result);
+
+		$result = String::tokenize(null);
+		$expected = null;
+		$this->assertEqual($expected, $result);
 	}
 
 	/**
