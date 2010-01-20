@@ -8,8 +8,8 @@
 
 namespace lithium\core;
 
-use \lithium\util\collection\Filters;
 use \SplStack;
+use \lithium\util\collection\Filters;
 
 /**
  * Alternative base class in Lithium hierarchy, from which all (and only) static classes inherit.
@@ -73,21 +73,21 @@ class StaticObject {
 		foreach ($strategies as $strategy) {
 			$strategy::$method($params);
 		}
-
 		return $params['data'];
 	}
 
 	/**
 	 * Allows setting & querying of static object strategies.
 	 *
-	 * - If $name is set, returns the strategies attached to the current static object.
-	 * - If $name and $strategy are set, $strategy is added to the strategy stack denoted by $name.
-	 * - If $name and $strategy are not set, then the full indexed strategies array is returned
-	 *   (note: the strategies are wrapped in \SplStack).
+	 * - If `$name` is set, returns the strategies attached to the current static object.
+	 * - If `$name` and `$strategy` are set, $strategy is added to the strategy stack denoted by
+	 *   `$name`.
+	 * - If `$name` and `$strategy` are not set, then the full indexed strategies array is returned
+	 *   (note: the strategies are wrapped in `SplStack`).
 	 *
 	 * @param string $name Name of cache configuration.
 	 * @param mixed $strategy Fully namespaced cache strategy identifier. String or array
-	 * @return mixed                   See above description.
+	 * @return mixed See above description.
 	 */
 	public static function strategies($name = '', $strategy = null) {
 		if (empty($name)) {
@@ -105,23 +105,22 @@ class StaticObject {
 				array_walk($strategy, function($value) use (&$strategies) {
 					$strategies->push($value);
 				});
-			}
-			else if (is_string($strategy)) {
+			} elseif (is_string($strategy)) {
 				$strategies->push($strategy);
 			}
-
 			return true;
 		}
-
 		return static::$_strategies[$name];
 	}
+
 	/**
 	 * Calls a method on this object with the given parameters. Provides an OO wrapper for
-	 * call_user_func_array, and improves performance by using straight method calls in most cases.
+	 * `call_user_func_array()`, and improves performance by using straight method calls in most
+	 * cases.
 	 *
-	 * @param string $method  Name of the method to call
-	 * @param array $params  Parameter list to use when calling $method
-	 * @return mixed  Returns the result of the method call
+	 * @param string $method Name of the method to call.
+	 * @param array $params Parameter list to use when calling `$method`.
+	 * @return mixed Returns the result of the method call.
 	 */
 	public static function invokeMethod($method, $params = array()) {
 		switch (count($params)) {
@@ -165,9 +164,11 @@ class StaticObject {
 			return $callback->__invoke($class, $params, null);
 		}
 
-		$f = isset(static::$_methodFilters[$class][$method])
-			? static::$_methodFilters[$class][$method] : array();
-		$items = array_merge($f, $filters, array($callback));
+		if (!isset(static::$_methodFilters[$class][$method])) {
+			static::$_methodFilters += array($class => array());
+			static::$_methodFilters[$class][$method] = array();
+		}
+		$items = array_merge(static::$_methodFilters[$class][$method], $filters, array($callback));
 		return Filters::run($class, $params, compact('items', 'class', 'method'));
 	}
 
