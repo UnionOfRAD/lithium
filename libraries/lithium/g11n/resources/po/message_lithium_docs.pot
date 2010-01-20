@@ -1,7 +1,7 @@
 #
 # Lithium: the most rad php framework
 #
-# @copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)
+# @copyright     Copyright 2010, Union of RAD (http://union-of-rad.org)
 # @license       http://opensource.org/licenses/bsd-license.php The BSD License
 #
 #, fuzzy
@@ -22,7 +22,7 @@ msgid "Lithium: the most rad php framework"
 msgstr ""
 
 #. lithium\util\Collection
-msgid "@copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)\n@license       http://opensource.org/licenses/bsd-license.php The BSD License"
+msgid "@copyright     Copyright 2010, Union of RAD (http://union-of-rad.org)\n@license       http://opensource.org/licenses/bsd-license.php The BSD License"
 msgstr ""
 
 #. lithium\util\Collection::invoke()
@@ -425,7 +425,7 @@ msgid "The replacement to use for spaces."
 msgstr ""
 
 #. lithium\util\Set
-msgid "@copyright     Copyright 2009, Union of RAD (http://union-of-rad.org)\n               Copyright 2009, Cake Software Foundation, Inc. (http://cakefoundation.org)\n@license       http://opensource.org/licenses/mit-license.php The MIT License"
+msgid "@copyright     Copyright 2010, Union of RAD (http://union-of-rad.org)\n               Copyright 2010, Cake Software Foundation, Inc. (http://cakefoundation.org)\n@license       http://opensource.org/licenses/mit-license.php The MIT License"
 msgstr ""
 
 #. lithium\util\Set::check()
