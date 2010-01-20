@@ -117,7 +117,7 @@ class Build extends \lithium\console\Command {
 		$library = Libraries::get($this->library);
 
 		if (!empty($library['path'])) {
-			$path = dirname($library['path']) . str_replace('\\', '/',
+			$path = $library['path'] . str_replace(array('\\', $this->library), array('/',''),
 				"\\{$params['namespace']}\\{$params['class']}"
 			);
 			$file = str_replace('//', '/', "{$path}.php");

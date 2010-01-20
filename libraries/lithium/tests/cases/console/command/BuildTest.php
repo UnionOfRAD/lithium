@@ -23,9 +23,12 @@ class BuildTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->_backup['cwd'] = getcwd();
 		$this->_backup['_SERVER'] = $_SERVER;
+		$this->_backup['app'] = Libraries::get('app');
+
 		$_SERVER['argv'] = array();
 		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
 
+		Libraries::add('app', array('path' => $this->_testPath . '/new', 'bootstrap' => false));
 		Libraries::add('build_test', array('path' => $this->_testPath . '/build_test'));
 		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
 		$this->request->params = array('library' => 'build_test');
@@ -34,6 +37,7 @@ class BuildTest extends \lithium\test\Unit {
 	public function tearDown() {
 		$_SERVER = $this->_backup['_SERVER'];
 		chdir($this->_backup['cwd']);
+		Libraries::add('app', $this->_backup['app']);
 		$this->_cleanUp();
 	}
 
@@ -45,7 +49,25 @@ class BuildTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testSave() {
+	public function testSaveWithApp() {
+		chdir($this->_testPath);
+		$this->request->params = array('library' => 'app');
+		$build = new MockBuild(array('request' => $this->request));
+		$result = $build->save('test', array(
+			'namespace' => 'app\tests\cases\models',
+			'use' => 'app\models\Post',
+			'class' => 'PostTest',
+			'methods' => "\tpublic function testCreate() {\n\n\t}\n",
+		));
+		$this->assertTrue($result);
+
+		$result = $this->_testPath . '/new/tests/cases/models/PostTest.php';
+		$this->assertTrue(file_exists($result));
+
+		$this->_cleanUp();
+	}
+
+	public function testSaveWithLibrary() {
 		chdir($this->_testPath);
 		$build = new MockBuild(array('request' => $this->request));
 		$result = $build->save('test', array(
