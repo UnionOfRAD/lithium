@@ -38,8 +38,24 @@ use \Exception;
  */
 class Controller extends \lithium\core\Object {
 
+	/**
+	 * Contains an instance of the `Request` object with all the details of the HTTP request that
+	 * was dispatched to the controller object. Any parameters captured in routing, such as
+	 * controller or action name are accessible as properties of this object, i.e.
+	 * `$this->request->controller` or `$this->request->action`.
+	 *
+	 * @see lithium\action\Request
+	 * @var object
+	 */
 	public $request = null;
 
+	/**
+	 * Contains an instance of the `Response` object which aggregates the headers and body content
+	 * to be written back to the client (browser) when the result of the request is rendered.
+	 *
+	 * @see lithium\action\Response
+	 * @var object
+	 */
 	public $response = null;
 
 	/**
@@ -96,14 +112,10 @@ class Controller extends \lithium\core\Object {
 
 	public function __construct($config = array()) {
 		$defaults = array(
-			'request' => null, 'response' => array(),
-			'render' => array(), 'classes' => array()
+			'request' => null, 'response' => array(), 'render' => array(), 'classes' => array()
 		);
 		$config += $defaults;
-
-		if (!empty($config['request'])) {
-			$this->request = $config['request'];
-		}
+		$this->request = empty($config['request']) ? $this->request : $config['request'];
 
 		foreach (array('render', 'classes') as $key) {
 			if (!empty($config[$key])) {
@@ -197,8 +209,7 @@ class Controller extends \lithium\core\Object {
 			$options = array('template' => $options);
 		}
 		$defaults = array(
-			'status' => 200, 'location' => false,
-			'data' => array(), 'head' => false,
+			'status' => 200, 'location' => false, 'data' => array(), 'head' => false
 		);
 		$options += $defaults;
 		$media = $this->_classes['media'];
@@ -240,13 +251,9 @@ class Controller extends \lithium\core\Object {
 	 */
 	public function redirect($url, $options = array()) {
 		$router = $this->_classes['router'];
-		$defaults = array(
-			'location' => $router::match($url, $this->request),
-			'status' => 302,
-			'head' => true,
-			'exit' => true
-		);
+		$defaults = array('location' => null, 'status' => 302, 'head' => true, 'exit' => true);
 		$options += $defaults;
+		$options['location'] = $options['location'] ?: $router::match($url, $this->request);
 
 		$this->_filter(__METHOD__, compact('options'), function($self, $params, $chain) {
 			$self->render($params['options']);
