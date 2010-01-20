@@ -49,6 +49,55 @@ class StringTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * testHash method - Tests hash generation using `util\String::hash()`
+	 *
+	 * @return void
+	 */
+	public function testHash() {
+		$salt = 'Salt and pepper';
+		$value = 'Lithium rocks!';
+
+		$expected = sha1($value);
+		$result = String::hash($value, 'sha1');
+		$this->assertEqual($expected, $result);
+
+		$result = String::hash($value);
+		$this->assertEqual($expected, $result);
+
+		$expected = sha1($salt . $value);
+		$result = String::hash($value, 'sha1', $salt);
+		$this->assertEqual($expected, $result);
+
+		$expected = md5($value);
+		$result = String::hash($value, 'md5');
+		$this->assertEqual($expected, $result);
+
+		$expected = md5($salt . $value);
+		$result = String::hash($value, 'md5', $salt);
+		$this->assertEqual($expected, $result);
+
+		$sha256 = function($value) {
+			if (function_exists('mhash')) {
+				return bin2hex(mhash(MHASH_SHA256, $value));
+			} elseif (function_exists('hash')) {
+				return hash('sha256', $value);
+			}
+			throw new Exception();
+		};
+
+		try {
+			$expected = $sha256($value);
+			$result = String::hash($value, 'sha256');
+			$this->assertEqual($expected, $result);
+
+			$expected = $sha256($salt . $value);
+			$result = String::hash($value, 'sha256', $salt);
+			$this->assertEqual($expected, $result);
+		} catch (Exception $e) {
+		}
+	}
+
+	/**
 	 * testInsert method
 	 *
 	 * @access public
