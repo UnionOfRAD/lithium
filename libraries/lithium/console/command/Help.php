@@ -85,8 +85,9 @@ class Help extends \lithium\console\Command {
 	/**
 	 * Get the api for the class.
 	 *
+	 * @param string $class fully namespaced class in dot notation
 	 * @param string $type method|property
-	 * @param string $name fully namespaced class in dot notation
+	 * @param string $name the name of the method or property
 	 * @return array
 	 */
 	public function api($class = null, $type = null, $name = null) {
@@ -115,6 +116,7 @@ class Help extends \lithium\console\Command {
 	 * Get the methods for the class
 	 *
 	 * @param string $class
+	 * @param array $options
 	 * @return array
 	 */
 	protected function _methods($class, $options = array()) {
@@ -172,6 +174,7 @@ class Help extends \lithium\console\Command {
 	 * Get the properties for the class
 	 *
 	 * @param string $class
+	 * @param array $options
 	 * @return array
 	 */
 	protected function _properties($class, $options = array()) {
@@ -196,10 +199,9 @@ class Help extends \lithium\console\Command {
 	}
 
 	/**
-	 * undocumented function
+	 * Output the formatted properties or methods.
 	 *
-	 * @param string $type
-	 * @param string $params
+	 * @param array $params from _properties|_methods
 	 * @return void
 	 */
 	protected function _render($params) {
@@ -216,7 +218,6 @@ class Help extends \lithium\console\Command {
 					$this->out($this->_pad("{$arg}: {$desc['text']}", 2));
 				}
 			}
-
 			if ($param['description']) {
 				$this->out($this->_pad($param['description'], 2));
 			}
@@ -225,10 +226,10 @@ class Help extends \lithium\console\Command {
 	}
 
 	/**
-	 * undocumented function
+	 * Add left padding for prettier display.
 	 *
-	 * @param string $message
-	 * @param string $level
+	 * @param string $message the text to render
+	 * @param string $level the level of indentation
 	 * @return void
 	 */
 	protected function _pad($message, $level = 1) {
