@@ -9,6 +9,7 @@
 namespace lithium\template\helper;
 
 use \lithium\util\Set;
+use \lithium\util\Inflector;
 
 /**
  * A helper class to facilitate generating, processing and securing HTML forms. By default, `Form`
@@ -326,7 +327,8 @@ class Form extends \lithium\template\Helper {
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
 	}
 
-	public function label($name, $title, $options = array()) {
+	public function label($name, $title = null, $options = array()) {
+		$title = $title ?: Inflector::humanize($name);
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		return $this->_render(__METHOD__, $template, compact('name', 'title', 'options'));
 	}

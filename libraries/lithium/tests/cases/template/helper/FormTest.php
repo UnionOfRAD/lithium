@@ -210,6 +210,13 @@ class FormTest extends \lithium\test\Unit {
 			'Enter the next value &gt;&gt;',
 			'/label'
 		));
+
+		$result = $this->form->label('user_name');
+		$this->assertTags($result, array(
+			'label' => array('for' => 'user_name'),
+			'User Name',
+			'/label'
+		));
 	}
 
 	public function testSubmitGeneration() {
