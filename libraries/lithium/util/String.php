@@ -92,7 +92,7 @@ class String {
 		$string = $salt . $string;
 
 		switch (true) {
-			case (($type == 'sha1' || $type == null) && function_exists('sha1')):
+			case (($type == 'sha1' || !$type) && function_exists('sha1')):
 				return sha1($string);
 			case ($type == 'sha256' && function_exists('mhash')):
 				return bin2hex(mhash(MHASH_SHA256, $string));
@@ -259,7 +259,7 @@ class String {
 	 * @param integer $index The number of the part to return based on the regex.
 	 * @return mixed
 	 */
-	static function extract($regex, $str, $index = 0) {
+	public static function extract($regex, $str, $index = 0) {
 		if (!preg_match($regex, $str, $match)) {
 			return false;
 		}

@@ -167,8 +167,6 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @return array Settings for the named configuration.
 	 */
 	protected static function _config($name) {
-		$defaults = array('adapter' => null, 'filters' => array(), 'strategies' => array());
-
 		if (!isset(static::$_configurations[$name])) {
 			return null;
 		}
@@ -179,9 +177,25 @@ class Adaptable extends \lithium\core\StaticObject {
 		}
 		$env = Environment::get();
 		$config = isset($settings[$env]) ? $settings[$env] : $settings;
+		return (static::$_configurations[$name] += array(static::_initConfig($name, $config)));
+	}
 
-		static::$_configurations[$name] = array((array) $config + $defaults) + $settings;
-		return static::$_configurations[$name][0];
+	/**
+	 * A stub method called by `_config()` which allows `Adaptable` subclasses to automatically
+	 * assign or auto-generate additional configuration data, once a configuration is first
+	 * accessed. This allows configuration data to be lazy-loaded from adapters or other data
+	 * sources.
+	 *
+	 * @param string $name The name of the configuration which is being accessed. This is the key
+	 *               name containing the specific set of configuration passed into `config()`.
+	 * @param array $config Contains the configuration assigned to `$name`. If this configuration is
+	 *              segregated by environment, then this will contian the configuration for the
+	 *              current environment.
+	 * @return array Returns the final array of settings for the given named configuration.
+	 */
+	protected static function _initConfig($name, $config) {
+		$defaults = array('adapter' => null, 'filters' => array(), 'strategies' => array());
+		return (array) $config + $defaults;
 	}
 }
 

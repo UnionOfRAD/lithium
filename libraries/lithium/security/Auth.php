@@ -16,6 +16,30 @@ class Auth extends \lithium\core\Adaptable {
 	 * @var object `Collection` of authentication configurations.
 	 */
 	protected static $_configurations;
+
+	protected static $_adapters = 'adapter.security.auth';
+
+	protected static $_classes = array(
+		'session' => '\lithium\storage\Session'
+	);
+
+	protected static function _initConfig($name, $config) {
+		$defaults = array(
+			'sessionKey' => $name,
+			'sessionClass' => static::$_classes['session']
+		);
+		return parent::_initConfig($name, $config) + $defaults;
+	}
+
+	public static function check($name, $credentials, $options = array()) {
+		$defaults = array('session' => true);
+		$options += $defaults;
+
+		if ($user = static::adapter($name)->check($credentials, $options)) {
+			return true;
+		}
+		return false;
+	}
 }
 
 ?>
