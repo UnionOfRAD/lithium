@@ -55,12 +55,21 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $document->id;
 		$this->assertEqual($expected, $result);
 
+		$result = $document['id'];
+		$this->assertEqual($expected, $result);
+
 		$expected = 'Two';
 		$result = $document->name;
 		$this->assertEqual($expected, $result);
 
+		$result = $document['name'];
+		$this->assertEqual($expected, $result);
+
 		$expected = 'Lorem ipsum two';
 		$result = $document->content;
+		$this->assertEqual($expected, $result);
+
+		$result = $document['content'];
 		$this->assertEqual($expected, $result);
 	}
 

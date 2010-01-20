@@ -135,6 +135,17 @@ class Document extends \lithium\util\Collection {
 	}
 
 	/**
+	 * Allows document fields to be accessed as array keys, i.e. `$document['_id']`.
+	 *
+	 * @param mixed $offset String or integer indicating the offset or index of a document in a set,
+	 *              or the name of a field in an individual document.
+	 * @return mixed Returns either a sub-object in the document, or a scalar field value.
+	 */
+	public function offsetGet($offset) {
+		return $this->__get($offset);
+	}
+
+	/**
 	 * PHP magic method used when accessing fields as document properties, i.e. `$document->_id`.
 	 *
 	 * @param $name The field name, as specified with an object property.
@@ -142,10 +153,12 @@ class Document extends \lithium\util\Collection {
 	 *         types in sub-`Document` objects.
 	 */
 	public function __get($name) {
-		if (!isset($this->_items[$name])) {
+		$items = null;
+
+		if (!isset($this->_items[$name]) && !$items = $this->_populate(null, $name)) {
 			return null;
 		}
-		$items = $this->_items[$name];
+		$items = $items ?: $this->_items[$name];
 
 		if ($this->_isComplexType($items) && !$items instanceof Iterator) {
 			$this->_items[$name] = $this->_record('recordSet', $this->_items[$name]);
