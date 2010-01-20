@@ -88,7 +88,7 @@ class String {
 	 * @param string $salt
 	 * @return string Hash.
 	 */
-	function hash($string, $type = null, $salt = null) {
+	public static function hash($string, $type = null, $salt = null) {
 		$string = $salt . $string;
 
 		switch (true) {
