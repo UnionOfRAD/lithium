@@ -15,15 +15,16 @@ use \lithium\analysis\Inspector;
 
 /**
  * Runs a given set of unit tests and outputs the results.
+ *
  */
 class Test extends \lithium\console\Command {
 
 	/**
-	 * Path to the test case, in dot notation.
+	 * Path to the test case in dot notation.
 	 *
 	 * For example:
 	 * {{{
-	 * lithium test -case console.CommandTest
+	 * lithium test --case=console.CommandTest
 	 * }}}
 	 *
 	 * @var string
@@ -35,7 +36,7 @@ class Test extends \lithium\console\Command {
 	 *
 	 * For example:
 	 * {{{
-	 * lithium test -group console
+	 * lithium test --group=lithium.tests.cases.console
 	 * }}}
 	 *
 	 * @var string
@@ -45,6 +46,10 @@ class Test extends \lithium\console\Command {
 	/**
 	 * Filters.
 	 *
+	 * For example:
+	 * {{{
+	 * lithium test --case=lithium.tests.cases.core.ObjectTest --filters=Coverage
+	 * }}}
 	 * @var string
 	 */
 	public $filters = array();
@@ -55,11 +60,11 @@ class Test extends \lithium\console\Command {
 	 *
 	 * Case example:
 	 * {{{
-	 * lithium test -case lithium.tests.cases.core.ObjectTest
+	 * lithium test --case=lithium.tests.cases.core.ObjectTest
 	 * }}}
 	 * Group example:
 	 * {{{
-	 * lithium test -group lithium.tests.cases.core
+	 * lithium test --group=lithium.tests.cases.core
 	 * }}}
 	 *
 	 * @return void

@@ -10,11 +10,11 @@ namespace lithium\console\command;
 
 use \lithium\core\Libraries;
 use \lithium\util\Inflector;
-use \lithium\util\reflection\Inspector;
-use \lithium\util\reflection\Docblock;
+use \lithium\analysis\Inspector;
+use \lithium\analysis\Docblock;
 
 /**
- * Get information about a particular class like methods, properties, descriptions
+ * Get information about a particular class including methods, properties, and descriptions.
  *
  */
 class Help extends \lithium\console\Command {
@@ -22,103 +22,93 @@ class Help extends \lithium\console\Command {
 	/**
 	 * Auto run the help command
 	 *
-	 * @param string $name
+	 * @param string $name COMMAND to get help
 	 * @return void
 	 */
 	public function run($name = null) {
-		$class = Libraries::locate('command', $name);
-		if (!$class) {
-			$this->error("{$name} not found");
-		}
-		$pad = function($message, $level = 1) {
-			$padding = str_repeat(' ', $level * 4);
-			return $padding . str_replace("\n", "\n{$padding}", $message);
-		};
-
-		if (class_exists($class)) {
-			$properties = $this->_properties($class);
-			$this->out('USAGE');
-			$this->out($pad(sprintf("li3 %s%s [ARGS]",
-				$name ?: 'COMMAND',
-				array_reduce($properties, function($a, $b) { return "{$a} {$b['usage']}"; })
-			)));
-
+		$this->clear();
+		if (!$name) {
 			$this->nl();
-			$this->out('DESCRIPTION');
-			$info = Inspector::info($class);
-			$this->out($pad($info['description']));
+			$this->out('COMMANDS');
+			$commands = Libraries::locate('command', null, array('recursive' => false));
 
-			if ($properties) {
+			foreach ($commands as $command) {
+				$info = Inspector::info($command);
+				$this->out($this->_pad(Inflector::classify($info['shortName'])));
+				$this->out($this->_pad(strtok($info['description'], "\n"), 2));
 				$this->nl();
-				$this->out('OPTIONS');
-
-				foreach ($properties as $param) {
-					$this->out($pad($param['usage']));
-
-					if ($param['description']) {
-						$this->out($pad($param['description'], 2));
-					}
-					$this->nl();
-				}
 			}
-			if ($methods = $this->_methods($class)) {
-				$this->nl();
-				$this->out('TASKS');
-
-				foreach ($methods as $param) {
-					if (empty($param['usage'])) {
-						continue;
-					}
-					$this->out($pad($param['usage']));
-
-					if ($param['description']) {
-						$this->out($pad($param['description'], 2));
-					}
-					$this->nl();
-				}
-			}
+			$this->out('See `li3 help COMMAND` for more information on a specific command.');
 			return true;
 		}
+		$class = Libraries::locate('command', $name);
 
-		$this->nl();
-		$this->out('COMMANDS');
-		$commands = Libraries::locate('command', null, array('recursive' => false));
+		if (!$class) {
+			$this->error("{$name} not found");
+			return false;
+		}
+		if (strpos($name, '\\') !== false) {
+			$name = join('', array_slice(explode("\\", $name), -1));
+		}
+		$methods = $this->_methods($class);
+		$properties = $this->_properties($class);
 
-		foreach ($commands as $command) {
-			$info = Inspector::info($command);
-			$this->out($pad(Inflector::underscore($info['shortName'])));
-			$this->out($pad($info['description'], 2));
+		$this->out('USAGE');
+		$this->out($this->_pad(sprintf("li3 %s%s [ARGS]",
+			$name ?: 'COMMAND',
+			array_reduce($properties, function($a, $b) {
+				return "{$a} {$b['usage']}";
+			})
+		)));
+		$info = Inspector::info($class);
+
+		if (!empty($info['description'])) {
+			$this->nl();
+			$this->out('DESCRIPTION');
+			$this->out($this->_pad(strtok($info['description'], "\n"), 1));
 			$this->nl();
 		}
-		$this->out('See `li3 help COMMAND` for more information on a specific command.');
+
+		if ($properties || $methods) {
+			$this->out('OPTIONS');
+		}
+
+		if ($properties) {
+			$this->_render($properties);
+		}
+		if ($methods) {
+			$this->_render($methods);
+		}
 		return true;
 	}
 
 	/**
-	 * Get the api for the class
+	 * Get the api for the class.
 	 *
-	 * @param string $type (method, properties)
-	 * @param string $name
+	 * @param string $type method|property
+	 * @param string $name fully namespaced class in dot notation
 	 * @return array
 	 */
-	public function api($type, $name = null) {
-		if ($name === null) {
-			$name = $type;
-			$type = null;
-		}
+	public function api($class = null, $type = null, $name = null) {
+		$this->clear();
+		$class = str_replace(".", "\\", $class);
+
 		switch ($type) {
 			default:
-				$info = Inspector::info($name);
-				$this->out($pad(Inflector::underscore($info['shortName'])));
-				$this->out($pad($info['description'], 2));
+				$info = Inspector::info($class);
+				$result = array('class' => array(
+					'name' => Inflector::classify($info['shortName']),
+					'description' => $info['description']
+				));
 			break;
 			case 'method':
-
+				$result = $this->_methods($class, compact('name'));
 			break;
 			case 'property':
-
+				$result = $this->_properties($class, compact('name'));
 			break;
 		}
+		$this->_render($result);
 	}
 
 	/**
@@ -127,7 +117,9 @@ class Help extends \lithium\console\Command {
 	 * @param string $class
 	 * @return array
 	 */
-	protected function _methods($class) {
+	protected function _methods($class, $options = array()) {
+		$defaults = array('name' => null);
+		$options += $defaults;
 		$methods = Inspector::methods($class)->map(
 			function($item) {
 				if ($item->name[0] === '_') {
@@ -152,19 +144,28 @@ class Help extends \lithium\console\Command {
 			},
 			array('collect' => false)
 		);
-		foreach ($methods as &$method) {
+		$results = array();
+		foreach ($methods as $method) {
 			$comment = Docblock::comment($method['docComment']);
 			$name = $method['name'];
-			$command = $method['name'] === 'run' ? null : $method['name'];
-			$description = $method['name'] === 'run' ? null : $comment['description'];
-			$args = isset($comment['tags']['params'])
-				? join(' ', array_keys($comment['tags']['params'])) : null;
-			$return = isset($comment['tags']['return'])
-				? strtok($comment['tags']['return'], ' ') : null;
-			$usage = trim("{$command} {$args}");
-			$method = compact('name', 'description', 'return', 'usage');
+			$description = $comment['description'];
+			$args = !isset($comment['tags']['params']) ? null : $comment['tags']['params'];
+			$return = !isset($comment['tags']['return']) ? null :
+				trim(strtok($comment['tags']['return'], ' '));
+			$command = $name === 'run' ? null : $name;
+			$command = !$command && !empty($args) ? '[ARGS]' : $command;
+			$usage = "{$command} ";
+			$usage .= empty($args) ? null : join(' ', array_map(function ($a) {
+					return '[' . str_replace('$', '', $a) . ']';
+			}, array_keys($args)));
+
+			$results[$name] = compact('name', 'description', 'return', 'args', 'usage');
+
+			if ($name && $name == $options['name']) {
+				return array($name => $results[$name]);
+			}
 		}
-		return $methods;
+		return $results;
 	}
 
 	/**
@@ -173,21 +174,66 @@ class Help extends \lithium\console\Command {
 	 * @param string $class
 	 * @return array
 	 */
-	protected function _properties($class) {
+	protected function _properties($class, $options = array()) {
+		$defaults = array('name' => null);
+		$options += $defaults;
 		$properties = Inspector::properties($class);
+		$results = array();
 
 		foreach ($properties as &$property) {
 			$comment = Docblock::comment($property['docComment']);
 			$description = $comment['description'];
 			$type = isset($comment['tags']['var']) ? strtok($comment['tags']['var'], ' ') : null;
-
 			$name = str_replace('_', '-', Inflector::underscore($property['name']));
 			$usage = $type == 'boolean' ? "-{$name}" : "--{$name}=" . strtoupper($name);
+			$results[$name] = compact('name', 'description', 'type', 'usage');
 
-			$property = compact('name', 'description', 'type', 'usage');
+			if ($name == $options['name']) {
+				return array($name => $results[$name]);
+			}
 		}
+		return $results;
+	}
 
-		return $properties;
+	/**
+	 * undocumented function
+	 *
+	 * @param string $type
+	 * @param string $params
+	 * @return void
+	 */
+	protected function _render($params) {
+		foreach ($params as $name => $param) {
+			if ($name === 'run' || empty($param['name'])) {
+				continue;
+			}
+			$usage = (!empty($param['usage'])) ? trim($param['usage']) : $param['name'];
+			$this->out($this->_pad($usage));
+
+			if (!empty($param['args'])) {
+				foreach ((array) $param['args'] as $arg => $desc) {
+					$arg = str_replace('$', '', $arg);
+					$this->out($this->_pad("{$arg}: {$desc['text']}", 2));
+				}
+			}
+
+			if ($param['description']) {
+				$this->out($this->_pad($param['description'], 2));
+			}
+			$this->nl();
+		}
+	}
+
+	/**
+	 * undocumented function
+	 *
+	 * @param string $message
+	 * @param string $level
+	 * @return void
+	 */
+	protected function _pad($message, $level = 1) {
+		$padding = str_repeat(' ', $level * 4);
+		return $padding . str_replace("\n", "\n{$padding}", $message);
 	}
 }
 

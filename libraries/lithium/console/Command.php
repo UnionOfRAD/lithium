@@ -9,6 +9,7 @@
 namespace lithium\console;
 
 use \Exception;
+use \lithium\console\command\Help;
 
 /**
  * The base class to inherit when writing console scripts in Lithium.
@@ -17,6 +18,7 @@ class Command extends \lithium\core\Object {
 
 	/**
 	 * If -h or --help param exists a help screen will be returned.
+	 * Similar to running `li3 help COMMAND`.
 	 *
 	 * @var boolean
 	 */
@@ -62,7 +64,7 @@ class Command extends \lithium\core\Object {
 	 */
 	public function __construct($config = array()) {
 		$defaults = array(
-			'request' => null, 'response' => array(), 'classes' => array()
+			'request' => null, 'response' => array(), 'classes' => $this->_classes
 		);
 		$config += $defaults;
 		parent::__construct($config);
@@ -289,7 +291,10 @@ class Command extends \lithium\core\Object {
 	 * @return boolean
 	 */
 	protected function _help() {
-
+		$help = new Help($this->_config);
+		$result = $help->run(get_class($this));
+		$this->response = $help->response;
+		return $result;
 	}
 }
 

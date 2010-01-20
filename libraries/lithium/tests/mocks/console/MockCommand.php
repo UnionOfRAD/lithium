@@ -8,6 +8,10 @@
 
 namespace lithium\tests\mocks\console;
 
+/**
+ * This is the Mock Command
+ *
+ */
 class MockCommand extends \lithium\console\Command {
 
 	public $case = null;
