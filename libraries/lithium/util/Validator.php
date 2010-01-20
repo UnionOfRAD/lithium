@@ -598,7 +598,7 @@ class Validator extends \lithium\core\StaticObject {
 	/**
 	 * Used to compare 2 numeric values.
 	 *
-	 * @param mixed $value If string is passed for a string must also be passed for $value2
+	 * @param mixed $value1 If string is passed for a string must also be passed for $value2
 	 *              used as an array it must be passed as
 	 *              {{{array('check1' => value, 'operator' => 'value', 'check2' => value)}}}
 	 * @param string $operator Can be either a word or operand
@@ -607,9 +607,9 @@ class Validator extends \lithium\core\StaticObject {
 	 * @param integer $value2 only needed if $value1 is a string
 	 * @return boolean Success
 	 */
-	public static function compare($value, $operator = null, $value2 = null) {
-		if (is_array($value)) {
-			extract($value, EXTR_OVERWRITE);
+	public static function compare($value1, $operator = null, $value2 = null) {
+		if (is_array($value1)) {
+			extract($value1, EXTR_OVERWRITE);
 		}
 		$replace = array(' ', "\t", "\n", "\r", "\0", "\x0B");
 		$operator = str_replace($replace, '', strtolower($operator));
