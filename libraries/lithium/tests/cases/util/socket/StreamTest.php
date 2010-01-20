@@ -30,6 +30,8 @@ class StreamTest extends \lithium\test\Unit {
 		$this->assertFalse($stream->encoding('UTF-8'));
 		$this->assertFalse($stream->write(null));
 		$this->assertFalse($stream->read());
+		$this->assertTrue($stream->eof());
+		$this->assertNull($stream->send(''));
 	}
 
 	public function testOpen() {
@@ -67,6 +69,11 @@ class StreamTest extends \lithium\test\Unit {
 		$stream->encoding('UTF-8');
 		$result = $stream->resource();
 		$this->assertTrue(is_resource($result));
+
+		$stream = new MockStream($this->_testConfig + array('encoding' => 'UTF-8'));
+		$result = $stream->open();
+		$result = $stream->resource();
+		$this->assertTrue(is_resource($result));
 	}
 
 	public function testWriteAndRead() {
@@ -77,8 +84,22 @@ class StreamTest extends \lithium\test\Unit {
 		$data .= "Connection: Close\r\n\r\n";
 		$this->assertTrue($stream->write($data));
 
+		$result = $stream->eof();
+		$this->assertFalse($result);
+
 		$result = $stream->read();
 		$this->assertPattern("/^HTTP/", $result);
+	}
+
+	public function testSend() {
+		$stream = new MockStream($this->_testConfig);
+		$result = $stream->open();
+		$data = "GET / HTTP/1.1\r\n";
+		$data .= "Host: localhost\r\n";
+		$data .= "Connection: Close\r\n\r\n";
+
+		$result = $stream->send($data, array('classes' => array('response' => '\lithium\http\Response')));
+		$this->assertNotEqual(null, $result);
 	}
 }
 
