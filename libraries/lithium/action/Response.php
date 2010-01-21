@@ -27,11 +27,15 @@ class Response extends \lithium\http\Response {
 
 	public function __construct($config = array()) {
 		$defaults = array('buffer' => 8192, 'request' => null);
-		if (!empty($config['request']) && is_object($config['request'])) {
-			$this->type = $config['request']->type();
+		parent::__construct((array) $config + $defaults);
+	}
+
+	protected function _init() {
+		parent::_init();
+
+		if (!empty($this->_config['request']) && is_object($this->_config['request'])) {
+			$this->type = $this->_config['request']->type();
 		}
-		$this->_config = (array) $config + $defaults;
-		parent::__construct($this->_config);
 	}
 
 	/**
@@ -76,6 +80,7 @@ class Response extends \lithium\http\Response {
 		if (isset($this->headers['location']) && $this->status['code'] === 200) {
 			$code = 302;
 		}
+
 		if (!$status = $this->status($code)) {
 			throw new Exception('Invalid status code');
 		}

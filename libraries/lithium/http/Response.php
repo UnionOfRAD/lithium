@@ -102,13 +102,17 @@ class Response extends \lithium\http\Base {
 	 * @return object
 	 */
 	public function __construct($config = array()) {
-		if (!empty($config['message'])) {
-			$parts = explode("\r\n\r\n", $config['message']);
+		$defaults = array('message' => '');
+		parent::__construct((array) $config + $defaults);
+	}
+
+	protected function _init() {
+		if (!empty($this->_config['message'])) {
+			$parts = explode("\r\n\r\n", $this->_config['message']);
 
 			if (empty($parts)) {
-				return false;
+				return;
 			}
-
 			$headers = str_replace("\r", "", explode("\n", array_shift($parts)));
 
 			if (array_filter($headers) == array()) {
@@ -132,16 +136,18 @@ class Response extends \lithium\http\Base {
 				}
 			}
 			$body = implode("\r\n\r\n", $parts);
+
 			if (isset($this->headers['Transfer-Encoding'])) {
 				$body = $this->_decode($body);
 			}
 			$this->body($body);
-			unset($config['message']);
+			unset($this->_config['message']);
 		}
 
-		foreach ((array) $config as $key => $value) {
+		foreach ((array) $this->_config as $key => $value) {
 			if (isset($this->{$key})) {
 				$this->{$key} = $value;
+				unset($this->_config[$key]);
 			}
 		}
 	}
