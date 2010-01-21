@@ -14,7 +14,6 @@ use \lithium\tests\mocks\analysis\MockLoggerAdapter;
 
 /**
  * Logger adapter test case
- *
  */
 class LoggerTest extends \lithium\test\Unit {
 
@@ -53,6 +52,8 @@ class LoggerTest extends \lithium\test\Unit {
 
 		$result = Logger::config();
 		$this->assertFalse($result);
+
+		$this->assertFalse(Logger::write('default', 'Test message.'));
 	}
 
 	public function testWrite() {
