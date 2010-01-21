@@ -37,6 +37,12 @@ class SourceTest extends \lithium\test\Unit {
 		$this->skipIf(!$isAvailable, "No test connection available");
 	}
 
+	public function tearDown() {
+		foreach (CompanyIntegration::all() as $company) {
+			$company->delete();
+		}
+	}
+
 	/**
 	 * Tests that a single record with a manually specified primary key can be created, persisted
 	 * to an arbitrary data store, re-read and updated.
@@ -105,6 +111,34 @@ class SourceTest extends \lithium\test\Unit {
 		foreach ($companies as $company) {
 			$this->assertTrue($company->delete());
 		}
+	}
+
+	public function testRecordOffset() {
+		$companyData = array(
+			array('name' => 'BigBoxMart'),
+			array('name' => 'Mom \'n Pop Shop')
+		);
+
+		foreach ($companyData as $data) {
+			CompanyIntegration::create($data)->save();
+		}
+		$all = CompanyIntegration::all();
+
+		$result = $all[0];
+		$expected = 'BigBoxMart';
+		$this->assertEqual($expected, $result['name']);
+
+		$result = $result->to('array');
+		$this->assertEqual($expected, $result['name']);
+
+		$result = $all[1];
+		$expected = 'Mom \'n Pop Shop';
+		$this->assertEqual($expected, $result['name']);
+
+		$result = $result->to('array');
+		$this->assertEqual($expected, $result['name']);
+
+		$this->assertNull($all[2]);
 	}
 }
 
