@@ -6,8 +6,8 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\console\command\build;
+namespace lithium\console\command\create;
 
-class View extends \lithium\console\command\Build {}
+class View extends \lithium\console\command\Create {}
 
 ?>

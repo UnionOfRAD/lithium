@@ -6,21 +6,21 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\console\command\build;
+namespace lithium\console\command\create;
 
 use \lithium\core\Libraries;
 use \lithium\analysis\Inspector;
 
 /**
- * Build test cases or mocks in a namespace for a class.
+ * Create test cases or mocks in a namespace for a class.
  *
  */
-class Test extends \lithium\console\command\Build {
+class Test extends \lithium\console\command\Create {
 
 	/**
 	 * Generate test cases in the given namespace.
-	 * `li3 build test model Post`
-	 * `li3 build test --library=li3_plugin model Post`
+	 * `li3 create test model Post`
+	 * `li3 create test --library=li3_plugin model Post`
 	 *
 	 * @param string $type namespace of the class (e.g. model, controller, some.name.space).
 	 * @param string $name Name of class to test.
@@ -59,8 +59,8 @@ class Test extends \lithium\console\command\Build {
 
 	/**
 	 * Generate a Mock that extends the name of the given class in the given namespace.
-	 * `li3 build test mock model Post`
-	 * `li3 build test --library=li3_plugin mock model Post`
+	 * `li3 create test mock model Post`
+	 * `li3 create test --library=li3_plugin mock model Post`
 	 *
 	 * @param string $type namespace of the class (e.g. model, controller, some.name.space).
 	 * @param string $name Class name to extend with the mock.

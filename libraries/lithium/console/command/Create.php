@@ -12,11 +12,11 @@ use \lithium\core\Libraries;
 use \lithium\util\String;
 
 /**
- * The `build` command allows you to rapidly develop your models, views, controllers, and tests
+ * The `create` command allows you to rapidly develop your models, views, controllers, and tests
  * by generating the minimum code necessary to test and run your application.
  *
  */
-class Build extends \lithium\console\Command {
+class Create extends \lithium\console\Command {
 
 	/**
 	 * Controls the interactive nature of the command.
@@ -50,7 +50,7 @@ class Build extends \lithium\console\Command {
 	}
 
 	/**
-	 * Run the build command. Takes `$command` and delegates to `$command::$method`
+	 * Run the create command. Takes `$command` and delegates to `$command::$method`
 	 *
 	 * @param string $command
 	 * @param string $method
@@ -60,7 +60,7 @@ class Build extends \lithium\console\Command {
 		if (!$command) {
 			return $this->interactive();
 		}
-		$class = Libraries::locate('command.build', $command);
+		$class = Libraries::locate('command.create', $command);
 		$command = new $class(array('request' => $this->request->shift(2)));
 
 		if (!method_exists($command, $method)) {
@@ -71,7 +71,7 @@ class Build extends \lithium\console\Command {
 	}
 
 	/**
-	 * Ask questions and use answers to build.
+	 * Ask questions and use answers to create.
 	 *
 	 * @return void
 	 */
@@ -98,14 +98,14 @@ class Build extends \lithium\console\Command {
 	}
 
 	/**
-	 * Save a template with the current params. Writes file to `Build::$path`.
+	 * Save a template with the current params. Writes file to `Create::$path`.
 	 *
 	 * @param string $template
 	 * @param string $params
 	 * @return boolean
 	 */
 	protected function _save($template, $params = array()) {
-		$file = Libraries::locate('command.build.template', $template, array(
+		$file = Libraries::locate('command.create.template', $template, array(
 			'filter' => false, 'type' => 'file', 'suffix' => '.txt.php',
 		));
 		if (!$file || is_array($file)) {

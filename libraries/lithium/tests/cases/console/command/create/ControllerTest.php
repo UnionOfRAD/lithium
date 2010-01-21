@@ -6,9 +6,9 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\console\command\build;
+namespace lithium\tests\cases\console\command\create;
 
-use \lithium\console\command\build\Controller;
+use \lithium\console\command\create\Controller;
 use \lithium\console\Request;
 use \lithium\core\Libraries;
 
@@ -27,9 +27,9 @@ class ControllerTest extends \lithium\test\Unit {
 		$_SERVER['argv'] = array();
 		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
 
-		Libraries::add('build_test', array('path' => $this->_testPath . '/build_test'));
+		Libraries::add('create_test', array('path' => $this->_testPath . '/create_test'));
 		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
-		$this->request->params = array('library' => 'build_test');
+		$this->request->params = array('library' => 'create_test');
 	}
 
 	public function tearDown() {
@@ -44,16 +44,16 @@ class ControllerTest extends \lithium\test\Unit {
 		));
 		$controller->path = $this->_testPath;
 		$controller->run('Posts');
-		$expected = "PostsController created in build_test\\controllers.\n";
+		$expected = "PostsController created in create_test\\controllers.\n";
 		$result = $controller->response->output;
 		$this->assertEqual($expected, $result);
 
 		$expected = <<<'test'
 
 
-namespace build_test\controllers;
+namespace create_test\controllers;
 
-use \build_test\models\Post;
+use \create_test\models\Post;
 
 class PostsController extends \lithium\action\Controller {
 
@@ -104,7 +104,7 @@ class PostsController extends \lithium\action\Controller {
 test;
 		$replace = array("<?php", "?>");
 		$result = str_replace($replace, '',
-			file_get_contents($this->_testPath . '/build_test/controllers/PostsController.php')
+			file_get_contents($this->_testPath . '/create_test/controllers/PostsController.php')
 		);
 		$this->assertEqual($expected, $result);
 	}

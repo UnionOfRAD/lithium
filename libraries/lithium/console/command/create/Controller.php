@@ -6,12 +6,12 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\console\command\build;
+namespace lithium\console\command\create;
 
 use \lithium\core\Libraries;
 use \lithium\util\Inflector;
 
-class Controller extends \lithium\console\command\Build {
+class Controller extends \lithium\console\command\Create {
 
 	public function run($name = null, $null = null) {
 		$library = Libraries::get($this->library);

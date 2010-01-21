@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\console\command\build;
+namespace lithium\console\command\create;
 
 use \Phar;
 use \lithium\core\Libraries;
@@ -15,12 +15,12 @@ use \lithium\core\Libraries;
  * Generate and extract Phar::GZ archives. Requires zlib extension.
  *
  */
-class Library extends \lithium\console\command\Build {
+class Library extends \lithium\console\command\Create {
 
 	/**
 	 * Extract an archive into a path
-	 * `li3 build library myapp`
-	 * `li3 build library myapp another_archive`
+	 * `li3 create library myapp`
+	 * `li3 create library myapp another_archive`
 	 *
 	 * @param string $new the name of or path to the library to create `from` phar.
 	 * @param string $from the name of or path to the phar.gz to copy.
@@ -30,7 +30,7 @@ class Library extends \lithium\console\command\Build {
 		$new = $this->_toPath($new);
 
 		if ($from[0] !== '/') {
-			$from = Libraries::locate('command.build.template', $from, array(
+			$from = Libraries::locate('command.create.template', $from, array(
 				'filter' => false, 'type' => 'file', 'suffix' => '.phar.gz',
 			));
 			if (!$from || is_array($from)) {
@@ -50,8 +50,8 @@ class Library extends \lithium\console\command\Build {
 
 	/**
 	 * Create the Phar::GZ archive.
-	 * `li3 build library archive my_archive`
-	 * `li3 build library archive my_archive myapp`
+	 * `li3 create library archive my_archive`
+	 * `li3 create library archive my_archive myapp`
 	 *
 	 * @param string $to The name of or path to the archive.
 	 * @param string $from The name of or path to the directory to compress.

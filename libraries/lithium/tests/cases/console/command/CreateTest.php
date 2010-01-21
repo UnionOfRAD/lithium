@@ -8,11 +8,11 @@
 
 namespace lithium\tests\cases\console\command;
 
-use \lithium\tests\mocks\console\command\MockBuild;
+use \lithium\tests\mocks\console\command\MockCreate;
 use \lithium\console\Request;
 use \lithium\core\Libraries;
 
-class BuildTest extends \lithium\test\Unit {
+class CreateTest extends \lithium\test\Unit {
 
 	public $request;
 
@@ -29,9 +29,9 @@ class BuildTest extends \lithium\test\Unit {
 		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
 
 		Libraries::add('app', array('path' => $this->_testPath . '/new', 'bootstrap' => false));
-		Libraries::add('build_test', array('path' => $this->_testPath . '/build_test'));
+		Libraries::add('create_test', array('path' => $this->_testPath . '/create_test'));
 		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
-		$this->request->params = array('library' => 'build_test');
+		$this->request->params = array('library' => 'create_test');
 	}
 
 	public function tearDown() {
@@ -42,18 +42,18 @@ class BuildTest extends \lithium\test\Unit {
 	}
 
 	public function testConstruct() {
-		$build = new MockBuild(array('request' => $this->request));
+		$create = new MockCreate(array('request' => $this->request));
 
-		$expected = 'build_test';
-		$result = $build->library;
+		$expected = 'create_test';
+		$result = $create->library;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testSaveWithApp() {
 		chdir($this->_testPath);
 		$this->request->params = array('library' => 'app');
-		$build = new MockBuild(array('request' => $this->request));
-		$result = $build->save('test', array(
+		$create = new MockCreate(array('request' => $this->request));
+		$result = $create->save('test', array(
 			'namespace' => 'app\tests\cases\models',
 			'use' => 'app\models\Post',
 			'class' => 'PostTest',
@@ -69,74 +69,74 @@ class BuildTest extends \lithium\test\Unit {
 
 	public function testSaveWithLibrary() {
 		chdir($this->_testPath);
-		$build = new MockBuild(array('request' => $this->request));
-		$result = $build->save('test', array(
-			'namespace' => 'build_test\tests\cases\models',
-			'use' => 'build_test\models\Post',
+		$create = new MockCreate(array('request' => $this->request));
+		$result = $create->save('test', array(
+			'namespace' => 'create_test\tests\cases\models',
+			'use' => 'create_test\models\Post',
 			'class' => 'PostTest',
 			'methods' => "\tpublic function testCreate() {\n\n\t}\n",
 		));
 		$this->assertTrue($result);
 
-		$result = $this->_testPath . '/build_test/tests/cases/models/PostTest.php';
+		$result = $this->_testPath . '/create_test/tests/cases/models/PostTest.php';
 		$this->assertTrue(file_exists($result));
 
 		$this->_cleanUp();
 	}
 
 	public function testRunWithoutCommand() {
-		$build = new MockBuild(array('request' => $this->request));
+		$create = new MockCreate(array('request' => $this->request));
 
 		$expected = null;
-		$result = $build->run();
+		$result = $create->run();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testRunWithModelCommand() {
-		$build = new MockBuild(array('request' => $this->request));
+		$create = new MockCreate(array('request' => $this->request));
 
 		$this->request->params += array(
-			'command' => 'build', 'action' => 'run', 'args' => array('model')
+			'command' => 'create', 'action' => 'run', 'args' => array('model')
 		);
-		$build->run('model');
+		$create->run('model');
 
 		$expected = 'model';
-		$result = $build->request->params['command'];
+		$result = $create->request->params['command'];
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testRunWithTestModelCommand() {
 		$this->request->params = array(
-			'command' => 'build', 'action' => 'run',
+			'command' => 'create', 'action' => 'run',
 			'args' => array('test', 'model', 'Post'),
-			'library' => 'build_test'
+			'library' => 'create_test'
 		);
-		$build = new MockBuild(array('request' => $this->request));
+		$create = new MockCreate(array('request' => $this->request));
 
-		$build->run('test', 'model');
+		$create->run('test', 'model');
 
 		$expected = 'test';
-		$result = $build->request->params['command'];
+		$result = $create->request->params['command'];
 		$this->assertEqual($expected, $result);
 
-		$result = $this->_testPath . '/build_test/tests/cases/models/PostTest.php';
+		$result = $this->_testPath . '/create_test/tests/cases/models/PostTest.php';
 		$this->assertTrue(file_exists($result));
 	}
 
 	public function testRunWithTestOtherCommand() {
-		$build = new MockBuild(array('request' => $this->request));
+		$create = new MockCreate(array('request' => $this->request));
 		$this->request->params = array(
-			'command' => 'build', 'action' => 'run',
+			'command' => 'create', 'action' => 'run',
 			'args' => array('test', 'something', 'Post'),
-			'library' => 'build_test'
+			'library' => 'create_test'
 		);
-		$build->run('test', 'something');
+		$create->run('test', 'something');
 
 		$expected = 'test';
-		$result = $build->request->params['command'];
+		$result = $create->request->params['command'];
 		$this->assertEqual($expected, $result);
 
-		$result = $this->_testPath . '/build_test/tests/cases/something/PostTest.php';
+		$result = $this->_testPath . '/create_test/tests/cases/something/PostTest.php';
 		$this->assertTrue(file_exists($result));
 	}
 }

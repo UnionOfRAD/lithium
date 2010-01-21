@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\console\command;
 
-class MockBuild extends \lithium\console\command\Build {
+class MockCreate extends \lithium\console\command\Create {
 
 	public function save($template, $params = array()) {
 		return $this->_save($template, $params);

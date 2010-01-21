@@ -6,9 +6,9 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\console\command\build;
+namespace lithium\tests\cases\console\command\create;
 
-use \lithium\console\command\build\Model;
+use \lithium\console\command\create\Model;
 use \lithium\console\Request;
 use \lithium\core\Libraries;
 
@@ -27,9 +27,9 @@ class ModelTest extends \lithium\test\Unit {
 		$_SERVER['argv'] = array();
 		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
 
-		Libraries::add('build_test', array('path' => $this->_testPath . '/build_test'));
+		Libraries::add('create_test', array('path' => $this->_testPath . '/create_test'));
 		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
-		$this->request->params = array('library' => 'build_test');
+		$this->request->params = array('library' => 'create_test');
 	}
 
 	public function tearDown() {
@@ -44,14 +44,14 @@ class ModelTest extends \lithium\test\Unit {
 		));
 		$model->path = $this->_testPath;
 		$model->run('Post');
-		$expected = "Post created in build_test\\models.\n";
+		$expected = "Post created in create_test\\models.\n";
 		$result = $model->response->output;
 		$this->assertEqual($expected, $result);
 
 		$expected = <<<'test'
 
 
-namespace build_test\models;
+namespace create_test\models;
 
 class Post extends \lithium\data\Model {
 
@@ -62,7 +62,7 @@ class Post extends \lithium\data\Model {
 test;
 		$replace = array("<?php", "?>");
 		$result = str_replace($replace, '',
-			file_get_contents($this->_testPath . '/build_test/models/Post.php')
+			file_get_contents($this->_testPath . '/create_test/models/Post.php')
 		);
 		$this->assertEqual($expected, $result);
 	}

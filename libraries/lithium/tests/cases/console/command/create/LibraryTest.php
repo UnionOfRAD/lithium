@@ -1,9 +1,9 @@
 <?php
 
-namespace lithium\tests\cases\console\command\build;
+namespace lithium\tests\cases\console\command\create;
 
 use \Phar;
-use \lithium\console\command\build\Library;
+use \lithium\console\command\create\Library;
 use \lithium\core\Libraries;
 use \lithium\console\Request;
 
@@ -22,27 +22,27 @@ class LibraryTest extends \lithium\test\Unit {
 		$_SERVER['argv'] = array();
 		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
 		chdir($this->_testPath);
-		Libraries::add('build_test', array('path' => $this->_testPath . '/build_test'));
+		Libraries::add('create_test', array('path' => $this->_testPath . '/create_test'));
 		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
 	}
 
 	public function tearDown() {
 		$_SERVER = $this->_backup['_SERVER'];
 		chdir($this->_backup['cwd']);
-		Libraries::remove('build_test');
+		Libraries::remove('create_test');
 		unset($this->request);
 	}
 
 	public function testRun() {
-		$this->request->params['library'] = 'build_test';
+		$this->request->params['library'] = 'create_test';
 		$app = new Library(array('request' => $this->request, 'classes' => $this->classes));
 
 		$expected = true;
-		$result = $app->run($this->_testPath . '/build_test');
+		$result = $app->run($this->_testPath . '/create_test');
 		$this->assertEqual($expected, $result);
 
-		$expected = "build_test created in {$this->_testPath} from ";
-		$expected .= LITHIUM_LIBRARY_PATH . "/lithium/console/command/build/template/app.phar.gz\n";
+		$expected = "create_test created in {$this->_testPath} from ";
+		$expected .= LITHIUM_LIBRARY_PATH . "/lithium/console/command/create/template/app.phar.gz\n";
 		$result = $app->response->output;
 		$this->assertEqual($expected, $result);
 	}
@@ -53,42 +53,42 @@ class LibraryTest extends \lithium\test\Unit {
 			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
 		);
 
-		$this->request->params['library'] = 'build_test';
+		$this->request->params['library'] = 'create_test';
 		$app = new Library(array('request' => $this->request, 'classes' => $this->classes));
 
 		$expected = true;
-		$result = $app->archive($this->_testPath . '/build_test', $this->_testPath . '/build_test');
+		$result = $app->archive($this->_testPath . '/create_test', $this->_testPath . '/create_test');
 		$this->assertEqual($expected, $result);
 
-		$expected = "build_test.phar.gz created in {$this->_testPath} from ";
-		$expected .= "{$this->_testPath}/build_test\n";
+		$expected = "create_test.phar.gz created in {$this->_testPath} from ";
+		$expected .= "{$this->_testPath}/create_test\n";
 
 		$result = $app->response->output;
 		$this->assertEqual($expected, $result);
 
-		Phar::unlinkArchive($this->_testPath . '/build_test.phar');
+		Phar::unlinkArchive($this->_testPath . '/create_test.phar');
 	}
 
 	public function testRunWithFullPaths() {
 		$this->skipIf(
-			!file_exists($this->_testPath . '/build_test.phar.gz'),
+			!file_exists($this->_testPath . '/create_test.phar.gz'),
 			'Skipped test {:class}::{:function}() - depends on {:class}::testArchive()'
 		);
-		$this->request->params['library'] = 'build_test';
+		$this->request->params['library'] = 'create_test';
 		$app = new Library(array('request' => $this->request, 'classes' => $this->classes));
 
 		$expected = true;
-		$result = $app->run($this->_testPath . '/new', $this->_testPath . '/build_test.phar.gz');
+		$result = $app->run($this->_testPath . '/new', $this->_testPath . '/create_test.phar.gz');
 		$this->assertEqual($expected, $result);
 
 		$this->assertTrue(file_exists($this->_testPath . '/new'));
 
 		$expected = "new created in {$this->_testPath} from ";
-		$expected .= "{$this->_testPath}/build_test.phar.gz\n";
+		$expected .= "{$this->_testPath}/create_test.phar.gz\n";
 		$result = $app->response->output;
 		$this->assertEqual($expected, $result);
 
-		Phar::unlinkArchive($this->_testPath . '/build_test.phar.gz');
+		Phar::unlinkArchive($this->_testPath . '/create_test.phar.gz');
 	}
 
 	public function testArchiveNoLibrary() {
@@ -130,7 +130,7 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->assertTrue(file_exists($this->_testPath . '/new'));
 
 		$expected = "new created in {$this->_testPath} from ";
-		$expected .= LITHIUM_LIBRARY_PATH . "/lithium/console/command/build/template/app.phar.gz\n";
+		$expected .= LITHIUM_LIBRARY_PATH . "/lithium/console/command/create/template/app.phar.gz\n";
 		$result = $app->response->output;
 		$this->assertEqual($expected, $result);
 

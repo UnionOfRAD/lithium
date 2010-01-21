@@ -6,11 +6,11 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\console\command\build;
+namespace lithium\console\command\create;
 
 use \lithium\core\Libraries;
 
-class Model extends \lithium\console\command\Build {
+class Model extends \lithium\console\command\Create {
 
 	public function run($name = null, $null = null) {
 		$library = Libraries::get($this->library);
