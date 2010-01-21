@@ -53,7 +53,7 @@ class View extends \lithium\core\Object {
 			if (!$class = Libraries::locate('adapter.template.view', $this->_config[$key])) {
 				throw new RuntimeException("Template adapter {$this->_config[$key]} not found");
 			}
-			$this->{'_' . $key} = new $class($this->_config);
+			$this->{'_' . $key} = new $class(array('view' => $this) + $this->_config);
 		}
 
 		$h = function($data) use (&$h) {
@@ -73,8 +73,12 @@ class View extends \lithium\core\Object {
 	}
 
 	public function render($type, $data = array(), $options = array()) {
-		$defaults = array('context' => array());
+		$defaults = array('context' => array(), 'type' => 'html');
 		$options += $defaults;
+
+		if (is_array($type)) {
+			list($type, $template) = each($type);
+		}
 
 		switch ($type) {
 			case 'all':
@@ -85,6 +89,9 @@ class View extends \lithium\core\Object {
 				}
 				$options['context'] += compact('content');
 				return $this->render('layout', $data, $options);
+			case 'element':
+				$options = compact('template') + array('controller' => 'elements') + $options;
+				$type = 'template';
 			case 'template':
 			case 'layout':
 				$template = $this->_loader->template($type, $options);

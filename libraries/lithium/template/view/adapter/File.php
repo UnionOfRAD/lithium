@@ -25,7 +25,7 @@ use \lithium\core\Libraries;
 class File extends \lithium\template\view\Renderer {
 
 	protected $_autoConfig = array(
-		'classes' => 'merge', 'request', 'context', 'strings', 'handlers'
+		'classes' => 'merge', 'request', 'context', 'strings', 'handlers', 'view'
 	);
 
 	protected $_classes = array(

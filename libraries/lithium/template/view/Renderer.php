@@ -19,7 +19,18 @@ abstract class Renderer extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('request', 'context', 'strings', 'handlers');
+	protected $_autoConfig = array(
+		'request', 'context', 'strings', 'handlers', 'view', 'classes' => 'merge'
+	);
+
+	/**
+	 * Holds an instance of the `View` object that created this rendering context. See the `view()`
+	 * method for more details.
+	 *
+	 * @see lithium\template\view\Renderer::view()
+	 * @var object
+	 */
+	protected $_view = null;
 
 	/**
 	 * Context values that exist across all templates rendered in this context.  These values
@@ -79,7 +90,11 @@ abstract class Renderer extends \lithium\core\Object {
 
 	public function __construct($config = array()) {
 		$defaults = array(
-			'strings' => array(), 'handlers' => array(), 'request' => null, 'context' => array(
+			'view' => null,
+			'strings' => array(),
+			'handlers' => array(),
+			'request' => null,
+			'context' => array(
 				'content' => '', 'title' => '', 'scripts' => array(), 'styles' => array()
 			)
 		);
@@ -117,7 +132,10 @@ abstract class Renderer extends \lithium\core\Object {
 				return "\n\t" . join("\n\t", $context['scripts']) . "\n";
 			}
 		);
+		unset($this->_config['view']);
 	}
+
+	abstract public function render($template, $data = array(), $options = array());
 
 	public function __get($property) {
 		$context = $this->_context;
@@ -295,6 +313,16 @@ abstract class Renderer extends \lithium\core\Object {
 	 */
 	public function request() {
 		return $this->_request;
+	}
+
+	/**
+	 * Retuns the `View` object that controls this rendering context's instance. This can be used,
+	 * for example, to render view elements, i.e. `<?=$this->view()->render('element' $name); ?>`.
+	 *
+	 * @return void
+	 */
+	public function view() {
+		return $this->_view;
 	}
 }
 
