@@ -268,6 +268,7 @@ class Media extends \lithium\core\StaticObject {
 	 *         plugins.
 	 * @see lithium\http\Media::$_assets
 	 * @see lithium\action\Request::env()
+	 * @filter
 	 */
 	public static function asset($path, $type, $options = array()) {
 		$defaults = array(
@@ -345,28 +346,39 @@ class Media extends \lithium\core\StaticObject {
 	 * @param mixed $data
 	 * @param array $options
 	 * @return void
+	 * @filter
 	 * @todo Implement proper exception handling
 	 */
 	public static function render(&$response, $data = null, $options = array()) {
-		$defaults = array('encode' => null, 'template' => null, 'layout' => null, 'view' => null);
+		$params = array('response' => &$response) + compact('data', 'options');
+		$types = static::$_types;
+		$handlers = static::$_handlers;
 
-		$options += array('type' => $response->type());
-		$type = $options['type'];
-		$result = null;
+		static::_filter(__FUNCTION__, $params, function($self, $params) use ($types, $handlers) {
+			$defaults = array(
+				'encode' => null, 'template' => null, 'layout' => null, 'view' => null
+			);
+			$response =& $params['response'];
+			$data = $params['data'];
+			$options = $params['options'] + array('type' => $response->type());
 
-		if (!isset(static::$_types[$type])) {
-			throw new Exception("Unhandled media type '$type'");
-		}
+			$type = $options['type'];
+			$result = null;
 
-		if (isset(static::$_handlers[$type])) {
-			$h = (array) static::$_handlers[$type] + (array) static::$_handlers['default'];
-		} else {
-			$h = $options + $defaults;
-			$filter = function($v) { return $v !== null; };
-			$h = array_filter($h, $filter) + static::$_handlers['default'] + $defaults;
-		}
-		$response->body(static::_handle($h, $data, $options));
-		$response->headers('Content-type', current((array) static::$_types[$type]));
+			if (!isset($types[$type])) {
+				throw new Exception("Unhandled media type '{$type}'");
+			}
+
+			if (isset($handlers[$type])) {
+				$h = (array) $handlers[$type] + (array) $handlers['default'];
+			} else {
+				$h = $options + $defaults;
+				$filter = function($v) { return $v !== null; };
+				$h = array_filter($h, $filter) + $handlers['default'] + $defaults;
+			}
+			$response->body($self::invokeMethod('_handle', array($h, $data, $options)));
+			$response->headers('Content-type', current((array) $types[$type]));
+		});
 	}
 
 	/**
