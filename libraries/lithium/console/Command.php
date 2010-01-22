@@ -61,14 +61,17 @@ class Command extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $colors = array('black' => 30, 'red' => 31, 'green' => 32, 'yellow' => 33, 'blue' => 34, 'purple' => 35, 'cyan' => 36, 'white' => 37, 'end' => 0);
+	protected $_colors = array(
+		'black' => 30, 'red' => 31, 'green' => 32, 
+		'yellow' => 33, 'blue' => 34, 'purple' => 35, 
+		'cyan' => 36, 'white' => 37, 'end' => 0);
 	
 	/**
 	 * String formatting modifiers for ANSI formatted output.
 	 *
 	 * @var array
 	 */
-	protected $colorModifiers = array('bold' => 1, 'underline' => 4);
+	protected $_colorModifiers = array('bold' => 1, 'underline' => 4);
 
 	/**
 	 * Constructor.
@@ -116,18 +119,19 @@ class Command extends \lithium\core\Object {
 	 */
 	protected function _colorCode($color, $modifier = null) {
 		//Abort for Windows systems that aren't forcing color, or if the color isn't found.
-		if ((strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && !$this->color) || !in_array(strtolower($color), $this->colors)) {
+		if ((strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && !$this->color) || 
+			!in_array(strtolower($color), $this->_colors)) {
 		    return;
 		}
 		//Default modifier setup
-		if(!in_array(strtolower($modifier), $this->colorModifiers) || $modifier == null) {
+		if(!in_array(strtolower($modifier), $this->_colorModifiers) || $modifier == null) {
 			$modifier = 0;
 		}
 		
-		if($this->colors[strtolower($color)] != 'end') {
-			return "\033[" . $modifier . ';' . $this->colors[strtolower($color)] . 'm';
+		if($this->_colors[strtolower($color)] != 'end') {
+			return "\033[" . $modifier . ';' . $this->_colors[strtolower($color)] . 'm';
 		} else {
-			return "\033[" . $this->colors[strtolower($color)] . 'm';
+			return "\033[" . $this->_colors[strtolower($color)] . 'm';
 		}
 	}
 	/**
