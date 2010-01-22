@@ -158,7 +158,7 @@ class Help extends \lithium\console\Command {
 			$command = !$command && !empty($args) ? '[ARGS]' : $command;
 			$usage = "{$command} ";
 			$usage .= empty($args) ? null : join(' ', array_map(function ($a) {
-					return '[' . str_replace('$', '', $a) . ']';
+					return '[' . str_replace('$', '', trim($a)) . ']';
 			}, array_keys($args)));
 
 			$results[$name] = compact('name', 'description', 'return', 'args', 'usage');
@@ -185,7 +185,7 @@ class Help extends \lithium\console\Command {
 
 		foreach ($properties as &$property) {
 			$comment = Docblock::comment($property['docComment']);
-			$description = $comment['description'];
+			$description = trim($comment['description']);
 			$type = isset($comment['tags']['var']) ? strtok($comment['tags']['var'], ' ') : null;
 			$name = str_replace('_', '-', Inflector::underscore($property['name']));
 			$usage = $type == 'boolean' ? "-{$name}" : "--{$name}=" . strtoupper($name);
@@ -213,10 +213,12 @@ class Help extends \lithium\console\Command {
 			$this->out($this->_pad($usage));
 
 			if (!empty($param['args'])) {
+				$args = array();
 				foreach ((array) $param['args'] as $arg => $desc) {
-					$arg = str_replace('$', '', $arg);
-					$this->out($this->_pad("{$arg}: {$desc['text']}", 2));
+					$arg = str_replace('$', '', trim($arg));
+					$args[] = $this->_pad("{$arg}: {$desc['text']}", 2);
 				}
+				$this->out($args);
 			}
 			if ($param['description']) {
 				$this->out($this->_pad($param['description'], 2));

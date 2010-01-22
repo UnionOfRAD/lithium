@@ -84,9 +84,91 @@ class Library extends \lithium\console\Command {
 	}
 
 	/**
+	 * Extract an archive into a path. If one param exists, the app.phar.gz template will be used.
+	 * If both parameters exist, then the first will be the template archive and the second will be
+	 * the name of the extracted archive
+	 *
+	 * `li3 library extract myapp` : uses the command/create/template/app.phar.gz
+	 * `li3 library extract another_archive myapp`
+	 * `li3 library extract plugin li3_plugin` : uses the command/create/template/plugin.phar.gz
+	 *
+	 * @param string $name if only param, command/create/template/app.phar.gz extracted to $name
+	 *     otherwise, the template name or full path to extract `from` phar.gz.
+	 * @param string $result if exists $name is extracted to $result
+	 * @return boolean
+	 */
+	public function extract($name = 'new', $result = null) {
+		$from = 'app';
+		$to = $name;
+
+		if ($result) {
+			$from = $name;
+			$to = $result;
+		}
+		$to = $this->_toPath($to);
+
+		if ($from[0] !== '/') {
+			$from = Libraries::locate('command.create.template', $from, array(
+				'filter' => false, 'type' => 'file', 'suffix' => '.phar.gz',
+			));
+			if (!$from || is_array($from)) {
+				return false;
+			}
+		}
+		if (file_exists($from)) {
+			$archive = new Phar($from);
+			if ($archive->extractTo($to)) {
+				$this->out(basename($to) . " created in " . dirname($to) . " from {$from}");
+				return true;
+			}
+		}
+		$this->error("Could not extract {$to} from {$from}");
+		return false;
+	}
+
+	/**
+	 * Create the Phar::GZ archive from a given directory. If no params, the current working
+	 * directory is archived with the name of that directory. If one param, the current working
+	 * directory will be archive with the name provided. If both params, the first is the
+	 * name or path to the library to archive and the second is the name of the resulting archive
+	 *
+	 * `li3 library archive my_archive` : archives current working directory to my_archive.phar.gz
+	 * `li3 library archive myapp my_archive` : archives 'myapp' to 'my_archive.phar.gz'
+	 *
+	 * @param string $name if only param, the archive name for the current working directory
+	 *     otherwise, The library name or path to the directory to compress.
+	 * @param string $result if exists, The name of the resulting archive
+	 * @return boolean
+	 */
+	public function archive($name = null, $result = null) {
+		$from = null;
+		$to = $name;
+
+		if ($result) {
+			$from = $name;
+			$to = $result;
+		}
+
+		$path = $this->_toPath($name);
+ 		$archive = new Phar("{$path}.phar");
+		$from = $this->_toPath($from);
+		$filter = '/^(?(?=\.)\.(htaccess|gitignore|gitmodules)|.*)$/i';
+		$result = (boolean) $archive->buildFromDirectory($from, $filter);
+
+		if ($result) {
+			$archive->compress(Phar::GZ);
+			$this->out(basename($path) . ".phar.gz created in " . dirname($path) . " from {$from}");
+			return true;
+		}
+		$this->error("Could not create archive from {$from}");
+		return false;
+	}
+
+
+	/**
 	 * List all the plugins and extensions available on the server.
 	 *
-	 * @param string $type
+	 * @param string $type plugins|extensions
 	 * @return void
 	 */
 	public function find($type = 'plugins') {
@@ -152,89 +234,6 @@ class Library extends \lithium\console\Command {
 				$this->path . '/' . basename($plugin->sources->phar, '.phar.gz')
 			);
 		}
-		return false;
-	}
-
-	/**
-	 * Extract an archive into a path. If one param exists, the app.phar.gz template will be used.
-	 * If both parameters exist, then the first will be the template archive and the second will be
-	 * the name of the extracted archive
-	 *
-	 * `li3 library extract myapp` : uses the command/create/template/app.phar.gz
-	 * `li3 library extract another_archive myapp`
-	 * `li3 library extract plugin li3_plugin` : uses the command/create/template/plugin.phar.gz
-	 *
-	 * @param string $name
-	 *               - if only param, command/create/template/app.phar.gz extracted to $name
-	 *               - otherwise, the template name or full path to extract `from` phar.gz.
-	 * @param string $result if exists $name is extracted to $result
-	 * @return boolean
-	 */
-	public function extract($name = 'new', $result = null) {
-		$from = 'app';
-		$to = $name;
-
-		if ($result) {
-			$from = $name;
-			$to = $result;
-		}
-		$to = $this->_toPath($to);
-
-		if ($from[0] !== '/') {
-			$from = Libraries::locate('command.create.template', $from, array(
-				'filter' => false, 'type' => 'file', 'suffix' => '.phar.gz',
-			));
-			if (!$from || is_array($from)) {
-				return false;
-			}
-		}
-		if (file_exists($from)) {
-			$archive = new Phar($from);
-			if ($archive->extractTo($to)) {
-				$this->out(basename($to) . " created in " . dirname($to) . " from {$from}");
-				return true;
-			}
-		}
-		$this->error("Could not extract {$to} from {$from}");
-		return false;
-	}
-
-	/**
-	 * Create the Phar::GZ archive from a given directory. If no params, the current working
-	 * directory is archived with the name of that directory. If one param, the current working
-	 * directory will be archive with the name provided. If both params, the first is the
-	 * name or path to the library to archive and the second is the name of the resulting archive
-	 *
-	 * `li3 library archive my_archive` : archives current working directory to my_archive.phar.gz
-	 * `li3 library archive myapp my_archive` : archives 'myapp' to 'my_archive.phar.gz'
-	 *
-	 * @param string $name
-	 *               - if only param, the archive name for the current working directory
-	 *               - otherwise, The library name or path to the directory to compress.
-	 * @param string $result if exists, The name of the resulting archive
-	 * @return boolean
-	 */
-	public function archive($name = null, $result = null) {
-		$from = null;
-		$to = $name;
-
-		if ($result) {
-			$from = $name;
-			$to = $result;
-		}
-
-		$path = $this->_toPath($name);
- 		$archive = new Phar("{$path}.phar");
-		$from = $this->_toPath($from);
-		$filter = '/^(?(?=\.)\.(htaccess|gitignore|gitmodules)|.*)$/i';
-		$result = (boolean) $archive->buildFromDirectory($from, $filter);
-
-		if ($result) {
-			$archive->compress(Phar::GZ);
-			$this->out(basename($path) . ".phar.gz created in " . dirname($path) . " from {$from}");
-			return true;
-		}
-		$this->error("Could not create archive from {$from}");
 		return false;
 	}
 
