@@ -55,24 +55,6 @@ class Command extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_autoConfig = array('classes' => 'merge');
-	
-	/**
-	 * Color codes used in ANSI colored output.
-	 *
-	 * @var array
-	 */
-	protected $_colors = array(
-		'black' => 30, 'red' => 31, 'green' => 32, 
-		'yellow' => 33, 'blue' => 34, 'purple' => 35, 
-		'cyan' => 36, 'white' => 37, 'end' => 0
-	);
-	
-	/**
-	 * String formatting modifiers for ANSI formatted output.
-	 *
-	 * @var array
-	 */
-	protected $_colorModifiers = array('bold' => 1, 'underline' => 4);
 
 	/**
 	 * Constructor.
@@ -110,31 +92,41 @@ class Command extends \lithium\core\Object {
 			}
 		}
 	}
-
+	
 	/**
-	 * Returns ANSI-style terminal color codes for colored console output.
+	 * Adds textual styles to console command output.
 	 *
-	 * @param string $color Possible values: black, red, green, yellow, blue, purple, cyan, white, and end.
-	 * @param string $modifier Possible values: bold and underline.
+	 * @param array $options Valid options are: 
+	 * 				- `'color'`: Foreground text color. Values: black, red, green, yellow, 
+	 * 					blue, purple, cyan, white, end.
+	 * 				- `'type'`: Text decoration type. Values: normal, bold, underline.
 	 * @return string
 	 */
-	protected function _colorCode($color, $modifier = null) {
-		//Abort for Windows systems that aren't forcing color, or if the color isn't found.
-		if ((strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && !$this->color) || 
-			!in_array(strtolower($color), $this->_colors)) {
+	protected function _style($options = array()) {
+		//Abort in cases of Windows clients that aren't forcing color, or missing colors.
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && !$this->color) {
 		    return;
 		}
-		//Default modifier setup
-		if(!in_array(strtolower($modifier), $this->_colorModifiers) || $modifier == null) {
-			$modifier = 0;
+
+		$defaults = array('type' => 'normal');
+		$options += $defaults;
+		
+		$colors = array(
+			'black' => 30, 'red' => 31, 'green' => 32, 
+			'yellow' => 33, 'blue' => 34, 'purple' => 35, 
+			'cyan' => 36, 'white' => 37, 'end' => 0
+		);
+
+		$types = array('bold' => 1, 'underline' => 4, 'normal' => 0);
+		
+		//IF no params (color) was supplied, send the end escape sequence.
+		if(array_key_exists('color', $options) === false) {
+			return "\033[" . $colors['end'] . 'm';
 		}
 		
-		if($this->_colors[strtolower($color)] != 'end') {
-			return "\033[" . $modifier . ';' . $this->_colors[strtolower($color)] . 'm';
-		} else {
-			return "\033[" . $this->_colors[strtolower($color)] . 'm';
-		}
+		return "\033[" . $types[$options['type']] . ';' . $colors[$options['color']] . 'm';
 	}
+	
 	/**
 	 * Called by the Dispatcher class to invoke an action.
 	 *
@@ -325,79 +317,6 @@ class Command extends \lithium\core\Object {
 			}
 		}
 		exit($status);
-	}
-
-	/**
-	 * Show help generated from the documented code of the command.
-	 *
-	 * @return boolean
-	 */
-	public function help() {
-		$parent = new ReflectionClass("\lithium\console\Command");
-		$class = new ReflectionClass(get_class($this));
-		$template = $class->newInstance();
-
-		$properties = array_diff($class->getProperties(), $parent->getProperties());
-		$properties = array_filter($properties, function($p) { return $p->isPublic(); });
-
-		foreach ($properties as &$property) {
-			$comment = Docblock::comment($property->getDocComment());
-			$description = $comment['description'];
-			$type = isset($comment['tags']['var']) ? strtok($comment['tags']['var'], ' ') : null;
-
-			$name = str_replace('_', '-', Inflector::underscore($property->getName()));
-			$usage = $type == 'boolean' ? "--{$name}" : "--{$name}=" . strtoupper($name);
-
-			$property = compact('name', 'description', 'type', 'usage');
-		}
-
-		$pad = function($message, $level = 1) {
-			$padding = str_repeat(' ', $level * 4);
-			return $padding . str_replace("\n", "\n{$padding}", $message);
-		};
-
-		$this->out($this->_colorCode('purple') . 'USAGE' . $this->_colorCode('end'));
-		$this->out($pad(sprintf("li3 %s%s [ARGS]",
-			$this->request->params['command'] ?: 'COMMAND',
-			array_reduce($properties, function($a, $b) { return "{$a} {$b['usage']}"; })
-		)));
-
-		if ($this->request->params['command']) {
-			$this->nl();
-			$this->out($this->_colorCode('blue') . 'DESCRIPTION' . $this->_colorCode('end'));
-			$comment = Docblock::comment($class->getDocComment());
-			$this->out($pad($comment['description']));
-		}
-		if ($properties) {
-			$this->nl();
-			$this->out($this->_colorCode('cyan') . 'OPTIONS' . $this->_colorCode('end'));
-
-			foreach ($properties as $param) {
-				$this->out($this->_colorCode('green') . $pad($param['usage']) . $this->_colorCode('end'));
-
-				if ($param['description']) {
-					$this->out($pad($param['description'], 2));
-				}
-				$this->nl();
-			}
-		}
-		if (!$this->request->params['command']) {
-			$this->nl();
-			$this->out($this->_colorCode('blue') . 'COMMANDS' . $this->_colorCode('end'));
-			$commands = Libraries::locate('command', null, array('recursive' => false));
-
-			foreach ($commands as $command) {
-				$class = new ReflectionClass($command);
-				$comment = Docblock::comment($class->getDocComment());
-				$command = explode('\\', $command);
-
-				$this->out($this->_colorCode('cyan') . $pad(Inflector::underscore(end($command))) . $this->_colorCode('end'));
-				$this->out($pad($comment['description'], 2));
-				$this->nl();
-			}
-			$this->out('See `' . $this->_colorCode('green') . 'li3 COMMAND help' . $this->_colorCode('end') . '` for more information on a specific command.');
-		}
-		return true;
 	}
 }
 
