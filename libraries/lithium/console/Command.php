@@ -55,6 +55,20 @@ class Command extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_autoConfig = array('classes' => 'merge');
+	
+	/**
+	 * Color codes used in ANSI colored output.
+	 *
+	 * @var array
+	 */
+	protected $colors = array('black' => 30, 'red' => 31, 'green' => 32, 'yellow' => 33, 'blue' => 34, 'purple' => 35, 'cyan' => 36, 'white' => 37, 'end' => 0);
+	
+	/**
+	 * String formatting modifiers for ANSI formatted output.
+	 *
+	 * @var array
+	 */
+	protected $colorModifiers = array('bold' => 1, 'underline' => 4);
 
 	/**
 	 * Constructor.
@@ -101,62 +115,19 @@ class Command extends \lithium\core\Object {
 	 * @return string
 	 */
 	protected function _colorCode($color, $modifier = null) {
-		
-		//Abandon if the system is Windows-based, and 
-		//forcing color has not been enabled.
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && !$this->color) {
+		//Abort for Windows systems that aren't forcing color, or if the color isn't found.
+		if ((strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && !$this->color) || !in_array(strtolower($color), $this->colors)) {
 		    return;
 		}
-		
-		$modifier = null;
-		$colorCode = null;
-		$output = "";
-
-		switch($modifier) {
-			case 'bold':
-				$modifier = 1;
-				break;
-			case 'underline':
-				$modifier = 4;
-				break;
-			default:
-				$modifier = 0;
-				break;
-		}
-		switch ($color) {
-			case 'black':
-				$colorCode = 30;
-				break;
-			case 'red':
-				$colorCode = 31;
-				break;
-			case 'green':
-				$colorCode = 32;
-				break;
-			case 'yellow':
-				$colorCode = 33;
-				break;
-			case 'blue':
-				$colorCode = 34;
-				break;
-			case 'purple':
-				$colorCode = 35;
-				break;
-			case 'cyan':
-				$colorCode = 36;
-				break;
-			case 'white':
-				$colorCode = 37;
-				break;
-			case 'end':
-				$colorCode = 0;
-				break;
+		//Default modifier setup
+		if(!in_array(strtolower($modifier), $this->colorModifiers) || $modifier == null) {
+			$modifier = 0;
 		}
 		
-		if($color != 'end') {
-			return "\033[" . $modifier . ';' . $colorCode . 'm';
+		if($this->colors[strtolower($color)] != 'end') {
+			return "\033[" . $modifier . ';' . $this->colors[strtolower($color)] . 'm';
 		} else {
-			return "\033[" . $colorCode . 'm';
+			return "\033[" . $this->colors[strtolower($color)] . 'm';
 		}
 	}
 	/**
