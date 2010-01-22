@@ -77,8 +77,10 @@ class Form extends \lithium\core\Object {
 	 * `'User'`), or a fully-namespaced class reference (i.e. `'app\models\User'`). When
 	 * authenticating users, the magic `first()` method is invoked against the model to return the
 	 * first record found when combining the conditions in the `$_scope` property with the
-	 * authentication data yielded from the `Request` object in `Form::check()`.
+	 * authentication data yielded from the `Request` object in `Form::check()`. (Note that the
+	 * model method called is configurable using the `$_query` property).
 	 *
+	 * @see lithium\security\auth\adapter\Form::$_query
 	 * @var string
 	 */
 	protected $_model = '';
@@ -133,12 +135,25 @@ class Form extends \lithium\core\Object {
 	protected $_filters = array('password' => array('\lithium\util\String', 'hash'));
 
 	/**
+	 * If you require custom model logic in your authentication query, use this setting to specify
+	 * which model method to call, and this method will receive the authentication query. In return,
+	 * the `Form` adapter expects a `Record` object which implements the `data()` method. See the
+	 * constructor for more information on setting this property. Defaults to `'first'`, which
+	 * calls, for example, `User::first()`.
+	 *
+	 * @see lithium\security\auth\adapter\Form::__construct()
+	 * @see lithium\data\model\Record::data()
+	 * @var string
+	 */
+	protected $_query = '';
+
+	/**
 	 * List of configuration properties to automatically assign to the properties of the adapter
 	 * when the class is constructed.
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('model', 'fields', 'scope', 'filters' => 'merge');
+	protected $_autoConfig = array('model', 'fields', 'scope', 'filters' => 'merge', 'query');
 
 	/**
 	 * Sets the initial configuration for the `Form` adapter, as detailed below.
@@ -146,6 +161,7 @@ class Form extends \lithium\core\Object {
 	 * @see lithium\security\auth\adapter\Form::$_model
 	 * @see lithium\security\auth\adapter\Form::$_fields
 	 * @see lithium\security\auth\adapter\Form::$_filters
+	 * @see lithium\security\auth\adapter\Form::$_query
 	 * @param array $config Sets the configuration for the adapter, which has the following options:
 	 *              - `'model'` _string_: The name of the model class to use. See the `$_model`
 	 *                property for details.
@@ -153,11 +169,15 @@ class Form extends \lithium\core\Object {
 	 *                the request data. See the `$_fields` property for details.
 	 *              - `'filters'` _array_: Named callbacks to apply to request data before the user
 	 *                lookup query is generated. See the `$_filters` property for more details.
+	 *              - `'query'` _string_: Determines the model method to invoke for authentication
+	 *                checks. See the `$_query` property for more details.
 	 */
 	public function __construct($config = array()) {
-		$defaults = array('model' => 'User', 'filters' => array(), 'fields' => array(
-			'username', 'password'
-		));
+		$defaults = array(
+			'model' => 'User', 'query' => 'first', 'filters' => array(), 'fields' => array(
+				'username', 'password'
+			)
+		);
 		parent::__construct((array) $config + $defaults);
 	}
 
@@ -175,9 +195,13 @@ class Form extends \lithium\core\Object {
 	 */
 	public function check($credentials, $options = array()) {
 		$model = $this->_model;
+		$query = $this->_query;
 		$conditions = $this->_scope + $this->_filters($credentials->data);
-		$user = $model::first(compact('conditions'));
+		$user = $model::$query(compact('conditions'));
 		return $user ? $user->data() : false;
+	}
+
+	public function clear($options = array()) {
 	}
 
 	protected function _init() {

@@ -17,6 +17,12 @@ class Auth extends \lithium\core\Adaptable {
 	 */
 	protected static $_configurations;
 
+	/**
+	 * The path used by `Libraries::locate()` to look up adapter classes for `Auth`.
+	 *
+	 * @see lithium\core\Libraries::locate()
+	 * @var string
+	 */
 	protected static $_adapters = 'adapter.security.auth';
 
 	protected static $_classes = array(
@@ -24,21 +30,45 @@ class Auth extends \lithium\core\Adaptable {
 	);
 
 	protected static function _initConfig($name, $config) {
-		$defaults = array(
-			'sessionKey' => $name,
-			'sessionClass' => static::$_classes['session']
-		);
-		return parent::_initConfig($name, $config) + $defaults;
+		$defaults = array('session' => array(
+			'key' => $name,
+			'class' => static::$_classes['session'],
+			'options' => array()
+		));
+		$config = parent::_initConfig($name, $config) + $defaults;
+		$config['session'] += $defaults['session'];
+		return $config;
 	}
 
-	public static function check($name, $credentials, $options = array()) {
-		$defaults = array('session' => true);
+	public static function check($name, $credentials = null, $options = array()) {
+		$defaults = array('checkSession' => true);
 		$options += $defaults;
+		$config = static::_config($name);
+		$session = $config['session'];
 
-		if ($user = static::adapter($name)->check($credentials, $options)) {
-			return true;
+		if ($options['checkSession']) {
+			if ($data = $session['class']::read($session['key'], $session['options'])) {
+				return $data;
+			}
+		}
+
+		if ($data = static::adapter($name)->check($credentials, $options)) {
+			$session['class']::write($session['key'], $data, $session['options']);
+			return $data;
 		}
 		return false;
+	}
+
+	public static function clear($name, $options = array()) {
+		$defaults = array('clearSession' => true);
+		$options += $defaults;
+		$config = static::_config($name);
+		$session = $config['session'];
+
+		if ($options['clearSession']) {
+			$session['class']::delete($session['key'], $session['options']);
+		}
+		static::adapter($name)->clear($options);
 	}
 }
 
