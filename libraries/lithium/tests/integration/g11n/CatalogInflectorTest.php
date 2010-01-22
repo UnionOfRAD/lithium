@@ -22,7 +22,7 @@ class CatalogInflectorTest extends \lithium\test\Unit {
 		Catalog::config(array(
 			'runtime' => array('adapter' => new Memory())
 		));
-		Inflector::__init();
+		Inflector::reset();
 	}
 
 	public function tearDown() {
