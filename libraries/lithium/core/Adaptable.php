@@ -155,7 +155,7 @@ class Adaptable extends \lithium\core\StaticObject {
 
 	/**
 	 * Gets an array of settings for the given named configuration in the current
-	 * Environment.
+	 * environment.
 	 *
 	 * The default types of settings for all adapters will contain keys for:
 	 * `adapter` - The class name of the adapter
@@ -177,7 +177,8 @@ class Adaptable extends \lithium\core\StaticObject {
 		}
 		$env = Environment::get();
 		$config = isset($settings[$env]) ? $settings[$env] : $settings;
-		return (static::$_configurations[$name] += array(static::_initConfig($name, $config)));
+		static::$_configurations[$name] += array(static::_initConfig($name, $config));
+		return static::$_configurations[$name][0];
 	}
 
 	/**
