@@ -19,6 +19,9 @@ class MockFormRenderer extends \lithium\template\view\Renderer {
 		}
 		return $this->_request;
 	}
+
+	public function render($template, $data = array(), $options = array()) {
+	}
 }
 
 ?>

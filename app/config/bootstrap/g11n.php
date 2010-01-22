@@ -8,6 +8,7 @@
 
 use \lithium\g11n\Message;
 use \lithium\util\String;
+use \lithium\http\Media;
 
 /**
  * Implements logic for handling cases where `Message::translate()` returns without a result.
@@ -36,6 +37,17 @@ Message::applyFilter('translate', function($self, $params, $chain) {
  */
 Message::applyFilter('translate', function($self, $params, $chain) {
 	return String::insert($chain->next($self, $params, $chain), $params['options']);
+});
+
+/**
+ * Embeds message translation content filters into the `View` class (or other content handler,
+ * if specified) when content is rendered. This enables short-hand translation functions, i.e.
+ * `<?=$t("Translated content"); ?>`.
+ */
+Media::applyFilter('_handle', function($self, $params, $chain) {
+	$params['handler'] += array('outputFilters' => array());
+	$params['handler']['outputFilters'] += Message::contentFilters();
+	return $chain->next($self, $params, $chain);
 });
 
 /*

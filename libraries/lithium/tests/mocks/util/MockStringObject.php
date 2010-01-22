@@ -10,6 +10,9 @@ namespace lithium\tests\mocks\util;
 
 class MockStringObject extends \lithium\template\view\Renderer {
 
+	public function render($template, $data = array(), $options = array()) {
+	}
+
 	public function __toString() {
 		return 'custom object';
 	}

@@ -9,6 +9,9 @@
 namespace lithium\tests\mocks\template\helper;
 
 class MockHtmlRenderer extends \lithium\template\view\Renderer {
+
+	public function render($template, $data = array(), $options = array()) {
+	}
 }
 
 ?>

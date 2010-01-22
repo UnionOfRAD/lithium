@@ -9,9 +9,10 @@
 namespace lithium\tests\cases\template;
 
 use \lithium\template\View;
-use \lithium\template\view\adapter\Simple;
 use \lithium\g11n\Catalog;
+use \lithium\g11n\Message;
 use \lithium\g11n\catalog\adapter\Memory;
+use \lithium\template\view\adapter\Simple;
 
 class TestViewClass extends \lithium\template\View {
 
@@ -63,8 +64,9 @@ class ViewTest extends \lithium\test\Unit {
 		);
 		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
 
-		$t = $this->_view->outputFilters['t'];
-		$tn = $this->_view->outputFilters['tn'];
+		$filters = Message::contentFilters();
+		$t = $filters['t'];
+		$tn = $filters['tn'];
 
 		$expected = 'Haus';
 		$result = $t('house', array('locale' => 'de'));

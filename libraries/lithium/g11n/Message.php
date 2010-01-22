@@ -72,6 +72,28 @@ class Message extends \lithium\core\StaticObject {
 		});
 	}
 
+
+	/**
+	 * Returns an array containing named closures which are used to embed short-hand aliases for
+	 * `translate()` in the templating layer.
+	 *
+	 * @return array Returns an array containing named short-hand translation functions wrapped as
+	 *         closures.
+	 */
+	public static function contentFilters() {
+		$t = function($message, $options = array()) {
+			return Message::translate($message, $options + array(
+				'default' => $message
+			));
+		};
+		$tn = function($message1, $message2, $count, $options = array()) {
+			return Message::translate($message1, $options + compact('count') + array(
+				'default' => $count == 1 ? $message1 : $message2
+			));
+		};
+		return compact('t', 'tn');
+	}
+
 	/**
 	 * Retrieves translations through the `Catalog` class by using `$id` as the lookup
 	 * key and taking the current or - if specified - the provided locale as well as the
