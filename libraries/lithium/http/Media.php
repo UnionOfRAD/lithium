@@ -410,30 +410,34 @@ class Media extends \lithium\core\StaticObject {
 	 * @return string
 	 */
 	protected static function _handle($handler, $data, $options) {
-		$result = '';
+		$params = compact('handler', 'data', 'options');
+		return static::_filter(__FUNCTION__,  $params, function($self, $params, $chain) {
+			extract($params, EXTR_OVERWRITE);
+			$result = '';
 
-		if (isset($options['request'])) {
-			$options += (array) $options['request']->params;
-			$handler['request'] = $options['request'];
-		}
+			if (isset($options['request'])) {
+				$options += (array) $options['request']->params;
+				$handler['request'] = $options['request'];
+			}
 
-		switch (true) {
-			case $handler['encode']:
-				$method = $handler['encode'];
-				$result = is_string($method) ? $method($data) : $method($data, $handler);
-			break;
-			case $handler['view']:
-				$view = new $handler['view']($handler);
-				$result = $view->render('all', $data, $options);
-			break;
-			case ($handler['template'] === false) && is_string($data):
-				$result = $data;
-			break;
-			default:
-				$result = print_r($data, true);
-			break;
-		}
-		return $result;
+			switch (true) {
+				case $handler['encode']:
+					$method = $handler['encode'];
+					$result = is_string($method) ? $method($data) : $method($data, $handler);
+				break;
+				case $handler['view']:
+					$view = new $handler['view']($handler);
+					$result = $view->render('all', $data, $options);
+				break;
+				case ($handler['template'] === false) && is_string($data):
+					$result = $data;
+				break;
+				default:
+					$result = print_r($data, true);
+				break;
+			}
+			return $result;
+		});
 	}
 }
 
