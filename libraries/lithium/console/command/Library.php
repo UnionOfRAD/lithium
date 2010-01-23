@@ -9,6 +9,7 @@
 namespace lithium\console\command;
 
 use \Phar;
+use \RuntimeException;
 use \lithium\core\Libraries;
 
 /**
@@ -141,6 +142,9 @@ class Library extends \lithium\console\Command {
 	 * @return boolean
 	 */
 	public function archive($name = null, $result = null) {
+		if (ini_get('phar.readonly') == '1') {
+			throw new RuntimeException('set phar.readonly = 0 in php.ini');
+		}
 		$from = null;
 		$to = $name;
 

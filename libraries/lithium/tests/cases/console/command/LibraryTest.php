@@ -197,6 +197,10 @@ class LibraryTest extends \lithium\test\Unit {
 	}
 
 	public function testPush() {
+		$this->skipIf(
+			ini_get('phar.readonly') == '1',
+			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+		);
 		$result = $this->library->archive(
 			$this->_testPath . '/library_test_plugin',
 			$this->_testPath . '/library_test_plugin'
@@ -221,6 +225,10 @@ class LibraryTest extends \lithium\test\Unit {
 	}
 
 	public function testInstall() {
+		$this->skipIf(
+			ini_get('phar.readonly') == '1',
+			'Skipped test {:class}::{:function}() - relies on {:class}::testPush()'
+		);
 		$this->library->path = $this->_testPath;
 		$result = $this->library->install('library_test_plugin');
 		$this->assertTrue($result);
