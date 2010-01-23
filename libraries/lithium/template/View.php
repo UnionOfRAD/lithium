@@ -29,7 +29,7 @@ class View extends \lithium\core\Object {
 
 	protected $_renderer = null;
 
-	protected $_autoConfig = array('outputFilters' => 'merge', 'request');
+	protected $_autoConfig = array('request');
 
 	public function __construct($config = array()) {
 		$defaults = array(
@@ -43,6 +43,7 @@ class View extends \lithium\core\Object {
 	}
 
 	protected function _init() {
+		parent::_init();
 		foreach (array('loader', 'renderer') as $key) {
 			if (is_object($this->_config[$key])) {
 				$this->{'_' . $key} = $this->_config[$key];
@@ -58,7 +59,7 @@ class View extends \lithium\core\Object {
 		$h = function($data) use (&$h) {
 			return is_array($data) ? array_map($h, $data) : htmlspecialchars((string) $data);
 		};
-		$this->outputFilters += compact('h');
+		$this->outputFilters += compact('h') + $this->_config['outputFilters'];
 	}
 
 	public function render($type, $data = array(), $options = array()) {
