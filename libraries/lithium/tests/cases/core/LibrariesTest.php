@@ -353,6 +353,20 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertEqual(1, count($result));
 		$this->assertIdentical(__FILE__, $result[0]->getPathname());
 	}
+
+	public function testFindWithOptions() {
+		$result = Libraries::find('lithium', array(
+			'path' => '/console/command/create/template',
+			'namespaces' => false, 'suffix' => false,
+			'filter' => false, 'exclude' => false, 'format' => function ($file, $config) {
+				return basename($file);
+			},
+		));
+		$this->assertTrue(count($result) > 3);
+		$this->assertTrue(array_search('controller.txt.php', $result));
+		$this->assertTrue(array_search('model.txt.php', $result));
+		$this->assertTrue(array_search('plugin.phar.gz', $result));
+	}
 }
 
 ?>

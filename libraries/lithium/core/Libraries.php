@@ -531,11 +531,11 @@ class Libraries {
 		$path = rtrim($config['path'] . $options['path'], '/');
 
 		$search = function($path) use ($config, $options) {
-			return (array) glob(
-				$path . '/*' . ($options['namespaces'] ? '' : $config['suffix'])
-			);
+			$suffix = $options['namespaces'] ? '' : $config['suffix'];
+			$suffix = isset($options['suffix']) ? $options['suffix'] : $suffix;
+			return (array) glob($path . '/*' . $suffix);
 		};
-		$libs = $search($path, $config);
+		$libs = $search($path);
 
 		if ($options['namespaces'] === true) {
 			$filter = '/^.+\/[A-Za-z0-9_]+$|^.*' . preg_quote($config['suffix'], '/') . '/';
@@ -549,7 +549,7 @@ class Libraries {
 				if (!is_dir($dir)) {
 					continue;
 				}
-				$libs = array_merge($libs, $search($dir, $config));
+				$libs = array_merge($libs, $search($dir));
 				$queue = array_merge(
 					$queue, array_diff((array) glob($dir . '/*', GLOB_ONLYDIR), $libs)
 				);
