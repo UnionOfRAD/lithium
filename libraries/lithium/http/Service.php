@@ -177,7 +177,7 @@ class Service extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function send($method, $path = null, $data = null, $options = array()) {
-		$defaults = array('type' => 'form', 'return' => 'body');
+		$defaults = array('return' => 'body');
 		$options += $defaults;
 
 		if (!$this->connect()) {
@@ -206,6 +206,8 @@ class Service extends \lithium\core\Object {
 	 *         string or POST/PUT data, and URL.
 	 */
 	protected function _request($method, $path, $data, $options) {
+		$defaults = array('type' => 'form');
+		$options += $defaults;
 		$request = new $this->_classes['request']($this->_config + $options);
 		$request->path = str_replace('//', '/', "{$request->path}{$path}");
 		$request->method = $method = strtoupper($method);

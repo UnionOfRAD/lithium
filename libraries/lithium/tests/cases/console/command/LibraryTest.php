@@ -220,6 +220,17 @@ class LibraryTest extends \lithium\test\Unit {
 		$result = is_dir($this->_testPath . '/library_test_plugin');
 		$this->assertTrue($result);
 
+		$this->library->username = 'gwoo';
+		$this->library->password = 'password';
+		$request = $this->library->push('library_test_plugin');
+
+		$expected = array('method' => 'Basic', 'username' => 'gwoo', 'password' => 'password');
+		$result = $request->auth;
+		$this->assertEqual($expected, $result);
+
+		$result = is_dir($this->_testPath . '/library_test_plugin');
+		$this->assertTrue($result);
+
 		$this->_cleanUp('tests/library_test_plugin');
 		rmdir($this->_testPath . '/library_test_plugin');
 	}

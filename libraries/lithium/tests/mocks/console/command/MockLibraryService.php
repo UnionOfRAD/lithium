@@ -11,6 +11,9 @@ namespace lithium\tests\mocks\console\command;
 class MockLibraryService extends \lithium\http\Service {
 
 	public function send($method, $path = null, $data = array(), $options = array()) {
+		if ($method == 'post') {
+			return $this->_request($method, $path, $data, $options);
+		}
 		if ($path == 'lab/plugins') {
 			return json_encode($this->__data('plugins'));
 		}

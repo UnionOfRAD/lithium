@@ -21,18 +21,39 @@ use \lithium\core\Libraries;
 class Library extends \lithium\console\Command {
 
 	/**
-	 * Absolute path to config file
+	 * Absolute path to config file.
 	 *
 	 * @var string
 	 */
 	public $conf = null;
 
 	/**
-	 * server hosts to query for plugins
+	 * Server host to query for plugins.
 	 *
 	 * @var string
 	 */
 	public $server = 'lab.lithify.me';
+
+	/**
+	 * The port for the server.
+	 *
+	 * @var string
+	 */
+	public $port = 80;
+
+	/**
+	 * The username for the server authentication.
+	 *
+	 * @var string
+	 */
+	public $username = '';
+
+	/**
+	 * The password for corresponding username.
+	 *
+	 * @var string
+	 */
+	public $password = '';
 
 	/**
 	 * Holds settings from conf file
@@ -292,7 +313,10 @@ class Library extends \lithium\console\Command {
 		$file = "{$path}.phar.gz";
 
 		if (file_exists($file)) {
-			$service = new $this->_classes['service'](array('host' => $this->server));
+			$service = new $this->_classes['service'](array(
+				'host' => $this->server, 'port' => $this->port,
+				'login' => $this->username, 'password' => $this->password
+			));
 			$boundary = md5(date('r', time()));
 			$headers = array("Content-Type: multipart/form-data; boundary={$boundary}");
 			$data = join("\r\n", array(
@@ -305,6 +329,7 @@ class Library extends \lithium\console\Command {
 			$result = $service->post('/lab/server/receive', $data, compact('headers'));
 			return $result;
 		}
+		$this->error("{$file} does not exist. Run `li3 library archive {$name}`");
 		return false;
 	}
 
