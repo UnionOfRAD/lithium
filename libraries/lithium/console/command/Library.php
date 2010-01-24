@@ -199,9 +199,7 @@ class Library extends \lithium\console\Command {
  		$archive = new Phar("{$path}.phar");
 		$from = $this->_toPath($from);
 
-		$filter = '/^(?(?=\.)\.(htaccess|gitignore|gitmodules))|(.*)$/i';
-		$filter = null;
-		//$filter = '/.*\.(htaccess|gitignore|gitmodules)/i';
+		$filter = '/^(\.(htaccess|gitignore|gitmodules|.+?))$/i';
 		$result = (boolean) $archive->buildFromDirectory($from, $filter);
 
 		if (file_exists("{$path}.phar.gz")) {
