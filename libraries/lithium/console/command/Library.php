@@ -56,6 +56,19 @@ class Library extends \lithium\console\Command {
 	public $password = '';
 
 	/**
+	 * @see `force`
+	 * @var boolean
+	 */
+	public $f = false;
+
+	/**
+	 * Force operation to complete. Typically used for overwriting files.
+	 *
+	 * @var string
+	 */
+	public $force = false;
+
+	/**
 	 * Holds settings from conf file
 	 *
 	 * @var array
@@ -83,6 +96,7 @@ class Library extends \lithium\console\Command {
 		if (file_exists($this->conf)) {
 			$this->_settings += json_decode($this->conf, true);
 		}
+		$this->force = $this->f ? $this->f : $this->force;
 	}
 
 	/**
@@ -166,20 +180,37 @@ class Library extends \lithium\console\Command {
 		if (ini_get('phar.readonly') == '1') {
 			throw new RuntimeException('set phar.readonly = 0 in php.ini');
 		}
-		$from = null;
+		$from = $name;
 		$to = $name;
 
 		if ($result) {
 			$from = $name;
 			$to = $result;
 		}
+		$path = $this->_toPath($to);
 
-		$path = $this->_toPath($name);
+		if (file_exists("{$path}.phar")) {
+			if (!$this->force) {
+				$this->error(basename($path) . ".phar already exists in " . dirname($path));
+				return false;
+			}
+			Phar::unlinkArchive("{$path}.phar");
+		}
  		$archive = new Phar("{$path}.phar");
 		$from = $this->_toPath($from);
-		$filter = '/^(?(?=\.)\.(htaccess|gitignore|gitmodules)|.*)$/i';
+
+		$filter = '/^(?(?=\.)\.(htaccess|gitignore|gitmodules))|(.*)$/i';
+		$filter = null;
+		//$filter = '/.*\.(htaccess|gitignore|gitmodules)/i';
 		$result = (boolean) $archive->buildFromDirectory($from, $filter);
 
+		if (file_exists("{$path}.phar.gz")) {
+			if (!$this->force) {
+				$this->error(basename($path) . ".phar.gz already exists in " . dirname($path));
+				return false;
+			}
+			Phar::unlinkArchive("{$path}.phar.gz");
+		}
 		if ($result) {
 			$archive->compress(Phar::GZ);
 			$this->out(basename($path) . ".phar.gz created in " . dirname($path) . " from {$from}");
@@ -319,9 +350,10 @@ class Library extends \lithium\console\Command {
 			));
 			$boundary = md5(date('r', time()));
 			$headers = array("Content-Type: multipart/form-data; boundary={$boundary}");
+			$name = basename($file);
 			$data = join("\r\n", array(
 				"--{$boundary}",
-				"Content-Disposition: form-data; name=\"phar\"; filename=\"{$file}\"",
+				"Content-Disposition: form-data; name=\"phar\"; filename=\"{$name}\"",
 				"Content-Type: application/phar", "",
 				base64_encode(file_get_contents($file)),
 				"--{$boundary}--"

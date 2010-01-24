@@ -249,9 +249,11 @@ class LibraryTest extends \lithium\test\Unit {
 
 		$result = is_dir($this->_testPath . '/library_test_plugin');
 		$this->assertTrue($result);
+
+		Phar::unlinkArchive($this->_testPath . '/library_test_plugin.phar');
+		Phar::unlinkArchive($this->_testPath . '/library_test_plugin.phar.gz');
 		$this->_cleanUp();
 	}
-
 
 	public function testFind() {
 		$this->library->find();
@@ -273,6 +275,85 @@ Created: 2009-11-30
 test;
 		$result = $this->library->response->output;
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testForceArchive() {
+		$this->skipIf(
+			ini_get('phar.readonly') == '1',
+			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+		);
+		$result = $this->library->extract('plugin', $this->_testPath . '/library_test_plugin');
+		$this->assertTrue($result);
+
+		$this->library->response->output = null;
+		$result = $this->library->archive(
+			$this->_testPath . '/library_test_plugin',
+			$this->_testPath . '/library_test_plugin'
+		);
+		$this->assertTrue($result);
+
+		$expected = "library_test_plugin.phar.gz created in {$this->_testPath} from ";
+		$expected .= "{$this->_testPath}/library_test_plugin\n";
+		$result = $this->library->response->output;
+		$this->assertEqual($expected, $result);
+
+		$this->library->response->output = null;
+		$result = $this->library->archive(
+			$this->_testPath . '/library_test_plugin',
+			$this->_testPath . '/library_test_plugin'
+		);
+		$this->assertFalse($result);
+
+		$expected = "library_test_plugin.phar already exists in {$this->_testPath}\n";
+		$result = $this->library->response->error;
+		$this->assertEqual($expected, $result);
+
+
+		$this->library->force = true;
+		$this->library->response->output = null;
+		$result = $this->library->archive(
+			$this->_testPath . '/library_test_plugin',
+			$this->_testPath . '/library_test_plugin'
+		);
+		$this->assertTrue($result);
+
+		$expected = "library_test_plugin.phar.gz created in {$this->_testPath} from ";
+		$expected .= "{$this->_testPath}/library_test_plugin\n";
+		$result = $this->library->response->output;
+		$this->assertEqual($expected, $result);
+
+		unlink($this->_testPath . '/library_test_plugin.phar');
+
+		$this->library->force = false;
+		$this->library->response->output = null;
+		$this->library->response->error = null;
+		$result = $this->library->archive(
+			$this->_testPath . '/library_test_plugin',
+			$this->_testPath . '/library_test_plugin'
+		);
+		$this->assertFalse($result);
+
+		$expected = "library_test_plugin.phar.gz already exists in {$this->_testPath}\n";
+		$result = $this->library->response->error;
+		$this->assertEqual($expected, $result);
+
+		$this->library->force = true;
+		$this->library->response->output = null;
+		$this->library->response->error = null;
+		$result = $this->library->archive(
+			$this->_testPath . '/library_test_plugin',
+			$this->_testPath . '/library_test_plugin'
+		);
+		$this->assertTrue($result);
+
+		$expected = "library_test_plugin.phar.gz created in {$this->_testPath} from ";
+		$expected .= "{$this->_testPath}/library_test_plugin\n";
+		$result = $this->library->response->output;
+		$this->assertEqual($expected, $result);
+
+		Phar::unlinkArchive($this->_testPath . '/library_test_plugin.phar');
+		Phar::unlinkArchive($this->_testPath . '/library_test_plugin.phar.gz');
+		$this->_cleanUp();
 	}
 }
 
