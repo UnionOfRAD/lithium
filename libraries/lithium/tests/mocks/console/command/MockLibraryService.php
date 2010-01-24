@@ -8,11 +8,28 @@
 
 namespace lithium\tests\mocks\console\command;
 
+use lithium\http\Response;
+
 class MockLibraryService extends \lithium\http\Service {
 
 	public function send($method, $path = null, $data = array(), $options = array()) {
 		if ($method == 'post') {
-			return $this->_request($method, $path, $data, $options);
+			$this->request = $this->_request($method, $path, $data, $options);
+			if (!empty($this->request->auth['username'])) {
+				$user =  array(
+					'method' => 'Basic', 'username' => 'gwoo', 'password' => 'password'
+				);
+				if ($this->request->auth !== $user) {
+					$this->last = (object) array('response' =>  new Response());
+					$this->last->response->status(401);
+					return json_encode(array(
+						'error' => 'Invalid username/password.'
+					));
+				}
+			}
+			$this->last = (object) array('response' =>  new Response());
+			$this->last->response->status(201);
+			return json_encode($this->__data('plugins', 1));
 		}
 		if ($path == 'lab/plugins') {
 			return json_encode($this->__data('plugins'));
@@ -45,6 +62,7 @@ class MockLibraryService extends \lithium\http\Service {
 				'requires' => array()
 			),
 			array(
+				'id' => 'b22a2f0dfc873fd0e1a7655f4895872ae4b94ef4',
 				'name' => 'library_test_plugin', 'version' => '1.0',
 				'summary' => 'an li3 plugin example',
 				'maintainers' => array(

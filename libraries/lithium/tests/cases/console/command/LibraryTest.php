@@ -215,17 +215,12 @@ class LibraryTest extends \lithium\test\Unit {
 		$result = file_exists($this->_testPath . '/library_test_plugin.phar.gz');
 		$this->assertTrue($result);
 
+		$this->library->response->output = null;
 		$result = $this->library->push('library_test_plugin');
 
-		$result = is_dir($this->_testPath . '/library_test_plugin');
-		$this->assertTrue($result);
-
-		$this->library->username = 'gwoo';
-		$this->library->password = 'password';
-		$request = $this->library->push('library_test_plugin');
-
-		$expected = array('method' => 'Basic', 'username' => 'gwoo', 'password' => 'password');
-		$result = $request->auth;
+		$expected = "library_test_plugin added to {$this->library->server}.\n";
+		$expected .= "See http://{$this->library->server}/lab/plugins/view/{$result->id}\n";
+		$result = $this->library->response->output;
 		$this->assertEqual($expected, $result);
 
 		$result = is_dir($this->_testPath . '/library_test_plugin');
@@ -350,6 +345,55 @@ test;
 		$expected .= "{$this->_testPath}/library_test_plugin\n";
 		$result = $this->library->response->output;
 		$this->assertEqual($expected, $result);
+
+		Phar::unlinkArchive($this->_testPath . '/library_test_plugin.phar');
+		Phar::unlinkArchive($this->_testPath . '/library_test_plugin.phar.gz');
+		$this->_cleanUp();
+	}
+
+	public function testPushWithAuth() {
+		$this->skipIf(
+			ini_get('phar.readonly') == '1',
+			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+		);
+		$result = $this->library->extract('plugin', $this->_testPath . '/library_test_plugin');
+		$this->assertTrue($result);
+
+		$result = $this->library->archive(
+			$this->_testPath . '/library_test_plugin',
+			$this->_testPath . '/library_test_plugin'
+		);
+		$this->assertTrue($result);
+
+		$result = file_exists($this->_testPath . '/library_test_plugin.phar.gz');
+		$this->assertTrue($result);
+
+		$this->library->response->output = null;
+		$this->library->username = 'gwoo';
+		$this->library->password = 'password';
+		$result = $this->library->push('library_test_plugin');
+		$this->assertTrue($result);
+
+		$expected = "library_test_plugin added to {$this->library->server}.\n";
+		$expected .= "See http://{$this->library->server}/lab/plugins/view/{$result->id}\n";
+		$result = $this->library->response->output;
+		$this->assertEqual($expected, $result);
+
+		$result = file_exists($this->_testPath . '/library_test_plugin');
+		$this->assertTrue($result);
+
+		$this->library->response->output = null;
+		$this->library->username = 'bob';
+		$this->library->password = 'password';
+		$result = $this->library->push('library_test_plugin');
+		$this->assertFalse($result);
+
+		$expected = "Invalid username/password.\n";
+		$result = $this->library->response->output;
+		$this->assertEqual($expected, $result);
+
+		$result = file_exists($this->_testPath . '/library_test_plugin');
+		$this->assertTrue($result);
 
 		Phar::unlinkArchive($this->_testPath . '/library_test_plugin.phar');
 		Phar::unlinkArchive($this->_testPath . '/library_test_plugin.phar.gz');

@@ -312,7 +312,9 @@ class Library extends \lithium\console\Command {
 			$data = json_encode(array(
 				'name' => $name, 'version' => null,
 				'summary' => null,
-				'maintainers' => array(array()),
+				'maintainers' => array(array(
+					'name' => '', 'email' => '', 'website' => ''
+				)),
 				'sources' => array("http://{$this->server}/lab/download/{$name}.phar.gz"),
 				'commands' => array(
 					'install' => array(), 'update' => array(), 'remove' => array(),
@@ -358,8 +360,18 @@ class Library extends \lithium\console\Command {
 				base64_encode(file_get_contents($file)),
 				"--{$boundary}--"
 			));
-			$result = $service->post('/lab/server/receive', $data, compact('headers'));
-			return $result;
+			$result = json_decode($service->post('/lab/server/receive', $data, compact('headers')));
+			if ($service->last->response->status['code'] == 201) {
+				$this->out(array(
+					"{$result->name} added to {$this->server}.",
+					"See http://{$this->server}/lab/plugins/view/{$result->id}"
+				));
+				return $result;
+			}
+			if (!empty($result->error)) {
+				$this->out($result->error);
+			}
+			return false;
 		}
 		$this->error("{$file} does not exist. Run `li3 library archive {$name}`");
 		return false;
