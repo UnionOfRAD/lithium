@@ -48,7 +48,7 @@ class File extends \lithium\template\view\Renderer {
 	 * @return string
 	 */
 	public function render($template, $data = array(), $options = array()) {
-		$this->_context += $options['context'];
+		$this->_context = $options['context'] + $this->_context;
 
 		$__t__ = $this->_config['protocol'] . '://' . $template;
 		unset($options);
@@ -56,7 +56,7 @@ class File extends \lithium\template\view\Renderer {
 		ob_start();
 
 		include $__t__;
-		return $this->_context['content'] = ob_get_clean();
+		return ob_get_clean();
 	}
 
 	/**
