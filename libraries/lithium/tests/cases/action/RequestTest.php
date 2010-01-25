@@ -137,6 +137,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testHttpsFromScriptUri() {
 		$_SERVER['SCRIPT_URI'] = 'https://lithium.com';
+		unset($_SERVER['HTTPS']);
 		$request = new Request();
 
 		$expected = true;
