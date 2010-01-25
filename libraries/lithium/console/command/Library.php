@@ -276,22 +276,24 @@ class Library extends \lithium\console\Command {
 		}
 		$this->header($plugin->name);
 
-		$isGit = (
-			isset($plugin->sources->git) &&
-			strpos(shell_exec('git --version'), 'git version 1.6') !== false
-		);
-		if ($isGit) {
-			$result = shell_exec("cd {$this->path} && git clone {$plugin->sources->git}");
-			return $result;
-		}
-		if (isset($plugin->sources->phar)) {
-			$remote = $plugin->sources->phar;
-			$local = $this->path . '/' . basename($plugin->sources->phar);
-			$write = file_put_contents($local, file_get_contents($remote));
-			$archive = new Phar($local);
-			return $archive->extractTo(
-				$this->path . '/' . basename($plugin->sources->phar, '.phar.gz')
-			);
+		$hasGit = function () {
+			return (strpos(shell_exec('git --version'), '1.6') !== false);
+		};
+		foreach ((array) $plugin->sources as $source) {
+			if (strpos($source, 'phar.gz') !== false) {
+				$write = file_put_contents(
+					"{$this->path}/{$plugin->name}.phar.gz", file_get_contents($source)
+				);
+				$archive = new Phar("{$this->path}/{$plugin->name}.phar.gz");
+				return $archive->extractTo("{$this->path}/{$plugin->name}");
+			}
+			$url = parse_url($source);
+
+			if (!empty($url['scheme']) && $url['scheme'] == 'git' && $hasGit()) {
+				$result = shell_exec(
+					"cd {$this->path} && git clone {$source}"
+				);
+			}
 		}
 		return false;
 	}
