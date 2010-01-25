@@ -69,6 +69,13 @@ class Library extends \lithium\console\Command {
 	public $force = false;
 
 	/**
+	 * Filter used for including files in archive.
+	 *
+	 * @var string
+	 */
+	public $filter = '/\.(php|htaccess|jpg|png|gif|css|js|ico|json|ini)$/';
+
+	/**
 	 * Holds settings from conf file
 	 *
 	 * @var array
@@ -198,9 +205,7 @@ class Library extends \lithium\console\Command {
 		}
  		$archive = new Phar("{$path}.phar");
 		$from = $this->_toPath($from);
-
-		$filter = '/^(\.(htaccess|gitignore|gitmodules|.+?))$/i';
-		$result = (boolean) $archive->buildFromDirectory($from, $filter);
+		$result = (boolean) $archive->buildFromDirectory($from, $this->filter);
 
 		if (file_exists("{$path}.phar.gz")) {
 			if (!$this->force) {

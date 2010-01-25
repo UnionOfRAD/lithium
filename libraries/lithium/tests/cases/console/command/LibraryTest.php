@@ -120,6 +120,12 @@ class LibraryTest extends \lithium\test\Unit {
 		$result = $this->library->response->output;
 		$this->assertEqual($expected, $result);
 
+		$result = file_exists($this->_testPath . '/new/.htaccess');
+		$this->assertTrue($result);
+
+		$result = file_exists($this->_testPath . '/new/.DS_Store');
+		$this->assertFalse($result);
+
 		Phar::unlinkArchive($this->_testPath . '/library_test.phar.gz');
 	}
 
