@@ -213,6 +213,20 @@ class LibraryTest extends \lithium\test\Unit {
 			ini_get('phar.readonly') == '1',
 			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
 		);
+
+		$result = file_put_contents(
+			$this->_testPath . '/library_test_plugin/config/library_test_plugin.json',
+			json_encode(array(
+				'name' => 'library_test_plugin',
+				'version' => '1.0',
+				'summary' => 'something',
+				'sources' => array(
+					'phar' => 'http://somewhere.com/download/library_test_plugin.phar.gz'
+				)
+			))
+		);
+		$this->assertTrue($result);
+
 		$result = $this->library->archive(
 			$this->_testPath . '/library_test_plugin',
 			$this->_testPath . '/library_test_plugin'
@@ -226,9 +240,10 @@ class LibraryTest extends \lithium\test\Unit {
 
 		$result = file_exists($this->_testPath . '/library_test_plugin.phar.gz');
 		$this->assertTrue($result);
-
 		$this->library->response->output = null;
+
 		$result = $this->library->push('library_test_plugin');
+		$this->assertTrue($result);
 
 		$expected = "library_test_plugin added to {$this->library->server}.\n";
 		$expected .= "See http://{$this->library->server}/lab/plugins/view/{$result->id}\n";
@@ -372,6 +387,19 @@ test;
 			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
 		);
 		$result = $this->library->extract('plugin', $this->_testPath . '/library_test_plugin');
+		$this->assertTrue($result);
+
+		$result = file_put_contents(
+			$this->_testPath . '/library_test_plugin/config/library_test_plugin.json',
+			json_encode(array(
+				'name' => 'library_test_plugin',
+				'version' => '1.0',
+				'summary' => 'something',
+				'sources' => array(
+					'phar' => 'http://somewhere.com/download/library_test_plugin.phar.gz'
+				)
+			))
+		);
 		$this->assertTrue($result);
 
 		$result = $this->library->archive(

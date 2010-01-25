@@ -310,11 +310,21 @@ class Library extends \lithium\console\Command {
 		$path = $this->_toPath($name);
 		$name = basename($name);
 		$formula = "{$path}/config/{$name}.json";
+		$data = array();
 
+		if (file_exists($formula)) {
+			$data = json_decode(file_get_contents($formula), true);
+		}
+		if (empty($data['version'])) {
+			$data['version'] = $this->in("please supply a version");
+		}
+		if (empty($data['summary'])) {
+			$data['summary'] = $this->in("please supply a summary");
+		}
 		if (file_exists($path) && !file_exists($formula)) {
-			$data = json_encode(array(
-				'name' => $name, 'version' => null,
-				'summary' => null,
+			$data = json_encode($data + array(
+				'name' => $name, 'version' => '0.1',
+				'summary' => "a plugin called {$name}",
 				'maintainers' => array(array(
 					'name' => '', 'email' => '', 'website' => ''
 				)),
@@ -324,6 +334,10 @@ class Library extends \lithium\console\Command {
 				),
 				'requires' => array()
 			));
+			if (!is_dir(dirname($formula)) && !mkdir(dirname($formula), 0755, true)) {
+				$this->error("Formula for {$name} not created in {$path}");
+				return false;
+			}
 			$result = file_put_contents($formula, $data);
 		}
 		if ($result) {
@@ -331,7 +345,7 @@ class Library extends \lithium\console\Command {
 			return true;
 		}
 		$this->error("Formula for {$name} not created in {$path}");
-		return true;
+		return false;
 	}
 
 	/**
@@ -348,6 +362,23 @@ class Library extends \lithium\console\Command {
 		$name = basename($name);
 		$file = "{$path}.phar.gz";
 
+		if (!file_exists("phar://{$file}/config/{$name}.json")) {
+			$this->error(array(
+				"The forumla for {$name} is missing.", "Run li3 library formulate {$name}"
+			));
+			return false;
+		}
+		$formula = json_decode(file_get_contents("phar://{$file}/config/{$name}.json"));
+		$isValid = (
+			!empty($formula->name) && !empty($formula->version)
+			&& !empty($formula->summary) && !empty($formula->sources)
+		);
+		if (!$isValid) {
+			$this->error(array(
+				"The forumla for {$name} is not valid.", "Run li3 library formulate {$name}"
+			));
+			return false;
+		}
 		if (file_exists($file)) {
 			$service = new $this->_classes['service'](array(
 				'host' => $this->server, 'port' => $this->port,
@@ -376,7 +407,7 @@ class Library extends \lithium\console\Command {
 			}
 			return false;
 		}
-		$this->error("{$file} does not exist. Run `li3 library archive {$name}`");
+		$this->error(array("{$file} does not exist.", "Run li3 library archive {$name}"));
 		return false;
 	}
 
