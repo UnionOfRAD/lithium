@@ -425,6 +425,7 @@ test;
 		$result = file_exists($this->_testPath . '/library_test_plugin');
 		$this->assertTrue($result);
 
+		$this->library->response->error = null;
 		$this->library->response->output = null;
 		$this->library->username = 'bob';
 		$this->library->password = 'password';
@@ -432,7 +433,7 @@ test;
 		$this->assertFalse($result);
 
 		$expected = "Invalid username/password.\n";
-		$result = $this->library->response->output;
+		$result = $this->library->response->error;
 		$this->assertEqual($expected, $result);
 
 		$result = file_exists($this->_testPath . '/library_test_plugin');

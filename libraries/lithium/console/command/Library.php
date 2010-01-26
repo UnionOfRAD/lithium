@@ -28,6 +28,13 @@ class Library extends \lithium\console\Command {
 	public $conf = null;
 
 	/**
+	 * Path to where plugins will be installed. Relative to current working directory.
+	 *
+	 * @var string
+	 */
+	public $path = null;
+
+	/**
 	 * Server host to query for plugins.
 	 *
 	 * @var string
@@ -103,6 +110,7 @@ class Library extends \lithium\console\Command {
 		if (file_exists($this->conf)) {
 			$this->_settings += json_decode($this->conf, true);
 		}
+		$this->path = $this->_toPath($this->path ?: 'libraries/plugins');
 		$this->force = $this->f ? $this->f : $this->force;
 	}
 
@@ -233,9 +241,12 @@ class Library extends \lithium\console\Command {
 	public function find($type = 'plugins') {
 		$results = array();
 
-		foreach (array_keys($this->_settings['servers']) as $server) {
-			$service = new $this->_classes['service'](array('host' => $server));
-			$results[$server] = json_decode($service->get("lab/{$type}"));
+		foreach ($this->_settings['servers'] as $server => $enabled) {
+			if (!$enabled) { continue; }
+			$service = new $this->_classes['service'](array(
+				'host' => $server, 'port' => $this->port
+			));
+			$results[$server] = json_decode($service->get("lab/{$type}.json"));
 
 			if (empty($results[$server])) {
 				$this->out("No {$type} at {$server}");
@@ -262,30 +273,50 @@ class Library extends \lithium\console\Command {
 	 * Install plugins or extensions to the current application.
 	 * For plugins, the install commands specified in the formula is run.
 	 *
-	 * @param string $plugin name of plugin to add
+	 * @param string $name name of plugin to add
 	 * @return boolean
 	 */
-	public function install($plugin = null) {
+	public function install($name = null) {
 		$results = array();
-		foreach ($this->_settings['servers'] as $server) {
-			$service = new $this->_classes['service'](array('host' => $server));
-			$results[$server] = json_decode($service->get("lab/{$plugin}.json"));
+		foreach ($this->_settings['servers'] as $server => $enabled) {
+			if (!$enabled) { continue; }
+			$service = new $this->_classes['service'](array(
+				'host' => $server, 'port' => $this->port
+			));
+			$results[$server] = json_decode($service->get("lab/{$name}.json"));
 		}
-		if (count($results) == 1) {
+		if (count($results)) {
 			$plugin = current($results);
 		}
-		$this->header($plugin->name);
 
 		$hasGit = function () {
 			return (strpos(shell_exec('git --version'), '1.6') !== false);
 		};
+		if (empty($plugin->sources)) {
+			$this->error("{$name} not found");
+			return false;
+		}
+
 		foreach ((array) $plugin->sources as $source) {
 			if (strpos($source, 'phar.gz') !== false) {
-				$write = file_put_contents(
+				$written = file_put_contents(
 					"{$this->path}/{$plugin->name}.phar.gz", file_get_contents($source)
 				);
-				$archive = new Phar("{$this->path}/{$plugin->name}.phar.gz");
-				return $archive->extractTo("{$this->path}/{$plugin->name}");
+				if (!$written) {
+					$this->error("{$plugin->name}.phar.gz could not be saved");
+					return false;
+				}
+				$this->out("{$plugin->name}.phar.gz saved to {$this->path}");
+				try {
+					$archive = new Phar("{$this->path}/{$plugin->name}.phar.gz");
+					if ($archive->extractTo("{$this->path}/{$plugin->name}")) {
+						$this->out("{$plugin->name} installed to {$this->path}/{$plugin->name}");
+						$this->out("Remember to update the bootstrap.");
+						return true;
+					}
+				} catch (\Exception $e) {
+					$this->error($e->getMessage());
+				}
 			}
 			$url = parse_url($source);
 
@@ -295,6 +326,7 @@ class Library extends \lithium\console\Command {
 				);
 			}
 		}
+		$this->out("{$plugin->name} not installed.");
 		return false;
 	}
 
@@ -405,8 +437,10 @@ class Library extends \lithium\console\Command {
 				return $result;
 			}
 			if (!empty($result->error)) {
-				$this->out($result->error);
+				$this->error($result->error);
+				return false;
 			}
+			$this->error((array) $result);
 			return false;
 		}
 		$this->error(array("{$file} does not exist.", "Run li3 library archive {$name}"));
@@ -429,7 +463,7 @@ class Library extends \lithium\console\Command {
 	 * @param string $name
 	 * @return string
 	 */
-	protected function _toPath($name) {
+	protected function _toPath($name = null) {
 		if ($name[0] === '/') {
 			return $name;
 		}
@@ -439,7 +473,7 @@ class Library extends \lithium\console\Command {
 			return $library['path'];
 		}
 		$path = $this->request->env('working');
-		return ($name) ? "{$path}/{$name}" : $path;
+		return (!empty($name)) ? "{$path}/{$name}" : $path;
 	}
 }
 

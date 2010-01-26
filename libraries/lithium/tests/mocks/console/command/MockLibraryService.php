@@ -37,6 +37,12 @@ class MockLibraryService extends \lithium\http\Service {
 		if ($path == 'lab/extensions') {
 			return json_encode($this->__data('extensions'));
 		}
+		if (preg_match("/lab\/plugins/", $path, $match)) {
+			return json_encode($this->__data('plugins'));
+		}
+		if (preg_match("/lab\/extensions/", $path, $match)) {
+			return json_encode($this->__data('extensions'));
+		}
 		if (preg_match("/lab\/(.*?).json/", $path, $match)) {
 			return json_encode($this->__data('plugins', 1));
 		}
