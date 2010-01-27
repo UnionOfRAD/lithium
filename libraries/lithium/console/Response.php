@@ -74,7 +74,12 @@ class Response extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function output($string) {
-		return fwrite($this->output, $string);
+		$params = compact('string');
+		
+		return $this->_filter(__FUNCTION__, $params, function($self, $params, $chain) {
+			extract($params);
+			return fwrite($self->output, $string);
+		});
 	}
 
 	/**
@@ -83,7 +88,7 @@ class Response extends \lithium\core\Object {
 	 * @param string $string
 	 * @return mixed
 	 */
-	public function error($string) {
+	public function error($string_n	) {
 		return fwrite($this->error, $string);
 	}
 
