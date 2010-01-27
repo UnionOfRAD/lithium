@@ -50,6 +50,11 @@ require __DIR__ . '/bootstrap/libraries.php';
 // require __DIR__ . '/bootstrap/g11n.php';
 
 /**
+ * This file configures console filters and settings, specifically output behavior and coloring.
+ */
+// require __DIR__ . '/bootstrap/console.php';
+
+/**
  * This configures your session storage. The Cookie storage adapter must be connected first, since
  * it intercepts any writes where the `'expires'` key is set in the options array.  When creating a
  * new application, it is suggested that you change the value of `'key'` below.

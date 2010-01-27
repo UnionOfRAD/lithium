@@ -76,7 +76,7 @@ class Response extends \lithium\core\Object {
 	public function output($string) {
 		$params = compact('string');
 		
-		return $this->_filter(__FUNCTION__, $params, function($self, $params, $chain) {
+		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) {
 			extract($params);
 			return fwrite($self->output, $string);
 		});
