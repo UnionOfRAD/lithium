@@ -80,7 +80,7 @@ class Library extends \lithium\console\Command {
 	 *
 	 * @var string
 	 */
-	public $filter = '/\.(php|htaccess|jpg|png|gif|css|js|ico|json|ini)$/';
+	public $filter = '/\.(php|htaccess|jpg|png|gif|css|js|ico|json|ini)|(empty)$/';
 
 	/**
 	 * Holds settings from conf file
