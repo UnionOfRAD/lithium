@@ -94,40 +94,6 @@ class Command extends \lithium\core\Object {
 	}
 	
 	/**
-	 * Adds textual styles to console command output.
-	 *
-	 * @param array $options Valid options are: 
-	 * 				- `'color'`: Foreground text color. Values: black, red, green, yellow, 
-	 * 					blue, purple, cyan, white, end.
-	 * 				- `'type'`: Text decoration type. Values: normal, bold, underline.
-	 * @return string
-	 */
-	protected function _style($options = array()) {
-		//Abort in cases of Windows clients that aren't forcing color, or missing colors.
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && !$this->color) {
-		    return;
-		}
-
-		$defaults = array('type' => 'normal');
-		$options += $defaults;
-		
-		$colors = array(
-			'black' => 30, 'red' => 31, 'green' => 32, 
-			'yellow' => 33, 'blue' => 34, 'purple' => 35, 
-			'cyan' => 36, 'white' => 37, 'end' => 0
-		);
-
-		$types = array('bold' => 1, 'underline' => 4, 'normal' => 0);
-		
-		//IF no params (color) was supplied, send the end escape sequence.
-		if(array_key_exists('color', $options) === false) {
-			return "\033[" . $colors['end'] . 'm';
-		}
-		
-		return "\033[" . $types[$options['type']] . ';' . $colors[$options['color']] . 'm';
-	}
-	
-	/**
 	 * Called by the Dispatcher class to invoke an action.
 	 *
 	 * @param string $action name of the method to run
