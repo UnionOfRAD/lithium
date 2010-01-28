@@ -209,7 +209,7 @@ class Controller extends \lithium\core\Object {
 			$options = array('template' => $options);
 		}
 		$defaults = array(
-			'status' => 200, 'location' => false, 'data' => array(), 'head' => false
+			'status' => null, 'location' => false, 'data' => array(), 'head' => false
 		);
 		$options += $defaults;
 		$media = $this->_classes['media'];

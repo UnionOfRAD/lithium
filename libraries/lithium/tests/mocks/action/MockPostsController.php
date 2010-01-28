@@ -30,6 +30,11 @@ class MockPostsController extends \lithium\action\Controller {
 		$this->redirect('/posts');
 	}
 
+	public function not_found($id = null) {
+		$this->response->status(404);
+		$this->render(array('json' => $this->response->status));
+	}
+
 	public function view($id = null) {
 		if (!empty($id)) {
 			// throw new NotFoundException();

@@ -182,6 +182,24 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertEqual($result->body, null);
 		$this->assertEqual($result->headers(), array());
 	}
+
+	public function testResponseStatus() {
+		$postsController = new MockPostsController(array('classes' => array(
+			'response' => '\lithium\tests\mocks\action\MockControllerResponse'
+		)));
+		$this->assertFalse($postsController->stopped);
+
+		$postsController->__invoke(null, array('action' => 'not_found'));
+
+		$result = $postsController->access('_render');
+		$this->assertTrue($result['hasRendered']);
+
+		$expected = array('code' => 404, 'message' => 'Not Found');
+		$result = $postsController->response->status;
+		$this->assertEqual($expected, $result);
+		$result = json_decode($postsController->response->body(), true);
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
