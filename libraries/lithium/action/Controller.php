@@ -116,7 +116,9 @@ class Controller extends \lithium\core\Object {
 		);
 		$config += $defaults;
 		$this->request = empty($config['request']) ? $this->request : $config['request'];
-
+		if ($this->request) {
+			$this->_render['type'] = $this->request->type();
+		}
 		foreach (array('render', 'classes') as $key) {
 			if (!empty($config[$key])) {
 				$this->{'_' . $key} = (array) $config[$key] + $this->{'_' . $key};
@@ -149,7 +151,6 @@ class Controller extends \lithium\core\Object {
 			if (substr($action, 0, 1) == '_' || method_exists(__CLASS__, $action)) {
 				throw new Exception('Private method!');
 			}
-
 			$response = $config['response'] + array('request' => $self->request);
 			$self->response = new $classes['response']($response);
 			$render['template'] = $render['template'] ?: $action;
@@ -160,7 +161,6 @@ class Controller extends \lithium\core\Object {
 				// See todo, temporary alleviating obscure failure
 				throw $e;
 			}
-
 			if (!empty($result)) {
 				if (is_string($result)) {
 					$self->render(array('text' => $result));
@@ -218,7 +218,7 @@ class Controller extends \lithium\core\Object {
 			$this->set($options['data']);
 			unset($options['data']);
 		}
-		$options = $options + $this->_render + array('request' => $this->request);
+		$options = $options + $this->_render;
 		$type = key($options);
 		$types = array_flip($media::types());
 
@@ -238,7 +238,7 @@ class Controller extends \lithium\core\Object {
 		}
 		$data = $this->_render['data'];
 		$data = (isset($data[0]) && count($data) == 1) ? $data[0] : $data;
-		$media::render($this->response, $data, $options);
+		$media::render($this->response, $data, $options + array('request' => $this->request));
 	}
 
 	/**

@@ -200,6 +200,35 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = json_decode($postsController->response->body(), true);
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testResponseTypeBasedOnRequestType() {
+		$request = new MockControllerRequest(array('type' => 'json'));
+
+		$postsController = new MockPostsController(array(
+			'request' => $request,
+			'classes' => array(
+				'response' => '\lithium\tests\mocks\action\MockControllerResponse'
+			)
+		));
+		$this->assertFalse($postsController->stopped);
+
+		$postsController->__invoke($request, array('action' => 'type'));
+
+		$expected = array(
+			'type' => 'json', 'data' => array('data' => 'test'), 'auto' => true,
+			'layout' => 'default', 'template' => 'type', 'hasRendered' => true
+		);
+		$result = $postsController->access('_render');
+		$this->assertEqual($expected, $result);
+
+		$expected = 'application/json';
+		$result = $postsController->response->headers('Content-type');
+		$this->assertEqual($expected, $result);
+
+		$expected = array('data' => 'test');
+		$result = json_decode($postsController->response->body(), true);
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
