@@ -288,15 +288,13 @@ class Library extends \lithium\console\Command {
 		if (count($results)) {
 			$plugin = current($results);
 		}
-
-		$hasGit = function () {
-			return (strpos(shell_exec('git --version'), '1.6') !== false);
-		};
 		if (empty($plugin->sources)) {
 			$this->error("{$name} not found");
 			return false;
 		}
-
+		$hasGit = function () {
+			return (strpos(`git --version`, '1.6') !== false);
+		};
 		foreach ((array) $plugin->sources as $source) {
 			if (strpos($source, 'phar.gz') !== false) {
 				$written = file_put_contents(
