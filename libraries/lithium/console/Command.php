@@ -125,14 +125,18 @@ class Command extends \lithium\core\Object {
 	 *
 	 * @param string $str
 	 * @param integer $newlines
+	 * @param string $style The name of the style the string is to be wrapped in.
 	 * @return integer|void
 	 */
-	public function out($str = null, $newlines = 1) {
+	public function out($str = null, $newlines = 1, $style = "") {
 		if (is_array($str)) {
 			foreach ($str as $string) {
 				$this->out($string, $newlines);
 			}
 			return;
+		}
+		if($style !== "") {
+			$str = "{:$style}" . $str . "{:end}";
 		}
 		if ($newlines) {
 			$str = $str . str_pad("\n", $newlines, "\n");
