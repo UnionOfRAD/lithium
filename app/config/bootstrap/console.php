@@ -13,11 +13,11 @@ ConsoleDispatcher::applyFilter('_call', function($self, $params, $chain) {
 	$params['callable']->response->applyFilter('output', function($self, $params, $chain) {	
 		$styles = array(
 			/** General **/
-			'heading1' => "\033[1;36m",
+			'heading1' => "\033[1;30;46m",
 			'heading2' => "\033[1;35m",
 			'heading3' => "\033[1;34m",
-			'option'   => "\033[1;33m",
-			'command'  => "\033[1;32m",
+			'option'   => "\033[40;37m",
+			'command'  => "\033[1;40;37m",
 			/** Colors **/
 			'black'  => "\033[0;30m",
 			'red'    => "\033[0;31m",
