@@ -30,7 +30,7 @@ abstract class Socket extends \lithium\core\Object {
 	 *              - `'timeout'`: Seconds after opening the socket times out (defaults to `30`).
 	 * @return void
 	 */
-	public function __construct($config) {
+	public function __construct($config = array()) {
 		$defaults = array(
 			'persistent' => false,
 			'protocol'   => 'tcp',
