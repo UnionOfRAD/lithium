@@ -14,8 +14,8 @@ ConsoleDispatcher::applyFilter('_call', function($self, $params, $chain) {
 		$styles = array(
 			/** General **/
 			'heading1' => "\033[1;36m",
-			'heading2' => "\033[1;34m",
-			'heading3' => "\033[1;35m",
+			'heading2' => "\033[1;35m",
+			'heading3' => "\033[1;34m",
 			'option'   => "\033[1;33m",
 			'command'  => "\033[1;32m",
 			/** Colors **/
