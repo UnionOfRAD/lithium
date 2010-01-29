@@ -137,6 +137,10 @@ abstract class Renderer extends \lithium\core\Object {
 
 	abstract public function render($template, $data = array(), $options = array());
 
+	public function __isSet($property) {
+		return isset($this->_context[$property]);
+	}
+
 	public function __get($property) {
 		$context = $this->_context;
 		$helpers = $this->_helpers;
