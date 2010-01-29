@@ -30,9 +30,9 @@ ConsoleDispatcher::applyFilter('_call', function($self, $params, $chain) {
 			'end'    => "\033[0m",
 		);
 		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-			array_walk($styles, function(&$value, $key) {
-				$value = '';
-			});
+			foreach($styles as $key => $value) {
+				$styles[$key] = '';
+			}
 		}
 		$params['string'] = String::insert($params['string'], $styles);
 		return $chain->next($self, $params, $chain);
