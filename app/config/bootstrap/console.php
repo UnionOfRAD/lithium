@@ -10,32 +10,8 @@ use \lithium\console\Dispatcher as ConsoleDispatcher;
 use \lithium\util\String;
 
 ConsoleDispatcher::applyFilter('_call', function($self, $params, $chain) {
-	$params['callable']->response->applyFilter('output', function($self, $params, $chain) {	
-		$styles = array(
-			/** General **/
-			'heading1' => "\033[1;30;46m",
-			'heading2' => "\033[1;35m",
-			'heading3' => "\033[1;34m",
-			'option'   => "\033[40;37m",
-			'command'  => "\033[1;40;37m",
-			/** Colors **/
-			'black'  => "\033[0;30m",
-			'red'    => "\033[0;31m",
-			'green'  => "\033[0;32m",
-			'yellow' => "\033[0;33m",
-			'blue'   => "\033[0;34m",
-			'purple' => "\033[0;35m",
-			'cyan'   => "\033[0;36m",
-			'white'  => "\033[0;37m",
-			'end'    => "\033[0m",
-		);
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-			foreach($styles as $key => $value) {
-				$styles[$key] = '';
-			}
-		}
-		$params['string'] = String::insert($params['string'], $styles);
-		return $chain->next($self, $params, $chain);
-	}); 
+	$params['callable']->response->styles(array(
+		'heading' => 'changed'
+	));
 	return $chain->next($self, $params, $chain);
 });

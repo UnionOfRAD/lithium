@@ -210,7 +210,7 @@ class Command extends \lithium\core\Object {
 	 */
 	public function header($text, $line = 80) {
 		$this->hr($line);
-		$this->out($text);
+		$this->out($text, 1, 'heading1');
 		$this->hr($line);
 	}
 
