@@ -64,6 +64,28 @@ class SessionTest extends \lithium\test\Unit {
 		$this->assertNull(Session::read('key'));
 		$this->assertIdentical(false, Session::write('key', 'value'));
 	}
+	
+	public function testNamedConfigurationReadWrite() {
+		$store1 = new Memory();
+		$store2 = new Memory();
+		$config = array(
+			'store1' => array('adapter' => &$store1, 'filters' => array(), 'strategies' => array()),
+			'store2' => array('adapter' => &$store2, 'filters' => array(), 'strategies' => array())
+		);
+		Session::reset();
+		Session::config($config);
+		$result = Session::config();
+		$this->assertEqual($config, $result);
+		
+		$result = Session::write('key', 'value', array('name' => 'store1'));
+		$this->assertTrue($result);
+		
+		$result = Session::read('key', array('name' => 'store1'));
+		$this->assertEqual($result, 'value');
+		
+		$result = Session::read('key', array('name' => 'store2'));
+		$this->assertFalse($result);
+	}
 
 	public function testSessionConfigReset() {
 		$this->assertTrue(Session::write('key', 'value'));

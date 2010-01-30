@@ -86,7 +86,7 @@ class Session extends \lithium\core\Adaptable {
 	public static function read($key, $options = array()) {
 		$defaults = array('name' => null);
 		$options += $defaults;
-		$method = ($name = $options['name']) ? static::_adapter($name)->read($key, $options) : null;
+		$method = ($name = $options['name']) ? static::adapter($name)->read($key, $options) : null;
 		$settings = static::_config($name);
 
 		if (!$method) {
