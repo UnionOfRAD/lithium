@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\Test;
+namespace lithium\tests\cases\test;
 
 class UnitTest extends \lithium\test\Unit {
 
