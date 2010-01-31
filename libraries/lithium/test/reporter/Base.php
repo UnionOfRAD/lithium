@@ -6,40 +6,34 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\test;
+namespace lithium\test\reporter;
 
 use \Exception;
 use \lithium\core\Libraries;
 use \lithium\util\Inflector;
 
 /**
- * Reporter class to handle test report output
- *
- * @param class \lithium\test\Report
+ * Reporter class to handle test report output.
  */
-class Reporter extends \lithium\core\Object {
+abstract class Base extends \lithium\core\Object {
 
-	/**
-	 * undocumented function
-	 *
-	 * @param object $stats \lithium\test\Report
-	 * @return void
-	 */
 	public function stats($stats) {
 		$defaults = array(
-			'asserts' => null, 'passes' => array(), 'fails' => array(),
-			'errors' => array(), 'exceptions' => array(),
+			'asserts' => null,
+			'passes' => array(),
+			'fails' => array(),
+			'errors' => array(),
+			'exceptions' => array(),
 		);
 		$stats = (array) $stats + $defaults;
 
-		$asserts = $stats['asserts'];
-		$passes = count($stats['passes']);
-		$fails = count($stats['fails']);
-		$errors = count($stats['errors']);
-		$exceptions = count($stats['exceptions']);
-		$success = ($passes === $asserts && $errors === 0);
-		$aggregate = compact('asserts', 'passes', 'fails', 'errors', 'exceptions', 'success');
-		$result = array($this->_result($aggregate));
+		$count = array_map(
+			function($value) { return is_array($value) ? count($value) : $value; },
+			$stats
+		);
+		$success = $count['passes'] === $count['asserts'] && $count['errors'] === 0;
+
+		$result[] = $this->_result($count + compact('success'));
 
 		foreach ((array) $stats['errors'] as $error) {
 			switch ($error['result']) {
@@ -56,7 +50,7 @@ class Reporter extends \lithium\core\Object {
 	}
 
 	/**
-	 * return menu as a string to be used as render
+	 * Return menu as a string to be used as render.
 	 *
 	 * @param array $classes
 	 * @param array $options
@@ -131,57 +125,15 @@ class Reporter extends \lithium\core\Object {
 		return $this->_item(null, array('menu' => $result));
 	}
 
-	/**
-	 * undocumented function
-	 *
-	 * @param string $filters
-	 * @return void
-	 */
-	public function filters($filters) {
+	abstract public function filters($filters);
 
-	}
+	abstract protected function _result($data);
 
-	/**
-	 * undocumented function
-	 *
-	 * @param array $data
-	 * @return void
-	 */
-	protected function _result($data) {
+	abstract protected function _fail($data);
 
-	}
+	abstract protected function _exception($data);
 
-	/**
-	 * undocumented function
-	 *
-	 * @param array $data
-	 * @return void
-	 */
-	protected function _fails($data) {
-
-	}
-
-	/**
-	 * undocumented function
-	 *
-	 * @param array $data
-	 * @return void
-	 */
-	protected function _exception($data) {
-
-	}
-
-	/**
-	 * undocumented function
-	 *
-	 * @param array $data
-	 * @return void
-	 */
-	protected function _item($data) {
-
-	}
-
-
+	abstract protected function _item($data);
 }
 
 ?>

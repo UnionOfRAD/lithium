@@ -6,14 +6,14 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\test;
+namespace lithium\tests\cases\test\reporter;
 
-use \lithium\test\Reporter;
+use \lithium\test\reporter\Base;
 
-class ReporterTest extends \lithium\test\Unit {
+class BaseTest extends \lithium\test\Unit {
 
 	public function setUp() {
-		$this->reporter = new Reporter();
+		$this->reporter = new Base();
 	}
 
 	public function testMenu() {
@@ -36,7 +36,7 @@ class ReporterTest extends \lithium\test\Unit {
 			'passes' => array(array(
 				'line' => 23, 'method' => 'testNothing',
 				'assertion' => 'assertEqual', 'message' => 'the message',
-				'class' => 'lithium\tests\cases\test\ReporterTest'
+				'class' => 'lithium\tests\cases\test\reporter\BaseTest'
 			)),
 			'fails' => array(array('method' => 'testNothing')),
 			'errors' => array(),
@@ -53,7 +53,7 @@ class ReporterTest extends \lithium\test\Unit {
 			'passes' => array(array(
 				'line' => 23, 'method' => 'testNothing',
 				'assertion' => 'assertEqual', 'message' => 'the message',
-				'class' => 'lithium\tests\cases\test\ReporterTest'
+				'class' => 'lithium\tests\cases\test\reporter\BaseTest'
 			)),
 			'fails' => array(array('method' => 'testNothing')),
 			'errors' => array('result' => 'fail'),

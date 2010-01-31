@@ -28,7 +28,7 @@ class Report extends \lithium\core\Object {
 	public $group = null;
 
 	/**
-	 * Contains an instance of `lithium\test\Reporter`, which contains the format to be displayed
+	 * Contains an instance of a test reporter, which contains the format to be displayed.
 	 *
 	 * @var object
 	 */

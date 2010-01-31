@@ -10,14 +10,8 @@ namespace lithium\test\reporter;
 
 use lithium\util\String;
 
-class Text extends \lithium\test\Reporter {
+class Text extends \lithium\test\reporter\Base {
 
-	/**
-	 * undocumented function
-	 *
-	 * @param array $stats
-	 * @return string
-	 */
 	protected function _result($stats) {
 		$result = array(
 			"{$stats['passes']} / {$stats['asserts']} passes",
@@ -28,31 +22,19 @@ class Text extends \lithium\test\Reporter {
 		return join("\n", $result);
 	}
 
-	/**
-	 * undocumented function
-	 *
-	 * @param array $error
-	 * @return string
-	 */
 	protected function _fail($error) {
 		$fail = array(
-			"Assertion '{$error['assertion']}' failed in",
-			"{$error['class']}::{$error['method']}()",
+			"Assertion `{$error['assertion']}` failed in",
+			"`{$error['class']}::{$error['method']}()`",
 			"on line {$error['line']}:",
 			"\n{$error['message']}",
 		);
 		return join(" ", $fail);
 	}
 
-	/**
-	 * undocumented function
-	 *
-	 * @param array $error
-	 * @return string
-	 */
 	protected function _exception($error) {
 		$exception = array(
-			"Exception thrown in {$error['class']}::{$error['method']}() on line {$error['line']}:",
+			"Exception thrown in `{$error['class']}::{$error['method']}()` on line {$error['line']}:",
 			"{$error['message']}",
 		);
 		if (isset($error['trace']) && !empty($error['trace'])) {
@@ -61,12 +43,6 @@ class Text extends \lithium\test\Reporter {
 		return join("\n", $exception);
 	}
 
-	/**
-	 * undocumented function
-	 *
-	 * @param string $filters
-	 * @return void
-	 */
 	public function filters($filters) {
 		$output = array();
 
@@ -76,13 +52,6 @@ class Text extends \lithium\test\Reporter {
 		return join("\n", $output);
 	}
 
-	/**
-	 * undocumented function
-	 *
-	 * @param string $type
-	 * @param string $params
-	 * @return void
-	 */
 	public function _item($type, $params = array()) {
 		$defaults = array(
 			'namespace' => null, 'name' => null, 'menu' => null

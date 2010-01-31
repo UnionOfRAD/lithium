@@ -10,22 +10,12 @@ namespace lithium\test\reporter;
 
 use lithium\util\String;
 
-/**
- * Html Reporter
- *
- */
-class Html extends \lithium\test\Reporter {
+class Html extends \lithium\test\reporter\Base {
 
 	protected $_classes = array(
 		'router' => '\lithium\net\http\Router'
 	);
 
-	/**
-	 * undocumented function
-	 *
-	 * @param array $stats
-	 * @return string
-	 */
 	protected function _result($stats) {
 		$class = ($stats['success'] ? 'success' : 'fail');
 		$result = array(
@@ -38,12 +28,6 @@ class Html extends \lithium\test\Reporter {
 		return join("", $result);
 	}
 
-	/**
-	 * undocumented function
-	 *
-	 * @param array $error
-	 * @return string
-	 */
 	protected function _fail($error) {
 		$fail = array(
 			'<div class="test-assert test-assert-failed">',
@@ -56,12 +40,6 @@ class Html extends \lithium\test\Reporter {
 		return join("", $fail);
 	}
 
-	/**
-	 * undocumented function
-	 *
-	 * @param array $error
-	 * @return string
-	 */
 	protected function _exception($error) {
 		$exception = array(
 			'<div class="test-exception">',
@@ -76,12 +54,6 @@ class Html extends \lithium\test\Reporter {
 		return join("", $exception);
 	}
 
-	/**
-	 * undocumented function
-	 *
-	 * @param string $filters
-	 * @return void
-	 */
 	public function filters($filters) {
 		$result = array();
 		foreach ((array) $filters as $class => $data) {
@@ -91,9 +63,9 @@ class Html extends \lithium\test\Reporter {
 	}
 
 	/**
-	 * Renders a menu item
+	 * Renders a menu item.
 	 *
-	 * @param string $type group, case or null
+	 * @param string $type group, case or null.
 	 * @param string $options
 	 *               - request: a request object
 	 *               - namespace: namespace for test case

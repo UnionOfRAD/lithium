@@ -40,7 +40,7 @@ use \RecursiveIteratorIterator;
 class Unit extends \lithium\core\Object {
 
 	/**
-	 * The Reference to the \test\Reporter class.
+	 * The Reference to a test reporter class.
 	 *
 	 * @var string
 	 */

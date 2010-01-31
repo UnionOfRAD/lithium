@@ -8,7 +8,6 @@
 
 namespace lithium\test;
 
-use \lithium\test\Reporter;
 use \lithium\test\Dispatcher;
 use \lithium\core\Libraries;
 
