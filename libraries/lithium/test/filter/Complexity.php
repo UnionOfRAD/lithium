@@ -14,7 +14,7 @@ use \lithium\analysis\Inspector;
 /**
  * Calculates the cyclomatic complexity of class methods, and shows worst-offenders and statistics.
  */
-class Complexity extends \lithium\core\StaticObject {
+class Complexity extends \lithium\test\filter\Base {
 
 	/**
 	 * Collects complexity analysis results for classes/methods.
@@ -30,19 +30,17 @@ class Complexity extends \lithium\core\StaticObject {
 	);
 
 	/**
-	 * Takes an instance of `test\Group` containing one or more test cases introspects the test
-	 * subject classes to extract cyclomatic complexity data.
+	 * Takes an instance of an object (usually a Collection object) containing test
+	 * instances. Introspects the test subject classes to extract cyclomatic complexity data.
 	 *
-	 * @param object $object Instance of `Group` containing instances of `lithium\test\Unit`.
-	 * @param array $options Not implemented
-	 * @return object Returns the value of the `$object` parameter.
+	 * @param object $tests Instance of Collection containing instances of tests.
+	 * @param array $options Not used.
+	 * @return object|void Returns the instance of `$tests`.
 	 */
-	public static function apply($object, $options = array()) {
-		$defaults = array();
-		$options += $defaults;
-
-		foreach ($object->invoke('subject') as $class) {
+	public static function apply($tests, $options = array()) {
+		foreach ($tests->invoke('subject') as $class) {
 			static::$_results[$class] = array();
+
 			if (!$methods = Inspector::methods($class, 'ranges')) {
 				continue;
 			}
@@ -55,10 +53,17 @@ class Complexity extends \lithium\core\StaticObject {
 				static::$_results[$class][$method] = count($branches) + 1;
 			}
 		}
-		return $object;
+		return $tests;
 	}
 
-	public static function analyze($results, $classes = array()) {
+	/**
+	 * Analyzes the results of a test run and returns the result of the analysis.
+	 *
+	 * @param array $results The results of the test run.
+	 * @param array $options Not used.
+	 * @return array|void The results of the analysis.
+	 */
+	public static function analyze($results, $options = array()) {
 		$metrics = array('max' => array(), 'class' => array());
 
 		foreach (static::$_results as $class => $methods) {
@@ -71,36 +76,49 @@ class Complexity extends \lithium\core\StaticObject {
 				$metrics['max']["{$class}::{$method}()"] = $count;
 			}
 		}
+
 		arsort($metrics['max']);
 		arsort($metrics['class']);
 		return $metrics;
 	}
 
-	public static function output($format, $data) {
-		echo '<h3>Cyclomatic Complexity</h3>';
-		echo '<table class="metrics"><tbody>';
+	/**
+	 * Returns data to be output by a reporter.
+	 *
+	 * @param string $format I.e. `'html'` or `'text'`.
+	 * @param array $analysis The results of the analysis.
+	 * @return string|void
+	 */
+	public static function output($format, $analysis) {
+		$output = null;
 
-		foreach (array_slice($data['max'], 0, 10) as $method => $count) {
-			if ($count <= 7) {
-				continue;
+		if ($format == 'html') {
+			$output .= '<h3>Cyclomatic Complexity</h3>';
+			$output .= '<table class="metrics"><tbody>';
+
+			foreach (array_slice($analysis['max'], 0, 10) as $method => $count) {
+				if ($count <= 7) {
+					continue;
+				}
+				$output .= '<tr>';
+				$output .= '<td class="metric-name">Worst Offender</th>';
+				$output .= '<td class="metric">' . $method . ' - ' . $count . '</td>';
+				$output .= '</tr>';
 			}
-			echo '<tr>';
-			echo '<td class="metric-name">Worst Offender</th>';
-			echo '<td class="metric">' . $method . ' - ' . $count . '</td>';
-			echo '</tr>';
-		}
 
-		echo '<tr>';
-		echo '<th colspan="2">Class Averages</th>';
-		echo '</tr>';
+			$output .= '<tr>';
+			$output .= '<th colspan="2">Class Averages</th>';
+			$output .= '</tr>';
 
-		foreach (array_slice($data['class'], 0, 10) as $class => $count) {
-			echo '<tr>';
-			echo '<td class="metric-name">' . $class . '</th>';
-			echo '<td class="metric">' . round($count, 2) . '</td>';
-			echo '</tr>';
+			foreach (array_slice($analysis['class'], 0, 10) as $class => $count) {
+				$output .= '<tr>';
+				$output .= '<td class="metric-name">' . $class . '</th>';
+				$output .= '<td class="metric">' . round($count, 2) . '</td>';
+				$output .= '</tr>';
+			}
+			$output .= '</tbody></table>';
 		}
-		echo '</tbody></table>';
+		return $output;
 	}
 }
 

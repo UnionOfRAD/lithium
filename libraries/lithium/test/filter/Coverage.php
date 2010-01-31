@@ -16,7 +16,7 @@ use \lithium\analysis\Inspector;
 /**
  * Runs code coverage analysis for the executed tests.
  */
-class Coverage extends \lithium\core\StaticObject {
+class Coverage extends \lithium\test\filter\Base {
 
 	/**
 	 * Collects coverage analysis results from Xdebug.
@@ -24,70 +24,42 @@ class Coverage extends \lithium\core\StaticObject {
 	protected static $_results = array();
 
 	/**
-	 * Takes an instance of an object (usually a Collection object) containing unit test case
-	 * instances.  Attaches code coverage filtering to test cases.
+	 * Takes an instance of an object (usually a Collection object) containing test
+	 * instances. Attaches code coverage filtering to test cases.
 	 *
-	 * @param object $object Instance of Collection containing instances of lithium\test\Unit
+	 * @see lithium\test\filter\Coverage::collect()
+	 * @param object $tests Instance of Collection containing instances of tests.
 	 * @param array $options Options for how code coverage should be applied. These options are
 	 *              also passed to `Coverage::collect()` to determine how to aggregate results. See
 	 *              the documentation for `collect()` for further options.  Options affecting this
 	 *              method are:
 	 *              -'method': The name of method to attach to, defaults to 'run'.
-	 * @return object Returns the instance of $object with code coverage analysis triggers applied.
-	 * @see lithium\test\filter\Coverage::collect()
+	 * @return object|void Returns the instance of `$tests` with code coverage analysis
+	 *                     triggers applied.
 	 */
-	public static function apply($object, $options = array()) {
+	public static function apply($tests, $options = array()) {
 		$defaults = array('method' => 'run');
 		$options += $defaults;
 		$m = $options['method'];
 
-		$object->invoke('applyFilter', array($m, function($self, $params, $chain) use ($options) {
+		$tests->invoke('applyFilter', array($m, function($self, $params, $chain) use ($options) {
 			xdebug_start_code_coverage(XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE);
 			$chain->next($self, $params, $chain);
 			$results = xdebug_get_code_coverage();
 			xdebug_stop_code_coverage();
 			Coverage::collect($self->subject(), $results, $options);
 		}));
-		return $object;
-	}
-
-	/**
-	 * Collects code coverage analysis results from `xdebug_get_code_coverage()`.
-	 *
-	 * @param string $class Class name that these test results correspond to.
-	 * @param array $results A results array from `xdebug_get_code_coverage()`.
-	 * @param array $options Set of options defining how results should be collected.
-	 * @return void
-	 * @see lithium\test\Coverage::analyze()
-	 * @todo Implement $options['merging']
-	 */
-	public static function collect($class, $results, $options = array()) {
-		$defaults = array('merging' => 'class');
-		$options += $defaults;
-
-		foreach ($results as $file => $lines) {
-			unset($results[$file][0]);
-		}
-
-		switch ($options['merging']) {
-			case 'class':
-			default:
-				if (!isset(static::$_results[$class])) {
-					static::$_results[$class] = array();
-				}
-				static::$_results[$class][] = $results;
-			break;
-		}
+		return $tests;
 	}
 
 	/**
 	 * Analyzes code coverage results collected from XDebug, and performs coverage density analysis.
 	 *
-	 * @param array $results
-	 * @param array $classes Optional. A list of classes to analyze coverage on.  By default, gets
-	 *              all defined subclasses of lithium\test\Unit which are currently in memory.
-	 * @return array Returns an array indexed by file and line, showing the number of instances
-	 *               each line was called.
+	 * @param array $results The results of the test run.
+	 * @param array $classes A list of classes to analyze coverage on. By default, gets all
+	 *              defined subclasses of lithium\test\Unit which are currently in memory.
+	 * @return array|void Returns an array indexed by file and line, showing the number of
+	 *                    instances each line was called.
 	 */
 	public static function analyze($results, $classes = array()) {
 		$classes = $classes ?: array_filter(get_declared_classes(), function($class) {
@@ -120,52 +92,11 @@ class Coverage extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Reduces the results of multiple XDebug code coverage runs into a single 2D array of the
-	 * aggregate line coverage density per file.
+	 * Returns data to be output by a reporter.
 	 *
-	 * @param array $runs An array containing multiple runs of raw XDebug coverage data, where
-	 *              each array key is a file name, and it's value is XDebug's coverage
-	 *              data for that file.
-	 * @param array $classMap An optional map with class names as array keys and corresponding file
-	 *              names as values. Used to filter the returned results, and will cause the array
-	 *              keys of the results to be class names instead of file names.
-	 * @return array
-	 */
-	protected static function _density($runs, $classMap = array()) {
-		$results = array();
-
-		foreach ($runs as $run) {
-			foreach ($run as $file => $coverage) {
-				$file = str_replace('\\', '/', $file);
-
-				if (!empty($classMap)) {
-					if (!$class = array_search($file, $classMap)) {
-						continue;
-					}
-					$file = $class;
-				}
-				if (!isset($results[$file])) {
-					$results[$file] = array();
-				}
-				$coverage = array_filter($coverage, function($line) { return ($line === 1); });
-
-				foreach ($coverage as $line => $isCovered) {
-					if (!isset($results[$file][$line])) {
-						$results[$file][$line] = 0;
-					}
-					$results[$file][$line]++;
-				}
-			}
-		}
-		return $results;
-	}
-
-	/**
-	 * Outputs the coverage analysis to a specific format
-	 *
-	 * @param string $format [required] html,txt
-	 * @param array $analysis [required] from Coverage::analysis()
-	 * @return string
+	 * @param string $format I.e. `'html'` or `'text'`.
+	 * @param array $analysis The results of the analysis.
+	 * @return string|void
 	 */
 	public static function output($format, $analysis) {
 		if (empty($analysis)) {
@@ -234,26 +165,96 @@ class Coverage extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Returns header for stats
+	 * Collects code coverage analysis results from `xdebug_get_code_coverage()`.
 	 *
-	 * @param string $format [required] html,txt
-	 * @param string $class [required] class name
-	 * @param array $data [required] from output
-	 * @return string
+	 * @param string $class Class name that these test results correspond to.
+	 * @param array $results A results array from `xdebug_get_code_coverage()`.
+	 * @param array $options Set of options defining how results should be collected.
+	 * @return void
+	 * @see lithium\test\Coverage::analyze()
+	 * @todo Implement $options['merging']
 	 */
-	public static function stats($format, $class, $data) {
-		$covered = count($data['covered']) . ' of ' . count($data['executable']);
+	public static function collect($class, $results, $options = array()) {
+		$defaults = array('merging' => 'class');
+		$options += $defaults;
+
+		foreach ($results as $file => $lines) {
+			unset($results[$file][0]);
+		}
+
+		switch ($options['merging']) {
+			case 'class':
+			default:
+				if (!isset(static::$_results[$class])) {
+					static::$_results[$class] = array();
+				}
+				static::$_results[$class][] = $results;
+			break;
+		}
+	}
+
+	/**
+	 * Returns header for stats.
+	 *
+	 * @param string $format I.e. `'html'` or `'text'`.
+	 * @param string $class
+	 * @param array $analysis The results of the analysis.
+	 * @return string|void
+	 */
+	public static function stats($format, $class, $analysis) {
+		$covered = count($analysis['covered']) . ' of ' . count($analysis['executable']);
 
 		if ($format == 'html') {
-			$title = "{$class}: {$covered} lines covered (<em>{$data['percentage']}%</em>)";
+			$title = "{$class}: {$covered} lines covered (<em>{$analysis['percentage']}%</em>)";
 			return '<h4 class="coverage">' . $title . '</h4>';
 		}
 	}
 
 	/**
+	 * Reduces the results of multiple XDebug code coverage runs into a single 2D array of the
+	 * aggregate line coverage density per file.
+	 *
+	 * @param array $runs An array containing multiple runs of raw XDebug coverage data, where
+	 *              each array key is a file name, and it's value is XDebug's coverage
+	 *              data for that file.
+	 * @param array $classMap An optional map with class names as array keys and corresponding file
+	 *              names as values. Used to filter the returned results, and will cause the array
+	 *              keys of the results to be class names instead of file names.
+	 * @return array
+	 */
+	protected static function _density($runs, $classMap = array()) {
+		$results = array();
+
+		foreach ($runs as $run) {
+			foreach ($run as $file => $coverage) {
+				$file = str_replace('\\', '/', $file);
+
+				if (!empty($classMap)) {
+					if (!$class = array_search($file, $classMap)) {
+						continue;
+					}
+					$file = $class;
+				}
+				if (!isset($results[$file])) {
+					$results[$file] = array();
+				}
+				$coverage = array_filter($coverage, function($line) { return ($line === 1); });
+
+				foreach ($coverage as $line => $isCovered) {
+					if (!isset($results[$file][$line])) {
+						$results[$file][$line] = 0;
+					}
+					$results[$file][$line]++;
+				}
+			}
+		}
+		return $results;
+	}
+
+	/**
 	 * Returns row or file in specified format
 	 *
-	 * @param string $format [required] html,txt
+	 * @param string $format [required] html,text
 	 * @param string $type [required] row, file
 	 * @param array $data [required] from output
 	 * @return string
@@ -274,9 +275,7 @@ class Coverage extends \lithium\core\StaticObject {
 					str_replace("\t", "    ", $data['data'])
 				)
 			);
-		}
-
-		if ($format === 'txt') {
+		} elseif ($format === 'text') {
 			if ($type == 'file') {
 				return sprintf("%s\n\n%s", $data['file'], join("\n", $data['data']));
 			}

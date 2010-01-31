@@ -8,7 +8,7 @@
 
 namespace lithium\test\filter;
 
-class Profiler extends \lithium\core\StaticObject {
+class Profiler extends \lithium\test\filter\Base {
 
 	/**
 	 * Collects profiling results from test-wrapping filters.
@@ -75,38 +75,22 @@ class Profiler extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Add, remove, or modify a profiler check.
+	 * Takes an instance of an object (usually a Collection object) containing test
+	 * instances. Allows for preparing tests before they are run.
 	 *
-	 * @param mixed $name
-	 * @param string $value
-	 * @see lithium\test\Profiler::$_metrics
-	 * @return mixed
+	 * @param object $tests Instance of Collection containing instances of tests.
+	 * @param array $options Options for how this filter should be applied. Available optiosn are:
+	 *              - `'method'`
+	 *              - `'run'`
+	 *              - `'checks'`
+	 * @return object|void Returns the instance of `$tests`.
 	 */
-	public function check($name, $value = null) {
-		if (is_null($value) && !is_array($name)) {
-			return isset(static::$_metrics[$name]) ? static::$_metrics[$name] : null;
-		}
-
-		if ($value === false) {
-			unset(static::$_metrics[$name]);
-			return;
-		}
-
-		if (!empty($value)) {
-			static::$_metrics[$name] = $value;
-		}
-
-		if (is_array($name)) {
-			static::$_metrics = $name + static::$_metrics;
-		}
-	}
-
-	public static function apply($object, $options = array()) {
+	public static function apply($tests, $options = array()) {
 		$defaults = array('method' => 'run', 'checks' => static::$_metrics);
 		$options += $defaults;
 		$m = $options['method'];
 
-		$object->invoke('applyFilter', array($m, function($self, $params, $chain) use ($options) {
+		$tests->invoke('applyFilter', array($m, function($self, $params, $chain) use ($options) {
 			$start = $results = array();
 
 			$runCheck = function($check) {
@@ -135,18 +119,17 @@ class Profiler extends \lithium\core\StaticObject {
 			));
 			return $methodResult;
 		}));
-		return $object;
+		return $tests;
 	}
 
-	public static function collect($class, $method, $results, $options = array()) {
-		$defaults = array('test' => null);
-		$options += $defaults;
-
-		static::$_classMap[$options['test']] = $class;
-		static::$_results[$class][$method] = $results;
-	}
-
-	public static function analyze($results, $classes = array()) {
+	/**
+	 * Analyzes the results of a test run and returns the result of the analysis.
+	 *
+	 * @param array $results The results of the test run.
+	 * @param array $options Not used.
+	 * @return array|void The results of the analysis.
+	 */
+	public static function analyze($results, $options = array()) {
 		$metrics = array();
 
 		foreach ($results as $testCase) {
@@ -176,10 +159,17 @@ class Profiler extends \lithium\core\StaticObject {
 		return $metrics;
 	}
 
-	public static function output($format, $data) {
+	/**
+	 * Returns data to be output by a reporter.
+	 *
+	 * @param string $format I.e. `'html'` or `'text'`.
+	 * @param array $analysis The results of the analysis.
+	 * @return string|void
+	 */
+	public static function output($format, $analysis) {
 		$totals = array();
 
-		foreach ($data as $class => $metrics) {
+		foreach ($analysis as $class => $metrics) {
 			foreach ($metrics as $title => $value) {
 				$totals[$title] = isset($totals[$title]) ? $totals[$title] : 0;
 				$totals[$title] += $value;
@@ -203,7 +193,7 @@ class Profiler extends \lithium\core\StaticObject {
 			}
 			echo '</tbody></table>';
 
-		} else if ($format == 'text') {
+		} elseif ($format == 'text') {
 			foreach ($totals as $title => $value) {
 				if (!isset(static::$_metrics[$title])) {
 					continue;
@@ -213,6 +203,41 @@ class Profiler extends \lithium\core\StaticObject {
 			}
 			return $results;
 		}
+	}
+
+	/**
+	 * Add, remove, or modify a profiler check.
+	 *
+	 * @param mixed $name
+	 * @param string $value
+	 * @see lithium\test\Profiler::$_metrics
+	 * @return mixed
+	 */
+	public function check($name, $value = null) {
+		if (is_null($value) && !is_array($name)) {
+			return isset(static::$_metrics[$name]) ? static::$_metrics[$name] : null;
+		}
+
+		if ($value === false) {
+			unset(static::$_metrics[$name]);
+			return;
+		}
+
+		if (!empty($value)) {
+			static::$_metrics[$name] = $value;
+		}
+
+		if (is_array($name)) {
+			static::$_metrics = $name + static::$_metrics;
+		}
+	}
+
+	public static function collect($class, $method, $results, $options = array()) {
+		$defaults = array('test' => null);
+		$options += $defaults;
+
+		static::$_classMap[$options['test']] = $class;
+		static::$_results[$class][$method] = $results;
 	}
 }
 

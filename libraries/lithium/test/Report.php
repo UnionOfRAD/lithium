@@ -105,19 +105,26 @@ class Report extends \lithium\core\Object {
 	public function run() {
 		$tests = $this->group->tests();
 		$filters = array();
+
 		foreach ($this->filters as $filter => $options) {
-			if(!$class = Libraries::locate('test.filter', $filter)) {
+			if (!$class = Libraries::locate('test.filter', $filter)) {
 				throw new Exception("{$class} is not a valid test filter.");
 			}
 			$options = isset($options['apply']) ? $options['apply'] : array();
-			$tests = $class::apply($tests, $options);
+			$tests = $class::apply($tests, $options) ?: $tests;
 			$filters[] = compact('class', 'options');
 		}
 		$this->results['group'] = $tests->run();
 
 		foreach ($filters as $filter) {
-			$filter['options'] = isset($filter['options']['analyze']) ? $filter['options']['analyze'] : array();
-			$this->results['filters'][$filter['class']] = $filter['class']::analyze($this->results['group'], $filter['options']);
+			if (isset($filter['options']['analyze'])) {
+				$filter['options'] = $filter['options']['analyze'];
+			} else {
+				$filter['options'] = array();
+			}
+			$this->results['filters'][$filter['class']] = $filter['class']::analyze(
+				$this->results['group'], $filter['options']
+			);
 		}
 	}
 
