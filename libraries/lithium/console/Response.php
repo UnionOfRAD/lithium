@@ -113,6 +113,8 @@ class Response extends \lithium\core\Object {
 			'heading3' => "\033[1;34m",
 			'option'   => "\033[40;37m",
 			'command'  => "\033[1;40;37m",
+			'error'    => "\033[0;31m",
+			'success'  => "\033[0;32m",
 			'black'  => "\033[0;30m",
 			'red'    => "\033[0;31m",
 			'green'  => "\033[0;32m",
