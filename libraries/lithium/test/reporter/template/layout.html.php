@@ -9,7 +9,6 @@
 		<link rel="stylesheet" href="<?php echo $base;?>/css/debug.css" />
 		<link href="<?php echo $base;?>/favicon.ico" title="Icon" type="image/x-icon" rel="icon" />
 		<link href="<?php echo $base;?>/favicon.ico" title="Icon" type="image/x-icon" rel="shortcut icon" /></head>
-
 	</head>
 	<body class="test-dashboard">
 		<h1>Lithium Unit Test Dashboard</h1>

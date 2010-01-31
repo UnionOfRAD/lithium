@@ -479,6 +479,7 @@ class Library extends \lithium\console\Command {
 		if (!empty($library['path'])) {
 			return $library['path'];
 		}
+
 		$path = $this->request->env('working');
 		return (!empty($name)) ? "{$path}/{$name}" : $path;
 	}
