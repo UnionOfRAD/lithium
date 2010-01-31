@@ -89,6 +89,7 @@ class Test extends \lithium\console\Command {
 
 		$this->header($report->title);
 		$this->out($report->stats());
+		$this->nl();
 		$this->out($report->filters());
 	}
 
