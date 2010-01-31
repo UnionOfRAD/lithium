@@ -14,8 +14,7 @@ use \lithium\test\Dispatcher;
 use \lithium\analysis\Inspector;
 
 /**
- * Runs a given set of unit tests and outputs the results.
- *
+ * Runs a given set of tests and outputs the results.
  */
 class Test extends \lithium\console\Command {
 
@@ -50,6 +49,7 @@ class Test extends \lithium\console\Command {
 	 * {{{
 	 * lithium test --case=lithium.tests.cases.core.ObjectTest --filters=Coverage
 	 * }}}
+	 *
 	 * @var string
 	 */
 	public $filters = array();
@@ -62,6 +62,7 @@ class Test extends \lithium\console\Command {
 	 * {{{
 	 * lithium test --case=lithium.tests.cases.core.ObjectTest
 	 * }}}
+	 *
 	 * Group example:
 	 * {{{
 	 * lithium test --group=lithium.tests.cases.core
@@ -70,6 +71,8 @@ class Test extends \lithium\console\Command {
 	 * @return void
 	 */
 	public function run() {
+		$this->header('Test');
+
 		if ($this->_getTests() != true) {
 			return 0;
 		}
@@ -82,15 +85,21 @@ class Test extends \lithium\console\Command {
 		} elseif (!empty($this->group)) {
 			$this->group = '\\' . str_replace('.', '\\', $this->group);
 		}
+		$this->nl();
+
+		$this->out(sprintf('Running `%s`... ', $this->case ?: $this->group), false);
 
 		$report = Dispatcher::run($this->case ?: $this->group, array(
 			'filters' => $this->filters, 'reporter' => 'text'
 		));
 
-		$this->header($report->title);
+		$this->out('done.', 2);
+
+		if ($output = $report->filters()) {
+			$this->out($output, 2);
+		}
 		$this->out($report->stats());
 		$this->nl();
-		$this->out($report->filters());
 	}
 
 	/**
