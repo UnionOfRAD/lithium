@@ -139,7 +139,12 @@ class Inspector extends \lithium\core\StaticObject {
 
 		if ($type == 'property' && !$classInspector->isAbstract()) {
 			$inspector->setAccessible(true);
-			$result['value'] = $inspector->getValue($classInspector->newInstance());
+
+			try {
+				$result['value'] = $inspector->getValue($classInspector->newInstance());
+			} catch (Exception $e) {
+				return null;
+			}
 		}
 
 		if (isset($result['start']) && isset($result['end'])) {
