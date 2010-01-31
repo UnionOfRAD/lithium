@@ -42,7 +42,7 @@ class TextTest extends \lithium\test\Unit {
 			'class' => 'MockTest', 'method' => 'testNothing', 'line' => 8,
 			'message' => 'the message',
 		);
-		$expected = "Assertion 'assertEqual' failed in MockTest::testNothing() on line 8: ";
+		$expected = "Assertion `assertEqual` failed in `MockTest::testNothing()` on line 8: ";
 		$expected .= "\nthe message";
 		$result = $this->mock->fail($fail);
 		$this->assertEqual($expected, $result);
@@ -53,7 +53,7 @@ class TextTest extends \lithium\test\Unit {
 			'class' => 'MockTest', 'method' => 'testNothing', 'line' => 8,
 			'message' => 'the message', 'trace' => 'the trace'
 		);
-		$expected = "Exception thrown in MockTest::testNothing() on line 8:\n";
+		$expected = "Exception thrown in `MockTest::testNothing()` on line 8:\n";
 		$expected .= "the message\nTrace: the trace";
 		$result = $this->mock->exception($exception);
 		$this->assertEqual($expected, $result);

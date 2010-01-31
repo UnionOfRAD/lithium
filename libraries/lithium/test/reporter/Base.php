@@ -15,7 +15,7 @@ use \lithium\util\Inflector;
 /**
  * Reporter class to handle test report output.
  */
-abstract class Base extends \lithium\core\Object {
+class Base extends \lithium\core\Object {
 
 	public function stats($stats) {
 		$defaults = array(
@@ -125,15 +125,15 @@ abstract class Base extends \lithium\core\Object {
 		return $this->_item(null, array('menu' => $result));
 	}
 
-	abstract public function filters($filters);
+	public function filters($filters) {}
 
-	abstract protected function _result($data);
+	protected function _result($data) {}
 
-	abstract protected function _fail($data);
+	protected function _fail($data) {}
 
-	abstract protected function _exception($data);
+	protected function _exception($data) {}
 
-	abstract protected function _item($data);
+	protected function _item($data) {}
 }
 
 ?>
