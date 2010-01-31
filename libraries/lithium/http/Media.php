@@ -19,7 +19,7 @@ use \lithium\core\Libraries;
  *
  * Using the `Media` class, you can globally configure input and output of different types of
  * content, i.e.:
- * {{{ embed:lithium\tests\cases\http\MediaTest::testCustomEncodeHandler(4-13) }}}
+ * {{{ embed:lithium\tests\cases\http\MediaTest::testCustomEncodeHandler(4-12) }}}
  *
  * You may then render CSV content from anywhere in your application. For example, in a controller
  * you may do the following:

@@ -221,8 +221,7 @@ class MediaTest extends \lithium\test\Unit {
 				fputcsv($out, $record);
 			}
 			fclose($out);
-			$content = ob_get_clean();
-			return $content;
+			return ob_get_clean();
 		}));
 
 		$data = array(
