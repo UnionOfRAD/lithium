@@ -100,12 +100,21 @@ class Library extends \lithium\console\Command {
 	);
 
 	/**
-	 * Initialize _settings from `--conf`
+	 * Initialize _settings from `--conf`.
+	 *
+	 * Throws an exception if the command is  initialized without a request object
+	 * which is needed by `_toPath()` in order to determine the current working directory.
+	 * This most often happens if the command is inspected using the `ReflectionClass`.
 	 *
 	 * @return void
 	 */
 	protected function _init() {
 		parent::_init();
+
+		if (!isset($this->request)) {
+			throw new RuntimeException("Command has been initialized without a request object");
+		}
+
 		$this->_settings['servers'][$this->server] = true;
 		if (file_exists($this->conf)) {
 			$this->_settings += json_decode($this->conf, true);
