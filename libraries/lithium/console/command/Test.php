@@ -79,21 +79,16 @@ class Test extends \lithium\console\Command {
 
 		if (!empty($this->case)) {
 			$this->case = '\\' . str_replace('.', '\\', $this->case);
-		}
-
-		if (!empty($this->group)) {
+		} elseif (!empty($this->group)) {
 			$this->group = '\\' . str_replace('.', '\\', $this->group);
 		}
-		$run = $this->case ?: $this->group;
 
-		$report = Dispatcher::run($run, array(
+		$report = Dispatcher::run($this->case ?: $this->group, array(
 			'filters' => $this->filters, 'reporter' => 'text'
 		));
 
 		$this->header($report->title);
-
 		$this->out($report->stats());
-
 		$this->out($report->filters());
 	}
 
@@ -103,13 +98,15 @@ class Test extends \lithium\console\Command {
 	 * @return void
 	 */
 	public function missing() {
-		$tests = Group::all();
 		$this->header('Classes with no test case');
-		$classFilter = '/\w+Test$|webroot|index$|^app\\\\config|^app\\\\views/';
-		$classes = array_diff(
-			Libraries::find(true, array('exclude' => $classFilter, 'recursive' => true)),
-			$tests
-		);
+
+		$classes = Libraries::find(true, array(
+			'recursive' => true,
+			'exclude' => '/\w+Test$|webroot|index$|^app\\\\config|^app\\\\views/'
+		));
+		$tests = Group::all();
+		$classes = array_diff($classes, $tests);
+
 		sort($classes);
 		$this->out($classes);
 	}
