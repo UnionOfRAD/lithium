@@ -63,9 +63,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 		Connections::add('conn-test-2', $this->config);
 		$this->assertEqual(array('conn-test', 'conn-test-2'), Connections::get());
 
-		$expected = $this->config + array(
-			'type' => 'database', 'filters' => array(), 'strategies' => array()
-		);
+		$expected = $this->config + array('type' => 'database', 'filters' => array());
 		$this->assertEqual($expected, Connections::get('conn-test', array('config' => true)));
 
 		$this->assertNull(Connections::reset());

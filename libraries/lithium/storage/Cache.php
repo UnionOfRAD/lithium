@@ -78,7 +78,6 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param mixed $expiry
 	 * @param mixed $conditions Conditions for the write operation to proceed
 	 * @return boolean True on successful cache write, false otherwise
-	 * @strategy
 	 */
 	public static function write($name, $key, $data, $expiry, $conditions = null) {
 		$settings = static::config();

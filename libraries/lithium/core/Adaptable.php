@@ -160,7 +160,6 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * The default types of settings for all adapters will contain keys for:
 	 * `adapter` - The class name of the adapter
 	 * `filters` - An array of filters to be applied to the adapter methods
-	 * `strategies` - An array of strategies to be applied to the adapter methods (un-implemented)
 	 *
 	 * @see lithium\core\Environment
 	 * @param string $name Named configuration.
@@ -195,7 +194,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @return array Returns the final array of settings for the given named configuration.
 	 */
 	protected static function _initConfig($name, $config) {
-		$defaults = array('adapter' => null, 'filters' => array(), 'strategies' => array());
+		$defaults = array('adapter' => null, 'filters' => array());
 		return (array) $config + $defaults;
 	}
 }

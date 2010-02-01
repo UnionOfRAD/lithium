@@ -29,8 +29,7 @@ class LoggerTest extends \lithium\test\Unit {
 		$test = new MockLoggerAdapter();
 		$config = array('logger' => array(
 			'adapter' => $test,
-			'filters' => array(),
-			'strategies' => array()
+			'filters' => array()
 		));
 
 		$result = Logger::config($config);

@@ -35,8 +35,8 @@ class SessionTest extends \lithium\test\Unit {
 		$store1 = new Memory();
 		$store2 = new Memory();
 		$config = array(
-			'store1' => array('adapter' => &$store1, 'filters' => array(), 'strategies' => array()),
-			'store2' => array('adapter' => &$store2, 'filters' => array(), 'strategies' => array())
+			'store1' => array('adapter' => &$store1, 'filters' => array()),
+			'store2' => array('adapter' => &$store2, 'filters' => array())
 		);
 
 		Session::config($config);
@@ -69,8 +69,8 @@ class SessionTest extends \lithium\test\Unit {
 		$store1 = new Memory();
 		$store2 = new Memory();
 		$config = array(
-			'store1' => array('adapter' => &$store1, 'filters' => array(), 'strategies' => array()),
-			'store2' => array('adapter' => &$store2, 'filters' => array(), 'strategies' => array())
+			'store1' => array('adapter' => &$store1, 'filters' => array()),
+			'store2' => array('adapter' => &$store2, 'filters' => array())
 		);
 		Session::reset();
 		Session::config($config);

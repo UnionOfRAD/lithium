@@ -25,8 +25,7 @@ class AdaptableTest extends \lithium\test\Unit {
 
 		$items = array(array(
 			'adapter' => '\some\adapter',
-			'filters' => array('filter1', 'filter2'),
-			'strategies' => array()
+			'filters' => array('filter1', 'filter2')
 		));
 		$result = $this->adaptable->config($items);
 		$this->assertNull($result);
@@ -37,8 +36,7 @@ class AdaptableTest extends \lithium\test\Unit {
 
 		$items = array(array(
 			'adapter' => '\some\adapter',
-			'filters' => array('filter1', 'filter2'),
-			'strategies' => array('strategy1', 'strategy2')
+			'filters' => array('filter1', 'filter2')
 		));
 		$this->adaptable->config($items);
 		$result = $this->adaptable->config();
@@ -49,8 +47,7 @@ class AdaptableTest extends \lithium\test\Unit {
 	public function testReset() {
 		$items = array(array(
 			'adapter' => '\some\adapter',
-			'filters' => array('filter1', 'filter2'),
-			'strategies' => array('strategy1', 'strategy2')
+			'filters' => array('filter1', 'filter2')
 		));
 		$this->adaptable->config($items);
 		$result = $this->adaptable->config();
@@ -73,8 +70,7 @@ class AdaptableTest extends \lithium\test\Unit {
 		$adapter = new MockAdapter();
 		$items = array('default' => array(
 			'adapter' => 'Memory',
-			'filters' => array(),
-			'strategies' => array()
+			'filters' => array()
 		));
 		$adapter::config($items);
 		$result = $adapter::config();
@@ -91,8 +87,7 @@ class AdaptableTest extends \lithium\test\Unit {
 
 		$items = array('default' => array(
 			'adapter' => 'Memory',
-			'filters' => array(),
-			'strategies' => array()
+			'filters' => array()
 		));
 		$adapter::config($items);
 		$result = $adapter::config();
@@ -111,7 +106,7 @@ class AdaptableTest extends \lithium\test\Unit {
 		$adapter = new MockAdapter();
 
 		$items = array('default' => array(
-			'adapter' => 'NonExistent', 'filters' => array(), 'strategies' => array()
+			'adapter' => 'NonExistent', 'filters' => array()
 		));
 		$adapter::config($items);
 		$result = $adapter::config();
@@ -127,7 +122,7 @@ class AdaptableTest extends \lithium\test\Unit {
 
 	public function testEnvironmentSpecificConfiguration() {
 		$adapter = new MockAdapter();
-		$config = array('adapter' => 'Memory', 'filters' => array(), 'strategies' => array());
+		$config = array('adapter' => 'Memory', 'filters' => array());
 		$items = array('default' => array(
 			'development' => $config, 'test' => $config, 'production' => $config
 		));
@@ -147,15 +142,12 @@ class AdaptableTest extends \lithium\test\Unit {
 
 	public function testConfigurationNoAdapter() {
 		$adapter = new MockAdapter();
-		$items = array('default' => array('filters' => array(), 'strategies' => array()));
+		$items = array('default' => array('filters' => array()));
 		$adapter::config($items);
 		$this->expectException(
 			'No adapter set for configuration in class lithium\tests\mocks\core\MockAdapter'
 		);
 		$result = $adapter::adapter('default');
-	}
-
-	public function testApplyStrategies() {
 	}
 }
 

@@ -21,9 +21,7 @@ class CacheTest extends \lithium\test\Unit {
 		$result = Cache::config();
 		$this->assertFalse($result);
 
-		$config = array('default' => array(
-			'adapter' => '\some\adapter', 'filters' => array(), 'strategies' => array()
-		));
+		$config = array('default' => array('adapter' => '\some\adapter', 'filters' => array()));
 		$result = Cache::config($config);
 		$this->assertNull($result);
 
@@ -34,11 +32,7 @@ class CacheTest extends \lithium\test\Unit {
 		$result = Cache::reset();
 		$this->assertNull($result);
 
-		$config = array('default' => array(
-			'adapter' => '\some\adapter',
-			'strategies' => array('Strategy1', 'Strategy2'),
-			'filters' => array()
-		));
+		$config = array('default' => array('adapter' => '\some\adapter', 'filters' => array()));
 		Cache::config($config);
 
 		$result = Cache::config();
@@ -50,7 +44,6 @@ class CacheTest extends \lithium\test\Unit {
 
 		$config = array('default' => array(
 			'adapter' => '\some\adapter',
-			'strategies' => array('Strategy1', 'Strategy2'),
 			'filters' => array('Filter1', 'Filter2')
 		));
 		Cache::config($config);
@@ -139,7 +132,7 @@ class CacheTest extends \lithium\test\Unit {
 
 	public function testCacheWrite() {
 		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
+			'adapter' => 'Memory', 'filters' => array()
 		));
 		Cache::config($config);
 		$result = Cache::config();
@@ -155,7 +148,7 @@ class CacheTest extends \lithium\test\Unit {
 
 	public function testCacheWriteWithConditions() {
 		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
+			'adapter' => 'Memory', 'filters' => array()
 		));
 		Cache::config($config);
 		$result = Cache::config();
@@ -180,7 +173,7 @@ class CacheTest extends \lithium\test\Unit {
 
 	public function testCacheReadAndWrite() {
 		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
+			'adapter' => 'Memory', 'filters' => array()
 		));
 		Cache::config($config);
 		$result = Cache::config();
@@ -216,7 +209,7 @@ class CacheTest extends \lithium\test\Unit {
 
 	public function testCacheReadAndWriteWithConditions() {
 		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
+			'adapter' => 'Memory', 'filters' => array()
 		));
 		Cache::config($config);
 		$result = Cache::config();
@@ -243,7 +236,7 @@ class CacheTest extends \lithium\test\Unit {
 
 	public function testCacheWriteAndDelete() {
 		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
+			'adapter' => 'Memory', 'filters' => array()
 		));
 		Cache::config($config);
 		$result = Cache::config();
@@ -263,7 +256,7 @@ class CacheTest extends \lithium\test\Unit {
 
 	public function testCacheWriteAndDeleteWithConditions() {
 		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
+			'adapter' => 'Memory', 'filters' => array()
 		));
 		Cache::config($config);
 		$result = Cache::config();
@@ -288,7 +281,7 @@ class CacheTest extends \lithium\test\Unit {
 
 	public function testCacheWriteAndClear() {
 		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
+			'adapter' => 'Memory', 'filters' => array()
 		));
 		Cache::config($config);
 		$result = Cache::config();
@@ -311,7 +304,7 @@ class CacheTest extends \lithium\test\Unit {
 
 	public function testClean() {
 		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
+			'adapter' => 'Memory', 'filters' => array()
 		));
 		Cache::config($config);
 		$result = Cache::config();
@@ -328,7 +321,7 @@ class CacheTest extends \lithium\test\Unit {
 
 	public function testReset() {
 		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
+			'adapter' => 'Memory', 'filters' => array()
 		));
 		Cache::config($config);
 		$result = Cache::config();
@@ -344,7 +337,7 @@ class CacheTest extends \lithium\test\Unit {
 
 	public function testIncrement() {
 		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
+			'adapter' => 'Memory', 'filters' => array()
 		));
 		Cache::config($config);
 		$result = Cache::config();
@@ -363,7 +356,7 @@ class CacheTest extends \lithium\test\Unit {
 
 	public function testDecrement() {
 		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
+			'adapter' => 'Memory', 'filters' => array()
 		));
 		Cache::config($config);
 		$result = Cache::config();
@@ -382,7 +375,7 @@ class CacheTest extends \lithium\test\Unit {
 
 	public function testNonPortableCacheAdapterMethod() {
 		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
+			'adapter' => 'Memory', 'filters' => array()
 		));
 		Cache::config($config);
 		$result = Cache::config();
@@ -395,7 +388,7 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertFalse($result);
 
 		$config = array('default' => array(
-			'adapter' => 'File', 'filters' => array(), 'strategies' => array()
+			'adapter' => 'File', 'filters' => array()
 		));
 		Cache::config($config);
 		$result = Cache::config();
@@ -407,8 +400,7 @@ class CacheTest extends \lithium\test\Unit {
 		$config = array('default' => array(
 			'adapter' => 'File',
 			'path' => LITHIUM_APP_PATH . '/resources/tmp/cache',
-			'filters' => array(),
-			'strategies' => array()
+			'filters' => array()
 		));
 		Cache::config($config);
 
