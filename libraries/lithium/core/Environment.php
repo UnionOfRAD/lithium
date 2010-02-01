@@ -17,11 +17,12 @@ use \lithium\util\Set;
  * While those three environments are the most common, you can create any arbitrary environment
  * with any set of configuration, for example:
  *
- * {{{
- * Environment::set('production',  array('foo' => 'bar'));
- * Environment::set('staging',     array('foo' => 'baz'));
- * Environment::set('development', array('foo' => 'dib'));
- * }}}
+ * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testSetAndGetCurrentEnvironment(1-3)}}}
+ *
+ * You can then retrieve the configurations using the key name. The correct configuration is
+ * returned, automatically accounting for the current environment:
+ *
+ * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testSetAndGetCurrentEnvironment(15-15)}}}
  *
  * `Environment` also works with subclasses of `Adaptable`, allowing you to maintain separate
  * configurations for database servers, cache adapters, and other environment-specific classes, for
@@ -59,6 +60,16 @@ use \lithium\util\Set;
  * ));
  * }}}
  *
+ * When the cache configuration is accessed in the application's code, the correct configuration is
+ * automatically used:
+ * {{{
+ * $user = User::find($request->id);
+ * Cache::write('userData', "User.{$request->id}", $user->data(), '+5 days');
+ * }}}
+ *
+ * In this configuration, the above example will automatically send cache writes to the file system
+ * during local development, and to a [ memcache](http://memcached.org/) server in production.
+ *
  * When writing classes that connect to other external resources, you can automatically take
  * advantage of environment-specific configurations by extending `Adaptable` and implementing
  * your resource-handling functionality in adapter classes.
@@ -68,26 +79,55 @@ use \lithium\util\Set;
  * information, see the documentation for `Environment::is()`.
  *
  * @see lithium\core\Adaptable
- * @see lithium\core\Environment::is()
  */
 class Environment {
 
 	protected static $_configurations = array(
-		'base' => array(),
-		'production' => array(
-			'inherit' => 'base'
-		),
-		'development' => array(
-			'inherit' => 'base'
-		),
-		'test' => array(
-			'inherit' => 'development'
-		)
+		'production' => array(),
+		'development' => array(),
+		'test' => array()
 	);
 
-	protected static $_current = null;
+	/**
+	 * Holds the name of the current environment under which the application is running. Set by
+	 * passing a `Request` object or `$_SERVER` or `$_ENV` array into `Environment::set()` (which
+	 * in turn passes this on to the _detector_ used to determine the correct environment). Can be
+	 * tested or retrieved using `Environment::is()` or `Environment::get()`.
+	 *
+	 * @see lithium\correct\Environment::set()
+	 * @see lithium\correct\Environment::is()
+	 * @see lithium\correct\Environment::get()
+	 * @var string
+	 */
+	protected static $_current = '';
 
+	/**
+	 * If `Environment::is()` is used to assign a custom closure for environment detection, a copy
+	 * is kept in `$_detector`. Otherwise, `$_detector` is `null`, and the hard-coded detector is
+	 * used.
+	 *
+	 * @see lithium\core\Environment::_detector()
+	 * @see lithium\core\Environment::is()
+	 * @var object
+	 */
 	protected static $_detector = null;
+
+	/**
+	 * Resets the `Environment` class to its default state, including unsetting the current
+	 * environment, removing any environment-specific configurations, and removing the custom
+	 * environment detector, if any has been specified.
+	 *
+	 * @return void
+	 */
+	public static function reset() {
+		static::$_current = '';
+		static::$_detector = null;
+		static::$_configurations = array(
+			'production' => array(),
+			'development' => array(),
+			'test' => array()
+		);
+	}
 
 	/**
 	 * A simple boolean detector that can be used to test which environment the application is
@@ -120,19 +160,35 @@ class Environment {
 		return (static::$_current == $detect);
 	}
 
-	public static function get($name = null, $key = null) {
-		if (empty($name) && empty($key)) {
+	/**
+	 * Gets the current environment name, a setting associated with the current environment, or the
+	 * entire configuration array for the current environment.
+	 *
+	 * @param string $name The name of the environment setting to retrieve, or the name of an
+	 *               environment, if that environment's entire configuration is to be retrieved. If
+	 *               retrieving the current environment name, `$name` should not be passed.
+	 * @return mixed If `$name` is unspecified, returns the name of the current environment name as
+	 *         a string (i.e. `'production'`). If an environment name is specified, returns that
+	 *         environment's entire configuration as an array.
+	 */
+	public static function get($name = null) {
+		if (empty($name)) {
 			return static::$_current;
 		}
-		if (!isset(static::$_configurations[$name])) {
+		if (isset(static::$_configurations[$name])) {
+			return static::$_configurations[$name];
+		}
+		if (!isset(static::$_configurations[static::$_current])) {
 			return null;
 		}
-		return static::$_configurations[$name];
+		$config = static::$_configurations[static::$_current];
+		return isset($config[$name]) ? $config[$name] : null;
 	}
 
 	/**
 	 * Creates, modifies or switches to an existing configuration.
 	 *
+	 * @see lithium\http\Request.
 	 * @param mixed $env
 	 * @param array $config
 	 * @return array
@@ -149,12 +205,26 @@ class Environment {
 			}
 			return;
 		}
-
-		if (isset(static::$_configurations[$env]) && $base = static::$_configurations[$env]) {
+		if (isset(static::$_configurations[$env])) {
+			$base = static::$_configurations[$env];
 			return static::$_configurations[$env] = Set::merge($base, $config);
 		}
 	}
 
+	/**
+	 * Accessor method for `Environment::$_detector`. If `$_detector` is unset, returns the default
+	 * detector built into the class. For more information on setting and using `$_detector`, see
+	 * the documentation for `Environment::is()`. The `_detector()` method is called at the
+	 * beginning of the application's life-cycle, when `Environment::set()` is passed either an
+	 * instance of a `Request` object, or the `$_SERVER` or `$_ENV` array. This object (or array)
+	 * is then passed onto `$_detector`, which returns the correct environment.
+	 *
+	 * @see lithium\core\Environment::is()
+	 * @see lithium\core\Environment::set()
+	 * @see lithium\core\Environment::$_detector
+	 * @return object Returns a callable object (anonymous function) which detects the application's
+	 *         current environment.
+	 */
 	protected static function _detector() {
 		return static::$_detector ?: function($request) {
 			switch (true) {

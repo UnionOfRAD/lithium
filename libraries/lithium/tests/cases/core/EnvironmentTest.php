@@ -13,6 +13,10 @@ use \lithium\tests\mocks\core\MockRequest;
 
 class EnvironmentTest extends \lithium\test\Unit {
 
+	public function setUp() {
+		Environment::reset();
+	}
+
 	/**
 	 * Tests setting and getting current environment, and that invalid environments cannot be
 	 * selected.
@@ -20,12 +24,23 @@ class EnvironmentTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testSetAndGetCurrentEnvironment() {
+		Environment::set('production',  array('foo' => 'bar'));
+		Environment::set('staging',     array('foo' => 'baz'));
+		Environment::set('development', array('foo' => 'dib'));
+
 		Environment::set('development');
+
 		$this->assertEqual('development', Environment::get());
-		$this->assertEqual('development', Environment::is());
 		$this->assertTrue(Environment::is('development'));
-		$this->assertNull(Environment::get('foo'));
-		$this->assertTrue(is_array(Environment::get('development')));
+		$this->assertNull(Environment::get('doesNotExist'));
+
+		$expected = array('foo' => 'dib');
+		$config = Environment::get('development');
+		$this->assertEqual($expected, $config);
+
+		$foo = Environment::get('foo'); // returns 'dib', since the current env. is 'development'
+		$expected = 'dib';
+		$this->assertEqual($expected, $foo);
 	}
 
 	/**
@@ -34,12 +49,12 @@ class EnvironmentTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testModifyEnvironmentConfiguration() {
-		$expected = array('inherit' => 'development', 'foo' => 'bar');
-		Environment::set('test', array('foo' => 'bar'));
+		$expected = array('foo' => 'bar');
+		Environment::set('test', $expected);
 		$this->assertEqual($expected, Environment::get('test'));
 
-		$expected = array('inherit' => 'production', 'foo' => 'bar', 'baz' => 'qux');
-		Environment::set('test', array('inherit' => 'production', 'baz' => 'qux'));
+		$expected += array('baz' => 'qux');
+		Environment::set('test', array('baz' => 'qux'));
 		$this->assertEqual($expected, Environment::get('test'));
 	}
 
@@ -59,6 +74,22 @@ class EnvironmentTest extends \lithium\test\Unit {
 		$request = new MockRequest(array('SERVER_ADDR' => '1.1.1.1', 'HTTP_HOST' => 'www.com'));
 		Environment::set($request);
 		$this->assertTrue(Environment::is('production'));
+	}
+
+	/**
+	 * Tests resetting the `Environment` class to its default state.
+	 *
+	 * @return void
+	 */
+	public function testReset() {
+		Environment::set('test', array('foo' => 'bar'));
+		Environment::set('test');
+		$this->assertEqual('test', Environment::get());
+		$this->assertEqual('bar', Environment::get('foo'));
+
+		Environment::reset();
+		$this->assertEqual('', Environment::get());
+		$this->assertNull(Environment::get('foo'));
 	}
 
 	/**
