@@ -170,6 +170,21 @@ class ObjectTest extends \lithium\test\Unit {
 		)) + $expected);
 		$this->assertEqual($expected, $config->getConfig());
 	}
+
+	/**
+	 * Tests that an object can be instantiated using the magic `__set_state()` method.
+	 *
+	 * @return void
+	 */
+	public function testStateBasedInstantiation() {
+		$result = MockObjectConfiguration::__set_state(array(
+			'key' => 'value', '_protected' => 'test'
+		));
+		$expected = 'lithium\tests\mocks\core\MockObjectConfiguration';
+		$this->assertEqual($expected, get_class($result));
+
+		$this->assertEqual('test', $result->getProtected());
+	}
 }
 
 ?>

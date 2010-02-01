@@ -9,8 +9,12 @@
 namespace lithium\tests\mocks\core;
 
 class MockObjectConfiguration extends \lithium\core\Object {
+
 	protected $_testScalar = 'default';
+
 	protected $_testArray = array('default');
+
+	protected $_protected = null;
 
 	public function __construct($config = array()) {
 		if (isset($config['autoConfig'])) {
@@ -22,6 +26,10 @@ class MockObjectConfiguration extends \lithium\core\Object {
 
 	public function testScalar($value) {
 		$this->_testScalar = 'called';
+	}
+
+	public function getProtected() {
+		return $this->_protected;
 	}
 
 	public function getConfig() {
