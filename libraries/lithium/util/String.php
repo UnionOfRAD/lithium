@@ -19,7 +19,6 @@ class String {
 	 *        object with properties for each value or an array keyed by requested context value.
 	 * @return string An RFC 4122-compliant UUID.
 	 * @link http://www.ietf.org/rfc/rfc4122.txt
-	 * @todo Fix method dependencies on old-school functions and request data access.
 	 */
 	public static function uuid($context) {
 		$val = function($value) use ($context) {

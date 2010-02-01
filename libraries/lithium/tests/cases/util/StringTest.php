@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\util;
 
 use \lithium\util\String;
+use \lithium\http\Request;
 use \lithium\tests\mocks\util\MockStringObject;
 
 class StringTest extends \lithium\test\Unit {
@@ -20,11 +21,12 @@ class StringTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	function testUuidGeneration() {
-		$this->skipIf(true);
-		$result = String::uuid();
+		$result = String::uuid(new Request());
 		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/";
-		$match = preg_match($pattern, $result);
-		$this->assertTrue($match);
+		$this->assertPattern($pattern, $result);
+
+		$result = String::uuid($_SERVER);
+		$this->assertPattern($pattern, $result);
 	}
 
 	/**
@@ -34,13 +36,12 @@ class StringTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	function testMultipleUuidGeneration() {
-		$this->skipIf(true);
 		$check = array();
-		$count = 700;
+		$count = 500;
 		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/";
 
 		for ($i = 0; $i < $count; $i++) {
-			$result = String::uuid();
+			$result = String::uuid($_SERVER);
 			$match = preg_match($pattern, $result);
 			$this->assertTrue($match);
 			$this->assertFalse(in_array($result, $check));
