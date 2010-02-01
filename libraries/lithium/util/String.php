@@ -9,6 +9,8 @@
 
 namespace lithium\util;
 
+use \Exception;
+
 class String {
 
 	/**
@@ -36,37 +38,7 @@ class String {
 			return $result;
 		};
 
-		$node = $val('SERVER_ADDR');
-		$pid = null;
-
-		if (strpos($node, ':') !== false) {
-			if (substr_count($node, '::')) {
-				$pad = str_repeat(':0000', 8 - substr_count($node, ':'));
-				$node = str_replace('::', $pad . ':', $node);
-			}
-			$node = explode(':', $node);
-			$ipv6 = '';
-
-			foreach ($node as $id) {
-				$ipv6 .= str_pad(base_convert($id, 16, 2), 16, 0, STR_PAD_LEFT);
-			}
-			$node = base_convert($ipv6, 2, 10);
-			$node = (strlen($node) < 38) ? null : crc32($node);
-		} elseif (empty($node)) {
-			$host = $val('HOSTNAME');
-			$host = $host ?: $val('HOST');
-
-			if (!empty($host)) {
-				$ip = gethostbyname($host);
-				$node = ($ip === $host) ? crc32($host) : $node = ip2long($ip);
-			}
-		} elseif ($node !== '127.0.0.1') {
-			$node = ip2long($node);
-		} else {
-			$node = null;
-		}
-		// $node = $node ?: crc32(Configure::read('Security.salt'));
-
+		$node = static::_hostname($val);
 		$pid = function_exists('zend_thread_id') ? zend_thread_id() : getmypid();
 		$pid = (!$pid || $pid > 65535) ? mt_rand(0, 0xfff) | 0x4000 : $pid;
 		list($timeMid, $timeLow) = explode(' ', microtime());
@@ -172,6 +144,7 @@ class String {
 			$hashVal = crc32($key);
 			$key = sprintf($format, preg_quote($key, '/'));
 			$str = preg_replace($key, $hashVal, $str);
+
 			if (is_object($value)) {
 				try {
 					$value = $value->__toString();
@@ -266,16 +239,21 @@ class String {
 	}
 
 	/**
-	 * Tokenizes a string using `$separator`, ignoring any instance of `$separator` that appears
-	 * between `$leftBound` and `$rightBound`.
+	 * Tokenizes a string using `$options['separator']`, ignoring any instance of
+	 * `$options['separator']` that appears between `$options['leftBound']` and
+	 * `$options['rightBound']`.
 	 *
 	 * @param string $data The data to tokenize.
-	 * @param string $separator The token to split the data on.
-	 * @param string $leftBound
-	 * @param string $rightBound
-	 * @return array
+	 * @param array $options Options to use when tokenizing:
+	 *              -`'separator'` _string_: The token to split the data on.
+	 *              -`'leftBound'` _string_: Left scope-enclosing boundary.
+	 *              -`'rightBound'` _string_: Right scope-enclosing boundary.
+	 * @return array Returns an array of tokens.
 	 */
-	public static function tokenize($data, $separator = ',', $leftBound = '(', $rightBound = ')') {
+	public static function tokenize($data, $options = array()) {
+		$defaults = array('separator' => ',', 'leftBound' => '(', 'rightBound' => ')');
+		extract($options + $defaults);
+
 		if (empty($data) || is_array($data)) {
 			return $data;
 		}
@@ -336,6 +314,46 @@ class String {
 			$results[] = $buffer;
 		}
 		return empty($results) ? array() : array_map('trim', $results);
+	}
+
+	/**
+	 * Used by `String::uuid()` to get the hostname from request context data. Uses fallbacks to get
+	 * the current host name or IP, depending on what values are available.
+	 *
+	 * @param mixed $context An array (i.e. `$_SERVER`), `Request` object, or anonymous function
+	 *              containing host data.
+	 * @return string Returns the host name or IP for use in generating a UUID.
+	 */
+	protected static function _hostname($context) {
+		$node = $context('SERVER_ADDR');
+
+		if (strpos($node, ':') !== false) {
+			if (substr_count($node, '::')) {
+				$pad = str_repeat(':0000', 8 - substr_count($node, ':'));
+				$node = str_replace('::', $pad . ':', $node);
+			}
+			$node = explode(':', $node);
+			$ipv6 = '';
+
+			foreach ($node as $id) {
+				$ipv6 .= str_pad(base_convert($id, 16, 2), 16, 0, STR_PAD_LEFT);
+			}
+			$node = base_convert($ipv6, 2, 10);
+			$node = (strlen($node) < 38) ? null : crc32($node);
+		} elseif (empty($node)) {
+			$host = $context('HOSTNAME');
+			$host = $host ?: $context('HOST');
+
+			if (!empty($host)) {
+				$ip = gethostbyname($host);
+				$node = ($ip === $host) ? crc32($host) : $node = ip2long($ip);
+			}
+		} elseif ($node !== '127.0.0.1') {
+			$node = ip2long($node);
+		} else {
+			$node = crc32(rand());
+		}
+		return $node;
 	}
 }
 

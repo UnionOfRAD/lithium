@@ -17,10 +17,9 @@ class StringTest extends \lithium\test\Unit {
 	/**
 	 * testUuidGeneration method
 	 *
-	 * @access public
 	 * @return void
 	 */
-	function testUuidGeneration() {
+	public function testUuidGeneration() {
 		$result = String::uuid(new Request());
 		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/";
 		$this->assertPattern($pattern, $result);
@@ -32,10 +31,9 @@ class StringTest extends \lithium\test\Unit {
 	/**
 	 * testMultipleUuidGeneration method
 	 *
-	 * @access public
 	 * @return void
 	 */
-	function testMultipleUuidGeneration() {
+	public function testMultipleUuidGeneration() {
 		$check = array();
 		$count = 500;
 		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/";
@@ -47,6 +45,36 @@ class StringTest extends \lithium\test\Unit {
 			$this->assertFalse(in_array($result, $check));
 			$check[] = $result;
 		}
+	}
+
+	/**
+	 * Tests generating a UUID with seed data provided by an anonymous function.
+	 *
+	 * @return void
+	 */
+	public function testGeneratingUuidWithCallback() {
+		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/";
+
+		$result = String::uuid(function($value) {
+			if ($value == 'SERVER_ADDR') {
+				return '::1';
+			}
+		});
+		$this->assertPattern($pattern, $result);
+
+		$result = String::uuid(function($value) {
+			if ($value == 'HOST') {
+				return '127.0.0.1';
+			}
+		});
+		$this->assertPattern($pattern, $result);
+
+		$result = String::uuid(function($value) {
+			if ($value == 'SERVER_ADDR') {
+				return '127.0.0.2';
+			}
+		});
+		$this->assertPattern($pattern, $result);
 	}
 
 	/**
@@ -101,10 +129,9 @@ class StringTest extends \lithium\test\Unit {
 	/**
 	 * testInsert method
 	 *
-	 * @access public
 	 * @return void
 	 */
-	function testInsert() {
+	public function testInsert() {
 		$string = '2 + 2 = {:sum}. Lithium is {:adjective}.';
 		$expected = '2 + 2 = 4. Lithium is yummy.';
 		$result = String::insert($string, array('sum' => '4', 'adjective' => 'yummy'));
@@ -299,8 +326,8 @@ class StringTest extends \lithium\test\Unit {
 	 * test Clean Insert
 	 *
 	 * @return void
-	 **/
-	function testCleanInsert() {
+	 */
+	public function testCleanInsert() {
 		$result = String::clean(':incomplete', array(
 			'clean' => true, 'before' => ':', 'after' => ''
 		));
@@ -344,10 +371,9 @@ class StringTest extends \lithium\test\Unit {
 	/**
 	 * testTokenize method
 	 *
-	 * @access public
 	 * @return void
 	 */
-	function testTokenize() {
+	public function testTokenize() {
 		$result = String::tokenize('A,(short,boring test)');
 		$expected = array('A', '(short,boring test)');
 		$this->assertEqual($expected, $result);
@@ -360,11 +386,15 @@ class StringTest extends \lithium\test\Unit {
 		$expected = array('A', '(short,very interesting( test))');
 		$this->assertEqual($expected, $result);
 
-		$result = String::tokenize('"single tag"', ' ', '"', '"');
+		$result = String::tokenize('"single tag"', array(
+			'separator' => ' ', 'leftBound' => '"', 'rightBound' => '"'
+		));
 		$expected = array('"single tag"');
 		$this->assertEqual($expected, $result);
 
-		$result = String::tokenize('tagA "single tag" tagB', ' ', '"', '"');
+		$result = String::tokenize('tagA "single tag" tagB', array(
+			'separator' => ' ', 'leftBound' => '"', 'rightBound' => '"'
+		));
 		$expected = array('tagA', '"single tag"', 'tagB');
 		$this->assertEqual($expected, $result);
 
