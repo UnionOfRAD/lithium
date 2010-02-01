@@ -87,7 +87,12 @@ class Inspector extends \lithium\core\StaticObject {
 
 		if ($type == 'method' || $type == 'property') {
 			list($class, $identifier) = explode('::', $identifier);
-			$classInspector = new ReflectionClass($class);
+
+			try {
+				$classInspector = new ReflectionClass($class);
+			} catch (Exception $e) {
+				return null;
+			}
 
 			if ($type == 'property') {
 				$identifier = substr($identifier, 1);
@@ -117,7 +122,7 @@ class Inspector extends \lithium\core\StaticObject {
 				$setAccess = (
 					($type == 'method' || $type == 'property') &&
 					array_intersect($result['modifiers'], array('private', 'protected')) != array()
-					 && method_exists($inspector, 'setAccessible')
+					&& method_exists($inspector, 'setAccessible')
 				);
 
 				if ($setAccess) {
@@ -132,7 +137,7 @@ class Inspector extends \lithium\core\StaticObject {
 			}
 		}
 
-		if ($type == 'property') {
+		if ($type == 'property' && !$classInspector->isAbstract()) {
 			$inspector->setAccessible(true);
 			$result['value'] = $inspector->getValue($classInspector->newInstance());
 		}
