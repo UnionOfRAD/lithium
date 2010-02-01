@@ -100,6 +100,20 @@ class StaticObjectTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that calling a filter-able method with no filters added does not trigger an error.
+	 *
+	 * @return void
+	 */
+	public function testCallingUnfilteredMethods() {
+		$class = 'lithium\tests\mocks\core\MockStaticMethodFiltering';
+		$result = $class::manual(array(function($self, $params, $chain) {
+			return '-' . $chain->next($self, $params, $chain) . '-';
+		}));
+		$expected = '-Working-';
+		$this->assertEqual($expected, $result);
+	}
+
+	/**
 	 * Tests that filtered methods in parent classes can call methods in subclasses.
 	 *
 	 * @return void

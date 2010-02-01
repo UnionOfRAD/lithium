@@ -28,6 +28,13 @@ class MockStaticMethodFiltering extends \lithium\core\StaticObject {
 		return static::_filter(__FUNCTION__, array(), $method);
 	}
 
+	public static function manual($filters) {
+		$method = function($self, $params, $chain) {
+			return "Working";
+		};
+		return static::_filter(__FUNCTION__, array(), $method, $filters);
+	}
+
 	public static function callSubclassMethod() {
 		return static::_filter(__FUNCTION__, array(), function($self, $params, $chain) {
 			return $self::childMethod();
