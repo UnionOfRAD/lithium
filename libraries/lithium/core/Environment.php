@@ -186,12 +186,41 @@ class Environment {
 	}
 
 	/**
-	 * Creates, modifies or switches to an existing configuration.
+	 * Creates, modifies or switches to an existing environment configuration. To create a new
+	 * configuration, or to update an existing configuration, pass an environment name and an array
+	 * that defines its configuration:
+	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testModifyEnvironmentConfig(1-1) }}}
 	 *
-	 * @see lithium\http\Request.
-	 * @param mixed $env
-	 * @param array $config
-	 * @return array
+	 * You can then add to an existing configuration by calling the `set()` method again with the
+	 * same environment name:
+	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testModifyEnvironmentConfig(6-6) }}}
+	 *
+	 * The settings for the environment will then be the aggregate of all `set()` calls:
+	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testModifyEnvironmentConfig(7-7) }}}
+	 *
+	 * The `set()` method can also be called to manually set which environment to operate in:
+	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testSetAndGetCurrentEnvironment(5-5) }}}
+	 *
+	 * Finally, `set()` can accept a `Request` object, or the `$_SERVER` or `$_ENV` superglobals, to
+	 * automatically detect the correct environment.
+	 *
+	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testEnvironmentDetection(9-10) }}}
+	 *
+	 * For more information on defining custom rules to automatically detect your application's
+	 * environment, see the documentation for `Environment::is()`.
+	 *
+	 * @see lithium\http\Request
+	 * @see lithium\core\Environment::is()
+	 * @param mixed $env The name of the environment you wish to create, update or switch to
+	 *              (string), or a `Request` object or `$_SERVER` / `$_ENV` array used to detect
+	 *              (and switch to) the application's current environment.
+	 * @param array $config If creating or updating a configuration, accepts an array of settings.
+	 *              If the environment name specified in `$env` already exists, the values in
+	 *              `$config` will be recursively merged with any pre-existing settings.
+	 * @return array If creating or updating a configuration, returns an array of the environment's
+	 *               settings. If updating an existing configuration, this will be the newly-applied
+	 *               configuration merged with the pre-existing values. If setting the environment
+	 *               itself (i.e. `$config` is unspecified), returns `null`.
 	 */
 	public static function set($env, $config = null) {
 		if (is_null($config)) {
@@ -205,10 +234,8 @@ class Environment {
 			}
 			return;
 		}
-		if (isset(static::$_configurations[$env])) {
-			$base = static::$_configurations[$env];
-			return static::$_configurations[$env] = Set::merge($base, $config);
-		}
+		$base = isset(static::$_configurations[$env]) ? static::$_configurations[$env] : array();
+		return static::$_configurations[$env] = Set::merge($base, $config);
 	}
 
 	/**

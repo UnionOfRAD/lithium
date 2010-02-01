@@ -44,17 +44,36 @@ class EnvironmentTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests creating a custom environment, and verifies that settings are properly retrieved.
+	 *
+	 * @return void
+	 */
+	public function testCreateNonStandardEnvironment() {
+		Environment::set('custom', array('host' => 'server.local'));
+		Environment::set('custom');
+
+		$host = Environment::get('host');
+		$expected = 'server.local';
+		$this->assertEqual($expected, $host);
+
+		$custom = Environment::get('custom');
+		$expected = array('host' => 'server.local');
+		$this->assertEqual($expected, $custom);
+	}
+
+	/**
 	 * Tests modifying environment configuration.
 	 *
 	 * @return void
 	 */
-	public function testModifyEnvironmentConfiguration() {
+	public function testModifyEnvironmentConfig() {
+		Environment::set('test', array('foo' => 'bar'));
 		$expected = array('foo' => 'bar');
-		Environment::set('test', $expected);
 		$this->assertEqual($expected, Environment::get('test'));
 
-		$expected += array('baz' => 'qux');
+		$expected = array('foo' => 'bar', 'baz' => 'qux');
 		Environment::set('test', array('baz' => 'qux'));
+		$settings = Environment::get('test'); // returns array('foo' => 'bar', 'baz' => 'qux')
 		$this->assertEqual($expected, Environment::get('test'));
 	}
 
@@ -73,7 +92,8 @@ class EnvironmentTest extends \lithium\test\Unit {
 
 		$request = new MockRequest(array('SERVER_ADDR' => '1.1.1.1', 'HTTP_HOST' => 'www.com'));
 		Environment::set($request);
-		$this->assertTrue(Environment::is('production'));
+		$isProduction = Environment::is('production'); // returns true if not running locally
+		$this->assertTrue($isProduction);
 	}
 
 	/**
@@ -115,6 +135,10 @@ class EnvironmentTest extends \lithium\test\Unit {
 		$request = new MockRequest(array('HTTP_HOST' => 'lappy.local'));
 		Environment::set($request);
 		$this->assertTrue(Environment::is('production'));
+
+		$request = new MockRequest(array('HTTP_HOST' => 'staging.server'));
+		Environment::set($request);
+		$this->assertTrue(Environment::is('test'));
 
 		$request = new MockRequest(array('HTTP_HOST' => 'test.local'));
 		Environment::set($request);
