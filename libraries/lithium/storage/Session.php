@@ -152,12 +152,26 @@ class Session extends \lithium\core\Adaptable {
 		$defaults = array('name' => null);
 		$options += $defaults;
 
-		if ($options['name']) {
-			return static::adapter($options['name'])->delete($key, $options);
+		$methods = array();
+
+		if ($name = $options['name']) {
+			$methods = array($name => static::adapter($name)->delete($key, $options));
+		} else {
+			foreach (static::$_configurations->keys() as $name) {
+				if ($method = static::adapter($name)->delete($key, $options)) {
+					$methods[$name] = $method;
+				}
+			}
 		}
-		foreach (static::$_configurations->keys() as $name) {
-			static::adapter($name)->delete($key, $options);
+		$result = false;
+		$settings = static::_config($name);
+
+		foreach ($methods as $name => $method) {
+			$params = compact('key', 'value', 'options');
+			$filters = $settings['filters'];
+			$result = $result || static::_filter(__METHOD__, $params, $method, $filters);
 		}
+		return $result;
 	}
 
 	/**
