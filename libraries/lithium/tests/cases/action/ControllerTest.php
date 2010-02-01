@@ -32,14 +32,14 @@ class ControllerTest extends \lithium\test\Unit {
 
 		$postsController = new MockPostsController(array(
 			'render' => array('layout' => false),
-			'classes' => array('response' => '\app\extensions\http\Response')
+			'classes' => array('response' => '\app\extensions\net\http\Response')
 		));
 
 		$result = $postsController->access('_render');
 		$this->assertIdentical($result['layout'], false);
 
 		$result = $postsController->access('_classes');
-		$this->assertIdentical($result['response'], '\app\extensions\http\Response');
+		$this->assertIdentical($result['response'], '\app\extensions\net\http\Response');
 	}
 
 	/**

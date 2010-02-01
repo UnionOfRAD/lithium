@@ -35,7 +35,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @var array
 	 */
 	protected $_classes = array(
-		'media' => '\lithium\http\Media'
+		'media' => '\lithium\net\http\Media'
 	);
 
 	/**

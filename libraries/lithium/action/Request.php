@@ -20,8 +20,8 @@ use \lithium\util\Validator;
  *
  * @see lithium\action\Dispatcher
  * @see lithium\action\Controller
- * @see lithium\http\Router
- * @see lithium\http\Route
+ * @see lithium\net\http\Router
+ * @see lithium\net\http\Route
  * @see lithium\action\Request::__get()
  */
 class Request extends \lithium\core\Object {
@@ -81,7 +81,7 @@ class Request extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_classes = array('media' => '\lithium\http\Media');
+	protected $_classes = array('media' => '\lithium\net\http\Media');
 
 	/**
 	 * options used to detect request type

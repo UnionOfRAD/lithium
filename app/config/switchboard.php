@@ -16,7 +16,7 @@
  * @see lithium\util\collection\Filters
  */
 
-use \lithium\http\Router;
+use \lithium\net\http\Router;
 use \lithium\core\Environment;
 use \lithium\action\Dispatcher;
 
@@ -24,7 +24,7 @@ use \lithium\action\Dispatcher;
  * Loads application routes before the request is dispatched.  Change this to `include_once` if
  * more than one request cycle is executed per HTTP request.
  *
- * @see lithium\http\Router
+ * @see lithium\net\http\Router
  */
 Dispatcher::applyFilter('run', function($self, $params, $chain) {
 	include __DIR__ . '/routes.php';
@@ -42,6 +42,5 @@ Dispatcher::applyFilter('_callable', function($self, $params, $chain) {
 	Environment::set($params['request']);
 	return $chain->next($self, $params, $chain);
 });
-
 
 ?>

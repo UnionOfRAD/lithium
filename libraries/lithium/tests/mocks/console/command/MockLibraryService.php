@@ -8,9 +8,9 @@
 
 namespace lithium\tests\mocks\console\command;
 
-use lithium\http\Response;
+use lithium\net\http\Response;
 
-class MockLibraryService extends \lithium\http\Service {
+class MockLibraryService extends \lithium\net\http\Service {
 
 	public function send($method, $path = null, $data = array(), $options = array()) {
 		if ($method == 'post') {

@@ -19,20 +19,20 @@ use \Exception;
  * classes. Each action has a specific responsibility, such as listing a set of objects, updating an
  * object, or deleting an object.
  *
- * A controller object is instanciated by the `Dispatcher` (`lithium\http\Dispatcher`), and is given
- * an instance of the `lithium\action\Request` class, which contains all necessary request state,
- * including routing information, `GET` & `POST` data, and server variables. The controller is then
- * invoked (using PHP's magic `__invoke()` syntax), and the proper action is called, according to
- * the routing information stored in the `Request` object.
+ * A controller object is instanciated by the `Dispatcher` (`lithium\net\http\Dispatcher`), and is
+ * given an instance of the `lithium\action\Request` class, which contains all necessary request
+ * state, including routing information, `GET` & `POST` data, and server variables. The controller
+ * is then invoked (using PHP's magic `__invoke()` syntax), and the proper action is called,
+ * according to the routing information stored in the `Request` object.
  *
  * A controller then returns a response (i.e. using `redirect()` or `render()`) which includes HTTP
  * headers, and/or a serialized data response (JSON or XML, etc.) or HTML webpage.
  *
  * For more information on returning serialized data responses for web services, or manipulating
  * template rendering from within your controllers, see the settings in `$_render` and the
- * `lithium\http\Media` class.
+ * `lithium\net\http\Media` class.
  *
- * @see lithium\http\Media
+ * @see lithium\net\http\Media
  * @see lithium\action\Dispatcher
  * @see lithium\action\Controller::$_render
  */
@@ -83,11 +83,11 @@ class Controller extends \lithium\core\Object {
 	 * `<app-path>/views/<controller>/<action>.<type>.php`, i.e.: `app/views/posts/index.html.php`.
 	 *
 	 * To change the inner-workings of these settings (template paths, default render settings for
-	 * individual content types), see the `lithium\http\Media` class.
+	 * individual content types), see the `lithium\net\http\Media` class.
 	 *
 	 * @var array
-	 * @see lithium\http\Media::type()
-	 * @see lithium\http\Media::render()
+	 * @see lithium\net\http\Media::type()
+	 * @see lithium\net\http\Media::render()
 	 */
 	protected $_render = array(
 		'type'        => 'html',
@@ -105,8 +105,8 @@ class Controller extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'media' => '\lithium\http\Media',
-		'router' => '\lithium\http\Router',
+		'media' => '\lithium\net\http\Media',
+		'router' => '\lithium\net\http\Router',
 		'response' => '\lithium\action\Response'
 	);
 

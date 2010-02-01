@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\data\source\http\adapter;
 
-class MockSocket extends \lithium\util\Socket {
+class MockSocket extends \lithium\net\Socket {
 
 	protected $_data = null;
 

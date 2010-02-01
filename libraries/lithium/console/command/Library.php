@@ -95,7 +95,7 @@ class Library extends \lithium\console\Command {
 	 * @package default
 	 */
 	protected $_classes = array(
-		'service' => '\lithium\http\Service',
+		'service' => '\lithium\net\http\Service',
 		'response' => '\lithium\console\Response'
 	);
 

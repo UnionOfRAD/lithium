@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\template\helper;
 
-use \lithium\http\Router;
+use \lithium\net\http\Router;
 use \lithium\data\model\Record;
 use \lithium\template\helper\Form;
 use \lithium\tests\mocks\template\helper\MockFormPost;

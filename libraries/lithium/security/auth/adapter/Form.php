@@ -66,7 +66,7 @@ use \lithium\core\Libraries;
  * Note that if you are specifying the `'fields'` configuration using key/value pairs, the key
  * used to specify the filter must match the key side of the `'fields'` assignment.
  *
- * @see lithium\http\Request::$data
+ * @see lithium\net\http\Request::$data
  * @see lithium\data\Model::find()
  * @see lithium\util\String::hash()
  */
@@ -88,7 +88,7 @@ class Form extends \lithium\core\Object {
 	/**
 	 * The list of fields to extract from the `Request` object and use when querying the database.
 	 * This can either be a simple array of field names, or a set of key/value pairs, which map
-	 * the field names in the request to 
+	 * the field names in the request to
 	 *
 	 * @var array
 	 */

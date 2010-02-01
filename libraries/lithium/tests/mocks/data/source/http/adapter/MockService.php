@@ -8,9 +8,9 @@
 
 namespace lithium\tests\mocks\data\source\http\adapter;
 
-use \lithium\http\Response;
+use \lithium\net\http\Response;
 
-class MockService extends \lithium\http\Service {
+class MockService extends \lithium\net\http\Service {
 
 	public function send($method, $path = null, $data = array(), $options = array()) {
 		$defaults = array('return' => 'body', 'type' => 'form');

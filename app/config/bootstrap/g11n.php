@@ -8,7 +8,7 @@
 
 use \lithium\g11n\Message;
 use \lithium\util\String;
-use \lithium\http\Media;
+use \lithium\net\http\Media;
 
 /**
  * Implements logic for handling cases where `Message::translate()` returns without a result.

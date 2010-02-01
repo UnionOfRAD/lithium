@@ -50,8 +50,8 @@ abstract class Renderer extends \lithium\core\Object {
 	 * @see Renderer::$_handlers
 	 */
 	protected $_classes = array(
-		'router' => 'lithium\http\Router',
-		'media'  => 'lithium\http\Media'
+		'router' => 'lithium\net\http\Router',
+		'media'  => 'lithium\net\http\Media'
 	);
 
 	/**

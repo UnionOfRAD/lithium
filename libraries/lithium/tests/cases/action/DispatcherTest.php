@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\action;
 
-use \lithium\http\Router;
-use \lithium\http\Request;
+use \lithium\net\http\Router;
+use \lithium\net\http\Request;
 use \lithium\action\Dispatcher;
 use \lithium\tests\mocks\action\MockDispatcher;
 

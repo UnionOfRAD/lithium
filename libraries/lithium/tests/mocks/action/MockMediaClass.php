@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\action;
 
-class MockMediaClass extends \lithium\http\Media {
+class MockMediaClass extends \lithium\net\http\Media {
 
 	public static function render(&$response, $data = null, $options = array()) {
 		$response->options = $options;

@@ -21,7 +21,7 @@ use \Exception;
  * @see lithium\action\Dispatcher
  * @see lithium\action\Controller
  */
-class Response extends \lithium\http\Response {
+class Response extends \lithium\net\http\Response {
 
 	protected $_config = array();
 

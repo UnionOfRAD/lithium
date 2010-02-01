@@ -25,7 +25,7 @@ use \lithium\core\Libraries;
  * and passes it the `Request` object instance. The `Controller` returns a `Response` object to the
  * `Dispatcher`, where the headers and content are rendered and sent to the browser.
  *
- * @see lithium\http\Router
+ * @see lithium\net\http\Router
  * @see lithium\action\Request
  * @see lithium\action\Response
  * @see lithium\action\Controller
@@ -36,19 +36,19 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * Fully-namespaced router class reference.  Class must implement a `parse()` method,
 	 * which must return an array with (at a minimum) 'controller' and 'action' keys.
 	 *
-	 * @see lithium\http\Router::parse()
+	 * @see lithium\net\http\Router::parse()
 	 * @var array
 	 */
 	protected static $_classes = array(
 		'request' => '\lithium\action\Request',
-		'router' => '\lithium\http\Router'
+		'router' => '\lithium\net\http\Router'
 	);
 
 	/**
 	 * Contains pre-process format strings for changing Dispatcher's behavior based on 'rules'.
 	 *
 	 * Each key in the array represents a 'rule'; if a key that matches the rule is present (and
-	 * not empty) in a route, (i.e. the result of `lithium\http\Router::parse()`) then the rule's
+	 * not empty) in a route, (i.e. the result of `lithium\net\http\Router::parse()`) then the rule's
 	 * value will be applied to the route before it is dispatched.  When applying a rule, any array
 	 * elements array elements of the flag which are present in the route will be modified using a
 	 * `lithium\util\String::insert()`-formatted string.
@@ -88,7 +88,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Dispatches a request based on a request object (an instance of `lithium\http\Request`). If
+	 * Dispatches a request based on a request object (an instance of `lithium\net\http\Request`). If
 	 * `$request` is null, a new request object is instantiated based on the value of the
 	 * `'request'` key in the `$_classes` array.
 	 *

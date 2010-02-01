@@ -17,7 +17,7 @@ use lithium\util\String;
 class Html extends \lithium\test\Reporter {
 
 	protected $_classes = array(
-		'router' => '\lithium\http\Router'
+		'router' => '\lithium\net\http\Router'
 	);
 
 	/**

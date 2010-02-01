@@ -11,7 +11,7 @@ namespace lithium\data\source;
 use \lithium\core\Libraries;
 
 /**
- * Http class to access data sources using \lithium\http\Service.
+ * Http class to access data sources using \lithium\net\http\Service.
  */
 class Http extends \lithium\data\Source {
 
@@ -23,13 +23,13 @@ class Http extends \lithium\data\Source {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'service' => '\lithium\http\Service'
+		'service' => '\lithium\net\http\Service'
 	);
 
 	/**
 	 * Service connection
 	 *
-	 * @var object lithium\http\Service
+	 * @var object lithium\net\http\Service
 	 */
 	protected $_connection = null;
 

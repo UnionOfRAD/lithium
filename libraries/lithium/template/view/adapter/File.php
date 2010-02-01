@@ -30,8 +30,8 @@ class File extends \lithium\template\view\Renderer {
 
 	protected $_classes = array(
 		'stream' => '\lithium\template\view\Stream',
-		'router' => 'lithium\http\Router',
-		'media'  => 'lithium\http\Media'
+		'router' => 'lithium\net\http\Router',
+		'media'  => 'lithium\net\http\Media'
 	);
 
 	public function __construct($config = array()) {

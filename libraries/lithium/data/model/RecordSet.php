@@ -67,7 +67,7 @@ class RecordSet extends \lithium\util\Collection {
 
 	protected $_classes = array(
 		'record' => '\lithium\model\Record',
-		'media' => '\lithium\http\Media'
+		'media' => '\lithium\net\http\Media'
 	);
 
 	/**

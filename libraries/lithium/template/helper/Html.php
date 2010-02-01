@@ -109,7 +109,7 @@ class Html extends \lithium\template\Helper {
 	 * Used by output handlers to calculate asset paths in conjunction with the `Media` class.
 	 *
 	 * @var array
-	 * @see lithium\http\Media
+	 * @see lithium\net\http\Media
 	 */
 	public $contentMap = array(
 		'script' => 'js',

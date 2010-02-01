@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\test\reporter;
 
-use \lithium\http\Router;
+use \lithium\net\http\Router;
 use \lithium\action\Request;
 use \lithium\test\reporter\Html;
 use \lithium\tests\mocks\test\reporter\MockHtml;

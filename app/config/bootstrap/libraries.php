@@ -23,11 +23,11 @@ require LITHIUM_LIBRARY_PATH . '/lithium/util/Inflector.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/util/Set.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/util/String.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/core/Environment.php';
-require LITHIUM_LIBRARY_PATH . '/lithium/http/Base.php';
-require LITHIUM_LIBRARY_PATH . '/lithium/http/Media.php';
-require LITHIUM_LIBRARY_PATH . '/lithium/http/Request.php';
-require LITHIUM_LIBRARY_PATH . '/lithium/http/Response.php';
-require LITHIUM_LIBRARY_PATH . '/lithium/http/Route.php';
+require LITHIUM_LIBRARY_PATH . '/lithium/net/http/Base.php';
+require LITHIUM_LIBRARY_PATH . '/lithium/net/http/Media.php';
+require LITHIUM_LIBRARY_PATH . '/lithium/net/http/Request.php';
+require LITHIUM_LIBRARY_PATH . '/lithium/net/http/Response.php';
+require LITHIUM_LIBRARY_PATH . '/lithium/net/http/Route.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/action/Controller.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/action/Dispatcher.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/action/Request.php';
@@ -51,3 +51,5 @@ Libraries::add('app');
  * Add some plugins
  */
 // Libraries::add('plugin', 'li3_docs');
+
+?>

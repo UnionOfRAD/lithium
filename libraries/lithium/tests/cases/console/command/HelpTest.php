@@ -120,7 +120,7 @@ class HelpTest extends \lithium\test\Unit {
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$expected = null;
-		$result = $help->api('lithium.http.Request', 'property');
+		$result = $help->api('lithium.net.http.Request', 'property');
 		$this->assertEqual($expected, $result);
 
 		$expected = "    --host=HOST\n        The Host header value and authority.";
@@ -134,7 +134,7 @@ class HelpTest extends \lithium\test\Unit {
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$expected = null;
-		$result = $help->api( 'lithium.http.Request', 'property', 'host');
+		$result = $help->api( 'lithium.net.http.Request', 'property', 'host');
 		$this->assertEqual($expected, $result);
 
 		$expected = "    --host=HOST\n        The Host header value and authority.";

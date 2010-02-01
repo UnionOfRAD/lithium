@@ -114,7 +114,7 @@ class Document extends \lithium\util\Collection {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'media' => '\lithium\http\Media',
+		'media' => '\lithium\net\http\Media',
 		'record' => '\lithium\data\model\Document',
 		'recordSet' => '\lithium\data\model\Document'
 	);
