@@ -8,9 +8,9 @@
 
 use \lithium\g11n\Catalog;
 use \lithium\g11n\Message;
-use \lithium\net\http\Media;
 use \lithium\util\Inflector;
 use \lithium\util\Validator;
+use \lithium\net\http\Media;
 
 /**
  * Globalization (g11n) catalog configuration.  The catalog allows for obtaining and
