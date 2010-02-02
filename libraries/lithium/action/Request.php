@@ -74,7 +74,7 @@ class Request extends \lithium\core\Object {
 	 *
 	 * @var string
 	 */
-	protected $_type = 'html';
+	protected $_type = null;
 
 	/**
 	 * classes used
@@ -339,7 +339,16 @@ class Request extends \lithium\core\Object {
 	 *         on the content type of the request.
 	 */
 	public function type() {
-		return $this->_type;
+		if ($this->_type !== null) {
+			return $this->_type;
+		}
+		if (!empty($this->params['type'])) {
+			return $this->_type = $this->params['type'];
+		}
+		if ($type = $this->env('Content-type')) {
+			return $this->_type = $type;
+		}
+		return $this->_type = 'html';
 	}
 
 	/**

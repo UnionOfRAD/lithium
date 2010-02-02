@@ -794,6 +794,31 @@ class RequestTest extends \lithium\test\Unit {
 		$result = $request->is('mobile');
 		$this->assertTrue($result);
 	}
+
+	public function testRequestTypeFromConstruct() {
+		$request = new Request(array('type' => 'json'));
+
+		$expected = 'json';
+		$result = $request->type();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testRequestTypeFromParams() {
+		$request = new Request();
+		$request->params['type'] = 'json';
+
+		$expected = 'json';
+		$result = $request->type();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testRequestTypeFromHeader() {
+		$request = new Request(array('env' => array('Content-type' => 'json')));
+
+		$expected = 'json';
+		$result = $request->type();
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
