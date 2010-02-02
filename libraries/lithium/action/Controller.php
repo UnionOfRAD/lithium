@@ -116,6 +116,7 @@ class Controller extends \lithium\core\Object {
 		);
 		$config += $defaults;
 		$this->request = empty($config['request']) ? $this->request : $config['request'];
+
 		if ($this->request) {
 			$this->_render['type'] = $this->request->type();
 		}

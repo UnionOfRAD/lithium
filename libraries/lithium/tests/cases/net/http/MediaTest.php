@@ -273,6 +273,23 @@ class MediaTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that attempts to render a media type with no handler registered produces an
+	 * 'unhandled media type' exception, even if the type itself is a registered content type.
+	 *
+	 * @return void
+	 */
+	public function testUnregisteredContentHandler() {
+		$response = new Response();
+		$response->type = 'xml';
+
+		$this->expectException("Unhandled media type 'xml'");
+		Media::render($response, array('foo' => 'bar'));
+
+		$result = $response->body;
+		$this->assertNull($result);
+	}
+
+	/**
 	 * Tests handling content type manually using parameters to `Media::render()`, for content types
 	 * that are registered but have no default handler.
 	 *
@@ -298,6 +315,28 @@ class MediaTest extends \lithium\test\Unit {
 
 		$result = $response->body;
 		$this->assertNull($result);
+	}
+
+	/**
+	 * Tests that parameters from the `Request` object passed into `render()` via
+	 * `$options['request']` are properly merged into the `$options` array passed to render
+	 * handlers.
+	 *
+	 * @return void
+	 */
+	public function testRequestOptionMerging() {
+		$request = new Request();
+		$request->params['foo'] = 'bar';
+
+		$response = new Response();
+		$response->type = 'custom';
+
+		Media::render($response, null, compact('request') + array(
+			'layout' => false,
+			'template' => false,
+			'encode' => function($data, $handler, $options) { return $options['foo']; }
+		));
+		$this->assertEqual(array('bar'), $response->body);
 	}
 
 	public function testMediaEncoding() {

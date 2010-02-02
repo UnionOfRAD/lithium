@@ -197,9 +197,7 @@ class Media extends \lithium\core\StaticObject {
 		if (!empty($content)) {
 			static::$_types[$type] = $content;
 		}
-		if (!empty($options)) {
-			static::$_handlers[$type] = ((array) $options + $defaults);
-		}
+		static::$_handlers[$type] = !empty($options) ? ((array) $options + $defaults) : array();
 	}
 
 	/**
@@ -362,21 +360,18 @@ class Media extends \lithium\core\StaticObject {
 			$data = $params['data'];
 			$options = $params['options'] + array('type' => $response->type());
 
-			$type = $options['type'];
 			$result = null;
+			$type = $options['type'];
+			$hasHandler = isset($handlers[$type]);
+			$handler = $options + ($hasHandler ? $handlers[$type] : array()) + $defaults;
 
-			if (!isset($types[$type])) {
+			if ((!$handler['encode'] && !$handler['view']) && !$hasHandler) {
 				throw new Exception("Unhandled media type '{$type}'");
 			}
 
-			if (isset($handlers[$type])) {
-				$h = (array) $handlers[$type] + (array) $handlers['default'];
-			} else {
-				$h = $options + $defaults;
-				$filter = function($v) { return $v !== null; };
-				$h = array_filter($h, $filter) + $handlers['default'] + $defaults;
-			}
-			$response->body($self::invokeMethod('_handle', array($h, $data, $options)));
+			$filter = function($v) { return $v !== null; };
+			$handler = array_filter($handler, $filter) + $handlers['default'] + $defaults;
+			$response->body($self::invokeMethod('_handle', array($handler, $data, $options)));
 			$response->headers('Content-type', current((array) $types[$type]));
 		});
 	}
@@ -423,7 +418,9 @@ class Media extends \lithium\core\StaticObject {
 			switch (true) {
 				case $handler['encode']:
 					$method = $handler['encode'];
-					$result = is_string($method) ? $method($data) : $method($data, $handler);
+					$result = is_string($method) ? $method($data) : $method(
+						$data, $handler, $options
+					);
 				break;
 				case $handler['view']:
 					$view = new $handler['view']($handler);
