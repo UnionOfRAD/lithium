@@ -10,8 +10,41 @@ namespace lithium\tests\mocks\data\source\database\adapter;
 
 class MockAdapter extends \lithium\data\source\Database {
 
+	/**
+	 * An array of records to test.
+	 *
+	 * This is useful for testing how an `Adapter` returns the data when invoking
+	 * the `Adapter::result()` function
+	 *
+	 * @var array
+	 */
+	protected $_records = array();
+
+	/**
+	 * A list of columns for the current test
+	 *
+	 * @var array
+	 */
+	protected $_columns = array();
+
+	/**
+	 * Holds an array of values that should be processed on initialisation.
+	 *
+	 * @var array
+	 */
+	protected $_autoConfig = array('records', 'columns');
+
+	/**
+	 * Internal pointer to indicate the current record.
+	 *
+	 * @var array
+	 */
+	protected $_pointer = 0;
+
 	public function __construct(array $config = array()) {
-		parent::__construct($config);
+		$defaults =  array('records' => array(), 'columns' => array());
+		$config['autoConnect'] = false;
+		parent::__construct((array) $config + $defaults);
 	}
 
 	public function connect() {
@@ -27,13 +60,10 @@ class MockAdapter extends \lithium\data\source\Database {
 	}
 
 	public function encoding($encoding = null) {
-		if (empty($encoding)) {
-			return '';
-		}
-		return $encoding;
+		return $encoding ?: '';
 	}
 
-	public function  describe($entity, $meta = array()) {
+	public function describe($entity, $meta = array()) {
 		return array();
 	}
 
@@ -54,7 +84,11 @@ class MockAdapter extends \lithium\data\source\Database {
 	}
 
 	public function result($type, $resource, $context) {
-		return true;
+		$return = null;
+		if (array_key_exists($this->_pointer, $this->_records)) {
+			$return = $this->_records[$this->_pointer++];
+		}
+		return $return;
 	}
 
 	public function error() {
@@ -70,10 +104,10 @@ class MockAdapter extends \lithium\data\source\Database {
 	}
 
 	public function schema($query, $resource = null, $context = null) {
-		return true;
+		return $this->_columns;
 	}
 
-	public function conditions($conditions, $context) {
+	public function conditions($conditions, $context, $options = array()) {
 		return $conditions;
 	}
 
@@ -99,8 +133,12 @@ class MockAdapter extends \lithium\data\source\Database {
 
 	}
 
-	public function renderCommand($type, $data, $context) {
+	public function renderCommand($type, $data = null, $context = null) {
 		return '';
+	}
+
+	public function key() {
+
 	}
 }
 

@@ -30,6 +30,11 @@ class RecordSet extends \lithium\util\Collection {
 	 */
 	protected $_index = array();
 
+	/**
+	 * The internal pointer to indicate which `Record` is the current record.
+	 *
+	 * @var integer
+	 */
 	protected $_pointer = 0;
 
 	/**
@@ -65,8 +70,13 @@ class RecordSet extends \lithium\util\Collection {
 	 */
 	protected $_columns = array();
 
+	/**
+	 * Dynamic dependancies
+	 *
+	 * @var array
+	 */
 	protected $_classes = array(
-		'record' => '\lithium\model\Record',
+		'record' => '\lithium\data\model\Record',
 		'media' => '\lithium\net\http\Media'
 	);
 
@@ -89,6 +99,11 @@ class RecordSet extends \lithium\util\Collection {
 	 */
 	protected $_hasInitialized = false;
 
+	/**
+	 * Holds an array of values that should be processed on initialization.
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array(
 		'items', 'classes' => 'merge', 'handle', 'model', 'result', 'query'
 	);
@@ -160,25 +175,41 @@ class RecordSet extends \lithium\util\Collection {
 		$this->_close();
 	}
 
+	/**
+	 * Assigns a value to the specified offset.
+	 *
+	 * @param integer $offset The offset to assign the value to.
+	 * @param mixed $value The value to set.
+	 * @return mixed The value which was set.
+	 */
 	public function offsetSet($offset, $value) {
-		if (in_array($offset, $this->_index)) {
+		$class = $this->_classes['record'];
+		$model = $this->_model;
+		$value = new $class(array('data' => $value, 'exists' => true));
+		if (array_key_exists($offset, $this->_index)) {
 			return $this->_items[array_search($offset, $this->_index)] = $value;
 		}
 		$this->_index[] = $offset;
 		return $this->_items[] = $value;
 	}
 
+	/**
+	 * Unsets an offset.
+	 *
+	 * @param string $offset The offset to unset.
+	 * @return void
+	 */
 	public function offsetUnset($offset) {
 		unset($this->_index[$index = array_search($offset, $this->_index)]);
 		unset($this->_items[$index]);
 	}
 
 	/**
-	* Reset the set's iterator and return the first record in the set.
-	* The next call of `current()` will get the first record in the set.
-	*
-	* @return `Record`
-	*/
+	 * Reset the set's iterator and return the first record in the set.
+	 * The next call of `current()` will get the first record in the set.
+	 *
+	 * @return object `Record`
+	 */
 	public function rewind() {
 		$this->_pointer = 0;
 		$this->_valid = (reset($this->_items) !== false && reset($this->_index));
@@ -195,19 +226,19 @@ class RecordSet extends \lithium\util\Collection {
 	}
 
 	/**
-	* Returns the currently pointed to record in the set.
-	*
-	* @return `Record`
-	*/
+	 * Returns the currently pointed to record in the set.
+	 *
+	 * @return `Record`
+	 */
 	public function current() {
 		return $this->_items[$this->_pointer];
 	}
 
 	/**
-	* Returns the currently pointed to record's unique key.
-	*
-	* @return mixed
-	*/
+	 * Returns the currently pointed to record's unique key.
+	 *
+	 * @return mixed
+	 */
 	public function key() {
 		return $this->_index[$this->_pointer];
 	}
@@ -227,12 +258,20 @@ class RecordSet extends \lithium\util\Collection {
 			$this->_valid = !is_null($this->_populate());
 		}
 
+		$return = null;
 		if ($this->_valid) {
+			$return = $this->current();
 			$this->_pointer++;
 		}
-		return $this->_valid ? $this->current() : null;
+
+		return $return;
 	}
 
+	/**
+	 * Returns meta information for this `RecordSet`
+	 *
+	 * @return array
+	 */
 	public function meta() {
 		return array('model' => $this->_model);
 	}
@@ -266,8 +305,8 @@ class RecordSet extends \lithium\util\Collection {
 	}
 
 	/**
-	* Magic alias for _close().
-	*/
+	 * Magic alias for _close().
+	 */
 	public function __destruct() {
 		$this->_close();
 	}
@@ -290,6 +329,7 @@ class RecordSet extends \lithium\util\Collection {
 			return $this->_close();
 		}
 		$result = null;
+		$modelClass = $this->_model;
 
 		foreach ((array) $this->_columns as $model => $fields) {
 			$data = array_combine($fields, array_slice($data, 0, count($fields)));
@@ -297,7 +337,7 @@ class RecordSet extends \lithium\util\Collection {
 
 			$class = $this->_classes['record'];
 			$this->_items[] = ($record = new $class(compact('model', 'data', 'exists')));
-			$this->_index[] = $key;
+			$this->_index[] = $modelClass::key($record);
 			return $record;
 		}
 	}
