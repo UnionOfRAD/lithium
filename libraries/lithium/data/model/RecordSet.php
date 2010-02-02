@@ -303,6 +303,39 @@ class RecordSet extends \lithium\util\Collection {
 		}
 		return $result;
 	}
+	/**
+	 * Applies a callback to all items in the collection.
+	 *
+	 * Overriden to load any data that has not yet been loaded.
+	 *
+	 * @param callback $filter The filter to apply.
+	 * @return object This collection instance.
+	 */
+	public function each($filter) {
+		if (!$this->_closed()) {
+			while($this->next()) {}
+		}
+		return parent::each($filter);
+	}
+
+	/**
+	 * Applies a callback to a copy of all items in the collection
+	 * and returns the result.
+	 *
+	 * Overriden to load any data that has not yet been loaded.
+	 *
+	 * @param callback $filter The filter to apply.
+	 * @param array $options The available options are:
+	 *              - `'collect'`: If `true`, the results will be returned wrapped
+	 *              in a new Collection object or subclass.
+	 * @return array|object The filtered items.
+	 */
+	public function map($filter, $options = array()) {
+		if (!$this->_closed()) {
+			while($this->next()) {}
+		}
+		return parent::map($filter, $options);
+	}
 
 	/**
 	 * Magic alias for _close().

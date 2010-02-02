@@ -13,15 +13,22 @@ use \lithium\tests\mocks\data\source\database\adapter\MockAdapter;
 use \lithium\tests\mocks\data\MockModel;
 use \lithium\data\Connections;
 
+/**
+ * RecordSet tests
+ */
 class RecordSetTest extends \lithium\test\Unit {
-
+	/**
+	 * RecordSet object to test
+	 *
+	 * @var object
+	 */
 	protected $_recordSet = null;
 
-/**
- * Array of records for testing
- *
- * @var array
- */
+	/**
+	 * Array of records for testing
+	 *
+	 * @var array
+	 */
 	protected $_records = array(
 		array('id' => 1, 'data' => 'data1'),
 		array('id' => 2, 'data' => 'data2'),
@@ -56,8 +63,6 @@ class RecordSetTest extends \lithium\test\Unit {
 			'exists' => true,
 		));
 
-		$expected = array('Test' => array('id', 'data'));
-
 		$this->assertEqual('lithium\tests\mocks\data\MockModel', $recordSet->get('_model'));
 		$this->assertTrue($recordSet->get('_result'));
 
@@ -76,22 +81,37 @@ class RecordSetTest extends \lithium\test\Unit {
 	}
 
 	public function testOffsetGet() {
-		$this->assertEqual($this->_records[0], $this->_recordSet[1]->to('array'));
-		$this->assertEqual($this->_records[1], $this->_recordSet[2]->to('array'));
-		$this->assertEqual($this->_records[2], $this->_recordSet[3]->to('array'));
-		$this->assertEqual($this->_records[3], $this->_recordSet[4]->to('array'));
+		$expected = array('id' => 1, 'data' => 'data1');
+		$this->assertEqual($expected, $this->_recordSet[1]->to('array'));
 
+		$expected = array('id' => 2, 'data' => 'data2');
+		$this->assertEqual($expected, $this->_recordSet[2]->to('array'));
+
+		$expected = array('id' => 3, 'data' => 'data3');
+		$this->assertEqual($expected, $this->_recordSet[3]->to('array'));
+
+		$expected = array('id' => 4, 'data' => 'data4');
+		$this->assertEqual($expected, $this->_recordSet[4]->to('array'));
+
+		$expected = array('id' => 3, 'data' => 'data3');
 		$this->assertEqual($this->_records[2], $this->_recordSet[3]->to('array'));
 
 		$this->expectException();
-		$this->_recordSet[4];
+		$this->_recordSet[5];
 	}
 
 	public function testOffsetGetBackwards() {
-		$this->assertEqual($this->_records[3], $this->_recordSet[4]->to('array'));
-		$this->assertEqual($this->_records[2], $this->_recordSet[3]->to('array'));
-		$this->assertEqual($this->_records[1], $this->_recordSet[2]->to('array'));
-		$this->assertEqual($this->_records[0], $this->_recordSet[1]->to('array'));
+		$expected = array('id' => 4, 'data' => 'data4');
+		$this->assertEqual($expected, $this->_recordSet[4]->to('array'));
+
+		$expected = array('id' => 3, 'data' => 'data3');
+		$this->assertEqual($expected, $this->_recordSet[3]->to('array'));
+
+		$expected = array('id' => 2, 'data' => 'data2');
+		$this->assertEqual($expected, $this->_recordSet[2]->to('array'));
+
+		$expected = array('id' => 1, 'data' => 'data1');
+		$this->assertEqual($expected, $this->_recordSet[1]->to('array'));
 	}
 
 	public function testOffsetSet() {
@@ -194,8 +214,33 @@ class RecordSetTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $this->_recordSet->to('json'));
 	}
 
-	public function testProtectedPopulate() {
+	public function testEach() {
+		$filter = function($rec) {
+			$rec->more_data = 'More Data' . $rec->id;
+			return $rec;
+		};
+		$expected = array(
+			1 => array('id' => 1, 'data' => 'data1', 'more_data' => 'More Data1'),
+			2 => array('id' => 2, 'data' => 'data2', 'more_data' => 'More Data2'),
+			3 => array('id' => 3, 'data' => 'data3', 'more_data' => 'More Data3'),
+			4 => array('id' => 4, 'data' => 'data4', 'more_data' => 'More Data4')
+		);
+		$result = $this->_recordSet->each($filter)->to('array');
+		$this->assertEqual($expected, $result);
+	}
 
+	public function testMap() {
+		$filter = function($rec) {
+			return $rec->id . $rec->data;
+		};
+		$expected = array('1data1', '2data2', '3data3', '4data4');
+
+		$result = $this->_recordSet->map($filter, array('collect' => false));
+		$this->assertEqual($expected, $result);
+
+		$result = $this->_recordSet->map($filter);
+
+		$this->assertEqual($expected, $result->get('_items'));
 	}
 }
 
