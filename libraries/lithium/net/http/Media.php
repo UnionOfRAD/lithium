@@ -137,6 +137,36 @@ class Media extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Alias for `types()`; included for interface compatibility with
+	 * `lithium\util\Collection::to()`, which allows a collection object to be exported to any
+	 * format supported by a `Media` handler. See the documentation for `Collection::to()` for more
+	 * information.
+	 *
+	 * @see lithium\net\http\Media
+	 * @return array Returns the value of `Media::types()`.
+	 */
+	public static function formats() {
+		return static::types();
+	}
+
+	/**
+	 * Alias for `encode()`; included for interface compatibility with
+	 * `lithium\util\Collection::to()`, which allows a collection object to be exported to any
+	 * format supported by a `Media` handler. See the documentation for `Collection::to()` for more
+	 * information.
+	 *
+	 * @param mixed $format Format into which data will be converted, i.e. `'json'`.
+	 * @param mixed $data Either an array or object (usually an instance of `Collection`) which will
+	 *              be converted into the specified format.
+	 * @param array $options Additional handler-specific options to pass to the content handler.
+	 * @return mixed
+	 */
+	public static function to($format, $data, $options = array()) {
+		$data = is_object($data) ? $data->to('array') : $data;
+		return static::encode($format, $data, $options);
+	}
+
+	/**
 	 * Map an extension to a particular content-type (or types) with a set of options.
 	 *
 	 * Examples:

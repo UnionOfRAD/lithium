@@ -15,6 +15,17 @@ namespace lithium\util;
 class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator, \Countable {
 
 	/**
+	 * A central registry of global format handlers for `Collection` objects and subclasses.
+	 * Accessed via the `formats()` method.
+	 *
+	 * @see \lithium\util\Collection::formats()
+	 * @var array
+	 */
+	protected static $_formats = array(
+		'array' => '\lithium\util\Collection::_toArray'
+	);
+
+	/**
 	 * The items contained in the collection.
 	 *
 	 * @var array
@@ -34,19 +45,29 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 *
 	 * @var array
 	 */
-	protected $_classes = array(
-		'media' => '\lithium\net\http\Media'
-	);
 
-	/**
-	 * undocumented variable
-	 *
-	 * @var array
-	 */
 	protected $_autoConfig = array('items');
 
 	/**
-	 * undocumented function
+	 * Accessor method for adding format handlers to instances and subclasses of `Collection`.
+	 *
+	 * @param string $format
+	 * @param mixed $handler
+	 * @return mixed
+	 */
+	public static function formats($format, $handler = null) {
+		if ($format === false) {
+			return static::$_formats = array();
+		}
+		if ((is_null($handler)) && class_exists($format)) {
+			return static::$_formats[] = $format;
+		}
+		return static::$_formats[$format] = $handler;
+	}
+
+	/**
+	 * Initializes the collection object by merging in collection items and removing redundant
+	 * object properties.
 	 *
 	 * @return void
 	 */
@@ -125,37 +146,30 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	public function to($format, $options = array()) {
 		$defaults = array('internal' => false);
 		$options += $defaults;
-		$state = $options['internal'] ? $this->_items : $this;
-		$result = null;
+		$data = $options['internal'] ? $this->_items : $this;
 
-		switch ($format) {
-			case 'array':
-				$result = array();
+		if (is_object($format) && is_callable($format)) {
+			return $format($data, $options);
+		}
 
-				foreach ($state as $key => $value) {
-					if (is_object($value)) {
-						switch (true) {
-							case method_exists($value, 'to'):
-								$value = $value->to('array');
-							break;
-							case (is_object($value) && $vars = get_object_vars($value)):
-								$value = $vars;
-							break;
-							case method_exists($value, '__toString'):
-								$value = $value->__toString();
-							break;
-						}
-					}
-					$result[$key] = $value;
-				}
-				return $result;
-			default:
-				$media = $this->_classes['media'];
+		if (isset(static::$_formats[$format]) && is_callable(static::$_formats[$format])) {
+			$handler = static::$_formats[$format];
+			$handler = is_string($handler) ? explode('::', $handler, 2) : $handler;
 
-				if (in_array($format, $media::types())) {
-					return $media::encode($format, $this->to('array', $options));
-				}
-			break;
+			if (is_array($handler)) {
+				list($class, $method) = $handler;
+				return $class::$method($data, $options);
+			}
+			return $handler($data, $options);
+		}
+
+		foreach (static::$_formats as $key => $handler) {
+			if (!is_int($key)) {
+				continue;
+			}
+			if (in_array($format, $handler::formats($format, $data, $options))) {
+				return $handler::to($format, $data, $options);
+			}
 		}
 	}
 
@@ -378,6 +392,36 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 */
 	public function keys() {
 		return array_keys($this->_items);
+	}
+
+	/**
+	 * Exports a `Collection` instance to an array. Used by `Collection::to()`.
+	 *
+	 * @param mixed $data Either a `Collection` instance, or an array representing a `Collection`'s
+	 *              internal state.
+	 * @return array Returns the value of `$data` as a pure PHP array, recursively converting all
+	 *         sub-objects and other values to their closest array or scalar equivalents.
+	 */
+	protected static function _toArray($data) {
+		$result = array();
+
+		foreach ($data as $key => $item) {
+			switch (true) {
+				case (!is_object($item)):
+					$result[$key] = $item;
+				break;
+				case (method_exists($item, 'to')):
+					$result[$key] = $item->to('array');
+				break;
+				case ($vars = get_object_vars($item)):
+					$result[$key] = $vars;
+				break;
+				case (method_exists($item, '__toString')):
+					$result[$key] = (string) $item;
+				break;
+			}
+		}
+		return $result;
 	}
 }
 

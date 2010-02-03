@@ -82,9 +82,7 @@ class Message extends \lithium\core\StaticObject {
 	 */
 	public static function contentFilters() {
 		$t = function($message, $options = array()) {
-			return Message::translate($message, $options + array(
-				'default' => $message
-			));
+			return Message::translate($message, $options + array('default' => $message));
 		};
 		$tn = function($message1, $message2, $count, $options = array()) {
 			return Message::translate($message1, $options + compact('count') + array(

@@ -219,6 +219,7 @@ class CollectionTest extends \lithium\test\Unit {
 	}
 
 	public function testCollectionFormatConversion() {
+		Collection::formats('\lithium\http\Media');
 		$items = array('hello', 'goodbye', 'foo' => array('bar', 'baz' => 'dib'));
 		$collection = new Collection(compact('items'));
 

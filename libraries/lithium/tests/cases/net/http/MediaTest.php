@@ -27,6 +27,8 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertTrue(in_array('json', $result));
 		$this->assertFalse(in_array('my', $result));
 
+		$this->assertEqual($result, Media::formats());
+
 		$result = Media::type('json');
 		$expected = 'application/json';
 		$this->assertEqual($expected, $result['content']);
@@ -344,6 +346,8 @@ class MediaTest extends \lithium\test\Unit {
 		$expected = json_encode($data);
 		$result = Media::encode('json', $data);
 		$this->assertEqual($expected, $result);
+
+		$this->assertEqual($result, Media::to('json', $data));
 
 		$result = Media::encode('badness', $data);
 		$this->assertNull($result);
