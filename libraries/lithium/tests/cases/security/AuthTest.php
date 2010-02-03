@@ -51,6 +51,24 @@ class AuthTest extends \lithium\test\Unit {
 		Auth::clear('test');
 		$this->assertFalse(Auth::check('test'));
 	}
+
+	public function testManualSessionInitialization() {
+		$this->assertFalse(Auth::check('test'));
+		$user = array('id' => 13, 'user' => 'bob');
+
+		$this->assertTrue(Auth::set('test', $user));
+
+		$result = Auth::check('test');
+		$this->assertEqual($user, $result);
+	}
+
+	public function testManualSessionFail() {
+		$this->assertFalse(Auth::check('test'));
+		$user = array('id' => 13, 'user' => 'bob');
+
+		$this->assertFalse(Auth::set('test', $user, array('fail' => true)));
+		$this->assertFalse(Auth::check('test'));
+	}
 }
 
 ?>

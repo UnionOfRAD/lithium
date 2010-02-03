@@ -14,6 +14,13 @@ class MockAuthAdapter extends \lithium\core\Object {
 		return isset($options['success']) ? $credentials : false;
 	}
 
+	public function set($data, $options = array()) {
+		if (isset($options['fail'])) {
+			return false;
+		}
+		return $data;
+	}
+
 	public function clear($options = array()) {
 	}
 }

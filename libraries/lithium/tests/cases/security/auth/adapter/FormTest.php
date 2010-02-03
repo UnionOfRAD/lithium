@@ -39,6 +39,19 @@ class FormTest extends \lithium\test\Unit {
 		$expected = array('username' => sha1('Person'), 'password' => sha1('password'));
 		$this->assertEqual($expected, $result);
 	}
+
+	/**
+	 * Tests that `Form::set()` passes data through unmodified, even with invalid options.
+	 *
+	 * @return void
+	 */
+	public function testSetPassthru() {
+		$subject = new Form(array('model' => __CLASS__));
+		$user = array('id' => 5, 'name' => 'bob');
+
+		$result = $subject->set($user, null);
+		$this->assertIdentical($user, $result);
+	}
 }
 
 ?>
