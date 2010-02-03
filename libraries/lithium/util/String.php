@@ -12,6 +12,11 @@ namespace lithium\util;
 use \Closure;
 use \Exception;
 
+/**
+ * String manipulation utility class. Includes functionality for hashing, UUID generation,
+ * {:tag} and regex replacement, and tokenization.
+ *
+ */
 class String {
 
 	/**
