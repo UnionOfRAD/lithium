@@ -201,6 +201,25 @@ class Form extends \lithium\core\Object {
 		return $user ? $user->data() : false;
 	}
 
+	/**
+	 * A pass-through method called by `Auth`. Returns the value of `$data`, which is written to
+	 * a user's session. When implementing a custom adapter, this method may be used to modify or
+	 * reject data before it is written to the session.
+	 *
+	 * @param array $data User data to be written to the session.
+	 * @param array $options Adapter-specific options. Not implemented in the `Form` adapter.
+	 * @return array Returns the value of `$data`.
+	 */
+	public function set($data, $options = array()) {
+		return $data;
+	}
+
+	/**
+	 * Called by `Auth` when a user session is terminated. Not implemented in the `Form` adapter.
+	 *
+	 * @param array $options Adapter-specific options. Not implemented in the `Form` adapter.
+	 * @return void
+	 */
 	public function clear($options = array()) {
 	}
 

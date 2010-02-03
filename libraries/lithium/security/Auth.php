@@ -13,6 +13,18 @@ namespace lithium\security;
  * sources against different storage backends in a common way. As with most other adapter-driven
  * classes in the framework, `Auth` allows you to specify one or more named configurations,
  * including an adapter, which can be referenced by name in your application.
+ *
+ * `Auth` is responsible for managing session state for each configuration, and exposes a set of
+ * methods which adapters can implement: `set()`, `check()` and `clear()`. You can read more about
+ * each method below. Beyond these methods, `Auth` makes very few assumptions about how your
+ * application authenticates users. Each adapter accepts a set of credentials, and returns an array
+ * of user information on success, and `false` on failure. On successful authentication attempts,
+ * the data returned from the credential check is written to the session, which is automatically
+ * accessed on subsequent checks (though manual re-checking can be forced on a per-instance basis).
+ *
+ * For additional information on configuring and working with `Auth`, see the `Form` adapter.
+ *
+ * @see lithium\security\auth\adapter\Form
  */
 class Auth extends \lithium\core\Adaptable {
 
@@ -87,40 +99,56 @@ class Auth extends \lithium\core\Adaptable {
 	public static function check($name, $credentials = null, $options = array()) {
 		$defaults = array('checkSession' => true, 'writeSession' => true);
 		$options += $defaults;
+		$params = compact('name', 'credentials', 'options');
 
-		$config = static::_config($name);
-		$session = $config['session'];
+		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+			extract($params);
+			$config = $self::invokeMethod('_config', array($name));
+			$session = $config['session'];
 
-		if ($options['checkSession']) {
-			if ($data = $session['class']::read($session['key'], $session['options'])) {
-				return $data;
+			if ($options['checkSession']) {
+				if ($data = $session['class']::read($session['key'], $session['options'])) {
+					return $data;
+				}
 			}
-		}
 
-		if (($credentials) && $data = static::adapter($name)->check($credentials, $options)) {
-			if ($options['writeSession']) {
-				static::set($name, $data);
+			if (($credentials) && $data = $self::adapter($name)->check($credentials, $options)) {
+				return ($options['writeSession']) ? $self::set($name, $data) : $data;
 			}
-			return $data;
-		}
-		return false;
+			return false;
+		});
 	}
 
 	/**
-	 * Manually authenticate a user with the given ID. Rather than checking a user's credentials,
-	 * this method allows you to manually specify a user for whom you'd like to manually initialize
-	 * an authenticated session.
+	 * Manually authenticate a user with the given set of data. Rather than checking a user's
+	 * credentials, this method allows you to manually specify a user for whom you'd like to
+	 * initialize an authenticated session.
+	 *
+	 * By default, before writing the data to the session, the `set()` method of the named
+	 * configuration's adapter receives the data to be written, and has an opportunity to modify
+	 * or reject it.
 	 *
 	 * @param string $name The name of the adapter configuration to.
 	 * @param array $data The user data to be written to the session.
 	 * @param array $options Any additional session-writing options. These may override any options
 	 *              set by the default session configuration for `$name`.
-	 * @return void
+	 * @return array Returns the array of data written to the session, or `false` if the adapter
+	 *         rejects the data.
 	 */
 	public static function set($name, $data, $options = array()) {
-		$config = static::_config($name);
-		$session = $config['session'];
-		$session['class']::write($session['key'], $data, $options + $session['options']);
+		$params = compact('name', 'data', 'options');
+
+		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+			extract($params);
+			$config = $self::invokeMethod('_config', array($name));
+			$session = $config['session'];
+
+			if ($data = $self::adapter($name)->set($data, $options)) {
+				$session['class']::write($session['key'], $data, $options + $session['options']);
+				return $data;
+			}
+			return false;
+		});
 	}
 
 	/**
@@ -140,13 +168,16 @@ class Auth extends \lithium\core\Adaptable {
 		$defaults = array('clearSession' => true);
 		$options += $defaults;
 
-		$config = static::_config($name);
-		$session = $config['session'];
+		return static::_filter(__FUNCTION__, compact('name', 'options'), function($self, $params) {
+			extract($params);
+			$config = $self::invokeMethod('_config', array($name));
+			$session = $config['session'];
 
-		if ($options['clearSession']) {
-			$session['class']::delete($session['key'], $session['options']);
-		}
-		static::adapter($name)->clear($options);
+			if ($options['clearSession']) {
+				$session['class']::delete($session['key'], $session['options']);
+			}
+			$self::adapter($name)->clear($options);
+		});
 	}
 }
 
