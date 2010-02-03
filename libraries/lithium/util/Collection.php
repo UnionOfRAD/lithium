@@ -9,8 +9,12 @@
 namespace lithium\util;
 
 /**
- * Collection class to implement ArrayAccess, Iterator, and Countable
+ * The parent class for all collection objects. Contains methods for collection iteration, 
+ * conversion, and filtering. Implements ArrayAccess, Iterator, and Countable.
  *
+ * @link http://us.php.net/manual/en/class.arrayaccess.php
+ * @link http://us.php.net/manual/en/class.iterator.php
+ * @link http://us.php.net/manual/en/class.countable.php
  */
 class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator, \Countable {
 
