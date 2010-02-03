@@ -9,6 +9,24 @@
 
 namespace lithium\util;
 
+/**
+ * Used for complex manipulation, comparison, and access of array data. Some methods allow for
+ * XPath-like data access, as follows:
+ * 
+ *  - `'/User/id'`: Similar to the classic {n}.User.id.
+ *  - `'/User[2]/name'`: Selects the name of the second User.
+ *  - `'/User[id>2]'`: Selects all Users with an id > 2.
+ *  - `'/User[id>2][<5]'`: Selects all Users with an id > 2 but < 5.
+ *  - `'/Post/Comment[author_name=John]/../name'`: Selects the name of
+ *    all posts that have at least one comment written by John.
+ *  - `'/Posts[name]'`: Selects all Posts that have a `'name'` key.
+ *  - `'/Comment/.[1]'`: Selects the contents of the first comment.
+ *  - `'/Comment/.[:last]'`: Selects the last comment.
+ *  - `'/Comment/.[:first]'`: Selects the first comment.
+ *  - `'/Comment[text=/lithium/i]`': Selects the all comments that have
+ *    a text matching the regex `/lithium/i`.
+ *  - `'/Comment/@*'`: Selects all key names of all comments.
+ */
 class Set {
 
 	/**
