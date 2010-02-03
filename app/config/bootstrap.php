@@ -84,5 +84,4 @@ require __DIR__ . '/bootstrap/libraries.php';
 //
 // Collection::formats('\lithium\net\http\Media');
 
-
 ?>

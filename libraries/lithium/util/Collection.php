@@ -78,7 +78,6 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 *
 	 * @var array
 	 */
-
 	protected $_autoConfig = array('items');
 
 	/**
