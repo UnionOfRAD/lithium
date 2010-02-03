@@ -5,4 +5,4 @@ REM
 REM @copyright     Copyright 2010, Union of RAD (http://union-of-rad.org)
 REM @license       http://opensource.org/licenses/bsd-license.php The BSD License
 REM
-php -f %~dp0lithium.php %*
+php -f "%~dp0lithium.php" %*
