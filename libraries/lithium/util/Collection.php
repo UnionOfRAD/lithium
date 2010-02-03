@@ -74,7 +74,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	protected $_valid = false;
 
 	/**
-	 * undocumented variable
+	 * Allows a collection's items to be automatically assigned from class construction options.
 	 *
 	 * @var array
 	 */
