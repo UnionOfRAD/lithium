@@ -67,7 +67,7 @@ class Affected extends \lithium\test\filter\Base {
 	}
 
 	public static function output($format, $analysis) {
-		$analysis = $analysis[0];
+		$analysis = isset($analysis[0]) ? $analysis[0] : array();
 		$output = array();
 
 		if ($format == 'html') {

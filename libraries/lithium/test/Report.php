@@ -122,6 +122,9 @@ class Report extends \lithium\core\Object {
 			} else {
 				$filter['options'] = array();
 			}
+			if (!isset($this->results['filters'][$filter['class']])) {
+				$this->results['filters'][$filter['class']] = array();
+			}
 			$this->results['filters'][$filter['class']] = $filter['class']::analyze(
 				$this->results['group'],
 				$this->results['filters'][$filter['class']],

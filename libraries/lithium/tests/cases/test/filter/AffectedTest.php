@@ -32,6 +32,18 @@ class AffectedTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testSingleTestWithSingleResult() {
+		$group = new Group();
+		$group->add('\lithium\tests\cases\core\StaticObjectTest');
+		$tests = Affected::apply($this->report, $group->tests());
+
+		$expected = array(
+			'lithium\tests\cases\core\StaticObjectTest'
+		);
+		$result = $tests->map('get_class', array('collect' => false));
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testMultipleTests() {
 		$group = new Group();
 		$group->add('\lithium\tests\cases\g11n\CatalogTest');
@@ -58,6 +70,14 @@ class AffectedTest extends \lithium\test\Unit {
 			'lithium\tests\cases\g11n\MessageTest'
 		);
 		$result = $tests->map('get_class', array('collect' => false));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testOutputWithEmptyAnalysis() {
+		$expected = "Additional Affected Tests\n-------------------------";
+
+		$result = Affected::output('text', array());
+
 		$this->assertEqual($expected, $result);
 	}
 }
