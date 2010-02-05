@@ -28,6 +28,7 @@ class Coverage extends \lithium\test\filter\Base {
 	 * instances. Attaches code coverage filtering to test cases.
 	 *
 	 * @see lithium\test\filter\Coverage::collect()
+	 * @param object $report Instance of Report which is calling apply.
 	 * @param object $tests Instance of Collection containing instances of tests.
 	 * @param array $options Options for how code coverage should be applied. These options are
 	 *              also passed to `Coverage::collect()` to determine how to aggregate results. See

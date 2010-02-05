@@ -32,14 +32,15 @@ class Complexity extends \lithium\test\filter\Base {
 	/**
 	 * Takes an instance of an object (usually a Collection object) containing test
 	 * instances. Introspects the test subject classes to extract cyclomatic complexity data.
-	 *
+	 * @param object $report Instance of Report which is calling apply.
 	 * @param object $tests Instance of Collection containing instances of tests.
 	 * @param array $options Not used.
 	 * @return object|void Returns the instance of `$tests`.
 	 */
-	public static function apply($tests, $options = array()) {
+	public static function apply($report, $tests, $options = array()) {
+		$results = array();
 		foreach ($tests->invoke('subject') as $class) {
-			static::$_results[$class] = array();
+			$results[$class] = array();
 
 			if (!$methods = Inspector::methods($class, 'ranges')) {
 				continue;
@@ -50,7 +51,8 @@ class Complexity extends \lithium\test\filter\Base {
 				$branches = Parser::tokenize(join("\n", (array) $lines), array(
 					'include' => static::$_include
 				));
-				static::$_results[$class][$method] = count($branches) + 1;
+				$results[$class][$method] = count($branches) + 1;
+				$report->collectFilterResults(__CLASS__, $results);
 			}
 		}
 		return $tests;
@@ -60,13 +62,15 @@ class Complexity extends \lithium\test\filter\Base {
 	 * Analyzes the results of a test run and returns the result of the analysis.
 	 *
 	 * @param array $results The results of the test run.
+	 * @param array $filterResults The results of the filter on the test run.
 	 * @param array $options Not used.
 	 * @return array|void The results of the analysis.
 	 */
-	public static function analyze($results, $options = array()) {
+	public static function analyze($results, $filterResults, $options = array()) {
+		$filterResults = static::collect($filterResults);
 		$metrics = array('max' => array(), 'class' => array());
 
-		foreach (static::$_results as $class => $methods) {
+		foreach ($filterResults as $class => $methods) {
 			if (!$methods) {
 				continue;
 			}
@@ -119,6 +123,26 @@ class Complexity extends \lithium\test\filter\Base {
 			$output .= '</tbody></table>';
 		}
 		return $output;
+	}
+
+	/**
+	 * Collects raw data aggregated in Report and prepares it for analysis
+	 *
+	 * @param array $filterResults The results of the filter on the test run.
+	 * @return array The packaged results.
+	 */
+	public static function collect($filterResults) {
+		$packagedResults = array();
+
+		foreach ($filterResults as $result) {
+			$class = key($result);
+			if (!isset($packagedResults[$class])) {
+				$packagedResults[$class] = array();
+			}
+			$packagedResults[$class] = array_merge($result[$class], $packagedResults[$class]);
+		}
+
+		return $packagedResults;
 	}
 }
 
