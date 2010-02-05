@@ -11,13 +11,18 @@ namespace lithium\tests\cases\test\filter;
 use lithium\test\filter\Affected;
 use lithium\test\Group;
 use lithium\tests\cases\g11n\CatalogTest;
+use lithium\tests\mocks\test\MockReport;
 
 class AffectedTest extends \lithium\test\Unit {
+
+	public function setUp() {
+		$this->report = new MockReport();
+	}
 
 	public function testSingleTest() {
 		$group = new Group();
 		$group->add('\lithium\tests\cases\g11n\CatalogTest');
-		$tests = Affected::apply($group->tests());
+		$tests = Affected::apply($this->report, $group->tests());
 
 		$expected = array(
 			'lithium\tests\cases\g11n\CatalogTest',
@@ -31,7 +36,7 @@ class AffectedTest extends \lithium\test\Unit {
 		$group = new Group();
 		$group->add('\lithium\tests\cases\g11n\CatalogTest');
 		$group->add('\lithium\tests\cases\analysis\LoggerTest');
-		$tests = Affected::apply($group->tests());
+		$tests = Affected::apply($this->report, $group->tests());
 
 		$expected = array(
 			'lithium\tests\cases\g11n\CatalogTest',
@@ -46,7 +51,7 @@ class AffectedTest extends \lithium\test\Unit {
 		$group = new Group();
 		$group->add('\lithium\tests\cases\g11n\CatalogTest');
 		$group->add('\lithium\tests\cases\g11n\MessageTest');
-		$tests = Affected::apply($group->tests());
+		$tests = Affected::apply($this->report, $group->tests());
 
 		$expected = array(
 			'lithium\tests\cases\g11n\CatalogTest',
