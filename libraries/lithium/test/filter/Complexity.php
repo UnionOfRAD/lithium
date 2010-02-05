@@ -48,7 +48,7 @@ class Complexity extends \lithium\test\filter\Base {
 					'include' => static::$_include
 				));
 				$results[$class][$method] = count($branches) + 1;
-				$report->collectFilterResults(__CLASS__, $results);
+				$report->collect(__CLASS__, $results);
 			}
 		}
 		return $tests;

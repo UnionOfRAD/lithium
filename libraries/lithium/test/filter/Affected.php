@@ -49,7 +49,7 @@ class Affected extends \lithium\test\filter\Base {
 			if ($test && !in_array($test, $testsClasses)) {
 				$tests[] = new $test();
 			}
-			$report->collectFilterResults(__CLASS__, array($class => $test));
+			$report->collect(__CLASS__, array($class => $test));
 		}
 		return $tests;
 	}

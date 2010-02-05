@@ -141,7 +141,7 @@ class Report extends \lithium\core\Object {
 	 *				later analysis by the filter itself.
 	 * @return void
 	 */
-	public function collectFilterResults($class, $results) {
+	public function collect($class, $results) {
 		if(!isset($this->results['filters'][$class])) {
 			$this->results['filters'][$class] = array();
 		}

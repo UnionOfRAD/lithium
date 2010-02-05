@@ -105,7 +105,7 @@ class Profiler extends \lithium\test\filter\Base {
 			foreach ($options['checks'] as $name => $check) {
 				$results[$name] = $runCheck($check['function']) - $start[$name];
 			}
-			$report->collectFilterResults(
+			$report->collect(
 				__CLASS__,
 				array(
 					$self->subject() => $results,

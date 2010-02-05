@@ -43,7 +43,7 @@ class Coverage extends \lithium\test\filter\Base {
 			$chain->next($self, $params, $chain);
 			$results = xdebug_get_code_coverage();
 			xdebug_stop_code_coverage();
-			$report->collectFilterResults(__CLASS__, array( $self->subject() => $results ));
+			$report->collect(__CLASS__, array($self->subject() => $results));
 		}));
 		return $tests;
 	}
