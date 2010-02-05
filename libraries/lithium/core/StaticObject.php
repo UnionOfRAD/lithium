@@ -93,9 +93,10 @@ class StaticObject {
 	 */
 	protected static function _filter($method, $params, $callback, $filters = array()) {
 		if (!strpos($method, '::')) {
-			$method = get_called_class() . '::' . $method;
+			$class = get_called_class();
+		} else {
+			list($class, $method) = explode('::', $method);
 		}
-		list($class, $method) = explode('::', $method);
 
 		if (empty(static::$_methodFilters[$class][$method]) && empty($filters)) {
 			return $callback->__invoke($class, $params, null);
