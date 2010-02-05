@@ -88,6 +88,16 @@ abstract class Renderer extends \lithium\core\Object {
 	 */
 	protected $_handlers = array();
 
+	/**
+	 * An array containing any additional variables to be injected into view templates. This allows
+	 * local variables to be communicated between multiple templates (i.e. an element and a layout)
+	 * which are using the same rendering context.
+	 *
+	 * @see lithium\template\view\Renderer::set()
+	 * @var array
+	 */
+	protected $_data = array();
+
 	public function __construct($config = array()) {
 		$defaults = array(
 			'view' => null,
@@ -206,7 +216,7 @@ abstract class Renderer extends \lithium\core\Object {
 		if ($class = Libraries::locate('helper', ucfirst($name))) {
 			return $this->_helpers[$name] = new $class($config + array('context' => $this));
 		}
-		throw new RuntimeException("Helper $name not found");
+		throw new RuntimeException("Helper {$name} not found");
 	}
 
 	/**
@@ -217,7 +227,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 */
 	public function strings($strings = null) {
 		if (is_array($strings)) {
-			return $this->_strings += $strings;
+			return $this->_strings = $this->_strings + $strings;
 		}
 		if (is_string($strings)) {
 			return isset($this->_strings[$strings]) ? $this->_strings[$strings] : null;
@@ -327,6 +337,20 @@ abstract class Renderer extends \lithium\core\Object {
 	 */
 	public function view() {
 		return $this->_view;
+	}
+
+	/**
+	 * Allows variables to be set by one template and used in subsequent templates rendered using
+	 * the same context. For example, a variable can be set in a template and used in an element
+	 * rendered within a template, or an element or template could set a variable which would be
+	 * made available in the layout.
+	 *
+	 * @param array $data An arroy of key/value pairs representing local variables that should be
+	 *              made available to all other templates rendered in this rendering context.
+	 * @return void
+	 */
+	public function set($data = array()) {
+		$this->_data = $data + $this->_data;
 	}
 }
 

@@ -80,6 +80,9 @@ abstract class Helper extends \lithium\core\Object {
 		if ($options['escape'] === false) {
 			return $value;
 		}
+		if (is_array($value)) {
+			return array_map(array($this, __FUNCTION__), $value);
+		}
 		return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 	}
 

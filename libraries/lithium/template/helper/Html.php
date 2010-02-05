@@ -216,6 +216,9 @@ class Html extends \lithium\template\Helper {
 		if ($options['inline']) {
 			return $script;
 		}
+		if ($this->_context) {
+			$this->_context->scripts($script);
+		}
 	}
 
 	/**
@@ -246,7 +249,14 @@ class Html extends \lithium\template\Helper {
 			$params = compact('type', 'path', 'options');
 			return $self->invokeMethod('_render', array($method, $template, $params));
 		};
-		return $this->_filter(__METHOD__, $params, $filter);
+		$style = $this->_filter(__METHOD__, $params, $filter);
+
+		if ($options['inline']) {
+			return $style;
+		}
+		if ($this->_context) {
+			$this->_context->styles($style);
+		}
 	}
 
 	/**
