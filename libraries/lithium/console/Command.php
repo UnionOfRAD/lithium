@@ -278,6 +278,18 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
+	 * Show help generated from the documented code of the command.
+	 *
+	 * @return boolean
+	 */
+	protected function _help() {
+		$help = new Help($this->_config);
+		$result = $help->run(get_class($this));
+		$this->response = $help->response;
+		return $result;
+	}
+
+	/**
 	 * Handles the response that is sent to the stream.
 	 *
 	 * @param string $type the stream either output or error
@@ -291,14 +303,22 @@ class Command extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _response($type, $string, $options) {
-		$options = (is_array($options) ? $options : (is_int($options))
-			? array('nl' => $options) : (is_string($options))
-			? array('style' => $options) : array()
-		);
+		$defaults = array('nl' => 1, 'style' => null);
+		if (!is_array($options)) {
+			if (!$options || is_int($options)) {
+				$options = array('nl' => $options);
+			} else if (is_string($options)) {
+				$options = array('style' => $options);
+			} else {
+				$options = array();
+			}
+		}
+		$options += $defaults;
+
 		if (is_array($string)) {
 			$method = ($type == 'error' ? $type : 'out');
 			foreach ($string as $out) {
-				$this->{$method}($out, $newlines);
+				$this->{$method}($out, $options);
 			}
 			return;
 		}

@@ -8,6 +8,8 @@
 
 namespace lithium\tests\mocks\console;
 
+use \lithium\util\String;
+
 class MockResponse extends \lithium\console\Response {
 
 	public $testAction;
@@ -20,12 +22,12 @@ class MockResponse extends \lithium\console\Response {
 		$this->error = null;
 	}
 
-	public function output($string) {
-		return $this->output .= $string;
+	public function output($output) {
+		return $this->output .= String::insert($output, $this->styles(false));
 	}
 
-	public function error($string) {
-		return $this->error .= $string;
+	public function error($error) {
+		return $this->error .= String::insert($error, $this->styles(false));
 	}
 
 	public function __destruct() {

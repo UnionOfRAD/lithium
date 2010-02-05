@@ -86,7 +86,7 @@ class Response extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function error($error) {
-		return fwrite($this->error, $error);
+		return fwrite($this->error, String::insert($error, $this->styles()));
 	}
 
 	/**
@@ -125,10 +125,13 @@ class Response extends \lithium\core\Object {
 			'white'  => "\033[0;37m",
 			'end'    => "\033[0m",
 		);
+		if ($styles === false) {
+			return array_combine(array_keys($defaults), array_pad(array(), count($defaults), null));
+		}
 		$styles += $defaults;
 
 		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-			$styles = array_flip(array_keys($styles));
+			return $this->styles(false);
 		}
 		return $styles;
 	}
