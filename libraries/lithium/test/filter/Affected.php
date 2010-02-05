@@ -23,26 +23,18 @@ use lithium\analysis\Inspector;
  */
 class Affected extends \lithium\test\filter\Base {
 
-	/**
-	 * Holds metrics for this filter.
-	 *
-	 * @see lithium\test\filter\Affected::apply()
-	 * @see lithium\test\filter\Affected::output()
-	 * @var array Keys are affected classes, values (if available) corresponding test case classes.
-	 */
-	protected static $_metrics = array();
-
 	protected static $_cachedDepends = array();
 
 	/**
 	 * Takes an instance of an object (usually a Collection object) containing test
 	 * instances. Adds affected tests to the test collection.
 	 *
+	 * @param object $report Instance of Report which is calling apply.
 	 * @param object $tests Instance of Collection containing instances of tests.
 	 * @param array $options Not used.
 	 * @return object|void Returns the instance of `$tests`.
 	 */
-	public static function apply($tests, $options = array()) {
+	public static function apply($report, $tests, $options = array()) {
 		$affected = array();
 		$testsClasses = $tests->map('get_class', array('collect' => false));
 
@@ -57,19 +49,32 @@ class Affected extends \lithium\test\filter\Base {
 			if ($test && !in_array($test, $testsClasses)) {
 				$tests[] = new $test();
 			}
-			static::$_metrics[$class] = $test;
+			$report->collectFilterResults(__CLASS__, array($class => $test));
 		}
 		return $tests;
 	}
 
+	/**
+	 * Analyzes the results of a test run and returns the result of the analysis.
+	 *
+	 * @param array $results The results of the test run.
+	 * @param array $filterResults The results of the filter on the test run.
+	 * @param array $options
+	 * @return array|void The results of the analysis.
+	 */
+	public static function analyze($results, $filterResults, $options = array()) {
+		return $filterResults;
+	}
+
 	public static function output($format, $analysis) {
+		$analysis = $analysis[0];
 		$output = array();
 
 		if ($format == 'html') {
 			$output[] = "<h3>Additional Affected Tests</h3>";
 			$output[] = "<ul class=\"metrics\">";
 
-			foreach (static::$_metrics as $class => $test) {
+			foreach ($analysis as $class => $test) {
 				if ($test) {
 					$output[] = "<li>{$test}</li>";
 				}
@@ -79,7 +84,7 @@ class Affected extends \lithium\test\filter\Base {
 			$output[] = "Additional Affected Tests";
 			$output[] = "-------------------------";
 
-			foreach (static::$_metrics as $class => $test) {
+			foreach ($analysis as $class => $test) {
 				if ($test) {
 					$output[] = " - {$test}";
 				}
