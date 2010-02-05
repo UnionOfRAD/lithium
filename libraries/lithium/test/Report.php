@@ -133,18 +133,17 @@ class Report extends \lithium\core\Object {
 	/**
 	 * Collects Results from the test filters and aggregates them.
 	 *
-	 * @param string $class Fully namespaced classname of the filter
-	 *				 for which to aggregate results.
-	 * @param array $results Array of the filter results packaged for
+	 * @param string $class Classname of the filter for which to aggregate results.
+	 * @param array $results Array of the filter results for
 	 *				later analysis by the filter itself.
 	 * @return void
 	 */
 	public function collectFilterResults($class, $results) {
-		$testClass = key($results);
-		if(!isset($this->results['filters'][$class][$testClass])) {
-			$this->results['filters'][$class][$testClass] = array();
+		//$testClass = key($results);
+		if(!isset($this->results['filters'][$class])) {
+			$this->results['filters'][$class] = array();
 		}
-		$this->results['filters'][$class][$testClass] = $results[$testClass];
+		$this->results['filters'][$class][] = $results;
 	}
 
 	/**

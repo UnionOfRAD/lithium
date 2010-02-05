@@ -26,8 +26,8 @@ class Affected extends \lithium\test\filter\Base {
 	/**
 	 * Holds metrics for this filter.
 	 *
-	 * @see lihtium\test\filter\Affected::apply()
-	 * @see lihtium\test\filter\Affected::output()
+	 * @see lithium\test\filter\Affected::apply()
+	 * @see lithium\test\filter\Affected::output()
 	 * @var array Keys are affected classes, values (if available) corresponding test case classes.
 	 */
 	protected static $_metrics = array();

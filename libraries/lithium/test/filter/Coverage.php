@@ -47,7 +47,7 @@ class Coverage extends \lithium\test\filter\Base {
 			$chain->next($self, $params, $chain);
 			$results = xdebug_get_code_coverage();
 			xdebug_stop_code_coverage();
-			$report->collectFilterResults(__CLASS__, Coverage::collect($self->subject(), $results, $options));
+			$report->collectFilterResults(__CLASS__, array( $self->subject() => $results ));
 		}));
 		return $tests;
 	}
@@ -63,6 +63,7 @@ class Coverage extends \lithium\test\filter\Base {
 	 *                    instances each line was called.
 	 */
 	public static function analyze($results, $filterResults, $classes = array()) {
+		$filterResults = static::collect($filterResults);
 		$classes = $classes ?: array_filter(get_declared_classes(), function($class) {
 			return (!is_subclass_of($class, 'lithium\test\Unit'));
 		});
@@ -168,30 +169,36 @@ class Coverage extends \lithium\test\filter\Base {
 	/**
 	 * Collects code coverage analysis results from `xdebug_get_code_coverage()`.
 	 *
-	 * @param string $class Class name that these test results correspond to.
-	 * @param array $results A results array from `xdebug_get_code_coverage()`.
+	 * @param array $filterResults An array of results arrays from `xdebug_get_code_coverage()`.
 	 * @param array $options Set of options defining how results should be collected.
 	 * @return array The packaged filter results.
 	 * @see lithium\test\Coverage::analyze()
 	 * @todo Implement $options['merging']
 	 */
-	public static function collect($class, $results, $options = array()) {
+	public static function collect($filterResults, $options = array()) {
 		$defaults = array('merging' => 'class');
 		$options += $defaults;
-		$filterResults[$class] = array();
+		$packagedResults = array();
 
-		foreach ($results as $file => $lines) {
-			unset($results[$file][0]);
+		foreach ($filterResults as $results) {
+			$class = key($results);
+			$results = $results[$class];
+			foreach ($results as $file => $lines) {
+				unset($results[$file][0]);
+			}
+
+			switch ($options['merging']) {
+				case 'class':
+				default:
+					if (!isset($packagedResults[$class])) {
+						$packagedResults[$class] = array();
+					}
+					$packagedResults[$class][] = $results;
+				break;
+			}
 		}
 
-		switch ($options['merging']) {
-			case 'class':
-			default:
-				$filterResults[$class][] = $results;
-			break;
-		}
-
-		return $filterResults;
+		return $packagedResults;
 	}
 
 	/**
