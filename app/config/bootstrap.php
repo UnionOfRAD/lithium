@@ -77,6 +77,6 @@ require __DIR__ . '/bootstrap/libraries.php';
  */
 use \lithium\util\Collection;
 
-Collection::formats('\lithium\http\Media');
+Collection::formats('\lithium\net\http\Media');
 
 ?>
