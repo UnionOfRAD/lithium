@@ -111,7 +111,7 @@ class Report extends \lithium\core\Object {
 				throw new Exception("{$class} is not a valid test filter.");
 			}
 			$options = isset($options['apply']) ? $options['apply'] : array();
-			$tests = $class::apply($tests, $options) ?: $tests;
+			$tests = $class::apply($this, $tests, $options) ?: $tests;
 			$filters[] = compact('class', 'options');
 		}
 		$this->results['group'] = $tests->run();
@@ -123,9 +123,28 @@ class Report extends \lithium\core\Object {
 				$filter['options'] = array();
 			}
 			$this->results['filters'][$filter['class']] = $filter['class']::analyze(
-				$this->results['group'], $filter['options']
+				$this->results['group'],
+				$this->results['filters'][$filter['class']],
+				$filter['options']
 			);
 		}
+	}
+
+	/**
+	 * Collects Results from the test filters and aggregates them.
+	 *
+	 * @param string $class Fully namespaced classname of the filter
+	 *				 for which to aggregate results.
+	 * @param array $results Array of the filter results packaged for
+	 *				later analysis by the filter itself.
+	 * @return void
+	 */
+	public function collectFilterResults($class, $results) {
+		$testClass = key($results);
+		if(!isset($this->results['filters'][$class][$testClass])) {
+			$this->results['filters'][$class][$testClass] = array();
+		}
+		$this->results['filters'][$class][$testClass] = $results[$testClass];
 	}
 
 	/**
