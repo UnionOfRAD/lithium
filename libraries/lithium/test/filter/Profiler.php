@@ -11,16 +11,6 @@ namespace lithium\test\filter;
 class Profiler extends \lithium\test\filter\Base {
 
 	/**
-	 * Collects profiling results from test-wrapping filters.
-	 */
-	protected static $_results = array();
-
-	/**
-	 * Maps class names to test class names
-	 */
-	protected static $_classMap = array();
-
-	/**
 	 * Contains the list of profiler checks to run against each test.  Values can be string
 	 * function names, arrays containing function names as the first key and function parameters
 	 * as subsequent keys, or closures.
@@ -78,19 +68,20 @@ class Profiler extends \lithium\test\filter\Base {
 	 * Takes an instance of an object (usually a Collection object) containing test
 	 * instances. Allows for preparing tests before they are run.
 	 *
+	 * @param object $report Instance of Report which is calling apply.
 	 * @param object $tests Instance of Collection containing instances of tests.
-	 * @param array $options Options for how this filter should be applied. Available optiosn are:
+	 * @param array $options Options for how this filter should be applied. Available options are:
 	 *              - `'method'`
 	 *              - `'run'`
 	 *              - `'checks'`
 	 * @return object|void Returns the instance of `$tests`.
 	 */
-	public static function apply($tests, $options = array()) {
+	public static function apply($report, $tests, $options = array()) {
 		$defaults = array('method' => 'run', 'checks' => static::$_metrics);
 		$options += $defaults;
 		$m = $options['method'];
 
-		$tests->invoke('applyFilter', array($m, function($self, $params, $chain) use ($options) {
+		$tests->invoke('applyFilter', array($m, function($self, $params, $chain) use ($report, $options) {
 			$start = $results = array();
 
 			$runCheck = function($check) {
@@ -114,9 +105,14 @@ class Profiler extends \lithium\test\filter\Base {
 			foreach ($options['checks'] as $name => $check) {
 				$results[$name] = $runCheck($check['function']) - $start[$name];
 			}
-			Profiler::collect($self->subject(), $params['method'], $results, $options + array(
-				'test' => get_class($self)
-			));
+			$report->collectFilterResults(
+				__CLASS__,
+				array(
+					$self->subject() => $results,
+					'options' => $options + array('test' => get_class($self)),
+					'method' => $params['method']
+				)
+			);
 			return $methodResult;
 		}));
 		return $tests;
@@ -126,10 +122,13 @@ class Profiler extends \lithium\test\filter\Base {
 	 * Analyzes the results of a test run and returns the result of the analysis.
 	 *
 	 * @param array $results The results of the test run.
+	 * @param array $filterResults The results of the filter on the test run.
 	 * @param array $options Not used.
 	 * @return array|void The results of the analysis.
 	 */
-	public static function analyze($results, $options = array()) {
+	public static function analyze($results, $filterResults, $options = array()) {
+		$collectedResults = static::collect($filterResults);
+		extract($collectedResults, EXTR_OVERWRITE);
 		$metrics = array();
 
 		foreach ($results as $testCase) {
@@ -137,7 +136,7 @@ class Profiler extends \lithium\test\filter\Base {
 				if ($assertion['result'] != 'pass' && $assertion['result'] != 'fail') {
 					continue;
 				}
-				$class = static::$_classMap[$assertion['class']];
+				$class = $classMap[$assertion['class']];
 
 				if (!isset($metrics[$class])) {
 					$metrics[$class] = array('assertions' => 0);
@@ -146,7 +145,7 @@ class Profiler extends \lithium\test\filter\Base {
 			}
 		}
 
-		foreach (static::$_results as $class => $methods) {
+		foreach ($filterResults as $class => $methods) {
 			foreach ($methods as $methodName => $timers) {
 				foreach ($timers as $title => $value) {
 					if (!isset($metrics[$class][$title])) {
@@ -232,12 +231,36 @@ class Profiler extends \lithium\test\filter\Base {
 		}
 	}
 
-	public static function collect($class, $method, $results, $options = array()) {
+	/**
+	 * Collects the raw filter results and packages them for analysis.
+	 *
+	 * @param array $filterResults The results of the filter on the test run.
+	 * @return array The packaged filter results prepared for analysis.
+	 */
+	public static function collect($filterResults) {
 		$defaults = array('test' => null);
-		$options += $defaults;
+		$classMap = array();
+		$packagedResults = array();
 
-		static::$_classMap[$options['test']] = $class;
-		static::$_results[$class][$method] = $results;
+		foreach ($filterResults as $results) {
+			$class = key($results);
+			$options = $results['options'];
+			$options += $defaults;
+			$method = $results['method'];
+
+			$classMap[$options['test']] = $class;
+			if (!isset($packagedResults[$class])) {
+				$packagedResults[$class] = array();
+			}
+			$packagedResults[$class][$method] = $results[$class];
+		}
+
+		$filterResults = $packagedResults;
+
+		return array(
+			'filterResults' => $filterResults,
+			'classMap' => $classMap
+		);
 	}
 }
 
