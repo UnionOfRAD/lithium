@@ -17,11 +17,6 @@ use \lithium\analysis\Inspector;
 class Complexity extends \lithium\test\filter\Base {
 
 	/**
-	 * Collects complexity analysis results for classes/methods.
-	 */
-	protected static $_results = array();
-
-	/**
 	 * The list of tokens which represent the starting point of a code branch.
 	 */
 	protected static $_include = array(

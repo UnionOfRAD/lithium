@@ -139,7 +139,6 @@ class Report extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function collectFilterResults($class, $results) {
-		//$testClass = key($results);
 		if(!isset($this->results['filters'][$class])) {
 			$this->results['filters'][$class] = array();
 		}

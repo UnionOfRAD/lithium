@@ -19,11 +19,6 @@ use \lithium\analysis\Inspector;
 class Coverage extends \lithium\test\filter\Base {
 
 	/**
-	 * Collects coverage analysis results from Xdebug.
-	 */
-	protected static $_results = array();
-
-	/**
 	 * Takes an instance of an object (usually a Collection object) containing test
 	 * instances. Attaches code coverage filtering to test cases.
 	 *
