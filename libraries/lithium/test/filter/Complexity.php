@@ -27,6 +27,7 @@ class Complexity extends \lithium\test\filter\Base {
 	/**
 	 * Takes an instance of an object (usually a Collection object) containing test
 	 * instances. Introspects the test subject classes to extract cyclomatic complexity data.
+	 *
 	 * @param object $report Instance of Report which is calling apply.
 	 * @param object $tests Instance of Collection containing instances of tests.
 	 * @param array $options Not used.
