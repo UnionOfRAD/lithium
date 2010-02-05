@@ -72,17 +72,17 @@ class Response extends \lithium\core\Object {
 	/**
 	 * Writes string to output stream
 	 *
-	 * @param string $string
+	 * @param string $output
 	 * @return mixed
 	 */
-	public function output($string) {
-		fwrite($this->output, String::insert($string, $this->styles()));
+	public function output($output) {
+		return fwrite($this->output, String::insert($output, $this->styles()));
 	}
 
 	/**
 	 * Writes string to error stream
 	 *
-	 * @param string $string
+	 * @param string $error
 	 * @return mixed
 	 */
 	public function error($error) {
@@ -99,11 +99,11 @@ class Response extends \lithium\core\Object {
 		fclose($this->output);
 		fclose($this->error);
 	}
-	
+
 	/**
 	 * Handles styling output.
 	 *
-	 * @param array $styles 
+	 * @param array $styles
 	 * @return array
 	 */
 	public function styles($styles = array()) {
@@ -124,8 +124,9 @@ class Response extends \lithium\core\Object {
 			'cyan'   => "\033[0;36m",
 			'white'  => "\033[0;37m",
 			'end'    => "\033[0m",
-			);
+		);
 		$styles += $defaults;
+
 		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 			$styles = array_flip(array_keys($styles));
 		}

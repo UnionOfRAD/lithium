@@ -92,7 +92,7 @@ class Command extends \lithium\core\Object {
 			}
 		}
 	}
-	
+
 	/**
 	 * Called by the Dispatcher class to invoke an action.
 	 *
@@ -123,45 +123,33 @@ class Command extends \lithium\core\Object {
 	/**
 	 * Writes string to output stream.
 	 *
-	 * @param string $str
-	 * @param integer $newlines
-	 * @param string $style The name of the style the string is to be wrapped in.
+	 * @param string $output
+	 * @param integer|string|array $options
+	 *        integer as the number of new lines.
+	 *        string as the style
+	 *        array as :
+	 *        - nl : number of new lines to add at the end
+	 *        - style : the style name to wrap around the
 	 * @return integer|void
 	 */
-	public function out($str = null, $newlines = 1, $style = "") {
-		if (is_array($str)) {
-			foreach ($str as $string) {
-				$this->out($string, $newlines);
-			}
-			return;
-		}
-		if($style !== "") {
-			$str = "{:$style}" . $str . "{:end}";
-		}
-		if ($newlines) {
-			$str = $str . str_pad("\n", $newlines, "\n");
-		}
-		return $this->response->output($str);
+	public function out($output = null, $options = array('nl' => 1)) {
+		return $this->_response('output', $output, $options);
 	}
 
 	/**
 	 * Writes string to error stream.
 	 *
-	 * @param string $str
-	 * @param integer $newlines
+	 * @param string $error
+	 * @param integer|string|array $options
+	 *        integer as the number of new lines.
+	 *        string as the style
+	 *        array as :
+	 *        - nl : number of new lines to add at the end
+	 *        - style : the style name to wrap around the
 	 * @return integer|void
 	 */
-	public function error($str = null, $newlines = 1) {
-		if (is_array($str)) {
-			foreach ($str as $string) {
-				$this->error($string, $newlines);
-			}
-			return;
-		}
-		if ($newlines) {
-			$str = $str . str_pad("\n", $newlines, "\n");
-		}
-		return $this->response->error($str);
+	public function error($error = null, $options = array('nl' => 1)) {
+		return $this->_response('error', $error, $options);
 	}
 
 	/**
@@ -248,7 +236,7 @@ class Command extends \lithium\core\Object {
 	 * @return integer
 	 */
 	public function nl($number = 1) {
-		return $this->out(null, $number);
+		return str_pad("\n", $number, "\n");
 	}
 
 	/**
@@ -287,6 +275,42 @@ class Command extends \lithium\core\Object {
 			}
 		}
 		exit($status);
+	}
+
+	/**
+	 * Handles the response that is sent to the stream.
+	 *
+	 * @param string $type the stream either output or error
+	 * @param string $string the message to render
+	 * @param integer|string|array $options
+	 *        integer as the number of new lines.
+	 *        string as the style
+	 *        array as :
+	 *        - nl : number of new lines to add at the end
+	 *        - style : the style name to wrap around the
+	 * @return void
+	 */
+	protected function _response($type, $string, $options) {
+		$options = (is_array($options) ? $options : (is_int($options))
+			? array('nl' => $options) : (is_string($options))
+			? array('style' => $options) : array()
+		);
+		if (is_array($string)) {
+			$method = ($type == 'error' ? $type : 'out');
+			foreach ($string as $out) {
+				$this->{$method}($out, $newlines);
+			}
+			return;
+		}
+		extract($options);
+
+		if($style !== null) {
+			$string = "{:{$style}}{$string}{:end}";
+		}
+		if ($nl) {
+			$string = $string . $this->nl($nl);
+		}
+		return $this->response->{$type}($string);
 	}
 }
 
