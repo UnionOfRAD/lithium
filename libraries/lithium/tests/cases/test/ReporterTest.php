@@ -6,14 +6,14 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\test\reporter;
+namespace lithium\tests\cases\test;
 
-use \lithium\test\reporter\Base;
+use \lithium\test\Reporter;
 
-class BaseTest extends \lithium\test\Unit {
+class ReporterTest extends \lithium\test\Unit {
 
 	public function setUp() {
-		$this->reporter = new Base();
+		$this->reporter = new Reporter();
 	}
 
 	public function testMenu() {
