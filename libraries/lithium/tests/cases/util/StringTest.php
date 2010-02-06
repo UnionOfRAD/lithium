@@ -420,6 +420,14 @@ class StringTest extends \lithium\test\Unit {
 		$this->assertEqual('part', String::extract('/\w+\s*(\w+)/', 'second part', 1));
 		$this->assertNull(String::extract('/\w+\s*(\w+)/', 'second part', 2));
 	}
+
+	public function testStringInsertWithQuestionMark() {
+		$result = String::insert('some string with a ?', array());
+		$this->assertEqual('some string with a ?', $result);
+
+		$result = String::insert('some {:param}string with a ?', array('param' => null));
+		$this->assertEqual('some string with a ?', $result);
+	}
 }
 
 ?>
