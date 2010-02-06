@@ -28,16 +28,19 @@ class Help extends \lithium\console\Command {
 	public function run($name = null) {
 		if (!$name) {
 			$this->nl();
-			$this->out('COMMANDS', 1, 'heading1');
+			$this->out('COMMANDS', 'heading1');
 			$commands = Libraries::locate('command', null, array('recursive' => false));
 
 			foreach ($commands as $command) {
 				$info = Inspector::info($command);
-				$this->out($this->_pad(Inflector::classify($info['shortName'])), 1, 'heading2');
+				$this->out($this->_pad(Inflector::classify($info['shortName'])), 'heading2');
 				$this->out($this->_pad(strtok($info['description'], "\n"), 2));
 				$this->nl();
 			}
-			$this->out('See `{:command}li3 help COMMAND{:end}` for more information on a specific command.');
+			$this->out(
+				'See `{:command}li3 help COMMAND{:end}` '
+				. 'for more information on a specific command.'
+			);
 			return true;
 		}
 		$class = Libraries::locate('command', $name);
@@ -52,7 +55,7 @@ class Help extends \lithium\console\Command {
 		$methods = $this->_methods($class);
 		$properties = $this->_properties($class);
 
-		$this->out('USAGE', 1, 'heading1');
+		$this->out('USAGE', 'heading1');
 		$this->out($this->_pad(sprintf("{:command}li3 %s{:end}{:option}%s{:end} [ARGS]",
 			$name ?: 'COMMAND',
 			array_reduce($properties, function($a, $b) {
@@ -69,7 +72,7 @@ class Help extends \lithium\console\Command {
 		}
 
 		if ($properties || $methods) {
-			$this->out('OPTIONS', 1, 'heading2');
+			$this->out('OPTIONS', 'heading2');
 		}
 
 		if ($properties) {
@@ -208,7 +211,7 @@ class Help extends \lithium\console\Command {
 				continue;
 			}
 			$usage = (!empty($param['usage'])) ? trim($param['usage']) : $param['name'];
-			$this->out($this->_pad($usage), 1, 'option');
+			$this->out($this->_pad($usage), 'option');
 
 			if (!empty($param['args'])) {
 				$args = array();

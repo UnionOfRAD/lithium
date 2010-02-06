@@ -54,7 +54,8 @@ class Console extends \lithium\test\Reporter {
 	 */
 	protected function _exception($error) {
 		$exception = array(
-			"{:error}Exception thrown in {$error['class']}::{$error['method']}() on line {$error['line']}:{:end}",
+			"{:error}Exception thrown in
+			{$error['class']}::{$error['method']}() on line {$error['line']}:{:end}",
 			"{$error['message']}",
 		);
 		if (isset($error['trace']) && !empty($error['trace'])) {
