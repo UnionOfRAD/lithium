@@ -51,15 +51,14 @@ class Coverage extends \lithium\test\filter\Base {
 	/**
 	 * Analyzes code coverage results collected from XDebug, and performs coverage density analysis.
 	 *
-	 * @param array $results The results of the test run.
-	 * @param array $filterResults The results of the filter on the test run.
+	 * @param object $report The report instance running this filter and aggregating results
 	 * @param array $classes A list of classes to analyze coverage on. By default, gets all
 	 *              defined subclasses of lithium\test\Unit which are currently in memory.
 	 * @return array|void Returns an array indexed by file and line, showing the number of
 	 *                    instances each line was called.
 	 */
-	public static function analyze($results, $filterResults, $classes = array()) {
-		$filterResults = static::collect($filterResults);
+	public static function analyze($report, $classes = array()) {
+		$filterResults = static::collect($report->results['filters'][__CLASS__]);
 		$classes = $classes ?: array_filter(get_declared_classes(), function($class) {
 			return (!is_subclass_of($class, 'lithium\test\Unit'));
 		});

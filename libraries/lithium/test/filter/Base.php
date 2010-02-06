@@ -26,12 +26,11 @@ class Base extends \lithium\core\StaticObject {
 	/**
 	 * Analyzes the results of a test run and returns the result of the analysis.
 	 *
-	 * @param array $results The results of the test run.
-	 * @param array $filterResults The results of the filter on the test run.
+	 * @param object $report The report instance running this filter and aggregating results
 	 * @param array $options
 	 * @return array|void The results of the analysis.
 	 */
-	public static function analyze($results, $filterResults, $options = array()) {}
+	public static function analyze($report, $options = array()) {}
 
 	/**
 	 * Returns data to be output by a reporter.

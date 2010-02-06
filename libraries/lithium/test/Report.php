@@ -126,8 +126,7 @@ class Report extends \lithium\core\Object {
 				$this->results['filters'][$filter['class']] = array();
 			}
 			$this->results['filters'][$filter['class']] = $filter['class']::analyze(
-				$this->results['group'],
-				$this->results['filters'][$filter['class']],
+				$this,
 				$filter['options']
 			);
 		}
