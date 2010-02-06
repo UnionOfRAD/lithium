@@ -16,7 +16,7 @@ use \lithium\analysis\Inspector;
 /**
  * Runs code coverage analysis for the executed tests.
  */
-class Coverage extends \lithium\test\filter\Base {
+class Coverage extends \lithium\test\Filter {
 
 	/**
 	 * Takes an instance of an object (usually a Collection object) containing test

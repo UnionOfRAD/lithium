@@ -10,7 +10,7 @@ namespace lithium\test\reporter;
 
 use lithium\util\String;
 
-class Text extends \lithium\test\reporter\Base {
+class Text extends \lithium\test\Reporter {
 
 	protected function _result($stats) {
 		$result = array(

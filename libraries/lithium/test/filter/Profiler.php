@@ -8,7 +8,7 @@
 
 namespace lithium\test\filter;
 
-class Profiler extends \lithium\test\filter\Base {
+class Profiler extends \lithium\test\Filter {
 
 	/**
 	 * Contains the list of profiler checks to run against each test.  Values can be string

@@ -21,7 +21,7 @@ use lithium\analysis\Inspector;
  * 3. Assigning test cases to those classes.
  *
  */
-class Affected extends \lithium\test\filter\Base {
+class Affected extends \lithium\test\Filter {
 
 	protected static $_cachedDepends = array();
 

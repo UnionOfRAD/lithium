@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\test\reporter;
+namespace lithium\test;
 
 use \Exception;
 use \lithium\core\Libraries;
@@ -15,7 +15,7 @@ use \lithium\util\Inflector;
 /**
  * Reporter class to handle test report output.
  */
-class Base extends \lithium\core\Object {
+class Reporter extends \lithium\core\Object {
 
 	public function stats($stats) {
 		$defaults = array(

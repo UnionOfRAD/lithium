@@ -14,7 +14,7 @@ use \lithium\analysis\Inspector;
 /**
  * Calculates the cyclomatic complexity of class methods, and shows worst-offenders and statistics.
  */
-class Complexity extends \lithium\test\filter\Base {
+class Complexity extends \lithium\test\Filter {
 
 	/**
 	 * The list of tokens which represent the starting point of a code branch.

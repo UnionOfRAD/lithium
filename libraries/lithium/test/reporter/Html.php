@@ -10,7 +10,7 @@ namespace lithium\test\reporter;
 
 use lithium\util\String;
 
-class Html extends \lithium\test\reporter\Base {
+class Html extends \lithium\test\Reporter {
 
 	protected $_classes = array(
 		'router' => '\lithium\net\http\Router'

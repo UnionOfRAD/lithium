@@ -6,12 +6,12 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\test\filter;
+namespace lithium\test;
 
 /**
  * `Base` is the base class for all test filters.
  */
-class Base extends \lithium\core\StaticObject {
+class Filter extends \lithium\core\StaticObject {
 
 	/**
 	 * Takes an instance of an object (usually a Collection object) containing test
