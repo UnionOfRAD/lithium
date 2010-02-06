@@ -37,14 +37,14 @@ class Coverage extends \lithium\test\Filter {
 		$defaults = array('method' => 'run');
 		$options += $defaults;
 		$m = $options['method'];
-
-		$tests->invoke('applyFilter', array($m, function($self, $params, $chain) use ($report, $options) {
+		$filter = function($self, $params, $chain) use ($report, $options) {
 			xdebug_start_code_coverage(XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE);
 			$chain->next($self, $params, $chain);
 			$results = xdebug_get_code_coverage();
 			xdebug_stop_code_coverage();
 			$report->collect(__CLASS__, array($self->subject() => $results));
-		}));
+		};
+		$tests->invoke('applyFilter', array($m, $filter));
 		return $tests;
 	}
 

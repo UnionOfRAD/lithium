@@ -54,7 +54,6 @@ class File extends \lithium\template\view\Renderer {
 		unset($options);
 		extract($data, EXTR_OVERWRITE);
 		ob_start();
-
 		include $__t__;
 		return ob_get_clean();
 	}
@@ -68,7 +67,7 @@ class File extends \lithium\template\view\Renderer {
 	 * @todo Replace me with include_path search?
 	 */
 	public function template($type, $options) {
-		if (!isset($this->_config[$type])) {
+		if (!isset($this->_config['paths'][$type])) {
 			return null;
 		}
 		$options = array_filter($options, function($item) { return is_string($item); });
@@ -81,7 +80,7 @@ class File extends \lithium\template\view\Renderer {
 		$library = Libraries::get($options['library']);
 		$options['library'] = $library['path'];
 
-		foreach ((array) $this->_config[$type] as $path) {
+		foreach ((array) $this->_config['paths'][$type] as $path) {
 			if (file_exists($path = String::insert($path, $options))) {
 				return $path;
 			}

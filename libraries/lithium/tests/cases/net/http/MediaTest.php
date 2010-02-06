@@ -352,6 +352,20 @@ class MediaTest extends \lithium\test\Unit {
 		$result = Media::encode('badness', $data);
 		$this->assertNull($result);
 	}
+
+	public function testRenderWithOptionsMerging() {
+		$request = new Request();
+		$request->params['controller'] = 'pages';
+
+		$response = new Response();
+		$response->type = 'html';
+
+		Media::render($response, null, compact('request') + array(
+			'layout' => false,
+			'template' => 'home',
+		));
+		$this->assertPattern('/Home/', $response->body());
+	}
 }
 
 ?>

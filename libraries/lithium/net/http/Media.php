@@ -73,8 +73,10 @@ class Media extends \lithium\core\StaticObject {
 	protected static $_handlers = array(
 		'default' => array(
 			'view'     => '\lithium\template\View',
-			'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
-			'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
+			'paths' => array(
+				'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
+				'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
+			),
 			'encode'   => false,
 			'decode'   => false
 		),
@@ -398,9 +400,9 @@ class Media extends \lithium\core\StaticObject {
 			if ((!$handler['encode'] && !$handler['view']) && !$hasHandler) {
 				throw new Exception("Unhandled media type '{$type}'");
 			}
-
 			$filter = function($v) { return $v !== null; };
 			$handler = array_filter($handler, $filter) + $handlers['default'] + $defaults;
+
 			$response->body($self::invokeMethod('_handle', array($handler, $data, $options)));
 			$response->headers('Content-type', current((array) $types[$type]));
 		});

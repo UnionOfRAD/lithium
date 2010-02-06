@@ -80,8 +80,7 @@ class Profiler extends \lithium\test\Filter {
 		$defaults = array('method' => 'run', 'checks' => static::$_metrics);
 		$options += $defaults;
 		$m = $options['method'];
-
-		$tests->invoke('applyFilter', array($m, function($self, $params, $chain) use ($report, $options) {
+		$filter = function($self, $params, $chain) use ($report, $options) {
 			$start = $results = array();
 
 			$runCheck = function($check) {
@@ -114,7 +113,8 @@ class Profiler extends \lithium\test\Filter {
 				)
 			);
 			return $methodResult;
-		}));
+		};
+		$tests->invoke('applyFilter', array($m, $filter));
 		return $tests;
 	}
 
