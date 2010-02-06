@@ -24,7 +24,6 @@ class Coverage extends \lithium\test\filter\Base {
 	 *
 	 * @see lithium\test\filter\Coverage::collect()
 	 * @param object $report Instance of Report which is calling apply.
-	 * @param object $tests Instance of Collection containing instances of tests.
 	 * @param array $options Options for how code coverage should be applied. These options are
 	 *              also passed to `Coverage::collect()` to determine how to aggregate results. See
 	 *              the documentation for `collect()` for further options.  Options affecting this
@@ -33,7 +32,8 @@ class Coverage extends \lithium\test\filter\Base {
 	 * @return object|void Returns the instance of `$tests` with code coverage analysis
 	 *                     triggers applied.
 	 */
-	public static function apply($report, $tests, $options = array()) {
+	public static function apply($report, $options = array()) {
+		$tests = $report->group->tests();
 		$defaults = array('method' => 'run');
 		$options += $defaults;
 		$m = $options['method'];

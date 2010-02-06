@@ -111,7 +111,7 @@ class Report extends \lithium\core\Object {
 				throw new Exception("{$class} is not a valid test filter.");
 			}
 			$options = isset($options['apply']) ? $options['apply'] : array();
-			$tests = $class::apply($this, $tests, $options) ?: $tests;
+			$tests = $class::apply($this, $options) ?: $tests;
 			$filters[] = compact('class', 'options');
 		}
 		$this->results['group'] = $tests->run();
@@ -142,7 +142,7 @@ class Report extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function collect($class, $results) {
-		if(!isset($this->results['filters'][$class])) {
+		if (!isset($this->results['filters'][$class])) {
 			$this->results['filters'][$class] = array();
 		}
 		$this->results['filters'][$class][] = $results;

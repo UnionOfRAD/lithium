@@ -69,14 +69,14 @@ class Profiler extends \lithium\test\filter\Base {
 	 * instances. Allows for preparing tests before they are run.
 	 *
 	 * @param object $report Instance of Report which is calling apply.
-	 * @param object $tests Instance of Collection containing instances of tests.
 	 * @param array $options Options for how this filter should be applied. Available options are:
 	 *              - `'method'`
 	 *              - `'run'`
 	 *              - `'checks'`
 	 * @return object|void Returns the instance of `$tests`.
 	 */
-	public static function apply($report, $tests, $options = array()) {
+	public static function apply($report, $options = array()) {
+		$tests = $report->group->tests();
 		$defaults = array('method' => 'run', 'checks' => static::$_metrics);
 		$options += $defaults;
 		$m = $options['method'];
