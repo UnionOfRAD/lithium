@@ -175,9 +175,9 @@ class Form extends \lithium\template\Helper {
 	 */
 	public function create($binding = null, $options = array()) {
 		$defaults = array(
-			'url' => null,
+			'url' => $this->_context->request()->params,
 			'type' => null,
-			'action' => $this->_context->request()->params['action'],
+			'action' => null,
 			'method' => $binding ? ($binding->exists() ? 'put' : 'post') : 'post'
 		);
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, $options);
@@ -204,7 +204,7 @@ class Form extends \lithium\template\Helper {
 				));
 			}
 
-			$url = $options['url'] ?: array('action' => $options['action']);
+			$url = $options['action'] ? array('action' => $options['action']) : $options['url'];
 			unset($options['url'], $options['action']);
 			$options['method'] = strtoupper($options['method']);
 

@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\template\helper;
 
+use \lithium\action\Request;
 use \lithium\net\http\Router;
 use \lithium\data\model\Record;
 use \lithium\template\helper\Form;
@@ -30,6 +31,8 @@ class FormTest extends \lithium\test\Unit {
 	 */
 	public $context = null;
 
+	public $base = null;
+
 	protected $_routes = array();
 
 	/**
@@ -41,10 +44,13 @@ class FormTest extends \lithium\test\Unit {
 		$this->_routes = Router::get();
 		Router::connect(null);
 		Router::connect('/{:controller}/{:action}/{:id}.{:type}', array('id' => null));
-		Router::connect('/{:controller}/{:action}');
+		Router::connect('/{:controller}/{:action}/{:args}');
 
 		$this->context = new MockFormRenderer();
 		$this->form = new Form(array('context' => $this->context));
+
+		$base = trim($this->context->request()->env('base'), '/') . '/';
+		$this->base = ($base == '/') ? $base : '/' . $base;
 	}
 
 	public function tearDown() {
@@ -54,27 +60,24 @@ class FormTest extends \lithium\test\Unit {
 	}
 
 	public function testFormCreation() {
-		$base = trim($this->context->request()->env('base'), '/') . '/';
-		$base = ($base == '/') ? $base : '/' . $base;
-
 		$result = $this->form->create();
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$base}posts/add", 'method' => 'POST')
+			'form' => array('action' => "{$this->base}posts/add", 'method' => 'POST')
 		));
 
 		$result = $this->form->create(null, array('method' => 'get'));
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$base}posts/add", 'method' => 'GET')
+			'form' => array('action' => "{$this->base}posts/add", 'method' => 'GET')
 		));
 
 		$result = $this->form->create(null, array('type' => 'file'));
 		$this->assertTags($result, array('form' => array(
-			'action' => "{$base}posts/add", 'method' => 'POST', 'enctype' => 'multipart/form-data'
+			'action' => "{$this->base}posts/add", 'method' => 'POST', 'enctype' => 'multipart/form-data'
 		)));
 
 		$result = $this->form->create(null, array('method' => 'GET', 'type' => 'file'));
 		$this->assertTags($result, array('form' => array(
-			'action' => "{$base}posts/add", 'method' => 'POST', 'enctype' => 'multipart/form-data'
+			'action' => "{$this->base}posts/add", 'method' => 'POST', 'enctype' => 'multipart/form-data'
 		)));
 	}
 
@@ -84,17 +87,14 @@ class FormTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testRestFormCreation() {
-		$base = trim($this->context->request()->env('base'), '/') . '/';
-		$base = ($base == '/') ? $base : '/' . $base;
-
 		$result = $this->form->create(null, array('action' => 'delete', 'method' => 'delete'));
 		$this->assertTags($result, array('form' => array(
-			'action' => "{$base}posts/delete", 'method' => 'DELETE'
+			'action' => "{$this->base}posts/delete", 'method' => 'DELETE'
 		)));
 
 		$result = $this->form->create(null, array('method' => 'put', 'type' => 'file'));
 		$this->assertTags($result, array('form' => array(
-			'action' => "{$base}posts/add", 'method' => 'PUT', 'enctype' => 'multipart/form-data'
+			'action' => "{$this->base}posts/add", 'method' => 'PUT', 'enctype' => 'multipart/form-data'
 		)));
 	}
 
@@ -122,12 +122,10 @@ class FormTest extends \lithium\test\Unit {
 				'body' => 'This is the body of the saved post'
 			)
 		));
-		$base = trim($this->context->request()->env('base'), '/') . '/';
-		$base = ($base == '/') ? $base : '/' . $base;
 
 		$result = $this->form->create($record);
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$base}posts/add", 'method' => 'POST')
+			'form' => array('action' => "{$this->base}posts/add", 'method' => 'POST')
 		));
 
 		$result = $this->form->text('title');
@@ -398,6 +396,30 @@ class FormTest extends \lithium\test\Unit {
 			'multiple' => true
 		));
 		$this->assertTags($result, $expected);
+	}
+
+	public function testFormCreateWithMoreParams() {
+		$request = new Request();
+		$request->params = array('controller' => 'mock', 'action' => 'test', 'args' => array('1'));
+		$context = new MockFormRenderer(compact('request'));
+		$form = new Form(compact('context'));
+
+		$result = $form->create();
+		$this->assertTags($result, array(
+			'form' => array('action' => "{$this->base}mock/test/1", 'method' => 'POST')
+		));
+	}
+
+	public function testFormCreateWithMoreParamsButSpecifiedAction() {
+		$request = new Request();
+		$request->params = array('controller' => 'mock', 'action' => 'test', 'args' => array('1'));
+		$context = new MockFormRenderer(compact('request'));
+		$form = new Form(compact('context'));
+
+		$result = $form->create(null, array('action' => 'radness'));
+		$this->assertTags($result, array(
+			'form' => array('action' => "{$this->base}mock/radness", 'method' => 'POST')
+		));
 	}
 }
 
