@@ -9,7 +9,7 @@
 namespace lithium\tests\cases\data\model;
 
 use \stdClass;
-use \lithium\data\model\Document;
+use \lithium\data\collection\Document;
 use \lithium\tests\mocks\data\model\MockDocumentPost;
 use \lithium\tests\mocks\data\model\MockDocumentSource;
 use \lithium\tests\mocks\data\model\MockDocumentMultipleKey;
@@ -24,19 +24,19 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
-		$result = $document->next()->to('array');
+		$result = $document->next()->data();
 		$this->assertEqual($expected, $result);
 
 		$expected = array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three');
 		$document->next();
-		$result = $document->current()->to('array');
+		$result = $document->current()->data();
 		$this->assertEqual($expected, $result);
 
 		$result = $document->next();
 		$this->assertTrue(empty($result));
 
 		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
-		$result = $document->rewind()->to('array');
+		$result = $document->rewind()->data();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -106,7 +106,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
-		$result = $doc->next()->to('array');
+		$result = $doc->next()->data();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -133,7 +133,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
-		$result = $doc->next()->to('array');
+		$result = $doc->next()->data();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -151,11 +151,11 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertTrue(is_object($doc->children), 'children is not an object');
 
 		$this->assertTrue(
-			is_a($doc->children,'\lithium\data\model\Document'),
+			is_a($doc->children,'\lithium\data\collection\Document'),
 			'Children is not of the type Document'
 		);
 		$this->skipIf(
-			!is_a($doc->children,'\lithium\data\model\Document'),
+			!is_a($doc->children,'\lithium\data\collection\Document'),
 			'Children is not of the type Document'
 		);
 
@@ -164,7 +164,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array('id' => 125, 'type' => 'child', 'children' => null);
-		$result = $doc->children->next()->to('array');
+		$result = $doc->children->next()->data();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -177,11 +177,11 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual('father', $doc->name);
 
 		$this->assertTrue(is_object($doc->child), 'children is not an object');
-		$this->assertTrue(is_a($doc->child, '\lithium\data\model\Document'),
+		$this->assertTrue(is_a($doc->child, '\lithium\data\collection\Document'),
 			'Child is not of the type Document'
 		);
 		$this->skipIf(
-			!is_a($doc->child,'\lithium\data\model\Document'),
+			!is_a($doc->child,'\lithium\data\collection\Document'),
 			'Child is not of the type Document'
 		);
 
@@ -200,8 +200,8 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc->arr1 = array('something' => 'else');
 		$doc->arr2 = array('some' => 'noses', 'have' => 'it');
 
-		$this->assertTrue(is_a($doc->arr1, '\lithium\data\model\Document'));
-		$this->assertTrue(is_a($doc->arr2, '\lithium\data\model\Document'));
+		$this->assertTrue(is_a($doc->arr1, '\lithium\data\collection\Document'));
+		$this->assertTrue(is_a($doc->arr2, '\lithium\data\collection\Document'));
 	}
 
 	public function testRewindNoData() {
@@ -220,7 +220,7 @@ class DocumentTest extends \lithium\test\Unit {
 		)));
 
 		$expected = array('id' => 1, 'name' => 'One');
-		$result = $doc->rewind()->to('array');
+		$result = $doc->rewind()->data();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -287,11 +287,11 @@ class DocumentTest extends \lithium\test\Unit {
 
 		$this->assertTrue(is_object($doc->arr), 'arr is not an object');
 		$this->assertTrue(
-			is_a($doc->arr,'\lithium\data\model\Document'),
+			is_a($doc->arr,'\lithium\data\collection\Document'),
 			'arr is not of the type Document'
 		);
 		$this->skipIf(
-			!is_a($doc->arr,'\lithium\data\model\Document'),
+			!is_a($doc->arr,'\lithium\data\collection\Document'),
 			'arr is not of the type Document'
 		);
 
@@ -378,14 +378,14 @@ class DocumentTest extends \lithium\test\Unit {
 		));
 
 		$result = $doc->rewind();
-		$this->assertTrue(is_a($result,'\lithium\data\model\Document'));
+		$this->assertTrue(is_a($result,'\lithium\data\collection\Document'));
 
 		$expected = array('id' => 2, 'name' => 'Moe');
-		$result = $doc->next()->to('array');
+		$result = $doc->next()->data();
 		$this->assertEqual($expected, $result);
 
 		$expected = array('id' => 3, 'name' => 'Roe');
-		$result = $doc->next()->to('array');
+		$result = $doc->next()->data();
 		$this->assertEqual($expected, $result);
 
 		$result = $doc->next();

@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\data\model;
 
-use \lithium\tests\mocks\data\model\MockRecordSet;
+use \lithium\tests\mocks\data\collection\MockRecordSet;
 use \lithium\tests\mocks\data\source\database\adapter\MockAdapter;
 use \lithium\tests\mocks\data\MockModel;
 use \lithium\data\Connections;
@@ -54,7 +54,7 @@ class RecordSetTest extends \lithium\test\Unit {
 	public function testInit() {
 		$recordSet = new MockRecordSet();
 
-		$this->assertTrue(is_a($recordSet, '\lithium\data\model\RecordSet'));
+		$this->assertTrue(is_a($recordSet, '\lithium\data\collection\RecordSet'));
 
 		$recordSet = new MockRecordSet(array(
 			'model'  => 'lithium\tests\mocks\data\MockModel',

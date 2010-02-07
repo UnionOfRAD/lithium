@@ -149,7 +149,7 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testSimpleFind() {
 		$result = MockPost::find('all');
-		$this->assertTrue($result instanceof \lithium\data\model\RecordSet);
+		$this->assertTrue($result instanceof \lithium\data\collection\RecordSet);
 	}
 
 	/**
@@ -301,7 +301,7 @@ class ModelTest extends \lithium\test\Unit {
 	public function testFindAll() {
 	    $tags = MockTag::find('all', array('conditions' => array('id' => 2)));
 
-		$this->assertTrue($tags instanceof \lithium\data\model\RecordSet);
+		$this->assertTrue($tags instanceof \lithium\data\collection\RecordSet);
 		$this->assertEqual(1, $tags->count());
 		$tag = $tags->rewind();
 		$this->assertTrue($tag instanceof \lithium\data\model\Record);

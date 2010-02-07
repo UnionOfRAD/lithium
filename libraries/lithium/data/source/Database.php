@@ -78,7 +78,6 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	public function create($record, array $options = array()) {
-
 	}
 
 	/**
@@ -129,8 +128,8 @@ abstract class Database extends \lithium\data\Source {
 	public function renderCommand($type, $data = null, $context = null) {
 		if (is_object($type)) {
 			$context = $type;
-			$data = $type->export($this);
-			$type = $type->type();
+			$data = $context->export($this);
+			$type = $context->type();
 		}
 		if (!isset($this->_strings[$type])) {
 			throw new InvalidArgumentException("Invalid query type '{$type}'");
@@ -176,6 +175,8 @@ abstract class Database extends \lithium\data\Source {
 	public function conditions($conditions, $context, $options = array()) {
 		$defaults = array('prepend' => true);
 		$options += $defaults;
+		$model = $context->model();
+		$schema = $model ? $model::schema() : array();
 
 		switch (true) {
 			case empty($conditions):
@@ -197,6 +198,10 @@ abstract class Database extends \lithium\data\Source {
 				case (is_string($key) && is_object($value)):
 					$value = trim(rtrim($this->renderCommand($value), ';'));
 					$result[] = "{$key} IN ({$value})";
+				break;
+				default:
+					$value = $this->value($value, isset($schema[$key]) ? $schema[$key] : null);
+					$result[] = "{$key} = {$value}";
 				break;
 			}
 		}

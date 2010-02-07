@@ -68,8 +68,8 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function configureClass($class) {
 		return array('meta' => array('key' => 'id'), 'classes' => array(
-			'record' => '\lithium\data\model\Document',
-			'recordSet' => '\lithium\data\model\Document'
+			'record' => '\lithium\data\collection\Document',
+			'recordSet' => '\lithium\data\collection\Document'
 		));
 	}
 

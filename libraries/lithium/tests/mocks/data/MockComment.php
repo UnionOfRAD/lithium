@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\data;
 
 use \lithium\data\model\Query;
 use \lithium\data\model\Record;
-use \lithium\data\model\RecordSet;
+use \lithium\data\collection\RecordSet;
 
 class MockComment extends \lithium\data\Model {
 
