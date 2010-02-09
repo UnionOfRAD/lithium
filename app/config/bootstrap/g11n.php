@@ -46,7 +46,7 @@ Message::applyFilter('translate', function($self, $params, $chain) {
  */
 Media::applyFilter('_handle', function($self, $params, $chain) {
 	$params['handler'] += array('outputFilters' => array());
-	$params['handler']['outputFilters'] += Message::contentFilters();
+	$params['handler']['outputFilters'] += Message::shortHands();
 	return $chain->next($self, $params, $chain);
 });
 

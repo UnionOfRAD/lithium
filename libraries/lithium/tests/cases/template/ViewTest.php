@@ -64,7 +64,7 @@ class ViewTest extends \lithium\test\Unit {
 		);
 		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
 
-		$filters = Message::contentFilters();
+		$filters = Message::shortHands();
 		$t = $filters['t'];
 		$tn = $filters['tn'];
 

@@ -20,8 +20,8 @@ use \lithium\g11n\Catalog;
  * given here in order to help understanding the purpose of this class through the context
  * of the process as a whole.
  *
- *  1. Marking messages as translateable.  `$t()` and `$tn()` (implemented in the `View`
- *     class) are recognized as message marking and picked up by the extraction parser.
+ *  1. Marking messages as translateable.  `$t()` and `$tn()` (implemented in `shortHands()`)
+ *     are recognized as message marking and picked up by the extraction parser.
  *
  *  2. Extracting marked messages.  Messages can be extracted through the `g11n`
  *     command which in turn utilizes the `Catalog` class with the builtin `Code`
@@ -40,7 +40,6 @@ use \lithium\g11n\Catalog;
  *
  *  6. Retrieving the translation for a message. See description for `Message::translate()`.
  *
- * @see lithium\template\View
  * @see lithium\g11n\Catalog
  * @see lithium\console\command\G11n
  * @see lithium\g11n\catalog\adapter\Code
@@ -74,13 +73,28 @@ class Message extends \lithium\core\StaticObject {
 
 
 	/**
-	 * Returns an array containing named closures which are used to embed short-hand aliases for
-	 * `translate()` in the templating layer.
+	 * Returns an array containing named closures which are short-hand aliases for `translate()`.
+	 * They can be embeded as content filters in the templating layer using a filter for
+	 * `Media::_handle()` or be used in other places where needed.
 	 *
-	 * @return array Returns an array containing named short-hand translation functions wrapped as
-	 *         closures.
+	 * Usage:
+	 * {{{
+	 * 	$t('look');
+	 * 	$tn('book', 'books', array('count' => 3));
+	 * }}}
+	 *
+	 * Using in a method:
+	 * {{{
+	 * 	public function index() {
+	 * 		extract(Message::shortHands());
+	 * 		$notice = $t('look');
+	 * 	}
+	 * }}}
+	 *
+	 * @return array Named short-hand (`'t'` and `'tn'`) translation functions.
+	 * @see lithium\net\http\Media::_handle()
 	 */
-	public static function contentFilters() {
+	public static function shortHands() {
 		$t = function($message, $options = array()) {
 			return Message::translate($message, $options + array('default' => $message));
 		};
