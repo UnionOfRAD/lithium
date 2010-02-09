@@ -154,6 +154,66 @@ class MessageTest extends \lithium\test\Unit {
 		$result = Message::translate('catalog', array('locale' => 'fr'));
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testShortHandsBasic() {
+		$data = array(
+			'house' => array('Haus', 'Häuser')
+		);
+		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+
+		$filters = Message::shortHands();
+		$t = $filters['t'];
+		$tn = $filters['tn'];
+
+		$expected = 'Haus';
+		$result = $t('house', array('locale' => 'de'));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Haus';
+		$result = $tn('house', 'houses', 1, array('locale' => 'de'));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Häuser';
+		$result = $tn('house', 'houses', 3, array('locale' => 'de'));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testShortHandsSymmetry() {
+		$data = array(
+			'house' => array('Haus', 'Häuser')
+		);
+		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+
+		$filters = Message::shortHands();
+		$t = $filters['t'];
+		$tn = $filters['tn'];
+
+		$expected = Message::translate('house', array('locale' => 'de'));
+		$result = $t('house', array('locale' => 'de'));
+		$this->assertEqual($expected, $result);
+
+		$expected = Message::translate('house', array('locale' => 'de', 'count' => 1));
+		$result = $tn('house', 'houses', 1, array('locale' => 'de'));
+		$this->assertEqual($expected, $result);
+
+		$expected = Message::translate('house', array('locale' => 'de', 'count' => 3));
+		$result = $tn('house', 'houses', 3, array('locale' => 'de'));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testShortHandsAsymmetry() {
+		$filters = Message::shortHands();
+		$t = $filters['t'];
+		$tn = $filters['tn'];
+
+		$expected = Message::translate('house', array('locale' => 'de'));
+		$result = $t('house', array('locale' => 'de'));
+		$this->assertNotEqual($expected, $result);
+
+		$expected = Message::translate('house', array('locale' => 'de', 'count' => 3));
+		$result = $tn('house', 'houses', array('locale' => 'de'));
+		$this->assertNotEqual($expected, $result);
+	}
 }
 
 ?>
