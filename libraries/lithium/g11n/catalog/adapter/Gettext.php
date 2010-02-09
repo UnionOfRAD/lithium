@@ -67,6 +67,9 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 		if (!is_dir($this->_config['path'])) {
 			throw new Exception("Gettext directory does not exist at `{$this->_config['path']}`");
 		}
+		if (!is_writable($this->_config['path'])) {
+			throw new Exception("Gettext directory is not writable at `{$this->_config['path']}`");
+		}
 	}
 
 	/**
