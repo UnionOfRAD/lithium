@@ -9,6 +9,7 @@
 namespace lithium\g11n;
 
 use \lithium\core\Environment;
+use \lithium\util\String;
 use \lithium\g11n\Locale;
 use \lithium\g11n\Catalog;
 
@@ -56,21 +57,42 @@ class Message extends \lithium\core\StaticObject {
 	 * Message::translate('house', array('count' => 23));
 	 * }}}
 	 *
+	 * `String::insert()`-style placeholders may be used within the message
+	 * and replacements provided directly within the `options`  argument.
+	 *
+	 * Example:
+	 * {{{
+	 * Message::translate('Your {:color} paintings are looking just great.', array(
+	 * 	'color' => 'silver',
+	 * 	'locale' => 'fr'
+	 * ));
+	 * }}}
+	 *
 	 * @param string $id The id to use when looking up the translation.
 	 * @param array $options Valid options are:
 	 *              - `'count'`: Used to determine the correct plural form.
 	 *              - `'locale'`: The target locale, defaults to current locale.
 	 *              - `'scope'`: The scope of the message.
-	 * @return string|void The translation or `null` if none could be found.
-	 * @filter
+	 *              - `'default'`: Is used as a fall back if `_translated()` returns without a result.
+	 * @return string|void The translation or the value of the `'default'` option if none could be found.
+	 * @see lithium\util\String::insert()
 	 */
 	public static function translate($id, $options = array()) {
-		$params = compact('id', 'options');
-		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
-			return $self::invokeMethod('_translated', array($params['id'], $params['options']));
-		});
-	}
+		$defaults = array(
+			'count' => 1,
+			// 'locale' => Environment::get('g11n.locale'),
+			'locale' => 'root',
+			'scope' => null,
+			'default' => null
+		);
+		extract($options + $defaults);
 
+		$result = static::_translated($id, $count, $locale, compact('scope'));
+
+		if ($result || $default) {
+			return String::insert($result ?: $default, $options);
+		}
+	}
 
 	/**
 	 * Returns an array containing named closures which are short-hand aliases for `translate()`.
@@ -113,39 +135,38 @@ class Message extends \lithium\core\StaticObject {
 	 * value of the `'count'` option to a closure.
 	 *
 	 * @param string $id The lookup key.
-	 * @param array $options Valid options are:
-	 *              - `'count'`: Used to determine the correct plural form.
-	 *              - `'locale'`: The target locale, defaults to current locale.
+	 * @param integer $count Used to determine the correct plural form.
+	 * @param string $locale The target locale.
+	 * @param array $options Passed through to `Catalog::read()`. Valid options are:
 	 *              - `'scope'`: The scope of the message.
 	 * @return string|void The translation or `null` if none could be found or the plural
 	 *         form could not be determined.
 	 * @see lithium\g11n\Catalog
+	 * @filter
 	 * @todo Message pages need caching.
 	 */
-	protected static function _translated($id, $options = array()) {
-		$defaults = array(
-			'count' => 1,
-			// 'locale' => Environment::get('g11n.locale'),
-			'locale' => 'root',
-			'scope' => null
-		);
-		extract($options + $defaults);
+	protected static function _translated($id, $count, $locale, $options = array()) {
+		$params = compact('id', 'count', 'locale', 'options');
 
-		$page = Catalog::read('message', $locale, compact('scope'));
+		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
+			extract($params);
 
-		if (!isset($page[$id])) {
-			return null;
-		}
-		$translated = (array) $page[$id];
+			$page = Catalog::read('message', $locale, $options);
 
-		if (!isset($page['plural']) || !is_callable($page['plural'])) {
-			return null;
-		}
-		$key = $page['plural']($count);
+			if (!isset($page[$id])) {
+				return null;
+			}
+			$translated = (array) $page[$id];
 
-		if (isset($translated[$key])) {
-			return $translated[$key];
-		}
+			if (!isset($page['plural']) || !is_callable($page['plural'])) {
+				return null;
+			}
+			$key = $page['plural']($count);
+
+			if (isset($translated[$key])) {
+				return $translated[$key];
+			}
+		});
 	}
 }
 

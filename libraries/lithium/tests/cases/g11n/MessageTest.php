@@ -23,6 +23,8 @@ class MessageTest extends \lithium\test\Unit {
 		Catalog::config(array(
 			'runtime' => array('adapter' => new Memory())
 		));
+		$data = function($n) { return $n == 1 ? 0 : 1; };
+		Catalog::write('message.plural', 'root', $data, array('name' => 'runtime'));
 	}
 
 	public function tearDown() {
@@ -30,19 +32,22 @@ class MessageTest extends \lithium\test\Unit {
 		Catalog::config($this->_backups['catalogConfig']);
 	}
 
-	public function testTranslate() {
-		$data = function($n) { return $n == 1 ? 0 : 1; };
-		Catalog::write('message.plural', 'root', $data, array('name' => 'runtime'));
-
+	public function testTranslateBasic() {
 		$data = array(
-			'lithium' => 'Kuchen',
-			'house' => array('Haus', 'Häuser')
+			'catalog' => 'Katalog',
 		);
 		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
 
-		$expected = 'Kuchen';
-		$result = Message::translate('lithium', array('locale' => 'de'));
+		$expected = 'Katalog';
+		$result = Message::translate('catalog', array('locale' => 'de'));
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testTranslatePlural() {
+		$data = array(
+			'house' => array('Haus', 'Häuser')
+		);
+		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
 
 		$expected = 'Haus';
 		$result = Message::translate('house', array('locale' => 'de'));
@@ -50,6 +55,103 @@ class MessageTest extends \lithium\test\Unit {
 
 		$expected = 'Häuser';
 		$result = Message::translate('house', array('locale' => 'de', 'count' => 5));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testTranslateFail() {
+		$result = Message::translate('catalog', array('locale' => 'de'));
+		$this->assertNull($result);
+
+		Catalog::reset();
+		Catalog::config(array(
+			'runtime' => array('adapter' => new Memory())
+		));
+
+		$data = array(
+			'catalog' => 'Katalog',
+		);
+		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+
+		$result = Message::translate('catalog', array('locale' => 'de'));
+		$this->assertNull($result);
+
+		$data = 'not a valid pluralization function';
+		Catalog::write('message.plural', 'root', $data, array('name' => 'runtime'));
+
+		$result = Message::translate('catalog', array('locale' => 'de'));
+		$this->assertNull($result);
+	}
+
+	public function testTranslateScope() {
+		$data = array(
+			'catalog' => 'Katalog',
+		);
+		Catalog::write('message', 'de', $data, array('name' => 'runtime', 'scope' => 'test'));
+
+		$data = function($n) { return $n == 1 ? 0 : 1; };
+		Catalog::write('message.plural', 'root', $data, array(
+			'name' => 'runtime', 'scope' => 'test'
+		));
+
+		$result = Message::translate('catalog', array('locale' => 'de'));
+		$this->assertNull($result);
+
+		$expected = 'Katalog';
+		$result = Message::translate('catalog', array('locale' => 'de', 'scope' => 'test'));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testTranslateDefault() {
+		$result = Message::translate('Here I am', array('locale' => 'de'));
+		$this->assertNull($result);
+
+		$result = Message::translate('Here I am', array(
+			'locale' => 'de', 'default' => 'Here I am'
+		));
+		$expected = 'Here I am';
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testTranslatePlaceholders() {
+		$data = array(
+			'green' => 'grün',
+			'The fish is {:color}.' => 'Der Fisch ist {:color}.',
+			'{:count} bike' => array('{:count} Fahrrad', '{:count} Fahrräder'),
+		);
+		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+
+		$expected = 'Der Fisch ist grün.';
+		$result = Message::translate('The fish is {:color}.', array(
+			'locale' => 'de',
+			'color' => Message::translate('green', array('locale' => 'de'))
+		));
+		$this->assertEqual($expected, $result);
+
+		$expected = '1 Fahrrad';
+		$result = Message::translate('{:count} bike', array('locale' => 'de', 'count' => 1));
+		$this->assertEqual($expected, $result);
+
+		$expected = '7 Fahrräder';
+		$result = Message::translate('{:count} bike', array('locale' => 'de', 'count' => 7));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testTranslateLocales() {
+		$data = array(
+			'catalog' => 'Katalog',
+		);
+		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+		$data = array(
+			'catalog' => 'catalogue',
+		);
+		Catalog::write('message', 'fr', $data, array('name' => 'runtime'));
+
+		$expected = 'Katalog';
+		$result = Message::translate('catalog', array('locale' => 'de'));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'catalogue';
+		$result = Message::translate('catalog', array('locale' => 'fr'));
 		$this->assertEqual($expected, $result);
 	}
 }

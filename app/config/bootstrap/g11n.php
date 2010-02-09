@@ -11,36 +11,7 @@ use \lithium\util\String;
 use \lithium\net\http\Media;
 
 /**
- * Implements logic for handling cases where `Message::translate()` returns without a result.
- * The  message specified for the `'default'` option will be used as a fall back. By
- * default the value for the options is the message passed to the method.
- */
-Message::applyFilter('translate', function($self, $params, $chain) {
-	$params['options'] += array('default' => $params['id']);
-	return $chain->next($self, $params, $chain) ?: $params['options']['default'];
-});
-
-/**
- * Placeholders in translated messages.  Adds support for `String::insert()`-style placeholders
- * to translated messages.  Placeholders may be used within the message and replacements provided
- * directly within the `options` argument.
- *
- * Usage:
- * {{{
- * Message::translate('Your {:color} paintings are looking just great.', array(
- * 	'color' => 'silver',
- * 	'locale' => 'fr'
- * ));
- * }}}
- *
- * @see lithium\util\String::insert()
- */
-Message::applyFilter('translate', function($self, $params, $chain) {
-	return String::insert($chain->next($self, $params, $chain), $params['options']);
-});
-
-/**
- * Embeds message translation content filters into the `View` class (or other content handler,
+ * Embeds message translation short-hands into the `View` class (or other content handler,
  * if specified) when content is rendered. This enables short-hand translation functions, i.e.
  * `<?=$t("Translated content"); ?>`.
  */
