@@ -16,6 +16,12 @@ class GettextTest extends \lithium\test\Unit {
 
 	public $adapter;
 
+	public function skip() {
+		$path = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$message = "Path {$path} is not writable.";
+		$this->skipIf(!is_writable($path), $message);
+	}
+
 	public function setUp() {
 		$this->_path = $path = LITHIUM_APP_PATH . '/resources/tmp/tests/g11n';
 		mkdir($this->_path . '/en/LC_MESSAGES', 0755, true);
