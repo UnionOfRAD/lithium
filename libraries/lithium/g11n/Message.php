@@ -62,9 +62,9 @@ class Message extends \lithium\core\StaticObject {
 	 *
 	 * Example:
 	 * {{{
-	 * Message::translate('Your {:color} paintings are looking just great.', array(
-	 * 	'color' => 'silver',
-	 * 	'locale' => 'fr'
+	 * Message::translate('I can see {:count} bike.');
+	 * Message::translate('This {:color} painting is {:color}.', array(
+	 * 	'color' => Message::translate('silver'),
 	 * ));
 	 * }}}
 	 *
@@ -107,8 +107,8 @@ class Message extends \lithium\core\StaticObject {
 	 *
 	 * Usage:
 	 * {{{
-	 * 	$t('look');
-	 * 	$tn('book', 'books', array('count' => 3));
+	 * 	$t('bike');
+	 * 	$tn('bike', 'bikes', array('count' => 3));
 	 * }}}
 	 *
 	 * Using in a method:
