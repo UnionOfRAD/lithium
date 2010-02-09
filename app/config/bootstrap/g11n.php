@@ -40,6 +40,12 @@ Catalog::config(array(
 	)
 ));
 
+/**
+ * Globalization runtime data.  You can add globalized data during runtime utilizing a
+ * configuration set up to use the _memory_ adapter.
+ */
+$data = function($n) { return $n != 1 ? 1 : 0; };
+Catalog::write('message.plural', 'root', $data, array('name' => 'runtime'));
 
 /**
  * Embeds message translation short-hands into the `View` class (or other content handler,
@@ -69,13 +75,6 @@ Media::applyFilter('_handle', function($self, $params, $chain) {
 //
 // Inflector::rules('uninflected', 'bord');
 // Inflector::rules('uninflected', array('bord', 'baird'));
-
-/**
- * Globalization runtime data.  You can add globalized data during runtime utilizing a
- * configuration set up to use the _memory_ adapter.
- */
-// $data = function($n) { return $n != 1 ? 1 : 0; };
-// Catalog::write('message.plural', 'root', $data, array('name' => 'runtime'));
 
 /**
  * Enabling globalization integration.  Classes in the framework are designed with
