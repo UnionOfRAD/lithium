@@ -7,7 +7,6 @@
  */
 
 use \lithium\g11n\Message;
-use \lithium\util\String;
 use \lithium\net\http\Media;
 
 /**
