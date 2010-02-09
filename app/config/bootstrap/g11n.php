@@ -6,8 +6,40 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
+use \lithium\g11n\Catalog;
 use \lithium\g11n\Message;
 use \lithium\net\http\Media;
+
+/**
+ * Globalization (g11n) catalog configuration.  The catalog allows for obtaining and
+ * writing globalized data. Each configuration can be adjusted through the following settings:
+ *
+ *   - `'adapter' The name of a supported adapter. The builtin adapters are _memory_ (a
+ *     simple adapter good for runtime data and testing), _gettext_, _cldr_ (for
+ *     interfacing with Unicode's common locale data repository) and _code_ (used mainly for
+ *     extracting message templates from source code).
+ *
+ *   - `'path'` All adapters with the exception of the _memory_ adapter require a directory
+ *     which holds the data.
+ *
+ *   - `'scope'` If you plan on using scoping i.e. for accessing plugin data separately you
+ *     need to specify a scope for each configuration, except for those using the _memory_,
+ *     _php_ or _gettext_ adapter which handle this internally.
+ */
+Catalog::config(array(
+	'runtime' => array(
+		'adapter' => 'Memory'
+	),
+// 	'app' => array(
+// 		'adapter' => 'Gettext',
+// 		'path' => LITHIUM_APP_PATH . '/resources/g11n'
+// 	),
+	'lithium' => array(
+		'adapter' => 'Php',
+		'path' => LITHIUM_LIBRARY_PATH . '/lithium/g11n/resources/php'
+	)
+));
+
 
 /**
  * Embeds message translation short-hands into the `View` class (or other content handler,
@@ -37,38 +69,6 @@ Media::applyFilter('_handle', function($self, $params, $chain) {
 //
 // Inflector::rules('uninflected', 'bord');
 // Inflector::rules('uninflected', array('bord', 'baird'));
-
-/**
- * Globalization (g11n) catalog configuration.  The catalog allows for obtaining and
- * writing globalized data. Each configuration can be adjusted through the following settings:
- *
- *   - `'adapter' The name of a supported adapter. The builtin adapters are _memory_ (a
- *     simple adapter good for runtime data and testing), _gettext_, _cldr_ (for
- *     interfacing with Unicode's common locale data repository) and _code_ (used mainly for
- *     extracting message templates from source code).
- *
- *   - `'path'` All adapters with the exception of the _memory_ adapter require a directory
- *     which holds the data.
- *
- *   - `'scope'` If you plan on using scoping i.e. for accessing plugin data separately you
- *     need to specify a scope for each configuration, except for those using the _memory_,
- *     _php_ or _gettext_ adapter which handle this internally.
- */
-// use lithium\g11n\Catalog;
-//
-// Catalog::config(array(
-// 	'runtime' => array(
-// 		'adapter' => 'Memory'
-// 	),
-// 	'app' => array(
-// 		'adapter' => 'Gettext',
-// 		'path' => LITHIUM_APP_PATH . '/resources/g11n'
-// 	),
-// 	'lithium' => array(
-// 		'adapter' => 'Php',
-// 		'path' => LITHIUM_LIBRARY_PATH . '/lithium/g11n/resources/php'
-// 	)
-// ));
 
 /**
  * Globalization runtime data.  You can add globalized data during runtime utilizing a
