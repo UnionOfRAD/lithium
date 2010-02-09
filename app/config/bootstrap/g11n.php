@@ -9,6 +9,8 @@
 use \lithium\g11n\Catalog;
 use \lithium\g11n\Message;
 use \lithium\net\http\Media;
+use \lithium\util\Inflector;
+use \lithium\util\Validator;
 
 /**
  * Globalization (g11n) catalog configuration.  The catalog allows for obtaining and
@@ -48,23 +50,15 @@ $data = function($n) { return $n != 1 ? 1 : 0; };
 Catalog::write('message.plural', 'root', $data, array('name' => 'runtime'));
 
 /**
- * Embeds message translation short-hands into the `View` class (or other content handler,
- * if specified) when content is rendered. This enables short-hand translation functions, i.e.
- * `<?=$t("Translated content"); ?>`.
+ * Integration with `Inflector`.
  */
-Media::applyFilter('_handle', function($self, $params, $chain) {
-	$params['handler'] += array('outputFilters' => array());
-	$params['handler']['outputFilters'] += Message::shortHands();
-	return $chain->next($self, $params, $chain);
-});
+// Inflector::rules('transliteration', Catalog::read('inflection.transliteration', 'en'));
 
 /*
  * Inflector configuration examples.  If your application has custom singular or plural rules, or
  * extra non-ASCII characters to transliterate, you can configure that by uncommenting the lines
  * below.
  */
-// use lithium\util\Inflector;
-//
 // Inflector::rules('singular', array('rules' => array('/rata/' => '\1ratus')));
 // Inflector::rules('singular', array('irregular' => array('foo' => 'bar')));
 //
@@ -76,15 +70,24 @@ Media::applyFilter('_handle', function($self, $params, $chain) {
 // Inflector::rules('uninflected', 'bord');
 // Inflector::rules('uninflected', array('bord', 'baird'));
 
+
 /**
- * Enabling globalization integration.  Classes in the framework are designed with
- * globalization in mind. To enable globalization for these classes we just need to pass
- * the needed data into them.
+ * Integration with `View`. Embeds message translation short-hands into the `View`
+ * class (or other content handler, if specified) when content is rendered. This
+ * enables short-hand translation functions, i.e. `<?=$t("Translated content"); ?>`.
  */
-// use lithium\util\Validator;
-// use lithium\util\Inflector;
-//
-// Validator::add('phone', Catalog::read('validation.phone', 'en_US'));
-// Inflector::rules('transliteration', Catalog::read('inflection.transliteration', 'en'));
+Media::applyFilter('_handle', function($self, $params, $chain) {
+	$params['handler'] += array('outputFilters' => array());
+	$params['handler']['outputFilters'] += Message::shortHands();
+	return $chain->next($self, $params, $chain);
+});
+
+/**
+ * Integration with `Validator`. You can load locale dependent rules into the `Validator`
+ * by specifying them manually or retrieving them with the `Catalog` class.
+ */
+Validator::add('phone', Catalog::read('validation.phone', 'en_US'));
+Validator::add('postalCode', Catalog::read('validation.postalCode', 'en_US'));
+Validator::add('ssn', Catalog::read('validation.ssn', 'en_US'));
 
 ?>
