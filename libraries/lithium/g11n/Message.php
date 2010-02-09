@@ -74,6 +74,7 @@ class Message extends \lithium\core\StaticObject {
 	 *              - `'locale'`: The target locale, defaults to current locale.
 	 *              - `'scope'`: The scope of the message.
 	 *              - `'default'`: Is used as a fall back if `_translated()` returns without a result.
+	 *              - `'noop'`: If `true` no whatsoever lookup takes place.
 	 * @return string|void The translation or the value of the `'default'` option if none could be found.
 	 * @see lithium\util\String::insert()
 	 */
@@ -83,11 +84,16 @@ class Message extends \lithium\core\StaticObject {
 			// 'locale' => Environment::get('g11n.locale'),
 			'locale' => 'root',
 			'scope' => null,
-			'default' => null
+			'default' => null,
+			'noop' => false
 		);
 		extract($options + $defaults);
 
-		$result = static::_translated($id, $count, $locale, compact('scope'));
+		if ($noop) {
+			$result = null;
+		} else {
+			$result = static::_translated($id, $count, $locale, compact('scope'));
+		}
 
 		if ($result || $default) {
 			return String::insert($result ?: $default, $options);

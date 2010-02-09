@@ -155,6 +155,16 @@ class MessageTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testTranslateNoop() {
+		$data = array(
+			'catalog' => 'Katalog',
+		);
+		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+
+		$result = Message::translate('catalog', array('locale' => 'de', 'noop' => true));
+		$this->assertNull($result);
+	}
+
 	public function testShortHandsBasic() {
 		$data = array(
 			'house' => array('Haus', 'Häuser')
