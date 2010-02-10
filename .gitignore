@@ -1,4 +1,3 @@
 .DS_Store
-libraries/*
 app/libraries/plugins/*
 app/resources/tmp/*
