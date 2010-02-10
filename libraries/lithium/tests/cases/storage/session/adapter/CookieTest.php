@@ -12,6 +12,17 @@ use \lithium\storage\session\adapter\Cookie;
 
 class CookieTest extends \lithium\test\Unit {
 
+	/**
+	 * Skip the test if running under CLI.
+	 *
+	 * @return void
+	 */
+	public function skip() {
+		$sapi = PHP_SAPI;
+		$message = 'Cookie tests cannot be run via command-line interface.';
+		$this->skipIf($sapi === 'cli', $message);
+	}
+
 	public function assertCookie($expected, $headers) {
 		$key = $expected['key'];
 		$value = preg_quote(urlencode($expected['value']), '/');
