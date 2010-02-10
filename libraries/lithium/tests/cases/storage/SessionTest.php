@@ -11,17 +11,8 @@ namespace lithium\tests\cases\storage;
 use \lithium\storage\Session;
 use \lithium\util\Collection;
 use \lithium\storage\session\adapter\Memory;
+use \lithium\tests\mocks\storage\session\adapter\SessionStorageConditional;
 
-class SessionStorageConditional extends Memory {
-
-	public function read($key, $options = array()) {
-		return isset($options['fail']) ? null : parent::read($key, $options);
-	}
-
-	public function write($key, $value, $options = array()) {
-		return isset($options['fail']) ? null : parent::write($key, $value, $options);
-	}
-}
 
 class SessionTest extends \lithium\test\Unit {
 
@@ -64,7 +55,7 @@ class SessionTest extends \lithium\test\Unit {
 		$this->assertNull(Session::read('key'));
 		$this->assertIdentical(false, Session::write('key', 'value'));
 	}
-	
+
 	public function testNamedConfigurationReadWrite() {
 		$store1 = new Memory();
 		$store2 = new Memory();
@@ -76,13 +67,13 @@ class SessionTest extends \lithium\test\Unit {
 		Session::config($config);
 		$result = Session::config();
 		$this->assertEqual($config, $result);
-		
+
 		$result = Session::write('key', 'value', array('name' => 'store1'));
 		$this->assertTrue($result);
-		
+
 		$result = Session::read('key', array('name' => 'store1'));
 		$this->assertEqual($result, 'value');
-		
+
 		$result = Session::read('key', array('name' => 'store2'));
 		$this->assertFalse($result);
 	}
