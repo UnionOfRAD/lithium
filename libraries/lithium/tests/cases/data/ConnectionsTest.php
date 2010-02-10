@@ -70,7 +70,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$this->assertFalse(Connections::get());
 
 		Connections::__init();
-		$this->assertTrue(Connections::get());
+		$this->assertTrue(is_array(Connections::get()));
 	}
 
 	public function testConnectionAutoInstantiation() {
