@@ -48,7 +48,12 @@ class Memory extends \lithium\core\Object {
 	}
 
 	public function delete($key, $options = array()) {
-		unset($this->_session[$key]);
+		$session =& $this->_session;
+
+		return function($self, $params, $chain) use (&$session) {
+			extract($params);
+			unset($session[$key]);
+		};
 	}
 
 	/**

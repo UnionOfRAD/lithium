@@ -167,7 +167,7 @@ class Session extends \lithium\core\Adaptable {
 		$settings = static::_config($name);
 
 		foreach ($methods as $name => $method) {
-			$params = compact('key', 'value', 'options');
+			$params = compact('key', 'options');
 			$filters = $settings['filters'];
 			$result = $result || static::_filter(__METHOD__, $params, $method, $filters);
 		}
