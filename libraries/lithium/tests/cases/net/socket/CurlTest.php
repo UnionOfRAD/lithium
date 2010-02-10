@@ -93,11 +93,13 @@ class CurlTest extends \lithium\test\Unit {
 		$result = $stream->resource();
 		$this->assertTrue(is_resource($result));
 
-		$stream->set(CURLOPT_URL, 'http://localhost');
+		$url = 'http://localhost';
+
+		$stream->set(CURLOPT_URL, $url);
 		$this->assertTrue($stream->write(null));
 
 		$result = $stream->read();
-		$this->assertPattern("/^<!doctype/i", $result);
+		$this->assertEqual(file_get_contents($url), $result);
 	}
 }
 
