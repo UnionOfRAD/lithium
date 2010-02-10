@@ -232,6 +232,43 @@ class Form extends \lithium\template\Helper {
 	}
 
 	/**
+	 * Generates a form field with a label, input, and error message (if applicable), all contained
+	 * within a wrapping element.
+	 *
+	 * @param string $name The name of the field to render. If the form was bound to an object
+	 *               passed in `create()`, `$name` should be the field name of a
+	 * @param array $options Rendering options for the form field.
+	 * @return string Returns a form input (the input type is based on the `'type'` option), with
+	 *         label and error message, wrapped in a `<div />` element.
+	 */
+	public function field($name, $options = array()) {
+		$defaults = array('label' => null, 'type' => 'text', 'template' => null, 'list' => null);
+		$options += $defaults;
+		$type = $options['type'];
+
+		$field = $label = $error = null;
+
+		if ($options['label'] === null || !empty($options['label'])) {
+			$label = $this->label($name, $options['label']);
+		}
+		$fieldOptions = array_diff_key($options, $defaults);
+
+		switch (true) {
+			case ($type == 'select'):
+				$field = $this->select($name, $options['list'], $fieldOptions);
+			break;
+			case (method_exists($this, $type)):
+				$field = $this->{$type}($name, $fieldOptions);
+			break;
+		}
+
+		if ($this->_binding) {
+			$error = $this->error($name);
+		}
+		return $this->_render(__METHOD__, $options['template'], compact('label', 'field', 'error'));
+	}
+
+	/**
 	 * Generates an HTML `<input type="submit" />` object.
 	 *
 	 * @param string $title The title of the submit button.
@@ -331,6 +368,29 @@ class Form extends \lithium\template\Helper {
 		$title = $title ?: Inflector::humanize($name);
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		return $this->_render(__METHOD__, $template, compact('name', 'title', 'options'));
+	}
+
+	/**
+	 * Generates an error message for a field which is part of an object bound to a form in
+	 * `create()`.
+	 *
+	 * @param string $name The name of the field for which to render an error.
+	 * @param mixed $key If more than one error is present for `$name`, a key may be specified.
+	 *              By default, the first available error is used.
+	 * @param array $options Any rendering options or HTML attributes to be used when rendering
+	 *              the error.
+	 * @return string Returns a rendered error message based on the `'error'` string template.
+	 */
+	public function error($name, $key = null, $options = array()) {
+		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+
+		if (!$this->_binding || !$content = $this->_binding->errors($name)) {
+			return null;
+		}
+		if (is_array($content) && !$key) {
+			$content = reset($content);
+		}
+		return $this->_render(__METHOD__, $template, compact('content', 'options'));
 	}
 
 	protected function _defaults($method, $name, $options) {
