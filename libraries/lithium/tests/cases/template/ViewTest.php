@@ -47,6 +47,39 @@ class ViewTest extends \lithium\test\Unit {
 		$result = $h('<p>Foo, Bar & Baz</p>');
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testBasicRenderModes() {
+		$view = new View(array('loader' => 'Simple', 'renderer' => 'Simple'));
+
+		$result = $view->render('template', array('content' => 'world'), array(
+			'template' => 'Hello {:content}!'
+		));
+		$expected = 'Hello world!';
+		$this->assertEqual($expected, $result);
+
+		$result = $view->render(array('element' => 'Logged in as: {:name}.'), array(
+			'name' => "Cap'n Crunch"
+		));
+		$expected = "Logged in as: Cap'n Crunch.";
+		$this->assertEqual($expected, $result);
+
+		$xmlHeader = '<' . '?xml version="1.0" ?' . '>' . "\n";
+		$result = $view->render('all', array('type' => 'auth', 'success' => 'true'), array(
+			'layout' => $xmlHeader . "\n{:content}\n",
+			'template' => '<{:type}>{:success}</{:type}>'
+		));
+		$expected = "{$xmlHeader}\n<auth>true</auth>\n";
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testFullRenderNoLayout() {
+		$view = new View(array('loader' => 'Simple', 'renderer' => 'Simple'));
+		$result = $view->render('all', array('type' => 'auth', 'success' => 'true'), array(
+			'template' => '<{:type}>{:success}</{:type}>'
+		));
+		$expected = '<auth>true</auth>';
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

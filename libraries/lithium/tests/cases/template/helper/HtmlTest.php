@@ -34,7 +34,8 @@ class HtmlTest extends \lithium\test\Unit {
 		Router::connect('/{:controller}/{:action}/{:id}.{:type}');
 		Router::connect('/{:controller}/{:action}.{:type}');
 
-		$this->html = new Html(array('context' => new MockHtmlRenderer()));
+		$this->context = new MockHtmlRenderer();
+		$this->html = new Html(array('context' => &$this->context));
 	}
 
 	/**
@@ -438,6 +439,30 @@ class HtmlTest extends \lithium\test\Unit {
 			)
 		);
 		$this->assertTags($result, $expected);
+	}
+
+	public function testNonInlineScriptsAndStyles() {
+		$result = trim($this->context->scripts());
+		$this->assertFalse($result);
+
+		$result = $this->html->script('application', array('inline' => false));
+		$this->assertFalse($result);
+
+		$result = $this->context->scripts();
+		$this->assertTags($result, array('script' => array(
+			'type' => 'text/javascript', 'src' => 'regex:/.*js\/application\.js/'
+		)));
+
+		$result = trim($this->context->styles());
+		$this->assertFalse($result);
+
+		$result = $this->html->style('base', array('inline' => false));
+		$this->assertFalse($result);
+
+		$result = $this->context->styles();
+		$this->assertTags($result, array('link' => array(
+			'rel' => 'stylesheet', 'type' => 'text/css', 'href' => 'regex:/.*css\/base\.css/'
+		)));
 	}
 
 	/**

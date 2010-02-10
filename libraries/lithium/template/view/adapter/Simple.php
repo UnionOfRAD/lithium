@@ -8,6 +8,7 @@
 
 namespace lithium\template\view\adapter;
 
+use \Closure;
 use \Exception;
 use \lithium\util\Set;
 use \lithium\util\String;
@@ -31,25 +32,17 @@ class Simple extends \lithium\template\view\Renderer {
 	 *
 	 * @param string $template
 	 * @param array $data
-	 * @param array $context
 	 * @param array $options
 	 * @return string
 	 */
-	public function render($template, $data = array(), $context = array(), $options = array()) {
-		foreach ($data as $key => $val) {
-			switch (true) {
-				case is_object($val):
-					try {
-						$data[$key] = (string) $val;
-					} catch (Exception $e) {
-						$data[$key] = '';
-					}
-				break;
-				case is_array($val):
-					$data = array_merge($data, Set::flatten($val));
-				break;
-			}
+	public function render($template, $data = array(), $options = array()) {
+		$context = array();
+		$this->_context = $options['context'] + $this->_context;
+
+		foreach (array_keys($this->_context) as $key) {
+			$context[$key] = $this->__get($key);
 		}
+		$data = array_merge($this->_toString($context), $this->_toString($data));
 		return String::insert($template, $data, $options);
 	}
 
@@ -62,6 +55,24 @@ class Simple extends \lithium\template\view\Renderer {
 	 */
 	public function template($type, $options) {
 		return isset($options[$type]) ? $options[$type] : '';
+	}
+
+	protected function _toString($data) {
+		foreach ($data as $key => $val) {
+			switch (true) {
+				case is_object($val) && !$val instanceof Closure:
+					try {
+						$data[$key] = (string) $val;
+					} catch (Exception $e) {
+						$data[$key] = '';
+					}
+				break;
+				case is_array($val):
+					$data = array_merge($data, Set::flatten($val));
+				break;
+			}
+		}
+		return $data;
 	}
 }
 

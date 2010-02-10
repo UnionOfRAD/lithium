@@ -63,7 +63,7 @@ class View extends \lithium\core\Object {
 	}
 
 	public function render($type, $data = array(), $options = array()) {
-		$defaults = array('context' => array(), 'type' => 'html');
+		$defaults = array('context' => array(), 'type' => 'html', 'layout' => null);
 		$options += $defaults;
 
 		if (is_array($type)) {

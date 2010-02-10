@@ -140,6 +140,9 @@ abstract class Renderer extends \lithium\core\Object {
 			'title'   => 'escape',
 			'scripts' => function($scripts) use (&$context) {
 				return "\n\t" . join("\n\t", $context['scripts']) . "\n";
+			},
+			'styles' => function($styles) use (&$context) {
+				return "\n\t" . join("\n\t", $context['styles']) . "\n";
 			}
 		);
 		unset($this->_config['view']);
