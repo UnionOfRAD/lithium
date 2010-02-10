@@ -143,10 +143,10 @@ class LibrariesTest extends \lithium\test\Unit {
 	public function testPathCaching() {
 		$this->assertFalse(Libraries::cache(false));
 		$path = Libraries::path(__CLASS__);
-		$this->assertEqual(__FILE__, $path);
+		$this->assertEqual(__FILE__, realpath($path));
 
 		$result = Libraries::cache();
-		$this->assertEqual($result[__CLASS__], __FILE__);
+		$this->assertEqual(realpath($result[__CLASS__]), __FILE__);
 	}
 
 	/**
@@ -334,7 +334,7 @@ class LibrariesTest extends \lithium\test\Unit {
 			}
 		));
 		$this->assertEqual(1, count($result));
-		$this->assertIdentical(__FILE__, $result[0]->getPathname());
+		$this->assertIdentical(__FILE__, $result[0]->getRealPath());
 	}
 
 	public function testFindingClassesWithCallableExcludes() {
@@ -351,7 +351,7 @@ class LibrariesTest extends \lithium\test\Unit {
 			}
 		));
 		$this->assertEqual(1, count($result));
-		$this->assertIdentical(__FILE__, $result[0]->getPathname());
+		$this->assertIdentical(__FILE__, $result[0]->getRealPath());
 	}
 
 	public function testFindWithOptions() {
