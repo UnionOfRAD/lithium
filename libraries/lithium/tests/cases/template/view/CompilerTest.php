@@ -8,9 +8,9 @@
 
 namespace lithium\tests\cases\template\view;
 
-use \lithium\template\view\Stream;
+use \lithium\template\view\Compiler;
 
-class StreamTest extends \lithium\test\Unit {
+class CompilerTest extends \lithium\test\Unit {
 
 	protected $_path;
 
@@ -33,23 +33,18 @@ class StreamTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
+		foreach (glob("{$this->_path}/resources/tmp/cache/templates/*.php") as $file) {
+			unlink($file);
+		}
 		unlink($this->_path . '/resources/tmp/tests/template.html.php');
 	}
 
-	public function testPathFailure() {
-		$stream = new Stream();
-		$null = null;
-		$result = $stream->stream_open(null, null, null, $null);
-		$this->assertFalse($result);
-	}
+	public function testTemplateContentRewriting() {
+		$template = Compiler::template($this->_path . '/resources/tmp/tests/template.html.php');
 
-	public function testStreamContentRewriting() {
-		$stream = new Stream();
-		$null = null;
-		$path = 'lithium.template://' . $this->_path . '/resources/tmp/tests/template.html.php';
+		$this->assertTrue(file_exists($template));
 
-		$stream->stream_open($path, null, null, $null);
-		$result = array_map('trim', explode("\n", trim($stream->stream_read(999))));
+		$result = array_map('trim', explode("\n", trim(file_get_contents($template))));
 
 		$expected = "<?php echo 'this is unescaped content'; ?" . ">";
 		$this->assertEqual($expected, $result[0]);
