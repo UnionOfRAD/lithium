@@ -421,6 +421,15 @@ class FormTest extends \lithium\test\Unit {
 			'form' => array('action' => "{$this->base}mock/radness", 'method' => 'POST')
 		));
 	}
+
+	public function testFormField() {
+		$result = $this->form->field('name');
+		$this->assertTags($result, array(
+			'div' => array(),
+			'label' => array('for' => 'name'), 'Name', '/label',
+			'input' => array('type' => 'text', 'name' => 'name'),
+		));
+	}
 }
 
 ?>
