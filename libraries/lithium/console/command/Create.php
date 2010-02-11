@@ -61,7 +61,9 @@ class Create extends \lithium\console\Command {
 			return $this->interactive();
 		}
 		$class = Libraries::locate('command.create', $command);
-		$command = new $class(array('request' => $this->request->shift(2)));
+		$command = new $class(array(
+			'request' => $this->request->shift(2), 'classes'=> $this->_classes
+		));
 
 		if (!method_exists($command, $method)) {
 			array_unshift($command->request->params['args'], $method);

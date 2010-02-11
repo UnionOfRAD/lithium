@@ -13,6 +13,17 @@ use \lithium\console\Request;
 
 class RouterTest extends \lithium\test\Unit {
 
+	protected $_backup;
+
+	public function setUp() {
+		$this->_backup = $_SERVER;
+		$_SERVER['argv'] = array();
+	}
+
+	public function tearDown() {
+		$_SERVER = $this->_backup;
+	}
+
 	public function testParseNoOptions() {
 		$expected = array(
 			'command' => null, 'action' => 'run', 'args' => array()

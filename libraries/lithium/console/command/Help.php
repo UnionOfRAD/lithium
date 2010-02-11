@@ -26,7 +26,6 @@ class Help extends \lithium\console\Command {
 	 * @return void
 	 */
 	public function run($name = null) {
-		$this->clear();
 		if (!$name) {
 			$this->nl();
 			$this->out('COMMANDS');
@@ -91,7 +90,6 @@ class Help extends \lithium\console\Command {
 	 * @return array
 	 */
 	public function api($class = null, $type = null, $name = null) {
-		$this->clear();
 		$class = str_replace(".", "\\", $class);
 
 		switch ($type) {
