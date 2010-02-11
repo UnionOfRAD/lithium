@@ -367,6 +367,12 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertTrue(array_search('model.txt.php', $result));
 		$this->assertTrue(array_search('plugin.phar.gz', $result));
 	}
+	
+	public function testLocateWithDotSyntax() {
+		$expected = 'app\controllers\PagesController';
+		$result = Libraries::locate('controllers', 'app.Pages');
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

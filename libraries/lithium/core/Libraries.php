@@ -30,7 +30,7 @@ use \lithium\util\String;
  *
  * @see lithium\core\Libraries::add()
  * @see lithium\core\Libraries::locate()
- * @see lithium\core\Libraries::$_classPaths
+ * @see lithium\core\Libraries::$_paths
  */
 class Libraries {
 
@@ -55,7 +55,7 @@ class Libraries {
 	 *
 	 * @var array
 	 */
-	protected static $_classPaths = array(
+	protected static $_paths = array(
 		'adapter' => array(
 			'{:library}\extensions\adapter\{:namespace}\{:class}\{:name}',
 			'{:library}\{:namespace}\{:class}\adapter\{:name}' => array('libraries' => 'lithium')
@@ -77,8 +77,16 @@ class Libraries {
 			'{:library}\extensions\helper\{:name}',
 			'{:library}\template\helper\{:name}' => array('libraries' => 'lithium')
 		),
+		'libraries' => array(
+			'{:app}/libraries/{:name}',
+			'{:root}/libraries/{:name}'
+		),
 		'models' => array(
 			'{:library}\models\{:name}'
+		),
+		'plugins' => array(
+			'{:app}/libraries/plugins/{:name}',
+			'{:root}/libraries/plugins/{:name}'
 		),
 		'socket' => array(
 			'{:library}\extensions\socket\{:name}',
@@ -91,22 +99,6 @@ class Libraries {
 		'tests' => array(
 			'{:library}\tests\{:namespace}\{:class}\{:name}Test'
 		)
-	);
-
-	/**
-	 * @todo Implement in add()
-	 */
-	protected static $_libraryPaths = array(
-		'{:app}/libraries/{:name}',
-		'{:root}/plugins/{:name}'
-	);
-
-	/**
-	 * @todo Implement in add()
-	 */
-	protected static $_pluginPaths = array(
-		'{:app}/libraries/plugins/{:name}',
-		'{:root}/plugins/{:name}'
 	);
 
 	/**
@@ -143,7 +135,7 @@ class Libraries {
 	 */
 	public static function add($name, $config = array()) {
 		$defaults = array(
-			'path' => LITHIUM_LIBRARY_PATH . '/' . $name,
+			'path' => null,
 			'prefix' => $name . "\\",
 			'suffix' => '.php',
 			'loader' => null,
@@ -158,6 +150,7 @@ class Libraries {
 				$defaults['bootstrap'] = 'config/switchboard.php';
 			break;
 			case 'lithium':
+				$defaults['path'] = LITHIUM_LIBRARY_PATH . '/lithium';
 				$defaults['loader'] = 'lithium\core\Libraries::load';
 				$defaults['defer'] = true;
 			break;
@@ -167,7 +160,8 @@ class Libraries {
 		}
 
 		$config = (array) $config + $defaults;
-		$config['path'] = str_replace('\\', '/', $config['path']);
+		$config['path'] = ($config['path'])
+			? str_replace('\\', '/', $config['path']) : static::locate('libraries', $name);
 		static::$_configurations[$name] = $config;
 
 		if ($config['includePath']) {
@@ -350,7 +344,7 @@ class Libraries {
 	 * If `$name` is not specified, `locate()` returns an array with all classes of the specified
 	 * type which can be found. By default, `locate()` searches all registered libraries.
 	 *
-	 * @see lithium\core\Libraries::$_classPaths
+	 * @see lithium\core\Libraries::$_paths
 	 * @see lithium\core\Libraries::add()
 	 * @param string $type
 	 * @param string $name
@@ -372,13 +366,13 @@ class Libraries {
 		$params = static::_params($type, $name);
 		extract($params);
 
-		if (!isset(static::$_classPaths[$type])) {
+		if (!isset(static::$_paths[$type])) {
 			return null;
 		}
 		if (is_null($name)) {
 			return static::_locateAll($params, $options);
 		}
-		$paths = static::$_classPaths[$type];
+		$paths = static::$_paths[$type];
 
 		if (strpos($name, '.')) {
 			list($params['library'], $params['name']) = explode('.', $name);
@@ -425,13 +419,13 @@ class Libraries {
 	 * @param boolean $defer A boolean flag indicating which libraries to search, either the ones
 	 *        with the `'defer'` flag set, or the ones without.
 	 * @param array $paths List of paths to be searched for the given service (class).  These are
-	 *        defined in `lithium\core\Libraries::$_classPaths`, and are organized by class type.
+	 *        defined in `lithium\core\Libraries::$_paths`, and are organized by class type.
 	 * @param array $params The list of insert parameters to be injected into each path format
 	 *        string when searching for classes.
 	 * @param array $options
 	 * @return string Returns a class path as a string if a given class is found, or null if no
 	 *         class in any path matching any of the parameters is located.
-	 * @see lithium\core\Libraries::$_classPaths
+	 * @see lithium\core\Libraries::$_paths
 	 * @see lithium\core\Libraries::locate()
 	 */
 	protected static function _locateDeferred($defer, $paths, $params, $options = array()) {
@@ -490,14 +484,14 @@ class Libraries {
 			}
 		);
 		$options += $defaults;
-		$classPaths = static::$_classPaths[$params['type']];
+		$paths = static::$_paths[$params['type']];
 		$libraries = $options['libraries'] ?: array_keys(static::$_configurations);
-		$paths = $classes = array();
+		$classes = array();
 
 		foreach ($libraries as $library) {
 			$config = static::$_configurations[$library];
 
-			foreach ($classPaths as $template => $tplOpts) {
+			foreach ($paths as $template => $tplOpts) {
 				if (is_int($template)) {
 					$template = $tplOpts;
 					$tplOpts = array();
@@ -597,12 +591,7 @@ class Libraries {
 			$options += $defaults;
 
 			if ($options['path'] === null) {
-				foreach (static::$_pluginPaths as $path) {
-					if (is_dir($dir = String::insert($path, compact('name') + $params))) {
-						$options['path'] = $dir;
-						break;
-					}
-				}
+				$options['path'] = static::locate('plugins', $name, $params);
 			}
 			if ($options['bootstrap'] === null) {
 				$options['bootstrap'] = file_exists($options['path'] . '/config/bootstrap.php');
