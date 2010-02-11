@@ -12,22 +12,12 @@ use \lithium\util\Set;
 
 class SetTest extends \lithium\test\Unit {
 
-	/**
-	 * testDepthWithEmptyData method
-	 *
-	 * @return void
-	 */
 	public function testDepthWithEmptyData() {
 		$data = array();
 		$result = Set::depth($data);
 		$this->assertEqual($result, 0);
 	}
 
-	/**
-	 * testDepthOneLevelWithDefaults method
-	 *
-	 * @return void
-	 */
 	public function testDepthOneLevelWithDefaults() {
 		$data = array();
 		$result = Set::depth($data);
@@ -46,11 +36,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertEqual($result, 1);
  	}
 
-	/**
-	 * testDepthTwoLevelsWithDefaults method
-	 *
-	 * @return void
-	 */
 	public function testDepthTwoLevelsWithDefaults() {
 		$data = array('1' => array('1.1' => '1.1.1'), '2', '3' => array('3.1' => '3.1.1'));
 		$result = Set::depth($data);
@@ -72,22 +57,14 @@ class SetTest extends \lithium\test\Unit {
 		$result = Set::depth($data, false, 0);
 		$this->assertEqual($result, 2);
 	}
-	/**
-	 * testDepthTwoLevelsWithDefaults method
-	 *
-	 * @return void
-	 */
+
 	public function testDepthTwoLevelsWithAll() {
 		$data = array('1' => '1.1', '2', '3' => array('3.1' => '3.1.1'));
 		$result = Set::depth($data, true);
 		$this->assertEqual($result, 2);
 	}
 
-	/**
-	 * testDepthThreeLevelsWithAll method
-	 *
-	 * @return void
-	 */
+
 	public function testDepthThreeLevelsWithAll() {
 		$data = array(
 			'1' => array('1.1' => '1.1.1'), '2', '3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
@@ -119,11 +96,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertEqual($result, 5);
 	}
 
-	/**
-	 * testDepthFourLevelsWithAll method
-	 *
-	 * @return void
-	 */
 	public function testDepthFourLevelsWithAll() {
 		$data = array('1' => array('1.1' => '1.1.1'), array(
 			'2' => array('2.1' => array('2.1.1' => '2.1.1.1'))),
@@ -133,11 +105,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertEqual($result, 4);
 	}
 
-	/**
-	 * testDepthFiveLevelsWithAll method
-	 *
-	 * @return void
-	 */
 	public function testDepthFiveLevelsWithAll() {
 
 		$data = array('1' => array('1.1' => '1.1.1'), array(
@@ -155,11 +122,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertEqual($result, 5);
 	}
 
-	/**
-	 * testFlattenOneLevel
-	 *
-	 * @return void
-	 */
 	public function testFlattenOneLevel() {
 		$data = array('Larry', 'Curly', 'Moe');
 		$result = Set::flatten($data);
@@ -170,11 +132,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertEqual($result, $data);
 	}
 
-	/**
-	 * testFlattenTwoLevels
-	 *
-	 * @return void
-	 */
 	public function testFlattenTwoLevels() {
 		$data = array(
 			array(
@@ -207,11 +164,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	/**
-	 * testFormatmethod
-	 *
-	 * @return void
-	 */
 	public function testFormat() {
 		$data = array(
 			array('Person' => array(
@@ -274,11 +226,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	/**
-	 * testMatches first, because extract and others depend on it.
-	 *
-	 * @return void
-	 */
 	public function testMatchesBasic() {
 		$a = array(
 			array('Article' => array('id' => 1, 'title' => 'Article 1')),
@@ -306,11 +253,7 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertFalse(Set::matches('/Article[id=4]', $a));
 		$this->assertTrue(Set::matches(array(), $a));
 	}
-	/**
-	 * testDeeperMatches method
-	 *
-	 * @return void
-	 */
+
 	public function testMatchesMultipleLevels() {
 		$result = array(
 			'Attachment' => array(
@@ -334,12 +277,7 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertFalse($result);
 	}
 
-	/**
-	 * testSetExtractReturnsEmptyArray method
-	 *
-	 * @return void
-	 */
-	public function testSetExtractReturnsEmptyArray() {
+	public function testExtractReturnsEmptyArray() {
 		$expected = array();
 		$result = Set::extract(array(), '/Post/id');
 		$this->assertIdentical($expected, $result);
@@ -357,11 +295,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertIdentical($expected, $result);
 	}
 
-	/**
-	 * testNumericKeyExtraction method
-	 *
-	 * @return void
-	 */
 	public function testExtractionOfNotNull() {
 		$data = array(
 			'plugin' => null, 'admin' => false, 'controller' => 'posts',
@@ -373,12 +306,7 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertIdentical($expected, $result);
 	}
 
-	/**
-	 * testNumericKeyExtraction method
-	 *
-	 * @return void
-	 */
-	public function testNumericKeyExtraction() {
+	public function testExtractOfNumericKeys() {
 		$data = array(1, 'whatever');
 
 		$expected = array(1, 'whatever');
@@ -386,11 +314,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertIdentical($expected, $result);
 	}
 
-	/**
-	 * testExtract method
-	 *
-	 * @return void
-	 */
 	public function testExtract() {
 		$a = array(
 			array(
@@ -863,12 +786,7 @@ class SetTest extends \lithium\test\Unit {
 
 	}
 
-	/**
-	 * testNumericArrayCheck method
-	 *
-	 * @return void
-	 */
-	public function testNumericArrayCheck() {
+	public function testIsNumericArrayCheck() {
 		$data = array('one');
 		$this->assertTrue(Set::isNumeric(array_keys($data)));
 
@@ -900,12 +818,7 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertFalse(Set::isNumeric(array_keys($data)));
 	}
 
-	/**
-	 * testKeyCheck method
-	 *
-	 * @return void
-	 */
-	public function testKeyCheck() {
+	public function testCheckKeys() {
 		$data = array('Multi' => array('dimensonal' => array('array')));
 		$this->assertTrue(Set::check($data, 'Multi.dimensonal'));
 		$this->assertFalse(Set::check($data, 'Multi.dimensonal.array'));
@@ -971,11 +884,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertFalse(Set::check($data, '0.Article.user_id.a'));
 	}
 
-	/**
-	 * testMerge method
-	 *
-	 * @return void
-	 */
 	public function testMerge() {
 		$result = Set::merge(array('foo'));
 		$this->assertIdentical($result, array('foo'));
@@ -1071,12 +979,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertIdentical(Set::normalize(Set::merge($a, $b)), $expected);
 	}
 
-
-	/**
-	 * testSort depends on extract
-	 *
-	 * @return void
-	 */
 	public function testSort() {
 		$a = array(
 			array('Person' => array('name' => 'Jeff'), 'Friend' => array(array('name' => 'Nate'))),
@@ -1134,11 +1036,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertIdentical($a, $b);
 	}
 
-	/**
-	 * testInsert method
-	 *
-	 * @return void
-	 */
 	public function testInsert() {
 		$a = array('pages' => array('name' => 'page'));
 
@@ -1163,11 +1060,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertIdentical($expected, $result);
 	}
 
-	/**
-	 * testRemove method
-	 *
-	 * @return void
-	 */
 	public function testRemove() {
 		$a = array('pages' => array('name' => 'page'), 'files' => array('name' => 'files'));
 
@@ -1191,11 +1083,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertIdentical($expected, $result);
 	}
 
-	/**
-	 * testCheck method
-	 *
-	 * @return void
-	 */
 	public function testCheck() {
 		$set = array(
 			'My Index 1' => array('First' => 'The first item')
@@ -1213,12 +1100,7 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertFalse(Set::check($set, 'My Index 1.First.Seconds.Third.Fourth'));
 	}
 
-	/**
-	 * testWritingWithFunkyKeys method
-	 *
-	 * @return void
-	 */
-	public function testWritingWithFunkyKeys() {
+	public function testInsertAndRemoveWithFunkyKeys() {
 		$set = Set::insert(array(), 'Session Test', "test");
 		$result = Set::extract($set, '/Session Test');
 		$this->assertEqual($result, array('test'));
@@ -1230,11 +1112,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertTrue(Set::check($set, 'Session Test.Test Case'));
 	}
 
-	/**
-	 * testDiff method
-	 *
-	 * @return void
-	 */
 	public function testDiff() {
 		$a = array(array('name' => 'main'), array('name' => 'about'));
 		$b = array(array('name' => 'main'), array('name' => 'about'), array('name' => 'contact'));
@@ -1258,11 +1135,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertIdentical($expected, $result);
 	}
 
-	/**
-	 * testContains method
-	 *
-	 * @return void
-	 */
 	public function testContains() {
 		$a = array(
 			0 => array('name' => 'main'),
@@ -1279,11 +1151,7 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertFalse(Set::contains($a, $b));
 		$this->assertTrue(Set::contains($b, $a));
 	}
-	/**
-	 * testCombine method
-	 *
-	 * @return void
-	 */
+
 	public function testCombine() {
 		$result = Set::combine(array(), '/User/id', '/User/Data');
 		$this->assertFalse($result);
@@ -1415,16 +1283,12 @@ class SetTest extends \lithium\test\Unit {
 		$expected = array(2 => null, 14 => null, 25 => null);
 		$this->assertIdentical($expected, $result);
 	}
-	/**
-	 * testMapReverse method
-	 *
-	 * @return void
-	 */
+
 	public function testMapReverse() {
-		$result = Set::reverse(null);
+		$result = Set::toArray(null);
 		$this->assertEqual($result, null);
 
-		$result = Set::reverse(false);
+		$result = Set::toArray(false);
 		$this->assertEqual($result, false);
 
 		$expected = array(
@@ -1476,11 +1340,11 @@ class SetTest extends \lithium\test\Unit {
 				)
 			)
 		);
-		$map = Set::map($expected, true);
+		$map = Set::toObject($expected, true);
 		$this->assertEqual($map->Array1->Array1Data1, $expected['Array1']['Array1Data1']);
 		$this->assertEqual($map->Array2[0]->Array2Data1, $expected['Array2'][0]['Array2Data1']);
 
-		$result = Set::reverse($map);
+		$result = Set::toArray($map);
 		$this->assertEqual($expected, $result);
 
 		$expected = array(
@@ -1494,7 +1358,7 @@ class SetTest extends \lithium\test\Unit {
 				array('id'=> 2, 'title' => 'Second Tag')
 			),
 		);
-		$map = Set::map($expected);
+		$map = Set::toObject($expected);
 		$this->assertIdentical($map->title, $expected['Post']['title']);
 		foreach ($map->Comment as $comment) {
 			$ids[] = $comment->id;
@@ -1556,8 +1420,8 @@ class SetTest extends \lithium\test\Unit {
 				)
 			)
 		);
-		$map = Set::map($expected, true);
-		$result = Set::reverse($map);
+		$map = Set::toObject($expected, true);
+		$result = Set::toArray($map);
 		$this->assertIdentical($expected, $result);
 
 		$expected = array(
@@ -1621,13 +1485,13 @@ class SetTest extends \lithium\test\Unit {
 			'another3' => 'string',
 			'some3' => 'thing else'
 		);
-		$map = Set::map($expected, true);
-		$result = Set::reverse($map);
+		$map = Set::toObject($expected, true);
+		$result = Set::toArray($map);
 		$this->assertIdentical($expected, $result);
 
 		$expected = array('User' => array('psword'=> 'whatever', 'Icon' => array('id' => 851)));
-		$map = Set::map($expected);
-		$result = Set::reverse($map);
+		$map = Set::toObject($expected);
+		$result = Set::toArray($map);
 		$this->assertIdentical($expected, $result);
 
 		$expected = array('User' => array('psword'=> 'whatever', 'Icon' => array('id' => 851)));
@@ -1636,7 +1500,7 @@ class SetTest extends \lithium\test\Unit {
 		$class->User->psword = 'whatever';
 		$class->User->Icon = new \stdClass;
 		$class->User->Icon->id = 851;
-		$result = Set::reverse($class);
+		$result = Set::toArray($class);
 		$this->assertIdentical($expected, $result);
 
 		$expected = array(
@@ -1654,7 +1518,7 @@ class SetTest extends \lithium\test\Unit {
 		$class->User->Profile->name = 'Some Name';
 		$class->User->Profile->address = 'Some Address';
 
-		$result = Set::reverse($class);
+		$result = Set::toArray($class);
 		$this->assertIdentical($expected, $result);
 
 		$expected = array('User' => array(
@@ -1701,7 +1565,7 @@ class SetTest extends \lithium\test\Unit {
 		$class->User->Comment->{'1'}->created = '2007-03-18 10:47:23';
 		$class->User->Comment->{'1'}->updated = '2007-03-18 10:49:31';
 
-		$result = Set::reverse($class);
+		$result = Set::toArray($class);
 		$this->assertIdentical($expected, $result);
 
 		$expected = array('User' => array(
@@ -1748,7 +1612,7 @@ class SetTest extends \lithium\test\Unit {
 		$comment2->created = '2007-03-18 10:47:23';
 		$comment2->updated = '2007-03-18 10:49:31';
 		$class->User->Comment =  array($comment, $comment2);
-		$result = Set::reverse($class);
+		$result = Set::toArray($class);
 		$this->assertIdentical($expected, $result);
 
 		$class = new \stdClass;
@@ -1758,7 +1622,7 @@ class SetTest extends \lithium\test\Unit {
 		$class->Profile = new \stdClass;
 		$class->Profile->name = 'Joe Mamma';
 
-		$result = Set::reverse($class);
+		$result = Set::toArray($class);
 		$expected = array(
 			'User' => array('id' => '100'),
 			'someString' => 'this is some string',
@@ -1774,7 +1638,7 @@ class SetTest extends \lithium\test\Unit {
 		$class->Profile->name = 'Joe Mamma';
 		$class->Profile->_name_ = 'Profile';
 
-		$result = Set::reverse($class);
+		$result = Set::toArray($class);
 		$expected = array(
 			'User' => array('id' => '100'),
 			'Profile' => array('name' => 'Joe Mamma')
@@ -1782,11 +1646,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	/**
-	 * testMapNesting method
-	 *
-	 * @return void
-	 */
 	public function testMapNesting() {
 		$expected = array(
 			array(
@@ -1845,7 +1704,7 @@ class SetTest extends \lithium\test\Unit {
 			)
 		);
 
-		$mapped = Set::map($expected);
+		$mapped = Set::toObject($expected);
 		$ids = array();
 
 		foreach ($mapped as $object)	 {
@@ -1857,7 +1716,7 @@ class SetTest extends \lithium\test\Unit {
 			$expected[0]['IndexedPage']['headers']
 		);
 
-		$result = Set::reverse($mapped);
+		$result = Set::toArray($mapped);
 		$this->assertIdentical($expected, $result);
 
 		$data = array(
@@ -1884,7 +1743,7 @@ class SetTest extends \lithium\test\Unit {
 				),
 			)
 		);
-		$mapped = Set::map($data);
+		$mapped = Set::toObject($data);
 
 		$expected = new \stdClass();
 		$expected->_name_ = 'IndexedPage';
@@ -1904,17 +1763,13 @@ class SetTest extends \lithium\test\Unit {
 		}
 		$this->assertEqual($ids, array(1, 2));
 
-		$result = Set::map(null);
+		$result = Set::toObject(null);
 		$expected = null;
 		$this->assertEqual($expected, $result);
 	}
-	/**
-	 * testNestedMappedData method
-	 *
-	 * @return void
-	 */
+
 	public function testNestedMappedData() {
-		$result = Set::map(array(
+		$result = Set::toObject(array(
 			array(
 				'Post' => array(
 					'id' => '1', 'author_id' => '1', 'title' => 'First Post',
@@ -1991,7 +1846,7 @@ class SetTest extends \lithium\test\Unit {
 
 		$this->assertEqual($test, $result);
 
-		$result = Set::map(
+		$result = Set::toObject(
 			array(
 				'Post' => array(
 					'id' => '1', 'author_id' => '1', 'title' => 'First Post',
@@ -2063,7 +1918,7 @@ class SetTest extends \lithium\test\Unit {
 			)
 		);
 
-		$result = Set::map($data);
+		$result = Set::toObject($data);
 
 		$expected = new \stdClass();
 		$expected->_name_ = 'User';
@@ -2148,7 +2003,7 @@ class SetTest extends \lithium\test\Unit {
 			)
 		);
 
-		$result = Set::map($data);
+		$result = Set::toObject($data);
 
 		$expected = new \stdClass();
 		$expected->_name_ = 'FooUser';
@@ -2187,12 +2042,8 @@ class SetTest extends \lithium\test\Unit {
 
 		$this->assertEqual($expected, $result);
 	}
-	/**
-	 * testPushDiff method
-	 *
-	 * @return void
-	 */
-	public function testPushDiff() {
+
+	public function testBlend() {
 		$array1 = array('ModelOne' => array(
 			'id' => 1001, 'field_one' => 'a1.m1.f1', 'field_two' => 'a1.m1.f2'
 		));
@@ -2200,7 +2051,7 @@ class SetTest extends \lithium\test\Unit {
 			'id' => 1002, 'field_one' => 'a2.m2.f1', 'field_two' => 'a2.m2.f2'
 		));
 
-		$result = Set::pushDiff($array1, $array2);
+		$result = Set::blend($array1, $array2);
 
 		$this->assertIdentical($result, $array1 + $array2);
 
@@ -2208,7 +2059,7 @@ class SetTest extends \lithium\test\Unit {
 			'id' => 1003, 'field_one' => 'a3.m1.f1',
 			'field_two' => 'a3.m1.f2', 'field_three' => 'a3.m1.f3'
 		));
-		$result = Set::pushDiff($array1, $array3);
+		$result = Set::blend($array1, $array3);
 
 		$expected = array('ModelOne' => array(
 			'id' => 1001, 'field_one' => 'a1.m1.f1',
@@ -2234,14 +2085,14 @@ class SetTest extends \lithium\test\Unit {
 			))
 		);
 
-		$result = Set::pushDiff($array1, $array2);
+		$result = Set::blend($array1, $array2);
 		$this->assertIdentical($result, $array1);
 
 		$array3 = array(array('ModelThree' => array(
 			'id' => 1003, 'field_one' => 's3.0.m3.f1', 'field_two' => 's3.0.m3.f2'
 		)));
 
-		$result = Set::pushDiff($array1, $array3);
+		$result = Set::blend($array1, $array3);
 		$expected = array(
 			array(
 				'ModelOne' => array(
@@ -2257,28 +2108,18 @@ class SetTest extends \lithium\test\Unit {
 		);
 		$this->assertIdentical($expected, $result);
 
-		$result = Set::pushDiff($array1, null);
+		$result = Set::blend($array1, null);
 		$this->assertIdentical($result, $array1);
 
-		$result = Set::pushDiff($array1, $array2);
+		$result = Set::blend($array1, $array2);
 		$this->assertIdentical($result, $array1 + $array2);
 	}
 
-	/**
-	 * testStrictKeyCheck method
-	 *
-	 * @return void
-	 */
 	public function testStrictKeyCheck() {
 		$set = array('a' => 'hi');
 		$this->assertFalse(Set::check($set, 'a.b'));
 	}
 
-	/**
-	 * Tests list normalization where the input array's keys are mixed between strings and integers.
-	 *
-	 * @return void
-	 */
 	public function testMixedKeyNormalization() {
 		$input = array('"string"' => array('before' => '=>'), 1 => array('before' => '=>'));
 		$result = Set::normalize($input);

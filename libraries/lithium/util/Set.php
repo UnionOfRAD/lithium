@@ -30,6 +30,29 @@ namespace lithium\util;
 class Set {
 
 	/**
+	 * Add the keys/values in `$array2` that are not found in `$array` onto the end of `$array`.
+	 *
+	 * @param mixed $array Original array.
+	 * @param mixed $array2 Second array to add onto the Original.
+	 * @return array A Blended array of keys and values.
+	 */
+	public static function blend($array, $array2) {
+		if (empty($array) && !empty($array2)) {
+			return $array2;
+		}
+		if (!empty($array) && !empty($array2)) {
+			foreach ($array2 as $key => $value) {
+				if (!isset($array[$key])) {
+					$array[$key] = $value;
+				} elseif (is_array($value)) {
+					$array[$key] = static::blend($array[$key], $array2[$key]);
+				}
+			}
+		}
+		return $array;
+	}
+
+	/**
 	 * Checks if a particular path is set in an array
 	 *
 	 * @param mixed $data Data to check on.
@@ -43,7 +66,6 @@ class Set {
 		if (!is_array($path)) {
 			$path = explode('.', $path);
 		}
-
 		foreach ($path as $i => $key) {
 			if (is_numeric($key) && intval($key) > 0 || $key === '0') {
 				$key = intval($key);
@@ -55,6 +77,84 @@ class Set {
 					return false;
 				}
 				$data =& $data[$key];
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Creates an associative array using a `$path1` as the path to build its keys, and optionally
+	 * `$path2` as path to get the values. If `$path2` is not specified, all values will be
+	 * initialized to `null` (useful for `Set::merge()`). You can optionally group the values by
+	 * what is obtained when following the path specified in `$groupPath`.
+	 *
+	 * @param array $data Array from where to extract keys and values.
+	 * @param mixed $path1 As an array, or as a dot-delimited string.
+	 * @param mixed $path2 As an array, or as a dot-delimited string.
+	 * @param string $groupPath As an array, or as a dot-delimited string.
+	 * @return array Combined array.
+	 */
+	public static function combine($data, $path1 = null, $path2 = null, $groupPath = null) {
+		if (empty($data)) {
+			return array();
+		}
+		if (is_object($data)) {
+			$data = get_object_vars($data);
+		}
+		if (is_array($path1)) {
+			$format = array_shift($path1);
+			$keys = static::format($data, $format, $path1);
+		} else {
+			$keys = static::extract($data, $path1);
+		}
+		$vals = array();
+		if (!empty($path2) && is_array($path2)) {
+			$format = array_shift($path2);
+			$vals = static::format($data, $format, $path2);
+		} elseif (!empty($path2)) {
+			$vals = static::extract($data, $path2);
+		}
+		$valCount = count($vals);
+		$count = count($keys);
+
+		for ($i = $valCount; $i < $count; $i++) {
+			$vals[$i] = null;
+		}
+		if ($groupPath != null) {
+			$group = static::extract($data, $groupPath);
+			if (!empty($group)) {
+				$c = count($keys);
+				for ($i = 0; $i < $c; $i++) {
+					if (!isset($group[$i])) {
+						$group[$i] = 0;
+					}
+					if (!isset($out[$group[$i]])) {
+						$out[$group[$i]] = array();
+					}
+					$out[$group[$i]][$keys[$i]] = $vals[$i];
+				}
+				return $out;
+			}
+		}
+		return array_combine($keys, $vals);
+	}
+
+	/**
+	 * Determines if `val2` is contained in `val1`
+	 *
+	 * @param array $val1 First value.
+	 * @param array $val2 Second value.
+	 * @return boolean true if `$val1` contains `$val2`, `false` otherwise.
+	 */
+	public static function contains($val1, $val2) {
+		if (empty($val1) || empty($val2)) {
+			return false;
+		}
+		foreach ((array) $val2 as $key => $val) {
+			if (is_numeric($key)) {
+				static::contains($val, $val1);
+			} elseif (!isset($val1[$key]) || $val1[$key] != $val) {
+				return false;
 			}
 		}
 		return true;
@@ -78,6 +178,7 @@ class Set {
 		}
 		$defaults = array('all' => false, 'count' => 0);
 		$options += $defaults;
+
 		if (!empty($options['all'])) {
 			$depth = array($options['count']);
 			if (is_array($data) && reset($data) !== false) {
@@ -97,316 +198,37 @@ class Set {
 	}
 
 	/**
-	 * Collapses a multi-dimensional array into a single dimension, using a delimited array path
-	 * for each array element's key, i.e. array(array('Foo' => array('Bar' => 'Far'))) becomes
-	 * array('0.Foo.Bar' => 'Far').
+	 * Computes the difference between two arrays.
 	 *
-	 * @param array $data array to flatten
-	 * @param array $options Available options are:
-	 *              - `'separator'`: String to separate array keys in path (defaults to `'.'`).
-	 *              - `'path'`: Starting point (defaults to null).
-	 * @return array
+	 * @param mixed $val1 First value.
+	 * @param mixed $val2 Second value.
+	 * @return array Computed difference.
 	 */
-	public static function flatten($data, $options = array()) {
-		$result = array();
-
-		if (!is_array($options)) {
-			$options = array('separator' => $options);
-		}
-
-		$defaults = array('separator' => '.', 'path' => null);
-		$options += $defaults;
-
-		if (!is_null($options['path'])) {
-			$options['path'] .= $options['separator'];
-		}
-
-		foreach ($data as $key => $val) {
-			if (is_array($val)) {
-				$result += (array) static::flatten($val, array(
-					'separator' => $options['separator'],
-					'path' => $options['path'] . $key
-				));
-			} else {
-				$result[$options['path'] . $key] = $val;
-			}
-		}
-		return $result;
-	}
-
-	/**
-	 * Returns a series of values extracted from an array, formatted in a format string.
-	 *
-	 * @param array $data Source array from which to extract the data.
-	 * @param string $format Format string into which values will be inserted using `sprintf()`.
-	 * @param array $keys An array containing one or more `Set::extract()`-style key paths.
-	 * @return array An array of strings extracted from `$keys` and formatted with `$format`.
-	 * @link http://php.net/sprintf
-	 */
-	public static function format($data, $format, $keys) {
-
-		$extracted = array();
-		$count = count($keys);
-
-		if (!$count) {
-			return;
-		}
-
-		for ($i = 0; $i < $count; $i++) {
-			$extracted[] = static::extract($data, $keys[$i]);
+	public static function diff($val1, $val2 = null) {
+		if (empty($val1)) {
+			return (array) $val2;
+		} elseif (empty($val2)) {
+			return (array) $val1;
 		}
 		$out = array();
-		$data = $extracted;
-		$count = count($data[0]);
 
-		if (preg_match_all('/\{([0-9]+)\}/msi', $format, $keys2) && isset($keys2[1])) {
-			$keys = $keys2[1];
-			$format = preg_split('/\{([0-9]+)\}/msi', $format);
-			$count2 = count($format);
+		foreach ($val1 as $key => $val) {
+			$exists = isset($val2[$key]);
 
-			for ($j = 0; $j < $count; $j++) {
-				$formatted = '';
-				for ($i = 0; $i <= $count2; $i++) {
-					if (isset($format[$i])) {
-						$formatted .= $format[$i];
-					}
-					if (isset($keys[$i]) && isset($data[$keys[$i]][$j])) {
-						$formatted .= $data[$keys[$i]][$j];
-					}
-				}
-				$out[] = $formatted;
+			if ($exists && $val2[$key] != $val) {
+				$out[$key] = $val;
+			} elseif (!$exists) {
+				$out[$key] = $val;
 			}
-		} else {
-			$count2 = count($data);
-			for ($j = 0; $j < $count; $j++) {
-				$args = array();
-				for ($i = 0; $i < $count2; $i++) {
-					if (isset($data[$i][$j])) {
-						$args[] = $data[$i][$j];
-					}
-				}
-				$out[] = vsprintf($format, $args);
+			unset($val2[$key]);
+		}
+
+		foreach ($val2 as $key => $val) {
+			if (!isset($out[$key])) {
+				$out[$key] = $val;
 			}
 		}
 		return $out;
-	}
-
-	/**
-	 * Checks to see if all the values in the array are numeric.
-	 *
-	 * @param array $array The array to check.  If null, the value of the current Set object.
-	 * @return boolean `true` if values are numeric, `false` otherwise.
-	 */
-	public static function isNumeric($array = null) {
-		if (empty($array)) {
-			return null;
-		}
-
-		if ($array === range(0, count($array) - 1)) {
-			return true;
-		}
-
-		$numeric = true;
-		$keys = array_keys($array);
-		$count = count($keys);
-
-		for ($i = 0; $i < $count; $i++) {
-			if (!is_numeric($array[$keys[$i]])) {
-				$numeric = false;
-				break;
-			}
-		}
-		return $numeric;
-	}
-
-	/**
-	 * This function can be used to see if a single item or a given XPath
-	 * match certain conditions.
-	 *
-	 * @param mixed $conditions An array of condition strings or an XPath expression.
-	 * @param array $data An array of data to execute the match on.
-	 * @param integer $i Optional: The 'nth'-number of the item being matched.
-	 * @param integer $length
-	 * @return boolean
-	 */
-	public static function matches($conditions, $data = array(), $i = null, $length = null) {
-		if (empty($conditions)) {
-			return true;
-		}
-		if (is_string($conditions) || is_string($data)) {
-			return !!static::extract($data, $conditions);
-		}
-		foreach ($conditions as $condition) {
-			if ($condition === ':last') {
-				if ($i != $length) {
-					return false;
-				}
-				continue;
-			} elseif ($condition === ':first') {
-				if ($i != 1) {
-					return false;
-				}
-				continue;
-			}
-			if (!preg_match('/(.+?)([><!]?[=]|[><])(.*)/', $condition, $match)) {
-				if (ctype_digit($condition)) {
-					if ($i != $condition) {
-						return false;
-					}
-				} elseif (preg_match_all('/(?:^[0-9]+|(?<=,)[0-9]+)/', $condition, $matches)) {
-					return in_array($i, $matches[0]);
-				} elseif (!isset($data[$condition])) {
-					return false;
-				}
-				continue;
-			}
-
-			list(,$key,$op,$expected) = $match;
-			if (!isset($data[$key])) {
-				return false;
-			}
-			$val = $data[$key];
-
-			if ($op === '=' && $expected && $expected{0} === '/') {
-				return preg_match($expected, $val);
-			} elseif ($op === '=' &&  $val != $expected) {
-				return false;
-			} elseif ($op === '!=' && $val == $expected) {
-				return false;
-			} elseif ($op === '>' && $val <= $expected) {
-				return false;
-			} elseif ($op === '<' && $val >= $expected) {
-				return false;
-			} elseif ($op === '<=' && $val > $expected) {
-				return false;
-			} elseif ($op === '>=' && $val < $expected) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Maps the contents of the Set object to an object hierarchy.  Maintains numeric
-	 * keys as arrays of objects.
-	 *
-	 * @param array $data The array.
-	 * @param string $class A class name of the type of object to map to.
-	 * @param boolean $name whether the _name_ should be filled.
-	 * @return object Hierarchical object.
-	 */
-	public static function map($data, $class = 'stdClass', $name = false) {
-		if (empty($data)) {
-			return $data;
-		}
-		if ($class === true) {
-			$out = new \stdClass;
-		} else {
-			$out = new $class;
-		}
-
-		if (is_array($data)) {
-			$keys = array_keys($data);
-			foreach ($data as $key => $value) {
-				if ($keys[0] === $key && $class !== true) {
-					$name = true;
-				}
-				if (is_numeric($key)) {
-					if (is_object($out)) {
-						$out = get_object_vars($out);
-					}
-					$out[$key] = static::map($value, $class);
-					$isNamed = (
-						is_object($out[$key]) && !isset($out[$key]->_name_) &&
-						$name !== true && static::depth($value, true) >= 2
-					);
-					if ($isNamed) {
-						$out[$key]->_name_ = $name;
-					}
-				} elseif (is_array($value)) {
-					if ($name === true) {
-						$out->_name_ = $key;
-						$name = false;
-						foreach ($value as $key2 => $value2) {
-							$out->{$key2} = static::map($value2, true);
-						}
-					} else {
-						if (!is_numeric($key)) {
-							$out->{$key} = static::map($value, true, $key);
-							if (is_object($out->{$key}) && !isset($out->{$key}->_name_)) {
-								$out->{$key}->_name_ = $key;
-							}
-						} else {
-							$out->{$key} = static::map($value, true);
-						}
-					}
-				} else {
-					$out->{$key} = $value;
-				}
-			}
-		} else {
-			$out = $data;
-		}
-		return $out;
-	}
-
-	/**
-	 * This function can be thought of as a hybrid between PHP's `array_merge()`
-	 * and `array_merge_recursive()`.  The difference to the two is that if an
-	 * array key contains another array then the function behaves recursive
-	 * (unlike `array_merge()`) but does not do if for keys containing strings
-	 * (unlike `array_merge_recursive()`).  Please note: This function will work
-	 * with an unlimited amount of arguments and typecasts non-array parameters
-	 * into arrays.
-	 *
-	 * @param array $arr1 Array to be merged.
-	 * @param array $arr2 Array to merge with.
-	 * @return array Merged array.
-	 */
-	public static function merge($arr1, $arr2 = null) {
-		$args = func_get_args();
-
-		if (!isset($result)) {
-			$result = (array) current($args);
-		}
-
-		while (($arg = next($args)) !== false) {
-			foreach ((array) $arg as $key => $val) {
-				if (is_array($val) && isset($result[$key]) && is_array($result[$key])) {
-					$result[$key] = static::merge($result[$key], $val);
-				} elseif (is_int($key)) {
-					$result[] = $val;
-				} else {
-					$result[$key] = $val;
-				}
-			}
-		}
-		return $result;
-	}
-
-	/**
-	 * Pushes the differences in `$array2` onto the end of `$array`.
-	 *
-	 * @param mixed $array Original array.
-	 * @param mixed $array2 Differences to push.
-	 * @return array Combined array.
-	 */
-	public static function pushDiff($array, $array2) {
-		if (empty($array) && !empty($array2)) {
-			return $array2;
-		}
-		if (!empty($array) && !empty($array2)) {
-			foreach ($array2 as $key => $value) {
-				if (!isset($array[$key])) {
-					$array[$key] = $value;
-				} else {
-					if (is_array($value)) {
-						$array[$key] = static::pushDiff($array[$key], $array2[$key]);
-					}
-				}
-			}
-		}
-		return $array;
 	}
 
 	/**
@@ -436,20 +258,17 @@ class Set {
 		if (empty($data)) {
 			return array();
 		}
-
 		if (is_string($data)) {
 			$tmp = $path;
 			$path = $data;
 			$data = $tmp;
 			unset($tmp);
 		}
-
 		if ($path === '/') {
 			return array_filter($data, function($data) {
 				return ($data === 0 || $data === '0' || !empty($data));
 			});
 		}
-
 		$contexts = $data;
 		$options = array_merge(array('flatten' => true), $options);
 
@@ -573,6 +392,97 @@ class Set {
 	}
 
 	/**
+	 * Collapses a multi-dimensional array into a single dimension, using a delimited array path
+	 * for each array element's key, i.e. array(array('Foo' => array('Bar' => 'Far'))) becomes
+	 * array('0.Foo.Bar' => 'Far').
+	 *
+	 * @param array $data array to flatten
+	 * @param array $options Available options are:
+	 *              - `'separator'`: String to separate array keys in path (defaults to `'.'`).
+	 *              - `'path'`: Starting point (defaults to null).
+	 * @return array
+	 */
+	public static function flatten($data, $options = array()) {
+		$result = array();
+
+		if (!is_array($options)) {
+			$options = array('separator' => $options);
+		}
+		$defaults = array('separator' => '.', 'path' => null);
+		$options += $defaults;
+
+		if (!is_null($options['path'])) {
+			$options['path'] .= $options['separator'];
+		}
+		foreach ($data as $key => $val) {
+			if (is_array($val)) {
+				$result += (array) static::flatten($val, array(
+					'separator' => $options['separator'],
+					'path' => $options['path'] . $key
+				));
+			} else {
+				$result[$options['path'] . $key] = $val;
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * Returns a series of values extracted from an array, formatted in a format string.
+	 *
+	 * @param array $data Source array from which to extract the data.
+	 * @param string $format Format string into which values will be inserted using `sprintf()`.
+	 * @param array $keys An array containing one or more `Set::extract()`-style key paths.
+	 * @return array An array of strings extracted from `$keys` and formatted with `$format`.
+	 * @link http://php.net/sprintf
+	 */
+	public static function format($data, $format, $keys) {
+		$extracted = array();
+		$count = count($keys);
+
+		if (!$count) {
+			return;
+		}
+		for ($i = 0; $i < $count; $i++) {
+			$extracted[] = static::extract($data, $keys[$i]);
+		}
+		$out = array();
+		$data = $extracted;
+		$count = count($data[0]);
+
+		if (preg_match_all('/\{([0-9]+)\}/msi', $format, $keys2) && isset($keys2[1])) {
+			$keys = $keys2[1];
+			$format = preg_split('/\{([0-9]+)\}/msi', $format);
+			$count2 = count($format);
+
+			for ($j = 0; $j < $count; $j++) {
+				$formatted = '';
+				for ($i = 0; $i <= $count2; $i++) {
+					if (isset($format[$i])) {
+						$formatted .= $format[$i];
+					}
+					if (isset($keys[$i]) && isset($data[$keys[$i]][$j])) {
+						$formatted .= $data[$keys[$i]][$j];
+					}
+				}
+				$out[] = $formatted;
+			}
+		} else {
+			$count2 = count($data);
+			for ($j = 0; $j < $count; $j++) {
+				$args = array();
+				for ($i = 0; $i < $count2; $i++) {
+					if (isset($data[$i][$j])) {
+						$args[] = $data[$i][$j];
+					}
+				}
+				$out[] = vsprintf($format, $args);
+			}
+		}
+		return $out;
+	}
+
+	/**
 	 * Inserts `$data` into an array as defined by `$path`.
 	 *
 	 * @param mixed $list Where to insert into.
@@ -603,93 +513,129 @@ class Set {
 	}
 
 	/**
-	 * Removes an element from an array as defined by `$path`.
+	 * Checks to see if all the values in the array are numeric.
 	 *
-	 * @param mixed $list From where to remove.
-	 * @param mixed $path A dot-delimited string.
-	 * @return array Array with `$path` removed from its value.
+	 * @param array $array The array to check.  If null, the value of the current Set object.
+	 * @return boolean `true` if values are numeric, `false` otherwise.
 	 */
-	public static function remove($list, $path = null) {
-		if (empty($path)) {
-			return $list;
+	public static function isNumeric($array = null) {
+		if (empty($array)) {
+			return null;
 		}
-		if (!is_array($path)) {
-			$path = explode('.', $path);
+		if ($array === range(0, count($array) - 1)) {
+			return true;
 		}
-		$_list =& $list;
+		$numeric = true;
+		$keys = array_keys($array);
+		$count = count($keys);
 
-		foreach ($path as $i => $key) {
-			if (is_numeric($key) && intval($key) > 0 || $key === '0') {
-				$key = intval($key);
-			}
-			if ($i === count($path) - 1) {
-				unset($_list[$key]);
-			} else {
-				if (!isset($_list[$key])) {
-					return $list;
-				}
-				$_list =& $_list[$key];
+		for ($i = 0; $i < $count; $i++) {
+			if (!is_numeric($array[$keys[$i]])) {
+				$numeric = false;
+				break;
 			}
 		}
-		return $list;
+		return $numeric;
 	}
 
 	/**
-	 * Computes the difference between two arrays.
+	 * This function can be used to see if a single item or a given XPath
+	 * match certain conditions.
 	 *
-	 * @param mixed $val1 First value.
-	 * @param mixed $val2 Second value.
-	 * @return array Computed difference.
+	 * @param mixed $conditions An array of condition strings or an XPath expression.
+	 * @param array $data An array of data to execute the match on.
+	 * @param integer $i Optional: The 'nth'-number of the item being matched.
+	 * @param integer $length
+	 * @return boolean
 	 */
-	public static function diff($val1, $val2 = null) {
-		if (empty($val1)) {
-			return (array) $val2;
-		} elseif (empty($val2)) {
-			return (array) $val1;
+	public static function matches($conditions, $data = array(), $i = null, $length = null) {
+		if (empty($conditions)) {
+			return true;
 		}
-		$out = array();
-
-		foreach ($val1 as $key => $val) {
-			$exists = isset($val2[$key]);
-
-			if ($exists && $val2[$key] != $val) {
-				$out[$key] = $val;
-			} elseif (!$exists) {
-				$out[$key] = $val;
-			}
-			unset($val2[$key]);
+		if (is_string($conditions) || is_string($data)) {
+			return !!static::extract($data, $conditions);
 		}
-
-		foreach ($val2 as $key => $val) {
-			if (!isset($out[$key])) {
-				$out[$key] = $val;
-			}
-		}
-		return $out;
-	}
-
-	/**
-	 * Determines if one array contains the exact keys and values of another.
-	 *
-	 * @param array $val1 First value.
-	 * @param array $val2 Second value.
-	 * @return boolean true if `$val1` contains `$val2`, `false` otherwise.
-	 */
-	public static function contains($val1, $val2 = null) {
-		if (empty($val1) || empty($val2)) {
-			return false;
-		}
-
-		foreach ($val2 as $key => $val) {
-			if (is_numeric($key)) {
-				static::contains($val, $val1);
-			} else {
-				if (!isset($val1[$key]) || $val1[$key] != $val) {
+		foreach ($conditions as $condition) {
+			if ($condition === ':last') {
+				if ($i != $length) {
 					return false;
 				}
+				continue;
+			} elseif ($condition === ':first') {
+				if ($i != 1) {
+					return false;
+				}
+				continue;
+			}
+			if (!preg_match('/(.+?)([><!]?[=]|[><])(.*)/', $condition, $match)) {
+				if (ctype_digit($condition)) {
+					if ($i != $condition) {
+						return false;
+					}
+				} elseif (preg_match_all('/(?:^[0-9]+|(?<=,)[0-9]+)/', $condition, $matches)) {
+					return in_array($i, $matches[0]);
+				} elseif (!isset($data[$condition])) {
+					return false;
+				}
+				continue;
+			}
+			list(,$key,$op,$expected) = $match;
+
+			if (!isset($data[$key])) {
+				return false;
+			}
+			$val = $data[$key];
+
+			if ($op === '=' && $expected && $expected{0} === '/') {
+				return preg_match($expected, $val);
+			} elseif ($op === '=' &&  $val != $expected) {
+				return false;
+			} elseif ($op === '!=' && $val == $expected) {
+				return false;
+			} elseif ($op === '>' && $val <= $expected) {
+				return false;
+			} elseif ($op === '<' && $val >= $expected) {
+				return false;
+			} elseif ($op === '<=' && $val > $expected) {
+				return false;
+			} elseif ($op === '>=' && $val < $expected) {
+				return false;
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * This function can be thought of as a hybrid between PHP's `array_merge()`
+	 * and `array_merge_recursive()`.  The difference to the two is that if an
+	 * array key contains another array then the function behaves recursive
+	 * (unlike `array_merge()`) but does not do if for keys containing strings
+	 * (unlike `array_merge_recursive()`).  Please note: This function will work
+	 * with an unlimited amount of arguments and typecasts non-array parameters
+	 * into arrays.
+	 *
+	 * @return array Merged array of all passed params.
+	 */
+	public static function merge() {
+		$args = func_get_args();
+
+		if (empty($args[0])) {
+			return array();
+		}
+		$result = (array) current($args);
+
+		while (($arg = next($args)) !== false) {
+			foreach ((array) $arg as $key => $val) {
+				if (is_array($val) && isset($result[$key]) && is_array($result[$key])) {
+					$result[$key] = static::merge($result[$key], $val);
+				} elseif (is_int($key)) {
+					$result[] = $val;
+				} else {
+					$result[$key] = $val;
+				}
+			}
+		}
+		return $result;
 	}
 
 	/**
@@ -742,105 +688,35 @@ class Set {
 	}
 
 	/**
-	 * Creates an associative array using a `$path1` as the path to build its keys, and optionally
-	 * `$path2` as path to get the values. If `$path2` is not specified, all values will be
-	 * initialized to `null` (useful for `Set::merge()`). You can optionally group the values by
-	 * what is obtained when following the path specified in `$groupPath`.
+	 * Removes an element from an array as defined by `$path`.
 	 *
-	 * @param array $data Array from where to extract keys and values.
-	 * @param mixed $path1 As an array, or as a dot-delimited string.
-	 * @param mixed $path2 As an array, or as a dot-delimited string.
-	 * @param string $groupPath As an array, or as a dot-delimited string.
-	 * @return array Combined array.
+	 * @param mixed $list From where to remove.
+	 * @param mixed $path A dot-delimited string.
+	 * @return array Array with `$path` removed from its value.
 	 */
-	public static function combine($data, $path1 = null, $path2 = null, $groupPath = null) {
-		if (empty($data)) {
-			return array();
+	public static function remove($list, $path = null) {
+		if (empty($path)) {
+			return $list;
 		}
+		if (!is_array($path)) {
+			$path = explode('.', $path);
+		}
+		$_list =& $list;
 
-		if (is_object($data)) {
-			$data = get_object_vars($data);
-		}
-
-		if (is_array($path1)) {
-			$format = array_shift($path1);
-			$keys = static::format($data, $format, $path1);
-		} else {
-			$keys = static::extract($data, $path1);
-		}
-		$vals = array();
-		if (!empty($path2) && is_array($path2)) {
-			$format = array_shift($path2);
-			$vals = static::format($data, $format, $path2);
-		} elseif (!empty($path2)) {
-			$vals = static::extract($data, $path2);
-		}
-
-		$valCount = count($vals);
-		$count = count($keys);
-		for ($i = $valCount; $i < $count; $i++) {
-			$vals[$i] = null;
-		}
-
-		if ($groupPath != null) {
-			$group = static::extract($data, $groupPath);
-			if (!empty($group)) {
-				$c = count($keys);
-				for ($i = 0; $i < $c; $i++) {
-					if (!isset($group[$i])) {
-						$group[$i] = 0;
-					}
-					if (!isset($out[$group[$i]])) {
-						$out[$group[$i]] = array();
-					}
-					$out[$group[$i]][$keys[$i]] = $vals[$i];
-				}
-				return $out;
+		foreach ($path as $i => $key) {
+			if (is_numeric($key) && intval($key) > 0 || $key === '0') {
+				$key = intval($key);
 			}
-		}
-		return array_combine($keys, $vals);
-	}
-
-	/**
-	 * Converts an object into an array. If `$object` is no object, reverse
-	 * will return the same value.
-	 *
-	 * @param object $object Object to reverse.
-	 * @return array
-	 */
-	public static function reverse($object) {
-		$out = array();
-		if (is_object($object)) {
-			$keys = get_object_vars($object);
-			if (isset($keys['_name_'])) {
-				$identity = $keys['_name_'];
-				unset($keys['_name_']);
-			}
-			$new = array();
-			foreach ($keys as $key => $value) {
-				if (is_array($value)) {
-					$new[$key] = static::reverse($value);
-				} else {
-					if (isset($value->_name_)) {
-						$new = array_merge($new, static::reverse($value));
-					} else {
-						$new[$key] = static::reverse($value);
-					}
-				}
-			}
-			if (isset($identity)) {
-				$out[$identity] = $new;
+			if ($i === count($path) - 1) {
+				unset($_list[$key]);
 			} else {
-				$out = $new;
+				if (!isset($_list[$key])) {
+					return $list;
+				}
+				$_list =& $_list[$key];
 			}
-		} elseif (is_array($object)) {
-			foreach ($object as $key => $value) {
-				$out[$key] = static::reverse($value);
-			}
-		} else {
-			$out = $object;
 		}
-		return $out;
+		return $list;
 	}
 
 	/**
@@ -874,12 +750,7 @@ class Set {
 			static::extract($result, '/id'),
 			static::extract($result, '/value')
 		);
-		if ($dir === 'desc') {
-			$dir = SORT_DESC;
-		} else {
-			$dir = SORT_ASC;
-		}
-
+		$dir = ($dir === 'desc') ? SORT_DESC : SORT_ASC;
 		array_multisort($values, $dir, $keys, $dir);
 		$sorted = array();
 		$keys = array_unique($keys);
@@ -888,6 +759,112 @@ class Set {
 			$sorted[] = $data[$k];
 		}
 		return $sorted;
+	}
+
+	/**
+	 * Converts an object into an array. If `$object` is no object, reverse
+	 * will return the same value.
+	 *
+	 * @param object $object Object to reverse.
+	 * @return array
+	 */
+	public static function toArray($object) {
+		$out = array();
+		if (is_object($object)) {
+			$keys = get_object_vars($object);
+			if (isset($keys['_name_'])) {
+				$identity = $keys['_name_'];
+				unset($keys['_name_']);
+			}
+			$new = array();
+			foreach ($keys as $key => $value) {
+				if (is_array($value)) {
+					$new[$key] = static::toArray($value);
+				} else {
+					if (isset($value->_name_)) {
+						$new = array_merge($new, static::toArray($value));
+					} else {
+						$new[$key] = static::toArray($value);
+					}
+				}
+			}
+			if (isset($identity)) {
+				$out[$identity] = $new;
+			} else {
+				$out = $new;
+			}
+		} elseif (is_array($object)) {
+			foreach ($object as $key => $value) {
+				$out[$key] = static::toArray($value);
+			}
+		} else {
+			$out = $object;
+		}
+		return $out;
+	}
+
+	/**
+	 * Maps the contents of the Set object to an object hierarchy.  Maintains numeric
+	 * keys as arrays of objects.
+	 *
+	 * @param array $data The array.
+	 * @param string $class A class name of the type of object to map to.
+	 * @param boolean $name whether the _name_ should be filled.
+	 * @return object Hierarchical object.
+	 */
+	public static function toObject($data, $class = 'stdClass', $name = false) {
+		if (empty($data)) {
+			return $data;
+		}
+		if ($class === true) {
+			$out = new \stdClass;
+		} else {
+			$out = new $class;
+		}
+
+		if (is_array($data)) {
+			$keys = array_keys($data);
+			foreach ($data as $key => $value) {
+				if ($keys[0] === $key && $class !== true) {
+					$name = true;
+				}
+				if (is_numeric($key)) {
+					if (is_object($out)) {
+						$out = get_object_vars($out);
+					}
+					$out[$key] = static::toObject($value, $class);
+					$isNamed = (
+						is_object($out[$key]) && !isset($out[$key]->_name_) &&
+						$name !== true && static::depth($value, true) >= 2
+					);
+					if ($isNamed) {
+						$out[$key]->_name_ = $name;
+					}
+				} elseif (is_array($value)) {
+					if ($name === true) {
+						$out->_name_ = $key;
+						$name = false;
+						foreach ($value as $key2 => $value2) {
+							$out->{$key2} = static::toObject($value2, true);
+						}
+					} else {
+						if (!is_numeric($key)) {
+							$out->{$key} = static::toObject($value, true, $key);
+							if (is_object($out->{$key}) && !isset($out->{$key}->_name_)) {
+								$out->{$key}->_name_ = $key;
+							}
+						} else {
+							$out->{$key} = static::toObject($value, true);
+						}
+					}
+				} else {
+					$out->{$key} = $value;
+				}
+			}
+		} else {
+			$out = $data;
+		}
+		return $out;
 	}
 }
 
