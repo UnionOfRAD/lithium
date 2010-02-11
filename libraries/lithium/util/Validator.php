@@ -11,6 +11,50 @@ namespace lithium\util;
 use \lithium\util\Set;
 use \InvalidArgumentException;
 
+/**
+ * Validator provies static access to commonly used data validation logic. These common routines
+ * cover HTML form input data such as phone and credit card numbers, dates and postal codes, but
+ * also include general checks for regular expressions and booleans and numericality.
+ * 
+ * General data checking is done by using Validator statically. Rules can be specified as a 
+ * parameter to the check() method or automatically accessed via the is[RuleName]() method name
+ * convention:
+ * 
+ * {{{
+ * use \lithium\util\Validator;
+ * 
+ * Validator::rule('email', 'foo@example.com');  // true
+ * Validator::isEmail('foo-at-example.com');     // false
+ * }}}
+ * 
+ * Data can also be validated against multiple rules, each having its own associated error
+ * message. The rule structure is array-based and hierarchical based on rule names and 
+ * messages. Resposes match 
+ * 
+ * {{{
+ * $rules = array(
+ * 	'title' => 'please enter a title',
+ * 	'email' => array(
+ * 		array('notEmpty', 'message' => 'email is empty'),
+ * 		array('email', 'message' => 'email is not valid'),
+ * 	)
+ * );
+ * $data = array('email' => 'foo');
+ * Validator::check($data, $rules);
+ * 
+ * //result:
+ * 
+ * array(
+ * 		'title' => array('please enter a title'),
+ *		'email' => array('email is not valid')
+ * ); 
+ * 
+ * }}}
+ * 
+ * Custom validation rules can also be added to Validator at runtime. These can either take the
+ * form of regex strings or functions supplied to the add() method.
+ *
+ */
 class Validator extends \lithium\core\StaticObject {
 
 	/**
