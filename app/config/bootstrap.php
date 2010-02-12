@@ -80,8 +80,9 @@ require __DIR__ . '/bootstrap/libraries.php';
  * return $posts->to('json');
  * }}}
  */
-use \lithium\util\Collection;
+// use \lithium\util\Collection;
+//
+// Collection::formats('\lithium\net\http\Media');
 
-Collection::formats('\lithium\net\http\Media');
 
 ?>
