@@ -85,8 +85,9 @@ class Test extends \lithium\console\Command {
 		} elseif (!empty($this->group)) {
 			$this->group = '\\' . str_replace('.', '\\', $this->group);
 		}
+		$run = $this->case ?: $this->group;
 		$this->nl();
-		$this->out(sprintf('Running `%s`... ', $this->case ?: $this->group), false);
+		$this->out(sprintf('Running `%s`... ', $run), false);
 
 		$report = Dispatcher::run($run, array(
 			'filters' => $this->filters, 'reporter' => 'console'
