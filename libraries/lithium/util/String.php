@@ -9,6 +9,7 @@
 
 namespace lithium\util;
 
+use \Closure;
 use \Exception;
 
 class String {
@@ -120,7 +121,7 @@ class String {
 			);
 		}
 
-		if (empty($format) && strpos($str, '?') === false) {
+		if (empty($format) && (strpos($str, '?') === false || !isset($data[0]))) {
 			$replace = array();
 
 			foreach ($data as $key => $value) {
@@ -130,7 +131,7 @@ class String {
 			return $options['clean'] ? static::clean($str, $options) : $str;
 		}
 
-		if (strpos($str, '?') !== false) {
+		if (strpos($str, '?') !== false && isset($data[0])) {
 			$offset = 0;
 			while (($pos = strpos($str, '?', $offset)) !== false) {
 				$val = array_shift($data);
@@ -143,9 +144,13 @@ class String {
 		foreach ($data as $key => $value) {
 			$hashVal = crc32($key);
 			$key = sprintf($format, preg_quote($key, '/'));
+
+			if (!$key) {
+				continue;
+			}
 			$str = preg_replace($key, $hashVal, $str);
 
-			if (is_object($value)) {
+			if (is_object($value) && !$value instanceof Closure) {
 				try {
 					$value = $value->__toString();
 				} catch (Exception $e) {
