@@ -18,10 +18,10 @@ class Memory extends \lithium\core\Object {
 	public $_session = array();
 
 	public function key() {
-		$config = array(
-			'SERVER_ADDR' => isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : '127.0.0.1'
-		);
-		return String::uuid(function($value) use ($config) { return $_SERVER[$value]; });
+		$context = function ($value) use (&$config) {
+			return (isset($_SERVER['SERVER_ADDR'])) ? $_SERVER['SERVER_ADDR'] : '127.0.0.1';
+		};
+		return String::uuid($context);
 	}
 
 	public function isStarted() {
