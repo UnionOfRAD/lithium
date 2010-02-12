@@ -762,13 +762,28 @@ class Set {
 	}
 
 	/**
+	 * Genric method for converting arrays and objects between different types
+	 *
+	 * @param string $type The type to convert to : array|object
+	 * @param string $data The array or object data to convert
+	 * @param string $options
+	 * @return void
+	 */
+	public static function to($type, $data, $options = array()) {
+		if ($type === 'object') {
+			return static::_toObject($data, $options);
+		}
+		return static::_toArray($data);
+	}
+
+	/**
 	 * Converts an object into an array. If `$object` is no object, reverse
 	 * will return the same value.
 	 *
-	 * @param object $object Object to reverse.
+	 * @param object $object Object to make into an array.
 	 * @return array
 	 */
-	public static function toArray($object) {
+	public static function _toArray($object) {
 		$out = array();
 		if (is_object($object)) {
 			$keys = get_object_vars($object);
@@ -779,12 +794,12 @@ class Set {
 			$new = array();
 			foreach ($keys as $key => $value) {
 				if (is_array($value)) {
-					$new[$key] = static::toArray($value);
+					$new[$key] = static::_toArray($value);
 				} else {
 					if (isset($value->_name_)) {
-						$new = array_merge($new, static::toArray($value));
+						$new = array_merge($new, static::_toArray($value));
 					} else {
-						$new[$key] = static::toArray($value);
+						$new[$key] = static::_toArray($value);
 					}
 				}
 			}
@@ -795,7 +810,7 @@ class Set {
 			}
 		} elseif (is_array($object)) {
 			foreach ($object as $key => $value) {
-				$out[$key] = static::toArray($value);
+				$out[$key] = static::_toArray($value);
 			}
 		} else {
 			$out = $object;
@@ -808,53 +823,52 @@ class Set {
 	 * keys as arrays of objects.
 	 *
 	 * @param array $data The array.
-	 * @param string $class A class name of the type of object to map to.
-	 * @param boolean $name whether the _name_ should be filled.
+	 * @param string $options
 	 * @return object Hierarchical object.
 	 */
-	public static function toObject($data, $class = 'stdClass', $name = false) {
+	public static function _toObject($data, $options = array()) {
 		if (empty($data)) {
 			return $data;
 		}
-		if ($class === true) {
-			$out = new \stdClass;
-		} else {
-			$out = new $class;
-		}
+
+		$defaults = array('class' => '\stdClass', 'flatten' => true, 'name' => false);
+		$options += $defaults;
+		$out = new $options['class'];
+		$name = $options['name'];
 
 		if (is_array($data)) {
 			$keys = array_keys($data);
 			foreach ($data as $key => $value) {
-				if ($keys[0] === $key && $class !== true) {
-					$name = true;
-				}
 				if (is_numeric($key)) {
 					if (is_object($out)) {
 						$out = get_object_vars($out);
 					}
-					$out[$key] = static::toObject($value, $class);
+					$out[$key] = static::_toObject($value, $options);
 					$isNamed = (
+						!empty($options['name']) && $options['flatten'] === false &&
 						is_object($out[$key]) && !isset($out[$key]->_name_) &&
-						$name !== true && static::depth($value, true) >= 2
+						static::depth($value, true) >= 2
 					);
 					if ($isNamed) {
-						$out[$key]->_name_ = $name;
+						$out[$key]->_name_ = $options['name'];
 					}
 				} elseif (is_array($value)) {
-					if ($name === true) {
+					if ($options['flatten'] === true) {
+						$options['flatten'] = false;
 						$out->_name_ = $key;
-						$name = false;
 						foreach ($value as $key2 => $value2) {
-							$out->{$key2} = static::toObject($value2, true);
+							$out->{$key2} = static::_toObject($value2, array('flatten' => false));
 						}
 					} else {
 						if (!is_numeric($key)) {
-							$out->{$key} = static::toObject($value, true, $key);
+							$out->{$key} = static::_toObject($value, array(
+								'flatten' => false, 'name' => $key
+							));
 							if (is_object($out->{$key}) && !isset($out->{$key}->_name_)) {
 								$out->{$key}->_name_ = $key;
 							}
 						} else {
-							$out->{$key} = static::toObject($value, true);
+							$out->{$key} = static::_toObject($value, array('flatten' => true));
 						}
 					}
 				} else {
