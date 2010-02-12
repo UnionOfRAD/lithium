@@ -310,8 +310,8 @@ class Media extends \lithium\core\StaticObject {
 			'check' => false,
 			'library' => 'app'
 		);
-		$options += (static::$_assets[$type] + $defaults);
 		$type = isset(static::$_assets[$type]) ? $type : 'generic';
+		$options += (static::$_assets[$type] + $defaults);
 		$params = compact('path', 'type', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params, $chain) {

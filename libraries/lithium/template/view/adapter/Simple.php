@@ -20,8 +20,6 @@ use \lithium\util\String;
  */
 class Simple extends \lithium\template\view\Renderer {
 
-	protected $_classes = array();
-
 	public function __construct($config = array()) {
 		$defaults = array('classes' => array());
 		parent::__construct($config + $defaults);

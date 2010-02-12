@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\template\view;
 
+use \lithium\template\View;
 use \lithium\action\Request;
 use \lithium\template\Helper;
 use \lithium\template\helper\Html;
@@ -20,14 +21,12 @@ class RendererTest extends \lithium\test\Unit {
 	}
 
 	public function testInitialization() {
-		$subject = new Simple();
-
 		$expected = array('url', 'path', 'options', 'content', 'title', 'scripts', 'styles');
-		$result = array_keys($subject->handlers());
+		$result = array_keys($this->subject->handlers());
 		$this->assertEqual($expected, $result);
 
 		$expected = array('content', 'title', 'scripts', 'styles');
-		$result = array_keys($subject->context());
+		$result = array_keys($this->subject->context());
 		$this->assertEqual($expected, $result);
 	}
 
@@ -40,13 +39,32 @@ class RendererTest extends \lithium\test\Unit {
 		$this->assertEqual(array(), $this->subject->context('scripts'));
 		$this->assertEqual(array(), $this->subject->scripts);
 		$this->assertNull($this->subject->foo());
+		$this->assertFalse(isset($this->subject->foo));
 
 		$this->subject = new Simple(array('context' => array(
 			'content' => '', 'title' => '', 'scripts' => array(), 'styles' => array(), 'foo' => '!'
 		)));
 		$result = $this->subject->foo();
-		$expected = '!';
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('!', $result);
+		$this->assertTrue(isset($this->subject->foo));
+	}
+
+	/**
+	 * Tests built-in content handlers for generating URLs, paths to static assets, and handling
+	 * output of elements written to the request context.
+	 *
+	 * @return void
+	 */
+	public function testCoreHandlers() {
+		$url = $this->subject->applyHandler(null, null, 'url', array(
+			'controller' => 'foo', 'action' => 'bar'
+		));
+		$this->assertEqual('/foo/bar', $url);
+
+		$helper = new Html();
+		$class = get_class($helper);
+		$path = $this->subject->applyHandler($helper, "{$class}::script", 'path', 'foo/file');
+		$this->assertEqual('/js/foo/file.js', $path);
 	}
 
 	public function testHandlerInsertion() {
