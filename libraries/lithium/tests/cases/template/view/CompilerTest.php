@@ -13,10 +13,12 @@ use \lithium\template\view\Compiler;
 class CompilerTest extends \lithium\test\Unit {
 
 	protected $_path;
+	
+	protected $_file = 'resources/tmp/tests/template.html.php';
 
 	public function setUp() {
 		$this->_path = str_replace('\\', '/', LITHIUM_APP_PATH);
-		file_put_contents($this->_path . '/resources/tmp/tests/template.html.php', "
+		file_put_contents("{$this->_path}/{$this->_file}", "
 			<?php echo 'this is unescaped content'; ?" . ">
 			<?='this is escaped content'; ?" . ">
 			<?=\$alsoEscaped; ?" . ">
@@ -36,11 +38,11 @@ class CompilerTest extends \lithium\test\Unit {
 		foreach (glob("{$this->_path}/resources/tmp/cache/templates/*.php") as $file) {
 			unlink($file);
 		}
-		unlink($this->_path . '/resources/tmp/tests/template.html.php');
+		unlink("{$this->_path}/{$this->_file}");
 	}
 
 	public function testTemplateContentRewriting() {
-		$template = Compiler::template($this->_path . '/resources/tmp/tests/template.html.php');
+		$template = Compiler::template("{$this->_path}/{$this->_file}");
 
 		$this->assertTrue(file_exists($template));
 
@@ -81,6 +83,22 @@ class CompilerTest extends \lithium\test\Unit {
 
 		$expected = "'); ?>";
 		$this->assertEqual($expected, $result[11]);
+	}
+
+	public function testFallbackWithNonWritableDirectory() {
+		$this->expectException('/failed to open stream/');
+		$result = Compiler::template("{$this->_path}/{$this->_file}", array(
+			'path' => LITHIUM_APP_PATH . '/foo',
+			'fallback' => true
+		));
+		$this->assertEqual("{$this->_path}/{$this->_file}", $result);
+
+		$this->expectException('/Could not write compiled template to cache/');
+		$this->expectException('/failed to open stream/');
+		$result = Compiler::template("{$this->_path}/{$this->_file}", array(
+			'path' => LITHIUM_APP_PATH . '/foo',
+			'fallback' => false
+		));
 	}
 }
 

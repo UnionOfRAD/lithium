@@ -8,6 +8,8 @@
 
 namespace lithium\template\view;
 
+use \Exception;
+
 /**
  * The template compiler is a simple string replacement engine which allows PHP templates to be
  * overridden with custom syntax. The default process rules allow PHP templates using short-echo
@@ -31,7 +33,8 @@ class Compiler extends \lithium\core\StaticObject {
 	 * @return void
 	 */
 	public static function template($file, $options = array()) {
-		$defaults = array('path' => LITHIUM_APP_PATH . '/resources/tmp/cache/templates');
+		$cachePath = LITHIUM_APP_PATH . '/resources/tmp/cache/templates';
+		$defaults = array('path' => $cachePath, 'fallback' => true);
 		$options += $defaults;
 
 		$stats = stat($file);
@@ -40,7 +43,14 @@ class Compiler extends \lithium\core\StaticObject {
 		$template = "{$options['path']}/{$template}";
 
 		if (!file_exists($template)) {
-			file_put_contents($template, static::compile(file_get_contents($file)));
+			$compiled = static::compile(file_get_contents($file));
+			$success = (file_put_contents($template, $compiled) !== false);
+
+			if (!$success && $options['fallback']) {
+				return $file;
+			} elseif (!$success && !$options['fallback']) {
+				throw new Exception('Could not write compiled template to cache');
+			}
 		}
 		return $template;
 	}
