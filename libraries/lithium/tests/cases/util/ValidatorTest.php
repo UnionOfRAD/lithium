@@ -38,22 +38,16 @@ class ValidatorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testAddCustomRegexMethods() {
-		// $this->expectException("Rule 'foo' is not a validation rule");
-		// $this->assertNull(Validator::isFoo('foo'));
+		$this->assertNull(Validator::rules('foo'));
 
 		Validator::add('foo', '/^foo$/');
 		$this->assertTrue(Validator::isFoo('foo'));
 		$this->assertFalse(Validator::isFoo('bar'));
+		$this->assertTrue(in_array('foo', Validator::rules()));
+		$this->assertEqual('/^foo$/', Validator::rules('foo'));
 
-		// $this->expectException("Rule 'uuid' is not a validation rule");
-		// $this->assertNull(Validator::isUuid('1c0a5830-6025-11de-8a39-0800200c9a66'));
-
-		$uuid = '/[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}/';
-		Validator::add('uuid', $uuid);
-		$this->assertTrue(Validator::isUuid('1c0a5830-6025-11de-8a39-0800200c9a66'));
-		$this->assertTrue(Validator::isUuid('1c0a5831-6025-11de-8a39-0800200c9a66'));
-		$this->assertTrue(Validator::isUuid('1c0a5832-6025-11de-8a39-0800200c9a66'));
-		$this->assertFalse(Validator::isUuid('zc0a5832-6025-11de-8a39-0800200c9a66'));
+		$this->expectException("Rule 'bar' is not a validation rule");
+		$this->assertNull(Validator::isBar('foo'));
 	}
 
 	/**
@@ -63,6 +57,18 @@ class ValidatorTest extends \lithium\test\Unit {
 	 */
 	public function testStateReset() {
 		Validator::__init();
+	}
+
+	/**
+	 * Tests that valid and invalid UUIDs are properly detected.
+	 *
+	 * @return void
+	 */
+	public function testUuid() {
+		$this->assertTrue(Validator::isUuid('1c0a5830-6025-11de-8a39-0800200c9a66'));
+		$this->assertTrue(Validator::isUuid('1c0a5831-6025-11de-8a39-0800200c9a66'));
+		$this->assertTrue(Validator::isUuid('1c0a5832-6025-11de-8a39-0800200c9a66'));
+		$this->assertFalse(Validator::isUuid('zc0a5832-6025-11de-8a39-0800200c9a66'));
 	}
 
 	/**
@@ -909,74 +915,34 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testCompare() {
-		$result = Validator::compare(1, '>', 0);
-		$this->assertTrue($result);
-
-		$result = Validator::compare(0, '<', 1);
-		$this->assertTrue($result);
-
-		$result = Validator::compare(1, '>=', 1);
-		$this->assertTrue($result);
-
-		$result = Validator::compare(1, '<=', 1);
-		$this->assertTrue($result);
-
-		$result = Validator::compare(1, '==', 1);
-		$this->assertTrue($result);
-
-		$result = Validator::compare(1, '==', '1');
-		$this->assertTrue($result);
-
-		$result = Validator::compare(1, '!=', 0);
-		$this->assertTrue($result);
-
-		$result = Validator::compare(1, '!=', '1');
-		$this->assertFalse($result);
-
-		$result = Validator::compare(1, '===', 1);
-		$this->assertTrue($result);
-
-		$result = Validator::compare(1, '===', '1');
-		$this->assertFalse($result);
-	}
-
-	public function testHasMinLength() {
-		$string = 'hello world';
-		$minLength = 1;
-		$result = Validator::hasMinLength($string, $minLength);
-		$this->assertTrue($result);
-
-		$minLength = 20;
-		$result = Validator::hasMinLength($string, $minLength);
-		$this->assertFalse($result);
-	}
-
-	public function testHasMaxLength() {
-		$string = 'hello world';
-		$maxLength = 1;
-		$result = Validator::hasMaxLength($string, $maxLength);
-		$this->assertFalse($result);
-
-		$maxLength = 20;
-		$result = Validator::hasMaxLength($string, $maxLength);
-		$this->assertTrue($result);
-	}
-
 	public function testIsInRange() {
 		$value = 5;
 		$lower = 1;
 		$upper = 10;
-		$result = Validator::isInRange($value, $lower, $upper);
+		$result = Validator::isInRange($value, null, compact('lower', 'upper'));
 		$this->assertTrue($result);
 
 		$value = 0;
-		$result = Validator::isInRange($value, $lower, $upper);
+		$result = Validator::isInRange($value, null, compact('lower', 'upper'));
 		$this->assertFalse($result);
 
 		$value = 11;
-		$result = Validator::isInRange($value, $lower, $upper);
+		$result = Validator::isInRange($value, null, compact('lower', 'upper'));
 		$this->assertFalse($result);
+
+		$result = Validator::isInRange(-1, null, array('upper' => 1));
+		$this->assertTrue($result);
+
+		$result = Validator::isInRange(2, null, array('upper' => 1));
+		$this->assertFalse($result);
+
+		$result = Validator::isInRange(2, null, array('lower' => 1));
+		$this->assertTrue($result);
+
+		$result = Validator::isInRange(1, null, array('lower' => 1));
+		$this->assertFalse($result);
+
+		$this->assertTrue(Validator::isInRange(0));
 	}
 }
 
