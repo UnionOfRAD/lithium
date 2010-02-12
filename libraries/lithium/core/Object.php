@@ -37,8 +37,6 @@ class Object {
 
 	protected $_methodFilters = array();
 
-	protected $_extendMethodFilters = array();
-
 	protected static $_parents = array();
 
 	/**

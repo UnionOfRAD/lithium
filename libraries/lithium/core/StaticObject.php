@@ -8,7 +8,6 @@
 
 namespace lithium\core;
 
-use \SplStack;
 use \lithium\util\collection\Filters;
 
 /**
@@ -16,19 +15,7 @@ use \lithium\util\collection\Filters;
  */
 class StaticObject {
 
-	/**
-	 * Stores configuration information for object instances at time of construction.
-	 * **Do not override.** Pass any additional variables to `parent::__construct()`.
-	 *
-	 * @var array
-	 */
-	protected static $_config = array();
-
 	protected static $_methodFilters = array();
-
-	protected static $_extendMethodFilters = array();
-
-	public static function __init() {}
 
 	/**
 	 * Apply a closure to a method of the current static object.
