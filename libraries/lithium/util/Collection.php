@@ -10,28 +10,28 @@ namespace lithium\util;
 
 /**
  * The parent class for all collection objects. Contains methods for collection iteration, 
- * conversion, and filtering. Implements ArrayAccess, Iterator, and Countable.
- * 
+ * conversion, and filtering. Implements `ArrayAccess`, `Iterator`, and `Countable`.
+ *
  * Collection objects can act very much like arrays. This is especially evident in creating new
  * objects, or by converting Collection into an actual array:
- * 
+ *
  * {{{
  * $coll = new Collection();
  * $coll[] = 'foo';
  * // $coll[0] --> 'foo'
- * 
+ *
  * $coll = new Collection(array('items' => array('foo')));
  * // $coll[0] --> 'foo'
  * 
  * $array = $coll->to('array);
  * }}}
- * 
+ *
  * Apart from array-like data access, Collections allow for filtering and iteration methods:
  * 
  * {{{
- * 
+ *
  * $coll = new Collection(array('items' => array(0, 1, 2, 3, 4)));
- * 
+ *
  * $coll->first();   // 1 (the first non-empty value)
  * $coll->current(); // 0
  * $coll->next();    // 1
