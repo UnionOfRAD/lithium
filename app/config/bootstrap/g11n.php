@@ -17,6 +17,11 @@ use \lithium\util\Validator;
 use \lithium\net\http\Media;
 
 /**
+ * Sets the default timezone used by all date/time functions.
+ */
+date_default_timezone_set('UTC');
+
+/**
  * Adds globalization specifc settings to the evironment.
  *
  * The settings for the current locale, time zone and currency are kept as environment
