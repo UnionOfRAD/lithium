@@ -25,7 +25,15 @@ use \lithium\net\http\Media;
  * - `'locale'` The effective locale. Defaults to `'en'`.
  * - `'availableLocales'` Application locales available. Defaults to `array('en')`.
  */
+Environment::set('production', array(
+	'locale' => 'en',
+	'availableLocales' => array('en')
+));
 Environment::set('development', array(
+	'locale' => 'en',
+	'availableLocales' => array('en')
+));
+Environment::set('test', array(
 	'locale' => 'en',
 	'availableLocales' => array('en')
 ));
