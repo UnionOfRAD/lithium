@@ -143,6 +143,7 @@ class Locale extends \lithium\core\StaticObject {
 	 * // returns array('zh_Hans_HK_REVISED', 'zh_Hans_HK', 'zh_Hans', 'zh', 'root')
 	 * }}}
 	 *
+	 * @link http://www.unicode.org/reports/tr35/tr35-13.html#Locale_Inheritance
 	 * @param string $locale A locale in an arbitrary form (i.e. `'en_US'` or `'EN-US'`).
 	 * @return array Indexed array of locales (starting with the most specific one).
 	 */
