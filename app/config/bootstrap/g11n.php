@@ -22,7 +22,7 @@ use \lithium\net\http\Media;
 date_default_timezone_set('UTC');
 
 /**
- * Adds globalization specifc settings to the evironment.
+ * Adds globalization specific settings to the environment.
  *
  * The settings for the current locale, time zone and currency are kept as environment
  * settings. This allows for _centrally_ switching, _transparently_ setting and retrieving
