@@ -56,7 +56,13 @@ class ValidatorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testStateReset() {
+		$this->assertNull(Validator::rules('foo'));
+
+		Validator::add('foo', '/foo/');
+		$this->assertEqual('/foo/', Validator::rules('foo'));
+
 		Validator::__init();
+		$this->assertNull(Validator::rules('foo'));
 	}
 
 	/**
@@ -86,6 +92,26 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isPhone('0800-LITHIUM'));
 		$this->assertTrue(Validator::isPhone('0800-LITHIUM', 'foo'));
 		$this->assertTrue(Validator::isPhone('0800-LITHIUM', 'any'));
+	}
+
+	/**
+	 * Tests that setting the `'contain'` rule option to false correctly requires a string to be
+	 * an exact match of the regex, with no additional characters outside.
+	 *
+	 * @return void
+	 */
+	public function testRegexContainment() {
+		$this->assertTrue(Validator::isIp('127.0.0.1', null, array('contains' => false)));
+
+		$this->expectException('/Unknown modifier/');
+		$this->assertFalse(Validator::isIp('127.0.0.1', null, array('contains' => true)));
+
+		Validator::add('foo', '/foo/', array('contains' => true));
+		$this->assertTrue(Validator::isFoo('foobar'));
+
+		Validator::add('foo', 'foo', array('contains' => false));
+		$this->assertFalse(Validator::isFoo('foobar'));
+		$this->assertTrue(Validator::isFoo('foo'));
 	}
 
 	public function testPrefilterMethodAccess() {
