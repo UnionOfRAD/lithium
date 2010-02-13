@@ -606,7 +606,7 @@ class Set {
 	}
 
 	/**
-	 * This function can be thought of as a hybrid between PHP's `array_merge()`
+	 * This method can be thought of as a hybrid between PHP's `array_merge()`
 	 * and `array_merge_recursive()`.  The difference to the two is that if an
 	 * array key contains another array then the function behaves recursive
 	 * (unlike `array_merge()`) but does not do if for keys containing strings
@@ -616,11 +616,14 @@ class Set {
 	 *
 	 * @return array Merged array of all passed params.
 	 */
-	public static function merge() {
-		$args = func_get_args();
+	public static function merge($arr1, $arr2 = null) {
+		$args = array($arr1, $arr2);
 
-		if (empty($args[0])) {
+		if (empty($arr1) && empty($arr2)) {
 			return array();
+		}
+		if (empty($arr1) || empty($arr2)) {
+			return empty($arr1) ? (array) $arr2 : (array) $arr1;
 		}
 		$result = (array) current($args);
 

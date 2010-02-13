@@ -893,8 +893,8 @@ class SetTest extends \lithium\test\Unit {
 		$result = Set::merge('foo', 'bar');
 		$this->assertIdentical($result, array('foo', 'bar'));
 
-		$result = Set::merge('foo', array('user' => 'bob', 'no-bar'), 'bar');
-		$this->assertIdentical($result, array('foo', 'user' => 'bob', 'no-bar', 'bar'));
+		$result = Set::merge('foo', array('user' => 'bob', 'no-bar'));
+		$this->assertIdentical($result, array('foo', 'user' => 'bob', 'no-bar'));
 
 		$a = array('foo', 'foo2');
 		$b = array('bar', 'bar2');
@@ -939,11 +939,11 @@ class SetTest extends \lithium\test\Unit {
 			'ice-cream',
 			'chocolate'
 		);
-		$this->assertIdentical(Set::merge($a, $b, $c), $expected);
+		$this->assertIdentical($expected, Set::merge(Set::merge($a, $b), $c));
 
-		$this->assertIdentical(Set::merge($a, $b, array(), $c), $expected);
+		$this->assertIdentical($expected, Set::merge(Set::merge($a, $b), Set::merge(array(), $c)));
 
-		$result = Set::merge($a, $b, $c);
+		$result = Set::merge($a, Set::merge($b, $c));
 		$this->assertIdentical($expected, $result);
 
 		$a = array('Tree', 'CounterCache',
