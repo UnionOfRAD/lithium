@@ -108,4 +108,30 @@ Validator::add('phone', Catalog::read('validation.phone', 'en_US'));
 Validator::add('postalCode', Catalog::read('validation.postalCode', 'en_US'));
 Validator::add('ssn', Catalog::read('validation.ssn', 'en_US'));
 
+/**
+ * Intercepts dispatching processes in order to set the effective locale by using
+ * the locale of the request or if that is not available retrieving a locale preferred
+ * by the client.
+ */
+ActionDispatcher::applyFilter('_callable', function($self, $params, $chain) {
+	$request = $params['request'];
+	$controller = $chain->next($self, $params, $chain);
+
+	if (!$request->locale) {
+		$request->params['locale'] = Locale::preferred($request);
+	}
+	Environment::set('development', array('locale' => $request->locale));
+	return $controller;
+});
+ConsoleDispatcher::applyFilter('_callable', function($self, $params, $chain) {
+	$request = $params['request'];
+	$command = $chain->next($self, $params, $chain);
+
+	if (!$request->locale) {
+		$request->params['locale'] = Locale::preferred($request);
+	}
+	Environment::set('development', array('locale' => $request->locale));
+	return $command;
+});
+
 ?>
