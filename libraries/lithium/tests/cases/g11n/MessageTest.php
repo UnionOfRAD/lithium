@@ -25,11 +25,17 @@ class MessageTest extends \lithium\test\Unit {
 		));
 		$data = function($n) { return $n == 1 ? 0 : 1; };
 		Catalog::write('message.plural', 'root', $data, array('name' => 'runtime'));
+
+		$this->_backups['environment'] = Environment::get('test');
+		Environment::set('test', array('locale' => 'en'));
+		Environment::set('test');
 	}
 
 	public function tearDown() {
 		Catalog::reset();
 		Catalog::config($this->_backups['catalogConfig']);
+
+		Environment::set('test', $this->_backups['environment']);
 	}
 
 	public function testTranslateBasic() {

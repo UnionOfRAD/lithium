@@ -6,11 +6,29 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
+use \lithium\core\Environment;
+use \lithium\g11n\Locale;
 use \lithium\g11n\Catalog;
 use \lithium\g11n\Message;
 use \lithium\util\Inflector;
 use \lithium\util\Validator;
 use \lithium\net\http\Media;
+
+/**
+ * Adds globalization specifc settings to the evironment.
+ *
+ * The settings for the current locale, time zone and currency are kept as environment
+ * settings. This allows for _centrally_ switching, _transparently_ setting and retrieving
+ * globalization related settings.
+ *
+ * The environment settings are:
+ * - `'locale'` The effective locale. Defaults to `'en'`.
+ * - `'availableLocales'` Application locales available. Defaults to `array('en')`.
+ */
+Environment::set('development', array(
+	'locale' => 'en',
+	'availableLocales' => array('en')
+));
 
 /**
  * Globalization (g11n) catalog configuration.  The catalog allows for obtaining and

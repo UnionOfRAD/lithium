@@ -81,8 +81,7 @@ class Message extends \lithium\core\StaticObject {
 	public static function translate($id, $options = array()) {
 		$defaults = array(
 			'count' => 1,
-			// 'locale' => Environment::get('g11n.locale'),
-			'locale' => 'root',
+			'locale' => Environment::get('locale'),
 			'scope' => null,
 			'default' => null,
 			'noop' => false
