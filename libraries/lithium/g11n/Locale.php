@@ -162,6 +162,126 @@ class Locale extends \lithium\core\StaticObject {
 		$locales[] = 'root';
 		return $locales;
 	}
+
+	/**
+	 * Searches an array of locales for the best match to a locale. The locale
+	 * is iteratively simplified until either it matches one of the locales
+	 * in the list or the locale can't be further simplified.
+	 *
+	 * This method partially implements the lookup matching scheme as described
+	 * in RFC 4647, section 3.4 and thus does not strictly conform to the
+	 * specification.
+	 *
+	 * Differences to specification:
+	 * - No support for wildcards in the to-be-matched locales.
+	 * - No support for locales with private subtags.
+	 * - No support for a default return value.
+	 * - Passed locales are required to be in canonical form (i.e. `'ja_JP'`).
+	 *
+	 * @link http://www.ietf.org/rfc/rfc4647.txt
+	 * @param array $locales Locales to match against `$locale`.
+	 * @param string $locale A locale in it's canoncial form (i.e. `'zh_Hans_HK_REVISED'`).
+	 * @return string|void The matched locale.
+	 */
+	public static function lookup($locales, $locale) {
+		$tags = static::decompose($locale);
+
+		while (count($tags) > 0) {
+			if (($key = array_search(static::compose($tags), $locales)) !== false) {
+				return $locales[$key];
+			}
+			array_pop($tags);
+		}
+	}
+
+	/**
+	 * Determines the preferred locale from a request or array. Optionally negotiates
+	 * the preferred locale with available locales.
+	 *
+	 * @see lithium\g11n\Locale::_preferredAction()
+	 * @see lithium\g11n\Locale::_preferredConsole()
+	 * @see lithium\g11n\Locale::lookup()
+	 * @param object|array $request An action or console request object or an array of locales.
+	 * @param array $available A list of locales to negotiate the preferred locale with.
+	 * @return string|void The preferred locale in it's canoncial form (i.e. `'fr_CA'`).
+	 */
+	public static function preferred($request, $available = null) {
+		if (is_array($request)) {
+			$result = $request;
+		} elseif ($request instanceof \lithium\action\Request) {
+			$result = static::_preferredAction($request);
+		} elseif ($request instanceof \lithium\console\Request) {
+			$result = static::_preferredConsole($request);
+		} else {
+			return null;
+		}
+		if (!$available) {
+			return array_shift($result);
+		}
+		foreach ((array) $result as $locale) {
+			if ($match = static::lookup($available, $locale)) {
+				return $match;
+			}
+		}
+	}
+
+	/**
+	 * Detects preferred locales from an action request by looking at the
+	 * `'Accept-Language'` header as described by RFC 2616, section 14.4.
+	 *
+	 * @link http://www.ietf.org/rfc/rfc2616.txt
+	 * @param object $request An instance of `lithium\action\Request`.
+	 * @return array Preferred locales in their canoncial form (i.e. `'fr_CA'`).
+	 */
+	protected static function _preferredAction($request) {
+		$regex  = '(?P<locale>[\w\-]+)+(?:;q=(?P<quality>[0-9]+\.[0-9]+))?';
+		$result = array();
+
+		foreach (explode(',', $request->env('HTTP_ACCEPT_LANGUAGE')) as $part) {
+			if (preg_match("/{$regex}/", $part, $matches)) {
+				$locale = static::canonicalize($matches['locale']);
+				$quality = isset($matches['quality']) ? $matches['quality'] : 1;
+				$result[$locale] = $quality;
+			}
+		}
+		arsort($result);
+		return array_keys($result);
+	}
+
+	/**
+	 * Detects preferred locales from a console request by looking at certain
+	 * environment variables. The environment variables may be present or not
+	 * depending on your system. If multiple variables are present the following
+	 * hierachy is used: `'LANGUAGE'`,  `'LC_ALL'`, `'LANG'`.
+	 *
+	 * The locales of the `'LC_ALL'` and the `'LANG'` are formatted according
+	 * to the posix standard: `language(_territory)(.encoding)(@modifier)`.
+	 * Locales having such a format are automatically canoncialized and transformed
+	 * into the `Locale` class' format.
+	 *
+	 * @link http://www.linux.com/archive/feature/53781
+	 * @param object $request An instance of `lithium\console\Request`.
+	 * @return array Preferred locales in their canoncial form (i.e. `'fr_CA'`).
+	 */
+	protected static function _preferredConsole($request) {
+		$regex = '(?P<locale>[\w\_]+)(\.|@|$)+';
+		$result = array();
+
+		if ($value = $request->env('LANGUAGE')) {
+			return explode(':', $value);
+		}
+		foreach (array('LC_ALL', 'LANG') as $variable)  {
+			$value = $request->env($variable);
+
+			if (!$value || $value == 'C' || $value == 'POSIX') {
+				continue;
+			}
+			if (preg_match("/{$regex}/", $value, $matches)) {
+				return (array) $matches['locale'];
+			}
+		}
+		return $result;
+	}
 }
 
 ?>

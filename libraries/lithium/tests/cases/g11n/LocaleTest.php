@@ -9,6 +9,8 @@
 namespace lithium\tests\cases\g11n;
 
 use \lithium\g11n\Locale;
+use \lithium\action\Request as ActionRequest;
+use \lithium\console\Request as ConsoleRequest;
 
 class LocaleTest extends \lithium\test\Unit {
 
@@ -275,6 +277,178 @@ class LocaleTest extends \lithium\test\Unit {
 		$this->assertEqual('en_US_POSIX', Locale::canonicalize('en_US-posiX'));
 		$this->assertEqual('kpe_GN', Locale::canonicalize('kpe_gn'));
 		$this->assertEqual('zh_Hans_HK_REVISED', Locale::canonicalize('ZH-HANS-HK_REVISED'));
+	}
+
+	public function testLookup() {
+		$expected = 'zh_Hans_HK';
+		$result = Locale::lookup(
+			array('zh_Hans_REVISED', 'zh_Hans_HK', 'zh', 'zh_Hans'),
+			'zh_Hans_HK_REVISED'
+		);
+		$this->assertEqual($expected, $result);
+
+		$expected = 'zh_Hans_HK';
+		$result = Locale::lookup(
+			array('zh', 'zh_Hans_REVISED', 'zh_Hans_HK', 'zh_Hans'),
+			'zh_Hans_HK_REVISED'
+		);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testPreferredFromActionRequest() {
+		$request = new ActionRequest(array(
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => 'da, en-gb;q=0.8, en;q=0.7')
+		));
+		$expected = 'da';
+		$result = Locale::preferred($request);
+		$this->assertEqual($expected, $result);
+
+		$request = new ActionRequest(array(
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => 'en-gb;q=0.8, da, en;q=0.7')
+		));
+		$expected = 'da';
+		$result = Locale::preferred($request);
+		$this->assertEqual($expected, $result);
+
+		$request = new ActionRequest(array(
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => 'en-gb;q=0.8, en;q=0.7')
+		));
+		$expected = 'en_GB';
+		$result = Locale::preferred($request);
+		$this->assertEqual($expected, $result);
+
+		$request = new ActionRequest(array(
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => 'da')
+		));
+		$expected = 'da';
+		$result = Locale::preferred($request);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testPreferredFromConsoleRequestLanguage() {
+		$request = new ConsoleRequest(array(
+			'env' => array('LANGUAGE' => 'sv_SE:nn_NO:de_DE')
+		));
+		$expected = 'sv_SE';
+		$result = Locale::preferred($request);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testPreferredFromConsoleRequestLcAll() {
+		$request = new ConsoleRequest(array(
+			'env' => array('LC_ALL' => 'es_ES@euro')
+		));
+		$expected = 'es_ES';
+		$result = Locale::preferred($request);
+		$this->assertEqual($expected, $result);
+
+		$request = new ConsoleRequest(array(
+			'env' => array('LC_ALL' => 'en_US.UTF-8')
+		));
+		$expected = 'en_US';
+		$result = Locale::preferred($request);
+		$this->assertEqual($expected, $result);
+
+		$request = new ConsoleRequest(array(
+			'env' => array('LC_ALL' => 'en_US')
+		));
+		$expected = 'en_US';
+		$result = Locale::preferred($request);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testPreferredFromConsoleRequestLang() {
+		$request = new ConsoleRequest(array(
+			'env' => array('LANG' => 'es_ES@euro')
+		));
+		$expected = 'es_ES';
+		$result = Locale::preferred($request);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testPreferredFromConsoleRequestPrecedence() {
+		$request = new ConsoleRequest(array(
+			'env' => array(
+				'LANGUAGE' => 'da_DK:ja_JP',
+				'LC_ALL' => 'fr_CA',
+				'LANG' => 'de_DE'
+		)));
+		$expected = 'da_DK';
+		$result = Locale::preferred($request);
+		$this->assertEqual($expected, $result);
+
+		$request = new ConsoleRequest(array(
+			'env' => array(
+				'LC_ALL' => 'fr_CA',
+				'LANG' => 'de_DE'
+		)));
+		$expected = 'fr_CA';
+		$result = Locale::preferred($request);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testPreferredFromConsoleRequestEmptyLocales() {
+		$request = new ConsoleRequest(array(
+			'env' => array('LC_ALL' => 'C')
+		));
+		$result = Locale::preferred($request);
+		$this->assertNull($result);
+
+		$request = new ConsoleRequest(array(
+			'env' => array('LC_ALL' => 'POSIX')
+		));
+		$result = Locale::preferred($request);
+		$this->assertNull($result);
+
+		$request = new ConsoleRequest(array(
+			'env' => array('LC_ALL' => '')
+		));
+		$result = Locale::preferred($request);
+		$this->assertNull($result);
+	}
+
+	public function testPreferredAvailableNegotiation() {
+		$expected = 'nl_BE';
+		$result = Locale::preferred(
+			array('nl_NL', 'nl_BE', 'nl', 'en_US', 'en'),
+			array('en', 'en_US', 'nl_BE')
+		);
+		$this->assertEqual($expected, $result);
+
+		$expected = 'da';
+		$result = Locale::preferred(
+			array('da', 'en_GB', 'en'),
+			array('da', 'en_GB', 'en')
+		);
+		$this->assertEqual($expected, $result);
+
+		$expected = 'da';
+		$result = Locale::preferred(
+			array('da', 'en_GB', 'en'),
+			array('en', 'en_GB', 'da')
+		);
+		$this->assertEqual($expected, $result);
+
+		$expected = 'en_GB';
+		$result = Locale::preferred(
+			array('da', 'en_GB', 'en'),
+			array('en_GB', 'en')
+		);
+		$this->assertEqual($expected, $result);
+
+		$expected = 'da';
+		$result = Locale::preferred(
+			array('da_DK', 'en_GB', 'en'),
+			array('da', 'en_GB', 'en')
+		);
+		$this->assertEqual($expected, $result);
+
+		$expected = 'zh';
+		$result = Locale::preferred(
+			array('zh_Hans_REVISED', 'zh_Hans_HK', 'zh', 'en'),
+			array('zh_Hans_HK_REVISED', 'zh_Hans_HK', 'zh', 'en')
+		);
+		$this->assertEqual($expected, $result);
 	}
 }
 
