@@ -6,6 +6,8 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
+namespace lithium;
+
 use \lithium\core\Environment;
 use \lithium\g11n\Locale;
 use \lithium\g11n\Catalog;
