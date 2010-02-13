@@ -14,7 +14,7 @@ use \lithium\util\String;
 /**
  * Manages all aspects of class and file location, naming and mapping. Implements auto-loading for
  * the Lithium core, as well as all applications, plugins and vendor libraries registered.
- * Typically, libraries and plugins are registered in `app/config/bootstrap.php`.
+ * Typically, libraries and plugins are registered in `app/config/bootstrap/libraries.php`.
  *
  * By convention, vendor libraries are typically located in `app/libraries` or `/libraries`, and
  * plugins are located in `app/libraries/plugins` or `/libraries/plugins`. By default, `Libraries`
@@ -26,11 +26,12 @@ use \lithium\util\String;
  * `'{:library}\models\{:name}'`, which will find a model class in any registered app, plugin or
  * vendor library that follows that path (namespace) convention. You can find classes by name (see
  * `locate()` for more information on class-locating precedence), or find all models in all
- * registered libraries (apps / plugins / vendor libraries, etc).
+ * registered libraries (apps / plugins / vendor libraries, etc). For more information on modifying
+ * the default class organization, or defining your own class types, see the `paths()` method.
  *
  * @see lithium\core\Libraries::add()
  * @see lithium\core\Libraries::locate()
- * @see lithium\core\Libraries::$_paths
+ * @see lithium\core\Libraries::paths()
  */
 class Libraries {
 
@@ -52,7 +53,7 @@ class Libraries {
 	 * specified from most-specific to least-specific. See the `locate()` method for usage examples.
 	 *
 	 * @see lithium\core\Libraries::locate()
-	 *
+	 * @see lithium\core\Libraries::paths()
 	 * @var array
 	 */
 	protected static $_paths = array(
@@ -81,16 +82,10 @@ class Libraries {
 			'{:app}/libraries/{:name}',
 			'{:root}/libraries/{:name}'
 		),
-		'models' => array(
-			'{:library}\models\{:name}'
-		),
+		'models' => '{:library}\models\{:name}',
 		'plugins' => array(
 			'{:app}/libraries/plugins/{:name}',
 			'{:root}/libraries/plugins/{:name}'
-		),
-		'socket' => array(
-			'{:library}\extensions\socket\{:name}',
-			'{:library}\{:class}\socket\{:name}' => array('libraries' => 'lithium')
 		),
 		'test' => array(
 			'{:library}\extensions\test\{:namespace}\{:class}\{:name}',
@@ -108,6 +103,70 @@ class Libraries {
 	 * @see lithium\core\Libraries::load()
 	 */
 	protected static $_cachedPaths = array();
+
+	/**
+	 * Accessor method for the class path templates which `Libraries` uses to look up and load
+	 * classes. Using this method, you can define your own types of classes, or modify the default
+	 * organization of built-in class types.
+	 *
+	 * For example, in a queuing application, you can define a class type called `'job'`:
+	 * {{{
+	 * Libraries::paths(array('job' => '{:library}\extensions\job\{:name}'));
+	 * }}}
+	 *
+	 * Then, any classes you add to the `extensions/job` directory in your application will be
+	 * automatically detected when calling `Libraries::locate('job')`. Additionally, any matching
+	 * classes in the `extensions/job` directory of any plugin or vendor library you add to your
+	 * application will also be detected.
+	 *
+	 * Supposing you wanted to have the option of further organizing jobs by class type (some jobs
+	 * are related to updating caches, others to sending notifications, etc.), you can specify
+	 * mulitple paths per class type, with varying levels of specificity:
+	 * {{{
+	 * Libraries::paths(array('job' => array(
+	 * 	'{:library}\extensions\job\{:class}\{:name}',
+	 * 	'{:library}\extensions\job\{:name}'
+	 * )));
+	 * }}}
+	 *
+	 * This allows you to, for example, have two different classes called `Cleanup`. One may be
+	 * located in `app\extensions\job\Cleanup`, while the other is in
+	 * `app\extensions\job\cache\Cleanup`. Calling: {{{Libraries::locate('job');}}} will find
+	 * both classes, while {{{Libraries::locate('job.cache');}}} will only find the second. You can
+	 * also find individual jobs by name: {{{Libraries::locate('job', 'Cleanup');}}}
+	 *
+	 * See `Libraries::locate()` for more information on using built-in and user-defined paths to
+	 * look up classes.
+	 *
+	 * In addition to adding custom class types, `paths()` allows you to redefine the naming and
+	 * organization of existing types. For example, if you wished to reference your model classes
+	 * as `app\models\PostModel` instead of `app\models\Post`, you can do the following:
+	 * {{{Libraries::paths(array('models' => '{:library}\models\{:name}Model'));}}} Note, however,
+	 * that this is a destructive, not an additive operation, and will replace any existing paths
+	 * defined for that type. If you wish to add a search path for an existing type, you must do
+	 * the following:
+	 * {{{
+	 * $existing = Libraries::paths('controllers');
+	 * Libraries::paths(array('controller' => array_merge(
+	 * 	array('{:library}\extensions\controllers\{:name}Controller'), (array) $existing
+	 * )));
+	 * }}}
+	 *
+	 * @see lithium\core\Libraries::locate()
+	 * @see lithium\core\Libraries::$_paths
+	 * @param mixed $path If `$path` is a string, returns the path(s) associated with that path
+	 *              type, or `null` if no paths are defined for that type.
+	 * @return mixed
+	 */
+	public static function paths($path = null) {
+		if (empty($path)) {
+			return static::$_paths;
+		}
+		if (is_string($path)) {
+			return isset(static::$_paths[$path]) ? static::$_paths[$path] : null;
+		}
+		static::$_paths = array_merge(static::$_paths, (array) $path);
+	}
 
 	/**
 	 * Adds a class library from which files can be loaded
@@ -334,22 +393,55 @@ class Libraries {
 	 * Performs service location for an object of a specific type. If `$name` is a string, finds the
 	 * first instance of a class with the given name in any registered library (i.e. apps, plugins
 	 * or vendor libraries registered via `Libraries::add()`), based on each library's order of
-	 * precedence.
+	 * precedence. For example, this will find the first model called `File` in any plugin or class
+	 * library loaded into an application, including the application itself.
+	 *
+	 * {{{Libraries::locate('models', 'File');}}}
 	 *
 	 * Order of precedence is usually based on the order in which the library was registered (via
 	 * `Libraries::add()`), unless the library was registered with the `'defer'` option set to
 	 * `true`. All libraries with the `'defer'` option set will be searched in
-	 * registration-order **after** searching all libraries **without** `'defer'` set.
+	 * registration-order **after** searching all libraries **without** `'defer'` set. This means
+	 * that in the above example, if an app and a plugin both have a model named `File`, then the
+	 * model from the app will be returned first, assuming the app was registered first (and
+	 * assuming the default settings).
 	 *
 	 * If `$name` is not specified, `locate()` returns an array with all classes of the specified
 	 * type which can be found. By default, `locate()` searches all registered libraries.
 	 *
-	 * @see lithium\core\Libraries::$_paths
+	 * {{{Libraries::locate('models');}}}
+	 *
+	 * For example, the above will return an array of all model classes in all registered plugins
+	 * and libraries (including the app itself).
+	 *
+	 * To learn more about adding and modifying the class paths used with `locate()`, see the
+	 * documentation for the `paths()` method.
+	 *
+	 * @see lithium\core\Libraries::paths()
 	 * @see lithium\core\Libraries::add()
-	 * @param string $type
-	 * @param string $name
-	 * @param array $options
-	 * @return mixed
+	 * @see lithium\core\Libraries::_locateDeferred()
+	 * @param string $type The type of class to search for. Typically follows the name of the
+	 *               directory in which the class is stored, i.e. `'models'`, `'controllers'` or
+	 *               `'adapter'`. Some classes types, such as adapters, will require a greater
+	 *               degree of specificity when looking up the desired class. In this case, the dot
+	 *               syntax is used, as in this example when looking up cache adapters:
+	 *               `'adapter.storage.cache'`, or this example, when looking up authentication
+	 *               adapters: `'adapter.security.auth'`.
+	 * @param string $name The base name (without namespace) of the class you wish to locate. If
+	 *               unspecified, `locate()` will attempt to find all classes of the type specified
+	 *               in `$type`. If you only wish to search for classes within a single plugin or
+	 *               library, you may use the dot syntax to prefix the class name with the library
+	 *               name, i.e. `'app.Post'`, which will only look for a `Post` model within the
+	 *               app itself.
+	 * @param array $options The options to use when searching and returning class names.
+	 *              - `'type'` _string_: Defaults to `'class'`. If set to `'file'`, returns file
+	 *                names instead of class names.
+	 *              - `'library'` _string_: When specified, only the given library/plugin name will
+	 *                be searched.
+	 * @return mixed If `$name` is specified, returns the name of the first class found that matches
+	 *         `$name` and `$type`, or returns `null` if no matching classes were found in any
+	 *         registered library. If `$name` is not specified, returns an array of all classes
+	 *         found which match `$type`.
 	 */
 	public static function locate($type, $name = null, $options = array()) {
 		$defaults = array('type' => 'class');
@@ -491,7 +583,7 @@ class Libraries {
 		foreach ($libraries as $library) {
 			$config = static::$_configurations[$library];
 
-			foreach ($paths as $template => $tplOpts) {
+			foreach ((array) $paths as $template => $tplOpts) {
 				if (is_int($template)) {
 					$template = $tplOpts;
 					$tplOpts = array();
@@ -502,16 +594,30 @@ class Libraries {
 					unset($opts['libraries']);
 					continue;
 				}
-				$path = String::insert($template, $params, array('escape' => '/'));
-				$opts['path'] = preg_replace(
-					'/(\/\*)|(\/(?:[A-Z][a-z0-9_]*))|({:\w+})/', '', str_replace('\\', '/', $path)
-				);
-				if (is_dir("{$config['path']}/{$opts['path']}")) {
-					$classes = array_merge($classes, static::_search($config, $opts));
+				$path  = String::insert($template, $params, array('escape' => '/'));
+				$parts = explode('\\', $path);
+				$name  = end($parts);
+
+				$pattern = '/(\/\*)|(\/(?:[A-Z][a-z0-9_]*))|({:\w+})/';
+				$opts['path'] = preg_replace($pattern, '', str_replace('\\', '/', $path));
+
+				if (is_dir(str_replace('//', '/', "{$config['path']}/{$opts['path']}"))) {
+					$classes = array_merge($classes, static::_search($config, $opts, $name));
 				}
 			}
 		}
 		return $classes;
+	}
+
+	protected static function _locatePath($type, $params) {
+		if (!isset(static::$_paths[$type])) {
+			return null;
+		}
+		foreach (static::$_paths[$type] as $path) {
+			if (is_dir($path = String::insert($path, $params))) {
+				return $path;
+			}
+		}
 	}
 
 	/**
@@ -519,9 +625,10 @@ class Libraries {
 	 *
 	 * @param string $config
 	 * @param string $options
+	 * @param string $name
 	 * @return array
 	 */
-	protected static function _search($config, $options) {
+	protected static function _search($config, $options, $name = null) {
 		$path = rtrim($config['path'] . $options['path'], '/');
 
 		$search = function($path) use ($config, $options) {
@@ -553,6 +660,7 @@ class Libraries {
 			foreach ($libs as $i => $file) {
 				$libs[$i] = $options['format']($file, $config);
 			}
+			$libs = $name ? preg_grep("/{$name}$/", $libs) : $libs;
 		}
 		if ($exclude = $options['exclude']) {
 			if (is_string($exclude)) {
@@ -591,7 +699,7 @@ class Libraries {
 			$options += $defaults;
 
 			if ($options['path'] === null) {
-				$options['path'] = static::locate('plugins', $name, $params);
+				$options['path'] = static::_locatePath('plugins', compact('name') + $params);
 			}
 			if ($options['bootstrap'] === null) {
 				$options['bootstrap'] = file_exists($options['path'] . '/config/bootstrap.php');

@@ -20,6 +20,24 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertFalse(strpos($result, '\\'));
 	}
 
+	public function testPathTemplate() {
+		$expected = array('{:app}/libraries/{:name}', '{:root}/libraries/{:name}');
+		$result = Libraries::paths('libraries');
+		$this->assertEqual($expected, $result);
+
+		$this->assertNull(Libraries::locate('authAdapter', 'Form'));
+
+		$paths = Libraries::paths();
+		$test  = array('authAdapter' => array('lithium\security\auth\adapter\{:name}'));
+		Libraries::paths($test);
+
+		$this->assertEqual($paths + $test, Libraries::paths());
+
+		$class = Libraries::locate('authAdapter', 'Form');
+		$expected = 'lithium\security\auth\adapter\Form';
+		$this->assertEqual($expected, $class);
+	}
+
 	public function testPathTransform() {
 		$expected = 'Library/Class/Separated/By/Underscore';
 		$result = Libraries::path('Library_Class_Separated_By_Underscore', array(
@@ -123,6 +141,16 @@ class LibrariesTest extends \lithium\test\Unit {
 
 		$this->assertFalse(in_array('lithium\LICENSE.txt', $result));
 		$this->assertFalse(in_array('lithium\readme.wiki', $result));
+
+		$this->assertFalse(Libraries::find('lithium'));
+		$result = Libraries::find('lithium', array('path' => '/test/filter/reporter/template'));
+		$this->assertFalse($result);
+
+		$result = Libraries::find('lithium', array(
+			'path' => '/test/filter/reporter/template',
+			'namespaces' => true
+		));
+		$this->assertFalse($result);
 	}
 
 	/**
