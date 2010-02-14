@@ -430,6 +430,63 @@ class FormTest extends \lithium\test\Unit {
 			'input' => array('type' => 'text', 'name' => 'name'),
 		));
 	}
+
+	public function testFormFieldSelect() {
+		$result = $this->form->field('states', array(
+			'type' => 'select', 'list' => array('CA', 'RI')
+		));
+		$this->assertTags($result, array(
+			'div' => array(),
+			'label' => array('for' => 'states'), 'States', '/label',
+			'select' => array('name' => 'states'),
+			array('option' => array('value' => '0', 'selected' => 'selected')),
+			'CA',
+			'/option',
+			array('option' => array('value' => '1')),
+			'RI',
+			'/option',
+			'/select',
+		));
+	}
+
+	public function testFormErrorWithout() {
+		$this->form->create(null);
+		$result = $this->form->error('name');
+		$this->assertTrue(is_null($result));
+	}
+
+	public function testFormErrorWithRecordAndStringError() {
+		$record = new Record();
+		$record->errors(array('name' => 'Please enter a name'));
+		$this->form->create($record);
+
+		$result = $this->form->error('name');
+		$this->assertTags($result, array(
+			'div' => array(), 'Please enter a name', '/div'
+		));
+	}
+
+	public function testFormErrorWithRecordAndSpecificKey() {
+		$record = new Record();
+		$record->errors(array('name' => array('Please enter a name')));
+		$this->form->create($record);
+
+		$result = $this->form->error('name', 0);
+		$this->assertTags($result, array(
+			'div' => array(), 'Please enter a name', '/div'
+		));
+	}
+
+	public function testFormFieldWithError() {
+		$record = new Record();
+		$record->errors(array('name' => array('Please enter a name')));
+		$this->form->create($record);
+
+		$expected = '<div><label for="name">Name</label><input type="text" name="name" />'
+			. '<div>Please enter a name</div></div>';
+		$result = $this->form->field('name');
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

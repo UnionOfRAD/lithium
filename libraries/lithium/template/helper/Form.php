@@ -439,8 +439,8 @@ class Form extends \lithium\template\Helper {
 		if (!$this->_binding || !$content = $this->_binding->errors($name)) {
 			return null;
 		}
-		if (is_array($content) && !$key) {
-			$content = reset($content);
+		if (is_array($content)) {
+			$content = !isset($content[$key]) ? reset($content) : $content[$key];
 		}
 		return $this->_render(__METHOD__, $template, compact('content', 'options'));
 	}
@@ -449,14 +449,17 @@ class Form extends \lithium\template\Helper {
 		$methodConfig = isset($this->_config[$method]) ? $this->_config[$method] : array();
 		$options += $methodConfig + $this->_config['base'];
 
-		if ($name && $this->_binding && (!isset($options['value']) || empty($options['value']))) {
-			$options['value'] = $this->_binding->data($name);
+		$hasValue = (
+			(!isset($options['value']) || empty($options['value'])) &&
+			$name && $this->_binding && $value = $this->_binding->data($name)
+		);
+		if ($hasValue) {
+			$options['value'] = $value;
 		}
-
-		if (isset($options['default'])) {
-			$options['value'] = !empty($options['value']) ? $options['value'] : $options['default'];
-			unset($options['default']);
+		if (isset($options['default']) && empty($options['value'])) {
+			$options['value'] = $options['default'];
 		}
+		unset($options['default']);
 		$template = isset($this->_templateMap[$method]) ? $this->_templateMap[$method] : $method;
 		return array($name, $options, $template);
 	}
