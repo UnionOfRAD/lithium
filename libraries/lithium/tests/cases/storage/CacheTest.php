@@ -10,6 +10,7 @@ namespace lithium\tests\cases\storage;
 
 use \lithium\storage\Cache;
 use \lithium\util\Collection;
+use \SplFileInfo;
 
 class CacheTest extends \lithium\test\Unit {
 
@@ -437,6 +438,11 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testIntegrationFileAdapterWrite() {
+		$directory = new SplFileInfo(LITHIUM_APP_PATH . "/resources/tmp/cache/");
+		$accessible = ($directory->isDir() && $directory->isReadable() && $directory->isWritable());
+		$message = "$directory does not have the proper permissions.";
+		$this->skipIf(!$accessible, $message);
+
 		$config = array('default' => array(
 			'adapter' => 'File',
 			'path' => LITHIUM_APP_PATH . '/resources/tmp/cache',
