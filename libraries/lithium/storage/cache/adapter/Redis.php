@@ -108,9 +108,8 @@ class Redis extends \lithium\core\Object {
 		$Redis =& static::$_Redis;
 
 		return function($self, $params, $chain) use (&$Redis) {
-			extract($params);
-			if($Redis->set($key, $data)){
-				return $self->invokeMethod('_ttl', array($key, $expiry));
+			if($Redis->set($params['key'], $params['data'])){
+				return $self->invokeMethod('_ttl', array($params['key'], $params['expiry']));
 			}
 		};
 	}
@@ -125,23 +124,21 @@ class Redis extends \lithium\core\Object {
 		$Redis =& static::$_Redis;
 
 		return function($self, $params, $chain) use (&$Redis) {
-			extract($params);
-			return $Redis->get($key);
+			return $Redis->get($params['key']);
 		};
 	}
 
 	/**
 	 * Delete value from the cache
 	 *
-	 * @param string $key        The key to uniquely identify the cached item
+	 * @param string $key The key to uniquely identify the cached item
 	 * @return mixed True on successful delete, false otherwise
 	 */
 	public function delete($key) {
 		$Redis =& static::$_Redis;
 
 		return function($self, $params, $chain) use (&$Redis) {
-			extract($params);
-			return (boolean) $Redis->delete($key);
+			return (boolean) $Redis->delete($params['key']);
 		};
 	}
 
@@ -156,8 +153,7 @@ class Redis extends \lithium\core\Object {
 		$Redis =& static::$_Redis;
 
 		return function($self, $params, $chain) use (&$Redis, $offset) {
-			extract($params);
-			return $Redis->decr($key, $offset);
+			return $Redis->decr($params['key'], $offset);
 		};
 	}
 
@@ -172,8 +168,7 @@ class Redis extends \lithium\core\Object {
 		$Redis =& static::$_Redis;
 
 		return function($self, $params, $chain) use (&$Redis, $offset) {
-			extract($params);
-			return $Redis->incr($key, $offset);
+			return $Redis->incr($params['key'], $offset);
 		};
 	}
 
