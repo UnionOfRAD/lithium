@@ -63,8 +63,8 @@ class Memory extends \lithium\core\Object {
 				$results = array();
 
 				foreach($key as $k => &$v) {
-					if (isset($cache[$k])) {
-						$results[$k] = $cache[$k];
+					if (isset($cache[$v])) {
+						$results[$v] = $cache[$v];
 					}
 				}
 				return $results;
