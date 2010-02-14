@@ -125,6 +125,36 @@ class MemcacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testReadMulti() {
+		$expiry = '+1 minute';
+		$time = strtotime($expiry);
+		$key = array(
+			'key1' => 'data1',
+			'key2' => 'data2',
+			'key3' => 'data3'
+		);
+
+		$result = $this->_Memcached->setMulti($key, $time);
+		$this->assertTrue($result);
+
+		$closure = $this->Memcache->read(array_keys($key));
+		$this->assertTrue(is_callable($closure));
+
+		$params = array('key' => array_keys($key));
+		$result = $closure($this->Memcache, $params, null);
+		$expected = array(
+			'key1' => 'data1',
+			'key2' => 'data2',
+			'key3' => 'data3'
+		);
+		$this->assertEqual($expected, $result);
+
+		foreach ($key as $name => &$value) {
+			$result = $this->_Memcached->delete($name);
+			$this->assertTrue($result);
+		}
+	}
+
 	public function testReadKeyThatDoesNotExist() {
 		$key = 'does_not_exist';
 		$closure = $this->Memcache->read($key);
