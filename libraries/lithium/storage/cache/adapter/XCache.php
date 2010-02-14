@@ -71,13 +71,7 @@ class XCache extends \lithium\core\Object {
 	 */
 	public function write($key, $data, $expiry) {
 		return function($self, $params, $chain) {
-			extract($params);
-			$cachetime = strtotime($expiry);
-			$duration = $cachetime - time();
-
-			xcache_set($key . '_expires', $cachetime, $duration);
-			return xcache_set($key, $data, $cachetime);
-
+			return xcache_set($params['key'], $params['data'], strtotime($params['expiry']));
 		};
 	}
 
@@ -89,10 +83,7 @@ class XCache extends \lithium\core\Object {
 	 */
 	public function read($key) {
 		return function($self, $params, $chain) {
-			extract($params);
-			$cachetime = intval(xcache_get($key . '_expires'));
-			$time = time();
-			return ($cachetime < $time) ? false : xcache_get($key);
+			return xcache_get($params['key']);
 		};
 	}
 
@@ -104,9 +95,7 @@ class XCache extends \lithium\core\Object {
 	 */
 	public function delete($key) {
 		return function($self, $params, $chain) {
-			extract($params);
-			xcache_unset($key . '_expires');
-			return xcache_unset($key);
+			return xcache_unset($params['key']);
 		};
 	}
 
@@ -123,8 +112,7 @@ class XCache extends \lithium\core\Object {
 	 */
 	public function decrement($key, $offset = 1) {
 		return function($self, $params, $chain) use ($offset) {
-			extract($params);
-			return xcache_dec($key, $offset);
+			return xcache_dec($params['key'], $offset);
 		};
 	}
 
@@ -141,7 +129,7 @@ class XCache extends \lithium\core\Object {
 	public function increment($key, $offset = 1) {
 		return function($self, $params, $chain) use ($offset) {
 			extract($params);
-			return xcache_inc($key, $offset);
+			return xcache_inc($params['key'], $offset);
 		};
 	}
 

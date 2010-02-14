@@ -62,9 +62,6 @@ class XCacheTest extends \lithium\test\Unit {
 		$result = xcache_get($key);
 		$this->assertEqual($expected, $result);
 
-		$result = xcache_get($key . '_expires');
-		$this->assertEqual($time, $result);
-
 		$result = xcache_unset($key);
 		$this->assertTrue($result);
 
@@ -81,17 +78,10 @@ class XCacheTest extends \lithium\test\Unit {
 		$expected = $data;
 		$this->assertEqual($expected, $result);
 
-
 		$result = xcache_get($key);
 		$this->assertEqual($expected, $result);
 
-		$result = xcache_get($key . '_expires');
-		$this->assertEqual($time, $result);
-
 		$result = xcache_unset($key);
-		$this->assertTrue($result);
-
-		$result = xcache_unset($key . '_expires');
 		$this->assertTrue($result);
 	}
 
@@ -99,9 +89,6 @@ class XCacheTest extends \lithium\test\Unit {
 		$key = 'read_key';
 		$data = 'read data';
 		$time = strtotime('+1 minute');
-
-		$result = xcache_set($key . '_expires', $time, 60);
-		$this->assertTrue($result);
 
 		$result = xcache_set($key, $data, 60);
 		$this->assertTrue($result);
@@ -115,9 +102,6 @@ class XCacheTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = xcache_unset($key);
-		$this->assertTrue($result);
-
-		$result = xcache_unset($key . '_expires');
 		$this->assertTrue($result);
 
 		$key = 'another_read_key';
@@ -127,9 +111,6 @@ class XCacheTest extends \lithium\test\Unit {
 		$result = xcache_set($key, $data, 60);
 		$this->assertTrue($result);
 
-		$result = xcache_set($key . '_expires', $time, 60);
-		$this->assertTrue($result);
-
 		$closure = $this->XCache->read($key);
 		$this->assertTrue(is_callable($closure));
 
@@ -139,9 +120,6 @@ class XCacheTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = xcache_unset($key);
-		$this->assertTrue($result);
-
-		$result = xcache_unset($key . '_expires');
 		$this->assertTrue($result);
 	}
 
@@ -164,18 +142,12 @@ class XCacheTest extends \lithium\test\Unit {
 		$result = xcache_set($key, $data, 60);
 		$this->assertTrue($result);
 
-		$result = xcache_set($key . '_expires', $time, 60);
-		$this->assertTrue($result);
-
 		$closure = $this->XCache->delete($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
 		$result = $closure($this->XCache, $params, null);
 		$this->assertTrue($result);
-
-		$this->assertFalse(xcache_unset($key));
-		$this->assertFalse(xcache_unset($key . '_expires'));
 	}
 
 	public function testDeleteNonExistentKey() {
@@ -208,9 +180,6 @@ class XCacheTest extends \lithium\test\Unit {
 		$result = xcache_get($key);
 		$this->assertEqual($expected, $result);
 
-		$result = xcache_get($key . '_expires');
-		$this->assertEqual($time, $result);
-
 		$closure = $this->XCache->read($key);
 		$this->assertTrue(is_callable($closure));
 
@@ -225,29 +194,6 @@ class XCacheTest extends \lithium\test\Unit {
 		$params = compact('key');
 		$result = $closure($this->XCache, $params, null);
 		$this->assertTrue($result);
-
-		$this->assertFalse(xcache_get($key));
-		$this->assertFalse(xcache_get($key . '_expires'));
-	}
-
-	public function testExpiredRead() {
-		$key = 'expiring_read_key';
-		$data = 'expired data';
-		$time = strtotime('+1 second');
-
-		$result = xcache_set($key . '_expires', $time, 1);
-		$this->assertTrue($result);
-
-		$result = xcache_set($key, $data, 1);
-		$this->assertTrue($result);
-
-		sleep(2);
-		$closure = $this->XCache->read($key);
-		$this->assertTrue(is_callable($closure));
-
-		$params = compact('key');
-		$result = $closure($this->XCache, $params, null);
-		$this->assertFalse($result);
 	}
 
 	public function testClear() {
