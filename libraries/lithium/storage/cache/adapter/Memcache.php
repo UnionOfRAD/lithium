@@ -106,7 +106,7 @@ class Memcache extends \lithium\core\Object {
 	/**
 	 * Read value(s) from the cache
 	 *
-	 * @param string $key        The key to uniquely identify the cached item
+	 * @param string $key The key to uniquely identify the cached item
 	 * @return mixed Cached value if successful, false otherwise
 	 * @todo Refactor to use RES_NOTFOUND for return value checks
 	 */
@@ -114,14 +114,19 @@ class Memcache extends \lithium\core\Object {
 		$Memcached =& static::$_Memcached;
 
 		return function($self, $params, $chain) use (&$Memcached) {
-			return $Memcached->get($params['key']);
+			$key = $params['key'];
+
+			if (is_array($key)) {
+				return $Memcached->getMulti($key);
+			}
+			return $Memcached->get($key);
 		};
 	}
 
 	/**
 	 * Delete value from the cache
 	 *
-	 * @param string $key        The key to uniquely identify the cached item
+	 * @param string $key The key to uniquely identify the cached item
 	 * @return mixed True on successful delete, false otherwise
 	 */
 	public function delete($key) {
