@@ -139,6 +139,18 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testIncrement() {
+		$key = 'key_to_increment';
+		$result = $this->File->increment($key);
+		$this->assertEqual(false, $result);
+	}
+
+	public function testDecrement() {
+		$key = 'key_to_decrement';
+		$result = $this->File->decrement($key);
+		$this->assertEqual(false, $result);
+	}
+
 
 }
 
