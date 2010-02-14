@@ -368,6 +368,7 @@ class MediaTest extends \lithium\test\Unit {
 			'template' => 'home',
 		));
 		$this->assertPattern('/Home/', $response->body());
+		$this->_cleanUp();
 	}
 }
 
