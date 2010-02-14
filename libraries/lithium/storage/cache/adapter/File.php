@@ -16,7 +16,15 @@ use \DirectoryIterator;
  *
  * This File adapter provides basic support for `write`, `read`, `delete`
  * and `clear` cache functionality, as well as allowing the first four
- * methods to be filtered as per the Lithium filtering system.
+ * methods to be filtered as per the Lithium filtering system. The File adapter
+ * is a very simple cache, and should only be used for prototyping or for specifically
+ * caching _files_. For more general caching needs, please consider using a more
+ * appropriate cache adapter.
+ *
+ * This adapter does *not* provide increment/decrement functionality. For such
+ * functionality, please use a more approrpiate cache adapter.
+ *
+ * This adapter does *not* allow multi-key operations for any methods.
  *
  * The path that the cached files will be written to defaults to
  * `LITHIUM_APP_PATH/resources/tmp/cache`, but is user-configurable on cache configuration.
@@ -25,14 +33,18 @@ use \DirectoryIterator;
  * of the cached data, and is transparently added and/or removed when values
  * are stored and/or retrieved from the cache.
  *
+ * @see lithium\storage\cache\adapter
  */
 class File extends \lithium\core\Object {
 
 	/**
-	 * Class constructor
+	 * Class constructor.
 	 *
-	 * @param array $config
+	 * @param array $config Configuration parameters for this cache adapter.
+	 *        These settings are indexed by name and queryable
+	 *        through `Cache::config('name')`.
 	 * @return void
+	 * @see lithium\storage\Cache::config()
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('path' => LITHIUM_APP_PATH . '/resources/tmp/cache');
@@ -40,12 +52,12 @@ class File extends \lithium\core\Object {
 	}
 
 	/**
-	 * Write value(s) to the cache
+	 * Write value(s) to the cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @param mixed $data The value to be cached
-	 * @param string $expiry A strtotime() compatible cache time
-	 * @return boolean True on successful write, false otherwise
+	 * @param string $key The key to uniquely identify the cached item.
+	 * @param mixed $data The value to be cached.
+	 * @param string $expiry A strtotime() compatible cache time.
+	 * @return boolean True on successful write, false otherwise.
 	 */
 	public function write($key, $data, $expiry) {
 		$path = $this->_config['path'];
@@ -62,10 +74,10 @@ class File extends \lithium\core\Object {
 	}
 
 	/**
-	 * Read value(s) from the cache
+	 * Read value(s) from the cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @return mixed Cached value if successful, false otherwise
+	 * @param string $key The key to uniquely identify the cached item.
+	 * @return mixed Cached value if successful, false otherwise.
 	 */
 	public function read($key) {
 		$path = $this->_config['path'];
@@ -94,10 +106,10 @@ class File extends \lithium\core\Object {
 	}
 
 	/**
-	 * Delete value from the cache
+	 * Delete an entry from the cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @return mixed True on successful delete, false otherwise
+	 * @param string $key The key to uniquely identify the cached item.
+	 * @return mixed True on successful delete, false otherwise.
 	 */
 	public function delete($key) {
 		$path = $this->_config['path'];
@@ -146,9 +158,9 @@ class File extends \lithium\core\Object {
 	}
 
 	/**
-	 * Clears user-space cache
+	 * Clears user-space cache.
 	 *
-	 * @return mixed True on successful clear, false otherwise
+	 * @return mixed True on successful clear, false otherwise.
 	 */
 	public function clear() {
 		$directory = new DirectoryIterator($this->_config['path']);
@@ -166,11 +178,10 @@ class File extends \lithium\core\Object {
 	 * Determines if the File adapter can read and write
 	 * to the configured path.
 	 *
-	 * return boolean True if enabled, false otherwise
+	 * return boolean True if enabled, false otherwise.
 	 */
 	public function enabled() {
 		$directory = new SplFileInfo($this->_config['path']);
-
 		return ($directory->isDir() && $directory->isReadable() && $directory->isWritable());
 	}
 }
