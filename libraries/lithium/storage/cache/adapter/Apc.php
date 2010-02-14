@@ -81,7 +81,7 @@ class Apc extends \lithium\core\Object {
 	 * array of key names, this adapter will attempt to return an array of data
 	 * containing key/value pairs of the requested data.
 	 *
-	 * @param string $key The key to uniquely identify the cached item.
+	 * @param string|array $key The key to uniquely identify the cached item.
 	 * @return mixed Cached value if successful, false otherwise.
 	 */
 	public function read($key) {
@@ -97,7 +97,7 @@ class Apc extends \lithium\core\Object {
 	 * array of key names, this adapter method will attempt to remove these keys
 	 * from the user space cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item.
+	 * @param string|array $key The key to uniquely identify the cached item.
 	 * @return mixed True on successful delete, false otherwise.
 	 */
 	public function delete($key) {

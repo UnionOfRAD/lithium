@@ -36,17 +36,10 @@ namespace lithium\storage\cache\adapter;
  * and `clear` cache functionality, as well as allowing the first four
  * methods to be filtered as per the Lithium filtering system.
  *
- * This adapter defines several methods that are _not_ implemented in other
- * adapters, and are thus non-portable - see the documentation for `Cache`
- * as to how these methods should be accessed.
- *
- * This adapter stores two keys for each written value - one which consists
- * of the data to be cached, and the other being a cache of the expiration time.
- * This is to unify the behavior of the XCache adapter to be in line with the other
- * adapters, since XCache cache expirations are only evaluated on requests subsequent
- * to their initial storage.
+ * This adapter does *not* allow multi-key operations for any methods.
  *
  * @see lithium\storage\Cache::key()
+ * @see lithium\storage\cache\adapter
  */
 class XCache extends \lithium\core\Object {
 

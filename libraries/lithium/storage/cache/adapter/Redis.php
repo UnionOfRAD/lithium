@@ -32,7 +32,7 @@ namespace lithium\storage\cache\adapter;
  * ));
  * }}}
  *
- * The 'server' key accepts a string argument in the format of ipaddress:port where the Redis
+ * The 'server' key accepts a string argument in the format of ip:port where the Redis
  * server can be found.
  *
  * This Redis adapter provides basic support for `write`, `read`, `delete`
@@ -44,6 +44,7 @@ namespace lithium\storage\cache\adapter;
  *
  * @see lithium\storage\Cache::key()
  * @see lithium\storage\Cache::adapter()
+ * @see http://github.com/owlient/phpredis
  *
  */
 class Redis extends \lithium\core\Object {

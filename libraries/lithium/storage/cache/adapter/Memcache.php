@@ -41,8 +41,7 @@ use \lithium\util\Set;
  * adapters, and are thus non-portable - see the documentation for `Cache`
  * as to how these methods should be accessed.
  *
- * This adapter stores two keys for each written value - one which consists
- * of the data to be cached, and the other being a cache of the expiration time.
+ * This adapter supports multi-key `write` and `read` operations.
  *
  * @see lithium\storage\Cache::key()
  * @see lithium\storage\Cache::adapter()
@@ -87,12 +86,16 @@ class Memcache extends \lithium\core\Object {
 	}
 
 	/**
-	 * Write value(s) to the cache
+	 * Write value(s) to the cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @param mixed $value The value to be cached
-	 * @param string $expiry A strtotime() compatible cache time
-	 * @return boolean True on successful write, false otherwise
+	 * This adapter method supports multi-key write. By specifying `$key` as an
+	 * associative array of key/value pairs, `$data` is ignored and all keys that
+	 * are cached will receive an expiration time of `$expiry`.
+	 *
+	 * @param string|array $key The key to uniquely identify the cached item.
+	 * @param mixed $value The value to be cached.
+	 * @param string $expiry A strtotime() compatible cache time.
+	 * @return boolean True on successful write, false otherwise.
 	 */
 	public function write($key, $value, $expiry) {
 		$Memcached =& static::$Memcached;
@@ -109,11 +112,15 @@ class Memcache extends \lithium\core\Object {
 	}
 
 	/**
-	 * Read value(s) from the cache
+	 * Read value(s) from the cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @return mixed Cached value if successful, false otherwise
-	 * @todo Refactor to use RES_NOTFOUND for return value checks
+	 * This adapter method supports multi-key reads. By specifying `$key` as an
+	 * array of key names, this adapter will attempt to return an array of data
+	 * containing key/value pairs of the requested data.
+	 *
+	 * @param string|array $key The key to uniquely identify the cached item.
+	 * @return mixed Cached value if successful, false otherwise.
+	 * @todo Refactor to use RES_NOTFOUND for return value checks.
 	 */
 	public function read($key) {
 		$Memcached =& static::$Memcached;
@@ -129,10 +136,10 @@ class Memcache extends \lithium\core\Object {
 	}
 
 	/**
-	 * Delete value from the cache
+	 * Delete value from the cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @return mixed True on successful delete, false otherwise
+	 * @param string $key The key to uniquely identify the cached item.
+	 * @return mixed True on successful delete, false otherwise.
 	 */
 	public function delete($key) {
 		$Memcached =& static::$Memcached;
@@ -182,9 +189,9 @@ class Memcache extends \lithium\core\Object {
 	}
 
 	/**
-	 * Clears user-space cache
+	 * Clears user-space cache.
 	 *
-	 * @return mixed True on successful clear, false otherwise
+	 * @return mixed True on successful clear, false otherwise.
 	 */
 	public function clear() {
 		return static::$Memcached->flush();
@@ -194,8 +201,7 @@ class Memcache extends \lithium\core\Object {
 	 * Determines if the Memcached extension has been installed and
 	 * properly started.
 	 *
-	 * @todo make this a bit smarter.
-	 * return boolean True if enabled, false otherwise
+	 * return boolean True if enabled, false otherwise.
 	 */
 	public function enabled() {
 		if (!extension_loaded('memcached')) {
