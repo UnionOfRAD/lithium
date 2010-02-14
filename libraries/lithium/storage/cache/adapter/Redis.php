@@ -51,7 +51,7 @@ class Redis extends \lithium\core\Object {
 	 *
 	 * @var object Memcache object
 	 */
-	protected static $_Redis = null;
+	public static $Redis = null;
 
 	/**
 	 * Object constructor
@@ -71,15 +71,15 @@ class Redis extends \lithium\core\Object {
 			'server' => '127.0.0.1:6379'
 		);
 
-		if (is_null(static::$_Redis)) {
-			static::$_Redis = new \Redis();
+		if (is_null(static::$Redis)) {
+			static::$Redis = new \Redis();
 		}
 
 		$config += $defaults;
 		parent::__construct($config);
 
 		list($IP, $port) = explode(':', $this->_config['server']);
-		static::$_Redis->connect($IP, $port);
+		static::$Redis->connect($IP, $port);
 	}
 
 	/**
@@ -91,7 +91,7 @@ class Redis extends \lithium\core\Object {
 	 */
 	protected function _ttl($key, $expiry) {
 		$expires = strtotime($expiry) - time();
-		return static::$_Redis->setTimeout($key, $expires);
+		return static::$Redis->setTimeout($key, $expires);
 	}
 
 	/**
@@ -103,7 +103,7 @@ class Redis extends \lithium\core\Object {
 	 * @return boolean True on successful write, false otherwise
 	 */
 	public function write($key, $value, $expiry) {
-		$Redis =& static::$_Redis;
+		$Redis =& static::$Redis;
 
 		return function($self, $params, $chain) use (&$Redis) {
 			if($Redis->set($params['key'], $params['data'])){
@@ -119,7 +119,7 @@ class Redis extends \lithium\core\Object {
 	 * @return mixed Cached value if successful, false otherwise
 	 */
 	public function read($key) {
-		$Redis =& static::$_Redis;
+		$Redis =& static::$Redis;
 
 		return function($self, $params, $chain) use (&$Redis) {
 			return $Redis->get($params['key']);
@@ -133,7 +133,7 @@ class Redis extends \lithium\core\Object {
 	 * @return mixed True on successful delete, false otherwise
 	 */
 	public function delete($key) {
-		$Redis =& static::$_Redis;
+		$Redis =& static::$Redis;
 
 		return function($self, $params, $chain) use (&$Redis) {
 			return (boolean) $Redis->delete($params['key']);
@@ -148,7 +148,7 @@ class Redis extends \lithium\core\Object {
 	 * @return mixed Item's new value on successful decrement, false otherwise
 	 */
 	public function decrement($key, $offset = 1) {
-		$Redis =& static::$_Redis;
+		$Redis =& static::$Redis;
 
 		return function($self, $params, $chain) use (&$Redis, $offset) {
 			return $Redis->decr($params['key'], $offset);
@@ -163,7 +163,7 @@ class Redis extends \lithium\core\Object {
 	 * @return mixed Item's new value on successful increment, false otherwise
 	 */
 	public function increment($key, $offset = 1) {
-		$Redis =& static::$_Redis;
+		$Redis =& static::$Redis;
 
 		return function($self, $params, $chain) use (&$Redis, $offset) {
 			return $Redis->incr($params['key'], $offset);
@@ -176,7 +176,7 @@ class Redis extends \lithium\core\Object {
 	 * @return mixed True on successful clear, false otherwise
 	 */
 	public function clear() {
-		return static::$_Redis->flushdb();
+		return static::$Redis->flushdb();
 	}
 
 	/**
@@ -189,7 +189,7 @@ class Redis extends \lithium\core\Object {
 		if (!extension_loaded('redis')) {
 			return false;
 		}
-		$version = static::$_Redis->info();
+		$version = static::$Redis->info();
 		return (!empty($version));
 	}
 }
