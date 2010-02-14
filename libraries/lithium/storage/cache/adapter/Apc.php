@@ -79,10 +79,14 @@ class Apc extends \lithium\core\Object {
 	}
 
 	/**
-	 * Read value(s) from the cache
+	 * Read value(s) from the cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @return mixed Cached value if successful, false otherwise
+	 * This adapter method supports multi-key reads. By specifying `$key` as an
+	 * array of key names, this adapter will attempt to return an array of data
+	 * containing key/value pairs of the requested data.
+	 *
+	 * @param string $key The key to uniquely identify the cached item.
+	 * @return mixed Cached value if successful, false otherwise.
 	 */
 	public function read($key) {
 		return function($self, $params, $chain) {
@@ -91,10 +95,14 @@ class Apc extends \lithium\core\Object {
 	}
 
 	/**
-	 * Delete value from the cache
+	 * Delete value from the cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @return mixed True on successful delete, false otherwise
+	 * This adapter method supports multi-key deletes. By specifynig `$key` as an
+	 * array of key names, this adapter method will attempt to remove these keys
+	 * from the user space cache.
+	 *
+	 * @param string $key The key to uniquely identify the cached item.
+	 * @return mixed True on successful delete, false otherwise.
 	 */
 	public function delete($key) {
 		return function($self, $params, $chain) {
