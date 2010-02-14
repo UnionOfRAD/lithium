@@ -206,6 +206,13 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertNull($result);
 	}
 
+	public function testFindingClassesAndNamespaces() {
+		$result = Libraries::find('app', array('namespaces' => true));
+		$this->assertTrue(in_array('app\config', $result));
+		$this->assertTrue(in_array('app\controllers', $result));
+		$this->assertTrue(in_array('app\models', $result));
+		$this->assertFalse(in_array('app\index', $result));
+	}
 
 	public function testFindingClassesWithExclude() {
 		$expected = array();

@@ -281,36 +281,48 @@ class Libraries {
 	 * @return array
 	 */
 	public static function find($library, $options = array()) {
+		$format = function ($file, $config) {
+			$trim = array(strlen($config['path']) + 1, strlen($config['suffix']));
+			$rTrim = strpos($file, $config['suffix']) !== false ? -$trim[1] : 9999;
+			$file = preg_split('/[\/\\\\]/', substr($file, $trim[0], $rTrim));
+			return $config['prefix'] . join('\\', $file);
+		};
+
 		$defaults = array(
 			'path' => '', 'recursive' => false,
 			'filter' => '/^(\w+)?(\\\\[a-z0-9_]+)+\\\\[A-Z][a-zA-Z0-9]+$/',
 			'exclude' => '',
-			'format' => function ($file, $config) {
-				$trim = array(strlen($config['path']) + 1, strlen($config['suffix']));
-				$rTrim = strpos($file, $config['suffix']) !== false ? -$trim[1] : 9999;
-				$file = preg_split('/[\/\\\\]/', substr($file, $trim[0], $rTrim));
-				return $config['prefix'] . join('\\', $file);
-			},
+			'format' => $format,
 			'namespaces' => false
 		);
 		$options += $defaults;
+		$libs = array();
 
 		if ($options['namespaces'] && $options['filter'] == $defaults['filter']) {
+			$options['format'] = function($class, $config) use ($format, $defaults) {
+				if (is_dir($class)) {
+					return $format($class, $config);
+				}
+				if (preg_match($defaults['filter'], $class = $format($class, $config))) {
+					return $class;
+				}
+			};
 			$options['filter'] = false;
 		}
+
 		if ($library === true) {
-			$libs = array();
 			foreach (array_keys(static::$_configurations) as $library) {
 				$libs = array_merge($libs, static::find($library, $options));
 			}
 			return $libs;
 		}
+
 		if (!isset(static::$_configurations[$library])) {
 			return null;
 		}
-		$config = static::$_configurations[$library];
-		$libs = static::_search($config, $options);
-		return array_values($libs);
+
+		$libs = static::_search(static::$_configurations[$library], $options);
+		return array_values(array_filter($libs));
 	}
 
 	/**
@@ -672,7 +684,7 @@ class Libraries {
 		if ($filter = $options['filter']) {
 			if (is_string($filter)) {
 				$libs = preg_grep($filter, $libs) ;
-			} else if (is_callable($filter)){
+			} elseif (is_callable($filter)) {
 				$libs = array_filter(array_map($filter, $libs));
 			}
 		}
