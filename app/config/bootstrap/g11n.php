@@ -137,7 +137,7 @@ ActionDispatcher::applyFilter('_callable', function($self, $params, $chain) {
 	if (!$request->locale) {
 		$request->params['locale'] = Locale::preferred($request);
 	}
-	Environment::set('development', array('locale' => $request->locale));
+	Environment::set(Environment::get(), array('locale' => $request->locale));
 	return $controller;
 });
 ConsoleDispatcher::applyFilter('_callable', function($self, $params, $chain) {
@@ -147,7 +147,7 @@ ConsoleDispatcher::applyFilter('_callable', function($self, $params, $chain) {
 	if (!$request->locale) {
 		$request->params['locale'] = Locale::preferred($request);
 	}
-	Environment::set('development', array('locale' => $request->locale));
+	Environment::set(Environment::get(), array('locale' => $request->locale));
 	return $command;
 });
 
