@@ -64,18 +64,8 @@ class Apc extends \lithium\core\Object {
 	 */
 	public function write($key, $data, $expiry) {
 		return function($self, $params, $chain) {
-			extract($params);
-			$cachetime = strtotime($expiry);
-			$duration = $cachetime - time();
-
-			if (is_array($key)) {
-				$expiryKeys = array_map(function($v) { return $v . '_expires'; }, array_keys($key));
-				$result = apc_store(array_fill_keys($expiryKeys, $cachetime), $duration);
-				return apc_store($key, $cachetime);
-			}
-			apc_store($key . '_expires', $cachetime, $duration);
-			return apc_store($key, $data, $cachetime);
-
+			$cachetime = strtotime($params['expiry']);
+			return apc_store($params['key'], $params['data'], $cachetime);
 		};
 	}
 
@@ -87,10 +77,7 @@ class Apc extends \lithium\core\Object {
 	 */
 	public function read($key) {
 		return function($self, $params, $chain) {
-			extract($params);
-			$cachetime = intval(apc_fetch($key . '_expires'));
-			$time = time();
-			return ($cachetime < $time) ? false : apc_fetch($key);
+			return apc_fetch($params['key']);
 		};
 	}
 
@@ -102,9 +89,7 @@ class Apc extends \lithium\core\Object {
 	 */
 	public function delete($key) {
 		return function($self, $params, $chain) {
-			extract($params);
-			apc_delete($key . '_expires');
-			return apc_delete($key);
+			return apc_delete($params['key']);
 		};
 	}
 
@@ -121,8 +106,7 @@ class Apc extends \lithium\core\Object {
 	 */
 	public function decrement($key, $offset = 1) {
 		return function($self, $params, $chain) use ($offset) {
-			extract($params);
-			return apc_dec($key, $offset);
+			return apc_dec($params['key'], $offset);
 		};
 	}
 
@@ -139,8 +123,7 @@ class Apc extends \lithium\core\Object {
 	 */
 	public function increment($key, $offset = 1) {
 		return function($self, $params, $chain) use ($offset) {
-			extract($params);
-			return apc_inc($key, $offset);
+			return apc_inc($params['key'], $offset);
 		};
 	}
 

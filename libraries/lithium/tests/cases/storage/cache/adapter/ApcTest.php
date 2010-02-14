@@ -54,9 +54,6 @@ class ApcTest extends \lithium\test\Unit {
 		$result = apc_fetch($key);
 		$this->assertEqual($expected, $result);
 
-		$result = apc_fetch($key . '_expires');
-		$this->assertEqual($time, $result);
-
 		$result = apc_delete($key);
 		$this->assertTrue($result);
 
@@ -76,13 +73,7 @@ class ApcTest extends \lithium\test\Unit {
 		$result = apc_fetch($key);
 		$this->assertEqual($expected, $result);
 
-		$result = apc_fetch($key . '_expires');
-		$this->assertEqual($time, $result);
-
 		$result = apc_delete($key);
-		$this->assertTrue($result);
-
-		$result = apc_delete($key . '_expires');
 		$this->assertTrue($result);
 	}
 
@@ -107,16 +98,6 @@ class ApcTest extends \lithium\test\Unit {
 		$result = apc_fetch(array_keys($key));
 		$this->assertEqual($key, $result);
 
-		$expiryKeys = array_map(function($v) {
-			return $v . '_expires';
-		}, array_keys($key));
-
-		$result = apc_fetch($expiryKeys);
-		$this->assertEqual(array_fill_keys($expiryKeys, $time), $result);
-
-		$result = apc_delete($expiryKeys);
-		$this->assertEqual(array(), $result);
-
 		$result = apc_delete(array_keys($key));
 		$this->assertEqual(array(), $result);
 	}
@@ -126,9 +107,6 @@ class ApcTest extends \lithium\test\Unit {
 		$data = 'read data';
 		$time = strtotime('+1 minute');
 
-		$result = apc_store($key . '_expires', $time, 60);
-		$this->assertTrue($result);
-
 		$result = apc_store($key, $data, 60);
 		$this->assertTrue($result);
 
@@ -141,9 +119,6 @@ class ApcTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = apc_delete($key);
-		$this->assertTrue($result);
-
-		$result = apc_delete($key . '_expires');
 		$this->assertTrue($result);
 
 		$key = 'another_read_key';
@@ -153,21 +128,16 @@ class ApcTest extends \lithium\test\Unit {
 		$result = apc_store($key, $data, 60);
 		$this->assertTrue($result);
 
-		$result = apc_store($key . '_expires', $time, 60);
-		$this->assertTrue($result);
-
 		$closure = $this->Apc->read($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
 		$result = $closure($this->Apc, $params, null);
 		$expected = $data;
+
 		$this->assertEqual($expected, $result);
 
 		$result = apc_delete($key);
-		$this->assertTrue($result);
-
-		$result = apc_delete($key . '_expires');
 		$this->assertTrue($result);
 	}
 
@@ -190,18 +160,12 @@ class ApcTest extends \lithium\test\Unit {
 		$result = apc_store($key, $data, 60);
 		$this->assertTrue($result);
 
-		$result = apc_store($key . '_expires', $time, 60);
-		$this->assertTrue($result);
-
 		$closure = $this->Apc->delete($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
 		$result = $closure($this->Apc, $params, null);
 		$this->assertTrue($result);
-
-		$this->assertFalse(apc_delete($key));
-		$this->assertFalse(apc_delete($key . '_expires'));
 	}
 
 	public function testDeleteNonExistentKey() {
@@ -234,9 +198,6 @@ class ApcTest extends \lithium\test\Unit {
 		$result = apc_fetch($key);
 		$this->assertEqual($expected, $result);
 
-		$result = apc_fetch($key . '_expires');
-		$this->assertEqual($time, $result);
-
 		$closure = $this->Apc->read($key);
 		$this->assertTrue(is_callable($closure));
 
@@ -251,29 +212,6 @@ class ApcTest extends \lithium\test\Unit {
 		$params = compact('key');
 		$result = $closure($this->Apc, $params, null);
 		$this->assertTrue($result);
-
-		$this->assertFalse(apc_fetch($key));
-		$this->assertFalse(apc_fetch($key . '_expires'));
-	}
-
-	public function testExpiredRead() {
-		$key = 'expiring_read_key';
-		$data = 'expired data';
-		$time = strtotime('+1 second');
-
-		$result = apc_store($key . '_expires', $time, 1);
-		$this->assertTrue($result);
-
-		$result = apc_store($key, $data, 1);
-		$this->assertTrue($result);
-
-		sleep(2);
-		$closure = $this->Apc->read($key);
-		$this->assertTrue(is_callable($closure));
-
-		$params = compact('key');
-		$result = $closure($this->Apc, $params, null);
-		$this->assertFalse($result);
 	}
 
 	public function testClear() {
