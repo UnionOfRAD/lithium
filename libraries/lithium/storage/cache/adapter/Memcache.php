@@ -36,10 +36,7 @@ use \lithium\util\Set;
  *
  * This Memcache adapter provides basic support for `write`, `read`, `delete`
  * and `clear` cache functionality, as well as allowing the first four
- * methods to be filtered as per the Lithium filtering system. Additionally,
- * This adapter defines several methods that are _not_ implemented in other
- * adapters, and are thus non-portable - see the documentation for `Cache`
- * as to how these methods should be accessed.
+ * methods to be filtered as per the Lithium filtering system.
  *
  * This adapter supports multi-key `write` and `read` operations.
  *
