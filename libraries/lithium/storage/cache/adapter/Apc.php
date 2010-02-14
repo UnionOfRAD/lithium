@@ -31,11 +31,7 @@ namespace lithium\storage\cache\adapter;
  * adapters, and are thus non-portable - see the documentation for `Cache`
  * as to how these methods should be accessed.
  *
- * This adapter stores two keys for each written value - one which consists
- * of the data to be cached, and the other being a cache of the expiration time.
- * This is to unify the behavior of the APC adapter to be in line with the other
- * adapters, since APC cache expirations are only evaluated on requests subsequent
- * to their initial storage.
+ * This adapter supports multi-key `write`, `read` and `delete` operations.
  *
  * Learn more about APC in the [PHP APC manual](http://php.net/manual/en/book.apc.php).
  *
