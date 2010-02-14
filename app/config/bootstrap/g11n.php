@@ -15,6 +15,8 @@ use \lithium\g11n\Message;
 use \lithium\util\Inflector;
 use \lithium\util\Validator;
 use \lithium\net\http\Media;
+use \lithium\action\Dispatcher as ActionDispatcher;
+use \lithium\console\Dispatcher as ConsoleDispatcher;
 
 /**
  * Sets the default timezone used by all date/time functions.
@@ -111,7 +113,7 @@ Catalog::write('message.plural', 'root', $data, array('name' => 'runtime'));
  */
 Media::applyFilter('_handle', function($self, $params, $chain) {
 	$params['handler'] += array('outputFilters' => array());
-	$params['handler']['outputFilters'] += Message::shortHands();
+	$params['handler']['outputFilters'] += Message::shorthands();
 	return $chain->next($self, $params, $chain);
 });
 

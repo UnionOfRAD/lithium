@@ -177,7 +177,7 @@ class MessageTest extends \lithium\test\Unit {
 		);
 		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
 
-		$filters = Message::shortHands();
+		$filters = Message::shorthands();
 		$t = $filters['t'];
 		$tn = $filters['tn'];
 
@@ -200,7 +200,7 @@ class MessageTest extends \lithium\test\Unit {
 		);
 		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
 
-		$filters = Message::shortHands();
+		$filters = Message::shorthands();
 		$t = $filters['t'];
 		$tn = $filters['tn'];
 
@@ -218,7 +218,7 @@ class MessageTest extends \lithium\test\Unit {
 	}
 
 	public function testShortHandsAsymmetry() {
-		$filters = Message::shortHands();
+		$filters = Message::shorthands();
 		$t = $filters['t'];
 		$tn = $filters['tn'];
 

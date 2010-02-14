@@ -22,7 +22,7 @@ One special case situation to take _important_ note of, is the use of
 `<?=$this->foo()?>`. In this scenario, the code is translated to
 `<?php echo $this->foo(); ?>` rather than being filtered through `$h()` as with
 the former explanation. When direct access to a method or property on `$this` is
-contained in the shorthand syntax, it will be output as normal without being
+contained in the shorthands syntax, it will be output as normal without being
 filtered. This is to make it easier to work with helpers that return markup.
 
 An example would be something like: {{{
