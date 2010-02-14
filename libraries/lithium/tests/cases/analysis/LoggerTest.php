@@ -17,6 +17,11 @@ use \lithium\tests\mocks\analysis\MockLoggerAdapter;
  */
 class LoggerTest extends \lithium\test\Unit {
 
+	public function skip() {
+		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_writable($this->_testPath), "{$this->_testPath} is not readable.");
+	}
+
 	public function setUp() {
 		Logger::config(array('default' => array('adapter' => new MockLoggerAdapter())));
 	}
@@ -61,24 +66,27 @@ class LoggerTest extends \lithium\test\Unit {
 	}
 
 	public function testIntegrationWriteFile() {
+		$base = LITHIUM_APP_PATH . '/resources/tmp/logs';
+		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+
 		$config = array('default' => array('adapter' => 'File'));
 		Logger::config($config);
 
 		$result = Logger::write('default', 'Message line 1');
-		$this->assertTrue(file_exists(LITHIUM_APP_PATH . '/resources/tmp/logs/default.log'));
+		$this->assertTrue(file_exists($base . '/default.log'));
 
 		$expected = "Message line 1\n";
-		$result = file_get_contents(LITHIUM_APP_PATH . '/resources/tmp/logs/default.log');
+		$result = file_get_contents($base . '/default.log');
 		$this->assertEqual($expected, $result);
 
 		$result = Logger::write('default', 'Message line 2');
 		$this->assertTrue($result);
 
 		$expected = "Message line 1\nMessage line 2\n";
-		$result = file_get_contents(LITHIUM_APP_PATH . '/resources/tmp/logs/default.log');
+		$result = file_get_contents($base . '/default.log');
 		$this->assertEqual($expected, $result);
 
-		unlink(LITHIUM_APP_PATH . '/resources/tmp/logs/default.log');
+		unlink($base . '/default.log');
 	}
 }
 

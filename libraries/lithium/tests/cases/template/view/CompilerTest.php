@@ -13,8 +13,13 @@ use \lithium\template\view\Compiler;
 class CompilerTest extends \lithium\test\Unit {
 
 	protected $_path;
-	
+
 	protected $_file = 'resources/tmp/tests/template.html.php';
+
+	public function skip() {
+		$path = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_writable($path), "{$path} is not writable.");
+	}
 
 	public function setUp() {
 		$this->_path = str_replace('\\', '/', LITHIUM_APP_PATH);

@@ -21,11 +21,15 @@ class LibraryTest extends \lithium\test\Unit {
 
 	protected $_testPath = null;
 
+	public function skip() {
+		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_writable($this->_testPath), "{$this->_testPath} is not writable.");
+	}
+
 	public function setUp() {
 		$this->_backup['cwd'] = getcwd();
 		$this->_backup['_SERVER'] = $_SERVER;
 		$_SERVER['argv'] = array();
-		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
 
 		chdir($this->_testPath);
 		Libraries::add('library_test', array('path' => $this->_testPath . '/library_test'));

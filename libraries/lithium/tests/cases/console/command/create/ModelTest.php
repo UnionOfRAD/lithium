@@ -20,12 +20,16 @@ class ModelTest extends \lithium\test\Unit {
 
 	protected $_testPath = null;
 
+	public function skip() {
+		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_writable($this->_testPath), "{$this->_testPath} is not readable.");
+	}
+
 	public function setUp() {
 		$this->classes = array('response' => '\lithium\tests\mocks\console\MockResponse');
 		$this->_backup['cwd'] = getcwd();
 		$this->_backup['_SERVER'] = $_SERVER;
 		$_SERVER['argv'] = array();
-		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
 
 		Libraries::add('create_test', array('path' => $this->_testPath . '/create_test'));
 		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));

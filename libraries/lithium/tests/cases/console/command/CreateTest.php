@@ -20,13 +20,17 @@ class CreateTest extends \lithium\test\Unit {
 
 	protected $_testPath = null;
 
+	public function skip() {
+		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_writable($this->_testPath), "{$this->_testPath} is not writable.");
+	}
+
 	public function setUp() {
 		$this->_backup['cwd'] = getcwd();
 		$this->_backup['_SERVER'] = $_SERVER;
 		$this->_backup['app'] = Libraries::get('app');
 
 		$_SERVER['argv'] = array();
-		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
 
 		Libraries::add('app', array('path' => $this->_testPath . '/new', 'bootstrap' => false));
 		Libraries::add('create_test', array('path' => $this->_testPath . '/create_test'));
@@ -50,6 +54,7 @@ class CreateTest extends \lithium\test\Unit {
 	}
 
 	public function testSaveWithApp() {
+
 		chdir($this->_testPath);
 		$this->request->params = array('library' => 'app');
 		$create = new MockCreate(array('request' => $this->request));

@@ -95,6 +95,8 @@ class UnitTest extends \lithium\test\Unit {
 
 	public function testCleanUp() {
 		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+
 		$this->assertTrue(mkdir("{$base}/cleanup_test"));
 		$this->assertTrue(touch("{$base}/cleanup_test/file"));
 		$this->assertTrue(touch("{$base}/cleanup_test/.hideme"));
@@ -105,6 +107,8 @@ class UnitTest extends \lithium\test\Unit {
 
 	public function testCleanUpWithFullPath() {
 		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+
 		$this->assertTrue(mkdir("{$base}/cleanup_test"));
 		$this->assertTrue(touch("{$base}/cleanup_test/file"));
 		$this->assertTrue(touch("{$base}/cleanup_test/.hideme"));
@@ -119,6 +123,8 @@ class UnitTest extends \lithium\test\Unit {
 
 	public function testCleanUpWithRelativePath() {
 		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+
 		$this->assertTrue(mkdir("{$base}/cleanup_test"));
 		$this->assertTrue(touch("{$base}/cleanup_test/file"));
 		$this->assertTrue(touch("{$base}/cleanup_test/.hideme"));

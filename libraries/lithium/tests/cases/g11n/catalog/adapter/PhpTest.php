@@ -14,8 +14,13 @@ class PhpTest extends \lithium\test\Unit {
 
 	public $adapter;
 
-	public function setUp() {
+	public function skip() {
 		$this->_path = $path = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$message = "{$path} is not writable.";
+		$this->skipIf(!is_writable($path), $message);
+	}
+
+	public function setUp() {
 		mkdir($this->_path . '/fr/message', 0755, true);
 		$this->adapter = new Php(compact('path'));
 	}
@@ -25,6 +30,10 @@ class PhpTest extends \lithium\test\Unit {
 	}
 
 	public function testRead() {
+		$this->skipif(
+			!is_writable($path), LITHIUM_APP_PATH . '/resources/tmp/tests is not writable'
+		);
+
 		$data = array(
 			'politics' => 'politique',
 			'house' => array('maison', 'maisons')

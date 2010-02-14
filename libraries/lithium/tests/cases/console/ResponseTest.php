@@ -17,8 +17,8 @@ class ResponseTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->streams = array(
-			'output' => LITHIUM_APP_PATH . '/resources/tmp/output.txt',
-			'error' => LITHIUM_APP_PATH . '/resources/tmp/error.txt'
+			'output' => LITHIUM_APP_PATH . '/resources/tmp/tests/output.txt',
+			'error' => LITHIUM_APP_PATH . '/resources/tmp/tests/error.txt'
 		);
 	}
 
@@ -38,6 +38,9 @@ class ResponseTest extends \lithium\test\Unit {
 	}
 
 	public function testConstructWithConfigOutput() {
+		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+
 		$stream = fopen($this->streams['output'], 'w');
 		$response = new Response(array(
 			'output' => $stream
@@ -48,6 +51,9 @@ class ResponseTest extends \lithium\test\Unit {
 	}
 
 	public function testConstructWithConfigErrror() {
+		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+
 		$stream = fopen($this->streams['error'], 'w');
 		$response = new Response(array(
 			'error' => $stream
@@ -58,6 +64,9 @@ class ResponseTest extends \lithium\test\Unit {
 	}
 
 	public function testOutput() {
+		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+
 		$response = new Response(array(
 			'output' => fopen($this->streams['output'], 'w+')
 		));
@@ -73,6 +82,9 @@ class ResponseTest extends \lithium\test\Unit {
 	}
 
 	public function testError() {
+		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+
 		$response = new Response(array(
 			'error' => fopen($this->streams['error'], 'w+')
 		));

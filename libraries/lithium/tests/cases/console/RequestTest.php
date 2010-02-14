@@ -18,7 +18,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->streams = array(
-			'input' => LITHIUM_APP_PATH . '/resources/tmp/input.txt',
+			'input' => LITHIUM_APP_PATH . '/resources/tmp/tests/input.txt',
 		);
 
 		$this->_backups['cwd'] = getcwd();
@@ -52,10 +52,13 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testEnvWorking() {
-		chdir(LITHIUM_APP_PATH . '/resources/tmp');
+		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_readable($base), "{$base} is not readable.");
+
+		chdir(LITHIUM_APP_PATH . '/resources/tmp/tests');
 		$request = new Request();
 
-		$expected = LITHIUM_APP_PATH . '/resources/tmp';
+		$expected = LITHIUM_APP_PATH . '/resources/tmp/tests';
 		$result = $request->env('working');
 		$this->assertEqual($expected, $result);
 	}
@@ -117,6 +120,9 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testConstructWithEnv() {
+		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_readable($base), "{$base} is not writable.");
+
 		chdir(LITHIUM_APP_PATH . '/resources/tmp');
 		$request = new Request(array(
 			'env' => array('working' => '/some/other/path')
@@ -128,6 +134,9 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testInput() {
+		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+
 		$stream = fopen($this->streams['input'], 'w+');
 		$request = new Request(array(
 			'input' => $stream
