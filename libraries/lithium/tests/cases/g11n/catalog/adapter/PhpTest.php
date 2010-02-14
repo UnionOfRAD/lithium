@@ -22,7 +22,7 @@ class PhpTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		mkdir($this->_path . '/fr/message', 0755, true);
-		$this->adapter = new Php(compact('path'));
+		$this->adapter = new Php(array('path' => $this->_path));
 	}
 
 	public function tearDown() {
@@ -30,10 +30,6 @@ class PhpTest extends \lithium\test\Unit {
 	}
 
 	public function testRead() {
-		$this->skipif(
-			!is_writable($path), LITHIUM_APP_PATH . '/resources/tmp/tests is not writable'
-		);
-
 		$data = array(
 			'politics' => 'politique',
 			'house' => array('maison', 'maisons')
