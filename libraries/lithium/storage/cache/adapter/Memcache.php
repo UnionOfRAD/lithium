@@ -62,9 +62,9 @@ class Memcache extends \lithium\core\Object {
 	 * Instantiates the Memcached object, adds appropriate servers to the pool,
 	 * and configures any optional settings passed.
 	 *
-	 * @param  array $config Configuration parameters for this cache adapter.
-	 *                       These settings are indexed by name and queryable
-	 *                       through `Cache::config('name')`.
+	 * @param array $config Configuration parameters for this cache adapter.
+	 *        These settings are indexed by name and queryable
+	 *        through `Cache::config('name')`.
 	 *
 	 * @return void
 	 * @see lithium\storage\Cache::config()
@@ -99,7 +99,12 @@ class Memcache extends \lithium\core\Object {
 
 		return function($self, $params, $chain) use (&$Memcached) {
 			$expires = strtotime($params['expiry']);
-			return $Memcached->set($params['key'], $params['data'], $expires);
+			$key = $params['key'];
+
+			if (is_array($key)) {
+				return $Memcached->setMulti($key, $expires);
+			}
+			return $Memcached->set($key, $params['data'], $expires);
 		};
 	}
 

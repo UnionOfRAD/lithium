@@ -87,6 +87,33 @@ class MemcacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testWriteMulti() {
+		$expiry = '+1 minute';
+		$time = strtotime($expiry);
+		$key = array(
+			'key1' => 'data1',
+			'key2' => 'data2',
+			'key3' => 'data3'
+		);
+		$data = null;
+
+		$closure = $this->Memcache->write($key, $data, $expiry);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key', 'data', 'expiry');
+		$result = $closure($this->Memcache, $params, null);
+		$this->assertTrue($result);
+
+		$result = $this->_Memcached->getMulti(array_keys($key));
+		$expected = $key;
+		$this->assertEqual($expected, $result);
+
+		foreach ($key as $name => &$value) {
+			$result = $this->_Memcached->delete($name);
+			$this->assertTrue($result);
+		}
+	}
+
 	public function testSimpleRead() {
 		$key = 'read_key';
 		$data = 'read data';
