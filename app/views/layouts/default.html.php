@@ -11,7 +11,7 @@
 <head>
 	<?php echo $this->html->charset();?>
 	<title>Application > <?php echo $this->title?></title>
-	<?php echo $this->html->style('base');?>
+	<?php echo $this->html->style('lithium');?>
 	<?php echo $this->scripts();?>
 	<?php echo $this->html->link('Icon', null, array('type' => 'icon'));?>
 </head>
