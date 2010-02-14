@@ -80,7 +80,6 @@ class Memcache extends \lithium\core\Object {
 		if (is_null(static::$_Memcached)) {
 			static::$_Memcached = new \Memcached();
 		}
-
 		$configuration = Set::merge($defaults, $config);
 		parent::__construct($configuration);
 
@@ -99,12 +98,8 @@ class Memcache extends \lithium\core\Object {
 		$Memcached =& static::$_Memcached;
 
 		return function($self, $params, $chain) use (&$Memcached) {
-			extract($params);
-			$expires = strtotime($expiry);
-
-			$Memcached->set($key . '_expires', $expires, $expires);
-			return $Memcached->set($key, $data, $expires);
-
+			$expires = strtotime($params['expiry']);
+			return $Memcached->set($params['key'], $params['data'], $expires);
 		};
 	}
 
@@ -119,10 +114,7 @@ class Memcache extends \lithium\core\Object {
 		$Memcached =& static::$_Memcached;
 
 		return function($self, $params, $chain) use (&$Memcached) {
-			extract($params);
-			$cachetime = intval($Memcached->get($key . '_expires'));
-			$time = time();
-			return ($cachetime < $time) ? false : $Memcached->get($key);
+			return $Memcached->get($params['key']);
 		};
 	}
 
@@ -136,9 +128,7 @@ class Memcache extends \lithium\core\Object {
 		$Memcached =& static::$_Memcached;
 
 		return function($self, $params, $chain) use (&$Memcached) {
-			extract($params);
-			$Memcached->delete($key . '_expires');
-			return $Memcached->delete($key);
+			return $Memcached->delete($params['key']);
 		};
 	}
 
@@ -158,8 +148,7 @@ class Memcache extends \lithium\core\Object {
 		$Memcached =& static::$_Memcached;
 
 		return function($self, $params, $chain) use (&$Memcached, $offset) {
-			extract($params);
-			return $Memcached->decrement($key, $offset);
+			return $Memcached->decrement($params['key'], $offset);
 		};
 	}
 
@@ -178,8 +167,7 @@ class Memcache extends \lithium\core\Object {
 		$Memcached =& static::$_Memcached;
 
 		return function($self, $params, $chain) use (&$Memcached, $offset) {
-			extract($params);
-			return $Memcached->increment($key, $offset);
+			return $Memcached->increment($params['key'], $offset);
 		};
 	}
 
@@ -204,11 +192,7 @@ class Memcache extends \lithium\core\Object {
 			return false;
 		}
 		$version = static::$_Memcached->getVersion();
-
-		if (empty($version)) {
-			return false;
-		}
-		return true;
+		return (!empty($version));
 	}
 }
 
