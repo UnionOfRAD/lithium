@@ -55,16 +55,25 @@ class Apc extends \lithium\core\Object {
 	}
 
 	/**
-	 * Write value(s) to the cache
+	 * Write value(s) to the cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @param mixed $data The value to be cached
-	 * @param string $expiry A strtotime() compatible cache time
-	 * @return boolean True on successful write, false otherwise
+	 * This adapter method supports multi-key write. By specifying `$key` as an
+	 * associative array of key/value pairs, `$data` is ignored and all keys that
+	 * are cached will receive an expiration time of `$expiry`.
+	 *
+	 * @param string|array $key The key to uniquely identify the cached item.
+	 * @param mixed $data The value to be cached.
+	 * @param string $expiry A strtotime() compatible cache time.
+	 * @return boolean True on successful write, false otherwise.
 	 */
 	public function write($key, $data, $expiry) {
 		return function($self, $params, $chain) {
 			$cachetime = strtotime($params['expiry']);
+			$key = $params['key'];
+
+			if (is_array($key)) {
+				return apc_store($key, $cachetime);
+			}
 			return apc_store($params['key'], $params['data'], $cachetime);
 		};
 	}
