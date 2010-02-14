@@ -111,23 +111,23 @@ class MediaTest extends \lithium\test\Unit {
 		$result = Media::asset('this.file.should.not.exist', 'css', array('check' => true));
 		$this->assertFalse($result);
 
-		$result = Media::asset('base', 'css', array('check' => 'true', 'library' => 'app'));
-		$expected = '/css/base.css';
+		$result = Media::asset('debug', 'css', array('check' => 'true', 'library' => 'app'));
+		$expected = '/css/debug.css';
 		$this->assertEqual($expected, $result);
 
-		$result = Media::asset('base', 'css', array('timestamp' => true));
-		$this->assertPattern('%^/css/base\.css\?\d+$%', $result);
+		$result = Media::asset('debug', 'css', array('timestamp' => true));
+		$this->assertPattern('%^/css/debug\.css\?\d+$%', $result);
 
-		$result = Media::asset('base.css?type=test', 'css', array(
+		$result = Media::asset('debug.css?type=test', 'css', array(
 			'check' => 'true', 'base' => 'foo'
 		));
-		$expected = 'foo/css/base.css?type=test';
+		$expected = 'foo/css/debug.css?type=test';
 		$this->assertEqual($expected, $result);
 
-		$result = Media::asset('base.css?type=test', 'css', array(
+		$result = Media::asset('debug.css?type=test', 'css', array(
 			'check' => 'true', 'base' => 'foo', 'timestamp' => true
 		));
-		$this->assertPattern('%^foo/css/base\.css\?type=test&\d+$%', $result);
+		$this->assertPattern('%^foo/css/debug\.css\?type=test&\d+$%', $result);
 	}
 
 	public function testCustomAssetPathGeneration() {
@@ -182,18 +182,18 @@ class MediaTest extends \lithium\test\Unit {
 		$result = Media::asset('/foo/bar', 'js', array('base' => '/base', 'check' => true));
 		$this->assertFalse($result);
 
-		$result = Media::asset('/css/base', 'css', array('base' => '/base', 'check' => true));
-		$expected = '/base/css/base.css';
+		$result = Media::asset('/css/debug', 'css', array('base' => '/base', 'check' => true));
+		$expected = '/base/css/debug.css';
 		$this->assertEqual($expected, $result);
 
-		$result = Media::asset('/css/base.css', 'css', array('base' => '/base', 'check' => true));
-		$expected = '/base/css/base.css';
+		$result = Media::asset('/css/debug.css', 'css', array('base' => '/base', 'check' => true));
+		$expected = '/base/css/debug.css';
 		$this->assertEqual($expected, $result);
 
-		$result = Media::asset('/css/base.css?foo', 'css', array(
+		$result = Media::asset('/css/debug.css?foo', 'css', array(
 			'base' => '/base', 'check' => true
 		));
-		$expected = '/base/css/base.css?foo';
+		$expected = '/base/css/debug.css?foo';
 		$this->assertEqual($expected, $result);
 	}
 
