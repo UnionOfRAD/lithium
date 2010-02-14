@@ -62,7 +62,7 @@ class MemoryTest extends \lithium\test\Unit {
 		$closure = $this->Memory->read(array_keys($key));
 		$this->assertTrue(is_callable($closure));
 
-		$params = compact('key');
+		$params = array('key' => array_keys($key));
 		$result = $closure($this->Memory, $params, null);
 		$this->assertEqual($key, $result);
 	}
