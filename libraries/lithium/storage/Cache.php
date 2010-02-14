@@ -31,16 +31,17 @@ namespace lithium\storage;
  * ));}}}
  *
  * Each adapter provides a consistent interface for the basic cache operations of `write`, `read`,
- * `delete` and `clear`, which can be used interchangably between all adapters. Some adapters (e.g.
- * Memcached, Apc) provide additional methods that are not consistently available across
- * other adapters. To make use of these, it is always possible to call:
+ * `delete` and `clear`, which can be used interchangably between all adapters. Some adapters
+ * may provide additional methods that are not consistently available across other adapters.
+ * To make use of these, it is always possible to call:
  *
  * {{{Cache::adapter('named-configuration')->methodName($argument);}}}
  *
  * This allows a very wide range of flexibility, at the cost of portability.
  *
- * For more information on `Cache` methods and specific adapters, please see their relevant
- * documentation.
+ * Some cache adapters (e.g. File) do *not* provide the functionality for increment/decrement.
+ * Additionally, some cache adapters support multi-key operations for `write`, `read` and `delete`-
+ * Please see the individual documentation for cache adapters and the operations that they support.
  *
  * @see lithium\core\Adaptable
  * @see lithium\storage\cache\adapter
