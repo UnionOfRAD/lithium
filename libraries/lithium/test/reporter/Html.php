@@ -54,6 +54,17 @@ class Html extends \lithium\test\Reporter {
 		return join("", $exception);
 	}
 
+	protected function _skip($skip) {
+		$result = array(
+			'<div class="test-skip">',
+			"Skip {$skip['trace'][1]['class']}::{$skip['trace'][1]['function']}() ",
+			"on line {$skip['trace'][1]['line']}: ",
+			"<span class=\"content\">{$skip['message']}</span>",
+			"</div>"
+		);
+		return join("", $result);
+	}
+
 	public function filters($filters) {
 		$result = array();
 		foreach ((array) $filters as $class => $data) {

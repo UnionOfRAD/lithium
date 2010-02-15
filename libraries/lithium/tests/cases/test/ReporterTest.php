@@ -56,7 +56,7 @@ class ReporterTest extends \lithium\test\Unit {
 				'class' => 'lithium\tests\cases\test\reporter\BaseTest'
 			)),
 			'fails' => array(array('method' => 'testNothing')),
-			'errors' => array('result' => 'fail'),
+			'errors' => array(array('result' => 'fail')),
 			'exceptions' => array(),
 		);
 		$expected = "";

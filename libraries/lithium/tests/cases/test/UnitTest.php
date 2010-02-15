@@ -14,10 +14,6 @@ class UnitTest extends \lithium\test\Unit {
 		return $this->_compare($type, $expected, $result);
 	}
 
-	/**
-	 * @todo Figure out a way to expect failures
-	 * @return void
-	 */
 	public function testBaseAssertions() {
 		$this->assert(true);
 		//$this->assert(false);
@@ -37,12 +33,6 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	/**
-	 * undocumented function
-	 *
-	 * @return void
-	 * @todo See @todo above.
-	 */
 	public function testAssertEqualNumericFail() {
 		$result = array(1, 2);
 		$expected = array(1, 2, 3);
@@ -88,7 +78,8 @@ class UnitTest extends \lithium\test\Unit {
 			'testBaseAssertions', 'testCompare', 'testAssertEqualNumeric',
 			'testAssertEqualNumericFail', 'testAssertEqualAssociativeArray',
 			'testAssertEqualThreeDFail', 'testAssertIdentical', 'testTestMethods',
-			'testCleanUp', 'testCleanUpWithFullPath', 'testCleanUpWithRelativePath'
+			'testCleanUp', 'testCleanUpWithFullPath', 'testCleanUpWithRelativePath',
+			'testSkipIf'
 		);
 		$this->assertEqual($expected, $this->methods());
 	}
@@ -135,6 +126,16 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertFalse(file_exists("{$base}/cleanup_test/.hideme"));
 
 		$this->_cleanUp();
+	}
+
+	public function testSkipIf() {
+		try {
+			$this->skipIf(true, 'skip me');
+		} catch (\Exception $e) {
+			$result = $e->getMessage();
+		}
+		$expected = 'skip me';
+		$this->assertEqual($expected, $result);
 	}
 }
 

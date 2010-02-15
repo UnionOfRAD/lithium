@@ -58,6 +58,19 @@ class TextTest extends \lithium\test\Unit {
 		$result = $this->mock->exception($exception);
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testSkip() {
+		$exception = array(
+			'trace' => array(array(), array(
+				'class' => 'MockTest', 'function' => 'testNothing', 'line' => 8
+			)),
+			'message' => 'skip this test',
+		);
+		$expected = "Skip MockTest::testNothing() on line 8:\n";
+		$expected .= "skip this test";
+		$result = $this->mock->skip($exception);
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

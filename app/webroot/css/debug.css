@@ -81,7 +81,7 @@ div.test-result-fail {
 	border-color: #990000;
 }
 
-div.test-assert, div.test-exception {
+div.test-assert, div.test-exception, div.test-skip {
 	margin: 4px 0;
 	padding: 4px 8px;
 	color: #000000;
@@ -117,6 +117,15 @@ div.test-exception span.trace {
 	border-left: 1px solid #C09090;
 }
 
+div.test-skip {
+	border-color: #000000;
+	background-color: #CCC;
+}
+
+div.test-skip span.content {
+	display: block;
+	font-style: italic;
+}
 /*--- SQL Dumps ---*/
 .lithium-sql-log table {
 	background: #f4f4f4;

@@ -18,12 +18,22 @@ class HtmlTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->html = new Html();
 		$this->mock = new MockHtml();
+		$this->_routes = Router::get();
+		Router::connect(null);
 		Router::connect('/test/{:args}', array('controller' => '\lithium\test\Controller'));
 		Router::connect('/test', array('controller' => '\lithium\test\Controller'));
 		$this->request = new Request(array(
 			'base' => null,
 			'env' => array('PHP_SELF' => '/', 'DOCUMENT_ROOT' => '/')
 		));
+	}
+
+	public function tearDown() {
+		Router::connect(null);
+
+		foreach ($this->_routes as $route) {
+			Router::connect($route);
+		}
 	}
 
 	public function testMenuWithoutData() {
@@ -103,6 +113,21 @@ class HtmlTest extends \lithium\test\Unit {
 		$expected .= "</div>";
 
 		$result = $this->mock->exception($exception);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSkip() {
+		$exception = array(
+			'trace' => array(array(), array(
+				'class' => 'MockTest', 'function' => 'testNothing', 'line' => 8
+			)),
+			'message' => 'skip this test',
+		);
+		$expected = "<div class=\"test-skip\">";
+		$expected .= "Skip MockTest::testNothing() on line 8: ";
+		$expected .= "<span class=\"content\">skip this test</span>";
+		$expected .= "</div>";
+		$result = $this->mock->skip($exception);
 		$this->assertEqual($expected, $result);
 	}
 }

@@ -43,6 +43,15 @@ class Text extends \lithium\test\Reporter {
 		return join("\n", $exception);
 	}
 
+	protected function _skip($skip) {
+		$result = array(
+			"Skip {$skip['trace'][1]['class']}::{$skip['trace'][1]['function']}() ",
+			"on line {$skip['trace'][1]['line']}:\n",
+			"{$skip['message']}",
+		);
+		return join("", $result);
+	}
+
 	public function filters($filters) {
 		$output = array();
 

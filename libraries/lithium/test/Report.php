@@ -160,10 +160,10 @@ class Report extends \lithium\core\Object {
 				'passes' => array(),
 				'fails' => array(),
 				'exceptions' => array(),
-				'errors' => array()
+				'errors' => array(),
+				'skips' => array()
 			);
 			$result = empty($result[0]) ? array($result) : $result;
-
 			foreach ($result as $response) {
 				if (empty($response['result'])) {
 					continue;
@@ -178,7 +178,7 @@ class Report extends \lithium\core\Object {
 				if (in_array($result, array('pass', 'fail'))) {
 					$stats['asserts']++;
 				}
-				if (in_array($result, array('pass', 'fail', 'exception'))) {
+				if (in_array($result, array('pass', 'fail', 'exception', 'skip'))) {
 					$stats[Inflector::pluralize($result)][] = $response;
 				}
 			}

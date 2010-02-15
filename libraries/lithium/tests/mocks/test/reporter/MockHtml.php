@@ -21,6 +21,10 @@ class MockHtml extends \lithium\test\reporter\Html {
 	public function exception($exceptions) {
 		return $this->_exception($exceptions);
 	}
+
+	public function skip($skips) {
+		return $this->_skip($skips);
+	}
 }
 
 ?>

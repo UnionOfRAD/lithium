@@ -24,6 +24,7 @@ class Reporter extends \lithium\core\Object {
 			'fails' => array(),
 			'errors' => array(),
 			'exceptions' => array(),
+			'skips' => array()
 		);
 		$stats = (array) $stats + $defaults;
 
@@ -36,17 +37,16 @@ class Reporter extends \lithium\core\Object {
 		$result[] = $this->_result($count + compact('success'));
 
 		foreach ((array) $stats['errors'] as $error) {
-			switch ($error['result']) {
-				case 'fail':
-					$error += array('class' => 'unknown', 'method' => 'unknown');
-					$result[] = $this->_fail($error);
-				break;
-				case 'exception':
-					$result[] = $this->_exception($error);
-				break;
-			}
+			$error = array_merge(
+				array('class' => 'unknown', 'method' => 'unknown'), (array) $error
+			);
+			$method = "_{$error['result']}";
+			$result[] = $this->{$method}($error);
 		}
-		return join("\n", $result);
+		foreach ((array) $stats['skips'] as $skip) {
+			$result[] = $this->_skip($skip);
+		}
+		return trim(join("\n", $result));
 	}
 
 	/**
@@ -132,6 +132,8 @@ class Reporter extends \lithium\core\Object {
 	protected function _fail($data) {}
 
 	protected function _exception($data) {}
+
+	protected function _skip($data) {}
 
 	protected function _item($data) {}
 }

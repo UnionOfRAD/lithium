@@ -92,11 +92,8 @@ class Unit extends \lithium\core\Object {
 		try {
 			$this->skip();
 		} catch (Exception $e) {
-			if (preg_match('/^Skipped test/', $e->getMessage())) {
-				$this->_result('skip', array());
-			}
-			$this->_handleException($e, __LINE__ - 5);
-			return;
+			$this->_handleException($e);
+			return $this->_results;
 		}
 		set_error_handler($options['handler']);
 
@@ -523,7 +520,6 @@ class Unit extends \lithium\core\Object {
 		$info = (array('result' => $type) + $info);
 		$defaults = array();
 		$options += $defaults;
-
 		if ($this->_reporter) {
 			$filtered = $this->_reporter->__invoke($info);
 			$info = is_array($filtered) ? $filtered : $info;
@@ -543,6 +539,7 @@ class Unit extends \lithium\core\Object {
 			$this->setUp();
 		} catch (Exception $e) {
 			$this->_handleException($e, __LINE__ - 2);
+			return $this->_results;
 		}
 		$params = compact('options', 'method');
 
@@ -552,13 +549,7 @@ class Unit extends \lithium\core\Object {
 				$lineFlag = __LINE__ + 1;
 				$self->$method();
 			} catch (Exception $e) {
-				if (preg_match('/^Skipped test/', $e->getMessage())) {
-					$self->invokeMethod('_result', array('skip', array(
-						'message' => $e->getMessage()
-					)));
-				} else {
-					$self->invokeMethod('_handleException', array($e, $lineFlag));
-				}
+				$self->invokeMethod('_handleException', array($e));
 			}
 		});
 		$this->tearDown();
