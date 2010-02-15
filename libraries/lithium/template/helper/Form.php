@@ -16,8 +16,9 @@ use \lithium\util\Inflector;
  * will simply generate HTML forms and widgets, but by creating a form with a _binding object_,
  * the helper can pre-fill form input values, render error messages, and introspect column types.
  *
- * For example:
+ * For example, assuming you have created a `Post` model in your application:
  * {{{// In controller code:
+ * use \app\models\Post;
  * $post = Post::find(1);
  * return compact('post');
  *
@@ -166,6 +167,8 @@ class Form extends \lithium\template\Helper {
 	 * define your own custom objects as well. For more information on custom data objects, see
 	 * `lithium\template\helper\Form::$_binding`.
 	 *
+	 * @see lithium\template\helper\Form::$_binding
+	 * @see lithium\data\model\Record
 	 * @param object $binding
 	 * @param array $options
 	 * @return string Returns a `<form />` open tag with the `action` attribute defined by either
