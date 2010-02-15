@@ -171,13 +171,13 @@ class MessageTest extends \lithium\test\Unit {
 		$this->assertNull($result);
 	}
 
-	public function testShortHandsBasic() {
+	public function testAliasesBasic() {
 		$data = array(
 			'house' => array('Haus', 'Häuser')
 		);
 		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
 
-		$filters = Message::shorthands();
+		$filters = Message::aliases();
 		$t = $filters['t'];
 		$tn = $filters['tn'];
 
@@ -194,13 +194,13 @@ class MessageTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testShortHandsSymmetry() {
+	public function testAliasesSymmetry() {
 		$data = array(
 			'house' => array('Haus', 'Häuser')
 		);
 		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
 
-		$filters = Message::shorthands();
+		$filters = Message::aliases();
 		$t = $filters['t'];
 		$tn = $filters['tn'];
 
@@ -217,8 +217,8 @@ class MessageTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testShortHandsAsymmetry() {
-		$filters = Message::shorthands();
+	public function testAliasesAsymmetry() {
+		$filters = Message::aliases();
 		$t = $filters['t'];
 		$tn = $filters['tn'];
 

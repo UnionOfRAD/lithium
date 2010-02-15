@@ -21,7 +21,7 @@ use \lithium\g11n\Catalog;
  * given here in order to help understanding the purpose of this class through the context
  * of the process as a whole.
  *
- *  1. Marking messages as translatable.  `$t()` and `$tn()` (implemented in `shorthands()`)
+ *  1. Marking messages as translatable.  `$t()` and `$tn()` (implemented in `aliases()`)
  *     are recognized as message marking and picked up by the extraction parser.
  *
  *  2. Extracting marked messages.  Messages can be extracted through the `g11n`
@@ -102,7 +102,7 @@ class Message extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Returns an array containing named closures which are short-hand aliases for `translate()`.
+	 * Returns an array containing named closures which are aliases for `translate()`.
 	 * They can be embedded as content filters in the template layer using a filter for
 	 * `Media::_handle()` or be used in other places where needed.
 	 *
@@ -115,15 +115,15 @@ class Message extends \lithium\core\StaticObject {
 	 * Using in a method:
 	 * {{{
 	 * 	public function index() {
-	 * 		extract(Message::shorthands());
+	 * 		extract(Message::aliases());
 	 * 		$notice = $t('look');
 	 * 	}
 	 * }}}
 	 *
-	 * @return array Named short-hand (`'t'` and `'tn'`) translation functions.
+	 * @return array Named aliases (`'t'` and `'tn'`) for translation functions.
 	 * @see lithium\net\http\Media::_handle()
 	 */
-	public static function shorthands() {
+	public static function aliases() {
 		$t = function($message, $options = array()) {
 			return Message::translate($message, $options + array('default' => $message));
 		};

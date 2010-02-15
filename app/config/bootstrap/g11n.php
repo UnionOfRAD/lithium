@@ -107,13 +107,13 @@ Catalog::write('message.plural', 'root', $data, array('name' => 'runtime'));
 
 
 /**
- * Integration with `View`. Embeds message translation short-hands into the `View`
+ * Integration with `View`. Embeds message translation aliases into the `View`
  * class (or other content handler, if specified) when content is rendered. This
- * enables short-hand translation functions, i.e. `<?=$t("Translated content"); ?>`.
+ * enables translation functions, i.e. `<?=$t("Translated content"); ?>`.
  */
 Media::applyFilter('_handle', function($self, $params, $chain) {
 	$params['handler'] += array('outputFilters' => array());
-	$params['handler']['outputFilters'] += Message::shorthands();
+	$params['handler']['outputFilters'] += Message::aliases();
 	return $chain->next($self, $params, $chain);
 });
 
