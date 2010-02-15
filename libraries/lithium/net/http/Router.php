@@ -94,11 +94,13 @@ class Router extends \lithium\core\StaticObject {
 		if (empty(static::$_configuration)) {
 			static::__init();
 		}
-		if (is_null($route)) {
+		if ($route === null) {
 			return static::$_configuration;
 		}
 		return isset(static::$_configuration[$route]) ? static::$_configuration[$route] : null;
 	}
 }
+
+Router::__init();
 
 ?>

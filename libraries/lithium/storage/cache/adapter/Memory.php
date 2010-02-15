@@ -169,7 +169,7 @@ class Memory extends \lithium\core\Object {
 	 *
 	 * @return boolean True
 	 */
-	public function enabled() {
+	public static function enabled() {
 		return true;
 	}
 

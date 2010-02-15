@@ -195,10 +195,10 @@ class Memcache extends \lithium\core\Object {
 	}
 
 	/**
-	 * Determines if the Memcached extension has been installed and
-	 * properly started.
+	 * Determines if the Memcached extension has been installed and properly started.
 	 *
-	 * return boolean True if enabled, false otherwise.
+	 * @return boolean Returns `true` if the Memcached extensions is installed and enabled, `false`
+	 *         otherwise.
 	 */
 	public function enabled() {
 		if (!extension_loaded('memcached')) {

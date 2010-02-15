@@ -175,14 +175,12 @@ class File extends \lithium\core\Object {
 	}
 
 	/**
-	 * Determines if the File adapter can read and write
-	 * to the configured path.
+	 * Implements cache adapter support-detection interface.
 	 *
-	 * return boolean True if enabled, false otherwise.
+	 * @return boolean Always returns `true`.
 	 */
-	public function enabled() {
-		$directory = new SplFileInfo($this->_config['path']);
-		return ($directory->isDir() && $directory->isReadable() && $directory->isWritable());
+	public static function enabled() {
+		return true;
 	}
 }
 

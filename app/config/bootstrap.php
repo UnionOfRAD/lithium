@@ -6,8 +6,6 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium;
-
 /**
  * This is the path to the class libraries used by your application, and must contain a copy of the
  * Lithium core.  By default, this directory is named 'libraries', and resides in the same
@@ -41,6 +39,12 @@ if (!include LITHIUM_LIBRARY_PATH . '/lithium/core/Libraries.php') {
  * classes to improve bootstrap performance.
  */
 require __DIR__ . '/bootstrap/libraries.php';
+
+/**
+ * This file contains configurations for connecting to external caching resources, as well as
+ * default caching rules for various systems within your application
+ */
+require __DIR__ . '/bootstrap/cache.php';
 
 /**
  * This file contains your application's globalization rules, including inflections,

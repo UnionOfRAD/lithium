@@ -21,7 +21,6 @@ class PhpTest extends \lithium\test\Unit {
 		/* Garbage collection */
 		$this->_gc_divisor = ini_get('session.gc_divisor');
 		ini_set('session.gc_divisor', '1');
-
 	}
 
 	public function tearDown() {
@@ -34,7 +33,8 @@ class PhpTest extends \lithium\test\Unit {
 	}
 
 	public function testEnabled() {
-		$this->assertTrue($this->Php->enabled());
+		$php = $this->Php;
+		$this->assertTrue($php::enabled());
 	}
 
 	public function testInit() {

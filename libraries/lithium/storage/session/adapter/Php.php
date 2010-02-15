@@ -138,7 +138,7 @@ class Php extends \lithium\core\Object {
 	 *
 	 * return boolean True if enabled, false otherwise
 	 */
-	public function enabled() {
+	public static function enabled() {
 		return (boolean) session_id();
 	}
 }

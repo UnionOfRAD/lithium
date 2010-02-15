@@ -42,7 +42,8 @@ class XCacheTest extends \lithium\test\Unit {
 	}
 
 	public function testEnabled() {
-		$this->assertTrue($this->XCache->enabled());
+		$xcache = $this->XCache;
+		$this->assertTrue($xcache::enabled());
 	}
 
 	public function testSimpleWrite() {

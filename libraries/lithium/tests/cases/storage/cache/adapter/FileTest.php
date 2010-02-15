@@ -35,7 +35,8 @@ class FileTest extends \lithium\test\Unit {
 	}
 
 	public function testEnabled() {
-		$this->assertTrue($this->File->enabled());
+		$file = $this->File;
+		$this->assertTrue($file::enabled());
 	}
 
 	public function testWrite() {

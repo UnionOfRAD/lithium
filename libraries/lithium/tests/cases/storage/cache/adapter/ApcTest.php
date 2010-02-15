@@ -34,7 +34,8 @@ class ApcTest extends \lithium\test\Unit {
 	}
 
 	public function testEnabled() {
-		$this->assertTrue($this->Apc->enabled());
+		$apc = $this->Apc;
+		$this->assertTrue($apc::enabled());
 	}
 
 	public function testSimpleWrite() {

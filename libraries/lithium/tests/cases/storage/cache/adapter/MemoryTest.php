@@ -21,7 +21,8 @@ class MemoryTest extends \lithium\test\Unit {
 	}
 
 	public function testEnabled() {
-		$this->assertTrue($this->Memory->enabled());
+		$memory = $this->Memory;
+		$this->assertTrue($memory::enabled());
 	}
 
 	public function testWriteAndRead() {

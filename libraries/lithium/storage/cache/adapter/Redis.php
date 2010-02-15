@@ -183,7 +183,7 @@ class Redis extends \lithium\core\Object {
 	 * Determines if the Redis extension has been installed and
 	 * that there is a redis-server available
 	 *
-	 * return boolean True if enabled, false otherwise
+	 * @return boolean Returns `true` if the Redis extension is enabled, `false` otherwise.
 	 */
 	public function enabled() {
 		if (!extension_loaded('redis')) {

@@ -14,6 +14,10 @@ use \SplFileInfo;
 
 class CacheTest extends \lithium\test\Unit {
 
+	public function setUp() {
+		Cache::reset();
+	}
+
 	public function tearDown() {
 		Cache::reset();
 	}

@@ -42,7 +42,8 @@ class RedisTest extends \lithium\test\Unit {
 	}
 
 	public function testEnabled() {
-		$this->assertTrue($this->Redis->enabled());
+		$redis = $this->Redis;
+		$this->assertTrue($redis::enabled());
 	}
 
 	public function testSimpleWrite() {

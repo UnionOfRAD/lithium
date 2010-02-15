@@ -44,7 +44,8 @@ class MemcacheTest extends \lithium\test\Unit {
 	}
 
 	public function testEnabled() {
-		$this->assertTrue($this->Memcache->enabled());
+		$memcache = $this->Memcache;
+		$this->assertTrue($memcache::enabled());
 	}
 
 	public function testSimpleWrite() {

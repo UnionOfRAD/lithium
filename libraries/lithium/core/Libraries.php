@@ -473,7 +473,7 @@ class Libraries {
 		if (!isset(static::$_paths[$type])) {
 			return null;
 		}
-		if (is_null($name)) {
+		if (!$name) {
 			return static::_locateAll($params, $options);
 		}
 		$paths = static::$_paths[$type];

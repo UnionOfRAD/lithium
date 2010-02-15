@@ -155,7 +155,7 @@ class Apc extends \lithium\core\Object {
 	 *
 	 * return boolean True if enabled, false otherwise
 	 */
-	public function enabled() {
+	public static function enabled() {
 		return (extension_loaded('apc') && apc_cache_info('user'));
 	}
 }
