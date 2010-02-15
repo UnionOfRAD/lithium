@@ -6,9 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium;
-
-use \lithium\core\Libraries;
+use lithium\core\Libraries;
 
 /**
  * Optimize default request cycle by loading common classes.  If you're implementing custom
@@ -20,20 +18,25 @@ require LITHIUM_LIBRARY_PATH . '/lithium/core/StaticObject.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/util/Collection.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/util/collection/Filters.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/util/Inflector.php';
-require LITHIUM_LIBRARY_PATH . '/lithium/util/Set.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/util/String.php';
+require LITHIUM_LIBRARY_PATH . '/lithium/core/Adaptable.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/core/Environment.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/net/http/Base.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/net/http/Media.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/net/http/Request.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/net/http/Response.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/net/http/Route.php';
+require LITHIUM_LIBRARY_PATH . '/lithium/net/http/Router.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/action/Controller.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/action/Dispatcher.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/action/Request.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/action/Response.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/template/View.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/template/view/Renderer.php';
+require LITHIUM_LIBRARY_PATH . '/lithium/template/view/Compiler.php';
+require LITHIUM_LIBRARY_PATH . '/lithium/template/view/adapter/File.php';
+require LITHIUM_LIBRARY_PATH . '/lithium/storage/Cache.php';
+require LITHIUM_LIBRARY_PATH . '/lithium/storage/cache/adapter/Apc.php';
 
 /**
  * Add the Lithium core library.  This sets default paths and initializes the autoloader.  You
