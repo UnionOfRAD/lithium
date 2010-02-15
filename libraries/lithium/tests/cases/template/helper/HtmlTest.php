@@ -45,7 +45,10 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public function tearDown() {
 		Router::connect(null);
-		$this->_routes->each(function($route) { Router::connect($route); });
+
+		foreach ($this->_routes as $route) {
+			Router::connect($route);
+		}
 		unset($this->html);
 	}
 

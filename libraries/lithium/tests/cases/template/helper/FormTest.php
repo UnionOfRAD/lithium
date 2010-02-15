@@ -54,6 +54,8 @@ class FormTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
+		Router::connect(null);
+
 		foreach ($this->_routes as $route) {
 			Router::connect($route);
 		}
