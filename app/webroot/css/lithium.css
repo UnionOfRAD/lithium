@@ -20,8 +20,8 @@ body {
 #container {
 	position: relative;
 	width: 950px;
-	margin: 60px auto;
-	padding: 0 20px 60px;
+	margin: 0 auto;
+	padding: 60px 20px;
 }
 
 /*--- Basics ---*/
@@ -262,12 +262,12 @@ table, form, pre > code {
 	margin-top: 12px;
 	margin-bottom: 12px;
 }
-table, form, pre > code, img, .shadow {
+table, form, pre > code, .shadow {
 	-moz-box-shadow: 2px 2px 12px rgba(0,0,0,.15);
 	-webkit-box-shadow: 2px 2px 12px rgba(0,0,0,0.15);
 	box-shadow: 2px 2px 12px rgba(0,0,0,.15);
 }
-img {
+img.shadow {
 	border: 1px solid rgba(255,255,255,.15);
 }
 input[type=submit], input[type=button], input[type=reset], input[type=file], button {
