@@ -44,9 +44,8 @@ class Compiler extends \lithium\core\StaticObject {
 
 		if (!file_exists($template)) {
 			$compiled = static::compile(file_get_contents($file));
-			$success = is_writable(dirname($template))
-				? (file_put_contents($template, $compiled) !== false)
-				: false;
+			$success = $options['fallback'] && !is_writable(dirname($template))
+				? false : (file_put_contents($template, $compiled) !== false);
 
 			if (!$success && $options['fallback']) {
 				return $file;
