@@ -6,14 +6,15 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-use \lithium\data\Connections;
+// use \lithium\data\Connections;
+//
+// Connections::add('default', 'database', array(
+// 	'adapter' => 'MySql',
+// 	'host' => 'localhost',
+// 	'login' => 'root',
+// 	'password' => '',
+// 	'database' => 'lithium-blog'
+// ));
 
-Connections::add('default', 'database', array(
-	'adapter' => 'MySql',
-	'host' => 'localhost',
-	'login' => 'root',
-	'password' => '',
-	'database' => 'lithium-blog'
-));
 
 ?>
