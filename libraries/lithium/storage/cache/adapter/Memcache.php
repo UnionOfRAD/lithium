@@ -51,7 +51,7 @@ class Memcache extends \lithium\core\Object {
 	 *
 	 * @var object Memcache object
 	 */
-	public static $Memcached = null;
+	public static $connection = null;
 
 	/**
 	 * Object constructor.
@@ -73,13 +73,13 @@ class Memcache extends \lithium\core\Object {
 			)
 		);
 
-		if (is_null(static::$Memcached)) {
-			static::$Memcached = new \Memcached();
+		if (is_null(static::$connection)) {
+			static::$connection = new \Memcached();
 		}
 		$configuration = Set::merge($defaults, $config);
 		parent::__construct($configuration);
 
-		static::$Memcached->addServers($this->_config['servers']);
+		static::$connection->addServers($this->_config['servers']);
 	}
 
 	/**
@@ -95,16 +95,16 @@ class Memcache extends \lithium\core\Object {
 	 * @return boolean True on successful write, false otherwise.
 	 */
 	public function write($key, $value, $expiry) {
-		$Memcached =& static::$Memcached;
+		$connection =& static::$connection;
 
-		return function($self, $params, $chain) use (&$Memcached) {
+		return function($self, $params, $chain) use (&$connection) {
 			$expires = strtotime($params['expiry']);
 			$key = $params['key'];
 
 			if (is_array($key)) {
-				return $Memcached->setMulti($key, $expires);
+				return $connection->setMulti($key, $expires);
 			}
-			return $Memcached->set($key, $params['data'], $expires);
+			return $connection->set($key, $params['data'], $expires);
 		};
 	}
 
@@ -120,15 +120,15 @@ class Memcache extends \lithium\core\Object {
 	 * @todo Refactor to use RES_NOTFOUND for return value checks.
 	 */
 	public function read($key) {
-		$Memcached =& static::$Memcached;
+		$connection =& static::$connection;
 
-		return function($self, $params, $chain) use (&$Memcached) {
+		return function($self, $params, $chain) use (&$connection) {
 			$key = $params['key'];
 
 			if (is_array($key)) {
-				return $Memcached->getMulti($key);
+				return $connection->getMulti($key);
 			}
-			return $Memcached->get($key);
+			return $connection->get($key);
 		};
 	}
 
@@ -139,10 +139,10 @@ class Memcache extends \lithium\core\Object {
 	 * @return mixed True on successful delete, false otherwise.
 	 */
 	public function delete($key) {
-		$Memcached =& static::$Memcached;
+		$connection =& static::$connection;
 
-		return function($self, $params, $chain) use (&$Memcached) {
-			return $Memcached->delete($params['key']);
+		return function($self, $params, $chain) use (&$connection) {
+			return $connection->delete($params['key']);
 		};
 	}
 
@@ -159,10 +159,10 @@ class Memcache extends \lithium\core\Object {
 	 * @return mixed Item's new value on successful decrement, false otherwise
 	 */
 	public function decrement($key, $offset = 1) {
-		$Memcached =& static::$Memcached;
+		$connection =& static::$connection;
 
-		return function($self, $params, $chain) use (&$Memcached, $offset) {
-			return $Memcached->decrement($params['key'], $offset);
+		return function($self, $params, $chain) use (&$connection, $offset) {
+			return $connection->decrement($params['key'], $offset);
 		};
 	}
 
@@ -178,10 +178,10 @@ class Memcache extends \lithium\core\Object {
 	 * @return mixed Item's new value on successful increment, false otherwise
 	 */
 	public function increment($key, $offset = 1) {
-		$Memcached =& static::$Memcached;
+		$connection =& static::$connection;
 
-		return function($self, $params, $chain) use (&$Memcached, $offset) {
-			return $Memcached->increment($params['key'], $offset);
+		return function($self, $params, $chain) use (&$connection, $offset) {
+			return $connection->increment($params['key'], $offset);
 		};
 	}
 
@@ -191,7 +191,7 @@ class Memcache extends \lithium\core\Object {
 	 * @return mixed True on successful clear, false otherwise.
 	 */
 	public function clear() {
-		return static::$Memcached->flush();
+		return static::$connection->flush();
 	}
 
 	/**
@@ -204,7 +204,7 @@ class Memcache extends \lithium\core\Object {
 		if (!extension_loaded('memcached')) {
 			return false;
 		}
-		$version = static::$Memcached->getVersion();
+		$version = static::$connection->getVersion();
 		return (!empty($version));
 	}
 }
