@@ -36,13 +36,18 @@ class Auth extends \lithium\core\Adaptable {
 	protected static $_configurations;
 
 	/**
-	 * The path used by `Libraries::locate()` to look up adapter classes for `Auth`.
+	 * Libraries::locate() compatible path to adapters for this class.
 	 *
 	 * @see lithium\core\Libraries::locate()
-	 * @var string
+	 * @var string Dot-delimited path.
 	 */
 	protected static $_adapters = 'adapter.security.auth';
 
+	/**
+	 * Dynamic class dependencies.
+	 *
+	 * @var array Associative array of class names & their namespaces.
+	 */
 	protected static $_classes = array(
 		'session' => '\lithium\storage\Session'
 	);

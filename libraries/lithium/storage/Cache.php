@@ -55,6 +55,11 @@ class Cache extends \lithium\core\Adaptable {
 	 */
 	protected static $_configurations = null;
 
+	/**
+	 * Libraries::locate() compatible path to adapters for this class.
+	 *
+	 * @var string Dot-delimited path.
+	 */
 	protected static $_adapters = 'adapter.storage.cache';
 
 	/**

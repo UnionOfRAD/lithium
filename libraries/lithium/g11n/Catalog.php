@@ -21,8 +21,19 @@ use \lithium\util\Collection;
  */
 class Catalog extends \lithium\core\Adaptable {
 
+	/**
+	 * A Collection of the configurations you add through Catalog::config().
+	 *
+	 * @var Collection
+	 */
 	protected static $_configurations = null;
 
+	/**
+	 * Libraries::locate() compatible path to adapters for this class.
+	 *
+	 * @see lithium\core\Libraries::locate()
+	 * @var string Dot-delimited path.
+	 */
 	protected static $_adapters = 'adapter.g11n.catalog';
 
 	public static function config($config = null) {

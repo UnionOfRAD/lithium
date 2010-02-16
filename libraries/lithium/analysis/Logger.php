@@ -21,6 +21,12 @@ class Logger extends \lithium\core\Adaptable {
 	 */
 	protected static $_configurations = null;
 
+	/**
+	 * Libraries::locate() compatible path to adapters for this class.
+	 *
+	 * @see lithium\core\Libraries::locate()
+	 * @var string Dot-delimited path.
+	 */
 	protected static $_adapters = 'adapter.analysis.logger';
 
 	/**
