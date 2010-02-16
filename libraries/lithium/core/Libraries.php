@@ -626,7 +626,10 @@ class Libraries {
 			return null;
 		}
 		foreach (static::$_paths[$type] as $path) {
-			if (is_dir($path = str_replace(array_keys($params), array_values($params), $path))) {
+			$replace = array_merge(array_keys($params), array('{', '}', ':'));
+			$with = array_merge(array_values($params), array('', '', ''));
+
+			if (is_dir($path = str_replace($replace, $with, $path))) {
 				return $path;
 			}
 		}
