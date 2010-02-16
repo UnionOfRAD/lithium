@@ -626,7 +626,7 @@ class Libraries {
 			return null;
 		}
 		foreach (static::$_paths[$type] as $path) {
-			if (is_dir($path = String::insert($path, $params))) {
+			if (is_dir($path = str_replace(array_keys($params), array_values($params), $path))) {
 				return $path;
 			}
 		}
