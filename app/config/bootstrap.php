@@ -44,7 +44,7 @@ require __DIR__ . '/bootstrap/libraries.php';
  * This file contains configurations for connecting to external caching resources, as well as
  * default caching rules for various systems within your application
  */
-require __DIR__ . '/bootstrap/cache.php';
+// require __DIR__ . '/bootstrap/cache.php';
 
 /**
  * This file contains your application's globalization rules, including inflections,
@@ -87,5 +87,6 @@ require __DIR__ . '/bootstrap/cache.php';
 // use \lithium\util\Collection;
 //
 // Collection::formats('\lithium\net\http\Media');
+
 
 ?>
