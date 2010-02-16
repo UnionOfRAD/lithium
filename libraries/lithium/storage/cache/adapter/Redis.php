@@ -49,9 +49,9 @@ class Redis extends \lithium\core\Object {
 	/**
 	 * Redis object instance used by this adapter.
 	 *
-	 * @var object Memcache object
+	 * @var object Redis object
 	 */
-	public static $Redis = null;
+	public static $connection = null;
 
 	/**
 	 * Object constructor
@@ -71,15 +71,15 @@ class Redis extends \lithium\core\Object {
 			'server' => '127.0.0.1:6379'
 		);
 
-		if (is_null(static::$Redis)) {
-			static::$Redis = new \Redis();
+		if (is_null(static::$connection)) {
+			static::$connection = new \Redis();
 		}
 
 		$config += $defaults;
 		parent::__construct($config);
 
 		list($IP, $port) = explode(':', $this->_config['server']);
-		static::$Redis->connect($IP, $port);
+		static::$connection->connect($IP, $port);
 	}
 
 	/**
@@ -91,7 +91,7 @@ class Redis extends \lithium\core\Object {
 	 */
 	protected function _ttl($key, $expiry) {
 		$expires = strtotime($expiry) - time();
-		return static::$Redis->setTimeout($key, $expires);
+		return static::$connection->setTimeout($key, $expires);
 	}
 
 	/**
@@ -103,10 +103,10 @@ class Redis extends \lithium\core\Object {
 	 * @return boolean True on successful write, false otherwise
 	 */
 	public function write($key, $value, $expiry) {
-		$Redis =& static::$Redis;
+		$connection =& static::$connection;
 
-		return function($self, $params, $chain) use (&$Redis) {
-			if($Redis->set($params['key'], $params['data'])){
+		return function($self, $params, $chain) use (&$connection) {
+			if($connection->set($params['key'], $params['data'])){
 				return $self->invokeMethod('_ttl', array($params['key'], $params['expiry']));
 			}
 		};
@@ -119,10 +119,10 @@ class Redis extends \lithium\core\Object {
 	 * @return mixed Cached value if successful, false otherwise
 	 */
 	public function read($key) {
-		$Redis =& static::$Redis;
+		$connection =& static::$connection;
 
-		return function($self, $params, $chain) use (&$Redis) {
-			return $Redis->get($params['key']);
+		return function($self, $params, $chain) use (&$connection) {
+			return $connection->get($params['key']);
 		};
 	}
 
@@ -133,10 +133,10 @@ class Redis extends \lithium\core\Object {
 	 * @return mixed True on successful delete, false otherwise
 	 */
 	public function delete($key) {
-		$Redis =& static::$Redis;
+		$connection =& static::$connection;
 
-		return function($self, $params, $chain) use (&$Redis) {
-			return (boolean) $Redis->delete($params['key']);
+		return function($self, $params, $chain) use (&$connection) {
+			return (boolean) $connection->delete($params['key']);
 		};
 	}
 
@@ -148,10 +148,10 @@ class Redis extends \lithium\core\Object {
 	 * @return mixed Item's new value on successful decrement, false otherwise
 	 */
 	public function decrement($key, $offset = 1) {
-		$Redis =& static::$Redis;
+		$connection =& static::$connection;
 
-		return function($self, $params, $chain) use (&$Redis, $offset) {
-			return $Redis->decr($params['key'], $offset);
+		return function($self, $params, $chain) use (&$connection, $offset) {
+			return $connection->decr($params['key'], $offset);
 		};
 	}
 
@@ -163,10 +163,10 @@ class Redis extends \lithium\core\Object {
 	 * @return mixed Item's new value on successful increment, false otherwise
 	 */
 	public function increment($key, $offset = 1) {
-		$Redis =& static::$Redis;
+		$connection =& static::$connection;
 
-		return function($self, $params, $chain) use (&$Redis, $offset) {
-			return $Redis->incr($params['key'], $offset);
+		return function($self, $params, $chain) use (&$connection, $offset) {
+			return $connection->incr($params['key'], $offset);
 		};
 	}
 
@@ -176,7 +176,7 @@ class Redis extends \lithium\core\Object {
 	 * @return mixed True on successful clear, false otherwise
 	 */
 	public function clear() {
-		return static::$Redis->flushdb();
+		return static::$connection->flushdb();
 	}
 
 	/**
@@ -189,7 +189,7 @@ class Redis extends \lithium\core\Object {
 		if (!extension_loaded('redis')) {
 			return false;
 		}
-		$version = static::$Redis->info();
+		$version = static::$connection->info();
 		return (!empty($version));
 	}
 }
