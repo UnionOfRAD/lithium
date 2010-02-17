@@ -6,11 +6,11 @@ use \lithium\storage\session\adapter\Memory;
 
 class SessionStorageConditional extends Memory {
 
-	public function read($key, $options = array()) {
+	public function read($key, array $options = array()) {
 		return isset($options['fail']) ? null : parent::read($key, $options);
 	}
 
-	public function write($key, $value, $options = array()) {
+	public function write($key, $value, array $options = array()) {
 		return isset($options['fail']) ? null : parent::write($key, $value, $options);
 	}
 }

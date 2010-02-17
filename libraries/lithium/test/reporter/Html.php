@@ -84,7 +84,7 @@ class Html extends \lithium\test\Reporter {
 	 *               - menu: current menu string for recursive construction
 	 * @return void
 	 */
-	protected function _item($type, $options = array()) {
+	protected function _item($type, array $options = array()) {
 		$defaults = array('request' => null, 'namespace' => null, 'name' => null, 'menu' => null);
 		$options += $defaults;
 		$router = $this->_classes['router'];

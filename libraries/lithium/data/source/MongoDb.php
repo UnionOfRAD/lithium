@@ -52,7 +52,7 @@ class MongoDb extends \lithium\data\Source {
 	 *
 	 * @see lithium\data\Connections::add()
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'persistent' => true,
 			'host'       => 'localhost',
@@ -153,7 +153,7 @@ class MongoDb extends \lithium\data\Source {
 		return call_user_func_array(array(&$this->_connection, $method), $params);
 	}
 
-	public function create($query, $options = array()) {
+	public function create($query, array $options = array()) {
 		$params = compact('query', 'options');
 		$conn =& $this->_connection;
 		$db =& $this->_db;
@@ -173,7 +173,7 @@ class MongoDb extends \lithium\data\Source {
 		});
 	}
 
-	public function read($query, $options = array()) {
+	public function read($query, array $options = array()) {
 		$defaults = array('return' => 'resource');
 		$options += $defaults;
 		$params = compact('query', 'options');
@@ -190,7 +190,7 @@ class MongoDb extends \lithium\data\Source {
 		});
 	}
 
-	public function update($query, $options = array()) {
+	public function update($query, array $options = array()) {
 		$params = compact('query', 'options');
 		$conn =& $this->_connection;
 		$db =& $this->_db;
@@ -208,7 +208,7 @@ class MongoDb extends \lithium\data\Source {
 		});
 	}
 
-	public function delete($query, $options) {
+	public function delete($query, array $options = array()) {
 		$query = $query->export($this);
 		extract($query, EXTR_OVERWRITE);
 

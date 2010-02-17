@@ -37,7 +37,7 @@ class Php extends \lithium\core\Object {
 	 * @param array $config
 	 * @return void
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		parent::__construct((array) $config + $this->_defaults);
 	}
 
@@ -91,7 +91,7 @@ class Php extends \lithium\core\Object {
 	 * @param array $options Options array
 	 * @return mixed Data in the session if successful, false otherwise
 	 */
-	public function read($key, $options = array()) {
+	public function read($key, array $options = array()) {
 		return function($self, $params, $chain) {
 			extract($params);
 			return isset($_SESSION[$key]) ? $_SESSION[$key] : null;
@@ -106,7 +106,7 @@ class Php extends \lithium\core\Object {
 	 * @param array $options Options array
 	 * @return boolean True on successful write, false otherwise
 	 */
-	public static function write($key, $value, $options = array()) {
+	public static function write($key, $value, array $options = array()) {
 		return function($self, $params, $chain) {
 			extract($params);
 			$_SESSION[$key] = $value;
@@ -120,7 +120,7 @@ class Php extends \lithium\core\Object {
 	 * @param array $options Options array
 	 * @return boolean True on successful delete, false otherwise
 	 */
-	public static function delete($key, $options = array()) {
+	public static function delete($key, array $options = array()) {
 		return function($self, $params, $chain) {
 			extract($params);
 

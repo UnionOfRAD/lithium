@@ -163,7 +163,7 @@ class Validator extends \lithium\core\StaticObject {
 			'boolean' => function($value) {
 				return in_array($value, array(0, 1, '0', '1', true, false), true);
 			},
-			'decimal' => function($value, $format = null, $options = array()) {
+			'decimal' => function($value, $format = null, array $options = array()) {
 				$defaults = array('precision' => null);
 				$options += $defaults;
 
@@ -376,7 +376,7 @@ class Validator extends \lithium\core\StaticObject {
 	 *              matching it in whole.
 	 * @return void
 	 */
-	public static function add($name, $rule = null, $options = array()) {
+	public static function add($name, $rule = null, array $options = array()) {
 		if (!is_array($name)) {
 			$name = array($name => $rule);
 		}
@@ -398,7 +398,7 @@ class Validator extends \lithium\core\StaticObject {
 	 * @return boolean
 	 * @todo Write tests for pre- and post-filtering
 	 */
-	public static function rule($rule, $value, $format = 'any', $options = array()) {
+	public static function rule($rule, $value, $format = 'any', array $options = array()) {
 		if (!isset(static::$_rules[$rule])) {
 			throw new InvalidArgumentException("Rule '{$rule}' is not a validation rule");
 		}

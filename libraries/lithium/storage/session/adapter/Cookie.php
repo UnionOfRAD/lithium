@@ -41,7 +41,7 @@ class Cookie extends \lithium\core\Object {
 	 * @param array $config
 	 * @return void
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		parent::__construct((array) $config + $this->_defaults);
 	}
 
@@ -80,7 +80,7 @@ class Cookie extends \lithium\core\Object {
 	 * @param array $options Options array
 	 * @return mixed Data in the session if successful, false otherwise
 	 */
-	public function read($key, $options = array()) {
+	public function read($key, array $options = array()) {
 		$config = $options + $this->_config;
 
 		return function($self, $params, $chain) use (&$config) {
@@ -100,7 +100,7 @@ class Cookie extends \lithium\core\Object {
 	 * @param array $options Options array
 	 * @return boolean True on successful write, false otherwise
 	 */
-	public function write($key, $value = null, $options = array()) {
+	public function write($key, $value = null, array $options = array()) {
 		if (!isset($options['expire']) && empty($this->_config['expire'])
 				&& $key != $this->_config['name']) {
 			return null;
@@ -135,7 +135,7 @@ class Cookie extends \lithium\core\Object {
 	 * @param array $options Options array
 	 * @return boolean True on successful delete, false otherwise
 	 */
-	public function delete($key, $options = array()) {
+	public function delete($key, array $options = array()) {
 		$config = $options + $this->_config;
 
 		return function($self, $params, $chain) use (&$config) {

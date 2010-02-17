@@ -93,7 +93,7 @@ class Filters extends \lithium\util\Collection {
 	 *          first, and will be the last to return.
 	 * @return Returns the value returned by the first closure in `$options['items`]`.
 	 */
-	public static function run($class, $params, $options = array()) {
+	public static function run($class, $params, array $options = array()) {
 		$defaults = array('class' => null, 'method' => null, 'items' => array());
 		$chain = new Filters((array) $options + $defaults);
 		return $chain->rewind()->__invoke($class, $params, $chain);

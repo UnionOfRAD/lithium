@@ -109,7 +109,7 @@ class String {
 	 * @return string
 	 * @todo Optimize this
 	 */
-	public static function insert($str, $data, $options = array()) {
+	public static function insert($str, $data, array $options = array()) {
 		$defaults = array(
 			'before' => '{:', 'after' => '}', 'escape' => null, 'format' => null, 'clean' => false
 		);
@@ -190,7 +190,7 @@ class String {
 	 *        - `'word'`: Regular expression matching words.
 	 * @return string The cleaned string.
 	 */
-	public static function clean($str, $options = array()) {
+	public static function clean($str, array $options = array()) {
 		if (!$options['clean']) {
 			return $str;
 		}
@@ -260,7 +260,7 @@ class String {
 	 *              -`'rightBound'` _string_: Right scope-enclosing boundary.
 	 * @return array Returns an array of tokens.
 	 */
-	public static function tokenize($data, $options = array()) {
+	public static function tokenize($data, array $options = array()) {
 		$defaults = array('separator' => ',', 'leftBound' => '(', 'rightBound' => ')');
 		extract($options + $defaults);
 

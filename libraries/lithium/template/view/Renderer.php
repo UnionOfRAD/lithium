@@ -98,7 +98,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 */
 	protected $_data = array();
 
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'view' => null,
 			'strings' => array(),
@@ -122,13 +122,12 @@ abstract class Renderer extends \lithium\core\Object {
 		$request =& $this->_request;
 		$context =& $this->_context;
 		$classes =& $this->_classes;
-		$self =& $this;
 
 		$this->_handlers += array(
-			'url' => function($url) use (&$classes, &$self, &$request) {
+			'url' => function($url) use (&$classes, &$request) {
 				return $classes['router']::match($url ?: '', $request);
 			},
-			'path' => function($path, $ref, $options = array()) use (&$self, &$classes, &$request) {
+			'path' => function($path, $ref, array $options = array()) use (&$classes, &$request) {
 				$defaults = array('base' => $request ? $request->env('base') : '');
 				list($helper, $methodRef) = $ref;
 				list($class, $method) = explode('::', $methodRef);
@@ -148,7 +147,7 @@ abstract class Renderer extends \lithium\core\Object {
 		unset($this->_config['view']);
 	}
 
-	abstract public function render($template, $data = array(), $options = array());
+	abstract public function render($template, $data = array(), array $options = array());
 
 	public function __isSet($property) {
 		return isset($this->_context[$property]);
@@ -304,7 +303,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 * @see lithium\template\view\Renderer::handlers()
 	 * @see lithium\template\view\Renderer::$_handlers
 	 */
-	public function applyHandler($helper, $method, $name, $value, $options = array()) {
+	public function applyHandler($helper, $method, $name, $value, array $options = array()) {
 		if (!(isset($this->_handlers[$name]) && $handler = $this->_handlers[$name])) {
 			return $value;
 		}

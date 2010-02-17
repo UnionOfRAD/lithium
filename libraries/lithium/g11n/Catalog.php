@@ -68,7 +68,7 @@ class Catalog extends \lithium\core\Adaptable {
 	 *        - `'lossy'`: Whether or not to use the compact and lossy format, defaults to `true`.
 	 * @return array|void If available the requested data, else `null`.
 	 */
-	public static function read($category, $locale, $options = array()) {
+	public static function read($category, $locale, array $options = array()) {
 		$defaults = array('name' => null, 'scope' => null, 'lossy' => true);
 		$options += $defaults;
 
@@ -118,7 +118,7 @@ class Catalog extends \lithium\core\Adaptable {
 	 *        - `'scope'`: The scope to use.
 	 * @return boolean Success.
 	 */
-	public static function write($category, $locale, $data, $options = array()) {
+	public static function write($category, $locale, $data, array $options = array()) {
 		$defaults = array('name' => null, 'scope' => null);
 		$options += $defaults;
 

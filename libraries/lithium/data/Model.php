@@ -112,7 +112,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return void
 	 * @todo Merge in inherited config from AppModel and other parent classes.
 	 */
-	public static function __init($options = array()) {
+	public static function __init(array $options = array()) {
 		if (($class = get_called_class()) == __CLASS__) {
 			return;
 		}
@@ -182,7 +182,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return void
 	 * @filter This method can be filtered.
 	 */
-	public static function find($type, $options = array()) {
+	public static function find($type, array $options = array()) {
 		$self = static::_instance();
 		$classes = $self->_classes;
 
@@ -384,7 +384,7 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
 	 */
-	public function save($record, $data = null, $options = array()) {
+	public function save($record, $data = null, array $options = array()) {
 		$self = static::_instance();
 		$classes = $self->_classes;
 		$meta = array('model' => get_called_class()) + $self->_meta;
@@ -417,7 +417,7 @@ class Model extends \lithium\core\StaticObject {
 		return static::_filter(__FUNCTION__, $params, $filter);
 	}
 
-	public function validates($record, $options = array()) {
+	public function validates($record, array $options = array()) {
 		$self = static::_instance();
 		$validator = $self->_classes['validator'];
 		$params = compact('record', 'options');
@@ -433,7 +433,7 @@ class Model extends \lithium\core\StaticObject {
 		return static::_filter(__FUNCTION__, $params, $filter);
 	}
 
-	public function delete($record, $options = array()) {
+	public function delete($record, array $options = array()) {
 		$self = static::_instance();
 		$query = $self->_classes['query'];
 		$model = get_called_class();

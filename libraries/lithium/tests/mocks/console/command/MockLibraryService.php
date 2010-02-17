@@ -12,7 +12,7 @@ use lithium\net\http\Response;
 
 class MockLibraryService extends \lithium\net\http\Service {
 
-	public function send($method, $path = null, $data = array(), $options = array()) {
+	public function send($method, $path = null, $data = array(), array $options = array()) {
 		if ($method == 'post') {
 			$this->request = $this->_request($method, $path, $data, $options);
 			if (!empty($this->request->auth['username'])) {

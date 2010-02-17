@@ -244,7 +244,7 @@ class RecordSet extends \lithium\util\Collection {
 	 * @param array $options
 	 * @return mixed
 	 */
-	public function to($format, $options = array()) {
+	public function to($format, array $options = array()) {
 		$defaults = array('indexed' => true);
 		$options += $defaults;
 

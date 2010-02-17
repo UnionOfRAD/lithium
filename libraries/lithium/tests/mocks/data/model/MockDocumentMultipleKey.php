@@ -22,7 +22,7 @@ class MockDocumentMultipleKey extends \lithium\data\Model {
 		'initialized' => false
 	);
 
-	public static function __init($options = array()) {}
+	public static function __init(array $options = array()) {}
 
 	public static function schema($field = null) {
 		return array();
@@ -38,7 +38,7 @@ class MockDocumentMultipleKey extends \lithium\data\Model {
 		return null;
 	}
 
-	public static function find($type = 'all', $options = array()) {
+	public static function find($type = 'all', array $options = array()) {
 		switch ($type) {
 			case 'first':
 				return new Document(array('items' =>

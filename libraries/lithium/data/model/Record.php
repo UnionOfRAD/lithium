@@ -62,7 +62,7 @@ class Record extends \lithium\core\Object {
 	 * @param array $config
 	 * @return object Record object.
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array('model' => null, 'data' => array());
 		parent::__construct((array) $config + $defaults);
 	}
@@ -169,7 +169,7 @@ class Record extends \lithium\core\Object {
 	 * @param array $options
 	 * @return mixed
 	 */
-	public function to($format, $options = array()) {
+	public function to($format, array $options = array()) {
 		switch ($format) {
 			case 'array':
 				$result = $this->_data;

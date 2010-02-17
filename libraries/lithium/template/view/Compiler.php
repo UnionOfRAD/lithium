@@ -32,7 +32,7 @@ class Compiler extends \lithium\core\StaticObject {
 	 * @param string $options
 	 * @return void
 	 */
-	public static function template($file, $options = array()) {
+	public static function template($file, array $options = array()) {
 		$cachePath = LITHIUM_APP_PATH . '/resources/tmp/cache/templates';
 		$defaults = array('path' => $cachePath, 'fallback' => true);
 		$options += $defaults;

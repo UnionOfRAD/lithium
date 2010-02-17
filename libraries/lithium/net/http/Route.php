@@ -89,7 +89,7 @@ class Route extends \lithium\core\Object {
 		'template', 'pattern', 'keys', 'params', 'match', 'defaults', 'subPatterns'
 	);
 
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'params' => array(),
 			'template' => '/',
@@ -137,7 +137,7 @@ class Route extends \lithium\core\Object {
 	 * @param string $context
 	 * @return mixed
 	 */
-	public function match($options = array(), $context = null) {
+	public function match(array $options = array(), $context = null) {
 		$defaults = array('action' => 'index');
 		$options += $defaults;
 
@@ -212,7 +212,7 @@ class Route extends \lithium\core\Object {
 	 * @param array $options
 	 * @return void
 	 */
-	public function compile($options = array()) {
+	public function compile(array $options = array()) {
 		$defaults = array('wrap' => true, 'compile' => true);
 		$options += $defaults;
 

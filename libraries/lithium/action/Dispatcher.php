@@ -75,7 +75,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @return array If no parameters are passed, returns an associative array with the current
 	 *         configuration, otherwise returns `null`.
 	 */
-	public static function config($config = array()) {
+	public static function config(array $config = array()) {
 		if (empty($config)) {
 			return array('rules' => static::$_rules);
 		}
@@ -100,7 +100,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *         `lithium\action\Response`.
 	 * @todo Add exception-handling/error page rendering
 	 */
-	public static function run($request = null, $options = array()) {
+	public static function run($request = null, array $options = array()) {
 		$defaults = array('request' => array());
 		$options += $defaults;
 		$classes = static::$_classes;

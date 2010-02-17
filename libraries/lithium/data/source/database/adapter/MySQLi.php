@@ -78,7 +78,7 @@ class MySQLi extends \lithium\data\source\Database {
 	 * @see lithium\data\Source::__construct()
 	 * @see lithium\data\Connections::add()
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array('port' => '3306');
 		parent::__construct((array) $config + $defaults);
 	}
@@ -92,9 +92,9 @@ class MySQLi extends \lithium\data\source\Database {
 	 * @param object $context
 	 * @return array Field names
 	 */
-	public function columns($query, $mysqliResult = null, $context = null) {
+	public function schema($query, $mysqliResult = null, $context = null) {
 		if (is_object($query)) {
-			return parent::columns($query, $mysqliResult, $context);
+			return parent::schema($query, $mysqliResult, $context);
 		}
 
 		$result = array();
@@ -327,7 +327,7 @@ class MySQLi extends \lithium\data\source\Database {
 		return $entity;
 	}
 
-	protected function _execute($sql, $options = array()) {
+	protected function _execute($sql, array $options = array()) {
 		$defaults = array('buffered' => true);
 		$options += $defaults;
 

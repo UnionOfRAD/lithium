@@ -35,7 +35,7 @@ abstract class Socket extends \lithium\core\Object {
 	 *              - `'timeout'`: Seconds after opening the socket times out (defaults to `30`).
 	 * @return void
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'persistent' => false,
 			'protocol'   => 'tcp',
@@ -94,7 +94,7 @@ abstract class Socket extends \lithium\core\Object {
 	 *                    - response: a class to use for the response
 	 * @return boolean response string or object like `\lithium\net\http\Response`
 	 */
-	abstract public function send($message, $options = array());
+	abstract public function send($message, array $options = array());
 
 	/**
 	 * Sets the timeout on the socket *connection*.

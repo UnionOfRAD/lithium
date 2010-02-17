@@ -65,21 +65,21 @@ class Redis extends \lithium\core\Object {
 	 * @see lithium\storage\Cache::config()
 	 * @todo Implement configurable & optional authentication
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'prefix' => '',
 			'server' => '127.0.0.1:6379'
 		);
 
-		if (is_null(static::$connection)) {
-			static::$connection = new \Redis();
+		if (is_null(static::$Redis)) {
+			static::$Redis = new \Redis();
 		}
 
 		$config += $defaults;
 		parent::__construct($config);
 
 		list($IP, $port) = explode(':', $this->_config['server']);
-		static::$connection->connect($IP, $port);
+		static::$Redis->connect($IP, $port);
 	}
 
 	/**

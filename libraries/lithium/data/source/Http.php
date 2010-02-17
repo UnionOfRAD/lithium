@@ -46,7 +46,7 @@ class Http extends \lithium\data\Source {
 	 * @param array $config
 	 * @return void
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'classes'    => array(),
 			'adapter'    => null,
@@ -151,7 +151,7 @@ class Http extends \lithium\data\Source {
 	 * @param array $options
 	 * @return void
 	 */
-	public function create($query, $options = array()) {
+	public function create($query, array $options = array()) {
 		return $this->_connection->post();
 	}
 
@@ -162,7 +162,7 @@ class Http extends \lithium\data\Source {
 	 * @param array $options
 	 * @return string
 	 */
-	public function read($query, $options = array()) {
+	public function read($query, array $options = array()) {
 		return $this->_connection->get();
 	}
 
@@ -173,7 +173,7 @@ class Http extends \lithium\data\Source {
 	 * @param array $options
 	 * @return string
 	 */
-	public function update($query, $options = array()) {
+	public function update($query, array $options = array()) {
 		return $this->_connection->put();
 	}
 
@@ -184,7 +184,7 @@ class Http extends \lithium\data\Source {
 	 * @param array $options
 	 * @return string
 	 */
-	public function delete($query = null, $options = array()) {
+	public function delete($query = null, array $options = array()) {
 		return $this->_connection->delete();
 	}
 }

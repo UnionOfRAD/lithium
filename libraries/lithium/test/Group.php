@@ -38,7 +38,7 @@ class Group extends \lithium\util\Collection {
 	 * @param string $options
 	 * @return array
 	 */
-	public static function all($options = array()) {
+	public static function all(array $options = array()) {
 		$defaults = array('transform' => false, 'library' => true);
 		$options += $defaults;
 		$m = '/\\\\tests\\\\cases\\\\(.+)Test$/';
@@ -56,7 +56,7 @@ class Group extends \lithium\util\Collection {
 	 * @param string $options
 	 * @return array
 	 */
-	public function add($test = null, $options = array()) {
+	public function add($test = null, array $options = array()) {
 		$callback = function($test) {
 			if (empty($test)) {
 				return array();
@@ -99,7 +99,7 @@ class Group extends \lithium\util\Collection {
 	 * @param string $options
 	 * @return lithium\util\Collection
 	 */
-	public function tests($params = array(), $options = array()) {
+	public function tests($params = array(), array $options = array()) {
 		$tests = new Collection();
 		array_map(function($test) use ($tests) { $tests[] = new $test; }, $this->_items);
 		return $tests;

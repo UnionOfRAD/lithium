@@ -122,7 +122,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @todo Implement filtering.
 	 * @return mixed
 	 */
-	public function invoke($method, $parameters = array(), $options = array()) {
+	public function invoke($method, $parameters = array(), array $options = array()) {
 		$defaults = array('merge' => false, 'collect' => false);
 		$options += $defaults;
 		$results = array();
@@ -175,7 +175,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 *          and the collection must be iterated in order to fetch all objects.
 	 * @return mixed The converted object.
 	 */
-	public function to($format, $options = array()) {
+	public function to($format, array $options = array()) {
 		$defaults = array('internal' => false);
 		$options += $defaults;
 		$data = $options['internal'] ? $this->_items : $this;
@@ -214,7 +214,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 *              in a new Collection object or subclass.
 	 * @return array|object The filtered items.
 	 */
-	public function find($filter, $options = array()) {
+	public function find($filter, array $options = array()) {
 		$defaults = array('collect' => true);
 		$options += $defaults;
 		$items = array_filter($this->_items, $filter);
@@ -270,7 +270,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 *              in a new Collection object or subclass.
 	 * @return array|object The filtered items.
 	 */
-	public function map($filter, $options = array()) {
+	public function map($filter, array $options = array()) {
 		$defaults = array('collect' => true);
 		$options += $defaults;
 		$items = array_map($filter, $this->_items);

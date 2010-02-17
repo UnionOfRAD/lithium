@@ -33,7 +33,7 @@ class Affected extends \lithium\test\Filter {
 	 * @param array $options Not used.
 	 * @return object|void Returns the instance of `$tests`.
 	 */
-	public static function apply($report, $options = array()) {
+	public static function apply($report, array $options = array()) {
 		$tests = $report->group->tests();
 		$affected = array();
 		$testsClasses = $tests->map('get_class', array('collect' => false));
@@ -61,7 +61,7 @@ class Affected extends \lithium\test\Filter {
 	 * @param array $options
 	 * @return array|void The results of the analysis.
 	 */
-	public static function analyze($report, $options = array()) {
+	public static function analyze($report, array $options = array()) {
 		return $report->results['filters'][__CLASS__];
 	}
 

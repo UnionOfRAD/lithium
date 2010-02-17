@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\data\source\database\adapter;
 
 class MockAdapter extends \lithium\data\source\Database {
 
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		parent::__construct($config);
 	}
 
@@ -37,19 +37,19 @@ class MockAdapter extends \lithium\data\source\Database {
 		return array();
 	}
 
-	public function create($record, $options = array()) {
+	public function create($record, array $options = array()) {
 		return true;
 	}
 
-	public function read($query, $options = array()) {
+	public function read($query, array $options = array()) {
 		return true;
 	}
 
-	public function update($query, $options) {
+	public function update($query, array $options = array()) {
 		return true;
 	}
 
-	public function delete($query, $options) {
+	public function delete($query, array $options = array()) {
 		return true;
 	}
 

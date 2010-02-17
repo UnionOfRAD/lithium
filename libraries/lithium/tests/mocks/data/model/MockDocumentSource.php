@@ -13,15 +13,15 @@ class MockDocumentSource extends \lithium\data\Source {
 	public function connect() {	}
 	public function disconnect() {}
 	public function entities($class = null) {}
-	public function describe($entity, $meta = array()) { }
-	public function create($query, $options) {	}
-	public function update($query, $options) {	}
-	public function delete($query, $options) {	}
+	public function describe($entity, $meta = array()) {}
+	public function create($query, array $options = array()) {}
+	public function update($query, array $options = array()) {}
+	public function delete($query, array $options = array() ) {}
 
 	protected $point = 0;
 	protected $result = null;
 
-	public function read($query = null, $options = null) {
+	public function read($query = null, array $options = array()) {
 		$this->point = 0;
 		$this->result = array(
 			array('id' => 1, 'name' => 'Joe'),

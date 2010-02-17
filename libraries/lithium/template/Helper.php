@@ -41,7 +41,7 @@ abstract class Helper extends \lithium\core\Object {
 		'nohref', 'noshade', 'nowrap', 'multiple', 'noresize'
 	);
 
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array('handlers' => array(), 'context' => null);
 		parent::__construct($config + $defaults);
 	}
@@ -73,7 +73,7 @@ abstract class Helper extends \lithium\core\Object {
 	 * @param array $options
 	 * @return mixed
 	 */
-	public function escape($value, $method = null, $options = array()) {
+	public function escape($value, $method = null, array $options = array()) {
 		$defaults = array('escape' => true);
 		$options += $defaults;
 
@@ -86,7 +86,7 @@ abstract class Helper extends \lithium\core\Object {
 		return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 	}
 
-	protected function _render($method, $string, $params, $options = array()) {
+	protected function _render($method, $string, $params, array $options = array()) {
 		$defaults = array();
 		$options += $defaults;
 
@@ -97,7 +97,7 @@ abstract class Helper extends \lithium\core\Object {
 		return String::insert(isset($strings[$string]) ? $strings[$string] : $string, $params);
 	}
 
-	protected function _attributes($params, $method = null, $options = array()) {
+	protected function _attributes($params, $method = null, array $options = array()) {
 		if (!is_array($params)) {
 			return empty($params) ? '' : ' ' . $params;
 		}
@@ -112,7 +112,7 @@ abstract class Helper extends \lithium\core\Object {
 		return $result ? $options['prepend'] . implode(' ', $result) . $options['append'] : '';
 	}
 
-	protected function _formatAttr($key, $value, $options = array()) {
+	protected function _formatAttr($key, $value, array $options = array()) {
 		$defaults = array('escape' => true);
 		$options += $defaults;
 

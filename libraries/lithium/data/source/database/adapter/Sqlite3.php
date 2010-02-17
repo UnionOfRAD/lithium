@@ -56,7 +56,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @see lithium\data\Source::__construct()
 	 * @see lithium\data\Connections::add()
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'database'   => '',
 			'flags'      => NULL,
@@ -164,9 +164,9 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @param object $context
 	 * @return array
 	 */
-	public function columns($query, $resource = null, $context = null) {
+	public function schema($query, $resource = null, $context = null) {
 		if (is_object($query)) {
-			return parent::columns($query, $resource, $context);
+			return parent::schema($query, $resource, $context);
 		}
 
 		$result = array();
@@ -202,7 +202,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 		return $name;
 	}
 
-	protected function _execute($sql, $options = array()) {
+	protected function _execute($sql, array $options = array()) {
 		$params = compact('sql', 'options');
 		$conn =& $this->_connection;
 

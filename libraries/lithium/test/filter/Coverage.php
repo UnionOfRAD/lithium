@@ -32,7 +32,7 @@ class Coverage extends \lithium\test\Filter {
 	 * @return object|void Returns the instance of `$tests` with code coverage analysis
 	 *                     triggers applied.
 	 */
-	public static function apply($report, $options = array()) {
+	public static function apply($report, array $options = array()) {
 		$tests = $report->group->tests();
 		$defaults = array('method' => 'run');
 		$options += $defaults;
@@ -57,7 +57,7 @@ class Coverage extends \lithium\test\Filter {
 	 * @return array|void Returns an array indexed by file and line, showing the number of
 	 *                    instances each line was called.
 	 */
-	public static function analyze($report, $classes = array()) {
+	public static function analyze($report, array $classes = array()) {
 		$filterResults = static::collect($report->results['filters'][__CLASS__]);
 		$classes = $classes ?: array_filter(get_declared_classes(), function($class) {
 			return (!is_subclass_of($class, 'lithium\test\Unit'));
@@ -170,7 +170,7 @@ class Coverage extends \lithium\test\Filter {
 	 * @see lithium\test\Coverage::analyze()
 	 * @todo Implement $options['merging']
 	 */
-	public static function collect($filterResults, $options = array()) {
+	public static function collect($filterResults, array $options = array()) {
 		$defaults = array('merging' => 'class');
 		$options += $defaults;
 		$packagedResults = array();

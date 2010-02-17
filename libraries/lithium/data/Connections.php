@@ -140,7 +140,7 @@ class Connections extends \lithium\core\Adaptable {
 	 *          configuration, instead of the connection itself.
 	 * @return mixed A configured instance of the connection, or an array of the configuration used.
 	 */
-	public static function get($name = null, $options = array()) {
+	public static function get($name = null, array $options = array()) {
 		$defaults = array('config' => false, 'autoCreate' => true);
 		$options += $defaults;
 

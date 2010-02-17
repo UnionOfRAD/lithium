@@ -25,9 +25,9 @@ class Response extends \lithium\net\http\Response {
 
 	protected $_config = array();
 
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array('buffer' => 8192, 'request' => null);
-		parent::__construct((array) $config + $defaults);
+		parent::__construct($config + $defaults);
 	}
 
 	protected function _init() {

@@ -14,7 +14,7 @@ use \lithium\security\auth\adapter\Form;
 
 class FormTest extends \lithium\test\Unit {
 
-	public static function first($options = array()) {
+	public static function first(array $options = array()) {
 		return new Record(array('data' => $options['conditions']));
 	}
 
@@ -49,7 +49,7 @@ class FormTest extends \lithium\test\Unit {
 		$subject = new Form(array('model' => __CLASS__));
 		$user = array('id' => 5, 'name' => 'bob');
 
-		$result = $subject->set($user, null);
+		$result = $subject->set($user);
 		$this->assertIdentical($user, $result);
 	}
 }

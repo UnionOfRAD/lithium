@@ -26,7 +26,7 @@ class Debugger extends \lithium\core\Object {
 	 *        - `'trace'`: A trace to use instead of generating one.
 	 * @return string|array Stack trace formatted according to `'format'` option.
 	 */
-	public static function trace($options = array()) {
+	public static function trace(array $options = array()) {
 		$defaults = array(
 			'depth' => 999,
 			'format' => null,

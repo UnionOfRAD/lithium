@@ -43,7 +43,7 @@ class File extends \lithium\template\view\Renderer {
 		'media'  => 'lithium\net\http\Media'
 	);
 
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array('classes' => array(), 'compile' => true);
 		parent::__construct((array) $config + $defaults);
 	}
@@ -56,7 +56,7 @@ class File extends \lithium\template\view\Renderer {
 	 * @param array $options
 	 * @return string
 	 */
-	public function render($template, $data = array(), $options = array()) {
+	public function render($template, $data = array(), array $options = array()) {
 		$this->_context = $options['context'] + $this->_context;
 		$template__ = $template;
 		unset($options, $template);

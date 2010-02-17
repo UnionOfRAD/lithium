@@ -125,7 +125,7 @@ class Document extends \lithium\util\Collection {
 		'items', 'classes' => 'merge', 'handle', 'model', 'result', 'query', 'parent', 'exists'
 	);
 
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		if (isset($config['data']) && !isset($config['items'])) {
 			$config['items'] = $config['data'];
 			unset($config['data']);
@@ -379,7 +379,7 @@ class Document extends \lithium\util\Collection {
 	 * @param array $options
 	 * @return object Returns a new `Document` object instance.
 	 */
-	protected function _record($classType, $items, $options = array()) {
+	protected function _record($classType, $items, array $options = array()) {
 		$parent = $this;
 		$model = $this->_model;
 		$exists = $this->_exists;

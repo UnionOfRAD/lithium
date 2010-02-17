@@ -27,7 +27,7 @@ class Syslog extends \lithium\core\Object {
 	 * @param array $config
 	 * @return void
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'identity' => false,
 			'options'  => LOG_ODELAY,

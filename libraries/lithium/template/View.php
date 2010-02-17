@@ -31,7 +31,7 @@ class View extends \lithium\core\Object {
 
 	protected $_autoConfig = array('request');
 
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'request' => null,
 			'vars' => array(),
@@ -62,7 +62,7 @@ class View extends \lithium\core\Object {
 		$this->outputFilters += compact('h') + $this->_config['outputFilters'];
 	}
 
-	public function render($type, $data = array(), $options = array()) {
+	public function render($type, $data = array(), array $options = array()) {
 		$defaults = array('context' => array(), 'type' => 'html', 'layout' => null);
 		$options += $defaults;
 

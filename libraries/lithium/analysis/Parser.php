@@ -24,7 +24,7 @@ class Parser extends \lithium\core\StaticObject {
 	 * @param string $options
 	 * @return mixed
 	 */
-	public static function token($string, $options = array()) {
+	public static function token($string, array $options = array()) {
 		$defaults = array('id' => false);
 		$options += $defaults;
 
@@ -35,7 +35,7 @@ class Parser extends \lithium\core\StaticObject {
 		return $token[($options['id']) ? 'id' : 'name'];
 	}
 
-	public static function tokenize($code, $options = array()) {
+	public static function tokenize($code, array $options = array()) {
 		$defaults = array('wrap' => true, 'ignore' => array(), 'include' => array());
 		$options += $defaults;
 		$tokens = array();
@@ -82,7 +82,7 @@ class Parser extends \lithium\core\StaticObject {
 	 *                the line of code to be matched, defaults to false
 	 * @return array
 	 */
-	public static function find($code, $pattern, $options = array()) {
+	public static function find($code, $pattern, array $options = array()) {
 		$defaults = array(
 			'all' => true, 'capture' => array(), 'ignore' => array('T_WHITESPACE'),
 			'return' => true, 'lineBreaks' => false, 'startOfLine' => false
@@ -193,7 +193,7 @@ class Parser extends \lithium\core\StaticObject {
 		return $results;
 	}
 
-	public static function match($code, $parameters, $options = array()) {
+	public static function match($code, $parameters, array $options = array()) {
 		$defaults = array('ignore' => array('T_WHITESPACE'), 'return' => true);
 		$options += $defaults;
 		$parameters = static::_prepareMatchParams($parameters);

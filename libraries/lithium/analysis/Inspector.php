@@ -171,7 +171,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 *         filtered out as well.
 	 * @return array Returns an array of the executable line numbers of the class.
 	 */
-	public static function executable($class, $options = array()) {
+	public static function executable($class, array $options = array()) {
 		$defaults = array(
 			'self' => true, 'filter' => true, 'methods' => array(),
 			'empty' => array(' ', "\t", '}', ')', ';'), 'pattern' => null,
@@ -219,7 +219,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 *         and each value is an array of line numbers which are contained in the method.
 	 * @param array $options
 	 */
-	public static function methods($class, $format = null, $options = array()) {
+	public static function methods($class, $format = null, array $options = array()) {
 		$defaults = array('methods' => array(), 'group' => true, 'self' => true);
 		$options += $defaults;
 
@@ -268,7 +268,7 @@ class Inspector extends \lithium\core\StaticObject {
 		return $result;
 	}
 
-	public static function properties($class, $options = array()) {
+	public static function properties($class, array $options = array()) {
 		$defaults = array('properties' => array(), 'self' => true);
 		$options += $defaults;
 
@@ -348,7 +348,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 *         or false on error.
 	 * @link http://php.net/manual/en/function.class-parents.php
 	 */
-	public static function parents($class, $options = array()) {
+	public static function parents($class, array $options = array()) {
 		$defaults = array('autoLoad' => false);
 		$options += $defaults;
 		$class = is_object($class) ? get_class($class) : $class;
@@ -367,7 +367,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 * @return array Associative of classes and their corresponding definition files
 	 * @todo Document valid options
 	 */
-	public static function classes($options = array()) {
+	public static function classes(array $options = array()) {
 		$defaults = array('group' => 'classes', 'file' => null);
 		$options += $defaults;
 
@@ -410,7 +410,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 * @return array An array of the static and dynamic class dependencies
 	 * @todo Document valid options
 	 */
-	public static function dependencies($classes, $options = array()) {
+	public static function dependencies($classes, array $options = array()) {
 		$defaults = array('type' => null);
 		$options += $defaults;
 		$static = $dynamic = array();

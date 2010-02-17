@@ -28,11 +28,11 @@ class Memory extends \lithium\core\Object {
 		return true;
 	}
 
-	public function check($key, $options = array()) {
+	public function check($key, array $options = array()) {
 		return isset($this->_session[$key]);
 	}
 
-	public function read($key, $options = array()) {
+	public function read($key, array $options = array()) {
 		$session = $this->_session;
 
 		return function($self, $params, $chain) use ($session) {
@@ -41,7 +41,7 @@ class Memory extends \lithium\core\Object {
 		};
 	}
 
-	public function write($key, $value, $options = array()) {
+	public function write($key, $value, array $options = array()) {
 		$session =& $this->_session;
 
 		return function($self, $params, $chain) use (&$session) {
@@ -50,7 +50,7 @@ class Memory extends \lithium\core\Object {
 		};
 	}
 
-	public function delete($key, $options = array()) {
+	public function delete($key, array $options = array()) {
 		$session =& $this->_session;
 
 		return function($self, $params, $chain) use (&$session) {

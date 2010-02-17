@@ -20,7 +20,7 @@ use \lithium\util\String;
  */
 class Simple extends \lithium\template\view\Renderer {
 
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array('classes' => array());
 		parent::__construct($config + $defaults);
 	}
@@ -33,7 +33,7 @@ class Simple extends \lithium\template\view\Renderer {
 	 * @param array $options
 	 * @return string
 	 */
-	public function render($template, $data = array(), $options = array()) {
+	public function render($template, $data = array(), array $options = array()) {
 		$context = array();
 		$this->_context = $options['context'] + $this->_context;
 

@@ -20,7 +20,7 @@ class MockComment extends \lithium\data\Model {
 		'connection' => 'mock-source', 'key' => 'comment_id'
 	);
 
-	public static function find($type, $options = array()) {
+	public static function find($type, array $options = array()) {
 		$defaults = array(
 			'conditions' => null, 'fields' => null, 'order' => null, 'limit' => null, 'page' => 1
 		);

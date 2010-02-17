@@ -16,7 +16,7 @@ class MockCollectionObject extends \lithium\core\Object {
 		return $method;
 	}
 
-	public function to($format, $options = array()) {
+	public function to($format, array $options = array()) {
 		switch ($format) {
 			case 'array':
 				return $this->data + array(2 => 3);

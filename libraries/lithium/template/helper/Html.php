@@ -173,7 +173,7 @@ class Html extends \lithium\template\Helper {
 	 * @param array $options Array of HTML attributes.
 	 * @return string Returns an `<a />` or `<link />` element.
 	 */
-	public function link($title, $url = null, $options = array()) {
+	public function link($title, $url = null, array $options = array()) {
 		$defaults = array('escape' => true);
 		$options += $defaults;
 
@@ -198,7 +198,7 @@ class Html extends \lithium\template\Helper {
 	 * @param array $options
 	 * @return string
 	 */
-	public function script($path, $options = array()) {
+	public function script($path, array $options = array()) {
 		$defaults = array('inline' => true);
 		$options += $defaults;
 		$m = __METHOD__;
@@ -230,7 +230,7 @@ class Html extends \lithium\template\Helper {
 	 * @return string CSS <link /> or <style /> tag, depending on the type of link.
 	 * @filter This method can be filtered.
 	 */
-	public function style($path, $options = array()) {
+	public function style($path, array $options = array()) {
 		$defaults = array('type' => 'stylesheet', 'inline' => true);
 		$options += $defaults;
 
@@ -266,7 +266,7 @@ class Html extends \lithium\template\Helper {
 	 * @param array $options Array of HTML attributes.
 	 * @return string
 	 */
-	public function image($path, $options = array()) {
+	public function image($path, array $options = array()) {
 		$defaults = array('alt' => '');
 		$options += $defaults;
 		$path = is_array($path) ? $this->_context->url($path) : $path;
@@ -303,7 +303,7 @@ class Html extends \lithium\template\Helper {
 	 * @param array $options Additional HTML attributes of the DIV tag
 	 * @return string The formatted DIV element
 	 */
-	function block($class = null, $content = null, $options = array()) {
+	function block($class = null, $content = null, array $options = array()) {
 		if ($class) {
 			$options['class'] = $class;
 		}
@@ -318,7 +318,7 @@ class Html extends \lithium\template\Helper {
 	 * @param array $options Additional HTML attributes of the P tag
 	 * @return string The formatted P element
 	 */
-	function para($class, $content, $options = array()) {
+	function para($class, $content, array $options = array()) {
 		if ($class) {
 			$options['class'] = $class;
 		}
@@ -336,7 +336,7 @@ class Html extends \lithium\template\Helper {
 	 *               is 'html', 'rss', 'atom', or 'icon', the mime-type is returned.
 	 * @return string
 	 */
-	protected function _metaLink($type, $url = null, $options = array()) {
+	protected function _metaLink($type, $url = null, array $options = array()) {
 		$options += isset($this->_metaLinks[$type]) ? $this->_metaLinks[$type] : array();
 
 		if ($type == 'icon') {

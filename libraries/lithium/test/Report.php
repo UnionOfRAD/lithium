@@ -70,7 +70,7 @@ class Report extends \lithium\core\Object {
 	 *        - 'group': The test group with items to be run.
 	 *		  - 'filters': An array of filters that the test output should be run through.
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'title' => null,
 			'group' => null,

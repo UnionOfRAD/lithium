@@ -47,7 +47,7 @@ class MockSocket extends \lithium\net\Socket {
 		return true;
 	}
 
-	public function send($message, $options = array()) {
+	public function send($message, array $options = array()) {
 		if ($this->write($message)) {
 			$message = $this->read();
 			$response = new $options['classes']['response'](compact('message'));

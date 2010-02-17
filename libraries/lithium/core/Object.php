@@ -45,7 +45,7 @@ class Object {
 	 * @param array $config
 	 * @return object
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array('init' => true);
 		$this->_config = (array) $config + $defaults;
 

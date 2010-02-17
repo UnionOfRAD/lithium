@@ -42,7 +42,7 @@ class Cldr extends \lithium\g11n\catalog\adapter\Base {
 	 *        - `'scope'`: Scope to use.
 	 * @return object
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array('path' => null, 'scope' => null);
 		parent::__construct($config + $defaults);
 	}

@@ -105,7 +105,7 @@ class Request extends \lithium\net\http\Base {
 	 * @param array $config
 	 * @return object
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'scheme' => 'http',
 			'host' => 'localhost',
@@ -171,7 +171,7 @@ class Request extends \lithium\net\http\Base {
 		return "?" . $this->params = substr($query, 0, -1);
 	}
 
-	public function to($format, $options = array()) {
+	public function to($format, array $options = array()) {
 		switch ($format) {
 			case 'array':
 				return array(

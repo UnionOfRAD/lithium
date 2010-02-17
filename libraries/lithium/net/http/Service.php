@@ -63,7 +63,7 @@ class Service extends \lithium\core\Object {
 	 * @param array $config
 	 * @return void
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'autoConnect' => true,
 			'persistent' => false,
@@ -127,7 +127,7 @@ class Service extends \lithium\core\Object {
 	 * @param array $options
 	 * @return string
 	 */
-	public function get($path = null, $data = array(), $options = array()) {
+	public function get($path = null, $data = array(), array $options = array()) {
 		return $this->send(__FUNCTION__, $path, $data, $options);
 	}
 
@@ -139,7 +139,7 @@ class Service extends \lithium\core\Object {
 	 * @param array $options
 	 * @return string
 	 */
-	public function post($path = null, $data = array(), $options = array()) {
+	public function post($path = null, $data = array(), array $options = array()) {
 		return $this->send(__FUNCTION__, $path, $data, $options);
 	}
 
@@ -151,7 +151,7 @@ class Service extends \lithium\core\Object {
 	 * @param array $options
 	 * @return string
 	 */
-	public function put($path = null, $data = array(), $options = array()) {
+	public function put($path = null, $data = array(), array $options = array()) {
 		return $this->send(__FUNCTION__, $path, $data, $options);
 	}
 
@@ -163,7 +163,7 @@ class Service extends \lithium\core\Object {
 	 * @param array $options
 	 * @return string
 	 */
-	public function delete($path = null, $data = array(), $options = array()) {
+	public function delete($path = null, $data = array(), array $options = array()) {
 		return $this->send(__FUNCTION__, $path, $data, $options);
 	}
 
@@ -176,7 +176,7 @@ class Service extends \lithium\core\Object {
 	 * @param array $options
 	 * @return string
 	 */
-	public function send($method, $path = null, $data = null, $options = array()) {
+	public function send($method, $path = null, $data = null, array $options = array()) {
 		$defaults = array('return' => 'body');
 		$options += $defaults;
 

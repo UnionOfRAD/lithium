@@ -163,7 +163,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @param array $options Additional handler-specific options to pass to the content handler.
 	 * @return mixed
 	 */
-	public static function to($format, $data, $options = array()) {
+	public static function to($format, $data, array $options = array()) {
 		$data = is_object($data) ? $data->to('array') : $data;
 		return static::encode($format, $data, $options);
 	}
@@ -207,7 +207,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @see lithium\net\http\Media::$_handlers
 	 * @see lithium\util\String::insert()
 	 */
-	public static function type($type, $content = null, $options = array()) {
+	public static function type($type, $content = null, array $options = array()) {
 		$defaults = array(
 			'view' => false,
 			'template' => false,
@@ -263,7 +263,7 @@ class Media extends \lithium\core\StaticObject {
 		if (empty($options)) {
 			return isset(static::$_assets[$type]) ? static::$_assets[$type] : null;
 		}
-		$options = (array) $options + $defaults;
+		$options += $defaults;
 
 		if (isset(static::$_assets[$type])) {
 			static::$_assets[$type] = array_filter((array) $options) + static::$_assets[$type];
@@ -300,7 +300,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @see lithium\action\Request::env()
 	 * @filter
 	 */
-	public static function asset($path, $type, $options = array()) {
+	public static function asset($path, $type, array $options = array()) {
 		$defaults = array(
 			'base' => null,
 			'timestamp' => false,
@@ -379,7 +379,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @filter
 	 * @todo Implement proper exception handling
 	 */
-	public static function render(&$response, $data = null, $options = array()) {
+	public static function render(&$response, $data = null, array $options = array()) {
 		$params = array('response' => &$response) + compact('data', 'options');
 		$types = static::$_types;
 		$handlers = static::$_handlers;
@@ -419,7 +419,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @param array $options Handler-specific options.
 	 * @return mixed
 	 */
-	public static function encode($type, $data, $options = array()) {
+	public static function encode($type, $data, array $options = array()) {
 		if (!isset(static::$_handlers[$type])) {
 			return null;
 		}
@@ -435,6 +435,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @param array $data
 	 * @param array $options
 	 * @return string
+	 * @filter
 	 */
 	protected static function _handle($handler, $data, $options) {
 		$params = compact('handler', 'data', 'options');

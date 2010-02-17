@@ -25,7 +25,7 @@ class Controller extends \lithium\core\Object {
 	 * @param string $options
 	 * @return void
 	 */
-	public function __invoke($request, $params, $options = array()) {
+	public function __invoke($request, $params, array $options = array()) {
 		error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
 		$filter = function($self, $params, $chain) {
 			try {

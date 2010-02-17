@@ -172,7 +172,7 @@ class Form extends \lithium\core\Object {
 	 *              - `'query'` _string_: Determines the model method to invoke for authentication
 	 *                checks. See the `$_query` property for more details.
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'model' => 'User', 'query' => 'first', 'filters' => array(), 'fields' => array(
 				'username', 'password'
@@ -193,7 +193,7 @@ class Form extends \lithium\core\Object {
 	 *              adapter.
 	 * @return array Returns an array containing user information on success, or `false` on failure.
 	 */
-	public function check($credentials, $options = array()) {
+	public function check($credentials, array $options = array()) {
 		$model = $this->_model;
 		$query = $this->_query;
 		$conditions = $this->_scope + $this->_filters($credentials->data);
@@ -210,7 +210,7 @@ class Form extends \lithium\core\Object {
 	 * @param array $options Adapter-specific options. Not implemented in the `Form` adapter.
 	 * @return array Returns the value of `$data`.
 	 */
-	public function set($data, $options = array()) {
+	public function set($data, array $options = array()) {
 		return $data;
 	}
 
@@ -220,7 +220,7 @@ class Form extends \lithium\core\Object {
 	 * @param array $options Adapter-specific options. Not implemented in the `Form` adapter.
 	 * @return void
 	 */
-	public function clear($options = array()) {
+	public function clear(array $options = array()) {
 	}
 
 	protected function _init() {

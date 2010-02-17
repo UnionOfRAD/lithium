@@ -57,7 +57,7 @@ class Php extends \lithium\g11n\catalog\adapter\Base {
 	 *        - `'path'`: The path to the directory holding the data.
 	 * @return object
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array('path' => null);
 		parent::__construct($config + $defaults);
 	}

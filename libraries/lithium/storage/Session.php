@@ -88,7 +88,7 @@ class Session extends \lithium\core\Adaptable {
 	 * @param array $options Optional parameters that this method accepts
 	 * @return mixed Read result on successful session read, null otherwise
 	 */
-	public static function read($key, $options = array()) {
+	public static function read($key, array $options = array()) {
 		$defaults = array('name' => null);
 		$options += $defaults;
 		$method = ($name = $options['name']) ? static::adapter($name)->read($key, $options) : null;
@@ -116,7 +116,7 @@ class Session extends \lithium\core\Adaptable {
 	 * @param array $options Optional parameters that this method accepts
 	 * @return boolean True on successful write, false otherwise
 	 */
-	public static function write($key, $value = null, $options = array()) {
+	public static function write($key, $value = null, array $options = array()) {
 		$defaults = array('name' => null);
 		$options += $defaults;
 
@@ -153,7 +153,7 @@ class Session extends \lithium\core\Adaptable {
 	 * @param array $options
 	 * @return void
 	 */
-	public static function delete($key, $options = array()) {
+	public static function delete($key, array $options = array()) {
 		$defaults = array('name' => null);
 		$options += $defaults;
 
@@ -187,7 +187,7 @@ class Session extends \lithium\core\Adaptable {
 	 * @param array $options
 	 * @return boolean
 	 */
-	public static function check($key, $options = array()) {
+	public static function check($key, array $options = array()) {
 		$defaults = array('name' => null);
 		$options += $defaults;
 

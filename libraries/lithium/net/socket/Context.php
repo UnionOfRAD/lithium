@@ -53,7 +53,7 @@ class Context extends \lithium\net\Socket {
 	 * @param array $options
 	 * @return string
 	 */
-	public function send($message, $options = array()) {
+	public function send($message, array $options = array()) {
 		$defaults = array('path' => null, 'classes' => array('response' => null));
 		$options += $defaults;
 

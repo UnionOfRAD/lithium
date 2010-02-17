@@ -32,7 +32,7 @@ class Complexity extends \lithium\test\Filter {
 	 * @param array $options Not used.
 	 * @return object|void Returns the instance of `$tests`.
 	 */
-	public static function apply($report, $options = array()) {
+	public static function apply($report, array $options = array()) {
 		$tests = $report->group->tests();
 		$results = array();
 		foreach ($tests->invoke('subject') as $class) {
@@ -61,7 +61,7 @@ class Complexity extends \lithium\test\Filter {
 	 * @param array $options Not used.
 	 * @return array|void The results of the analysis.
 	 */
-	public static function analyze($report, $options = array()) {
+	public static function analyze($report, array $options = array()) {
 		$filterResults = static::collect($report->results['filters'][__CLASS__]);
 		$metrics = array('max' => array(), 'class' => array());
 

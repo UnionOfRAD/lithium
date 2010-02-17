@@ -45,7 +45,7 @@ class Apc extends \lithium\core\Object {
 	 * @param array $config
 	 * @return void
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array('prefix' => '');
 		parent::__construct($config + $defaults);
 	}

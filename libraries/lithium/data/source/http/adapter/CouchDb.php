@@ -36,7 +36,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param array $config
 	 * @return void
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array('port' => 5984);
 		$config = (array) $config + $defaults;
 		parent::__construct($config);
@@ -145,7 +145,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param string $options
 	 * @return boolean
 	 */
-	public function create($query, $options = array()) {
+	public function create($query, array $options = array()) {
 		$params = compact('query', 'options');
 		$conn =& $this->_connection;
 
@@ -182,7 +182,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param string $options
 	 * @return object
 	 */
-	public function read($query, $options = array()) {
+	public function read($query, array $options = array()) {
 		$defaults = array('return' => 'resource');
 		$options += $defaults;
 		$params = compact('query', 'options');
@@ -209,7 +209,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param string $options
 	 * @return boolean
 	 */
-	public function update($query, $options = array()) {
+	public function update($query, array $options = array()) {
 		$params = compact('query', 'options');
 		$conn =& $this->_connection;
 
@@ -246,7 +246,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param string $options
 	 * @return boolean
 	 */
-	public function delete($query, $options = array()) {
+	public function delete($query, array $options = array()) {
 		$params = compact('query', 'options');
 		$conn =& $this->_connection;
 

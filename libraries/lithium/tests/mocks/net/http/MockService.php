@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\net\http;
 
 class MockService extends \lithium\net\http\Service {
 
-	public function get($path = null, $data = array(), $options = array()) {
+	public function get($path = null, $data = array(), array $options = array()) {
 		$defaults = array('type' => 'form', 'return' => 'body');
 		$options += $defaults;
 		if ($this->connect() === false) {

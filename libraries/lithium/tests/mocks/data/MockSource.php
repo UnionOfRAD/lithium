@@ -30,19 +30,19 @@ class MockSource extends \lithium\data\Source {
 		return array();
 	}
 
-	public function create($query, $options) {
+	public function create($query, array $options = array()) {
 		return array($query => $options);
 	}
 
-	public function read($query, $options) {
+	public function read($query, array $options = array()) {
 		return compact('query', 'options');
 	}
 
-	public function update($query, $options) {
+	public function update($query, array $options = array()) {
 		return compact('query', 'options');
 	}
 
-	public function delete($query, $options) {
+	public function delete($query, array $options = array()) {
 		return compact('query', 'options');
 	}
 

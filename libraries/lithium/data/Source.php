@@ -47,7 +47,7 @@ abstract class Source extends \lithium\core\Object {
 	 * @param array $config
 	 * @return Source object
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array('autoConnect' => true);
 		parent::__construct((array) $config + $defaults);
 	}
@@ -64,6 +64,7 @@ abstract class Source extends \lithium\core\Object {
 	}
 
 	protected function _init() {
+		parent::_init();
 		if ($this->_config['autoConnect']) {
 			$this->connect();
 		}
@@ -82,7 +83,7 @@ abstract class Source extends \lithium\core\Object {
 	 *         as the connection could have timed out or otherwise been dropped by the remote
 	 *         resource during the course of the request.
 	 */
-	public function isConnected($options = array()) {
+	public function isConnected(array $options = array()) {
 		$defaults = array('autoConnect' => false);
 		$options += $defaults;
 
@@ -108,7 +109,6 @@ abstract class Source extends \lithium\core\Object {
 	 *
 	 * @param string $model The fully-name-spaced class name of the object making the request.
 	 * @return array Returns an array of objects to which models can connect.
-	 * @filter This method can be filtered.
 	 */
 	abstract public function entities($class = null);
 
@@ -121,7 +121,7 @@ abstract class Source extends \lithium\core\Object {
 	 * @param array $options
 	 * @return boolean Returns true if the operation was a success, otherwise false.
 	 */
-	abstract public function create($query, $options);
+	abstract public function create($query, array $options = array());
 
 	/**
 	 * Abstract. Must be defined by child classes.
@@ -130,7 +130,7 @@ abstract class Source extends \lithium\core\Object {
 	 * @param array $options
 	 * @return boolean Returns true if the operation was a success, otherwise false.
 	 */
-	abstract public function read($query, $options);
+	abstract public function read($query, array $options = array());
 
 	/**
 	 * Updates a set of records in a concrete data store.
@@ -142,7 +142,7 @@ abstract class Source extends \lithium\core\Object {
 	 * @param array $options Options to execute, which are defined by the concrete implementation.
 	 * @return boolean Returns true if the update operation was a success, otherwise false.
 	 */
-	abstract public function update($query, $options);
+	abstract public function update($query, array $options = array());
 
 	/**
 	 * Abstract. Must be defined by child classes.
@@ -151,7 +151,7 @@ abstract class Source extends \lithium\core\Object {
 	 * @param array $options
 	 * @return boolean Returns true if the operation was a success, otherwise false.
 	 */
-	abstract public function delete($query, $options);
+	abstract public function delete($query, array $options = array());
 
 	/**
 	 * A method which can be optionally implemented to configure a model class.

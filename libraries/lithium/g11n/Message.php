@@ -80,7 +80,7 @@ class Message extends \lithium\core\StaticObject {
 	 *                     could be found.
 	 * @see lithium\util\String::insert()
 	 */
-	public static function translate($id, $options = array()) {
+	public static function translate($id, array $options = array()) {
 		$defaults = array(
 			'count' => 1,
 			'locale' => Environment::get('locale'),
@@ -124,10 +124,10 @@ class Message extends \lithium\core\StaticObject {
 	 * @see lithium\net\http\Media::_handle()
 	 */
 	public static function aliases() {
-		$t = function($message, $options = array()) {
+		$t = function($message, array $options = array()) {
 			return Message::translate($message, $options + array('default' => $message));
 		};
-		$tn = function($message1, $message2, $count, $options = array()) {
+		$tn = function($message1, $message2, $count, array $options = array()) {
 			return Message::translate($message1, $options + compact('count') + array(
 				'default' => $count == 1 ? $message1 : $message2
 			));
@@ -152,7 +152,7 @@ class Message extends \lithium\core\StaticObject {
 	 * @filter
 	 * @todo Message pages need caching.
 	 */
-	protected static function _translated($id, $count, $locale, $options = array()) {
+	protected static function _translated($id, $count, $locale, array $options = array()) {
 		$params = compact('id', 'count', 'locale', 'options');
 
 		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {

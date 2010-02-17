@@ -119,7 +119,7 @@ class Form extends \lithium\template\Helper {
 	 */
 	protected $_binding = null;
 
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'base' => array(), 'text' => array(), 'textarea' => array(),
 			'select' => array('multiple' => false)
@@ -145,7 +145,7 @@ class Form extends \lithium\template\Helper {
 	 *         an array of the currently set template overrides (in the `'templates'` array key).
 	 * @see lithium\template\helper\Form::$_templateMap
 	 */
-	public function config($config = array()) {
+	public function config(array $config = array()) {
 		if (empty($config)) {
 			return array('templates' => $this->_templateMap) + array_intersect_key(
 				$this->_config, array('base' => '', 'text' => '', 'textarea' => '')
@@ -176,7 +176,7 @@ class Form extends \lithium\template\Helper {
 	 *         specified), the HTTP method is defined by the `'type'` option, and any HTML
 	 *         attributes passed in `$options`.
 	 */
-	public function create($binding = null, $options = array()) {
+	public function create($binding = null, array $options = array()) {
 		$defaults = array(
 			'url' => $this->_context->request()->params,
 			'type' => null,
@@ -244,7 +244,7 @@ class Form extends \lithium\template\Helper {
 	 * @return string Returns a form input (the input type is based on the `'type'` option), with
 	 *         label and error message, wrapped in a `<div />` element.
 	 */
-	public function field($name, $options = array()) {
+	public function field($name, array $options = array()) {
 		$defaults = array(
 			'label' => null, 'type' => 'text',
 			'template' => 'field', 'wrap' => null,
@@ -287,7 +287,7 @@ class Form extends \lithium\template\Helper {
 	 * @param array $options
 	 * @return string Returns a submit `<input />` tag with the given title and HTML attributes.
 	 */
-	public function submit($title = null, $options = array()) {
+	public function submit($title = null, array $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, null, $options);
 		return $this->_render(__METHOD__, $template, compact('title', 'options'));
 	}
@@ -299,7 +299,7 @@ class Form extends \lithium\template\Helper {
 	 * @param array $options
 	 * @return string Returns a `<textarea>` tag with the given name and HTML attributes.
 	 */
-	public function textarea($name, $options = array()) {
+	public function textarea($name, array $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		$value = isset($options['value']) ? $options['value'] : '';
 		unset($options['value']);
@@ -313,7 +313,7 @@ class Form extends \lithium\template\Helper {
 	 * @param array $options
 	 * @return string Returns a `<input />` tag with the given name and HTML attributes.
 	 */
-	public function text($name, $options = array()) {
+	public function text($name, array $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
 	}
@@ -338,7 +338,7 @@ class Form extends \lithium\template\Helper {
 	 *             that is selected by default.
 	 * @return string Returns an HTML `<select />` element.
 	 */
-	public function select($name, $list = array(), $options = array()) {
+	public function select($name, $list = array(), array $options = array()) {
 		$defaults = array('empty' => false, 'value' => null);
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 
@@ -377,7 +377,7 @@ class Form extends \lithium\template\Helper {
 	 * @param array $options
 	 * @return string Returns a `<input />` tag with the given name and HTML attributes.
 	 */
-	public function checkbox($name, $options = array()) {
+	public function checkbox($name, array $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 
 		if (!isset($options['checked'])) {
@@ -394,7 +394,7 @@ class Form extends \lithium\template\Helper {
 	 * @param array $options
 	 * @return string Returns a `<input />` tag with the given name and HTML attributes.
 	 */
-	public function password($name, $options = array()) {
+	public function password($name, array $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
 	}
@@ -406,7 +406,7 @@ class Form extends \lithium\template\Helper {
 	 * @param array $options
 	 * @return string Returns a `<input />` tag with the given name and HTML attributes.
 	 */
-	public function hidden($name, $options = array()) {
+	public function hidden($name, array $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
 	}
@@ -419,7 +419,7 @@ class Form extends \lithium\template\Helper {
 	 * @param array $options
 	 * @return string Returns a `<label>` tag for the name and with HTML attributes.
 	 */
-	public function label($name, $title = null, $options = array()) {
+	public function label($name, $title = null, array $options = array()) {
 		$title = $title ?: Inflector::humanize($name);
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		return $this->_render(__METHOD__, $template, compact('name', 'title', 'options'));
@@ -436,7 +436,7 @@ class Form extends \lithium\template\Helper {
 	 *              the error.
 	 * @return string Returns a rendered error message based on the `'error'` string template.
 	 */
-	public function error($name, $key = null, $options = array()) {
+	public function error($name, $key = null, array $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 
 		if (!$this->_binding || !$content = $this->_binding->errors($name)) {

@@ -46,7 +46,7 @@ class File extends \lithium\core\Object {
 	 * @return void
 	 * @see lithium\storage\Cache::config()
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array('path' => LITHIUM_APP_PATH . '/resources/tmp/cache');
 		parent::__construct($config + $defaults);
 	}

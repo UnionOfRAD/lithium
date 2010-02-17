@@ -61,7 +61,7 @@ class MySql extends \lithium\data\source\Database {
 	 * @see lithium\data\Source::__construct()
 	 * @see lithium\data\Connections::add()
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array('port' => '3306');
 		parent::__construct((array) $config + $defaults);
 	}
@@ -254,7 +254,7 @@ class MySql extends \lithium\data\source\Database {
 		return $name;
 	}
 
-	protected function _execute($sql, $options = array()) {
+	protected function _execute($sql, array $options = array()) {
 		$defaults = array('buffered' => true);
 		$options += $defaults;
 

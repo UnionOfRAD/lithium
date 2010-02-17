@@ -110,7 +110,7 @@ class Controller extends \lithium\core\Object {
 		'response' => '\lithium\action\Response'
 	);
 
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'request' => null, 'response' => array(), 'render' => array(), 'classes' => array()
 		);
@@ -138,7 +138,7 @@ class Controller extends \lithium\core\Object {
 	 * @todo Implement proper exception catching/throwing
 	 * @filter This method can be filtered.
 	 */
-	public function __invoke($request, $dispatchParams, $options = array()) {
+	public function __invoke($request, $dispatchParams, array $options = array()) {
 		$classes = $this->_classes;
 		$config = $this->_config;
 		$render =& $this->_render;
@@ -250,7 +250,7 @@ class Controller extends \lithium\core\Object {
 	 * @return void
 	 * @filter This method can be filtered.
 	 */
-	public function redirect($url, $options = array()) {
+	public function redirect($url, array $options = array()) {
 		$router = $this->_classes['router'];
 		$defaults = array('location' => null, 'status' => 302, 'head' => true, 'exit' => true);
 		$options += $defaults;

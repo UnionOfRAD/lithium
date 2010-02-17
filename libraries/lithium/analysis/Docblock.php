@@ -88,7 +88,7 @@ class Docblock extends \lithium\core\StaticObject {
 	 *         and `line` keys.
 	 * @todo Actually implement useful $options
 	 */
-	public static function parse($str, $options = array()) {
+	public static function parse($str, array $options = array()) {
 		$tagTypes = array('todo', 'discuss', 'fix', 'important');
 		$tags = '/@(?P<type>' . join('|', $tagTypes) . ')\s(?P<text>.+)$/mi';
 

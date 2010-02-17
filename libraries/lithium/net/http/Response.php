@@ -101,7 +101,7 @@ class Response extends \lithium\net\http\Base {
 	 * @param array $config
 	 * @return object
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array('message' => '');
 		parent::__construct((array) $config + $defaults);
 	}

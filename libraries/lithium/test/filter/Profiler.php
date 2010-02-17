@@ -75,7 +75,7 @@ class Profiler extends \lithium\test\Filter {
 	 *              - `'checks'`
 	 * @return object|void Returns the instance of `$tests`.
 	 */
-	public static function apply($report, $options = array()) {
+	public static function apply($report, array $options = array()) {
 		$tests = $report->group->tests();
 		$defaults = array('method' => 'run', 'checks' => static::$_metrics);
 		$options += $defaults;
@@ -125,7 +125,7 @@ class Profiler extends \lithium\test\Filter {
 	 * @param array $options Not used.
 	 * @return array|void The results of the analysis.
 	 */
-	public static function analyze($report, $options = array()) {
+	public static function analyze($report, array $options = array()) {
 		$results = $report->results['group'];
 		$collectedResults = static::collect($report->results['filters'][__CLASS__]);
 		extract($collectedResults, EXTR_OVERWRITE);

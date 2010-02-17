@@ -21,7 +21,7 @@ class Filter extends \lithium\core\StaticObject {
 	 * @param array $options Options for how this filter should be applied.
 	 * @return object|void Returns the instance of `$tests`.
 	 */
-	public static function apply($report, $options = array()) {}
+	public static function apply($report, array $options = array()) {}
 
 	/**
 	 * Analyzes the results of a test run and returns the result of the analysis.
@@ -30,7 +30,7 @@ class Filter extends \lithium\core\StaticObject {
 	 * @param array $options
 	 * @return array|void The results of the analysis.
 	 */
-	public static function analyze($report, $options = array()) {}
+	public static function analyze($report, array $options = array()) {}
 
 	/**
 	 * Returns data to be output by a reporter.

@@ -280,7 +280,7 @@ class Libraries {
 	 * @param string $options
 	 * @return array
 	 */
-	public static function find($library, $options = array()) {
+	public static function find($library, array $options = array()) {
 		$format = function ($file, $config) {
 			$trim = array(strlen($config['path']) + 1, strlen($config['suffix']));
 			$rTrim = strpos($file, $config['suffix']) !== false ? -$trim[1] : 9999;
@@ -363,7 +363,7 @@ class Libraries {
 	 * @return string Returns the absolute path to the file containing `$class`, or `null` if the
 	 *         file cannot be found.
 	 */
-	public static function path($class, $options = array()) {
+	public static function path($class, array $options = array()) {
 		$defaults = array('dirs' => false);
 		$options += $defaults;
 		$class = ltrim($class, '\\');
@@ -455,7 +455,7 @@ class Libraries {
 	 *         registered library. If `$name` is not specified, returns an array of all classes
 	 *         found which match `$type`.
 	 */
-	public static function locate($type, $name = null, $options = array()) {
+	public static function locate($type, $name = null, array $options = array()) {
 		$defaults = array('type' => 'class');
 		$options += $defaults;
 
@@ -476,7 +476,7 @@ class Libraries {
 		if (!$name) {
 			return static::_locateAll($params, $options);
 		}
-		$paths = static::$_paths[$type];
+		$paths = (array) static::$_paths[$type];
 
 		if (strpos($name, '.')) {
 			list($params['library'], $params['name']) = explode('.', $name);
@@ -532,7 +532,7 @@ class Libraries {
 	 * @see lithium\core\Libraries::$_paths
 	 * @see lithium\core\Libraries::locate()
 	 */
-	protected static function _locateDeferred($defer, $paths, $params, $options = array()) {
+	protected static function _locateDeferred($defer, $paths, $params, array $options = array()) {
 		if (isset($options['library'])) {
 			$libraries = (array) $options['library'];
 			$libraries = array_intersect_key(
@@ -577,7 +577,7 @@ class Libraries {
 	 * @param string $options
 	 * @return void
 	 */
-	protected static function _locateAll($params, $options = array()) {
+	protected static function _locateAll(array $params, array $options = array()) {
 		$defaults = array(
 			'libraries' => null, 'recursive' => true, 'namespaces' => false,
 			'filter' => false, 'exclude' => false,
@@ -588,14 +588,14 @@ class Libraries {
 			}
 		);
 		$options += $defaults;
-		$paths = static::$_paths[$params['type']];
+		$paths = (array) static::$_paths[$params['type']];
 		$libraries = $options['libraries'] ?: array_keys(static::$_configurations);
 		$classes = array();
 
 		foreach ($libraries as $library) {
 			$config = static::$_configurations[$library];
 
-			foreach ((array) $paths as $template => $tplOpts) {
+			foreach ($paths as $template => $tplOpts) {
 				if (is_int($template)) {
 					$template = $tplOpts;
 					$tplOpts = array();

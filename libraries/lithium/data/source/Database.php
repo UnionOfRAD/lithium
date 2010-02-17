@@ -58,7 +58,7 @@ abstract class Database extends \lithium\data\Source {
 	 * @param $config array Array of configuration options.
 	 * @return Database object.
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
 			'persistent' => true,
 			'host'       => 'localhost',
@@ -77,7 +77,7 @@ abstract class Database extends \lithium\data\Source {
 		return $value;
 	}
 
-	public function create($record, $options = array()) {
+	public function create($record, array $options = array()) {
 
 	}
 
@@ -88,7 +88,7 @@ abstract class Database extends \lithium\data\Source {
 	 * @param string $options
 	 * @return void
 	 */
-	public function read($query, $options = array()) {
+	public function read($query, array $options = array()) {
 		$defaults = array('return' => 'resource');
 		$options += $defaults;
 		$params = compact('query', 'options');
@@ -119,11 +119,11 @@ abstract class Database extends \lithium\data\Source {
 		});
 	}
 
-	public function update($query, $options) {
+	public function update($query, array $options = array()) {
 
 	}
 
-	public function delete($query, $options) {
+	public function delete($query, array $options = array()) {
 
 	}
 

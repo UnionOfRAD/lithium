@@ -70,7 +70,7 @@ class Unit extends \lithium\core\Object {
 	 *                which may modify the results presented.
 	 * @return array
 	 */
-	public function run($options = array()) {
+	public function run(array $options = array()) {
 		$defaults = array('methods' => array(), 'reporter' => null, 'handler' => null);
 		$options += $defaults;
 		$this->_results = array();
@@ -516,7 +516,7 @@ class Unit extends \lithium\core\Object {
 	 * @param array $options Currently unimplemented.
 	 * @return void
 	 */
-	protected function _result($type, $info, $options = array()) {
+	protected function _result($type, $info, array $options = array()) {
 		$info = (array('result' => $type) + $info);
 		$defaults = array();
 		$options += $defaults;

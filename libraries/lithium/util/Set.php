@@ -254,7 +254,7 @@ class Set {
 	 *              disabled for higher XPath-ness.
 	 * @return array An array of matched items.
 	 */
-	public static function extract($data, $path = null, $options = array()) {
+	public static function extract($data, $path = null, array $options = array()) {
 		if (empty($data)) {
 			return array();
 		}
@@ -772,7 +772,7 @@ class Set {
 	 * @param string $options
 	 * @return void
 	 */
-	public static function to($type, $data, $options = array()) {
+	public static function to($type, $data, array $options = array()) {
 		if ($type === 'object') {
 			return static::_toObject($data, $options);
 		}
@@ -829,7 +829,7 @@ class Set {
 	 * @param string $options
 	 * @return object Hierarchical object.
 	 */
-	public static function _toObject($data, $options = array()) {
+	public static function _toObject($data, array $options = array()) {
 		if (empty($data)) {
 			return $data;
 		}

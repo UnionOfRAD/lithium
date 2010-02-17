@@ -101,7 +101,7 @@ class Auth extends \lithium\core\Adaptable {
 	 *         lookup against the current session), returns an array of user information from the
 	 *         storage backend used by the configured adapter.
 	 */
-	public static function check($name, $credentials = null, $options = array()) {
+	public static function check($name, $credentials = null, array $options = array()) {
 		$defaults = array('checkSession' => true, 'writeSession' => true);
 		$options += $defaults;
 		$params = compact('name', 'credentials', 'options');
@@ -140,7 +140,7 @@ class Auth extends \lithium\core\Adaptable {
 	 * @return array Returns the array of data written to the session, or `false` if the adapter
 	 *         rejects the data.
 	 */
-	public static function set($name, $data, $options = array()) {
+	public static function set($name, $data, array $options = array()) {
 		$params = compact('name', 'data', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
@@ -169,7 +169,7 @@ class Auth extends \lithium\core\Adaptable {
 	 *                specified configuration is removed, otherwise it is retained.
 	 * @return void
 	 */
-	public static function clear($name, $options = array()) {
+	public static function clear($name, array $options = array()) {
 		$defaults = array('clearSession' => true);
 		$options += $defaults;
 

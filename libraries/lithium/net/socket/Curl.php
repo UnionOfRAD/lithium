@@ -178,7 +178,7 @@ class Curl extends \lithium\net\Socket {
 	 *                    - response: a class to use for the response
 	 * @return boolean response string or object like `\lithium\net\http\Response`
 	 */
-	public function send($message, $options = array()) {
+	public function send($message, array $options = array()) {
 		if ($this->write((string) $message)) {
 			$message = $this->read();
 			$response = new $options['classes']['response'](compact('message'));
