@@ -28,7 +28,7 @@ abstract class Filter extends \lithium\core\StaticObject {
 	 *
 	 * @param object $report The report instance running this filter and aggregating results
 	 * @param array $options
-	 * @return array|void The results of the analysis.
+	 * @return array The results of the analysis.
 	 */
 	public static function analyze($report, array $options = array()) {
 		return $report->results['filters'][get_called_class()];
