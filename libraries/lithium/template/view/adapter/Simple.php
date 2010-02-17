@@ -36,6 +36,7 @@ class Simple extends \lithium\template\view\Renderer {
 	public function render($template, $data = array(), array $options = array()) {
 		$defaults = array('context' => array());
 		$options += $defaults;
+
 		$context = array();
 		$this->_context = $options['context'] + $this->_context;
 
