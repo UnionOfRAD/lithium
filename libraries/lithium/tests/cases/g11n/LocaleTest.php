@@ -389,19 +389,19 @@ class LocaleTest extends \lithium\test\Unit {
 
 	public function testPreferredFromConsoleRequestEmptyLocales() {
 		$request = new ConsoleRequest(array(
-			'env' => array('LC_ALL' => 'C')
+			'env' => array('LC_ALL' => 'C', 'LANG' => null, 'LANGUAGE' => null)
 		));
 		$result = Locale::preferred($request);
 		$this->assertNull($result);
 
 		$request = new ConsoleRequest(array(
-			'env' => array('LC_ALL' => 'POSIX')
+			'env' => array('LC_ALL' => 'POSIX', 'LANG' => null, 'LANGUAGE' => null)
 		));
 		$result = Locale::preferred($request);
 		$this->assertNull($result);
 
 		$request = new ConsoleRequest(array(
-			'env' => array('LC_ALL' => '')
+			'env' => array('LC_ALL' => '', 'LANG' => null, 'LANGUAGE' => null)
 		));
 		$result = Locale::preferred($request);
 		$this->assertNull($result);
