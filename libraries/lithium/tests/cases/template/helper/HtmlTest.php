@@ -444,6 +444,12 @@ class HtmlTest extends \lithium\test\Unit {
 		$this->assertTags($result, $expected);
 	}
 
+	/**
+	 * Tests that script and style tags with `'inline'` set to `false` are written to the rendering
+	 * context instead of being returned directly.
+	 *
+	 * @return void
+	 */
 	public function testNonInlineScriptsAndStyles() {
 		$result = trim($this->context->scripts());
 		$this->assertFalse($result);
@@ -467,6 +473,28 @@ class HtmlTest extends \lithium\test\Unit {
 			'rel' => 'stylesheet', 'type' => 'text/css', 'href' => 'regex:/.*css\/base\.css/'
 		)));
 	}
+
+	/**
+	 * Tests that scripts and styles are correctly written to the rendering context even when
+	 * passing multiple scripts or styles to a single method call.
+	 *
+	 * @return void
+	 */
+	public function testMultiNonInlineScriptsAndStyles() {
+		$result = $this->html->script(array('foo', 'bar'));
+		$expected = array(
+			array('script' => array('type' => 'text/javascript', 'src' => 'regex:/.*\/foo\.js/')),
+			'/script',
+			array('script' => array('type' => 'text/javascript', 'src' => 'regex:/.*\/bar\.js/')),
+			'/script'
+		);
+		$this->assertTags($result, $expected);
+
+		$this->assertNulL($this->html->script(array('foo', 'bar'), array('inline' => false)));
+		$result = $this->context->scripts();
+		$this->assertTags($result, $expected);
+	}
+
 
 	/**
 	 * Tests arbitrary tag generation.

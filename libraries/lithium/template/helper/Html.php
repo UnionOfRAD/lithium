@@ -204,8 +204,10 @@ class Html extends \lithium\template\Helper {
 		$m = __METHOD__;
 
 		if (is_array($path)) {
-			$result = join("\n\t", array_map(array(&$this, __FUNCTION__), $path));
-			return ($options['inline']) ? $result . "\n" : null;
+			foreach ($path as $i => $item) {
+				$path[$i] = $this->script($item, $options);
+			}
+			return ($options['inline']) ? join("\n\t", $path) . "\n" : null;
 		}
 		$params = compact('path') + array('options' => array_diff_key($options, $defaults));
 
@@ -235,8 +237,10 @@ class Html extends \lithium\template\Helper {
 		$options += $defaults;
 
 		if (is_array($path)) {
-			$result = join("\n\t", array_map(array(&$this, __FUNCTION__), $path));
-			return ($options['inline']) ? $result . "\n" : null;
+			foreach ($path as $i => $item) {
+				$path[$i] = $this->style($item, $options);
+			}
+			return ($options['inline']) ? join("\n\t", $path) . "\n" : null;
 		}
 		$params = compact('path', 'options');
 		$method = __METHOD__;
