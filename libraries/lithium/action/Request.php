@@ -128,8 +128,8 @@ class Request extends \lithium\core\Object {
 		parent::_init();
 		$mobile = array(
 			'iPhone', 'MIDP', 'AvantGo', 'BlackBerry', 'J2ME', 'Opera Mini', 'DoCoMo', 'NetFront',
-			'Nokia', 'PalmOS', 'PalmSource', 'portalmmm', 'Plucker', 'ReqwirelessWeb',
-			'SonyEricsson', 'Symbian', 'UP\.Browser', 'Windows CE', 'Xiino'
+			'Nokia', 'PalmOS', 'PalmSource', 'portalmmm', 'Plucker', 'ReqwirelessWeb', 'iPod',
+			'SonyEricsson', 'Symbian', 'UP\.Browser', 'Windows CE', 'Xiino', 'Android'
 		);
 		if (!empty($this->_config['detectors']['mobile'][1])) {
 			$mobile = array_merge($mobile, (array) $this->_config['detectors']['mobile'][1]);
