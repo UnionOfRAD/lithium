@@ -54,17 +54,6 @@ class Affected extends \lithium\test\Filter {
 		return $tests;
 	}
 
-	/**
-	 * Analyzes the results of a test run and returns the result of the analysis.
-	 *
-	 * @param object $report The report instance running this filter and aggregating results
-	 * @param array $options
-	 * @return array|void The results of the analysis.
-	 */
-	public static function analyze($report, array $options = array()) {
-		return $report->results['filters'][__CLASS__];
-	}
-
 	public static function output($format, $analysis) {
 		$analysis = isset($analysis[0]) ? $analysis[0] : array();
 		$output = array();

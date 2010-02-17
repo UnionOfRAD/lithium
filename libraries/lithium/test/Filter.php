@@ -11,7 +11,7 @@ namespace lithium\test;
 /**
  * `Base` is the base class for all test filters.
  */
-class Filter extends \lithium\core\StaticObject {
+abstract class Filter extends \lithium\core\StaticObject {
 
 	/**
 	 * Takes an instance of an object (usually a Collection object) containing test
@@ -30,7 +30,9 @@ class Filter extends \lithium\core\StaticObject {
 	 * @param array $options
 	 * @return array|void The results of the analysis.
 	 */
-	public static function analyze($report, array $options = array()) {}
+	public static function analyze($report, array $options = array()) {
+		return $report->results['filters'][get_called_class()];
+	}
 
 	/**
 	 * Returns data to be output by a reporter.
