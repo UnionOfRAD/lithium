@@ -9,7 +9,7 @@
 namespace lithium\test;
 
 /**
- * `Base` is the base class for all test filters.
+ * `Filter` is the base class for all test filters.
  */
 abstract class Filter extends \lithium\core\StaticObject {
 
