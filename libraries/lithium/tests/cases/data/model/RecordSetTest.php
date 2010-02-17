@@ -12,6 +12,7 @@ use \lithium\tests\mocks\data\collection\MockRecordSet;
 use \lithium\tests\mocks\data\source\database\adapter\MockAdapter;
 use \lithium\tests\mocks\data\MockModel;
 use \lithium\data\Connections;
+use \lithium\util\Collection;
 
 /**
  * RecordSet tests
@@ -200,6 +201,8 @@ class RecordSetTest extends \lithium\test\Unit {
 	}
 
 	public function testTo() {
+		Collection::formats('\lithium\net\http\Media');
+
 		$this->assertFalse(isset($this->_recordSet[0]));
 		$expected = array(
 			1 => array('id' => 1, 'data' => 'data1'),

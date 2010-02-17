@@ -93,7 +93,7 @@ abstract class Source extends \lithium\core\Object {
 		return $this->_isConnected;
 	}
 
-	public function run($query, $options = array()) {
+	public function run($query, array $options = array()) {
 		if (is_object($query) && method_exists($this, $query->type())) {
 			return $this->{$query->type()}($query, $options);
 		}

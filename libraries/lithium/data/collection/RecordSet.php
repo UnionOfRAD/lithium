@@ -203,7 +203,7 @@ class RecordSet extends \lithium\data\Collection {
 	 * @param array $options
 	 * @return mixed
 	 */
-	public function to($format, $options = array()) {
+	public function to($format, array $options = array()) {
 		$defaults = array('indexed' => true);
 		$options += $defaults;
 
@@ -249,7 +249,7 @@ class RecordSet extends \lithium\data\Collection {
 	 *              in a new `Collection` object or subclass.
 	 * @return array|object The filtered items.
 	 */
-	public function map($filter, $options = array()) {
+	public function map($filter, array $options = array()) {
 		$this->offsetGet(null);
 		return parent::map($filter, $options);
 	}

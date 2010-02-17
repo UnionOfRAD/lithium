@@ -130,7 +130,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 *              in a new Collection object or subclass.
 	 * @return array|object The filtered items.
 	 */
-	public function map($filter, $options = array()) {
+	public function map($filter, array $options = array()) {
 		if (!$this->_closed()) {
 			while($this->next()) {}
 		}

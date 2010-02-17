@@ -17,7 +17,7 @@ class MockModel extends \lithium\data\Model {
 		return $values['id'];
 	}
 
-	public static function __init($options = array()) {}
+	public static function __init(array $options = array()) {}
 }
 
 ?>

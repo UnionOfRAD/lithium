@@ -156,7 +156,7 @@ class MongoDb extends \lithium\data\Source {
 	public function schema($query, $resource = null, $context = null) {
 	}
 
-	public function create($query, $options = array()) {
+	public function create($query, array $options = array()) {
 		$params = compact('query', 'options');
 		$conn =& $this->_connection;
 		$db =& $this->_db;
