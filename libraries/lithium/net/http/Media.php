@@ -38,31 +38,17 @@ class Media extends \lithium\core\StaticObject {
 	 * @see lithium\net\http\Media::type()
 	 */
 	protected static $_types = array(
-		'ai'           => 'application/postscript',
-		'amf'          => 'application/x-amf',
 		'atom'         => 'application/atom+xml',
-		'bin'          => 'application/octet-stream',
-		'bz2'          => 'application/x-bzip',
-		'class'        => 'application/octet-stream',
 		'css'          => 'text/css',
-		'csv'          => array('application/csv', 'application/vnd.ms-excel'),
-		'file'         => 'multipart/form-data',
 		'form'         => 'application/x-www-form-urlencoded',
 		'htm'          => array('alias' => 'html'),
 		'html'         => array('text/html', '*/*'),
 		'js'           => 'text/javascript',
 		'json'         => 'application/json',
-		'pdf'          => 'application/pdf',
 		'rss'          => 'application/rss+xml',
-		'swf'          => 'application/x-shockwave-flash',
-		'tar'          => 'application/x-tar',
 		'text'         => 'text/plain',
 		'txt'          => array('alias' => 'text'),
-		'vcf'          => 'text/x-vcard',
-		'xhtml'        => array('application/xhtml+xml', 'application/xhtml', 'text/xhtml'),
-		'xhtml-mobile' => 'application/vnd.wap.xhtml+xml',
 		'xml'          => array('application/xml', 'text/xml'),
-		'zip'          => 'application/x-zip'
 	);
 
 	/**
