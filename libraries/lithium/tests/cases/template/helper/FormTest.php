@@ -42,7 +42,7 @@ class FormTest extends \lithium\test\Unit {
 	 */
 	public function setUp() {
 		$this->_routes = Router::get();
-		Router::connect(null);
+		Router::reset();
 		Router::connect('/{:controller}/{:action}/{:id}.{:type}', array('id' => null));
 		Router::connect('/{:controller}/{:action}/{:args}');
 
@@ -54,7 +54,7 @@ class FormTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
-		Router::connect(null);
+		Router::reset();
 
 		foreach ($this->_routes as $route) {
 			Router::connect($route);

@@ -19,11 +19,11 @@ class DispatcherTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->_routes = Router::get();
-		Router::connect(null);
+		Router::reset();
 	}
 
 	public function tearDown() {
-		Router::connect(null);
+		Router::reset();
 
 		foreach ($this->_routes as $route) {
 			Router::connect($route);

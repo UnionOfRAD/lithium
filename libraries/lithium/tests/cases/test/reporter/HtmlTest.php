@@ -19,7 +19,7 @@ class HtmlTest extends \lithium\test\Unit {
 		$this->html = new Html();
 		$this->mock = new MockHtml();
 		$this->_routes = Router::get();
-		Router::connect(null);
+		Router::reset();
 		Router::connect('/test/{:args}', array('controller' => '\lithium\test\Controller'));
 		Router::connect('/test', array('controller' => '\lithium\test\Controller'));
 		$this->request = new Request(array(
@@ -29,7 +29,7 @@ class HtmlTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
-		Router::connect(null);
+		Router::reset();
 
 		foreach ($this->_routes as $route) {
 			Router::connect($route);

@@ -21,11 +21,11 @@ class RouterTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->request = new Request();
 		$this->_routes = Router::get();
-		Router::connect(null);
+		Router::reset();
 	}
 
 	public function tearDown() {
-		Router::connect(null);
+		Router::reset();
 
 		foreach ($this->_routes as $route) {
 			Router::connect($route);
@@ -133,6 +133,26 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that URLs specified as "Controller::action" are interpreted properly.
+	 *
+	 * @return void
+	 */
+	public function testStringActions() {
+		Router::connect('/login', array('controller' => 'sessions', 'action' => 'create'));
+		Router::connect('/{:controller}', array('action' => 'index'));
+		Router::connect('/{:controller}/{:action}');
+
+		$result = Router::match("Sessions::create");
+		$this->assertEqual('/login', $result);
+
+		$result = Router::match("Posts::index");
+		$this->assertEqual('/posts', $result);
+
+		$result = Router::match("ListItems::archive");
+		$this->assertEqual('/list_items/archive', $result);
+	}
+
+	/**
 	 * Tests that routing is fully reset when `Router::connect()` is passed a null value
 	 *
 	 * @return void
@@ -145,7 +165,7 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::parse($this->request);
 		$this->assertEqual($expected, $result);
 
-		Router::connect(null);
+		Router::reset();
 		$this->assertNull(Router::parse($this->request));
 	}
 
@@ -186,7 +206,7 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::match(array('controller' => 'posts', 'action' => 'archive'));
 		$this->assertEqual('/posts/archive', $result);
 
-		Router::connect(null);
+		Router::reset();
 		Router::connect('/{:controller}/{:action}', array('controller' => 'users'));
 
 		$result = Router::match(array('action' => 'view'));

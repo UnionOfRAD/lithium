@@ -30,7 +30,7 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public function setUp() {
 		$this->_routes = Router::get();
-		Router::connect(null);
+		Router::reset();
 		Router::connect('/{:controller}/{:action}/{:id}.{:type}');
 		Router::connect('/{:controller}/{:action}.{:type}');
 
@@ -44,7 +44,7 @@ class HtmlTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function tearDown() {
-		Router::connect(null);
+		Router::reset();
 
 		foreach ($this->_routes as $route) {
 			Router::connect($route);

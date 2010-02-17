@@ -8,8 +8,29 @@
 
 namespace lithium\net\http;
 
+use \lithium\util\Inflector;
 use \lithium\util\Collection;
 
+/**
+ * The two primary responsibilities of the `Router` class are to generate URLs from parameter lists,
+ * and to determine the correct set of dispatch parameters for incoming requests.
+ *
+ * Using `Route` objects, these two operations can be handled in a reciprocally consistent way.
+ * For example, if you wanted the `/login` URL to be routed to
+ * `app\controllers\UsersController::login()`, you could set up a route like the following in
+ * `app/config/routes.php`:
+ * {{{
+ * use \lithium\net\http\Router;
+ *
+ * Router::connect('/login', array('controller' => 'users', 'action' => 'login'));}}}
+ *
+ * Not only would that correctly route all requests for `/login` to `UsersController::index()`, but
+ * any time the framework generated a route with matching parameters, `Router` would return the
+ * correct short URL. This allows you to keep your application's URL structure nicely decoupled
+ * from the underlying software design.
+ *
+ * For more information on parsing and generating URLs, see the `parse()` and `match()` methods.
+ */
 class Router extends \lithium\core\StaticObject {
 
 	protected static $_configuration = null;
@@ -18,6 +39,11 @@ class Router extends \lithium\core\StaticObject {
 		'route' => '\lithium\net\http\Route'
 	);
 
+	/**
+	 * Called when the `Router` class is loaded. Initializes the route list.
+	 *
+	 * @return void
+	 */
 	public static function __init() {
 		static::$_configuration = new Collection();
 	}
@@ -31,11 +57,7 @@ class Router extends \lithium\core\StaticObject {
 	 * @return array Array of routes
 	 * @see lithium\net\http\Router::parse()
 	 */
-	public static function connect($template, $params = array(), $options = array()) {
-		if ($template === null) {
-			return static::__init();
-		}
-
+	public static function connect($template, $params = array(), array $options = array()) {
 		if (!is_object($template)) {
 			$params + array('action' => 'index');
 			$class = static::$_classes['route'];
@@ -45,12 +67,15 @@ class Router extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Takes an instance of lithium\net\http\Request (or a subclass) and matches it against each
+	 * Accepts an instance of `lithium\action\Request` (or a subclass) and matches it against each
 	 * route, in the order that the routes are connected.
 	 *
-	 * @param object $request A request object containing URL and environment data.
-	 * @return array
+	 * @see lithium\action\Request
 	 * @see lithium\net\http\Router::connect()
+	 * @param object $request A request object containing URL and environment data.
+	 * @return array Returns an array of parameters specifying how the given request should be
+	 *         routed. The keys returned depend on the `Route` object that was matched, but
+	 *         typically include `'controller'` and `'action'` keys.
 	 */
 	public static function parse($request) {
 		return static::$_configuration->first(function($route) use ($request) {
@@ -65,7 +90,6 @@ class Router extends \lithium\core\StaticObject {
 	 * @param array $options
 	 * @param object $context
 	 * @return string
-	 * @todo Implement full context support
 	 */
 	public static function match($options = array(), $context = null) {
 		if (is_string($options)) {
@@ -74,9 +98,15 @@ class Router extends \lithium\core\StaticObject {
 			if (strpos($path, '#') === 0 || strpos($path, 'mailto') === 0 || strpos($path, '://')) {
 				return $path;
 			}
-			$base = $context ? $context->env('base') : '';
-			$path = trim($path, '/');
-			return "{$base}/{$path}";
+
+			if (!preg_match('/^[A-Za-z0-9_]+::[A-Za-z0-9_]+$/', $path)) {
+				$base = $context ? $context->env('base') : '';
+				$path = trim($path, '/');
+				return "{$base}/{$path}";
+			}
+			list($controller, $action) = explode('::', $path, 2);
+			$controller = Inflector::underscore($controller);
+			$options = compact('controller', 'action');
 		}
 		$defaults = array_filter(array(
 			'action' => ($context && $context->action) ? $context->action : 'index',
@@ -91,13 +121,19 @@ class Router extends \lithium\core\StaticObject {
 	}
 
 	public static function get($route = null) {
-		if (empty(static::$_configuration)) {
-			static::__init();
-		}
 		if ($route === null) {
 			return static::$_configuration;
 		}
 		return isset(static::$_configuration[$route]) ? static::$_configuration[$route] : null;
+	}
+
+	/**
+	 * Resets the `Router` to its default state, unloading all routes.
+	 *
+	 * @return void
+	 */
+	public static function reset() {
+		static::__init();
 	}
 }
 
