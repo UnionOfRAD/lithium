@@ -77,6 +77,12 @@ require __DIR__ . '/bootstrap/cache.php';
 // require __DIR__ . '/bootstrap/console.php';
 
 /**
+ * This file contains filters for the test suite to bypass having a controller and render test
+ * templates directly through the test dispatcher.
+ */
+require __DIR__ . '/bootstrap/test.php';
+
+/**
  * This configures your session storage. The Cookie storage adapter must be connected first, since
  * it intercepts any writes where the `'expires'` key is set in the options array.
  */
