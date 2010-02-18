@@ -194,6 +194,23 @@ class Report extends \lithium\core\Object {
 	public function filters() {
 		return $this->reporter->filters((array) $this->results['filters']);
 	}
+
+	/**
+	 * Renders the test output (e.g. layouts and filter templates)
+	 *
+	 * @param string $template name of the template (eg: layout)
+	 * @param string $data array from `_data()` method
+	 * @return string
+	 */
+	public function render($template, $data) {
+		$template = Libraries::locate('test.reporter.template', $template, array(
+			'filter' => false, 'type' => 'file', 'suffix' => '.html.php',
+		));
+		extract($data);
+		ob_start();
+		include $template;
+		return ob_get_clean();
+	}
 }
 
 ?>
