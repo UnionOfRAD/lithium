@@ -255,7 +255,7 @@ class StringTest extends \lithium\test\Unit {
 		));
 		$this->assertEqual($expected, $result);
 
-		$result = String::insert("this is a ? string", "test");
+		$result = String::insert("this is a ? string", array("test"));
 		$expected = "this is a test string";
 		$this->assertEqual($expected, $result);
 

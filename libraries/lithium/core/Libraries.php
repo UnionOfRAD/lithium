@@ -623,13 +623,10 @@ class Libraries {
 
 	protected static function _locatePath($type, $params) {
 		if (!isset(static::$_paths[$type])) {
-			return null;
+			return;
 		}
 		foreach (static::$_paths[$type] as $path) {
-			$replace = array_merge(array_keys($params), array('{:', '}'));
-			$with = array_merge(array_values($params), array('', ''));
-
-			if (is_dir($path = str_replace($replace, $with, $path))) {
+			if (is_dir($path = String::insert($path, $params))) {
 				return $path;
 			}
 		}

@@ -87,9 +87,6 @@ abstract class Helper extends \lithium\core\Object {
 	}
 
 	protected function _render($method, $string, $params, array $options = array()) {
-		$defaults = array();
-		$options += $defaults;
-
 		foreach ($params as $key => $value) {
 			$params[$key] = $this->_context->applyHandler($this, $method, $key, $value, $options);
 		}

@@ -109,13 +109,16 @@ class String {
 	 * @return string
 	 * @todo Optimize this
 	 */
-	public static function insert($str, $data, array $options = array()) {
+	public static function insert($str, array $data, array $options = array()) {
 		$defaults = array(
-			'before' => '{:', 'after' => '}', 'escape' => null, 'format' => null, 'clean' => false
+			'before' => '{:',
+			'after' => '}',
+			'escape' => null,
+			'format' => null,
+			'clean' => false
 		);
 		$options += $defaults;
 		$format = $options['format'];
-		$data = (array) $data;
 
 		if ($format == 'regex' || (empty($format) && !empty($options['escape']))) {
 			$format = sprintf(
@@ -126,7 +129,7 @@ class String {
 			);
 		}
 
-		if (empty($format) && (strpos($str, '?') === false || !isset($data[0]))) {
+		if (empty($format) && !isset($data[0])) {
 			$replace = array();
 
 			foreach ($data as $key => $value) {
