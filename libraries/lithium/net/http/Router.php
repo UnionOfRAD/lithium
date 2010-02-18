@@ -33,20 +33,11 @@ use \lithium\util\Collection;
  */
 class Router extends \lithium\core\StaticObject {
 
-	protected static $_configuration = null;
+	protected static $_configurations = array();
 
 	protected static $_classes = array(
 		'route' => '\lithium\net\http\Route'
 	);
-
-	/**
-	 * Called when the `Router` class is loaded. Initializes the route list.
-	 *
-	 * @return void
-	 */
-	public static function __init() {
-		static::$_configuration = new Collection();
-	}
 
 	/**
 	 * Connects a new route and returns the current routes array.
@@ -63,7 +54,7 @@ class Router extends \lithium\core\StaticObject {
 			$class = static::$_classes['route'];
 			$template = new $class(compact('template', 'params', 'options'));
 		}
-		return (static::$_configuration[] = $template);
+		return (static::$_configurations[] = $template);
 	}
 
 	/**
@@ -78,9 +69,11 @@ class Router extends \lithium\core\StaticObject {
 	 *         typically include `'controller'` and `'action'` keys.
 	 */
 	public static function parse($request) {
-		return static::$_configuration->first(function($route) use ($request) {
-			return $route->parse($request);
-		});
+		foreach (static::$_configurations as $route) {
+			if ($match = $route->parse($request)) {
+				return $match;
+			}
+		}
 	}
 
 	/**
@@ -115,16 +108,18 @@ class Router extends \lithium\core\StaticObject {
 		$options += $defaults;
 		$base = isset($context) ? $context->env('base') : '';
 
-		return $base . static::$_configuration->first(function($route) use ($options, $context) {
-			return $route->match($options, $context);
-		});
+		foreach (static::$_configurations as $route) {
+			if ($match = $route->match($options, $context)) {
+				return "{$base}{$match}";
+			}
+		}
 	}
 
 	public static function get($route = null) {
 		if ($route === null) {
-			return static::$_configuration;
+			return static::$_configurations;
 		}
-		return isset(static::$_configuration[$route]) ? static::$_configuration[$route] : null;
+		return isset(static::$_configurations[$route]) ? static::$_configurations[$route] : null;
 	}
 
 	/**
@@ -133,10 +128,8 @@ class Router extends \lithium\core\StaticObject {
 	 * @return void
 	 */
 	public static function reset() {
-		static::__init();
+		static::$_configurations = array();
 	}
 }
-
-Router::__init();
 
 ?>
