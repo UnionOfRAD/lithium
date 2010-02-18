@@ -274,7 +274,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return array
 	 */
 	public function result($type, $resource, $context) {
-		if (!is_object($resource)) {
+		if (!is_object($resource) || isset($resource->error)) {
 			return null;
 		}
 		$result = null;
