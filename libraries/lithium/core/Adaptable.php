@@ -39,7 +39,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 *
 	 * @var object `Collection` of configurations, indexed by name.
 	 */
-	protected static $_configurations = null;
+	protected static $_configurations = array();
 
 	/**
 	 * To be re-defined in sub-classes.
@@ -52,15 +52,6 @@ class Adaptable extends \lithium\core\StaticObject {
 	protected static $_adapters = null;
 
 	/**
-	 * Initialization of static class.
-	 *
-	 * @return void
-	 */
-	public static function __init() {
-		return static::$_configurations = new Collection();
-	}
-
-	/**
 	 * Sets configurations for a particular adaptable implementation, or returns the current
 	 * configuration settings.
 	 *
@@ -68,11 +59,8 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @return object|void `Collection` of configurations or void if setting configurations.
 	 */
 	public static function config($config = null) {
-		if (!static::$_configurations) {
-			static::__init();
-		}
 		if ($config && is_array($config)) {
-			static::$_configurations = new Collection(array('items' => $config));
+			static::$_configurations = $config;
 			return;
 		}
 		if ($config) {
@@ -80,7 +68,7 @@ class Adaptable extends \lithium\core\StaticObject {
 		}
 		$result = array();
 
-		foreach (static::$_configurations->keys() as $key) {
+		foreach (array_keys(static::$_configurations) as $key) {
 			$result[$key] = static::_config($key);
 		}
 		return $result;
@@ -92,7 +80,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @return void
 	 */
 	public static function reset() {
-		static::__init();
+		static::$_configurations = array();
 	}
 
 	/**
@@ -148,6 +136,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 */
 	protected static function _class($config, $paths = array()) {
 		$self = get_called_class();
+
 		if (!$name = $config['adapter']) {
 			throw new Exception("No adapter set for configuration in class {$self}");
 		}

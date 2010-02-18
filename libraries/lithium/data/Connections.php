@@ -36,7 +36,7 @@ class Connections extends \lithium\core\Adaptable {
 	 *
 	 * @var Collection
 	 */
-	protected static $_configurations = null;
+	protected static $_configurations = array();
 
 	/**
 	 * Libraries::locate() compatible path to adapters for this class.
@@ -52,7 +52,6 @@ class Connections extends \lithium\core\Adaptable {
 	 * @return void
 	 */
 	public static function __init() {
-		parent::__init();
 		require LITHIUM_APP_PATH . '/config/connections.php';
 	}
 
@@ -97,7 +96,7 @@ class Connections extends \lithium\core\Adaptable {
 	 *         internal configuration array used by `Connections`.
 	 * @see lithium\data\Model::$_meta
 	 */
-	public static function add($name, $type = null, $config = array()) {
+	public static function add($name, $type = null, array $config = array()) {
 		if (is_array($type)) {
 			list($config, $type) = array($type, null);
 		}
@@ -108,7 +107,7 @@ class Connections extends \lithium\core\Adaptable {
 			'login'    => '',
 			'password' => ''
 		);
-		return static::$_configurations[$name] = (array) $config + $defaults;
+		return static::$_configurations[$name] = $config + $defaults;
 	}
 
 	/**
@@ -145,7 +144,7 @@ class Connections extends \lithium\core\Adaptable {
 		$options += $defaults;
 
 		if (empty($name)) {
-			return static::$_configurations->keys();
+			return array_keys(static::$_configurations);
 		}
 
 		if (!isset(static::$_configurations[$name])) {

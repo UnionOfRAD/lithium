@@ -95,7 +95,7 @@ class Session extends \lithium\core\Adaptable {
 		$settings = static::_config($name);
 
 		if (!$method) {
-			foreach (static::$_configurations->keys() as $name) {
+			foreach (array_keys(static::$_configurations) as $name) {
 				if ($method = static::adapter($name)->read($key, $options)) {
 					break;
 				}
@@ -120,7 +120,7 @@ class Session extends \lithium\core\Adaptable {
 		$defaults = array('name' => null);
 		$options += $defaults;
 
-		if (is_resource($value) || !static::$_configurations->count()) {
+		if (is_resource($value) || !static::$_configurations) {
 			return false;
 		}
 		$methods = array();
@@ -128,7 +128,7 @@ class Session extends \lithium\core\Adaptable {
 		if ($name = $options['name']) {
 			$methods = array($name => static::adapter($name)->write($key, $value, $options));
 		} else {
-			foreach (static::$_configurations->keys() as $name) {
+			foreach (array_keys(static::$_configurations) as $name) {
 				if ($method = static::adapter($name)->write($key, $value, $options)) {
 					$methods[$name] = $method;
 				}
@@ -162,7 +162,7 @@ class Session extends \lithium\core\Adaptable {
 		if ($name = $options['name']) {
 			$methods = array($name => static::adapter($name)->delete($key, $options));
 		} else {
-			foreach (static::$_configurations->keys() as $name) {
+			foreach (array_keys(static::$_configurations) as $name) {
 				if ($method = static::adapter($name)->delete($key, $options)) {
 					$methods[$name] = $method;
 				}
@@ -194,7 +194,7 @@ class Session extends \lithium\core\Adaptable {
 		if ($options['name']) {
 			return static::adapter($options['name'])->check($key, $options);
 		}
-		foreach (static::$_configurations->keys() as $name) {
+		foreach (array_keys(static::$_configurations) as $name) {
 			if (static::adapter($name)->check($key, $options)) {
 				return true;
 			}
@@ -204,7 +204,7 @@ class Session extends \lithium\core\Adaptable {
 
 	public static function adapter($name = null) {
 		if (empty($name)) {
-			if (!$names = static::$_configurations->keys()) {
+			if (!$names = array_keys(static::$_configurations)) {
 				return;
 			}
 			$name = end($names);
