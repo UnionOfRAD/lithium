@@ -62,21 +62,19 @@ class Object {
 	 * @return void
 	 */
 	protected function _init() {
-		foreach ($this->_autoConfig as $key => $flag) {
-			if (is_int($key)) {
-				$key = $flag;
-				$flag = null;
-			}
-
-			if (!isset($this->_config[$key])) {
+		foreach ($this->_autoConfig as $key => &$flag) {
+			if (!isset($this->_config[$key]) && !isset($this->_config[$flag])) {
 				continue;
 			}
-			$property = "_{$key}";
 
-			if ($flag == 'merge') {
+			if ($flag === 'merge') {
+				$property = '_' . $key;
 				$this->{$property} = $this->_config[$key] + $this->{$property};
 			} else {
-				$this->{$property} = $this->_config[$key];
+				if (is_int($key)) {
+					$key = $flag;
+				}
+				$this->{"_$key"} = $this->_config[$key];
 			}
 		}
 	}
