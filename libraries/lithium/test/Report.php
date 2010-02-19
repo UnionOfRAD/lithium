@@ -200,11 +200,15 @@ class Report extends \lithium\core\Object {
 	 *
 	 * @param string $template name of the template (eg: layout)
 	 * @param string $data array from `_data()` method
+	 * @param array $options Array of options (e.g. rendering type)
 	 * @return string
 	 */
-	public function render($template, $data) {
+	public function render($template, $data, $options = null) {
+		$options = (array) $options + array(
+			"type" => "html"
+		);
 		$template = Libraries::locate('test.reporter.template', $template, array(
-			'filter' => false, 'type' => 'file', 'suffix' => '.html.php',
+			'filter' => false, 'type' => 'file', 'suffix' => '.' . $options['type'] . '.php',
 		));
 		extract($data);
 		ob_start();

@@ -14,7 +14,7 @@ Dispatcher::applyFilter('_callable', function($self, $params, $chain) {
 	list($isTest, $test) = explode('/', $params['request']->url, 2) + array("", "");
 	$request = $params['request'];
 	if ($isTest === "test") {
-		return function() use($test, $request) {
+		return function() use ($test, $request) {
 			$group = "\\" . str_replace("/", "\\", $test);
 			$report = TestDispatcher::run($group , $request->query + array(
 				'reporter' => 'html'
