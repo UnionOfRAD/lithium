@@ -82,6 +82,24 @@ class Affected extends \lithium\test\Filter {
 	}
 
 	/**
+	 * Analyzes the results of a test run and returns the result of the analysis.
+	 *
+	 * @param object $report The report instance running this filter and aggregating results
+	 * @param array $options
+	 * @return array The results of the analysis.
+	 */
+	public static function analyze($report, array $options = array()) {
+		$analyze = array();
+		foreach ($report->results['filters'][__CLASS__] as $result) {
+			foreach ($result as $class => $test) {
+				$analyze[$class] = $test;
+			}
+		}
+
+		return $analyze;
+	}
+
+	/**
 	 * Returns all classes directly depending on a given class.
 	 *
 	 * @param string $dependency The class name to use as a dependency.
