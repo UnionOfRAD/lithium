@@ -44,9 +44,8 @@ class Parser extends \lithium\core\StaticObject {
 		if ($options['wrap']) {
 			$code = "<?php {$code}?>";
 		}
-
 		foreach (token_get_all($code) as $token) {
-			$token = is_array($token) ? $token : array(null, $token, $line);
+			$token = (isset($token[1])) ? $token : array(null, $token, $line);
 			list($id, $content, $line) = $token;
 			$name = $id ? token_name($id) : $content;
 
@@ -56,10 +55,12 @@ class Parser extends \lithium\core\StaticObject {
 				}
 			}
 
-			if (in_array($name, $options['ignore']) || in_array($id, $options['ignore'])) {
-				continue;
+			if (!empty($options['ignore'])) {
+				if (in_array($name, $options['ignore']) || in_array($id, $options['ignore'])) {
+					continue;
+				}
 			}
-			$tokens[] = compact('id', 'name', 'content', 'line');
+			$tokens[] = array('id' => $id, 'name' => $name, 'content' => $content, 'line' => $line);
 		}
 
 		if ($options['wrap'] && empty($options['include'])) {
