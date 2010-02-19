@@ -205,10 +205,9 @@ class Report extends \lithium\core\Object {
 	 */
 	public function render($template, $data, $options = null) {
 		$options = (array) $options + array(
-			"format" => "html",
-			"type" => "layouts"
+			"format" => "html"
 		);
-		$template = Libraries::locate('test.views.' . $options['type'], $template, array(
+		$template = Libraries::locate('test.templates', $template, array(
 			'filter' => false, 'type' => 'file', 'suffix' => '.' . $options['format'] . '.php',
 		));
 		extract($data);
