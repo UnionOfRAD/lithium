@@ -23,7 +23,7 @@ namespace lithium\util;
  * $coll = new Collection(array('items' => array('foo')));
  * // $coll[0] --> 'foo'
  * 
- * $array = $coll->to('array);
+ * $array = $coll->to('array');
  * }}}
  *
  * Apart from array-like data access, Collections allow for filtering and iteration methods:
