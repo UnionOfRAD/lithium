@@ -62,12 +62,8 @@ class Object {
 	 * @return void
 	 */
 	protected function _init() {
-		if ($this->_autoConfig === array(true)) {
-			$this->_autoConfig = array_keys($this->_config);
-		}
-
 		foreach ($this->_autoConfig as $key => $flag) {
-			if (is_numeric($key)) {
+			if (is_int($key)) {
 				$key = $flag;
 				$flag = null;
 			}
@@ -75,17 +71,12 @@ class Object {
 			if (!isset($this->_config[$key])) {
 				continue;
 			}
+			$property = "_{$key}";
 
-			switch ($flag) {
-				case 'merge':
-					$this->{"_$key"} = $this->_config[$key] + $this->{"_$key"};
-				break;
-				case 'call':
-					$this->{$key}($this->_config[$key]);
-				break;
-				default:
-					$this->{"_$key"} = $this->_config[$key];
-				break;
+			if ($flag == 'merge') {
+				$this->{$property} = $this->_config[$key] + $this->{$property};
+			} else {
+				$this->{$property} = $this->_config[$key];
 			}
 		}
 	}

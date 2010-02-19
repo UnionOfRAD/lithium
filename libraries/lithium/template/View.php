@@ -56,9 +56,7 @@ class View extends \lithium\core\Object {
 			$this->{'_' . $key} = new $class(array('view' => $this) + $this->_config);
 		}
 
-		$h = function($data) use (&$h) {
-			return is_array($data) ? array_map($h, $data) : htmlspecialchars((string) $data);
-		};
+		$h = function($data) { return htmlspecialchars((string) $data); };
 		$this->outputFilters += compact('h') + $this->_config['outputFilters'];
 	}
 
