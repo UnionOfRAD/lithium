@@ -36,8 +36,10 @@
 			</span>
 			<?php
 				echo $report->stats();
-				echo $report->filters();
 			?>
+			<?php foreach ($report->results['filters'] as $filter => $data): ?>
+				<?= $report->render(strtolower(array_pop(explode("\\", $filter))), $data); ?>
+			<?php endforeach ?>
 		</div>
 		<div style="clear:both"></div>
 	</body>

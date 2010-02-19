@@ -82,45 +82,6 @@ class Complexity extends \lithium\test\Filter {
 	}
 
 	/**
-	 * Returns data to be output by a reporter.
-	 *
-	 * @param string $format I.e. `'html'` or `'text'`.
-	 * @param array $analysis The results of the analysis.
-	 * @return string|void
-	 */
-	public static function output($format, $analysis) {
-		$output = null;
-
-		if ($format == 'html') {
-			$output .= '<h3>Cyclomatic Complexity</h3>';
-			$output .= '<table class="metrics"><tbody>';
-
-			foreach (array_slice($analysis['max'], 0, 10) as $method => $count) {
-				if ($count <= 7) {
-					continue;
-				}
-				$output .= '<tr>';
-				$output .= '<td class="metric-name">Worst Offender</th>';
-				$output .= '<td class="metric">' . $method . ' - ' . $count . '</td>';
-				$output .= '</tr>';
-			}
-
-			$output .= '<tr>';
-			$output .= '<th colspan="2">Class Averages</th>';
-			$output .= '</tr>';
-
-			foreach (array_slice($analysis['class'], 0, 10) as $class => $count) {
-				$output .= '<tr>';
-				$output .= '<td class="metric-name">' . $class . '</th>';
-				$output .= '<td class="metric">' . round($count, 2) . '</td>';
-				$output .= '</tr>';
-			}
-			$output .= '</tbody></table>';
-		}
-		return $output;
-	}
-
-	/**
 	 * Collects raw data aggregated in Report and prepares it for analysis
 	 *
 	 * @param array $filterResults The results of the filter on the test run.
