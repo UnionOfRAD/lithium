@@ -53,27 +53,6 @@ class HtmlTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * testDocType method
-	 *
-	 * @access public
-	 * @return void
-	 */
-	function testDocType() {
-		$result = $this->html->docType('xhtml-strict');
-		$expected = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" ';
-		$expected .= '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
-
-		$this->assertEqual($result, $expected);
-
-		$result = $this->html->docType('html4-strict');
-		$expected = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" ';
-		$expected .= '"http://www.w3.org/TR/html4/strict.dtd">';
-		$this->assertEqual($result, $expected);
-
-		$this->assertNull($this->html->docType('badness'));
-	}
-
-	/**
 	 * Tests that character set declarations render the correct character set and meta tag.
 	 *
 	 * @return void

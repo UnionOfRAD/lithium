@@ -26,7 +26,6 @@ class Html extends \lithium\template\Helper {
 		'block-end'        => '</div>',
 		'block-start'      => '<div{:options}>',
 		'charset'     => '<meta http-equiv="Content-Type" content="{:type}; charset={:charset}" />',
-		'doctype'          => '<!DOCTYPE {:version} PUBLIC "{:dtd}" "{:url}">',
 		'image'            => '<img src="{:path}"{:options} />',
 		'js-block'         => '<script type="text/javascript"{:options}>{:content}</script>',
 		'js-end'           => '</script>',
@@ -52,49 +51,6 @@ class Html extends \lithium\template\Helper {
 	);
 
 	/**
-	 * Document type definitions
-	 *
-	 * @var	array
-	 */
-	protected $_docTypes = array(
-		'html4-strict' => array(
-			'version' => 'HTML',
-			'dtd' => '-//W3C//DTD HTML 4.01//EN',
-			'url' => 'http://www.w3.org/TR/html4/strict.dtd'
-		),
-		'html4-trans'  => array(
-			'version' => 'HTML',
-			'dtd' => '-//W3C//DTD HTML 4.01 Transitional//EN',
-			'url' => 'http://www.w3.org/TR/html4/loose.dtd'
-		),
-		'html4-frame'  => array(
-			'version' => 'HTML',
-			'dtd' => '-//W3C//DTD HTML 4.01 Frameset//EN',
-			'url' => 'http://www.w3.org/TR/html4/frameset.dtd'
-		),
-		'xhtml-strict' => array(
-			'version' => 'html',
-			'dtd' => '-//W3C//DTD XHTML 1.0 Strict//EN',
-			'url' => 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'
-		),
-		'xhtml-trans' => array(
-			'version' => 'html',
-			'dtd' => '-//W3C//DTD XHTML 1.0 Transitional//EN',
-			'url' => 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'
-		),
-		'xhtml-frame' => array(
-			'version' => 'html',
-			'dtd' => '-//W3C//DTD XHTML 1.0 Frameset//EN',
-			'url' => 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd'
-		),
-		'xhtml11' => array(
-			'version' => 'html',
-			'dtd' => '-//W3C//DTD XHTML 1.1//EN',
-			'url' => 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'
-		)
-	);
-
-	/**
 	 * Data used for custom <meta /> links.
 	 *
 	 * @var array
@@ -117,31 +73,6 @@ class Html extends \lithium\template\Helper {
 		'image' => 'image',
 		'_metaLink' => 'generic'
 	);
-
-	/**
-	 * Returns a doctype string.
-	 *
-	 * Possible doctypes:
-	 *
-	 * - `html4-strict`: HTML4 Strict.
-	 * - `html4-trans`: HTML4 Transitional.
-	 * - `html4-frame`: HTML4 Frameset.
-	 * - `xhtml-strict`: XHTML1 Strict.
-	 * - `xhtml-trans`: XHTML1 Transitional.
-	 * - `xhtml-frame`: XHTML1 Frameset.
-	 * - `xhtml11`: XHTML1.1
-	 *
-	 * Note that the HTML5 doctype has been omitted, because the doctype tag is simply
-	 * `<!doctype html>`.
-	 *
-	 * @param string $type Doctype to use.
-	 * @return string An HTML doctype tag.
-	 */
-	public function docType($type = 'xhtml-trans') {
-		if (isset($this->_docTypes[$type])) {
-			return $this->_render(__METHOD__, 'doctype', $this->_docTypes[$type]);
-		}
-	}
 
 	/**
 	 * Returns a charset meta-tag.
