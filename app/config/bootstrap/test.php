@@ -17,7 +17,8 @@ Dispatcher::applyFilter('_callable', function($self, $params, $chain) {
 		return function() use ($test, $request) {
 			$group = "\\" . str_replace("/", "\\", $test);
 			$report = TestDispatcher::run($group , $request->query + array(
-				'reporter' => 'html'
+				'reporter' => 'html',
+				'format' => 'html'
 			));
 			$filters = Libraries::locate('test.filter', null, array(
 				'exclude' => '/Base$/'
@@ -32,9 +33,7 @@ Dispatcher::applyFilter('_callable', function($self, $params, $chain) {
 
 			$result = compact('request', 'group', 'report', 'filters', 'classes', 'menu');
 
-			return $report->render('layout', $result, array(
-				"format" => "html"
-			));
+			return $report->render('layout', $result);
 		};
 	}
 

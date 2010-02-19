@@ -35,6 +35,13 @@ class Report extends \lithium\core\Object {
 	public $reporter = null;
 
 	/**
+	 * Contains the format for the results to be rendered in
+	 *
+	 * @var string
+	 */
+	public $format = null;
+
+	/**
 	 * An array of fully-namespaced class names representing the filters to be applied to this test
 	 * group.
 	 *
@@ -75,7 +82,8 @@ class Report extends \lithium\core\Object {
 			'title' => null,
 			'group' => null,
 			'filters' => array(),
-			'reporter' => 'text'
+			'reporter' => 'text',
+			'format' => 'txt'
 		);
 		parent::__construct((array) $config + $defaults);
 	}
@@ -95,6 +103,7 @@ class Report extends \lithium\core\Object {
 		$this->group = $this->_config['group'];
 		$this->filters = $this->_config['filters'];
 		$this->title = $this->_config['title'] ?: $this->_config['title'];
+		$this->format = $this->_config['format'];
 	}
 
 	/**
@@ -203,12 +212,9 @@ class Report extends \lithium\core\Object {
 	 * @param array $options Array of options (e.g. rendering type)
 	 * @return string
 	 */
-	public function render($template, $data, $options = null) {
-		$options = (array) $options + array(
-			"format" => "html"
-		);
+	public function render($template, $data) {
 		$template = Libraries::locate('test.templates', $template, array(
-			'filter' => false, 'type' => 'file', 'suffix' => '.' . $options['format'] . '.php',
+			'filter' => false, 'type' => 'file', 'suffix' => '.' . $this->format . '.php',
 		));
 		extract($data);
 		ob_start();
