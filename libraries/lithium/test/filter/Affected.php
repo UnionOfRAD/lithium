@@ -54,33 +54,6 @@ class Affected extends \lithium\test\Filter {
 		return $tests;
 	}
 
-	public static function output($format, $analysis) {
-		$analysis = isset($analysis[0]) ? $analysis[0] : array();
-		$output = array();
-
-		if ($format == 'html') {
-			$output[] = "<h3>Additional Affected Tests</h3>";
-			$output[] = "<ul class=\"metrics\">";
-
-			foreach ($analysis as $class => $test) {
-				if ($test) {
-					$output[] = "<li>{$test}</li>";
-				}
-			}
-			$output[] = "</ul>";
-		} elseif ($format == 'text') {
-			$output[] = "Additional Affected Tests";
-			$output[] = "-------------------------";
-
-			foreach ($analysis as $class => $test) {
-				if ($test) {
-					$output[] = " - {$test}";
-				}
-			}
-		}
-		return implode("\n", $output);
-	}
-
 	/**
 	 * Analyzes the results of a test run and returns the result of the analysis.
 	 *

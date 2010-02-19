@@ -39,7 +39,8 @@
 			?>
 			<?php foreach ($report->results['filters'] as $filter => $data): ?>
 				<?= $report->render(
-						strtolower(array_pop(explode("\\", $filter))), array("analysis" => $data)
+						strtolower(array_pop(explode("\\", $filter))),
+						array("analysis" => $data)
 					); ?>
 			<?php endforeach ?>
 		</div>
