@@ -159,12 +159,6 @@ class ObjectTest extends \lithium\test\Unit {
 			'testScalar', 'testArray' => 'merge'
 		)) + $expected);
 		$this->assertEqual($expected, $config->getConfig());
-
-		$expected = array('testScalar' => 'called', 'testArray' => array('default'));
-		$config = new MockObjectConfiguration(array('autoConfig' => array(
-			'testScalar' => 'call'
-		)) + $expected);
-		$this->assertEqual($expected, $config->getConfig());
 	}
 
 	/**

@@ -71,10 +71,7 @@ class Object {
 				$property = '_' . $key;
 				$this->{$property} = $this->_config[$key] + $this->{$property};
 			} else {
-				if (is_int($key)) {
-					$key = $flag;
-				}
-				$this->{"_$key"} = $this->_config[$key];
+				$this->{"_$flag"} = $this->_config[$flag];
 			}
 		}
 	}
