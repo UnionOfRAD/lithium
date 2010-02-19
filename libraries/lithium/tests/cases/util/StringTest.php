@@ -311,6 +311,20 @@ class StringTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that text replacements with `String::insert()` using key/value pairs are not
+	 * mis-handled if numeric keys are present in the array (only if they appear first).
+	 *
+	 * @return void
+	 */
+	public function testInsertWithUnusedNumericKey() {
+		$result = String::insert("Hey, what are you tryin' to {:action} on us?", array(
+			'action' => 'push', '!'
+		));
+		$expected = "Hey, what are you tryin' to push on us?";
+		$this->assertEqual($expected, $result);
+	}
+
+	/**
 	 * Tests casting/inserting of custom objects with `String::insert()`.
 	 *
 	 * @return void

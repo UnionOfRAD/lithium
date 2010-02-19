@@ -119,6 +119,7 @@ class String {
 		);
 		$options += $defaults;
 		$format = $options['format'];
+		reset($data);
 
 		if ($format == 'regex' || (empty($format) && !empty($options['escape']))) {
 			$format = sprintf(
@@ -129,7 +130,7 @@ class String {
 			);
 		}
 
-		if (empty($format) && !isset($data[0])) {
+		if (empty($format) && key($data) !== 0) {
 			$replace = array();
 
 			foreach ($data as $key => $value) {
