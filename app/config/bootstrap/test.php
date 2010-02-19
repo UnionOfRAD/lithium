@@ -32,7 +32,10 @@ Dispatcher::applyFilter('_callable', function($self, $params, $chain) {
 
 			$result = compact('request', 'group', 'report', 'filters', 'classes', 'menu');
 
-			return $report->render('layout', $result);
+			return $report->render('default', $result, array(
+				"format" => "html",
+				"type" => "layouts"
+			));
 		};
 	}
 
