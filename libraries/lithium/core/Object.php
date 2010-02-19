@@ -66,7 +66,6 @@ class Object {
 			if (!isset($this->_config[$key]) && !isset($this->_config[$flag])) {
 				continue;
 			}
-			$property = "_{$key}";
 
 			if ($flag === 'merge') {
 				$property = '_' . $key;
