@@ -96,6 +96,8 @@ class Libraries {
 		)
 	);
 
+	protected static $_default;
+
 	/**
 	 * Holds cached class paths generated and used by `lithium\core\Libraries::load()`.
 	 *
@@ -201,26 +203,29 @@ class Libraries {
 			'includePath' => false,
 			'transform' => null,
 			'bootstrap' => null,
-			'defer' => false
+			'defer' => false,
+			'default' => false
 		);
-		switch ($name) {
-			case 'app':
-				$defaults['path'] = LITHIUM_APP_PATH;
-				$defaults['bootstrap'] = 'config/switchboard.php';
-			break;
-			case 'lithium':
-				$defaults['path'] = LITHIUM_LIBRARY_PATH . '/lithium';
-				$defaults['loader'] = 'lithium\core\Libraries::load';
-				$defaults['defer'] = true;
-			break;
-			case 'plugin':
-				return static::_addPlugins((array) $config);
-			break;
+
+		if ($name == 'lithium') {
+			$defaults['path'] = LITHIUM_LIBRARY_PATH . '/lithium';
+			$defaults['loader'] = 'lithium\core\Libraries::load';
+			$defaults['defer'] = true;
+		} elseif ($name == 'plugin') {
+			return static::_addPlugins((array) $config);
+		}
+		$config = (array) $config + $defaults;
+
+		if ($config['default']) {
+			static::$_default = $name;
+			$config['path'] = $config['path'] ?: LITHIUM_APP_PATH;
 		}
 
-		$config = (array) $config + $defaults;
-		$config['path'] = ($config['path'])
-			? str_replace('\\', '/', $config['path']) : static::locate('libraries', $name);
+		if ($config['path']) {
+			$config['path'] = str_replace('\\', '/', $config['path']);
+		} else {
+			$config['path'] = static::locate('libraries', $name);
+		}
 		static::$_configurations[$name] = $config;
 
 		if ($config['includePath']) {
@@ -250,6 +255,9 @@ class Libraries {
 	public static function get($name = null) {
 		if (empty($name)) {
 			return static::$_configurations;
+		}
+		if ($name === true) {
+			$name = static::$_default;
 		}
 		return isset(static::$_configurations[$name]) ? static::$_configurations[$name] : null;
 	}

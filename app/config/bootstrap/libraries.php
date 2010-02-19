@@ -48,7 +48,7 @@ Libraries::add('lithium');
  * Add the application.  You can pass a `'path'` key here if this bootstrap file is outside of
  * your main application, but generally you should not need to change any settings.
  */
-Libraries::add('app');
+Libraries::add('app', array('default' => true));
 
 /**
  * Add some plugins

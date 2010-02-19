@@ -84,8 +84,7 @@ class File extends \lithium\template\view\Renderer {
 			$options['library'] = $options['plugin'];
 		}
 
-		$options['library'] = isset($options['library']) ? $options['library'] : 'app';
-		$library = Libraries::get($options['library']);
+		$library = Libraries::get(isset($options['library']) ? $options['library'] : true);
 		$options['library'] = $library['path'];
 		$path = $this->_paths((array) $this->_config['paths'][$type], $options);
 
