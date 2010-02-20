@@ -213,7 +213,7 @@ class Form extends \lithium\template\Helper {
 			$options['method'] = strtoupper($options['method']);
 
 			return $self->invokeMethod('_render', array(
-				$method, $template, compact('url', 'options')
+				$chain->method(true), $template, compact('url', 'options')
 			));
 		};
 		return $this->_filter(__METHOD__, $params, $filter);

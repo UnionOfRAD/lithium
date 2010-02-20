@@ -319,6 +319,25 @@ class Document extends \lithium\data\Collection {
 	}
 
 	/**
+	 * Called after a `Document` is saved. Updates the object's internal state to reflect the
+	 * corresponding database record, and sets the `Document`'s primary key, if this is a
+	 * newly-created object.
+	 *
+	 * @param $id The ID to assign, where applicable.
+	 * @return void
+	 */
+	public function update($id = null) {
+		if ($id) {
+			$id = (array) $id;
+			$model = $this->_model;
+			foreach ((array) $model::meta('key') as $i => $key) {
+				$this->__set($key, $id[$i]);
+			}
+		}
+		$this->_exists = true;
+	}
+
+	/**
 	 * Used by getter and setter methods to determine whether the value of data is a complex type
 	 * that should be given its own sub-object withih the `Document`.
 	 *
