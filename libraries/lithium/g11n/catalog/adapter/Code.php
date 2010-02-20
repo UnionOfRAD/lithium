@@ -103,9 +103,9 @@ class Code extends \lithium\g11n\catalog\adapter\Base {
 	 * is a rather simple and stupid parser but also fast and easy to grasp. It doesn't
 	 * actively attempt to detect and work around syntax errors in marker functions.
 	 *
+	 * @see lithium\g11n\Message::aliases()
 	 * @param string $file Absolute path to a PHP file.
 	 * @return array
-	 * @see lithium\template\View
 	 */
 	protected function _parsePhp($file) {
 		$contents = file_get_contents($file);
@@ -163,10 +163,10 @@ class Code extends \lithium\g11n\catalog\adapter\Base {
 	 * Merges an item into given data and removes quotation marks
 	 * from the beginning and end of message strings.
 	 *
+	 * @see lithium\g11n\catalog\adapter\Base::_merge()
 	 * @param array $data Data to merge item into.
 	 * @param array $item Item to merge into $data.
 	 * @return array The merged data.
-	 * @see lithium\g11n\catalog\adapter\Base::_merge()
 	 */
     protected function _merge($data, $item) {
 		array_walk($item['ids'], function(&$value) {
