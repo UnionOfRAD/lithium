@@ -10,7 +10,6 @@ namespace lithium\data;
 
 use \Exception;
 use \lithium\util\String;
-use \lithium\util\Collection;
 use \lithium\core\Libraries;
 
 /**
@@ -34,7 +33,7 @@ class Connections extends \lithium\core\Adaptable {
 	/**
 	 * A Collection of the configurations you add through Connections::add().
 	 *
-	 * @var Collection
+	 * @var `\lithium\util\Collection`
 	 */
 	protected static $_configurations = array();
 
@@ -67,6 +66,7 @@ class Connections extends \lithium\core\Adaptable {
 	 * ));
 	 * }}}
 	 *
+	 * @see lithium\data\Model::$_meta
 	 * @param string $name The name by which this connection is referenced. Use this name to
 	 *        retrieve the connection again using `Connections::get()`, or to bind a model to it
 	 *        using `Model::$_meta['connection']`.
@@ -84,7 +84,6 @@ class Connections extends \lithium\core\Adaptable {
 	 *        settings it supports.
 	 * @return array Returns the final post-processed connection information, as stored in the
 	 *         internal configuration array used by `Connections`.
-	 * @see lithium\data\Model::$_meta
 	 */
 	public static function add($name, $type = null, array $config = array()) {
 		if (is_array($type)) {
