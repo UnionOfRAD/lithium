@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\g11n\catalog\adapter;
 
+use \Exception;
 use \lithium\g11n\catalog\adapter\Code;
 
 if (false) {
@@ -45,9 +46,35 @@ class CodeTest extends \lithium\test\Unit {
 
 	public $adapter;
 
+	protected $_path;
+
 	public function setUp() {
-		$path = __DIR__;
+		$this->_path = $path = __DIR__;
 		$this->adapter = new Code(compact('path'));
+	}
+
+	public function tearDown() {
+		$this->_cleanUp();
+	}
+
+	public function testPathMustExist() {
+		$path = LITHIUM_APP_PATH . '/resources/tmp/tests';
+
+		try {
+			new Code(array('path' => $this->_path));
+			$result = true;
+		} catch (Exception $e) {
+			$result = false;
+		}
+		$this->assert($result);
+
+		try {
+			new Code(array('path' => "{$path}/i_do_not_exist"));
+			$result = false;
+		} catch (Exception $e) {
+			$result = true;
+		}
+		$this->assert($result);
 	}
 
 	public function testReadMessageTemplateTSimple() {
@@ -155,6 +182,23 @@ class CodeTest extends \lithium\test\Unit {
 		$expected = 'plural mixed 2';
 		$result = $results['mixed 2']['ids']['plural'];
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testReadWithScope() {
+		$this->adapter = new Code(array('path' => $this->_path, 'scope' => 'li3_bot'));
+
+		$results = $this->adapter->read('messageTemplate', 'root', null);
+		$this->assertFalse($results);
+
+		$results = $this->adapter->read('messageTemplate', 'root', 'li3_bot');
+		$expected = array('singular' => 'simple 1');
+		$result = $results['simple 1']['ids'];
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testNoReadSupportForOtherCategories() {
+		$result = $this->adapter->read('message', 'de', null);
+		$this->assertFalse($result);
 	}
 }
 
