@@ -85,27 +85,25 @@ class Coverage extends \lithium\test\Filter {
 			$percentage = round(count($covered) / (count($executable) ?: 1), 4) * 100;
 			$result[$class] = compact('class', 'executable', 'covered', 'uncovered', 'percentage');
 		}
+
+		$result = static::collectLines($result);
 		return $result;
 	}
 
 	/**
-	 * Returns data to be output by a reporter.
+	 * Takes the raw line numbers and returns results with the code from
+	 * uncovered lines included.
 	 *
-	 * @param string $format I.e. `'html'` or `'text'`.
-	 * @param array $analysis The results of the analysis.
-	 * @return string|void
+	 * @param array $result The raw line number results
+	 * @return array
 	 */
-	public static function output($format, $analysis) {
-		if (empty($analysis)) {
-			return null;
-		}
+	protected static function collectLines($result) {
 		$output = null;
 		$aggregate = array('covered' => 0, 'executable' => 0);
 
-		foreach ($analysis as $class => $coverage) {
+		foreach ($result as $class => $coverage) {
 			$out = array();
 			$file = Libraries::path($class);
-			$output .= static::stats($format, $class, $coverage);
 
 			$aggregate['covered'] += count($coverage['covered']);
 			$aggregate['executable'] += count($coverage['executable']);
@@ -148,26 +146,20 @@ class Coverage extends \lithium\test\Filter {
 					);
 				}
 			}
-			$data = array();
 
-			foreach ($out as $line => $row) {
-				$row['line'] = $line;
-				$data[] = static::_format($format, 'row', $row);
-			}
-			if (!empty($data)) {
-				$output .= static::_format($format, 'file', compact('file', 'data'));
-			}
+			$result[$class]['output'][$file] = $out;
 		}
-		return $output;
+
+		return $result;
 	}
 
 	/**
 	 * Collects code coverage analysis results from `xdebug_get_code_coverage()`.
 	 *
+	 * @see lithium\test\Coverage::analyze()
 	 * @param array $filterResults An array of results arrays from `xdebug_get_code_coverage()`.
 	 * @param array $options Set of options defining how results should be collected.
 	 * @return array The packaged filter results.
-	 * @see lithium\test\Coverage::analyze()
 	 * @todo Implement $options['merging']
 	 */
 	public static function collect($filterResults, array $options = array()) {
@@ -194,23 +186,6 @@ class Coverage extends \lithium\test\Filter {
 		}
 
 		return $packagedResults;
-	}
-
-	/**
-	 * Returns header for stats.
-	 *
-	 * @param string $format I.e. `'html'` or `'text'`.
-	 * @param string $class
-	 * @param array $analysis The results of the analysis.
-	 * @return string|void
-	 */
-	public static function stats($format, $class, $analysis) {
-		$covered = count($analysis['covered']) . ' of ' . count($analysis['executable']);
-
-		if ($format == 'html') {
-			$title = "{$class}: {$covered} lines covered (<em>{$analysis['percentage']}%</em>)";
-			return '<h4 class="coverage">' . $title . '</h4>';
-		}
 	}
 
 	/**
@@ -252,40 +227,6 @@ class Coverage extends \lithium\test\Filter {
 			}
 		}
 		return $results;
-	}
-
-	/**
-	 * Returns row or file in specified format
-	 *
-	 * @param string $format [required] html,text
-	 * @param string $type [required] row, file
-	 * @param array $data [required] from output
-	 * @return string
-	 */
-	protected static function _format($format, $type, $data) {
-		if ($format === 'html') {
-			if ($type == 'file') {
-				return sprintf(
-					'<div class="code-coverage-results"><h4 class="name">%s</h4>%s</div>',
-					$data['file'], join("\n", $data['data'])
-				);
-			}
-			return sprintf(
-				'<div class="code-line %s">
-					<span class="line-num">%d</span>
-					<span class="content">%s</span>
-				</div>', $data['class'], $data['line'], htmlspecialchars(
-					str_replace("\t", "    ", $data['data'])
-				)
-			);
-		} elseif ($format === 'text') {
-			if ($type == 'file') {
-				return sprintf("%s\n\n%s", $data['file'], join("\n", $data['data']));
-			}
-			return sprintf("%s: line %d\n%s\n\n",
-				$data['class'], $data['line'], str_replace("\t", "    ", $data['data'])
-			);
-		}
 	}
 }
 
