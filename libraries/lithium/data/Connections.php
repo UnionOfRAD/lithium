@@ -46,16 +46,6 @@ class Connections extends \lithium\core\Adaptable {
 	protected static $_adapters = 'data.source';
 
 	/**
-	 * Initialization of static class
-	 * Starts static properties and includes the app Connections.php file.
-	 *
-	 * @return void
-	 */
-	public static function __init() {
-		require LITHIUM_APP_PATH . '/config/connections.php';
-	}
-
-	/**
 	 * Add connection configurations to your app in `/app/config/connections.php`
 	 *
 	 * For example:
