@@ -196,15 +196,6 @@ class Report extends \lithium\core\Object {
 	}
 
 	/**
-	 * undocumented function
-	 *
-	 * @return void
-	 */
-	public function filters() {
-		return $this->reporter->filters((array) $this->results['filters']);
-	}
-
-	/**
 	 * Renders the test output (e.g. layouts and filter templates)
 	 *
 	 * @param string $template name of the template (eg: layout)
