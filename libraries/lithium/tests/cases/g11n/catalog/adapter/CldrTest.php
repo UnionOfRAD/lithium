@@ -22,7 +22,7 @@ class CldrTest extends \lithium\test\Unit {
 	 */
 	public function skip() {
 		$available = is_dir(LITHIUM_APP_PATH . '/resources/g11n/cldr');
-		$this->skipIf(!$available, 'The data for needed by the cldr adapter cannot be found.');
+		$this->skipIf(!$available, 'Data needed by the cldr adapter is not available.');
 	}
 
 	public function setUp() {
