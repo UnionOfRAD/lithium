@@ -108,7 +108,7 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 		foreach ($files as $file) {
 			$method = '_parse' . ucfirst(pathinfo($file, PATHINFO_EXTENSION));
 
-			if (!is_readable($file)) {
+			if (!file_exists($file) || !is_readable($file)) {
 				continue;
 			}
 			$stream = fopen($file, 'rb');
