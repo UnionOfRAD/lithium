@@ -167,8 +167,8 @@ class Profiler extends \lithium\test\Filter {
 					}
 
 					if (!isset($totals[$title]['format'])) {
-						$f = static::$_formatters[static::$_metrics[$title]['format']];
-						$totals[$title]['formatter'] = $f;
+						$format = static::$_metrics[$title]['format'];
+						$totals[$title]['formatter'] = static::$_formatters[$format];
 					}
 				}
 			}
