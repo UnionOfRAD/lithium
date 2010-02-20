@@ -235,8 +235,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc->id = 3;
 		$this->assertFalse($doc->exists());
 
-		$doc->invokeMethod('_update', array(12));
-
+		$doc->update(12);
 		$this->assertTrue($doc->exists());
 
 		$expected = 12;
@@ -255,8 +254,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc->id = 3;
 		$this->assertFalse($doc->exists());
 
-		$doc->invokeMethod('_update', array(array(12, '1-2')));
-
+		$doc->update(array(12, '1-2'));
 		$this->assertTrue($doc->exists());
 
 		$expected = 12;
