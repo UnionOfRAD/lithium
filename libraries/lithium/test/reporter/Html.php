@@ -65,14 +65,6 @@ class Html extends \lithium\test\Reporter {
 		return join("", $result);
 	}
 
-	public function filters($filters) {
-		$result = array();
-		foreach ((array) $filters as $class => $data) {
-			$result[] = $class::output('html', $data);
-		}
-		return join("\n", $result);
-	}
-
 	/**
 	 * Renders a menu item.
 	 *
