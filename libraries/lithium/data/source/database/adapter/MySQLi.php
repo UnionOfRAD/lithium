@@ -271,7 +271,7 @@ class MySQLi extends \lithium\data\source\Database {
 		return $result;
 	}
 
-	public function value($value) {
+	public function value($value, array $schema = array()) {
 		return "'" . $this->_connection->real_escape_string($value) . "'";
 	}
 

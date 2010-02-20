@@ -142,6 +142,8 @@ class MockAdapter extends \lithium\data\source\Database {
 	protected function _execute($sql) {
 		return $sql;
 	}
+
+	protected function _insertId($query) {}
 }
 
 ?>
