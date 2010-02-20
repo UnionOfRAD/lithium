@@ -155,61 +155,35 @@ class Profiler extends \lithium\test\Filter {
 				}
 			}
 		}
-		return $metrics;
-	}
 
-	/**
-	 * Returns data to be output by a reporter.
-	 *
-	 * @param string $format I.e. `'html'` or `'text'`.
-	 * @param array $analysis The results of the analysis.
-	 * @return string|void
-	 */
-	public static function output($format, $analysis) {
 		$totals = array();
+		foreach ($metrics as $class => $data) {
+			foreach ($data as $title => $value) {
+				if(isset(static::$_metrics[$title])) {
+					if (isset($totals[$title]['value'])) {
+						$totals[$title]['value'] += $value;
+					} else {
+						$totals[$title]['value'] = $value;
+					}
 
-		foreach ($analysis as $class => $metrics) {
-			foreach ($metrics as $title => $value) {
-				$totals[$title] = isset($totals[$title]) ? $totals[$title] : 0;
-				$totals[$title] += $value;
+					if (!isset($totals[$title]['format'])) {
+						$f = static::$_formatters[static::$_metrics[$title]['format']];
+						$totals[$title]['formatter'] = $f;
+					}
+				}
 			}
 		}
-		$results = array();
-		$output = null;
 
-		if ($format == 'html') {
-			$output .= '<h3>Benchmarks</h3>';
-			$output .= '<table class="metrics"><tbody>';
-
-			foreach ($totals as $title => $value) {
-				if (!isset(static::$_metrics[$title])) {
-					continue;
-				}
-				$formatter = static::$_formatters[static::$_metrics[$title]['format']];
-				$output .= '<tr>';
-				$output .= '<td class="metric-name">' . $title . '</th>';
-				$output .= '<td class="metric">' . $formatter($value) . '</td>';
-				$output .= '</tr>';
-			}
-			$output .= '</tbody></table>';
-		} elseif ($format == 'text') {
-			foreach ($totals as $title => $value) {
-				if (!isset(static::$_metrics[$title])) {
-					continue;
-				}
-				$formatter = static::$_formatters[static::$_metrics[$title]['format']];
-				$output .= $title . ': ' . $formatter($value) . "\n";
-			}
-		}
-		return $output;
+		$metrics['totals'] = $totals;
+		return $metrics;
 	}
 
 	/**
 	 * Add, remove, or modify a profiler check.
 	 *
+	 * @see lithium\test\Profiler::$_metrics
 	 * @param mixed $name
 	 * @param string $value
-	 * @see lithium\test\Profiler::$_metrics
 	 * @return mixed
 	 */
 	public function check($name, $value = null) {
