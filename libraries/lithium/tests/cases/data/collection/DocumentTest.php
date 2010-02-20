@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\data\model;
+namespace lithium\tests\cases\data\collection;
 
 use \stdClass;
 use \lithium\data\collection\Document;
