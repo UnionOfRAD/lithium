@@ -12,7 +12,7 @@ use \lithium\data\source\http\adapter\CouchDb;
 
 use \lithium\data\Model;
 use \lithium\data\model\Query;
-use \lithium\data\model\Record;
+use \lithium\data\collection\Document;
 
 class CouchDbTest extends \lithium\test\Unit {
 
@@ -31,9 +31,9 @@ class CouchDbTest extends \lithium\test\Unit {
 	);
 
 	public function setUp() {
-		$this->query = new Query(array(
-			'model' => '\lithium\tests\mocks\data\source\http\adapter\MockCouchPost',
-			'record' => new Record()
+		$model = '\lithium\tests\mocks\data\source\http\adapter\MockCouchPost';
+		$this->query = new Query(compact('model') + array(
+			'record' => new Document(compact('model'))
 		));
 	}
 
