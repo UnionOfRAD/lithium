@@ -189,7 +189,7 @@ class Form extends \lithium\template\Helper {
 		$method = __METHOD__;
 		$params = compact('binding', 'options');
 
-		$filter = function($self, $params, $chain) use ($template, $defaults, &$_binding) {
+		$filter = function($self, $params, $chain) use ($method, $template, $defaults, &$_binding) {
 			extract($params);
 			$_binding = $binding;
 			$append = '';
@@ -213,10 +213,10 @@ class Form extends \lithium\template\Helper {
 			$options['method'] = strtoupper($options['method']);
 
 			return $self->invokeMethod('_render', array(
-				$chain->method(true), $template, compact('url', 'options')
+				$method, $template, compact('url', 'options')
 			));
 		};
-		return $this->_filter(__FUNCTION__, $params, $filter);
+		return $this->_filter(__METHOD__, $params, $filter);
 	}
 
 	public function end() {
