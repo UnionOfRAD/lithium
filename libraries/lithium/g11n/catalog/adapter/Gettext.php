@@ -414,15 +414,16 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 * @param array $data
 	 * @param array $meta
 	 * @return void
+	 * @todo Determine if needed and implement compiler.
 	 */
 	protected function _compileMo($stream, $data) {}
 
 	/**
 	 * Prepares an item before it is being written and escapes fields.
 	 *
+	 * @see lithium\g11n\catalog\adapter\Base::_prepareForWrite()
 	 * @param mixed $item
 	 * @return mixed
-	 * @see lithium\g11n\catalog\adapter\Base::_prepareForWrite()
 	 */
 	protected function _prepareForWrite($item) {
 		$filter = function ($value) use (&$filter) {
@@ -454,10 +455,10 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 * are **not** being merged. Whitespace characters are space, tab, vertical tab,
 	 * line feed, carriage return and form feed.
 	 *
+	 * @see lithium\g11n\catalog\adapter\Base::_merge()
 	 * @param array $data Data to merge item into.
 	 * @param array $item Item to merge into $data.
 	 * @return array The merged data.
-	 * @see lithium\g11n\catalog\adapter\Base::_merge()
 	 */
 	protected function _merge($data, $item) {
 		$filter = function ($value) use (&$filter) {
