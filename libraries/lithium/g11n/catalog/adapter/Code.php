@@ -69,7 +69,6 @@ class Code extends \lithium\g11n\catalog\adapter\Base {
 		switch ($category) {
 			case 'messageTemplate':
 				return $this->_readMessageTemplate($path);
-			break;
 			default:
 				return null;
 		}
