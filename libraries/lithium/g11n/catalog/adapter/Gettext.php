@@ -44,6 +44,32 @@ use \Exception;
 class Gettext extends \lithium\g11n\catalog\adapter\Base {
 
 	/**
+	 * Magic used for validating the format of a MO file as well as
+	 * detecting if the machine used to create that file was little endian.
+	 *
+	 * @see lithium\g11n\catalog\adapter\Gettext::_parseMo()
+	 * @var float
+	 */
+	const MO_LE_MAGIC = 0x950412de;
+
+	/**
+	 * Magic used for validating the format of a MO file as well as
+	 * detecting if the machine used to create that file was big endian.
+	 *
+	 * @see lithium\g11n\catalog\adapter\Gettext::_parseMo()
+	 * @var float
+	 */
+	const MO_BE_MAGIC = 0xde120495;
+
+	/**
+	 * The size of the header of a MO file in bytes.
+	 *
+	 * @see lithium\g11n\catalog\adapter\Gettext::_parseMo()
+	 * @var float Number of bytes.
+	 */
+	const MO_HEADER_SIZE = 28;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param array $config Available configuration options are:
@@ -225,12 +251,17 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 * @throws Exception If stream content has an invalid format.
 	 */
 	protected function _parseMo($stream) {
-		$magic = unpack('V1', fread($stream, 4));
-		$magic = substr(dechex(current($magic)), -8);
+		$stat = fstat($stream);
 
-		if ($magic == '950412de') {
+		if ($stat['size'] < self::MO_HEADER_SIZE) {
+			throw new Exception("MO stream caontent has an invalid format");
+		}
+		$magic = unpack('V1', fread($stream, 4));
+		$magic = hexdec(substr(dechex(current($magic)), -8));
+
+		if ($magic == self::MO_LE_MAGIC) {
 			$isBigEndian = false;
-		} elseif ($magic == 'de120495') {
+		} elseif ($magic == self::MO_BE_MAGIC) {
 			$isBigEndian = true;
 		} else {
 			throw new Exception("MO stream content has an invalid format");
