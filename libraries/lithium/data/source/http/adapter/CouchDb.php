@@ -169,7 +169,7 @@ class CouchDb extends \lithium\data\source\Http {
 
 			if ($success = (isset($result->id) || (isset($result->ok) && $result->ok === true))) {
 				$query->data($data + (array) $result);
-				$query->record()->invokeMethod('_update', array($result->id));
+				$query->record()->update($result->id);
 			}
 			return $success;
 		});
@@ -219,6 +219,7 @@ class CouchDb extends \lithium\data\source\Http {
 			extract($options, EXTR_OVERWRITE);
 			extract($conditions, EXTR_OVERWRITE);
 			$data = $query->data();
+
 			if (empty($data['_id']) && !empty($data['id'])) {
 				$data['_id'] = $data['id'];
 				$data['_rev'] = $data['rev'];
@@ -228,7 +229,7 @@ class CouchDb extends \lithium\data\source\Http {
 			$result = is_string($result) ? json_decode($result) : $result;
 
 			if ($success = (isset($result->_id) || (isset($result->ok) && $result->ok === true))) {
-				$query->record()->invokeMethod('_update');
+				$query->record()->update();
 				return true;
 			}
 

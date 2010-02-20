@@ -163,6 +163,25 @@ class Record extends \lithium\core\Object {
 	}
 
 	/**
+	 * Called after a `Record` is saved. Updates the object's internal state to reflect the
+	 * corresponding database record, and sets the `Record`'s primary key, if this is a
+	 * newly-created object.
+	 *
+	 * @param $id The ID to assign, where applicable.
+	 * @return void
+	 */
+	public function update($id = null) {
+		if ($id) {
+			$id = (array) $id;
+			$model = $this->_model;
+			foreach ((array) $model::meta('key') as $i => $key) {
+				$this->__set($key, $id[$i]);
+			}
+		}
+		$this->_exists = true;
+	}
+
+	/**
 	 * Converts the data in the record set to a different format, i.e. an array.
 	 *
 	 * @param string $format currently only `array`

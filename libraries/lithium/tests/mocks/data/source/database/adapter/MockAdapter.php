@@ -99,7 +99,7 @@ class MockAdapter extends \lithium\data\source\Database {
 		return $name;
 	}
 
-	public function value($value) {
+	public function value($value, array $schema = array()) {
 		return $value;
 	}
 
@@ -130,7 +130,6 @@ class MockAdapter extends \lithium\data\source\Database {
 			return '';
 		}
 		return $order;
-
 	}
 
 	public function renderCommand($type, $data = null, $context = null) {
@@ -138,7 +137,10 @@ class MockAdapter extends \lithium\data\source\Database {
 	}
 
 	public function key() {
+	}
 
+	protected function _execute($sql) {
+		return $sql;
 	}
 }
 

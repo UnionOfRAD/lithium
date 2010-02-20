@@ -56,10 +56,10 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	* Get method of type, i.e. 'read', 'update', 'create', 'delete'
-	*
-	* @return string
-	*/
+	 * Get method of type, i.e. 'read', 'update', 'create', 'delete'
+	 *
+	 * @return string
+	 */
 	public function type() {
 		return $this->_type;
 	}
@@ -246,6 +246,16 @@ class Query extends \lithium\core\Object {
 			$results[$item] = $this->{'_' . $item};
 		}
 		return $results;
+	}
+
+ 	/**
+	 * Gets a custom query field which does not have an accessor method.
+	 *
+	 * @param string $part Query part
+	 * @return mixed Returns the value as set in the `Query` object's constructor.
+	 */
+	public function __call($key, $params = array()) {
+		return isset($this->_config[$key]) ? $this->_config[$key] : null;
 	}
 
 	/**

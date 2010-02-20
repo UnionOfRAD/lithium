@@ -9,9 +9,10 @@
 namespace lithium\tests\integration\data;
 
 use \Exception;
+use \ArrayAccess;
 use \lithium\data\Connections;
 
-class CompanyIntegration extends \lithium\data\Model {
+class Company extends \lithium\data\Model {
 
 	protected $_meta = array(
 		'connection' => 'test',
@@ -25,20 +26,23 @@ class CompanyIntegration extends \lithium\data\Model {
 
 class SourceTest extends \lithium\test\Unit {
 
+	public $companyData = array(
+		array('name' => 'BigBoxMart'),
+		array('name' => 'Ma \'n Pa\'s Data Warehousing & Bait Shop')
+	);
+
 	public function setUp() {
-		CompanyIntegration::__init();
+		Company::__init();
 	}
 
 	public function tearDown() {
 		try {
-			foreach (CompanyIntegration::all() as $company) {
+			foreach (Company::all() as $company) {
 				$company->delete();
 			}
 		} catch (Exception $e) {
-			var_dump($e);
 		}
 	}
-
 
 	/**
 	 * Skip the test if no test database connection available.
@@ -60,10 +64,10 @@ class SourceTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testSingleReadWriteWithKey() {
-		$key = CompanyIntegration::meta('key');
-		$classes = CompanyIntegration::classes();
+		$key = Company::meta('key');
+		$classes = Company::classes();
 
-		$new = CompanyIntegration::create(array($key => 12345, 'name' => 'Acme, Inc.'));
+		$new = Company::create(array($key => 12345, 'name' => 'Acme, Inc.'));
 		$this->assertTrue(is_a($new, $classes['record']));
 
 		$result = $new->data();
@@ -75,7 +79,7 @@ class SourceTest extends \lithium\test\Unit {
 		$this->assertTrue($new->save());
 		$this->assertTrue($new->exists());
 
-		$existing = CompanyIntegration::find(12345);
+		$existing = Company::find(12345);
 		$result = $existing->data();
 		$this->assertEqual($expected[$key], $result[$key]);
 		$this->assertEqual($expected['name'], $result['name']);
@@ -84,7 +88,7 @@ class SourceTest extends \lithium\test\Unit {
 		$existing->name = 'Big Brother and the Holding Company';
 		$this->assertTrue($existing->save());
 
-		$existing = CompanyIntegration::find(12345);
+		$existing = Company::find(12345);
 		$result = $existing->data();
 		$expected['name'] = 'Big Brother and the Holding Company';
 		$this->assertEqual($expected[$key], $result[$key]);
@@ -94,22 +98,18 @@ class SourceTest extends \lithium\test\Unit {
 	}
 
 	public function testReadWriteMultiple() {
-		$companyData = array(
-			array('name' => 'BigBoxMart'),
-			array('name' => 'Mom \'n Pop Shop')
-		);
 		$companies = array();
-		$key = CompanyIntegration::meta('key');
+		$key = Company::meta('key');
 
-		foreach ($companyData as $data) {
-			$companies[] = CompanyIntegration::create($data);
+		foreach ($this->companyData as $data) {
+			$companies[] = Company::create($data);
 			$this->assertTrue($companies[count($companies) - 1]->save());
 			$this->assertTrue($companies[count($companies) - 1]->{$key});
 		}
 
-		$all = CompanyIntegration::all();
+		$all = Company::all();
 
-		$expected = count($companyData);
+		$expected = count($this->companyData);
 		$this->assertEqual($expected, $all->count());
 		$this->assertEqual($expected, count($all));
 
@@ -123,17 +123,14 @@ class SourceTest extends \lithium\test\Unit {
 	}
 
 	public function testRecordOffset() {
-		$companyData = array(
-			array('name' => 'BigBoxMart'),
-			array('name' => 'Ma \'n Pa\'s Data Warehousing & Bait Shop')
-		);
-
-		foreach ($companyData as $data) {
-			CompanyIntegration::create($data)->save();
+		foreach ($this->companyData as $data) {
+			Company::create($data)->save();
 		}
-		$all = CompanyIntegration::all();
+		$all = Company::all();
 
-		$result = $all[0];
+		$result = $all->first();
+		$this->skipIf(!$result instanceof ArrayAccess, 'Class does not implement ArrayAccess');
+
 		$expected = 'BigBoxMart';
 		$this->assertEqual($expected, $result['name']);
 
@@ -158,12 +155,12 @@ class SourceTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testGetRecordByGeneratedId() {
-		$key = CompanyIntegration::meta('key');
-		$company = CompanyIntegration::create(array('name' => 'Test Company'));
+		$key = Company::meta('key');
+		$company = Company::create(array('name' => 'Test Company'));
 		$this->assertTrue($company->save());
 
 		$id = $company->{$key};
-		$companyCopy = CompanyIntegration::find($id);
+		$companyCopy = Company::find($id);
 		$this->assertEqual($company->data(), $companyCopy->data());
 	}
 }

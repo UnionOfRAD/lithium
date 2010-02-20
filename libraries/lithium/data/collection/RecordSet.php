@@ -123,7 +123,10 @@ class RecordSet extends \lithium\data\Collection {
 	public function offsetSet($offset, $value) {
 		$class = $this->_classes['record'];
 		$model = $this->_model;
-		$value = new $class(array('data' => $value, 'exists' => true));
+
+		if (is_array($value)) {
+			$value = new $class(array('data' => $value, 'exists' => true));
+		}
 		if (array_key_exists($offset, $this->_index)) {
 			return $this->_items[array_search($offset, $this->_index)] = $value;
 		}
@@ -151,7 +154,11 @@ class RecordSet extends \lithium\data\Collection {
 	public function rewind() {
 		$this->_pointer = 0;
 		reset($this->_index);
-		return ($record = parent::rewind()) ? $record : $this->_items[$this->_pointer];
+
+		if ($record = parent::rewind()) {
+			return $record;
+		}
+		return empty($this->_items) ? null : $this->_items[$this->_pointer];
 	}
 
 	/**
@@ -262,24 +269,25 @@ class RecordSet extends \lithium\data\Collection {
 	 * @param mixed $key
 	 * @return array
 	 */
-	protected function _populate($data = null, $key = null) {
+	protected function _populate($record = null, $key = null) {
 		if ($this->_closed()) {
 			return;
 		}
-		$data = $data ?: $this->_handle->result('next', $this->_result, $this);
-
-		if (!$data) {
-			return $this->_close();
-		}
-		$result = null;
+		$record = $record ?: $this->_handle->result('next', $this->_result, $this);
 		$modelClass = $this->_model;
 
-		foreach ((array) $this->_columns as $model => $fields) {
-			$data = array_combine($fields, array_slice($data, 0, count($fields)));
-			$exists = true;
+		if (!$record) {
+			return $this->_close();
+		}
 
-			$class = $this->_classes['record'];
-			$this->_items[] = ($record = new $class(compact('model', 'data', 'exists')));
+		foreach ((array) $this->_columns as $model => $fields) {
+
+			if (is_array($record)) {
+				$class = $this->_classes['record'];
+				$data = array_combine($fields, array_slice($record, 0, count($fields)));
+				$record = new $class(compact('model', 'data') + array('exists' => true));
+			}
+			$this->_items[] = $record;
 			$this->_index[] = $modelClass::key($record);
 			return $record;
 		}

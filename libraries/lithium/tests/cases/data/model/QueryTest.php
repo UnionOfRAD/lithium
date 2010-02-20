@@ -10,6 +10,7 @@ namespace lithium\tests\cases\data\model;
 
 use \lithium\data\model\Record;
 use \lithium\data\model\Query;
+use \lithium\tests\mocks\data\MockPostObject;
 use \lithium\tests\mocks\data\model\MockDatabase;
 use \lithium\tests\mocks\data\model\MockQueryPost;
 use \lithium\tests\mocks\data\model\MockQueryComment;
@@ -215,6 +216,15 @@ class QueryTest extends \lithium\test\Unit {
 		$expected = array('id' => 12);
 		$result = $query->conditions();
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testExtra() {
+		$object = new MockPostObject(array('id'=>1, 'data'=>'test'));
+		$query = new Query(array('conditions' => 'foo', 'extra' => 'value', 'extraObject' => $object));
+		$this->assertEqual(array('foo'), $query->conditions());
+		$this->assertEqual('value', $query->extra());
+		$this->assertEqual($object, $query->extraObject());
+		$this->assertNull($query->extra2());
 	}
 
 	public function testExport() {

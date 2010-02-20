@@ -276,6 +276,23 @@ class MySQLi extends \lithium\data\source\Database {
 	}
 
 	/**
+	 * Gets the last auto-generated ID from the query that inserted a new record.
+	 *
+	 * @param object $query The `Query` object associated with the query which generated 
+	 * @return mixed Returns the last inserted ID key for an auto-increment column or a column
+	 *         bound to a sequence.
+	 */
+	protected function _insertId($query) {
+		$resource = $this->_execute('SELECT LAST_INSERT_ID() AS insertID');
+		list($id) = $this->result('next', $resource, null);
+		$this->result('close', $resource, null);
+
+		if (!empty($id) && $id !== '0') {
+			return $id;
+		}
+	}
+
+	/**
 	 * Converts database-layer column types to basic types.
 	 *
 	 * @param string $real Real database-layer column type (i.e. "varchar(255)").

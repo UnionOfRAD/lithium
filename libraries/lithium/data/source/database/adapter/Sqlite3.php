@@ -119,6 +119,9 @@ class Sqlite3 extends \lithium\data\source\Database {
 		});
 	}
 
+	protected function _insertId($query) {
+	}
+
 	public function encoding($encoding = null) {
 		$encodingMap = array('UTF-8' => 'utf8');
 

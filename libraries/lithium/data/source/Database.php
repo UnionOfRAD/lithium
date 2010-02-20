@@ -73,11 +73,41 @@ abstract class Database extends \lithium\data\Source {
 		return $name;
 	}
 
-	public function value($value) {
+	public function value($value, array $schema = array()) {
 		return $value;
 	}
 
-	public function create($record, array $options = array()) {
+	public function create($query, array $options = array()) {
+		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
+			extract($params);
+
+			$model = $query->model();
+			$fields = $values = array();
+			$data = $query->export($self);
+			$schema = (array) $model::schema();
+
+			while (list($field, $value) = each($data['fields'])) {
+				$schema += array($field => array('default' => null));
+				if ($value === null && $schema[$field]['default'] === null) {
+					continue;
+				}
+				$fields[] = $self->name($field);
+				$values[] = $self->value($value, $schema[$field]);
+			}
+			$fields = join(', ', $fields);
+			$values = join(', ', $values);
+			$sql = $self->renderCommand('create', compact('fields', 'values') + $data, $query);
+			$id = null;
+
+			if ($self->invokeMethod('_execute', array($sql))) {
+				if (!$model::key($query->record())) {
+					$id = $self->invokeMethod('_insertId', array($query));
+				}
+				$query->record()->update($id);
+				return true;
+			}
+			return false;
+		});
 	}
 
 	/**
@@ -102,7 +132,7 @@ abstract class Database extends \lithium\data\Source {
 
 			switch ($options['return']) {
 				case 'resource':
-				break;
+					return $result;
 				case 'array':
 					$columns = $self->schema($query, $result);
 					$records = array();
@@ -111,18 +141,46 @@ abstract class Database extends \lithium\data\Source {
 						$records[] = array_combine($columns, $data);
 					}
 					$self->result('close', $result, null);
-					$result = $records;
-				break;
+					return $records;
 			}
-			return $result;
 		});
 	}
 
 	public function update($query, array $options = array()) {
+		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
+			extract($params);
+
+			$fields = array();
+			$model = $query->model();
+			$data = $query->export($self);
+			$schema = (array) $model::schema();
+
+			while (list($field, $value) = each($data['fields'])) {
+				$schema += array($field => array());
+				$fields[] = $self->name($field) . ' = ' . $self->value($value, $schema[$field]);
+			}
+			$fields = join(', ', $fields);
+			$sql = $self->renderCommand('update', compact('fields') + $data, $query);
+
+			if ($self->invokeMethod('_execute', array($sql))) {
+				$query->record()->update();
+				return true;
+			}
+			return false;
+		});
 	}
 
 	public function delete($query, array $options = array()) {
+		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
+			extract($params);
+			$data = $query->export($self);
 
+			if (!$data['conditions']) {
+				return false;
+			}
+			$sql = $self->renderCommand('delete', $data, $query);
+			return (bool) $self->invokeMethod('_execute', array($sql));
+		});
 	}
 
 	public function renderCommand($type, $data = null, $context = null) {
@@ -200,7 +258,7 @@ abstract class Database extends \lithium\data\Source {
 					$result[] = "{$key} IN ({$value})";
 				break;
 				default:
-					$value = $this->value($value, isset($schema[$key]) ? $schema[$key] : null);
+					$value = $this->value($value, isset($schema[$key]) ? $schema[$key] : array());
 					$result[] = "{$key} = {$value}";
 				break;
 			}
@@ -210,7 +268,13 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	public function fields($fields, $context) {
-		return empty($fields) ? '*' : join(', ', $fields);
+		switch ($context->type()) {
+			case 'create':
+			case 'update':
+				return $fields ?: $context->data();
+			default:
+				return empty($fields) ? '*' : join(', ', $fields);
+		}
 	}
 
 	public function limit($limit, $context) {
@@ -218,15 +282,14 @@ abstract class Database extends \lithium\data\Source {
 			return '';
 		}
 		$result = '';
-		$offset = $context->offset() ?: '';
 
-		if (!empty($offset)) {
+		if ($offset = $context->offset() ?: '') {
 			$offset .= ', ';
 		}
 		return "LIMIT {$offset}{$limit}";
 	}
 
-	function order($order, $context) {
+	public function order($order, $context) {
 		if (is_string($order) && strpos($order, ',') && !preg_match('/\(.+\,.+\)/', $order)) {
 			$order = array_map('trim', explode(',', $order));
 		}
@@ -285,6 +348,10 @@ abstract class Database extends \lithium\data\Source {
 		return ' ORDER BY ' . $keys . ' ' . $direction;
 	}
 
+	abstract protected function _execute($query);
+
+	abstract protected function _insertId($query);
+
 	/**
 	 * Returns a fully-qualified table name (i.e. with prefix), quoted.
 	 *
@@ -293,6 +360,53 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	protected function _entityName($entity) {
 		return $this->name($entity);
+	}
+
+	/**
+	 * Attempts to automatically determine the column type of a value. Used by the `value()` method
+	 * of various database adapters to determine how to prepare a value if the schema is not
+	 * specified.
+	 *
+	 * @param mixed $value The value to be prepared for an SQL query.
+	 * @return string Returns the name of the column type which `$value` most likely belongs to.
+	 */
+	protected function _introspectType($value) {
+		switch (true) {
+			case (is_bool($value)):
+				return 'boolean';
+			case (is_float($value) || preg_match('/^\d+\.\d+/$')):
+				return 'float';
+			case (is_int($value) || preg_match('/^\d+/$')):
+				return 'integer';
+			case (is_string($value) && strlen($value) <= $this->_columns['string']['length']):
+				return 'string';
+			default:
+				return 'text';
+		}
+	}
+
+	/**
+	 * Casts a value which is being written or compared to a boolean-type database column.
+	 *
+	 * @param mixed $value A value of unknown type to be cast to boolean. Numeric values not equal
+	 *              to zero evaluate to `true`, otherwise `false`. String values equal to `'true'`,
+	 *              `'t'` or `'T'` evaluate to `true`, all others to `false`. In all other cases,
+	 *               uses PHP's default casting.
+	 * @return boolean Returns a boolean representation of `$value`, based on the comparison rules
+	 *         specified above. Database adapters may override this method if boolean type coercion
+	 *         is required and falls outside the rules defined.
+	 */
+	protected function _toBoolean($value) {
+		if (is_bool($value)) {
+			return $value;
+		}
+		if (is_int($value) || is_float($value)) {
+			return ($value !== 0);
+		}
+		if (is_string($value)) {
+			return ($value == 't' || $value == 'T' || $value == 'true');
+		}
+		return (bool) $value;
 	}
 }
 

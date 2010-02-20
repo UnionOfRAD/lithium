@@ -151,7 +151,7 @@ class MySql extends \lithium\data\source\Database {
 				preg_match('/(?P<type>\w+)(\((?P<length>\d+)\))?/', $column['Type'], $match);
 				$filtered = array_intersect_key($match, array('type' => null, 'length' => null));
 				$match = $filtered + array('length' => null);
-				// $match['type'] = $self->invokeMethod('_column', $match['type']);
+				$match = $self->invokeMethod('_column', array($match['type'])) + $match;
 
 				$fields[$column['Field']] = $match + array(
 					'null'     => ($column['Null'] == 'YES' ? true : false),
@@ -203,7 +203,19 @@ class MySql extends \lithium\data\source\Database {
 		return $result;
 	}
 
-	public function value($value) {
+	public function value($value, array $schema = array()) {
+		if ($value === null) {
+			return 'NULL';
+		}
+
+		switch ($type = isset($schema['type']) ? $schema['type'] : $this->_introspectType($value)) {
+			case 'boolean':
+				return $this->_toBoolean($value);
+			case 'float':
+				return floatval($value);
+			case 'integer':
+				return intval($value);
+		}
 		return "'" . mysql_real_escape_string($value, $this->_connection) . "'";
 	}
 
@@ -258,19 +270,19 @@ class MySql extends \lithium\data\source\Database {
 		$defaults = array('buffered' => true);
 		$options += $defaults;
 
-		$params = compact('sql', 'options');
 		$conn =& $this->_connection;
+		$params = compact('sql', 'options');
 
 		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use (&$conn) {
 			extract($params);
 			$func = ($options['buffered']) ? 'mysql_query' : 'mysql_unbuffered_query';
-			$resource = $func($sql, $conn);
+			$result = $func($sql, $conn);
 
-			if (!is_resource($resource)) {
+			if (!(is_resource($result) || $result === true)) {
 				list($code, $error) = $self->error();
-				throw new Exception("$sql: $error", $code);
+				throw new Exception("{$sql}: {$error}", $code);
 			}
-			return $resource;
+			return $result;
 		});
 	}
 
@@ -280,20 +292,34 @@ class MySql extends \lithium\data\source\Database {
 
 		while ($j < $numFields) {
 			$column = mysql_fetch_field($results, $j);
-
-			if (!empty($column->table)) {
-				$this->map[$index++] = array($column->table, $column->name);
-			} else {
-				$this->map[$index++] = array(0, $column->name);
-			}
+			$name = $column->name;
+			$table = $column->table;
+			$this->map[$index++] = empty($table) ? array(0, $name) : array($table, $name);
 			$j++;
+		}
+	}
+
+	/**
+	 * Gets the last auto-generated ID from the query that inserted a new record.
+	 *
+	 * @param object $query The `Query` object associated with the query which generated 
+	 * @return mixed Returns the last inserted ID key for an auto-increment column or a column
+	 *         bound to a sequence.
+	 */
+	protected function _insertId($query) {
+		$resource = $this->_execute('SELECT LAST_INSERT_ID() AS insertID');
+		list($id) = $this->result('next', $resource, null);
+		$this->result('close', $resource, null);
+
+		if (!empty($id) && $id !== '0') {
+			return $id;
 		}
 	}
 
 	/**
 	 * Converts database-layer column types to basic types.
 	 *
-	 * @param string $real Real database-layer column type (i.e. "varchar(255)")
+	 * @param string $real Real database-layer column type (i.e. `"varchar(255)"`)
 	 * @return string Abstract column type (i.e. "string")
 	 */
 	protected function _column($real) {

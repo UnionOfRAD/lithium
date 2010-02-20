@@ -38,6 +38,10 @@ class MockDatabase extends \lithium\data\source\Database {
 		}
 		return $ret;
 	}
+
+	protected function _execute($sql) {
+		return $sql;
+	}
 }
 
 ?>
