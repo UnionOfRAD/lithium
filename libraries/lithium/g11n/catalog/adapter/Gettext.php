@@ -9,7 +9,6 @@
 namespace lithium\g11n\catalog\adapter;
 
 use \Exception;
-use \lithium\util\Inflector;
 
 /**
  * The `Gettext` class is an adapter for reading and writing PO and MO files without the
@@ -141,7 +140,7 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 		}
 
 		if ($category == 'message') {
-			$category = Inflector::pluralize($category);
+			$category = 'messages';
 		}
 		$category = strtoupper($category);
 
