@@ -76,14 +76,6 @@ class AffectedTest extends \lithium\test\Unit {
 		$result = $tests->map('get_class', array('collect' => false));
 		$this->assertEqual($expected, $result);
 	}
-
-	public function testOutputWithEmptyAnalysis() {
-		$expected = "Additional Affected Tests\n-------------------------";
-
-		$result = Affected::output('text', array());
-
-		$this->assertEqual($expected, $result);
-	}
 }
 
 ?>
