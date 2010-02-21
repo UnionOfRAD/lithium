@@ -23,13 +23,11 @@ Dispatcher::applyFilter('_callable', function($self, $params, $chain) {
 			$filters = Libraries::locate('test.filter', null, array(
 				'exclude' => '/Base$/'
 			));
-			$classes = Libraries::locate('tests', null, array(
+			$menu = Libraries::locate('tests', null, array(
 				'filter' => '/cases|integration|functional/',
 				'exclude' => '/mocks/'
 			));
-			$menu = $report->reporter->menu($classes, array(
-				'request' => $request, 'tree' => true
-			));
+			sort($menu);
 
 			$result = compact('request', 'group', 'report', 'filters', 'classes', 'menu');
 
