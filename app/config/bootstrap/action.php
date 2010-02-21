@@ -7,9 +7,10 @@
  */
 
 /**
- * Welcome to the switchboard. This file contains a series of method filters that allow you to
- * intercept different parts of Lithium's request cycle as they happen.  You can apply filters to
- * any object method that has a `@filter` flag in its API documentation.
+ * This file contains a series of method filters that allow you to intercept different parts of
+ * Lithium's dispatch cycle. The filters below are used for on-demand loading of routing
+ * configuration, and automatically configuring the correct environment in which the application
+ * runs.
  *
  * For more information on in the filters system, see `lithium\util\collection\Filters`.
  *
@@ -27,7 +28,7 @@ use \lithium\action\Dispatcher;
  * @see lithium\net\http\Router
  */
 Dispatcher::applyFilter('run', function($self, $params, $chain) {
-	include __DIR__ . '/routes.php';
+	include __DIR__ . '/../routes.php';
 	return $chain->next($self, $params, $chain);
 });
 
