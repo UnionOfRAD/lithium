@@ -6,16 +6,29 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
+/**
+ * This file creates a default cache configuration using the most optimized adapter available, and
+ * uses it to provide default caching for high-overhead operations.
+ */
 use lithium\storage\Cache;
-use lithium\storage\cache\adapter\Apc;
 use lithium\core\Libraries;
 use lithium\action\Dispatcher;
+use lithium\storage\cache\adapter\Apc;
+
+$apcEnabled = Apc::enabled();
 
 Cache::config(array(
 	'default' => array(
-		'adapter' => '\lithium\storage\cache\adapter\\' . (Apc::enabled() ? 'Apc' : 'File')
+		'adapter' => '\lithium\storage\cache\adapter\\' . ($apcEnabled ? 'Apc' : 'File')
 	)
 ));
+
+/**
+ * If APC is not available and the cache directory is not writeable, bail out.
+ */
+if (!$apcEnabled && !is_writable(LITHIUM_APP_PATH . '/resources/tmp/cache')) {
+	return;
+}
 
 Dispatcher::applyFilter('run', function($self, $params, $chain) {
 	if ($cache = Cache::read('default', 'core.libraryCache')) {
