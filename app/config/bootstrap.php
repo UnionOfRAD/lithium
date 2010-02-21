@@ -41,6 +41,11 @@ if (!include LITHIUM_LIBRARY_PATH . '/lithium/core/Libraries.php') {
 require __DIR__ . '/bootstrap/libraries.php';
 
 /**
+ * Include this file if your application uses a database connection.
+ */
+// require __DIR__ . '/connections.php';
+
+/**
  * This file defines bindings between classes which are triggered during the request cycle, and
  * allow the framework to automatically configure its environmental settings. You can add your own
  * behavior and modify the dispatch cycle to suit your needs.

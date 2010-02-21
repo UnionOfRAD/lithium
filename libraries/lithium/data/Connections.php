@@ -14,15 +14,15 @@ use \lithium\core\Libraries;
 
 /**
  * The `Connections` class manages a list of named configurations that connect to external
- * resources. Connections are usually comprised of a type (i.e. `'Database'` or `'Http'`), a
- * reference to an adapter class (i.e. `'MySql'` or `'MongoDb'`), and authentication credentials.
+ * resources. Connections are usually comprised of a type (i.e. `'database'` or `'http'`), a
+ * reference to an adapter class (i.e. `'MySql'` or `'CouchDb'`), and authentication credentials.
  *
  * While connections can be added and removed dynamically during the course of your application
  * (using `Connections::add()`), it is most typical to define all connections at once, in
  * `app/config/connections.php`.
  *
- * `Connections` handles adapter classes efficiently by only loading adapter classes and creating
- * instances when they are requested (using `Connections::get()`).
+ * THe `Connections` class handles adapter classes efficiently by only loading adapter classes and
+ * creating instances when they are requested (using `Connections::get()`).
  *
  * Adapters are usually subclasses of `lithium\data\Source`.
  *
@@ -49,7 +49,8 @@ class Connections extends \lithium\core\Adaptable {
 	 *
 	 * For example:
 	 * {{{
-	 * Connections::add('default', 'database', array(
+	 * Connections::add('default', array(
+	 *     'type' => 'database',
 	 *     'adapter' => 'MySql',
 	 *     'host' => 'localhost',
 	 *     'login' => 'root',
@@ -61,36 +62,46 @@ class Connections extends \lithium\core\Adaptable {
 	 * or
 	 *
 	 * {{{
-	 * Connections::add('couch', 'http', array(
-	 *     'adapter' => 'Couch','host' => '127.0.0.1', 'port' => 5984
+	 * Connections::add('couch', array(
+	 * 	'type' => 'http', 'adapter' => 'CouchDb', 'host' => '127.0.0.1', 'port' => 5984
 	 * ));
+	 * }}}
+	 * or
+	 *
+	 * {{{
+	 * Connections::add('mongo', array('type' => 'MongoDb', 'database' => 'my_app'));
 	 * }}}
 	 *
 	 * @see lithium\data\Model::$_meta
 	 * @param string $name The name by which this connection is referenced. Use this name to
 	 *        retrieve the connection again using `Connections::get()`, or to bind a model to it
 	 *        using `Model::$_meta['connection']`.
-	 * @param string $type The type of data source that defines this connection; typically a class
-	 *        or name-space name. Relational database data sources, use `'database'`, while CouchDB
-	 *        and other HTTP-related data sources use `'http'`, etc. For classes which directly
-	 *        extend `lithium\data\Source`, and do not use an adapter, simply use the name of the
-	 *        class, i.e. `'MongoDb'`.
 	 * @param array $config Contains all additional configuration information used by the
 	 *        connection, including the name of the adapter class where applicable (i.e. `MySql`),
 	 *        the server name and port or socket to connect to, and (typically) the name of the
 	 *        database or other entity to use. Each adapter has its own specific configuration
 	 *        settings for handling things like connection persistence, data encoding, etc. See the
 	 *        individual adapter or data source class for more information on what configuration
-	 *        settings it supports.
+	 *        settings it supports. Basic / required options supported by most adapters:
+	 *        - `'type'` _string_: The type of data source that defines this connection; typically a
+	 *          class or namespace name. Relational database data sources, use `'database'`, while
+	 *          CouchDB and other HTTP-related data sources use `'http'`, etc. For classes which
+	 *          directly extend `lithium\data\Source`, and do not use an adapter, simply use the
+	 *          name of the class, i.e. `'MongoDb'`.
+	 *        - `'adapter'` _string_: For `type`s such as `'database'` which are adapter-driven,
+	 *          provides the name of the adapter associated with this configuration.
+	 *        - `'host'` _string_: The host name that the database should connect to. Typically
+	 *          defaults to `'localhost'`.
+	 *        - `'login'` _string_: If the connection requires authentication, specifies the login
+	 *          name to use.
+	 *        - `'password'` _string_: If the connection requires authentication, specifies the
+	 *          password to use.
 	 * @return array Returns the final post-processed connection information, as stored in the
 	 *         internal configuration array used by `Connections`.
 	 */
-	public static function add($name, $type = null, array $config = array()) {
-		if (is_array($type)) {
-			list($config, $type) = array($type, null);
-		}
+	public static function add($name, array $config = array()) {
 		$defaults = array(
-			'type'     => $type ?: 'database',
+			'type'     => 'database',
 			'adapter'  => null,
 			'host'     => 'localhost',
 			'login'    => '',
