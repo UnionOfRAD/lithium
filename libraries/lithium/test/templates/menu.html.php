@@ -31,7 +31,11 @@
 	<?php endwhile ?>
 
 	<?php while ($depth < $caseDepth-1): ?>
-		<li><a href="<?= $base ?>/test/<?= join(array_slice($path, 0, $depth+1), "\\") ?>"><?= $path[$depth] ?></a><ul>
+		<li>
+			<a href="<?= $base ?>/test/<?= join(array_slice($path, 0, $depth+1), "\\") ?>">
+				<?= $path[$depth] ?>
+			</a>
+			<ul>
 		<?php
 			array_push($prev, $current);
 			$current = $path[$depth];
