@@ -349,7 +349,7 @@ class Libraries {
 		$path = isset(static::$_cachedPaths[$class]) ? static::$_cachedPaths[$class] : null;
 		$path = $path ?: static::path($class);
 
-		if ($path && is_readable($path) && include $path) {
+		if ($path && @include $path) {
 			static::$_cachedPaths[$class] = $path;
 			method_exists($class, '__init') ? $class::__init() : null;
 		} elseif ($require) {
