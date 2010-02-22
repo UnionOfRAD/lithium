@@ -69,7 +69,7 @@ class Base extends \lithium\core\Object {
 	 * @return array The merged data.
 	 */
 	protected function _merge($data, $item) {
-		if (!isset($item['id'])) {
+		if (empty($item['id'])) {
 			return $data;
 		}
 		$id = $item['id'];
