@@ -40,6 +40,7 @@ use \Exception;
  *
  * @see lithium\g11n\Locale
  * @link http://php.net/setlocale
+ * @link http://www.gnu.org/software/gettext/manual/gettext.html
  */
 class Gettext extends \lithium\g11n\catalog\adapter\Base {
 
