@@ -180,57 +180,63 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	/**
 	 * Parses portable object (PO) format.
 	 *
+	 * This parser sacrifices some features of the reference implementation the
+	 * differences to that implementation are as follows.
+	 * - No support for comments spanning multiple lines.
+	 * - Translator and extracted comments are treated as being the same type.
+	 * - Message IDs are allowed to have other encodings as just US-ASCII.
+	 *
 	 * @param resource $stream
 	 * @return array
 	 */
 	protected function _parsePo($stream) {
 		$defaults = array(
 			'id' => null,
-			'ids' => array('singular' => null, 'plural' => null),
+			'ids' => array(),
 			'translated' => array(),
 			'flags' => array(),
 			'comments' => array(),
 			'occurrences' => array()
 		);
-		extract($defaults);
 		$data = array();
+		$item = $defaults;
 
 		while ($line = fgets($stream)) {
 			$line = trim($line);
 
 			if ($line === '') {
-				continue;
-			}
-
-			if (preg_match('/^#\,\s(\w+)$/', $line, $matches)) {
-				$flags[$matches[1]] = true;
-			} elseif (preg_match('/^#\.\s(.+)$/', $line, $matches)) {
-				$comments[] = $matches[1];
-			} elseif (preg_match('/^#\:\s(.+):([0-9]+)$/', $line, $matches)) {
-				$occurrences[] = array('file' => $matches[1], 'line' => $matches[2]);
-			} elseif (preg_match('/^msgid\s"(.+)"$/', $line, $matches)) {
-				if ($id) {
-					$data = $this->_merge($data, compact(
-						'id', 'ids', 'translated',
-						'flags', 'occurrences', 'comments'
-					));
-					extract($defaults, EXTR_OVERWRITE);
-				}
-				$id = $ids['singular'] = $matches[1];
-			} elseif (preg_match('/^msgid_plural\s"(.+)"$/', $line, $matches)) {
-				$ids['plural'] = $matches[1];
-			} elseif (preg_match('/^msgstr\s"(.+)"$/', $line, $matches)) {
-				$translated[0] = $matches[1];
-			} elseif (preg_match('/^msgstr\[(\d+)\]\s"(.+)"$/', $line, $matches)) {
-				$translated[$matches[1]] = $matches[2];
-			} elseif ($translated && preg_match('/^"(.+)"$/', $line, $matches)) {
-				$translated[key($translated)] .= $matches[1];
+				$data = $this->_merge($data, $item);
+				$item = $defaults;
+			} elseif (substr($line, 0, 3) === '#~ ') {
+				$item['flags']['obsolete'] = true;
+			} elseif (substr($line, 0, 3) === '#, ') {
+				$item['flags'][substr($line, 3)] = true;
+			} elseif (substr($line, 0, 3) === '#: ') {
+				$item['occurrences'][] = array(
+					'file' => strtok(substr($line, 3), ':'),
+					'line' => strtok(':')
+				);
+			} elseif (substr($line, 0, 3) === '#. ') {
+				$item['comments'][] = substr($line, 3);
+			} elseif ($line[0] === '#') {
+				$item['comments'][] = ltrim(substr($line, 1));
+			} elseif (substr($line, 0, 7) === 'msgid "') {
+				$item['ids']['singular'] = substr($line, 7, -1);
+			} elseif (substr($line, 0, 9) === 'msgctxt "') {
+				$item['context'] = substr($line, 9, -1);
+			} elseif (substr($line, 0, 8) === 'msgstr "') {
+				$item['translated'][0] = substr($line, 8, -1);
+			} elseif ($line[0] === '"') {
+				$continues = $item['translated'] ? 'translated' : 'ids';
+				end($item[$continues]);
+				$item[$continues][key($item[$continues])] .= substr($line, 1, -1);
+			} elseif (substr($line, 0, 14) === 'msgid_plural "') {
+				$item['ids']['plural'] = substr($line, 14, -1);
+			} elseif (substr($line, 0, 7) === 'msgstr[') {
+				$item['translated'][(integer) substr($line, 7, 1)] = substr($line, 11, -1);
 			}
 		}
-		return $this->_merge($data, compact(
-			'id', 'ids', 'translated',
-			'flags', 'occurrences', 'comments'
-		));
+		return $this->_merge($data, $item);
 	}
 
 	/**
@@ -311,7 +317,6 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 			$translated = explode("\000", $translated);
 
 			$data = $this->_merge($data, array(
-				'id' => $singularId,
 				'ids' => array('singular' => $singularId, 'plural' => $pluralId),
 				'translated' => $translated
 			));
@@ -470,12 +475,15 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 			$value = ctype_space($value) ? null : $value;
 			return $value;
 		};
-		$fields = array('id', 'ids', 'translated');
+		$fields = array('ids', 'translated');
 
 		foreach ($fields as $field) {
 			if (isset($item[$field])) {
 				$item[$field] = $filter($item[$field]);
 			}
+		}
+		if (isset($item['ids']['singular'])) {
+			$item['id'] = $item['ids']['singular'];
 		}
         return parent::_merge($data, $item);
     }
