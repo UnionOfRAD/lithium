@@ -363,6 +363,7 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 		$output[] = '"MIME-Version: 1.0\n"';
 		$output[] = '"Content-Type: text/plain; charset=CHARSET\n"';
 		$output[] = '"Content-Transfer-Encoding: 8bit\n"';
+		$output[] = '"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"';
 		$output[] = '';
 		$output = implode("\n", $output) . "\n";
 		fwrite($stream, $output);
