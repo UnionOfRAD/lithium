@@ -15,22 +15,22 @@ use \InvalidArgumentException;
  * Validator provies static access to commonly used data validation logic. These common routines
  * cover HTML form input data such as phone and credit card numbers, dates and postal codes, but
  * also include general checks for regular expressions and booleans and numericality.
- * 
- * General data checking is done by using Validator statically. Rules can be specified as a 
+ *
+ * General data checking is done by using Validator statically. Rules can be specified as a
  * parameter to the check() method or automatically accessed via the is[RuleName]() method name
  * convention:
- * 
+ *
  * {{{
  * use \lithium\util\Validator;
- * 
+ *
  * Validator::rule('email', 'foo@example.com');  // true
  * Validator::isEmail('foo-at-example.com');     // false
  * }}}
- * 
+ *
  * Data can also be validated against multiple rules, each having its own associated error
- * message. The rule structure is array-based and hierarchical based on rule names and 
- * messages. Resposes match 
- * 
+ * message. The rule structure is array-based and hierarchical based on rule names and
+ * messages. Resposes match
+ *
  * {{{
  * $rules = array(
  * 	'title' => 'please enter a title',
@@ -41,16 +41,16 @@ use \InvalidArgumentException;
  * );
  * $data = array('email' => 'foo');
  * Validator::check($data, $rules);
- * 
+ *
  * //result:
- * 
+ *
  * array(
  * 		'title' => array('please enter a title'),
  *		'email' => array('email is not valid')
- * ); 
- * 
+ * );
+ *
  * }}}
- * 
+ *
  * Custom validation rules can also be added to Validator at runtime. These can either take the
  * form of regex strings or functions supplied to the add() method.
  *
@@ -70,7 +70,6 @@ class Validator extends \lithium\core\StaticObject {
 	protected static $_rules = array();
 
 	protected static $_options = array(
-		'ip' => array('contains' => false),
 		'defaults' => array('contains' => true)
 	);
 
@@ -144,10 +143,10 @@ class Validator extends \lithium\core\StaticObject {
 				'my'       => '%^(((0[123456789]|10|11|12)([- /.])(([1][9][0-9][0-9])|([2][0-9]' .
 				              '[0-9][0-9]))))$%'
 			),
-			'hostname'     => '(?:[a-z0-9][-a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.' .
-			                  '(?:(?:[a-z]{2}\.)?[a-z]{2,4}|museum|travel)',
-			'ip'           => '(?:(?:25[0-5]|2[0-4][0-9]|(?:(?:1[0-9])?|[1-9]?)[0-9])\.){3}' .
-			                  '(?:25[0-5]|2[0-4][0-9]|(?:(?:1[0-9])?|[1-9]?)[0-9])',
+			'ip' => function($value, $format = null, array $options = array()) {
+				$options += array('flags' => array());
+				return (boolean) filter_var($value, FILTER_VALIDATE_IP, array('flags' => $options['flags']));
+			},
 			'money'        => array(
 				'right'    => '/^(?!0,?\d)(?:\d{1,3}(?:([, .])\d{3})?(?:\1\d{3})*|(?:\d+))' .
 				              '((?!\1)[,.]\d{2})?(?<!\x{00a2})\p{Sc}?$/u',
@@ -161,15 +160,18 @@ class Validator extends \lithium\core\StaticObject {
 			'time'         => '%^((0?[1-9]|1[012])(:[0-5]\d){0,2}([AP]M|[ap]m))$|^([01]\d|2[0-3])' .
 			                  '(:[0-5]\d){0,2}$%',
 			'boolean' => function($value) {
-				return in_array($value, array(0, 1, '0', '1', true, false), true);
+				$bool = is_bool($value);
+				return ($bool || filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null);
 			},
 			'decimal' => function($value, $format = null, array $options = array()) {
-				$defaults = array('precision' => null);
-				$options += $defaults;
+				if (isset($options['precision'])) {
+					$precision = strlen($value) - strrpos($value, '.') - 1;
 
-				$precision = '+(?:[eE][-+]?[0-9]+)?';
-				$precision = $options['precision'] ? '{' . $options['precision'] . '}' : $precision;
-				return (boolean) preg_match("/^[-+]?[0-9]*\\.{1}[0-9]{$precision}$/", (string) $value);
+					if ($precision !== (int) $options['precision']) {
+						return false;
+					}
+				}
+				return (boolean) filter_var($value, FILTER_VALIDATE_FLOAT);
 			},
 			'inList' => function($value, $format, $options) {
 				$options += array('list' => array());
@@ -216,21 +218,14 @@ class Validator extends \lithium\core\StaticObject {
 				}
 				return is_finite($value);
 			},
-			'uuid' => "/{$alnum}{8}-{$alnum}{4}-{$alnum}{4}-{$alnum}{4}-{$alnum}{12}/"
-		);
-
-		static::$_rules['email'] = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`';
-		static::$_rules['email'] .= '{|}~-]+)*@' . static::$_rules['hostname'] . '$/i';
-
-		$urlChars = '([' . preg_quote('!"$&\'()*+,-.@_:;=') . '\/0-9a-z]|(%[0-9a-f]{2}))';
-		$url = '/^(?:(?:https?|ftps?|file|news|gopher):\/\/)__strict__';
-		$url .=  '(?:' . static::$_rules['ip'] . '|' . static::$_rules['hostname'] . ')';
-		$url .= '(?::[1-9][0-9]{0,3})?(?:\/?|\/' . $urlChars . '*)?(?:\?' . $urlChars . '*)?';
-		$url .= '(?:#' . $urlChars . '*)?$/i';
-
-		static::$_rules['url'] = array(
-			'strict' => str_replace('__strict__', '', $url),
-			'loose' =>  str_replace('__strict__', '?', $url)
+			'uuid' => "/{$alnum}{8}-{$alnum}{4}-{$alnum}{4}-{$alnum}{4}-{$alnum}{12}/",
+			'email' => function($value) {
+				return filter_var($value, FILTER_VALIDATE_EMAIL);
+			},
+			'url' => function($value, $format = null, array $options = array()) {
+				$options += array('flags' => array());
+				return (boolean) filter_var($value, FILTER_VALIDATE_URL, array('flags' => $options['flags']));
+			}
 		);
 
 		$emptyCheck = function($self, $params, $chain) {
@@ -254,10 +249,8 @@ class Validator extends \lithium\core\StaticObject {
 			return $options['deep'] ? Validator::isLuhn($value) : true;
 		});
 
-		$host = static::$_rules['hostname'];
-
 		static::$_methodFilters[$class]['email'] = array(
-			function($self, $params, $chain) use ($host) {
+			function($self, $params, $chain) {
 				extract($params);
 				$defaults = array('deep' => false);
 				$options += $defaults;
@@ -268,11 +261,10 @@ class Validator extends \lithium\core\StaticObject {
 				if (!$options['deep']) {
 					return true;
 				}
+				list($prefix, $host) = explode('@', $params['value']);
 
-				if (preg_match('/@(' . $host . ')$/i', $value, $regs)) {
-					if (getmxrr($regs[1], $mxhosts)) {
-						return is_array($mxhosts);
-					}
+				if (getmxrr($host, $mxhosts)) {
+					return is_array($mxhosts);
 				}
 				return false;
 			}
