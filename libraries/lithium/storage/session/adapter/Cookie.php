@@ -76,15 +76,20 @@ class Cookie extends \lithium\core\Object {
 	/**
 	 * Read value from the session
 	 *
-	 * @param string $key Key of the entry to be read
+	 * @param null|string $key Key of the entry to be read. If $key is null, returns
+	 *        all cookie key/value pairs that have been set.
 	 * @param array $options Options array
 	 * @return mixed Data in the session if successful, false otherwise
 	 */
-	public function read($key, array $options = array()) {
+	public function read($key = null, array $options = array()) {
 		$config = $options + $this->_config;
 
 		return function($self, $params, $chain) use (&$config) {
 			extract($params);
+
+			if (!$key) {
+				return $_COOKIE;
+			}
 			if (!isset($_COOKIE[$key])) {
 				return null;
 			}

@@ -133,14 +133,19 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertIdentical($value, $result);
 
 		$key = 'non-existent';
-
 		$closure = $this->Php->read($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
 		$result = $closure($this->Php, $params, null);
-
 		$this->assertNull($result);
+
+		$closure = $this->Php->read();
+		$this->assertTrue(is_callable($closure));
+
+		$result = $closure($this->Php, array('key' => null), null);
+		$expected = array('read_test' => 'value to be read', '_timestamp' => time());
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testDelete() {

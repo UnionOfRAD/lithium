@@ -97,10 +97,6 @@ class CookieTest extends \lithium\test\Unit {
 		$this->assertCookie(compact('key', 'value', 'expires', 'path'), headers_list());
 	}
 
-	public function testWriteArrayOfValues() {
-
-	}
-
 	public function testRead() {
 		$key = 'read';
 		$value = 'value to be read';
@@ -113,13 +109,15 @@ class CookieTest extends \lithium\test\Unit {
 		$result = $closure($this->Cookie, $params, null);
 		$this->assertEqual($value, $result);
 
+		$result = $closure($this->Cookie, array('key' => null), null);
+		$this->assertEqual($_COOKIE, $result);
+
 		$key = 'does_not_exist';
 		$closure = $this->Cookie->read($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
 		$result = $closure($this->Cookie, $params, null);
-
 		$this->assertNull($result);
 	}
 

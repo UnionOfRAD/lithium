@@ -87,13 +87,18 @@ class Php extends \lithium\core\Object {
 	/**
 	 * Read value from the session
 	 *
-	 * @param string $key Key of the entry to be read
+	 * @param null|string $key Key of the entry to be read. If no key is passed, all
+	 *        current session data is returned.
 	 * @param array $options Options array
 	 * @return mixed Data in the session if successful, false otherwise
 	 */
-	public function read($key, array $options = array()) {
+	public function read($key = null, array $options = array()) {
 		return function($self, $params, $chain) {
 			extract($params);
+
+			if (!$key) {
+				return $_SESSION;
+			}
 			return isset($_SESSION[$key]) ? $_SESSION[$key] : null;
 		};
 	}
