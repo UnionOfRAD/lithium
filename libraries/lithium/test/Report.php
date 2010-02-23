@@ -183,11 +183,19 @@ class Report extends \lithium\core\Object {
 			return $stats;
 		});
 
+		$stats = (array) $stats + array(
+			'asserts' => null,
+			'passes' => array(),
+			'fails' => array(),
+			'errors' => array(),
+			'exceptions' => array(),
+			'skips' => array()
+		);
 		$count = array_map(
 			function($value) { return is_array($value) ? count($value) : $value; },
 			$stats
 		);
-		$success = $count['passes'] === $count['asserts'] && $count['errors'] === 0;
+		$success = $count['passes'] == $count['asserts'] && $count['errors'] === 0;
 
 		return compact("stats", "count", "success");
 	}

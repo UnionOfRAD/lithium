@@ -33,6 +33,47 @@ body.test-dashboard h1 {
 	background: #B5B4A4;
 }
 
+a.test-button, a.test-button:link, a.test-button:visited, a.test-button:hover, a.test-button:active {
+	display: block;
+	margin: 8px 0 15px 0;
+	padding: 8px 10px;
+	border: 2px solid #000000;
+	font-family: Helvetica, Arial, sans-serif;
+	font-weight: bold;
+	font-size: 16px;
+	background-color:#B5B4a4;
+	border-color: #009933;
+	border-radius: 5px;
+	text-align: center;
+	text-decoration: none;
+}
+
+a.test-button:hover, a.test-button:active {
+	background-color: #33CC66;
+}
+
+ul.menu, ul.menu ul {
+	list-style: none;
+}
+
+ul.menu ul {
+	padding-left: 10px;
+}
+
+ul.menu a {
+	text-decoration: none;
+}
+
+ul.menu a:hover, ul.menu a:active {
+	color: #009933;
+}
+
+a.menu-folder {
+	font-weight: bold;
+	text-decoration: none;
+	border-bottom: 1px dashed #ccc;
+}
+
 /*--- Benchmarking ---*/
 table.metrics {
 	border: 0;

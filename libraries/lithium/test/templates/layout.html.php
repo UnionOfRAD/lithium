@@ -14,7 +14,8 @@
 		<h1>Lithium Unit Test Dashboard</h1>
 
 		<div style="float: left; padding: 10px 0 20px 20px; width: 20%;">
-			<h2><a href="<?= $base ?>/test/">Tests</a></h2>
+			<h2>Select Test(s):</h2>
+			<a class="test-button" href="<?= $base ?>/test/lithium/tests">Run All Tests</a>
 			<?= $report->render("menu", array("menu" => $menu, "base" => $base)) ?>
 		</div>
 

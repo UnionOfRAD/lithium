@@ -3,7 +3,6 @@
 	$prev = array();
 	$current = null;
 ?>
-<ul><li><a href="<?= $base ?>/test/lithium/tests">Run All Tests</a></li>
 <?php foreach ($menu as $test): ?>
 	<?php
 		$case = array_pop($path = explode("\\", $test));
@@ -11,7 +10,7 @@
 	?>
 
 	<?php if (!isset($current)): ?>
-		<ul>
+		<ul class="menu">
 	<?php endif ?>
 
 	<?php while ($depth >= $caseDepth): ?>
@@ -32,7 +31,7 @@
 
 	<?php while ($depth < $caseDepth-1): ?>
 		<li>
-			<a href="<?= $base ?>/test/<?= join(array_slice($path, 0, $depth+1), "\\") ?>">
+			<a class="menu-folder" href="<?= $base ?>/test/<?= join(array_slice($path, 0, $depth+1), "\\") ?>">
 				<?= $path[$depth] ?>
 			</a>
 			<ul>
@@ -47,7 +46,7 @@
 
 <?php endforeach ?>
 
-<?php while($depth > 0): ?>
+<?php while($depth > 1): ?>
 	</li></ul>
 	<?php $depth--; ?>
 <?php endwhile ?>
