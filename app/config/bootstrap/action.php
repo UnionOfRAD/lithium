@@ -17,18 +17,29 @@
  * @see lithium\util\collection\Filters
  */
 
+use \lithium\core\Libraries;
 use \lithium\net\http\Router;
 use \lithium\core\Environment;
 use \lithium\action\Dispatcher;
 
 /**
- * Loads application routes before the request is dispatched.  Change this to `include_once` if
- * more than one request cycle is executed per HTTP request.
+ * This filter loads all application routes in all plugins, loading the default application routes
+ * last. Change this code if plugin routes must be loaded in a specific order, or if application
+ * routes must be loaded first (in which case the catch-all routes should be removed). If
+ * `Dispatcher::run()` is called multiple times in the course of a single request, change the
+ * `include`s to `include_once`.
  *
  * @see lithium\net\http\Router
  */
 Dispatcher::applyFilter('run', function($self, $params, $chain) {
-	include __DIR__ . '/../routes.php';
+	foreach (Libraries::get() as $name => $config) {
+		if ($config['default']) {
+			continue;
+		}
+		$file = "{$config['path']}/config/routes.php";
+		file_exists($file) ? include $file : null;
+	}
+	include LITHIUM_APP_PATH . '/config/routes.php';
 	return $chain->next($self, $params, $chain);
 });
 

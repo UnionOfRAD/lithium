@@ -83,10 +83,6 @@ class Libraries {
 			'{:root}/libraries/{:name}'
 		),
 		'models' => '{:library}\models\{:name}',
-		'plugins' => array(
-			'{:app}/libraries/plugins/{:name}',
-			'{:root}/libraries/plugins/{:name}'
-		),
 		'test' => array(
 			'{:library}\extensions\test\{:namespace}\{:class}\{:name}',
 			'{:library}\test\{:namespace}\{:class}\{:name}' => array('libraries' => 'lithium')
@@ -194,7 +190,7 @@ class Libraries {
 	 *          which receives the class name as a parameter, and returns a file path as output.
 	 * @return array Returns the resulting set of options created for this library.
 	 */
-	public static function add($name, $config = array()) {
+	public static function add($name, array $config = array()) {
 		$defaults = array(
 			'path' => null,
 			'prefix' => $name . "\\",
@@ -202,30 +198,32 @@ class Libraries {
 			'loader' => null,
 			'includePath' => false,
 			'transform' => null,
-			'bootstrap' => null,
+			'bootstrap' => true,
 			'defer' => false,
 			'default' => false
 		);
 
-		if ($name == 'lithium') {
-			$defaults['path'] = LITHIUM_LIBRARY_PATH . '/lithium';
-			$defaults['loader'] = 'lithium\core\Libraries::load';
+		if ($name === 'lithium') {
 			$defaults['defer'] = true;
-		} elseif ($name == 'plugin') {
-			return static::_addPlugins((array) $config);
+			$defaults['bootstrap'] = false;
+			$defaults['path'] = dirname(__DIR__);
+			$defaults['loader'] = 'lithium\core\Libraries::load';
 		}
-		$config = (array) $config + $defaults;
 
-		if ($config['default']) {
+		if (isset($config['default']) && $config['default']) {
 			static::$_default = $name;
-			$config['path'] = $config['path'] ?: LITHIUM_APP_PATH;
+			$defaults['path'] = LITHIUM_APP_PATH;
+			$defaults['bootstrap'] = false;
+		}
+		$config += $defaults;
+
+		if (!$config['path']) {
+			$config['path'] = static::_locatePath('libraries', compact('name') + array(
+				'app' => LITHIUM_APP_PATH, 'root' => LITHIUM_LIBRARY_PATH
+			));
 		}
 
-		if ($config['path']) {
-			$config['path'] = str_replace('\\', '/', $config['path']);
-		} else {
-			$config['path'] = static::locate('libraries', $name);
-		}
+		$config['path'] = str_replace('\\', '/', $config['path']);
 		static::$_configurations[$name] = $config;
 
 		if ($config['includePath']) {
@@ -233,10 +231,11 @@ class Libraries {
 			set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 		}
 
-		if (!empty($config['bootstrap'])) {
-			if ($config['bootstrap'] === true) {
-				$config['bootstrap'] = 'config/bootstrap.php';
-			}
+		if ($config['bootstrap'] === true) {
+			$path = "{$config['path']}/config/bootstrap.php";
+			$config['bootstrap'] = file_exists($path) ? '/config/bootstrap.php' : false;
+		}
+		if ($config['bootstrap']) {
 			require "{$config['path']}/{$config['bootstrap']}";
 		}
 
@@ -685,7 +684,7 @@ class Libraries {
 		if ($exclude = $options['exclude']) {
 			if (is_string($exclude)) {
 				$libs = preg_grep($exclude, $libs, PREG_GREP_INVERT);
-			} else if (is_callable($exclude)){
+			} elseif (is_callable($exclude)) {
 				$libs = array_values(array_filter($libs, $exclude));
 			}
 		}
@@ -697,43 +696,6 @@ class Libraries {
 			}
 		}
 		return $libs;
-	}
-
-	/**
-	 * Register a Lithium plugin.
-	 *
-	 * @param string $plugins
-	 * @param string $options
-	 * @return void
-	 */
-	protected static function _addPlugins($plugins) {
-		$defaults = array('bootstrap' => null, 'route' => true, 'path' => null);
-		$params = array('app' => LITHIUM_APP_PATH, 'root' => LITHIUM_LIBRARY_PATH);
-		$result = array();
-
-		foreach ($plugins as $name => $options) {
-			if (is_int($name)) {
-				$name = $options;
-				$options = array();
-			}
-			$options += $defaults;
-
-			if ($options['path'] === null) {
-				$options['path'] = static::_locatePath('plugins', compact('name') + $params);
-			}
-			if ($options['bootstrap'] === null) {
-				$options['bootstrap'] = file_exists($options['path'] . '/config/bootstrap.php');
-			}
-			$plugin = static::add($name, $options);
-
-			if ($plugin['route']) {
-				$defaultRoutes = $plugin['path'] . '/config/routes.php';
-				$route = ($plugin['route'] === true) ? $defaultRoutes : $plugin['route'];
-				!file_exists($route) ?: include $route;
-			}
-			$result[$name] = $plugin;
-		}
-		return $result;
 	}
 
 	/**
