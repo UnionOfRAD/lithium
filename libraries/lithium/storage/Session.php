@@ -85,8 +85,8 @@ class Session extends \lithium\core\Adaptable {
 	 * Reads a value from a persistent session store.
 	 *
 	 * @param string $key Key to be read
-	 * @param array $options Optional parameters that this method accepts
-	 * @return mixed Read result on successful session read, null otherwise
+	 * @param array $options Optional parameters that this method accepts.
+	 * @return mixed Read result on successful session read, null otherwise.
 	 */
 	public static function read($key, array $options = array()) {
 		$defaults = array('name' => null);
@@ -114,8 +114,8 @@ class Session extends \lithium\core\Adaptable {
 	 *
 	 * @param string $key Key to be read
 	 * @param mixed $value Data to be stored
-	 * @param array $options Optional parameters that this method accepts
-	 * @return boolean True on successful write, false otherwise
+	 * @param array $options Optional parameters that this method accepts.
+	 * @return boolean True on successful write, false otherwise.
 	 */
 	public static function write($key, $value = null, array $options = array()) {
 		$defaults = array('name' => null);
@@ -151,8 +151,8 @@ class Session extends \lithium\core\Adaptable {
 	 * Deletes a named key from a single adapter (if a `'name'` option is specified) or all
 	 * session adapters.
 	 *
-	 * @param string $key The name of the session key to delete
-	 * @param array $options
+	 * @param string $key The name of the session key to delete.
+	 * @param array $options Optional parameters that this method accepts.
 	 * @return void
 	 */
 	public static function delete($key, array $options = array()) {
@@ -186,7 +186,7 @@ class Session extends \lithium\core\Adaptable {
 	 * specified (via `'name'` in `$options`), only that configuration is checked.
 	 *
 	 * @param string $key The session key to check.
-	 * @param array $options
+	 * @param array $options Optional parameters that this method accepts.
 	 * @return boolean
 	 */
 	public static function check($key, array $options = array()) {
@@ -204,6 +204,13 @@ class Session extends \lithium\core\Adaptable {
 		return false;
 	}
 
+	/**
+	 * Returns the adapter object instance of the named configuration.
+	 *
+	 * @param null|string $name Named configuration. If not set, the last configured
+	 *        adapter object instance will be returned.
+	 * @return object Adapter instance.
+	 */
 	public static function adapter($name = null) {
 		if (empty($name)) {
 			if (!$names = array_keys(static::$_configurations)) {
