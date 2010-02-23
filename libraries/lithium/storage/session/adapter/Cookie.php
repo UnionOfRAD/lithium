@@ -35,10 +35,9 @@ class Cookie extends \lithium\core\Object {
 	/**
 	 * Class constructor.
 	 *
-	 * Takes care of setting appropriate configurations for
-	 * this object.
+	 * Takes care of setting appropriate configurations for this object.
 	 *
-	 * @param array $config
+	 * @param array $config Optional configuration parameters.
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
@@ -65,56 +64,51 @@ class Cookie extends \lithium\core\Object {
 	}
 
 	/**
-	 * Obtain the status of the session
+	 * Obtain the status of the session.
 	 *
-	 * @return boolean True if $_COOKIE has been initialized, false otherwise
+	 * @return boolean True if $_COOKIE has been initialized, false otherwise.
 	 */
 	public function isStarted() {
 		return (isset($_COOKIE));
 	}
 
 	/**
-	 * Read value from the session
+	 * Read a value from the cookie.
 	 *
 	 * @param null|string $key Key of the entry to be read. If $key is null, returns
 	 *        all cookie key/value pairs that have been set.
-	 * @param array $options Options array
-	 * @return mixed Data in the session if successful, false otherwise
+	 * @return mixed Data in the session if successful, null otherwise.
 	 */
-	public function read($key = null, array $options = array()) {
-		$config = $options + $this->_config;
-
-		return function($self, $params, $chain) use (&$config) {
-			extract($params);
-
+	public function read($key = null) {
+		return function($self, $params, $chain) {
+			$key = $params['key'];
 			if (!$key) {
 				return $_COOKIE;
 			}
-			if (!isset($_COOKIE[$key])) {
-				return null;
-			}
-			return $_COOKIE[$key];
+			return (isset($_COOKIE[$key])) ? $_COOKIE[$key] : null;
 		};
 	}
 
 	/**
-	 * Write value to the session
+	 * Write a value to the cookie store.
 	 *
-	 * @param string $key Key of the item to be stored
-	 * @param mixed $value The value to be stored
-	 * @param array $options Options array
-	 * @return boolean True on successful write, false otherwise
+	 * @param string $key Key of the item to be stored.
+	 * @param mixed $value The value to be stored.
+	 * @param array $options Options array.
+	 * @return boolean True on successful write, false otherwise.
 	 */
 	public function write($key, $value = null, array $options = array()) {
-		if (!isset($options['expire']) && empty($this->_config['expire'])
-				&& $key != $this->_config['name']) {
+		$expire = !isset($options['expire']) && empty($this->_config['expire']);
+
+		if ($expire && $key != $this->_config['name']) {
 			return null;
 		}
 		$config = $options + $this->_config;
 		$expires = (isset($options['expire'])) ? $options['expire'] : $config['expire'];
 
 		return function($self, $params, $chain) use (&$config, &$expires) {
-			extract($params);
+			$key = $params['key'];
+			$value = $params['value'];
 			$key = is_array($key) ? Set::flatten($key) : array($key => $value);
 
 			foreach ($key as $name => $val) {
@@ -134,17 +128,17 @@ class Cookie extends \lithium\core\Object {
 	}
 
 	/**
-	 * Delete value from the cookie
+	 * Delete a value from the cookie store.
 	 *
-	 * @param string $key The key to be deleted
-	 * @param array $options Options array
-	 * @return boolean True on successful delete, false otherwise
+	 * @param string $key The key to be deleted from the cookie store.
+	 * @param array $options Options array.
+	 * @return boolean True on successful delete, false otherwise.
 	 */
 	public function delete($key, array $options = array()) {
 		$config = $options + $this->_config;
 
 		return function($self, $params, $chain) use (&$config) {
-			extract($params);
+			$key = $params['key'];
 			$key = is_array($key) ? Set::flatten($key) : array($key);
 
 			foreach ($key as $name) {

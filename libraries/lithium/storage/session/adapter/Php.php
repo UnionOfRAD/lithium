@@ -66,17 +66,17 @@ class Php extends \lithium\core\Object {
 	}
 
 	/**
-	 * Obtain the status of the session
+	 * Obtain the status of the session.
 	 *
 	 * @return boolean True if $_SESSION is accessible and if a '_timestamp' key
-	 *                 has been set, false otherwise.
+	 *         has been set, false otherwise.
 	 */
 	public function isStarted() {
 		return (isset($_SESSION) && isset($_SESSION['_timestamp']));
 	}
 
 	/**
-	 * Obtain the session id
+	 * Obtain the session id.
 	 *
 	 * @return mixed Session id, or null if the session has not been started.
 	 */
@@ -85,16 +85,16 @@ class Php extends \lithium\core\Object {
 	}
 
 	/**
-	 * Read value from the session
+	 * Read a value from the session.
 	 *
 	 * @param null|string $key Key of the entry to be read. If no key is passed, all
 	 *        current session data is returned.
-	 * @param array $options Options array
-	 * @return mixed Data in the session if successful, false otherwise
+	 * @param array $options Options array. Not used for this adapter method.
+	 * @return mixed Data in the session if successful, false otherwise.
 	 */
 	public function read($key = null, array $options = array()) {
 		return function($self, $params, $chain) {
-			extract($params);
+			$key = $params['key'];
 
 			if (!$key) {
 				return $_SESSION;
@@ -104,17 +104,16 @@ class Php extends \lithium\core\Object {
 	}
 
 	/**
-	 * Write value to the session
+	 * Write a value to the session.
 	 *
-	 * @param string $key Key of the item to be stored
-	 * @param mixed $value The value to be stored
-	 * @param array $options Options array
+	 * @param string $key Key of the item to be stored.
+	 * @param mixed $value The value to be stored.
+	 * @param array $options Options array. Not used for this adapter method.
 	 * @return boolean True on successful write, false otherwise
 	 */
 	public static function write($key, $value, array $options = array()) {
 		return function($self, $params, $chain) {
-			extract($params);
-			$_SESSION[$key] = $value;
+			$_SESSION[$params['key']] = $params['value'];
 		};
 	}
 
@@ -122,26 +121,25 @@ class Php extends \lithium\core\Object {
 	 * Delete value from the session
 	 *
 	 * @param string $key The key to be deleted
-	 * @param array $options Options array
+	 * @param array $options Options array. Not used for this adapter method.
 	 * @return boolean True on successful delete, false otherwise
 	 */
 	public static function delete($key, array $options = array()) {
 		return function($self, $params, $chain) {
-			extract($params);
+			$key = $params['key'];
 
 			if (isset($_SESSION[$key])) {
 				unset($_SESSION[$key]);
 				return true;
-			} else {
-				return false;
 			}
+			return false;
 		};
 	}
 
 	/**
 	 * Determines if PHP sessions are enabled.
 	 *
-	 * return boolean True if enabled, false otherwise
+	 * return boolean True if enabled (that is, if session_id() returns a value), false otherwise.
 	 */
 	public static function enabled() {
 		return (boolean) session_id();

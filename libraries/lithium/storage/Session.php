@@ -48,10 +48,10 @@ class Session extends \lithium\core\Adaptable {
 	protected static $_adapters = 'adapter.storage.session';
 
 	/**
-	 * Returns key to be used in session read, write and delete operations
+	 * Returns key used to identify the session.
 	 *
-	 * @param mixed $name Named session configuration
-	 * @return string Value of key
+	 * @param mixed $name Named session configuration.
+	 * @return null|string Value of key, or `null` if no named configuration exists.
 	 */
 	public static function key($name = null) {
 		return is_object($adapter = static::adapter($name)) ? $adapter->key() : null;
@@ -61,7 +61,7 @@ class Session extends \lithium\core\Adaptable {
 	 * Indicates whether the the current request includes information on a previously started
 	 * session.
 	 *
-	 * @param string $name
+	 * @param string $name Named session configuration.
 	 * @return boolean Returns true if a the request includes a key from a previously created
 	 *         session.
 	 */
@@ -74,7 +74,7 @@ class Session extends \lithium\core\Adaptable {
 	 * comparing the session start time to the expiration time set in the configuration, and any
 	 * security settings.
 	 *
-	 * @param string $name
+	 * @param string $name Named session configuration.
 	 * @return boolean Returns true if the current session is active and valid.
 	 */
 	public static function isValid($name = null) {
