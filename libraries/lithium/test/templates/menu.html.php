@@ -31,8 +31,8 @@
 
 	<?php while ($depth < $caseDepth-1): ?>
 		<li>
-			<a class="menu-folder" href="<?= $base ?>/test/<?= join(array_slice($path, 0, $depth+1), "\\") ?>">
-				<?= $path[$depth] ?>
+			<a class="menu-folder" href="<?php echo $base ?>/test/<?php echo join(array_slice($path, 0, $depth+1), "\\") ?>">
+				<?php echo $path[$depth] ?>
 			</a>
 			<ul>
 		<?php
@@ -42,7 +42,7 @@
 		?>
 	<?php endwhile ?>
 
-	<li><a href="<?= $base ?>/test/<?= join($path, "\\") ?>"><?= $case ?></a></li>
+	<li><a href="<?php echo $base ?>/test/<?php echo join($path, "\\") ?>"><?php echo $case ?></a></li>
 
 <?php endforeach ?>
 

@@ -15,8 +15,8 @@
 
 		<div style="float: left; padding: 10px 0 20px 20px; width: 20%;">
 			<h2>Select Test(s):</h2>
-			<a class="test-button" href="<?= $base ?>/test/lithium/tests">Run All Tests</a>
-			<?= $report->render("menu", array("menu" => $menu, "base" => $base)) ?>
+			<a class="test-button" href="<?php echo $base ?>/test/lithium/tests">Run All Tests</a>
+			<?php echo $report->render("menu", array("menu" => $menu, "base" => $base)) ?>
 		</div>
 
 		<div style="float:left; padding: 10px; width: 75%">
@@ -35,9 +35,9 @@
 					$filters
 				)); ?>
 			</span>
-			<?= $report->render("stats", $report->stats()) ?>
+			<?php echo $report->render("stats", $report->stats()) ?>
 			<?php foreach ($report->results['filters'] as $filter => $data): ?>
-				<?= $report->render(
+				<?php echo $report->render(
 						strtolower(array_pop(explode("\\", $filter))),
 						array("analysis" => $data)
 					); ?>

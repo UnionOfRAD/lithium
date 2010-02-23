@@ -3,8 +3,8 @@
 
 <?php foreach ($analysis['totals'] as $title => $data): ?>
 	<tr>
-		<td class="metric-name"><?= $title ?></td>
-		<td class="metric"><?= $data['formatter']($data['value']) ?></td>
+		<td class="metric-name"><?php echo $title ?></td>
+		<td class="metric"><?php echo $data['formatter']($data['value']) ?></td>
 	</tr>
 <?php endforeach ?>
 </tbody></table>

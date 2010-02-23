@@ -8,7 +8,7 @@
 	?>
 	<tr>
 		<td class="metric-name">Worst Offender</th>
-		<td class="metric"><?= $method . ' - ' . $count ?></td>
+		<td class="metric"><?php echo $method . ' - ' . $count ?></td>
 	</tr>
 <?php endforeach ?>
 	<tr>
@@ -16,8 +16,8 @@
 	</tr>
 <?php foreach (array_slice($analysis['class'], 0, 10) as $class => $count): ?>
 	<tr>
-		<td class="metric-name"><?= $class ?></th>
-		<td class="metric"><?= round($count, 2) ?></td>
+		<td class="metric-name"><?php echo $class ?></th>
+		<td class="metric"><?php echo round($count, 2) ?></td>
 	</tr>
 <?php endforeach ?>
 </tbody></table>
