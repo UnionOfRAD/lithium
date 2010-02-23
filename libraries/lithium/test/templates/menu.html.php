@@ -3,7 +3,7 @@
 	$prev = array();
 	$current = null;
 ?>
-<ul><li><a href="<?= $base ?>/test/lithium/tests">lithium</a></li>
+<ul><li><a href="<?= $base ?>/test/lithium/tests">Run All Tests</a></li>
 <?php foreach ($menu as $test): ?>
 	<?php
 		$case = array_pop($path = explode("\\", $test));

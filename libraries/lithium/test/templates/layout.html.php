@@ -34,9 +34,7 @@
 					$filters
 				)); ?>
 			</span>
-			<?php
-				echo $report->stats();
-			?>
+			<?= $report->render("stats", $report->stats()) ?>
 			<?php foreach ($report->results['filters'] as $filter => $data): ?>
 				<?= $report->render(
 						strtolower(array_pop(explode("\\", $filter))),

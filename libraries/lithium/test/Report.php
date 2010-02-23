@@ -28,13 +28,6 @@ class Report extends \lithium\core\Object {
 	public $group = null;
 
 	/**
-	 * Contains an instance of a test reporter, which contains the format to be displayed.
-	 *
-	 * @var object
-	 */
-	public $reporter = null;
-
-	/**
 	 * Contains the format for the results to be rendered in
 	 *
 	 * @var string
@@ -82,7 +75,6 @@ class Report extends \lithium\core\Object {
 			'title' => null,
 			'group' => null,
 			'filters' => array(),
-			'reporter' => 'text',
 			'format' => 'txt'
 		);
 		parent::__construct((array) $config + $defaults);
@@ -94,12 +86,6 @@ class Report extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _init() {
-		$class = Inflector::camelize($this->_config['reporter']);
-
-		if (!$reporter = Libraries::locate('test.reporter', $class)) {
-			throw new Exception("{$class} is not a valid reporter");
-		}
-		$this->reporter = new $reporter();
 		$this->group = $this->_config['group'];
 		$this->filters = $this->_config['filters'];
 		$this->title = $this->_config['title'] ?: $this->_config['title'];
@@ -163,7 +149,7 @@ class Report extends \lithium\core\Object {
 	 */
 	public function stats() {
 		$results = (array) $this->results['group'];
-		return $this->reporter->stats(array_reduce($results, function($stats, $result) {
+		$stats = array_reduce($results, function($stats, $result) {
 			$stats = (array) $stats + array(
 				'asserts' => 0,
 				'passes' => array(),
@@ -180,6 +166,9 @@ class Report extends \lithium\core\Object {
 				$result = $response['result'];
 
 				if (in_array($result, array('fail', 'exception'))) {
+					$response = array_merge(
+						array('class' => 'unknown', 'method' => 'unknown'), $response
+					);
 					$stats['errors'][] = $response;
 				}
 				unset($response['file'], $response['result']);
@@ -192,7 +181,15 @@ class Report extends \lithium\core\Object {
 				}
 			}
 			return $stats;
-		}));
+		});
+
+		$count = array_map(
+			function($value) { return is_array($value) ? count($value) : $value; },
+			$stats
+		);
+		$success = $count['passes'] === $count['asserts'] && $count['errors'] === 0;
+
+		return compact("stats", "count", "success");
 	}
 
 	/**
