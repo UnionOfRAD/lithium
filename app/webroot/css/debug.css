@@ -57,7 +57,7 @@ ul.menu, ul.menu ul {
 }
 
 ul.menu ul {
-	padding-left: 5px;
+	padding: 0;
 }
 
 ul.menu a {

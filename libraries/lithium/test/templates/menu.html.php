@@ -1,5 +1,5 @@
 <?php
-	$depth = 2;
+	$depth = 0;
 	$prev = array();
 	$current = null;
 ?>
@@ -47,7 +47,7 @@
 
 <?php endforeach ?>
 
-<?php while($depth > 1): ?>
+<?php while($depth > 0): ?>
 	</li></ul>
 	<?php $depth--; ?>
 <?php endwhile ?>
