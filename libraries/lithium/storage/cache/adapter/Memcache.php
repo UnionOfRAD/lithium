@@ -195,17 +195,13 @@ class Memcache extends \lithium\core\Object {
 	}
 
 	/**
-	 * Determines if the Memcached extension has been installed and properly started.
+	 * Determines if the Memcached extension has been installed.
 	 *
-	 * @return boolean Returns `true` if the Memcached extensions is installed and enabled, `false`
+	 * @return boolean Returns `true` if the Memcached extension is installed and enabled, `false`
 	 *         otherwise.
 	 */
-	public function enabled() {
-		if (!extension_loaded('memcached')) {
-			return false;
-		}
-		$version = static::$connection->getVersion();
-		return (!empty($version));
+	public static function enabled() {
+		return extension_loaded('memcached');
 	}
 }
 

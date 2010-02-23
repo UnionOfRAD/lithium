@@ -178,7 +178,7 @@ class XCache extends \lithium\core\Object {
 	 * return boolean True if enabled, false otherwise
 	 */
 	public static function enabled() {
-		return (extension_loaded('xcache') && function_exists('xcache_info'));
+		return extension_loaded('xcache');
 	}
 }
 

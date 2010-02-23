@@ -71,15 +71,15 @@ class Redis extends \lithium\core\Object {
 			'server' => '127.0.0.1:6379'
 		);
 
-		if (is_null(static::$Redis)) {
-			static::$Redis = new \Redis();
+		if (is_null(static::$connection)) {
+			static::$connection = new \Redis();
 		}
 
 		$config += $defaults;
 		parent::__construct($config);
 
 		list($IP, $port) = explode(':', $this->_config['server']);
-		static::$Redis->connect($IP, $port);
+		static::$connection->connect($IP, $port);
 	}
 
 	/**
@@ -185,12 +185,8 @@ class Redis extends \lithium\core\Object {
 	 *
 	 * @return boolean Returns `true` if the Redis extension is enabled, `false` otherwise.
 	 */
-	public function enabled() {
-		if (!extension_loaded('redis')) {
-			return false;
-		}
-		$version = static::$connection->info();
-		return (!empty($version));
+	public static function enabled() {
+		return extension_loaded('redis');
 	}
 }
 
