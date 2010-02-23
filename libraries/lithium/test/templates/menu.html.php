@@ -5,7 +5,8 @@
 ?>
 <?php foreach ($menu as $test): ?>
 	<?php
-		$case = array_pop($path = explode("\\", $test));
+		$path = explode("\\", $test);
+		$case = array_pop($path);
 		$caseDepth = count($path);
 	?>
 
