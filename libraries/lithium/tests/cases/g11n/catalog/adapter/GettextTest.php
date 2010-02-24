@@ -224,20 +224,11 @@ EOD;
 		$this->assertFalse($result);
 	}
 
-	public function testReadPoWithFlagsAndComments() {
-		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
-		$data = <<<EOD
-#: test.php:1
-#, fuzzy
-#, c-format
-#. extracted comment
-#  translator comment
-msgid "singular 1"
-msgstr "translated 1"
-EOD;
-		file_put_contents($file, $data);
+	public function testReadAndWritePoWithFlagsAndComments() {
+		$this->adapter->mo = false;
 
-		$expected = array(
+		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
+		$catalog = array(
 			'singular 1' => array(
 				'id' => 'singular 1',
 				'ids' => array('singular' => 'singular 1'),
@@ -252,8 +243,33 @@ EOD;
 				),
 			)
 		);
+		$po = <<<EOD
+#: test.php:1
+#, fuzzy
+#, c-format
+#. extracted comment
+#  translator comment
+msgid "singular 1"
+msgstr "translated 1"
+EOD;
+		file_put_contents($file, $po);
 		$result = $this->adapter->read('message', 'de', null);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($catalog, $result);
+
+		unlink($file);
+
+		$this->adapter->write('message', 'de', null, $catalog);
+		$po = <<<EOD
+#: test.php:1
+#. extracted comment
+#. translator comment
+#, fuzzy
+#, c-format
+msgid "singular 1"
+msgstr "translated 1"
+EOD;
+		$result = file_get_contents($file);
+		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
 	}
 
 	public function testReadPoMultiline() {
