@@ -108,7 +108,7 @@ class Cldr extends \lithium\g11n\catalog\adapter\Base {
 		$query .= "/postCodeRegex[@territoryId=\"{$territory}\"]";
 
 		$nodes = $this->_parseXml($file, $query);
-		$regex =  (string)current($nodes);
+		$regex =  (string) current($nodes);
 
 		return $this->_merge($data, array(
 			'id' => 'postalCode',
@@ -127,8 +127,8 @@ class Cldr extends \lithium\g11n\catalog\adapter\Base {
 
 		foreach ($nodes as $node) {
 			$data = $this->_merge($data, array(
-				'id' => (string)$node['type'],
-				'translated' => (string)$node
+				'id' => (string) $node['type'],
+				'translated' => (string) $node
 			));
 		}
 		return $data;
@@ -145,8 +145,8 @@ class Cldr extends \lithium\g11n\catalog\adapter\Base {
 			$displayNames = $node->xpath('displayName');
 
 			$data = $this->_merge($data, array(
-				'id' => (string)$node['type'],
-				'translated' => (string)current($displayNames)
+				'id' => (string) $node['type'],
+				'translated' => (string) current($displayNames)
 			));
 		}
 		return $data;

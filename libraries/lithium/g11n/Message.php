@@ -68,6 +68,7 @@ class Message extends \lithium\core\StaticObject {
 	 * ));
 	 * }}}
 	 *
+	 * @see lithium\util\String::insert()
 	 * @param string $id The id to use when looking up the translation.
 	 * @param array $options Valid options are:
 	 *              - `'count'`: Used to determine the correct plural form.
@@ -78,7 +79,6 @@ class Message extends \lithium\core\StaticObject {
 	 *              - `'noop'`: If `true` no whatsoever lookup takes place.
 	 * @return string|void The translation or the value of the `'default'` option if none
 	 *                     could be found.
-	 * @see lithium\util\String::insert()
 	 */
 	public static function translate($id, array $options = array()) {
 		$defaults = array(
@@ -120,8 +120,8 @@ class Message extends \lithium\core\StaticObject {
 	 * 	}
 	 * }}}
 	 *
-	 * @return array Named aliases (`'t'` and `'tn'`) for translation functions.
 	 * @see lithium\net\http\Media::_handle()
+	 * @return array Named aliases (`'t'` and `'tn'`) for translation functions.
 	 */
 	public static function aliases() {
 		$t = function($message, array $options = array()) {
@@ -141,6 +141,7 @@ class Message extends \lithium\core\StaticObject {
 	 * scope into account.  Hereupon the correct plural form is determined by passing the
 	 * value of the `'count'` option to a closure.
 	 *
+	 * @see lithium\g11n\Catalog
 	 * @param string $id The lookup key.
 	 * @param integer $count Used to determine the correct plural form.
 	 * @param string $locale The target locale.
@@ -148,7 +149,6 @@ class Message extends \lithium\core\StaticObject {
 	 *              - `'scope'`: The scope of the message.
 	 * @return string|void The translation or `null` if none could be found or the plural
 	 *         form could not be determined.
-	 * @see lithium\g11n\Catalog
 	 * @filter
 	 * @todo Message pages need caching.
 	 */
