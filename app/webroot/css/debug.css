@@ -44,6 +44,8 @@ a.test-button, a.test-button:link, a.test-button:visited, a.test-button:hover, a
 	background-color:#B5B4a4;
 	border-color: #009933;
 	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
 	text-align: center;
 	text-decoration: none;
 }
