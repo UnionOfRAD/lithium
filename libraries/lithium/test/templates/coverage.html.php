@@ -11,8 +11,8 @@
 				<?php foreach ($data as $line => $row): ?>
 					<div class="code-line <?php echo $row['class'] ?>">
 						<span class="line-num"><?php echo $line ?></span>
-						<span class="content"><?=
-							htmlspecialchars(str_replace("\t", "	", $row['data']))
+						<span class="content"><?php
+							echo htmlspecialchars(str_replace("\t", "	", $row['data']))
 						?></span>
 					</div><!-- code-line -->
 				<?php endforeach ?>
