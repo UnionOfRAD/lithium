@@ -566,6 +566,37 @@ EOD;
 		$expected = '"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\\\n"\n';
 		$this->assertPattern("%{$expected}%", $result);
 	}
+
+	public function testReadAndWritePoValidation() {
+		$this->adapter->mo = false;
+		mkdir("{$this->_path}/de/LC_VALIDATION", 0755, true);
+
+		$file = "{$this->_path}/de/LC_VALIDATION/default.po";
+		$catalog = array(
+			'phone' => array(
+				'id' => 'phone',
+				'ids' => array('singular' => 'phone'),
+				'flags' => array(),
+				'translated' => array('/[0-9].*/i'),
+				'occurrences' => array(),
+				'comments' => array()
+			)
+		);
+		$po = <<<EOD
+msgid "phone"
+msgstr "/[0-9].*/i"
+EOD;
+
+		file_put_contents($file, $po);
+		$result = $this->adapter->read('validation', 'de', null);
+		$this->assertEqual($catalog, $result);
+
+		unlink($file);
+
+		$this->adapter->write('validation', 'de', null, $catalog);
+		$result = file_get_contents($file);
+		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
+	}
 }
 
 ?>
