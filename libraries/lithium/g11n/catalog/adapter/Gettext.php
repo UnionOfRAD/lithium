@@ -391,7 +391,7 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 				}
 			} else {
 				if (is_array($item['translated'])) {
-					$value = array_pop($item['translated']);
+					$item['translated'] = array_pop($item['translated']);
 				}
 				$output[] = "msgstr \"{$item['translated']}\"";
 			}
