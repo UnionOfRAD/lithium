@@ -15,17 +15,22 @@ use \lithium\util\collection\Filters;
  */
 class StaticObject {
 
+	/**
+	 * Stores the closures that represent the method filters. They are indexed by called class.
+	 *
+	 * @var array Method filters, indexed by get_called_class().
+	 */
 	protected static $_methodFilters = array();
 
 	/**
 	 * Apply a closure to a method of the current static object.
 	 *
+	 * @see lithium\core\StaticObject::_filter()
+	 * @see lithium\util\collection\Filters
 	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
 	 *        method name as a string, or an array of method names.
 	 * @param closure $closure The closure that is used to filter the method.
 	 * @return void
-	 * @see lithium\core\StaticObject::_filter()
-	 * @see lithium\util\collection\Filters
 	 */
 	public static function applyFilter($method, $closure = null) {
 		$class = get_called_class();
@@ -69,6 +74,7 @@ class StaticObject {
 	 * Executes a set of filters against a method by taking a method's main implementation as a
 	 * callback, and iteratively wrapping the filters around it.
 	 *
+	 * @see lithium\util\collection\Filters
 	 * @param string|array $method The name of the method being executed, or an array containing
 	 *        the name of the class that defined the method, and the method name.
 	 * @param array $params An associative array containing all the parameters passed into
@@ -76,7 +82,6 @@ class StaticObject {
 	 * @param Closure $callback The method's implementation, wrapped in a closure.
 	 * @param array $filters Additional filters to apply to the method for this call only.
 	 * @return mixed
-	 * @see lithium\util\collection\Filters
 	 */
 	protected static function _filter($method, $params, $callback, $filters = array()) {
 		if (!strpos($method, '::')) {
