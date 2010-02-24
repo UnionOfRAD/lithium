@@ -17,7 +17,7 @@
 		<ul class="menu">
 	<?php endif ?>
 
-	<?php while ($depth >= $caseDepth): ?>
+	<?php while ($depth >= $caseDepth+1): ?>
 		</li></ul>
 		<?php
 			$depth--;
@@ -33,7 +33,7 @@
 		?>
 	<?php endwhile ?>
 
-	<?php while ($depth < count($path)-1): ?>
+	<?php while ($depth < count($path)): ?>
 		<li>
 			<a class="menu-folder" href="<?php echo $base ?>/test/<?php echo join(array_slice($path, 0, $depth+1), "\\") ?>">
 				<?php echo $path[$depth] ?>
@@ -46,7 +46,7 @@
 		?>
 	<?php endwhile ?>
 
-	<li><a href="<?php echo $base ?>/test/<?php echo join($path, "\\") ?>"><?php echo $case ?></a></li>
+	<li><a href="<?php echo $base ?>/test/<?php echo join($path, "\\") ?>/<?php echo $case ?>"><?php echo $case ?></a></li>
 
 <?php endforeach ?>
 
