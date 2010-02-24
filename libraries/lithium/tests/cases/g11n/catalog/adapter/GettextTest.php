@@ -504,13 +504,10 @@ EOD;
 		);
 
 		$this->adapter->write('message', 'de', null, $data);
-		$this->assertTrue(file_exists("{$this->_path}/de/LC_MESSAGES/default.po"));
 		$result = $this->adapter->read('message', 'de', null);
 		$this->assertEqual($data, $result);
 
 		$this->adapter->write('messageTemplate', 'root', null, $data);
-		$this->assertTrue(file_exists("{$this->_path}/message_default.pot"));
-
 		$result = $this->adapter->read('messageTemplate', 'root', null);
 		$this->assertEqual($data, $result);
 	}
