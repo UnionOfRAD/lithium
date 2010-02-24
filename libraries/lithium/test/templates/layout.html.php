@@ -37,8 +37,10 @@
 			</span>
 			<?php echo $report->render("stats", $report->stats()) ?>
 			<?php foreach ($report->results['filters'] as $filter => $data): ?>
-				<?php echo $report->render(
-						strtolower(array_pop(explode("\\", $filter))),
+				<?php
+					$filterClass = strtolower(array_pop(explode("\\", $filter)));
+					echo $report->render(
+						$filterClass,
 						array("analysis" => $data)
 					); ?>
 			<?php endforeach ?>
