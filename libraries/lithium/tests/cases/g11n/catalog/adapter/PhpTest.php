@@ -138,7 +138,6 @@ class PhpTest extends \lithium\test\Unit {
 				'occurrences' => array()
 		));
 		$this->assertEqual($expected, $result);
-
 	}
 }
 
