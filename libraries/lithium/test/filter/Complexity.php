@@ -91,11 +91,12 @@ class Complexity extends \lithium\test\Filter {
 		$packagedResults = array();
 
 		foreach ($filterResults as $result) {
-			$class = key($result);
-			if (!isset($packagedResults[$class])) {
-				$packagedResults[$class] = array();
+			foreach($result as $class => $method) {
+				if (!isset($packagedResults[$class])) {
+					$packagedResults[$class] = array();
+				}
+				$packagedResults[$class] = array_merge($result[$class], $packagedResults[$class]);
 			}
-			$packagedResults[$class] = array_merge($result[$class], $packagedResults[$class]);
 		}
 
 		return $packagedResults;
