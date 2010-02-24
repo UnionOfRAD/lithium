@@ -8,8 +8,11 @@
 		$path = explode("\\", $test);
 		$case = array_pop($path);
 		$caseDepth = count($path);
+		if (isset($prev[1]) && $path[0] != $prev[1]) {
+			$caseDepth = 1;
+			$current = $prev[1];
+		}
 	?>
-
 	<?php if (!isset($current)): ?>
 		<ul class="menu">
 	<?php endif ?>
@@ -30,7 +33,7 @@
 		?>
 	<?php endwhile ?>
 
-	<?php while ($depth < $caseDepth-1): ?>
+	<?php while ($depth < count($path)-1): ?>
 		<li>
 			<a class="menu-folder" href="<?php echo $base ?>/test/<?php echo join(array_slice($path, 0, $depth+1), "\\") ?>">
 				<?php echo $path[$depth] ?>
