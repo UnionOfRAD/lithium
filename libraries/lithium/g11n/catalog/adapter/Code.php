@@ -23,7 +23,7 @@ use \RecursiveDirectoryIterator;
  * @see lithium\g11n\Message
  * @see lithium\template\View
  */
-class Code extends \lithium\g11n\catalog\adapter\Base {
+class Code extends \lithium\g11n\catalog\Adapter {
 
 	/**
 	 * Constructor.
@@ -163,7 +163,7 @@ class Code extends \lithium\g11n\catalog\adapter\Base {
 	 * Merges an item into given data and removes quotation marks
 	 * from the beginning and end of message strings.
 	 *
-	 * @see lithium\g11n\catalog\adapter\Base::_merge()
+	 * @see lithium\g11n\catalog\Adapter::_merge()
 	 * @param array $data Data to merge item into.
 	 * @param array $item Item to merge into $data.
 	 * @return array The merged data.

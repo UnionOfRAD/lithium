@@ -32,7 +32,7 @@ use \lithium\g11n\Locale;
  * @link http://unicode.org/cldr
  * @link http://unicode.org/Public/cldr/1.7.0/core.zip
  */
-class Cldr extends \lithium\g11n\catalog\adapter\Base {
+class Cldr extends \lithium\g11n\catalog\Adapter {
 
 	/**
 	 * Constructor.

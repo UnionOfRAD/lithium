@@ -6,12 +6,12 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\g11n\catalog\adapter;
+namespace lithium\g11n\catalog;
 
 /**
- * The `Base` class is the foundation for all g11n catalog adapters.
+ * This is the foundation class for all g11n catalog adapters.
  */
-class Base extends \lithium\core\Object {
+class Adapter extends \lithium\core\Object {
 
 	/**
 	 * Reads data.

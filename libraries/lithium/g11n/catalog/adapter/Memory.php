@@ -14,7 +14,7 @@ namespace lithium\g11n\catalog\adapter;
  * Written data is stored in memory and lost after the end of the script execution. The
  * adapter is also very useful for testing.
  */
-class Memory extends \lithium\g11n\catalog\adapter\Base {
+class Memory extends \lithium\g11n\catalog\Adapter {
 
 	/**
 	 * Holds data during runtime.

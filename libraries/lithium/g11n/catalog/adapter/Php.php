@@ -48,7 +48,7 @@ use \Exception;
  *
  * @see lithium\g11n\catalog\adapter\Gettext
  */
-class Php extends \lithium\g11n\catalog\adapter\Base {
+class Php extends \lithium\g11n\catalog\Adapter {
 
 	/**
 	 * Constructor.

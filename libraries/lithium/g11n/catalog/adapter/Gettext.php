@@ -42,7 +42,7 @@ use \Exception;
  * @link http://php.net/setlocale
  * @link http://www.gnu.org/software/gettext/manual/gettext.html
  */
-class Gettext extends \lithium\g11n\catalog\adapter\Base {
+class Gettext extends \lithium\g11n\catalog\Adapter {
 
 	/**
 	 * Magic used for validating the format of a MO file as well as
@@ -448,7 +448,7 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 * Double escaped characters are maintained and not escaped once again.
 	 *
 	 * @link http://www.asciitable.com
-	 * @see lithium\g11n\catalog\adapter\Base::_prepareForWrite()
+	 * @see lithium\g11n\catalog\Adapter::_prepareForWrite()
 	 * @param mixed $item
 	 * @return mixed
 	 */
@@ -481,7 +481,7 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 * or are empty are **not** being merged. Whitespace characters are space, tab, vertical
 	 * tab, line feed, carriage return and form feed.
 	 *
-	 * @see lithium\g11n\catalog\adapter\Base::_merge()
+	 * @see lithium\g11n\catalog\Adapter::_merge()
 	 * @param array $data Data to merge item into.
 	 * @param array $item Item to merge into $data.
 	 * @return array The merged data.
