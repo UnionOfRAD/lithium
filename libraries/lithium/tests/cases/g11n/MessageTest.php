@@ -74,7 +74,7 @@ class MessageTest extends \lithium\test\Unit {
 		));
 
 		$data = array(
-			'catalog' => 'Katalog',
+			'catalog' => array('Katalog', 'Kataloge'),
 		);
 		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
 

@@ -193,9 +193,8 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 */
 	protected function _parsePo($stream) {
 		$defaults = array(
-			'id' => null,
 			'ids' => array(),
-			'translated' => array(),
+			'translated' => null,
 			'flags' => array(),
 			'comments' => array(),
 			'occurrences' => array()
@@ -227,11 +226,16 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 			} elseif (substr($line, 0, 9) === 'msgctxt "') {
 				$item['context'] = substr($line, 9, -1);
 			} elseif (substr($line, 0, 8) === 'msgstr "') {
-				$item['translated'][0] = substr($line, 8, -1);
+				$item['translated'] = substr($line, 8, -1);
 			} elseif ($line[0] === '"') {
-				$continues = $item['translated'] ? 'translated' : 'ids';
-				end($item[$continues]);
-				$item[$continues][key($item[$continues])] .= substr($line, 1, -1);
+				$continues = isset($item['translated']) ? 'translated' : 'ids';
+
+				if (is_array($item[$continues])) {
+					end($item[$continues]);
+					$item[$continues][key($item[$continues])] .= substr($line, 1, -1);
+				} else {
+					$item[$continues] .= substr($line, 1, -1);
+				}
 			} elseif (substr($line, 0, 14) === 'msgid_plural "') {
 				$item['ids']['plural'] = substr($line, 14, -1);
 			} elseif (substr($line, 0, 7) === 'msgstr[') {
@@ -292,7 +296,7 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 
 		for ($i = 0; $i < $count; $i++) {
 			$singularId = $pluralId = null;
-			$translated = array();
+			$translated = null;
 
 			fseek($stream, $offsetId + $i * 8);
 
@@ -316,7 +320,10 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 
 			fseek($stream, $offset);
 			$translated = fread($stream, $length);
-			$translated = explode("\000", $translated);
+
+			if (strpos($translated, "\000") !== false) {
+				$translated = explode("\000", $translated);
+			}
 
 			$data = $this->_merge($data, array(
 				'ids' => array('singular' => $singularId, 'plural' => $pluralId),

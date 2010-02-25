@@ -98,7 +98,7 @@ EOD;
 				'id' => 'singular 1',
 				'ids' => array('singular' => 'singular 1'),
 				'flags' => array(),
-				'translated' => array('translated 1'),
+				'translated' => 'translated 1',
 				'occurrences' => array(),
 				'comments' => array()
 			)
@@ -123,7 +123,7 @@ EOD;
 				'id' => 'singular 1',
 				'ids' => array('singular' => 'singular 1'),
 				'flags' => array(),
-				'translated' => array('translated 1'),
+				'translated' => 'translated 1',
 				'occurrences' => array(),
 				'comments' => array()
 			),
@@ -131,7 +131,7 @@ EOD;
 				'id' => 'singular 2',
 				'ids' => array('singular' => 'singular 2'),
 				'flags' => array(),
-				'translated' => array('translated 2'),
+				'translated' => 'translated 2',
 				'occurrences' => array(),
 				'comments' => array()
 			)
@@ -196,7 +196,7 @@ EOD;
 				'id' => 'singular 1',
 				'ids' => array('singular' => 'singular 1'),
 				'flags' => array(),
-				'translated' => array('translated 1'),
+				'translated' => 'translated 1',
 				'occurrences' => array(),
 				'comments' => array()
 			)
@@ -236,7 +236,7 @@ EOD;
 				'id' => 'singular 1',
 				'ids' => array('singular' => 'singular 1'),
 				'flags' => array('fuzzy' => true, 'c-format' => true),
-				'translated' => array('translated 1'),
+				'translated' => 'translated 1',
 				'occurrences' => array(
 					array('file' => 'test.php', 'line' => 1)
 				),
@@ -292,9 +292,7 @@ EOD;
 					'singular' => 'An id'
 				),
 				'flags' => array(),
-				'translated' => array(
-					'This is a translation spanning multiple lines.'
-				),
+				'translated' => 'This is a translation spanning multiple lines.',
 				'occurrences' => array(),
 				'comments' => array()
 			)
@@ -320,9 +318,7 @@ EOD;
 					'singular' => 'This is an id spanning multiple lines.'
 				),
 				'flags' => array(),
-				'translated' => array(
-					'This is a translation spanning multiple lines.'
-				),
+				'translated' => 'This is a translation spanning multiple lines.',
 				'occurrences' => array(),
 				'comments' => array()
 			)
@@ -385,7 +381,7 @@ EOD;
 		file_put_contents($file, $data);
 
 		$result = $this->adapter->read('message', 'de', null);
-		$this->assertEqual($result['singular 1']['translated'][0], $dummy);
+		$this->assertEqual($result['singular 1']['translated'], $dummy);
 	}
 
 	public function testReadMoLittleEndian() {
@@ -415,7 +411,7 @@ EOD;
 				'id' => 'singular 2',
 				'ids' => array('singular' => 'singular 2', 'plural' => null),
 				'flags' => array(),
-				'translated' => array('translated 2'),
+				'translated' => 'translated 2',
 				'occurrences' => array(),
 				'comments' => array()
 			)
@@ -580,7 +576,7 @@ EOD;
 				'id' => 'phone',
 				'ids' => array('singular' => 'phone'),
 				'flags' => array(),
-				'translated' => array('/[0-9].*/i'),
+				'translated' => '/[0-9].*/i',
 				'occurrences' => array(),
 				'comments' => array()
 			)

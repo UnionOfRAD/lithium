@@ -139,6 +139,31 @@ class PhpTest extends \lithium\test\Unit {
 		));
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testReadValidation() {
+		mkdir("{$this->_path}/fr/validation", 0755, true);
+
+		$data = array(
+			'phone' => '/[0-9].*/i',
+		);
+		$contents[] = '<?php';
+		$contents[] = 'return ' . var_export($data, true);
+		$contents[] = '?>';
+		file_put_contents("{$this->_path}/fr/validation/default.php", implode("\n", $contents));
+
+		$result = $this->adapter->read('validation', 'fr', null);
+		$expected = array(
+			'phone' => array(
+				'id' => 'phone',
+				'ids' => array(),
+				'translated' => '/[0-9].*/i',
+				'flags' => array(),
+				'comments' => array(),
+				'occurrences' => array()
+		));
+		$this->assertEqual($expected, $result);
+
+	}
 }
 
 ?>
