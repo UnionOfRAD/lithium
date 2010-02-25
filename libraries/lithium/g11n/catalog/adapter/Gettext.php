@@ -66,7 +66,7 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 * The size of the header of a MO file in bytes.
 	 *
 	 * @see lithium\g11n\catalog\adapter\Gettext::_parseMo()
-	 * @var float Number of bytes.
+	 * @var integer Number of bytes.
 	 */
 	const MO_HEADER_SIZE = 28;
 
@@ -185,6 +185,8 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 * - No support for comments spanning multiple lines.
 	 * - Translator and extracted comments are treated as being the same type.
 	 * - Message IDs are allowed to have other encodings as just US-ASCII.
+	 *
+	 * Items with an empty id are ignored. For more information see `_merge()`.
 	 *
 	 * @param resource $stream
 	 * @return array
@@ -342,8 +344,11 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 *
 	 * To improve portability accross libraries the header is generated according
 	 * to the format of the output of `xgettext`. This means using the same names for
-	 * placeholders as well as including an empty fuzzy entry. The only difference
-	 * in the header format is the initial header which just features one line of text.
+	 * placeholders as well as including an empty fuzzy entry. The empty entry at the
+	 * beginning aids in parsing the file as it _attracts_ the preceding comments and
+	 * following metadata when parsed which could otherwise be mistaken as a continued
+	 * translation. The only difference in the header format is the initial header which
+	 * just features one line of text.
 	 *
 	 * @param resource $stream
 	 * @param array $data
@@ -459,8 +464,8 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	 * Merges an item into given data and unescapes fields.
 	 *
 	 * Please note that items with an id containing exclusively whitespace characters
-	 * are **not** being merged. Whitespace characters are space, tab, vertical tab,
-	 * line feed, carriage return and form feed.
+	 * or are empty are **not** being merged. Whitespace characters are space, tab, vertical
+	 * tab, line feed, carriage return and form feed.
 	 *
 	 * @see lithium\g11n\catalog\adapter\Base::_merge()
 	 * @param array $data Data to merge item into.
