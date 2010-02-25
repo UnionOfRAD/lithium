@@ -64,6 +64,60 @@ class MessageTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testTranslateNonIntegerCounts() {
+		$data = array(
+			'house' => array('Haus', 'Häuser')
+		);
+		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+
+		$expected = 'Häuser';
+		$result = Message::translate('house', array('locale' => 'de', 'count' => 2.31));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Häuser';
+		$result = Message::translate('house', array('locale' => 'de', 'count' => 1.1));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Häuser';
+		$result = Message::translate('house', array('locale' => 'de', 'count' => 0.1));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Haus';
+		$result = Message::translate('house', array('locale' => 'de', 'count' => true));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Häuser';
+		$result = Message::translate('house', array('locale' => 'de', 'count' => false));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Häuser';
+		$result = Message::translate('house', array('locale' => 'de', 'count' => '2'));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Häuser';
+		$result = Message::translate('house', array('locale' => 'de', 'count' => '0'));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testTranslateNegativeIntegerCounts() {
+		$data = array(
+			'house' => array('Haus', 'Häuser')
+		);
+		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+
+		$expected = 'Haus';
+		$result = Message::translate('house', array('locale' => 'de', 'count' => -1));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Häuser';
+		$result = Message::translate('house', array('locale' => 'de', 'count' => -2));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Häuser';
+		$result = Message::translate('house', array('locale' => 'de', 'count' => -5));
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testTranslateFail() {
 		$result = Message::translate('catalog', array('locale' => 'de'));
 		$this->assertNull($result);

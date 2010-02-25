@@ -71,7 +71,13 @@ class Message extends \lithium\core\StaticObject {
 	 * @see lithium\util\String::insert()
 	 * @param string $id The id to use when looking up the translation.
 	 * @param array $options Valid options are:
-	 *              - `'count'`: Used to determine the correct plural form.
+	 *              - `'count'`: Used to determine the correct plural form. You can either pass
+	 *                           a signed or unsigned integer, the behavior when passing other types
+	 *                           is yet undefined.
+	 *                           The count is made absolute before being passed to the pluralization
+	 *                           function. This has the effect that that with i.e. an English
+	 *                           pluralization function passing `-1` results in a singular
+	 *                           translation.
 	 *              - `'locale'`: The target locale, defaults to current locale.
 	 *              - `'scope'`: The scope of the message.
 	 *              - `'default'`: Is used as a fall back if `_translated()` returns
@@ -93,7 +99,7 @@ class Message extends \lithium\core\StaticObject {
 		if ($noop) {
 			$result = null;
 		} else {
-			$result = static::_translated($id, $count, $locale, compact('scope'));
+			$result = static::_translated($id, abs($count), $locale, compact('scope'));
 		}
 
 		if ($result || $default) {
