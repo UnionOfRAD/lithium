@@ -73,12 +73,12 @@ require __DIR__ . '/bootstrap/action.php';
 
 /**
  * This configures your session storage. The Cookie storage adapter must be connected first, since
- * it intercepts any writes where the `'expires'` key is set in the options array.  When creating a
- * new application, it is suggested that you change the value of `'key'` below.
+ * it intercepts any writes where the `'expires'` key is set in the options array.
  */
 // use \lithium\storage\Session;
 //
 // Session::config(array(
+// 	'cookie' => array('adapter' => 'Cookie', 'expire' => '+2 days'),
 // 	'default' => array('adapter' => 'Php')
 // ));
 
