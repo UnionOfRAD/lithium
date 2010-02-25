@@ -168,6 +168,37 @@ EOD;
 		$this->assertEqual($expected, $result);
 
 	}
+
+	public function testReadWithAnonymousFunction() {
+		mkdir("{$this->_path}/fr/message", 0755, true);
+
+		$data = <<<EOD
+<?php
+return array(
+	'plural' => function() { return 123; },
+	'politics' => 'politique',
+);
+?>
+EOD;
+		file_put_contents("{$this->_path}/fr/message/default.php", $data);
+
+		$result = $this->adapter->read('message', 'fr', null);
+		$expected = array(
+			'id' => 'politics',
+			'ids' => array(),
+			'translated' => 'politique',
+			'flags' => array(),
+			'comments' => array(),
+			'occurrences' => array()
+		);
+		$this->assertEqual($expected, $result['politics']);
+
+		$this->assertTrue(is_callable($result['plural']['translated']));
+
+		$expected = 123;
+		$result = $result['plural']['translated']();
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
