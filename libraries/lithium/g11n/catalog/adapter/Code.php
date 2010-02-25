@@ -57,7 +57,7 @@ class Code extends \lithium\g11n\catalog\Adapter {
 	 * @param string $category A category. `'messageTemplate'` is the only category supported.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
-	 * @return array|null
+	 * @return array|void
 	 */
 	public function read($category, $locale, $scope) {
 		if ($scope != $this->_config['scope']) {
@@ -168,7 +168,7 @@ class Code extends \lithium\g11n\catalog\Adapter {
 	 * @param array $item Item to merge into $data.
 	 * @return array The merged data.
 	 */
-    protected function _merge($data, $item) {
+    protected function _merge(array $data, array $item) {
 		array_walk($item['ids'], function(&$value) {
 			$value = substr($value, 1, -1);
 		});

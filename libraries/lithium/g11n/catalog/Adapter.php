@@ -41,10 +41,10 @@ class Adapter extends \lithium\core\Object {
 	 * @param string $category A category.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
-	 * @param mixed $data The data to write.
+	 * @param array $data The data to write.
 	 * @return boolean
 	 */
-	public function write($category, $locale, $scope, $data) {
+	public function write($category, $locale, $scope, array $data) {
 		return false;
 	}
 
@@ -54,10 +54,10 @@ class Adapter extends \lithium\core\Object {
 	 * Override this method in sublcasses if you need to
 	 * i.e. escape the item's values.
 	 *
-	 * @param mixed $item
-	 * @return mixed
+	 * @param array $item
+	 * @return array
 	 */
-	protected function _prepareForWrite($item) {
+	protected function _prepareForWrite(array $item) {
 		return $item;
 	}
 
@@ -68,7 +68,7 @@ class Adapter extends \lithium\core\Object {
 	 * @param array $item Item to merge into $data. The item must have an `'id'` key.
 	 * @return array The merged data.
 	 */
-	protected function _merge($data, $item) {
+	protected function _merge(array $data, array $item) {
 		if (!isset($item['id'])) {
 			return $data;
 		}

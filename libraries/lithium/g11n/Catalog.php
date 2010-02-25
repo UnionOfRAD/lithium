@@ -114,7 +114,7 @@ class Catalog extends \lithium\core\Adaptable {
 	 *
 	 * @param string $category A (dot-delimited) category.
 	 * @param string $locale A locale identifier.
-	 * @param array $data
+	 * @param mixed $data If method is used without specifying an id must be an array.
 	 * @param array $options Valid options are:
 	 *        - `'name'`: One or multiple configuration names.
 	 *        - `'scope'`: The scope to use.

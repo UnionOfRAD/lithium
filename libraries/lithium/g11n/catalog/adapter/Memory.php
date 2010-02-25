@@ -29,7 +29,7 @@ class Memory extends \lithium\g11n\catalog\Adapter {
 	 * @param string $category A category.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
-	 * @return mixed
+	 * @return array|void
 	 */
 	public function read($category, $locale, $scope) {
 		$scope = $scope ?: 'default';
@@ -45,10 +45,10 @@ class Memory extends \lithium\g11n\catalog\Adapter {
 	 * @param string $category A category.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
-	 * @param mixed $data The data to write.
+	 * @param array $data The data to write.
 	 * @return boolean
 	 */
-	public function write($category, $locale, $scope, $data) {
+	public function write($category, $locale, $scope, array $data) {
 		$scope = $scope ?: 'default';
 
 		if (!isset($this->_data[$scope][$category][$locale])) {

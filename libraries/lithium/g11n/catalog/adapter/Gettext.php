@@ -128,10 +128,10 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 * @param string $category A category.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
-	 * @param mixed $data The data to write.
+	 * @param array $data The data to write.
 	 * @return boolean
 	 */
-	public function write($category, $locale, $scope, $data) {
+	public function write($category, $locale, $scope, array $data) {
 		$files = $this->_files($category, $locale, $scope);
 
 		foreach ($files as $file) {
@@ -361,7 +361,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 * @param array $data
 	 * @return boolean
 	 */
-	protected function _compilePo($stream, $data) {
+	protected function _compilePo($stream, array $data) {
 		$output[] = '# This file is distributed under the same license as the PACKAGE package.';
 		$output[] = '#';
 		$output[] = '#, fuzzy';
@@ -422,7 +422,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 * @param array $meta
 	 * @return boolean Success.
 	 */
-	protected function _compilePot($stream, $data) {
+	protected function _compilePot($stream, array $data) {
 		return $this->_compilePo($stream, $data);
 	}
 
@@ -431,11 +431,10 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 *
 	 * @param resource $stream
 	 * @param array $data
-	 * @param array $meta
 	 * @return void
 	 * @todo Determine if needed and implement compiler.
 	 */
-	protected function _compileMo($stream, $data) {}
+	protected function _compileMo($stream, array $data) {}
 
 	/**
 	 * Prepares an item before it is being written and escapes fields.
@@ -449,10 +448,10 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 *
 	 * @link http://www.asciitable.com
 	 * @see lithium\g11n\catalog\Adapter::_prepareForWrite()
-	 * @param mixed $item
-	 * @return mixed
+	 * @param array $item
+	 * @return array
 	 */
-	protected function _prepareForWrite($item) {
+	protected function _prepareForWrite(array $item) {
 		$filter = function ($value) use (&$filter) {
 			if (is_array($value)) {
 				return array_map($filter, $value);
@@ -486,7 +485,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 * @param array $item Item to merge into $data.
 	 * @return array The merged data.
 	 */
-	protected function _merge($data, $item) {
+	protected function _merge(array $data, array $item) {
 		$filter = function ($value) use (&$filter) {
 			if (is_array($value)) {
 				return array_map($filter, $value);
