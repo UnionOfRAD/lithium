@@ -28,7 +28,7 @@ class Cookie extends \lithium\core\Object {
 	 *		strtotime-compatible string instead of an epochal timestamp.
 	 */
 	protected $_defaults = array(
-		'name' => 'li3', 'expire' => '+2 days', 'path' => '/',
+		'name' => 'app', 'expire' => '+2 days', 'path' => '/',
 		'domain' => '', 'secure' => false, 'httponly' => false
 	);
 
@@ -42,7 +42,7 @@ class Cookie extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
-		parent::__construct((array) $config + $this->_defaults);
+		parent::__construct($config + $this->_defaults);
 	}
 
 	/**

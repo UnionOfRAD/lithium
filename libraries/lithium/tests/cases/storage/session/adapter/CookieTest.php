@@ -33,7 +33,7 @@ class CookieTest extends \lithium\test\Unit {
 			$expires = ".+?";
 		}
 		$path = preg_quote($expected['path'], '/');
-		$pattern = "/^Set\-Cookie:\sli3\[$key\]=$value;\sexpires=$expires;\spath=$path/";
+		$pattern = "/^Set\-Cookie:\sapp\[$key\]=$value;\sexpires=$expires;\spath=$path/";
 		$match = false;
 
 		foreach ($headers as $header) {
@@ -59,7 +59,7 @@ class CookieTest extends \lithium\test\Unit {
 	}
 
 	public function testKey() {
-		$this->assertEqual('li3', $this->Cookie->key());
+		$this->assertEqual('app', $this->Cookie->key());
 	}
 
 	public function testIsStarted() {
