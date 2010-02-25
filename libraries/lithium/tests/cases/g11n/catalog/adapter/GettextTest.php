@@ -596,6 +596,151 @@ EOD;
 		$result = file_get_contents($file);
 		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
 	}
+
+	public function testEscapeUnescape() {
+		$this->adapter->mo = false;
+		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
+
+		$chars = array(
+			"\0" => '\000',
+			"\1" => '\001',
+			"\2" => '\002',
+			"\3" => '\003',
+			"\4" => '\004',
+			"\5" => '\005',
+			"\6" => '\006',
+			"\7" => '\a',
+			"\10" => '\b',
+			"\11" => '\t',
+			"\12" => '\n',
+			"\13" => '\v',
+			"\14" => '\f',
+			"\15" => '\r',
+			"\16" => '\016',
+			"\17" => '\017',
+			"\20" => '\020',
+			"\21" => '\021',
+			"\22" => '\022',
+			"\23" => '\023',
+			"\24" => '\024',
+			"\25" => '\025',
+			"\26" => '\026',
+			"\30" => '\030',
+			"\31" => '\031',
+			"\32" => '\032',
+			"\33" => '\033',
+			"\34" => '\034',
+			"\35" => '\035',
+			"\36" => '\036',
+			"\37" => '\037',
+			'"' => '\"',
+			'\\' => '\\\\'
+		);
+
+		foreach ($chars as $unescaped => $escaped) {
+			$ord = ord($unescaped);
+
+			$catalog = array(
+				"this is the{$unescaped}message" => array(
+					'id' => "this is the{$unescaped}message",
+					'ids' => array('singular' => "this is the{$unescaped}message"),
+					'flags' => array(),
+					'translated' => "this is the{$unescaped}translation",
+					'occurrences' => array(),
+					'comments' => array()
+				)
+			);
+			$po = <<<EOD
+msgid "this is the{$escaped}message"
+msgstr "this is the{$escaped}translation"
+EOD;
+			file_put_contents($file, $po);
+			$result = $this->adapter->read('message', 'de', null);
+			$message  = "`{$unescaped}` (ASCII decimal {$ord}) was not escaped to `{$escaped}`";
+			$this->assertEqual($catalog, $result, $message);
+
+			unlink($file);
+
+			$this->adapter->write('message', 'de', null, $catalog);
+			$result = file_get_contents($file);
+			$message = "`{$escaped}` was not unescaped to `{$unescaped}` (ASCII decimal {$ord})";
+			$this->assertPattern('/' . preg_quote($po, '/') . '/', $result, $message);
+
+			unlink($file);
+		}
+	}
+
+	public function testCrLfToLfOnWrite() {
+		$this->adapter->mo = false;
+		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
+
+		$catalog = array(
+			"this is the\r\nmessage" => array(
+				'id' => "this is the\r\nmessage",
+				'ids' => array('singular' => "this is the\r\nmessage"),
+				'flags' => array(),
+				'translated' => "this is the\r\ntranslation",
+				'occurrences' => array(),
+				'comments' => array()
+			)
+		);
+		$po = <<<EOD
+msgid "this is the\\nmessage"
+msgstr "this is the\\ntranslation"
+EOD;
+
+		$this->adapter->write('message', 'de', null, $catalog);
+		$result = file_get_contents($file);
+		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
+	}
+
+	public function testFixEscapedSingleQuoteOnWrite() {
+		$this->adapter->mo = false;
+		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
+
+		$catalog = array(
+			"this is the\\'message" => array(
+				'id' => "this is the\\'message",
+				'ids' => array('singular' => "this is the\\'message"),
+				'flags' => array(),
+				'translated' => "this is the\\'translation",
+				'occurrences' => array(),
+				'comments' => array()
+			)
+		);
+		$po = <<<EOD
+msgid "this is the'message"
+msgstr "this is the'translation"
+EOD;
+
+		$this->adapter->write('message', 'de', null, $catalog);
+		$result = file_get_contents($file);
+		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
+	}
+
+	public function testFixDoubleEscapedOnWrite() {
+		$this->adapter->mo = false;
+		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
+
+		$catalog = array(
+			"this is the\\\\message" => array(
+				'id' => "this is the\\\\message",
+				'ids' => array('singular' => "this is the\\\\message"),
+				'flags' => array(),
+				'translated' => "this is the\\\\translation",
+				'occurrences' => array(),
+				'comments' => array()
+			)
+		);
+		$po = <<<EOD
+msgid "this is the\\\\message"
+msgstr "this is the\\\\translation"
+EOD;
+
+		$this->adapter->write('message', 'de', null, $catalog);
+		$result = file_get_contents($file);
+		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
+	}
 }
 
 ?>

@@ -440,6 +440,14 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 	/**
 	 * Prepares an item before it is being written and escapes fields.
 	 *
+	 * All characters from \000 to \037 (this includes new line and tab characters)
+	 * as well as the backslash (`\`) and the double quote (`"`) are escaped.
+	 *
+	 * Literal Windows CRLFs (`\r\n`) are converted to LFs (`\n`) to improve cross platform
+	 * compatibility. Escaped single quotes (`'`) are unescaped as they should not need to be.
+	 * Double escaped characters are maitained and not escaped once again.
+	 *
+	 * @link http://www.asciitable.com
 	 * @see lithium\g11n\catalog\adapter\Base::_prepareForWrite()
 	 * @param mixed $item
 	 * @return mixed
@@ -449,8 +457,7 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 			if (is_array($value)) {
 				return array_map($filter, $value);
 			}
-			$value = strtr($value, array("\\'" => "'", "\\\\" => "\\"));
-			$value = str_replace("\r\n", "\n", $value);
+			$value = strtr($value, array("\\'" => "'", 	"\\\\" => "\\",	"\r\n" => "\n"));
 			$value = addcslashes($value, "\0..\37\\\"");
 			return $value;
 		};
