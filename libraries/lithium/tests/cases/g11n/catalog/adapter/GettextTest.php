@@ -217,6 +217,9 @@ msgstr ""
 
 msgid " "
 msgstr ""
+
+msgid ""
+msgstr "translated"
 EOD;
 		file_put_contents($file, $data);
 

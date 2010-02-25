@@ -472,11 +472,9 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 			if (is_array($value)) {
 				return array_map($filter, $value);
 			}
-			$value = stripcslashes($value);
-			$value = ctype_space($value) ? null : $value;
-			return $value;
+			return stripcslashes($value);
 		};
-		$fields = array('ids', 'translated');
+		$fields = array('id', 'ids', 'translated');
 
 		foreach ($fields as $field) {
 			if (isset($item[$field])) {
@@ -485,6 +483,9 @@ class Gettext extends \lithium\g11n\catalog\adapter\Base {
 		}
 		if (isset($item['ids']['singular'])) {
 			$item['id'] = $item['ids']['singular'];
+		}
+		if (empty($item['id']) || ctype_space($item['id'])) {
+			return $data;
 		}
         return parent::_merge($data, $item);
     }
