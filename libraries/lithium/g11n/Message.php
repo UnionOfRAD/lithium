@@ -63,7 +63,7 @@ class Message extends \lithium\core\StaticObject {
 	 * Example:
 	 * {{{
 	 * Message::translate('I can see {:count} bike.');
-	 * Message::translate('This {:color} painting is {:color}.', array(
+	 * Message::translate('This painting is {:color}.', array(
 	 * 	'color' => Message::translate('silver'),
 	 * ));
 	 * }}}
