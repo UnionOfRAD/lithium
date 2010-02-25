@@ -364,6 +364,39 @@ class RouteTest extends \lithium\test\Unit {
 		$result = $route->parse($request);
 		$this->assertFalse($result);
 	}
+
+	/**
+	 * Tests that routes with querystrings are correctly processed.
+	 */
+	public function testRoutesWithQueryStrings() {
+		$route = new Route(array('template' => '/{:controller}/{:action}/{:args}'));
+
+		$expected = '/posts?foo=bar';
+		$result = $route->match(array('controller' => 'posts', '?' => 'foo=bar'));
+		$this->assertEqual($expected, $result);
+
+		$expected = '/posts?foo=bar&baz=dib';
+		$result = $route->match(array('controller' => 'posts', '?' => 'foo=bar&baz=dib'));
+		$this->assertEqual($expected, $result);
+
+		$expected = '/posts?foo=bar';
+		$result = $route->match(array('controller' => 'posts', '?' => array('foo' => 'bar')));
+		$this->assertEqual($expected, $result);
+
+		$expected = '/posts/archive?foo=bar&baz=dib';
+		$result = $route->match(array('controller' => 'posts', 'action' => 'archive', '?' => array(
+			'foo' => 'bar', 'baz' => 'dib'
+		)));
+		$this->assertEqual($expected, $result);
+
+		$expected = '/posts/archive?foo[]=bar&foo[]=baz';
+		$result = $route->match(array(
+			'controller' => 'posts',
+			'action' => 'archive',
+			'?' => 'foo[]=bar&foo[]=baz'
+		));
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

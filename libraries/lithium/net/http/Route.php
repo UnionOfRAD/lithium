@@ -140,6 +140,13 @@ class Route extends \lithium\core\Object {
 	public function match(array $options = array(), $context = null) {
 		$defaults = array('action' => 'index');
 		$options += $defaults;
+		$query = null;
+
+		if (isset($options['?'])) {
+			$query = $options['?'];
+			$query = '?' . (is_array($query) ? http_build_query($query) : $query);
+			unset($options['?']);
+		}
 
 		if (array_intersect_key($options, $this->_match) !== $this->_match) {
 			return false;
@@ -153,7 +160,7 @@ class Route extends \lithium\core\Object {
 		if (array_intersect_key($this->_keys, $options) + $args !== $this->_keys + $args) {
 			return false;
 		}
-		return $this->_write($options, $defaults + $this->_defaults + array('args' => ''));
+		return $this->_write($options, $defaults + $this->_defaults + array('args' => '')) . $query;
 	}
 
 	/**
