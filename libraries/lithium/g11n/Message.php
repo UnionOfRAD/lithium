@@ -163,15 +163,17 @@ class Message extends \lithium\core\StaticObject {
 			if (!isset($page[$id])) {
 				return null;
 			}
-			$translated = (array) $page[$id];
+			if (!is_array($page[$id])) {
+				return $page[$id];
+			}
 
 			if (!isset($page['plural']) || !is_callable($page['plural'])) {
 				return null;
 			}
 			$key = $page['plural']($count);
 
-			if (isset($translated[$key])) {
-				return $translated[$key];
+			if (isset($page[$id][$key])) {
+				return $page[$id][$key];
 			}
 		});
 	}

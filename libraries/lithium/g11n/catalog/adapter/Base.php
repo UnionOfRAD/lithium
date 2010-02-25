@@ -90,10 +90,10 @@ class Base extends \lithium\core\Object {
 		foreach (array('ids', 'flags', 'comments', 'occurrences') as $field) {
 			$data[$id][$field] = array_merge($data[$id][$field], $item[$field]);
 		}
-		if (is_array($item['translated'])) {
-			$data[$id]['translated'] = (array) $data[$id]['translated'] + $item['translated'];
-		} elseif (!isset($data[$id]['translated'])) {
+		if (!isset($data[$id]['translated'])) {
 			$data[$id]['translated'] = $item['translated'];
+		} elseif (is_array($item['translated'])) {
+			$data[$id]['translated'] = (array) $data[$id]['translated'] + $item['translated'];
 		}
 		return $data;
 	}
