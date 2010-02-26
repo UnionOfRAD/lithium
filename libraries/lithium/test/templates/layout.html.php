@@ -11,40 +11,48 @@
 		<link href="<?php echo $base;?>/favicon.ico" title="Icon" type="image/x-icon" rel="shortcut icon" /></head>
 	</head>
 	<body class="test-dashboard">
-		<h1>Lithium Unit Test Dashboard</h1>
-
-		<div style="float: left; padding: 10px 0 20px 20px; width: 20%;">
-			<h2>Select Test(s):</h2>
-			<a class="test-button" href="<?php echo $base ?>/test/all">Run All Tests</a>
-			<?php echo $report->render("menu", array("menu" => $menu, "base" => $base)) ?>
+		<div id="header">
+			<header>
+				<h1><a href="<?php echo $base ?>/test/">Lithium Unit Test Dashboard</a></h1>
+				<a class="test-button" href="<?php echo $base ?>/test/all">Run All Tests</a>
+			</header>
 		</div>
 
-		<div style="float:left; padding: 10px; width: 75%">
-			<h2>Stats for <?php echo $report->title; ?></h2>
+		<div class="article">
+				<article>
+					<div class="test-menu">
+						<h2>Select Test(s):</h2>
+						<?php echo $report->render("menu", array("menu" => $menu, "base" => $base)) ?>
+					</div>
 
-			<h3>Test results</h3>
+					<div class="test-content">
+						<h2>Stats for <?php echo $report->title; ?></h2>
 
-			<span class="filters">
-				<?php echo join(' | ', array_map(
-					function($class) use ($request) {
-						$url = "?filters[]={$class}";
-						$name = join('', array_slice(explode("\\", $class), -1));
-						$key = Inflector::underscore($name);
-						return "<a class=\"{$key}\" href=\"{$url}\">{$name}</a>";
-					},
-					$filters
-				)); ?>
-			</span>
-			<?php echo $report->render("stats", $report->stats()) ?>
-			<?php foreach ($report->results['filters'] as $filter => $data): ?>
-				<?php
-					$filterClass = explode("\\", $filter);
-					$filterClass = array_pop($filterClass);
-					echo $report->render(
-						strtolower($filterClass),
-						array("analysis" => $data)
-					); ?>
-			<?php endforeach ?>
+						<h3>Test results</h3>
+
+						<span class="filters">
+							<?php echo join('', array_map(
+								function($class) use ($request) {
+									$url = "?filters[]={$class}";
+									$name = join('', array_slice(explode("\\", $class), -1));
+									$key = Inflector::underscore($name);
+									return "<a class=\"{$key}\" href=\"{$url}\">{$name}</a>";
+								},
+								$filters
+							)); ?>
+						</span>
+						<?php echo $report->render("stats", $report->stats()) ?>
+						<?php foreach ($report->results['filters'] as $filter => $data): ?>
+							<?php
+								$filterClass = explode("\\", $filter);
+								$filterClass = array_pop($filterClass);
+								echo $report->render(
+									strtolower($filterClass),
+									array("analysis" => $data)
+								); ?>
+						<?php endforeach ?>
+					</div>
+			</article>
 		</div>
 		<div style="clear:both"></div>
 	</body>
