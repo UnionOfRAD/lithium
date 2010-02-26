@@ -16,6 +16,19 @@ Dispatcher::applyFilter('_callable', function($self, $params, $chain) {
 	if ($isTest === "test") {
 		return function() use ($test, $request) {
 			$group = "\\" . str_replace("/", "\\", $test);
+
+			if ($group == "\\all") {
+				$group = Libraries::locate('tests', null, array(
+					'filter' => '/cases|integration|functional/',
+					'exclude' => '/mocks/'
+				));
+				$group = array_map(function($test) {
+					$path = explode("\\", $test);
+					return "\\" . array_shift($path);
+				}, $group);
+				$group = array_unique($group);
+			}
+
 			$report = TestDispatcher::run($group , $request->query + array(
 				'reporter' => 'html',
 				'format' => 'html'

@@ -15,7 +15,7 @@
 
 		<div style="float: left; padding: 10px 0 20px 20px; width: 20%;">
 			<h2>Select Test(s):</h2>
-			<a class="test-button" href="<?php echo $base ?>/test/lithium/tests">Run All Tests</a>
+			<a class="test-button" href="<?php echo $base ?>/test/all">Run All Tests</a>
 			<?php echo $report->render("menu", array("menu" => $menu, "base" => $base)) ?>
 		</div>
 
