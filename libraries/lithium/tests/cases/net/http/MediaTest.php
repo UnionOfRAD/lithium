@@ -170,11 +170,11 @@ class MediaTest extends \lithium\test\Unit {
 		$expected = '/app/base/js/path/file.js';
 		$this->assertEqual($expected, $result);
 
-		Libraries::add('plugin', array('li3_foo_blog' => array(
+		Libraries::add('li3_foo_blog', array(
 			'path' => LITHIUM_APP_PATH . '/libraries/plugins/blog',
 			'bootstrap' => false,
 			'route' => false
-		)));
+		));
 
 		$result = Media::asset('path/file', 'js', array(
 			'library' => 'li3_foo_blog', 'base' => '/app/base'

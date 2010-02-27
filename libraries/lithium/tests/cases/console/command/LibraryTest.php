@@ -32,7 +32,11 @@ class LibraryTest extends \lithium\test\Unit {
 		$_SERVER['argv'] = array();
 
 		chdir($this->_testPath);
-		Libraries::add('library_test', array('path' => $this->_testPath . '/library_test'));
+
+		Libraries::add('library_test', array(
+			'path' => $this->_testPath . '/library_test', 'bootstrap' => false
+		));
+
 		Libraries::add('plugin', array(
 			'library_test_plugin' => array('path' => $this->_testPath . '/library_test_plugin')
 		));

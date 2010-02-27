@@ -345,18 +345,6 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertNull($result);
 	}
 
-	public function testAddingMulitplePlugins() {
-		$plugins = Libraries::add('plugin', array(
-			'li3_foo_blog' => array('bootstrap' => false),
-			'li3_foo_forum'
-		));
-		$expected = array('li3_foo_blog', 'li3_foo_forum');
-		$this->assertEqual($expected, array_keys($plugins));
-
-		$this->assertIdentical(false, $plugins['li3_foo_blog']['bootstrap']);
-		$this->assertIdentical(false, $plugins['li3_foo_forum']['bootstrap']);
-	}
-
 	public function testFindingClassesWithCallableFilters() {
 		$result = Libraries::find('lithium', array(
 			'recursive' => true, 'path' => '/tests/cases',

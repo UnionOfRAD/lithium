@@ -233,7 +233,7 @@ class Libraries {
 
 		if ($config['bootstrap'] === true) {
 			$path = "{$config['path']}/config/bootstrap.php";
-			$config['bootstrap'] = file_exists($path) ? '/config/bootstrap.php' : false;
+			$config['bootstrap'] = file_exists($path) ? 'config/bootstrap.php' : false;
 		}
 		if ($config['bootstrap']) {
 			require "{$config['path']}/{$config['bootstrap']}";
