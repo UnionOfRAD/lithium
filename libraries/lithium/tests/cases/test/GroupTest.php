@@ -36,26 +36,28 @@ class GroupTest extends \lithium\test\Unit {
 		$group = new Group();
 		$result = $group->add('g11n');
 		$expected = array(
-		  'lithium\tests\cases\g11n\CatalogTest',
-		  'lithium\tests\cases\g11n\LocaleTest',
-		  'lithium\tests\cases\g11n\MessageTest',
-		  'lithium\tests\cases\g11n\catalog\adapter\CldrTest',
-		  'lithium\tests\cases\g11n\catalog\adapter\CodeTest',
-		  'lithium\tests\cases\g11n\catalog\adapter\GettextTest',
-		  'lithium\tests\cases\g11n\catalog\adapter\PhpTest',
+			'lithium\tests\cases\g11n\CatalogTest',
+			'lithium\tests\cases\g11n\LocaleTest',
+			'lithium\tests\cases\g11n\MessageTest',
+			'lithium\tests\cases\g11n\catalog\AdapterTest',
+			'lithium\tests\cases\g11n\catalog\adapter\CldrTest',
+			'lithium\tests\cases\g11n\catalog\adapter\CodeTest',
+			'lithium\tests\cases\g11n\catalog\adapter\GettextTest',
+			'lithium\tests\cases\g11n\catalog\adapter\PhpTest',
 		);
 		$this->assertEqual($expected, $result);
 
 		$result = $group->add('data\ModelTest');
 		$expected = array(
-		  'lithium\tests\cases\g11n\CatalogTest',
-		  'lithium\tests\cases\g11n\LocaleTest',
-		  'lithium\tests\cases\g11n\MessageTest',
-		  'lithium\tests\cases\g11n\catalog\adapter\CldrTest',
-		  'lithium\tests\cases\g11n\catalog\adapter\CodeTest',
-		  'lithium\tests\cases\g11n\catalog\adapter\GettextTest',
-		  'lithium\tests\cases\g11n\catalog\adapter\PhpTest',
-		  'lithium\tests\cases\data\ModelTest'
+			'lithium\tests\cases\g11n\CatalogTest',
+			'lithium\tests\cases\g11n\LocaleTest',
+			'lithium\tests\cases\g11n\MessageTest',
+			'lithium\tests\cases\g11n\catalog\AdapterTest',
+			'lithium\tests\cases\g11n\catalog\adapter\CldrTest',
+			'lithium\tests\cases\g11n\catalog\adapter\CodeTest',
+			'lithium\tests\cases\g11n\catalog\adapter\GettextTest',
+			'lithium\tests\cases\g11n\catalog\adapter\PhpTest',
+			'lithium\tests\cases\data\ModelTest'
 		);
 		$this->assertEqual($expected, $result);
 	}

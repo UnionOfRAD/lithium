@@ -85,7 +85,8 @@ class LibrariesTest extends \lithium\test\Unit {
 			'transform' => null,
 			'bootstrap' => null,
 			'defer' => true,
-			'includePath' => false
+			'includePath' => false,
+			'default' => false
 		);
 		$this->assertEqual($expected, $result);
 		$this->assertNull(Libraries::get('foo'));

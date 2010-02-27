@@ -656,15 +656,13 @@ msgstr "this is the{$escaped}translation"
 EOD;
 			file_put_contents($file, $po);
 			$result = $this->adapter->read('message', 'de', null);
-			$message  = "`{$unescaped}` (ASCII decimal {$ord}) was not escaped to `{$escaped}`";
-			$this->assertEqual($catalog, $result, $message);
+			$this->assertEqual($catalog, $result);
 
 			unlink($file);
 
 			$this->adapter->write('message', 'de', null, $catalog);
 			$result = file_get_contents($file);
-			$message = "`{$escaped}` was not unescaped to `{$unescaped}` (ASCII decimal {$ord})";
-			$this->assertPattern('/' . preg_quote($po, '/') . '/', $result, $message);
+			$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
 
 			unlink($file);
 		}
