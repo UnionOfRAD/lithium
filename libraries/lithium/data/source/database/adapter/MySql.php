@@ -62,8 +62,8 @@ class MySql extends \lithium\data\source\Database {
 	 * @see lithium\data\Connections::add()
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('port' => '3306');
-		parent::__construct((array) $config + $defaults);
+		$defaults = array('port' => '3306', 'encoding' => null);
+		parent::__construct($config + $defaults);
 	}
 
 	/**
@@ -86,7 +86,7 @@ class MySql extends \lithium\data\source\Database {
 			$this->_isConnected = true;
 		}
 
-		if (!empty($config['encoding'])) {
+		if ($config['encoding']) {
 			$this->encoding($config['encoding']);
 		}
 
@@ -204,6 +204,9 @@ class MySql extends \lithium\data\source\Database {
 	}
 
 	public function value($value, array $schema = array()) {
+		if (is_array($value)) {
+			return parent::value($value, $schema);
+		}
 		if ($value === null) {
 			return 'NULL';
 		}

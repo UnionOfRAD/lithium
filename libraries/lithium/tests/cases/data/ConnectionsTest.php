@@ -33,12 +33,12 @@ class ConnectionsTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		foreach ($this->_preserved as $name => $config) {
-			Connections::add($name, $config['type'], $config);
+			Connections::add($name, $config);
 		}
 	}
 
 	public function testConnectionCreate() {
-		$result = Connections::add('conn-test', 'database', $this->config);
+		$result = Connections::add('conn-test', array('type' => 'database') + $this->config);
 		$expected = $this->config + array('type' => 'database');
 		$this->assertEqual($expected, $result);
 
@@ -69,7 +69,6 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$this->assertNull(Connections::reset());
 		$this->assertFalse(Connections::get());
 
-		Connections::__init();
 		$this->assertTrue(is_array(Connections::get()));
 	}
 
@@ -95,6 +94,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 
 	public function testStreamConnection() {
 		$config = array(
+			'type' => 'Http',
 			'socket' => 'Stream',
 			'host' => 'localhost',
 			'login' => 'root',
@@ -102,10 +102,11 @@ class ConnectionsTest extends \lithium\test\Unit {
 			'port' => '80'
 		);
 
-		Connections::add('stream-test', 'Http', $config);
+		Connections::add('stream-test', $config);
 		$result = Connections::get('stream-test');
 		$this->assertTrue($result instanceof \lithium\data\source\Http);
 	}
+
 /*
 	public function testErrorExceptions() {
 		$config = array(

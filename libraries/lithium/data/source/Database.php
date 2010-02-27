@@ -13,6 +13,8 @@ use \InvalidArgumentException;
 
 abstract class Database extends \lithium\data\Source {
 
+	protected $_columns = array();
+
 	protected $_strings = array(
 		'read' => "
 			SELECT {:fields} From {:table}
@@ -74,6 +76,11 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	public function value($value, array $schema = array()) {
+		if (is_array($value)) {
+			foreach ($value as $key => $val) {
+				$value[$key] = $this->value($val, $schema);
+			}
+		}
 		return $value;
 	}
 
@@ -192,6 +199,7 @@ abstract class Database extends \lithium\data\Source {
 		if (!isset($this->_strings[$type])) {
 			throw new InvalidArgumentException("Invalid query type '{$type}'");
 		}
+		$data = array_filter($data);
 		return trim(String::insert($this->_strings[$type], $data, array('clean' => true)));
 	}
 
@@ -249,6 +257,8 @@ abstract class Database extends \lithium\data\Source {
 		$boolean = 'AND';
 
 		foreach ($conditions as $key => $value) {
+			$schema[$key] = isset($schema[$key]) ? $schema[$key] : array();
+
 			switch (true) {
 				case (is_numeric($key) && is_string($value)):
 					$result[] = $value;
@@ -257,8 +267,12 @@ abstract class Database extends \lithium\data\Source {
 					$value = trim(rtrim($this->renderCommand($value), ';'));
 					$result[] = "{$key} IN ({$value})";
 				break;
+				case (is_string($key) && is_array($value)):
+					$value = join(', ', $this->value($value, $schema[$key]));
+					$result[] = "{$key} IN ({$value})";
+				break;
 				default:
-					$value = $this->value($value, isset($schema[$key]) ? $schema[$key] : array());
+					$value = $this->value($value, $schema[$key]);
 					$result[] = "{$key} = {$value}";
 				break;
 			}
@@ -330,12 +344,16 @@ abstract class Database extends \lithium\data\Source {
 		$keys = preg_replace('/ORDER\\x20BY/i', '', $keys);
 
 		if (strpos($keys, '.')) {
-			preg_match_all('/([a-zA-Z0-9_]{1,})\\.([a-zA-Z0-9_]{1,})/', $keys, $result, PREG_PATTERN_ORDER);
+			preg_match_all(
+				'/([a-zA-Z0-9_]{1,})\\.([a-zA-Z0-9_]{1,})/', $keys, $result, PREG_PATTERN_ORDER
+			);
 			$pregCount = count($result[0]);
 
 			for ($i = 0; $i < $pregCount; $i++) {
 				if (!is_numeric($result[0][$i])) {
-					$keys = preg_replace('/' . $result[0][$i] . '/', $this->name($result[0][$i]), $keys);
+					$keys = preg_replace(
+						'/' . $result[0][$i] . '/', $this->name($result[0][$i]), $keys
+					);
 				}
 			}
 			$result = ' ORDER BY ' . $keys;
@@ -346,6 +364,15 @@ abstract class Database extends \lithium\data\Source {
 			return ' ORDER BY ' . preg_replace('/' . $match[1] . '/', '', $keys) . $direction;
 		}
 		return ' ORDER BY ' . $keys . ' ' . $direction;
+	}
+
+	/**
+	 * Adds formatting to SQL comments before they're embedded in queries.
+	 *
+	 * @param string $comment
+	 * @return string
+	 */
+	public function comment($comment) {
 	}
 
 	abstract protected function _execute($query);
@@ -374,9 +401,9 @@ abstract class Database extends \lithium\data\Source {
 		switch (true) {
 			case (is_bool($value)):
 				return 'boolean';
-			case (is_float($value) || preg_match('/^\d+\.\d+/$')):
+			case (is_float($value) || preg_match('/^\d+\.\d+$/', $value)):
 				return 'float';
-			case (is_int($value) || preg_match('/^\d+/$')):
+			case (is_int($value) || preg_match('/^\d+$/', $value)):
 				return 'integer';
 			case (is_string($value) && strlen($value) <= $this->_columns['string']['length']):
 				return 'string';

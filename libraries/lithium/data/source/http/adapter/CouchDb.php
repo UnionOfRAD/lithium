@@ -198,7 +198,8 @@ class CouchDb extends \lithium\data\source\Http {
 			if (empty($path) && empty($conditions)) {
 				$path = '/_all_docs';
 			}
-			return json_decode($conn->get($table . $path, $conditions + $limit + $order));
+			$queryParams = (array) $conditions + (array) $limit + (array) $order;
+			return json_decode($conn->get($table . $path, $queryParams));
 		});
 	}
 
@@ -225,7 +226,8 @@ class CouchDb extends \lithium\data\source\Http {
 				$data['_rev'] = $data['rev'];
 				unset($data['id'], $data['rev']);
 			}
-			$result = $conn->put($table . $path, $conditions + $data, array('type' => 'json'));
+			$queryParams = (array) $conditions + (array) $data;
+			$result = $conn->put($table . $path, $queryParams, array('type' => 'json'));
 			$result = is_string($result) ? json_decode($result) : $result;
 
 			if ($success = (isset($result->_id) || (isset($result->ok) && $result->ok === true))) {
@@ -326,7 +328,7 @@ class CouchDb extends \lithium\data\source\Http {
 		$paths = array('design', 'view');
 		foreach ($paths as $element) {
 			if (isset($conditions[$element])) {
-				$path .= "/_{$element}/$conditions[$element]";
+				$path .= "/_{$element}/{$conditions[$element]}";
 				unset($conditions[$element]);
 			}
 		}

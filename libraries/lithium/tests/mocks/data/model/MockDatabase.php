@@ -10,6 +10,10 @@ namespace lithium\tests\mocks\data\model;
 
 class MockDatabase extends \lithium\data\source\Database {
 
+	protected $_columns = array(
+		'string' => array('length' => 255)
+	);
+
 	public function connect() {}
 
 	public function disconnect() {}
@@ -37,6 +41,25 @@ class MockDatabase extends \lithium\data\source\Database {
 			return '';
 		}
 		return $ret;
+	}
+
+	public function value($value, array $schema = array()) {
+		if (is_array($value)) {
+			return parent::value($value, $schema);
+		}
+		if ($value === null) {
+			return 'NULL';
+		}
+
+		switch ($type = isset($schema['type']) ? $schema['type'] : $this->_introspectType($value)) {
+			case 'boolean':
+				return $this->_toBoolean($value);
+			case 'float':
+				return floatval($value);
+			case 'integer':
+				return intval($value);
+		}
+		return "'{$value}'";
 	}
 
 	protected function _execute($sql) {

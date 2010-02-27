@@ -155,6 +155,9 @@ class Sqlite3 extends \lithium\data\source\Database {
 	}
 
 	public function value($value, array $schema = array()) {
+		if (is_array($value)) {
+			return parent::value($value, $schema);
+		}
 		return $this->_connection->escapeString($value);
 	}
 

@@ -60,7 +60,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost',
 			'fields' => array('id', 'title', 'created')
 		)));
-		$expected = 'SELECT id, title, created From mock_database_posts  ;';
+		$expected = 'SELECT id, title, created From mock_database_posts;';
 		$this->assertEqual($expected, $result);
 
 		$result = $this->db->renderCommand(new Query(array(
@@ -69,7 +69,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'fields' => array('id', 'title', 'created'),
 			'limit' => 1
 		)));
-		$expected = 'SELECT id, title, created From mock_database_posts  LIMIT 1;';
+		$expected = 'SELECT id, title, created From mock_database_posts LIMIT 1;';
 		$this->assertEqual($expected, $result);
 
 		$result = $this->db->renderCommand(new Query(array(
@@ -80,7 +80,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'conditions' => 'Post.id = 2'
 		)));
 		$expected = 'SELECT id, title, created From mock_database_posts WHERE Post.id = 2';
-		$expected .= '  LIMIT 1;';
+		$expected .= ' LIMIT 1;';
 		$this->assertEqual($expected, $result);
 	}
 
@@ -101,7 +101,12 @@ class DatabaseTest extends \lithium\test\Unit {
 				))
 			)))
 		));
-		$this->db->renderCommand($query);
+		$result = $this->db->renderCommand($query);
+
+		$expected = "SELECT MockDatabasePost.title, MockDatabasePost.body From mock_database_posts";
+		$expected .= " WHERE Post.id IN (SELECT post_id From mock_database_taggings WHERE ";
+		$expected .= "MockDatabaseTag.tag IN ('foo', 'bar', 'baz'));";
+		$this->assertEqual($expected, $result);
 	}
 }
 

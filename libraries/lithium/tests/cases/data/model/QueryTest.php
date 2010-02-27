@@ -220,7 +220,9 @@ class QueryTest extends \lithium\test\Unit {
 
 	public function testExtra() {
 		$object = new MockPostObject(array('id'=>1, 'data'=>'test'));
-		$query = new Query(array('conditions' => 'foo', 'extra' => 'value', 'extraObject' => $object));
+		$query = new Query(array(
+			'conditions' => 'foo', 'extra' => 'value', 'extraObject' => $object
+		));
 		$this->assertEqual(array('foo'), $query->conditions());
 		$this->assertEqual('value', $query->extra());
 		$this->assertEqual($object, $query->extraObject());
@@ -243,9 +245,16 @@ class QueryTest extends \lithium\test\Unit {
 			'table',
 			'comment',
 			'model',
-			'page'
+			'page',
+			'group',
+			'joins',
+			'calculate',
+			'offset'
 		);
 		$result = array_keys($export);
+
+		sort($expected);
+		sort($result);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'id, author_id, title';

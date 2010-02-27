@@ -21,7 +21,7 @@ use \lithium\tests\mocks\data\MockPostForValidates;
 class ModelTest extends \lithium\test\Unit {
 
 	public function _init() {
-		Connections::add('mock-source', '\lithium\tests\mocks\data\MockSource');
+		Connections::add('mock-source', array('type' => '\lithium\tests\mocks\data\MockSource'));
 	}
 
 	public function testOverrideMeta() {

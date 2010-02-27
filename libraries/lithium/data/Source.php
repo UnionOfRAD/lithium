@@ -160,6 +160,17 @@ abstract class Source extends \lithium\core\Object {
 	abstract public function delete($query, array $options = array());
 
 	/**
+	 * Returns the list of methods which format values imported from `Query` objects. Should be
+	 * overridden in subclasses.
+	 *
+	 * @see lithium\data\model\Query
+	 * @return array
+	 */
+	public function methods() {
+		return get_class_methods($this);
+	}
+
+	/**
 	 * A method which can be optionally implemented to configure a model class.
 	 *
 	 * @param string $class The name of the model class to be configured.
