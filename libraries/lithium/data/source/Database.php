@@ -193,7 +193,6 @@ abstract class Database extends \lithium\data\Source {
 			$sql = $self->renderCommand('delete', $data, $query);
 			return (bool) $self->invokeMethod('_execute', array($sql));
 		});
-<<<<<<< HEAD
 	}
 
 	/**
@@ -210,8 +209,6 @@ abstract class Database extends \lithium\data\Source {
 	public function item($model, array $data = array(), array $options = array()) {
 		$class = $this->_classes['record'];
 		return new $class(compact('model', 'data') + $options);
-=======
->>>>>>> Refactoring data layer to support CRUD operations against MySQL. Misc. refactorings to support Doctrine integration.
 	}
 
 	public function renderCommand($type, $data = null, $context = null) {
@@ -296,11 +293,7 @@ abstract class Database extends \lithium\data\Source {
 					$result[] = "{$key} IN ({$value})";
 				break;
 				default:
-<<<<<<< HEAD
 					$value = $this->value($value, $schema[$key]);
-=======
-					$value = $this->value($value, isset($schema[$key]) ? $schema[$key] : array());
->>>>>>> Refactoring data layer to support CRUD operations against MySQL. Misc. refactorings to support Doctrine integration.
 					$result[] = "{$key} = {$value}";
 				break;
 			}
@@ -394,6 +387,15 @@ abstract class Database extends \lithium\data\Source {
 		return ' ORDER BY ' . $keys . ' ' . $direction;
 	}
 
+	/**
+	 * Adds formatting to SQL comments before they're embedded in queries.
+	 *
+	 * @param string $comment
+	 * @return string
+	 */
+	public function comment($comment) {
+	}
+
 	abstract protected function _execute($query);
 
 	abstract protected function _insertId($query);
@@ -433,15 +435,9 @@ abstract class Database extends \lithium\data\Source {
 		switch (true) {
 			case (is_bool($value)):
 				return 'boolean';
-<<<<<<< HEAD
 			case (is_float($value) || preg_match('/^\d+\.\d+$/', $value)):
 				return 'float';
 			case (is_int($value) || preg_match('/^\d+$/', $value)):
-=======
-			case (is_float($value) || preg_match('/^\d+\.\d+/$')):
-				return 'float';
-			case (is_int($value) || preg_match('/^\d+/$')):
->>>>>>> Refactoring data layer to support CRUD operations against MySQL. Misc. refactorings to support Doctrine integration.
 				return 'integer';
 			case (is_string($value) && strlen($value) <= $this->_columns['string']['length']):
 				return 'string';

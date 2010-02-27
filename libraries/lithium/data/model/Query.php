@@ -277,14 +277,18 @@ class Query extends \lithium\core\Object {
 		return $results;
 	}
 
- 	/**
+	/**
 	 * Gets a custom query field which does not have an accessor method.
 	 *
-	 * @param string $part Query part
+	 * @param string $method Query part.
+	 * @param string $params Query parameters.
 	 * @return mixed Returns the value as set in the `Query` object's constructor.
 	 */
-	public function __call($key, $params = array()) {
-		return isset($this->_config[$key]) ? $this->_config[$key] : null;
+	public function __call($method, $params = array()) {
+		if ($params) {
+			$this->_config[$method] = current($params);
+		}
+		return isset($this->_config[$method]) ? $this->_config[$method] : null;
 	}
 
 	/**
