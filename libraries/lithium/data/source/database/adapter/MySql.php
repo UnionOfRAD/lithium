@@ -119,7 +119,7 @@ class MySql extends \lithium\data\source\Database {
 	public function entities($model = null) {
 		$config = $this->_config;
 		$method = function($self, $params, $chain) use ($config) {
-			$name = $this->name($self->config['database']);
+			$name = $this->name($config['database']);
 			return $self->query("SHOW TABLES FROM {$name};");
 		};
 		return $this->_filter(__METHOD__, compact('model'), $method);
