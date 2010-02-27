@@ -141,7 +141,7 @@ class Request extends \lithium\core\Object {
 		$this->_base = $this->_base ?: $this->_base();
 		$this->url = '/';
 
-		if (!empty($this->_config['url'])) {
+		if (isset($this->_config['url'])) {
 			$this->url = rtrim($this->_config['url'], '/');
 		} elseif (!empty($_GET['url']) ) {
 			$this->url = rtrim($_GET['url'], '/');
@@ -153,14 +153,14 @@ class Request extends \lithium\core\Object {
 		if (!empty($this->_config['query'])) {
 			$this->query = $this->_config['query'];
 		}
-		if (!empty($_GET) ) {
+		if (isset($_GET)) {
 			$this->query += $_GET;
 		}
 
 		if (!empty($this->_config['data'])) {
 			$this->data = $this->_config['data'];
 		}
-		if (!empty($_POST) ) {
+		if (isset($_POST)) {
 			$this->data += $_POST;
 		}
 
@@ -173,7 +173,18 @@ class Request extends \lithium\core\Object {
 			$this->_env['REQUEST_METHOD'] = $this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'];
 		}
 
-		if (!empty($_FILES)) {
+		$method = strtoupper($this->_env['REQUEST_METHOD']);
+
+		if (($method == 'POST' || $method == 'PUT') && !$this->data) {
+			$media = $this->_classes['media'];
+			$key = 'CONTENT_TYPE';
+
+			if (isset($this->_env[$key]) && $type = $media::type($this->_env[$key])) {
+				$this->data = $media::decode($type, file_get_contents('php://input'));
+			}
+		}
+
+		if (isset($_FILES)) {
 			$result = array();
 			$normalize = function($key, $value) use ($result, &$normalize){
 				foreach ($value as $param => $content) {
