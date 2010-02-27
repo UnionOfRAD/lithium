@@ -81,8 +81,9 @@ class Dispatcher extends \lithium\core\StaticObject {
 		}
 
 		foreach ($config as $key => $val) {
-			if (isset(static::${'_' . $key})) {
-				static::${'_' . $key} = $val + static::${'_' . $key};
+			$key = "_{$key}";
+			if (isset(static::${$key})) {
+				static::${$key} = $val + static::${$key};
 			}
 		}
 	}

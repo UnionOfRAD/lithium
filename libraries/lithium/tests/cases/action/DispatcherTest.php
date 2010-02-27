@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\action;
 
+use \lithium\action\Request;
 use \lithium\net\http\Router;
-use \lithium\net\http\Request;
 use \lithium\action\Dispatcher;
 use \lithium\tests\mocks\action\MockDispatcher;
 
@@ -32,13 +32,56 @@ class DispatcherTest extends \lithium\test\Unit {
 
 	public function testRun() {
 		Router::connect('/', array('controller' => 'test', 'action' => 'test'));
-		$request = new Request();
-		$request->url = '/';
-		MockDispatcher::run($request);
+		MockDispatcher::run(new Request(array('url' => '/')));
 
 		$result = end(MockDispatcher::$dispatched);
 		$expected = array('controller' => 'test', 'action' => 'test');
 		$this->assertEqual($expected, $result->params);
+	}
+
+	public function testRunWithNoRouting() {
+		$this->expectException('/Could not route request/');
+		MockDispatcher::run(new Request(array('url' => '/')));
+	}
+
+	public function testConfigManipulation() {
+		$config = MockDispatcher::config();
+		$expected = array('rules' => array());
+		$this->assertEqual($expected, $config);
+
+		MockDispatcher::config(array('rules' => array(
+			'admin' => array('action' => 'admin_{:action}')
+		)));
+
+		Router::connect('/', array('controller' => 'test', 'action' => 'test', 'admin' => true));
+		MockDispatcher::run(new Request(array('url' => '/')));
+
+		$result = end(MockDispatcher::$dispatched);
+		$expected = array('action' => 'admin_test', 'controller' => 'test', 'admin' => true);
+		$this->assertEqual($expected, $result->params);
+	}
+
+	public function testControllerLookupFail() {
+		Dispatcher::config(array('classes' => array('router' => __CLASS__)));
+
+		$this->expectException('/Controller SomeNonExistentController not found/');
+		Dispatcher::run(new Request(array('url' => '/')));
+	}
+
+	public function testPluginControllerLookupFail() {
+		Dispatcher::config(array('classes' => array('router' => __CLASS__)));
+
+		$this->expectException('/Controller some_invalid_plugin.Controller not found/');
+		Dispatcher::run(new Request(array('url' => '/plugin')));
+	}
+
+	public static function parse($request) {
+		switch ($request->url) {
+			case '':
+				return array('controller' => 'some_non_existent_controller', 'action' => 'index');
+			case '/plugin':
+				return array('controller' => 'some_invalid_plugin.controller', 'action' => 'index');
+		}
 	}
 }
 
