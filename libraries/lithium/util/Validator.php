@@ -69,6 +69,13 @@ class Validator extends \lithium\core\StaticObject {
 	 */
 	protected static $_rules = array();
 
+	/**
+	 * Default options used when defining a new validator rule.
+	 *
+	 * @var array Options
+	 * @see lithium\util\Validator::add()
+	 * @see lithium\util\Validator::rule()
+	 */
 	protected static $_options = array(
 		'defaults' => array('contains' => true)
 	);
@@ -145,7 +152,9 @@ class Validator extends \lithium\core\StaticObject {
 			),
 			'ip' => function($value, $format = null, array $options = array()) {
 				$options += array('flags' => array());
-				return (boolean) filter_var($value, FILTER_VALIDATE_IP, array('flags' => $options['flags']));
+				return (boolean) filter_var(
+					$value, FILTER_VALIDATE_IP, array('flags' => $options['flags'])
+				);
 			},
 			'money'        => array(
 				'right'    => '/^(?!0,?\d)(?:\d{1,3}(?:([, .])\d{3})?(?:\1\d{3})*|(?:\d+))' .
@@ -161,7 +170,9 @@ class Validator extends \lithium\core\StaticObject {
 			                  '(:[0-5]\d){0,2}$%',
 			'boolean' => function($value) {
 				$bool = is_bool($value);
-				return ($bool || filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null);
+				$filter = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+				return ($bool || $filter !== null);
 			},
 			'decimal' => function($value, $format = null, array $options = array()) {
 				if (isset($options['precision'])) {
@@ -224,7 +235,9 @@ class Validator extends \lithium\core\StaticObject {
 			},
 			'url' => function($value, $format = null, array $options = array()) {
 				$options += array('flags' => array());
-				return (boolean) filter_var($value, FILTER_VALIDATE_URL, array('flags' => $options['flags']));
+				return (boolean) filter_var(
+					$value, FILTER_VALIDATE_URL, array('flags' => $options['flags'])
+				);
 			}
 		);
 
@@ -527,13 +540,13 @@ class Validator extends \lithium\core\StaticObject {
 	/**
 	 * Validates credit card numbers. Returns true if `$value` is in the proper credit card format.
 	 *
+	 * @see lithium\util\Validator::isLuhn()
 	 * @param mixed $value credit card number to validate
 	 * @param mixed $type 'all' may be passed as a sting, defaults to fast which checks format of
 	 *                     most major credit cards if an array is used only the values of the array
 	 *                     are checked.  Example: array('amex', 'bankcard', 'maestro')
 	 * @param boolean $deep set to true this will check the Luhn algorithm of the credit card.
 	 * @return boolean Success
-	 * @see lithium\util\Validator::isLuhn()
 	 */
 	// public static function isCreditCard($value, $format = 'fast', $deep = false) {}
 
@@ -663,16 +676,17 @@ class Validator extends \lithium\core\StaticObject {
 	// public static function isSsn($value, $format = null) {}
 
 	/**
-	 * Checks that a value is a valid URL according to http://www.w3.org/Addressing/URL/url-spec.txt
+	 * Checks that a value is a valid URL according to
+	 * http://www.w3.org/Addressing/URL/url-spec.txt
 	 *
 	 * The regex checks for the following component parts:
-	 * 	a valid, optional, scheme
-	 * 		a valid ip address OR
-	 * 		a valid domain name as defined by section 2.3.1 of http://www.ietf.org/rfc/rfc1035.txt
-	 *	  with an optional port number
-	 *	an optional valid path
-	 *	an optional query string (get parameters)
-	 *	an optional fragment (anchor tag)
+	 * 	    - A valid, optional, scheme
+	 * 		- A valid ip address OR
+	 * 		- A valid domain name as defined by section 2.3.1 of
+	 * 		  http://www.ietf.org/rfc/rfc1035.txt with an optional port number
+	 *	    - An optional valid path
+	 *	    - An optional query string (get parameters)
+	 *	    - An optional fragment (anchor tag)
 	 *
 	 * @param string $value Value to check
 	 * @return boolean Success
