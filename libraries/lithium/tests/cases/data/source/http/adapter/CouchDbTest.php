@@ -21,6 +21,7 @@ class CouchDbTest extends \lithium\test\Unit {
 			'service' => '\lithium\tests\mocks\data\source\http\adapter\MockService',
 			'socket' => '\lithium\tests\mocks\data\source\http\adapter\MockSocket'
 		),
+		'database' => 'lithium-test',
 		'persistent' => false,
 		'protocol' => 'tcp',
 		'host' => 'localhost',
@@ -68,6 +69,7 @@ class CouchDbTest extends \lithium\test\Unit {
 	public function testEntities() {
 		$couchdb = new CouchDb($this->_testConfig);
 		$result = $couchdb->entities();
+		$this->assertNull($result);
 	}
 
 	public function testDescribe() {
@@ -82,7 +84,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->create($this->query);
 		$this->assertEqual($expected, $result);
 
-		$expected = '/posts';
+		$expected = '/lithium-test';
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
 
@@ -98,7 +100,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->create($this->query);
 		$this->assertEqual($expected, $result);
 
-		$expected = '/posts/12345';
+		$expected = '/lithium-test/12345';
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
 
@@ -113,11 +115,11 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->read($this->query);
 		$this->assertEqual($expected, $result);
 
-		$expected = '/posts/_all_docs';
+		$expected = '/lithium-test/_all_docs';
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
 
-		$expected = '';
+		$expected = 'include_docs=true';
 		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
 	}
@@ -129,7 +131,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->read($this->query);
 		$this->assertEqual($expected, $result);
 
-		$expected = '/posts/12345';
+		$expected = '/lithium-test/12345';
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
 
@@ -147,7 +149,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->read($this->query);
 		$this->assertEqual($expected, $result);
 
-		$expected = '/posts/_design/latest/_view/all';
+		$expected = '/lithium-test/_design/latest/_view/all';
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
 
@@ -199,6 +201,14 @@ class CouchDbTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testResultClose() {
+		$couchdb = new CouchDb($this->_testConfig);
+
+		$expected = null;
+		$result = $couchdb->result('close', (object) array(), $this->query);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testUpdate() {
 		$couchdb = new CouchDb($this->_testConfig);
 		$this->query->data(array('id' => 12345, 'rev' => '1-1', 'title' => 'One'));
@@ -207,7 +217,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->update($this->query);
 		$this->assertEqual($expected, $result);
 
-		$expected = '/posts/12345';
+		$expected = '/lithium-test/12345';
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
 
@@ -224,7 +234,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->delete($this->query);
 		$this->assertEqual($expected, $result);
 
-		$expected = '/posts/12345';
+		$expected = '/lithium-test/12345';
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
 
@@ -232,6 +242,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
 	}
+
 }
 
 ?>

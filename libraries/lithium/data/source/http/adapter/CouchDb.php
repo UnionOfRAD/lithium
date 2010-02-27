@@ -103,15 +103,16 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return void
 	 */
 	public function describe($entity, $meta = array()) {
+		$database = $this->_config['database'];
 		if (!$this->_db) {
-			$result = $this->get($entity);
+			$result = $this->get($database);
 			if (isset($result->db_name)) {
 				$this->_db = true;
 			}
 			if (!$this->_db) {
 				if (isset($result->error)) {
 					if ($result->error == 'not_found') {
-						$result = $this->put($entity);
+						$result = $this->put($database);
 					}
 				}
 				if (isset($result->ok) || isset($result->db_name)) {
@@ -148,21 +149,23 @@ class CouchDb extends \lithium\data\source\Http {
 	public function create($query, array $options = array()) {
 		$params = compact('query', 'options');
 		$conn =& $this->_connection;
+		$config = $this->_config;
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn) {
+		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
 			extract($params);
 			$options = $query->export($self);
 			extract($options, EXTR_OVERWRITE);
 			$data = $query->data();
 
 			$id = null;
+			$data['type'] = $table;
 
 			if (!empty($data['id'])) {
 				$id = '/' . $data['id'];
 				$data['_id'] = (string) $data['id'];
-				$result = $conn->put($table . $id, $data, array('type' => 'json'));
+				$result = $conn->put($config['database'] . $id, $data, array('type' => 'json'));
 			} else {
-				$result = $conn->post($table, $data, array('type' => 'json'));
+				$result = $conn->post($config['database'], $data, array('type' => 'json'));
 			}
 			$result = is_string($result) ? json_decode($result) : $result;
 			$result = (object) $self->result('next', $result, $query);
@@ -187,8 +190,9 @@ class CouchDb extends \lithium\data\source\Http {
 		$options += $defaults;
 		$params = compact('query', 'options');
 		$conn =& $this->_connection;
+		$config = $this->_config;
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn) {
+		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
 			extract($params);
 			$options = $query->export($self);
 
@@ -197,9 +201,10 @@ class CouchDb extends \lithium\data\source\Http {
 
 			if (empty($path) && empty($conditions)) {
 				$path = '/_all_docs';
+				$conditions['include_docs'] = 'true';
 			}
 			$queryParams = (array) $conditions + (array) $limit + (array) $order;
-			return json_decode($conn->get($table . $path, $queryParams));
+			return json_decode($conn->get($config['database'] . $path, $queryParams));
 		});
 	}
 
@@ -213,8 +218,9 @@ class CouchDb extends \lithium\data\source\Http {
 	public function update($query, array $options = array()) {
 		$params = compact('query', 'options');
 		$conn =& $this->_connection;
+		$config = $this->_config;
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn) {
+		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
 			extract($params);
 			$options = $query->export($self);
 			extract($options, EXTR_OVERWRITE);
@@ -227,7 +233,7 @@ class CouchDb extends \lithium\data\source\Http {
 				unset($data['id'], $data['rev']);
 			}
 			$queryParams = (array) $conditions + (array) $data;
-			$result = $conn->put($table . $path, $queryParams, array('type' => 'json'));
+			$result = $conn->put($config['database'] . $path, $queryParams, array('type' => 'json'));
 			$result = is_string($result) ? json_decode($result) : $result;
 
 			if ($success = (isset($result->_id) || (isset($result->ok) && $result->ok === true))) {
@@ -252,8 +258,9 @@ class CouchDb extends \lithium\data\source\Http {
 	public function delete($query, array $options = array()) {
 		$params = compact('query', 'options');
 		$conn =& $this->_connection;
+		$config = $this->_config;
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn) {
+		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
 			extract($params);
 			$options = $query->export($self);
 			extract($options, EXTR_OVERWRITE);
@@ -263,7 +270,7 @@ class CouchDb extends \lithium\data\source\Http {
 			if (!empty($data['rev'])) {
 				$conditions['rev'] = $data['rev'];
 			}
-			$result = json_decode($conn->delete($table . $path, $conditions));
+			$result = json_decode($conn->delete($config['database'] . $path, $conditions));
 			return (isset($result->ok) && $result->ok === true);
 		});
 	}
@@ -308,9 +315,6 @@ class CouchDb extends \lithium\data\source\Http {
 			case 'close':
 				unset($resource);
 				$result = null;
-			break;
-			default:
-				$result = parent::result($type, $resource, $context);
 			break;
 		}
 		return $result;
