@@ -14,33 +14,38 @@
 		<div id="header">
 			<header>
 				<h1><a href="<?php echo $base ?>/test/">Lithium Unit Test Dashboard</a></h1>
-				<a class="test-button" href="<?php echo $base ?>/test/all">Run All Tests</a>
+				<a class="test-all" href="<?php echo $base ?>/test/all">run all tests</a>
 			</header>
 		</div>
 
 		<div class="article">
 				<article>
 					<div class="test-menu">
-						<h2>Select Test(s):</h2>
+
 						<?php echo $report->render("menu", array("menu" => $menu, "base" => $base)) ?>
 					</div>
 
 					<div class="test-content">
-						<h2>Stats for <?php echo $report->title; ?></h2>
-
-						<h3>Test results</h3>
-
 						<span class="filters">
 							<?php echo join('', array_map(
 								function($class) use ($request) {
 									$url = "?filters[]={$class}";
 									$name = join('', array_slice(explode("\\", $class), -1));
 									$key = Inflector::underscore($name);
-									return "<a class=\"{$key}\" href=\"{$url}\">{$name}</a>";
+									$active = (
+										isset($request->query['filters']) &&
+										array_search($class, $request->query['filters']) !== false
+									) ?
+										'active' : null ;
+									return "<a class=\"{$key} {$active}\" href=\"{$url}\">{$name}</a>";
 								},
 								$filters
 							)); ?>
 						</span>
+
+						<?php if (is_array($report->title)) { $report->title = join (', ', $report->title); } ?>
+						<h2><span>test results for </span><?php echo $report->title; ?></h2>
+
 						<?php echo $report->render("stats", $report->stats()) ?>
 						<?php foreach ($report->results['filters'] as $filter => $data): ?>
 							<?php

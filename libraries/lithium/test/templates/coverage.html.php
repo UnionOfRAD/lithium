@@ -7,7 +7,6 @@
 	<?php foreach ($coverage['output'] as $file => $data): ?>
 		<?php if (!empty($data)): ?>
 			<div class="code-coverage-results">
-				<h4 class="name"><?php echo $file ?></h4>
 				<?php foreach ($data as $line => $row): ?>
 					<div class="code-line <?php echo $row['class'] ?>">
 						<span class="line-num"><?php echo $line ?></span>
@@ -16,7 +15,9 @@
 						?></span>
 					</div><!-- code-line -->
 				<?php endforeach ?>
-			</div><!-- code-coverage-results -->
+			</div>
+			<h4 class="code-coverage-name"><?php echo $file ?></h4>
+			<!-- code-coverage-results -->
 		<?php endif ?>
 	<?php endforeach ?>
 <?php endforeach ?>
