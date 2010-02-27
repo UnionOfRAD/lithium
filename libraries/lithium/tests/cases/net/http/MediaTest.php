@@ -61,6 +61,17 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertFalse(in_array('my', $result));
 	}
 
+	/**
+	 * Tests that `Media` will return the correct type name of recognized, registered content types.
+	 *
+	 * @return void
+	 */
+	public function testContentTypeDetection() {
+		$this->assertNull(Media::type('application/foo'));
+		$this->assertEqual('js', Media::type('application/javascript'));
+		$this->assertEqual('html', Media::type('*/*'));
+	}
+
 	public function testAssetTypeHandling() {
 		$result = Media::assets();
 		$expected = array('js', 'css', 'image', 'generic');
@@ -210,6 +221,23 @@ class MediaTest extends \lithium\test\Unit {
 		$expected = json_encode($data);
 		$result = $response->body();
 		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * Tests that types with decode handlers can properly decode content.
+	 *
+	 * @return void
+	 */
+	public function testDecode() {
+		$data = (object) array('movies' => array(
+			(object) array('name' => 'Shaun of the Dead', 'year' => 2004),
+			(object) array('name' => 'V for Vendetta', 'year' => 2005)
+		));
+		$encoded = '{"movies":[{"name":"Shaun of the Dead","year":2004},';
+		$encoded .= '{"name":"V for Vendetta","year":2005}]}';
+
+		$result = Media::decode('json', $encoded);
+		$this->assertEqual($data, $result);
 	}
 
 	public function testCustomEncodeHandler() {

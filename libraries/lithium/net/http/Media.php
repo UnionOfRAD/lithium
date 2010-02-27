@@ -42,8 +42,8 @@ class Media extends \lithium\core\StaticObject {
 		'css'          => 'text/css',
 		'form'         => 'application/x-www-form-urlencoded',
 		'htm'          => array('alias' => 'html'),
-		'html'         => array('text/html', '*/*'),
-		'js'           => 'text/javascript',
+		'html'         => array('text/html', 'application/xhtml+xml', '*/*'),
+		'js'           => array('application/javascript', 'text/javascript'),
 		'json'         => 'application/json',
 		'rss'          => 'application/rss+xml',
 		'text'         => 'text/plain',
@@ -170,7 +170,17 @@ class Media extends \lithium\core\StaticObject {
 	 * Media::type('my', false);
 	 * }}}
 	 *
+	 * Alternatively, can be used to detect the type name of a registered content type:
+	 * {{{
+	 * Media::type('application/json'); // returns 'json'
+	 * Media::type('application/javascript'); // returns 'javascript'
+	 * Media::type('text/javascript'); // also returns 'javascript'
+	 * }}}
+	 *
 	 * @param string $type A file extension for the type, i.e. `'txt'`, `'js'`, or `'atom'`.
+	 *               Alternatively, may be a content type, i.e. `'text/html'`,
+	 *               `'application/atom+xml'`, etc.; in which case, the type name (i.e. '`html'` or
+	 *               `'atom'`) will be returned.
 	 * @param mixed $content Optional. A string or array containing the content-type(s) that
 	 *        `$type` should map to.  If `$type` is an array of content-types, the first one listed
 	 *        should be the "primary" type.
@@ -204,6 +214,15 @@ class Media extends \lithium\core\StaticObject {
 
 		if ($content === false) {
 			unset(static::$_types[$type], static::$_handlers[$type]);
+		}
+
+		if (strpos($type, '/')) {
+			foreach (static::$_types as $name => $cTypes) {
+				if ($type == $cTypes || (is_array($cTypes) && in_array($type, $cTypes))) {
+					return $name;
+				}
+			}
+			return;
 		}
 
 		if (empty($content) && empty($options)) {
@@ -410,6 +429,25 @@ class Media extends \lithium\core\StaticObject {
 			return null;
 		}
 		$method = static::$_handlers[$type]['encode'];
+		return is_string($method) ? $method($data) : $method($data, $handler + $options);
+	}
+
+	/**
+	 * For media types registered in `$_handlers` which include an `'decode'` setting, decodes data
+	 * according to the specified media type.
+	 *
+	 * @param string $type Specifies the media type into which `$data` will be encoded. This media
+	 *        type must have an `'encode'` setting specified in `Media::$_handlers`.
+	 * @param mixed $data Arbitrary data you wish to encode. Note that some encoders can only handle
+	 *        arrays or objects.
+	 * @param array $options Handler-specific options.
+	 * @return mixed
+	 */
+	public static function decode($type, $data, array $options = array()) {
+		if (!isset(static::$_handlers[$type])) {
+			return null;
+		}
+		$method = static::$_handlers[$type]['decode'];
 		return is_string($method) ? $method($data) : $method($data, $handler + $options);
 	}
 
