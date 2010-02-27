@@ -42,11 +42,14 @@ class Adaptable extends \lithium\core\StaticObject {
 	protected static $_configurations = array();
 
 	/**
-	 * Strategies. To be re-defined in sub-classes that implement strategy execution.
+	 * To be re-defined in sub-classes.
 	 *
-	 * @var array SplStack of strategies, indexed by named configuration.
+	 * Holds the Libraries::locate() compatible path string where the strategy in question
+	 * may be found.
+	 *
+	 * @var string Path string.
 	 */
-	protected static $_strategies = array();
+	protected static $_strategies = null;
 
 	/**
 	 * To be re-defined in sub-classes.
@@ -91,7 +94,8 @@ class Adaptable extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Returns adapter class name for given `$name` configuration.
+	 * Returns adapter class name for given `$name` configuration, using
+	 * the `$_adapter` path defined in Adaptable subclasses.
 	 *
 	 * @param string $name Class name of adapter to load.
 	 * @return object Adapter object.
@@ -115,71 +119,6 @@ class Adaptable extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Applies the configured strategies to the passed data.
-	 *
-	 * @param mixed $data The data to be transformed.
-	 * @param string $type The strategy method to be called: either `inbound` or `outbound`.
-	 * @param array $params Parameters that are used by the strategy $method.
-	 * @return mixed The transformed input data.
-	 **/
-	public static function applyStrategies($data, $type, $params = array()) {
-		$strategies = self::strategies($params['name']);
-
-		switch ($type) {
-			case 'inbound':
-				$mode = SplStack::IT_MODE_LIFO | SplStack::IT_MODE_KEEP;
-				break;
-			case 'outbound':
-				$mode = SplStack::IT_MODE_FIFO | SplStack::IT_MODE_KEEP;
-				break;
-		}
-		$strategies->setIteratorMode($mode);
-
-		//foreach ($strategies as $strategy) {
-			//$strategy::$method($params);
-		//}
-		//return $params['data'];
-	}
-
-	/**
-	 * Allows setting & querying of static object strategies.
-	 *
-	 * - If `$name` is set, returns the strategies attached to the current static object.
-	 * - If `$name` and `$strategy` are set, $strategy is added to the strategy stack denoted by
-	 *   `$name`.
-	 * - If `$name` and `$strategy` are not set, then the full indexed strategies array is returned
-	 *   (note: the strategies are wrapped in `SplStack`).
-	 *
-	 * @todo Move functionality to separate class/namespace.
-	 * @param string $name Named configuration.
-	 * @param mixed $strategy Fully namespaced cache strategy identifier. String or array
-	 * @return mixed See above description.
-	 */
-	public static function strategies($name = '', $strategy = null) {
-		if (empty($name)) {
-			return static::$_strategies;
-		}
-
-		if (!isset(static::$_strategies[$name])) {
-			static::$_strategies[$name] = new SplStack();
-		}
-
-		if (!empty($strategy)) {
-			$strategies = static::$_strategies[$name];
-
-			if (is_array($strategy)) {
-				array_walk($strategy, function($value) use (&$strategies) {
-					$strategies->push($value);
-				});
-			} elseif (is_string($strategy)) {
-				$strategies->push($strategy);
-			}
-			return true;
-		}
-		return static::$_strategies[$name];
-	}
-
-	/**
 	 * Determines if the adapter specified in the named configuration is enabled.
 	 *
 	 * `Enabled` can mean various things, e.g. having a PECL memcached extension compiled
@@ -198,8 +137,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Looks up an adapter class by name, using the `$_adapters` property set by a subclass of
-	 * `Adaptable`.
+	 * Looks up an adapter class by name.
 	 *
 	 * @see lithium\core\libraries::locate()
 	 * @param string $config The configuration array of the adapter to be located.

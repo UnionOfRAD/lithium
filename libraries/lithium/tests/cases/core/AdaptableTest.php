@@ -15,7 +15,6 @@ use \lithium\tests\mocks\core\MockAdapter;
 
 class AdaptableTest extends \lithium\test\Unit {
 
-
 	public function setUp() {
 		$this->adaptable = new Adaptable();
 	}
