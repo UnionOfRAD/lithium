@@ -26,6 +26,10 @@
 					</div>
 
 					<div class="test-content">
+						<?php if (is_array($report->title)) {
+							$report->title = join (', ', $report->title);
+						} ?>
+						<h2><span>test results for </span><?php echo $report->title; ?></h2>
 						<span class="filters">
 							<?php echo join('', array_map(
 								function($class) use ($request) {
@@ -42,10 +46,6 @@
 								$filters
 							)); ?>
 						</span>
-
-						<?php if (is_array($report->title)) { $report->title = join (', ', $report->title); } ?>
-						<h2><span>test results for </span><?php echo $report->title; ?></h2>
-
 						<?php echo $report->render("stats", $report->stats()) ?>
 						<?php foreach ($report->results['filters'] as $filter => $data): ?>
 							<?php
