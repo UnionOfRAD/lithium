@@ -103,11 +103,14 @@ class CreateTest extends \lithium\test\Unit {
 		$this->request->params += array(
 			'command' => 'create', 'action' => 'run', 'args' => array('model')
 		);
-		$create->run('model');
+		$create->run('model', 'Post');
 
 		$expected = 'model';
 		$result = $create->request->params['command'];
 		$this->assertEqual($expected, $result);
+
+		$result = $this->_testPath . '/create_test/models/Post.php';
+		$this->assertTrue(file_exists($result));
 	}
 
 	public function testRunWithTestModelCommand() {

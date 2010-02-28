@@ -35,7 +35,7 @@ class Test extends \lithium\console\command\Create {
 		$use = "\\{$library['prefix']}{$namespace}\\{$name}";
 		$methods =  array();
 
-		if (class_exists($use)) {
+		if (class_exists($use, false)) {
 			$methods = array();
 			foreach (array_keys(Inspector::methods($use, 'extents')) as $method) {
 				$methods[] = "\tpublic function test" . ucwords($method) . "() {}";

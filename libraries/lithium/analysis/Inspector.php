@@ -60,7 +60,7 @@ class Inspector extends \lithium\core\StaticObject {
 		if (strpos($identifier, '::')) {
 			return (strpos($identifier, '$') !== false) ? 'property' : 'method';
 		}
-		if (class_exists($identifier) && in_array($identifier, get_declared_classes())) {
+		if (class_exists($identifier, false) && in_array($identifier, get_declared_classes())) {
 			return 'class';
 		}
 		return 'namespace';
