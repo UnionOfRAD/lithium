@@ -246,15 +246,21 @@ class Form extends \lithium\template\Helper {
 	 */
 	public function field($name, array $options = array()) {
 		$defaults = array(
-			'label' => null, 'type' => 'text',
-			'template' => 'field', 'wrap' => null,
+			'label' => null,
+			'type' => 'text',
+			'template' => 'field',
+			'wrap' => null,
 			'list' => null
 		);
 		$options += $defaults;
+		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+
+		if ($options['template'] != $defaults['template']) {
+			$template = $options['template'];
+		}
 		$wrap = $options['wrap'];
 		$type = $options['type'];
-
-		$label = $input = $error = null;
+		$label = $input = null;
 
 		if ($options['label'] === null || !empty($options['label'])) {
 			$label = $this->label($name, $options['label']);
@@ -269,15 +275,10 @@ class Form extends \lithium\template\Helper {
 				$input = $this->{$type}($name, $fieldOptions);
 			break;
 		}
+		$error = ($this->_binding) ? $this->error($name) : null;
+		$params = compact('wrap', 'label', 'input', 'error');
 
-		if ($this->_binding) {
-			$error = $this->error($name);
-		}
-		return $this->_render(
-			__METHOD__,
-			$options['template'],
-			compact('wrap', 'label', 'input', 'error')
-		);
+		return $this->_render(__METHOD__, $template, $params);
 	}
 
 	/**

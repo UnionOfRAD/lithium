@@ -489,6 +489,20 @@ class FormTest extends \lithium\test\Unit {
 		$result = $this->form->field('name');
 		$this->assertEqual($expected, $result);
 	}
+
+	/**
+	 * Tests that the string template form `Form::field()` can be overridden.
+	 *
+	 * @return void
+	 */
+	public function testFieldTemplateOverride() {
+		$this->form->config(array('templates' => array('field' => '{:label}{:input}{:error}')));
+		$result = $this->form->field('name', array('type' => 'text'));
+		$this->assertTags($result, array(
+			'label' => array('for' => 'name'), 'Name', '/label',
+			'input' => array('type' => 'text', 'name' => 'name')
+		));
+	}
 }
 
 ?>
