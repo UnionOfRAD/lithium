@@ -29,8 +29,13 @@ body.test-dashboard #header h1 {
 body.test-dashboard #header h1 a {
 	text-decoration: none;
 	display: block;
-	padding: 0.25em 0.5em;
+	padding: .45em 0.75em 0 0;
 	color: rgba(0,0,0,.15);
+}
+
+body.test-dashboard .triangle:before {
+	content: '\25B2';
+	font-size: 1em;
 }
 
 body.test-dashboard #header {
@@ -63,7 +68,7 @@ body.test-dashboard .test-content {
 
 }
 .test-content h2 span {
-	color: #B1B1B1;
+	color: #ccc;
 	display: block;
 	font-size: .65em;
 }
@@ -84,14 +89,14 @@ body.test-dashboard a.test-button:active {
 	background-color:#f5f5f5;
 	border-color: #e6e6e6;
 	color: #999;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
 	padding: .5em 1em;
 	margin: 0;
 	background-color: white;
 	border: 1px solid #e5e5e5;
 	text-decoration: none;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
 	-moz-box-shadow: 0 0 6px rgba(0,0,0,.1);
 	-webkit-box-shadow: 0 0 6px rgba(0,0,0,.1);
 	box-shadow: 0 0 6px rgba(0,0,0,.1);
@@ -111,7 +116,7 @@ body.test-dashboard ul {
 	padding: 0.2em 0 0.2em 0;
 }
 
-body.test-dashboard li, a.test-all {
+body.test-dashboard li {
 	display: block;
 	margin: 0 0 1px 0;
 	padding: 0.25em 0 0.25em 0.75em;
@@ -162,7 +167,7 @@ ul.menu a:hover, ul.menu a:active {
 	color: black;
 }
 
-a.menu-folder, a.test-all {
+a.menu-folder {
 	color: #333 !important;
 	font-weight: bold;
 	text-decoration: none;
@@ -170,31 +175,56 @@ a.menu-folder, a.test-all {
 }
 
 a.test-all {
-	font-size: 2em;
+	display: block;
+	float: left;
+	font-size: 1.5em;
 	text-align: center;
+	text-decoration: none;
 	padding: .25em 0;
-	margin: 0;
-	width: 20%;
-	background: none;
-	font-weight: normal;
+	margin: .5em 4%;
+	width: 12%;
+	color: rgba(255,255,255,.25) !important;
+	background: #454545;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	-moz-box-shadow: 0 0 6px rgba(0,0,0,.25);
+	-webkit-box-shadow: 0 0 6px rgba(0,0,0,.25);
+	box-shadow: 0 0 6px rgba(0,0,0,.25);
+	border: 1px solid rgba(0,0,0,.05);
 }
 a.test-all:hover {
-	color: black !important;
+	background: #60AF12;
+	color: white !important;
+	-moz-box-shadow: inset 0 0 6px rgba(0,0,0,.25);
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.25);
+	box-shadow: inset 0 0 6px rgba(0,0,0,.25);
 }
 
-a.menu-folder:before {
+ul.menu a:before, a.menu-folder:before {
 	display: inline !important;
 	float: none !important;
-	padding: 0 !important;
-	content: '\2386';
+	padding: 0 0.5em 0 0;
+	content: '\25B4';
 	font-weight: normal;
-	color: rgba(0,0,0,.25)
+	color: rgba(0,0,0,.15)
+}
+a.menu-folder:before {
+	padding: 0 !important;
+	content: '\25B2' !important;
+}
+ul.menu a:hover:before, a.menu-folder:hover:before {
+	color: #60AF12;
 }
 
 /*--- Benchmarking ---*/
 table.metrics {
-	border: 0;
-	border-top: 1px solid #ccc;
+	border: 1px solid #e6e6e6;
+	border: 1px solid rgba(0,0,0,.1);
+	-moz-box-shadow: 0 0 6px rgba(0,0,0,.15);
+	-webkit-box-shadow: 0 0 6px rgba(0,0,0,.15);
+	box-shadow: 0 0 6px rgba(0,0,0,.15);
+	margin: 0 auto;
 }
 
 td.metric-name {
@@ -206,7 +236,7 @@ td.metric-name {
 }
 td.metric {
 	border: 0;
-	font-family: 'Courier New', Courier;
+	font-family: 'Andale Mono', Monaco, Courier, monospace !important;
 	font-weight: bold;
 	padding: 6px 8px;
 	text-align: right;
@@ -367,7 +397,6 @@ span.filters {
 	margin-top: 0;
 }
 span.filters a {
-	background:white;
 	padding: .5em;
 	margin-left: .25em;
 	text-decoration:none;

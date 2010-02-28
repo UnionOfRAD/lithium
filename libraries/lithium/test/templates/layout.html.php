@@ -8,12 +8,12 @@
 		<title></title>
 		<link rel="stylesheet" href="<?php echo $base;?>/css/debug.css" />
 		<link href="<?php echo $base;?>/favicon.ico" title="Icon" type="image/x-icon" rel="icon" />
-		<link href="<?php echo $base;?>/favicon.ico" title="Icon" type="image/x-icon" rel="shortcut icon" /></head>
+		<link href="<?php echo $base;?>/favicon.ico" title="Icon" type="image/x-icon" rel="shortcut icon" />
 	</head>
 	<body class="test-dashboard">
 		<div id="header">
 			<header>
-				<h1><a href="<?php echo $base ?>/test/">Lithium Unit Test Dashboard</a></h1>
+				<h1><a href="<?php echo $base ?>/test/"><span class="triangle"></span> Lithium Unit Test Dashboard</a></h1>
 				<a class="test-all" href="<?php echo $base ?>/test/all">run all tests</a>
 			</header>
 		</div>
