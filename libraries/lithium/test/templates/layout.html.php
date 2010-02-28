@@ -6,7 +6,7 @@
 <html>
 	<head>
 		<title></title>
-		<link rel="stylesheet" href="<?php echo $base;?>/css/debug.css" />
+		<link rel="stylesheet" href="<?php echo $base; ?>/css/debug.css" />
 		<link href="<?php echo $base; ?>/favicon.ico" type="image/x-icon" rel="icon" />
 		<link href="<?php echo $base; ?>/favicon.ico" type="image/x-icon" rel="shortcut icon" />
 	</head>
@@ -32,7 +32,11 @@
 					<?php if (is_array($report->title)) {
 						$report->title = join (', ', $report->title);
 					} ?>
-					<h2><span>test results for </span><?php echo $report->title; ?></h2>
+
+					<?php if ($report->title != '' && $report->title != '\\') { ?>
+						<h2><span>test results for </span><?php echo $report->title; ?></h2>
+					<?php } ?>
+
 					<span class="filters">
 						<?php echo join('', array_map(
 							function($class) use ($request) {
@@ -50,8 +54,8 @@
 						)); ?>
 					</span>
 					<?php
-
 					echo $report->render("stats", $report->stats());
+
 					foreach ($report->results['filters'] as $filter => $data) {
 						$filterClass = explode("\\", $filter);
 						$filterClass = array_pop($filterClass);
