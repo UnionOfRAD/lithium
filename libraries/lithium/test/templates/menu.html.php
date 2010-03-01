@@ -8,10 +8,17 @@
 		$path = explode("\\", $test);
 		$case = array_pop($path);
 		$caseDepth = count($path);
-		if (isset($prev[1]) && $path[0] != $prev[1]) {
+		for ($i = count($prev) - 1; $i > 0; $i--) {
+			if (isset($path[$i-1]) && $path[$i-1] != $prev[$i]) {
+				$caseDepth = $i;
+				$current = $prev[$i];
+			}
+		}
+
+		/*if (isset($prev[1]) && $path[0] != $prev[1]) {
 			$caseDepth = 1;
 			$current = $prev[1];
-		}
+		}*/
 	?>
 	<?php if (!isset($current)): ?>
 		<ul class="menu">
