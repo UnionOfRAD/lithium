@@ -61,6 +61,10 @@ class Libraries {
 			'{:library}\extensions\adapter\{:namespace}\{:class}\{:name}',
 			'{:library}\{:namespace}\{:class}\adapter\{:name}' => array('libraries' => 'lithium')
 		),
+		'strategy' => array(
+			'{:library}\extensions\strategy\{:namespace}\{:class}\{:name}',
+			'{:library}\{:namespace}\{:class}\strategy\{:name}' => array('libraries' => 'lithium')
+		),
 		'command' => array(
 			'{:library}\extensions\command\{:namespace}\{:class}\{:name}',
 			'{:library}\console\command\{:namespace}\{:class}\{:name}' => array(
@@ -527,6 +531,8 @@ class Libraries {
 	 * Performs service location lookups by library, based on the library's `'defer'` flag.
 	 * Libraries with `'defer'` set to `true` will be searched last when looking up services.
 	 *
+	 * @see lithium\core\Libraries::$_paths
+	 * @see lithium\core\Libraries::locate()
 	 * @param boolean $defer A boolean flag indicating which libraries to search, either the ones
 	 *        with the `'defer'` flag set, or the ones without.
 	 * @param array $paths List of paths to be searched for the given service (class).  These are
@@ -536,8 +542,6 @@ class Libraries {
 	 * @param array $options
 	 * @return string Returns a class path as a string if a given class is found, or null if no
 	 *         class in any path matching any of the parameters is located.
-	 * @see lithium\core\Libraries::$_paths
-	 * @see lithium\core\Libraries::locate()
 	 */
 	protected static function _locateDeferred($defer, $paths, $params, array $options = array()) {
 		if (isset($options['library'])) {
