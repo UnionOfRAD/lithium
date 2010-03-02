@@ -184,7 +184,7 @@ class Request extends \lithium\core\Object {
 			}
 		}
 
-		if (isset($_FILES)) {
+		if (isset($_FILES) && $_FILES) {
 			$result = array();
 			$normalize = function($key, $value) use ($result, &$normalize){
 				foreach ($value as $param => $content) {
@@ -215,7 +215,7 @@ class Request extends \lithium\core\Object {
 					}
 				}
 			}
-			$this->data += $result;
+			$this->data = (array) $this->data + $result;
 		}
 	}
 
