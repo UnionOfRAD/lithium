@@ -40,7 +40,6 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @var array
 	 */
 	protected static $_classes = array(
-		'request' => '\lithium\action\Request',
 		'router' => '\lithium\net\http\Router'
 	);
 
@@ -89,30 +88,27 @@ class Dispatcher extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Dispatches a request based on a request object (an instance of `lithium\net\http\Request`). If
-	 * `$request` is null, a new request object is instantiated based on the value of the
-	 * `'request'` key in the `$_classes` array.
+	 * Dispatches a request based on a request object (an instance or subclass of
+	 * `lithium\net\http\Request`).
 	 *
-	 * @param object $request An instance of a request object with HTTP request information.  If
-	 *        `null`, an instance will be created.
+	 * @see lithium\action\Request
+	 * @see lithium\action\Response
+	 * @param object $request An instance of a request object (usually `lithium\action\Request`)
+	 *               with HTTP request information.
 	 * @param array $options
 	 * @return mixed Returns the value returned from the callable object retrieved from
 	 *         `Dispatcher::_callable()`, which is either a string or an instance of
 	 *         `lithium\action\Response`.
 	 * @todo Add exception-handling/error page rendering
 	 */
-	public static function run($request = null, array $options = array()) {
-		$defaults = array('request' => array());
-		$options += $defaults;
-		$classes = static::$_classes;
+	public static function run($request, array $options = array()) {
+		$router = static::$_classes['router'];
 		$params = compact('request', 'options');
-		$method = __FUNCTION__;
 
-		return static::_filter($method, $params, function($self, $params, $chain) use ($classes) {
-			extract($params);
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($router) {
+			$request = $params['request'];
+			$options = $params['options'];
 
-			$router = $classes['router'];
-			$request = $request ?: new $classes['request']($options['request']);
 			$request->params = $router::parse($request);
 			$params = $self::invokeMethod('_applyRules', array($request->params));
 
