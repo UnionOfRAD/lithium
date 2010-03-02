@@ -81,20 +81,14 @@ class Cldr extends \lithium\g11n\catalog\Adapter {
 
 		switch ($category) {
 			case 'currency':
-				$data = $this->_readCurrency($path, $locale);
-			break;
+				return $this->_readCurrency($path, $locale);
 			case 'language':
 			case 'script':
 			case 'territory':
-				$data = $this->_readList($path, $category, $locale);
-			break;
+				return $this->_readList($path, $category, $locale);
 			case 'validation':
-				$data = $this->_readValidation($path, $locale);
-			break;
-			default:
-				return null;
+				return $this->_readValidation($path, $locale);
 		}
-		return $data;
 	}
 
 	protected function _readValidation($path, $locale) {
