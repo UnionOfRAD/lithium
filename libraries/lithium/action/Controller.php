@@ -110,22 +110,25 @@ class Controller extends \lithium\core\Object {
 		'response' => '\lithium\action\Response'
 	);
 
+	protected $_autoConfig = array('render' => 'merge', 'classes' => 'merge');
+
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'request' => null, 'response' => array(), 'render' => array(), 'classes' => array()
 		);
-		$config += $defaults;
-		$this->request = empty($config['request']) ? $this->request : $config['request'];
+		parent::__construct($config + $defaults);
+	}
+
+	protected function _init() {
+		parent::_init();
+		$this->request = $this->request ?: $this->_config['request'];
 
 		if ($this->request) {
 			$this->_render['type'] = $this->request->type();
 		}
-		foreach (array('render', 'classes') as $key) {
-			if (!empty($config[$key])) {
-				$this->{'_' . $key} = (array) $config[$key] + $this->{'_' . $key};
-			}
-		}
-		parent::__construct($config);
+
+		$config = $this->_config['response'] + array('request' => $this->request);
+		$this->response = new $this->_classes['response']($config);
 	}
 
 	/**
@@ -152,8 +155,6 @@ class Controller extends \lithium\core\Object {
 			if (substr($action, 0, 1) == '_' || method_exists(__CLASS__, $action)) {
 				throw new Exception('Private method!');
 			}
-			$response = $config['response'] + array('request' => $self->request);
-			$self->response = new $classes['response']($response);
 			$render['template'] = $render['template'] ?: $action;
 
 			try {

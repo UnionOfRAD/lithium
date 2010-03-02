@@ -16,33 +16,6 @@ use \lithium\tests\mocks\action\MockControllerRequest;
 class ControllerTest extends \lithium\test\Unit {
 
 	/**
-	 * Tests that render settings and dynamic class dependencies can properly be injected into the
-	 * controller through the constructor.
-	 *
-	 * @return void
-	 */
-	public function testConstructionWithCustomProperties() {
-		$postsController = new MockPostsController();
-
-		$result = $postsController->access('_render');
-		$this->assertIdentical($result['layout'], 'default');
-
-		$result = $postsController->access('_classes');
-		$this->assertIdentical($result['response'], '\lithium\action\Response');
-
-		$postsController = new MockPostsController(array(
-			'render' => array('layout' => false),
-			'classes' => array('response' => '\app\extensions\net\http\Response')
-		));
-
-		$result = $postsController->access('_render');
-		$this->assertIdentical($result['layout'], false);
-
-		$result = $postsController->access('_classes');
-		$this->assertIdentical($result['response'], '\app\extensions\net\http\Response');
-	}
-
-	/**
 	 * Tests that controllers can be instantiated with custom request objects.
 	 *
 	 * @return void
