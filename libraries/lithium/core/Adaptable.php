@@ -104,13 +104,13 @@ class Adaptable extends \lithium\core\StaticObject {
 		$config = static::_config($name);
 
 		if ($config === null) {
-			throw new Exception("Adapter configuration {$name} has not been defined");
+			throw new Exception("Configuration $name has not been defined");
 		}
 
 		if (isset($config['adapter']) && is_object($config['adapter'])) {
 			return $config['adapter'];
 		}
-		$class = static::_class($config, static::$_adapters);
+		$class = static::_class($config['adapter'], static::$_adapters);
 		$settings = static::$_configurations[$name];
 		$settings[0]['adapter'] = new $class($config);
 
@@ -125,37 +125,37 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * & loaded, as well as having the memcache server up & available.
 	 *
 	 * @param string $name The named configuration whose adapter will be checked.
-	 * @return boolean|null  True if adapter is enabled, false if not. This method will return
-	 *         null if no configuration under the given $name exists.
+	 * @return boolean|null  True if adapter is enabled, false if not. This method will
+	 *         return null if no configuration under the given $name exists.
 	 */
 	public static function enabled($name) {
 		if (!static::_config($name)) {
-			return;
+			return null;
 		}
 		$adapter = static::adapter($name);
 		return $adapter::enabled();
 	}
 
 	/**
-	 * Looks up an adapter class by name.
+	 * Looks up an adapter or strategy class by name.
 	 *
 	 * @see lithium\core\libraries::locate()
-	 * @param string $config The configuration array of the adapter to be located.
+	 * @param string $name The name of the adapter or strategy to be located.
 	 * @param array $paths Optional array of search paths that will be checked.
 	 * @return string Returns a fully-namespaced class reference to the adapter class.
 	 */
-	protected static function _class($config, $paths = array()) {
-		$self = get_called_class();
-
-		if (!$name = $config['adapter']) {
-			throw new Exception("No adapter set for configuration in class {$self}");
+	protected static function _class($name, $paths = array()) {
+		if (!$name) {
+			$self = get_called_class();
+			throw new Exception("No adapter(strategy) set for configuration in class {$self}");
 		}
 		foreach ((array) $paths as $path) {
 			if ($class = Libraries::locate($path, $name)) {
 				return $class;
 			}
 		}
-		throw new Exception("Could not find adapter {$name} in class {$self}");
+		$self = get_called_class();
+		throw new Exception("Could not find adapter(strategy) {$name} in class {$self}");
 	}
 
 	/**
