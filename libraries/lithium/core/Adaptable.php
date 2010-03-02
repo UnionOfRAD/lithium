@@ -118,6 +118,11 @@ class Adaptable extends \lithium\core\StaticObject {
 		return static::$_configurations[$name][0]['adapter'];
 	}
 
+	public static function strategies($name = null) {
+		$config = static::_config($name);
+
+	}
+
 	/**
 	 * Determines if the adapter specified in the named configuration is enabled.
 	 *

@@ -11,7 +11,9 @@ namespace lithium\tests\cases\core;
 use \lithium\util\Collection;
 use \lithium\core\Adaptable;
 use \lithium\storage\cache\adapter\Memory;
+use \lithium\storage\cache\strategy\Serialize;
 use \lithium\tests\mocks\core\MockAdapter;
+use \lithium\tests\mocks\core\MockStrategy;
 
 class AdaptableTest extends \lithium\test\Unit {
 
@@ -79,6 +81,22 @@ class AdaptableTest extends \lithium\test\Unit {
 		$result = $adapter::adapter('default');
 		$expected = new Memory($items['default']);
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testStrategy() {
+		$strategy = new MockStrategy();
+		$items = array('default' => array(
+			'strategies' => array('Serialize'),
+			'filters' => array(),
+			'adapter' => null
+		));
+		$strategy::config($items);
+		$result = $strategy::config();
+		$expected = $items;
+		$this->assertEqual($expected, $result);
+
+		$result = $strategy::strategies('default');
+		$expected = new Serialize($items['default']);
 	}
 
 	public function testEnabled() {
