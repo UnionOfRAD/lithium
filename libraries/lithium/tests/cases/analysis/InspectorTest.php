@@ -141,6 +141,12 @@ class InspectorTest extends \lithium\test\Unit {
 		$this->assertEqual('property', Inspector::type('Inspector::$_classes'));
 		$this->assertEqual('method', Inspector::type('Inspector::type'));
 		$this->assertEqual('method', Inspector::type('Inspector::type()'));
+
+		$this->assertEqual('class', Inspector::type('\lithium\security\Auth'));
+		$this->assertEqual('class', Inspector::type('lithium\security\Auth'));
+
+		$this->assertEqual('namespace', Inspector::type('\lithium\security\auth'));
+		$this->assertEqual('namespace', Inspector::type('lithium\security\auth'));
 	}
 
 	/**
