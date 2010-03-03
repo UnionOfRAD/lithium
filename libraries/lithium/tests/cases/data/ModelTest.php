@@ -149,7 +149,7 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testSimpleFind() {
 		$result = MockPost::find('all');
-		$this->assertTrue($result instanceof \lithium\data\collection\RecordSet);
+		$this->assertTrue($result['query'] instanceof \lithium\data\model\Query);
 	}
 
 	/**

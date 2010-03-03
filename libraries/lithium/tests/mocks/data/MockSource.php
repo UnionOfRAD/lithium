@@ -10,6 +10,11 @@ namespace lithium\tests\mocks\data;
 
 class MockSource extends \lithium\data\Source {
 
+	protected $_classes = array(
+		'record' => '\lithium\data\model\Record',
+		'recordSet' => '\lithium\data\collection\RecordSet'
+	);
+
 	public function connect() {
 		return true;
 	}
@@ -20,6 +25,11 @@ class MockSource extends \lithium\data\Source {
 
 	public function entities($class = null) {
 		return array('mock_posts', 'mock_comments', 'mock_tags', 'posts_tags');
+	}
+
+	public function item($model, array $data = array(), array $options = array()) {
+		$class = $this->_classes['record'];
+		return new $class(compact('model', 'data') + $options);
 	}
 
 	public function describe($entity, $meta = array()) {

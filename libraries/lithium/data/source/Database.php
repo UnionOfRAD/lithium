@@ -27,6 +27,11 @@ abstract class Database extends \lithium\data\Source {
 		'join'   => "{:type} JOIN {:table} {:constraint}"
 	);
 
+	protected $_classes = array(
+		'record' => '\lithium\data\model\Record',
+		'recordSet' => '\lithium\data\collection\RecordSet'
+	);
+
 	/**
 	 * Abstract. Must be defined by child class.
 	 * Getter/Setter for the connection's encoding
@@ -188,6 +193,22 @@ abstract class Database extends \lithium\data\Source {
 			$sql = $self->renderCommand('delete', $data, $query);
 			return (bool) $self->invokeMethod('_execute', array($sql));
 		});
+	}
+
+	/**
+	 * Returns a newly-created `Record` object, bound to a model and populated with default data
+	 * and options.
+	 *
+	 * @param string $model A fully-namespaced class name representing the model class to which the
+	 *               `Record` object will be bound.
+	 * @param array $data The default data with which the new `Record` should be populated.
+	 * @param array $options Any additional options to pass to the `Record`'s constructor.
+	 * @return object Returns a new, un-saved `Record` object bound to the model class specified in
+	 *         `$model`.
+	 */
+	public function item($model, array $data = array(), array $options = array()) {
+		$class = $this->_classes['record'];
+		return new $class(compact('model', 'data') + $options);
 	}
 
 	public function renderCommand($type, $data = null, $context = null) {

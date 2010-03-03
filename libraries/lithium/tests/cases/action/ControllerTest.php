@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\action;
 
 use \Exception;
+use \lithium\action\Request;
 use \lithium\action\Controller;
 use \lithium\tests\mocks\action\MockPostsController;
 use \lithium\tests\mocks\action\MockControllerRequest;
@@ -273,6 +274,27 @@ class ControllerTest extends \lithium\test\Unit {
 		$expected = array('data' => 'test');
 		$result = json_decode($postsController->response->body(), true);
 		$this->assertEqual($expected, $result);
+	}
+
+	public function methods() {
+		return array('testDispatchingWithExplicitControllerName');
+	}
+
+	/**
+	 * Tests that requests which are dispotched with the controller route parameter specified as
+	 * a fully-qualified class name are able to locate their templates correctly.
+	 *
+	 * @return void
+	 */
+	public function testDispatchingWithExplicitControllerName() {
+		$request = new Request(array('url' => '/'));
+		$request->params = array(
+			'controller' => '\lithium\tests\mocks\action\MockPostsController',
+			'action' => 'index'
+		);
+
+		$postsController = new MockPostsController(compact('request'));
+		$postsController->__invoke($request, $request->params);
 	}
 }
 

@@ -18,10 +18,6 @@ class Company extends \lithium\data\Model {
 		'connection' => 'test',
 		'source' => 'companies'
 	);
-
-	public static function classes() {
-		return static::_instance()->_classes;
-	}
 }
 
 class SourceTest extends \lithium\test\Unit {
@@ -65,10 +61,8 @@ class SourceTest extends \lithium\test\Unit {
 	 */
 	public function testSingleReadWriteWithKey() {
 		$key = Company::meta('key');
-		$classes = Company::classes();
 
 		$new = Company::create(array($key => 12345, 'name' => 'Acme, Inc.'));
-		$this->assertTrue(is_a($new, $classes['record']));
 
 		$result = $new->data();
 		$expected = array($key => 12345, 'name' => 'Acme, Inc.');

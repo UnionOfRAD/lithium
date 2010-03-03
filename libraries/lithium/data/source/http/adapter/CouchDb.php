@@ -30,6 +30,11 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	protected $_db = false;
 
+	protected $_classes = array(
+		'service' => '\lithium\net\http\Service',
+		'document' => '\lithium\data\collection\Document'
+	);
+
 	/**
 	 * Constructor
 	 *
@@ -67,10 +72,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @see lithium\data\Model::$_classes
 	 */
 	public function configureClass($class) {
-		return array('meta' => array('key' => 'id'), 'classes' => array(
-			'record' => '\lithium\data\collection\Document',
-			'recordSet' => '\lithium\data\collection\Document'
-		));
+		return array('meta' => array('key' => 'id'), 'classes' => array());
 	}
 
 	/**
@@ -193,10 +195,11 @@ class CouchDb extends \lithium\data\source\Http {
 		$config = $this->_config;
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
-			extract($params);
-			$options = $query->export($self);
+			$query = $params['query'];
+			$options = $params['options'];
+			$params = $query->export($self);
 
-			extract($options, EXTR_OVERWRITE);
+			extract($params, EXTR_OVERWRITE);
 			extract($conditions, EXTR_OVERWRITE);
 
 			if (empty($path) && empty($conditions)) {
@@ -204,7 +207,11 @@ class CouchDb extends \lithium\data\source\Http {
 				$conditions['include_docs'] = 'true';
 			}
 			$queryParams = (array) $conditions + (array) $limit + (array) $order;
-			return json_decode($conn->get($config['database'] . $path, $queryParams));
+			$data = json_decode($conn->get($config['database'] . $path, $queryParams), true);
+
+			return $self->item($options['model'], $data, compact('query') + array(
+				'exists' => true
+			));
 		});
 	}
 
@@ -273,6 +280,22 @@ class CouchDb extends \lithium\data\source\Http {
 			$result = json_decode($conn->delete($config['database'] . $path, $conditions));
 			return (isset($result->ok) && $result->ok === true);
 		});
+	}
+
+	/**
+	 * Returns a newly-created `Document` object, bound to a model and populated with default data
+	 * and options.
+	 *
+	 * @param string $model A fully-namespaced class name representing the model class to which the
+	 *               `Document` object will be bound.
+	 * @param array $data The default data with which the new `Document` should be populated.
+	 * @param array $options Any additional options to pass to the `Document`'s constructor
+	 * @return object Returns a new, un-saved `Document` object bound to the model class specified
+	 *         in `$model`.
+	 */
+	public function item($model, array $data = array(), array $options = array()) {
+		$class = $this->_classes['document'];
+		return new $class(compact('model', 'data') + $options);
 	}
 
 	/**

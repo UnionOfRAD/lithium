@@ -40,18 +40,16 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	protected $_classes = array(
 		'connections' => '\lithium\data\Connections',
-		'query' => '\lithium\data\model\Query',
-		'record' => '\lithium\data\model\Record',
-		'recordSet' => '\lithium\data\model\RecordSet',
-		'validator' => '\lithium\util\Validator',
+		'query'       => '\lithium\data\model\Query',
+		'validator'   => '\lithium\util\Validator'
 	);
 
 	protected $_relations = array();
 
 	protected $_relationTypes = array(
 		'belongsTo' => array('class', 'key', 'conditions', 'fields'),
-		'hasOne' => array('class', 'key', 'conditions', 'fields', 'dependent'),
-		'hasMany' => array(
+		'hasOne'    => array('class', 'key', 'conditions', 'fields', 'dependent'),
+		'hasMany'   => array(
 			'class', 'key', 'conditions', 'fields', 'order', 'limit',
 			'dependent', 'exclusive', 'finder', 'counter'
 		)
@@ -136,7 +134,16 @@ class Model extends \lithium\core\StaticObject {
 		static::_instance()->_relations = static::_relations();
 	}
 
+	/**
+	 * Exports an array of custom finders which use the filter system to wrap around `find()`
+	 *
+	 * @return void
+	 */
 	protected static function _findFilters() {
+		$self = static::_instance();
+		$query =& $self->_query;
+		$classes = $self->_classes;
+
 		return array(
 			'first' => function($self, $params, $chain) {
 				$params['options']['limit'] = 1;
@@ -153,6 +160,21 @@ class Model extends \lithium\core\StaticObject {
 					$chain->next($self, $params, $chain)
 				);
 				return $result;
+			},
+			'count' => function($self, $params, $chain) use (&$query, &$classes) {
+				$model = $self;
+				$type = $params['type'];
+				$options = array_filter($params['options']);
+
+				$classes = $options['classes'];
+				unset($options['classes']);
+
+				if (!isset($options['conditions']) && $options) {
+					$options = array('conditions' => $options) + compact('classes', 'model');
+				}
+
+				$query = new $classes['query'](array('type' => 'read') + $options);
+				return $self::invokeMethod('_connection')->calculation('count', $query, $options);
 			}
 		);
 	}
@@ -161,7 +183,7 @@ class Model extends \lithium\core\StaticObject {
 		$self = static::_instance();
 
 		if ($method == 'all' || isset($self->_finders[$method])) {
-			if (isset($params[0]) && !is_array($params[0])) {
+			if (isset($params[0]) && (is_string($params[0]) || is_int($params[0]))) {
 				$params[0] = array('conditions' => array($self->_meta['key'] => $params[0]));
 			}
 			return $self::find($method, $params ? $params[0] : array());
@@ -201,24 +223,10 @@ class Model extends \lithium\core\StaticObject {
 
 		$filter = function($self, $params) use ($meta) {
 			$options = $params['options'] + array('model' => $meta['name']);
-			$connections = $options['classes']['connections'];
-			$name = $meta['meta']['connection'];
+			$query = $options['classes']['query'];
 
-			$query = new $options['classes']['query'](array('type' => 'read') + $options);
-			$connection = $connections::get($name);
-			$result = $connection->read($query, $options);
-
-			if ($result === null) {
-				return null;
-			}
-			return new $options['classes']['recordSet'](array(
-				'query'    => $query,
-				'model'    => $options['model'],
-				'handle'   => &$connection,
-				'classes'  => $options['classes'],
-				'result'   => &$result,
-				'exists'   => true
-			));
+			$connection = $self::invokeMethod('_connection');
+			return $connection->read(new $query(array('type' => 'read') + $options), $options);
 		};
 		$finder = isset($self->_finders[$type]) ? array($self->_finders[$type]) : array();
 		return static::_filter(__FUNCTION__, $params, $filter, $finder);
@@ -266,7 +274,12 @@ class Model extends \lithium\core\StaticObject {
 
 	public static function key($values = array()) {
 		$key = static::_instance()->_meta['key'];
-		$values = is_object($values) ? $values->to('array') : $values;
+
+		if (is_object($values) && method_exists($values, 'to')) {
+			$values = $values->to('array');
+		} elseif (is_object($values) && isset($values->{$key})) {
+			return $values->{$key};
+		}
 
 		if (empty($values)) {
 			return $key;
@@ -351,17 +364,18 @@ class Model extends \lithium\core\StaticObject {
 	 * @return object Returns a new, **un-saved** record object.
 	 */
 	public static function create($data = array()) {
-		$schema = static::schema();
-		if (!empty($schema)) {
-			foreach ($schema as $field => $settings) {
-				if (!isset($data[$field]) && array_key_exists('default', $settings)) {
-					$data[$field] = $settings['default'];
+		return static::_filter(__FUNCTION__, compact('data'), function($self, $params) {
+			$data = $params['data'];
+
+			if ($schema = $self::schema()) {
+				foreach ($schema as $field => $config) {
+					if (!isset($data[$field]) && isset($config['default'])) {
+						$data[$field] = $config['default'];
+					}
 				}
 			}
-		}
-		$class = static::_instance()->_classes['record'];
-		$model = get_called_class();
-		return new $class(compact('model', 'data'));
+			return $self::invokeMethod('_connection')->item($self, $data);
+		});
 	}
 
 	/**
@@ -393,7 +407,7 @@ class Model extends \lithium\core\StaticObject {
 		$options += $defaults + compact('classes');
 		$params = compact('record', 'data', 'options');
 
-		$filter = function($class, $params) use (&$self, $meta) {
+		$filter = function($self, $params) use ($meta) {
 			extract($params);
 
 			if ($data) {
@@ -404,11 +418,10 @@ class Model extends \lithium\core\StaticObject {
 				return false;
 			}
 
-			$queryOptions = array('type' => 'read') + $options + $meta + compact('record');
+			$type = $record->exists() ? 'update' : 'create';
+			$queryOptions = compact('type') + $options + $meta + compact('record');
 			$query = new $options['classes']['query']($queryOptions);
-			$method = $record->exists() ? 'update' : 'create';
-
-			return $self->invokeMethod('_connection')->{$method}($query, $options);
+			return $self::invokeMethod('_connection')->{$type}($query, $options);
 		};
 
 		if (!$options['callbacks']) {
