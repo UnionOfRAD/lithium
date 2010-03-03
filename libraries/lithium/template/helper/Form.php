@@ -173,7 +173,7 @@ class Form extends \lithium\template\Helper {
 	 * @param array $options
 	 * @return string Returns a `<form />` open tag with the `action` attribute defined by either
 	 *         the `'action'` or `'url'` options (defaulting to the current page if none is
-	 *         specified), the HTTP method is defined by the `'type'` option, and any HTML
+	 *         specified), the HTTP method is defined by the `'method'` option, and any HTML
 	 *         attributes passed in `$options`.
 	 */
 	public function create($binding = null, array $options = array()) {
