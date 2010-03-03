@@ -487,11 +487,14 @@ class Model extends \lithium\core\StaticObject {
 	 * @param mixed $closure
 	 */
 	public static function applyFilter($method, $closure = null) {
-		foreach ((array) $method as $m) {
-			if (!isset(static::_instance()->_instanceFilters[$m])) {
-				static::_instance()->_instanceFilters[$m] = array();
+		$instance = static::_instance();
+		$methods = (array) $method;
+
+		foreach ($methods as $method) {
+			if (!isset($instance->_instanceFilters[$method])) {
+				$instance->_instanceFilters[$method] = array();
 			}
-			static::_instance()->_instanceFilters[$m][] = $closure;
+			$instance->_instanceFilters[$method][] = $closure;
 		}
 	}
 
@@ -509,10 +512,11 @@ class Model extends \lithium\core\StaticObject {
 		if (!strpos($method, '::')) {
 			$method = get_called_class() . '::' . $method;
 		}
-		list($class, $m) = explode('::', $method, 2);
+		list($class, $method) = explode('::', $method, 2);
+		$instance = static::_instance();
 
-		if (isset(static::_instance()->_instanceFilters[$m])) {
-			$filters = array_merge(static::_instance()->_instanceFilters[$m], $filters);
+		if (isset($instance->_instanceFilters[$method])) {
+			$filters = array_merge($instance->_instanceFilters[$method], $filters);
 		}
 		return parent::_filter($method, $params, $callback, $filters);
 	}
