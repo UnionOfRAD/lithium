@@ -107,8 +107,10 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	public function disconnect() {
-		if ($this->_isConnected) {
-			$this->_isConnected = !$this->_connection->close();
+		if ($this->_connection && $this->_connection->connected) {
+			try {
+				$this->_isConnected = !$this->_connection->close();
+			} catch (Exception $e) {}
 			unset($this->_db, $this->_connection);
 			return !$this->_isConnected;
 		}
