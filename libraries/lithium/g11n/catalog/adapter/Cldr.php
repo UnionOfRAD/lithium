@@ -102,7 +102,7 @@ class Cldr extends \lithium\g11n\catalog\Adapter {
 		$query .= "/postCodeRegex[@territoryId=\"{$territory}\"]";
 
 		$nodes = $this->_parseXml($file, $query);
-		$regex =  (string) current($nodes);
+		$regex = (string) current($nodes);
 
 		return $this->_merge($data, array(
 			'id' => 'postalCode',
