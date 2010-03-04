@@ -147,7 +147,6 @@ class Adaptable extends \lithium\core\StaticObject {
 	/**
 	 * Applies strategies configured in `$name` for `$method` on `$data`.
 	 *
-	 * @todo Implement reversing of stack for inbound/outbound strategy application.
 	 * @param string $method The strategy method to be applied.
 	 * @param string $name The named configuration
 	 * @param mixed $data The data to which the strategies will be applied.
@@ -169,7 +168,9 @@ class Adaptable extends \lithium\core\StaticObject {
 		}
 
 		foreach ($strategies as $strategy) {
-			$data = $strategy::$method($data);
+			if (method_exists($strategy, $method)) {
+				$data = $strategy::$method($data);
+			}
 		}
 		return $data;
 	}
