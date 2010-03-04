@@ -150,7 +150,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @param string $method The strategy method to be applied.
 	 * @param string $name The named configuration
 	 * @param mixed $data The data to which the strategies will be applied.
-	 * @param null|string $mode If `$mode` is set to LIFO, the strategies are applied in reverse
+	 * @param null|string $mode If `$mode` is set to 'LIFO', the strategies are applied in reverse.
 	 *        order of their definition.
 	 * @return mixed Result of application of strategies to data. If no strategies
 	 *         have been configured, this method will simply return the original data.

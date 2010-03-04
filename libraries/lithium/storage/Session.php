@@ -105,7 +105,8 @@ class Session extends \lithium\core\Adaptable {
 			}
 		}
 		$filters = $settings['filters'];
-		return static::_filter(__METHOD__, compact('key', 'options'), $method, $filters);
+		$result = static::_filter(__METHOD__, compact('key', 'options'), $method, $filters);
+		return static::applyStrategies(__FUNCTION__, $name, $result, 'LIFO');
 	}
 
 	/**
@@ -136,6 +137,7 @@ class Session extends \lithium\core\Adaptable {
 		}
 		$result = false;
 		$settings = static::_config($name);
+		$data = static::applyStrategies(__FUNCTION__, $name, $value);
 
 		foreach ($methods as $name => $method) {
 			$params = compact('key', 'value', 'options');
