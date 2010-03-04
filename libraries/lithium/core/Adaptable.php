@@ -11,7 +11,7 @@ namespace lithium\core;
 use \Exception;
 use \lithium\util\Collection;
 use \lithium\core\Environment;
-use \SplStack;
+use \SplDoublyLinkedList;
 
 /**
  * The `Adaptable` static class is the base class from which all adapter implementations extend.
@@ -135,7 +135,7 @@ class Adaptable extends \lithium\core\StaticObject {
 		if (!isset($config['strategies'])) {
 			return null;
 		}
-		$stack = new SplStack();
+		$stack = new SplDoublyLinkedList();
 
 		foreach ($config['strategies'] as $strategy) {
 			$class = static::_class($strategy, static::$_strategies);
@@ -151,15 +151,21 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @param string $method The strategy method to be applied.
 	 * @param string $name The named configuration
 	 * @param mixed $data The data to which the strategies will be applied.
+	 * @param null|string $mode If `$mode` is set to LIFO, the strategies are applied in reverse
+	 *        order of their definition.
 	 * @return mixed Result of application of strategies to data. If no strategies
 	 *         have been configured, this method will simply return the original data.
 	 */
-	public static function applyStrategies($method, $name, $data) {
+	public static function applyStrategies($method, $name, $data, $mode = null) {
 		if (!$strategies = static::strategies($name)) {
 			return $data;
 		}
 		if (!count($strategies)) {
 			return $data;
+		}
+
+		if ($mode === 'LIFO') {
+			$strategies->setIteratorMode(SplDoublyLinkedList::IT_MODE_LIFO);
 		}
 
 		foreach ($strategies as $strategy) {

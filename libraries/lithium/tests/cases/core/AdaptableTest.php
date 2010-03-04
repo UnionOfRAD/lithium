@@ -14,7 +14,7 @@ use \lithium\storage\cache\adapter\Memory;
 use \lithium\storage\cache\strategy\Serializer;
 use \lithium\tests\mocks\core\MockAdapter;
 use \lithium\tests\mocks\core\MockStrategy;
-use \SplStack;
+use \SplDoublyLinkedList;
 
 class AdaptableTest extends \lithium\test\Unit {
 
@@ -87,7 +87,7 @@ class AdaptableTest extends \lithium\test\Unit {
 	public function testStrategy() {
 		$strategy = new MockStrategy();
 		$items = array('default' => array(
-			'strategies' => array('Serialize'),
+			'strategies' => array('Serializer'),
 			'filters' => array(),
 			'adapter' => null
 		));
@@ -97,9 +97,9 @@ class AdaptableTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $strategy::strategies('default');
-		$this->assertTrue($result instanceof SplStack);
+		$this->assertTrue($result instanceof SplDoublyLinkedList);
 		$this->assertEqual(count($result), 1);
-		$this->assertTrue($result->top() instanceof Serialize);
+		$this->assertTrue($result->top() instanceof Serializer);
 	}
 
 	public function testNonExistentStrategyConfiguration() {
@@ -130,6 +130,28 @@ class AdaptableTest extends \lithium\test\Unit {
 		$data = array('some' => 'data');
 		$result = $strategy::applyStrategies('write', 'default', $data);
 		$this->assertEqual(serialize($data), $result);
+	}
+
+	public function testApplyMultipleStrategies() {
+		$strategy = new MockStrategy();
+		$items = array('default' => array(
+			'filters' => array(),
+			'adapter' => null,
+			'strategies' => array('Serializer', 'Encoder')
+		));
+		$strategy::config($items);
+		$result = $strategy::config();
+		$expected = $items;
+		$this->assertEqual($expected, $result);
+
+		$data = array('some' => 'data');
+		$result = $strategy::applyStrategies('write', 'default', $data);
+		$transformed = base64_encode(serialize($data));
+		$this->assertEqual($transformed, $result);
+
+		$result = $strategy::applyStrategies('read', 'default', $transformed, 'LIFO');
+		$expected = $data;
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testApplyStrategiesNoConfiguredStrategies() {

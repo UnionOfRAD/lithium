@@ -139,7 +139,7 @@ class Cache extends \lithium\core\Adaptable {
 		$filters = $settings[$name]['filters'];
 
 		$result = static::_filter(__FUNCTION__, $params, $method, $filters);
-		return static::applyStrategies(__FUNCTION__, $name, $result);
+		return static::applyStrategies(__FUNCTION__, $name, $result, 'LIFO');
 	}
 
 	/**
