@@ -13,7 +13,8 @@ use \Exception;
 /**
  * The `Controller` class is the fundamental building block of your application's request/response
  * cycle. Controllers are organized around a single logical entity, usually one or more model
- * classes (i.e. `lithium\data\Model`) and is tasked with performing operations against that entity.
+ * classes (i.e. `lithium\data\Model`) and are tasked with performing operations against that
+ * entity.
  *
  * Each controller has a series of 'actions' which are defined as class methods of the `Controller`
  * classes. Each action has a specific responsibility, such as listing a set of objects, updating an
@@ -142,12 +143,14 @@ class Controller extends \lithium\core\Object {
 	 * @filter This method can be filtered.
 	 */
 	public function __invoke($request, $dispatchParams, array $options = array()) {
-		$classes = $this->_classes;
-		$config = $this->_config;
 		$render =& $this->_render;
+		$params = compact('request', 'dispatchParams', 'options');
 
-		$filter = function($self, $params, $chain) use ($config, $classes, &$render) {
-			extract($params, EXTR_OVERWRITE);
+		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$render) {
+			$request = $params['request'];
+			$dispatchParams = $params['dispatchParams'];
+			$options = $params['options'];
+
 			$action = $dispatchParams['action'];
 			$args = isset($dispatchParams['args']) ? $dispatchParams['args'] : array();
 			$result = null;
@@ -160,10 +163,10 @@ class Controller extends \lithium\core\Object {
 			try {
 				$result = $self->invokeMethod($action, $args);
 			} catch (Exception $e) {
-				// See todo, temporary alleviating obscure failure
 				throw $e;
 			}
-			if (!empty($result)) {
+
+			if ($result) {
 				if (is_string($result)) {
 					$self->render(array('text' => $result));
 				} elseif (is_array($result)) {
@@ -172,11 +175,10 @@ class Controller extends \lithium\core\Object {
 			}
 
 			if (!$render['hasRendered'] && $render['auto']) {
-				$self->render($action);
+				$self->render();
 			}
 			return $self->response;
-		};
-		return $this->_filter(__METHOD__, compact('dispatchParams', 'request', 'options'), $filter);
+		});
 	}
 
 	/**

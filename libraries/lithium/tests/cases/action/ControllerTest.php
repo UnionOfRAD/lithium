@@ -233,6 +233,19 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	/**
+	 * Tests that `$_render['template']` can be manually set in a controller action and will not be
+	 * overwritten.
+	 *
+	 * @return void
+	 */
+	public function testManuallySettingTemplate() {
+		$postsController = new MockControllerRequest();
+		$postsController(new Request(), array('action' => 'changeTemplate'));
+		$result = $postsController->access('_render');
+		$this->assertEqual('foo', $result['template']);
+	}
+
 	public function testResponseTypeBasedOnRequestHeaderType() {
 		$request = new MockControllerRequest(array('env' => array('Content-type' => 'json')));
 

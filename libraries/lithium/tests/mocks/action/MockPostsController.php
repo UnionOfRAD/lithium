@@ -54,6 +54,10 @@ class MockPostsController extends \lithium\action\Controller {
 		$this->render(array('layout' => false, 'template' => 'view'));
 	}
 
+	public function changeTemplate() {
+		$this->_render['template'] = 'foo';
+	}
+
 	protected function _safe() {
 		throw new Exception('Something wrong happened');
 	}
