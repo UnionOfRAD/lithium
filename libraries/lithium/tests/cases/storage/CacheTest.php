@@ -466,6 +466,39 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 		$this->assertFalse(file_exists(LITHIUM_APP_PATH . '/resources/tmp/cache/key'));
 	}
+
+	public function testIntegrationFileAdapterWithStrategies() {
+		$directory = new SplFileInfo(LITHIUM_APP_PATH . "/resources/tmp/cache/");
+		$accessible = ($directory->isDir() && $directory->isReadable() && $directory->isWritable());
+		$message = "$directory does not have the proper permissions.";
+		$this->skipIf(!$accessible, $message);
+
+		$config = array('default' => array(
+			'adapter' => 'File',
+			'path' => LITHIUM_APP_PATH . '/resources/tmp/cache',
+			'filters' => array(),
+			'strategies' => array('Serializer')
+		));
+		Cache::config($config);
+
+		$data = array('some' => 'data');
+		$result = Cache::write('default', 'key', $data, '+1 minute');
+		$this->assertTrue($result);
+
+		$time = time() + 60;
+		$result = file_get_contents(LITHIUM_APP_PATH . '/resources/tmp/cache/key');
+
+		$expected = "{:expiry:$time}\na:1:{s:4:\"some\";s:4:\"data\";}";
+		$this->assertEqual($result, $expected);
+
+		$result = Cache::read('default', 'key');
+		$this->assertEqual($data, $result);
+
+		$result = unlink(LITHIUM_APP_PATH . '/resources/tmp/cache/key');
+		$this->assertTrue($result);
+		$this->assertFalse(file_exists(LITHIUM_APP_PATH . '/resources/tmp/cache/key'));
+
+	}
 }
 
 ?>

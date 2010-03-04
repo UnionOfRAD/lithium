@@ -11,9 +11,10 @@ namespace lithium\tests\cases\core;
 use \lithium\util\Collection;
 use \lithium\core\Adaptable;
 use \lithium\storage\cache\adapter\Memory;
-use \lithium\storage\cache\strategy\Serialize;
+use \lithium\storage\cache\strategy\Serializer;
 use \lithium\tests\mocks\core\MockAdapter;
 use \lithium\tests\mocks\core\MockStrategy;
+use \SplStack;
 
 class AdaptableTest extends \lithium\test\Unit {
 
@@ -96,7 +97,69 @@ class AdaptableTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $strategy::strategies('default');
-		$expected = new Serialize($items['default']);
+		$this->assertTrue($result instanceof SplStack);
+		$this->assertEqual(count($result), 1);
+		$this->assertTrue($result->top() instanceof Serialize);
+	}
+
+	public function testNonExistentStrategyConfiguration() {
+		$strategy = new MockStrategy();
+		$this->expectException('Configuration non_existent_config has not been defined');
+		$result = $strategy::strategies('non_existent_config');
+		$this->assertNull($result);
+	}
+
+	public function testApplyStrategiesNonExistentConfiguration() {
+		$strategy = new MockStrategy();
+		$this->expectException('Configuration non_existent_config has not been defined');
+		$strategy::applyStrategies('method', 'non_existent_config', null);
+	}
+
+	public function testApplySingleStrategy() {
+		$strategy = new MockStrategy();
+		$items = array('default' => array(
+			'filters' => array(),
+			'adapter' => null,
+			'strategies' => array('Serializer')
+		));
+		$strategy::config($items);
+		$result = $strategy::config();
+		$expected = $items;
+		$this->assertEqual($expected, $result);
+
+		$data = array('some' => 'data');
+		$result = $strategy::applyStrategies('write', 'default', $data);
+		$this->assertEqual(serialize($data), $result);
+	}
+
+	public function testApplyStrategiesNoConfiguredStrategies() {
+		$strategy = new MockStrategy();
+
+		$items = array('default' => array(
+			'filters' => array(),
+			'adapter' => null
+		));
+		$strategy::config($items);
+		$result = $strategy::config();
+		$expected = $items;
+		$this->assertEqual($expected, $result);
+
+		$result = $strategy::applyStrategies('method', 'default', null);
+		$this->assertNull($result);
+
+		$items = array('default' => array(
+			'filters' => array(),
+			'adapter' => null,
+			'strategies' => array()
+		));
+		$strategy::config($items);
+		$result = $strategy::config();
+		$expected = $items;
+		$this->assertEqual($expected, $result);
+
+		$data = array('some' => 'data');
+		$result = $strategy::applyStrategies('method', 'default', $data);
+		$this->assertEqual($data, $result);
 	}
 
 	public function testEnabled() {

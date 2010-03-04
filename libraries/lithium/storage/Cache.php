@@ -63,6 +63,13 @@ class Cache extends \lithium\core\Adaptable {
 	protected static $_adapters = 'adapter.storage.cache';
 
 	/**
+	 * Libraries::locate() compatible path to strategies for this class.
+	 *
+	 * @var string Dot-delimited path.
+	 */
+	protected static $_strategies = 'strategy.storage.cache';
+
+	/**
 	 * Generates the cache key.
 	 *
 	 * @param mixed $key A string (or lambda/closure that evaluates to a string)
@@ -101,6 +108,7 @@ class Cache extends \lithium\core\Adaptable {
 			$expiry = $data;
 			$data = null;
 		}
+		$data = static::applyStrategies(__FUNCTION__, $name, $data);
 		$method = static::adapter($name)->write($key, $data, $expiry);
 		$params = compact('key', 'data', 'expiry');
 		return static::_filter(__FUNCTION__, $params, $method, $settings[$name]['filters']);
@@ -130,7 +138,8 @@ class Cache extends \lithium\core\Adaptable {
 		$params = compact('key');
 		$filters = $settings[$name]['filters'];
 
-		return static::_filter(__FUNCTION__, $params, $method, $filters);
+		$result = static::_filter(__FUNCTION__, $params, $method, $filters);
+		return static::applyStrategies(__FUNCTION__, $name, $result);
 	}
 
 	/**

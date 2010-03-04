@@ -11,6 +11,7 @@ namespace lithium\core;
 use \Exception;
 use \lithium\util\Collection;
 use \lithium\core\Environment;
+use \SplStack;
 
 /**
  * The `Adaptable` static class is the base class from which all adapter implementations extend.
@@ -118,9 +119,53 @@ class Adaptable extends \lithium\core\StaticObject {
 		return static::$_configurations[$name][0]['adapter'];
 	}
 
-	public static function strategies($name = null) {
+	/**
+	 * Obtain an SplStack of the strategies for the given `$name` configuration, using
+	 * the `$_strategies` path defined in Adaptable subclasses.
+	 *
+	 * @param string $name Class name of adapter to load.
+	 * return object SplStack of strategies, or null if none defined.
+	 */
+	public static function strategies($name) {
 		$config = static::_config($name);
 
+		if ($config === null) {
+			throw new Exception("Configuration $name has not been defined");
+		}
+		if (!isset($config['strategies'])) {
+			return null;
+		}
+		$stack = new SplStack();
+
+		foreach ($config['strategies'] as $strategy) {
+			$class = static::_class($strategy, static::$_strategies);
+			$stack->push(new $class($config));
+		}
+		return $stack;
+	}
+
+	/**
+	 * Applies strategies configured in `$name` for `$method` on `$data`.
+	 *
+	 * @todo Implement reversing of stack for inbound/outbound strategy application.
+	 * @param string $method The strategy method to be applied.
+	 * @param string $name The named configuration
+	 * @param mixed $data The data to which the strategies will be applied.
+	 * @return mixed Result of application of strategies to data. If no strategies
+	 *         have been configured, this method will simply return the original data.
+	 */
+	public static function applyStrategies($method, $name, $data) {
+		if (!$strategies = static::strategies($name)) {
+			return $data;
+		}
+		if (!count($strategies)) {
+			return $data;
+		}
+
+		foreach ($strategies as $strategy) {
+			$data = $strategy::$method($data);
+		}
+		return $data;
 	}
 
 	/**
