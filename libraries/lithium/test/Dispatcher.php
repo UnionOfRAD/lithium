@@ -51,18 +51,17 @@ class Dispatcher extends \lithium\core\StaticObject {
 			'reporter' => 'text'
 		);
 		$options += $defaults;
-
-		$items = (array) $group;
 		$isCase = is_string($group) && preg_match('/Test$/', $group);
+		$items = ($isCase) ? array(new $group()) : (array) $group;
 
-		if ($isCase) {
-			$items = array(new $group());
-		}
 		$options['filters'] = Set::normalize($options['filters']);
 		$group = static::_group($items);
 		$report = static::_report($group, $options);
-		$report->run();
-		return $report;
+
+		return static::_filter(__METHOD__, compact('report'), function($self, $params, $chain) {
+			$params['report']->run();
+			return $params['report'];
+		});
 	}
 
 	/**

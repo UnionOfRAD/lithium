@@ -28,13 +28,6 @@ class Report extends \lithium\core\Object {
 	public $group = null;
 
 	/**
-	 * Contains the format for the results to be rendered in
-	 *
-	 * @var string
-	 */
-	public $format = null;
-
-	/**
 	 * An array of fully-namespaced class names representing the filters to be applied to this test
 	 * group.
 	 *
@@ -75,7 +68,8 @@ class Report extends \lithium\core\Object {
 			'title' => null,
 			'group' => null,
 			'filters' => array(),
-			'format' => 'txt'
+			'format' => 'txt',
+			'reporter' => 'txt'
 		);
 		parent::__construct((array) $config + $defaults);
 	}
@@ -89,7 +83,6 @@ class Report extends \lithium\core\Object {
 		$this->group = $this->_config['group'];
 		$this->filters = $this->_config['filters'];
 		$this->title = $this->_config['title'] ?: $this->_config['title'];
-		$this->format = $this->_config['format'];
 	}
 
 	/**
@@ -182,7 +175,6 @@ class Report extends \lithium\core\Object {
 			}
 			return $stats;
 		});
-
 		$stats = (array) $stats + array(
 			'asserts' => null,
 			'passes' => array(),
@@ -196,7 +188,6 @@ class Report extends \lithium\core\Object {
 			$stats
 		);
 		$success = $count['passes'] == $count['asserts'] && $count['errors'] === 0;
-
 		return compact("stats", "count", "success");
 	}
 
@@ -208,14 +199,19 @@ class Report extends \lithium\core\Object {
 	 * @param array $options Array of options (e.g. rendering type)
 	 * @return string
 	 */
-	public function render($template, $data) {
-		$template = Libraries::locate('test.templates', $template, array(
-			'filter' => false, 'type' => 'file', 'suffix' => '.' . $this->format . '.php',
+	public function render($template, $data = array()) {
+		$config = $this->_config;
+		$template = Libraries::locate("test.templates.{$config['reporter']}", $template, array(
+			'filter' => false, 'type' => 'file', 'suffix' => ".{$config['format']}.php",
 		));
-		extract($data);
-		ob_start();
-		include $template;
-		return ob_get_clean();
+		$params = compact('template', 'data', 'config');
+
+		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) {
+			extract($params['data']);
+			ob_start();
+			include $params['template'];
+			return ob_get_clean();
+		});
 	}
 }
 
