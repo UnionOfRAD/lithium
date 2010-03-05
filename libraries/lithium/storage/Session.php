@@ -87,6 +87,7 @@ class Session extends \lithium\core\Adaptable {
 	 * @param string $key Key to be read
 	 * @param array $options Optional parameters that this method accepts.
 	 * @return mixed Read result on successful session read, null otherwise.
+	 * @filter This method may be filtered.
 	 */
 	public static function read($key, array $options = array()) {
 		$defaults = array('name' => null);
@@ -116,6 +117,7 @@ class Session extends \lithium\core\Adaptable {
 	 * @param mixed $value Data to be stored
 	 * @param array $options Optional parameters that this method accepts.
 	 * @return boolean True on successful write, false otherwise.
+	 * @filter This method may be filtered.
 	 */
 	public static function write($key, $value = null, array $options = array()) {
 		$defaults = array('name' => null);
@@ -154,6 +156,7 @@ class Session extends \lithium\core\Adaptable {
 	 * @param string $key The name of the session key to delete.
 	 * @param array $options Optional parameters that this method accepts.
 	 * @return void
+	 * @filter This method may be filtered.
 	 */
 	public static function delete($key, array $options = array()) {
 		$defaults = array('name' => null);
@@ -188,6 +191,7 @@ class Session extends \lithium\core\Adaptable {
 	 * @param string $key The session key to check.
 	 * @param array $options Optional parameters that this method accepts.
 	 * @return boolean
+	 * @filter This method may be filtered.
 	 */
 	public static function check($key, array $options = array()) {
 		$defaults = array('name' => null);

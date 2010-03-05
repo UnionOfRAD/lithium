@@ -91,6 +91,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param string $expiry A strtotime() compatible cache time
 	 * @param mixed $conditions Conditions for the write operation to proceed
 	 * @return boolean True on successful cache write, false otherwise
+	 * @filter This method may be filtered.
 	 */
 	public static function write($name, $key, $data, $expiry = null, $conditions = null) {
 		$settings = static::config();
@@ -122,6 +123,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param mixed $key Key to be retrieved
 	 * @param mixed $conditions Conditions for the read operation to proceed
 	 * @return mixed Read results on successful cache read, null otherwise
+	 * @filter This method may be filtered.
 	 */
 	public static function read($name, $key, $conditions = null) {
 		$settings = static::config();
@@ -149,6 +151,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param mixed $key Key to be deleted
 	 * @param mixed $conditions Conditions for the delete operation to proceed
 	 * @return boolean True on successful deletion, false otherwise
+	 * @filter This method may be filtered.
 	 */
 	public static function delete($name, $key, $conditions = null) {
 		$settings = static::config();
@@ -177,7 +180,8 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to 1.
 	 * @param mixed $conditions
-	 * @return inter|boolean Item's new value on successful increment, false otherwise
+	 * @return integer|boolean Item's new value on successful increment, false otherwise
+	 * @filter This method may be filtered.
 	 */
 	public static function increment($name, $key, $offset = 1, $conditions = null) {
 		$settings = static::config();
@@ -207,6 +211,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param integer $offset Offset to decrement - defaults to 1.
 	 * @param mixed $conditions
 	 * @return integer|boolean Item's new value on successful decrement, false otherwise
+	 * @filter This method may be filtered.
 	 */
 	public static function decrement($name, $key, $offset = 1, $conditions = null) {
 		$settings = static::config();
