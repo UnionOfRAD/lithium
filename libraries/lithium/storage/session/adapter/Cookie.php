@@ -64,12 +64,24 @@ class Cookie extends \lithium\core\Object {
 	}
 
 	/**
-	 * Obtain the status of the session.
+	 * Obtain the status of the cookie storage.
 	 *
 	 * @return boolean True if $_COOKIE has been initialized, false otherwise.
 	 */
 	public function isStarted() {
 		return (isset($_COOKIE));
+	}
+
+	/**
+	 * Checks if a value has been set in the cookie.
+	 *
+	 * @param string $key Key of the entry to be checked.
+	 * @return boolean True if the key exists, false otherwise.
+	 */
+	public function check($key) {
+		return function($self, $params, $chain) {
+			return (isset($_COOKIE[$params['key']]));
+		};
 	}
 
 	/**

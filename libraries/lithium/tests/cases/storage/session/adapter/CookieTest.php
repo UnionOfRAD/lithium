@@ -28,7 +28,8 @@ class CookieTest extends \lithium\test\Unit {
 		$value = preg_quote(urlencode($expected['value']), '/');
 
 		if (isset($expected['expires'])) {
-			$expires = preg_quote(gmdate('D, d-M-Y H:i:s \G\M\T', strtotime($expected['expires'])), '/');
+			$date = gmdate('D, d-M-Y H:i:s \G\M\T', strtotime($expected['expires']));
+			$expires = preg_quote($date, '/');
 		} else {
 			$expires = ".+?";
 		}
@@ -119,6 +120,27 @@ class CookieTest extends \lithium\test\Unit {
 		$params = compact('key');
 		$result = $closure($this->Cookie, $params, null);
 		$this->assertNull($result);
+	}
+
+	public function testCheck() {
+		$key = 'read';
+		$value = 'value to be read';
+		$_COOKIE[$key] = $value;
+
+		$closure = $this->Cookie->check($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Cookie, $params, null);
+		$this->assertTrue($result);
+
+		$key = 'does_not_exist';
+		$closure = $this->Cookie->check($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Cookie, $params, null);
+		$this->assertFalse($result);
 	}
 
 	public function testReadArrayOfValues() {
