@@ -66,7 +66,8 @@ class PhpTest extends \lithium\test\Unit {
 
 	public function testCustomConfiguration() {
 		$config = array(
-			'name' => 'awesome_name', 'cookie_lifetime' => 1200, 'cookie_domain' => 'awesome.domain',
+			'name' => 'awesome_name', 'cookie_lifetime' => 1200,
+			'cookie_domain' => 'awesome.domain',
 		);
 
 		$adapter = new Php($config);
@@ -146,6 +147,27 @@ class PhpTest extends \lithium\test\Unit {
 		$result = $closure($this->Php, array('key' => null), null);
 		$expected = array('read_test' => 'value to be read', '_timestamp' => time());
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testCheck() {
+		$key = 'read';
+		$value = 'value to be read';
+		$_SESSION[$key] = $value;
+
+		$closure = $this->Php->check($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Php, $params, null);
+		$this->assertTrue($result);
+
+		$key = 'does_not_exist';
+		$closure = $this->Php->check($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Php, $params, null);
+		$this->assertFalse($result);
 	}
 
 	public function testDelete() {

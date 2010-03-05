@@ -85,6 +85,18 @@ class Php extends \lithium\core\Object {
 	}
 
 	/**
+	 * Checks if a value has been set in the session.
+	 *
+	 * @param string $key Key of the entry to be checked.
+	 * @return boolean True if the key exists, false otherwise.
+	 */
+	public function check($key) {
+		return function($self, $params, $chain) {
+			return (isset($_SESSION[$params['key']]));
+		};
+	}
+
+	/**
 	 * Read a value from the session.
 	 *
 	 * @param null|string $key Key of the entry to be read. If no key is passed, all
