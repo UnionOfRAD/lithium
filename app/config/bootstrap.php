@@ -41,17 +41,17 @@ if (!include LITHIUM_LIBRARY_PATH . '/lithium/core/Libraries.php') {
 require __DIR__ . '/bootstrap/libraries.php';
 
 /**
- * This file contains configurations for connecting to external caching resources, as well as
- * default caching rules for various systems within your application
- */
-require __DIR__ . '/bootstrap/cache.php';
-
-/**
  * This file defines bindings between classes which are triggered during the request cycle, and
  * allow the framework to automatically configure its environmental settings. You can add your own
  * behavior and modify the dispatch cycle to suit your needs.
  */
 require __DIR__ . '/bootstrap/action.php';
+
+/**
+ * This file contains configurations for connecting to external caching resources, as well as
+ * default caching rules for various systems within your application
+ */
+require __DIR__ . '/bootstrap/cache.php';
 
 /**
  * This file contains your application's globalization rules, including inflections,

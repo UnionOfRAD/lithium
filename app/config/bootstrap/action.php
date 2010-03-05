@@ -32,14 +32,11 @@ use \lithium\action\Dispatcher;
  * @see lithium\net\http\Router
  */
 Dispatcher::applyFilter('run', function($self, $params, $chain) {
-	foreach (Libraries::get() as $name => $config) {
-		if ($config['default']) {
-			continue;
-		}
+	foreach (array_reverse(Libraries::get()) as $name => $config) {
+		if ($name === 'lithium') continue;
 		$file = "{$config['path']}/config/routes.php";
 		file_exists($file) ? include $file : null;
 	}
-	include LITHIUM_APP_PATH . '/config/routes.php';
 	return $chain->next($self, $params, $chain);
 });
 
