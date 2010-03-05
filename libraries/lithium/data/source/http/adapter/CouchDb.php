@@ -209,7 +209,7 @@ class CouchDb extends \lithium\data\source\Http {
 			$queryParams = (array) $conditions + (array) $limit + (array) $order;
 			$data = json_decode($conn->get($config['database'] . $path, $queryParams), true);
 
-			return $self->item($options['model'], $data, compact('query') + array(
+			return $self->item($params['model'], $data, compact('query') + array(
 				'exists' => true
 			));
 		});
