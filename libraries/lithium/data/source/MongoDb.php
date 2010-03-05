@@ -10,7 +10,9 @@ namespace lithium\data\source;
 
 use \Mongo;
 use \MongoId;
+use \MongoCode;
 use \MongoDBRef;
+use \Exception;
 
 /**
  * A data source adapter which allows you to connect to the MongoDB database engine. MongoDB is an
@@ -198,11 +200,14 @@ class MongoDb extends \lithium\data\Source {
 			$conditions = $params['conditions'];
 
 			if ($group = $params['group']) {
-				$params += array('reduce' => null, 'initial' => null);
-				$initial = $params['initial'];
-				$reduce = $params['reduce'];
+				$group += array(
+					'$reduce' => $params['reduce'] ?: null, 'initial' => $params['initial'] ?: null
+				);
 
-				$stats = $db->{$table}->group($group, $initial, $reduce, $conditions);
+				$stats = $db->command(array('group' => $group + array(
+					'ns' => $table,
+					'cond' => $conditions
+				)));
 				$data = isset($stats['retval']) ? $stats['retval'] : null;
 				unset($stats['retval']);
 
@@ -323,15 +328,18 @@ class MongoDb extends \lithium\data\Source {
 		if (!$group) {
 			return;
 		}
+		if (is_string($group) && strpos($group, 'function') === 0) {
+			return array('$keyf' => new MongoCode($group));
+		}
+		$group = (array) $group;
 
-		if (is_string($group) || (array_keys($group) == range(0, count($group) - 1))) {
-			$group = (array) $group;
-			foreach ($group as $i => $field) {
+		foreach ($group as $i => $field) {
+			if (is_int($i)) {
 				$group[$field] = true;
 				unset($group[$i]);
 			}
 		}
-		return $group;
+		return array('key' => $group);
 	}
 
 	public function conditions($conditions, $context) {
@@ -348,7 +356,7 @@ class MongoDb extends \lithium\data\Source {
 			if ($key[0] === '$') {
 				continue;
 			}
-			if (is_array($value)) {
+			if (is_array($value) && strpos(key($value), '$') !== 0) {
 				$conditions[$key] = array('$in' => $value);
 			}
 		}
