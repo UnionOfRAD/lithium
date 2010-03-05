@@ -64,7 +64,7 @@ class Record extends \lithium\core\Object {
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('model' => null, 'data' => array());
-		parent::__construct((array) $config + $defaults);
+		parent::__construct($config + $defaults);
 	}
 
 	public function __get($name) {

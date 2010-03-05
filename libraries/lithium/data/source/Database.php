@@ -401,19 +401,6 @@ abstract class Database extends \lithium\data\Source {
 	abstract protected function _insertId($query);
 
 	/**
-	 * Adds formatting to SQL comments before they're embedded in queries.
-	 *
-	 * @param string $comment
-	 * @return string
-	 */
-	public function comment($comment) {
-	}
-
-	abstract protected function _execute($query);
-
-	abstract protected function _insertId($query);
-
-	/**
 	 * Returns a fully-qualified table name (i.e. with prefix), quoted.
 	 *
 	 * @param string $entity

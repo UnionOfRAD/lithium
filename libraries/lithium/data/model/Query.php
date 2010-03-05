@@ -292,20 +292,6 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	 * Gets a custom query field which does not have an accessor method.
-	 *
-	 * @param string $method Query part.
-	 * @param string $params Query parameters.
-	 * @return mixed Returns the value as set in the `Query` object's constructor.
-	 */
-	public function __call($method, $params = array()) {
-		if ($params) {
-			$this->_config[$method] = current($params);
-		}
-		return isset($this->_config[$method]) ? $this->_config[$method] : null;
-	}
-
-	/**
 	 * Will return a find first condition on the associated model if a record is connected.
 	 * Called by conditions when it is called as a get and no condition is set.
 	 *
