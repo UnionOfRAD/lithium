@@ -408,10 +408,11 @@ class Model extends \lithium\core\StaticObject {
 		$params = compact('record', 'data', 'options');
 
 		$filter = function($self, $params) use ($meta) {
-			extract($params);
+			$record = $params['record'];
+			$options = $params['options'];
 
-			if ($data) {
-				$record->set($data);
+			if ($params['data']) {
+				$record->set($params['data']);
 			}
 
 			if ($options['validate'] && !$record->validates()) {
