@@ -363,7 +363,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @param array $data Any data that this record should be populated with initially.
 	 * @return object Returns a new, **un-saved** record object.
 	 */
-	public static function create($data = array()) {
+	public static function create(array $data = array()) {
 		return static::_filter(__FUNCTION__, compact('data'), function($self, $params) {
 			$data = $params['data'];
 
