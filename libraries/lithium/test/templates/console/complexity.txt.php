@@ -10,7 +10,7 @@ foreach (array_slice($analysis['max'], 0, 10) as $method => $count) {
 echo "Class Averages\n";
 foreach (array_slice($analysis['class'], 0, 10) as $class => $count) {
 	echo "\t{$class} - ";
-	echo round($count, 2);
+	echo round($count, 2) . "\n";
 }
 
 echo "\n";
