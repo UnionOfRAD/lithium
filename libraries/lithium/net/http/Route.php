@@ -160,6 +160,11 @@ class Route extends \lithium\core\Object {
 		if (array_intersect_key($this->_keys, $options) + $args !== $this->_keys + $args) {
 			return false;
 		}
+		foreach ($this->_subPatterns as $key => $pattern) {
+			if (isset($options[$key]) && !preg_match("/^{$pattern}$/", $options[$key])) {
+				return false;
+			}
+		}
 		return $this->_write($options, $defaults + $this->_defaults + array('args' => '')) . $query;
 	}
 
@@ -180,7 +185,11 @@ class Route extends \lithium\core\Object {
 		}
 
 		foreach (array_reverse($options + array('args' => ''), true) as $key => $value) {
-			$rpl = "{:{$key}}";
+			if (isset($this->_subPatterns[$key])) {
+				$rpl = "{:{$key}:{$this->_subPatterns[$key]}}";
+			} else {
+				$rpl = "{:{$key}}";
+			}
 			$len = - strlen($rpl);
 
 			if ($trimmed && isset($defaults[$key]) && $value == $defaults[$key]) {

@@ -397,6 +397,15 @@ class RouteTest extends \lithium\test\Unit {
 		));
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testReversingRegexRoutes() {
+		$route = new Route(array('template' => '/{:controller}/{:id:[0-7]+}'));
+
+		$result = $route->match(array('controller' => 'posts', 'id' => '007'));
+		$this->assertEqual('/posts/007', $result);
+
+		$this->assertFalse($route->match(array('controller' => 'posts', 'id' => '009')));
+	}
 }
 
 ?>
