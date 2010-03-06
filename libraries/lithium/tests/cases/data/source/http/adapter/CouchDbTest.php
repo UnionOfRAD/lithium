@@ -77,6 +77,20 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->describe('companies');
 	}
 
+	public function testItem() {
+		$couchdb = new CouchDb($this->_testConfig);
+		$data = array(
+			'_id' => 'a1', '_rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1'
+		);
+		$expected =array(
+			'id' => 'a1', 'rev' => '1-2',
+			'author' => 'author 1', 'body' => 'body 1'
+		);
+		$item = $couchdb->item($this->query->model(), $data);
+		$result = $item->data();
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testCreateNoId() {
 		$couchdb = new CouchDb($this->_testConfig);
 		$this->query->data(array('name' => 'Acme Inc.'));
@@ -111,8 +125,7 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	public function testReadNoConditions() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$expected = true;
-		$result = $couchdb->read($this->query);
+		$expected = true;		$result = $couchdb->read($this->query);
 		$this->assertEqual($expected, $result);
 
 		$expected = '/lithium-test/_all_docs';
@@ -149,7 +162,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->read($this->query);
 		$this->assertEqual($expected, $result);
 
-		$expected = '/lithium-test/_design/latest/_view/all';
+		$expected = '/lithium-test/_design/latest/_view/all/';
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
 
@@ -201,6 +214,69 @@ class CouchDbTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testRowsResultFromAllDocs() {
+		$couchdb = new CouchDb($this->_testConfig);
+
+		$rows = (object) array('total_rows' => 3, 'offset' => 0, 'rows' => array(
+			(object) array('id' => 'a1', 'key' => null, 'value' => array(
+				'author' => 'author 1',
+				'body' => 'body 1'
+			)),
+			(object) array('id' => 'a2', 'key' => null, 'value' => array(
+				'author' => 'author 2',
+				'body' => 'body 2'
+			)),
+			(object) array('id' => 'a3', 'key' => null, 'value' => array(
+				'author' => 'author 3',
+				'body' => 'body 3'
+			))
+		));
+		$expected = array(
+			'id' => 'a1', 'author' => 'author 1', 'body' => 'body 1'
+		);
+		$result = $couchdb->result('next', $rows, $this->query);
+		$this->assertEqual($expected, $result);
+
+		$expected = array(
+			'id' => 'a2', 'author' => 'author 2', 'body' => 'body 2'
+		);
+		$result = $couchdb->result('next', $rows, $this->query);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testRowsResultFromAllDocsIncludDocs() {
+		$couchdb = new CouchDb($this->_testConfig);
+
+		$rows = (object) array('total_rows' => 3, 'offset' => 0, 'rows' => array(
+			(object) array('doc' => array(
+				'_id' => 'a1', '_rev' => '1-1',
+				'author' => 'author 1',
+				'body' => 'body 1'
+			)),
+			(object) array('doc' => array(
+				'_id' => 'a2', '_rev' => '1-2',
+				'author' => 'author 2',
+				'body' => 'body 2'
+			)),
+			(object) array('doc' => array(
+				'_id' => 'a3', '_rev' => '1-3',
+				'author' => 'author 3',
+				'body' => 'body 3'
+			))
+		));
+		$expected = array(
+			'id' => 'a1', 'rev' => '1-1', 'author' => 'author 1', 'body' => 'body 1'
+		);
+		$result = $couchdb->result('next', $rows, $this->query);
+		$this->assertEqual($expected, $result);
+
+		$expected = array(
+			'id' => 'a2', 'rev' => '1-2', 'author' => 'author 2', 'body' => 'body 2'
+		);
+		$result = $couchdb->result('next', $rows, $this->query);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testResultClose() {
 		$couchdb = new CouchDb($this->_testConfig);
 
@@ -242,7 +318,6 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
 	}
-
 }
 
 ?>

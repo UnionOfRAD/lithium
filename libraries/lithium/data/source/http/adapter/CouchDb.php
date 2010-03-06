@@ -125,7 +125,6 @@ class CouchDb extends \lithium\data\source\Http {
 		if (!$this->_db) {
 			throw new Exception("{$entity} is not available.");
 		}
-
 		return array('id' => array(), 'rev' => array());
 	}
 
@@ -149,34 +148,31 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return boolean
 	 */
 	public function create($query, array $options = array()) {
+		$defaults = array('model' => $query->model());
+		$options += $defaults;
 		$params = compact('query', 'options');
 		$conn =& $this->_connection;
 		$config = $this->_config;
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
-			extract($params);
-			$options = $query->export($self);
-			extract($options, EXTR_OVERWRITE);
+			$request = array('type' => 'json');
+			$query = $params['query'];
+			$options = $params['options'];
 			$data = $query->data();
+			$data += array('type' => $options['model']::meta('source'));
 
-			$id = null;
-			$data['type'] = $table;
-
-			if (!empty($data['id'])) {
-				$id = '/' . $data['id'];
-				$data['_id'] = (string) $data['id'];
-				$result = $conn->put($config['database'] . $id, $data, array('type' => 'json'));
-			} else {
-				$result = $conn->post($config['database'], $data, array('type' => 'json'));
+			if (isset($data['id'])) {
+				return $self->update($query, $options);
 			}
-			$result = is_string($result) ? json_decode($result) : $result;
-			$result = (object) $self->result('next', $result, $query);
+			$result = $conn->post($config['database'], $data, $request);
+			$result = is_string($result) ? json_decode($result, true) : $result;
 
-			if ($success = (isset($result->id) || (isset($result->ok) && $result->ok === true))) {
-				$query->data($data + (array) $result);
-				$query->record()->update($result->id);
+			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
+				$result = $self->invokeMethod('_format', array($result, $options));
+				$query->record()->update($result['id'], $result);
+				return true;
 			}
-			return $success;
+			return false;
 		});
 	}
 
@@ -188,7 +184,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return object
 	 */
 	public function read($query, array $options = array()) {
-		$defaults = array('return' => 'resource');
+		$defaults = array('return' => 'resource', 'model' => $query->model());
 		$options += $defaults;
 		$params = compact('query', 'options');
 		$conn =& $this->_connection;
@@ -198,20 +194,21 @@ class CouchDb extends \lithium\data\source\Http {
 			$query = $params['query'];
 			$options = $params['options'];
 			$params = $query->export($self);
-
 			extract($params, EXTR_OVERWRITE);
-			extract($conditions, EXTR_OVERWRITE);
+			list($_path, $conditions) = (array) $conditions;
 
-			if (empty($path) && empty($conditions)) {
-				$path = '/_all_docs';
+			if (empty($_path)) {
+				$_path = '_all_docs';
 				$conditions['include_docs'] = 'true';
 			}
-			$queryParams = (array) $conditions + (array) $limit + (array) $order;
-			$data = json_decode($conn->get($config['database'] . $path, $queryParams), true);
+			$data = (array) $conditions + (array) $limit + (array) $order;
+			$result = json_decode($conn->get("{$config['database']}/{$_path}", $data));
 
-			return $self->item($params['model'], $data, compact('query') + array(
-				'exists' => true
-			));
+			if (isset($result->error) && $result->error == 'not_found') {
+				return $result;
+			}
+			$options += compact('result');
+			return $self->invokeMethod('_result', array('document', $query, $options));
 		});
 	}
 
@@ -228,27 +225,27 @@ class CouchDb extends \lithium\data\source\Http {
 		$config = $this->_config;
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
-			extract($params);
-			$options = $query->export($self);
-			extract($options, EXTR_OVERWRITE);
-			extract($conditions, EXTR_OVERWRITE);
+			$query = $params['query'];
+			$options = $params['options'];
 			$data = $query->data();
+			$params = $query->export($self);
+			extract($params, EXTR_OVERWRITE);
+			list($_path, $conditions) = (array) $conditions;
 
-			if (empty($data['_id']) && !empty($data['id'])) {
-				$data['_id'] = $data['id'];
-				$data['_rev'] = $data['rev'];
-				unset($data['id'], $data['rev']);
+			foreach (array('id', 'rev') as $key) {
+				$data["_{$key}"] = isset($data[$key]) ? (string) $data[$key] : null;
+				unset($data[$key]);
 			}
-			$queryParams = (array) $conditions + (array) $data;
-			$result = $conn->put($config['database'] . $path, $queryParams, array('type' => 'json'));
-			$result = is_string($result) ? json_decode($result) : $result;
+			$data = (array) $conditions + array_filter((array) $data);
+			$result = $conn->put("{$config['database']}/{$_path}", $data, array('type' => 'json'));
+			$result = is_string($result) ? json_decode($result, true) : $result;
 
-			if ($success = (isset($result->_id) || (isset($result->ok) && $result->ok === true))) {
-				$query->record()->update();
+			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
+				$result = $self->invokeMethod('_format', array($result, $options));
+				$query->record()->update($result['id'], $result);
 				return true;
 			}
-
-			if (isset($result->error) && $result->error === 'conflict') {
+			if (isset($result['error']) && $result['error'] === 'conflict') {
 				return $self->read($query, $options);
 			}
 			return false;
@@ -268,16 +265,15 @@ class CouchDb extends \lithium\data\source\Http {
 		$config = $this->_config;
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
-			extract($params);
-			$options = $query->export($self);
-			extract($options, EXTR_OVERWRITE);
-			extract($conditions, EXTR_OVERWRITE);
+			$query = $params['query'];
+			$params = $query->export($self);
+			list($_path, $conditions) = $params['conditions'];
 			$data = $query->data();
 
 			if (!empty($data['rev'])) {
 				$conditions['rev'] = $data['rev'];
 			}
-			$result = json_decode($conn->delete($config['database'] . $path, $conditions));
+			$result = json_decode($conn->delete("{$config['database']}/{$_path}", $conditions));
 			return (isset($result->ok) && $result->ok === true);
 		});
 	}
@@ -294,6 +290,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 *         in `$model`.
 	 */
 	public function item($model, array $data = array(), array $options = array()) {
+		$result = $data = $this->_format($data);
 		$class = $this->_classes['document'];
 		return new $class(compact('model', 'data') + $options);
 	}
@@ -308,39 +305,28 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function result($type, $resource, $context) {
 		if (!is_object($resource) || isset($resource->error)) {
-			return null;
+			return;
 		}
-		$result = null;
-
 		switch ($type) {
 			case 'next':
 				if (!isset($resource->rows)) {
-					$result = (array) $resource;
-				} elseif (isset($resource->rows[$this->_iterator])) {
-					$result = (array) $resource->rows[$this->_iterator]->value;
-					$result['id'] = $resource->rows[$this->_iterator]->id;
-					if (isset($resource->rows[$this->_iterator]->key)) {
-						$result['key'] = $resource->rows[$this->_iterator]->key;
-					}
-					$this->_iterator++;
-				} else {
-					$this->_iterator = 0;
+					return $this->_format((array) $resource);
 				}
-				if (isset($result['_id'])) {
-					$result['id'] = $result['_id'];
-					unset($result['_id']);
-					if (isset($result['_rev'])) {
-						$result['rev'] = $result['_rev'];
-						unset($result['_rev']);
-					}
+				if (isset($resource->rows[$this->_iterator]->doc)) {
+					return $this->_format((array) $resource->rows[$this->_iterator++]->doc);
+				}
+				if (isset($resource->rows[$this->_iterator]->value)) {
+					$data = (array) $resource->rows[$this->_iterator]->value;
+					$data['id'] = $resource->rows[$this->_iterator++]->id;
+					return $this->_format($data);
 				}
 			break;
 			case 'close':
 				unset($resource);
-				$result = null;
+				$this->_iterator = 0;
 			break;
 		}
-		return $result;
+		return;
 	}
 
 	/**
@@ -352,22 +338,24 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function conditions($conditions, $context) {
 		$path = null;
-		$paths = array('design', 'view');
-		foreach ($paths as $element) {
-			if (isset($conditions[$element])) {
-				$path .= "/_{$element}/{$conditions[$element]}";
-				unset($conditions[$element]);
+		if (isset($conditions['design'])) {
+			$paths = array('design', 'view');
+			foreach ($paths as $element) {
+				if (isset($conditions[$element])) {
+					$path .= "_{$element}/{$conditions[$element]}/";
+					unset($conditions[$element]);
+				}
 			}
 		}
 		if (isset($conditions['id'])) {
-			$path = "/{$conditions['id']}";
+			$path = "{$conditions['id']}";
 			unset($conditions['id']);
-		} elseif (isset($conditions['_id'])) {
-			$path = "/{$conditions['_id']}";
-			unset($conditions['_id']);
 		}
-		$conditions = array_filter((array) $conditions);
-		return compact('path', 'conditions');
+		if (isset($conditions['path'])) {
+			$path = "{$conditions['path']}";
+			unset($conditions['path']);
+		}
+		return array($path, $conditions);
 	}
 
 	/**
@@ -401,6 +389,39 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	function order($order, $context) {
 		return (array) $order ?: array();
+	}
+
+	/**
+	 * Formats a CouchDb result set into a standard result to be passed to item
+	 *
+	 * @param string $data data returned from query
+	 * @param string $options
+	 * @return void
+	 */
+	protected function _format(array $data) {
+		if (isset($data['_id'])) {
+			$data['id'] = $data['_id'];
+		}
+		if (isset($data['_rev'])) {
+			$data['rev'] = $data['_rev'];
+		}
+		unset($data['_id'], $data['_rev']);
+		return $data;
+	}
+
+	/**
+	 * Handle the result from read
+	 *
+	 * @param string $type
+	 * @param string $query
+	 * @param string $config
+	 * @return void
+	 */
+	protected function _result($type, $query, $config = array()) {
+		$defaults = array('handle' => &$this, 'exists' => true);
+		$config = compact('query') + $config + $defaults;
+		$class = $this->_classes[$type];
+		return new $class($config);
 	}
 }
 

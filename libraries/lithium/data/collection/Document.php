@@ -307,7 +307,8 @@ class Document extends \lithium\data\Collection {
 	 * @param $id The ID to assign, where applicable.
 	 * @return void
 	 */
-	public function update($id = null) {
+	public function update($id = null, $data = array()) {
+		$this->__set($data);
 		if ($id) {
 			$id = (array) $id;
 			$model = $this->_model;
