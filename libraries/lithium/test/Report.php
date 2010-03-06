@@ -213,6 +213,23 @@ class Report extends \lithium\core\Object {
 			return ob_get_clean();
 		});
 	}
+
+	/**
+	 * Loops through and renders each filter that currently has stored results
+	 *
+	 * @param string $separator Optional separator string to join the templates on
+	 * @return string|boolean
+	 */
+	public function filters($separator = null) {
+		$output = false;
+		foreach ($this->results['filters'] as $filter => $analysis) {
+			$filterClass = explode("\\", $filter);
+			$filterClass = array_pop($filterClass);
+			$output .= $separator . $this->render(strtolower($filterClass), compact('analysis'));
+		}
+
+		return $output;
+	}
 }
 
 ?>

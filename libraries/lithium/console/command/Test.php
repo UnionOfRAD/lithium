@@ -99,10 +99,8 @@ class Test extends \lithium\console\Command {
 		$this->hr();
 		$this->out($report->render('stats', $report->stats()));
 
-		foreach ($report->results['filters'] as $filter => $data) {
-			$filterClass = explode("\\", $filter);
-			$filterClass = array_pop($filterClass);
-			$this->out($report->render(strtolower($filterClass), array("analysis" => $data)));
+		if ($filterResults = $report->filters("\n")) {
+			$this->out($filterResults);
 		}
 
 		$this->hr();

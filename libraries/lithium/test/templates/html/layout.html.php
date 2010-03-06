@@ -56,11 +56,7 @@
 					<?php
 					echo $report->render("stats", $report->stats());
 
-					foreach ($report->results['filters'] as $filter => $data) {
-						$filterClass = explode("\\", $filter);
-						$filterClass = array_pop($filterClass);
-						echo $report->render(strtolower($filterClass), array("analysis" => $data));
-					}
+					echo $report->filters();
 					?>
 				</div>
 			</article>
