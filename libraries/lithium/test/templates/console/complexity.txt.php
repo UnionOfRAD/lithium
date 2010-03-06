@@ -1,5 +1,5 @@
 <?php
-echo "Cyclomatic Complexity:\n\n";
+echo "===Cyclomatic Complexity===\n";
 
 foreach (array_slice($analysis['max'], 0, 10) as $method => $count) {
 	if ($count <= 7) {
