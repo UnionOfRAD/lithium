@@ -90,14 +90,13 @@ class Test extends \lithium\console\Command {
 		$this->out(sprintf('Running `%s`... ', $run), false);
 
 		$report = Dispatcher::run($run, array(
-			'filters' => $this->filters, 'reporter' => 'console'
+			'filters' => $this->filters,
+			'reporter' => 'console',
+			'format' => 'txt'
 		));
 		$this->out('done.', 2);
 
-		if ($output = $report->filters()) {
-			$this->out($output, 2);
-		}
-		$this->out($report->stats());
+		$this->out($report->render('stats', $report->stats()));
 		$this->nl();
 	}
 
