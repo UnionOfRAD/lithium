@@ -94,11 +94,6 @@ class DatabaseTest extends \lithium\test\Unit {
 				'fields' => array('post_id'),
 				'model' => '\lithium\tests\mocks\data\model\MockDatabaseTagging',
 				'conditions' => array('MockDatabaseTag.tag' => array('foo', 'bar', 'baz')),
-				'join' => new Query(array(
-					'type' => 'read',
-					'model' => '\lithium\tests\mocks\data\model\MockDatabaseTag',
-					'conditions' => 'MockDatabaseTagging.tag_id = MockDatabaseTag.id'
-				))
 			)))
 		));
 		$result = $this->db->renderCommand($query);
@@ -106,6 +101,26 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected = "SELECT MockDatabasePost.title, MockDatabasePost.body From mock_database_posts";
 		$expected .= " WHERE Post.id IN (SELECT post_id From mock_database_taggings WHERE ";
 		$expected .= "MockDatabaseTag.tag IN ('foo', 'bar', 'baz'));";
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testJoin() {
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => '\lithium\tests\mocks\data\model\MockDatabasePost',
+			'fields' => array('MockDatabasePost.title', 'MockDatabasePost.body'),
+			'conditions' => array('MockDatabaseTag.tag' => array('foo', 'bar', 'baz')),
+			'joins' => array(new Query(array(
+				'type' => 'read',
+				'model' => '\lithium\tests\mocks\data\model\MockDatabaseTag',
+				'constraint' => 'MockDatabaseTagging.tag_id = MockDatabaseTag.id'
+			)))
+		));
+		$result = $this->db->renderCommand($query);
+
+		$expected = "SELECT MockDatabasePost.title, MockDatabasePost.body From mock_database_posts";
+		$expected .= " JOIN mock_database_tags ON MockDatabaseTagging.tag_id = MockDatabaseTag.id";
+		$expected .= " WHERE MockDatabaseTag.tag IN ('foo', 'bar', 'baz');";
 		$this->assertEqual($expected, $result);
 	}
 }

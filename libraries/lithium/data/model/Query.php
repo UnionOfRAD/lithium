@@ -223,7 +223,7 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Set and get method for the query's record instance
 	 *
-	 * @param object $record reference to the query's current record
+	 * @param object $binding reference to the query's current record
 	 * @return object reference to the query's current record
 	 */
 	public function &record(&$binding = null) {
@@ -246,11 +246,17 @@ class Query extends \lithium\core\Object {
 		return $this->_binding ? $this->_binding->data() : array();
 	}
 
-	public function join($join = null) {
-		if ($join) {
-			$this->_join = array_merge($this->_join, (array) $join);
+	/**
+	 * Set and get the join queries
+	 *
+	 * @param query|array $joins a single query object or an array of query objects
+	 * @return array of query objects
+	 */
+	public function join($joins = null) {
+		if ($joins) {
+			$this->_config['joins'] = array_merge($this->_config['joins'], (array) $joins);
 		}
-		return $this->_join;
+		return $this->_config['joins'];
 	}
 
 	/**

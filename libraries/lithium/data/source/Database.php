@@ -17,14 +17,14 @@ abstract class Database extends \lithium\data\Source {
 
 	protected $_strings = array(
 		'read' => "
-			SELECT {:fields} From {:table}
-			{:joins} {:conditions} {:group} {:order} {:limit};{:comment}
+			SELECT {:fields} From {:table} {:joins} {:conditions} {:group} {:order} {:limit};
+			{:comment}
 		",
 		'create' => "INSERT INTO {:table} ({:fields}) VALUES ({:values});{:comment}",
 		'update' => "UPDATE {:table} SET {:fields} {:conditions};{:comment}",
 		'delete' => "DELETE {:flags} From {:table} {:aliases} {:conditions};{:comment}",
 		'schema' => "CREATE TABLE {:table} (\n{:columns}{:indexes});{:comment}",
-		'join'   => "{:type} JOIN {:table} {:constraint}"
+		'join'   => "{:type} JOIN {:table} ON {:constraint}"
 	);
 
 	protected $_classes = array(
@@ -194,7 +194,7 @@ abstract class Database extends \lithium\data\Source {
 				return false;
 			}
 			$sql = $self->renderCommand('delete', $data, $query);
-			return (bool) $self->invokeMethod('_execute', array($sql));
+			return (boolean) $self->invokeMethod('_execute', array($sql));
 		});
 	}
 
@@ -327,6 +327,14 @@ abstract class Database extends \lithium\data\Source {
 		return "LIMIT {$offset}{$limit}";
 	}
 
+	public function joins($joins, $context) {
+		$result = null;
+		foreach ($joins as $join) {
+			$result .= $this->renderCommand('join', $join->export($this));
+		}
+		return $result;
+	}
+
 	public function order($order, $context) {
 		if (is_string($order) && strpos($order, ',') && !preg_match('/\(.+\,.+\)/', $order)) {
 			$order = array_map('trim', explode(',', $order));
@@ -457,7 +465,7 @@ abstract class Database extends \lithium\data\Source {
 		if (is_string($value)) {
 			return ($value == 't' || $value == 'T' || $value == 'true');
 		}
-		return (bool) $value;
+		return (boolean) $value;
 	}
 }
 

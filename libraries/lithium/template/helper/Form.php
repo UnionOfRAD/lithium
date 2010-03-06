@@ -138,12 +138,12 @@ class Form extends \lithium\template\Helper {
 	 * $this->form->config(array('label' => array('class' => 'foo')));
 	 * }}}
 	 *
+	 * @see lithium\template\helper\Form::$_templateMap
 	 * @param array $config An associative array where the keys are `Form` method names, and the
 	 *              values are arrays of configuration options to be included in the `$options`
 	 *              parameter of each method specified.
 	 * @return array Returns an array containing the currently set per-method configurations, and
 	 *         an array of the currently set template overrides (in the `'templates'` array key).
-	 * @see lithium\template\helper\Form::$_templateMap
 	 */
 	public function config(array $config = array()) {
 		if (empty($config)) {
@@ -213,7 +213,7 @@ class Form extends \lithium\template\Helper {
 			$options['method'] = strtoupper($options['method']);
 
 			return $self->invokeMethod('_render', array(
-				$chain->method(true), $template, compact('url', 'options')
+				$method, $template, compact('url', 'options')
 			));
 		};
 		return $this->_filter(__METHOD__, $params, $filter);
