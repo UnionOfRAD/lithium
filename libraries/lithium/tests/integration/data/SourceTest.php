@@ -123,7 +123,7 @@ class SourceTest extends \lithium\test\Unit {
 		$all = Company::all();
 
 		$result = $all->first();
-		$this->skipIf(!$result instanceof ArrayAccess, 'Class does not implement ArrayAccess');
+		$this->skipIf(!$result instanceof ArrayAccess, 'Data class does not implement ArrayAccess');
 
 		$expected = 'BigBoxMart';
 		$this->assertEqual($expected, $result['name']);

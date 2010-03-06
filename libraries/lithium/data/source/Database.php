@@ -130,17 +130,15 @@ abstract class Database extends \lithium\data\Source {
 	 * @return void
 	 */
 	public function read($query, array $options = array()) {
-		$defaults = array('return' => 'resource');
+		$defaults = array('return' => 'set');
 		$options += $defaults;
-		$params = compact('query', 'options');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) {
-			extract($params);
+		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
+			$query = $params['query'];
+			$options = $params['options'];
 
-			if (!is_string($query)) {
-				$query = $self->renderCommand($query);
-			}
-			$result = $self->invokeMethod('_execute', array($query));
+			$sql = is_string($query) ? $query : $self->renderCommand($query);
+			$result = $self->invokeMethod('_execute', array($sql));
 
 			switch ($options['return']) {
 				case 'resource':
@@ -154,6 +152,11 @@ abstract class Database extends \lithium\data\Source {
 					}
 					$self->result('close', $result, null);
 					return $records;
+				case 'set':
+					return $self->item($query->model(), array(), compact('query', 'result') + array(
+						'class' => 'recordSet',
+						'handle' => $self,
+					));
 			}
 		});
 	}
@@ -207,7 +210,7 @@ abstract class Database extends \lithium\data\Source {
 	 *         `$model`.
 	 */
 	public function item($model, array $data = array(), array $options = array()) {
-		$class = $this->_classes['record'];
+		$class = $this->_classes[isset($options['class']) ? $options['class'] : 'record'];
 		return new $class(compact('model', 'data') + $options);
 	}
 
