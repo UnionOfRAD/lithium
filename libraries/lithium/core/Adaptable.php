@@ -111,7 +111,7 @@ class Adaptable extends \lithium\core\StaticObject {
 		if (isset($config['adapter']) && is_object($config['adapter'])) {
 			return $config['adapter'];
 		}
-		$class = static::_class($config['adapter'], static::$_adapters);
+		$class = static::_class($config, static::$_adapters);
 		$settings = static::$_configurations[$name];
 		$settings[0]['adapter'] = new $class($config);
 
@@ -138,7 +138,7 @@ class Adaptable extends \lithium\core\StaticObject {
 		$stack = new SplDoublyLinkedList();
 
 		foreach ($config['strategies'] as $strategy) {
-			$class = static::_class($strategy, static::$_strategies);
+			$class = static::_strategy($strategy, static::$_strategies);
 			$stack->push(new $class($config));
 		}
 		return $stack;
@@ -194,25 +194,59 @@ class Adaptable extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Looks up an adapter or strategy class by name.
+	 * Looks up an adapter by class by name.
 	 *
 	 * @see lithium\core\libraries::locate()
-	 * @param string $name The name of the adapter or strategy to be located.
+	 * @param string $config Configuration array of class to be found.
 	 * @param array $paths Optional array of search paths that will be checked.
 	 * @return string Returns a fully-namespaced class reference to the adapter class.
 	 */
-	protected static function _class($name, $paths = array()) {
+	protected static function _class($config, $paths = array()) {
+		if (!$name = $config['adapter']) {
+			$self = get_called_class();
+			throw new Exception("No adapter set for configuration in class {$self}");
+		}
+		if (!$class = static::_locate($paths, $name)) {
+			$self = get_called_class();
+			throw new Exception("Could not find adapter {$name} in class {$self}");
+		}
+		return $class;
+	}
+
+	/**
+	 * Looks up a strategy by class by name.
+	 *
+	 * @see lithium\core\libraries::locate()
+	 * @param string $name The strategy to locate.
+	 * @param array $paths Optional array of search paths that will be checked.
+	 * @return string Returns a fully-namespaced class reference to the adapter class.
+	 */
+	protected static function _strategy($name, $paths = array()) {
 		if (!$name) {
 			$self = get_called_class();
-			throw new Exception("No adapter(strategy) set for configuration in class {$self}");
+			throw new Exception("No strategy set for configuration in class {$self}");
 		}
+		if (!$class = static::_locate($paths, $name)) {
+			$self = get_called_class();
+			throw new Exception("Could not find strategy {$name} in class {$self}");
+		}
+		return $class;
+	}
+
+	/**
+	 * Perform library location for an array of paths or a single string-based path.
+	 *
+	 * @param string|array $paths Paths that Libraries::locate() will utilize.
+	 * @param string $name The name of the class to be located.
+	 * @return null|string Fully-namespaced path to the class, or null if not found.
+	 */
+	protected static function _locate($paths, $name) {
 		foreach ((array) $paths as $path) {
 			if ($class = Libraries::locate($path, $name)) {
 				return $class;
 			}
 		}
-		$self = get_called_class();
-		throw new Exception("Could not find adapter(strategy) {$name} in class {$self}");
+		return null;
 	}
 
 	/**

@@ -215,7 +215,7 @@ class AdaptableTest extends \lithium\test\Unit {
 		$expected = $items;
 		$this->assertEqual($expected, $result);
 
-		$message  = 'Could not find adapter(strategy) NonExistent in ';
+		$message  = 'Could not find adapter NonExistent in ';
 		$message .= 'class lithium\tests\mocks\core\MockAdapter';
 		$this->expectException($message);
 
@@ -248,7 +248,7 @@ class AdaptableTest extends \lithium\test\Unit {
 		$items = array('default' => array('filters' => array()));
 		$adapter::config($items);
 
-		$message  = 'No adapter(strategy) set for configuration in ';
+		$message  = 'No adapter set for configuration in ';
 		$message .= 'class lithium\tests\mocks\core\MockAdapter';
 		$this->expectException($message);
 		$result = $adapter::adapter('default');
