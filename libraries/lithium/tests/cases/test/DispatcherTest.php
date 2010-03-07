@@ -19,9 +19,6 @@ class DispatcherTest extends \lithium\test\Unit {
 
 		$result = $report->group;
 		$this->assertTrue(is_a($result, '\lithium\test\Group'));
-
-		$result = $report->reporter;
-		$this->assertTrue(is_a($result, '\lithium\test\reporter\Text'));
 	}
 
 	public function testRunWithReporter() {
@@ -30,9 +27,6 @@ class DispatcherTest extends \lithium\test\Unit {
 
 		$result = $report->group;
 		$this->assertTrue(is_a($result, '\lithium\test\Group'));
-
-		$result = $report->reporter;
-		$this->assertTrue(is_a($result, '\lithium\test\reporter\Html'));
 	}
 
 	public function testRunCaseWithString() {

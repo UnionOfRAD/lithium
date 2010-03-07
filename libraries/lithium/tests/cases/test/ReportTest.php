@@ -40,9 +40,13 @@ class ReportTest extends \lithium\test\Unit {
 		));
 		$report->run();
 
-		$expected = "1 / 1 passes\n0 fails and 0 exceptions";
+		$expected = 1;
 		$result = $report->stats();
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result['count']['asserts']);
+
+		$this->assertEqual($expected, $result['count']['passes']);
+
+		$this->assertTrue($result['success']);
 	}
 }
 
