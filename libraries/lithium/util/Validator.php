@@ -12,24 +12,26 @@ use \lithium\util\Set;
 use \InvalidArgumentException;
 
 /**
- * Validator provies static access to commonly used data validation logic. These common routines
- * cover HTML form input data such as phone and credit card numbers, dates and postal codes, but
- * also include general checks for regular expressions and booleans and numericality.
+ * The `Validator` class provies static access to commonly used data validation logic. These common
+ * routines cover HTML form input data such as phone and credit card numbers, dates and postal
+ * codes, but also include general checks for regular expressions and booleans and numericality.
  *
- * General data checking is done by using Validator statically. Rules can be specified as a
- * parameter to the check() method or automatically accessed via the is[RuleName]() method name
+ * General data checking is done by using `Validator` statically. Rules can be specified as a
+ * parameter to the `rule()` method or automatically accessed via the `is[RuleName]()` method name
  * convention:
  *
  * {{{
  * use \lithium\util\Validator;
  *
+ * // The following are equivalent:
  * Validator::rule('email', 'foo@example.com');  // true
  * Validator::isEmail('foo-at-example.com');     // false
  * }}}
  *
  * Data can also be validated against multiple rules, each having its own associated error
  * message. The rule structure is array-based and hierarchical based on rule names and
- * messages. Resposes match
+ * messages. Resposes match the keys present in `$data` up with an array of rules which they
+ * violate.
  *
  * {{{
  * $rules = array(
@@ -42,7 +44,7 @@ use \InvalidArgumentException;
  * $data = array('email' => 'foo');
  * Validator::check($data, $rules);
  *
- * //result:
+ * // result:
  *
  * array(
  * 		'title' => array('please enter a title'),
@@ -51,9 +53,8 @@ use \InvalidArgumentException;
  *
  * }}}
  *
- * Custom validation rules can also be added to Validator at runtime. These can either take the
- * form of regex strings or functions supplied to the add() method.
- *
+ * Custom validation rules can also be added to `Validator` at runtime. These can either take the
+ * form of regular expression strings or functions supplied to the `add()` method.
  */
 class Validator extends \lithium\core\StaticObject {
 
@@ -370,6 +371,32 @@ class Validator extends \lithium\core\StaticObject {
 	 * ));
 	 * }}}
 	 *
+	 * In addition to regular expressions, validation rules can also be defined as full anonymous
+	 * functions:
+	 * {{{
+	 * use app\models\Account;
+	 *
+	 * Validator::add('accountActive', function($value) {
+	 * 	$value = is_int($value) ? Account::find($value) : $value;
+	 * 	return (boolean) $value->is_active;
+	 * });
+	 *
+	 * $testAccount = Account::create(array('is_active' => false));
+	 * Validator::isAccountActive($testAccount); // returns false
+	 * }}}
+	 *
+	 * These functions can take up to 3 parameters:
+	 * 	- `$value` _mixed_: This is the actual value to be validated (as in the above example).
+	 * 	- `$format` _string_: Often, validation rules come in multiple "formats", for example:
+	 * 	  postal codes, which vary by country or region. Defining multiple formats allows you to
+	 * 	  retian flexibility in how you validate data. In cases where a user's country of origin is
+	 * 	  known, the appropriate validation rule may be selected. In cases where it is not known,
+	 * 	  the value of `$format` may be `'any'`, which should pass if any format matches. In cases
+	 * 	  where validation rule formats are not mutually exclusive, the value may be `'all'`, in
+	 * 	  which case all must match.
+	 * 	- `$options` _array_: This parameter allows a validation rule to implement custom options.
+	 *
+	 * @see lithium\util\Validator::$_rules
 	 * @param mixed $name The name of the validation rule (string), or an array of key/value pairs
 	 *              of names and rules.
 	 * @param string $rule If $name is a string, this should be a string regular expression, or a
