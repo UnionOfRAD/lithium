@@ -135,7 +135,7 @@ class Request extends \lithium\core\Object {
 			$mobile = array_merge($mobile, (array) $this->_config['detectors']['mobile'][1]);
 		}
 		$this->_detectors['mobile'][1] = $mobile;
-		$this->_env += (array) $_SERVER + (array) $_ENV;
+		$this->_env += (array) $_SERVER + (array) $_ENV + array('REQUEST_METHOD' => 'GET');
 		$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
 		$this->_env['PLATFORM'] = isset($envs[PHP_SAPI]) ? $envs[PHP_SAPI] : null;
 		$this->_base = $this->_base ?: $this->_base();
@@ -223,9 +223,9 @@ class Request extends \lithium\core\Object {
 	 * Allows request parameters to be accessed as object properties, i.e. `$this->request->action`
 	 * instead of `$this->request->params['action']`.
 	 *
+	 * @see lithium\action\Request::$params
 	 * @param string $name The property name/parameter key to return.
 	 * @return mixed Returns the value of `$params[$name]` if it is set, otherwise returns null.
-	 * @see lithium\action\Request::$params
 	 */
 	public function __get($name) {
 		if (isset($this->params[$name])) {

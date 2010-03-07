@@ -13,11 +13,22 @@ use \lithium\action\Request;
 use \lithium\template\Helper;
 use \lithium\template\helper\Html;
 use \lithium\template\view\adapter\Simple;
+use \lithium\net\http\Router;
 
 class RendererTest extends \lithium\test\Unit {
 
 	public function setUp() {
+		$this->_routes = Router::get();
+		Router::reset();
+		Router::connect('/{:controller}/{:action}');
 		$this->subject = new Simple();
+	}
+
+	public function tearDown() {
+		Router::reset();
+		foreach ($this->_routes as $route) {
+			Router::connect($route);
+		}
 	}
 
 	public function testInitialization() {
