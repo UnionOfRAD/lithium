@@ -44,6 +44,9 @@ class MySql extends \lithium\data\source\Database {
 	/**
 	 * Constructs the MySQL adapter and sets the default port to 3306.
 	 *
+	 * @see lithium\data\source\Database::__construct()
+	 * @see lithium\data\Source::__construct()
+	 * @see lithium\data\Connections::add()
 	 * @param array $config Configuration options for this class. For additional configuration,
 	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options
 	 *        defined by this class:
@@ -56,10 +59,6 @@ class MySql extends \lithium\data\source\Database {
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
 	 * @return The adapter instance.
-	 *
-	 * @see lithium\data\source\Database::__construct()
-	 * @see lithium\data\Source::__construct()
-	 * @see lithium\data\Connections::add()
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('port' => '3306', 'encoding' => null);
@@ -207,19 +206,12 @@ class MySql extends \lithium\data\source\Database {
 		if (is_array($value)) {
 			return parent::value($value, $schema);
 		}
-		if ($value === null) {
-			return 'NULL';
-		}
+		$result = parent::value($value, $schema);;
 
-		switch ($type = isset($schema['type']) ? $schema['type'] : $this->_introspectType($value)) {
-			case 'boolean':
-				return $this->_toBoolean($value);
-			case 'float':
-				return floatval($value);
-			case 'integer':
-				return intval($value);
+		if (is_string($result)) {
+			return "'" . mysql_real_escape_string($value, $this->_connection) . "'";
 		}
-		return "'" . mysql_real_escape_string($value, $this->_connection) . "'";
+		return $result;
 	}
 
 	/**
@@ -305,7 +297,7 @@ class MySql extends \lithium\data\source\Database {
 	/**
 	 * Gets the last auto-generated ID from the query that inserted a new record.
 	 *
-	 * @param object $query The `Query` object associated with the query which generated 
+	 * @param object $query The `Query` object associated with the query which generated
 	 * @return mixed Returns the last inserted ID key for an auto-increment column or a column
 	 *         bound to a sequence.
 	 */

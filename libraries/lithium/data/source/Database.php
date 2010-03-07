@@ -13,8 +13,21 @@ use \InvalidArgumentException;
 
 abstract class Database extends \lithium\data\Source {
 
-	protected $_columns = array();
+	/**
+	 * The supported column types and their default values
+	 *
+	 * @var array
+	 */
+	protected $_columns = array(
+		'string' => array('length' => 255)
+	);
 
+	/**
+	 * Strings used to render the given statement
+	 *
+	 * @see \lithium\data\source\Database::renderCommand()
+	 * @var string
+	 */
 	protected $_strings = array(
 		'read' => "
 			SELECT {:fields} From {:table} {:joins} {:conditions} {:group} {:order} {:limit};
@@ -33,8 +46,8 @@ abstract class Database extends \lithium\data\Source {
 	);
 
 	/**
-	 * Abstract. Must be defined by child class.
 	 * Getter/Setter for the connection's encoding
+	 * Abstract. Must be defined by child class.
 	 *
 	 * @param mixed $encoding
 	 * @return mixed.
@@ -42,14 +55,41 @@ abstract class Database extends \lithium\data\Source {
 	abstract public function encoding($encoding = null);
 
 	/**
+	 * Handle the result return from the
 	 * Abstract. Must be defined by child class.
-	*/
+	 *
+	 * @param string $type next|close The current step in the iteration.
+	 * @param mixed $resource The result resource returned from the database.
+	 * @param \lithium\data\model\Query $context The given query.
+	 * @return void
+	 */
 	abstract public function result($type, $resource, $context);
 
 	/**
-	 * Abstract. Must be defined by child class.
-	*/
+	 * Return the last errors produced by a the execution of a query.
+ 	 * Abstract. Must be defined by child class.
+ 	 *
+	 */
 	abstract public function error();
+
+	/**
+	 * Execute a given query
+ 	 * Abstract. Must be defined by child class.
+ 	 *
+ 	 * @see \lithium\data\source\Database::renderCommand()
+	 * @param string $sql The sql string to execute
+	 * @return resource
+	 */
+	abstract protected function _execute($sql);
+
+	/**
+	 * Get the last insert id from the database.
+	 * Abstract. Must be defined by child class.
+	 *
+	 * @param \lithium\data\model\Query $context The given query.
+	 * @return void
+	 */
+	abstract protected function _insertId($query);
 
 	/**
 	 * Creates the database object and set default values for it.
@@ -76,23 +116,57 @@ abstract class Database extends \lithium\data\Source {
 		parent::__construct((array) $config + $defaults);
 	}
 
+	/**
+	 * Field name handler to ensure proper escaping.
+	 *
+	 * @param string $name
+	 * @return string
+	 */
 	public function name($name) {
 		return $name;
 	}
 
+	/**
+	 * Converts a given value into the proper type based on a given schema definition.
+	 *
+	 * @see \lithium\data\source\Database::schema()
+	 * @param mixed $value The value to be converted. Arrays will be recursively converted.
+	 * @param array $schema Formatted array from `\lithium\data\source\Database::schema()`
+	 * @return mixed value with converted type
+	 */
 	public function value($value, array $schema = array()) {
 		if (is_array($value)) {
 			foreach ($value as $key => $val) {
 				$value[$key] = $this->value($val, $schema);
 			}
+			return $value;
 		}
-		return $value;
+		if ($value === null) {
+			return 'NULL';
+		}
+		switch ($type = isset($schema['type']) ? $schema['type'] : $this->_introspectType($value)) {
+			case 'boolean':
+				return $this->_toBoolean($value);
+			case 'float':
+				return floatval($value);
+			case 'integer':
+				return intval($value);
+		}
+		return "'{$value}'";
 	}
 
+	/**
+	 * Inserts a new record into the database based on a the `Query`. The record is updated
+	 * with the id of the insert.
+	 *
+	 * @param object $query A `\lithium\data\model\Query` object
+	 * @param array $options none
+	 * @return boolean
+	 * @filter
+	 */
 	public function create($query, array $options = array()) {
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
-			extract($params);
-
+			$query = $params['query'];
 			$model = $query->model();
 			$fields = $values = array();
 			$data = $query->export($self);
@@ -109,9 +183,9 @@ abstract class Database extends \lithium\data\Source {
 			$fields = join(', ', $fields);
 			$values = join(', ', $values);
 			$sql = $self->renderCommand('create', compact('fields', 'values') + $data, $query);
-			$id = null;
-
 			if ($self->invokeMethod('_execute', array($sql))) {
+				$id = null;
+
 				if (!$model::key($query->record())) {
 					$id = $self->invokeMethod('_insertId', array($query));
 				}
@@ -123,14 +197,17 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Reads records from a database using a `Query` object or raw SQL string.
+	 * Reads records from a database using a `\lithium\data\model\Query` object or raw SQL string.
 	 *
-	 * @param string $query
+	 * @param string|object $query `\lithium\data\model\Query` object or sql string
 	 * @param string $options
-	 * @return void
+	 *               - `return` : switch return between `'array'`, `'item'`, or `'resource'`.
+	 *               default: `item`. Requires a `Query` object
+	 * @return mixed Determined by `$options['return'].
+	 * @filter
 	 */
 	public function read($query, array $options = array()) {
-		$defaults = array('return' => 'set');
+		$defaults = array('return' => 'item');
 		$options += $defaults;
 
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
@@ -152,7 +229,7 @@ abstract class Database extends \lithium\data\Source {
 					}
 					$self->result('close', $result, null);
 					return $records;
-				case 'set':
+				case 'item':
 					return $self->item($query->model(), array(), compact('query', 'result') + array(
 						'class' => 'recordSet',
 						'handle' => $self,
@@ -161,14 +238,20 @@ abstract class Database extends \lithium\data\Source {
 		});
 	}
 
+	/**
+	 * Updates a record in the database based on the given `Query`.
+	 *
+	 * @param object $query A `\lithium\data\model\Query` object
+	 * @param array $options none
+	 * @return boolean
+	 */
 	public function update($query, array $options = array()) {
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
-			extract($params);
-
-			$fields = array();
+			$query = $params['query'];
 			$model = $query->model();
 			$data = $query->export($self);
 			$schema = (array) $model::schema();
+			$fields = array();
 
 			while (list($field, $value) = each($data['fields'])) {
 				$schema += array($field => array());
@@ -185,6 +268,13 @@ abstract class Database extends \lithium\data\Source {
 		});
 	}
 
+	/**
+	 * Deletes a record in the database based on the given `Query`.
+	 *
+	 * @param object $query A `\lithium\data\model\Query` object
+	 * @param array $options none
+	 * @return boolean
+	 */
 	public function delete($query, array $options = array()) {
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
 			extract($params);
@@ -214,6 +304,14 @@ abstract class Database extends \lithium\data\Source {
 		return new $class(compact('model', 'data') + $options);
 	}
 
+	/**
+	 * Returns a given `type` statement for the given data, rendered from the Database::$_strings
+	 *
+	 * @param string $type create|read|update|delete|join
+	 * @param string $data The data to replace in the string
+	 * @param string $context
+	 * @return string
+	 */
 	public function renderCommand($type, $data = null, $context = null) {
 		if (is_object($type)) {
 			$context = $type;
@@ -227,6 +325,15 @@ abstract class Database extends \lithium\data\Source {
 		return trim(String::insert($this->_strings[$type], $data, array('clean' => true)));
 	}
 
+	/**
+	 * Builds an array of keyed on the fully-namespaced `Model` with array of fields as values
+	 * for the given `Query`
+	 *
+	 * @param object $query A `\lithium\data\model\Query` object
+	 * @param string $resource
+	 * @param string $context
+	 * @return void
+	 */
 	public function schema($query, $resource = null, $context = null) {
 		$model = $query->model();
 		$fields = $query->fields();
@@ -262,7 +369,16 @@ abstract class Database extends \lithium\data\Source {
 		return $result;
 	}
 
-	public function conditions($conditions, $context, $options = array()) {
+	/**
+	 * Returns a string of formatted conditions to be inserted into the query statement
+	 *
+	 * @param string|array $conditions The conditions for this query.
+	 * @param object $context The current `\lithium\data\model\Query`.
+	 * @param array $options
+	 *               - `prepend` : added before WHERE clause
+	 * @return void
+	 */
+	public function conditions($conditions, $context, array $options = array()) {
 		$defaults = array('prepend' => true);
 		$options += $defaults;
 		$model = $context->model();
@@ -305,6 +421,13 @@ abstract class Database extends \lithium\data\Source {
 		return ($options['prepend'] && !empty($result)) ? "WHERE {$result}" : $result;
 	}
 
+	/**
+	 * Returns
+	 *
+	 * @param string $fields
+	 * @param string $context
+	 * @return void
+	 */
 	public function fields($fields, $context) {
 		switch ($context->type()) {
 			case 'create':
@@ -315,27 +438,41 @@ abstract class Database extends \lithium\data\Source {
 		}
 	}
 
+	/**
+	 * Returns a LIMIT statement from the given limit and the offset of the context object.
+	 *
+	 * @param integer $limit An
+	 * @param object $context The `\lithium\data\model\Query` object
+	 * @return string
+	 */
 	public function limit($limit, $context) {
 		if (empty($limit)) {
-			return '';
-		}
-		$result = '';
-
+			return;
+		};
 		if ($offset = $context->offset() ?: '') {
 			$offset .= ', ';
 		}
 		return "LIMIT {$offset}{$limit}";
 	}
 
+	/**
+	 * Returns a join statement for given array of query objects
+	 *
+	 * @param object|array $joins A single or array of `\lithium\data\model\Query` objects
+	 * @param object $context The parent `\lithium\data\model\Query` object
+	 * @return string
+	 */
 	public function joins($joins, $context) {
 		$result = null;
-		foreach ($joins as $join) {
+		foreach ((array) $joins as $join) {
 			$result .= $this->renderCommand('join', $join->export($this));
 		}
 		return $result;
 	}
 
 	public function order($order, $context) {
+		$direction = 'DESC';
+
 		if (is_string($order) && strpos($order, ',') && !preg_match('/\(.+\,.+\)/', $order)) {
 			$order = array_map('trim', explode(',', $order));
 		}
@@ -345,7 +482,7 @@ abstract class Database extends \lithium\data\Source {
 			return '';
 		}
 
-		if (is_array($keys)) {
+		if (is_array($order)) {
 			$keys = (Set::countDim($keys) > 1) ? array_map(array(&$this, 'order'), $keys) : $keys;
 
 			foreach ($keys as $key => $value) {
@@ -373,9 +510,9 @@ abstract class Database extends \lithium\data\Source {
 			}
 			return ' ORDER BY ' . trim(str_replace('ORDER BY', '', join(',', $order)));
 		}
-		$keys = preg_replace('/ORDER\\x20BY/i', '', $keys);
+		$keys = preg_replace('/ORDER\\x20BY/i', '', $order);
 
-		if (strpos($keys, '.')) {
+		if (strpos($order, '.')) {
 			preg_match_all(
 				'/([a-zA-Z0-9_]{1,})\\.([a-zA-Z0-9_]{1,})/', $keys, $result, PREG_PATTERN_ORDER
 			);
@@ -404,12 +541,7 @@ abstract class Database extends \lithium\data\Source {
 	 * @param string $comment
 	 * @return string
 	 */
-	public function comment($comment) {
-	}
-
-	abstract protected function _execute($query);
-
-	abstract protected function _insertId($query);
+	public function comment($comment) {}
 
 	/**
 	 * Returns a fully-qualified table name (i.e. with prefix), quoted.

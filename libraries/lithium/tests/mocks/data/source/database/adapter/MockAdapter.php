@@ -110,7 +110,7 @@ class MockAdapter extends \lithium\data\source\Database {
 		return $this->_columns;
 	}
 
-	public function conditions($conditions, $context, $options = array()) {
+	public function conditions($conditions, $context, array $options = array()) {
 		return $conditions;
 	}
 

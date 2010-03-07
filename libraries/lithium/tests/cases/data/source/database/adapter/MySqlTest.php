@@ -75,6 +75,33 @@ class MySqlTest extends \lithium\test\Unit {
 		$this->assertEqual('UTF-8', $this->db->encoding());
 	}
 
+	public function testValueByIntrospect() {
+		$expected = "'string'";
+		$result = $this->db->value("string");
+		$this->assertTrue(is_string($result));
+		$this->assertEqual($expected, $result);
+
+		$expected = "'\'this string is escaped\''";
+		$result = $this->db->value("'this string is escaped'");
+		$this->assertTrue(is_string($result));
+		$this->assertEqual($expected, $result);
+
+		$expected = true;
+		$result = $this->db->value(true);
+		$this->assertTrue(is_bool($result));
+		$this->assertEqual($expected, $result);
+
+		$expected = 1;
+		$result = $this->db->value('1');
+		$this->assertTrue(is_int($result));
+		$this->assertEqual($expected, $result);
+
+		$expected = 1.1;
+		$result = $this->db->value('1.1');
+		$this->assertTrue(is_float($result));
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testColumnAbstraction() {
 		$result = $this->db->invokeMethod('_column', array('varchar'));
 		$this->assertEqual(array('type' => 'string'), $result);
@@ -101,6 +128,11 @@ class MySqlTest extends \lithium\test\Unit {
 	public function testAbstractColumnResolution() {
 
 	}
+
+	public function testDescribe() {
+
+	}
+
 
 	public function testExecuteException() {
 		$this->expectException();
