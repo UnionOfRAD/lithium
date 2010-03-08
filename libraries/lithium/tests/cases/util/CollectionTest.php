@@ -222,6 +222,12 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertEqual(array(0, 1, 'baz'), $collection->keys());
 	}
 
+	/**
+	 * Tests that various types of handlers can be registered with `Collection::formats()`, and
+	 * that collection instances are converted correctly.
+	 *
+	 * @return void
+	 */
 	public function testCollectionFormatConversion() {
 		Collection::formats('\lithium\net\http\Media');
 		$items = array('hello', 'goodbye', 'foo' => array('bar', 'baz' => 'dib'));
@@ -229,9 +235,27 @@ class CollectionTest extends \lithium\test\Unit {
 
 		$expected = json_encode($items);
 		$result = $collection->to('json');
-		$this->assertEqual($result, $expected);
+		$this->assertEqual($expected, $result);
 
 		$this->assertNull($collection->to('badness'));
+
+		Collection::formats(false);
+		$this->assertNull($collection->to('json'));
+
+		Collection::formats('json', function($collection, $options) {
+			return json_encode($collection->to('array'));
+		});
+		$result = $collection->to('json');
+		$this->assertEqual($expected, $result);
+
+		$result = $collection->to(function($collection) {
+			$value = array_map(
+				function($i) { return is_array($i) ? join(',', $i) : $i; }, $collection->to('array')
+			);
+			return join(',', $value);
+		});
+		$expected = 'hello,goodbye,bar,dib';
+		$this->assertEqual($expected, $result);
 	}
 }
 
