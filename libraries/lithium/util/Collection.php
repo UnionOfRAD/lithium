@@ -81,7 +81,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * A central registry of global format handlers for `Collection` objects and subclasses.
 	 * Accessed via the `formats()` method.
 	 *
-	 * @see \lithium\util\Collection::formats()
+	 * @see lithium\util\Collection::formats()
 	 * @var array
 	 */
 	protected static $_formats = array(
@@ -112,10 +112,50 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 
 	/**
 	 * Accessor method for adding format handlers to instances and subclasses of `Collection`.
+	 * The values assigned are used by `Collection::to()` to convert `Collection` instances into
+	 * different formats, i.e. JSON.
 	 *
-	 * @param string $format
-	 * @param mixed $handler
-	 * @return mixed
+	 * This can be accomplished in two ways. First, format handlers may be registered on a
+	 * case-by-case basis, as in the following:
+	 *
+	 * {{{
+	 * Collection::formats('json', function($collection, $options) {
+	 * 	return json_encode($collection->to('array'));
+	 * });
+	 *
+	 * // You can also implement the above as a static class method, and register it as follows:
+	 * Collection::formats('json', '\my\custom\Formatter::toJson');
+	 * }}}
+	 *
+	 * Alternatively, you can implement a class that can handle several formats. This class must
+	 * implement two static methods:
+	 *
+	 * - A `formats()` method, which returns an array indicating what formats it handles.
+	 *
+	 * - A `to()` method, which handles the actual conversion.
+	 *
+	 * Once a class implements these methods, it may be registered per the followng:
+	 * {{{
+	 * Collection::formats('\lithium\net\http\Media');
+	 * }}}
+	 *
+	 * For reference on how to implement these methods, see the `Media` class.
+	 *
+	 * Once a handler is registered, any instance of `Collection` or a subclass can be converted to
+	 * the format(s) supported by the class or handler, using the `to()` method.
+	 *
+	 * @see lithium\net\http\Media::to()
+	 * @see lithium\net\http\Media::formats()
+	 * @see lithium\util\Collection::to()
+	 * @param string $format A string representing the name of the format that a `Collection` can
+	 *               be converted to. This corresponds to the `$format` parameter in the `to()`
+	 *               method. Alternatively, the fully-namespaced class name of a format-handler
+	 *               class.
+	 * @param mixed $handler If `$format` is the name of a format string, `$handler` should be the
+	 *              function that handles the conversion, either an anonymous function, or a
+	 *              reference to a method name in `"Class::method"` form. If `$format` is a class
+	 *              name, can be `null`.
+	 * @return mixed Returns the value of the format handler assigned.
 	 */
 	public static function formats($format, $handler = null) {
 		if ($format === false) {
@@ -195,15 +235,31 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	}
 
 	/**
-	 * Converts the Collection object to another type of object, or a simple type such as an array.
+	 * Converts a `Collection` object to another type of object, or a simple type such as an array.
+	 * The supported values of `$format` depend on the format handlers registered in the static
+	 * property `Collection::$_formats`. The `Collection` class comes with built-in support for
+	 * array conversion, but other formats may be registered.
 	 *
-	 * @param string $format Currently only `'array'` is supported.
+	 * Once the appropriate handlers are registered, a `Collection` instance can be converted into
+	 * any handler-supported format, i.e.: {{{
+	 * $collection->to('json'); // returns a JSON string
+	 * $collection->to('xml'); // returns an XML string
+	 * }}}
+	 *
+	 *  _Please note that Lithium does not ship with a default XML handler, but one can be
+	 * configured easily._
+	 *
+	 * @see lithium\util\Collection::formats()
+	 * @see lithium\util\Collection::$_formats
+	 * @param string $format By default the only supported value is `'array'`. However, additional
+	 *               format handlers can be registered using the `formats()` method.
 	 * @param $options Options for converting this collection:
-	 *        - 'internal': Boolean indicating whether the current internal representation of the
+	 *        - `'internal'` _boolean_: Indicates whether the current internal representation of the
 	 *          collection should be exported. Defaults to `false`, which uses the standard iterator
 	 *          interfaces. This is useful for exporting record sets, where records are lazy-loaded,
 	 *          and the collection must be iterated in order to fetch all objects.
-	 * @return mixed The converted object.
+	 * @return mixed The object converted to the value specified in `$format`; usually an array or
+	 *         string.
 	 */
 	public function to($format, array $options = array()) {
 		$defaults = array('internal' => false);
