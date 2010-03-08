@@ -22,14 +22,11 @@ use \SplDoublyLinkedList;
  *
  * All immediate subclasses to `Adaptable` must define the protected attributes `$_configurations`
  * and `$_adapters`. The former is where all local adapter named configurations will be
- * stored (as a Collection of named configuration settings), and the latter must contain the
- * Libraries::locate() compatible path string.
+ * stored (as an array of named configuration settings), and the latter must contain the
+ * `Libraries::locate()`-compatible path string (or array of strings) specifying how adapter classes
+ * should be located.
  *
  * This static class should **never** be called explicitly.
- *
- * @see lithium\storage\Cache
- * @see lithium\storage\Session
- * @see lithium\analysis\Logger
  *
  * @todo Implement as abstract class with abstract method `adapter` when Inspector has been fixed.
  */
@@ -55,7 +52,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	/**
 	 * To be re-defined in sub-classes.
 	 *
-	 * Holds the Libraries::locate() compatible path string where the adapter in question
+	 * Holds the `Libraries::locate()`-compatible path string where the adapter in question
 	 * may be found.
 	 *
 	 * @var string Path string.

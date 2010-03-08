@@ -23,7 +23,7 @@ use \lithium\util\Collection;
  * process, which will then be available to you in all other parts of your application.
  *
  * Each adapter provides a consistent interface for the basic cache operations of `write`, `read`
- * and `delete`, which can be used interchangably between all adapters. ty.
+ * and `delete`, which can be used interchangably between all adapters.
  *
  * For more information on `Session` methods and specific adapters, please see their relevant
  * documentation.
