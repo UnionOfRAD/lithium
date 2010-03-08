@@ -11,28 +11,27 @@ namespace lithium\core;
 use \lithium\util\collection\Filters;
 
 /**
- * Base class in Lithium hierarchy, from which all concrete classes inherit. This class defines
+ * Base class in Lithium's hierarchy, from which all concrete classes inherit. This class defines
  * several conventions for how classes in Lithium should be structured:
  *
  * - **Universal constructor**: Any class which defines a `__construct()` method should take
  *   exactly one parameter (`$config`), and that parameter should always be an array. Any settings
  *   passed to the constructor will be stored in the `$_config` property of the object.
- *
  * - **Initialization / automatic configuration**: After the constructor, the `_init()` method is
  *   called. This method can be used to initialize the object, keeping complex logic and
  *   high-overhead or difficult to test operations out of the constructor. This method is called
  *   automatically by `Object::__construct()`, but may be disabled by passing `'init' => false` to
  *   the constructor. The initializer is also used for automatically assigning object properties.
  *   See the documentation for the `_init()` method for more details.
- *
  * - **Filters**: The `Object` class implements two methods which allow an object to easily
  *   implement filterable methods. The `_filter()` method allows methods to be implemented as
  *   filterable, and the `applyFilter()` method allows filters to be wrapped around them.
- *
  * - **Testing / misc.**: The `__set_state()` method provides a default implementation of the PHP
  *   magic method (works with `var_export()`) which can instantiate an object with a static method
  *   call. Finally, the `_stop()` method may be used instead of `exit()`, as it can be overridden
  *   for testing purposes.
+ *
+ * @see lithium\core\StaticObject
  */
 class Object {
 

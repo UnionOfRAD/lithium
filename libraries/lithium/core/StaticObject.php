@@ -11,14 +11,18 @@ namespace lithium\core;
 use \lithium\util\collection\Filters;
 
 /**
- * Alternative base class in Lithium hierarchy, from which all (and only) static classes inherit.
+ * Provides a base class for all static classes in the Lithium framework. Similar to its
+ * counterpart, the `Object` class, `StaticObject` defines some utility methods for working with
+ * the filters system, and methods useful for testing purposes.
+ *
+ * @see lithium\core\Object
  */
 class StaticObject {
 
 	/**
 	 * Stores the closures that represent the method filters. They are indexed by called class.
 	 *
-	 * @var array Method filters, indexed by get_called_class().
+	 * @var array Method filters, indexed by `get_called_class()`.
 	 */
 	protected static $_methodFilters = array();
 
