@@ -95,7 +95,9 @@ class Report extends \lithium\core\Object {
 		$filters = array();
 
 		foreach ($this->filters as $filter => $options) {
-			$filter = ucwords($filter);
+			if (!strpos($filter, "\\")) {
+				$filter = ucwords($filter);
+			}
 			if (!$class = Libraries::locate('test.filter', $filter)) {
 				throw new Exception("{$class} is not a valid test filter.");
 			}
