@@ -303,7 +303,6 @@ class Libraries {
 	/**
 	 * Finds the classes in a library/namespace/folder
 	 *
-	 * @todo Tie this into how path() is implemented
 	 * @param string $library
 	 * @param string $options
 	 * @return array

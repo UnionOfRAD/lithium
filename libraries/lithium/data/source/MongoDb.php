@@ -26,10 +26,10 @@ use \Exception;
  *
  * After installing MongoDB, you can connect to it as follows:
  * {{{//app/config/connections.php:
- * Connections::add('default', 'MongoDb', array('database' => 'myDb'));}}}
+ * Connections::add('default', array('type' => 'MongoDb', 'database' => 'myDb'));}}}
  *
  * By default, it will attempt to connect to a Mongo instance running on `localhost` on port
- * 27017. See `__construct()` for details on how to change this.
+ * 27017. See `__construct()` for details on the accepted configuration settings.
  *
  * @see lithium\data\collection\Document
  * @see lithium\data\Connections::add()
