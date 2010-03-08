@@ -54,7 +54,7 @@
 						)); ?>
 					</span>
 					<?php
-					echo $report->render("stats", $report->stats());
+					echo $report->render("stats");
 
 					echo $report->filters();
 					?>

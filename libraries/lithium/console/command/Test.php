@@ -97,7 +97,7 @@ class Test extends \lithium\console\Command {
 		$this->out('done.', 2);
 
 		$this->hr();
-		$this->out($report->render('stats', $report->stats()));
+		$this->out($report->render('stats'));
 
 		if ($filterResults = $report->filters("\n")) {
 			$this->out($filterResults);
