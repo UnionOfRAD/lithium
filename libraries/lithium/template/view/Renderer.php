@@ -46,8 +46,8 @@ abstract class Renderer extends \lithium\core\Object {
 	 * `Renderer`'s dependencies. These classes are used by the output handlers to generate URLs
 	 * for dynamic resources and static assets.
 	 *
-	 * @var array
 	 * @see Renderer::$_handlers
+	 * @var array
 	 */
 	protected $_classes = array(
 		'router' => 'lithium\net\http\Router',
@@ -82,9 +82,9 @@ abstract class Renderer extends \lithium\core\Object {
 	 * helper method renders a template string (using `_render()`) and a key which is to be embedded
 	 * in the template string matches an array key of a corresponding handler.
 	 *
-	 * @var array
 	 * @see lithium\template\view\Renderer::applyHandler()
 	 * @see lithium\template\view\Renderer::handlers()
+	 * @var array
 	 */
 	protected $_handlers = array();
 
@@ -98,6 +98,22 @@ abstract class Renderer extends \lithium\core\Object {
 	 */
 	protected $_data = array();
 
+	/**
+	 * Render the template with given data.
+	 * Abstract. Must be added to subclasses.
+	 *
+	 * @param string $template
+	 * @param string $data
+	 * @param array $options
+	 * @return void
+	 */
+	abstract public function render($template, $data = array(), array $options = array());
+
+	/**
+	 * undocumented function
+	 *
+	 * @param array $config
+	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'view' => null,
@@ -147,8 +163,6 @@ abstract class Renderer extends \lithium\core\Object {
 		unset($this->_config['view']);
 	}
 
-	abstract public function render($template, $data = array(), array $options = array());
-
 	public function __isSet($property) {
 		return isset($this->_context[$property]);
 	}
@@ -177,13 +191,13 @@ abstract class Renderer extends \lithium\core\Object {
 	 * `$method` is a key in `Renderer::$_handlers`, the value passed as the first parameter in the
 	 * method call will be passed through the handler and returned.
 	 *
+	 * @see lithium\template\view\Renderer::$_context
+	 * @see lithium\template\view\Renderer::$_handlers
+	 * @see lithium\template\view\Renderer::applyHandler()
 	 * @param string $method The method name to call, usually either a rendering context value or a
 	 *               content handler.
 	 * @param array $params
 	 * @return mixed
-	 * @see lithium\template\view\Renderer::$_context
-	 * @see lithium\template\view\Renderer::$_handlers
-	 * @see lithium\template\view\Renderer::applyHandler()
 	 */
 	public function __call($method, $params) {
 		if (!isset($this->_context[$method]) && !isset($this->_handlers[$method])) {
@@ -242,11 +256,11 @@ abstract class Renderer extends \lithium\core\Object {
 	 * across all templates rendered in the current context, and are usually outputted in a layout
 	 * template.
 	 *
+	 * @see lithium\template\view\Renderer::$_context
 	 * @param string $property If unspecified, an associative array of all context values is
 	 *               returned. If a string is specified, the context value matching the name given
 	 *               will be returned, or `null` if that name does not exist.
 	 * @return mixed A string or array, depending on whether `$property` is specified.
-	 * @see lithium\template\view\Renderer::$_context
 	 */
 	public function context($property = null) {
 		if (!empty($property)) {
@@ -260,6 +274,8 @@ abstract class Renderer extends \lithium\core\Object {
 	 * `$handlers`.  For more on how to implement handlers and the various types, see
 	 * `applyHandler()`.
 	 *
+	 * @see lithium\template\view\Renderer::applyHandler()
+	 * @see lithium\template\view\Renderer::$_handlers
 	 * @param mixed $handlers If `$handlers` is empty or no value is provided, the current list
 	 *              of handlers is returned.  If `$handlers` is a string, the handler with the name
 	 *              matching the string will be returned, or null if one does not exist. If
@@ -268,8 +284,6 @@ abstract class Renderer extends \lithium\core\Object {
 	 *              taking precedence over those newly added.
 	 * @return mixed Returns an array of handlers or a single handler reference, depending on the
 	 *               value of `$handlers`.
-	 * @see lithium\template\view\Renderer::applyHandler()
-	 * @see lithium\template\view\Renderer::$_handlers
 	 */
 	public function handlers($handlers = null) {
 		if (is_array($handlers)) {
@@ -293,6 +307,8 @@ abstract class Renderer extends \lithium\core\Object {
 	 *   the calling helper and the calling method name as the second, and `$options` as the third.
 	 * In all cases, handlers should return the transformed version of `$value`.
 	 *
+	 * @see lithium\template\view\Renderer::handlers()
+	 * @see lithium\template\view\Renderer::$_handlers
 	 * @param object $helper The instance of the object (usually a helper) that is invoking
 	 * @param string $method The object (helper) method which is applying the handler to the content
 	 * @param string $name The name of the value to which the handler is applied, i.e. `'url'`,
@@ -300,14 +316,11 @@ abstract class Renderer extends \lithium\core\Object {
 	 * @param mixed $value The value to be transformed by the handler, which is ultimately returned.
 	 * @param array $options Any options which should be passed to the handler used in this call.
 	 * @return mixed The transformed value of `$value`, after it has been processed by a handler.
-	 * @see lithium\template\view\Renderer::handlers()
-	 * @see lithium\template\view\Renderer::$_handlers
 	 */
 	public function applyHandler($helper, $method, $name, $value, array $options = array()) {
 		if (!(isset($this->_handlers[$name]) && $handler = $this->_handlers[$name])) {
 			return $value;
 		}
-
 		switch (true) {
 			case is_string($handler) && is_object($helper):
 				return $helper->invokeMethod($handler, array($value, $method, $options));

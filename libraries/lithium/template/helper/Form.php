@@ -45,7 +45,7 @@ class Form extends \lithium\template\Helper {
 		'error'                => '<div{:options}>{:content}</div>',
 		'errors'               => '{:content}',
 		'file'                 => '<input type="file" name="{:name}"{:options} />',
-		'form'                 => '<form action="{:url}"{:options}>',
+		'form'                 => '<form action="{:url}"{:options}>{:content}',
 		'form-end'             => '</form>',
 		'hidden'               => '<input type="hidden" name="{:name}"{:options} />',
 		'field'                => '<div{:wrap}>{:label}{:input}{:error}</div>',
@@ -55,7 +55,7 @@ class Form extends \lithium\template\Helper {
 		'option-group'         => '<optgroup label="{:label}"{:options}>',
 		'option-group-end'     => '</optgroup>',
 		'password'             => '<input type="password" name="{:name}"{:options} />',
-		'radio'             => '<input type="radio" name="{:name}" id="{:id}"{:options} />{:label}',
+		'radio'         => '<input type="radio" name="{:name}" id="{:id}"{:options} />{:label}',
 		'select-start'         => '<select name="{:name}"{:options}>',
 		'select-multi-start'   => '<select name="{:name}[]"{:options}>',
 		'select-empty'         => '<option value=""{:options}>&nbsp;</option>',
@@ -184,39 +184,38 @@ class Form extends \lithium\template\Helper {
 			'method' => $binding ? ($binding->exists() ? 'put' : 'post') : 'post'
 		);
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, $options);
-		$options = (array) $options + $defaults;
+		list($scope, $options) = $this->_options($defaults, $options);
+
 		$_binding =& $this->_binding;
 		$method = __METHOD__;
-		$params = compact('binding', 'options');
+		$params = compact('scope', 'options', 'binding');
 
 		$filter = function($self, $params, $chain) use ($method, $template, $defaults, &$_binding) {
-			extract($params);
-			$_binding = $binding;
-			$append = '';
+			$scope = $params['scope'];
+			$options = $params['options'];
+			$_binding = $params['binding'];
+			$content = null;
 
-			if ($options['type'] == 'file') {
-				if (strtolower($options['method']) == 'get') {
-					$options['method'] = 'post';
+			if (!in_array(strtolower($scope['method']), array('get', 'post'))) {
+				$content = $self->hidden('_method', array(
+					'name' => '_method', 'value' => strtoupper($scope['method'])
+				));
+			}
+			if ($scope['type'] == 'file') {
+				if (strtolower($scope['method']) == 'get') {
+					$scope['method'] = 'post';
 				}
 				$options['enctype'] = 'multipart/form-data';
 			}
-			unset($options['type']);
 
-			if (!in_array(strtolower($options['method']), array('get', 'post'))) {
-				$append .= $self->hidden('_method', array(
-					'name' => '_method', 'value' => strtoupper($options['method'])
-				));
-			}
-
-			$url = $options['action'] ? array('action' => $options['action']) : $options['url'];
-			unset($options['url'], $options['action']);
-			$options['method'] = strtoupper($options['method']);
+			$url = $scope['action'] ? array('action' => $scope['action']) : $scope['url'];
+			$options['method'] = strtoupper($scope['method']);
 
 			return $self->invokeMethod('_render', array(
-				$method, $template, compact('url', 'options')
+				$method, $template, compact('url', 'content', 'options')
 			));
 		};
-		return $this->_filter(__METHOD__, $params, $filter);
+		return $this->_filter($method, $params, $filter);
 	}
 
 	public function end() {
@@ -253,7 +252,7 @@ class Form extends \lithium\template\Helper {
 			'wrap' => null,
 			'list' => null
 		);
-		$options += $defaults;
+		list($options, $fieldOptions) = $this->_options($defaults, $options);
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 
 		if ($options['template'] != $defaults['template']) {
@@ -266,7 +265,6 @@ class Form extends \lithium\template\Helper {
 		if ($options['label'] === null || !empty($options['label'])) {
 			$label = $this->label($name, $options['label']);
 		}
-		$fieldOptions = array_diff_key($options, $defaults);
 
 		switch (true) {
 			case ($type == 'select'):
@@ -303,8 +301,8 @@ class Form extends \lithium\template\Helper {
 	 */
 	public function textarea($name, array $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
-		$value = isset($options['value']) ? $options['value'] : '';
-		unset($options['value']);
+		list($scope, $options) = $this->_options(array('value' => null), $options);
+		$value = isset($scope['value']) ? $scope['value'] : '';
 		return $this->_render(__METHOD__, $template, compact('name', 'options', 'value'));
 	}
 
@@ -343,24 +341,20 @@ class Form extends \lithium\template\Helper {
 	public function select($name, $list = array(), array $options = array()) {
 		$defaults = array('empty' => false, 'value' => null);
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		list($scope, $options) = $this->_options($defaults, $options);
 
-		$options += $defaults;
-		$val = $options['value'];
-		$empty = $options['empty'];
-		unset($options['value'], $options['empty']);
-
-		if ($empty) {
-			$list = array('' => ($empty === true) ? '' : $empty) + $list;
+		if ($scope['empty']) {
+			$list = array('' => ($scope['empty'] === true) ? '' : $scope['empty']) + $list;
 		}
-		$startTemplate = ($options['multiple']) ? 'select-multi-start' : 'select-start';
+		$startTemplate = ($scope['multiple']) ? 'select-multi-start' : 'select-start';
 		$output = $this->_render(__METHOD__, $startTemplate, compact('name', 'options'));
 
 		foreach ($list as $value => $title) {
 			$selected = false;
 
-			if (is_array($val) && in_array($value, $val)) {
+			if (is_array($scope['value']) && in_array($value, $scope['value'])) {
 				$selected = true;
-			} elseif ($val == $value) {
+			} elseif ($scope['value'] == $value) {
 				$selected = true;
 			}
 			$options = $selected ? array('selected' => true) : array();
@@ -381,11 +375,11 @@ class Form extends \lithium\template\Helper {
 	 */
 	public function checkbox($name, array $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		list($scope, $options) = $this->_options(array('value' => null), $options);
 
-		if (!isset($options['checked'])) {
-			$options['checked'] = isset($options['value']) ? $options['value'] : false;
+		if (!isset($scope['checked'])) {
+			$options['checked'] = isset($scope['value']) ? $scope['value'] : false;
 		}
-		unset($options['value']);
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
 	}
 
@@ -422,9 +416,13 @@ class Form extends \lithium\template\Helper {
 	 * @return string Returns a `<label>` tag for the name and with HTML attributes.
 	 */
 	public function label($name, $title = null, array $options = array()) {
+		$defaults = array('escape' => true);
 		$title = $title ?: Inflector::humanize($name);
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
-		return $this->_render(__METHOD__, $template, compact('name', 'title', 'options'));
+		list($scope, $options) = $this->_options($defaults, $options);
+		return $this->_render(
+			__METHOD__, $template, compact('name', 'title', 'options'), $scope
+		);
 	}
 
 	/**

@@ -82,7 +82,6 @@ class HtmlTest extends \lithium\test\Unit {
 			array('controller' => 'posts', 'type' => 'rss'),
 			array('type' => 'rss')
 		);
-
 		$this->assertTags($result, array('link' => array(
 			'href' => 'regex:/.*\/posts\/index\.rss/',
 			'type' => 'application/rss+xml',
@@ -306,7 +305,6 @@ class HtmlTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	function testImage() {
-
 		$result = $this->html->image('test.gif');
 		$this->assertTags($result, array('img' => array('src' => '/img/test.gif', 'alt' => '')));
 
@@ -346,60 +344,6 @@ class HtmlTest extends \lithium\test\Unit {
 		$result = $this->html->style('http://whatever.com/screen.css?1234');
 		$expected['link']['href'] = 'regex:/http:\/\/.*\/screen\.css\?1234/';
 		$this->assertTags($result, $expected);
-
-// 		Configure::write('Asset.filter.css', 'css.php');
-// 		$result = $this->html->style('lithium.generic');
-// 		$expected['link']['href'] = 'regex:/.*ccss\/lithium\.generic\.css/';
-// 		$this->assertTags($result, $expected);
-// 		Configure::write('Asset.filter.css', false);
-//
-// 		$result = explode("\n", trim($this->html->style(array('lithium.generic', 'vendor.generic'))));
-// 		$expected['link']['href'] = 'regex:/.*css\/lithium\.generic\.css/';
-// 		$this->assertTags($result[0], $expected);
-// 		$expected['link']['href'] = 'regex:/.*css\/vendor\.generic\.css/';
-// 		$this->assertTags($result[1], $expected);
-// 		$this->assertEqual(count($result), 2);
-//
-// 		Configure::write('Asset.timestamp', true);
-//
-// 		Configure::write('Asset.filter.css', 'css.php');
-// 		$result = $this->html->style('lithium.generic');
-// 		$expected['link']['href'] = 'regex:/.*ccss\/lithium\.generic\.css\?[0-9]+/';
-// 		$this->assertTags($result, $expected);
-// 		Configure::write('Asset.filter.css', false);
-//
-// 		$result = $this->html->style('lithium.generic');
-// 		$expected['link']['href'] = 'regex:/.*css\/lithium\.generic\.css\?[0-9]+/';
-// 		$this->assertTags($result, $expected);
-//
-// 		$debug = Configure::read('debug');
-// 		Configure::write('debug', 0);
-//
-// 		$result = $this->html->style('lithium.generic');
-// 		$expected['link']['href'] = 'regex:/.*css\/lithium\.generic\.css/';
-// 		$this->assertTags($result, $expected);
-//
-// 		Configure::write('Asset.timestamp', 'force');
-//
-// 		$result = $this->html->style('lithium.generic');
-// 		$expected['link']['href'] = 'regex:/.*css\/lithium\.generic\.css\?[0-9]+/';
-// 		$this->assertTags($result, $expected);
-//
-// 		$webroot = $this->html->webroot;
-// 		$this->html->webroot = '/testing/';
-// 		$result = $this->html->style('lithium.generic');
-// 		$expected['link']['href'] = 'regex:/\/testing\/css\/lithium\.generic\.css\?/';
-// 		$this->assertTags($result, $expected);
-// 		$this->html->webroot = $webroot;
-//
-// 		$webroot = $this->html->webroot;
-// 		$this->html->webroot = '/testing/longer/';
-// 		$result = $this->html->style('lithium.generic');
-// 		$expected['link']['href'] = 'regex:/\/testing\/longer\/css\/lithium\.generic\.css\?/';
-// 		$this->assertTags($result, $expected);
-// 		$this->html->webroot = $webroot;
-//
-// 		Configure::write('debug', $debug);
 	}
 
 	/**
@@ -474,45 +418,26 @@ class HtmlTest extends \lithium\test\Unit {
 		$this->assertTags($result, $expected);
 	}
 
-
-	/**
-	 * Tests arbitrary tag generation.
-	 *
-	 * @return void
-	 */
-	public function testTag() {
-		$result = $this->html->tag('div');
-		$this->assertTags($result, '<div');
-
-		$result = $this->html->tag('div', 'text');
-		$this->assertTags($result, '<div', 'text', '/div');
-
-		$result = $this->html->tag('div', '<text>', array('class' => 'class-name'), true);
-		$this->assertTags($result, array(
-			'div' => array('class' => 'class-name'), '&lt;text&gt;', '/div'
-		));
-
-		$result = $this->html->tag('div', '<text>', 'class-name', true);
-		$this->assertTags($result, array(
-			'div' => array('class' => 'class-name'), '&lt;text&gt;', '/div'
-		));
-	}
-
 	/**
 	 * Tests generation of block-level element (<div />).
 	 *
 	 * @return void
 	 */
-	public function testBlock() {
-		$result = $this->html->block('class-name');
+	public function testDivBlock() {
+		$result = $this->html->tag('div', 'class-name');
 		$this->assertTags($result, array('div' => array('class' => 'class-name')));
 
-		$result = $this->html->block('class-name', 'text');
+		$result = $this->html->tag('div', 'class-name', 'text');
 		$this->assertTags($result, array('div' => array('class' => 'class-name'), 'text', '/div'));
 
-		$result = $this->html->block('class-name', '<text>', array(), true);
+		$result = $this->html->tag('div', 'class-name', '<text>');
 		$this->assertTags($result, array(
 			'div' => array('class' => 'class-name'), '&lt;text&gt;', '/div'
+		));
+
+		$result = $this->html->tag('div', 'class-name', '&text', array('escape' => false));
+		$this->assertTags($result, array(
+			'div' => array('class' => 'class-name'), '&text', '/div'
 		));
 	}
 
@@ -521,16 +446,21 @@ class HtmlTest extends \lithium\test\Unit {
 	 *
 	 * @return void
 	 */
-	function testPara() {
-		$result = $this->html->para('class-name', '');
+	function testPTag() {
+		$result = $this->html->tag('p', 'class-name');
 		$this->assertTags($result, array('p' => array('class' => 'class-name')));
 
-		$result = $this->html->para('class-name', 'text');
+		$result = $this->html->tag('p', 'class-name', 'text');
 		$this->assertTags($result, array('p' => array('class' => 'class-name'), 'text', '/p'));
 
-		$result = $this->html->para('class-name', '<text>', array(), true);
+		$result = $this->html->tag('p', 'class-name', '<text>');
 		$this->assertTags($result, array(
 			'p' => array('class' => 'class-name'), '&lt;text&gt;', '/p'
+		));
+
+		$result = $this->html->tag('p', 'class-name', '&text', array('escape' => false));
+		$this->assertTags($result, array(
+			'p' => array('class' => 'class-name'), '&text', '/p'
 		));
 	}
 }

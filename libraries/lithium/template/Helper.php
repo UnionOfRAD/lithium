@@ -86,6 +86,20 @@ abstract class Helper extends \lithium\core\Object {
 		return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 	}
 
+	/**
+	 * Takes the defaults and current options, merges them and returns options which have
+	 * the default keys removed and full set of options as the scope.
+	 *
+	 * @param array $defaults
+	 * @param array $scope the complete set of options
+	 * @return array $scope, $options
+	 */
+	protected function _options(array $defaults, array $scope) {
+		$scope += $defaults;
+		$options = array_diff_key($scope, $defaults);
+		return array($scope, $options);
+	}
+
 	protected function _render($method, $string, $params, array $options = array()) {
 		foreach ($params as $key => $value) {
 			$params[$key] = $this->_context->applyHandler($this, $method, $key, $value, $options);
@@ -98,11 +112,9 @@ abstract class Helper extends \lithium\core\Object {
 		if (!is_array($params)) {
 			return empty($params) ? '' : ' ' . $params;
 		}
-
 		$defaults = array('escape' => true, 'prepend' => ' ', 'append' => '');
 		$options += $defaults;
 		$result = array();
-
 		foreach ($params as $key => $value) {
 			$result[] = $this->_formatAttr($key, $value, $options);
 		}
@@ -110,11 +122,8 @@ abstract class Helper extends \lithium\core\Object {
 	}
 
 	protected function _formatAttr($key, $value, array $options = array()) {
-		$defaults = array('escape' => true);
+		$defaults = array('escape' => true, 'format' => '%s="%s"');
 		$options += $defaults;
-
-		$format = '%s="%s"';
-		$value = (string) $value;
 
 		if (in_array($key, $this->_minimized)) {
 			$isMini = ($value == 1 || $value === true || $value === 'true' || $value == $key);
@@ -122,11 +131,12 @@ abstract class Helper extends \lithium\core\Object {
 				return null;
 			}
 		}
+		$value = (string) $value;
 
 		if ($options['escape']) {
-			return sprintf($format, $this->escape($key), $this->escape($value));
+			return sprintf($options['format'], $this->escape($key), $this->escape($value));
 		}
-		return sprintf($format, $key, $value);
+		return sprintf($options['format'], $key, $value);
 	}
 }
 

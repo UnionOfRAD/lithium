@@ -85,7 +85,9 @@ class RendererTest extends \lithium\test\Unit {
 
 		$foo = function($value) { return "Foo: {$value}"; };
 
-		$expected = array('url', 'path', 'options', 'content', 'title', 'scripts', 'styles', 'foo');
+		$expected = array(
+			'url', 'path', 'options', 'content', 'title', 'scripts', 'styles', 'foo'
+		);
 		$result = array_keys($this->subject->handlers(compact('foo')));
 		$this->assertEqual($expected, $result);
 

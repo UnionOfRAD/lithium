@@ -74,12 +74,16 @@ class FormTest extends \lithium\test\Unit {
 
 		$result = $this->form->create(null, array('type' => 'file'));
 		$this->assertTags($result, array('form' => array(
-			'action' => "{$this->base}posts/add", 'method' => 'POST', 'enctype' => 'multipart/form-data'
+			'action' => "{$this->base}posts/add",
+			'enctype' => 'multipart/form-data',
+			'method' => 'POST',
 		)));
 
 		$result = $this->form->create(null, array('method' => 'GET', 'type' => 'file'));
 		$this->assertTags($result, array('form' => array(
-			'action' => "{$this->base}posts/add", 'method' => 'POST', 'enctype' => 'multipart/form-data'
+			'action' => "{$this->base}posts/add",
+			'method' => 'POST',
+			'enctype' => 'multipart/form-data'
 		)));
 	}
 
@@ -96,7 +100,9 @@ class FormTest extends \lithium\test\Unit {
 
 		$result = $this->form->create(null, array('method' => 'put', 'type' => 'file'));
 		$this->assertTags($result, array('form' => array(
-			'action' => "{$this->base}posts/add", 'method' => 'PUT', 'enctype' => 'multipart/form-data'
+			'action' => "{$this->base}posts/add",
+			'method' => 'PUT',
+			'enctype' => 'multipart/form-data'
 		)));
 	}
 
@@ -110,7 +116,6 @@ class FormTest extends \lithium\test\Unit {
 				'body' => 'This is the body of the saved post'
 			)
 		));
-
 		$result = $this->form->create($record);
 	}
 
@@ -215,6 +220,15 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array(
 			'label' => array('for' => 'user_name'),
 			'User Name',
+			'/label'
+		));
+	}
+
+	public function testLabelGenerationWithNoEscape() {
+		$result = $this->form->label('next', 'Enter the next value >>', array('escape' => false));
+		$this->assertTags($result, array(
+			'label' => array('for' => 'next'),
+			'Enter the next value >>',
 			'/label'
 		));
 	}

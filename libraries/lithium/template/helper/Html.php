@@ -57,7 +57,7 @@ class Html extends \lithium\template\Helper {
 	 */
 	protected $_metaLinks = array(
 		'atom' => array('type' => 'application/atom+xml', 'rel' => 'alternate'),
-		'rss'  => array('type'  => 'application/rss+xml', 'rel' => 'alternate'),
+		'rss'  => array('type' => 'application/rss+xml', 'rel' => 'alternate'),
 		'icon' => array('type' => 'image/x-icon', 'rel' => 'icon')
 	);
 
@@ -101,23 +101,20 @@ class Html extends \lithium\template\Helper {
 	 *              applcation, an external URL (starts with `'http://'` or `'https://'`), an anchor
 	 *              name starting with `'#'` (i.e. `'#top'`), or an array defining a set of request
 	 *              parameters that should be matched against a route in `Router`.
-	 * @param array $options Array of HTML attributes.
+	 * @param array $options Array of HTML s and other options.
 	 * @return string Returns an `<a />` or `<link />` element.
 	 */
 	public function link($title, $url = null, array $options = array()) {
-		$defaults = array('escape' => true);
-		$options += $defaults;
+		$defaults = array('escape' => true, 'type' => null);
+		list($scope, $options) = $this->_options($defaults, $options);
 
-		if (isset($options['type']) && $type = $options['type']) {
-			unset($options['type']);
-			$options = array_diff_key($options, $defaults) + compact('title');
+		if (isset($scope['type']) && $type = $scope['type']) {
+			$options += compact('title');
 			return $this->_metaLink($type, $url, $options);
 		}
 
 		$url = is_null($url) ? $title : $url;
-		$params = $options;
-		$options = array_diff_key($options, $defaults);
-		return $this->_render(__METHOD__, 'link', compact('title', 'url', 'options'), $params);
+		return $this->_render(__METHOD__, 'link', compact('title', 'url', 'options'), $scope);
 	}
 
 	/**
@@ -128,25 +125,25 @@ class Html extends \lithium\template\Helper {
 	 * @param mixed $path String path to JavaScript file, or an array of paths.
 	 * @param array $options
 	 * @return string
+	 * @filter This method can be filtered.
 	 */
 	public function script($path, array $options = array()) {
 		$defaults = array('inline' => true);
-		$options += $defaults;
-		$m = __METHOD__;
+		list($scope, $options) = $this->_options($defaults, $options);
 
 		if (is_array($path)) {
 			foreach ($path as $i => $item) {
-				$path[$i] = $this->script($item, $options);
+				$path[$i] = $this->script($item, $scope);
 			}
-			return ($options['inline']) ? join("\n\t", $path) . "\n" : null;
+			return ($scope['inline']) ? join("\n\t", $path) . "\n" : null;
 		}
-		$params = compact('path') + array('options' => array_diff_key($options, $defaults));
+		$m = __METHOD__;
+		$params = compact('path', 'options');
 
 		$script = $this->_filter(__METHOD__, $params, function($self, $params, $chain) use ($m) {
 			return $self->invokeMethod('_render', array($m, 'script', $params));
 		});
-
-		if ($options['inline']) {
+		if ($scope['inline']) {
 			return $script;
 		}
 		if ($this->_context) {
@@ -165,28 +162,24 @@ class Html extends \lithium\template\Helper {
 	 */
 	public function style($path, array $options = array()) {
 		$defaults = array('type' => 'stylesheet', 'inline' => true);
-		$options += $defaults;
+		list($scope, $options) = $this->_options($defaults, $options);
 
 		if (is_array($path)) {
 			foreach ($path as $i => $item) {
-				$path[$i] = $this->style($item, $options);
+				$path[$i] = $this->style($item, $scope);
 			}
-			return ($options['inline']) ? join("\n\t", $path) . "\n" : null;
+			return ($scope['inline']) ? join("\n\t", $path) . "\n" : null;
 		}
-		$params = compact('path', 'options');
 		$method = __METHOD__;
-
+		$type = $scope['type'];
+		$params = compact('type', 'path', 'options');
 		$filter = function($self, $params, $chain) use ($defaults, $method) {
-			extract($params);
-			$type = $options['type'];
-			$options = array_diff_key($options, $defaults);
-			$template = ($type == 'import') ? 'style-import' : 'style-link';
-			$params = compact('type', 'path', 'options');
+			$template = ($params['type'] == 'import') ? 'style-import' : 'style-link';
 			return $self->invokeMethod('_render', array($method, $template, $params));
 		};
-		$style = $this->_filter(__METHOD__, $params, $filter);
+		$style = $this->_filter($method, $params, $filter);
 
-		if ($options['inline']) {
+		if ($scope['inline']) {
 			return $style;
 		}
 		if ($this->_context) {
@@ -200,8 +193,9 @@ class Html extends \lithium\template\Helper {
 	 * @param string $path Path to the image file, relative to the app/webroot/img/ directory.
 	 * @param array $options Array of HTML attributes.
 	 * @return string
+	 * @filter This method can be filtered.
 	 */
-	public function image($path, array $options = array()) {
+ 	public function image($path, array $options = array()) {
 		$defaults = array('alt' => '');
 		$options += $defaults;
 		$path = is_array($path) ? $this->_context->url($path) : $path;
@@ -217,49 +211,20 @@ class Html extends \lithium\template\Helper {
 	 * Returns a formatted block tag, i.e <div />, <span />, <p />.
 	 *
 	 * @param string $name Tag name.
+	 * @param string $class the css class for the given tag
 	 * @param string $content String content that will appear inside the div element.
-	 *   If null, only a start tag will be printed
+	 *               If null, only a start tag will be printed
 	 * @param array $options Additional HTML attributes of the DIV tag
 	 * @return string The formatted tag element
 	 */
-	function tag($name, $content = null, $options = array()) {
-		$options = is_array($options) ? $options : array('class' => $options);
-		return $this->_render(__METHOD__, ($content === null) ? 'tag-start' : 'tag', compact(
-			'name', 'options', 'content'
-		));
-	}
+	function tag($name, $class, $content = null, array $options = array()) {
+		$defaults = array('escape' => true);
+		list($scope, $options) = $this->_options($defaults, $options += compact('class'));
 
-	/**
-	 * Returns a formatted DIV tag for HTML FORMs.
-	 *
-	 * @param string $class CSS class name of the div element.
-	 * @param string $content String content that will appear inside the div element.
-	 *   If null, only a start tag will be printed
-	 * @param array $options Additional HTML attributes of the DIV tag
-	 * @return string The formatted DIV element
-	 */
-	function block($class = null, $content = null, array $options = array()) {
-		if ($class) {
-			$options['class'] = $class;
-		}
-		return $this->_render(__METHOD__, 'block', compact('content', 'options'));
-	}
-
-	/**
-	 * Returns a formatted P tag.
-	 *
-	 * @param string $class CSS class name of the p element.
-	 * @param string $content String content that will appear inside the p element.
-	 * @param array $options Additional HTML attributes of the P tag
-	 * @return string The formatted P element
-	 */
-	function para($class, $content, array $options = array()) {
-		if ($class) {
-			$options['class'] = $class;
-		}
-		return $this->_render(__METHOD__, ($content === null) ? 'para-start' : 'para', compact(
-			'content', 'options'
-		));
+		return $this->_render(
+			__METHOD__, ($content === null) ? 'tag-start' : 'tag',
+			compact('name', 'options', 'content'), $scope
+		);
 	}
 
 	/**
@@ -280,13 +245,11 @@ class Html extends \lithium\template\Helper {
 				'handlers' => array('url' => 'path')
 			));
 			$options['rel'] = 'shortcut icon';
-
 			$ieFix = $this->_render(__METHOD__, 'meta-link', compact('url', 'options'), array(
 				'handlers' => array('url' => 'path')
 			));
 			return "{$standard}\n\t{$ieFix}";
 		}
-
 		return $this->_render(__METHOD__, 'meta-link', compact('url', 'options'), array(
 			'handlers' => array()
 		));

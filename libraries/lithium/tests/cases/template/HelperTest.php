@@ -31,9 +31,8 @@ class HelperTest extends \lithium\test\Unit {
 			'context' => new MockRenderer(),
 			'handlers' => array('content' => function($value) { return "\n{$value}\n"; })
 		);
-		$this->helper = new MockHelper($params);
-
-		$this->assertEqual($this->helper->_context, $params['context']);
+		$helper = new MockHelper($params);
+		$this->assertEqual($helper->_context, $params['context']);
 	}
 
 	/**
@@ -64,6 +63,44 @@ class HelperTest extends \lithium\test\Unit {
 		$value  = '<blockquote>"Thou shalt not escape!"</blockquote>';
 		$result = $this->helper->escape($value, null, array('escape' => false));
 		$this->assertEqual($value, $result);
+	}
+
+	public function testOptions() {
+		$defaults = array('value' => null);
+		$options = array('value' => 1, 'title' => 'one');
+		$expected = array(
+			array('value' => 1, 'title' => 'one'),
+			array('title' => 'one')
+		);
+		$result = $this->helper->testOptions($defaults, $options);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testAttributes() {
+		$attributes = array('value' => 1, 'title' => 'one');
+		$expected = ' value="1" title="one"';
+		$result = $this->helper->testAttributes($attributes);
+		$this->assertEqual($expected, $result);
+
+		$attributes = array('checked' => true, 'title' => 'one');
+		$expected = ' checked="checked" title="one"';
+		$result = $this->helper->testAttributes($attributes);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testRender() {
+		$params = array(
+			'context' => new MockRenderer(),
+			'handlers' => array('content' => function($value) { return "\n{$value}\n"; })
+		);
+		$helper = new MockHelper($params);
+		$title = 'cool';
+		$url = '/here';
+		$options = array('value' => 1, 'title' => 'one');
+
+		$expected = '<a href="/here" value="1" title="one">cool</a>';
+		$result = $helper->testRender('link', 'link', compact('title', 'url', 'options'));
+		$this->assertEqual($expected, $result);
 	}
 }
 
