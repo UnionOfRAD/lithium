@@ -638,7 +638,7 @@ EOD;
 		);
 
 		foreach ($chars as $unescaped => $escaped) {
-			$ord = ord($unescaped);
+			$ord = decoct(ord($unescaped));
 
 			$catalog = array(
 				"this is the{$unescaped}message" => array(
@@ -656,13 +656,17 @@ msgstr "this is the{$escaped}translation"
 EOD;
 			file_put_contents($file, $po);
 			$result = $this->adapter->read('message', 'de', null);
-			$this->assertEqual($catalog, $result);
+			$message  = "`{$unescaped}` (ASCII octal {$ord}) was not escaped to `{$escaped}`";
+			$message .= "\n{:message}";
+			$this->assertEqual($catalog, $result, $message);
 
 			unlink($file);
 
 			$this->adapter->write('message', 'de', null, $catalog);
 			$result = file_get_contents($file);
-			$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
+			$message  = "`{$escaped}` was not unescaped to `{$unescaped}` (ASCII octal {$ord})";
+			$message .= "\n{:message}";
+			$this->assertPattern('/' . preg_quote($po, '/') . '/', $result, $message);
 
 			unlink($file);
 		}
