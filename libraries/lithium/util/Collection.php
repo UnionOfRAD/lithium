@@ -27,7 +27,7 @@ namespace lithium\util;
  * }}}
  *
  * Apart from array-like data access, Collections allow for filtering and iteration methods:
- * 
+ *
  * {{{
  *
  * $coll = new Collection(array('items' => array(0, 1, 2, 3, 4)));
@@ -39,6 +39,36 @@ namespace lithium\util;
  * $coll->next();    // 3
  * $coll->prev();    // 2
  * $coll->rewind();  // 0
+ * }}}
+ *
+ * The primary purpose of the `Collection` class is to enable simple, efficient access to groups
+ * of similar objects, and to perform operations against these objects using anonymous functions.
+ *
+ * The `map()` and `each()` methods allow you to perform operations against the entire set of values
+ * in a `Collection`, while `find()` and `first()` allow you to search through values and pick out
+ * one or more.
+ *
+ * The `Collection` class also supports dispatching methods against a set of objects, if the method
+ * is supported by all objects. For example: {{{
+ * class Task {
+ * 	public function run($when) {
+ * 		// Do some work
+ * 	}
+ * }
+ *
+ * $items = array(
+ * 	new Task(array('task' => 'task 1')),
+ * 	new Task(array('task' => 'task 2')),
+ * 	new Task(array('task' => 'task 3'))
+ * );
+ * $tasks = new Collection(compact('items'));
+ *
+ * // $result will contain an array, and each element will be the return
+ * // value of a run() method call:
+ * $result = $tasks->invoke('run', array('now'));
+ *
+ * // Alternatively, the method can be called natively, with the same result:
+ * $result = $tasks->run('now');
  * }}}
  *
  * @link http://us.php.net/manual/en/class.arrayaccess.php
