@@ -30,6 +30,24 @@ use \InvalidArgumentException;
  * registered libraries (apps / plugins / vendor libraries, etc). For more information on modifying
  * the default class organization, or defining your own class types, see the `paths()` method.
  *
+ * #### Auto-loading classes
+ *
+ * Lithium defines several rules, conventions and recommendations for naming and organizing classes.
+ * The autoloader itself conforms to the [PHP Interoperability Group's draft
+ * specification](http://groups.google.com/group/php-standards/web/psr-0-final-proposal). While the
+ * autoloader will load any classes conforming to that specification, Lithium itself follows
+ * additional constraints, which are also recommended for Lithium applications, libraries and
+ * extensions, and are as follows:
+ *
+ * - Each library must exist in a top-level vendor namespace
+ * - Each top-level vendor namespace must define a set of sub-packages, and should not contain
+ *   classes
+ * - Namespace names must be lowercased and under_scored
+ * - Class names must be CamelCased
+ *
+ * Any libraries registered by calling `Libraries::add()` which follow the autoloader's will have
+ * their classes automatically loaded when referenced.
+ *
  * @see lithium\core\Libraries::add()
  * @see lithium\core\Libraries::locate()
  * @see lithium\core\Libraries::paths()
