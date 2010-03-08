@@ -11,12 +11,28 @@ namespace lithium\core;
 use \lithium\util\collection\Filters;
 
 /**
- * Base class in Lithium hierarchy, from which all other dynamic classes inherit.
+ * Base class in Lithium hierarchy, from which all concrete classes inherit. This class defines
+ * several conventions for how classes in Lithium should be structured:
  *
- * Options defined:
- *  - 'init' `boolean` Controls constructor behaviour for calling the _init method. If false the
- *    method is not called, otherwise it is. Defaults to true.
+ * - **Universal constructor**: Any class which defines a `__construct()` method should take
+ *   exactly one parameter (`$config`), and that parameter should always be an array. Any settings
+ *   passed to the constructor will be stored in the `$_config` property of the object.
  *
+ * - **Initialization / automatic configuration**: After the constructor, the `_init()` method is
+ *   called. This method can be used to initialize the object, keeping complex logic and
+ *   high-overhead or difficult to test operations out of the constructor. This method is called
+ *   automatically by `Object::__construct()`, but may be disabled by passing `'init' => false` to
+ *   the constructor. The initializer is also used for automatically assigning object properties.
+ *   See the documentation for the `_init()` method for more details.
+ *
+ * - **Filters**: The `Object` class implements two methods which allow an object to easily
+ *   implement filterable methods. The `_filter()` method allows methods to be implemented as
+ *   filterable, and the `applyFilter()` method allows filters to be wrapped around them.
+ *
+ * - **Testing / misc.**: The `__set_state()` method provides a default implementation of the PHP
+ *   magic method (works with `var_export()`) which can instantiate an object with a static method
+ *   call. Finally, the `_stop()` method may be used instead of `exit()`, as it can be overridden
+ *   for testing purposes.
  */
 class Object {
 
@@ -29,25 +45,41 @@ class Object {
 	protected $_config = array();
 
 	/**
-	 * Holds an array of values that should be processed on initialisation.
+	 * Holds an array of values that should be processed on initialization. Each value should have
+	 * a matching protected property (prefixed with `_`) defined in the class. If the property is
+	 * an array, the property name should be the key and the value should be `'merge'`. See the
+	 * `_init()` method for more details.
 	 *
+	 * @see lithium\core\Object::_init()
 	 * @var array
 	 */
 	protected $_autoConfig = array();
 
+	/**
+	 * Contains a 2-dimensional array of filters applied to this object's methods, indexed by method
+	 * name. See the associated methods for more details.
+	 *
+	 * @see lithium\core\Object::_filter()
+	 * @see lithium\core\Object::applyFilter()
+	 * @var array
+	 */
 	protected $_methodFilters = array();
 
 	protected static $_parents = array();
 
 	/**
-	 * Initialises properties, unless supplied configuration options change the default behaviour.
+	 * Initializes properties, unless supplied configuration options change the default behaviour.
 	 *
-	 * @param array $config
-	 * @return object
+	 * @param array $config The configuration options which will be assigned to the `$_config`
+	 *              property. This method accepts one configuration option:
+	 *              - `'init'` _boolean_: Controls constructor behavior for calling the `_init()`
+	 *                method. If `false`, the method is not called, otherwise it is. Defaults to
+	 *                `true`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('init' => true);
-		$this->_config = (array) $config + $defaults;
+		$this->_config = $config + $defaults;
 
 		if ($this->_config['init']) {
 			$this->_init();
@@ -55,10 +87,26 @@ class Object {
 	}
 
 	/**
-	 * Initializer function. Called by constructor unless constructor `'init'` flag set to false.
-	 * May be used for testing purposes, where objects need to be manipulated in an un-initialized
-	 * state.
+	 * Initializer function called by the constructor unless constructor `'init'` flag set to
+	 * `false`. May be used for testing purposes, where objects need to be manipulated in an
+	 * un-initialized state, or for high-overhead operations that require more control that the
+	 * constructor provides. Additionally, this method iterates over the `$_autoConfig` property
+	 * to automatically assign configuration settings to their corresponding properties.
 	 *
+	 * For example, given the following: {{{
+	 * class Bar extends \lithium\core\Object {
+	 * 	protected $_autoConfig = array('foo');
+	 * 	protected $_foo;
+	 * }
+	 *
+	 * $instance = new Bar(array('foo' => 'value'));
+	 * }}}
+	 *
+	 * The `$_foo` property of `$instance` would automatically be set to `'value'`. If `$_foo` was
+	 * an array, `$_autoConfig` could be set to `array('foo' => 'merge')`, and the constructor value
+	 * of `'foo'` would be merged with the default value of `$_foo` and assigned to it.
+	 *
+	 * @see lithium\core\Object::$_autoConfig
 	 * @return void
 	 */
 	protected function _init() {
@@ -145,16 +193,21 @@ class Object {
 
 	/**
 	 * Executes a set of filters against a method by taking a method's main implementation as a
-	 * callback, and iteratively wrapping the filters around it.
+	 * callback, and iteratively wrapping the filters around it. This, along with the `Filters`
+	 * class, is the core of Lithium's filters system. This system allows you to "reach into" an
+	 * object's methods which are marked as _filterable_, and intercept calls to those methods,
+	 * optionally modifying parameters or return values.
 	 *
-	 * @param string|array $method The name of the method being executed, or an array containing
-	 *        the name of the class that defined the method, and the method name.
+	 * @see lithium\core\Object::applyFilter()
+	 * @see lithium\util\collection\Filters
+	 * @param string $method The name of the method being executed, usually the value of
+	 *               `__METHOD__`.
 	 * @param array $params An associative array containing all the parameters passed into
-	 *        the method.
+	 *              the method.
 	 * @param Closure $callback The method's implementation, wrapped in a closure.
 	 * @param array $filters Additional filters to apply to the method for this call only.
-	 * @return mixed
-	 * @see lithium\util\collection\Filters
+	 * @return mixed Returns the return value of `$callback`, modified by any filters passed in
+	 *         `$filters` or applied with `applyFilter()`.
 	 */
 	protected function _filter($method, $params, $callback, $filters = array()) {
 		list($class, $method) = explode('::', $method);
@@ -168,6 +221,11 @@ class Object {
 		return Filters::run($this, $params, compact('items', 'class', 'method'));
 	}
 
+	/**
+	 * Gets and caches an array of the parent methods of a class.
+	 *
+	 * @return array Returns an array of parent classes for the current class.
+	 */
 	protected static function _parents() {
 		$class = get_called_class();
 
