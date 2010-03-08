@@ -8,17 +8,17 @@
 
 namespace lithium\tests\cases\storage\cache\strategy;
 
-use \lithium\storage\cache\strategy\Encoder;
+use \lithium\storage\cache\strategy\Base64;
 
-class EncoderTest extends \lithium\test\Unit {
+class Base64Test extends \lithium\test\Unit {
 
 	public function setUp() {
-		$this->Encoder = new Encoder();
+		$this->Base64 = new Base64();
 	}
 
 	public function testWrite() {
 		$data = 'a test string';
-		$result = $this->Encoder->write($data);
+		$result = $this->Base64->write($data);
 		$expected = base64_encode($data);
 		$this->assertEqual($expected, $result);
 	}
@@ -26,7 +26,7 @@ class EncoderTest extends \lithium\test\Unit {
 	public function testRead() {
 		$expected = 'a test string';
 		$encoded = base64_encode($expected);
-		$result = $this->Encoder->read($encoded);
+		$result = $this->Base64->read($encoded);
 		$this->assertEqual($expected, $result);
 	}
 }

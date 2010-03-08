@@ -137,7 +137,7 @@ class AdaptableTest extends \lithium\test\Unit {
 		$items = array('default' => array(
 			'filters' => array(),
 			'adapter' => null,
-			'strategies' => array('Serializer', 'Encoder')
+			'strategies' => array('Serializer', 'Base64')
 		));
 		$strategy::config($items);
 		$result = $strategy::config();
