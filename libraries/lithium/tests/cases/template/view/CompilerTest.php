@@ -98,12 +98,32 @@ class CompilerTest extends \lithium\test\Unit {
 		));
 		$this->assertEqual("{$this->_path}/{$this->_file}", $result);
 
-		$this->expectException('/Could not write compiled template to cache/');
+		$this->expectException('/Could not write compiled template/');
 		$this->expectException('/failed to open stream/');
 		$result = Compiler::template("{$this->_path}/{$this->_file}", array(
 			'path' => LITHIUM_APP_PATH . '/foo',
 			'fallback' => false
 		));
+	}
+
+	public function testTemplateCacheHit() {
+		$path = LITHIUM_APP_PATH . '/resources/tmp/cache/templates';
+		$original = Compiler::template("{$this->_path}/{$this->_file}", compact('path'));
+		$cache = glob("{$path}/*");
+		clearstatcache();
+
+		$cached = Compiler::template("{$this->_path}/{$this->_file}", compact('path'));
+		$this->assertEqual($original, $cached);
+		$this->assertEqual($cache, glob("{$path}/*"));
+
+		file_put_contents("{$this->_path}/{$this->_file}", "Updated");
+		clearstatcache();
+		$updated = Compiler::template("{$this->_path}/{$this->_file}", compact('path'));
+		$newCache = glob("{$path}/*");
+
+		$this->assertNotEqual($cache, $updated);
+		$this->assertEqual(count($cache), count($newCache));
+		$this->assertNotEqual($cache, $newCache);
 	}
 }
 

@@ -38,22 +38,28 @@ class Compiler extends \lithium\core\StaticObject {
 		$options += $defaults;
 
 		$stats = stat($file);
-		$oname = basename($file, '.php');
+		$dir = dirname($file);
+		$oname = basename(dirname($dir)) . '_' . basename($dir) . '_' . basename($file, '.php');
 		$template = "template_{$oname}_{$stats['ino']}_{$stats['mtime']}_{$stats['size']}.php";
 		$template = "{$options['path']}/{$template}";
 
-		if (!file_exists($template)) {
-			$compiled = static::compile(file_get_contents($file));
-			$success = $options['fallback'] && !is_writable(dirname($template))
-				? false : (file_put_contents($template, $compiled) !== false);
-
-			if (!$success && $options['fallback']) {
-				return $file;
-			} elseif (!$success && !$options['fallback']) {
-				throw new Exception('Could not write compiled template to cache');
-			}
+		if (file_exists($template)) {
+			return $template;
 		}
-		return $template;
+		$compiled = static::compile(file_get_contents($file));
+
+		if (is_writable($cachePath) && file_put_contents($template, $compiled) !== false) {
+			foreach (glob("{$options['path']}/template_{$oname}_*.php") as $expired) {
+				if ($expired !== $template) {
+					unlink($expired);
+				}
+			}
+			return $template;
+		}
+		if ($options['fallback']) {
+			return $file;
+		}
+		throw new Exception("Could not write compiled template {$template} to cache");
 	}
 
 	public static function compile($string) {
