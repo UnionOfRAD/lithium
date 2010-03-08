@@ -10,6 +10,7 @@ namespace lithium\core;
 
 use \Exception;
 use \lithium\util\String;
+use \InvalidArgumentException;
 
 /**
  * Manages all aspects of class and file location, naming and mapping. Implements auto-loading for
@@ -206,14 +207,12 @@ class Libraries {
 			'defer' => false,
 			'default' => false
 		);
-
 		if ($name === 'lithium') {
 			$defaults['defer'] = true;
 			$defaults['bootstrap'] = false;
 			$defaults['path'] = dirname(__DIR__);
 			$defaults['loader'] = 'lithium\core\Libraries::load';
 		}
-
 		if (isset($config['default']) && $config['default']) {
 			static::$_default = $name;
 			$defaults['path'] = LITHIUM_APP_PATH;
@@ -222,11 +221,13 @@ class Libraries {
 		$config += $defaults;
 
 		if (!$config['path']) {
-			$config['path'] = static::_locatePath('libraries', compact('name') + array(
+			$params = compact('name') + array(
 				'app' => LITHIUM_APP_PATH, 'root' => LITHIUM_LIBRARY_PATH
-			));
+			);
+			if (!$config['path'] = static::_locatePath('libraries', $params)) {
+				throw new InvalidArgumentException("Library '{$name}' not found.");
+			}
 		}
-
 		$config['path'] = str_replace('\\', '/', $config['path']);
 		static::$_configurations[$name] = $config;
 
@@ -234,7 +235,6 @@ class Libraries {
 			$path = ($config['includePath'] === true) ? $config['path'] : $config['includePath'];
 			set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 		}
-
 		if ($config['bootstrap'] === true) {
 			$path = "{$config['path']}/config/bootstrap.php";
 			$config['bootstrap'] = file_exists($path) ? 'config/bootstrap.php' : false;
@@ -242,7 +242,6 @@ class Libraries {
 		if ($config['bootstrap']) {
 			require "{$config['path']}/{$config['bootstrap']}";
 		}
-
 		if (!empty($config['loader'])) {
 			spl_autoload_register($config['loader']);
 		}
@@ -353,7 +352,7 @@ class Libraries {
 		$path = isset(static::$_cachedPaths[$class]) ? static::$_cachedPaths[$class] : null;
 		$path = $path ?: static::path($class);
 
-		if ($path && @include $path) {
+		if ($path && include $path) {
 			static::$_cachedPaths[$class] = $path;
 			method_exists($class, '__init') ? $class::__init() : null;
 		} elseif ($require) {

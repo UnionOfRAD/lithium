@@ -37,8 +37,8 @@ class LibraryTest extends \lithium\test\Unit {
 			'path' => $this->_testPath . '/library_test', 'bootstrap' => false
 		));
 
-		Libraries::add('plugin', array(
-			'library_test_plugin' => array('path' => $this->_testPath . '/library_test_plugin')
+		Libraries::add('library_test_plugin', array(
+			'path' => $this->_testPath . '/library_test_plugin'
 		));
 
 		$this->classes = array(
@@ -79,7 +79,8 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = "library_test created in {$this->_testPath} from ";
-		$expected .= LITHIUM_LIBRARY_PATH . "/lithium/console/command/create/template/app.phar.gz\n";
+		$expected .= LITHIUM_LIBRARY_PATH
+			. "/lithium/console/command/create/template/app.phar.gz\n";
 		$result = $this->library->response->output;
 		$this->assertEqual($expected, $result);
 	}
@@ -180,7 +181,8 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->assertTrue(file_exists($this->_testPath . '/new'));
 
 		$expected = "new created in {$this->_testPath} from ";
-		$expected .= LITHIUM_LIBRARY_PATH . "/lithium/console/command/create/template/app.phar.gz\n";
+		$expected .= LITHIUM_LIBRARY_PATH
+			. "/lithium/console/command/create/template/app.phar.gz\n";
 		$result = $app->response->output;
 		$this->assertEqual($expected, $result);
 

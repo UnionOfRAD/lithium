@@ -125,6 +125,16 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	/**
+	* Tests that an exception is thrown when a library is added which could not be found.
+	*
+	* @return void
+	*/
+	public function testAddInvalidLibrary() {
+		$this->expectException("Library 'invalid_foo' not found.");
+		Libraries::add('invalid_foo');
+	}
+
+	/**
 	 * Tests that non-class files are always filtered out of `find()` results unless an alternate
 	 * filter is specified.
 	 *
@@ -391,7 +401,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertTrue(array_search('model.txt.php', $result));
 		$this->assertTrue(array_search('plugin.phar.gz', $result));
 	}
-	
+
 	public function testLocateWithDotSyntax() {
 		$expected = 'app\controllers\PagesController';
 		$result = Libraries::locate('controllers', 'app.Pages');
