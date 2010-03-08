@@ -31,7 +31,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'host'          => 'localhost',
 			'login'         => 'root',
 			'password'      => '',
-			'database'      => 'lithium',
+			'database'      => null,
 			'autoConnect'   => true,
 			'init'          => true
 		);
@@ -46,7 +46,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'host'          => '127.0.0.1',
 			'login'         => 'bob',
 			'password'      => '',
-			'database'      => 'lithium',
+			'database'      => null,
 			'autoConnect'   => true,
 			'init'          => true
 		);

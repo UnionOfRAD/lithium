@@ -100,7 +100,7 @@ abstract class Database extends \lithium\data\Source {
 	 *  - 'login' _string_ Username to use when connecting to server. Defaults to 'root'.
 	 *  - 'password' _string_ Password to use when connecting to server. Defaults to none.
 	 *  - 'persistent' _boolean_ If true a persistent connection will be attempted, provided the
-	 *    adapter supports it. Defaults to true.
+	 *    adapter supports it. Defaults to `true`.
 	 *
 	 * @param $config array Array of configuration options.
 	 * @return Database object.
@@ -111,9 +111,9 @@ abstract class Database extends \lithium\data\Source {
 			'host'       => 'localhost',
 			'login'      => 'root',
 			'password'   => '',
-			'database'   => 'lithium',
+			'database'   => null,
 		);
-		parent::__construct((array) $config + $defaults);
+		parent::__construct($config + $defaults);
 	}
 
 	/**
