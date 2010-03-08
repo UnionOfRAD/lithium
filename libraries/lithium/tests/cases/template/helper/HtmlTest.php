@@ -417,52 +417,6 @@ class HtmlTest extends \lithium\test\Unit {
 		$result = $this->context->scripts();
 		$this->assertTags($result, $expected);
 	}
-
-	/**
-	 * Tests generation of block-level element (<div />).
-	 *
-	 * @return void
-	 */
-	public function testDivBlock() {
-		$result = $this->html->tag('div', 'class-name');
-		$this->assertTags($result, array('div' => array('class' => 'class-name')));
-
-		$result = $this->html->tag('div', 'class-name', 'text');
-		$this->assertTags($result, array('div' => array('class' => 'class-name'), 'text', '/div'));
-
-		$result = $this->html->tag('div', 'class-name', '<text>');
-		$this->assertTags($result, array(
-			'div' => array('class' => 'class-name'), '&lt;text&gt;', '/div'
-		));
-
-		$result = $this->html->tag('div', 'class-name', '&text', array('escape' => false));
-		$this->assertTags($result, array(
-			'div' => array('class' => 'class-name'), '&text', '/div'
-		));
-	}
-
-	/**
-	 * Tests paragraph generation.
-	 *
-	 * @return void
-	 */
-	function testPTag() {
-		$result = $this->html->tag('p', 'class-name');
-		$this->assertTags($result, array('p' => array('class' => 'class-name')));
-
-		$result = $this->html->tag('p', 'class-name', 'text');
-		$this->assertTags($result, array('p' => array('class' => 'class-name'), 'text', '/p'));
-
-		$result = $this->html->tag('p', 'class-name', '<text>');
-		$this->assertTags($result, array(
-			'p' => array('class' => 'class-name'), '&lt;text&gt;', '/p'
-		));
-
-		$result = $this->html->tag('p', 'class-name', '&text', array('escape' => false));
-		$this->assertTags($result, array(
-			'p' => array('class' => 'class-name'), '&text', '/p'
-		));
-	}
 }
 
 ?>

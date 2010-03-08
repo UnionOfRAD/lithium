@@ -208,26 +208,6 @@ class Html extends \lithium\template\Helper {
 	}
 
 	/**
-	 * Returns a formatted block tag, i.e <div />, <span />, <p />.
-	 *
-	 * @param string $name Tag name.
-	 * @param string $class the css class for the given tag
-	 * @param string $content String content that will appear inside the div element.
-	 *               If null, only a start tag will be printed
-	 * @param array $options Additional HTML attributes of the DIV tag
-	 * @return string The formatted tag element
-	 */
-	function tag($name, $class, $content = null, array $options = array()) {
-		$defaults = array('escape' => true);
-		list($scope, $options) = $this->_options($defaults, $options += compact('class'));
-
-		return $this->_render(
-			__METHOD__, ($content === null) ? 'tag-start' : 'tag',
-			compact('name', 'options', 'content'), $scope
-		);
-	}
-
-	/**
 	 * Creates a link to an external resource.
 	 *
 	 * @param string $type The title of the external resource
