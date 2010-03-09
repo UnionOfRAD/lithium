@@ -119,7 +119,7 @@ class Library extends \lithium\console\Command {
 		if (file_exists($this->conf)) {
 			$this->_settings += json_decode($this->conf, true);
 		}
-		$this->path = $this->_toPath($this->path ?: 'libraries/plugins');
+		$this->path = $this->_toPath($this->path ?: 'libraries');
 		$this->force = $this->f ? $this->f : $this->force;
 	}
 
