@@ -6,20 +6,19 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\integration\test\filter;
+namespace lithium\tests\integration\test;
 
 use lithium\test\filter\Coverage;
 use lithium\test\Group;
-use lithium\tests\mocks\test\MockUnitTest;
 use lithium\test\Report;
 
-class CoverageTest extends \lithium\test\Integration {
+class FilterTest extends \lithium\test\Integration {
 
 	public function setUp() {
 		$this->report = new Report(array(
-			'title' => '\lithium\tests\mocks\test\MockUnitTest',
+			'title' => '\lithium\tests\mocks\test\MockFilterTest',
 			'group' => new Group(
-				array('items' => array('\lithium\tests\mocks\test\filters\MockCoverageClassTest'))
+				array('items' => array('\lithium\tests\mocks\test\MockFilterClassTest'))
 			)
 		));
 	}
@@ -33,7 +32,7 @@ class CoverageTest extends \lithium\test\Integration {
 
 		$result = $this->report->results['filters'];
 		$percentage = $result['lithium\test\filter\Coverage'];
-		$percentage = $percentage['lithium\tests\mocks\test\filters\MockCoverageClass'];
+		$percentage = $percentage['lithium\tests\mocks\test\MockFilterClass'];
 		$percentage = $percentage['percentage'];
 
 		$this->assertEqual($expected, $percentage);
@@ -54,7 +53,7 @@ class CoverageTest extends \lithium\test\Integration {
 
 		$result = $this->report->results['filters'];
 		$percentage = $result['lithium\test\filter\Coverage'];
-		$percentage = $percentage['lithium\tests\mocks\test\filters\MockCoverageClass'];
+		$percentage = $percentage['lithium\tests\mocks\test\MockFilterClass'];
 		$percentage = $percentage['percentage'];
 
 		$this->assertEqual($expected, $percentage);

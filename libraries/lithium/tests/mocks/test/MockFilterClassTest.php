@@ -6,14 +6,14 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\mocks\test\filters;
+namespace lithium\tests\mocks\test;
 
-use lithium\tests\mocks\test\filters\MockCoverageClass;
+use lithium\tests\mocks\test\MockFilterClass;
 
-class MockCoverageClassTest extends \lithium\test\Unit {
+class MockFilterClassTest extends \lithium\test\Unit {
 
 	public function testNothing() {
-		$coverage = new MockCoverageClass();
+		$coverage = new MockFilterClass();
 
 		$this->assertTrue(true);
 	}

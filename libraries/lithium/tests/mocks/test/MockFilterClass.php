@@ -6,9 +6,9 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\mocks\test\filters;
+namespace lithium\tests\mocks\test;
 
-class MockCoverageClass extends \lithium\core\Object{
+class MockFilterClass extends \lithium\core\Object{
 	public function __construct($all = false) {
 		if($all) {
 			return true;
