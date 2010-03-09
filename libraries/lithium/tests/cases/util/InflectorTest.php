@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\Util;
+namespace lithium\tests\cases\util;
 
 use \lithium\util\Inflector;
 
