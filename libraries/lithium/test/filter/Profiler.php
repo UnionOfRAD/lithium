@@ -218,7 +218,7 @@ class Profiler extends \lithium\test\Filter {
 
 		foreach ($filterResults as $results) {
 			$class = key($results);
-			$options = (array) $results['options'];
+			$options = (array) (isset($results['options']) ?: null);
 			$options += $defaults;
 			$method = $results['method'];
 

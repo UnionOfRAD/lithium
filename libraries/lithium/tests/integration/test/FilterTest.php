@@ -39,24 +39,130 @@ class FilterTest extends \lithium\test\Integration {
 	}
 
 	public function testSingleTestWithMultipleFilters() {
-		$permutations = array(
-			array("Coverage", "Complexity"),
-			array("Coverage", "Profiler"),
-			array("Coverage", "Affected")
-
+		$all = array(
+			"Coverage",
+			"Complexity",
+			"Profiler"
 		);
-		$this->report->filters = array("Coverage" => "", "Complexity" => "");
 
-		$this->report->run();
+		$permutations = $this->power_perms($all);
 
-		$expected = 40;
+		foreach ($permutations as $filters) {
+			$filters = array_flip($filters);
+			$filters = array_map(function($v) {
+				return "";
+			}, $filters);
 
-		$result = $this->report->results['filters'];
-		$percentage = $result['lithium\test\filter\Coverage'];
-		$percentage = $percentage['lithium\tests\mocks\test\MockFilterClass'];
-		$percentage = $percentage['percentage'];
+			$report = new Report(array(
+				'title' => '\lithium\tests\mocks\test\MockFilterTest',
+				'group' => new Group(
+					array('items' => array('\lithium\tests\mocks\test\MockFilterClassTest'))
+				)
+			));
+			$this->report->filters = $filters;
 
-		$this->assertEqual($expected, $percentage);
+			$this->report->run();
+
+			if (array_key_exists("Coverage", $filters)) {
+				$expected = 40;
+
+				$result = $this->report->results['filters'];
+				$this->assertTrue(isset($result['lithium\test\filter\Coverage']),
+					"Filter(s): '" .join(array_keys($filters), ", ") . "' returned no Coverage results."
+				);
+				$percentage = $result['lithium\test\filter\Coverage'];
+				$percentage = $percentage['lithium\tests\mocks\test\MockFilterClass'];
+				$percentage = $percentage['percentage'];
+
+				$this->assertEqual($expected, $percentage);
+			}
+		}
+	}
+
+	/**
+	 * Methods for getting all permutations of each set in the power set of an array of strings
+	 * (from the php.net manual on shuffle)
+	 */
+
+	private function power_perms($arr) {
+
+	    $power_set = $this->power_set($arr);
+	    $result = array();
+	    foreach($power_set as $set) {
+	        $perms = $this->perms($set);
+	        $result = array_merge($result,$perms);
+	    }
+	    return $result;
+	}
+
+	private function power_set($in,$minLength = 1) {
+
+	   $count = count($in);
+	   $members = pow(2,$count);
+	   $return = array();
+	   for ($i = 0; $i < $members; $i++) {
+	      $b = sprintf("%0".$count."b",$i);
+	      $out = array();
+	      for ($j = 0; $j < $count; $j++) {
+	         if ($b{$j} == '1') $out[] = $in[$j];
+	      }
+	      if (count($out) >= $minLength) {
+	         $return[] = $out;
+	      }
+	   }
+
+	   //usort($return,"cmp");  //can sort here by length
+	   return $return;
+	}
+
+	private function factorial($int){
+	   if($int < 2) {
+	       return 1;
+	   }
+
+	   for($f = 2; $int-1 > 1; $f *= $int--);
+
+	   return $f;
+	}
+
+	private function perm($arr, $nth = null) {
+
+	    if ($nth === null) {
+	        return $this->perms($arr);
+	    }
+
+	    $result = array();
+	    $length = count($arr);
+
+	    while ($length--) {
+	        $f = $this->factorial($length);
+	        $p = floor($nth / $f);
+	        $result[] = $arr[$p];
+	        $this->array_delete_by_key($arr, $p);
+	        $nth -= $p * $f;
+	    }
+
+	    $result = array_merge($result,$arr);
+	    return $result;
+	}
+
+	private function perms($arr) {
+	    $p = array();
+	    for ($i=0; $i < $this->factorial(count($arr)); $i++) {
+	        $p[] = $this->perm($arr, $i);
+	    }
+	    return $p;
+	}
+
+	private function array_delete_by_key(&$array, $delete_key, $use_old_keys = FALSE) {
+
+	    unset($array[$delete_key]);
+
+	    if(!$use_old_keys) {
+	        $array = array_values($array);
+	    }
+
+	    return TRUE;
 	}
 }
 
