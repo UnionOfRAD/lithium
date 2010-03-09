@@ -176,7 +176,12 @@ class Library extends \lithium\console\Command {
 			}
 		}
 		if (file_exists($from)) {
-			$archive = new Phar($from);
+			try {
+				$archive = new Phar($from);
+			} catch (\Exception $e) {
+				$this->error($e->getMessage());
+				return false;
+			}
 			if ($archive->extractTo($to)) {
 				$this->out(basename($to) . " created in " . dirname($to) . " from {$from}");
 				return true;
@@ -220,7 +225,12 @@ class Library extends \lithium\console\Command {
 			}
 			Phar::unlinkArchive("{$path}.phar");
 		}
- 		$archive = new Phar("{$path}.phar");
+		try {
+	 		$archive = new Phar("{$path}.phar");
+		} catch (\Exception $e) {
+			$this->error($e->getMessage());
+			return false;
+		}
 		$from = $this->_toPath($from);
 		$result = (boolean) $archive->buildFromDirectory($from, $this->filter);
 
