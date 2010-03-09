@@ -98,7 +98,9 @@ class Unit extends \lithium\core\Object {
 		set_error_handler($options['handler']);
 
 		foreach ($methods as $method) {
-			$this->_runTestMethod($method, $options);
+			if ($this->_runTestMethod($method, $options) === false) {
+				break;
+			}
 		}
 
 		restore_error_handler();
@@ -442,7 +444,9 @@ class Unit extends \lithium\core\Object {
 							$attr = $val;
 							$val = '.+?';
 							$explanations[] = sprintf('Attribute "%s" present', $attr);
-						} elseif (!empty($val) && preg_match('/^regex\:\/(.+)\/$/i', $val, $matches)) {
+						} elseif (
+							!empty($val) && preg_match('/^regex\:\/(.+)\/$/i', $val, $matches)
+						) {
 							$quotes = '"?';
 							$val = $matches[1];
 							$explanations[] = sprintf('Attribute "%s" matches "%s"', $attr, $val);
@@ -561,6 +565,8 @@ class Unit extends \lithium\core\Object {
 	 * is found, the expectation is removed from the stack and the error is ignored.  If no match
 	 * is found, then the error data is logged to the test results.
 	 *
+	 * @see lithium\test\Unit::expectException()
+	 * @see lithium\test\Unit::_reportException()
 	 * @param mixed $exception An `Exception` object instance, or an array containing the following
 	 *              keys: `'message'`, `'file'`, `'line'`, `'trace'` (in `debug_backtrace()`
 	 *              format) and optionally `'code'` (error code number) and `'context'` (an array
@@ -568,8 +574,6 @@ class Unit extends \lithium\core\Object {
 	 * @param integer $lineFlag A flag used for determining the relevant scope of the call stack.
 	 *                Set to the line number where test methods are called.
 	 * @return void
-	 * @see lithium\test\Unit::expectException()
-	 * @see lithium\test\Unit::_reportException()
 	 */
 	protected function _handleException($exception, $lineFlag = null) {
 		if (is_object($exception)) {
@@ -717,10 +721,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Returns a basic message for the data returned from `_result()`.
 	 *
-	 * @param array $data The data to use for creating the message.
-	 * @return string
 	 * @see lithium\test\Unit::assert()
 	 * @see lithium\test\Unit::_result()
+	 * @param array $data The data to use for creating the message.
+	 * @return string
 	 */
 	protected function _message($data = array()) {
 		$messages = null;
@@ -787,7 +791,9 @@ class Unit extends \lithium\core\Object {
 		$dirs = new RecursiveDirectoryIterator($path);
 		$iterator = new RecursiveIteratorIterator($dirs, RecursiveIteratorIterator::CHILD_FIRST);
 		foreach ($iterator as $item) {
-			if ($item->getPathname() === "{$path}/empty") continue;
+			if ($item->getPathname() === "{$path}/empty") {
+				continue;
+			}
 			($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname());
 		}
 	}
