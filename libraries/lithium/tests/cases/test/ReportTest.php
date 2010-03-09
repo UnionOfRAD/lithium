@@ -52,8 +52,8 @@ class ReportTest extends \lithium\test\Unit {
 
 	public function testSingleFilter() {
 		$report = new Report(array(
-			'title' => '\lithium\tests\mocks\test\MockUnitTest',
-			'group' => new Group(array('items' => array('\lithium\tests\mocks\test\MockUnitTest'))),
+			'title' => '\lithium\tests\mocks\test\MockFilterClassTest',
+			'group' => new Group(array('items' => array('\lithium\tests\mocks\test\MockFilterClassTest'))),
 			'filters' => array("Complexity" => "")
 		));
 		$report->run();
@@ -78,9 +78,9 @@ class ReportTest extends \lithium\test\Unit {
 
 	public function testFilters() {
 		$report = new Report(array(
-			'title' => '\lithium\tests\mocks\test\filters\MockCoverageClassTest',
+			'title' => '\lithium\tests\mocks\test\MockFilterClassTest',
 			'group' => new Group(
-				array('items' => array('\lithium\tests\mocks\test\filters\MockCoverageClassTest'))
+				array('items' => array('\lithium\tests\mocks\test\MockFilterClassTest'))
 			),
 			'filters' => array("Complexity" => ""),
 			'format' => 'html',
