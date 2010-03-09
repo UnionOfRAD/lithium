@@ -509,7 +509,7 @@ class CacheTest extends \lithium\test\Unit {
 			'adapter' => 'File',
 			'path' => LITHIUM_APP_PATH . '/resources/tmp/cache',
 			'filters' => array(),
-			'strategies' => array('Serializer', 'Encoder')
+			'strategies' => array('Serializer', 'Base64')
 		));
 		Cache::config($config);
 
