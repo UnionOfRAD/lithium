@@ -42,7 +42,8 @@ class FilterTest extends \lithium\test\Integration {
 		$all = array(
 			"Coverage",
 			"Complexity",
-			"Profiler"
+			"Profiler",
+			"Affected"
 		);
 
 		$permutations = $this->power_perms($all);
@@ -59,14 +60,15 @@ class FilterTest extends \lithium\test\Integration {
 					array('items' => array('\lithium\tests\mocks\test\MockFilterClassTest'))
 				)
 			));
-			$this->report->filters = $filters;
 
-			$this->report->run();
+			$report->filters = $filters;
+
+			$report->run();
 
 			if (array_key_exists("Coverage", $filters)) {
 				$expected = 40;
 
-				$result = $this->report->results['filters'];
+				$result = $report->results['filters'];
 				$this->assertTrue(isset($result['lithium\test\filter\Coverage']),
 					"Filter(s): '" .join(array_keys($filters), ", ") . "' returned no Coverage results."
 				);
