@@ -23,7 +23,7 @@ class AffectedTest extends \lithium\test\Unit {
 		$group = new Group();
 		$group->add('\lithium\tests\cases\g11n\CatalogTest');
 		$this->report->group = $group;
-		$tests = Affected::apply($this->report);
+		$tests = Affected::apply($this->report, $group->tests());
 
 		$expected = array(
 			'lithium\tests\cases\g11n\CatalogTest',
@@ -37,7 +37,7 @@ class AffectedTest extends \lithium\test\Unit {
 		$group = new Group();
 		$group->add('\lithium\tests\cases\core\StaticObjectTest');
 		$this->report->group = $group;
-		$tests = Affected::apply($this->report);
+		$tests = Affected::apply($this->report, $group->tests());
 
 		$expected = array(
 			'lithium\tests\cases\core\StaticObjectTest'
@@ -51,7 +51,7 @@ class AffectedTest extends \lithium\test\Unit {
 		$group->add('\lithium\tests\cases\g11n\CatalogTest');
 		$group->add('\lithium\tests\cases\analysis\LoggerTest');
 		$this->report->group = $group;
-		$tests = Affected::apply($this->report);
+		$tests = Affected::apply($this->report, $group->tests());
 
 		$expected = array(
 			'lithium\tests\cases\g11n\CatalogTest',
@@ -67,7 +67,7 @@ class AffectedTest extends \lithium\test\Unit {
 		$group->add('\lithium\tests\cases\g11n\CatalogTest');
 		$group->add('\lithium\tests\cases\g11n\MessageTest');
 		$this->report->group = $group;
-		$tests = Affected::apply($this->report);
+		$tests = Affected::apply($this->report, $group->tests());
 
 		$expected = array(
 			'lithium\tests\cases\g11n\CatalogTest',

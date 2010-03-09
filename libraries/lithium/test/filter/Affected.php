@@ -30,11 +30,11 @@ class Affected extends \lithium\test\Filter {
 	 * instances. Adds affected tests to the test collection.
 	 *
 	 * @param object $report Instance of Report which is calling apply.
+	 * @param array $tests The test to apply this filter on
 	 * @param array $options Not used.
 	 * @return object|void Returns the instance of `$tests`.
 	 */
-	public static function apply($report, array $options = array()) {
-		$tests = $report->group->tests();
+	public static function apply($report, $tests, array $options = array()) {
 		$affected = array();
 		$testsClasses = $tests->map('get_class', array('collect' => false));
 

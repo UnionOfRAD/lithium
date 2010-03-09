@@ -29,11 +29,11 @@ class Complexity extends \lithium\test\Filter {
 	 * instances. Introspects the test subject classes to extract cyclomatic complexity data.
 	 *
 	 * @param object $report Instance of Report which is calling apply.
+	 * @param array $tests The test to apply this filter on
 	 * @param array $options Not used.
 	 * @return object|void Returns the instance of `$tests`.
 	 */
-	public static function apply($report, array $options = array()) {
-		$tests = $report->group->tests();
+	public static function apply($report, $tests, array $options = array()) {
 		$results = array();
 		foreach ($tests->invoke('subject') as $class) {
 			$results[$class] = array();

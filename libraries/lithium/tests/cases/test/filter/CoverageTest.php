@@ -29,7 +29,7 @@ class CoverageTest extends \lithium\test\Unit {
 
 		$this->report->run();
 
-		$expected = 40;
+		$expected = 45;
 
 		$result = $this->report->results['filters'];
 		$percentage = $result['lithium\test\filter\Coverage'];
@@ -40,18 +40,24 @@ class CoverageTest extends \lithium\test\Unit {
 	}
 
 	public function testSingleTestWithMultipleFilters() {
-			$this->report->filters = array("Coverage" => "", "Complexity" => "");
+		$permutations = array(
+			array("Coverage", "Complexity"),
+			array("Coverage", "Profiler"),
+			array("Coverage", "Affected")
 
-			$this->report->run();
+		);
+		$this->report->filters = array("Coverage" => "", "Complexity" => "");
 
-			$expected = 40;
+		$this->report->run();
 
-			$result = $this->report->results['filters'];
-			$percentage = $result['lithium\test\filter\Coverage'];
-			$percentage = $percentage['lithium\tests\mocks\test\filters\MockCoverageClass'];
-			$percentage = $percentage['percentage'];
+		$expected = 40;
 
-			$this->assertEqual($expected, $percentage);
+		$result = $this->report->results['filters'];
+		$percentage = $result['lithium\test\filter\Coverage'];
+		$percentage = $percentage['lithium\tests\mocks\test\filters\MockCoverageClass'];
+		$percentage = $percentage['percentage'];
+
+		$this->assertEqual($expected, $percentage);
 	}
 }
 

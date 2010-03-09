@@ -18,10 +18,11 @@ abstract class Filter extends \lithium\core\StaticObject {
 	 * instances. Allows for preparing tests before they are run.
 	 *
 	 * @param object $report Instance of Report which is calling apply.
+	 * @param array $tests The test to apply this filter on
 	 * @param array $options Options for how this filter should be applied.
 	 * @return object|void Returns the instance of `$tests`.
 	 */
-	public static function apply($report, array $options = array()) {}
+	public static function apply($report, $tests, array $options = array()) {}
 
 	/**
 	 * Analyzes the results of a test run and returns the result of the analysis.
