@@ -14,11 +14,6 @@
 				$current = $prev[$i];
 			}
 		}
-
-		/*if (isset($prev[1]) && $path[0] != $prev[1]) {
-			$caseDepth = 1;
-			$current = $prev[1];
-		}*/
 	?>
 	<?php if (!isset($current)): ?>
 		<ul class="menu">
