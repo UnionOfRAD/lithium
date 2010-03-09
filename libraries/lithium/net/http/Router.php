@@ -40,13 +40,18 @@ class Router extends \lithium\core\StaticObject {
 	);
 
 	/**
-	 * Connects a new route and returns the current routes array.
+	 * Connects a new route and returns the current routes array. This method creates a new
+	 * `Route` object and registers it with the `Router`. The order in which routes are connected
+	 * matters, since the order of precedence is taken into account in parsing and matching
+	 * operations.
 	 *
+	 * @see lithium\net\http\Route
+	 * @see lithium\net\http\Router::parse()
+	 * @see lithium\net\http\Router::match()
 	 * @param string $template An empty string, or a route string "/"
 	 * @param array $params An array describing the default or required elements of the route
 	 * @param array $options
 	 * @return array Array of routes
-	 * @see lithium\net\http\Router::parse()
 	 */
 	public static function connect($template, $params = array(), array $options = array()) {
 		if (!is_object($template)) {

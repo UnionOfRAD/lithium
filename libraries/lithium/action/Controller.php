@@ -20,7 +20,7 @@ use \Exception;
  * classes. Each action has a specific responsibility, such as listing a set of objects, updating an
  * object, or deleting an object.
  *
- * A controller object is instanciated by the `Dispatcher` (`lithium\net\http\Dispatcher`), and is
+ * A controller object is instanciated by the `Dispatcher` (`lithium\action\Dispatcher`), and is
  * given an instance of the `lithium\action\Request` class, which contains all necessary request
  * state, including routing information, `GET` & `POST` data, and server variables. The controller
  * is then invoked (using PHP's magic `__invoke()` syntax), and the proper action is called,
