@@ -59,8 +59,8 @@ class Coverage extends \lithium\test\Filter {
 	 */
 	public static function analyze($report, array $classes = array()) {
 		$filterResults = static::collect($report->results['filters'][__CLASS__]);
-		$classes = $classes ?: array_filter(get_declared_classes(), function($class) {
-			return (!is_subclass_of($class, 'lithium\test\Unit'));
+		$classes = $classes ?: array_filter(get_declared_classes(), function($class) use ($filterResults) {
+			return (!(is_subclass_of($class, 'lithium\test\Unit')) || array_key_exists($class, $filterResults));
 		});
 		$classes = array_values(array_intersect((array) $classes, array_keys($filterResults)));
 		$densities = $result = array();

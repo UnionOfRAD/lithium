@@ -6,14 +6,14 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\test\filter;
+namespace lithium\tests\integration\test\filter;
 
 use lithium\test\filter\Coverage;
 use lithium\test\Group;
 use lithium\tests\mocks\test\MockUnitTest;
 use lithium\test\Report;
 
-class CoverageTest extends \lithium\test\Unit {
+class CoverageTest extends \lithium\test\Integration {
 
 	public function setUp() {
 		$this->report = new Report(array(
@@ -29,7 +29,7 @@ class CoverageTest extends \lithium\test\Unit {
 
 		$this->report->run();
 
-		$expected = 45;
+		$expected = 40;
 
 		$result = $this->report->results['filters'];
 		$percentage = $result['lithium\test\filter\Coverage'];
