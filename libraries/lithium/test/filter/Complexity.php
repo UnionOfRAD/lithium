@@ -95,7 +95,8 @@ class Complexity extends \lithium\test\Filter {
 				if (!isset($packagedResults[$class])) {
 					$packagedResults[$class] = array();
 				}
-				$packagedResults[$class] = array_merge($result[$class], $packagedResults[$class]);
+				$classResult = (array) $result[$class];
+				$packagedResults[$class] = array_merge($classResult, $packagedResults[$class]);
 			}
 		}
 
