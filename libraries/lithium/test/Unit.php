@@ -536,7 +536,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param string $method The name of the test method to run.
 	 * @param array $options
-	 * @return void
+	 * @return void | false
 	 */
 	protected function _runTestMethod($method, $options) {
 		try {
@@ -547,7 +547,7 @@ class Unit extends \lithium\core\Object {
 		}
 		$params = compact('options', 'method');
 
-		$this->_filter(__CLASS__ . '::run', $params, function($self, $params, $chain) {
+		$passed = $this->_filter(__CLASS__ . '::run', $params, function($self, $params, $chain) {
 			try {
 				$method = $params['method'];
 				$lineFlag = __LINE__ + 1;
@@ -557,6 +557,8 @@ class Unit extends \lithium\core\Object {
 			}
 		});
 		$this->tearDown();
+
+		return $passed;
 	}
 
 	/**
@@ -796,6 +798,15 @@ class Unit extends \lithium\core\Object {
 			}
 			($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname());
 		}
+	}
+
+	/**
+	 * Returns the current results
+	 *
+	 * @return array The Results, currently
+	 */
+	public function results() {
+		return $this->_results;
 	}
 }
 
