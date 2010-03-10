@@ -45,7 +45,7 @@ class Form extends \lithium\template\Helper {
 		'error'                => '<div{:options}>{:content}</div>',
 		'errors'               => '{:content}',
 		'file'                 => '<input type="file" name="{:name}"{:options} />',
-		'form'                 => '<form action="{:url}"{:options}>{:content}',
+		'form'                 => '<form action="{:url}"{:options}>{:append}',
 		'form-end'             => '</form>',
 		'hidden'               => '<input type="hidden" name="{:name}"{:options} />',
 		'field'                => '<div{:wrap}>{:label}{:input}{:error}</div>',
@@ -194,13 +194,14 @@ class Form extends \lithium\template\Helper {
 			$scope = $params['scope'];
 			$options = $params['options'];
 			$_binding = $params['binding'];
-			$content = null;
+			$append = null;
 
 			if (!in_array(strtolower($scope['method']), array('get', 'post'))) {
-				$content = $self->hidden('_method', array(
-					'name' => '_method', 'value' => strtoupper($scope['method'])
+				$append = $self->hidden('_method', array(
+					'value' => strtoupper($scope['method'])
 				));
 			}
+
 			if ($scope['type'] == 'file') {
 				if (strtolower($scope['method']) == 'get') {
 					$scope['method'] = 'post';
@@ -212,7 +213,7 @@ class Form extends \lithium\template\Helper {
 			$options['method'] = strtoupper($scope['method']);
 
 			return $self->invokeMethod('_render', array(
-				$method, $template, compact('url', 'content', 'options')
+				$method, $template, compact('url', 'options', 'append')
 			));
 		};
 		return $this->_filter($method, $params, $filter);

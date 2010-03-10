@@ -94,16 +94,31 @@ class FormTest extends \lithium\test\Unit {
 	 */
 	public function testRestFormCreation() {
 		$result = $this->form->create(null, array('action' => 'delete', 'method' => 'delete'));
-		$this->assertTags($result, array('form' => array(
-			'action' => "{$this->base}posts/delete", 'method' => 'DELETE'
-		)));
+		$this->assertTags($result, array(
+			'form' => array(
+				'action' => "{$this->base}posts/delete", 'method' => 'DELETE'
+			),
+			'input' => array(
+				'type' => "hidden",
+				'name' => '_method',
+				'value' => 'DELETE'
+			)
+		));
 
 		$result = $this->form->create(null, array('method' => 'put', 'type' => 'file'));
-		$this->assertTags($result, array('form' => array(
-			'action' => "{$this->base}posts/add",
-			'method' => 'PUT',
-			'enctype' => 'multipart/form-data'
-		)));
+		$this->assertTags($result, array(
+			'form' => array(
+				'action' => "{$this->base}posts/add",
+				'method' => 'PUT',
+				'enctype' => 'multipart/form-data'
+			),
+			'input' => array(
+				'type' => "hidden",
+				'name' => '_method',
+				'value' => 'PUT'
+			)
+		));
+
 	}
 
 	public function testFormCreationWithBinding() {
@@ -117,6 +132,10 @@ class FormTest extends \lithium\test\Unit {
 			)
 		));
 		$result = $this->form->create($record);
+		$this->assertTags($result, array('form' => array(
+			'action' => "{$this->base}posts/add",
+			'method' => 'POST',
+		)));
 	}
 
 	public function testFormDataBinding() {
