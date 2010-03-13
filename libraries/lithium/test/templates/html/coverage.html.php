@@ -1,4 +1,4 @@
-<?php foreach ($analysis as $class => $coverage): ?>
+<?php foreach ($data as $class => $coverage): ?>
 	<h4 class="coverage">
 		<?php echo $class ?>:
 		<?php echo count($coverage['covered']) ?> of <?php echo count($coverage['executable']) ?>

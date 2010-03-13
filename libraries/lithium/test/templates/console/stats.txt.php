@@ -9,6 +9,7 @@ echo "\n" . ($success ? '{:success}' : '') . "{$passes} / {$asserts} passes\n";
 echo "{$fails} " . ($fails == 1 ? 'fail' : 'fails');
 echo " and {$exceptions} ";
 echo ($exceptions == 1 ? 'exception' : 'exceptions') . ($success ? '{:end}' : '') . "\n";
+
 foreach ((array) $stats['errors'] as $error) {
 	if ($error['result'] == 'fail') {
 		echo "\n{:error}Assertion '{$error['assertion']}' failed in ";

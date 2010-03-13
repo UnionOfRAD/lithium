@@ -24,18 +24,17 @@ class FilterTest extends \lithium\test\Integration {
 	}
 
 	public function testSingleTest() {
-		$this->report->filters = array("Coverage" => "");
+		$this->report->filters(array("Coverage" => ""));
 
 		$this->report->run();
 
 		$expected = 40;
 
-		$result = $this->report->results['filters'];
-		$percentage = $result['lithium\test\filter\Coverage'];
-		$percentage = $percentage['lithium\tests\mocks\test\MockFilterClass'];
-		$percentage = $percentage['percentage'];
+		$filter = $this->report->results['filters']['lithium\test\filter\Coverage'];
+		$data = $filter['lithium\tests\mocks\test\MockFilterClass'];
+		$result = $data['percentage'];
 
-		$this->assertEqual($expected, $percentage);
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testSingleTestWithMultipleFilters() {
@@ -61,7 +60,7 @@ class FilterTest extends \lithium\test\Integration {
 				)
 			));
 
-			$report->filters = $filters;
+			$report->filters($filters);
 
 			$report->run();
 
@@ -69,8 +68,10 @@ class FilterTest extends \lithium\test\Integration {
 				$expected = 40;
 
 				$result = $report->results['filters'];
+
 				$this->assertTrue(isset($result['lithium\test\filter\Coverage']),
-					"Filter(s): '" .join(array_keys($filters), ", ") . "' returned no Coverage results."
+					"Filter(s): '" . join(array_keys($filters), ", ") . "'"
+					. "returned no Coverage results."
 				);
 				$percentage = $result['lithium\test\filter\Coverage'];
 				$percentage = $percentage['lithium\tests\mocks\test\MockFilterClass'];
@@ -87,7 +88,6 @@ class FilterTest extends \lithium\test\Integration {
 	 */
 
 	private function power_perms($arr) {
-
 	    $power_set = $this->power_set($arr);
 	    $result = array();
 	    foreach($power_set as $set) {
@@ -98,12 +98,11 @@ class FilterTest extends \lithium\test\Integration {
 	}
 
 	private function power_set($in,$minLength = 1) {
-
 	   $count = count($in);
 	   $members = pow(2,$count);
 	   $return = array();
 	   for ($i = 0; $i < $members; $i++) {
-	      $b = sprintf("%0".$count."b",$i);
+	      $b = sprintf("%0" . $count . "b", $i);
 	      $out = array();
 	      for ($j = 0; $j < $count; $j++) {
 	         if ($b{$j} == '1') $out[] = $in[$j];
@@ -122,7 +121,7 @@ class FilterTest extends \lithium\test\Integration {
 	       return 1;
 	   }
 
-	   for($f = 2; $int-1 > 1; $f *= $int--);
+	   for($f = 2; $int - 1 > 1; $f *= $int--){}
 
 	   return $f;
 	}
@@ -150,7 +149,7 @@ class FilterTest extends \lithium\test\Integration {
 
 	private function perms($arr) {
 	    $p = array();
-	    for ($i=0; $i < $this->factorial(count($arr)); $i++) {
+	    for ($i = 0; $i < $this->factorial(count($arr)); $i++) {
 	        $p[] = $this->perm($arr, $i);
 	    }
 	    return $p;

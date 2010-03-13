@@ -76,17 +76,10 @@ class Test extends \lithium\console\Command {
 		if ($this->_getTests() != true) {
 			return 0;
 		}
-		$startBenchmark = microtime(true);
-
 		error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
 
-		if (!empty($this->case)) {
-			$this->case = '\\' . str_replace('.', '\\', $this->case);
-		} elseif (!empty($this->group)) {
-			$this->group = '\\' . str_replace('.', '\\', $this->group);
-		}
 		$run = $this->case ?: $this->group;
-		$this->nl();
+		$run = '\\' . str_replace('.', '\\', $run);
 		$this->out(sprintf('Running `%s`... ', $run), false);
 
 		$report = Dispatcher::run($run, array(
@@ -95,12 +88,12 @@ class Test extends \lithium\console\Command {
 			'format' => 'txt'
 		));
 		$this->out('done.', 2);
-
-		$this->hr();
+		$this->out('{:heading1}Results{:end}', 0);
 		$this->out($report->render('stats'));
 
-		if ($filterResults = $report->filters("\n")) {
-			$this->out($filterResults);
+		foreach ($report->filters() as $filter => $options) {
+			$data = $report->results['filters'][$filter];
+			$this->out($report->render($options['name'], compact('data')));
 		}
 
 		$this->hr();

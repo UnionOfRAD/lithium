@@ -28,14 +28,6 @@ class Report extends \lithium\core\Object {
 	public $group = null;
 
 	/**
-	 * An array of fully-namespaced class names representing the filters to be applied to this test
-	 * group.
-	 *
-	 * @var array
-	 */
-	public $filters = array();
-
-	/**
 	 * Title of the group being run
 	 *
 	 * @var string
@@ -55,6 +47,14 @@ class Report extends \lithium\core\Object {
 	 * @var array
 	 */
 	public $timer = array('start' => null, 'end' => null);
+
+	/**
+	 * An array key on fully-namespaced class names of the filter with options to be
+	 * applied for the filter as the value
+	 *
+	 * @var array
+	 */
+	protected $_filters = array();
 
 	/**
 	 * Construct Report Object
@@ -81,7 +81,6 @@ class Report extends \lithium\core\Object {
 	 */
 	protected function _init() {
 		$this->group = $this->_config['group'];
-		$this->filters = $this->_config['filters'];
 		$this->title = $this->_config['title'] ?: $this->_config['title'];
 	}
 
@@ -92,34 +91,15 @@ class Report extends \lithium\core\Object {
 	 */
 	public function run() {
 		$tests = $this->group->tests();
-		$filters = array();
 
-		foreach ($this->filters as $filter => $options) {
-			if (!strpos($filter, "\\")) {
-				$filter = ucwords($filter);
-			}
-			if (!$class = Libraries::locate('test.filter', $filter)) {
-				throw new Exception("{$class} is not a valid test filter.");
-			}
-			$options = isset($options['apply']) ? $options['apply'] : array();
-			$tests = $class::apply($this, $tests, $options) ?: $tests;
-			$filters[] = compact('class', 'options');
+		foreach ($this->filters() as $filter => $options) {
+			$this->results['filters'][$filter] = array();
+			$tests = $filter::apply($this, $tests, $options['apply']) ?: $tests;
 		}
 		$this->results['group'] = $tests->run();
 
-		foreach ($filters as $filter) {
-			if (isset($filter['options']['analyze'])) {
-				$filter['options'] = $filter['options']['analyze'];
-			} else {
-				$filter['options'] = array();
-			}
-			if (!isset($this->results['filters'][$filter['class']])) {
-				$this->results['filters'][$filter['class']] = array();
-			}
-			$this->results['filters'][$filter['class']] = $filter['class']::analyze(
-				$this,
-				$filter['options']
-			);
+		foreach ($this->filters() as $filter => $options) {
+			$this->results['filters'][$filter] = $filter::analyze($this, $options['analyze']);
 		}
 	}
 
@@ -132,9 +112,6 @@ class Report extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function collect($class, $results) {
-		if (!isset($this->results['filters'][$class])) {
-			$this->results['filters'][$class] = array();
-		}
 		$this->results['filters'][$class][] = $results;
 	}
 
@@ -220,21 +197,20 @@ class Report extends \lithium\core\Object {
 		});
 	}
 
-	/**
-	 * Loops through and renders each filter that currently has stored results
-	 *
-	 * @param string $separator Optional separator string to join the templates on
-	 * @return string|boolean
-	 */
-	public function filters($separator = null) {
-		$output = false;
-		foreach ($this->results['filters'] as $filter => $analysis) {
-			$filterClass = explode("\\", $filter);
-			$filterClass = array_pop($filterClass);
-			$output .= $separator . $this->render(strtolower($filterClass), compact('analysis'));
+	public function filters(array $filters = array()) {
+		if (!empty($this->_filters) && empty($filters)) {
+			return $this->_filters;
 		}
-
-		return $output;
+		$filters += (array) $this->_config['filters'];
+		$results = array();
+		foreach ($filters as $filter => $options) {
+			if (!$class = Libraries::locate('test.filter', $filter)) {
+				throw new Exception("{$class} is not a valid test filter.");
+			}
+			$options['name'] = strtolower(join('', array_slice(explode("\\", $class), -1)));
+			$results[$class] = $options + array('apply' => array(), 'analyze' => array());
+		}
+		return $this->_filters = $results;
 	}
 }
 

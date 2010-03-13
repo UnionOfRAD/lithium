@@ -1,7 +1,6 @@
+{:heading2}Benchmarks{:end}
 <?php
-	echo "===Benchmarks===\n";
-
-	foreach ($analysis['totals'] as $title => $data) {
-		echo "{$title}: {$data['formatter']($data['value'])}\n";
+	foreach ($data['totals'] as $title => $result) {
+		echo "{$title}: {$result['formatter']($result['value'])}\n";
 	}
 ?>

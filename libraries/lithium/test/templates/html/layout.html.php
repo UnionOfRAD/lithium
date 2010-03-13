@@ -56,7 +56,10 @@
 					<?php
 					echo $report->render("stats");
 
-					echo $report->filters();
+					foreach ($report->filters() as $filter => $options) {
+						$data = $report->results['filters'][$filter];
+						echo $report->render($options['name'], compact('data'));
+					}
 					?>
 				</div>
 			</article>

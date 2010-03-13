@@ -10,7 +10,6 @@ namespace lithium\tests\cases\test;
 
 use \lithium\test\Report;
 use \lithium\test\Group;
-//use \lithium\test\filter\Complexity;
 
 class ReportTest extends \lithium\test\Unit {
 
@@ -34,6 +33,24 @@ class ReportTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testFilters() {
+		$report = new Report(array(
+			'title' => '\lithium\tests\mocks\test\MockFilterClassTest',
+			'group' => new Group(
+				array('items' => array('\lithium\tests\mocks\test\MockFilterClassTest'))
+			),
+			'filters' => array("Complexity" => ""),
+			'format' => 'html',
+			'reporter' => 'html'
+		));
+
+		$expected = array('lithium\test\filter\Complexity' => array(
+			'name' => 'complexity', 'apply' => array(), 'analyze' => array()
+		));
+		$result = $report->filters();
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testStats() {
 		$report = new Report(array(
 			'title' => '\lithium\tests\mocks\test\MockUnitTest',
@@ -44,22 +61,8 @@ class ReportTest extends \lithium\test\Unit {
 		$expected = 1;
 		$result = $report->stats();
 		$this->assertEqual($expected, $result['count']['asserts']);
-
 		$this->assertEqual($expected, $result['count']['passes']);
-
 		$this->assertTrue($result['success']);
-	}
-
-	public function testSingleFilter() {
-		$report = new Report(array(
-			'title' => '\lithium\tests\mocks\test\MockFilterClassTest',
-			'group' => new Group(array('items' => array('\lithium\tests\mocks\test\MockFilterClassTest'))),
-			'filters' => array("Complexity" => "")
-		));
-		$report->run();
-
-		$class = 'lithium\test\filter\Complexity';
-		$this->assertNotEqual(null, $report->results['filters'][$class]);
 	}
 
 	public function testRender() {
@@ -71,26 +74,23 @@ class ReportTest extends \lithium\test\Unit {
 		));
 		$report->run();
 
-		$output = $report->render("stats");
-
-		$this->assertPattern("/1 \/ 1 passes, 0  fails	and 0  exceptions/", $output);
+		$result = $report->render("stats");
+		$this->assertPattern("/1 \/ 1 passes, 0  fails	and 0  exceptions/", $result);
 	}
 
-	public function testFilters() {
+	public function testSingleFilter() {
 		$report = new Report(array(
 			'title' => '\lithium\tests\mocks\test\MockFilterClassTest',
-			'group' => new Group(
-				array('items' => array('\lithium\tests\mocks\test\MockFilterClassTest'))
-			),
-			'filters' => array("Complexity" => ""),
-			'format' => 'html',
-			'reporter' => 'html'
+			'group' => new Group(array(
+				'items' => array('\lithium\tests\mocks\test\MockFilterClassTest')
+			)),
+			'filters' => array("Complexity" => "")
 		));
 		$report->run();
 
-		$output = $report->filters();
-
-		$this->assertPattern("/<h3>Cyclomatic Complexity<\/h3>/", $output);
+		$class = 'lithium\test\filter\Complexity';
+		$result = $report->results['filters'][$class];
+		$this->assertTrue(isset($report->results['filters'][$class]));
 	}
 }
 

@@ -1,7 +1,6 @@
+{:heading2}Code Coverage{:end}
 <?php
-	echo "===Code Coverage===\n";
-
-	foreach ($analysis as $class => $coverage) {
+	foreach ($data as $class => $coverage) {
 		echo ($coverage['percentage'] >= 85 ? "{:success}" : "{:error}");
 		echo "{$class}{:end}: ";
 		echo count($coverage['covered']) . " of " . count($coverage['executable']);
