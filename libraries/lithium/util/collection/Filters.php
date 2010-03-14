@@ -95,8 +95,9 @@ class Filters extends \lithium\util\Collection {
 	 */
 	public static function run($class, $params, array $options = array()) {
 		$defaults = array('class' => null, 'method' => null, 'items' => array());
-		$chain = new Filters((array) $options + $defaults);
-		return $chain->rewind()->__invoke($class, $params, $chain);
+		$chain = new Filters($options + $defaults);
+		$next = $chain->rewind();
+		return $next($class, $params, $chain);
 	}
 
 	/**
@@ -115,7 +116,8 @@ class Filters extends \lithium\util\Collection {
 		if (empty($self) || empty($chain)) {
 			return parent::next();
 		}
-		return parent::next()->__invoke($self, $params, $chain);
+		$next = parent::next();
+		return $next($self, $params, $chain);
 	}
 
 	/**
