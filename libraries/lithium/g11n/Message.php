@@ -173,10 +173,10 @@ class Message extends \lithium\core\StaticObject {
 				return $page[$id];
 			}
 
-			if (!isset($page['plural']) || !is_callable($page['plural'])) {
+			if (!isset($page['pluralRule']) || !is_callable($page['pluralRule'])) {
 				return null;
 			}
-			$key = $page['plural']($count);
+			$key = $page['pluralRule']($count);
 
 			if (isset($page[$id][$key])) {
 				return $page[$id][$key];

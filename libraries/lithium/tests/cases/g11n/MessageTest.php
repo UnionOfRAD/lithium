@@ -24,7 +24,7 @@ class MessageTest extends \lithium\test\Unit {
 			'runtime' => array('adapter' => new Memory())
 		));
 		$data = function($n) { return $n == 1 ? 0 : 1; };
-		Catalog::write('message.plural', 'root', $data, array('name' => 'runtime'));
+		Catalog::write('message.pluralRule', 'root', $data, array('name' => 'runtime'));
 
 		$this->_backups['environment'] = Environment::get('test');
 		Environment::set('test', array('locale' => 'en'));
@@ -136,7 +136,7 @@ class MessageTest extends \lithium\test\Unit {
 		$this->assertNull($result);
 
 		$data = 'not a valid pluralization function';
-		Catalog::write('message.plural', 'root', $data, array('name' => 'runtime'));
+		Catalog::write('message.pluralRule', 'root', $data, array('name' => 'runtime'));
 
 		$result = Message::translate('catalog', array('locale' => 'de'));
 		$this->assertNull($result);
@@ -149,7 +149,7 @@ class MessageTest extends \lithium\test\Unit {
 		Catalog::write('message', 'de', $data, array('name' => 'runtime', 'scope' => 'test'));
 
 		$data = function($n) { return $n == 1 ? 0 : 1; };
-		Catalog::write('message.plural', 'root', $data, array(
+		Catalog::write('message.pluralRule', 'root', $data, array(
 			'name' => 'runtime', 'scope' => 'test'
 		));
 

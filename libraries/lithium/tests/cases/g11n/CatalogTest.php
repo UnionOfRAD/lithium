@@ -228,8 +228,8 @@ class CatalogTest extends \lithium\test\Unit {
 	 */
 	public function testDataTypeSupport() {
 		$data = function($n) { return $n == 1 ? 0 : 1; };
-		Catalog::write('message.plural', 'en', $data, array('name' => 'runtime'));
-		$result = Catalog::read('message.plural', 'en');
+		Catalog::write('message.pluralRule', 'en', $data, array('name' => 'runtime'));
+		$result = Catalog::read('message.pluralRule', 'en');
 		$this->assertEqual($data, $result);
 
 		$data = array('fish', 'fishes');
