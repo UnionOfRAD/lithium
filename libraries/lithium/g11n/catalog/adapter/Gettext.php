@@ -51,7 +51,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 * @see lithium\g11n\catalog\adapter\Gettext::_parseMo()
 	 * @var float
 	 */
-	const MO_LE_MAGIC = 0x950412de;
+	const MO_LITTLE_ENDIAN_MAGIC = 0x950412de;
 
 	/**
 	 * Magic used for validating the format of a MO file as well as
@@ -60,7 +60,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 * @see lithium\g11n\catalog\adapter\Gettext::_parseMo()
 	 * @var float
 	 */
-	const MO_BE_MAGIC = 0xde120495;
+	const MO_BIG_ENDIAN_MAGIC = 0xde120495;
 
 	/**
 	 * The size of the header of a MO file in bytes.
@@ -272,9 +272,9 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 		$magic = unpack('V1', fread($stream, 4));
 		$magic = hexdec(substr(dechex(current($magic)), -8));
 
-		if ($magic == self::MO_LE_MAGIC) {
+		if ($magic == self::MO_LITTLE_ENDIAN_MAGIC) {
 			$isBigEndian = false;
-		} elseif ($magic == self::MO_BE_MAGIC) {
+		} elseif ($magic == self::MO_BIG_ENDIAN_MAGIC) {
 			$isBigEndian = true;
 		} else {
 			throw new Exception("MO stream content has an invalid format");
