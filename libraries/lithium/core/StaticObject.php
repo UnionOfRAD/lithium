@@ -95,7 +95,7 @@ class StaticObject {
 		}
 
 		if (empty(static::$_methodFilters[$class][$method]) && empty($filters)) {
-			return $callback->__invoke($class, $params, null);
+			return $callback($class, $params, null);
 		}
 
 		if (!isset(static::$_methodFilters[$class][$method])) {
