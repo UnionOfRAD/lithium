@@ -597,6 +597,32 @@ EOD;
 		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
 	}
 
+	public function testWrittenPoHasShortFilePaths() {
+		$this->adapter->mo = false;
+
+		$data = array(
+			'singular 1' => array(
+				'id' => 'singular 1',
+				'ids' => array('singular' => 'singular 1', 'plural' => 'plural 1'),
+				'flags' => array(),
+				'translated' => array('translated 1-0', 'translated 1-1'),
+				'occurrences' => array(
+					array('file' => LITHIUM_APP_PATH . '/testa.php', 'line' => 22),
+					array('file' => '/testb.php', 'line' => 23)
+				),
+				'comments' => array()
+			)
+		);
+		$this->adapter->write('messageTemplate', 'root', null, $data);
+		$result = file_get_contents("{$this->_path}/message_default.pot");
+
+		$expected = '\#: /testa\.php:22';
+		$this->assertPattern("={$expected}=", $result);
+
+		$expected = '\#: /testb\.php:23';
+		$this->assertPattern("={$expected}=", $result);
+	}
+
 	public function testEscapeUnescape() {
 		$this->adapter->mo = false;
 		$file = "{$this->_path}/de/LC_MESSAGES/default.po";

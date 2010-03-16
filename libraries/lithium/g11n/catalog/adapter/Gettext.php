@@ -469,6 +469,11 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 		if (!isset($item['ids']['singular'])) {
 			$item['ids']['singular'] = $item['id'];
 		}
+		if (isset($item['occurrences'])) {
+			foreach ($item['occurrences'] as &$occurrence) {
+				$occurrence['file'] = str_replace(LITHIUM_APP_PATH, '', $occurrence['file']);
+			}
+		}
 		return parent::_prepareForWrite($item);
 	}
 
