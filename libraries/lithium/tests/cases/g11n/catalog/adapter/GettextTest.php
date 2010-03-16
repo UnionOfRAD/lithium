@@ -556,7 +556,7 @@ EOD;
 		$expected = '"MIME-Version: 1.0\\\n"\n';
 		$this->assertPattern("%{$expected}%", $result);
 
-		$expected = '"Content-Type: text/plain; charset=CHARSET\\\n"\n';
+		$expected = '"Content-Type: text/plain; charset=UTF-8\\\n"\n';
 		$this->assertPattern("%{$expected}%", $result);
 
 		$expected = '"Content-Transfer-Encoding: 8bit\\\n"\n';

@@ -372,7 +372,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 		$output[] = '"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"';
 		$output[] = '"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"';
 		$output[] = '"MIME-Version: 1.0\n"';
-		$output[] = '"Content-Type: text/plain; charset=CHARSET\n"';
+		$output[] = '"Content-Type: text/plain; charset=UTF-8\n"';
 		$output[] = '"Content-Transfer-Encoding: 8bit\n"';
 		$output[] = '"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"';
 		$output[] = '';
