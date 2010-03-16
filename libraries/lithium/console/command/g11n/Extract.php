@@ -65,7 +65,7 @@ class Extract extends \lithium\console\Command {
 	protected function _extract() {
 		$message[] = 'A `Catalog` class configuration with an adapter that is capable of';
 		$message[] = 'handling read requests for the `messageTemplate` category is needed';
-		$message[] = 'in order to proceed.';
+		$message[] = 'in order to proceed. This may also be referred to as `extractor`.';
 		$this->out($message);
 		$this->out();
 
@@ -111,7 +111,7 @@ class Extract extends \lithium\console\Command {
 	protected function _writeTemplate($data) {
 		$message[] = 'In order to proceed you need to choose a `Catalog` configuration';
 		$message[] = 'which is used for writing the template. The adapter for the configuration';
-		$message[] = 'should be capable of handling write requests for the `message.template`';
+		$message[] = 'should be capable of handling write requests for the `messageTemplate`';
 		$message[] = 'category.';
 		$this->out($message);
 		$this->out();
