@@ -38,20 +38,20 @@ class Extract extends \lithium\console\Command {
 		$this->header('Message Extraction');
 
 		if (!$data = $this->_extract()) {
-			$this->err('Yielded no items.');
+			$this->error('Yielded no items.');
 			return 1;
 		}
 		$count = count($data);
 		$this->out("Yielded {$count} items.");
-		$this->nl();
+		$this->out();
 
 		$this->header('Message Template Creation');
 
 		if (!$this->_writeTemplate($data)) {
-			$this->err('Failed to write template.');
+			$this->error('Failed to write template.');
 			return 1;
 		}
-		$this->nl();
+		$this->out();
 
 		return 0;
 	}
@@ -67,7 +67,7 @@ class Extract extends \lithium\console\Command {
 		$message[] = 'handling read requests for the `messageTemplate` category is needed';
 		$message[] = 'in order to proceed.';
 		$this->out($message);
-		$this->nl();
+		$this->out();
 
 		$configs = (array) Catalog::config();
 
@@ -75,7 +75,7 @@ class Extract extends \lithium\console\Command {
 		foreach ($configs as $name => $config) {
 			$this->out(" - {$name}");
 		}
-		$this->nl();
+		$this->out();
 
 		$name = $this->in('Please choose a configuration or hit [enter] to add one:', array(
 			'choices' => array_keys($configs)
@@ -114,7 +114,7 @@ class Extract extends \lithium\console\Command {
 		$message[] = 'should be capable of handling write requests for the `message.template`';
 		$message[] = 'category.';
 		$this->out($message);
-		$this->nl();
+		$this->out();
 
 		$configs = (array) Catalog::config();
 
@@ -122,7 +122,7 @@ class Extract extends \lithium\console\Command {
 		foreach ($configs as $name => $config) {
 			$this->out(" - {$name}");
 		}
-		$this->nl();
+		$this->out();
 
 		$name = $this->in('Please choose a configuration or hit [enter] to add one:', array(
 			'choices' => array_keys($configs)
@@ -148,7 +148,7 @@ class Extract extends \lithium\console\Command {
 		$message[] = 'The template is now ready to be saved.';
 		$message[] = 'Please note that an existing template will be overwritten.';
 		$this->out($message);
-		$this->nl();
+		$this->out();
 
 		if ($this->in('Save?', array('choices' => array('y', 'n'), 'default' => 'n')) != 'y') {
 			$this->out('Aborting upon user request.');
