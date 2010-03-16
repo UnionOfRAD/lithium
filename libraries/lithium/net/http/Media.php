@@ -25,7 +25,7 @@ use \lithium\core\Libraries;
  * you may do the following:
  *
  * {{{
- * 	$this->render(array('csv', 'data' => Post::find('all')));
+ * 	$this->render(array('csv' => Post::find('all')));
  * }}}
  */
 class Media extends \lithium\core\StaticObject {
