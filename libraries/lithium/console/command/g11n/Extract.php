@@ -83,10 +83,10 @@ class Extract extends \lithium\console\Command {
 
 		if (!$name) {
 			$adapter = $this->in('Adapter:', array(
-				'default' => 'Gettext'
+				'default' => 'Code'
 			));
 			$path = $this->in('Path:', array(
-				'default' => $this->destination
+				'default' => $this->source
 			));
 			$scope = $this->in('Scope:', array(
 				'default' => $this->scope
