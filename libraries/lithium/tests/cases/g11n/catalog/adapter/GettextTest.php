@@ -535,7 +535,7 @@ EOD;
 		$this->adapter->write('message', 'de', null, $data);
 		$result = file_get_contents("{$this->_path}/de/LC_MESSAGES/default.po");
 
-		$expected = '#, fuzzy\nmsgid ""\nmsgstr ""\n"Project-Id';
+		$expected = 'msgstr ""\n"Project-Id';
 		$this->assertPattern("%{$expected}%", $result);
 
 		$expected = '"Project-Id-Version: PACKAGE VERSION\\\n"\n';

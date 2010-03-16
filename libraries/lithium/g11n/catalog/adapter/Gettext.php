@@ -351,7 +351,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 *
 	 * To improve portability accross libraries the header is generated according
 	 * to the format of the output of `xgettext`. This means using the same names for
-	 * placeholders as well as including an empty fuzzy entry. The empty entry at the
+	 * placeholders as well as including an empty entry. The empty entry at the
 	 * beginning aids in parsing the file as it _attracts_ the preceding comments and
 	 * following metadata when parsed which could otherwise be mistaken as a continued
 	 * translation. The only difference in the header format is the initial header which
@@ -364,7 +364,6 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	protected function _compilePo($stream, array $data) {
 		$output[] = '# This file is distributed under the same license as the PACKAGE package.';
 		$output[] = '#';
-		$output[] = '#, fuzzy';
 		$output[] = 'msgid ""';
 		$output[] = 'msgstr ""';
 		$output[] = '"Project-Id-Version: PACKAGE VERSION\n"';
