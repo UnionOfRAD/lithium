@@ -134,7 +134,7 @@ class Code extends \lithium\g11n\catalog\Adapter {
 			if ($open) {
 				if ($position >= ($open === 'singular' ? 1 : 2)) {
 					$data = $this->_merge($data, array(
-						'id' => &$ids['singular'],
+						'id' => $ids['singular'],
 						'ids' => $ids,
 						'occurrences' => array($occurrence),
 					));
