@@ -48,6 +48,15 @@ use \lithium\g11n\Catalog;
 class Message extends \lithium\core\StaticObject {
 
 	/**
+	 * Holds cached message pages generated and used
+	 * by `lithium\g11n\Message::_translated()`.
+	 *
+	 * @var array
+	 * @see lithium\g11n\Message::_translated()
+	 */
+	protected static $_cachedPages = array();
+
+	/**
 	 * Translates a message according to the current or provided locale
 	 * and into it's correct plural form.
 	 *
@@ -142,6 +151,23 @@ class Message extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Returns or sets the page cache used for mapping message ids to translations.
+	 *
+	 * @param array $cache A multidimensional array to use when pre-populating the cache. The
+	 *              structure of the array is `scope/locale/id`. If `false`, the cache is cleared.
+	 * @return array Returns an array of cached pages, formatted per the description for `$cache`.
+	 */
+	public static function cache($cache = null) {
+		if ($cache === false) {
+			static::$_cachedPages = array();
+		}
+		if (is_array($cache)) {
+			static::$_cachedPages += $cache;
+		}
+		return static::$_cachedPages;
+	}
+
+	/**
 	 * Retrieves translations through the `Catalog` class by using `$id` as the lookup
 	 * key and taking the current or - if specified - the provided locale as well as the
 	 * scope into account.  Hereupon the correct plural form is determined by passing the
@@ -156,15 +182,18 @@ class Message extends \lithium\core\StaticObject {
 	 * @return string|void The translation or `null` if none could be found or the plural
 	 *         form could not be determined.
 	 * @filter
-	 * @todo Message pages need caching.
 	 */
 	protected static function _translated($id, $count, $locale, array $options = array()) {
 		$params = compact('id', 'count', 'locale', 'options');
 
-		return static::_filter(__METHOD__, $params, function($self, $params, $chain) {
+		$cache =& static::$_cachedPages;
+		return static::_filter(__METHOD__, $params, function($self, $params, $chain) use (&$cache) {
 			extract($params);
 
-			$page = Catalog::read('message', $locale, $options);
+			if (!isset($cache[$options['scope']][$locale])) {
+				$cache[$options['scope']][$locale] = Catalog::read('message', $locale, $options);
+			}
+			$page = $cache[$options['scope']][$locale];
 
 			if (!isset($page[$id])) {
 				return null;

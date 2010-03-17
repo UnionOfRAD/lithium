@@ -29,6 +29,7 @@ class MessageTest extends \lithium\test\Unit {
 		$this->_backups['environment'] = Environment::get('test');
 		Environment::set('test', array('locale' => 'en'));
 		Environment::set('test');
+		Message::cache(false);
 	}
 
 	public function tearDown() {
