@@ -106,7 +106,7 @@ class Session extends \lithium\core\Adaptable {
 			}
 		}
 		$filters = $settings['filters'];
-		$result = static::_filter(__METHOD__, compact('key', 'options'), $method, $filters);
+		$result = static::_filter(__FUNCTION__, compact('key', 'options'), $method, $filters);
 		return static::applyStrategies(__FUNCTION__, $name, $result, 'LIFO');
 	}
 
@@ -144,7 +144,7 @@ class Session extends \lithium\core\Adaptable {
 		foreach ($methods as $name => $method) {
 			$params = compact('key', 'value', 'options');
 			$filters = $settings['filters'];
-			$result = $result || static::_filter(__METHOD__, $params, $method, $filters);
+			$result = $result || static::_filter(__FUNCTION__, $params, $method, $filters);
 		}
 		return $result;
 	}
@@ -167,19 +167,19 @@ class Session extends \lithium\core\Adaptable {
 		if ($name = $options['name']) {
 			$methods = array($name => static::adapter($name)->delete($key, $options));
 		} else {
-			foreach (array_keys(static::$_configurations) as $name) {
+			foreach (static::$_configurations as $name => $config) {
 				if ($method = static::adapter($name)->delete($key, $options)) {
 					$methods[$name] = $method;
 				}
 			}
 		}
 		$result = false;
-		$settings = static::_config($name);
+		$params = compact('key', 'options');
 
 		foreach ($methods as $name => $method) {
-			$params = compact('key', 'options');
+			$settings = static::_config($name);
 			$filters = $settings['filters'];
-			$result = $result || static::_filter(__METHOD__, $params, $method, $filters);
+			$result = $result || static::_filter(__FUNCTION__, $params, $method, $filters);
 		}
 		return $result;
 	}
@@ -196,16 +196,26 @@ class Session extends \lithium\core\Adaptable {
 	public static function check($key, array $options = array()) {
 		$defaults = array('name' => null);
 		$options += $defaults;
+		$methods = array();
 
-		if ($options['name']) {
-			return static::adapter($options['name'])->check($key, $options);
-		}
-		foreach (array_keys(static::$_configurations) as $name) {
-			if (static::adapter($name)->check($key, $options)) {
-				return true;
+		if ($name = $options['name']) {
+			$methods = array($name => static::adapter($name)->check($key, $options));
+		} else {
+			foreach (static::$_configurations as $name => $config) {
+				if ($method = static::adapter($name)->check($key, $options)) {
+					$methods[$name] = $method;
+				}
 			}
 		}
-		return false;
+		$params = compact('key', 'options');
+		$result = false;
+
+		foreach ($methods as $name => $method) {
+			$settings = static::_config($name);
+			$filters = $settings['filters'];
+			$result = $result || static::_filter(__FUNCTION__, $params, $method, $filters);
+		}
+		return $result;
 	}
 
 	/**

@@ -29,7 +29,10 @@ class Memory extends \lithium\core\Object {
 	}
 
 	public function check($key, array $options = array()) {
-		return isset($this->_session[$key]);
+		$session =& $this->_session;
+		return function($self, $params, $chain) use (&$session) {
+			return isset($session[$params['key']]);
+		};
 	}
 
 	public function read($key = null, array $options = array()) {

@@ -115,39 +115,26 @@ class SessionTest extends \lithium\test\Unit {
 		Session::write('key1', 'value', array('name' => 'persistent'));
 		Session::write('key2', 'value', array('name' => 'temp'));
 
-		$result = Session::check('key1');
-		$this->assertTrue($result);
+		$this->assertTrue(Session::check('key1'));
+		$this->assertTrue(Session::check('key2'));
 
-		$result = Session::check('key2');
-		$this->assertTrue($result);
+		$this->assertTrue(Session::check('key1', array('name' => 'persistent')));
+		$this->assertFalse(Session::check('key1', array('name' => 'temp')));
 
-		$result = Session::check('key1', array('name' => 'persistent'));
-		$this->assertTrue($result);
-
-		$result = Session::check('key1', array('name' => 'temp'));
-		$this->assertFalse($result);
-
-		$result = Session::check('key2', array('name' => 'persistent'));
-		$this->assertFalse($result);
-
-		$result = Session::check('key2', array('name' => 'temp'));
-		$this->assertTrue($result);
+		$this->assertFalse(Session::check('key2', array('name' => 'persistent')));
+		$this->assertTrue(Session::check('key2', array('name' => 'temp')));
 
 		Session::delete('key1');
-		$result = Session::check('key1');
-		$this->assertFalse($result);
+		$this->assertFalse(Session::check('key1'));
 
 		Session::write('key1', 'value', array('name' => 'persistent'));
-		$result = Session::check('key1');
-		$this->assertTrue($result);
+		$this->assertTrue(Session::check('key1'));
 
 		Session::delete('key1', array('name' => 'temp'));
-		$result = Session::check('key1');
-		$this->assertTrue($result);
+		$this->assertTrue(Session::check('key1'));
 
 		Session::delete('key1', array('name' => 'persistent'));
-		$result = Session::check('key1');
-		$this->assertFalse($result);
+		$this->assertFalse(Session::check('key1'));
 	}
 
 	/**
