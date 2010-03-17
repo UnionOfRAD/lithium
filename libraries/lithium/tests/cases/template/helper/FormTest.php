@@ -259,6 +259,15 @@ class FormTest extends \lithium\test\Unit {
 			'First Name',
 			'/label'
 		));
+
+		$result = $this->form->label('first_name', array(
+			null => array('id' => 'first_name_label')
+		));
+		$this->assertTags($result, array(
+			'label' => array('for' => 'first_name', 'id' => 'first_name_label'),
+			'First Name',
+			'/label'
+		));
 	}
 
 	public function testLabelGenerationWithNoEscape() {
