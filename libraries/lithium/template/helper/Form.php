@@ -263,7 +263,7 @@ class Form extends \lithium\template\Helper {
 		$type = $options['type'];
 		$label = $input = null;
 
-		if ($options['label'] === null || !empty($options['label'])) {
+		if ($options['label'] === null || $options['label']) {
 			$label = $this->label($name, $options['label']);
 		}
 
@@ -418,12 +418,15 @@ class Form extends \lithium\template\Helper {
 	 */
 	public function label($name, $title = null, array $options = array()) {
 		$defaults = array('escape' => true);
+
+		if (is_array($title)) {
+			list($title, $options) = each($title);
+		}
 		$title = $title ?: Inflector::humanize($name);
+
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		list($scope, $options) = $this->_options($defaults, $options);
-		return $this->_render(
-			__METHOD__, $template, compact('name', 'title', 'options'), $scope
-		);
+		return $this->_render(__METHOD__, $template, compact('name', 'title', 'options'), $scope);
 	}
 
 	/**
