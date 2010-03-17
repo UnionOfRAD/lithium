@@ -75,7 +75,7 @@ Catalog::config(array(
 		'adapter' => 'Php',
 		'path' => LITHIUM_LIBRARY_PATH . '/lithium/g11n/resources/php'
 	)
-));
+) + Catalog::config());
 
 /**
  * Integration with `Inflector`.
