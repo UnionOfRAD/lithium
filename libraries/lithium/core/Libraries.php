@@ -402,7 +402,7 @@ class Libraries {
 			$params = $options + $config;
 			$suffix = $params['suffix'];
 
-			if (strpos($class, $params['prefix']) !== 0) {
+			if ($params['prefix'] && strpos($class, $params['prefix']) !== 0) {
 				continue;
 			}
 			if (!empty($params['transform'])) {
