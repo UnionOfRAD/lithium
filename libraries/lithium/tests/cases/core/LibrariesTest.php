@@ -133,6 +133,33 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->expectException("Library 'invalid_foo' not found.");
 		Libraries::add('invalid_foo');
 	}
+	
+	/**
+	 * Tests that non-prefixed (poorly named or structured) libraries can still be added.
+	 *
+	 * @return void
+	 */
+	public function testAddNonPrefixedLibrary() {
+		$fake = "<?php class Fake {} ?>";
+		$fakeDir = '/tmp/fake';
+		$fakeFilename = $fakeDir . '/fake.php';
+		mkdir($fakeDir);
+		file_put_contents($fakeFilename, $fake);
+
+		Libraries::add('fake', array(
+			'path' => '/tmp/fake',
+			'includePath' => true,
+			'prefix' => false,
+			'transform' => function($class, $params) {
+				return $params['path'] . '/' . \lithium\util\Inflector::underscore($class) . '.php';
+			}
+		));
+		
+		$fakeClass = new \Fake();
+		unlink($fakeFilename);
+		rmdir($fakeDir);
+		Libraries::remove('fake');
+	}
 
 	/**
 	 * Tests that non-class files are always filtered out of `find()` results unless an alternate
