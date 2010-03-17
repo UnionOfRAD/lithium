@@ -169,9 +169,19 @@ class Code extends \lithium\g11n\catalog\Adapter {
 	 * @return array The merged data.
 	 */
     protected function _merge(array $data, array $item) {
-		array_walk($item['ids'], function(&$value) {
-			$value = substr($value, 1, -1);
-		});
+		$filter = function ($value) use (&$filter) {
+			if (is_array($value)) {
+				return array_map($filter, $value);
+			}
+			return substr($value, 1, -1);
+		};
+		$fields = array('id', 'ids', 'translated');
+
+		foreach ($fields as $field) {
+			if (isset($item[$field])) {
+				$item[$field] = $filter($item[$field]);
+			}
+		}
         return parent::_merge($data, $item);
     }
 }
