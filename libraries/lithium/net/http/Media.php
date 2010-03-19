@@ -425,7 +425,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @return mixed
 	 */
 	public static function encode($type, $data, array $options = array()) {
-		if (!isset(static::$_handlers[$type])) {
+		if (!isset(static::$_handlers[$type]) || !isset(static::$_handlers[$type]['encode'])) {
 			return null;
 		}
 		$method = static::$_handlers[$type]['encode'];
@@ -444,7 +444,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @return mixed
 	 */
 	public static function decode($type, $data, array $options = array()) {
-		if (!isset(static::$_handlers[$type])) {
+		if (!isset(static::$_handlers[$type]) || !isset(static::$_handlers[$type]['decode'])) {
 			return null;
 		}
 		$method = static::$_handlers[$type]['decode'];
