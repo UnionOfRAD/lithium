@@ -178,7 +178,7 @@ class Form extends \lithium\core\Object {
 				'username', 'password'
 			)
 		);
-		parent::__construct((array) $config + $defaults);
+		parent::__construct($config + $defaults);
 	}
 
 	/**
