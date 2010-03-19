@@ -240,7 +240,7 @@ class InflectorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testVariableNaming() {
-		$this->assertEqual(Inflector::camelize('test_field', false), 'testField');
+		$this->assertEqual(Inflector::camelize('test_field'), 'TestField');
 		$this->assertEqual(Inflector::camelize('test_fieLd', false), 'testFieLd');
 		$this->assertEqual(Inflector::camelize('test field', false), 'testField');
 		$this->assertEqual(Inflector::camelize('Test_field', false), 'testField');

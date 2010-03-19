@@ -307,7 +307,7 @@ class Inflector {
 			$regexIrregular = static::_enclose(join('|', array_keys($irregular)));
 			static::$_singular += compact('regexUninflected', 'regexIrregular');
 		}
-		if (preg_match('/(.*)\\b(' . $regexIrregular . ')$/i', $word, $regs)) {
+		if (preg_match("/(.*)\\b({$regexIrregular})\$/i", $word, $regs)) {
 			$singular = substr($word, 0, 1) . substr($irregular[strtolower($regs[2])], 1);
 			return static::$_singularized[$word] = $regs[1] . $singular;
 		}
@@ -343,14 +343,13 @@ class Inflector {
 	 * @return string CamelCased version of the word (i.e. `'RedBike'`).
 	 */
 	public static function camelize($word, $cased = true) {
-		if (isset(static::$_camelized[$word])) {
+		if (isset(static::$_camelized[$word]) && $cased) {
 			return static::$_camelized[$word];
 		}
 		$word = str_replace(" ", "", ucwords(str_replace("_", " ", $word)));
 
 		if (!$cased) {
-			$replace = strtolower(substr($word, 0, 1));
-			return preg_replace('/\\w/', $replace, $word, 1);
+			return lcfirst($word);
 		}
 		return static::$_camelized[$word] = $word;
 	}
