@@ -10,42 +10,40 @@ use lithium\core\Libraries;
 use lithium\action\Dispatcher;
 use lithium\test\Dispatcher as TestDispatcher;
 
-Dispatcher::applyFilter('_callable', function($self, $params, $chain) {
+Dispatcher::applyFilter('run', function($self, $params, $chain) {
 	list($isTest, $test) = explode('/', $params['request']->url, 2) + array("", "");
 	$request = $params['request'];
 	if ($isTest === "test") {
-		return function() use ($test, $request) {
-			$group = "\\" . str_replace("/", "\\", $test);
+		$group = "\\" . str_replace("/", "\\", $test);
 
-			if ($group == "\\all") {
-				$group = Libraries::locate('tests', null, array(
-					'filter' => '/cases|integration|functional/',
-					'exclude' => '/mocks/'
-				));
-				$group = array_map(function($test) {
-					$path = explode("\\", $test);
-					return "\\" . array_shift($path);
-				}, $group);
-				$group = array_unique($group);
-			}
-
-			$report = TestDispatcher::run($group , $request->query + array(
-				'reporter' => 'html',
-				'format' => 'html'
-			));
-			$filters = Libraries::locate('test.filter', null, array(
-				'exclude' => '/Base$/'
-			));
-			$menu = Libraries::locate('tests', null, array(
+		if ($group == "\\all") {
+			$group = Libraries::locate('tests', null, array(
 				'filter' => '/cases|integration|functional/',
 				'exclude' => '/mocks/'
 			));
-			sort($menu);
+			$group = array_map(function($test) {
+				$path = explode("\\", $test);
+				return "\\" . array_shift($path);
+			}, $group);
+			$group = array_unique($group);
+		}
 
-			$result = compact('request', 'group', 'report', 'filters', 'classes', 'menu');
+		$report = TestDispatcher::run($group , $request->query + array(
+			'reporter' => 'html',
+			'format' => 'html'
+		));
+		$filters = Libraries::locate('test.filter', null, array(
+			'exclude' => '/Base$/'
+		));
+		$menu = Libraries::locate('tests', null, array(
+			'filter' => '/cases|integration|functional/',
+			'exclude' => '/mocks/'
+		));
+		sort($menu);
 
-			return $report->render('layout', $result);
-		};
+		$result = compact('request', 'group', 'report', 'filters', 'classes', 'menu');
+
+		return $report->render('layout', $result);
 	}
 
 	return $chain->next($self, $params, $chain);
