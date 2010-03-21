@@ -61,72 +61,6 @@ class Unit extends \lithium\core\Object {
 	protected $_expected = array();
 
 	/**
-	 * Runs the test methods in this test case, with the given options.
-	 *
-	 * @param array $options The options to use when running the test.	Available options are:
-	 *             - 'methods': An arbitrary array of method names to execute. If
-	 *                unspecified, all methods starting with 'test' are run.
-	 *             - 'reporter': A closure which gets called after each test result,
-	 *                which may modify the results presented.
-	 * @return array
-	 */
-	public function run(array $options = array()) {
-		$defaults = array('methods' => array(), 'reporter' => null, 'handler' => null);
-		$options += $defaults;
-		$this->_results = array();
-		$self = $this;
-
-		$h = function($code, $message, $file, $line = 0, $context = array()) use ($self) {
-			$trace = debug_backtrace();
-			$trace = array_slice($trace, 1, count($trace));
-
-			$self->invokeMethod('_handleException', array(
-				compact('code', 'message', 'file', 'line', 'trace', 'context')
-			));
-		};
-
-		$options['handler'] = $options['handler'] ?: $h;
-		$methods = $options['methods'] ?: $this->methods();
-		$this->_reporter = $options['reporter'] ?: $this->_reporter;
-
-		try {
-			$this->skip();
-		} catch (Exception $e) {
-			$this->_handleException($e);
-			return $this->_results;
-		}
-		set_error_handler($options['handler']);
-
-		foreach ($methods as $method) {
-			if ($this->_runTestMethod($method, $options) === false) {
-				break;
-			}
-		}
-
-		restore_error_handler();
-		return $this->_results;
-	}
-
-	/**
-	 * Returns the class name that is the subject under test for this test case.
-	 *
-	 * @return string
-	 */
-	public function subject() {
-		return preg_replace('/Test$/', '', str_replace('tests\\cases\\', '', get_class($this)));
-	}
-
-	/**
-	 * Return test methods to run
-	 *
-	 * @return array
-	 */
-	public function methods() {
-		static $methods;
-		return $methods ?: $methods = array_values(preg_grep('/^test/', get_class_methods($this)));
-	}
-
-	/**
 	 * Setup method run before every test method. override in subclasses
 	 *
 	 * @return void
@@ -179,16 +113,89 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * undocumented function
+	 * Returns the class name that is the subject under test for this test case.
 	 *
-	 * @param string $expression
-	 * @param string $message
-	 * @param string $data
+	 * @return string
+	 */
+	public function subject() {
+		return preg_replace('/Test$/', '', str_replace('tests\\cases\\', '', get_class($this)));
+	}
+
+	/**
+	 * Return test methods to run
+	 *
+	 * @return array
+	 */
+	public function methods() {
+		static $methods;
+		return $methods ?: $methods = array_values(preg_grep('/^test/', get_class_methods($this)));
+	}
+
+	/**
+	 * Runs the test methods in this test case, with the given options.
+	 *
+	 * @param array $options The options to use when running the test.	Available options are:
+	 *             - 'methods': An arbitrary array of method names to execute. If
+	 *                unspecified, all methods starting with 'test' are run.
+	 *             - 'reporter': A closure which gets called after each test result,
+	 *                which may modify the results presented.
+	 * @return array
+	 */
+	public function run(array $options = array()) {
+		$defaults = array('methods' => array(), 'reporter' => null, 'handler' => null);
+		$options += $defaults;
+		$this->_results = array();
+		$self = $this;
+
+		$h = function($code, $message, $file, $line = 0, $context = array()) use ($self) {
+			$trace = debug_backtrace();
+			$trace = array_slice($trace, 1, count($trace));
+
+			$self->invokeMethod('_handleException', array(
+				compact('code', 'message', 'file', 'line', 'trace', 'context')
+			));
+		};
+
+		$options['handler'] = $options['handler'] ?: $h;
+		$methods = $options['methods'] ?: $this->methods();
+		$this->_reporter = $options['reporter'] ?: $this->_reporter;
+
+		try {
+			$this->skip();
+		} catch (Exception $e) {
+			$this->_handleException($e);
+			return $this->_results;
+		}
+		set_error_handler($options['handler']);
+
+		foreach ($methods as $method) {
+			if ($this->_runTestMethod($method, $options) === false) {
+				break;
+			}
+		}
+
+		restore_error_handler();
+		return $this->_results;
+	}
+
+	/**
+	 * General assert method used by others for common output.
+	 *
+	 * @param boolean $expression
+	 * @param string $message The message to output. If the message is not a string, then it will be
+	 *        converted to '{:message}'. Use '{:message}' in the string and it will use the `$data`
+	 *        to format the message with `String::insert()`.
+	 * @param array $data
 	 * @return void
 	 */
-	public function assert($expression, $message = '{:message}', $data = array()) {
+	public function assert($expression, $message = false, $data = array()) {
 		if (!is_string($message)) {
 			$message = '{:message}';
+		}
+		if (strpos($message, "{:message}") !== false) {
+			$params = $data;
+			$params['message'] = $this->_message($params);
+			$message = String::insert($message, $params);
 		}
 		$trace = Debugger::trace(array('start' => 1, 'format' => 'array'));
 		$methods = $this->methods();
@@ -200,19 +207,14 @@ class Unit extends \lithium\core\Object {
 			}
 			$i++;
 		}
-
-		if (strpos($message, "{:message}") !== false) {
-			$data['message'] = $this->_message($data);
-		}
-
 		$result = array(
 			'file'      => $trace[$i - 1]['file'],
 			'line'      => $trace[$i - 1]['line'],
 			'method'    => $trace[$i]['function'],
 			'assertion' => $trace[$i - 1]['function'],
 			'class'     => get_class($trace[$i - 1]['object']),
-			'message'   => String::insert($message, $data),
-			'data'      => $data
+			'message'   => $message,
+			'data'      => $data,
 		);
 		$this->_result(($expression ? 'pass' : 'fail'), $result);
 		return $expression;
@@ -226,11 +228,8 @@ class Unit extends \lithium\core\Object {
 	 * @param mixed $result
 	 * @param string $message
 	 */
-	public function assertEqual($expected, $result, $message = '{:message}') {
-		$data = null;
-		if ($expected != $result) {
-			$data = $this->_compare('equal', $expected, $result);
-		}
+	public function assertEqual($expected, $result, $message = false) {
+		$data = ($expected != $result) ? $this->_compare('equal', $expected, $result) : null;
 		$this->assert($expected == $result, $message, $data);
 	}
 
@@ -241,7 +240,7 @@ class Unit extends \lithium\core\Object {
 	 * @param mixed $result
 	 * @param string $message
 	 */
-	public function assertNotEqual($expected, $result, $message = '{:message}') {
+	public function assertNotEqual($expected, $result, $message = false) {
 		$this->assert($result != $expected, $message, compact('expected', 'result'));
 	}
 
@@ -252,11 +251,8 @@ class Unit extends \lithium\core\Object {
 	 * @param mixed $result
 	 * @param string $message
 	 */
-	public function assertIdentical($expected, $result, $message = '{:message}') {
-		$data = null;
-		if ($expected !== $result) {
-			$data = $this->_compare('identical', $expected, $result);
-		}
+	public function assertIdentical($expected, $result, $message = false) {
+		$data = ($expected !== $result) ? $this->_compare('identical', $expected, $result) : null;
 		$this->assert($expected === $result, $message, $data);
 	}
 
@@ -487,12 +483,12 @@ class Unit extends \lithium\core\Object {
 
 			if (!$matches) {
 				$this->assert(false, sprintf(
-					'{:message} - Item #%d / regex #%d failed: %s', $itemNum, $i, $description
+					'- Item #%d / regex #%d failed: %s', $itemNum, $i, $description
 				));
 				return false;
 			}
 		}
-		return $this->assert(true, '%s');
+		return $this->assert(true);
 	}
 
 	/**
@@ -716,8 +712,7 @@ class Unit extends \lithium\core\Object {
 				return true;
 			}
 		}
-		$data = compact('trace', 'expected', 'result');
-		return $data;
+		return compact('trace', 'expected', 'result');
 	}
 
 	/**
@@ -726,23 +721,25 @@ class Unit extends \lithium\core\Object {
 	 * @see lithium\test\Unit::assert()
 	 * @see lithium\test\Unit::_result()
 	 * @param array $data The data to use for creating the message.
+	 * @param string $message The string prepended to the generate message in the current scope.
 	 * @return string
 	 */
-	protected function _message($data = array()) {
-		$messages = null;
+	protected function _message(&$data = array(), $message =  null) {
 		if (!empty($data[0])) {
-			foreach ($data as $message) {
-				$messages .= $this->_message($message);
+			foreach ($data as $key => $value) {
+				$message = (!empty($data[$key][0])) ? $message : null;
+				$message .= $this->_message($value, $message);
+				unset($data[$key]);
 			}
-			return $messages;
+			return $message;
 		}
-
 		$defaults = array('trace' => null, 'expected' => null, 'result' => null);
-		$data = (array) $data + $defaults;
+		$result = (array) $data + $defaults;
+		$data = array_diff((array) $data, $defaults);
 		return sprintf("trace: %s\nexpected: %s\nresult: %s\n",
-			$data['trace'],
-			var_export($data['expected'], true),
-			var_export($data['result'], true)
+			$result['trace'],
+			var_export($result['expected'], true),
+			var_export($result['result'], true)
 		);
 	}
 

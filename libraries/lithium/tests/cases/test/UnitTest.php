@@ -8,6 +8,9 @@
 
 namespace lithium\tests\cases\test;
 
+use lithium\tests\mocks\test\MockUnitTest;
+use \Exception;
+
 class UnitTest extends \lithium\test\Unit {
 
 	public function compare($type, $expected, $result = null) {
@@ -21,7 +24,19 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertFalse(false);
 	}
 
-	public function testCompare() {
+	public function testCompareIsEqual() {
+		$expected = true;
+		$result = $this->compare('equal', 'string', 'string');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testCompareIsIdentical() {
+		$expected = true;
+		$result = $this->compare('identical', 'string', 'string');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testCompareTypes() {
 		$expected = array('trace' => null, 'expected' => 'array', 'result' => 'string');
 		$result = $this->compare('equal', array(), 'string');
 		$this->assertEqual($expected, $result);
@@ -34,9 +49,32 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testAssertEqualNumericFail() {
-		$result = array(1, 2);
 		$expected = array(1, 2, 3);
-		//$this->assertEqual($expected, $result);
+		$result = array(1, 2);
+		$this->assertEqual($expected, $result);
+
+		$expected = array(
+			'result' => 'fail', 'file' => __FILE__, 'line' => 54,
+			'method' => 'testAssertEqualNumericFail', 'assertion' => 'assertEqual',
+			'class' => __CLASS__, 'message' =>
+				"trace: [2]\nexpected: array (\n  0 => 1,\n  1 => 2,\n  2 => 3,\n)\n"
+				. "result: array (\n  0 => 1,\n  1 => 2,\n)\n",
+			'data' => array(
+				'trace' => '[2]',
+				'expected' => array(
+				  0 => 1,
+				  1 => 2,
+				  2 => 3,
+				),
+				'result' => array(
+				  0 => 1,
+				  1 => 2,
+				)
+			)
+		);
+		$result = $this->_results[7];
+		unset($this->_results[7]);
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testAssertEqualAssociativeArray() {
@@ -51,37 +89,268 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	/**
-	 * undocumented function
-	 *
-	 * @return void
-	 * @todo See @todo above.
-	 */
 	public function testAssertEqualThreeDFail() {
-		$result = array(
-			array(array(1, 2), array(1)),
-			array(array(1, 2), array(1))
-		);
 		$expected = array(
 			array(array(1, 2), array(1, 2)),
 			array(array(1, 2), array(1, 2))
 		);
-		//$this->assertEqual($expected, $result);
+		$result = array(
+			array(array(1, 2), array(1)),
+			array(array(1, 2), array(1))
+		);
+		$this->assertEqual($expected, $result);
+
+		$expected = array(
+			'result' => 'fail', 'file' => __FILE__, 'line' => 101,
+			'method' => 'testAssertEqualThreeDFail', 'assertion' => 'assertEqual',
+			'class' => __CLASS__, 'message' =>
+				"trace: [0][1][1]\nexpected: array (\n  0 => 1,\n  1 => 2,\n)\n"
+				. "result: array (\n  0 => 1,\n)\n"
+				. "trace: [1][1][1]\nexpected: array (\n  0 => 1,\n  1 => 2,\n)\n"
+				. "result: array (\n  0 => 1,\n)\n",
+			'data' => array(
+				array(
+					array(
+						'trace' => '[0][1][1]',
+						'expected' => array(
+						  0 => 1,
+						  1 => 2,
+						),
+						'result' => array(
+						  0 => 1,
+						)
+					),
+				),
+				array(
+					array('trace' => '[1][1][1]',
+						'expected' => array(
+						  0 => 1,
+						  1 => 2,
+						),
+						'result' => array(
+						  0 => 1,
+						)
+					)
+				)
+			)
+		);
+		$result = $this->_results[10];
+		unset($this->_results[10]);
+		$this->assertEqual($expected, $result);
 	}
 
-	public function testAssertIdentical() {
+	public function testAssertWithCustomMessage() {
+		$expected = false;
+		$result = true;
+		$this->assertEqual($expected, $result, 'Custom Message Test');
 
+		$expected = 'Custom Message Test';
+		$result = $this->_results[12];
+		unset($this->_results[12]);
+		$this->assertEqual($expected, $result['message']);
 	}
 
 	public function testTestMethods() {
 		$expected = array(
-			'testBaseAssertions', 'testCompare', 'testAssertEqualNumeric',
+			'testBaseAssertions', 'testCompareIsEqual', 'testCompareIsIdentical',
+			'testCompareTypes', 'testAssertEqualNumeric',
 			'testAssertEqualNumericFail', 'testAssertEqualAssociativeArray',
-			'testAssertEqualThreeDFail', 'testAssertIdentical', 'testTestMethods',
+			'testAssertEqualThreeDFail', 'testAssertWithCustomMessage', 'testTestMethods',
+			'testSubject', 'testRun', 'testAssertNotEqual', 'testAssertIdentical',
+			'testAssertNull', 'testAssertNoPattern', 'testAssertPattern', 'testAssertTags',
+			'testAssertTagsNoClosingTag', 'testAssertTagsMissingAttribute',
+			'testIdenticalArrayFail',
 			'testCleanUp', 'testCleanUpWithFullPath', 'testCleanUpWithRelativePath',
-			'testSkipIf'
+			'testSkipIf', 'testExpectException', 'testHandleException', 'testResults'
 		);
-		$this->assertEqual($expected, $this->methods());
+		$this->assertIdentical($expected, $this->methods());
+	}
+
+	public function testSubject() {
+		$test = new MockUnitTest();
+		$expected = 'lithium\\tests\\mocks\\test\\MockUnit';
+		$result = $test->subject();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testRun() {
+		$test = new MockUnitTest();
+		$expected = array(
+			'result' => 'pass',
+			'file' => LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/MockUnitTest.php',
+			'line' => 14,
+			'method' => 'testNothing',
+			'assertion' => 'assertTrue',
+			'class' => 'lithium\\tests\\mocks\\test\\MockUnitTest',
+			'message' => "trace: \nexpected: true\nresult: true\n",
+			'data' => array('expected' => true, 'result' => true)
+		);
+		$result = $test->run();
+		$this->assertEqual($expected, $result[0]);
+	}
+
+	public function testAssertNotEqual() {
+		$expected = true;
+		$result = true;
+		$this->assertNotEqual($expected, $result);
+
+		$expected = 'fail';
+		$result = $this->_results[17];
+		unset($this->_results[17]);
+		$this->assertEqual($expected, $result['result']);
+
+		$expected = 'testAssertNotEqual';
+		$this->assertEqual($expected, $result['method']);
+
+		$expected = 'assertNotEqual';
+		$this->assertEqual($expected, $result['assertion']);
+	}
+
+	public function testAssertIdentical() {
+		$expected = true;
+		$result = 1;
+		$this->assertIdentical($expected, $result);
+
+		$expected = 'fail';
+		$result = $this->_results[21];
+		unset($this->_results[21]);
+		$this->assertEqual($expected, $result['result']);
+
+		$expected = 'testAssertIdentical';
+		$this->assertEqual($expected, $result['method']);
+
+		$expected = 'assertIdentical';
+		$this->assertEqual($expected, $result['assertion']);
+	}
+
+	public function testAssertNull() {
+		$expected = null;
+		$result = null;
+		$this->assertNull($expected, $result);
+
+		$expected = 'pass';
+		$result = $this->_results[25];
+		unset($this->_results[25]);
+		$this->assertEqual($expected, $result['result']);
+
+		$expected = 'testAssertNull';
+		$this->assertEqual($expected, $result['method']);
+
+		$expected = 'assertNull';
+		$this->assertEqual($expected, $result['assertion']);
+	}
+
+	public function testAssertNoPattern() {
+		$expected = '/\s/';
+		$result = null;
+		$this->assertNoPattern($expected, $result);
+
+		$expected = 'pass';
+		$result = $this->_results[29];
+		unset($this->_results[29]);
+		$this->assertEqual($expected, $result['result']);
+
+		$expected = 'testAssertNoPattern';
+		$this->assertEqual($expected, $result['method']);
+
+		$expected = 'assertNoPattern';
+		$this->assertEqual($expected, $result['assertion']);
+	}
+	public function testAssertPattern() {
+		$expected = '/\s/';
+		$result = ' ';
+		$this->assertPattern($expected, $result);
+
+		$expected = 'pass';
+		$result = $this->_results[33];
+		unset($this->_results[33]);
+		$this->assertEqual($expected, $result['result']);
+
+		$expected = 'testAssertPattern';
+		$this->assertEqual($expected, $result['method']);
+
+		$expected = 'assertPattern';
+		$this->assertEqual($expected, $result['assertion']);
+	}
+
+	public function testAssertTags() {
+		$result = '<input id="test">';
+		$this->assertTags($result, array(
+			'input' => array('id' => 'test')
+		));
+
+		$expected = 'pass';
+		$result = $this->_results[37];
+		unset($this->_results[37]);
+		$this->assertEqual($expected, $result['result']);
+
+		$expected = 'testAssertTags';
+		$this->assertEqual($expected, $result['method']);
+
+		$expected = 'assertTags';
+		$this->assertEqual($expected, $result['assertion']);
+	}
+
+	public function testAssertTagsNoClosingTag() {
+		$result = '<span id="test">';
+		$this->assertTags($result, array(
+			'span' => array('id' => 'test'), '/span'
+		));
+
+		$expected = 'fail';
+		$result = $this->_results[41];
+		unset($this->_results[41]);
+		$this->assertEqual($expected, $result['result']);
+
+		$expected = 'testAssertTagsNoClosingTag';
+		$this->assertEqual($expected, $result['method']);
+
+		$expected = 'assertTags';
+		$this->assertEqual($expected, $result['assertion']);
+
+		$expected = '- Item #2 / regex #3 failed: Close span tag';
+		$this->assertEqual($expected, $result['message']);
+	}
+
+	public function testAssertTagsMissingAttribute() {
+		$result = '<span></span>';
+		$this->assertTags($result, array(
+			'span' => array('id' => 'test'), '/span'
+		));
+
+		$expected = 'fail';
+		$result = $this->_results[46];
+		unset($this->_results[46]);
+		$this->assertEqual($expected, $result['result']);
+
+		$expected = 'testAssertTagsMissingAttribute';
+		$this->assertEqual($expected, $result['method']);
+
+		$expected = 'assertTags';
+		$this->assertEqual($expected, $result['assertion']);
+
+		$expected = '- Item #1 / regex #1 failed: Attribute "id" == "test"';
+		$this->assertEqual($expected, $result['message']);
+	}
+
+	public function testIdenticalArrayFail() {
+		$expected = array('1', '2', '3');
+		$result = array(1, '2', '3');;
+		$this->assertIdentical($expected, $result);
+
+		$expected = 'fail';
+		$result = $this->_results[51];
+		unset($this->_results[51]);
+		$this->assertEqual($expected, $result['result']);
+
+		$expected = 'testIdenticalArrayFail';
+		$this->assertEqual($expected, $result['method']);
+
+		$expected = 'assertIdentical';
+		$this->assertEqual($expected, $result['assertion']);
+
+		$expected = "trace: [0]\nexpected: 'string'\nresult: 'integer'\n";
+		$this->assertEqual($expected, $result['message']);
 	}
 
 	public function testCleanUp() {
@@ -135,6 +404,28 @@ class UnitTest extends \lithium\test\Unit {
 			$result = $e->getMessage();
 		}
 		$expected = 'skip me';
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testExpectException() {
+		$this->expectException('test expected exception');
+		$expected = 'test expected exception';
+		$result = $this->_expected[0];
+		unset($this->_expected[0]);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testHandleException() {
+		$this->_handleException(new Exception('test handle exception'));
+		$expected = 'test handle exception';
+		$result = $this->_results[74];
+		unset($this->_results[74]);
+		$this->assertEqual($expected, $result['message']);
+	}
+
+	public function testResults() {
+		$expected = 63;
+		$result = count($this->results());
 		$this->assertEqual($expected, $result);
 	}
 }
