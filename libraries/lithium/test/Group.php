@@ -33,20 +33,21 @@ class Group extends \lithium\util\Collection {
 	}
 
 	/**
-	 * Get all tests
+	 * Get all test cases. By default, does not include function or integration tests.
 	 *
 	 * @param string $options
 	 * @return array
 	 */
 	public static function all(array $options = array()) {
-		$defaults = array('transform' => false, 'library' => true);
+		$defaults = array(
+			'library' => true,
+			'filter' => '/cases/',
+			'exclude' => '/mock/',
+			'recursive' => true
+		);
 		$options += $defaults;
-		$m = '/\\\\tests\\\\cases\\\\(.+)Test$/';
-		$transform = function($class) use ($m) { return preg_replace($m, '\\\\\1', $class); };
-		$classes = Libraries::locate('tests', null, $options + array(
-			'filter' => '/cases|integration|functional/', 'recursive' => true
-		));
-		return $options['transform'] ? array_map($transform, $classes) : $classes;
+		$classes = Libraries::locate('tests', null, $options);
+		return $classes;
 	}
 
 	/**
@@ -65,7 +66,7 @@ class Group extends \lithium\util\Collection {
 				return array(get_class($test));
 			}
 			if (is_string($test)) {
-				if ($test[0] != '\\') {
+				if ($test[0] != '\\' && strpos($test, 'lithium\\') === false) {
 					$test = "lithium\\tests\cases\\{$test}";
 				}
 				if (preg_match("/Test/", $test)) {

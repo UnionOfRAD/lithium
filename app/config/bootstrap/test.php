@@ -8,44 +8,17 @@
 
 use lithium\core\Libraries;
 use lithium\action\Dispatcher;
-use lithium\test\Dispatcher as TestDispatcher;
+use lithium\test\Controller;
 
 Dispatcher::applyFilter('run', function($self, $params, $chain) {
-	list($isTest, $test) = explode('/', $params['request']->url, 2) + array("", "");
+	list($isTest, $args) = explode('/', $params['request']->url, 2) + array("", "");
 	$request = $params['request'];
+
 	if ($isTest === "test") {
-		$group = "\\" . str_replace("/", "\\", $test);
-
-		if ($group == "\\all") {
-			$group = Libraries::locate('tests', null, array(
-				'filter' => '/cases|integration|functional/',
-				'exclude' => '/mocks/'
-			));
-			$group = array_map(function($test) {
-				$path = explode("\\", $test);
-				return "\\" . array_shift($path);
-			}, $group);
-			$group = array_unique($group);
-		}
-
-		$report = TestDispatcher::run($group , $request->query + array(
-			'reporter' => 'html',
-			'format' => 'html'
-		));
-		$filters = Libraries::locate('test.filter', null, array(
-			'exclude' => '/Base$/'
-		));
-		$menu = Libraries::locate('tests', null, array(
-			'filter' => '/cases|integration|functional/',
-			'exclude' => '/mocks/'
-		));
-		sort($menu);
-
-		$result = compact('request', 'group', 'report', 'filters', 'classes', 'menu');
-
-		return $report->render('layout', $result);
+		$controller = new Controller();
+		$args = str_replace('/', '\\', $args);
+		return $controller($request, compact('args'));
 	}
-
 	return $chain->next($self, $params, $chain);
 });
 

@@ -29,13 +29,7 @@
 				</div>
 
 				<div class="test-content">
-					<?php if (is_array($report->title)) {
-						$report->title = join (', ', $report->title);
-					} ?>
-
-					<?php if ($report->title != '' && $report->title != '\\') { ?>
-						<h2><span>test results for </span><?php echo $report->title; ?></h2>
-					<?php } ?>
+					<h2><span>test results for </span><?php echo $report->title; ?></h2>
 
 					<span class="filters">
 						<?php echo join('', array_map(

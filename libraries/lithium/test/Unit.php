@@ -735,7 +735,7 @@ class Unit extends \lithium\core\Object {
 		}
 		$defaults = array('trace' => null, 'expected' => null, 'result' => null);
 		$result = (array) $data + $defaults;
-		$data = array_diff((array) $data, $defaults);
+
 		return sprintf("trace: %s\nexpected: %s\nresult: %s\n",
 			$result['trace'],
 			var_export($result['expected'], true),
