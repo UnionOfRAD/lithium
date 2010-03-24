@@ -24,12 +24,22 @@ class PhpTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
-		if (session_id()) {
-			session_destroy();
-		}
+		$this->_destroySession(session_name());
+
 		/* Revert to original garbage collection probability */
 		ini_set('session.gc_divisor', $this->_gc_divisor);
+	}
 
+	protected function _destroySession($name) {
+		if (session_id()) {
+			$settings = session_get_cookie_params();
+			$_SESSION = array();
+			setcookie(
+				$name, '', time() - 1000, $settings['path'], $settings['domain'],
+				$settings['secure'], $settings['httponly']
+			);
+			session_destroy();
+		}
 	}
 
 	public function testEnabled() {
@@ -40,7 +50,7 @@ class PhpTest extends \lithium\test\Unit {
 	public function testInit() {
 		$id = session_id();
 		$this->assertTrue(!empty($id));
-		$this->assertEqual(session_cache_limiter(), "nocache");
+		$this->assertEqual(session_cache_limiter(), "must-revalidate");
 
 		$result = $_SESSION['_timestamp'];
 		$expected = time();
@@ -62,12 +72,15 @@ class PhpTest extends \lithium\test\Unit {
 
 		$result = ini_get('session.cookie_httponly');
 		$this->assertFalse($result);
+
+		$result = ini_get('session.save_path');
+		$this->assertEqual('', $result);
 	}
 
 	public function testCustomConfiguration() {
 		$config = array(
 			'name' => 'awesome_name', 'cookie_lifetime' => 1200,
-			'cookie_domain' => 'awesome.domain',
+			'cookie_domain' => 'awesome.domain', 'save_path' => LITHIUM_APP_PATH . '/resources/tmp/'
 		);
 
 		$adapter = new Php($config);
@@ -86,23 +99,37 @@ class PhpTest extends \lithium\test\Unit {
 
 		$result = ini_get('session.cookie_httponly');
 		$this->assertFalse($result);
+
+		$result = ini_get('session.save_path');
+		$this->assertEqual($config['save_path'], $result);
 	}
 
 	public function testIsStarted() {
 		$result = $this->Php->isStarted();
 		$this->assertTrue($result);
 
-		unset($_SESSION);
-
+		$this->_destroySession(session_name());
 		$result = $this->Php->isStarted();
 		$this->assertFalse($result);
+	}
+
+	public function testIsStartedNoInit() {
+		$this->_destroySession(session_name());
+
+		$Php = new Php(array('init' => false));
+		$result = $Php->isStarted();
+		$this->assertFalse($result);
+
+		$Php = new Php();
+		$result = $Php->isStarted();
+		$this->assertTrue($result);
 	}
 
 	public function testKey() {
 		$result = $this->Php->key();
 		$this->assertEqual(session_id(), $result);
 
-		session_destroy();
+		$this->_destroySession(session_name());
 		$result = $this->Php->key();
 		$this->assertNull($result);
 	}

@@ -8,6 +8,8 @@
 
 namespace lithium\storage\session\adapter;
 
+use \Exception;
+
 /**
  * A minimal adapter to interface with native PHP sessions.
  *
@@ -25,7 +27,7 @@ class Php extends \lithium\core\Object {
 	 */
 	protected $_defaults = array(
 		'name' => '', 'cookie_lifetime' => '86400', 'cookie_domain' => '',
-		'cookie_secure' => false, 'cookie_httponly' => false
+		'cookie_secure' => false, 'cookie_httponly' => false, 'save_path' => ''
 	);
 
 	/**
@@ -48,21 +50,38 @@ class Php extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _init() {
-		session_write_close();
-
-		if (headers_sent()) {
-			$_SESSION = (empty($_SESSION)) ?: array();
-		} elseif (!isset($_SESSION)) {
-			session_cache_limiter("nocache");
-		}
-		session_start();
-
 		foreach ($this->_defaults as $key => $config) {
 			if (isset($this->_config[$key])) {
-				ini_set("session.{$key}", $this->_config[$key]);
+				if (ini_set("session.{$key}", $this->_config[$key]) === false) {
+					throw new Exception("Could not initialize the session.");
+				}
+			}
+		}
+		if (!$this->isStarted()) {
+			if (!$this->_startup()) {
+				throw new Exception("Could not start session.");
 			}
 		}
 		$_SESSION['_timestamp'] = time();
+	}
+
+	/**
+	 * Starts the session.
+	 *
+	 * @return boolean True if session successfully started, false otherwise.
+	 */
+	protected function _startup() {
+		session_write_close();
+
+		if (headers_sent()) {
+			if (empty($_SESSION)) {
+				$_SESSION = array();
+			}
+			return false;
+		} elseif (!isset($_SESSION)) {
+			session_cache_limiter("must-revalidate");
+		}
+		return session_start();
 	}
 
 	/**
