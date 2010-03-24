@@ -110,7 +110,11 @@ class Model extends \lithium\core\StaticObject {
 	 * @return void
 	 * @todo Merge in inherited config from AppModel and other parent classes.
 	 */
-	public static function __init(array $options = array()) {
+	public static function __init() {
+		static::config();
+	}
+
+	public static function config(array $options = array()) {
 		if (($class = get_called_class()) == __CLASS__) {
 			return;
 		}

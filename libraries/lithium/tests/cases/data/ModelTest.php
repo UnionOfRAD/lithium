@@ -42,21 +42,21 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testClassInitialization() {
 		$expected = MockPost::instances();
-		MockPost::__init();
+		MockPost::config();
 		$this->assertEqual($expected, MockPost::instances());
 
-		Model::__init();
+		Model::config();
 		$this->assertEqual($expected, MockPost::instances());
 
 		$this->assertEqual('mock_posts', \lithium\tests\mocks\data\MockPost::meta('source'));
 
-		MockPost::__init(array('source' => 'post'));
+		MockPost::config(array('source' => 'post'));
 		$this->assertEqual('post', MockPost::meta('source'));
 
-		MockPost::__init(array('source' => false));
+		MockPost::config(array('source' => false));
 		$this->assertIdentical(false, MockPost::meta('source'));
 
-		MockPost::__init(array('source' => null));
+		MockPost::config(array('source' => null));
 		$this->assertIdentical('mock_posts', MockPost::meta('source'));
 	}
 
@@ -70,7 +70,7 @@ class ModelTest extends \lithium\test\Unit {
 			'connection'  => 'mock-source',
 			'initialized' => true
 		);
-		MockPost::__init();
+		MockPost::config();
 		$this->assertEqual($expected, MockPost::meta());
 
 		$expected = array(
