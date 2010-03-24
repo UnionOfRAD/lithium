@@ -10,8 +10,17 @@ namespace lithium\tests\integration\storage;
 
 use \lithium\storage\Session;
 
-
 class SessionPhpTest extends \lithium\test\Unit {
+
+	public function setUp() {
+		Session::config(array(
+			'test' => array(
+				'name' => 'test',
+				'adapter' => 'Php',
+				'cookie_lifetime' => 0
+			)
+		));
+	}
 
 	public function testWriteReadDelete() {
 		Session::config(array(
@@ -33,32 +42,6 @@ class SessionPhpTest extends \lithium\test\Unit {
 
 		$result = Session::read($key, array('name' => 'test'));
 		$this->assertNull($result);
-	}
-
-	public function testStrategiesPhpAdapter() {
-		Session::config(array(
-			'strategy' => array(
-				'adapter' => 'Php',
-				'strategies' => array('Hmac' => array('secret' => 'somesecretkey'))
-			)
-		));
-
-		$key = 'test';
-		$value = 'value';
-
-		Session::write($key, $value, array('name' => 'strategy'));
-		$result = Session::read($key, array('name' => 'strategy'));
-
-		$this->assertEqual($value, $result);
-		$this->assertTrue(Session::delete($key, array('name' => 'strategy')));
-		$result = Session::read($key, array('name' => 'strategy'));
-		$this->assertNull($result);
-
-		$cache = $_SESSION;
-		$_SESSION['injectedkey'] = 'hax0r';
-		$this->expectException('/Possible data tampering - HMAC signature does not match data.');
-		$result = Session::read($key, array('name' => 'strategy'));
-		$_SESSION = $cache;
 	}
 }
 
