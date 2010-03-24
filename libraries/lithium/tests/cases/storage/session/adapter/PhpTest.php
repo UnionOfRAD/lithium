@@ -33,24 +33,26 @@ class PhpTest extends \lithium\test\Unit {
 	protected function _destroySession($name) {
 		if (session_id()) {
 			$settings = session_get_cookie_params();
-			$_SESSION = array();
 			setcookie(
 				$name, '', time() - 1000, $settings['path'], $settings['domain'],
 				$settings['secure'], $settings['httponly']
 			);
 			session_destroy();
 		}
+		$_SESSION = array();
 	}
 
 	public function testEnabled() {
 		$php = $this->Php;
+		$this->assertFalse($php::enabled());
+
+		session_start();
 		$this->assertTrue($php::enabled());
 	}
 
 	public function testInit() {
 		$id = session_id();
-		$this->assertTrue(!empty($id));
-		$this->assertEqual(session_cache_limiter(), "must-revalidate");
+		$this->assertTrue(empty($id));
 
 		$result = $_SESSION['_timestamp'];
 		$expected = time();
