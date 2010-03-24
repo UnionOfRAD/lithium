@@ -105,8 +105,7 @@ class Php extends \lithium\core\Object {
 	 * @return mixed Session id, or null if the session has not been started.
 	 */
 	public function key() {
-		$id = session_id();
-		return ($id === '') ? null : $id;
+		return session_id() ?: null;
 	}
 
 	/**
