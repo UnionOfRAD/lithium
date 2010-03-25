@@ -12,6 +12,7 @@ use \lithium\util\Set;
 use \lithium\util\Inflector;
 use \RuntimeException;
 use \UnexpectedValueException;
+use \BadMethodCallException;
 
 /**
  * Model class
@@ -193,12 +194,19 @@ class Model extends \lithium\core\StaticObject {
 			}
 			return $self::find($method, $params ? $params[0] : array());
 		}
+		$pattern = '/^findBy(?P<field>\w+)$|^find(?P<type>\w+)By(?P<fields>\w+)$/';
 
-		if (preg_match('/^find(?P<type>\w+)By(?P<fields>\w+)/', $method, $match)) {
-			$match['type'][0] = strtolower($match['type'][0]);
-			$type = $match['type'];
-			$fields = Inflector::underscore($match['fields']);
+		if (preg_match($pattern, $method, $m)) {
+			$field = Inflector::underscore($m['field'] ? $m['field'] : $m['fields']);
+			$type = isset($m['type']) ? $m['type'] : 'first';
+			$type[0] = strtolower($type[0]);
+
+			$conditions = array($field => array_shift($params));
+			return $self::find($type, compact('conditions') + $params);
 		}
+
+		$message = "Method %s not defined or handled in class %s";
+		throw new BadMethodCallException(sprintf($message, $method, get_class($self)));
 	}
 
 	/**

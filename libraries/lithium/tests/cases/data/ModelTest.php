@@ -152,6 +152,20 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertTrue($result['query'] instanceof \lithium\data\model\Query);
 	}
 
+	public function testMagicFinders() {
+		$result = MockPost::findById(5);
+		$result2 = MockPost::findFirstById(5);
+		$this->assertEqual($result2, $result);
+
+		$expected = array('id' => 5);
+		$this->assertEqual($expected, $result['query']->conditions());
+
+		$this->assertEqual('read', $result['query']->type());
+
+		$this->expectException('/Method findFoo not defined or handled in class/');
+		MockPost::findFoo();
+	}
+
 	/**
 	 * Tests the find 'first' filter on a simple record set.
 	 *
@@ -184,7 +198,7 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testCustomFindMethods() {
-		print_r(MockPost::findFirstById());
+		// print_r(MockPost::findFirstById());
 	}
 
 	public function testKeyGeneration() {
