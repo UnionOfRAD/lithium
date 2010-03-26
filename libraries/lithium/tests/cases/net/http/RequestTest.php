@@ -124,6 +124,9 @@ class RequestTest extends \lithium\test\Unit {
 		));
 		$result = (string) $this->request;
 		$this->assertEqual($expected, $result);
+
+		$result = $this->request->to('string');
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testToStringWithAuth() {
@@ -154,6 +157,44 @@ class RequestTest extends \lithium\test\Unit {
 		));
 		$this->request->body(array('status=cool'));
 		$result = (string) $this->request;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testToArray() {
+		$expected = array(
+			'method' => 'GET',
+			'content' => '',
+			'header' => array(
+				'Host: localhost:80',
+				'Connection: Close',
+				'User-Agent: Mozilla/5.0 (Lithium)'
+			)
+		);
+		$result = $this->request->to('array');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testToUrl() {
+		$expected = 'http://localhost:80/';
+		$result = $this->request->to('url');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testToContext() {
+		$expected = array(
+			'http' => array(
+				'method' => 'GET',
+				'content' => '',
+				'header' => array(
+					'Host: localhost:80',
+					'Connection: Close',
+					'User-Agent: Mozilla/5.0 (Lithium)'
+				),
+				'ignore_errors' => true,
+				'timeout' => 1
+			)
+		);
+		$result = $this->request->to('context');
 		$this->assertEqual($expected, $result);
 	}
 }
