@@ -38,7 +38,7 @@ class Php extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
-		parent::__construct((array) $config + $this->_defaults);
+		parent::__construct($config + $this->_defaults);
 	}
 
 	/**
@@ -59,7 +59,7 @@ class Php extends \lithium\core\Object {
 
 		foreach ($this->_defaults as $key => $config) {
 			if (isset($this->_config[$key])) {
-				ini_set("session.$key", $this->_config[$key]);
+				ini_set("session.{$key}", $this->_config[$key]);
 			}
 		}
 		$_SESSION['_timestamp'] = time();
