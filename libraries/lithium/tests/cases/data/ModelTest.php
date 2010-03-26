@@ -145,6 +145,13 @@ class ModelTest extends \lithium\test\Unit {
 
 		$expected = 'Do you ever read any of the books you burn?';
 		$this->assertEqual($expected, $comment->text);
+
+		$comment = MockComment::create(array(
+			'author_id' => 111,
+			'text' => 'This comment should already exist'
+		), array('exists' => true));
+
+		$this->assertTrue($comment->exists());
 	}
 
 	public function testSimpleFind() {

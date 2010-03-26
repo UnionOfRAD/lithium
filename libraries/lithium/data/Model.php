@@ -374,11 +374,13 @@ class Model extends \lithium\core\StaticObject {
 	 * }}}
 	 *
 	 * @param array $data Any data that this record should be populated with initially.
+	 * @param array $options Options to be passed to item.
 	 * @return object Returns a new, **un-saved** record object.
 	 */
-	public static function create(array $data = array()) {
-		return static::_filter(__FUNCTION__, compact('data'), function($self, $params) {
+	public static function create(array $data = array(), array $options = array()) {
+		return static::_filter(__FUNCTION__, compact('data', 'options'), function($self, $params) {
 			$data = $params['data'];
+			$options = $params['options'];
 
 			if ($schema = $self::schema()) {
 				foreach ($schema as $field => $config) {
@@ -387,7 +389,7 @@ class Model extends \lithium\core\StaticObject {
 					}
 				}
 			}
-			return $self::invokeMethod('_connection')->item($self, $data);
+			return $self::invokeMethod('_connection')->item($self, $data, $options);
 		});
 	}
 
@@ -403,10 +405,10 @@ class Model extends \lithium\core\StaticObject {
 	 * @param object $record The record or document object to be saved in the database.
 	 * @param array $data Any data that should be assigned to the record before it is saved.
 	 * @param array $options Options:
-	 *        - 'callbacks': If `false`, all callbacks will be disabled before executing. Defaults to
-	 *        `true`.
-	 *        - 'validate': If `false`, validation will be skipped, and the record will be immediately
-	 *        saved. Defaults to `true`.
+	 *        - 'callbacks': If `false`, all callbacks will be disabled before executing. Defaults
+	 *        to `true`.
+	 *        - 'validate': If `false`, validation will be skipped, and the record will be
+	 *        immediately saved. Defaults to `true`.
 	 *        - 'whitelist': An array of fields that are allowed to be saved to this record.
 	 *
 	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
