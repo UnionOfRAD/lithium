@@ -314,7 +314,7 @@ class Validator extends \lithium\core\StaticObject {
 	 * @param string $rules array of rules to check against object properties
 	 * @return mixed When all validation rules pass
 	 */
-	public static function check($values, $rules) {
+	public static function check($values, $rules, array $options = array()) {
 		$defaults = array(
 			'notEmpty',
 			'message' => null,
@@ -331,7 +331,7 @@ class Validator extends \lithium\core\StaticObject {
 			$errors[$field] = array();
 
 			foreach ($rules as $key => $rule) {
-				$rule += $defaults;
+				$rule += $defaults + compact('values');
 				list($name) = $rule;
 
 				if (!isset($values[$field])) {
@@ -343,7 +343,7 @@ class Validator extends \lithium\core\StaticObject {
 				if (empty($values[$field]) && $rule['skipEmpty']) {
 					continue;
 				}
-				if (!static::rule($name, $values[$field], $rule['format'], $rule)) {
+				if (!static::rule($name, $values[$field], $rule['format'], $rule + $options)) {
 					$errors[$field][] = $rule['message'] ?: $key;
 				}
 			}
