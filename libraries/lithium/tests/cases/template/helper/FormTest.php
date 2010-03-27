@@ -493,6 +493,30 @@ class FormTest extends \lithium\test\Unit {
 		));
 	}
 
+	public function testCustomInputTypes() {
+		// Creates an HTML5 'range' input slider:
+		$range = $this->form->range('completion', array('min' => 0, 'max' => 100));
+		$this->assertTags($range, array('input' => array(
+			'type' => 'range', 'name' => 'completion', 'min' => '0', 'max' => '100'
+		)));
+	}
+
+	public function testFieldWithCustomType() {
+		$field = $this->form->field('completion', array(
+			'type' => 'range', 'id' => 'completion', 'min' => '0', 'max' => '100',
+			'label' => 'Completion %', 'wrap' => array('class' => 'input')
+		));
+		$this->assertTags($field, array(
+			'div' => array('class' => 'input'),
+			'label' => array('for' => 'completion'), 'Completion %', '/label',
+			'input' => array(
+				'type' => 'range', 'name' => 'completion',
+				'id' => 'completion', 'min' => '0', 'max' => '100'
+			),
+			'/div'
+		));
+	}
+
 	public function testFormFieldSelect() {
 		$result = $this->form->field('states', array(
 			'type' => 'select', 'list' => array('CA', 'RI')

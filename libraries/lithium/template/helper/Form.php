@@ -44,6 +44,7 @@ class Form extends \lithium\template\Helper {
 		'checkbox-multi-start' => '',
 		'error'                => '<div{:options}>{:content}</div>',
 		'errors'               => '{:content}',
+		'element'              => '<input type="{:type}" name="{:name}"{:options} />',
 		'file'                 => '<input type="file" name="{:name}"{:options} />',
 		'form'                 => '<form action="{:url}"{:options}>{:append}',
 		'form-end'             => '</form>',
@@ -124,7 +125,18 @@ class Form extends \lithium\template\Helper {
 			'base' => array(), 'text' => array(), 'textarea' => array(),
 			'select' => array('multiple' => false)
 		);
-		parent::__construct((array) $config + $defaults);
+		parent::__construct($config + $defaults);
+	}
+
+	/**
+	 * Object initializer. Adds a content handler for the `wrap` key in the `field()` method, which
+	 * converts an array of properties to an attribute string.
+	 *
+	 * @return void
+	 */
+	protected function _init() {
+		parent::_init();
+		$this->_context->handlers(array('wrap' => '_attributes'));
 	}
 
 	/**
@@ -219,6 +231,12 @@ class Form extends \lithium\template\Helper {
 		return $this->_filter($method, $params, $filter);
 	}
 
+	/**
+	 * Echoes a closing `</form>` tag and unbinds the `Form` helper from any `Record` or `Document`
+	 * object used to generate the corresponding form.
+	 *
+	 * @return string Returns a closing `</form>` tag.
+	 */
 	public function end() {
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, array());
 		$params = compact('options', 'template');
@@ -236,6 +254,26 @@ class Form extends \lithium\template\Helper {
 	}
 
 	/**
+	 * Implements alternative input types as method calls against `Form` helper. Enables the
+	 * generation of HTML5 input types and other custom input types:
+	 *
+	 * {{{ embed:lithium\tests\cases\template\helper\FormTest::testCustomInputTypes(1-2) }}}
+	 *
+	 * @param string $type The method called, which represents the `type` attribute of the
+	 *               `<input />` tag.
+	 * @param array $params An array of method parameters passed to the method call. The first
+	 *              element should be the name of the input field, and the second should be an array
+	 *              of element attributes.
+	 * @return string Returns an `<input />` tag of the type specified in `$type`.
+	 */
+	public function __call($type, array $params = array()) {
+		list($name, $options) = $params;
+		list($name, $options, $template) = $this->_defaults($type, $name, $options);
+		$template = $this->_context->strings($template) ? $template : 'element';
+		return $this->_render($type, $template, compact('type', 'name', 'options', 'value'));
+	}
+
+	/**
 	 * Generates a form field with a label, input, and error message (if applicable), all contained
 	 * within a wrapping element.
 	 *
@@ -250,7 +288,7 @@ class Form extends \lithium\template\Helper {
 			'label' => null,
 			'type' => 'text',
 			'template' => 'field',
-			'wrap' => null,
+			'wrap' => array(),
 			'list' => null
 		);
 		list($options, $fieldOptions) = $this->_options($defaults, $options);
@@ -271,7 +309,7 @@ class Form extends \lithium\template\Helper {
 			case ($type == 'select'):
 				$input = $this->select($name, $options['list'], $fieldOptions);
 			break;
-			case (method_exists($this, $type)):
+			default:
 				$input = $this->{$type}($name, $fieldOptions);
 			break;
 		}
