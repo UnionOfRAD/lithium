@@ -10,6 +10,7 @@ namespace lithium\tests\cases\core;
 
 use \lithium\util\Collection;
 use \lithium\core\Adaptable;
+use \lithium\core\Environment;
 use \lithium\storage\cache\adapter\Memory;
 use \lithium\storage\cache\strategy\Serializer;
 use \lithium\tests\mocks\core\MockAdapter;
@@ -230,6 +231,7 @@ class AdaptableTest extends \lithium\test\Unit {
 			'development' => $config, 'test' => $config, 'production' => $config
 		));
 		$adapter::config($items);
+
 		$result = $adapter::config();
 		$expected = array('default' => $config);
 		$this->assertEqual($expected, $result);

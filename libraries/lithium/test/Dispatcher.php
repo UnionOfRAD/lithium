@@ -11,6 +11,7 @@ namespace lithium\test;
 use \lithium\util\Set;
 use \lithium\util\Inflector;
 use \lithium\core\Libraries;
+use \lithium\core\Environment;
 
 /**
  * The Lithium Test Dispatcher
@@ -59,7 +60,12 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$report = static::_report($group, $options);
 
 		return static::_filter(__METHOD__, compact('report'), function($self, $params, $chain) {
+			$environment = Environment::get();
+			Environment::set('test');
+
 			$params['report']->run();
+
+			Environment::set($environment);
 			return $params['report'];
 		});
 	}
@@ -67,9 +73,9 @@ class Dispatcher extends \lithium\core\StaticObject {
 	/**
 	 * Creates the group class based
 	 *
+	 * @see \lithium\test\Dispatcher::$_classes
 	 * @param array $items array of cases or groups
 	 * @return object Group object constructed with $items
-	 * @see \lithium\test\Dispatcher::$_classes
 	 */
 	protected static function _group($items) {
 		$group = Libraries::locate('test', static::$_classes['group']);
@@ -81,11 +87,11 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * Creates the test report class based on either the passed test case or the
 	 * passed test group.
 	 *
+	 * @see \lithium\test\Dispatcher::$_classes
 	 * @param string $group
 	 * @param array $options Options array passed from Dispatcher::run(). Should contain
 	 *        one of 'case' or 'group' keys.
 	 * @return object Group object constructed with the test case or group passed in $options.
-	 * @see \lithium\test\Dispatcher::$_classes
 	 */
 	protected static function _report($group, $options) {
 		$report = Libraries::locate('test', static::$_classes['report']);
