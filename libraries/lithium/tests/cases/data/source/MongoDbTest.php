@@ -9,7 +9,16 @@
 
 namespace lithium\tests\cases\data\source;
 
+use \lithium\data\Connections;
+use \lithium\data\source\MongoDb;
+
 class MongoDbTest extends \lithium\test\Unit {
+
+	public function skip() {
+		$message = 'MongoDb Extension is not loaded';
+		$this->skipIf(!MongoDb::enabled(), $message);
+	}
+
 }
 
 ?>

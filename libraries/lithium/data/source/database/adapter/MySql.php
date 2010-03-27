@@ -66,6 +66,15 @@ class MySql extends \lithium\data\source\Database {
 	}
 
 	/**
+	 * Check for required PHP extension
+	 *
+	 * @return boolean
+	 */
+	public static function enabled() {
+		return extension_loaded('mysql');
+	}
+
+	/**
 	 * Connects to the database using the options provided to the class constructor.
 	 *
 	 * @return boolean Returns `true` if a database connection could be established, otherwise

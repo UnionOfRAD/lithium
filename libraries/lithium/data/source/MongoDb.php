@@ -82,6 +82,15 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	/**
+	 * Check for required PHP extension
+	 *
+	 * @return boolean
+	 */
+	public static function enabled() {
+		return extension_loaded('mongo');
+	}
+
+	/**
 	 * Configures a model class by overriding the default dependencies for `'recordSet'` and
 	 * `'record'` , and sets the primary key to `'_id'`, in keeping with Mongo's conventions.
 	 *
