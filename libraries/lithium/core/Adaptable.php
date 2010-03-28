@@ -140,7 +140,8 @@ class Adaptable extends \lithium\core\StaticObject {
 			if (is_array($strategy)) {
 				$name = $key;
 				$class = static::_strategy($name, static::$_strategies);
-				$arguments = $config['strategies'][$class];
+				$index = (isset($config['strategies'][$name])) ? $name : $class;
+				$arguments = $config['strategies'][$index];
 			} else {
 				$name = $strategy;
 				$class = static::_strategy($name, static::$_strategies);
