@@ -21,7 +21,7 @@ class Json extends \lithium\core\Object {
 	 * @param mixed $data The data to be encoded.
 	 * @return string The encoded  data.
 	 */
-	public static function write($data) {
+	public function write($data) {
 		return json_encode($data);
 	}
 
@@ -33,7 +33,7 @@ class Json extends \lithium\core\Object {
 	 * @param string $data Serialized data.
 	 * @return mixed Result of unserialization.
 	 */
-	public static function read($data) {
+	public function read($data) {
 		return json_decode($data);
 	}
 }

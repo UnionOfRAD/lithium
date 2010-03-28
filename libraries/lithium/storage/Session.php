@@ -96,7 +96,7 @@ class Session extends \lithium\core\Adaptable {
 	 * @return mixed Read result on successful session read, null otherwise.
 	 * @filter This method may be filtered.
 	 */
-	public static function read($key, array $options = array()) {
+	public static function read($key = null, array $options = array()) {
 		$defaults = array('name' => null);
 		$options += $defaults;
 		$method = ($name = $options['name']) ? static::adapter($name)->read($key, $options) : null;

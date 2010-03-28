@@ -157,12 +157,12 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @param string $method The strategy method to be applied.
 	 * @param string $name The named configuration
 	 * @param mixed $data The data to which the strategies will be applied.
-	 * @param null|string $mode If `$mode` is set to 'LIFO', the strategies are applied in reverse.
+	 * @param array $options If `mode` is set to 'LIFO', the strategies are applied in reverse.
 	 *        order of their definition.
 	 * @return mixed Result of application of strategies to data. If no strategies
 	 *         have been configured, this method will simply return the original data.
 	 */
-	public static function applyStrategies($method, $name, $data, $mode = null) {
+	public static function applyStrategies($method, $name, $data, $options = array('mode' => null)){
 		if (!$strategies = static::strategies($name)) {
 			return $data;
 		}
@@ -170,13 +170,14 @@ class Adaptable extends \lithium\core\StaticObject {
 			return $data;
 		}
 
-		if ($mode === 'LIFO') {
+		if (isset($options['mode']) && ($options['mode'] === 'LIFO')) {
 			$strategies->setIteratorMode(SplDoublyLinkedList::IT_MODE_LIFO);
+			unset($options['mode']);
 		}
 
 		foreach ($strategies as $strategy) {
 			if (method_exists($strategy, $method)) {
-				$data = $strategy::$method($data);
+				$data = $strategy->{$method}($data, $options);
 			}
 		}
 		return $data;

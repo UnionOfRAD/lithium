@@ -109,7 +109,8 @@ class Cache extends \lithium\core\Adaptable {
 			$expiry = $data;
 			$data = null;
 		}
-		$data = static::applyStrategies(__FUNCTION__, $name, $data);
+		$options = array('key' => $key, 'class' => __CLASS__);
+		$data = static::applyStrategies(__FUNCTION__, $name, $data, $options);
 		$method = static::adapter($name)->write($key, $data, $expiry);
 		$params = compact('key', 'data', 'expiry');
 		return static::_filter(__FUNCTION__, $params, $method, $settings[$name]['filters']);
@@ -141,7 +142,8 @@ class Cache extends \lithium\core\Adaptable {
 		$filters = $settings[$name]['filters'];
 
 		$result = static::_filter(__FUNCTION__, $params, $method, $filters);
-		return static::applyStrategies(__FUNCTION__, $name, $result, 'LIFO');
+		$options = array('key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__);
+		return static::applyStrategies(__FUNCTION__, $name, $result, $options);
 	}
 
 	/**

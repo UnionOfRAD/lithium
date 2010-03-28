@@ -21,7 +21,7 @@ class Base64 extends \lithium\core\Object {
 	 * @param mixed $data The data to be serialized.
 	 * @return string Serialized data.
 	 */
-	public static function write($data) {
+	public function write($data) {
 		return base64_encode($data);
 	}
 
@@ -33,7 +33,7 @@ class Base64 extends \lithium\core\Object {
 	 * @param string $data Serialized data.
 	 * @return mixed Result of unserialization.
 	 */
-	public static function read($data) {
+	public function read($data) {
 		return base64_decode($data);
 	}
 }

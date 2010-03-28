@@ -21,7 +21,7 @@ class Serializer extends \lithium\core\Object {
 	 * @param mixed $data The data to be serialized.
 	 * @return string Serialized data.
 	 */
-	public static function write($data) {
+	public function write($data) {
 		return serialize($data);
 	}
 
@@ -33,7 +33,7 @@ class Serializer extends \lithium\core\Object {
 	 * @param string $data Serialized data.
 	 * @return mixed Result of unserialization.
 	 */
-	public static function read($data) {
+	public function read($data) {
 		return unserialize($data);
 	}
 }

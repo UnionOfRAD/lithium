@@ -196,7 +196,8 @@ class AdaptableTest extends \lithium\test\Unit {
 		$transformed = base64_encode(serialize($data));
 		$this->assertEqual($transformed, $result);
 
-		$result = $strategy::applyStrategies('read', 'default', $transformed, 'LIFO');
+		$options = array('mode' => 'LIFO');
+		$result = $strategy::applyStrategies('read', 'default', $transformed, $options);
 		$expected = $data;
 		$this->assertEqual($expected, $result);
 	}
