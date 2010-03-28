@@ -125,7 +125,8 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	public function testReadNoConditions() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$expected = true;		$result = $couchdb->read($this->query);
+		$expected = true;
+		$result = $couchdb->read($this->query);
 		$this->assertEqual($expected, $result);
 
 		$expected = '/lithium-test/_all_docs';

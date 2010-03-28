@@ -9,15 +9,30 @@
 
 namespace lithium\tests\cases\data\source;
 
-use \lithium\data\Connections;
 use \lithium\data\source\MongoDb;
 
 class MongoDbTest extends \lithium\test\Unit {
 
+	protected $_testConfig = array(
+		'type' => 'MongoDb',
+		'database' => 'test',
+		'host' => 'localhost',
+		'port' => '27017',
+		'persistent' => false
+	);
+
 	public function skip() {
 		$message = 'MongoDb Extension is not loaded';
 		$this->skipIf(!MongoDb::enabled(), $message);
+
+		$mongodb = new MongoDb($this->_testConfig);
+		$this->skipIf(
+			!$mongodb->isConnected(),
+			"`{$this->_testConfig['database']}` database or connection unavailable"
+		);
 	}
+
+
 
 }
 

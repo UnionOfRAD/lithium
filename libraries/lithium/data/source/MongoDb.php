@@ -107,9 +107,14 @@ class MongoDb extends \lithium\data\Source {
 	public function connect() {
 		$config = $this->_config;
 		$this->_isConnected = false;
-		$this->_connection = new Mongo("mongodb://{$config['host']}:{$config['port']}", array(
-			'persist' => $config['persistent']
-		));
+
+		try {
+			$this->_connection = new Mongo("mongodb://{$config['host']}:{$config['port']}", array(
+				'persist' => $config['persistent']
+			));
+		} catch (Exception $e) {
+			return $this->_isConnected;
+		}
 
 		if ($this->_db = $this->_connection->{$config['database']}) {
 			$this->_isConnected = true;
