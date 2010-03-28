@@ -54,12 +54,12 @@ class SessionPhpTest extends \lithium\test\Unit {
 		$result = Session::read($key, array('name' => 'strategy'));
 		$this->assertNull($result);
 
+		$cache = $_SESSION;
 		$_SESSION['injectedkey'] = 'hax0r';
 		$this->expectException('/Possible data tampering - HMAC signature does not match data.');
 		$result = Session::read($key, array('name' => 'strategy'));
-		unset($_SESSION['injectedkey']);
+		$_SESSION = $cache;
 	}
-
 }
 
 ?>
