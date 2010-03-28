@@ -9,6 +9,7 @@
 namespace lithium\action;
 
 use \Exception;
+use \lithium\util\Inflector;
 
 /**
  * The `Controller` class is the fundamental building block of your application's request/response
@@ -212,11 +213,16 @@ class Controller extends \lithium\core\Object {
 		if (is_string($options)) {
 			$options = array('template' => $options);
 		}
-		$defaults = array(
-			'status' => null, 'location' => false, 'data' => array(), 'head' => false
-		);
-		$options += $defaults;
+		$class = get_class($this);
 		$media = $this->_classes['media'];
+
+		$defaults = array('status' => null, 'location' => false, 'data' => null, 'head' => false);
+		$options += $defaults + array(
+			'controller' => Inflector::underscore(
+				preg_replace('/Controller$/', '', substr($class, strrpos($class, '\\') + 1))
+			)
+		);
+
 
 		if (!empty($options['data'])) {
 			$this->set($options['data']);

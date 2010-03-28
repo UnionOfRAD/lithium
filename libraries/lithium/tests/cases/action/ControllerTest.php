@@ -136,6 +136,24 @@ class ControllerTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that requests where the controller class is specified manually continue to route to
+	 * the correct template path.
+	 *
+	 * @return void
+	 */
+	public function testRenderWithNamespacedController() {
+		$request = new Request();
+		$request->params['controller'] = 'lithium\tests\mocks\action\MockPostsController';
+
+		$controller = new MockPostsController(compact('request') + array('classes' => array(
+			'media' => '\lithium\tests\mocks\action\MockMediaClass'
+		)));
+
+		$controller->render();
+		$this->assertEqual('mock_posts', $controller->response->options['controller']);
+	}
+
+	/**
 	 * Verifies that protected methods (i.e. prefixed with '_'), and methods declared in the
 	 * Controller base class cannot be accessed.
 	 *
@@ -241,7 +259,9 @@ class ControllerTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testManuallySettingTemplate() {
-		$postsController = new MockControllerRequest();
+		$postsController = new MockPostsController(array('classes' => array(
+			'media' => '\lithium\tests\mocks\action\MockMediaClass'
+		)));
 		$postsController(new Request(), array('action' => 'changeTemplate'));
 		$result = $postsController->access('_render');
 		$this->assertEqual('foo', $result['template']);
@@ -276,9 +296,9 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function methods() {
-		return array('testDispatchingWithExplicitControllerName');
-	}
+	// public function methods() {
+	// 	return array('testDispatchingWithExplicitControllerName');
+	// }
 
 	/**
 	 * Tests that requests which are dispotched with the controller route parameter specified as

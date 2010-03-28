@@ -142,8 +142,13 @@ class Dispatcher extends \lithium\core\StaticObject {
 				list($library, $params['controller']) = explode('.', $params['controller']);
 				$library .= '.';
 			}
-			$controller = $library . Inflector::camelize($params['controller']);
-			$class = Libraries::locate('controllers', $controller);
+
+			if (strpos($params['controller'], '\\') !== false) {
+				$class = $params['controller'];
+			} else {
+				$controller = $library . Inflector::camelize($params['controller']);
+				$class = Libraries::locate('controllers', $controller);
+			}
 
 			if (class_exists($class)) {
 				return new $class(compact('request'));
