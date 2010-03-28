@@ -134,9 +134,18 @@ class Adaptable extends \lithium\core\StaticObject {
 		}
 		$stack = new SplDoublyLinkedList();
 
-		foreach ($config['strategies'] as $strategy) {
-			$class = static::_strategy($strategy, static::$_strategies);
-			$stack->push(new $class($config));
+		foreach ($config['strategies'] as $key => $strategy) {
+			$arguments = array();
+
+			if (is_array($strategy)) {
+				$name = $key;
+				$class = static::_strategy($name, static::$_strategies);
+				$arguments = $config['strategies'][$class];
+			} else {
+				$name = $strategy;
+				$class = static::_strategy($name, static::$_strategies);
+			}
+			$stack->push(new $class($arguments));
 		}
 		return $stack;
 	}

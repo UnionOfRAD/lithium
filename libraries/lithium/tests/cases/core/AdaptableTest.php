@@ -11,7 +11,6 @@ namespace lithium\tests\cases\core;
 use \lithium\util\Collection;
 use \lithium\core\Adaptable;
 use \lithium\storage\cache\adapter\Memory;
-use \lithium\storage\cache\strategy\Serializer;
 use \lithium\tests\mocks\core\MockAdapter;
 use \lithium\tests\mocks\core\MockStrategy;
 use \SplDoublyLinkedList;
@@ -87,7 +86,7 @@ class AdaptableTest extends \lithium\test\Unit {
 	public function testStrategy() {
 		$strategy = new MockStrategy();
 		$items = array('default' => array(
-			'strategies' => array('Serializer'),
+			'strategies' => array('\lithium\tests\mocks\storage\cache\strategy\MockSerializer'),
 			'filters' => array(),
 			'adapter' => null
 		));
@@ -99,7 +98,33 @@ class AdaptableTest extends \lithium\test\Unit {
 		$result = $strategy::strategies('default');
 		$this->assertTrue($result instanceof SplDoublyLinkedList);
 		$this->assertEqual(count($result), 1);
-		$this->assertTrue($result->top() instanceof Serializer);
+		$this->assertTrue(
+			$result->top() instanceof \lithium\tests\mocks\storage\cache\strategy\MockSerializer
+		);
+	}
+
+	public function testStrategyConstructionSettings() {
+		$strategy = new MockStrategy();
+		$items = array('default' => array(
+			'strategies' => array(
+				'\lithium\tests\mocks\storage\cache\strategy\MockConfigurizer' => array(
+					'key1' => 'value1', 'key2' => 'value2'
+				)
+			),
+			'filters' => array(),
+			'adapter' => null
+		));
+		$strategy::config($items);
+		$result = $strategy::config();
+		$expected = $items;
+		$this->assertEqual($expected, $result);
+
+		$result = $strategy::strategies('default');
+		$this->assertTrue($result instanceof SplDoublyLinkedList);
+		$this->assertEqual(count($result), 1);
+		$this->assertTrue(
+			$result->top() instanceof \lithium\tests\mocks\storage\cache\strategy\MockConfigurizer
+		);
 	}
 
 	public function testNonExistentStrategyConfiguration() {
@@ -120,7 +145,7 @@ class AdaptableTest extends \lithium\test\Unit {
 		$items = array('default' => array(
 			'filters' => array(),
 			'adapter' => null,
-			'strategies' => array('Serializer')
+			'strategies' => array('\lithium\tests\mocks\storage\cache\strategy\MockSerializer'),
 		));
 		$strategy::config($items);
 		$result = $strategy::config();
@@ -132,12 +157,34 @@ class AdaptableTest extends \lithium\test\Unit {
 		$this->assertEqual(serialize($data), $result);
 	}
 
+	public function testApplySingleStrategyWithConfiguration() {
+		$strategy = new MockStrategy();
+		$params = array('key1' => 'value1', 'key2' => 'value2');
+		$items = array('default' => array(
+			'filters' => array(),
+			'adapter' => null,
+			'strategies' => array(
+				'\lithium\tests\mocks\storage\cache\strategy\MockConfigurizer' => $params
+			)
+		));
+		$strategy::config($items);
+		$result = $strategy::config();
+		$expected = $items;
+		$this->assertEqual($expected, $result);
+
+		$result = $strategy::applyStrategies('write', 'default', null);
+		$this->assertEqual($params, $result);
+	}
+
 	public function testApplyMultipleStrategies() {
 		$strategy = new MockStrategy();
 		$items = array('default' => array(
 			'filters' => array(),
 			'adapter' => null,
-			'strategies' => array('Serializer', 'Base64')
+			'strategies' => array(
+				'\lithium\tests\mocks\storage\cache\strategy\MockSerializer',
+				'Base64'
+			)
 		));
 		$strategy::config($items);
 		$result = $strategy::config();
