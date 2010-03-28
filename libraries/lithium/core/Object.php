@@ -212,7 +212,7 @@ class Object {
 		list($class, $method) = explode('::', $method);
 
 		if (empty($this->_methodFilters[$method]) && empty($filters)) {
-			return $callback->__invoke($this, $params, null);
+			return $callback($this, $params, null);
 		}
 
 		$f = isset($this->_methodFilters[$method]) ? $this->_methodFilters[$method] : array();
