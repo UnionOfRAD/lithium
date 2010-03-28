@@ -8,14 +8,33 @@
 
 namespace lithium\storage\session\strategy;
 
+use \Exception;
+use \RuntimeException;
+
 /**
  * HMAC strategy.
  */
 class Hmac extends \lithium\core\Object {
 
+	/**
+	 * The HMAC secret.
+	 *
+	 * @var string HMAC secret string.
+	 */
+	protected static $_secret = null;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param array $config Configuration array. Will throw an exception if the 'secret'
+	 *        configuration key is not set.
+	 * @return void
+	 */
 	public function __construct(array $config = array()) {
-		parent::__construct($config + array('secret' => 'my_secret_key'));
+		if (!isset($config['secret'])) {
+			throw new Exception("HMAC strategy requires a secret key.");
+		}
+		static::$_secret = $config['secret'];
 	}
 
 	/**
@@ -30,13 +49,17 @@ class Hmac extends \lithium\core\Object {
 	 * @param mixed $data The data to be signed.
 	 * @return array Data & signature.
 	 */
-	public static function write($data) {
-		if (!isset($this->_config['secret'])) {
-			return $data;
+	public function write($data, array $options) {
+		$class = $options['class'];
+		$futureData = $class::read(null, array('strategies' => false));
+		$futureData += array($options['key'] => $data);
+
+		if (isset($futureData['__signature'])) {
+			unset($futureData['__signature']);
 		}
-		$secret = $this->_config['secret'];
-		$signature = hash_hmac('sha1', serialize($data), $secret);
-		$data = array('data' => $data, '__signature' => $signature);
+		$signature = hash_hmac('sha1', serialize($futureData), static::$_secret);
+		$class::write('__signature', $signature, $options + array('strategies' => false));
+		return $data;
 	}
 
 	/**
@@ -47,16 +70,46 @@ class Hmac extends \lithium\core\Object {
 	 * @param array $data the Data being read.
 	 * @return array validated data
 	 */
-	public static function read($data) {
-		if (!isset($this->_config['secret']) || !isset($data['signature'])) {
-			return $data;
+	public function read($data, array $options) {
+		$class = $options['class'];
+
+		$futureData = $class::read(null, array('strategies' => false));// + array($options['key'] => $data);
+		$currentSignature = $futureData['__signature'];
+		unset($futureData['__signature']);
+		$signature = hash_hmac('sha1', serialize($futureData), static::$_secret);
+
+		if ($signature !== $currentSignature) {
+			$message = "Possible data tampering - HMAC signature does not match data.";
+			throw new RuntimeException($message);
 		}
-		$secret = $this->_config['secret'];
-		$signature = hash_hmac('sha1', serialize($data), $secret);
-		$data['__valid'] = ($signature === $secret);
-		unset($data['__signature']);
 		return $data;
 	}
+
+	/**
+	 * Delete strategy method.
+	 *
+	 * @see lithium\storage\Session
+	 * @see lithium\core\Adaptable::config()
+	 * @see http://php.net/manual/en/function.hash-hmac.php
+	 * @param mixed $data The data to be signed.
+	 * @param array $options
+	 * @return array Data & signature.
+	 */
+	public function delete($data, array $options) {
+		$class = $options['class'];
+		$futureData = $class::read(null, array('strategies' => false));
+
+		if (isset($futureData[$options['key']])) {
+			unset($futureData[$options['key']]);
+		}
+		if (isset($futureData['__signature'])) {
+			unset($futureData['__signature']);
+		}
+		$signature = hash_hmac('sha1', serialize($futureData), static::$_secret);
+		$class::write('__signature', $signature, $options + array('strategies' => false));
+		return $data;
+	}
+
 }
 
 ?>
