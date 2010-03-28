@@ -109,8 +109,12 @@ class Cache extends \lithium\core\Adaptable {
 			$expiry = $data;
 			$data = null;
 		}
-		$options = array('key' => $key, 'class' => __CLASS__);
-		$data = static::applyStrategies(__FUNCTION__, $name, $data, $options);
+
+		if (!isset($options['strategies']) || $strategies) {
+			$options = array('key' => $key, 'class' => __CLASS__);
+			$data = static::applyStrategies(__FUNCTION__, $name, $data, $options);
+		}
+
 		$method = static::adapter($name)->write($key, $data, $expiry);
 		$params = compact('key', 'data', 'expiry');
 		return static::_filter(__FUNCTION__, $params, $method, $settings[$name]['filters']);
@@ -143,7 +147,12 @@ class Cache extends \lithium\core\Adaptable {
 
 		$result = static::_filter(__FUNCTION__, $params, $method, $filters);
 		$options = array('key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__);
-		return static::applyStrategies(__FUNCTION__, $name, $result, $options);
+		$strategies = (isset($options['strategies']) && $options['strategies'] === true);
+
+		if (!isset($options['strategies']) || $strategies) {
+			return static::applyStrategies(__FUNCTION__, $name, $result, $options);
+		}
+		return $result;
 	}
 
 	/**
@@ -168,10 +177,15 @@ class Cache extends \lithium\core\Adaptable {
 
 		$key = static::key($key);
 		$method = static::adapter($name)->delete($key);
-		$params = compact('key');
 		$filters = $settings[$name]['filters'];
+		$options = array('key' => $key, 'class' => __CLASS__);
 
-		return static::_filter(__FUNCTION__, $params, $method, $filters);
+		if (!isset($options['strategies']) || $strategies) {
+			$options += array('key' => $key, 'class' => __CLASS__);
+			$key = static::applyStrategies(__FUNCTION__, $name, $key, $options);
+		}
+
+		return static::_filter(__FUNCTION__, compact('key'), $method, $filters);
 	}
 
 	/**
