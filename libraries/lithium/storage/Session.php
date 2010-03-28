@@ -48,6 +48,13 @@ class Session extends \lithium\core\Adaptable {
 	protected static $_adapters = 'adapter.storage.session';
 
 	/**
+	 * Libraries::locate() compatible path to strategies for this class.
+	 *
+	 * @var string Dot-delimited path.
+	 */
+	protected static $_strategies = 'strategy.storage.session';
+
+	/**
 	 * Returns key used to identify the session.
 	 *
 	 * @param mixed $name Named session configuration.
