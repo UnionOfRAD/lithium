@@ -105,7 +105,7 @@ class FormTest extends \lithium\test\Unit {
 
 		$this->assertTags($result, array(
 			'form' => array(
-				'action' => "{$this->base}posts/delete", 'method' => 'DELETE'
+				'action' => "{$this->base}posts/delete", 'method' => 'POST'
 			),
 			'input' => array(
 				'type' => "hidden",
@@ -118,7 +118,7 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array(
 			'form' => array(
 				'action' => "{$this->base}posts",
-				'method' => 'PUT',
+				'method' => 'POST',
 				'enctype' => 'multipart/form-data'
 			),
 			'input' => array(
@@ -128,6 +128,12 @@ class FormTest extends \lithium\test\Unit {
 			)
 		));
 
+		$record = new Record(array('exists' => true));
+		$result = $this->form->create($record);
+		$this->assertTags($result, array(
+			'form' => array('action' => "{$this->base}posts/add", 'method' => 'POST'),
+			'input' => array('type' => "hidden", 'name' => '_method', 'value' => 'PUT')
+		));
 	}
 
 	public function testFormCreationWithBinding() {

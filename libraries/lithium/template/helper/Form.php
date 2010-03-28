@@ -208,17 +208,18 @@ class Form extends \lithium\template\Helper {
 			$_binding = $params['binding'];
 			$append = null;
 
-			if (!in_array(strtolower($scope['method']), array('get', 'post'))) {
-				$append = $self->hidden('_method', array(
-					'value' => strtoupper($scope['method'])
-				));
-			}
-
 			if ($scope['type'] == 'file') {
 				if (strtolower($scope['method']) == 'get') {
 					$scope['method'] = 'post';
 				}
 				$options['enctype'] = 'multipart/form-data';
+			}
+
+			if (!in_array(strtolower($scope['method']), array('get', 'post'))) {
+				$append = $self->hidden('_method', array(
+					'value' => strtoupper($scope['method'])
+				));
+				$scope['method'] = 'POST';
 			}
 
 			$url = $scope['action'] ? array('action' => $scope['action']) : $scope['url'];
