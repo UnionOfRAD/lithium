@@ -35,9 +35,7 @@ class DispatcherTest extends \lithium\test\Unit {
 		MockDispatcher::run(new Request(array('url' => '/')));
 
 		$result = end(MockDispatcher::$dispatched);
-		$expected = array('controller' => 'test', 'action' => 'test', 'persist' => array(
-			'controller'
-		));
+		$expected = array('controller' => 'test', 'action' => 'test');
 		$this->assertEqual($expected, $result->params);
 	}
 
@@ -59,11 +57,7 @@ class DispatcherTest extends \lithium\test\Unit {
 		MockDispatcher::run(new Request(array('url' => '/')));
 
 		$result = end(MockDispatcher::$dispatched);
-		$expected = array(
-			'action' => 'admin_test', 'controller' => 'test', 'admin' => true, 'persist' => array(
-				'controller'
-			)
-		);
+		$expected = array('action' => 'admin_test', 'controller' => 'test', 'admin' => true);
 		$this->assertEqual($expected, $result->params);
 	}
 

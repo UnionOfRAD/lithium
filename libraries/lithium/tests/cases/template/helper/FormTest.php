@@ -131,7 +131,7 @@ class FormTest extends \lithium\test\Unit {
 		$record = new Record(array('exists' => true));
 		$result = $this->form->create($record);
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts/add", 'method' => 'POST'),
+			'form' => array('action' => "{$this->base}posts", 'method' => 'POST'),
 			'input' => array('type' => "hidden", 'name' => '_method', 'value' => 'PUT')
 		));
 	}
