@@ -31,8 +31,10 @@ class SessionTest extends \lithium\test\Unit {
 	}
 
 	public function assertCookie($expected, $headers) {
+		$defaults = array('expires' => '(?:.+?)', 'path' => '/', 'name' => 'app');
+		$expected += $defaults;
+
 		$key = $expected['key'];
-		$name = (isset($expected['name'])) ? $expected['name'] : 'app';
 		$value = preg_quote(urlencode($expected['value']), '/');
 
 		if (isset($expected['expires'])) {
@@ -42,7 +44,9 @@ class SessionTest extends \lithium\test\Unit {
 			$expires = ".+?";
 		}
 		$path = preg_quote($expected['path'], '/');
-		$pattern = "/^Set\-Cookie:\s$name\[$key\]=$value;\sexpires=$expires;\spath=$path/";
+		$pattern  = "/^Set\-Cookie:\s{$expected['name']}\[$key\]=$value;";
+		$pattern .= "\sexpires={$expected['expires']};\spath=$path/";
+		$pattern .=
 		$match = false;
 
 		foreach ($headers as $header) {
@@ -90,16 +94,14 @@ class SessionTest extends \lithium\test\Unit {
 		Session::write('testkey2', 'value2', array('name' => 'app'));
 		Session::write('testkey3', 'value3', array('name' => 'app'));
 
-		$params = array('expires' => '+1 day', 'path' => '/');
-
 		$this->assertCookie(
-			array('key' => 'testkey1', 'value' => 'value1') + $params, headers_list()
+			array('key' => 'testkey1', 'value' => 'value1'), headers_list()
 		);
 		$this->assertCookie(
-			array('key' => 'testkey2', 'value' => 'value2') + $params, headers_list()
+			array('key' => 'testkey2', 'value' => 'value2'), headers_list()
 		);
 		$this->assertCookie(
-			array('key' => 'testkey3', 'value' => 'value3') + $params, headers_list()
+			array('key' => 'testkey3', 'value' => 'value3'), headers_list()
 		);
 
 		Session::delete('testkey1', array('name' => 'app'));
@@ -109,13 +111,13 @@ class SessionTest extends \lithium\test\Unit {
 		$params = array('exires' => '-1 second', 'path' => '/');
 
 		$this->assertCookie(
-			array('key' => 'testkey1', 'value' => 'deleted') + $params, headers_list()
+			array('key' => 'testkey1', 'value' => 'deleted'), headers_list()
 		);
 		$this->assertCookie(
-			array('key' => 'testkey2', 'value' => 'deleted') + $params, headers_list()
+			array('key' => 'testkey2', 'value' => 'deleted'), headers_list()
 		);
 		$this->assertCookie(
-			array('key' => 'testkey3', 'value' => 'deleted') + $params, headers_list()
+			array('key' => 'testkey3', 'value' => 'deleted'), headers_list()
 		);
 	}
 
