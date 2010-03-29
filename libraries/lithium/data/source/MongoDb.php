@@ -112,13 +112,10 @@ class MongoDb extends \lithium\data\Source {
 			$this->_connection = new Mongo("mongodb://{$config['host']}:{$config['port']}", array(
 				'persist' => $config['persistent']
 			));
-		} catch (Exception $e) {
-			return $this->_isConnected;
-		}
-
-		if ($this->_db = $this->_connection->{$config['database']}) {
-			$this->_isConnected = true;
-		}
+			if ($this->_db = $this->_connection->{$config['database']}) {
+				$this->_isConnected = true;
+			}
+		} catch (Exception $e) {}
 		return $this->_isConnected;
 	}
 
@@ -198,7 +195,10 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	public function read($query, array $options = array()) {
-		$defaults = array('return' => 'resource');
+		$defaults = array(
+			'return' => 'resource',
+			'model' => null
+		);
 		$options += $defaults;
 
 		$db =& $this->_db;
