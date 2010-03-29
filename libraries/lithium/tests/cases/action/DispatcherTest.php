@@ -35,7 +35,9 @@ class DispatcherTest extends \lithium\test\Unit {
 		MockDispatcher::run(new Request(array('url' => '/')));
 
 		$result = end(MockDispatcher::$dispatched);
-		$expected = array('controller' => 'test', 'action' => 'test');
+		$expected = array('controller' => 'test', 'action' => 'test', 'persist' => array(
+			'controller'
+		));
 		$this->assertEqual($expected, $result->params);
 	}
 
@@ -57,7 +59,11 @@ class DispatcherTest extends \lithium\test\Unit {
 		MockDispatcher::run(new Request(array('url' => '/')));
 
 		$result = end(MockDispatcher::$dispatched);
-		$expected = array('action' => 'admin_test', 'controller' => 'test', 'admin' => true);
+		$expected = array(
+			'action' => 'admin_test', 'controller' => 'test', 'admin' => true, 'persist' => array(
+				'controller'
+			)
+		);
 		$this->assertEqual($expected, $result->params);
 	}
 
@@ -75,13 +81,17 @@ class DispatcherTest extends \lithium\test\Unit {
 		Dispatcher::run(new Request(array('url' => '/plugin')));
 	}
 
-	public static function parse($request) {
-		switch ($request->url) {
-			case '':
-				return array('controller' => 'some_non_existent_controller', 'action' => 'index');
-			case '/plugin':
-				return array('controller' => 'some_invalid_plugin.controller', 'action' => 'index');
+	public static function process($request) {
+		$params = array(
+			'' => array('controller' => 'some_non_existent_controller', 'action' => 'index'),
+			'/plugin' => array(
+				'controller' => 'some_invalid_plugin.controller', 'action' => 'index'
+			)
+		);
+		if (isset($params[$request->url])) {
+			$request->params = $params[$request->url];
 		}
+		return $request;
 	}
 }
 

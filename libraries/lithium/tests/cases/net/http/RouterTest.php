@@ -8,9 +8,9 @@
 
 namespace lithium\tests\cases\net\http;
 
+use \lithium\action\Request;
 use \lithium\net\http\Route;
 use \lithium\net\http\Router;
-use \lithium\action\Request;
 
 class RouterTest extends \lithium\test\Unit {
 
@@ -101,7 +101,9 @@ class RouterTest extends \lithium\test\Unit {
 	 */
 	public function testBasicRouteMatching() {
 		Router::connect('/hello', array('controller' => 'posts', 'action' => 'index'));
-		$expected = array('controller' => 'posts', 'action' => 'index');
+		$expected = array('controller' => 'posts', 'action' => 'index', 'persist' => array(
+			'controller'
+		));
 
 		foreach (array('/hello/', '/hello', 'hello/', 'hello') as $url) {
 			$this->request->url = $url;
@@ -112,7 +114,9 @@ class RouterTest extends \lithium\test\Unit {
 
 	public function testRouteMatchingWithDefaultParameters() {
 		Router::connect('/{:controller}/{:action}', array('action' => 'view'));
-		$expected = array('controller' => 'posts', 'action' => 'view');
+		$expected = array('controller' => 'posts', 'action' => 'view', 'persist' => array(
+			'controller'
+		));
 
 		foreach (array('/posts/view', '/posts', 'posts', 'posts/view', 'posts/view/') as $url) {
 			$this->request->url = $url;
@@ -153,7 +157,7 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests that routing is fully reset when `Router::connect()` is passed a null value
+	 * Tests that routing is fully reset when calling `Router::reset()`.
 	 *
 	 * @return void
 	 */
@@ -161,7 +165,9 @@ class RouterTest extends \lithium\test\Unit {
 		Router::connect('/{:controller}', array('controller' => 'posts'));
 		$this->request->url = '/hello';
 
-		$expected = array('controller' => 'hello', 'action' => 'index');
+		$expected = array('controller' => 'hello', 'action' => 'index', 'persist' => array(
+			'controller'
+		));
 		$result = Router::parse($this->request);
 		$this->assertEqual($expected, $result);
 
@@ -290,6 +296,33 @@ class RouterTest extends \lithium\test\Unit {
 			'controller' => 'tests', 'action' => 'add', 'args' => array('alke', 'php')
 		));
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testProcess() {
+		Router::connect('/add/{:args}', array('controller' => 'tests', 'action' => 'add'));
+		$request = Router::process(new Request(array('url' => '/add/foo/bar')));
+
+		$params = array('controller' => 'tests', 'action' => 'add', 'args' => array('foo', 'bar'));
+		$this->assertEqual($params, $request->params);
+		$this->assertEqual(array('controller'), $request->persist);
+
+		$request = Router::process(new Request(array('url' => '/remove/foo/bar')));
+		$this->assertFalse($request->params);
+	}
+
+	/**
+	 * Tests that a request context with persistent parameters generates URLs where those parameters
+	 * are properly taken into account.
+	 *
+	 * @return void
+	 */
+	public function testParameterPersistence() {
+		Router::connect('/add/{:args}', array('controller' => 'tests', 'action' => 'add'), array(
+			'persist' => array('controller', 'action')
+		));
+		$request = Router::process(new Request(array('url' => '/add/foo/bar')));
+		$url = Router::match(array('args' => array('baz', 'dib')), $request);
+		$this->assertEqual('/add/baz/dib', $url);
 	}
 }
 

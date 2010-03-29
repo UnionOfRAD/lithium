@@ -51,11 +51,11 @@ class RouteTest extends \lithium\test\Unit {
 		$request->url = '/';
 
 		$result = $route->parse($request);
-		$this->assertEqual($params, $result);
+		$this->assertEqual($params + array('persist' => array('controller')), $result);
 
 		$request->url = '';
 		$result = $route->parse($request);
-		$this->assertEqual($params, $result);
+		$this->assertEqual($params + array('persist' => array('controller')), $result);
 
 		$request->url = '/posts';
 		$this->assertFalse($route->parse($request));
@@ -91,13 +91,15 @@ class RouteTest extends \lithium\test\Unit {
 		$route = new Route(array('template' => '/{:controller}'));
 		$request = new Request();
 
+		$default = array('action' => 'index', 'persist' => array('controller'));
+
 		$request->url = '/posts';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'posts', 'action' => 'index'), $result);
+		$this->assertEqual(array('controller' => 'posts') + $default, $result);
 
 		$request->url = '/users';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'users', 'action' => 'index'), $result);
+		$this->assertEqual(array('controller' => 'users') + $default, $result);
 
 		$request->url = '/users/index';
 		$this->assertFalse($route->parse($request));
@@ -132,25 +134,30 @@ class RouteTest extends \lithium\test\Unit {
 		$route = new Route(array('template' => '/{:controller}/{:action}'));
 		$request = new Request();
 
+		$default = array('action' => 'index', 'persist' => array('controller'));
+
 		$request->url = '/posts';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'posts', 'action' => 'index'), $result);
+		$this->assertEqual(array('controller' => 'posts') + $default, $result);
 
 		$request->url = '/users';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'users', 'action' => 'index'), $result);
+		$this->assertEqual(array('controller' => 'users') + $default, $result);
 
 		$request->url = '/1';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => '1', 'action' => 'index'), $result);
+		$this->assertEqual(array('controller' => '1') + $default, $result);
 
 		$request->url = '/users/index';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'users', 'action' => 'index'), $result);
+		$this->assertEqual(array('controller' => 'users') + $default, $result);
 
 		$request->url = '/users/view';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'users', 'action' => 'view'), $result);
+		$expected = array('controller' => 'users', 'action' => 'view', 'persist' => array(
+			'controller'
+		));
+		$this->assertEqual($expected, $result);
 
 		$request->url = '/users/view/5';
 		$this->assertFalse($route->parse($request));
@@ -164,10 +171,11 @@ class RouteTest extends \lithium\test\Unit {
 			'template' => '/{:controller}/{:action}/{:id}', 'params' => array('id' => null)
 		));
 		$request = new Request();
+		$persist = array('persist' => array('controller'));
 
 		$request->url = '/posts';
 		$result = $route->parse($request);
-		$expected = array('controller' => 'posts', 'action' => 'index', 'id' => null);
+		$expected = array('controller' => 'posts', 'action' => 'index', 'id' => null) + $persist;
 		$this->assertEqual($expected, $result);
 
 		$request->url = '/posts/index';
@@ -180,7 +188,7 @@ class RouteTest extends \lithium\test\Unit {
 
 		$request->url = '/posts/view/5';
 		$result = $route->parse($request);
-		$expected = array('controller' => 'posts', 'action' => 'view', 'id' => '5');
+		$expected = array('controller' => 'posts', 'action' => 'view', 'id' => '5') + $persist;
 		$this->assertEqual($expected, $result);
 
 		$request->url = '/';
@@ -196,26 +204,21 @@ class RouteTest extends \lithium\test\Unit {
 			'params' => array('id' => null)
 		));
 		$request = new Request();
+		$default = array('controller' => 'posts', 'persist' => array('controller'));
 
 		$request->url = '/posts/view/5.xml';
 		$result = $route->parse($request);
-		$expected = array(
-			'controller' => 'posts', 'action' => 'view', 'id' => '5', 'type' => 'xml'
-		);
+		$expected = array('action' => 'view', 'id' => '5', 'type' => 'xml') + $default;
 		$this->assertEqual($expected, $result);
 
 		$request->url = '/posts/index.xml';
 		$result = $route->parse($request);
-		$expected = array(
-			'controller' => 'posts', 'action' => 'index', 'id' => '', 'type' => 'xml'
-		);
+		$expected = array('action' => 'index', 'id' => '', 'type' => 'xml') + $default;
 		$this->assertEqual($expected, $result);
 
 		$request->url = '/posts.xml';
 		$result = $route->parse($request);
-		$expected = array(
-			'controller' => 'posts', 'action' => 'index', 'id' => '', 'type' => 'xml'
-		);
+		$expected = array('action' => 'index', 'id' => '', 'type' => 'xml') + $default;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -236,7 +239,8 @@ class RouteTest extends \lithium\test\Unit {
 
 		$result = $route->parse($request);
 		$expected = array(
-			'controller' => 'posts', 'action' => 'index', 'args' => array('foo', 'bar')
+			'controller' => 'posts', 'action' => 'index', 'args' => array('foo', 'bar'),
+			'persist' => array('controller')
 		);
 		$this->assertEqual($expected, $result);
 	}
@@ -252,7 +256,9 @@ class RouteTest extends \lithium\test\Unit {
 		$this->assertFalse($result);
 
 		$request = new Request();
-		$expected = array('controller' => 'sessions', 'action' => 'add');
+		$expected = array('controller' => 'sessions', 'action' => 'add', 'persist' => array(
+			'controller'
+		));
 
 		$request->url = '/login';
 		$result = $route->parse($request);
@@ -281,7 +287,9 @@ class RouteTest extends \lithium\test\Unit {
 		$request->url = '/posts';
 
 		$result = $route->parse($request);
-		$expected = array('controller' => 'posts', 'action' => 'index');
+		$expected = array('controller' => 'posts', 'action' => 'index', 'persist' => array(
+			'controller'
+		));
 		$this->assertEqual($expected, $result);
 
 		$result = $route->match(array('controller' => 'posts', 'action' => 'index'));
@@ -327,8 +335,9 @@ class RouteTest extends \lithium\test\Unit {
 			'match' => array('controller' => 'users', 'action' => 'index'),
 			'defaults' => array('controller' => 'users'),
 			'keys' => array('user' => 'user'),
-			'options' => array('compile' => false, 'wrap' => false)
+			'compile' => false
 		));
+
 		$result = $route->match(array('controller' => 'users', 'user' => 'alke'));
 		$expected = '/users/alke';
 		$this->assertEqual($expected, $result);
@@ -338,11 +347,11 @@ class RouteTest extends \lithium\test\Unit {
 		$expected = array('controller' => 'users', 'action' => 'index', 'user' => 'alke');
 
 		$result = $route->parse($request);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected + array('persist' => array('controller')), $result);
 
 		$request->url = '/u/alke';
 		$result = $route->parse($request);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected + array('persist' => array('controller')), $result);
 	}
 
 	/**
@@ -358,7 +367,7 @@ class RouteTest extends \lithium\test\Unit {
 		$expected = array('controller' => 'users', 'action' => 'view', 'user' => '10');
 
 		$result = $route->parse($request);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected + array('persist' => array('controller')), $result);
 
 		$request->url = '/users/view/my_login';
 		$result = $route->parse($request);

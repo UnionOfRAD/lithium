@@ -55,8 +55,9 @@ class Route extends \lithium\core\Object {
 	 *
 	 * This string can contain fixed elements, i.e. `"/admin"`, capture elements,
 	 * i.e. `"/{:controller}"`, capture elements optionally paired with regular expressions or
-	 * named regular expression patterns, i.e. `"/{:id:\d+}"` or `"/{:id:ID}"`, wildcard captures
-	 * i.e. `"**"`, or any combination thereof, i.e. `"/admin/{:controller}/{:id:ID}/**"`.
+	 * named regular expression patterns, i.e. `"/{:id:\d+}"` or `"/{:id:ID}"`, the special wildcard
+	 * capture, i.e. `"{:args}"`, or any combination thereof, i.e.
+	 * `"/admin/{:controller}/{:id:\d+}/{:args}"`.
 	 *
 	 * @var string
 	 */
@@ -77,6 +78,15 @@ class Route extends \lithium\core\Object {
 
 	protected $_keys = array();
 
+	/**
+	 * An array of key/value pairs representing the parameters of the route. For keys which match
+	 * parameters present in the route template, the corresponding values match the default values
+	 * of those parameters. Specifying a default value for a template parameter makes that
+	 * parameter optional. Any other pairs specified must match exactly when doing a reverse lookup
+	 * in order for the route to match.
+	 *
+	 * @var array
+	 */
 	protected $_params = array();
 
 	protected $_match = array();
@@ -85,8 +95,18 @@ class Route extends \lithium\core\Object {
 
 	protected $_subPatterns = array();
 
+	/**
+	 * An array of parameter names which will persist by default when generating URLs. By default,
+	 * the `'controller'` parameter is set to persist, which means that the controller name matched
+	 * for a given request will be used to generate all URLs for that request, unless the
+	 * `'controller'` parameter is specified in that URL with another value.
+	 *
+	 * @var array
+	 */
+	protected $_persist = array();
+
 	protected $_autoConfig = array(
-		'template', 'pattern', 'keys', 'params', 'match', 'defaults', 'subPatterns'
+		'template', 'pattern', 'keys', 'params', 'match', 'defaults', 'subPatterns', 'persist'
 	);
 
 	public function __construct(array $config = array()) {
@@ -97,7 +117,8 @@ class Route extends \lithium\core\Object {
 			'match' => array(),
 			'defaults' => array(),
 			'keys' => array(),
-			'options' => array()
+			'compile' => true,
+			'persist' => array('controller')
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -106,7 +127,10 @@ class Route extends \lithium\core\Object {
 		parent::_init();
 		$this->_pattern = $this->_pattern ?: rtrim($this->_template, '/');
 		$this->_params += array('action' => 'index');
-		$this->compile($this->_config['options']);
+
+		if ($this->_config['compile']) {
+			$this->compile();
+		}
 	}
 
 	/**
@@ -123,7 +147,11 @@ class Route extends \lithium\core\Object {
 		if (preg_match($this->_pattern, $url, $match)) {
 			$match['args'] = isset($match['args']) ?  explode('/', $match['args']) : array();
 			$result = array_intersect_key($match, $this->_keys) + $this->_params + $this->_defaults;
-			$result['action'] = $result['action'] ?: 'index';
+
+			if (!$result['action']) {
+				unset($result['action']);
+			}
+			$result += array('action' => 'index', 'persist' => $this->_persist);
 			return $result;
 		}
 		return false;
@@ -139,6 +167,7 @@ class Route extends \lithium\core\Object {
 	 */
 	public function match(array $options = array(), $context = null) {
 		$defaults = array('action' => 'index');
+		$args = array('args' => 'args');
 		$options += $defaults;
 		$query = null;
 
@@ -148,14 +177,13 @@ class Route extends \lithium\core\Object {
 			unset($options['?']);
 		}
 
-		if (array_intersect_key($options, $this->_match) !== $this->_match) {
+		if (array_intersect_key($options, $this->_match) != $this->_match) {
 			return false;
 		}
 		if (array_diff_key(array_diff_key($options, $this->_match), $this->_keys) !== array()) {
 			return false;
 		}
 		$options += $this->_defaults;
-		$args = array('args' => 'args');
 
 		if (array_intersect_key($this->_keys, $options) + $args !== $this->_keys + $args) {
 			return false;
@@ -228,18 +256,10 @@ class Route extends \lithium\core\Object {
 	 * @param array $options
 	 * @return void
 	 */
-	public function compile(array $options = array()) {
-		$defaults = array('wrap' => true, 'compile' => true);
-		$options += $defaults;
-
-		if (!$options['compile']) {
-			$this->_pattern = $options['wrap'] ? '@^' . $this->_pattern . '$@' : $this->_pattern;
-			return;
-		}
-
+	public function compile() {
 		$this->_match = $this->_params;
 		$this->_pattern = $this->_template;
-		$this->_pattern = $options['wrap'] ? '@^' . $this->_pattern . '$@' : $this->_pattern;
+		$this->_pattern = "@^{$this->_pattern}\$@";
 
 		if ($this->_template === '/' || $this->_template === '') {
 			return;

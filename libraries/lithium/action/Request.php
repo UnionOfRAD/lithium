@@ -41,6 +41,13 @@ class Request extends \lithium\core\Object {
 	public $params = array();
 
 	/**
+	 * Route parameters that should persist when generating URLs in this request context.
+	 *
+	 * @var array
+	 */
+	public $persist = array();
+
+	/**
 	 * POST data
 	 *
 	 * @var data

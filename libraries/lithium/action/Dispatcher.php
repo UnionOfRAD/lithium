@@ -109,13 +109,12 @@ class Dispatcher extends \lithium\core\StaticObject {
 			$request = $params['request'];
 			$options = $params['options'];
 
-			$request->params = $router::parse($request);
+			$request = $router::process($request);
 			$params = $self::invokeMethod('_applyRules', array($request->params));
 
 			if (!$params) {
 				throw new Exception('Could not route request');
 			}
-
 			$callable = $self::invokeMethod('_callable', array($request, $params, $options));
 			return $self::invokeMethod('_call', array($callable, $request, $params));
 		});

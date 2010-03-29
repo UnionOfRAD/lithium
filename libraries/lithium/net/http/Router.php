@@ -57,9 +57,28 @@ class Router extends \lithium\core\StaticObject {
 		if (!is_object($template)) {
 			$params + array('action' => 'index');
 			$class = static::$_classes['route'];
-			$template = new $class(compact('template', 'params', 'options'));
+			$template = new $class(compact('template', 'params') + $options);
 		}
 		return (static::$_configurations[] = $template);
+	}
+
+	/**
+	 * Wrapper method which takes a `Request` object, parses it through all attached `Route`
+	 * objects, and assigns the resulting parameters to the `Request` object, and returning it.
+	 *
+	 * @param object $request A request object, usually an instance of `lithium\action\Request`.
+	 * @return object Returns a copy of the `Request` object with parameters applied.
+	 */
+	public static function process($request) {
+		if (!$params = static::parse($request)) {
+			return $request;
+		}
+		$persist = (is_array($params) && isset($params['persist'])) ? $params['persist'] : array();
+		unset($params['persist']);
+
+		$request->params = $params;
+		$request->persist = $persist;
+		return $request;
 	}
 
 	/**
@@ -91,25 +110,17 @@ class Router extends \lithium\core\StaticObject {
 	 */
 	public static function match($options = array(), $context = null) {
 		if (is_string($options)) {
-			$path = $options;
-
-			if (strpos($path, '#') === 0 || strpos($path, 'mailto') === 0 || strpos($path, '://')) {
-				return $path;
+			if (is_string($options = static::_matchString($options, $context))) {
+				return $options;
 			}
-
-			if (!preg_match('/^[A-Za-z0-9_]+::[A-Za-z0-9_]+$/', $path)) {
-				$base = $context ? $context->env('base') : '';
-				$path = trim($path, '/');
-				return "{$base}/{$path}";
-			}
-			list($controller, $action) = explode('::', $path, 2);
-			$controller = Inflector::underscore($controller);
-			$options = compact('controller', 'action');
 		}
-		$defaults = array_filter(array(
-			'action' => ($context && $context->action) ? $context->action : 'index',
-			'controller' => ($context && $context->action) ? $context->controller : null
-		));
+		$defaults = array('action' => 'index');
+
+		if ($context && isset($context->persist)) {
+			foreach ($context->persist as $key) {
+				$defaults[$key] = $context->params[$key];
+			}
+		}
 		$options += $defaults;
 		$base = isset($context) ? $context->env('base') : '';
 
@@ -134,6 +145,20 @@ class Router extends \lithium\core\StaticObject {
 	 */
 	public static function reset() {
 		static::$_configurations = array();
+	}
+
+	protected static function _matchString($path, $context) {
+		if (strpos($path, '#') === 0 || strpos($path, 'mailto') === 0 || strpos($path, '://')) {
+			return $path;
+		}
+		if (!preg_match('/^[A-Za-z0-9_]+::[A-Za-z0-9_]+$/', $path)) {
+			$base = $context ? $context->env('base') : '';
+			$path = trim($path, '/');
+			return "{$base}/{$path}";
+		}
+		list($controller, $action) = explode('::', $path, 2);
+		$controller = Inflector::underscore($controller);
+		return compact('controller', 'action');
 	}
 }
 

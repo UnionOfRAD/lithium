@@ -46,7 +46,11 @@ class FormTest extends \lithium\test\Unit {
 		Router::connect('/{:controller}/{:action}/{:id}.{:type}', array('id' => null));
 		Router::connect('/{:controller}/{:action}/{:args}');
 
-		$this->context = new MockFormRenderer();
+		$request = new Request();
+		$request->params = array('controller' => 'posts', 'action' => 'index');
+		$request->persist = array('controller');
+
+		$this->context = new MockFormRenderer(compact('request'));
 		$this->form = new Form(array('context' => $this->context));
 
 		$base = trim($this->context->request()->env('base'), '/') . '/';
@@ -64,27 +68,31 @@ class FormTest extends \lithium\test\Unit {
 	public function testFormCreation() {
 		$result = $this->form->create();
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts/add", 'method' => 'POST')
+			'form' => array('action' => "{$this->base}posts", 'method' => 'POST')
 		));
 
 		$result = $this->form->create(null, array('method' => 'get'));
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts/add", 'method' => 'GET')
+			'form' => array('action' => "{$this->base}posts", 'method' => 'GET')
 		));
 
 		$result = $this->form->create(null, array('type' => 'file'));
 		$this->assertTags($result, array('form' => array(
-			'action' => "{$this->base}posts/add",
+			'action' => "{$this->base}posts",
 			'enctype' => 'multipart/form-data',
 			'method' => 'POST',
 		)));
 
 		$result = $this->form->create(null, array('method' => 'GET', 'type' => 'file'));
 		$this->assertTags($result, array('form' => array(
-			'action' => "{$this->base}posts/add",
+			'action' => "{$this->base}posts",
 			'method' => 'POST',
 			'enctype' => 'multipart/form-data'
 		)));
+	}
+
+	public function methods() {
+		return array('testRestFormCreation');
 	}
 
 	/**
@@ -94,6 +102,7 @@ class FormTest extends \lithium\test\Unit {
 	 */
 	public function testRestFormCreation() {
 		$result = $this->form->create(null, array('action' => 'delete', 'method' => 'delete'));
+
 		$this->assertTags($result, array(
 			'form' => array(
 				'action' => "{$this->base}posts/delete", 'method' => 'DELETE'
@@ -108,7 +117,7 @@ class FormTest extends \lithium\test\Unit {
 		$result = $this->form->create(null, array('method' => 'put', 'type' => 'file'));
 		$this->assertTags($result, array(
 			'form' => array(
-				'action' => "{$this->base}posts/add",
+				'action' => "{$this->base}posts",
 				'method' => 'PUT',
 				'enctype' => 'multipart/form-data'
 			),
