@@ -34,10 +34,19 @@ class Create extends \lithium\console\Command {
 	public $library = 'app';
 
 	/**
-	 * The template to use to generate the file.
+	 * The name of the template to use to generate the file. This allows you to add a custom
+	 * template to be used in place of the core template for each command. Place templates in
+	 * `<library>\extensions\command\create\template`.
 	 *
 	 */
 	public $template = null;
+
+	/**
+	 * The variable parameters of the template.
+	 *
+	 * @var array
+	 */
+	protected $_params = array();
 
 	/**
 	 * Class Constrcutor.
@@ -47,6 +56,11 @@ class Create extends \lithium\console\Command {
 	public function __construct($config = array()) {
 		$this->template = strtolower(join('', array_slice(explode("\\", get_class($this)), -1)));
 		parent::__construct($config);
+	}
+
+	public function _init() {
+		parent::_init();
+		$this->_params = $this->_parse($this->template);
 	}
 
 	/**
@@ -82,6 +96,40 @@ class Create extends \lithium\console\Command {
 	}
 
 	/**
+	 * Parse a template to find available variables specified in `{:name}` format. Each variable
+	 * corresponds to a method in the sub command. For example, a `{:namespace}` variable will
+	 * call the namespace method in the model command when `li3 create model Post` is called.
+	 *
+	 * @param string $template
+	 * @return array
+	 */
+	protected function _parse($template) {
+		$contents = $this->_tempalte($template);
+		preg_match_all('/(?:\{:(?P<params>[^}]+)\})/', $contents, $keys);
+
+		if (!empty($keys['params'])) {
+			return array_unique($keys['params']);
+		}
+		return array();
+	}
+
+	/**
+	 * Returns the contents of the template.
+	 *
+	 * @param string $name
+	 * @return string
+	 */
+	protected function _template($name) {
+		$file = Libraries::locate('command.create.template', $template, array(
+			'filter' => false, 'type' => 'file', 'suffix' => '.txt.php',
+		));
+		if (!$file || is_array($file)) {
+			return false;
+		}
+		return file_get_contents($file);
+	}
+
+	/**
 	 * Get the namespace.
 	 *
 	 * @param string $name
@@ -107,14 +155,7 @@ class Create extends \lithium\console\Command {
 	 * @return boolean
 	 */
 	protected function _save($template, $params = array()) {
-		$file = Libraries::locate('command.create.template', $template, array(
-			'filter' => false, 'type' => 'file', 'suffix' => '.txt.php',
-		));
-		if (!$file || is_array($file)) {
-			return false;
-		}
-
-		$contents = file_get_contents($file);
+		$contents = $this->_tempalte($template);
 		$result = String::insert($contents, $params);
 		$library = Libraries::get($this->library);
 
