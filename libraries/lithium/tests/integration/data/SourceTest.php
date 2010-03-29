@@ -98,6 +98,29 @@ class SourceTest extends \lithium\test\Unit {
 		$existing->delete();
 	}
 
+	public function testFindFirstWithFieldsOption()
+	{
+		$key = Company::meta('key');
+		$new = Company::create(array($key => 12345, 'name' => 'Acme, Inc.'));
+		$result = $new->data();
+
+		$expected = array($key => 12345, 'name' => 'Acme, Inc.');
+		$this->assertEqual($expected['name'], $result['name']);
+		$this->assertEqual($expected[$key], $result[$key]);
+		$this->assertTrue($new->save());
+
+		$result = Company::find('first',
+			array(
+				'fields' => array('name')
+			)
+		);
+		$this->assertFalse(is_null($result));
+
+		$this->skipIf(is_null($result), 'No result returned to test');
+		$result = $result->data();
+		$this->assertEqual($expected['name'], $result['name']);
+	}
+
 	public function testReadWriteMultiple() {
 		$companies = array();
 		$key = Company::meta('key');
