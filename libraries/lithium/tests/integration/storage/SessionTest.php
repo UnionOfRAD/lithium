@@ -46,7 +46,6 @@ class SessionTest extends \lithium\test\Unit {
 		$path = preg_quote($expected['path'], '/');
 		$pattern  = "/^Set\-Cookie:\s{$expected['name']}\[$key\]=$value;";
 		$pattern .= "\sexpires={$expected['expires']};\spath=$path/";
-		$pattern .=
 		$match = false;
 
 		foreach ($headers as $header) {
