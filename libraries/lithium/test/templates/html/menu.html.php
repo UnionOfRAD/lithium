@@ -37,7 +37,7 @@
 
 	<?php while ($depth < count($path)): ?>
 		<li>
-			<a class="menu-folder" title="run '<?php echo $path[$depth]; ?>' tests" href="<?php echo $base ?>/test/<?php echo join(array_slice($path, 0, $depth+1), "\\") ?>">
+			<a class="menu-folder" title="run '<?php echo $path[$depth]; ?>' tests" href="<?php echo $base ?>/test/<?php echo join(array_slice($path, 0, $depth+1), "/") ?>">
 				<?php echo $path[$depth] ?>
 			</a>
 			<ul>
