@@ -91,10 +91,6 @@ class FormTest extends \lithium\test\Unit {
 		)));
 	}
 
-	public function methods() {
-		return array('testRestFormCreation');
-	}
-
 	/**
 	 * Tests creating forms with non-browser compatible HTTP methods, required for REST interfaces.
 	 *
@@ -148,7 +144,7 @@ class FormTest extends \lithium\test\Unit {
 		));
 		$result = $this->form->create($record);
 		$this->assertTags($result, array('form' => array(
-			'action' => "{$this->base}posts/add",
+			'action' => "{$this->base}posts",
 			'method' => 'POST',
 		)));
 	}
@@ -166,7 +162,7 @@ class FormTest extends \lithium\test\Unit {
 
 		$result = $this->form->create($record);
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts/add", 'method' => 'POST')
+			'form' => array('action' => "{$this->base}posts", 'method' => 'POST')
 		));
 
 		$result = $this->form->text('title');
@@ -481,6 +477,7 @@ class FormTest extends \lithium\test\Unit {
 	public function testFormCreateWithMoreParamsButSpecifiedAction() {
 		$request = new Request();
 		$request->params = array('controller' => 'mock', 'action' => 'test', 'args' => array('1'));
+		$request->persist = array('controller');
 		$context = new MockFormRenderer(compact('request'));
 		$form = new Form(compact('context'));
 
