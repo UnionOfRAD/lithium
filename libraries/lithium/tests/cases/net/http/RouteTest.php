@@ -415,6 +415,20 @@ class RouteTest extends \lithium\test\Unit {
 
 		$this->assertFalse($route->match(array('controller' => 'posts', 'id' => '009')));
 	}
+
+	/**
+	 * Tests that route templates with elements containing repetition patterns are correctly parsed.
+	 *
+	 * @return void
+	 */
+	public function testPatternsWithRepetition() {
+		$route = new Route(array('template' => '/{:id:[0-9a-f]{24}}.{:type}'));
+		$data = $route->export();
+		$this->assertEqual('@^(?:/(?P<id>[0-9a-f]{24}))\.(?P<type>[^\/]+)$@', $data['pattern']);
+
+		$this->assertEqual(array('id' => 'id', 'type' => 'type'), $data['keys']);
+		$this->assertEqual(array('id' => '[0-9a-f]{24}'), $data['subPatterns']);
+	}
 }
 
 ?>

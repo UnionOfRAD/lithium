@@ -264,11 +264,10 @@ class Route extends \lithium\core\Object {
 		if ($this->_template === '/' || $this->_template === '') {
 			return;
 		}
-		preg_match_all('/(?:\{:(?P<params>[^}]+)\})/', $this->_pattern, $keys);
-
-		if (empty($keys['params'])) {
+		if (!$keys = $this->_compilePatterns($this->_pattern)) {
 			return;
 		}
+
 		$shortKeys = array();
 		$this->_pattern = str_replace('.{', '\.{', $this->_pattern);
 
@@ -278,7 +277,7 @@ class Route extends \lithium\core\Object {
 			$this->_keys['args'] = 'args';
 		}
 
-		foreach ($keys['params'] as $i => $param) {
+		foreach ($keys as $i => $param) {
 			$paramName = $param;
 
 			if (strpos($param, ':')) {
@@ -294,12 +293,32 @@ class Route extends \lithium\core\Object {
 			$this->_pattern = str_replace("/{:{$param}}", "(?:/{$regex}){$req}", $this->_pattern);
 			$this->_pattern = str_replace("{:{$param}}", $regex, $this->_pattern);
 		}
-		$shortKeys += $keys['params'];
+		$shortKeys += $keys;
 		ksort($shortKeys);
 
 		$this->_keys = array_combine($shortKeys, $shortKeys);
 		$this->_defaults = array_intersect_key($this->_params, $this->_keys);
 		$this->_match = array_diff_key($this->_params, $this->_defaults);
+	}
+
+	/**
+	 * Parses route template macros down to regular expression named capture groups.
+	 *
+	 * @param string $pattern The URL pattern to parse.
+	 * @return array Returns an array of regular expression capture patterns.
+	 */
+	protected function _compilePatterns($pattern) {
+		$repl = array();
+		$replace = function($value) use (&$repl) {
+			$key = ':::' . count($repl) . ':::';
+			$repl[$key] = $value[0];
+			return $key;
+		};
+		$pattern = preg_replace_callback('/\{[0-9,]+\}/', $replace, $pattern);
+
+		preg_match_all('/(?:\{:(?P<params>[^}]+)\})/', $pattern, $keys);
+		$keys = str_replace(array_keys($repl), array_values($repl), join("\n", $keys['params']));
+		return $keys ? explode("\n", $keys) : array();
 	}
 }
 
