@@ -162,7 +162,9 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @return mixed Result of application of strategies to data. If no strategies
 	 *         have been configured, this method will simply return the original data.
 	 */
-	public static function applyStrategies($method, $name, $data, $options = array('mode' => null)){
+	public static function applyStrategies($method, $name, $data, array $options = array()){
+		$options += array('mode' => null);
+
 		if (!$strategies = static::strategies($name)) {
 			return $data;
 		}

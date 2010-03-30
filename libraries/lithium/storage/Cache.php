@@ -89,17 +89,19 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param mixed $key Key to uniquely identify the cache entry
 	 * @param mixed $data Data to be cached
 	 * @param string $expiry A strtotime() compatible cache time
-	 * @param mixed $conditions Conditions for the write operation to proceed
+	 * @param mixed $options Options for the method, filters and strategies.
 	 * @return boolean True on successful cache write, false otherwise
 	 * @filter This method may be filtered.
 	 */
-	public static function write($name, $key, $data, $expiry = null, $conditions = null) {
+	public static function write($name, $key, $data, $expiry = null, array $options = array()) {
+		$options += array('conditions' => null, 'strategies' => true);
 		$settings = static::config();
 
 		if (!isset($settings[$name])) {
 			return false;
 		}
 
+		$conditions = $options['conditions'];
 		if (is_callable($conditions) && !$conditions()) {
 			return false;
 		}
@@ -110,7 +112,7 @@ class Cache extends \lithium\core\Adaptable {
 			$data = null;
 		}
 
-		if (!isset($options['strategies']) || $strategies) {
+		if ($options['strategies']) {
 			$options = array('key' => $key, 'class' => __CLASS__);
 			$data = static::applyStrategies(__FUNCTION__, $name, $data, $options);
 		}
@@ -126,17 +128,19 @@ class Cache extends \lithium\core\Adaptable {
 	 *
 	 * @param string $name Configuration to be used for reading
 	 * @param mixed $key Key to be retrieved
-	 * @param mixed $conditions Conditions for the read operation to proceed
+	 * @param mixed $options Options for the method and strategies.
 	 * @return mixed Read results on successful cache read, null otherwise
 	 * @filter This method may be filtered.
 	 */
-	public static function read($name, $key, $conditions = null) {
+	public static function read($name, $key, array $options = array()) {
+		$options += array('conditions' => null, 'strategies' => true);
 		$settings = static::config();
 
 		if (!isset($settings[$name])) {
 			return false;
 		}
 
+		$conditions = $options['conditions'];
 		if (is_callable($conditions) && !$conditions()) {
 			return false;
 		}
@@ -144,12 +148,10 @@ class Cache extends \lithium\core\Adaptable {
 		$method = static::adapter($name)->read($key);
 		$params = compact('key');
 		$filters = $settings[$name]['filters'];
-
 		$result = static::_filter(__FUNCTION__, $params, $method, $filters);
-		$options = array('key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__);
-		$strategies = (isset($options['strategies']) && $options['strategies'] === true);
 
-		if (!isset($options['strategies']) || $strategies) {
+		if ($options['strategies']) {
+			$options = array('key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__);
 			return static::applyStrategies(__FUNCTION__, $name, $result, $options);
 		}
 		return $result;
@@ -160,17 +162,19 @@ class Cache extends \lithium\core\Adaptable {
 	 *
 	 * @param string $name The cache configuration to delete from
 	 * @param mixed $key Key to be deleted
-	 * @param mixed $conditions Conditions for the delete operation to proceed
+	 * @param mixed $options Options for the method and strategies.
 	 * @return boolean True on successful deletion, false otherwise
 	 * @filter This method may be filtered.
 	 */
-	public static function delete($name, $key, $conditions = null) {
+	public static function delete($name, $key, array $options = array()) {
+		$options += array('conditions' => null, 'strategies' => true);
 		$settings = static::config();
 
 		if (!isset($settings[$name])) {
 			return false;
 		}
 
+		$conditions = $options['conditions'];
 		if (is_callable($conditions) && !$conditions()) {
 			return false;
 		}
@@ -178,9 +182,8 @@ class Cache extends \lithium\core\Adaptable {
 		$key = static::key($key);
 		$method = static::adapter($name)->delete($key);
 		$filters = $settings[$name]['filters'];
-		$options = array('key' => $key, 'class' => __CLASS__);
 
-		if (!isset($options['strategies']) || $strategies) {
+		if ($options['strategies']) {
 			$options += array('key' => $key, 'class' => __CLASS__);
 			$key = static::applyStrategies(__FUNCTION__, $name, $key, $options);
 		}
@@ -195,16 +198,18 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param string $name
 	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @param mixed $conditions
+	 * @param mixed $options Options for this method.
 	 * @return integer|boolean Item's new value on successful increment, false otherwise
 	 * @filter This method may be filtered.
 	 */
-	public static function increment($name, $key, $offset = 1, $conditions = null) {
+	public static function increment($name, $key, $offset = 1, array $options = array()) {
+		$options += array('conditions' => null);
 		$settings = static::config();
 
 		if (!isset($settings[$name])) {
 			return false;
 		}
+		$conditions = $options['conditions'];
 
 		if (is_callable($conditions) && !$conditions()) {
 			return false;
@@ -225,16 +230,18 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param string $name
 	 * @param string $key Key of numeric cache item to dercrement
 	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @param mixed $conditions
+	 * @param mixed $options Options for this method.
 	 * @return integer|boolean Item's new value on successful decrement, false otherwise
 	 * @filter This method may be filtered.
 	 */
-	public static function decrement($name, $key, $offset = 1, $conditions = null) {
+	public static function decrement($name, $key, $offset = 1, array $options = array()) {
+		$options += array('conditions' => null);
 		$settings = static::config();
 
 		if (!isset($settings[$name])) {
 			return false;
 		}
+		$conditions = $options['conditions'];
 
 		if (is_callable($conditions) && !$conditions()) {
 			return false;

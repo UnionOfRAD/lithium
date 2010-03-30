@@ -81,6 +81,7 @@ class Session extends \lithium\core\Adaptable {
 	 * comparing the session start time to the expiration time set in the configuration, and any
 	 * security settings.
 	 *
+	 * @todo Implement
 	 * @param string $name Named session configuration.
 	 * @return boolean Returns true if the current session is active and valid.
 	 */
@@ -97,7 +98,7 @@ class Session extends \lithium\core\Adaptable {
 	 * @filter This method may be filtered.
 	 */
 	public static function read($key = null, array $options = array()) {
-		$defaults = array('name' => null);
+		$defaults = array('name' => null, 'strategies' => true);
 		$options += $defaults;
 		$method = ($name = $options['name']) ? static::adapter($name)->read($key, $options) : null;
 		$settings = static::_config($name);
@@ -114,10 +115,9 @@ class Session extends \lithium\core\Adaptable {
 		}
 		$filters = $settings['filters'];
 		$result = static::_filter(__FUNCTION__, compact('key', 'options'), $method, $filters);
-		$options += array('key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__);
 
-		$strategies = (isset($options['strategies']) && $options['strategies'] === true);
-		if (!isset($options['strategies']) || $strategies) {
+		if ($options['strategies']) {
+			$options += array('key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__);
 			return static::applyStrategies(__FUNCTION__, $name, $result, $options);
 		}
 		return $result;
@@ -133,7 +133,7 @@ class Session extends \lithium\core\Adaptable {
 	 * @filter This method may be filtered.
 	 */
 	public static function write($key, $value = null, array $options = array()) {
-		$defaults = array('name' => null);
+		$defaults = array('name' => null, 'strategies' => true);
 		$options += $defaults;
 
 		if (is_resource($value) || !static::$_configurations) {
@@ -152,9 +152,8 @@ class Session extends \lithium\core\Adaptable {
 		}
 		$result = false;
 		$settings = static::_config($name);
-		$strategies = (isset($options['strategies']) && $options['strategies'] === true);
 
-		if (!isset($options['strategies']) || $strategies) {
+		if ($options['strategies']) {
 			$options += array('key' => $key, 'class' => __CLASS__);
 			$value = static::applyStrategies(__FUNCTION__, $name, $value, $options);
 		}
@@ -177,7 +176,7 @@ class Session extends \lithium\core\Adaptable {
 	 * @filter This method may be filtered.
 	 */
 	public static function delete($key, array $options = array()) {
-		$defaults = array('name' => null);
+		$defaults = array('name' => null, 'strategies' => true);
 		$options += $defaults;
 
 		$methods = array();
@@ -192,10 +191,9 @@ class Session extends \lithium\core\Adaptable {
 			}
 		}
 		$result = false;
-		$strategies = (isset($options['strategies']) && $options['strategies'] === true);
 		$options += array('key' => $key, 'class' => __CLASS__);
 
-		if (!isset($options['strategies']) || $strategies) {
+		if ($options['strategies']) {
 			$options += array('key' => $key, 'class' => __CLASS__);
 			$key = static::applyStrategies(__FUNCTION__, $name, $key, $options);
 		}
@@ -218,7 +216,7 @@ class Session extends \lithium\core\Adaptable {
 	 * @filter This method may be filtered.
 	 */
 	public static function check($key, array $options = array()) {
-		$defaults = array('name' => null);
+		$defaults = array('name' => null, 'strategies' => true);
 		$options += $defaults;
 		$methods = array();
 
@@ -238,6 +236,10 @@ class Session extends \lithium\core\Adaptable {
 			$settings = static::_config($name);
 			$filters = $settings['filters'];
 			$result = $result || static::_filter(__FUNCTION__, $params, $method, $filters);
+		}
+		if ($options['strategies']) {
+			$options += array('key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__);
+			return static::applyStrategies(__FUNCTION__, $name, $result, $options);
 		}
 		return $result;
 	}

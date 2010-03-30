@@ -200,18 +200,26 @@ class CacheTest extends \lithium\test\Unit {
 		$expected = $config;
 		$this->assertEqual($expected, $result);
 
-		$result = Cache::write('default', 'some_key', 'some_data', '+1 minute', function() {
+		$conditions = function() {
 			return false;
-		});
+		};
+		$result = Cache::write(
+			'default', 'some_key', 'some_data', '+1 minute', compact('conditions')
+		);
 		$this->assertFalse($result);
 
-		$anonymous = function() use (&$config) {
+		$conditions = function() use (&$config) {
 			return (isset($config['default']));
 		};
-		$result = Cache::write('default', 'some_key', 'some_data', '+1 minute', $anonymous);
+
+		$result = Cache::write(
+			'default', 'some_key', 'some_data', '+1 minute', compact('conditions')
+		);
 		$this->assertTrue($result);
 
-		$result = Cache::write('non_existing', 'key_value', 'data', '+1 minute', $anonymous);
+		$result = Cache::write(
+			'non_existing', 'key_value', 'data', '+1 minute', compact('conditions')
+		);
 		$this->assertFalse($result);
 
 	}
@@ -261,21 +269,22 @@ class CacheTest extends \lithium\test\Unit {
 		$expected = $config;
 		$this->assertEqual($expected, $result);
 
-		$anonymous = function() use (&$config) {
+		$conditions = function() use (&$config) {
 			return (isset($config['default']));
 		};
-		$result = Cache::read('non_existing', 'key_value', $anonymous);
+		$result = Cache::read('non_existing', 'key_value', compact('conditions'));
 		$this->assertFalse($result);
 
-		$result = Cache::read('default', 'key_value', $anonymous);
+		$result = Cache::read('default', 'key_value', compact('conditions'));
 		$this->assertFalse($result);
 
-		$result = Cache::write('default', 'keyed', 'some data', '+1 minute', $anonymous);
+		$result = Cache::write('default', 'keyed', 'some data', '+1 minute', compact('conditions'));
 		$this->assertTrue($result);
 
-		$result = Cache::write('default', 'keyed', 'some data', '+1 minute', function() {
+		$conditions = function() {
 			return false;
-		});
+		};
+		$result = Cache::write('default', 'keyed', 'some data', '+1 minute', compact('conditions'));
 		$this->assertFalse($result);
 	}
 
@@ -308,19 +317,23 @@ class CacheTest extends \lithium\test\Unit {
 		$expected = $config;
 		$this->assertEqual($expected, $result);
 
-		$anonymous = function() use (&$config) {
+		$conditions = function() use (&$config) {
 			return (isset($config['default']));
 		};
-		$result = Cache::delete('non_existing', 'key_value', $anonymous);
+		$result = Cache::delete('non_existing', 'key_value', compact('conditions'));
 		$this->assertFalse($result);
 
 		$result = Cache::write('default', 'to delete', 'dead data', '+1 minute');
 		$this->assertTrue($result);
 
-		$result = Cache::delete('default', 'to delete', function() { return false; });
+		$result = Cache::delete('default', 'to delete', array(
+			'conditions' => function() {
+				return false;
+			}
+		));
 		$this->assertFalse($result);
 
-		$result = Cache::delete('default', 'to delete', $anonymous);
+		$result = Cache::delete('default', 'to delete', compact('conditions'));
 		$this->assertTrue($result);
 	}
 
