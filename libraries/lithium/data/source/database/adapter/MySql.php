@@ -161,10 +161,7 @@ class MySql extends \lithium\data\source\Database {
 			$fields = array();
 
 			foreach ($columns as $column) {
-				preg_match('/(?P<type>\w+)(\((?P<length>\d+)\))?/', $column['Type'], $match);
-				$filtered = array_intersect_key($match, array('type' => null, 'length' => null));
-				$match = $filtered + array('length' => null);
-				$match = $self->invokeMethod('_column', array($match['type'])) + $match;
+				$match = $self->invokeMethod('_column', array($column['Type']));
 
 				$fields[$column['Field']] = $match + array(
 					'null'     => ($column['Null'] == 'YES' ? true : false),
@@ -329,14 +326,14 @@ class MySql extends \lithium\data\source\Database {
 	 * Converts database-layer column types to basic types.
 	 *
 	 * @param string $real Real database-layer column type (i.e. `"varchar(255)"`)
-	 * @return string Abstract column type (i.e. "string")
+	 * @return array Column type (i.e. "string") plus 'length' when appropriate.
 	 */
 	protected function _column($real) {
 		if (is_array($real)) {
 			return $real['type'] . (isset($real['length']) ? "({$real['length']})" : '');
 		}
 
-		if (!preg_match('/(?P<type>[^(]+)(?:\((?P<length>[^)]+)\))?/', $real, $column)) {
+		if (!preg_match('/(?P<type>\w+)(?:\((?P<length>\d+)\))?/', $real, $column)) {
 			return $real;
 		}
 		$column = array_intersect_key($column, array('type' => null, 'length' => null));
