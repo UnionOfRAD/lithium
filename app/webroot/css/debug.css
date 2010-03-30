@@ -112,26 +112,25 @@ body.test-dashboard a.test-button:active {
 }
 
 body.test-dashboard ul {
-	margin: .25em 0 0 0;
+	margin: .25em 0;
 	padding: 0.2em 0 0 0;
 }
 
-body.test-dashboard li {
+body.test-dashboard ul ul li {
 	display: block;
-	margin: 0 0 1px 0;
+	margin: 0 0 1px .5em;
 	padding: 0.25em 0 0 0.75em;
-	background: rgba(0,0,0,.03);
-	border: 1px solid rgba(0,0,0,0.02);
+	border: 1px solid rgba(0,0,0,0.05);
 	border-width: 0 0 1px 1px;
 }
 
 body.test-dashboard .test-menu {
 	float: left;
-	padding: 0;
+	padding: 0 0 0 1em;
 	width: 20%;
-	background: white;
+	background: #f6f6f6;
 	font-size: .85em;
-	border-right: 1px solid rgba(0,0,0,0.02);
+	border-right: 1px solid rgba(0,0,0,0.05);
 }
 
 .test-dashboard .test-menu > ul {
@@ -142,7 +141,6 @@ body.test-dashboard .test-menu {
 	margin-top: .1em;
 }
 .test-dashboard .test-menu li:hover {
-	background: rgba(0,0,0,0.01);
 }
 .test-dashboard .test-menu li > ul {
 	display: block;
@@ -159,20 +157,17 @@ ul.menu a {
 	display: block;
 }
 
-ul.menu a:hover {
-
-}
-
-ul.menu a:hover, ul.menu a:active {
+ul.menu a:hover, ul.menu a:active, ul.menu a.menu-folder:hover {
 	color: black;
 }
 
-a.menu-folder {
-	color: #333 !important;
+ul.menu a.menu-folder {
+	color: #333;
 	font-weight: bold;
 	text-decoration: none;
 	font-size: 1.2em;
 }
+
 
 a.test-all {
 	display: block;
@@ -183,22 +178,19 @@ a.test-all {
 	padding: .25em 0;
 	margin: .5em 4%;
 	width: 12%;
-	color: rgba(255,255,255,.25) !important;
-	background: #454545;
+	color: rgba(255,255,255,.65) !important;
+	background: #ccc;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
-	-moz-box-shadow: 0 0 6px rgba(0,0,0,.25);
-	-webkit-box-shadow: 0 0 6px rgba(0,0,0,.25);
-	box-shadow: 0 0 6px rgba(0,0,0,.25);
+	-moz-box-shadow: inset 0 0 6px rgba(0,0,0,.25);
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.25);
+	box-shadow: inset 0 0 6px rgba(0,0,0,.25);
 	border: 1px solid rgba(0,0,0,.05);
 }
 a.test-all:hover {
 	background: #60AF12;
 	color: white !important;
-	-moz-box-shadow: inset 0 0 6px rgba(0,0,0,.25);
-	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.25);
-	box-shadow: inset 0 0 6px rgba(0,0,0,.25);
 }
 
 ul.menu a {
@@ -212,7 +204,7 @@ ul.menu a:before, a.menu-folder:before {
 	padding: 0 0.5em 0 0;
 	content: '\25B4';
 	font-weight: normal;
-	color: rgba(0,0,0,.15)
+	color: rgba(0,0,0,.1);
 }
 a.menu-folder:before {
 	padding: 0 !important;
