@@ -84,6 +84,20 @@ class RecordTest extends \lithium\test\Unit {
 		$result = $record->errors('not_a_field');
 		$this->assertNull($result);
 	}
+
+	/**
+	 * Test the ability to set multiple field's values, and that they can be read back.
+	 */
+	public function testSetData() {
+		$record = new Record;
+		$this->assertTrue(empty($record->_data));
+		$expected = array('id' => 1, 'name' => 'Joe Bloggs', 'address' => 'The Park');
+		$record->set($expected);
+		$this->assertEqual($expected, $record->to('array'));
+
+		$this->assertEqual($expected['name'], $record->data('name'));
+		//var_dump($record->to('array'));
+	}
 }
 
 ?>
