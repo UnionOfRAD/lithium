@@ -13,6 +13,11 @@ use \lithium\core\Libraries;
 
 class View extends \lithium\core\Object {
 
+	/**
+	 * Output filters for view rendering.
+	 *
+	 * @var array List of filters.
+	 */
 	public $outputFilters = array();
 
 	/**
@@ -25,12 +30,38 @@ class View extends \lithium\core\Object {
 	 */
 	protected $_request = null;
 
+	/**
+	 * The object responsible for loading template files.
+	 *
+	 * @var object Loader object.
+	 */
 	protected $_loader = null;
 
+	/**
+	 * Object responsible for rendering output.
+	 *
+	 * @var objet Renderer object.
+	 */
 	protected $_renderer = null;
 
+	/**
+	 * Auto-configuration parameters.
+	 *
+	 * @var array Objects to auto-configure.
+	 */
 	protected $_autoConfig = array('request');
 
+	/**
+	 * Constructor.
+	 *
+	 * @param array $config Configuration parameters.
+	 *        Defaults are:
+	 *          - `loader`: File
+	 *          - `renderer`: File
+	 *          - `request`: none specified
+	 *          - `vars`: empty
+	 * @return void
+	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'request' => null,
@@ -42,6 +73,11 @@ class View extends \lithium\core\Object {
 		parent::__construct($config + $defaults);
 	}
 
+	/**
+	 * Perform initialization of the View.
+	 *
+	 * @return void
+	 */
 	protected function _init() {
 		parent::_init();
 		foreach (array('loader', 'renderer') as $key) {
@@ -60,32 +96,80 @@ class View extends \lithium\core\Object {
 		$this->outputFilters += compact('h') + $this->_config['outputFilters'];
 	}
 
-	public function render($type, $data = array(), array $options = array()) {
+	/**
+	 * Render the view.
+	 *
+	 * @param string|array $type
+	 * @param array $data
+	 * @param array $options
+	 * @return string The rendered view that was requested.
+	 */
+	public function render($type, array $data = array(), array $options = array()) {
 		$defaults = array('context' => array(), 'type' => 'html', 'layout' => null);
 		$options += $defaults;
+		$template = null;
 
 		if (is_array($type)) {
 			list($type, $template) = each($type);
 		}
+		return $this->{"_" . $type}($template, $data, $options);
+	}
 
-		switch ($type) {
-			case 'all':
-				$content = $this->render('template', $data, $options);
+	/**
+	 * The 'all' render type handler.
+	 *
+	 * @param string $template Not used in this handler. Can be specified as null.
+	 * @param array $data Template data.
+	 * @param array $options Layout rendering options.
+	 */
+	protected function _all($template, $data, $options) {
+		$content = $this->render('template', $data, $options);
 
-				if (!$options['layout']) {
-					return $content;
-				}
-				$options['context'] += compact('content');
-				return $this->render('layout', $data, $options);
-			case 'element':
-				$options = compact('template') + array('controller' => 'elements') + $options;
-				$type = 'template';
-			case 'template':
-			case 'layout':
-				$template = $this->_loader->template($type, $options);
-				$data = (array) $data + $this->outputFilters;
-				return $this->_renderer->render($template, $data, $options);
+		if (!$options['layout']) {
+			return $content;
 		}
+		$options['context'] += array('content' => $content);
+		return $this->_layout($template, $data, $options);
+	}
+
+	/**
+	 * The 'element' render type handler.
+	 *
+	 * @param string $template Template to be rendered.
+	 * @param array $data Template data.
+	 * @param array $options Renderer options.
+	 */
+	protected function _element($template, $data, $options) {
+		$options += array('controller' => 'elements', 'template' => $template);
+		$template = $this->_loader->template('template', $options);
+		$data = $data + $this->outputFilters;
+		return $this->_renderer->render($template, $data, $options);
+	}
+
+	/**
+	 * The 'template' render type handler.
+	 *
+	 * @param string $template Template to be rendered.
+	 * @param array $data Template data.
+	 * @param array $options Renderer options.
+	 */
+	protected function _template($template, $data, $options) {
+		$template = $this->_loader->template('template', $options);
+		$data = $data + $this->outputFilters;
+		return $this->_renderer->render($template, $data, $options);
+	}
+
+	/**
+	 * The 'layout' render type handler.
+	 *
+	 * @param string $template Not used in this handler.
+	 * @param array $data Template data.
+	 * @param array $options Renderer options.
+	 */
+	protected function _layout($template, $data, $options) {
+		$template = $this->_loader->template('layout', $options);
+		$data = (array) $data + $this->outputFilters;
+		return $this->_renderer->render($template, $data, $options);
 	}
 }
 
