@@ -238,6 +238,13 @@ class FormTest extends \lithium\test\Unit {
 		)));
 	}
 
+	public function testFormInputField() {
+		$result = $this->form->file('upload');
+		$this->assertTags($result, array('input' => array(
+			'type' => 'file', 'name' => 'upload'
+		)));
+	}
+
 	public function testLabelGeneration() {
 		$result = $this->form->label('next', 'Enter the next value >>');
 		$this->assertTags($result, array(

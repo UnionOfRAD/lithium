@@ -268,6 +268,7 @@ class Form extends \lithium\template\Helper {
 	 * @return string Returns an `<input />` tag of the type specified in `$type`.
 	 */
 	public function __call($type, array $params = array()) {
+		$params += array(null, array());
 		list($name, $options) = $params;
 		list($name, $options, $template) = $this->_defaults($type, $name, $options);
 		$template = $this->_context->strings($template) ? $template : 'element';
