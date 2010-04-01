@@ -62,9 +62,12 @@ class MongoDb extends \lithium\data\Source {
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'persistent' => true,
+			'login'      => null,
+			'password'   => null,
 			'host'       => 'localhost',
 			'database'   => 'lithium',
 			'port'       => '27017',
+			'timeout'    => 100
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -108,9 +111,15 @@ class MongoDb extends \lithium\data\Source {
 		$config = $this->_config;
 		$this->_isConnected = false;
 
+		$host = "{$config['host']}:{$config['port']}";
+		$login = $config['login'] ? "{$config['login']}:{$config['password']}@" : '';
+		$connection = "mongodb://{$login}{$host}" . ($login ? "/{$config['database']}" : '');
+
 		try {
-			$this->_connection = new Mongo("mongodb://{$config['host']}:{$config['port']}", array(
-				'persist' => $config['persistent']
+			$this->_connection = new Mongo($connection, array(
+				'connect' => true,
+				'persist' => $config['persistent'],
+				'timeout' => $config['timeout']
 			));
 			if ($this->_db = $this->_connection->{$config['database']}) {
 				$this->_isConnected = true;
