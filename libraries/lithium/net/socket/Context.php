@@ -15,7 +15,10 @@ class Context extends \lithium\net\Socket {
 
 	protected $_connection = null;
 
+	protected $_timeout = null;
+
 	public function open() {
+		$this->timeout($this->_config['timeout']);
 		return true;
 	}
 
@@ -39,7 +42,7 @@ class Context extends \lithium\net\Socket {
 	}
 
 	public function timeout($time = null) {
-		return true;
+		return $this->_timeout = $time;
 	}
 
 	public function encoding($encoding = null) {
@@ -54,14 +57,19 @@ class Context extends \lithium\net\Socket {
 	 * @return string
 	 */
 	public function send($message, array $options = array()) {
-		$defaults = array('path' => null, 'classes' => array('response' => null));
+		$defaults = array(
+			'path' => null, 'classes' => array('response' => null),
+			'context' => array(
+				'ignore_errors' => true, 'timeout' => $this->_timeout
+			)
+		);
 		$options += $defaults;
 
 		if ($this->open() === false) {
 			return false;
 		}
 		$url = is_object($message) ? $message->to('url') : $options['path'];
-		$message = is_object($message) ? $message->to('context') : $message;
+		$message = is_object($message) ? $message->to('context', $options['context']) : $message;
 
 		if ($this->_connection = fopen($url, 'r', false, stream_context_create($message))) {
 			$meta = stream_get_meta_data($this->_connection);

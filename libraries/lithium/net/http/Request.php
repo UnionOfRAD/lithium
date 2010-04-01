@@ -183,10 +183,7 @@ class Request extends \lithium\net\http\Base {
 				$query = $this->queryString();
 				return "{$this->scheme}://{$this->host}:{$this->port}{$this->path}{$query}";
 			case 'context':
-				return array($this->scheme => $options + $this->to('array') + array(
-					'method' => null, 'content' => null,
-					'ignore_errors' => true, 'timeout' => 1
-				));
+				return array($this->scheme => $options + $this->to('array'));
 			case 'string':
 			default:
 				return (string) $this;

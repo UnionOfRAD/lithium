@@ -190,8 +190,6 @@ class RequestTest extends \lithium\test\Unit {
 					'Connection: Close',
 					'User-Agent: Mozilla/5.0 (Lithium)'
 				),
-				'ignore_errors' => true,
-				'timeout' => 1
 			)
 		);
 		$result = $this->request->to('context');
