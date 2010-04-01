@@ -104,7 +104,7 @@ class View extends \lithium\core\Object {
 	 * @param array $options
 	 * @return string The rendered view that was requested.
 	 */
-	public function render($type, $data, array $options = array()) {
+	public function render($type, $data = null, array $options = array()) {
 		$defaults = array('context' => array(), 'type' => 'html', 'layout' => null);
 		$options += $defaults;
 		$data = ($data) ?: array();
@@ -123,7 +123,7 @@ class View extends \lithium\core\Object {
 	 * @param array $data Template data.
 	 * @param array $options Layout rendering options.
 	 */
-	protected function _all($template, $data, $options) {
+	protected function _all($template, $data, array $options = array()) {
 		$content = $this->render('template', $data, $options);
 
 		if (!$options['layout']) {
@@ -140,7 +140,7 @@ class View extends \lithium\core\Object {
 	 * @param array $data Template data.
 	 * @param array $options Renderer options.
 	 */
-	protected function _element($template, $data, $options) {
+	protected function _element($template, $data, array $options = array()) {
 		$options += array('controller' => 'elements', 'template' => $template);
 		$template = $this->_loader->template('template', $options);
 		$data = $data + $this->outputFilters;
@@ -154,7 +154,7 @@ class View extends \lithium\core\Object {
 	 * @param array $data Template data.
 	 * @param array $options Renderer options.
 	 */
-	protected function _template($template, $data, $options) {
+	protected function _template($template, $data, array $options = array()) {
 		$template = $this->_loader->template('template', $options);
 		$data = $data + $this->outputFilters;
 		return $this->_renderer->render($template, $data, $options);
@@ -167,7 +167,7 @@ class View extends \lithium\core\Object {
 	 * @param array $data Template data.
 	 * @param array $options Renderer options.
 	 */
-	protected function _layout($template, $data, $options) {
+	protected function _layout($template, $data, array $options = array()) {
 		$template = $this->_loader->template('layout', $options);
 		$data = (array) $data + $this->outputFilters;
 		return $this->_renderer->render($template, $data, $options);
