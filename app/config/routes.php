@@ -7,6 +7,7 @@
  */
 
 use \lithium\net\http\Router;
+use \lithium\core\Environment;
 
 /**
  * Uncomment the line below to enable routing for admin actions.
@@ -29,8 +30,10 @@ Router::connect('/pages/{:args}', array('controller' => 'pages', 'action' => 'vi
 /**
  * Connect the testing routes.
  */
-Router::connect('/test/{:args}', array('controller' => '\lithium\test\Controller'));
-Router::connect('/test', array('controller' => '\lithium\test\Controller'));
+if (!Environment::is('production')) {
+	Router::connect('/test/{:args}', array('controller' => '\lithium\test\Controller'));
+	Router::connect('/test', array('controller' => '\lithium\test\Controller'));
+}
 
 /**
  * Finally, connect the default routes.

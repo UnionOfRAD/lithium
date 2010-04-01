@@ -23,15 +23,25 @@ use \lithium\core\Environment;
 use \lithium\action\Dispatcher;
 
 /**
- * This filter loads all application routes in all plugins, loading the default application routes
- * last. Change this code if plugin routes must be loaded in a specific order, or if application
- * routes must be loaded first (in which case the catch-all routes should be removed). If
- * `Dispatcher::run()` is called multiple times in the course of a single request, change the
+ * This filter intercepts the `run()` of the `Dispatcher`, and first passes the `'request'`
+ * parameter (an instance of the `Request` object) to the `Environment` class to detect which
+ * environment the application is running in. Then, loads all application routes in all plugins,
+ * loading the default application routes last.
+ *
+ * Change this code if plugin routes must be loaded in a specific order (i.e. not the same order as
+ * the plugins are added in your bootstrap configuration), or if application routes must be loaded
+ * first (in which case the default catch-all routes should be removed).
+ *
+ * If `Dispatcher::run()` is called multiple times in the course of a single request, change the
  * `include`s to `include_once`.
  *
+ * @see lithium\action\Request
+ * @see lithium\core\Environment
  * @see lithium\net\http\Router
  */
 Dispatcher::applyFilter('run', function($self, $params, $chain) {
+	Environment::set($params['request']);
+
 	foreach (array_reverse(Libraries::get()) as $name => $config) {
 		if ($name === 'lithium') {
 			continue;
@@ -39,18 +49,6 @@ Dispatcher::applyFilter('run', function($self, $params, $chain) {
 		$file = "{$config['path']}/config/routes.php";
 		file_exists($file) ? include $file : null;
 	}
-	return $chain->next($self, $params, $chain);
-});
-
-/**
- * Intercepts the `Dispatcher` as it finds a controller object, and passes the `'request'` parameter
- * to the `Environment` class to detect which environment the application is running in.
- *
- * @see lithium\action\Request
- * @see lithium\core\Environment
- */
-Dispatcher::applyFilter('_callable', function($self, $params, $chain) {
-	Environment::set($params['request']);
 	return $chain->next($self, $params, $chain);
 });
 
