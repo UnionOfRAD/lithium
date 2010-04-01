@@ -36,11 +36,11 @@ class Router extends \lithium\core\Object {
 			}
 			while ($arg = array_shift($args)) {
 
-				if (preg_match('/^-(?P<key>[a-zA-Z0-9]+)$/', $arg, $match)) {
+				if (preg_match('/^-(?P<key>[a-zA-Z0-9]+)$/i', $arg, $match)) {
 					$params[$match['key']] = true;
 					continue;
 				}
-				if (preg_match('/^--(?P<key>[a-z0-9-]+)(?:=(?P<val>.+))?$/', $arg, $match)) {
+				if (preg_match('/^--(?P<key>[a-z0-9-]+)(?:=(?P<val>.+))?$/i', $arg, $match)) {
 					$params[$match['key']] = !isset($match['val']) ? true : $match['val'];
 					continue;
 				}
