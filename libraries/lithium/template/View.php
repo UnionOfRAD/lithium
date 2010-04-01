@@ -104,9 +104,10 @@ class View extends \lithium\core\Object {
 	 * @param array $options
 	 * @return string The rendered view that was requested.
 	 */
-	public function render($type, array $data = array(), array $options = array()) {
+	public function render($type, $data, array $options = array()) {
 		$defaults = array('context' => array(), 'type' => 'html', 'layout' => null);
 		$options += $defaults;
+		$data = ($data) ?: array();
 		$template = null;
 
 		if (is_array($type)) {
