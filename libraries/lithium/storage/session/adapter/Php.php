@@ -44,19 +44,6 @@ class Php extends \lithium\core\Object {
 	}
 
 	/**
-	 * Object destructor. Ensures that the session is written on object destruct.
-	 *
-	 * @return void
-	 */
-	public function __destruct() {
-		if (session_id() === '') {
-			return;
-		}
-		session_write_close();
-	}
-
-
-	/**
 	 * Initialization of the session.
 	 *
 	 * @todo Split up into an _initialize() and a _startup().
@@ -112,6 +99,7 @@ class Php extends \lithium\core\Object {
 	 * Checks if a value has been set in the session.
 	 *
 	 * @param string $key Key of the entry to be checked.
+	 * @param array $options Options array. Not used for this adapter method.
 	 * @return boolean True if the key exists, false otherwise.
 	 */
 	public static function check($key) {
@@ -187,10 +175,10 @@ class Php extends \lithium\core\Object {
 	/**
 	 * Determines if PHP sessions are enabled.
 	 *
-	 * return boolean True if enabled (that is, if session_id() returns a value), false otherwise.
+	 * @return boolean True if enabled (that is, if session_id() returns a value), false otherwise.
 	 */
 	public static function enabled() {
-		return (session_id() !== '');
+		return (boolean) session_id();
 	}
 }
 
