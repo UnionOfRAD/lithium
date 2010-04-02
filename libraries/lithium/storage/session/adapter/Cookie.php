@@ -28,7 +28,7 @@ class Cookie extends \lithium\core\Object {
 	 *		strtotime-compatible string instead of an epochal timestamp.
 	 */
 	protected $_defaults = array(
-		'name' => 'app', 'expire' => '+2 days', 'path' => '/',
+		'name' => 'li3', 'expire' => '+2 days', 'path' => '/',
 		'domain' => '', 'secure' => false, 'httponly' => false
 	);
 
@@ -92,10 +92,21 @@ class Cookie extends \lithium\core\Object {
 	 * @return mixed Data in the session if successful, null otherwise.
 	 */
 	public function read($key = null) {
-		return function($self, $params, $chain) {
+		$config = $this->_config;
+
+		return function($self, $params, $chain) use (&$config) {
 			$key = $params['key'];
 			if (!$key) {
 				return $_COOKIE;
+			}
+			if (strpos($key, '.') !== false) {
+				$key = explode('.', $key);
+				$result = $_COOKIE[$config['name']];
+
+				foreach ($key as $k) {
+					$result = $result[$k];
+				}
+				return ($result !== array()) ? $result : null;
 			}
 			return (isset($_COOKIE[$key])) ? $_COOKIE[$key] : null;
 		};
@@ -131,6 +142,15 @@ class Cookie extends \lithium\core\Object {
 					$name = current($name);
 				} else {
 					$name = (array_shift($name) . '[' . join('][', $name) . ']');
+				}
+
+				if (is_array($val)) {
+					foreach ($val as $key => $v) {
+						setcookie($name . "[$key]", $v, strtotime($expires), $config['path'],
+							$config['domain'], $config['secure'], $config['httponly']
+						);
+					}
+					return true;
 				}
 				setcookie($name, $val, strtotime($expires), $config['path'],
 					$config['domain'], $config['secure'], $config['httponly']
