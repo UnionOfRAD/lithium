@@ -186,13 +186,14 @@ class InspectorTest extends \lithium\test\Unit {
 
 	public function testClassDependencies() {
 		$expected = array(
-			'Exception', 'ReflectionClass', 'ReflectionException',
-			'lithium\\core\\Libraries', 'lithium\\util\\Collection'
+			'Exception', 'ReflectionClass', 'ReflectionException', 'lithium\\core\\Libraries'
 		);
-		$result = Inspector::dependencies($this->subject());
-		$this->assertEqual($expected, $result);
 
 		$result = Inspector::dependencies($this->subject(), array('type' => 'static'));
+		$this->assertEqual($expected, $result);
+
+		$expected[] = 'lithium\\util\\Collection';
+		$result = Inspector::dependencies($this->subject());
 		$this->assertEqual($expected, $result);
 	}
 

@@ -12,7 +12,6 @@ use \Exception;
 use \ReflectionClass;
 use \ReflectionException;
 use \lithium\core\Libraries;
-use \lithium\util\Collection;
 
 /**
  * General source code inspector
@@ -143,7 +142,7 @@ class Inspector extends \lithium\core\StaticObject {
 			$inspector->setAccessible(true);
 
 			try {
-				$result['value'] = $inspector->getValue($classInspector->newInstance());
+				$result['value'] = $inspector->getValue(static::_instance($class));
 			} catch (Exception $e) {
 				return null;
 			}
@@ -375,9 +374,10 @@ class Inspector extends \lithium\core\StaticObject {
 
 		$list = get_declared_classes();
 		$classes = array();
+		$collection = static::$_classes['collection'];
 
 		if (!empty($options['file'])) {
-			$loaded = new Collection(array('items' => array_map(
+			$loaded = new $collection(array('items' => array_map(
 				function($class) { return new ReflectionClass($class); }, $list
 			)));
 
@@ -420,7 +420,9 @@ class Inspector extends \lithium\core\StaticObject {
 		$join = function ($i) { return join('', $i); };
 
 		foreach ((array) $classes as $class) {
-			$data = file_get_contents(Libraries::path($class));
+			$data = explode("\n", file_get_contents(Libraries::path($class)));
+			$data = "<?php \n" . join("\n", preg_grep('/^\s*use /', $data)) . "\n ?>";
+
 			$classes = array_map($join, Parser::find($data, 'use *;', array(
 				'return'      => 'content',
 				'lineBreaks'  => true,
@@ -434,7 +436,7 @@ class Inspector extends \lithium\core\StaticObject {
 			$classes = static::info($class . '::$_classes', array('value'));
 
 			if (isset($classes['value'])) {
-				$dynamic = array_merge($dynamic, array_map($trim, $classes['value']));
+				$dynamic = array_merge($dynamic, array_map($trim, array_values($classes['value'])));
 			}
 		}
 
@@ -443,6 +445,22 @@ class Inspector extends \lithium\core\StaticObject {
 		}
 		$type = $options['type'];
 		return isset(${$type}) ? ${$type} : null;
+	}
+
+	/**
+	 * Returns an instance of the given class without directly instantiating it. Inspired by the
+	 * work of Sebastian Bergmann on the PHP Object Freezer project.
+	 *
+	 * @link http://sebastian-bergmann.de/archives/831-Freezing-and-Thawing-PHP-Objects.html
+	 * @param string $class The name of the class to return an instance of.
+	 * @return object Returns an instance of the object given by `$class` without calling that
+	 *        class' constructor.
+	 */
+	protected static function _instance($class) {
+		if (!class_exists($class)) {
+			throw new RuntimeException(sprintf('Class "%s" could not be found.', $class));
+		}
+		return unserialize(sprintf('O:%d:"%s":0:{}', strlen($class), $class));
 	}
 
 	/**

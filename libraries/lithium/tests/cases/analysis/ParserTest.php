@@ -117,10 +117,8 @@ class ParserTest extends \lithium\test\Unit {
 
 		$expected = array(
 			'\ReflectionClass',
-			'\lithium\core\Libraries',
-			'\lithium\util\Collection',
-			'\lithium\util\Validator',
-			'\lithium\util\Set'
+			'\lithium\util\Set',
+			'\lithium\util\Collection'
 		);
 
 		$results = array_map(

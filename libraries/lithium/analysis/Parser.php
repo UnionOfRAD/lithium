@@ -9,10 +9,8 @@
 namespace lithium\analysis;
 
 use \ReflectionClass;
-use \lithium\core\Libraries;
-use \lithium\util\Collection;
-use \lithium\util\Validator;
 use \lithium\util\Set;
+use \lithium\util\Collection;
 
 class Parser extends \lithium\core\StaticObject {
 
