@@ -67,7 +67,7 @@ class Php extends \lithium\core\Object {
 	 *         false otherwise.
 	 */
 	protected static function _startup() {
-		if (session_id() !== '') {
+		if (session_id()) {
 			return true;
 		}
 		if (!isset($_SESSION)) {
@@ -82,8 +82,8 @@ class Php extends \lithium\core\Object {
 	 * @return boolean True if $_SESSION is accessible and if a '_timestamp' key
 	 *         has been set, false otherwise.
 	 */
-	public function isStarted() {
-		return (isset($_SESSION) && isset($_SESSION['_timestamp']));
+	public static function isStarted() {
+		return ((!session_id()) && isset($_SESSION) && isset($_SESSION['_timestamp']));
 	}
 
 	/**
@@ -91,7 +91,7 @@ class Php extends \lithium\core\Object {
 	 *
 	 * @return mixed Session id, or null if the session has not been started.
 	 */
-	public function key() {
+	public static function key() {
 		return session_id() ?: null;
 	}
 
@@ -102,8 +102,8 @@ class Php extends \lithium\core\Object {
 	 * @param array $options Options array. Not used for this adapter method.
 	 * @return boolean True if the key exists, false otherwise.
 	 */
-	public static function check($key) {
-		if ((session_id() === '') && !self::_startup()) {
+	public static function check($key, array $options = array()) {
+		if (!self::isStarted() && !self::_startup()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params, $chain) {
@@ -120,7 +120,7 @@ class Php extends \lithium\core\Object {
 	 * @return mixed Data in the session if successful, false otherwise.
 	 */
 	public static function read($key = null, array $options = array()) {
-		if ((session_id() === '') && !self::_startup()) {
+		if (!self::isStarted() && !self::_startup()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params, $chain) {
@@ -142,7 +142,7 @@ class Php extends \lithium\core\Object {
 	 * @return boolean True on successful write, false otherwise
 	 */
 	public static function write($key, $value, array $options = array()) {
-		if ((session_id() === '') && !self::_startup()) {
+		if (!self::isStarted() && !self::_startup()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params, $chain) {
@@ -158,7 +158,7 @@ class Php extends \lithium\core\Object {
 	 * @return boolean True on successful delete, false otherwise
 	 */
 	public static function delete($key, array $options = array()) {
-		if ((session_id() === '') && !self::_startup()) {
+		if (!self::isStarted() && !self::_startup()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params, $chain) {

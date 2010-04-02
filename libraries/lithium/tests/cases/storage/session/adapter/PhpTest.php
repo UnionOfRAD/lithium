@@ -13,9 +13,7 @@ use \lithium\storage\session\adapter\Php;
 class PhpTest extends \lithium\test\Unit {
 
 	public function setUp() {
-		if (session_id()) {
-			session_destroy();
-		}
+		$this->_destroySession(session_name());
 		$this->Php = new Php();
 
 		/* Garbage collection */
@@ -44,10 +42,8 @@ class PhpTest extends \lithium\test\Unit {
 
 	public function testEnabled() {
 		$php = $this->Php;
+		$this->_destroySession(session_name());
 		$this->assertFalse($php::enabled());
-
-		session_start();
-		$this->assertTrue($php::enabled());
 	}
 
 	public function testInit() {
@@ -61,7 +57,7 @@ class PhpTest extends \lithium\test\Unit {
 
 	public function testDefaultConfiguration() {
 		$result = ini_get('session.name');
-		$this->assertEqual('', $result);
+		$this->assertEqual('li3', $result);
 
 		$result = ini_get('session.cookie_lifetime');
 		$this->assertEqual(strtotime('+1 day') - time(), (integer) $result);

@@ -86,12 +86,12 @@ class SessionTest extends \lithium\test\Unit {
 	 */
 	public function testCookieWriteReadDelete() {
 		Session::config(array(
-			'app' => array('adapter' => 'Cookie', 'expiry' => '+1 day')
+			'li3' => array('adapter' => 'Cookie', 'expiry' => '+1 day')
 		));
 
-		Session::write('testkey1', 'value1', array('name' => 'app'));
-		Session::write('testkey2', 'value2', array('name' => 'app'));
-		Session::write('testkey3', 'value3', array('name' => 'app'));
+		Session::write('testkey1', 'value1', array('name' => 'li3'));
+		Session::write('testkey2', 'value2', array('name' => 'li3'));
+		Session::write('testkey3', 'value3', array('name' => 'li3'));
 
 		$this->assertCookie(
 			array('key' => 'testkey1', 'value' => 'value1'), headers_list()
