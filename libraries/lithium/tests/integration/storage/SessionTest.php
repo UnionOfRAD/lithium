@@ -31,21 +31,23 @@ class SessionTest extends \lithium\test\Unit {
 	}
 
 	public function assertCookie($expected, $headers) {
-		$defaults = array('expires' => '(?:.+?)', 'path' => '/', 'name' => 'app');
+		$defaults = array('path' => '/', 'name' => 'li3');
 		$expected += $defaults;
-
-		$key = $expected['key'];
 		$value = preg_quote(urlencode($expected['value']), '/');
+
+		$key = explode('.', $expected['key']);
+		$key = (count($key) == 1) ? '[' . current($key) . ']' : ('[' . join('][', $key) . ']');
+		$key = preg_quote($key, '/');
 
 		if (isset($expected['expires'])) {
 			$date = gmdate('D, d-M-Y H:i:s \G\M\T', strtotime($expected['expires']));
 			$expires = preg_quote($date, '/');
 		} else {
-			$expires = ".+?";
+			$expires = '(?:.+?)';
 		}
 		$path = preg_quote($expected['path'], '/');
-		$pattern  = "/^Set\-Cookie:\s{$expected['name']}\[$key\]=$value;";
-		$pattern .= "\sexpires={$expected['expires']};\spath=$path/";
+		$pattern  = "/^Set\-Cookie:\s{$expected['name']}$key=$value;";
+		$pattern .= "\sexpires=$expires;\spath=$path/";
 		$match = false;
 
 		foreach ($headers as $header) {
@@ -103,9 +105,9 @@ class SessionTest extends \lithium\test\Unit {
 			array('key' => 'testkey3', 'value' => 'value3'), headers_list()
 		);
 
-		Session::delete('testkey1', array('name' => 'app'));
-		Session::delete('testkey2', array('name' => 'app'));
-		Session::delete('testkey3', array('name' => 'app'));
+		Session::delete('testkey1', array('name' => 'li3'));
+		Session::delete('testkey2', array('name' => 'li3'));
+		Session::delete('testkey3', array('name' => 'li3'));
 
 		$params = array('exires' => '-1 second', 'path' => '/');
 

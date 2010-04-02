@@ -47,9 +47,10 @@ class Hmac extends \lithium\core\Object {
 	 * @see lithium\core\Adaptable::config()
 	 * @see http://php.net/manual/en/function.hash-hmac.php
 	 * @param mixed $data The data to be signed.
+	 * @param array $options Options for this method.
 	 * @return array Data & signature.
 	 */
-	public function write($data, array $options) {
+	public function write($data, array $options = array()) {
 		$class = $options['class'];
 		$futureData = $class::read(null, array('strategies' => false));
 		$futureData += array($options['key'] => $data);
@@ -58,7 +59,7 @@ class Hmac extends \lithium\core\Object {
 			unset($futureData['__signature']);
 		}
 		$signature = hash_hmac('sha1', serialize($futureData), static::$_secret);
-		$class::write('__signature', $signature, $options + array('strategies' => false));
+		$class::write('__signature', $signature, array('strategies' => false) + $options);
 		return $data;
 	}
 
@@ -68,12 +69,13 @@ class Hmac extends \lithium\core\Object {
 	 * the data is safe, and the 'valid' key in the returned data will be
 	 *
 	 * @param array $data the Data being read.
+	 * @param array $options Options for this method.
 	 * @return array validated data
 	 */
-	public function read($data, array $options) {
+	public function read($data, array $options = array()) {
 		$class = $options['class'];
 
-		$futureData = $class::read(null, array('strategies' => false));// + array($options['key'] => $data);
+		$futureData = $class::read(null, array('strategies' => false));
 		$currentSignature = $futureData['__signature'];
 		unset($futureData['__signature']);
 		$signature = hash_hmac('sha1', serialize($futureData), static::$_secret);
@@ -92,10 +94,10 @@ class Hmac extends \lithium\core\Object {
 	 * @see lithium\core\Adaptable::config()
 	 * @see http://php.net/manual/en/function.hash-hmac.php
 	 * @param mixed $data The data to be signed.
-	 * @param array $options
+	 * @param array $options Options for this method.
 	 * @return array Data & signature.
 	 */
-	public function delete($data, array $options) {
+	public function delete($data, array $options = array()) {
 		$class = $options['class'];
 		$futureData = $class::read(null, array('strategies' => false));
 
@@ -106,10 +108,9 @@ class Hmac extends \lithium\core\Object {
 			unset($futureData['__signature']);
 		}
 		$signature = hash_hmac('sha1', serialize($futureData), static::$_secret);
-		$class::write('__signature', $signature, $options + array('strategies' => false));
+		$class::write('__signature', $signature, array('strategies' => false) + $options);
 		return $data;
 	}
-
 }
 
 ?>
