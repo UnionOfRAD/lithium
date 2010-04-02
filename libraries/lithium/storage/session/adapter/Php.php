@@ -26,7 +26,7 @@ class Php extends \lithium\core\Object {
 	 * @var array Keys are session ini settings, but without the `session.` namespace.
 	 */
 	protected $_defaults = array(
-		'name' => '', 'cookie_lifetime' => '86400', 'cookie_domain' => '',
+		'name' => 'li3', 'cookie_lifetime' => '86400', 'cookie_domain' => '',
 		'cookie_secure' => false, 'cookie_httponly' => false, 'save_path' => ''
 	);
 
@@ -80,7 +80,7 @@ class Php extends \lithium\core\Object {
 	 *         false otherwise.
 	 */
 	protected static function _startup() {
-		if (session_id() === '') {
+		if (session_id() !== '') {
 			return true;
 		}
 		if (!isset($_SESSION)) {
