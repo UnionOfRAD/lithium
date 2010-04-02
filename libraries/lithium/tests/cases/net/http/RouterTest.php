@@ -320,9 +320,9 @@ class RouterTest extends \lithium\test\Unit {
 		Router::connect('/add/{:args}', array('controller' => 'tests', 'action' => 'add'), array(
 			'persist' => array('controller', 'action')
 		));
-		$request = Router::process(new Request(array('url' => '/add/foo/bar')));
-		$url = Router::match(array('args' => array('baz', 'dib')), $request);
-		$this->assertEqual('/add/baz/dib', $url);
+		$request = Router::process(new Request(array('url' => '/add/foo/bar', 'base' => '')));
+		$path = Router::match(array('args' => array('baz', 'dib')), $request);
+		$this->assertEqual('/add/baz/dib', $path);
 	}
 }
 

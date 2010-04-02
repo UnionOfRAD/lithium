@@ -145,7 +145,7 @@ class Request extends \lithium\core\Object {
 		$this->_env += (array) $_SERVER + (array) $_ENV + array('REQUEST_METHOD' => 'GET');
 		$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
 		$this->_env['PLATFORM'] = isset($envs[PHP_SAPI]) ? $envs[PHP_SAPI] : null;
-		$this->_base = $this->_base ?: $this->_base();
+		$this->_base = isset($this->_base) ? $this->_base : $this->_base();
 		$this->url = '/';
 
 		if (isset($this->_config['url'])) {
