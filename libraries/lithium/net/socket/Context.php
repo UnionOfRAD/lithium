@@ -13,7 +13,7 @@ namespace lithium\net\socket;
  */
 class Context extends \lithium\net\Socket {
 
-	protected $_connection = null;
+	public $connection = null;
 
 	protected $_timeout = null;
 
@@ -23,8 +23,8 @@ class Context extends \lithium\net\Socket {
 	}
 
 	public function close() {
-		if (is_resource($this->_connection)) {
-			return fclose($this->_connection);
+		if (is_resource($this->connection)) {
+			return fclose($this->connection);
 		}
 		return true;
 	}
@@ -71,11 +71,11 @@ class Context extends \lithium\net\Socket {
 		$url = is_object($message) ? $message->to('url') : $options['path'];
 		$message = is_object($message) ? $message->to('context', $options['context']) : $message;
 
-		if ($this->_connection = fopen($url, 'r', false, stream_context_create($message))) {
-			$meta = stream_get_meta_data($this->_connection);
+		if ($this->connection = fopen($url, 'r', false, stream_context_create($message))) {
+			$meta = stream_get_meta_data($this->connection);
 			$headers = $meta['wrapper_data'] ?: array();
 			$message = isset($headers[0]) ? $headers[0] : null;
-			$body = stream_get_contents($this->_connection);
+			$body = stream_get_contents($this->connection);
 			$this->close();
 
 			if (!$options['classes']['response']) {

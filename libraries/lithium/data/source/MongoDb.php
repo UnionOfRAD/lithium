@@ -116,12 +116,12 @@ class MongoDb extends \lithium\data\Source {
 		$connection = "mongodb://{$login}{$host}" . ($login ? "/{$config['database']}" : '');
 
 		try {
-			$this->_connection = new Mongo($connection, array(
+			$this->connection = new Mongo($connection, array(
 				'connect' => true,
 				'persist' => $config['persistent'],
 				'timeout' => $config['timeout']
 			));
-			if ($this->_db = $this->_connection->{$config['database']}) {
+			if ($this->_db = $this->connection->{$config['database']}) {
 				$this->_isConnected = true;
 			}
 		} catch (Exception $e) {}
@@ -129,11 +129,11 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	public function disconnect() {
-		if ($this->_connection && $this->_connection->connected) {
+		if ($this->connection && $this->connection->connected) {
 			try {
-				$this->_isConnected = !$this->_connection->close();
+				$this->_isConnected = !$this->connection->close();
 			} catch (Exception $e) {}
-			unset($this->_db, $this->_connection);
+			unset($this->_db, $this->connection);
 			return !$this->_isConnected;
 		}
 		return true;
@@ -174,7 +174,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @return mixed The return value of the native method specified in `$method`.
 	 */
 	public function __call($method, $params) {
-		return call_user_func_array(array(&$this->_connection, $method), $params);
+		return call_user_func_array(array(&$this->connection, $method), $params);
 	}
 
 	public function schema($query, $resource = null, $context = null) {
@@ -183,7 +183,7 @@ class MongoDb extends \lithium\data\Source {
 
 	public function create($query, array $options = array()) {
 		$params = compact('query', 'options');
-		$conn =& $this->_connection;
+		$conn =& $this->connection;
 		$db =& $this->_db;
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, &$db) {
@@ -211,7 +211,7 @@ class MongoDb extends \lithium\data\Source {
 		$options += $defaults;
 
 		$db =& $this->_db;
-		$conn =& $this->_connection;
+		$conn =& $this->connection;
 		$params = compact('query', 'options');
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, &$db) {
@@ -257,7 +257,7 @@ class MongoDb extends \lithium\data\Source {
 
 	public function update($query, array $options = array()) {
 		$db =& $this->_db;
-		$conn =& $this->_connection;
+		$conn =& $this->connection;
 		$params = compact('query', 'options');
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, &$db) {
@@ -277,7 +277,7 @@ class MongoDb extends \lithium\data\Source {
 
 	public function delete($query, array $options = array()) {
 		$db =& $this->_db;
-		$conn =& $this->_connection;
+		$conn =& $this->connection;
 		$params = compact('query', 'options');
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, &$db) {

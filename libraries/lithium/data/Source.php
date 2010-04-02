@@ -28,7 +28,7 @@ abstract class Source extends \lithium\core\Object {
 	 *
 	 * @var mixed
 	 */
-	protected $_connection = null;
+	public $connection = null;
 
 	/**
 	 * Stores the status of this object's connection. Updated when `connect()` or `disconnect()` are

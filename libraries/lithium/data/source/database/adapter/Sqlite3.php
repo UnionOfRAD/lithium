@@ -10,6 +10,9 @@
 namespace lithium\data\source\database\adapter;
 
 use \Exception;
+use \SQLite3 as SQLite;
+use \SQLite3Result;
+
 /**
  * Sqlite database driver
  *
@@ -74,7 +77,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 		$config = $this->_config;
 		$this->_isConnected = false;
 
-		if ($this->_connection = new \SQLite3($config['database'], $config['flags'], $config['key'])) {
+		if ($this->connection = new SQLite($config['database'], $config['flags'], $config['key'])) {
 			$this->_isConnected = true;
 		}
 		return $this->_isConnected;
@@ -82,7 +85,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 
 	public function disconnect() {
 		if ($this->_isConnected) {
-			$this->_isConnected = !$this->_connection->close();
+			$this->_isConnected = !$this->connection->close();
 			return !$this->_isConnected;
 		}
 		return true;
@@ -126,16 +129,16 @@ class Sqlite3 extends \lithium\data\source\Database {
 		$encodingMap = array('UTF-8' => 'utf8');
 
 		if (empty($encoding)) {
-			$encoding = $this->_connection->querySingle('PRAGMA encoding');
+			$encoding = $this->connection->querySingle('PRAGMA encoding');
 			return ($key = array_search($encoding, $encodingMap)) ? $key : $encoding;
 		}
 		$encoding = isset($encodingMap[$encoding]) ? $encodingMap[$encoding] : $encoding;
-		$this->_connection->exec("PRAGMA encoding = \"{$encoding}\"");
-		return $this->_connection->querySingle("PRAGMA encoding");
+		$this->connection->exec("PRAGMA encoding = \"{$encoding}\"");
+		return $this->connection->querySingle("PRAGMA encoding");
 	}
 
 	public function result($type, $resource, $context) {
-		if (!($resource instanceof \SQLite3Result)) {
+		if (!($resource instanceof SQLite3Result)) {
 			return null;
 		}
 
@@ -158,7 +161,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 		if (is_array($value)) {
 			return parent::value($value, $schema);
 		}
-		return $this->_connection->escapeString($value);
+		return $this->connection->escapeString($value);
 	}
 
 	/**
@@ -190,8 +193,8 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @return array
 	 */
 	public function error() {
-		if ($this->_connection->lastErrorMsg()) {
-			return array($this->_connection->lastErrorCode(), $this->_connection->lastErrorMsg());
+		if ($this->connection->lastErrorMsg()) {
+			return array($this->connection->lastErrorCode(), $this->connection->lastErrorMsg());
 		}
 		return null;
 	}
@@ -210,12 +213,12 @@ class Sqlite3 extends \lithium\data\source\Database {
 
 	protected function _execute($sql, array $options = array()) {
 		$params = compact('sql', 'options');
-		$conn =& $this->_connection;
+		$conn =& $this->connection;
 
 		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use (&$conn) {
 			extract($params);
 			$result = $conn->query($sql);
-			if ( !($result instanceof \SQLite3Result) ) {
+			if ( !($result instanceof SQLite3Result) ) {
 				list($code, $error) = $self->error();
 				throw new Exception("$sql: $error", $code);
 			}

@@ -90,12 +90,12 @@ class MySql extends \lithium\data\source\Database {
 		}
 
 		if ($config['persistent']) {
-			$this->_connection = mysql_connect($host, $config['login'], $config['password'], true);
+			$this->connection = mysql_connect($host, $config['login'], $config['password'], true);
 		} else {
-			$this->_connection = mysql_pconnect($host, $config['login'], $config['password']);
+			$this->connection = mysql_pconnect($host, $config['login'], $config['password']);
 		}
 
-		if (mysql_select_db($config['database'], $this->_connection)) {
+		if (mysql_select_db($config['database'], $this->connection)) {
 			$this->_isConnected = true;
 		}
 
@@ -104,7 +104,7 @@ class MySql extends \lithium\data\source\Database {
 		}
 
 		$this->_useAlias = (boolean) version_compare(
-			mysql_get_server_info($this->_connection), "4.1", ">="
+			mysql_get_server_info($this->connection), "4.1", ">="
 		);
 		return $this->_isConnected;
 	}
@@ -116,7 +116,7 @@ class MySql extends \lithium\data\source\Database {
 	 */
 	public function disconnect() {
 		if ($this->_isConnected) {
-			$this->_isConnected = !mysql_close($this->_connection);
+			$this->_isConnected = !mysql_close($this->connection);
 			return !$this->_isConnected;
 		}
 		return true;
@@ -189,11 +189,11 @@ class MySql extends \lithium\data\source\Database {
 		$encodingMap = array('UTF-8' => 'utf8');
 
 		if (empty($encoding)) {
-			$encoding = mysql_client_encoding($this->_connection);
+			$encoding = mysql_client_encoding($this->connection);
 			return ($key = array_search($encoding, $encodingMap)) ? $key : $encoding;
 		}
 		$encoding = isset($encodingMap[$encoding]) ? $encodingMap[$encoding] : $encoding;
-		return mysql_set_charset($encoding, $this->_connection);
+		return mysql_set_charset($encoding, $this->connection);
 	}
 
 	public function result($type, $resource, $context) {
@@ -223,7 +223,7 @@ class MySql extends \lithium\data\source\Database {
 		$result = parent::value($value, $schema);;
 
 		if (is_string($result)) {
-			return "'" . mysql_real_escape_string($value, $this->_connection) . "'";
+			return "'" . mysql_real_escape_string($value, $this->connection) . "'";
 		}
 		return $result;
 	}
@@ -257,8 +257,8 @@ class MySql extends \lithium\data\source\Database {
 	 * @return array
 	 */
 	public function error() {
-		if (mysql_error($this->_connection)) {
-			return array(mysql_errno($this->_connection), mysql_error($this->_connection));
+		if (mysql_error($this->connection)) {
+			return array(mysql_errno($this->connection), mysql_error($this->connection));
 		}
 		return null;
 	}
@@ -279,7 +279,7 @@ class MySql extends \lithium\data\source\Database {
 		$defaults = array('buffered' => true);
 		$options += $defaults;
 
-		$conn =& $this->_connection;
+		$conn =& $this->connection;
 		$params = compact('sql', 'options');
 
 		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use (&$conn) {

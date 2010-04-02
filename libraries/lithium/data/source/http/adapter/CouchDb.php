@@ -57,7 +57,7 @@ class CouchDb extends \lithium\data\source\Http {
 		if ($this->_isConnected) {
 			$this->disconnect();
 			$this->_db = false;
-			unset($this->_connection);
+			unset($this->connection);
 		}
 	}
 
@@ -84,7 +84,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function __call($method, $params = array()) {
 		list($path, $data, $options) = ($params + array('/', array(), array()));
-		return json_decode($this->_connection->{$method}($path, $data, $options));
+		return json_decode($this->connection->{$method}($path, $data, $options));
 	}
 
 	/**
@@ -151,7 +151,7 @@ class CouchDb extends \lithium\data\source\Http {
 		$defaults = array('model' => $query->model());
 		$options += $defaults;
 		$params = compact('query', 'options');
-		$conn =& $this->_connection;
+		$conn =& $this->connection;
 		$config = $this->_config;
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
@@ -187,7 +187,7 @@ class CouchDb extends \lithium\data\source\Http {
 		$defaults = array('return' => 'resource', 'model' => $query->model());
 		$options += $defaults;
 		$params = compact('query', 'options');
-		$conn =& $this->_connection;
+		$conn =& $this->connection;
 		$config = $this->_config;
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
@@ -221,7 +221,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function update($query, array $options = array()) {
 		$params = compact('query', 'options');
-		$conn =& $this->_connection;
+		$conn =& $this->connection;
 		$config = $this->_config;
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
@@ -261,7 +261,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function delete($query, array $options = array()) {
 		$params = compact('query', 'options');
-		$conn =& $this->_connection;
+		$conn =& $this->connection;
 		$config = $this->_config;
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {

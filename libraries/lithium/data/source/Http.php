@@ -15,6 +15,19 @@ use \lithium\core\Libraries;
  */
 class Http extends \lithium\data\Source {
 
+	/**
+	 * Service connection
+	 *
+	 * @var object lithium\net\http\Service
+	 */
+	public $connection = null;
+
+	/**
+	 * The set of array keys which will be auto-populated in the object's protected properties from
+	 * constructor parameters.
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array('classes' => 'merge');
 
 	/**
@@ -25,13 +38,6 @@ class Http extends \lithium\data\Source {
 	protected $_classes = array(
 		'service' => '\lithium\net\http\Service'
 	);
-
-	/**
-	 * Service connection
-	 *
-	 * @var object lithium\net\http\Service
-	 */
-	protected $_connection = null;
 
 	/**
 	 * Is Connected?
@@ -73,7 +79,7 @@ class Http extends \lithium\data\Source {
 	}
 
 	protected function _init() {
-		$this->_connection = new $this->_classes['service']($this->_config);
+		$this->connection = new $this->_classes['service']($this->_config);
 		parent::_init();
 	}
 
@@ -84,7 +90,7 @@ class Http extends \lithium\data\Source {
 	 * @return mixed
 	 */
 	public function __get($property) {
-		return $this->_connection->{$property};
+		return $this->connection->{$property};
 	}
 
 	/**
@@ -95,7 +101,7 @@ class Http extends \lithium\data\Source {
 	 * @return mixed
 	 */
 	public function __call($method, $params) {
-		return $this->_connection->invokeMethod($method, $params);
+		return $this->connection->invokeMethod($method, $params);
 	}
 
 	/**
@@ -104,7 +110,7 @@ class Http extends \lithium\data\Source {
 	 * @return boolean
 	 */
 	public function connect() {
-		if (!$this->_isConnected && $this->_connection->connect()) {
+		if (!$this->_isConnected && $this->connection->connect()) {
 			$this->_isConnected = true;
 		}
 		return $this->_isConnected;
@@ -117,7 +123,7 @@ class Http extends \lithium\data\Source {
 	 */
 	public function disconnect() {
 		if ($this->_isConnected) {
-			if ($this->_connection->disconnect()) {
+			if ($this->connection->disconnect()) {
 				$this->_isConnected = false;
 			}
 		}
@@ -152,7 +158,7 @@ class Http extends \lithium\data\Source {
 	 * @return void
 	 */
 	public function create($query, array $options = array()) {
-		return $this->_connection->post();
+		return $this->connection->post();
 	}
 
 	/**
@@ -163,7 +169,7 @@ class Http extends \lithium\data\Source {
 	 * @return string
 	 */
 	public function read($query, array $options = array()) {
-		return $this->_connection->get();
+		return $this->connection->get();
 	}
 
 	/**
@@ -174,7 +180,7 @@ class Http extends \lithium\data\Source {
 	 * @return string
 	 */
 	public function update($query, array $options = array()) {
-		return $this->_connection->put();
+		return $this->connection->put();
 	}
 
 	/**
@@ -185,7 +191,7 @@ class Http extends \lithium\data\Source {
 	 * @return string
 	 */
 	public function delete($query = null, array $options = array()) {
-		return $this->_connection->delete();
+		return $this->connection->delete();
 	}
 }
 

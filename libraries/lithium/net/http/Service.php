@@ -16,6 +16,13 @@ use \lithium\core\Libraries;
 class Service extends \lithium\core\Object {
 
 	/**
+	 * The `Socket` instance used to send `Service` calls.
+	 *
+	 * @var \lithium\net\Socket
+	 */
+	public $connection = null;
+
+	/**
 	 * Holds the request and response used by send.
 	 *
 	 * @var object
@@ -28,13 +35,6 @@ class Service extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_autoConfig = array('classes' => 'merge');
-
-	/**
-	 * The `Socket` instance used to send `Service` calls.
-	 *
-	 * @var \lithium\net\Socket
-	 */
-	protected $_connection = null;
 
 	/**
 	 * Indicates whether `Service` can connect to the HTTP endpoint for which it is configured.
@@ -91,7 +91,7 @@ class Service extends \lithium\core\Object {
 		parent::_init();
 		$class = Libraries::locate('socket.util', $this->_classes['socket']);
 		if (is_string($class)) {
-			$this->_connection = new $class($this->_config);
+			$this->connection = new $class($this->_config);
 		}
 	}
 
@@ -101,8 +101,8 @@ class Service extends \lithium\core\Object {
 	 * @return boolean
 	 */
 	public function connect() {
-		if (!$this->_isConnected && $this->_connection) {
-			$this->_isConnected = $this->_connection->open();
+		if (!$this->_isConnected && $this->connection) {
+			$this->_isConnected = $this->connection->open();
 		}
 		return $this->_isConnected;
 	}
@@ -114,7 +114,7 @@ class Service extends \lithium\core\Object {
 	 */
 	public function disconnect() {
 		if ($this->_isConnected) {
-			$this->_isConnected = !$this->_connection->close();;
+			$this->_isConnected = !$this->connection->close();
 		}
 		return !$this->_isConnected;
 	}
@@ -184,7 +184,7 @@ class Service extends \lithium\core\Object {
 			return;
 		}
 		$request = $this->_request($method, $path, $data, $options);
-		$response = $this->_connection->send($request, array('classes' => $this->_classes));
+		$response = $this->connection->send($request, array('classes' => $this->_classes));
 
 		if ($response) {
 			$this->last = (object) compact('request', 'response');
