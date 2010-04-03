@@ -736,8 +736,12 @@ class Unit extends \lithium\core\Object {
 		$defaults = array('trace' => null, 'expected' => null, 'result' => null);
 		$result = (array) $data + $defaults;
 
-		return sprintf("trace: %s\nexpected: %s\nresult: %s\n",
-			$result['trace'],
+		$message = null;
+		if (!empty($result['trace'])) {
+			$message = sprintf("trace: %s\n", $result['trace']);
+		}
+
+		return $message . sprintf("expected: %s\nresult: %s\n",
 			var_export($result['expected'], true),
 			var_export($result['result'], true)
 		);
