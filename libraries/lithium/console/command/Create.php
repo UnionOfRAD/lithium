@@ -58,6 +58,11 @@ class Create extends \lithium\console\Command {
 		parent::__construct($config);
 	}
 
+	/**
+	 * Class initializer. Parses template and sets up params that need to be filled.
+	 *
+	 * @return void
+	 */
 	public function _init() {
 		parent::_init();
 		$this->_params = $this->_parse($this->template);
@@ -71,7 +76,7 @@ class Create extends \lithium\console\Command {
 	 * @return void
 	 */
 	public function run($command = null, $method = 'run') {
-		if (!$command) {
+		if (!$command || $this->$i) {
 			return $this->interactive();
 		}
 		$class = Libraries::locate('command.create', $command);
@@ -87,7 +92,7 @@ class Create extends \lithium\console\Command {
 	}
 
 	/**
-	 * Ask questions and use answers to create.
+	 * [-i] Ask questions and use answers to create.
 	 *
 	 * @return void
 	 */
@@ -104,11 +109,10 @@ class Create extends \lithium\console\Command {
 	 * @return array
 	 */
 	protected function _parse($template) {
-		$contents = $this->_tempalte($template);
+		$contents = $this->_template($template);
 		preg_match_all('/(?:\{:(?P<params>[^}]+)\})/', $contents, $keys);
-
 		if (!empty($keys['params'])) {
-			return array_unique($keys['params']);
+			return array_values(array_unique($keys['params']));
 		}
 		return array();
 	}
@@ -116,11 +120,11 @@ class Create extends \lithium\console\Command {
 	/**
 	 * Returns the contents of the template.
 	 *
-	 * @param string $name
+	 * @param string $name the name of the template
 	 * @return string
 	 */
 	protected function _template($name) {
-		$file = Libraries::locate('command.create.template', $template, array(
+		$file = Libraries::locate('command.create.template', $name, array(
 			'filter' => false, 'type' => 'file', 'suffix' => '.txt.php',
 		));
 		if (!$file || is_array($file)) {

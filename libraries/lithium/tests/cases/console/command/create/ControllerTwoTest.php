@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\console\command\create;
 
-use \lithium\console\command\create\ControllerTwo;
+use \lithium\tests\mocks\console\command\create\MockController;
 use \lithium\console\Request;
 use \lithium\core\Libraries;
 
@@ -43,9 +43,36 @@ class ControllerTwoTest extends \lithium\test\Unit {
 	}
 
 	public function testInit() {
-		$controller = new ControllerTwo(array(
+		$controller = new MockController(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
+		$expected = array('namespace', 'use', 'class', 'plural', 'model', 'singular');
+		$result = $controller->parse('controller');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testNamespace() {
+
+	}
+
+	public function testUse() {
+
+	}
+
+	public function testClass() {
+
+	}
+
+	public function testPlural() {
+
+	}
+
+	public function testModel() {
+
+	}
+
+	public function testSingular() {
+
 	}
 }
 
