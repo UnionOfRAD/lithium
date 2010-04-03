@@ -1,3 +1,4 @@
+<h3>Code Coverage</h3>
 <?php foreach ($data as $class => $coverage): ?>
 	<h4 class="coverage">
 		<?php echo $class ?>:
