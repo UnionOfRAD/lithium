@@ -308,7 +308,7 @@ div.test-result code {
 
 div.test-assert, div.test-exception, div.test-skip {
 	margin: 1px 0 0 0;
-	padding: .5em 1em;
+	padding: .5em 0 .5em 1em;
 	color: #000000;
 	font-family: 'Andale Mono', Monaco, Courier, monospace !important;
 	font-size: .90em;
@@ -323,41 +323,61 @@ div.test-assert-passed {
 div.test-assert-failed {
 	color: #7F0D0D;
 	border: 1px solid #CC1414;
-	border-width: 0 0 1px 4px;
+	border-width: 0 0 1px 8px;
+	background: ;
 }
 
 div.test-exception {
+	color: #995F0F;
 	border: 1px solid #E58F16;
-	border-width: 0 0 1px 4px;
-	color:#995F0F;
-}
-
-div.test-assert span.content, div.test-exception span.content, div.test-exception span.trace {
-	display: block;
-	clear: both;
-	white-space: pre;
-}
-
-div.test-exception span.content {
-	font-style: italic;
-}
-
-div.test-exception span.trace {
-	padding: 0 0 0 5px;
-	margin: 2px 0 2px 3px;
-	border-left: 1px solid #C09090;
+	background: ;
+	border-width: 0 0 1px 8px;
 }
 
 div.test-skip {
 	background-color: #fafafa;
 	color: #666;
 	border: 1px solid rgba(0,0,0,.05);
-	border-width:0 0 1px 4px;
+	border-width:0 0 1px 8px;
+}
+
+.test-assert span.content,
+.test-exception span.content,
+.test-skip span.content,
+.test-assert span.trace,
+.test-exception span.trace,
+.test-skip span.trace {
+	display: block;
+	clear: both;
+	white-space: pre;
+	color: #777;
+	font-size: .9em;
+	padding: .5em 1em;
+	margin: .5em 0;
+	background: #fafafa;
+	border: rgba(0,0,0,.1);
+	-moz-box-shadow: inset 0 0 6px rgba(0,0,0,.15);
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.15);
+	box-shadow: inset 0 0 6px rgba(0,0,0,.15);
+}
+
+.test-assert span.trace {
+	padding: 0 .5em;
+	margin: .25em 0 .25em .5em;
+	background: #FAFAFA;
+}
+
+div.test-exception span.trace {
+	font-style: italic;
 }
 
 div.test-skip span.content {
-	display: block;
-	font-style: italic;
+	color: #999;
+	padding: 0 1em;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	border: none;
 }
 /*--- SQL Dumps ---*/
 .lithium-sql-log table {
@@ -454,9 +474,6 @@ span.filters a:hover, span.filters a.active {
 
 span.filters a.active {
 	background: #62B212;
-	-moz-box-shadow: inset 0 0 12px rgba(0,0,0,.25);
-	-webkit-box-shadow: inset 0 0 12px rgba(0,0,0,.25);
-	box-shadow: inset 0 0 12px rgba(0,0,0,.25);
 	text-shadow: 0px 0px 6px rgba(0,0,0,.5);
 	color: white;
 }
