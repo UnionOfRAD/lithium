@@ -3,7 +3,11 @@
 
 <?php foreach ($data as $class => $test): ?>
 	<?php if ($test): ?>
-		<li><?php echo $test ?></li>
+		<li>
+			<a title="run '<?php echo $test; ?>' tests" href="<?php echo $base ?>/test/<?php echo str_replace('\\', '/', $test); ?>">
+				<?php echo $test ?>
+			</a>
+		</li>
 	<?php endif ?>
 <?php endforeach ?>
 

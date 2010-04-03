@@ -52,7 +52,7 @@
 
 					foreach ($report->filters() as $filter => $options) {
 						$data = $report->results['filters'][$filter];
-						echo $report->render($options['name'], compact('data'));
+						echo $report->render($options['name'], compact('data', 'base'));
 					}
 					?>
 				</div>
