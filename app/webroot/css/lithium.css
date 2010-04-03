@@ -52,20 +52,23 @@ pre > code {
 	border: 1px solid white;
 	padding: 1em !important; /* remove if base important is removed, too */
 	overflow: auto;
+	font-size: .85em;
 }
 code, pre, .fixed {
 	font-family: Monaco, Courier, monospace !important;
 	font-weight: normal;
-	font-size: .85em;
+	font-size: 0.85em;
 	white-space: pre;
 }
 code {
 	padding: .2em .25em !important;
-	border: 1px solid #f0f0f0;
-	background: #fafafa;
+	border: 1px solid #e6e6e6;
+	background: #f6f6f6;
+	font-size: 0.75em;
 }
 pre {
-	padding-bottom: 0.5em;
+	background: none;
+	padding: 0 0 .5em 0 !important;
 }
 
 /*--- Lists ---*/
