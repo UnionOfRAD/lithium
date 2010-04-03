@@ -182,7 +182,7 @@ class UnitTest extends \lithium\test\Unit {
 			'method' => 'testNothing',
 			'assertion' => 'assertTrue',
 			'class' => 'lithium\\tests\\mocks\\test\\MockUnitTest',
-			'message' => "trace: \nexpected: true\nresult: true\n",
+			'message' => "expected: true\nresult: true\n",
 			'data' => array('expected' => true, 'result' => true)
 		);
 		$result = $test->run();
