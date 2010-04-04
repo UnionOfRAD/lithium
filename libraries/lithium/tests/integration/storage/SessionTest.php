@@ -30,40 +30,6 @@ class SessionTest extends \lithium\test\Unit {
 		}
 	}
 
-	public function assertCookie($expected, $headers) {
-		$defaults = array('path' => '/', 'name' => 'li3');
-		$expected += $defaults;
-		$value = preg_quote(urlencode($expected['value']), '/');
-
-		$key = explode('.', $expected['key']);
-		$key = (count($key) == 1) ? '[' . current($key) . ']' : ('[' . join('][', $key) . ']');
-		$key = preg_quote($key, '/');
-
-		if (isset($expected['expires'])) {
-			$date = gmdate('D, d-M-Y H:i:s \G\M\T', strtotime($expected['expires']));
-			$expires = preg_quote($date, '/');
-		} else {
-			$expires = '(?:.+?)';
-		}
-		$path = preg_quote($expected['path'], '/');
-		$pattern  = "/^Set\-Cookie:\s{$expected['name']}$key=$value;";
-		$pattern .= "\sexpires=$expires;\spath=$path/";
-		$match = false;
-
-		foreach ($headers as $header) {
-			if (preg_match($pattern, $header)) {
-				$match = true;
-				continue;
-			}
-		}
-
-		if (!$match) {
-			$this->assert(false, sprintf('{:message} - Cookie %s not found in headers.', $pattern));
-			return false;
-		}
-		return $this->assert(true, '%s');
-	}
-
 	public function testWriteReadDelete() {
 		Session::config(array(
 			'test' => array('adapter' => 'Php')
@@ -96,13 +62,13 @@ class SessionTest extends \lithium\test\Unit {
 		Session::write('testkey3', 'value3', array('name' => 'li3'));
 
 		$this->assertCookie(
-			array('key' => 'testkey1', 'value' => 'value1'), headers_list()
+			array('key' => 'testkey1', 'value' => 'value1')
 		);
 		$this->assertCookie(
-			array('key' => 'testkey2', 'value' => 'value2'), headers_list()
+			array('key' => 'testkey2', 'value' => 'value2')
 		);
 		$this->assertCookie(
-			array('key' => 'testkey3', 'value' => 'value3'), headers_list()
+			array('key' => 'testkey3', 'value' => 'value3')
 		);
 
 		Session::delete('testkey1', array('name' => 'li3'));
@@ -112,13 +78,13 @@ class SessionTest extends \lithium\test\Unit {
 		$params = array('exires' => '-1 second', 'path' => '/');
 
 		$this->assertCookie(
-			array('key' => 'testkey1', 'value' => 'deleted'), headers_list()
+			array('key' => 'testkey1', 'value' => 'deleted')
 		);
 		$this->assertCookie(
-			array('key' => 'testkey2', 'value' => 'deleted'), headers_list()
+			array('key' => 'testkey2', 'value' => 'deleted')
 		);
 		$this->assertCookie(
-			array('key' => 'testkey3', 'value' => 'deleted'), headers_list()
+			array('key' => 'testkey3', 'value' => 'deleted')
 		);
 	}
 

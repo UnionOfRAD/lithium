@@ -343,9 +343,12 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * Checks for an input tag with a name attribute (contains any non-empty value) and an id
 	 * attribute that contains 'my-input':
+	 * {{{
 	 * 	array('input' => array('name', 'id' => 'my-input'))
+	 * }}}
 	 *
 	 * Checks for two p elements with some text in them:
+	 * {{{
 	 * 	array(
 	 * 		array('p' => true),
 	 * 		'textA',
@@ -354,13 +357,16 @@ class Unit extends \lithium\core\Object {
 	 * 		'textB',
 	 * 		'/p'
 	 *	)
+	 * }}}
 	 *
 	 * You can also specify a pattern expression as part of the attribute values, or the tag
 	 * being defined, if you prepend the value with preg: and enclose it with slashes, like so:
+	 * {{{
 	 *	array(
 	 *  	array('input' => array('name', 'id' => 'preg:/FieldName\d+/')),
 	 *  	'preg:/My\s+field/'
 	 *	)
+	 * }}}
 	 *
 	 * Important: This function is very forgiving about whitespace and also accepts any
 	 * permutation of attribute order. It will also allow whitespaces between specified tags.
@@ -489,6 +495,63 @@ class Unit extends \lithium\core\Object {
 			}
 		}
 		return $this->assert(true);
+	}
+
+	/**
+	 * Assert Cookie data is properly set in headers.
+	 *
+	 * The value passed to `exepected` is an array of the cookie data, with at least the key and
+	 * value expected, but can support any of the following keys:
+	 * 	- `key`: the expected key
+	 * 	- `value`: the expected value
+	 * 	- `path`: optionally specifiy a path
+	 * 	- `name`: optionally specify the cookie name
+	 * 	- `expires`: optionally assert a specific expire time
+	 *
+	 * @param array $expected
+	 * @param array $headers When empty, value of `headers_list()` is used.
+	 */
+	public function assertCookie($expected, $headers = null) {
+		$defaults = array('path' => '/', 'name' => 'app');
+		$expected += $defaults;
+
+		$result = $headers;
+		if (empty($result)) {
+			$result = headers_list();
+		}
+
+		$value = preg_quote(urlencode($expected['value']), '/');
+
+		$key = explode('.', $expected['key']);
+		$key = (count($key) == 1) ? '[' . current($key) . ']' : ('[' . join('][', $key) . ']');
+		$key = preg_quote($key, '/');
+
+		if (isset($expected['expires'])) {
+			$date = gmdate('D, d-M-Y H:i:s \G\M\T', strtotime($expected['expires']));
+			$expires = preg_quote($date, '/');
+		} else {
+			$expires = '(?:.+?)';
+		}
+		$path = preg_quote($expected['path'], '/');
+		$pattern  = "/^Set\-Cookie:\s{$expected['name']}$key=$value;";
+		$pattern .= "\sexpires=$expires;\spath=$path/";
+		$match = false;
+
+		foreach ($result as $header) {
+			if (preg_match($pattern, $header)) {
+				$match = true;
+				continue;
+			}
+		}
+
+		if (!$match) {
+			$this->assert(false,
+				sprintf('{:message} - Cookie %s not found in headers.', $pattern),
+				compact('expected', 'result')
+			);
+			return false;
+		}
+		return $this->assert(true, '%s');
 	}
 
 	/**

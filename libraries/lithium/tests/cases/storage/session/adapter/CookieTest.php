@@ -23,59 +23,6 @@ class CookieTest extends \lithium\test\Unit {
 		$this->skipIf($sapi === 'cli', $message);
 	}
 
-	public function tearDown() {
-		$this->_destroySession();
-	}
-
-	protected function _destroySession($name = null) {
-		if (!$name) {
-			$name = session_name();
-		}
-		$settings = session_get_cookie_params();
-		setcookie(
-			$name, '', time() - 1000, $settings['path'], $settings['domain'],
-			$settings['secure'], $settings['httponly']
-		);
-		if (session_id()) {
-			session_destroy();
-		}
-		$_COOKIE = array();
-	}
-
-	public function assertCookie($expected, $headers) {
-		$defaults = array('path' => '/', 'name' => 'li3');
-		$expected += $defaults;
-		$value = preg_quote(urlencode($expected['value']), '/');
-
-		$key = explode('.', $expected['key']);
-		$key = (count($key) == 1) ? '[' . current($key) . ']' : ('[' . join('][', $key) . ']');
-		$key = preg_quote($key, '/');
-
-		if (isset($expected['expires'])) {
-			$date = gmdate('D, d-M-Y H:i:s \G\M\T', strtotime($expected['expires']));
-			$expires = preg_quote($date, '/');
-		} else {
-			$expires = '(?:.+?)';
-		}
-		$path = preg_quote($expected['path'], '/');
-		$pattern  = "/^Set\-Cookie:\s{$expected['name']}$key=$value;";
-		$pattern .= "\sexpires=$expires;\spath=$path/";
-		$match = false;
-
-		foreach ($headers as $header) {
-			if (preg_match($pattern, $header)) {
-				$match = true;
-				continue;
-			}
-		}
-
-		if (!$match) {
-			$this->assert(false, sprintf('{:message} - Cookie %s not found in headers.', $pattern));
-			return false;
-		}
-		return $this->assert(true, '%s');
-	}
-
 	public function setUp() {
 		$this->Cookie = new Cookie();
 	}
@@ -104,7 +51,7 @@ class CookieTest extends \lithium\test\Unit {
 		$params = compact('key', 'value');
 		$result = $closure($this->Cookie, $params, null);
 
-		$this->assertCookie(compact('key', 'value', 'expires', 'path'), headers_list());
+		$this->assertCookie(compact('key', 'value', 'expires', 'path'));
 	}
 
 	public function testWriteArrayData() {
@@ -161,7 +108,7 @@ class CookieTest extends \lithium\test\Unit {
 		$params = compact('key', 'value', 'options');
 		$result = $closure($this->Cookie, $params, null);
 
-		$this->assertCookie(compact('key', 'value', 'expires', 'path'), headers_list());
+		$this->assertCookie(compact('key', 'value', 'expires', 'path'));
 	}
 
 	public function testRead() {
@@ -221,7 +168,7 @@ class CookieTest extends \lithium\test\Unit {
 		$result = $closure($this->Cookie, $params, null);
 		$this->assertNull($result);
 
-		$this->assertCookie(compact('key', 'value', 'path'), headers_list());
+		$this->assertCookie(compact('key', 'value', 'path'));
 	}
 }
 
