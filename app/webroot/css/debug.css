@@ -475,10 +475,10 @@ span.filters a.active {
 	color: white;
 }
 
-div.code-coverage-results {
+div.code-coverage-results, h4.code-coverage-name {
 	clear: both;
 	color: #000000;
-	font-size: 11px;
+	font-size: .9em;
 	font-family: 'Andale Mono', Monaco, Courier, monospace !important;
 	background-color: #fafafa;
 	border: 1px solid #e6e6e6;
@@ -496,11 +496,11 @@ h4.coverage {
 }
 
 h4.code-coverage-name {
-	color: rgba(0,0,0,.25);
+	color: #999;
+	background-color: #ECECEC;
+	border-top: none;
 	padding: 0.25em;
 	margin: 0;
-	font-family: 'Andale Mono', Monaco, Courier, monospace !important;
-	font-size: .85em;
 	font-weight: normal;
 	float: right;
 }
@@ -516,30 +516,30 @@ div.code-coverage-results span.content {
 	clear: right;
 	white-space: pre;
 	line-height: 20px;
+	background: black;
 }
 
 div.code-coverage-results div.uncovered span.content {
-	color: #bd0b0b;
-	background-color: #FFD8D8;
+	color: #FFD8D8;
+	background-color: #260000;
 }
 
 div.code-coverage-results div.covered span.content {
-	color: #457D0D;
-	background-color: #E0F2CD;
+	color: #DDFDCB;
+	background-color: #0C2600;
 }
 
 div.code-coverage-results div.ignored span.content {
-	color: rgba(0,0,0,.25);
+	color: rgba(255,255,255,.5);
 }
 
 div.code-coverage-results span.line-num {
 	display: block;
 	float: left;
 	width: 3em;
-	color: #A9A9A9;
-	color: rgba(0,0,0,.25);
-	text-align: right;
+	color: #999;
 	background-color: #ECECEC;
+	text-align: right;
 	border-right: 1px solid #ccc;
 	padding-right: 4px;
 	margin-right: 5px;
