@@ -11,7 +11,7 @@
 
 body.test-dashboard {
 	font-family: Helvetica, Arial, sans-serif;
-	font-size: 90%;
+	font-size: 16px;
 	margin: 0;
 	min-width: 800px;
 }
@@ -60,7 +60,7 @@ body.test-dashboard .test-content {
 
 .test-content h2 {
 	font-weight: normal;
-	font-size: 1.75em;
+	font-size: 1.45em;
 	margin-bottom: .5em;
 	float: left;
 }
@@ -82,7 +82,7 @@ body.test-dashboard a.test-button:active {
 	display: block;
 	float: right;
 	font-weight: bold;
-	font-size: 1.25;
+	font-size: 1.25em;
 	background-color:#f5f5f5;
 	border-color: #e6e6e6;
 	color: #999;
@@ -396,8 +396,8 @@ pre {
 
 pre.lithium-debug {
 	background: #ffcc00;
-	font-size: 120%;
-	line-height: 140%;
+	font-size: 1.2em;
+	line-height: 1.5em;
 	margin-top: 1em;
 	overflow: auto;
 	position: relative;
@@ -409,8 +409,8 @@ div.lithium-stack-trace {
 	color: #333;
 	margin: 0px;
 	padding: 6px;
-	font-size: 120%;
-	line-height: 140%;
+	font-size: 1.2em;
+	line-height: 1.5em;
 	overflow: auto;
 	position: relative;
 }
@@ -431,8 +431,8 @@ div.lithium-stack-trace pre, div.lithium-code-dump pre {
 
 div.lithium-code-dump pre, div.lithium-code-dump pre code {
 	clear: both;
-	font-size: 12px;
-	line-height: 15px;
+	font-size: 1em;
+	line-height: 1.5em;
 	margin: 4px 2px;
 	padding: 4px;
 	overflow: auto;
@@ -447,7 +447,7 @@ div.lithium-code-dump span.code-highlight {
 span.filters {
 	display: block;
 	float: right;
-	margin: 2em 0 .5em 0;
+	margin: 1em 0 .5em 0;
 }
 span.filters a {
 	display: block;
@@ -478,7 +478,7 @@ span.filters a.active {
 div.code-coverage-results, h4.code-coverage-name {
 	clear: both;
 	color: #000000;
-	font-size: .9em;
+	font-size: .8em;
 	font-family: 'Andale Mono', Monaco, Courier, monospace !important;
 	background-color: #fafafa;
 	border: 1px solid #e6e6e6;
@@ -499,8 +499,8 @@ h4.code-coverage-name {
 	color: #999;
 	background-color: #ECECEC;
 	border-top: none;
-	padding: 0.25em;
-	margin: 0;
+	padding: 0.25em 0.5em;
+	margin: 0 1px 0 0;
 	font-weight: normal;
 	float: right;
 }
@@ -515,7 +515,8 @@ div.code-coverage-results span.content {
 	display: block;
 	clear: right;
 	white-space: pre;
-	line-height: 20px;
+	line-height: 1.5em;
+	min-height: 1.5em;
 	background: black;
 }
 
@@ -543,7 +544,7 @@ div.code-coverage-results span.line-num {
 	border-right: 1px solid #ccc;
 	padding-right: 4px;
 	margin-right: 5px;
-	line-height: 20px;
+	line-height: 1.5em;
 }
 
 div.code-coverage-results .code-line:hover span.line-num {
@@ -577,7 +578,7 @@ div.code-coverage-results p.note {
 	color: #bbb;
 	padding: 5px;
 	margin: 5px 0 10px;
-	font-size: 10px;
+	font-size: .8em;
 }
 
 div.code-coverage-results span.result-bad {
