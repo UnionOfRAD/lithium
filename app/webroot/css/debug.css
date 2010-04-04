@@ -60,13 +60,14 @@ body.test-dashboard .test-content {
 
 .test-content h2 {
 	font-weight: normal;
-	font-size: 1.5em;
+	font-size: 1.75em;
+	margin-bottom: .5em;
 	float: left;
 }
 .test-content h2 span {
 	color: #bbb;
 	display: block;
-	font-size: .75em;
+	font-size: .55em;
 }
 .test-content h3 {
 	font-weight: normal;
@@ -311,34 +312,30 @@ div.test-assert, div.test-exception, div.test-skip {
 	padding: .5em 0 .5em 1em;
 	color: #000000;
 	font-family: 'Andale Mono', Monaco, Courier, monospace !important;
-	font-size: .90em;
+	font-size: 1em;
 	line-height: 1.5em;
 	position: relative;
+	border: 1px solid rgba(0,0,0,.05);
+	border-width:0 0 1px 8px;
 }
 
 div.test-assert-passed {
-	background-color: #D0F9E0;
+	border-left-color: #D0F9E0;
 }
 
 div.test-assert-failed {
 	color: #7F0D0D;
-	border: 1px solid #CC1414;
-	border-width: 0 0 1px 8px;
-	background: ;
+	border-left-color: #CC1414;
 }
 
 div.test-exception {
 	color: #995F0F;
-	border: 1px solid #E58F16;
-	background: ;
-	border-width: 0 0 1px 8px;
+	border-left-color: #E58F16;
 }
 
 div.test-skip {
 	background-color: #fafafa;
 	color: #666;
-	border: 1px solid rgba(0,0,0,.05);
-	border-width:0 0 1px 8px;
 }
 
 .test-assert span.content,
@@ -355,7 +352,7 @@ div.test-skip {
 	padding: .5em 1em;
 	margin: .5em 0;
 	background: #fafafa;
-	border: rgba(0,0,0,.1);
+	border: 1px solid rgba(0,0,0,.1);
 	-moz-box-shadow: inset 0 0 6px rgba(0,0,0,.15);
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.15);
 	box-shadow: inset 0 0 6px rgba(0,0,0,.15);
@@ -450,7 +447,7 @@ div.lithium-code-dump span.code-highlight {
 span.filters {
 	display: block;
 	float: right;
-	margin: 1em 0 .5em 0;
+	margin: 2em 0 .5em 0;
 }
 span.filters a {
 	display: block;
