@@ -9,19 +9,36 @@
 use \lithium\data\Connections;
 
 $checkName = null;
-$checkStatus = array();
+$checkStatus = $solutions = array();
 
-$notify = function($status, $message) use (&$checkName, &$checkStatus) {
-	$checkStatus[$checkName] = $status;
-	$status = $status ? 'success' : 'fail';
+$notify = function($status, $message, $solution = null) use (&$checkName, &$checkStatus, &$solutions) {
+	$checkStatus[$checkName] = $status === true;
+
+	if (!is_string($status)) {
+		$status = $status ? 'success' : 'fail';
+	}
+
 	$message = is_array($message) ? join("\n<br />", $message) : $message;
+
+	if (!empty($solution)) {
+		$default = array(
+			'id' => 'help-' . $checkName,
+			'title' => $checkName,
+			'content' => null
+		);
+		if (is_array($solution['content'])) {
+			$solution['content'] = join("\n<br />", $solution['content']);
+		}
+		$solutions[$checkName] = $solution += $default;
+
+	}
 	return "<div class=\"test-result test-result-{$status}\">{$message}</div>";
 };
 
 $sanityChecks = array(
 	'resourcesWritable' => function() use ($notify) {
 		if (is_writable($path = LITHIUM_APP_PATH . '/resources')) {
-			return $notify(true, 'Your application\'s resources directory is writable.');
+			return $notify(true, 'Resources directory is writable.');
 		}
 		return $notify(false, array(
 			"Your resource path (<code>$path</code>) is not writeable. " .
@@ -30,29 +47,60 @@ $sanityChecks = array(
 		));
 	},
 	'database' => function() use ($notify) {
-		if (!$config = Connections::get('default')) {
-			return $notify(false, array(
-				'No default database connection defined. To create a database connection, ' .
-				'edit the file <code>' . LITHIUM_APP_PATH . '/config/bootstrap.php</code>, and ' .
-				'uncomment the following line:',
-				'<code>require __DIR__ . \'/connections.php\';</code>',
-				'Then, edit the file <code>' . LITHIUM_APP_PATH . '/config/connections.php</code>.'
+		$config = Connections::config();
+		if (empty($config)) {
+			return $notify('notice', array('No database connections defined.'), array(
+				'title' => 'Database Connections',
+				'content' => array(
+					'To create a database connection, edit the file <code>' . LITHIUM_APP_PATH .
+					'/config/bootstrap.php</code>, and uncomment the following line:',
+					'<pre><code>require __DIR__ . \'/connections.php\';</code></pre>',
+					'Then, edit the file <code>' . LITHIUM_APP_PATH . '/config/connections.php</code>.'
+				)
 			));
 		}
-		return $notify(true, 'Default database connection configured.');
+		return $notify(true, 'Database connection(s) configured.');
 	},
-	'databaseConnected' => function() use ($notify, &$checkStatus) {
-		if (!$checkStatus['database']) {
-			return;
-		}
-		if (@Connections::get('default')->connect()) {
-			return $notify(true, 'Connection to default database verified.');
-		}
-		return $notify(false, array(
-			'Could not connect to default database. Please check the ' .
-			'settings in <code>' . LITHIUM_APP_PATH . '/config/connections.php</code>.'
-		));
-	},
+	// 'databaseEnabled' => function() use ($notify, &$checkStatus) {
+	// 	if (!$checkStatus['database']) {
+	// 		return;
+	// 	}
+	// 	$results = array();
+	// 	$config = Connections::config();
+	// 	foreach ($config as $name => $options) {
+	// 		$enabled = Connections::enabled($name);
+	// 		if (!$enabled) {
+	// 			$results[] = $notify('exception', "Database for <code>{$options}</code> is not enabled.");
+	// 		}
+	// 	}
+	// 	if (empty($results)) {
+	// 		$results[] = $notify(true, "Database(s) enabled.");
+	// 	}
+	// 	return implode("\n", $results);
+	// },
+	// 'databaseConnected' => function() use ($notify, &$checkStatus) {
+	// 	if (!$checkStatus['database']) {
+	// 		return;
+	// 	}
+	// 	$results = array();
+	// 	$config = Connections::config();
+	// 	foreach ($config as $name => $options) {
+	// 		$enabled = Connections::enabled($name);
+	// 		if ($enabled) {
+	// 			$connection = Connections::get($name)->connect();
+	// 			if ($connection) {
+	// 				$results[] = $notify(
+	// 					true, "Connection to <code>{$name}</code> database verified."
+	// 				);
+	// 			} else {
+	// 				$results[] = $notify(
+	// 					false, "Could not connect to <code>{$name}</code> database."
+	// 				);
+	// 			}
+	// 		}
+	// 	}
+	// 	return implode("\n", $results);
+	// },
 	'magicQuotes' => function() use ($notify) {
 		if (get_magic_quotes_gpc() === 0) {
 			return;
@@ -70,30 +118,10 @@ $sanityChecks = array(
 			'Register globals is enabled in your PHP configuration. Please set <code>' .
 			'register_globals = Off</code> in your <code>php.ini</code> settings.'
 		));
-	}
+	},
 );
 
 ?>
-<h3><?php echo $this->title('home'); ?></h3>
-
-<p>
-	This is your application's default home page. To change this template, edit the file
-	<code><?php echo LITHIUM_APP_PATH . '/views/pages/home.html.php'; ?></code>.
-</p>
-
-<p>
-	To change the application's <em>layout</em> (the file containing the
-	header, footer and default styles), edit the file
-	<code><?php echo LITHIUM_APP_PATH . '/views/layouts/default.html.php'; ?></code>.
-</p>
-
-<p>
-	To change the <em><a href="http://lithify.me/docs/lithium/net/http/Router">routing</a></em> of
-	the application's default page, edit the file
-	<code><?php echo LITHIUM_APP_PATH . '/config/routes.php'; ?></code>.
-</p>
-
-<h3>system check</h3>
 
 <?php
 
@@ -102,8 +130,38 @@ foreach ($sanityChecks as $checkName => $check) {
 }
 
 ?>
+<h3>Getting Started</h3>
+<p>
+	This is your application's default home page. To change this template, edit the file
+	<code><?php echo LITHIUM_APP_PATH . '/views/pages/home.html.php'; ?></code>.
+</p>
 
-<h4>additional resources</h4>
+<h4>Layout</h4>
+<p>
+	To change the application's <em>layout</em> (the file containing the
+	header, footer and default styles), edit the file
+	<code><?php echo LITHIUM_APP_PATH . '/views/layouts/default.html.php'; ?></code>.
+</p>
+
+<h4>Routing</h4>
+<p>
+	To change the <em><a href="http://lithify.me/docs/lithium/net/http/Router">routing</a></em> of
+	the application's default page, edit the file
+	<code><?php echo LITHIUM_APP_PATH . '/config/routes.php'; ?></code>.
+</p>
+
+<?php
+if (!empty($solutions)) {
+	foreach ($solutions as $solution) { ?>
+
+<h4 id="<?php echo $solution['id']; ?>"><?php echo $solution['title']; ?></h4>
+<p><?php echo $solution['content']; ?></p>
+
+<?php	}
+}
+?>
+
+<h4>Additional Resources</h4>
 <ul>
 	<li><a href="http://lithify.me/docs/lithium">Lithium API</a></li>
 	<li><a href="http://rad-dev.org/lithium/wiki">Lithium Development Wiki</a></li>
