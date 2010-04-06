@@ -34,7 +34,9 @@ $exceptions = intval($count['exceptions']) ?: 0;
 <?php foreach ((array) $stats['skips'] as $skip): ?>
 	<?php $trace = $skip['trace'][1]; ?>
 	<div class="test-skip">
-		Skip <?php echo "{$trace['class']}::{$trace['function']}() on line {$trace['line']}:" ?>
+		<?php $method = $trace['function']; ?>
+		<?php $test = $trace['class'] . ($method != 'skip' ? "::{$method}()" : ''); ?>
+		Skipped test <?php echo $test ?>
 		<span class="content"><?php echo $skip['message'] ?></span>
 	</div>
 <?php endforeach ?>
