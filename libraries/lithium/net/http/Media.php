@@ -8,7 +8,7 @@
 
 namespace lithium\net\http;
 
-use \Exception;
+use \RuntimeException;
 use \lithium\util\String;
 use \lithium\core\Libraries;
 
@@ -37,53 +37,14 @@ class Media extends \lithium\core\StaticObject {
 	 * @var array
 	 * @see lithium\net\http\Media::type()
 	 */
-	protected static $_types = array(
-		'atom'         => 'application/atom+xml',
-		'css'          => 'text/css',
-		'form'         => 'application/x-www-form-urlencoded',
-		'htm'          => array('alias' => 'html'),
-		'html'         => array('text/html', 'application/xhtml+xml', '*/*'),
-		'js'           => array('application/javascript', 'text/javascript'),
-		'json'         => 'application/json',
-		'rss'          => 'application/rss+xml',
-		'text'         => 'text/plain',
-		'txt'          => array('alias' => 'text'),
-		'xml'          => array('application/xml', 'text/xml'),
-	);
+	protected static $_types = array();
 
 	/**
 	 * A map of media handler objects or callbacks, mapped to media types.
 	 *
 	 * @var array
 	 */
-	protected static $_handlers = array(
-		'default' => array(
-			'view'     => '\lithium\template\View',
-			'paths' => array(
-				'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
-				'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
-			),
-			'encode'   => false,
-			'decode'   => false
-		),
-		'html' => array(),
-		'json' => array(
-			'view'   => false,
-			'layout' => false,
-			'encode' => 'json_encode',
-			'decode' => 'json_decode'
-		),
-		'text' => array(
-			'view'     => false,
-			'layout'   => false,
-			'template' => false
-		),
-		'form' => array(
-			'view'   => false,
-			'layout' => false,
-			'encode' => 'http_build_query'
-		)
-	);
+	protected static $_handlers = array();
 
 	/**
 	 * Contains default path settings for various asset types.
@@ -95,24 +56,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @var array
 	 * @see lithium\net\http\Media::assets()
 	 */
-	protected static $_assets = array(
-		'js' => array('suffix' => '.js', 'filter' => null, 'path' => array(
-			'{:base}/{:library}/js/{:path}' => array('base', 'library', 'path'),
-			'{:base}/js/{:path}' => array('base', 'path')
-		)),
-		'css' => array('suffix' => '.css', 'filter' => null, 'path' => array(
-			'{:base}/{:library}/css/{:path}' => array('base', 'library', 'path'),
-			'{:base}/css/{:path}' => array('base', 'path')
-		)),
-		'image' => array('suffix' => null, 'filter' => null, 'path' => array(
-			'{:base}/{:library}/img/{:path}' => array('base', 'library', 'path'),
-			'{:base}/img/{:path}' => array('base', 'path')
-		)),
-		'generic' => array('suffix' => null, 'filter' => null, 'path' => array(
-			'{:base}/{:library}/{:path}' => array('base', 'library', 'path'),
-			'{:base}/{:path}' => array('base', 'path')
-		))
-	);
+	protected static $_assets = array();
 
 	/**
 	 * Returns the list of registered media types.  New types can be set with the `type()` method.
@@ -121,7 +65,7 @@ class Media extends \lithium\core\StaticObject {
 	 *         list of types handled.
 	 */
 	public static function types() {
-		return array_keys(static::$_types);
+		return array_keys(static::_types());
 	}
 
 	/**
@@ -217,7 +161,7 @@ class Media extends \lithium\core\StaticObject {
 		}
 
 		if (strpos($type, '/')) {
-			foreach (static::$_types as $name => $cTypes) {
+			foreach (static::_types() as $name => $cTypes) {
 				if ($type == $cTypes || (is_array($cTypes) && in_array($type, $cTypes))) {
 					return $name;
 				}
@@ -225,16 +169,14 @@ class Media extends \lithium\core\StaticObject {
 			return;
 		}
 
-		if (empty($content) && empty($options)) {
-			$content = isset(static::$_types[$type]) ? static::$_types[$type] : null;
-			$options = isset(static::$_handlers[$type]) ? static::$_handlers[$type] : null;
-			return compact('content', 'options');
+		if (!$content && !$options) {
+			return array('content' => static::_types($type), 'options' => static::_handlers($type));
 		}
 
-		if (!empty($content)) {
+		if ($content) {
 			static::$_types[$type] = $content;
 		}
-		static::$_handlers[$type] = !empty($options) ? ((array) $options + $defaults) : array();
+		static::$_handlers[$type] = $options ? ($options + $defaults) : array();
 	}
 
 	/**
@@ -259,22 +201,21 @@ class Media extends \lithium\core\StaticObject {
 	public static function assets($type = null, $options = array()) {
 		$defaults = array('suffix' => null, 'filter' => null, 'path' => array());
 
-		if (empty($type)) {
-			return static::$_assets;
+		if (!$type) {
+			return static::_assets();
 		}
 		if ($options === false) {
 			unset(static::$_assets[$type]);
 		}
-		if (empty($options)) {
-			return isset(static::$_assets[$type]) ? static::$_assets[$type] : null;
+		if (!$options) {
+			return static::_assets($type);
 		}
-		$options += $defaults;
+		$options = (array) $options + $defaults;
 
-		if (isset(static::$_assets[$type])) {
-			static::$_assets[$type] = array_filter((array) $options) + static::$_assets[$type];
-		} else {
-			static::$_assets[$type] = $options;
+		if ($base = static::_assets($type)) {
+			$options = array_merge($base, array_filter($options));
 		}
+		static::$_assets[$type] = $options;
 	}
 
 	/**
@@ -315,8 +256,11 @@ class Media extends \lithium\core\StaticObject {
 			'check' => false,
 			'library' => 'app'
 		);
-		$type = isset(static::$_assets[$type]) ? $type : 'generic';
-		$options += (static::$_assets[$type] + $defaults);
+		if (!$base = static::_assets($type)) {
+			$type = 'generic';
+			$base = static::_assets('generic');
+		}
+		$options += ($base + $defaults);
 		$params = compact('path', 'type', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params, $chain) {
@@ -386,13 +330,11 @@ class Media extends \lithium\core\StaticObject {
 	 */
 	public static function render(&$response, $data = null, array $options = array()) {
 		$params = array('response' => &$response) + compact('data', 'options');
-		$types = static::$_types;
-		$handlers = static::$_handlers;
+		$types = static::_types();
+		$handlers = static::_handlers();
 
 		static::_filter(__FUNCTION__, $params, function($self, $params) use ($types, $handlers) {
-			$defaults = array(
-				'encode' => null, 'template' => null, 'layout' => null, 'view' => null
-			);
+			$defaults = array('encode' => null, 'template' => null, 'layout' => '', 'view' => null);
 			$response =& $params['response'];
 			$data = $params['data'];
 			$options = $params['options'] + array('type' => $response->type());
@@ -402,14 +344,17 @@ class Media extends \lithium\core\StaticObject {
 			$hasHandler = isset($handlers[$type]);
 			$handler = $options + ($hasHandler ? $handlers[$type] : array()) + $defaults;
 
-			if ((!$handler['encode'] && !$handler['view']) && !$hasHandler) {
-				throw new Exception("Unhandled media type '{$type}'");
-			}
 			$filter = function($v) { return $v !== null; };
 			$handler = array_filter($handler, $filter) + $handlers['default'] + $defaults;
 
+			if (!$hasHandler) {
+				throw new RuntimeException("Unhandled media type '{$type}'");
+			}
+
+			if (isset($types[$type])) {
+				$response->headers('Content-type', current((array) $types[$type]));
+			}
 			$response->body($self::invokeMethod('_handle', array($handler, $data, $options)));
-			$response->headers('Content-type', current((array) $types[$type]));
 		});
 	}
 
@@ -425,10 +370,10 @@ class Media extends \lithium\core\StaticObject {
 	 * @return mixed
 	 */
 	public static function encode($type, $data, array $options = array()) {
-		if (!isset(static::$_handlers[$type]) || !isset(static::$_handlers[$type]['encode'])) {
+		if ((!$handler = static::_handlers($type)) || !isset($handler['encode'])) {
 			return null;
 		}
-		$method = static::$_handlers[$type]['encode'];
+		$method = $handler['encode'];
 		return is_string($method) ? $method($data) : $method($data, $handler + $options);
 	}
 
@@ -444,11 +389,23 @@ class Media extends \lithium\core\StaticObject {
 	 * @return mixed
 	 */
 	public static function decode($type, $data, array $options = array()) {
-		if (!isset(static::$_handlers[$type]) || !isset(static::$_handlers[$type]['decode'])) {
+		if ((!$handler = static::_handlers($type)) || !isset($handler['decode'])) {
 			return null;
 		}
-		$method = static::$_handlers[$type]['decode'];
+		$method = $handler['decode'];
 		return is_string($method) ? $method($data) : $method($data, $handler + $options);
+	}
+
+	/**
+	 * Resets the `Media` class to its default state. Mainly used for ensuring a consistent state
+	 * during testing.
+	 *
+	 * @return void
+	 */
+	public static function reset() {
+		foreach (get_class_vars(__CLASS__) as $name => $value) {
+			static::${$name} = array();
+		}
 	}
 
 	/**
@@ -464,8 +421,9 @@ class Media extends \lithium\core\StaticObject {
 	protected static function _handle($handler, $data, $options) {
 		$params = compact('handler', 'data', 'options');
 		return static::_filter(__FUNCTION__,  $params, function($self, $params, $chain) {
-			extract($params, EXTR_OVERWRITE);
-			$result = '';
+			$handler = $params['handler'];
+			$options = $params['options'];
+			$data = $params['data'];
 
 			if (isset($options['request'])) {
 				$options += (array) $options['request']->params;
@@ -475,23 +433,98 @@ class Media extends \lithium\core\StaticObject {
 			switch (true) {
 				case $handler['encode']:
 					$method = $handler['encode'];
-					$result = is_string($method) ? $method($data) : $method(
-						$data, $handler, $options
-					);
-				break;
-				case $handler['view']:
+					return is_string($method) ? $method($data) : $method($data, $handler, $options);
+				case class_exists($handler['view']):
 					$view = new $handler['view']($handler);
-					$result = $view->render('all', $data, $options);
-				break;
+					return $view->render('all', $data, $options);
 				case ($handler['template'] === false) && is_string($data):
-					$result = $data;
-				break;
+					return $data;
 				default:
-					$result = print_r($data, true);
-				break;
+					throw new RuntimeException("Could not interpret type settings for handler.");
 			}
 			return $result;
 		});
+	}
+
+	protected static function _types($type = null) {
+		$types = static::$_types + array(
+			'atom'         => 'application/atom+xml',
+			'css'          => 'text/css',
+			'form'         => 'application/x-www-form-urlencoded',
+			'htm'          => array('alias' => 'html'),
+			'html'         => array('text/html', 'application/xhtml+xml', '*/*'),
+			'js'           => array('application/javascript', 'text/javascript'),
+			'json'         => 'application/json',
+			'rss'          => 'application/rss+xml',
+			'text'         => 'text/plain',
+			'txt'          => array('alias' => 'text'),
+			'xml'          => array('application/xml', 'text/xml'),
+		);
+		if ($type) {
+			return isset($types[$type]) ? $types[$type] : null;
+		}
+		return $types;
+	}
+
+	protected static function _handlers($type = null) {
+		$handlers = static::$_handlers + array(
+			'default' => array(
+				'view'     => '\lithium\template\View',
+				'paths' => array(
+					'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
+					'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
+				),
+				'encode'   => false,
+				'decode'   => false
+			),
+			'html' => array(),
+			'json' => array(
+				'view'   => false,
+				'layout' => false,
+				'encode' => 'json_encode',
+				'decode' => 'json_decode'
+			),
+			'text' => array(
+				'view'     => false,
+				'layout'   => false,
+				'template' => false,
+				'encode'   => function($data) { return $data; }
+			),
+			'form' => array(
+				'view'   => false,
+				'layout' => false,
+				'encode' => 'http_build_query'
+			)
+		);
+		if ($type) {
+			return isset($handlers[$type]) ? $handlers[$type] : null;
+		}
+		return $handlers;
+	}
+
+	protected static function _assets($type = null) {
+		$assets = static::$_assets + array(
+			'js' => array('suffix' => '.js', 'filter' => null, 'path' => array(
+				'{:base}/{:library}/js/{:path}' => array('base', 'library', 'path'),
+				'{:base}/js/{:path}' => array('base', 'path')
+			)),
+			'css' => array('suffix' => '.css', 'filter' => null, 'path' => array(
+				'{:base}/{:library}/css/{:path}' => array('base', 'library', 'path'),
+				'{:base}/css/{:path}' => array('base', 'path')
+			)),
+			'image' => array('suffix' => null, 'filter' => null, 'path' => array(
+				'{:base}/{:library}/img/{:path}' => array('base', 'library', 'path'),
+				'{:base}/img/{:path}' => array('base', 'path')
+			)),
+			'generic' => array('suffix' => null, 'filter' => null, 'path' => array(
+				'{:base}/{:library}/{:path}' => array('base', 'library', 'path'),
+				'{:base}/{:path}' => array('base', 'path')
+			))
+		);
+		if ($type) {
+			return isset($assets[$type]) ? $assets[$type] : null;
+		}
+		return $assets;
 	}
 }
 

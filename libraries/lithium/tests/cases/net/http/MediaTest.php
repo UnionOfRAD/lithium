@@ -16,6 +16,15 @@ use \lithium\core\Libraries;
 class MediaTest extends \lithium\test\Unit {
 
 	/**
+	 * Reset the `Media` class to its default state.
+	 *
+	 * @return void
+	 */
+	public function setUp() {
+		Media::reset();
+	}
+
+	/**
 	 * Tests setting, getting and removing custom media types.
 	 *
 	 * @return void
@@ -355,6 +364,7 @@ class MediaTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testRequestOptionMerging() {
+		Media::type('custom', 'text/x-custom');
 		$request = new Request();
 		$request->params['foo'] = 'bar';
 
@@ -391,12 +401,24 @@ class MediaTest extends \lithium\test\Unit {
 		$response = new Response();
 		$response->type = 'html';
 
-		Media::render($response, null, compact('request') + array(
-			'layout' => false,
-			'template' => 'home',
-		));
-		$this->assertPattern('/home/', $response->body());
+		$this->expectException('/Template not found/');
+		Media::render($response, null, compact('request'));
 		$this->_cleanUp();
+	}
+
+	/**
+	 * Tests that the `Media` class' configuration can be reset to its default state.
+	 *
+	 * @return void
+	 */
+	public function testStateReset() {
+		$this->assertFalse(in_array('foo', Media::types()));
+
+		Media::type('foo', 'text/x-foo');
+		$this->assertTrue(in_array('foo', Media::types()));
+
+		Media::reset();
+		$this->assertFalse(in_array('foo', Media::types()));
 	}
 }
 

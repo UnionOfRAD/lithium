@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\net\http;
 
+use \lithium\net\http\Media;
 use \lithium\tests\mocks\net\http\MockService;
 
 class ServiceTest extends \lithium\test\Unit {
@@ -26,6 +27,10 @@ class ServiceTest extends \lithium\test\Unit {
 		'port' => 80,
 		'timeout' => 2
 	);
+
+	public function setUp() {
+		Media::reset();
+	}
 
 	public function testAllMethodsNoConnection() {
 		$http = new MockService(array('classes' => array('socket' => false)));
