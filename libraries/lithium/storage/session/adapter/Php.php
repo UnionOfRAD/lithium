@@ -26,8 +26,7 @@ class Php extends \lithium\core\Object {
 	 * @var array Keys are session ini settings, but without the `session.` namespace.
 	 */
 	protected $_defaults = array(
-		'name' => 'li3', 'cookie_lifetime' => '86400', 'cookie_domain' => '',
-		'cookie_secure' => false, 'cookie_httponly' => false, 'save_path' => ''
+		'session.name' => 'li3', 'session.cookie_lifetime' => '86400',
 	);
 
 	/**
@@ -50,14 +49,17 @@ class Php extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _init() {
-		foreach ($this->_defaults as $key => $config) {
-			if (isset($this->_config[$key])) {
-				if (ini_set("session.{$key}", $this->_config[$key]) === false) {
-					throw new RuntimeException("Could not initialize the session.");
-				}
+		$config = $this->_config;
+		unset($config['adapter'], $config['strategies'], $config['filters'], $config['init']);
+
+		foreach ($config as $key => $value) {
+			if (strpos($key, 'session.') === false) {
+				continue;
+			}
+			if (ini_set($key, $value) === false) {
+				throw new RuntimeException("Could not initialize the session.");
 			}
 		}
-		$_SESSION['_timestamp'] = time();
 	}
 
 	/**
@@ -71,7 +73,7 @@ class Php extends \lithium\core\Object {
 			return true;
 		}
 		if (!isset($_SESSION)) {
-			session_cache_limiter("must-revalidate");
+			session_cache_limiter('nocache');
 		}
 		return session_start();
 	}
@@ -83,7 +85,7 @@ class Php extends \lithium\core\Object {
 	 *         has been set, false otherwise.
 	 */
 	public static function isStarted() {
-		return ((!session_id()) && isset($_SESSION) && isset($_SESSION['_timestamp']));
+		return (boolean) session_id();
 	}
 
 	/**

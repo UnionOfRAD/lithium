@@ -143,7 +143,6 @@ class Cookie extends \lithium\core\Object {
 				} else {
 					$name = (array_shift($name) . '[' . join('][', $name) . ']');
 				}
-
 				if (is_array($val)) {
 					foreach ($val as $key => $v) {
 						setcookie($name . "[$key]", $v, strtotime($expires), $config['path'],

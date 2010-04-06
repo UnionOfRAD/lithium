@@ -23,6 +23,25 @@ class CookieTest extends \lithium\test\Unit {
 		$this->skipIf($sapi === 'cli', $message);
 	}
 
+	public function tearDown() {
+		$this->_destroySession();
+	}
+
+	protected function _destroySession($name = null) {
+		if (!$name) {
+			$name = session_name();
+		}
+		$settings = session_get_cookie_params();
+		setcookie(
+			$name, '', time() - 1000, $settings['path'], $settings['domain'],
+			$settings['secure'], $settings['httponly']
+		);
+		if (session_id()) {
+			session_destroy();
+		}
+		$_COOKIE = array();
+	}
+
 	public function assertCookie($expected, $headers) {
 		$defaults = array('path' => '/', 'name' => 'li3');
 		$expected += $defaults;

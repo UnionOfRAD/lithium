@@ -13,8 +13,11 @@ use \lithium\storage\session\adapter\Php;
 class PhpTest extends \lithium\test\Unit {
 
 	public function setUp() {
-		$this->_destroySession(session_name());
+		$this->_session = isset($_SESSION) ? $_SESSION : array();
+		$this->_destroySession();
+
 		$this->Php = new Php();
+		$this->_destroySession();
 
 		/* Garbage collection */
 		$this->_gc_divisor = ini_get('session.gc_divisor');
@@ -22,19 +25,23 @@ class PhpTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
-		$this->_destroySession(session_name());
+		$this->_destroySession();
 
 		/* Revert to original garbage collection probability */
 		ini_set('session.gc_divisor', $this->_gc_divisor);
+		$_SESSION = $this->_session;
 	}
 
-	protected function _destroySession($name) {
+	protected function _destroySession($name = null) {
+		if (!$name) {
+			$name = session_name();
+		}
+		$settings = session_get_cookie_params();
+		setcookie(
+			$name, '', time() - 1000, $settings['path'], $settings['domain'],
+			$settings['secure'], $settings['httponly']
+		);
 		if (session_id()) {
-			$settings = session_get_cookie_params();
-			setcookie(
-				$name, '', time() - 1000, $settings['path'], $settings['domain'],
-				$settings['secure'], $settings['httponly']
-			);
 			session_destroy();
 		}
 		$_SESSION = array();
@@ -50,12 +57,6 @@ class PhpTest extends \lithium\test\Unit {
 		$id = session_id();
 		$this->assertTrue(empty($id));
 
-		$result = $_SESSION['_timestamp'];
-		$expected = time();
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testDefaultConfiguration() {
 		$result = ini_get('session.name');
 		$this->assertEqual('li3', $result);
 
@@ -77,20 +78,21 @@ class PhpTest extends \lithium\test\Unit {
 
 	public function testCustomConfiguration() {
 		$config = array(
-			'name' => 'awesome_name', 'cookie_lifetime' => 1200,
-			'cookie_domain' => 'awesome.domain', 'save_path' => LITHIUM_APP_PATH . '/resources/tmp/'
+			'session.name' => 'awesome_name', 'session.cookie_lifetime' => 1200,
+			'session.cookie_domain' => 'awesome.domain',
+			'session.save_path' => LITHIUM_APP_PATH . '/resources/tmp/'
 		);
 
 		$adapter = new Php($config);
 
 		$result = ini_get('session.name');
-		$this->assertEqual($config['name'], $result);
+		$this->assertEqual($config['session.name'], $result);
 
 		$result = ini_get('session.cookie_lifetime');
-		$this->assertEqual($config['cookie_lifetime'], (integer) $result);
+		$this->assertEqual($config['session.cookie_lifetime'], (integer) $result);
 
 		$result = ini_get('session.cookie_domain');
-		$this->assertEqual($config['cookie_domain'], $result);
+		$this->assertEqual($config['session.cookie_domain'], $result);
 
 		$result = ini_get('session.cookie_secure');
 		$this->assertFalse($result);
@@ -99,10 +101,15 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertFalse($result);
 
 		$result = ini_get('session.save_path');
-		$this->assertEqual($config['save_path'], $result);
+		$this->assertEqual($config['session.save_path'], $result);
 	}
 
 	public function testIsStarted() {
+		$result = $this->Php->isStarted();
+		$this->assertFalse($result);
+
+		$this->Php->read();
+
 		$result = $this->Php->isStarted();
 		$this->assertTrue($result);
 
@@ -119,6 +126,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertFalse($result);
 
 		$Php = new Php();
+		$Php->read();
 		$result = $Php->isStarted();
 		$this->assertTrue($result);
 	}
@@ -146,6 +154,8 @@ class PhpTest extends \lithium\test\Unit {
 	}
 
 	public function testRead() {
+		$this->Php->read();
+
 		$key = 'read_test';
 		$value = 'value to be read';
 
@@ -156,6 +166,7 @@ class PhpTest extends \lithium\test\Unit {
 
 		$params = compact('key');
 		$result = $closure($this->Php, $params, null);
+
 		$this->assertIdentical($value, $result);
 
 		$key = 'non-existent';
@@ -170,11 +181,13 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertTrue(is_callable($closure));
 
 		$result = $closure($this->Php, array('key' => null), null);
-		$expected = array('read_test' => 'value to be read', '_timestamp' => time());
+		$expected = array('read_test' => 'value to be read');
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testCheck() {
+		$this->Php->read();
+
 		$key = 'read';
 		$value = 'value to be read';
 		$_SESSION[$key] = $value;
@@ -196,6 +209,8 @@ class PhpTest extends \lithium\test\Unit {
 	}
 
 	public function testDelete() {
+		$this->Php->read();
+
 		$key = 'delete_test';
 		$value = 'value to be deleted';
 
@@ -218,7 +233,6 @@ class PhpTest extends \lithium\test\Unit {
 		$result = $closure($this->Php, $params, null);
 
 		$this->assertFalse($result);
-
 	}
 }
 
