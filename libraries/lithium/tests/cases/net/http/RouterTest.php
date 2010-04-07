@@ -143,7 +143,6 @@ class RouterTest extends \lithium\test\Unit {
 	 */
 	public function testStringActions() {
 		Router::connect('/login', array('controller' => 'sessions', 'action' => 'create'));
-		Router::connect('/{:controller}', array('action' => 'index'));
 		Router::connect('/{:controller}/{:action}');
 
 		$result = Router::match("Sessions::create");
@@ -154,6 +153,35 @@ class RouterTest extends \lithium\test\Unit {
 
 		$result = Router::match("ListItems::archive");
 		$this->assertEqual('/list_items/archive', $result);
+	}
+
+	/**
+	 * Tests that URLs specified as "Controller::action" and including additional parameters are
+	 * interpreted properly.
+	 *
+	 * @return void
+	 */
+	public function testEmbeddedStringActions() {
+		Router::connect('/logout/{:id:[0-9]{5,6}}', array(
+			'controller' => 'sessions', 'action' => 'destroy', 'id' => null
+		));
+		Router::connect('/{:controller}/{:action}');
+		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}', array('id' => null));
+
+		$result = Router::match("Sessions::create");
+		$this->assertEqual('/sessions/create', $result);
+
+		$result = Router::match(array("Sessions::create"));
+		$this->assertEqual('/sessions/create', $result);
+
+		$result = Router::match(array("Sessions::destroy", 'id' => '03815'));
+		$this->assertEqual('/logout/03815', $result);
+
+		$result = Router::match(array("Sessions::create", 'id' => 'foo'));
+		$this->assertNull($result);
+
+		$result = Router::match("Posts::index");
+		$this->assertEqual('/posts', $result);
 	}
 
 	/**

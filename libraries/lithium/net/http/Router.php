@@ -109,10 +109,17 @@ class Router extends \lithium\core\StaticObject {
 	 * @return string
 	 */
 	public static function match($options = array(), $context = null) {
-		if (is_string($options)) {
-			if (is_string($options = static::_matchString($options, $context))) {
+		if (is_string($path = $options)) {
+			if (strpos($path, '#') === 0 || strpos($path, 'mailto') === 0 || strpos($path, '://')) {
+				return $path;
+			}
+			if (is_string($options = static::_parseString($options, $context))) {
 				return $options;
 			}
+		}
+		if (isset($options[0]) && is_array($params = static::_parseString($options[0], $context))) {
+			unset($options[0]);
+			$options = $params + $options;
 		}
 		$defaults = array('action' => 'index');
 
@@ -126,7 +133,7 @@ class Router extends \lithium\core\StaticObject {
 
 		foreach (static::$_configurations as $route) {
 			if ($match = $route->match($options, $context)) {
-				return "{$base}{$match}";
+				return rtrim("{$base}{$match}", '/');
 			}
 		}
 	}
@@ -147,10 +154,7 @@ class Router extends \lithium\core\StaticObject {
 		static::$_configurations = array();
 	}
 
-	protected static function _matchString($path, $context) {
-		if (strpos($path, '#') === 0 || strpos($path, 'mailto') === 0 || strpos($path, '://')) {
-			return $path;
-		}
+	protected static function _parseString($path, $context) {
 		if (!preg_match('/^[A-Za-z0-9_]+::[A-Za-z0-9_]+$/', $path)) {
 			$base = $context ? $context->env('base') : '';
 			$path = trim($path, '/');
