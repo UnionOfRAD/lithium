@@ -10,6 +10,7 @@ namespace lithium\template\helper;
 
 use \lithium\util\Set;
 use \lithium\util\Inflector;
+use \UnexpectedValueException;
 
 /**
  * A helper class to facilitate generating, processing and securing HTML forms. By default, `Form`
@@ -189,6 +190,14 @@ class Form extends \lithium\template\Helper {
 	 *         attributes passed in `$options`.
 	 */
 	public function create($binding = null, array $options = array()) {
+		if ($binding) {
+			foreach (array('data', 'errors', 'exists') as $method) {
+				if (!method_exists($binding, $method)) {
+					throw new UnexpectedValueException("Invalid binding object passed.");
+				}
+			}
+		}
+
 		$defaults = array(
 			'url' => $this->_context->request()->params,
 			'type' => null,
