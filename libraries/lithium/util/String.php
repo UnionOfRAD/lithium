@@ -65,11 +65,11 @@ class String {
 	 * @param string $salt
 	 * @return string Hash.
 	 */
-	public static function hash($string, $type = null, $salt = null) {
+	public static function hash($string, $type = 'sha1', $salt = null) {
 		$string = $salt . $string;
 
 		switch (true) {
-			case (($type == 'sha1' || !$type) && function_exists('sha1')):
+			case ($type == 'sha1' && function_exists('sha1')):
 				return sha1($string);
 			case ($type == 'sha256' && function_exists('mhash')):
 				return bin2hex(mhash(MHASH_SHA256, $string));
