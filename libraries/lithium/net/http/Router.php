@@ -55,7 +55,14 @@ class Router extends \lithium\core\StaticObject {
 	 */
 	public static function connect($template, $params = array(), array $options = array()) {
 		if (!is_object($template)) {
-			$params + array('action' => 'index');
+			if (is_string($params)) {
+				$params = static::_parseString($params, false);
+			}
+			if (isset($params[0]) && is_array($tmp = static::_parseString($params[0], false))) {
+				unset($params[0]);
+				$params = $tmp + $params;
+			}
+			$params += array('action' => 'index');
 			$class = static::$_classes['route'];
 			$template = new $class(compact('template', 'params') + $options);
 		}
@@ -158,7 +165,7 @@ class Router extends \lithium\core\StaticObject {
 		if (!preg_match('/^[A-Za-z0-9_]+::[A-Za-z0-9_]+$/', $path)) {
 			$base = $context ? $context->env('base') : '';
 			$path = trim($path, '/');
-			return "{$base}/{$path}";
+			return $context !== false ? "{$base}/{$path}" : null;
 		}
 		list($controller, $action) = explode('::', $path, 2);
 		$controller = Inflector::underscore($controller);

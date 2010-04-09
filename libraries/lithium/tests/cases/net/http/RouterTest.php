@@ -185,6 +185,43 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that routes can be created with shorthand strings, i.e. `'Controller::action'` and
+	 * `array('Controller::action', 'id' => '...')`.
+	 *
+	 * @return void
+	 */
+	public function testStringParameterConnect() {
+		Router::connect('/posts/{:id:[0-9a-f]{24}}', 'Posts::edit');
+
+		$result = Router::match(array(
+			'controller' => 'posts', 'action' => 'edit', 'id' => '4bbf25bd8ead0e5180130000'
+		));
+		$expected = '/posts/4bbf25bd8ead0e5180130000';
+		$this->assertEqual($expected, $result);
+
+		$result = Router::match(array(
+			'controller' => 'posts', 'action' => 'view', 'id' => '4bbf25bd8ead0e5180130000'
+		));
+		$this->assertNull($result);
+
+		Router::reset();
+		Router::connect('/posts/{:page:[0-9]+}', array('Posts::index', 'page' => '1'));
+
+		$result = Router::match(array('controller' => 'posts', 'page' => '5'));
+		$expected = '/posts/5';
+		$this->assertEqual($expected, $result);
+
+		$result = Router::match(array('Posts::index', 'page' => '10'));
+		$expected = '/posts/10';
+		$this->assertEqual($expected, $result);
+
+		$request = new Request(array('url' => '/posts/13'));
+		$result = Router::process($request);
+		$expected = array('controller' => 'posts', 'action' => 'index', 'page' => '13');
+		$this->assertEqual($expected, $result->params);
+	}
+
+	/**
 	 * Tests that routing is fully reset when calling `Router::reset()`.
 	 *
 	 * @return void
