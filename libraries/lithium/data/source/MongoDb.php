@@ -13,6 +13,7 @@ use \MongoId;
 use \MongoCode;
 use \MongoDBRef;
 use \Exception;
+use \lithium\util\Inflector;
 
 /**
  * A data source adapter which allows you to connect to the MongoDB database engine. MongoDB is an
@@ -313,6 +314,16 @@ class MongoDb extends \lithium\data\Source {
 			case 'count':
 				return $this->read($query, $options)->count();
 		}
+	}
+
+	public function relationship($class, $type, $name, array $options = array()) {
+		$key = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name'));
+		$defaults = compact('key') + array(
+			'type' => $type,
+			'class' => $name,
+			'fields' => true
+		);
+		return $options + $defaults;
 	}
 
 	/**

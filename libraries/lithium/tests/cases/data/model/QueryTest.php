@@ -8,14 +8,17 @@
 
 namespace lithium\tests\cases\data\model;
 
-use \lithium\data\model\Record;
+use \lithium\data\Connections;
 use \lithium\data\model\Query;
+use \lithium\data\model\Record;
 use \lithium\tests\mocks\data\MockPostObject;
 use \lithium\tests\mocks\data\model\MockDatabase;
 use \lithium\tests\mocks\data\model\MockQueryPost;
 use \lithium\tests\mocks\data\model\MockQueryComment;
 
 class QueryTest extends \lithium\test\Unit {
+
+	protected $_configs = array();
 
 	protected $_queryArr = array(
 		'model' => '\lithium\tests\mocks\data\model\MockQueryPost',
@@ -29,8 +32,19 @@ class QueryTest extends \lithium\test\Unit {
 	);
 
 	public function setUp() {
-		MockQueryPost::__init();
-		MockQueryComment::__init();
+		$this->db = new MockDatabase();
+		$this->_configs = Connections::config();
+
+		Connections::reset();
+		Connections::config(array('mock-database-connection' => array('adapter' => &$this->db)));
+
+		MockQueryPost::config();
+		MockQueryComment::config();
+	}
+
+	public function tearDown() {
+		Connections::reset();
+		Connections::config($this->_configs);
 	}
 
 	/**

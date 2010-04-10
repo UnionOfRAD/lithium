@@ -12,9 +12,14 @@ use \lithium\data\source\http\adapter\CouchDb;
 
 use \lithium\data\Model;
 use \lithium\data\model\Query;
+use \lithium\data\Connections;
 use \lithium\data\collection\Document;
 
 class CouchDbTest extends \lithium\test\Unit {
+
+	public $db;
+
+	protected $_configs = array();
 
 	protected $_testConfig = array(
 		'classes' => array(
@@ -32,28 +37,33 @@ class CouchDbTest extends \lithium\test\Unit {
 	);
 
 	public function setUp() {
-		$model = '\lithium\tests\mocks\data\source\http\adapter\MockCouchPost';
-		$this->query = new Query(compact('model') + array(
-			'record' => new Document(compact('model'))
-		));
+		$this->_configs = Connections::config();
+
+		Connections::reset();
+		$this->db = new CouchDb(array('classes' => array('socket' => false)));
+		Connections::config(array('mock-couchdb-connection' => array('adapter' => &$this->db)));
+
+		$options = array('model' => '\lithium\tests\mocks\data\source\http\adapter\MockCouchPost');
+		$this->query = new Query($options + array('record' => new Document($options)));
 	}
 
 	public function tearDown() {
+		Connections::reset();
+		Connections::config($this->_configs);
 		unset($this->query);
 	}
 
 	public function testAllMethodsNoConnection() {
-		$couchdb = new CouchDb(array('classes' => array('socket' => false)));
-		$this->assertFalse($couchdb->connect());
-		$this->assertTrue($couchdb->disconnect());
-		$this->assertFalse($couchdb->get());
-		$this->assertFalse($couchdb->post());
-		$this->assertFalse($couchdb->put());
+		$this->assertFalse($this->db->connect());
+		$this->assertTrue($this->db->disconnect());
+		$this->assertFalse($this->db->get());
+		$this->assertFalse($this->db->post());
+		$this->assertFalse($this->db->put());
 	}
 
 	public function testConnect() {
-		$couchdb = new CouchDb($this->_testConfig);
-		$result = $couchdb->connect();
+		$this->db = new CouchDb($this->_testConfig);
+		$result = $this->db->connect();
 		$this->assertTrue($result);
 	}
 

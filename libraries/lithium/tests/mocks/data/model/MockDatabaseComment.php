@@ -12,6 +12,10 @@ class MockDatabaseComment extends \lithium\data\Model {
 
 	public $belongsTo = array('MockDatabasePost');
 
+	protected $_meta = array(
+		'connection' => 'mock-database-connection'
+	);
+
 	protected $_schema = array(
 		'id' => array('type' => 'integer'),
 		'post_id' => array('type' => 'integer'),

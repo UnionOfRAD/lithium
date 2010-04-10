@@ -193,6 +193,10 @@ class Http extends \lithium\data\Source {
 	public function delete($query = null, array $options = array()) {
 		return $this->connection->delete();
 	}
+
+	public function relationship($class, $type, $name, array $options = array()) {
+		return array();
+	}
 }
 
 ?>

@@ -9,6 +9,7 @@
 namespace lithium\data\source;
 
 use \lithium\util\String;
+use \lithium\util\Inflector;
 use \InvalidArgumentException;
 
 abstract class Database extends \lithium\data\Source {
@@ -286,6 +287,17 @@ abstract class Database extends \lithium\data\Source {
 			$sql = $self->renderCommand('delete', $data, $query);
 			return (boolean) $self->invokeMethod('_execute', array($sql));
 		});
+	}
+
+	public function relationship($class, $type, $name, array $options = array()) {
+		$key = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name'));
+		$defaults = array(
+			'type' => $type,
+			'class' => $name,
+			'fields' => true,
+			'key' => $key . '_id'
+		);
+		return $options + $defaults;
 	}
 
 	/**

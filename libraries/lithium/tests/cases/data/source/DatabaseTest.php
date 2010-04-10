@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\data\source;
 
+use \lithium\data\Connections;
 use \lithium\data\model\Query;
 use \lithium\data\model\Record;
 use \lithium\data\source\Database;
@@ -19,10 +20,22 @@ class DatabaseTest extends \lithium\test\Unit {
 
 	public $db = null;
 
+	protected $_configs = array();
+
 	public function setUp() {
 		$this->db = new MockDatabase();
-		MockDatabasePost::__init();
-		MockDatabaseComment::__init();
+		$this->_configs = Connections::config();
+
+		Connections::reset();
+		Connections::config(array('mock-database-connection' => array('adapter' => &$this->db)));
+
+		MockDatabasePost::config();
+		MockDatabaseComment::config();
+	}
+
+	public function tearDown() {
+		Connections::reset();
+		Connections::config($this->_configs);
 	}
 
 	public function testDefaultConfig() {

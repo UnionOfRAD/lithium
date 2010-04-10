@@ -12,6 +12,7 @@ class MockCouchPost extends \lithium\data\Model {
 
 	protected $_meta = array(
 		'source' => 'posts',
+		'connection' => 'mock-couchdb-connection'
 	);
 
 	protected $_schema = array(

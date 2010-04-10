@@ -8,11 +8,80 @@
 
 namespace lithium\tests\mocks\data;
 
+use \lithium\util\Inflector;
+
 class MockSource extends \lithium\data\Source {
 
 	protected $_classes = array(
 		'record' => '\lithium\data\model\Record',
 		'recordSet' => '\lithium\data\collection\RecordSet'
+	);
+
+	private $_mockPosts = array(
+		'id' => array('type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL),
+		'user_id' => array(
+			'type' => 'int', 'length' => '10', 'null' => true, 'default' => NULL
+		),
+		'title' => array(
+			'type' => 'varchar', 'length' => '255', 'null' => true, 'default' => NULL
+		),
+		'body' => array(
+			'type' => 'text', 'length' => NULL, 'null' => true, 'default' => NULL
+		),
+		'created' => array(
+			'type' => 'datetime', 'length' => NULL, 'null' => true, 'default' => NULL
+		),
+		'modified' => array(
+			'type' => 'datetime', 'length' => NULL, 'null' => true, 'default' => NULL
+		),
+		'status' => array(
+			'type' => 'tinyint', 'length' => '1', 'null' => false, 'default' => '0'
+		)
+	);
+
+	private $_mockComments = array(
+		'id' => array(
+			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
+		),
+		'comment_type_id' => array(
+			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
+		),
+		'article_id' => array(
+			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
+		),
+		'comment_id' => array(
+			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
+		),
+		'user_id' => array(
+			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
+		),
+		'created' => array(
+			'type' => 'datetime', 'length' => NULL, 'null' => false, 'default' => NULL,
+		),
+		'body' => array(
+			'type' => 'text', 'length' => NULL, 'null' => false, 'default' => NULL,
+		),
+		'subscribed' => array(
+			'type' => 'tinyint', 'length' => '1', 'null' => false, 'default' => NULL,
+		),
+		'published' => array(
+			'type' => 'tinyint', 'length' => '1', 'null' => false, 'default' => NULL,
+		),
+	);
+
+	private $_mockTags = array(
+		'id' => array(
+			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
+		),
+		'linked' => array(
+			'type' => 'int', 'length' => '10', 'null' => true, 'default' => NULL,
+		),
+		'name' => array(
+			'type' => 'varchar', 'length' => '20', 'null' => true, 'default' => NULL,
+		),
+		'keyname' => array(
+			'type' => 'varchar', 'length' => '20', 'null' => true, 'default' => NULL,
+		),
 	);
 
 	public function connect() {
@@ -33,7 +102,7 @@ class MockSource extends \lithium\data\Source {
 	}
 
 	public function describe($entity, $meta = array()) {
-		$var = "__{$entity}";
+		$var = "_" . Inflector::camelize($entity, false);
 		if ($this->{$var}) {
 			return $this->{$var};
 		}
@@ -64,72 +133,16 @@ class MockSource extends \lithium\data\Source {
 
 	}
 
-	private $__mock_posts = array(
-		'id' => array('type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL),
-		'user_id' => array(
-			'type' => 'int', 'length' => '10', 'null' => true, 'default' => NULL
-		),
-		'title' => array(
-			'type' => 'varchar', 'length' => '255', 'null' => true, 'default' => NULL
-		),
-		'body' => array(
-			'type' => 'text', 'length' => NULL, 'null' => true, 'default' => NULL
-		),
-		'created' => array(
-			'type' => 'datetime', 'length' => NULL, 'null' => true, 'default' => NULL
-		),
-		'modified' => array(
-			'type' => 'datetime', 'length' => NULL, 'null' => true, 'default' => NULL
-		),
-		'status' => array(
-			'type' => 'tinyint', 'length' => '1', 'null' => false, 'default' => '0'
-		)
-	);
-
-	private $__mock_comments = array(
-		'id' => array(
-			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
-		),
-		'comment_type_id' => array(
-			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
-		),
-		'article_id' => array(
-			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
-		),
-		'comment_id' => array(
-			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
-		),
-		'user_id' => array(
-			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
-		),
-		'created' => array(
-			'type' => 'datetime', 'length' => NULL, 'null' => false, 'default' => NULL,
-		),
-		'body' => array(
-			'type' => 'text', 'length' => NULL, 'null' => false, 'default' => NULL,
-		),
-		'subscribed' => array(
-			'type' => 'tinyint', 'length' => '1', 'null' => false, 'default' => NULL,
-		),
-		'published' => array(
-			'type' => 'tinyint', 'length' => '1', 'null' => false, 'default' => NULL,
-		),
-	);
-
-	private $__mock_tags = array(
-		'id' => array(
-			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
-		),
-		'linked' => array(
-			'type' => 'int', 'length' => '10', 'null' => true, 'default' => NULL,
-		),
-		'name' => array(
-			'type' => 'varchar', 'length' => '20', 'null' => true, 'default' => NULL,
-		),
-		'keyname' => array(
-			'type' => 'varchar', 'length' => '20', 'null' => true, 'default' => NULL,
-		),
-	);
+	public function relationship($class, $type, $name, array $options = array()) {
+		$key = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name'));
+		$defaults = array(
+			'type' => $type,
+			'class' => $name,
+			'fields' => true,
+			'key' => $key . '_id'
+		);
+		return $options + $defaults;
+	}
 }
 
 ?>

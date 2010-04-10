@@ -12,6 +12,10 @@ class MockDatabaseTag extends \lithium\data\Model {
 
 	public $hasMany = array('MockDatabaseTagging');
 
+	protected $_meta = array(
+		'connection' => 'mock-database-connection'
+	);
+
 	protected $_schema = array(
 		'id' => array('type' => 'integer'),
 		'title' => array('type' => 'string'),

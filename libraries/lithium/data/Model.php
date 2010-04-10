@@ -441,7 +441,7 @@ class Model extends \lithium\core\StaticObject {
 		};
 
 		if (!$options['callbacks']) {
-			return $filter->__invoke($record, $options);
+			return $filter($record, $options);
 		}
 		return static::_filter(__FUNCTION__, $params, $filter);
 	}
@@ -568,17 +568,12 @@ class Model extends \lithium\core\StaticObject {
 	protected static function _relations() {
 		$relations = array();
 		$self = static::_instance();
+		$class = get_called_class();
+		$connection = $self->_connection();
 
 		foreach ($self->_relationTypes as $type => $keys) {
-			foreach (Set::normalize($self->{$type}) as $name => $options) {
-				$key = Inflector::underscore($type == 'belongsTo' ? $name : $self->_meta['name']);
-				$defaults = array(
-					'type' => $type,
-					'class' => $name,
-					'fields' => true,
-					'key' => $key . '_id'
-				);
-				$relations[$name] = (array) $options + $defaults;
+			foreach (Set::normalize($self->{$type}) as $name => $config) {
+				$relations[$name] = $connection->relationship($class, $type, $name, (array) $config);
 			}
 		}
 		return $relations;

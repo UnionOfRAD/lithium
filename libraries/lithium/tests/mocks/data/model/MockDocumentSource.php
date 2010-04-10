@@ -45,9 +45,19 @@ class MockDocumentSource extends \lithium\data\Source {
 				unset($resource);
 				$result = null;
 				break;
-
 		}
 		return $result;
+	}
+
+	public function relationship($class, $type, $name, array $options = array()) {
+		$key = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name'));
+		$defaults = array(
+			'type' => $type,
+			'class' => $name,
+			'fields' => true,
+			'key' => $key . '_id'
+		);
+		return $options + $defaults;
 	}
 }
 

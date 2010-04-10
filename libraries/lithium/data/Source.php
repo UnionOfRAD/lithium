@@ -121,6 +121,13 @@ abstract class Source extends \lithium\core\Object {
 	abstract public function describe($entity, $meta = array());
 
 	/**
+	 * Defines or modifies the default settings of a relationship between two models.
+	 *
+	 * @return array Returns an array containing the configuration for a model relationship.
+	 */
+	abstract public function relationship($class, $type, $name, array $options = array());
+
+	/**
 	 * Abstract. Must be defined by child classes.
 	 *
 	 * @param mixed $query

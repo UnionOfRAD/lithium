@@ -11,7 +11,8 @@ namespace lithium\tests\mocks\data\model;
 class MockQueryPost extends \lithium\data\Model {
 
 	protected $_meta = array(
-		'source' => false
+		'source' => false,
+		'connection' => 'mock-database-connection'
 	);
 
 	protected $_schema = array(
