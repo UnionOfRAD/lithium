@@ -137,10 +137,16 @@ class MockSource extends \lithium\data\Source {
 		$key = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name'));
 		$defaults = array(
 			'type' => $type,
-			'class' => $name,
+			'class' => null,
 			'fields' => true,
 			'key' => $key . '_id'
 		);
+		$options += $defaults;
+
+		if (!$options['class']) {
+			$assoc = preg_replace("/\\w+$/", "", $class) . $name;
+			$options['class'] = class_exists($assoc) ? $assoc : Libraries::locate('models', $assoc);
+		}
 		return $options + $defaults;
 	}
 }

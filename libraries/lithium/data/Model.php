@@ -312,15 +312,11 @@ class Model extends \lithium\core\StaticObject {
 		}
 
 		if (isset($self->_relationTypes[$name])) {
-			return $self->$name;
+			return array_keys(array_filter($self->_relations, function($i) use ($name) {
+				return $i['type'] == $name;
+			}));
 		}
-
-		foreach (array_keys($self->_relationTypes) as $type) {
-			if (isset($self->{$type}[$name])) {
-				return $self->{$type}[$name];
-			}
-		}
-		return null;
+		return isset($self->_relations[$name]) ? $self->_relations[$name] : null;
 	}
 
 	/**
@@ -333,10 +329,11 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function schema($field = null) {
 		$self = static::_instance();
-		if (empty($self->_schema)) {
+
+		if (!$self->_schema) {
 			$self->_schema = $self->_connection()->describe($self::meta('source'), $self->_meta);
 		}
-		if (is_string($field) && !empty($field)) {
+		if (is_string($field) && $field) {
 			return isset($self->_schema[$field]) ? $self->_schema[$field] : null;
 		}
 		return $self->_schema;
@@ -362,7 +359,7 @@ class Model extends \lithium\core\StaticObject {
 			return false;
 		}
 		$schema = static::schema();
-		return (!empty($schema) && isset($schema[$field]));
+		return ($schema && isset($schema[$field]));
 	}
 
 	/**
@@ -573,7 +570,8 @@ class Model extends \lithium\core\StaticObject {
 
 		foreach ($self->_relationTypes as $type => $keys) {
 			foreach (Set::normalize($self->{$type}) as $name => $config) {
-				$relations[$name] = $connection->relationship($class, $type, $name, (array) $config);
+				$config = $connection->relationship($class, $type, $name, (array) $config);
+				$relations[$name] = $config + compact('type');
 			}
 		}
 		return $relations;

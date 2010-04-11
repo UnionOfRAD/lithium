@@ -14,10 +14,16 @@ use \lithium\data\Connections;
 
 class Company extends \lithium\data\Model {
 
-	protected $_meta = array(
-		'connection' => 'test',
-		'source' => 'companies'
-	);
+	public $hasMany = array('Employee');
+
+	protected $_meta = array('connection' => 'test');
+}
+
+class Employee extends \lithium\data\Model {
+
+	public $belongsTo = array('Company');
+
+	protected $_meta = array('connection' => 'test');
 }
 
 class SourceTest extends \lithium\test\Unit {
@@ -28,7 +34,8 @@ class SourceTest extends \lithium\test\Unit {
 	);
 
 	public function setUp() {
-		Company::__init();
+		Company::config();
+		Employee::config();
 	}
 
 	public function tearDown() {
@@ -156,6 +163,29 @@ class SourceTest extends \lithium\test\Unit {
 		$id = $company->{$key};
 		$companyCopy = Company::find($id);
 		$this->assertEqual($company->data(), $companyCopy->data());
+	}
+
+	/**
+	 * Tests the default relationship information provided by the backend data source.
+	 *
+	 * @return void
+	 */
+	public function testDefaultRelationshipInfo() {
+		$this->assertEqual(array('Employee'), Company::relations());
+		$this->assertEqual(array('Company'), Employee::relations());
+
+		$this->assertEqual(array('Employee'), Company::relations('hasMany'));
+		$this->assertEqual(array('Company'), Employee::relations('belongsTo'));
+
+		$this->assertFalse(Company::relations('belongsTo'));
+		$this->assertFalse(Company::relations('hasOne'));
+
+		$this->assertFalse(Employee::relations('hasMany'));
+		$this->assertFalse(Employee::relations('hasOne'));
+
+		$result = Company::relations('Employee');
+		$this->assertEqual('hasMany', $result['type']);
+		$this->assertEqual(__NAMESPACE__ . '\Employee', $result['class']);
 	}
 }
 

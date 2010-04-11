@@ -130,8 +130,21 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertFalse(MockComment::relations('hasMany'));
 		$this->assertFalse(MockPost::relations('belongsTo'));
 
-		$this->assertNull(MockComment::relations('MockPost'));
-		$this->assertNull(MockPost::relations('MockComment'));
+		$expected = array(
+			'type' => 'belongsTo',
+			'class' => 'lithium\tests\mocks\data\MockPost',
+			'fields' => true,
+			'key' => 'mock_post_id'
+		);
+		$this->assertEqual($expected, MockComment::relations('MockPost'));
+
+		$expected = array(
+			'type' => 'hasMany',
+			'class' => 'lithium\tests\mocks\data\MockComment',
+			'fields' => true,
+			'key' => 'mock_post_id'
+		);
+		$this->assertEqual($expected, MockPost::relations('MockComment'));
 	}
 
 	public function testSimpleRecordCreation() {
