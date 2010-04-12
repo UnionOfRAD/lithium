@@ -23,19 +23,28 @@ use \Exception;
  */
 class Response extends \lithium\net\http\Response {
 
-	protected $_config = array();
+	protected $_classes = array('router' => '\lithium\net\http\Router');
 
 	public function __construct(array $config = array()) {
-		$defaults = array('buffer' => 8192, 'request' => null);
+		$defaults = array(
+			'buffer' => 8192, 'request' => null, 'location' => null, 'status' => null
+		);
 		parent::__construct($config + $defaults);
 	}
 
 	protected function _init() {
-		parent::_init();
-
-		if (!empty($this->_config['request']) && is_object($this->_config['request'])) {
+		if ($this->_config['status']) {
+			$this->status(null, $this->_config['status']);
+		}
+		if ($this->_config['request'] && is_object($this->_config['request'])) {
 			$this->type = $this->_config['request']->type();
 		}
+		if ($this->_config['location']) {
+			$router = $this->_classes['router'];
+			$location = $router::match($this->_config['location'], $this->_config['request']);
+			$this->headers('Location', $location);
+		}
+		parent::_init();
 	}
 
 	/**

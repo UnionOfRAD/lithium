@@ -11,6 +11,7 @@ namespace lithium\tests\cases\net\http;
 use \lithium\action\Request;
 use \lithium\net\http\Route;
 use \lithium\net\http\Router;
+use \lithium\action\Response;
 
 class RouterTest extends \lithium\test\Unit {
 
@@ -388,6 +389,28 @@ class RouterTest extends \lithium\test\Unit {
 		$request = Router::process(new Request(array('url' => '/add/foo/bar', 'base' => '')));
 		$path = Router::match(array('args' => array('baz', 'dib')), $request);
 		$this->assertEqual('/add/baz/dib', $path);
+	}
+
+	/**
+	 * Tests passing a closure handler to `Router::connect()` to bypass or augment default
+	 * dispatching.
+	 *
+	 * @return void
+	 */
+	public function testRouteHandler() {
+		Router::connect('/login', 'Users::login');
+
+		Router::connect('/users/login', array(), function($request, $params) {
+			return new Response(array(
+				'location' => array('controller' => 'users', 'action' => 'login')
+			));
+		});
+
+		$result = Router::process(new Request(array('url' => '/users/login')));
+		$this->assertTrue($result instanceof Response);
+
+		$headers = array('Location' => '/login');
+		$this->assertEqual($headers, $result->headers);
 	}
 }
 

@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\net\http;
 
+use \lithium\action\Request;
 use \lithium\net\http\Route;
-use \lithium\net\http\Request;
 
 class RouteTest extends \lithium\test\Unit {
 
@@ -428,6 +428,25 @@ class RouteTest extends \lithium\test\Unit {
 
 		$this->assertEqual(array('id' => 'id', 'type' => 'type'), $data['keys']);
 		$this->assertEqual(array('id' => '[0-9a-f]{24}'), $data['subPatterns']);
+	}
+
+	/**
+	 * Tests that route handlers are able to modify route parameters.
+	 *
+	 * @return void
+	 */
+	public function testHandlerModification() {
+		$route = new Route(array(
+			'template' => '/{:id:[0-9a-f]{24}}.{:type}',
+			'handler' => function($request, $params) {
+				return $params + array('lang' => $request->env('ACCEPT_LANG') ?: 'en');
+			}
+		));
+
+		$request = new Request(array('url' => '/4bbf25bd8ead0e5180120000.json'));
+		$result = $route->parse($request);
+		$lang = $request->env('ACCEPT_LANG') ?: 'en';
+		$this->assertEqual($lang, $result['lang']);
 	}
 }
 

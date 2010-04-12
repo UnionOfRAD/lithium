@@ -105,26 +105,40 @@ class Route extends \lithium\core\Object {
 	 */
 	protected $_persist = array();
 
+	/**
+	 * Contains a function which will be executed if this route is matched. The function takes the
+	 * instance of the associated `Request` object, and the array of matched route parameters, and
+	 * must return either the parameters array (which may be modified by the handler) or a
+	 * `Response` object, in which case the response will be returned directly. This may be used to
+	 * handle redirects, or simple API services.
+	 *
+	 * @var object
+	 */
+	protected $_handler = null;
+
 	protected $_autoConfig = array(
-		'template', 'pattern', 'keys', 'params', 'match', 'defaults', 'subPatterns', 'persist'
+		'template', 'pattern', 'keys', 'params', 'match',
+		'defaults', 'subPatterns', 'persist', 'handler'
 	);
 
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'params' => array(),
+			'params'   => array(),
 			'template' => '/',
-			'pattern' => '^[\/]*$',
-			'match' => array(),
+			'pattern'  => '^[\/]*$',
+			'match'    => array(),
 			'defaults' => array(),
-			'keys' => array(),
-			'compile' => true,
-			'persist' => array('controller')
+			'keys'     => array(),
+			'compile'  => true,
+			'persist'  => array('controller'),
+			'handler'  => null,
 		);
 		parent::__construct($config + $defaults);
 	}
 
 	protected function _init() {
 		parent::_init();
+
 		$this->_pattern = $this->_pattern ?: rtrim($this->_template, '/');
 		$this->_params += array('action' => 'index');
 
@@ -144,17 +158,23 @@ class Route extends \lithium\core\Object {
 	public function parse($request) {
 		$url = '/' . trim($request->url, '/');
 
-		if (preg_match($this->_pattern, $url, $match)) {
-			$match['args'] = isset($match['args']) ?  explode('/', $match['args']) : array();
-			$result = array_intersect_key($match, $this->_keys) + $this->_params + $this->_defaults;
-
-			if (!$result['action']) {
-				unset($result['action']);
-			}
-			$result += array('action' => 'index', 'persist' => $this->_persist);
-			return $result;
+		if (!preg_match($this->_pattern, $url, $match)) {
+			return false;
 		}
-		return false;
+
+		$match['args'] = isset($match['args']) ?  explode('/', $match['args']) : array();
+		$result = array_intersect_key($match, $this->_keys) + $this->_params + $this->_defaults;
+
+		if (!$result['action']) {
+			unset($result['action']);
+		}
+		$result += array('action' => 'index', 'persist' => $this->_persist);
+
+		if ($this->_handler) {
+			$handler = $this->_handler;
+			$result = $handler($request, $result);
+		}
+		return $result;
 	}
 
 	/**

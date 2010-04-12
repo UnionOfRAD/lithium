@@ -53,7 +53,7 @@ class Router extends \lithium\core\StaticObject {
 	 * @param array $options
 	 * @return array Array of routes
 	 */
-	public static function connect($template, $params = array(), array $options = array()) {
+	public static function connect($template, $params = array(), $options = array()) {
 		if (!is_object($template)) {
 			if (is_string($params)) {
 				$params = static::_parseString($params, false);
@@ -63,6 +63,10 @@ class Router extends \lithium\core\StaticObject {
 				$params = $tmp + $params;
 			}
 			$params += array('action' => 'index');
+
+			if (is_callable($options)) {
+				$options = array('handler' => $options);
+			}
 			$class = static::$_classes['route'];
 			$template = new $class(compact('template', 'params') + $options);
 		}
@@ -77,13 +81,18 @@ class Router extends \lithium\core\StaticObject {
 	 * @return object Returns a copy of the `Request` object with parameters applied.
 	 */
 	public static function process($request) {
-		if (!$params = static::parse($request)) {
+		if (!$result = static::parse($request)) {
 			return $request;
 		}
-		$persist = (is_array($params) && isset($params['persist'])) ? $params['persist'] : array();
-		unset($params['persist']);
 
-		$request->params = $params;
+		if (is_object($result) && $result instanceof \lithium\action\Response) {
+			return $result;
+		}
+
+		$persist = (is_array($result) && isset($result['persist'])) ? $result['persist'] : array();
+		unset($result['persist']);
+
+		$request->params = $result;
 		$request->persist = $persist;
 		return $request;
 	}
