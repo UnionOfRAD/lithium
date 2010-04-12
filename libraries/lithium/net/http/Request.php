@@ -14,7 +14,7 @@ use \lithium\util\String;
  * Facilitates HTTP request creation by assembling connection and path info, `GET` and `POST` data,
  * and authentication credentials in a single, stateful object.
  */
-class Request extends \lithium\net\http\Base {
+class Request extends \lithium\net\http\Message {
 
 	/**
 	 * The protocol scheme to be used in the request. Used when calculating the target URL of this

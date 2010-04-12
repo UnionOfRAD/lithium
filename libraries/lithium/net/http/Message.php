@@ -12,7 +12,7 @@ namespace lithium\net\http;
  * Base class for `lithium\net\http\Request` and `lithium\net\http\Response`. Implements basic
  * protocol handling for HTTP-based transactions.
  */
-class Base extends \lithium\core\Object {
+class Message extends \lithium\core\Object {
 
 	/**
 	 * The full protocol: HTTP/1.1

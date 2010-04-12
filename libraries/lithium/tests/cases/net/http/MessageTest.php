@@ -8,14 +8,14 @@
 
 namespace lithium\tests\cases\net\http;
 
-use \lithium\net\http\Base;
+use \lithium\net\http\Message;
 
-class BaseTest extends \lithium\test\Unit {
+class MessageTest extends \lithium\test\Unit {
 
 	public $request = null;
 
 	public function setUp() {
-		$this->base = new Base();
+		$this->base = new Message();
 	}
 
 	public function testHeaderKey() {

@@ -11,7 +11,7 @@ namespace lithium\net\http;
 /**
  * Parses and stores the status, headers and body of an HTTP response.
  */
-class Response extends \lithium\net\http\Base {
+class Response extends \lithium\net\http\Message {
 
 	/**
 	 * Status code and message.
