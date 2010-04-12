@@ -24,16 +24,51 @@ use \lithium\core\Environment;
  */
 class ErrorHandler extends \lithium\core\StaticObject {
 
+	/**
+	 * Configuration parameters.
+	 *
+	 * @var array Config params
+	 */
 	protected static $_config = array();
 
+	/**
+	 * Error/exception handlers.
+	 *
+	 * @var array An array of closures that represent all invokable error/exception handlers.
+	 */
 	protected static $_handlers = array();
 
+	/**
+	 * Types of checks available for sorting & parsing errors/exceptions.
+	 * Default checks are for `code`, `stack` and `message`.
+	 *
+	 * @var array Array of checks represented as closures, indexed by name.
+	 */
 	protected static $_checks = array();
 
+	/**
+	 * Currently registered exception handler.
+	 *
+	 * @var closure Closure representing exception handler.
+	 */
 	protected static $_exceptionHandler = null;
 
+	/**
+	 * State of error/exception handling.
+	 *
+	 * @var boolean True if custom error/exception handlers have been registered, false
+	 *      otherwise.
+	 */
 	protected static $_isRunning = false;
 
+	/**
+	 * Setup basic error handling checks/types, as well as register the error and exception
+	 * hanlders.
+	 *
+	 * Called on static class initialization (i.e. when first loaded).
+	 *
+	 * @return void
+	 */
 	public static function __init() {
 		static::$_checks = array(
 			'type'  => function($config, $info) {
@@ -73,14 +108,35 @@ class ErrorHandler extends \lithium\core\StaticObject {
 		};
 	}
 
+	/**
+	 * Getter & setter of error/exception handlers.
+	 *
+	 * @param array $handlers If set, the passed `$handlers` array will be merged with
+	 *        the already defined handlers in the `ErrorHandler` static class.
+	 * @return array Current set of handlers.
+	 */
 	public static function handlers($handlers = array()) {
 		return (static::$_handlers = $handlers + static::$_handlers);
 	}
 
-	public static function config($config = array()) {
+	/**
+	 * Configure the `ErrorHandler`.
+	 *
+	 * @param array $config Configuration directives.
+	 * @return Current configuration set.
+	 */
+	public static function config(array $config = array()) {
 		return (static::$_config = array_merge($config, static::$_config));
 	}
 
+	/**
+	 * Register error and exception handlers.
+	 *
+	 * This method (`ErrorHandler::run()`) needs to be called as early as possible in the bootstrap
+	 * cycle; immediately after `require`-ing `bootstrap/libraries.php` is your best bet.
+	 *
+	 * @return void
+	 */
 	public static function run() {
 		$self = get_called_class();
 
@@ -96,7 +152,8 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Returns the state of the error handler indicating whether
+	 * Returns the state of the `ErrorHandler`, indicating whether or not custom error/exception
+	 * handers have been regsitered.
 	 *
 	 * @return void
 	 */
@@ -131,6 +188,14 @@ class ErrorHandler extends \lithium\core\StaticObject {
 		static::__init();
 	}
 
+	/**
+	 * Receives the handled errors and exceptions that have been caught, and processes them
+	 * in a normalized manner.
+	 *
+	 * @param object|array $info
+	 * @param array $scope
+	 * @return boolean True if successfully handled, false otherwise.
+	 */
 	public static function handle($info, $scope = array()) {
 		$checks = static::$_checks;
 		$rules = $scope ?: static::$_config;
@@ -138,14 +203,8 @@ class ErrorHandler extends \lithium\core\StaticObject {
 		$info = is_object($info) ? $handler($info, true) : $info;
 
 		$defaults = array(
-			'type'      => null,
-			'code'      => 0,
-			'message'   => null,
-			'file'      => null,
-			'line'      => 0,
-			'trace'     => array(),
-			'context'   => null,
-			'exception' => null
+			'type' => null, 'code' => 0, 'message' => null, 'file' => null, 'line' => 0,
+			'trace' => array(), 'context' => null, 'exception' => null
 		);
 		$info = (array) $info + $defaults;
 
@@ -164,21 +223,28 @@ class ErrorHandler extends \lithium\core\StaticObject {
 					continue 2;
 				}
 			}
+			if (!isset($config['handler'])) {
+				return false;
+			}
 			if ((isset($config['conditions']) && $call = $config['conditions']) && !$call($info)) {
 				return false;
 			}
 			if ((isset($config['scope'])) && static::handle($info, $config['scope']) !== false) {
 				return true;
 			}
-			if (isset($config['handler'])) {
-				$handler = $config['handler'];
-				return $handler($info) !== false;
-			}
+			$handler = $config['handler'];
+			return $handler($info) !== false;
 		}
 		return false;
 	}
 
-	protected static function _origin($stack) {
+	/**
+	 * Determine frame from the stack trace where the error/exception was first generated.
+	 *
+	 * @param array $stack Stacktrace from error/exception that was produced.
+	 * @return string Class where error/exception was generated.
+	 */
+	protected static function _origin(array $stack) {
 		foreach ($stack as $frame) {
 			if (isset($frame['class'])) {
 				return trim($frame['class'], '\\');
@@ -186,7 +252,12 @@ class ErrorHandler extends \lithium\core\StaticObject {
 		}
 	}
 
-	protected static function _trace($stack) {
+	/**
+	 * Trim down a typical stack trace to class & method calls.
+	 *
+	 * @param array $stack A debug_backtrace() compatible stacktrace output.
+	 */
+	protected static function _trace(array $stack) {
 		$result = array();
 
 		foreach ($stack as $frame) {
