@@ -167,7 +167,7 @@ class Model extends \lithium\core\StaticObject {
 				);
 				return $result;
 			},
-			'count' => function($self, $params, $chain) use (&$query, &$classes) {
+			'count' => function($self, $params, $chain) {
 				$model = $self;
 				$type = $params['type'];
 				$options = array_filter($params['options']);
