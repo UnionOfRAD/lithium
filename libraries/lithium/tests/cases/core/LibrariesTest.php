@@ -21,7 +21,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testPathTemplate() {
-		$expected = array('{:app}/libraries/{:name}', '{:root}/libraries/{:name}');
+		$expected = array('{:app}/libraries/{:name}', '{:root}/{:name}');
 		$result = Libraries::paths('libraries');
 		$this->assertEqual($expected, $result);
 
@@ -133,7 +133,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->expectException("Library 'invalid_foo' not found.");
 		Libraries::add('invalid_foo');
 	}
-	
+
 	/**
 	 * Tests that non-prefixed (poorly named or structured) libraries can still be added.
 	 *
@@ -154,7 +154,7 @@ class LibrariesTest extends \lithium\test\Unit {
 				return $params['path'] . '/' . \lithium\util\Inflector::underscore($class) . '.php';
 			}
 		));
-		
+
 		$fakeClass = new \Fake();
 		unlink($fakeFilename);
 		rmdir($fakeDir);

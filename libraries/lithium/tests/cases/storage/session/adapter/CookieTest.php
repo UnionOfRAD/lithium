@@ -27,6 +27,25 @@ class CookieTest extends \lithium\test\Unit {
 		$this->Cookie = new Cookie();
 	}
 
+	public function tearDown() {
+		$this->_destroyCookie();
+	}
+
+	protected function _destroyCookie($name = null) {
+		if (!$name) {
+			$name = session_name();
+		}
+		$settings = session_get_cookie_params();
+		setcookie(
+			$name, '', time() - 1000, $settings['path'], $settings['domain'],
+			$settings['secure'], $settings['httponly']
+		);
+		if (session_id()) {
+			session_destroy();
+		}
+		$_COOKIE = array();
+	}
+
 	public function testEnabled() {
 		$this->assertTrue($this->Cookie->isEnabled());
 	}

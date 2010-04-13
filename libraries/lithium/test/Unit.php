@@ -512,12 +512,11 @@ class Unit extends \lithium\core\Object {
 	 * @param array $headers When empty, value of `headers_list()` is used.
 	 */
 	public function assertCookie($expected, $headers = null) {
-		$defaults = array('path' => '/', 'name' => 'app');
+		$defaults = array('path' => '/', 'name' => 'li3');
 		$expected += $defaults;
 
-		$result = $headers;
-		if (empty($result)) {
-			$result = headers_list();
+		if (empty($headers)) {
+			$headers = headers_list();
 		}
 
 		$value = preg_quote(urlencode($expected['value']), '/');
@@ -537,7 +536,7 @@ class Unit extends \lithium\core\Object {
 		$pattern .= "\sexpires=$expires;\spath=$path/";
 		$match = false;
 
-		foreach ($result as $header) {
+		foreach ($headers as $header) {
 			if (preg_match($pattern, $header)) {
 				$match = true;
 				continue;
