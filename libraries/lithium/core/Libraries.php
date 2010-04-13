@@ -78,6 +78,7 @@ class Libraries {
 	protected static $_paths = array(
 		'adapter' => array(
 			'{:library}\extensions\adapter\{:namespace}\{:class}\{:name}',
+			'{:library}\extensions\adapter\{:class}\{:name}',
 			'{:library}\{:namespace}\{:class}\adapter\{:name}' => array('libraries' => 'lithium')
 		),
 		'strategy' => array(
