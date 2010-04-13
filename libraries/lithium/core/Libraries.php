@@ -104,7 +104,7 @@ class Libraries {
 		),
 		'libraries' => array(
 			'{:app}/libraries/{:name}',
-			'{:root}/libraries/{:name}'
+			'{:root}/{:name}'
 		),
 		'models' => '{:library}\models\{:name}',
 		'test' => array(
