@@ -8,7 +8,21 @@
 
 namespace lithium\tests\cases\net\socket;
 
+use \lithium\net\socket\Context;
+
 class ContextTest extends \lithium\test\Unit {
+
+	public $subject;
+
+	public function setUp() {
+		$this->subject = new Context();
+	}
+
+	public function testGetSetTimeout() {
+		$this->assertNull($this->subject->timeout());
+		$this->assertEqual(30, $this->subject->timeout(30));
+		$this->assertEqual(30, $this->subject->timeout());
+	}
 }
 
 ?>

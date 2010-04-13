@@ -42,7 +42,10 @@ class Context extends \lithium\net\Socket {
 	}
 
 	public function timeout($time = null) {
-		return $this->_timeout = $time;
+		if ($time !== null) {
+			$this->_timeout = $time;
+		}
+		return $this->_timeout;
 	}
 
 	public function encoding($encoding = null) {
