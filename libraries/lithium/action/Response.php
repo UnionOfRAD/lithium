@@ -33,16 +33,16 @@ class Response extends \lithium\net\http\Response {
 	}
 
 	protected function _init() {
-		if ($this->_config['status']) {
-			$this->status(null, $this->_config['status']);
-		}
+		$this->status($this->_config['status']);
+		unset($this->_config['status']);
+
 		if ($this->_config['request'] && is_object($this->_config['request'])) {
 			$this->type = $this->_config['request']->type();
 		}
 		if ($this->_config['location']) {
 			$router = $this->_classes['router'];
 			$location = $router::match($this->_config['location'], $this->_config['request']);
-			$this->headers('Location', $location);
+			$this->headers('location', $location);
 		}
 		parent::_init();
 	}
@@ -93,7 +93,6 @@ class Response extends \lithium\net\http\Response {
 		if (!$status = $this->status($code)) {
 			throw new Exception('Invalid status code');
 		}
-
 		$this->_writeHeader($status);
 
 		foreach ($this->headers as $name => $value) {
