@@ -205,15 +205,13 @@ class LibraryTest extends \lithium\test\Unit {
 	}
 
 	public function testFormulate() {
-		$result = $this->library->formulate(
-			$this->_testPath . '/library_test_plugin'
-		);
+		$path = $this->_testPath . '/library_test_plugin';
+		mkdir($path);
+
+		$result = $this->library->formulate($path);
 		$this->assertTrue($result);
 
-		$result = file_exists(
-			$this->_testPath
-			. '/library_test_plugin/config/library_test_plugin.json'
-		);
+		$result = file_exists($path . '/config/library_test_plugin.json');
 		$this->assertTrue($result);
 	}
 
