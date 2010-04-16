@@ -133,7 +133,7 @@ abstract class Database extends \lithium\data\Source {
 	public function name($name) {
 		$open  = reset($this->_quotes);
 		$close = next($this->_quotes);
-		return "{$open}{$name}{$close}";
+		return $name ? "{$open}{$name}{$close}" : null;
 	}
 
 	/**
