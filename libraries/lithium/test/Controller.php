@@ -33,6 +33,7 @@ class Controller extends \lithium\core\Object {
 		$defaults = array('reporter' => 'html', 'format' => 'html');
 		$options += (array) $request->query + $defaults;
 		$params = compact('request', 'dispatchParams', 'options');
+		set_time_limit(0);
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			$request = $params['request'];
