@@ -25,6 +25,8 @@ class CookieTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->Cookie = new Cookie();
+		$path = explode('/', LITHIUM_APP_PATH);
+		$this->name = end($path) . 'cookie';
 	}
 
 	public function tearDown() {
@@ -51,7 +53,7 @@ class CookieTest extends \lithium\test\Unit {
 	}
 
 	public function testKey() {
-		$this->assertEqual('li3', $this->Cookie->key());
+		$this->assertEqual($this->name, $this->Cookie->key());
 	}
 
 	public function testIsStarted() {
@@ -73,6 +75,12 @@ class CookieTest extends \lithium\test\Unit {
 		$this->assertCookie(compact('key', 'value', 'expires', 'path'));
 	}
 
+	public function testCustomCookieName() {
+		$Cookie = new Cookie(array('name' => 'test'));
+		$this->assertEqual('test', $Cookie->key());
+	}
+
+
 	public function testWriteArrayData() {
 		$key = 'user';
 		$value = array('email' => 'test@localhost', 'name' => 'Testy McTesterson');
@@ -92,7 +100,7 @@ class CookieTest extends \lithium\test\Unit {
 	public function testReadDotSyntax() {
 		$key = 'read.test';
 		$value = 'value to be read';
-		$_COOKIE['li3']['read']['test'] = $value;
+		$_COOKIE[$this->name]['read']['test'] = $value;
 
 		$closure = $this->Cookie->read($key);
 		$this->assertTrue(is_callable($closure));
