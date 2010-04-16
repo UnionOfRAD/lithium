@@ -21,40 +21,23 @@ use \InvalidArgumentException;
  * convention:
  *
  * {{{
- * use \lithium\util\Validator;
+ * 		use \lithium\util\Validator;
  *
- * // The following are equivalent:
- * Validator::rule('email', 'foo@example.com');  // true
- * Validator::isEmail('foo-at-example.com');     // false
+ * 		// The following are equivalent:
+ * 		Validator::rule('email', 'foo@example.com');  // true
+ * 		Validator::isEmail('foo-at-example.com');     // false
  * }}}
  *
- * Data can also be validated against multiple rules, each having its own associated error
+ * Data can also be validated against multiple rules, each having their own associated error
  * message. The rule structure is array-based and hierarchical based on rule names and
  * messages. Resposes match the keys present in `$data` up with an array of rules which they
  * violate.
  *
- * {{{
- * $rules = array(
- * 	'title' => 'please enter a title',
- * 	'email' => array(
- * 		array('notEmpty', 'message' => 'email is empty'),
- * 		array('email', 'message' => 'email is not valid'),
- * 	)
- * );
- * $data = array('email' => 'foo');
- * Validator::check($data, $rules);
+ * {{{ embed:lithium\tests\cases\util\ValidatorTest::testCheckMultipleHasFirstError(1-15) }}}
  *
- * // result:
- *
- * array(
- * 		'title' => array('please enter a title'),
- *		'email' => array('email is not valid')
- * );
- *
- * }}}
- *
- * Custom validation rules can also be added to `Validator` at runtime. These can either take the
- * form of regular expression strings or functions supplied to the `add()` method.
+ * See the `check()` method for more information an multi-value datasets. Custom validation rules
+ * can also be added to `Validator` at runtime. These can either take the form of regular expression
+ * strings or functions supplied to the `add()` method.
  */
 class Validator extends \lithium\core\StaticObject {
 
@@ -305,16 +288,18 @@ class Validator extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Checks a set of values against a specified rules list.
+	 * Checks a set of values against a specified rules list. This method may be used to validate
+	 * any arbitrary array of data against a set of validation rules.
 	 *
-	 * This method may be used to validate any arbitrary array data against a set of validation
-	 * rules.
-	 *
-	 * @param object $values An array of key/value pairs, where the values are to be checked.
-	 * @param string $rules array of rules to check against object properties
-	 * @return mixed When all validation rules pass
+	 * @param array $values An array of key/value pairs, where the values are to be checked.
+	 * @param array $rules An array of rules to check the values in `$values` against. Each key in
+	 *              `$rules` should match a key contained in `$values`, and each value should be a
+	 *              validation rule in one of the allowable formats.
+	 * @return array Returns an array containing all validation failures for data in `$values`,
+	 *         where each key matches a key in `$values`, and each value is an array of that
+	 *         element's validation errors.
 	 */
-	public static function check($values, $rules, array $options = array()) {
+	public static function check(array $values, array $rules, array $options = array()) {
 		$defaults = array(
 			'notEmpty',
 			'message' => null,

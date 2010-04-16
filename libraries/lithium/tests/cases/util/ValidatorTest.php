@@ -848,7 +848,7 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	public function testCheckHasErrors() {
 		$rules = array('title' => array('please enter a title'));
-		$result = Validator::check(null, $rules);
+		$result = Validator::check(array(), $rules);
 		$this->assertFalse(empty($result));
 
 		$expected = array('title' => array('please enter a title'));
@@ -870,7 +870,7 @@ class ValidatorTest extends \lithium\test\Unit {
 				array('email', 'message' => 'email is not valid')
 			)
 		);
-		$result = Validator::check(null, $rules);
+		$result = Validator::check(array(), $rules);
 		$this->assertFalse(empty($result));
 
 		$expected = array(
@@ -890,13 +890,14 @@ class ValidatorTest extends \lithium\test\Unit {
 		);
 		$data = array('email' => 'something');
 		$result = Validator::check($data, $rules);
-		$this->assertFalse(empty($result));
 
-		$expected = array(
+		// result:
+		$errors = array(
 			'title' => array('please enter a title'),
 			'email' => array('email is not valid')
 		);
-		$this->assertEqual($expected, $result);
+		$this->assertFalse(empty($result));
+		$this->assertEqual($errors, $result);
 	}
 
 	public function testCheckMultipleHasOneError() {
