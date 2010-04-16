@@ -47,6 +47,13 @@ abstract class Database extends \lithium\data\Source {
 	);
 
 	/**
+	 * A pair of opening/closing quote characters used for quoting identifiers in SQL queries.
+	 *
+	 * @var array
+	 */
+	protected $_quotes = array();
+
+	/**
 	 * Getter/Setter for the connection's encoding
 	 * Abstract. Must be defined by child class.
 	 *
@@ -124,7 +131,9 @@ abstract class Database extends \lithium\data\Source {
 	 * @return string
 	 */
 	public function name($name) {
-		return $name;
+		$open  = reset($this->_quotes);
+		$close = next($this->_quotes);
+		return "{$open}{$name}{$close}";
 	}
 
 	/**
@@ -489,68 +498,38 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	public function order($order, $context) {
-		$direction = 'DESC';
+		$direction = 'ASC';
+		$model = $context->model();
 
-		if (is_string($order) && strpos($order, ',') && !preg_match('/\(.+\,.+\)/', $order)) {
-			$order = array_map('trim', explode(',', $order));
-		}
-		$order = (is_array($order) ? array_filter($order) : $order);
-
-		if (empty($order)) {
-			return '';
+		if (is_string($order)) {
+			if ($model::schema($order)) {
+				$order = array($order => $direction);
+			} elseif (!preg_match('/\s+(A|DE)SC/i', $order)) {
+				return "ORDER BY {$order} {$direction}";
+			} else {
+				return "ORDER BY {$order}";
+			}
 		}
 
 		if (is_array($order)) {
-			$keys = (Set::countDim($keys) > 1) ? array_map(array(&$this, 'order'), $keys) : $keys;
+			$result = array();
 
-			foreach ($keys as $key => $value) {
-				if (is_numeric($key)) {
-					$key = $value = ltrim(str_replace('ORDER BY ', '', $this->order($value)));
-					$value = (!preg_match('/\\x20ASC|\\x20DESC/i', $key) ? ' ' . $direction : '');
-				} else {
-					$value = ' ' . $value;
+			foreach ($order as $column => $dir) {
+				if (is_int($column)) {
+					$column = $dir;
+					$dir = $direction;
 				}
-
-				if (!preg_match('/^.+\\(.*\\)/', $key) && !strpos($key, ',')) {
-					if (preg_match('/\\x20ASC|\\x20DESC/i', $key, $dir)) {
-						$dir = $dir[0];
-						$key = preg_replace('/\\x20ASC|\\x20DESC/i', '', $key);
-					} else {
-						$dir = '';
-					}
-					$key = trim($key);
-					if (!preg_match('/\s/', $key)) {
-						$key = $this->name($key);
-					}
-					$key .= ' ' . trim($dir);
+				if (!in_array($dir, array('ASC', 'asc', 'DESC', 'desc'))) {
+					$dir = $direction;
 				}
-				$order[] = $this->order($key . $value);
-			}
-			return ' ORDER BY ' . trim(str_replace('ORDER BY', '', join(',', $order)));
-		}
-		$keys = preg_replace('/ORDER\\x20BY/i', '', $order);
-
-		if (strpos($order, '.')) {
-			preg_match_all(
-				'/([a-zA-Z0-9_]{1,})\\.([a-zA-Z0-9_]{1,})/', $keys, $result, PREG_PATTERN_ORDER
-			);
-			$pregCount = count($result[0]);
-
-			for ($i = 0; $i < $pregCount; $i++) {
-				if (!is_numeric($result[0][$i])) {
-					$keys = preg_replace(
-						'/' . $result[0][$i] . '/', $this->name($result[0][$i]), $keys
-					);
+				if ($field = $model::schema($column)) {
+					$name = $this->name($model::meta('name')) . '.' . $this->name($column);
+					$result[] = "{$name} {$dir}";
 				}
 			}
-			$result = ' ORDER BY ' . $keys;
-			return $result . (!preg_match('/\\x20ASC|\\x20DESC/i', $keys) ? ' ' . $direction : '');
-
-		} elseif (preg_match('/(\\x20ASC|\\x20DESC)/i', $keys, $match)) {
-			$direction = $match[1];
-			return ' ORDER BY ' . preg_replace('/' . $match[1] . '/', '', $keys) . $direction;
+			$order = join(', ', $result);
+			return "ORDER BY {$order}";
 		}
-		return ' ORDER BY ' . $keys . ' ' . $direction;
 	}
 
 	/**

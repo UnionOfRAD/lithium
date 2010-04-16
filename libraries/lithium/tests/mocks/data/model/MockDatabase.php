@@ -12,6 +12,8 @@ class MockDatabase extends \lithium\data\source\Database {
 
 	public $sql = null;
 
+	protected $_quotes = array('{', '}');
+
 	public function connect() {
 		return true;
 	}

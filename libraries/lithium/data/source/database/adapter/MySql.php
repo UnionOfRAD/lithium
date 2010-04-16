@@ -34,6 +34,13 @@ class MySql extends \lithium\data\source\Database {
 	);
 
 	/**
+	 * Pair of opening and closing quote characters used for quoting identifiers in queries.
+	 *
+	 * @var array
+	 */
+	protected $_quotes = array('`', '`');
+
+	/**
 	 * MySQL-specific value denoting whether or not table aliases should be used in DELETE and
 	 * UPDATE queries.
 	 *

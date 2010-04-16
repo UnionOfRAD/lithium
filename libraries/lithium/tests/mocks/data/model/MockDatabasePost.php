@@ -18,6 +18,7 @@ class MockDatabasePost extends \lithium\data\Model {
 
 	protected $_schema = array(
 		'id' => array('type' => 'integer'),
+		'author_id' => array('type' => 'integer'),
 		'title' => array('type' => 'string'),
 		'created' => array('type' => 'datetime')
 	);
