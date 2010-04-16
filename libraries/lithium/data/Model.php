@@ -41,6 +41,7 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	protected $_classes = array(
 		'connections' => '\lithium\data\Connections',
+		'record'      => '\lithium\data\model\Record',
 		'query'       => '\lithium\data\model\Query',
 		'validator'   => '\lithium\util\Validator'
 	);
@@ -123,12 +124,15 @@ class Model extends \lithium\core\StaticObject {
 		$self = static::_instance();
 		$base = get_class_vars(__CLASS__);
 
+		$defaults = array('classes' => array(), 'meta' => array(), 'finders' => array());
 		$meta =  $options + $self->_meta + $base['_meta'];
 		$classes = $self->_classes + $base['_classes'];
+		$config = array();
 
-		$conn = $classes['connections']::get($meta['connection']);
-		$config = ($conn) ? $conn->configureClass($class) : array();
-		$defaults = array('classes' => array(), 'meta' => array(), 'finders' => array());
+		if ($meta['connection']) {
+			$conn = $classes['connections']::get($meta['connection']);
+			$config = ($conn) ? $conn->configureClass($class) : array();
+		}
 		$config += $defaults;
 
 		$self->_classes = ($config['classes'] + $classes);
@@ -375,7 +379,11 @@ class Model extends \lithium\core\StaticObject {
 	 * @return object Returns a new, **un-saved** record object.
 	 */
 	public static function create(array $data = array(), array $options = array()) {
-		return static::_filter(__FUNCTION__, compact('data', 'options'), function($self, $params) {
+		$self = static::_instance();
+		$classes = $self->_classes;
+		$params = compact('data', 'options');
+
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($classes) {
 			$data = $params['data'];
 			$options = $params['options'];
 
@@ -386,7 +394,11 @@ class Model extends \lithium\core\StaticObject {
 					}
 				}
 			}
-			return $self::invokeMethod('_connection')->item($self, $data, $options);
+
+			if ($self::meta('connection')) {
+				return $self::invokeMethod('_connection')->item($self, $data, $options);
+			}
+			return new $classes['record'](array('model' => $self) + compact('data') + $options);
 		});
 	}
 
@@ -462,13 +474,12 @@ class Model extends \lithium\core\StaticObject {
 	public function delete($record, array $options = array()) {
 		$self = static::_instance();
 		$query = $self->_classes['query'];
-		$model = get_called_class();
 		$params = compact('record', 'options');
-		$method = __FUNCTION__;
 
-		return static::_filter($method, $params, function($self, $params) use ($model, $query) {
-			extract($params);
-			$options += compact('record', 'model');
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($query) {
+			$type = 'delete';
+			$record = $params['record'];
+			$options = $params['options'] + array('model' => $self) + compact('type', 'record');
 			return $self::invokeMethod('_connection')->delete(new $query($options), $options);
 		});
 	}
@@ -565,6 +576,11 @@ class Model extends \lithium\core\StaticObject {
 	protected static function _relations() {
 		$relations = array();
 		$self = static::_instance();
+
+		if (!$self->_meta['connection']) {
+			return array();
+		}
+
 		$class = get_called_class();
 		$connection = $self->_connection();
 

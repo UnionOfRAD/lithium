@@ -20,8 +20,17 @@ use \lithium\tests\mocks\data\MockPostForValidates;
 
 class ModelTest extends \lithium\test\Unit {
 
-	public function _init() {
-		Connections::add('mock-source', array('type' => '\lithium\tests\mocks\data\MockSource'));
+	public function setUp() {
+		Connections::config(array('mock-source' => array(
+			'type' => '\lithium\tests\mocks\data\MockSource'
+		)));
+		MockPost::config(array('connection' => 'mock-source'));
+		MockTag::config();
+		MockComment::config();
+	}
+
+	public function tearDown() {
+		Connections::config(array('mock-source' => false));
 	}
 
 	public function testOverrideMeta() {
@@ -159,11 +168,10 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = 'Do you ever read any of the books you burn?';
 		$this->assertEqual($expected, $comment->text);
 
-		$comment = MockComment::create(array(
-			'author_id' => 111,
-			'text' => 'This comment should already exist'
-		), array('exists' => true));
-
+		$comment = MockComment::create(
+			array('author_id' => 111, 'text' => 'This comment should already exist'),
+			array('exists' => true)
+		);
 		$this->assertTrue($comment->exists());
 	}
 
@@ -179,7 +187,6 @@ class ModelTest extends \lithium\test\Unit {
 
 		$expected = array('id' => 5);
 		$this->assertEqual($expected, $result['query']->conditions());
-
 		$this->assertEqual('read', $result['query']->type());
 
 		$this->expectException('/Method findFoo not defined or handled in class/');
@@ -327,6 +334,49 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = 'mock_creators';
 		$result = MockCreator::meta('source');
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testModelWithNoBackend() {
+		$this->assertEqual('mock-source', MockPost::meta('connection'));
+		MockPost::config(array('connection' => false));
+		$this->assertFalse(MockPost::meta('connection'));
+
+		$schema = array(
+			'id' => array('type' => 'integer'),
+			'author_id' => array('type' => 'integer'),
+			'title' => array('type' => 'string'),
+			'body' => array('type' => 'text')
+		);
+		MockPost::overrideSchema($schema);
+		$this->assertEqual($schema, MockPost::schema());
+
+		$post = MockPost::create(array('title' => 'New post'));
+		$this->assertTrue($post instanceof \lithium\data\model\Record);
+		$this->assertEqual('New post', $post->title);
+
+		$this->expectException('/Connection name not defined/');
+		$post->save();
+	}
+
+	public function testSave() {
+		$record = MockPost::create(array('title' => 'New post', 'author_id' => 13));
+		$result = $record->save();
+		var_dump($result);
+	}
+
+	public function testImplicitKeyFind() {
+		$result = MockPost::find(10);
+		$this->assertEqual('read', $result['query']->type());
+		$this->assertEqual('lithium\tests\mocks\data\MockPost', $result['query']->model());
+		$this->assertEqual(array('id' => 10), $result['query']->conditions());
+	}
+
+	public function testDelete() {
+		$record = MockPost::create(array('id' => 5), array('exists' => true));
+		$result = $record->delete();
+		$this->assertEqual('delete', $result['query']->type());
+		$this->assertEqual('mock_posts', $result['query']->table());
+		$this->assertEqual(array('id' => 5), $result['query']->conditions());
 	}
 
 	/*

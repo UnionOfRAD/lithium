@@ -75,6 +75,7 @@ class Adaptable extends \lithium\core\StaticObject {
 			return static::_config($config);
 		}
 		$result = array();
+		static::$_configurations = array_filter(static::$_configurations);
 
 		foreach (array_keys(static::$_configurations) as $key) {
 			$result[$key] = static::_config($key);

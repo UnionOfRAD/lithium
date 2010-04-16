@@ -18,6 +18,10 @@ class MockPost extends \lithium\data\Model {
 		static::_instance()->_schema = array();
 	}
 
+	public static function overrideSchema(array $schema = array()) {
+		static::_instance()->_schema = $schema;
+	}
+
 	public static function instances() {
 		return array_keys(static::$_instances);
 	}
