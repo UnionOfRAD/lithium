@@ -23,10 +23,14 @@ class RedisTest extends \lithium\test\Unit {
 		$this->skipIf(!$extensionExists, $message);
 
 		$R = new \Redis();
-		$R->connect('127.0.0.1', 6379);
-		$message = 'redis-server does not appear to be running on 127.0.0.1:6379';
-		$result = $R->info();
-		$this->skipIf(empty($result), $message);
+		$result = null;
+		try {
+			$R->connect('127.0.0.1', 6379);
+		} catch (\Exception $e) {
+			$message = 'redis-server does not appear to be running on 127.0.0.1:6379';
+			$result = $R->info();
+			$this->skipIf(empty($result), $message);
+		}
 		unset($R);
 	}
 

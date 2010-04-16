@@ -58,12 +58,11 @@ class Redis extends \lithium\core\Object {
 	 *
 	 * Instantiates the Redis object and connects it to the configured server.
 	 *
+	 * @todo Implement configurable & optional authentication
+	 * @see lithium\storage\Cache::config()
 	 * @param array $config Configuration parameters for this cache adapter.
 	 *        These settings are indexed by name and queryable through `Cache::config('name')`.
-	 *
 	 * @return void
-	 * @see lithium\storage\Cache::config()
-	 * @todo Implement configurable & optional authentication
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -71,13 +70,18 @@ class Redis extends \lithium\core\Object {
 			'server' => '127.0.0.1:6379'
 		);
 
+		parent::__construct($config + $defaults);
+	}
+
+	/**
+	 * Initialize the Redis connection object and connect to the Redis server.
+	 *
+	 * @return void
+	 */
+	protected function _init() {
 		if (is_null(static::$connection)) {
 			static::$connection = new \Redis();
 		}
-
-		$config += $defaults;
-		parent::__construct($config);
-
 		list($IP, $port) = explode(':', $this->_config['server']);
 		static::$connection->connect($IP, $port);
 	}
