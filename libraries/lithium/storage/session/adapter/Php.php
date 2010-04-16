@@ -26,7 +26,7 @@ class Php extends \lithium\core\Object {
 	 * @var array Keys are session ini settings, but without the `session.` namespace.
 	 */
 	protected $_defaults = array(
-		'session.name' => 'li3', 'session.cookie_lifetime' => '86400',
+		'session.cookie_lifetime' => '86400',
 	);
 
 	/**
@@ -52,6 +52,10 @@ class Php extends \lithium\core\Object {
 		$config = $this->_config;
 		unset($config['adapter'], $config['strategies'], $config['filters'], $config['init']);
 
+		if (!isset($config['session.name'])) {
+			$path = explode('/', LITHIUM_APP_PATH);
+			$config['session.name'] = end($path);
+		}
 		foreach ($config as $key => $value) {
 			if (strpos($key, 'session.') === false) {
 				continue;
