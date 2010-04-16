@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\storage\session\adapter;
 
 use \lithium\storage\session\adapter\Php;
+use \lithium\tests\mocks\storage\session\adapter\MockPhp;
 
 class PhpTest extends \lithium\test\Unit {
 
@@ -62,25 +63,14 @@ class PhpTest extends \lithium\test\Unit {
 
 		$result = ini_get('session.cookie_lifetime');
 		$this->assertEqual(strtotime('+1 day') - time(), (integer) $result);
-
-		$result = ini_get('session.cookie_domain');
-		$this->assertEqual('', $result);
-
-		$result = ini_get('session.cookie_secure');
-		$this->assertFalse($result);
-
-		$result = ini_get('session.cookie_httponly');
-		$this->assertFalse($result);
-
-		$result = ini_get('session.save_path');
-		$this->assertEqual('', $result);
 	}
 
 	public function testCustomConfiguration() {
 		$config = array(
 			'session.name' => 'awesome_name', 'session.cookie_lifetime' => 1200,
 			'session.cookie_domain' => 'awesome.domain',
-			'session.save_path' => LITHIUM_APP_PATH . '/resources/tmp/'
+			'session.save_path' => LITHIUM_APP_PATH . '/resources/tmp/',
+			'somebad.configuration' => 'whoops'
 		);
 
 		$adapter = new Php($config);
@@ -102,6 +92,9 @@ class PhpTest extends \lithium\test\Unit {
 
 		$result = ini_get('session.save_path');
 		$this->assertEqual($config['session.save_path'], $result);
+
+		$result = ini_get('somebad.configuration');
+		$this->assertFalse($result);
 	}
 
 	public function testIsStarted() {
@@ -233,6 +226,30 @@ class PhpTest extends \lithium\test\Unit {
 		$result = $closure($this->Php, $params, null);
 
 		$this->assertFalse($result);
+	}
+
+	public function testCheckThrowException() {
+		$Php = new MockPhp(array('init' => false));
+		$this->expectException('/Could not start session./');
+		$Php->check('whatever');
+	}
+
+	public function testReadThrowException() {
+		$Php = new MockPhp(array('init' => false));
+		$this->expectException('/Could not start session./');
+		$Php->read('whatever');
+	}
+
+	public function testWriteThrowException() {
+		$Php = new MockPhp(array('init' => false));
+		$this->expectException('/Could not start session./');
+		$Php->write('whatever', 'value');
+	}
+
+	public function testDeleteThrowException() {
+		$Php = new MockPhp(array('init' => false));
+		$this->expectException('/Could not start session./');
+		$Php->delete('whatever');
 	}
 }
 

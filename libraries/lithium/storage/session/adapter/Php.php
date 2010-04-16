@@ -21,7 +21,7 @@ use \RuntimeException;
 class Php extends \lithium\core\Object {
 
 	/**
-	 * Default ini settings for this session adapter
+	 * Default ini settings for this session adapter.
 	 *
 	 * @var array Keys are session ini settings, but without the `session.` namespace.
 	 */
@@ -30,12 +30,12 @@ class Php extends \lithium\core\Object {
 	);
 
 	/**
-	 * Class constructor
+	 * Class constructor.
 	 *
-	 * Takes care of setting appropriate configurations for
-	 * this object.
+	 * Takes care of setting appropriate configurations for this object.
 	 *
-	 * @param array $config
+	 * @param array $config Unified constructor configuration parameters. You can set
+	 *        the `session.*` PHP ini settings here as key/value pairs.
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
@@ -105,7 +105,7 @@ class Php extends \lithium\core\Object {
 	 * @return boolean True if the key exists, false otherwise.
 	 */
 	public static function check($key, array $options = array()) {
-		if (!self::isStarted() && !self::_startup()) {
+		if (!static::isStarted() && !static::_startup()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params, $chain) {
@@ -122,7 +122,7 @@ class Php extends \lithium\core\Object {
 	 * @return mixed Data in the session if successful, false otherwise.
 	 */
 	public static function read($key = null, array $options = array()) {
-		if (!self::isStarted() && !self::_startup()) {
+		if (!static::isStarted() && !static::_startup()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params, $chain) {
@@ -144,7 +144,7 @@ class Php extends \lithium\core\Object {
 	 * @return boolean True on successful write, false otherwise
 	 */
 	public static function write($key, $value, array $options = array()) {
-		if (!self::isStarted() && !self::_startup()) {
+		if (!static::isStarted() && !static::_startup()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params, $chain) {
@@ -160,7 +160,7 @@ class Php extends \lithium\core\Object {
 	 * @return boolean True on successful delete, false otherwise
 	 */
 	public static function delete($key, array $options = array()) {
-		if (!self::isStarted() && !self::_startup()) {
+		if (!static::isStarted() && !static::_startup()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params, $chain) {
