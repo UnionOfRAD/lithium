@@ -40,7 +40,7 @@ class Http extends \lithium\core\Object {
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'method' => 'digest', 'realm' => 'Protected by Lithium', 'users' => array()
+			'method' => 'digest', 'realm' => basename(LITHIUM_APP_PATH), 'users' => array()
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -59,7 +59,7 @@ class Http extends \lithium\core\Object {
 	 */
 	public function check($request, array $options = array()) {
 		$method = "_{$this->_config['method']}";
-		return $this->$method($request);
+		return $this->{$method}($request);
 	}
 
 	/**
@@ -94,8 +94,8 @@ class Http extends \lithium\core\Object {
 		$users = $this->_config['users'];
 		$username = $request->env('PHP_AUTH_USER');
 		$password = $request->env('PHP_AUTH_PW');
-		$isValid = !empty($users[$username]) && $users[$username] === $password;
-		if ($isValid !== true) {
+
+		if (!isset($users[$username]) || $users[$username] !== $password) {
 			$this->_writeHeader("WWW-Authenticate: Basic realm=\"{$this->_config['realm']}\"");
 			return;
 		}
@@ -115,6 +115,7 @@ class Http extends \lithium\core\Object {
 			'cnonce' => null, 'qop' => null, 'uri' => null,
 			'response' => null
 		);
+
 		$result = array_map(function ($string) use (&$data) {
 			$parts = explode('=', trim($string), 2) + array('', '');
 			$data[$parts[0]] = trim($parts[1], '"');
@@ -122,20 +123,19 @@ class Http extends \lithium\core\Object {
 
 		$users = $this->_config['users'];
 		$password = !empty($users[$data['username']]) ? $users[$data['username']] : null;
-		$hash = md5(
-			md5($data['username'] . ':' . $realm . ':' . $password)
-				. ':' . $data['nonce'] . ':' . $data['nc']
-				. ':' . $data['cnonce'] . ':' . $data['qop'] . ':' .
-			md5($request->env('REQUEST_METHOD') . ':' . $data['uri'])
-		);
-		$isValid = (
-			!empty($data['username']) && $hash === $data['response']
-		);
-		if ($isValid !== true) {
+
+		$user = md5("{$data['username']}:{$realm}:{$password}");
+		$nonce = "{$data['nonce']}:{$data['nc']}:{$data['cnonce']}:{$data['qop']}";
+		$req = md5($request->env('REQUEST_METHOD') . ':' . $data['uri']);
+		$hash = md5("{$user}:{$nonce}:{$req}");
+
+		if (!$data['username'] || $hash !== $data['response']) {
 			$nonce = uniqid();
 			$opaque = md5($realm);
-			$this->_writeHeader("WWW-Authenticate: Digest realm=\"{$realm}\" "
-				. "qop=\"auth\",nonce=\"{$nonce}\",opaque=\"{$opaque}\"");
+
+			$message = "WWW-Authenticate: Digest realm=\"{$realm}\" qop=\"auth\",";
+			$message .= "nonce=\"{$nonce}\",opaque=\"{$opaque}\"";
+			$this->_writeHeader($message);
 			return;
 		}
 		return array('username' => $data['username'], 'password' => $password);

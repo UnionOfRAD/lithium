@@ -24,7 +24,7 @@ class HttpTest extends \lithium\test\Unit {
 		$result = $http->check($this->request);
 		$this->assertFalse($result);
 
-		$expected = array('WWW-Authenticate: Basic realm="Protected by Lithium"');
+		$expected = array('WWW-Authenticate: Basic realm="' . basename(LITHIUM_APP_PATH) . '"');
 		$result = $http->headers;
 		$this->assertEqual($expected, $result);
 	}
@@ -59,7 +59,7 @@ class HttpTest extends \lithium\test\Unit {
 				. 'nc="00000001",cnonce="95b2cd1e179bf5414e52ed62811481cf",'
 				. 'uri="/http_auth",realm="Protected by Lithium",'
 				. 'opaque="d3fb67a7aa4d887ec4bf83040a820a46",username="gwoo",'
-				. 'response="d176d22193e052aa26bfddb051cdee93"')
+				. 'response="04d7d878c67f289f37e553d2025e3a52"')
 		));
 		$http = new MockHttp(array('users' => array('gwoo' => 'li3')));
 		$result = $http->check($request);
