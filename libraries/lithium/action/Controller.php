@@ -201,7 +201,7 @@ class Controller extends \lithium\core\Object {
 	 *        - `'data'`: An associative array of variables to be assigned to the template. These
 	 *          are merged on top of any variables set in `Controller::set()`.
 	 *        - `'head'`: If true, only renders the headers of the response, not the body. Defaults
-	 *          to false.
+	 *          to `false`.
 	 *        - `'template'`: The name of a template, which usually matches the name of the action.
 	 *          By default, this template is looked for in the views directory of the current
 	 *          controller, i.e. given a `PostsController` object, if template is set to `'view'`,

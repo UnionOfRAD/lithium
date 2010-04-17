@@ -961,6 +961,24 @@ class ValidatorTest extends \lithium\test\Unit {
 
 		$this->assertTrue(Validator::isInRange(0));
 	}
+
+	public function testValidationWithContextData() {
+		Validator::add('someModelRule', function($value, $format, $options) {
+			return $value == 'Title' && $options['values']['body'] == 'Body';
+		});
+
+		$result = Validator::check(
+			array('title' => 'Title', 'body' => 'Body'),
+			array('title' => array('someModelRule'))
+		);
+		$this->assertIdentical(array(), $result);
+
+		$result = Validator::check(
+			array('title' => 'Title', 'body' => 'Not Body'),
+			array('title' => array('someModelRule'))
+		);
+		$this->assertIdentical(array('title' => array(0)), $result);
+	}
 }
 
 ?>

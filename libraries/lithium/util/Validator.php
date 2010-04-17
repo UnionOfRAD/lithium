@@ -294,7 +294,46 @@ class Validator extends \lithium\core\StaticObject {
 	 * @param array $values An array of key/value pairs, where the values are to be checked.
 	 * @param array $rules An array of rules to check the values in `$values` against. Each key in
 	 *              `$rules` should match a key contained in `$values`, and each value should be a
-	 *              validation rule in one of the allowable formats.
+	 *              validation rule in one of the allowable formats. For example, if you are
+	 *              validating a data set containing a `'title'` key, possible values for
+	 *              `$rules` would be as follows:
+	 *              - `array('title' => 'You must include a title')`: This is the simplest form of
+	 *                validation rule, in which the value is simply a message to display if the rule
+	 *                fails. Using this format, all other validation settings inherit from the
+	 *                defaults, including the validation rule itself, which only checks to see that
+	 *                the corresponding key in `$values` is present and contains a value that is not
+	 *                empty. _Please note when globalizing validation messages:_ When specifying
+	 *                messages, it may be preferable to use a code string (i.e. `'ERR_NO_TITLE'`)
+	 *                instead of the full text of the validation error. These code strings may then
+	 *                be translated by the appropriate tools in the templating layer.
+	 *              - `array('title' => array('alphaNumeric', 'message' => 'Invalid title'))`: In
+	 *                the second format, the validation rule and associated configuration are
+	 *                specified as an array, where the rule to use is the first value in the array
+	 *                (no key), and additional settings are specified as other keys in the array.
+	 *                Please see the list below for more information on allowed keys.
+	 *              - The final format allows you to apply multiple validation rules to a single
+	 *                value, and it is specified as follows:
+	 *
+	 * `array('title' => array(
+	 * 	array('notEmpty', 'message' => 'You must include a title'),
+	 * 	array('alphaNumeric', 'message' => 'Your title must be alphanumeric')
+	 * ));`
+	 *
+	 * Each rule defined as an array can contain any of the following settings (in addition to the
+	 * first value, which represents the rule to be used):
+	 *  - `'message'` _string_: The error message to be returned if the validation rule fails. See
+	 *    the note above regarding globalization of error messages.
+	 *  - `'required`' _boolean_: Represents whether the value is required to be present in
+	 *    `$values`. If `'required'` is set to `false`, the validation rule will be skipped if the
+	 *     corresponding key is not present. Defaults to `true`.
+	 *  - `'skipEmpty'` _boolean_: Similar to `'required'`, this setting (if `true`) will cause the
+	 *    validation rule to be skipped if the corresponding value is empty (an empty string or
+	 *    `null`). Defaults to `false`.
+	 *  - `'format'` _string_: If the validation rule has multiple format definitions (see the
+	 *    `add()` or `__init()` methods), the name of the format to be used can be specified here.
+	 *    Additionally, two special values can be used: either `'any'`, which means that all formats
+	 *    will be checked and the rule will pass if any format passes, or `'all'`, which requires
+	 *    all formats to pass in order for the rule check to succeed.
 	 * @return array Returns an array containing all validation failures for data in `$values`,
 	 *         where each key matches a key in `$values`, and each value is an array of that
 	 *         element's validation errors.
@@ -305,8 +344,7 @@ class Validator extends \lithium\core\StaticObject {
 			'message' => null,
 			'required' => true,
 			'skipEmpty' => false,
-			'format' => 'any',
-			'last' => false
+			'format' => 'any'
 		);
 		$errors = array();
 
