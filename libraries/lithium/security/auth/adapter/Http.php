@@ -11,16 +11,36 @@ namespace lithium\security\auth\adapter;
 use \lithium\core\Libraries;
 
 /**
- * The `Http` adapter provides basic and digest authentication based on the HTTP protocol
+ * The `Http` adapter provides basic and digest authentication based on the HTTP protocol.
+ * By default, the adapter uses Http Digest based authentication.
+ * {{{
+ * Auth::config(array('name' => array('adapter' => 'Http', 'users' => array('gwoo' => 'li3'))))
+ * }}}
+ *
+ * To use Basic authentication, set the `method` to basic.
+ * {{{
+ * Auth::config(array('name' => array(
+ *     'adapter' => 'Http', 'users' => array('gwoo' => 'li3'),
+ *     'method' => 'basic'
+ * )))
+ * }}}
  *
  * @link http://tools.ietf.org/html/rfc2068#section-14.8
+ * @see `\lithium\action\Request`
  */
 class Http extends \lithium\core\Object {
 
+	/**
+	 * Setup default configuration options.
+	 *
+	 * @param array $config
+	 *        - `method`: default: `digest` options: `basic|digest`
+	 *        - `realm`: default: `Protected by Lithium`
+	 *        - `users`: the users to permit. key => value pair of username => password
+	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'method' => 'digest', 'realm' => 'Protected by Lithium',
-			'users' => array()
+			'method' => 'digest', 'realm' => 'Protected by Lithium', 'users' => array()
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -40,52 +60,6 @@ class Http extends \lithium\core\Object {
 	public function check($request, array $options = array()) {
 		$method = "_{$this->_config['method']}";
 		return $this->$method($request);
-	}
-
-	protected function _basic($request) {
-		$users = $this->_config['users'];
-		$username = $request->env('PHP_AUTH_USER');
-		$password = $request->env('PHP_AUTH_PW');
-		$isValid = !empty($users[$username]) && $users[$username] === $password;
-		if ($isValid !== true) {
-			header("WWW-Authenticate: Basic realm=\"{$this->_config['realm']}\"");
-			return;
-		}
-		return compact('username', 'password');
-	}
-
-	protected function _digest($request) {
-		$realm = $this->_config['realm'];
-		$data = array(
-			'username' => null, 'nonce' => null, 'nc' => null,
-			'cnonce' => null, 'qop' => null, 'uri' => null,
-			'response' => null
-		);
-		$result = array_map(function ($string) use (&$data) {
-			$parts = explode('=', trim($string), 2) + array('', '');
-			$data[$parts[0]] = trim($parts[1], '"');
-		}, explode(',', $request->env('PHP_AUTH_DIGEST')));
-
-		$users = $this->_config['users'];
-		$password = !empty($users[$data['username']]) ? $users[$data['username']] : null;
-
-		$hash = md5(
-			md5($data['username'] . ':' . $realm . ':' . $password)
-				. ':' . $data['nonce'] . ':' . $data['nc']
-				. ':' . $data['cnonce'] . ':' . $data['qop'] . ':' .
-			md5($request->env('REQUEST_METHOD') . ':' . $data['uri'])
-		);
-		$isValid = (
-			!empty($data['username']) && $hash === $data['response']
-		);
-		if ($isValid !== true) {
-			$nonce = uniqid();
-			$opaque = md5($realm);
-			header("WWW-Authenticate: Digest realm=\"{$realm}\""
-				. "qop=\"auth\",nonce=\"{$nonce}\",opaque=\"{$opaque}\"");
-			return;
-		}
-		return array('username' => $data['username'], 'password' => $password);
 	}
 
 	/**
@@ -108,6 +82,73 @@ class Http extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function clear(array $options = array()) {
+	}
+
+	/**
+	 * Handler for HTTP Basic Authentication
+	 *
+	 * @param string $request a `\lithium\action\Request` object
+	 * @return void
+	 */
+	protected function _basic($request) {
+		$users = $this->_config['users'];
+		$username = $request->env('PHP_AUTH_USER');
+		$password = $request->env('PHP_AUTH_PW');
+		$isValid = !empty($users[$username]) && $users[$username] === $password;
+		if ($isValid !== true) {
+			$this->_writeHeader("WWW-Authenticate: Basic realm=\"{$this->_config['realm']}\"");
+			return;
+		}
+		return compact('username', 'password');
+	}
+
+	/**
+	 * Handler for HTTP Digest Authentication
+	 *
+	 * @param string $request a `\lithium\action\Request` object
+	 * @return void
+	 */
+	protected function _digest($request) {
+		$realm = $this->_config['realm'];
+		$data = array(
+			'username' => null, 'nonce' => null, 'nc' => null,
+			'cnonce' => null, 'qop' => null, 'uri' => null,
+			'response' => null
+		);
+		$result = array_map(function ($string) use (&$data) {
+			$parts = explode('=', trim($string), 2) + array('', '');
+			$data[$parts[0]] = trim($parts[1], '"');
+		}, explode(',', $request->env('PHP_AUTH_DIGEST')));
+
+		$users = $this->_config['users'];
+		$password = !empty($users[$data['username']]) ? $users[$data['username']] : null;
+		$hash = md5(
+			md5($data['username'] . ':' . $realm . ':' . $password)
+				. ':' . $data['nonce'] . ':' . $data['nc']
+				. ':' . $data['cnonce'] . ':' . $data['qop'] . ':' .
+			md5($request->env('REQUEST_METHOD') . ':' . $data['uri'])
+		);
+		$isValid = (
+			!empty($data['username']) && $hash === $data['response']
+		);
+		if ($isValid !== true) {
+			$nonce = uniqid();
+			$opaque = md5($realm);
+			$this->_writeHeader("WWW-Authenticate: Digest realm=\"{$realm}\" "
+				. "qop=\"auth\",nonce=\"{$nonce}\",opaque=\"{$opaque}\"");
+			return;
+		}
+		return array('username' => $data['username'], 'password' => $password);
+	}
+
+	/**
+	 * Helper method for writing headers. Mainly used to override the output while testing.
+	 *
+	 * @param string $string the string the send as a header
+	 * @return void
+	 */
+	protected function _writeHeader($string) {
+		header($string, true);
 	}
 }
 
