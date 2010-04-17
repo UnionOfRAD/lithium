@@ -228,11 +228,11 @@ class Form extends \lithium\template\Helper {
 				$append = $self->hidden('_method', array(
 					'value' => strtoupper($scope['method'])
 				));
-				$scope['method'] = 'POST';
+				$scope['method'] = 'post';
 			}
 
 			$url = $scope['action'] ? array('action' => $scope['action']) : $scope['url'];
-			$options['method'] = strtoupper($scope['method']);
+			$options['method'] = strtolower($scope['method']);
 
 			return $self->invokeMethod('_render', array(
 				$method, $template, compact('url', 'options', 'append')

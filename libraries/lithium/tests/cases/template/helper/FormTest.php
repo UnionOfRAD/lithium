@@ -69,25 +69,25 @@ class FormTest extends \lithium\test\Unit {
 	public function testFormCreation() {
 		$result = $this->form->create();
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts", 'method' => 'POST')
+			'form' => array('action' => "{$this->base}posts", 'method' => 'post')
 		));
 
 		$result = $this->form->create(null, array('method' => 'get'));
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts", 'method' => 'GET')
+			'form' => array('action' => "{$this->base}posts", 'method' => 'get')
 		));
 
 		$result = $this->form->create(null, array('type' => 'file'));
 		$this->assertTags($result, array('form' => array(
 			'action' => "{$this->base}posts",
 			'enctype' => 'multipart/form-data',
-			'method' => 'POST',
+			'method' => 'post',
 		)));
 
-		$result = $this->form->create(null, array('method' => 'GET', 'type' => 'file'));
+		$result = $this->form->create(null, array('method' => 'get', 'type' => 'file'));
 		$this->assertTags($result, array('form' => array(
 			'action' => "{$this->base}posts",
-			'method' => 'POST',
+			'method' => 'post',
 			'enctype' => 'multipart/form-data'
 		)));
 	}
@@ -102,7 +102,7 @@ class FormTest extends \lithium\test\Unit {
 
 		$this->assertTags($result, array(
 			'form' => array(
-				'action' => "{$this->base}posts/delete", 'method' => 'POST'
+				'action' => "{$this->base}posts/delete", 'method' => 'post'
 			),
 			'input' => array(
 				'type' => "hidden",
@@ -115,7 +115,7 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array(
 			'form' => array(
 				'action' => "{$this->base}posts",
-				'method' => 'POST',
+				'method' => 'post',
 				'enctype' => 'multipart/form-data'
 			),
 			'input' => array(
@@ -128,7 +128,7 @@ class FormTest extends \lithium\test\Unit {
 		$record = new Record(array('exists' => true));
 		$result = $this->form->create($record);
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts", 'method' => 'POST'),
+			'form' => array('action' => "{$this->base}posts", 'method' => 'post'),
 			'input' => array('type' => "hidden", 'name' => '_method', 'value' => 'PUT')
 		));
 	}
@@ -146,7 +146,7 @@ class FormTest extends \lithium\test\Unit {
 		$result = $this->form->create($record);
 		$this->assertTags($result, array('form' => array(
 			'action' => "{$this->base}posts",
-			'method' => 'POST',
+			'method' => 'post',
 		)));
 	}
 
@@ -168,7 +168,7 @@ class FormTest extends \lithium\test\Unit {
 
 		$result = $this->form->create($record);
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts", 'method' => 'POST')
+			'form' => array('action' => "{$this->base}posts", 'method' => 'post')
 		));
 
 		$result = $this->form->text('title');
@@ -483,7 +483,7 @@ class FormTest extends \lithium\test\Unit {
 
 		$result = $form->create();
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}mock/test/1", 'method' => 'POST')
+			'form' => array('action' => "{$this->base}mock/test/1", 'method' => 'post')
 		));
 	}
 
@@ -496,7 +496,7 @@ class FormTest extends \lithium\test\Unit {
 
 		$result = $form->create(null, array('action' => 'radness'));
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}mock/radness", 'method' => 'POST')
+			'form' => array('action' => "{$this->base}mock/radness", 'method' => 'post')
 		));
 	}
 
