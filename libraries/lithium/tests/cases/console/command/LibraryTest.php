@@ -95,10 +95,8 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->library->library = 'library_test';
 
 		$expected = true;
-		$result = $this->library->archive(
-			$this->_testPath . '/library_test',
-			$this->_testPath . '/library_test'
-		);
+		$testPath = "{$this->_testPath}/library_test";
+		$result = $this->library->archive($testPath, $testPath);
 		$this->assertEqual($expected, $result);
 
 		$expected = "library_test.phar.gz created in {$this->_testPath} from ";
@@ -106,12 +104,12 @@ class LibraryTest extends \lithium\test\Unit {
 		$result = $this->library->response->output;
 		$this->assertEqual($expected, $result);
 
-		Phar::unlinkArchive($this->_testPath . '/library_test.phar');
+		Phar::unlinkArchive("{$this->_testPath}/library_test.phar");
 	}
 
 	public function testExtractWithFullPaths() {
 		$this->skipIf(
-			!file_exists($this->_testPath . '/library_test.phar.gz'),
+			!file_exists("{$this->_testPath}/library_test.phar.gz"),
 			'Skipped test {:class}::{:function}() - depends on {:class}::testArchive()'
 		);
 		$this->library->library = 'library_test';
@@ -192,16 +190,18 @@ class LibraryTest extends \lithium\test\Unit {
 	public function testExtractPlugin() {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->library->library = 'library_plugin_test';
+		$path = $this->_testPath;
 
 		$expected = true;
-		$result = $this->library->extract('plugin', $this->_testPath . '/library_test_plugin');
+		$result = $this->library->extract('plugin', "{$path}/library_test_plugin");
 		$this->assertEqual($expected, $result);
 
-		$expected = "library_test_plugin created in {$this->_testPath} from ";
-		$expected .= LITHIUM_LIBRARY_PATH
-			. "/lithium/console/command/create/template/plugin.phar.gz\n";
+		$expected = "library_test_plugin created in {$path} from " . LITHIUM_LIBRARY_PATH;
+		$expected .= "/lithium/console/command/create/template/plugin.phar.gz\n";
 		$result = $this->library->response->output;
 		$this->assertEqual($expected, $result);
+
+		$this->_cleanup();
 	}
 
 	public function testFormulate() {
