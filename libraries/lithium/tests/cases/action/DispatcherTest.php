@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\action;
 
 use \lithium\action\Request;
+use \lithium\action\Response;
 use \lithium\net\http\Router;
 use \lithium\action\Dispatcher;
 use \lithium\tests\mocks\action\MockDispatcher;
@@ -75,13 +76,31 @@ class DispatcherTest extends \lithium\test\Unit {
 		Dispatcher::run(new Request(array('url' => '/plugin')));
 	}
 
+	public function testCall() {
+		$result = MockDispatcher::run(new Request(array('url' => '/call')));
+		$this->assertEqual('Working', $result->body);
+	}
+
+	public function testAutoHandler() {
+		$result = MockDispatcher::run(new Request(array('url' => '/auto')));
+		$this->assertEqual(array('location: /redirect'), $result->headers());
+	}
+
 	public static function process($request) {
+		if ($request->url == '/auto') {
+			return new Response(array('location' => '/redirect'));
+		}
+
 		$params = array(
 			'' => array('controller' => 'some_non_existent_controller', 'action' => 'index'),
 			'/plugin' => array(
 				'controller' => 'some_invalid_plugin.controller', 'action' => 'index'
-			)
+			),
+			'/call' => array('action' => 'index', 'controller' => function($request) {
+				return new Response(array('body' => 'Working'));
+			})
 		);
+
 		if (isset($params[$request->url])) {
 			$request->params = $params[$request->url];
 		}

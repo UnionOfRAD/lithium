@@ -21,6 +21,9 @@ class MockDispatcher extends \lithium\action\Dispatcher {
 	}
 
 	protected static function _call($callable, $request, $params) {
+		if (is_callable($callable->params['controller'])) {
+			return parent::_call($callable->params['controller'], $request, $params);
+		}
 		static::$dispatched[] = $callable;
 	}
 }
