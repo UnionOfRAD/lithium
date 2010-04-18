@@ -145,7 +145,9 @@ class Request extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function __destruct() {
-		fclose($this->input);
+		if ($this->input) {
+			fclose($this->input);
+		}
 	}
 }
 

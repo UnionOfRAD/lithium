@@ -96,8 +96,12 @@ class Response extends \lithium\core\Object {
 	 *
 	 **/
 	public function __destruct() {
-		fclose($this->output);
-		fclose($this->error);
+		if ($this->output) {
+			fclose($this->output);
+		}
+		if ($this->error) {
+			fclose($this->error);
+		}
 	}
 
 	/**
