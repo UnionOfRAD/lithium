@@ -22,7 +22,7 @@ use \lithium\core\Libraries;
  * @see lithium\template\View
  * @see lithium\template\view\Compiler
  */
-class File extends \lithium\template\view\Renderer {
+class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 
 	protected $_autoConfig = array(
 		'classes' => 'merge', 'request', 'context', 'strings', 'handlers', 'view', 'compile'
@@ -37,6 +37,15 @@ class File extends \lithium\template\view\Renderer {
 	 */
 	protected $_compile = true;
 
+	/**
+	 * An array containing the variables currently in the scope of the template. These values are
+	 * manipulable using array syntax against the template object, i.e. `$this['foo'] = 'bar'`
+	 * inside your template files.
+	 *
+	 * @var array
+	 */
+	protected $_data = array();
+
 	protected $_classes = array(
 		'compiler' => '\lithium\template\view\Compiler',
 		'router' => 'lithium\net\http\Router',
@@ -44,8 +53,8 @@ class File extends \lithium\template\view\Renderer {
 	);
 
 	public function __construct(array $config = array()) {
-		$defaults = array('classes' => array(), 'compile' => true);
-		parent::__construct((array) $config + $defaults);
+		$defaults = array('classes' => array(), 'compile' => true, 'extract' => true);
+		parent::__construct($config + $defaults);
 	}
 
 	/**
@@ -57,10 +66,17 @@ class File extends \lithium\template\view\Renderer {
 	 * @return string
 	 */
 	public function render($template, $data = array(), array $options = array()) {
+		$defaults = array('context' => array());
+		$options += $defaults;
+
 		$this->_context = $options['context'] + $this->_context;
+		$this->_data = (array) $data;
 		$template__ = $template;
-		unset($options, $template);
-		extract($data, EXTR_OVERWRITE);
+		unset($options, $template, $defaults);
+
+		if ($this->_config['extract']) {
+			extract($this->_data, EXTR_OVERWRITE);
+		}
 
 		ob_start();
 		include $template__;
@@ -93,6 +109,28 @@ class File extends \lithium\template\view\Renderer {
 			$path = $compiler::template($path);
 		}
 		return $path;
+	}
+
+	/**
+	 * Allows checking to see if a value is set in template data, i.e. `$this['foo']` in templates.
+	 *
+	 * @param string $offset The key / variable name to check.
+	 * @return boolean Returns `true` if the value is set, otherwise `false`.
+	 */
+	public function offsetExists($offset) {
+		return array_key_exists($offset, $this->_data);
+	}
+
+	public function offsetGet($offset) {
+		return isset($this->_data[$offset]) ? $this->_data[$offset] : null;
+	}
+
+	public function offsetSet($offset, $value) {
+		$this->_data[$offset] = $value;
+	}
+
+	public function offsetUnset($offset) {
+		unset($this->_data[$offset]);
 	}
 
 	/**
