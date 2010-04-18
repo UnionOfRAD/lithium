@@ -490,7 +490,9 @@ class Form extends \lithium\template\Helper {
 	 * @return string Returns a rendered error message based on the `'error'` string template.
 	 */
 	public function error($name, $key = null, array $options = array()) {
+		$defaults = array('class' => 'error');
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		$options += $defaults;
 
 		if (!$this->_binding || !$content = $this->_binding->errors($name)) {
 			return null;

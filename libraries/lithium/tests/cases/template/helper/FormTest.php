@@ -564,7 +564,7 @@ class FormTest extends \lithium\test\Unit {
 
 		$result = $this->form->error('name');
 		$this->assertTags($result, array(
-			'div' => array(), 'Please enter a name', '/div'
+			'div' => array('class' => 'error'), 'Please enter a name', '/div'
 		));
 	}
 
@@ -575,7 +575,7 @@ class FormTest extends \lithium\test\Unit {
 
 		$result = $this->form->error('name', 0);
 		$this->assertTags($result, array(
-			'div' => array(), 'Please enter a name', '/div'
+			'div' => array('class' => 'error'), 'Please enter a name', '/div'
 		));
 	}
 
@@ -584,9 +584,22 @@ class FormTest extends \lithium\test\Unit {
 		$record->errors(array('name' => array('Please enter a name')));
 		$this->form->create($record);
 
-		$expected = '<div><label for="name">Name</label><input type="text" name="name" />'
-			. '<div>Please enter a name</div></div>';
+		$expected = '<div><label for="name">Name</label><input type="text" name="name" />';
+		$expected .= '<div class="error">Please enter a name</div></div>';
 		$result = $this->form->field('name');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testErrorWithCustomConfiguration() {
+		$this->form->config(array('error' => array('class' => 'custom-error-class')));
+
+		$record = new Record();
+		$record->errors(array('name' => array('Please enter a name')));
+		$this->form->create($record);
+
+		$result = $this->form->field('name');
+		$expected = '<div><label for="name">Name</label><input type="text" name="name" />';
+		$expected .= '<div class="custom-error-class">Please enter a name</div></div>';
 		$this->assertEqual($expected, $result);
 	}
 
