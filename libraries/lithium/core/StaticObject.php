@@ -95,11 +95,7 @@ class StaticObject {
 	 * @return mixed
 	 */
 	protected static function _filter($method, $params, $callback, $filters = array()) {
-		if (!strpos($method, '::')) {
-			$class = get_called_class();
-		} else {
-			list($class, $method) = explode('::', $method);
-		}
+		$class = get_called_class();
 
 		if (empty(static::$_methodFilters[$class][$method]) && empty($filters)) {
 			return $callback($class, $params, null);

@@ -119,8 +119,20 @@ class StaticObjectTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testCallingSubclassMethodsInFilteredMethods() {
-		$class = '\lithium\tests\mocks\core\MockStaticFilteringExtended';
+		$class = 'lithium\tests\mocks\core\MockStaticFilteringExtended';
 		$this->assertEqual('Working', $class::callSubclassMethod());
+	}
+
+	public function testClassParents() {
+		$class = 'lithium\tests\mocks\core\MockStaticMethodFiltering';
+		$class::parents(null);
+
+		$result = $class::parents();
+		$expected = array('lithium\core\StaticObject' => 'lithium\core\StaticObject');
+		$this->assertEqual($expected, $result);
+
+		$cache = $class::parents(true);
+		$this->assertEqual(array($class => $expected), $cache);
 	}
 }
 

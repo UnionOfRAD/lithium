@@ -45,6 +45,16 @@ class MockStaticMethodFiltering extends \lithium\core\StaticObject {
 		$args = func_get_args();
 		return $args;
 	}
+
+	public static function parents($get = false) {
+		if ($get === null) {
+			static::$_parents = array();
+		}
+		if ($get) {
+			return static::$_parents;
+		}
+		return static::_parents();
+	}
 }
 
 ?>
