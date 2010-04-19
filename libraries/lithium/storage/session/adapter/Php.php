@@ -53,8 +53,7 @@ class Php extends \lithium\core\Object {
 		unset($config['adapter'], $config['strategies'], $config['filters'], $config['init']);
 
 		if (!isset($config['session.name'])) {
-			$path = explode('/', LITHIUM_APP_PATH);
-			$config['session.name'] = end($path);
+			$config['session.name'] = basename(LITHIUM_APP_PATH);
 		}
 		foreach ($config as $key => $value) {
 			if (strpos($key, 'session.') === false) {

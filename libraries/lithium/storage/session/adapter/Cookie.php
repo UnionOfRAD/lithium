@@ -28,7 +28,7 @@ class Cookie extends \lithium\core\Object {
 	 *		strtotime-compatible string instead of an epochal timestamp.
 	 */
 	protected $_defaults = array(
-		'expire' => '+2 days', 'path' => '/',
+		'expire' => '+2 days', 'path' => '/', 'name' => null,
 		'domain' => '', 'secure' => false, 'httponly' => false
 	);
 
@@ -50,11 +50,10 @@ class Cookie extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _init() {
-		if (empty($this->_config['name'])) {
-			$path = explode('/', LITHIUM_APP_PATH);
-			$this->_config['name'] = end($path) . 'cookie';
-		}
+		parent::_init();
+		$this->_config['name'] = $this->_config['name'] ?: basename(LITHIUM_APP_PATH) . 'cookie';
 	}
+
 	/**
 	 * Obtain the top-level cookie key.
 	 *
