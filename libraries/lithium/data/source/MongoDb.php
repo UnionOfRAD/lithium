@@ -39,6 +39,20 @@ use \lithium\util\Inflector;
 class MongoDb extends \lithium\data\Source {
 
 	/**
+	 * The Mongo class instance.
+	 *
+	 * @var object
+	 */
+	public $connection = null;
+
+	/**
+	 * The MongoDB object instance.
+	 *
+	 * @var object
+	 */
+	protected $_db = null;
+
+	/**
 	 * Classes used by this class.
 	 *
 	 * @var array
