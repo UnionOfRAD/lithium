@@ -110,7 +110,7 @@ class MockSource extends \lithium\data\Source {
 	}
 
 	public function create($query, array $options = array()) {
-		return array($query => $options);
+		return compact('query', 'options');
 	}
 
 	public function read($query, array $options = array()) {

@@ -27,6 +27,13 @@ class StaticObject {
 	protected static $_methodFilters = array();
 
 	/**
+	 * Keeps a cached list of each class' inheritance tree.
+	 *
+	 * @var array
+	 */
+	protected static $_parents = array();
+
+	/**
 	 * Apply a closure to a method of the current static object.
 	 *
 	 * @see lithium\core\StaticObject::_filter()
@@ -104,6 +111,20 @@ class StaticObject {
 		}
 		$items = array_merge(static::$_methodFilters[$class][$method], $filters, array($callback));
 		return Filters::run($class, $params, compact('items', 'class', 'method'));
+	}
+
+	/**
+	 * Gets and caches an array of the parent methods of a class.
+	 *
+	 * @return array Returns an array of parent classes for the current class.
+	 */
+	protected static function _parents() {
+		$class = get_called_class();
+
+		if (!isset(self::$_parents[$class])) {
+			self::$_parents[$class] = class_parents($class);
+		}
+		return self::$_parents[$class];
 	}
 
 	/**

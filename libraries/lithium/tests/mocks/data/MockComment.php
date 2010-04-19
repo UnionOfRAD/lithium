@@ -12,13 +12,11 @@ use \lithium\data\model\Query;
 use \lithium\data\model\Record;
 use \lithium\data\collection\RecordSet;
 
-class MockComment extends \lithium\data\Model {
+class MockComment extends \lithium\tests\mocks\data\MockBase {
 
 	public $belongsTo = array('MockPost');
 
-	protected $_meta = array(
-		'connection' => 'mock-source', 'key' => 'comment_id'
-	);
+	protected $_meta = array('key' => 'comment_id');
 
 	public static function find($type, array $options = array()) {
 		$defaults = array(

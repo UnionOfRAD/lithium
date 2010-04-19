@@ -11,9 +11,9 @@ namespace lithium\tests\cases\data;
 use \lithium\data\Model;
 use \lithium\data\Connections;
 use \lithium\analysis\Inspector;
+use \lithium\tests\mocks\data\MockTag;
 use \lithium\tests\mocks\data\MockPost;
 use \lithium\tests\mocks\data\MockComment;
-use \lithium\tests\mocks\data\MockTag;
 use \lithium\tests\mocks\data\MockTagging;
 use \lithium\tests\mocks\data\MockCreator;
 use \lithium\tests\mocks\data\MockPostForValidates;
@@ -57,7 +57,7 @@ class ModelTest extends \lithium\test\Unit {
 		Model::config();
 		$this->assertEqual($expected, MockPost::instances());
 
-		$this->assertEqual('mock_posts', \lithium\tests\mocks\data\MockPost::meta('source'));
+		$this->assertEqual('mock_posts', MockPost::meta('source'));
 
 		MockPost::config(array('source' => 'post'));
 		$this->assertEqual('post', MockPost::meta('source'));
@@ -67,6 +67,11 @@ class ModelTest extends \lithium\test\Unit {
 
 		MockPost::config(array('source' => null));
 		$this->assertIdentical('mock_posts', MockPost::meta('source'));
+
+		MockPost::config();
+		$this->assertEqual('mock_posts', MockPost::meta('source'));
+
+		$this->assertEqual('mock-source', MockPost::meta('connection'));
 	}
 
 	public function testMetaInformation() {

@@ -8,11 +8,9 @@
 
 namespace lithium\tests\mocks\data;
 
-class MockPost extends \lithium\data\Model {
+class MockPost extends \lithium\tests\mocks\data\MockBase {
 
 	public $hasMany = array('MockComment');
-
-	protected $_meta = array('connection' => 'mock-source');
 
 	public static function resetSchema() {
 		static::_instance()->_schema = array();

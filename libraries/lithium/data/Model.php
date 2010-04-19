@@ -106,6 +106,21 @@ class Model extends \lithium\core\StaticObject {
 	protected $_finders = array();
 
 	/**
+	 * List of base model classes. Any classes which are declared to be base model classes (i.e.
+	 * extended but not directly interacted with) must be present in this list. Models can declare
+	 * themselves as base models using the following code:
+	 * {{{
+	 * public function __init() {
+	 * 	static::_isBase();
+	 * 	parent::__init();
+	 * }
+	 * }}}
+	 *
+	 * @var array
+	 */
+	protected static $_baseClasses = array(__CLASS__ => true);
+
+	/**
 	 * Sets default connection options and connects default finders.
 	 *
 	 * @param array $options
@@ -117,16 +132,29 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	public static function config(array $options = array()) {
-		if (($class = get_called_class()) == __CLASS__) {
+		if (static::_isBase($class = get_called_class())) {
 			return;
 		}
 		$name = static::_name();
 		$self = static::_instance();
-		$base = get_class_vars(__CLASS__);
-
 		$defaults = array('classes' => array(), 'meta' => array(), 'finders' => array());
-		$meta =  $options + $self->_meta + $base['_meta'];
-		$classes = $self->_classes + $base['_classes'];
+
+		$meta = $options + $self->_meta;
+		$classes = $self->_classes;
+
+		foreach (static::_parents() as $parent) {
+			$base = get_class_vars($parent);
+
+			if (isset($base['_meta'])) {
+				$meta += $base['_meta'];
+			}
+			if (isset($base['_classes'])) {
+				$classes += $base['_classes'];
+			}
+			if ($class == __CLASS__) {
+				break;
+			}
+		}
 		$config = array();
 
 		if ($meta['connection']) {
@@ -591,6 +619,13 @@ class Model extends \lithium\core\StaticObject {
 			}
 		}
 		return $relations;
+	}
+
+	protected static function _isBase($class = null, $set = false) {
+		if ($set) {
+			static::$_baseClasses[$class] = true;
+		}
+		return isset(static::$_baseClasses[$class]);
 	}
 }
 
