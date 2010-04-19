@@ -45,6 +45,15 @@ class MongoDb extends \lithium\data\Source {
 	);
 
 	/**
+	 * Map of typical SQL-like operators to their MongoDB equivalents.
+	 *
+	 * @var array Keys are SQL-like operators, value is the MongoDB equivalent.
+	 */
+	protected $_operators = array(
+		'<' => '$lt', '>' => '$gt', '<=' =>  '$lte', '>=' => '$gte', '!=' => '$ne', '<>' => '$ne'
+	);
+
+	/**
 	 * Instantiates the MongoDB adapter with the default connection information.
 	 *
 	 * @param array $config All information required to connect to the database, including:
@@ -383,17 +392,25 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	public function conditions($conditions, $context) {
-		if (!$conditions) {
-			return array();
-		}
-
-		if ($context->type() == 'create') {
-			return $this->_toMongoId($conditions);
+		switch (true) {
+			case !$conditions:
+				return array();
+			case $conditions instanceof MongoCode:
+				return array('$where' => $conditions);
+			case is_string($conditions):
+				return array('$where' => new MongoCode($conditions));
+			case is_callable($context) && $context->type() == 'create':
+				return $this->_toMongoId($conditions);
 		}
 		$conditions = $this->_toMongoId($conditions);
 
 		foreach ($conditions as $key => $value) {
 			if ($key[0] === '$') {
+				continue;
+			}
+			if (is_array($value) && (isset($this->_operators[key($value)]))) {
+				$operator = $this->_operators[$key($value)];
+				$conditions[$key] = array($operator => current($value));
 				continue;
 			}
 			if (is_array($value) && strpos(key($value), '$') !== 0) {

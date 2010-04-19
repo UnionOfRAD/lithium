@@ -107,6 +107,74 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testConditions() {
+		$result = $this->db->conditions(null, null);
+		$this->assertEqual(array(), $result);
+
+		$function = 'function() { return this.x < y;}';
+		$conditions = new \MongoCode($function);
+		$result = $this->db->conditions($conditions, null);
+
+		$this->assertTrue(is_array($result));
+		$this->assertTrue(isset($result['$where']));
+		$this->assertEqual($conditions, $result['$where']);
+
+		$conditions = $function;
+		$result = $this->db->conditions($conditions, null);
+		$this->assertTrue(is_array($result));
+		$this->assertTrue(isset($result['$where']));
+		$this->assertEqual($conditions, $result['$where']);
+
+		$conditions = array('key' => 'value', 'anotherkey' => 'some other value');
+		$result = $this->db->conditions($conditions, null);
+		$this->assertTrue(is_array($result));
+		$this->assertEqual($conditions, $result);
+
+		$conditions = array('key' => array('one', 'two', 'three'));
+		$result = $this->db->conditions($conditions, null);
+		$this->assertTrue(is_array($result));
+		$this->assertTrue(isset($result['key']));
+		$this->assertTrue(isset($result['key']['$in']));
+		$this->assertEqual($conditions['key'], $result['key']['$in']);
+
+		$conditions = array('$where' => array('some' => 'value'));
+		$result = $this->db->conditions($conditions, null);
+		$this->assertTrue(is_array($result));
+		$this->assertEqual($conditions, $result);
+	}
+
+	public function testMongoConditionalOperators() {
+		$conditions = array('key' => array('<' => 10));
+		$expected = array('key' => array('$lt' => 10));
+		$result = $this->db->conditions($conditions, null);
+		$this->assertEqual($expected, $result);
+
+		$conditions = array('key' => array('<=' => 10));
+		$expected = array('key' => array('$lte' => 10));
+		$result = $this->db->conditions($conditions, null);
+		$this->assertEqual($expected, $result);
+
+		$conditions = array('key' => array('>' => 10));
+		$expected = array('key' => array('$gt' => 10));
+		$result = $this->db->conditions($conditions, null);
+		$this->assertEqual($expected, $result);
+
+		$conditions = array('key' => array('>=' => 10));
+		$expected = array('key' => array('$gte' => 10));
+		$result = $this->db->conditions($conditions, null);
+		$this->assertEqual($expected, $result);
+
+		$conditions = array('key' => array('!=' => 10));
+		$expected = array('key' => array('$ne' => 10));
+		$result = $this->db->conditions($conditions, null);
+		$this->assertEqual($expected, $result);
+
+		$conditions = array('key' => array('<>' => 10));
+		$expected = array('key' => array('$ne' => 10));
+		$result = $this->db->conditions($conditions, null);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testReadNoConditions() {
 		$data = array('title' => 'Test Post');
 		$this->query->data($data);
