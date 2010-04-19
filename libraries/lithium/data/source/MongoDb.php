@@ -347,6 +347,15 @@ class MongoDb extends \lithium\data\Source {
 		return new $class(compact('model', 'data') + $options);
 	}
 
+	/**
+	 * Executes calculation-related queries, such as those required for `count`.
+	 *
+	 * @param string $type Only accepts `count`.
+	 * @param mixed $query The query to be executed.
+	 * @param array $options Optional arguments for the `read()` query that will be executed
+	 *        to obtain the calculation result.
+	 * @return integer Result of the calculation.
+	 */
 	public function calculation($type, $query, array $options = array()) {
 		$query->calculate($type);
 
@@ -356,6 +365,15 @@ class MongoDb extends \lithium\data\Source {
 		}
 	}
 
+	/**
+	 * Document relationships.
+	 *
+	 * @param string $class
+	 * @param string $type Relationship type, e.g. `belongsTo`.
+	 * @param string $name
+	 * @param array $options
+	 * @return array
+	 */
 	public function relationship($class, $type, $name, array $options = array()) {
 		$key = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name'));
 		$defaults = compact('key') + array(
@@ -388,6 +406,15 @@ class MongoDb extends \lithium\data\Source {
 		}
 	}
 
+	/**
+	 * Allows for iteration over result sets.
+	 *
+	 * @param string $type One of 'next' or 'close'.
+	 * @param object $resource The resource to act upon.
+	 * @param object $context
+	 * @return mixed If `$type` is `next` and the resource has a `next` item, that item is
+	 *         returned. Null otherwise.
+	 */
 	public function result($type, $resource, $context) {
 		if (!is_object($resource)) {
 			return null;
@@ -404,6 +431,13 @@ class MongoDb extends \lithium\data\Source {
 		}
 	}
 
+	/**
+	 * Formats `group` clauses fro MongoDB.
+	 *
+	 * @param string|array $group The group clause.
+	 * @param object $context
+	 * @return array Formatted `group` clause.
+	 */
 	public function group($group, $context) {
 		if (!$group) {
 			return;
@@ -466,24 +500,70 @@ class MongoDb extends \lithium\data\Source {
 		return $conditions;
 	}
 
+	/**
+	 * Return formatted identifiers for fields.
+	 *
+	 * MongoDB does nt require field identifer escaping; as a result,
+	 * this method is not implemented.
+	 *
+	 * @param array $fields Fields to be parsed
+	 * @param object $context
+	 * @return array Parsed fields array
+	 */
 	public function fields($fields, $context) {
 		return $fields ?: array();
 	}
 
+	/**
+	 * Return formatted clause for limit.
+	 *
+	 * MongoDB does nt require limit identifer formatting; as a result,
+	 * this method is not implemented.
+	 *
+	 * @param mixed $limit The `limit` clause to be formatted
+	 * @param object $context
+	 * @return mixed Formatted `limit` clause.
+	 */
 	public function limit($limit, $context) {
 		return $limit ?: 0;
 	}
 
+	/**
+	 * Return formatted clause for order.
+	 *
+	 * @param mixed $order The `order` clause to be formatted
+	 * @param object $context
+	 * @return mixed Formatted `order` clause.
+	 */
 	public function order($order, $context) {
 		return $order ?: array();
 	}
 
-	protected function _result($type, $query, $config = array()) {
+	/**
+	 * Wrap query result with a Document instance (configurable by setting the proper `classes`
+	 * configuration entry).
+	 *
+	 * @param string $type Type of result; defaults to `document`.
+	 * @param mixed $query The query.
+	 * @param array $config Optional Document configuration parameters, passed on construction.
+	 * @return object Instance of `MongoDB::$_classes[$type]`, which defaults to `Document`.
+	 */
+	protected function _result($type, $query, array $config = array()) {
 		$defaults = array('handle' => &$this, 'exists' => true);
 		$class = $this->_classes[$type];
 		return new $class(compact('query') + $config + $defaults);
 	}
 
+	/**
+	 * Adds a proper MongoId to the passed `$data` if an appropriate `_id` field with a
+	 * 24-character alphanumeric identifier exists.
+	 *
+	 * @param array|object $data The passed data. If `$data` is an object, no MongoId will
+	 *        be generated and the original object will be returned.
+	 * @return array|object The passed `$data` with the `_id` parameter transformed into a
+	 *         MongoId object, or the original data if `_id` is not set, or if `_id` is already
+	 *         an object.
+	 */
 	protected function _toMongoId($data) {
 		if (isset($data['_id']) && !is_object($data['_id'])) {
 			if (preg_match('/^[0-9a-f]{24}$/', (string) $data['_id'])) {
