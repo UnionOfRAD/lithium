@@ -67,7 +67,12 @@ class MongoDb extends \lithium\data\Source {
 	 * @var array Keys are SQL-like operators, value is the MongoDB equivalent.
 	 */
 	protected $_operators = array(
-		'<' => '$lt', '>' => '$gt', '<=' =>  '$lte', '>=' => '$gte', '!=' => '$ne', '<>' => '$ne'
+		'<' => '$lt',
+		'>' => '$gt',
+		'<=' =>  '$lte',
+		'>=' => '$gte',
+		'!=' => array('single' => '$ne', 'multiple' => '$nin'),
+		'<>' => array('single' => '$ne', 'multiple' => '$nin')
 	);
 
 	/**
@@ -417,6 +422,14 @@ class MongoDb extends \lithium\data\Source {
 		return array('key' => $group);
 	}
 
+	/**
+	 * Map incoming conditions with their corresponding MongoDB-native operators.
+	 *
+	 * @param array $conditions Array of conditions
+	 * @param object $context Context with which this method was called; currently
+	 *        inspects the return value of `$context->type()`.
+	 * @return array Transformed conditions
+	 */
 	public function conditions($conditions, $context) {
 		switch (true) {
 			case !$conditions:
@@ -435,8 +448,15 @@ class MongoDb extends \lithium\data\Source {
 				continue;
 			}
 			if (is_array($value) && (isset($this->_operators[key($value)]))) {
-				$operator = $this->_operators[$key($value)];
-				$conditions[$key] = array($operator => current($value));
+				list($type, $data) = each($value);
+
+				if (is_array($this->_operators[$type])) {
+					$format = (is_array($data)) ? 'multiple' : 'single';
+					$operator = $this->_operators[$type][$format];
+				} else {
+					$operator = $this->_operators[$type];
+				}
+				$conditions[$key] = array($operator => $data);
 				continue;
 			}
 			if (is_array($value) && strpos(key($value), '$') !== 0) {

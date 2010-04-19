@@ -173,6 +173,16 @@ class MongoDbTest extends \lithium\test\Unit {
 		$expected = array('key' => array('$ne' => 10));
 		$result = $this->db->conditions($conditions, null);
 		$this->assertEqual($expected, $result);
+
+		$conditions = array('key' => array('!=' => array(10, 20, 30)));
+		$expected = array('key' => array('$nin' => array(10, 20, 30)));
+		$result = $this->db->conditions($conditions, null);
+		$this->assertEqual($expected, $result);
+
+		$conditions = array('key' => array('<>' => array(10, 20, 30)));
+		$expected = array('key' => array('$nin' => array(10, 20, 30)));
+		$result = $this->db->conditions($conditions, null);
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testReadNoConditions() {
