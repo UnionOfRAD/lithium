@@ -364,9 +364,13 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testSave() {
-		$record = MockPost::create(array('title' => 'New post', 'author_id' => 13));
+		$data = array('title' => 'New post', 'author_id' => 13);
+		$record = MockPost::create($data);
 		$result = $record->save();
-		var_dump($result);
+
+		$this->assertEqual('create', $result['query']->type());
+		$this->assertEqual($data, $result['query']->data());
+		$this->assertEqual('lithium\tests\mocks\data\MockPost', $result['query']->model());
 	}
 
 	public function testImplicitKeyFind() {

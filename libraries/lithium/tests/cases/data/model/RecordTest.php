@@ -96,7 +96,6 @@ class RecordTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $record->to('array'));
 
 		$this->assertEqual($expected['name'], $record->data('name'));
-		//var_dump($record->to('array'));
 	}
 }
 
