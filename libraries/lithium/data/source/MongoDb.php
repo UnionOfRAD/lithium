@@ -38,8 +38,11 @@ use \lithium\util\Inflector;
  */
 class MongoDb extends \lithium\data\Source {
 
-	protected $_db = null;
-
+	/**
+	 * Classes used by this class.
+	 *
+	 * @var array
+	 */
 	protected $_classes = array(
 		'document' => '\lithium\data\collection\Document'
 	);
@@ -56,6 +59,7 @@ class MongoDb extends \lithium\data\Source {
 	/**
 	 * Instantiates the MongoDB adapter with the default connection information.
 	 *
+	 * @see lithium\data\Connections::add()
 	 * @param array $config All information required to connect to the database, including:
 	 *        - `'database'`: The name of the database to connect to. Defaults to 'lithium'.
 	 *        - `'host'`: The IP or machine name where Mongo is running. Defaults to 'localhost'.
@@ -66,8 +70,6 @@ class MongoDb extends \lithium\data\Source {
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
 	 * @return object The adapter instance.
-	 *
-	 * @see lithium\data\Connections::add()
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -107,16 +109,21 @@ class MongoDb extends \lithium\data\Source {
 	 * Configures a model class by overriding the default dependencies for `'recordSet'` and
 	 * `'record'` , and sets the primary key to `'_id'`, in keeping with Mongo's conventions.
 	 *
+	 * @see lithium\data\Model::$_meta
+	 * @see lithium\data\Model::$_classes
 	 * @param string $class The fully-namespaced model class name to be configured.
 	 * @return Returns an array containing keys `'classes'` and `'meta'`, which will be merged with
 	 *         their respective properties in `Model`.
-	 * @see lithium\data\Model::$_meta
-	 * @see lithium\data\Model::$_classes
 	 */
 	public function configureClass($class) {
 		return array('meta' => array('key' => '_id'), 'classes' => array());
 	}
 
+	/**
+	 * Connects to the Mongo server.
+	 *
+	 * @return boolean True if connected, false otherwise.
+	 */
 	public function connect() {
 		$config = $this->_config;
 		$this->_isConnected = false;
@@ -138,6 +145,11 @@ class MongoDb extends \lithium\data\Source {
 		return $this->_isConnected;
 	}
 
+	/**
+	 * Disconnect from the Mongo server.
+	 *
+	 * @return boolean True on successful disconnect, false otherwise.
+	 */
 	public function disconnect() {
 		if ($this->connection && $this->connection->connected) {
 			try {

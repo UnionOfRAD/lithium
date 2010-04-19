@@ -289,7 +289,6 @@ class MongoDbTest extends \lithium\test\Unit {
 		$expected = 0;
 		$this->assertEqual($expected, $result);
 	}
-
 }
 
 ?>
