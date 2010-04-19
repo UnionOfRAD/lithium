@@ -32,7 +32,7 @@ class Create extends \lithium\console\Command {
 	 *
 	 * @var string
 	 */
-	public $library = 'app';
+	public $library = null;
 
 	/**
 	 * The name of the template to use to generate the file. This allows you to add a custom
@@ -44,7 +44,7 @@ class Create extends \lithium\console\Command {
 	public $template = null;
 
 	/**
-	 * Holds request library data from `\lithium\core\Libraries::get()`
+	 * Holds library data from `\lithium\core\Libraries::get()`
 	 *
 	 * @var array
 	 */
@@ -60,6 +60,7 @@ class Create extends \lithium\console\Command {
 		$this->template = (!$this->template && !empty($this->request->args[0]))
 			? $this->request->args[0] : null;
 		$defaults = array('prefix' => null, 'path' => null);
+		$this->library = $this->library ?: Libraries::get(true);
 		$this->_library = (array) Libraries::get($this->library) + $defaults;
 	}
 
