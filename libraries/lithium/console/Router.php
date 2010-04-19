@@ -29,8 +29,9 @@ class Router extends \lithium\core\Object {
 		if (!empty($request->params)) {
 			$params = $request->params + $params;
 		}
-		if (!empty($request->args)) {
-			$args = $request->args;
+
+		if (!empty($request->argv)) {
+			$args = $request->argv;
 			if (empty($params['command'])) {
 				$params['command'] = array_shift($args);
 			}

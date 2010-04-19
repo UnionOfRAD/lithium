@@ -17,17 +17,17 @@ namespace lithium\console;
 class Request extends \lithium\core\Object {
 
 	/**
-	 * Arguments for the request.
+	 * The raw data passed from the command line
 	 *
 	 * @var array
 	 */
-	public $args = array();
+	public $argv = array();
 
 	/**
 	 * Parameters parsed from arguments.
 	 *
-	 * @var array
 	 * @see lithium\console\Router
+	 * @var array
 	 */
 	public $params = array(
 		'command' => null, 'action' => 'run', 'args' => array()
@@ -75,7 +75,7 @@ class Request extends \lithium\core\Object {
 		$this->_env['working'] = getcwd() ?: null;
 		$argv = (array) $this->env('argv');
 		$this->_env['script'] = array_shift($argv);
-		$this->args += $argv + (array) $this->_config['args'];
+		$this->argv += $argv + (array) $this->_config['args'];
 		$this->input = $this->_config['input'];
 
 		if (!is_resource($this->_config['input'])) {
@@ -83,19 +83,23 @@ class Request extends \lithium\core\Object {
 		}
 		parent::_init();
 	}
-	
+
 	/**
 	 * Allows request parameters to be accessed as object properties, i.e. `$this->request->action`
 	 * instead of `$this->request->params['action']`.
 	 *
+	 * @see lithium\action\Request::$params
 	 * @param string $name The property name/parameter key to return.
 	 * @return mixed Returns the value of `$params[$name]` if it is set, otherwise returns null.
-	 * @see lithium\action\Request::$params
 	 */
 	public function __get($name) {
 		if (isset($this->params[$name])) {
 			return $this->params[$name];
 		}
+	}
+
+	public function __isSet($name) {
+		return isset($this->params[$name]);
 	}
 
 	/**
@@ -125,7 +129,9 @@ class Request extends \lithium\core\Object {
 			$this->shift(--$i);
 		}
 		$this->params['command'] = $this->params['action'];
-		$this->params['action'] = array_shift($this->params['args']);
+		if (isset($this->params['args'][0])) {
+			$this->params['action'] = array_shift($this->params['args']);
+		}
 		return $this;
 	}
 

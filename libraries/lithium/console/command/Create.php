@@ -30,6 +30,7 @@ class Create extends \lithium\console\Command {
 	/**
 	 * Name of library to use
 	 *
+	 * @var string
 	 */
 	public $library = 'app';
 
@@ -38,34 +39,55 @@ class Create extends \lithium\console\Command {
 	 * template to be used in place of the core template for each command. Place templates in
 	 * `<library>\extensions\command\create\template`.
 	 *
+	 * @var string
 	 */
 	public $template = null;
 
 	/**
-	 * The variable parameters of the template.
+	 * Holds request library data from `\lithium\core\Libraries::get()`
 	 *
 	 * @var array
 	 */
-	protected $_params = array();
-
-	/**
-	 * Class Constrcutor.
-	 *
-	 * @param string $config
-	 */
-	public function __construct($config = array()) {
-		$this->template = strtolower(join('', array_slice(explode("\\", get_class($this)), -1)));
-		parent::__construct($config);
-	}
+	protected $_library = array();
 
 	/**
 	 * Class initializer. Parses template and sets up params that need to be filled.
 	 *
 	 * @return void
 	 */
-	public function _init() {
+	protected function _init() {
 		parent::_init();
-		$this->_params = $this->_parse($this->template);
+		$this->template = (!$this->template && !empty($this->request->args[0]))
+			? $this->request->args[0] : null;
+		$defaults = array('prefix' => null, 'path' => null);
+		$this->_library = (array) Libraries::get($this->library) + $defaults;
+	}
+
+	/**
+	 * Magic method to call the appropriate sub-command and method.
+	 *
+	 * @param string $command The sub-command name. example: Model, Controller, Test
+	 * @param string $params
+	 * @return void
+	 */
+	public function __call($command, $params = array()) {
+		if (!isset($this->_commands[$command])) {
+			$class = Libraries::locate('command.create', $command);
+			if (!$class) {
+				$this->error("{$command} not found.");
+				return false;
+			}
+			$this->_commands[$command] = new $class(array(
+				'request' => $this->request->shift(2), 'classes'=> $this->_classes
+			));
+		}
+		$command = $this->_commands[$command];
+		$method = "_" . array_shift($params);
+
+		if (!method_exists($command, $method)) {
+			return null;
+		}
+		return $command->invokeMethod($method, $params);
 	}
 
 	/**
@@ -75,20 +97,25 @@ class Create extends \lithium\console\Command {
 	 * @param string $method
 	 * @return void
 	 */
-	public function run($command = null, $method = 'run') {
-		if (!$command || $this->$i) {
+	public function run($command = null) {
+		if (!$command || $this->i) {
 			return $this->interactive();
 		}
-		$class = Libraries::locate('command.create', $command);
-		$command = new $class(array(
-			'request' => $this->request->shift(2), 'classes'=> $this->_classes
-		));
+		$data = array();
+		$params = $this->params($command);
 
-		if (!method_exists($command, $method)) {
-			array_unshift($command->request->params['args'], $method);
-			$method = 'run';
+		foreach ($params as $i => $param) {
+			if (!$data[$param] = $this->{$command}($param)) {
+				$data[$param] = !empty($this->request->args[$i]) ? $this->request->args[$i] : null;
+			}
 		}
-		return $command->invokeMethod($method, $command->request->params['args']);
+		var_Dump($data);
+		if ($this->_save($this->template, $data)) {
+			$this->out("{$data['class']} created in {$data['namespace']}.");
+			return true;
+		}
+		$this->error("{$command} could not be created.");
+		return false;
 	}
 
 	/**
@@ -108,9 +135,13 @@ class Create extends \lithium\console\Command {
 	 * @param string $template
 	 * @return array
 	 */
-	protected function _parse($template) {
+	protected function params($template = null) {
 		$contents = $this->_template($template);
+		if (empty($contents)) {
+			return array();
+		}
 		preg_match_all('/(?:\{:(?P<params>[^}]+)\})/', $contents, $keys);
+
 		if (!empty($keys['params'])) {
 			return array_values(array_unique($keys['params']));
 		}
@@ -123,7 +154,8 @@ class Create extends \lithium\console\Command {
 	 * @param string $name the name of the template
 	 * @return string
 	 */
-	protected function _template($name) {
+	protected function _template($name = null) {
+		$name = $this->template ? $this->template : $name;
 		$file = Libraries::locate('command.create.template', $name, array(
 			'filter' => false, 'type' => 'file', 'suffix' => '.txt.php',
 		));
@@ -139,7 +171,7 @@ class Create extends \lithium\console\Command {
 	 * @param string $name
 	 * @return string
 	 */
-	protected function _namespace($name) {
+	protected function _namespace($name = null) {
 		$nameToSpace = array(
 			'model' => 'models', 'view' => 'views', 'controller' => 'controllers',
 			'command' => 'extensions.command', 'adapter' => 'extensions.adapter',
@@ -148,7 +180,8 @@ class Create extends \lithium\console\Command {
 		if (isset($nameToSpace[$name])) {
 			$name = $nameToSpace[$name];
 		}
-		return str_replace('.', '\\', $name);
+		$name = str_replace('.', '\\', $name);
+		return $this->_library['prefix'] . $name;
 	}
 
 	/**
@@ -159,12 +192,12 @@ class Create extends \lithium\console\Command {
 	 * @return boolean
 	 */
 	protected function _save($template, $params = array()) {
-		$contents = $this->_tempalte($template);
+		$contents = $this->_template($template);
 		$result = String::insert($contents, $params);
-		$library = Libraries::get($this->library);
 
-		if (!empty($library['path'])) {
-			$path = $library['path'] . str_replace(array('\\', $this->library), array('/',''),
+		if (!empty($this->_library['path'])) {
+			$path = $this->_library['path'] . str_replace(
+				array('\\', $this->library), array('/',''),
 				"\\{$params['namespace']}\\{$params['class']}"
 			);
 			$file = str_replace('//', '/', "{$path}.php");

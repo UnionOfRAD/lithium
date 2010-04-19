@@ -16,29 +16,8 @@ use \lithium\core\Libraries;
  */
 class Model extends \lithium\console\command\Create {
 
-	/**
-	 * Creates a new model by name.
-	 *
-	 * @param string $name Model name.
-	 * @param string $null 
-	 */
-	public function run($name = null, $null = null) {
-		$library = Libraries::get($this->library);
-		if (empty($library['prefix'])) {
-			return false;
-		}
-		$params = array(
-			'namespace' => "{$library['prefix']}models",
-			'class' => "{$name}",
-		);
-
-		if ($this->_save($this->template, $params)) {
-			$this->out(
-				"{$params['class']} created in {$params['namespace']}."
-			);
-			return true;
-		}
-		return false;
+	protected function _class() {
+		return $this->request->action;
 	}
 }
 

@@ -64,7 +64,7 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testConstructWithServer() {
-		$_SERVER['argv'] = array('/path/to/lithium.php','one', 'two');
+		$_SERVER['argv'] = array('/path/to/lithium.php', 'one', 'two');
 		$request = new Request();
 
 		$expected = '/path/to/lithium.php';
@@ -72,7 +72,7 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array('one', 'two');
-		$result = $request->args;
+		$result = $request->argv;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -82,7 +82,7 @@ class RequestTest extends \lithium\test\Unit {
 		));
 
 		$expected = array('/path/to/lithium.php', 'wrong');
-		$result = $request->args;
+		$result = $request->argv;
 		$this->assertEqual($expected, $result);
 
 		$_SERVER['argv'] = array('/path/to/lithium.php');
@@ -95,7 +95,7 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array('one', 'two');
-		$result = $request->args;
+		$result = $request->argv;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -104,7 +104,7 @@ class RequestTest extends \lithium\test\Unit {
 			'args' => array('ok')
 		));
 		$expected = array('ok');
-		$this->assertEqual($expected, $request->args);
+		$this->assertEqual($expected, $request->argv);
 
 		$request = new Request(array(
 			'env' => array('script' => '/path/to/lithium.php'),
@@ -116,7 +116,7 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array('one', 'two', 'three', 'four');
-		$this->assertEqual($expected, $request->args);
+		$this->assertEqual($expected, $request->argv);
 	}
 
 	public function testConstructWithEnv() {

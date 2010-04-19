@@ -49,6 +49,30 @@ class Controller extends \lithium\console\command\Create {
 		}
 		return false;
 	}
+
+	protected function _namespace($options = array()) {
+
+	}
+
+	protected function _use($options = array()) {
+
+	}
+
+	protected function _class($options = array()) {
+
+	}
+
+	protected function _plural($options = array()) {
+
+	}
+
+	protected function _model($options = array()) {
+
+	}
+
+	protected function _singular($options = array()) {
+
+	}
 }
 
 ?>

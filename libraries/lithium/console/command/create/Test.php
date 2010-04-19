@@ -12,15 +12,48 @@ use \lithium\core\Libraries;
 use \lithium\analysis\Inspector;
 
 /**
- * Create test cases or mocks in a namespace for a class.
+ * Generate test cases in the given namespace.
+ * `li3 create test model Post`
+ * `li3 create test --library=li3_plugin model Post`
  *
+ * @param string $type namespace of the class (e.g. model, controller, some.name.space).
+ * @param string $name Name of class to test.
+ * @return void
  */
 class Test extends \lithium\console\command\Create {
+
+	protected function _namespace($name) {
+		var_Dump($name);
+		return parent::_namespace($name) . "\\{$this->request->action}";
+	}
+
+	protected function _use() {
+		$namespace = $this->_namespace($this->request->command);
+		$class = array_shift($this->request->args);
+		return $this->_use = "\\{$namespace}\\{$class}";
+	}
+
+	protected function _class() {
+		$class = array_shift($this->request->args);
+		return  $class . "Test";
+	}
+
+	protected function _methods() {
+		$use = $this->_use();
+
+		if (class_exists($use, false)) {
+			$methods = array();
+			foreach (array_keys(Inspector::methods($use, 'extents')) as $method) {
+				$methods[] = "\tpublic function test" . ucwords($method) . "() {}";
+			}
+		}
+		return join("\n", $methods);
+	}
 
 	/**
 	 * Generate test cases in the given namespace.
 	 * `li3 create test model Post`
-	 * `li3 create test --library=li3_plugin model Post`
+	 * `li3 create --library=li3_plugin test model Post`
 	 *
 	 * @param string $type namespace of the class (e.g. model, controller, some.name.space).
 	 * @param string $name Name of class to test.
