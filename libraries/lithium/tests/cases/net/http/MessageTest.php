@@ -43,10 +43,8 @@ class MessageTest extends \lithium\test\Unit {
 	}
 
 	public function testHeaderArrayValue() {
-		$expected = array(
-			'User-Agent: Mozilla/5.0 (Lithium)',
-		);
-		$result = $this->base->headers(array('User-Agent: Mozilla/5.0 (Lithium)'));
+		$expected = array('User-Agent: Mozilla/5.0');
+		$result = $this->base->headers(array('User-Agent: Mozilla/5.0'));
 		$this->assertEqual($expected, $result);
 	}
 

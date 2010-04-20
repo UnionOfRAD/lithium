@@ -58,7 +58,7 @@ class RequestTest extends \lithium\test\Unit {
 		$expected = array(
 			'Host: localhost:443',
 			'Connection: Close',
-			'User-Agent: Mozilla/5.0 (Lithium)',
+			'User-Agent: Mozilla/5.0',
 			'Header: Value'
 		);
 		$result = $request->headers();
@@ -119,7 +119,7 @@ class RequestTest extends \lithium\test\Unit {
 			'GET / HTTP/1.1',
 			'Host: localhost:80',
 			'Connection: Close',
-			'User-Agent: Mozilla/5.0 (Lithium)',
+			'User-Agent: Mozilla/5.0',
 			'', ''
 		));
 		$result = (string) $this->request;
@@ -138,7 +138,7 @@ class RequestTest extends \lithium\test\Unit {
 			'GET / HTTP/1.1',
 			'Host: localhost:80',
 			'Connection: Close',
-			'User-Agent: Mozilla/5.0 (Lithium)',
+			'User-Agent: Mozilla/5.0',
 			'Authorization: Basic ' . base64_encode('root:something'),
 			'', ''
 		));
@@ -151,7 +151,7 @@ class RequestTest extends \lithium\test\Unit {
 			'GET / HTTP/1.1',
 			'Host: localhost:80',
 			'Connection: Close',
-			'User-Agent: Mozilla/5.0 (Lithium)',
+			'User-Agent: Mozilla/5.0',
 			'Content-Length: 11',
 			'', 'status=cool'
 		));
@@ -167,7 +167,7 @@ class RequestTest extends \lithium\test\Unit {
 			'header' => array(
 				'Host: localhost:80',
 				'Connection: Close',
-				'User-Agent: Mozilla/5.0 (Lithium)'
+				'User-Agent: Mozilla/5.0'
 			)
 		);
 		$result = $this->request->to('array');
@@ -188,7 +188,7 @@ class RequestTest extends \lithium\test\Unit {
 				'header' => array(
 					'Host: localhost:80',
 					'Connection: Close',
-					'User-Agent: Mozilla/5.0 (Lithium)'
+					'User-Agent: Mozilla/5.0'
 				),
 			)
 		);

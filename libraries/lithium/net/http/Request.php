@@ -67,7 +67,7 @@ class Request extends \lithium\net\http\Message {
 	 * {{{
 	 * 	array(
 	 * 		'Host' => $this->host . ":" . $this->port,
-	 * 		'Connection' => 'Close', 'User-Agent' => 'Mozilla/5.0 (Lithium)'
+	 * 		'Connection' => 'Close', 'User-Agent' => 'Mozilla/5.0'
 	 * 	)
 	 * }}}
 	 * @var array
@@ -124,9 +124,9 @@ class Request extends \lithium\net\http\Message {
 		$this->protocol = "HTTP/{$this->version}";
 
 		$this->headers = array(
-			'Host' => $this->host . ":" . $this->port,
+			'Host' => "{$this->host}:{$this->port}",
 			'Connection' => 'Close',
-			'User-Agent' => 'Mozilla/5.0 (Lithium)'
+			'User-Agent' => 'Mozilla/5.0',
 		);
 		$this->headers($config['headers']);
 
@@ -174,11 +174,10 @@ class Request extends \lithium\net\http\Message {
 	public function to($format, array $options = array()) {
 		switch ($format) {
 			case 'array':
-				return array(
-					'method' => $this->method,
-					'content' => $this->body(),
-					'header' => $this->headers()
-				);
+				$method = $this->method;
+				$content = $this->body();
+				$header = $this->headers();
+				return compact('method', 'content', 'header');
 			case 'url':
 				$query = $this->queryString();
 				return "{$this->scheme}://{$this->host}:{$this->port}{$this->path}{$query}";

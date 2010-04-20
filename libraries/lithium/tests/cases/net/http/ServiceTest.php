@@ -146,7 +146,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'POST /update.xml HTTP/1.1',
 			'Host: localhost:80',
 			'Connection: Close',
-			'User-Agent: Mozilla/5.0 (Lithium)',
+			'User-Agent: Mozilla/5.0',
 			'Content-Type: application/x-www-form-urlencoded',
 			'Content-Length: 11',
 			'', 'status=cool'
@@ -162,7 +162,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'PUT /update.xml HTTP/1.1',
 			'Host: localhost:80',
 			'Connection: Close',
-			'User-Agent: Mozilla/5.0 (Lithium)',
+			'User-Agent: Mozilla/5.0',
 			'Content-Type: application/x-www-form-urlencoded',
 			'Content-Length: 11',
 			'', 'status=cool'
@@ -178,7 +178,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'DELETE /posts/1 HTTP/1.1',
 			'Host: localhost:80',
 			'Connection: Close',
-			'User-Agent: Mozilla/5.0 (Lithium)',
+			'User-Agent: Mozilla/5.0',
 			'', ''
 		));
 		$result = (string) $http->last->request;
@@ -192,7 +192,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'POST /update.xml HTTP/1.1',
 			'Host: localhost:80',
 			'Connection: Close',
-			'User-Agent: Mozilla/5.0 (Lithium)',
+			'User-Agent: Mozilla/5.0',
 			'Content-Type: application/json',
 			'Content-Length: 17',
 			'', '{"status":"cool"}'
