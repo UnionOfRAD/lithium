@@ -10,6 +10,7 @@ namespace lithium\test;
 
 use \Exception;
 use \lithium\util\String;
+use \lithium\core\Libraries;
 use \lithium\util\Validator;
 use \lithium\analysis\Debugger;
 use \lithium\analysis\Inspector;
@@ -59,6 +60,22 @@ class Unit extends \lithium\core\Object {
 	 * @var string
 	 */
 	protected $_expected = array();
+
+	/**
+	 * Finds the test case for the corresponding class name.
+	 *
+	 * @param string $class A fully-namespaced class reference for which to find a test case.
+	 * @return string Returns the class name of a test case for `$class`, or `null` if none exists.
+	 */
+	public static function get($class) {
+		$parts = explode('\\', $class);
+
+		$library = array_shift($parts);
+		$name = array_pop($parts);
+		$type = "tests.cases." . implode('.', $parts);
+
+		return Libraries::locate($type, $name, compact('library'));
+	}
 
 	/**
 	 * Setup method run before every test method. override in subclasses

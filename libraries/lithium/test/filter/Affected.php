@@ -8,8 +8,9 @@
 
 namespace lithium\test\filter;
 
-use lithium\core\Libraries;
-use lithium\analysis\Inspector;
+use \lithium\test\Unit;
+use \lithium\core\Libraries;
+use \lithium\analysis\Inspector;
 
 /**
  * The `Affected` test filter adds test cases to the tests that are about to be run.
@@ -44,7 +45,7 @@ class Affected extends \lithium\test\Filter {
 		$affected = array_unique($affected);
 
 		foreach ($affected as $class) {
-			$test = self::_testCaseForClass($class);
+			$test = Unit::get($class);
 
 			if ($test && !in_array($test, $testsClasses)) {
 				$tests[] = new $test();
@@ -100,22 +101,6 @@ class Affected extends \lithium\test\Filter {
 			}
 		}
 		return $affected;
-	}
-
-	/**
-	 * Returns corresponding test case for a class, ensuring it actually exists.
-	 *
-	 * @param string $class
-	 * @return string|void
-	 */
-	protected static function _testCaseForClass($class) {
-		$parts = explode('\\', $class);
-
-		$library = array_shift($parts);
-		$name = array_pop($parts);
-		$type = "tests.cases." . implode('.', $parts);
-
-		return Libraries::locate($type, $name, compact('library'));
 	}
 }
 
