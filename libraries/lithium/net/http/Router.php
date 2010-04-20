@@ -84,17 +84,7 @@ class Router extends \lithium\core\StaticObject {
 		if (!$result = static::parse($request)) {
 			return $request;
 		}
-
-		if (is_object($result) && $result instanceof \lithium\action\Response) {
-			return $result;
-		}
-
-		$persist = (is_array($result) && isset($result['persist'])) ? $result['persist'] : array();
-		unset($result['persist']);
-
-		$request->params = $result;
-		$request->persist = $persist;
-		return $request;
+		return $result;
 	}
 
 	/**

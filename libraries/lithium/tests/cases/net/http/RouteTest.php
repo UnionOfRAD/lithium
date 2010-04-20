@@ -51,11 +51,13 @@ class RouteTest extends \lithium\test\Unit {
 		$request->url = '/';
 
 		$result = $route->parse($request);
-		$this->assertEqual($params + array('persist' => array('controller')), $result);
+		$this->assertEqual($params, $result->params);
+		$this->assertEqual(array('controller'), $result->persist);
 
 		$request->url = '';
 		$result = $route->parse($request);
-		$this->assertEqual($params + array('persist' => array('controller')), $result);
+		$this->assertEqual($params, $result->params);
+		$this->assertEqual(array('controller'), $result->persist);
 
 		$request->url = '/posts';
 		$this->assertFalse($route->parse($request));
@@ -90,16 +92,15 @@ class RouteTest extends \lithium\test\Unit {
 	public function testSimpleRouteParsing() {
 		$route = new Route(array('template' => '/{:controller}'));
 		$request = new Request();
-
-		$default = array('action' => 'index', 'persist' => array('controller'));
+		$default = array('action' => 'index');
 
 		$request->url = '/posts';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'posts') + $default, $result);
+		$this->assertEqual(array('controller' => 'posts') + $default, $result->params);
 
 		$request->url = '/users';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'users') + $default, $result);
+		$this->assertEqual(array('controller' => 'users') + $default, $result->params);
 
 		$request->url = '/users/index';
 		$this->assertFalse($route->parse($request));
@@ -133,31 +134,28 @@ class RouteTest extends \lithium\test\Unit {
 	public function testRouteParsingWithOptionalParam() {
 		$route = new Route(array('template' => '/{:controller}/{:action}'));
 		$request = new Request();
-
-		$default = array('action' => 'index', 'persist' => array('controller'));
+		$default = array('action' => 'index');
 
 		$request->url = '/posts';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'posts') + $default, $result);
+		$this->assertEqual(array('controller' => 'posts') + $default, $result->params);
 
 		$request->url = '/users';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'users') + $default, $result);
+		$this->assertEqual(array('controller' => 'users') + $default, $result->params);
 
 		$request->url = '/1';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => '1') + $default, $result);
+		$this->assertEqual(array('controller' => '1') + $default, $result->params);
 
 		$request->url = '/users/index';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'users') + $default, $result);
+		$this->assertEqual(array('controller' => 'users') + $default, $result->params);
 
 		$request->url = '/users/view';
 		$result = $route->parse($request);
-		$expected = array('controller' => 'users', 'action' => 'view', 'persist' => array(
-			'controller'
-		));
-		$this->assertEqual($expected, $result);
+		$expected = array('controller' => 'users', 'action' => 'view');
+		$this->assertEqual($expected, $result->params);
 
 		$request->url = '/users/view/5';
 		$this->assertFalse($route->parse($request));
@@ -171,25 +169,24 @@ class RouteTest extends \lithium\test\Unit {
 			'template' => '/{:controller}/{:action}/{:id}', 'params' => array('id' => null)
 		));
 		$request = new Request();
-		$persist = array('persist' => array('controller'));
 
 		$request->url = '/posts';
 		$result = $route->parse($request);
-		$expected = array('controller' => 'posts', 'action' => 'index', 'id' => null) + $persist;
-		$this->assertEqual($expected, $result);
+		$expected = array('controller' => 'posts', 'action' => 'index', 'id' => null);
+		$this->assertEqual($expected, $result->params);
 
 		$request->url = '/posts/index';
 		$result = $route->parse($request);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result->params);
 
 		$request->url = '/posts/index/';
 		$result = $route->parse($request);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result->params);
 
 		$request->url = '/posts/view/5';
 		$result = $route->parse($request);
-		$expected = array('controller' => 'posts', 'action' => 'view', 'id' => '5') + $persist;
-		$this->assertEqual($expected, $result);
+		$expected = array('controller' => 'posts', 'action' => 'view', 'id' => '5');
+		$this->assertEqual($expected, $result->params);
 
 		$request->url = '/';
 		$this->assertFalse($route->parse($request));
@@ -204,22 +201,22 @@ class RouteTest extends \lithium\test\Unit {
 			'params' => array('id' => null)
 		));
 		$request = new Request();
-		$default = array('controller' => 'posts', 'persist' => array('controller'));
+		$default = array('controller' => 'posts');
 
 		$request->url = '/posts/view/5.xml';
 		$result = $route->parse($request);
 		$expected = array('action' => 'view', 'id' => '5', 'type' => 'xml') + $default;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result->params);
 
 		$request->url = '/posts/index.xml';
 		$result = $route->parse($request);
 		$expected = array('action' => 'index', 'id' => '', 'type' => 'xml') + $default;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result->params);
 
 		$request->url = '/posts.xml';
 		$result = $route->parse($request);
 		$expected = array('action' => 'index', 'id' => '', 'type' => 'xml') + $default;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result->params);
 	}
 
 	public function testRouteMatchingWithEmptyTrailingParams() {
@@ -239,10 +236,9 @@ class RouteTest extends \lithium\test\Unit {
 
 		$result = $route->parse($request);
 		$expected = array(
-			'controller' => 'posts', 'action' => 'index', 'args' => array('foo', 'bar'),
-			'persist' => array('controller')
+			'controller' => 'posts', 'action' => 'index', 'args' => array('foo', 'bar')
 		);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result->params);
 	}
 
 	public function testStaticRouteMatching() {
@@ -256,17 +252,15 @@ class RouteTest extends \lithium\test\Unit {
 		$this->assertFalse($result);
 
 		$request = new Request();
-		$expected = array('controller' => 'sessions', 'action' => 'add', 'persist' => array(
-			'controller'
-		));
+		$expected = array('controller' => 'sessions', 'action' => 'add');
 
 		$request->url = '/login';
 		$result = $route->parse($request);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result->params);
 
 		$request->url = 'login';
 		$result = $route->parse($request);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result->params);
 	}
 
 	/**
@@ -287,10 +281,8 @@ class RouteTest extends \lithium\test\Unit {
 		$request->url = '/posts';
 
 		$result = $route->parse($request);
-		$expected = array('controller' => 'posts', 'action' => 'index', 'persist' => array(
-			'controller'
-		));
-		$this->assertEqual($expected, $result);
+		$expected = array('controller' => 'posts', 'action' => 'index');
+		$this->assertEqual($expected, $result->params);
 
 		$result = $route->match(array('controller' => 'posts', 'action' => 'index'));
 		$expected = '/posts';
@@ -347,11 +339,11 @@ class RouteTest extends \lithium\test\Unit {
 		$expected = array('controller' => 'users', 'action' => 'index', 'user' => 'alke');
 
 		$result = $route->parse($request);
-		$this->assertEqual($expected + array('persist' => array('controller')), $result);
+		$this->assertEqual($expected, $result->params);
 
 		$request->url = '/u/alke';
 		$result = $route->parse($request);
-		$this->assertEqual($expected + array('persist' => array('controller')), $result);
+		$this->assertEqual($expected, $result->params);
 	}
 
 	/**
@@ -367,7 +359,7 @@ class RouteTest extends \lithium\test\Unit {
 		$expected = array('controller' => 'users', 'action' => 'view', 'user' => '10');
 
 		$result = $route->parse($request);
-		$this->assertEqual($expected + array('persist' => array('controller')), $result);
+		$this->assertEqual($expected, $result->params);
 
 		$request->url = '/users/view/my_login';
 		$result = $route->parse($request);
@@ -438,15 +430,16 @@ class RouteTest extends \lithium\test\Unit {
 	public function testHandlerModification() {
 		$route = new Route(array(
 			'template' => '/{:id:[0-9a-f]{24}}.{:type}',
-			'handler' => function($request, $params) {
-				return $params + array('lang' => $request->env('ACCEPT_LANG') ?: 'en');
+			'handler' => function($request) {
+				$request->params += array('lang' => $request->env('ACCEPT_LANG') ?: 'en');
+				return $request;
 			}
 		));
 
 		$request = new Request(array('url' => '/4bbf25bd8ead0e5180120000.json'));
 		$result = $route->parse($request);
 		$lang = $request->env('ACCEPT_LANG') ?: 'en';
-		$this->assertEqual($lang, $result['lang']);
+		$this->assertEqual($lang, $result->params['lang']);
 	}
 }
 

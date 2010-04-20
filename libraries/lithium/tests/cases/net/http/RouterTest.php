@@ -102,34 +102,32 @@ class RouterTest extends \lithium\test\Unit {
 	 */
 	public function testBasicRouteMatching() {
 		Router::connect('/hello', array('controller' => 'posts', 'action' => 'index'));
-		$expected = array('controller' => 'posts', 'action' => 'index', 'persist' => array(
-			'controller'
-		));
+		$expected = array('controller' => 'posts', 'action' => 'index');
 
 		foreach (array('/hello/', '/hello', 'hello/', 'hello') as $url) {
 			$this->request->url = $url;
 			$result = Router::parse($this->request);
-			$this->assertEqual($expected, $result);
+			$this->assertEqual($expected, $result->params);
+			$this->assertEqual(array('controller'), $result->persist);
 		}
 	}
 
 	public function testRouteMatchingWithDefaultParameters() {
 		Router::connect('/{:controller}/{:action}', array('action' => 'view'));
-		$expected = array('controller' => 'posts', 'action' => 'view', 'persist' => array(
-			'controller'
-		));
+		$expected = array('controller' => 'posts', 'action' => 'view');
 
 		foreach (array('/posts/view', '/posts', 'posts', 'posts/view', 'posts/view/') as $url) {
 			$this->request->url = $url;
 			$result = Router::parse($this->request);
-			$this->assertEqual($expected, $result);
+			$this->assertEqual($expected, $result->params);
+			$this->assertEqual(array('controller'), $result->persist);
 		}
 		$expected['action'] = 'index';
 
 		foreach (array('/posts/index', 'posts/index', 'posts/index/') as $url) {
 			$this->request->url = $url;
 			$result = Router::parse($this->request);
-			$this->assertEqual($expected, $result);
+			$this->assertEqual($expected, $result->params);
 		}
 
 		$this->request->url = '/posts/view/1';
@@ -231,11 +229,9 @@ class RouterTest extends \lithium\test\Unit {
 		Router::connect('/{:controller}', array('controller' => 'posts'));
 		$this->request->url = '/hello';
 
-		$expected = array('controller' => 'hello', 'action' => 'index', 'persist' => array(
-			'controller'
-		));
+		$expected = array('controller' => 'hello', 'action' => 'index');
 		$result = Router::parse($this->request);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result->params);
 
 		Router::reset();
 		$this->assertNull(Router::parse($this->request));
@@ -400,7 +396,7 @@ class RouterTest extends \lithium\test\Unit {
 	public function testRouteHandler() {
 		Router::connect('/login', 'Users::login');
 
-		Router::connect('/users/login', array(), function($request, $params) {
+		Router::connect('/users/login', array(), function($request) {
 			return new Response(array(
 				'location' => array('controller' => 'users', 'action' => 'login')
 			));

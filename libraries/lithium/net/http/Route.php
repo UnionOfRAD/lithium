@@ -168,13 +168,14 @@ class Route extends \lithium\core\Object {
 		if (!$result['action']) {
 			unset($result['action']);
 		}
-		$result += array('action' => 'index', 'persist' => $this->_persist);
+		$request->params = $result + array('action' => 'index');
+		$request->persist = $this->_persist;
 
 		if ($this->_handler) {
 			$handler = $this->_handler;
-			$result = $handler($request, $result);
+			return $handler($request);
 		}
-		return $result;
+		return $request;
 	}
 
 	/**
