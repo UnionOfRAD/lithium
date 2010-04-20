@@ -76,8 +76,8 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 
 		if ($this->_config['extract']) {
 			extract($this->_data, EXTR_OVERWRITE);
-		} else {
-			extract($this->_view->outputFilters, EXTR_OVERWRITE);
+		} elseif ($this->_view) {
+			extract((array) $this->_view->outputFilters, EXTR_OVERWRITE);
 		}
 
 		ob_start();
