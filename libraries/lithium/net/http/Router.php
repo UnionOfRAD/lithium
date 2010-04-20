@@ -127,13 +127,17 @@ class Router extends \lithium\core\StaticObject {
 			unset($options[0]);
 			$options = $params + $options;
 		}
-		$defaults = array('action' => 'index');
 
 		if ($context && isset($context->persist)) {
 			foreach ($context->persist as $key) {
-				$defaults[$key] = $context->params[$key];
+				$options += array($key => $context->params[$key]);
+				if ($options[$key] === null) {
+					unset($options[$key]);
+				}
 			}
 		}
+
+		$defaults = array('action' => 'index');
 		$options += $defaults;
 		$base = isset($context) ? $context->env('base') : '';
 

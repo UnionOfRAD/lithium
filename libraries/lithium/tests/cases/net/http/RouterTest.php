@@ -388,6 +388,31 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that persistent parameters can be overridden with nulled-out values.
+	 *
+	 * @return void
+	 */
+	public function testOverridingPersistentParameters() {
+		Router::connect(
+			'/admin/{:controller}/{:action}',
+			array('admin' => true),
+			array('persist' => array('admin', 'controller'))
+		);
+		Router::connect('/{:controller}/{:action}');
+
+		$request = Router::process(new Request(array('url' => '/admin/posts/add', 'base' => '')));
+		$expected = array('controller' => 'posts', 'action' => 'add', 'admin' => true);
+		$this->assertEqual($expected, $request->params);
+		$this->assertEqual(array('admin', 'controller'), $request->persist);
+
+		$url = Router::match(array('action' => 'archive'), $request);
+		$this->assertEqual('/admin/posts/archive', $url);
+
+		$url = Router::match(array('action' => 'archive', 'admin' => null), $request);
+		$this->assertEqual('/posts/archive', $url);
+	}
+
+	/**
 	 * Tests passing a closure handler to `Router::connect()` to bypass or augment default
 	 * dispatching.
 	 *
