@@ -215,18 +215,15 @@ class PhpTest extends \lithium\test\Unit {
 
 		$params = compact('key');
 		$result = $closure($this->Php, $params, null);
-
 		$this->assertTrue($result);
 
 		$key = 'non-existent';
-
 		$closure = $this->Php->delete($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
 		$result = $closure($this->Php, $params, null);
-
-		$this->assertFalse($result);
+		$this->assertTrue($result);
 	}
 
 	public function testCheckThrowException() {

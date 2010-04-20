@@ -8,6 +8,7 @@
 
 namespace lithium\storage\session\adapter;
 
+use \lithium\util\Set;
 use \RuntimeException;
 
 /**
@@ -112,7 +113,7 @@ class Php extends \lithium\core\Object {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params, $chain) {
-			return (isset($_SESSION[$params['key']]));
+			return Set::check($_SESSION, $params['key']);
 		};
 	}
 
@@ -134,7 +135,13 @@ class Php extends \lithium\core\Object {
 			if (!$key) {
 				return $_SESSION;
 			}
-			return isset($_SESSION[$key]) ? $_SESSION[$key] : null;
+			$key = '/' . str_replace('.', '/', $key);
+			$result = Set::extract($_SESSION, $key);
+
+			if (count($result) === 1) {
+				$result = current($result);
+			}
+			return $result ?: null;
 		};
 	}
 
@@ -151,7 +158,9 @@ class Php extends \lithium\core\Object {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params, $chain) {
-			$_SESSION[$params['key']] = $params['value'];
+			return Php::overwrite(
+				$_SESSION, Set::insert($_SESSION, $params['key'], $params['value'])
+			);
 		};
 	}
 
@@ -160,7 +169,7 @@ class Php extends \lithium\core\Object {
 	 *
 	 * @param string $key The key to be deleted
 	 * @param array $options Options array. Not used for this adapter method.
-	 * @return boolean True on successful delete, false otherwise
+	 * @return boolean True if the key no longer exists in the session, false otherwise
 	 */
 	public static function delete($key, array $options = array()) {
 		if (!static::isStarted() && !static::_startup()) {
@@ -168,12 +177,8 @@ class Php extends \lithium\core\Object {
 		}
 		return function($self, $params, $chain) {
 			$key = $params['key'];
-
-			if (isset($_SESSION[$key])) {
-				unset($_SESSION[$key]);
-				return true;
-			}
-			return false;
+			Php::overwrite($_SESSION, Set::remove($_SESSION, $key));
+			return !Set::check($_SESSION, $key);
 		};
 	}
 
@@ -184,6 +189,27 @@ class Php extends \lithium\core\Object {
 	 */
 	public static function enabled() {
 		return (boolean) session_id();
+	}
+
+	/**
+	 * Overwrites session keys and values.
+	 *
+	 * @param array $old Reference to the array that needs to be overwritten. Will usually
+	 *        be `$_SESSION`.
+	 * @param array $new The data that should overwrite the keys/values in `$old`.
+	 * @return void
+	 */
+	public static function overwrite(&$old, $new) {
+		if (!empty($old)) {
+			foreach ($old as $key => $value) {
+				if (!isset($new[$key])) {
+					unset($old[$key]);
+				}
+			}
+		}
+		foreach ($new as $key => $value) {
+			$old[$key] = $value;
+		}
 	}
 }
 

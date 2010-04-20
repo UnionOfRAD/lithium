@@ -32,26 +32,57 @@ class SessionTest extends \lithium\test\Unit {
 
 	public function testWriteReadDelete() {
 		Session::config(array(
-			'test' => array('adapter' => 'Php')
+			'default' => array('adapter' => 'Php')
 		));
 
 		$key = 'test';
 		$value = 'value';
 
-		Session::write($key, $value, array('name' => 'test'));
-		$result = Session::read($key, array('name' => 'test'));
+		Session::write($key, $value);
+		$result = Session::read($key);
 
 		$this->assertEqual($value, $result);
-		$this->assertTrue(Session::delete($key, array('name' => 'test')));
+		$this->assertTrue(Session::delete($key));
 
-		$result = Session::read($key, array('name' => 'test'));
+		$result = Session::read($key);
 		$this->assertNull($result);
 	}
 
-	/**
-	 * This method works in tandem with the next one - values
-	 * are written here, and then are read & asserted in the next method.
-	 */
+	public function testNamespaces() {
+		Session::config(array(
+			'test' => array('adapter' => 'Php')
+		));
+
+		$value = 'second value';
+		Session::write('first.second', $value);
+		$result = Session::read('first.second');
+		$this->assertEqual($value, $result);
+		$this->assertTrue(isset($_SESSION['first']));
+		$this->assertTrue(isset($_SESSION['first']['second']));
+		$this->assertEqual($value, $_SESSION['first']['second']);
+
+		$result = Session::read('first');
+		$expected = array('first' => array('second' => 'second value'));
+		$this->assertEqual($expected, $result);
+		$this->assertTrue(isset($_SESSION['first']));
+		$this->assertEqual($_SESSION['first'], $result['first']);
+
+		$value = 'another value';
+		Session::write('first.sibling', $value);
+		$result = Session::read('first.sibling');
+		$this->assertEqual($value, $result);
+		$this->assertEqual($_SESSION['first']['sibling'], $value);
+
+		$result = Session::delete('first.sibling');
+		$this->assertEqual(true, $result);
+		$this->assertFalse(isset($_SESSION['first']['sibling']));
+		$this->assertTrue(isset($_SESSION['first']['second']));
+
+		$result = Session::delete('first');
+		$this->assertEqual(true, $result);
+		$this->assertFalse(isset($_SESSION['first']));
+	}
+
 	public function testCookieWriteReadDelete() {
 		Session::config(array(
 			'li3' => array('adapter' => 'Cookie', 'expiry' => '+1 day')
