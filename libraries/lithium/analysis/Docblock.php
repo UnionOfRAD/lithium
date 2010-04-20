@@ -18,56 +18,33 @@ namespace lithium\analysis;
 class Docblock extends \lithium\core\StaticObject {
 
 	/**
+	 * List of supported docblock tags.
+	 *
+	 * @var array
+	 */
+	public static $tags = array(
+		'todo', 'discuss', 'fix', 'important', 'var',
+		'param', 'return', 'throws', 'see', 'link',
+		'task', 'dependencies'
+	);
+
+	/**
 	 * Parses a doc block into its major components of `description`, `text` and `tags`.
 	 *
-	 * @param string $description The doc block string to be parsed
+	 * @param string $comment The doc block string to be parsed
 	 * @return array An associative array of the parsed comment, whose keys are `description`,
-	 *         `text` and `tags`
-	 * @todo Implement text
+	 *         `text` and `tags`.
 	 */
-	public static function comment($description) {
+	public static function comment($comment) {
 		$text = null;
 		$tags = array();
-		$description = trim(preg_replace('/^(\s*\/\*\*|\s*\*\/|\s*\* ?)/m', '', $description));
+		$description = null;
+		$comment = trim(preg_replace('/^(\s*\/\*\*|\s*\*\/|\s*\* ?)/m', '', $comment));
 
-		if (!(preg_match_all('/\n@(\w+)\s+/', $description, $tagNames))) {
-			return compact('description', 'text', 'tags');
+		if ($items = preg_split('/\n@/ms', $comment, 2)) {
+			list($description, $tags) = $items + array('', '');
+			$tags = $tags ? static::tags("@{$tags}") : array();
 		}
-		$tagContents = preg_split('/\n@\w+\s+/ms', $description);
-
-		foreach (array_values(array_slice($tagContents, 1)) as $i => $desc) {
-			$description = trim(str_replace("@{$tagNames[1][$i]} {$desc}", '', $description));
-			$tag = $tagNames[1][$i];
-
-			if (isset($tags[$tag])) {
-				$tags[$tag] = (array) $tags[$tag];
-				$tags[$tag][] = $desc;
-			} else {
-				$tags[$tag] = $desc;
-			}
-		}
-
-		if (isset($tags['param'])) {
-			$params = $tags['param'];
-			$tags['params'] = array();
-
-			foreach ((array) $params as $param) {
-				$param = explode(' ', $param, 3);
-				$type = $name = $text = null;
-
-				foreach (array('type', 'name', 'text') as $i => $key) {
-					if (!isset($param[$i])) {
-						break;
-					}
-					${$key} = $param[$i];
-				}
-				if (!empty($name)) {
-					$tags['params'][$name] = compact('type', 'text');
-				}
-			}
-			unset($tags['param']);
-		}
-		$text = '';
 
 		if (strpos($description, "\n\n")) {
 			list($description, $text) = explode("\n\n", $description, 2);
@@ -80,31 +57,66 @@ class Docblock extends \lithium\core\StaticObject {
 	/**
 	 * Parses `@<tagname>` docblock tags and their descriptions from a docblock.
 	 *
-	 * Currently supported tags are `todo`, `discuss`, `fix` and `important`.
+	 * See the `$tags` property for the list of supported tags.
 	 *
-	 * @param string $str The string to be parsed for tags
-	 * @param string $options Options array.
-	 * @return array A numerically indexed array of a associative arrays, with `type`, `text`
-	 *         and `line` keys.
-	 * @todo Actually implement useful $options
+	 * @param string $string The string to be parsed for tags
+	 * @return array Returns an array where each docblock tag is a key name, and the corresponding
+	 *         values are either strings (if one of each tag), or arrays (if multiple of the same
+	 *         tag).
 	 */
-	public static function parse($str, array $options = array()) {
-		$tagTypes = array('todo', 'discuss', 'fix', 'important');
-		$tags = '/@(?P<type>' . join('|', $tagTypes) . ')\s(?P<text>.+)$/mi';
+	public static function tags($string) {
+		$regex = '/\n@(?P<type>' . join('|', static::$tags) . ")/msi";
+		$string = trim($string);
 
-		if (!preg_match_all($tags, $str, $matches, PREG_SET_ORDER ^ PREG_OFFSET_CAPTURE)) {
-			return false;
+		if (!$result = preg_split($regex, "\n$string", -1, PREG_SPLIT_DELIM_CAPTURE)) {
+			return array();
 		}
-		$r = array();
+		$tags = array();
 
-		foreach ($matches as $match) {
-			list($type, $offset) = $match['type'];
-			list($text) = $match['text'];
-			$line = preg_match_all('/\r?\n/', substr($str, 0, $offset), $matches) + 1;
-			$type = strtolower($type);
-			$r[] = compact('type', 'text', 'line');
+		for ($i = 1; $i < count($result) - 1; $i += 2) {
+			$type = trim(strtolower($result[$i]));
+			$text = trim($result[$i + 1]);
+
+			if (isset($tags[$type])) {
+				$tags[$type] = is_array($tags[$type]) ? $tags[$type] : (array) $tags[$type];
+				$tags[$type][] = $text;
+			} else {
+				$tags[$type] = $text;
+			}
 		}
-		return $r;
+
+		if (isset($tags['param'])) {
+			$params = $tags['param'];
+			$tags['params'] = static::_params((array) $tags['param']);
+			unset($tags['param']);
+		}
+		return $tags;
+	}
+
+	/**
+	 * Parses `@param` docblock tags to separate out the parameter type from the description.
+	 *
+	 * @param array $params An array of `@param` tags, as parsed from the `tags()` method.
+	 * @return array Returns an array where each key is a parameter name, and each value is an
+	 *         associative array containing `'type'` and `'text'` keys.
+	 */
+	protected static function _params(array $params) {
+		$result = array();
+		foreach ($params as $param) {
+			$param = explode(' ', $param, 3);
+			$type = $name = $text = null;
+
+			foreach (array('type', 'name', 'text') as $i => $key) {
+				if (!isset($param[$i])) {
+					break;
+				}
+				${$key} = $param[$i];
+			}
+			if ($name) {
+				$result[$name] = compact('type', 'text');
+			}
+		}
+		return $result;
 	}
 }
 
