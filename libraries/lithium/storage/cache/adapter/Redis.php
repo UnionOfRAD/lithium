@@ -106,11 +106,23 @@ class Redis extends \lithium\core\Object {
 	 * @param string $expiry A strtotime() compatible cache time
 	 * @return boolean True on successful write, false otherwise
 	 */
-	public function write($key, $value, $expiry) {
+	public function write($key, $value = null, $expiry = null) {
 		$connection =& static::$connection;
 
 		return function($self, $params, $chain) use (&$connection) {
-			if($connection->set($params['key'], $params['data'])){
+			if ($params['expiry'] === null) {
+				$expiry = $params['data'];
+
+				if ($connection->mset($params['key'])) {
+					$ttl = array();
+
+					foreach ($params['key'] as $k => $v) {
+						$ttl[$k] = $self->invokeMethod('_ttl', array($k, $expiry));
+					}
+					return $ttl;
+				}
+			}
+			if ($connection->set($params['key'], $params['data'])){
 				return $self->invokeMethod('_ttl', array($params['key'], $params['expiry']));
 			}
 		};
@@ -126,7 +138,12 @@ class Redis extends \lithium\core\Object {
 		$connection =& static::$connection;
 
 		return function($self, $params, $chain) use (&$connection) {
-			return $connection->get($params['key']);
+			$key = $params['key'];
+
+			if (is_array($key)) {
+				return $connection->getMultiple($key);
+			}
+			return $connection->get($key);
 		};
 	}
 

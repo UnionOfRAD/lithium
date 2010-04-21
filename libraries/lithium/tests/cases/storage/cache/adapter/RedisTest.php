@@ -137,6 +137,43 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testMultiRead() {
+		$data = array('key1' => 'value1', 'key2' => 'value2');
+		$result = $this->_Redis->mset($data);
+		$this->assertTrue($result);
+
+		$closure = $this->Redis->read(array_keys($data));
+		$this->assertTrue(is_callable($closure));
+
+		$params = array('key' => array_keys($data));
+		$result = $closure($this->Redis, $params, null);
+		$expected = array_values($data);
+		$this->assertEqual($expected, $result);
+
+		foreach ($data as $k => $v) {
+			$result = $this->_Redis->delete($k);
+			$this->assertTrue($result);
+		}
+	}
+
+	public function testMultiWrite() {
+		$key = array('key1' => 'value1', 'key2' => 'value2');
+		$expiry = '+5 seconds';
+		$time = strtotime($expiry);
+
+		$closure = $this->Redis->write($key, $expiry);
+		$this->assertTrue(is_callable($closure));
+
+		$params = array('key' => $key, 'data' => $expiry, 'expiry' => null);
+		$result = $closure($this->Redis, $params, null);
+		$expected = array('key1' => true, 'key2' => true);
+		$this->assertEqual($expected, $result);
+
+		$result = $this->_Redis->getMultiple(array_keys($key));
+		$expected = array_values($key);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testReadKeyThatDoesNotExist() {
 		$key = 'does_not_exist';
 		$closure = $this->Redis->read($key);
