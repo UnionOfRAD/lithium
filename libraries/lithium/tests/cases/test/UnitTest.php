@@ -161,7 +161,7 @@ class UnitTest extends \lithium\test\Unit {
 			'testAssertTagsNoClosingTag', 'testAssertTagsMissingAttribute',
 			'testIdenticalArrayFail',
 			'testCleanUp', 'testCleanUpWithFullPath', 'testCleanUpWithRelativePath',
-			'testSkipIf', 'testExpectException', 'testHandleException', 'testResults'
+			'testSkipIf', 'testExpectException', 'testHandleException', 'testResults', 'testGetTest'
 		);
 		$this->assertIdentical($expected, $this->methods());
 	}
@@ -427,6 +427,11 @@ class UnitTest extends \lithium\test\Unit {
 		$expected = 63;
 		$result = count($this->results());
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testGetTest() {
+		$test = static::get('lithium\test\Unit');
+		$this->assertEqual($test, __CLASS__);
 	}
 }
 
