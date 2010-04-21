@@ -191,6 +191,73 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertEqual($data, $result);
 	}
 
+	public function testCacheReadWithConditions() {
+		$config = array('default' => array(
+			'adapter' => 'Memory', 'filters' => array()
+		));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
+		$this->assertEqual($expected, $result);
+
+		$conditions = function() {
+			return false;
+		};
+
+		$result = Cache::read('default', 'some_key', compact('conditions'));
+		$this->assertFalse($result);
+
+		$conditions = function() use (&$config) {
+			return (isset($config['default']));
+		};
+
+		Cache::write('default', 'some_key', 'some value', '+1 minute');
+		$result = Cache::read('default', 'some_key', compact('conditions'));
+		$this->assertTrue($result);
+
+		$result = Cache::read('non_existing', 'key_value', compact('conditions'));
+		$this->assertFalse($result);
+	}
+
+	public function testCacheIncrementDecrementWithConditions() {
+		$config = array('default' => array(
+			'adapter' => 'Memory', 'filters' => array()
+		));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
+		$this->assertEqual($expected, $result);
+
+		$conditions = function() {
+			return false;
+		};
+
+		$result = Cache::increment('default', 'some_key', 1, compact('conditions'));
+		$this->assertFalse($result);
+
+		$conditions = function() use (&$config) {
+			return (isset($config['default']));
+		};
+
+		Cache::write('default', 'some_key', 1, '+1 minute');
+		$result = Cache::increment('default', 'some_key', 1, compact('conditions'));
+		$this->assertEqual(2, $result);
+
+		$conditions = function() {
+			return false;
+		};
+
+		$result = Cache::decrement('default', 'decrement_some_key', 1, compact('conditions'));
+		$this->assertFalse($result);
+
+		$conditions = function() use (&$config) {
+			return (isset($config['default']));
+		};
+		Cache::write('default', 'decrement_some_key', 1, '+1 minute');
+		$result = Cache::decrement('default', 'decrement_some_key', 1, compact('conditions'));
+		$this->assertEqual(0, $result);
+	}
+
 	public function testCacheWriteWithConditions() {
 		$config = array('default' => array(
 			'adapter' => 'Memory', 'filters' => array()
@@ -427,6 +494,9 @@ class CacheTest extends \lithium\test\Unit {
 		$expected = $config;
 		$this->assertEqual($expected, $result);
 
+		$result = Cache::increment('does_not_exist', 'inc');
+		$this->assertFalse($result);
+
 		$result = Cache::write('default', 'increment', 5, '+1 minute');
 		$this->assertTrue($result);
 
@@ -445,6 +515,9 @@ class CacheTest extends \lithium\test\Unit {
 		$result = Cache::config();
 		$expected = $config;
 		$this->assertEqual($expected, $result);
+
+		$result = Cache::decrement('does_not_exist', 'dec');
+		$this->assertFalse($result);
 
 		$result = Cache::write('default', 'decrement', 5, '+1 minute');
 		$this->assertTrue($result);
