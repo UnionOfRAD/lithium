@@ -133,7 +133,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @filter This method may be filtered.
 	 */
 	public static function read($name, $key, array $options = array()) {
-		$options += array('conditions' => null, 'strategies' => true);
+		$options += array('conditions' => null, 'strategies' => true, 'write' => null);
 		$settings = static::config();
 
 		if (!isset($settings[$name])) {
@@ -150,9 +150,16 @@ class Cache extends \lithium\core\Adaptable {
 		$filters = $settings[$name]['filters'];
 		$result = static::_filter(__FUNCTION__, $params, $method, $filters);
 
+		if ($result === null && $options['write']) {
+			$write = (is_callable($options['write'])) ? $options['write']() : $options['write'];
+			list($expiry, $value) = each($write);
+
+			return static::write($name, $key, $value, $expiry);
+		}
+
 		if ($options['strategies']) {
 			$options = array('key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__);
-			return static::applyStrategies(__FUNCTION__, $name, $result, $options);
+			$result = static::applyStrategies(__FUNCTION__, $name, $result, $options);
 		}
 		return $result;
 	}
@@ -187,7 +194,6 @@ class Cache extends \lithium\core\Adaptable {
 			$options += array('key' => $key, 'class' => __CLASS__);
 			$key = static::applyStrategies(__FUNCTION__, $name, $key, $options);
 		}
-
 		return static::_filter(__FUNCTION__, compact('key'), $method, $filters);
 	}
 

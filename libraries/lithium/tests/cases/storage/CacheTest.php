@@ -221,7 +221,32 @@ class CacheTest extends \lithium\test\Unit {
 			'non_existing', 'key_value', 'data', '+1 minute', compact('conditions')
 		);
 		$this->assertFalse($result);
+	}
 
+	public function testCacheReadThroughWrite() {
+		$config = array('default' => array(
+			'adapter' => 'Memory', 'filters' => array()
+		));
+		Cache::config($config);
+		$result = Cache::config();
+		$expected = $config;
+		$this->assertEqual($expected, $result);
+
+		$write = function() {
+			return array('+1 minute' => 'read-through write');
+		};
+		$result = Cache::read('default', 'read_through', compact('write'));
+		$this->assertEqual('read-through write', $result);
+
+		$result = Cache::read('default', 'read_through');
+		$this->assertEqual('read-through write', $result);
+
+		$write = array('+1 minute' => 'string read-through write');
+		$result = Cache::read('default', 'string_read_through', compact('write'));
+		$this->assertEqual('string read-through write', $result);
+
+		$result = Cache::read('default', 'string_read_through');
+		$this->assertEqual('string read-through write', $result);
 	}
 
 	public function testCacheReadAndWrite() {
