@@ -65,11 +65,7 @@ class Redis extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array(
-			'prefix' => '',
-			'server' => '127.0.0.1:6379'
-		);
-
+		$defaults = array('prefix' => '', 'server' => '127.0.0.1:6379');
 		parent::__construct($config + $defaults);
 	}
 
@@ -79,7 +75,7 @@ class Redis extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _init() {
-		if (is_null(static::$connection)) {
+		if (!static::$connection) {
 			static::$connection = new \Redis();
 		}
 		list($IP, $port) = explode(':', $this->_config['server']);

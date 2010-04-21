@@ -50,6 +50,11 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertTrue($redis::enabled());
 	}
 
+	public function testInit() {
+		$Redis = new Redis();
+		$this->assertTrue($Redis::$connection instanceof \Redis);
+	}
+
 	public function testSimpleWrite() {
 		$key = 'key';
 		$data = 'value';
@@ -99,7 +104,6 @@ class RedisTest extends \lithium\test\Unit {
 	public function testSimpleRead() {
 		$key = 'read_key';
 		$data = 'read data';
-		$time = strtotime('+1 minute');
 
 		$result = $this->_Redis->set($key, $data);
 		$this->assertTrue($result);
