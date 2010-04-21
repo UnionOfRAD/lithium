@@ -90,8 +90,7 @@ class Redis extends \lithium\core\Object {
 	 * @return boolean True if expiry could be set for the given key, false otherwise
 	 */
 	protected function _ttl($key, $expiry) {
-		$expires = strtotime($expiry) - time();
-		return static::$connection->setTimeout($key, $expires);
+		return static::$connection->expireAt($key, strtotime($expiry));
 	}
 
 	/**
