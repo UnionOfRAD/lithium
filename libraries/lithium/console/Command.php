@@ -133,6 +133,7 @@ class Command extends \lithium\core\Object {
 	 * @return integer|void
 	 */
 	public function out($output = null, $options = array('nl' => 1)) {
+		$options = is_int($options) ? array('nl' => $options) : $options;
 		return $this->_response('output', $output, $options);
 	}
 
@@ -236,7 +237,7 @@ class Command extends \lithium\core\Object {
 	 * @return integer
 	 */
 	public function nl($number = 1) {
-		return str_pad("\n", $number, "\n");
+		return str_repeat("\n", $number);
 	}
 
 	/**

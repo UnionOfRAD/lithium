@@ -42,10 +42,10 @@ class HelpTest extends \lithium\test\Unit {
 		$result = $help->response->output;
 		$this->assertPattern("/{$expected}/", $result);
 
-		$expected = "Test\n        Runs a given set of tests and outputs the results.";
 		$expected = preg_quote($expected);
 		$result = $help->response->output;
-		$this->assertPattern("/{$expected}/", $result);
+		$pattern = "/\s+Test\s+Runs a given set of tests and outputs the results\./ms";
+		$this->assertPattern($pattern, $result);
 
 	}
 

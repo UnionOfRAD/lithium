@@ -27,25 +27,20 @@ class Help extends \lithium\console\Command {
 	 */
 	public function run($name = null) {
 		if (!$name) {
-			$this->nl();
-			$this->out('COMMANDS', 'heading1');
+			$this->out('COMMANDS', 'heading1', 2);
 			$commands = Libraries::locate('command', null, array('recursive' => false));
 
 			foreach ($commands as $command) {
 				$info = Inspector::info($command);
 				$this->out($this->_pad(Inflector::classify($info['shortName'])), 'heading2');
-				$this->out($this->_pad(strtok($info['description'], "\n"), 2));
-				$this->nl();
+				$this->out($this->_pad($info['description']), 2);
 			}
-			$this->out(
-				'See `{:command}li3 help COMMAND{:end}` '
-				. 'for more information on a specific command.'
-			);
+			$message = 'See `{:command}li3 help COMMAND{:end}`';
+			$message .= ' for more information on a specific command.';
+			$this->out($message, 2);
 			return true;
 		}
-		$class = Libraries::locate('command', $name);
-
-		if (!$class) {
+		if (!$class = Libraries::locate('command', $name)) {
 			$this->error("{$name} not found");
 			return false;
 		}
