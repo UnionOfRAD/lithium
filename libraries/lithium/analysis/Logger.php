@@ -36,7 +36,7 @@ class Logger extends \lithium\core\Adaptable {
 	 * @param string $message Message to be written.
 	 * @return boolean `True` on successful write, `false` otherwise.
 	 */
-	public static function write($type, $message) {
+	public static function write($type, $message, array $options = array()) {
 		if (!$config = static::_config($type)) {
 			return false;
 		}
