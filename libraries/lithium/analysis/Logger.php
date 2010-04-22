@@ -8,10 +8,12 @@
 
 namespace lithium\analysis;
 
-use \lithium\util\String;
-use \lithium\core\Libraries;
-use \lithium\util\Collection;
-
+/**
+ * The `Logger` class provides a consistent, application-wide interface for configuring and writing
+ * log messages. As with other subclasses of `Adaptable`, `Logger` can be configured with a series
+ * of named configurations, each containing a log adapter to write to. `Logger` exposes a single
+ * method, `write()`, which can write to one or more log adapters.
+ */
 class Logger extends \lithium\core\Adaptable {
 
 	/**
