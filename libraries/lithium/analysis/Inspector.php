@@ -14,11 +14,11 @@ use \ReflectionException;
 use \lithium\core\Libraries;
 
 /**
- * General source code inspector
+ * General source code inspector.
  *
  * This inspector provides a simple interface to the PHP Reflection API that
  * can be used to gather information about any PHP source file for purposes of
- * test metrics, static analysis or any number of possible use cases.
+ * test metrics or static analysis.
  */
 class Inspector extends \lithium\core\StaticObject {
 

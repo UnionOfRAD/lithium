@@ -12,8 +12,8 @@ namespace lithium\analysis;
  * A source code doc block parser.
  *
  * This parser may be used as the basis for a variety of secondary tools, including
- * a reflection-based API generator, a code metrics analyzer, and various other possible
- * use cases.
+ * a reflection-based API generator, a code metrics analyzer, and various other code or structural
+ * analysis tools.
  */
 class Docblock extends \lithium\core\StaticObject {
 

@@ -10,6 +10,28 @@ namespace lithium\analysis\logger\adapter;
 
 use \lithium\util\String;
 
+/**
+ * The `Cache` logger allows log messages to be written to cache configurations set up in
+ * `lithium\storage\Cache`. In order to use this adapter, you must first configure a cache adapter
+ * for it to write to, as follows:
+ *
+ * {{{ lithium\storage\Cache::config(array(
+ * 	'storage' => array('adapter' => 'Redis', 'server' => '127.0.0.1:6379')
+ * ));}}}
+ *
+ * Then, you can configure the `Cache` logger with the `'storage'` config:
+ * {{{ lithium\analysis\Logger::config(array(
+ * 	'debug' => array('adapter' => 'Cache', 'config' => 'storage')
+ * ));
+ * }}}
+ *
+ * You can then send messages to the logger which will be written to the cache store:
+ * {{{
+ * lithium\analysis\Logger::write('debug', 'This message will be written to a Redis data store.');
+ * }}}
+ *
+ * @see lithium\storage\Cache
+ */
 class Cache extends \lithium\core\Object {
 
 	protected $_classes = array(

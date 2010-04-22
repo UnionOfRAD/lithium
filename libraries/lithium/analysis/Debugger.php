@@ -10,6 +10,10 @@ namespace lithium\analysis;
 
 use \lithium\util\String;
 
+/**
+ * The `Debugger` class provides basic facilities for generating and rendering meta-data about the
+ * state of an application in its current context.
+ */
 class Debugger extends \lithium\core\Object {
 
 	/**
