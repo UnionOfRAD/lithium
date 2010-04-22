@@ -295,23 +295,23 @@ class Model extends \lithium\core\StaticObject {
 		$self = static::_instance();
 		$defaults = array('classes' => array(), 'meta' => array(), 'finders' => array());
 
-		$meta = $options + $self->_meta;
+		$meta    = $options + $self->_meta;
 		$classes = $self->_classes;
+		$schema  = array();
+		$config  = array();
 
 		foreach (static::_parents() as $parent) {
 			$base = get_class_vars($parent);
 
-			if (isset($base['_meta'])) {
-				$meta += $base['_meta'];
-			}
-			if (isset($base['_classes'])) {
-				$classes += $base['_classes'];
+			foreach (array('meta', 'schema', 'classes') as $key) {
+				if (isset($base["_{$key}"])) {
+					${$key} += $base["_{$key}"];
+				}
 			}
 			if ($class == __CLASS__) {
 				break;
 			}
 		}
-		$config = array();
 
 		if ($meta['connection']) {
 			$conn = $classes['connections']::get($meta['connection']);
@@ -322,6 +322,7 @@ class Model extends \lithium\core\StaticObject {
 		$self->_classes = ($config['classes'] + $classes);
 		$self->_meta = (compact('class', 'name') + $config['meta'] + $meta);
 		$self->_meta['initialized'] = false;
+		$self->_schema += $schema;
 
 		$self->_finders += $config['finders'] + $self->_findFilters();
 		static::_instance()->_relations = static::_relations();
