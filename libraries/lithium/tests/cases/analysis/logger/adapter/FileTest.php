@@ -8,14 +8,46 @@
 
 namespace lithium\tests\cases\analysis\logger\adapter;
 
+use \lithium\util\collection\Filters;
 use \lithium\analysis\logger\adapter\File;
 
 class FileTest extends \lithium\test\Unit {
 
+	public $subject;
+
 	public function setUp() {
-		die('WTF?');
-		$this->path = LITHIUM_APP_PATH . '/resources/tmp/logs/';
-		$this->Adapter = new File(array('path' => $this->path));
+		$this->path = LITHIUM_APP_PATH . '/resources/tmp/logs';
+		$this->tearDown();
+	}
+
+	public function tearDown() {
+		if (file_exists("{$this->path}/debug.log")) {
+			unlink("{$this->path}/debug.log");
+		}
+	}
+
+	public function testWriting() {
+		$this->subject = new File(array('path' => $this->path));
+		$type = 'debug';
+		$message = 'This is a debug message';
+		$function = $this->subject->write($type, $message);
+		$now = date('Y-m-d H:i:s');
+		$function('lithium\analysis\Logger', compact('type', 'message'), new Filters());
+
+		$log = file_get_contents("{$this->path}/debug.log");
+		$this->assertEqual("{$now} This is a debug message\n", $log);
+	}
+
+	public function testWithoutTimestamp() {
+		$this->subject = new File(array('path' => $this->path, 'timestamp' => false));
+		$type = 'debug';
+		$message = 'This is a debug message';
+		$function = $this->subject->write($type, $message);
+		$now = date('Y-m-d H:i:s');
+		$function('lithium\analysis\Logger', compact('type', 'message'), new Filters());
+
+		$log = file_get_contents("{$this->path}/debug.log");
+		$this->assertEqual("This is a debug message\n", $log);
 	}
 }
 
