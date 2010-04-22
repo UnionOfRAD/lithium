@@ -8,6 +8,11 @@
 
 namespace lithium\test\filter;
 
+/**
+ * The `Profiler` filter tracks timing and memory usage information for each test method, and
+ * presents aggregate reports across single test runs. Used for performance-tuning classes and
+ * methods.
+ */
 class Profiler extends \lithium\test\Filter {
 
 	/**

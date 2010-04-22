@@ -8,11 +8,18 @@
 
 namespace lithium\console;
 
-use \UnexpectedValueException;
-use \lithium\core\Libraries;
 use \lithium\util\String;
+use \lithium\core\Libraries;
 use \lithium\util\Inflector;
+use \UnexpectedValueException;
 
+/**
+ * The console dispatcher is responsible for accepting requests from scripts called from the command
+ * line, and executing the appropriate `Command` class(es). The `run()` method accepts an instance
+ * of `lithium\console\Request`, which encapsulates the console environment and any command-line
+ * parameters passed to the script. `Dispatcher` then invokes `lithium\console\Router` to determine
+ * the correct `Command` class to invoke, and which method should be called.
+ */
 class Dispatcher extends \lithium\core\StaticObject {
 
 	/**
@@ -55,7 +62,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *         current configuration, otherwise returns null.
 	 */
 	public static function config($config = array()) {
-		if (empty($config)) {
+		if (!$config) {
 			return array('rules' => static::$_rules);
 		}
 		foreach ($config as $key => $val) {

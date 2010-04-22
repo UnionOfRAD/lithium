@@ -8,6 +8,12 @@
 
 namespace lithium\data;
 
+/**
+ * The `Collection` class extends the generic `lithium\util\Collection` class to provide
+ * context-specific features for working with sets of data persisted by a backend data store. This
+ * is a general abstraction that operates on abitrary sets of data from either relational or
+ * non-relational data stores.
+ */
 abstract class Collection extends \lithium\util\Collection {
 
 	/**

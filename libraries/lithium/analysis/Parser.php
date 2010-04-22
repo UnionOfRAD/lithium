@@ -12,6 +12,10 @@ use \ReflectionClass;
 use \lithium\util\Set;
 use \lithium\util\Collection;
 
+/**
+ * The parser class uses PHP's tokenizer to provide methods and tools for performing static analysis
+ * on PHP code.
+ */
 class Parser extends \lithium\core\StaticObject {
 
 	/**

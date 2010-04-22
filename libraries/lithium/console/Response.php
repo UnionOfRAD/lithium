@@ -11,10 +11,10 @@ namespace lithium\console;
 use \lithium\util\String;
 
 /**
- * Holds current request from console
- *
- *
- **/
+ * The `Response` class is used by other console classes to generate output. It contains stream
+ * resources for writing output and errors, as well as shell coloring information, and the response
+ * status code for the currently-executing command.
+ */
 class Response extends \lithium\core\Object {
 
 	/**
