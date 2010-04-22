@@ -83,6 +83,28 @@ class AdaptableTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testConfigAndAdapter() {
+		$adapter = new MockAdapter();
+		$items = array('default' => array(
+			'adapter' => 'Memory',
+			'filters' => array()
+		));
+		$adapter::config($items);
+		$config = $adapter::config();
+
+		$intermediate = $adapter::adapter('default');
+		$expected = new Memory($items['default']);
+		$this->assertEqual($expected, $intermediate);
+
+		$result = $adapter::config();
+		$modified['default'] = $config['default'] + array('object' => $intermediate);
+		$this->assertEqual($modified, $result);
+
+		$adapter::config(array('default' => array('adapter' => 'Memory')));
+		$result = $adapter::config();
+		$this->assertEqual($config, $result);
+	}
+
 	public function testStrategy() {
 		$strategy = new MockStrategy();
 		$items = array('default' => array(

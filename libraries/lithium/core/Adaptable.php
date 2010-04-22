@@ -106,15 +106,15 @@ class Adaptable extends \lithium\core\StaticObject {
 			throw new Exception("Configuration $name has not been defined");
 		}
 
-		if (isset($config['adapter']) && is_object($config['adapter'])) {
-			return $config['adapter'];
+		if (isset($config['object'])) {
+			return $config['object'];
 		}
 		$class = static::_class($config, static::$_adapters);
 		$settings = static::$_configurations[$name];
-		$settings[0]['adapter'] = new $class($config);
+		$settings[0]['object'] = new $class($config);
 
 		static::$_configurations[$name] = $settings;
-		return static::$_configurations[$name][0]['adapter'];
+		return static::$_configurations[$name][0]['object'];
 	}
 
 	/**

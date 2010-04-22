@@ -41,7 +41,12 @@ class CouchDbTest extends \lithium\test\Unit {
 
 		Connections::reset();
 		$this->db = new CouchDb(array('classes' => array('socket' => false)));
-		Connections::config(array('mock-couchdb-connection' => array('adapter' => &$this->db)));
+		Connections::config(array(
+			'mock-couchdb-connection' => array(
+				'object' => &$this->db,
+				'adapter' => 'CouchDb'
+			)
+		));
 
 		$options = array('model' => '\lithium\tests\mocks\data\source\http\adapter\MockCouchPost');
 		$this->query = new Query($options + array('record' => new Document($options)));
@@ -92,7 +97,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$data = array(
 			'_id' => 'a1', '_rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1'
 		);
-		$expected =array(
+		$expected = array(
 			'id' => 'a1', 'rev' => '1-2',
 			'author' => 'author 1', 'body' => 'body 1'
 		);

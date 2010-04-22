@@ -155,7 +155,7 @@ class Connections extends \lithium\core\Adaptable {
 		}
 		$settings = static::$_configurations[$name];
 
-		if (!isset($settings[0]['adapter']) || !is_object($settings[0]['adapter'])) {
+		if (!isset($settings[0]['object'])) {
 			if (!$options['autoCreate']) {
 				return null;
 			}
