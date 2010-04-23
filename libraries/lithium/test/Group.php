@@ -58,39 +58,25 @@ class Group extends \lithium\util\Collection {
 	 * @return array
 	 */
 	public function add($test = null, array $options = array()) {
-		$callback = function($test) {
-			if (empty($test)) {
-				return array();
+		$resolve = function($self, $test) {
+			switch (true) {
+				case !$test:
+					return array();
+				case is_object($test) && $test instanceof \lithium\test\Unit:
+					return array(get_class($test));
+				case is_string($test) && !file_exists(Libraries::path($test)):
+					return $self->invokeMethod('_unitClass', array($test));
+				default:
+					return (array) $test;
 			}
-			if (is_object($test) && $test instanceof \lithium\test\Unit) {
-				return array(get_class($test));
-			}
-			if (is_string($test)) {
-				if ($test[0] != '\\' && strpos($test, 'lithium\\') === false) {
-					$test = "lithium\\tests\cases\\{$test}";
-				}
-				if (preg_match("/Test/", $test)) {
-					return array($test);
-				}
-				$parts = array_filter(explode("\\", $test));
-				$library = array_shift($parts);
-				$test = Libraries::find($library, array(
-					'recursive' => true,
-					'path' => '/' . join('/', $parts),
-					'filter' => '/cases|intergration|functional/'
-				));
-				return (array) $test;
-			}
-			return (array) $test;
 		};
-
 		if (is_array($test)) {
 			foreach ($test as $t) {
-				$this->_items = array_filter(array_merge($this->_items, $callback($t)));
+				$this->_items = array_filter(array_merge($this->_items, $resolve($this, $t)));
 			}
 			return $this->_items;
 		}
-		return $this->_items = array_merge($this->_items, $callback($test));
+		return $this->_items = array_merge($this->_items, $resolve($this, $test));
 	}
 
 	/**
@@ -104,6 +90,32 @@ class Group extends \lithium\util\Collection {
 		$tests = new Collection();
 		array_map(function($test) use ($tests) { $tests[] = new $test; }, $this->_items);
 		return $tests;
+	}
+
+	/**
+	 * Gets a unit test class (or classes) from a class or namespace path string.
+	 *
+	 * @param string $test The path string in which to find the test case(s). This may be a
+	 *               namespace, a Lithium package name, or a fully-namespaced class reference.
+	 * @return array Returns an array containing one or more fully-namespaced class references to
+	 *         unit tests.
+	 */
+	protected function _unitClass($test) {
+		if ($test[0] != '\\' && strpos($test, 'lithium\\') === false) {
+			if (file_exists(Libraries::path($test = "lithium\\tests\cases\\{$test}"))) {
+				return array($test);
+			}
+		}
+		if (preg_match("/Test/", $test)) {
+			return array($test);
+		}
+		list($library, $path) = explode("\\", trim($test, '\\'), 2);
+
+		return (array) Libraries::find($library, array(
+			'recursive' => true,
+			'path' => '/' . str_replace('\\', '/', $path),
+			'filter' => '/cases|intergration|functional/'
+		));
 	}
 }
 

@@ -32,7 +32,7 @@ class GroupTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testAddByString(){
+	public function testAddByString() {
 		$group = new Group();
 		$result = $group->add('g11n');
 		$expected = array(
