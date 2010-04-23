@@ -15,23 +15,124 @@ use \UnexpectedValueException;
 use \BadMethodCallException;
 
 /**
- * Model class
+ * The `Model` class is the starting point for the domain logic of your application.
+ * Models are tasked with providing meaning to otherwise raw and unprocessed data (e.g.
+ * user profile).
  *
- * @todo Methods: bind(), and 'bind' option for find() et al., create(), save(), delete(),
- *       validate()
+ * Models expose a consistent and unified API to interact with an underlying datasource (e.g.
+ * MongoDB, MySQL) for operations such as querying, saving, updating and deleting data from the
+ * persistent storage.
+ *
+ * Models allow you to interact with your data in two fundamentally different ways: querying, and
+ * data mutation (saving/updating/deleting). All query-related operations may be done through the
+ * static `find` method, along with some additional utility methods provided for convenience.
+ *
+ * Examples:
+ * {{{
+ * // Return all 'post' records
+ * Post::find('all');
+ * Post::all();
+ *
+ * // With conditions and a limit
+ * Post::find('all', array('conditions' => array('published' => true), 'limit' => 10));
+ * Post::all(array('conditions' => array('published' => true), 'limit' => 10));
+ *
+ * // Integer count of all 'post' records
+ * Post::find('count');
+ * Post::count(); //
+ *
+ * // With conditions
+ * Post::find('count', array('conditions' => array('published' => true)));
+ * Post::count(array('conditions' => array('published' => true)));
+ *
+ * }}}
+ *
+ * The actual objects returned from `find` calls will depend on the type of datasource in use.
+ * MongoDB, for example, will return results as a `Document`, while MySQL will return results
+ * as a `RecordSet`. Both of these classes extend a common `data\Collection` class, and provide
+ * the necessary abstraction to make working with either type completely transparent.
+ *
+ * For data mutation (saving/updating/deleting), the `Model` class acts as a broker to the proper
+ * objects. When creating a new record, for example, a call to `Post::create()` will return a
+ * `data\model\Record` object, which can then be acted upon.
+ *
+ * Example:
+ * {{{
+ * $post = Post::create();
+ * $post->author = 'Robert';
+ * $post->title = 'Newest Post!';
+ * $post->content = 'Lithium rocks. That is all.';
+ *
+ * $post->save();
+ * }}}
+ *
+ * @see lithium\data\model\Record
+ * @see lithium\data\collection\Document
+ * @see lithium\data\collection\RecordSet
+ * @see lithium\data\Connections
+ *
  */
 class Model extends \lithium\core\StaticObject {
 
+	/**
+	 * Criteria for data validation.
+	 *
+	 * Example usage:
+	 * {{{
+	 * public $validates = array(
+	 *     'title' => 'please enter a title',
+	 *     'email' => array(
+	 *         array('notEmpty', 'message' => 'Email is empty.'),
+	 *         array('email', 'message' => 'Email is not valid.'),
+	 *     )
+	 * );
+	 * }}}
+	 *
+	 * @var array
+	 */
 	public $validates = array();
 
+	/**
+	 * Model hasOne relations.
+	 * Not yet implemented.
+	 *
+	 * @var array
+	 */
 	public $hasOne = array();
 
+	/**
+	 * Model hasMany relations.
+	 * Not yet implemented.
+	 *
+	 * @var array
+	 */
 	public $hasMany = array();
 
+	/**
+	 * Model belongsTo relations.
+	 * Not yet implemented.
+	 *
+	 * @var array
+	 */
 	public $belongsTo = array();
 
+	/**
+	 * Stores model instances for internal use.
+	 *
+	 * While the `Model` public API does not require instantiation thanks to late static binding
+	 * introduced in PHP 5.3, LSB does not apply to class attributes. In order to prevent you
+	 * from needing to redeclare every single `Model` class attribute in subclasses, instances of
+	 * the models are stored and used internally.
+	 *
+	 * @var array
+	 */
 	protected static $_instances = array();
 
+	/**
+	 * Stores the filters that are applied to the model instances stored in `Model::$_instances`.
+	 *
+	 * @var array
+	 */
 	protected $_instanceFilters = array();
 
 	/**
@@ -48,6 +149,18 @@ class Model extends \lithium\core\StaticObject {
 
 	protected $_relations = array();
 
+	/**
+	 * List of relation types and the configuration fields that these relations
+	 * require/accept.
+	 *
+	 * Valid relation types are:
+	 *
+	 * - `belongsTo`
+	 * - `hasOne`
+	 * - `hasMany`
+	 *
+	 * @var array
+	 */
 	protected $_relationTypes = array(
 		'belongsTo' => array('class', 'key', 'conditions', 'fields'),
 		'hasOne'    => array('class', 'key', 'conditions', 'fields', 'dependent'),
@@ -85,10 +198,39 @@ class Model extends \lithium\core\StaticObject {
 		'initialized' => false
 	);
 
+	/**
+	 * Stores the data schema.
+	 *
+	 * The schema is lazy-loaded by the first call to `Model::schema()`, unless it has been
+	 * manually defined in the `Model` subclass.
+	 *
+	 * For schemaless persistent storage (e.g. MongoDB), this is never populated
+	 * automatically - if you desire a fixed schema to interact with in those cases, you will
+	 * be required to define it yourself.
+	 *
+	 * Example:
+	 * {{{
+	 * protected $_schema = array(
+	 *     'name' => array('default' => 'Moe', 'type' => 'string', 'null' => false),
+	 *     'sign' => array('default' => 'bar', 'type' => 'string', 'null' => false),
+	 *     'age'  => array('default' => 0, 'type' => 'number', 'null' => false)
+	 * );
+	 * }}}
+	 *
+	 * @var array
+	 */
 	protected $_schema = array();
 
 	/**
 	 * Default query parameters.
+	 *
+	 * - `conditions`: The conditional query elements, e.g.
+	 *                 `'conditions' => array('published' => true)`
+	 * - `fields`: The fields that should be retrieved. When set to `null`, defaults to
+	 *             all fields.
+	 * - `order`: The order in which the data will be returned, e.g. `'order' => 'ASC'`.
+	 * - `limit`: The maximum number of records to return.
+	 * - `page`: For pagination of data.
 	 *
 	 * @var array
 	 */
@@ -102,6 +244,8 @@ class Model extends \lithium\core\StaticObject {
 
 	/**
 	 * Custom find query properties, indexed by name.
+	 *
+	 * @var array
 	 */
 	protected $_finders = array();
 
@@ -131,6 +275,18 @@ class Model extends \lithium\core\StaticObject {
 		static::config();
 	}
 
+	/**
+	 * Configures the model for use. This method is called by `Model::__init()`.
+	 *
+	 * This method will set the `Model::$_classes`, `Model::$_meta`, `Model::$_finders` class
+	 * attributes, as well as obtain a handle to the configured persistent storage connection.
+	 *
+	 * @param array $options Possible options are:
+	 * - `classes`: Dynamic class dependencies.
+	 * - `meta`: Meta-information for this model, such as the connection.
+	 * - `finders`: Custom finders for this model.
+	 * @return void
+	 */
 	public static function config(array $options = array()) {
 		if (static::_isBase($class = get_called_class())) {
 			return;
@@ -172,7 +328,7 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Exports an array of custom finders which use the filter system to wrap around `find()`
+	 * Exports an array of custom finders which use the filter system to wrap around `find()`.
 	 *
 	 * @return void
 	 */
@@ -217,6 +373,17 @@ class Model extends \lithium\core\StaticObject {
 		);
 	}
 
+	/**
+	 * Allows the use of syntactic-sugar like `Model::all()` instead of `Model::find('all')`.
+	 *
+	 * @see lithium\data\Model::find()
+	 * @see http://php.net/manual/en/language.oop5.overloading.php
+	 *
+	 * @throws BadMethodCallException On unhandled call, will throw an exception.
+	 * @param string $method Method name caught by `__callStatic`.
+	 * @param array $params Arguments given to the above `$method` call.
+	 * @return mixed Results of dispatched `Model::find()` call.
+	 */
 	public static function __callStatic($method, $params) {
 		$self = static::_instance();
 
@@ -242,10 +409,30 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * undocumented function
+	 * The `find` method allows you to retrieve data from the connected data source.
 	 *
-	 * @param string $type
-	 * @param string $options
+	 * Examples:
+	 * {{{
+	 * Model::find('all'); // returns all records
+	 * Model::find('count'); // returns a count of all records
+	 *
+	 * // The first ten records that have 'author' set to 'Lithium'
+	 * Model::find('all',
+	 *     'conditions' => array('author' => "Lithium"),
+	 *     'limit' => 10
+	 * );
+	 * }}}
+	 *
+	 * @param string $type The find type, which is looked up in `Model::$_finders`. By default it
+	 *        accepts `all`, `first`, `list` and `count`,
+	 * @param string $options Options for the query. By default, accepts:
+	 *        - `conditions`: The conditional query elements, e.g.
+	 *                 `'conditions' => array('published' => true)`
+	 *        - `fields`: The fields that should be retrieved. When set to `null`, defaults to
+	 *             all fields.
+	 *        - `order`: The order in which the data will be returned, e.g. `'order' => 'ASC'`.
+	 *        - `limit`: The maximum number of records to return.
+	 *        - `page`: For pagination of data.
 	 * @return void
 	 * @filter This method can be filtered.
 	 */
@@ -281,9 +468,9 @@ class Model extends \lithium\core\StaticObject {
 	 * Gets or sets a finder by name.  This can be an array of default query options,
 	 * or a closure that accepts an array of query options, and a closure to execute.
 	 *
-	 * @param string $name
-	 * @param string $options
-	 * @return void
+	 * @param string $name The finder name, e.g. `first`.
+	 * @param string $options If you are setting a finder, this is the finder definition.
+	 * @return mixed Finder definition if querying, null otherwise.
 	 */
 	public static function finder($name, $options = null) {
 		$self = static::_instance();
