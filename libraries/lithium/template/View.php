@@ -97,11 +97,15 @@ class View extends \lithium\core\Object {
 	}
 
 	/**
-	 * Render the view.
+	 * Render a layout, template, view or element.
 	 *
-	 * @param string|array $type
-	 * @param array $data
-	 * @param array $options
+	 * @param string|array $type The view type. Possible values are `element`, `template`,
+	 *        `layout` and `all`.
+	 * @param array $data The data to be made available in the rendered view.
+	 * @param array $options Rendering options:
+	 *        - `context`: Render context
+	 *        - `type`: The media type to render. Defaults to `html`.
+	 *        - `layout`: The layout in which the rendered view should be wrapped in.
 	 * @return string The rendered view that was requested.
 	 */
 	public function render($type, $data = null, array $options = array()) {

@@ -1,15 +1,18 @@
-#### Special syntax
+﻿#### Special syntax
 
 Views have a special syntax for outputting escaped text. The standard way to
 output escaped text in your views from Lithium is as follows: {{{
 <?=$variable;?>
 }}}
 
-This is where a lot of confusion comes in because it is commonly misunderstood
+This is where a lot of confusion comes in, because it is commonly misunderstood
 that Lithium depends on `short_open_tags`, however, that's not the case. The
-contents of a view is processed through a [ stream](template/view/Stream) before
-it is included by PHP. See the PHP [ manual](http://www.php.net/streams) to learn
-more about streams.
+contents of a view are processed through a [ tokenizer](template/view/Compier) before
+it is included by PHP. The file is then `compiled` into the final PHP+HTML (or whatever
+other content type that is requsted), which is then passed off to be fully rendered
+by the two-step view to its final form.
+
+See the PHP [ manual](http://php.net/manual/en/book.tokenizer.php) to learn more about tokens.
 
 The stream wrapper reads the file and searches for anything that looks like
 `<?=...?>` and replaces it with `<?php echo $h(...); ?>`.

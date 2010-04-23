@@ -14,11 +14,22 @@ use \Exception;
  * The template compiler is a simple string replacement engine which allows PHP templates to be
  * overridden with custom syntax. The default process rules allow PHP templates using short-echo
  * syntax (`<?=`) to be rewritten to full PHP tags which automatically escape their output.
+ *
+ * It is possible to create your own template compiler and have the chosen `View` adapter use that
+ * instead. Please see the documentation on the dynamic dependencies of the adapter in question
+ * to know more about how this can be achieved.
+ *
+ * @see \lithium\template\View
+ * @see \lithium\template\view\adapter
  */
 class Compiler extends \lithium\core\StaticObject {
 
 	/**
 	 * The list of syntax replacements to apply to compiled templates.
+	 *
+	 * @var array Key/value pairs of regular expressions. The keys are the regexes,
+	 *      and the values are the resulting expressions along with any capture groups
+	 *      that may have been used in the corresponding regexes.
 	 */
 	protected static $_processors = array(
 		'/\<\?=\s*\$this->(.+?)\s*;?\s*\?>/msx' => '<?php echo $this->$1; ?>',
@@ -28,9 +39,13 @@ class Compiler extends \lithium\core\StaticObject {
 	/**
 	 * Compiles a template and writes it to a cache file, which is used for inclusion.
 	 *
-	 * @param string $file The full
-	 * @param string $options
-	 * @return void
+	 * @param string $file The full path to the template that will be compiled.
+	 * @param string $options Options for compilation include:
+	 *        - `path`: Path where the compiled template should be written.
+	 *        - `fallback`: Boolean indicating that if the compilation failed for some
+	 *                      reason (e.g. `path` is not writable), that the compiled template
+	 *                      should still be returned and no exception be thrown.
+	 * @return string The compiled template.
 	 */
 	public static function template($file, array $options = array()) {
 		$cachePath = LITHIUM_APP_PATH . '/resources/tmp/cache/templates';
@@ -62,6 +77,14 @@ class Compiler extends \lithium\core\StaticObject {
 		throw new Exception("Could not write compiled template {$template} to cache");
 	}
 
+	/**
+	 * Preprocess the passed `$string` (usually a PHP template) for syntax replacements
+	 * using sets of regular expressions.
+	 *
+	 * @see \lithium\template\view\Compiler::$_processors
+	 * @param string $string The string to be preprocessed.
+	 * @return string Processed string.
+	 */
 	public static function compile($string) {
 		$patterns = static::$_processors;
 		return preg_replace(array_keys($patterns), array_values($patterns), $string);
