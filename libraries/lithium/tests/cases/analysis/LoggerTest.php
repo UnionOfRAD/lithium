@@ -69,7 +69,7 @@ class LoggerTest extends \lithium\test\Unit {
 		$base = LITHIUM_APP_PATH . '/resources/tmp/logs';
 		$this->skipIf(!is_writable($base), "{$base} is not writable.");
 
-		$config = array('default' => array('adapter' => 'File'));
+		$config = array('default' => array('adapter' => 'File', 'timestamp' => false));
 		Logger::config($config);
 
 		$result = Logger::write('default', 'Message line 1');
