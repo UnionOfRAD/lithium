@@ -46,7 +46,7 @@ class Php extends \lithium\core\Object {
 	/**
 	 * Initialization of the session.
 	 *
-	 * @todo Split up into an _initialize() and a _startup().
+	 * @todo Split up into an _initialize() and a _start().
 	 * @return void
 	 */
 	protected function _init() {
@@ -72,7 +72,7 @@ class Php extends \lithium\core\Object {
 	 * @return boolean True if session successfully started (or has already been started),
 	 *         false otherwise.
 	 */
-	protected static function _startup() {
+	protected static function _start() {
 		if (session_id()) {
 			return true;
 		}
@@ -109,7 +109,7 @@ class Php extends \lithium\core\Object {
 	 * @return boolean True if the key exists, false otherwise.
 	 */
 	public static function check($key, array $options = array()) {
-		if (!static::isStarted() && !static::_startup()) {
+		if (!static::isStarted() && !static::_start()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params, $chain) {
@@ -126,7 +126,7 @@ class Php extends \lithium\core\Object {
 	 * @return mixed Data in the session if successful, false otherwise.
 	 */
 	public static function read($key = null, array $options = array()) {
-		if (!static::isStarted() && !static::_startup()) {
+		if (!static::isStarted() && !static::_start()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params, $chain) {
@@ -135,13 +135,16 @@ class Php extends \lithium\core\Object {
 			if (!$key) {
 				return $_SESSION;
 			}
-			$key = '/' . str_replace('.', '/', $key);
-			$result = Set::extract($_SESSION, $key);
-
-			if (count($result) === 1) {
-				$result = current($result);
+			if (strpos($key, '.') === false) {
+				return isset($_SESSION[$key]) ? $_SESSION[$key] : null;
 			}
-			return $result ?: null;
+			$filter  = function($keys, $data) use (&$filter) {
+				$key = array_shift($keys);
+				if (isset($data[$key])) {
+					return (empty($keys)) ? $data[$key] : $filter($keys, $data[$key]);
+				}
+			};
+			return $filter(explode('.', $key), $_SESSION);
 		};
 	}
 
@@ -154,11 +157,11 @@ class Php extends \lithium\core\Object {
 	 * @return boolean True on successful write, false otherwise
 	 */
 	public static function write($key, $value, array $options = array()) {
-		if (!static::isStarted() && !static::_startup()) {
+		if (!static::isStarted() && !static::_start()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params, $chain) {
-			return Php::overwrite(
+			return $self::overwrite(
 				$_SESSION, Set::insert($_SESSION, $params['key'], $params['value'])
 			);
 		};
@@ -172,12 +175,12 @@ class Php extends \lithium\core\Object {
 	 * @return boolean True if the key no longer exists in the session, false otherwise
 	 */
 	public static function delete($key, array $options = array()) {
-		if (!static::isStarted() && !static::_startup()) {
+		if (!static::isStarted() && !static::_start()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params, $chain) {
 			$key = $params['key'];
-			Php::overwrite($_SESSION, Set::remove($_SESSION, $key));
+			$self::overwrite($_SESSION, Set::remove($_SESSION, $key));
 			return !Set::check($_SESSION, $key);
 		};
 	}

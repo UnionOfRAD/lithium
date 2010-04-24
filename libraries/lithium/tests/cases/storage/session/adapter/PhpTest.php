@@ -249,6 +249,42 @@ class PhpTest extends \lithium\test\Unit {
 		$this->expectException('/Could not start session./');
 		$Php->delete('whatever');
 	}
+
+	public function testReadDotSyntax() {
+		$this->Php->read();
+
+		$key = 'dot';
+		$value = array('syntax' => array('key' => 'value'));
+
+		$_SESSION[$key] = $value;
+
+		$closure = $this->Php->read($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->Php, $params, null);
+
+		$this->assertIdentical($value, $result);
+
+
+		$params = array('key' => 'dot.syntax');
+		$result = $closure($this->Php, $params, null);
+
+		$this->assertIdentical($value['syntax'], $result);
+	}
+
+	public function testWriteDotSyntax() {
+		$key = 'dot.syntax';
+		$value = 'value to be written';
+
+		$closure = $this->Php->write($key, $value);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key', 'value');
+		$result = $closure($this->Php, $params, null);
+
+		$this->assertEqual($_SESSION['dot']['syntax'], $value);
+	}
 }
 
 ?>
