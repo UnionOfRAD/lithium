@@ -135,7 +135,9 @@ class MongoDb extends \lithium\data\Source {
 	 *         their respective properties in `Model`.
 	 */
 	public function configureClass($class) {
-		return array('meta' => array('key' => '_id'), 'classes' => array());
+		return array('meta' => array('key' => '_id'), 'classes' => array(
+			'record' => $this->_classes['document']
+		));
 	}
 
 	/**

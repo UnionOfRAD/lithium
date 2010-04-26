@@ -23,6 +23,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @var string
 	 */
 	protected $_iterator = 0;
+
 	/**
 	 * True if Database exists
 	 *
@@ -48,7 +49,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('port' => 5984);
-		$config = (array) $config + $defaults;
+		$config = $config + $defaults;
 		parent::__construct($config);
 	}
 
@@ -67,8 +68,8 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * Configures a model class by overriding the default dependencies for `'recordSet'` and
-	 * `'record'` , and sets the primary key to `'_id'`, in keeping with CouchDb conventions.
+	 * Configures a model class by setting the primary key to `'id'`, in keeping with CouchDb
+	 * conventions.
 	 *
 	 * @param string $class The fully-namespaced model class name to be configured.
 	 * @return Returns an array containing keys `'classes'` and `'meta'`, which will be merged with
@@ -77,7 +78,9 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @see lithium\data\Model::$_classes
 	 */
 	public function configureClass($class) {
-		return array('meta' => array('key' => 'id'), 'classes' => array());
+		return array('meta' => array('key' => 'id'), 'classes' => array(
+			'record' => $this->_classes['document']
+		));
 	}
 
 	/**
@@ -210,7 +213,7 @@ class CouchDb extends \lithium\data\source\Http {
 			$result = json_decode($conn->get("{$config['database']}/{$_path}", $data));
 
 			if (isset($result->error) && $result->error == 'not_found') {
-				return $result;
+				$result = array();
 			}
 			$options += compact('result');
 			return $self->invokeMethod('_result', array('document', $query, $options));

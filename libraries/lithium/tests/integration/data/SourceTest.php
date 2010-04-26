@@ -98,8 +98,7 @@ class SourceTest extends \lithium\test\Unit {
 		$existing->delete();
 	}
 
-	public function testFindFirstWithFieldsOption()
-	{
+	public function testFindFirstWithFieldsOption() {
 		$key = Company::meta('key');
 		$new = Company::create(array($key => 12345, 'name' => 'Acme, Inc.'));
 		$result = $new->data();
@@ -109,16 +108,14 @@ class SourceTest extends \lithium\test\Unit {
 		$this->assertEqual($expected[$key], $result[$key]);
 		$this->assertTrue($new->save());
 
-		$result = Company::find('first',
-			array(
-				'fields' => array('name')
-			)
-		);
+		$result = Company::find('first', array('fields' => array('name')));
 		$this->assertFalse(is_null($result));
 
 		$this->skipIf(is_null($result), 'No result returned to test');
 		$result = $result->data();
 		$this->assertEqual($expected['name'], $result['name']);
+
+		$this->assertTrue($new->delete());
 	}
 
 	public function testReadWriteMultiple() {
@@ -152,7 +149,7 @@ class SourceTest extends \lithium\test\Unit {
 		}
 		$all = Company::all();
 
-		$result = $all->first();
+		$result = $all->first(function($doc) { return $doc->name == 'BigBoxMart'; });
 		$this->skipIf(!$result instanceof ArrayAccess, 'Data class does not implement ArrayAccess');
 
 		$expected = 'BigBoxMart';
@@ -194,6 +191,11 @@ class SourceTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testDefaultRelationshipInfo() {
+		$this->skipIf(
+			Company::relations('Employee') == array('type' => 'hasMany'),
+			'This data source does not support relationships.'
+		);
+
 		$this->assertEqual(array('Employee'), Company::relations());
 		$this->assertEqual(array('Company'), Employee::relations());
 
