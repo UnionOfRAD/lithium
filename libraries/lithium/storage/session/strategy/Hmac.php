@@ -52,13 +52,12 @@ class Hmac extends \lithium\core\Object {
 	 */
 	public function write($data, array $options = array()) {
 		$class = $options['class'];
+
 		$futureData = $class::read(null, array('strategies' => false));
 		$futureData += array($options['key'] => $data);
+		unset($futureData['__signature']);
 
-		if (isset($futureData['__signature'])) {
-			unset($futureData['__signature']);
-		}
-		$signature = hash_hmac('sha1', serialize($futureData), static::$_secret);
+		$signature = static::_signature($futureData);
 		$class::write('__signature', $signature, array('strategies' => false) + $options);
 		return $data;
 	}
@@ -76,9 +75,16 @@ class Hmac extends \lithium\core\Object {
 		$class = $options['class'];
 
 		$futureData = $class::read(null, array('strategies' => false));
-		$currentSignature = $futureData['__signature'];
 		unset($futureData['__signature']);
-		$signature = hash_hmac('sha1', serialize($futureData), static::$_secret);
+
+		if (!isset($futureData['__signature'])) {
+			$signature = hash_hmac('sha1', serialize($futureData), static::$_secret);
+			$class::write('__signature', $signature, array('strategies' => false) + $options);
+			return $data;
+		}
+
+		$currentSignature = $futureData['__signature'];
+		$signature = static::_signature($futureData);
 
 		if ($signature !== $currentSignature) {
 			$message = "Possible data tampering - HMAC signature does not match data.";
@@ -99,17 +105,25 @@ class Hmac extends \lithium\core\Object {
 	 */
 	public function delete($data, array $options = array()) {
 		$class = $options['class'];
-		$futureData = $class::read(null, array('strategies' => false));
 
-		if (isset($futureData[$options['key']])) {
-			unset($futureData[$options['key']]);
-		}
-		if (isset($futureData['__signature'])) {
-			unset($futureData['__signature']);
-		}
-		$signature = hash_hmac('sha1', serialize($futureData), static::$_secret);
+		$futureData = $class::read(null, array('strategies' => false));
+		unset($futureData[$options['key']], $futureData['__signature']);
+
+		$signature = static::_signature($futureData);
 		$class::write('__signature', $signature, array('strategies' => false) + $options);
 		return $data;
+	}
+
+	/**
+	 * Calculate the HMAC signature based on the data and a secret key.
+	 *
+	 * @param mixed $data
+	 * @param null|string $secret Secret key for HMAC signature creation.
+	 * @return string HMAC signature.
+	 */
+	protected static function _signature($data, $secret = null) {
+		$secret = ($secret) ?: static::$_secret;
+		return hash_hmac('sha1', serialize($data), $secret);
 	}
 }
 

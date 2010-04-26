@@ -138,6 +138,10 @@ class SessionTest extends \lithium\test\Unit {
 		$result = Session::read($key, array('name' => 'strategy'));
 		$this->assertNull($result);
 
+		Session::write($key, $value, array('name' => 'strategy'));
+		$result = Session::read($key, array('name' => 'strategy'));
+		$this->assertEqual($value, $result);
+
 		$cache = $_SESSION;
 		$_SESSION['injectedkey'] = 'hax0r';
 		$this->expectException('/Possible data tampering - HMAC signature does not match data./');
