@@ -11,6 +11,56 @@ namespace lithium\template;
 use \RuntimeException;
 use \lithium\core\Libraries;
 
+/**
+ * As one of the three pillars of the Model-View-Controller design pattern, the `View` class
+ * (along with other supporting classes) is responsible for taking the data passed from the
+ * request and/or controller, inserting this into the requested view/layout, and then presenting
+ * the rendered content in the appropriate content-type.
+ *
+ * The `View` class interacts with a variety of other classes in order to achieve maximum
+ * flexibility and configurability at all points in the view rendering and presentation
+ * process. The `Loader` class is tasked with locating and reading template files which are then
+ * passed to the `Renderer` adapter subclass.
+ *
+ * It is also possible to instantiate and call `View` directly, in cases where you wish to bypass
+ * all other parts of the framework and simply return rendered content.
+ *
+ * A simple example, using the `Simple` renderer/loader for string templates:
+ *
+ * {{{
+ * $view = new View(array('loader' => 'Simple', 'renderer' => 'Simple'));
+ * echo $view->render(array('element' => 'Hello, {:name}!'), array(
+ *     'name' => "Robert"
+ * ));
+ *
+ * // Output:
+ * "Hello, Robert!";
+ * }}}
+ *
+ * (note: This is easily adapted for XML templating).
+ *
+ * Another example, this time of something that could be used in an appliation
+ * error handler:
+ *
+ * {{{
+ * $view = new View(array(
+ *     'paths' => array(
+ *         'template' => '{:library}/views/errors/{:template}.{:type}.php',
+ *         'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
+ *     )
+ * ));
+ *
+ * echo $View->render('all', array('content' => $info), array(
+ *     'template' => '404',
+ *     'type' => 'html',
+ *     'layout' => 'error'
+ * ));
+ * }}}
+ *
+ * @see \lithium\view\Renderer
+ * @see \lithium\view\adapter
+ * @see \lithium\net\http\Media
+ */
 class View extends \lithium\core\Object {
 
 	/**
@@ -55,11 +105,13 @@ class View extends \lithium\core\Object {
 	 * Constructor.
 	 *
 	 * @param array $config Configuration parameters.
-	 *        Defaults are:
-	 *          - `loader`: File
-	 *          - `renderer`: File
-	 *          - `request`: none specified
-	 *          - `vars`: empty
+	 *        The available options are:
+	 *          - `loader`: For locating/reading view, layout and element
+	 *                      templates. Defaults to `File`.
+	 *          - `renderer`: Populates the view/layout with the data set from the controller.
+	 *                        Defaults to `File`.
+	 *          - `request`: The request object to be made available in the view. Defalts to `null`.
+	 *          - `vars`: Defaults to `array()`.
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
@@ -77,6 +129,7 @@ class View extends \lithium\core\Object {
 	 * Perform initialization of the View.
 	 *
 	 * @return void
+	 * @throws RuntimeException when template adapter cannot be found.
 	 */
 	protected function _init() {
 		parent::_init();
