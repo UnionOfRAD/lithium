@@ -22,29 +22,31 @@ use \lithium\analysis\Inspector;
  */
 class Test extends \lithium\console\command\Create {
 
-	protected function _namespace($name) {
+	protected function _namespace($name = null) {
 		return parent::_namespace($name) . "\\{$this->request->action}";
 	}
 
 	protected function _use() {
 		$namespace = $this->_namespace($this->request->command);
-		$class = array_shift($this->request->args);
+		$class = array_shift($this->request->params['args']);
 		return "\\{$namespace}\\{$class}";
 	}
 
 	protected function _class() {
-		$class = array_shift($this->request->args);
+		$class = array_shift($this->request->params['args']);
 		return  $class . "Test";
 	}
 
 	protected function _methods() {
 		$use = $this->_use();
 
-		if (class_exists($use, false)) {
-			$methods = array();
-			foreach (array_keys(Inspector::methods($use, 'extents')) as $method) {
-				$methods[] = "\tpublic function test" . ucwords($method) . "() {}";
-			}
+		if (!class_exists($use, false)) {
+			return "";
+		}
+		$methods = array();
+
+		foreach (array_keys(Inspector::methods($use, 'extents')) as $method) {
+			$methods[] = "\tpublic function test" . ucwords($method) . "() {}";
 		}
 		return join("\n", $methods);
 	}

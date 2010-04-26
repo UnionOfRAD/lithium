@@ -110,7 +110,6 @@ class Create extends \lithium\console\Command {
 				$data[$param] = !empty($this->request->args[$i]) ? $this->request->args[$i] : null;
 			}
 		}
-		var_Dump($data);
 		if ($this->_save($this->template, $data)) {
 			$this->out("{$data['class']} created in {$data['namespace']}.");
 			return true;

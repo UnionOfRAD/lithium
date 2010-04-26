@@ -19,13 +19,15 @@ use \lithium\core\Libraries;
  * @param string $name Class name to extend with the mock.
  * @return void
  */
-class Test extends \lithium\console\command\Create {
+class Mock extends \lithium\console\command\Create {
 
 	public function run($type = null, $name = null) {
 		$library = Libraries::get($this->library);
-		if (empty($library['prefix'])) {
+
+		if (!$library['prefix']) {
 			return false;
 		}
+
 		$namespace = $this->_namespace($type);
 		$params = array(
 			'namespace' => "{$library['prefix']}tests\\mocks\\{$namespace}",
