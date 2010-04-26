@@ -27,8 +27,6 @@ use \SplDoublyLinkedList;
  * should be located.
  *
  * This static class should **never** be called explicitly.
- *
- * @todo Implement as abstract class with abstract method `adapter` when Inspector has been fixed.
  */
 class Adaptable extends \lithium\core\StaticObject {
 
@@ -103,7 +101,7 @@ class Adaptable extends \lithium\core\StaticObject {
 		$config = static::_config($name);
 
 		if ($config === null) {
-			throw new Exception("Configuration $name has not been defined");
+			throw new Exception("Configuration '{$name}' has not been defined.");
 		}
 
 		if (isset($config['object'])) {

@@ -32,15 +32,13 @@ class LoggerTest extends \lithium\test\Unit {
 
 	public function testConfig() {
 		$test = new MockLoggerAdapter();
-		$config = array('logger' => array(
-			'adapter' => $test,
-			'filters' => array()
-		));
+		$config = array('logger' => array('adapter' => $test, 'filters' => array()));
 
 		$result = Logger::config($config);
 		$this->assertNull($result);
 
 		$result = Logger::config();
+		$config['logger'] += array('priority' => true);
 		$expected = $config;
 		$this->assertEqual($expected, $result);
 	}
@@ -57,11 +55,11 @@ class LoggerTest extends \lithium\test\Unit {
 		$result = Logger::config();
 		$this->assertFalse($result);
 
-		$this->assertFalse(Logger::write('default', 'Test message.'));
+		$this->assertFalse(Logger::write('info', 'Test message.'));
 	}
 
 	public function testWrite() {
-		$result = Logger::write('default', 'value');
+		$result = Logger::write('info', 'value');
 		$this->assertTrue($result);
 	}
 
@@ -72,21 +70,48 @@ class LoggerTest extends \lithium\test\Unit {
 		$config = array('default' => array('adapter' => 'File', 'timestamp' => false));
 		Logger::config($config);
 
-		$result = Logger::write('default', 'Message line 1');
-		$this->assertTrue(file_exists($base . '/default.log'));
+		$result = Logger::write('info', 'Message line 1');
+		$this->assertTrue(file_exists($base . '/info.log'));
 
 		$expected = "Message line 1\n";
-		$result = file_get_contents($base . '/default.log');
+		$result = file_get_contents($base . '/info.log');
 		$this->assertEqual($expected, $result);
 
-		$result = Logger::write('default', 'Message line 2');
+		$result = Logger::write('info', 'Message line 2');
 		$this->assertTrue($result);
 
 		$expected = "Message line 1\nMessage line 2\n";
-		$result = file_get_contents($base . '/default.log');
+		$result = file_get_contents($base . '/info.log');
 		$this->assertEqual($expected, $result);
 
-		unlink($base . '/default.log');
+		unlink($base . '/info.log');
+	}
+
+	public function testWriteWithInvalidPriority() {
+		$this->expectException("Attempted to write log message with invalid priority 'foo'.");
+		Logger::foo("Test message");
+	}
+
+	public function testWriteByName() {
+		$base = LITHIUM_APP_PATH . '/resources/tmp/logs';
+		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+
+		Logger::config(array('default' => array(
+			'adapter' => 'File', 'timestamp' => false, 'priority' => false
+		)));
+
+		$this->assertFalse(file_exists($base . '/info.log'));
+
+		$this->assertFalse(Logger::write('info', 'Message line 1'));
+		$this->assertFalse(file_exists($base . '/info.log'));
+
+		$this->assertTrue(Logger::write(null, 'Message line 1', array('name' => 'default')));
+
+		$expected = "Message line 1\n";
+		$result = file_get_contents($base . '/.log');
+		$this->assertEqual($expected, $result);
+
+		unlink($base . '/.log');
 	}
 }
 

@@ -28,11 +28,11 @@ class FileTest extends \lithium\test\Unit {
 
 	public function testWriting() {
 		$this->subject = new File(array('path' => $this->path));
-		$type = 'debug';
+		$priority = 'debug';
 		$message = 'This is a debug message';
-		$function = $this->subject->write($type, $message);
+		$function = $this->subject->write($priority, $message);
 		$now = date('Y-m-d H:i:s');
-		$function('lithium\analysis\Logger', compact('type', 'message'), new Filters());
+		$function('lithium\analysis\Logger', compact('priority', 'message'), new Filters());
 
 		$log = file_get_contents("{$this->path}/debug.log");
 		$this->assertEqual("{$now} This is a debug message\n", $log);
@@ -40,11 +40,11 @@ class FileTest extends \lithium\test\Unit {
 
 	public function testWithoutTimestamp() {
 		$this->subject = new File(array('path' => $this->path, 'timestamp' => false));
-		$type = 'debug';
+		$priority = 'debug';
 		$message = 'This is a debug message';
-		$function = $this->subject->write($type, $message);
+		$function = $this->subject->write($priority, $message);
 		$now = date('Y-m-d H:i:s');
-		$function('lithium\analysis\Logger', compact('type', 'message'), new Filters());
+		$function('lithium\analysis\Logger', compact('priority', 'message'), new Filters());
 
 		$log = file_get_contents("{$this->path}/debug.log");
 		$this->assertEqual("This is a debug message\n", $log);

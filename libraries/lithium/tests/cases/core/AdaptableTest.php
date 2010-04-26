@@ -62,7 +62,7 @@ class AdaptableTest extends \lithium\test\Unit {
 
 	public function testNonExistentConfig() {
 		$adapter = new MockAdapter();
-		$this->expectException('Configuration non_existent_config has not been defined');
+		$this->expectException("Configuration 'non_existent_config' has not been defined.");
 		$result = $adapter::adapter('non_existent_config');
 		$this->assertNull($result);
 	}

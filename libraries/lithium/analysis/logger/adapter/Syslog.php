@@ -9,51 +9,76 @@
 namespace lithium\analysis\logger\adapter;
 
 /**
- * The Syslog adapter facilitates logging messages to a syslogd backend.
+ * The Syslog adapter facilitates logging messages to a `syslogd` backend. See the constructor for
+ * information on configuring this adapter.
+ *
+ * @see lithium\analysis\logger\adapter\Syslog::__construct()
  */
 class Syslog extends \lithium\core\Object {
 
 	/**
-	 * The last connection to have opened syslog. This will determine whether or
-	 * not the log needs to be closed and reopened.
+	 * Flag indicating whether or not the connection to `syslogd` has been opened yet.
 	 *
-	 * @var string
+	 * @var boolean
 	 */
-	protected static $_lastOpenedBy;
+	protected $_isConnected = false;
 
 	/**
-	 * Class constructor
+	 * Array that maps `Logger` message priority names to `syslog`-compatible priority constants.
 	 *
-	 * @param array $config
+	 * @var array
+	 */
+	protected $_priorities = array(
+		'emergency' => LOG_EMERG,
+		'alert'     => LOG_ALERT,
+		'critical'  => LOG_CRIT,
+		'error'     => LOG_ERR,
+		'warning'   => LOG_WARNING,
+		'notice'    => LOG_NOTICE,
+		'info'      => LOG_INFO,
+		'debug'     => LOG_DEBUG
+	);
+
+	/**
+	 * Class constructor. Configures the `Syslog` adapter instance with the default settings. For
+	 * more information on these settings, see the documentation for
+	 * [the `openlog()` function](http://php.net/openlog).
+	 *
+	 * @param array $config Available configuration settings for this adapter:
+	 *              - `'identity'` _string_: The identity string to be attached to each message in
+	 *                the system log. This is usually a string that meaningfully identifies your
+	 *                application. Defaults to `false`.
+	 *              - `'options'` _integer_: The flags to use when opening the log. Defaults to
+	 *                `LOG_ODELAY`.
+	 *              - `'facility'` _integer_: A flag specifying the program to use to log the
+	 *                messages. See the `openlog()` documentation for more information. Defaults to
+	 *                `LOG_USER`.
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array(
-			'identity' => false,
-			'options'  => LOG_ODELAY,
-			'facility' => LOG_USER,
-			'priority' => LOG_INFO
-		);
+		$defaults = array('identity' => false, 'options'  => LOG_ODELAY, 'facility' => LOG_USER);
 		parent::__construct($config + $defaults);
 	}
 
 	/**
-	 * Appends `$data` to file `$type`.
+	 * Appends `$message` to the system log.
 	 *
-	 * @param string $type
-	 * @param string $message
-	 * @return boolean `True` on successful write, `false` otherwise.
+	 * @param string $priority The message priority string. Maps to a `syslogd` priority constant.
+	 * @param string $message The message to write.
+	 * @return boolean Returns `true` on successful write, `false` otherwise.
 	 */
-	public function write($type, $message) {
-		if (static::$_lastOpenedBy != $type) {
-			closelog(); // Close previously opened log (doesn't matter if none opened)
-			openlog($this->_config['identity'], $this->_config['options'], $this->_config['facility']);
-			static::$_lastOpenedBy = $type;
+	public function write($priority, $message) {
+		$config = $this->_config;
+		$_priorities = $this->_priorities;
+
+		if (!$this->_isConnected) {
+			closelog();
+			openlog($config['identity'], $config['options'], $config['facility']);
+			$this->_isConnected = true;
 		}
 
-		$priority = $this->_config['priority'];
-
-		return function($self, $params, $chain) use ($priority) {
+		return function($self, $params, $chain) use ($_priorities) {
+			$priority = $_priorities[$params['priority']];
 			return syslog($priority, $params['message']);
 		};
 	}

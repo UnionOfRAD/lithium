@@ -32,7 +32,6 @@ class SyslogTest extends \lithium\test\Unit {
 			'identity' => false,
 			'options' => LOG_ODELAY,
 			'facility' => LOG_USER,
-			'priority' => LOG_INFO,
 			'init' => true
 		);
 		$result = $this->syslog->_config;
@@ -54,7 +53,7 @@ class SyslogTest extends \lithium\test\Unit {
 	}
 
 	public function testWrite() {
-		$result = Logger::write('syslog', 'SyslogTest message...');
+		$result = Logger::write('info', 'SyslogTest message...', array('name' => 'syslog'));
 		$this->assertTrue($result);
 	}
 }

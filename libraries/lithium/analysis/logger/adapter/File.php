@@ -56,7 +56,7 @@ class File extends \lithium\core\Object {
 		$config = $this->_config;
 
 		return function($self, $params, $chain) use (&$config) {
-			$type = $params['type'];
+			$type = $params['priority'];
 			$message = $params['message'];
 			$time = $config['timestamp'] ? date($config['timestamp']) . ' ' : '';
 			$path = $config['path'];
