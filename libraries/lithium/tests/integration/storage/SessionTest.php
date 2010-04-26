@@ -62,10 +62,10 @@ class SessionTest extends \lithium\test\Unit {
 		$this->assertEqual($value, $_SESSION['first']['second']);
 
 		$result = Session::read('first');
-		$expected = array('first' => array('second' => 'second value'));
+		$expected = array('second' => 'second value');
 		$this->assertEqual($expected, $result);
 		$this->assertTrue(isset($_SESSION['first']));
-		$this->assertEqual($_SESSION['first'], $result['first']);
+		$this->assertEqual($_SESSION['first'], $result);
 
 		$value = 'another value';
 		Session::write('first.sibling', $value);

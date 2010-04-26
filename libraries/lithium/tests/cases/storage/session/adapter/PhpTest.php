@@ -266,7 +266,6 @@ class PhpTest extends \lithium\test\Unit {
 
 		$this->assertIdentical($value, $result);
 
-
 		$params = array('key' => 'dot.syntax');
 		$result = $closure($this->Php, $params, null);
 
