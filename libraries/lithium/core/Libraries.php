@@ -421,11 +421,11 @@ class Libraries {
 				$list = array_map(function($i) { return str_replace('\\', '/', $i); }, $list);
 
 				if (in_array($fullPath . $suffix, $list)) {
-					return static::$_cachedPaths[$class] = $fullPath . $suffix;
+					return static::$_cachedPaths[$class] = realpath($fullPath . $suffix);
 				}
-				return is_dir($fullPath) ? $fullPath : null;
+				return is_dir($fullPath) ? realpath($fullPath) : null;
 			}
-			return static::$_cachedPaths[$class] = $fullPath . $suffix;
+			return static::$_cachedPaths[$class] = realpath($fullPath . $suffix);
 		}
 	}
 
