@@ -96,7 +96,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			$router = $classes['router'];
 			$request = $request ?: new $classes['request']($options['request']);
 			$request->params = $router::parse($request);
-			$params = $self::invokeMethod('_applyRules', array($request->params));
+			$params = $request->params;
 
 			try {
 				$callable = $self::invokeMethod('_callable', array($request, $params, $options));
@@ -167,33 +167,6 @@ class Dispatcher extends \lithium\core\StaticObject {
 			}
 			throw new UnexpectedValueException("{$callable} not callable");
 		});
-	}
-
-	/**
-	 * Attempts to apply a set of formatting rules from `$_rules` to a `$params` array, where each
-	 * formatting rule is applied if the key of the rule in `$_rules` is present and not empty in
-	 * `$params`.  Also performs sanity checking against `$params` to ensure that no value
-	 * matching a rule is present unless the rule check passes.
-	 *
-	 * @param array $params An array of route parameters to which rules will be applied.
-	 * @return array Returns the $params array with formatting rules applied to array values.
-	 */
-	protected static function _applyRules($params) {
-		foreach (static::$_rules as $rule => $value) {
-			foreach ($value as $k => $v) {
-				if (!empty($params[$rule])) {
-					$params[$k] = String::insert($v, $params);
-				}
-
-				$match = preg_replace('/\{:\w+\}/', '@', $v);
-				$match = preg_replace('/@/', '.+', preg_quote($match, '/'));
-
-				if (preg_match('/' . $match . '/i', $params[$k])) {
-					return false;
-				}
-			}
-		}
-		return $params;
 	}
 }
 
