@@ -112,6 +112,11 @@ class Controller extends \lithium\core\Object {
 		'response' => '\lithium\action\Response'
 	);
 
+	/**
+	 * Auto configuration properties.
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array('render' => 'merge', 'classes' => 'merge');
 
 	public function __construct(array $config = array()) {

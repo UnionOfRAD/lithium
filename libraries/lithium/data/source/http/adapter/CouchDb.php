@@ -30,6 +30,12 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	protected $_db = false;
 
+	/**
+	 * Classes used by `CouchDb`.
+	 *
+	 * @package default
+	 * @author John David Anderson
+	 */
 	protected $_classes = array(
 		'service' => '\lithium\net\http\Service',
 		'document' => '\lithium\data\collection\Document'

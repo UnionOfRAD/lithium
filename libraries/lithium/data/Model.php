@@ -147,6 +147,11 @@ class Model extends \lithium\core\StaticObject {
 		'validator'   => '\lithium\util\Validator'
 	);
 
+	/**
+	 * A list of the current relation types for this `Model`.
+	 *
+	 * @var array
+	 */
 	protected $_relations = array();
 
 	/**
@@ -482,6 +487,14 @@ class Model extends \lithium\core\StaticObject {
 		$self->_finders[$name] = $options;
 	}
 
+	/**
+	 * Set/get method for `Model` metadata.
+	 *
+	 * @see lithium\data\Model::$_meta
+	 * @param string $key Model metadata key.
+	 * @param string $value Model metadata value.
+	 * @return mixed Metadata value for a given key.
+	 */
 	public static function meta($key = null, $value = null) {
 		$self = static::_instance();
 
@@ -505,6 +518,13 @@ class Model extends \lithium\core\StaticObject {
 		return isset($self->_meta[$key]) ? $self->_meta[$key] : null;
 	}
 
+	/**
+	 * If no values supplied, returns the name of the `Model` key. If values 
+	 * are supplied, returns the key value.
+	 *
+	 * @param array $values An array of values.
+	 * @return mixed Key value.
+	 */
 	public static function key($values = array()) {
 		$key = static::_instance()->_meta['key'];
 
@@ -524,6 +544,13 @@ class Model extends \lithium\core\StaticObject {
 		return isset($values[$key]) ? $values[$key] : null;
 	}
 
+	/**
+	 * Returns a list of models related to `Model`, or a list of models related
+	 * to this model, but of a certain type.
+	 * 
+	 * @param string $name A type of model relation.
+	 * @return array An array of relation types.
+	 */
 	public static function relations($name = null) {
 		$self = static::_instance();
 
@@ -671,6 +698,14 @@ class Model extends \lithium\core\StaticObject {
 		return static::_filter(__FUNCTION__, $params, $filter);
 	}
 
+	/**
+	 * Indicates whether the `Model`'s current data validates, given the 
+	 * current rules setup.
+	 *
+	 * @param string $record Model record to validate.
+	 * @param array $options Options.
+	 * @return boolean Success.
+	 */
 	public function validates($record, array $options = array()) {
 		$self = static::_instance();
 		$validator = $self->_classes['validator'];
@@ -687,6 +722,13 @@ class Model extends \lithium\core\StaticObject {
 		return static::_filter(__FUNCTION__, $params, $filter);
 	}
 
+	/**
+	 * Deletes the data associated with the current `Model`.
+	 *
+	 * @param string $record Record to delete.
+	 * @param array $options Options.
+	 * @return boolean Success.
+	 */
 	public function delete($record, array $options = array()) {
 		$self = static::_instance();
 		$query = $self->_classes['query'];
@@ -809,6 +851,13 @@ class Model extends \lithium\core\StaticObject {
 		return $relations;
 	}
 
+	/**
+	 * Helper function for setting/getting base class settings.
+	 *
+	 * @param string $class Classname.
+	 * @param boolean $set If `true`, then the `$class` will be set.
+	 * @return boolean Success.
+	 */
 	protected static function _isBase($class = null, $set = false) {
 		if ($set) {
 			static::$_baseClasses[$class] = true;

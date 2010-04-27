@@ -180,10 +180,23 @@ class MongoDb extends \lithium\data\Source {
 		return true;
 	}
 
+	/**
+	 * Returns the list of collections in the currently-connected database.
+	 *
+	 * @param string $class The fully-name-spaced class name of the model object making the request.
+	 * @return array Returns an array of objects to which models can connect.
+	 */
 	public function entities($class = null) {
 		return array_map(function($col) { return $col->getName(); }, $this->_db->listCollections());
 	}
 
+	/**
+	 * Gets the column 'schema' for a given MongoDB collection. Not applicable to this data source.
+	 *
+	 * @param mixed $entity Would normally specify a table name.
+	 * @param array $meta
+	 * @return array Returns an associative array describing the given table's schema.
+	 */
 	public function describe($entity, $meta = array()) {
 		return array();
 	}
@@ -218,10 +231,27 @@ class MongoDb extends \lithium\data\Source {
 		return call_user_func_array(array(&$this->connection, $method), $params);
 	}
 
+	/**
+	 * Normally used in cases where the query is a raw string (as opposed to a `Query` object), 
+	 * to database must determine the correct column names from the result resource. Not 
+	 * applicable to this data source.
+	 *
+	 * @param mixed $query
+	 * @param resource $resource
+	 * @param object $context
+	 * @return array
+	 */
 	public function schema($query, $resource = null, $context = null) {
 		return array();
 	}
 
+	/**
+	 * Create new document
+	 *
+	 * @param string $query
+	 * @param string $options
+	 * @return boolean
+	 */
 	public function create($query, array $options = array()) {
 		$params = compact('query', 'options');
 		$conn =& $this->connection;
@@ -244,6 +274,13 @@ class MongoDb extends \lithium\data\Source {
 		});
 	}
 
+	/**
+	 * Read from document
+	 *
+	 * @param string $query
+	 * @param string $options
+	 * @return object
+	 */
 	public function read($query, array $options = array()) {
 		$defaults = array(
 			'return' => 'resource',
@@ -296,6 +333,13 @@ class MongoDb extends \lithium\data\Source {
 		});
 	}
 
+	/**
+	 * Update document
+	 *
+	 * @param string $query
+	 * @param string $options
+	 * @return boolean
+	 */
 	public function update($query, array $options = array()) {
 		$db =& $this->_db;
 		$conn =& $this->connection;
@@ -316,6 +360,13 @@ class MongoDb extends \lithium\data\Source {
 		});
 	}
 
+	/**
+	 * Delete document
+	 *
+	 * @param string $query
+	 * @param string $options
+	 * @return boolean
+	 */
 	public function delete($query, array $options = array()) {
 		$db =& $this->_db;
 		$conn =& $this->connection;

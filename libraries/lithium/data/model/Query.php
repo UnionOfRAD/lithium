@@ -29,8 +29,19 @@ class Query extends \lithium\core\Object {
 	 */
 	protected $_binding = null;
 
+	/**
+	 * Auto configuration properties.
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array('type');
 
+	/**
+	 * Class constructor
+	 *
+	 * @param array $config
+	 * @return void
+	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'calculate'  => null,
@@ -71,6 +82,12 @@ class Query extends \lithium\core\Object {
 		return $this->_type;
 	}
 
+	/**
+	 * Accessor method for `Query` calculate values.
+	 *
+	 * @param string $calculate Value for calculate config setting.
+	 * @return mixed Current calculate config value.
+	 */
 	public function calculate($calculate = null) {
 		if ($calculate) {
 			$this->_config['calculate'] = $calculate;
@@ -198,6 +215,12 @@ class Query extends \lithium\core\Object {
 		return $this->_config['order'];
 	}
 
+	/**
+	 * Set and get method for the `Query` group config setting.
+	 *
+	 * @param string $group New group config setting.
+	 * @return mixed Current group config setting.
+	 */
 	public function group($group = null) {
 		if ($group) {
 			$this->_config['group'] = $group;

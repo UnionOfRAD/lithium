@@ -47,6 +47,11 @@ class Record extends \lithium\core\Object {
 	 */
 	protected $_exists = false;
 
+	/**
+	 * Auto configuration.
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array('model', 'exists', 'data' => 'merge');
 
 	protected $_hasValidated = false;
@@ -67,15 +72,34 @@ class Record extends \lithium\core\Object {
 		parent::__construct($config + $defaults);
 	}
 
+	/**
+	 * Overloading for reading inaccessible properties.
+	 *
+	 * @param string $name Property name.
+	 * @return mixed Result.
+	 */
 	public function __get($name) {
 		return isset($this->_data[$name]) ? $this->_data[$name] : null;
 	}
 
+	/**
+	 * Overloading for writing to inaccessible properties.
+	 *
+	 * @param string $name Property name.
+	 * @param string $value Property value.
+	 * @return mixed Result.
+	 */
 	public function __set($name, $value) {
 		$this->_modified[$name] = true;
 		$this->_data[$name] = $value;
 	}
 
+	/**
+	 * Overloading for calling isset() or empty() on inaccessible properties.
+	 *
+	 * @param string $name Property name.
+	 * @return mixed Result.
+	 */
 	public function __isset($name) {
 		return array_key_exists($name, $this->_data);
 	}

@@ -93,6 +93,13 @@ abstract class Source extends \lithium\core\Object {
 		return $this->_isConnected;
 	}
 
+	/**
+	 * Run the specified query.
+	 *
+	 * @param string $query Query.
+	 * @param array $options Options.
+	 * @return mixed Results, based on `$query`.
+	 */
 	public function run($query, array $options = array()) {
 		if (is_object($query) && method_exists($this, $query->type())) {
 			return $this->{$query->type()}($query, $options);
@@ -118,6 +125,18 @@ abstract class Source extends \lithium\core\Object {
 	 */
 	abstract public function entities($class = null);
 
+	/**
+	 * Gets the column schema for a given entity (such as a database table).
+	 *
+	 * @param mixed $entity Specifies the table name for which the schema should be returned, or
+	 *        the class name of the model object requesting the schema, in which case the model
+	 *        class will be queried for the correct table name.
+	 * @param array $meta
+	 * @return array Returns an associative array describing the given table's schema, where the
+	 *         array keys are the available fields, and the values are arrays describing each
+	 *         field, containing the following keys:
+	 *         - `'type'`: The field type name
+	 */
 	abstract public function describe($entity, $meta = array());
 
 	/**

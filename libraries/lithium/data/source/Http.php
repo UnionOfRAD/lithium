@@ -194,6 +194,15 @@ class Http extends \lithium\data\Source {
 		return $this->connection->delete();
 	}
 
+	/**
+	 * Defines or modifies the default settings of a relationship between two models.
+	 *
+	 * @param string $class
+	 * @param string $type
+	 * @param string $name
+	 * @param array $options
+	 * @return array Returns an array containing the configuration for a model relationship.
+	 */
 	public function relationship($class, $type, $name, array $options = array()) {
 		return array();
 	}

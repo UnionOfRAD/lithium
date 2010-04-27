@@ -94,11 +94,22 @@ class Document extends \lithium\data\Collection {
 		'recordSet' => __CLASS__
 	);
 
+	/**
+	 * Auto configuration properties.
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array(
 		'items', 'classes' => 'merge', 'handle', 'model',
 		'result', 'query', 'parent', 'exists', 'stats'
 	);
 
+	/**
+	 * Class constructor
+	 *
+	 * @param array $config
+	 * @return void
+	 */
 	public function __construct($config = array()) {
 		if (isset($config['data']) && !isset($config['items'])) {
 			$config['items'] = $config['data'];
@@ -292,6 +303,13 @@ class Document extends \lithium\data\Collection {
 		return $this->to('array');
 	}
 
+	/**
+	 * Gets the stat or stats associated with this `Document`.
+	 *
+	 * @param string $name Stat name.
+	 * @return mixed Single stat if `$name` supplied, else all stats for this 
+	 *               `Document`.
+	 */
 	public function stats($name = null) {
 		if ($name) {
 			return isset($this->_stats[$name]) ? $this->_stats[$name] : null;

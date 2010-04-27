@@ -41,6 +41,11 @@ abstract class Database extends \lithium\data\Source {
 		'join'   => "{:type} JOIN {:table} ON {:constraint}"
 	);
 
+	/**
+	 * Classes used by `Database`.
+	 *
+	 * @var array
+	 */
 	protected $_classes = array(
 		'record' => '\lithium\data\model\Record',
 		'recordSet' => '\lithium\data\collection\RecordSet'
@@ -298,6 +303,15 @@ abstract class Database extends \lithium\data\Source {
 		});
 	}
 
+	/**
+	 * Defines or modifies the default settings of a relationship between two models.
+	 *
+	 * @param string $class
+	 * @param string $type
+	 * @param string $name
+	 * @param array $options
+	 * @return array Returns an array containing the configuration for a model relationship.
+	 */
 	public function relationship($class, $type, $name, array $options = array()) {
 		$key = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name'));
 		$defaults = array(
@@ -497,6 +511,13 @@ abstract class Database extends \lithium\data\Source {
 		return $result;
 	}
 
+	/**
+	 * Return formatted clause for order.
+	 *
+	 * @param mixed $order The `order` clause to be formatted
+	 * @param object $context
+	 * @return mixed Formatted `order` clause.
+	 */
 	public function order($order, $context) {
 		$direction = 'ASC';
 		$model = $context->model();

@@ -77,6 +77,15 @@ abstract class Collection extends \lithium\util\Collection {
 		'items', 'classes' => 'merge', 'handle', 'model', 'result', 'query'
 	);
 
+	/**
+	 * Returns a boolean indicating whether an offset exists for the 
+	 * current `Document`.
+	 *
+	 * @param string $offset String or integer indicating the offset or 
+	 *               index of a document in a set, or the name of a field in an
+	 *               individual document.
+	 * @return boolean Result.
+	 */
 	public function offsetExists($offset) {
 		return ($this->offsetGet($offset) !== null);
 	}

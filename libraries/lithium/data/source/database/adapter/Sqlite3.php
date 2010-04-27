@@ -83,6 +83,11 @@ class Sqlite3 extends \lithium\data\source\Database {
 		return $this->_isConnected;
 	}
 
+	/**
+	 * Disconnects the adapter from the database.
+	 *
+	 * @return boolean True on success, else false.
+	 */
 	public function disconnect() {
 		if ($this->_isConnected) {
 			$this->_isConnected = !$this->connection->close();
@@ -91,6 +96,13 @@ class Sqlite3 extends \lithium\data\source\Database {
 		return true;
 	}
 
+	/**
+	 * Returns the list of tables in the currently-connected database.
+	 *
+	 * @param string $model The fully-name-spaced class name of the model object making the request.
+	 * @return array Returns an array of objects to which models can connect.
+	 * @filter This method can be filtered.
+	 */
 	public function entities($model = null) {
 		$config = $this->_config;
 		$method = function($self, $params, $chain) use ($config) {
@@ -99,6 +111,19 @@ class Sqlite3 extends \lithium\data\source\Database {
 		return $this->_filter(__METHOD__, compact('model'), $method);
 	}
 
+	/**
+	 * Gets the column schema for a given Sqlite3 table.
+	 *
+	 * @param mixed $entity Specifies the table name for which the schema should be returned, or
+	 *        the class name of the model object requesting the schema, in which case the model
+	 *        class will be queried for the correct table name.
+	 * @param array $meta
+	 * @return array Returns an associative array describing the given table's schema, where the
+	 *         array keys are the available fields, and the values are arrays describing each
+	 *         field, containing the following keys:
+	 *         - `'type'`: The field type name
+	 * @filter This method can be filtered.
+	 */
 	public function describe($entity, $meta = array()) {
 		$params = compact('entity', 'meta');
 		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) {
@@ -122,9 +147,22 @@ class Sqlite3 extends \lithium\data\source\Database {
 		});
 	}
 
+	/**
+	 * Get the last insert id from the database.
+	 *
+	 * @param \lithium\data\model\Query $context The given query.
+	 * @return void
+	 */
 	protected function _insertId($query) {
 	}
 
+	/**
+	 * Gets or sets the encoding for the connection.
+	 *
+	 * @param $encoding
+	 * @return boolean|string If setting the encoding; returns true on success, else false.
+	 *         When getting, returns the encoding.
+	 */
 	public function encoding($encoding = null) {
 		$encodingMap = array('UTF-8' => 'utf8');
 
@@ -137,6 +175,14 @@ class Sqlite3 extends \lithium\data\source\Database {
 		return $this->connection->querySingle("PRAGMA encoding");
 	}
 
+	/**
+	 * Handle the result.
+	 *
+	 * @param string $type next|close The current step in the iteration.
+	 * @param mixed $resource The result resource returned from the database.
+	 * @param \lithium\data\model\Query $context The given query.
+	 * @return mixed Result
+	 */
 	public function result($type, $resource, $context) {
 		if (!($resource instanceof SQLite3Result)) {
 			return null;
@@ -157,6 +203,14 @@ class Sqlite3 extends \lithium\data\source\Database {
 		return $result;
 	}
 
+	/**
+	 * Converts a given value into the proper type based on a given schema definition.
+	 *
+	 * @see \lithium\data\source\Database::schema()
+	 * @param mixed $value The value to be converted. Arrays will be recursively converted.
+	 * @param array $schema Formatted array from `\lithium\data\source\Database::schema()`
+	 * @return mixed Value with converted type.
+	 */
 	public function value($value, array $schema = array()) {
 		if (is_array($value)) {
 			return parent::value($value, $schema);
@@ -211,6 +265,14 @@ class Sqlite3 extends \lithium\data\source\Database {
 		return $name;
 	}
 
+	/**
+	 * Execute a given query.
+ 	 *
+ 	 * @see \lithium\data\source\Database::renderCommand()
+	 * @param string $sql The sql string to execute
+	 * @param array $options No available options.
+	 * @return resource
+	 */
 	protected function _execute($sql, array $options = array()) {
 		$params = compact('sql', 'options');
 		$conn =& $this->connection;
