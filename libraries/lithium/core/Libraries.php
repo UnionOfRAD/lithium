@@ -649,6 +649,14 @@ class Libraries {
 		return $classes;
 	}
 
+	/**
+	 * Helper function for returning known paths given a certain type.
+	 *
+	 * @see lithium\core\Libraries::$_paths
+	 * @param string $type Path type (specified in $_paths).
+	 * @param string $params Path parameters.
+	 * @return string Valid path name.
+	 */
 	protected static function _locatePath($type, $params) {
 		if (!isset(static::$_paths[$type])) {
 			return;

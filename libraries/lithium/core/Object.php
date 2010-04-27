@@ -64,6 +64,12 @@ class Object {
 	 */
 	protected $_methodFilters = array();
 
+	/**
+	 * Parents of the current class.
+	 *
+	 * @see lithium\core\Object::_parents()
+	 * @var array
+	 */
 	protected static $_parents = array();
 
 	/**
