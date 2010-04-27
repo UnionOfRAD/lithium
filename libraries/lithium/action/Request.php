@@ -27,14 +27,14 @@ use \lithium\util\Validator;
 class Request extends \lithium\core\Object {
 
 	/**
-	 * current url of request
+	 * Current url of request.
 	 *
 	 * @var string
 	 */
 	public $url = null;
 
 	/**
-	 * params for request
+	 * Params for request.
 	 *
 	 * @var array
 	 */
@@ -48,21 +48,21 @@ class Request extends \lithium\core\Object {
 	public $persist = array();
 
 	/**
-	 * POST data
+	 * POST data.
 	 *
 	 * @var data
 	 */
 	public $data = array();
 
 	/**
-	 * GET data
+	 * GET data.
 	 *
 	 * @var string
 	 */
 	public $query = array();
 
 	/**
-	 * base path
+	 * Base path.
 	 *
 	 * @var string
 	 */
@@ -77,22 +77,24 @@ class Request extends \lithium\core\Object {
 	protected $_env = array();
 
 	/**
-	 * request type
+	 * Request type.
 	 *
+	 * @see lithium\action\Request::$_detectors
 	 * @var string
 	 */
 	protected $_type = null;
 
 	/**
-	 * classes used
+	 * Classes used by `Request`.
 	 *
 	 * @var array
 	 */
 	protected $_classes = array('media' => '\lithium\net\http\Media');
 
 	/**
-	 * options used to detect request type
+	 * Options used to detect request type.
 	 *
+	 * @see lithium\action\Request::$_type
 	 * @var string
 	 */
 	protected $_detectors = array(

@@ -269,6 +269,14 @@ class Inspector extends \lithium\core\StaticObject {
 		return $result;
 	}
 
+	/**
+	 * Returns various information on the properties of an object.
+	 *
+	 * @param mixed $class A string class name or an object instance, from which to get methods.
+	 * @param array $options Set of options:
+	 *        -'self': If true (default), only returns properties defined in `$class`,
+	 *         excluding properties from inherited classes.
+	 */
 	public static function properties($class, array $options = array()) {
 		$defaults = array('properties' => array(), 'self' => true);
 		$options += $defaults;
@@ -498,6 +506,13 @@ class Inspector extends \lithium\core\StaticObject {
 		return new static::$_classes['collection'](compact('items'));
 	}
 
+	/**
+	 * Helper method to determine if a class applies to a list of modifiers.
+	 *
+	 * @param string $inspector ReflectionClass instance.
+	 * @param string $list List of modifiers to test.
+	 * @return boolean Test result.
+	 */
 	protected static function _modifiers($inspector, $list = array()) {
 		$list = $list ?: array('public', 'private', 'protected', 'abstract', 'final', 'static');
 		return array_filter($list, function($modifier) use ($inspector) {

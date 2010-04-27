@@ -37,6 +37,18 @@ class Parser extends \lithium\core\StaticObject {
 		return $token[($options['id']) ? 'id' : 'name'];
 	}
 
+	/**
+	 * Splits the provided `$code` into PHP language tokens.
+	 *
+	 * @param string $code Source code to be tokenized.
+	 * @param array $options Options consists of:
+	 *        -'wrap': Boolean indicating whether or not to wrap the supplied
+	 *          code in PHP tags.
+	 *        -'ignore': An array containing PHP language tokens to ignore.
+	 *        -'include': If supplied, an array of the only language tokens
+	 *         to include in the output.
+	 * @return array An array of tokens in the supplied source code.
+	 */
 	public static function tokenize($code, array $options = array()) {
 		$defaults = array('wrap' => true, 'ignore' => array(), 'include' => array());
 		$options += $defaults;
@@ -196,6 +208,17 @@ class Parser extends \lithium\core\StaticObject {
 		return $results;
 	}
 
+	/**
+	 * Token pattern matching.
+	 *
+	 * @param string $code Source code to be analyzed.
+	 * @param string $parameters An array containing token patterns to be matched.
+	 * @param array $options The list of options to be used when matching `$code`:
+	 *              - 'ignore': An array of language tokens to ignore.
+	 *              - 'return': If set to 'content' returns an array of 
+	 *                matching tokens.
+	 * @return array Array of matching tokens.
+	 */
 	public static function match($code, $parameters, array $options = array()) {
 		$defaults = array('ignore' => array('T_WHITESPACE'), 'return' => true);
 		$options += $defaults;
@@ -228,6 +251,13 @@ class Parser extends \lithium\core\StaticObject {
 		return $results;
 	}
 
+	/**
+	 * Compares two PHP language tokens.
+	 *
+	 * @param array $pattern Pattern token.
+	 * @param array $token Token to be compared.
+	 * @return boolean Match result.
+	 */
 	public static function matchToken($pattern, $token) {
 		if ($pattern['name'] != $token['name']) {
 			return false;
@@ -252,6 +282,13 @@ class Parser extends \lithium\core\StaticObject {
 		return false;
 	}
 
+	/**
+	 * Helper function to normalize parameters for token matching.
+	 *
+	 * @see lithium\analysis\Parser::match()
+	 * @param array $parameters Params to be normalized.
+	 * @return array Normalized parameters.
+	 */
 	protected static function _prepareMatchParams($parameters) {
 		foreach (Set::normalize($parameters) as $token => $scope) {
 			if (strpos($token, 'T_') !== 0) {

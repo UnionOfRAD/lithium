@@ -34,6 +34,11 @@ use \lithium\util\String;
  */
 class Cache extends \lithium\core\Object {
 
+	/**
+	 * Classes used by `Cache`.
+	 *
+	 * @var array
+	 */
 	protected $_classes = array(
 		'cache' => '\lithium\storage\Cache'
 	);

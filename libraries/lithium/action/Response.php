@@ -23,6 +23,11 @@ use \Exception;
  */
 class Response extends \lithium\net\http\Response {
 
+	/**
+	 * Classes used by Response.
+	 * 
+	 * @var array 
+	 */
 	protected $_classes = array('router' => '\lithium\net\http\Router');
 
 	public function __construct(array $config = array()) {

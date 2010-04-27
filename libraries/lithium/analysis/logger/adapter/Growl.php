@@ -90,6 +90,13 @@ class Growl extends \lithium\core\Object {
 		parent::__construct($config + $defaults);
 	}
 
+	/**
+	 * Writes `$message` to a new Growl notification.
+	 *
+	 * @param string $type Not used (all notifications are of the same type).
+	 * @param string $message Message to be shown.
+	 * @return boolean `True` on successful write, `false` otherwise.
+	 */
 	public function write($type, $message) {
 		if (!$this->_register()) {
 
@@ -101,6 +108,15 @@ class Growl extends \lithium\core\Object {
 		};
 	}
 
+	/**
+	 * Posts a new notification to the Growl server.
+	 *
+	 * @param string $description Message to be displayed.
+	 * @param array $options Options consists of:
+	 *        -'title': The title of the displayed notification. Displays the
+	 *         name of the application's parent folder by default.
+	 * @return boolean `True` on successful write, `false` otherwise.
+	 */
 	public function notify($description = '', $options = array()) {
 		if (!$this->_register()) {
 			return false;
@@ -130,6 +146,11 @@ class Growl extends \lithium\core\Object {
 		return true;
 	}
 
+	/**
+	 * Growl server connection registration and initialization.
+	 *
+	 * @return boolean `True` on successful write, `false` otherwise.
+	 */
 	protected function _register() {
 		if ($this->_registered) {
 			return true;
