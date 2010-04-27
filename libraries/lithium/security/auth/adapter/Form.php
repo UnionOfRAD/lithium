@@ -232,6 +232,12 @@ class Form extends \lithium\core\Object {
 		$this->_model = Libraries::locate('models', $this->_model);
 	}
 
+	/**
+	 * Calls each registered callback, by field name.
+	 *
+	 * @param string $data Keyed form data.
+	 * @return mixed Callback result.
+	 */
 	protected function _filters($data) {
 		$result = array();
 
