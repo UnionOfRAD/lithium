@@ -33,8 +33,19 @@ use \lithium\util\Collection;
  */
 class Router extends \lithium\core\StaticObject {
 
+	/**
+	 * An array of loaded lithium\net\http\Route objects used to match Request objects against.
+	 *
+	 * @var array
+	 */
 	protected static $_configurations = array();
 
+	/**
+	 * Classes used by `Router`.
+	 *
+	 * @package default
+	 * @author John David Anderson
+	 */
 	protected static $_classes = array(
 		'route' => '\lithium\net\http\Route'
 	);
@@ -148,6 +159,12 @@ class Router extends \lithium\core\StaticObject {
 		}
 	}
 
+	/**
+	 * Returns a route from the loaded configurations, by name.
+	 *
+	 * @param string $route Name of the route to request.
+	 * @return lithium\net\http\Route 
+	 */
 	public static function get($route = null) {
 		if ($route === null) {
 			return static::$_configurations;
@@ -164,6 +181,13 @@ class Router extends \lithium\core\StaticObject {
 		static::$_configurations = array();
 	}
 
+	/**
+	 * Helper function for taking a path string and parsing it into a controller and action array.
+	 *
+	 * @param string $path Path string to parse.
+	 * @param boolean $context 
+	 * @return array
+	 */
 	protected static function _parseString($path, $context) {
 		if (!preg_match('/^[A-Za-z0-9_]+::[A-Za-z0-9_]+$/', $path)) {
 			$base = $context ? $context->env('base') : '';

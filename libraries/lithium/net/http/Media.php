@@ -446,6 +446,13 @@ class Media extends \lithium\core\StaticObject {
 		});
 	}
 
+	/**
+	 * Helper method for listing registered media types. Returns all types, or a single 
+	 * content type if a specific type is specified.
+	 *
+	 * @param string $type Type to return.
+	 * @return mixed Array of types, or single type requested.
+	 */
 	protected static function _types($type = null) {
 		$types = static::$_types + array(
 			'atom'         => 'application/atom+xml',
@@ -466,6 +473,13 @@ class Media extends \lithium\core\StaticObject {
 		return $types;
 	}
 
+	/**
+	 * Helper method for listing registered type handlers. Returns all handlers, or the
+	 * handler for a specific media type, if requested.
+	 *
+	 * @param string $type The type of handler to return.
+	 * @return mixed Array of all handlers, or the handler for a specific type.
+	 */
 	protected static function _handlers($type = null) {
 		$handlers = static::$_handlers + array(
 			'default' => array(
@@ -502,6 +516,13 @@ class Media extends \lithium\core\StaticObject {
 		return $handlers;
 	}
 
+	/**
+	 * Helper method to list all asset paths, or the path for a single type.
+	 *
+	 * @param string $type The type you wish to get paths for.
+	 * @return mixed An array of all paths, or a single array of paths for the
+	 *               given type.
+	 */
 	protected static function _assets($type = null) {
 		$assets = static::$_assets + array(
 			'js' => array('suffix' => '.js', 'filter' => null, 'path' => array(

@@ -76,6 +76,12 @@ class Route extends \lithium\core\Object {
 	 */
 	protected $_pattern = '';
 
+	/**
+	 * An array of route parameter names (i.e. {:foo}) that appear in the URL template. 
+	 *
+	 * @var array
+	 * @see lithium\net\http\Route::$_template
+	 */
 	protected $_keys = array();
 
 	/**
@@ -89,10 +95,28 @@ class Route extends \lithium\core\Object {
 	 */
 	protected $_params = array();
 
+	/**
+	 * The array of values that appear in the second parameter of the array, which are not present 
+	 * in the URL template.
+	 *
+	 * @var array
+	 */
 	protected $_match = array();
 
+	/**
+	 * The default values for the keys present in the URL template.
+	 *
+	 * @var array
+	 * @see lithium\net\http\Route::$_template
+	 * @see lithium\net\http\Route::$_keys
+	 */
 	protected $_defaults = array();
 
+	/**
+	 * An array of regular expression patterns used in route matching.
+	 *
+	 * @var array
+	 */
 	protected $_subPatterns = array();
 
 	/**
@@ -116,6 +140,11 @@ class Route extends \lithium\core\Object {
 	 */
 	protected $_handler = null;
 
+	/**
+	 * Auto configuration properties.
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array(
 		'template', 'pattern', 'keys', 'params', 'match',
 		'defaults', 'subPatterns', 'persist', 'handler'

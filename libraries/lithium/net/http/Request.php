@@ -171,6 +171,14 @@ class Request extends \lithium\net\http\Message {
 		return "?" . $this->params = substr($query, 0, -1);
 	}
 
+	/**
+	 * Converts the data in the record set to a different format, i.e. an array. Available
+	 * options: array, url, context, or string.
+	 *
+	 * @param string $format Format to convert to.
+	 * @param array $options
+	 * @return mixed
+	 */
 	public function to($format, array $options = array()) {
 		switch ($format) {
 			case 'array':
