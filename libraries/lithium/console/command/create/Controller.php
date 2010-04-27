@@ -11,8 +11,19 @@ namespace lithium\console\command\create;
 use \lithium\core\Libraries;
 use \lithium\util\Inflector;
 
+/**
+ * Creates a Lithium controller in the \app\controllers namespace.
+ *
+ */
 class Controller extends \lithium\console\command\Create {
 
+	/**
+	 * Generate a new controller by name.
+	 *
+	 * @param string $name Controller name.
+	 * @param string $null 
+	 * @return void
+	 */
 	public function run($name = null, $null = null) {
 		$library = Libraries::get($this->library);
 		if (empty($library['prefix'])) {

@@ -10,8 +10,18 @@ namespace lithium\console\command\create;
 
 use \lithium\core\Libraries;
 
+/**
+ * Creates a new Lithium model in the \app\models namespace.
+ *
+ */
 class Model extends \lithium\console\command\Create {
 
+	/**
+	 * Creates a new model by name.
+	 *
+	 * @param string $name Model name.
+	 * @param string $null 
+	 */
 	public function run($name = null, $null = null) {
 		$library = Libraries::get($this->library);
 		if (empty($library['prefix'])) {
