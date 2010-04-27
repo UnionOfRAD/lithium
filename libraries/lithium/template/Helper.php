@@ -27,8 +27,19 @@ abstract class Helper extends \lithium\core\Object {
 	 */
 	protected $_strings = array();
 
+	/**
+	 * The Renderer object this Helper is bound to.
+	 *
+	 * @var lithium\template\view\Renderer
+	 * @see lithium\template\view\Renderer
+	 */
 	protected $_context = null;
 
+	/**
+	 * Auto configuration properties.
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array('classes' => 'merge', 'context');
 
 	/**

@@ -503,6 +503,14 @@ class Form extends \lithium\template\Helper {
 		return $this->_render(__METHOD__, $template, compact('content', 'options'));
 	}
 
+	/**
+	 * Builds the defaults array for a method by name, according to the config.
+	 *
+	 * @param string $method The name of the method to create defaults for.
+	 * @param string $name The `$name` supplied to the original method.
+	 * @param string $options `$options` from the original method.
+	 * @return array Defaults array contents.
+	 */
 	protected function _defaults($method, $name, $options) {
 		$methodConfig = isset($this->_config[$method]) ? $this->_config[$method] : array();
 		$options += $methodConfig + $this->_config['base'];
