@@ -283,23 +283,6 @@ class HtmlTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests generating images with links wrapping them
-	 *
-	 * @return void
-	 */
-	public function testImageLinking() {
-		$this->skipIf(true, "Not implemented");
-
-		$result = $this->html->image('test.gif', array('url' => '#'));
-		$expected = array(
-			'a' => array('href' => '#'),
-			'img' => array('src' => 'regex:/img\/test\.gif\?\d*/', 'alt' => ''),
-			'/a'
-		);
-		$this->assertTags($result, $expected);
-	}
-
-	/**
 	 * Tests generating image tags
 	 *
 	 * @return void
