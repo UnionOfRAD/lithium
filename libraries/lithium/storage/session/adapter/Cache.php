@@ -41,6 +41,12 @@ namespace lithium\storage\session\adapter;
  */
 class Cache extends \lithium\core\Object {
 
+	/**
+	 * Classes used by `Cache`.
+	 *
+	 * @package default
+	 * @author John David Anderson
+	 */
 	protected $_classes = array(
 		'cache' => '\lithium\storage\Cache'
 	);
@@ -72,6 +78,14 @@ class Cache extends \lithium\core\Object {
 		return ($id = session_id()) == '' ? null : $id;
 	}
 
+	/**
+	 * Write a value to the session.
+	 *
+	 * @param string $key Key of the item to be stored.
+	 * @param mixed $value The value to be stored.
+	 * @param array $options Options array.
+	 * @return boolean True on successful write, false otherwise.
+	 */
 	public function write($key, $value = null, array $options = array()) {
 		$config = $this->_config;
 		$classes = $this->_classes;
