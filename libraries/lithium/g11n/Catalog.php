@@ -36,6 +36,12 @@ class Catalog extends \lithium\core\Adaptable {
 	 */
 	protected static $_adapters = 'adapter.g11n.catalog';
 
+	/**
+	 * Sets configurations for this Adaptable implementation.
+	 *
+	 * @param array $config Configurations, indexed by name.
+	 * @return object|void `Collection` of configurations or void if setting configurations.
+	 */
 	public static function config($config = null) {
 		$defaults = array('scope' => null);
 

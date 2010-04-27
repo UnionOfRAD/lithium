@@ -75,6 +75,14 @@ class Php extends \lithium\g11n\catalog\Adapter {
 		}
 	}
 
+	/**
+	 * Reads data.
+	 *
+	 * @param string $category A category.
+	 * @param string $locale A locale identifier.
+	 * @param string $scope The scope for the current operation.
+	 * @return array|void
+	 */
 	public function read($category, $locale, $scope) {
 		$path = $this->_config['path'];
 		$file = $this->_file($category, $locale, $scope);
@@ -88,6 +96,14 @@ class Php extends \lithium\g11n\catalog\Adapter {
 		return $data;
 	}
 
+	/**
+	 * Helper method for transforming a category, locale and scope into a filename.
+	 *
+	 * @param string $category Category name.
+	 * @param string $locale Locale identifier.
+	 * @param string $scope Current operation scope.
+	 * @return string Filename.
+	 */
 	protected function _file($category, $locale, $scope) {
 		$path = $this->_config['path'];
 		$scope = $scope ?: 'default';
