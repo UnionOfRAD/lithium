@@ -1,4 +1,5 @@
-﻿#### Special syntax
+﻿
+#### Special syntax
 
 Views have a special syntax for outputting escaped text. The standard way to
 output escaped text in your views from Lithium is as follows: {{{
