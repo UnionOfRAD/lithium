@@ -260,7 +260,7 @@ class Model extends \lithium\core\StaticObject {
 	 * themselves as base models using the following code:
 	 * {{{
 	 * public function __init() {
-	 * 	static::_isBase();
+	 * 	static::_isBase(__CLASS__, true);
 	 * 	parent::__init();
 	 * }
 	 * }}}
@@ -534,14 +534,12 @@ class Model extends \lithium\core\StaticObject {
 			return $values->{$key};
 		}
 
-		if (empty($values)) {
+		if (!$values) {
 			return $key;
 		}
-		if (is_array($key)) {
-			$scope = array_combine($key, array_fill(0, count($key), null));
-			return array_intersect_key($values, $scope);
-		}
-		return isset($values[$key]) ? $values[$key] : null;
+		$key = (array) $key;
+		$scope = array_combine($key, array_fill(0, count($key), null));
+		return array_intersect_key($values, $scope);
 	}
 
 	/**

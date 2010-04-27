@@ -230,7 +230,10 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testCustomFindMethods() {
-		// print_r(MockPost::findFirstById());
+		$result = MockPost::findFirstById(5);
+		$query = $result['query'];
+		$this->assertEqual(array('id' => 5), $query->conditions());
+		$this->assertEqual(1, $query->limit());
 	}
 
 	public function testKeyGeneration() {
@@ -238,7 +241,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual(array('post_id', 'tag_id'), MockTagging::key());
 
 		$result = MockComment::key(array('comment_id' => 5, 'body' => 'This is a comment'));
-		$this->assertEqual(5, $result);
+		$this->assertEqual(array('comment_id' => 5), $result);
 
 		$result = MockTagging::key(array(
 			'post_id' => 2,
