@@ -26,10 +26,15 @@ use \lithium\util\Collection;
  *
  * Not only would that correctly route all requests for `/login` to `UsersController::index()`, but
  * any time the framework generated a route with matching parameters, `Router` would return the
- * correct short URL. This allows you to keep your application's URL structure nicely decoupled
- * from the underlying software design.
+ * correct short URL.
  *
- * For more information on parsing and generating URLs, see the `parse()` and `match()` methods.
+ * While most framework components that work with URLs (and utilize routing) handle calling the
+ * `Router` directly (i.e. controllers doing redirects, or helpers generating links), if you have a
+ * scenario where you need to call the `Router` directly, you can use the `match()` method.
+ *
+ * This allows you to keep your application's URL structure nicely decoupled from the underlying
+ * software design. For more information on parsing and generating URLs, see the `parse()` and
+ * `match()` methods.
  */
 class Router extends \lithium\core\StaticObject {
 
@@ -119,11 +124,52 @@ class Router extends \lithium\core\StaticObject {
 
 	/**
 	 * Attempts to match an array of route parameters (i.e. `'controller'`, `'action'`, etc.)
-	 * against a connected `Route` object.
+	 * against a connected `Route` object. For example, given the following route:
 	 *
-	 * @param array $options
-	 * @param object $context
-	 * @return string
+	 * {{{
+	 * Router::connect('/login', array('controller' => 'users', 'action' => 'login'));
+	 * }}}
+	 *
+	 * This will match:
+	 * {{{
+	 * $url = Router::match(array('controller' => 'users', 'action' => 'login'));
+	 * // returns /login
+	 * }}}
+	 *
+	 * For URLs templates with no insert parameters (i.e. elements like `{:id}` that are replaced
+	 * with a value), all parameters must match exactly as they appear in the route parameters.
+	 *
+	 * Alternatively to using a full array, you can specify routes using a more compact syntax. The
+	 * above example can be written as:
+	 *
+	 * {{{ $url = Router::match('User::login'); // still returns /login }}}
+	 *
+	 * You can combine this with more complicated routes; for example:
+	 * {{{
+	 * Router::connect('/posts/{:id:\d+}', array('controller' => 'posts', 'action' => 'view'));
+	 * }}}
+	 *
+	 * This will match:
+	 * {{{
+	 * $url = Router::match(array('controller' => 'posts', 'action' => 'view', 'id' => '1138'));
+	 * // returns /posts/1138
+	 * }}}
+	 *
+	 * Again, you can specify the same URL with a more compact syntax, as in the following:
+	 * {{{
+	 * $url = Router::match(array('Posts::view', 'id' => '1138'));
+	 * // again, returns /posts/1138
+	 * }}}
+	 *
+	 * You can use either syntax anywhere a URL is accepted, i.e.
+	 * `lithium\action\Controller::redirect()`, or `lithium\template\helper\Html::link()`.
+	 *
+	 * @param array $options Array of options to match to a URL. Optionally, this can be a string
+	 *              containing a manually generated URL.
+	 * @param object $context An instance of `lithium\action\Request`. This supplies the context for
+	 *               any persistent parameters, as well as the base URL for the application.
+	 * @return string Returns a generated URL, based on the URL template of the matched route, and
+	 *         prefixed with the base URL of the application.
 	 */
 	public static function match($options = array(), $context = null) {
 		if (is_string($path = $options)) {
