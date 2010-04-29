@@ -109,6 +109,9 @@ class Group extends \lithium\util\Collection {
 		if (preg_match("/Test/", $test)) {
 			return array($test);
 		}
+		if (!trim($test, '\\') || strpos($test, '\\') === false) {
+			return array();
+		}
 		list($library, $path) = explode("\\", trim($test, '\\'), 2);
 
 		return (array) Libraries::find($library, array(

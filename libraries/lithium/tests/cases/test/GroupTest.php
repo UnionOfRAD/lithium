@@ -32,6 +32,14 @@ class GroupTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testAddEmpty() {
+		$group = new Group();
+		$group->add('');
+		$group->add('\\');
+		$group->add('foobar');
+		$this->assertFalse($group->items());
+	}
+
 	public function testAddByString() {
 		$group = new Group();
 		$result = $group->add('g11n');
