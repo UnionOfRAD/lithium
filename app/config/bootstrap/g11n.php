@@ -31,21 +31,16 @@ date_default_timezone_set('UTC');
  * globalization related settings.
  *
  * The environment settings are:
- * - `'locale'` The effective locale. Defaults to `'en'`.
- * - `'availableLocales'` Application locales available. Defaults to `array('en')`.
+ * - `'locale'` The effective locale.
+ * - `'locales'` Application locales available mapped to names. The available locales are used
+ *               to negotiate he effective locale, the names can be used i.e. when displaying
+ *               a menu for choosing the locale to users.
  */
-Environment::set('production', array(
-	'locale' => 'en',
-	'availableLocales' => array('en')
-));
-Environment::set('development', array(
-	'locale' => 'en',
-	'availableLocales' => array('en')
-));
-Environment::set('test', array(
-	'locale' => 'en',
-	'availableLocales' => array('en')
-));
+$locale = 'en';
+$locales = array('en' => 'English');
+Environment::set('production', compact('locale', 'locales'));
+Environment::set('development', compact('locale', 'locales'));
+Environment::set('test', array('locale' => 'en', 'locales' => array('en' => 'English')));
 
 /**
  * Globalization (g11n) catalog configuration.  The catalog allows for obtaining and
