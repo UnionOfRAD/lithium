@@ -88,6 +88,39 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testNestedKeyGetSet() {
+		$doc = new Document(array('data' => array(
+			'name' => 'Bob', 'location' => 'New York, NY', 'profile' => array(
+				'occupation' => 'Developer', 'likes' => 'PHP', 'dislikes' => 'Java'
+			)
+		)));
+
+		$expected = array('occupation' => 'Developer', 'likes' => 'PHP', 'dislikes' => 'Java');
+		$this->assertEqual($expected, $doc->profile->data());
+		$this->assertEqual('Java', $doc->profile->dislikes);
+		$this->assertEqual('Java', $doc->{'profile.dislikes'});
+		$this->assertNull($doc->{'profile.'});
+		$this->assertNull($doc->{'profile.foo'});
+		$this->assertNull($doc->{'profile.foo.bar'});
+
+		$doc->{'profile.dislikes'} = 'Crystal Reports';
+		$this->assertEqual('Crystal Reports', $doc->profile->dislikes);
+
+		$doc->{'profile.foo.bar'} = 'baz';
+		$this->assertTrue($doc->profile->foo instanceof Document);
+		$this->assertEqual(array('bar' => 'baz'), $doc->profile->foo->data());
+
+		$post = new Document(array('data' => array(
+			'title' => 'Blog Post',
+			'body' => 'Some post content.',
+			'meta' => array('tags' => array('foo', 'bar', 'baz'))
+		)));
+		$this->assertEqual(array('foo', 'bar', 'baz'), $post->meta->tags);
+
+		$post->{'meta.tags'}[] = 'dib';
+		$this->assertEqual(array('foo', 'bar', 'baz', 'dib'), $post->meta->tags);
+	}
+
 	public function testNoItems() {
 		$doc = new Document(array('items' => array()));
 		$result = $doc->id;
