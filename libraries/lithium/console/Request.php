@@ -103,6 +103,19 @@ class Request extends \lithium\core\Object {
 	}
 
 	/**
+	 * Get the value of a command line argument at a given key
+	 *
+	 * @param integer $key
+	 * @return mixed returns null if key does not exist or the value of the key in the args array
+	 */
+	public function args($key = 0) {
+		if (!empty($this->args[$key])) {
+			return $this->args[$key];
+		}
+		return null;
+	}
+
+	/**
 	 * Get environment variables.
 	 *
 	 * @param string $key
