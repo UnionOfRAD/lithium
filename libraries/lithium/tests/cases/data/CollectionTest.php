@@ -9,7 +9,16 @@
 
 namespace lithium\tests\cases\data;
 
+use \lithium\data\collection\Document;
+
 class CollectionTest extends \lithium\test\Unit {
+
+	public function testGetStats() {
+		$collection = new Document(array('stats' => array('foo' => 'bar')));
+		$this->assertNull($collection->stats('bar'));
+		$this->assertEqual('bar', $collection->stats('foo'));
+		$this->assertEqual(array('foo' => 'bar'), $collection->stats());
+	}
 }
 
 ?>
