@@ -33,7 +33,7 @@ class Auth extends \lithium\core\Adaptable {
 	 *
 	 * @var object `Collection` of authentication configurations.
 	 */
-	protected static $_configurations;
+	protected static $_configurations = array();
 
 	/**
 	 * Libraries::locate() compatible path to adapters for this class.

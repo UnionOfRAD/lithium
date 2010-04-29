@@ -69,6 +69,11 @@ class AuthTest extends \lithium\test\Unit {
 		$this->assertFalse(Auth::set('test', $user, array('fail' => true)));
 		$this->assertFalse(Auth::check('test'));
 	}
+
+	public function testNoConfigurations() {
+		Auth::reset();
+		$this->assertIdentical(array(), Auth::config());
+	}
 }
 
 ?>
