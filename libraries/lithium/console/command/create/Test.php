@@ -22,33 +22,35 @@ use \lithium\analysis\Inspector;
  */
 class Test extends \lithium\console\command\Create {
 
-	protected function _namespace($name = null) {
-		return parent::_namespace($name) . "\\{$this->request->action}";
+	protected function _namespace($name = null, $options = array()) {
+		return parent::_namespace($this->request->action, array('prepend' => 'tests.cases.'));
 	}
 
 	protected function _use() {
-		$namespace = $this->_namespace($this->request->command);
-		$class = array_shift($this->request->params['args']);
+		$namespace = parent::_namespace($this->request->action);
+		$class = $this->request->args(0);
 		return "\\{$namespace}\\{$class}";
 	}
 
 	protected function _class() {
-		$class = array_shift($this->request->params['args']);
+		$class = $this->request->args(0);
 		return  $class . "Test";
 	}
 
 	protected function _methods() {
 		$use = $this->_use();
+		$path = Libraries::path($use);
 
-		if (!class_exists($use, false)) {
+		if (!file_exists($path)) {
 			return "";
 		}
-		$methods = array();
+		$methods = Inspector::methods($use, 'extents');
+		$testMethods = array();
 
-		foreach (array_keys(Inspector::methods($use, 'extents')) as $method) {
-			$methods[] = "\tpublic function test" . ucwords($method) . "() {}";
+		foreach (array_keys($methods) as $method) {
+			$testMethods[] = "\tpublic function test" . ucwords($method) . "() {}";
 		}
-		return join("\n", $methods);
+		return join("\n", $testMethods);
 	}
 }
 

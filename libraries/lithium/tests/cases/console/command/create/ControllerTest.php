@@ -42,12 +42,42 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->_cleanUp();
 	}
 
+	public function testClass() {
+		$this->request->params += array(
+			'command' => 'controller', 'action' => 'Posts'
+		);
+		$model = new Controller(array(
+			'request' => $this->request, 'classes' => $this->classes
+		));
+
+		$expected = 'PostsController';
+		$result = $model->invokeMethod('_class');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testUse() {
+		$this->request->params += array(
+			'command' => 'controller', 'action' => 'Posts'
+		);
+		$model = new Controller(array(
+			'request' => $this->request, 'classes' => $this->classes
+		));
+
+		$expected = '\\create_test\\models\\Post';
+		$result = $model->invokeMethod('_use');
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testRun() {
+		$this->request->params += array(
+			'command' => 'create', 'action' => 'run',
+			'args' => array('controller', 'Posts')
+		);
 		$controller = new Controller(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$controller->path = $this->_testPath;
-		$controller->run('Posts');
+		$controller->run('controller');
 		$expected = "PostsController created in create_test\\controllers.\n";
 		$result = $controller->response->output;
 		$this->assertEqual($expected, $result);

@@ -8,11 +8,12 @@
 
 namespace lithium\tests\cases\console\command\create;
 
-use \lithium\console\command\create\Model;
+use \lithium\console\command\Create;
+use \lithium\console\command\create\Mock;
 use \lithium\console\Request;
 use \lithium\core\Libraries;
 
-class ModelTest extends \lithium\test\Unit {
+class MockTest extends \lithium\test\Unit {
 
 	public $request;
 
@@ -22,7 +23,7 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function skip() {
 		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
-		$this->skipIf(!is_writable($this->_testPath), "{$this->_testPath} is not readable.");
+		$this->skipIf(!is_writable($this->_testPath), "{$this->_testPath} is not writable.");
 	}
 
 	public function setUp() {
@@ -42,16 +43,36 @@ class ModelTest extends \lithium\test\Unit {
 		$this->_cleanUp();
 	}
 
-	public function testClass() {
-		$this->request->params = array(
-			'command' => 'model', 'action' => 'Post'
+	public function testMockModel() {
+		$this->request->params += array(
+			'command' => 'create', 'action' => 'run',
+			'args' => array('mock', 'model', 'Post')
 		);
-		$model = new Model(array(
+		$mock = new Mock(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
+		$mock->path = $this->_testPath;
+		$mock->run('mock');
+		$expected = "MockPost created in create_test\\tests\\mocks\\models.\n";
+		$result = $mock->response->output;
+		$this->assertEqual($expected, $result);
 
-		$expected = 'Post';
-		$result = $model->invokeMethod('_class');
+		$expected = <<<'test'
+
+
+namespace create_test\tests\mocks\models;
+
+class MockPost extends \create_test\models\Post {
+
+
+}
+
+
+test;
+		$replace = array("<?php", "?>");
+		$result = str_replace($replace, '',
+			file_get_contents($this->_testPath . '/create_test/tests/mocks/models/MockPost.php')
+		);
 		$this->assertEqual($expected, $result);
 	}
 }

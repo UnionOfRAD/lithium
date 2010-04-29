@@ -35,7 +35,7 @@ class CreateTest extends \lithium\test\Unit {
 		Libraries::add('app', array('path' => $this->_testPath . '/new', 'bootstrap' => false));
 		Libraries::add('create_test', array('path' => $this->_testPath . '/create_test'));
 		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
-		$this->request->params = array('library' => 'create_test');
+		$this->request->params = array('library' => 'create_test', 'action' => null);
 	}
 
 	public function tearDown() {
@@ -53,12 +53,45 @@ class CreateTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testSaveWithApp() {
+	public function testNonExistentCommand() {
+		$create = new MockCreate(array('request' => $this->request));
 
+		$expected = false;
+		$result = $create->does_not_exist();
+		$this->assertEqual($expected, $result);
+
+		$expected = "does_not_exist not found.\n";
+		$result = $create->response->error;
+		$this->assertEqual($expected, $result);
+
+	}
+
+	public function testNonExistentCommandMethod() {
+		$create = new MockCreate(array('request' => $this->request));
+
+		$expected = false;
+		$result = $create->model('does_not_exist');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testNamespace() {
+		$create = new MockCreate(array('request' => $this->request));
+
+		$expected = 'create_test\\two';
+		$result = $create->invokeMethod('_namespace', array(
+			'one', array(
+				'spaces' => array('one' => 'two')
+			)
+		));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSaveWithApp() {
 		chdir($this->_testPath);
 		$this->request->params = array('library' => 'app');
 		$create = new MockCreate(array('request' => $this->request));
-		$result = $create->save('test', array(
+		$create->template = 'test';
+		$result = $create->save(array(
 			'namespace' => 'app\tests\cases\models',
 			'use' => 'app\models\Post',
 			'class' => 'PostTest',
@@ -75,7 +108,8 @@ class CreateTest extends \lithium\test\Unit {
 	public function testSaveWithLibrary() {
 		chdir($this->_testPath);
 		$create = new MockCreate(array('request' => $this->request));
-		$result = $create->save('test', array(
+		$create->template = 'test';
+		$result = $create->save(array(
 			'namespace' => 'create_test\tests\cases\models',
 			'use' => 'create_test\models\Post',
 			'class' => 'PostTest',
@@ -92,8 +126,25 @@ class CreateTest extends \lithium\test\Unit {
 	public function testRunWithoutCommand() {
 		$create = new MockCreate(array('request' => $this->request));
 
-		$expected = null;
+		$expected = false;
 		$result = $create->run();
+		$this->assertEqual($expected, $result);
+
+		$expected = "What would you like to create? (model/view/controller/test/mock) \n > ";
+		$result = $create->response->output;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testRunNotSaved() {
+		$this->request->params['library'] = 'not_here';
+		$create = new MockCreate(array('request' => $this->request));
+
+		$expected = null;
+		$result = $create->run('model');
+		$this->assertEqual($expected, $result);
+
+		$expected = "model could not be created.\n";
+		$result = $create->response->error;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -133,13 +184,13 @@ class CreateTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithTestOtherCommand() {
-		$create = new MockCreate(array('request' => $this->request));
 		$this->request->params = array(
 			'command' => 'create', 'action' => 'run',
 			'args' => array('test', 'something', 'Post'),
 			'library' => 'create_test'
 		);
-		$create->run('test', 'something');
+		$create = new MockCreate(array('request' => $this->request));
+		$create->run('test');
 
 		$expected = 'test';
 		$result = $create->request->params['command'];

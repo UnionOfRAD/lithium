@@ -17,61 +17,24 @@ use \lithium\util\Inflector;
  */
 class Controller extends \lithium\console\command\Create {
 
-	/**
-	 * Generate a new controller by name.
-	 *
-	 * @param string $name Controller name.
-	 * @param string $null 
-	 * @return void
-	 */
-	public function run($name = null, $null = null) {
-		$library = Libraries::get($this->library);
-		if (empty($library['prefix'])) {
-			return false;
-		}
-		$model = Inflector::classify($name);
-		$use = "\\{$library['prefix']}models\\{$model}";
-
-		$params = array(
-			'namespace' => "{$library['prefix']}controllers",
-			'use' => $use,
-			'class' => "{$name}Controller",
-			'model' => $model,
-			'singular' => Inflector::singularize(Inflector::underscore($name)),
-			'plural' => Inflector::pluralize(Inflector::underscore($name))
-		);
-
-		if ($this->_save($this->template, $params)) {
-			$this->out(
-				"{$params['class']} created in {$params['namespace']}."
-			);
-			return true;
-		}
-		return false;
+	protected function _use() {
+		return '\\' . $this->_namespace('model') . '\\' . $this->_model();
 	}
 
-	protected function _namespace($options = array()) {
-
+	protected function _class() {
+		return $this->request->action . 'Controller';
 	}
 
-	protected function _use($options = array()) {
-
+	protected function _plural() {
+		return Inflector::pluralize(Inflector::camelize($this->request->action, false));
 	}
 
-	protected function _class($options = array()) {
-
+	protected function _model() {
+		return Inflector::classify($this->request->action);
 	}
 
-	protected function _plural($options = array()) {
-
-	}
-
-	protected function _model($options = array()) {
-
-	}
-
-	protected function _singular($options = array()) {
-
+	protected function _singular() {
+		return Inflector::singularize(Inflector::camelize($this->request->action, false));
 	}
 }
 

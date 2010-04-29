@@ -43,13 +43,17 @@ class TestTest extends \lithium\test\Unit {
 		$this->_cleanUp();
 	}
 
-	public function testModel() {
+	public function testTestModel() {
+		$this->request->params += array(
+			'command' => 'create', 'action' => 'run',
+			'args' => array('test', 'model', 'Post')
+		);
 		$test = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$test->path = $this->_testPath;
-		$test->run('model', 'Post');
-		$expected = "PostTest created for Post in create_test\\tests\\cases\\models.\n";
+		$test->run('test');
+		$expected = "PostTest created in create_test\\tests\\cases\\models.\n";
 		$result = $test->response->output;
 		$this->assertEqual($expected, $result);
 
@@ -78,31 +82,51 @@ test;
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testMockModel() {
+	public function testTestModelWithMethods() {
+		mkdir($this->_testPath . '/create_test/models/', 0755, true);
+		file_put_contents($this->_testPath . '/create_test/models/Post.php',
+"<?php
+namespace create_test\models;
+
+class Post {
+	public function someMethod() {}
+}"
+);
+
+		$this->request->params += array(
+			'command' => 'create', 'action' => 'run',
+			'args' => array('test', 'model', 'Post')
+		);
 		$test = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$test->path = $this->_testPath;
-		$test->mock('model', 'Post');
-		$expected = "MockPost created for Post in create_test\\tests\\mocks\\models.\n";
+		$test->run('test');
+		$expected = "PostTest created in create_test\\tests\\cases\\models.\n";
 		$result = $test->response->output;
 		$this->assertEqual($expected, $result);
 
 		$expected = <<<'test'
 
 
-namespace create_test\tests\mocks\models;
+namespace create_test\tests\cases\models;
 
-class MockPost extends \create_test\models\Post {
+use \create_test\models\Post;
 
+class PostTest extends \lithium\test\Unit {
 
+	public function setUp() {}
+
+	public function tearDown() {}
+
+	public function testSomeMethod() {}
 }
 
 
 test;
 		$replace = array("<?php", "?>");
 		$result = str_replace($replace, '',
-			file_get_contents($this->_testPath . '/create_test/tests/mocks/models/MockPost.php')
+			file_get_contents($this->_testPath . '/create_test/tests/cases/models/PostTest.php')
 		);
 		$this->assertEqual($expected, $result);
 	}

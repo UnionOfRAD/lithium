@@ -8,6 +8,34 @@
 
 namespace lithium\console\command\create;
 
-class View extends \lithium\console\command\Create {}
+use lithium\util\Inflector;
+use lithium\util\String;
+
+class View extends \lithium\console\command\Create {
+
+	protected function _save($params = array()) {
+		$params['path'] = Inflector::underscore($this->request->action);
+		$params['file'] = $this->request->args(0);
+
+		$contents = $this->_template();
+		$result = String::insert($contents, $params);
+
+		if (!empty($this->_library['path'])) {
+			$path = $this->_library['path'] . "/views/{$params['path']}/{$params['file']}";
+			$file = str_replace('//', '/', "{$path}.php");
+			$directory = dirname($file);
+
+			if (!is_dir($directory)) {
+				if (!mkdir($directory, 0755, true)) {
+					return false;
+				}
+			}
+			$directory = str_replace($this->path . '/', '', $directory);
+			$this->out("{$params['file']}.php created in {$directory}.");
+			return file_put_contents($file, "<?php\n\n{$result}\n\n?>");
+		}
+		return false;
+	}
+}
 
 ?>

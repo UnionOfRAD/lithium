@@ -57,10 +57,8 @@ class Create extends \lithium\console\Command {
 	 */
 	protected function _init() {
 		parent::_init();
-		$this->template = (!$this->template && !empty($this->request->args[0]))
-			? $this->request->args[0] : null;
+		$this->template = $this->template ?: $this->request->args(0);
 		$defaults = array('prefix' => null, 'path' => null);
-		$this->library = $this->library ?: Libraries::get(true);
 		$this->_library = (array) Libraries::get($this->library) + $defaults;
 	}
 
@@ -78,8 +76,12 @@ class Create extends \lithium\console\Command {
 				$this->error("{$command} not found.");
 				return false;
 			}
+			$this->request->params['i'] = $this->i;
+			$this->request->params['template'] = $this->template;
+
 			$this->_commands[$command] = new $class(array(
-				'request' => $this->request->shift(2), 'classes'=> $this->_classes
+				'request' => $this->request->shift(2),
+				'classes'=> $this->_classes,
 			));
 		}
 		$command = $this->_commands[$command];
@@ -95,23 +97,27 @@ class Create extends \lithium\console\Command {
 	 * Run the create command. Takes `$command` and delegates to `$command::$method`
 	 *
 	 * @param string $command
-	 * @param string $method
-	 * @return void
+	 * @return boolean
 	 */
 	public function run($command = null) {
-		if (!$command || $this->i) {
-			return $this->interactive();
+		if (!$command) {
+			$command = $this->in('What would you like to create?', array(
+				'choices' => array('model', 'view', 'controller', 'test', 'mock')
+			));
+		}
+		if (!$command) {
+			return false;
 		}
 		$data = array();
-		$params = $this->params($command);
+
+		$params = $this->{$command}('params');
 
 		foreach ($params as $i => $param) {
 			if (!$data[$param] = $this->{$command}($param)) {
-				$data[$param] = !empty($this->request->args[$i]) ? $this->request->args[$i] : null;
+				$data[$param] = $this->request->args($i);
 			}
 		}
-		if ($this->_save($this->template, $data)) {
-			$this->out("{$data['class']} created in {$data['namespace']}.");
+		if ($this->_save($data)) {
 			return true;
 		}
 		$this->error("{$command} could not be created.");
@@ -121,10 +127,11 @@ class Create extends \lithium\console\Command {
 	/**
 	 * [-i] Ask questions and use answers to create.
 	 *
-	 * @return void
+	 * @return boolean
 	 */
 	public function interactive() {
-
+		$this->i = true;
+		return $this->run();
 	}
 
 	/**
@@ -132,11 +139,11 @@ class Create extends \lithium\console\Command {
 	 * corresponds to a method in the sub command. For example, a `{:namespace}` variable will
 	 * call the namespace method in the model command when `li3 create model Post` is called.
 	 *
-	 * @param string $template
 	 * @return array
 	 */
-	protected function params($template = null) {
-		$contents = $this->_template($template);
+	protected function _params() {
+		$contents = $this->_template();
+
 		if (empty($contents)) {
 			return array();
 		}
@@ -151,12 +158,10 @@ class Create extends \lithium\console\Command {
 	/**
 	 * Returns the contents of the template.
 	 *
-	 * @param string $name the name of the template
 	 * @return string
 	 */
-	protected function _template($name = null) {
-		$name = $this->template ? $this->template : $name;
-		$file = Libraries::locate('command.create.template', $name, array(
+	protected function _template() {
+		$file = Libraries::locate('command.create.template', $this->template, array(
 			'filter' => false, 'type' => 'file', 'suffix' => '.txt.php',
 		));
 		if (!$file || is_array($file)) {
@@ -169,48 +174,57 @@ class Create extends \lithium\console\Command {
 	 * Get the namespace.
 	 *
 	 * @param string $name
+	 * @param array $options
 	 * @return string
 	 */
-	protected function _namespace($name = null) {
-		$nameToSpace = array(
-			'model' => 'models', 'view' => 'views', 'controller' => 'controllers',
-			'command' => 'extensions.command', 'adapter' => 'extensions.adapter',
-			'helper' => 'extensions.helper'
+	protected function _namespace($name = null, $options  = array()) {
+		$name = $name ?: $this->request->command;
+		$defaults = array(
+			'prefix' => $this->_library['prefix'],
+			'prepend' => null,
+			'spaces' => array(
+				'model' => 'models', 'view' => 'views', 'controller' => 'controllers',
+				'command' => 'extensions.command', 'adapter' => 'extensions.adapter',
+				'helper' => 'extensions.helper'
+			)
 		);
-		if (isset($nameToSpace[$name])) {
-			$name = $nameToSpace[$name];
+		$options += $defaults;
+
+		if (isset($options['spaces'][$name])) {
+			$name = $options['spaces'][$name];
 		}
-		$name = str_replace('.', '\\', $name);
-		return $this->_library['prefix'] . $name;
+		return str_replace('.', '\\', $options['prefix'] . $options['prepend'] . $name);
 	}
 
 	/**
 	 * Save a template with the current params. Writes file to `Create::$path`.
 	 *
-	 * @param string $template
 	 * @param string $params
 	 * @return boolean
 	 */
-	protected function _save($template, $params = array()) {
-		$contents = $this->_template($template);
+	protected function _save($params = array()) {
+		$defaults = array('namespace' => null, 'class' => null);
+		$params += $defaults;
+		if (empty($params['class'])) {
+			return false;
+		}
+		$contents = $this->_template();
 		$result = String::insert($contents, $params);
 
-		if (!empty($this->_library['path'])) {
-			$path = $this->_library['path'] . str_replace(
-				array('\\', $this->library), array('/',''),
-				"\\{$params['namespace']}\\{$params['class']}"
-			);
-			$file = str_replace('//', '/', "{$path}.php");
-			$directory = dirname($file);
+		$path = $this->_library['path'] . str_replace(
+			array('\\', $this->library), array('/',''),
+			"{$params['namespace']}\\{$params['class']}"
+		);
+		$file = str_replace('//', '/', "{$path}.php");
+		$directory = dirname($file);
 
-			if (!is_dir($directory)) {
-				if (!mkdir($directory, 0755, true)) {
-					return false;
-				}
+		if (!is_dir($directory)) {
+			if (!mkdir($directory, 0755, true)) {
+				return false;
 			}
-			return file_put_contents($file, "<?php\n\n{$result}\n\n?>");
 		}
-		return false;
+		$this->out("{$params['class']} created in {$params['namespace']}.");
+		return file_put_contents($file, "<?php\n\n{$result}\n\n?>");
 	}
 }
 

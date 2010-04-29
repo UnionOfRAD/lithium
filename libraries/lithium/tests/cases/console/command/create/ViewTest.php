@@ -8,11 +8,12 @@
 
 namespace lithium\tests\cases\console\command\create;
 
-use \lithium\tests\mocks\console\command\create\MockController;
+use \lithium\console\command\Create;
+use \lithium\console\command\create\View;
 use \lithium\console\Request;
 use \lithium\core\Libraries;
 
-class ControllerTwoTest extends \lithium\test\Unit {
+class ViewTest extends \lithium\test\Unit {
 
 	public $request;
 
@@ -42,37 +43,23 @@ class ControllerTwoTest extends \lithium\test\Unit {
 		$this->_cleanUp();
 	}
 
-	public function testInit() {
-		$controller = new MockController(array(
+	public function testIndexView() {
+		$this->request->params += array(
+			'command' => 'create', 'action' => 'run',
+			'args' => array('view', 'Posts', 'index.html')
+		);
+		$view = new View(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$expected = array('namespace', 'use', 'class', 'plural', 'model', 'singular');
-		$result = $controller->parse('controller');
+		$view->path = $this->_testPath;
+		$view->run('view');
+		$expected = "index.html.php created in create_test/views/posts.\n";
+		$result = $view->response->output;
 		$this->assertEqual($expected, $result);
-	}
 
-	public function testNamespace() {
-
-	}
-
-	public function testUse() {
-
-	}
-
-	public function testClass() {
-
-	}
-
-	public function testPlural() {
-
-	}
-
-	public function testModel() {
-
-	}
-
-	public function testSingular() {
-
+		$expected = true;
+		$result = file_exists($this->_testPath . '/create_test/views/posts/index.html.php');
+		$this->assertEqual($expected, $result);
 	}
 }
 
