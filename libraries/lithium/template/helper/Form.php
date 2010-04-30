@@ -151,15 +151,34 @@ class Form extends \lithium\template\Helper {
 	 * $this->form->config(array('label' => array('class' => 'foo')));
 	 * }}}
 	 *
+	 * Note that this can be overridden on a case-by-case basis, and when overridding, values are
+	 * not merged or combined. Therefore, if you wanted a particular `<label />` to have both `foo`
+	 * and `bar` as classes, you would have to specify `'class' => 'foo bar'`.
+	 *
+	 * You can also use this method to change the string template that a method uses to render its
+	 * content. For example, the default template for rendering a checkbox is
+	 * `'<input type="checkbox" name="{:name}"{:options} />'`. However, suppose you implemented your
+	 * own custom UI elements, and you wanted to change the markup used, you could do the following:
+	 *
+	 * {{{
+	 * $this->form->config(array('templates' => array(
+	 * 	'checkbox' => '<div id="{:name}" class="ui-checkbox-element"{:options}></div>'
+	 * )));
+	 * }}}
+	 *
+	 * Now, for any calls to `$this->form->checkbox()`, your custom markup template will be applied.
+	 * This works for any `Form` method that renders HTML elements.
+	 *
 	 * @see lithium\template\helper\Form::$_templateMap
-	 * @param array $config An associative array where the keys are `Form` method names, and the
+	 * @param array $config An associative array where the keys are `Form` method names (or
+	 *              `'templates'`, to include a template-overriding sub-array), and the
 	 *              values are arrays of configuration options to be included in the `$options`
 	 *              parameter of each method specified.
 	 * @return array Returns an array containing the currently set per-method configurations, and
 	 *         an array of the currently set template overrides (in the `'templates'` array key).
 	 */
 	public function config(array $config = array()) {
-		if (empty($config)) {
+		if (!$config) {
 			return array('templates' => $this->_templateMap) + array_intersect_key(
 				$this->_config, array('base' => '', 'text' => '', 'textarea' => '')
 			);
@@ -289,8 +308,26 @@ class Form extends \lithium\template\Helper {
 	 * within a wrapping element.
 	 *
 	 * @param string $name The name of the field to render. If the form was bound to an object
-	 *               passed in `create()`, `$name` should be the field name of a
-	 * @param array $options Rendering options for the form field.
+	 *               passed in `create()`, `$name` should be the name of a field in that object.
+	 *               Otherwise, can be any arbitrary field name, as it will appear in POST data.
+	 * @param array $options Rendering options for the form field. The available options are as
+	 *              follows:
+	 *              - `'label'` _mixed_: A string or array defining the label text and / or
+	 *                parameters. By default, the label text is a human-friendly version of `$name`.
+	 *                However, you can specify the label manually as a string, or both the label
+	 *                text and options as an array, i.e.:
+	 *                `array('label text' => array('class' => 'foo', 'any' => 'other options'))`.
+	 *              - `'type'` _string_: The type of form field to render. Available default options
+	 *                are: `'text'`, `'textarea'`, `'select'`, `'checkbox'`, `'password'` or
+	 *                `'hidden'`, as well as any arbitrary type (i.e. HTML5 form fields).
+	 *              - `'template'` _string_: Defaults to `'template'`, but can be set to any named
+	 *                template string, or an arbitrary HTML fragment. For example, to change the
+	 *                default wrapper tag from `<div />` to `<li />`, you can pass the following:
+	 *                `'<li{:wrap}>{:label}{:input}{:error}</li>'`.
+	 *              - `'wrap'` _array_: An array of HTML attributes which will be embedded in the
+	 *                wrapper tag.
+	 *              - `list` _array_: If `'type'` is set to `'select'`, `'list'` is an array of
+	 *                key/value pairs representing the `$list` parameter of the `select()` method.
 	 * @return string Returns a form input (the input type is based on the `'type'` option), with
 	 *         label and error message, wrapped in a `<div />` element.
 	 */
@@ -334,7 +371,8 @@ class Form extends \lithium\template\Helper {
 	 * Generates an HTML `<input type="submit" />` object.
 	 *
 	 * @param string $title The title of the submit button.
-	 * @param array $options
+	 * @param array $options Any options passed are converted to HTML attributes within the
+	 *              `<input />` tag.
 	 * @return string Returns a submit `<input />` tag with the given title and HTML attributes.
 	 */
 	public function submit($title = null, array $options = array()) {
@@ -343,10 +381,13 @@ class Form extends \lithium\template\Helper {
 	}
 
 	/**
-	 * Generates an HTML `<textarea></textarea>` object.
+	 * Generates an HTML `<textarea>...</textarea>` object.
 	 *
 	 * @param string $name The name of the field.
-	 * @param array $options
+	 * @param array $options The options to be used when generating the `<textarea />` tag pair,
+	 *              which are as follows:
+	 *              - `'value'` _string_: The content value of the field.
+	 *              - Any other options specified are rendered as HTML attributes of the element.
 	 * @return string Returns a `<textarea>` tag with the given name and HTML attributes.
 	 */
 	public function textarea($name, array $options = array()) {
@@ -360,7 +401,7 @@ class Form extends \lithium\template\Helper {
 	 * Generates an HTML `<input type="text" />` object.
 	 *
 	 * @param string $name The name of the field.
-	 * @param array $options
+	 * @param array $options All options passed are rendered as HTML attributes.
 	 * @return string Returns a `<input />` tag with the given name and HTML attributes.
 	 */
 	public function text($name, array $options = array()) {
@@ -420,7 +461,9 @@ class Form extends \lithium\template\Helper {
 	 * Generates an HTML `<input type="checkbox" />` object.
 	 *
 	 * @param string $name The name of the field.
-	 * @param array $options
+	 * @param array $options Options to be used when generating the checkbox `<input />` element:
+	 *              - `'checked'` _boolean_: Whether or not the field should be checked by default.
+	 *              - Any other options specified are rendered as HTML attributes of the element.
 	 * @return string Returns a `<input />` tag with the given name and HTML attributes.
 	 */
 	public function checkbox($name, array $options = array()) {
@@ -437,7 +480,7 @@ class Form extends \lithium\template\Helper {
 	 * Generates an HTML `<input type="password" />` object.
 	 *
 	 * @param string $name The name of the field.
-	 * @param array $options
+	 * @param array $options An array of HTML attributes with which the field should be rendered.
 	 * @return string Returns a `<input />` tag with the given name and HTML attributes.
 	 */
 	public function password($name, array $options = array()) {
@@ -449,7 +492,7 @@ class Form extends \lithium\template\Helper {
 	 * Generates an HTML `<input type="hidden" />` object.
 	 *
 	 * @param string $name The name of the field.
-	 * @param array $options
+	 * @param array $options An array of HTML attributes with which the field should be rendered.
 	 * @return string Returns a `<input />` tag with the given name and HTML attributes.
 	 */
 	public function hidden($name, array $options = array()) {
@@ -462,7 +505,9 @@ class Form extends \lithium\template\Helper {
 	 *
 	 * @param string $name The name of the field that the label is for.
 	 * @param string $title The content inside the `<label></label>` object.
-	 * @param array $options
+	 * @param array $options Besides HTML attributes, this parameter allows one additional flag:
+	 *              - `'escape'` _boolean_: Defaults to `true`. Indicates whether the title of the
+	 *                label should be escaped. If `false`, it will be treated as raw HTML.
 	 * @return string Returns a `<label>` tag for the name and with HTML attributes.
 	 */
 	public function label($name, $title = null, array $options = array()) {
