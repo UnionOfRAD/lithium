@@ -22,7 +22,7 @@ class Controller extends \lithium\console\command\Create {
 	}
 
 	protected function _class() {
-		return $this->request->action . 'Controller';
+		return Inflector::camelize(Inflector::pluralize($this->request->action) . 'Controller');
 	}
 
 	protected function _plural() {

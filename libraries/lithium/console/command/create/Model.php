@@ -8,7 +8,7 @@
 
 namespace lithium\console\command\create;
 
-use \lithium\core\Libraries;
+use \lithium\util\Inflector;
 
 /**
  * Creates a new Lithium model in the \app\models namespace.
@@ -17,7 +17,7 @@ use \lithium\core\Libraries;
 class Model extends \lithium\console\command\Create {
 
 	protected function _class() {
-		return $this->request->action;
+		return Inflector::classify($this->request->action);
 	}
 }
 

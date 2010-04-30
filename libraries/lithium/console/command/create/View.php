@@ -30,9 +30,11 @@ class View extends \lithium\console\command\Create {
 					return false;
 				}
 			}
-			$directory = str_replace($this->path . '/', '', $directory);
-			$this->out("{$params['file']}.php created in {$directory}.");
-			return file_put_contents($file, "<?php\n\n{$result}\n\n?>");
+			$directory = str_replace($this->_library['path'] . '/', '', $directory);
+
+			if (file_put_contents($file, "<?php\n\n{$result}\n\n?>")) {
+				return "{$params['file']}.php created in {$directory}.";
+			}
 		}
 		return false;
 	}

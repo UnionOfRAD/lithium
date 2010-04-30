@@ -9,6 +9,7 @@
 namespace lithium\console\command;
 
 use \lithium\core\Libraries;
+use \lithium\util\Inflector;
 use \lithium\util\String;
 
 /**
@@ -57,40 +58,27 @@ class Create extends \lithium\console\Command {
 	 */
 	protected function _init() {
 		parent::_init();
-		$this->template = $this->template ?: $this->request->args(0);
+		$this->library = $this->library ?: true;
 		$defaults = array('prefix' => null, 'path' => null);
 		$this->_library = (array) Libraries::get($this->library) + $defaults;
 	}
 
 	/**
-	 * Magic method to call the appropriate sub-command and method.
+	 * Magic method to get an instance of a sub-command
 	 *
-	 * @param string $command The sub-command name. example: Model, Controller, Test
-	 * @param string $params
-	 * @return void
+	 * @param string $name the name of the sub-command to instantiate
+	 * @return object;
 	 */
-	public function __call($command, $params = array()) {
-		if (!isset($this->_commands[$command])) {
-			$class = Libraries::locate('command.create', $command);
-			if (!$class) {
-				$this->error("{$command} not found.");
-				return false;
-			}
+	public function __get($name) {
+		if ($class = Libraries::locate('command.create', $name)) {
 			$this->request->params['i'] = $this->i;
 			$this->request->params['template'] = $this->template;
 
-			$this->_commands[$command] = new $class(array(
-				'request' => $this->request->shift(2),
+			return new $class(array(
+				'request' => $this->request,
 				'classes'=> $this->_classes,
 			));
 		}
-		$command = $this->_commands[$command];
-		$method = "_" . array_shift($params);
-
-		if (!method_exists($command, $method)) {
-			return null;
-		}
-		return $command->invokeMethod($method, $params);
 	}
 
 	/**
@@ -100,6 +88,11 @@ class Create extends \lithium\console\Command {
 	 * @return boolean
 	 */
 	public function run($command = null) {
+		$this->template = $this->template ?: $command;
+
+		if ($command && !$this->request->args(1)) {
+			return $this->_default($command);
+		}
 		if (!$command) {
 			$command = $this->in('What would you like to create?', array(
 				'choices' => array('model', 'view', 'controller', 'test', 'mock')
@@ -108,16 +101,7 @@ class Create extends \lithium\console\Command {
 		if (!$command) {
 			return false;
 		}
-		$data = array();
-
-		$params = $this->{$command}('params');
-
-		foreach ($params as $i => $param) {
-			if (!$data[$param] = $this->{$command}($param)) {
-				$data[$param] = $this->request->args($i);
-			}
-		}
-		if ($this->_save($data)) {
+		if ($this->_execute($command)) {
 			return true;
 		}
 		$this->error("{$command} could not be created.");
@@ -132,6 +116,83 @@ class Create extends \lithium\console\Command {
 	public function interactive() {
 		$this->i = true;
 		return $this->run();
+	}
+
+	/**
+	 * Execute the given sub-command for the current request.
+	 *
+	 * @param string $command The sub-command name. example: Model, Controller, Test
+	 * @param string $params
+	 * @return void
+	 */
+	protected function _execute($command) {
+		$this->request->shift(2);
+
+		if (!$class = $this->{$command}) {
+			return false;
+		}
+		$data = array();
+		$params = $class->invokeMethod('_params');
+
+		foreach ($params as $i => $param) {
+			if (!$data[$param] = $class->invokeMethod("_{$param}")) {
+				$data[$param] = $this->request->args($i);
+			}
+		}
+		if ($message = $class->invokeMethod('_save', array($data))) {
+			$this->out($message);
+			return true;
+		}
+		return false;
+	}
+	/**
+	 * Run through the default set. model, controller, test model, test controller
+	 *
+	 * @param string $name class name to create
+	 * @return boolean
+	 */
+	protected function _default($name) {
+		$commands = array(
+			array('model', $name),
+			array('controller', $name),
+			array('test', 'model', $name),
+			array('test', 'controller', Inflector::pluralize($name))
+		);
+		foreach ($commands as $command) {
+			$this->template = $command[0];
+			$this->request->params['args'] = $command;
+
+			if (!$this->_execute($command[0])) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Get the namespace.
+	 *
+	 * @param string $name
+	 * @param array $options
+	 * @return string
+	 */
+	protected function _namespace($name = null, $options  = array()) {
+		$name = $name ?: $this->request->command;
+		$defaults = array(
+			'prefix' => $this->_library['prefix'],
+			'prepend' => null,
+			'spaces' => array(
+				'model' => 'models', 'view' => 'views', 'controller' => 'controllers',
+				'command' => 'extensions.command', 'adapter' => 'extensions.adapter',
+				'helper' => 'extensions.helper'
+			)
+		);
+		$options += $defaults;
+
+		if (isset($options['spaces'][$name])) {
+			$name = $options['spaces'][$name];
+		}
+		return str_replace('.', '\\', $options['prefix'] . $options['prepend'] . $name);
 	}
 
 	/**
@@ -171,32 +232,6 @@ class Create extends \lithium\console\Command {
 	}
 
 	/**
-	 * Get the namespace.
-	 *
-	 * @param string $name
-	 * @param array $options
-	 * @return string
-	 */
-	protected function _namespace($name = null, $options  = array()) {
-		$name = $name ?: $this->request->command;
-		$defaults = array(
-			'prefix' => $this->_library['prefix'],
-			'prepend' => null,
-			'spaces' => array(
-				'model' => 'models', 'view' => 'views', 'controller' => 'controllers',
-				'command' => 'extensions.command', 'adapter' => 'extensions.adapter',
-				'helper' => 'extensions.helper'
-			)
-		);
-		$options += $defaults;
-
-		if (isset($options['spaces'][$name])) {
-			$name = $options['spaces'][$name];
-		}
-		return str_replace('.', '\\', $options['prefix'] . $options['prepend'] . $name);
-	}
-
-	/**
 	 * Save a template with the current params. Writes file to `Create::$path`.
 	 *
 	 * @param string $params
@@ -205,7 +240,8 @@ class Create extends \lithium\console\Command {
 	protected function _save($params = array()) {
 		$defaults = array('namespace' => null, 'class' => null);
 		$params += $defaults;
-		if (empty($params['class'])) {
+
+		if (empty($params['class']) || empty($this->_library['path'])) {
 			return false;
 		}
 		$contents = $this->_template();
@@ -223,8 +259,10 @@ class Create extends \lithium\console\Command {
 				return false;
 			}
 		}
-		$this->out("{$params['class']} created in {$params['namespace']}.");
-		return file_put_contents($file, "<?php\n\n{$result}\n\n?>");
+		if (file_put_contents($file, "<?php\n\n{$result}\n\n?>")) {
+			return "{$params['class']} created in {$params['namespace']}.";
+		}
+		return false;
 	}
 }
 

@@ -51,9 +51,9 @@ class ViewTest extends \lithium\test\Unit {
 		$view = new View(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$view->path = $this->_testPath;
+
 		$view->run('view');
-		$expected = "index.html.php created in create_test/views/posts.\n";
+		$expected = "index.html.php created in views/posts.\n";
 		$result = $view->response->output;
 		$this->assertEqual($expected, $result);
 

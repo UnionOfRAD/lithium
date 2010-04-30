@@ -9,6 +9,7 @@
 namespace lithium\console\command\create;
 
 use \lithium\core\Libraries;
+use \lithium\util\Inflector;
 use \lithium\analysis\Inspector;
 
 /**
@@ -33,8 +34,15 @@ class Test extends \lithium\console\command\Create {
 	}
 
 	protected function _class() {
-		$class = $this->request->args(0);
-		return  $class . "Test";
+		$name = $this->request->args(0);
+		$type = $this->request->params['action'];
+		$this->request->params['action'] = $name;
+
+		if ($command = $this->{$type}) {
+			$name = $command->invokeMethod('_class');
+		}
+		$this->request->params['action'] = $type;
+		return  Inflector::classify("{$name}Test");
 	}
 
 	protected function _methods() {
@@ -44,7 +52,7 @@ class Test extends \lithium\console\command\Create {
 		if (!file_exists($path)) {
 			return "";
 		}
-		$methods = Inspector::methods($use, 'extents');
+		$methods = (array) Inspector::methods($use, 'extents');
 		$testMethods = array();
 
 		foreach (array_keys($methods) as $method) {
