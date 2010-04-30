@@ -144,6 +144,23 @@ class EnvironmentTest extends \lithium\test\Unit {
 		Environment::set($request);
 		$this->assertTrue(Environment::is('production'));
 	}
+
+	/**
+	 * Tests calling `get()` and `set()` with `true` as the envrionment name, to automatically
+	 * select the current environment.
+	 *
+	 * @return void
+	 */
+	public function testReadWriteWithDefaultEnvironment() {
+		Environment::set('development');
+		Environment::set(true, array('foo' => 'bar'));
+
+		$this->assertEqual(array('foo' => 'bar'), Environment::get('development'));
+		$this->assertEqual(Environment::get(true), Environment::get('development'));
+
+		Environment::set('production');
+		$this->assertFalse(Environment::get(true));
+	}
 }
 
 ?>

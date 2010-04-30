@@ -172,8 +172,13 @@ class Environment {
 	 *         environment's entire configuration as an array.
 	 */
 	public static function get($name = null) {
-		if (empty($name)) {
-			return static::$_current;
+		$cur = static::$_current;
+
+		if (!$name) {
+			return $cur;
+		}
+		if ($name === true) {
+			return isset(static::$_configurations[$cur]) ? static::$_configurations[$cur] : null;
 		}
 		if (isset(static::$_configurations[$name])) {
 			return static::$_configurations[$name];
@@ -181,6 +186,7 @@ class Environment {
 		if (!isset(static::$_configurations[static::$_current])) {
 			return null;
 		}
+
 		$config = static::$_configurations[static::$_current];
 		return isset($config[$name]) ? $config[$name] : null;
 	}
@@ -234,6 +240,7 @@ class Environment {
 			}
 			return;
 		}
+		$env = ($env === true) ? static::$_current : $env;
 		$base = isset(static::$_configurations[$env]) ? static::$_configurations[$env] : array();
 		return static::$_configurations[$env] = Set::merge($base, $config);
 	}
