@@ -17,18 +17,19 @@ use \InvalidArgumentException;
  * the Lithium core, as well as all applications, plugins and vendor libraries registered.
  * Typically, libraries and plugins are registered in `app/config/bootstrap/libraries.php`.
  *
- * By convention, vendor libraries are typically located in `app/libraries` or `/libraries`, and
- * plugins are located in `app/libraries/plugins` or `/libraries/plugins`. By default, `Libraries`
- * will use its own autoloader for all plugins and vendor libraries, but can be configured to use
- * others on a case-by-case basis.
+ * By convention, plugins and vendor libraries are typically located in `app/libraries` or
+ * `/libraries` (the former may override the latter). By default, `Libraries` will use its own
+ * autoloader for all plugins and vendor libraries, but can be configured to use others on a
+ * per-library basis.
  *
- * `Libraries` also handles service location. Various 'types' of classes can be defined by name,
- * using _class patterns_, which define conventions for organizing classes, i.e. `'models'` is
- * `'{:library}\models\{:name}'`, which will find a model class in any registered app, plugin or
- * vendor library that follows that path (namespace) convention. You can find classes by name (see
- * `locate()` for more information on class-locating precedence), or find all models in all
- * registered libraries (apps / plugins / vendor libraries, etc). For more information on modifying
- * the default class organization, or defining your own class types, see the `paths()` method.
+ * `Libraries` also handles service location. Various _types_ of classes can be defined by name,
+ * using _class patterns_, which define conventions for organizing classes, i.e. `'models'`, which
+ * maps to `'{:library}\models\{:name}'`, which will find a model class in any registered app,
+ * plugin or vendor library that follows that path (namespace) convention. You can find classes by
+ * name (see the `locate()` method for more information on class-locating precedence), or find all
+ * models in all registered libraries (apps / plugins / vendor libraries, etc). For more information
+ * on modifying the default class organization, or defining your own class types, see the `paths()`
+ * method.
  *
  * #### Auto-loading classes
  *
@@ -40,8 +41,8 @@ use \InvalidArgumentException;
  * extensions, and are as follows:
  *
  * - Each library must exist in a top-level vendor namespace
- * - Each top-level vendor namespace must define a set of sub-packages, and should not contain
- *   classes
+ * - Each top-level vendor namespace must define a set of sub-packages, and should not directly
+ *   contain classes
  * - Namespace names must be lowercased and under_scored
  * - Class names must be CamelCased
  *
