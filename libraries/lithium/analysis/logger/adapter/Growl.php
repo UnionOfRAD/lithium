@@ -137,7 +137,7 @@ class Growl extends \lithium\core\Object {
 
         $flags = ($options['priority'] & 7) * 2;
 		$flags = ($options['priority'] < 0) ? $flags |= 8 : $flags;
-		$flags = ($options['sticky']) ? $flags | 1 : $flags;
+		$flags = ($options['sticky']) ? $flags | 256 : $flags;
 
 		$params = array('c2n5', static::PROTOCOL_VERSION, static::TYPE_NOTIFY, $flags);
 		$lengths = array_map('strlen', $message);
