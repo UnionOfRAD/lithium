@@ -109,10 +109,10 @@ class Group extends \lithium\util\Collection {
 		if (preg_match("/Test/", $test)) {
 			return array($test);
 		}
-		if (!trim($test, '\\') || strpos($test, '\\') === false) {
+		if (!$test = trim($test, '\\')) {
 			return array();
 		}
-		list($library, $path) = explode("\\", trim($test, '\\'), 2);
+		list($library, $path) = explode('\\', $test, 2) + array($test, null);
 
 		return (array) Libraries::find($library, array(
 			'recursive' => true,
