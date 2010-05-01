@@ -82,10 +82,16 @@ class Growl extends \lithium\core\Object {
 			'name'     => $name,
 			'host'     => '127.0.0.1',
 			'port'     => 9887,
-			'password' => '',
+			'password' => null,
 			'protocol' => 'udp',
 			'title'    => Inflector::humanize($name),
-			'notifications' => array('Errors', 'Messages')
+			'notifications' => array('Errors', 'Messages'),
+			'connection' => function($host, $port) {
+				if ($conn = fsockopen($host, $port, $message, $code)) {
+					return $conn;
+				}
+				throw new Exception("Growl connection failed: ({$code}) {$message}");
+			}
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -97,14 +103,14 @@ class Growl extends \lithium\core\Object {
 	 * @param string $message Message to be shown.
 	 * @return boolean `True` on successful write, `false` otherwise.
 	 */
-	public function write($type, $message) {
+	public function write($type, $message, array $options = array()) {
 		if (!$this->_register()) {
-
+			return;
 		}
 		$_self =& $this;
 
 		return function($self, $params, $chain) use (&$_self) {
-			return $_self->notify($params['message']);
+			return $_self->notify($params['message'], $params['options']);
 		};
 	}
 
@@ -157,11 +163,10 @@ class Growl extends \lithium\core\Object {
 		}
 
 		if (!$this->connection) {
-			$conn = $this->_config['protocol'] . '://' . $this->_config['host'];
-
-			if (!$this->connection = fsockopen($conn, $this->_config['port'], $message, $code)) {
-				throw new Exception("Growl connection failed: ({$code}) {$message}");
-			}
+			$connection = $this->_config['connection'];
+			$this->connection = $connection(
+				"{$this->_config['protocol']}://{$this->_config['host']}", $this->_config['port']
+			);
 		}
 		$app      = utf8_encode($this->_config['name']);
 		$nameEnc  = $defaultEnc = '';
@@ -173,7 +178,8 @@ class Growl extends \lithium\core\Object {
 		}
 		$data = pack('c2nc2', static::PROTOCOL_VERSION, static::TYPE_REG, strlen($app), $i, $i);
 		$data .= $app . $nameEnc . $defaultEnc;
-		$data .= pack('H32', md5($data . $this->_config['password']));
+		$checksum = pack('H32', md5($data . $this->_config['password']));
+		$data .= $checksum;
 
 		if (fwrite($this->connection, $data, strlen($data)) === false) {
 			throw new Exception('Could not send registration to Growl Server.');
