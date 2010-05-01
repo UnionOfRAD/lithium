@@ -15,6 +15,10 @@ use lithium\core\Libraries;
 use lithium\action\Dispatcher;
 use lithium\storage\cache\adapter\Apc;
 
+if (PHP_SAPI === 'cli') {
+	return;
+}
+
 /**
  * If APC is not available and the cache directory is not writeable, bail out.
  */
