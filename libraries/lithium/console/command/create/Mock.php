@@ -21,22 +21,23 @@ use \lithium\core\Libraries;
  */
 class Mock extends \lithium\console\command\Create {
 
-	protected function _namespace($name = null, $options = array()) {
-		return parent::_namespace($this->request->action, array('prepend' => 'tests.mocks.'));
+	protected function _namespace($request, $options = array()) {
+		$request->shift();
+		return parent::_namespace($request, array('prepend' => 'tests.mocks.'));
 	}
 
-	protected function _parent() {
-		$namespace = parent::_namespace($this->request->action);
-		$class = $this->request->args(0);
+	protected function _parent($request) {
+		$namespace = parent::_namespace($request);
+		$class = $request->action;
 		return "\\{$namespace}\\{$class}";
 	}
 
-	protected function _class() {
-		$class = $this->request->args(0);
+	protected function _class($request) {
+		$class = $request->action;
 		return "Mock{$class}";
 	}
 
-	protected function _methods() {
+	protected function _methods($request) {
 		return null;
 	}
 }

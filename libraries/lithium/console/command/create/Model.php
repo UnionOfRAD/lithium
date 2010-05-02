@@ -16,8 +16,8 @@ use \lithium\util\Inflector;
  */
 class Model extends \lithium\console\command\Create {
 
-	protected function _class() {
-		return Inflector::classify($this->request->action);
+	protected function _class($request) {
+		return Inflector::classify($request->action);
 	}
 }
 

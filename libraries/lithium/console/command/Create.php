@@ -135,7 +135,7 @@ class Create extends \lithium\console\Command {
 		$params = $class->invokeMethod('_params');
 
 		foreach ($params as $i => $param) {
-			if (!$data[$param] = $class->invokeMethod("_{$param}")) {
+			if (!$data[$param] = $class->invokeMethod("_{$param}", array($this->request))) {
 				$data[$param] = $this->request->args($i);
 			}
 		}
@@ -172,12 +172,12 @@ class Create extends \lithium\console\Command {
 	/**
 	 * Get the namespace.
 	 *
-	 * @param string $name
+	 * @param string $request
 	 * @param array $options
 	 * @return string
 	 */
-	protected function _namespace($name = null, $options  = array()) {
-		$name = $name ?: $this->request->command;
+	protected function _namespace($request, $options  = array()) {
+		$name = $request->command;
 		$defaults = array(
 			'prefix' => $this->_library['prefix'],
 			'prepend' => null,

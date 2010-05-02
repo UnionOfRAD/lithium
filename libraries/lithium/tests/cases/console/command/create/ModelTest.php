@@ -51,7 +51,7 @@ class ModelTest extends \lithium\test\Unit {
 		));
 
 		$expected = 'Post';
-		$result = $model->invokeMethod('_class');
+		$result = $model->invokeMethod('_class', array($this->request));
 		$this->assertEqual($expected, $result);
 	}
 }

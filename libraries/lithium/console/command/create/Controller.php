@@ -17,24 +17,25 @@ use \lithium\util\Inflector;
  */
 class Controller extends \lithium\console\command\Create {
 
-	protected function _use() {
-		return '\\' . $this->_namespace('model') . '\\' . $this->_model();
+	protected function _use($request) {
+		$request->params['command'] = 'model';
+		return '\\' . $this->_namespace($request) . '\\' . $this->_model($request);
 	}
 
-	protected function _class() {
-		return Inflector::camelize(Inflector::pluralize($this->request->action) . 'Controller');
+	protected function _class($request) {
+		return Inflector::camelize(Inflector::pluralize($request->action) . 'Controller');
 	}
 
-	protected function _plural() {
-		return Inflector::pluralize(Inflector::camelize($this->request->action, false));
+	protected function _plural($request) {
+		return Inflector::pluralize(Inflector::camelize($request->action, false));
 	}
 
-	protected function _model() {
-		return Inflector::classify($this->request->action);
+	protected function _model($request) {
+		return Inflector::classify($request->action);
 	}
 
-	protected function _singular() {
-		return Inflector::singularize(Inflector::camelize($this->request->action, false));
+	protected function _singular($request) {
+		return Inflector::singularize(Inflector::camelize($request->action, false));
 	}
 }
 

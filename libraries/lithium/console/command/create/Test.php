@@ -23,36 +23,37 @@ use \lithium\analysis\Inspector;
  */
 class Test extends \lithium\console\command\Create {
 
-	protected function _namespace($name = null, $options = array()) {
-		return parent::_namespace($this->request->action, array('prepend' => 'tests.cases.'));
+	protected function _namespace($request, $options = array()) {
+		$request->shift();
+		return parent::_namespace($request, array('prepend' => 'tests.cases.'));
 	}
 
-	protected function _use() {
-		$namespace = parent::_namespace($this->request->action);
-		$class = $this->request->args(0);
+	protected function _use($request) {
+		$namespace = parent::_namespace($request);
+		$class = $request->action;
 		return "\\{$namespace}\\{$class}";
 	}
 
-	protected function _class() {
-		$name = $this->request->args(0);
-		$type = $this->request->params['action'];
-		$this->request->params['action'] = $name;
+	protected function _class($request) {
+		$name = $request->action;
+		$type = $request->command;
 
 		if ($command = $this->{$type}) {
-			$name = $command->invokeMethod('_class');
+			$request->params['action'] = $name;
+			$name = $command->invokeMethod('_class', array($request));
 		}
-		$this->request->params['action'] = $type;
 		return  Inflector::classify("{$name}Test");
 	}
 
-	protected function _methods() {
-		$use = $this->_use();
+	protected function _methods($request) {
+		$use = $this->_use($request);
 		$path = Libraries::path($use);
 
 		if (!file_exists($path)) {
 			return "";
 		}
 		$methods = (array) Inspector::methods($use, 'extents');
+
 		$testMethods = array();
 
 		foreach (array_keys($methods) as $method) {

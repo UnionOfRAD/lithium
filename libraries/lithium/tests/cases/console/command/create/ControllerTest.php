@@ -51,7 +51,7 @@ class ControllerTest extends \lithium\test\Unit {
 		));
 
 		$expected = 'PostsController';
-		$result = $model->invokeMethod('_class');
+		$result = $model->invokeMethod('_class', array($this->request));
 		$this->assertEqual($expected, $result);
 	}
 
@@ -64,7 +64,7 @@ class ControllerTest extends \lithium\test\Unit {
 		));
 
 		$expected = '\\create_test\\models\\Post';
-		$result = $model->invokeMethod('_use');
+		$result = $model->invokeMethod('_use', array($this->request));
 		$this->assertEqual($expected, $result);
 	}
 
