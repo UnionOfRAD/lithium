@@ -438,7 +438,11 @@ class MediaTest extends \lithium\test\Unit {
 	}
 
 	public function testEncodeRecordSet() {
+<<<<<<< HEAD
 		$data = new RecordSet(array('data' => array(
+=======
+		$data = new RecordSet(array('items' => array(
+>>>>>>> Refactoring `\data\collection\RecordSet` to support indexes for pre-populated data, refactoring `\net\http\Media` to centralize handling of custom encoding, and adding data marshaling. Fixes ticket #53.
 			1 => new Record(array('data' => array('id' => 1, 'foo' => 'bar'))),
 			2 => new Record(array('data' => array('id' => 2, 'foo' => 'baz'))),
 			3 => new Record(array('data' => array('id' => 3, 'baz' => 'dib')))
