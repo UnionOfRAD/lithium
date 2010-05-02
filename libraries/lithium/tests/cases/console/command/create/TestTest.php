@@ -27,6 +27,7 @@ class TestTest extends \lithium\test\Unit {
 	}
 
 	public function setUp() {
+		Libraries::cache(false);
 		$this->classes = array('response' => '\lithium\tests\mocks\console\MockResponse');
 		$this->_backup['cwd'] = getcwd();
 		$this->_backup['_SERVER'] = $_SERVER;
