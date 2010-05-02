@@ -37,7 +37,7 @@ $notify = function($status, $message, $solution = null) use (&$checkName, &$chec
 
 $sanityChecks = array(
 	'resourcesWritable' => function() use ($notify) {
-		if (is_writable($path = LITHIUM_APP_PATH . '/resources')) {
+		if (is_writable($path = realpath(LITHIUM_APP_PATH . '/resources'))) {
 			return $notify(true, 'Resources directory is writable.');
 		}
 		return $notify(false, array(
@@ -48,14 +48,17 @@ $sanityChecks = array(
 	},
 	'database' => function() use ($notify) {
 		$config = Connections::config();
+		$boot = realpath(LITHIUM_APP_PATH . '/config/bootstrap.php');
+		$connections = realpath(LITHIUM_APP_PATH . '/config/connections.php');
+
 		if (empty($config)) {
 			return $notify('notice', array('No database connections defined.'), array(
 				'title' => 'Database Connections',
 				'content' => array(
-					'To create a database connection, edit the file <code>' . LITHIUM_APP_PATH .
-					'/config/bootstrap.php</code>, and uncomment the following line:',
+					'To create a database connection, edit the file <code>' . $boot . '</code>, ',
+					'and uncomment the following line:',
 					'<pre><code>require __DIR__ . \'/connections.php\';</code></pre>',
-					'Then, edit the file <code>' . LITHIUM_APP_PATH . '/config/connections.php</code>.'
+					'Then, edit the file <code>' . $connections . '</code>.'
 				)
 			));
 		}
@@ -133,21 +136,22 @@ foreach ($sanityChecks as $checkName => $check) {
 <h3>Getting Started</h3>
 <p>
 	This is your application's default home page. To change this template, edit the file
-	<code><?php echo LITHIUM_APP_PATH . '/views/pages/home.html.php'; ?></code>.
+	<code><?php echo realpath(LITHIUM_APP_PATH . '/views/pages/home.html.php'); ?></code>.
 </p>
 
 <h4>Layout</h4>
 <p>
-	To change the application's <em>layout</em> (the file containing the
-	header, footer and default styles), edit the file
-	<code><?php echo LITHIUM_APP_PATH . '/views/layouts/default.html.php'; ?></code>.
+	To change the application's
+	<em><a href="http://lithify.me/en/docs/lithium/template">layout</a></em> (the file containing
+	the header, footer and default styles), edit the file
+	<code><?php echo realpath(LITHIUM_APP_PATH . '/views/layouts/default.html.php'); ?></code>.
 </p>
 
 <h4>Routing</h4>
 <p>
 	To change the <em><a href="http://lithify.me/docs/lithium/net/http/Router">routing</a></em> of
 	the application's default page, edit the file
-	<code><?php echo LITHIUM_APP_PATH . '/config/routes.php'; ?></code>.
+	<code><?php echo realpath(LITHIUM_APP_PATH . '/config/routes.php'); ?></code>.
 </p>
 
 <?php
