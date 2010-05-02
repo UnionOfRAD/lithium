@@ -94,7 +94,6 @@ class Media extends \lithium\core\StaticObject {
 	 * @return mixed
 	 */
 	public static function to($format, $data, array $options = array()) {
-		$data = is_object($data) ? $data->to('array') : $data;
 		return static::encode($format, $data, $options);
 	}
 
@@ -364,7 +363,9 @@ class Media extends \lithium\core\StaticObject {
 	 * @return mixed
 	 */
 	public static function encode($type, $data, array $options = array()) {
-		if ((!$handler = static::_handlers($type)) || !isset($handler['encode'])) {
+		$handler = is_array($type) ? $type : static::_handlers($type);
+
+		if (!$handler || !isset($handler['encode'])) {
 			return null;
 		}
 
@@ -380,7 +381,7 @@ class Media extends \lithium\core\StaticObject {
 			$data = is_array($data) ? array_map($cast, $data) : $data;
 		}
 		$method = $handler['encode'];
-		return is_string($method) ? $method($data) : $method($data, $handler + $options);
+		return is_string($method) ? $method($data) : $method($data, $handler, $options);
 	}
 
 	/**
@@ -438,8 +439,7 @@ class Media extends \lithium\core\StaticObject {
 
 			switch (true) {
 				case $handler['encode']:
-					$method = $handler['encode'];
-					return is_string($method) ? $method($data) : $method($data, $handler, $options);
+					return $self::encode($handler, $data, $options);
 				case class_exists($handler['view']):
 					$view = new $handler['view']($handler);
 					return $view->render('all', $data, $options);
