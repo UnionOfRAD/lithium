@@ -312,6 +312,12 @@ class ControllerTest extends \lithium\test\Unit {
 		$postsController = new MockPostsController(compact('request'));
 		$postsController->__invoke($request, $request->params);
 	}
+
+	public function testNonExistentFunction() {
+		$postsController = new MockPostsController();
+		$this->expectException("Action 'foo' not found!");
+		$postsController(new Request(), array('action' => 'foo'));
+	}
 }
 
 ?>

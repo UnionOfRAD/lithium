@@ -163,6 +163,9 @@ class Controller extends \lithium\core\Object {
 			if (substr($action, 0, 1) == '_' || method_exists(__CLASS__, $action)) {
 				throw new DispatchException('Private method!');
 			}
+			if (!method_exists($self, $action)) {
+				throw new Exception("Action '{$action}' not found!");
+			}
 			$render['template'] = $render['template'] ?: $action;
 
 			try {
