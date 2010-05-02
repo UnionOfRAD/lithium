@@ -166,6 +166,9 @@ class Controller extends \lithium\core\Object {
 			if (!method_exists($self, $action)) {
 				throw new DispatchException("Action '{$action}' not found!");
 			}
+			if (!method_exists($self, $action)) {
+				throw new Exception("Action '{$action}' not found!");
+			}
 			$render['template'] = $render['template'] ?: $action;
 
 			try {
