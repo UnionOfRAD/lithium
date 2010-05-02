@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\core;
 
 use \SplFileInfo;
+use \lithium\util\Inflector;
 use \lithium\core\Libraries;
 
 class LibrariesTest extends \lithium\test\Unit {
@@ -140,22 +141,25 @@ class LibrariesTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testAddNonPrefixedLibrary() {
+		$tmpDir = realpath(LITHIUM_APP_PATH . '/resources/tmp');
+		$this->skipIf(!is_writable($tmpDir), "Can't write to resources directory.");
+
+		$fakeDir = $tmpDir . '/fake';
 		$fake = "<?php class Fake {} ?>";
-		$fakeDir = '/tmp/fake';
 		$fakeFilename = $fakeDir . '/fake.php';
 		mkdir($fakeDir);
 		file_put_contents($fakeFilename, $fake);
 
 		Libraries::add('fake', array(
-			'path' => '/tmp/fake',
+			'path' => $fakeDir,
 			'includePath' => true,
 			'prefix' => false,
-			'transform' => function($class, $params) {
-				return $params['path'] . '/' . \lithium\util\Inflector::underscore($class) . '.php';
+			'transform' => function($class, $config) {
+				return $config['path'] . '/' . Inflector::underscore($class) . '.php';
 			}
 		));
 
-		$fakeClass = new \Fake();
+		$this->assertTrue(class_exists('Fake'));
 		unlink($fakeFilename);
 		rmdir($fakeDir);
 		Libraries::remove('fake');
