@@ -13,6 +13,7 @@ use \MongoId;
 use \MongoCode;
 use \MongoDBRef;
 use \Exception;
+use \lithium\core\Libraries;
 use \lithium\util\Inflector;
 
 /**
@@ -98,7 +99,7 @@ class MongoDb extends \lithium\data\Source {
 			'host'       => 'localhost',
 			'database'   => 'lithium',
 			'port'       => '27017',
-			'timeout'    => 100
+			'timeout'    => 100,
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -589,6 +590,24 @@ class MongoDb extends \lithium\data\Source {
 	 * @return mixed Formatted `order` clause.
 	 */
 	public function order($order, $context) {
+		switch (true) {
+			case !$order:
+				return array();
+			case is_string($order):
+				return array($order => 1);
+			case is_array($order):
+				foreach ($order as $key => $value) {
+					if (!is_string($key)) {
+						unset($order[$key]);
+						$order[$value] = 1;
+						continue;
+					}
+					if (is_string($value)) {
+						$order[$key] = strtoupper($value) == 'ASC' ? 1 : -1;
+					}
+				}
+			break;
+		}
 		return $order ?: array();
 	}
 
