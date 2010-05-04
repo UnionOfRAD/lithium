@@ -14,6 +14,7 @@ use \lithium\template\Helper;
 use \lithium\template\helper\Html;
 use \lithium\template\view\adapter\Simple;
 use \lithium\net\http\Router;
+use \stdClass;
 
 class RendererTest extends \lithium\test\Unit {
 
@@ -176,6 +177,29 @@ class RendererTest extends \lithium\test\Unit {
 		$this->assertNull($this->subject->request());
 		$this->subject = new Simple(array('request' => new Request()));
 		$this->assertTrue($this->subject->request() instanceof Request);
+	}
+
+	public function testSetAndData() {
+		$data = array('one' => 1, 'two' => 2, 'three' => 'value');
+		$result = $this->subject->set($data);
+		$this->assertNull($result);
+
+		$result = $this->subject->data();
+		$this->assertEqual($data, $result);
+
+		$result = $this->subject->set(array('more' => new StdClass()));
+		$this->assertNull($result);
+
+		$result = $this->subject->data();
+		$this->assertEqual($data + array('more' => new StdClass()), $result);
+	}
+
+	/**
+	 * @todo Add integration test for Renderer being composed with a view object.
+	 */
+	public function testView() {
+		$result = $this->subject->view();
+		$this->assertNull($result);
 	}
 }
 

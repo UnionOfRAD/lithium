@@ -46,6 +46,13 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 */
 	protected $_data = array();
 
+	/**
+	 * `File`'s dependencies. These classes are used by the output handlers to generate URLs
+	 * for dynamic resources and static assets, as well as compiling the templates.
+	 *
+	 * @see Renderer::$_handlers
+	 * @var array
+	 */
 	protected $_classes = array(
 		'compiler' => '\lithium\template\view\Compiler',
 		'router' => 'lithium\net\http\Router',

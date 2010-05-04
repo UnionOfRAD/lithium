@@ -71,6 +71,11 @@ abstract class Renderer extends \lithium\core\Object {
 	 */
 	protected $_strings = array();
 
+	/**
+	 * The `Request` object instance, if applicable.
+	 *
+	 * @var object The request object.
+	 */
 	protected $_request = null;
 
 	/**
