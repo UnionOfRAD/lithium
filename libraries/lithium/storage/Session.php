@@ -38,7 +38,7 @@ class Session extends \lithium\core\Adaptable {
 	 *
 	 * @var object Collection of cache configurations
 	 */
-	protected static $_configurations = null;
+	protected static $_configurations = array();
 
 	/**
 	 * Libraries::locate() compatible path to adapters for this class.
