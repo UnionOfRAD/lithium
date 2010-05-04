@@ -161,7 +161,8 @@ class UnitTest extends \lithium\test\Unit {
 			'testAssertTagsNoClosingTag', 'testAssertTagsMissingAttribute',
 			'testIdenticalArrayFail',
 			'testCleanUp', 'testCleanUpWithFullPath', 'testCleanUpWithRelativePath',
-			'testSkipIf', 'testExpectException', 'testHandleException', 'testResults', 'testGetTest'
+			'testSkipIf', 'testExpectException', 'testHandleException', 'testResults',
+			'testGetTest', 'testAssertCookie'
 		);
 		$this->assertIdentical($expected, $this->methods());
 	}
@@ -256,6 +257,7 @@ class UnitTest extends \lithium\test\Unit {
 		$expected = 'assertNoPattern';
 		$this->assertEqual($expected, $result['assertion']);
 	}
+
 	public function testAssertPattern() {
 		$expected = '/\s/';
 		$result = ' ';
@@ -432,6 +434,23 @@ class UnitTest extends \lithium\test\Unit {
 	public function testGetTest() {
 		$test = static::get('lithium\test\Unit');
 		$this->assertEqual($test, __CLASS__);
+	}
+
+	public function testAssertCookie() {
+		$headers = array(
+			'Set-Cookie: name[key]=value; expires=Tue, 04-May-2010 19:02:36 GMT; path=/',
+			'Set-Cookie: name[key1]=value1; expires=Tue, 04-May-2010 19:02:36 GMT; path=/',
+			'Set-Cookie: name[key2][nested]=value1; expires=Tue, 04-May-2010 19:02:36 GMT; path=/'
+		);
+
+		$this->assertCookie(array('key' => 'key', 'value' => 'value'), $headers);
+		$this->assertCookie(array('key' => 'key1', 'value' => 'value1'), $headers);
+		$this->assertCookie(array('key' => 'key2.nested', 'value' => 'value1'), $headers);
+
+		$this->assertCookie(array(
+			'key' => 'key2.nested', 'value' => 'value1',
+			'expires' => 'May 04 2010 15:02:36'
+		), $headers);
 	}
 }
 
