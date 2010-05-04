@@ -198,7 +198,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 		$results = array();
 		$isCore = null;
 
-		foreach ($this->_items as $key => $value) {
+		foreach ($this as $key => $value) {
 			if (is_null($isCore)) {
 				$isCore = (method_exists(current($this->_items), 'invokeMethod'));
 			}
@@ -324,13 +324,13 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @see lithium\util\Collection::rewind()
 	 */
 	public function first($filter = null) {
-		if (empty($filter)) {
+		if (!$filter) {
 			return $this->rewind();
 		}
 
-		foreach ($this->_items as $item) {
-			if ($value = $filter($item)) {
-				return $value;
+		foreach ($this as $item) {
+			if ($filter($item)) {
+				return $item;
 			}
 		}
 	}
