@@ -13,7 +13,6 @@ use \MongoId;
 use \MongoCode;
 use \MongoDBRef;
 use \Exception;
-use \lithium\core\Libraries;
 use \lithium\util\Inflector;
 
 /**
@@ -59,7 +58,8 @@ class MongoDb extends \lithium\data\Source {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'document' => '\lithium\data\collection\Document'
+		'document' => '\lithium\data\collection\Document',
+		'relationship' => '\lithium\data\model\Relationship'
 	);
 
 	/**
@@ -429,19 +429,19 @@ class MongoDb extends \lithium\data\Source {
 	 * @return array
 	 */
 	public function relationship($class, $type, $name, array $options = array()) {
-		$key = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name'));
-		$defaults = compact('key') + array(
-			'type' => $type,
-			'class' => null,
-			'fields' => true
-		);
-		$options += $defaults;
+		$key = Inflector::camelize($type == 'belongsTo' ? $class::meta('name') : $name, false);
 
-		if (!$options['class']) {
-			$assoc = preg_replace("/\\w+$/", "", $class) . $name;
-			$options['class'] = class_exists($assoc) ? $assoc : Libraries::locate('models', $assoc);
-		}
-		return $options + $defaults;
+		$options += compact('name', 'type', 'key');
+		$options['from'] = $class;
+		$relationship = $this->_classes['relationship'];
+
+		$defaultLinks = array(
+			'hasOne' => $relationship::LINK_EMBEDDED,
+			'hasMany' => $relationship::LINK_EMBEDDED,
+			'belongsTo' => $relationship::LINK_CONTAINED
+		);
+		$options += array('link' => $defaultLinks[$type]);
+		return new $relationship($options);
 	}
 
 	/**

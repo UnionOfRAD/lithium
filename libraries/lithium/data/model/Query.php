@@ -8,6 +8,8 @@
 
 namespace lithium\data\model;
 
+use \Exception;
+
 /**
  * Query class
  */
@@ -20,6 +22,14 @@ class Query extends \lithium\core\Object {
 	 * @var string
 	 */
 	protected $_type = null;
+
+	/**
+	 * Array containing mappings of relationship and field names, which allow database results to
+	 * be mapped to the correct objects.
+	 *
+	 * @var array
+	 */
+	protected $_resultMap = array();
 
 	/**
 	 * If a `Query` is bound to a `Record` or `Document` object (i.e. for a `'create'` or
@@ -55,7 +65,8 @@ class Query extends \lithium\core\Object {
 			'offset'     => null,
 			'group'      => null,
 			'comment'    => null,
-			'joins'      => array()
+			'joins'      => array(),
+			'with'       => array()
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -70,7 +81,11 @@ class Query extends \lithium\core\Object {
 				$this->{$key}($val);
 			}
 		}
-		unset($this->_config['record'], $this->_config['init']);
+
+		if ($this->_config['with']) {
+			$this->_associate($this->_config['with']);
+		}
+		unset($this->_config['record'], $this->_config['init'], $this->_config['with']);
 	}
 
 	/**
@@ -340,6 +355,24 @@ class Query extends \lithium\core\Object {
 		}
 		$key = $model::meta('key');
 		return array($key => $this->_binding->{$key});
+	}
+
+	protected function _associate($related) {
+		if (!$model = $this->model()) {
+			return;
+		}
+		$queryClass = get_class($this);
+
+		foreach ((array) $related as $name => $config) {
+			if (is_int($name)) {
+				$name = $config;
+				$config = array();
+			}
+			if (!$relation = $model::relations($name)) {
+				throw new Exception("Related model not found");
+			}
+			$config += $relation->data();
+		}
 	}
 }
 

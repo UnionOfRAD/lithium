@@ -9,6 +9,7 @@
 namespace lithium\data\source;
 
 use \lithium\util\String;
+use \lithium\core\Libraries;
 use \lithium\util\Inflector;
 use \InvalidArgumentException;
 
@@ -48,7 +49,8 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	protected $_classes = array(
 		'record' => '\lithium\data\model\Record',
-		'recordSet' => '\lithium\data\collection\RecordSet'
+		'recordSet' => '\lithium\data\collection\RecordSet',
+		'relationship' => '\lithium\data\model\Relationship'
 	);
 
 	/**
@@ -198,6 +200,7 @@ abstract class Database extends \lithium\data\Source {
 			$fields = join(', ', $fields);
 			$values = join(', ', $values);
 			$sql = $self->renderCommand('create', compact('fields', 'values') + $data, $query);
+
 			if ($self->invokeMethod('_execute', array($sql))) {
 				$id = null;
 
@@ -313,7 +316,8 @@ abstract class Database extends \lithium\data\Source {
 	 * @return array Returns an array containing the configuration for a model relationship.
 	 */
 	public function relationship($class, $type, $name, array $options = array()) {
-		$key = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name'));
+		$singularName = ($type == 'hasMany') ? Inflector::singularize($name) : $name;
+		$key = Inflector::underscore($type == 'belongsTo' ? $class::meta('name') : $singularName);
 		$defaults = array(
 			'type' => $type,
 			'class' => null,
@@ -323,7 +327,7 @@ abstract class Database extends \lithium\data\Source {
 		$options += $defaults;
 
 		if (!$options['class']) {
-			$assoc = preg_replace("/\\w+$/", "", $class) . $name;
+			$assoc = preg_replace("/\\w+$/", "", $class) . $singularName;
 			$options['class'] = class_exists($assoc) ? $assoc : Libraries::locate('models', $assoc);
 		}
 		return $options + $defaults;
@@ -396,7 +400,7 @@ abstract class Database extends \lithium\data\Source {
 				case (is_numeric($scope) && $field == '*'):
 					$result[$model] = array_keys($model::schema());
 				break;
-				case (is_numeric($scope) && in_array($field, $relations)):
+				case (is_numeric($scope) && isset($relations[$field])):
 					$scope = $field;
 				case (in_array($scope, $relations, true) && $field == '*'):
 					$scope = $ns($scope);
@@ -487,9 +491,9 @@ abstract class Database extends \lithium\data\Source {
 	 * @return string
 	 */
 	public function limit($limit, $context) {
-		if (empty($limit)) {
+		if (!$limit) {
 			return;
-		};
+		}
 		if ($offset = $context->offset() ?: '') {
 			$offset .= ', ';
 		}
@@ -503,9 +507,9 @@ abstract class Database extends \lithium\data\Source {
 	 * @param object $context The parent `\lithium\data\model\Query` object
 	 * @return string
 	 */
-	public function joins($joins, $context) {
+	public function joins(array $joins, $context) {
 		$result = null;
-		foreach ((array) $joins as $join) {
+		foreach ($joins as $join) {
 			$result .= $this->renderCommand('join', $join->export($this));
 		}
 		return $result;
@@ -523,13 +527,11 @@ abstract class Database extends \lithium\data\Source {
 		$model = $context->model();
 
 		if (is_string($order)) {
-			if ($model::schema($order)) {
-				$order = array($order => $direction);
-			} elseif (!preg_match('/\s+(A|DE)SC/i', $order)) {
-				return "ORDER BY {$order} {$direction}";
-			} else {
-				return "ORDER BY {$order}";
+			if (!$model::schema($order)) {
+				$match = '/\s+(A|DE)SC/i';
+				return "ORDER BY {$order}" . (preg_match($match, $order) ? '' : " {$direction}");
 			}
+			$order = array($order => $direction);
 		}
 
 		if (is_array($order)) {
@@ -559,7 +561,9 @@ abstract class Database extends \lithium\data\Source {
 	 * @param string $comment
 	 * @return string
 	 */
-	public function comment($comment) {}
+	public function comment($comment) {
+		return $comment ? "/* {$comment} */" : null;
+	}
 
 	/**
 	 * Returns a fully-qualified table name (i.e. with prefix), quoted.

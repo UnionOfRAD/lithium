@@ -36,7 +36,8 @@ class Http extends \lithium\data\Source {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'service' => '\lithium\net\http\Service'
+		'service' => '\lithium\net\http\Service',
+		'relationship' => '\lithium\data\model\Relationship'
 	);
 
 	/**
@@ -204,7 +205,8 @@ class Http extends \lithium\data\Source {
 	 * @return array Returns an array containing the configuration for a model relationship.
 	 */
 	public function relationship($class, $type, $name, array $options = array()) {
-		return array();
+		$class = $this->_classes['relationship'];
+		return new $class();
 	}
 }
 

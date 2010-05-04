@@ -14,7 +14,8 @@ class MockSource extends \lithium\data\Source {
 
 	protected $_classes = array(
 		'record' => '\lithium\data\model\Record',
-		'recordSet' => '\lithium\data\collection\RecordSet'
+		'recordSet' => '\lithium\data\collection\RecordSet',
+		'relationship' => '\lithium\data\model\Relationship'
 	);
 
 	private $_mockPosts = array(
@@ -134,20 +135,13 @@ class MockSource extends \lithium\data\Source {
 	}
 
 	public function relationship($class, $type, $name, array $options = array()) {
-		$key = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name'));
-		$defaults = array(
-			'type' => $type,
-			'class' => null,
-			'fields' => true,
-			'key' => $key . '_id'
-		);
-		$options += $defaults;
+		$key = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name')) . '_id';
 
-		if (!$options['class']) {
-			$assoc = preg_replace("/\\w+$/", "", $class) . $name;
-			$options['class'] = class_exists($assoc) ? $assoc : Libraries::locate('models', $assoc);
-		}
-		return $options + $defaults;
+		$options += compact('name', 'type', 'key');
+		$options['from'] = $class;
+
+		$relationship = $this->_classes['relationship'];
+		return new $relationship($options);
 	}
 }
 

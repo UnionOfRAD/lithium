@@ -8,6 +8,8 @@
 
 namespace lithium\tests\mocks\data\model;
 
+use lithium\data\model\Relationship;
+
 class MockDocumentSource extends \lithium\data\Source {
 
 	public function connect() {	}
@@ -32,6 +34,7 @@ class MockDocumentSource extends \lithium\data\Source {
 	public function hasNext() {
 		return (is_array($this->result) && sizeof($this->result) > $this->point);
 	}
+
 	public function getNext() {
 		return $this->result[$this->point++];
 	}
@@ -50,14 +53,13 @@ class MockDocumentSource extends \lithium\data\Source {
 	}
 
 	public function relationship($class, $type, $name, array $options = array()) {
-		$key = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name'));
-		$defaults = array(
-			'type' => $type,
-			'class' => $name,
-			'fields' => true,
-			'key' => $key . '_id'
-		);
-		return $options + $defaults;
+		$key = Inflector::camelize($type == 'belongsTo' ? $name : $class::meta('name'));
+
+		$options += compact('name', 'type', 'key');
+		$options['from'] = $class;
+
+		$relationship = $this->_classes['relationship'];
+		return new $relationship($options);
 	}
 }
 
