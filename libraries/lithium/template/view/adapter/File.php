@@ -24,6 +24,12 @@ use \lithium\core\Libraries;
  */
 class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 
+	/**
+	 * These configuration variables will automatically be assigned to their corresponding protected
+	 * properties when the object is initialized.
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array(
 		'classes' => 'merge', 'request', 'context', 'strings', 'handlers', 'view', 'compile'
 	);
@@ -45,6 +51,14 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 * @var array
 	 */
 	protected $_data = array();
+
+	/**
+	 * Variables that have been set from a view/element/layout/etc. that should be available to the
+	 * same rendering context.
+	 *
+	 * @var array Key/value pairs of variables
+	 */
+	protected $_vars = array();
 
 	/**
 	 * `File`'s dependencies. These classes are used by the output handlers to generate URLs
@@ -77,7 +91,7 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 		$options += $defaults;
 
 		$this->_context = $options['context'] + $this->_context;
-		$this->_data = (array) $data;
+		$this->_data = (array) $data + $this->_vars;
 		$template__ = $template;
 		unset($options, $template, $defaults);
 

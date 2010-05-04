@@ -104,6 +104,14 @@ abstract class Renderer extends \lithium\core\Object {
 	protected $_data = array();
 
 	/**
+	 * Variables that have been set from a view/element/layout/etc. that should be available to the
+	 * same rendering context.
+	 *
+	 * @var array Key/value pairs of variables
+	 */
+	protected $_vars = array();
+
+	/**
 	 * Render the template with given data.
 	 * Abstract. Must be added to subclasses.
 	 *
@@ -360,6 +368,15 @@ abstract class Renderer extends \lithium\core\Object {
 	}
 
 	/**
+	 * Returns all variables and their values that have been set.
+	 *
+	 * @return array Key/value pairs of data that has been set.
+	 */
+	public function data() {
+		return $this->_data + $this->_vars;
+	}
+
+	/**
 	 * Allows variables to be set by one template and used in subsequent templates rendered using
 	 * the same context. For example, a variable can be set in a template and used in an element
 	 * rendered within a template, or an element or template could set a variable which would be
@@ -369,8 +386,9 @@ abstract class Renderer extends \lithium\core\Object {
 	 *              made available to all other templates rendered in this rendering context.
 	 * @return void
 	 */
-	public function set($data = array()) {
+	public function set(array $data = array()) {
 		$this->_data = $data + $this->_data;
+		$this->_vars = $data + $this->_vars;
 	}
 }
 
