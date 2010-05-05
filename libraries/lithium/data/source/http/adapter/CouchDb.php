@@ -71,11 +71,11 @@ class CouchDb extends \lithium\data\source\Http {
 	 * Configures a model class by setting the primary key to `'id'`, in keeping with CouchDb
 	 * conventions.
 	 *
+	 * @see lithium\data\Model::$_meta
+	 * @see lithium\data\Model::$_classes
 	 * @param string $class The fully-namespaced model class name to be configured.
 	 * @return Returns an array containing keys `'classes'` and `'meta'`, which will be merged with
 	 *         their respective properties in `Model`.
-	 * @see lithium\data\Model::$_meta
-	 * @see lithium\data\Model::$_classes
 	 */
 	public function configureClass($class) {
 		return array('meta' => array('key' => 'id'), 'classes' => array(
@@ -215,7 +215,10 @@ class CouchDb extends \lithium\data\source\Http {
 			if (isset($result->error) && $result->error == 'not_found') {
 				$result = array();
 			}
-			$options += compact('result');
+			$stats['total_rows'] = isset($result->total_rows) ? $result->total_rows : null;
+			$stats['offset'] = isset($result->offset) ? $result->offset : null;
+
+			$options += compact('result', 'stats');
 			return $self->invokeMethod('_result', array('document', $query, $options));
 		});
 	}

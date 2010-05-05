@@ -143,6 +143,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$expected = true;
 		$result = $couchdb->read($this->query);
 		$this->assertEqual($expected, $result);
+		$this->assertEqual(array('total_rows' => null, 'offset' => null), $result->stats());
 
 		$expected = '/lithium-test/_all_docs';
 		$result = $couchdb->last->request->path;
@@ -159,6 +160,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$this->query->conditions(array('id' => 12345));
 		$result = $couchdb->read($this->query);
 		$this->assertEqual($expected, $result);
+		$this->assertEqual(array('total_rows' => null, 'offset' => null), $result->stats());
 
 		$expected = '/lithium-test/12345';
 		$result = $couchdb->last->request->path;
@@ -176,6 +178,7 @@ class CouchDbTest extends \lithium\test\Unit {
 			'design' => 'latest', 'view' => 'all', 'limit' => 10, 'descending' => 'true'
 		));
 		$result = $couchdb->read($this->query);
+		$this->assertEqual(array('total_rows' => null, 'offset' => null), $result->stats());
 		$this->assertEqual($expected, $result);
 
 		$expected = '/lithium-test/_design/latest/_view/all/';
