@@ -295,28 +295,30 @@ class Validator extends \lithium\core\StaticObject {
 	 * @param array $rules An array of rules to check the values in `$values` against. Each key in
 	 *              `$rules` should match a key contained in `$values`, and each value should be a
 	 *              validation rule in one of the allowable formats. For example, if you are
-	 *              validating a data set containing a `'title'` key, possible values for
+	 *              validating a data set containing a `'credit_card'` key, possible values for
 	 *              `$rules` would be as follows:
-	 *              - `array('title' => 'You must include a title')`: This is the simplest form of
-	 *                validation rule, in which the value is simply a message to display if the rule
-	 *                fails. Using this format, all other validation settings inherit from the
-	 *                defaults, including the validation rule itself, which only checks to see that
-	 *                the corresponding key in `$values` is present and contains a value that is not
-	 *                empty. _Please note when globalizing validation messages:_ When specifying
-	 *                messages, it may be preferable to use a code string (i.e. `'ERR_NO_TITLE'`)
-	 *                instead of the full text of the validation error. These code strings may then
-	 *                be translated by the appropriate tools in the templating layer.
-	 *              - `array('title' => array('alphaNumeric', 'message' => 'Invalid title'))`: In
-	 *                the second format, the validation rule and associated configuration are
-	 *                specified as an array, where the rule to use is the first value in the array
-	 *                (no key), and additional settings are specified as other keys in the array.
-	 *                Please see the list below for more information on allowed keys.
+	 *              - `array('credit_card' => 'You must include a credit card number')`: This is the
+	 *                simplest form of validation rule, in which the value is simply a message to
+	 *                display if the rule fails. Using this format, all other validation settings
+	 *                inherit from the defaults, including the validation rule itself, which only
+	 *                checks to see that the corresponding key in `$values` is present and contains
+	 *                a value that is not empty. _Please note when globalizing validation messages:_
+	 *                When specifying messages, it may be preferable to use a code string (i.e.
+	 *                `'ERR_NO_TITLE'`) instead of the full text of the validation error. These code
+	 *                strings may then be translated by the appropriate tools in the templating
+	 *                layer.
+	 *              - `array('credit_card' => array('creditCard', 'message' => 'Invalid CC #'))`:
+	 *                In the second format, the validation rule (in this case `creditCard`) and
+	 *                associated configuration are specified as an array, where the rule to use is
+	 *                the first value in the array (no key), and additional settings are specified
+	 *                as other keys in the array. Please see the list below for more information on
+	 *                allowed keys.
 	 *              - The final format allows you to apply multiple validation rules to a single
 	 *                value, and it is specified as follows:
 	 *
-	 * `array('title' => array(
-	 * 	array('notEmpty', 'message' => 'You must include a title'),
-	 * 	array('alphaNumeric', 'message' => 'Your title must be alphanumeric')
+	 * `array('credit_card' => array(
+	 * 	array('notEmpty', 'message' => 'You must include credit card number'),
+	 * 	array('creditCard', 'message' => 'Your credit card number must be valid')
 	 * ));`
 	 *
 	 * Each rule defined as an array can contain any of the following settings (in addition to the
