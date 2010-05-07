@@ -101,7 +101,7 @@ class Connections extends \lithium\core\Adaptable {
 	 */
 	public static function add($name, array $config = array()) {
 		$defaults = array(
-			'type'     => 'database',
+			'type'     => null,
 			'adapter'  => null,
 			'host'     => 'localhost',
 			'login'    => '',

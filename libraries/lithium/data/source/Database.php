@@ -342,10 +342,10 @@ abstract class Database extends \lithium\data\Source {
 		$singularName = ($type == 'hasMany') ? Inflector::singularize($name) : $name;
 		$key = $type == 'belongsTo' ? $class::meta('name') : $singularName;
 		$key = Inflector::underscore($key) . '_id';
-		$config += compact('type', 'key');
+		$from = $class;
 
 		$relationship = $this->_classes['relationship'];
-		return new $relationship($config);
+		return new $relationship($config + compact('type', 'name', 'key', 'from'));
 	}
 
 	/**

@@ -73,12 +73,24 @@ class MySql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Check for required PHP extension
+	 * Check for required PHP extension, or supported database feature.
 	 *
-	 * @return boolean
+	 * @param string $feature Test for support for a specific feature, i.e. `"transactions"` or
+	 *               `"arrays"`.
+	 * @return boolean Returns `true` if the particular feature (or if MySQL) support is enabled,
+	 *         otherwise `false`.
 	 */
-	public static function enabled() {
-		return extension_loaded('mysql');
+	public static function enabled($feature = null) {
+		if (!$feature) {
+			return extension_loaded('mysql');
+		}
+		$features = array(
+			'arrays' => false,
+			'transactions' => false,
+			'booleans' => true,
+			'relationships' => true,
+		);
+		return isset($features[$feature]) ? $features[$feature] : null;
 	}
 
 	/**
@@ -231,21 +243,16 @@ class MySql extends \lithium\data\source\Database {
 	/**
 	 * Converts a given value into the proper type based on a given schema definition.
 	 *
-	 * @see \lithium\data\source\Database::schema()
+	 * @see lithium\data\source\Database::schema()
 	 * @param mixed $value The value to be converted. Arrays will be recursively converted.
 	 * @param array $schema Formatted array from `\lithium\data\source\Database::schema()`
 	 * @return mixed Value with converted type.
 	 */
 	public function value($value, array $schema = array()) {
-		if (is_array($value)) {
-			return parent::value($value, $schema);
+		if (($result = parent::value($value, $schema)) !== null) {
+			return $result;
 		}
-		$result = parent::value($value, $schema);;
-
-		if (is_string($result)) {
-			return "'" . mysql_real_escape_string($value, $this->connection) . "'";
-		}
-		return $result;
+		return "'" . mysql_real_escape_string((string) $value, $this->connection) . "'";
 	}
 
 	/**
@@ -298,7 +305,7 @@ class MySql extends \lithium\data\source\Database {
 	/**
 	 * Execute a given query.
  	 *
- 	 * @see \lithium\data\source\Database::renderCommand()
+ 	 * @see lithium\data\source\Database::renderCommand()
 	 * @param string $sql The sql string to execute
 	 * @param array $options Available options:
 	 *        - 'buffered': If set to `false` uses mysql_unbuffered_query which

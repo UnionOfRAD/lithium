@@ -117,12 +117,25 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	/**
-	 * Check for required PHP extension
+	 * With no parameter, checks to see if the `mongo` extension is installed. With a parameter,
+	 * queries for a specific supported feature.
 	 *
-	 * @return boolean
+	 * @param string $feature Test for support for a specific feature, i.e. `"transactions"` or
+	 *               `"arrays"`.
+	 * @return boolean Returns `true` if the particular feature (or if MongoDB) support is enabled,
+	 *         otherwise `false`.
 	 */
-	public static function enabled() {
-		return extension_loaded('mongo');
+	public static function enabled($feature = null) {
+		if (!$feature) {
+			return extension_loaded('mongo');
+		}
+		$features = array(
+			'arrays' => true,
+			'transactions' => false,
+			'booleans' => true,
+			'relationships' => true,
+		);
+		return isset($features[$feature]) ? $features[$feature] : null;
 	}
 
 	/**
@@ -425,14 +438,14 @@ class MongoDb extends \lithium\data\Source {
 	 * @param string $class
 	 * @param string $type Relationship type, e.g. `belongsTo`.
 	 * @param string $name
-	 * @param array $options
+	 * @param array $config
 	 * @return array
 	 */
-	public function relationship($class, $type, $name, array $options = array()) {
+	public function relationship($class, $type, $name, array $config = array()) {
 		$key = Inflector::camelize($type == 'belongsTo' ? $class::meta('name') : $name, false);
 
-		$options += compact('name', 'type', 'key');
-		$options['from'] = $class;
+		$config += compact('name', 'type', 'key');
+		$config['from'] = $class;
 		$relationship = $this->_classes['relationship'];
 
 		$defaultLinks = array(
@@ -440,8 +453,8 @@ class MongoDb extends \lithium\data\Source {
 			'hasMany' => $relationship::LINK_EMBEDDED,
 			'belongsTo' => $relationship::LINK_CONTAINED
 		);
-		$options += array('link' => $defaultLinks[$type]);
-		return new $relationship($options);
+		$config += array('link' => $defaultLinks[$type]);
+		return new $relationship($config);
 	}
 
 	/**

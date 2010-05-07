@@ -403,6 +403,28 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
+	 * With no parameter, always returns `true`, since CouchDB only depends on HTTP. With a
+	 * parameter, queries for a specific supported feature.
+	 *
+	 * @param string $feature Test for support for a specific feature, i.e. `"transactions"` or
+	 *               `"arrays"`.
+	 * @return boolean Returns `true` if the particular feature support is enabled, otherwise
+	 *         `false`.
+	 */
+	public static function enabled($feature = null) {
+		if (!$feature) {
+			return true;
+		}
+		$features = array(
+			'arrays' => true,
+			'transactions' => false,
+			'booleans' => true,
+			'relationships' => false,
+		);
+		return isset($features[$feature]) ? $features[$feature] : null;
+	}
+
+	/**
 	 * Formats a CouchDb result set into a standard result to be passed to item
 	 *
 	 * @param string $data data returned from query
