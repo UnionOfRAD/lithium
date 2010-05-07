@@ -29,7 +29,7 @@ class Query extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_resultMap = array();
+	protected $_map = array();
 
 	/**
 	 * If a `Query` is bound to a `Record` or `Document` object (i.e. for a `'create'` or
@@ -44,10 +44,10 @@ class Query extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('type');
+	protected $_autoConfig = array('type', 'map');
 
 	/**
-	 * Class constructor
+	 * Class constructor.
 	 *
 	 * @param array $config
 	 * @return void
@@ -66,7 +66,8 @@ class Query extends \lithium\core\Object {
 			'group'      => null,
 			'comment'    => null,
 			'joins'      => array(),
-			'with'       => array()
+			'with'       => array(),
+			'map'        => array(),
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -95,6 +96,18 @@ class Query extends \lithium\core\Object {
 	 */
 	public function type() {
 		return $this->_type;
+	}
+
+	/**
+	 * Returns or sets the column mapping scheme for relational databases.
+	 *
+	 * @return void
+	 */
+	public function map($map = null) {
+		if ($map) {
+			$this->_map = $map;
+		}
+		return $this->_map;
 	}
 
 	/**
@@ -161,10 +174,11 @@ class Query extends \lithium\core\Object {
 	 * }}}
 	 *
 	 * @param mixed $fields string, array or `false`
+	 * @param boolean $overwrite If `true`, existing fields will be removed before adding `$fields`.
 	 * @return array|void
 	 */
-	public function fields($fields = null) {
-		if ($fields === false) {
+	public function fields($fields = null, $overwrite = false) {
+		if ($fields === false || $overwrite) {
 			$this->_config['fields'] = array();
 		}
 		$this->_config['fields'] = (array) $this->_config['fields'];
@@ -319,6 +333,16 @@ class Query extends \lithium\core\Object {
 		}
 		$results['table'] = $dataSource->name($this->_config['table']);
 		return $results;
+	}
+
+	/**
+	 * Generates a schema map of the query's result set, where the keys are fully-namespaced model
+	 * class names, and the values are arrays of field names.
+	 *
+	 * @param object $dataSource An instance of the data source used to create the map.
+	 * @return array
+	 */
+	public function schema($dataSource) {
 	}
 
 	/**

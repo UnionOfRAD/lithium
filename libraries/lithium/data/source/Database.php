@@ -27,7 +27,7 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Strings used to render the given statement
 	 *
-	 * @see \lithium\data\source\Database::renderCommand()
+	 * @see lithium\data\source\Database::renderCommand()
 	 * @var string
 	 */
 	protected $_strings = array(
@@ -91,7 +91,7 @@ abstract class Database extends \lithium\data\Source {
 	 * Execute a given query
  	 * Abstract. Must be defined by child class.
  	 *
- 	 * @see \lithium\data\source\Database::renderCommand()
+ 	 * @see lithium\data\source\Database::renderCommand()
 	 * @param string $sql The sql string to execute
 	 * @return resource
 	 */
@@ -146,7 +146,7 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Converts a given value into the proper type based on a given schema definition.
 	 *
-	 * @see \lithium\data\source\Database::schema()
+	 * @see lithium\data\source\Database::schema()
 	 * @param mixed $value The value to be converted. Arrays will be recursively converted.
 	 * @param array $schema Formatted array from `\lithium\data\source\Database::schema()`
 	 * @return mixed value with converted type
@@ -163,13 +163,12 @@ abstract class Database extends \lithium\data\Source {
 		}
 		switch ($type = isset($schema['type']) ? $schema['type'] : $this->_introspectType($value)) {
 			case 'boolean':
-				return $this->_toBoolean($value);
+				return $this->_toNativeBoolean($value);
 			case 'float':
 				return floatval($value);
 			case 'integer':
 				return intval($value);
 		}
-		return "'{$value}'";
 	}
 
 	/**
@@ -197,6 +196,7 @@ abstract class Database extends \lithium\data\Source {
 				$fields[] = $self->name($field);
 				$values[] = $self->value($value, $schema[$field]);
 			}
+
 			$fields = join(', ', $fields);
 			$values = join(', ', $values);
 			$sql = $self->renderCommand('create', compact('fields', 'values') + $data, $query);
@@ -307,30 +307,45 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
+	 * Executes calculation-related queries, such as those required for `count` and other
+	 * aggregates.
+	 *
+	 * @param string $type Only accepts `count`.
+	 * @param mixed $query The query to be executed.
+	 * @param array $options Optional arguments for the `read()` query that will be executed
+	 *        to obtain the calculation result.
+	 * @return integer Result of the calculation.
+	 */
+	public function calculation($type, $query, array $options = array()) {
+		$query->calculate($type);
+
+		switch ($type) {
+			case 'count':
+				$fields = $this->fields($query->fields(), $query);
+				$query->fields("COUNT({$fields}) as count", true);
+				$query->map(array($query->model() => array('count')));
+				list($record) = $this->read($query, $options)->data();
+				return intval($record['count']);
+		}
+	}
+
+	/**
 	 * Defines or modifies the default settings of a relationship between two models.
 	 *
 	 * @param string $class
 	 * @param string $type
 	 * @param string $name
-	 * @param array $options
+	 * @param array $config
 	 * @return array Returns an array containing the configuration for a model relationship.
 	 */
-	public function relationship($class, $type, $name, array $options = array()) {
+	public function relationship($class, $type, $name, array $config = array()) {
 		$singularName = ($type == 'hasMany') ? Inflector::singularize($name) : $name;
-		$key = Inflector::underscore($type == 'belongsTo' ? $class::meta('name') : $singularName);
-		$defaults = array(
-			'type' => $type,
-			'class' => null,
-			'fields' => true,
-			'key' => $key . '_id'
-		);
-		$options += $defaults;
+		$key = $type == 'belongsTo' ? $class::meta('name') : $singularName;
+		$key = Inflector::underscore($key) . '_id';
+		$config += compact('type', 'key');
 
-		if (!$options['class']) {
-			$assoc = preg_replace("/\\w+$/", "", $class) . $singularName;
-			$options['class'] = class_exists($assoc) ? $assoc : Libraries::locate('models', $assoc);
-		}
-		return $options + $defaults;
+		$relationship = $this->_classes['relationship'];
+		return new $relationship($config);
 	}
 
 	/**
@@ -467,16 +482,22 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Returns
+	 * Returns either a formatted string for a select query, or an array of key/value pairs for a
+	 * create or update query.
 	 *
-	 * @param string $fields
-	 * @param string $context
-	 * @return void
+	 * @param array $fields Either an array of field names for a select, or key/value pairs for
+	 *              a create or update query.
+	 * @param string $context An instance of `Query`, containing the details of the query to be run.
+	 * @return mixed Returns a string or array, depending on the query type to be performed (as
+	 *         determined by `$context->type()`).
 	 */
 	public function fields($fields, $context) {
 		switch ($context->type()) {
 			case 'create':
 			case 'update':
+				if ($fields && is_array($fields) && is_int(key($fields))) {
+					return array_intersect_key($context->data(), array_combine($fields, $fields));
+				}
 				return $fields ?: $context->data();
 			default:
 				return empty($fields) ? '*' : join(', ', $fields);
@@ -620,6 +641,10 @@ abstract class Database extends \lithium\data\Source {
 			return ($value == 't' || $value == 'T' || $value == 'true');
 		}
 		return (boolean) $value;
+	}
+
+	protected function _toNativeBoolean($value) {
+		return $value ? 1 : 0;
 	}
 }
 
