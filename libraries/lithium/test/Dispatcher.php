@@ -73,7 +73,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	/**
 	 * Creates the group class based
 	 *
-	 * @see \lithium\test\Dispatcher::$_classes
+	 * @see lithium\test\Dispatcher::$_classes
 	 * @param array $items array of cases or groups
 	 * @return object Group object constructed with $items
 	 */
@@ -87,7 +87,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * Creates the test report class based on either the passed test case or the
 	 * passed test group.
 	 *
-	 * @see \lithium\test\Dispatcher::$_classes
+	 * @see lithium\test\Dispatcher::$_classes
 	 * @param string $group
 	 * @param array $options Options array passed from Dispatcher::run(). Should contain
 	 *        one of 'case' or 'group' keys.

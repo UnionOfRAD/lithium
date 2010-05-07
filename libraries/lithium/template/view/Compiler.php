@@ -19,8 +19,8 @@ use \Exception;
  * instead. Please see the documentation on the dynamic dependencies of the adapter in question
  * to know more about how this can be achieved.
  *
- * @see \lithium\template\View
- * @see \lithium\template\view\adapter
+ * @see lithium\template\View
+ * @see lithium\template\view\adapter
  */
 class Compiler extends \lithium\core\StaticObject {
 
@@ -81,7 +81,7 @@ class Compiler extends \lithium\core\StaticObject {
 	 * Preprocess the passed `$string` (usually a PHP template) for syntax replacements
 	 * using sets of regular expressions.
 	 *
-	 * @see \lithium\template\view\Compiler::$_processors
+	 * @see lithium\template\view\Compiler::$_processors
 	 * @param string $string The string to be preprocessed.
 	 * @return string Processed string.
 	 */

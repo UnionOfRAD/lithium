@@ -57,9 +57,9 @@ use \lithium\core\Libraries;
  * ));
  * }}}
  *
- * @see \lithium\view\Renderer
- * @see \lithium\view\adapter
- * @see \lithium\net\http\Media
+ * @see lithium\view\Renderer
+ * @see lithium\view\adapter
+ * @see lithium\net\http\Media
  */
 class View extends \lithium\core\Object {
 
