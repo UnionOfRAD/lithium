@@ -8,6 +8,8 @@
 
 namespace lithium\security;
 
+use \Exception;
+
 /**
  * The `Auth` class provides a common interface to authenticate user credentials from different
  * sources against different storage backends in a common way. As with most other adapter-driven
@@ -109,6 +111,10 @@ class Auth extends \lithium\core\Adaptable {
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
 			extract($params);
 			$config = $self::invokeMethod('_config', array($name));
+
+			if ($config === null) {
+				throw new Exception("Configuration '{$name}' has not been defined.");
+			}
 			$session = $config['session'];
 
 			if ($options['checkSession']) {

@@ -151,14 +151,14 @@ class AdaptableTest extends \lithium\test\Unit {
 
 	public function testNonExistentStrategyConfiguration() {
 		$strategy = new MockStrategy();
-		$this->expectException('Configuration non_existent_config has not been defined');
+		$this->expectException("Configuration 'non_existent_config' has not been defined.");
 		$result = $strategy::strategies('non_existent_config');
 		$this->assertNull($result);
 	}
 
 	public function testApplyStrategiesNonExistentConfiguration() {
 		$strategy = new MockStrategy();
-		$this->expectException('Configuration non_existent_config has not been defined');
+		$this->expectException("Configuration 'non_existent_config' has not been defined.");
 		$strategy::applyStrategies('method', 'non_existent_config', null);
 	}
 
@@ -285,8 +285,8 @@ class AdaptableTest extends \lithium\test\Unit {
 		$expected = $items;
 		$this->assertEqual($expected, $result);
 
-		$message  = 'Could not find adapter NonExistent in ';
-		$message .= 'class lithium\tests\mocks\core\MockAdapter';
+		$message  = 'Could not find adapter \'NonExistent\' in ';
+		$message .= 'class lithium\tests\mocks\core\MockAdapter.';
 		$this->expectException($message);
 
 		$result = $adapter::adapter('default');
@@ -319,7 +319,7 @@ class AdaptableTest extends \lithium\test\Unit {
 		$adapter::config($items);
 
 		$message  = 'No adapter set for configuration in ';
-		$message .= 'class lithium\tests\mocks\core\MockAdapter';
+		$message .= 'class lithium\tests\mocks\core\MockAdapter.';
 		$this->expectException($message);
 		$result = $adapter::adapter('default');
 	}
