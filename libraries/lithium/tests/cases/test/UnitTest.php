@@ -447,10 +447,10 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertCookie(array('key' => 'key1', 'value' => 'value1'), $headers);
 		$this->assertCookie(array('key' => 'key2.nested', 'value' => 'value1'), $headers);
 
-		$this->assertCookie(array(
-			'key' => 'key2.nested', 'value' => 'value1',
-			'expires' => 'May 04 2010 15:02:36'
-		), $headers);
+		$expected = array(
+			'key' => 'key2.nested', 'value' => 'value1', 'expires' => 'May 04 2010 14:02:36 EST'
+		);
+		$this->assertCookie($expected, $headers);
 	}
 }
 
