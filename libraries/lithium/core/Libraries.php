@@ -84,6 +84,7 @@ class Libraries {
 		),
 		'strategy' => array(
 			'{:library}\extensions\strategy\{:namespace}\{:class}\{:name}',
+			'{:library}\extensions\strategy\{:name}',
 			'{:library}\{:namespace}\{:class}\strategy\{:name}' => array('libraries' => 'lithium')
 		),
 		'command' => array(
