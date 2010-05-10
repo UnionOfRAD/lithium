@@ -58,16 +58,16 @@ class Memcache extends \lithium\core\Object {
 	 * Instantiates the Memcached object, adds appropriate servers to the pool,
 	 * and configures any optional settings passed.
 	 *
+	 * @see lithium\storage\Cache::config()
 	 * @param array $config Configuration parameters for this cache adapter.
 	 *        These settings are indexed by name and queryable
 	 *        through `Cache::config('name')`.
-	 *
 	 * @return void
-	 * @see lithium\storage\Cache::config()
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'prefix' => '',
+			'expiry' => '+1 hour',
 			'servers' => array(
 				array('127.0.0.1', 11211, 100)
 			)
@@ -91,14 +91,16 @@ class Memcache extends \lithium\core\Object {
 	 *
 	 * @param string|array $key The key to uniquely identify the cached item.
 	 * @param mixed $value The value to be cached.
-	 * @param string $expiry A strtotime() compatible cache time.
+	 * @param null|string $expiry A strtotime() compatible cache time. If no expiry time is set,
+	 *        then the default cache expiration time set with the cache configuration will be used.
 	 * @return boolean True on successful write, false otherwise.
 	 */
-	public function write($key, $value, $expiry) {
+	public function write($key, $value, $expiry = null) {
 		$connection =& static::$connection;
+		$expiry = ($expiry) ?: $this->_config['expiry'];
 
-		return function($self, $params, $chain) use (&$connection) {
-			$expires = strtotime($params['expiry']);
+		return function($self, $params, $chain) use (&$connection, $expiry) {
+			$expires = strtotime($expiry);
 			$key = $params['key'];
 
 			if (is_array($key)) {

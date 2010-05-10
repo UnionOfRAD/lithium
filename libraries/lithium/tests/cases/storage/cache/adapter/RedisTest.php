@@ -101,6 +101,30 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testWriteDefaultCacheExpiry() {
+		$Redis = new Redis(array('expiry' => '+5 seconds'));
+		$key = 'default_key';
+		$data = 'value';
+		$time = strtotime('+5 seconds');
+
+		$closure = $Redis->write($key, $data);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key', 'data');
+		$result = $closure($Redis, $params, null);
+		$expected = $data;
+		$this->assertEqual($expected, $result);
+
+		$result = $this->_Redis->get($key);
+		$this->assertEqual($expected, $result);
+
+		$result = $this->_Redis->ttl($key);
+		$this->assertEqual($time - time(), $result);
+
+		$result = $this->_Redis->delete($key);
+		$this->assertTrue($result);
+	}
+
 	public function testSimpleRead() {
 		$key = 'read_key';
 		$data = 'read data';

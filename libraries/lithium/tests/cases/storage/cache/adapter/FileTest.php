@@ -63,6 +63,30 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
 	}
 
+	public function testWriteDefaultCacheExpiry() {
+		$File = new File(array('expiry' => '+1 minute'));
+		$key = 'default_keykey';
+		$data = 'data';
+		$time = time() + 60;
+
+		$closure = $File->write($key, $data);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key', 'data');
+		$result = $closure($File, $params, null);
+		$expected = 25;
+		$this->assertEqual($expected, $result);
+
+		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
+		$this->assertEqual(
+			file_get_contents(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"),
+			"{:expiry:$time}\ndata"
+		);
+
+		$this->assertTrue(unlink(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
+		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
+	}
+
 	public function testRead() {
 		$key = 'key';
 		$time = time() + 60;

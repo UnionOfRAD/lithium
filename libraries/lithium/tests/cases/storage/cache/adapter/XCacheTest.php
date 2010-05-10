@@ -86,6 +86,28 @@ class XCacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testWriteDefaultCacheExpiry() {
+		$XCache = new XCache(array('expiry' => '+5 seconds'));
+		$key = 'default_key';
+		$data = 'value';
+		$time = strtotime('+5 seconds');
+
+		$closure = $XCache->write($key, $data);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key', 'data');
+		$result = $closure($XCache, $params, null);
+		$expected = $data;
+		$this->assertEqual($expected, $result);
+
+		$result = xcache_get($key);
+		$this->assertEqual($expected, $result);
+
+		$result = xcache_unset($key);
+		$this->assertTrue($result);
+
+	}
+
 	public function testSimpleRead() {
 		$key = 'read_key';
 		$data = 'read data';

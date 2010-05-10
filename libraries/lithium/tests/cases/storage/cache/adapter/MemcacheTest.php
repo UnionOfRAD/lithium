@@ -88,6 +88,27 @@ class MemcacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testWriteDefaultCacheExpiry() {
+		$Memcache = new Memcache(array('expiry' => '+5 seconds'));
+		$key = 'default_key';
+		$data = 'value';
+
+		$closure = $Memcache->write($key, $data);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key', 'data');
+		$result = $closure($Memcache, $params, null);
+		$expected = $data;
+		$this->assertEqual($expected, $result);
+
+		$result = $this->_Memcached->get($key);
+		$this->assertEqual($expected, $result);
+
+		$result = $this->_Memcached->delete($key);
+		$this->assertTrue($result);
+
+	}
+
 	public function testWriteMulti() {
 		$expiry = '+1 minute';
 		$time = strtotime($expiry);

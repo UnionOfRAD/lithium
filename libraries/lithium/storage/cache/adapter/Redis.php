@@ -65,7 +65,11 @@ class Redis extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('prefix' => '', 'server' => '127.0.0.1:6379');
+		$defaults = array(
+			'prefix' => '',
+			'expiry' => '+1 hour',
+			'server' => '127.0.0.1:6379'
+		);
 		parent::__construct($config + $defaults);
 	}
 
@@ -98,14 +102,16 @@ class Redis extends \lithium\core\Object {
 	 *
 	 * @param string $key The key to uniquely identify the cached item
 	 * @param mixed $value The value to be cached
-	 * @param string $expiry A strtotime() compatible cache time
+	 * @param null|string $expiry A strtotime() compatible cache time. If no expiry time is set,
+	 *        then the default cache expiration time set with the cache configuration will be used.
 	 * @return boolean True on successful write, false otherwise
 	 */
 	public function write($key, $value = null, $expiry = null) {
 		$connection =& static::$connection;
+		$expiry = ($expiry) ?: $this->_config['expiry'];
 
-		return function($self, $params, $chain) use (&$connection) {
-			if ($params['expiry'] === null) {
+		return function($self, $params, $chain) use (&$connection, $expiry) {
+			if (is_array($params['key'])) {
 				$expiry = $params['data'];
 
 				if ($connection->mset($params['key'])) {
@@ -118,7 +124,7 @@ class Redis extends \lithium\core\Object {
 				}
 			}
 			if ($connection->set($params['key'], $params['data'])){
-				return $self->invokeMethod('_ttl', array($params['key'], $params['expiry']));
+				return $self->invokeMethod('_ttl', array($params['key'], $expiry));
 			}
 		};
 	}

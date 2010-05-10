@@ -40,14 +40,21 @@ class File extends \lithium\core\Object {
 	/**
 	 * Class constructor.
 	 *
-	 * @param array $config Configuration parameters for this cache adapter.
-	 *        These settings are indexed by name and queryable
-	 *        through `Cache::config('name')`.
-	 * @return void
 	 * @see lithium\storage\Cache::config()
+	 * @param array $config Configuration parameters for this cache adapter. These settings are
+	 *        indexed by name and queryable through `Cache::config('name')`.
+	 *        The defaults are:
+	 *        - 'path' : Path where cached entries live `LITHIUM_APP_PATH . '/resources/tmp/cache'
+	 *        - 'expiry' : Default expiry time used if none is explicitly set when calling
+	 *          `Cache::write()`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('path' => LITHIUM_APP_PATH . '/resources/tmp/cache');
+		$defaults = array(
+			'path' => LITHIUM_APP_PATH . '/resources/tmp/cache',
+			'prefix' => '',
+			'expiry' => '+1 hour'
+		);
 		parent::__construct($config + $defaults);
 	}
 
@@ -56,17 +63,18 @@ class File extends \lithium\core\Object {
 	 *
 	 * @param string $key The key to uniquely identify the cached item.
 	 * @param mixed $data The value to be cached.
-	 * @param string $expiry A strtotime() compatible cache time.
+	 * @param null|string $expiry A strtotime() compatible cache time. If no expiry time is set,
+	 *        then the default cache expiration time set with the cache configuration will be used.
 	 * @return boolean True on successful write, false otherwise.
 	 */
-	public function write($key, $data, $expiry) {
+	public function write($key, $data, $expiry = null) {
 		$path = $this->_config['path'];
+		$expiry = ($expiry) ?: $this->_config['expiry'];
 
-		return function($self, $params, $chain) use (&$path) {
-			extract($params);
+		return function($self, $params, $chain) use (&$path, $expiry) {
 			$expiry = strtotime($expiry);
-			$data = "{:expiry:{$expiry}}\n{$data}";
-			$path = "$path/$key";
+			$data = "{:expiry:{$expiry}}\n{$params['data']}";
+			$path = "{$path}/{$params['key']}";
 
 			return file_put_contents($path, $data);
 		};

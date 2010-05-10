@@ -52,7 +52,7 @@ class XCache extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('prefix' => '');
+		$defaults = array('prefix' => '', 'expiry' => '+1 hour');
 		parent::__construct($config + $defaults);
 	}
 
@@ -61,12 +61,15 @@ class XCache extends \lithium\core\Object {
 	 *
 	 * @param string $key The key to uniquely identify the cached item
 	 * @param mixed $data The value to be cached
-	 * @param string $expiry A strtotime() compatible cache time
+	 * @param null|string $expiry A strtotime() compatible cache time. If no expiry time is set,
+	 *        then the default cache expiration time set with the cache configuration will be used.
 	 * @return boolean True on successful write, false otherwise
 	 */
-	public function write($key, $data, $expiry) {
-		return function($self, $params, $chain) {
-			return xcache_set($params['key'], $params['data'], strtotime($params['expiry']));
+	public function write($key, $data, $expiry = null) {
+		$expiry = ($expiry) ?: $this->_config['expiry'];
+
+		return function($self, $params, $chain) use ($expiry) {
+			return xcache_set($params['key'], $params['data'], strtotime($expiry));
 		};
 	}
 
