@@ -299,10 +299,12 @@ class Form extends \lithium\template\Helper {
 	 * Generates a form field with a label, input, and error message (if applicable), all contained
 	 * within a wrapping element.
 	 *
-	 * @example $this->form->field('name');
-	 * @example $this->form->field('present', array('type' => 'checkbox'));
-	 * @example $this->form->field(array('email' => 'Enter a valid email'));
-	 * @example $this->form->field(array('name','email','phone'),array('div' => false));
+	 * {{{
+	 *  echo $this->form->field('name');
+	 *  echo $this->form->field('present', array('type' => 'checkbox'));
+	 *  echo $this->form->field(array('email' => 'Enter a valid email'));
+	 *  echo $this->form->field(array('name','email','phone'),array('div' => false));
+	 * }}}
 	 * @param mixed $name The name of the field to render. If the form was bound to an object
 	 *                   passed in `create()`, `$name` should be the name of a field in that object.
 	 *                   Otherwise, can be any arbitrary field name, as it will appear in POST data.
@@ -335,13 +337,9 @@ class Form extends \lithium\template\Helper {
 			foreach ($name as $field => $label) {
 				if (is_numeric($field)) {
 					$field = $label;
-					if (isset($options['label'])) {
-						unset($options['label']);
-					}
-				} else {
-					$options['label'] = $label;
+					unset($label);
 				}
-				$return .= $this->field($field, $options);
+				$return .= $this->field($field, compact('label') + $options);
 			}
 			return $return;
 		}
