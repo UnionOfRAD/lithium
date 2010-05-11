@@ -108,39 +108,6 @@ abstract class Collection extends \lithium\util\Collection {
 	);
 
 	/**
-	 * Class constructor
-	 *
-	 * @param array $config
-	 * @return void
-	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('data' => array(), 'handle' => null, 'model' => null);
-		parent::__construct($config + $defaults);
-
-		foreach (array('data', 'classes', 'handle', 'model', 'result', 'query') as $key) {
-			unset($this->_config[$key]);
-		}
-		if (!is_array($this->_data)) {
-			$message = 'Error creating new Collection instance; data format invalid.';
-			throw new RuntimeException($message);
-		}
-	}
-
-	/**
-	 * Configures protected properties of a `Collection` so that it is parented to `$parent`.
-	 *
-	 * @param object $parent
-	 * @param array $config
-	 * @return void
-	 */
-	public function assignTo($parent, array $config = array()) {
-		foreach ($config as $key => $val) {
-			$this->{'_' . $key} = $val;
-		}
-		$this->_parent =& $parent;
-	}
-
-	/**
 	 * Returns the model which this particular collection is based off of.
 	 *
 	 * @return string The fully qualified model class name.

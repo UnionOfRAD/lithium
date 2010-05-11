@@ -184,6 +184,7 @@ class SourceTest extends \lithium\test\Unit {
 		$this->assertIdentical(1, Company::count(array('active' => false)));
 		$this->assertIdentical(0, Company::count(array('active' => null)));
 		$all = Company::all();
+		$this->assertIdentical(2, Company::count());
 
 		$expected = count($this->companyData);
 		$this->assertEqual($expected, $all->count());
