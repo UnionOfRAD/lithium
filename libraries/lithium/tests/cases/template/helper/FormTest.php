@@ -518,6 +518,45 @@ class FormTest extends \lithium\test\Unit {
 		));
 	}
 
+	public function testFieldWithLabelShorthand() {
+		$result = $this->form->field(array('name' => 'Enter a name'));
+		$this->assertTags($result, array(
+			'div' => array(),
+			'label' => array('for' => 'name'), 'Enter a name', '/label',
+			'input' => array('type' => 'text', 'name' => 'name'),
+		));
+	}
+
+	public function testMultipleFields() {
+		$result = $this->form->field(array(
+			'name' => 'Enter a name',
+			'phone_number',
+			'email' => 'Enter a valid email'
+		));
+		$this->assertTags($result, array(
+			array('div' => array()),
+				array('label' => array('for' => 'name')),
+					'Enter a name',
+				'/label',
+				array('input' => array('type' => 'text', 'name' => 'name')),
+			'/div',
+
+			array('div' => array()),
+				array('label' => array('for' => 'phone_number')),
+					'Phone Number',
+				'/label',
+				array('input' => array('type' => 'text', 'name' => 'phone_number')),
+			'/div',
+
+			array('div' => array()),
+				array('label' => array('for' => 'email')),
+					'Enter a valid email',
+				'/label',
+				array('input' => array('type' => 'text', 'name' => 'email')),
+			'/div'
+		));
+	}
+
 	public function testCustomInputTypes() {
 		// Creates an HTML5 'range' input slider:
 		$range = $this->form->range('completion', array('min' => 0, 'max' => 100));

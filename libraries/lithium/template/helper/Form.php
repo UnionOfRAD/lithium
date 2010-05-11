@@ -299,9 +299,15 @@ class Form extends \lithium\template\Helper {
 	 * Generates a form field with a label, input, and error message (if applicable), all contained
 	 * within a wrapping element.
 	 *
-	 * @param string $name The name of the field to render. If the form was bound to an object
-	 *               passed in `create()`, `$name` should be the name of a field in that object.
-	 *               Otherwise, can be any arbitrary field name, as it will appear in POST data.
+	 * @example $this->form->field('name');
+	 * @example $this->form->field('present', array('type' => 'checkbox'));
+	 * @example $this->form->field(array('email' => 'Enter a valid email'));
+	 * @example $this->form->field(array('name','email','phone'),array('div' => false));
+	 * @param mixed $name The name of the field to render. If the form was bound to an object
+	 *                   passed in `create()`, `$name` should be the name of a field in that object.
+	 *                   Otherwise, can be any arbitrary field name, as it will appear in POST data.
+	 *                   Alternatively supply an array of fields that will use the same options
+	 *                   array($field1 => $label1, $field2, $field3 => $label3)
 	 * @param array $options Rendering options for the form field. The available options are as
 	 *              follows:
 	 *              - `'label'` _mixed_: A string or array defining the label text and / or
@@ -324,6 +330,21 @@ class Form extends \lithium\template\Helper {
 	 *         label and error message, wrapped in a `<div />` element.
 	 */
 	public function field($name, array $options = array()) {
+		if (is_array($name)) {
+			$return = '';
+			foreach ($name as $field => $label) {
+				if (is_numeric($field)) {
+					$field = $label;
+					if (isset($options['label'])) {
+						unset($options['label']);
+					}
+				} else {
+					$options['label'] = $label;
+				}
+				$return .= $this->field($field, $options);
+			}
+			return $return;
+		}
 		$defaults = array(
 			'label' => null,
 			'type' => 'text',
