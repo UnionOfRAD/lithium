@@ -67,6 +67,15 @@ class Document extends \lithium\data\Collection {
 	protected $_parent = null;
 
 	/**
+	 * If this `Document` instance has a parent document (see `$_parent`), this value indicates
+	 * the key name of the parent document that contains it.
+	 *
+	 * @see lithium\data\collection\Document::$_parent
+	 * @var string
+	 */
+	protected $_pathKey = null;
+
+	/**
 	 * Indicates whether this document has already been created in the database.
 	 *
 	 * @var boolean
@@ -101,7 +110,7 @@ class Document extends \lithium\data\Collection {
 	 */
 	protected $_autoConfig = array(
 		'items', 'classes' => 'merge', 'handle', 'model',
-		'result', 'query', 'parent', 'exists', 'stats'
+		'result', 'query', 'parent', 'exists', 'stats', 'pathKey'
 	);
 
 	/**
@@ -110,7 +119,7 @@ class Document extends \lithium\data\Collection {
 	 * @param array $config
 	 * @return void
 	 */
-	public function __construct($config = array()) {
+	public function __construct(array $config = array()) {
 		if (isset($config['data']) && !isset($config['items'])) {
 			$config['items'] = $config['data'];
 			unset($config['data']);
@@ -143,16 +152,40 @@ class Document extends \lithium\data\Collection {
 	 * @return mixed Returns the value of the field specified in `$name`, and wraps complex data
 	 *         types in sub-`Document` objects.
 	 */
-	public function __get($name) {
+	public function &__get($name) {
+		$model = $this->_model;
 		$items = null;
+		$null  = null;
+
+		if (strpos($name, '.')) {
+			$current = $this;
+			$path = explode('.', $name);
+			$length = count($path) - 1;
+
+			foreach ($path as $i => $key) {
+				$current =& $current->__get($key);
+				if (!$current instanceof Document && $i < $length) {
+					return $null;
+				}
+			}
+			return $current;
+		}
+
+		foreach ($model::relations() as $relation => $config) {
+			$linkKey = $config->data('key');
+			if ($linkKey === $name) {
+				$items = isset($this->_items[$name]) ? $this->_items[$name] : array();
+				$this->_items[$name] = $this->_child('recordSet', $name, $items);
+			}
+		}
 
 		if (!isset($this->_items[$name]) && !$items = $this->_populate(null, $name)) {
-			return null;
+			return $null;
 		}
 		$items = $items ?: $this->_items[$name];
 
 		if ($this->_isComplexType($items) && !$items instanceof Iterator) {
-			$this->_items[$name] = $this->_record('recordSet', $this->_items[$name]);
+			$this->_items[$name] = $this->_child('recordSet', $name, $this->_items[$name]);
 		}
 		return $this->_items[$name];
 	}
@@ -171,8 +204,26 @@ class Document extends \lithium\data\Collection {
 			$this->_items = $name + $this->_items;
 			return;
 		}
+
+		if (is_string($name) && strpos($name, '.')) {
+			$current = $this;
+			$path = explode('.', $name);
+			$length = count($path) - 1;
+
+			for ($i = 0; $i < $length; $i++) {
+				$key = $path[$i];
+				$next = $current->__get($key);
+
+				if (!$next instanceof Document) {
+					$next = $current->_items[$key] = $this->_child('recordSet', $key, array());
+				}
+				$current = $next;
+			}
+			$current->__set(end($path), $value);
+		}
+
 		if ($this->_isComplexType($value) && !$value instanceof Iterator) {
-			$value = $this->_record('recordSet', $value);
+			$value = $this->_child('recordSet', $name, $value);
 		}
 		$this->_items[$name] = $value;
 	}
@@ -304,20 +355,6 @@ class Document extends \lithium\data\Collection {
 	}
 
 	/**
-	 * Gets the stat or stats associated with this `Document`.
-	 *
-	 * @param string $name Stat name.
-	 * @return mixed Single stat if `$name` supplied, else all stats for this 
-	 *               `Document`.
-	 */
-	public function stats($name = null) {
-		if ($name) {
-			return isset($this->_stats[$name]) ? $this->_stats[$name] : null;
-		}
-		return $this->_stats;
-	}
-
-	/**
 	 * Called after a `Document` is saved. Updates the object's internal state to reflect the
 	 * corresponding database record, and sets the `Document`'s primary key, if this is a
 	 * newly-created object.
@@ -380,23 +417,36 @@ class Document extends \lithium\data\Collection {
 		if (!isset($items)) {
 			return $this->_close();
 		}
-		return $this->_items[] = $this->_record('record', $items);
+		return $this->_items[] = $this->_child('record', $key, $items);
 	}
 
 	/**
-	 * Instantiates a new `Document` record object as a descendant of the current object, and sets
-	 * all default values and internal state.
+	 * Instantiates a new `Document` object as a descendant of the current object, and sets all
+	 * default values and internal state.
 	 *
 	 * @param string $classType The type of class to create, either `'record'` or `'recordSet'`.
 	 * @param array $items
 	 * @param array $options
 	 * @return object Returns a new `Document` object instance.
 	 */
-	protected function _record($classType, $items, $options = array()) {
+	protected function _child($classType, $key, $items, $options = array()) {
 		$parent = $this;
 		$model = $this->_model;
 		$exists = $this->_exists;
-		$options += compact('model', 'items', 'parent', 'exists');
+		$pathKey = trim("{$this->_pathKey}.{$key}", '.');
+
+		if ($key) {
+			foreach ($model::relations() as $name => $relation) {
+				$linkKey = $relation->data('key');
+
+				if ($pathKey === $linkKey) {
+					$model = $relation->data('to');
+					break;
+				}
+			}
+		}
+
+		$options += compact('model', 'items', 'parent', 'exists', 'pathKey');
 		return new $this->_classes[$classType]($options);
 	}
 }

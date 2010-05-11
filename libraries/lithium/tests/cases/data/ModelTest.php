@@ -127,14 +127,14 @@ class ModelTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testRelationshipIntrospection() {
-		$result = MockPost::relations();
+		$result = array_keys(MockPost::relations());
 		$expected = array('MockComment');
 		$this->assertEqual($expected, $result);
 
 		$result = MockPost::relations('hasMany');
 		$this->assertEqual($expected, $result);
 
-		$result = MockComment::relations();
+		$result = array_keys(MockComment::relations());
 		$expected = array('MockPost');
 		$this->assertEqual($expected, $result);
 
@@ -145,20 +145,26 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertFalse(MockPost::relations('belongsTo'));
 
 		$expected = array(
+			'name' => 'MockPost',
 			'type' => 'belongsTo',
-			'class' => 'lithium\tests\mocks\data\MockPost',
+			'from' => 'lithium\tests\mocks\data\MockComment',
+			'to' => 'lithium\tests\mocks\data\MockPost',
 			'fields' => true,
-			'key' => 'mock_post_id'
+			'key' => 'mock_post_id',
+			'init' => true
 		);
-		$this->assertEqual($expected, MockComment::relations('MockPost'));
+		$this->assertEqual($expected, MockComment::relations('MockPost')->data());
 
 		$expected = array(
+			'name' => 'MockComment',
 			'type' => 'hasMany',
-			'class' => 'lithium\tests\mocks\data\MockComment',
+			'to' => 'lithium\tests\mocks\data\MockComment',
+			'from' => 'lithium\tests\mocks\data\MockPost',
 			'fields' => true,
-			'key' => 'mock_post_id'
+			'key' => 'mock_post_id',
+			'init' => true
 		);
-		$this->assertEqual($expected, MockPost::relations('MockComment'));
+		$this->assertEqual($expected, MockPost::relations('MockComment')->data());
 	}
 
 	public function testSimpleRecordCreation() {

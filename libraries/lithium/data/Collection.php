@@ -78,6 +78,15 @@ abstract class Collection extends \lithium\util\Collection {
 	);
 
 	/**
+	 * Returns the model which this particular collection is based off of.
+	 *
+	 * @return string The fully qualified model class name.
+	 */
+	public function model() {
+		return $this->_model;
+	}
+
+	/**
 	 * Returns a boolean indicating whether an offset exists for the 
 	 * current `Document`.
 	 *
@@ -150,6 +159,20 @@ abstract class Collection extends \lithium\util\Collection {
 			while($this->next()) {}
 		}
 		return parent::map($filter, $options);
+	}
+
+	/**
+	 * Gets the stat or stats associated with this `Collection`.
+	 *
+	 * @param string $name Stat name.
+	 * @return mixed Single stat if `$name` supplied, else all stats for this
+	 *               `Collection`.
+	 */
+	public function stats($name = null) {
+		if ($name) {
+			return isset($this->_stats[$name]) ? $this->_stats[$name] : null;
+		}
+		return $this->_stats;
 	}
 
 	/**

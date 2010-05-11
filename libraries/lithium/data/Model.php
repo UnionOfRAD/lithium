@@ -370,8 +370,9 @@ class Model extends \lithium\core\StaticObject {
 				unset($options['classes']);
 
 				if (!isset($options['conditions']) && $options) {
-					$options = array('conditions' => $options) + compact('classes', 'model');
+					$options = array('conditions' => $options);
 				}
+				$options += compact('classes', 'model');
 
 				$query = new $classes['query'](array('type' => 'read') + $options);
 				return $self::invokeMethod('_connection')->calculation('count', $query, $options);
@@ -423,10 +424,9 @@ class Model extends \lithium\core\StaticObject {
 	 * Model::find('count'); // returns a count of all records
 	 *
 	 * // The first ten records that have 'author' set to 'Lithium'
-	 * Model::find('all',
-	 *     'conditions' => array('author' => "Lithium"),
-	 *     'limit' => 10
-	 * );
+	 * Model::find('all', array(
+	 *     'conditions' => array('author' => "Lithium"), 'limit' => 10
+	 * ));
 	 * }}}
 	 *
 	 * @param string $type The find type, which is looked up in `Model::$_finders`. By default it
@@ -530,7 +530,7 @@ class Model extends \lithium\core\StaticObject {
 
 		if (is_object($values) && method_exists($values, 'to')) {
 			$values = $values->to('array');
-		} elseif (is_object($values) && isset($values->{$key})) {
+		} elseif (is_object($values) && is_string($key) && isset($values->{$key})) {
 			return $values->{$key};
 		}
 
@@ -538,8 +538,7 @@ class Model extends \lithium\core\StaticObject {
 			return $key;
 		}
 		$key = (array) $key;
-		$scope = array_combine($key, array_fill(0, count($key), null));
-		return array_intersect_key($values, $scope);
+		return array_intersect_key($values, array_combine($key, $key));
 	}
 
 	/**
@@ -552,13 +551,12 @@ class Model extends \lithium\core\StaticObject {
 	public static function relations($name = null) {
 		$self = static::_instance();
 
-		if (empty($name)) {
-			return array_keys($self->_relations);
+		if (!$name) {
+			return $self->_relations;
 		}
-
 		if (isset($self->_relationTypes[$name])) {
 			return array_keys(array_filter($self->_relations, function($i) use ($name) {
-				return $i['type'] == $name;
+				return $i->data('type') == $name;
 			}));
 		}
 		return isset($self->_relations[$name]) ? $self->_relations[$name] : null;
@@ -652,14 +650,19 @@ class Model extends \lithium\core\StaticObject {
 	 * $post->save(null, array('validate' => false));
 	 * }}}
 	 *
-	 * @param object $record The record or document object to be saved in the database.
+	 * @param object $record The record or document object to be saved in the database. This
+	 *               parameter is implicit and should not be passed under normal circumstances.
+	 *               In the above example, the call to `save()` on the record object is
+	 *               transparently proxied through to the `Post` model class, and `$post` is passed
+	 *               in as the `$record` parameter.
 	 * @param array $data Any data that should be assigned to the record before it is saved.
 	 * @param array $options Options:
-	 *        - 'callbacks': If `false`, all callbacks will be disabled before executing. Defaults
-	 *        to `true`.
-	 *        - 'validate': If `false`, validation will be skipped, and the record will be
-	 *        immediately saved. Defaults to `true`.
-	 *        - 'whitelist': An array of fields that are allowed to be saved to this record.
+	 *        - `'callbacks'` _boolean_: If `false`, all callbacks will be disabled before
+	 *           executing. Defaults to `true`.
+	 *        - `'validate'` _boolean_: If `false`, validation will be skipped, and the record will
+	 *          be immediately saved. Defaults to `true`.
+	 *        - `'whitelist'` _array_: An array of fields that are allowed to be saved to this
+	 *          record.
 	 *
 	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
 	 */
@@ -842,8 +845,8 @@ class Model extends \lithium\core\StaticObject {
 
 		foreach ($self->_relationTypes as $type => $keys) {
 			foreach (Set::normalize($self->{$type}) as $name => $config) {
-				$config = $connection->relationship($class, $type, $name, (array) $config);
-				$relations[$name] = $config + compact('type');
+				$relationship = $connection->relationship($class, $type, $name, (array) $config);
+				$relations[$name] = $relationship;
 			}
 		}
 		return $relations;

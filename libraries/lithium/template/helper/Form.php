@@ -362,9 +362,7 @@ class Form extends \lithium\template\Helper {
 			break;
 		}
 		$error = ($this->_binding) ? $this->error($name) : null;
-		$params = compact('wrap', 'label', 'input', 'error');
-
-		return $this->_render(__METHOD__, $template, $params);
+		return $this->_render(__METHOD__, $template, compact('wrap', 'label', 'input', 'error'));
 	}
 
 	/**

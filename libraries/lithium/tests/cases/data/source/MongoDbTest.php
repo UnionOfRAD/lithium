@@ -14,6 +14,7 @@ use \lithium\data\source\MongoDb;
 use \lithium\data\Connections;
 use \lithium\data\Model;
 use \lithium\data\model\Query;
+use lithium\tests\mocks\data\MockPost;
 use \lithium\data\collection\Document;
 
 class MongoDbTest extends \lithium\test\Unit {
@@ -28,24 +29,19 @@ class MongoDbTest extends \lithium\test\Unit {
 	);
 
 	public function skip() {
-		$message = 'MongoDb Extension is not loaded';
-		$this->skipIf(!MongoDb::enabled(), $message);
+		$this->skipIf(!MongoDb::enabled(), 'MongoDb Extension is not loaded');
 
 		$db = new MongoDb($this->_testConfig);
-		$this->skipIf(
-			!$db->isConnected(),
-			"`{$this->_testConfig['database']}` database or connection unavailable"
-		);
+		$message = "`{$this->_testConfig['database']}` database or connection unavailable";
+		$this->skipIf(!$db->isConnected(), $message);
 
-		Connections::add('lithium_mongo_test', array(
-			$this->_testConfig
-		));
+		Connections::add('lithium_mongo_test', array($this->_testConfig));
 	}
 
 	public function setUp() {
 		$this->db = Connections::get('lithium_mongo_test');
-
 		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
+
 		$this->query = new Query(compact('model') + array(
 			'record' => new Document(compact('model'))
 		));
@@ -298,6 +294,66 @@ class MongoDbTest extends \lithium\test\Unit {
 		$result = $this->db->calculation('count', $this->query);
 		$expected = 0;
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testEnabled() {
+		$this->assertTrue(MongoDb::enabled());
+	}
+
+	public function testArbitraryMethodCalls() {
+		$config = $this->_testConfig;
+		$this->assertEqual("{$config['host']}:{$config['port']}", $this->db->__toString());
+		$this->assertTrue(is_array($this->db->listDBs()));
+	}
+
+	public function testDocumentSorting() {
+		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
+		$model::config(array('connection' => 'lithium_mongo_test', 'source' => 'ordered_docs'));
+
+		$model::create(array('title' => 'Third document',  'position' => 3))->save();
+		$model::create(array('title' => 'First document',  'position' => 1))->save();
+		$model::create(array('title' => 'Second document', 'position' => 2))->save();
+
+		$documents = $model::all(array('order' => 'position'));
+
+		$this->assertEqual('First document', $documents[0]->title);
+		$this->assertEqual('Second document', $documents[1]->title);
+		$this->assertEqual('Third document', $documents[2]->title);
+
+		$documents = $model::all(array('order' => array('position' => 'asc')));
+
+		$this->assertEqual('First document', $documents[0]->title);
+		$this->assertEqual('Second document', $documents[1]->title);
+		$this->assertEqual('Third document', $documents[2]->title);
+
+		$copy = $model::all(array('order' => array('position')));
+		$this->assertIdentical($documents->data(), $copy->data());
+
+		$documents = $model::all(array('order' => array('position' => 'desc')));
+
+		$this->assertEqual('Third document', $documents[0]->title);
+		$this->assertEqual('Second document', $documents[1]->title);
+		$this->assertEqual('First document', $documents[2]->title);
+
+		foreach ($documents as $doc) {
+			$this->assertTrue($doc->delete());
+		}
+	}
+
+	public function testRelationshipGeneration() {
+		Connections::add('mock-source', $this->_testConfig);
+		$model = 'lithium\tests\mocks\data\MockComment';
+		$result = $this->db->relationship($model, 'belongsTo', 'MockPost');
+		$expected = array(
+			'name' => 'MockPost',
+			'type' => 'belongsTo',
+			'key' => 'mockComment',
+			'from' => 'lithium\tests\mocks\data\MockComment',
+			'to' => 'lithium\tests\mocks\data\MockPost',
+			'fields' => true,
+			'init' => true
+		);
+		$this->assertEqual($expected, $result->data());
 	}
 }
 

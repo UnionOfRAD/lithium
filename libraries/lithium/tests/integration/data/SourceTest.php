@@ -14,7 +14,7 @@ use \lithium\data\Connections;
 
 class Company extends \lithium\data\Model {
 
-	public $hasMany = array('Employee');
+	public $hasMany = array('Employees');
 
 	protected $_meta = array('connection' => 'test');
 }
@@ -28,14 +28,17 @@ class Employee extends \lithium\data\Model {
 
 class SourceTest extends \lithium\test\Unit {
 
+	protected $_connection = null;
+
 	public $companyData = array(
-		array('name' => 'BigBoxMart'),
-		array('name' => 'Ma \'n Pa\'s Data Warehousing & Bait Shop')
+		array('name' => 'StuffMart', 'active' => true),
+		array('name' => 'Ma \'n Pa\'s Data Warehousing & Bait Shop', 'active' => false)
 	);
 
 	public function setUp() {
 		Company::config();
 		Employee::config();
+		$this->_connection = Connections::get('test');
 	}
 
 	public function tearDown() {
@@ -68,7 +71,6 @@ class SourceTest extends \lithium\test\Unit {
 	 */
 	public function testSingleReadWriteWithKey() {
 		$key = Company::meta('key');
-
 		$new = Company::create(array($key => 12345, 'name' => 'Acme, Inc.'));
 
 		$result = $new->data();
@@ -129,6 +131,7 @@ class SourceTest extends \lithium\test\Unit {
 		}
 
 		$all = Company::all();
+		$this->assertIdentical(2, Company::count());
 
 		$expected = count($this->companyData);
 		$this->assertEqual($expected, $all->count());
@@ -141,6 +144,7 @@ class SourceTest extends \lithium\test\Unit {
 		foreach ($companies as $company) {
 			$this->assertTrue($company->delete());
 		}
+		$this->assertIdentical(0, Company::count());
 	}
 
 	public function testRecordOffset() {
@@ -149,10 +153,10 @@ class SourceTest extends \lithium\test\Unit {
 		}
 		$all = Company::all();
 
-		$result = $all->first(function($doc) { return $doc->name == 'BigBoxMart'; });
+		$result = $all->first(function($doc) { return $doc->name == 'StuffMart'; });
 		$this->skipIf(!$result instanceof ArrayAccess, 'Data class does not implement ArrayAccess');
 
-		$expected = 'BigBoxMart';
+		$expected = 'StuffMart';
 		$this->assertEqual($expected, $result['name']);
 
 		$result = $result->data();
@@ -182,7 +186,7 @@ class SourceTest extends \lithium\test\Unit {
 
 		$id = $company->{$key};
 		$companyCopy = Company::find($id);
-		$this->assertEqual($company->data(), $companyCopy->data());
+		$this->assertEqual($company->data(), array_filter($companyCopy->data()));
 	}
 
 	/**
@@ -191,15 +195,14 @@ class SourceTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testDefaultRelationshipInfo() {
-		$this->skipIf(
-			Company::relations('Employee') == array('type' => 'hasMany'),
-			'This data source does not support relationships.'
-		);
+		$connection = $this->_connection;
+		$message = "Relationships are not supported by this adapter.";
+		$this->skipIf(!$connection::enabled('relationships'), $message);
 
-		$this->assertEqual(array('Employee'), Company::relations());
-		$this->assertEqual(array('Company'), Employee::relations());
+		$this->assertEqual(array('Employees'), array_keys(Company::relations()));
+		$this->assertEqual(array('Company'), array_keys(Employee::relations()));
 
-		$this->assertEqual(array('Employee'), Company::relations('hasMany'));
+		$this->assertEqual(array('Employees'), Company::relations('hasMany'));
 		$this->assertEqual(array('Company'), Employee::relations('belongsTo'));
 
 		$this->assertFalse(Company::relations('belongsTo'));
@@ -208,9 +211,17 @@ class SourceTest extends \lithium\test\Unit {
 		$this->assertFalse(Employee::relations('hasMany'));
 		$this->assertFalse(Employee::relations('hasOne'));
 
-		$result = Company::relations('Employee');
-		$this->assertEqual('hasMany', $result['type']);
-		$this->assertEqual(__NAMESPACE__ . '\Employee', $result['class']);
+		$result = Company::relations('Employees');
+		$this->assertEqual('hasMany', $result->data('type'));
+		$this->assertEqual(__NAMESPACE__ . '\Employee', $result->data('to'));
+	}
+
+	public function testRelationshipQuerying() {
+		foreach ($this->companyData as $data) {
+			Company::create($data)->save();
+		}
+		$related = $companies = Company::first()->employees->model();
+		$this->assertEqual($related, __NAMESPACE__ . '\Employee');
 	}
 }
 

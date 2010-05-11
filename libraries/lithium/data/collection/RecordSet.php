@@ -59,7 +59,11 @@ class RecordSet extends \lithium\data\Collection {
 		parent::_init();
 
 		if ($this->_handle && $this->_result) {
-			$this->_columns = $this->_handle->schema($this->_query, $this->_result, $this);
+			$this->_columns = $this->_columnMap();
+		}
+		if ($this->_items && !$this->_index) {
+			$this->_index = array_keys($this->_items);
+			$this->_items = array_values($this->_items);
 		}
 	}
 
@@ -175,8 +179,9 @@ class RecordSet extends \lithium\data\Collection {
 	 *
 	 * @return mixed
 	 */
-	public function key() {
-		return $this->_index[$this->_pointer];
+	public function key($full = false) {
+		$key = $this->_index[$this->_pointer];
+		return (is_array($key) && !$full) ? reset($key) : $this->_pointer;
 	}
 
 	/**
@@ -280,17 +285,25 @@ class RecordSet extends \lithium\data\Collection {
 			return $this->_close();
 		}
 
-		foreach ((array) $this->_columns as $model => $fields) {
-
+		foreach ($this->_columns as $model => $fields) {
 			if (is_array($record)) {
 				$class = $this->_classes['record'];
 				$data = array_combine($fields, array_slice($record, 0, count($fields)));
 				$record = new $class(compact('model', 'data') + array('exists' => true));
 			}
-			$this->_items[] = $record;
-			$this->_index[] = $modelClass::key($record);
-			return $record;
 		}
+		$key = $modelClass::key($record);
+
+		$this->_items[] = $record;
+		$this->_index[] = count($key) === 1 ? reset($key) : $key;
+		return $record;
+	}
+
+	protected function _columnMap() {
+		if ($map = $this->_query->map()) {
+			return $map;
+		}
+		return $this->_handle->schema($this->_query, $this->_result, $this);
 	}
 }
 
