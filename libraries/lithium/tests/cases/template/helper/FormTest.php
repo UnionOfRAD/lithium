@@ -577,6 +577,18 @@ class FormTest extends \lithium\test\Unit {
 		));
 	}
 
+	public function testFormMultipleErrors() {
+		$record = new Record();
+		$record->errors(array('email' => array('Empty', 'Valid')));
+		$this->form->create($record);
+
+		$result = $this->form->error('email');
+		$this->assertTags($result, array(
+			array('div' => array('class' => 'error')), 'Empty', '/div',
+			array('div' => array('class' => 'error')), 'Valid', '/div'
+		));
+	}
+
 	public function testFormErrorWithRecordAndSpecificKey() {
 		$record = new Record();
 		$record->errors(array('name' => array('Please enter a name')));

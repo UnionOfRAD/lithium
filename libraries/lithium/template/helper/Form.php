@@ -536,7 +536,16 @@ class Form extends \lithium\template\Helper {
 			return null;
 		}
 		if (is_array($content)) {
-			$content = !isset($content[$key]) ? reset($content) : $content[$key];
+			if ($key) {
+				$content = !isset($content[$key]) ? reset($content) : $content[$key];
+			} else {
+				$return = '';
+				$errors = $content;
+				foreach ($errors as $content) {
+					$return .= $this->_render(__METHOD__, $template, compact('content', 'options'));
+				}
+				return $return;
+			}
 		}
 		return $this->_render(__METHOD__, $template, compact('content', 'options'));
 	}
