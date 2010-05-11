@@ -588,6 +588,18 @@ class FormTest extends \lithium\test\Unit {
 		));
 	}
 
+	public function testFormErrorWithRecordAndSpecificKeyAndValue() {
+		$record = new Record();
+		$record->name = 'Nils';
+		$record->errors(array('name' => array('Please enter a name')));
+		$this->form->create($record);
+
+		$result = $this->form->error('name');
+		$this->assertTags($result, array(
+			'div' => array('class' => 'error'), 'Please enter a name', '/div'
+		));
+	}
+
 	public function testFormFieldWithError() {
 		$record = new Record();
 		$record->errors(array('name' => array('Please enter a name')));

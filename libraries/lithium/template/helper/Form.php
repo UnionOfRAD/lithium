@@ -529,6 +529,9 @@ class Form extends \lithium\template\Helper {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		$options += $defaults;
 
+		if (isset($options['value'])) {
+			unset($options['value']);
+		}
 		if (!$this->_binding || !$content = $this->_binding->errors($name)) {
 			return null;
 		}
