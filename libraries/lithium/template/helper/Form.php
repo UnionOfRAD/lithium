@@ -391,6 +391,9 @@ class Form extends \lithium\template\Helper {
 			case ($type == 'select'):
 				$input = $this->select($name, $options['list'], $fieldOptions);
 			break;
+			case ($type == 'radio'):
+				$input = $this->{'radio-field'}($name, $fieldOptions);
+			break;
 			default:
 				$input = $this->{$type}($name, $fieldOptions);
 			break;
