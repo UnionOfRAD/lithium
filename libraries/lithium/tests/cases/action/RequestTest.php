@@ -295,10 +295,13 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testType() {
 		$request = new Request();
+		$this->assertEqual('text/html', $request->type());
 
-		$expected = 'html';
-		$result = $request->type();
-		$this->assertEqual($expected, $result);
+		$request = new Request(array('env' => array(
+			'CONTENT_TYPE' => 'application/json; charset=UTF-8',
+			'REQUEST_METHOD' => 'POST'
+		)));
+		$this->assertEqual('application/json; charset=UTF-8', $request->type());
 	}
 
 	public function testRefererDefault() {
@@ -812,12 +815,20 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testRequestTypeFromHeader() {
-		$request = new Request(array('env' => array('Content-type' => 'json')));
+	public function testAutomaticContentDecoding() {
+		$stream = fopen('php://temp', 'r+');
+		fwrite($stream, '{ "foo": "bar" }');
+		rewind($stream);
+		$request = new Request(compact('stream') + array('env' => array(
+			'CONTENT_TYPE' => 'application/json; charset=UTF-8',
+			'REQUEST_METHOD' => 'POST'
+		)));
+		$this->assertEqual(array('foo' => 'bar'), $request->data);
+	}
 
-		$expected = 'json';
-		$result = $request->type();
-		$this->assertEqual($expected, $result);
+	public function testRequestTypeFromHeader() {
+		$request = new Request(array('env' => array('CONTENT_TYPE' => 'json')));
+		$this->assertEqual('json', $request->type());
 	}
 }
 

@@ -80,6 +80,7 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual('js', Media::type('application/javascript'));
 		$this->assertEqual('html', Media::type('*/*'));
 		$this->assertEqual('json', Media::type('application/json'));
+		$this->assertEqual('json', Media::type('application/json; charset=UTF-8'));
 
 		$expected = array('content' => 'application/json', 'options' => array(
 			'view' => false, 'layout' => false, 'encode' => 'json_encode', 'decode' => 'json_decode'

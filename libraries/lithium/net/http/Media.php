@@ -161,6 +161,9 @@ class Media extends \lithium\core\StaticObject {
 		}
 
 		if (strpos($type, '/')) {
+			if (strpos($type, ';')) {
+				list($type) = explode(';', $type);
+			}
 			foreach (static::_types() as $name => $cTypes) {
 				if ($type == $cTypes || (is_array($cTypes) && in_array($type, $cTypes))) {
 					return $name;

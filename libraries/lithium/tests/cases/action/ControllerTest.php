@@ -269,7 +269,7 @@ class ControllerTest extends \lithium\test\Unit {
 	}
 
 	public function testResponseTypeBasedOnRequestHeaderType() {
-		$request = new MockControllerRequest(array('env' => array('Content-type' => 'json')));
+		$request = new MockControllerRequest(array('env' => array('CONTENT_TYPE' => 'json')));
 
 		$postsController = new MockPostsController(array(
 			'request' => $request,

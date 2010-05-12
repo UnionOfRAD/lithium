@@ -92,6 +92,14 @@ class Request extends \lithium\core\Object {
 	protected $_classes = array('media' => '\lithium\net\http\Media');
 
 	/**
+	 * If POST / PUT data is coming from an input stream (rather than `$_POST`), this specified
+	 * where to read it from.
+	 *
+	 * @var stream
+	 */
+	protected $_stream = null;
+
+	/**
 	 * Options used to detect request type.
 	 *
 	 * @see lithium\action\Request::$_type
@@ -125,7 +133,7 @@ class Request extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'classes' => 'merge', 'env' => 'merge', 'detectors' => 'merge', 'base', 'type'
+		'classes' => 'merge', 'env' => 'merge', 'detectors' => 'merge', 'base', 'type', 'stream'
 	);
 
 	/**
@@ -183,13 +191,13 @@ class Request extends \lithium\core\Object {
 		}
 
 		$method = strtoupper($this->_env['REQUEST_METHOD']);
+		$media = $this->_classes['media'];
 
 		if (($method == 'POST' || $method == 'PUT') && !$this->data) {
-			$media = $this->_classes['media'];
-			$key = 'CONTENT_TYPE';
-
-			if (isset($this->_env[$key]) && $type = $media::type($this->_env[$key])) {
-				$this->data = $media::decode($type, file_get_contents('php://input'));
+			if ($type = $media::type($this->type())) {
+				$this->_stream = $this->_stream ?: fopen('php://input', 'r');
+				$this->data = (array) $media::decode($type, stream_get_contents($this->_stream));
+				fclose($this->_stream);
 			}
 		}
 
@@ -359,16 +367,13 @@ class Request extends \lithium\core\Object {
 	 *         on the content type of the request.
 	 */
 	public function type() {
-		if ($this->_type !== null) {
+		if ($this->_type) {
 			return $this->_type;
 		}
 		if (!empty($this->params['type'])) {
 			return $this->_type = $this->params['type'];
 		}
-		if ($type = $this->env('Content-type')) {
-			return $this->_type = $type;
-		}
-		return $this->_type = 'html';
+		return $this->_type = $this->env('CONTENT_TYPE') ?: 'text/html';
 	}
 
 	/**
