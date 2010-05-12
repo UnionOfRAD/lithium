@@ -79,6 +79,12 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertNull(Media::type('application/foo'));
 		$this->assertEqual('js', Media::type('application/javascript'));
 		$this->assertEqual('html', Media::type('*/*'));
+		$this->assertEqual('json', Media::type('application/json'));
+
+		$expected = array('content' => 'application/json', 'options' => array(
+			'view' => false, 'layout' => false, 'encode' => 'json_encode', 'decode' => 'json_decode'
+		));
+		$this->assertEqual($expected, Media::type('json'));
 	}
 
 	public function testAssetTypeHandling() {
