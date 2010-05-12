@@ -58,6 +58,7 @@ class Form extends \lithium\template\Helper {
 		'option-group-end'     => '</optgroup>',
 		'password'             => '<input type="password" name="{:name}"{:options} />',
 		'radio'         => '<input type="radio" name="{:name}" id="{:id}"{:options} />{:label}',
+		'radio-field'          => '<input type="radio" name="{:name}" {:options} />',
 		'select-start'         => '<select name="{:name}"{:options}>',
 		'select-multi-start'   => '<select name="{:name}[]"{:options}>',
 		'select-empty'         => '<option value=""{:options}>&nbsp;</option>',
@@ -370,6 +371,9 @@ class Form extends \lithium\template\Helper {
 		switch (true) {
 			case ($type == 'select'):
 				$input = $this->select($name, $options['list'], $fieldOptions);
+			break;
+			case ($type == 'radio'):
+				$input = $this->{'radio-field'}($name, $fieldOptions);
 			break;
 			default:
 				$input = $this->{$type}($name, $fieldOptions);
