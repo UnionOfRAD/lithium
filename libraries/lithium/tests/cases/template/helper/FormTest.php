@@ -688,6 +688,32 @@ class FormTest extends \lithium\test\Unit {
 			'input' => array('type' => 'text', 'name' => 'name')
 		));
 	}
+
+	public function testFieldAssumeSelectIfList() {
+		$result = $this->form->field(
+			'colors',
+			array('list' => array('r' => 'red', 'g' => 'green', 'b' => 'blue'))
+		);
+		$expected = array(
+			'<div',
+				array('label' => array('for' => 'colors')),
+					'Colors',
+				'/label',
+				'select' => array('name' => 'colors'),
+					array('option' => array('value' => 'r')),
+						'red',
+					'/option',
+					array('option' => array('value' => 'g')),
+						'green',
+					'/option',
+					array('option' => array('value' => 'b')),
+						'blue',
+					'/option',
+				'/select',
+			'/div'
+		);
+		$this->assertTags($result, $expected);
+	}
 }
 
 ?>

@@ -343,6 +343,9 @@ class Form extends \lithium\template\Helper {
 			}
 			return $return;
 		}
+		if (isset($options['list']) && !isset($options['type'])) {
+			$options['type'] = 'select';
+		}
 		$defaults = array(
 			'label' => null,
 			'type' => 'text',
