@@ -40,16 +40,16 @@ class StaticObject {
 	 * @see lithium\util\collection\Filters
 	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
 	 *        method name as a string, or an array of method names.
-	 * @param closure $closure The closure that is used to filter the method.
+	 * @param closure $filter The closure that is used to filter the method.
 	 * @return void
 	 */
-	public static function applyFilter($method, $closure = null) {
+	public static function applyFilter($method, $filter = null) {
 		$class = get_called_class();
 		foreach ((array) $method as $m) {
 			if (!isset(static::$_methodFilters[$class][$m])) {
 				static::$_methodFilters[$class][$m] = array();
 			}
-			static::$_methodFilters[$class][$m][] = $closure;
+			static::$_methodFilters[$class][$m][] = $filter;
 		}
 	}
 
@@ -96,11 +96,11 @@ class StaticObject {
 	 */
 	protected static function _filter($method, $params, $callback, $filters = array()) {
 		$class = get_called_class();
+		$hasNoFilters = empty(static::$_methodFilters[$class][$method]);
 
-		if (empty(static::$_methodFilters[$class][$method]) && empty($filters)) {
+		if ($hasNoFilters && !$filters && !Filters::hasApplied($class, $method)) {
 			return $callback($class, $params, null);
 		}
-
 		if (!isset(static::$_methodFilters[$class][$method])) {
 			static::$_methodFilters += array($class => array());
 			static::$_methodFilters[$class][$method] = array();

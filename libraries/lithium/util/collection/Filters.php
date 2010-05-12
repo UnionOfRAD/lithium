@@ -68,11 +68,66 @@ namespace lithium\util\collection;
  */
 class Filters extends \lithium\util\Collection {
 
+	/**
+	 * An array of filters indexed by class and method name, stored so that they can be lazily
+	 * applied to classes which are not loaded yet.
+	 *
+	 * @var array
+	 */
+	protected static $_lazyFilters = array();
+
+	/**
+	 * This is the list of configuration settings that will be automatically applied to the
+	 * properties of each `Filters` instance.
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array('items', 'class', 'method');
 
+	/**
+	 * The fully-namespaced class name of the class containing the method being filtered.
+	 *
+	 * @see lithium\util\collection\Filters::method()
+	 * @var string
+	 */
 	protected $_class = null;
 
+	/**
+	 * The name of the method being filtered by the current instance of `Filters`.
+	 *
+	 * @see lithium\util\collection\Filters::method()
+	 * @var string
+	 */
 	protected $_method = null;
+
+	/**
+	 * Lazily applies a filter to a method of a static class.
+	 *
+	 * @see lithium\core\StaticObject
+	 * @param string $class The fully namespaced name of a **static** class to which the filter will
+	 *               be applied. The class name specified in `$class` **must** extend
+	 *               `StaticObject`, or else statically implement the `applyFilter()` method.
+	 * @param string $method The method to which the filter will be applied.
+	 * @param closure $filter The filter to apply to the class method.
+	 * @return void
+	 */
+	public static function apply($class, $method, $filter) {
+		if (class_exists($class, false)) {
+			return $class::applyFilter($method, $filter);
+		}
+		static::$_lazyFilters[$class][$method][] = $filter;
+	}
+
+	/**
+	 * Checks to see if the given class / method has any filters which have been applied lazily,
+	 * and not yet attached.
+	 *
+	 * @param string $class Fully-namespaced class name.
+	 * @param string $method Method name.
+	 */
+	public static function hasApplied($class, $method) {
+		return isset(static::$_lazyFilters[$class][$method]);
+	}
 
 	/**
 	 * Collects a set of filters to iterate. Creates a filter chain for the given class/method,
@@ -95,7 +150,20 @@ class Filters extends \lithium\util\Collection {
 	 */
 	public static function run($class, $params, array $options = array()) {
 		$defaults = array('class' => null, 'method' => null, 'items' => array());
-		$chain = new Filters($options + $defaults);
+		$options += $defaults;
+		$lazyFilterCheck = (is_string($class) && $options['method']);
+
+		if ($lazyFilterCheck && isset(static::$_lazyFilters[$class][$options['method']])) {
+			$filters = static::$_lazyFilters[$class][$options['method']];
+			unset(static::$_lazyFilters[$class][$options['method']]);
+			$options['items'] = array_merge($filters, $options['items']);
+
+			foreach ($filters as $filter) {
+				$class::applyFilter($options['method'], $filter);
+			}
+		}
+
+		$chain = new Filters($options);
 		$next = $chain->rewind();
 		return $next($class, $params, $chain);
 	}

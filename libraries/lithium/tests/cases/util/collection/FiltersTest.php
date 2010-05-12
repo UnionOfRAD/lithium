@@ -9,8 +9,10 @@
 namespace lithium\tests\cases\util\collection;
 
 use \lithium\util\collection\Filters;
+use \lithium\tests\mocks\util\MockFilters;
 
 class FiltersTest extends \lithium\test\Unit {
+
 	public function testRun() {
 		$options = array('method' => __FUNCTION__, 'class' => __CLASS__, 'items' => array(
 			function($self, $params, $chain) {
@@ -40,6 +42,26 @@ class FiltersTest extends \lithium\test\Unit {
 		));
 		$result = Filters::run(__CLASS__, array(), $options);
 		$expected = 'This is a filter chain that calls $chain->next() without the $chain argument.';
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testLazyApply() {
+		$class = 'lithium\tests\mocks\util\MockFilters';
+
+		Filters::apply($class, 'filteredMethod', function($self, $params, $chain) {
+			return md5($chain->next($self, $params, $chain));
+		});
+
+		$expected = md5('Working?');
+		$result = $class::filteredMethod();
+		$this->assertEqual($expected, $result);
+
+		Filters::apply($class, 'filteredMethod', function($self, $params, $chain) {
+			return sha1($chain->next($self, $params, $chain));
+		});
+
+		$expected = md5(sha1('Working?'));
+		$result = $class::filteredMethod();
 		$this->assertEqual($expected, $result);
 	}
 }
