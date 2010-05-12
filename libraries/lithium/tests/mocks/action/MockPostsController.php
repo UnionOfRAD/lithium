@@ -30,7 +30,7 @@ class MockPostsController extends \lithium\action\Controller {
 		$this->redirect('/posts');
 	}
 
-	public function type() {
+	public function type($raw = false) {
 		return array('data' => 'test');
 	}
 

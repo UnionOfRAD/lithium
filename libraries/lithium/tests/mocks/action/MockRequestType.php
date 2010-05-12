@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\action;
 
 class MockRequestType extends \lithium\action\Request {
 
-	public function type() {
+	public function type($raw = false) {
 		return 'foo';
 	}
 }

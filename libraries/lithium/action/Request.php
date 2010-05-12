@@ -194,7 +194,9 @@ class Request extends \lithium\core\Object {
 		$media = $this->_classes['media'];
 
 		if (($method == 'POST' || $method == 'PUT') && !$this->data) {
-			if ($type = $media::type($this->type())) {
+			$type = $this->type();
+
+			if ($type && $type != 'html') {
 				$this->_stream = $this->_stream ?: fopen('php://input', 'r');
 				$this->data = (array) $media::decode($type, stream_get_contents($this->_stream));
 				fclose($this->_stream);
@@ -363,17 +365,27 @@ class Request extends \lithium\core\Object {
 	/**
 	 * Returns the content type of the response.
 	 *
+	 * @param boolean $raw If true, returns the full type (e.g. `application/json; charset=UTF-8`).
+	 *        If false, returns the reduced type, e.g. `json`.
 	 * @return string A simple content type name, i.e. `'html'`, `'xml'`, `'json'`, etc., depending
 	 *         on the content type of the request.
 	 */
-	public function type() {
-		if ($this->_type) {
+	public function type($raw = false) {
+		if (!$raw && $this->_type) {
 			return $this->_type;
 		}
-		if (!empty($this->params['type'])) {
-			return $this->_type = $this->params['type'];
+		if ($raw && $this->_rawType) {
+			return $this->_rawType;
 		}
-		return $this->_type = $this->env('CONTENT_TYPE') ?: 'text/html';
+		$media = $this->_classes['media'];
+		$this->_rawType = $this->env('CONTENT_TYPE') ?: 'text/html';
+
+		if (!empty($this->params['type'])) {
+			$this->_type = $this->params['type'];
+		} else {
+			$this->_type = $media::type($this->_rawType);
+		}
+		return $raw ? $this->_rawType : $this->_type;
 	}
 
 	/**
