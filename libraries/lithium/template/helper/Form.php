@@ -365,7 +365,8 @@ class Form extends \lithium\template\Helper {
 		$label = $input = null;
 
 		if ($options['label'] === null || $options['label']) {
-			$label = $this->label($name, $options['label']);
+			$for = (isset($options['id'])) ? $options['id'] : $name;
+			$label = $this->label($for, $options['label']);
 		}
 
 		switch (true) {
