@@ -114,6 +114,19 @@ class Memory extends \lithium\core\Object {
 	}
 
 	/**
+	 * Clears all keys from the session.
+	 *
+	 * @param array $options Options array. Not used fro this adapter method.
+	 */
+	public function clear(array $options = array()) {
+		$session =& $this->_session;
+
+		return function($self, $params, $chain) use (&$session) {
+			$session = array();
+		};
+	}
+
+	/**
 	 * This adapter is always enabled, as it has no external dependencies.
 	 *
 	 * @return boolean True

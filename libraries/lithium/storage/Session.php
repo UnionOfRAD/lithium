@@ -207,6 +207,41 @@ class Session extends \lithium\core\Adaptable {
 	}
 
 	/**
+	 * Clears all keys from a single adapter (if a `'name'` options is specified) or all
+	 * session adapters.
+	 *
+	 * @param array $options Optional parameters that this method accepts.
+	 */
+	public static function clear(array $options = array()) {
+		$defaults = array('name' => null, 'strategies' => true);
+		$options += $defaults;
+		$methods = array();
+
+		if ($name = $options['name']) {
+			$methods = array($name => static::adapter($name)->clear($options));
+		} else {
+			foreach (static::$_configurations as $name => $config) {
+				if ($method = static::adapter($name)->clear($options)) {
+					$methods[$name] = $method;
+				}
+			}
+		}
+		$params = compact('options');
+		$result = false;
+
+		foreach ($methods as $name => $method) {
+			$settings = static::_config($name);
+			$filters = $settings['filters'];
+			$result = $result || static::_filter(__FUNCTION__, $params, $method, $filters);
+		}
+		if ($options['strategies']) {
+			$options += array('mode' => 'LIFO', 'class' => __CLASS__);
+			return static::applyStrategies(__FUNCTION__, $name, $result, $options);
+		}
+		return $result;
+	}
+
+	/**
 	 * Checks if a session key is set in any adapter, or if a particular adapter configuration is
 	 * specified (via `'name'` in `$options`), only that configuration is checked.
 	 *

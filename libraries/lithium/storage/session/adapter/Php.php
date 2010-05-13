@@ -190,6 +190,22 @@ class Php extends \lithium\core\Object {
 	}
 
 	/**
+	 * Clears all keys from the session.
+	 *
+	 * @param array $options Options array. Not used fro this adapter method.
+	 * @return boolean True on successful clear, false otherwise.
+	 */
+	public function clear(array $options = array()) {
+		if (!static::isStarted() && !static::_start()) {
+			throw new RuntimeException("Could not start session.");
+		}
+
+		return function($self, $params, $chain) {
+			return session_destroy();
+		};
+	}
+
+	/**
 	 * Determines if PHP sessions are enabled.
 	 *
 	 * @return boolean True if enabled (that is, if session_id() returns a value), false otherwise.

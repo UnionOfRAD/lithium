@@ -138,6 +138,29 @@ class SessionTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests clearing all session data from one or all adapters.
+	 *
+	 * @return void
+	 */
+	public function testSessionClear() {
+		Session::config(array(
+			'primary' => array('adapter' => new Memory(), 'filters' => array()),
+			'secondary' => array('adapter' => new Memory(), 'filters' => array())
+		));
+		Session::write('key1', 'value', array('name' => 'primary'));
+		Session::write('key2', 'value', array('name' => 'secondary'));
+
+		Session::clear(array('name' => 'secondary'));
+		$this->assertTrue(Session::check('key1'));
+		$this->assertFalse(Session::check('key2'));
+
+		Session::write('key2', 'value', array('name' => 'secondary'));
+		Session::clear();
+		$this->assertFalse(Session::check('key1'));
+		$this->assertFalse(Session::check('key2'));
+	}
+
+	/**
 	 * Tests querying session keys from the primary adapter.
 	 * The memory adapter returns a UUID based on a server variable for portability.
 	 *
