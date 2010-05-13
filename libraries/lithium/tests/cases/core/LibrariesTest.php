@@ -107,7 +107,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$lithium = Libraries::get('lithium');
 		$this->assertFalse(empty($lithium));
 
-		$app = Libraries::get('app');
+		$app = Libraries::get(true);
 		$this->assertFalse(empty($app));
 
 		Libraries::remove(array('lithium', 'app'));
