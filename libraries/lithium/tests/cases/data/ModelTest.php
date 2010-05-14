@@ -82,7 +82,8 @@ class ModelTest extends \lithium\test\Unit {
 			'title'       => 'title',
 			'source'      => 'mock_posts',
 			'connection'  => 'mock-source',
-			'initialized' => true
+			'initialized' => true,
+			'locked'      => true,
 		);
 		MockPost::config();
 		$this->assertEqual($expected, MockPost::meta());
@@ -94,7 +95,8 @@ class ModelTest extends \lithium\test\Unit {
 			'title'      => 'comment_id',
 			'source'     => 'mock_comments',
 			'connection' => 'mock-source',
-			'initialized' => true
+			'initialized' => true,
+			'locked'      => true,
 		);
 		$this->assertEqual($expected, MockComment::meta());
 
@@ -147,10 +149,13 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = array(
 			'name' => 'MockPost',
 			'type' => 'belongsTo',
+			'key' => 'mock_post_id',
 			'from' => 'lithium\tests\mocks\data\MockComment',
 			'to' => 'lithium\tests\mocks\data\MockPost',
+			'link' => 'key',
 			'fields' => true,
-			'key' => 'mock_post_id',
+			'fieldName' => 'mockPost',
+			'scope' => null,
 			'init' => true
 		);
 		$this->assertEqual($expected, MockComment::relations('MockPost')->data());
@@ -158,10 +163,13 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = array(
 			'name' => 'MockComment',
 			'type' => 'hasMany',
-			'to' => 'lithium\tests\mocks\data\MockComment',
 			'from' => 'lithium\tests\mocks\data\MockPost',
+			'to' => 'lithium\tests\mocks\data\MockComment',
 			'fields' => true,
 			'key' => 'mock_post_id',
+			'link' => 'key',
+			'fieldName' => 'mockComment',
+			'scope' => null,
 			'init' => true
 		);
 		$this->assertEqual($expected, MockPost::relations('MockComment')->data());

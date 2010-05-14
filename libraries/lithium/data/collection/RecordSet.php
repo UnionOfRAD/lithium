@@ -65,10 +65,6 @@ class RecordSet extends \lithium\data\Collection {
 			$this->_index = array_keys($this->_items);
 			$this->_items = array_values($this->_items);
 		}
-		if ($this->_items && !$this->_index) {
-			$this->_index = array_keys($this->_items);
-			$this->_items = array_values($this->_items);
-		}
 	}
 
 	/**
@@ -108,7 +104,7 @@ class RecordSet extends \lithium\data\Collection {
 		if (!is_null($offset) && in_array($offset, $this->_index)) {
 			return $this->_items[array_search($offset, $this->_index)];
 		}
-		if ($this->_closed()) {
+		if ($this->closed()) {
 			return null;
 		}
 		$model = $this->_model;
@@ -118,28 +114,18 @@ class RecordSet extends \lithium\data\Collection {
 				return $record;
 			}
 		}
-		$this->_close();
+		$this->close();
 	}
 
 	/**
 	 * Assigns a value to the specified offset.
 	 *
 	 * @param integer $offset The offset to assign the value to.
-	 * @param mixed $value The value to set.
+	 * @param mixed $data The value to set.
 	 * @return mixed The value which was set.
 	 */
-	public function offsetSet($offset, $value) {
-		$class = $this->_classes['record'];
-		$model = $this->_model;
-
-		if (is_array($value)) {
-			$value = new $class(array('data' => $value, 'exists' => true));
-		}
-		if (array_key_exists($offset, $this->_index)) {
-			return $this->_items[array_search($offset, $this->_index)] = $value;
-		}
-		$this->_index[] = $offset;
-		return $this->_items[] = $value;
+	public function offsetSet($offset, $data) {
+		return $this->_populate($data, $offset);
 	}
 
 	/**
@@ -185,7 +171,7 @@ class RecordSet extends \lithium\data\Collection {
 	 */
 	public function key($full = false) {
 		$key = $this->_index[$this->_pointer];
-		return (is_array($key) && !$full) ? reset($key) : $this->_pointer;
+		return (is_array($key) && !$full) ? reset($key) : $key;
 	}
 
 	/**
@@ -279,32 +265,35 @@ class RecordSet extends \lithium\data\Collection {
 	 * @return array
 	 */
 	protected function _populate($record = null, $key = null) {
-		if ($this->_closed()) {
+		if ($this->closed() && !$record) {
 			return;
 		}
-		$record = $record ?: $this->_handle->result('next', $this->_result, $this);
 		$modelClass = $this->_model;
+		$class = $this->_classes['record'];
 
-		if (!$record) {
-			return $this->_close();
+		if (!($record = $record ?: $this->_handle->result('next', $this->_result, $this))) {
+			return $this->close();
 		}
 
-		foreach ($this->_columns as $model => $fields) {
-			if (is_array($record)) {
-				$class = $this->_classes['record'];
+		if (is_array($record)) {
+			foreach ($this->_columns as $model => $fields) {
 				$data = array_combine($fields, array_slice($record, 0, count($fields)));
 				$record = new $class(compact('model', 'data') + array('exists' => true));
 			}
 		}
-		$key = $modelClass::key($record);
-
+		if (is_array($key = $modelClass::key($record))) {
+			$key = count($key) === 1 ? reset($key) : $key;
+		}
+		if (in_array($key, $this->_index)) {
+			return $this->_items[array_search($key, $this->_index)] = $record;
+		}
 		$this->_items[] = $record;
-		$this->_index[] = count($key) === 1 ? reset($key) : $key;
+		$this->_index[] = $key;
 		return $record;
 	}
 
 	protected function _columnMap() {
-		if ($map = $this->_query->map()) {
+		if ($this->_query && $map = $this->_query->map()) {
 			return $map;
 		}
 		return $this->_handle->schema($this->_query, $this->_result, $this);

@@ -78,6 +78,21 @@ abstract class Collection extends \lithium\util\Collection {
 	);
 
 	/**
+	 * Class constructor
+	 *
+	 * @param array $config
+	 * @return void
+	 */
+	public function __construct(array $config = array()) {
+		if (isset($config['data']) && !isset($config['items'])) {
+			$config['items'] = $config['data'];
+			unset($config['data']);
+		}
+		parent::__construct($config);
+		$this->_items = (array) $this->_items;
+	}
+
+	/**
 	 * Returns the model which this particular collection is based off of.
 	 *
 	 * @return string The fully qualified model class name.
@@ -136,7 +151,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return object This collection instance.
 	 */
 	public function each($filter) {
-		if (!$this->_closed()) {
+		if (!$this->closed()) {
 			while($this->next()) {}
 		}
 		return parent::each($filter);
@@ -155,7 +170,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return array|object The filtered items.
 	 */
 	public function map($filter, array $options = array()) {
-		if (!$this->_closed()) {
+		if (!$this->closed()) {
 			while($this->next()) {}
 		}
 		return parent::map($filter, $options);
@@ -176,25 +191,13 @@ abstract class Collection extends \lithium\util\Collection {
 	}
 
 	/**
-	 * Magic alias for `_close()`. Ensures that the data set's connection is closed when the object
-	 * is destroyed.
-	 *
-	 * @return void
-	 */
-	public function __destruct() {
-		$this->_close();
-	}
-
-	abstract protected function _populate($data = null, $key = null);
-
-	/**
 	 * Executes when the associated result resource pointer reaches the end of its data set. The
 	 * resource is freed by the connection, and the reference to the connection is unlinked.
 	 *
 	 * @return void
 	 */
-	protected function _close() {
-		if (!$this->_closed()) {
+	public function close() {
+		if (!$this->closed()) {
 			$this->_result = $this->_handle->result('close', $this->_result, $this);
 			unset($this->_handle);
 		}
@@ -207,9 +210,34 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return boolean Returns true if all records are loaded and the database resources have been
 	 *         freed, otherwise returns false.
 	 */
-	protected function _closed() {
+	public function closed() {
 		return (empty($this->_result) || !isset($this->_handle) || empty($this->_handle));
 	}
+
+	/**
+	 * Ensures that the data set's connection is closed when the object is destroyed.
+	 *
+	 * @return void
+	 */
+	public function __destruct() {
+		$this->close();
+	}
+
+	/**
+	 * A method to be implemented by concrete `Collection` classes which, provided a reference to a
+	 * backend data source (see the `$_handle` property), and a resource representing a query result
+	 * cursor, fetches new result data and wraps it in the appropriate object type, which is added
+	 * into the `Collection` and returned.
+	 *
+	 * @param mixed $data Data (in an array or object) that is manually added to the data
+	 *              collection. If `null`, data is automatically fetched from the associated backend
+	 *              data source, if available.
+	 * @param mixed $key String, integer or array key representing the unique key of the data
+	 *              object. If `null`, the key will be extracted from the data passed or fetched,
+	 *              using the associated `Model` class.
+	 * @return object Returns a `Record` or `Document` object, or other data object.
+	 */
+	abstract protected function _populate($data = null, $key = null);
 }
 
 ?>

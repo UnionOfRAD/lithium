@@ -130,8 +130,11 @@ class SourceTest extends \lithium\test\Unit {
 			$this->assertTrue($companies[count($companies) - 1]->{$key});
 		}
 
-		$all = Company::all();
 		$this->assertIdentical(2, Company::count());
+		$this->assertIdentical(1, Company::count(array('active' => true)));
+		$this->assertIdentical(1, Company::count(array('active' => false)));
+		$this->assertIdentical(0, Company::count(array('active' => null)));
+		$all = Company::all();
 
 		$expected = count($this->companyData);
 		$this->assertEqual($expected, $all->count());

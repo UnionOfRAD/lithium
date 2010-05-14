@@ -13,9 +13,10 @@ use \lithium\data\Connections;
 class ConnectionsTest extends \lithium\test\Unit {
 
 	public $config = array(
-		'adapter' => 'MySql',
-		'host' => 'localhost',
-		'login' => '--user--',
+		'type'     => 'database',
+		'adapter'  => 'MySql',
+		'host'     => 'localhost',
+		'login'    => '--user--',
 		'password' => '--pass--',
 		'database' => 'db'
 	);

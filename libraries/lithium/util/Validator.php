@@ -21,11 +21,11 @@ use \InvalidArgumentException;
  * convention:
  *
  * {{{
- * 		use \lithium\util\Validator;
+ * use \lithium\util\Validator;
  *
- * 		// The following are equivalent:
- * 		Validator::rule('email', 'foo@example.com');  // true
- * 		Validator::isEmail('foo-at-example.com');     // false
+ * // The following are equivalent:
+ * Validator::rule('email', 'foo@example.com');  // true
+ * Validator::isEmail('foo-at-example.com');     // false
  * }}}
  *
  * Data can also be validated against multiple rules, each having their own associated error

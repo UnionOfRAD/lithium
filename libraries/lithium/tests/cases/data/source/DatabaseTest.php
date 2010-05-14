@@ -89,10 +89,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertTrue(is_string($result));
 		$this->assertEqual($expected, $result);
 
-		$expected = true;
 		$result = $this->db->value('true', array('type' => 'boolean'));
-		$this->assertTrue(is_bool($result));
-		$this->assertEqual($expected, $result);
+		$this->assertIdentical(1, $result);
 
 		$expected = 1;
 		$result = $this->db->value('1', array('type' => 'integer'));
@@ -111,10 +109,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertTrue(is_string($result));
 		$this->assertEqual($expected, $result);
 
-		$expected = true;
 		$result = $this->db->value(true);
-		$this->assertTrue(is_bool($result));
-		$this->assertEqual($expected, $result);
+		$this->assertIdentical(1, $result);
 
 		$expected = 1;
 		$result = $this->db->value('1');

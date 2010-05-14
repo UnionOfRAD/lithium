@@ -257,18 +257,19 @@ class QueryTest extends \lithium\test\Unit {
 		$this->skipIf(!is_array($export), 'Query::export() does not return an array');
 
 		$expected = array(
+			'calculate',
+			'comment',
 			'conditions',
 			'fields',
-			'order',
-			'limit',
-			'table',
-			'comment',
-			'model',
-			'page',
 			'group',
 			'joins',
-			'calculate',
-			'offset'
+			'limit',
+			'map',
+			'model',
+			'offset',
+			'order',
+			'page',
+			'table',
 		);
 		$result = array_keys($export);
 

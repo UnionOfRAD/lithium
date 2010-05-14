@@ -114,21 +114,6 @@ class Document extends \lithium\data\Collection {
 	);
 
 	/**
-	 * Class constructor
-	 *
-	 * @param array $config
-	 * @return void
-	 */
-	public function __construct(array $config = array()) {
-		if (isset($config['data']) && !isset($config['items'])) {
-			$config['items'] = $config['data'];
-			unset($config['data']);
-		}
-		parent::__construct($config);
-		$this->_items = (array) $this->_items;
-	}
-
-	/**
 	 * Magic PHP method used when model method is called on document instance.
 	 * If no model is set returns `null`.
 	 *
@@ -153,7 +138,6 @@ class Document extends \lithium\data\Collection {
 	 *         types in sub-`Document` objects.
 	 */
 	public function &__get($name) {
-		$model = $this->_model;
 		$items = null;
 		$null  = null;
 
@@ -171,11 +155,14 @@ class Document extends \lithium\data\Collection {
 			return $current;
 		}
 
-		foreach ($model::relations() as $relation => $config) {
-			$linkKey = $config->data('key');
-			if ($linkKey === $name) {
-				$items = isset($this->_items[$name]) ? $this->_items[$name] : array();
-				$this->_items[$name] = $this->_child('recordSet', $name, $items);
+		if ($model = $this->_model) {
+			foreach ($model::relations() as $relation => $config) {
+				$linkKey = $config->data('fieldName');
+				if ($linkKey === $name) {
+					$items = isset($this->_items[$name]) ? $this->_items[$name] : array();
+					$this->_items[$name] = $this->_relation('recordSet', $name, $items);
+					break;
+				}
 			}
 		}
 
@@ -185,7 +172,7 @@ class Document extends \lithium\data\Collection {
 		$items = $items ?: $this->_items[$name];
 
 		if ($this->_isComplexType($items) && !$items instanceof Iterator) {
-			$this->_items[$name] = $this->_child('recordSet', $name, $this->_items[$name]);
+			$this->_items[$name] = $this->_relation('recordSet', $name, $this->_items[$name]);
 		}
 		return $this->_items[$name];
 	}
@@ -215,7 +202,7 @@ class Document extends \lithium\data\Collection {
 				$next = $current->__get($key);
 
 				if (!$next instanceof Document) {
-					$next = $current->_items[$key] = $this->_child('recordSet', $key, array());
+					$next = $current->_items[$key] = $this->_relation('recordSet', $key, array());
 				}
 				$current = $next;
 			}
@@ -223,7 +210,7 @@ class Document extends \lithium\data\Collection {
 		}
 
 		if ($this->_isComplexType($value) && !$value instanceof Iterator) {
-			$value = $this->_child('recordSet', $name, $value);
+			$value = $this->_relation('recordSet', $name, $value);
 		}
 		$this->_items[$name] = $value;
 	}
@@ -409,15 +396,13 @@ class Document extends \lithium\data\Collection {
 	 * @return array
 	 */
 	protected function _populate($items = null, $key = null) {
-		if ($this->_closed()) {
+		if ($this->closed()) {
 			return;
 		}
-		$items = $items ?: $this->_handle->result('next', $this->_result, $this);
-
-		if (!isset($items)) {
-			return $this->_close();
+		if (($items = $items ?: $this->_handle->result('next', $this->_result, $this)) === null) {
+			return $this->close();
 		}
-		return $this->_items[] = $this->_child('record', $key, $items);
+		return $this->_items[] = $this->_relation('record', $key, $items);
 	}
 
 	/**
@@ -429,13 +414,13 @@ class Document extends \lithium\data\Collection {
 	 * @param array $options
 	 * @return object Returns a new `Document` object instance.
 	 */
-	protected function _child($classType, $key, $items, $options = array()) {
+	protected function _relation($classType, $key, $items, $options = array()) {
 		$parent = $this;
-		$model = $this->_model;
 		$exists = $this->_exists;
+		$key = ($key === null) ? count($this->_items) : $key;
 		$pathKey = trim("{$this->_pathKey}.{$key}", '.');
 
-		if ($key) {
+		if (($key || $key === 0) && $model = $this->_model) {
 			foreach ($model::relations() as $name => $relation) {
 				$linkKey = $relation->data('key');
 

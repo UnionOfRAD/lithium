@@ -57,7 +57,7 @@ class HttpTest extends \lithium\test\Unit {
 
 	public function testDescribe() {
 		$http = new Http($this->_testConfig);
-		$result = $http->describe(null, null);
+		$result = $http->describe(null, array());
 	}
 
 	public function testGet() {

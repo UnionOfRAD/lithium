@@ -8,12 +8,16 @@
 
 namespace lithium\tests\cases\data\model;
 
+use \lithium\data\Connections;
 use \lithium\data\model\Record;
 
 class RecordTest extends \lithium\test\Unit {
 
 	public function setUp() {
-		$this->record = new Record();
+		Connections::config(array('mock-source' => array(
+			'type' => '\lithium\tests\mocks\data\MockSource'
+		)));
+		$this->record = new Record(array('model' => 'lithium\tests\mocks\data\MockPost'));
 	}
 
 	/**
@@ -83,19 +87,37 @@ class RecordTest extends \lithium\test\Unit {
 
 		$result = $record->errors('not_a_field');
 		$this->assertNull($result);
+
+		$result = $record->errors('not_a_field', 'badness');
+		$this->assertEqual('badness', $result);
 	}
 
 	/**
 	 * Test the ability to set multiple field's values, and that they can be read back.
 	 */
 	public function testSetData() {
-		$record = new Record;
-		$this->assertTrue(empty($record->_data));
+		$this->assertFalse($this->record->data());
 		$expected = array('id' => 1, 'name' => 'Joe Bloggs', 'address' => 'The Park');
-		$record->set($expected);
-		$this->assertEqual($expected, $record->to('array'));
+		$this->record->set($expected);
+		$this->assertEqual($expected, $this->record->to('array'));
+		$this->assertEqual($expected['name'], $this->record->data('name'));
+	}
 
-		$this->assertEqual($expected['name'], $record->data('name'));
+	public function testRecordExists() {
+		$this->assertFalse($this->record->exists());
+		$this->record->update(313);
+		$this->assertIdentical(313, $this->record->id);
+		$this->assertTrue($this->record->exists());
+
+		$this->record = new Record(array('exists' => true));
+		$this->assertTrue($this->record->exists());
+	}
+
+	public function testMethodDispatch() {
+		$result = $this->record->save(array('foo' => 'bar'));
+		$this->assertEqual('create', $result['query']->type());
+		$this->assertEqual(array('foo' => 'bar'), $result['query']->data());
+		$this->assertNull($this->record->invalid());
 	}
 }
 

@@ -59,7 +59,7 @@ class RecordSetTest extends \lithium\test\Unit {
 
 		$connection = new MockAdapter(array(
 			'records' => $this->_records,
-			'columns' => array('Test' => array('id', 'data')),
+			'columns' => array('lithium\tests\mocks\data\MockModel' => array('id', 'data')),
 			'autoConnect' => false
 		));
 
@@ -72,7 +72,7 @@ class RecordSetTest extends \lithium\test\Unit {
 
 		$objectConnection = new MockAdapter(array(
 			'records' => $this->_objectRecords,
-			'columns' => array('MockPostObject' => array('id', 'data')),
+			'columns' => array('lithium\tests\mocks\data\MockPostObject' => array('id', 'data')),
 			'autoConnect' => false
 		));
 

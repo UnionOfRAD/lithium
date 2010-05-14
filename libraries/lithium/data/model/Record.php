@@ -15,18 +15,50 @@ namespace lithium\data\model;
 class Record extends \lithium\core\Object {
 
 	/**
-	* Namespaced name of model that this record is linked to.
-	*/
+	 * Namespaced name of model that this record is linked to.
+	 */
 	protected $_model = null;
 
 	/**
-	* Associative array of the records fields with values
-	*/
+	 * Associative array of the records fields with values
+	 */
 	protected $_data = array();
 
 	/**
-	* Validation errors
-	*/
+	 * If this object is chained off of an originally queried object, contains an instance of
+	 * `Relationship` defining the relationship from the origin object to this one.
+	 *
+	 * @var object
+	 */
+	protected $_relationship = null;
+
+	/**
+	 * An array containing all related records and recordsets, keyed by relationship name, as
+	 * defined in the bound model class.
+	 *
+	 * @var array
+	 */
+	protected $_relationships = array();
+
+	/**
+	 * If this record is chained off of another, contains the origin object.
+	 *
+	 * @var object
+	 */
+	protected $_parent = null;
+
+	/**
+	 * A reference to the object that originated this record set; usually an instance of
+	 * `lithium\data\Source` or `lithium\data\source\Database`. Used to load column definitions and
+	 * lazy-load records.
+	 *
+	 * @var object
+	 */
+	protected $_handle = null;
+
+	/**
+	 * Validation errors
+	 */
 	protected $_errors = array();
 
 	/**
@@ -52,9 +84,19 @@ class Record extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('model', 'exists', 'data' => 'merge');
+	protected $_autoConfig = array(
+		'model', 'exists', 'data', 'parent', 'relationship', 'handle', 'classes' => 'merge'
+	);
 
-	protected $_hasValidated = false;
+	/**
+	 * Classes used by `Record`.
+	 *
+	 * @var array
+	 */
+	protected $_classes = array(
+		'record' => '\lithium\data\model\Record',
+		'recordSet' => '\lithium\data\collection\RecordSet'
+	);
 
 	/**
 	 * Creates a new record object with default values.
@@ -78,8 +120,31 @@ class Record extends \lithium\core\Object {
 	 * @param string $name Property name.
 	 * @return mixed Result.
 	 */
-	public function __get($name) {
-		return isset($this->_data[$name]) ? $this->_data[$name] : null;
+	public function &__get($name) {
+		$items = null;
+		$null  = null;
+
+		if (isset($this->_relationships[$name])) {
+			return $this->_relationships[$name];
+		}
+
+		if ($model = $this->_model && $this->_handle) {
+			foreach ($model::relations() as $relation => $config) {
+				$linkKey = $config->data('fieldName');
+				$type = $config->data('type') == 'hasMany' ? 'recordSet' : 'record';
+				$class = $this->_classes[$type];
+
+				if ($linkKey === $name) {
+					$items = isset($this->_items[$name]) ? $this->_items[$name] : array();
+					$this->_relationships[$name] = new $class();
+					return $this->_relationships[$name];
+				}
+			}
+		}
+		if (isset($this->_data[$name])) {
+			return $this->_data[$name];
+		}
+		return $null;
 	}
 
 	/**
@@ -168,7 +233,7 @@ class Record extends \lithium\core\Object {
 	public function __call($method, $params) {
 		$model = $this->_model;
 
-		if (!$model) {
+		if (!$model || !method_exists($model, $method)) {
 			return null;
 		}
 		array_unshift($params, $this);

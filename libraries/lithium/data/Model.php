@@ -198,6 +198,7 @@ class Model extends \lithium\core\StaticObject {
 		'name' => null,
 		'title' => null,
 		'class' => null,
+		'locked' => true,
 		'source' => null,
 		'connection' => 'default',
 		'initialized' => false
@@ -209,9 +210,9 @@ class Model extends \lithium\core\StaticObject {
 	 * The schema is lazy-loaded by the first call to `Model::schema()`, unless it has been
 	 * manually defined in the `Model` subclass.
 	 *
-	 * For schemaless persistent storage (e.g. MongoDB), this is never populated
-	 * automatically - if you desire a fixed schema to interact with in those cases, you will
-	 * be required to define it yourself.
+	 * For schemaless persistent storage (e.g. MongoDB), this is never populated automatically - if
+	 * you desire a fixed schema to interact with in those cases, you will be required to define it
+	 * yourself.
 	 *
 	 * Example:
 	 * {{{
@@ -222,6 +223,26 @@ class Model extends \lithium\core\StaticObject {
 	 * );
 	 * }}}
 	 *
+	 * For MongoDB specifically, you can also implement a callback in your database connection
+	 * configuration that fetches and returns the schema data, as in the following:
+	 *
+	 * {{{
+	 * Connections::add('default', array(
+	 * 	'type' => 'MongoDb',
+	 * 	'host' => 'localhost',
+	 * 	'database' => 'app_name',
+	 * 	'schema' => function($db, $collection, $meta) {
+	 * 		$result = $db->connection->schemas->findOne(compact('collection'));
+	 * 		return $result ? $result['data'] : array();
+	 * 	}
+	 * ));
+	 * }}}
+	 *
+	 * This example defines an optional MongoDB convention in which the schema for each individual
+	 * collection is stored in a "schemas" collection, where each document contains the name of
+	 * a collection, along with a `'data'` key, which contains the schema for that collection.
+	 *
+	 * @see lithium\data\source\MongoDb::$_schema
 	 * @var array
 	 */
 	protected $_schema = array();
@@ -340,8 +361,7 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	protected static function _findFilters() {
 		$self = static::_instance();
-		$query =& $self->_query;
-		$classes = $self->_classes;
+		$_query =& $self->_query;
 
 		return array(
 			'first' => function($self, $params, $chain) {
@@ -361,15 +381,15 @@ class Model extends \lithium\core\StaticObject {
 				);
 				return $result;
 			},
-			'count' => function($self, $params, $chain) {
+			'count' => function($self, $params, $chain) use ($_query) {
 				$model = $self;
 				$type = $params['type'];
-				$options = array_filter($params['options']);
+				$options = array_diff_key($params['options'], $_query);
 
 				$classes = $options['classes'];
 				unset($options['classes']);
 
-				if (!isset($options['conditions']) && $options) {
+				if ($options && !isset($options['conditions'])) {
 					$options = array('conditions' => $options);
 				}
 				$options += compact('classes', 'model');
@@ -393,26 +413,30 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function __callStatic($method, $params) {
 		$self = static::_instance();
+		$isFinder = isset($self->_finders[$method]);
 
-		if ($method == 'all' || isset($self->_finders[$method])) {
-			if (isset($params[0]) && (is_string($params[0]) || is_int($params[0]))) {
+		if ($isFinder && count($params) === 2 && is_array($params[1])) {
+			$params = array($params[1] + array($method => $params[0]));
+		}
+
+		if ($method == 'all' || $isFinder) {
+			if ($params && is_scalar($params[0])) {
 				$params[0] = array('conditions' => array($self->_meta['key'] => $params[0]));
 			}
 			return $self::find($method, $params ? $params[0] : array());
 		}
-		$pattern = '/^findBy(?P<field>\w+)$|^find(?P<type>\w+)By(?P<fields>\w+)$/';
+		preg_match('/^findBy(?P<field>\w+)$|^find(?P<type>\w+)By(?P<fields>\w+)$/', $method, $args);
 
-		if (preg_match($pattern, $method, $m)) {
-			$field = Inflector::underscore($m['field'] ? $m['field'] : $m['fields']);
-			$type = isset($m['type']) ? $m['type'] : 'first';
-			$type[0] = strtolower($type[0]);
-
-			$conditions = array($field => array_shift($params));
-			return $self::find($type, compact('conditions') + $params);
+		if (!$args) {
+			$message = "Method %s not defined or handled in class %s";
+			throw new BadMethodCallException(sprintf($message, $method, get_class($self)));
 		}
+		$field = Inflector::underscore($args['field'] ? $args['field'] : $args['fields']);
+		$type = isset($args['type']) ? $args['type'] : 'first';
+		$type[0] = strtolower($type[0]);
 
-		$message = "Method %s not defined or handled in class %s";
-		throw new BadMethodCallException(sprintf($message, $method, get_class($self)));
+		$conditions = array($field => array_shift($params));
+		return $self::find($type, compact('conditions') + $params);
 	}
 
 	/**
@@ -450,7 +474,7 @@ class Model extends \lithium\core\StaticObject {
 			'conditions' => null, 'fields' => null, 'order' => null, 'limit' => null, 'page' => 1
 		);
 
-		if ($type != 'all' && !isset($self->_finders[$type])) {
+		if ($type != 'all' && !isset($self->_finders[$type]) && is_scalar($type)) {
 			$options['conditions'] = array($self->_meta['key'] => $type);
 			$type = 'first';
 		}
@@ -671,7 +695,12 @@ class Model extends \lithium\core\StaticObject {
 		$classes = $self->_classes;
 		$meta = array('model' => get_called_class()) + $self->_meta;
 
-		$defaults = array('validate' => true, 'whitelist' => null, 'callbacks' => true);
+		$defaults = array(
+			'validate' => true,
+			'whitelist' => null,
+			'callbacks' => true,
+			'locked' => $self->_meta['locked'],
+		);
 		$options += $defaults + compact('classes');
 		$params = compact('record', 'data', 'options');
 

@@ -93,7 +93,7 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testCreateFail() {
-		$this->expectException('couldn\'t create insert msg');
+		$this->expectException('no elements in doc');
 		$result = $this->db->create($this->query);
 	}
 
@@ -335,7 +335,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual('Second document', $documents[1]->title);
 		$this->assertEqual('First document', $documents[2]->title);
 
-		foreach ($documents as $doc) {
+		foreach ($documents as $i => $doc) {
 			$this->assertTrue($doc->delete());
 		}
 	}
@@ -349,8 +349,11 @@ class MongoDbTest extends \lithium\test\Unit {
 			'type' => 'belongsTo',
 			'key' => 'mockComment',
 			'from' => 'lithium\tests\mocks\data\MockComment',
+			'link' => 'contained',
 			'to' => 'lithium\tests\mocks\data\MockPost',
+			'scope' => null,
 			'fields' => true,
+			'fieldName' => 'mockPost',
 			'init' => true
 		);
 		$this->assertEqual($expected, $result->data());

@@ -54,9 +54,10 @@ class Relationship extends \lithium\core\Object {
 			'type' => null,
 			'to'   => null,
 			'from' => null,
+			'link' => self::LINK_KEY,
+			'scope' => null,
 			'fields' => true,
-			'link' => null,
-			'scope' => null
+			'fieldName' => null
 		);
 		$config += $defaults;
 		$singularName = $config['name'];
@@ -64,10 +65,12 @@ class Relationship extends \lithium\core\Object {
 		if ($config['type'] == 'hasMany') {
 			$singularName = Inflector::singularize($config['name']);
 		}
-
 		if (!$config['to']) {
 			$assoc = preg_replace("/\\w+$/", "", $config['from']) . $singularName;
 			$config['to'] = class_exists($assoc) ? $assoc : Libraries::locate('models', $assoc);
+		}
+		if (!$config['fieldName']) {
+			$config['fieldName'] = lcfirst($config['name']);
 		}
 		parent::__construct($config);
 	}
