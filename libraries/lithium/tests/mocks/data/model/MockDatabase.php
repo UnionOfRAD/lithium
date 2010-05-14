@@ -24,7 +24,7 @@ class MockDatabase extends \lithium\data\source\Database {
 
 	public function entities($class = null) {}
 
-	public function describe($entity, $meta = array()) {}
+	public function describe($entity, array $meta = array()) {}
 
 	public function encoding($encoding = null) {}
 
@@ -32,16 +32,23 @@ class MockDatabase extends \lithium\data\source\Database {
 
 	public function error() {}
 
+	public function value($value, array $schema = array()) {
+		if (($result = parent::value($value, $schema)) !== null) {
+			return $result;
+		}
+		return "'{$value}'";
+	}
+
+	public function testConfig() {
+		return $this->_config;
+	}
+
 	protected function _execute($sql) {
 		return $this->sql = $sql;
 	}
 
 	protected function _insertId($query) {
 		return sha1(serialize($query));
-	}
-
-	public function testConfig() {
-		return $this->_config;
 	}
 }
 

@@ -124,7 +124,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 *         - `'type'`: The field type name
 	 * @filter This method can be filtered.
 	 */
-	public function describe($entity, $meta = array()) {
+	public function describe($entity, array $meta = array()) {
 		$params = compact('entity', 'meta');
 		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) {
 			extract($params);

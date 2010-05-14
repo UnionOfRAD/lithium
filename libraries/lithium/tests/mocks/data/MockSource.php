@@ -102,7 +102,7 @@ class MockSource extends \lithium\data\Source {
 		return new $class(compact('model', 'data') + $options);
 	}
 
-	public function describe($entity, $meta = array()) {
+	public function describe($entity, array $meta = array()) {
 		$var = "_" . Inflector::camelize($entity, false);
 		if ($this->{$var}) {
 			return $this->{$var};

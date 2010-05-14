@@ -360,8 +360,9 @@ abstract class Database extends \lithium\data\Source {
 	 *         `$model`.
 	 */
 	public function item($model, array $data = array(), array $options = array()) {
+		$handle = $this;
 		$class = $this->_classes[isset($options['class']) ? $options['class'] : 'record'];
-		return new $class(compact('model', 'data') + $options);
+		return new $class(compact('model', 'data', 'handle') + $options);
 	}
 
 	/**

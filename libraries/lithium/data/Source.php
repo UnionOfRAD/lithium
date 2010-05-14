@@ -49,7 +49,7 @@ abstract class Source extends \lithium\core\Object {
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('autoConnect' => true);
-		parent::__construct((array) $config + $defaults);
+		parent::__construct($config + $defaults);
 	}
 
 	/**
@@ -137,7 +137,7 @@ abstract class Source extends \lithium\core\Object {
 	 *         field, containing the following keys:
 	 *         - `'type'`: The field type name
 	 */
-	abstract public function describe($entity, $meta = array());
+	abstract public function describe($entity, array $meta = array());
 
 	/**
 	 * Defines or modifies the default settings of a relationship between two models.

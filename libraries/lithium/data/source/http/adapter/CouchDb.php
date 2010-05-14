@@ -112,7 +112,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param string $meta
 	 * @return void
 	 */
-	public function describe($entity, $meta = array()) {
+	public function describe($entity, array $meta = array()) {
 		$database = $this->_config['database'];
 		if (!$this->_db) {
 			$result = $this->get($database);

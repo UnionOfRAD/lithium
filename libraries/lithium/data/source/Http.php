@@ -148,7 +148,7 @@ class Http extends \lithium\data\Source {
 	 * @param string $meta
 	 * @return void
 	 */
-	public function describe($entity, $meta = array()) {
+	public function describe($entity, array $meta = array()) {
 	}
 
 	/**

@@ -43,14 +43,14 @@ class MongoDb extends \lithium\data\Source {
 	 *
 	 * @var object
 	 */
-	public $connection = null;
+	public $server = null;
 
 	/**
 	 * The MongoDB object instance.
 	 *
 	 * @var object
 	 */
-	protected $_db = null;
+	public $connection = null;
 
 	/**
 	 * Classes used by this class.
@@ -77,15 +77,39 @@ class MongoDb extends \lithium\data\Source {
 	);
 
 	/**
+	 * A closure or anonymous function which receives an instance of this class, a collection name
+	 * and associated meta information, and returns an array defining the schema for that model,
+	 * where the keys are field names, and the values are arrays defining the type information for
+	 * the field. At a minimum, type arrays must contain a `'type'` key.
+	 *
+	 * @var closure
+	 */
+	protected $_schema = null;
+
+	/**
+	 * List of configuration keys which will be automatically assigned to their corresponding
+	 * protected class properties.
+	 *
+	 * @var array
+	 */
+	protected $_autoConfig = array('schema');
+
+	/**
 	 * Instantiates the MongoDB adapter with the default connection information.
 	 *
 	 * @see lithium\data\Connections::add()
+	 * @see lithium\data\source\MongoDb::$_schema
 	 * @param array $config All information required to connect to the database, including:
-	 *        - `'database'`: The name of the database to connect to. Defaults to 'lithium'.
-	 *        - `'host'`: The IP or machine name where Mongo is running. Defaults to 'localhost'.
-	 *        - `'persistent'`: If a persistent connection (if available) should be made. Defaults
-	 *            to true.
-	 *        - `'port'`: The port number Mongo is listening on. The default is '27017'.
+	 *        - `'database'` _string_: The name of the database to connect to. Defaults to `'app'`.
+	 *        - `'host'` _string_: The IP or machine name where Mongo is running. Defaults to
+	 *          `'localhost'`.
+	 *        - `'persistent'` _boolean_: If a persistent connection (if available) should be made.
+	 *            Defaults to `true`.
+	 *        - `'port'`_mixed_: The port number Mongo is listening on. The default is '27017'.
+	 *        - `'timeout'` _integer_: The number of milliseconds a connection attempt will wait
+	 *          before timing out and throwing an exception. Defaults to `100`.
+	 *        - `'schema'` _closure_: A closure or anonymous function which returns the schema
+	 *          information for a model class. See the `$_schema` property for more information.
 	 *
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
@@ -97,9 +121,10 @@ class MongoDb extends \lithium\data\Source {
 			'login'      => null,
 			'password'   => null,
 			'host'       => 'localhost',
-			'database'   => 'lithium',
+			'database'   => 'app',
 			'port'       => '27017',
 			'timeout'    => 100,
+			'schemd'     => null,
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -168,12 +193,12 @@ class MongoDb extends \lithium\data\Source {
 		$connection = "mongodb://{$login}{$host}" . ($login ? "/{$config['database']}" : '');
 
 		try {
-			$this->connection = new Mongo($connection, array(
+			$this->server = new Mongo($connection, array(
 				'connect' => true,
 				'persist' => $config['persistent'],
 				'timeout' => $config['timeout']
 			));
-			if ($this->_db = $this->connection->{$config['database']}) {
+			if ($this->connection = $this->server->{$config['database']}) {
 				$this->_isConnected = true;
 			}
 		} catch (Exception $e) {}
@@ -186,11 +211,11 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean True on successful disconnect, false otherwise.
 	 */
 	public function disconnect() {
-		if ($this->connection && $this->connection->connected) {
+		if ($this->server && $this->server->connected) {
 			try {
-				$this->_isConnected = !$this->connection->close();
+				$this->_isConnected = !$this->server->close();
 			} catch (Exception $e) {}
-			unset($this->_db, $this->connection);
+			unset($this->connection, $this->server);
 			return !$this->_isConnected;
 		}
 		return true;
@@ -203,18 +228,24 @@ class MongoDb extends \lithium\data\Source {
 	 * @return array Returns an array of objects to which models can connect.
 	 */
 	public function entities($class = null) {
-		return array_map(function($col) { return $col->getName(); }, $this->_db->listCollections());
+		$db = $this->connection;
+		return array_map(function($col) { return $col->getName(); }, $db->listCollections());
 	}
 
 	/**
-	 * Gets the column 'schema' for a given MongoDB collection. Not applicable to this data source.
+	 * Gets the column 'schema' for a given MongoDB collection. Only returns a schema if the
+	 * `'schema'` configuration flag has been set in the constructor.
 	 *
+	 * @see lithium\data\source\MongoDb::$_schema
 	 * @param mixed $entity Would normally specify a table name.
 	 * @param array $meta
 	 * @return array Returns an associative array describing the given table's schema.
 	 */
-	public function describe($entity, $meta = array()) {
-		return array();
+	public function describe($entity, array $meta = array()) {
+		if (!$schema = $this->_schema) {
+			return array();
+		}
+		return $schema($this, $entity, $meta);
 	}
 
 	/**
@@ -244,7 +275,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @return mixed The return value of the native method specified in `$method`.
 	 */
 	public function __call($method, $params) {
-		return call_user_func_array(array(&$this->connection, $method), $params);
+		return call_user_func_array(array(&$this->server, $method), $params);
 	}
 
 	/**
@@ -270,16 +301,14 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function create($query, array $options = array()) {
 		$params = compact('query', 'options');
-		$conn =& $this->connection;
-		$db =& $this->_db;
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, &$db) {
+		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			$query = $params['query'];
 			$options = $params['options'];
 
 			$data = $query->data();
 			$params = $query->export($self);
-			$result = $db->{$params['table']}->insert($data, true);
+			$result = $self->connection->{$params['table']}->insert($data, true);
 
 			if (isset($result['ok']) && $result['ok'] === 1.0) {
 				$id = $data['_id'];
@@ -298,53 +327,37 @@ class MongoDb extends \lithium\data\Source {
 	 * @return object
 	 */
 	public function read($query, array $options = array()) {
-		$defaults = array(
-			'return' => 'resource',
-			'model' => null
-		);
+		$defaults = array('return' => 'resource', 'model' => null);
 		$options += $defaults;
-
-		$db =& $this->_db;
-		$conn =& $this->connection;
 		$params = compact('query', 'options');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, &$db) {
+		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			$query = $params['query'];
 			$options = $params['options'];
-			$params = $query->export($self);
+			$args = $query->export($self);
+			$self->connection->resetError();
 
-			$table = $params['table'];
-			$conditions = $params['conditions'];
+			$table = $args['table'];
+			$conditions = $args['conditions'];
 
-			if ($group = $params['group']) {
-				$group += array(
-					'$reduce' => $params['reduce'] ?: null, 'initial' => $params['initial'] ?: null
-				);
+			if ($group = $args['group']) {
+				$group += array('$reduce' => $args['reduce'], 'initial' => $args['initial']);
+				$command = array('group' => $group + array('ns' => $table, 'cond' => $conditions));
 
-				$stats = $db->command(array('group' => $group + array(
-					'ns' => $table,
-					'cond' => $conditions
-				)));
+				$stats = $self->connection->command($command);
 				$data = isset($stats['retval']) ? $stats['retval'] : null;
 				unset($stats['retval']);
 
-				$params = array('document', $query, compact('data', 'stats') + array(
-					'model' => $options['model']
-				));
-				return $self->invokeMethod('_result', $params);
+				$config = compact('data', 'stats') + array('model' => $options['model']);
+				return $self->invokeMethod('_result', array('document', $query, $config));
 			}
-			$result = $db->{$table}->find($conditions, $params['fields']);
+			$result = $self->connection->{$table}->find($conditions, $args['fields']);
 
 			if ($query->calculate()) {
 				return $result;
 			}
-
-			$order = $params['order'];
-			$limit = $params['limit'];
-			$offset = $params['offset'];
-			$result = $result->sort($order)->limit($limit)->skip($offset);
+			$result = $result->sort($args['order'])->limit($args['limit'])->skip($args['offset']);
 			$options = compact('result') + array('model' => $options['model']);
-
 			return $self->invokeMethod('_result', array('document', $query, $options));
 		});
 	}
@@ -357,18 +370,14 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean
 	 */
 	public function update($query, array $options = array()) {
-		$db =& $this->_db;
-		$conn =& $this->connection;
-		$params = compact('query', 'options');
-
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, &$db) {
+		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
 			$query = $params['query'];
 			$options = $params['options'];
 
 			$params = $query->export($self);
 			$data = $query->data();
 
-			if ($db->{$params['table']}->update($params['conditions'], $data)) {
+			if ($self->connection->{$params['table']}->update($params['conditions'], $data)) {
 				$query->record()->update();
 				return true;
 			}
@@ -384,17 +393,13 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean
 	 */
 	public function delete($query, array $options = array()) {
-		$db =& $this->_db;
-		$conn =& $this->connection;
-		$params = compact('query', 'options');
-
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, &$db) {
+		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
 			$query = $params['query'];
 			$options = $params['options'];
 
 			$params = $query->export($self);
 			$params['conditions'] = $self->invokeMethod('_toMongoId', array($params['conditions']));
-			return $db->{$params['table']}->remove($params['conditions']);
+			return $self->connection->{$params['table']}->remove($params['conditions']);
 		});
 	}
 
