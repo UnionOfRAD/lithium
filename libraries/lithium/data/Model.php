@@ -384,7 +384,7 @@ class Model extends \lithium\core\StaticObject {
 	 * Allows the use of syntactic-sugar like `Model::all()` instead of `Model::find('all')`.
 	 *
 	 * @see lithium\data\Model::find()
-	 * @see http://php.net/manual/en/language.oop5.overloading.php
+	 * @link http://php.net/manual/en/language.oop5.overloading.php PHP Manual: Overloading
 	 *
 	 * @throws BadMethodCallException On unhandled call, will throw an exception.
 	 * @param string $method Method name caught by `__callStatic`.

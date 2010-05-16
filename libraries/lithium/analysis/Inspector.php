@@ -460,6 +460,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 * work of Sebastian Bergmann on the PHP Object Freezer project.
 	 *
 	 * @link http://sebastian-bergmann.de/archives/831-Freezing-and-Thawing-PHP-Objects.html
+	 *       Freezing and Thawing PHP Objects
 	 * @param string $class The name of the class to return an instance of.
 	 * @return object Returns an instance of the object given by `$class` without calling that
 	 *        class' constructor.

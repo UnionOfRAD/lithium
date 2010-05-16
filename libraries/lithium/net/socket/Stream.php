@@ -11,12 +11,12 @@ namespace lithium\net\socket;
 use \Exception;
 
 /**
- * A PHP stream-based socket adapter
+ * A PHP stream-based socket adapter.
  *
- * This stream adapter provides the required method implementations of the abstract Socket class
- * for `open`, `close`, `read`, `write`, `timeout` `eof` and `encoding`.
+ * This stream adapter provides the required method implementations of the abstract `Socket` class
+ * for the `open()`, `close()`, `read()`, `write()`, `timeout()` `eof()` and `encoding()` methods.
  *
- * @see http://www.php.net/manual/en/book.stream.php
+ * @link http://www.php.net/manual/en/book.stream.php PHP Manual: Streams
  * @see lithium\net\socket\Stream
  */
 class Stream extends \lithium\net\Socket {
@@ -116,11 +116,12 @@ class Stream extends \lithium\net\Socket {
 	}
 
 	/**
-	 * Set timeout period on a stream
+	 * Set timeout period on a stream.
 	 *
+	 * @link http://www.php.net/manual/en/function.stream-set-timeout.php
+	 *       PHP Manual: stream_set_timeout()
 	 * @param integer $time The timeout value in seconds.
 	 * @return void
-	 * @see http://www.php.net/manual/en/function.stream-set-timeout.php
 	 */
 	public function timeout($time) {
 		if (!is_resource($this->_resource)) {
@@ -133,10 +134,11 @@ class Stream extends \lithium\net\Socket {
 	 * Sets the character set for stream encoding
 	 *
 	 * Note: This function only exists in PHP 6. For PHP < 6, this method will return void.
+	 *
+	 * @link http://www.php.net/manual/en/function.stream-encoding.php PHP Manual: stream_encoding()
 	 * @param string $charset
-	 * @return mixed Returns void if `stream_encoding` method does not exist, boolean
-	 *         result of `stream_encoding` otherwise.
-	 * @see http://www.php.net/manual/en/function.stream-encoding.php
+	 * @return mixed Returns `null` if `stream_encoding()` function does not exist, boolean
+	 *         result of `stream_encoding()` otherwise.
 	 */
 	public function encoding($charset) {
 		if (!function_exists('stream_encoding')) {

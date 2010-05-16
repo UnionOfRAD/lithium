@@ -18,7 +18,7 @@ class MockSerializer extends \lithium\core\Object {
 	 * Write strategy method.
 	 * Serializes the passed data.
 	 *
-	 * @see http://php.net/manual/en/function.serialize.php
+	 * @link http://php.net/manual/en/function.serialize.php PHP Manual: serialize()
 	 * @param mixed $data The data to be serialized.
 	 * @return string Serialized data.
 	 */
@@ -30,7 +30,7 @@ class MockSerializer extends \lithium\core\Object {
 	 * Read strategy method.
 	 * Unserializes the passed data.
 	 *
-	 * @see http://php.net/manual/en/function.unserialize.php
+	 * @link http://php.net/manual/en/function.unserialize.php PHP Manual: unserialize()
 	 * @param string $data Serialized data.
 	 * @return mixed Result of unserialization.
 	 */

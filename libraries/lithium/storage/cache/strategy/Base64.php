@@ -9,15 +9,16 @@
 namespace lithium\storage\cache\strategy;
 
 /**
- * A PHP base64 encoding strategy.
+ * A PHP base64-encoding strategy.
  */
 class Base64 extends \lithium\core\Object {
 
 	/**
 	 * Write strategy method.
-	 * Base64 encodes the passed data.
 	 *
-	 * @see http://php.net/manual/en/function.base64-encode.php
+	 * Base64-encodes the passed data.
+	 *
+	 * @link http://php.net/manual/en/function.base64-encode.php PHP Manual: base64_encode()
 	 * @param mixed $data The data to be serialized.
 	 * @return string Serialized data.
 	 */
@@ -27,9 +28,10 @@ class Base64 extends \lithium\core\Object {
 
 	/**
 	 * Read strategy method.
+	 *
 	 * Unserializes the passed data.
 	 *
-	 * @see http://php.net/manual/en/function.base64-decode.php
+	 * @link http://php.net/manual/en/function.base64-decode.php PHP Manual: base64_decode()
 	 * @param string $data Serialized data.
 	 * @return mixed Result of unserialization.
 	 */

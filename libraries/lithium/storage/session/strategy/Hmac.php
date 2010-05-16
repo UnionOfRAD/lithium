@@ -45,7 +45,7 @@ class Hmac extends \lithium\core\Object {
 	 *
 	 * @see lithium\storage\Session
 	 * @see lithium\core\Adaptable::config()
-	 * @see http://php.net/manual/en/function.hash-hmac.php
+	 * @link http://php.net/manual/en/function.hash-hmac.php PHP Manual: hash_hmac()
 	 * @param mixed $data The data to be signed.
 	 * @param array $options Options for this method.
 	 * @return array Data & signature.
@@ -98,7 +98,7 @@ class Hmac extends \lithium\core\Object {
 	 *
 	 * @see lithium\storage\Session
 	 * @see lithium\core\Adaptable::config()
-	 * @see http://php.net/manual/en/function.hash-hmac.php
+	 * @link http://php.net/manual/en/function.hash-hmac.php PHP Manual: hash_hmac()
 	 * @param mixed $data The data to be signed.
 	 * @param array $options Options for this method.
 	 * @return array Data & signature.
