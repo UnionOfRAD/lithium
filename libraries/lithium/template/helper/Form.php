@@ -57,7 +57,7 @@ class Form extends \lithium\template\Helper {
 		'option-group'         => '<optgroup label="{:label}"{:options}>',
 		'option-group-end'     => '</optgroup>',
 		'password'             => '<input type="password" name="{:name}"{:options} />',
-		'radio'         	   => '<input type="radio" name="{:name}" id="{:id}"{:options} />',
+		'radio'                => '<input type="radio" name="{:name}" {:options} />',
 		'select-start'         => '<select name="{:name}"{:options}>',
 		'select-multi-start'   => '<select name="{:name}[]"{:options}>',
 		'select-empty'         => '<option value=""{:options}>&nbsp;</option>',
