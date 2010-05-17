@@ -74,10 +74,11 @@ class CreateTest extends \lithium\test\Unit {
 
 	public function testNamespace() {
 		$create = new MockCreate(array('request' => $this->request));
+        $this->request->command = 'one';
 
 		$expected = 'create_test\\two';
 		$result = $create->invokeMethod('_namespace', array(
-			'one', array(
+			$this->request, array(
 				'spaces' => array('one' => 'two')
 			)
 		));
@@ -156,8 +157,8 @@ class CreateTest extends \lithium\test\Unit {
 
 		$create->run('test');
 
-		$expected = 'test';
-		$result = $create->request->params['command'];
+		$expected = 'model';
+		$result = $create->request->command;
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_testPath . '/create_test/tests/cases/models/PostTest.php';
@@ -174,8 +175,8 @@ class CreateTest extends \lithium\test\Unit {
 
 		$create->run('test');
 
-		$expected = 'test';
-		$result = $create->request->params['command'];
+		$expected = 'controller';
+		$result = $create->request->command;
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_testPath . '/create_test/tests/cases/controllers/PostsControllerTest.php';
@@ -191,8 +192,8 @@ class CreateTest extends \lithium\test\Unit {
 		$create = new MockCreate(array('request' => $this->request));
 		$create->run('test');
 
-		$expected = 'test';
-		$result = $create->request->params['command'];
+		$expected = 'something';
+		$result = $create->request->command;
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_testPath . '/create_test/tests/cases/something/PostTest.php';

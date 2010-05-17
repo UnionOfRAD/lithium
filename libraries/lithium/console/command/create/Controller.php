@@ -8,32 +8,64 @@
 
 namespace lithium\console\command\create;
 
-use \lithium\core\Libraries;
 use \lithium\util\Inflector;
 
 /**
- * Creates a Lithium controller in the \app\controllers namespace.
+ * Generate a Controller class in the `--library` namespace
+ *
+ * `li3 create controller Posts`
+ * `li3 create --library=li3_plugin controller Posts`
  *
  */
 class Controller extends \lithium\console\command\Create {
 
+    /**
+     * Get the fully-qualified model class that is used by the controller.
+     *
+     * @param string $request
+     * @return string
+     */
 	protected function _use($request) {
 		$request->params['command'] = 'model';
 		return '\\' . $this->_namespace($request) . '\\' . $this->_model($request);
 	}
 
+    /**
+     * Get the controller class name.
+     *
+     * @param string $request
+     * @return string
+     */
 	protected function _class($request) {
 		return Inflector::camelize(Inflector::pluralize($request->action) . 'Controller');
 	}
 
+    /**
+     * Get the plural variable used for data in controller methods.
+     *
+     * @param string $request
+     * @return string
+     */
 	protected function _plural($request) {
 		return Inflector::pluralize(Inflector::camelize($request->action, false));
 	}
 
+    /**
+     * Get the model class used in controller methods.
+     *
+     * @param string $request
+     * @return string
+     */
 	protected function _model($request) {
 		return Inflector::classify($request->action);
 	}
 
+    /**
+     * Get the singular variable to use for data in controller methods.
+     *
+     * @param string $request
+     * @return string
+     */
 	protected function _singular($request) {
 		return Inflector::singularize(Inflector::camelize($request->action, false));
 	}

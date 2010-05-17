@@ -11,11 +11,20 @@ namespace lithium\console\command\create;
 use \lithium\util\Inflector;
 
 /**
- * Creates a new Lithium model in the \app\models namespace.
+ * Generate a Model class in the `--library` namespace
+ *
+ * `li3 create mdoel Post`
+ * `li3 create --library=li3_plugin model Post`
  *
  */
 class Model extends \lithium\console\command\Create {
 
+    /**
+     * Get the class name for the model.
+     *
+     * @param string $request
+     * @return string
+     */
 	protected function _class($request) {
 		return Inflector::classify($request->action);
 	}

@@ -8,35 +8,64 @@
 
 namespace lithium\console\command\create;
 
-use \lithium\core\Libraries;
+use \lithium\util\Inflector;
 
 /**
- * Generate a Mock that extends the name of the given class in the given namespace.
+ * Generate a Mock that extends the name of the given class in the `--library` namespace.
+ *
  * `li3 create mock model Post`
  * `li3 create --library=li3_plugin mock model Post`
  *
- * @param string $type namespace of the class (e.g. model, controller, some.name.space).
- * @param string $name Class name to extend with the mock.
- * @return void
  */
 class Mock extends \lithium\console\command\Create {
 
+    /**
+     * Get the namespace for the mock.
+     *
+     * @param string $request
+     * @param string $options
+     * @return string
+     */
 	protected function _namespace($request, $options = array()) {
 		$request->shift();
 		return parent::_namespace($request, array('prepend' => 'tests.mocks.'));
 	}
 
+    /**
+     * Get the parent for the mock.
+     *
+     * @param string $request
+     * @return string
+     */
 	protected function _parent($request) {
 		$namespace = parent::_namespace($request);
 		$class = $request->action;
 		return "\\{$namespace}\\{$class}";
 	}
 
+    /**
+     * Get the class name for the mock.
+     *
+     * @param string $request
+     * @return string
+     */
 	protected function _class($request) {
-		$class = $request->action;
-		return "Mock{$class}";
+		$name = $request->action;
+		$type = $request->command;
+
+		if ($command = $this->{$type}) {
+			$request->params['action'] = $name;
+			$name = $command->invokeMethod('_class', array($request));
+		}
+		return  Inflector::classify("Mock{$name}");
 	}
 
+    /**
+     * Get the methods for the mock to override
+     *
+     * @param string $request
+     * @return string
+     */
 	protected function _methods($request) {
 		return null;
 	}

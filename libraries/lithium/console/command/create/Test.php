@@ -13,27 +13,44 @@ use \lithium\util\Inflector;
 use \lithium\analysis\Inspector;
 
 /**
- * Generate test cases in the given namespace.
- * `li3 create test model Post`
- * `li3 create test --library=li3_plugin model Post`
+ * Generate a Test class in the `--library` namespace
  *
- * @param string $type namespace of the class (e.g. model, controller, some.name.space).
- * @param string $name Name of class to test.
- * @return void
+ * `li3 create test model Post`
+ * `li3 create --library=li3_plugin test model Post`
+ *
  */
 class Test extends \lithium\console\command\Create {
 
+    /**
+     * Get the namespace for the test case.
+     *
+     * @param string $request
+     * @param array $options
+     * @return string
+     */
 	protected function _namespace($request, $options = array()) {
 		$request->shift();
 		return parent::_namespace($request, array('prepend' => 'tests.cases.'));
 	}
 
+    /**
+     * Get the class used by the test case.
+     *
+     * @param string $request
+     * @return string
+     */
 	protected function _use($request) {
 		$namespace = parent::_namespace($request);
 		$class = $request->action;
 		return "\\{$namespace}\\{$class}";
 	}
 
+    /**
+     * Get the class name for the test case.
+     *
+     * @param string $request
+     * @return string
+     */
 	protected function _class($request) {
 		$name = $request->action;
 		$type = $request->command;
@@ -45,6 +62,12 @@ class Test extends \lithium\console\command\Create {
 		return  Inflector::classify("{$name}Test");
 	}
 
+    /**
+     * Get the methods to test.
+     *
+     * @param string $request
+     * @return string
+     */
 	protected function _methods($request) {
 		$use = $this->_use($request);
 		$path = Libraries::path($use);

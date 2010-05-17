@@ -11,8 +11,20 @@ namespace lithium\console\command\create;
 use lithium\util\Inflector;
 use lithium\util\String;
 
+/**
+ * Generate a View file in the `--library` namespace
+ *
+ * `li3 create view Posts index`
+ * `li3 create --library=li3_plugin view Posts index`
+ *
+ */
 class View extends \lithium\console\command\Create {
 
+    /**
+     * Override the save method to handle view specific params.
+     *
+     * @param array $params
+     */
 	protected function _save($params = array()) {
 		$params['path'] = Inflector::underscore($this->request->action);
 		$params['file'] = $this->request->args(0);
