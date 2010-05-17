@@ -218,7 +218,7 @@ class Form extends \lithium\template\Helper {
 			'method' => $binding ? ($binding->exists() ? 'put' : 'post') : 'post'
 		);
 		if (!isset($options['id'])) {
-			$options['id'] = Inflector::camelize($this->_context->request()->params['action']);
+			$options['id'] = $this->_context->request()->params['action'];
 		}
 		$this->_formId = $options['id'];
 
@@ -373,9 +373,9 @@ class Form extends \lithium\template\Helper {
 		if (!isset($fieldOptions['id'])) {
 			$fieldOptions['id'] = '';
 			if ($this->_formId) {
-				$fieldOptions['id'] = $this->_formId;
+				$fieldOptions['id'] = $this->_formId.'-';
 			}
-			$fieldOptions['id'] .= Inflector::camelize($name);
+			$fieldOptions['id'] .= $name;
 
 		}
 
