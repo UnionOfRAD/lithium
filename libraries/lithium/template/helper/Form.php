@@ -121,6 +121,8 @@ class Form extends \lithium\template\Helper {
 	 */
 	protected $_binding = null;
 
+	protected $_formId = false;
+
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'base' => array(), 'text' => array(), 'textarea' => array(),
@@ -215,6 +217,11 @@ class Form extends \lithium\template\Helper {
 			'action' => null,
 			'method' => $binding ? ($binding->exists() ? 'put' : 'post') : 'post'
 		);
+		$this->_formId = false;
+		if (isset($options['id'])) {
+			$this->_formId = $options['id'];
+		}
+
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, $options);
 		list($scope, $options) = $this->_options($defaults, $options);
 
@@ -363,13 +370,19 @@ class Form extends \lithium\template\Helper {
 		$type = $options['type'];
 		$label = $input = null;
 
+		if (!isset($fieldOptions['id'])) {
+			$fieldOptions['id'] = '';
+			if ($this->_formId) {
+				$fieldOptions['id'] = $this->_formId;
+			}
+			$fieldOptions['id'] .= $name;
+
+		}
+
 		if ($options['label'] === null || $options['label']) {
-			$for = $name;
-			if (isset($options['id'])) {
-				$for = $options['id'];
-				if (!isset($options['label'])) {
-					$options['label'] = Inflector::humanize($name);
-				}
+			$for = $fieldOptions['id'];
+			if (!isset($options['label'])) {
+				$options['label'] = Inflector::humanize($name);
 			}
 			$label = $this->label($for, $options['label']);
 		}
