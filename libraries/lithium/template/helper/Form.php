@@ -486,17 +486,29 @@ class Form extends \lithium\template\Helper {
 	 * @param string $name The name of the field.
 	 * @param array $options Options to be used when generating the checkbox `<input />` element:
 	 *              - `'checked'` _boolean_: Whether or not the field should be checked by default.
+	 *              - `'value'` _mixed_: if specified, it will be used as the 'value' html
+	 *                attribute and no hidden input field will be added
 	 *              - Any other options specified are rendered as HTML attributes of the element.
 	 * @return string Returns a `<input />` tag with the given name and HTML attributes.
 	 */
 	public function checkbox($name, array $options = array()) {
-		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
-		list($scope, $options) = $this->_options(array('value' => null), $options);
-
-		if (!isset($scope['checked'])) {
-			$options['checked'] = isset($scope['value']) ? $scope['value'] : false;
+		$value = '1'; $hidden = true;
+		if (isset($options['value'])) {
+			$value = $options['value'];
+			$hidden = false;
+			unset($options['value']);
 		}
-		return $this->_render(__METHOD__, $template, compact('name', 'options'));
+		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+
+		if (!isset($options['checked'])) {
+			$options['checked'] = isset($options['value']) ? ($options['value'] == $value) : false;
+		}
+		$out = '';
+		if ($hidden) {
+			$out = $this->hidden($name, array('value' => 0));
+		}
+		$options += array('value' => $value);
+		return $out . $this->_render(__METHOD__, $template, compact('name', 'options'));
 	}
 
 	/**

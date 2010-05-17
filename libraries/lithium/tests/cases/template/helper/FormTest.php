@@ -318,19 +318,94 @@ class FormTest extends \lithium\test\Unit {
 
 	public function testCheckboxGeneration() {
 		$result = $this->form->checkbox('foo');
-		$this->assertTags($result, array('input' => array('type' => 'checkbox', 'name' => 'foo')));
+		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => 0, 'name' => 'foo')),
+			array('input' => array('type' => 'checkbox', 'value' => 1, 'name' => 'foo'))
+		));
 
 		$result = $this->form->checkbox('foo', array('checked' => false));
-		$this->assertTags($result, array('input' => array('type' => 'checkbox', 'name' => 'foo')));
+		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => 0, 'name' => 'foo')),
+			array('input' => array('type' => 'checkbox', 'value' => 1, 'name' => 'foo'))
+		));
 
 		$result = $this->form->checkbox('foo', array('checked' => true));
+		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => 0, 'name' => 'foo')),
+			array('input' => array(
+				'type' => 'checkbox', 'value' => 1, 'name' => 'foo', 'checked' => 'checked'
+			))
+		));
+
+		$result = $this->form->checkbox('foo', array('checked' => true));
+		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => 0, 'name' => 'foo')),
+			array('input' => array(
+				'type' => 'checkbox', 'value' => 1, 'name' => 'foo', 'checked' => 'checked'
+			))
+		));
+
+		$record = new Record();
+		$record->foo = true;
+		$this->form->create($record);
+
+		$result = $this->form->checkbox('foo');
+		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => 0, 'name' => 'foo')),
+			array('input' => array(
+				'type' => 'checkbox', 'value' => 1, 'name' => 'foo', 'checked' => 'checked'
+			))
+		));
+	}
+
+	public function testCustomCheckbox() {
+		$result = $this->form->checkbox('foo', array('value' => '1'));
+		$this->assertTags($result, array(
+			array('input' => array('type' => 'checkbox', 'value' => '1',  'name' => 'foo'))
+		));
+
+		$result = $this->form->checkbox('foo', array('checked' => true, 'value' => '1'));
 		$this->assertTags($result, array('input' => array(
-			'type' => 'checkbox', 'name' => 'foo', 'checked' => 'checked'
+				'type' => 'checkbox', 'name' => 'foo', 'value' => '1', 'checked' => 'checked'
 		)));
 
-		$result = $this->form->checkbox('foo', array('value' => true));
+		$record = new Record();
+		$record->foo = true;
+		$this->form->create($record);
+
+		$result = $this->form->checkbox('foo', array('value' => '1'));
+		$this->assertTags($result, array(
+			array('input' => array(
+				'type' => 'checkbox', 'value' => '1', 'name' => 'foo', 'checked' => 'checked'
+			))
+		));
+	}
+
+	public function testCustomValueCheckbox() {
+		$result = $this->form->checkbox('foo', array('value' => 'HERO'));
+		$this->assertTags($result, array(
+			array('input' => array('type' => 'checkbox', 'value' => 'HERO', 'name' => 'foo'))
+		));
+
+		$result = $this->form->checkbox('foo', array('value' => 'HERO'));
 		$this->assertTags($result, array('input' => array(
-			'type' => 'checkbox', 'name' => 'foo', 'checked' => 'checked'
+				'type' => 'checkbox', 'name' => 'foo', 'value' => 'HERO',
+		)));
+
+		$result = $this->form->checkbox('foo', array('value' => 'nose'));
+		$this->assertTags($result, array(
+			array('input' => array(
+				'type' => 'checkbox', 'value' => 'nose', 'name' => 'foo'
+			))
+		));
+
+		$record = new Record();
+		$record->foo = 'nose';
+		$this->form->create($record);
+
+		$result = $this->form->checkbox('foo', array('value' => 'nose'));
+		$this->assertTags($result, array('input' => array(
+				'type' => 'checkbox', 'name' => 'foo', 'value' => 'nose', 'checked' => 'checked'
 		)));
 	}
 
