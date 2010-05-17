@@ -217,10 +217,10 @@ class Form extends \lithium\template\Helper {
 			'action' => null,
 			'method' => $binding ? ($binding->exists() ? 'put' : 'post') : 'post'
 		);
-		$this->_formId = false;
-		if (isset($options['id'])) {
-			$this->_formId = $options['id'];
+		if (!isset($options['id'])) {
+			$options['id'] = Inflector::camelize($this->_context->request()->params['action']);
 		}
+		$this->_formId = $options['id'];
 
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, $options);
 		list($scope, $options) = $this->_options($defaults, $options);
@@ -375,7 +375,7 @@ class Form extends \lithium\template\Helper {
 			if ($this->_formId) {
 				$fieldOptions['id'] = $this->_formId;
 			}
-			$fieldOptions['id'] .= $name;
+			$fieldOptions['id'] .= Inflector::camelize($name);
 
 		}
 

@@ -69,12 +69,12 @@ class FormTest extends \lithium\test\Unit {
 	public function testFormCreation() {
 		$result = $this->form->create();
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts", 'method' => 'post')
+			'form' => array('action' => "{$this->base}posts", 'method' => 'post', 'id' => 'Index')
 		));
 
 		$result = $this->form->create(null, array('method' => 'get'));
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts", 'method' => 'get')
+			'form' => array('action' => "{$this->base}posts", 'method' => 'get', 'id' => 'Index')
 		));
 
 		$result = $this->form->create(null, array('type' => 'file'));
@@ -82,13 +82,15 @@ class FormTest extends \lithium\test\Unit {
 			'action' => "{$this->base}posts",
 			'enctype' => 'multipart/form-data',
 			'method' => 'post',
+			'id' => 'Index'
 		)));
 
 		$result = $this->form->create(null, array('method' => 'get', 'type' => 'file'));
 		$this->assertTags($result, array('form' => array(
 			'action' => "{$this->base}posts",
 			'method' => 'post',
-			'enctype' => 'multipart/form-data'
+			'enctype' => 'multipart/form-data',
+			'id' => 'Index'
 		)));
 
 		$result = $this->form->create(null, array('id' => 'Registration'));
@@ -107,7 +109,7 @@ class FormTest extends \lithium\test\Unit {
 
 		$this->assertTags($result, array(
 			'form' => array(
-				'action' => "{$this->base}posts/delete", 'method' => 'post'
+				'action' => "{$this->base}posts/delete", 'method' => 'post', 'id' => 'Index'
 			),
 			'input' => array(
 				'type' => "hidden",
@@ -121,7 +123,8 @@ class FormTest extends \lithium\test\Unit {
 			'form' => array(
 				'action' => "{$this->base}posts",
 				'method' => 'post',
-				'enctype' => 'multipart/form-data'
+				'enctype' => 'multipart/form-data',
+				'id' => 'Index'
 			),
 			'input' => array(
 				'type' => "hidden",
@@ -133,7 +136,7 @@ class FormTest extends \lithium\test\Unit {
 		$record = new Record(array('exists' => true));
 		$result = $this->form->create($record);
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts", 'method' => 'post'),
+			'form' => array('action' => "{$this->base}posts", 'method' => 'post', 'id' => 'Index'),
 			'input' => array('type' => "hidden", 'name' => '_method', 'value' => 'PUT')
 		));
 	}
@@ -152,6 +155,7 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array('form' => array(
 			'action' => "{$this->base}posts",
 			'method' => 'post',
+			'id' => 'Index'
 		)));
 	}
 
@@ -171,7 +175,7 @@ class FormTest extends \lithium\test\Unit {
 
 		$result = $this->form->create($record);
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts", 'method' => 'post')
+			'form' => array('action' => "{$this->base}posts", 'method' => 'post', 'id' => 'Index')
 		));
 
 		$result = $this->form->text('title');
@@ -561,7 +565,11 @@ class FormTest extends \lithium\test\Unit {
 
 		$result = $form->create();
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}mock/test/1", 'method' => 'post')
+			'form' => array(
+				'action' => "{$this->base}mock/test/1",
+				'method' => 'post',
+				'id' => 'Test'
+			)
 		));
 	}
 
@@ -574,7 +582,11 @@ class FormTest extends \lithium\test\Unit {
 
 		$result = $form->create(null, array('action' => 'radness'));
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}mock/radness", 'method' => 'post')
+			'form' => array(
+				'action' => "{$this->base}mock/radness",
+				'method' => 'post',
+				'id' => 'Test'
+			)
 		));
 	}
 
@@ -582,8 +594,8 @@ class FormTest extends \lithium\test\Unit {
 		$result = $this->form->field('name');
 		$this->assertTags($result, array(
 			'div' => array(),
-			'label' => array('for' => 'name'), 'Name', '/label',
-			'input' => array('type' => 'text', 'name' => 'name', 'id' => 'name'),
+			'label' => array('for' => 'Name'), 'Name', '/label',
+			'input' => array('type' => 'text', 'name' => 'name', 'id' => 'Name'),
 		));
 	}
 
@@ -602,8 +614,8 @@ class FormTest extends \lithium\test\Unit {
 		$result = $this->form->field(array('name' => 'Enter a name'));
 		$this->assertTags($result, array(
 			'div' => array(),
-			'label' => array('for' => 'name'), 'Enter a name', '/label',
-			'input' => array('type' => 'text', 'name' => 'name', 'id' => 'name'),
+			'label' => array('for' => 'Name'), 'Enter a name', '/label',
+			'input' => array('type' => 'text', 'name' => 'name', 'id' => 'Name'),
 		));
 	}
 
@@ -615,24 +627,24 @@ class FormTest extends \lithium\test\Unit {
 		));
 		$this->assertTags($result, array(
 			array('div' => array()),
-				array('label' => array('for' => 'name')),
+				array('label' => array('for' => 'Name')),
 					'Enter a name',
 				'/label',
-				array('input' => array('type' => 'text', 'name' => 'name', 'id' => 'name')),
+				array('input' => array('type' => 'text', 'name' => 'name', 'id' => 'Name')),
 			'/div',
 
 			array('div' => array()),
-				array('label' => array('for' => 'phone_number')),
+				array('label' => array('for' => 'PhoneNumber')),
 					'Phone Number',
 				'/label',
-				array('input' => array('type' => 'text', 'name' => 'phone_number', 'id' => 'phone_number')),
+				array('input' => array('type' => 'text', 'name' => 'phone_number', 'id' => 'PhoneNumber')),
 			'/div',
 
 			array('div' => array()),
-				array('label' => array('for' => 'email')),
+				array('label' => array('for' => 'Email')),
 					'Enter a valid email',
 				'/label',
-				array('input' => array('type' => 'text', 'name' => 'email', 'id' => 'email')),
+				array('input' => array('type' => 'text', 'name' => 'email', 'id' => 'Email')),
 			'/div'
 		));
 	}
@@ -667,8 +679,8 @@ class FormTest extends \lithium\test\Unit {
 		));
 		$this->assertTags($result, array(
 			'div' => array(),
-			'label' => array('for' => 'states'), 'States', '/label',
-			'select' => array('name' => 'states', 'id' => 'states'),
+			'label' => array('for' => 'States'), 'States', '/label',
+			'select' => array('name' => 'states', 'id' => 'States'),
 			array('option' => array('value' => '0', 'selected' => 'selected')),
 			'CA',
 			'/option',
@@ -736,7 +748,7 @@ class FormTest extends \lithium\test\Unit {
 		$record->errors(array('name' => array('Please enter a name')));
 		$this->form->create($record);
 
-		$expected = '<div><label for="name">Name</label><input type="text" name="name" id="name" />';
+		$expected = '<div><label for="IndexName">Name</label><input type="text" name="name" id="IndexName" />';
 		$expected .= '<div class="error">Please enter a name</div></div>';
 		$result = $this->form->field('name');
 		$this->assertEqual($expected, $result);
@@ -750,7 +762,7 @@ class FormTest extends \lithium\test\Unit {
 		$this->form->create($record);
 
 		$result = $this->form->field('name');
-		$expected = '<div><label for="name">Name</label><input type="text" name="name" id="name" />';
+		$expected = '<div><label for="IndexName">Name</label><input type="text" name="name" id="IndexName" />';
 		$expected .= '<div class="custom-error-class">Please enter a name</div></div>';
 		$this->assertEqual($expected, $result);
 	}
@@ -764,8 +776,8 @@ class FormTest extends \lithium\test\Unit {
 		$this->form->config(array('templates' => array('field' => '{:label}{:input}{:error}')));
 		$result = $this->form->field('name', array('type' => 'text'));
 		$this->assertTags($result, array(
-			'label' => array('for' => 'name'), 'Name', '/label',
-			'input' => array('type' => 'text', 'name' => 'name', 'id' => 'name')
+			'label' => array('for' => 'Name'), 'Name', '/label',
+			'input' => array('type' => 'text', 'name' => 'name', 'id' => 'Name')
 		));
 	}
 
@@ -776,10 +788,10 @@ class FormTest extends \lithium\test\Unit {
 		);
 		$expected = array(
 			'<div',
-				array('label' => array('for' => 'colors')),
+				array('label' => array('for' => 'Colors')),
 					'Colors',
 				'/label',
-				'select' => array('name' => 'colors', 'id' => 'colors'),
+				'select' => array('name' => 'colors', 'id' => 'Colors'),
 					array('option' => array('value' => 'r')),
 						'red',
 					'/option',
@@ -800,8 +812,8 @@ class FormTest extends \lithium\test\Unit {
 		$result = $this->form->field('name');
 		$this->assertTags($result, array(
 			'div' => array(),
-			'label' => array('for' => 'Username'), 'Name', '/label',
-			'input' => array('type' => 'text', 'name' => 'name', 'id' => 'Username'),
+			'label' => array('for' => 'UserName'), 'Name', '/label',
+			'input' => array('type' => 'text', 'name' => 'name', 'id' => 'UserName'),
 		));
 
 	}
