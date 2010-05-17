@@ -13,6 +13,14 @@ use \lithium\core\Libraries;
 use \lithium\util\Inflector;
 use \InvalidArgumentException;
 
+/**
+ * The `Database` class provides the base-level abstraction for SQL-oriented relational databases.
+ * It handles all aspects of abstraction, including formatting for basic query types and SQL
+ * fragments (i.e. for joins), converting `Query` objects to SQL, and various other functionality
+ * which is shared across multiple relational databases.
+ *
+ * @see lithium\data\model\Query
+ */
 abstract class Database extends \lithium\data\Source {
 
 	/**
@@ -51,6 +59,23 @@ abstract class Database extends \lithium\data\Source {
 		'record' => '\lithium\data\model\Record',
 		'recordSet' => '\lithium\data\collection\RecordSet',
 		'relationship' => '\lithium\data\model\Relationship'
+	);
+
+	/**
+	 * List of SQL operators, paired with handling options.
+	 *
+	 * @var array
+	 */
+	protected $_operators = array(
+		'='  => array('multiple' => 'IN'),
+		'<'  => array(),
+		'>'  => array(),
+		'<=' => array(),
+		'>=' => array(),
+		'!=' => array('multiple' => 'NOT IN'),
+		'<>' => array('multiple' => 'NOT IN'),
+		'between' => array('format' => 'BETWEEN ? AND ?'),
+		'BETWEEN' => array('format' => 'BETWEEN ? AND ?')
 	);
 
 	/**
@@ -140,7 +165,7 @@ abstract class Database extends \lithium\data\Source {
 	public function name($name) {
 		$open  = reset($this->_quotes);
 		$close = next($this->_quotes);
-		return $name ? "{$open}{$name}{$close}" : null;
+		return preg_match('/^[a-z0-9_-]+$/i', $name) ? "{$open}{$name}{$close}" : $name;
 	}
 
 	/**
@@ -182,32 +207,19 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function create($query, array $options = array()) {
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
-			$query = $params['query'];
-			$model = $query->model();
-			$fields = $values = array();
-			$data = $query->export($self);
-			$schema = (array) $model::schema();
-
-			while (list($field, $value) = each($data['fields'])) {
-				$schema += array($field => array('default' => null));
-				if ($value === null && $schema[$field]['default'] === null) {
-					continue;
-				}
-				$fields[] = $self->name($field);
-				$values[] = $self->value($value, $schema[$field]);
-			}
-
-			$fields = join(', ', $fields);
-			$values = join(', ', $values);
-			$sql = $self->renderCommand('create', compact('fields', 'values') + $data, $query);
+			$query  = $params['query'];
+			$model  = $query->model();
+			$params = $query->export($self);
+			$sql    = $self->renderCommand('create', $params, $query);
+			$id     = null;
 
 			if ($self->invokeMethod('_execute', array($sql))) {
-				$id = null;
-
-				if (!$model::key($query->record())) {
-					$id = $self->invokeMethod('_insertId', array($query));
+				if ($query->record()) {
+					if (!$model::key($query->record())) {
+						$id = $self->invokeMethod('_insertId', array($query));
+					}
+					$query->record()->update($id);
 				}
-				$query->record()->update($id);
 				return true;
 			}
 			return false;
@@ -266,17 +278,8 @@ abstract class Database extends \lithium\data\Source {
 	public function update($query, array $options = array()) {
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
 			$query = $params['query'];
-			$model = $query->model();
-			$data = $query->export($self);
-			$schema = (array) $model::schema();
-			$fields = array();
-
-			while (list($field, $value) = each($data['fields'])) {
-				$schema += array($field => array());
-				$fields[] = $self->name($field) . ' = ' . $self->value($value, $schema[$field]);
-			}
-			$fields = join(', ', $fields);
-			$sql = $self->renderCommand('update', compact('fields') + $data, $query);
+			$params = $query->export($self);
+			$sql = $self->renderCommand('update', $params, $query);
 
 			if ($self->invokeMethod('_execute', array($sql))) {
 				$query->record()->update();
@@ -325,7 +328,7 @@ abstract class Database extends \lithium\data\Source {
 				$query->fields("COUNT({$fields}) as count", true);
 				$query->map(array($query->model() => array('count')));
 				list($record) = $this->read($query, $options)->data();
-				return intval($record['count']);
+				return isset($return['count']) ? intval($record['count']) : null;
 		}
 	}
 
@@ -340,12 +343,12 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function relationship($class, $type, $name, array $config = array()) {
 		$singularName = ($type == 'hasMany') ? Inflector::singularize($name) : $name;
-		$key = $type == 'belongsTo' ? $class::meta('name') : $singularName;
-		$key = Inflector::underscore($key) . '_id';
+		$keys = $type == 'belongsTo' ? $class::meta('name') : $singularName;
+		$keys = Inflector::underscore($keys) . '_id';
 		$from = $class;
 
 		$relationship = $this->_classes['relationship'];
-		return new $relationship($config + compact('type', 'name', 'key', 'from'));
+		return new $relationship($config + compact('type', 'name', 'keys', 'from'));
 	}
 
 	/**
@@ -431,16 +434,24 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Returns a string of formatted conditions to be inserted into the query statement
+	 * Returns a string of formatted conditions to be inserted into the query statement. If the
+	 * query conditions are defined as an array, key pairs are converted to SQL strings.
+	 *
+	 * Conversion rules are as follows:
+	 *
+	 * - If `$key` is numeric and `$value` is a string, `$value` is treated as a literal SQL
+	 *   fragment and returned.
+	 * - 
 	 *
 	 * @param string|array $conditions The conditions for this query.
 	 * @param object $context The current `\lithium\data\model\Query`.
 	 * @param array $options
 	 *               - `prepend` : added before WHERE clause
-	 * @return void
+	 * @return string Returns the `WHERE` clause of an SQL query.
 	 */
 	public function conditions($conditions, $context, array $options = array()) {
 		$defaults = array('prepend' => true);
+		$ops = $this->_operators;
 		$options += $defaults;
 		$model = $context->model();
 		$schema = $model ? $model::schema() : array();
@@ -451,11 +462,9 @@ abstract class Database extends \lithium\data\Source {
 			case is_string($conditions):
 				return ($options['prepend']) ? "WHERE {$conditions}" : $conditions;
 			case !is_array($conditions):
-				return null;
+				return '';
 		}
-
 		$result = array();
-		$boolean = 'AND';
 
 		foreach ($conditions as $key => $value) {
 			$schema[$key] = isset($schema[$key]) ? $schema[$key] : array();
@@ -468,17 +477,22 @@ abstract class Database extends \lithium\data\Source {
 					$value = trim(rtrim($this->renderCommand($value), ';'));
 					$result[] = "{$key} IN ({$value})";
 				break;
+				case (is_string($key) && is_array($value) && isset($ops[key($value)])):
+					foreach ($value as $op => $val) {
+						$result[] = $this->_operator($key, array($op => $val), $schema[$key]);
+					}
+				break;
 				case (is_string($key) && is_array($value)):
-					$value = join(', ', $this->value($value, $schema[$key]));
+					$value = join(', ', $this->value($value, $schema));
 					$result[] = "{$key} IN ({$value})";
 				break;
 				default:
-					$value = $this->value($value, $schema[$key]);
+					$value = $this->value($value, $schema);
 					$result[] = "{$key} = {$value}";
 				break;
 			}
 		}
-		$result = join(" {$boolean} ", $result);
+		$result = join(" AND ", $result);
 		return ($options['prepend'] && !empty($result)) ? "WHERE {$result}" : $result;
 	}
 
@@ -493,16 +507,20 @@ abstract class Database extends \lithium\data\Source {
 	 *         determined by `$context->type()`).
 	 */
 	public function fields($fields, $context) {
-		switch ($context->type()) {
-			case 'create':
-			case 'update':
-				if ($fields && is_array($fields) && is_int(key($fields))) {
-					return array_intersect_key($context->data(), array_combine($fields, $fields));
-				}
-				return $fields ?: $context->data();
-			default:
-				return empty($fields) ? '*' : join(', ', $fields);
+		$type = $context->type();
+		$model = $context->model();
+		$schema = $model ? (array) $model::schema() : array();
+
+		if ($type == 'create' || $type == 'update') {
+			$data = $context->data();
+
+			if ($fields && is_array($fields) && is_int(key($fields))) {
+				$data = array_intersect_key($data, array_combine($fields, $fields));
+			}
+			$method = "_{$type}Fields";
+			return $this->{$method}($data, $schema, $context);
 		}
+		return empty($fields) ? '*' : join(', ', $fields);
 	}
 
 	/**
@@ -585,6 +603,69 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function comment($comment) {
 		return $comment ? "/* {$comment} */" : null;
+	}
+
+	protected function _createFields($data, $schema, $context) {
+		$fields = $values = array();
+
+		while (list($field, $value) = each($data)) {
+			$fields[] = $this->name($field);
+			$values[] = $this->value($value, isset($schema[$field]) ? $schema[$field] : array());
+		}
+		$fields = join(', ', $fields);
+		$values = join(', ', $values);
+		return compact('fields', 'values');
+	}
+
+	protected function _updateFields($data, $schema, $context) {
+		$fields = array();
+
+		while (list($field, $value) = each($data)) {
+			$schema += array($field => array('default' => null));
+
+			if ($value === null && $schema[$field]['default'] === null) {
+				continue;
+			}
+			$fields[] = $this->name($field) . ' = ' . $this->value($value, $schema[$field]);
+		}
+		return join(', ', $fields);
+	}
+
+	/**
+	 * Handles conversion of SQL operator keys to SQL statements.
+	 *
+	 * @param string $key Key in a conditions array. Usually a field name.
+	 * @param mixed $value An SQL operator or comparison value.
+	 * @param array $schema An array defining the schema of the field used in the criteria.
+	 * @param array $options
+	 * @return string Returns an SQL string representing part of a `WHERE` clause of a query.
+	 */
+	protected function _operator($key, $value, array $schema = array(), array $options = array()) {
+		$defaults = array('boolean' => 'AND');
+		$options += $defaults;
+
+		list($op, $value) = each($value);
+		$config = $this->_operators[$op];
+		$key = $this->name($key);
+		$values = array();
+
+		foreach ((array) $value as $val) {
+			$values[] = $this->value($val, $schema);
+		}
+
+		switch (true) {
+			case (isset($config['format'])):
+				return $key . ' ' . String::insert($config['format'], $values);
+			case (count($values) > 1 && isset($config['multiple'])):
+				$op = $config['multiple'];
+				$values = join(', ', $values);
+				return "{$key} {$op} ({$values})";
+			case (count($values) > 1):
+				return join(" {$options['boolean']} ", array_map(
+					function($v) use ($key, $op) { return "{$key} {$op} {$v}"; }, $values
+				));
+		}
+		return "{$key} {$op} {$values[0]}";
 	}
 
 	/**

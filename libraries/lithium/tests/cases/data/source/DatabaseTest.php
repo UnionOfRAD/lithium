@@ -396,6 +396,72 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected = 'ORDER BY {MockDatabasePost}.{author_id} ASC, {MockDatabasePost}.{title} DESC';
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testScopedDelete() {
+		$query = new Query(array(
+			'type' => 'delete',
+			'conditions' => array('published' => false),
+			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost'
+		));
+		$sql = 'DELETE From {mock_database_posts} WHERE published = 0;';
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+	}
+
+	public function testScopedUpdate() {
+		$query = new Query(array(
+			'type' => 'update',
+			'conditions' => array('expires' => array('>=' => '2010-05-13')),
+			'data' => array('published' => false),
+			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost'
+		));
+		$sql = "UPDATE {mock_database_posts} SET {published} = 0 WHERE {expires} >= '2010-05-13';";
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+	}
+
+	public function testQueryOperators() {
+		$query = new Query(array(
+			'type' => 'read',
+			'conditions' => array('score' => array('between' => array(90, 100))),
+			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost'
+		));
+		$sql = "SELECT * From {mock_database_posts} WHERE {score} BETWEEN 90 AND 100;";
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+
+		$query = new Query(array(
+			'type' => 'read',
+			'conditions' => array('score' => array('>' => 90, '<' => 100)),
+			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost'
+		));
+		$sql = "SELECT * From {mock_database_posts} WHERE {score} > 90 AND {score} < 100;";
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+
+		$query = new Query(array(
+			'type' => 'read',
+			'conditions' => array('score' => array('!=' => array(98, 99, 100))),
+			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost'
+		));
+		$sql = "SELECT * From {mock_database_posts} WHERE {score} NOT IN (98, 99, 100);";
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+
+		$query = new Query(array(
+			'type' => 'read',
+			'conditions' => "custom conditions string",
+			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost'
+		));
+		$sql = "SELECT * From {mock_database_posts} WHERE custom conditions string;";
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+	}
+
+	public function testRawConditions() {
+		$query = new Query(array(
+			'type' => 'read',
+			'conditions' => null,
+			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost'
+		));
+		$this->assertFalse($this->db->conditions(5, $query));
+		$this->assertFalse($this->db->conditions(null, $query));
+		$this->assertEqual("WHERE CUSTOM", $this->db->conditions("CUSTOM", $query));
+	}
 }
 
 ?>

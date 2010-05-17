@@ -20,12 +20,12 @@ use \BadMethodCallException;
  * user profile).
  *
  * Models expose a consistent and unified API to interact with an underlying datasource (e.g.
- * MongoDB, MySQL) for operations such as querying, saving, updating and deleting data from the
- * persistent storage.
+ * MongoDB, CouchDB, MySQL) for operations such as querying, saving, updating and deleting data
+ * from the persistent storage.
  *
  * Models allow you to interact with your data in two fundamentally different ways: querying, and
  * data mutation (saving/updating/deleting). All query-related operations may be done through the
- * static `find` method, along with some additional utility methods provided for convenience.
+ * static `find()` method, along with some additional utility methods provided for convenience.
  *
  * Examples:
  * {{{
@@ -39,15 +39,14 @@ use \BadMethodCallException;
  *
  * // Integer count of all 'post' records
  * Post::find('count');
- * Post::count(); //
+ * Post::count(); // This is equivalent to the above.
  *
  * // With conditions
  * Post::find('count', array('conditions' => array('published' => true)));
  * Post::count(array('conditions' => array('published' => true)));
- *
  * }}}
  *
- * The actual objects returned from `find` calls will depend on the type of datasource in use.
+ * The actual objects returned from `find()` calls will depend on the type of datasource in use.
  * MongoDB, for example, will return results as a `Document`, while MySQL will return results
  * as a `RecordSet`. Both of these classes extend a common `data\Collection` class, and provide
  * the necessary abstraction to make working with either type completely transparent.
@@ -355,52 +354,6 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Exports an array of custom finders which use the filter system to wrap around `find()`.
-	 *
-	 * @return void
-	 */
-	protected static function _findFilters() {
-		$self = static::_instance();
-		$_query =& $self->_query;
-
-		return array(
-			'first' => function($self, $params, $chain) {
-				$params['options']['limit'] = 1;
-				$data = $chain->next($self, $params, $chain);
-				return is_object($data) ? $data->rewind() : $data;
-			},
-			'list' => function($self, $params, $chain) {
-				$result = array();
-				$meta = $self::meta();
-
-				array_map(
-					function($record) use (&$result, $meta) {
-						$result[$record->{$meta['key']}] = $record->{$meta['title']};
-					},
-					$chain->next($self, $params, $chain)
-				);
-				return $result;
-			},
-			'count' => function($self, $params, $chain) use ($_query) {
-				$model = $self;
-				$type = $params['type'];
-				$options = array_diff_key($params['options'], $_query);
-
-				$classes = $options['classes'];
-				unset($options['classes']);
-
-				if ($options && !isset($options['conditions'])) {
-					$options = array('conditions' => $options);
-				}
-				$options += compact('classes', 'model');
-
-				$query = new $classes['query'](array('type' => 'read') + $options);
-				return $self::invokeMethod('_connection')->calculation('count', $query, $options);
-			}
-		);
-	}
-
-	/**
 	 * Allows the use of syntactic-sugar like `Model::all()` instead of `Model::find('all')`.
 	 *
 	 * @see lithium\data\Model::find()
@@ -693,7 +646,8 @@ class Model extends \lithium\core\StaticObject {
 	public function save($record, $data = null, array $options = array()) {
 		$self = static::_instance();
 		$classes = $self->_classes;
-		$meta = array('model' => get_called_class()) + $self->_meta;
+		$_meta = array('model' => get_called_class()) + $self->_meta;
+		$_schema = $self->_schema;
 
 		$defaults = array(
 			'validate' => true,
@@ -704,9 +658,10 @@ class Model extends \lithium\core\StaticObject {
 		$options += $defaults + compact('classes');
 		$params = compact('record', 'data', 'options');
 
-		$filter = function($self, $params) use ($meta) {
+		$filter = function($self, $params) use ($_meta, $_schema) {
 			$record = $params['record'];
 			$options = $params['options'];
+			$class = $options['classes']['query'];
 
 			if ($params['data']) {
 				$record->set($params['data']);
@@ -720,10 +675,12 @@ class Model extends \lithium\core\StaticObject {
 				}
 				return $record->validates($validationOptions);
 			}
+			if ($options['whitelist'] || $options['locked']) {
+				$whitelist = $options['whitelist'] ?: array_keys($_schema);
+			}
 
 			$type = $record->exists() ? 'update' : 'create';
-			$queryOptions = compact('type') + $options + $meta + compact('record');
-			$query = new $options['classes']['query']($queryOptions);
+			$query = new $class(compact('type', 'whitelist', 'record') + $options + $_meta);
 			return $self::invokeMethod('_connection')->{$type}($query, $options);
 		};
 
@@ -770,14 +727,65 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public function delete($record, array $options = array()) {
 		$self = static::_instance();
-		$query = $self->_classes['query'];
+		$_class = $self->_classes['query'];
 		$params = compact('record', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($query) {
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($_class) {
 			$type = 'delete';
 			$record = $params['record'];
 			$options = $params['options'] + array('model' => $self) + compact('type', 'record');
-			return $self::invokeMethod('_connection')->delete(new $query($options), $options);
+			return $self::invokeMethod('_connection')->delete(new $_class($options), $options);
+		});
+	}
+
+	/**
+	 * Update multiple records or documents with the given data, restricted by the given set of
+	 * criteria (optional).
+	 *
+	 * @param mixed $data Typically an array of key/value pairs that specify the new data with which
+	 *              the records will be updated. For SQL databases, this can optionally be an SQL
+	 *              fragment representing the `SET` clause of an `UPDATE` query.
+	 * @param mixed $conditions An array of key/value pairs representing the scope of the records
+	 *              to be updated.
+	 * @param array $options Any database-specific options to use when performing the operation. See
+	 *              the `delete()` method of the corresponding backend database for available
+	 *              options.
+	 * @return boolean Returns `true` if the update operation succeeded, otherwise `false`.
+	 */
+	public static function update($data, $conditions = array(), array $options = array()) {
+		$self = static::_instance();
+		$_class = $self->_classes['query'];
+		$params = compact('data', 'conditions', 'options');
+
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($_class) {
+			$options = $params + $params['options'] + array('model' => $self, 'type' => 'update');
+			unset($options['options']);
+			return $self::invokeMethod('_connection')->update(new $_class($options), $options);
+		});
+	}
+
+	/**
+	 * Remove multiple documents or records based on a given set of criteria. **WARNING**: If no
+	 * criteria are specified, or if the criteria (`$conditions`) is an empty value (i.e. an empty
+	 * array or `null`), all the data in the backend data source (i.e. table or collection) _will_
+	 * be deleted.
+	 *
+	 * @param mixed $conditions An array of key/value pairs representing the scope of the records or
+	 *              documents to be deleted.
+	 * @param array $options Any database-specific options to use when performing the operation. See
+	 *              the `delete()` method of the corresponding backend database for available
+	 *              options.
+	 * @return boolean Returns `true` if the remove operation succeeded, otherwise `false`.
+	 */
+	public static function remove($conditions = array(), array $options = array()) {
+		$self = static::_instance();
+		$_class = $self->_classes['query'];
+		$params = compact('conditions', 'options');
+
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($_class) {
+			$options = $params['options'] + $params + array('model' => $self, 'type' => 'delete');
+			unset($options['options']);
+			return $self::invokeMethod('_connection')->delete(new $_class($options), $options);
 		});
 	}
 
@@ -902,6 +910,52 @@ class Model extends \lithium\core\StaticObject {
 			static::$_baseClasses[$class] = true;
 		}
 		return isset(static::$_baseClasses[$class]);
+	}
+
+	/**
+	 * Exports an array of custom finders which use the filter system to wrap around `find()`.
+	 *
+	 * @return void
+	 */
+	protected static function _findFilters() {
+		$self = static::_instance();
+		$_query =& $self->_query;
+
+		return array(
+			'first' => function($self, $params, $chain) {
+				$params['options']['limit'] = 1;
+				$data = $chain->next($self, $params, $chain);
+				return is_object($data) ? $data->rewind() : $data;
+			},
+			'list' => function($self, $params, $chain) {
+				$result = array();
+				$meta = $self::meta();
+
+				array_map(
+					function($record) use (&$result, $meta) {
+						$result[$record->{$meta['key']}] = $record->{$meta['title']};
+					},
+					$chain->next($self, $params, $chain)
+				);
+				return $result;
+			},
+			'count' => function($self, $params, $chain) use ($_query) {
+				$model = $self;
+				$type = $params['type'];
+				$options = array_diff_key($params['options'], $_query);
+
+				$classes = $options['classes'];
+				unset($options['classes']);
+
+				if ($options && !isset($options['conditions'])) {
+					$options = array('conditions' => $options);
+				}
+				$options += compact('classes', 'model');
+
+				$query = new $classes['query'](array('type' => 'read') + $options);
+				return $self::invokeMethod('_connection')->calculation('count', $query, $options);
+			}
+		);
 	}
 }
 

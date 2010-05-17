@@ -11,7 +11,18 @@ namespace lithium\data\model;
 use \Exception;
 
 /**
- * Query class
+ * The `Query` class acts as a container for all information necessary to perform a particular
+ * database operation. Each `Query` object instance has a type, which is usually one of `'create'`,
+ * `'read'`, `'update'` or `'delete'`.
+ *
+ * Because of this, `Query` objects are the primary method of communication between `Model` classes
+ * and backend data sources. This helps to keep APIs abstract and flexible, since a model is only
+ * required to call a single method against its backend. Since the `Query` object simply acts as a
+ * structured data container, each backend can choose how to operate on the data the `Query`
+ * contains. See each class method for more details on what data this class supports.
+ *
+ * @see lithium\data\Model
+ * @see lithium\data\Source
  */
 class Query extends \lithium\core\Object {
 
@@ -40,6 +51,14 @@ class Query extends \lithium\core\Object {
 	protected $_binding = null;
 
 	/**
+	 * An array of data used in a write context. Only used if no binding object is present in the
+	 * `$_binding` property.
+	 *
+	 * @var array
+	 */
+	protected $_data = array();
+
+	/**
 	 * Auto configuration properties.
 	 *
 	 * @var array
@@ -47,7 +66,14 @@ class Query extends \lithium\core\Object {
 	protected $_autoConfig = array('type', 'map');
 
 	/**
-	 * Class constructor.
+	 * Class constructor, which initializes the default values this object supports. Even though
+	 * only a specific list of configuration parameters is available by default, the `Query` object
+	 * uses the `__call()` method to implement automatic getters and setters for any arbitrary piece
+	 * of data.
+	 *
+	 * This means that any information may be passed into the constructor may be used by the backend
+	 * data source executing the query (or ignored, if support is not implemented). This is useful
+	 * if, for example, you wish to extend a core data source and implement custom fucntionality.
 	 *
 	 * @param array $config
 	 * @return void
@@ -68,6 +94,7 @@ class Query extends \lithium\core\Object {
 			'joins'      => array(),
 			'with'       => array(),
 			'map'        => array(),
+			'whitelist'  => array(),
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -82,7 +109,9 @@ class Query extends \lithium\core\Object {
 				$this->{$key}($val);
 			}
 		}
-
+		if ($list = $this->_config['whitelist']) {
+			$this->_config['whitelist'] = array_combine($list, $list);
+		}
 		if ($this->_config['with']) {
 			$this->_associate($this->_config['with']);
 		}
@@ -291,11 +320,14 @@ class Query extends \lithium\core\Object {
 	 * @param array $data if set, will set given array.
 	 * @return array Empty array if no data, array of data if the record has it.
 	 */
-	public function data($data = array()) {
+	public function data(array $data = array()) {
+		$bind =& $this->_binding;
+
 		if ($data) {
-			return $this->_binding ? $this->_binding->set($data) : null;
+			return $bind ? $bind->set($data) : $this->_data = array_merge($this->_data, $data);
 		}
-		return $this->_binding ? $this->_binding->data() : array();
+		$data = $bind ? $bind->data() : $this->_data;
+		return ($list = $this->_config['whitelist']) ? array_intersect_key($data, $list) : $data;
 	}
 
 	/**
@@ -332,6 +364,11 @@ class Query extends \lithium\core\Object {
 			$results[$item] = $this->_config[$item];
 		}
 		$results['table'] = $dataSource->name($this->_config['table']);
+		$created = array('fields', 'values');
+
+		if (is_array($results['fields']) && array_keys($results['fields']) == $created) {
+			$results = $results['fields'] + $results;
+		}
 		return $results;
 	}
 
