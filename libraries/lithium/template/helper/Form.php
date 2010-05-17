@@ -608,7 +608,7 @@ class Form extends \lithium\template\Helper {
 		$options += $methodConfig + $this->_config['base'];
 
 		$hasValue = (
-			(!isset($options['value']) || empty($options['value'])) &&
+			(!isset($options['value']) || $options['value'] === null) &&
 			$name && $this->_binding && $value = $this->_binding->data($name)
 		);
 		if ($hasValue) {
