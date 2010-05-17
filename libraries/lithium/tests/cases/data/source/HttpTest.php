@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\data\source;
 
 use \lithium\data\source\Http;
+use \lithium\data\model\Query;
 
 class HttpTest extends \lithium\test\Unit {
 
@@ -32,7 +33,6 @@ class HttpTest extends \lithium\test\Unit {
 		$this->assertFalse($http->get());
 		$this->assertFalse($http->post());
 		$this->assertFalse($http->put());
-		$this->assertFalse($http->delete());
 	}
 
 	public function testConnect() {

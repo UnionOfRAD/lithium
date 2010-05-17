@@ -48,6 +48,18 @@ class Http extends \lithium\data\Source {
 	protected $_isConnected = false;
 
 	/**
+	 * Strings used to render the given statement
+	 *
+	 * @var string
+	 */
+	protected $_strings = array(
+		'read'	 => array('method' => 'get', 'path' => "{:fields}/{:conditions}"),
+		'create' => array('method' => 'post', 'path' => "{:fields}/{:conditions}"),
+		'update' => array('method' => 'put', 'path' => "{:fields}/{:conditions}"),
+		'delete' => array('method' => 'delete', 'path' => "{:fields}/{:conditions}")
+	);
+
+	/**
 	 * Constructor
 	 *
 	 * @param array $config
@@ -55,8 +67,8 @@ class Http extends \lithium\data\Source {
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'classes'    => array(),
-			'adapter'    => null,
+			'classes'	 => array(),
+			'adapter'	 => null,
 			'persistent' => false,
 			'protocol'   => 'tcp',
 			'host'       => 'localhost',
@@ -102,6 +114,16 @@ class Http extends \lithium\data\Source {
 	 * @return mixed
 	 */
 	public function __call($method, $params) {
+		if (isset($this->_strings[$method])) {
+			$conn =& $this->connection;
+			$config = $this->_config;
+			$strings = $this->_strings[$method];
+
+			$filter = function($self, $params) use (&$conn, $config, $strings) {
+				return $this->connection->{$strings['method']}($path, $params);
+			};
+			return $this->_filter(__METHOD__, $params, $filter);
+		}
 		return $this->connection->invokeMethod($method, $params);
 	}
 
@@ -159,7 +181,25 @@ class Http extends \lithium\data\Source {
 	 * @return void
 	 */
 	public function create($query, array $options = array()) {
-		return $this->connection->post();
+		$params = compact('query', 'options');
+		$conn =& $this->connection;
+
+		if (!isset($this->_strings[__FUNCTION__])) {
+			return null;
+		}
+		$strings = $this->_strings[__FUNCTION__];
+
+		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $strings) {
+			$path = null;
+			$query = $params['query'];
+
+			if ($query) {
+				$params = $query->export($self);
+				$path = String::insert($strings['path'], $params);
+			}
+			$method = $strings['method'];
+			return $conn->{$method}($path);
+		});
 	}
 
 	/**
@@ -170,7 +210,25 @@ class Http extends \lithium\data\Source {
 	 * @return string
 	 */
 	public function read($query, array $options = array()) {
-		return $this->connection->get();
+		$params = compact('query', 'options');
+		$conn =& $this->connection;
+
+		if (!isset($this->_strings[__FUNCTION__])) {
+			return null;
+		}
+		$strings = $this->_strings[__FUNCTION__];
+
+		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $strings) {
+			$path = null;
+			$query = $params['query'];
+
+			if ($query) {
+				$params = $query->export($self);
+				$path = String::insert($strings['path'], $params);
+			}
+			$method = $strings['method'];
+			return $conn->{$method}($path);
+		});
 	}
 
 	/**
@@ -181,7 +239,25 @@ class Http extends \lithium\data\Source {
 	 * @return string
 	 */
 	public function update($query, array $options = array()) {
-		return $this->connection->put();
+		$params = compact('query', 'options');
+		$conn =& $this->connection;
+
+		if (!isset($this->_strings[__FUNCTION__])) {
+			return null;
+		}
+		$strings = $this->_strings[__FUNCTION__];
+
+		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $strings) {
+			$path = null;
+			$query = $params['query'];
+
+			if ($query) {
+				$params = $query->export($self);
+				$path = String::insert($strings['path'], $params);
+			}
+			$method = $strings['method'];
+			return $conn->{$method}($path);
+		});
 	}
 
 	/**
@@ -191,8 +267,26 @@ class Http extends \lithium\data\Source {
 	 * @param array $options
 	 * @return string
 	 */
-	public function delete($query = null, array $options = array()) {
-		return $this->connection->delete();
+	public function delete($query, array $options = array()) {
+		$params = compact('query', 'options');
+		$conn =& $this->connection;
+
+		if (!isset($this->_strings[__FUNCTION__])) {
+			return null;
+		}
+		$strings = $this->_strings[__FUNCTION__];
+
+		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $strings) {
+			$path = null;
+			$query = $params['query'];
+
+			if ($query) {
+				$params = $query->export($self);
+				$path = String::insert($strings['path'], $params);
+			}
+			$method = $strings['method'];
+			return $conn->{$method}($path);
+		});
 	}
 
 	/**
