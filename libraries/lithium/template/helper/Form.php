@@ -503,7 +503,7 @@ class Form extends \lithium\template\Helper {
 		if ($hidden) {
 			$out = $this->hidden($name, array('value' => 0));
 		}
-		$options += array('value' => $value);
+		$options['value'] = $value;
 		return $out . $this->_render(__METHOD__, $template, compact('name', 'options'));
 	}
 
