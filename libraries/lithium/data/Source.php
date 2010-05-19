@@ -94,16 +94,13 @@ abstract class Source extends \lithium\core\Object {
 	}
 
 	/**
-	 * Run the specified query.
+	 * Quotes data-source-native identifiers, where applicable.
 	 *
-	 * @param string $query Query.
-	 * @param array $options Options.
-	 * @return mixed Results, based on `$query`.
+	 * @param string $name Identifier name.
+	 * @return string Returns `$name`, quoted if applicable.
 	 */
-	public function run($query, array $options = array()) {
-		if (is_object($query) && method_exists($this, $query->type())) {
-			return $this->{$query->type()}($query, $options);
-		}
+	public function name($name) {
+		return $name;
 	}
 
 	/**
