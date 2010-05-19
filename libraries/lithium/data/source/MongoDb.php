@@ -306,7 +306,7 @@ class MongoDb extends \lithium\data\Source {
 			$query = $params['query'];
 			$options = $params['options'];
 
-			$data = $query->data();
+			$data = $self->invokeMethod('_toMongoId', array($query->data()));
 			$params = $query->export($self);
 			$result = $self->connection->{$params['table']}->insert($data, true);
 
@@ -375,10 +375,10 @@ class MongoDb extends \lithium\data\Source {
 			$options = $params['options'];
 
 			$params = $query->export($self);
-			$data = $query->data();
+			$data = $self->invokeMethod('_toMongoId', array($query->data()));
 
 			if ($self->connection->{$params['table']}->update($params['conditions'], $data)) {
-				$query->record()->update();
+				$query->record() ? $query->record()->update() : null;
 				return true;
 			}
 			return false;

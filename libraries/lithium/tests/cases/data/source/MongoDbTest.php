@@ -11,6 +11,7 @@ namespace lithium\tests\cases\data\source;
 
 use \lithium\data\source\MongoDb;
 
+use \MongoId;
 use \lithium\data\Connections;
 use \lithium\data\Model;
 use \lithium\data\model\Query;
@@ -338,6 +339,33 @@ class MongoDbTest extends \lithium\test\Unit {
 		foreach ($documents as $i => $doc) {
 			$this->assertTrue($doc->delete());
 		}
+	}
+
+	public function testMongoIdPreservation() {
+		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
+		$model::config(array('connection' => 'lithium_mongo_test', 'source' => 'ordered_docs'));
+
+		$post = $model::create(array('title' => 'A post'));
+		$post->save();
+
+		$id = $post->_id;
+		$this->assertTrue(is_string($id));
+
+		$data = Connections::get('lithium_mongo_test')->connection->ordered_docs->findOne(array(
+			'_id' => new MongoId($id)
+		));
+		$this->assertEqual('A post', $data['title']);
+		$this->assertEqual($id, (string) $data['_id']);
+		$this->assertTrue($data['_id'] instanceof MongoId);
+
+		$post->title = 'An updated post';
+		$post->save();
+
+		$data = Connections::get('lithium_mongo_test')->connection->ordered_docs->findOne(array(
+			'_id' => new MongoId($id)
+		));
+		$this->assertEqual('An updated post', $data['title']);
+		$this->assertEqual($id, (string) $data['_id']);
 	}
 
 	public function testRelationshipGeneration() {
