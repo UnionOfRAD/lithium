@@ -383,10 +383,16 @@ class MySql extends \lithium\data\source\Database {
 			return $real['type'] . (isset($real['length']) ? "({$real['length']})" : '');
 		}
 
-		if (!preg_match('/(?P<type>\w+)(?:\((?P<length>\d+)\))?/', $real, $column)) {
+		if (!preg_match('/(?P<type>\w+)(?:\((?P<length>[\d,]+)\))?/', $real, $column)) {
 			return $real;
 		}
 		$column = array_intersect_key($column, array('type' => null, 'length' => null));
+
+		if (isset($column['length']) && $column['length']) {
+			$length = explode(',', $column['length']) + array(null, null);
+			$column['length'] = $length[0] ? intval($length[0]) : null;
+			$length[1] ? $column['precision'] = intval($length[1]) : null;
+		}
 
 		switch (true) {
 			case in_array($column['type'], array('date', 'time', 'datetime', 'timestamp')):

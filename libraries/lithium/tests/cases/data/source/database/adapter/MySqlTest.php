@@ -88,53 +88,39 @@ class MySqlTest extends \lithium\test\Unit {
 		$this->assertTrue(is_string($result));
 		$this->assertEqual($expected, $result);
 
-		$expected = true;
-		$result = $this->db->value(true);
-		$this->assertTrue(is_bool($result));
-		$this->assertEqual($expected, $result);
-
-		$expected = 1;
-		$result = $this->db->value('1');
-		$this->assertTrue(is_int($result));
-		$this->assertEqual($expected, $result);
-
-		$expected = 1.1;
-		$result = $this->db->value('1.1');
-		$this->assertTrue(is_float($result));
-		$this->assertEqual($expected, $result);
+		$this->assertIdentical(1, $this->db->value(true));
+		$this->assertIdentical(1, $this->db->value('1'));
+		$this->assertIdentical(1.1, $this->db->value('1.1'));
 	}
 
 	public function testColumnAbstraction() {
 		$result = $this->db->invokeMethod('_column', array('varchar'));
-		$this->assertEqual(array('type' => 'string'), $result);
+		$this->assertIdentical(array('type' => 'string'), $result);
 
 		$result = $this->db->invokeMethod('_column', array('tinyint(1)'));
-		$this->assertEqual(array('type' => 'boolean'), $result);
+		$this->assertIdentical(array('type' => 'boolean'), $result);
 
 		$result = $this->db->invokeMethod('_column', array('varchar(255)'));
-		$this->assertEqual(array('type' => 'string', 'length' => '255'), $result);
+		$this->assertIdentical(array('type' => 'string', 'length' => 255), $result);
 
 		$result = $this->db->invokeMethod('_column', array('text'));
-		$this->assertEqual(array('type' => 'text'), $result);
+		$this->assertIdentical(array('type' => 'text'), $result);
 
 		$result = $this->db->invokeMethod('_column', array('text'));
-		$this->assertEqual(array('type' => 'text'), $result);
+		$this->assertIdentical(array('type' => 'text'), $result);
 
 		$result = $this->db->invokeMethod('_column', array('decimal(12,2)'));
-		$this->assertEqual(array('type' => 'float', 'length' => '12,2'), $result);
+		$this->assertIdentical(array('type' => 'float', 'length' => 12, 'precision' => 2), $result);
 
 		$result = $this->db->invokeMethod('_column', array('int(11)'));
-		$this->assertEqual(array('type' => 'integer', 'length' => '11'), $result);
+		$this->assertIdentical(array('type' => 'integer', 'length' => 11), $result);
 	}
 
 	public function testAbstractColumnResolution() {
-
 	}
 
 	public function testDescribe() {
-
 	}
-
 
 	public function testExecuteException() {
 		$this->expectException();
