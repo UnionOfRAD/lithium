@@ -431,6 +431,11 @@ class Document extends \lithium\data\Collection {
 			}
 		}
 
+		if (is_object($items) && $items instanceof Document) {
+			$items->assignTo($this, compact('model', 'pathKey'));
+			return $items;
+		}
+
 		$options += compact('model', 'items', 'parent', 'exists', 'pathKey');
 		return new $this->_classes[$classType]($options);
 	}
