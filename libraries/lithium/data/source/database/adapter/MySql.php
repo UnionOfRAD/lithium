@@ -10,6 +10,14 @@ namespace lithium\data\source\database\adapter;
 
 use \Exception;
 
+/**
+ * Extends the `Database` class to implement the necessary SQL-formatting and resultset-fetching
+ * features for working with MySQL databases.
+ *
+ * For more information on configuring the database connection, see the `__construct()` method.
+ *
+ * @see lithium\data\source\database\adapter\MySql::__construct()
+ */
 class MySql extends \lithium\data\source\Database {
 
 	/**
@@ -58,17 +66,17 @@ class MySql extends \lithium\data\source\Database {
 	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options
 	 *        defined by this class:
 	 *        - `'database'`: The name of the database to connect to. Defaults to 'lithium'.
-	 *        - `'host'`: The IP or machine name where MySQL is running. Defaults to 'localhost'.
+	 *        - `'host'`: The IP or machine name where MySQL is running, followed by a colon,
+	 *          followed by a port number or socket. Defaults to `'localhost:3306'`.
 	 *        - `'persistent'`: If a persistent connection (if available) should be made.
 	 *          Defaults to true.
-	 *        - `'port'`: The port number MySQL is listening on. The default is '3306'.
 	 *
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
 	 * @return The adapter instance.
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('port' => '3306', 'encoding' => null);
+		$defaults = array('host' => 'localhost:3306', 'encoding' => null);
 		parent::__construct($config + $defaults);
 	}
 
@@ -102,7 +110,7 @@ class MySql extends \lithium\data\source\Database {
 	public function connect() {
 		$config = $this->_config;
 		$this->_isConnected = false;
-		$host = $config['host'] . ':' . $config['port'];
+		$host = $config['host'];
 
 		if (!$config['database']) {
 			return false;

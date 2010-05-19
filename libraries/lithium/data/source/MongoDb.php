@@ -101,8 +101,8 @@ class MongoDb extends \lithium\data\Source {
 	 * @see lithium\data\source\MongoDb::$_schema
 	 * @param array $config All information required to connect to the database, including:
 	 *        - `'database'` _string_: The name of the database to connect to. Defaults to `'app'`.
-	 *        - `'host'` _string_: The IP or machine name where Mongo is running. Defaults to
-	 *          `'localhost'`.
+	 *        - `'host'` _string_: The IP or machine name where Mongo is running, followed by a
+	 *           colon, and the port number. Defaults to `'localhost:27017'`.
 	 *        - `'persistent'` _boolean_: If a persistent connection (if available) should be made.
 	 *            Defaults to `true`.
 	 *        - `'port'`_mixed_: The port number Mongo is listening on. The default is '27017'.
@@ -120,9 +120,8 @@ class MongoDb extends \lithium\data\Source {
 			'persistent' => true,
 			'login'      => null,
 			'password'   => null,
-			'host'       => 'localhost',
+			'host'       => 'localhost:27107',
 			'database'   => 'app',
-			'port'       => '27017',
 			'timeout'    => 100,
 			'schemd'     => null,
 		);
@@ -188,7 +187,7 @@ class MongoDb extends \lithium\data\Source {
 		$config = $this->_config;
 		$this->_isConnected = false;
 
-		$host = "{$config['host']}:{$config['port']}";
+		$host = $config['host'];
 		$login = $config['login'] ? "{$config['login']}:{$config['password']}@" : '';
 		$connection = "mongodb://{$login}{$host}" . ($login ? "/{$config['database']}" : '');
 

@@ -25,8 +25,7 @@ class MySqlTest extends \lithium\test\Unit {
 	 * @todo Tie into the Environment class to ensure that the test database is being used.
 	 */
 	public function skip() {
-		$message = 'MySql Extension is not loaded';
-		$this->skipIf(!MySql::enabled(), $message);
+		$this->skipIf(!MySql::enabled(), 'MySQL Extension is not loaded');
 
 		$this->_dbConfig = Connections::get('test', array('config' => true));
 		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'MySql');
@@ -47,9 +46,9 @@ class MySqlTest extends \lithium\test\Unit {
 		$db = new MockMySql(array('autoConnect' => false));
 		$result = $db->get('_config');
 		$expected = array(
-			'autoConnect' => false, 'port' => '3306', 'encoding' => NULL,'persistent' => true,
-			'host' => 'localhost', 'login' => 'root', 'password' => '',
-			'database' => 'lithium', 'init' => true
+			'autoConnect' => false, 'encoding' => NULL,'persistent' => true,
+			'host' => 'localhost:3306', 'login' => 'root', 'password' => '',
+			'database' => null, 'init' => true
 		);
 		$this->assertEqual($expected, $result);
 	}
