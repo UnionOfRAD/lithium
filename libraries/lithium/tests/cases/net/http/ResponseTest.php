@@ -174,6 +174,13 @@ class ResponseTest extends \lithium\test\Unit {
 		$result = $response->body();
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testTypeHeader() {
+		$response = new Response(array('type' => 'application/json'));
+		$result = (string) $response;
+		$this->assertPattern('/^HTTP\/1\.1 200 OK/', $result);
+		$this->assertPattern('/Content-Type: application\/json\s+$/ms', $result);
+	}
 }
 
 ?>

@@ -164,7 +164,7 @@ class Response extends \lithium\net\http\Message {
 			$data = $key;
 		}
 		if (!empty($data)) {
-			$this->status = array('code'=> null, 'message' => null);
+			$this->status = array('code' => null, 'message' => null);
 			if (is_numeric($data) && isset($this->_statuses[$data])) {
 				$this->status = array('code' => $data, 'message' => $this->_statuses[$data]);
 			} else {
@@ -190,6 +190,9 @@ class Response extends \lithium\net\http\Message {
 	* @return string
 	*/
 	public function __toString() {
+		if ($this->type != 'text/html' && !isset($this->headers['Content-Type'])) {
+			$this->headers['Content-Type'] = $this->type;
+		}
 		$first = "{$this->protocol} {$this->status['code']} {$this->status['message']}";
 		$response = array($first, join("\r\n", $this->headers()), "", $this->body());
 		return join("\r\n", $response);
