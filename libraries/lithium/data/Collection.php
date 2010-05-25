@@ -74,7 +74,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'items', 'classes' => 'merge', 'handle', 'model', 'result', 'query'
+		'items', 'classes' => 'merge', 'handle', 'model', 'result', 'query', 'parent'
 	);
 
 	/**
@@ -89,7 +89,25 @@ abstract class Collection extends \lithium\util\Collection {
 			unset($config['data']);
 		}
 		parent::__construct($config);
+
+		foreach (array('items', 'classes', 'handle', 'model', 'result', 'query') as $key) {
+			unset($this->_config[$key]);
+		}
 		$this->_items = (array) $this->_items;
+	}
+
+	/**
+	 * Configures protected properties of a `Collection` so that it is parented to `$parent`.
+	 *
+	 * @param object $parent
+	 * @param array $config
+	 * @return void
+	 */
+	public function assignTo($parent, array $config = array()) {
+		foreach ($config as $key => $val) {
+			$this->{'_' . $key} = $val;
+		}
+		$this->_parent =& $parent;
 	}
 
 	/**
@@ -121,7 +139,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return object `Record`
 	 */
 	public function rewind() {
-		$this->_valid = (reset($this->_items) !== false);
+		$this->_valid = (reset($this->_items)  || count($this->_items));
 
 		if (!$this->_valid && !$this->_hasInitialized) {
 			$this->_hasInitialized = true;

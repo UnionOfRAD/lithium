@@ -50,16 +50,21 @@ class Relationship extends \lithium\core\Object {
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'name' => null,
-			'key'  => null,
+			'keys' => array(),
 			'type' => null,
 			'to'   => null,
 			'from' => null,
 			'link' => self::LINK_KEY,
-			'scope' => null,
 			'fields' => true,
-			'fieldName' => null
+			'fieldName' => null,
+			'conditions' => null,
 		);
-		$config += $defaults;
+		parent::__construct($config + $defaults);
+	}
+
+	protected function _init() {
+		parent::_init();
+		$config = $this->_config;
 		$singularName = $config['name'];
 
 		if ($config['type'] == 'hasMany') {
@@ -72,7 +77,8 @@ class Relationship extends \lithium\core\Object {
 		if (!$config['fieldName']) {
 			$config['fieldName'] = lcfirst($config['name']);
 		}
-		parent::__construct($config);
+		$config['keys'] = $this->_keys($config['keys'], $config);
+		$this->_config = $config;
 	}
 
 	public function data($key = null) {
@@ -80,6 +86,11 @@ class Relationship extends \lithium\core\Object {
 			return $this->_config;
 		}
 		return isset($this->_config[$key]) ? $this->_config[$key] : null;
+	}
+
+	protected function _keys($keys, $config) {
+		$related = ($config['type'] == 'belongsTo') ? $config['to'] : $config['from'];
+		return array_combine((array) $keys, (array) $related::key());
 	}
 }
 

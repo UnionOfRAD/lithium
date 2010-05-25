@@ -320,7 +320,7 @@ class Query extends \lithium\core\Object {
 	 * @param array $data if set, will set given array.
 	 * @return array Empty array if no data, array of data if the record has it.
 	 */
-	public function data(array $data = array()) {
+	public function data($data = array()) {
 		$bind =& $this->_binding;
 
 		if ($data) {

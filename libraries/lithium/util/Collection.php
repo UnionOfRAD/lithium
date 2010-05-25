@@ -537,6 +537,9 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 				case (method_exists($item, '__toString')):
 					$result[$key] = (string) $item;
 				break;
+				default:
+					$result[$key] = $item;
+				break;
 			}
 		}
 		return $result;

@@ -27,12 +27,10 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->_configs = Connections::config();
 
 		Connections::reset();
-		Connections::config(array(
-			'mock-database-connection' => array(
-				'object' => &$this->db,
-				'adapter' => 'MockDatabase'
-			)
-		));
+		Connections::config(array('mock-database-connection' => array(
+			'object' => &$this->db,
+			'adapter' => 'MockDatabase'
+		)));
 
 		MockDatabasePost::config();
 		MockDatabaseComment::config();

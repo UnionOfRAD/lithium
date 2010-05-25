@@ -162,7 +162,7 @@ class DocumentTest extends \lithium\test\Unit {
 			array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
 		));
 		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
-		$result = $doc->current();
+		$result = $doc->current()->data();
 		$this->assertEqual($expected, $result);
 
 		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
@@ -477,7 +477,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc->fat = true;
 		$doc->set(array('hair' => true, 'fast' => false));
 
-		$expected = array('hair', 'fast', 'tall', 'fat');
+		$expected = array('tall', 'fat', 'hair', 'fast');
 		$result = array_keys($doc->data());
 		$this->assertEqual($expected, $result);
 	}

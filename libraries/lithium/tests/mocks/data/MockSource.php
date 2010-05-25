@@ -135,9 +135,9 @@ class MockSource extends \lithium\data\Source {
 	}
 
 	public function relationship($class, $type, $name, array $options = array()) {
-		$key = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name')) . '_id';
+		$keys = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name')) . '_id';
 
-		$options += compact('name', 'type', 'key');
+		$options += compact('name', 'type', 'keys');
 		$options['from'] = $class;
 
 		$relationship = $this->_classes['relationship'];

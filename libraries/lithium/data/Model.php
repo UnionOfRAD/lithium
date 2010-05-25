@@ -475,7 +475,7 @@ class Model extends \lithium\core\StaticObject {
 	public static function meta($key = null, $value = null) {
 		$self = static::_instance();
 
-		if (!empty($value)) {
+		if ($value) {
 			$self->_meta[$key] = $value;
 		}
 		if (is_array($key)) {

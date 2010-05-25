@@ -149,13 +149,13 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = array(
 			'name' => 'MockPost',
 			'type' => 'belongsTo',
-			'key' => 'mock_post_id',
+			'keys' => array('mock_post_id' => 'id'),
 			'from' => 'lithium\tests\mocks\data\MockComment',
 			'to' => 'lithium\tests\mocks\data\MockPost',
 			'link' => 'key',
 			'fields' => true,
 			'fieldName' => 'mockPost',
-			'scope' => null,
+			'conditions' => null,
 			'init' => true
 		);
 		$this->assertEqual($expected, MockComment::relations('MockPost')->data());
@@ -166,10 +166,10 @@ class ModelTest extends \lithium\test\Unit {
 			'from' => 'lithium\tests\mocks\data\MockPost',
 			'to' => 'lithium\tests\mocks\data\MockComment',
 			'fields' => true,
-			'key' => 'mock_post_id',
+			'keys' => array('mock_post_id' => 'id'),
 			'link' => 'key',
 			'fieldName' => 'mockComment',
-			'scope' => null,
+			'conditions' => null,
 			'init' => true
 		);
 		$this->assertEqual($expected, MockPost::relations('MockComment')->data());
@@ -421,42 +421,36 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual(array('id' => 5), $result['query']->conditions());
 	}
 
-	/*
-	* @todo create proper mock objects for the following test
-	*
-	public function testFindAll() {
-	    $tags = MockTag::find('all', array('conditions' => array('id' => 2)));
+	public function testMultiRecordUpdate() {
+		$result = MockPost::update(
+			array('published' => false),
+			array('expires' => array('>=' => '2010-05-13'))
+		);
+		$query = $result['query'];
+		$this->assertEqual('update', $query->type());
+		$this->assertEqual(array('published' => false), $query->data());
+		$this->assertEqual(array('expires' => array('>=' => '2010-05-13')), $query->conditions());
+	}
 
-		$this->assertTrue($tags instanceof \lithium\data\collection\RecordSet);
-		$this->assertEqual(1, $tags->count());
-		$tag = $tags->rewind();
-		$this->assertTrue($tag instanceof \lithium\data\model\Record);
+	public function testMultiRecordDelete() {
+		$result = MockPost::remove(array('published' => false));
+		$query = $result['query'];
+		$this->assertEqual('delete', $query->type());
+		$this->assertEqual(array('published' => false), $query->conditions());
 
-		$tags2 = MockTag::find('all', array('conditions' => array('id' => 3)));
-
-		$this->assertEqual(0, $tags2->count());
+		$keys = array_keys(array_filter($query->export(Connections::get('mock-source'))));
+		$expected = array('conditions', 'model', 'table');
+		$this->assertEqual($expected, $keys);
 	}
 
 	public function testFindFirst() {
-	    $tag = MockTag::find('first', array('conditions' => array('id' => 2)));
+		$tag = MockTag::find('first', array('conditions' => array('id' => 2)));
+		$tag2 = MockTag::find(2);
+		$tag3 = MockTag::first(2);
 
-		$this->assertTrue($tag instanceof \lithium\data\model\Record);
-		$this->assertEqual('2', $tag->id);
-
-		$tag2 = MockTag::find('first', array('conditions' => array('id' => 3)));
-
-		$this->assertNull($tag2);
-
-		$tag = MockTag::find(2);
-
-		$this->assertTrue($tag instanceof \lithium\data\model\Record);
-		$this->assertEqual('2', $tag->id);
-
-		$tag2 = MockTag::find(3);
-
-		$this->assertNull($tag2);
+		$this->assertEqual($tag, $tag2);
+		$this->assertEqual($tag, $tag3);
 	}
-	*/
 }
 
 ?>

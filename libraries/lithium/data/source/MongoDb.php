@@ -446,9 +446,9 @@ class MongoDb extends \lithium\data\Source {
 	 * @return array
 	 */
 	public function relationship($class, $type, $name, array $config = array()) {
-		$key = Inflector::camelize($type == 'belongsTo' ? $class::meta('name') : $name, false);
+		$keys = Inflector::camelize($type == 'belongsTo' ? $class::meta('name') : $name, false);
 
-		$config += compact('name', 'type', 'key');
+		$config += compact('name', 'type', 'keys');
 		$config['from'] = $class;
 		$relationship = $this->_classes['relationship'];
 

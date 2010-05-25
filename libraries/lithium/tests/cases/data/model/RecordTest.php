@@ -17,7 +17,9 @@ class RecordTest extends \lithium\test\Unit {
 		Connections::config(array('mock-source' => array(
 			'type' => '\lithium\tests\mocks\data\MockSource'
 		)));
-		$this->record = new Record(array('model' => 'lithium\tests\mocks\data\MockPost'));
+		$model = 'lithium\tests\mocks\data\MockPost';
+		$model::config(array('connection' => 'mock-source', 'key' => 'id'));
+		$this->record = new Record(compact('model'));
 	}
 
 	/**
@@ -114,9 +116,9 @@ class RecordTest extends \lithium\test\Unit {
 	}
 
 	public function testMethodDispatch() {
-		$result = $this->record->save(array('foo' => 'bar'));
+		$result = $this->record->save(array('title' => 'foo'));
 		$this->assertEqual('create', $result['query']->type());
-		$this->assertEqual(array('foo' => 'bar'), $result['query']->data());
+		$this->assertEqual(array('title' => 'foo'), $result['query']->data());
 		$this->assertNull($this->record->invalid());
 	}
 }

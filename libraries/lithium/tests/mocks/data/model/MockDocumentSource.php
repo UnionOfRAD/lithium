@@ -53,9 +53,9 @@ class MockDocumentSource extends \lithium\data\Source {
 	}
 
 	public function relationship($class, $type, $name, array $options = array()) {
-		$key = Inflector::camelize($type == 'belongsTo' ? $name : $class::meta('name'));
+		$keys = Inflector::camelize($type == 'belongsTo' ? $name : $class::meta('name'));
 
-		$options += compact('name', 'type', 'key');
+		$options += compact('name', 'type', 'keys');
 		$options['from'] = $class;
 
 		$relationship = $this->_classes['relationship'];

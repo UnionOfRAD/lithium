@@ -63,7 +63,7 @@ class Record extends \lithium\core\Object {
 
 	/**
 	 * An array of flags to track which fields in this record have been modified, where the keys
-	 * are field names, and the values are always true. If, for example, a change to a field is
+	 * are field names, and the values are always `true`. If, for example, a change to a field is
 	 * reverted, that field's flag should be unset from the list.
 	 *
 	 * @var array
@@ -128,7 +128,7 @@ class Record extends \lithium\core\Object {
 			return $this->_relationships[$name];
 		}
 
-		if ($model = $this->_model && $this->_handle) {
+		if (($model = $this->_model) && $this->_handle) {
 			foreach ($model::relations() as $relation => $config) {
 				$linkKey = $config->data('fieldName');
 				$type = $config->data('type') == 'hasMany' ? 'recordSet' : 'record';
@@ -264,10 +264,24 @@ class Record extends \lithium\core\Object {
 			$id = (array) $id;
 			$model = $this->_model;
 			foreach ((array) $model::meta('key') as $i => $key) {
-				$this->__set($key, $id[$i]);
+				$this->_data[$key] = $id[$i];
 			}
 		}
 		$this->_exists = true;
+	}
+
+	/**
+	 * Configures protected properties of a `Record` so that it is parented to `$parent`.
+	 *
+	 * @param object $parent
+	 * @param array $config 
+	 * @return void
+	 */
+	public function assignTo($parent, array $config = array()) {
+		foreach ($config as $key => $val) {
+			$this->{'_' . $key} = $val;
+		}
+		$this->_parent =& $parent;
 	}
 
 	/**

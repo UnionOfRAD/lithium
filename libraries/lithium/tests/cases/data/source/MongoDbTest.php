@@ -370,16 +370,19 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function testRelationshipGeneration() {
 		Connections::add('mock-source', $this->_testConfig);
-		$model = 'lithium\tests\mocks\data\MockComment';
-		$result = $this->db->relationship($model, 'belongsTo', 'MockPost');
-		$expected = array(
+		$from = 'lithium\tests\mocks\data\MockComment';
+		$to = 'lithium\tests\mocks\data\MockPost';
+
+		$from::config(array('connection' => 'mock-source'));
+		$to::config(array('connection' => 'mock-source'));
+
+		$result = $this->db->relationship($from, 'belongsTo', 'MockPost');
+		$expected = compact('from', 'to') + array(
 			'name' => 'MockPost',
 			'type' => 'belongsTo',
-			'key' => 'mockComment',
-			'from' => 'lithium\tests\mocks\data\MockComment',
+			'keys' => array('mockComment' => '_id'),
 			'link' => 'contained',
-			'to' => 'lithium\tests\mocks\data\MockPost',
-			'scope' => null,
+			'conditions' => null,
 			'fields' => true,
 			'fieldName' => 'mockPost',
 			'init' => true

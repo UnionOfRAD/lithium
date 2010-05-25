@@ -36,12 +36,10 @@ class QueryTest extends \lithium\test\Unit {
 		$this->_configs = Connections::config();
 
 		Connections::reset();
-		Connections::config(array(
-			'mock-database-connection' => array(
-				'object' => &$this->db,
-				'adapter' => 'MockDatabase')
-			)
-		);
+		Connections::config(array('mock-database-connection' => array(
+			'object' => &$this->db,
+			'adapter' => 'MockDatabase'
+		)));
 
 		MockQueryPost::config();
 		MockQueryComment::config();
@@ -270,6 +268,7 @@ class QueryTest extends \lithium\test\Unit {
 			'order',
 			'page',
 			'table',
+			'whitelist'
 		);
 		$result = array_keys($export);
 
