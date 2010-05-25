@@ -236,9 +236,9 @@ class MongoDb extends \lithium\data\Source {
 	 * `'schema'` configuration flag has been set in the constructor.
 	 *
 	 * @see lithium\data\source\MongoDb::$_schema
-	 * @param mixed $entity Would normally specify a table name.
+	 * @param mixed $entity Would normally specify a collection name.
 	 * @param array $meta
-	 * @return array Returns an associative array describing the given table's schema.
+	 * @return array Returns an associative array describing the given collection's schema.
 	 */
 	public function describe($entity, array $meta = array()) {
 		if (!$schema = $this->_schema) {
@@ -307,7 +307,7 @@ class MongoDb extends \lithium\data\Source {
 
 			$data = $self->invokeMethod('_toMongoId', array($query->data()));
 			$params = $query->export($self);
-			$result = $self->connection->{$params['table']}->insert($data, true);
+			$result = $self->connection->{$params['source']}->insert($data, true);
 
 			if (isset($result['ok']) && $result['ok'] === 1.0) {
 				$id = $data['_id'];
@@ -336,12 +336,12 @@ class MongoDb extends \lithium\data\Source {
 			$args = $query->export($self);
 			$self->connection->resetError();
 
-			$table = $args['table'];
+			$source = $args['source'];
 			$conditions = $args['conditions'];
 
 			if ($group = $args['group']) {
 				$group += array('$reduce' => $args['reduce'], 'initial' => $args['initial']);
-				$command = array('group' => $group + array('ns' => $table, 'cond' => $conditions));
+				$command = array('group' => $group + array('ns' => $source, 'cond' => $conditions));
 
 				$stats = $self->connection->command($command);
 				$data = isset($stats['retval']) ? $stats['retval'] : null;
@@ -350,7 +350,7 @@ class MongoDb extends \lithium\data\Source {
 				$config = compact('data', 'stats') + array('model' => $options['model']);
 				return $self->invokeMethod('_result', array('document', $query, $config));
 			}
-			$result = $self->connection->{$table}->find($conditions, $args['fields']);
+			$result = $self->connection->{$source}->find($conditions, $args['fields']);
 
 			if ($query->calculate()) {
 				return $result;
@@ -376,7 +376,7 @@ class MongoDb extends \lithium\data\Source {
 			$params = $query->export($self);
 			$data = $self->invokeMethod('_toMongoId', array($query->data()));
 
-			if ($self->connection->{$params['table']}->update($params['conditions'], $data)) {
+			if ($self->connection->{$params['source']}->update($params['conditions'], $data)) {
 				$query->record() ? $query->record()->update() : null;
 				return true;
 			}
@@ -398,7 +398,7 @@ class MongoDb extends \lithium\data\Source {
 
 			$params = $query->export($self);
 			$params['conditions'] = $self->invokeMethod('_toMongoId', array($params['conditions']));
-			return $self->connection->{$params['table']}->remove($params['conditions']);
+			return $self->connection->{$params['source']}->remove($params['conditions']);
 		});
 	}
 

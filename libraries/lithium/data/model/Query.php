@@ -84,7 +84,7 @@ class Query extends \lithium\core\Object {
 			'conditions' => array(),
 			'fields'     => array(),
 			'model'      => null,
-			'table'      => null,
+			'source'     => null,
 			'order'      => null,
 			'limit'      => null,
 			'page'       => null,
@@ -154,7 +154,7 @@ class Query extends \lithium\core\Object {
 
 	/**
 	 * Set and get method for the model associated with the `Query`.
-	 * Will also set the source table, i.e. `$this->_table`.
+	 * Will also set the source table, i.e. `$this->_config['source']`.
 	 *
 	 * @param string $model
 	 * @return string
@@ -162,7 +162,7 @@ class Query extends \lithium\core\Object {
 	public function model($model = null) {
 		if ($model) {
 			$this->_config['model'] = $model;
-			$this->_config['table'] = $model::meta('source');
+			$this->_config['source'] = $model::meta('source');
 		}
 		return $this->_config['model'];
 	}
@@ -363,7 +363,7 @@ class Query extends \lithium\core\Object {
 		foreach ($copy as $item) {
 			$results[$item] = $this->_config[$item];
 		}
-		$results['table'] = $dataSource->name($this->_config['table']);
+		$results['source'] = $dataSource->name($this->_config['source']);
 		$created = array('fields', 'values');
 
 		if (is_array($results['fields']) && array_keys($results['fields']) == $created) {

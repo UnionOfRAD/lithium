@@ -417,7 +417,7 @@ class ModelTest extends \lithium\test\Unit {
 		$record = MockPost::create(array('id' => 5), array('exists' => true));
 		$result = $record->delete();
 		$this->assertEqual('delete', $result['query']->type());
-		$this->assertEqual('mock_posts', $result['query']->table());
+		$this->assertEqual('mock_posts', $result['query']->source());
 		$this->assertEqual(array('id' => 5), $result['query']->conditions());
 	}
 
@@ -439,7 +439,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual(array('published' => false), $query->conditions());
 
 		$keys = array_keys(array_filter($query->export(Connections::get('mock-source'))));
-		$expected = array('conditions', 'model', 'table');
+		$expected = array('conditions', 'model', 'source');
 		$this->assertEqual($expected, $keys);
 	}
 

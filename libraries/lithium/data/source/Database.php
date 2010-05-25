@@ -40,14 +40,14 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	protected $_strings = array(
 		'read' => "
-			SELECT {:fields} From {:table} {:joins} {:conditions} {:group} {:order} {:limit};
+			SELECT {:fields} From {:source} {:joins} {:conditions} {:group} {:order} {:limit};
 			{:comment}
 		",
-		'create' => "INSERT INTO {:table} ({:fields}) VALUES ({:values});{:comment}",
-		'update' => "UPDATE {:table} SET {:fields} {:conditions};{:comment}",
-		'delete' => "DELETE {:flags} From {:table} {:aliases} {:conditions};{:comment}",
-		'schema' => "CREATE TABLE {:table} (\n{:columns}{:indexes});{:comment}",
-		'join'   => "{:type} JOIN {:table} ON {:constraint}"
+		'create' => "INSERT INTO {:source} ({:fields}) VALUES ({:values});{:comment}",
+		'update' => "UPDATE {:source} SET {:fields} {:conditions};{:comment}",
+		'delete' => "DELETE {:flags} From {:source} {:aliases} {:conditions};{:comment}",
+		'schema' => "CREATE TABLE {:source} (\n{:columns}{:indexes});{:comment}",
+		'join'   => "{:type} JOIN {:source} ON {:constraint}"
 	);
 
 	/**

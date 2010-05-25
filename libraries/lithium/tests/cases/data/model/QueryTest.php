@@ -267,7 +267,7 @@ class QueryTest extends \lithium\test\Unit {
 			'offset',
 			'order',
 			'page',
-			'table',
+			'source',
 			'whitelist'
 		);
 		$result = array_keys($export);
@@ -281,7 +281,7 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = MockQueryPost::meta('source');
-		$result = $export['table'];
+		$result = $export['source'];
 		$this->assertEqual($expected, $result);
 	}
 }
