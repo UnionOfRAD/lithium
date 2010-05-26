@@ -10,6 +10,12 @@ namespace lithium\template;
 
 use \lithium\util\String;
 
+/**
+ * Abstract class for template helpers to extend.
+ * Supplies the basic functionality of _render and _options,
+ * as well as escaping.
+ *
+ */
 abstract class Helper extends \lithium\core\Object {
 
 	/**
@@ -111,6 +117,17 @@ abstract class Helper extends \lithium\core\Object {
 		return array($scope, $options);
 	}
 
+	/**
+	 * Render a string template after applying context filters
+	 * Use examples in the Html::link() method:
+	 * ```return $this->_render(__METHOD__, 'link', compact('title', 'url', 'options'), $scope);```
+	 *
+	 * @param string $method name of method that is calling the render (for context filters)
+	 * @param string $string template key (in Helper::_strings) to render
+	 * @param array $params associatied array of template inserts {:key} will be replaced by value
+	 * @param array $options
+	 * @return string Rendered HTML
+	 */
 	protected function _render($method, $string, $params, array $options = array()) {
 		foreach ($params as $key => $value) {
 			$params[$key] = $this->_context->applyHandler($this, $method, $key, $value, $options);
@@ -119,6 +136,14 @@ abstract class Helper extends \lithium\core\Object {
 		return String::insert(isset($strings[$string]) ? $strings[$string] : $string, $params);
 	}
 
+	/**
+	 * Convert a set of options to HTML attributes
+	 *
+	 * @param array $params
+	 * @param string $method
+	 * @param array $options
+	 * @return string
+	 */
 	protected function _attributes($params, $method = null, array $options = array()) {
 		if (!is_array($params)) {
 			return empty($params) ? '' : ' ' . $params;
@@ -132,6 +157,14 @@ abstract class Helper extends \lithium\core\Object {
 		return $result ? $options['prepend'] . implode(' ', $result) . $options['append'] : '';
 	}
 
+	/**
+	 * Convert a key/value pair to a valid html attribute
+	 *
+	 * @param string $key
+	 * @param mixed $value
+	 * @param array $options
+	 * @return string
+	 */
 	protected function _formatAttr($key, $value, array $options = array()) {
 		$defaults = array('escape' => true, 'format' => '%s="%s"');
 		$options += $defaults;
