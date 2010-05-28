@@ -9,6 +9,7 @@
 namespace lithium\data\source;
 
 use \lithium\core\Libraries;
+use \lithium\util\String;
 
 /**
  * Http class to access data sources using \lithium\net\http\Service.
@@ -48,15 +49,15 @@ class Http extends \lithium\data\Source {
 	protected $_isConnected = false;
 
 	/**
-	 * Strings used to render the given statement
+	 * List of methods and their corresponding HTTP method and path.
 	 *
-	 * @var string
+	 * @var array
 	 */
-	protected $_strings = array(
-		'read'	 => array('method' => 'get', 'path' => "{:fields}/{:conditions}"),
-		'create' => array('method' => 'post', 'path' => "{:fields}/{:conditions}"),
-		'update' => array('method' => 'put', 'path' => "{:fields}/{:conditions}"),
-		'delete' => array('method' => 'delete', 'path' => "{:fields}/{:conditions}")
+	protected $_methods = array(
+		'read'	 => array('method' => 'get', 'path' => "/{:database}/{:source}/{:id}"),
+		'create' => array('method' => 'post', 'path' => "/{:database}/{:source}/{:id}"),
+		'update' => array('method' => 'put', 'path' => "/{:database}/{:source}/{:id}"),
+		'delete' => array('method' => 'delete', 'path' => "/{:database}/{:source}/{:id}")
 	);
 
 	/**
@@ -114,13 +115,18 @@ class Http extends \lithium\data\Source {
 	 * @return mixed
 	 */
 	public function __call($method, $params) {
-		if (isset($this->_strings[$method])) {
+		if (isset($this->_methods[$method])) {
 			$conn =& $this->connection;
 			$config = $this->_config;
-			$strings = $this->_strings[$method];
 
-			$filter = function($self, $params) use (&$conn, $config, $strings) {
-				return $this->connection->{$strings['method']}($path, $params);
+			if (!isset($this->_methods[$method])) {
+				return null;
+			}
+			$method = $this->_methods[$method];
+
+			$filter = function($self, $params) use (&$conn, $config, $method) {
+				$path = String::insert($method['path'], $params);
+				return $this->connection->{$method['method']}($path, $params);
 			};
 			return $this->_filter(__METHOD__, $params, $filter);
 		}
@@ -183,23 +189,27 @@ class Http extends \lithium\data\Source {
 	public function create($query, array $options = array()) {
 		$params = compact('query', 'options');
 		$conn =& $this->connection;
+		$config = $this->_config;
 
-		if (!isset($this->_strings[__FUNCTION__])) {
+		if (!isset($this->_methods[__FUNCTION__])) {
 			return null;
 		}
-		$strings = $this->_strings[__FUNCTION__];
+		$method = $this->_methods[__FUNCTION__];
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $strings) {
-			$path = null;
+		$filter = function($self, $params) use (&$conn, $config, $method) {
 			$query = $params['query'];
+			$options = $params['options'];
+			$params = array();
 
 			if ($query) {
 				$params = $query->export($self);
-				$path = String::insert($strings['path'], $params);
+				$config += (array) $query->data();
 			}
-			$method = $strings['method'];
-			return $conn->{$method}($path);
-		});
+			$path = String::insert($method['path'], $config + $options, array('clean' => true));
+
+			return $conn->{$method['method']}($path, $params);
+		};
+		return $this->_filter(__METHOD__, $params, $filter);
 	}
 
 	/**
@@ -213,10 +223,10 @@ class Http extends \lithium\data\Source {
 		$params = compact('query', 'options');
 		$conn =& $this->connection;
 
-		if (!isset($this->_strings[__FUNCTION__])) {
+		if (!isset($this->_methods[__FUNCTION__])) {
 			return null;
 		}
-		$strings = $this->_strings[__FUNCTION__];
+		$strings = $this->_methods[__FUNCTION__];
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $strings) {
 			$path = null;
@@ -242,10 +252,10 @@ class Http extends \lithium\data\Source {
 		$params = compact('query', 'options');
 		$conn =& $this->connection;
 
-		if (!isset($this->_strings[__FUNCTION__])) {
+		if (!isset($this->_methods[__FUNCTION__])) {
 			return null;
 		}
-		$strings = $this->_strings[__FUNCTION__];
+		$strings = $this->_methods[__FUNCTION__];
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $strings) {
 			$path = null;
@@ -271,10 +281,10 @@ class Http extends \lithium\data\Source {
 		$params = compact('query', 'options');
 		$conn =& $this->connection;
 
-		if (!isset($this->_strings[__FUNCTION__])) {
+		if (!isset($this->_methods[__FUNCTION__])) {
 			return null;
 		}
-		$strings = $this->_strings[__FUNCTION__];
+		$strings = $this->_methods[__FUNCTION__];
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $strings) {
 			$path = null;
@@ -304,6 +314,10 @@ class Http extends \lithium\data\Source {
 			return ($class) ? new $class() : null;
 		}
 		return null;
+	}
+
+	public function name($name) {
+		return $name;
 	}
 }
 

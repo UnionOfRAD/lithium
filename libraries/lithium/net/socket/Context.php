@@ -96,7 +96,7 @@ class Context extends \lithium\net\Socket {
 	 * @param string $encoding The character set to use.
 	 * @return boolean `true` if encoding has been set, `false` otherwise.
 	 */
-	public function encoding($encoding = null) {
+	public function encoding($charset = null) {
 		return false;
 	}
 
@@ -109,7 +109,9 @@ class Context extends \lithium\net\Socket {
 	 */
 	public function send($message, array $options = array()) {
 		$defaults = array(
-			'path' => null, 'classes' => array('response' => null), 'context' => array(
+			'path' => null, 'classes' => array('response' => null),
+			'context' => array(
+				'protocol_version' => '1.1',
 				'ignore_errors' => true, 'timeout' => $this->_timeout
 			)
 		);

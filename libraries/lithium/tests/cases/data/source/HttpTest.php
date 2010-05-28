@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\data\source;
 
 use \lithium\data\source\Http;
+use \lithium\data\Connections;
 use \lithium\data\model\Query;
 
 class HttpTest extends \lithium\test\Unit {
@@ -25,6 +26,24 @@ class HttpTest extends \lithium\test\Unit {
 		'port' => 80,
 		'timeout' => 2,
 	);
+
+	public function setUp() {
+		$this->_configs = Connections::config();
+		Connections::reset();
+
+		Connections::config(array(
+			'mock-couchdb-connection' => array(
+				'type' => 'http',
+				'adapter' => 'CouchDb'
+			)
+		));
+	}
+
+	public function tearDown() {
+		Connections::reset();
+		Connections::config($this->_configs);
+		unset($this->query);
+	}
 
 	public function testAllMethodsNoConnection() {
 		$http = new Http(array('classes' => array('socket' => false)));
@@ -155,6 +174,16 @@ class HttpTest extends \lithium\test\Unit {
 	public function testUpdate() {
 		$http = new Http($this->_testConfig);
 		$result = $http->update(null);
+		$this->assertEqual('Test!', $result);
+	}
+
+	public function testCreateWithModel() {
+		$http = new Http($this->_testConfig);
+		$query = new Query(array(
+			'model' => '\lithium\tests\mocks\data\source\http\adapter\MockCouchPost'
+		));
+
+		$result = $http->create($query);
 		$this->assertEqual('Test!', $result);
 	}
 }
