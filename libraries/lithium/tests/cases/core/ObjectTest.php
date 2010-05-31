@@ -14,6 +14,7 @@ use \lithium\tests\mocks\core\MockExposed;
 use \lithium\tests\mocks\core\MockCallable;
 use \lithium\tests\mocks\core\MockObjectForParents;
 use \lithium\tests\mocks\core\MockObjectConfiguration;
+use \lithium\tests\mocks\core\MockInstantiator;
 
 class ObjectTest extends \lithium\test\Unit {
 
@@ -174,6 +175,28 @@ class ObjectTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, get_class($result));
 
 		$this->assertEqual('test', $result->getProtected());
+	}
+
+	public function testInstanceWithClassesKey() {
+		$object = new MockInstantiator();
+		$expected = 'lithium\tests\mocks\core\MockRequest';
+		$result = get_class($object->instance('request'));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testInstanceWithNamespacedClass() {
+		$object = new MockInstantiator();
+		$expected = 'lithium\tests\mocks\core\MockRequest';
+		$result = get_class($object->instance('lithium\tests\mocks\core\MockRequest'));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testInstanceWithObject() {
+		$object = new MockInstantiator();
+		$request = new \lithium\tests\mocks\core\MockRequest();
+		$expected = 'lithium\tests\mocks\core\MockRequest';
+		$result = get_class($object->instance($request));
+		$this->assertEqual($expected, $result);
 	}
 }
 

@@ -8,10 +8,12 @@
 
 namespace lithium\tests\mocks\core;
 
-class MockObjectForParents extends \lithium\core\Object {
+class MockInstantiator extends \lithium\core\Object {
 
-	public static function parents() {
-		return static::_parents();
+	protected $_classes = array('request' => '\lithium\tests\mocks\core\MockRequest');
+
+	public function instance($name, array $config = array()) {
+		return $this->_instance($name, $config);
 	}
 }
 

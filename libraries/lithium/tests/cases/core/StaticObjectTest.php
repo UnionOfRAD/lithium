@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\core;
 
 use \lithium\core\StaticObject;
+use \lithium\tests\mocks\core\MockStaticInstantiator;
 
 class StaticObjectTest extends \lithium\test\Unit {
 
@@ -133,6 +134,27 @@ class StaticObjectTest extends \lithium\test\Unit {
 
 		$cache = $class::parents(true);
 		$this->assertEqual(array($class => $expected), $cache);
+	}
+
+	public function testInstanceWithClassesKey() {
+		$expected = 'lithium\tests\mocks\core\MockRequest';
+		$result = get_class(MockStaticInstantiator::instance('request'));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testInstanceWithNamespacedClass() {
+		$expected = 'lithium\tests\mocks\core\MockRequest';
+		$result = get_class(MockStaticInstantiator::instance(
+			'lithium\tests\mocks\core\MockRequest'
+		));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testInstanceWithObject() {
+		$request = new \lithium\tests\mocks\core\MockRequest();
+		$expected = 'lithium\tests\mocks\core\MockRequest';
+		$result = get_class(MockStaticInstantiator::instance($request));
+		$this->assertEqual($expected, $result);
 	}
 }
 

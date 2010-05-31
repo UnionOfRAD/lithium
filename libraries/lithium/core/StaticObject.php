@@ -82,6 +82,25 @@ class StaticObject {
 	}
 
 	/**
+	 * Returns an instance of a class with given `config`. The `name` could be a key from the
+	 * `classes` array, a fully namespaced class name, or an object. Typically this method is used
+	 * in `_init` to create the dependencies used in the current class.
+	 *
+	 * @param string|object $name A `classes` key or fully-namespaced class name.
+	 * @param array $config The configuration passed to the constructor.
+	 * @return void
+	 */
+	protected static function _instance($name, array $config = array()) {
+		if (is_object($name)) {
+			return $name;
+		}
+		if (isset(static::$_classes[$name])) {
+			$name = static::$_classes[$name];
+		}
+		return new $name($config);
+	}
+
+	/**
 	 * Executes a set of filters against a method by taking a method's main implementation as a
 	 * callback, and iteratively wrapping the filters around it.
 	 *
@@ -126,10 +145,11 @@ class StaticObject {
 	/**
 	 * Exit immediately. Primarily used for overrides during testing.
 	 *
+	 * @param integer|string $status integer range 0 to 254, string printed on exit
 	 * @return void
 	 */
-	protected static function _stop() {
-		exit();
+	protected static function _stop($status = 0) {
+		exit($status);
 	}
 }
 

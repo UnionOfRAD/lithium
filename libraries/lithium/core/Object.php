@@ -133,12 +133,12 @@ class Object {
 	/**
 	 * Apply a closure to a method of the current object instance.
 	 *
-	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
+	 * @see lithium\core\Object::_filter()
+	 * @see lithium\util\collection\Filters
+ 	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
 	 *        method name as a string, or an array of method names.
 	 * @param closure $filter The closure that is used to filter the method(s).
 	 * @return void
-	 * @see lithium\core\Object::_filter()
-	 * @see lithium\util\collection\Filters
 	 */
 	public function applyFilter($method, $filter = null) {
 		foreach ((array) $method as $m) {
@@ -197,6 +197,25 @@ class Object {
 	}
 
 	/**
+	 * Returns an instance of a class with given `config`. The `name` could be a key from the
+	 * `classes` array, a fully-namespaced class name, or an object. Typically this method is used
+	 * in `_init` to create the dependencies used in the current class.
+	 *
+	 * @param string|object $name A `classes` key or fully-namespaced class name.
+	 * @param array $config The configuration passed to the constructor.
+	 * @return void
+	 */
+	protected function _instance($name, array $config = array()) {
+		if (is_object($name)) {
+			return $name;
+		}
+		if (isset($this->_classes[$name])) {
+			$name = $this->_classes[$name];
+		}
+		return new $name($config);
+	}
+
+	/**
 	 * Executes a set of filters against a method by taking a method's main implementation as a
 	 * callback, and iteratively wrapping the filters around it. This, along with the `Filters`
 	 * class, is the core of Lithium's filters system. This system allows you to "reach into" an
@@ -241,12 +260,13 @@ class Object {
 	}
 
 	/**
-	 * Exit immediately.  Primarily used for overrides during testing.
+	 * Exit immediately. Primarily used for overrides during testing.
 	 *
+	 * @param integer|string $status integer range 0 to 254, string printed on exit
 	 * @return void
 	 */
-	protected function _stop() {
-		exit();
+	protected function _stop($status = 0) {
+		exit($status);
 	}
 }
 
