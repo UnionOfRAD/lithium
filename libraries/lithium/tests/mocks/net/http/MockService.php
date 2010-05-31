@@ -25,7 +25,7 @@ class MockService extends \lithium\net\http\Service {
 			'',
 			'Test!'
 		));
-		$response = new $this->_classes['response'](compact('message'));
+		$response = $this->_instance('response', compact('message'));
 		$this->last = (object) compact('request', 'response');
 		return ($options['return'] == 'body') ? $response->body() : $response;
 

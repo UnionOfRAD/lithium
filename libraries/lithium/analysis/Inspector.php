@@ -142,7 +142,7 @@ class Inspector extends \lithium\core\StaticObject {
 			$inspector->setAccessible(true);
 
 			try {
-				$result['value'] = $inspector->getValue(static::_instance($class));
+				$result['value'] = $inspector->getValue(static::_class($class));
 			} catch (Exception $e) {
 				return null;
 			}
@@ -382,10 +382,9 @@ class Inspector extends \lithium\core\StaticObject {
 
 		$list = get_declared_classes();
 		$classes = array();
-		$collection = static::$_classes['collection'];
 
 		if (!empty($options['file'])) {
-			$loaded = new $collection(array('items' => array_map(
+			$loaded = static::_instance('collection', array('items' => array_map(
 				function($class) { return new ReflectionClass($class); }, $list
 			)));
 
@@ -465,7 +464,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 * @return object Returns an instance of the object given by `$class` without calling that
 	 *        class' constructor.
 	 */
-	protected static function _instance($class) {
+	protected static function _class($class) {
 		if (!class_exists($class)) {
 			throw new RuntimeException(sprintf('Class "%s" could not be found.', $class));
 		}
@@ -504,7 +503,7 @@ class Inspector extends \lithium\core\StaticObject {
 		if ($options['public']) {
 			$items = array_filter($items, function($item) { return $item->isPublic(); });
 		}
-		return new static::$_classes['collection'](compact('items'));
+		return static::_instance('collection', compact('items'));
 	}
 
 	/**

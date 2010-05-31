@@ -90,9 +90,7 @@ class Service extends \lithium\core\Object {
 	protected function _init() {
 		parent::_init();
 		$class = Libraries::locate('socket.util', $this->_classes['socket']);
-		if (is_string($class)) {
-			$this->connection = new $class($this->_config);
-		}
+		$this->connection = $this->_instance($class, $this->_config);
 	}
 
 	/**
@@ -208,7 +206,7 @@ class Service extends \lithium\core\Object {
 	protected function _request($method, $path, $data, $options) {
 		$defaults = array('type' => 'form');
 		$options += $defaults;
-		$request = new $this->_classes['request']($this->_config + $options);
+		$request = $this->_instance('request', $this->_config + $options);
 		$request->path = str_replace('//', '/', "{$request->path}{$path}");
 		$request->method = $method = strtoupper($method);
 		$media = $this->_classes['media'];

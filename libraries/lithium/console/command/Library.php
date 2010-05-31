@@ -262,7 +262,7 @@ class Library extends \lithium\console\Command {
 
 		foreach ($this->_settings['servers'] as $server => $enabled) {
 			if (!$enabled) { continue; }
-			$service = new $this->_classes['service'](array(
+			$service = $this->_instance('service', array(
 				'host' => $server, 'port' => $this->port
 			));
 			$results[$server] = json_decode($service->get("lab/{$type}.json"));
@@ -299,7 +299,7 @@ class Library extends \lithium\console\Command {
 		$results = array();
 		foreach ($this->_settings['servers'] as $server => $enabled) {
 			if (!$enabled) { continue; }
-			$service = new $this->_classes['service'](array(
+			$service = $this->_instance('service', array(
 				'host' => $server, 'port' => $this->port
 			));
 			$results[$server] = json_decode($service->get("lab/{$name}.json"));
@@ -431,7 +431,7 @@ class Library extends \lithium\console\Command {
 			return false;
 		}
 		if (file_exists($file)) {
-			$service = new $this->_classes['service'](array(
+			$service = $this->_instance('service', array(
 				'host' => $this->server, 'port' => $this->port,
 				'login' => $this->username, 'password' => $this->password
 			));

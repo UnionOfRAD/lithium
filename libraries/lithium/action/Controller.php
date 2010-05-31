@@ -135,7 +135,7 @@ class Controller extends \lithium\core\Object {
 		}
 
 		$config = $this->_config['response'] + array('request' => $this->request);
-		$this->response = new $this->_classes['response']($config);
+		$this->response = $this->_instance('response', $config);
 	}
 
 	/**

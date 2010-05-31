@@ -27,16 +27,16 @@ class Command extends \lithium\core\Object {
 	/**
 	 * A Request object.
 	 *
-	 * @var object
 	 * @see lithium\console\Request
+	 * @var object
 	 */
 	public $request;
 
 	/**
 	 * A Response object.
 	 *
-	 * @var object
 	 * @see lithium\console\Response
+	 * @var object
 	 */
 	public $response;
 
@@ -81,7 +81,7 @@ class Command extends \lithium\core\Object {
 		parent::_init();
 
 		$this->request = $this->_config['request'];
-		$this->response = new $this->_classes['response']($this->_config['response']);
+		$this->response = $this->_instance('response', $this->_config['response']);
 
 		if (!empty($this->request->params)) {
 			$params = (array) array_diff_key(
@@ -96,12 +96,12 @@ class Command extends \lithium\core\Object {
 	/**
 	 * Called by the Dispatcher class to invoke an action.
 	 *
+	 * @see lithium\console\Dispatcher
+	 * @see lithium\console\Response
 	 * @param string $action name of the method to run
 	 * @param array $args the args from the request
 	 * @param array $options
 	 * @return object The response object associated with this command.
-	 * @see lithium\console\Dispatcher
-	 * @see lithium\console\Response
 	 * @todo Implement proper exception catching/throwing.
 	 * @todo Implement filters.
 	 */
@@ -175,8 +175,8 @@ class Command extends \lithium\core\Object {
 		} else {
 			$this->out("{$prompt} {$choices} \n [{$options['default']}] > ", false);
 		}
-
 		$result = null;
+
 		do  {
 			$result = trim($this->request->input());
 		} while (

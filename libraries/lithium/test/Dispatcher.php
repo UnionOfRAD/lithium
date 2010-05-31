@@ -79,7 +79,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 */
 	protected static function _group($items) {
 		$group = Libraries::locate('test', static::$_classes['group']);
-		$class = new $group(compact('items'));
+		$class = static::_instance($group, compact('items'));
 		return $class;
 	}
 
@@ -95,7 +95,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 */
 	protected static function _report($group, $options) {
 		$report = Libraries::locate('test', static::$_classes['report']);
-		$class = new $report(compact('group') + $options);
+		$class = static::_instance($report, compact('group') + $options);
 		return $class;
 	}
 }
