@@ -37,7 +37,11 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testCompareTypes() {
-		$expected = array('trace' => null, 'expected' => 'array', 'result' => 'string');
+		$expected = array(
+			'trace' => null,
+			'expected' => "(array) Array\n(\n)",
+			'result' => "(string) string"
+		);
 		$result = $this->compare('equal', array(), 'string');
 		$this->assertEqual($expected, $result);
 	}
@@ -54,7 +58,7 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array(
-			'result' => 'fail', 'file' => __FILE__, 'line' => 54,
+			'result' => 'fail', 'file' => __FILE__, 'line' => __LINE__ - 3,
 			'method' => 'testAssertEqualNumericFail', 'assertion' => 'assertEqual',
 			'class' => __CLASS__, 'message' =>
 				"trace: [2]\nexpected: array (\n  0 => 1,\n  1 => 2,\n  2 => 3,\n)\n"
@@ -101,7 +105,7 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array(
-			'result' => 'fail', 'file' => __FILE__, 'line' => 101,
+			'result' => 'fail', 'file' => __FILE__, 'line' => __LINE__ - 3,
 			'method' => 'testAssertEqualThreeDFail', 'assertion' => 'assertEqual',
 			'class' => __CLASS__, 'message' =>
 				"trace: [0][1][1]\nexpected: array (\n  0 => 1,\n  1 => 2,\n)\n"
@@ -162,7 +166,7 @@ class UnitTest extends \lithium\test\Unit {
 			'testIdenticalArrayFail',
 			'testCleanUp', 'testCleanUpWithFullPath', 'testCleanUpWithRelativePath',
 			'testSkipIf', 'testExpectException', 'testHandleException', 'testResults',
-			'testGetTest', 'testAssertCookie'
+			'testGetTest', 'testAssertCookie', 'testCompareWithEmptyResult'
 		);
 		$this->assertIdentical($expected, $this->methods());
 	}
@@ -351,7 +355,7 @@ class UnitTest extends \lithium\test\Unit {
 		$expected = 'assertIdentical';
 		$this->assertEqual($expected, $result['assertion']);
 
-		$expected = "trace: [0]\nexpected: 'string'\nresult: 'integer'\n";
+		$expected = "trace: [0]\nexpected: '(string) 1'\nresult: '(integer) 1'\n";
 		$this->assertEqual($expected, $result['message']);
 	}
 
@@ -451,6 +455,16 @@ class UnitTest extends \lithium\test\Unit {
 			'key' => 'key2.nested', 'value' => 'value1', 'expires' => 'May 04 2010 14:02:36 EST'
 		);
 		$this->assertCookie($expected, $headers);
+	}
+
+	public function testCompareWithEmptyResult() {
+		$result = $this->compare('equal', array('key' => array('val1', 'val2')), array());
+		$expected = array(array(
+			'trace' => '[key][0]',
+			'expected' => array('val1', 'val2'),
+			'result' => array()
+		));
+		$this->assertEqual($expected, $result);
 	}
 }
 

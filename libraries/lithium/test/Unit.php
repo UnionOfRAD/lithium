@@ -164,33 +164,31 @@ class Unit extends \lithium\core\Object {
 		$this->_results = array();
 		$self = $this;
 
-		$h = function($code, $message, $file, $line = 0, $context = array()) use ($self) {
-			$trace = debug_backtrace();
-			$trace = array_slice($trace, 1, count($trace));
-
-			$self->invokeMethod('_handleException', array(
-				compact('code', 'message', 'file', 'line', 'trace', 'context')
-			));
-		};
-
-		$options['handler'] = $options['handler'] ?: $h;
-		$methods = $options['methods'] ?: $this->methods();
-		$this->_reporter = $options['reporter'] ?: $this->_reporter;
-
 		try {
 			$this->skip();
 		} catch (Exception $e) {
 			$this->_handleException($e);
 			return $this->_results;
 		}
+
+		$h = function($code, $message, $file, $line = 0, $context = array()) use ($self) {
+			$trace = debug_backtrace();
+			$trace = array_slice($trace, 1, count($trace));
+			$self->invokeMethod('_reportException', array(
+				compact('code', 'message', 'file', 'line', 'trace', 'context')
+			));
+		};
+		$options['handler'] = $options['handler'] ?: $h;
 		set_error_handler($options['handler']);
+
+		$methods = $options['methods'] ?: $this->methods();
+		$this->_reporter = $options['reporter'] ?: $this->_reporter;
 
 		foreach ($methods as $method) {
 			if ($this->_runTestMethod($method, $options) === false) {
 				break;
 			}
 		}
-
 		restore_error_handler();
 		return $this->_results;
 	}
@@ -652,6 +650,8 @@ class Unit extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _handleException($exception, $lineFlag = null) {
+		$data = $exception;
+
 		if (is_object($exception)) {
 			$data = array();
 
@@ -665,31 +665,30 @@ class Unit extends \lithium\core\Object {
 			if ($ref['class'] == __CLASS__ && $ref['function'] == 'skipIf') {
 				return $this->_result('skip', $data);
 			}
-			$exception = $data;
 		}
-		$message = $exception['message'];
-
-		$isExpected = (($exp = end($this->_expected)) && ($exp === true || $exp == $message || (
-			Validator::isRegex($exp) && preg_match($exp, $message)
-		)));
-
-		if ($isExpected) {
-			return array_pop($this->_expected);
-		}
-		$this->_reportException($exception, $lineFlag);
+		return $this->_reportException($data, $lineFlag);
 	}
 
 	/**
 	 * Convert an exception object to an exception result array for test reporting.
 	 *
-	 * @param object $exception The exception object to report on. Statistics are gathered and
+	 * @param array $exception The exception data to report on. Statistics are gathered and
 	 *               added to the reporting stack contained in `Unit::$_results`.
 	 * @param string $lineFlag
 	 * @return void
 	 * @todo Refactor so that reporters handle trace formatting.
 	 */
 	protected function _reportException($exception, $lineFlag = null) {
+		$message = $exception['message'];
+
+		$isExpected = (($exp = end($this->_expected)) && ($exp === true || $exp == $message || (
+			Validator::isRegex($exp) && preg_match($exp, $message)
+		)));
+		if ($isExpected) {
+			return array_pop($this->_expected);
+		}
 		$initFrame = current($exception['trace']) + array('class' => '-', 'function' => '-');
+
 		foreach ($exception['trace'] as $frame) {
 			if (isset($scopedFrame)) {
 				break;
@@ -701,21 +700,20 @@ class Unit extends \lithium\core\Object {
 				$scopedFrame = $frame;
 			}
 		}
-		$trace = $exception['trace'];
-		unset($exception['trace']);
-
-		$this->_result('exception', $exception + array(
-			'class'     => $initFrame['class'],
-			'method'    => $initFrame['function'],
-			'trace'     => Debugger::trace(array(
-				'trace'        => $trace,
+		if (class_exists('lithium\analysis\Debugger')) {
+			$exception['trace'] = Debugger::trace(array(
+				'trace'        => $exception['trace'],
 				'format'       => '{:functionRef}, line {:line}',
 				'includeScope' => false,
 				'scope'        => array_filter(array(
 					'functionRef' => __NAMESPACE__ . '\{closure}',
 					'line'        => $lineFlag
 				)),
-			))
+			));
+		}
+		$this->_result('exception', $exception + array(
+			'class'     => $initFrame['class'],
+			'method'    => $initFrame['function']
 		));
 	}
 
@@ -731,11 +729,13 @@ class Unit extends \lithium\core\Object {
 	 * @return array Data with the keys `trace'`, `'expected'` and `'result'`.
 	 */
 	protected function _compare($type, $expected, $result = null, $trace = null) {
-		$types = array(
-			'trace' => $trace, 'expected' => gettype($expected), 'result' => gettype($result)
-		);
+		$types = array('expected' => gettype($expected), 'result' => gettype($result));
+
 		if ($types['expected'] !== $types['result']) {
-			return $types;
+			return array('trace' => $trace,
+				'expected' => trim("({$types['expected']}) " . print_r($expected, true)),
+				'result' => trim("({$types['result']}) " . print_r($result, true))
+			);
 		}
 
 		$data = array();
@@ -749,14 +749,14 @@ class Unit extends \lithium\core\Object {
 
 		if (is_array($expected)) {
 			foreach ($expected as $key => $value) {
-				$check = array_key_exists($key, $result) ? $result[$key] : false;
+				$check = array_key_exists($key, $result) ? $result[$key] : array();
 				$newTrace = (($isObject == true) ? "{$trace}->{$key}" : "{$trace}[{$key}]");
 
 				if ($type === 'identical') {
 					if ($value === $check) {
 						continue;
 					}
-					if ($check === false) {
+					if ($check === array()) {
 						$trace = $newTrace;
 						return compact('trace', 'expected', 'result');
 					}

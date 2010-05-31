@@ -108,6 +108,7 @@ class Debugger extends \lithium\core\Object {
 	 */
 	public static function export($var) {
 		$export = var_export($var, true);
+
 		if (is_array($var)) {
 			$replace = array(" (", " )", "  ", " )", "=> \n\t");
 			$with = array("(", ")", "\t", "\t)", "=> ");

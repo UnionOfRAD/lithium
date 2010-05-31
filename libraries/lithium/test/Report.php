@@ -122,15 +122,16 @@ class Report extends \lithium\core\Object {
 	 */
 	public function stats() {
 		$results = (array) $this->results['group'];
-		$stats = array_reduce($results, function($stats, $result) {
-			$stats = (array) $stats + array(
-				'asserts' => 0,
-				'passes' => array(),
-				'fails' => array(),
-				'exceptions' => array(),
-				'errors' => array(),
-				'skips' => array()
-			);
+		$defaults = array(
+			'asserts' => 0,
+			'passes' => array(),
+			'fails' => array(),
+			'exceptions' => array(),
+			'errors' => array(),
+			'skips' => array()
+		);
+		$stats = array_reduce($results, function($stats, $result) use ($defaults) {
+			$stats = (array) $stats = $defaults;
 			$result = empty($result[0]) ? array($result) : $result;
 			foreach ($result as $response) {
 				if (empty($response['result'])) {
@@ -155,14 +156,6 @@ class Report extends \lithium\core\Object {
 			}
 			return $stats;
 		});
-		$stats = (array) $stats + array(
-			'asserts' => null,
-			'passes' => array(),
-			'fails' => array(),
-			'errors' => array(),
-			'exceptions' => array(),
-			'skips' => array()
-		);
 		$count = array_map(
 			function($value) { return is_array($value) ? count($value) : $value; },
 			$stats
