@@ -20,7 +20,10 @@ use \lithium\tests\mocks\data\MockPostForValidates;
 
 class ModelTest extends \lithium\test\Unit {
 
+	protected $_configs = array();
+
 	public function setUp() {
+		$this->_configs = Connections::config();
 		Connections::config(array('mock-source' => array(
 			'type' => '\lithium\tests\mocks\data\MockSource'
 		)));
@@ -31,6 +34,7 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		Connections::config(array('mock-source' => false));
+		Connections::config($this->_configs);
 	}
 
 	public function testOverrideMeta() {

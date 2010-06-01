@@ -29,17 +29,20 @@ class MongoDbTest extends \lithium\test\Unit {
 		'persistent' => false
 	);
 
+	protected $_configs = array();
+
 	public function skip() {
 		$this->skipIf(!MongoDb::enabled(), 'MongoDb Extension is not loaded');
 
 		$db = new MongoDb($this->_testConfig);
 		$message = "`{$this->_testConfig['database']}` database or connection unavailable";
 		$this->skipIf(!$db->isConnected(), $message);
-
-		Connections::add('lithium_mongo_test', array($this->_testConfig));
 	}
 
 	public function setUp() {
+		$this->_configs = Connections::config();
+		Connections::add('lithium_mongo_test', array($this->_testConfig));
+
 		$this->db = Connections::get('lithium_mongo_test');
 		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
 
@@ -50,7 +53,9 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		unset($this->query);
+		Connections::reset();
 		$this->db->dropDB('lithium_test');
+		Connections::config($this->_configs);
 	}
 
 	public function testBadConnection() {
@@ -303,7 +308,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function testArbitraryMethodCalls() {
 		$config = $this->_testConfig;
-		$this->assertEqual("{$config['host']}:{$config['port']}", $this->db->__toString());
+		$this->assertEqual("[{$config['host']}:{$config['port']}]", $this->db->__toString());
 		$this->assertTrue(is_array($this->db->listDBs()));
 	}
 
@@ -388,6 +393,7 @@ class MongoDbTest extends \lithium\test\Unit {
 			'init' => true
 		);
 		$this->assertEqual($expected, $result->data());
+		Connections::config(array('mock-source' => false));
 	}
 }
 

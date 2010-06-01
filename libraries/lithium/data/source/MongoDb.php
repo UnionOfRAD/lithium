@@ -399,8 +399,8 @@ class MongoDb extends \lithium\data\Source {
 			$options = $params['options'];
 
 			$params = $query->export($self);
-			$params['conditions'] = $self->invokeMethod('_toMongoId', array($params['conditions']));
-			return $self->connection->{$params['source']}->remove($params['conditions']);
+			$conditions = $self->invokeMethod('_toMongoId', array($params['conditions']));
+			return $self->connection->{$params['source']}->remove($conditions);
 		});
 	}
 
@@ -489,7 +489,7 @@ class MongoDb extends \lithium\data\Source {
 				$result = parent::result($type, $resource, $context);
 			break;
 		}
-		if (is_array($result) && isset($result['_id'])) {
+		if (is_array($result) && isset($result['_id']) && is_object($result['_id'])) {
 			$result['_id'] = (string) $result['_id'];
 		}
 		return $result;

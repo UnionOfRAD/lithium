@@ -189,13 +189,12 @@ class RecordSet extends \lithium\data\Collection {
 		if (!$this->_valid) {
 			$this->_valid = !is_null($this->_populate());
 		}
-
 		$return = null;
-		if ($this->_valid) {
-			$return = $this->current();
-			$this->_pointer++;
-		}
 
+		if ($this->_valid) {
+			$this->_pointer++;
+			$return = $this->current();
+		}
 		return $return;
 	}
 

@@ -181,8 +181,8 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	/**
 	 * Handles dispatching of methods against all items in the collection.
 	 *
-	 * @param string $method
-	 * @param array $parameters
+	 * @param string $method The name of the method to call on each instance in the collection.
+	 * @param array $params The parameters to pass on each method call.
 	 * @param array $options Specifies options for how to run the given method against the object
 	 *              collection. The available options are:
 	 *              - `'collect'`: If `true`, the results of this method call will be returned
@@ -190,37 +190,20 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 *              - `'merge'`: Used primarily if the method being invoked returns an array.  If
 	 *                set to `true`, merges all results arrays into one.
 	 * @todo Implement filtering.
-	 * @return mixed
+	 * @return mixed Returns either an array of the return values of the methods, or the return
+	 *         values wrapped in a `Collection` instance.
 	 */
-	public function invoke($method, $parameters = array(), array $options = array()) {
+	public function invoke($method, array $params = array(), array $options = array()) {
+		$class = get_class($this);
 		$defaults = array('merge' => false, 'collect' => false);
 		$options += $defaults;
-		$results = array();
-		$isCore = null;
+		$data = array();
 
-		foreach ($this as $key => $value) {
-			if (is_null($isCore)) {
-				$isCore = (method_exists(current($this->_data), 'invokeMethod'));
-			}
-
-			if ($isCore) {
-				$result = $this->_data[$key]->invokeMethod($method, $parameters);
-			} else {
-				$result = call_user_func_array(array(&$this->_data[$key], $method), $parameters);
-			}
-
-			if (!empty($options['merge'])) {
-				$results = array_merge($results, $result);
-			} else {
-				$results[$key] = $result;
-			}
+		foreach ($this as $object) {
+			$value = call_user_func_array(array(&$object, $method), $params);
+			($options['merge']) ? $data = array_merge($data, $value) : $data[$this->key()] = $value;
 		}
-
-		if ($options['collect']) {
-			$class = get_class($this);
-			$results = new $class(array('data' => $results));
-		}
-		return $results;
+		return ($options['collect']) ? new $class(compact('data')) : $data;
 	}
 
 	/**
@@ -495,7 +478,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	/**
 	 * Counts the items of the object.
 	 *
-	 * @return integer Number of items.
+	 * @return integer Returns the number of items in the collection.
 	 */
 	public function count() {
 		$count = iterator_count($this);

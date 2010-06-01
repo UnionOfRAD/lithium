@@ -330,7 +330,7 @@ abstract class Database extends \lithium\data\Source {
 				$query->fields("COUNT({$fields}) as count", true);
 				$query->map(array($query->model() => array('count')));
 				list($record) = $this->read($query, $options)->data();
-				return isset($return['count']) ? intval($record['count']) : null;
+				return isset($record['count']) ? intval($record['count']) : null;
 		}
 	}
 

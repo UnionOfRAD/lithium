@@ -106,6 +106,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 		Connections::add('stream-test', $config);
 		$result = Connections::get('stream-test');
 		$this->assertTrue($result instanceof \lithium\data\source\Http);
+		Connections::config(array('stream-test' => false));
 	}
 
 /*

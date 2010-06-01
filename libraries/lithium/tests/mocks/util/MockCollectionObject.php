@@ -12,8 +12,8 @@ class MockCollectionObject extends \lithium\core\Object {
 
 	public $data = array(1 => 2);
 
-	public function invokeMethod($method, $params = array()) {
-		return $method;
+	public function testFoo() {
+		return 'testFoo';
 	}
 
 	public function to($format, array $options = array()) {
