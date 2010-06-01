@@ -23,6 +23,17 @@ namespace lithium\data;
 abstract class Source extends \lithium\core\Object {
 
 	/**
+	 * Default entity and set classes used by subclasses of `Source`.
+	 *
+	 * @var array
+	 */
+	protected $_classes = array(
+		'entity' => '\lithium\data\Entity',
+		'set' => '\lithium\data\Collection',
+		'relationship' => '\lithium\data\model\Relationship'
+	);
+
+	/**
 	 * Stores a connection to a remote resource. Usually a database connection (`resource` type),
 	 * or an HTTP connection object ('object' type).
 	 *
@@ -207,6 +218,25 @@ abstract class Source extends \lithium\core\Object {
 	 */
 	public function configureClass($class) {
 		return array();
+	}
+
+	/**
+	 * This method is responsible for factorying a new instance of a single entity object of correct
+	 * type, matching the current data source class.
+	 *
+	 * @param string $model A fully-namespaced class name representing the model class to which the
+	 *               `Entity` object will be bound.
+	 * @param array $data The default data with which the new `Entity` should be populated.
+	 * @param array $options Any additional options to pass to the `Entity`'s constructor
+	 * @return object Returns a new, un-saved `Entity` object bound to the model class specified
+	 *         in `$model`.
+	 */
+	public function item($model, array $data = array(), array $options = array()) {
+		$defaults = array('class' => 'entity');
+		$type = isset($options['class']) ? $options['class'] : 'entity';
+		$class = isset($this->_classes[$type]) ? $this->_classes[$type] : $this->_classes['entity'];
+		unset($options['class']);
+		return new $class(compact('model', 'data') + $options);
 	}
 }
 

@@ -191,20 +191,20 @@ class RecordSetTest extends \lithium\test\Unit {
 
 	public function testOffsetSet() {
 		$this->_recordSet[5] = $expected = array('id' => 5, 'data' => 'data5');
-		$items = $this->_recordSet->get('_items');
+		$items = $this->_recordSet->get('_data');
 		$this->assertEqual($expected, $items[0]->to('array'));
 
 		$this->_recordSet[] = $expected = array('id' => 6, 'data' => 'data6');
-		$items = $this->_recordSet->get('_items');
+		$items = $this->_recordSet->get('_data');
 		$this->assertEqual($expected, $items[1]->to('array'));
 
 		$this->_objectRecordSet[5] = $expected = new MockPostObject(array('id' => 5, 'data' => 'data5'));
-		$items = $this->_recordSet->get('_items');
+		$items = $this->_recordSet->get('_data');
 		$this->assertEqual($expected->id, $items[0]->id);
 		$this->assertEqual($expected->data, $items[0]->data);
 
 		$this->_recordSet[] = $expected = new MockPostObject(array('id' => 6, 'data' => 'data6'));
-		$items = $this->_recordSet->get('_items');
+		$items = $this->_recordSet->get('_data');
 		$this->assertEqual($expected->id, $items[1]->id);
 		$this->assertEqual($expected->data, $items[1]->data);
 	}
@@ -415,13 +415,13 @@ class RecordSetTest extends \lithium\test\Unit {
 
 		$result = $this->_recordSet->map($filter);
 
-		$this->assertEqual($expected, $result->get('_items'));
+		$this->assertEqual($expected, $result->get('_data'));
 
 		$result = $this->_objectRecordSet->map($filter, array('collect' => false));
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_objectRecordSet->map($filter);
-		$this->assertEqual($expected, $result->get('_items'));
+		$this->assertEqual($expected, $result->get('_data'));
 	}
 }
 

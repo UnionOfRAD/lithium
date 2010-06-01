@@ -43,7 +43,8 @@ class RecordSet extends \lithium\data\Collection {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'record' => '\lithium\data\model\Record'
+		'entity' => '\lithium\data\entity\Record',
+		'set' => __CLASS__
 	);
 
 	/**
@@ -61,9 +62,9 @@ class RecordSet extends \lithium\data\Collection {
 		if ($this->_handle && $this->_result) {
 			$this->_columns = $this->_columnMap();
 		}
-		if ($this->_items && !$this->_index) {
-			$this->_index = array_keys($this->_items);
-			$this->_items = array_values($this->_items);
+		if ($this->_data && !$this->_index) {
+			$this->_index = array_keys($this->_data);
+			$this->_data = array_values($this->_data);
 		}
 	}
 
@@ -102,7 +103,7 @@ class RecordSet extends \lithium\data\Collection {
 	 */
 	public function offsetGet($offset) {
 		if (!is_null($offset) && in_array($offset, $this->_index)) {
-			return $this->_items[array_search($offset, $this->_index)];
+			return $this->_data[array_search($offset, $this->_index)];
 		}
 		if ($this->closed()) {
 			return null;
@@ -136,7 +137,7 @@ class RecordSet extends \lithium\data\Collection {
 	 */
 	public function offsetUnset($offset) {
 		unset($this->_index[$index = array_search($offset, $this->_index)]);
-		unset($this->_items[$index]);
+		unset($this->_data[$index]);
 	}
 
 	/**
@@ -152,7 +153,7 @@ class RecordSet extends \lithium\data\Collection {
 		if ($record = parent::rewind()) {
 			return $record;
 		}
-		return empty($this->_items) ? null : $this->_items[$this->_pointer];
+		return empty($this->_data) ? null : $this->_data[$this->_pointer];
 	}
 
 	/**
@@ -161,7 +162,7 @@ class RecordSet extends \lithium\data\Collection {
 	 * @return `Record`
 	 */
 	public function current() {
-		return $this->_items[$this->_pointer];
+		return $this->_data[$this->_pointer];
 	}
 
 	/**
@@ -183,7 +184,7 @@ class RecordSet extends \lithium\data\Collection {
 	 *                available.
 	 */
 	public function next() {
-		$this->_valid = (next($this->_items) !== false && next($this->_index) !== false);
+		$this->_valid = (next($this->_data) !== false && next($this->_index) !== false);
 
 		if (!$this->_valid) {
 			$this->_valid = !is_null($this->_populate());
@@ -214,7 +215,7 @@ class RecordSet extends \lithium\data\Collection {
 
 		switch ($format) {
 			case 'array':
-				$result = array_map(function($r) { return $r->to('array'); }, $this->_items);
+				$result = array_map(function($r) { return $r->to('array'); }, $this->_data);
 				if (is_scalar(current($this->_index)) && $options['indexed']) {
 					$result = array_combine($this->_index, $result);
 				}
@@ -227,7 +228,7 @@ class RecordSet extends \lithium\data\Collection {
 	}
 
 	/**
-	 * Applies a callback to all items in the collection.
+	 * Applies a callback to all data in the collection.
 	 *
 	 * Overriden to load any data that has not yet been loaded.
 	 *
@@ -240,7 +241,7 @@ class RecordSet extends \lithium\data\Collection {
 	}
 
 	/**
-	 * Applies a callback to a copy of all items in the collection
+	 * Applies a callback to a copy of all data in the collection
 	 * and returns the result.
 	 *
 	 * Overriden to load any data that has not yet been loaded.
@@ -249,7 +250,7 @@ class RecordSet extends \lithium\data\Collection {
 	 * @param array $options The available options are:
 	 *              - `'collect'`: If `true`, the results will be returned wrapped
 	 *              in a new `Collection` object or subclass.
-	 * @return array|object The filtered items.
+	 * @return array|object The filtered data.
 	 */
 	public function map($filter, array $options = array()) {
 		$this->offsetGet(null);
@@ -269,7 +270,7 @@ class RecordSet extends \lithium\data\Collection {
 			return;
 		}
 		$modelClass = $this->_model;
-		$class = $this->_classes['record'];
+		$class = $this->_classes['entity'];
 
 		if (!($record = $record ?: $this->_handle->result('next', $this->_result, $this))) {
 			return $this->close();
@@ -285,9 +286,9 @@ class RecordSet extends \lithium\data\Collection {
 			$key = count($key) === 1 ? reset($key) : $key;
 		}
 		if (in_array($key, $this->_index)) {
-			return $this->_items[array_search($key, $this->_index)] = $record;
+			return $this->_data[array_search($key, $this->_index)] = $record;
 		}
-		$this->_items[] = $record;
+		$this->_data[] = $record;
 		$this->_index[] = $key;
 		return $record;
 	}

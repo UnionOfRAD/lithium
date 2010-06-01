@@ -74,12 +74,12 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * Creates the group class based
 	 *
 	 * @see lithium\test\Dispatcher::$_classes
-	 * @param array $items array of cases or groups
-	 * @return object Group object constructed with $items
+	 * @param array $data Array of cases or groups.
+	 * @return object Group object constructed with `$data`.
 	 */
-	protected static function _group($items) {
+	protected static function _group($data) {
 		$group = Libraries::locate('test', static::$_classes['group']);
-		$class = static::_instance($group, compact('items'));
+		$class = static::_instance($group, compact('data'));
 		return $class;
 	}
 

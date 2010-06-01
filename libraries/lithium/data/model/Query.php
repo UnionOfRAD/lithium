@@ -48,11 +48,11 @@ class Query extends \lithium\core\Object {
 	 *
 	 * @var object
 	 */
-	protected $_binding = null;
+	protected $_entity = null;
 
 	/**
 	 * An array of data used in a write context. Only used if no binding object is present in the
-	 * `$_binding` property.
+	 * `$_entity` property.
 	 *
 	 * @var array
 	 */
@@ -115,7 +115,7 @@ class Query extends \lithium\core\Object {
 		if ($this->_config['with']) {
 			$this->_associate($this->_config['with']);
 		}
-		unset($this->_config['record'], $this->_config['init'], $this->_config['with']);
+		unset($this->_config['entity'], $this->_config['init'], $this->_config['with']);
 	}
 
 	/**
@@ -170,10 +170,10 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Set and get method for conditions.
 	 *
-	 * If no conditions are set in query, it will ask the record for findById condition array.
+	 * If no conditions are set in query, it will ask the bound entity for condition array.
 	 *
-	 * @param array $conditions
-	 * @return array
+	 * @param mixed $conditions String or array to append to existing conditions.
+	 * @return array Returns an array of all conditions applied to this query.
 	 */
 	public function conditions($conditions = null) {
 		if ($conditions) {
@@ -181,7 +181,7 @@ class Query extends \lithium\core\Object {
 			$this->_config['conditions'] = (array) $this->_config['conditions'];
 			$this->_config['conditions'] = array_merge($this->_config['conditions'], $conditions);
 		}
-		return $this->_config['conditions'] ?: $this->_recordConditions();
+		return $this->_config['conditions'] ?: $this->_entityConditions();
 	}
 
 	/**
@@ -204,7 +204,7 @@ class Query extends \lithium\core\Object {
 	 *
 	 * @param mixed $fields string, array or `false`
 	 * @param boolean $overwrite If `true`, existing fields will be removed before adding `$fields`.
-	 * @return array|void
+	 * @return array Returns an array containing all fields added to the query.
 	 */
 	public function fields($fields = null, $overwrite = false) {
 		if ($fields === false || $overwrite) {
@@ -261,7 +261,7 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	 * Set and get method for the query's order specification
+	 * Set and get method for the query's order specification.
 	 *
 	 * @param array|string $order
 	 * @return mixed
@@ -302,16 +302,16 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	 * Set and get method for the query's record instance
+	 * Set and get method for the query's entity instance.
 	 *
-	 * @param object $binding reference to the query's current record
-	 * @return object reference to the query's current record
+	 * @param object $entity Reference to the query's current entity object.
+	 * @return object Reference to the query's current entity object.
 	 */
-	public function &record(&$binding = null) {
-		if ($binding) {
-			$this->_binding = $binding;
+	public function &entity(&$entity = null) {
+		if ($entity) {
+			$this->_entity = $entity;
 		}
-		return $this->_binding;
+		return $this->_entity;
 	}
 
 	/**
@@ -321,7 +321,7 @@ class Query extends \lithium\core\Object {
 	 * @return array Empty array if no data, array of data if the record has it.
 	 */
 	public function data($data = array()) {
-		$bind =& $this->_binding;
+		$bind =& $this->_entity;
 
 		if ($data) {
 			return $bind ? $bind->set($data) : $this->_data = array_merge($this->_data, $data);
@@ -402,20 +402,15 @@ class Query extends \lithium\core\Object {
 	 *
 	 * @return array ([model's primary key'] => [that key set in the record]).
 	 */
-	protected function _recordConditions() {
-		if (!$this->_binding) {
+	protected function _entityConditions() {
+		if (!$this->_entity || !($model = $this->_config['model'])) {
 			return;
 		}
-		$model = $this->_config['model'];
-
-		if (!$model) {
-			return null;
-		}
-		if (is_array($key = $model::key($this->_binding))) {
+		if (is_array($key = $model::key($this->_entity->data()))) {
 			return $key;
 		}
 		$key = $model::meta('key');
-		return array($key => $this->_binding->{$key});
+		return array($key => $this->_entity->{$key});
 	}
 
 	protected function _associate($related) {

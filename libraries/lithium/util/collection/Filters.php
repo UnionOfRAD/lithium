@@ -19,7 +19,7 @@ namespace lithium\util\collection;
  * of filters, which are applied in these methods and passed to `Filters::run()`.
  *
  * When implementing a custom filter system outside of Lithium, you can create your own list of
- * filters, and pass it to `$options['items']` in the `run()` method.
+ * filters, and pass it to `$options['data']` in the `run()` method.
  *
  * When creating a filter to apply to a method, you need the name of the method you want to call,
  * along with a **closure**, that defines what you want the filter to do.  All filters take the same
@@ -82,7 +82,7 @@ class Filters extends \lithium\util\Collection {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('items', 'class', 'method');
+	protected $_autoConfig = array('data', 'class', 'method');
 
 	/**
 	 * The fully-namespaced class name of the class containing the method being filtered.
@@ -143,20 +143,20 @@ class Filters extends \lithium\util\Collection {
 	 *
 	 *        -'class': The name of the class that initiated the filter chain.
 	 *        -'method': The name of the method that initiated the filter chain.
-	 *        -'items': An array of callable objects (usually closures) to be iterated through.
-	 *          By default, execution will be nested such that the first item will be executed
-	 *          first, and will be the last to return.
-	 * @return Returns the value returned by the first closure in `$options['items`]`.
+	 *        -`'data'` _array_: An array of callable objects (usually closures) to be iterated
+	 *          through. By default, execution will be nested such that the first item will be
+	 *          executed first, and will be the last to return.
+	 * @return Returns the value returned by the first closure in `$options['data`]`.
 	 */
 	public static function run($class, $params, array $options = array()) {
-		$defaults = array('class' => null, 'method' => null, 'items' => array());
+		$defaults = array('class' => null, 'method' => null, 'data' => array());
 		$options += $defaults;
 		$lazyFilterCheck = (is_string($class) && $options['method']);
 
 		if ($lazyFilterCheck && isset(static::$_lazyFilters[$class][$options['method']])) {
 			$filters = static::$_lazyFilters[$class][$options['method']];
 			unset(static::$_lazyFilters[$class][$options['method']]);
-			$options['items'] = array_merge($filters, $options['items']);
+			$options['data'] = array_merge($filters, $options['data']);
 
 			foreach ($filters as $filter) {
 				$class::applyFilter($options['method'], $filter);

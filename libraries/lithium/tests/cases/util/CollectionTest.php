@@ -26,7 +26,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertEqual($collection[0], 'foo');
 		$this->assertEqual(count($collection), 1);
 
-		$collection = new Collection(array('items' => array('foo')));
+		$collection = new Collection(array('data' => array('foo')));
 		$this->assertEqual($collection[0], 'foo');
 		$this->assertEqual(count($collection), 1);
 	}
@@ -46,7 +46,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$result = $collection->invoke('mapArray', array(), array('merge' => true));
 		$this->assertEqual($result, array_fill(0, 10, 'foo'));
 
-		$collection = new Collection(array('items' => array_fill(0, 10, new MockCollectionObject())));
+		$collection = new Collection(array('data' => array_fill(0, 10, new MockCollectionObject())));
 		$result = $collection->testFoo();
 		$this->assertEqual($result, array_fill(0, 10, 'testFoo'));
 
@@ -56,17 +56,17 @@ class CollectionTest extends \lithium\test\Unit {
 	}
 
 	public function testObjectCasting() {
-		$collection = new Collection(array('items' => array_fill(0, 10, new MockCollectionObject())));
+		$collection = new Collection(array('data' => array_fill(0, 10, new MockCollectionObject())));
 		$result = $collection->to('array');
 		$expected = array_fill(0, 10, array(1 => 2, 2 => 3));
 		$this->assertEqual($expected, $result);
 
-		$collection = new Collection(array('items' => array_fill(0, 10, new MockCollectionMarker())));
+		$collection = new Collection(array('data' => array_fill(0, 10, new MockCollectionMarker())));
 		$result = $collection->to('array');
 		$expected = array_fill(0, 10, array('marker' => false, 'data' => 'foo'));
 		$this->assertEqual($expected, $result);
 
-		$collection = new Collection(array('items' => array_fill(0, 10, new MockCollectionStringCast())));
+		$collection = new Collection(array('data' => array_fill(0, 10, new MockCollectionStringCast())));
 		$result = $collection->to('array');
 		$expected = array_fill(0, 10, json_encode(array(1 => 2, 2 => 3)));
 		$this->assertEqual($expected, $result);
@@ -78,7 +78,7 @@ class CollectionTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testCollectionFindFilter() {
-		$collection = new Collection(array('items' => array_merge(
+		$collection = new Collection(array('data' => array_merge(
 			array_fill(0, 10, 1),
 			array_fill(0, 10, 2)
 		)));
@@ -99,19 +99,19 @@ class CollectionTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testCollectionFirstFilter() {
-		$collection = new Collection(array('items' => array(0, 1, 2)));
+		$collection = new Collection(array('data' => array(0, 1, 2)));
 		$result = $collection->first(function($value) { return $value; });
 		$this->assertEqual(1, $result);
 
-		$collection = new Collection(array('items' => array('Hello', '', 'Goodbye')));
+		$collection = new Collection(array('data' => array('Hello', '', 'Goodbye')));
 		$result = $collection->first(function($value) { return $value; });
 		$this->assertEqual('Hello', $result);
 
-		$collection = new Collection(array('items' => array('', 'Hello', 'Goodbye')));
+		$collection = new Collection(array('data' => array('', 'Hello', 'Goodbye')));
 		$result = $collection->first(function($value) { return $value; });
 		$this->assertEqual('Hello', $result);
 
-		$collection = new Collection(array('items' => array('', 'Hello', 'Goodbye')));
+		$collection = new Collection(array('data' => array('', 'Hello', 'Goodbye')));
 		$result = $collection->first();
 		$this->assertEqual('', $result);
 	}
@@ -123,7 +123,7 @@ class CollectionTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testCollectionEachFilter() {
-		$collection = new Collection(array('items' => array(1, 2, 3, 4, 5)));
+		$collection = new Collection(array('data' => array(1, 2, 3, 4, 5)));
 		$filter = function($item) { return ++$item; };
 		$result = $collection->each($filter);
 
@@ -132,7 +132,7 @@ class CollectionTest extends \lithium\test\Unit {
 	}
 
 	public function testCollectionMapFilter() {
-		$collection = new Collection(array('items' => array(1, 2, 3, 4, 5)));
+		$collection = new Collection(array('data' => array(1, 2, 3, 4, 5)));
 		$filter = function($item) { return ++$item; };
 		$result = $collection->map($filter);
 
@@ -150,7 +150,7 @@ class CollectionTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testArrayAccessOffsetMethods() {
-		$collection = new Collection(array('items' => array('foo', 'bar', 'baz' => 'dib')));
+		$collection = new Collection(array('data' => array('foo', 'bar', 'baz' => 'dib')));
 		$this->assertTrue($collection->offsetExists(0));
 		$this->assertTrue($collection->offsetExists(1));
 		$this->assertTrue($collection->offsetExists('0'));
@@ -173,7 +173,7 @@ class CollectionTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testArrayAccessTraversalMethods() {
-		$collection = new Collection(array('items' => array('foo', 'bar', 'baz' => 'dib')));
+		$collection = new Collection(array('data' => array('foo', 'bar', 'baz' => 'dib')));
 		$this->assertEqual('foo', $collection->current());
 		$this->assertEqual('bar', $collection->next());
 		$this->assertEqual('foo', $collection->prev());
@@ -218,7 +218,7 @@ class CollectionTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testInternalKeys() {
-		$collection = new Collection(array('items' => array('foo', 'bar', 'baz' => 'dib')));
+		$collection = new Collection(array('data' => array('foo', 'bar', 'baz' => 'dib')));
 		$this->assertEqual(array(0, 1, 'baz'), $collection->keys());
 	}
 
@@ -230,10 +230,10 @@ class CollectionTest extends \lithium\test\Unit {
 	 */
 	public function testCollectionFormatConversion() {
 		Collection::formats('\lithium\net\http\Media');
-		$items = array('hello', 'goodbye', 'foo' => array('bar', 'baz' => 'dib'));
-		$collection = new Collection(compact('items'));
+		$data = array('hello', 'goodbye', 'foo' => array('bar', 'baz' => 'dib'));
+		$collection = new Collection(compact('data'));
 
-		$expected = json_encode($items);
+		$expected = json_encode($data);
 		$result = $collection->to('json');
 		$this->assertEqual($expected, $result);
 

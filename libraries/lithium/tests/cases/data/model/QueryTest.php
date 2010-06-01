@@ -10,7 +10,7 @@ namespace lithium\tests\cases\data\model;
 
 use \lithium\data\Connections;
 use \lithium\data\model\Query;
-use \lithium\data\model\Record;
+use \lithium\data\entity\Record;
 use \lithium\tests\mocks\data\MockPostObject;
 use \lithium\tests\mocks\data\model\MockDatabase;
 use \lithium\tests\mocks\data\model\MockQueryPost;
@@ -149,15 +149,14 @@ class QueryTest extends \lithium\test\Unit {
 	public function testRecord() {
 		$query = new Query($this->_queryArr);
 
-		$result = $query->record();
+		$result = $query->entity();
 		$this->assertNull($result);
 
 		$record = (object) array('id' => 12);
 		$record->title = 'Lorem Ipsum';
 
-		$query->record($record);
-
-		$query_record = $query->record();
+		$query->entity($record);
+		$query_record = $query->entity();
 
 		$expected = 12;
 		$result = $query_record->id;
@@ -167,7 +166,7 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $query_record->title;
 		$this->assertEqual($expected, $result);
 
-		$this->assertTrue($record == $query->record());
+		$this->assertTrue($record == $query->entity());
 	}
 
 	public function testComment() {
@@ -195,7 +194,7 @@ class QueryTest extends \lithium\test\Unit {
 		$record->id = 12;
 		$record->title = 'Lorem Ipsum';
 
-		$query->record($record);
+		$query->entity($record);
 
 		$expected = array('id' => 12, 'title' => 'Lorem Ipsum');
 		$result = $query->data();
@@ -223,11 +222,10 @@ class QueryTest extends \lithium\test\Unit {
 	}
 
 	public function testConditionFromRecord() {
-		$r = new Record();
-		$r->id = 12;
-		$query = new Query(array(
+		$entity = new Record();
+		$entity->id = 12;
+		$query = new Query(compact('entity') + array(
 			'model' => '\lithium\tests\mocks\data\model\MockQueryPost',
-			'record' => $r
 		));
 
 		$expected = array('id' => 12);
@@ -236,7 +234,7 @@ class QueryTest extends \lithium\test\Unit {
 	}
 
 	public function testExtra() {
-		$object = new MockPostObject(array('id'=>1, 'data'=>'test'));
+		$object = new MockPostObject(array('id' => 1, 'data' => 'test'));
 		$query = new Query(array(
 			'conditions' => 'foo', 'extra' => 'value', 'extraObject' => $object
 		));

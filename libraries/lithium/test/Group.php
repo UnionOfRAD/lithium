@@ -25,9 +25,10 @@ class Group extends \lithium\util\Collection {
 	 */
 	protected function _init() {
 		parent::_init();
-		$items = $this->_items;
-		$this->_items = array();
-		foreach ($items as $item) {
+		$data = $this->_data;
+		$this->_data = array();
+
+		foreach ($data as $item) {
 			$this->add($item);
 		}
 	}
@@ -72,11 +73,11 @@ class Group extends \lithium\util\Collection {
 		};
 		if (is_array($test)) {
 			foreach ($test as $t) {
-				$this->_items = array_filter(array_merge($this->_items, $resolve($this, $t)));
+				$this->_data = array_filter(array_merge($this->_data, $resolve($this, $t)));
 			}
-			return $this->_items;
+			return $this->_data;
 		}
-		return $this->_items = array_merge($this->_items, $resolve($this, $test));
+		return $this->_data = array_merge($this->_data, $resolve($this, $test));
 	}
 
 	/**
@@ -88,7 +89,7 @@ class Group extends \lithium\util\Collection {
 	 */
 	public function tests($params = array(), array $options = array()) {
 		$tests = new Collection();
-		array_map(function($test) use ($tests) { $tests[] = new $test; }, $this->_items);
+		array_map(function($test) use ($tests) { $tests[] = new $test; }, $this->_data);
 		return $tests;
 	}
 

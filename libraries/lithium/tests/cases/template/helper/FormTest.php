@@ -11,7 +11,7 @@ namespace lithium\tests\cases\template\helper;
 use \stdClass;
 use \lithium\action\Request;
 use \lithium\net\http\Router;
-use \lithium\data\model\Record;
+use \lithium\data\entity\Record;
 use \lithium\template\helper\Form;
 use \lithium\tests\mocks\template\helper\MockFormPost;
 use \lithium\tests\mocks\template\helper\MockFormRenderer;
@@ -148,11 +148,6 @@ class FormTest extends \lithium\test\Unit {
 			'action' => "{$this->base}posts",
 			'method' => 'post',
 		)));
-	}
-
-	public function testFormCreationWithInvalidBinding() {
-		$this->expectException('/Invalid binding object passed/');
-		$this->form->create(new stdClass());
 	}
 
 	public function testFormDataBinding() {

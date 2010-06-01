@@ -12,11 +12,11 @@ namespace lithium\tests\cases\data\source;
 use \lithium\data\source\MongoDb;
 
 use \MongoId;
-use \lithium\data\Connections;
 use \lithium\data\Model;
+use \lithium\data\Connections;
 use \lithium\data\model\Query;
+use \lithium\data\entity\Document;
 use lithium\tests\mocks\data\MockPost;
-use \lithium\data\collection\Document;
 
 class MongoDbTest extends \lithium\test\Unit {
 
@@ -44,7 +44,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
 
 		$this->query = new Query(compact('model') + array(
-			'record' => new Document(compact('model'))
+			'entity' => new Document(compact('model'))
 		));
 	}
 
@@ -188,7 +188,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->db->create($this->query);
 
 		$result = $this->db->read($this->query);
-		$this->assertTrue($result);
+		$this->assertTrue($result == true);
 
 		$expected = 1;
 		$this->assertEqual($expected, $result->count());
@@ -205,14 +205,14 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$this->query->conditions(array('title' => 'Nonexistent Post'));
 		$result = $this->db->read($this->query);
-		$this->assertTrue($result);
+		$this->assertTrue($result == true);
 
 		$expected = 0;
 		$this->assertEqual($expected, $result->count());
 
 		$this->query->conditions($data);
 		$result = $this->db->read($this->query);
-		$this->assertTrue($result);
+		$this->assertTrue($result == true);
 
 		$expected = 1;
 		$this->assertEqual($expected, $result->count());
@@ -228,7 +228,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
 		$this->query = new Query(compact('model') + array(
-			'record' => new Document(compact('model'))
+			'entity' => new Document(compact('model'))
 		));
 		$newData = array('title' => 'New Post Title');
 		$this->query->data($newData);
@@ -265,7 +265,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
 		$this->query = new Query(compact('model') + array(
-			'record' => new Document(compact('model'))
+			'entity' => new Document(compact('model'))
 		));
 		$this->query->conditions(array('_id' => $record['_id']));
 		$result = $this->db->delete($this->query);
@@ -284,7 +284,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$data = array('title' => 'New Item');
 		$result = $this->db->item($model, $data);
 
-		$this->assertTrue($result instanceof \lithium\data\collection\Document);
+		$this->assertTrue($result instanceof \lithium\data\entity\Document);
 
 		$expected = $data;
 		$result = $result->to('array');

@@ -142,7 +142,7 @@ class Form extends \lithium\core\Object {
 	 * calls, for example, `User::first()`.
 	 *
 	 * @see lithium\security\auth\adapter\Form::__construct()
-	 * @see lithium\data\model\Record::data()
+	 * @see lithium\data\entity\Record::data()
 	 * @var string
 	 */
 	protected $_query = '';

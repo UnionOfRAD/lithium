@@ -22,11 +22,11 @@ class GroupTest extends \lithium\test\Unit {
 	}
 
 	public function testAddCaseThroughConstructor() {
-		$items = (array) "\lithium\\tests\mocks\\test";
-		$group = new Group(compact('items'));
+		$data = (array) "\lithium\\tests\mocks\\test";
+		$group = new Group(compact('data'));
 
 		$expected = new Collection(array(
-			'items' => array(new \lithium\tests\mocks\test\cases\MockTest())
+			'data' => array(new \lithium\tests\mocks\test\cases\MockTest())
 		));
 		$result = $group->tests();
 		$this->assertEqual($expected, $result);
@@ -69,18 +69,18 @@ class GroupTest extends \lithium\test\Unit {
 	}
 
 	public function testAddByMixedThroughConstructor() {
-		$expected = new Collection(array('items' => array(
+		$expected = new Collection(array('data' => array(
 			new \lithium\tests\cases\data\ModelTest(),
 			new \lithium\tests\cases\core\ObjectTest()
 		)));
 
-		$group = new Group(array('items' => array(
+		$group = new Group(array('data' => array(
 			'data\ModelTest',
 			new \lithium\tests\cases\core\ObjectTest()
 		)));
 		$this->assertEqual($expected, $group->tests());
 
-		$group = new Group(array('items' => array(array(
+		$group = new Group(array('data' => array(array(
 			'Data\ModelTest',
 			new \lithium\tests\cases\core\ObjectTest()
 		))));

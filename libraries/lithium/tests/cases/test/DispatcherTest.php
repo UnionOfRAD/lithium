@@ -53,7 +53,7 @@ class DispatcherTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = new Collection(array(
-			'items' => array(new \lithium\tests\mocks\test\cases\MockTest())
+			'data' => array(new \lithium\tests\mocks\test\cases\MockTest())
 		));
 		$result = $report->group->tests();
 		$this->assertEqual($expected, $result);

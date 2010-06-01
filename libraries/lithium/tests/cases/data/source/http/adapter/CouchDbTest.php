@@ -13,7 +13,7 @@ use \lithium\data\source\http\adapter\CouchDb;
 use \lithium\data\Model;
 use \lithium\data\model\Query;
 use \lithium\data\Connections;
-use \lithium\data\collection\Document;
+use \lithium\data\entity\Document;
 
 class CouchDbTest extends \lithium\test\Unit {
 
@@ -49,7 +49,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		));
 
 		$options = array('model' => '\lithium\tests\mocks\data\source\http\adapter\MockCouchPost');
-		$this->query = new Query($options + array('record' => new Document($options)));
+		$this->query = new Query($options + array('entity' => new Document($options)));
 	}
 
 	public function tearDown() {

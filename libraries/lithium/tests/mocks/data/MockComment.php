@@ -9,7 +9,7 @@
 namespace lithium\tests\mocks\data;
 
 use \lithium\data\model\Query;
-use \lithium\data\model\Record;
+use \lithium\data\entity\Record;
 use \lithium\data\collection\RecordSet;
 
 class MockComment extends \lithium\tests\mocks\data\MockBase {
@@ -32,7 +32,7 @@ class MockComment extends \lithium\tests\mocks\data\MockBase {
 
 			return new RecordSet(array(
 				'query'    => $query,
-				'items'    => array_map(
+				'data'    => array_map(
 					function($data) { return new Record(compact('data')); },
 					array(
 						array('comment_id' => 1, 'author_id' => 123, 'text' => 'First comment'),

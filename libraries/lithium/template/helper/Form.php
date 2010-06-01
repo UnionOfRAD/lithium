@@ -112,11 +112,11 @@ class Form extends \lithium\template\Helper {
 	 *             the keys match keys from `schema()`, and the values are either strings (in cases
 	 *             where a field only has one error) or an array (in case of multiple errors),
 	 *
-	 * For an example of how to implement these methods, see the `lithium\data\model\Record` object.
+	 * For an example of how to implement these methods, see the `lithium\data\Entity` object.
 	 *
 	 * @var mixed A single data object, a `Collection` of multiple data ovjects, or an array of data
 	 *            objects/`Collection`s.
-	 * @see lithium\data\model\Record
+	 * @see lithium\data\Entity
 	 * @see lithium\template\helper\Form::create()
 	 */
 	protected $_binding = null;
@@ -200,7 +200,7 @@ class Form extends \lithium\template\Helper {
 	 * `lithium\template\helper\Form::$_binding`.
 	 *
 	 * @see lithium\template\helper\Form::$_binding
-	 * @see lithium\data\model\Record
+	 * @see lithium\data\Entity
 	 * @param object $binding
 	 * @param array $options
 	 * @return string Returns a `<form />` open tag with the `action` attribute defined by either
@@ -208,15 +208,7 @@ class Form extends \lithium\template\Helper {
 	 *         specified), the HTTP method is defined by the `'method'` option, and any HTML
 	 *         attributes passed in `$options`.
 	 */
-	public function create($binding = null, array $options = array()) {
-		if ($binding) {
-			foreach (array('data', 'errors', 'exists') as $method) {
-				if (!method_exists($binding, $method)) {
-					throw new UnexpectedValueException("Invalid binding object passed.");
-				}
-			}
-		}
-
+	public function create(\lithium\data\Entity $binding = null, array $options = array()) {
 		$defaults = array(
 			'url' => $this->_context->request()->params,
 			'type' => null,

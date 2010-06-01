@@ -219,7 +219,7 @@ class ModelTest extends \lithium\test\Unit {
 	 */
 	public function testSimpleFindFirst() {
 		$result = MockComment::first();
-		$this->assertTrue($result instanceof \lithium\data\model\Record);
+		$this->assertTrue($result instanceof \lithium\data\entity\Record);
 
 		$expected = 'First comment';
 		$this->assertEqual($expected, $result->text);
@@ -389,7 +389,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual($schema, MockPost::schema());
 
 		$post = MockPost::create(array('title' => 'New post'));
-		$this->assertTrue($post instanceof \lithium\data\model\Record);
+		$this->assertTrue($post instanceof \lithium\data\Entity);
 		$this->assertEqual('New post', $post->title);
 
 		$this->expectException('/Connection name not defined/');

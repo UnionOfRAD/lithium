@@ -10,7 +10,7 @@ namespace lithium\tests\cases\data\source;
 
 use \lithium\data\Connections;
 use \lithium\data\model\Query;
-use \lithium\data\model\Record;
+use \lithium\data\entity\Record;
 use \lithium\data\source\Database;
 use \lithium\tests\mocks\data\model\MockDatabase;
 use \lithium\tests\mocks\data\model\MockDatabasePost;
@@ -231,19 +231,18 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testCreate() {
-		$record = new Record(array(
+		$entity = new Record(array(
 			'model' => '\lithium\tests\mocks\data\model\MockDatabasePost',
 			'data' => array('title' => 'new post', 'body' => 'the body')
 		));
-		$query = new Query(array(
+		$query = new Query(compact('entity') + array(
 			'type' => 'create',
 			'model' => '\lithium\tests\mocks\data\model\MockDatabasePost',
-			'record' => $record
 		));
 		$expected = sha1(serialize($query));
 		$result = $this->db->create($query);
 		$this->assertTrue($result);
-		$result = $query->record()->id;
+		$result = $query->entity()->id;
 		$this->assertEqual($expected, $result);
 
 		$expected = "INSERT INTO {mock_database_posts} ({title}, {body})";
@@ -253,19 +252,18 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testCreateWithKey() {
-		$record = new Record(array(
+		$entity = new Record(array(
 			'model' => '\lithium\tests\mocks\data\model\MockDatabasePost',
 			'data' => array('id' => 1, 'title' => 'new post', 'body' => 'the body')
 		));
-		$query = new Query(array(
+		$query = new Query(compact('entity') + array(
 			'type' => 'create',
 			'model' => '\lithium\tests\mocks\data\model\MockDatabasePost',
-			'record' => $record
 		));
 		$expected = 1;
 		$result = $this->db->create($query);
 		$this->assertTrue($result);
-		$result = $query->record()->id;
+		$result = $query->entity()->id;
 		$this->assertEqual($expected, $result);
 
 		$expected = "INSERT INTO {mock_database_posts}"
@@ -313,20 +311,19 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testUpdate() {
-		$record = new Record(array(
+		$entity = new Record(array(
 			'model' => '\lithium\tests\mocks\data\model\MockDatabasePost',
 			'data' => array('id' => 1, 'title' => 'new post', 'body' => 'the body'),
 			'exists' => true
 		));
-		$query = new Query(array(
+		$query = new Query(compact('entity') + array(
 			'type' => 'update',
 			'model' => '\lithium\tests\mocks\data\model\MockDatabasePost',
-			'record' => $record
 		));
 		$result = $this->db->update($query);
 		$this->assertTrue($result);
 		$expected = 1;
-		$result = $query->record()->id;
+		$result = $query->entity()->id;
 		$this->assertEqual($expected, $result);
 
 		$expected = "UPDATE {mock_database_posts} SET"
@@ -337,20 +334,19 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testDelete() {
-		$record = new Record(array(
+		$entity = new Record(array(
 			'model' => '\lithium\tests\mocks\data\model\MockDatabasePost',
 			'data' => array('id' => 1, 'title' => 'new post', 'body' => 'the body'),
 			'exists' => true
 		));
-		$query = new Query(array(
+		$query = new Query(compact('entity') + array(
 			'type' => 'delete',
 			'model' => '\lithium\tests\mocks\data\model\MockDatabasePost',
-			'record' => $record
 		));
 		$result = $this->db->delete($query);
 		$this->assertTrue($result);
 		$expected = 1;
-		$result = $query->record()->id;
+		$result = $query->entity()->id;
 		$this->assertEqual($expected, $result);
 
 		$expected = "DELETE From {mock_database_posts}"

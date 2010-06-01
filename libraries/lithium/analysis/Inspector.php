@@ -384,7 +384,7 @@ class Inspector extends \lithium\core\StaticObject {
 		$classes = array();
 
 		if (!empty($options['file'])) {
-			$loaded = static::_instance('collection', array('items' => array_map(
+			$loaded = static::_instance('collection', array('data' => array_map(
 				function($class) { return new ReflectionClass($class); }, $list
 			)));
 
@@ -486,24 +486,24 @@ class Inspector extends \lithium\core\StaticObject {
 	protected static function _items($class, $method, $options) {
 		$defaults = array('names' => array(), 'self' => true, 'public' => true);
 		$options += $defaults;
-		$items = $class->{$method}();
+		$data = $class->{$method}();
 
 		if (!empty($options['names'])) {
-			$items = array_filter($items, function($item) use ($options) {
+			$data = array_filter($data, function($item) use ($options) {
 				return in_array($item->getName(), (array) $options['names']);
 			});
 		}
 
 		if ($options['self']) {
-			$items = array_filter($items, function($item) use ($class) {
+			$data = array_filter($data, function($item) use ($class) {
 				return ($item->getDeclaringClass()->getName() == $class->getName());
 			});
 		}
 
 		if ($options['public']) {
-			$items = array_filter($items, function($item) { return $item->isPublic(); });
+			$data = array_filter($data, function($item) { return $item->isPublic(); });
 		}
-		return static::_instance('collection', compact('items'));
+		return static::_instance('collection', compact('data'));
 	}
 
 	/**

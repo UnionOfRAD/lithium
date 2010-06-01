@@ -14,7 +14,7 @@ use \lithium\tests\mocks\util\MockFilters;
 class FiltersTest extends \lithium\test\Unit {
 
 	public function testRun() {
-		$options = array('method' => __FUNCTION__, 'class' => __CLASS__, 'items' => array(
+		$options = array('method' => __FUNCTION__, 'class' => __CLASS__, 'data' => array(
 			function($self, $params, $chain) {
 				$params['message'] .= 'is a filter chain ';
 				return $chain->next($self, $params, $chain);
@@ -34,7 +34,7 @@ class FiltersTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithoutChain() {
-		$options = array('method' => __FUNCTION__, 'class' => __CLASS__, 'items' => array(
+		$options = array('method' => __FUNCTION__, 'class' => __CLASS__, 'data' => array(
 			function($self, $params, $chain) {
 				return $chain->next($self, $params, null);
 			},

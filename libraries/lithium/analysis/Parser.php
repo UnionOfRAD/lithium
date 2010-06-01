@@ -108,8 +108,8 @@ class Parser extends \lithium\core\StaticObject {
 		$patternMatch = array();
 		$ret = $options['return'];
 
-		$tokens = new Collection(array('items' => static::tokenize($code, $options)));
-		$pattern = new Collection(array('items' => static::tokenize($pattern, $options)));
+		$tokens = new Collection(array('data' => static::tokenize($code, $options)));
+		$pattern = new Collection(array('data' => static::tokenize($pattern, $options)));
 
 		$breaks = function($token) use (&$tokens, &$matches, &$patternMatch, $options) {
 			if (!$options['lineBreaks']) {

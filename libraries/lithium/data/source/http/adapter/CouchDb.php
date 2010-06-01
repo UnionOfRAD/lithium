@@ -38,7 +38,8 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	protected $_classes = array(
 		'service' => '\lithium\net\http\Service',
-		'document' => '\lithium\data\collection\Document'
+		'entity' => '\lithium\data\entity\Document',
+		'set' => '\lithium\data\collection\DocumentSet'
 	);
 
 	/**
@@ -78,7 +79,8 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function configureClass($class) {
 		return array('meta' => array('key' => 'id'), 'classes' => array(
-			'record' => $this->_classes['document']
+			'entity' => $this->_classes['entity'],
+			'set' => $this->_classes['set'],
 		));
 	}
 
@@ -176,7 +178,7 @@ class CouchDb extends \lithium\data\source\Http {
 
 			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
 				$result = $self->invokeMethod('_format', array($result, $options));
-				$query->record()->update($result['id'], $result);
+				$query->entity()->update($result['id'], $result);
 				return true;
 			}
 			return false;
@@ -218,7 +220,7 @@ class CouchDb extends \lithium\data\source\Http {
 			$stats['offset'] = isset($result->offset) ? $result->offset : null;
 
 			$options += compact('result', 'stats');
-			return $self->invokeMethod('_result', array('document', $query, $options));
+			return $self->invokeMethod('_result', array('set', $query, $options));
 		});
 	}
 
@@ -252,7 +254,7 @@ class CouchDb extends \lithium\data\source\Http {
 
 			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
 				$result = $self->invokeMethod('_format', array($result, $options));
-				$query->record()->update($result['id'], $result);
+				$query->entity()->update($result['id'], $result);
 				return true;
 			}
 			if (isset($result['error']) && $result['error'] === 'conflict') {
@@ -300,9 +302,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 *         in `$model`.
 	 */
 	public function item($model, array $data = array(), array $options = array()) {
-		$result = $data = $this->_format($data);
-		$class = $this->_classes['document'];
-		return new $class(compact('model', 'data') + $options);
+		return parent::item($model, $this->_format($data), $options);
 	}
 
 	/**

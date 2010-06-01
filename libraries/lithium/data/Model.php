@@ -43,7 +43,7 @@ use \BadMethodCallException;
  *
  * // With conditions
  * Post::find('count', array('conditions' => array('published' => true)));
- * Post::count(array('conditions' => array('published' => true)));
+ * Post::count(array('published' => true));
  * }}}
  *
  * The actual objects returned from `find()` calls will depend on the type of datasource in use.
@@ -65,11 +65,11 @@ use \BadMethodCallException;
  * $post->save();
  * }}}
  *
- * @see lithium\data\model\Record
- * @see lithium\data\collection\Document
+ * @see lithium\data\entity\Record
+ * @see lithium\data\entity\Document
  * @see lithium\data\collection\RecordSet
+ * @see lithium\data\collection\DocumentSet
  * @see lithium\data\Connections
- *
  */
 class Model extends \lithium\core\StaticObject {
 
@@ -141,7 +141,7 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	protected $_classes = array(
 		'connections' => '\lithium\data\Connections',
-		'record'      => '\lithium\data\model\Record',
+		'entity'      => '\lithium\data\Entity',
 		'query'       => '\lithium\data\model\Query',
 		'validator'   => '\lithium\util\Validator'
 	);
@@ -514,6 +514,9 @@ class Model extends \lithium\core\StaticObject {
 		if (!$values) {
 			return $key;
 		}
+		if (!is_array($values) && !is_array($key)) {
+			return array($key => $values);
+		}
 		$key = (array) $key;
 		return array_intersect_key($values, array_combine($key, $key));
 	}
@@ -614,7 +617,7 @@ class Model extends \lithium\core\StaticObject {
 			if ($self::meta('connection')) {
 				return $self::invokeMethod('_connection')->item($self, $data, $options);
 			}
-			return new $classes['record'](array('model' => $self) + compact('data') + $options);
+			return new $classes['entity'](array('model' => $self) + compact('data') + $options);
 		});
 	}
 
@@ -627,11 +630,11 @@ class Model extends \lithium\core\StaticObject {
 	 * $post->save(null, array('validate' => false));
 	 * }}}
 	 *
-	 * @param object $record The record or document object to be saved in the database. This
+	 * @param object $entity The record or document object to be saved in the database. This
 	 *               parameter is implicit and should not be passed under normal circumstances.
-	 *               In the above example, the call to `save()` on the record object is
+	 *               In the above example, the call to `save()` on the `$post` object is
 	 *               transparently proxied through to the `Post` model class, and `$post` is passed
-	 *               in as the `$record` parameter.
+	 *               in as the `$entity` parameter.
 	 * @param array $data Any data that should be assigned to the record before it is saved.
 	 * @param array $options Options:
 	 *        - `'callbacks'` _boolean_: If `false`, all callbacks will be disabled before
@@ -643,7 +646,7 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
 	 */
-	public function save($record, $data = null, array $options = array()) {
+	public function save($entity, $data = null, array $options = array()) {
 		$self = static::_instance();
 		$classes = $self->_classes;
 		$_meta = array('model' => get_called_class()) + $self->_meta;
@@ -656,15 +659,15 @@ class Model extends \lithium\core\StaticObject {
 			'locked' => $self->_meta['locked'],
 		);
 		$options += $defaults + compact('classes');
-		$params = compact('record', 'data', 'options');
+		$params = compact('entity', 'data', 'options');
 
 		$filter = function($self, $params) use ($_meta, $_schema) {
-			$record = $params['record'];
+			$entity = $params['entity'];
 			$options = $params['options'];
 			$class = $options['classes']['query'];
 
 			if ($params['data']) {
-				$record->set($params['data']);
+				$entity->set($params['data']);
 			}
 
 			if ($options['validate']) {
@@ -679,8 +682,8 @@ class Model extends \lithium\core\StaticObject {
 				$whitelist = $options['whitelist'] ?: array_keys($_schema);
 			}
 
-			$type = $record->exists() ? 'update' : 'create';
-			$query = new $class(compact('type', 'whitelist', 'record') + $options + $_meta);
+			$type = $entity->exists() ? 'update' : 'create';
+			$query = new $class(compact('type', 'whitelist', 'entity') + $options + $_meta);
 			return $self::invokeMethod('_connection')->{$type}($query, $options);
 		};
 
@@ -694,7 +697,7 @@ class Model extends \lithium\core\StaticObject {
 	 * Indicates whether the `Model`'s current data validates, given the
 	 * current rules setup.
 	 *
-	 * @param string $record Model record to validate.
+	 * @param string $entity Model record to validate.
 	 * @param array $options Options.
 	 * @return boolean Success.
 	 */
@@ -703,7 +706,7 @@ class Model extends \lithium\core\StaticObject {
 		$options += $defaults;
 		$self = static::_instance();
 		$validator = $self->_classes['validator'];
-		$params = compact('record', 'options');
+		$params = compact('entity', 'options');
 
 		$filter = function($parent, $params) use (&$self, $validator) {
 			extract($params);
@@ -721,19 +724,19 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Deletes the data associated with the current `Model`.
 	 *
-	 * @param string $record Record to delete.
+	 * @param string $entity Entity to delete.
 	 * @param array $options Options.
 	 * @return boolean Success.
 	 */
-	public function delete($record, array $options = array()) {
+	public function delete($entity, array $options = array()) {
 		$self = static::_instance();
 		$_class = $self->_classes['query'];
-		$params = compact('record', 'options');
+		$params = compact('entity', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($_class) {
 			$type = 'delete';
-			$record = $params['record'];
-			$options = $params['options'] + array('model' => $self) + compact('type', 'record');
+			$entity = $params['entity'];
+			$options = $params['options'] + array('model' => $self) + compact('type', 'entity');
 			return $self::invokeMethod('_connection')->delete(new $_class($options), $options);
 		});
 	}

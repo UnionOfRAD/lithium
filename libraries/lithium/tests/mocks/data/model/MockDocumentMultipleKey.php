@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\data\model;
 
-use \lithium\data\collection\Document;
+use \lithium\data\entity\Document;
 
 class MockDocumentMultipleKey extends \lithium\data\Model {
 
@@ -41,13 +41,13 @@ class MockDocumentMultipleKey extends \lithium\data\Model {
 	public static function find($type = 'all', array $options = array()) {
 		switch ($type) {
 			case 'first':
-				return new Document(array('items' =>
+				return new Document(array('data' =>
 					array('id' => 2, 'rev' => '1-1', 'name' => 'Two', 'content' => 'Lorem ipsum two')
 				));
 			break;
 			case 'all':
 			default :
-				return new Document(array('items' => array(
+				return new Document(array('data' => array(
 					array('id' => 1, 'rev' => '1-1','name' => 'One', 'content' => 'Lorem ipsum one'),
 					array('id' => 2, 'rev' => '1-1','name' => 'Two', 'content' => 'Lorem ipsum two'),
 					array('id' => 3, 'rev' => '1-1', 'name' => 'Three', 'content' => 'Lorem ipsum three')

@@ -124,8 +124,8 @@ class StaticObject {
 			static::$_methodFilters += array($class => array());
 			static::$_methodFilters[$class][$method] = array();
 		}
-		$items = array_merge(static::$_methodFilters[$class][$method], $filters, array($callback));
-		return Filters::run($class, $params, compact('items', 'class', 'method'));
+		$data = array_merge(static::$_methodFilters[$class][$method], $filters, array($callback));
+		return Filters::run($class, $params, compact('data', 'class', 'method'));
 	}
 
 	/**

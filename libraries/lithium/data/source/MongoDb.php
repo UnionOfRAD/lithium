@@ -32,7 +32,7 @@ use \lithium\util\Inflector;
  * By default, it will attempt to connect to a Mongo instance running on `localhost` on port
  * 27017. See `__construct()` for details on the accepted configuration settings.
  *
- * @see lithium\data\collection\Document
+ * @see lithium\data\entity\Document
  * @see lithium\data\Connections::add()
  * @see lithium\data\source\MongoDb::__construct()
  */
@@ -58,7 +58,8 @@ class MongoDb extends \lithium\data\Source {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'document' => '\lithium\data\collection\Document',
+		'entity' => '\lithium\data\entity\Document',
+		'set' => '\lithium\data\collection\DocumentSet',
 		'relationship' => '\lithium\data\model\Relationship'
 	);
 
@@ -163,8 +164,8 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	/**
-	 * Configures a model class by overriding the default dependencies for `'recordSet'` and
-	 * `'record'` , and sets the primary key to `'_id'`, in keeping with Mongo's conventions.
+	 * Configures a model class by overriding the default dependencies for `'set'` and
+	 * `'entity'` , and sets the primary key to `'_id'`, in keeping with Mongo's conventions.
 	 *
 	 * @see lithium\data\Model::$_meta
 	 * @see lithium\data\Model::$_classes
@@ -174,7 +175,8 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function configureClass($class) {
 		return array('meta' => array('key' => '_id'), 'classes' => array(
-			'record' => $this->_classes['document']
+			'entity' => $this->_classes['entity'],
+			'set' => $this->_classes['set'],
 		));
 	}
 
@@ -311,7 +313,7 @@ class MongoDb extends \lithium\data\Source {
 
 			if (isset($result['ok']) && $result['ok'] === 1.0) {
 				$id = $data['_id'];
-				$query->record()->update(is_object($id) ? $id->__toString() : null);
+				$query->entity()->update(is_object($id) ? $id->__toString() : null);
 				return true;
 			}
 			return false;
@@ -348,7 +350,7 @@ class MongoDb extends \lithium\data\Source {
 				unset($stats['retval']);
 
 				$config = compact('data', 'stats') + array('model' => $options['model']);
-				return $self->invokeMethod('_result', array('document', $query, $config));
+				return $self->invokeMethod('_result', array('set', $query, $config));
 			}
 			$result = $self->connection->{$source}->find($conditions, $args['fields']);
 
@@ -357,7 +359,7 @@ class MongoDb extends \lithium\data\Source {
 			}
 			$result = $result->sort($args['order'])->limit($args['limit'])->skip($args['offset']);
 			$options = compact('result') + array('model' => $options['model']);
-			return $self->invokeMethod('_result', array('document', $query, $options));
+			return $self->invokeMethod('_result', array('set', $query, $options));
 		});
 	}
 
@@ -377,7 +379,7 @@ class MongoDb extends \lithium\data\Source {
 			$data = $self->invokeMethod('_toMongoId', array($query->data()));
 
 			if ($self->connection->{$params['source']}->update($params['conditions'], $data)) {
-				$query->record() ? $query->record()->update() : null;
+				$query->entity() ? $query->entity()->update() : null;
 				return true;
 			}
 			return false;
@@ -400,22 +402,6 @@ class MongoDb extends \lithium\data\Source {
 			$params['conditions'] = $self->invokeMethod('_toMongoId', array($params['conditions']));
 			return $self->connection->{$params['source']}->remove($params['conditions']);
 		});
-	}
-
-	/**
-	 * Returns a newly-created `Document` object, bound to a model and populated with default data
-	 * and options.
-	 *
-	 * @param string $model A fully-namespaced class name representing the model class to which the
-	 *               `Document` object will be bound.
-	 * @param array $data The default data with which the new `Document` should be populated.
-	 * @param array $options Any additional options to pass to the `Document`'s constructor.
-	 * @return object Returns a new, un-saved `Document` object bound to the model class specified
-	 *         in `$model`.
-	 */
-	public function item($model, array $data = array(), array $options = array()) {
-		$class = $this->_classes['document'];
-		return new $class(compact('model', 'data') + $options);
 	}
 
 	/**
@@ -493,13 +479,20 @@ class MongoDb extends \lithium\data\Source {
 
 		switch ($type) {
 			case 'next':
-				return $resource->hasNext() ? $resource->getNext() : null;
+				$result = $resource->hasNext() ? $resource->getNext() : null;
+			break;
 			case 'close':
 				unset($resource);
-				return null;
+				$result = null;
+			break;
 			default:
-				return parent::result($type, $resource, $context);
+				$result = parent::result($type, $resource, $context);
+			break;
 		}
+		if (is_array($result) && isset($result['_id'])) {
+			$result['_id'] = (string) $result['_id'];
+		}
+		return $result;
 	}
 
 	/**

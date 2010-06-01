@@ -20,7 +20,7 @@ namespace lithium\util;
  * $coll[] = 'foo';
  * // $coll[0] --> 'foo'
  *
- * $coll = new Collection(array('items' => array('foo')));
+ * $coll = new Collection(array('data' => array('foo')));
  * // $coll[0] --> 'foo'
  * 
  * $array = $coll->to('array');
@@ -30,7 +30,7 @@ namespace lithium\util;
  *
  * {{{
  *
- * $coll = new Collection(array('items' => array(0, 1, 2, 3, 4)));
+ * $coll = new Collection(array('data' => array(0, 1, 2, 3, 4)));
  *
  * $coll->first();   // 1 (the first non-empty value)
  * $coll->current(); // 0
@@ -56,12 +56,12 @@ namespace lithium\util;
  * 	}
  * }
  *
- * $items = array(
+ * $data = array(
  * 	new Task(array('task' => 'task 1')),
  * 	new Task(array('task' => 'task 2')),
  * 	new Task(array('task' => 'task 3'))
  * );
- * $tasks = new Collection(compact('items'));
+ * $tasks = new Collection(compact('data'));
  *
  * // $result will contain an array, and each element will be the return
  * // value of a run() method call:
@@ -93,7 +93,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 *
 	 * @var array
 	 */
-	protected $_items = array();
+	protected $_data = array();
 
 	/**
 	 * Indicates whether the current position is valid or not.
@@ -108,7 +108,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('items');
+	protected $_autoConfig = array('data');
 
 	/**
 	 * Accessor method for adding format handlers to instances and subclasses of `Collection`.
@@ -175,7 +175,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 */
 	protected function _init() {
 		parent::_init();
-		unset($this->_config['items']);
+		unset($this->_config['data']);
 	}
 
 	/**
@@ -186,7 +186,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @param array $options Specifies options for how to run the given method against the object
 	 *              collection. The available options are:
 	 *              - `'collect'`: If `true`, the results of this method call will be returned
-	 *                wrapped in a new Collection object or subclass.
+	 *                wrapped in a new `Collection` object or subclass.
 	 *              - `'merge'`: Used primarily if the method being invoked returns an array.  If
 	 *                set to `true`, merges all results arrays into one.
 	 * @todo Implement filtering.
@@ -200,13 +200,13 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 
 		foreach ($this as $key => $value) {
 			if (is_null($isCore)) {
-				$isCore = (method_exists(current($this->_items), 'invokeMethod'));
+				$isCore = (method_exists(current($this->_data), 'invokeMethod'));
 			}
 
 			if ($isCore) {
-				$result = $this->_items[$key]->invokeMethod($method, $parameters);
+				$result = $this->_data[$key]->invokeMethod($method, $parameters);
 			} else {
-				$result = call_user_func_array(array(&$this->_items[$key], $method), $parameters);
+				$result = call_user_func_array(array(&$this->_data[$key], $method), $parameters);
 			}
 
 			if (!empty($options['merge'])) {
@@ -218,7 +218,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 
 		if ($options['collect']) {
 			$class = get_class($this);
-			$results = new $class(array('items' => $results));
+			$results = new $class(array('data' => $results));
 		}
 		return $results;
 	}
@@ -264,7 +264,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	public function to($format, array $options = array()) {
 		$defaults = array('internal' => false);
 		$options += $defaults;
-		$data = $options['internal'] ? $this->_items : $this;
+		$data = $options['internal'] ? $this->_data : $this;
 
 		if (is_object($format) && is_callable($format)) {
 			return $format($data, $options);
@@ -297,19 +297,19 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @param callback $filter Callback to use for filtering.
 	 * @param array $options The available options are:
 	 *              - `'collect'`: If `true`, the results will be returned wrapped
-	 *              in a new Collection object or subclass.
+	 *              in a new `Collection` object or subclass.
 	 * @return array|object The filtered items.
 	 */
 	public function find($filter, array $options = array()) {
 		$defaults = array('collect' => true);
 		$options += $defaults;
-		$items = array_filter($this->_items, $filter);
+		$data = array_filter($this->_data, $filter);
 
 		if ($options['collect']) {
 			$class = get_class($this);
-			$items = new $class(compact('items'));
+			$data = new $class(compact('data'));
 		}
-		return $items;
+		return $data;
 	}
 
 	/**
@@ -342,30 +342,30 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return object This collection instance.
 	 */
 	public function each($filter) {
-		$this->_items = array_map($filter, $this->_items);
+		$this->_data = array_map($filter, $this->_data);
 		return $this;
 	}
 
 	/**
-	 * Applies a callback to a copy of all items in the collection
+	 * Applies a callback to a copy of all data in the collection
 	 * and returns the result.
 	 *
 	 * @param callback $filter The filter to apply.
 	 * @param array $options The available options are:
 	 *              - `'collect'`: If `true`, the results will be returned wrapped
-	 *              in a new Collection object or subclass.
-	 * @return array|object The filtered items.
+	 *              in a new `Collection` object or subclass.
+	 * @return array|object The filtered data.
 	 */
 	public function map($filter, array $options = array()) {
 		$defaults = array('collect' => true);
 		$options += $defaults;
-		$items = array_map($filter, $this->_items);
+		$data = array_map($filter, $this->_data);
 
 		if ($options['collect']) {
 			$class = get_class($this);
-			return new $class(compact('items'));
+			return new $class(compact('data'));
 		}
-		return $items;
+		return $data;
 	}
 
 	/**
@@ -375,7 +375,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return boolean `true` if offset exists, `false` otherwise.
 	 */
 	public function offsetExists($offset) {
-		return isset($this->_items[$offset]);
+		return isset($this->_data[$offset]);
 	}
 
 	/**
@@ -385,7 +385,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return mixed Value at offset.
 	 */
 	public function offsetGet($offset) {
-		return $this->_items[$offset];
+		return $this->_data[$offset];
 	}
 
 	/**
@@ -397,9 +397,9 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 */
 	public function offsetSet($offset, $value) {
 		if (is_null($offset)) {
-			return $this->_items[] = $value;
+			return $this->_data[] = $value;
 		}
-		return $this->_items[$offset] = $value;
+		return $this->_data[$offset] = $value;
 	}
 
 	/**
@@ -409,7 +409,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return void
 	 */
 	public function offsetUnset($offset) {
-		unset($this->_items[$offset]);
+		unset($this->_data[$offset]);
 	}
 
 	/**
@@ -418,8 +418,8 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return mixed The current item after rewinding.
 	 */
 	public function rewind() {
-		$this->_valid = (reset($this->_items) !== false);
-		return current($this->_items);
+		$this->_valid = (reset($this->_data) !== false);
+		return current($this->_data);
 	}
 
 	/**
@@ -428,8 +428,8 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return mixed The current item after moving.
 	 */
 	public function end() {
-		$this->_valid = (end($this->_items) !== false);
-		return current($this->_items);
+		$this->_valid = (end($this->_data) !== false);
+		return current($this->_data);
 	}
 
 	/**
@@ -447,7 +447,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return mixed The current item.
 	 */
 	public function current() {
-		return current($this->_items);
+		return current($this->_data);
 	}
 
 	/**
@@ -456,7 +456,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return scalar Scalar on success `0` on failure.
 	 */
 	public function key() {
-		return key($this->_items);
+		return key($this->_data);
 	}
 
 	/**
@@ -466,10 +466,10 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return mixed The current item after moving.
 	 */
 	public function prev() {
-		if (!prev($this->_items)) {
-			end($this->_items);
+		if (!prev($this->_data)) {
+			end($this->_data);
 		}
-		return current($this->_items);
+		return current($this->_data);
 	}
 
 	/**
@@ -478,8 +478,8 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return The current item after moving.
 	 */
 	public function next() {
-		$this->_valid = (next($this->_items) !== false);
-		return current($this->_items);
+		$this->_valid = (next($this->_data) !== false);
+		return current($this->_data);
 	}
 
 	/**
@@ -489,7 +489,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return void
 	 */
 	public function append($value) {
-		is_object($value) ? $this->_items[] =& $value : $this->_items[] = $value;
+		is_object($value) ? $this->_data[] =& $value : $this->_data[] = $value;
 	}
 
 	/**
@@ -509,7 +509,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return array The keys of the items.
 	 */
 	public function keys() {
-		return array_keys($this->_items);
+		return array_keys($this->_data);
 	}
 
 	/**

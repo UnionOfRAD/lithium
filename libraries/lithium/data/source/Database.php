@@ -56,8 +56,8 @@ abstract class Database extends \lithium\data\Source {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'record' => '\lithium\data\model\Record',
-		'recordSet' => '\lithium\data\collection\RecordSet',
+		'entity' => '\lithium\data\entity\Record',
+		'set' => '\lithium\data\collection\RecordSet',
 		'relationship' => '\lithium\data\model\Relationship'
 	);
 
@@ -214,11 +214,11 @@ abstract class Database extends \lithium\data\Source {
 			$id     = null;
 
 			if ($self->invokeMethod('_execute', array($sql))) {
-				if ($query->record()) {
-					if (!$model::key($query->record())) {
+				if ($query->entity()) {
+					if (!$model::key($query->entity())) {
 						$id = $self->invokeMethod('_insertId', array($query));
 					}
-					$query->record()->update($id);
+					$query->entity()->update($id);
 				}
 				return true;
 			}
@@ -261,7 +261,7 @@ abstract class Database extends \lithium\data\Source {
 					return $records;
 				case 'item':
 					return $self->item($query->model(), array(), compact('query', 'result') + array(
-						'class' => 'recordSet',
+						'class' => 'set',
 						'handle' => $self,
 					));
 			}
@@ -282,7 +282,9 @@ abstract class Database extends \lithium\data\Source {
 			$sql = $self->renderCommand('update', $params, $query);
 
 			if ($self->invokeMethod('_execute', array($sql))) {
-				$query->record()->update();
+				if ($query->entity()) {
+					$query->entity()->update();
+				}
 				return true;
 			}
 			return false;
@@ -363,16 +365,14 @@ abstract class Database extends \lithium\data\Source {
 	 *         `$model`.
 	 */
 	public function item($model, array $data = array(), array $options = array()) {
-		$handle = $this;
-		$class = $this->_classes[isset($options['class']) ? $options['class'] : 'record'];
-		return new $class(compact('model', 'data', 'handle') + $options);
+		return parent::item($model, $data, array('handle' => $this) + $options);
 	}
 
 	/**
-	 * Returns a given `type` statement for the given data, rendered from the Database::$_strings
+	 * Returns a given `type` statement for the given data, rendered from `Database::$_strings`.
 	 *
-	 * @param string $type create|read|update|delete|join
-	 * @param string $data The data to replace in the string
+	 * @param string $type One of `'create'`, `'read'`, `'update'`, `'delete'` or `'join'`.
+	 * @param string $data The data to replace in the string.
 	 * @param string $context
 	 * @return string
 	 */

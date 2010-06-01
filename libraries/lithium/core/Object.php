@@ -241,8 +241,8 @@ class Object {
 		}
 
 		$f = isset($this->_methodFilters[$method]) ? $this->_methodFilters[$method] : array();
-		$items = array_merge($f, $filters, array($callback));
-		return Filters::run($this, $params, compact('items', 'class', 'method'));
+		$data = array_merge($f, $filters, array($callback));
+		return Filters::run($this, $params, compact('data', 'class', 'method'));
 	}
 
 	/**

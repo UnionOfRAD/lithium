@@ -12,7 +12,7 @@ use \lithium\net\http\Media;
 use \lithium\action\Request;
 use \lithium\action\Response;
 use \lithium\core\Libraries;
-use \lithium\data\model\Record;
+use \lithium\data\entity\Record;
 use \lithium\data\collection\RecordSet;
 
 class MediaTest extends \lithium\test\Unit {
@@ -439,7 +439,7 @@ class MediaTest extends \lithium\test\Unit {
 	}
 
 	public function testEncodeRecordSet() {
-		$data = new RecordSet(array('items' => array(
+		$data = new RecordSet(array('data' => array(
 			1 => new Record(array('data' => array('id' => 1, 'foo' => 'bar'))),
 			2 => new Record(array('data' => array('id' => 2, 'foo' => 'baz'))),
 			3 => new Record(array('data' => array('id' => 3, 'baz' => 'dib')))

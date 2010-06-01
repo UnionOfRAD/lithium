@@ -18,7 +18,7 @@ class FilterTest extends \lithium\test\Integration {
 		$this->report = new Report(array(
 			'title' => '\lithium\tests\mocks\test\MockFilterTest',
 			'group' => new Group(
-				array('items' => array('\lithium\tests\mocks\test\MockFilterClassTest'))
+				array('data' => array('\lithium\tests\mocks\test\MockFilterClassTest'))
 			)
 		));
 	}
@@ -56,7 +56,7 @@ class FilterTest extends \lithium\test\Integration {
 			$report = new Report(array(
 				'title' => '\lithium\tests\mocks\test\MockFilterTest',
 				'group' => new Group(
-					array('items' => array('\lithium\tests\mocks\test\MockFilterClassTest'))
+					array('data' => array('\lithium\tests\mocks\test\MockFilterClassTest'))
 				)
 			));
 
