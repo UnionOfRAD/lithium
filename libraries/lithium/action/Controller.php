@@ -228,8 +228,7 @@ class Controller extends \lithium\core\Object {
 			)
 		);
 
-
-		if (!empty($options['data'])) {
+		if ($options['data']) {
 			$this->set($options['data']);
 			unset($options['data']);
 		}
