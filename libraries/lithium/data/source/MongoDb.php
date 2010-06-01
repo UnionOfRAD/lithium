@@ -405,8 +405,13 @@ class MongoDb extends \lithium\data\Source {
 			}
 			$collection = $self->connection->{$source};
 
+<<<<<<< HEAD
 			if ($source == "{$_config['gridPrefix']}.files") {
 				$collection = $self->connection->getGridFS();
+=======
+				$config = compact('data', 'stats') + array('model' => $options['model']);
+				return $self->invokeMethod('_result', array('set', $query, $config));
+>>>>>>> Adding test for `\data\Source`. Refactoring classes in `\data` into "entity" and "set" classes. Split `Document` into `entity\Document` and `collection\DocumentSet`. Renamed `\util\Collection::$_items` to `\util\Collection::$_data`. Constructor parameter in all subclasses is now `'data'`, to provide more consistency with entity classes, etc. Changed `\data\model\Query::binding()` to `\data\model\Query::entity()`, to better  reflect design.
 			}
 			$result = $collection->find($args['conditions'], $args['fields']);
 
@@ -414,8 +419,13 @@ class MongoDb extends \lithium\data\Source {
 				return $result;
 			}
 			$result = $result->sort($args['order'])->limit($args['limit'])->skip($args['offset']);
+<<<<<<< HEAD
 			$config = compact('result', 'query') + array('class' => 'set');
 			return $self->item($options['model'], array(), $config);
+=======
+			$options = compact('result') + array('model' => $options['model']);
+			return $self->invokeMethod('_result', array('set', $query, $options));
+>>>>>>> Adding test for `\data\Source`. Refactoring classes in `\data` into "entity" and "set" classes. Split `Document` into `entity\Document` and `collection\DocumentSet`. Renamed `\util\Collection::$_items` to `\util\Collection::$_data`. Constructor parameter in all subclasses is now `'data'`, to provide more consistency with entity classes, etc. Changed `\data\model\Query::binding()` to `\data\model\Query::entity()`, to better  reflect design.
 		});
 	}
 
@@ -455,10 +465,14 @@ class MongoDb extends \lithium\data\Source {
 			}
 			unset($args['data']['_id']);
 
+<<<<<<< HEAD
 			$update = $self->invokeMethod('_toMongoId', array($args['data']));
 			$update = ($options['atomic']) ? array('$set' => $update) : $update;
 
 			if ($self->connection->{$args['source']}->update($args['conditions'], $update)) {
+=======
+			if ($self->connection->{$params['source']}->update($params['conditions'], $data)) {
+>>>>>>> Adding test for `\data\Source`. Refactoring classes in `\data` into "entity" and "set" classes. Split `Document` into `entity\Document` and `collection\DocumentSet`. Renamed `\util\Collection::$_items` to `\util\Collection::$_data`. Constructor parameter in all subclasses is now `'data'`, to provide more consistency with entity classes, etc. Changed `\data\model\Query::binding()` to `\data\model\Query::entity()`, to better  reflect design.
 				$query->entity() ? $query->entity()->update() : null;
 				return true;
 			}
@@ -546,10 +560,13 @@ class MongoDb extends \lithium\data\Source {
 		switch ($type) {
 			case 'next':
 				$result = $resource->hasNext() ? $resource->getNext() : null;
+<<<<<<< HEAD
 
 				if ($result instanceof MongoGridFSFile) {
 					$result = array('file' => $result) + $result->file;
 				}
+=======
+>>>>>>> Adding test for `\data\Source`. Refactoring classes in `\data` into "entity" and "set" classes. Split `Document` into `entity\Document` and `collection\DocumentSet`. Renamed `\util\Collection::$_items` to `\util\Collection::$_data`. Constructor parameter in all subclasses is now `'data'`, to provide more consistency with entity classes, etc. Changed `\data\model\Query::binding()` to `\data\model\Query::entity()`, to better  reflect design.
 			break;
 			case 'close':
 				unset($resource);
@@ -558,6 +575,12 @@ class MongoDb extends \lithium\data\Source {
 			default:
 				$result = parent::result($type, $resource, $context);
 			break;
+<<<<<<< HEAD
+=======
+		}
+		if (is_array($result) && isset($result['_id'])) {
+			$result['_id'] = (string) $result['_id'];
+>>>>>>> Adding test for `\data\Source`. Refactoring classes in `\data` into "entity" and "set" classes. Split `Document` into `entity\Document` and `collection\DocumentSet`. Renamed `\util\Collection::$_items` to `\util\Collection::$_data`. Constructor parameter in all subclasses is now `'data'`, to provide more consistency with entity classes, etc. Changed `\data\model\Query::binding()` to `\data\model\Query::entity()`, to better  reflect design.
 		}
 		return $result;
 	}
