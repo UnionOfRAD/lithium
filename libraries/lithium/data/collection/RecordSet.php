@@ -66,10 +66,6 @@ class RecordSet extends \lithium\data\Collection {
 			$this->_index = array_keys($this->_data);
 			$this->_data = array_values($this->_data);
 		}
-		if ($this->_items && !$this->_index) {
-			$this->_index = array_keys($this->_items);
-			$this->_items = array_values($this->_items);
-		}
 	}
 
 	/**
