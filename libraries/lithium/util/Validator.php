@@ -166,7 +166,8 @@ class Validator extends \lithium\core\StaticObject {
 						return false;
 					}
 				}
-				return (boolean) filter_var($value, FILTER_VALIDATE_FLOAT);
+				$filter = filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+				return ($filter !== null);
 			},
 			'inList' => function($value, $format, $options) {
 				$options += array('list' => array());

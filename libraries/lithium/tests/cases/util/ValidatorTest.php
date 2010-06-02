@@ -197,6 +197,12 @@ class ValidatorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	function testDecimal() {
+		$this->assertTrue(Validator::isDecimal('0.0'));
+		$this->assertTrue(Validator::isDecimal('0.000'));
+		$this->assertTrue(Validator::isDecimal('1.1'));
+		$this->assertTrue(Validator::isDecimal('11.11'));
+		$this->assertTrue(Validator::isDecimal('+0'));
+		$this->assertTrue(Validator::isDecimal('-0'));
 		$this->assertTrue(Validator::isDecimal('+1234.54321'));
 		$this->assertTrue(Validator::isDecimal('-1234.54321'));
 		$this->assertTrue(Validator::isDecimal('1234.54321'));
