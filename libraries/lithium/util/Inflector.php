@@ -338,7 +338,7 @@ class Inflector {
 	/**
 	 * Takes a under_scored word and turns it into a CamelCased or camelBack word
 	 *
-	 * @param string $word Under_scored version of a word (i.e. `'red_bike'`).
+	 * @param string $word An under_scored or slugged word (i.e. `'red_bike'` or `'red-bike'`).
 	 * @param boolean $cased If false, first character is not upper cased
 	 * @return string CamelCased version of the word (i.e. `'RedBike'`).
 	 */
@@ -346,7 +346,7 @@ class Inflector {
 		if (isset(static::$_camelized[$word]) && $cased) {
 			return static::$_camelized[$word];
 		}
-		$word = str_replace(" ", "", ucwords(str_replace("_", " ", $word)));
+		$word = str_replace(" ", "", ucwords(str_replace(array("_", '-'), " ", $word)));
 
 		if (!$cased) {
 			return lcfirst($word);
@@ -364,9 +364,26 @@ class Inflector {
 		if (isset(static::$_underscored[$word])) {
 			return static::$_underscored[$word];
 		}
-		return static::$_underscored[$word] = strtolower(
-			preg_replace('/(?<=\\w)([A-Z])/', '_\\1', $word)
+		return static::$_underscored[$word] = strtolower(static::slug($word, '_'));
+	}
+
+	/**
+	 * Returns a string with all spaces converted to given replacement and
+	 * non word characters removed.  Maps special characters to ASCII using
+	 * `Inflector::$_transliteration`, which can be updated using `Inflector::rules()`.
+	 *
+	 * @see lithium\util\Inflector::rules()
+	 * @param string $string An arbitrary string to convert.
+	 * @param string $replacement The replacement to use for spaces.
+	 * @return string The converted string.
+	 */
+	public static function slug($string, $replacement = '-') {
+		$map = static::$_transliteration + array(
+			'/[^\w\s]/' => ' ', '/\\s+/' => $replacement,
+			'/(?<=[a-z])([A-Z])/' => $replacement . '\\1',
+			str_replace(':rep', preg_quote($replacement, '/'), '/^[:rep]+|[:rep]+$/') => '',
 		);
+		return preg_replace(array_keys($map), array_values($map), $string);
 	}
 
 	/**
@@ -403,24 +420,6 @@ class Inflector {
 	 */
 	public static function classify($tableName) {
 		return static::camelize(static::singularize($tableName));
-	}
-
-	/**
-	 * Returns a string with all spaces converted to given replacement and
-	 * non word characters removed.  Maps special characters to ASCII using
-	 * `Inflector::$_transliteration`, which can be updated using `Inflector::rules()`.
-	 *
-	 * @see lithium\util\Inflector::rules()
-	 * @param string $string An arbitrary string to convert.
-	 * @param string $replacement The replacement to use for spaces.
-	 * @return string The converted string.
-	 */
-	public static function slug($string, $replacement = '-') {
-		$map = static::$_transliteration + array(
-			'/[^\w\s]/' => ' ', '/\\s+/' => $replacement,
-			str_replace(':rep', preg_quote($replacement, '/'), '/^[:rep]+|[:rep]+$/') => '',
-		);
-		return preg_replace(array_keys($map), array_values($map), $string);
 	}
 
 	/**

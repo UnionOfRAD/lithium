@@ -21,7 +21,7 @@ class InflectorTest extends \lithium\test\Unit {
 	 *
 	 * @return void
 	 */
-	public function testInflectingSingulars() {
+	public function testSingularize() {
 		$this->assertEqual(Inflector::singularize('categorias'), 'categoria');
 		$this->assertEqual(Inflector::singularize('menus'), 'menu');
 		$this->assertEqual(Inflector::singularize('news'), 'news');
@@ -67,7 +67,7 @@ class InflectorTest extends \lithium\test\Unit {
 	 *
 	 * @return void
 	 */
-	public function testInflectingPlurals() {
+	public function testPluralize() {
 		$this->assertEqual(Inflector::pluralize('categoria'), 'categorias');
 		$this->assertEqual(Inflector::pluralize('house'), 'houses');
 		$this->assertEqual(Inflector::pluralize('powerhouse'), 'powerhouses');
@@ -116,7 +116,7 @@ class InflectorTest extends \lithium\test\Unit {
 	 *
 	 * @return void
 	 */
-	public function testInflectorReplace() {
+	public function testSlug() {
 		$result = Inflector::slug('Foo Bar: Not just for breakfast any-more');
 		$expected = 'Foo-Bar-Not-just-for-breakfast-any-more';
 		$this->assertEqual($expected, $result);
@@ -160,6 +160,10 @@ class InflectorTest extends \lithium\test\Unit {
 
 		$result = Inflector::slug('#this melts your face1#2#3');
 		$expected = 'this-melts-your-face1-2-3';
+		$this->assertEqual($expected, $result);
+
+		$result = Inflector::slug('ThisMeltsYourFace');
+		$expected = 'This-Melts-Your-Face';
 		$this->assertEqual($expected, $result);
 	}
 
@@ -212,7 +216,7 @@ class InflectorTest extends \lithium\test\Unit {
 	 *
 	 * @return void
 	 */
-	public function testIrregularSynchronicity() {
+	public function testIrregularWords() {
 		$expectedPlural = Inflector::rules('plural');
 		$this->assertFalse(isset($expectedPlural['irregular']['bar']));
 
@@ -239,7 +243,8 @@ class InflectorTest extends \lithium\test\Unit {
 	 *
 	 * @return void
 	 */
-	public function testVariableNaming() {
+	public function testCamelize() {
+		$this->assertEqual(Inflector::camelize('test-field'), 'TestField');
 		$this->assertEqual(Inflector::camelize('test_field'), 'TestField');
 		$this->assertEqual(Inflector::camelize('test_fieLd', false), 'testFieLd');
 		$this->assertEqual(Inflector::camelize('test field', false), 'testField');
@@ -251,7 +256,7 @@ class InflectorTest extends \lithium\test\Unit {
 	 *
 	 * @return void
 	 */
-	public function testClassNaming() {
+	public function testClassify() {
 		$this->assertEqual(Inflector::classify('artists_genres'), 'ArtistsGenre');
 		$this->assertEqual(Inflector::classify('file_systems'), 'FileSystem');
 		$this->assertEqual(Inflector::classify('news'), 'News');
@@ -262,7 +267,7 @@ class InflectorTest extends \lithium\test\Unit {
 	 *
 	 * @return void
 	 */
-	public function testTableNaming() {
+	public function testTabelize() {
 		$this->assertEqual(Inflector::tableize('ArtistsGenre'), 'artists_genres');
 		$this->assertEqual(Inflector::tableize('FileSystem'), 'file_systems');
 		$this->assertEqual(Inflector::tableize('News'), 'news');
@@ -273,7 +278,7 @@ class InflectorTest extends \lithium\test\Unit {
 	 *
 	 * @return void
 	 */
-	public function testHumanization() {
+	public function testHumanize() {
 		$this->assertEqual(Inflector::humanize('posts'), 'Posts');
 		$this->assertEqual(Inflector::humanize('posts_tags'), 'Posts Tags');
 		$this->assertEqual(Inflector::humanize('file_systems'), 'File Systems');
