@@ -27,7 +27,7 @@ class MockCommandHelp extends \lithium\console\Command {
 	 * @var boolean
 	 */
 	public $s = true;
-	
+
 	/**
 	 * Don't show this.
 	 *
@@ -64,17 +64,17 @@ class MockCommandHelp extends \lithium\console\Command {
 	 * @param string $arg2
 	 * @return boolean
 	 */
-	public function sampleTaskWithOptionalArgs($arg1 = null, $arg2 = nill) {
+	public function sampleTaskWithOptionalArgs($arg1 = null, $arg2 = null) {
 		return true;
 	}
-	
+
 	/**
 	 * Don't show in the help
 	 *
 	 * @return void
 	 */
 	protected function _sampleHelper() {
-		
+
 	}
 }
 

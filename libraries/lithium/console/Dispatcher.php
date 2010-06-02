@@ -8,9 +8,7 @@
 
 namespace lithium\console;
 
-use \lithium\util\String;
 use \lithium\core\Libraries;
-use \lithium\util\Inflector;
 use \UnexpectedValueException;
 
 /**
@@ -51,7 +49,8 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @see lithium\util\String::insert()
 	 */
 	protected static $_rules = array(
-		//'plugin' => array('command' => '{:plugin}.{:command}')
+		'command' => array(array('\lithium\util\Inflector', 'camelize')),
+		'action' => array(array('\lithium\util\Inflector', 'camelize', array(false)))
 	);
 
 	/**
@@ -91,12 +90,14 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$method = __FUNCTION__;
 
 		return static::_filter($method, $params, function($self, $params, $chain) use ($classes) {
-			extract($params);
+			$request = $params['request'];
+			$options = $params['options'];
 
 			$router = $classes['router'];
 			$request = $request ?: new $classes['request']($options['request']);
 			$request->params = $router::parse($request);
-			$params = $request->params;
+
+			$params = $self::invokeMethod('_applyRules', array($request->params));
 
 			try {
 				$callable = $self::invokeMethod('_callable', array($request, $params, $options));
@@ -108,28 +109,25 @@ class Dispatcher extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Determines Command to use for current request. If
+	 * Determines Command to use for current request.
 	 *
 	 * @param string $request
 	 * @param string $params
 	 * @param string $options
-	 * @return class \lithium\console\COmmand
+	 * @return class \lithium\console\Command
 	 */
 	protected static function _callable($request, $params, $options) {
 		$params = compact('request', 'params', 'options');
 		return static::_filter(__FUNCTION__, $params, function($self, $params, $chain) {
-			extract($params, EXTR_OVERWRITE);
-			$name = $class = $params['command'];
+			$request = $params['request'];
+			$params = $params['params'];
+			$name = $params['command'];
 
 			if (!$name) {
 				$request->params['args'][0] = $name;
-				$name = $class = '\lithium\console\command\Help';
+				$name = '\lithium\console\command\Help';
 			}
-			if ($class[0] !== '\\') {
-				$name = Inflector::camelize($class);
-				$class = Libraries::locate('command', $name);
-			}
-
+			$class = Libraries::locate('command', $name);
 			if (class_exists($class)) {
 				return new $class(compact('request'));
 			}
@@ -150,23 +148,52 @@ class Dispatcher extends \lithium\core\StaticObject {
 		return static::_filter(__FUNCTION__, $params, function($self, $params, $chain) {
 			if (is_callable($callable = $params['callable'])) {
 				$request = $params['request'];
+				$params = $params['params'];
 
-				if (!method_exists($callable, $request->params['action'])) {
-					array_unshift($request->params['args'], $request->params['action']);
-					$request->params['action'] = 'run';
+				if (!method_exists($callable, $params['action'])) {
+					array_unshift($params['args'], $request->params['action']);
+					$params['action'] = 'run';
 				}
 				$isHelp = (
-					!empty($request->params['help']) || !empty($request->params['h'])
-					|| !method_exists($callable, $request->params['action'])
+					!empty($params['help']) || !empty($params['h'])
+					|| !method_exists($callable, $params['action'])
 				);
 				if ($isHelp) {
-
-					$request->params['action'] = '_help';
+					$params['action'] = '_help';
 				}
-				return $callable($request->params['action'], $request->params['args']);
+				return $callable($params['action'], $params['args']);
 			}
 			throw new UnexpectedValueException("{$callable} not callable");
 		});
+	}
+
+	/**
+	 * Attempts to apply a set of formatting rules from `$_rules` to a `$params` array, where each
+	 * formatting rule is applied if the key of the rule in `$_rules` is present and not empty in
+	 * `$params`.  Also performs sanity checking against `$params` to ensure that no value
+	 * matching a rule is present unless the rule check passes.
+	 *
+	 * @param array $params An array of route parameters to which rules will be applied.
+	 * @return array Returns the `$params` array with formatting rules applied to array values.
+	 */
+	protected static function _applyRules($params) {
+		$result = array();
+
+		if (!$params) {
+			return false;
+		}
+
+		foreach (static::$_rules as $name => $rules) {
+			foreach ($rules as $rule) {
+				if (!empty($params[$name]) && isset($rule[0])) {
+					$options = array_merge(
+						array($params[$name]), isset($rule[2]) ? (array) $rule[2] : array()
+					);
+					$result[$name] = call_user_func_array(array($rule[0], $rule[1]), $options);
+				}
+			}
+		}
+		return $result + array_diff_key($params, $result);
 	}
 }
 

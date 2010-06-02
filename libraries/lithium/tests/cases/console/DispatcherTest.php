@@ -26,7 +26,10 @@ class DispatcherTest extends \lithium\test\Unit {
 
 	public function testEmptyConfigReturnRules() {
 		$result = Dispatcher::config();
-		$expected = array('rules' => array());
+		$expected = array('rules' => array(
+			'command' => array(array('\lithium\util\Inflector', 'camelize')),
+			'action' => array(array('\lithium\util\Inflector', 'camelize', array(false)))
+		));
 		$this->assertEqual($expected, $result);
 	}
 
@@ -91,6 +94,41 @@ class DispatcherTest extends \lithium\test\Unit {
 		)));
 
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testRunWithCamelizingCommand() {
+		$expected = (object) array('status' => "Command `FooBar` not found\n");
+		$result = Dispatcher::run(new Request(array(
+			'args' => array(
+				'foo-bar',
+			)
+		)));
+		$this->assertEqual($expected, $result);
+
+		$expected = (object) array('status' => "Command `FooBar` not found\n");
+		$result = Dispatcher::run(new Request(array(
+			'args' => array(
+				'foo_bar',
+			)
+		)));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testRunWithCamelizingAction() {
+		$result = Dispatcher::run(new Request(array(
+			'args' => array(
+				'\lithium\tests\mocks\console\command\MockCommandHelp',
+				'sample-task-with-required-args'
+			)
+		)));
+
+		$result = Dispatcher::run(new Request(array(
+			'args' => array(
+				'\lithium\tests\mocks\console\command\MockCommandHelp',
+				'sample_task_with_optional_args'
+			)
+		)));
+		$this->assertTrue($result === true);
 	}
 }
 
