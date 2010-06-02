@@ -321,6 +321,7 @@ class Validator extends \lithium\core\StaticObject {
 	 * 	array('notEmpty', 'message' => 'You must include credit card number'),
 	 * 	array('creditCard', 'message' => 'Your credit card number must be valid')
 	 * ));`
+	 * @param array $options Validator-specific options.
 	 *
 	 * Each rule defined as an array can contain any of the following settings (in addition to the
 	 * first value, which represents the rule to be used):
@@ -415,12 +416,13 @@ class Validator extends \lithium\core\StaticObject {
 	 * 	- `$value` _mixed_: This is the actual value to be validated (as in the above example).
 	 * 	- `$format` _string_: Often, validation rules come in multiple "formats", for example:
 	 * 	  postal codes, which vary by country or region. Defining multiple formats allows you to
-	 * 	  retian flexibility in how you validate data. In cases where a user's country of origin is
-	 * 	  known, the appropriate validation rule may be selected. In cases where it is not known,
-	 * 	  the value of `$format` may be `'any'`, which should pass if any format matches. In cases
-	 * 	  where validation rule formats are not mutually exclusive, the value may be `'all'`, in
-	 * 	  which case all must match.
-	 * 	- `$options` _array_: This parameter allows a validation rule to implement custom options.
+	 * 	  retian flexibility in how you validate data. In cases where a user's country of origin
+	 * 	  is known, the appropriate validation rule may be selected. In cases where it is not
+	 * 	  known, the value of `$format` may be `'any'`, which should pass if any format matches.
+	 * 	  In cases where validation rule formats are not mutually exclusive, the value may be
+	 * 	  `'all'`, in which case all must match.
+	 * 	- `$options` _array_: This parameter allows a validation rule to implement custom
+	 * 	  options.
 	 *
 	 * @see lithium\util\Validator::$_rules
 	 * @param mixed $name The name of the validation rule (string), or an array of key/value pairs
