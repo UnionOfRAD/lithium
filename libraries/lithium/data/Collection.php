@@ -151,11 +151,10 @@ abstract class Collection extends \lithium\util\Collection {
 
 	/**
 	 * Returns a boolean indicating whether an offset exists for the 
-	 * current `Document`.
+	 * current `Collection`.
 	 *
 	 * @param string $offset String or integer indicating the offset or 
-	 *               index of a document in a set, or the name of a field in an
-	 *               individual document.
+	 *               index of an entity in the set.
 	 * @return boolean Result.
 	 */
 	public function offsetExists($offset) {
@@ -259,7 +258,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 *         freed, otherwise returns false.
 	 */
 	public function closed() {
-		return (empty($this->_result) || !isset($this->_handle) || empty($this->_handle));
+		return (empty($this->_result) && !isset($this->_handle) && empty($this->_handle));
 	}
 
 	/**
