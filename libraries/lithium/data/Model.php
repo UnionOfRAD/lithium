@@ -519,7 +519,7 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * If no values supplied, returns the name of the `Model` key. If values 
+	 * If no values supplied, returns the name of the `Model` key. If values
 	 * are supplied, returns the key value.
 	 *
 	 * @param array $values An array of values.
@@ -544,7 +544,7 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Returns a list of models related to `Model`, or a list of models related
 	 * to this model, but of a certain type.
-	 * 
+	 *
 	 * @param string $name A type of model relation.
 	 * @return array An array of relation types.
 	 */
@@ -683,8 +683,13 @@ class Model extends \lithium\core\StaticObject {
 				$record->set($params['data']);
 			}
 
-			if ($options['validate'] && !$record->validates()) {
-				return false;
+			if ($options['validate']) {
+				$validationOptions = array();
+
+				if (is_array($options['validate'])) {
+					$validationOptions = array('rules' => $options['validate']);
+				}
+				return $record->validates($validationOptions);
 			}
 
 			$type = $record->exists() ? 'update' : 'create';
@@ -700,7 +705,7 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Indicates whether the `Model`'s current data validates, given the 
+	 * Indicates whether the `Model`'s current data validates, given the
 	 * current rules setup.
 	 *
 	 * @param string $record Model record to validate.
@@ -708,14 +713,18 @@ class Model extends \lithium\core\StaticObject {
 	 * @return boolean Success.
 	 */
 	public function validates($record, array $options = array()) {
+		$defaults = array('rules' => $this->validates);
+		$options += $defaults;
 		$self = static::_instance();
 		$validator = $self->_classes['validator'];
 		$params = compact('record', 'options');
 
 		$filter = function($parent, $params) use (&$self, $validator) {
 			extract($params);
+			$rules = $options['rules'];
+			unset ($options['rules']);
 
-			if ($errors = $validator::check($record->data(), $self->validates, $options)) {
+			if ($errors = $validator::check($record->data(), $rules, $options)) {
 				$record->errors($errors);
 			}
 			return empty($errors);

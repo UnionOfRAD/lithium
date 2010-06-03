@@ -313,6 +313,22 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertTrue(empty($result));
 	}
 
+	public function testCustomValidationCriteria() {
+		$validates = array(
+			'title' => 'A custom message here for empty titles.',
+			'email' => array(
+				array('notEmpty', 'message' => 'email is empty.'),
+			)
+		);
+		$post = MockPostForValidates::create(array(
+			'title' => 'custom validation', 'email' => 'asdf'
+		));
+
+		$result = $post->validates(array('rules' => $validates));
+		$this->assertTrue($result === true);
+		$this->assertIdentical(array(), $post->errors());
+	}
+
 	public function testDefaultValuesFromSchema() {
 		$creator = MockCreator::create();
 		$expected = array(
