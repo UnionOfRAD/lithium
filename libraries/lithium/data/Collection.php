@@ -258,7 +258,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 *         freed, otherwise returns false.
 	 */
 	public function closed() {
-		return (empty($this->_result) && !isset($this->_handle) && empty($this->_handle));
+		return (empty($this->_result) && (!isset($this->_handle) || empty($this->_handle)));
 	}
 
 	/**
