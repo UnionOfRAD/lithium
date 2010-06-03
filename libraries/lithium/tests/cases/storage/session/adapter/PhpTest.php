@@ -63,7 +63,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertEqual(end($path), $result);
 
 		$result = ini_get('session.cookie_lifetime');
-		$this->assertEqual(strtotime('+1 day') - time(), (integer) $result);
+		$this->assertEqual(0, (integer) $result);
 	}
 
 	public function testCustomConfiguration() {
