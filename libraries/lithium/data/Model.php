@@ -623,7 +623,7 @@ class Model extends \lithium\core\StaticObject {
 
 	/**
 	 * An instance method (called on record and document objects) to create or update the record or
-	 * document in the database that corresponds to `$record`. For example:
+	 * document in the database that corresponds to `$entity`. For example:
 	 * {{{
 	 * $post = Post::create();
 	 * $post->title = "My post";
@@ -670,14 +670,12 @@ class Model extends \lithium\core\StaticObject {
 				$entity->set($params['data']);
 			}
 
-			if ($options['validate']) {
-				$validationOptions = array();
-
-				if (is_array($options['validate'])) {
-					$validationOptions = array('rules' => $options['validate']);
+			if ($rules = $options['validate']) {
+				if (!$entity->validates(is_array($rules) ? compact('rules') : array())) {
+					return false;
 				}
-				return $record->validates($validationOptions);
 			}
+
 			if ($options['whitelist'] || $options['locked']) {
 				$whitelist = $options['whitelist'] ?: array_keys($_schema);
 			}
@@ -688,7 +686,7 @@ class Model extends \lithium\core\StaticObject {
 		};
 
 		if (!$options['callbacks']) {
-			return $filter($record, $options);
+			return $filter($entity, $options);
 		}
 		return static::_filter(__FUNCTION__, $params, $filter);
 	}
@@ -701,7 +699,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @param array $options Options.
 	 * @return boolean Success.
 	 */
-	public function validates($record, array $options = array()) {
+	public function validates($entity, array $options = array()) {
 		$defaults = array('rules' => $this->validates);
 		$options += $defaults;
 		$self = static::_instance();
@@ -713,8 +711,8 @@ class Model extends \lithium\core\StaticObject {
 			$rules = $options['rules'];
 			unset ($options['rules']);
 
-			if ($errors = $validator::check($record->data(), $rules, $options)) {
-				$record->errors($errors);
+			if ($errors = $validator::check($entity->data(), $rules, $options)) {
+				$entity->errors($errors);
 			}
 			return empty($errors);
 		};
@@ -935,8 +933,8 @@ class Model extends \lithium\core\StaticObject {
 				$meta = $self::meta();
 
 				array_map(
-					function($record) use (&$result, $meta) {
-						$result[$record->{$meta['key']}] = $record->{$meta['title']};
+					function($entity) use (&$result, $meta) {
+						$result[$entity->{$meta['key']}] = $entity->{$meta['title']};
 					},
 					$chain->next($self, $params, $chain)
 				);

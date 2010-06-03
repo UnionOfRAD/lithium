@@ -410,6 +410,16 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual('lithium\tests\mocks\data\MockPost', $result['query']->model());
 	}
 
+	public function testSaveWithFailedValidation() {
+		$data = array('title' => '', 'author_id' => 13);
+		$record = MockPost::create($data);
+		$result = $record->save(null, array('validate' => array(
+			'title' => 'A title must be present'
+		)));
+
+		$this->assertIdentical(false, $result);
+	}
+
 	public function testImplicitKeyFind() {
 		$result = MockPost::find(10);
 		$this->assertEqual('read', $result['query']->type());
