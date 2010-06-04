@@ -229,8 +229,15 @@ class MongoDb extends \lithium\data\Source {
 	 * @return array Returns an array of objects to which models can connect.
 	 */
 	public function entities($class = null) {
-		$db = $this->connection;
-		return array_map(function($col) { return $col->getName(); }, $db->listCollections());
+		if(!$this->_isConnected && !$this->connect()) {
+			throw new Exception("Could not connect to the database.");
+		}
+		return array_map(
+			function($col) {
+				return $col->getName();
+			},
+			$this->connection->listCollections()
+		);
 	}
 
 	/**
@@ -280,8 +287,8 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	/**
-	 * Normally used in cases where the query is a raw string (as opposed to a `Query` object), 
-	 * to database must determine the correct column names from the result resource. Not 
+	 * Normally used in cases where the query is a raw string (as opposed to a `Query` object),
+	 * to database must determine the correct column names from the result resource. Not
 	 * applicable to this data source.
 	 *
 	 * @param mixed $query
@@ -301,6 +308,9 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean
 	 */
 	public function create($query, array $options = array()) {
+		if(!$this->_isConnected && !$this->connect()) {
+			throw new Exception("Could not connect to the database.");
+		}
 		$params = compact('query', 'options');
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) {
@@ -328,6 +338,9 @@ class MongoDb extends \lithium\data\Source {
 	 * @return object
 	 */
 	public function read($query, array $options = array()) {
+		if(!$this->_isConnected && !$this->connect()) {
+			throw new Exception("Could not connect to the database.");
+		}
 		$defaults = array('return' => 'resource', 'model' => null);
 		$options += $defaults;
 		$params = compact('query', 'options');
@@ -371,6 +384,10 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean
 	 */
 	public function update($query, array $options = array()) {
+		if(!$this->_isConnected && !$this->connect()) {
+			throw new Exception("Could not connect to the database.");
+		}
+
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
 			$query = $params['query'];
 			$options = $params['options'];
@@ -394,6 +411,10 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean
 	 */
 	public function delete($query, array $options = array()) {
+		if(!$this->_isConnected && !$this->connect()) {
+			throw new Exception("Could not connect to the database.");
+		}
+
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
 			$query = $params['query'];
 			$options = $params['options'];

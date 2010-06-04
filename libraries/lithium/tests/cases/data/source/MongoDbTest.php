@@ -16,7 +16,8 @@ use \lithium\data\Model;
 use \lithium\data\Connections;
 use \lithium\data\model\Query;
 use \lithium\data\entity\Document;
-use lithium\tests\mocks\data\MockPost;
+use \lithium\tests\mocks\data\MockPost;
+use \lithium\tests\mocks\data\source\MockMongoConnection;
 
 class MongoDbTest extends \lithium\test\Unit {
 
@@ -394,6 +395,36 @@ class MongoDbTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result->data());
 		Connections::config(array('mock-source' => false));
+	}
+
+	public function testCreateNoConnectionException() {
+		$db = new MockMongoConnection($this->_testConfig + array('autoConnect' => false));
+		$this->expectException('Could not connect to the database.');
+		$result = $db->create(null);
+	}
+
+	public function testReadNoConnectionException() {
+		$db = new MockMongoConnection($this->_testConfig + array('autoConnect' => false));
+		$this->expectException('Could not connect to the database.');
+		$result = $db->read(null);
+	}
+
+	public function testUpdateNoConnectionException() {
+		$db = new MockMongoConnection($this->_testConfig + array('autoConnect' => false));
+		$this->expectException('Could not connect to the database.');
+		$result = $db->update(null);
+	}
+
+	public function testDeleteNoConnectionException() {
+		$db = new MockMongoConnection($this->_testConfig + array('autoConnect' => false));
+		$this->expectException('Could not connect to the database.');
+		$result = $db->delete(null);
+	}
+
+	public function testEntitiesNoConnectionException() {
+		$db = new MockMongoConnection($this->_testConfig + array('autoConnect' => false));
+		$this->expectException('Could not connect to the database.');
+		$result = $db->entities(null);
 	}
 }
 
