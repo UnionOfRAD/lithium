@@ -120,6 +120,9 @@ class Media extends \lithium\core\StaticObject {
 	 * Media::type('text/javascript'); // also returns 'javascript'
 	 * }}}
 	 *
+	 * @see lithium\net\http\Media::$_types
+	 * @see lithium\net\http\Media::$_handlers
+	 * @see lithium\util\String::insert()
 	 * @param string $type A file extension for the type, i.e. `'txt'`, `'js'`, or `'atom'`.
 	 *               Alternatively, may be a content type, i.e. `'text/html'`,
 	 *               `'application/atom+xml'`, etc.; in which case, the type name (i.e. '`html'` or
@@ -144,9 +147,6 @@ class Media extends \lithium\core\StaticObject {
 	 *         `$type` (can be a string or array, if multiple content-types are available), and
 	 *         `'options'` is the array of options which define how this content-type should be
 	 *         handled.  If `$content` or `$options` are non-empty, returns `null`.
-	 * @see lithium\net\http\Media::$_types
-	 * @see lithium\net\http\Media::$_handlers
-	 * @see lithium\util\String::insert()
 	 */
 	public static function type($type, $content = null, array $options = array()) {
 		$defaults = array(
@@ -176,6 +176,7 @@ class Media extends \lithium\core\StaticObject {
 	/**
 	 * Gets or sets options for various asset types.
 	 *
+	 * @see lithium\util\String::insert()
 	 * @param string $type The name of the asset type, i.e. `'js'` or `'css'`.
 	 * @param array $options If registering a new asset type or modifying an existing asset type,
 	 *        contains settings for the asset type, where the available keys are as follows:
@@ -190,7 +191,6 @@ class Media extends \lithium\core\StaticObject {
 	 *         associated options is returned. If `$type` is a string and `$options` is empty,
 	 *         returns an associative array with the options for `$type`. If `$type` and `$options`
 	 *         are both non-empty, returns `null`.
-	 * @see lithium\util\String::insert()
 	 */
 	public static function assets($type = null, $options = array()) {
 		$defaults = array('suffix' => null, 'filter' => null, 'path' => array());
@@ -216,6 +216,8 @@ class Media extends \lithium\core\StaticObject {
 	 * Calculates the web-accessible path to a static asset, usually a JavaScript, CSS or image
 	 * file.
 	 *
+	 * @see lithium\net\http\Media::$_assets
+	 * @see lithium\action\Request::env()
 	 * @param string $path The path to the asset, relative to the given `$type`s path and without a
 	 *        suffix. If the path contains a URI Scheme (eg. `http://`), no path munging will occur.
 	 * @param string $type The asset type. See `Media::$_assets` or `Media::assets()`.
@@ -239,10 +241,7 @@ class Media extends \lithium\core\StaticObject {
 	 *         for the asset's existence (`$options['check']`), returns `false` if it does not exist
 	 *         in your `/webroot` directory, or the `/webroot` directories of one of your included
 	 *         plugins.
-	 * @see lithium\net\http\Media::$_assets
-	 * @see lithium\net\http\Media::assets()
-	 * @see lithium\action\Request::env()
-	 * @filter This method can be filtered.
+	 * @filter
 	 */
 	public static function asset($path, $type, array $options = array()) {
 		$defaults = array(
@@ -517,7 +516,7 @@ class Media extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Helper method for listing registered media types. Returns all types, or a single 
+	 * Helper method for listing registered media types. Returns all types, or a single
 	 * content type if a specific type is specified.
 	 *
 	 * @param string $type Type to return.
