@@ -51,9 +51,7 @@ class ControllerTest extends \lithium\test\Unit {
 
 		$postsController = new MockPostsController();
 		$this->expectException('/Unhandled media type/');
-		$result = $postsController->__invoke(null, array(
-			'action' => 'index', 'args' => array(true)
-		));
+		$result = $postsController(null, array('action' => 'index', 'args' => array(true)));
 
 		$this->assertTrue(is_a($result, 'lithium\action\Response'));
 		$this->assertEqual($result->body, '');
@@ -86,7 +84,7 @@ class ControllerTest extends \lithium\test\Unit {
 	public function testRedirectResponse() {
 		$postsController = new MockPostsController();
 
-		$result = $postsController->__invoke(null, array('action' => 'delete'));
+		$result = $postsController(null, array('action' => 'delete'));
 		$this->assertEqual($result->body(), '');
 
 		$headers = array('Location' => '/posts');
@@ -182,7 +180,7 @@ class ControllerTest extends \lithium\test\Unit {
 		)));
 		$this->assertFalse($postsController->stopped);
 
-		$postsController->__invoke(null, array('action' => 'not_found'));
+		$postsController(null, array('action' => 'not_found'));
 
 		$result = $postsController->access('_render');
 		$this->assertTrue($result['hasRendered']);
@@ -195,7 +193,8 @@ class ControllerTest extends \lithium\test\Unit {
 	}
 
 	public function testResponseTypeBasedOnRequestType() {
-		$request = new MockControllerRequest(array('type' => 'json'));
+		$request = new MockControllerRequest();
+		$request->params['type'] = 'json';
 
 		$postsController = new MockPostsController(array(
 			'request' => $request,
@@ -205,7 +204,7 @@ class ControllerTest extends \lithium\test\Unit {
 		));
 		$this->assertFalse($postsController->stopped);
 
-		$postsController->__invoke($request, array('action' => 'type'));
+		$postsController($request, array('action' => 'type'));
 
 		$expected = array(
 			'type' => 'json', 'data' => array('data' => 'test'), 'auto' => true,
@@ -269,19 +268,17 @@ class ControllerTest extends \lithium\test\Unit {
 	}
 
 	public function testResponseTypeBasedOnRequestHeaderType() {
-		$request = new MockControllerRequest(array('env' => array(
-			'CONTENT_TYPE' => 'application/json')
+		$request = new MockControllerRequest(array(
+			'env' => array('HTTP_ACCEPT' => 'application/json,*/*')
 		));
 
 		$postsController = new MockPostsController(array(
 			'request' => $request,
-			'classes' => array(
-				'response' => '\lithium\tests\mocks\action\MockControllerResponse'
-			)
+			'classes' => array('response' => '\lithium\tests\mocks\action\MockControllerResponse')
 		));
 		$this->assertFalse($postsController->stopped);
 
-		$postsController->__invoke($request, array('action' => 'type'));
+		$postsController($request, array('action' => 'type'));
 
 		$expected = array(
 			'type' => 'json', 'data' => array('data' => 'test'), 'auto' => true,
@@ -298,10 +295,6 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = json_decode($postsController->response->body(), true);
 		$this->assertEqual($expected, $result);
 	}
-
-	// public function methods() {
-	// 	return array('testDispatchingWithExplicitControllerName');
-	// }
 
 	/**
 	 * Tests that requests which are dispotched with the controller route parameter specified as

@@ -76,8 +76,7 @@ class MediaTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testContentTypeDetection() {
-		$result = Media::type('application/foo');
-		$this->assertNull($result['content']);
+		$this->assertNull(Media::type('application/foo'));
 
 		$result = Media::type('application/javascript');
 		$this->assertEqual('js', $result['content']);

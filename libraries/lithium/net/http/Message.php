@@ -125,7 +125,10 @@ class Message extends \lithium\core\Object {
 		if (strpos($type, '/')) {
 			$media = $this->_classes['media'];
 			$data = $media::type($type);
-			$type = $data['content'];
+
+			if (isset($data['content'])) {
+				$type = $data['content'];
+			}
 		}
 		return $this->_type = $type;
 	}

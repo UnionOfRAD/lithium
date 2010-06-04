@@ -312,7 +312,24 @@ class Request extends \lithium\net\http\Message {
 	 *         a fully-qualified content-type if not (i.e. `'image/jpeg'`).
 	 */
 	public function accepts() {
-		return isset($this->params['type']) ? $this->params['type'] : 'html';
+		if (isset($this->params['type'])) {
+			return $this->params['type'];
+		}
+		if (!(($accept = $this->env('HTTP_ACCEPT')) && strpos($accept, ',') !== false)) {
+			return 'html';
+		}
+		$media = $this->_classes['media'];
+		$accept = explode(',', $accept);
+
+		if ($accept[0] == 'application/xml' && in_array('application/xhtml+xml', $accept)) {
+			unset($accept[0]);
+		}
+
+		foreach ($accept as $type) {
+			if ($result = $media::type($type)) {
+				return $result['content'];
+			}
+		}
 	}
 
 	/**

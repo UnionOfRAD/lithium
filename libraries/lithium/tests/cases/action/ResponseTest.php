@@ -20,6 +20,11 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->response = new MockResponse(array('init' => false));
 	}
 
+	public function testDefaultTypeInitialization() {
+		$response = new Response(array('request' => new MockRequestType()));
+		$this->assertEqual('foo', $response->type());
+	}
+
 	public function testTypeManipulation() {
 		$this->assertEqual('html', $this->response->type());
 		$this->assertEqual('html', $this->response->type('html'));
