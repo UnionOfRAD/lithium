@@ -117,7 +117,7 @@ class Group extends \lithium\util\Collection {
 		return (array) Libraries::find($library, array(
 			'recursive' => true,
 			'path' => '/' . str_replace('\\', '/', $path),
-			'filter' => '/cases|intergration|functional/'
+			'filter' => '/cases|integration|functional/'
 		));
 	}
 }
