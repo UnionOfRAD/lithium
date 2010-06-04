@@ -926,7 +926,8 @@ class Model extends \lithium\core\StaticObject {
 			'first' => function($self, $params, $chain) {
 				$params['options']['limit'] = 1;
 				$data = $chain->next($self, $params, $chain);
-				return is_object($data) ? $data->rewind() : $data;
+				$data = is_object($data) ? $data->rewind() : $data;
+				return $data ?: null;
 			},
 			'list' => function($self, $params, $chain) {
 				$result = array();

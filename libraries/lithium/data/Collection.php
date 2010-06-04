@@ -178,6 +178,7 @@ abstract class Collection extends \lithium\util\Collection {
 				return $entity;
 			}
 		}
+		return current($this->_data);
 	}
 
 	/**
