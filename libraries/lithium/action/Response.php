@@ -25,8 +25,8 @@ class Response extends \lithium\net\http\Response {
 
 	/**
 	 * Classes used by Response.
-	 * 
-	 * @var array 
+	 *
+	 * @var array
 	 */
 	protected $_classes = array('router' => '\lithium\net\http\Router');
 
@@ -42,7 +42,7 @@ class Response extends \lithium\net\http\Response {
 		unset($this->_config['status']);
 
 		if ($this->_config['request'] && is_object($this->_config['request'])) {
-			$this->type = $this->_config['request']->type();
+			$this->_type = $this->_config['request']->type();
 		}
 		if ($this->_config['location']) {
 			$router = $this->_classes['router'];
@@ -50,19 +50,6 @@ class Response extends \lithium\net\http\Response {
 			$this->headers('location', $location);
 		}
 		parent::_init();
-	}
-
-	/**
-	 * Content Type.
-	 *
-	 * @param string $type
-	 * @return string
-	 */
-	public function type($type = null) {
-		if ($type !== null) {
-			return $this->type = $type;
-		}
-		return $this->type;
 	}
 
 	/**
@@ -113,6 +100,9 @@ class Response extends \lithium\net\http\Response {
 			} elseif (!is_numeric($name)) {
 				$this->_writeHeader("{$name}: {$value}");
 			}
+		}
+		if ($code == 302 || $code == 204) {
+			return;
 		}
 		$chunked = str_split(join("\r\n", (array) $this->body), $this->_config['buffer']);
 

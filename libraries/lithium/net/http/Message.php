@@ -43,6 +43,20 @@ class Message extends \lithium\core\Object {
 	public $body = array();
 
 	/**
+	 * Content-Type
+	 *
+	 * @var string
+	 */
+	protected $_type = 'html';
+
+	/**
+	 * Classes used by `Request`.
+	 *
+	 * @var array
+	 */
+	protected $_classes = array('media' => '\lithium\net\http\Media');
+
+	/**
 	 * Add a header to rendered output, or return a single header or full header list.
 	 *
 	 * @param string $key
@@ -90,6 +104,25 @@ class Message extends \lithium\core\Object {
 	public function body($data = null) {
 		$this->body = array_merge((array) $this->body, (array) $data);
 		return trim(join("\r\n", $this->body));
+	}
+
+	/**
+	 * Sets/Gets the content type
+	 *
+	 * @param string $type a full content type i.e. `'application/json'` or simple name `'json'`
+	 * @return string A simple content type name, i.e. `'html'`, `'xml'`, `'json'`, etc., depending
+	 *         on the content type of the request.
+	 */
+	public function type($type = null) {
+		if ($type === null) {
+			return $this->_type;
+		}
+		if (strpos($type, '/')) {
+			$media = $this->_classes['media'];
+			$data = $media::type($type);
+			$type = $data['content'];
+		}
+		return $this->_type = $type;
 	}
 }
 

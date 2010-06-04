@@ -24,7 +24,7 @@ use \lithium\util\Validator;
  * @see lithium\net\http\Route
  * @see lithium\action\Request::__get()
  */
-class Request extends \lithium\core\Object {
+class Request extends \lithium\net\http\Message {
 
 	/**
 	 * Current url of request.
@@ -75,14 +75,6 @@ class Request extends \lithium\core\Object {
 	 * @see lithium\action\Request::env()
 	 */
 	protected $_env = array();
-
-	/**
-	 * Request type.
-	 *
-	 * @see lithium\action\Request::$_detectors
-	 * @var string
-	 */
-	protected $_type = null;
 
 	/**
 	 * Classes used by `Request`.
@@ -191,13 +183,13 @@ class Request extends \lithium\core\Object {
 		}
 
 		$method = strtoupper($this->_env['REQUEST_METHOD']);
-		$media = $this->_classes['media'];
 
 		if (($method == 'POST' || $method == 'PUT') && !$this->data) {
 			$type = $this->type();
 
-			if ($type && $type != 'html') {
+			if ($type && $type !== 'html') {
 				$this->_stream = $this->_stream ?: fopen('php://input', 'r');
+				$media = $this->_classes['media'];
 				$this->data = (array) $media::decode($type, stream_get_contents($this->_stream));
 				fclose($this->_stream);
 			}
@@ -363,29 +355,22 @@ class Request extends \lithium\core\Object {
 	}
 
 	/**
-	 * Returns the content type of the response.
+	 * Sets/Gets the content type. If `'type'` is null, the method will attempt to determine the
+	 * type first, from the params, then from the environment setting
 	 *
-	 * @param boolean $raw If true, returns the full type (e.g. `application/json; charset=UTF-8`).
-	 *        If false, returns the reduced type, e.g. `json`.
+	 * @param string $type a full content type i.e. `'application/json'` or simple name `'json'`
 	 * @return string A simple content type name, i.e. `'html'`, `'xml'`, `'json'`, etc., depending
 	 *         on the content type of the request.
 	 */
-	public function type($raw = false) {
-		if (!$raw && $this->_type) {
-			return $this->_type;
-		}
-		if ($raw && $this->_rawType) {
-			return $this->_rawType;
-		}
-		$media = $this->_classes['media'];
-		$this->_rawType = $this->env('CONTENT_TYPE') ?: 'text/html';
+	public function type($type = null) {
+		if ($type === null) {
+			$type = $this->type;
 
-		if (!empty($this->params['type'])) {
-			$this->_type = $this->params['type'];
-		} else {
-			$this->_type = $media::type($this->_rawType);
+			if (empty($type)) {
+				$type = $this->env('CONTENT_TYPE');
+			}
 		}
-		return $raw ? $this->_rawType : $this->_type;
+		return parent::type($type);
 	}
 
 	/**

@@ -295,13 +295,13 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testType() {
 		$request = new Request();
-		$this->assertEqual('text/html', $request->type(true));
+		$this->assertEqual('html', $request->type());
 
 		$request = new Request(array('env' => array(
 			'CONTENT_TYPE' => 'application/json; charset=UTF-8',
 			'REQUEST_METHOD' => 'POST'
 		)));
-		$this->assertEqual('application/json; charset=UTF-8', $request->type(true));
+		$this->assertEqual('application/json; charset=UTF-8', $request->env('CONTENT_TYPE'));
 		$this->assertEqual('json', $request->type());
 	}
 
@@ -829,7 +829,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testRequestTypeFromHeader() {
 		$request = new Request(array('env' => array('CONTENT_TYPE' => 'json')));
-		$this->assertEqual('json', $request->type(true));
+		$this->assertEqual('json', $request->type());
 	}
 }
 
