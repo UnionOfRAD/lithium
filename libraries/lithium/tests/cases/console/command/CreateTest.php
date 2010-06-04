@@ -103,7 +103,7 @@ class CreateTest extends \lithium\test\Unit {
 		$this->request->params += array(
 			'command' => 'create', 'action' => 'run', 'args' => array('model')
 		);
-		$create->run('model', 'Post');
+		$create->run('Model', 'Post');
 
 		$expected = 'model';
 		$result = $create->request->params['command'];
@@ -121,7 +121,7 @@ class CreateTest extends \lithium\test\Unit {
 		);
 		$create = new MockCreate(array('request' => $this->request));
 
-		$create->run('test', 'model');
+		$create->run('Test', 'model');
 
 		$expected = 'test';
 		$result = $create->request->params['command'];
@@ -138,7 +138,7 @@ class CreateTest extends \lithium\test\Unit {
 			'args' => array('test', 'something', 'Post'),
 			'library' => 'create_test'
 		);
-		$create->run('test', 'something');
+		$create->run('Test', 'something');
 
 		$expected = 'test';
 		$result = $create->request->params['command'];
