@@ -179,7 +179,7 @@ abstract class Database extends \lithium\data\Source {
 	public function value($value, array $schema = array()) {
 		if (is_array($value)) {
 			foreach ($value as $key => $val) {
-				$value[$key] = $this->value($val, $schema);
+				$value[$key] = $this->value($val, isset($schema[$key]) ? $schema[$key] : $schema);
 			}
 			return $value;
 		}
@@ -200,25 +200,34 @@ abstract class Database extends \lithium\data\Source {
 	 * Inserts a new record into the database based on a the `Query`. The record is updated
 	 * with the id of the insert.
 	 *
-	 * @param object $query A `\lithium\data\model\Query` object
-	 * @param array $options none
-	 * @return boolean
+	 * @see lithium\util\String::insert()
+	 * @param object $query An SQL query string, or `lithium\data\model\Query` object instance.
+	 * @param array $options If $query is a string, $options contains an array of bind values to be
+	 *              escaped, quoted, and inserted into `$query` using `String::insert()`.
+	 * @return boolean Returns `true` if the query succeeded, otherwise `false`.
 	 * @filter
 	 */
 	public function create($query, array $options = array()) {
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
-			$query  = $params['query'];
-			$model  = $query->model();
-			$params = $query->export($self);
-			$sql    = $self->renderCommand('create', $params, $query);
-			$id     = null;
+			$query = $params['query'];
+			$model = $entity = $object = $id = null;
 
-			if ($self->invokeMethod('_execute', array($sql))) {
-				if ($query->entity()) {
-					if (!$model::key($query->entity())) {
-						$id = $self->invokeMethod('_insertId', array($query));
+			if (is_object($query)) {
+				$object = $query;
+				$model = $query->model();
+				$params = $query->export($self);
+				$entity =& $query->entity();
+				$query = $self->renderCommand('create', $params, $query);
+			} else {
+				$query = String::insert($query, $self->value($params['options']));
+			}
+
+			if ($self->invokeMethod('_execute', array($query))) {
+				if ($entity) {
+					if (($model) && !$model::key($entity)) {
+						$id = $self->invokeMethod('_insertId', array($object));
 					}
-					$query->entity()->update($id);
+					$entity->update($id);
 				}
 				return true;
 			}
@@ -227,13 +236,14 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Reads records from a database using a `\lithium\data\model\Query` object or raw SQL string.
+	 * Reads records from a database using a `lithium\data\model\Query` object or raw SQL string.
 	 *
-	 * @param string|object $query `\lithium\data\model\Query` object or sql string
-	 * @param string $options
-	 *               - `return` : switch return between `'array'`, `'item'`, or `'resource'`.
-	 *               default: `item`. Requires a `Query` object
-	 * @return mixed Determined by `$options['return'].
+	 * @param string|object $query `lithium\data\model\Query` object or SQL string.
+	 * @param string $options If `$query` is a raw string, contains the values that will be escaped
+	 *               and quoted. Other options:
+	 *               - `'return'` _string_: switch return between `'array'`, `'item'`, or
+	 *                 `'resource'`; defaults to `'item'`.
+	 * @return mixed Determined by `$options['return']`.
 	 * @filter
 	 */
 	public function read($query, array $options = array()) {
@@ -242,12 +252,18 @@ abstract class Database extends \lithium\data\Source {
 
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
 			$query = $params['query'];
-			$options = $params['options'];
+			$args = $params['options'];
+			$return = $args['return'];
+			unset($args['return']);
 
-			$sql = is_string($query) ? $query : $self->renderCommand($query);
+			if (is_string($query)) {
+				$sql = String::insert($query, $self->value($args));
+			} else {
+				$sql = $self->renderCommand($query);
+			}
 			$result = $self->invokeMethod('_execute', array($sql));
 
-			switch ($options['return']) {
+			switch ($return) {
 				case 'resource':
 					return $result;
 				case 'array':
@@ -294,19 +310,26 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Deletes a record in the database based on the given `Query`.
 	 *
-	 * @param object $query A `\lithium\data\model\Query` object
-	 * @param array $options none
-	 * @return boolean
+	 * @param object $query An SQL string, or `lithium\data\model\Query` object instance.
+	 * @param array $options If `$query` is a string, `$options` is the array of quoted/escaped
+	 *              parameter values to be inserted into the query.
+	 * @return boolean Returns `true` on successful query execution (not necessarily if records are
+	 *         deleted), otherwise `false`.
 	 */
 	public function delete($query, array $options = array()) {
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
-			extract($params);
-			$data = $query->export($self);
+			$query = $params['query'];
 
-			if (!$data['conditions']) {
-				return false;
+			if (is_object($query)) {
+				$data = $query->export($self);
+
+				if (!$data['conditions']) {
+					return false;
+				}
+				$sql = $self->renderCommand('delete', $data, $query);
+			} else {
+				$sql = String::insert($query, $self->value($params['options']));
 			}
-			$sql = $self->renderCommand('delete', $data, $query);
 			return (boolean) $self->invokeMethod('_execute', array($sql));
 		});
 	}

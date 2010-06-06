@@ -326,19 +326,18 @@ class MySql extends \lithium\data\source\Database {
 		$defaults = array('buffered' => true);
 		$options += $defaults;
 
-		$conn =& $this->connection;
-		$params = compact('sql', 'options');
+		return $this->_filter(__METHOD__, compact('sql', 'options'), function($self, $params) {
+			$sql = $params['sql'];
+			$options = $params['options'];
 
-		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use (&$conn) {
-			extract($params);
 			$func = ($options['buffered']) ? 'mysql_query' : 'mysql_unbuffered_query';
-			$result = $func($sql, $conn);
+			$result = $func($sql, $self->connection);
 
-			if (!(is_resource($result) || $result === true)) {
-				list($code, $error) = $self->error();
-				throw new Exception("{$sql}: {$error}", $code);
+			if (is_resource($result) || $result === true) {
+				return $result;
 			}
-			return $result;
+			list($code, $error) = $self->error();
+			throw new Exception("{$sql}: {$error}", $code);
 		});
 	}
 
@@ -366,10 +365,7 @@ class MySql extends \lithium\data\source\Database {
 		$resource = $this->_execute('SELECT LAST_INSERT_ID() AS insertID');
 		list($id) = $this->result('next', $resource, null);
 		$this->result('close', $resource, null);
-
-		if (!empty($id) && $id !== '0') {
-			return $id;
-		}
+		return ($id && $id !== '0') ? $id : null;
 	}
 
 	/**

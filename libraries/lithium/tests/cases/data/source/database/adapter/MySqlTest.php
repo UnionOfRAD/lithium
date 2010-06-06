@@ -116,6 +116,37 @@ class MySqlTest extends \lithium\test\Unit {
 		$this->assertIdentical(array('type' => 'integer', 'length' => 11), $result);
 	}
 
+	public function testRawSqlQuerying() {
+		$this->assertTrue($this->db->create(
+			'INSERT INTO companies (name, active) VALUES (?, ?)',
+			array('Test', 1)
+		));
+
+		$result = $this->db->read('SELECT * From companies WHERE name = {:name}', array(
+			'name' => 'Test',
+			'return' => 'array'
+		));
+		$this->assertEqual(1, count($result));
+		$expected = array('id', 'name', 'active', 'created', 'modified');
+		$this->assertEqual($expected, array_keys($result[0]));
+
+		$this->assertTrue(is_numeric($result[0]['id']));
+		unset($result[0]['id']);
+
+		$expected = array('name' => 'Test', 'active' => '1', 'created' => null, 'modified' => null);
+		$this->assertIdentical($expected, $result[0]);
+
+		$this->assertTrue($this->db->delete('DELETE From companies WHERE name = {:name}', array(
+			'name' => 'Test'
+		)));
+
+		$result = $this->db->read('SELECT * From companies WHERE name = {:name}', array(
+			'name' => 'Test',
+			'return' => 'array'
+		));
+		$this->assertFalse($result);
+	}
+
 	public function testAbstractColumnResolution() {
 	}
 
