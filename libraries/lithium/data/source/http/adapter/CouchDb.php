@@ -39,7 +39,7 @@ class CouchDb extends \lithium\data\source\Http {
 	protected $_classes = array(
 		'service' => '\lithium\net\http\Service',
 		'entity' => '\lithium\data\entity\Document',
-		'set' => '\lithium\data\collection\DocumentSet'
+		'set' => '\lithium\data\collection\DocumentSet',
 	);
 
 	/**
@@ -203,6 +203,7 @@ class CouchDb extends \lithium\data\source\Http {
 			$query = $params['query'];
 			$options = $params['options'];
 			$params = $query->export($self);
+			$params['fields'] += array('rev');
 			extract($params, EXTR_OVERWRITE);
 			list($_path, $conditions) = (array) $conditions;
 

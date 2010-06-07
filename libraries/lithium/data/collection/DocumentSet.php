@@ -245,7 +245,7 @@ class DocumentSet extends \lithium\data\Collection {
 
 		if (($key || $key === 0) && $model = $this->_model) {
 			foreach ($model::relations() as $name => $relation) {
-				if ($key === $relation->data('fieldName')) {
+				if ($relation && ($key === $relation->data('fieldName'))) {
 					$model = $relation->data('to');
 					break;
 				}

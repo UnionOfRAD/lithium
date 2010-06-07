@@ -153,7 +153,7 @@ class Document extends \lithium\data\Entity {
 
 		if ($model = $this->_model) {
 			foreach ($model::relations() as $relation => $config) {
-				if (($linkKey = $config->data('fieldName')) === $name) {
+				if ($config && (($linkKey = $config->data('fieldName')) === $name)) {
 					$data = isset($this->_data[$name]) ? $this->_data[$name] : array();
 					$this->_data[$name] = $this->_relation('set', $name, $data);
 					break;

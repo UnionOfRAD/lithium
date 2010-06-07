@@ -205,8 +205,11 @@ class Http extends \lithium\data\Source {
 	 * @return array Returns an array containing the configuration for a model relationship.
 	 */
 	public function relationship($class, $type, $name, array $options = array()) {
-		$class = $this->_classes['relationship'];
-		return new $class();
+		if (isset($this->_classes['relationship'])) {
+			$class = $this->_classes['relationship'];
+			return ($class) ? new $class() : null;
+		}
+		return null;
 	}
 }
 

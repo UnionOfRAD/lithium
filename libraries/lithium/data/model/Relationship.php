@@ -90,6 +90,9 @@ class Relationship extends \lithium\core\Object {
 
 	protected function _keys($keys, $config) {
 		$related = ($config['type'] == 'belongsTo') ? $config['to'] : $config['from'];
+		if (!$related) {
+			return array();
+		}
 		return array_combine((array) $keys, (array) $related::key());
 	}
 }
