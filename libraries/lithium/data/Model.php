@@ -350,7 +350,7 @@ class Model extends \lithium\core\StaticObject {
 		$self->_schema += $schema;
 
 		$self->_finders += $config['finders'] + $self->_findFilters();
-		static::_instance()->_relations = static::_relations();
+		static::_relations();
 	}
 
 	/**
@@ -543,6 +543,29 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Creates a relationship binding between this model and another.
+	 *
+	 * @see lithium\data\model\Relationship
+	 * @param string $type The type of relationship to create. Must be one of `'hasOne'`,
+	 *               `'hasMany'` or `'belongsTo'`.
+	 * @param string $name The name of the relationship. If this is also the name of the model,
+	 *               the model must be in the same namespace as this model. Otherwise, the
+	 *               fully-namespaced path to the model class must be specified in `$config`.
+	 * @param array $config Any other configuration that should be specified in the relationship.
+	 *              See the `Relationship` class for more information.
+	 * @return object Returns an instance of the `Relationship` class that defines the connection.
+	 */
+	public static function bind($type, $name, array $config = array()) {
+		$self = static::_instance();
+
+		if (!isset($self->_relationTypes[$type])) {
+			throw new RuntimeException("Invalid relationship type '{$type}' specified.");
+		}
+		$rel = static::_connection()->relationship(get_called_class(), $type, $name, $config);
+		return static::_instance()->_relations[$name] = $rel;
+	}
+
+	/**
 	 * Lazy-initialize the schema for this Model object, if it is not already manually set in the
 	 * object. You can declare `protected $_schema = array(...)` to define the schema manually.
 	 *
@@ -554,7 +577,7 @@ class Model extends \lithium\core\StaticObject {
 		$self = static::_instance();
 
 		if (!$self->_schema) {
-			$self->_schema = $self->_connection()->describe($self::meta('source'), $self->_meta);
+			$self->_schema = static::_connection()->describe($self::meta('source'), $self->_meta);
 		}
 		if (is_string($field) && $field) {
 			return isset($self->_schema[$field]) ? $self->_schema[$field] : null;
@@ -880,23 +903,17 @@ class Model extends \lithium\core\StaticObject {
 	 * @todo See if this can be rewritten to be lazy.
 	 */
 	protected static function _relations() {
-		$relations = array();
 		$self = static::_instance();
 
 		if (!$self->_meta['connection']) {
-			return array();
+			return;
 		}
-
-		$class = get_called_class();
-		$connection = $self->_connection();
 
 		foreach ($self->_relationTypes as $type => $keys) {
 			foreach (Set::normalize($self->{$type}) as $name => $config) {
-				$relationship = $connection->relationship($class, $type, $name, (array) $config);
-				$relations[$name] = $relationship;
+				static::bind($type, $name, (array) $config);
 			}
 		}
-		return $relations;
 	}
 
 	/**
