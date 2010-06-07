@@ -321,7 +321,7 @@ class MongoDb extends \lithium\data\Source {
 			$params = $query->export($self);
 			$result = $self->connection->{$params['source']}->insert($data, true);
 
-			if (isset($result['ok']) && $result['ok'] === 1.0) {
+			if (isset($result['ok']) && (bool) $result['ok'] === true) {
 				$id = $data['_id'];
 				$query->entity()->update(is_object($id) ? $id->__toString() : null);
 				return true;
@@ -517,7 +517,7 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	/**
-	 * Formats `group` clauses fro MongoDB.
+	 * Formats `group` clauses for MongoDB.
 	 *
 	 * @param string|array $group The group clause.
 	 * @param object $context
