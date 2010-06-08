@@ -86,9 +86,9 @@ class Query extends \lithium\core\Object {
 			'model'      => null,
 			'source'     => null,
 			'order'      => null,
+			'offset'     => null,
 			'limit'      => null,
 			'page'       => null,
-			'offset'     => null,
 			'group'      => null,
 			'comment'    => null,
 			'joins'      => array(),
@@ -104,7 +104,7 @@ class Query extends \lithium\core\Object {
 		unset($this->_config['type']);
 
 		foreach ($this->_config as $key => $val) {
-			if (method_exists($this, $key)) {
+			if (method_exists($this, $key) && $val !== null) {
 				$this->_config[$key] = is_array($this->_config[$key]) ? array() : null;
 				$this->{$key}($val);
 			}
@@ -240,7 +240,7 @@ class Query extends \lithium\core\Object {
 	 * @return integer
 	 */
 	public function offset($offset = null) {
-		if ($offset) {
+		if ($offset !== null) {
 			$this->_config['offset'] = intval($offset);
 		}
 		return $this->_config['offset'];
@@ -254,8 +254,8 @@ class Query extends \lithium\core\Object {
 	 */
 	public function page($page = null) {
 		if ($page) {
-			$this->_config['page'] = intval($page) ?: 1;
-			$this->offset(($this->_config['page'] - 1) * $this->_config['limit']);
+			$this->_config['page'] = $page = (intval($page) ?: 1);
+			$this->offset(($page - 1) * $this->_config['limit']);
 		}
 		return $this->_config['page'];
 	}

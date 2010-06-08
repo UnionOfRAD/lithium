@@ -282,6 +282,24 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $export['source'];
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testPagination() {
+		$query = new Query(array('limit' => 5, 'page' => 1));
+		$this->assertEqual(0, $query->offset());
+
+		$query = new Query(array('limit' => 5, 'page' => 2));
+		$this->assertEqual(5, $query->offset());
+
+		$query->page(1);
+		$this->assertEqual(0, $query->offset());
+	}
+
+	public function testJoin() {
+		$query = new Query(array('joins' => array(array('foo' => 'bar'))));
+		$query->join(array(array('bar' => 'baz')));
+
+		$this->assertEqual($query->join(), array(array('foo' => 'bar'), array('bar' => 'baz')));
+	}
 }
 
 ?>
