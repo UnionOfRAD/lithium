@@ -203,7 +203,6 @@ class CouchDb extends \lithium\data\source\Http {
 			$query = $params['query'];
 			$options = $params['options'];
 			$params = $query->export($self);
-			$params['fields'] += array('rev');
 			extract($params, EXTR_OVERWRITE);
 			list($_path, $conditions) = (array) $conditions;
 
@@ -255,7 +254,7 @@ class CouchDb extends \lithium\data\source\Http {
 
 			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
 				$result = $self->invokeMethod('_format', array($result, $options));
-				$query->entity()->update($result['id'], $result);
+				$query->entity()->update($result['id'], array('rev' => $result['rev']));
 				return true;
 			}
 			if (isset($result['error']) && $result['error'] === 'conflict') {
@@ -289,6 +288,19 @@ class CouchDb extends \lithium\data\source\Http {
 			$result = json_decode($conn->delete("{$config['database']}/{$_path}", $conditions));
 			return (isset($result->ok) && $result->ok === true);
 		});
+	}
+
+	/**
+	 * Executes calculation-related queries, such as those required for `count`.
+	 *
+	 * @param string $type Only accepts `count`.
+	 * @param mixed $query The query to be executed.
+	 * @param array $options Optional arguments for the `read()` query that will be executed
+	 *        to obtain the calculation result.
+	 * @return integer Result of the calculation.
+	 */
+	public function calculation($type, $query, array $options = array()) {
+		return $this->read($query, $options)->stats('total_rows');
 	}
 
 	/**

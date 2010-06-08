@@ -35,16 +35,41 @@ class SourceTest extends \lithium\test\Unit {
 		array('name' => 'Ma \'n Pa\'s Data Warehousing & Bait Shop', 'active' => false)
 	);
 
+	/**
+	 * @todo Make less dumb.
+	 *
+	 */
 	public function setUp() {
 		Company::config();
 		Employee::config();
 		$this->_connection = Connections::get('test');
+
+		if (strpos(get_class($this->_connection), 'CouchDb')) {
+			$this->_loadViews();
+		}
 
 		try {
 			foreach (Company::all() as $company) {
 				$company->delete();
 			}
 		} catch (Exception $e) {}
+	}
+
+	protected function _loadViews() {
+		Company::create()->save();
+	}
+
+	/**
+	 * @todo Make less dumb.
+	 *
+	 */
+	public function tearDown() {
+		try {
+			foreach (Company::all() as $company) {
+				$company->delete();
+			}
+		} catch (Exception $e) {}
+
 	}
 
 	/**
@@ -117,13 +142,15 @@ class SourceTest extends \lithium\test\Unit {
 
 	public function testFindFirstWithFieldsOption() {
 		$key = Company::meta('key');
-		$new = Company::create(array($key => 12345, 'name' => 'Acme, Inc.'));
+		$new = Company::create(array($key => 1111, 'name' => 'Test find first with fields.'));
 		$result = $new->data();
 
-		$expected = array($key => 12345, 'name' => 'Acme, Inc.');
+		$expected = array($key => 1111, 'name' => 'Test find first with fields.');
 		$this->assertEqual($expected['name'], $result['name']);
 		$this->assertEqual($expected[$key], $result[$key]);
+		$this->assertFalse($new->exists());
 		$this->assertTrue($new->save());
+		$this->assertTrue($new->exists());
 
 		$result = Company::find('first', array('fields' => array('name')));
 		$this->assertFalse(is_null($result));
@@ -131,7 +158,6 @@ class SourceTest extends \lithium\test\Unit {
 		$this->skipIf(is_null($result), 'No result returned to test');
 		$result = $result->data();
 		$this->assertEqual($expected['name'], $result['name']);
-		var_dump($new->data());
 
 		$this->assertTrue($new->delete());
 	}
@@ -146,10 +172,10 @@ class SourceTest extends \lithium\test\Unit {
 			$this->assertTrue($companies[count($companies) - 1]->{$key});
 		}
 
-		//$this->assertIdentical(2, Company::count());
-		//$this->assertIdentical(1, Company::count(array('active' => true)));
-		//$this->assertIdentical(1, Company::count(array('active' => false)));
-		//$this->assertIdentical(0, Company::count(array('active' => null)));
+		$this->assertIdentical(2, Company::count());
+		$this->assertIdentical(1, Company::count(array('active' => true)));
+		$this->assertIdentical(1, Company::count(array('active' => false)));
+		$this->assertIdentical(0, Company::count(array('active' => null)));
 		$all = Company::all();
 
 		$expected = count($this->companyData);
@@ -163,7 +189,7 @@ class SourceTest extends \lithium\test\Unit {
 		foreach ($companies as $company) {
 			$this->assertTrue($company->delete());
 		}
-		//$this->assertIdentical(0, Company::count());
+		$this->assertIdentical(0, Company::count());
 	}
 
 	public function testRecordOffset() {

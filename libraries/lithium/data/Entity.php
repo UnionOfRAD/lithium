@@ -286,12 +286,15 @@ class Entity extends \lithium\core\Object {
 	 * @param $id The ID to assign, where applicable.
 	 * @return void
 	 */
-	public function update($id = null) {
+	public function update($id = null, $data = array()) {
 		if ($id) {
 			$id = (array) $id;
 			$model = $this->_model;
 			foreach ((array) $model::meta('key') as $i => $key) {
 				$this->_data[$key] = $id[$i];
+			}
+			foreach ($data as $key => $value) {
+				$this->_data[$key] = $value;
 			}
 		}
 		$this->_exists = true;
@@ -301,7 +304,7 @@ class Entity extends \lithium\core\Object {
 	 * Configures protected properties of a `Record` so that it is parented to `$parent`.
 	 *
 	 * @param object $parent
-	 * @param array $config 
+	 * @param array $config
 	 * @return void
 	 */
 	public function assignTo($parent, array $config = array()) {
