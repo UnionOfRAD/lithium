@@ -76,11 +76,20 @@ class MediaTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testContentTypeDetection() {
-		$this->assertNull(Media::type('application/foo'));
-		$this->assertEqual('js', Media::type('application/javascript'));
-		$this->assertEqual('html', Media::type('*/*'));
-		$this->assertEqual('json', Media::type('application/json'));
-		$this->assertEqual('json', Media::type('application/json; charset=UTF-8'));
+		$result = Media::type('application/foo');
+		$this->assertNull($result['content']);
+
+		$result = Media::type('application/javascript');
+		$this->assertEqual('js', $result['content']);
+
+		$result = Media::type('*/*');
+		$this->assertEqual('html', $result['content']);
+
+		$result = Media::type('application/json');
+		$this->assertEqual('json', $result['content']);
+
+		$result = Media::type('application/json; charset=UTF-8');
+		$this->assertEqual('json', $result['content']);
 
 		$expected = array('content' => 'application/json', 'options' => array(
 			'view' => false, 'layout' => false, 'encode' => 'json_encode', 'decode' => 'json_decode'
@@ -258,7 +267,7 @@ class MediaTest extends \lithium\test\Unit {
 
 	public function testCustomEncodeHandler() {
 		$response = new Response();
-		$response->type = 'csv';
+		$response->type('csv');
 
 		Media::type('csv', 'application/csv', array('encode' => function($data) {
 			ob_start();
@@ -293,7 +302,7 @@ class MediaTest extends \lithium\test\Unit {
 	 */
 	public function testPlainTextOutput() {
 		$response = new Response();
-		$response->type = 'text';
+		$response->type('text');
 		Media::render($response, "Hello, world!");
 
 		$expected = array("Hello, world!");
@@ -309,7 +318,7 @@ class MediaTest extends \lithium\test\Unit {
 	 */
 	public function testUndhandledContent() {
 		$response = new Response();
-		$response->type = 'bad';
+		$response->type('bad');
 
 		$this->expectException("Unhandled media type 'bad'");
 		Media::render($response, array('foo' => 'bar'));
@@ -326,7 +335,7 @@ class MediaTest extends \lithium\test\Unit {
 	 */
 	public function testUnregisteredContentHandler() {
 		$response = new Response();
-		$response->type = 'xml';
+		$response->type('xml');
 
 		$this->expectException("Unhandled media type 'xml'");
 		Media::render($response, array('foo' => 'bar'));

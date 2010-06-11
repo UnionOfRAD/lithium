@@ -41,9 +41,6 @@ class Response extends \lithium\net\http\Response {
 		$this->status($this->_config['status']);
 		unset($this->_config['status']);
 
-		if ($this->_config['request'] && is_object($this->_config['request'])) {
-			$this->_type = $this->_config['request']->type();
-		}
 		if ($this->_config['location']) {
 			$router = $this->_classes['router'];
 			$location = $router::match($this->_config['location'], $this->_config['request']);
@@ -104,7 +101,7 @@ class Response extends \lithium\net\http\Response {
 		if ($code == 302 || $code == 204) {
 			return;
 		}
-		$chunked = str_split(join("\r\n", (array) $this->body), $this->_config['buffer']);
+		$chunked = $this->body(null, $this->_config);
 
 		foreach ($chunked as $chunk) {
 			echo $chunk;

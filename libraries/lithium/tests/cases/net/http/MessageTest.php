@@ -74,12 +74,18 @@ class MessageTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testBodyBuffer() {
+		$expected = array('P', 'a', 'r', 't', ' ', '1');
+		$result = $this->message->body('Part 1', array('buffer' => 1));
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testType() {
 		$expected = 'json';
 		$result = $this->message->type("json");
 		$this->assertEqual($expected, $result);
 
-		$expected = 'application/json';
+		$expected = 'json';
 		$result = $this->message->type("application/json; charset=UTF-8");
 		$this->assertEqual($expected, $result);
 	}

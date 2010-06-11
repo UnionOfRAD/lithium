@@ -99,11 +99,16 @@ class Message extends \lithium\core\Object {
 	 * Add body parts.
 	 *
 	 * @param mixed $data
+	 * @param array $options
+	 *        - `'buffer'`: split the body string
 	 * @return array
 	 */
-	public function body($data = null) {
+	public function body($data = null, $options = array()) {
+		$default = array('buffer' => null);
+		$options += $default;
 		$this->body = array_merge((array) $this->body, (array) $data);
-		return trim(join("\r\n", $this->body));
+		$body = trim(join("\r\n", $this->body));
+		return ($options['buffer']) ? str_split($body, $options['buffer']) : $body;
 	}
 
 	/**
