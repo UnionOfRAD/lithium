@@ -198,6 +198,12 @@ class ObjectTest extends \lithium\test\Unit {
 		$result = get_class($object->instance($request));
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testInstanceFalse() {
+		$object = new MockInstantiator();
+		$result = $object->instance(false);
+		$this->assertFalse($result);
+	}
 }
 
 ?>

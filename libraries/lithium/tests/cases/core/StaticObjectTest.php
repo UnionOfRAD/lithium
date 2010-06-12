@@ -156,6 +156,11 @@ class StaticObjectTest extends \lithium\test\Unit {
 		$result = get_class(MockStaticInstantiator::instance($request));
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testInstanceFalse() {
+		$result = MockStaticInstantiator::instance(false);
+		$this->assertFalse($result);
+	}
 }
 
 ?>

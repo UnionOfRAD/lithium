@@ -131,7 +131,7 @@ class Report extends \lithium\core\Object {
 			'skips' => array()
 		);
 		$stats = array_reduce($results, function($stats, $result) use ($defaults) {
-			$stats = (array) $stats = $defaults;
+			$stats = (array) $stats + $defaults;
 			$result = empty($result[0]) ? array($result) : $result;
 			foreach ($result as $response) {
 				if (empty($response['result'])) {

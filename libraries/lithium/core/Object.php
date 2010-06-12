@@ -206,7 +206,7 @@ class Object {
 	 * @return void
 	 */
 	protected function _instance($name, array $config = array()) {
-		if (is_object($name)) {
+		if (is_object($name) || !$name) {
 			return $name;
 		}
 		if (isset($this->_classes[$name])) {
