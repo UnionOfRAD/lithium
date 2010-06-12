@@ -53,7 +53,7 @@ class Mock extends \lithium\console\command\Create {
 		$name = $request->action;
 		$type = $request->command;
 
-		if ($command = $this->{$type}) {
+		if ($command = $this->_instance($type)) {
 			$request->params['action'] = $name;
 			$name = $command->invokeMethod('_class', array($request));
 		}

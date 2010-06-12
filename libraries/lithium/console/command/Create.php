@@ -72,24 +72,6 @@ class Create extends \lithium\console\Command {
 	}
 
 	/**
-	 * Magic method to get an instance of a sub-command
-	 *
-	 * @param string $name the name of the sub-command to instantiate
-	 * @return object;
-	 */
-	public function __get($name) {
-		if ($class = Libraries::locate('command.create', $name)) {
-			$this->request->params['i'] = $this->i;
-			$this->request->params['template'] = $this->template;
-
-			return new $class(array(
-				'request' => $this->request,
-				'classes'=> $this->_classes,
-			));
-		}
-	}
-
-	/**
 	 * Run the create command. Takes `$command` and delegates to `$command::$method`
 	 *
 	 * @param string $command
@@ -136,7 +118,7 @@ class Create extends \lithium\console\Command {
 	protected function _execute($command) {
 		$this->request->shift(2);
 
-		if (!$class = $this->{$command}) {
+		if (!$class = $this->_instance($command)) {
 			return false;
 		}
 		$data = array();
@@ -153,6 +135,7 @@ class Create extends \lithium\console\Command {
 		}
 		return false;
 	}
+
 	/**
 	 * Run through the default set. model, controller, test model, test controller
 	 *
@@ -238,6 +221,27 @@ class Create extends \lithium\console\Command {
 		}
 		return file_get_contents($file);
 	}
+
+	/**
+	 * Get an instance of a sub-command
+	 *
+	 * @param string $name the name of the sub-command to instantiate
+	 * @param array $config
+	 * @return object;
+	 */
+	protected function _instance($name, array $config = array()) {
+		if ($class = Libraries::locate('command.create', Inflector::camelize($name))) {
+			$this->request->params['i'] = $this->i;
+			$this->request->params['template'] = $this->template;
+
+			return new $class(array(
+				'request' => $this->request,
+				'classes'=> $this->_classes,
+			));
+		}
+		return parent::_instance($name, $config);
+	}
+
 
 	/**
 	 * Save a template with the current params. Writes file to `Create::$path`.
