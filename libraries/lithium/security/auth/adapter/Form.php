@@ -103,8 +103,8 @@ class Form extends \lithium\core\Object {
 	protected $_scope = array();
 
 	/**
-	 * Callback filters to apply to request data before using it the authentication query. Each key
-	 * in the array must match a request field specified in the `$_fields` property, and each
+	 * Callback filters to apply to request data before using it in the authentication query. Each
+	 * key in the array must match a request field specified in the `$_fields` property, and each
 	 * value must either be a reference to a function or method name, or a closure. For example, to
 	 * automatically hash passwords, the `Form` adapter provides the following default
 	 * configuration, i.e.: `array('password' => array('\lithium\util\String', 'hash'))`.
@@ -127,7 +127,6 @@ class Form extends \lithium\core\Object {
 	 * 		)
 	 * 	));
 	 * }}}
-	 *
 	 *
 	 * @see lithium\security\auth\adapter\Form::$_fields
 	 * @var array
