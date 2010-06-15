@@ -371,7 +371,6 @@ class Media extends \lithium\core\StaticObject {
 		}
 
 		$cast = function($data) {
-<<<<<<< HEAD
 			if (is_object($data)) {
 				return method_exists($data, 'to') ? $data->to('array') : get_object_vars($data);
 			}
@@ -382,17 +381,6 @@ class Media extends \lithium\core\StaticObject {
 			$data = is_object($data) ? $cast($data) : $data;
 			$data = is_array($data) ? array_map($cast, $data) : $data;
 		}
-=======
-			if (!is_object($data)) {
-				return $data;
-			}
-			return method_exists($data, 'to') ? $data->to('array') : get_object_vars($data);
-		};
-
-		$data = is_object($data) ? $cast($data) : $data;
-		$data = is_array($data) ? array_map($cast, $data) : $data;
-
->>>>>>> Changing exceptions thrown in `\action` to instances of `\action\DispatchException`.
 		$method = $handler['encode'];
 		return is_string($method) ? $method($data) : $method($data, $handler, $options);
 	}
@@ -486,18 +474,11 @@ class Media extends \lithium\core\StaticObject {
 			'txt'          => array('alias' => 'text'),
 			'xml'          => array('application/xml', 'text/xml'),
 		);
-<<<<<<< HEAD
 
 		if (!$type) {
 			return $types;
 		}
 		if (strpos($type, '/') === false) {
-=======
-		if ($type) {
-<<<<<<< HEAD
->>>>>>> Changing exceptions thrown in `\action` to instances of `\action\DispatchException`.
-=======
->>>>>>> Changing exceptions thrown in `\action` to instances of `\action\DispatchException`.
 			return isset($types[$type]) ? $types[$type] : null;
 		}
 		if (strpos($type, ';')) {
