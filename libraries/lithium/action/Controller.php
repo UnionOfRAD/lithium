@@ -8,8 +8,8 @@
 
 namespace lithium\action;
 
-use \Exception;
 use \lithium\util\Inflector;
+use \lithium\action\DispatchException;
 
 /**
  * The `Controller` class is the fundamental building block of your application's request/response
@@ -92,7 +92,7 @@ class Controller extends \lithium\core\Object {
 	 * @see lithium\net\http\Media::render()
 	 */
 	protected $_render = array(
-		'type'        => 'html',
+		'type'        => null,
 		'data'        => array(),
 		'auto'        => true,
 		'layout'      => 'default',
@@ -162,7 +162,7 @@ class Controller extends \lithium\core\Object {
 			$result = null;
 
 			if (substr($action, 0, 1) == '_' || method_exists(__CLASS__, $action)) {
-				throw new Exception('Private method!');
+				throw new DispatchException('Private method!');
 			}
 			$render['template'] = $render['template'] ?: $action;
 

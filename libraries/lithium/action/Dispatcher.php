@@ -8,10 +8,10 @@
 
 namespace lithium\action;
 
-use \Exception;
 use \lithium\util\String;
 use \lithium\util\Inflector;
 use \lithium\core\Libraries;
+use \lithium\action\DispatchException;
 
 /**
  * `Dispatcher` is the outermost layer of the framework, responsible for both receiving the initial
@@ -115,7 +115,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			$params = $self::invokeMethod('_applyRules', array($result->params));
 
 			if (!$params) {
-				throw new Exception('Could not route request');
+				throw new DispatchException('Could not route request');
 			}
 			$callable = $self::invokeMethod('_callable', array($result, $params, $options));
 			return $self::invokeMethod('_call', array($callable, $result, $params));
@@ -154,7 +154,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			if (class_exists($class)) {
 				return new $class(compact('request'));
 			}
-			throw new Exception("Controller {$controller} not found");
+			throw new DispatchException("Controller '{$controller}' not found");
 		});
 	}
 
@@ -164,7 +164,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			if (is_callable($callable = $params['callable'])) {
 				return $callable($params['request'], $params['params']);
 			}
-			throw new Exception('Result not callable');
+			throw new DispatchException('Result not callable');
 		});
 	}
 

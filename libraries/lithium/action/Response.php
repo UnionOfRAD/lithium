@@ -41,6 +41,9 @@ class Response extends \lithium\net\http\Response {
 		$this->status($this->_config['status']);
 		unset($this->_config['status']);
 
+		if ($this->_config['request'] && is_object($this->_config['request'])) {
+			$this->type = $this->_config['request']->accepts();
+		}
 		if ($this->_config['location']) {
 			$router = $this->_classes['router'];
 			$location = $router::match($this->_config['location'], $this->_config['request']);
