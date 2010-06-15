@@ -96,39 +96,28 @@ class PostsController extends \lithium\action\Controller {
 		return compact('posts');
 	}
 
-	public function view($id = null) {
-		$post = Post::find($id);
+	public function view() {
+		$post = Post::first($this->request->id);
 		return compact('post');
 	}
 
 	public function add() {
-		if (!empty($this->request->data)) {
-			$post = Post::create($this->request->data);
-			if ($post->save()) {
-				$this->redirect(array(
-					'controller' => 'posts', 'action' => 'view',
-					'args' => array($post->id)
-				));
-			}
-		}
-		if (empty($post)) {
-			$post = Post::create();
+		$post = Post::create();
+
+		if (($this->request->data) && $post->save($this->request->data)) {
+			$this->redirect(array('Posts::view', 'args' => array($post->id)));
 		}
 		return compact('post');
 	}
 
-	public function edit($id = null) {
-		$post = Post::find($id);
-		if (empty($post)) {
-			$this->redirect(array('controller' => 'posts', 'action' => 'index'));
+	public function edit() {
+		$post = Post::find($this->request->id);
+
+		if (!$post) {
+			$this->redirect('Posts::index');
 		}
-		if (!empty($this->request->data)) {
-			if ($post->save($this->request->data)) {
-				$this->redirect(array(
-					'controller' => 'posts', 'action' => 'view',
-					'args' => array($post->id)
-				));
-			}
+		if (($this->request->data) && $post->save($this->request->data)) {
+			$this->redirect(array('Posts::view', 'args' => array($post->id)));
 		}
 		return compact('post');
 	}
