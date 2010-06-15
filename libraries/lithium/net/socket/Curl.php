@@ -28,9 +28,9 @@ class Curl extends \lithium\net\Socket {
 	 * `read` and `write` operations. These options should be set by
 	 * using the `set` method.
 	 *
-	 * @var array
 	 * @link http://www.php.net/manual/en/function.curl-setopt.php PHP Manual: curl_setopt()
 	 * @see lithium\net\socket\Curl::set()
+	 * @var array
 	 */
 	public $options = array();
 
