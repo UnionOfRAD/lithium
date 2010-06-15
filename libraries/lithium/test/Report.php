@@ -71,7 +71,7 @@ class Report extends \lithium\core\Object {
 			'format' => 'txt',
 			'reporter' => 'console'
 		);
-		parent::__construct((array) $config + $defaults);
+		parent::__construct($config + $defaults);
 	}
 
 	/**
@@ -156,9 +156,9 @@ class Report extends \lithium\core\Object {
 			}
 			return $stats;
 		});
+		$stats = (array) $stats + $defaults;
 		$count = array_map(
-			function($value) { return is_array($value) ? count($value) : $value; },
-			$stats
+			function($value) { return is_array($value) ? count($value) : $value; }, $stats
 		);
 		$success = $count['passes'] == $count['asserts'] && $count['errors'] === 0;
 		return compact("stats", "count", "success");
