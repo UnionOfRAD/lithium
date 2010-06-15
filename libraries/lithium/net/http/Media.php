@@ -494,6 +494,9 @@ class Media extends \lithium\core\StaticObject {
 		if (strpos($type, '/') === false) {
 =======
 		if ($type) {
+<<<<<<< HEAD
+>>>>>>> Changing exceptions thrown in `\action` to instances of `\action\DispatchException`.
+=======
 >>>>>>> Changing exceptions thrown in `\action` to instances of `\action\DispatchException`.
 			return isset($types[$type]) ? $types[$type] : null;
 		}
