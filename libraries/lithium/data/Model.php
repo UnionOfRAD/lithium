@@ -27,6 +27,9 @@ use \BadMethodCallException;
  * data mutation (saving/updating/deleting). All query-related operations may be done through the
  * static `find()` method, along with some additional utility methods provided for convenience.
  *
+ * Classes extending this one should, conventionally, be named as Singular, CamelCase and be
+ * placed in the app/models directory. i.e. a posts model would be app/model/Post.php.
+ *
  * Examples:
  * {{{
  * // Return all 'post' records
