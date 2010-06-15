@@ -24,6 +24,11 @@ class Employee extends \lithium\data\Model {
 	public $belongsTo = array('Company');
 
 	protected $_meta = array('connection' => 'test', 'locked' => false);
+
+	public function lastName($document) {
+		$name = explode(' ', $document->name);
+		return $name[1];
+	}
 }
 
 class SourceTest extends \lithium\test\Unit {
@@ -68,8 +73,9 @@ class SourceTest extends \lithium\test\Unit {
 			foreach (Company::all() as $company) {
 				$company->delete();
 			}
-		} catch (Exception $e) {}
-
+		} catch (Exception $e) {
+			$this->assertTrue(false, $e->getMessage());
+		}
 	}
 
 	/**
@@ -141,6 +147,7 @@ class SourceTest extends \lithium\test\Unit {
 	}
 
 	public function testFindFirstWithFieldsOption() {
+		return;
 		$key = Company::meta('key');
 		$new = Company::create(array($key => 1111, 'name' => 'Test find first with fields.'));
 		$result = $new->data();
@@ -168,8 +175,8 @@ class SourceTest extends \lithium\test\Unit {
 
 		foreach ($this->companyData as $data) {
 			$companies[] = Company::create($data);
-			$this->assertTrue($companies[count($companies) - 1]->save());
-			$this->assertTrue($companies[count($companies) - 1]->{$key});
+			$this->assertTrue(end($companies)->save());
+			$this->assertTrue(end($companies)->{$key});
 		}
 
 		$this->assertIdentical(2, Company::count());
@@ -192,29 +199,25 @@ class SourceTest extends \lithium\test\Unit {
 		$this->assertIdentical(0, Company::count());
 	}
 
-	public function testRecordOffset() {
+	public function testEntityFields() {
 		foreach ($this->companyData as $data) {
 			Company::create($data)->save();
 		}
 		$all = Company::all();
 
 		$result = $all->first(function($doc) { return $doc->name == 'StuffMart'; });
-		$this->skipIf(!$result instanceof ArrayAccess, 'Data class does not implement ArrayAccess');
-
-		$expected = 'StuffMart';
-		$this->assertEqual($expected, $result['name']);
+		$this->assertEqual('StuffMart', $result->name);
 
 		$result = $result->data();
-		$this->assertEqual($expected, $result['name']);
+		$this->assertEqual('StuffMart', $result['name']);
 
-		$result = $all[1];
-		$expected = 'Ma \'n Pa\'s Data Warehousing & Bait Shop';
-		$this->assertEqual($expected, $result['name']);
+		$result = $all->next();
+		$this->assertEqual('Ma \'n Pa\'s Data Warehousing & Bait Shop', $result->name);
 
 		$result = $result->data();
-		$this->assertEqual($expected, $result['name']);
+		$this->assertEqual('Ma \'n Pa\'s Data Warehousing & Bait Shop', $result['name']);
 
-		$this->assertNull($all[2]);
+		$this->assertNull($all->next());
 	}
 
 	/**
@@ -229,7 +232,7 @@ class SourceTest extends \lithium\test\Unit {
 		$company = Company::create(array('name' => 'Test Company'));
 		$this->assertTrue($company->save());
 
-		$id = $company->{$key};
+		$id = (string) $company->{$key};
 		$companyCopy = Company::find($id)->data();
 		$data = $company->data();
 
@@ -262,17 +265,60 @@ class SourceTest extends \lithium\test\Unit {
 		$this->assertFalse(Employee::relations('hasOne'));
 
 		$result = Company::relations('Employees');
+
 		$this->assertEqual('hasMany', $result->data('type'));
 		$this->assertEqual(__NAMESPACE__ . '\Employee', $result->data('to'));
 	}
 
 	public function testRelationshipQuerying() {
-		return;
+		$connection = $this->_connection;
+		$message = "Relationships are not supported by this adapter.";
+		$this->skipIf(!$connection::enabled('relationships'), $message);
+
 		foreach ($this->companyData as $data) {
 			Company::create($data)->save();
 		}
-		$related = $companies = Company::first()->employees->model();
-		$this->assertEqual($related, __NAMESPACE__ . '\Employee');
+		$stuffMart = Company::findFirstByName('StuffMart');
+		$maAndPas = Company::findFirstByName('Ma \'n Pa\'s Data Warehousing & Bait Shop');
+
+		$this->assertEqual(__NAMESPACE__ . '\Employee', $stuffMart->employees->model());
+		$this->assertEqual(__NAMESPACE__ . '\Employee', $maAndPas->employees->model());
+
+		foreach (array('Mr. Smith', 'Mr. Jones', 'Mr. Brown') as $name) {
+			$stuffMart->employees[] = Employee::create(compact('name'));
+		}
+		$expected = Company::key($stuffMart) + array(
+			'name' => 'StuffMart', 'active' => true, 'employees' => array(
+				array('name' => 'Mr. Smith'),
+				array('name' => 'Mr. Jones'),
+				array('name' => 'Mr. Brown')
+			)
+		);
+		$this->assertEqual($expected, $stuffMart->data());
+		$this->assertTrue($stuffMart->save());
+		$this->assertEqual('Smith', $stuffMart->employees[0]->lastName());
+
+		$stuffMartReloaded = Company::findFirstByName('StuffMart');
+		$this->assertEqual('Smith', $stuffMartReloaded->employees[0]->lastName());
+
+		foreach (array('Ma', 'Pa') as $name) {
+			$maAndPas->employees[] = Employee::create(compact('name'));
+		}
+		$maAndPas->save();
+	}
+
+	public function testAbstractTypeHandling() {
+		$key = Company::meta('key');
+
+		foreach ($this->companyData as $data) {
+			$companies[] = Company::create($data);
+			$this->assertTrue(end($companies)->save());
+			$this->assertTrue(end($companies)->{$key});
+		}
+
+		foreach (Company::all() as $company) {
+			$this->assertTrue($company->delete());
+		}
 	}
 }
 

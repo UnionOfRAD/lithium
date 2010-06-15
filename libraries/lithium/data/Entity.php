@@ -9,6 +9,8 @@
 namespace lithium\data;
 
 use \RuntimeException;
+use \lithium\data\Source;
+use \lithium\util\Collection as Col;
 
 /**
  * `Entity` class. Represents data such as a row or document in a database. Entities have fields
@@ -22,17 +24,9 @@ class Entity extends \lithium\core\Object {
 	protected $_model = null;
 
 	/**
-	 * Associative array of the records fields with values
+	 * Associative array of the entity's fields and values.
 	 */
 	protected $_data = array();
-
-	/**
-	 * If this object is chained off of an originally queried object, contains an instance of
-	 * `Relationship` defining the relationship from the origin object to this one.
-	 *
-	 * @var object
-	 */
-	protected $_relationship = null;
 
 	/**
 	 * An array containing all related records and recordsets, keyed by relationship name, as
@@ -279,25 +273,53 @@ class Entity extends \lithium\core\Object {
 	}
 
 	/**
-	 * Called after a `Record` is saved. Updates the object's internal state to reflect the
+	 * Called after an `Entity` is saved. Updates the object's internal state to reflect the
 	 * corresponding database record, and sets the `Record`'s primary key, if this is a
 	 * newly-created object.
 	 *
-	 * @param $id The ID to assign, where applicable.
+	 * @param mixed $id The ID to assign, where applicable.
+	 * @param array $data Any additional generated data assigned to the object by the database.
 	 * @return void
 	 */
-	public function update($id = null, $data = array()) {
-		if ($id) {
-			$id = (array) $id;
-			$model = $this->_model;
-			foreach ((array) $model::meta('key') as $i => $key) {
-				$this->_data[$key] = $id[$i];
-			}
-			foreach ($data as $key => $value) {
-				$this->_data[$key] = $value;
-			}
-		}
+	public function update($id = null, array $data = array()) {
+		$this->_modified = array();
 		$this->_exists = true;
+
+		if (!$id) {
+			return;
+		}
+
+		$model = $this->_model;
+		$key = $model::meta('key');
+
+		if (is_array($key)) {
+			foreach ($key as $i => $k) {
+				$this->_data[$k] = $id[$i];
+			}
+		} else {
+			$this->_data[$key] = $id;
+		}
+		foreach ($data as $key => $value) {
+			$this->_data[$key] = $value;
+		}
+	}
+
+	/**
+	 * Gets the array of fields modified on this entity.
+	 *
+	 * @return array Returns an array where the keys are entity field names, and the values are
+	 *         always `true`.
+	 */
+	public function modified() {
+		if (!$this->_exists) {
+			$keys = array_keys($this->_data);
+			return array_combine($keys, array_fill(0, count($keys), true));
+		}
+		return $this->_modified;
+	}
+
+	public function export(Source $dataSource, array $options = array()) {
+		return array_intersect_key($this->_data, $this->_modified);
 	}
 
 	/**
@@ -324,7 +346,7 @@ class Entity extends \lithium\core\Object {
 	public function to($format, array $options = array()) {
 		switch ($format) {
 			case 'array':
-				$result = $this->_data;
+				$result = Col::toArray($this->_data);
 			break;
 			default:
 				$result = $this;

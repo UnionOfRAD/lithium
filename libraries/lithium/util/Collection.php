@@ -85,7 +85,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @var array
 	 */
 	protected static $_formats = array(
-		'array' => '\lithium\util\Collection::_toArray'
+		'array' => '\lithium\util\Collection::toArray'
 	);
 
 	/**
@@ -159,7 +159,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 */
 	public static function formats($format, $handler = null) {
 		if ($format === false) {
-			return static::$_formats = array('array' => '\lithium\util\Collection::_toArray');
+			return static::$_formats = array('array' => '\lithium\util\Collection::toArray');
 		}
 		if ((is_null($handler)) && class_exists($format)) {
 			return static::$_formats[] = $format;
@@ -503,7 +503,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return array Returns the value of `$data` as a pure PHP array, recursively converting all
 	 *         sub-objects and other values to their closest array or scalar equivalents.
 	 */
-	protected static function _toArray($data) {
+	public static function toArray($data) {
 		$result = array();
 
 		foreach ($data as $key => $item) {

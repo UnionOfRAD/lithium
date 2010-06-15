@@ -88,9 +88,12 @@ class Relationship extends \lithium\core\Object {
 		return isset($this->_config[$key]) ? $this->_config[$key] : null;
 	}
 
+	public function __get($name) {
+		return $this->data($name);
+	}
+
 	protected function _keys($keys, $config) {
-		$related = ($config['type'] == 'belongsTo') ? $config['to'] : $config['from'];
-		if (!$related) {
+		if (!($related = ($config['type'] == 'belongsTo') ? $config['to'] : $config['from'])) {
 			return array();
 		}
 		return array_combine((array) $keys, (array) $related::key());

@@ -9,16 +9,10 @@
 namespace lithium\data\collection;
 
 use \Iterator;
+use \lithium\data\Source;
+use \lithium\util\Collection;
 
 class DocumentSet extends \lithium\data\Collection {
-
-	/**
-	 * An array containing all related documents, keyed by relationship name, as defined in the
-	 * bound model class.
-	 *
-	 * @var array
-	 */
-	protected $_relationships = array();
 
 	/**
 	 * The class dependencies for `Document`.
@@ -26,7 +20,7 @@ class DocumentSet extends \lithium\data\Collection {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'entity' => '\lithium\data\entity\Document',
+		'entity' => 'lithium\data\entity\Document',
 		'set' => __CLASS__
 	);
 
@@ -68,7 +62,6 @@ class DocumentSet extends \lithium\data\Collection {
 			$value = $this->_relation('set', $name, $value);
 		}
 		$this->_data[$name] = $value;
-		$this->_modified[$name] = true;
 	}
 
 	/**
@@ -106,7 +99,9 @@ class DocumentSet extends \lithium\data\Collection {
 	 * @return void
 	 */
 	public function set($values) {
-		$this->__set($values);
+		foreach ($values as $key => $val) {
+			$this[$key] = $val;
+		}
 	}
 
 	/**
@@ -117,7 +112,22 @@ class DocumentSet extends \lithium\data\Collection {
 	 * @return mixed Returns either a sub-object in the document, or a scalar field value.
 	 */
 	public function offsetGet($offset) {
-		return $this->__get($offset);
+		$data = null;
+		$null  = null;
+
+		if (!isset($this->_data[$offset]) && !$data = $this->_populate(null, $offset)) {
+			return $null;
+		}
+		$data = $data ?: $this->_data[$offset];
+
+		if (is_a($data, $this->_classes['entity'])) {
+			return $data;
+		}
+
+		if ($this->_isComplexType($data)) {
+			$this->_data[$offset] = $this->_relation('entity', $offset, $this->_data[$offset]);
+		}
+		return $this->_data[$offset];
 	}
 
 	/**
@@ -126,7 +136,21 @@ class DocumentSet extends \lithium\data\Collection {
 	 * @return object Returns the first `Document` object instance in the collection.
 	 */
 	public function rewind() {
-		return ($entity = parent::rewind()) ? $entity : $this->__get(key($this->_data));
+		$data = parent::rewind();
+		$key = key($this->_data);
+
+		if (is_a($data, $this->_classes['entity'])) {
+			return $data;
+		}
+
+		if ($this->_isComplexType($data)) {
+			$this->_data[$key] = $this->_relation('entity', $key, $this->_data[$key]);
+		}
+		return isset($this->_data[$key]) ? $this->_data[$key] : null;
+	}
+
+	public function current() {
+		return $this->offsetGet(key($this->_data));
 	}
 
 	/**
@@ -146,43 +170,14 @@ class DocumentSet extends \lithium\data\Collection {
 			$this->_valid = true;
 		}
 		$this->_valid = $this->_valid ?: !is_null($this->_populate());
-		return $this->_valid ? $this->__get(key($this->_data)) : null;
+		return $this->_valid ? $this->offsetGet(key($this->_data)) : null;
 	}
 
-	/**
-	 * PHP magic method used when accessing fields as document properties, i.e. `$document->_id`.
-	 *
-	 * @param $name The field name, as specified with an object property.
-	 * @return mixed Returns the value of the field specified in `$name`, and wraps complex data
-	 *         types in sub-`Document` objects.
-	 */
-	public function &__get($name) {
-		$data = null;
-		$null  = null;
-
-		if (strpos($name, '.')) {
-			$current = $this;
-			$path = explode('.', $name);
-			$length = count($path) - 1;
-
-			foreach ($path as $i => $key) {
-				$current =& $current->__get($key);
-				if (!$current instanceof Document && $i < $length) {
-					return $null;
-				}
-			}
-			return $current;
-		}
-
-		if (!isset($this->_data[$name]) && !$data = $this->_populate(null, $name)) {
-			return $null;
-		}
-		$data = $data ?: $this->_data[$name];
-
-		if ($this->_isComplexType($data) && !$data instanceof \lithium\data\Entity) {
-			$this->_data[$name] = $this->_relation('entity', $name, $this->_data[$name]);
-		}
-		return $this->_data[$name];
+	public function export(Source $dataSource, array $options = array()) {
+		$map = function($doc) use ($dataSource, $options) {
+			return is_array($doc) ? $doc : $doc->export($dataSource, $options);
+		};
+		return array_map($map, $this->_data);
 	}
 
 	/**
@@ -240,23 +235,13 @@ class DocumentSet extends \lithium\data\Collection {
 	 */
 	protected function _relation($classType, $key, $data, $options = array()) {
 		$parent = $this;
-		$key = ($key === null) ? count($this->_data) : $key;
-		$pathKey = trim("{$this->_pathKey}.{$key}", '.');
-
-		if (($key || $key === 0) && $model = $this->_model) {
-			foreach ($model::relations() as $name => $relation) {
-				if ($relation && ($key === $relation->data('fieldName'))) {
-					$model = $relation->data('to');
-					break;
-				}
-			}
-		}
+		$model = $this->_model;
 
 		if (is_object($data) && $data instanceof Document) {
 			$data->assignTo($this, compact('model', 'pathKey'));
 			return $data;
 		}
-		$options += compact('model', 'data', 'parent', 'pathKey');
+		$options += compact('model', 'data', 'parent');
 		return new $this->_classes[$classType]($options);
 	}
 }

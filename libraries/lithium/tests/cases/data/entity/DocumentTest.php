@@ -10,6 +10,7 @@ namespace lithium\tests\cases\data\entity;
 
 use \stdClass;
 use \lithium\data\entity\Document;
+use \lithium\data\collection\DocumentSet;
 use \lithium\tests\mocks\data\model\MockDocumentPost;
 use \lithium\tests\mocks\data\model\MockDocumentSource;
 use \lithium\tests\mocks\data\model\MockDocumentMultipleKey;
@@ -20,7 +21,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$document = MockDocumentPost::find('all');
 
 		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
-		$result = $document->current();
+		$result = $document->current()->data();
 		$this->assertEqual($expected, $result);
 
 		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
@@ -79,10 +80,6 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function methods() {
-		return array('testNestedKeyGetSet');
-	}
-
 	public function testNestedKeyGetSet() {
 		$doc = new Document(array('data' => array(
 			'name' => 'Bob', 'location' => 'New York, NY', 'profile' => array(
@@ -123,14 +120,14 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 
 	public function testWithData() {
-		$doc = new Document(array('data' => array(
+		$doc = new DocumentSet(array('data' => array(
 			array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
 			array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
 			array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
 		)));
 
 		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
-		$result = $doc->current();
+		$result = $doc->current()->data();
 		$this->assertEqual($expected, $result);
 
 		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
@@ -150,7 +147,7 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 
 	public function testSetMultiple() {
-		$doc = new Document();
+		$doc = new DocumentSet();
 		$doc->set(array(
 			array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
 			array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
@@ -179,20 +176,15 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertTrue(is_object($doc->children), 'children is not an object');
 
 		$this->assertTrue(
-			is_a($doc->children,'\lithium\data\entity\Document'),
-			'Children is not of the type Document'
-		);
-		$this->skipIf(
-			!is_a($doc->children,'\lithium\data\entity\Document'),
-			'Children is not of the type Document'
+			$doc->children instanceof Document, 'Children is not of the type Document'
 		);
 
 		$expected = array('id' => 124, 'type' => 'child', 'children' => null);
-		$result = $doc->children->current();
+		$result = $doc->children->{0}->data();
 		$this->assertEqual($expected, $result);
 
 		$expected = array('id' => 125, 'type' => 'child', 'children' => null);
-		$result = $doc->children->next()->data();
+		$result = $doc->children->{1}->data();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -233,15 +225,13 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 
 	public function testRewindNoData() {
-		$doc = new Document();
-
-		$expected = null;
+		$doc = new DocumentSet();
 		$result = $doc->rewind();
-		$this->assertEqual($expected, $result);
+		$this->assertNull($result);
 	}
 
 	public function testRewindData() {
-		$doc = new Document(array('data' => array(
+		$doc = new DocumentSet(array('data' => array(
 			array('id' => 1, 'name' => 'One'),
 			array('id' => 2, 'name' => 'Two'),
 			array('id' => 3, 'name' => 'Three')
@@ -356,7 +346,7 @@ class DocumentTest extends \lithium\test\Unit {
 
 		$doc->id = 12;
 		$doc->name = 'Joe';
-		$doc->sons = array('Moe', 'Greg',12, 0.3);
+		$doc->sons = array('Moe', 'Greg', 12, 0.3);
 		$doc->set(array('daughters' => array('Susan', 'Tinkerbell')));
 
 		$expected = array(
@@ -369,12 +359,15 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testCall() {
+	public function testInvalidCall() {
 		$doc = new Document();
 
+		$this->expectException("No model bound or unhandled method call 'medicin'.");
 		$result = $doc->medicin();
 		$this->assertNull($result);
+	}
 
+	public function testCall() {
 		$doc = new Document(array('model' => 'lithium\tests\mocks\data\model\MockDocumentPost'));
 
 		$expected = 'lithium';
@@ -391,13 +384,12 @@ class DocumentTest extends \lithium\test\Unit {
 		$expected = 'job';
 		$result = $doc->ret('nose','job');
 		$this->assertEqual($expected, $result);
-
 	}
 
 	public function testPopulateResourceClose() {
 		$resource = new MockDocumentSource();
 		$resource->read();
-		$doc = new Document(array(
+		$doc = new DocumentSet(array(
 			'model' => 'lithium\tests\mocks\data\model\MockDocumentPost',
 			'handle' => new MockDocumentSource(),
 			'result' => $resource
@@ -446,7 +438,7 @@ class DocumentTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testObjectIteration() {
-		$doc = new Document(array('data' => array(
+		$doc = new DocumentSet(array('data' => array(
 			(object) array('foo' => 'bar'),
 			(object) array('bar' => 'foo')
 		)));
@@ -479,16 +471,16 @@ class DocumentTest extends \lithium\test\Unit {
 
 	public function testComplexTypes() {
 		$doc = new Document();
-		$this->assertFalse($doc->invoke('isComplexType', array(null)));
-		$this->assertFalse($doc->invoke('isComplexType', array('')));
-		$this->assertFalse($doc->invoke('isComplexType', array(array())));
-		$this->assertFalse($doc->invokeMethod('_isComplexType',array(new stdClass())));
+		$this->assertFalse($doc->invokeMethod('_isComplexType', array(null)));
+		$this->assertFalse($doc->invokeMethod('_isComplexType', array('')));
+		$this->assertFalse($doc->invokeMethod('_isComplexType', array(array())));
+		$this->assertFalse($doc->invokeMethod('_isComplexType', array(new stdClass())));
 	}
 
 	public function testIsset() {
 		$doc = new Document(array('data' => array(
-				'title' => 'Post',
-				'content' => 'Lorem Ipsum',
+			'title' => 'Post',
+			'content' => 'Lorem Ipsum'
 		)));
 
 		$this->assertTrue(isset($doc->title));
@@ -565,19 +557,14 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 
 	public function testErrors() {
-		$doc = new Document(array(
-			'data' => array(
-				'title' => 'Post',
-				'content' => 'Lorem Ipsum',
-				'parsed' => null,
-				'permanent' => false
-			)
-		));
+		$doc = new Document(array('data' => array(
+			'title' => 'Post',
+			'content' => 'Lorem Ipsum',
+			'parsed' => null,
+			'permanent' => false
+		)));
 
-		$errors = array(
-			'title' => 'Too short',
-			'parsed' => 'Empty'
-		);
+		$errors = array('title' => 'Too short', 'parsed' => 'Empty');
 		$doc->errors($errors);
 
 		$expected = $errors;
@@ -592,6 +579,22 @@ class DocumentTest extends \lithium\test\Unit {
 		$expected = 'Too generic';
 		$result = $doc->errors('title');
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testDocumentNesting() {
+		$data = array(
+			'top' => 'level',
+			'second' => array('level' => 'of data')
+		);
+		$doc = new Document(compact('data'));
+		$this->assertTrue(isset($doc->top));
+		$this->assertTrue(isset($doc->second->level));
+		$this->assertTrue($doc->second instanceof Document);
+
+		$this->assertEqual('level', $doc->top);
+		$this->assertEqual('of data', $doc->second->level);
+
+		
 	}
 }
 

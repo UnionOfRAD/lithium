@@ -229,7 +229,7 @@ class CollectionTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testCollectionFormatConversion() {
-		Collection::formats('\lithium\net\http\Media');
+		Collection::formats('lithium\net\http\Media');
 		$data = array('hello', 'goodbye', 'foo' => array('bar', 'baz' => 'dib'));
 		$collection = new Collection(compact('data'));
 

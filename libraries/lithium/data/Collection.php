@@ -168,7 +168,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return object Returns the first `Entity` instance in the set.
 	 */
 	public function rewind() {
-		$this->_valid = (reset($this->_data)  || count($this->_data));
+		$this->_valid = (reset($this->_data) || count($this->_data));
 
 		if (!$this->_valid && !$this->_hasInitialized) {
 			$this->_hasInitialized = true;
@@ -222,6 +222,33 @@ abstract class Collection extends \lithium\util\Collection {
 			while($this->next()) {}
 		}
 		return parent::map($filter, $options);
+	}
+
+	/**
+	 * Converts the current state of the data structure to an array.
+	 *
+	 * @return array Returns the array value of the data in this `Collection`.
+	 */
+	public function data() {
+		return $this->to('array');
+	}
+
+	/**
+	 * Adds the specified object to the `Collection` instance, and assigns associated metadata to
+	 * the added object.
+	 *
+	 * @param string $offset The offset to assign the value to.
+	 * @param mixed $data The entity object to add.
+	 * @return mixed Returns the set `Entity` object.
+	 */
+	public function offsetSet($offset, $data) {
+		if (is_array($data)) {
+			$class = $this->_classes['entity'];
+			$data = new $class(compact('data'));
+		} else {
+			$data->assignTo($this);
+		}
+		return $this->_data[] = $data;
 	}
 
 	/**

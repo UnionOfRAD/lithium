@@ -9,6 +9,7 @@
 namespace lithium\data\model;
 
 use \Exception;
+use \lithium\data\Source;
 
 /**
  * The `Query` class acts as a container for all information necessary to perform a particular
@@ -349,7 +350,10 @@ class Query extends \lithium\core\Object {
 	 * @param object $dataSource Instance of the data-source to use for conversion.
 	 * @return array Converted properties.
 	 */
-	public function export($dataSource) {
+	public function export(Source $dataSource, array $options = array()) {
+		$defaults = array('data' => array());
+		$options += $defaults;
+
 		$keys = array_keys($this->_config);
 		$methods = $dataSource->methods();
 		$results = array();
@@ -363,6 +367,11 @@ class Query extends \lithium\core\Object {
 		foreach ($copy as $item) {
 			$results[$item] = $this->_config[$item];
 		}
+		$entity =& $this->_entity;
+		$data = $entity ? $entity->export($dataSource, $options['data']) : $this->_data;
+		$data = ($list = $this->_config['whitelist']) ? array_intersect_key($data, $list) : $data;
+		$results += compact('data');
+
 		$results['source'] = $dataSource->name($this->_config['source']);
 		$created = array('fields', 'values');
 

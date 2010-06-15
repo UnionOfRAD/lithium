@@ -279,7 +279,7 @@ class Model extends \lithium\core\StaticObject {
 	 * extended but not directly interacted with) must be present in this list. Models can declare
 	 * themselves as base models using the following code:
 	 * {{{
-	 * public function __init() {
+	 * public static function __init() {
 	 * 	static::_isBase(__CLASS__, true);
 	 * 	parent::__init();
 	 * }
@@ -422,12 +422,13 @@ class Model extends \lithium\core\StaticObject {
 	public static function find($type, array $options = array()) {
 		$self = static::_instance();
 		$classes = $self->_classes;
+		$finder = array();
 
 		$defaults = array(
 			'conditions' => null, 'fields' => null, 'order' => null, 'limit' => null, 'page' => 1
 		);
 
-		if ($type != 'all' && !isset($self->_finders[$type]) && is_scalar($type)) {
+		if ($type != 'all' && is_scalar($type) && !isset($self->_finders[$type])) {
 			$options['conditions'] = array($self->_meta['key'] => $type);
 			$type = 'first';
 		}
@@ -443,7 +444,9 @@ class Model extends \lithium\core\StaticObject {
 			$connection = $self::invokeMethod('_connection');
 			return $connection->read(new $query(array('type' => 'read') + $options), $options);
 		};
-		$finder = isset($self->_finders[$type]) ? array($self->_finders[$type]) : array();
+		if (is_string($type) && isset($self->_finders[$type])) {
+			$finder = is_callable($self->_finders[$type]) ? array($self->_finders[$type]) : array();
+		}
 		return static::_filter(__FUNCTION__, $params, $filter, $finder);
 	}
 
@@ -613,7 +616,7 @@ class Model extends \lithium\core\StaticObject {
 	 * {{{
 	 * $post = Post::create(array("title" => "New post"));
 	 * echo $post->title; // echoes "New post"
-	 * $post->save();
+	 * $success = $post->save();
 	 * }}}
 	 *
 	 * @param array $data Any data that this record should be populated with initially.

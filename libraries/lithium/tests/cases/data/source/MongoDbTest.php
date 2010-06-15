@@ -12,6 +12,8 @@ namespace lithium\tests\cases\data\source;
 use \lithium\data\source\MongoDb;
 
 use \MongoId;
+use \MongoCode;
+use \MongoRegex;
 use \lithium\data\Model;
 use \lithium\data\Connections;
 use \lithium\data\model\Query;
@@ -115,7 +117,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual(array(), $result);
 
 		$function = 'function() { return this.x < y;}';
-		$conditions = new \MongoCode($function);
+		$conditions = new MongoCode($function);
 		$result = $this->db->conditions($conditions, null);
 
 		$this->assertTrue(is_array($result));
@@ -186,6 +188,11 @@ class MongoDbTest extends \lithium\test\Unit {
 		$expected = array('key' => array('$nin' => array(10, 20, 30)));
 		$result = $this->db->conditions($conditions, null);
 		$this->assertEqual($expected, $result);
+
+		$conditions = array('key' => array('like' => '/regex/i'));
+		$result = $this->db->conditions($conditions, null);
+		$expected = array('key' => new MongoRegex('/regex/i'));
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testReadNoConditions() {
@@ -225,12 +232,15 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testUpdate() {
-		$data = array('title' => 'Test Post');
-		$this->query->data($data);
+		$this->query->data(array('title' => 'Test Post'));
 		$this->db->create($this->query);
 
 		$result = $this->db->read($this->query);
 		$original = $result->first()->to('array');
+
+		$this->assertEqual(array('_id', 'title'), array_keys($original));
+		$this->assertEqual('Test Post', $original['title']);
+		$this->assertPattern('/[0-9a-f]{24}/', $original['_id']);
 
 		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
 		$this->query = new Query(compact('model') + array(
@@ -353,12 +363,10 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$post = $model::create(array('title' => 'A post'));
 		$post->save();
-
 		$id = $post->_id;
-		$this->assertTrue(is_string($id));
 
 		$data = Connections::get('lithium_mongo_test')->connection->ordered_docs->findOne(array(
-			'_id' => new MongoId($id)
+			'_id' => $id
 		));
 		$this->assertEqual('A post', $data['title']);
 		$this->assertEqual($id, (string) $data['_id']);
@@ -425,6 +433,24 @@ class MongoDbTest extends \lithium\test\Unit {
 		$db = new MockMongoConnection($this->_testConfig + array('autoConnect' => false));
 		$this->expectException('Could not connect to the database.');
 		$result = $db->entities(null);
+	}
+
+	public function testAtomicUpdate() {
+		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
+		$model::config(array('connection' => 'lithium_mongo_test', 'source' => 'posts'));
+
+		$document = $model::create(array('initial' => 'one', 'values' => 'two'));
+		$document->save();
+
+		$duplicate = $model::create(array('_id' => $document->_id), array('exists' => true));
+		$duplicate->values = 'new';
+		$duplicate->save();
+
+		$document = $model::find((string) $duplicate->_id);
+		$expected = array(
+			'_id' => (string) $duplicate->_id, 'initial' => 'one', 'values' => 'new'
+		);
+		$this->assertEqual($expected, $document->data());
 	}
 }
 

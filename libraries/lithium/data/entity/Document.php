@@ -9,9 +9,11 @@
 namespace lithium\data\entity;
 
 use \Iterator;
+use \lithium\data\Source;
+use \lithium\util\Collection;
 
 /**
- * `Document` is an alternative to the `collection\RecordSet` class, which is optimized for
+ * `Document` is an alternative to the `entity\Record` class, which is optimized for
  * organizing collections of entities from document-oriented databases such as CouchDB or MongoDB.
  * A `Document` object's fields can represent a collection of both simple and complex data types,
  * as well as other `Document` objects. Given the following data (document) structure:
@@ -77,15 +79,13 @@ class Document extends \lithium\data\Entity {
 
 	protected $_errors = array();
 
-	protected $_data = array();
-
 	/**
 	 * An array containing all related documents, keyed by relationship name, as defined in the
 	 * bound model class.
 	 *
 	 * @var array
 	 */
-	protected $_relationships = array();
+	protected $_relations = array();
 
 	/**
 	 * An array of flags to track which fields in this document have been modified, where the keys
@@ -112,7 +112,7 @@ class Document extends \lithium\data\Entity {
 	 */
 	protected $_classes = array(
 		'entity' => __CLASS__,
-		'set' => __CLASS__
+		'set' => 'lithium\data\collection\DocumentSet'
 	);
 
 	/**
@@ -126,6 +126,19 @@ class Document extends \lithium\data\Entity {
 	);
 
 	/**
+	 * The keys of this array represent fields which have either already been "boxed" in a wrapper
+	 * object, or verified as not needing to be.
+	 *
+	 * @var array
+	 */
+	protected $_marked = array();
+
+	protected function _init() {
+		parent::_init();
+		$this->_data = (array) $this->_data;
+	}
+
+	/**
 	 * PHP magic method used when accessing fields as document properties, i.e. `$document->_id`.
 	 *
 	 * @param $name The field name, as specified with an object property.
@@ -136,36 +149,101 @@ class Document extends \lithium\data\Entity {
 		$data = null;
 		$null  = null;
 
+		if (isset($this->_relationships[$name])) {
+			return $this->_relationships[$name];
+		}
+		if (isset($this->_marked[$name])) {
+			return $this->_data[$name];
+		}
 		if (strpos($name, '.')) {
-			$current = $this;
-			$path = explode('.', $name);
-			$length = count($path) - 1;
-
-			foreach ($path as $i => $key) {
-				$current =& $current->__get($key);
-
-				if (!$current instanceof Document && $i < $length) {
-					return $null;
-				}
-			}
-			return $current;
+			return $this->_getNested($name);
 		}
 
 		if ($model = $this->_model) {
 			foreach ($model::relations() as $relation => $config) {
 				if ($config && (($linkKey = $config->data('fieldName')) === $name)) {
 					$data = isset($this->_data[$name]) ? $this->_data[$name] : array();
-					$this->_data[$name] = $this->_relation('set', $name, $data);
-					break;
+					$this->_relationships[$name] = $this->_relationship($config);
+					return $this->_relationships[$name];
 				}
 			}
 		}
 		$data = isset($this->_data[$name]) ? $this->_data[$name] : null;
 
-		if ($this->_isComplexType($data) && !$data instanceof Iterator) {
+		if (!is_object($data) && $this->_isComplexType($data)) {
 			$this->_data[$name] = $this->_relation('entity', $name, $this->_data[$name]);
 		}
-		return $this->_data[$name];
+		$this->_marked[$name] = true;
+
+		if (isset($this->_data[$name])) {
+			return $this->_data[$name];
+		}
+		return $null;
+	}
+
+	public function export(Source $dataSource, array $options = array()) {
+		$defaults = array('atomic' => true);
+		$options += $defaults;
+		$data = array();
+
+		foreach ($this->_data as $key => $val) {
+			if (is_object($val)) {
+				if (is_a($val, $this->_classes['entity'])) {
+					$val = $val->export($dataSource, $options);
+				} elseif (is_a($val, $this->_classes['set'])) {
+					$val = $val->export($dataSource, array('atomic' => false) + $options);
+				}
+			}
+			$data[$key] = $val;
+		}
+
+		if ($options['atomic'] && $this->_exists) {
+			$data = array_intersect_key($data, $this->_modified);
+		}
+
+		if ($model = $this->_model) {
+			$name = null;
+			$options = array('atomic' => false) + $options;
+			$relations = new Collection(array('data' => $model::relations()));
+			$find = function($relation) use (&$name) { return $relation->fieldName === $name; };
+
+			foreach ($this->_relationships as $name => $subObject) {
+				if (($rel = $relations->first($find)) && $rel->link == $rel::LINK_EMBEDDED) {
+					$data[$name] = $subObject->export($dataSource, $options);
+				}
+			}
+		}
+		return $data;
+	}
+
+	protected function _relationship($relationship) {
+		$classType = ($relationship->type == 'hasMany') ? 'set' : 'entity';
+		$config = array('model' => $relationship->to, 'parent' => $this, 'exists' => true);
+		$class = $this->_classes[$classType];
+
+		switch ($relationship->link) {
+			case $relationship::LINK_EMBEDDED:
+				$field = $relationship->fieldName;
+				$config['data'] = isset($this->_data[$field]) ? $this->_data[$field] : array();
+			break;
+		}
+		return new $class($config);
+	}
+
+	protected function &_getNested($name) {
+		$null  = null;
+		$current = $this;
+		$path = explode('.', $name);
+		$length = count($path) - 1;
+
+		foreach ($path as $i => $key) {
+			$current =& $current->__get($key);
+
+			if (!$current instanceof Document && $i < $length) {
+				return $null;
+			}
+		}
+		return $current;
 	}
 
 	/**
@@ -186,28 +264,32 @@ class Document extends \lithium\data\Entity {
 		}
 
 		if (is_string($name) && strpos($name, '.')) {
-			$current = $this;
-			$path = explode('.', $name);
-			$length = count($path) - 1;
-
-			for ($i = 0; $i < $length; $i++) {
-				$key = $path[$i];
-				$next = $current->__get($key);
-
-				if (!$next instanceof Document) {
-					$next = $current->_data[$key] = $this->_relation('entity', $key, array());
-				}
-				$current = $next;
-			}
-			$current->__set(end($path), $value);
-			return;
+			return $this->_setNested($name, $value);
 		}
 
-		if ($this->_isComplexType($value) && !$value instanceof Iterator) {
+		if ($this->_isComplexType($value) && !$value instanceof Document) {
 			$value = $this->_relation('entity', $name, $value);
 		}
 		$this->_data[$name] = $value;
+		$this->_marked[$name] = true;
 		$this->_modified[$name] = true;
+	}
+
+	protected function _setNested($name, $value) {
+		$current = $this;
+		$path = explode('.', $name);
+		$length = count($path) - 1;
+
+		for ($i = 0; $i < $length; $i++) {
+			$key = $path[$i];
+			$next = $current->__get($key);
+
+			if (!$next instanceof Document) {
+				$next = $current->_data[$key] = $this->_relation('entity', $key, array());
+			}
+			$current = $next;
+		}
+		$current->__set(end($path), $value);
 	}
 
 	/**
@@ -260,15 +342,6 @@ class Document extends \lithium\data\Entity {
 	}
 
 	/**
-	 * Rewinds the collection of sub-`Document`s to the beginning and returns the first one found.
-	 *
-	 * @return object Returns the first `Document` object instance in the collection.
-	 */
-	public function rewind() {
-		return ($value = parent::rewind()) ? $value : $this->__get(key($this->_data));
-	}
-
-	/**
 	 * Returns the next `Document` in the set, and advances the object's internal pointer. If the
 	 * end of the set is reached, a new document will be fetched from the data source connection
 	 * handle (`$_handle`). If no more records can be fetched, returns `null`.
@@ -298,7 +371,9 @@ class Document extends \lithium\data\Entity {
 		if ($field) {
 			return isset($this->_data[$field]) ? $this->_data[$field] : null;
 		}
-		return $this->to('array');
+		return $this->to('array') + array_map(
+			function($relationship) { return $relationship->data(); }, $this->_relationships
+		);
 	}
 
 	/**
