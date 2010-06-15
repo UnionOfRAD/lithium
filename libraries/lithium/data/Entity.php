@@ -180,7 +180,7 @@ class Entity extends \lithium\core\Object {
 			throw new RuntimeException("No model bound or unhandled method call '{$method}'.");
 		}
 		array_unshift($params, $this);
-		$class = $model::invokeMethod('_instance');
+		$class = $model::invokeMethod('_object');
 		return call_user_func_array(array(&$class, $method), $params);
 	}
 
