@@ -14,7 +14,6 @@ class MockMongoPost extends \lithium\data\Model {
 		'connection' => 'lithium_mongo_test',
 		'source' => 'posts'
 	);
-
 }
 
 ?>

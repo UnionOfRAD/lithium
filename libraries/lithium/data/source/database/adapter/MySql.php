@@ -130,9 +130,8 @@ class MySql extends \lithium\data\source\Database {
 			$this->encoding($config['encoding']);
 		}
 
-		$this->_useAlias = (boolean) version_compare(
-			mysql_get_server_info($this->connection), "4.1", ">="
-		);
+		$info = mysql_get_server_info($this->connection);
+		$this->_useAlias = (boolean) version_compare($info, "4.1", ">=");
 		return $this->_isConnected;
 	}
 
@@ -194,9 +193,6 @@ class MySql extends \lithium\data\source\Database {
 					'null'     => ($column['Null'] == 'YES' ? true : false),
 					'default'  => $column['Default'],
 				);
-				//if (!empty($column['Key']) && isset($this->index[$column[0]['Key']])) {
-				//	$fields[$column['Field']]['key'] = $this->index[$column[0]['Key']];
-				//}
 			}
 			return $fields;
 		});
