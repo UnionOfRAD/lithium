@@ -9,39 +9,28 @@ class {:class} extends \lithium\action\Controller {
 		return compact('{:plural}');
 	}
 
-	public function view($id = null) {
-		${:singular} = {:model}::find($id);
+	public function view() {
+		${:singular} = {:model}::first($this->request->id);
 		return compact('{:singular}');
 	}
 
 	public function add() {
-		if (!empty($this->request->data)) {
-			${:singular} = {:model}::create($this->request->data);
-			if (${:singular}->save()) {
-				$this->redirect(array(
-					'controller' => '{:plural}', 'action' => 'view',
-					'args' => array(${:singular}->id)
-				));
-			}
-		}
-		if (empty(${:singular})) {
-			${:singular} = {:model}::create();
+		${:singular} = {:model}::create();
+
+		if (($this->request->data) && ${:singular}->save($this->request->data)) {
+			$this->redirect(array('{:name}::view', 'args' => array(${:singular}->id)));
 		}
 		return compact('{:singular}');
 	}
 
-	public function edit($id = null) {
-		${:singular} = {:model}::find($id);
-		if (empty(${:singular})) {
-			$this->redirect(array('controller' => '{:plural}', 'action' => 'index'));
+	public function edit() {
+		${:singular} = {:model}::find($this->request->id);
+
+		if (!${:singular}) {
+			$this->redirect('{:name}::index');
 		}
-		if (!empty($this->request->data)) {
-			if (${:singular}->save($this->request->data)) {
-				$this->redirect(array(
-					'controller' => '{:plural}', 'action' => 'view',
-					'args' => array(${:singular}->id)
-				));
-			}
+		if (($this->request->data) && ${:singular}->save($this->request->data)) {
+			$this->redirect(array('{:name}::view', 'args' => array(${:singular}->id)));
 		}
 		return compact('{:singular}');
 	}
