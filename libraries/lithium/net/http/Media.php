@@ -474,11 +474,15 @@ class Media extends \lithium\core\StaticObject {
 			'txt'          => array('alias' => 'text'),
 			'xml'          => array('application/xml', 'text/xml'),
 		);
+<<<<<<< HEAD
 
 		if (!$type) {
 			return $types;
 		}
 		if (strpos($type, '/') === false) {
+=======
+		if ($type) {
+>>>>>>> Changing exceptions thrown in `\action` to instances of `\action\DispatchException`.
 			return isset($types[$type]) ? $types[$type] : null;
 		}
 		if (strpos($type, ';')) {
