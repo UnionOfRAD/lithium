@@ -305,6 +305,17 @@ class Request extends \lithium\net\http\Message {
 	}
 
 	/**
+	 * Returns the type of content that the client is requesting.
+	 *
+	 * @see lithium\net\http\Media
+	 * @return string Returns a simple type name if the type is registered (i.e. `'json'`), or
+	 *         a fully-qualified content-type if not (i.e. `'image/jpeg'`).
+	 */
+	public function accepts() {
+		return isset($this->params['type']) ? $this->params['type'] : 'html';
+	}
+
+	/**
 	 * Get params, data, query or env
 	 *
 	 * @param string $key data:title, env:base
