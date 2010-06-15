@@ -65,14 +65,14 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testControllerLookupFail() {
 		Dispatcher::config(array('classes' => array('router' => __CLASS__)));
 
-		$this->expectException('/Controller SomeNonExistentController not found/');
+		$this->expectException("/Controller 'SomeNonExistentController' not found/");
 		Dispatcher::run(new Request(array('url' => '/')));
 	}
 
 	public function testPluginControllerLookupFail() {
 		Dispatcher::config(array('classes' => array('router' => __CLASS__)));
 
-		$this->expectException('/Controller some_invalid_plugin.Controller not found/');
+		$this->expectException("/Controller 'some_invalid_plugin.Controller' not found/");
 		Dispatcher::run(new Request(array('url' => '/plugin')));
 	}
 
