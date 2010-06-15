@@ -43,7 +43,8 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['content']);
 
 		$expected = array(
-			'view' => false, 'layout' => false, 'encode' => 'json_encode', 'decode' => 'json_decode'
+			'view' => false, 'layout' => false, 'cast' => true,
+			'encode' => 'json_encode', 'decode' => 'json_decode'
 		);
 		$this->assertEqual($expected, $result['options']);
 
@@ -57,11 +58,8 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['content']);
 
 		$expected = array(
-			'view' => '\my\custom\View',
-			'template' => null,
-			'layout' => null,
-			'encode' => null,
-			'decode' => null
+			'view' => '\my\custom\View', 'template' => null, 'layout' => null,
+			'encode' => null, 'decode' => null, 'cast' => true
 		);
 		$this->assertEqual($expected, $result['options']);
 
@@ -92,7 +90,8 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual('json', $result['content']);
 
 		$expected = array('content' => 'application/json', 'options' => array(
-			'view' => false, 'layout' => false, 'encode' => 'json_encode', 'decode' => 'json_decode'
+			'view' => false, 'layout' => false, 'cast' => true,
+			'encode' => 'json_encode', 'decode' => 'json_decode'
 		));
 		$this->assertEqual($expected, Media::type('json'));
 	}

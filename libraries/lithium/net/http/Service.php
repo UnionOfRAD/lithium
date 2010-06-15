@@ -74,7 +74,7 @@ class Service extends \lithium\core\Object {
 			'login'      => 'root',
 			'password'   => '',
 			'port'       => 80,
-			'timeout'    => 1,
+			'timeout'    => 30,
 			'encoding'   => 'UTF-8',
 		);
 		$config = (array) $config + $defaults;

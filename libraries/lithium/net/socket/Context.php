@@ -25,7 +25,7 @@ class Context extends \lithium\net\Socket {
 	 *
 	 * @var int
 	 */
-	protected $_timeout = null;
+	protected $_timeout = 30;
 
 	/**
 	 * Opens the socket and sets its timeout value.
@@ -109,8 +109,7 @@ class Context extends \lithium\net\Socket {
 	 */
 	public function send($message, array $options = array()) {
 		$defaults = array(
-			'path' => null, 'classes' => array('response' => null),
-			'context' => array(
+			'path' => null, 'classes' => array('response' => null), 'context' => array(
 				'ignore_errors' => true, 'timeout' => $this->_timeout
 			)
 		);
@@ -121,8 +120,10 @@ class Context extends \lithium\net\Socket {
 		}
 		$url = is_object($message) ? $message->to('url') : $options['path'];
 		$message = is_object($message) ? $message->to('context', $options['context']) : $message;
+		$message = array('http' => array('ignore_errors' => true, 'timeout' => $this->_timeout));
+		$context = stream_context_create($message);
 
-		if ($this->connection = fopen($url, 'r', false, stream_context_create($message))) {
+		if ($this->connection = fopen($url, 'r', false, $context)) {
 			$meta = stream_get_meta_data($this->connection);
 			$headers = $meta['wrapper_data'] ?: array();
 			$message = isset($headers[0]) ? $headers[0] : null;

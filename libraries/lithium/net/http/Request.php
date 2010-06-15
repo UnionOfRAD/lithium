@@ -190,7 +190,14 @@ class Request extends \lithium\net\http\Message {
 				$query = $this->queryString();
 				return "{$this->scheme}://{$this->host}:{$this->port}{$this->path}{$query}";
 			case 'context':
-				return array($this->scheme => $options + $this->to('array'));
+				$scheme = $this->scheme;
+				$result = array($scheme => $options + $this->to('array'));
+
+				if (is_array($result[$scheme]['header'])) {
+					$result[$scheme]['header'] = join("\r\n", $result[$scheme]['header']);
+				}
+				unset($result[$scheme]['content']);
+				return $result;
 			case 'string':
 			default:
 				return (string) $this;
