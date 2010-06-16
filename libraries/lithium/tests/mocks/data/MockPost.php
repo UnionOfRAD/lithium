@@ -13,11 +13,11 @@ class MockPost extends \lithium\tests\mocks\data\MockBase {
 	public $hasMany = array('MockComment');
 
 	public static function resetSchema() {
-		static::_instance()->_schema = array();
+		static::_object()->_schema = array();
 	}
 
 	public static function overrideSchema(array $schema = array()) {
-		static::_instance()->_schema = $schema;
+		static::_object()->_schema = $schema;
 	}
 
 	public static function instances() {

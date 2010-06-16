@@ -24,7 +24,7 @@ class MockComment extends \lithium\tests\mocks\data\MockBase {
 		);
 		$options += $defaults;
 		$params = compact('type', 'options');
-		$self = static::_instance();
+		$self = static::_object();
 
 		$filter = function($self, $params) {
 			extract($params);
