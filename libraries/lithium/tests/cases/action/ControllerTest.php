@@ -50,7 +50,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertEqual($result2, $result);
 
 		$postsController = new MockPostsController();
-		$this->expectException('/Template not found/');
+		$this->expectException('/Unhandled media type/');
 		$result = $postsController->__invoke(null, array(
 			'action' => 'index', 'args' => array(true)
 		));

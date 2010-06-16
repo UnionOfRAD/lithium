@@ -136,25 +136,15 @@ class Dispatcher extends \lithium\core\StaticObject {
 	protected static function _callable($request, $params, $options) {
 		$params = compact('request', 'params', 'options');
 		return static::_filter(__FUNCTION__, $params, function($self, $params, $chain) {
-			extract($params, EXTR_OVERWRITE);
-			$library = '';
-
-			if (strpos($params['controller'], '.')) {
-				list($library, $params['controller']) = explode('.', $params['controller']);
-				$library .= '.';
-			}
-
-			if (strpos($params['controller'], '\\') !== false) {
-				$class = $params['controller'];
-			} else {
-				$controller = $library . Inflector::camelize($params['controller']);
-				$class = Libraries::locate('controllers', $controller);
-			}
+			$request = $params['request'];
+			$options = $params['options'];
+			$params = $params['params'];
+			$class = Libraries::locate('controllers', $params['controller']);
 
 			if (class_exists($class)) {
 				return new $class(compact('request'));
 			}
-			throw new DispatchException("Controller '{$controller}' not found");
+			throw new DispatchException("Controller '{$params['controller']}' not found");
 		});
 	}
 
@@ -182,6 +172,17 @@ class Dispatcher extends \lithium\core\StaticObject {
 
 		if (!$params) {
 			return false;
+		}
+		if (isset($params['controller']) && is_string($params['controller'])) {
+			$controller = $params['controller'];
+
+			if (strpos($controller, '.') !== false) {
+				list($library, $controller) = explode('.', $controller);
+				$controller = $library . '.' . Inflector::camelize($controller);
+			} elseif (strpos($controller, '\\') === false) {
+				$controller = Inflector::camelize($controller);
+			}
+			$params['controller'] = $controller;
 		}
 
 		foreach (static::$_rules as $rule => $value) {
