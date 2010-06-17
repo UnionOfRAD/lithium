@@ -249,7 +249,7 @@ class Create extends \lithium\console\Command {
 	 * @param string $params
 	 * @return boolean
 	 */
-	protected function _save($params = array()) {
+	protected function _save(array $params = array()) {
 		$defaults = array('namespace' => null, 'class' => null);
 		$params += $defaults;
 
@@ -259,17 +259,13 @@ class Create extends \lithium\console\Command {
 		$contents = $this->_template();
 		$result = String::insert($contents, $params);
 
-		$path = str_replace(
-			'\\', '/', "{$params['namespace']}\\{$params['class']}"
-		);
+		$path = str_replace('\\', '/', "{$params['namespace']}\\{$params['class']}");
 		$path = $this->_library['path'] . stristr($path, '/');
 		$file = str_replace('//', '/', "{$path}.php");
 		$directory = dirname($file);
 
-		if (!is_dir($directory)) {
-			if (!mkdir($directory, 0755, true)) {
-				return false;
-			}
+		if ((!is_dir($directory)) && !mkdir($directory, 0755, true)) {
+			return false;
 		}
 		if (file_put_contents($file, "<?php\n\n{$result}\n\n?>")) {
 			return "{$params['class']} created in {$params['namespace']}.";

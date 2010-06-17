@@ -37,7 +37,7 @@ class Controller extends \lithium\console\command\Create {
      * @return string
      */
 	protected function _class($request) {
-		return $this->_name($request). 'Controller';
+		return $this->_name($request) . 'Controller';
 	}
 
 	/**
@@ -78,36 +78,6 @@ class Controller extends \lithium\console\command\Create {
      */
 	protected function _singular($request) {
 		return Inflector::singularize(Inflector::camelize($request->action, false));
-	}
-
-	/**
-	 * Generate a new controller by name.
-	 *
-	 * @param string $name Controller name.
-	 * @param string $null 
-	 * @return void
-	 */
-	public function run($name = null, $null = null) {
-		$library = Libraries::get($this->library);
-
-		if (!$library['prefix']) {
-			return false;
-		}
-		$model = Inflector::classify($name);
-		$use = "\\{$library['prefix']}models\\{$model}";
-
-		$params = compact('name', 'model', 'use') + array(
-			'namespace' => "{$library['prefix']}controllers",
-			'class' => "{$name}Controller",
-			'singular' => Inflector::singularize(Inflector::underscore($name)),
-			'plural' => Inflector::pluralize(Inflector::underscore($name))
-		);
-
-		if ($this->_save($this->template, $params)) {
-			$this->out("{$params['class']} created in {$params['namespace']}.");
-			return true;
-		}
-		return false;
 	}
 }
 
