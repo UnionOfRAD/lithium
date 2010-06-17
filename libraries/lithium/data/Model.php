@@ -428,6 +428,10 @@ class Model extends \lithium\core\StaticObject {
 			'conditions' => null, 'fields' => null, 'order' => null, 'limit' => null, 'page' => 1
 		);
 
+		if ($type === null) {
+			return null;
+		}
+
 		if ($type != 'all' && is_scalar($type) && !isset($self->_finders[$type])) {
 			$options['conditions'] = array($self->_meta['key'] => $type);
 			$type = 'first';
