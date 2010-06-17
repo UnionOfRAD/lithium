@@ -131,9 +131,8 @@ class Controller extends \lithium\core\Object {
 		$this->request = $this->request ?: $this->_config['request'];
 
 		if ($this->request) {
-			$this->_render['type'] = $this->request->type() ?: 'html';
+			$this->_render['type'] = $this->request->accepts() ?: 'html';
 		}
-
 		$config = $this->_config['response'] + array('request' => $this->request);
 		$this->response = $this->_instance('response', $config);
 	}
