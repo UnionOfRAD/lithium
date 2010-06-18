@@ -20,7 +20,7 @@ class SourceTest extends \lithium\test\Unit {
 			'connect', 'disconnect', 'entities', 'describe', 'create', 'read', 'update', 'delete',
 			'schema', 'result', 'relationship', '__construct', '__destruct', '_init', 'isConnected',
 			'name', 'methods', 'configureClass', 'item', 'applyFilter', 'invokeMethod',
-			'__set_state', '_filter', '_parents', '_stop'
+			'__set_state', '_instance', '_filter', '_parents', '_stop'
 		);
 		$this->assertEqual($expected, $methods);
 	}

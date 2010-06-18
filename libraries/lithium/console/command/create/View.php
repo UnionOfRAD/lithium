@@ -25,7 +25,7 @@ class View extends \lithium\console\command\Create {
      *
      * @param array $params
      */
-	protected function _save($params = array()) {
+	protected function _save(array $params = array()) {
 		$params['path'] = Inflector::underscore($this->request->action);
 		$params['file'] = $this->request->args(0);
 

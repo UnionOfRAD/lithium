@@ -256,6 +256,7 @@ class QueryTest extends \lithium\test\Unit {
 			'calculate',
 			'comment',
 			'conditions',
+			'data',
 			'fields',
 			'group',
 			'joins',

@@ -127,8 +127,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 				$request->params['args'][0] = $name;
 				$name = '\lithium\console\command\Help';
 			}
-			$class = Libraries::locate('command', $name);
-			if (class_exists($class)) {
+			if (class_exists($class = Libraries::locate('command', $name))) {
 				return new $class(compact('request'));
 			}
 			throw new UnexpectedValueException("Command `{$name}` not found");

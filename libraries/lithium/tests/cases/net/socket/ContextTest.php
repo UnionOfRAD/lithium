@@ -19,9 +19,9 @@ class ContextTest extends \lithium\test\Unit {
 	}
 
 	public function testGetSetTimeout() {
-		$this->assertNull($this->subject->timeout());
-		$this->assertEqual(30, $this->subject->timeout(30));
 		$this->assertEqual(30, $this->subject->timeout());
+		$this->assertEqual(25, $this->subject->timeout(25));
+		$this->assertEqual(25, $this->subject->timeout());
 	}
 }
 
