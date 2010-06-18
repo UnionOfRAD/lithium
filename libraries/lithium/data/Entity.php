@@ -356,13 +356,13 @@ class Entity extends \lithium\core\Object {
 	}
 
 	/**
-	 * Instantiates a new `Document` object as a descendant of the current object, and sets all
+	 * Instantiates a new `Entity` object as a descendant of the current object, and sets all
 	 * default values and internal state.
 	 *
 	 * @param string $classType The type of class to create, either `'entity'` or `'set'`.
 	 * @param array $data
 	 * @param array $options
-	 * @return object Returns a new `Document` object instance.
+	 * @return object Returns a new `Entity` object instance.
 	 */
 	protected function _relation($classType, $key, $data, $options = array()) {
 		$parent = $this;

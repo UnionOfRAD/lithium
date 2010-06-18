@@ -185,20 +185,28 @@ class Document extends \lithium\data\Entity {
 		$defaults = array('atomic' => true);
 		$options += $defaults;
 		$data = array();
+		$nested = array();
 
 		foreach ($this->_data as $key => $val) {
-			if (is_object($val)) {
-				if (is_a($val, $this->_classes['entity'])) {
-					$val = $val->export($dataSource, $options);
-				} elseif (is_a($val, $this->_classes['set'])) {
-					$val = $val->export($dataSource, array('atomic' => false) + $options);
-				}
+			if (!is_object($val)) {
+				$data[$key] = $val;
+				continue;
 			}
-			$data[$key] = $val;
+			$nestedOptions = $options;
+
+			switch (true) {
+				case (is_a($val, $this->_classes['set'])):
+					$nestedOptions = array('atomic' => false) + $options;
+				case (is_a($val, $this->_classes['entity'])):
+					if ($data[$key] = $val->export($dataSource, $nestedOptions)) {
+						$nested[$key] = true;
+					}
+				break;
+			}
 		}
 
 		if ($options['atomic'] && $this->_exists) {
-			$data = array_intersect_key($data, $this->_modified);
+			$data = array_intersect_key($data, $this->_modified + $nested);
 		}
 
 		if ($model = $this->_model) {
@@ -214,6 +222,29 @@ class Document extends \lithium\data\Entity {
 			}
 		}
 		return $data;
+	}
+
+	public function update($id = null, array $data = array()) {
+		foreach ($this->_data as $key => $val) {
+			if (is_a($val, $this->_classes['entity'])) {
+				$this->_data[$key]->update(null, isset($data[$key]) ? $data[$key] : array());
+			}
+		}
+		return parent::update($id, $data);
+	}
+
+	/**
+	 * Instantiates a new `Document` object as a descendant of the current object, and sets all
+	 * default values and internal state.
+	 *
+	 * @param string $classType The type of class to create, either `'entity'` or `'set'`.
+	 * @param array $data
+	 * @param array $options
+	 * @return object Returns a new `Document` object instance.
+	 */
+	protected function _relation($classType, $key, $data, $options = array()) {
+		$options['exists'] = false;
+		return parent::_relation($classType, $key, $data, $options);
 	}
 
 	protected function _relationship($relationship) {

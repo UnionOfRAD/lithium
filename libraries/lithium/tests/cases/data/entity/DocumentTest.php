@@ -593,8 +593,47 @@ class DocumentTest extends \lithium\test\Unit {
 
 		$this->assertEqual('level', $doc->top);
 		$this->assertEqual('of data', $doc->second->level);
+	}
 
-		
+	/**
+	 * Tests that a modified `Document` exports the proper fields in a newly-appended nested
+	 * `Document`.
+	 *
+	 * @return void
+	 */
+	public function testModifiedExport() {
+		$database = new MockDocumentSource();
+
+		$doc = new Document(array('data' => array('foo' => 'bar', 'baz' => 'dib')));
+		$doc->nested = array('more' => 'data');
+
+		$newData = $doc->export($database);
+		$expected = array('foo' => 'bar', 'baz' => 'dib', 'nested' => array('more' => 'data'));
+		$this->assertEqual($expected, $newData);
+
+		$doc = new Document(array('exists' => true, 'data' => array(
+			'foo' => 'bar', 'baz' => 'dib'
+		)));
+		$this->assertFalse($doc->export($database));
+
+		$doc->nested = array('more' => 'data');
+		$this->assertEqual('data', $doc->nested->more);
+
+		$modified = $doc->export($database);
+		$this->assertEqual(array('nested' => array('more' => 'data')), $modified);
+
+		$doc->update();
+		$this->assertFalse($doc->export($database));
+
+		$doc->more = 'cowbell';
+		$doc->nested->evenMore = 'cowbell';
+		$modified = $doc->export($database);
+		$expected = array('nested' => array('evenMore' => 'cowbell'), 'more' => 'cowbell');
+		$this->assertEqual($expected, $modified);
+
+		$doc->update();
+		$doc->nested->evenMore = 'foo!';
+		$this->assertEqual(array('nested' => array('evenMore' => 'foo!')), $doc->export($database));
 	}
 }
 
