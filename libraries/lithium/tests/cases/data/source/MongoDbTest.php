@@ -452,6 +452,26 @@ class MongoDbTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $document->data());
 	}
+
+	/**
+	 * Tests that the MongoDB adapter will not attempt to overwrite the _id field on document
+	 * update.
+	 *
+	 * @return void
+	 */
+	public function testPreserveId() {
+		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
+		$model::config(array('connection' => 'lithium_mongo_test', 'source' => 'posts'));
+
+		$document = $model::create(array('_id' => 'custom'));
+		$document->save();
+
+		$document->_id = 'custom2';
+		$document->foo = 'bar';
+		$this->assertTrue($document->save());
+		$this->assertNull($model::first('custom2'));
+		$this->assertEqual(array('_id' => 'custom'), $model::first('custom')->data());
+	}
 }
 
 ?>

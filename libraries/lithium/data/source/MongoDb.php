@@ -453,6 +453,7 @@ class MongoDb extends \lithium\data\Source {
 			if ($args['source'] == $gridCol && isset($args['data']['file'])) {
 				$args['data']['_id'] = $self->invokeMethod('_saveFile', array($args));
 			}
+			unset($args['data']['_id']);
 
 			$update = $self->invokeMethod('_toMongoId', array($args['data']));
 			$update = ($options['atomic']) ? array('$set' => $update) : $update;
