@@ -183,7 +183,12 @@ class RequestTest extends \lithium\test\Unit {
 	public function testToContext() {
 		$expected = array('http' => array(
 			'method' => 'GET',
-			'header' => "Host: localhost:80\r\nConnection: Close\r\nUser-Agent: Mozilla/5.0"
+			'content' => '',
+			'header' => array(
+				'Host: localhost:80',
+				'Connection: Close',
+				'User-Agent: Mozilla/5.0'
+			)
 		));
 		$result = $this->request->to('context');
 		$this->assertEqual($expected, $result);
