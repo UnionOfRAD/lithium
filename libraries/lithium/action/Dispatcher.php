@@ -112,7 +112,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			if (($result = $router::process($request)) instanceof Response) {
 				return $result;
 			}
-			$params = $self::invokeMethod('_applyRules', array($result->params));
+			$params = $self::applyRules($result->params);
 
 			if (!$params) {
 				throw new DispatchException('Could not route request');
@@ -120,6 +120,50 @@ class Dispatcher extends \lithium\core\StaticObject {
 			$callable = $self::invokeMethod('_callable', array($result, $params, $options));
 			return $self::invokeMethod('_call', array($callable, $result, $params));
 		});
+	}
+
+	/**
+	 * Attempts to apply a set of formatting rules from `$_rules` to a `$params` array, where each
+	 * formatting rule is applied if the key of the rule in `$_rules` is present and not empty in
+	 * `$params`.  Also performs sanity checking against `$params` to ensure that no value
+	 * matching a rule is present unless the rule check passes.
+	 *
+	 * @param array $params An array of route parameters to which rules will be applied.
+	 * @return array Returns the `$params` array with formatting rules applied to array values.
+	 */
+	public static function applyRules($params) {
+		$result = array();
+
+		if (!$params) {
+			return false;
+		}
+		if (isset($params['controller']) && is_string($params['controller'])) {
+			$controller = $params['controller'];
+
+			if (strpos($controller, '.') !== false) {
+				list($library, $controller) = explode('.', $controller);
+				$controller = $library . '.' . Inflector::camelize($controller);
+			} elseif (strpos($controller, '\\') === false) {
+				$controller = Inflector::camelize($controller);
+			}
+			$params['controller'] = $controller;
+		}
+
+		foreach (static::$_rules as $rule => $value) {
+			foreach ($value as $k => $v) {
+				if (!empty($params[$rule])) {
+					$result[$k] = String::insert($v, $params);
+				}
+
+				$match = preg_replace('/\{:\w+\}/', '@', $v);
+				$match = preg_replace('/@/', '.+', preg_quote($match, '/'));
+
+				if (preg_match('/' . $match . '/i', $params[$k])) {
+					return false;
+				}
+			}
+		}
+		return $result + array_diff_key($params, $result);
 	}
 
 	/**
@@ -156,50 +200,6 @@ class Dispatcher extends \lithium\core\StaticObject {
 			}
 			throw new DispatchException('Result not callable');
 		});
-	}
-
-	/**
-	 * Attempts to apply a set of formatting rules from `$_rules` to a `$params` array, where each
-	 * formatting rule is applied if the key of the rule in `$_rules` is present and not empty in
-	 * `$params`.  Also performs sanity checking against `$params` to ensure that no value
-	 * matching a rule is present unless the rule check passes.
-	 *
-	 * @param array $params An array of route parameters to which rules will be applied.
-	 * @return array Returns the `$params` array with formatting rules applied to array values.
-	 */
-	protected static function _applyRules($params) {
-		$result = array();
-
-		if (!$params) {
-			return false;
-		}
-		if (isset($params['controller']) && is_string($params['controller'])) {
-			$controller = $params['controller'];
-
-			if (strpos($controller, '.') !== false) {
-				list($library, $controller) = explode('.', $controller);
-				$controller = $library . '.' . Inflector::camelize($controller);
-			} elseif (strpos($controller, '\\') === false) {
-				$controller = Inflector::camelize($controller);
-			}
-			$params['controller'] = $controller;
-		}
-
-		foreach (static::$_rules as $rule => $value) {
-			foreach ($value as $k => $v) {
-				if (!empty($params[$rule])) {
-					$result[$k] = String::insert($v, $params);
-				}
-
-				$match = preg_replace('/\{:\w+\}/', '@', $v);
-				$match = preg_replace('/@/', '.+', preg_quote($match, '/'));
-
-				if (preg_match('/' . $match . '/i', $params[$k])) {
-					return false;
-				}
-			}
-		}
-		return $result + array_diff_key($params, $result);
 	}
 }
 

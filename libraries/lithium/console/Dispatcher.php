@@ -97,7 +97,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			$request = $request ?: new $classes['request']($options['request']);
 			$request->params = $router::parse($request);
 
-			$params = $self::invokeMethod('_applyRules', array($request->params));
+			$params = $self::applyRules($request->params);
 
 			try {
 				$callable = $self::invokeMethod('_callable', array($request, $params, $options));
@@ -135,6 +135,35 @@ class Dispatcher extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Attempts to apply a set of formatting rules from `$_rules` to a `$params` array, where each
+	 * formatting rule is applied if the key of the rule in `$_rules` is present and not empty in
+	 * `$params`.  Also performs sanity checking against `$params` to ensure that no value
+	 * matching a rule is present unless the rule check passes.
+	 *
+	 * @param array $params An array of route parameters to which rules will be applied.
+	 * @return array Returns the `$params` array with formatting rules applied to array values.
+	 */
+	public static function applyRules($params) {
+		$result = array();
+
+		if (!$params) {
+			return false;
+		}
+
+		foreach (static::$_rules as $name => $rules) {
+			foreach ($rules as $rule) {
+				if (!empty($params[$name]) && isset($rule[0])) {
+					$options = array_merge(
+						array($params[$name]), isset($rule[2]) ? (array) $rule[2] : array()
+					);
+					$result[$name] = call_user_func_array(array($rule[0], $rule[1]), $options);
+				}
+			}
+		}
+		return $result + array_diff_key($params, $result);
+	}
+
+	/**
 	 * Call class method
 	 *
 	 * @param string $callable
@@ -164,35 +193,6 @@ class Dispatcher extends \lithium\core\StaticObject {
 			}
 			throw new UnexpectedValueException("{$callable} not callable");
 		});
-	}
-
-	/**
-	 * Attempts to apply a set of formatting rules from `$_rules` to a `$params` array, where each
-	 * formatting rule is applied if the key of the rule in `$_rules` is present and not empty in
-	 * `$params`.  Also performs sanity checking against `$params` to ensure that no value
-	 * matching a rule is present unless the rule check passes.
-	 *
-	 * @param array $params An array of route parameters to which rules will be applied.
-	 * @return array Returns the `$params` array with formatting rules applied to array values.
-	 */
-	protected static function _applyRules($params) {
-		$result = array();
-
-		if (!$params) {
-			return false;
-		}
-
-		foreach (static::$_rules as $name => $rules) {
-			foreach ($rules as $rule) {
-				if (!empty($params[$name]) && isset($rule[0])) {
-					$options = array_merge(
-						array($params[$name]), isset($rule[2]) ? (array) $rule[2] : array()
-					);
-					$result[$name] = call_user_func_array(array($rule[0], $rule[1]), $options);
-				}
-			}
-		}
-		return $result + array_diff_key($params, $result);
 	}
 }
 
