@@ -307,7 +307,6 @@ class InflectorTest extends \lithium\test\Unit {
 
 		$this->assertEqual(Inflector::slug('ABc'), 'ABc');
 		Inflector::rules('transliteration', array('AB' => 'a'));
-		Inflector::reset();
 		$this->assertEqual(Inflector::slug('ABc'), 'aac');
 	}
 

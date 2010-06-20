@@ -333,6 +333,11 @@ class Inflector {
 		static::$_camelized = static::$_underscored = array();
 		static::$_plural['regexUninflected'] = static::$_singular['regexUninflected'] = null;
 		static::$_plural['regexIrregular'] = static::$_singular['regexIrregular'] = null;
+		static::$_transliteration = array(
+			'/à|á|å|â/' => 'a', '/è|é|ê|ẽ|ë/' => 'e', '/ì|í|î/' => 'i', '/ò|ó|ô|ø/' => 'o',
+			'/ù|ú|ů|û/' => 'u', '/ç/' => 'c', '/ñ/' => 'n', '/ä|æ/' => 'ae', '/ö/' => 'oe',
+			'/ü/' => 'ue', '/Ä/' => 'Ae', '/Ü/' => 'Ue', '/Ö/' => 'Oe', '/ß/' => 'ss'
+		);
 	}
 
 	/**
