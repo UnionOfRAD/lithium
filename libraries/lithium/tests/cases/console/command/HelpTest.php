@@ -44,7 +44,7 @@ class HelpTest extends \lithium\test\Unit {
 
 		$expected = preg_quote($expected);
 		$result = $help->response->output;
-		$pattern = "/\s+Test\s+Runs a given set of tests and outputs the results\./ms";
+		$pattern = "/\s+test\s+Runs a given set of tests and outputs the results\./ms";
 		$this->assertPattern($pattern, $result);
 
 	}
@@ -57,7 +57,7 @@ class HelpTest extends \lithium\test\Unit {
 		$result = $help->run('Test');
 		$this->assertEqual($expected, $result);
 
-		$expected = "li3 Test --case=CASE --group=GROUP --filters=FILTERS [ARGS]";
+		$expected = "li3 test --case=CASE --group=GROUP --filters=FILTERS [ARGS]";
 		$expected = preg_quote($expected);
 		$result = $help->response->output;
 		$this->assertPattern("/{$expected}/", $result);

@@ -32,7 +32,8 @@ class Help extends \lithium\console\Command {
 
 			foreach ($commands as $command) {
 				$info = Inspector::info($command);
-				$this->out($this->_pad(Inflector::classify($info['shortName'])), 'heading2');
+				$name = strtolower(Inflector::slug($info['shortName']));
+				$this->out($this->_pad($name), 'heading2');
 				$this->out($this->_pad($info['description']), 2);
 			}
 			$message = 'See `{:command}li3 help COMMAND{:end}`';
@@ -40,6 +41,8 @@ class Help extends \lithium\console\Command {
 			$this->out($message, 2);
 			return true;
 		}
+		$name = Inflector::classify($name);
+
 		if (!$class = Libraries::locate('command', $name)) {
 			$this->error("{$name} not found");
 			return false;
@@ -47,6 +50,7 @@ class Help extends \lithium\console\Command {
 		if (strpos($name, '\\') !== false) {
 			$name = join('', array_slice(explode("\\", $name), -1));
 		}
+		$name = strtolower(Inflector::slug($name));
 		$methods = $this->_methods($class);
 		$properties = $this->_properties($class);
 

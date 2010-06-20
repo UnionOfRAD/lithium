@@ -116,9 +116,10 @@ class DispatcherTest extends \lithium\test\Unit {
 		$result = Dispatcher::run(new Request(array(
 			'args' => array(
 				'\lithium\tests\mocks\console\command\MockCommandHelp',
-				'sample-task-with-required-args'
+				'sample-task-with-optional-args'
 			)
 		)));
+		$this->assertTrue($result);
 
 		$result = Dispatcher::run(new Request(array(
 			'args' => array(
@@ -126,7 +127,7 @@ class DispatcherTest extends \lithium\test\Unit {
 				'sample_task_with_optional_args'
 			)
 		)));
-		$this->assertTrue($result === true);
+		$this->assertTrue($result);
 	}
 }
 
