@@ -23,7 +23,7 @@ class Context extends \lithium\net\Socket {
 	/**
 	 * Connection timeout value.
 	 *
-	 * @var int
+	 * @var integer
 	 */
 	protected $_timeout = 30;
 
@@ -76,7 +76,7 @@ class Context extends \lithium\net\Socket {
 	public function write($data) {
 		return true;
 	}
-	
+
 	/**
 	 * Sets the timeout on the socket *connection*.
 	 *
@@ -89,11 +89,11 @@ class Context extends \lithium\net\Socket {
 		}
 		return $this->_timeout;
 	}
-	
+
 	/**
 	 * Sets the encoding of the socket connection. Does not apply to this implementation.
 	 *
-	 * @param string $charset The character set to use.
+	 * @param string $encoding The character set to use.
 	 * @return boolean `true` if encoding has been set, `false` otherwise.
 	 */
 	public function encoding($encoding = null) {
@@ -120,10 +120,8 @@ class Context extends \lithium\net\Socket {
 		}
 		$url = is_object($message) ? $message->to('url') : $options['path'];
 		$message = is_object($message) ? $message->to('context', $options['context']) : $message;
-		$message = array('http' => array('ignore_errors' => true, 'timeout' => $this->_timeout));
-		$context = stream_context_create($message);
 
-		if ($this->connection = fopen($url, 'r', false, $context)) {
+		if ($this->connection = fopen($url, 'r', false, stream_context_create($message))) {
 			$meta = stream_get_meta_data($this->connection);
 			$headers = $meta['wrapper_data'] ?: array();
 			$message = isset($headers[0]) ? $headers[0] : null;
