@@ -160,10 +160,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 
 		if (($pos = strpos($category, 'Template')) !== false) {
 			$category = substr($category, 0, $pos);
-
-			return array(
-				"{$path}/{$category}_{$scope}.pot"
-			);
+			return array("{$path}/{$category}_{$scope}.pot");
 		}
 
 		if ($category == 'message') {
@@ -286,7 +283,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			'offsetId' => null,
 			'offsetTranslated' => null,
 			'sizeHashes' => null,
-			'offsetHashes' => null
+			'offsetHashes' => null,
 		);
 		foreach ($header as &$value) {
 			$value = $this->_readLong($stream, $isBigEndian);
@@ -325,10 +322,8 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 				$translated = explode("\000", $translated);
 			}
 
-			$data = $this->_merge($data, array(
-				'ids' => array('singular' => $singularId, 'plural' => $pluralId),
-				'translated' => $translated
-			));
+			$ids = array('singular' => $singularId, 'plural' => $pluralId);
+			$data = $this->_merge($data, compact('ids', 'translated'));
 		}
 		return $data;
 	}

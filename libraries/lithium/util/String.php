@@ -115,7 +115,7 @@ class String {
 			'after' => '}',
 			'escape' => null,
 			'format' => null,
-			'clean' => false
+			'clean' => false,
 		);
 		$options += $defaults;
 		$format = $options['format'];

@@ -40,9 +40,7 @@ class MessageTest extends \lithium\test\Unit {
 	}
 
 	public function testTranslateBasic() {
-		$data = array(
-			'catalog' => 'Katalog',
-		);
+		$data = array('catalog' => 'Katalog');
 		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
 
 		$expected = 'Katalog';
@@ -250,9 +248,7 @@ class MessageTest extends \lithium\test\Unit {
 	}
 
 	public function testAliasesSymmetry() {
-		$data = array(
-			'house' => array('Haus', 'Häuser')
-		);
+		$data = array('house' => array('Haus', 'Häuser'));
 		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
 
 		$filters = Message::aliases();
@@ -284,6 +280,33 @@ class MessageTest extends \lithium\test\Unit {
 		$expected = Message::translate('house', array('locale' => 'de', 'count' => 3));
 		$result = $tn('house', 'houses', array('locale' => 'de'));
 		$this->assertNotEqual($expected, $result);
+	}
+
+	public function testCaching() {
+		$data = array('catalog' => 'Katalog');
+		Catalog::write('message', 'de', $data, array('name' => 'runtime', 'scope' => 'foo'));
+
+		$this->assertFalse(Message::cache());
+
+		$result = Message::translate('catalog', array('locale' => 'de', 'scope' => 'foo'));
+		$this->assertEqual('Katalog', $result);
+
+		$cache = Message::cache();
+		$this->assertEqual('Katalog', $cache['foo']['de']['catalog']);
+
+		Message::cache(false);
+		$this->assertFalse(Message::cache());
+
+		Message::cache(array('foo' => array('de' => array('catalog' => '<Katalog>'))));
+		$result = Message::translate('catalog', array('locale' => 'de', 'scope' => 'foo'));
+		$this->assertEqual('<Katalog>', $result);
+
+		$options = array('locale' => 'de', 'scope' => 'foo', 'count' => 2);
+		$this->assertEqual('<Katalog>', Message::translate('catalog', $options));
+
+		Message::cache(false);
+		Message::cache(array('foo' => array('de' => array('catalog' => array('<Katalog>')))));
+		$this->assertNull(Message::translate('catalog', $options));
 	}
 }
 

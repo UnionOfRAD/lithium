@@ -322,6 +322,12 @@ class CatalogTest extends \lithium\test\Unit {
 		));
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testInvalidWrite() {
+		Catalog::reset();
+		$data = array('house'	=> array('id' => 'house'));
+		$this->assertFalse(Catalog::write('message', 'de', $data));
+	}
 }
 
 ?>
