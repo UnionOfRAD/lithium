@@ -77,15 +77,14 @@ class Affected extends \lithium\test\Filter {
 	 * Returns all classes directly depending on a given class.
 	 *
 	 * @param string $dependency The class name to use as a dependency.
+	 * @param string $exclude Regex path exclusion filter.
 	 * @return array Classes having a direct dependency on `$dependency`. May cotain duplicates.
 	 */
-	protected static function _affected($dependency) {
-		$classes = Libraries::find(true, array(
-			'recursive' => true,
-			'exclude' => '/(tests|webroot|resources|libraries|plugins)/'
-		));
-		$affected = array();
+	protected static function _affected($dependency, $exclude = null) {
+		$exclude = $exclude ?: '/(tests|webroot|resources|libraries|plugins)/';
+		$classes = Libraries::find(true, compact('exclude') + array('recursive' => true));
 		$dependency = ltrim($dependency, '\\');
+		$affected = array();
 
 		foreach ($classes as $class) {
 			if (isset(static::$_cachedDepends[$class])) {

@@ -69,7 +69,7 @@ class Report extends \lithium\core\Object {
 			'group' => null,
 			'filters' => array(),
 			'format' => 'txt',
-			'reporter' => 'console'
+			'reporter' => 'console',
 		);
 		parent::__construct($config + $defaults);
 	}

@@ -44,7 +44,7 @@ class Group extends \lithium\util\Collection {
 			'library' => true,
 			'filter' => '/cases/',
 			'exclude' => '/mock/',
-			'recursive' => true
+			'recursive' => true,
 		);
 		$options += $defaults;
 		$classes = Libraries::locate('tests', null, $options);
@@ -118,7 +118,7 @@ class Group extends \lithium\util\Collection {
 		return (array) Libraries::find($library, array(
 			'recursive' => true,
 			'path' => '/' . str_replace('\\', '/', $path),
-			'filter' => '/cases|integration|functional/'
+			'filter' => '/cases|integration|functional/',
 		));
 	}
 }
