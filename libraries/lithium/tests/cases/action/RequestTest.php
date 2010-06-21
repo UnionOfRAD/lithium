@@ -98,6 +98,10 @@ class RequestTest extends \lithium\test\Unit {
 		$expected = '\\lithium\\app\\webroot\\index.php';
 		$result = $request->env('SCRIPT_FILENAME');
 		$this->assertEqual($expected, $result);
+
+		$request = new Request(array('env' => array('SCRIPT_FILENAME' => null)));
+		$path = $request->env('DOCUMENT_ROOT') . $request->env('PHP_SELF');
+		$this->assertEqual($path, $request->env('SCRIPT_FILENAME'));
 	}
 
 	public function testDocumentRoot() {
@@ -243,13 +247,11 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testDetect() {
-		$_SERVER['SOME_COOL_DETECTION'] = true;
-		$request = new Request();
+		$request = new Request(array('env' => array('SOME_COOL_DETECTION' => true)));
 		$request->detect('cool', 'SOME_COOL_DETECTION');
 
-		$expected = true;
-		$result = $request->is('cool');
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($request->is('cool'));
+		$this->assertFalse($request->is('foo'));
 	}
 
 	public function testDetectWithClosure() {
@@ -830,6 +832,27 @@ class RequestTest extends \lithium\test\Unit {
 	public function testRequestTypeFromHeader() {
 		$request = new Request(array('env' => array('CONTENT_TYPE' => 'json')));
 		$this->assertEqual('json', $request->type());
+	}
+
+	public function testResponseTypeDetection() {
+		$request = new Request(array('env' => array('HTTP_ACCEPT' => 'text/xml,*/*')));
+		$this->assertEqual('xml', $request->accepts());
+
+		$request->params['type'] = 'json';
+		$this->assertEqual('json', $request->accepts());
+
+		$request = new Request(array('env' => array(
+			'HTTP_ACCEPT' => 'application/xml,image/png,*/*'
+		)));
+		$this->assertEqual('xml', $request->accepts());
+
+		$request = new Request(array('env' => array(
+			'HTTP_ACCEPT' => 'application/xml,application/xhtml+xml'
+		)));
+		$this->assertEqual('html', $request->accepts());
+
+		$request = new Request(array('env' => array('HTTP_ACCEPT' => null)));
+		$this->assertEqual('html', $request->accepts());
 	}
 }
 

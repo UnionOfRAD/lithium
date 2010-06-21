@@ -94,8 +94,8 @@ class Request extends \lithium\net\http\Message {
 	/**
 	 * Options used to detect request type.
 	 *
-	 * @see lithium\action\Request::$_type
-	 * @var string
+	 * @see lithium\action\Request::detect()
+	 * @var array
 	 */
 	protected $_detectors = array(
 		'mobile'  => array('HTTP_USER_AGENT', null),
@@ -109,15 +109,6 @@ class Request extends \lithium\net\http\Message {
 		'head'    => array('REQUEST_METHOD', 'HEAD'),
 		'options' => array('REQUEST_METHOD', 'OPTIONS')
 	);
-
-	/**
-	 * Content-types accepted by the client. If extension parsing is enabled in the Router, and an
-	 * extension is detected, the corresponding content-type will be used as the overriding primary
-	 * content-type accepted.
-	 *
-	 * @var array
-	 */
-	protected $_acceptTypes = array();
 
 	/**
 	 * Auto configuration properties.
@@ -135,6 +126,7 @@ class Request extends \lithium\net\http\Message {
 	 */
 	protected function _init() {
 		parent::_init();
+
 		$mobile = array(
 			'iPhone', 'MIDP', 'AvantGo', 'BlackBerry', 'J2ME', 'Opera Mini', 'DoCoMo', 'NetFront',
 			'Nokia', 'PalmOS', 'PalmSource', 'portalmmm', 'Plucker', 'ReqwirelessWeb', 'iPod',
@@ -286,7 +278,7 @@ class Request extends \lithium\net\http\Message {
 				if ($this->_env['PLATFORM'] == 'IIS') {
 					return str_replace('\\\\', '\\', $this->env('PATH_TRANSLATED'));
 				}
-				return $this->env('PHP_SELF');
+				return $this->env('DOCUMENT_ROOT') . $this->env('PHP_SELF');
 			case 'DOCUMENT_ROOT':
 				$fileName = $this->env('SCRIPT_FILENAME');
 				$offset = (!strpos($this->env('SCRIPT_NAME'), '.php')) ? 4 : 0;
@@ -361,25 +353,25 @@ class Request extends \lithium\net\http\Message {
 	public function is($flag) {
 		$flag = strtolower($flag);
 
-		if (!empty($this->_detectors[$flag])) {
-			$detector = $this->_detectors[$flag];
-
-			if (is_array($detector)) {
-				list($key, $check) = $detector + array('', '');
-				if (is_array($check)) {
-					$check = '/' . join('|', $check) . '/i';
-				}
-				if (Validator::isRegex($check)) {
-					return (boolean) preg_match($check, $this->env($key));
-				}
-				return ($this->env($key) == $check);
-			}
-			if (is_callable($detector)) {
-				return $detector($this);
-			}
-			return (boolean) $this->env($detector);
+		if (empty($this->_detectors[$flag])) {
+			return false;
 		}
-		return false;
+		$detector = $this->_detectors[$flag];
+
+		if (is_array($detector)) {
+			list($key, $check) = $detector + array('', '');
+			if (is_array($check)) {
+				$check = '/' . join('|', $check) . '/i';
+			}
+			if (Validator::isRegex($check)) {
+				return (boolean) preg_match($check, $this->env($key));
+			}
+			return ($this->env($key) == $check);
+		}
+		if (is_callable($detector)) {
+			return $detector($this);
+		}
+		return (boolean) $this->env($detector);
 	}
 
 	/**
