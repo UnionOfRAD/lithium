@@ -465,6 +465,29 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual($tag, $tag2);
 		$this->assertEqual($tag, $tag3);
 	}
+
+	/**
+	 * Tests that varying `count` syntaxes all produce the same query operation (i.e.
+	 * `Model::count(...)`, `Model::find('count', ...)` etc).
+	 *
+	 * @return void
+	 */
+	public function testCountSyntax() {
+		$base = MockPost::count(array('email' => 'foo@example.com'));
+		$query = $base['query'];
+
+		$this->assertEqual('read', $query->type());
+		$this->assertEqual('count', $query->calculate());
+		$this->assertEqual(array('email' => 'foo@example.com'), $query->conditions());
+
+		$result = MockPost::find('count', array('conditions' => array(
+			'email' => 'foo@example.com'
+		)));
+		$this->assertEqual($query, $result['query']);
+
+		$result = MockPost::count(array('conditions' => array('email' => 'foo@example.com')));
+		$this->assertEqual($query, $result['query']);
+	}
 }
 
 ?>

@@ -973,8 +973,10 @@ class Model extends \lithium\core\StaticObject {
 				$classes = $options['classes'];
 				unset($options['classes']);
 
-				if ($options && !isset($options['conditions'])) {
+				if ($options && !isset($params['options']['conditions'])) {
 					$options = array('conditions' => $options);
+				} else {
+					$options = $params['options'];
 				}
 				$options += compact('classes', 'model');
 

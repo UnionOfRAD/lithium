@@ -138,6 +138,11 @@ class MockSource extends \lithium\data\Source {
 		$relationship = $this->_classes['relationship'];
 		return new $relationship($options);
 	}
+
+	public function calculation($type, $query, array $options = array()) {
+		$query->calculate($type);
+		return compact('query', 'options');
+	}
 }
 
 ?>
