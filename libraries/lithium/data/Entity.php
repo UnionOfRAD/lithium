@@ -13,8 +13,14 @@ use \lithium\data\Source;
 use \lithium\util\Collection as Col;
 
 /**
- * `Entity` class. Represents data such as a row or document in a database. Entities have fields
- * (often known as columns in databases).
+ * `Entity` is a smart data object which represents data such as a row or document in a
+ * database. Entities have fields (often known as columns in databases), and track changes to its
+ * fields, as well as associated validation errors, etc.
+ *
+ * The `Entity` class can also be used as a base class for your own custom data objects, and is the
+ * basis for generating forms with the `Form` helper.
+ *
+ * @see lithium\template\helper\Form
  */
 class Entity extends \lithium\core\Object {
 
