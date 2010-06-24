@@ -15,10 +15,12 @@ namespace lithium\storage\cache\adapter;
  * which abstracts away key generation, adapter instantiation and filter
  * implementation.
  *
- * A simple configuration of this adapter can be accomplished in `app/config/bootstrap.php`
+ * A simple configuration of this adapter can be accomplished in `app/config/bootstrap/cache.php`
  * as follows:
  *
  * {{{
+ * use lithium\storage\Cache;
+ *
  * Cache::config(array(
  *     'cache-config-name' => array(
  *         'adapter' => 'XCache',
@@ -29,7 +31,7 @@ namespace lithium\storage\cache\adapter;
  * }}}
  *
  * Note that the `username` and `password` configuration fields are only required if
- * you wish to use XCache::clear() - all other methods do not require XCache administrator
+ * you wish to use `XCache::clear()` - all other methods do not require XCache administrator
  * credentials.
  *
  * This XCache adapter provides basic support for `write`, `read`, `delete`

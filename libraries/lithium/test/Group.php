@@ -12,9 +12,7 @@ use \lithium\core\Libraries;
 use \lithium\util\Collection;
 
 /**
- * Group Test Collection
- *
- * @package lithium.test
+ * Group Test Collection.
  */
 class Group extends \lithium\util\Collection {
 

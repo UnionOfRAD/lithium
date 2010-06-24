@@ -48,11 +48,10 @@ class Router extends \lithium\core\StaticObject {
 	/**
 	 * Classes used by `Router`.
 	 *
-	 * @package default
-	 * @author John David Anderson
+	 * @var array
 	 */
 	protected static $_classes = array(
-		'route' => '\lithium\net\http\Route'
+		'route' => 'lithium\net\http\Route'
 	);
 
 	/**

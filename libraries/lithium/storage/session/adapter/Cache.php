@@ -16,7 +16,7 @@ namespace lithium\storage\session\adapter;
  * adapter to. For example:
  *
  * {{{
- * use \lithium\storage\Cache;
+ * use lithium\storage\Cache;
  *
  * Cache::config(array(
  * 	'local' => array('adapter' => 'Apc'),
@@ -29,7 +29,7 @@ namespace lithium\storage\session\adapter;
  * Then, you can configure your session storage:
  *
  * {{{
- * use \lithium\storage\Session;
+ * use lithium\storage\Session;
  *
  * Session::config(array(
  * 	'default' => array('adapter' => 'Cache', 'config' => 'distributed')
@@ -44,11 +44,10 @@ class Cache extends \lithium\core\Object {
 	/**
 	 * Classes used by `Cache`.
 	 *
-	 * @package default
-	 * @author John David Anderson
+	 * @var array
 	 */
 	protected $_classes = array(
-		'cache' => '\lithium\storage\Cache'
+		'cache' => 'lithium\storage\Cache'
 	);
 
 	/**

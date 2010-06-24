@@ -13,9 +13,7 @@ use \lithium\core\Libraries;
 use \lithium\util\Inflector;
 
 /**
- * Report object for running group tests holding results
- *
- * @package default
+ * Report object for running group tests holding results.
  */
 class Report extends \lithium\core\Object {
 

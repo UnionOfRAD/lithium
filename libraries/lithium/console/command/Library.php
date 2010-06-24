@@ -92,11 +92,11 @@ class Library extends \lithium\console\Command {
 	/**
 	 * some classes
 	 *
-	 * @package default
+	 * @var array
 	 */
 	protected $_classes = array(
-		'service' => '\lithium\net\http\Service',
-		'response' => '\lithium\console\Response'
+		'service' => 'lithium\net\http\Service',
+		'response' => 'lithium\console\Response'
 	);
 
 	/**
