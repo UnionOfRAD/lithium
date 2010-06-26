@@ -103,6 +103,15 @@ class Filters extends \lithium\util\Collection {
 	/**
 	 * Lazily applies a filter to a method of a static class.
 	 *
+	 * This method is useful if you want to apply a filter inside a global bootstrap file to a
+	 * static class which may or may not be loaded during every request, or which may be loaded
+	 * lazily elsewhere in your application. If the class is already loaded, the filter will be
+	 * applied immediately.
+	 *
+	 * However, if the class has not been loaded, the filter will be stored and applied to the class
+	 * the first time the method specified in `$method` is called. This works for any class which
+	 * extends `StaticObject`.
+	 *
 	 * @see lithium\core\StaticObject
 	 * @param string $class The fully namespaced name of a **static** class to which the filter will
 	 *               be applied. The class name specified in `$class` **must** extend
@@ -122,6 +131,11 @@ class Filters extends \lithium\util\Collection {
 	 * Checks to see if the given class / method has any filters which have been applied lazily,
 	 * and not yet attached.
 	 *
+	 * If a filter has been lazily applied (using `Filters::apply()`) to a class which is/was not
+	 * yet loaded, checks to see if the filter is still being held, or has been applied. The filter
+	 * will not be applied until the method being filtered has been called.
+	 *
+	 * @see lithium\util\collection\Filters::apply()
 	 * @param string $class Fully-namespaced class name.
 	 * @param string $method Method name.
 	 */
@@ -153,7 +167,7 @@ class Filters extends \lithium\util\Collection {
 		$options += $defaults;
 		$lazyFilterCheck = (is_string($class) && $options['method']);
 
-		if ($lazyFilterCheck && isset(static::$_lazyFilters[$class][$options['method']])) {
+		if (($lazyFilterCheck) && isset(static::$_lazyFilters[$class][$options['method']])) {
 			$filters = static::$_lazyFilters[$class][$options['method']];
 			unset(static::$_lazyFilters[$class][$options['method']]);
 			$options['data'] = array_merge($filters, $options['data']);
