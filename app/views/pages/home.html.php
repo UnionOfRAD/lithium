@@ -49,7 +49,7 @@ $sanityChecks = array(
 	'database' => function() use ($notify) {
 		$config = Connections::config();
 		$boot = realpath(LITHIUM_APP_PATH . '/config/bootstrap.php');
-		$connections = realpath(LITHIUM_APP_PATH . '/config/connections.php');
+		$connections = realpath(LITHIUM_APP_PATH . '/config/bootstrap/connections.php');
 
 		if (empty($config)) {
 			return $notify('notice', array('No database connections defined.'), array(
@@ -57,7 +57,7 @@ $sanityChecks = array(
 				'content' => array(
 					'To create a database connection, edit the file <code>' . $boot . '</code>, ',
 					'and uncomment the following line:',
-					'<pre><code>require __DIR__ . \'/connections.php\';</code></pre>',
+					'<pre><code>require __DIR__ . \'/bootstrap/connections.php\';</code></pre>',
 					'Then, edit the file <code>' . $connections . '</code>.'
 				)
 			));

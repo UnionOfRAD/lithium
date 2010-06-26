@@ -17,13 +17,13 @@
  * @see lithium\util\collection\Filters
  */
 
-use \lithium\core\Libraries;
-use \lithium\net\http\Router;
-use \lithium\core\Environment;
-use \lithium\action\Dispatcher;
+use lithium\core\Libraries;
+use lithium\net\http\Router;
+use lithium\core\Environment;
+use lithium\action\Dispatcher;
 
 /**
- * This filter intercepts the `run()` of the `Dispatcher`, and first passes the `'request'`
+ * This filter intercepts the `run()` method of the `Dispatcher`, and first passes the `'request'`
  * parameter (an instance of the `Request` object) to the `Environment` class to detect which
  * environment the application is running in. Then, loads all application routes in all plugins,
  * loading the default application routes last.

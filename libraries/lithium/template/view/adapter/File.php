@@ -68,7 +68,7 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'compiler' => '\lithium\template\view\Compiler',
+		'compiler' => 'lithium\template\view\Compiler',
 		'router' => 'lithium\net\http\Router',
 		'media'  => 'lithium\net\http\Media'
 	);
