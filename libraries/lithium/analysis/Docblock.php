@@ -40,6 +40,7 @@ class Docblock extends \lithium\core\StaticObject {
 		$tags = array();
 		$description = null;
 		$comment = trim(preg_replace('/^(\s*\/\*\*|\s*\*\/|\s*\* ?)/m', '', $comment));
+		$comment = str_replace("\r\n", "\n", $comment);
 
 		if ($items = preg_split('/\n@/ms', $comment, 2)) {
 			list($description, $tags) = $items + array('', '');
@@ -68,9 +69,7 @@ class Docblock extends \lithium\core\StaticObject {
 		$regex = '/\n@(?P<type>' . join('|', static::$tags) . ")/msi";
 		$string = trim($string);
 
-		if (!$result = preg_split($regex, "\n$string", -1, PREG_SPLIT_DELIM_CAPTURE)) {
-			return array();
-		}
+		$result = preg_split($regex, "\n$string", -1, PREG_SPLIT_DELIM_CAPTURE);
 		$tags = array();
 
 		for ($i = 1; $i < count($result) - 1; $i += 2) {

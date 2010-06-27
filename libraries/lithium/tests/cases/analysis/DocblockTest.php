@@ -89,6 +89,20 @@ class DocblockTest extends \lithium\test\Unit {
 		$this->assertEqual("The second discussion item", $tags['discuss'][1]);
 
 		$this->assertEqual('void This tag contains a email@address.com.', $tags['return']);
+		$this->assertEqual(array(), Docblock::tags(null));
+
+		$this->assertEqual(array('params' => array()), Docblock::tags("Foobar\n\n@param string"));
+	}
+
+	public function testDocblockNewlineHandling() {
+		$doc  = " * This line as well as the line below it,\r\n";
+		$doc .= " * are part of the description.\r\n *\r\n * This line isn't.";
+		$result = Docblock::comment($doc);
+
+		$description = "This line as well as the line below it,\nare part of the description.";
+		$this->assertEqual($description, $result['description']);
+
+		$this->assertEqual('This line isn\'t.', $result['text']);
 	}
 }
 
