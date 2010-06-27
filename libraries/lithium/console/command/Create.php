@@ -16,13 +16,8 @@ use \lithium\util\String;
  * The `create` command allows you to rapidly develop your models, views, controllers, and tests
  * by generating the minimum code necessary to test and run your application.
  *
- * `li3 create model Post`
- * `li3 create test model Post
- * `li3 create mock model Post`
- * `li3 create controller Posts
- * `li3 create test controller Posts`
- * `li3 create mock controller Posts`
- * `li3 create view Post index`
+ * `li3 create --template=controller Posts`
+ * `li3 create --template=model Post`
  *
  */
 class Create extends \lithium\console\Command {
