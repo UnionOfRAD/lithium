@@ -248,7 +248,7 @@ class Media extends \lithium\core\StaticObject {
 			'path' => array(),
 			'suffix' => null,
 			'check' => false,
-			'library' => 'app'
+			'library' => 'app',
 		);
 		if (!$base = static::_assets($type)) {
 			$type = 'generic';
@@ -529,7 +529,7 @@ class Media extends \lithium\core\StaticObject {
 				'cast'   => true,
 				'view'   => false,
 				'layout' => false,
-				'encode' => 'http_build_query'
+				'encode' => 'http_build_query',
 			)
 		);
 		if ($type) {

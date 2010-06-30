@@ -96,8 +96,9 @@ class Route extends \lithium\core\Object {
 	protected $_params = array();
 
 	/**
-	 * The array of values that appear in the second parameter of the array, which are not present 
-	 * in the URL template.
+	 * The array of values that appear in the second parameter of `Router::connect()`, which are
+	 * **not** present in the URL template. When matching a route, these parameters must appear
+	 * **exactly** as specified here.
 	 *
 	 * @var array
 	 */
@@ -141,13 +142,15 @@ class Route extends \lithium\core\Object {
 	protected $_handler = null;
 
 	/**
-	 * Auto configuration properties.
+	 * Auto configuration properties. Also used as the list of properties to return when exporting
+	 * this `Route` object to an array.
 	 *
+	 * @see lithium\net\http\Route::export()
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'template', 'pattern', 'keys', 'params', 'match',
-		'defaults', 'subPatterns', 'persist', 'handler'
+		'template', 'pattern', 'params', 'match', 'meta',
+		'keys', 'defaults', 'subPatterns', 'persist', 'handler'
 	);
 
 	public function __construct(array $config = array()) {
@@ -156,6 +159,7 @@ class Route extends \lithium\core\Object {
 			'template' => '/',
 			'pattern'  => '^[\/]*$',
 			'match'    => array(),
+			'meta'     => array(),
 			'defaults' => array(),
 			'keys'     => array(),
 			'compile'  => true,
@@ -195,9 +199,9 @@ class Route extends \lithium\core\Object {
 		$result = array_intersect_key($match, $this->_keys) + $this->_params + $this->_defaults;
 
 		if (!$result['action']) {
-			unset($result['action']);
+			$result['action'] = 'index';
 		}
-		$request->params = $result + array('action' => 'index');
+		$request->params = $result;
 		$request->persist = $this->_persist;
 
 		if ($this->_handler) {
@@ -263,12 +267,9 @@ class Route extends \lithium\core\Object {
 		}
 
 		foreach (array_reverse($options + array('args' => ''), true) as $key => $value) {
-			if (isset($this->_subPatterns[$key])) {
-				$rpl = "{:{$key}:{$this->_subPatterns[$key]}}";
-			} else {
-				$rpl = "{:{$key}}";
-			}
-			$len = - strlen($rpl);
+			$pattern = isset($this->_subPatterns[$key]) ? ":{$this->_subPatterns[$key]}" : '';
+			$rpl = "{:{$key}{$pattern}}";
+			$len = strlen($rpl) * -1;
 
 			if ($trimmed && isset($defaults[$key]) && $value == $defaults[$key]) {
 				if (substr($template, $len) == $rpl) {
@@ -277,7 +278,7 @@ class Route extends \lithium\core\Object {
 				}
 			}
 			$template = str_replace($rpl, $value, $template);
-			$trimmed = ($key == 'args') ? $trimmed :  false;
+			$trimmed = ($key == 'args') ? $trimmed : false;
 		}
 		return $template;
 	}
@@ -291,9 +292,8 @@ class Route extends \lithium\core\Object {
 	 */
 	public function export() {
 		$result = array();
-		$keys = array('template', 'pattern', 'keys', 'params', 'match', 'defaults', 'subPatterns');
 
-		foreach ($keys as $key) {
+		foreach ($this->_autoConfig as $key) {
 			$result[$key] = $this->{'_' . $key};
 		}
 		return $result;

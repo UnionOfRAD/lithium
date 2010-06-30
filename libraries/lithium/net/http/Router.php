@@ -198,9 +198,10 @@ class Router extends \lithium\core\StaticObject {
 		$base = isset($context) ? $context->env('base') : '';
 
 		foreach (static::$_configurations as $route) {
-			if ($match = $route->match($options, $context)) {
-				return rtrim("{$base}{$match}", '/');
+			if (!$match = $route->match($options, $context)) {
+				continue;
 			}
+			return rtrim("{$base}{$match}", '/') ?: '/';
 		}
 	}
 

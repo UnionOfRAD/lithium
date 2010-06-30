@@ -433,6 +433,24 @@ class RouterTest extends \lithium\test\Unit {
 		$headers = array('location' => '/login');
 		$this->assertEqual($headers, $result->headers);
 	}
+
+	/**
+	 * Tests that a successful match against a route with template `'/'` operating at the root of
+	 * a domain never returns an empty string.
+	 *
+	 * @return void
+	 */
+	public function testMatchingEmptyRoute() {
+		Router::connect('/', 'Users::view');
+
+		$request = new Request(array('base' => '/'));
+		$url = Router::match(array('controller' => 'users', 'action' => 'view'), $request);
+		$this->assertEqual('/', $url);
+
+		$request = new Request(array('base' => ''));
+		$url = Router::match(array('controller' => 'users', 'action' => 'view'), $request);
+		$this->assertEqual('/', $url);
+	}
 }
 
 ?>

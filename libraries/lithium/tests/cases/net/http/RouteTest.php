@@ -441,6 +441,27 @@ class RouteTest extends \lithium\test\Unit {
 		$lang = $request->env('ACCEPT_LANG') ?: 'en';
 		$this->assertEqual($lang, $result->params['lang']);
 	}
+
+	/**
+	 * Tests that a successful match against a route with template `'/'` operating at the root of
+	 * a domain never returns an empty string.
+	 *
+	 * @return void
+	 */
+	public function testMatchingEmptyRoute() {
+		$route = new Route(array(
+			'template' => '/',
+			'params' => array('controller' => 'users', 'action' => 'view')
+		));
+
+		$request = new Request(array('base' => '/'));
+		$url = $route->match(array('controller' => 'users', 'action' => 'view'), $request);
+		$this->assertEqual('/', $url);
+
+		$request = new Request(array('base' => ''));
+		$url = $route->match(array('controller' => 'users', 'action' => 'view'), $request);
+		$this->assertEqual('/', $url);
+	}
 }
 
 ?>
