@@ -499,39 +499,26 @@ class Media extends \lithium\core\StaticObject {
 	 * @return mixed Array of all handlers, or the handler for a specific type.
 	 */
 	protected static function _handlers($type = null) {
+		$format = array('view' => false, 'layout' => false);
+		$json   = array('encode' => 'json_encode', 'decode' => 'json_decode');
+		$paths  = array(
+			'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
+			'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
+		);
+
 		$handlers = static::$_handlers + array(
-			'default' => array(
-				'view'     => '\lithium\template\View',
-				'paths' => array(
-					'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
-					'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
-				),
+			'default' => compact('paths') + array(
+				'view'     => 'lithium\template\View',
 				'encode'   => false,
 				'decode'   => false,
 				'cast'     => false,
 			),
 			'html' => array(),
-			'json' => array(
-				'view'   => false,
-				'layout' => false,
-				'encode' => 'json_encode',
-				'decode' => 'json_decode',
-				'cast'     => true,
-			),
-			'text' => array(
-				'cast'     => false,
-				'view'     => false,
-				'layout'   => false,
-				'template' => false,
-				'encode'   => function($data) { return $data; }
-			),
-			'form' => array(
-				'cast'   => true,
-				'view'   => false,
-				'layout' => false,
-				'encode' => 'http_build_query',
-			)
+			'json' => $format + $json + array('cast' => true),
+			'text' => $format + array('cast' => false, 'encode' => function($s) { return $s; }),
+			'form' => $format + array('cast' => true, 'encode' => 'http_build_query'),
 		);
+
 		if ($type) {
 			return isset($handlers[$type]) ? $handlers[$type] : null;
 		}
