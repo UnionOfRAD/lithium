@@ -45,59 +45,38 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testInitMethodOverride() {
 		$_POST['Article']['title'] = 'cool';
-		$_ENV['HTTP_X_HTTP_METHOD_OVERRIDE'] = 'GET';
-		$request = new Request();
+		$request = new Request(array('env' => array('HTTP_X_HTTP_METHOD_OVERRIDE' => 'GET')));
 
-		$expected = 'GET';
-		$result = $request->env('REQUEST_METHOD');
-		$this->assertEqual($expected, $result);
-
-		$expected = array('Article' => array('title' => 'cool'));
-		$result = $request->data;
-		$this->assertEqual($expected, $result);
-
-		unset($_POST, $request);
+		$this->assertEqual('GET', $request->env('REQUEST_METHOD'));
+		$this->assertEqual(array('Article' => array('title' => 'cool')), $request->data);
+		unset($_POST);
 	}
 
 	public function testInitMethodOverrideWithEmptyServer() {
+		$_POST['Article']['title'] = 'cool';
 		$request = new Request(array('env' => array('HTTP_X_HTTP_METHOD_OVERRIDE' => 'POST')));
-		$request->data = array('Article' => array('title' => 'cool'));
-
-		$expected = 'POST';
-		$result = $request->env('REQUEST_METHOD');
-		$this->assertEqual($expected, $result);
-
-		$expected = array('Article' => array('title' => 'cool'));
-		$result = $request->data;
-		$this->assertEqual($expected, $result);
-
-		unset($_POST, $request);
+		$this->assertEqual('POST', $request->env('REQUEST_METHOD'));
+		$this->assertEqual(array('Article' => array('title' => 'cool')), $request->data);
+		unset($_POST['Article']);
 	}
 
 	public function testScriptFilename() {
 		$request = new Request(array('env' => array(
 			'SCRIPT_FILENAME' => '/lithium/app/webroot/index.php'
 		)));
-
-		$expected = '/lithium/app/webroot/index.php';
 		$result = $request->env('SCRIPT_FILENAME');
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('/lithium/app/webroot/index.php', $result);
 	}
 
 	public function testPlatform() {
 		$request = new MockIisRequest();
-
-		$expected = 'IIS';
 		$result = $request->env('PLATFORM');
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('IIS', $result);
 	}
 
 	public function testScriptFilenameTranslatedForIIS() {
 		$request = new MockIisRequest();
-
-		$expected = '\\lithium\\app\\webroot\\index.php';
-		$result = $request->env('SCRIPT_FILENAME');
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('\\lithium\\app\\webroot\\index.php', $request->env('SCRIPT_FILENAME'));
 
 		$request = new Request(array('env' => array('SCRIPT_FILENAME' => null)));
 		$path = $request->env('DOCUMENT_ROOT') . $request->env('PHP_SELF');
@@ -105,12 +84,10 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testDocumentRoot() {
-		$_SERVER['DOCUMENT_ROOT'] = '/home/lithium/app/webroot';
-		$request = new Request();
-
-		$expected = '/home/lithium/app/webroot';
-		$result = $request->env('DOCUMENT_ROOT');
-		$this->assertEqual($expected, $result);
+		$request = new Request(array(
+			'env' => array('DOCUMENT_ROOT' => '/home/lithium/app/webroot')
+		));
+		$this->assertEqual('/home/lithium/app/webroot', $request->env('DOCUMENT_ROOT'));
 	}
 
 	public function testDocumentRootTranslatedForIIS() {
@@ -227,9 +204,12 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testGetMethod() {
-		$_SERVER['PHP_SELF'] = '/lithium.com/app/webroot/index.php';
-		$_POST['Article']['title'] = 'cool';
-		$request = new Request();
+		$request = new Request(array('env' => array(
+			'PHP_SELF' => '/lithium.com/app/webroot/index.php',
+			'HTTP_ACCEPT' => 'text/html,application/xml,image/png,*/*',
+			'HTTP_ACCEPT_LANGUAGE' => 'da, en-gb;q=0.8, en;q=0.7'
+		)));
+		$request->data = array('Article' => array('title' => 'cool'));
 
 		$expected = array('title' => 'cool');
 		$result = $request->get('data:Article');
@@ -243,7 +223,9 @@ class RequestTest extends \lithium\test\Unit {
 		$result = $request->get('env:base');
 		$this->assertEqual($expected, $result);
 
-		unset($_POST, $request);
+		$accept = $request->get('http:accept');
+		$this->assertEqual('text/html,application/xml,image/png,*/*', $accept);
+		$this->assertEqual($request->get('http:method'), $request->env('REQUEST_METHOD'));
 	}
 
 	public function testDetect() {
@@ -256,13 +238,11 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testDetectWithClosure() {
 		$request = new Request();
-		$request->detect('cool', function ($self) {
-			return true;
-		});
+		$request->detect('cool', function ($self) { return true; });
+		$request->detect('notCool', function ($self) { return false; });
 
-		$expected = true;
-		$result = $request->is('cool');
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($request->is('cool'));
+		$this->assertFalse($request->is('notCool'));
 	}
 
 	public function testDetectWithArray() {
@@ -277,8 +257,7 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testDetectWithArrayRegex() {
-		$_SERVER['SOME_COOL_DETECTION'] = 'this is cool';
-		$request = new Request();
+		$request = new Request(array('env' => array('SOME_COOL_DETECTION' => 'this is cool')));
 		$request->detect('cool', array('SOME_COOL_DETECTION', '/cool/'));
 
 		$expected = true;
@@ -286,13 +265,19 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testIsMobile() {
-		$_SERVER['HTTP_USER_AGENT'] = 'iPhone';
-		$request = new Request();
+	public function testContentTypeDetection() {
+		$request = new Request(array('env' => array(
+			'CONTENT_TYPE' => 'application/json; charset=UTF-8',
+			'REQUEST_METHOD' => 'POST'
+		)));
+		$this->assertTrue($request->is('json'));
+		$this->assertFalse($request->is('html'));
+		$this->assertFalse($request->is('foo'));
+	}
 
-		$expected = true;
-		$result = $request->is('mobile');
-		$this->assertEqual($expected, $result);
+	public function testIsMobile() {
+		$request = new Request(array('env' => array('HTTP_USER_AGENT' => 'iPhone')));
+		$this->assertTrue($request->is('mobile'));
 	}
 
 	public function testType() {

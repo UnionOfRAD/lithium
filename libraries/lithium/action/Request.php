@@ -81,7 +81,7 @@ class Request extends \lithium\net\http\Message {
 	 *
 	 * @var array
 	 */
-	protected $_classes = array('media' => '\lithium\net\http\Media');
+	protected $_classes = array('media' => 'lithium\net\http\Media');
 
 	/**
 	 * If POST / PUT data is coming from an input stream (rather than `$_POST`), this specified
@@ -325,10 +325,10 @@ class Request extends \lithium\net\http\Message {
 	}
 
 	/**
-	 * Get params, data, query or env
+	 * Uses a custom prefix syntax to extract specific data points from the request.
 	 *
 	 * @param string $key data:title, env:base
-	 * @return void
+	 * @return string
 	 */
 	public function get($key) {
 		list($var, $key) = explode(':', $key);
@@ -336,10 +336,13 @@ class Request extends \lithium\net\http\Message {
 		switch (true) {
 			case in_array($var, array('params', 'data', 'query')):
 				return isset($this->{$var}[$key]) ? $this->{$var}[$key] : null;
-			case ($var == 'env'):
+			case ($var === 'env'):
 				return $this->env($key);
+			case ($var === 'http' && $key === 'method'):
+				return $this->env('REQUEST_METHOD');
+			case ($var === 'http'):
+				return $this->env('HTTP_' . strtoupper($key));
 		}
-		return null;
 	}
 
 	/**
@@ -351,10 +354,13 @@ class Request extends \lithium\net\http\Message {
 	 * @return boolean
 	 */
 	public function is($flag) {
-		$flag = strtolower($flag);
+		$media = $this->_classes['media'];
 
-		if (empty($this->_detectors[$flag])) {
-			return false;
+		if (!isset($this->_detectors[$flag])) {
+			if (!in_array($flag, $media::types())) {
+				return false;
+			}
+			return $this->type() == $flag;
 		}
 		$detector = $this->_detectors[$flag];
 
