@@ -116,11 +116,11 @@ class Adaptable extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Obtain an SplStack of the strategies for the given `$name` configuration, using
-	 * the `$_strategies` path defined in Adaptable subclasses.
+	 * Obtain an `SplStack` of the strategies for the given `$name` configuration, using
+	 * the `$_strategies` path defined in `Adaptable` subclasses.
 	 *
 	 * @param string $name Class name of adapter to load.
-	 * return object SplStack of strategies, or null if none defined.
+	 * @return object `SplStack` of strategies, or `null` if none are defined.
 	 */
 	public static function strategies($name) {
 		$config = static::_config($name);

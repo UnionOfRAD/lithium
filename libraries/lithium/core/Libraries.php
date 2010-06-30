@@ -226,7 +226,7 @@ class Libraries {
 			'transform' => null,
 			'bootstrap' => true,
 			'defer' => false,
-			'default' => false
+			'default' => false,
 		);
 		if ($name === 'lithium') {
 			$defaults['defer'] = true;
@@ -323,7 +323,7 @@ class Libraries {
 			'filter' => '/^(\w+)?(\\\\[a-z0-9_]+)+\\\\[A-Z][a-zA-Z0-9]+$/',
 			'exclude' => '',
 			'format' => $format,
-			'namespaces' => false
+			'namespaces' => false,
 		);
 		$options += $defaults;
 		$libs = array();

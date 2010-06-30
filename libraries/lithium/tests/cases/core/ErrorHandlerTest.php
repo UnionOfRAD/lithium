@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\core;
 
+use \Closure;
 use \Exception;
 use \UnexpectedValueException;
 use \lithium\core\ErrorHandler;
@@ -90,6 +91,19 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 
 		trigger_error('Test notice', E_USER_NOTICE);
 		$this->assertEqual(2, count($this->errors));
+	}
+
+	public function testReset() {
+		ErrorHandler::reset();
+		$this->assertEqual(array(), ErrorHandler::handlers());
+
+		$result = ErrorHandler::handlers(array('test' => function($error) { /* Do something */ }));
+		$this->assertEqual(array('test'), array_keys($result));
+		$this->assertTrue($result['test'] instanceof Closure);
+		$this->assertEqual($result, ErrorHandler::handlers());
+
+		ErrorHandler::reset();
+		$this->assertEqual(array(), ErrorHandler::handlers());
 	}
 }
 

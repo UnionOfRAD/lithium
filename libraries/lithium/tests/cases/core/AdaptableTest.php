@@ -125,6 +125,23 @@ class AdaptableTest extends \lithium\test\Unit {
 		);
 	}
 
+	public function testInvalidStrategy() {
+		$strategy = new MockStrategy();
+		$items = array('default' => array(
+			'strategies' => array('InvalidStrategy'),
+			'filters' => array(),
+			'adapter' => null
+		));
+		$strategy::config($items);
+
+		$class = 'lithium\tests\mocks\core\MockStrategy';
+		$message = "Could not find strategy 'InvalidStrategy' in class {$class}.";
+		$this->expectException($message);
+
+		$result = $strategy::strategies('default');
+		$this->assertTrue($result instanceof SplDoublyLinkedList);
+	}
+
 	public function testStrategyConstructionSettings() {
 		$strategy = new MockStrategy();
 		$items = array('default' => array(
