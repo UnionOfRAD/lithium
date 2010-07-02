@@ -32,9 +32,18 @@ class HttpTest extends \lithium\test\Unit {
 		Connections::reset();
 
 		Connections::config(array(
-			'mock-couchdb-connection' => array(
-				'type' => 'http',
-				'adapter' => 'CouchDb'
+			'mock-http-connection' => array(
+				'type' => 'Http',
+			)
+		));
+
+		Connections::config(array(
+			'mock-http-conn' => array(
+				'type' => 'Http',
+				'methods' => array(
+					'something' => array('method' => 'get'),
+					'do' => array('method' => 'post'),
+				)
 			)
 		));
 	}
@@ -82,7 +91,6 @@ class HttpTest extends \lithium\test\Unit {
 	public function testGet() {
 		$http = new Http($this->_testConfig);
 		$result = $http->get();
-		$this->assertEqual('Test!', $result);
 
 		$expected = 'HTTP/1.1';
 		$result = $http->last->response->protocol;
@@ -108,7 +116,6 @@ class HttpTest extends \lithium\test\Unit {
 	public function testGetPath() {
 		$http = new Http($this->_testConfig);
 		$result = $http->get('search.json');
-		$this->assertEqual('Test!', $result);
 
 		$expected = 'HTTP/1.1';
 		$result = $http->last->response->protocol;
@@ -133,9 +140,9 @@ class HttpTest extends \lithium\test\Unit {
 
 	public function testPost() {
 		$http = new Http($this->_testConfig);
-		$http->post('update.xml', array('status' => 'cool'));
+		$http->post('add.xml', array('status' => 'cool'));
 		$expected = join("\r\n", array(
-			'POST /update.xml HTTP/1.1',
+			'POST /add.xml HTTP/1.1',
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
@@ -149,42 +156,206 @@ class HttpTest extends \lithium\test\Unit {
 
 	public function testPut() {
 		$http = new Http($this->_testConfig);
-		$result = $http->put();
-		$this->assertEqual('Test!', $result);
-	}
-
-	public function testDelete() {
-		$http = new Http($this->_testConfig);
-		$result = $http->delete(null);
-		$this->assertEqual('Test!', $result);
+		$result = $http->put('update.xml', array('status' => 'cool'));
+		$expected = join("\r\n", array(
+			'PUT /update.xml HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'Content-Type: application/x-www-form-urlencoded',
+			'Content-Length: 11',
+			'', 'status=cool'
+		));
+		$result = (string) $http->last->request;
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testCreate() {
 		$http = new Http($this->_testConfig);
 		$result = $http->create(null);
-		$this->assertEqual('Test!', $result);
+		$expected = join("\r\n", array(
+			'POST / HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'', ''
+		));
+		$result = (string) $http->last->request;
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testRead() {
 		$http = new Http($this->_testConfig);
 		$result = $http->read(null);
-		$this->assertEqual('Test!', $result);
+		$expected = join("\r\n", array(
+			'GET / HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'', ''
+		));
+		$result = (string) $http->last->request;
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testUpdate() {
 		$http = new Http($this->_testConfig);
 		$result = $http->update(null);
-		$this->assertEqual('Test!', $result);
+		$expected = join("\r\n", array(
+			'PUT / HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'', ''
+		));
+		$result = (string) $http->last->request;
+		$this->assertEqual($expected, $result);
 	}
+
+	public function testDelete() {
+		$http = new Http($this->_testConfig);
+		$result = $http->delete(null);
+		$expected = join("\r\n", array(
+			'DELETE / HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'', ''
+		));
+		$result = (string) $http->last->request;
+		$this->assertEqual($expected, $result);
+	}
+
 
 	public function testCreateWithModel() {
 		$http = new Http($this->_testConfig);
 		$query = new Query(array(
-			'model' => '\lithium\tests\mocks\data\source\http\adapter\MockCouchPost'
+			'model' => '\lithium\tests\mocks\data\source\MockHttpModel',
+			'data' => array('title' => 'Test Title')
 		));
 
 		$result = $http->create($query);
-		$this->assertEqual('Test!', $result);
+		$expected = join("\r\n", array(
+			'POST /posts HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'Content-Type: application/x-www-form-urlencoded',
+			'Content-Length: 16',
+			'', 'title=Test+Title'
+		));
+		$result = (string) $http->last->request;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testReadWithModel() {
+		$http = new Http($this->_testConfig);
+		$query = new Query(array(
+			'model' => '\lithium\tests\mocks\data\source\MockHttpModel',
+		));
+
+		$result = $http->read($query);
+		$expected = join("\r\n", array(
+			'GET /posts HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'', ''
+		));
+		$result = (string) $http->last->request;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testReadWithModelConditions() {
+		$http = new Http($this->_testConfig);
+		$query = new Query(array(
+			'model' => '\lithium\tests\mocks\data\source\MockHttpModel',
+			'conditions' => array('page' => 2)
+		));
+
+		$result = $http->read($query);
+		$expected = join("\r\n", array(
+			'GET /posts?page=2 HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'Content-Type: application/x-www-form-urlencoded',
+			'', ''
+		));
+		$result = (string) $http->last->request;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testUpdateWithModel() {
+		$http = new Http($this->_testConfig);
+		$query = new Query(array(
+			'model' => '\lithium\tests\mocks\data\source\MockHttpModel',
+			'data' => array('id' => '1', 'title' => 'Test Title')
+		));
+
+		$result = $http->update($query);
+		$expected = join("\r\n", array(
+			'PUT /posts/1 HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'Content-Type: application/x-www-form-urlencoded',
+			'Content-Length: 21',
+			'', 'id=1&title=Test+Title'
+		));
+		$result = (string) $http->last->request;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testDeleteWithModel() {
+		$http = new Http($this->_testConfig);
+		$query = new Query(array(
+			'model' => '\lithium\tests\mocks\data\source\MockHttpModel',
+			'data' => array('id' => '1')
+		));
+
+		$result = $http->delete($query);
+		$expected = join("\r\n", array(
+			'DELETE /posts/1 HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'', ''
+		));
+		$result = (string) $http->last->request;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testCustomGetMethod() {
+		$conn = Connections::get('mock-http-conn');
+
+		$result = $conn->something();
+		$expected = join("\r\n", array(
+			'GET /something HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'', ''
+		));
+		$result = (string) $conn->last->request;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testCustomPostMethod() {
+		$conn = Connections::get('mock-http-conn');
+
+		$result = $conn->do(array('title' => 'sup'));
+		$expected = join("\r\n", array(
+			'POST /do HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'Content-Type: application/x-www-form-urlencoded',
+			'Content-Length: 9',
+			'', 'title=sup'
+		));
+		$result = (string) $conn->last->request;
+		$this->assertEqual($expected, $result);
 	}
 }
 
