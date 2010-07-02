@@ -319,6 +319,40 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests matching routes and returning an absolute (protocol + hostname) URL.
+	 *
+	 * @return void
+	 */
+	public function testRouteMatchAbsoluteUrl() {
+		Router::connect('/login', array('controller' => 'sessions', 'action' => 'add'));
+		$result = Router::match('Sessions::add', $this->request);
+		$this->assertEqual('/login', $result);
+
+		$result = Router::match('Sessions::add', $this->request, array('absolute' => true));
+		$base  = $this->request->env('HTTPS') ? 'https://' : 'http://';
+		$base .= $this->request->env('HTTP_HOST');
+		$this->assertEqual($base . '/login', $result);
+
+		$result = Router::match('Sessions::add',
+			$this->request, array('host' => 'test.local', 'absolute' => true)
+		);
+		$base = $this->request->env('HTTPS') ? 'https://' : 'http://';
+		$this->assertEqual($base . 'test.local/login', $result);
+
+		$result = Router::match('Sessions::add',
+			$this->request, array('scheme' => 'https://', 'absolute' => true)
+		);
+		$base = 'https://' . $this->request->env('HTTP_HOST');
+		$this->assertEqual($base . '/login', $result);
+
+		$result = Router::match('Sessions::add',
+			$this->request, array('scheme' => 'https://', 'absolute' => true)
+		);
+		$base = 'https://' . $this->request->env('HTTP_HOST');
+		$this->assertEqual($base . '/login', $result);
+	}
+
+	/**
 	 * Tests getting routes using `Router::get()`, and checking to see if the routes returned match
 	 * the routes connected.
 	 *

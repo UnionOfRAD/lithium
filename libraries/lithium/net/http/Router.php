@@ -172,38 +172,40 @@ class Router extends \lithium\core\StaticObject {
 	 * You can use either syntax anywhere a URL is accepted, i.e.
 	 * `lithium\action\Controller::redirect()`, or `lithium\template\helper\Html::link()`.
 	 *
-	 * @param array $options Array of options to match to a URL. Optionally, this can be a string
+	 * @param string|array $url Options to match to a URL. Optionally, this can be a string
 	 *              containing a manually generated URL.
 	 * @param object $context An instance of `lithium\action\Request`. This supplies the context for
 	 *               any persistent parameters, as well as the base URL for the application.
+	 * @param array $options Options for the generation of the matched URL. Currently accepted values
+	 *              are: `'absolute' => true|false`, `'host' => string` and `'scheme' => string`.
 	 * @return string Returns a generated URL, based on the URL template of the matched route, and
 	 *         prefixed with the base URL of the application.
 	 */
-	public static function match($options = array(), $context = null) {
-		if (is_string($path = $options)) {
+	public static function match($url = array(), $context = null, array $options = array()) {
+		if (is_string($path = $url)) {
 			if (strpos($path, '#') === 0 || strpos($path, 'mailto') === 0 || strpos($path, '://')) {
 				return $path;
 			}
-			if (is_string($options = static::_parseString($options, $context))) {
-				return $options;
+			if (is_string($url = static::_parseString($url, $context))) {
+				return $url;
 			}
 		}
-		if (isset($options[0]) && is_array($params = static::_parseString($options[0], $context))) {
-			unset($options[0]);
-			$options = $params + $options;
+		if (isset($url[0]) && is_array($params = static::_parseString($url[0], $context))) {
+			unset($url[0]);
+			$url = $params + $url;
 		}
 
 		if ($context && isset($context->persist)) {
 			foreach ($context->persist as $key) {
-				$options += array($key => $context->params[$key]);
-				if ($options[$key] === null) {
-					unset($options[$key]);
+				$url += array($key => $context->params[$key]);
+				if ($url[$key] === null) {
+					unset($url[$key]);
 				}
 			}
 		}
 
 		$defaults = array('action' => 'index');
-		$options += $defaults;
+		$url += $defaults;
 		$base = isset($context) ? $context->env('base') : '';
 		$suffix = null;
 
@@ -213,11 +215,39 @@ class Router extends \lithium\core\StaticObject {
 		}
 
 		foreach (static::$_configurations as $route) {
-			if (!$match = $route->match($options, $context)) {
-				continue;
+			if ($match = $route->match($url, $context)) {
+				$path = rtrim("{$base}{$match}", '/');
+				return static::_prefix($path, $context, $options);
 			}
 			return rtrim("{$base}{$match}{$suffix}", '/') ?: '/';
 		}
+	}
+
+	/**
+	 * Returns the prefix (scheme + hostname) for a URL based on the passed `$options` and the
+	 * `$context`.
+	 *
+	 * @param string $path The URL to be prefixed.
+	 * @param object $context The request context.
+	 * @param array $options Options for generating the proper prefix. Currently accepted values
+	 *              are: `'absolute' => true|false`, `'host' => string` and `'scheme' => string`.
+	 * @return string The prefixed URL, depending on the passed options.
+	 */
+	protected static function _prefix($path, $context = null, array $options = array()) {
+		$scheme = $host = null;
+		$absolute = false;
+
+		if (!empty($context)) {
+			$host = $context->env('HTTP_HOST');
+			$scheme = ($context->env('HTTPS')) ? 'https://' : 'http://';
+		}
+		$options += compact('absolute', 'host', 'scheme');
+
+		if (!empty($options['absolute'])) {
+			return $options['scheme'] . $options['host'] . $path;
+		}
+		return $path;
+
 	}
 
 	/**
