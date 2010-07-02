@@ -357,6 +357,7 @@ class Validator extends \lithium\core\StaticObject {
 			$rules = is_array(current($rules)) ? $rules : array($rules);
 			$errors[$field] = array();
 
+			$options['field'] = $field;
 			foreach ($rules as $key => $rule) {
 				$rule += $defaults + compact('values');
 				list($name) = $rule;

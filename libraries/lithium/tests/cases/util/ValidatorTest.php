@@ -30,6 +30,40 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isUrl('google.com', 'loose'));
 	}
 
+	public function testFieldOption() {
+		Validator::add('isInArray', function($data, $params, $options) {
+			$existing = array(
+				'number' => array('one', 'two', 'three'),
+				'name' => array('bob', 'bill')
+			);
+			return isset($options['field']) && isset($existing[$options['field']]) &&
+				in_array($data,$existing[$options['field']]);
+		});
+
+		$fieldValidationRules = array(
+			'number' => array('rule' => array('isInArray')),
+			'name' => array('rule' => array('isInArray')),
+		);
+
+		$result = Validator::check(
+			array('number' => 'one', 'name' => 'bob'),
+			$fieldValidationRules
+		);
+		$this->assertTrue(empty($result));
+
+		$result = Validator::check(
+			array('number' => 'four', 'name' => 'bob'),
+			$fieldValidationRules
+		);
+		$this->assertFalse(empty($result));
+
+		$result = Validator::check(
+			array('number' => 'one', 'name' => 'rex'),
+			$fieldValidationRules
+		);
+		$this->assertFalse(empty($result));
+	}
+
 	/**
 	 * Tests that new methods can be called on Validator by adding rules using Validator::add().
 	 *
