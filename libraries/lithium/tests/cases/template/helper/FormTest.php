@@ -416,6 +416,15 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array('input' => array(
 				'type' => 'checkbox', 'name' => 'foo', 'value' => 'nose', 'checked' => 'checked'
 		)));
+
+		$record = new Record();
+		$record->foo = 'foot';
+		$this->form->create($record);
+
+		$result = $this->form->checkbox('foo', array('value' => 'nose'));
+		$this->assertTags($result, array('input' => array(
+				'type' => 'checkbox', 'name' => 'foo', 'value' => 'nose'
+		)));
 	}
 
 	public function testSelectGeneration() {
