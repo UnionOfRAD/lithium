@@ -46,6 +46,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$this->expectException('/mysql_get_server_info/');
 		$this->expectException('/mysql_select_db/');
 		$this->expectException('/mysql_connect/');
+		$this->expectException('/mysql_connect/');
 		$result = Connections::get('conn-test');
 		$this->assertTrue($result instanceof \lithium\data\source\database\adapter\MySql);
 
@@ -54,6 +55,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 
 		$this->expectException('/mysql_get_server_info/');
 		$this->expectException('/mysql_select_db/');
+		$this->expectException('/mysql_connect/');
 		$this->expectException('/mysql_connect/');
 		$result = Connections::get('conn-test-2');
 		$this->assertTrue($result instanceof \lithium\data\source\database\adapter\MySql);
@@ -79,6 +81,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 
 		$this->expectException('/mysql_get_server_info/');
 		$this->expectException('/mysql_select_db/');
+		$this->expectException('/mysql_connect/');
 		$this->expectException('/mysql_connect/');
 		$result = Connections::get('conn-test');
 		$this->assertTrue($result instanceof \lithium\data\source\database\adapter\MySql);
