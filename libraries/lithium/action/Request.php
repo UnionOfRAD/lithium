@@ -249,13 +249,6 @@ class Request extends \lithium\net\http\Message {
 			return $this->_base;
 		}
 
-		if ($key == 'HTTPS') {
-			if (isset($this->_env['HTTPS'])) {
-				return (!empty($this->_env['HTTPS']) && $this->_env['HTTPS'] !== 'off');
-			}
-			return (strpos($this->_env['SCRIPT_URI'], 'https://') === 0);
-		}
-
 		if ($key == 'SCRIPT_NAME' && !isset($this->_env['SCRIPT_NAME'])) {
 			if ($this->_env['PLATFORM'] == 'CGI' || isset($this->_env['SCRIPT_URL'])) {
 				$key = 'SCRIPT_URL';
@@ -274,6 +267,14 @@ class Request extends \lithium\net\http\Message {
 		}
 
 		switch ($key) {
+			case 'HTTPS':
+				if (isset($this->_env['SCRIPT_URI'])) {
+					return (strpos($this->_env['SCRIPT_URI'], 'https://') === 0);
+				}
+				if (isset($this->_env['HTTPS'])) {
+					return (!empty($this->_env['HTTPS']) && $this->_env['HTTPS'] !== 'off');
+				}
+				return false;
 			case 'SCRIPT_FILENAME':
 				if ($this->_env['PLATFORM'] == 'IIS') {
 					return str_replace('\\\\', '\\', $this->env('PATH_TRANSLATED'));
