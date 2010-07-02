@@ -301,6 +301,44 @@ class QueryTest extends \lithium\test\Unit {
 
 		$this->assertEqual($query->join(), array(array('foo' => 'bar'), array('bar' => 'baz')));
 	}
+
+	/**
+	 * Tests that assigning a whitelist to a query properly restricts the list of data fields that
+	 * the query exposes.
+	 *
+	 * @return void
+	 */
+	public function testWhitelisting() {
+		$data = array('foo' => 1, 'bar' => 2, 'baz' => 3);
+		$query = new Query(compact('data'));
+		$this->assertEqual($data, $query->data());
+
+		$query = new Query(compact('data') + array('whitelist' => array('foo', 'bar')));
+		$this->assertEqual(array('foo' => 1, 'bar' => 2), $query->data());
+	}
+
+	/**
+	 * Tests basic property accessors and mutators.
+	 *
+	 * @return void
+	 */
+	public function testBasicAssignments() {
+		$query = new Query();
+		$group = array('key' => 'hits', 'reduce' => 'function() {}');
+		$calculate = 'count';
+
+		$this->assertNull($query->group());
+		$query->group($group);
+		$this->assertEqual($group, $query->group());
+
+		$this->assertNull($query->calculate());
+		$query->calculate($calculate);
+		$this->assertEqual($calculate, $query->calculate());
+
+		$query = new Query(compact('calculate', 'group'));
+		$this->assertEqual($group, $query->group());
+		$this->assertEqual($calculate, $query->calculate());
+	}
 }
 
 ?>
