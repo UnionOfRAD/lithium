@@ -217,7 +217,7 @@ class Router extends \lithium\core\StaticObject {
 		foreach (static::$_configurations as $route) {
 			if ($match = $route->match($url, $context)) {
 				$path = rtrim("{$base}{$match}", '/');
-				return static::_prefix($path, $context, $options);
+				return (!empty($options)) ? static::_prefix($path, $context, $options) : $path;
 			}
 			return rtrim("{$base}{$match}{$suffix}", '/') ?: '/';
 		}
