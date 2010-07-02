@@ -28,7 +28,7 @@ use \lithium\core\Libraries;
  * {{{
  * 	Auth::config(array(
  * 		'customer' => array(
- *          'adapter' => 'Form',
+ * 			'adapter' => 'Form',
  * 			'model' => 'Customer',
  * 			'fields' => array('email', 'password')
  * 		)
@@ -43,7 +43,7 @@ use \lithium\core\Libraries;
  * {{{
  * 	Auth::config(array(
  * 		'customer' => array(
- *          'adapter' => 'Form',
+ * 			'adapter' => 'Form',
  * 			'model' => 'Customer',
  * 			'fields' => array('username' => 'login.username', 'password' => 'login.password'),
  * 			'scope' => array('active' => true)
@@ -116,7 +116,7 @@ class Form extends \lithium\core\Object {
 	 * {{{
 	 * 	Auth::config(array(
 	 * 		'members' => array(
-	 *          'adapter' => 'Form',
+	 * 			'adapter' => 'Form',
 	 * 			'model' => 'Member',
 	 * 			'fields' => array('email', 'password'),
 	 * 			'filters' => array(function($data) {
