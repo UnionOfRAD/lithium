@@ -307,8 +307,11 @@ class RouteTest extends \lithium\test\Unit {
 			'params' => array('action' => 'view'),
 			'defaults' => array('action' => 'view'),
 			'match' => array(),
+			'meta' => array(),
 			'keys' => array('controller' => 'controller', 'action' => 'action'),
-			'subPatterns' => array()
+			'subPatterns' => array(),
+			'persist' => array('controller'),
+			'handler' => null
 		);
 		$this->assertEqual($expected, $result);
 	}
@@ -461,6 +464,19 @@ class RouteTest extends \lithium\test\Unit {
 		$request = new Request(array('base' => ''));
 		$url = $route->match(array('controller' => 'users', 'action' => 'view'), $request);
 		$this->assertEqual('/', $url);
+	}
+
+	public function testTrimmingEmptyPathElements() {
+		$route = new Route(array(
+			'template' => '/{:controller}/{:id:[0-9]+}',
+			'params' => array('action' => 'index', 'id' => null)
+		));
+
+		$url = $route->match(array('controller' => 'posts', 'id' => '13'));
+		$this->assertEqual("/posts/13", $url);
+
+		$url = $route->match(array('controller' => 'posts'));
+		$this->assertEqual("/posts", $url);
 	}
 }
 

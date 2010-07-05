@@ -105,6 +105,14 @@ class Route extends \lithium\core\Object {
 	protected $_match = array();
 
 	/**
+	 * An array of metadata parameters which must be present in the request in order for the route
+	 * to match.
+	 *
+	 * @var array
+	 */
+	protected $_meta = array();
+
+	/**
 	 * The default values for the keys present in the URL template.
 	 *
 	 * @var array
@@ -276,6 +284,10 @@ class Route extends \lithium\core\Object {
 					$template = rtrim(substr($template, 0, $len), '/');
 					continue;
 				}
+			}
+			if ($value === null) {
+				$template = str_replace("/{$rpl}", '', $template);
+				continue;
 			}
 			$template = str_replace($rpl, $value, $template);
 			$trimmed = ($key == 'args') ? $trimmed : false;

@@ -40,9 +40,12 @@ class RouterTest extends \lithium\test\Unit {
 			'pattern' => '@^/hello$@',
 			'params' => array('controller' => 'posts', 'action' => 'index'),
 			'match' => array('controller' => 'posts', 'action' => 'index'),
+			'meta' => array(),
+			'persist' => array('controller'),
 			'defaults' => array(),
 			'keys' => array(),
-			'subPatterns' => array()
+			'subPatterns' => array(),
+			'handler' => null
 		);
 		$this->assertEqual($expected, $result->export());
 
@@ -54,8 +57,11 @@ class RouterTest extends \lithium\test\Unit {
 			'params' => array('action' => 'view'),
 			'defaults' => array('action' => 'view'),
 			'match' => array(),
+			'meta' => array(),
+			'persist' => array('controller'),
 			'keys' => array('controller' => 'controller', 'action' => 'action'),
-			'subPatterns' => array()
+			'subPatterns' => array(),
+			'handler' => null
 		);
 		$this->assertEqual($expected, $result->export());
 	}
@@ -76,7 +82,10 @@ class RouterTest extends \lithium\test\Unit {
 			'params' => array('action' => 'view', 'required' => true),
 			'defaults' => array('action' => 'view'),
 			'match' => array('required' => true),
-			'subPatterns' => array()
+			'meta' => array(),
+			'persist' => array('controller'),
+			'subPatterns' => array(),
+			'handler' => null
 		);
 		$this->assertEqual($expected, $result->export());
 	}
@@ -89,8 +98,11 @@ class RouterTest extends \lithium\test\Unit {
 			'keys' => array('controller' => 'controller', 'action' => 'action'),
 			'params' => array('action' => 'archive'),
 			'match' => array(),
+			'meta' => array(),
+			'persist' => array('controller'),
 			'defaults' => array('action' => 'archive'),
-			'subPatterns' => array()
+			'subPatterns' => array(),
+			'handler' => null
 		);
 		$this->assertEqual($expected, $result->export());
 	}
@@ -450,6 +462,32 @@ class RouterTest extends \lithium\test\Unit {
 		$request = new Request(array('base' => ''));
 		$url = Router::match(array('controller' => 'users', 'action' => 'view'), $request);
 		$this->assertEqual('/', $url);
+	}
+
+	/**
+	 * Tests routing based on content type extensions, with HTML being the default when types are
+	 * not defined.
+	 *
+	 * @return void
+	 */
+	public function testTypeBasedRouting() {
+		Router::connect('/{:controller}/{:id:[0-9]+}', array(
+			'action' => 'index', 'type' => 'html', 'id' => null
+		));
+		Router::connect('/{:controller}/{:id:[0-9]+}.{:type}', array(
+			'action' => 'index', 'id' => null
+		));
+
+		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}', array(
+			'type' => 'html', 'id' => null
+		));
+		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}.{:type}', array('id' => null));
+
+		$url = Router::match(array('controller' => 'posts', 'type' => 'html'));
+		$this->assertEqual('/posts', $url);
+
+		$url = Router::match(array('controller' => 'posts', 'type' => 'json'));
+		$this->assertEqual('/posts.json', $url);
 	}
 }
 
