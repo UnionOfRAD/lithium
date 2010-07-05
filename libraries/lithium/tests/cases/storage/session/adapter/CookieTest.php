@@ -141,7 +141,7 @@ class CookieTest extends \lithium\test\Unit {
 	public function testRead() {
 		$key = 'read';
 		$value = 'value to be read';
-		$_COOKIE[$key] = $value;
+		$_COOKIE[$this->name][$key] = $value;
 
 		$closure = $this->Cookie->read($key);
 		$this->assertTrue(is_callable($closure));
@@ -165,7 +165,7 @@ class CookieTest extends \lithium\test\Unit {
 	public function testCheck() {
 		$key = 'read';
 		$value = 'value to be read';
-		$_COOKIE[$key] = $value;
+		$_COOKIE[$this->name][$key] = $value;
 
 		$closure = $this->Cookie->check($key);
 		$this->assertTrue(is_callable($closure));

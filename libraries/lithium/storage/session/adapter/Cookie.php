@@ -89,8 +89,10 @@ class Cookie extends \lithium\core\Object {
 	 * @return boolean True if the key exists, false otherwise.
 	 */
 	public function check($key) {
-		return function($self, $params, $chain) {
-			return (isset($_COOKIE[$params['key']]));
+		$config = $this->_config;
+
+		return function($self, $params, $chain) use (&$config) {
+			return (isset($_COOKIE[$config['name']][$params['key']]));
 		};
 	}
 
@@ -99,9 +101,10 @@ class Cookie extends \lithium\core\Object {
 	 *
 	 * @param null|string $key Key of the entry to be read. If $key is null, returns
 	 *        all cookie key/value pairs that have been set.
+	 * @param array $options Options array. Not used in this adapter.
 	 * @return mixed Data in the session if successful, null otherwise.
 	 */
-	public function read($key = null) {
+	public function read($key = null, array $options = array()) {
 		$config = $this->_config;
 
 		return function($self, $params, $chain) use (&$config) {
@@ -118,7 +121,7 @@ class Cookie extends \lithium\core\Object {
 				}
 				return ($result !== array()) ? $result : null;
 			}
-			return (isset($_COOKIE[$key])) ? $_COOKIE[$key] : null;
+			return (isset($_COOKIE[$config['name']][$key])) ? $_COOKIE[$config['name']][$key] : null;
 		};
 	}
 
@@ -132,11 +135,11 @@ class Cookie extends \lithium\core\Object {
 	 */
 	public function write($key, $value = null, array $options = array()) {
 		$expire = !isset($options['expire']) && empty($this->_config['expire']);
+		$config = $this->_config;
 
-		if ($expire && $key != $this->_config['name']) {
+		if ($expire && $key != $config['name']) {
 			return null;
 		}
-		$config = $options + $this->_config;
 		$expires = (isset($options['expire'])) ? $options['expire'] : $config['expire'];
 
 		return function($self, $params, $chain) use (&$config, &$expires) {
@@ -176,7 +179,7 @@ class Cookie extends \lithium\core\Object {
 	 * @return boolean True on successful delete, false otherwise.
 	 */
 	public function delete($key, array $options = array()) {
-		$config = $options + $this->_config;
+		$config = $this->_config;
 
 		return function($self, $params, $chain) use (&$config) {
 			$key = $params['key'];
