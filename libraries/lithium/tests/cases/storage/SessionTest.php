@@ -14,6 +14,10 @@ use \lithium\storage\session\adapter\Memory;
 use \lithium\tests\mocks\storage\session\adapter\SessionStorageConditional;
 
 
+/**
+ *
+ * @todo Refactor this to get rid of the very integration-style tests.
+ */
 class SessionTest extends \lithium\test\Unit {
 
 	public function setUp() {
