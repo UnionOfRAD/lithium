@@ -122,7 +122,7 @@ class MySqlTest extends \lithium\test\Unit {
 			array('Test', 1)
 		));
 
-		$result = $this->db->read('SELECT * From companies WHERE name = {:name}', array(
+		$result = $this->db->read('SELECT * From companies AS Company WHERE name = {:name}', array(
 			'name' => 'Test',
 			'return' => 'array'
 		));
@@ -140,7 +140,7 @@ class MySqlTest extends \lithium\test\Unit {
 			'name' => 'Test'
 		)));
 
-		$result = $this->db->read('SELECT * From companies WHERE name = {:name}', array(
+		$result = $this->db->read('SELECT * From companies AS Company WHERE name = {:name}', array(
 			'name' => 'Test',
 			'return' => 'array'
 		));
