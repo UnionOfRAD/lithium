@@ -36,7 +36,7 @@ class Request extends \lithium\net\http\Message {
 	 *
 	 * @var string
 	 */
-	public $port = 80;
+	public $port = null;
 
 	/**
 	 * The method of the request, typically one of the following: `GET`, `POST`, `PUT`, `DELETE`,
@@ -109,7 +109,7 @@ class Request extends \lithium\net\http\Message {
 		$defaults = array(
 			'scheme' => 'http',
 			'host' => 'localhost',
-			'port' => 80,
+			'port' => null,
 			'method' => 'GET',
 			'path' => '/',
 			'headers' => array(),
@@ -124,7 +124,7 @@ class Request extends \lithium\net\http\Message {
 		$this->protocol = "HTTP/{$this->version}";
 
 		$this->headers = array(
-			'Host' => "{$this->host}:{$this->port}",
+			'Host' => $this->port ? "{$this->host}:{$this->port}" : $this->host,
 			'Connection' => 'Close',
 			'User-Agent' => 'Mozilla/5.0',
 		);
@@ -188,7 +188,8 @@ class Request extends \lithium\net\http\Message {
 				return compact('method', 'content', 'header');
 			case 'url':
 				$query = $this->queryString();
-				return "{$this->scheme}://{$this->host}:{$this->port}{$this->path}{$query}";
+				$host = $this->host . ($this->port ? ":{$this->port}" : '');
+				return "{$this->scheme}://{$host}{$this->path}{$query}";
 			case 'context':
 				$scheme = $this->scheme;
 				return array($this->scheme => $options + $this->to('array'));

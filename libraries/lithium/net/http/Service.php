@@ -73,7 +73,7 @@ class Service extends \lithium\core\Object {
 			'auth'       => 'Basic',
 			'login'      => 'root',
 			'password'   => '',
-			'port'       => 80,
+			'port'       => null,
 			'timeout'    => 30,
 			'encoding'   => 'UTF-8',
 		);
@@ -204,7 +204,7 @@ class Service extends \lithium\core\Object {
 	 *         string or POST/PUT data, and URL.
 	 */
 	protected function _request($method, $path, $data, $options) {
-		$defaults = array('type' => 'form');
+		$defaults = array('type' => 'form', 'scheme' => $this->_config['protocol']);
 		$options += $defaults;
 		$request = $this->_instance('request', $this->_config + $options);
 		$request->path = str_replace('//', '/', "{$request->path}{$path}");

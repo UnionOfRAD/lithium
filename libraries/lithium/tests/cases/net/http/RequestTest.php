@@ -117,7 +117,7 @@ class RequestTest extends \lithium\test\Unit {
 	public function testToString() {
 		$expected = join("\r\n", array(
 			'GET / HTTP/1.1',
-			'Host: localhost:80',
+			'Host: localhost',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'', ''
@@ -136,7 +136,7 @@ class RequestTest extends \lithium\test\Unit {
 		)));
 		$expected = join("\r\n", array(
 			'GET / HTTP/1.1',
-			'Host: localhost:80',
+			'Host: localhost',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Authorization: Basic ' . base64_encode('root:something'),
@@ -149,7 +149,7 @@ class RequestTest extends \lithium\test\Unit {
 	public function testToStringWithBody() {
 		$expected = join("\r\n", array(
 			'GET / HTTP/1.1',
-			'Host: localhost:80',
+			'Host: localhost',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Content-Length: 11',
@@ -165,7 +165,7 @@ class RequestTest extends \lithium\test\Unit {
 			'method' => 'GET',
 			'content' => '',
 			'header' => array(
-				'Host: localhost:80',
+				'Host: localhost',
 				'Connection: Close',
 				'User-Agent: Mozilla/5.0'
 			)
@@ -175,7 +175,12 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testToUrl() {
-		$expected = 'http://localhost:80/';
+		$expected = 'http://localhost/';
+		$result = $this->request->to('url');
+		$this->assertEqual($expected, $result);
+
+		$this->request = new Request(array('scheme' => 'https', 'port' => 443));
+		$expected = 'https://localhost:443/';
 		$result = $this->request->to('url');
 		$this->assertEqual($expected, $result);
 	}
@@ -185,7 +190,7 @@ class RequestTest extends \lithium\test\Unit {
 			'method' => 'GET',
 			'content' => '',
 			'header' => array(
-				'Host: localhost:80',
+				'Host: localhost',
 				'Connection: Close',
 				'User-Agent: Mozilla/5.0'
 			)

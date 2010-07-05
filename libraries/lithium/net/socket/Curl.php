@@ -24,7 +24,7 @@ namespace lithium\net\socket;
 class Curl extends \lithium\net\Socket {
 
 	/**
-	 * Contains options that will be passed to curl_setopt_array before
+	 * Contains options that will be passed to `curl_setopt_array` before
 	 * `read` and `write` operations. These options should be set by
 	 * using the `set` method.
 	 *
@@ -35,10 +35,11 @@ class Curl extends \lithium\net\Socket {
 	public $options = array();
 
 	/**
-	 * Opens a curl connection and initializes the internal resource handle
+	 * Opens a curl connection and initializes the internal resource handle.
 	 *
-	 * @return mixed False if the Socket configuration does not contain the
-	 *		   'protocol' or 'host' settings, curl resource otherwise.
+	 * @return mixed Returns `false` if the socket configuration does not contain the
+	 *         `'protocol'` or `'host'` settings, or if configuration fails, otherwise returns a
+	 *         curl resource.
 	 */
 	public function open() {
 		$config = $this->_config;
@@ -50,19 +51,18 @@ class Curl extends \lithium\net\Socket {
 		$url = "{$config['protocol']}://{$config['host']}";
 		$this->_resource = curl_init($url);
 		curl_setopt($this->_resource, CURLOPT_PORT, $config['port']);
-		curl_setopt($this->_resource, CURLOPT_HEADER, 0);
+		curl_setopt($this->_resource, CURLOPT_HEADER, true);
 		curl_setopt($this->_resource, CURLOPT_RETURNTRANSFER, true);
 
-		if (is_resource($this->_resource)) {
-			$this->_isConnected = true;
-
-			$this->timeout($config['timeout']);
-
-			if (!empty($config['encoding'])) {
-				$this->encoding($config['encoding']);
-			}
+		if (!is_resource($this->_resource)) {
+			return false;
 		}
+		$this->_isConnected = true;
+		$this->timeout($config['timeout']);
 
+		if (isset($config['encoding'])) {
+			$this->encoding($config['encoding']);
+		}
 		return $this->_resource;
 	}
 
@@ -125,7 +125,7 @@ class Curl extends \lithium\net\Socket {
 	}
 
 	/**
-	 * A convenience method to set the curl CURLOPT_CONNECTTIMEOUT
+	 * A convenience method to set the curl `CURLOPT_CONNECTTIMEOUT`
 	 * setting for the current connection. This determines the number
 	 * of seconds to wait while trying to connect.
 	 *
@@ -180,10 +180,22 @@ class Curl extends \lithium\net\Socket {
 	 * @return boolean response string or object like `\lithium\net\http\Response`
 	 */
 	public function send($message, array $options = array()) {
+
+		if (is_object($message)) {
+			curl_setopt($this->_resource, CURLOPT_URL, $message->to('url'));
+			curl_setopt($this->_resource, CURLOPT_POST, ($message->method == 'POST'));
+			curl_setopt($this->_resource, CURLOPT_HTTPHEADER, $message->headers());
+
+			if ($message->method == 'POST') {
+				curl_setopt($this->_resource, CURLOPT_POSTFIELDS, $message->body());
+			}
+		}
+
 		if ($this->write((string) $message)) {
-			$message = $this->read();
-			$response = new $options['classes']['response'](compact('message'));
-			return $response;
+			$result = $this->read();
+			list($headers, $body) = explode("\r\n\r\n", $result, 2);
+			$headers = explode("\r\n", $headers);
+			return new $options['classes']['response'](compact('body', 'headers'));
 		}
 	}
 }
