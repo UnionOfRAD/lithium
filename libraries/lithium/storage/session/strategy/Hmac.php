@@ -12,7 +12,29 @@ use \Exception;
 use \RuntimeException;
 
 /**
- * HMAC strategy.
+ * This strategy allows you to sign your `Session` and/or `Cookie` data with a passphrase
+ * to ensure that it has not been tampered with.
+ *
+ * Example configuration:
+ *
+ * {{{
+ * Session::config(array(
+ *     'default' => array(
+ *	       'adapter' => 'Cookie',
+ *	       'strategies' => array('Hmac' => array('secret' => 'foobar'))
+ *     )
+ * ));
+ *
+ * This will configure the `HMAC` strategy to be used for all `Session` operations with the
+ * `default` named configuration. A hash-based message authentication code (HMAC) will be
+ * calculated for all data stored in your cookies, and will be compared to the signature
+ * stored in your cookie data. If the two do not match, then your data has been tampered with
+ * (or you have modified the data directly _without_ passing through the `Session` class, which
+ * amounts to the same), then a catchable `RuntimeException` is thrown.
+ *
+ * Please note that this strategy is very finnicky, and is so by design. If you attempt to access
+ * or modify the stored data in any way other than through the `Session` class configured with the
+ * `Hmac` strategy with the properly configured `secret`, then it will probably blow up.
  */
 class Hmac extends \lithium\core\Object {
 
