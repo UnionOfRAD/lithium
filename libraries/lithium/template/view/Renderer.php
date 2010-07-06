@@ -11,6 +11,19 @@ namespace lithium\template\view;
 use \RuntimeException;
 use \lithium\core\Libraries;
 
+/**
+ * The `Renderer` abstract class serves as a base for all concrete `Renderer` adapters.
+ *
+ * When in a view, the local scope is that of an instance of `Renderer` - meaning that
+ * `$this` in views is an instance of the current renderer adapter.
+ *
+ * For more information about implementing your own template loaders or renderers, see the
+ * `lithium\template\View` class.
+ *
+ * @see lithium\template\View
+ * @see lithium\template\adapter\File
+ * @see lithium\template\adapter\Simple
+ */
 abstract class Renderer extends \lithium\core\Object {
 
 	/**
@@ -123,9 +136,19 @@ abstract class Renderer extends \lithium\core\Object {
 	abstract public function render($template, $data = array(), array $options = array());
 
 	/**
-	 * undocumented function
+	 * Renderer constructor.
+	 *
+	 * Accepts these following configuration parameters:
+	 * - `view`: The `View` object associated with this renderer.
+	 * - `strings`: String templates used by helpers.
+	 * - `handlers`: An array of output handlers for string template inputs.
+	 * - `request`: The `Request` object associated with this renderer and passed to the
+	 *              defined handlers.
+	 * - `context`: An array of the current rendering context data, including `content`,
+	 *              `title`, `scripts` and `styles`.
 	 *
 	 * @param array $config
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -176,7 +199,16 @@ abstract class Renderer extends \lithium\core\Object {
 		unset($this->_config['view']);
 	}
 
-	public function __isSet($property) {
+	/**
+	 * Magic `__isset` method.
+	 *
+	 * Is triggered by calling isset() or empty() on inaccessible properties, and performs
+	 * an `isset()` check on for keys in the current `context`.
+	 *
+	 * @param string $property The accessed property.
+	 * @return boolean True if set, false otherwise.
+	 */
+	public function __isset($property) {
 		return isset($this->_context[$property]);
 	}
 
