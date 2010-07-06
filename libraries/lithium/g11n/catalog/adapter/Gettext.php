@@ -39,8 +39,8 @@ use \Exception;
  * }}}
  *
  * @see lithium\g11n\Locale
- * @link http://php.net/setlocale
- * @link http://www.gnu.org/software/gettext/manual/gettext.html
+ * @link http://php.net/setlocale PHP Manual: setlocale()
+ * @link http://www.gnu.org/software/gettext/manual/gettext.html GNU Gettext Utilities
  */
 class Gettext extends \lithium\g11n\catalog\Adapter {
 
