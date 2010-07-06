@@ -12,7 +12,23 @@ use \lithium\core\Libraries;
 use \lithium\util\Collection;
 
 /**
- * Group Test Collection.
+ * A `Collection` of tests that represents a test group.
+ *
+ * Tests are added to this group either on `construct` by passing a fully-namespaced test class
+ * or namespace string-based path, e.g.
+ *
+ * {{{
+ * $group = new Group(array('data' => array(
+ *     'data\ModelTest',
+ *     new \lithium\tests\cases\core\ObjectTest()
+ * )));
+ * }}}
+ *
+ * Or they can be added programmatically:
+ *
+ * {{{
+ * $group->add('data\ModelTest');
+ * }}}
  */
 class Group extends \lithium\util\Collection {
 
@@ -50,11 +66,11 @@ class Group extends \lithium\util\Collection {
 	}
 
 	/**
-	 * Add a tests to the group
+	 * Add a tests to the group.
 	 *
-	 * @param string $test
-	 * @param string $options
-	 * @return array
+	 * @param string $test The test to be added.
+	 * @param string $options Method options. Currently not used in this method.
+	 * @return array Updated list of tests contained within this collection.
 	 */
 	public function add($test = null, array $options = array()) {
 		$resolve = function($self, $test) {
