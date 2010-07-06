@@ -39,9 +39,9 @@ class Controller extends \lithium\core\Object {
 			$request = $params['request'];
 			$options = $params['options'];
 			$params = $params['dispatchParams'];
-			$group = '\\' . join('\\', (array) $params['args']);
+			$group = join('\\', (array) $params['args']);
 
-			if ($group === "\\all") {
+			if ($group === "all") {
 				$group = Group::all();
 				$options['title'] = 'All Tests';
 			}

@@ -29,7 +29,9 @@
 				</div>
 
 				<div class="test-content">
-					<h2><span>test results for </span><?php echo $report->title; ?></h2>
+					<?php if ($report->title) { ?>
+						<h2><span>test results for </span><?php echo $report->title; ?></h2>
+					<?php } ?>
 
 					<span class="filters">
 						<?php echo join('', array_map(
