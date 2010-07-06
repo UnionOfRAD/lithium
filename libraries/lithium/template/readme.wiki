@@ -41,8 +41,8 @@ An example would be something like: {{{
 
 **Other useful information:**
 
-- [Introduction to PHP streams](http://www.php.net/intro.stream)
-- [Stream examples](http://www.php.net/stream.examples)
+ - [Introduction to PHP streams](http://www.php.net/intro.stream)
+ - [Stream examples](http://www.php.net/stream.examples)
 
 #### Using helpers
 
@@ -58,3 +58,31 @@ re-instanciate the helper.
 
 Using such an approach, helpers can easily be loaded as needed without any
 performance impact.
+
+**More info**
+
+ - [ Html helper](template/helper/Html)
+ - [ Form helper](template/helper/Form)
+ - [ Helper base class](template/Helper)
+
+#### Rendering Elements
+
+Elements are reusable view snippets that you can use in several views and layouts.
+You can reference it like so: 
+{{{
+echo $this->view()->render(
+	array('element' => 'menu'), 
+	array('var1' => $var1, 'var2' => $var2)
+);
+}}} 
+
+Where `menu` is the name of your element file, in this example `app/views/elements/menu.html.php`
+and `var1` and `var2` are variables either declared in the view or set in the controller (as
+per the normal way of passing variables to views with `return` or `$this->set`) that you want the
+element to be able to access. For short syntax you can use `compact('var1','var2')`.
+
+**More info**
+
+ - [ View](template/View)
+ - [ Renderer](template/view/Renderer)
+ - [ File adapter](template/view/adapter/File)
