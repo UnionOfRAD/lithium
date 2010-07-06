@@ -8,10 +8,21 @@
 
 namespace lithium\test;
 
+/**
+ * This is the base class for integration tests.
+ *
+ * Integration tests are for determining that different parts of the framework will work
+ * together (integrate) as expected. An example of a common integration test would be for
+ * ensuring that an adapter interacts correctly with the class it is designed to interface
+ * with. Example: the `Session` class and the `Php` adapter. Unit tests will ensure that
+ * both the `Session` and `Php` classes behave correctly under isolation, while an integration
+ * test ensures that the two classes interact and interface correctly.
+ *
+ */
 class Integration extends \lithium\test\Unit {
 
 	/**
-	 * Auto init for applying Integration filter
+	 * Auto init for applying Integration filter to this test class.
 	 *
 	 * @return void
 	 */
