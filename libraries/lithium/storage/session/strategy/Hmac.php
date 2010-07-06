@@ -35,6 +35,8 @@ use \RuntimeException;
  * Please note that this strategy is very finnicky, and is so by design. If you attempt to access
  * or modify the stored data in any way other than through the `Session` class configured with the
  * `Hmac` strategy with the properly configured `secret`, then it will probably blow up.
+ *
+ * @link http://en.wikipedia.org/wiki/HMAC Wikipedia: Hash-based Message Authentication Code
  */
 class Hmac extends \lithium\core\Object {
 
