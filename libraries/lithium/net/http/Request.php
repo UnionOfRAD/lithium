@@ -130,7 +130,7 @@ class Request extends \lithium\net\http\Message {
 		);
 		$this->headers($config['headers']);
 
-		if (!empty($config['auth']['password'])) {
+		if (!empty($config['auth']['method'])) {
 			$this->headers('Authorization', $config['auth']['method'] . ' ' . base64_encode(
 				$config['auth']['username'] . ':' . $config['auth']['password']
 			));
@@ -182,17 +182,18 @@ class Request extends \lithium\net\http\Message {
 	public function to($format, array $options = array()) {
 		switch ($format) {
 			case 'array':
-				$method = $this->method;
-				$content = $this->body();
-				$header = $this->headers();
-				return compact('method', 'content', 'header');
+				return get_object_vars($this);
 			case 'url':
 				$query = $this->queryString();
 				$host = $this->host . ($this->port ? ":{$this->port}" : '');
 				return "{$this->scheme}://{$host}{$this->path}{$query}";
 			case 'context':
-				$scheme = $this->scheme;
-				return array($this->scheme => $options + $this->to('array'));
+				$defaults = array(
+					'method' => $this->method,
+					'header' => $this->headers(), 'content' => $this->body(),
+					'protocol_version' => $this->version, 'ignore_errors' => true
+				);
+				return array('http' => $options + $defaults);
 			case 'string':
 			default:
 				return (string) $this;

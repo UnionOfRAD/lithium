@@ -23,7 +23,7 @@ class Service extends \lithium\core\Object {
 	public $connection = null;
 
 	/**
-	 * Holds the request and response used by send.
+	 * Holds the last request and response object
 	 *
 	 * @var object
 	 */
@@ -65,16 +65,14 @@ class Service extends \lithium\core\Object {
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'autoConnect' => true,
 			'persistent' => false,
-			'protocol'   => 'http',
+			'scheme'     => 'http',
 			'host'       => 'localhost',
-			'version'    => '1.1',
-			'auth'       => 'Basic',
-			'login'      => 'root',
-			'password'   => '',
 			'port'       => null,
 			'timeout'    => 30,
+			'auth'       => null,
+			'login'      => 'root',
+			'password'   => '',
 			'encoding'   => 'UTF-8',
 		);
 		$config = (array) $config + $defaults;
@@ -89,32 +87,7 @@ class Service extends \lithium\core\Object {
 
 	protected function _init() {
 		parent::_init();
-		$class = Libraries::locate('socket.util', $this->_classes['socket']);
-		$this->connection = $this->_instance($class, $this->_config);
-	}
-
-	/**
-	 * Connect to data source.
-	 *
-	 * @return boolean
-	 */
-	public function connect() {
-		if (!$this->_isConnected && $this->connection) {
-			$this->_isConnected = $this->connection->open();
-		}
-		return $this->_isConnected;
-	}
-
-	/**
-	 * Disconnect from socket.
-	 *
-	 * @return boolean
-	 */
-	public function disconnect() {
-		if ($this->_isConnected) {
-			$this->_isConnected = !$this->connection->close();
-		}
-		return !$this->_isConnected;
+		$this->_classes['socket'] = Libraries::locate('socket.util', $this->_classes['socket']);
 	}
 
 	/**
@@ -170,25 +143,32 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @param string $method
 	 * @param string $path
-	 * @param array $data
-	 * @param array $options
+	 * @param array $data the parameters for the request. For GET/DELETE this is the query string
+	 *        for POST/PUT this is the body
+	 * @param array $options passed to request and socket
 	 * @return string
 	 */
-	public function send($method, $path = null, $data = null, array $options = array()) {
-		$defaults = array('return' => 'body');
-		$options += $defaults;
+	public function send($method, $path = null, $data = array(), array $options = array()) {
+		$request = $this->_request($method, $path, $data, $options);
+		$defaults = array('return' => 'body', 'scheme' => 'http', 'host' => $request->host);
+		$options += $this->_config + $defaults;
+		$this->connection = $this->_instance('socket', $options);
 
-		if (!$this->connect()) {
+		if (!$this->connection || !$this->connection->open()) {
 			return;
 		}
-		$request = $this->_request($method, $path, $data, $options);
-		$response = $this->connection->send($request, array('classes' => $this->_classes));
-
-		if ($response) {
-			$this->last = (object) compact('request', 'response');
-			$this->disconnect();
-			return ($options['return'] == 'body') ? $response->body() : $response;
+		if ($this->connection->write($request)) {
+			$message = $this->connection->read();
 		}
+		$this->connection->close();
+		$result = null;
+
+		if ($message) {
+			$response = $this->_instance('response', $message);
+			$result = ($options['return'] == 'body') ? $response->body() : $response;
+		}
+		$this->last = (object) compact('request', 'response');
+		return $result;
 	}
 
 	/**
@@ -207,7 +187,7 @@ class Service extends \lithium\core\Object {
 		$defaults = array('type' => 'form', 'scheme' => $this->_config['protocol']);
 		$options += $defaults;
 		$request = $this->_instance('request', $this->_config + $options);
-		$request->path = str_replace('//', '/', "{$request->path}{$path}");
+		$request->path = str_replace('//', '/', "{$request->path}/{$path}");
 		$request->method = $method = strtoupper($method);
 		$media = $this->_classes['media'];
 		$type = null;
@@ -218,7 +198,8 @@ class Service extends \lithium\core\Object {
 			$request->headers(array('Content-Type' => current($contentType)));
 			$data = Media::encode($options['type'], $data, $options);
 		}
-		in_array($method, array('POST', 'PUT')) ? $request->body($data) : $request->params = $data;
+		in_array($method, array('POST', 'PUT'))
+			? $request->body($data) : $request->params = $data;
 		return $request;
 	}
 }

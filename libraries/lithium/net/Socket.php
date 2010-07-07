@@ -38,10 +38,8 @@ abstract class Socket extends \lithium\core\Object {
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'persistent' => false,
-			'protocol'   => 'tcp',
+			'scheme'     => 'tcp',
 			'host'       => 'localhost',
-			'login'      => 'root',
-			'password'   => '',
 			'port'       => 80,
 			'timeout'    => 30
 		);
@@ -92,7 +90,7 @@ abstract class Socket extends \lithium\core\Object {
 	 *                - path: path for the current request
 	 *                - classes: array of classes to use
 	 *                    - response: a class to use for the response
-	 * @return boolean response string or object like `\lithium\net\http\Response`
+	 * @return array headers, body, message
 	 */
 	abstract public function send($message, array $options = array());
 

@@ -193,7 +193,9 @@ class RequestTest extends \lithium\test\Unit {
 				'Host: localhost',
 				'Connection: Close',
 				'User-Agent: Mozilla/5.0'
-			)
+			),
+			'protocol_version' => '1.1',
+			'ignore_errors' => true
 		));
 		$result = $this->request->to('context');
 		$this->assertEqual($expected, $result);

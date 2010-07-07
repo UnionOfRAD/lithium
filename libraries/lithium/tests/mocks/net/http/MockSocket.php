@@ -25,14 +25,7 @@ class MockSocket extends \lithium\net\Socket {
 	}
 
 	public function read() {
-		return join("\r\n", array(
-			'HTTP/1.1 200 OK',
-			'Header: Value',
-			'Connection: close',
-			'Content-Type: text/html;charset=UTF-8',
-			'',
-			'Test!'
-		));
+		return $this->data;
 	}
 
 	public function write($data) {
@@ -41,9 +34,8 @@ class MockSocket extends \lithium\net\Socket {
 
 	public function send($message, array $options = array()) {
 		if ($this->write($message)) {
-			$message = $this->read();
-			$response = new $options['classes']['response'](compact('message'));
-			return $response;
+			$message = (string) $this->read();
+			return compact('message');
 		}
 	}
 

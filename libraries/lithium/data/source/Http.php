@@ -197,7 +197,6 @@ class Http extends \lithium\data\Source {
 			return null;
 		}
 		$method = $this->_methods[__FUNCTION__];
-
 		$filter = function($self, $params) use (&$conn, $config, $method) {
 			$query = $params['query'];
 			$options = $params['options'];

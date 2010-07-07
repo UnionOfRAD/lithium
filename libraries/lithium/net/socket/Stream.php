@@ -28,30 +28,29 @@ class Stream extends \lithium\net\Socket {
 	 *		   'protocol' or 'host' settings,  socket resource otherwise.
 	 */
 	public function open() {
-		$config = $this->_config;
+		$options += $this->_config;
 
-		if (empty($config['protocol']) || empty($config['host'])) {
+		if (empty($options['scheme']) || empty($options['host'])) {
 			return false;
 		}
 
-		$host = "{$config['protocol']}://{$config['host']}:{$config['port']}";
+		$host = "{$options['scheme']}://{$options['host']}:{$options['port']}";
 		$flags = STREAM_CLIENT_CONNECT;
 
-		if ($config['persistent']) {
+		if ($options['persistent']) {
 			$flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT;
 		}
 		$this->_resource = stream_socket_client(
-			$host, $errorCode, $errorMessage, $config['timeout'], $flags
+			$host, $errorCode, $errorMessage, $options['timeout'], $flags
 		);
 
 		if (!empty($errorCode) || !empty($errorMessage)) {
 			throw new Exception($errorMessage, $errorCode);
 		}
+		$this->timeout($options['timeout']);
 
-		$this->timeout($config['timeout']);
-
-		if (!empty($config['encoding'])) {
-			$this->encoding($config['encoding']);
+		if (!empty($options['encoding'])) {
+			$this->encoding($options['encoding']);
 		}
 
 		return $this->_resource;
@@ -112,7 +111,7 @@ class Stream extends \lithium\net\Socket {
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
-		return fwrite($this->_resource, $data, strlen($data));
+		return fwrite($this->_resource, (string) $data, strlen($data));
 	}
 
 	/**
@@ -135,7 +134,7 @@ class Stream extends \lithium\net\Socket {
 	 *
 	 * Note: This function only exists in PHP 6. For PHP < 6, this method will return void.
 	 *
-	 * @link http://www.php.net/manual/en/function.stream-encoding.php PHP Manual: stream_encoding()
+	 * @link http://www.php.net/manual/en/function.stream-encoding.php stream_encoding()
 	 * @param string $charset
 	 * @return mixed Returns `null` if `stream_encoding()` function does not exist, boolean
 	 *         result of `stream_encoding()` otherwise.
@@ -144,7 +143,8 @@ class Stream extends \lithium\net\Socket {
 		if (!function_exists('stream_encoding')) {
 			return false;
 		}
-		return is_resource($this->_resource) ? stream_encoding($this->_resource, $charset) : false;
+		return is_resource($this->_resource)
+			? stream_encoding($this->_resource, $charset) : false;
 	}
 
 	/**

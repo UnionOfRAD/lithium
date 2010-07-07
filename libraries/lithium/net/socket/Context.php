@@ -14,13 +14,6 @@ namespace lithium\net\socket;
 class Context extends \lithium\net\Socket {
 
 	/**
-	 * Stream resource for this socket context.
-	 *
-	 * @var mixed
-	 */
-	public $connection = null;
-
-	/**
 	 * Connection timeout value.
 	 *
 	 * @var integer
@@ -28,13 +21,20 @@ class Context extends \lithium\net\Socket {
 	protected $_timeout = 30;
 
 	/**
+	 * Content of the stream
+	 *
+	 * @var string
+	 */
+	protected $_content = null;
+
+	/**
 	 * Opens the socket and sets its timeout value.
 	 *
 	 * @return boolean Success.
 	 */
 	public function open() {
-		$this->timeout($this->_config['timeout']);
-		return true;
+		$config = $this->_config;
+		$this->timeout($config['timeout']);
 	}
 
 	/**
@@ -43,8 +43,12 @@ class Context extends \lithium\net\Socket {
 	 * @return boolean Success.
 	 */
 	public function close() {
-		if (is_resource($this->connection)) {
-			return fclose($this->connection);
+		if (!is_resource($this->_resource)) {
+			return true;
+		}
+		fclose($this->_resource);
+		if (is_resource($this->_resource)) {
+			$this->close();
 		}
 		return true;
 	}
@@ -64,7 +68,20 @@ class Context extends \lithium\net\Socket {
 	 * @return void
 	 */
 	public function read() {
-		return null;
+		$content = $this->_content;
+
+		$url = is_object($url) ? $content->to('url') : $url;
+		$context = is_object($url)
+			? $url->to('context', $options['context'])
+			: array($options['wrapper'] => $options['context']);
+		$this->connection = fopen($url, $options['mode'], false, stream_context_create($context));
+
+		if ($this->connection) {
+			$meta = stream_get_meta_data($this->connection);
+			$headers = isset($meta['wrapper_data']) ? $meta['wrapper_data'] : array();
+			$message = isset($headers[0]) ? $headers[0] : null;
+			$body = stream_get_contents($this->connection);
+		}
 	}
 
 	/**
@@ -74,7 +91,7 @@ class Context extends \lithium\net\Socket {
 	 * @return boolean Success
 	 */
 	public function write($data) {
-		return true;
+		return $this->_content = $data;
 	}
 
 	/**
@@ -93,7 +110,7 @@ class Context extends \lithium\net\Socket {
 	/**
 	 * Sets the encoding of the socket connection. Does not apply to this implementation.
 	 *
-	 * @param string $encoding The character set to use.
+	 * @param string $charset The character set to use.
 	 * @return boolean `true` if encoding has been set, `false` otherwise.
 	 */
 	public function encoding($charset = null) {
@@ -103,37 +120,30 @@ class Context extends \lithium\net\Socket {
 	/**
 	 * Send request and return response data
 	 *
-	 * @param string $message
+	 * @param object|string $url
+	 *        - object with to('url) and to('context') methods
+	 *        - string url like "php://temp"
 	 * @param array $options
 	 * @return string
 	 */
-	public function send($message, array $options = array()) {
+	public function send($url, array $options = array()) {
 		$defaults = array(
-			'path' => null, 'classes' => array('response' => null),
-			'context' => array(
-				'protocol_version' => '1.1',
-				'ignore_errors' => true, 'timeout' => $this->_timeout
-			)
+			'wrapper' => 'html', 'mode' => 'r',
 		);
 		$options += $defaults;
 
-		if ($this->open() === false) {
-			return false;
-		}
-		$url = is_object($message) ? $message->to('url') : $options['path'];
-		$message = is_object($message) ? $message->to('context', $options['context']) : $message;
+		$url = is_object($url) ? $url->to('url') : $url;
+		$context = is_object($url)
+			? $url->to('context', $options['context'])
+			: array($options['wrapper'] => $options['context']);
+		$this->connection = fopen($url, $options['mode'], false, stream_context_create($context));
 
-		if ($this->connection = fopen($url, 'r', false, stream_context_create($message))) {
+		if ($this->connection) {
 			$meta = stream_get_meta_data($this->connection);
-			$headers = $meta['wrapper_data'] ?: array();
+			$headers = isset($meta['wrapper_data']) ? $meta['wrapper_data'] : array();
 			$message = isset($headers[0]) ? $headers[0] : null;
 			$body = stream_get_contents($this->connection);
-			$this->close();
-
-			if (!$options['classes']['response']) {
-				return $body;
-			}
-			return new $options['classes']['response'](compact('headers', 'body', 'message'));
+			return compact('headers', 'message', 'body');
 		}
 	}
 }
