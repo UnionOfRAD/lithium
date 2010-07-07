@@ -408,26 +408,55 @@ class Libraries {
 			if ($params['prefix'] && strpos($class, $params['prefix']) !== 0) {
 				continue;
 			}
-			if (!empty($params['transform'])) {
-				if (is_callable($params['transform'])) {
-					return $params['transform']($class, $params);
+			if ($transform = $params['transform']) {
+				if ($file = static::_transformPath($transform, $class, $params)) {
+					return $file;
 				}
-				list($match, $replace) = $params['transform'];
-				return preg_replace($match, $replace, $class);
+				continue;
 			}
 			$path = str_replace("\\", '/', substr($class, strlen($params['prefix'])));
 			$fullPath = "{$params['path']}/{$path}";
 
-			if ($options['dirs']) {
-				$list = glob(dirname($fullPath) . '/*');
-				$list = array_map(function($i) { return str_replace('\\', '/', $i); }, $list);
-
-				if (in_array($fullPath . $suffix, $list)) {
-					return static::$_cachedPaths[$class] = realpath($fullPath . $suffix);
-				}
-				return is_dir($fullPath) ? realpath($fullPath) : null;
+			if (!$options['dirs']) {
+				return static::$_cachedPaths[$class] = realpath($fullPath . $suffix);
 			}
-			return static::$_cachedPaths[$class] = realpath($fullPath . $suffix);
+
+			$list = glob(dirname($fullPath) . '/*');
+			$list = array_map(function($i) { return str_replace('\\', '/', $i); }, $list);
+
+			if (in_array($fullPath . $suffix, $list)) {
+				return static::$_cachedPaths[$class] = realpath($fullPath . $suffix);
+			}
+			return is_dir($fullPath) ? realpath($fullPath) : null;
+		}
+	}
+
+	/**
+	 * Handles the conversion of a class name to a file name using a custom transformation typically
+	 * defined in the `'transform'` key of a configuration defined through `Libraries::add()`.
+	 *
+	 * The transformation can either be a closure which receives two parameters (the class name
+	 * as a string, and the library configuration as an array), or an array with two values (one
+	 * being the pattern to match, the other being the replacement).
+	 *
+	 * @see lithium\core\Libraries::add()
+	 * @see lithium\core\Libraries::path()
+	 * @param mixed $transform Either a closure or an array containing a regular expression match
+	 *              and replacement. If the closure returns an empty value, or the regular
+	 *              expression fails to match, will return `null`.
+	 * @param string $class The class name which is attempting to be mapped to a file.
+	 * @param array $options The configuration of the library as passed to `Libraries::add()`, along
+	 *              with any options specified in the call to `Libraries::path()`.
+	 * @return string Returns transformed path of a class to a file, or `null` if the transformation
+	 *         did not match.
+	 */
+	protected static function _transformPath($transform, $class, array $options = array()) {
+		if ((is_callable($transform)) && $file = $transform($class, $options)) {
+			return $file;
+		}
+		if (is_array($transform)) {
+			list($match, $replace) = $transform;
+			return preg_replace($match, $replace, $class) ?: null;
 		}
 	}
 

@@ -150,6 +150,12 @@ class LibrariesTest extends \lithium\test\Unit {
 		mkdir($fakeDir);
 		file_put_contents($fakeFilename, $fake);
 
+		Libraries::add('bad', array(
+			'prefix' => false,
+			'path' => $fakeDir,
+			'transform' => function($class, $config) { return ''; }
+		));
+
 		Libraries::add('fake', array(
 			'path' => $fakeDir,
 			'includePath' => true,
@@ -159,6 +165,7 @@ class LibrariesTest extends \lithium\test\Unit {
 			}
 		));
 
+		$this->assertFalse(class_exists('Fake', false));
 		$this->assertTrue(class_exists('Fake'));
 		unlink($fakeFilename);
 		rmdir($fakeDir);
