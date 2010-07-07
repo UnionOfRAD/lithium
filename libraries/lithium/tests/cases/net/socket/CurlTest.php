@@ -8,7 +8,8 @@
 
 namespace lithium\tests\cases\net\socket;
 
-use \lithium\tests\mocks\net\socket\MockCurl;
+use lithium\net\http\Request;
+use lithium\tests\mocks\net\socket\MockCurl;
 
 class CurlTest extends \lithium\test\Unit {
 
@@ -22,15 +23,16 @@ class CurlTest extends \lithium\test\Unit {
 		'timeout' => 2
 	);
 
+	protected $_testUrl = 'http://localhost';
+
 	/**
 	 * Skip the test if curl is not available in your PHP installation.
 	 *
 	 * @return void
 	 */
 	public function skip() {
-		$extensionExists = function_exists('curl_init');
 		$message = 'Your PHP installation was not compiled with curl support.';
-		$this->skipIf(!$extensionExists, $message);
+		$this->skipIf(!function_exists('curl_init'), $message);
 	}
 
 	public function testAllMethodsNoConnection() {
@@ -87,19 +89,16 @@ class CurlTest extends \lithium\test\Unit {
 
 	public function testWriteAndRead() {
 		$stream = new MockCurl($this->_testConfig);
-		$result = $stream->open();
-		$this->assertTrue(is_resource($result));
+		$this->assertTrue(is_resource($stream->open()));
+		$this->assertTrue(is_resource($stream->resource()));
 
-		$result = $stream->resource();
-		$this->assertTrue(is_resource($result));
-
-		$url = 'http://localhost';
-
-		$stream->set(CURLOPT_URL, $url);
+		$stream->set(CURLOPT_URL, $this->_testUrl);
 		$this->assertTrue($stream->write(null));
+		$this->assertTrue($stream->read());
 
-		$result = $stream->read();
-		//$this->assertEqual(file_get_contents($url), $result);
+		$response = $stream->send(new Request());
+		$this->assertEqual(trim(file_get_contents($this->_testUrl)), trim($response->body()));
+		$this->assertNull($stream->eof());
 	}
 }
 

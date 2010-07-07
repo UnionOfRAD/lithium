@@ -35,6 +35,13 @@ class Curl extends \lithium\net\Socket {
 	public $options = array();
 
 	/**
+	 * Default class dependencies of the `Curl` adapter.
+	 *
+	 * @var array
+	 */
+	protected $_classes = array('response' => 'lithium\net\http\Response');
+
+	/**
 	 * Opens a curl connection and initializes the internal resource handle.
 	 *
 	 * @return mixed Returns `false` if the socket configuration does not contain the
@@ -180,6 +187,8 @@ class Curl extends \lithium\net\Socket {
 	 * @return boolean response string or object like `\lithium\net\http\Response`
 	 */
 	public function send($message, array $options = array()) {
+		$defaults = array('classes' => $this->_classes);
+		$options += $defaults;
 
 		if (is_object($message)) {
 			curl_setopt($this->_resource, CURLOPT_URL, $message->to('url'));
@@ -191,11 +200,9 @@ class Curl extends \lithium\net\Socket {
 			}
 		}
 
-		if ($this->write((string) $message)) {
-			$result = $this->read();
-			list($headers, $body) = explode("\r\n\r\n", $result, 2);
-			$headers = explode("\r\n", $headers);
-			return new $options['classes']['response'](compact('body', 'headers'));
+		if ($message = $this->write((string) $message)) {
+			$message = $message ?: $this->read();
+			return new $options['classes']['response'](compact('message'));
 		}
 	}
 }
