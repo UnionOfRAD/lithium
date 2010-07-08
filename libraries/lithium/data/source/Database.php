@@ -371,9 +371,7 @@ abstract class Database extends \lithium\data\Source {
 		$keys = $type == 'belongsTo' ? $class::meta('name') : $singularName;
 		$keys = Inflector::underscore($keys) . '_id';
 		$from = $class;
-
-		$relationship = $this->_classes['relationship'];
-		return new $relationship($config + compact('type', 'name', 'keys', 'from'));
+		return $this->_instance('relationship', $config + compact('type', 'name', 'keys', 'from'));
 	}
 
 	/**
@@ -433,7 +431,7 @@ abstract class Database extends \lithium\data\Source {
 			return "{$namespace}{$class}";
 		};
 
-		if (empty($fields)) {
+		if (!$fields) {
 			return array($model => array_keys($model::schema()));
 		}
 
