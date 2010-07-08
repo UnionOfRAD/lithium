@@ -196,12 +196,18 @@ class Router extends \lithium\core\StaticObject {
 		$defaults = array('action' => 'index');
 		$options += $defaults;
 		$base = isset($context) ? $context->env('base') : '';
+		$suffix = null;
+
+		if (isset($options['#'])) {
+			$suffix = "#{$options['#']}";
+			unset($options['#']);
+		}
 
 		foreach (static::$_configurations as $route) {
 			if (!$match = $route->match($options, $context)) {
 				continue;
 			}
-			return rtrim("{$base}{$match}", '/') ?: '/';
+			return rtrim("{$base}{$match}{$suffix}", '/') ?: '/';
 		}
 	}
 

@@ -166,6 +166,25 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual('/list_items/archive', $result);
 	}
 
+	public function testNamedAnchor() {
+		Router::connect('/{:controller}/{:action}');
+		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}', array('id' => null));
+
+		$result = Router::match(array('Posts::edit', '#' => 'foo'));
+		$this->assertEqual('/posts/edit#foo', $result);
+
+		$result = Router::match(array('Posts::edit', 'id' => 42, '#' => 'foo'));
+		$this->assertEqual('/posts/edit/42#foo', $result);
+
+		$result = Router::match(array('controller' => 'users', 'action' => 'view', '#' => 'blah'));
+		$this->assertEqual('/users/view#blah', $result);
+
+		$result = Router::match(array(
+			'controller' => 'users', 'action' => 'view', 'id' => 47, '#' => 'blargh'
+		));
+		$this->assertEqual('/users/view/47#blargh', $result);
+	}
+
 	/**
 	 * Tests that URLs specified as "Controller::action" and including additional parameters are
 	 * interpreted properly.
