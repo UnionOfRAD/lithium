@@ -263,6 +263,7 @@ class QueryTest extends \lithium\test\Unit {
 			'limit',
 			'map',
 			'model',
+			'name',
 			'offset',
 			'order',
 			'page',

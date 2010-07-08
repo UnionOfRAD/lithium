@@ -453,7 +453,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual(array('published' => false), $query->conditions());
 
 		$keys = array_keys(array_filter($query->export(Connections::get('mock-source'))));
-		$expected = array('conditions', 'model', 'source');
+		$expected = array('name', 'conditions', 'model', 'source');
 		$this->assertEqual($expected, $keys);
 	}
 

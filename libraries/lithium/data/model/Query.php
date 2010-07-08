@@ -164,6 +164,7 @@ class Query extends \lithium\core\Object {
 		if ($model) {
 			$this->_config['model'] = $model;
 			$this->_config['source'] = $model::meta('source');
+			$this->_config['name'] = $model::meta('name');
 		}
 		return $this->_config['model'];
 	}

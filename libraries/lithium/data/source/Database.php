@@ -39,10 +39,6 @@ abstract class Database extends \lithium\data\Source {
 	 * @var string
 	 */
 	protected $_strings = array(
-		'read' => "
-			SELECT {:fields} From {:source} {:joins} {:conditions} {:group} {:order} {:limit};
-			{:comment}
-		",
 		'create' => "INSERT INTO {:source} ({:fields}) VALUES ({:values});{:comment}",
 		'update' => "UPDATE {:source} SET {:fields} {:conditions};{:comment}",
 		'delete' => "DELETE {:flags} From {:source} {:aliases} {:conditions};{:comment}",
@@ -152,6 +148,10 @@ abstract class Database extends \lithium\data\Source {
 			'login'      => 'root',
 			'password'   => '',
 			'database'   => null,
+		);
+		$this->_strings += array(
+			'read' => 'SELECT {:fields} From {:source} {:alias} {:joins} {:conditions} {:group} ' .
+			          '{:order} {:limit};{:comment}'
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -402,6 +402,10 @@ abstract class Database extends \lithium\data\Source {
 			$context = $type;
 			$data = $context->export($this);
 			$type = $context->type();
+
+			if (!isset($data['alias'])) {
+				$data['alias'] = "AS {$data['name']}";
+			}
 		}
 		if (!isset($this->_strings[$type])) {
 			throw new InvalidArgumentException("Invalid query type '{$type}'");
