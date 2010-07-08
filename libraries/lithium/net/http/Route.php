@@ -77,7 +77,7 @@ class Route extends \lithium\core\Object {
 	protected $_pattern = '';
 
 	/**
-	 * An array of route parameter names (i.e. {:foo}) that appear in the URL template. 
+	 * An array of route parameter names (i.e. {:foo}) that appear in the URL template.
 	 *
 	 * @var array
 	 * @see lithium\net\http\Route::$_template

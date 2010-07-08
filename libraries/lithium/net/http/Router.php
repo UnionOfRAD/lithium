@@ -215,7 +215,7 @@ class Router extends \lithium\core\StaticObject {
 	 * Returns a route from the loaded configurations, by name.
 	 *
 	 * @param string $route Name of the route to request.
-	 * @return lithium\net\http\Route 
+	 * @return lithium\net\http\Route
 	 */
 	public static function get($route = null) {
 		if ($route === null) {
@@ -237,7 +237,7 @@ class Router extends \lithium\core\StaticObject {
 	 * Helper function for taking a path string and parsing it into a controller and action array.
 	 *
 	 * @param string $path Path string to parse.
-	 * @param boolean $context 
+	 * @param boolean $context
 	 * @return array
 	 */
 	protected static function _parseString($path, $context) {
