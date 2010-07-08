@@ -295,18 +295,6 @@ class MySql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Quotes identifiers.
-	 *
-	 * Currently, this method simply returns the identifier.
-	 *
-	 * @param string $name The identifier to quote.
-	 * @return string The quoted identifier.
-	 */
-	public function name($name) {
-		return $name;
-	}
-
-	/**
 	 * Execute a given query.
  	 *
  	 * @see lithium\data\source\Database::renderCommand()
