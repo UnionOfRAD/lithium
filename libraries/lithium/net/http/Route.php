@@ -202,6 +202,13 @@ class Route extends \lithium\core\Object {
 		if (!preg_match($this->_pattern, $url, $match)) {
 			return false;
 		}
+		foreach ($this->_meta as $key => $compare) {
+			$value = $request->get($key);
+
+			if (!($compare == $value || (is_array($compare) && in_array($value, $compare)))) {
+				return false;
+			}
+		}
 
 		$match['args'] = isset($match['args']) ?  explode('/', $match['args']) : array();
 		$result = array_intersect_key($match, $this->_keys) + $this->_params + $this->_defaults;
@@ -229,7 +236,6 @@ class Route extends \lithium\core\Object {
 	 */
 	public function match(array $options = array(), $context = null) {
 		$defaults = array('action' => 'index');
-		$args = array('args' => 'args');
 		$options += $defaults;
 		$query = null;
 
@@ -238,6 +244,29 @@ class Route extends \lithium\core\Object {
 			$query = '?' . (is_array($query) ? http_build_query($query) : $query);
 			unset($options['?']);
 		}
+
+		if (!$options = $this->_matchKeys($options)) {
+			return false;
+		}
+		foreach ($this->_subPatterns as $key => $pattern) {
+			if (isset($options[$key]) && !preg_match("/^{$pattern}$/", $options[$key])) {
+				return false;
+			}
+		}
+		return $this->_write($options, $defaults + $this->_defaults + array('args' => '')) . $query;
+	}
+
+	/**
+	 * A helper method used by `match()` to verify that options required to match this route are
+	 * present in a URL array.
+	 *
+	 * @see lithium\net\http\Route::match()
+	 * @param array $options An array of URL parameters.
+	 * @return mixed On success, returns an updated array of options, merged with defaults. On
+	 *         failure, returns `false`.
+	 */
+	protected function _matchKeys($options) {
+		$args = array('args' => 'args');
 
 		if (array_intersect_key($options, $this->_match) != $this->_match) {
 			return false;
@@ -250,12 +279,7 @@ class Route extends \lithium\core\Object {
 		if (array_intersect_key($this->_keys, $options) + $args !== $this->_keys + $args) {
 			return false;
 		}
-		foreach ($this->_subPatterns as $key => $pattern) {
-			if (isset($options[$key]) && !preg_match("/^{$pattern}$/", $options[$key])) {
-				return false;
-			}
-		}
-		return $this->_write($options, $defaults + $this->_defaults + array('args' => '')) . $query;
+		return $options;
 	}
 
 	/**
@@ -322,6 +346,7 @@ class Route extends \lithium\core\Object {
 		$this->_match = $this->_params;
 		$this->_pattern = $this->_template;
 		$this->_pattern = "@^{$this->_pattern}\$@";
+		$this->_extractMeta();
 
 		if ($this->_template === '/' || $this->_template === '') {
 			return;
@@ -361,6 +386,21 @@ class Route extends \lithium\core\Object {
 		$this->_keys = array_combine($shortKeys, $shortKeys);
 		$this->_defaults = array_intersect_key($this->_params, $this->_keys);
 		$this->_match = array_diff_key($this->_params, $this->_defaults);
+	}
+
+	/**
+	 * Extracts HTTP method / header parameters from default parameter list.
+	 *
+	 * @return void
+	 */
+	protected function _extractMeta() {
+		foreach ($this->_params as $key => $value) {
+			if (!strpos($key, ':')) {
+				continue;
+			}
+			unset($this->_params[$key]);
+			$this->_meta[$key] = $value;
+		}
 	}
 
 	/**

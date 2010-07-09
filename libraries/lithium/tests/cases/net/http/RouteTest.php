@@ -446,6 +446,40 @@ class RouteTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that requests can be routed based on HTTP method verbs or HTTP headers.
+	 *
+	 * @return void
+	 */
+	public function testHeaderAndMethodBasedRouting() {
+		$parameters = array('controller' => 'users', 'action' => 'edit');
+
+		$route = new Route(array(
+			'template' => '/',
+			'params' => $parameters + array('http:method' => 'POST')
+		));
+
+		$request = new Request(array('env' => array('HTTP_METHOD' => 'GET')));
+		$request->url = '/';
+		$this->assertFalse($route->parse($request));
+
+		$request = new Request(array('env' => array('REQUEST_METHOD' => 'POST')));
+		$request->url = '/';
+		$this->assertEqual($parameters, $route->parse($request)->params);
+
+		$route = new Route(array(
+			'template' => '/{:controller}/{:id:[0-9]+}',
+			'params' => $parameters + array('http:method' => array('POST', 'PUT'))
+		));
+
+		$request = new Request(array('env' => array('REQUEST_METHOD' => 'PUT')));
+		$request->url = '/users/abc';
+		$this->assertFalse($route->parse($request));
+
+		$request->url = '/users/54';
+		$this->assertEqual($parameters + array('id' => '54'), $route->parse($request)->params);
+	}
+
+	/**
 	 * Tests that a successful match against a route with template `'/'` operating at the root of
 	 * a domain never returns an empty string.
 	 *
@@ -466,6 +500,11 @@ class RouteTest extends \lithium\test\Unit {
 		$this->assertEqual('/', $url);
 	}
 
+	/**
+	 * Tests that routes with optional trailing elements have unnecessary slashes trimmed.
+	 *
+	 * @return void
+	 */
 	public function testTrimmingEmptyPathElements() {
 		$route = new Route(array(
 			'template' => '/{:controller}/{:id:[0-9]+}',

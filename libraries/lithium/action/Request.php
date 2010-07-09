@@ -116,7 +116,7 @@ class Request extends \lithium\net\http\Message {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'classes' => 'merge', 'env' => 'merge', 'detectors' => 'merge', 'base', 'type', 'stream'
+		'classes' => 'merge', 'env', 'detectors' => 'merge', 'base', 'type', 'stream'
 	);
 
 	/**

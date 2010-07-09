@@ -508,6 +508,42 @@ class RouterTest extends \lithium\test\Unit {
 		$url = Router::match(array('controller' => 'posts', 'type' => 'json'));
 		$this->assertEqual('/posts.json', $url);
 	}
+
+	/**
+	 * Tests that routes can be connected and correctly match based on HTTP headers or method verbs.
+	 *
+	 * @return void
+	 */
+	public function testHttpMethodBasedRouting() {
+		Router::connect('/{:controller}/{:id:[0-9]+}', array(
+			'http:method' => 'GET', 'action' => 'view'
+		));
+		Router::connect('/{:controller}/{:id:[0-9]+}', array(
+			'http:method' => 'PUT', 'action' => 'edit'
+		));
+
+		$request = new Request(array('url' => '/posts/13', 'env' => array(
+			'REQUEST_METHOD' => 'GET'
+		)));
+		$params = Router::process($request)->params;
+		$expected = array('controller' => 'posts', 'action' => 'view', 'id' => '13');
+		$this->assertEqual($expected, $params);
+
+		$this->assertEqual('/posts/13', Router::match($params));
+
+		$request = new Request(array('url' => '/posts/13', 'env' => array(
+			'REQUEST_METHOD' => 'PUT'
+		)));
+		$params = Router::process($request)->params;
+		$expected = array('controller' => 'posts', 'action' => 'edit', 'id' => '13');
+		$this->assertEqual($expected, $params);
+
+		$request = new Request(array('url' => '/posts/13', 'env' => array(
+			'REQUEST_METHOD' => 'POST'
+		)));
+		$params = Router::process($request)->params;
+		$this->assertFalse($params);
+	}
 }
 
 ?>
