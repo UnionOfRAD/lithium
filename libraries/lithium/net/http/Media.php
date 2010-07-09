@@ -218,13 +218,14 @@ class Media extends \lithium\core\StaticObject {
 	 *
 	 * @param string $path The path to the asset, relative to the given `$type`s path and without a
 	 *        suffix. If the path contains a URI Scheme (eg. `http://`), no path munging will occur.
-	 * @param string $type The asset type. See `Media::$_assets`.
+	 * @param string $type The asset type. See `Media::$_assets` or `Media::assets()`.
 	 * @param array $options Contains setting for finding and handling the path, where the keys are
 	 *        the following:
 	 *        - `'base'`: The base URL of your application. Defaults to `null` for no base path.
 	 *          This is usually set with the return value of a call to `env('base')` on an instance
 	 *          of `lithium\action\Request`.
-	 *        - `check`: Check for the existence of the file before returning. Defaults to `false`.
+	 *        - `'check'`: Check for the existence of the file before returning. Defaults to
+	 *          `false`.
 	 *        - `'filter'`: An array of key/value pairs representing simple string replacements to
 	 *          be done on a path once it is generated.
 	 *        - `'path'`: An array of paths to search for the asset in. The paths should use
@@ -232,13 +233,16 @@ class Media extends \lithium\core\StaticObject {
 	 *        - `suffix`: The suffix to attach to the path, generally a file extension.
 	 *        - `'timestamp'`: Appends the last modified time of the file to the path if `true`.
 	 *          Defaults to `false`.
+	 *        - `'library'`: The name of the library from which to load the asset. Defaults to
+	 *           `true`, for the default library.
 	 * @return string Returns the publicly-accessible absolute path to the static asset. If checking
 	 *         for the asset's existence (`$options['check']`), returns `false` if it does not exist
 	 *         in your `/webroot` directory, or the `/webroot` directories of one of your included
 	 *         plugins.
 	 * @see lithium\net\http\Media::$_assets
+	 * @see lithium\net\http\Media::assets()
 	 * @see lithium\action\Request::env()
-	 * @filter
+	 * @filter This method can be filtered.
 	 */
 	public static function asset($path, $type, array $options = array()) {
 		$defaults = array(
@@ -248,7 +252,7 @@ class Media extends \lithium\core\StaticObject {
 			'path' => array(),
 			'suffix' => null,
 			'check' => false,
-			'library' => 'app',
+			'library' => true,
 		);
 		if (!$base = static::_assets($type)) {
 			$type = 'generic';
@@ -258,36 +262,32 @@ class Media extends \lithium\core\StaticObject {
 		$params = compact('path', 'type', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params, $chain) {
-			extract($params);
+			$path = $params['path'];
+			$type = $params['type'];
+			$options = $params['options'];
+			$library = $options['library'];
 
 			if (preg_match('/^[a-z0-9-]+:\/\//i', $path)) {
 				return $path;
 			}
-
-			$library = $options['library'];
 			$config = Libraries::get($library);
 			$paths = $options['path'];
 
-			($library == 'app') ? end($paths) : reset($paths);
+			$config['default'] ? end($paths) : reset($paths);
 			$options['library'] = basename($config['path']);
 
 			if ($options['suffix'] && strpos($path, $options['suffix']) === false) {
 				$path .= $options['suffix'];
 			}
-			$file = $config['path'] . '/webroot';
 
-			if ($path[0] == '/') {
-				$result = "{$options['base']}{$path}";
-				$file .= $path;
-			} else {
-				$result = String::insert(key($paths), compact('path') + $options);
-				$realPath = str_replace('{:library}/', '', key($paths));
-				$file = String::insert($realPath, array('base' => $file) + compact('path'));
+			if ($options['check'] || $options['timestamp']) {
+				$file = $self::path($path, $type, $options);
 			}
-			$path = $result;
 
-			if ($qOffset = strpos($file, '?')) {
-				$file = substr($file, 0, $qOffset);
+			if ($path[0] === '/') {
+				$path = "{$options['base']}{$path}";
+			} else {
+				$path = String::insert(key($paths), compact('path') + $options);
 			}
 
 			if ($options['check'] && !is_file($file)) {
@@ -306,6 +306,70 @@ class Media extends \lithium\core\StaticObject {
 			}
 			return $path;
 		});
+	}
+
+	/**
+	 * Gets the physical path to the web assets (i.e. `/webroot`) directory of a library.
+	 *
+	 * @param string $library The name of the library for which to find the path, or `true` for the
+	 *               default library.
+	 * @return string Returns the physical path to the web assets directory for a library. For
+	 *         example, the `/webroot` directory of the default library would be
+	 *         `LITHIUM_APP_PATH . '/webroot'`.
+	 */
+	public static function pathRoot($library) {
+		if (!$config = Libraries::get($library)) {
+			return null;
+		}
+		if (isset($config['webroot'])) {
+			return $config['webroot'];
+		}
+		return $config['path'] . '/webroot';
+	}
+
+	/**
+	 * Returns the physical path to an asset in the `/webroot` directory of an application or
+	 * plugin.
+	 *
+	 * @param string $path The path to a web asset, relative to the root path for its type. For
+	 *               example, for a JavaScript file in `/webroot/js/subpath/file.js`, the correct
+	 *               value for `$path` would be `'subpath/file.js'`.
+	 * @param string $type A valid asset type, i.e. `'js'`, `'cs'`, `'image'`, or another type
+	 *               registered with `Media::assets()`, or `'generic'`.
+	 * @param array $options The options used to calculate the path to the file.
+	 * @return string Returns the physical filesystem path to an asset in the `/webroot` directory.
+	 */
+	public static function path($path, $type, array $options = array()) {
+		$defaults = array(
+			'base' => null,
+			'path' => array(),
+			'suffix' => null,
+			'library' => true,
+		);
+		if (!$base = static::_assets($type)) {
+			$type = 'generic';
+			$base = static::_assets('generic');
+		}
+		$options += ($base + $defaults);
+		$config = Libraries::get($options['library']);
+		$root = static::pathRoot($options['library']);
+		$paths = $options['path'];
+
+		$config['default'] ? end($paths) : reset($paths);
+		$options['library'] = basename($config['path']);
+
+		if ($qOffset = strpos($path, '?')) {
+			$path = substr($path, 0, $qOffset);
+		}
+
+		if ($path[0] === '/') {
+			$file = $root . $path;
+		} else {
+			$template = str_replace('{:library}/', '', key($paths));
+			$insert = array('base' => $root) + compact('path');
+			$file = String::insert($template, $insert);
+		}
+		return realpath($file);
 	}
 
 	/**
