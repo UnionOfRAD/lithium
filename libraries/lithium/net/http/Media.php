@@ -264,13 +264,12 @@ class Media extends \lithium\core\StaticObject {
 				return $path;
 			}
 
-			$library = isset($options['plugin']) ? $options['plugin'] : $options['library'];
+			$library = $options['library'];
 			$config = Libraries::get($library);
 			$paths = $options['path'];
 
 			($library == 'app') ? end($paths) : reset($paths);
 			$options['library'] = basename($config['path']);
-			unset($options['plugin']);
 
 			if ($options['suffix'] && strpos($path, $options['suffix']) === false) {
 				$path .= $options['suffix'];
