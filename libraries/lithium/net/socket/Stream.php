@@ -28,29 +28,29 @@ class Stream extends \lithium\net\Socket {
 	 *		   'protocol' or 'host' settings,  socket resource otherwise.
 	 */
 	public function open() {
-		$options += $this->_config;
+		$config = $this->_config;
 
-		if (empty($options['scheme']) || empty($options['host'])) {
+		if (empty($config['scheme']) || empty($config['host'])) {
 			return false;
 		}
 
-		$host = "{$options['scheme']}://{$options['host']}:{$options['port']}";
+		$host = "{$config['scheme']}://{$config['host']}:{$config['port']}";
 		$flags = STREAM_CLIENT_CONNECT;
 
-		if ($options['persistent']) {
+		if ($config['persistent']) {
 			$flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT;
 		}
 		$this->_resource = stream_socket_client(
-			$host, $errorCode, $errorMessage, $options['timeout'], $flags
+			$host, $errorCode, $errorMessage, $config['timeout'], $flags
 		);
 
 		if (!empty($errorCode) || !empty($errorMessage)) {
 			throw new Exception($errorMessage, $errorCode);
 		}
-		$this->timeout($options['timeout']);
+		$this->timeout($config['timeout']);
 
-		if (!empty($options['encoding'])) {
-			$this->encoding($options['encoding']);
+		if (!empty($config['encoding'])) {
+			$this->encoding($config['encoding']);
 		}
 
 		return $this->_resource;
@@ -158,7 +158,10 @@ class Stream extends \lithium\net\Socket {
 	 * @return boolean response string or object like `\lithium\net\http\Response`
 	 */
 	public function send($message, array $options = array()) {
-		if ($this->write((string) $message)) {
+		$defaults = array('response' => $this->_classes['response']);
+		$options += $defaults;
+
+		if ($this->write($message)) {
 			$message = $this->read();
 			$response = new $options['classes']['response'](compact('message'));
 			return $response;

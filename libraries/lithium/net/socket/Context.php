@@ -28,6 +28,16 @@ class Context extends \lithium\net\Socket {
 	protected $_content = null;
 
 	/**
+	 * Constructor
+	 *
+	 * @param array $config
+	 */
+	public function __construct(array $config = array()) {
+		$defaults = array('mode' => 'r', 'message' => null);
+		parent::__construct($config + $defaults);
+	}
+
+	/**
 	 * Opens the socket and sets its timeout value.
 	 *
 	 * @return boolean Success.
@@ -35,6 +45,15 @@ class Context extends \lithium\net\Socket {
 	public function open() {
 		$config = $this->_config;
 		$this->timeout($config['timeout']);
+		$url = "{$config['scheme']}://{$config['host']}:{$config['port']}";
+		$context = array($config['scheme'] => array());
+
+		if (is_object($config['message'])) {
+			$url = $config['message']->to('url');
+			$context = $config['message']->to('context');
+		}
+		$this->_resource = fopen($url, $config['mode'], false, stream_context_create($context));
+		return $this->_resource;
 	}
 
 	/**
@@ -59,7 +78,10 @@ class Context extends \lithium\net\Socket {
 	 * @return boolean Success.
 	 */
 	public function eof() {
-		return true;
+		if (!is_resource($this->_resource)) {
+			return true;
+		}
+		return feof($this->_resource);
 	}
 
 	/**
@@ -68,20 +90,15 @@ class Context extends \lithium\net\Socket {
 	 * @return void
 	 */
 	public function read() {
-		$content = $this->_content;
-
-		$url = is_object($url) ? $content->to('url') : $url;
-		$context = is_object($url)
-			? $url->to('context', $options['context'])
-			: array($options['wrapper'] => $options['context']);
-		$this->connection = fopen($url, $options['mode'], false, stream_context_create($context));
-
-		if ($this->connection) {
-			$meta = stream_get_meta_data($this->connection);
-			$headers = isset($meta['wrapper_data']) ? $meta['wrapper_data'] : array();
-			$message = isset($headers[0]) ? $headers[0] : null;
-			$body = stream_get_contents($this->connection);
+		if (!is_resource($this->_resource)) {
+			return false;
 		}
+
+		$meta = stream_get_meta_data($this->_resource);
+		$headers = isset($meta['wrapper_data'])
+			? join("\r\n", $meta['wrapper_data']) . "\r\n\r\n" : null;
+		return $headers . stream_get_contents($this->_resource);
+		return compact('headers', 'body');
 	}
 
 	/**
@@ -91,7 +108,8 @@ class Context extends \lithium\net\Socket {
 	 * @return boolean Success
 	 */
 	public function write($data) {
-		return $this->_content = $data;
+		$this->_content = $data;
+		return true;
 	}
 
 	/**
@@ -120,30 +138,17 @@ class Context extends \lithium\net\Socket {
 	/**
 	 * Send request and return response data
 	 *
-	 * @param object|string $url
-	 *        - object with to('url) and to('context') methods
-	 *        - string url like "php://temp"
+	 * @param object $message
 	 * @param array $options
 	 * @return string
 	 */
-	public function send($url, array $options = array()) {
-		$defaults = array(
-			'wrapper' => 'html', 'mode' => 'r',
-		);
+	public function send($message, array $options = array()) {
+		$defaults = array('response' => $this->_classes['response']);
 		$options += $defaults;
 
-		$url = is_object($url) ? $url->to('url') : $url;
-		$context = is_object($url)
-			? $url->to('context', $options['context'])
-			: array($options['wrapper'] => $options['context']);
-		$this->connection = fopen($url, $options['mode'], false, stream_context_create($context));
-
-		if ($this->connection) {
-			$meta = stream_get_meta_data($this->connection);
-			$headers = isset($meta['wrapper_data']) ? $meta['wrapper_data'] : array();
-			$message = isset($headers[0]) ? $headers[0] : null;
-			$body = stream_get_contents($this->connection);
-			return compact('headers', 'message', 'body');
+		if ($this->write($message)) {
+			$body = $this->read();
+			return new $options['response'](compact('body'));
 		}
 	}
 }

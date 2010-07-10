@@ -8,18 +8,27 @@
 
 namespace lithium\tests\cases\net\socket;
 
+use lithium\net\http\Request;
 use \lithium\net\socket\Context;
 
 class ContextTest extends \lithium\test\Unit {
 
-	public $subject;
+	protected $_testConfig = array(
+		'persistent' => false,
+		'scheme' => 'http',
+		'host' => 'localhost',
+		'port' => 80,
+		'timeout' => 2
+	);
+
+	protected $_testUrl = 'http://localhost';
 
 	public function setUp() {
-		$this->subject = new Context();
+		$this->socket = new Context($this->_testConfig);
 	}
 
 	public function tearDown() {
-		unset($this->subject);
+		unset($this->socket);
 	}
 
 	public function testConstruct() {
@@ -30,38 +39,38 @@ class ContextTest extends \lithium\test\Unit {
 	}
 
 	public function testGetSetTimeout() {
-		$this->assertEqual(30, $this->subject->timeout());
-		$this->assertEqual(25, $this->subject->timeout(25));
-		$this->assertEqual(25, $this->subject->timeout());
+		$this->assertEqual(30, $this->socket->timeout());
+		$this->assertEqual(25, $this->socket->timeout(25));
+		$this->assertEqual(25, $this->socket->timeout());
 	}
 
-	public function testConnect() {
-		$this->assertEqual(true, $this->subject->open());
+	public function testOpen() {
+		$this->assertTrue(is_resource($this->socket->open()));
 	}
 
 	public function testClose() {
-		$this->subject->connection = fopen('php://temp', 'r');
-		$this->assertEqual(true, $this->subject->close());
-	}
-
-	public function testRead() {
-
-	}
-
-	public function testWrite() {
-
-	}
-
-	public function testEof() {
-
+		$this->assertEqual(true, $this->socket->close());
 	}
 
 	public function testEncoding() {
-
+		$this->assertEqual(false, $this->socket->encoding());
 	}
 
-	public function testSend() {
-		$this->assertEqual('', $this->subject->send('php://temp'));
+	public function testMessageInConfig() {
+		$socket = new Context(array('message' => new Request()));
+		$this->assertTrue(is_resource($socket->open()));
+	}
+
+	public function testWriteAndRead() {
+		$stream = new Context($this->_testConfig);
+		$this->assertTrue(is_resource($stream->open()));
+		$this->assertTrue(is_resource($stream->resource()));
+
+		$response = $stream->send(new Request(), array(
+			'response' => 'lithium\net\http\Response'
+		));
+		$this->assertEqual(trim(file_get_contents($this->_testUrl)), trim($response->body()));
+		$this->assertTrue($stream->eof());
 	}
 }
 

@@ -9,16 +9,14 @@
 namespace lithium\tests\cases\net\socket;
 
 use lithium\net\http\Request;
-use lithium\tests\mocks\net\socket\MockCurl;
+use lithium\net\socket\Curl;
 
 class CurlTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
 		'persistent' => false,
-		'protocol' => 'tcp',
+		'scheme' => 'http',
 		'host' => 'localhost',
-		'login' => 'root',
-		'password' => '',
 		'port' => 80,
 		'timeout' => 2
 	);
@@ -36,7 +34,7 @@ class CurlTest extends \lithium\test\Unit {
 	}
 
 	public function testAllMethodsNoConnection() {
-		$stream = new MockCurl(array('protocol' => null));
+		$stream = new Curl(array('scheme' => null));
 		$this->assertFalse($stream->open());
 		$this->assertTrue($stream->close());
 		$this->assertFalse($stream->timeout(2));
@@ -46,7 +44,7 @@ class CurlTest extends \lithium\test\Unit {
 	}
 
 	public function testOpen() {
-		$stream = new MockCurl($this->_testConfig);
+		$stream = new Curl($this->_testConfig);
 		$result = $stream->open();
 		$this->assertTrue($result);
 
@@ -55,7 +53,7 @@ class CurlTest extends \lithium\test\Unit {
 	}
 
 	public function testClose() {
-		$stream = new MockCurl($this->_testConfig);
+		$stream = new Curl($this->_testConfig);
 		$result = $stream->open();
 		$this->assertTrue($result);
 
@@ -67,7 +65,7 @@ class CurlTest extends \lithium\test\Unit {
 	}
 
 	public function testTimeout() {
-		$stream = new MockCurl($this->_testConfig);
+		$stream = new Curl($this->_testConfig);
 		$result = $stream->open();
 		$stream->timeout(10);
 		$result = $stream->resource();
@@ -75,20 +73,20 @@ class CurlTest extends \lithium\test\Unit {
 	}
 
 	public function testEncoding() {
-		$stream = new MockCurl($this->_testConfig);
+		$stream = new Curl($this->_testConfig);
 		$result = $stream->open();
 		$stream->encoding('UTF-8');
 		$result = $stream->resource();
 		$this->assertTrue(is_resource($result));
 
-		$stream = new MockCurl($this->_testConfig + array('encoding' => 'UTF-8'));
+		$stream = new Curl($this->_testConfig + array('encoding' => 'UTF-8'));
 		$result = $stream->open();
 		$result = $stream->resource();
 		$this->assertTrue(is_resource($result));
 	}
 
 	public function testWriteAndRead() {
-		$stream = new MockCurl($this->_testConfig);
+		$stream = new Curl($this->_testConfig);
 		$this->assertTrue(is_resource($stream->open()));
 		$this->assertTrue(is_resource($stream->resource()));
 
@@ -96,7 +94,9 @@ class CurlTest extends \lithium\test\Unit {
 		$this->assertTrue($stream->write(null));
 		$this->assertTrue($stream->read());
 
-		$response = $stream->send(new Request());
+		$response = $stream->send(new Request(), array(
+			'response' => 'lithium\net\http\Response'
+		));
 		$this->assertEqual(trim(file_get_contents($this->_testUrl)), trim($response->body()));
 		$this->assertNull($stream->eof());
 	}

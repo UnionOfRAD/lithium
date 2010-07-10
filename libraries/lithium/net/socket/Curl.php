@@ -35,27 +35,20 @@ class Curl extends \lithium\net\Socket {
 	public $options = array();
 
 	/**
-	 * Default class dependencies of the `Curl` adapter.
-	 *
-	 * @var array
-	 */
-	protected $_classes = array('response' => 'lithium\net\http\Response');
-
-	/**
 	 * Opens a curl connection and initializes the internal resource handle.
 	 *
 	 * @return mixed Returns `false` if the socket configuration does not contain the
-	 *         `'protocol'` or `'host'` settings, or if configuration fails, otherwise returns a
+	 *         `'scheme'` or `'host'` settings, or if configuration fails, otherwise returns a
 	 *         curl resource.
 	 */
 	public function open() {
 		$config = $this->_config;
 
-		if (empty($config['protocol']) || empty($config['host'])) {
+		if (empty($config['scheme']) || empty($config['host'])) {
 			return false;
 		}
 
-		$url = "{$config['protocol']}://{$config['host']}";
+		$url = "{$config['scheme']}://{$config['host']}";
 		$this->_resource = curl_init($url);
 		curl_setopt($this->_resource, CURLOPT_PORT, $config['port']);
 		curl_setopt($this->_resource, CURLOPT_HEADER, true);
@@ -179,30 +172,29 @@ class Curl extends \lithium\net\Socket {
 	/**
 	 * Aggregates read and write methods into a coherent request response
 	 *
-	 * @param mixed $message array or object like `\lithium\net\http\Request`
+	 * @param mixed $message a request object based on `\lithium\net\Message`
 	 * @param array $options
-	 *                - path: path for the current request
-	 *                - classes: array of classes to use
-	 *                    - response: a class to use for the response
-	 * @return boolean response string or object like `\lithium\net\http\Response`
+	 *              - '`response`': a fully-namespaced string for the response object
+	 * @return object a response object based on `\lithium\net\Message`
 	 */
 	public function send($message, array $options = array()) {
-		$defaults = array('classes' => $this->_classes);
+		$defaults = array('response' => $this->_classes['response']);
 		$options += $defaults;
 
-		if (is_object($message)) {
-			curl_setopt($this->_resource, CURLOPT_URL, $message->to('url'));
-			curl_setopt($this->_resource, CURLOPT_POST, ($message->method == 'POST'));
-			curl_setopt($this->_resource, CURLOPT_HTTPHEADER, $message->headers());
+		$this->set(CURLOPT_URL, $message->to('url'));
 
-			if ($message->method == 'POST') {
-				curl_setopt($this->_resource, CURLOPT_POSTFIELDS, $message->body());
-			}
+		if (isset($message->headers)) {
+			$this->set(CURLOPT_HTTPHEADER, $message->headers());
 		}
-
-		if ($message = $this->write((string) $message)) {
-			$message = $message ?: $this->read();
-			return new $options['classes']['response'](compact('message'));
+		if (isset($message->method) && $message->method == 'POST') {
+			$this->set(array(
+				CURLOPT_POST => true,
+				CURLOPT_POSTFIELDS => $message->body()
+			));
+		}
+		if ($message = $this->write($message)) {
+			$body = $message ?: $this->read();
+			return new $options['response'](compact('body'));
 		}
 	}
 }

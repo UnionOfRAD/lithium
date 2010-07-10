@@ -143,12 +143,10 @@ class Service extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function send($method, $path = null, $data = array(), array $options = array()) {
-		$request = $this->_request($method, $path, $data, $options);
-		$defaults = array(
-			'return' => 'body', 'classes' => $this->_classes,
-			'scheme' => $request->scheme, 'host' => $request->host
-		);
+		$defaults = array('return' => 'body', 'classes' => $this->_classes);
 		$options += $defaults + $this->_config;
+		$request = $this->_request($method, $path, $data, $options);
+		$options += array('message' => $request);
 		$this->connection = $this->_instance('socket', $options);
 
 		if (!$this->connection || !$this->connection->open()) {
