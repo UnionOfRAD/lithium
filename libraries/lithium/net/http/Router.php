@@ -54,6 +54,15 @@ class Router extends \lithium\core\StaticObject {
 		'route' => 'lithium\net\http\Route'
 	);
 
+	public static function config($config = array()) {
+		if (!$config) {
+			return array('classes' => static::$_classes);
+		}
+		if (isset($config['classes'])) {
+			static::$_classes = $config['classes'] + static::$_classes;
+		}
+	}
+
 	/**
 	 * Connects a new route and returns the current routes array. This method creates a new
 	 * `Route` object and registers it with the `Router`. The order in which routes are connected

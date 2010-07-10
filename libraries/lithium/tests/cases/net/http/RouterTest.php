@@ -544,6 +544,22 @@ class RouterTest extends \lithium\test\Unit {
 		$params = Router::process($request)->params;
 		$this->assertFalse($params);
 	}
+
+	/**
+	 * Tests that the class dependency configuration can be modified.
+	 *
+	 * @return void
+	 */
+	public function testCustomConfiguration() {
+		$old = Router::config();
+		$config = array('classes' => array('route' => 'my\custom\Route'));
+
+		Router::config($config);
+		$this->assertEqual($config, Router::config());
+
+		Router::config($old);
+		$this->assertEqual($old, Router::config());
+	}
 }
 
 ?>
