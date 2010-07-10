@@ -444,9 +444,23 @@ class RouterTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testParameterPersistence() {
-		Router::connect('/add/{:args}', array('controller' => 'tests', 'action' => 'add'), array(
-			'persist' => array('controller', 'action')
+		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}', array(), array(
+			'persist' => array('controller', 'id')
 		));
+
+		// URLs generated with $request will now have the 'controller' and 'id'
+		// parameters copied to new URLs.
+		$request = Router::process(new Request(array('url' => 'posts/view/1138')));
+
+		$params = array('action' => 'edit');
+		$url = Router::match($params, $request); // Returns: '/posts/edit/1138'
+		$this->assertEqual('/posts/edit/1138', $url);
+
+		Router::connect(
+			'/add/{:args}',
+			array('controller' => 'tests', 'action' => 'add'),
+			array('persist' => array('controller', 'action'))
+		);
 		$request = Router::process(new Request(array('url' => '/add/foo/bar', 'base' => '')));
 		$path = Router::match(array('args' => array('baz', 'dib')), $request);
 		$this->assertEqual('/add/baz/dib', $path);

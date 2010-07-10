@@ -194,32 +194,21 @@ class Router extends \lithium\core\StaticObject {
 			unset($url[0]);
 			$url = $params + $url;
 		}
-
-		if ($context && isset($context->persist)) {
-			foreach ($context->persist as $key) {
-				$url += array($key => $context->params[$key]);
-				if ($url[$key] === null) {
-					unset($url[$key]);
-				}
-			}
-		}
-
+		$url = static::_persist($url, $context);
 		$defaults = array('action' => 'index');
 		$url += $defaults;
-		$base = isset($context) ? $context->env('base') : '';
-		$suffix = null;
 
-		if (isset($options['#'])) {
-			$suffix = "#{$options['#']}";
-			unset($options['#']);
-		}
+		$base = isset($context) ? $context->env('base') : '';
+		$suffix = isset($url['#']) ? "#{$url['#']}" : null;
+		unset($url['#']);
 
 		foreach (static::$_configurations as $route) {
-			if ($match = $route->match($url, $context)) {
-				$path = rtrim("{$base}{$match}", '/');
-				return (!empty($options)) ? static::_prefix($path, $context, $options) : $path;
+			if (!$match = $route->match($url, $context)) {
+				continue;
 			}
-			return rtrim("{$base}{$match}{$suffix}", '/') ?: '/';
+			$path = rtrim("{$base}{$match}{$suffix}", '/') ?: '/';
+			$path = ($options) ? static::_prefix($path, $context, $options) : $path;
+			return $path ?: '/';
 		}
 	}
 
@@ -234,20 +223,45 @@ class Router extends \lithium\core\StaticObject {
 	 * @return string The prefixed URL, depending on the passed options.
 	 */
 	protected static function _prefix($path, $context = null, array $options = array()) {
-		$scheme = $host = null;
-		$absolute = false;
+		$defaults = array('scheme' => null, 'host' => null, 'absolute' => false);
 
-		if (!empty($context)) {
-			$host = $context->env('HTTP_HOST');
-			$scheme = ($context->env('HTTPS')) ? 'https://' : 'http://';
+		if ($context) {
+			$defaults['host'] = $context->env('HTTP_HOST');
+			$defaults['scheme'] = $context->env('HTTPS') ? 'https://' : 'http://';
 		}
-		$options += compact('absolute', 'host', 'scheme');
+		$options += $defaults;
 
-		if (!empty($options['absolute'])) {
-			return $options['scheme'] . $options['host'] . $path;
+		return ($options['absolute']) ? "{$options['scheme']}{$options['host']}{$path}" : $path;
+	}
+
+	/**
+	 * Copies persistent parameters (parameters in the request which have been designated to
+	 * persist) to the current URL, unless the parameter has been explicitly disabled from
+	 * persisting by setting the value in the URL to `null`, or by assigning some other value.
+	 *
+	 * For example:
+	 *
+	 * {{{ embed:lithium\tests\cases\net\http\RouterTest::testParameterPersistence(1-10) }}}
+	 *
+	 * @see lithium\action\Request::$persist
+	 * @param array $url The parameters that define the URL to be matched.
+	 * @param object $context Typically an instance of `lithium\action\Request`, which contains a
+	 *               `$persist` property, which is an array of keys to be persisted in URLs between
+	 *                requests.
+	 * @return array Returns the modified URL array.
+	 */
+	protected static function _persist($url, $context) {
+		if (!$context || !isset($context->persist)) {
+			return $url;
 		}
-		return $path;
+		foreach ($context->persist as $key) {
+			$url += array($key => $context->params[$key]);
 
+			if ($url[$key] === null) {
+				unset($url[$key]);
+			}
+		}
+		return $url;
 	}
 
 	/**
