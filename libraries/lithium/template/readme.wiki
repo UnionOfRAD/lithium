@@ -61,11 +61,66 @@ performance impact.
 
 **More info**
 
- - [ Html helper](template/helper/Html)
+ - [ HTML helper](template/helper/Html)
  - [ Form helper](template/helper/Form)
  - [ Helper base class](template/Helper)
 
-#### Rendering Elements
+#### Creating custom helpers
+
+You can also create your own custom helper very easily by extending the `Helper` base class, and
+placing your helper in the correct namespace. By default, helpers belong in the
+`<library>\extensions\helper` namespace, but this can be changed through configuration (see the
+[the `Libraries` class](core/Libraries)). For example, consider the following class, saved as
+`app/extensions/helper/Custom.php`:
+{{{
+<?php
+
+namespace app\extensions\helper;
+
+class Custom extends \lithium\template\Helper {
+
+	public function greeting($name) {
+		return "Hello {$name}!";
+	}
+}
+
+?>
+}}}
+
+You can then use your helper in templates as follows:
+{{{
+<?=$this->custom->greeting("World"); ?>
+}}}
+
+Your custom helper will then be auto-loaded into the templating engine from your application or a
+plugin.
+
+#### Extending core helpers
+
+Because your application and plugins have a higher order-of-precedence than the Lithium core,
+classes like helpers can be extended and replaced seamlessly, without any changes to your templates.
+
+For example, to add or replace methods in the `Form` helper, you can add the following to
+`app/extensions/helper/Form.php`:
+
+{{{
+<?php
+
+namespace app\extensions\helper;
+
+class Form extends \lithium\template\helper\Form {
+
+	// Add or override Form helper methods
+}
+
+?>
+}}}
+
+Your custom `Form` helper will now be invoked in all instances where `$this->form` is called in a
+template. For more information on the load order of classes, see
+[the `locate()` method of the `Libraries` class](core/Libraries::locate)
+
+#### Rendering elements
 
 Elements are reusable view snippets that you can use in several views and layouts.
 You can reference it like so: 
