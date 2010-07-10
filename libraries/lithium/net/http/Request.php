@@ -17,41 +17,12 @@ use \lithium\util\String;
 class Request extends \lithium\net\http\Message {
 
 	/**
-	 * The protocol scheme to be used in the request. Used when calculating the target URL of this
-	 * request's end point.
-	 *
-	 * @var string
-	 */
-	public $scheme = 'http';
-
-	/**
-	 * The Host header value and authority.
-	 *
-	 * @var string
-	 */
-	public $host = 'localhost';
-
-	/**
-	 * Port number.
-	 *
-	 * @var string
-	 */
-	public $port = null;
-
-	/**
 	 * The method of the request, typically one of the following: `GET`, `POST`, `PUT`, `DELETE`,
 	 * `OPTIONS`, `HEAD`, `TRACE` or `CONNECT`.
 	 *
 	 * @var string
 	 */
 	public $method = 'GET';
-
-	/**
-	 * Absolute path of the request.
-	 *
-	 * @var string
-	 */
-	public $path = '/';
 
 	/**
 	 * Used to build query string.
@@ -75,17 +46,6 @@ class Request extends \lithium\net\http\Message {
 	public $headers = array();
 
 	/**
-	 * The authentication/authorization information
-	 *
-	 * For example:
-	 * {{{
-	 *     array('method' => 'Basic', 'username' => 'lithium', 'password' => 'rad')
-	 * }}}
-	 * @var array
-	 */
-	public $auth = array();
-
-	/**
 	 * Cookies.
 	 *
 	 * @var array
@@ -93,16 +53,12 @@ class Request extends \lithium\net\http\Message {
 	public $cookies = array();
 
 	/**
-	 * Body.
-	 *
-	 * @var array
-	 */
-	public $body = array();
-
-	/**
 	 * Constructor
 	 *
 	 * @param array $config
+	 *        - auth: the Authorization method (Basic|Digest)
+	 *        - username: the username for auth
+	 *        - password: the password for auth
 	 * @return object
 	 */
 	public function __construct(array $config = array()) {
@@ -112,17 +68,15 @@ class Request extends \lithium\net\http\Message {
 			'port' => null,
 			'method' => 'GET',
 			'path' => '/',
+			'auth' => null,
 			'headers' => array(),
 			'body' => array(),
 			'params' => array()
 		);
 		$config += $defaults;
+		parent::__construct($config);
 
-		foreach ($config as $key => $value) {
-			$this->{$key} = $value;
-		}
 		$this->protocol = "HTTP/{$this->version}";
-
 		$this->headers = array(
 			'Host' => $this->port ? "{$this->host}:{$this->port}" : $this->host,
 			'Connection' => 'Close',
@@ -130,11 +84,6 @@ class Request extends \lithium\net\http\Message {
 		);
 		$this->headers($config['headers']);
 
-		if (!empty($config['auth']['method'])) {
-			$this->headers('Authorization', $config['auth']['method'] . ' ' . base64_encode(
-				$config['auth']['username'] . ':' . $config['auth']['password']
-			));
-		}
 		if (strpos($this->host, '/') !== false) {
 			$parts = explode('/', $this->host, 2);
 			$this->host = $parts[0];
@@ -181,8 +130,6 @@ class Request extends \lithium\net\http\Message {
 	 */
 	public function to($format, array $options = array()) {
 		switch ($format) {
-			case 'array':
-				return get_object_vars($this);
 			case 'url':
 				$query = $this->queryString();
 				$host = $this->host . ($this->port ? ":{$this->port}" : '');
@@ -194,9 +141,8 @@ class Request extends \lithium\net\http\Message {
 					'protocol_version' => $this->version, 'ignore_errors' => true
 				);
 				return array('http' => $options + $defaults);
-			case 'string':
 			default:
-				return (string) $this;
+				return parent::to($format, $options);
 		}
 	}
 
@@ -206,12 +152,14 @@ class Request extends \lithium\net\http\Message {
 	 * @return string
 	 */
 	public function __toString() {
-		$query = $this->queryString();
-		$path = str_replace('//', '/', $this->path) . $query;
-
+		if (!empty($this->_config['auth'])) {
+			$this->headers('Authorization', "{$this->_config['auth']} " . base64_encode(
+				"{$this->username}:{$this->password}"
+			));
+		}
+		$path = str_replace('//', '/', $this->path) . $this->queryString();
 		$body = $this->body();
 		$this->headers('Content-Length', strlen($body));
-
 		$request = array(
 			"{$this->method} {$path} {$this->protocol}",
 			join("\r\n", $this->headers()),

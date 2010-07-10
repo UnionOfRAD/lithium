@@ -25,7 +25,10 @@ class MockSocket extends \lithium\net\Socket {
 	}
 
 	public function read() {
-		return $this->data;
+		if (is_object($this->data)) {
+			$data = $this->data->to('array');
+		}
+		return new $this->_classes['response']($data);
 	}
 
 	public function write($data) {
@@ -34,8 +37,8 @@ class MockSocket extends \lithium\net\Socket {
 
 	public function send($message, array $options = array()) {
 		if ($this->write($message)) {
-			$message = (string) $this->read();
-			return compact('message');
+			$body = (string) $this->read();
+			return compact('body');
 		}
 	}
 

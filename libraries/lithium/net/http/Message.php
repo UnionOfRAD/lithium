@@ -12,7 +12,7 @@ namespace lithium\net\http;
  * Base class for `lithium\net\http\Request` and `lithium\net\http\Response`. Implements basic
  * protocol handling for HTTP-based transactions.
  */
-class Message extends \lithium\core\Object {
+class Message extends \lithium\net\Message {
 
 	/**
 	 * The full protocol: HTTP/1.1
@@ -93,22 +93,6 @@ class Message extends \lithium\core\Object {
 			$headers[] = "{$key}: {$value}";
 		}
 		return $headers;
-	}
-
-	/**
-	 * Add body parts.
-	 *
-	 * @param mixed $data
-	 * @param array $options
-	 *        - `'buffer'`: split the body string
-	 * @return array
-	 */
-	public function body($data = null, $options = array()) {
-		$default = array('buffer' => null);
-		$options += $default;
-		$this->body = array_merge((array) $this->body, (array) $data);
-		$body = trim(join("\r\n", $this->body));
-		return ($options['buffer']) ? str_split($body, $options['buffer']) : $body;
 	}
 
 	/**

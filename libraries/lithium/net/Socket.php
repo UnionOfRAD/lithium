@@ -23,6 +23,21 @@ abstract class Socket extends \lithium\core\Object {
 	protected $_resource = null;
 
 	/**
+	 * the classes for the socket
+	 *
+	 * @var array
+	 */
+	protected $_classes = array(
+		'response' => '\lithium\net\Message'
+	);
+
+	/**
+	 * Auto config
+	 *
+	 */
+	protected $_autoConfig = array('classes' => 'merge');
+
+	/**
 	 * Constructor.
 	 *
 	 * @param array $config Available configuration options are:
@@ -70,7 +85,7 @@ abstract class Socket extends \lithium\core\Object {
 	/**
 	 * Reads from the socket.
 	 *
-	 * @return mixed The read contents, or `false` if reading failed.
+	 * @return object `lithium\net\Message`
 	 */
 	abstract public function read();
 

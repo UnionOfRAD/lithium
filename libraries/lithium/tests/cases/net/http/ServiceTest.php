@@ -143,7 +143,6 @@ class ServiceTest extends \lithium\test\Unit {
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Content-Type: application/x-www-form-urlencoded',
-			'Content-Length: 11',
 			'', 'status=cool'
 		));
 		$result = (string) $http->last->response;
@@ -171,7 +170,6 @@ class ServiceTest extends \lithium\test\Unit {
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Content-Type: application/x-www-form-urlencoded',
-			'Content-Length: 11',
 			'', 'status=cool'
 		));
 		$result = (string) $http->last->response;
@@ -223,7 +221,6 @@ class ServiceTest extends \lithium\test\Unit {
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Content-Type: application/json',
-			'Content-Length: 17',
 			'', '{"status":"cool"}'
 		));
 		$result = (string) $http->last->response;

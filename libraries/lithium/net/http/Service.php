@@ -71,17 +71,11 @@ class Service extends \lithium\core\Object {
 			'port'       => null,
 			'timeout'    => 30,
 			'auth'       => null,
-			'login'      => 'root',
-			'password'   => '',
+			'username'   => null,
+			'password'   => null,
 			'encoding'   => 'UTF-8',
 		);
 		$config = (array) $config + $defaults;
-
-		$config['auth'] = array(
-			'method'   => $config['auth'],
-			'username' => $config['login'],
-			'password' => $config['password']
-		);
 		parent::__construct($config);
 	}
 
@@ -150,25 +144,22 @@ class Service extends \lithium\core\Object {
 	 */
 	public function send($method, $path = null, $data = array(), array $options = array()) {
 		$request = $this->_request($method, $path, $data, $options);
-		$defaults = array('return' => 'body', 'scheme' => 'http', 'host' => $request->host);
-		$options += $this->_config + $defaults;
+		$defaults = array(
+			'return' => 'body', 'classes' => $this->_classes,
+			'scheme' => $request->scheme, 'host' => $request->host
+		);
+		$options += $defaults + $this->_config;
 		$this->connection = $this->_instance('socket', $options);
 
 		if (!$this->connection || !$this->connection->open()) {
 			return;
 		}
 		if ($this->connection->write($request)) {
-			$message = $this->connection->read();
+			$response = $this->connection->read();
 		}
 		$this->connection->close();
-		$result = null;
-
-		if ($message) {
-			$response = $this->_instance('response', $message);
-			$result = ($options['return'] == 'body') ? $response->body() : $response;
-		}
 		$this->last = (object) compact('request', 'response');
-		return $result;
+		return ($options['return'] == 'body') ? $response->body() : $response;;
 	}
 
 	/**
@@ -184,10 +175,10 @@ class Service extends \lithium\core\Object {
 	 *         string or POST/PUT data, and URL.
 	 */
 	protected function _request($method, $path, $data, $options) {
-		$defaults = array('type' => 'form', 'scheme' => $this->_config['protocol']);
+		$defaults = array('type' => 'form', 'scheme' => $this->_config['scheme']);
 		$options += $defaults;
 		$request = $this->_instance('request', $this->_config + $options);
-		$request->path = str_replace('//', '/', "{$request->path}/{$path}");
+		$request->path = str_replace('//', '/', "{$request->path}{$path}");
 		$request->method = $method = strtoupper($method);
 		$media = $this->_classes['media'];
 		$type = null;

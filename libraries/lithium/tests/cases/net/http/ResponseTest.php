@@ -49,7 +49,7 @@ class ResponseTest extends \lithium\test\Unit {
 	}
 
 	public function testParseMessage() {
-		$message = join("\r\n", array(
+		$body = join("\r\n", array(
 			'HTTP/1.1 200 OK',
 			'Header: Value',
 			'Connection: close',
@@ -58,15 +58,15 @@ class ResponseTest extends \lithium\test\Unit {
 			'Test!'
 		));
 
-		$response = new Response(compact('message'));
-		$this->assertEqual($message, (string) $response);
+		$response = new Response(compact('body'));
+		$this->assertEqual($body, (string) $response);
 
-		$message = 'Invalid Message';
+		$body = 'Not a Message';
 		$expected = join("\r\n", array(
 			'HTTP/1.1 200 OK',
-			'', '', ''
+			'', '', 'Not a Message'
 		));
-		$response = new Response(compact('message'));
+		$response = new Response(compact('body'));
 		$this->assertEqual($expected, (string) $response);
 	}
 
@@ -97,7 +97,7 @@ class ResponseTest extends \lithium\test\Unit {
 			),
 			'type' => 'text/html',
 			'charset' => 'UTF-8',
-			'body' => 'Test!'
+			'body' => array('Test!')
 		);
 		$response = new Response($config);
 		$this->assertEqual($expected, (string) $response);
@@ -117,11 +117,12 @@ class ResponseTest extends \lithium\test\Unit {
 			'',
 		));
 
-		$message = $headers . join("\r\n", array(
+		$body = $headers . join("\r\n", array(
 			'b7',
 			'{"total_rows":1,"offset":0,"rows":[',
 			'{"id":"88989cafcd81b09f81078eb523832e8e","key":"gwoo","value":' .
-			 '{"author":"gwoo","language":"php","preview":"test","created":"2009-10-27 12:14:12"}}',
+			 '{"author":"gwoo","language":"php","preview":"test",' .
+			 '"created":"2009-10-27 12:14:12"}}',
 			'4',
 			'',
 			']}',
@@ -132,35 +133,36 @@ class ResponseTest extends \lithium\test\Unit {
 			'',
 			'',
 		));
-		$response = new Response(compact('message'));
+		$response = new Response(compact('body'));
 
 		$expected = join("\r\n", array(
 			'{"total_rows":1,"offset":0,"rows":[',
-			'{"id":"88989cafcd81b09f81078eb523832e8e","key":"gwoo","value":'.
-			'{"author":"gwoo","language":"php","preview":"test","created":"2009-10-27 12:14:12"}}',
+			'{"id":"88989cafcd81b09f81078eb523832e8e","key":"gwoo","value":' .
+			'{"author":"gwoo","language":"php","preview":"test",' .
+			'"created":"2009-10-27 12:14:12"}}',
 			']}',
 		));
 		$result = $response->body();
 		$this->assertEqual($expected, $result);
 
-		$message = $headers . join("\r\n", array(
+		$body = $headers . join("\r\n", array(
 			'body'
 		));
 		$expected = 'body';
-		$response = new Response(compact('message'));
+		$response = new Response(compact('body'));
 		$result = $response->body();
 		$this->assertEqual($expected, $result);
 
-		$message = $headers . join("\r\n", array(
+		$body = $headers . join("\r\n", array(
 			'[part one];',
 			'[part two]'
 		));
 		$expected = '[part two]';
-		$response = new Response(compact('message'));
+		$response = new Response(compact('body'));
 		$result = $response->body();
 		$this->assertEqual($expected, $result);
 
-		$message = join("\r\n", array(
+		$body = join("\r\n", array(
 			'HTTP/1.1 200 OK',
 			'Header: Value',
 			'Connection: close',
@@ -170,7 +172,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'Test!'
 		));
 		$expected = 'Test!';
-		$response = new Response(compact('message'));
+		$response = new Response(compact('body'));
 		$result = $response->body();
 		$this->assertEqual($expected, $result);
 	}

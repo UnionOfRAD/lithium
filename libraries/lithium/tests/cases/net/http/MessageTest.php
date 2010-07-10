@@ -56,30 +56,6 @@ class MessageTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testBody() {
-		$expected = "Part 1";
-		$result = $this->message->body('Part 1');
-		$this->assertEqual($expected, $result);
-
-		$expected = "Part 1\r\nPart 2";
-		$result = $this->message->body('Part 2');
-		$this->assertEqual($expected, $result);
-
-		$expected = "Part 1\r\nPart 2\r\nPart 3\r\nPart 4";
-		$result = $this->message->body(array('Part 3', 'Part 4'));
-		$this->assertEqual($expected, $result);
-
-		$expected = array('Part 1', 'Part 2', 'Part 3', 'Part 4');
-		$result = $this->message->body;
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testBodyBuffer() {
-		$expected = array('P', 'a', 'r', 't', ' ', '1');
-		$result = $this->message->body('Part 1', array('buffer' => 1));
-		$this->assertEqual($expected, $result);
-	}
-
 	public function testType() {
 		$expected = 'json';
 		$result = $this->message->type("json");

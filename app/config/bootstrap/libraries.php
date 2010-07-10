@@ -21,6 +21,7 @@ require LITHIUM_LIBRARY_PATH . '/lithium/util/Inflector.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/util/String.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/core/Adaptable.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/core/Environment.php';
+require LITHIUM_LIBRARY_PATH . '/lithium/net/Message.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/net/http/Message.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/net/http/Media.php';
 require LITHIUM_LIBRARY_PATH . '/lithium/net/http/Request.php';

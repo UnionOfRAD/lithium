@@ -130,10 +130,11 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testToStringWithAuth() {
-		$request = new Request(array('auth' => array(
-			'method' => 'Basic',
-			'username' => 'root', 'password' => 'something'
-		)));
+		$request = new Request(array(
+			'auth' => 'Basic',
+			'username' => 'root',
+			'password' => 'something'
+		));
 		$expected = join("\r\n", array(
 			'GET / HTTP/1.1',
 			'Host: localhost',
@@ -163,12 +164,22 @@ class RequestTest extends \lithium\test\Unit {
 	public function testToArray() {
 		$expected = array(
 			'method' => 'GET',
-			'content' => '',
-			'header' => array(
-				'Host: localhost',
-				'Connection: Close',
-				'User-Agent: Mozilla/5.0'
-			)
+			'params' => array(),
+			'headers' => array(
+				'Host' => 'localhost',
+				'Connection' => 'Close',
+				'User-Agent' => 'Mozilla/5.0'
+			),
+			'cookies' => array(),
+			'protocol' => 'HTTP/1.1',
+			'version' => '1.1',
+			'body' => array(),
+			'scheme' => 'http',
+			'host' => 'localhost',
+			'port' => NULL,
+			'path' => '/',
+			'username' => NULL,
+			'password' => NULL,
 		);
 		$result = $this->request->to('array');
 		$this->assertEqual($expected, $result);

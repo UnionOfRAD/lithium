@@ -95,20 +95,12 @@ class Response extends \lithium\net\http\Message {
 		504 => 'Gateway Time-out'
 	);
 
-	/**
-	 * Constructor.
-	 *
-	 * @param array $config
-	 * @return object
-	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('message' => '');
-		parent::__construct($config + $defaults);
-	}
+		parent::__construct($config);
+		$body = $this->_config['body'];
 
-	protected function _init() {
-		if (!empty($this->_config['message'])) {
-			$parts = explode("\r\n\r\n", $this->_config['message']);
+		if (is_string($body) && strpos($body, 'HTTP') !== false) {
+			$parts = explode("\r\n\r\n", $body);
 
 			if (empty($parts)) {
 				return;
@@ -121,7 +113,8 @@ class Response extends \lithium\net\http\Message {
 			preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)\s+(.*)/i', array_shift($headers), $match);
 
 			if (!empty($match)) {
-				list($line, $this->version, $code, $message) = $match;
+				list($line, $version, $code, $message) = $match;
+				$this->version = $version;
 				$this->status = compact('code', 'message') + $this->status;
 			}
 			$this->protocol = "HTTP/{$this->version}";
@@ -140,15 +133,7 @@ class Response extends \lithium\net\http\Message {
 			if (isset($this->headers['Transfer-Encoding'])) {
 				$body = $this->_decode($body);
 			}
-			$this->body($body);
-			unset($this->_config['message']);
-		}
-
-		foreach ((array) $this->_config as $key => $value) {
-			if (isset($this->{$key})) {
-				$this->{$key} = $value;
-				unset($this->_config[$key]);
-			}
+			$this->body = array($body);
 		}
 	}
 
