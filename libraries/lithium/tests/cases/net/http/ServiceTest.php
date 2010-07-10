@@ -19,12 +19,7 @@ class ServiceTest extends \lithium\test\Unit {
 		'classes' => array(
 			'socket' => '\lithium\tests\mocks\net\http\MockSocket'
 		),
-		'persistent' => false,
-		'protocol' => 'tcp',
 		'host' => 'localhost',
-		'login' => 'root',
-		'password' => '',
-		'port' => 80,
 		'timeout' => 2
 	);
 

@@ -152,9 +152,7 @@ class Service extends \lithium\core\Object {
 		if (!$this->connection || !$this->connection->open()) {
 			return;
 		}
-		if ($this->connection->write($request)) {
-			$response = $this->connection->read();
-		}
+		$response = $this->connection->send($request, $options);
 		$this->connection->close();
 		$this->last = (object) compact('request', 'response');
 		return ($options['return'] == 'body') ? $response->body() : $response;;

@@ -33,8 +33,9 @@ class Stream extends \lithium\net\Socket {
 		if (empty($config['scheme']) || empty($config['host'])) {
 			return false;
 		}
-
-		$host = "{$config['scheme']}://{$config['host']}:{$config['port']}";
+		$scheme = ($config['scheme'] !== 'udp') ? 'tcp' : 'udp';
+		$port = ($config['port']) ?: 80;
+		$host = "{$scheme}://{$config['host']}:{$port}";
 		$flags = STREAM_CLIENT_CONNECT;
 
 		if ($config['persistent']) {
@@ -162,8 +163,8 @@ class Stream extends \lithium\net\Socket {
 		$options += $defaults;
 
 		if ($this->write($message)) {
-			$message = $this->read();
-			$response = new $options['classes']['response'](compact('message'));
+			$body = $this->read();
+			$response = new $options['classes']['response'](compact('body'));
 			return $response;
 		}
 	}
