@@ -20,6 +20,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'socket' => '\lithium\tests\mocks\net\http\MockSocket'
 		),
 		'host' => 'localhost',
+		'port' => 80,
 		'timeout' => 2
 	);
 

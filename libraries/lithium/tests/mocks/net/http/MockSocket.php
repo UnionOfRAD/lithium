@@ -26,13 +26,17 @@ class MockSocket extends \lithium\net\Socket {
 
 	public function read() {
 		if (is_object($this->data)) {
-			$data = $this->data->to('array');
+			$data = "HTTP/1.1 200 OK\r\n" .
+				join("\r\n", $this->data->headers()) .
+				"\r\n\r\n" .
+				$this->data->body();
 		}
-		return new $this->_classes['response']($data);
+		return $data;
 	}
 
 	public function write($data) {
-		return $this->data = $data;
+		$this->data = $data;
+		return true;
 	}
 
 	public function send($message, array $options = array()) {
