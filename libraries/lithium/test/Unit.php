@@ -737,7 +737,6 @@ class Unit extends \lithium\core\Object {
 				'result' => trim("({$types['result']}) " . print_r($result, true))
 			);
 		}
-
 		$data = array();
 		$isObject = false;
 
@@ -750,14 +749,24 @@ class Unit extends \lithium\core\Object {
 		if (is_array($expected)) {
 			foreach ($expected as $key => $value) {
 				$check = array_key_exists($key, $result) ? $result[$key] : array();
-				$newTrace = (($isObject == true) ? "{$trace}->{$key}" : "{$trace}[{$key}]");
-
+				$newTrace = "{$trace}[{$key}]";
+				if ($isObject) {
+					$newTrace = ($trace) ? "{$trace}->{$key}" : $key;
+					$expected = (object) $expected;
+					$result = (object) $result;
+				}
 				if ($type === 'identical') {
 					if ($value === $check) {
 						continue;
 					}
 					if ($check === array()) {
 						$trace = $newTrace;
+						return compact('trace', 'expected', 'result');
+					}
+					if (is_string($check)) {
+						$trace = $newTrace;
+						$expected = $value;
+						$result = $check;
 						return compact('trace', 'expected', 'result');
 					}
 				} else {
@@ -774,9 +783,6 @@ class Unit extends \lithium\core\Object {
 				if ($compare !== true) {
 					$data[] = $compare;
 				}
-			}
-			if (empty($data)) {
-				return compact('trace', 'expected', 'result');
 			}
 			return $data;
 		}
@@ -818,7 +824,12 @@ class Unit extends \lithium\core\Object {
 		if (!empty($result['trace'])) {
 			$message = sprintf("trace: %s\n", $result['trace']);
 		}
-
+		if (is_object($result['expected'])) {
+			$result['expected'] = get_object_vars($result['expected']);
+		}
+		if (is_object($result['result'])) {
+			$result['result'] = get_object_vars($result['result']);
+		}
 		return $message . sprintf("expected: %s\nresult: %s\n",
 			var_export($result['expected'], true),
 			var_export($result['result'], true)
