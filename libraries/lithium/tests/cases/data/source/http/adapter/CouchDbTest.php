@@ -48,7 +48,9 @@ class CouchDbTest extends \lithium\test\Unit {
 			)
 		));
 
-		$options = array('model' => '\lithium\tests\mocks\data\source\http\adapter\MockCouchPost');
+		$options = array(
+			'model' => '\lithium\tests\mocks\data\source\http\adapter\MockCouchPost'
+		);
 		$this->query = new Query($options + array('entity' => new Document($options)));
 	}
 
@@ -59,7 +61,7 @@ class CouchDbTest extends \lithium\test\Unit {
 	}
 
 	public function testAllMethodsNoConnection() {
-		$this->assertFalse($this->db->connect());
+		$this->assertTrue($this->db->connect());
 		$this->assertTrue($this->db->disconnect());
 		$this->assertFalse($this->db->get());
 		$this->assertFalse($this->db->post());

@@ -109,6 +109,9 @@ class Context extends \lithium\net\Socket {
 	 */
 	public function write($data) {
 		$this->_content = $data;
+		if (is_object($data)) {
+			stream_context_set_option($this->_resource, $data->to('context'));
+		}
 		return true;
 	}
 

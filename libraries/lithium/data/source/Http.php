@@ -68,32 +68,27 @@ class Http extends \lithium\data\Source {
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'classes'	 => array(),
 			'adapter'	 => null,
 			'persistent' => false,
-			'protocol'   => 'tcp',
+			'scheme'     => 'http',
 			'host'       => 'localhost',
 			'version'    => '1.1',
-			'auth'       => 'Basic',
-			'login'      => 'root',
+			'auth'       => null,
+			'login'      => '',
 			'password'   => '',
 			'port'       => 80,
 			'timeout'    => 30,
 			'encoding'   => 'UTF-8'
 		);
 		$config = (array) $config + $defaults;
-
-		$config['auth'] = array(
-			'method' => $config['auth'],
-			'username' => $config['login'],
-			'password' => $config['password']
-		);
-		$this->_classes = $config['classes'] + $this->_classes;
+		$config['username'] = $config['login'];
 		parent::__construct($config);
 	}
 
 	protected function _init() {
-		$this->connection = new $this->_classes['service']($this->_config);
+		$config = $this->_config;
+		unset($config['type']);
+		$this->connection = new $this->_classes['service']($config);
 		parent::_init();
 	}
 
@@ -140,7 +135,7 @@ class Http extends \lithium\data\Source {
 	 * @return boolean
 	 */
 	public function connect() {
-		if (!$this->_isConnected && $this->connection->connect()) {
+		if (!$this->_isConnected) {
 			$this->_isConnected = true;
 		}
 		return $this->_isConnected;
@@ -152,10 +147,8 @@ class Http extends \lithium\data\Source {
 	 * @return boolean
 	 */
 	public function disconnect() {
-		if ($this->_isConnected) {
-			if ($this->connection->disconnect()) {
-				$this->_isConnected = false;
-			}
+		if ($this->_isConnected && $this->connection !== null) {
+			$this->_isConnected = false;
 		}
 		return !$this->_isConnected;
 	}
