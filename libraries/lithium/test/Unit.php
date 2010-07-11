@@ -872,7 +872,7 @@ class Unit extends \lithium\core\Object {
 		$dirs = new RecursiveDirectoryIterator($path);
 		$iterator = new RecursiveIteratorIterator($dirs, RecursiveIteratorIterator::CHILD_FIRST);
 		foreach ($iterator as $item) {
-			if ($item->getPathname() === "{$path}/empty") {
+			if ($item->getPathname() === "{$path}/empty" || $iterator->isDot()) {
 				continue;
 			}
 			($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname());
