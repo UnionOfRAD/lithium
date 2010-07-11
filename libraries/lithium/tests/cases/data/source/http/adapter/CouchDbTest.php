@@ -23,7 +23,6 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
 		'classes' => array(
-			'service' => '\lithium\tests\mocks\data\source\http\adapter\MockService',
 			'socket' => '\lithium\tests\mocks\data\source\http\adapter\MockSocket'
 		),
 		'database' => 'lithium-test',
@@ -91,7 +90,9 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	public function testDescribe() {
 		$couchdb = new CouchDb($this->_testConfig);
+		$this->expectException('/companies is not available/');
 		$result = $couchdb->describe('companies');
+		$this->assertNull($result);
 	}
 
 	public function testItem() {

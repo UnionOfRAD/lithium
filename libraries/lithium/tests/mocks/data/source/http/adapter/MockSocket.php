@@ -25,13 +25,19 @@ class MockSocket extends \lithium\net\Socket {
 	}
 
 	public function read() {
+		$data = json_encode(array(
+			'ok' => true,
+			'id' => '12345',
+			'rev' => '1-2',
+			'body' => 'something'
+		));
 		return join("\r\n", array(
 			'HTTP/1.1 200 OK',
 			'Header: Value',
 			'Connection: close',
 			'Content-Type: text/html;charset=UTF-8',
 			'',
-			'Test!'
+			$data
 		));
 	}
 
@@ -48,7 +54,7 @@ class MockSocket extends \lithium\net\Socket {
 	}
 
 	public function send($message, array $options = array()) {
-		$body = (string) $message;
+		$body = $this->read();
 		return new $options['classes']['response'](compact('body'));
 	}
 }

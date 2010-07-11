@@ -82,7 +82,7 @@ class Message extends \lithium\core\Object {
 		);
 		$config += $defaults;
 
-		foreach ($config as $key => $value) {
+		foreach (array_filter($config) as $key => $value) {
 			$this->{$key} = $value;
 		}
 		parent::__construct($config);

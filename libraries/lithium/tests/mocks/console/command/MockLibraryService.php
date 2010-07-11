@@ -15,11 +15,11 @@ class MockLibraryService extends \lithium\net\http\Service {
 	public function send($method, $path = null, $data = array(), array $options = array()) {
 		if ($method == 'post') {
 			$this->request = $this->_request($method, $path, $data, $options);
-			if (!empty($this->request->auth['username'])) {
+			if (!empty($this->request->username)) {
 				$user =  array(
 					'method' => 'Basic', 'username' => 'gwoo', 'password' => 'password'
 				);
-				if ($this->request->auth !== $user) {
+				if ($this->request->username !== $user['username']) {
 					$this->last = (object) array('response' =>  new Response());
 					$this->last->response->status(401);
 					return json_encode(array(

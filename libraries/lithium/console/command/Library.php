@@ -433,7 +433,7 @@ class Library extends \lithium\console\Command {
 		if (file_exists($file)) {
 			$service = $this->_instance('service', array(
 				'host' => $this->server, 'port' => $this->port,
-				'login' => $this->username, 'password' => $this->password
+				'auth' => 'Basic', 'username' => $this->username, 'password' => $this->password
 			));
 			$boundary = md5(date('r', time()));
 			$headers = array("Content-Type: multipart/form-data; boundary={$boundary}");
@@ -445,7 +445,10 @@ class Library extends \lithium\console\Command {
 				base64_encode(file_get_contents($file)),
 				"--{$boundary}--"
 			));
-			$result = json_decode($service->post('/lab/server/receive', $data, compact('headers')));
+			$result = json_decode($service->post(
+				'/lab/server/receive', $data, compact('headers')
+			));
+
 			if ($service->last->response->status['code'] == 201) {
 				$this->out(array(
 					"{$result->name} added to {$this->server}.",

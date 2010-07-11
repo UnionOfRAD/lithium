@@ -120,10 +120,10 @@ class HelpTest extends \lithium\test\Unit {
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$expected = null;
-		$result = $help->api('lithium.net.http.Request', 'property');
+		$result = $help->api('lithium.net.Message', 'property');
 		$this->assertEqual($expected, $result);
 
-		$expected = "    --host=HOST\n        The Host header value and authority.";
+		$expected = "    --host=HOST\n        The hostname for this endpoint.";
 		$expected = preg_quote($expected);
 		$result = $help->response->output;
 		$this->assertPattern("/{$expected}/", $result);
@@ -134,10 +134,10 @@ class HelpTest extends \lithium\test\Unit {
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$expected = null;
-		$result = $help->api( 'lithium.net.http.Request', 'property', 'host');
+		$result = $help->api('lithium.net.Message', 'property');
 		$this->assertEqual($expected, $result);
 
-		$expected = "    --host=HOST\n        The Host header value and authority.";
+		$expected = "    --host=HOST\n        The hostname for this endpoint.";
 		$expected = preg_quote($expected);
 		$result = $help->response->output;
 		$this->assertPattern("/{$expected}/", $result);

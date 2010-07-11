@@ -115,8 +115,10 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function describe($entity, array $meta = array()) {
 		$database = $this->_config['database'];
+
 		if (!$this->_db) {
 			$result = $this->get($database);
+
 			if (isset($result->db_name)) {
 				$this->_db = true;
 			}
@@ -134,7 +136,6 @@ class CouchDb extends \lithium\data\source\Http {
 		if (!$this->_db) {
 			throw new Exception("{$entity} is not available.");
 		}
-		return array('id' => array(), 'rev' => array());
 	}
 
 	/**

@@ -140,7 +140,7 @@ class Response extends \lithium\net\http\Message {
 	}
 
 	/**
-	 * undocumented function
+	 * Set and get the status for the response
 	 *
 	 * @param string $key
 	 * @param string $data
@@ -152,6 +152,7 @@ class Response extends \lithium\net\http\Message {
 		}
 		if (!empty($data)) {
 			$this->status = array('code' => null, 'message' => null);
+
 			if (is_numeric($data) && isset($this->_statuses[$data])) {
 				$this->status = array('code' => $data, 'message' => $this->_statuses[$data]);
 			} else {
