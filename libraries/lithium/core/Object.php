@@ -74,7 +74,7 @@ class Object {
 
 	/**
 	 * Initializes class configuration (`$_config`), and assigns object properties using the
-	 * `_init()`, unless otherwise specified by configuration. See below for details.
+	 * `_init()` method, unless otherwise specified by configuration. See below for details.
 	 *
 	 * @see lithium\core\Object::$_config
 	 * @see lithium\core\Object::_init()
