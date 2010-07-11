@@ -57,9 +57,9 @@ class MessageTest extends \lithium\test\Unit {
 	}
 
 	public function testType() {
-		$expected = 'json';
 		$result = $this->message->type("json");
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('json', $result);
+		$this->assertEqual('json', $this->message->type());
 
 		$expected = 'json';
 		$result = $this->message->type("application/json; charset=UTF-8");

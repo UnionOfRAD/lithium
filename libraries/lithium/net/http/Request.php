@@ -135,10 +135,9 @@ class Request extends \lithium\net\http\Message {
 				$host = $this->host . ($this->port ? ":{$this->port}" : '');
 				return "{$this->scheme}://{$host}{$this->path}{$query}";
 			case 'context':
-				if (!empty($this->_config['auth'])) {
-					$this->headers('Authorization', "{$this->_config['auth']} " . base64_encode(
-						"{$this->username}:{$this->password}"
-					));
+				if ($this->_config['auth']) {
+					$auth = base64_encode("{$this->username}:{$this->password}");
+					$this->headers('Authorization', "{$this->_config['auth']} {$auth}");
 				}
 				$content = $this->body();
 				$this->headers('Content-Length', strlen($content));

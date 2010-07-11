@@ -54,7 +54,7 @@ class Message extends \lithium\net\Message {
 	 *
 	 * @var array
 	 */
-	protected $_classes = array('media' => '\lithium\net\http\Media');
+	protected $_classes = array('media' => 'lithium\net\http\Media');
 
 	/**
 	 * Add a header to rendered output, or return a single header or full header list.

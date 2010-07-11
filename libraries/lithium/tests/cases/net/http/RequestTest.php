@@ -147,6 +147,28 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testToContextWithAuth() {
+		$request = new Request(array(
+			'auth' => 'Basic',
+			'username' => 'Aladdin',
+			'password' => 'open sesame'
+		));
+		$expected = array('http' => array(
+			'method' => 'GET',
+			'header' => array(
+				'Host: localhost',
+				'Connection: Close',
+				'User-Agent: Mozilla/5.0',
+				'Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=='
+			),
+			'content' => '',
+			'protocol_version' => '1.1',
+			'ignore_errors' => true
+		));
+		$result = $request->to('context');
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testToStringWithBody() {
 		$expected = join("\r\n", array(
 			'GET / HTTP/1.1',
