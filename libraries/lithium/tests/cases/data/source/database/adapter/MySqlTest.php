@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\data\source\database\adapter;
 
 use \lithium\data\Connections;
+use \lithium\data\model\Query;
 use \lithium\data\source\database\adapter\MySql;
 use \lithium\tests\mocks\data\source\database\adapter\MockMySql;
 
@@ -156,6 +157,69 @@ class MySqlTest extends \lithium\test\Unit {
 	public function testExecuteException() {
 		$this->expectException();
 		$this->db->read('SELECT deliberate syntax error');
+	}
+
+	public function testEnabledFeatures() {
+		$this->assertTrue(MySql::enabled());
+		$this->assertTrue(MySql::enabled('relationships'));
+		$this->assertFalse(MySql::enabled('arrays'));
+	}
+
+	public function testEntityQuerying() {
+		$sources = $this->db->entities();
+		$this->assertTrue(is_array($sources));
+		$this->assertFalse(empty($sources));
+	}
+
+	public function testQueryOrdering() {
+		$insert = new Query(array(
+			'type' => 'create',
+			'source' => 'companies',
+			'data' => array(
+				'name' => 'Foo',
+				'active' => true,
+				'created' => date('Y-m-d H:i:s')
+			)
+		));
+		$this->assertIdentical(true, $this->db->create($insert));
+
+		$insert->data(array(
+			'name' => 'Bar',
+			'created' => date('Y-m-d H:i:s', strtotime('-5 minutes'))
+		));
+		$this->assertIdentical(true, $this->db->create($insert));
+
+		$insert->data(array(
+			'name' => 'Baz',
+			'created' => date('Y-m-d H:i:s', strtotime('-10 minutes'))
+		));
+		$this->assertIdentical(true, $this->db->create($insert));
+
+		$read = new Query(array(
+			'type' => 'read',
+			'source' => 'companies',
+			'fields' => array('name'),
+			'order' => array('created' => 'asc')
+		));
+		$result = $this->db->read($read, array('return' => 'array'));
+		$expected = array(
+			array('name' => 'Baz'),
+			array('name' => 'Bar'),
+			array('name' => 'Foo')
+		);
+		$this->assertEqual($expected, $result);
+
+		$read->order(array('created' => 'desc'));
+		$result = $this->db->read($read, array('return' => 'array'));
+		$expected = array(
+			array('name' => 'Foo'),
+			array('name' => 'Bar'),
+			array('name' => 'Baz')
+		);
+		$this->assertEqual($expected, $result);
+
+		$delete = new Query(array('type' => 'delete', 'source' => 'companies'));
+		$this->assertTrue($this->db->delete($delete));
 	}
 }
 

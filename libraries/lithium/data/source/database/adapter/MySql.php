@@ -156,12 +156,20 @@ class MySql extends \lithium\data\source\Database {
 	 * @filter This method can be filtered.
 	 */
 	public function entities($model = null) {
-		$config = $this->_config;
-		$method = function($self, $params, $chain) use ($config) {
-			$name = $this->name($config['database']);
-			return $self->query("SHOW TABLES FROM {$name};");
-		};
-		return $this->_filter(__METHOD__, compact('model'), $method);
+		$_config = $this->_config;
+		$params = compact('model');
+
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
+			$name = $self->name($_config['database']);
+			$result = $self->invokeMethod('_execute', array("SHOW TABLES FROM {$name};"));
+			$entities = array();
+
+			while ($data = $self->result('next', $result, null)) {
+				list($entities[]) = $data;
+			}
+			$self->result('close', $result, null);
+			return $entities;
+		});
 	}
 
 	/**
