@@ -307,7 +307,7 @@ class CatalogTest extends \lithium\test\Unit {
 		Catalog::write('runtime', 'message', 'de', $data);
 		$result = Catalog::read('runtime', 'message', 'de', array('lossy' => false));
 		$expected = array(
-			'house'	=> array(
+			'house' => array(
 				'id' => 'house',
 				'ids' => array(),
 				'translated' => 'Haus',
@@ -318,7 +318,7 @@ class CatalogTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$data = array(
-			'house'	=> array(
+			'house' => array(
 				'id' => 'house',
 				'ids' => array(),
 				'translated' => 'Haus',
@@ -329,7 +329,7 @@ class CatalogTest extends \lithium\test\Unit {
 		Catalog::write('runtime', 'message', 'de', $data);
 		$result = Catalog::read('runtime', 'message', 'de', array('lossy' => false));
 		$expected = array(
-			'house'	=> array(
+			'house' => array(
 				'id' => 'house',
 				'ids' => array(),
 				'translated' => 'Haus',
@@ -342,7 +342,7 @@ class CatalogTest extends \lithium\test\Unit {
 
 	public function testOutputLossyFormat() {
 		$data = array(
-			'house'	=> array(
+			'house' => array(
 				'id' => 'house',
 				'ids' => array('singular' => 'house'),
 				'translated' => 'Haus',
@@ -360,7 +360,7 @@ class CatalogTest extends \lithium\test\Unit {
 
 	public function testOutputLosslessFormat() {
 		$data = array(
-			'house'	=> array(
+			'house' => array(
 				'id' => 'house',
 				'ids' => array('singular' => 'house'),
 				'translated' => 'Haus',
@@ -371,7 +371,7 @@ class CatalogTest extends \lithium\test\Unit {
 		Catalog::write('runtime', 'message', 'de', $data);
 		$result = Catalog::read('runtime', 'message', 'de', array('lossy' => false));
 		$expected = array(
-			'house'	=> array(
+			'house' => array(
 				'id' => 'house',
 				'ids' => array('singular' => 'house'),
 				'translated' => 'Haus',
