@@ -51,8 +51,8 @@ class RecordSet extends \lithium\data\Collection {
 	 * Initializes the record set and uses the database handle to get the column list contained in
 	 * the query that created this object.
 	 *
-	 * @return void
 	 * @see lithium\data\collection\RecordSet::$_columns
+	 * @return void
 	 * @todo The part that uses _handle->schema() should be rewritten so that the column list
 	 *       is coming from the query object.
 	 */
@@ -74,9 +74,9 @@ class RecordSet extends \lithium\data\Collection {
 	 * records until either all available records have been loaded, or a matching key has been
 	 * found.
 	 *
+	 * @see lithium\data\collection\RecordSet::offsetGet()
 	 * @param mixed $offset The ID of the record to check for.
 	 * @return boolean Returns true if the record's ID is found in the set, otherwise false.
-	 * @see lithium\data\collection\RecordSet::offsetGet()
 	 */
 	public function offsetExists($offset) {
 		if (in_array($offset, $this->_index)) {
@@ -94,12 +94,12 @@ class RecordSet extends \lithium\data\Collection {
 	 * Because record data in `RecordSet` is lazy-loaded from the database, new records are fetched
 	 * until one with a matching key is found.
 	 *
+	 * @see lithium\data\collection\RecordSet::$_index
 	 * @param mixed $offset The offset, or ID (index) of the record you wish to load.  If
 	 *                      `$offset` is `null`, all records are loaded into the record set, and
 	 *                      `offsetGet` returns `null`.
 	 * @return object Returns a `Record` object if a record is found with a key that matches the
 	 *                value of `$offset`, otheriwse returns `null`.
-	 * @see lithium\data\collection\RecordSet::$_index
 	 */
 	public function offsetGet($offset) {
 		if (!is_null($offset) && in_array($offset, $this->_index)) {
@@ -168,6 +168,7 @@ class RecordSet extends \lithium\data\Collection {
 	/**
 	 * Returns the currently pointed to record's unique key.
 	 *
+	 * @param boolean $full If true, returns the complete key.
 	 * @return mixed
 	 */
 	public function key($full = false) {
@@ -264,7 +265,7 @@ class RecordSet extends \lithium\data\Collection {
 	 * Lazy-loads records from a query using a reference to a database adapter and a query
 	 * result resource.
 	 *
-	 * @param array $data
+	 * @param array $record
 	 * @param mixed $key
 	 * @return array
 	 */
