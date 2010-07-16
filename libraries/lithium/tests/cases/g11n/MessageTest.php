@@ -41,7 +41,7 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testTranslateBasic() {
 		$data = array('catalog' => 'Katalog');
-		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'message', 'de', $data);
 
 		$expected = 'Katalog';
 		$result = Message::translate('catalog', array('locale' => 'de'));
@@ -249,7 +249,7 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testAliasesSymmetry() {
 		$data = array('house' => array('Haus', 'Häuser'));
-		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'message', 'de', $data);
 
 		$filters = Message::aliases();
 		$t = $filters['t'];
