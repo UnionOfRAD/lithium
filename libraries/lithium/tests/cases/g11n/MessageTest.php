@@ -24,7 +24,7 @@ class MessageTest extends \lithium\test\Unit {
 			'runtime' => array('adapter' => new Memory())
 		));
 		$data = function($n) { return $n == 1 ? 0 : 1; };
-		Catalog::write('message.pluralRule', 'root', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'message.pluralRule', 'root', $data);
 
 		$this->_backups['environment'] = Environment::get('test');
 		Environment::set('test', array('locale' => 'en'));
@@ -52,7 +52,7 @@ class MessageTest extends \lithium\test\Unit {
 		$data = array(
 			'house' => array('Haus', 'Häuser')
 		);
-		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'message', 'de', $data);
 
 		$expected = 'Haus';
 		$result = Message::translate('house', array('locale' => 'de'));
@@ -67,7 +67,7 @@ class MessageTest extends \lithium\test\Unit {
 		$data = array(
 			'house' => array('Haus', 'Häuser')
 		);
-		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'message', 'de', $data);
 
 		$expected = 'Häuser';
 		$result = Message::translate('house', array('locale' => 'de', 'count' => 2.31));
@@ -102,7 +102,7 @@ class MessageTest extends \lithium\test\Unit {
 		$data = array(
 			'house' => array('Haus', 'Häuser')
 		);
-		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'message', 'de', $data);
 
 		$expected = 'Haus';
 		$result = Message::translate('house', array('locale' => 'de', 'count' => -1));
@@ -129,13 +129,13 @@ class MessageTest extends \lithium\test\Unit {
 		$data = array(
 			'catalog' => array('Katalog', 'Kataloge'),
 		);
-		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'message', 'de', $data);
 
 		$result = Message::translate('catalog', array('locale' => 'de'));
 		$this->assertNull($result);
 
 		$data = 'not a valid pluralization function';
-		Catalog::write('message.pluralRule', 'root', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'message.pluralRule', 'root', $data);
 
 		$result = Message::translate('catalog', array('locale' => 'de'));
 		$this->assertNull($result);
@@ -145,11 +145,11 @@ class MessageTest extends \lithium\test\Unit {
 		$data = array(
 			'catalog' => 'Katalog',
 		);
-		Catalog::write('message', 'de', $data, array('name' => 'runtime', 'scope' => 'test'));
+		Catalog::write('runtime', 'message', 'de', $data, array('scope' => 'test'));
 
 		$data = function($n) { return $n == 1 ? 0 : 1; };
-		Catalog::write('message.pluralRule', 'root', $data, array(
-			'name' => 'runtime', 'scope' => 'test'
+		Catalog::write('runtime', 'message.pluralRule', 'root', $data, array(
+			'scope' => 'test'
 		));
 
 		$result = Message::translate('catalog', array('locale' => 'de'));
@@ -177,7 +177,7 @@ class MessageTest extends \lithium\test\Unit {
 			'The fish is {:color}.' => 'Der Fisch ist {:color}.',
 			'{:count} bike' => array('{:count} Fahrrad', '{:count} Fahrräder'),
 		);
-		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'message', 'de', $data);
 
 		$expected = 'Der Fisch ist grün.';
 		$result = Message::translate('The fish is {:color}.', array(
@@ -199,11 +199,11 @@ class MessageTest extends \lithium\test\Unit {
 		$data = array(
 			'catalog' => 'Katalog',
 		);
-		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'message', 'de', $data);
 		$data = array(
 			'catalog' => 'catalogue',
 		);
-		Catalog::write('message', 'fr', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'message', 'fr', $data);
 
 		$expected = 'Katalog';
 		$result = Message::translate('catalog', array('locale' => 'de'));
@@ -218,7 +218,7 @@ class MessageTest extends \lithium\test\Unit {
 		$data = array(
 			'catalog' => 'Katalog',
 		);
-		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'message', 'de', $data);
 
 		$result = Message::translate('catalog', array('locale' => 'de', 'noop' => true));
 		$this->assertNull($result);
@@ -228,7 +228,7 @@ class MessageTest extends \lithium\test\Unit {
 		$data = array(
 			'house' => array('Haus', 'Häuser')
 		);
-		Catalog::write('message', 'de', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'message', 'de', $data);
 
 		$filters = Message::aliases();
 		$t = $filters['t'];

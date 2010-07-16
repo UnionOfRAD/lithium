@@ -64,26 +64,28 @@ class Catalog extends \lithium\core\Adaptable {
 	 *
 	 * Usage:
 	 * {{{
-	 * Catalog::read('message', 'zh');
-	 * Catalog::read('validation.postalCode', 'en_US');
+	 * Catalog::read(true, 'message', 'zh');
+	 * Catalog::read('default', 'message', 'zh');
+	 * Catalog::read('default', 'validation.postalCode', 'en_US');
 	 * }}}
 	 *
+	 * @param mixed $name Provide a single configuration name as a string or multiple ones as
+	 *        an array which will be used to read from. Pass `true` to use all configurations.
 	 * @param string $category A (dot-delimeted) category.
 	 * @param string $locale A locale identifier.
 	 * @param array $options Valid options are:
-	 *        - `'name'`: One or multiple configuration names.
 	 *        - `'scope'`: The scope to use.
 	 *        - `'lossy'`: Whether or not to use the compact and lossy format, defaults to `true`.
 	 * @return array|void If available the requested data, else `null`.
 	 */
-	public static function read($category, $locale, array $options = array()) {
-		$defaults = array('name' => null, 'scope' => null, 'lossy' => true);
+	public static function read($name, $category, $locale, array $options = array()) {
+		$defaults = array('scope' => null, 'lossy' => true);
 		$options += $defaults;
 
 		$category = strtok($category, '.');
 		$id = strtok('.');
 
-		$names = (array) $options['name'] ?: array_keys(static::$_configurations);
+		$names = $name === true ? array_keys(static::$_configurations) : (array) $name;
 		$results = array();
 
 		foreach (Locale::cascade($locale) as $cascaded) {
@@ -115,19 +117,19 @@ class Catalog extends \lithium\core\Adaptable {
 	 * $data = array(
 	 * 	'color' => '色'
 	 * );
-	 * Catalog::write('message', 'ja', $data, array('name' => 'runtime'));
+	 * Catalog::write('runtime', 'message', 'ja', $data);
 	 * }}}
 	 *
+	 * @param string $name Provide a configuration name to use for writing.
 	 * @param string $category A (dot-delimited) category.
 	 * @param string $locale A locale identifier.
 	 * @param mixed $data If method is used without specifying an id must be an array.
 	 * @param array $options Valid options are:
-	 *        - `'name'`: One or multiple configuration names.
 	 *        - `'scope'`: The scope to use.
 	 * @return boolean Success.
 	 */
-	public static function write($category, $locale, $data, array $options = array()) {
-		$defaults = array('name' => null, 'scope' => null);
+	public static function write($name, $category, $locale, $data, array $options = array()) {
+		$defaults = array('scope' => null);
 		$options += $defaults;
 
 		$category = strtok($category, '.');
@@ -143,13 +145,8 @@ class Catalog extends \lithium\core\Adaptable {
 			}
 		});
 
-		$names = (array) $options['name'] ?: array_keys(static::$_configurations);
-
-		foreach ($names as $name) {
-			$adapter = static::adapter($name);
-			return $adapter->write($category, $locale, $options['scope'], $data);
-		}
-		return false;
+		$adapter = static::adapter($name);
+		return $adapter->write($category, $locale, $options['scope'], $data);
 	}
 }
 

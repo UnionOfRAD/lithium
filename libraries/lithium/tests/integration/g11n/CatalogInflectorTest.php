@@ -37,9 +37,11 @@ class CatalogInflectorTest extends \lithium\test\Unit {
 				'&' => 'and'
 			)
 		);
-		Catalog::write('inflection', 'en', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'inflection', 'en', $data);
 
-		Inflector::rules('transliteration', Catalog::read('inflection.transliteration', 'en'));
+		Inflector::rules(
+			'transliteration', Catalog::read('runtime', 'inflection.transliteration', 'en')
+		);
 
 		$result = Inflector::slug('this & that');
 		$expected = 'this-and-that';
@@ -51,9 +53,11 @@ class CatalogInflectorTest extends \lithium\test\Unit {
 				'&' => 'und'
 			)
 		);
-		Catalog::write('inflection', 'de', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'inflection', 'de', $data);
 
-		Inflector::rules('transliteration', Catalog::read('inflection.transliteration', 'de'));
+		Inflector::rules(
+			'transliteration', Catalog::read('runtime', 'inflection.transliteration', 'de')
+		);
 
 		$result = Inflector::slug('this & that');
 		$expected = 'dhis-und-dhad';

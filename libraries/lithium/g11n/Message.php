@@ -191,7 +191,9 @@ class Message extends \lithium\core\StaticObject {
 			extract($params);
 
 			if (!isset($cache[$options['scope']][$locale])) {
-				$cache[$options['scope']][$locale] = Catalog::read('message', $locale, $options);
+				$cache[$options['scope']][$locale] = Catalog::read(
+					true, 'message', $locale, $options
+				);
 			}
 			$page = $cache[$options['scope']][$locale];
 

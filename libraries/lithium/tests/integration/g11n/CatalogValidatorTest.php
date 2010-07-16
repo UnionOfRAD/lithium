@@ -32,9 +32,9 @@ class CatalogValidatorTest extends \lithium\test\Unit {
 
 	public function testFlat() {
 		$data = '/postalCode en_US/';
-		Catalog::write('validation.postalCode', 'en_US', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'validation.postalCode', 'en_US', $data);
 
-		Validator::add('postalCode', Catalog::read('validation.postalCode', 'en_US'));
+		Validator::add('postalCode', Catalog::read('runtime', 'validation.postalCode', 'en_US'));
 
 		$result = Validator::isPostalCode('postalCode en_US');
 		$this->assertTrue($result);
@@ -45,9 +45,9 @@ class CatalogValidatorTest extends \lithium\test\Unit {
 			'postalCode' => '/postalCode en_US/',
 			'phone' => '/phone en_US/',
 		);
-		Catalog::write('validation', 'en_US', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'validation', 'en_US', $data);
 
-		Validator::add(Catalog::read('validation', 'en_US'));
+		Validator::add(Catalog::read('runtime', 'validation', 'en_US'));
 
 		$result = Validator::isPostalCode('postalCode en_US');
 		$this->assertTrue($result);
@@ -58,13 +58,13 @@ class CatalogValidatorTest extends \lithium\test\Unit {
 
 	public function testMultipleLocales() {
 		$data = '/phone en_US/';
-		Catalog::write('validation.phone', 'en_US', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'validation.phone', 'en_US', $data);
 		$data = '/phone en_GB/';
-		Catalog::write('validation.phone', 'en_GB', $data, array('name' => 'runtime'));
+		Catalog::write('runtime', 'validation.phone', 'en_GB', $data);
 
 		Validator::add('phone', array(
-			'en_US'	=> Catalog::read('validation.phone', 'en_US'),
-			'en_GB' => Catalog::Read('validation.phone', 'en_GB')
+			'en_US'	=> Catalog::read('runtime', 'validation.phone', 'en_US'),
+			'en_GB' => Catalog::read('runtime', 'validation.phone', 'en_GB')
 		));
 
 		$result = Validator::isPhone('phone en_US', 'en_US');

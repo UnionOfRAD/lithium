@@ -75,7 +75,7 @@ Catalog::config(array(
 /**
  * Integration with `Inflector`.
  */
-// Inflector::rules('transliteration', Catalog::read('inflection.transliteration', 'en'));
+// Inflector::rules('transliteration', Catalog::read(true, 'inflection.transliteration', 'en'));
 
 /*
  * Inflector configuration examples.  If your application has custom singular or plural rules, or
@@ -110,7 +110,7 @@ Media::applyFilter('_handle', function($self, $params, $chain) {
  * by specifying them manually or retrieving them with the `Catalog` class.
  */
 foreach (array('phone', 'postalCode', 'ssn') as $name) {
-	Validator::add($name, Catalog::read("validation.{$name}", 'en_US'));
+	Validator::add($name, Catalog::read(true, "validation.{$name}", 'en_US'));
 }
 
 /**

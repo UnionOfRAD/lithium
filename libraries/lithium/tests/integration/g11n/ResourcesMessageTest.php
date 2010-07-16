@@ -51,10 +51,10 @@ class ResourcesMessageTest extends \lithium\test\Unit {
 		);
 		foreach ($locales as $locale) {
 			$expected = 2;
-			$result = Catalog::read('message.pluralForms', $locale);
+			$result = Catalog::read('lithium', 'message.pluralForms', $locale);
 			$this->assertEqual($expected, $result, "Locale: `{$locale}`\n{:message}");
 
-			$rule = Catalog::read('message.pluralRule', $locale);
+			$rule = Catalog::read('lithium', 'message.pluralRule', $locale);
 
 			$expected  = '10111111111111111111111111111111111111111111111111';
 			$expected .= '11111111111111111111111111111111111111111111111111';
