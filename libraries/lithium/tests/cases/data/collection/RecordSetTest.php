@@ -134,6 +134,9 @@ class RecordSetTest extends \lithium\test\Unit {
 		$expected = array('id' => 3, 'data' => 'data3');
 		$this->assertEqual($this->_records[2], $this->_recordSet[3]->to('array'));
 
+		$recordSet = new MockRecordSet();
+		$this->assertEqual(array(), $recordSet->data());
+
 		$this->expectException();
 		$this->_recordSet[5];
 	}

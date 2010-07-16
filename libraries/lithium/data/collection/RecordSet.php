@@ -216,7 +216,11 @@ class RecordSet extends \lithium\data\Collection {
 			case 'array':
 				$result = array_map(function($r) { return $r->to('array'); }, $this->_data);
 				if (is_scalar(current($this->_index)) && $options['indexed']) {
-					$result = array_combine($this->_index, $result);
+					if (!empty($this->_index) && !empty($result)) {
+						$result = array_combine($this->_index, $result);
+					} else {
+						$result = array();
+					}
 				}
 			break;
 			default:
