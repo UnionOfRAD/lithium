@@ -13,6 +13,9 @@ use lithium\net\http\Response;
 class MockLibraryService extends \lithium\net\http\Service {
 
 	public function send($method, $path = null, $data = array(), array $options = array()) {
+		if ($this->_config['host'] == 'localhost') {
+			return null;
+		}
 		if ($method == 'post') {
 			$this->request = $this->_request($method, $path, $data, $options);
 			if (!empty($this->request->username)) {
@@ -43,8 +46,14 @@ class MockLibraryService extends \lithium\net\http\Service {
 		if (preg_match("/lab\/extensions/", $path, $match)) {
 			return json_encode($this->__data('extensions'));
 		}
-		if (preg_match("/lab\/(.*?).json/", $path, $match)) {
+		if (preg_match("/lab\/li3_lab.json/", $path, $match)) {
+			return json_encode($this->__data('plugins', 0));
+		}
+		if (preg_match("/lab\/library_test_plugin.json/", $path, $match)) {
 			return json_encode($this->__data('plugins', 1));
+		}
+		if (preg_match("/lab\/li3_docs.json/", $path, $match)) {
+			return json_encode($this->__data('plugins', 2));
 		}
 	}
 
@@ -85,6 +94,23 @@ class MockLibraryService extends \lithium\net\http\Service {
 				'requires' => array(
 					'li3_lab' => array('version' => '<=1.0')
 				)
+			),
+			array(
+				'name' => 'li3_docs', 'version' => '1.0',
+				'summary' => 'the li3 plugin client/server',
+				'maintainers' => array(
+					array(
+						'name' => 'gwoo', 'email' => 'gwoo@nowhere.com',
+						'website' => 'li3.rad-dev.org'
+					)
+				),
+				'created' => '2009-11-30', 'updated' => '2009-11-30',
+				'rating' => '9.9', 'downloads' => '1000',
+				'sources' => array(
+					'git' => 'git://rad-dev.org/li3_docs.git',
+					'phar' => 'http://downloads.rad-dev.org/li3_docs.phar.gz'
+				),
+				'requires' => array()
 			),
 		);
 

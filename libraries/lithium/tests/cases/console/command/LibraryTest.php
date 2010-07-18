@@ -49,7 +49,7 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->library = new Library(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$this->library->conf = $this->_conf = $this->_testPath . '/library.json';
+		$this->testConf = $this->library->conf = $this->_testPath . '/library.json';
 	}
 
 	public function tearDown() {
@@ -66,7 +66,19 @@ class LibraryTest extends \lithium\test\Unit {
 		$expected = array('servers' => array(
 			'lab.lithify.me' => true
 		));
-		$result = json_decode(file_get_contents($this->_conf), true);
+		$result = json_decode(file_get_contents($this->testConf), true);
+		$this->assertEqual($expected, $result);
+
+		//create a new object to test initialiaztion
+		$this->request->params += array('conf' => $this->testConf);
+		$library = new Library(array(
+			'request' => $this->request, 'classes' => $this->classes
+		));
+
+		$expected = array('servers' => array(
+			'lab.lithify.me' => true
+		));
+		$result = $this->library->config();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -205,13 +217,83 @@ class LibraryTest extends \lithium\test\Unit {
 	}
 
 	public function testFormulate() {
+		$this->library->formulate();
+		$expected = '/please supply a name/';
+		$result = $this->library->response->output;
+		$this->assertPattern($expected, $result);
+
 		$path = $this->_testPath . '/library_test_plugin';
 		mkdir($path);
+		$result = $this->library->formulate($path);
+		$this->assertTrue($result);
+
+		$result = file_exists($path . '/config/library_test_plugin.json');
+		$this->assertTrue($result);
+
+		$this->_cleanUp();
+	}
+
+	public function testFormulateWithFormula() {
+		$path = $this->_testPath . '/library_test_plugin';
+		mkdir($path);
+		mkdir($path . '/config');
+		file_put_contents(
+			$path . '/config/library_test_plugin.json',
+			json_encode(array(
+				'name' => 'library_test_plugin',
+				'version' => '1.0',
+				'summary' => 'something',
+				'sources' => array(
+					'phar' => 'http://somewhere.com/download/library_test_plugin.phar.gz'
+				)
+			))
+		);
 
 		$result = $this->library->formulate($path);
 		$this->assertTrue($result);
 
 		$result = file_exists($path . '/config/library_test_plugin.json');
+		$this->assertTrue($result);
+	}
+
+	public function testNoFormulate() {
+		$path = $this->_testPath . '/library_test_no_plugin';
+		$result = $this->library->formulate($path);
+		$this->assertFalse($result);
+
+		$result = file_exists($path . '/config/library_test_no_plugin.json');
+		$this->assertFalse($result);
+
+		$expected = '/Formula for library_test_no_plugin not created/';
+		$result = $this->library->response->error;
+		$this->assertPattern($expected, $result);
+	}
+
+	public function testFormulateNoPath() {
+		$path = $this->_testPath . '/library_test_no_plugin';
+		umask(0);
+		mkdir($path, 655);
+		umask(100);
+		$this->expectException('/Permission denied/');
+
+		$result = $this->library->formulate($path);
+		$this->assertFalse($result);
+
+		$result = file_exists($path . '/config/library_test_plugin.json');
+		$this->assertFalse($result);
+
+		$expected = '/Formula for library_test_no_plugin not created/';
+		$result = $this->library->response->error;
+		$this->assertPattern($expected, $result);
+
+		umask(0);
+		rmdir($path);
+	}
+
+	public function testPushNoName() {
+		$this->library->push();
+		$expected = 'please supply a name';
+		$result = $this->library->response->output;
 		$this->assertTrue($result);
 	}
 
@@ -286,6 +368,56 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->_cleanUp();
 	}
 
+	public function testNoInstall() {
+		$result = $this->library->install('library_test_plugin');
+		$expected = "library_test_plugin not installed.\n";
+		$result = $this->library->response->output;
+		$this->assertEqual($expected, $result);
+		$this->library->response->output = null;
+
+		$this->request->params += array('server' => null);
+		$library = new Library(array(
+			'request' => $this->request, 'classes' => $this->classes
+		));
+		$library->conf = $this->testConf;
+		$library->config('server', 'localhost');
+		$result = $this->library->install('library_not_a_plugin');
+		$expected = "library_not_a_plugin not found.\n";
+		$result = $this->library->response->error;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testNoInstalLab() {
+		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
+		$this->skipIf(
+			ini_get('phar.readonly') == '1',
+			'Skipped test {:class}::{:function}() - relies on {:class}::testPush()'
+		);
+		$this->library->path = $this->_testPath;
+		$result = $this->library->install('li3_lab');
+
+		$expected = "li3_lab not installed.\n";
+		$result = $this->library->response->output;
+		$this->assertEqual($expected, $result);
+
+		$result = is_dir($this->_testPath . '/li3_lab');
+		$this->assertFalse($result);
+		$this->_cleanUp();
+	}
+
+	public function testInstallDocs() {
+		$this->skipIf(strpos(shell_exec('git --version'), 'git version') === false,
+			'The git is not installed.'
+		);
+		$this->library->path = $this->_testPath;
+		$result = $this->library->install('li3_docs');
+		$this->assertTrue($result);
+
+		$result = is_dir($this->_testPath . '/li3_docs');
+		$this->assertTrue($result);
+		$this->_cleanUp();
+	}
+
 	public function testFind() {
 		$this->library->find();
 
@@ -304,7 +436,18 @@ Version: 1.0
 Created: 2009-11-30
 
 test;
-		$result = $this->library->response->output;
+	}
+
+	public function testFindNotFound() {
+		$this->request->params += array('server' => null);
+		$library = new Library(array(
+			'request' => $this->request, 'classes' => $this->classes
+		));
+		$library->conf = $this->testConf;
+		$library->config('server', 'localhost');
+		$library->find();
+		$expected = "No plugins at localhost\n";
+		$result = $library->response->output;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -450,6 +593,74 @@ test;
 		Phar::unlinkArchive($this->_testPath . '/library_test_plugin.phar');
 		Phar::unlinkArchive($this->_testPath . '/library_test_plugin.phar.gz');
 		$this->_cleanUp();
+	}
+
+
+	public function testPushNotValid() {
+		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
+		$this->skipIf(
+			ini_get('phar.readonly') == '1',
+			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+		);
+		$this->library->library = 'library_plugin_test';
+		$path = $this->_testPath;
+
+		$expected = true;
+		$result = $this->library->extract('plugin', "{$path}/library_test_plugin");
+		$this->assertEqual($expected, $result);
+		$this->library->response->output = null;
+
+		$file = $this->_testPath . '/library_test_plugin/config/library_test_plugin.json';
+		$result = file_put_contents(
+			$file,
+			json_encode(array(
+				'name' => 'library_test_plugin',
+				'version' => '1.0',
+				'summary' => 'something',
+			))
+		);
+		$this->assertTrue($result);
+
+		$result = $this->library->archive(
+			$this->_testPath . '/library_test_plugin',
+			$this->_testPath . '/library_test_plugin'
+		);
+		$this->assertTrue($result);
+
+		$expected = "library_test_plugin.phar.gz created in {$this->_testPath} from ";
+		$expected .= "{$this->_testPath}/library_test_plugin\n";
+		$result = $this->library->response->output;
+		$this->assertEqual($expected, $result);
+
+		$result = file_exists($this->_testPath . '/library_test_plugin.phar.gz');
+		$this->assertTrue($result);
+		$this->library->response->output = null;
+
+		$result = $this->library->push('library_test_plugin');
+		$this->assertFalse($result);
+
+		$expected = "/The forumla for library_test_plugin is not valid/";
+		$result = $this->library->response->error;
+		$this->assertPattern($expected, $result);
+
+		$result = is_dir($this->_testPath . '/library_test_plugin');
+		$this->assertTrue($result);
+
+		Phar::unlinkArchive($this->_testPath . '/library_test_plugin.phar');
+		Phar::unlinkArchive($this->_testPath . '/library_test_plugin.phar.gz');
+		$this->_cleanUp();
+	}
+
+	public function testNoArchive() {
+		$result = $this->library->archive(
+			$this->_testPath . '/library_test_plugin',
+			$this->_testPath . '/library_test_plugin'
+		);
+		$this->assertFalse($result);
+
+		$expected = "/Could not create archive from/";
+		$result = $this->library->response->error;
+		$this->assertPattern($expected, $result);
 	}
 }
 

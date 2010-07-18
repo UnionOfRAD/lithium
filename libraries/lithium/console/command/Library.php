@@ -9,6 +9,7 @@
 namespace lithium\console\command;
 
 use \Phar;
+use \Exception;
 use \RuntimeException;
 use \lithium\core\Libraries;
 
@@ -100,6 +101,15 @@ class Library extends \lithium\console\Command {
 	);
 
 	/**
+	 * Auto configuration properties.
+	 *
+	 * @var array
+	 */
+	protected $_autoConfig = array(
+		'classes' => 'merge', 'env', 'detectors' => 'merge', 'base', 'type', 'stream'
+	);
+
+	/**
 	 * Initialize _settings from `--conf`.
 	 *
 	 * Throws an exception if the command is  initialized without a request object
@@ -110,14 +120,11 @@ class Library extends \lithium\console\Command {
 	 */
 	protected function _init() {
 		parent::_init();
-
-		if (!isset($this->request)) {
-			throw new RuntimeException("Command has been initialized without a request object");
+		if ($this->server) {
+			$this->_settings['servers'][$this->server] = true;
 		}
-
-		$this->_settings['servers'][$this->server] = true;
 		if (file_exists($this->conf)) {
-			$this->_settings += json_decode($this->conf, true);
+			$this->_settings += (array) json_decode($this->conf, true);
 		}
 		$this->path = $this->_toPath($this->path ?: 'libraries');
 		$this->force = $this->f ? $this->f : $this->force;
@@ -133,7 +140,7 @@ class Library extends \lithium\console\Command {
 	 */
 	public function config($key = null, $value = null, $options = true) {
 		if (empty($key) || empty($value)) {
-			return false;
+			return $this->_settings;
 		}
 		switch($key) {
 			case 'server':
@@ -178,7 +185,7 @@ class Library extends \lithium\console\Command {
 		if (file_exists($from)) {
 			try {
 				$archive = new Phar($from);
-			} catch (\Exception $e) {
+			} catch (Exception $e) {
 				$this->error($e->getMessage());
 				return false;
 			}
@@ -227,13 +234,16 @@ class Library extends \lithium\console\Command {
 		}
 		try {
 	 		$archive = new Phar("{$path}.phar");
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			$this->error($e->getMessage());
 			return false;
 		}
+		$result = null;
 		$from = $this->_toPath($from);
-		$result = (boolean) $archive->buildFromDirectory($from, $this->filter);
 
+		if (is_dir($from)) {
+			$result = (boolean) $archive->buildFromDirectory($from, $this->filter);
+		}
 		if (file_exists("{$path}.phar.gz")) {
 			if (!$this->force) {
 				$this->error(basename($path) . ".phar.gz already exists in " . dirname($path));
@@ -272,16 +282,13 @@ class Library extends \lithium\console\Command {
 				continue;
 			}
 			foreach ((array) $results[$server] as $data) {
-				$header = "{$server} > {$data->name}";
-
-				if (!$header) {
-					$header = "{$server} > {$data->class}";
-				}
+				$name = isset($data->class) ? $data->class : $data->name;
+				$header = "{$server} > {$name}";
 				$out = array(
 					"{$data->summary}",
-					"Version: {$data->version}", "Created: {$data->created}",
+					"Version: {$data->version}",
+					"Created: {$data->created}",
 				);
-
 				$this->header($header);
 				$this->out(array_filter($out));
 			}
@@ -302,20 +309,19 @@ class Library extends \lithium\console\Command {
 			$service = $this->_instance('service', array(
 				'host' => $server, 'port' => $this->port
 			));
-			$results[$server] = json_decode($service->get("lab/{$name}.json"));
-		}
-		if (count($results)) {
-			$plugin = current($results);
+			if ($plugin = json_decode($service->get("lab/{$name}.json"))) {
+				break;
+			}
 		}
 		if (empty($plugin->sources)) {
-			$this->error("{$name} not found");
+			$this->error("{$name} not found.");
 			return false;
 		}
 		$hasGit = function () {
-			return (strpos(`git --version`, '1.6') !== false);
+			return (strpos(shell_exec('git --version'), 'git version') !== false);
 		};
 		foreach ((array) $plugin->sources as $source) {
-			if (strpos($source, 'phar.gz') !== false) {
+			if (strpos($source, 'phar.gz') !== false && file_exists($source)) {
 				$written = file_put_contents(
 					"{$this->path}/{$plugin->name}.phar.gz", file_get_contents($source)
 				);
@@ -324,14 +330,16 @@ class Library extends \lithium\console\Command {
 					return false;
 				}
 				$this->out("{$plugin->name}.phar.gz saved to {$this->path}");
+
 				try {
 					$archive = new Phar("{$this->path}/{$plugin->name}.phar.gz");
+
 					if ($archive->extractTo("{$this->path}/{$plugin->name}")) {
 						$this->out("{$plugin->name} installed to {$this->path}/{$plugin->name}");
 						$this->out("Remember to update the bootstrap.");
 						return true;
 					}
-				} catch (\Exception $e) {
+				} catch (Exception $e) {
 					$this->error($e->getMessage());
 				}
 			}
@@ -339,8 +347,13 @@ class Library extends \lithium\console\Command {
 
 			if (!empty($url['scheme']) && $url['scheme'] == 'git' && $hasGit()) {
 				$result = shell_exec(
-					"cd {$this->path} && git clone {$source}"
+					"cd {$this->path} && git clone {$source} {$plugin->name}"
 				);
+				if (is_dir("{$this->path}/{$plugin->name}")) {
+					$this->out("{$plugin->name} installed to {$this->path}/{$plugin->name}");
+					$this->out("Remember to update the bootstrap.");
+					return true;
+				}
 			}
 		}
 		$this->out("{$plugin->name} not installed.");
@@ -359,8 +372,9 @@ class Library extends \lithium\console\Command {
 		}
 		$result = false;
 		$path = $this->_toPath($name);
-		$name = basename($name);
+		$name = basename($path);
 		$formula = "{$path}/config/{$name}.json";
+
 		$data = array();
 
 		if (file_exists($formula)) {
@@ -373,7 +387,7 @@ class Library extends \lithium\console\Command {
 			$data['summary'] = $this->in("please supply a summary");
 		}
 		if (file_exists($path) && !file_exists($formula)) {
-			$data = json_encode($data + array(
+			$defaults = array(
 				'name' => $name, 'version' => '0.1',
 				'summary' => "a plugin called {$name}",
 				'maintainers' => array(array(
@@ -384,14 +398,15 @@ class Library extends \lithium\console\Command {
 					'install' => array(), 'update' => array(), 'remove' => array(),
 				),
 				'requires' => array()
-			));
+			);
+			$data += $defaults;
+
 			if (!is_dir(dirname($formula)) && !mkdir(dirname($formula), 0755, true)) {
 				$this->error("Formula for {$name} not created in {$path}");
 				return false;
 			}
-			$result = file_put_contents($formula, $data);
 		}
-		if ($result) {
+		if (is_dir(dirname($formula)) && file_put_contents($formula, json_encode($data))) {
 			$this->out("Formula for {$name} created in {$path}.");
 			return true;
 		}
@@ -484,7 +499,7 @@ class Library extends \lithium\console\Command {
 	 * @return string
 	 */
 	protected function _toPath($name = null) {
-		if ($name[0] === '/') {
+		if ($name && $name[0] === '/') {
 			return $name;
 		}
 		$library = Libraries::get($name);
