@@ -266,6 +266,8 @@ class ModelTest extends \lithium\test\Unit {
 			'tag_id' => 5,
 			'created' => '2009-06-16 10:00:00'
 		));
+		$this->assertEqual('id', MockPost::key());
+		$this->assertEqual(array('id' => 5), MockPost::key(5));
 		$this->assertEqual(array('post_id' => 2, 'tag_id' => 5), $result);
 	}
 
