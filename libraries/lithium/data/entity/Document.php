@@ -298,7 +298,7 @@ class Document extends \lithium\data\Entity {
 			return $this->_setNested($name, $value);
 		}
 
-		if ($this->_isComplexType($value) && !$value instanceof Document) {
+		if ($this->_isComplexType($value)) {
 			$value = $this->_relation('entity', $name, $value);
 		}
 		$this->_data[$name] = $value;
@@ -417,8 +417,15 @@ class Document extends \lithium\data\Entity {
 	 *         array of scalar values, otherwise returns `true`.
 	 */
 	protected function _isComplexType($data) {
-		if (is_object($data) && (array) $data === array()) {
-			return false;
+		if (is_object($data)) {
+			foreach ($this->_classes as $class) {
+				if (is_a($data, $class)) {
+					return false;
+				}
+			}
+			if ((array) $data === array()) {
+				return false;
+			}
 		}
 		if (is_scalar($data) || !$data) {
 			return false;
