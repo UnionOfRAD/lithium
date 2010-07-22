@@ -319,7 +319,9 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function testArbitraryMethodCalls() {
 		$config = $this->_testConfig;
-		$this->assertEqual("[{$config['host']}:{$config['port']}]", $this->db->__toString());
+		$result = $this->db->__toString();
+		$this->assertTrue(strpos($result, $config['host']) !== false);
+		$this->assertTrue(strpos($result, $config['port']) !== false);
 		$this->assertTrue(is_array($this->db->listDBs()));
 	}
 
