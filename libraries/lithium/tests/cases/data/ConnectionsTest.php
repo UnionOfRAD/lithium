@@ -43,6 +43,9 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$expected = $this->config + array('type' => 'database');
 		$this->assertEqual($expected, $result);
 
+		$message = 'Your PHP was not compiled with the MySQL extension';
+		$this->skipIf(!extension_loaded('mysql'), $message);
+
 		$this->expectException('/mysql_get_server_info/');
 		$this->expectException('/mysql_select_db/');
 		$this->expectException('/mysql_connect/');
@@ -64,6 +67,9 @@ class ConnectionsTest extends \lithium\test\Unit {
 		Connections::add('conn-test-2', $this->config);
 		$this->assertEqual(array('conn-test', 'conn-test-2'), Connections::get());
 
+		$message = 'Your PHP was not compiled with the MySQL extension';
+		$this->skipIf(!extension_loaded('mysql'), $message);
+
 		$expected = $this->config + array('type' => 'database', 'filters' => array());
 		$this->assertEqual($expected, Connections::get('conn-test', array('config' => true)));
 
@@ -76,6 +82,9 @@ class ConnectionsTest extends \lithium\test\Unit {
 	public function testConnectionAutoInstantiation() {
 		Connections::add('conn-test', $this->config);
 		Connections::add('conn-test-2', $this->config);
+
+		$message = 'Your PHP was not compiled with the MySQL extension';
+		$this->skipIf(!extension_loaded('mysql'), $message);
 
 		$this->expectException('/mysql_get_server_info/');
 		$this->expectException('/mysql_select_db/');
