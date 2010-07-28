@@ -145,8 +145,9 @@ class Extract extends \lithium\console\Command {
 			$name = 'runtime' . uniqid();
 			$configs[$name] = compact('adapter', 'path', 'scope');
 			Catalog::config($configs);
+		} else {
+			$scope = $this->in('Scope:', array('default' => $this->scope));
 		}
-		$scope = $configs[$name]['scope'] ?: $this->in('Scope:', array('default' => $this->scope));
 
 		$message = array();
 		$message[] = 'The template is now ready to be saved.';
