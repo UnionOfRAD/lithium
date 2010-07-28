@@ -154,7 +154,7 @@ class Extract extends \lithium\console\Command {
 		$this->out($message);
 		$this->out();
 
-		if ($this->in('Save?', array('choices' => array('y', 'n'), 'default' => 'n')) != 'y') {
+		if ($this->in('Save?', array('choices' => array('y', 'n'), 'default' => 'y')) != 'y') {
 			$this->out('Aborting upon user request.');
 			$this->stop(1);
 		}
