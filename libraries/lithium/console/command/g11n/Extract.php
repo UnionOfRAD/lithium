@@ -91,7 +91,7 @@ class Extract extends \lithium\console\Command {
 			$scope = $this->in('Scope:', array(
 				'default' => $this->scope
 			));
-			$name =	'runtime' . uniqid();
+			$name = 'runtime' . uniqid();
 			$configs[$name] = compact('adapter', 'path', 'scope');
 		}
 		Catalog::config($configs);
@@ -142,7 +142,7 @@ class Extract extends \lithium\console\Command {
 			$scope = $this->in('Scope:', array(
 				'default' => $this->scope
 			));
-			$name =	'runtime' . uniqid();
+			$name = 'runtime' . uniqid();
 			$configs[$name] = compact('adapter', 'path', 'scope');
 			Catalog::config($configs);
 		}

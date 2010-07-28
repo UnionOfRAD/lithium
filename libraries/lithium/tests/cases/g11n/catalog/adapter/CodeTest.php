@@ -132,7 +132,6 @@ EOD;
 		$result = isset($results[32203]);
 		$this->assertFalse($result);
 
-
 		$expected = array('singular' => 'invalid 1');
 		$result = $results['invalid 1']['ids'];
 		$this->assertEqual($expected, $result);
