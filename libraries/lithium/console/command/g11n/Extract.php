@@ -42,7 +42,7 @@ class Extract extends \lithium\console\Command {
 			return 1;
 		}
 		$count = count($data);
-		$this->out("Yielded {$count} items.");
+		$this->out("Yielded {$count} item(s).");
 		$this->out();
 
 		$this->header('Message Template Creation');
