@@ -11,37 +11,6 @@ namespace lithium\tests\cases\g11n\catalog\adapter;
 use \Exception;
 use \lithium\g11n\catalog\adapter\Code;
 
-if (false) {
-	$t('simple 1');
-
-	$t('options 1', null, array('locale' => 'en'));
-
-	$t('replace 1 {:a}', array('a' => 'b'));
-
-	$t($test['invalid']);
-	$t(32203);
-	$t('invalid 1', $test['invalid']);
-	$t('invalid 2', 32203);
-	$t('invalid 3', 'invalid 3b');
-
-	$t('escaping\n1');
-	$t("escaping\n2");
-	$t("escaping\r\n3");
-	$t('escaping
-	4');
-
-	$tn('singular simple 1', 'plural simple 1', 3);
-	$tn('singular simple 2', 'plural simple 2');
-
-	$t('mixed 1');
-	$tn('mixed 1', 'plural mixed 1', 3);
-
-	$t('mixed 2');
-	$tn('mixed 2', 'plural mixed 2', 3);
-	$t('mixed 2');
-	$t('plural mixed 2');
-}
-
 class CodeTest extends \lithium\test\Unit {
 
 	public $adapter;
@@ -49,8 +18,53 @@ class CodeTest extends \lithium\test\Unit {
 	protected $_path;
 
 	public function setUp() {
-		$this->_path = $path = __DIR__;
+		$this->_path = $path = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->skipIf(!is_writable($this->_path), "{$this->_path} is not writable.");
+
 		$this->adapter = new Code(compact('path'));
+
+		$file = "{$this->_path}/a.php";
+		$data = <<<'EOD'
+<?php
+$t('simple 1');
+
+$t('options 1', null, array('locale' => 'en'));
+
+$t('replace 1 {:a}', array('a' => 'b'));
+
+$t($test['invalid']);
+$t(32203);
+$t('invalid 1', $test['invalid']);
+$t('invalid 2', 32203);
+$t('invalid 3', 'invalid 3b');
+
+$t('escaping\n1');
+$t("escaping\n2");
+$t("escaping\r\n3");
+$t('escaping
+	4');
+
+$tn('singular simple 1', 'plural simple 1', 3);
+$tn('singular simple 2', 'plural simple 2');
+
+$t('mixed 1');
+$tn('mixed 1', 'plural mixed 1', 3);
+
+$t('mixed 2');
+$tn('mixed 2', 'plural mixed 2', 3);
+$t('mixed 2');
+$t('plural mixed 2');
+?>
+EOD;
+		file_put_contents($file, $data);
+
+		$file = "{$this->_path}/a.html.php";
+		$data = <<<'EOD'
+<?=$t('simple 1 short'); ?>
+
+<?=$tn('singular simple 1 short', 'plural simple 1 short', 3); ?>
+EOD;
+		file_put_contents($file, $data);
 	}
 
 	public function tearDown() {
@@ -82,6 +96,14 @@ class CodeTest extends \lithium\test\Unit {
 
 		$expected = array('singular' => 'simple 1');
 		$result = $results['simple 1']['ids'];
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testReadMessageTemplateTSimpleShort() {
+		$results = $this->adapter->read('messageTemplate', 'root', null);
+
+		$expected = array('singular' => 'simple 1 short');
+		$result = $results['simple 1 short']['ids'];
 		$this->assertEqual($expected, $result);
 	}
 
@@ -161,6 +183,18 @@ class CodeTest extends \lithium\test\Unit {
 
 		$expected = 'plural simple 2';
 		$result = $results['singular simple 2']['ids']['plural'];
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testReadMessageTemplateTnSimpleShort() {
+		$results = $this->adapter->read('messageTemplate', 'root', null);
+
+		$expected = 'singular simple 1 short';
+		$result = $results['singular simple 1 short']['ids']['singular'];
+		$this->assertEqual($expected, $result);
+
+		$expected = 'plural simple 1 short';
+		$result = $results['singular simple 1 short']['ids']['plural'];
 		$this->assertEqual($expected, $result);
 	}
 

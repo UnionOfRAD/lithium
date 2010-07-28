@@ -11,6 +11,7 @@ namespace lithium\g11n\catalog\adapter;
 use \Exception;
 use \RecursiveIteratorIterator;
 use \RecursiveDirectoryIterator;
+use \lithium\template\view\Compiler;
 
 /**
  * The `Code` class is an adapter which treats files containing code as just another source
@@ -109,6 +110,7 @@ class Code extends \lithium\g11n\catalog\Adapter {
 	 */
 	protected function _parsePhp($file) {
 		$contents = file_get_contents($file);
+		$contents = Compiler::compile($contents);
 
 		$defaults = array(
 			'ids' => array(),
