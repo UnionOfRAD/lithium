@@ -96,10 +96,14 @@ class Extract extends \lithium\console\Command {
 		}
 		Catalog::config($configs);
 
-		return Catalog::read('messageTemplate', 'root', compact('name') + array(
-			'scope' => $configs[$name]['scope'],
-			'lossy' => false
-		));
+		try {
+			return Catalog::read($name, 'messageTemplate', 'root', array(
+				'scope' => $configs[$name]['scope'],
+				'lossy' => false
+			));
+		} catch (Exception $e) {
+			return false;
+		}
 	}
 
 	/**
@@ -154,7 +158,11 @@ class Extract extends \lithium\console\Command {
 			$this->out('Aborting upon user request.');
 			$this->stop(1);
 		}
-		return Catalog::write('messageTemplate', 'root', $data, compact('name', 'scope'));
+		try {
+			return Catalog::write($name, 'messageTemplate', 'root', $data, compact('scope'));
+		} catch (Exception $e) {
+			return false;
+		}
 	}
 }
 
