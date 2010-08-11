@@ -88,6 +88,23 @@ class HelperTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testAttributeMinimization() {
+		$attributes = array('selected' => 1);
+		$expected = ' selected="selected"';
+		$result = $this->helper->testAttributes($attributes);
+		$this->assertEqual($expected, $result);
+
+		$attributes = array('selected' => true);
+		$expected = ' selected="selected"';
+		$result = $this->helper->testAttributes($attributes);
+		$this->assertEqual($expected, $result);
+
+		$attributes = array('selected' => 'true');
+		$expected = ' selected="true"';
+		$result = $this->helper->testAttributes($attributes);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testRender() {
 		$params = array(
 			'context' => new MockRenderer(),
