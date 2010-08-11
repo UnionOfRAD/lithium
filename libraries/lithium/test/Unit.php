@@ -738,18 +738,19 @@ class Unit extends \lithium\core\Object {
 			);
 		}
 		$data = array();
-		$isObject = false;
 
-		if (is_object($expected)) {
-			$isObject = true;
-			$expected = (array) $expected;
-			$result = (array) $result;
-		}
-
-		if (is_array($expected)) {
+		if (!is_scalar($expected)) {
 			foreach ($expected as $key => $value) {
+				$isObject = false;
+
+				if (is_object($expected)) {
+					$isObject = true;
+					$expected = (array) $expected;
+					$result = (array) $result;
+				}
 				$check = array_key_exists($key, $result) ? $result[$key] : array();
 				$newTrace = "{$trace}[{$key}]";
+
 				if ($isObject) {
 					$newTrace = ($trace) ? "{$trace}->{$key}" : $key;
 					$expected = (object) $expected;
@@ -791,10 +792,10 @@ class Unit extends \lithium\core\Object {
 			if ($expected === $result) {
 				return true;
 			}
-		} else {
-			if ($expected == $result) {
-				return true;
-			}
+			return compact('trace', 'expected', 'result');
+		}
+		if ($expected == $result) {
+			return true;
 		}
 		return compact('trace', 'expected', 'result');
 	}

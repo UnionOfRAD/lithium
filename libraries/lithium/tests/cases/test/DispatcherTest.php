@@ -53,17 +53,21 @@ class DispatcherTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = new Collection(array(
-			'data' => array(new \lithium\tests\mocks\test\cases\MockTest())
+			'data' => array(
+				new \lithium\tests\mocks\test\cases\MockSkipThrowsException(),
+				new \lithium\tests\mocks\test\cases\MockTest(),
+				new \lithium\tests\mocks\test\cases\MockTestErrorHandling()
+			)
 		));
 		$result = $report->group->tests();
 		$this->assertEqual($expected, $result);
 
 		$expected = 'testNothing';
-		$result = $report->results['group'][0][0]['method'];
+		$result = $report->results['group'][1][0]['method'];
 		$this->assertEqual($expected, $result);
 
 		$expected = 'pass';
-		$result = $report->results['group'][0][0]['result'];
+		$result = $report->results['group'][1][0]['result'];
 		$this->assertEqual($expected, $result);
 	}
 }

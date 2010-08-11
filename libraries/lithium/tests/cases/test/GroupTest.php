@@ -26,7 +26,11 @@ class GroupTest extends \lithium\test\Unit {
 		$group = new Group(compact('data'));
 
 		$expected = new Collection(array(
-			'data' => array(new \lithium\tests\mocks\test\cases\MockTest())
+			'data' => array(
+				new \lithium\tests\mocks\test\cases\MockSkipThrowsException(),
+				new \lithium\tests\mocks\test\cases\MockTest(),
+				new \lithium\tests\mocks\test\cases\MockTestErrorHandling()
+			)
 		));
 		$result = $group->tests();
 		$this->assertEqual($expected, $result);
