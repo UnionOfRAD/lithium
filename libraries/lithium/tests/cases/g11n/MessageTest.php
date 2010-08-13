@@ -284,7 +284,7 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testCaching() {
 		$data = array('catalog' => 'Katalog');
-		Catalog::write('message', 'de', $data, array('name' => 'runtime', 'scope' => 'foo'));
+		Catalog::write('runtime', 'message', 'de', $data, array('scope' => 'foo'));
 
 		$this->assertFalse(Message::cache());
 
