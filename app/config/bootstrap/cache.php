@@ -22,7 +22,7 @@ if (PHP_SAPI === 'cli') {
 /**
  * If APC is not available and the cache directory is not writeable, bail out.
  */
-if (!$apcEnabled = Apc::enabled() && !is_writable(LITHIUM_APP_PATH . '/resources/tmp/cache')) {
+if (!($apcEnabled = Apc::enabled()) && !is_writable(LITHIUM_APP_PATH . '/resources/tmp/cache')) {
 	return;
 }
 
