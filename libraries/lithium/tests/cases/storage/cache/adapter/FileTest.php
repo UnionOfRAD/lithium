@@ -14,6 +14,14 @@ use \SplFileInfo;
 class FileTest extends \lithium\test\Unit {
 
 	/**
+	 * Checks whether the 'empty' file exists in `app/resources/tmp/cache` and, if so, ensures
+	 * that it is restored at the end of the testing cycle.
+	 *
+	 * @var string
+	 */
+	protected $_hasEmpty = true;
+
+	/**
 	 * Skip the test if the default File adapter read/write path
 	 * is not read/write-able.
 	 *
@@ -27,10 +35,15 @@ class FileTest extends \lithium\test\Unit {
 	}
 
 	public function setUp() {
+		$this->_hasEmpty = file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/empty");
 		$this->File = new File();
 	}
 
 	public function tearDown() {
+		if ($this->_hasEmpty) {
+			touch(LITHIUM_APP_PATH . "/resources/tmp/cache/empty");
+			touch(LITHIUM_APP_PATH . "/resources/tmp/cache/templates/empty");
+		}
 		unset($this->File);
 	}
 

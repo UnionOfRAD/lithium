@@ -8,8 +8,9 @@
 
 namespace lithium\storage\cache\adapter;
 
-use \SplFileInfo;
-use \DirectoryIterator;
+use SplFileInfo;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 
 /**
  * A minimal file-based cache.
@@ -171,11 +172,12 @@ class File extends \lithium\core\Object {
 	 * @return mixed True on successful clear, false otherwise.
 	 */
 	public function clear() {
-		$directory = new DirectoryIterator($this->_config['path']);
+		$base = new RecursiveDirectoryIterator($this->_config['path']);
+		$iterator = new RecursiveIteratorIterator($base);
 
-		foreach ($directory as $file) {
+		foreach ($iterator as $file) {
 			if ($file->isFile()) {
-				unlink($file->getPathInfo());
+				unlink($file->getPathName());
 			}
 		}
 		return true;
