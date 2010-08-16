@@ -264,15 +264,20 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testFindingClassesWithExclude() {
-		$expected = array();
 		$options = array(
 			'recursive' => true,
 			'filter' => false,
 			'exclude' => '/\w+Test$|webroot|index$|^app\\\\config|^\w+\\\\views\/|\./'
 		);
 		$classes = Libraries::find('lithium', $options);
-		$result = preg_grep('/\w+Test/', $classes);
-		$this->assertEqual($expected, $result);
+
+		$this->assertTrue(in_array('lithium\util\Set', $classes));
+		$this->assertTrue(in_array('lithium\util\Collection', $classes));
+		$this->assertTrue(in_array('lithium\core\Libraries', $classes));
+		$this->assertTrue(in_array('lithium\action\Dispatcher', $classes));
+
+		$this->assertFalse(in_array('lithium\tests\integration\data\SourceTest', $classes));
+		$this->assertFalse(preg_grep('/\w+Test$/', $classes));
 
 		$expected = Libraries::find('lithium', array(
 			'filter' => '/\w+Test$/', 'recursive' => true
