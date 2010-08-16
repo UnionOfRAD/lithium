@@ -21,13 +21,14 @@ class AffectedTest extends \lithium\test\Unit {
 
 	public function testSingleTest() {
 		$group = new Group();
-		$group->add('\lithium\tests\cases\g11n\CatalogTest');
+		$group->add('lithium\tests\cases\g11n\CatalogTest');
 		$this->report->group = $group;
 		$tests = Affected::apply($this->report, $group->tests());
 
 		$expected = array(
 			'lithium\tests\cases\g11n\CatalogTest',
-			'lithium\tests\cases\g11n\MessageTest'
+			'lithium\tests\cases\g11n\MessageTest',
+			'lithium\tests\cases\console\command\g11n\ExtractTest'
 		);
 		$result = $tests->map('get_class', array('collect' => false));
 		$this->assertEqual($expected, $result);
@@ -35,28 +36,27 @@ class AffectedTest extends \lithium\test\Unit {
 
 	public function testSingleTestWithSingleResult() {
 		$group = new Group();
-		$group->add('\lithium\tests\cases\core\StaticObjectTest');
+		$group->add('lithium\tests\cases\core\StaticObjectTest');
 		$this->report->group = $group;
 		$tests = Affected::apply($this->report, $group->tests());
 
-		$expected = array(
-			'lithium\tests\cases\core\StaticObjectTest'
-		);
+		$expected = array('lithium\tests\cases\core\StaticObjectTest');
 		$result = $tests->map('get_class', array('collect' => false));
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testMultipleTests() {
 		$group = new Group();
-		$group->add('\lithium\tests\cases\g11n\CatalogTest');
-		$group->add('\lithium\tests\cases\analysis\LoggerTest');
+		$group->add('lithium\tests\cases\g11n\CatalogTest');
+		$group->add('lithium\tests\cases\analysis\LoggerTest');
 		$this->report->group = $group;
 		$tests = Affected::apply($this->report, $group->tests());
 
 		$expected = array(
 			'lithium\tests\cases\g11n\CatalogTest',
 			'lithium\tests\cases\analysis\LoggerTest',
-			'lithium\tests\cases\g11n\MessageTest'
+			'lithium\tests\cases\g11n\MessageTest',
+			'lithium\tests\cases\console\command\g11n\ExtractTest'
 		);
 		$result = $tests->map('get_class', array('collect' => false));
 		$this->assertEqual($expected, $result);
@@ -64,14 +64,15 @@ class AffectedTest extends \lithium\test\Unit {
 
 	public function testCyclicDependency() {
 		$group = new Group();
-		$group->add('\lithium\tests\cases\g11n\CatalogTest');
-		$group->add('\lithium\tests\cases\g11n\MessageTest');
+		$group->add('lithium\tests\cases\g11n\CatalogTest');
+		$group->add('lithium\tests\cases\g11n\MessageTest');
 		$this->report->group = $group;
 		$tests = Affected::apply($this->report, $group->tests());
 
 		$expected = array(
 			'lithium\tests\cases\g11n\CatalogTest',
-			'lithium\tests\cases\g11n\MessageTest'
+			'lithium\tests\cases\g11n\MessageTest',
+			'lithium\tests\cases\console\command\g11n\ExtractTest'
 		);
 		$result = $tests->map('get_class', array('collect' => false));
 		$this->assertEqual($expected, $result);
