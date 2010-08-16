@@ -320,11 +320,23 @@ class ValidatorTest extends \lithium\test\Unit {
 		 * Strange, but valid addresses
 		 */
 		$this->assertTrue(Validator::isEmail('_somename@example.com'));
-		$this->assertTrue(Validator::isEmail('abc@example'));
 		$this->assertTrue(Validator::isEmail('abc@example.c'));
-		$this->assertTrue(Validator::isEmail('abc.@example.com'));
 		$this->assertTrue(Validator::isEmail('abc@example.com.a'));
 		$this->assertTrue(Validator::isEmail('abc@example.toolong'));
+
+		/**
+		 * Addresses which are invalid, but not caught until PHP 5.3.3.
+		 */
+		$this->assertFalse(
+			Validator::isEmail('abc@example'),
+			'Invalid email address passed validation. Please update to PHP 5.3.3 '.
+			'or higher to correct this.'
+		);
+		$this->assertFalse(
+			Validator::isEmail('abc.@example.com'),
+			'Invalid email address passed validation. Please update to PHP 5.3.3 '.
+			'or higher to correct this.'
+		);
 
 		/**
 		 * Invalid addresses
