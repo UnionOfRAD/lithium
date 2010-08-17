@@ -68,6 +68,32 @@ class Cache extends \lithium\core\Object {
 	}
 
 	/**
+	 * Initialization of the session.
+	 * Sets the session save handlers to this adapters' corresponding methods.
+	 *
+	 * @return void
+	 */
+	protected function _init() {
+		parent::_init();
+
+		foreach ($this->_defaults as $key => $config) {
+			if (isset($this->_config[$key])) {
+				if (ini_set("session.{$key}", $this->_config[$key]) === false) {
+					throw new RuntimeException("Could not initialize the session.");
+				}
+			}
+		}
+		$this->_model = Libraries::locate('models', $this->_config['model']);
+
+		session_set_save_handler(
+			array(&$this, '_open'), array(&$this, '_close'), array(&$this, '_read'),
+			array(&$this, '_write'), array(&$this, '_destroy'), array(&$this, '_gc')
+		);
+		register_shutdown_function('session_write_close');
+		$this->_startup();
+	}
+
+	/**
 	 * Uses PHP's default session handling to generate a unique session ID.
 	 *
 	 * @return string Returns the session ID for the current request, or `null` if the session is
@@ -93,6 +119,37 @@ class Cache extends \lithium\core\Object {
 			return $classes['cache']::write(
 				$config['config'], $params['key'], $params['value']
 			);
+		};
+	}
+
+	/**
+	 * Read a value from the session.
+	 *
+	 * @param null|string $key Key of the entry to be read. If no key is passed, all
+	 *        current session data is returned.
+	 * @param array $options Options array. Not used for this adapter method.
+	 * @return mixed Data in the session if successful, false otherwise.
+	 */
+	public static function read($key = null, array $options = array()) {
+		if (!static::isStarted() && !static::_start()) {
+			throw new RuntimeException("Could not start session.");
+		}
+		return function($self, $params, $chain) {
+			$key = $params['key'];
+
+			if (!$key) {
+				return $_SESSION;
+			}
+			if (strpos($key, '.') === false) {
+				return isset($_SESSION[$key]) ? $_SESSION[$key] : null;
+			}
+			$filter  = function($keys, $data) use (&$filter) {
+				$key = array_shift($keys);
+				if (isset($data[$key])) {
+					return (empty($keys)) ? $data[$key] : $filter($keys, $data[$key]);
+				}
+			};
+			return $filter(explode('.', $key), $_SESSION);
 		};
 	}
 }
