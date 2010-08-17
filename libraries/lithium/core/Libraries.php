@@ -193,7 +193,23 @@ class Libraries {
 	}
 
 	/**
-	 * Adds a class library from which files can be loaded
+	 * Adds a class library from which files can be loaded.
+	 *
+	 * The `add()` method registers a named library configuration to your application, and is used
+	 * to allow the framework to auto-load classes on an as-needed basis.
+	 *
+	 * ### Adding libraries to your application
+	 *
+	 * In Lithium, libraries represent the broadest unit of class organization in an application,
+	 * and _everything_ is a library; this includes your application, and the Lithium framework
+	 * itself. Libraries can also be other frameworks, like Solar, Zend Framework or PEAR, or
+	 * Lithium plugins, which are simply libraries that follow the same organizational standards
+	 * as Lithium applications.
+	 *
+	 * By convention, libraries are placed in the `libraries` directory inside your application, or
+	 * the root `libraries` directory at the top level of the default distribution (i.e. the one
+	 * that contains the `lithium` directory), however, you can change this on a case-by-case basis
+	 * using the `'path'` key to specify an absolute path to the library's directory.
 	 *
 	 * @param string $name Library name, i.e. `'app'`, `'lithium'`, `'pear'` or `'solar'`.
 	 * @param array $config Specifies where the library is in the filesystem, and how classes
@@ -276,7 +292,7 @@ class Libraries {
 	 * @return array Retrieved configuration.
 	 */
 	public static function get($name = null) {
-		if (empty($name)) {
+		if (!$name) {
 			return static::$_configurations;
 		}
 		if ($name === true) {
