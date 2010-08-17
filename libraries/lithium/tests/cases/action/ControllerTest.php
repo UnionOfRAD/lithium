@@ -160,7 +160,7 @@ class ControllerTest extends \lithium\test\Unit {
 	 */
 	public function testProtectedMethodAccessAttempt() {
 		$postsController = new MockPostsController();
-		$this->expectException('/^Private/');
+		$this->expectException('/^Attempted to invoke a private method/');
 		$result = $postsController->__invoke(null, array('action' => 'redirect'));
 
 		$this->assertEqual($result->body, null);
@@ -315,7 +315,7 @@ class ControllerTest extends \lithium\test\Unit {
 
 	public function testNonExistentFunction() {
 		$postsController = new MockPostsController();
-		$this->expectException("Action 'foo' not found!");
+		$this->expectException("Action 'foo' not found.");
 		$postsController(new Request(), array('action' => 'foo'));
 	}
 }
