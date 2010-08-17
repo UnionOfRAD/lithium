@@ -56,15 +56,36 @@ class Response extends \lithium\net\http\Response {
 	 * Disables HTTP caching for web clients and proxies.
 	 *
 	 * @return void
+	 * @deprecated
 	 */
 	public function disableCache() {
+		$this->cache(false);
+	}
+
+	/**
+	 * Controls how or whether the client browser and web proxies should cache this response.
+	 *
+	 * @param mixed $expires This can be a Unix timestamp indicating when the page expires, or a
+	 *              string indicating the relative time offset that a page should expire, i.e.
+	 *              `"+5 hours". Finally, `$expires` can be set to `false` to completely disable
+	 *              browser or proxy caching.
+	 * @return void
+	 */
+	public function cache($expires) {
+		if ($expires === false) {
+			$control = array("no-store, no-cache, must-revalidate", "post-check=0, pre-check=0");
+			$expiration = "Mon, 26 Jul 1997 05:00:00 GMT";
+			$lastModified = gmdate("D, d M Y H:i:s") . " GMT";
+			$pragma = 'no-cache';
+		} else {
+			$expires = intval($expires) ? $expires : strtotime($expires);
+		}
+
 		$this->headers(array(
-			'Expires' => "Mon, 26 Jul 1997 05:00:00 GMT",
-			'Last-Modified' => gmdate("D, d M Y H:i:s") . " GMT",
-			'Cache-Control' => array(
-				"no-store, no-cache, must-revalidate", "post-check=0, pre-check=0"
-			),
-			'Pragma' => 'no-cache'
+			'Expires' => $expiration,
+			'Last-Modified' => $lastModified,
+			'Cache-Control' => $control,
+			'Pragma' => $pragma,
 		));
 	}
 
