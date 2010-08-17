@@ -129,6 +129,7 @@ class Controller extends \lithium\core\Object {
 	protected function _init() {
 		parent::_init();
 		$this->request = $this->request ?: $this->_config['request'];
+		$media = $this->_classes['media'];
 
 		if ($this->request) {
 			$this->_render['type'] = $this->request->accepts() ?: 'html';
@@ -217,18 +218,13 @@ class Controller extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function render($options = array()) {
-		if (is_string($options)) {
-			$options = array('template' => $options);
-		}
-		$class = get_class($this);
+		$options = is_string($options) ? array('template' => $options) : $options;
 		$media = $this->_classes['media'];
+		$class = get_class($this);
+		$name = preg_replace('/Controller$/', '', substr($class, strrpos($class, '\\') + 1));
 
 		$defaults = array('status' => null, 'location' => false, 'data' => null, 'head' => false);
-		$options += $defaults + array(
-			'controller' => Inflector::underscore(
-				preg_replace('/Controller$/', '', substr($class, strrpos($class, '\\') + 1))
-			)
-		);
+		$options += $defaults + array('controller' => Inflector::underscore($name));
 
 		if ($options['data']) {
 			$this->set($options['data']);
