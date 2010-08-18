@@ -962,9 +962,9 @@ class Model extends \lithium\core\StaticObject {
 
 				array_map(
 					function($entity) use (&$result, $meta) {
-						$result[$entity->{$meta['key']}] = $entity->{$meta['title']};
+						$result[$entity[$meta['key']]] = $entity[$meta['title']];
 					},
-					$chain->next($self, $params, $chain)
+					$chain->next($self, $params, $chain)->data()
 				);
 				return $result;
 			},
