@@ -124,7 +124,7 @@ class MongoDb extends \lithium\data\Source {
 			'persistent' => true,
 			'login'      => null,
 			'password'   => null,
-			'host'       => 'localhost:27107',
+			'host'       => Mongo::DEFAULT_HOST . ':' . Mongo::DEFAULT_PORT,
 			'database'   => 'app',
 			'timeout'    => 100,
 			'schema'     => null,
