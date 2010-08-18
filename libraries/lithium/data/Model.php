@@ -959,13 +959,12 @@ class Model extends \lithium\core\StaticObject {
 			'list' => function($self, $params, $chain) {
 				$result = array();
 				$meta = $self::meta();
+				$name = $meta['key'];
 
-				array_map(
-					function($entity) use (&$result, $meta) {
-						$result[$entity[$meta['key']]] = $entity[$meta['title']];
-					},
-					$chain->next($self, $params, $chain)->data()
-				);
+				foreach ($chain->next($self, $params, $chain) as $entity) {
+					$key = $entity->{$name};
+					$result[is_scalar($key) ? $key : (string) $key] = $entity->{$meta['title']};
+				}
 				return $result;
 			},
 			'count' => function($self, $params, $chain) use ($_query) {
