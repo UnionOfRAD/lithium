@@ -35,11 +35,11 @@ class Response extends \lithium\net\http\Message {
 	public $type = 'text/html';
 
 	/**
-	 * Character Set.
+	 * Character encoding.
 	 *
 	 * @var string
 	 */
-	public $charset = 'UTF-8';
+	public $encoding = 'UTF-8';
 
 	/**
 	 * The body.
@@ -95,48 +95,48 @@ class Response extends \lithium\net\http\Message {
 		504 => 'Gateway Time-out'
 	);
 
-	public function __construct(array $config = array()) {
-		parent::__construct($config);
-		$body = $this->_config['body'];
+	protected function _init() {
+		parent::_init();
 
-		if (!is_string($body)) {
-			return;
+		if (is_string($body = $this->_config['body']) && strpos($body, "\n")) {
+			$body = $this->_parseBody($body);
 		}
-		$parts = explode("\r\n\r\n", $body);
 
-		if (empty($parts)) {
-			return;
-		}
-		$headers = str_replace("\r", "", explode("\n", array_shift($parts)));
-
-		if (array_filter($headers) == array()) {
-			return;
-		}
-		preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)\s+(.*)/i', array_shift($headers), $match);
-
-		if (empty($match)) {
-			return;
-		}
-		list($line, $version, $code, $message) = $match;
-		$this->version = $version;
-		$this->status = compact('code', 'message') + $this->status;
-		$this->protocol = "HTTP/{$this->version}";
-		$this->headers($headers);
-
-		if (!empty($this->headers['Content-Type'])) {
+		if (isset($this->headers['Content-Type'])) {
 			preg_match('/^(.*?);charset=(.+)/i', $this->headers['Content-Type'], $match);
 
-			if (!empty($match)) {
+			if ($match) {
 				$this->type = trim($match[1]);
-				$this->charset = trim($match[2]);
+				$this->encoding = strtoupper(trim($match[2]));
 			}
 		}
-		$body = implode("\r\n\r\n", $parts);
 
 		if (isset($this->headers['Transfer-Encoding'])) {
 			$body = $this->_decode($body);
 		}
-		$this->body = array($body);
+		$this->body = $body;
+	}
+
+	protected function _parseBody($body) {
+		if (!$parts = explode("\r\n\r\n", $body)) {
+			return;
+		}
+		$headers = str_replace("\r", "", explode("\n", array_shift($parts)));
+		$body = implode("\r\n\r\n", $parts);
+
+		if (array_filter($headers) == array()) {
+			return $body;
+		}
+		preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)\s+(.*)/i', array_shift($headers), $match);
+		$this->headers($headers);
+
+		if (!$match) {
+			return;
+		}
+		list($line, $this->version, $code, $message) = $match;
+		$this->status = compact('code', 'message') + $this->status;
+		$this->protocol = "HTTP/{$this->version}";
+		return $body;
 	}
 
 	/**
