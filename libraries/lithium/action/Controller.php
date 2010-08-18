@@ -265,10 +265,12 @@ class Controller extends \lithium\core\Object {
 		$router = $this->_classes['router'];
 		$defaults = array('location' => null, 'status' => 302, 'head' => true, 'exit' => true);
 		$options += $defaults;
-		$options['location'] = $options['location'] ?: $router::match($url, $this->request);
+		$params = compact('url', 'options');
 
-		$this->_filter(__METHOD__, compact('options'), function($self, $params, $chain) {
-			$self->render($params['options']);
+		$this->_filter(__METHOD__, $params, function($self, $params) use ($router) {
+			$options = $params['options'];
+			$location = $options['location'] ?: $router::match($params['url'], $self->request);
+			$self->render(compact('location') + $options);
 		});
 
 		if ($options['exit']) {
