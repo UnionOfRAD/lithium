@@ -48,6 +48,20 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testParsingContentTypeWithEncoding() {
+		$response = new Response(array('headers' => array(
+			'Content-Type' => 'text/xml;charset=UTF-8'
+		)));
+		$this->assertEqual('text/xml', $response->type);
+		$this->assertEqual('UTF-8', $response->encoding);
+
+		$response = new Response(array('headers' => array(
+			'Content-Type' => 'text/xml;charset=UTF-8'
+		)));
+		$this->assertEqual('text/xml', $response->type);
+		$this->assertEqual('UTF-8', $response->encoding);
+	}
+
 	public function testParseMessage() {
 		$body = join("\r\n", array(
 			'HTTP/1.1 200 OK',
@@ -62,10 +76,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual($body, (string) $response);
 
 		$body = 'Not a Message';
-		$expected = join("\r\n", array(
-			'HTTP/1.1 200 OK',
-			'', '', 'Not a Message'
-		));
+		$expected = join("\r\n", array('HTTP/1.1 200 OK', '', '', 'Not a Message'));
 		$response = new Response(compact('body'));
 		$this->assertEqual($expected, (string) $response);
 	}
@@ -96,7 +107,7 @@ class ResponseTest extends \lithium\test\Unit {
 				'Content-Type' => 'text/html;charset=UTF-8'
 			),
 			'type' => 'text/html',
-			'charset' => 'UTF-8',
+			'encoding' => 'UTF-8',
 			'body' => array('Test!')
 		);
 		$response = new Response($config);

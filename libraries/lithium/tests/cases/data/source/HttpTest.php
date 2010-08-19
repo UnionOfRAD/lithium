@@ -109,7 +109,7 @@ class HttpTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = 'UTF-8';
-		$result = $http->last->response->charset;
+		$result = $http->last->response->encoding;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -117,25 +117,20 @@ class HttpTest extends \lithium\test\Unit {
 		$http = new Http($this->_testConfig);
 		$result = $http->get('search.json');
 
-		$expected = 'HTTP/1.1';
 		$result = $http->last->response->protocol;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('HTTP/1.1', $result);
 
-		$expected = '200';
 		$result = $http->last->response->status['code'];
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('200', $result);
 
-		$expected = 'OK';
 		$result = $http->last->response->status['message'];
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('OK', $result);
 
-		$expected = 'text/html';
 		$result = $http->last->response->type;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('text/html', $result);
 
-		$expected = 'UTF-8';
-		$result = $http->last->response->charset;
-		$this->assertEqual($expected, $result);
+		$result = $http->last->response->encoding;
+		$this->assertEqual('UTF-8', $result);
 	}
 
 	public function testPost() {

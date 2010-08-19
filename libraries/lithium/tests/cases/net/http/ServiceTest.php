@@ -88,7 +88,7 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = 'UTF-8';
-		$result = $http->last->response->charset;
+		$result = $http->last->response->encoding;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -114,7 +114,7 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = 'UTF-8';
-		$result = $http->last->response->charset;
+		$result = $http->last->response->encoding;
 		$this->assertEqual($expected, $result);
 	}
 

@@ -88,7 +88,7 @@ class Http extends \lithium\data\Source {
 	protected function _init() {
 		$config = $this->_config;
 		unset($config['type']);
-		$this->connection = new $this->_classes['service']($config);
+		$this->connection = $this->_instance('service', $config);
 		parent::_init();
 	}
 
