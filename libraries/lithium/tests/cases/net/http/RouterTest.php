@@ -326,29 +326,35 @@ class RouterTest extends \lithium\test\Unit {
 	public function testRouteMatchAbsoluteUrl() {
 		Router::connect('/login', array('controller' => 'sessions', 'action' => 'add'));
 		$result = Router::match('Sessions::add', $this->request);
-		$this->assertEqual('/login', $result);
+		$base = $this->request->env('base');
+		$this->assertEqual($base . '/login', $result);
 
 		$result = Router::match('Sessions::add', $this->request, array('absolute' => true));
 		$base  = $this->request->env('HTTPS') ? 'https://' : 'http://';
 		$base .= $this->request->env('HTTP_HOST');
+		$base .= $this->request->env('base');
 		$this->assertEqual($base . '/login', $result);
 
 		$result = Router::match('Sessions::add',
 			$this->request, array('host' => 'test.local', 'absolute' => true)
 		);
 		$base = $this->request->env('HTTPS') ? 'https://' : 'http://';
-		$this->assertEqual($base . 'test.local/login', $result);
-
-		$result = Router::match('Sessions::add',
-			$this->request, array('scheme' => 'https://', 'absolute' => true)
-		);
-		$base = 'https://' . $this->request->env('HTTP_HOST');
+		$base .= 'test.local';
+		$base .= $this->request->env('base');
 		$this->assertEqual($base . '/login', $result);
 
 		$result = Router::match('Sessions::add',
 			$this->request, array('scheme' => 'https://', 'absolute' => true)
 		);
 		$base = 'https://' . $this->request->env('HTTP_HOST');
+		$base .= $this->request->env('base');
+		$this->assertEqual($base . '/login', $result);
+
+		$result = Router::match('Sessions::add',
+			$this->request, array('scheme' => 'https://', 'absolute' => true)
+		);
+		$base = 'https://' . $this->request->env('HTTP_HOST');
+		$base .= $this->request->env('base');
 		$this->assertEqual($base . '/login', $result);
 	}
 
@@ -454,7 +460,7 @@ class RouterTest extends \lithium\test\Unit {
 
 		$params = array('action' => 'edit');
 		$url = Router::match($params, $request); // Returns: '/posts/edit/1138'
-		$this->assertEqual('/posts/edit/1138', $url);
+		$this->assertEqual($this->request->env('base') . '/posts/edit/1138', $url);
 
 		Router::connect(
 			'/add/{:args}',
