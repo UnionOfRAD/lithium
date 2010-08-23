@@ -116,16 +116,22 @@ class MySql extends \lithium\data\source\Database {
 			return false;
 		}
 
-		if ($config['persistent']) {
+		if (!$config['persistent']) {
 			$this->connection = mysql_connect($host, $config['login'], $config['password'], true);
 		} else {
 			$this->connection = mysql_pconnect($host, $config['login'], $config['password']);
 		}
+		
+		if (!$this->connection) {
+			return false;
+		}
 
 		if (mysql_select_db($config['database'], $this->connection)) {
 			$this->_isConnected = true;
+		} else {
+			return false;
 		}
-
+		
 		if ($config['encoding']) {
 			$this->encoding($config['encoding']);
 		}
