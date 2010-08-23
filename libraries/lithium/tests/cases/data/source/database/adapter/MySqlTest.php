@@ -71,7 +71,7 @@ class MySqlTest extends \lithium\test\Unit {
 
 		$db = new MySQL(array(
 			'autoConnect' => false, 'encoding' => NULL,'persistent' => false,
-			'host' => 'garbage:3306', 'login' => 'garbage', 'password' => '',
+			'host' => 'localhost:3306', 'login' => 'garbage', 'password' => '',
 			'database' => 'garbage', 'init' => true
 		) + $this->_dbConfig);
 
