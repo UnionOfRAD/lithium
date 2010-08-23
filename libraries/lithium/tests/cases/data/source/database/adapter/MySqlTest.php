@@ -62,8 +62,21 @@ class MySqlTest extends \lithium\test\Unit {
 	 */
 	public function testDatabaseConnection() {
 		$db = new MySql(array('autoConnect' => false) + $this->_dbConfig);
+
 		$this->assertTrue($db->connect());
 		$this->assertTrue($db->isConnected());
+
+		$this->assertTrue($db->disconnect());
+		$this->assertFalse($db->isConnected());
+
+		$db = new MySQL(array(
+			'autoConnect' => false, 'encoding' => NULL,'persistent' => false,
+			'host' => 'garbage:3306', 'login' => 'garbage', 'password' => '',
+			'database' => 'garbage', 'init' => true
+		) + $this->_dbConfig);
+
+		$this->assertFalse($db->connect());
+		$this->assertFalse($db->isConnected());
 
 		$this->assertTrue($db->disconnect());
 		$this->assertFalse($db->isConnected());
