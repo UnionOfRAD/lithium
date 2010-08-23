@@ -79,16 +79,17 @@ class LibrariesTest extends \lithium\test\Unit {
 	public function testLibraryConfigAccess() {
 		$result = Libraries::get('lithium');
 		$expected = array(
-			'path' => str_replace('\\', '/', LITHIUM_LIBRARY_PATH) . '/lithium',
-			'loader' => 'lithium\\core\\Libraries::load',
+			'path' => str_replace('\\', '/', realpath(LITHIUM_LIBRARY_PATH)) . '/lithium',
 			'prefix' => 'lithium\\',
 			'suffix' => '.php',
-			'transform' => null,
-			'bootstrap' => null,
-			'defer' => true,
+			'loader' => 'lithium\\core\\Libraries::load',
 			'includePath' => false,
+			'transform' => null,
+			'bootstrap' => false,
+			'defer' => true,
 			'default' => false
 		);
+
 		$this->assertEqual($expected, $result);
 		$this->assertNull(Libraries::get('foo'));
 
@@ -118,11 +119,11 @@ class LibrariesTest extends \lithium\test\Unit {
 		$result = Libraries::get('app');
 		$this->assertTrue(empty($result));
 
-		$result = Libraries::add('lithium', array('bootstrap' => null) + $lithium);
+		$result = Libraries::add('lithium', array('bootstrap' => false) + $lithium);
 		$this->assertEqual($lithium, $result);
 
-		$result = Libraries::add('app', array('bootstrap' => null) + $app);
-		$this->assertEqual(array('bootstrap' => null) + $app, $result);
+		$result = Libraries::add('app', array('bootstrap' => false) + $app);
+		$this->assertEqual(array('bootstrap' => false) + $app, $result);
 	}
 
 	/**
