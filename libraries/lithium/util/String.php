@@ -18,42 +18,56 @@ use \Exception;
  *
  */
 class String {
+	/**
+	 * UUID related constants
+	 */
+	const clearVer = 15;  // 00001111  Clears all bits of version byte with AND
+	const version4 = 64;  // 01000000
+	const clearVar = 63;  // 00111111  Clears all relevant bits of variant byte with AND
+	const varRFC   = 128; // 10000000  The RFC 4122 variant (this variant)
+
+	/**
+	 * A file pointer towards urandom if available, else false
+	 *
+	 * @var resource|false
+	 */
+	private static $urandom;
 
 	/**
 	 * Generates a random UUID.
 	 *
-	 * @param mixed $context Used to determine the values for `'SERVER_ADDR'`, `'HOST'`
-	 *        and `'HOSTNAME'`. Either a closure which is passed the requested context values, an
-	 *        object with properties for each value or an array keyed by requested context value.
-	 * @return string An RFC 4122-compliant UUID.
+	 * @return string An RFC 4122-compliant, version 4 UUID.
 	 * @link http://www.ietf.org/rfc/rfc4122.txt
+	 * @link http://jkingweb.ca/code/php/lib.uuid/
 	 */
-	public static function uuid($context) {
-		$val = function($value) use ($context) {
-			switch (true) {
-				case is_object($context) && is_callable($context):
-					$result = $context($value);
-				break;
-				case is_object($context):
-					$result = isset($context->$value) ? $context->$value : null;
-				break;
-				case is_array($context):
-					$result = isset($context[$value]) ? $context[$value] : null;
-				break;
+	public static function uuid() {
+		// Use urandom if available, else fall back to mt_rand
+		if (!isset(self::$urandom)) {
+			self::$urandom = is_readable('/dev/urandom') ? fopen('/dev/urandom', 'rb') : false;
+		}
+
+		// Generate random fields
+		if (self::$urandom) {
+			$uuid = fread(self::$urandom, 16);
+		} else {
+			$uuid = '';
+			for ($i = 0; $i < 16; $i++) {
+				$uuid .= chr(mt_rand(0, 255));
 			}
-			return $result;
-		};
+		}
 
-		$node = static::_hostname($val);
-		$pid = function_exists('zend_thread_id') ? zend_thread_id() : getmypid();
-		$pid = (!$pid || $pid > 65535) ? mt_rand(0, 0xfff) | 0x4000 : $pid;
-		list($timeMid, $timeLow) = explode(' ', microtime());
+		// Set version
+		$uuid[6] = chr(ord($uuid[6]) & self::clearVer | self::version4);
 
-		return sprintf(
-			"%08x-%04x-%04x-%02x%02x-%04x%08x",
-			(integer) $timeLow, (integer) substr($timeMid, 2) & 0xffff, mt_rand(0, 0xfff) | 0x4000,
-			mt_rand(0, 0x3f) | 0x80, mt_rand(0, 0xff), $pid, $node
-		);
+		// Set variant
+		$uuid[8] = chr(ord($uuid[8]) & self::clearVar | self::varRFC);
+
+		// Return the uuid's string representation
+		return bin2hex(substr($uuid, 0, 4)) . '-'
+			. bin2hex(substr($uuid, 4, 2)) . '-'
+			. bin2hex(substr($uuid, 6, 2)) . '-'
+			. bin2hex(substr($uuid, 8, 2)) . '-'
+			. bin2hex(substr($uuid, 10, 6));
 	}
 
 	/**
@@ -342,46 +356,6 @@ class String {
 			$results[] = $buffer;
 		}
 		return empty($results) ? array() : array_map('trim', $results);
-	}
-
-	/**
-	 * Used by `String::uuid()` to get the hostname from request context data. Uses fallbacks to get
-	 * the current host name or IP, depending on what values are available.
-	 *
-	 * @param mixed $context An array (i.e. `$_SERVER`), `Request` object, or anonymous function
-	 *              containing host data.
-	 * @return string Returns the host name or IP for use in generating a UUID.
-	 */
-	protected static function _hostname($context) {
-		$node = $context('SERVER_ADDR');
-
-		if (strpos($node, ':') !== false) {
-			if (substr_count($node, '::')) {
-				$pad = str_repeat(':0000', 8 - substr_count($node, ':'));
-				$node = str_replace('::', $pad . ':', $node);
-			}
-			$node = explode(':', $node);
-			$ipv6 = '';
-
-			foreach ($node as $id) {
-				$ipv6 .= str_pad(base_convert($id, 16, 2), 16, 0, STR_PAD_LEFT);
-			}
-			$node = base_convert($ipv6, 2, 10);
-			$node = (strlen($node) < 38) ? null : crc32($node);
-		} elseif (empty($node)) {
-			$host = $context('HOSTNAME');
-			$host = $host ?: $context('HOST');
-
-			if (!empty($host)) {
-				$ip = gethostbyname($host);
-				$node = ($ip === $host) ? crc32($host) : $node = ip2long($ip);
-			}
-		} elseif ($node !== '127.0.0.1') {
-			$node = ip2long($node);
-		} else {
-			$node = crc32(rand());
-		}
-		return $node;
 	}
 }
 

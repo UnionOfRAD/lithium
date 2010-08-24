@@ -25,15 +25,12 @@ class Memory extends \lithium\core\Object {
 	/**
 	 * Obtain the session key.
 	 *
-	 * For this adapter, it is a UUID based on the SERVER_ADDR variable.
+	 * For this adapter, it is a UUID.
 	 *
 	 * @return string UUID.
 	 */
 	public static function key() {
-		$context = function ($value) use (&$config) {
-			return (isset($_SERVER['SERVER_ADDR'])) ? $_SERVER['SERVER_ADDR'] : '127.0.0.1';
-		};
-		return String::uuid($context);
+		return String::uuid();
 	}
 
 	/**

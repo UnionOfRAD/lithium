@@ -20,11 +20,11 @@ class StringTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testUuidGeneration() {
-		$result = String::uuid(new Request());
-		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/";
+		$result = String::uuid();
+		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[a-f0-9]{4}-[a-f0-9]{12}$/";
 		$this->assertPattern($pattern, $result);
 
-		$result = String::uuid($_SERVER);
+		$result = String::uuid();
 		$this->assertPattern($pattern, $result);
 	}
 
@@ -36,45 +36,15 @@ class StringTest extends \lithium\test\Unit {
 	public function testMultipleUuidGeneration() {
 		$check = array();
 		$count = 500;
-		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/";
+		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[a-f0-9]{4}-[a-f0-9]{12}$/";
 
 		for ($i = 0; $i < $count; $i++) {
-			$result = String::uuid($_SERVER);
+			$result = String::uuid();
 			$match = preg_match($pattern, $result);
 			$this->assertTrue($match);
 			$this->assertFalse(in_array($result, $check));
 			$check[] = $result;
 		}
-	}
-
-	/**
-	 * Tests generating a UUID with seed data provided by an anonymous function.
-	 *
-	 * @return void
-	 */
-	public function testGeneratingUuidWithCallback() {
-		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/";
-
-		$result = String::uuid(function($value) {
-			if ($value == 'SERVER_ADDR') {
-				return '::1';
-			}
-		});
-		$this->assertPattern($pattern, $result);
-
-		$result = String::uuid(function($value) {
-			if ($value == 'HOST') {
-				return '127.0.0.1';
-			}
-		});
-		$this->assertPattern($pattern, $result);
-
-		$result = String::uuid(function($value) {
-			if ($value == 'SERVER_ADDR') {
-				return '127.0.0.2';
-			}
-		});
-		$this->assertPattern($pattern, $result);
 	}
 
 	/**

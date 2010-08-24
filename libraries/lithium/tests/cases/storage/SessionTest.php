@@ -166,7 +166,7 @@ class SessionTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests querying session keys from the primary adapter.
-	 * The memory adapter returns a UUID based on a server variable for portability.
+	 * The memory adapter returns a UUID.
 	 *
 	 * @return void
 	 */
