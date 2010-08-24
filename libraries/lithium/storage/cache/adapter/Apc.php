@@ -70,7 +70,7 @@ class Apc extends \lithium\core\Object {
 		$expiry = ($expiry) ?: $this->_config['expiry'];
 
 		return function($self, $params, $chain) use ($expiry) {
-			$cachetime = strtotime($expiry);
+			$cachetime = strtotime($expiry) - date('U');
 			$key = $params['key'];
 
 			if (is_array($key)) {

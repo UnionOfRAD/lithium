@@ -42,7 +42,6 @@ class ApcTest extends \lithium\test\Unit {
 		$key = 'key';
 		$data = 'value';
 		$expiry = '+5 seconds';
-		$time = strtotime($expiry);
 
 		$closure = $this->Apc->write($key, $data, $expiry);
 		$this->assertTrue(is_callable($closure));
@@ -61,7 +60,6 @@ class ApcTest extends \lithium\test\Unit {
 		$key = 'another_key';
 		$data = 'more_data';
 		$expiry = '+1 minute';
-		$time = strtotime($expiry);
 
 		$closure = $this->Apc->write($key, $data, $expiry);
 		$this->assertTrue(is_callable($closure));
@@ -100,7 +98,6 @@ class ApcTest extends \lithium\test\Unit {
 
 	public function testWriteMulti() {
 		$expiry = '+1 minute';
-		$time = strtotime($expiry);
 		$key = array(
 			'key1' => 'data1',
 			'key2' => 'data2',
@@ -126,7 +123,6 @@ class ApcTest extends \lithium\test\Unit {
 	public function testSimpleRead() {
 		$key = 'read_key';
 		$data = 'read data';
-		$time = strtotime('+1 minute');
 
 		$result = apc_store($key, $data, 60);
 		$this->assertTrue($result);
@@ -144,7 +140,6 @@ class ApcTest extends \lithium\test\Unit {
 
 		$key = 'another_read_key';
 		$data = 'read data';
-		$time = strtotime('+1 minute');
 
 		$result = apc_store($key, $data, 60);
 		$this->assertTrue($result);
@@ -164,7 +159,6 @@ class ApcTest extends \lithium\test\Unit {
 
 	public function testReadMulti() {
 		$expiry = '+1 minute';
-		$time = strtotime($expiry);
 		$key = array(
 			'key1' => 'data1',
 			'key2' => 'data2',
@@ -204,7 +198,6 @@ class ApcTest extends \lithium\test\Unit {
 	public function testDelete() {
 		$key = 'delete_key';
 		$data = 'data to delete';
-		$time = strtotime('+1 minute');
 
 		$result = apc_store($key, $data, 60);
 		$this->assertTrue($result);
@@ -219,7 +212,6 @@ class ApcTest extends \lithium\test\Unit {
 
 	public function testDeleteMulti() {
 		$expiry = '+1 minute';
-		$time = strtotime($expiry);
 		$key = array(
 			'key1' => 'data1',
 			'key2' => 'data2',
@@ -246,7 +238,6 @@ class ApcTest extends \lithium\test\Unit {
 	public function testDeleteNonExistentKey() {
 		$key = 'delete_key';
 		$data = 'data to delete';
-		$time = strtotime('+1 minute');
 
 		$closure = $this->Apc->delete($key);
 		$this->assertTrue(is_callable($closure));
@@ -260,7 +251,6 @@ class ApcTest extends \lithium\test\Unit {
 		$key = 'write_read_key';
 		$data = 'write/read value';
 		$expiry = '+5 seconds';
-		$time = strtotime($expiry);
 
 		$closure = $this->Apc->write($key, $data, $expiry);
 		$this->assertTrue(is_callable($closure));
@@ -292,12 +282,11 @@ class ApcTest extends \lithium\test\Unit {
 	public function testClear() {
 		$key1 = 'key_clear_1';
 		$key2 = 'key_clear_2';
-		$time = strtotime('+1 minute');
 
-		$result = apc_store($key1, 'data that will no longer exist', $time);
+		$result = apc_store($key1, 'data that will no longer exist', 60);
 		$this->assertTrue($result);
 
-		$result = apc_store($key2, 'more dead data', $time);
+		$result = apc_store($key2, 'more dead data', 60);
 		$this->assertTrue($result);
 
 		$result = $this->Apc->clear();
@@ -308,11 +297,10 @@ class ApcTest extends \lithium\test\Unit {
 	}
 
 	public function testDecrement() {
-		$time = strtotime('+1 minute');
 		$key = 'decrement';
 		$value = 10;
 
-		$result = apc_store($key, $value, $time);
+		$result = apc_store($key, $value, 60);
 		$this->assertTrue($result);
 
 		$closure = $this->Apc->decrement($key);
@@ -330,11 +318,10 @@ class ApcTest extends \lithium\test\Unit {
 	}
 
 	public function testDecrementNonIntegerValue() {
-		$time = strtotime('+1 minute');
 		$key = 'non_integer';
 		$value = 'no';
 
-		$result = apc_store($key, $value, $time);
+		$result = apc_store($key, $value, 60);
 		$this->assertTrue($result);
 
 		$closure = $this->Apc->decrement($key);
@@ -351,11 +338,10 @@ class ApcTest extends \lithium\test\Unit {
 	}
 
 	public function testIncrement() {
-		$time = strtotime('+1 minute');
 		$key = 'increment';
 		$value = 10;
 
-		$result = apc_store($key, $value, $time);
+		$result = apc_store($key, $value, 60);
 		$this->assertTrue($result);
 
 		$closure = $this->Apc->increment($key);
@@ -373,11 +359,10 @@ class ApcTest extends \lithium\test\Unit {
 	}
 
 	public function testIncrementNonIntegerValue() {
-		$time = strtotime('+1 minute');
 		$key = 'non_integer_increment';
 		$value = 'yes';
 
-		$result = apc_store($key, $value, $time);
+		$result = apc_store($key, $value, 60);
 		$this->assertTrue($result);
 
 		$closure = $this->Apc->increment($key);
