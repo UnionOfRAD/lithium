@@ -298,7 +298,7 @@ class Validator extends \lithium\core\StaticObject {
 				}
 				return is_finite($value);
 			},
-			'uuid' => "/{$alnum}{8}-{$alnum}{4}-{$alnum}{4}-{$alnum}{4}-{$alnum}{12}/",
+			'uuid' => "/^{$alnum}{8}-{$alnum}{4}-{$alnum}{4}-{$alnum}{4}-{$alnum}{12}$/",
 			'email' => function($value) {
 				return filter_var($value, FILTER_VALIDATE_EMAIL);
 			},

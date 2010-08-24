@@ -107,6 +107,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isUuid('1c0a5831-6025-11de-8a39-0800200c9a66'));
 		$this->assertTrue(Validator::isUuid('1c0a5832-6025-11de-8a39-0800200c9a66'));
 		$this->assertFalse(Validator::isUuid('zc0a5832-6025-11de-8a39-0800200c9a66'));
+		$this->assertFalse(Validator::isUuid('1-1c0a5832-6025-11de-8a39-0800200c9a66'));
 	}
 
 	/**
