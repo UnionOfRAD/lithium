@@ -20,7 +20,7 @@ Session::config(array(
 /**
  * Uncomment this to enable forms-based authentication. The configuration below will attempt to
  * authenticate users against a `User` model. In a controller, run
- * `Auth::check('default', $this->request)` to authenticate a user. This will check 
+ * `Auth::check('default', $this->request)` to authenticate a user. This will check
  *
  * @see lithium\security\auth\adapter\Form
  */

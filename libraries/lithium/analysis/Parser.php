@@ -215,8 +215,7 @@ class Parser extends \lithium\core\StaticObject {
 	 * @param string $parameters An array containing token patterns to be matched.
 	 * @param array $options The list of options to be used when matching `$code`:
 	 *              - 'ignore': An array of language tokens to ignore.
-	 *              - 'return': If set to 'content' returns an array of 
-	 *                matching tokens.
+	 *              - 'return': If set to 'content' returns an array of matching tokens.
 	 * @return array Array of matching tokens.
 	 */
 	public static function match($code, $parameters, array $options = array()) {

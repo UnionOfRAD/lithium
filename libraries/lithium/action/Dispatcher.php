@@ -47,10 +47,10 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * Contains pre-process format strings for changing Dispatcher's behavior based on 'rules'.
 	 *
 	 * Each key in the array represents a 'rule'; if a key that matches the rule is present (and
-	 * not empty) in a route, (i.e. the result of `lithium\net\http\Router::parse()`) then the rule's
-	 * value will be applied to the route before it is dispatched.  When applying a rule, any array
-	 * elements array elements of the flag which are present in the route will be modified using a
-	 * `lithium\util\String::insert()`-formatted string.
+	 * not empty) in a route, (i.e. the result of `lithium\net\http\Router::parse()`) then the
+	 * rule's value will be applied to the route before it is dispatched.  When applying a rule, any
+	 * array elements array elements of the flag which are present in the route will be modified
+	 * using a `lithium\util\String::insert()`-formatted string.
 	 *
 	 * For example, to implement action prefixes (i.e. `admin_index()`), set a rule named 'admin',
 	 * with a value array containing a modifier key for the `action` element of a route, i.e.:

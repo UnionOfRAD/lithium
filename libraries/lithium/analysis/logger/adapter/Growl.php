@@ -101,6 +101,8 @@ class Growl extends \lithium\core\Object {
 	 *
 	 * @param string $type Not used (all notifications are of the same type).
 	 * @param string $message Message to be shown.
+	 * @param array $options Any options that are passed to the `notify()` method. See the
+	 *              `$options` parameter of `notify()`.
 	 * @return boolean `True` on successful write, `false` otherwise.
 	 */
 	public function write($type, $message, array $options = array()) {

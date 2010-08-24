@@ -151,6 +151,8 @@ class Logger extends \lithium\core\Adaptable {
 	 * of adapter configurations returned will be used to write a message with the given priority.
 	 *
 	 * @param string $priority The priority level of a message to be written.
+	 * @param string $message The message to write to the adapter.
+	 * @param array $options Adapter-specific options.
 	 * @return array Returns an array of names of configurations which are set up to respond to the
 	 *         message priority specified in `$priority`, or configured to respond to _all_ message
 	 *        priorities.
