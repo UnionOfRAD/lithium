@@ -31,7 +31,7 @@ class String {
 	 *
 	 * @var resource|false
 	 */
-	private static $urandom;
+	protected static $urandom;
 
 	/**
 	 * Generates a random UUID.
@@ -42,13 +42,13 @@ class String {
 	 */
 	public static function uuid() {
 		// Use urandom if available, else fall back to mt_rand
-		if (!isset(self::$urandom)) {
-			self::$urandom = is_readable('/dev/urandom') ? fopen('/dev/urandom', 'rb') : false;
+		if (!isset(static::$urandom)) {
+			static::$urandom = is_readable('/dev/urandom') ? fopen('/dev/urandom', 'rb') : false;
 		}
 
 		// Generate random fields
-		if (self::$urandom) {
-			$uuid = fread(self::$urandom, 16);
+		if (static::$urandom) {
+			$uuid = fread(static::$urandom, 16);
 		} else {
 			$uuid = '';
 			for ($i = 0; $i < 16; $i++) {
@@ -57,10 +57,10 @@ class String {
 		}
 
 		// Set version
-		$uuid[6] = chr(ord($uuid[6]) & self::clearVer | self::version4);
+		$uuid[6] = chr(ord($uuid[6]) & static::clearVer | static::version4);
 
 		// Set variant
-		$uuid[8] = chr(ord($uuid[8]) & self::clearVar | self::varRFC);
+		$uuid[8] = chr(ord($uuid[8]) & static::clearVar | static::varRFC);
 
 		// Return the uuid's string representation
 		return bin2hex(substr($uuid, 0, 4)) . '-'
