@@ -21,7 +21,7 @@ class StringTest extends \lithium\test\Unit {
 	 */
 	public function testUuidGeneration() {
 		$result = String::uuid();
-		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[a-f0-9]{4}-[a-f0-9]{12}$/";
+		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[8-9a-b][a-f0-9]{3}-[a-f0-9]{12}$/";
 		$this->assertPattern($pattern, $result);
 
 		$result = String::uuid();
@@ -36,7 +36,7 @@ class StringTest extends \lithium\test\Unit {
 	public function testMultipleUuidGeneration() {
 		$check = array();
 		$count = 500;
-		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[a-f0-9]{4}-[a-f0-9]{12}$/";
+		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[8-9a-b][a-f0-9]{3}-[a-f0-9]{12}$/";
 
 		for ($i = 0; $i < $count; $i++) {
 			$result = String::uuid();
