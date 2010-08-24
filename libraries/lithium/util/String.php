@@ -31,7 +31,7 @@ class String {
 	 *
 	 * @var resource|false
 	 */
-	protected static $urandom;
+	protected static $_urandom;
 
 	/**
 	 * Generates a random UUID.
@@ -42,13 +42,13 @@ class String {
 	 */
 	public static function uuid() {
 		// Use urandom if available, else fall back to mt_rand
-		if (!isset(static::$urandom)) {
-			static::$urandom = is_readable('/dev/urandom') ? fopen('/dev/urandom', 'rb') : false;
+		if (!isset(static::$_urandom)) {
+			static::$_urandom = is_readable('/dev/urandom') ? fopen('/dev/urandom', 'rb') : false;
 		}
 
 		// Generate random fields
-		if (static::$urandom) {
-			$uuid = fread(static::$urandom, 16);
+		if (static::$_urandom) {
+			$uuid = fread(static::$_urandom, 16);
 		} else {
 			$uuid = '';
 			for ($i = 0; $i < 16; $i++) {
