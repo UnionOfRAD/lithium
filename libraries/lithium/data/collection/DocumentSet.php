@@ -229,8 +229,9 @@ class DocumentSet extends \lithium\data\Collection {
 	 * default values and internal state.
 	 *
 	 * @param string $classType The type of class to create, either `'entity'` or `'set'`.
-	 * @param array $data
-	 * @param array $options
+	 * @param string $key The key name to which the related object is assigned.
+	 * @param array $data The internal data of the related object.
+	 * @param array $options Any other options to pass when instantiating the related object.
 	 * @return object Returns a new `Document` object instance.
 	 */
 	protected function _relation($classType, $key, $data, $options = array()) {

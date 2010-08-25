@@ -185,14 +185,13 @@ class Filters extends \lithium\util\Collection {
 	/**
 	 * Provides short-hand convenience syntax for filter chaining.
 	 *
+	 * @see lithium\core\Object::applyFilter()
+	 * @see lithium\core\Object::_filter()
 	 * @param object $self The object instance that owns the filtered method.
 	 * @param array $params An associative array containing the parameters passed to the filtered
 	 *              method.
 	 * @param array $chain The Filters object instance containing this chain of filters.
 	 * @return mixed Returns the return value of the next filter in the chain.
-	 * @see lithium\core\Object::applyFilter()
-	 * @see lithium\core\Object::_filter()
-	 * @todo Implement checks allowing params to be null, to traverse filter chain
 	 */
 	public function next($self, $params, $chain) {
 		if (empty($self) || empty($chain)) {

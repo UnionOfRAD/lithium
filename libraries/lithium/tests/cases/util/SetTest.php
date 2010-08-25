@@ -8,7 +8,8 @@
 
 namespace lithium\tests\cases\util;
 
-use \lithium\util\Set;
+use stdClass;
+use lithium\util\Set;
 
 class SetTest extends \lithium\test\Unit {
 
@@ -691,7 +692,9 @@ class SetTest extends \lithium\test\Unit {
 		$result = Set::extract($tree, '/Category[name=Category 2]');
 		$this->assertEqual($expected, $result);
 
-		$expected = array(array('Category' => $tree[1]['Category'], 'children' => $tree[1]['children']));
+		$expected = array(array(
+			'Category' => $tree[1]['Category'], 'children' => $tree[1]['children']
+		));
 		$result = Set::extract($tree, '/Category[name=Category 2]/..');
 		$this->assertEqual($expected, $result);
 
@@ -906,7 +909,9 @@ class SetTest extends \lithium\test\Unit {
 
 		$a = array('users' => array('bob', 'jim'));
 		$b = array('users' => array('lisa', 'tina'));
-		$this->assertIdentical(Set::merge($a, $b), array('users' => array('bob', 'jim', 'lisa', 'tina')));
+		$this->assertIdentical(
+			Set::merge($a, $b), array('users' => array('bob', 'jim', 'lisa', 'tina'))
+		);
 
 		$a = array('users' => array('jim', 'bob'));
 		$b = array('users' => 'none');
@@ -946,45 +951,52 @@ class SetTest extends \lithium\test\Unit {
 		$result = Set::merge($a, Set::merge($b, $c));
 		$this->assertIdentical($expected, $result);
 
-		$a = array('Tree', 'CounterCache',
-				'Upload' => array('folder' => 'products',
-					'fields' => array('image_1_id', 'image_2_id', 'image_3_id', 'image_4_id', 'image_5_id')));
-		$b =  array('Cacheable' => array('enabled' => false),
-				'Limit',
-				'Bindable',
-				'Validator',
-				'Transactional');
+		$a = array('Tree', 'CounterCache', 'Upload' => array(
+			'folder' => 'products', 'fields' => array(
+				'image_1_id', 'image_2_id', 'image_3_id', 'image_4_id', 'image_5_id'
+			)
+		));
+		$b =  array(
+			'Cacheable' => array('enabled' => false),
+			'Limit', 'Bindable', 'Validator', 'Transactional'
+		);
 
-		$expected = array('Tree', 'CounterCache',
-				'Upload' => array('folder' => 'products',
-					'fields' => array('image_1_id', 'image_2_id', 'image_3_id', 'image_4_id', 'image_5_id')),
-				'Cacheable' => array('enabled' => false),
-				'Limit',
-				'Bindable',
-				'Validator',
-				'Transactional');
-
+		$expected = array('Tree', 'CounterCache', 'Upload' => array(
+			'folder' => 'products', 'fields' => array(
+				'image_1_id', 'image_2_id', 'image_3_id', 'image_4_id', 'image_5_id'
+			)),
+			'Cacheable' => array('enabled' => false),
+			'Limit',
+			'Bindable',
+			'Validator',
+			'Transactional'
+		);
 		$this->assertIdentical(Set::merge($a, $b), $expected);
 
-		$expected = array('Tree' => null, 'CounterCache' => null,
-				'Upload' => array('folder' => 'products',
-					'fields' => array('image_1_id', 'image_2_id', 'image_3_id', 'image_4_id', 'image_5_id')),
-				'Cacheable' => array('enabled' => false),
-				'Limit' => null,
-				'Bindable' => null,
-				'Validator' => null,
-				'Transactional' => null);
-
+		$expected = array('Tree' => null, 'CounterCache' => null, 'Upload' => array(
+			'folder' => 'products', 'fields' => array(
+				'image_1_id', 'image_2_id', 'image_3_id', 'image_4_id', 'image_5_id'
+			)),
+			'Cacheable' => array('enabled' => false),
+			'Limit' => null,
+			'Bindable' => null,
+			'Validator' => null,
+			'Transactional' => null
+		);
 		$this->assertIdentical(Set::normalize(Set::merge($a, $b)), $expected);
 	}
 
 	public function testSort() {
 		$a = array(
 			array('Person' => array('name' => 'Jeff'), 'Friend' => array(array('name' => 'Nate'))),
-			array('Person' => array('name' => 'Tracy'),'Friend' => array(array('name' => 'Lindsay')))
+			array('Person' => array('name' => 'Tracy'), 'Friend' => array(
+				array('name' => 'Lindsay')
+			))
 		);
 		$b = array(
-			array('Person' => array('name' => 'Tracy'),'Friend' => array(array('name' => 'Lindsay'))),
+			array('Person' => array('name' => 'Tracy'),'Friend' => array(
+				array('name' => 'Lindsay')
+			)),
 			array('Person' => array('name' => 'Jeff'), 'Friend' => array(array('name' => 'Nate')))
 		);
 		$a = Set::sort($a, '/Friend/name', 'asc');
@@ -992,10 +1004,14 @@ class SetTest extends \lithium\test\Unit {
 
 		$b = array(
 			array('Person' => array('name' => 'Jeff'), 'Friend' => array(array('name' => 'Nate'))),
-			array('Person' => array('name' => 'Tracy'), 'Friend' => array(array('name' => 'Lindsay')))
+			array('Person' => array('name' => 'Tracy'), 'Friend' => array(
+				array('name' => 'Lindsay')
+			))
 		);
 		$a = array(
-			array('Person' => array('name' => 'Tracy'), 'Friend' => array(array('name' => 'Lindsay'))),
+			array('Person' => array('name' => 'Tracy'), 'Friend' => array(
+				array('name' => 'Lindsay')
+			)),
 			array('Person' => array('name' => 'Jeff'), 'Friend' => array(array('name' => 'Nate')))
 		);
 		$a = Set::sort($a, '/Friend/name', 'desc');
@@ -1003,13 +1019,17 @@ class SetTest extends \lithium\test\Unit {
 
 		$a = array(
 			array('Person' => array('name' => 'Jeff'), 'Friend' => array(array('name' => 'Nate'))),
-			array('Person' => array('name' => 'Tracy'), 'Friend' => array(array('name' => 'Lindsay'))),
+			array('Person' => array('name' => 'Tracy'), 'Friend' => array(
+				array('name' => 'Lindsay')
+			)),
 			array('Person' => array('name' => 'Adam'), 'Friend' => array(array('name' => 'Bob')))
 		);
 		$b = array(
 			array('Person' => array('name' => 'Adam'),'Friend' => array(array('name' => 'Bob'))),
 			array('Person' => array('name' => 'Jeff'), 'Friend' => array(array('name' => 'Nate'))),
-			array('Person' => array('name' => 'Tracy'), 'Friend' => array(array('name' => 'Lindsay')))
+			array('Person' => array('name' => 'Tracy'), 'Friend' => array(
+				array('name' => 'Lindsay')
+			))
 		);
 		$a = Set::sort($a, '/Person/name', 'asc');
 		$this->assertIdentical($a, $b);
@@ -1260,7 +1280,7 @@ class SetTest extends \lithium\test\Unit {
 		);
 		$this->assertIdentical($expected, $result);
 
-		$b = new \stdClass();
+		$b = new stdClass();
 		$b->users = array(
 			array('User' => array(
 				'id' => 2, 'group_id' => 1, 'Data' => array(
@@ -1379,10 +1399,10 @@ class SetTest extends \lithium\test\Unit {
 
 	public function testToArrayFromObject() {
 		$expected = array('User' => array('psword'=> 'whatever', 'Icon' => array('id' => 851)));
-		$class = new \stdClass;
-		$class->User = new \stdClass;
+		$class = new stdClass();
+		$class->User = new stdClass();
 		$class->User->psword = 'whatever';
-		$class->User->Icon = new \stdClass;
+		$class->User->Icon = new stdClass();
 		$class->User->Icon->id = 851;
 		$result = Set::to('array', $class);
 		$this->assertIdentical($expected, $result);
@@ -1393,12 +1413,12 @@ class SetTest extends \lithium\test\Unit {
 				'Profile' => array('name' => 'Some Name', 'address' => 'Some Address')
 			)
 		);
-		$class = new \stdClass;
-		$class->User = new \stdClass;
+		$class = new stdClass();
+		$class->User = new stdClass();
 		$class->User->psword = 'whatever';
-		$class->User->Icon = new \stdClass;
+		$class->User->Icon = new stdClass();
 		$class->User->Icon->id = 851;
-		$class->User->Profile = new \stdClass;
+		$class->User->Profile = new stdClass();
 		$class->User->Profile->name = 'Some Name';
 		$class->User->Profile->address = 'Some Address';
 
@@ -1423,16 +1443,16 @@ class SetTest extends \lithium\test\Unit {
 			)
 		));
 
-		$class = new \stdClass;
-		$class->User = new \stdClass;
+		$class = new stdClass();
+		$class->User = new stdClass();
 		$class->User->psword = 'whatever';
-		$class->User->Icon = new \stdClass;
+		$class->User->Icon = new stdClass();
 		$class->User->Icon->id = 851;
-		$class->User->Profile = new \stdClass;
+		$class->User->Profile = new stdClass();
 		$class->User->Profile->name = 'Some Name';
 		$class->User->Profile->address = 'Some Address';
-		$class->User->Comment = new \stdClass;
-		$class->User->Comment->{'0'} = new \stdClass;
+		$class->User->Comment = new stdClass();
+		$class->User->Comment->{'0'} = new stdClass();
 		$class->User->Comment->{'0'}->id = 1;
 		$class->User->Comment->{'0'}->article_id = 1;
 		$class->User->Comment->{'0'}->user_id = 1;
@@ -1440,7 +1460,7 @@ class SetTest extends \lithium\test\Unit {
 		$class->User->Comment->{'0'}->published = 'Y';
 		$class->User->Comment->{'0'}->created = '2007-03-18 10:47:23';
 		$class->User->Comment->{'0'}->updated = '2007-03-18 10:49:31';
-		$class->User->Comment->{'1'} = new \stdClass;
+		$class->User->Comment->{'1'} = new stdClass();
 		$class->User->Comment->{'1'}->id = 2;
 		$class->User->Comment->{'1'}->article_id = 1;
 		$class->User->Comment->{'1'}->user_id = 2;
@@ -1470,16 +1490,16 @@ class SetTest extends \lithium\test\Unit {
 			)
 		));
 
-		$class = new \stdClass;
-		$class->User = new \stdClass;
+		$class = new stdClass();
+		$class->User = new stdClass();
 		$class->User->psword = 'whatever';
-		$class->User->Icon = new \stdClass;
+		$class->User->Icon = new stdClass();
 		$class->User->Icon->id = 851;
-		$class->User->Profile = new \stdClass;
+		$class->User->Profile = new stdClass();
 		$class->User->Profile->name = 'Some Name';
 		$class->User->Profile->address = 'Some Address';
 		$class->User->Comment = array();
-		$comment = new \stdClass;
+		$comment = new stdClass();
 		$comment->id = 1;
 		$comment->article_id = 1;
 		$comment->user_id = 1;
@@ -1487,7 +1507,7 @@ class SetTest extends \lithium\test\Unit {
 		$comment->published = 'Y';
 		$comment->created = '2007-03-18 10:47:23';
 		$comment->updated = '2007-03-18 10:49:31';
-		$comment2 = new \stdClass;
+		$comment2 = new stdClass();
 		$comment2->id = 2;
 		$comment2->article_id = 1;
 		$comment2->user_id = 2;
@@ -1499,11 +1519,11 @@ class SetTest extends \lithium\test\Unit {
 		$result = Set::to('array', $class);
 		$this->assertIdentical($expected, $result);
 
-		$class = new \stdClass;
-		$class->User = new \stdClass;
+		$class = new stdClass();
+		$class->User = new stdClass();
 		$class->User->id = 100;
 		$class->someString = 'this is some string';
-		$class->Profile = new \stdClass;
+		$class->Profile = new stdClass();
 		$class->Profile->name = 'Joe Mamma';
 
 		$result = Set::to('array', $class);
@@ -1514,11 +1534,11 @@ class SetTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result);
 
-		$class = new \stdClass;
-		$class->User = new \stdClass;
+		$class = new stdClass();
+		$class->User = new stdClass();
 		$class->User->id = 100;
 		$class->User->_name_ = 'User';
-		$class->Profile = new \stdClass;
+		$class->Profile = new stdClass();
 		$class->Profile->name = 'Joe Mamma';
 		$class->Profile->_name_ = 'Profile';
 
@@ -1531,7 +1551,7 @@ class SetTest extends \lithium\test\Unit {
 	}
 
 	public function testAssociativeArrayToObject() {
-		$data =array(
+		$data = array(
 			'Post' => array(
 				'id' => '1', 'author_id' => '1', 'title' => 'First Post',
 				'body' => 'First Post Body', 'published' => 'Y',
@@ -1546,7 +1566,7 @@ class SetTest extends \lithium\test\Unit {
 			),
 		);
 		$result = Set::to('object', $data);
-		$expected = new \stdClass;
+		$expected = new stdClass();
 		$expected->_name_ = 'Post';
 		$expected->id = '1';
 		$expected->author_id = '1';
@@ -1556,7 +1576,7 @@ class SetTest extends \lithium\test\Unit {
 		$expected->created = "2007-03-18 10:39:23";
 		$expected->updated = "2007-03-18 10:41:31";
 
-		$expected->Author = new \stdClass;
+		$expected->Author = new stdClass();
 		$expected->Author->id = '1';
 		$expected->Author->user = 'mariano';
 		$expected->Author->password = '5f4dcc3b5aa765d61d8327deb882cf99';
@@ -1602,7 +1622,7 @@ class SetTest extends \lithium\test\Unit {
 		);
 		$result = Set::to('object', $data);
 
-		$expected = new \stdClass;
+		$expected = new stdClass();
 		$expected->_name_ = 'Post';
 		$expected->id = '1';
 		$expected->author_id = '1';
@@ -1612,7 +1632,7 @@ class SetTest extends \lithium\test\Unit {
 		$expected->created = "2007-03-18 10:39:23";
 		$expected->updated = "2007-03-18 10:41:31";
 
-		$expected->Author = new \stdClass;
+		$expected->Author = new stdClass();
 		$expected->Author->id = '1';
 		$expected->Author->user = 'mariano';
 		$expected->Author->password = '5f4dcc3b5aa765d61d8327deb882cf99';
@@ -1621,7 +1641,7 @@ class SetTest extends \lithium\test\Unit {
 		$expected->Author->test = "working";
 		$expected->Author->_name_ = 'Author';
 
-		$expected2 = new \stdClass;
+		$expected2 = new stdClass();
 		$expected2->_name_ = 'Post';
 		$expected2->id = '2';
 		$expected2->author_id = '3';
@@ -1631,7 +1651,7 @@ class SetTest extends \lithium\test\Unit {
 		$expected2->created = "2007-03-18 10:41:23";
 		$expected2->updated = "2007-03-18 10:43:31";
 
-		$expected2->Author = new \stdClass;
+		$expected2->Author = new stdClass();
 		$expected2->Author->id = '3';
 		$expected2->Author->user = 'joel';
 		$expected2->Author->password = '5f4dcc3b5aa765d61d8327deb882cf99';
@@ -1685,19 +1705,19 @@ class SetTest extends \lithium\test\Unit {
 
 		$result = Set::to('object', $data);
 
-		$expected = new \stdClass();
+		$expected = new stdClass();
 		$expected->_name_ = 'User';
 		$expected->id = 1;
 		$expected->email = 'user@example.com';
 		$expected->first_name = 'John';
 		$expected->last_name = 'Smith';
 
-		$piece = new \stdClass();
+		$piece = new stdClass();
 		$piece->id = 1;
 		$piece->title = 'Moonlight Sonata';
 		$piece->composer = 'Ludwig van Beethoven';
 
-		$piece->PiecesUser = new \stdClass();
+		$piece->PiecesUser = new stdClass();
 		$piece->PiecesUser->id = 1;
 		$piece->PiecesUser->created = '2008-01-01 00:00:00';
 		$piece->PiecesUser->modified = '2008-01-01 00:00:00';
@@ -1708,12 +1728,12 @@ class SetTest extends \lithium\test\Unit {
 		$piece->_name_ = 'Piece';
 
 
-		$piece2 = new \stdClass();
+		$piece2 = new stdClass();
 		$piece2->id = 2;
 		$piece2->title = 'Moonlight Sonata 2';
 		$piece2->composer = 'Ludwig van Beethoven';
 
-		$piece2->PiecesUser = new \stdClass();
+		$piece2->PiecesUser = new stdClass();
 		$piece2->PiecesUser->id = 2;
 		$piece2->PiecesUser->created = '2008-01-01 00:00:00';
 		$piece2->PiecesUser->modified = '2008-01-01 00:00:00';
@@ -1722,7 +1742,6 @@ class SetTest extends \lithium\test\Unit {
 		$piece2->PiecesUser->_name_ = 'PiecesUser';
 
 		$piece2->_name_ = 'Piece';
-
 		$expected->Piece = array($piece, $piece2);
 
 		$this->assertEqual($expected, $result);
@@ -1802,19 +1821,19 @@ class SetTest extends \lithium\test\Unit {
 
 		$result = Set::to('object', $data);
 
-		$expected = new \stdClass();
+		$expected = new stdClass();
 		$expected->_name_ = 'FooUser';
 		$expected->id = 1;
 		$expected->email = 'user@example.com';
 		$expected->first_name = 'John';
 		$expected->last_name = 'Smith';
 
-		$piece = new \stdClass();
+		$piece = new stdClass();
 		$piece->id = 1;
 		$piece->title = 'Moonlight Sonata';
 		$piece->composer = 'Ludwig van Beethoven';
 		$piece->_name_ = 'FooPiece';
-		$piece->PiecesUser = new \stdClass();
+		$piece->PiecesUser = new stdClass();
 		$piece->PiecesUser->id = 1;
 		$piece->PiecesUser->created = '2008-01-01 00:00:00';
 		$piece->PiecesUser->modified = '2008-01-01 00:00:00';
@@ -1822,12 +1841,12 @@ class SetTest extends \lithium\test\Unit {
 		$piece->PiecesUser->user_id = 2;
 		$piece->PiecesUser->_name_ = 'FooPiecesUser';
 
-		$piece2 = new \stdClass();
+		$piece2 = new stdClass();
 		$piece2->id = 2;
 		$piece2->title = 'Moonlight Sonata 2';
 		$piece2->composer = 'Ludwig van Beethoven';
 		$piece2->_name_ = 'FooPiece';
-		$piece2->PiecesUser = new \stdClass();
+		$piece2->PiecesUser = new stdClass();
 		$piece2->PiecesUser->id = 2;
 		$piece2->PiecesUser->created = '2008-01-01 00:00:00';
 		$piece2->PiecesUser->modified = '2008-01-01 00:00:00';
@@ -1939,7 +1958,7 @@ class SetTest extends \lithium\test\Unit {
 		);
 		$mapped = Set::to('object', $data);
 
-		$expected = new \stdClass();
+		$expected = new stdClass();
 		$expected->_name_ = 'IndexedPage';
 		$expected->id = 2;
 		$expected->url = 'http://blah.com/';

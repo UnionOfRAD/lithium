@@ -9,7 +9,7 @@
 namespace lithium\util;
 
 /**
- * The parent class for all collection objects. Contains methods for collection iteration, 
+ * The parent class for all collection objects. Contains methods for collection iteration,
  * conversion, and filtering. Implements `ArrayAccess`, `Iterator`, and `Countable`.
  *
  * Collection objects can act very much like arrays. This is especially evident in creating new
@@ -22,7 +22,7 @@ namespace lithium\util;
  *
  * $coll = new Collection(array('data' => array('foo')));
  * // $coll[0] --> 'foo'
- * 
+ *
  * $array = $coll->to('array');
  * }}}
  *
@@ -299,12 +299,12 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * Returns the first non-empty value in the collection after a filter is applied, or rewinds the
 	 * collection and returns the first value.
 	 *
+	 * @see lithium\util\Collection::rewind()
 	 * @param callback $filter A closure through which collection values will be
 	 *                 passed. If the return value of this function is non-empty,
 	 *                 it will be returned as the result of the method call. If `null`, the
 	 *                 collection is rewound (see `rewind()`) and the first item is returned.
 	 * @return mixed Returns the first non-empty collection value returned from `$filter`.
-	 * @see lithium\util\Collection::rewind()
 	 */
 	public function first($filter = null) {
 		if (!$filter) {

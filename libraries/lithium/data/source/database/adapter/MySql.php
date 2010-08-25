@@ -229,7 +229,7 @@ class MySql extends \lithium\data\source\Database {
 	 *
 	 * @param string $type next|close The current step in the iteration.
 	 * @param mixed $resource The result resource returned from the database.
-	 * @param \lithium\data\model\Query $context The given query.
+	 * @param object $context The given query (an instance of `lithium\data\model\Query`).
 	 * @return mixed Result
 	 */
 	public function result($type, $resource, $context) {
@@ -309,10 +309,9 @@ class MySql extends \lithium\data\source\Database {
 	 * @param string $sql The sql string to execute
 	 * @param array $options Available options:
 	 *        - 'buffered': If set to `false` uses mysql_unbuffered_query which
-	 *          sends the SQL query query to MySQL without automatically 
-	 *          fetching and buffering the result rows as mysql_query() does (for
-	 *          less memory usage).
-	 * @return resource
+	 *          sends the SQL query query to MySQL without automatically fetching and buffering the
+	 *          result rows as `mysql_query()` does (for less memory usage).
+	 * @return resource Returns the result resource handle if the query is successful.
 	 */
 	protected function _execute($sql, array $options = array()) {
 		$defaults = array('buffered' => true);

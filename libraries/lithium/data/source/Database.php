@@ -466,12 +466,12 @@ abstract class Database extends \lithium\data\Source {
 	 *
 	 * - If `$key` is numeric and `$value` is a string, `$value` is treated as a literal SQL
 	 *   fragment and returned.
-	 * - 
 	 *
 	 * @param string|array $conditions The conditions for this query.
-	 * @param object $context The current `\lithium\data\model\Query`.
+	 * @param object $context The current `lithium\data\model\Query` instance.
 	 * @param array $options
-	 *               - `prepend` : added before WHERE clause
+	 *               - `prepend` _boolean_: Whether the return string should be prepended with the
+	 *                 `WHERE` keyword.
 	 * @return string Returns the `WHERE` clause of an SQL query.
 	 */
 	public function conditions($conditions, $context, array $options = array()) {

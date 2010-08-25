@@ -201,7 +201,9 @@ class RecordSetTest extends \lithium\test\Unit {
 		$items = $this->_recordSet->get('_data');
 		$this->assertEqual($expected, $items[1]->to('array'));
 
-		$this->_objectRecordSet[5] = $expected = new MockPostObject(array('id' => 5, 'data' => 'data5'));
+		$this->_objectRecordSet[5] = $expected = new MockPostObject(array(
+			'id' => 5, 'data' => 'data5'
+		));
 		$items = $this->_recordSet->get('_data');
 		$this->assertEqual($expected->id, $items[0]->id);
 		$this->assertEqual($expected->data, $items[0]->data);

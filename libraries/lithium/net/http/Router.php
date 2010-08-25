@@ -176,8 +176,14 @@ class Router extends \lithium\core\StaticObject {
 	 *              containing a manually generated URL.
 	 * @param object $context An instance of `lithium\action\Request`. This supplies the context for
 	 *               any persistent parameters, as well as the base URL for the application.
-	 * @param array $options Options for the generation of the matched URL. Currently accepted values
-	 *              are: `'absolute' => true|false`, `'host' => string` and `'scheme' => string`.
+	 * @param array $options Options for the generation of the matched URL. Currently accepted
+	 *              values are:
+	 *              - `'absolute'` _boolean_: Indicates whether or not the returned URL should be an
+	 *                absolute path (i.e. including scheme and host name).
+	 *              - `'host'` _string_: If `'absolute'` is `true`, sets the host name to be used,
+	 *                or overrides the one provided in `$context`.
+	 *              - `'scheme'` _string_: If `'absolute'` is `true`, sets the URL scheme to be
+	 *                used, or overrides the one provided in `$context`.
 	 * @return string Returns a generated URL, based on the URL template of the matched route, and
 	 *         prefixed with the base URL of the application.
 	 */

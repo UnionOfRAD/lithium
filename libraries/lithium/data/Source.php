@@ -207,14 +207,14 @@ abstract class Source extends \lithium\core\Object {
 	/**
 	 * A method which can be optionally implemented to configure a model class.
 	 *
+	 * @see lithium\data\Model::$_meta
+	 * @see lithium\data\Model::$_finders
+	 * @see lithium\data\Model::$_classes
 	 * @param string $class The name of the model class to be configured.
 	 * @return array This method should return an array one or more of the following keys: `'meta'`,
 	 *         `'classes'` or `'finders'`. These keys maps to the three corresponding properties in
 	 *         `lithium\data\Model`, and are used to override the base-level default settings and
 	 *         dependencies.
-	 * @see lithium\data\Model::$_meta
-	 * @see lithium\data\Model::$_finders
-	 * @see lithium\data\Model::$_classes
 	 */
 	public function configureClass($class) {
 		return array();

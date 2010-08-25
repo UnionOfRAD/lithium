@@ -12,7 +12,7 @@ namespace lithium\util;
 /**
  * Used for complex manipulation, comparison, and access of array data. Some methods allow for
  * XPath-like data access, as follows:
- * 
+ *
  *  - `'/User/id'`: Similar to the classic {n}.User.id.
  *  - `'/User[2]/name'`: Selects the name of the second User.
  *  - `'/User[id>2]'`: Selects all Users with an id > 2.
@@ -351,7 +351,9 @@ class Set {
 							'item' => $item,
 						);
 					}
-				} elseif (($key === $token || (ctype_digit($token) && $key == $token) || $token === '.')) {
+				} elseif (
+					($key === $token || (ctype_digit($token) && $key == $token) || $token === '.')
+				) {
 					$context['trace'][] = $key;
 					$matches[] = array(
 						'trace' => $context['trace'],
@@ -614,6 +616,8 @@ class Set {
 	 * with an unlimited amount of arguments and typecasts non-array parameters
 	 * into arrays.
 	 *
+	 * @param array $arr1 The base array.
+	 * @param array $arr2 The array to be merged on top of the base array.
 	 * @return array Merged array of all passed params.
 	 */
 	public static function merge($arr1, $arr2 = null) {

@@ -332,7 +332,7 @@ class MongoDb extends \lithium\data\Source {
 				$result = $self->connection->{$params['source']}->insert($data, true);
 			}
 
-			if (isset($result['ok']) && (bool) $result['ok'] === true) {
+			if (isset($result['ok']) && (boolean) $result['ok'] === true) {
 				$query->entity()->update($data['_id']);
 				return true;
 			}

@@ -329,12 +329,12 @@ class ValidatorTest extends \lithium\test\Unit {
 		 */
 		$this->assertFalse(
 			Validator::isEmail('abc@example'),
-			'Invalid email address passed validation. Please update to PHP 5.3.3 '.
+			'Invalid email address passed validation. Please update to PHP 5.3.3 ' .
 			'or higher to correct this.'
 		);
 		$this->assertFalse(
 			Validator::isEmail('abc.@example.com'),
-			'Invalid email address passed validation. Please update to PHP 5.3.3 '.
+			'Invalid email address passed validation. Please update to PHP 5.3.3 ' .
 			'or higher to correct this.'
 		);
 

@@ -121,7 +121,9 @@ class Cookie extends \lithium\core\Object {
 				}
 				return ($result !== array()) ? $result : null;
 			}
-			return (isset($_COOKIE[$config['name']][$key])) ? $_COOKIE[$config['name']][$key] : null;
+			if (isset($_COOKIE[$config['name']][$key])) {
+				return $_COOKIE[$config['name']][$key];
+			}
 		};
 	}
 

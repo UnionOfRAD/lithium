@@ -58,16 +58,17 @@ class Coverage extends \lithium\test\Filter {
 	 *                    instances each line was called.
 	 */
 	public static function analyze($report, array $classes = array()) {
-		$filterResults = static::collect($report->results['filters'][__CLASS__]);
-		$classes = $classes ?: array_filter(get_declared_classes(), function($class) use ($filterResults) {
-			return (!(is_subclass_of($class, 'lithium\test\Unit')) || array_key_exists($class, $filterResults));
+		$data = static::collect($report->results['filters'][__CLASS__]);
+		$classes = $classes ?: array_filter(get_declared_classes(), function($class) use ($data) {
+			$unit = 'lithium\test\Unit';
+			return (!(is_subclass_of($class, $unit)) || array_key_exists($class, $data));
 		});
-		$classes = array_values(array_intersect((array) $classes, array_keys($filterResults)));
+		$classes = array_values(array_intersect((array) $classes, array_keys($data)));
 		$densities = $result = array();
 
 		foreach ($classes as $class) {
 			$classMap = array($class => Libraries::path($class));
-			$densities += static::_density($filterResults[$class], $classMap);
+			$densities += static::_density($data[$class], $classMap);
 		}
 		$executableLines = array();
 
@@ -146,10 +147,8 @@ class Coverage extends \lithium\test\Filter {
 					);
 				}
 			}
-
 			$result[$class]['output'][$file] = $out;
 		}
-
 		return $result;
 	}
 

@@ -131,10 +131,11 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Returns or sets the column mapping scheme for relational databases.
 	 *
+	 * @param array $map Assigns the column map for this query.
 	 * @return void
 	 */
 	public function map($map = null) {
-		if ($map) {
+		if ($map !== null) {
 			$this->_map = $map;
 		}
 		return $this->_map;
@@ -346,10 +347,11 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	 * Convert the query's properties to the data-sources' syntax and return it as an array.
+	 * Convert the query's properties to the data sources' syntax and return it as an array.
 	 *
-	 * @param object $dataSource Instance of the data-source to use for conversion.
-	 * @return array Converted properties.
+	 * @param object $dataSource Instance of the data source to use for conversion.
+	 * @param array $options Options to use when exporting the data.
+	 * @return array Returns an array containing a data source-specific representation of a query.
 	 */
 	public function export(Source $dataSource, array $options = array()) {
 		$defaults = array('data' => array());

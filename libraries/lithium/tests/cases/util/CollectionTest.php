@@ -46,7 +46,9 @@ class CollectionTest extends \lithium\test\Unit {
 		$result = $collection->invoke('mapArray', array(), array('merge' => true));
 		$this->assertEqual($result, array_fill(0, 10, 'foo'));
 
-		$collection = new Collection(array('data' => array_fill(0, 10, new MockCollectionObject())));
+		$collection = new Collection(array(
+			'data' => array_fill(0, 10, new MockCollectionObject())
+		));
 		$result = $collection->testFoo();
 		$this->assertEqual($result, array_fill(0, 10, 'testFoo'));
 
@@ -56,17 +58,23 @@ class CollectionTest extends \lithium\test\Unit {
 	}
 
 	public function testObjectCasting() {
-		$collection = new Collection(array('data' => array_fill(0, 10, new MockCollectionObject())));
+		$collection = new Collection(array(
+			'data' => array_fill(0, 10, new MockCollectionObject())
+		));
 		$result = $collection->to('array');
 		$expected = array_fill(0, 10, array(1 => 2, 2 => 3));
 		$this->assertEqual($expected, $result);
 
-		$collection = new Collection(array('data' => array_fill(0, 10, new MockCollectionMarker())));
+		$collection = new Collection(array(
+			'data' => array_fill(0, 10, new MockCollectionMarker())
+		));
 		$result = $collection->to('array');
 		$expected = array_fill(0, 10, array('marker' => false, 'data' => 'foo'));
 		$this->assertEqual($expected, $result);
 
-		$collection = new Collection(array('data' => array_fill(0, 10, new MockCollectionStringCast())));
+		$collection = new Collection(array(
+			'data' => array_fill(0, 10, new MockCollectionStringCast())
+		));
 		$result = $collection->to('array');
 		$expected = array_fill(0, 10, json_encode(array(1 => 2, 2 => 3)));
 		$this->assertEqual($expected, $result);

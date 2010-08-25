@@ -32,7 +32,9 @@ class Sqlite3 extends \lithium\data\source\Database {
 		'integer' => array('name' => 'integer', 'limit' => 11, 'formatter' => 'intval'),
 		'float' => array('name' => 'float', 'formatter' => 'floatval'),
 		'datetime' => array('name' => 'datetime', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
-		'timestamp' => array('name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
+		'timestamp' => array(
+			'name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
+		),
 		'time' => array('name' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
 		'date' => array('name' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
 		'binary' => array('name' => 'blob'),
@@ -42,6 +44,9 @@ class Sqlite3 extends \lithium\data\source\Database {
 	/**
 	 * Constructs the Sqlite adapter
 	 *
+	 * @see lithium\data\source\Database::__construct()
+	 * @see lithium\data\Source::__construct()
+	 * @see lithium\data\Connections::add()
 	 * @param array $config Configuration options for this class. For additional configuration,
 	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options
 	 *        defined by this class:
@@ -54,10 +59,6 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
 	 * @return The adapter instance.
-	 *
-	 * @see lithium\data\source\Database::__construct()
-	 * @see lithium\data\Source::__construct()
-	 * @see lithium\data\Connections::add()
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -150,18 +151,18 @@ class Sqlite3 extends \lithium\data\source\Database {
 	/**
 	 * Get the last insert id from the database.
 	 *
-	 * @param \lithium\data\model\Query $context The given query.
+	 * @param object $query The given query, usually an instance of `lithium\data\model\Query`.
 	 * @return void
 	 */
-	protected function _insertId($query) {
-	}
+	protected function _insertId($query) {}
 
 	/**
 	 * Gets or sets the encoding for the connection.
 	 *
-	 * @param $encoding
-	 * @return boolean|string If setting the encoding; returns true on success, else false.
-	 *         When getting, returns the encoding.
+	 * @param string $encoding If setting the encoding, this is the name of the encoding to set,
+	 *               i.e. `'utf8'` or `'UTF-8'` (both formats are valid).
+	 * @return boolean|string If setting the encoding; returns `true` on success, or `false` on
+	 *         failure. When getting, returns the encoding as a string.
 	 */
 	public function encoding($encoding = null) {
 		$encodingMap = array('UTF-8' => 'utf8');
@@ -180,7 +181,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 *
 	 * @param string $type next|close The current step in the iteration.
 	 * @param mixed $resource The result resource returned from the database.
-	 * @param \lithium\data\model\Query $context The given query.
+	 * @param object $context The given query (an instance of `lithium\data\model\Query`).
 	 * @return mixed Result
 	 */
 	public function result($type, $resource, $context) {
