@@ -259,7 +259,7 @@ class Command extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function clear() {
-		passthru(substr(PHP_OS, 0, 3) == 'WIN' ? 'cls' : 'clear');
+		passthru(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN' ? 'cls' : 'clear');
 	}
 
 	/**
