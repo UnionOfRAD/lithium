@@ -112,13 +112,11 @@ class Response extends \lithium\core\Object {
 	 */
 	public function styles($styles = array()) {
 		$defaults = array(
-			'heading1' => "\033[1;30;46m",
-			'heading2' => "\033[1;35m",
-			'heading3' => "\033[1;34m",
-			'option'   => "\033[40;37m",
-			'command'  => "\033[1;40;37m",
-			'error'    => "\033[0;31m",
-			'success'  => "\033[0;32m",
+			'heading' => "\033[1;36m",
+			'option'  => "\033[0;35m",
+			'command' => "\033[0;35m",
+			'error'   => "\033[0;31m",
+			'success' => "\033[0;32m",
 			'black'  => "\033[0;30m",
 			'red'    => "\033[0;31m",
 			'green'  => "\033[0;32m",

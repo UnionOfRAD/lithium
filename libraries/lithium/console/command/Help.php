@@ -27,13 +27,13 @@ class Help extends \lithium\console\Command {
 	 */
 	public function run($name = null) {
 		if (!$name) {
-			$this->out('COMMANDS', 'heading1', 2);
+			$this->out('COMMANDS', 'heading', 2);
 			$commands = Libraries::locate('command', null, array('recursive' => false));
 
 			foreach ($commands as $command) {
 				$info = Inspector::info($command);
 				$name = strtolower(Inflector::slug($info['shortName']));
-				$this->out($this->_pad($name), 'heading2');
+				$this->out($this->_pad($name), 'heading');
 				$this->out($this->_pad($info['description']), 2);
 			}
 			$message = 'See `{:command}li3 help COMMAND{:end}`';
@@ -54,7 +54,7 @@ class Help extends \lithium\console\Command {
 		$methods = $this->_methods($class);
 		$properties = $this->_properties($class);
 
-		$this->out('USAGE', 'heading1');
+		$this->out('USAGE', 'heading');
 		$this->out($this->_pad(sprintf("{:command}li3 %s{:end}{:option}%s{:end} [ARGS]",
 			$name ?: 'COMMAND',
 			array_reduce($properties, function($a, $b) {
@@ -71,7 +71,7 @@ class Help extends \lithium\console\Command {
 		}
 
 		if ($properties || $methods) {
-			$this->out('OPTIONS', 'heading2');
+			$this->out('OPTIONS', 'heading');
 		}
 
 		if ($properties) {

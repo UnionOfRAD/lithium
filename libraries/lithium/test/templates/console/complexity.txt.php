@@ -1,4 +1,4 @@
-{:heading2}Cyclomatic Complexity{:end}
+{:heading}Cyclomatic Complexity{:end}
 <?php
 foreach (array_slice($data['max'], 0, 10) as $method => $count) {
 	if ($count <= 7) {
@@ -7,7 +7,7 @@ foreach (array_slice($data['max'], 0, 10) as $method => $count) {
 	echo "Worst Offender\n\t{$method} - {$count}\n";
 }
 ?>
-{:heading3}Class Averages{:end}
+{:heading}Class Averages{:end}
 <?php
 foreach (array_slice($data['class'], 0, 10) as $class => $count) {
 	echo "\t{$class} - ";
