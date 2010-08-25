@@ -156,7 +156,7 @@ class CommandTest extends \lithium\test\Unit {
 		$this->assertTrue($return);
 
 		$expected = "li3 mock-command --case=CASE --face=FACE ";
-		$expected .= "--mace=MACE --race=RACE -lace [ARGS]";
+		$expected .= "--mace=MACE --race=RACE --lace [ARGS]";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
@@ -173,7 +173,7 @@ class CommandTest extends \lithium\test\Unit {
 		$command = new MockCommandHelp(array('request' => $this->request));
 		$return = $command->__invoke('_help');
 
-		$expected = "li3 mock-command-help --long=LONG -s [ARGS]";
+		$expected = "li3 mock-command-help --long=LONG --blong -s [ARGS]";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);

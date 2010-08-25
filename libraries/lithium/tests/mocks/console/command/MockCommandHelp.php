@@ -22,6 +22,13 @@ class MockCommandHelp extends \lithium\console\Command {
 	public $long = 'default';
 
 	/**
+	 * This is a boolean long param.
+	 *
+	 * @var boolean
+	 */
+	public $blong = true;
+
+	/**
 	 * This is a short param.
 	 *
 	 * @var boolean

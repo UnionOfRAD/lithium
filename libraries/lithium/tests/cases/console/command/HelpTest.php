@@ -129,6 +129,19 @@ class HelpTest extends \lithium\test\Unit {
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
 	}
+
+	public function testApiProperties() {
+		$help = new Help(array(
+			'request' => $this->request, 'classes' => $this->classes
+		));
+		$expected = null;
+		$result = $help->api('lithium.tests.mocks.console.command.MockCommandHelp', 'property');
+		$this->assertEqual($expected, $result);
+
+		$expected = "\-\-long=LONG.*\-\-blong.*\-s";
+		$result = $help->response->output;
+		$this->assertPattern("/{$expected}/s", $result);
+	}
 }
 
 ?>

@@ -32,7 +32,7 @@ class MockCommand extends \lithium\console\Command {
 	 *
 	 * @var boolean Describe value of lace.
 	 */
-	public $lace;
+	public $lace = true;
 
 	protected $_dontShow = null;
 

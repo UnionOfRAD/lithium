@@ -188,7 +188,11 @@ class Help extends \lithium\console\Command {
 			$description = trim($comment['description']);
 			$type = isset($comment['tags']['var']) ? strtok($comment['tags']['var'], ' ') : null;
 			$name = str_replace('_', '-', Inflector::underscore($property['name']));
-			$usage = $type == 'boolean' ? "-{$name}" : "--{$name}=" . strtoupper($name);
+			$usage = strlen($name) == 1 ? "-{$name}" : "--{$name}";
+
+			if ($type != 'boolean') {
+				$usage .= '=' . strtoupper($name);
+			}
 			$results[$name] = compact('name', 'description', 'type', 'usage');
 
 			if ($name == $options['name']) {
