@@ -65,7 +65,7 @@ class Help extends \lithium\console\Command {
 
 		if (!empty($info['description'])) {
 			$this->nl();
-			$this->out('DESCRIPTION');
+			$this->out('DESCRIPTION', 'heading');
 			$this->out($this->_pad(strtok($info['description'], "\n"), 1));
 			$this->nl();
 		}
