@@ -158,6 +158,255 @@ class String {
 	}
 
 	/**
+	 * Hashes a password using PHP's crypt() and an optional salt. If no
+	 * salt is supplied, a cryptographically secure salt will be generated
+	 * using String::genSalt().
+	 *
+	 * Using this function is the proper way to hash a password. Using naive
+	 * methods such as String::hash() is fine to check a file's integrity,
+	 * but fundamentally insecure for passwords, due to the invariable lack
+	 * of a cryptographically secure salt.
+	 *
+	 * Usage:
+	 *
+	 * {{{
+	 * // Hash a password before storing it:
+	 * $hashed  = String::hashPassword($password);
+	 *
+	 * // Check a password by comparing it to its hashed value:
+	 * $check   = String::checkPassword($password, $hashed);
+	 *
+	 * // Use a stronger custom salt:
+	 * $salt    = String::genSalt('bf', 16); // 2^16 iterations
+	 * $hashed  = String::hashPassword($password, $salt); // Very slow
+	 * $check   = String::checkPassword($password, $hashed); // Very slow
+	 *
+	 * // Forward/backward compatibility
+	 * $salt1   = String::genSalt('bf', 6);
+	 * $salt2   = String::genSalt('bf', 12);
+	 * $hashed1 = String::hashPassword($password, $salt1); // Fast
+	 * $hashed2 = String::hashPassword($password, $salt2); // Slow
+	 * $check1  = String::checkPassword($password, $hashed1); // True
+	 * $check2  = String::checkPassword($password, $hashed2); // True
+	 * }}}
+	 *
+	 * @param string $password The password to hash.
+	 * @param string $salt Optional. The salt string.
+	 * @return string The hashed password.
+	 *        The result's length will be:
+	 *        - 60 chars for Blowfish hashes
+	 *        - 20 chars for XDES hashes
+	 *        - 34 chars for MD5 hashes
+	 * @see lithium\util\String::genSalt()
+	 **/
+	public static function hashPassword($password, $salt = null) {
+		return crypt($password, $salt ?: static::genSalt());
+	}
+
+	/**
+	 * Compares a password and its hashed value using PHP5's crypt().
+	 *
+	 * @param string $password The password to check
+	 * @param string $hash The hashed password to compare
+	 * @return boolean Whether the password is correct or not
+	 * @see lithium\util\String::hashPassword()
+	 * @see lithium\util\String::genSalt()
+	 **/
+	public static function checkPassword($password, $hash) {
+		return $hash == crypt($password, $hash);
+	}
+
+	/**
+	 * Generates a cryptographically secure salt, using the best available
+	 * method (tries Blowfish, then XDES, and fallbacks to MD5), for use in
+	 * String::hashPassword().
+	 *
+	 * Blowfish and xdes are adaptive hashing algorithms. md5 is not. Adaptive
+	 * hashing algorithms are designed in such a way that when computers get
+	 * faster, you can tune the algorithm to be slower by increasing the number
+	 * of hash iterations, without introducing incompatibility with existing
+	 * passwords.
+	 *
+	 * To pick an appropriate iteration count for adaptive algorithms, consider
+	 * that the original DES crypt was designed to have the speed of 4 hashes
+	 * per second on the hardware of that time. Slower than 4 hashes per second
+	 * would probably dampen usability. Faster than 100 hashes per second is
+	 * probably too fast. The defaults generate about 10 hashes per second
+	 * using a dual-core 2.2GHz CPU.
+	 *
+	 * Note: This salt generator is different from naive salt implementations
+	 * (e.g. md5(microtime())) that are invariably found in OSS PHP applications,
+	 * in that it uses all of the available bits of entropy for the supplied salt
+	 * method.
+	 *
+	 * This method should not be used as salts for custom password hashers,
+	 * however, because salts are prefixed with information expected by PHP's
+	 * crypt(). If you need a random source of alpha numeric characters, use
+	 * String::encode64() instead.
+	 *
+	 * @param string $type The hash type. Optional. Defaults to '`bf`'.
+	 *        Supported values include:
+	 *        - `'bf'`: Blowfish (128 salt bits, adaptive, max 72 chars)
+	 *        - `'xdes'`: XDES (24 salt bits, adaptive, max 8 chars)
+	 *        - `'md5'`: MD5 (48 salt bits, non-adaptive, unlimited length)
+	 * @param integer $count Optional. The base-2 logarithm of the iteration
+	 *        count, for adaptive algorithms. Defaults to:
+	 *        - `10` for Blowfish
+	 *        - `18` for XDES
+	 * @return string The salt string.
+	 * @link http://php.net/manual/en/function.crypt.php
+	 * @link http://www.postgresql.org/docs/9.0/static/pgcrypto.html
+	 * @see lithium\util\String::hashPassword()
+	 **/
+	public static function genSalt($type = null, $count = null) {
+		switch (true) {
+			case CRYPT_BLOWFISH == 1 && (!$type || $type === 'bf'):
+				return static::_genSaltBF($count);
+			case CRYPT_EXT_DES == 1 && (!$type || $type === 'xdes'):
+				return static::_genSaltXDES($count);
+			default:
+				return static::_genSaltMD5();
+		}
+	}
+
+	/**
+	 * Encodes bytes into the ./0-9A-Za-z alphabet, for use as salt when
+	 * hashing passwords.
+	 *
+	 * Note: this is not the same as  RFC 1421, or base64_encode(), which
+	 * uses an +/0-9A-Za-z alphabet.
+	 *
+	 * This function can be combined with String::random() to generate random
+	 * sequences of ./0-9A-Za-z characters:
+	 *
+	 * {{{
+	 * $prefix = '$prefix$'; // customize as needed
+	 * $bytes  = String::random(8); // 64 bits
+	 * $salt   = $prefix . String::encode64($bytes);
+	 * }}}
+	 *
+	 * @param string $input The input bytes.
+	 * @return string The same bytes in the /.0-9A-Za-z alphabet.
+	 */
+	public static function encode64($input) {
+		$base64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+		$i = 0;
+
+		$count = strlen($input);
+		$output = '';
+
+		do {
+			$value = ord($input[$i++]);
+			$output .= $base64[$value & 0x3f];
+
+			if ($i < $count) {
+				$value |= ord($input[$i]) << 8;
+			}
+			$output .= $base64[($value >> 6) & 0x3f];
+
+			if ($i++ >= $count) {
+				break;
+			}
+			if ($i < $count) {
+				$value |= ord($input[$i]) << 16;
+			}
+			$output .= $base64[($value >> 12) & 0x3f];
+
+			if ($i++ >= $count) {
+				break;
+			}
+			$output .= $base64[($value >> 18) & 0x3f];
+		} while ($i < $count);
+
+		return $output;
+	}
+
+	/**
+	 * Generates a Blowfish salt for use in hashPassword().
+	 *
+	 * @param integer $count The base-2 logarithm of the iteration count.
+	 *        Defaults to `10`. Can be `4` to `31`.
+	 * @return string $salt
+	 **/
+	protected static function _genSaltBf($count = 10) {
+		$count = (integer) $count;
+		if ($count < 4 || $count > 31)
+			$count = 10;
+
+		// We don't use the encode64() method here because it could result
+		// in 2 bits less of entropy depending on the last char.
+		$base64 = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		$i = 0;
+
+		$input = static::random(16); // 128 bits
+		$output = '';
+
+		do {
+			$c1 = ord($input[$i++]);
+			$output .= $base64[$c1 >> 2];
+			$c1 = ($c1 & 0x03) << 4;
+			if ($i >= 16) {
+				$output .= $base64[$c1];
+				break;
+			}
+
+			$c2 = ord($input[$i++]);
+			$c1 |= $c2 >> 4;
+			$output .= $base64[$c1];
+			$c1 = ($c2 & 0x0f) << 2;
+
+			$c2 = ord($input[$i++]);
+			$c1 |= $c2 >> 6;
+			$output .= $base64[$c1];
+			$output .= $base64[$c2 & 0x3f];
+		} while (1);
+
+		return '$2a$'
+			. chr(ord('0') + $count / 10) . chr(ord('0') + $count % 10) // zeroize $count
+			. '$' . $output;
+	}
+
+	/**
+	 * Generates an Extended DES salt for use in hashPassword().
+	 *
+	 * @param integer $count The base-2 logarithm of the iteration count.
+	 *        Defaults to `18`. Can be `1` to `24`.
+	 * @return string The XDES salt.
+	 */
+	protected static function _genSaltXDES($count = 18) {
+		$count = (integer) $count;
+		if ($count < 1 || $count > 24)
+			$count = 16;
+
+		// Count should be odd to not reveal weak DES keys
+		$count = (1 << $count) - 1;
+
+		$base64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+		$output = '_'
+			// iterations
+			. $base64[$count & 0x3f]
+			. $base64[($count >> 6) & 0x3f]
+			. $base64[($count >> 12) & 0x3f]
+			. $base64[($count >> 18) & 0x3f]
+			// 24 bits of salt
+			. self::encode64(self::random(3));
+
+		return $output;
+	}
+
+	/**
+	 * Generates an MD5 salt.
+	 *
+	 * @return string The MD5 salt.
+	 **/
+	protected static function _genSaltMD5() {
+		$output = '$1$'
+			. static::encode64(static::random(6)); // 48 bits
+		return $output;
+	}
+
+	/**
 	 * Replaces variable placeholders inside a string with any given data. Each key
 	 * in the `$data` array corresponds to a variable placeholder name in `$str`.
 	 *
