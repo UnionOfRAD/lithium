@@ -171,7 +171,7 @@ class String {
 	 * that:
 	 *
 	 * - Two identical passwords will not be hashed the same way.
-	 * - String::genSalt()'s count interator can be later increased (assuming
+	 * - String::genSalt()'s count interator can later be increased (assuming
 	 *   BF or XDES is available) within Lithium or your application, without
 	 *   invalidating existing password hashes.
 	 *
