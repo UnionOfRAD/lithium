@@ -167,8 +167,8 @@ class String {
 	 * but fundamentally insecure for passwords, due to the invariable lack
 	 * of a cryptographically secure salt.
 	 *
-	 * Moreover, String::hashPassword's cryptographically secure salts ensure
-	 * that:
+	 * Moreover, String::hashPassword()'s cryptographically secure salts
+	 * ensure that:
 	 *
 	 * - Two identical passwords will not be hashed the same way.
 	 * - String::genSalt()'s count interator can later be increased (assuming
