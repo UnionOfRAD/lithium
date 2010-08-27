@@ -13,6 +13,25 @@ use lithium\net\http\Request;
 use lithium\tests\mocks\util\MockStringObject;
 
 class StringTest extends \lithium\test\Unit {
+	/**
+	 * testRandomGenerator method
+	 *
+	 * @return void
+	 **/
+	public function testRandomGenerator() {
+		// Disallow allow seeding twice
+		$this->assertFalse(String::seed() && String::seed());
+
+		$check = array();
+		$count = 50;
+		$pattern = "/^[0-9A-Za-z\.\/]+$/";
+		for ($i = 0; $i < $count; $i++) {
+			$result = String::random(8);
+			$this->assertPattern($pattern, String::encode64($result));
+			$this->assertFalse(in_array($result, $check));
+			$check[] = $result;
+		}
+	}
 
 	/**
 	 * testUuidGeneration method
@@ -35,7 +54,7 @@ class StringTest extends \lithium\test\Unit {
 	 */
 	public function testMultipleUuidGeneration() {
 		$check = array();
-		$count = 500;
+		$count = 50;
 		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[8-9a-b][a-f0-9]{3}-[a-f0-9]{12}$/";
 
 		for ($i = 0; $i < $count; $i++) {
@@ -77,6 +96,48 @@ class StringTest extends \lithium\test\Unit {
 		$expected = 'a9050b4f44797bf60262de984ca12967711389cd6c4c4aeee2a739c159f1f667';
 		$result = String::hash($string, compact('type'));
 		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * testPassword method
+	 *
+	 * @return void
+	 **/
+	public function testPassword() {
+		$pass = 'Lithium rocks!';
+
+		$bfSalt = "{^\\$2a\\$06\\$[0-9A-Za-z./]{22}$}";
+		$bfHash = "{^\\$2a\\$06\\$[0-9A-Za-z./]{53}$}";
+
+		$xdesSalt = "{^_zD..[0-9A-Za-z./]{4}$}";
+		$xdesHash = "{^_zD..[0-9A-Za-z./]{15}$}";
+
+		$md5Salt = "{^\\$1\\$[0-9A-Za-z./]{8}$}";
+		$md5Hash = "{^\\$1\\$[0-9A-Za-z./]{8}\\$[0-9A-Za-z./]{22}$}";
+
+		// Make it a bit false, else we'll be there tomorrow
+		foreach (array('bf' => 6, 'xdes' => 10, 'md5' => false) as $method => $log2) {
+			$salts = array();
+			$hashes = array();
+			$count = 50;
+			$saltPattern = ${$method . 'Salt'};
+			$hashPattern = ${$method . 'Hash'};
+
+			for ($i = 0; $i < $count; $i++) {
+				$salt = String::genSalt($method, $log2);
+				$this->assertPattern($saltPattern, $salt);
+				$this->assertFalse(in_array($salt, $salts));
+				$salts[] = $salt;
+
+				$hash = String::hashPassword($pass, $salt);
+				$this->assertPattern($hashPattern, $hash);
+				$this->assertEqual(substr($hash, 0, strlen($salt)), $salt);
+				$this->assertFalse(in_array($hash, $hashes));
+				$hashes[] = $hash;
+
+				$this->assertTrue(String::checkPassword($pass, $hash));
+			}
+		}
 	}
 
 	/**
