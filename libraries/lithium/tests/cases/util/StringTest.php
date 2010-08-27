@@ -115,7 +115,7 @@ class StringTest extends \lithium\test\Unit {
 		$md5Salt = "{^\\$1\\$[0-9A-Za-z./]{8}$}";
 		$md5Hash = "{^\\$1\\$[0-9A-Za-z./]{8}\\$[0-9A-Za-z./]{22}$}";
 
-		// Make it a bit false, else we'll be there tomorrow
+		// Make it a bit slow, else we'll be there tomorrow
 		foreach (array('bf' => 6, 'xdes' => 10, 'md5' => false) as $method => $log2) {
 			$salts = array();
 			$hashes = array();
