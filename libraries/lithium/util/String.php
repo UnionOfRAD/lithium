@@ -242,7 +242,7 @@ class String {
 	 * probably too fast. The defaults generate about 10 hashes per second
 	 * using a dual-core 2.2GHz CPU.
 	 *
-	 * Note: This salt generator is different from naive salt implementations
+	 * Note: this salt generator is different from naive salt implementations
 	 * (e.g. md5(microtime())) that are invariably found in OSS PHP applications,
 	 * in that it uses all of the available bits of entropy for the supplied salt
 	 * method.
@@ -378,7 +378,9 @@ class String {
 	 * Generates an Extended DES salt for use in hashPassword().
 	 *
 	 * @param integer $count The base-2 logarithm of the iteration count.
-	 *        Defaults to `18`. Can be `1` to `24`.
+	 *        Defaults to `18`. Can be `1` to `24`. 1 will be stripped
+	 *        from the actual value, e.g. 2^18 - 1, to ensure we don't
+	 *        use a weak DES key.
 	 * @return string The XDES salt.
 	 */
 	protected static function _genSaltXDES($count = 18) {
