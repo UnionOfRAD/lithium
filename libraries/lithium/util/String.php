@@ -81,7 +81,7 @@ class String {
 	 */
 	public static function random($bytes) {
 		if (!isset(static::$_urandom)) {
-			self::seed();
+			static::seed();
 		}
 
 		if (static::$_urandom) {
@@ -229,7 +229,7 @@ class String {
 	 * method (tries Blowfish, then XDES, and fallbacks to MD5), for use in
 	 * String::hashPassword().
 	 *
-	 * Blowfish and xdes are adaptive hashing algorithms. md5 is not. Adaptive
+	 * Blowfish and XDES are adaptive hashing algorithms. MD5 is not. Adaptive
 	 * hashing algorithms are designed in such a way that when computers get
 	 * faster, you can tune the algorithm to be slower by increasing the number
 	 * of hash iterations, without introducing incompatibility with existing
@@ -398,7 +398,7 @@ class String {
 			. $base64[($count >> 12) & 0x3f]
 			. $base64[($count >> 18) & 0x3f]
 			// 24 bits of salt
-			. self::encode64(self::random(3));
+			. static::encode64(static::random(3));
 
 		return $output;
 	}
