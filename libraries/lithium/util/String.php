@@ -21,10 +21,10 @@ class String {
 	/**
 	 * UUID related constants
 	 */
-	const clearVer = 15;  // 00001111  Clears all bits of version byte with AND
-	const version4 = 64;  // 01000000
-	const clearVar = 63;  // 00111111  Clears all relevant bits of variant byte with AND
-	const varRFC   = 128; // 10000000  The RFC 4122 variant (this variant)
+	const clearVer = 15;  // 00001111  Clears all bits of version byte
+	const version4 = 64;  // 01000000  Sets the version bit
+	const clearVar = 63;  // 00111111  Clears relevant bits of variant byte
+	const varRFC   = 128; // 10000000  The RFC 4122 variant
 
 	/**
 	 * A file pointer towards urandom if available, else false
@@ -34,15 +34,56 @@ class String {
 	protected static $_urandom;
 
 	/**
-	 * Generates random bytes, using urandom if available, md_rand if not
-	 */
-	public static function random($bytes) {
-		// Use urandom if available, else fall back to mt_rand
-		if (!isset(static::$_urandom)) {
-			static::$_urandom = is_readable('/dev/urandom') ? fopen('/dev/urandom', 'rb') : false;
+	 * Seeds the random generator if it has yet to be done.
+	 *
+	 * @return boolean Success.
+	 **/
+	public static function seed() {
+		// Seeding more than once means less entropy, not more, so bail
+		if (isset(static::$_urandom)) {
+			return false;
 		}
 
-		// Generate random bytes
+		// Use urandom if the device is available
+		if (is_readable('/dev/urandom')) {
+			static::$_urandom = fopen('/dev/urandom', 'rb');
+		// Else seed PHP's mt_rand()
+		} else {
+			$seed = function() {
+				list($usec, $sec) = explode(' ', microtime());
+				$seed = (float) $sec + ((float) $usec * 100000);
+				if (function_exists('getmypid')) {
+					$seed .= getmypid();
+				}
+				return $seed;
+			};
+			mt_srand($seed());
+			static::$_urandom = false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Generates random bytes for use in UUIDs and password salts.
+	 *
+	 * The method seeds the random source automatically. It uses
+	 * /dev/urandom if the latter is available; md_rand() if not.
+	 *
+	 * It can also be used to generate arbitrary bits:
+	 *
+	 * {{{
+	 * $bits = bin2hex(String::random(8)); // 64 bits
+	 * }}}
+	 *
+	 * @param integer $bytes The number of bytes to generate
+	 * @param string Random bytes
+	 */
+	public static function random($bytes) {
+		if (!isset(static::$_urandom)) {
+			self::seed();
+		}
+
 		if (static::$_urandom) {
 			$rand = fread(static::$_urandom, $bytes);
 		} else {
@@ -56,11 +97,10 @@ class String {
 	}
 
 	/**
-	 * Generates a random UUID.
+	 * Generates an RFC 4122-compliant version 4 UUID.
 	 *
-	 * @return string An RFC 4122-compliant, version 4 UUID.
+	 * @return string The string representation of an RFC 4122-compliant, version 4 UUID.
 	 * @link http://www.ietf.org/rfc/rfc4122.txt
-	 * @link http://jkingweb.ca/code/php/lib.uuid/
 	 */
 	public static function uuid() {
 		$uuid = static::random(16);
