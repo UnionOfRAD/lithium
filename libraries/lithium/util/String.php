@@ -167,6 +167,14 @@ class String {
 	 * but fundamentally insecure for passwords, due to the invariable lack
 	 * of a cryptographically secure salt.
 	 *
+	 * Moreover, String::hashPassword's cryptographically secure salts ensure
+	 * that:
+	 *
+	 * - Two identical passwords will not be hashed the same way.
+	 * - String::genSalt()'s count interator can be later increased (assuming
+	 *   BF or XDES is available) within Lithium or your application, without
+	 *   invalidating existing password hashes.
+	 *
 	 * Usage:
 	 *
 	 * {{{
@@ -270,10 +278,10 @@ class String {
 	}
 
 	/**
-	 * Encodes bytes into the ./0-9A-Za-z alphabet, for use as salt when
+	 * Encodes bytes into an ./0-9A-Za-z alphabet, for use as salt when
 	 * hashing passwords.
 	 *
-	 * Note: this is not the same as  RFC 1421, or base64_encode(), which
+	 * Note: this is not the same as RFC 1421, or base64_encode(), which
 	 * uses an +/0-9A-Za-z alphabet.
 	 *
 	 * This function can be combined with String::random() to generate random
