@@ -34,13 +34,9 @@ class String {
 	protected static $_urandom;
 
 	/**
-	 * Generates a random UUID.
-	 *
-	 * @return string An RFC 4122-compliant, version 4 UUID.
-	 * @link http://www.ietf.org/rfc/rfc4122.txt
-	 * @link http://jkingweb.ca/code/php/lib.uuid/
+	 * Generates random bytes, using urandom if available, md_rand if not
 	 */
-	public static function uuid() {
+	public static function random($bytes) {
 		// Use urandom if available, else fall back to mt_rand
 		if (!isset(static::$_urandom)) {
 			static::$_urandom = is_readable('/dev/urandom') ? fopen('/dev/urandom', 'rb') : false;
@@ -48,13 +44,26 @@ class String {
 
 		// Generate random fields
 		if (static::$_urandom) {
-			$uuid = fread(static::$_urandom, 16);
+			$rand = fread(static::$_urandom, $bytes);
 		} else {
-			$uuid = '';
-			for ($i = 0; $i < 16; $i++) {
-				$uuid .= chr(mt_rand(0, 255));
+			$rand = '';
+			for ($i = 0; $i < $bytes; $i++) {
+				$rand .= chr(mt_rand(0, 255));
 			}
 		}
+
+		return $rand;
+	}
+
+	/**
+	 * Generates a random UUID.
+	 *
+	 * @return string An RFC 4122-compliant, version 4 UUID.
+	 * @link http://www.ietf.org/rfc/rfc4122.txt
+	 * @link http://jkingweb.ca/code/php/lib.uuid/
+	 */
+	public static function uuid() {
+		$uuid = static::random(16);
 
 		// Set version
 		$uuid[6] = chr(ord($uuid[6]) & static::clearVer | static::version4);
