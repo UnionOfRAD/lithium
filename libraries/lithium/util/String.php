@@ -42,7 +42,7 @@ class String {
 			static::$_urandom = is_readable('/dev/urandom') ? fopen('/dev/urandom', 'rb') : false;
 		}
 
-		// Generate random fields
+		// Generate random bytes
 		if (static::$_urandom) {
 			$rand = fread(static::$_urandom, $bytes);
 		} else {
