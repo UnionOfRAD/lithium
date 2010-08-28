@@ -185,6 +185,19 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual('/users/view/47#blargh', $result);
 	}
 
+    public function testQueryString() {
+		Router::connect('/{:controller}/{:action}');
+		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}', array('id' => null));
+
+		$result = Router::match(array('Posts::edit', '?' => array('key' => 'value')));
+		$this->assertEqual('/posts/edit?key=value', $result);
+
+		$result = Router::match(array(
+			'Posts::edit', 'id' => 42, '?' => array('key' => 'value', 'test' => 'foo')
+		));
+		$this->assertEqual('/posts/edit/42?key=value&test=foo', $result);
+    }
+
 	/**
 	 * Tests that URLs specified as "Controller::action" and including additional parameters are
 	 * interpreted properly.
