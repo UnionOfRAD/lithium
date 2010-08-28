@@ -68,7 +68,7 @@ class String {
 	 * Generates random bytes for use in UUIDs and password salts.
 	 *
 	 * The method seeds the random source automatically. It uses
-	 * /dev/urandom if the latter is available; md_rand() if not.
+	 * /dev/urandom if the latter is available; `md_rand()` if not.
 	 *
 	 * It can also be used to generate arbitrary bits:
 	 *
@@ -158,20 +158,20 @@ class String {
 	}
 
 	/**
-	 * Hashes a password using PHP's crypt() and an optional salt. If no
-	 * salt is supplied, a cryptographically secure salt will be generated
-	 * using String::genSalt().
+	 * Hashes a password using PHP's `crypt()` and an optional salt. If no
+	 * salt is supplied, a cryptographically strong salt will be generated
+	 * using `String::genSalt()`.
 	 *
 	 * Using this function is the proper way to hash a password. Using naive
-	 * methods such as String::hash() is fine to check a file's integrity,
+	 * methods such as `String::hash()` is fine to check a file's integrity,
 	 * but fundamentally insecure for passwords, due to the invariable lack
-	 * of a cryptographically secure salt.
+	 * of a cryptographically strong salt.
 	 *
-	 * Moreover, String::hashPassword()'s cryptographically secure salts
+	 * Moreover, `String::hashPassword()`'s cryptographically strong salts
 	 * ensure that:
 	 *
 	 * - Two identical passwords will not be hashed the same way.
-	 * - String::genSalt()'s count interator can later be increased (assuming
+	 * - `String::genSalt()`'s count interator can later be increased (assuming
 	 *   BF or XDES is available) within Lithium or your application, without
 	 *   invalidating existing password hashes.
 	 *
@@ -212,7 +212,7 @@ class String {
 	}
 
 	/**
-	 * Compares a password and its hashed value using PHP5's crypt().
+	 * Compares a password and its hashed value using PHP's `crypt()`.
 	 *
 	 * @param string $password The password to check
 	 * @param string $hash The hashed password to compare
@@ -225,9 +225,9 @@ class String {
 	}
 
 	/**
-	 * Generates a cryptographically secure salt, using the best available
+	 * Generates a cryptographically strong salt, using the best available
 	 * method (tries Blowfish, then XDES, and fallbacks to MD5), for use in
-	 * String::hashPassword().
+	 * `String::hashPassword()`.
 	 *
 	 * Blowfish and XDES are adaptive hashing algorithms. MD5 is not. Adaptive
 	 * hashing algorithms are designed in such a way that when computers get
@@ -242,15 +242,16 @@ class String {
 	 * probably too fast. The defaults generate about 10 hashes per second
 	 * using a dual-core 2.2GHz CPU.
 	 *
-	 * Note: this salt generator is different from naive salt implementations
-	 * (e.g. md5(microtime())) that are invariably found in OSS PHP applications,
+	 * Note1: this salt generator is different from naive salt implementations
+	 * (e.g. `md5(microtime())`) that are invariably found in OSS PHP applications,
 	 * in that it uses all of the available bits of entropy for the supplied salt
 	 * method.
 	 *
-	 * This method should not be used as salts for custom password hashers,
-	 * however, because salts are prefixed with information expected by PHP's
-	 * crypt(). If you need a random source of alpha numeric characters, use
-	 * String::encode64() instead.
+	 * Note2: this method should not be used as custom salts, for instance in a
+	 * custom password hasher. Indeed, salts are prefixed with information expected
+	 * by PHP's `crypt()`. To get an arbitrarily long, cryptographically strong salt
+	 * consisting in random sequences of alpha numeric characters, combine
+	 * `String::random()` and `String::encode64()` instead.
 	 *
 	 * @param string $type The hash type. Optional. Defaults to '`bf`'.
 	 *        Supported values include:
@@ -278,23 +279,22 @@ class String {
 	}
 
 	/**
-	 * Encodes bytes into an ./0-9A-Za-z alphabet, for use as salt when
+	 * Encodes bytes into an `./0-9A-Za-z` alphabet, for use as salt when
 	 * hashing passwords.
 	 *
-	 * Note: this is not the same as RFC 1421, or base64_encode(), which
-	 * uses an +/0-9A-Za-z alphabet.
+	 * Note: this is not the same as RFC 1421, or `base64_encode()`, which
+	 * uses an `+/0-9A-Za-z` alphabet.
 	 *
-	 * This function can be combined with String::random() to generate random
-	 * sequences of ./0-9A-Za-z characters:
+	 * This function can be combined with `String::random()` to generate random
+	 * sequences of `./0-9A-Za-z` characters:
 	 *
 	 * {{{
-	 * $prefix = '$prefix$'; // customize as needed
-	 * $bytes  = String::random(8); // 64 bits
-	 * $salt   = $prefix . String::encode64($bytes);
+	 * $salt = String::encode64(String::random(8)); // 64 bits
 	 * }}}
 	 *
 	 * @param string $input The input bytes.
-	 * @return string The same bytes in the /.0-9A-Za-z alphabet.
+	 * @return string The same bytes in the `/.0-9A-Za-z` alphabet.
+	 * @see lithium\util\String::random()
 	 */
 	public static function encode64($input) {
 		$base64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -330,7 +330,7 @@ class String {
 	}
 
 	/**
-	 * Generates a Blowfish salt for use in hashPassword().
+	 * Generates a Blowfish salt for use in `String::hashPassword()`.
 	 *
 	 * @param integer $count The base-2 logarithm of the iteration count.
 	 *        Defaults to `10`. Can be `4` to `31`.
@@ -346,7 +346,7 @@ class String {
 		$base64 = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		$i = 0;
 
-		$input = static::random(16); // 128 bits
+		$input = static::random(16); // 128 bits of salt
 		$output = '';
 
 		do {
@@ -370,16 +370,17 @@ class String {
 		} while (1);
 
 		return '$2a$'
-			. chr(ord('0') + $count / 10) . chr(ord('0') + $count % 10) // zeroize $count
+			// zeroize $count
+			. chr(ord('0') + $count / 10) . chr(ord('0') + $count % 10)
 			. '$' . $output;
 	}
 
 	/**
-	 * Generates an Extended DES salt for use in hashPassword().
+	 * Generates an Extended DES salt for use in `String::hashPassword()`.
 	 *
 	 * @param integer $count The base-2 logarithm of the iteration count.
 	 *        Defaults to `18`. Can be `1` to `24`. 1 will be stripped
-	 *        from the actual value, e.g. 2^18 - 1, to ensure we don't
+	 *        from the non-log value, e.g. 2^18 - 1, to ensure we don't
 	 *        use a weak DES key.
 	 * @return string The XDES salt.
 	 */
@@ -406,13 +407,14 @@ class String {
 	}
 
 	/**
-	 * Generates an MD5 salt.
+	 * Generates an MD5 salt for use in `String::hashPassword()`.
 	 *
 	 * @return string The MD5 salt.
 	 **/
 	protected static function _genSaltMD5() {
 		$output = '$1$'
-			. static::encode64(static::random(6)); // 48 bits
+			// 48 bits of salt
+			. static::encode64(static::random(6));
 		return $output;
 	}
 
