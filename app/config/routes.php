@@ -10,12 +10,6 @@ use \lithium\net\http\Router;
 use \lithium\core\Environment;
 
 /**
- * Uncomment the line below to enable routing for admin actions.
- * @todo Implement me.
- */
-// Router::namespace('/admin', array('admin' => true));
-
-/**
  * Here, we are connecting '/' (base path) to controller called 'Pages',
  * its action called 'view', and we pass a param to select the view file
  * to use (in this case, /app/views/pages/home.html.php)...
