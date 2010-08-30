@@ -21,7 +21,7 @@
  * return $posts->to('json');
  * }}}
  */
-use \lithium\util\Collection;
+use lithium\util\Collection;
 
 Collection::formats('\lithium\net\http\Media');
 
@@ -34,9 +34,9 @@ Collection::formats('\lithium\net\http\Media');
  * plugin's `webroot` directory into your main application's `webroot` directory, or adding routing
  * rules in your web server's configuration.
  */
-use \lithium\action\Dispatcher;
-use \lithium\core\Libraries;
-use \lithium\net\http\Media;
+use lithium\action\Dispatcher;
+use lithium\core\Libraries;
+use lithium\net\http\Media;
 
 Dispatcher::applyFilter('_callable', function($self, $params, $chain) {
 	list($plugin, $asset) = explode('/', $params['request']->url, 2) + array("", "");

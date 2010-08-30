@@ -8,15 +8,15 @@
 
 namespace lithium;
 
-use \lithium\core\Environment;
-use \lithium\g11n\Locale;
-use \lithium\g11n\Catalog;
-use \lithium\g11n\Message;
-use \lithium\util\Inflector;
-use \lithium\util\Validator;
-use \lithium\net\http\Media;
-use \lithium\action\Dispatcher as ActionDispatcher;
-use \lithium\console\Dispatcher as ConsoleDispatcher;
+use lithium\core\Environment;
+use lithium\g11n\Locale;
+use lithium\g11n\Catalog;
+use lithium\g11n\Message;
+use lithium\util\Inflector;
+use lithium\util\Validator;
+use lithium\net\http\Media;
+use lithium\action\Dispatcher as ActionDispatcher;
+use lithium\console\Dispatcher as ConsoleDispatcher;
 
 /**
  * Sets the default timezone used by all date/time functions.
