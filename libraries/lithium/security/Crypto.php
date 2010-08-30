@@ -45,7 +45,7 @@ class Crypto {
 		$source = static::$_source ?: static::_source();
 		return $source($bytes);
 	}
-	
+
 	/**
 	 * Encodes bytes into an `./0-9A-Za-z` alphabet, for use as salt when
 	 * hashing passwords.
@@ -113,12 +113,12 @@ class Crypto {
 		switch (true) {
 			case isset(static::$_source);
 				return static::$_source;
-			
+
 			case is_readable('/dev/urandom') && $fp = fopen('/dev/urandom', 'rb'):
 				return static::$_source = function($bytes) use (&$fp) {
 					return fread($fp, $bytes);
 				};
-			
+
 			case class_exists('COM', 0):
 				// http://msdn.microsoft.com/en-us/library/aa388182(VS.85).aspx
 				try {
@@ -126,10 +126,9 @@ class Crypto {
 					return static::$_source = function($bytes) use ($com) {
 						return base64_decode($com->GetRandom($bytes,0));
 					};
+				} catch (Exception $e) {
 				}
-				catch (Exception $e) {
-				}
-			
+
 			default:
 				// fallback to using mt_rand() if all else fails
 				return static::$_source = function($bytes) {
