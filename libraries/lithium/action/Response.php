@@ -73,20 +73,24 @@ class Response extends \lithium\net\http\Response {
 	 */
 	public function cache($expires) {
 		if ($expires === false) {
-			$control = array("no-store, no-cache, must-revalidate", "post-check=0, pre-check=0");
-			$expiration = "Mon, 26 Jul 1997 05:00:00 GMT";
-			$lastModified = gmdate("D, d M Y H:i:s") . " GMT";
-			$pragma = 'no-cache';
+			$headers = array(
+				'Expires' => 'Mon, 26 Jul 1997 05:00:00 GMT',
+				'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT',
+				'Cache-Control' => array(
+					'no-store, no-cache, must-revalidate',
+					'post-check=0, pre-check=0'
+				),
+				'Pragma' => 'no-cache',
+			);
 		} else {
-			$expires = intval($expires) ? $expires : strtotime($expires);
+			$expires = is_int($expires) ? $expires : strtotime($expires);
+			$headers = array(
+				'Expires' => gmdate('D, d M Y H:i:s', $expires) . ' GMT',
+				'Cache-Control' => 'max-age=' . ($expires - time()),
+			);
 		}
 
-		$this->headers(array(
-			'Expires' => $expiration,
-			'Last-Modified' => $lastModified,
-			'Cache-Control' => $control,
-			'Pragma' => $pragma,
-		));
+		$this->headers($headers);
 	}
 
 	/**
