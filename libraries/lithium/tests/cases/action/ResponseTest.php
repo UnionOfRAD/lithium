@@ -85,10 +85,10 @@ class ResponseTest extends \lithium\test\Unit {
 		$headers = array (
 			'HTTP/1.1 201 Created',
 			'Expires: Mon, 26 Jul 1997 05:00:00 GMT',
-			'Last-Modified: ' . gmdate("D, d M Y H:i:s") . ' GMT',
 			array(
 				'Cache-Control: no-store, no-cache, must-revalidate',
-				'Cache-Control: post-check=0, pre-check=0'
+				'Cache-Control: post-check=0, pre-check=0',
+				'Cache-Control: max-age=0'
 			),
 			'Pragma: no-cache'
 		);
