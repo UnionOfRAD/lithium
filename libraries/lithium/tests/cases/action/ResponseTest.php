@@ -49,6 +49,30 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual('Document body', $result);
 		$this->assertEqual(array('HTTP/1.1 200 OK'), $this->response->testHeaders);
 
+		$expires = strtotime('+1 hour');
+		$this->response->cache($expires);
+		ob_start();
+		$this->response->render();
+		$result = ob_get_clean();
+		$headers = array (
+			'HTTP/1.1 200 OK',
+			'Expires: ' . gmdate('D, d M Y H:i:s', $expires) . ' GMT',
+			'Cache-Control: max-age=' . ($expires - time()),
+		);
+		$this->assertEqual($headers, $this->response->testHeaders);
+
+		$expires = '+2 hours';
+		$this->response->cache($expires);
+		ob_start();
+		$this->response->render();
+		$result = ob_get_clean();
+		$headers = array (
+			'HTTP/1.1 200 OK',
+			'Expires: ' . gmdate('D, d M Y H:i:s', strtotime($expires)) . ' GMT',
+			'Cache-Control: max-age=' . (strtotime($expires) - time()),
+		);
+		$this->assertEqual($headers, $this->response->testHeaders);
+
 		$this->response->body = 'Created';
 		$this->response->status(201);
 		$this->response->disableCache();
