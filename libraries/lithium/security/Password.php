@@ -110,7 +110,7 @@ class Password extends \lithium\security\Crypto {
 	 * resulting salts are prefixed with information expected by PHP's
 	 * `crypt()`. To get an arbitrarily long, cryptographically strong salt
 	 * consisting in random sequences of alpha numeric characters, use
-	 * `lithium\security\Crypto::encode64()` instead.
+	 * `lithium\security\Crypto::random()` instead.
 	 *
 	 * @param string $type The hash type. Optional. Defaults to the best
 	 *        available option. Supported values, along with their maximum

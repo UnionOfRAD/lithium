@@ -27,15 +27,13 @@ class Crypto {
 	protected static $_source;
 
 	/**
-	 * Generates random bytes for use in UUIDs and password salts.
-	 *
-	 * The method seeds the random source automatically. It uses
-	 * /dev/urandom if the latter is available; `md_rand()` if not.
-	 *
-	 * It can also be used to generate arbitrary bits:
+	 * Generates random bytes for use in UUIDs and password salts, using
+	 * (when available) a cryptographically strong random number generator.
 	 *
 	 * {{{
-	 * $bits = bin2hex(String::random(8)); // 64 bits
+	 * $bits = String::random(8); // 64 bits
+	 * $hex = bin2hex($bits); // [0-9a-f]+
+	 * $salt = Crypto::encode64($bits); // [./0-9A-Za-z]+
 	 * }}}
 	 *
 	 * @param integer $bytes The number of random bytes to generate
@@ -48,20 +46,13 @@ class Crypto {
 
 	/**
 	 * Encodes bytes into an `./0-9A-Za-z` alphabet, for use as salt when
-	 * hashing passwords.
+	 * hashing passwords for instance.
 	 *
-	 * Note: this is not the same as RFC 1421, or `base64_encode()`, which
+	 * Note: this is not the same as `base64_encode()` (RFC 1421) which
 	 * uses an `+/0-9A-Za-z` alphabet.
 	 *
-	 * This function can be combined with `Crypto::random()` to generate random
-	 * sequences of `./0-9A-Za-z` characters:
-	 *
-	 * {{{
-	 * $salt = String::encode64(String::random(8)); // 64 bits
-	 * }}}
-	 *
 	 * @param string $input The input bytes.
-	 * @return string The same bytes in the `/.0-9A-Za-z` alphabet.
+	 * @return string The same bytes in the `./0-9A-Za-z` alphabet.
 	 * @see lithium\security\Crypto::random()
 	 */
 	public static function encode64($input) {
@@ -98,14 +89,14 @@ class Crypto {
 	}
 
 	/**
-	 * Configures Crypto::_$source using the best available random
-	 * number generator, or the supplied Closure.
+	 * Initializes Crypto::$_source using the best available random
+	 * number generator.
 	 *
-	 * On *nix systems, /dev/urandom gets used if available. On Windows
-	 * systems, COM gets used if available.
+	 * When available, /dev/urandom and COM gets used on *unix and
+	 * Windows systems, respectively.
 	 *
-	 * If all else fails, a Mersenne Twister gets used. (Strictly speaking,
-	 * this fallback is inadequate, but good enough.)
+	 * If all else fails, a Mersenne Twister gets used. (Strictly
+	 * speaking, this fallback is inadequate, but good enough.)
 	 *
 	 * @return Closure The random number generator.
 	 **/
