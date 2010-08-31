@@ -142,10 +142,9 @@ class Model extends \lithium\core\StaticObject {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'connections' => '\lithium\data\Connections',
-		'entity'      => '\lithium\data\Entity',
-		'query'       => '\lithium\data\model\Query',
-		'validator'   => '\lithium\util\Validator'
+		'connections' => 'lithium\data\Connections',
+		'query'       => 'lithium\data\model\Query',
+		'validator'   => 'lithium\util\Validator'
 	);
 
 	/**
@@ -445,10 +444,9 @@ class Model extends \lithium\core\StaticObject {
 
 		$filter = function($self, $params) use ($meta) {
 			$options = $params['options'] + array('model' => $meta['name']);
-			$query = $options['classes']['query'];
-
-			$connection = $self::invokeMethod('_connection');
-			return $connection->read(new $query(array('type' => 'read') + $options), $options);
+			$class = $options['classes']['query'];
+			$query = new $class(array('type' => 'read') + $options);
+			return $self::connection()->read($query, $options);
 		};
 		if (is_string($type) && isset($self->_finders[$type])) {
 			$finder = is_callable($self->_finders[$type]) ? array($self->_finders[$type]) : array();
@@ -570,7 +568,7 @@ class Model extends \lithium\core\StaticObject {
 		if (!isset($self->_relationTypes[$type])) {
 			throw new ConfigException("Invalid relationship type '{$type}' specified.");
 		}
-		$rel = static::_connection()->relationship(get_called_class(), $type, $name, $config);
+		$rel = static::connection()->relationship(get_called_class(), $type, $name, $config);
 		return static::_object()->_relations[$name] = $rel;
 	}
 
@@ -586,7 +584,7 @@ class Model extends \lithium\core\StaticObject {
 		$self = static::_object();
 
 		if (!$self->_schema) {
-			$self->_schema = static::_connection()->describe($self::meta('source'), $self->_meta);
+			$self->_schema = static::connection()->describe($self::meta('source'), $self->_meta);
 		}
 		if (is_string($field) && $field) {
 			return isset($self->_schema[$field]) ? $self->_schema[$field] : null;
@@ -645,11 +643,7 @@ class Model extends \lithium\core\StaticObject {
 					}
 				}
 			}
-
-			if ($self::meta('connection')) {
-				return $self::invokeMethod('_connection')->item($self, $data, $options);
-			}
-			return new $classes['entity'](array('model' => $self) + compact('data') + $options);
+			return $self::connection()->item($self, $data, $options);
 		});
 	}
 
@@ -701,20 +695,18 @@ class Model extends \lithium\core\StaticObject {
 			if ($params['data']) {
 				$entity->set($params['data']);
 			}
-
 			if ($rules = $options['validate']) {
 				if (!$entity->validates(is_array($rules) ? compact('rules') : array())) {
 					return false;
 				}
 			}
-
 			if ($options['whitelist'] || $options['locked']) {
 				$whitelist = $options['whitelist'] ?: array_keys($_schema);
 			}
 
 			$type = $entity->exists() ? 'update' : 'create';
 			$query = new $class(compact('type', 'whitelist', 'entity') + $options + $_meta);
-			return $self::invokeMethod('_connection')->{$type}($query, $options);
+			return $self::connection()->{$type}($query, $options);
 		};
 
 		if (!$options['callbacks']) {
@@ -767,7 +759,7 @@ class Model extends \lithium\core\StaticObject {
 			$type = 'delete';
 			$entity = $params['entity'];
 			$options = $params['options'] + array('model' => $self) + compact('type', 'entity');
-			return $self::invokeMethod('_connection')->delete(new $_class($options), $options);
+			return $self::connection()->delete(new $_class($options), $options);
 		});
 	}
 
@@ -793,7 +785,7 @@ class Model extends \lithium\core\StaticObject {
 		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($_class) {
 			$options = $params + $params['options'] + array('model' => $self, 'type' => 'update');
 			unset($options['options']);
-			return $self::invokeMethod('_connection')->update(new $_class($options), $options);
+			return $self::connection()->update(new $_class($options), $options);
 		});
 	}
 
@@ -818,7 +810,7 @@ class Model extends \lithium\core\StaticObject {
 		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($_class) {
 			$options = $params['options'] + $params + array('model' => $self, 'type' => 'delete');
 			unset($options['options']);
-			return $self::invokeMethod('_connection')->delete(new $_class($options), $options);
+			return $self::connection()->delete(new $_class($options), $options);
 		});
 	}
 
@@ -840,7 +832,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return object Returns an instance of `lithium\data\Source` from the connection configuration
 	 *         to which this model is bound.
 	 */
-	protected static function &_connection() {
+	public static function &connection() {
 		$self = static::_object();
 		$connections = $self->_classes['connections'];
 		$name = isset($self->_meta['connection']) ? $self->_meta['connection'] : null;
@@ -852,6 +844,13 @@ class Model extends \lithium\core\StaticObject {
 			return $conn;
 		}
 		throw new ConfigException("The data connection {$name} is not configured");
+	}
+
+	/**
+	 * @deprecated
+	 */
+	protected static function &_connection() {
+		return static::connection();
 	}
 
 	/**
@@ -980,9 +979,8 @@ class Model extends \lithium\core\StaticObject {
 					$options = $params['options'];
 				}
 				$options += compact('classes', 'model');
-
 				$query = new $classes['query'](array('type' => 'read') + $options);
-				return $self::invokeMethod('_connection')->calculation('count', $query, $options);
+				return $self::connection()->calculation('count', $query, $options);
 			}
 		);
 	}
