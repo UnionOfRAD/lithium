@@ -6,27 +6,27 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-use \lithium\net\http\Router;
-use \lithium\core\Environment;
+use lithium\net\http\Router;
+use lithium\core\Environment;
 
 /**
  * Here, we are connecting '/' (base path) to controller called 'Pages',
  * its action called 'view', and we pass a param to select the view file
  * to use (in this case, /app/views/pages/home.html.php)...
  */
-Router::connect('/', array('controller' => 'pages', 'action' => 'view', 'args' => array('home')));
+Router::connect('/', array('Pages::view', 'args' => array('home')));
 
 /**
  * ...and connect the rest of 'Pages' controller's urls.
  */
-Router::connect('/pages/{:args}', array('controller' => 'pages', 'action' => 'view'));
+Router::connect('/pages/{:args}', 'Pages::view');
 
 /**
  * Connect the testing routes.
  */
 if (!Environment::is('production')) {
-	Router::connect('/test/{:args}', array('controller' => '\lithium\test\Controller'));
-	Router::connect('/test', array('controller' => '\lithium\test\Controller'));
+	Router::connect('/test/{:args}', array('controller' => 'lithium\test\Controller'));
+	Router::connect('/test', array('controller' => 'lithium\test\Controller'));
 }
 
 /**
