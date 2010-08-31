@@ -8,7 +8,11 @@
 
 namespace lithium\tests\cases\data;
 
-use \lithium\data\Connections;
+use Exception;
+use lithium\data\Connections;
+use lithium\data\source\Http;
+use lithium\data\source\Mock;
+use lithium\data\source\database\adapter\MySql;
 
 class ConnectionsTest extends \lithium\test\Unit {
 
@@ -48,18 +52,18 @@ class ConnectionsTest extends \lithium\test\Unit {
 
 		$this->expectException('/mysql_get_server_info/');
 		$this->expectException('/mysql_select_db/');
-		$this->expectException('/mysql_connect/');
+		$this->expectException('/mysql_pconnect/');
 		$result = Connections::get('conn-test');
-		$this->assertTrue($result instanceof \lithium\data\source\database\adapter\MySql);
+		$this->assertTrue($result instanceof MySql);
 
 		$result = Connections::add('conn-test-2', $this->config);
 		$this->assertEqual($expected, $result);
 
 		$this->expectException('/mysql_get_server_info/');
 		$this->expectException('/mysql_select_db/');
-		$this->expectException('/mysql_connect/');
+		$this->expectException('/mysql_pconnect/');
 		$result = Connections::get('conn-test-2');
-		$this->assertTrue($result instanceof \lithium\data\source\database\adapter\MySql);
+		$this->assertTrue($result instanceof MySql);
 	}
 
 	public function testConnectionGetAndReset() {
@@ -88,12 +92,12 @@ class ConnectionsTest extends \lithium\test\Unit {
 
 		$this->expectException('/mysql_get_server_info/');
 		$this->expectException('/mysql_select_db/');
-		$this->expectException('/mysql_connect/');
+		$this->expectException('/mysql_pconnect/');
 		$result = Connections::get('conn-test');
-		$this->assertTrue($result instanceof \lithium\data\source\database\adapter\MySql);
+		$this->assertTrue($result instanceof MySql);
 
 		$result = Connections::get('conn-test');
-		$this->assertTrue($result instanceof \lithium\data\source\database\adapter\MySql);
+		$this->assertTrue($result instanceof MySql);
 
 		$this->assertNull(Connections::get('conn-test-2', array('autoCreate' => false)));
 	}
@@ -114,18 +118,18 @@ class ConnectionsTest extends \lithium\test\Unit {
 
 		Connections::add('stream-test', $config);
 		$result = Connections::get('stream-test');
-		$this->assertTrue($result instanceof \lithium\data\source\Http);
+		$this->assertTrue($result instanceof Http);
 		Connections::config(array('stream-test' => false));
 	}
 
-/*
 	public function testErrorExceptions() {
 		$config = array(
 			'adapter' => 'None',
 			'type' => 'Error'
 		);
-		Connections::add('NoConnection', 'Error', $config);
+		Connections::add('NoConnection', $config);
 		$result = false;
+
 		try {
 			Connections::get('NoConnection');
 		} catch(Exception $e) {
@@ -133,7 +137,11 @@ class ConnectionsTest extends \lithium\test\Unit {
 		}
 		$this->assertTrue($result, 'Exception is not thrown');
 	}
-*/
+
+	public function testGetNullAdapter() {
+		Connections::reset();
+		$this->assertTrue(Connections::get(false) instanceof Mock);
+	}
 }
 
 ?>
