@@ -37,7 +37,7 @@ class Crypto {
 	 * }}}
 	 *
 	 * @param integer $bytes The number of random bytes to generate
-	 * @param string Random bytes
+	 * @return string Random bytes
 	 */
 	public static function random($bytes) {
 		$source = static::$_source ?: static::_source();
@@ -99,7 +99,7 @@ class Crypto {
 	 * speaking, this fallback is inadequate, but good enough.)
 	 *
 	 * @return Closure The random number generator.
-	 **/
+	 */
 	protected static function _source() {
 		switch (true) {
 			case isset(static::$_source);

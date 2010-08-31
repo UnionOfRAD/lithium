@@ -66,7 +66,7 @@ class Password extends \lithium\security\Crypto {
 	 *        - 34 chars long for MD5 hashes
 	 * @see lithium\security\Password::check()
 	 * @see lithium\security\Password::genSalt()
-	 **/
+	 */
 	public static function hash($password, $salt = null) {
 		return crypt($password, $salt ?: static::genSalt());
 	}
@@ -79,7 +79,7 @@ class Password extends \lithium\security\Crypto {
 	 * @return boolean Whether the password is correct or not
 	 * @see lithium\security\Password::hash()
 	 * @see lithium\security\Password::genSalt()
-	 **/
+	 */
 	public static function check($password, $hash) {
 		return $hash == crypt($password, $hash);
 	}
@@ -106,8 +106,8 @@ class Password extends \lithium\security\Crypto {
 	 * (e.g. `md5(microtime())`) in that it uses all of the available bits of
 	 * entropy for the supplied salt method.
 	 *
-	 * Note2: this method should not be to generate custom salts. Indeed, the
-	 * resulting salts are prefixed with information expected by PHP's
+	 * Note2: this method should not be use to generate custom salts. Indeed,
+	 * the resulting salts are prefixed with information expected by PHP's
 	 * `crypt()`. To get an arbitrarily long, cryptographically strong salt
 	 * consisting in random sequences of alpha numeric characters, use
 	 * `lithium\security\Crypto::random()` instead.
@@ -127,7 +127,8 @@ class Password extends \lithium\security\Crypto {
 	 * @link http://www.postgresql.org/docs/9.0/static/pgcrypto.html
 	 * @see lithium\security\Password::hash()
 	 * @see lithium\security\Password::check()
-	 **/
+	 * @see lithium\security\Crypto::random()
+	 */
 	public static function genSalt($type = null, $count = null) {
 		switch (true) {
 			case CRYPT_BLOWFISH == 1 && (!$type || $type === 'bf'):
@@ -144,8 +145,8 @@ class Password extends \lithium\security\Crypto {
 	 *
 	 * @param integer $count The base-2 logarithm of the iteration count.
 	 *        Defaults to `10`. Can be `4` to `31`.
-	 * @return string $salt
-	 **/
+	 * @return string The Blowfish salt
+	 */
 	protected static function _genSaltBf($count = 10) {
 		$count = (integer) $count;
 		if ($count < 4 || $count > 31)
@@ -220,7 +221,7 @@ class Password extends \lithium\security\Crypto {
 	 * Generates an MD5 salt for use in `lithium\security\Password::hash()`.
 	 *
 	 * @return string The MD5 salt.
-	 **/
+	 */
 	protected static function _genSaltMD5() {
 		$output = '$1$'
 			// 48 bits of salt
