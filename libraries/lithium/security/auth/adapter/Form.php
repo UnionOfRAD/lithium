@@ -63,14 +63,14 @@ use lithium\core\Libraries;
  * configured. Filters are callbacks which accept the value of a field as input, and return a
  * modified version of the value as output. Filters can be any PHP callable, i.e. a closure or
  * `array('ClassName', 'method')`. The only filter that is configured by default is for
- * the password field, which is filtered by `lithium\util\String::hash()`.
+ * the password field, which is filtered by `lithium\security\Crypto::hash()`.
  *
  * Note that if you are specifying the `'fields'` configuration using key/value pairs, the key
  * used to specify the filter must match the key side of the `'fields'` assignment.
  *
  * @see lithium\net\http\Request::$data
  * @see lithium\data\Model::find()
- * @see lithium\util\String::hash()
+ * @see lithium\security\Crypto::hash()
  */
 class Form extends \lithium\core\Object {
 
@@ -109,7 +109,7 @@ class Form extends \lithium\core\Object {
 	 * key in the array must match a request field specified in the `$_fields` property, and each
 	 * value must either be a reference to a function or method name, or a closure. For example, to
 	 * automatically hash passwords, the `Form` adapter provides the following default
-	 * configuration, i.e.: `array('password' => array('\lithium\util\String', 'hash'))`.
+	 * configuration, i.e.: `array('password' => array('lithium\security\Crypto', 'hash'))`.
 	 *
 	 * Optionally, you can specify a callback with no key, which will receive (and can modify) the
 	 * entire credentials array before the query is executed, as in the following example:
@@ -134,7 +134,7 @@ class Form extends \lithium\core\Object {
 	 * @see lithium\security\auth\adapter\Form::$_fields
 	 * @var array
 	 */
-	protected $_filters = array('password' => array('\lithium\util\String', 'hash'));
+	protected $_filters = array('password' => array('lithium\security\Crypto', 'hash'));
 
 	/**
 	 * If you require custom model logic in your authentication query, use this setting to specify
