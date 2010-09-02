@@ -258,8 +258,8 @@ class CouchDb extends \lithium\data\source\Http {
 				$query->entity()->update($result['id'], array('rev' => $result['rev']));
 				return true;
 			}
-			if (isset($result['error']) && $result['error'] === 'conflict') {
-				return $self->read($query, $options);
+			if (isset($result['error'])) {
+				$query->entity()->errors(array($result['error']));
 			}
 			return false;
 		});
