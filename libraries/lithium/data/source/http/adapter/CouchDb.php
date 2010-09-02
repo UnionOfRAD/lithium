@@ -240,10 +240,11 @@ class CouchDb extends \lithium\data\source\Http {
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
 			$query = $params['query'];
 			$options = $params['options'];
-			$data = $query->data();
 			$params = $query->export($self);
 			extract($params, EXTR_OVERWRITE);
 			list($_path, $conditions) = (array) $conditions;
+
+			$data = $query->data();
 
 			foreach (array('id', 'rev') as $key) {
 				$data["_{$key}"] = isset($data[$key]) ? (string) $data[$key] : null;
