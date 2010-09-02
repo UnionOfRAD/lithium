@@ -16,7 +16,7 @@ class MockCouchModel extends \lithium\data\Model {
 	);
 }
 
-class CouchDbModelTest extends \lithium\test\Unit {
+class CouchDbIntegrationTest extends \lithium\test\Integration {
 
 	public function setUp() {
 		MockCouchModel::meta(array('connection' => 'test'));
