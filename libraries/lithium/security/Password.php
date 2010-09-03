@@ -125,8 +125,8 @@ class Password extends \lithium\security\Crypto {
 	 * @param string $type The hash type. Optional. Defaults to the best
 	 *        available option. Supported values, along with their maximum
 	 *        password lengths, include:
-	 *        - `'bf'`: Blowfish (128 salt bits, max 72 chars)
-	 *        - `'xdes'`: XDES (24 salt bits, max 8 chars)
+	 *        - `'bf'`: Blowfish (128 salt bits, first 72 chars considered)
+	 *        - `'xdes'`: XDES (24 salt bits, unlimited length)
 	 *        - `'md5'`: MD5 (48 salt bits, unlimited length)
 	 * @param integer $count Optional. The base-2 logarithm of the iteration
 	 *        count, for adaptive algorithms. Defaults to:
@@ -191,7 +191,7 @@ class Password extends \lithium\security\Crypto {
 		} while (1);
 
 		return '$2a$'
-			// zeroize iterations
+			// iterations, zeroized
 			. chr(ord('0') + $count / 10) . chr(ord('0') + $count % 10)
 			// 128 bits of salt, encoded
 			. '$' . $output;
@@ -217,12 +217,12 @@ class Password extends \lithium\security\Crypto {
 		$base64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
 		$output = '_'
-			// encode iterations
+			// iterations, encoded
 			. $base64[$count & 0x3f]
 			. $base64[($count >> 6) & 0x3f]
 			. $base64[($count >> 12) & 0x3f]
 			. $base64[($count >> 18) & 0x3f]
-			// 24 bits of salt
+			// 24 bits of salt, encoded
 			. static::random64(3);
 
 		return $output;
@@ -235,7 +235,7 @@ class Password extends \lithium\security\Crypto {
 	 */
 	protected static function _genSaltMD5() {
 		$output = '$1$'
-			// 48 bits of salt
+			// 48 bits of salt, encoded
 			. static::random64(6);
 		return $output;
 	}

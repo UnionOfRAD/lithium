@@ -52,6 +52,19 @@ class PasswordTest extends \lithium\test\Unit {
 			}
 		}
 	}
+	
+	/**
+	 * testPasswordMaxLength method
+	 *
+	 * @return void
+	 **/
+	public function testPasswordMaxLength() {
+		foreach (array('bf' => 72) as $method => $length) {
+			$salt = Password::genSalt($method);
+			$pass = str_repeat('a', $length);
+			$this->assertIdentical(Password::hash($pass, $salt), Password::hash($pass . 'a', $salt));
+		}
+	}
 }
 
 ?>
