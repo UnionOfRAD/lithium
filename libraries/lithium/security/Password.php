@@ -157,7 +157,7 @@ class Password extends \lithium\security\Crypto {
 	 *        Defaults to `10`. Can be `4` to `31`.
 	 * @return string The Blowfish salt
 	 */
-	protected static function _genSaltBf($count = static::BF) {
+	protected static function _genSaltBf($count = null) {
 		$count = (integer) $count;
 		if ($count < 4 || $count > 31)
 			$count = static::BF;
@@ -178,7 +178,7 @@ class Password extends \lithium\security\Crypto {
 	 *        use a weak DES key.
 	 * @return string The XDES salt.
 	 */
-	protected static function _genSaltXDES($count = static::XDES) {
+	protected static function _genSaltXDES($count = null) {
 		$count = (integer) $count;
 		if ($count < 1 || $count > 24)
 			$count = static::XDES;
