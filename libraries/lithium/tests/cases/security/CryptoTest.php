@@ -18,11 +18,25 @@ class CryptoTest extends \lithium\test\Unit {
 	 **/
 	public function testRandomGenerator() {
 		$check = array();
-		$count = 50;
-		$pattern = "/^[0-9A-Za-z\.\/]+$/";
+		$count = 25;
 		for ($i = 0; $i < $count; $i++) {
 			$result = Crypto::random(8);
-			$this->assertPattern($pattern, Crypto::encode64($result));
+			$this->assertFalse(in_array($result, $check));
+			$check[] = $result;
+		}
+	}
+	/**
+	 * testRandomGenerator method
+	 *
+	 * @return void
+	 **/
+	public function testRandom64Generator() {
+		$check = array();
+		$count = 25;
+		$pattern = "/^[0-9A-Za-z\.\/]{11}$/";
+		for ($i = 0; $i < $count; $i++) {
+			$result = Crypto::random64(8);
+			$this->assertPattern($pattern, $result);
 			$this->assertFalse(in_array($result, $check));
 			$check[] = $result;
 		}

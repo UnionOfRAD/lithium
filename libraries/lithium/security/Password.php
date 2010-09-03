@@ -16,6 +16,16 @@ namespace lithium\security;
  */
 class Password extends \lithium\security\Crypto {
 	/**
+	 * The default log2 number of iterations for Blowfish encryption
+	 */
+	const BF = 10;
+
+	/**
+	 * The default log2 number of iterations for XDES encryption
+	 */
+	const XDES = 18;
+
+	/**
 	 * Hashes a password using PHP's `crypt()` and an optional salt. If no
 	 * salt is supplied, a cryptographically strong salt will be generated
 	 * using `lithium\security\Password::genSalt()`.
@@ -109,8 +119,8 @@ class Password extends \lithium\security\Crypto {
 	 * Note2: this method should not be use to generate custom salts. Indeed,
 	 * the resulting salts are prefixed with information expected by PHP's
 	 * `crypt()`. To get an arbitrarily long, cryptographically strong salt
-	 * consisting in random sequences of alpha numeric characters, use
-	 * `lithium\security\Crypto::random()` instead.
+	 * consisting in random bits encoded as alpha numeric characters, use
+	 * `lithium\security\Crypto::random64()` instead.
 	 *
 	 * @param string $type The hash type. Optional. Defaults to the best
 	 *        available option. Supported values, along with their maximum
@@ -127,7 +137,7 @@ class Password extends \lithium\security\Crypto {
 	 * @link http://www.postgresql.org/docs/9.0/static/pgcrypto.html
 	 * @see lithium\security\Password::hash()
 	 * @see lithium\security\Password::check()
-	 * @see lithium\security\Crypto::random()
+	 * @see lithium\security\Crypto::random64()
 	 */
 	public static function genSalt($type = null, $count = null) {
 		switch (true) {
@@ -147,43 +157,16 @@ class Password extends \lithium\security\Crypto {
 	 *        Defaults to `10`. Can be `4` to `31`.
 	 * @return string The Blowfish salt
 	 */
-	protected static function _genSaltBf($count = 10) {
+	protected static function _genSaltBf($count = static::BF) {
 		$count = (integer) $count;
 		if ($count < 4 || $count > 31)
-			$count = 10;
-
-		// We don't use the encode64() method here because it could result
-		// in 2 bits less of entropy depending on the last char.
-		$base64 = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-		$i = 0;
-
-		$input = static::random(16); // 128 bits of salt
-		$output = '';
-
-		do {
-			$c1 = ord($input[$i++]);
-			$output .= $base64[$c1 >> 2];
-			$c1 = ($c1 & 0x03) << 4;
-			if ($i >= 16) {
-				$output .= $base64[$c1];
-				break;
-			}
-
-			$c2 = ord($input[$i++]);
-			$c1 |= $c2 >> 4;
-			$output .= $base64[$c1];
-			$c1 = ($c2 & 0x0f) << 2;
-
-			$c2 = ord($input[$i++]);
-			$c1 |= $c2 >> 6;
-			$output .= $base64[$c1];
-			$output .= $base64[$c2 & 0x3f];
-		} while (1);
+			$count = static::BF;
 
 		return '$2a$'
-			// zeroize $count
+			// zeroize iterations
 			. chr(ord('0') + $count / 10) . chr(ord('0') + $count % 10)
-			. '$' . $output;
+			// 128 bits of salt
+			. '$' . static::random64(16);
 	}
 
 	/**
@@ -195,10 +178,10 @@ class Password extends \lithium\security\Crypto {
 	 *        use a weak DES key.
 	 * @return string The XDES salt.
 	 */
-	protected static function _genSaltXDES($count = 18) {
+	protected static function _genSaltXDES($count = static::XDES) {
 		$count = (integer) $count;
 		if ($count < 1 || $count > 24)
-			$count = 16;
+			$count = static::XDES;
 
 		// Count should be odd to not reveal weak DES keys
 		$count = (1 << $count) - 1;
@@ -206,13 +189,13 @@ class Password extends \lithium\security\Crypto {
 		$base64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
 		$output = '_'
-			// iterations
+			// encode iterations
 			. $base64[$count & 0x3f]
 			. $base64[($count >> 6) & 0x3f]
 			. $base64[($count >> 12) & 0x3f]
 			. $base64[($count >> 18) & 0x3f]
 			// 24 bits of salt
-			. static::encode64(static::random(3));
+			. static::random64(3);
 
 		return $output;
 	}
@@ -225,7 +208,7 @@ class Password extends \lithium\security\Crypto {
 	protected static function _genSaltMD5() {
 		$output = '$1$'
 			// 48 bits of salt
-			. static::encode64(static::random(6));
+			. static::random64(6);
 		return $output;
 	}
 }

@@ -34,7 +34,6 @@ class Crypto {
 	 * {{{
 	 * $bits = String::random(8); // 64 bits
 	 * $hex = bin2hex($bits); // [0-9a-f]+
-	 * $salt = Crypto::encode64($bits); // [./0-9A-Za-z]+
 	 * }}}
 	 *
 	 * @param integer $bytes The number of random bytes to generate
@@ -46,47 +45,25 @@ class Crypto {
 	}
 
 	/**
-	 * Encodes bytes into an `./0-9A-Za-z` alphabet, for use as salt when
-	 * hashing passwords for instance.
+	 * Generates random bytes encoded into an `./0-9A-Za-z` alphabet, for use
+	 * as salt when hashing passwords for instance.
 	 *
-	 * Note: this is not the same as `base64_encode()` (RFC 1421) which
-	 * uses an `+/0-9A-Za-z` alphabet.
+	 * Note: this is not the same as `base64_encode()`, which encodes bytes
+	 * using an `A-Za-z0-9+/` alphabet.
 	 *
-	 * @param string $input The input bytes.
-	 * @return string The same bytes in the `./0-9A-Za-z` alphabet.
+	 * @param integer $bytes The number of random bytes to generate.
+	 * @return string The random bytes encoded in the `./0-9A-Za-z` alphabet.
 	 * @see lithium\security\Crypto::random()
 	 */
-	public static function encode64($input) {
-		$base64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-		$i = 0;
-
-		$count = strlen($input);
-		$output = '';
-
-		do {
-			$value = ord($input[$i++]);
-			$output .= $base64[$value & 0x3f];
-
-			if ($i < $count) {
-				$value |= ord($input[$i]) << 8;
-			}
-			$output .= $base64[($value >> 6) & 0x3f];
-
-			if ($i++ >= $count) {
-				break;
-			}
-			if ($i < $count) {
-				$value |= ord($input[$i]) << 16;
-			}
-			$output .= $base64[($value >> 12) & 0x3f];
-
-			if ($i++ >= $count) {
-				break;
-			}
-			$output .= $base64[($value >> 18) & 0x3f];
-		} while ($i < $count);
-
-		return $output;
+	public static function random64($bytes) {
+		// The alphabet used by base64_encode() is different than the one we
+		// should be using. When considering the meaty part of the resulting
+		// string, however, a bijection allows to go the from one to another.
+		// Given that we're working on random bytes, we can use safely use
+		// base64_encode() without losing any entropy, sparing ourselves the
+		// hassle of maintaining more code than needed.
+		$base64 = base64_encode(static::random($bytes));
+		return strtr(rtrim($base64, '='), '+', '.');
 	}
 
 	/**
