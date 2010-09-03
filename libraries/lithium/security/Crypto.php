@@ -62,8 +62,8 @@ class Crypto {
 		// Given that we're working on random bytes, we can use safely use
 		// base64_encode() without losing any entropy, sparing ourselves the
 		// hassle of maintaining more code than needed.
-		$base64 = base64_encode(static::random($bytes));
-		return strtr(rtrim($base64, '='), '+', '.');
+		$encoded = base64_encode(static::random($bytes));
+		return strtr(rtrim($encoded, '='), '+', '.');
 	}
 
 	/**

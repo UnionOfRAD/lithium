@@ -162,11 +162,39 @@ class Password extends \lithium\security\Crypto {
 		if ($count < 4 || $count > 31)
 			$count = static::BF;
 
+		// We don't use the random64() method here because it can result
+		// in 2 bits less of entropy depending on the last char.
+		$base64 = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		$i = 0;
+
+		$input = static::random(16); // 128 bits of salt
+		$output = '';
+
+		do {
+			$c1 = ord($input[$i++]);
+			$output .= $base64[$c1 >> 2];
+			$c1 = ($c1 & 0x03) << 4;
+			if ($i >= 16) {
+				$output .= $base64[$c1];
+				break;
+			}
+
+			$c2 = ord($input[$i++]);
+			$c1 |= $c2 >> 4;
+			$output .= $base64[$c1];
+			$c1 = ($c2 & 0x0f) << 2;
+
+			$c2 = ord($input[$i++]);
+			$c1 |= $c2 >> 6;
+			$output .= $base64[$c1];
+			$output .= $base64[$c2 & 0x3f];
+		} while (1);
+
 		return '$2a$'
 			// zeroize iterations
 			. chr(ord('0') + $count / 10) . chr(ord('0') + $count % 10)
-			// 128 bits of salt
-			. '$' . static::random64(16);
+			// 128 bits of salt, encoded
+			. '$' . $output;
 	}
 
 	/**

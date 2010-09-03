@@ -29,7 +29,7 @@ class PasswordTest extends \lithium\test\Unit {
 		$md5Hash = "{^\\$1\\$[0-9A-Za-z./]{8}\\$[0-9A-Za-z./]{22}$}";
 
 		// Make it faster than the default settings, else we'll be there tomorrow
-		foreach (array('bf' => 6, 'xdes' => 10, 'md5' => false) as $method => $log2) {
+		foreach (array('bf' => 6, 'xdes' => 10, 'md5' => null) as $method => $log2) {
 			$salts = array();
 			$hashes = array();
 			$count = 20;
