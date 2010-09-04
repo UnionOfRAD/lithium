@@ -220,7 +220,7 @@ class Php extends \lithium\core\Object {
 	 * @param array $old Reference to the array that needs to be overwritten. Will usually
 	 *        be `$_SESSION`.
 	 * @param array $new The data that should overwrite the keys/values in `$old`.
-	 * @return void
+	 * @return true Success
 	 */
 	public static function overwrite(&$old, $new) {
 		if (!empty($old)) {
@@ -233,6 +233,7 @@ class Php extends \lithium\core\Object {
 		foreach ($new as $key => $value) {
 			$old[$key] = $value;
 		}
+		return true;
 	}
 }
 
