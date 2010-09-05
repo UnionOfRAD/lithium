@@ -18,35 +18,11 @@ use lithium\test\Dispatcher;
 class Test extends \lithium\console\Command {
 
 	/**
-	 * Path to the test case in dot notation.
-	 *
-	 * For example:
-	 * {{{
-	 * lithium test --case=console.CommandTest
-	 * }}}
-	 *
-	 * @var string
-	 */
-	public $case = null;
-
-	/**
-	 * Path to test group in dot notation.
-	 *
-	 * For example:
-	 * {{{
-	 * lithium test --group=lithium.tests.cases.console
-	 * }}}
-	 *
-	 * @var string
-	 */
-	public $group = null;
-
-	/**
 	 * Filters.
 	 *
 	 * For example:
 	 * {{{
-	 * lithium test --case=lithium.tests.cases.core.ObjectTest --filters=Coverage
+	 * lithium test lithium/tests/cases/core/ObjectTest.php --filters=Coverage
 	 * }}}
 	 *
 	 * @var string
@@ -54,35 +30,44 @@ class Test extends \lithium\console\Command {
 	public $filters = array();
 
 	/**
-	 * Runs tests. Will provide a list of available tests if none are given.
-	 * Test cases should be given in dot notation.
+	 * Runs tests given a path to a directory or file containing tests. The path to the
+	 * test(s) may be absolte or relative to the current working directory.
 	 *
-	 * Case example:
 	 * {{{
-	 * lithium test --case=lithium.tests.cases.core.ObjectTest
-	 * }}}
-	 *
-	 * Group example:
-	 * {{{
-	 * lithium test --group=lithium.tests.cases.core
+	 * lithium test lithium/tests/cases/core/ObjectTest.php
+	 * lithium test lithium/tests/cases/core
 	 * }}}
 	 *
 	 * @param string $path Absolute or relative path to tests.
 	 * @return boolean Will exit with status `1` if one or more tests failed otherwise with `0`.
 	 */
-	public function run() {
-		$this->header('Test');
+	public function run($path = null) {
+		$path = str_replace('\\', '/', $path);
 
-		if ($this->_getTests() != true) {
-			return 0;
+		if (!$path) {
+			$this->error('Please provide a path to tests.');
+			return false;
 		}
+		if ($path[0] != '/') {
+			$path = $this->request->env('working') . '/' . $path;
+		}
+		if (!file_exists($path)) {
+			$this->error('Not a valid path.');
+			return false;
+		}
+
+		if (!$libraryPath = $this->_library($path)) {
+			$this->error("No library registered for path `{$path}`.");
+			return false;
+		}
+		$path = $libraryPath;
+
+		$this->header('Test');
+		$this->out(sprintf('Running test(s) in `%s`... ', $path), array('nl' => false));
+
 		error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
 
-		$run = $this->case ?: $this->group;
-		$run = '\\' . str_replace('.', '\\', $run);
-		$this->out(sprintf('Running `%s`... ', $run), false);
-
-		$report = Dispatcher::run($run, array(
+		$report = Dispatcher::run($path, array(
 			'filters' => $this->filters,
 			'reporter' => 'console',
 			'format' => 'txt'
@@ -140,32 +125,18 @@ class Test extends \lithium\console\Command {
 	}
 
 	/**
-	 * Provide a list of test cases and accept input as case to run.
+	 * Finds a library for given path.
 	 *
-	 * @return void
+	 * @param string $path Normalized (to slashes) absolute or relative path.
+	 * @return string|void The library's path on success.
 	 */
-	protected function _getTests() {
-		while (empty($this->case) && empty($this->group)) {
-			$tests = Libraries::locate('tests', null, array(
-				'filter' => '/cases|integration|functional/',
-				'exclude' => '/mocks/'
-			));
-			$tests = str_replace('\\', '.', $tests);
-
-			foreach ($tests as $key => $test) {
-				$this->out(++$key . ". " . $test);
-			}
-			$number = $this->in("Choose a test case. (q to quit)");
-
-			if (isset($tests[--$number])) {
-				$this->case = $tests[$number];
-			}
-
-			if ($number === 'q') {
-				return 0;
+	protected function _library($path) {
+		foreach (Libraries::get() as $name => $library) {
+			if (strpos($path, $library['path']) === 0) {
+				$path = str_replace(array($library['path'], '.php'), null, $path);
+				return '\\' . $name . str_replace('/', '\\', $path);
 			}
 		}
-		return 1;
 	}
 }
 
