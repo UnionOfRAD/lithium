@@ -110,7 +110,7 @@ class Test extends \lithium\console\Command {
 
 		$classes = Libraries::find(true, array(
 			'recursive' => true,
-			'exclude' => '/\w+Test$|webroot|index$|^app\\\\config|^app\\\\views/'
+			'exclude' => '/tests|resources|webroot|index$|^app\\\\config|^app\\\\views/'
 		));
 		$tests = Group::all();
 		$classes = array_diff($classes, $tests);
