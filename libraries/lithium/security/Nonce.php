@@ -9,6 +9,7 @@
 
 namespace lithium\security;
 
+use \lithium\security\Crypto;
 use \lithium\storage\Session;
 
 /**
@@ -16,7 +17,7 @@ use \lithium\storage\Session;
  * cryptographically strong salt generator, and utility functions to hash and check
  * passwords.
  */
-class Nonce extends \lithium\security\Crypto {
+class Nonce {
 	protected static $_salt;
 
 	/**
@@ -53,7 +54,7 @@ class Nonce extends \lithium\security\Crypto {
 	protected static function _salt() {
 		static::$_salt = Session::read('lithium.nonce', array('name' => 'default'));
 		if (!static::$_salt) {
-			static::$_salt = static::random(32); // 256 bits
+			static::$_salt = Crypto::random(32); // 256 bits
 			Session::write('lithium.nonce', static::$_salt, array('name' => 'default'));
 		}
 		return static::$_salt;

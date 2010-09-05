@@ -9,12 +9,14 @@
 
 namespace lithium\security;
 
+use \lithium\security\Crypto;
+
 /**
  * Password utility class that makes use of PHP's `crypt()` function. Includes a
  * cryptographically strong salt generator, and utility functions to hash and check
  * passwords.
  */
-class Password extends \lithium\security\Crypto {
+class Password {
 	/**
 	 * The default log2 number of iterations for Blowfish encryption
 	 */
@@ -167,7 +169,7 @@ class Password extends \lithium\security\Crypto {
 		$base64 = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		$i = 0;
 
-		$input = static::random(16); // 128 bits of salt
+		$input = Crypto::random(16); // 128 bits of salt
 		$output = '';
 
 		do {
@@ -223,7 +225,7 @@ class Password extends \lithium\security\Crypto {
 			. $base64[($count >> 12) & 0x3f]
 			. $base64[($count >> 18) & 0x3f]
 			// 24 bits of salt, encoded
-			. static::random64(3);
+			. Crypto::random64(3);
 
 		return $output;
 	}
@@ -236,7 +238,7 @@ class Password extends \lithium\security\Crypto {
 	protected static function _genSaltMD5() {
 		$output = '$1$'
 			// 48 bits of salt, encoded
-			. static::random64(6);
+			. Crypto::random64(6);
 		return $output;
 	}
 }
