@@ -28,7 +28,7 @@ if (!($apcEnabled = Apc::enabled()) && !is_writable(LITHIUM_APP_PATH . '/resourc
 
 Cache::config(array(
 	'default' => array(
-		'adapter' => '\lithium\storage\cache\adapter\\' . ($apcEnabled ? 'Apc' : 'File')
+		'adapter' => 'lithium\storage\cache\adapter\\' . ($apcEnabled ? 'Apc' : 'File')
 	)
 ));
 
