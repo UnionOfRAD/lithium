@@ -1,5 +1,20 @@
+<?php
+
+$summary = array(
+	'classes' => 0, 'executable' => 0, 'covered' => 0, 'uncovered' => 0, 'percentage' => 0
+);
+
+?>
+
 <h3>Code Coverage</h3>
 <?php foreach ($data as $class => $coverage): ?>
+	<?php
+		$summary['classes']++;
+		$summary['executable'] += count($coverage['executable']);
+		$summary['covered'] += count($coverage['covered']);
+		$summary['uncovered'] += count($coverage['uncovered']);
+		$summary['percentage'] += $coverage['percentage'];
+	?>
 	<h4 class="coverage">
 		<?php echo $class ?>:
 		<?php echo count($coverage['covered']) ?> of <?php echo count($coverage['executable']) ?>
@@ -22,3 +37,43 @@
 		<?php endif ?>
 	<?php endforeach ?>
 <?php endforeach ?>
+
+<?php
+	if (!$summary['classes'] || !$summary['executable']) {
+		return;
+	}
+?>
+
+<br /><br />
+
+<h4>Summary</h4>
+<table class="metrics"><tbody>
+	<tr>
+		<td class="metric-name">Classes Covered</th>
+		<td class="metric"><?php echo $summary['classes'] ?></td>
+	</tr>
+	<tr>
+		<td class="metric-name">Executable Lines</th>
+		<td class="metric"><?php echo $summary['executable'] ?></td>
+	</tr>
+	<tr>
+		<td class="metric-name">Lines Covered</th>
+		<td class="metric"><?php echo $summary['covered'] ?></td>
+	</tr>
+	<tr>
+		<td class="metric-name">Lines Uncovered</th>
+		<td class="metric"><?php echo $summary['uncovered'] ?></td>
+	</tr>
+	<tr>
+		<td class="metric-name">Total Coverage</th>
+		<td class="metric">
+			<?php echo round(($summary['covered'] / $summary['executable']) * 100, 2) ?>%
+		</td>
+	</tr>
+	<tr>
+		<td class="metric-name">Average Per Class</th>
+		<td class="metric">
+			<?php echo round($summary['percentage'] / $summary['classes'], 2) ?>%
+		</td>
+	</tr>
+</tbody></table>
