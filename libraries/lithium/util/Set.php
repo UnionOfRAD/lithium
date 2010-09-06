@@ -60,7 +60,7 @@ class Set {
 	 * @return boolean `true` if path is found, `false` otherwise.
 	 */
 	public static function check($data, $path = null) {
-		if (empty($path)) {
+		if (!$path) {
 			return $data;
 		}
 		if (!is_array($path)) {
@@ -79,7 +79,6 @@ class Set {
 				$data =& $data[$key];
 			}
 		}
-		return true;
 	}
 
 	/**
@@ -205,9 +204,9 @@ class Set {
 	 * @return array Computed difference.
 	 */
 	public static function diff($val1, $val2 = null) {
-		if (empty($val1)) {
+		if (!$val1) {
 			return (array) $val2;
-		} elseif (empty($val2)) {
+		} elseif (!$val2) {
 			return (array) $val1;
 		}
 		$out = array();
@@ -753,10 +752,9 @@ class Set {
 		$extract = static::extract($data, $path);
 		$result = $flatten($flatten, $extract);
 
-		list($keys, $values) = array(
-			static::extract($result, '/id'),
-			static::extract($result, '/value')
-		);
+		$keys = static::extract($result, '/id');
+		$values = static::extract($result, '/value');
+
 		$dir = ($dir === 'desc') ? SORT_DESC : SORT_ASC;
 		array_multisort($values, $dir, $keys, $dir);
 		$sorted = array();
@@ -766,126 +764,6 @@ class Set {
 			$sorted[] = $data[$k];
 		}
 		return $sorted;
-	}
-
-	/**
-	 * Genric method for converting arrays and objects between different types
-	 *
-	 * @param string $type The type to convert to : array|object
-	 * @param string $data The array or object data to convert
-	 * @param string $options
-	 * @return void
-	 */
-	public static function to($type, $data, array $options = array()) {
-		if ($type === 'object') {
-			return static::_toObject($data, $options);
-		}
-		return static::_toArray($data);
-	}
-
-	/**
-	 * Converts an object into an array. If `$object` is no object, reverse
-	 * will return the same value.
-	 *
-	 * @param object $object Object to make into an array.
-	 * @return array
-	 */
-	public static function _toArray($object) {
-		$out = array();
-		if (is_object($object)) {
-			$keys = get_object_vars($object);
-			if (isset($keys['_name_'])) {
-				$identity = $keys['_name_'];
-				unset($keys['_name_']);
-			}
-			$new = array();
-			foreach ($keys as $key => $value) {
-				if (is_array($value)) {
-					$new[$key] = static::_toArray($value);
-				} else {
-					if (isset($value->_name_)) {
-						$new = array_merge($new, static::_toArray($value));
-					} else {
-						$new[$key] = static::_toArray($value);
-					}
-				}
-			}
-			if (isset($identity)) {
-				$out[$identity] = $new;
-			} else {
-				$out = $new;
-			}
-		} elseif (is_array($object)) {
-			foreach ($object as $key => $value) {
-				$out[$key] = static::_toArray($value);
-			}
-		} else {
-			$out = $object;
-		}
-		return $out;
-	}
-
-	/**
-	 * Maps the contents of the Set object to an object hierarchy.  Maintains numeric
-	 * keys as arrays of objects.
-	 *
-	 * @param array $data The array.
-	 * @param string $options
-	 * @return object Hierarchical object.
-	 */
-	public static function _toObject($data, array $options = array()) {
-		if (empty($data)) {
-			return $data;
-		}
-
-		$defaults = array('class' => '\stdClass', 'flatten' => true, 'name' => false);
-		$options += $defaults;
-		$out = new $options['class'];
-		$name = $options['name'];
-
-		if (is_array($data)) {
-			$keys = array_keys($data);
-			foreach ($data as $key => $value) {
-				if (is_numeric($key)) {
-					if (is_object($out)) {
-						$out = get_object_vars($out);
-					}
-					$out[$key] = static::_toObject($value, $options);
-					$isNamed = (
-						!empty($options['name']) && $options['flatten'] === false &&
-						is_object($out[$key]) && !isset($out[$key]->_name_) &&
-						static::depth($value, true) >= 2
-					);
-					if ($isNamed) {
-						$out[$key]->_name_ = $options['name'];
-					}
-				} elseif (is_array($value)) {
-					if ($options['flatten'] === true) {
-						$options['flatten'] = false;
-						$out->_name_ = $key;
-						foreach ($value as $key2 => $value2) {
-							$out->{$key2} = static::_toObject($value2, array('flatten' => false));
-						}
-					} else {
-						if (!is_numeric($key)) {
-							$out->{$key} = static::_toObject($value, array(
-								'flatten' => false, 'name' => $key
-							));
-							if (is_object($out->{$key}) && !isset($out->{$key}->_name_)) {
-								$out->{$key}->_name_ = $key;
-							}
-						} else {
-							$out->{$key} = static::_toObject($value, array('flatten' => true));
-						}
-					}
-				} else {
-					$out->{$key} = $value;
-				}
-			}
-		} else {
-			$out = $data;
-		}
-		return $out;
 	}
 }
 
