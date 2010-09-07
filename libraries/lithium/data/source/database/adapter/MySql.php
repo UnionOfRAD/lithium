@@ -8,7 +8,7 @@
 
 namespace lithium\data\source\database\adapter;
 
-use \Exception;
+use lithium\data\model\QueryException;
 
 /**
  * Extends the `Database` class to implement the necessary SQL-formatting and resultset-fetching
@@ -328,7 +328,7 @@ class MySql extends \lithium\data\source\Database {
 				return $result;
 			}
 			list($code, $error) = $self->error();
-			throw new Exception("{$sql}: {$error}", $code);
+			throw new QueryException("{$sql}: {$error}", $code);
 		});
 	}
 

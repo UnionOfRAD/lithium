@@ -8,7 +8,7 @@
 
 namespace lithium\data\source\http\adapter;
 
-use \Exception;
+use lithium\core\ConfigException;
 
 /**
  * CouchDb adapter
@@ -134,7 +134,7 @@ class CouchDb extends \lithium\data\source\Http {
 			}
 		}
 		if (!$this->_db) {
-			throw new Exception("{$entity} is not available.");
+			throw new ConfigException("{$entity} is not available.");
 		}
 	}
 

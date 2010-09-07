@@ -8,10 +8,10 @@
 
 namespace lithium\data\source;
 
-use \lithium\util\String;
-use \lithium\core\Libraries;
-use \lithium\util\Inflector;
-use \InvalidArgumentException;
+use lithium\util\String;
+use lithium\core\Libraries;
+use lithium\util\Inflector;
+use InvalidArgumentException;
 
 /**
  * The `Database` class provides the base-level abstraction for SQL-oriented relational databases.

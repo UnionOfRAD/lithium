@@ -8,9 +8,9 @@
 
 namespace lithium\data;
 
-use \RuntimeException;
-use \lithium\data\Source;
-use \lithium\util\Collection as Col;
+use BadMethodCallException;
+use lithium\data\Source;
+use lithium\util\Collection as Col;
 
 /**
  * `Entity` is a smart data object which represents data such as a row or document in a
@@ -183,7 +183,9 @@ class Entity extends \lithium\core\Object {
 	 */
 	public function __call($method, $params) {
 		if (!($model = $this->_model) || !method_exists($model, $method)) {
-			throw new RuntimeException("No model bound or unhandled method call '{$method}'.");
+			throw new BadMethodCallException(
+				"No model bound or unhandled method call '{$method}'."
+			);
 		}
 		array_unshift($params, $this);
 		$class = $model::invokeMethod('_object');

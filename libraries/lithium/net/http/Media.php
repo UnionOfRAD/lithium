@@ -8,9 +8,9 @@
 
 namespace lithium\net\http;
 
-use \RuntimeException;
-use \lithium\util\String;
-use \lithium\core\Libraries;
+use lithium\util\String;
+use lithium\core\Libraries;
+use lithium\net\http\MediaException;
 
 /**
  * The `Media` class facilitates content-type mapping (mapping between content-types and file
@@ -404,7 +404,7 @@ class Media extends \lithium\core\StaticObject {
 			$handler = array_filter($handler, $filter) + $handlers['default'] + $defaults;
 
 			if (!$hasHandler) {
-				throw new RuntimeException("Unhandled media type '{$type}'");
+				throw new MediaException("Unhandled media type '{$type}'");
 			}
 
 			if (isset($types[$type])) {
@@ -509,7 +509,7 @@ class Media extends \lithium\core\StaticObject {
 				case ($handler['template'] === false) && is_string($data):
 					return $data;
 				default:
-					throw new RuntimeException("Could not interpret type settings for handler.");
+					throw new MediaException("Could not interpret type settings for handler.");
 			}
 			return $result;
 		});

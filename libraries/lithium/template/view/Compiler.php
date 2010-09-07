@@ -8,7 +8,7 @@
 
 namespace lithium\template\view;
 
-use \Exception;
+use lithium\template\TemplateException;
 
 /**
  * The template compiler is a simple string replacement engine which allows PHP templates to be
@@ -74,7 +74,7 @@ class Compiler extends \lithium\core\StaticObject {
 		if ($options['fallback']) {
 			return $file;
 		}
-		throw new Exception("Could not write compiled template {$template} to cache");
+		throw new TemplateException("Could not write compiled template {$template} to cache");
 	}
 
 	/**

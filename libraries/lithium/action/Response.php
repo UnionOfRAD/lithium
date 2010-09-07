@@ -8,7 +8,7 @@
 
 namespace lithium\action;
 
-use \Exception;
+use UnexpectedValueException;
 
 /**
  * A `Response` object is typically instantiated automatically by the `Controller`. It is assigned
@@ -103,7 +103,7 @@ class Response extends \lithium\net\http\Response {
 		}
 
 		if (!$status = $this->status($code)) {
-			throw new Exception('Invalid status code');
+			throw new UnexpectedValueException('Invalid status code');
 		}
 		$this->_writeHeader($status);
 

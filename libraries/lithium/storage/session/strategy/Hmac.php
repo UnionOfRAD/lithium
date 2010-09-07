@@ -8,8 +8,8 @@
 
 namespace lithium\storage\session\strategy;
 
-use \Exception;
-use \RuntimeException;
+use RuntimeException;
+use lithium\core\ConfigException;
 
 /**
  * This strategy allows you to sign your `Session` and/or `Cookie` data with a passphrase
@@ -56,7 +56,7 @@ class Hmac extends \lithium\core\Object {
 	 */
 	public function __construct(array $config = array()) {
 		if (!isset($config['secret'])) {
-			throw new Exception("HMAC strategy requires a secret key.");
+			throw new ConfigException("HMAC strategy requires a secret key.");
 		}
 		static::$_secret = $config['secret'];
 	}

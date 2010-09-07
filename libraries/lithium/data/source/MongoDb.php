@@ -8,14 +8,15 @@
 
 namespace lithium\data\source;
 
-use \Mongo;
-use \MongoId;
-use \MongoCode;
-use \MongoDBRef;
-use \MongoRegex;
-use \MongoGridFSFile;
-use \lithium\util\Inflector;
-use \Exception;
+use Mongo;
+use MongoId;
+use MongoCode;
+use MongoDBRef;
+use MongoRegex;
+use MongoGridFSFile;
+use lithium\util\Inflector;
+use lithium\core\NetworkException;
+use Exception;
 
 /**
  * A data source adapter which allows you to connect to the MongoDB database engine. MongoDB is an
@@ -729,7 +730,7 @@ class MongoDb extends \lithium\data\Source {
 
 	protected function _checkConnection() {
 		if (!$this->_isConnected && !$this->connect()) {
-			throw new Exception("Could not connect to the database.");
+			throw new NetworkException("Could not connect to the database.");
 		}
 	}
 }

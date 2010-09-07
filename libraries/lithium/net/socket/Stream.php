@@ -8,7 +8,7 @@
 
 namespace lithium\net\socket;
 
-use \Exception;
+use lithium\core\NetworkException;
 
 /**
  * A PHP stream-based socket adapter.
@@ -46,7 +46,7 @@ class Stream extends \lithium\net\Socket {
 		);
 
 		if (!empty($errorCode) || !empty($errorMessage)) {
-			throw new Exception($errorMessage, $errorCode);
+			throw new NetworkException($errorMessage);
 		}
 		$this->timeout($config['timeout']);
 

@@ -8,9 +8,10 @@
 
 namespace lithium\core;
 
-use \Exception;
-use \lithium\util\String;
-use \InvalidArgumentException;
+use RuntimeException;
+use lithium\util\String;
+use lithium\core\ConfigException;
+use lithium\core\ClassNotFoundException;
 
 /**
  * Manages all aspects of class and file location, naming and mapping. Implements auto-loading for
@@ -262,7 +263,7 @@ class Libraries {
 				'app' => LITHIUM_APP_PATH, 'root' => LITHIUM_LIBRARY_PATH
 			);
 			if (!$config['path'] = static::_locatePath('libraries', $params)) {
-				throw new InvalidArgumentException("Library '{$name}' not found.");
+				throw new ConfigException("Library '{$name}' not found.");
 			}
 		}
 		$config['path'] = str_replace('\\', '/', $config['path']);
@@ -392,7 +393,7 @@ class Libraries {
 			static::$_cachedPaths[$class] = $path;
 			method_exists($class, '__init') ? $class::__init() : null;
 		} elseif ($require) {
-			throw new Exception("Failed to load {$class} from {$path}");
+			throw new RuntimeException("Failed to load {$class} from {$path}");
 		}
 	}
 
@@ -474,6 +475,26 @@ class Libraries {
 			list($match, $replace) = $transform;
 			return preg_replace($match, $replace, $class) ?: null;
 		}
+	}
+
+	/**
+	 * Uses service location (i.e. `Libraries::locate()`) to look up a named class of a particular
+	 * type, and creates an instance of it, and passes an array of parameters to the constructor.
+	 *
+	 * If the given class can't be found, an exception is thrown.
+	 *
+	 * @param string $type The type of class as defined by `Libraries::$_paths`.
+	 * @param string $name The un-namespaced name of the class to instantiate.
+	 * @param array $options An array of constructor parameters to pass to the class.
+	 * @return object If the class is found, returns an instance of it, otherwise throws an
+	 *         exception.
+	 * @throws lithium\core\ClassNotFoundException Throws an exception if the class can't be found.
+	 */
+	public static function instance($type, $name, array $options = array()) {
+		if (!$class = static::locate($type, $name)) {
+			throw new ClassNotFoundException("Class '{$name}' of type '{$type}' not found.");
+		}
+		return new $class($options);
 	}
 
 	/**

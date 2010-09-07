@@ -8,9 +8,9 @@
 
 namespace lithium\template\view\adapter;
 
-use \Exception;
-use \lithium\util\String;
-use \lithium\core\Libraries;
+use lithium\util\String;
+use lithium\core\Libraries;
+use lithium\template\TemplateException;
 
 /**
  * The File adapter implements both template loading and rendering, and uses the `view\Stream` class
@@ -171,7 +171,7 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 				return $path;
 			}
 		}
-		throw new Exception("Template not found at {$path}");
+		throw new TemplateException("Template not found at {$path}");
 	}
 }
 

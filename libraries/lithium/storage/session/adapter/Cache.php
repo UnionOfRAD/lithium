@@ -8,6 +8,9 @@
 
 namespace lithium\storage\session\adapter;
 
+use RuntimeException;
+use lithium\core\ConfigException;
+
 /**
  * The `Cache` adapter is a simple session adapter which allows session data to be written to a
  * cache configuration.
@@ -79,7 +82,7 @@ class Cache extends \lithium\core\Object {
 		foreach ($this->_defaults as $key => $config) {
 			if (isset($this->_config[$key])) {
 				if (ini_set("session.{$key}", $this->_config[$key]) === false) {
-					throw new RuntimeException("Could not initialize the session.");
+					throw new ConfigException("Could not initialize the session.");
 				}
 			}
 		}
