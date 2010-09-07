@@ -14,6 +14,8 @@ namespace lithium\action;
  * which aren't callable, or un-routable (private) controller methods.
  */
 class DispatchException extends \RuntimeException {
+
+	protected $code = 404;
 }
 
 ?>

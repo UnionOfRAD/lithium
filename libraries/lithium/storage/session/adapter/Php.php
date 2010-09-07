@@ -8,8 +8,9 @@
 
 namespace lithium\storage\session\adapter;
 
-use \lithium\util\Set;
-use \RuntimeException;
+use lithium\util\Set;
+use RuntimeException;
+use lithium\core\ConfigException;
 
 /**
  * A minimal adapter to interface with native PHP sessions.
@@ -61,7 +62,7 @@ class Php extends \lithium\core\Object {
 				continue;
 			}
 			if (ini_set($key, $value) === false) {
-				throw new RuntimeException("Could not initialize the session.");
+				throw new ConfigException("Could not initialize the session.");
 			}
 		}
 	}

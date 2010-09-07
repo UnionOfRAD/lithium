@@ -8,7 +8,8 @@
 
 namespace lithium\g11n\catalog\adapter;
 
-use \Exception;
+use RangeException;
+use lithium\core\ConfigException;
 
 /**
  * The `Gettext` class is an adapter for reading and writing PO and MO files without the
@@ -86,12 +87,12 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 * Initializer.  Checks if the configured path exists.
 	 *
 	 * @return void
-	 * @throws \Exception
+	 * @throws ConfigException
 	 */
 	protected function _init() {
 		parent::_init();
 		if (!is_dir($this->_config['path'])) {
-			throw new Exception("Gettext directory does not exist at `{$this->_config['path']}`");
+			throw new ConfigException("Gettext directory does not exist at `{$this->_config['path']}`");
 		}
 	}
 
@@ -258,13 +259,13 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 *
 	 * @param resource $stream
 	 * @return array
-	 * @throws Exception If stream content has an invalid format.
+	 * @throws RangeException If stream content has an invalid format.
 	 */
 	protected function _parseMo($stream) {
 		$stat = fstat($stream);
 
 		if ($stat['size'] < self::MO_HEADER_SIZE) {
-			throw new Exception("MO stream caontent has an invalid format");
+			throw new RangeException("MO stream caontent has an invalid format");
 		}
 		$magic = unpack('V1', fread($stream, 4));
 		$magic = hexdec(substr(dechex(current($magic)), -8));
@@ -274,7 +275,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 		} elseif ($magic == self::MO_BIG_ENDIAN_MAGIC) {
 			$isBigEndian = true;
 		} else {
-			throw new Exception("MO stream content has an invalid format");
+			throw new RangeException("MO stream content has an invalid format");
 		}
 
 		$header = array(

@@ -8,8 +8,8 @@
 
 namespace lithium\template\view;
 
-use \RuntimeException;
-use \lithium\core\Libraries;
+use RuntimeException;
+use lithium\core\Libraries;
 
 /**
  * The `Renderer` abstract class serves as a base for all concrete `Renderer` adapters.

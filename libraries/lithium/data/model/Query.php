@@ -8,8 +8,8 @@
 
 namespace lithium\data\model;
 
-use \Exception;
-use \lithium\data\Source;
+use lithium\data\Source;
+use lithium\data\model\QueryException;
 
 /**
  * The `Query` class acts as a container for all information necessary to perform a particular
@@ -437,7 +437,7 @@ class Query extends \lithium\core\Object {
 				$config = array();
 			}
 			if (!$relation = $model::relations($name)) {
-				throw new Exception("Related model not found");
+				throw new QueryException("Related model not found");
 			}
 			$config += $relation->data();
 		}

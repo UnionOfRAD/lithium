@@ -138,11 +138,9 @@ class View extends \lithium\core\Object {
 				$this->{'_' . $key} = $this->_config[$key];
 				continue;
 			}
-
-			if (!$class = Libraries::locate('adapter.template.view', $this->_config[$key])) {
-				throw new RuntimeException("Template adapter {$this->_config[$key]} not found");
-			}
-			$this->{'_' . $key} = new $class(array('view' => $this) + $this->_config);
+			$class = $this->_config[$key];
+			$config = array('view' => $this) + $this->_config;
+			$this->{'_' . $key} = Libraries::instance('adapter.template.view', $class, $config);
 		}
 
 		$h = function($data) { return htmlspecialchars((string) $data); };

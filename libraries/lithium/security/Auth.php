@@ -8,7 +8,7 @@
 
 namespace lithium\security;
 
-use \Exception;
+use lithium\core\ConfigException;
 
 /**
  * The `Auth` class provides a common interface to authenticate user credentials from different
@@ -113,7 +113,7 @@ class Auth extends \lithium\core\Adaptable {
 			$config = $self::invokeMethod('_config', array($name));
 
 			if ($config === null) {
-				throw new Exception("Configuration '{$name}' has not been defined.");
+				throw new ConfigException("Configuration '{$name}' has not been defined.");
 			}
 			$session = $config['session'];
 

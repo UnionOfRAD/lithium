@@ -35,9 +35,9 @@ class ViewTest extends \lithium\test\Unit {
 	}
 
 	public function testInitializationWithBadClasses() {
-		$this->expectException('Template adapter Badness not found');
+		$this->expectException("Class 'Badness' of type 'adapter.template.view' not found.");
 		new View(array('loader' => 'Badness'));
-		$this->expectException('Template adapter Badness not found');
+		$this->expectException("Class 'Badness' of type 'adapter.template.view' not found.");
 		new View(array('renderer' => 'Badness'));
 	}
 

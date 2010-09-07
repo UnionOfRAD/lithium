@@ -8,8 +8,8 @@
 
 namespace lithium\analysis\logger\adapter;
 
-use \Exception;
-use \lithium\util\Inflector;
+use lithium\util\Inflector;
+use lithium\core\NetworkException;
 
 /**
  * The `Growl` logger implements support for the [ Growl](http://growl.info/) notification system
@@ -90,7 +90,7 @@ class Growl extends \lithium\core\Object {
 				if ($conn = fsockopen($host, $port, $message, $code)) {
 					return $conn;
 				}
-				throw new Exception("Growl connection failed: ({$code}) {$message}");
+				throw new NetworkException("Growl connection failed: ({$code}) {$message}");
 			}
 		);
 		parent::__construct($config + $defaults);
@@ -149,7 +149,7 @@ class Growl extends \lithium\core\Object {
 		$data .= pack('H32', md5($data . $this->_config['password']));
 
 		if (fwrite($this->connection, $data, strlen($data)) === false) {
-			throw new Exception('Could not send notification to Growl Server.');
+			throw new NetworkException('Could not send notification to Growl Server.');
 		}
 		return true;
 	}
@@ -184,7 +184,7 @@ class Growl extends \lithium\core\Object {
 		$data .= $checksum;
 
 		if (fwrite($this->connection, $data, strlen($data)) === false) {
-			throw new Exception('Could not send registration to Growl Server.');
+			throw new NetworkException('Could not send registration to Growl Server.');
 		}
 		return $this->_registered = true;
 	}

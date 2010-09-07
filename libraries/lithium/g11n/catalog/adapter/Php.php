@@ -8,7 +8,7 @@
 
 namespace lithium\g11n\catalog\adapter;
 
-use \Exception;
+use lithium\core\ConfigException;
 
 /**
  * The `Php` class is an adapter for reading from PHP files which hold g11n data
@@ -25,7 +25,7 @@ use \Exception;
  * );
  * ?>
  * }}}
-
+ *
  * The adapter works with a directory structure below. The example shows the structure
  * for the directory as given by the `'path'` configuration setting. It is similar to
  * the one used by the the `Gettext` adapter.
@@ -71,7 +71,7 @@ class Php extends \lithium\g11n\catalog\Adapter {
 	protected function _init() {
 		parent::_init();
 		if (!is_dir($this->_config['path'])) {
-			throw new Exception("Php directory does not exist at `{$this->_config['path']}`");
+			throw new ConfigException("Php directory does not exist at `{$this->_config['path']}`");
 		}
 	}
 

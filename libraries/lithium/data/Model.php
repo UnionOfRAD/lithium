@@ -8,11 +8,10 @@
 
 namespace lithium\data;
 
-use \lithium\util\Set;
-use \lithium\util\Inflector;
-use \RuntimeException;
-use \UnexpectedValueException;
-use \BadMethodCallException;
+use lithium\util\Set;
+use lithium\util\Inflector;
+use lithium\core\ConfigException;
+use BadMethodCallException;
 
 /**
  * The `Model` class is the starting point for the domain logic of your application.
@@ -569,7 +568,7 @@ class Model extends \lithium\core\StaticObject {
 		$self = static::_object();
 
 		if (!isset($self->_relationTypes[$type])) {
-			throw new RuntimeException("Invalid relationship type '{$type}' specified.");
+			throw new ConfigException("Invalid relationship type '{$type}' specified.");
 		}
 		$rel = static::_connection()->relationship(get_called_class(), $type, $name, $config);
 		return static::_object()->_relations[$name] = $rel;
@@ -847,12 +846,12 @@ class Model extends \lithium\core\StaticObject {
 		$name = isset($self->_meta['connection']) ? $self->_meta['connection'] : null;
 
 		if (!$name) {
-			throw new UnexpectedValueException("Connection name not defined");
+			throw new ConfigException("Connection name not defined");
 		}
 		if ($conn = $connections::get($name)) {
 			return $conn;
 		}
-		throw new RuntimeException("The data connection {$name} is not configured");
+		throw new ConfigException("The data connection {$name} is not configured");
 	}
 
 	/**

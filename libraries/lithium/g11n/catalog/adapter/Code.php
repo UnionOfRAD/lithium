@@ -8,10 +8,10 @@
 
 namespace lithium\g11n\catalog\adapter;
 
-use \Exception;
-use \RecursiveIteratorIterator;
-use \RecursiveDirectoryIterator;
-use \lithium\template\view\Compiler;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
+use lithium\core\ConfigException;
+use lithium\template\view\Compiler;
 
 /**
  * The `Code` class is an adapter which treats files containing code as just another source
@@ -48,7 +48,9 @@ class Code extends \lithium\g11n\catalog\Adapter {
 	protected function _init() {
 		parent::_init();
 		if (!is_dir($this->_config['path'])) {
-			throw new Exception("Code directory does not exist at `{$this->_config['path']}`");
+			throw new ConfigException(
+				"Code directory does not exist at `{$this->_config['path']}`"
+			);
 		}
 	}
 
