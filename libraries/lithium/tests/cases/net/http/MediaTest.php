@@ -8,12 +8,12 @@
 
 namespace lithium\tests\cases\net\http;
 
-use \lithium\net\http\Media;
-use \lithium\action\Request;
-use \lithium\action\Response;
-use \lithium\core\Libraries;
-use \lithium\data\entity\Record;
-use \lithium\data\collection\RecordSet;
+use lithium\net\http\Media;
+use lithium\action\Request;
+use lithium\action\Response;
+use lithium\core\Libraries;
+use lithium\data\entity\Record;
+use lithium\data\collection\RecordSet;
 
 class MediaTest extends \lithium\test\Unit {
 
@@ -468,6 +468,41 @@ class MediaTest extends \lithium\test\Unit {
 		)));
 		$json = '{"1":{"id":1,"foo":"bar"},"2":{"id":2,"foo":"baz"},"3":{"id":3,"baz":"dib"}}';
 		$this->assertEqual($json, Media::encode(array('encode' => 'json_encode'), $data));
+	}
+
+	/**
+	 * Tests that calling `Media::type()` to retrieve the details of a type that is aliased to
+	 * another type, automatically resolves to the settings of the type being pointed at.
+	 *
+	 * @return void
+	 */
+	public function testTypeAliasResolution() {
+		$resolved = Media::type('text');
+		$this->assertEqual('text/plain', $resolved['content']);
+		unset($resolved['options']['encode']);
+
+		$result = Media::type('txt');
+		unset($result['options']['encode']);
+		$this->assertEqual($resolved, $result);
+	}
+
+	public function testQueryUndefinedAssetTypes() {
+		$base = Media::path('index.php', 'generic');
+		$result = Media::path('index.php', 'foo');
+		$this->assertEqual($result, $base);
+
+		$base = Media::asset('/bar', 'generic');
+		$result = Media::asset('/bar', 'foo');
+		$this->assertEqual($result, $base);
+	}
+
+	public function testGetLibraryWebroot() {
+		$this->assertTrue(is_dir(Media::webroot(true)));
+		$this->assertNull(Media::webroot('foobar'));
+
+		Libraries::add('foobar', array('path' => __DIR__, 'webroot' => __DIR__));
+		$this->assertEqual(__DIR__, Media::webroot('foobar'));
+		Libraries::remove('foobar');
 	}
 }
 

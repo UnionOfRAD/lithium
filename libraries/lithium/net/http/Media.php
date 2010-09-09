@@ -165,6 +165,10 @@ class Media extends \lithium\core\StaticObject {
 			if (!$content = static::_types($type)) {
 				return;
 			}
+			if (is_array($content) && isset($content['alias'])) {
+				$type = $content['alias'];
+				$content = static::_types($type);
+			}
 			return compact('content') + array('options' => static::_handlers($type));
 		}
 		if ($content) {
