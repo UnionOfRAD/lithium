@@ -14,7 +14,7 @@ class MockRequestType extends \lithium\action\Request {
 		return 'foo';
 	}
 
-	public function accepts() {
+	public function accepts($type = null) {
 		return 'foo';
 	}
 }

@@ -8,7 +8,7 @@
 
 namespace lithium\action;
 
-use \lithium\util\Validator;
+use lithium\util\Validator;
 
 /**
  * A `Request` object is passed into or instantiated by the `Dispatcher`, and is responsible for
@@ -118,6 +118,14 @@ class Request extends \lithium\net\http\Message {
 	protected $_autoConfig = array(
 		'classes' => 'merge', 'env', 'detectors' => 'merge', 'base', 'type', 'stream'
 	);
+
+	/**
+	 * Contains an array of content-types, sorted by quality (the priority which the browser
+	 * requests each type).
+	 *
+	 * @var array
+	 */
+	protected $_acceptContent = array();
 
 	/**
 	 * Pulls request data from superglobals.
@@ -304,25 +312,61 @@ class Request extends \lithium\net\http\Message {
 	 * @return string Returns a simple type name if the type is registered (i.e. `'json'`), or
 	 *         a fully-qualified content-type if not (i.e. `'image/jpeg'`).
 	 */
-	public function accepts() {
-		if (isset($this->params['type'])) {
+	public function accepts($type = null) {
+		if ($type === true) {
+			return $this->_parseAccept();
+		}
+		if (!$type && isset($this->params['type'])) {
 			return $this->params['type'];
 		}
-		if (!(($accept = $this->env('HTTP_ACCEPT')) && strpos($accept, ',') !== false)) {
-			return 'html';
+		$accept = $this->_parseAccept();
+
+		if (!$type && !$accept) {
+			return $accept ?: 'html';
 		}
 		$media = $this->_classes['media'];
-		$accept = explode(',', $accept);
-
-		if ($accept[0] == 'application/xml' && in_array('application/xhtml+xml', $accept)) {
-			unset($accept[0]);
-		}
 
 		foreach ($accept as $type) {
 			if ($result = $media::type($type)) {
 				return $result['content'];
 			}
 		}
+	}
+
+	protected function _parseAccept() {
+		if ($this->_acceptContent) {
+			return $this->_acceptContent;
+		}
+		if (strpos($accept = $this->env('HTTP_ACCEPT'), ',') === false) {
+			$accept = array('text/html');
+		} else {
+			$accept = explode(',', $accept);
+		}
+
+		foreach ($accept as $i => $type) {
+			unset($accept[$i]);
+			list($type, $q) = (explode(';q=', $type, 2) + array($type, '1.0'));
+
+			if ($type == '*/*') {
+				$q = 0.1;
+			}
+			$accept[$type] = floatval($q);
+		}
+		arsort($accept, SORT_NUMERIC);
+
+		if (isset($accept['text/html']) || isset($accept['application/xhtml+xml'])) {
+			unset($accept['application/xml']);
+		}
+		$media = $this->_classes['media'];
+
+		if (isset($this->params['type'])) {
+			$handler = $media::type($this->params['type']);
+			if (isset($handler['options'])) {
+				$type = (array) $handler['content'];
+				$accept = array(current($type) => 1) + $accept;
+			}
+		}
+		return $this->_acceptContent = array_keys($accept);
 	}
 
 	/**
@@ -365,20 +409,21 @@ class Request extends \lithium\net\http\Message {
 		}
 		$detector = $this->_detectors[$flag];
 
-		if (is_array($detector)) {
-			list($key, $check) = $detector + array('', '');
-			if (is_array($check)) {
-				$check = '/' . join('|', $check) . '/i';
-			}
-			if (Validator::isRegex($check)) {
-				return (boolean) preg_match($check, $this->env($key));
-			}
-			return ($this->env($key) == $check);
-		}
 		if (is_callable($detector)) {
 			return $detector($this);
 		}
-		return (boolean) $this->env($detector);
+		if (!is_array($detector)) {
+			return (boolean) $this->env($detector);
+		}
+		list($key, $check) = $detector + array('', '');
+
+		if (is_array($check)) {
+			$check = '/' . join('|', $check) . '/i';
+		}
+		if (Validator::isRegex($check)) {
+			return (boolean) preg_match($check, $this->env($key));
+		}
+		return ($this->env($key) == $check);
 	}
 
 	/**

@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\net\http;
 
-use \lithium\net\http\Request;
+use lithium\net\http\Request;
 
 class RequestTest extends \lithium\test\Unit {
 

@@ -8,7 +8,7 @@
 
 namespace lithium\net\http;
 
-use \lithium\util\String;
+use lithium\util\String;
 
 /**
  * Facilitates HTTP request creation by assembling connection and path info, `GET` and `POST` data,
@@ -99,7 +99,7 @@ class Request extends \lithium\net\http\Message {
 	 * @return array
 	 */
 	public function queryString($params = array(), $format = "{:key}={:value}&") {
-		if (empty($params)) {
+		if (!$params) {
 			if (is_string($this->params)) {
 				return "?" . $this->params;
 			}
@@ -110,11 +110,10 @@ class Request extends \lithium\net\http\Message {
 		$query = null;
 
 		foreach ($params as $key => $value) {
-			$query .= String::insert($format, array(
-				'key' => urlencode($key), 'value' => urlencode($value)
-			));
+			$values = array('key' => urlencode($key), 'value' => urlencode($value));
+			$query .= String::insert($format, $values);
 		}
-		if (empty($query)) {
+		if (!$query) {
 			return null;
 		}
 		return "?" . $this->params = substr($query, 0, -1);

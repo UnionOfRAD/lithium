@@ -839,6 +839,59 @@ class RequestTest extends \lithium\test\Unit {
 		$request = new Request(array('env' => array('HTTP_ACCEPT' => null)));
 		$this->assertEqual('html', $request->accepts());
 	}
+
+	public function testParsingAcceptHeader() {
+		$chrome = array(
+			'application/xml',
+			'application/xhtml+xml',
+			'text/html;q=0.9',
+			'text/plain;q=0.8',
+			'image/png',
+			'*/*;q=0.5'
+		);
+		$firefox = array(
+			'text/html',
+			'application/xhtml+xml',
+			'application/xml;q=0.9',
+			'*/*;q=0.8'
+		);
+		$safari = array(
+			'application/xml',
+			'application/xhtml+xml',
+			'text/html;q=0.9',
+			'text/plain;q=0.8',
+			'image/png',
+			'*/*;q=0.5'
+		);
+		$opera = array(
+			'text/html',
+			'application/xml;q=0.9',
+			'application/xhtml+xml',
+			'image/png',
+			'image/jpeg',
+			'image/gif',
+			'image/x-xbitmap',
+			'*/*;q=0.1'
+		);
+		$request = new Request(array('env' => array('HTTP_ACCEPT' => join(',', $chrome))));
+		$this->assertEqual('html', $request->accepts());
+		$this->assertTrue(array_search('text/plain', $request->accepts(true)), 4);
+
+		$request = new Request(array('env' => array('HTTP_ACCEPT' => join(',', $safari))));
+		$this->assertEqual('html', $request->accepts());
+
+		$request = new Request(array('env' => array('HTTP_ACCEPT' => join(',', $firefox))));
+		$this->assertEqual('html', $request->accepts());
+
+		$request = new Request(array('env' => array('HTTP_ACCEPT' => join(',', $opera))));
+		$this->assertEqual('html', $request->accepts());
+
+		$request = new Request(array('env' => array('HTTP_ACCEPT' => join(',', $chrome))));
+		$request->params['type'] = 'txt';
+
+		$result = $request->accepts(true);
+		$this->assertEqual('text/plain', $result[0]);
+	}
 }
 
 ?>
