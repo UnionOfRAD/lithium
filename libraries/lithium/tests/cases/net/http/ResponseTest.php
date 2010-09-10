@@ -67,13 +67,14 @@ class ResponseTest extends \lithium\test\Unit {
 			'HTTP/1.1 200 OK',
 			'Header: Value',
 			'Connection: close',
-			'Content-Type: text/html;charset=UTF-8',
+			'Content-Type: text/html;charset=iso-8859-1',
 			'',
 			'Test!'
 		));
 
 		$response = new Response(compact('body'));
 		$this->assertEqual($body, (string) $response);
+		$this->assertEqual('ISO-8859-1', $response->encoding);
 
 		$body = 'Not a Message';
 		$expected = join("\r\n", array('HTTP/1.1 200 OK', '', '', 'Not a Message'));
