@@ -81,7 +81,7 @@ class Service extends \lithium\core\Object {
 
 	protected function _init() {
 		parent::_init();
-		$this->_classes['socket'] = Libraries::locate('socket.util', $this->_classes['socket']);
+		$this->_classes['socket'] = Libraries::locate('socket', $this->_classes['socket']);
 	}
 
 	/**
