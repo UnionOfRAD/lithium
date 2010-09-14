@@ -658,6 +658,17 @@ class FormTest extends \lithium\test\Unit {
 		));
 	}
 
+	public function testFormFieldWithCustomTemplate() {
+		$result = $this->form->field('name', array(
+			'template' => '<div{:wrap}>{:label}: {:input}{:error}</div>'
+		));
+		$this->assertTags($result, array(
+			'div' => array(),
+			'label' => array('for' => 'name'), 'Name', '/label', ':',
+			'input' => array('type' => 'text', 'name' => 'name'),
+		));
+	}
+
 	public function testCustomInputTypes() {
 		// Creates an HTML5 'range' input slider:
 		$range = $this->form->range('completion', array('min' => 0, 'max' => 100));
