@@ -329,7 +329,7 @@ class Form extends \lithium\template\Helper {
 			'type' => 'text',
 			'template' => 'field',
 			'wrap' => array(),
-			'list' => null
+			'list' => null,
 		);
 		list($options, $fieldOptions) = $this->_options($defaults, $options);
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
