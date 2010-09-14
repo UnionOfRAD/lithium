@@ -8,13 +8,13 @@
 
 namespace lithium\tests\cases\template\helper;
 
-use \stdClass;
-use \lithium\action\Request;
-use \lithium\net\http\Router;
-use \lithium\data\entity\Record;
-use \lithium\template\helper\Form;
-use \lithium\tests\mocks\template\helper\MockFormPost;
-use \lithium\tests\mocks\template\helper\MockFormRenderer;
+use stdClass;
+use lithium\action\Request;
+use lithium\net\http\Router;
+use lithium\data\entity\Record;
+use lithium\template\helper\Form;
+use lithium\tests\mocks\template\helper\MockFormPost;
+use lithium\tests\mocks\template\helper\MockFormRenderer;
 
 class FormTest extends \lithium\test\Unit {
 
@@ -503,6 +503,17 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array(
 			'div' => array(),
 			'label' => array('for' => 'name'), 'Name', '/label',
+			'input' => array('type' => 'text', 'name' => 'name'),
+		));
+	}
+
+	public function testFormFieldWithCustomTemplate() {
+		$result = $this->form->field('name', array(
+			'template' => '<div{:wrap}>{:label}: {:input}{:error}</div>'
+		));
+		$this->assertTags($result, array(
+			'div' => array(),
+			'label' => array('for' => 'name'), 'Name', '/label', ':',
 			'input' => array('type' => 'text', 'name' => 'name'),
 		));
 	}
