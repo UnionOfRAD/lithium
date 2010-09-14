@@ -83,11 +83,6 @@ class Libraries {
 			'{:library}\extensions\adapter\{:class}\{:name}',
 			'{:library}\{:namespace}\{:class}\adapter\{:name}' => array('libraries' => 'lithium')
 		),
-		'strategy' => array(
-			'{:library}\extensions\strategy\{:namespace}\{:class}\{:name}',
-			'{:library}\extensions\strategy\{:name}',
-			'{:library}\{:namespace}\{:class}\strategy\{:name}' => array('libraries' => 'lithium')
-		),
 		'command' => array(
 			'{:library}\extensions\command\{:namespace}\{:class}\{:name}',
 			'{:library}\console\command\{:namespace}\{:class}\{:name}' => array(
@@ -110,6 +105,16 @@ class Libraries {
 			'{:root}/{:name}'
 		),
 		'models' => '{:library}\models\{:name}',
+		'strategy' => array(
+			'{:library}\extensions\strategy\{:namespace}\{:class}\{:name}',
+			'{:library}\extensions\strategy\{:name}',
+			'{:library}\{:namespace}\{:class}\strategy\{:name}' => array('libraries' => 'lithium')
+		),
+		'socket' => array(
+			'{:library}\extensions\net\socket\{:name}',
+			'{:library}\extensions\socket\{:name}',
+			'{:library}\net\socket\{:name}'
+		),
 		'test' => array(
 			'{:library}\extensions\test\{:namespace}\{:class}\{:name}',
 			'{:library}\test\{:namespace}\{:class}\{:name}' => array('libraries' => 'lithium')
