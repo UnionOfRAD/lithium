@@ -141,7 +141,7 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * @var array
 	 */
-	protected $_classes = array(
+	protected static $_classes = array(
 		'connections' => 'lithium\data\Connections',
 		'query'       => 'lithium\data\model\Query',
 		'validator'   => 'lithium\util\Validator'
@@ -304,11 +304,10 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Configures the model for use. This method is called by `Model::__init()`.
 	 *
-	 * This method will set the `Model::$_classes`, `Model::$_meta`, `Model::$_finders` class
+	 * This method will set the `Model::$_schema`, `Model::$_meta`, `Model::$_finders` class
 	 * attributes, as well as obtain a handle to the configured persistent storage connection.
 	 *
 	 * @param array $options Possible options are:
-	 * - `classes`: Dynamic class dependencies.
 	 * - `meta`: Meta-information for this model, such as the connection.
 	 * - `finders`: Custom finders for this model.
 	 * @return void
@@ -319,12 +318,12 @@ class Model extends \lithium\core\StaticObject {
 		}
 		$name = static::_name();
 		$self = static::_object();
-		$defaults = array('classes' => array(), 'meta' => array(), 'finders' => array());
+		$defaults = array('meta' => array(), 'finders' => array(), 'schema' => array());
 
 		$meta    = $options + $self->_meta;
-		$classes = $self->_classes;
 		$schema  = array();
 		$config  = array();
+		$classes = static::$_classes;
 
 		foreach (static::_parents() as $parent) {
 			$base = get_class_vars($parent);
@@ -345,10 +344,10 @@ class Model extends \lithium\core\StaticObject {
 		}
 		$config += $defaults;
 
-		$self->_classes = ($config['classes'] + $classes);
-		$self->_meta = (compact('class', 'name') + $config['meta'] + $meta);
+		static::$_classes = $classes;
+		$self->_meta = (compact('class', 'name') + $meta + $config['meta']);
 		$self->_meta['initialized'] = false;
-		$self->_schema += $schema;
+		$self->_schema += $schema + $config['schema'];
 
 		$self->_finders += $config['finders'] + $self->_findFilters();
 		static::_relations();
@@ -423,7 +422,6 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function find($type, array $options = array()) {
 		$self = static::_object();
-		$classes = $self->_classes;
 		$finder = array();
 
 		$defaults = array(
@@ -439,14 +437,13 @@ class Model extends \lithium\core\StaticObject {
 			$type = 'first';
 		}
 
-		$options += ((array) $self->_query + (array) $defaults + compact('classes'));
+		$options += ((array) $self->_query + (array) $defaults);
 		$meta = array('meta' => $self->_meta, 'name' => get_called_class());
 		$params = compact('type', 'options');
 
 		$filter = function($self, $params) use ($meta) {
-			$options = $params['options'] + array('model' => $meta['name']);
-			$class = $options['classes']['query'];
-			$query = new $class(array('type' => 'read') + $options);
+			$options = $params['options'] + array('type' => 'read', 'model' => $meta['name']);
+			$query = $self::invokeMethod('_instance', array('query', $options));
 			return $self::connection()->read($query, $options);
 		};
 		if (is_string($type) && isset($self->_finders[$type])) {
@@ -630,10 +627,9 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function create(array $data = array(), array $options = array()) {
 		$self = static::_object();
-		$classes = $self->_classes;
 		$params = compact('data', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($classes) {
+		return static::_filter(__FUNCTION__, $params, function($self, $params) {
 			$data = $params['data'];
 			$options = $params['options'];
 
@@ -675,7 +671,6 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public function save($entity, $data = null, array $options = array()) {
 		$self = static::_object();
-		$classes = $self->_classes;
 		$_meta = array('model' => get_called_class()) + $self->_meta;
 		$_schema = $self->_schema;
 
@@ -685,13 +680,12 @@ class Model extends \lithium\core\StaticObject {
 			'callbacks' => true,
 			'locked' => $self->_meta['locked'],
 		);
-		$options += $defaults + compact('classes');
+		$options += $defaults;
 		$params = compact('entity', 'data', 'options');
 
 		$filter = function($self, $params) use ($_meta, $_schema) {
 			$entity = $params['entity'];
 			$options = $params['options'];
-			$class = $options['classes']['query'];
 
 			if ($params['data']) {
 				$entity->set($params['data']);
@@ -706,7 +700,8 @@ class Model extends \lithium\core\StaticObject {
 			}
 
 			$type = $entity->exists() ? 'update' : 'create';
-			$query = new $class(compact('type', 'whitelist', 'entity') + $options + $_meta);
+			$queryOpts = compact('type', 'whitelist', 'entity') + $options + $_meta;
+			$query = $self::invokeMethod('_instance', array('query', $queryOpts));
 			return $self::connection()->{$type}($query, $options);
 		};
 
@@ -728,13 +723,14 @@ class Model extends \lithium\core\StaticObject {
 		$defaults = array('rules' => $this->validates);
 		$options += $defaults;
 		$self = static::_object();
-		$validator = $self->_classes['validator'];
+		$validator = static::$_classes['validator'];
 		$params = compact('entity', 'options');
 
 		$filter = function($parent, $params) use (&$self, $validator) {
-			extract($params);
+			$entity = $params['entity'];
+			$options = $params['options'];
 			$rules = $options['rules'];
-			unset ($options['rules']);
+			unset($options['rules']);
 
 			if ($errors = $validator::check($entity->data(), $rules, $options)) {
 				$entity->errors($errors);
@@ -827,7 +823,7 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function &connection() {
 		$self = static::_object();
-		$connections = $self->_classes['connections'];
+		$connections = static::$_classes['connections'];
 		$name = isset($self->_meta['connection']) ? $self->_meta['connection'] : null;
 
 		if (!$name) {
