@@ -96,7 +96,7 @@ abstract class Database extends \lithium\data\Source {
 	 *
 	 * @param string $type next|close The current step in the iteration.
 	 * @param mixed $resource The result resource returned from the database.
-	 * @param \lithium\data\model\Query $context The given query.
+	 * @param lithium\data\model\Query $context The given query.
 	 * @return void
 	 */
 	abstract public function result($type, $resource, $context);

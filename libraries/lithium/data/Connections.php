@@ -140,16 +140,16 @@ class Connections extends \lithium\core\Adaptable {
 	 * @return mixed A configured instance of the connection, or an array of the configuration used.
 	 */
 	public static function get($name = null, array $options = array()) {
-		static $nullAdapter;
+		static $mockAdapter;
 		$defaults = array('config' => false, 'autoCreate' => true);
 		$options += $defaults;
 
 		if ($name === false) {
-			if (!$nullAdapter) {
+			if (!$mockAdapter) {
 				$class = Libraries::locate('data.source', 'Mock');
-				$nullAdapter = new $class();
+				$mockAdapter = new $class();
 			}
-			return $nullAdapter;
+			return $mockAdapter;
 		}
 
 		if (!$name) {

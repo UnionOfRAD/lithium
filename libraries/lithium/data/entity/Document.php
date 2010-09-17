@@ -8,9 +8,9 @@
 
 namespace lithium\data\entity;
 
-use \Iterator;
-use \lithium\data\Source;
-use \lithium\util\Collection;
+use Iterator;
+use lithium\data\Source;
+use lithium\util\Collection;
 
 /**
  * `Document` is an alternative to the `entity\Record` class, which is optimized for
@@ -59,7 +59,7 @@ use \lithium\util\Collection;
  * {{{$employees = $acme->employees;
  * // returns a Document object with the data in 'employees'}}}
  */
-class Document extends \lithium\data\Entity {
+class Document extends \lithium\data\Entity implements \Iterator {
 
 	/**
 	 * If this `Document` instance has a parent document (see `$_parent`), this value indicates
@@ -106,6 +106,14 @@ class Document extends \lithium\data\Entity {
 	protected $_stats = array();
 
 	/**
+	 * Holds the current iteration state. Used by `Document::valid()` to terminate `foreach` loops
+	 * when there are no more fields to iterate over.
+	 *
+	 * @var boolean
+	 */
+	protected $_valid = false;
+
+	/**
 	 * The class dependencies for `Document`.
 	 *
 	 * @var array
@@ -121,7 +129,7 @@ class Document extends \lithium\data\Entity {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'data', 'classes' => 'merge', 'handle', 'model',
+		'data', 'classes' => 'merge', 'model',
 		'result', 'parent', 'exists', 'stats', 'pathKey'
 	);
 
@@ -147,7 +155,7 @@ class Document extends \lithium\data\Entity {
 	 */
 	public function &__get($name) {
 		$data = null;
-		$null  = null;
+		$null = null;
 
 		if (isset($this->_relationships[$name])) {
 			return $this->_relationships[$name];
@@ -168,42 +176,25 @@ class Document extends \lithium\data\Entity {
 				}
 			}
 		}
-		$data = isset($this->_data[$name]) ? $this->_data[$name] : null;
-
-		if (!is_object($data) && $this->_isComplexType($data)) {
-			$this->_data[$name] = $this->_relation('entity', $name, $this->_data[$name]);
+		if (!isset($this->_data[$name])) {
+			return $null;
 		}
+		$data = $this->_data[$name];
+
+		if ($model = $this->_model) {
+			$pathKey = $this->_pathKey ? "{$this->_pathKey}.{$name}" : $name;
+			$options = compact('pathKey');
+			$this->_data[$name] = $model::connection()->cast($model, $name, $data, $options);
+		}
+
 		$this->_marked[$name] = true;
-
-		if (isset($this->_data[$name])) {
-			return $this->_data[$name];
-		}
-		return $null;
+		return $this->_data[$name];
 	}
 
 	public function export(Source $dataSource, array $options = array()) {
 		$defaults = array('atomic' => true);
 		$options += $defaults;
-		$data = array();
-		$nested = array();
-
-		foreach ($this->_data as $key => $val) {
-			if (!is_object($val)) {
-				$data[$key] = $val;
-				continue;
-			}
-			$nestedOptions = $options;
-
-			switch (true) {
-				case (is_a($val, $this->_classes['set'])):
-					$nestedOptions = array('atomic' => false) + $options;
-				case (is_a($val, $this->_classes['entity'])):
-					if ($data[$key] = $val->export($dataSource, $nestedOptions)) {
-						$nested[$key] = true;
-					}
-				break;
-			}
-		}
+		list($data, $nested) = $this->_exportRecursive($dataSource, $options);
 
 		if ($options['atomic'] && $this->_exists) {
 			$data = array_intersect_key($data, $this->_modified + $nested);
@@ -222,6 +213,30 @@ class Document extends \lithium\data\Entity {
 			}
 		}
 		return $data;
+	}
+
+	protected function _exportRecursive(Source $dataSource, array $options = array()) {
+		$data = array();
+		$nested = array();
+
+		foreach ($this->_data as $key => $val) {
+			$isEntity = is_a($val, $this->_classes['entity']);
+			$isSet = is_a($val, $this->_classes['set']);
+
+			if (!$isEntity && !$isSet) {
+				$data[$key] = $val;
+				continue;
+			}
+			$nestedOptions = $options;
+
+			if ($isSet || isset($this->_modified[$key])) {
+				$nestedOptions = array('atomic' => false) + $nestedOptions;
+			}
+			if (($isEntity || $isSet) && $data[$key] = $val->export($dataSource, $nestedOptions)) {
+				$nested[$key] = true;
+			}
+		}
+		return array($data, $nested);
 	}
 
 	public function update($id = null, array $data = array()) {
@@ -288,19 +303,19 @@ class Document extends \lithium\data\Entity {
 	 * @return void
 	 */
 	public function __set($name, $value = null) {
-		if (is_array($name) && !$value) {
-			foreach ($name as $key => $value) {
-				$this->__set($key, $value);
+		if (is_array($name)) {
+			foreach ($name as $key => $val) {
+				$this->__set($key, $val);
 			}
 			return;
 		}
-
 		if (is_string($name) && strpos($name, '.')) {
 			return $this->_setNested($name, $value);
 		}
-
-		if ($this->_isComplexType($value)) {
-			$value = $this->_relation('entity', $name, $value);
+		if ($model = $this->_model) {
+			$pathKey = $this->_pathKey ? "{$this->_pathKey}.{$name}" : $name;
+			$options = compact('pathKey');
+			$value = $model::connection()->cast($model, $name, $value, $options);
 		}
 		$this->_data[$name] = $value;
 		$this->_marked[$name] = true;
@@ -374,6 +389,35 @@ class Document extends \lithium\data\Entity {
 	}
 
 	/**
+	 * Rewinds to the first item.
+	 *
+	 * @return mixed The current item after rewinding.
+	 */
+	public function rewind() {
+		reset($this->_data);
+		$this->_valid = (count($this->_data) > 0);
+		return current($this->_data);
+	}
+
+	/**
+	 * Used by the `Iterator` interface to determine the current state of the iteration, and when
+	 * to stop iterating.
+	 *
+	 * @return boolean
+	 */
+	public function valid() {
+		return $this->_valid;
+	}
+
+	public function current() {
+		return current($this->_data);
+	}
+
+	public function key() {
+		return key($this->_data);
+	}
+
+	/**
 	 * Returns the next `Document` in the set, and advances the object's internal pointer. If the
 	 * end of the set is reached, a new document will be fetched from the data source connection
 	 * handle (`$_handle`). If no more records can be fetched, returns `null`.
@@ -389,7 +433,6 @@ class Document extends \lithium\data\Entity {
 		if (!$this->_valid && $cur !== $prev && $cur !== null) {
 			$this->_valid = true;
 		}
-		$this->_valid = $this->_valid ?: !is_null($this->_populate());
 		return $this->_valid ? $this->__get(key($this->_data)) : null;
 	}
 
@@ -406,39 +449,6 @@ class Document extends \lithium\data\Entity {
 		return $this->to('array') + array_map(
 			function($relationship) { return $relationship->data(); }, $this->_relationships
 		);
-	}
-
-	/**
-	 * Used by getter and setter methods to determine whether the value of data is a complex type
-	 * that should be given its own sub-object withih the `Document`.
-	 *
-	 * @param mixed $data The data to be tested. This test is used to determine if `$data` should be
-	 *              wrapped in an instance of `Document`.
-	 * @return boolean Returns `false` if the value of `$data` is a scalar type or a one-dimensional
-	 *         array of scalar values, otherwise returns `true`.
-	 */
-	protected function _isComplexType($data) {
-		if (is_object($data)) {
-			foreach ($this->_classes as $class) {
-				if (is_a($data, $class)) {
-					return false;
-				}
-			}
-			if ((array) $data === array()) {
-				return false;
-			}
-		}
-		if (is_scalar($data) || !$data) {
-			return false;
-		}
-		if (is_array($data)) {
-			if (array_keys($data) === range(0, count($data) - 1)) {
-				if (array_filter($data, 'is_scalar') == array_filter($data)) {
-					return false;
-				}
-			}
-		}
-		return true;
 	}
 }
 

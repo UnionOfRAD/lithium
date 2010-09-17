@@ -188,10 +188,10 @@ class MongoDb extends \lithium\data\Source {
 	 *         their respective properties in `Model`.
 	 */
 	public function configureClass($class) {
-		return array('meta' => array('key' => '_id'), 'classes' => array(
-			'entity' => $this->_classes['entity'],
-			'set' => $this->_classes['set'],
-		));
+		return array(
+			'meta' => array('key' => '_id'),
+			'schema' => array('_id' => array('type' => 'MongoId'))
+		);
 	}
 
 	/**
@@ -324,7 +324,7 @@ class MongoDb extends \lithium\data\Source {
 			$query = $params['query'];
 			$options = $params['options'];
 
-			$data = $self->invokeMethod('_toMongoId', array($query->data()));
+			$data = $query->data();
 			$params = $query->export($self);
 			$gridCol = "{$_config['gridPrefix']}.files";
 
@@ -345,7 +345,7 @@ class MongoDb extends \lithium\data\Source {
 
 	protected function _saveFile($params) {
 		$uploadKeys = array('name', 'type', 'tmp_name', 'error', 'size');
-		$data = $this->_toMongoId($params['data']);
+		$data = $params['data'];
 		$grid = $this->connection->getGridFS();
 		$file = null;
 		$method = null;
@@ -389,8 +389,9 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function read($query, array $options = array()) {
 		$this->_checkConnection();
-		$defaults = array('return' => 'resource', 'model' => null);
+		$defaults = array('return' => 'resource');
 		$options += $defaults;
+
 		$params = compact('query', 'options');
 		$_config = $this->_config;
 
@@ -404,7 +405,7 @@ class MongoDb extends \lithium\data\Source {
 			if ($group = $args['group']) {
 				$result = $self->invokeMethod('_group', array($group, $args, $options));
 				$config = array('class' => 'set') + compact('query') + $result;
-				return $self->item($options['model'], $config['data'], $config);
+				return $self->item($query->model(), $config['data'], $config);
 			}
 			$collection = $self->connection->{$source};
 
@@ -418,7 +419,7 @@ class MongoDb extends \lithium\data\Source {
 			}
 			$result = $result->sort($args['order'])->limit($args['limit'])->skip($args['offset']);
 			$config = compact('result', 'query') + array('class' => 'set');
-			return $self->item($options['model'], array(), $config);
+			return $self->item($query->model(), array(), $config);
 		});
 	}
 
@@ -457,9 +458,7 @@ class MongoDb extends \lithium\data\Source {
 				$args['data']['_id'] = $self->invokeMethod('_saveFile', array($args));
 			}
 			unset($args['data']['_id']);
-
-			$update = $self->invokeMethod('_toMongoId', array($args['data']));
-			$update = ($options['atomic']) ? array('$set' => $update) : $update;
+			$update = ($options['atomic']) ? array('$set' => $args['data']) : $args['data'];
 
 			if ($self->connection->{$args['source']}->update($args['conditions'], $update)) {
 				$query->entity() ? $query->entity()->update() : null;
@@ -484,7 +483,7 @@ class MongoDb extends \lithium\data\Source {
 			$options = $params['options'];
 
 			$params = $query->export($self);
-			$conditions = $self->invokeMethod('_toMongoId', array($params['conditions']));
+			$conditions = $params['conditions'];
 			return $self->connection->{$params['source']}->remove($conditions);
 		});
 	}
@@ -696,44 +695,56 @@ class MongoDb extends \lithium\data\Source {
 		return $order ?: array();
 	}
 
-	/**
-	 * Returns a newly-created `Document` object, bound to a model and populated with default data
-	 * and options.
-	 *
-	 * @param string $model A fully-namespaced class name representing the model class to which the
-	 *               `Document` object will be bound.
-	 * @param array $data The default data with which the new `Document` should be populated.
-	 * @param array $options Any additional options to pass to the `Record`'s constructor.
-	 * @return object Returns a new, un-saved `Document` object bound to the model class specified
-	 *         in `$model`.
-	 */
-	public function item($model, array $data = array(), array $options = array()) {
-		return parent::item($model, $data, array('handle' => $this) + $options);
-	}
+	public function cast($model, $key, $value, array $options = array()) {
+		$schema = $model::schema($key);
+		$schema = (array) $schema + array('type' => null, 'array' => false);
+		$type = $schema['type'];
 
-	/**
-	 * Adds a proper MongoId to the passed `$data` if an appropriate `_id` field with a
-	 * 24-character alphanumeric identifier exists.
-	 *
-	 * @param array|object $data The passed data. If `$data` is an object, no MongoId will
-	 *                     be generated and the original object will be returned.
-	 * @return array|object The passed `$data` with the `_id` parameter transformed into a
-	 *         `MongoId` object, or the original data if `_id` is not set, or if `_id` is already
-	 *         an object.
-	 */
-	protected function _toMongoId($data) {
-		if (isset($data['_id']) && !is_object($data['_id'])) {
-			if (preg_match('/^[0-9a-f]{24}$/', (string) $data['_id'])) {
-				$data['_id'] = new MongoId($data['_id']);
-			}
+		if (is_object($value)) {
+			return $value;
 		}
-		return $data;
+		switch (true) {
+			case ($type == 'MongoId' || $type == 'id'):
+				return preg_match('/^[0-9a-f]{24}$/', (string) $value) ? MongoId($value) : $value;
+			case in_array($type, array('date', 'datetime', 'timestamp', 'MongoDate')):
+				return new MongoDate(intval($value));
+			case is_array($value):
+				if (array_keys($value) === range(0, count($value) - 1)) {
+					return $this->item($model, $value, array('class' => 'array') + $options);
+				}
+				return $this->item($model, $value, $options);
+		}
+		return $value;
 	}
 
 	protected function _checkConnection() {
 		if (!$this->_isConnected && !$this->connect()) {
 			throw new NetworkException("Could not connect to the database.");
 		}
+	}
+
+	/**
+	 * Used by getter and setter methods to determine whether the value of data is a complex type
+	 * that should be given its own sub-object withih a MongoDB `Document`.
+	 *
+	 * @param mixed $data The data to be tested. This test is used to determine if `$data` should be
+	 *              wrapped in a MongoDB `Document`.
+	 * @return boolean Returns `false` if the value of `$data` is a scalar type or a one-dimensional
+	 *         array of scalar values, otherwise returns `true`.
+	 */
+	protected function _detectType($data) {
+		if (is_object($data) || is_scalar($data) || !$data) {
+			return false;
+		}
+		if (!is_array($data)) {
+			return true;
+		}
+		if (array_keys($data) === range(0, count($data) - 1)) {
+			if (array_filter($data, 'is_scalar') == array_filter($data)) {
+				return false;
+			}
+		}
+		return is_array($data);
 	}
 }
 

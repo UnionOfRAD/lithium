@@ -753,14 +753,14 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public function delete($entity, array $options = array()) {
 		$self = static::_object();
-		$_class = $self->_classes['query'];
 		$params = compact('entity', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($_class) {
-			$type = 'delete';
-			$entity = $params['entity'];
-			$options = $params['options'] + array('model' => $self) + compact('type', 'entity');
-			return $self::connection()->delete(new $_class($options), $options);
+		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+			$options = $params + $params['options'] + array('model' => $self, 'type' => 'delete');
+			unset($options['options']);
+
+			$query = $self::invokeMethod('_instance', array('query', $options));
+			return $self::connection()->delete($query, $options);
 		});
 	}
 
@@ -780,13 +780,15 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function update($data, $conditions = array(), array $options = array()) {
 		$self = static::_object();
-		$_class = $self->_classes['query'];
 		$params = compact('data', 'conditions', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($_class) {
+		return static::_filter(__FUNCTION__, $params, function($self, $params) {
 			$options = $params + $params['options'] + array('model' => $self, 'type' => 'update');
 			unset($options['options']);
-			return $self::connection()->update(new $_class($options), $options);
+			var_export($options);
+
+			$query = $self::invokeMethod('_instance', array('query', $options));
+			return $self::connection()->update($query, $options);
 		});
 	}
 
@@ -805,25 +807,15 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function remove($conditions = array(), array $options = array()) {
 		$self = static::_object();
-		$_class = $self->_classes['query'];
 		$params = compact('conditions', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($_class) {
+		return static::_filter(__FUNCTION__, $params, function($self, $params) {
 			$options = $params['options'] + $params + array('model' => $self, 'type' => 'delete');
 			unset($options['options']);
-			return $self::connection()->delete(new $_class($options), $options);
-		});
-	}
 
-	/**
-	 * Gets just the class name portion of a fully-name-spaced class name, i.e.
-	 * `app\models\Post::_name()` returns `'Post'`.
-	 *
-	 * @return string
-	 */
-	protected static function _name() {
-		static $name;
-		return $name ?: $name = join('', array_slice(explode("\\", get_called_class()), -1));
+			$query = $self::invokeMethod('_instance', array('query', $options));
+			return $self::connection()->delete($query, $options);
+		});
 	}
 
 	/**
@@ -848,10 +840,14 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * @deprecated
+	 * Gets just the class name portion of a fully-name-spaced class name, i.e.
+	 * `app\models\Post::_name()` returns `'Post'`.
+	 *
+	 * @return string
 	 */
-	protected static function &_connection() {
-		return static::connection();
+	protected static function _name() {
+		static $name;
+		return $name ?: $name = join('', array_slice(explode("\\", get_called_class()), -1));
 	}
 
 	/**
@@ -979,11 +975,19 @@ class Model extends \lithium\core\StaticObject {
 				} else {
 					$options = $params['options'];
 				}
-				$options += compact('classes', 'model');
-				$query = new $classes['query'](array('type' => 'read') + $options);
+				$options += array('type' => 'read') + compact('model');
+				$query = $self::invokeMethod('_instance', array('query', $options));
 				return $self::connection()->calculation('count', $query, $options);
 			}
 		);
+	}
+
+	/**
+	 * @deprecated
+	 * @see lithium\data\Model::connection()
+	 */
+	protected static function &_connection() {
+		return static::connection();
 	}
 }
 

@@ -38,18 +38,8 @@ class RecordSet extends \lithium\data\Collection {
 	protected $_columns = array();
 
 	/**
-	 * Dynamic dependancies
-	 *
-	 * @var array
-	 */
-	protected $_classes = array(
-		'entity' => '\lithium\data\entity\Record',
-		'set' => __CLASS__
-	);
-
-	/**
-	 * Initializes the record set and uses the database handle to get the column list contained in
-	 * the query that created this object.
+	 * Initializes the record set and uses the database connection to get the column list contained
+	 * in the query that created this object.
 	 *
 	 * @see lithium\data\collection\RecordSet::$_columns
 	 * @return void
@@ -59,7 +49,7 @@ class RecordSet extends \lithium\data\Collection {
 	protected function _init() {
 		parent::_init();
 
-		if ($this->_handle && $this->_result) {
+		if ($this->_result) {
 			$this->_columns = $this->_columnMap();
 		}
 		if ($this->_data && !$this->_index) {
@@ -178,8 +168,8 @@ class RecordSet extends \lithium\data\Collection {
 
 	/**
 	 * Returns the next record in the set, and advances the object's internal pointer. If the end of
-	 * the set is reached, a new record will be fetched from the data source connection handle
-	 * (`$_handle`). If no more records can be fetched, returns `null`.
+	 * the set is reached, a new record will be fetched from the data source connection handle.
+	 * If no more records can be fetched, returns `null`.
 	 *
 	 * @return object Returns the next record in the set, or `null`, if no more records are
 	 *                available.
@@ -265,28 +255,30 @@ class RecordSet extends \lithium\data\Collection {
 	 * Lazy-loads records from a query using a reference to a database adapter and a query
 	 * result resource.
 	 *
-	 * @param array $record
+	 * @param array $data
 	 * @param mixed $key
 	 * @return array
 	 */
-	protected function _populate($record = null, $key = null) {
-		if ($this->closed() && !$record) {
+	protected function _populate($data = null, $key = null) {
+		if ($this->closed() && !$record || !($model = $this->_model)) {
 			return;
 		}
-		$modelClass = $this->_model;
-		$class = $this->_classes['entity'];
+		$conn = $model::connection();
 
-		if (!($record = $record ?: $this->_handle->result('next', $this->_result, $this))) {
+		if (!($data = $data ?: $conn->result('next', $this->_result, $this))) {
 			return $this->close();
 		}
+		$offset = 0;
+		$recordMap = array();
 
-		if (is_array($record)) {
-			foreach ($this->_columns as $model => $fields) {
-				$data = array_combine($fields, array_slice($record, 0, count($fields)));
-				$record = new $class(compact('model', 'data') + array('exists' => true));
-			}
+		foreach ($this->_columns as $model => $fields) {
+			$record = array_combine($fields, array_slice($data, $offset, count($fields)));
+			$recordMap[$model] = $conn->item($model, $record, array('exists' => true));
 		}
-		if (is_array($key = $modelClass::key($record))) {
+		$record = reset($recordMap);
+		unset($recordMap[key($recordMap)]);
+
+		if (is_array($key = $model::key($recordMap))) {
 			$key = count($key) === 1 ? reset($key) : $key;
 		}
 		if (in_array($key, $this->_index)) {
@@ -301,7 +293,10 @@ class RecordSet extends \lithium\data\Collection {
 		if ($this->_query && $map = $this->_query->map()) {
 			return $map;
 		}
-		return $this->_handle->schema($this->_query, $this->_result, $this);
+		if (!($model = $this->_model)) {
+			return array();
+		}
+		return $model::connection()->schema($this->_query, $this->_result, $this);
 	}
 }
 

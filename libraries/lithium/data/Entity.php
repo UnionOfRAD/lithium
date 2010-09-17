@@ -156,7 +156,13 @@ class Entity extends \lithium\core\Object {
 	 * @param string $value Property value.
 	 * @return mixed Result.
 	 */
-	public function __set($name, $value) {
+	public function __set($name, $value = null) {
+		if (is_array($name) && !$value) {
+			foreach ($name as $key => $value) {
+				$this->__set($key, $value);
+			}
+			return;
+		}
 		$this->_modified[$name] = true;
 		$this->_data[$name] = $value;
 	}
