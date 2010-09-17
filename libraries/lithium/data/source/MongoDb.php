@@ -61,9 +61,9 @@ class MongoDb extends \lithium\data\Source {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'entity' => '\lithium\data\entity\Document',
-		'set' => '\lithium\data\collection\DocumentSet',
-		'relationship' => '\lithium\data\model\Relationship'
+		'entity' => 'lithium\data\entity\Document',
+		'set' => 'lithium\data\collection\DocumentSet',
+		'relationship' => 'lithium\data\model\Relationship'
 	);
 
 	/**
@@ -114,6 +114,8 @@ class MongoDb extends \lithium\data\Source {
 	 *          before timing out and throwing an exception. Defaults to `100`.
 	 *        - `'schema'` _closure_: A closure or anonymous function which returns the schema
 	 *          information for a model class. See the `$_schema` property for more information.
+	 *        - `'gridPrefix'` _string_: The default prefix for MongoDB's `chunks` and `files`
+	 *          collections. Defaults to `'fs'`.
 	 *
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.

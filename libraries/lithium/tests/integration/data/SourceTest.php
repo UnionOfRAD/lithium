@@ -8,9 +8,8 @@
 
 namespace lithium\tests\integration\data;
 
-use \Exception;
-use \ArrayAccess;
-use \lithium\data\Connections;
+use Exception;
+use lithium\data\Connections;
 
 class Company extends \lithium\data\Model {
 

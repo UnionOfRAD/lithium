@@ -8,19 +8,22 @@
 
 namespace lithium\tests\cases\data\source;
 
-use \lithium\data\Connections;
-use \lithium\data\model\Query;
-use \lithium\data\entity\Record;
-use \lithium\data\source\Database;
-use \lithium\tests\mocks\data\model\MockDatabase;
-use \lithium\tests\mocks\data\model\MockDatabasePost;
-use \lithium\tests\mocks\data\model\MockDatabaseComment;
+use lithium\data\Connections;
+use lithium\data\model\Query;
+use lithium\data\entity\Record;
+use lithium\data\source\Database;
+use lithium\data\collection\RecordSet;
+use lithium\tests\mocks\data\model\MockDatabase;
+use lithium\tests\mocks\data\model\MockDatabasePost;
+use lithium\tests\mocks\data\model\MockDatabaseComment;
 
 class DatabaseTest extends \lithium\test\Unit {
 
 	public $db = null;
 
 	protected $_configs = array();
+
+	protected $_model = 'lithium\tests\mocks\data\model\MockDatabasePost';
 
 	public function setUp() {
 		$this->db = new MockDatabase();

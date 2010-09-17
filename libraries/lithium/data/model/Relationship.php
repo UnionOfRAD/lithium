@@ -8,8 +8,8 @@
 
 namespace lithium\data\model;
 
-use \lithium\core\Libraries;
-use \lithium\util\Inflector;
+use lithium\core\Libraries;
+use lithium\util\Inflector;
 
 /**
  * The `Relationship` class encapsulates the data and functionality necessary to link two model

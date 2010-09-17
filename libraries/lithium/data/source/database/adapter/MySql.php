@@ -263,7 +263,7 @@ class MySql extends \lithium\data\source\Database {
 	 *
 	 * @see lithium\data\source\Database::schema()
 	 * @param mixed $value The value to be converted. Arrays will be recursively converted.
-	 * @param array $schema Formatted array from `\lithium\data\source\Database::schema()`
+	 * @param array $schema Formatted array from `lithium\data\source\Database::schema()`
 	 * @return mixed Value with converted type.
 	 */
 	public function value($value, array $schema = array()) {

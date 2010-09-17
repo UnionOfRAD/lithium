@@ -43,16 +43,6 @@ abstract class Collection extends \lithium\util\Collection {
 	protected $_model = null;
 
 	/**
-	 * A reference to the object that originated this entity set; usually an instance of
-	 * `lithium\data\Source` or `lithium\data\source\Database`. Used to load column definitions and
-	 * lazy-load entities.
-	 *
-	 * @see lithium\data\Source
-	 * @var object
-	 */
-	protected $_handle = null;
-
-	/**
 	 * A reference to the query object that originated this entity set; usually an instance of
 	 * `lithium\data\model\Query`.
 	 *
@@ -62,7 +52,7 @@ abstract class Collection extends \lithium\util\Collection {
 	protected $_query = null;
 
 	/**
-	 * A pointer or resource that is used to load entities from the object (`$_handle`) that
+	 * A pointer or resource that is used to load entities from the backend data source that
 	 * originated this collection.
 	 *
 	 * @var resource
@@ -239,9 +229,8 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return void
 	 */
 	public function close() {
-		if (!$this->closed()) {
-			$this->_result = $this->_handle->result('close', $this->_result, $this);
-			unset($this->_handle);
+		if (!$this->closed() && ($model = $this->_model)) {
+			$this->_result = $model::connection()->result('close', $this->_result, $this);
 		}
 	}
 
@@ -253,7 +242,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 *         freed, otherwise returns false.
 	 */
 	public function closed() {
-		return (empty($this->_result) && (!isset($this->_handle) || empty($this->_handle)));
+		return empty($this->_result);
 	}
 
 	/**
@@ -267,9 +256,9 @@ abstract class Collection extends \lithium\util\Collection {
 
 	/**
 	 * A method to be implemented by concrete `Collection` classes which, provided a reference to a
-	 * backend data source (see the `$_handle` property), and a resource representing a query result
-	 * cursor, fetches new result data and wraps it in the appropriate object type, which is added
-	 * into the `Collection` and returned.
+	 * backend data source, and a resource representing a query result cursor, fetches new result
+	 * data and wraps it in the appropriate object type, which is added into the `Collection` and
+	 * returned.
 	 *
 	 * @param mixed $data Data (in an array or object) that is manually added to the data
 	 *              collection. If `null`, data is automatically fetched from the associated backend

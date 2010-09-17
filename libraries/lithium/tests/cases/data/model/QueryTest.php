@@ -8,20 +8,22 @@
 
 namespace lithium\tests\cases\data\model;
 
-use \lithium\data\Connections;
-use \lithium\data\model\Query;
-use \lithium\data\entity\Record;
-use \lithium\tests\mocks\data\MockPostObject;
-use \lithium\tests\mocks\data\model\MockDatabase;
-use \lithium\tests\mocks\data\model\MockQueryPost;
-use \lithium\tests\mocks\data\model\MockQueryComment;
+use lithium\data\Connections;
+use lithium\data\model\Query;
+use lithium\data\entity\Record;
+use lithium\tests\mocks\data\MockPostObject;
+use lithium\tests\mocks\data\model\MockDatabase;
+use lithium\tests\mocks\data\model\MockQueryPost;
+use lithium\tests\mocks\data\model\MockQueryComment;
 
 class QueryTest extends \lithium\test\Unit {
+
+	protected $_model = 'lithium\tests\mocks\data\model\MockQueryPost';
 
 	protected $_configs = array();
 
 	protected $_queryArr = array(
-		'model' => '\lithium\tests\mocks\data\model\MockQueryPost',
+		'model' => 'lithium\tests\mocks\data\model\MockQueryPost',
 		'type' => 'read',
 		'order' => 'created DESC',
 		'limit' => 10,
@@ -65,14 +67,11 @@ class QueryTest extends \lithium\test\Unit {
 
 	public function testModel() {
 		$query = new Query($this->_queryArr);
+		$this->assertEqual($this->_model, $query->model());
 
-		$expected = '\lithium\tests\mocks\data\model\MockQueryPost';
-		$result = $query->model();
-		$this->assertEqual($expected, $result);
+		$query->model('lithium\tests\mocks\data\model\MockQueryComment');
 
-		$query->model('\lithium\tests\mocks\data\model\MockQueryComment');
-
-		$expected = '\lithium\tests\mocks\data\model\MockQueryComment';
+		$expected = 'lithium\tests\mocks\data\model\MockQueryComment';
 		$result = $query->model();
 		$this->assertEqual($expected, $result);
 	}
@@ -225,7 +224,7 @@ class QueryTest extends \lithium\test\Unit {
 		$entity = new Record();
 		$entity->id = 12;
 		$query = new Query(compact('entity') + array(
-			'model' => '\lithium\tests\mocks\data\model\MockQueryPost',
+			'model' => $this->_model,
 		));
 
 		$expected = array('id' => 12);
@@ -253,6 +252,7 @@ class QueryTest extends \lithium\test\Unit {
 		$this->skipIf(!is_array($export), 'Query::export() does not return an array');
 
 		$expected = array(
+			'alias',
 			'calculate',
 			'comment',
 			'conditions',
@@ -268,6 +268,7 @@ class QueryTest extends \lithium\test\Unit {
 			'order',
 			'page',
 			'source',
+			'type',
 			'whitelist'
 		);
 		$result = array_keys($export);
@@ -298,9 +299,17 @@ class QueryTest extends \lithium\test\Unit {
 
 	public function testJoin() {
 		$query = new Query(array('joins' => array(array('foo' => 'bar'))));
-		$query->join(array(array('bar' => 'baz')));
+		$query->join(array('bar' => 'baz'));
+		$expected = array(array('foo' => 'bar'), array('bar' => 'baz'));
+		$this->assertEqual($expected, $query->join());
 
-		$this->assertEqual($query->join(), array(array('foo' => 'bar'), array('bar' => 'baz')));
+		$query->join('zim', array('dib' => 'gir'));
+		$expected = array(
+			array('foo' => 'bar'),
+			array('bar' => 'baz'),
+			'zim' => array('dib' => 'gir')
+		);
+		$this->assertEqual($expected, $query->join());
 	}
 
 	/**
@@ -339,6 +348,45 @@ class QueryTest extends \lithium\test\Unit {
 		$query = new Query(compact('calculate', 'group'));
 		$this->assertEqual($group, $query->group());
 		$this->assertEqual($calculate, $query->calculate());
+	}
+
+	public function testInstantiationWithConditionsAndData() {
+		$options = array(
+			'type' => 'update',
+			'data' => array('title' => '..'),
+			'conditions' => array('title' => 'FML'),
+			'model' => 'lithium\tests\mocks\data\model\MockQueryPost'
+		);
+		$query = new Query($options);
+		$result = $query->export(Connections::get('mock-database-connection'));
+
+		$this->assertEqual(array('title' => '..'), $result['data']);
+		$this->assertEqual("WHERE title = 'FML'", $result['conditions']);
+	}
+
+	public function testEntityConditions() {
+		$entity = new Record(array('model' => $this->_model, 'exists' => true));
+		$entity->id = 13;
+		$query = new Query(compact('entity'));
+		$this->assertEqual(array('id' => 13), $query->conditions());
+	}
+
+	public function testAutomaticAliasing() {
+		$query = new Query(array('model' => $this->_model));
+		$this->assertEqual('MockQueryPost', $query->alias());
+	}
+
+	public function testFluentInterface() {
+		$query = new Query();
+		$conditions = array('foo' => 'bar');
+		$fields = array('foo', 'bar', 'baz', 'created');
+		$order = array('created' => 'ASC');
+
+		$result = $query->conditions($conditions)->fields($fields)->order($order);
+		$this->assertEqual($result, $query);
+		$this->assertEqual($conditions, $query->conditions());
+		$this->assertEqual($fields, $query->fields());
+		$this->assertEqual($order, $query->order());
 	}
 }
 

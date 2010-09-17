@@ -33,7 +33,7 @@ class Connections extends \lithium\core\Adaptable {
 	/**
 	 * A Collection of the configurations you add through Connections::add().
 	 *
-	 * @var `\lithium\util\Collection`
+	 * @var `lithium\util\Collection`
 	 */
 	protected static $_configurations = array();
 

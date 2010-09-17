@@ -28,9 +28,9 @@ abstract class Source extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'entity' => '\lithium\data\Entity',
-		'set' => '\lithium\data\Collection',
-		'relationship' => '\lithium\data\model\Relationship'
+		'entity' => 'lithium\data\Entity',
+		'set' => 'lithium\data\Collection',
+		'relationship' => 'lithium\data\model\Relationship'
 	);
 
 	/**

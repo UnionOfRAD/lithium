@@ -9,19 +9,21 @@
 
 namespace lithium\tests\cases\data\source;
 
-use \lithium\data\source\MongoDb;
-
-use \MongoId;
-use \MongoCode;
-use \MongoRegex;
-use \lithium\data\Model;
-use \lithium\data\Connections;
-use \lithium\data\model\Query;
-use \lithium\data\entity\Document;
-use \lithium\tests\mocks\data\MockPost;
-use \lithium\tests\mocks\data\source\MockMongoConnection;
+use lithium\data\source\MongoDb;
+use MongoId;
+use MongoCode;
+use MongoRegex;
+use MongoMaxKey;
+use lithium\data\Model;
+use lithium\data\Connections;
+use lithium\data\model\Query;
+use lithium\data\entity\Document;
+use lithium\tests\mocks\data\MockPost;
+use lithium\tests\mocks\data\source\MockMongoConnection;
 
 class MongoDbTest extends \lithium\test\Unit {
+
+	protected $_model = 'lithium\tests\mocks\data\source\MockMongoPost';
 
 	protected $_testConfig = array(
 		'type' => 'MongoDb',
@@ -242,7 +244,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual('Test Post', $original['title']);
 		$this->assertPattern('/[0-9a-f]{24}/', $original['_id']);
 
-		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
+		$model = $this->_model;
 		$this->query = new Query(compact('model') + array(
 			'entity' => new Document(compact('model'))
 		));
@@ -279,7 +281,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$record = $result->first()->to('array');
 
-		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
+		$model = $this->_model;
 		$this->query = new Query(compact('model') + array(
 			'entity' => new Document(compact('model'))
 		));
@@ -296,7 +298,7 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testItem() {
-		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
+		$model = $this->_model;
 		$data = array('title' => 'New Item');
 		$result = $this->db->item($model, $data);
 
@@ -315,6 +317,9 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function testEnabled() {
 		$this->assertTrue(MongoDb::enabled());
+		$this->assertTrue(MongoDb::enabled('arrays'));
+		$this->assertTrue(MongoDb::enabled('booleans'));
+		$this->assertTrue(MongoDb::enabled('relationships'));
 	}
 
 	public function testArbitraryMethodCalls() {
@@ -326,7 +331,7 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testDocumentSorting() {
-		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
+		$model = $this->_model;
 		$model::config(array('connection' => 'lithium_mongo_test', 'source' => 'ordered_docs'));
 
 		$model::create(array('title' => 'Third document',  'position' => 3))->save();
@@ -360,7 +365,7 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testMongoIdPreservation() {
-		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
+		$model = $this->_model;
 		$model::config(array('connection' => 'lithium_mongo_test', 'source' => 'ordered_docs'));
 
 		$post = $model::create(array('title' => 'A post'));
@@ -438,7 +443,7 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testAtomicUpdate() {
-		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
+		$model = $this->_model;
 		$model::config(array('connection' => 'lithium_mongo_test', 'source' => 'posts'));
 
 		$document = $model::create(array('initial' => 'one', 'values' => 'two'));
@@ -462,7 +467,7 @@ class MongoDbTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testPreserveId() {
-		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
+		$model = $this->_model;
 		$model::config(array('connection' => 'lithium_mongo_test', 'source' => 'posts'));
 
 		$document = $model::create(array('_id' => 'custom'));

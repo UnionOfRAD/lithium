@@ -12,7 +12,7 @@ use lithium\core\Libraries;
 use lithium\util\String;
 
 /**
- * Http class to access data sources using \lithium\net\http\Service.
+ * Http class to access data sources using `lithium\net\http\Service`.
  */
 class Http extends \lithium\data\Source {
 

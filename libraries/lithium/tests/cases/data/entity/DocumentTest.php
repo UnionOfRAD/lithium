@@ -8,12 +8,14 @@
 
 namespace lithium\tests\cases\data\entity;
 
-use \stdClass;
-use \lithium\data\entity\Document;
-use \lithium\data\collection\DocumentSet;
-use \lithium\tests\mocks\data\model\MockDocumentPost;
-use \lithium\tests\mocks\data\model\MockDocumentSource;
-use \lithium\tests\mocks\data\model\MockDocumentMultipleKey;
+use stdClass;
+use lithium\data\Connections;
+use lithium\data\entity\Document;
+use lithium\data\collection\DocumentSet;
+use lithium\data\collection\DocumentArray;
+use lithium\tests\mocks\data\model\MockDocumentPost;
+use lithium\tests\mocks\data\model\MockDocumentSource;
+use lithium\tests\mocks\data\model\MockDocumentMultipleKey;
 
 class DocumentTest extends \lithium\test\Unit {
 
