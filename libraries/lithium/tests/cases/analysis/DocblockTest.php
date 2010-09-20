@@ -104,6 +104,17 @@ class DocblockTest extends \lithium\test\Unit {
 
 		$this->assertEqual('This line isn\'t.', $result['text']);
 	}
+
+	/**
+	 * This docblock has an extra * in the closing element.
+	 *
+	 **/
+	public function testBadlyClosedDocblock() {
+		$info = Inspector::info(__METHOD__ . '()');
+		$description = 'This docblock has an extra * in the closing element.';
+		$this->assertEqual($description, $info['description']);
+		$this->assertEqual('', $info['text']);
+	}
 }
 
 ?>

@@ -39,7 +39,7 @@ class Docblock extends \lithium\core\StaticObject {
 		$text = null;
 		$tags = array();
 		$description = null;
-		$comment = trim(preg_replace('/^(\s*\/\*\*|\s*\*\/|\s*\* ?)/m', '', $comment));
+		$comment = trim(preg_replace('/^(\s*\/\*\*|\s*\*{1,2}\/|\s*\* ?)/m', '', $comment));
 		$comment = str_replace("\r\n", "\n", $comment);
 
 		if ($items = preg_split('/\n@/ms', $comment, 2)) {
