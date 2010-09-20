@@ -52,7 +52,14 @@ pre > code {
 	border: 1px solid white;
 	padding: 1em !important; /* remove if base important is removed, too */
 	overflow: auto;
-	font-size: .85em;
+	font-size: .9em;
+}
+a code {
+	background: transparent;
+	border: 0;
+}
+a:hover code {
+	color: inherit;
 }
 code, pre, .fixed {
 	font-family: Monaco, Courier, monospace !important;
@@ -62,9 +69,8 @@ code, pre, .fixed {
 }
 code {
 	padding: .2em .25em !important;
-	border: 1px solid #e6e6e6;
-	background: #f6f6f6;
-	font-size: 0.75em;
+	border: 1px solid #F0F0F0;
+	background: #FAFAFA;
 }
 pre {
 	background: none;
