@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\net\http;
 
-use \lithium\net\http\Response;
+use lithium\net\http\Response;
 
 class ResponseTest extends \lithium\test\Unit {
 
@@ -62,8 +62,16 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual('UTF-8', $response->encoding);
 	}
 
+	public function testConstructionWithBody() {
+		$response = new Response(array('message' => "Content-type: image/jpeg\r\n\r\nimage data"));
+		$this->assertEqual("image data", $response->body());
+
+		$response = new Response(array('body' => "image data"));
+		$this->assertEqual("image data", $response->body());
+	}
+
 	public function testParseMessage() {
-		$body = join("\r\n", array(
+		$message = join("\r\n", array(
 			'HTTP/1.1 200 OK',
 			'Header: Value',
 			'Connection: close',
@@ -72,8 +80,8 @@ class ResponseTest extends \lithium\test\Unit {
 			'Test!'
 		));
 
-		$response = new Response(compact('body'));
-		$this->assertEqual($body, (string) $response);
+		$response = new Response(compact('message'));
+		$this->assertEqual($message, (string) $response);
 		$this->assertEqual('ISO-8859-1', $response->encoding);
 
 		$body = 'Not a Message';
@@ -109,7 +117,7 @@ class ResponseTest extends \lithium\test\Unit {
 			),
 			'type' => 'text/html',
 			'encoding' => 'UTF-8',
-			'body' => array('Test!')
+			'body' => 'Test!'
 		);
 		$response = new Response($config);
 		$this->assertEqual($expected, (string) $response);
@@ -129,7 +137,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'',
 		));
 
-		$body = $headers . join("\r\n", array(
+		$message = $headers . join("\r\n", array(
 			'b7',
 			'{"total_rows":1,"offset":0,"rows":[',
 			'{"id":"88989cafcd81b09f81078eb523832e8e","key":"gwoo","value":' .
@@ -145,7 +153,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'',
 			'',
 		));
-		$response = new Response(compact('body'));
+		$response = new Response(compact('message'));
 
 		$expected = join("\r\n", array(
 			'{"total_rows":1,"offset":0,"rows":[',
@@ -154,27 +162,22 @@ class ResponseTest extends \lithium\test\Unit {
 			'"created":"2009-10-27 12:14:12"}}',
 			']}',
 		));
-		$result = $response->body();
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $response->body());
 
-		$body = $headers . join("\r\n", array(
-			'body'
-		));
-		$expected = 'body';
-		$response = new Response(compact('body'));
-		$result = $response->body();
-		$this->assertEqual($expected, $result);
+		$message = $headers . join("\r\n", array('body'));
 
-		$body = $headers . join("\r\n", array(
-			'[part one];',
-			'[part two]'
-		));
+		$response = new Response(compact('message'));
+		$result = $response->body();
+		$this->assertEqual('body', $result);
+
+		$message = $headers . join("\r\n", array('[part one];', '[part two]'));
 		$expected = '[part two]';
-		$response = new Response(compact('body'));
+		$response = new Response(compact('message'));
+
 		$result = $response->body();
 		$this->assertEqual($expected, $result);
 
-		$body = join("\r\n", array(
+		$message = join("\r\n", array(
 			'HTTP/1.1 200 OK',
 			'Header: Value',
 			'Connection: close',
@@ -184,7 +187,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'Test!'
 		));
 		$expected = 'Test!';
-		$response = new Response(compact('body'));
+		$response = new Response(compact('message'));
 		$result = $response->body();
 		$this->assertEqual($expected, $result);
 	}

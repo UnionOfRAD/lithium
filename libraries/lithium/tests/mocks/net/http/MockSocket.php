@@ -45,7 +45,7 @@ class MockSocket extends \lithium\net\Socket {
 
 		if ($this->write($message)) {
 			$body = $this->read();
-			return new $options['response'](compact('body'));
+			return new $options['response'](compact('message'));
 		}
 	}
 

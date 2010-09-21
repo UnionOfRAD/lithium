@@ -322,7 +322,7 @@ class Request extends \lithium\net\http\Message {
 		$accept = $this->_parseAccept();
 
 		if (!$type && !$accept) {
-			return $accept ?: 'html';
+			return 'html';
 		}
 		$media = $this->_classes['media'];
 

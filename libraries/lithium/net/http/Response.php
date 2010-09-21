@@ -97,9 +97,12 @@ class Response extends \lithium\net\http\Message {
 
 	protected function _init() {
 		parent::_init();
+		$body = $this->_config['body'];
 
-		if (is_string($body = $this->_config['body']) && strpos($body, "\n")) {
-			$body = $this->_parseBody($body);
+		if ($this->_config['body'] && !$this->_config['message']) {
+			$this->body = $this->_config['body'];
+		} elseif (($body = $this->_config['message']) && !$this->_config['body']) {
+			$body = $this->_parseMessage($body);
 		}
 
 		if (isset($this->headers['Content-Type'])) {
@@ -114,15 +117,15 @@ class Response extends \lithium\net\http\Message {
 		if (isset($this->headers['Transfer-Encoding'])) {
 			$body = $this->_decode($body);
 		}
-		$this->body = $body;
+		$this->body = $this->body ?: $body;
 	}
 
-	protected function _parseBody($body) {
-		if (!$parts = explode("\r\n\r\n", $body)) {
-			return;
+	protected function _parseMessage($body) {
+		if (!($parts = explode("\r\n\r\n", $body, 2)) || count($parts) == 1) {
+			return $body;
 		}
-		$headers = str_replace("\r", "", explode("\n", array_shift($parts)));
-		$body = implode("\r\n\r\n", $parts);
+		list($headers, $body) = $parts;
+		$headers = str_replace("\r", "", explode("\n", $headers));
 
 		if (array_filter($headers) == array()) {
 			return $body;
@@ -131,7 +134,7 @@ class Response extends \lithium\net\http\Message {
 		$this->headers($headers);
 
 		if (!$match) {
-			return;
+			return $body;
 		}
 		list($line, $this->version, $code, $message) = $match;
 		$this->status = compact('code', 'message') + $this->status;

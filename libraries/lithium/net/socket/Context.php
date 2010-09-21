@@ -150,9 +150,7 @@ class Context extends \lithium\net\Socket {
 		$options += $defaults;
 
 		if ($this->write($message)) {
-			$body = $this->read();
-
-			return new $options['response'](compact('body'));
+			return $this->_instance($options['response'], array('message' => $this->read()));
 		}
 	}
 }

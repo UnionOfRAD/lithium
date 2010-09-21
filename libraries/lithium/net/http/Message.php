@@ -74,7 +74,7 @@ class Message extends \lithium\net\Message {
 			}
 		}
 
-		if (!empty($value)) {
+		if ($value) {
 			$this->headers = array_merge($this->headers, array($key => $value));
 		} else {
 			foreach ((array) $key as $header => $value) {

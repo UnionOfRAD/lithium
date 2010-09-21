@@ -28,7 +28,7 @@ class Response extends \lithium\net\http\Response {
 	 *
 	 * @var array
 	 */
-	protected $_classes = array('router' => '\lithium\net\http\Router');
+	protected $_classes = array('router' => 'lithium\net\http\Router');
 
 	public function __construct(array $config = array()) {
 		$defaults = array(

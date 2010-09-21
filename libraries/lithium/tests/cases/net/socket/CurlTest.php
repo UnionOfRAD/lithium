@@ -94,9 +94,7 @@ class CurlTest extends \lithium\test\Unit {
 		$this->assertTrue($stream->write(null));
 		$this->assertTrue($stream->read());
 
-		$response = $stream->send(new Request(), array(
-			'response' => 'lithium\net\http\Response'
-		));
+		$response = $stream->send(new Request(), array('response' => 'lithium\net\http\Response'));
 		$this->assertEqual(trim(file_get_contents($this->_testUrl)), trim($response->body()));
 		$this->assertNull($stream->eof());
 	}
