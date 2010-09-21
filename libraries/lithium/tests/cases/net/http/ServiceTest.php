@@ -17,7 +17,7 @@ class ServiceTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
 		'classes' => array(
-			'socket' => '\lithium\tests\mocks\net\http\MockSocket'
+			'socket' => 'lithium\tests\mocks\net\http\MockSocket'
 		),
 		'host' => 'localhost',
 		'port' => 80,

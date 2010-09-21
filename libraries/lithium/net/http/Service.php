@@ -75,8 +75,7 @@ class Service extends \lithium\core\Object {
 			'password'   => null,
 			'encoding'   => 'UTF-8',
 		);
-		$config = (array) $config + $defaults;
-		parent::__construct($config);
+		parent::__construct($config + $defaults);
 	}
 
 	protected function _init() {
