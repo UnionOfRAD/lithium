@@ -217,7 +217,7 @@ class Object {
 		if (isset($this->_classes[$name])) {
 			$name = $this->_classes[$name];
 		}
-		return class_exists($name) ? new $name($config) : null;
+		return (is_string($name) && class_exists($name)) ? new $name($config) : null;
 	}
 
 	/**
