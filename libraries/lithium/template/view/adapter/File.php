@@ -119,10 +119,6 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 		}
 		$options = array_filter($options, function($item) { return is_string($item); });
 
-		if (isset($options['plugin'])) {
-			$options['library'] = $options['plugin'];
-		}
-
 		$library = Libraries::get(isset($options['library']) ? $options['library'] : true);
 		$options['library'] = $library['path'];
 		$path = $this->_paths((array) $this->_config['paths'][$type], $options);
