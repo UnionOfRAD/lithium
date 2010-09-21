@@ -127,6 +127,17 @@ class Service extends \lithium\core\Object {
 		return $this->send(__FUNCTION__, $path, $data, $options);
 	}
 
+	public function &connection() {
+		$config = $this->_config;
+
+		try {
+			$this->connection = Libraries::instance('socket', $config['socket'], $config);
+		} catch (ClassNotFoundException $e) {
+			$this->connection = null;
+		}
+		return $this->connection;
+	}
+
 	/**
 	 * Retrieve instance of configured socket
 	 *
@@ -159,6 +170,7 @@ class Service extends \lithium\core\Object {
 		$options += $defaults + $this->_config;
 		$request = $this->_request($method, $path, $data, $options);
 		$options += array('message' => $request);
+
 		if (!($conn =& $this->connection($options)) || !$conn->open()) {
 			return;
 		}
