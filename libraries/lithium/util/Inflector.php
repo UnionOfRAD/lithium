@@ -411,11 +411,10 @@ class Inflector {
 	 * @return string Human readable version of the word (i.e. `'Red Bike'`).
 	 */
 	public static function humanize($word, $separator = '_') {
-		if (isset(static::$_humanized[$word . $separator])) {
-			return static::$_humanized[$word . $separator];
+		if (isset(static::$_humanized[$key = $word . ':' . $separator])) {
+			return static::$_humanized[$key];
 		}
-		static::$_humanized[$word . $separator] = ucwords(str_replace($separator, " ", $word));
-		return static::$_humanized[$word . $separator];
+		return static::$_humanized[$key] = ucwords(str_replace($separator, " ", $word));
 	}
 
 	/**
