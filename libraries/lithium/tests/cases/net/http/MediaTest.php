@@ -46,7 +46,7 @@ class MediaTest extends \lithium\test\Unit {
 
 		$expected = array(
 			'view' => false, 'layout' => false, 'cast' => true,
-			'encode' => 'json_encode', 'decode' => 'json_decode'
+			'encode' => 'json_encode', 'decode' => $result['options']['decode']
 		);
 		$this->assertEqual($expected, $result['options']);
 
@@ -90,11 +90,12 @@ class MediaTest extends \lithium\test\Unit {
 		$result = Media::type('application/json; charset=UTF-8');
 		$this->assertEqual('json', $result['content']);
 
+		$result = Media::type('json');
 		$expected = array('content' => 'application/json', 'options' => array(
 			'view' => false, 'layout' => false, 'cast' => true,
-			'encode' => 'json_encode', 'decode' => 'json_decode'
+			'encode' => 'json_encode', 'decode' => $result['options']['decode']
 		));
-		$this->assertEqual($expected, Media::type('json'));
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testAssetTypeHandling() {
@@ -133,6 +134,8 @@ class MediaTest extends \lithium\test\Unit {
 		Media::assets('my', false);
 		$result = Media::assets('my');
 		$this->assertNull($result);
+
+		$this->assertEqual('/foo.exe', Media::asset('foo.exe', 'bar'));
 	}
 
 	public function testAssetPathGeneration() {
@@ -164,6 +167,9 @@ class MediaTest extends \lithium\test\Unit {
 			'check' => 'true', 'base' => 'foo', 'timestamp' => true
 		));
 		$this->assertPattern('%^foo/css/debug\.css\?type=test&\d+$%', $result);
+
+		$file = Media::path('css/debug.css', 'bar');
+		$this->assertTrue(file_exists($file));
 	}
 
 	public function testCustomAssetPathGeneration() {
@@ -402,9 +408,10 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$this->assertEqual($result, Media::to('json', $data));
+		$this->assertNull(Media::encode('badness', $data));
 
-		$result = Media::encode('badness', $data);
-		$this->assertNull($result);
+		$result = Media::decode('json', $expected);
+		$this->assertEqual($data, $result);
 	}
 
 	public function testRenderWithOptionsMerging() {
@@ -420,6 +427,22 @@ class MediaTest extends \lithium\test\Unit {
 		$this->expectException('/Template not found/');
 		Media::render($response, null, compact('request'));
 		$this->_cleanUp();
+	}
+
+	public function testCustomWebroot() {
+		Libraries::add('defaultStyleApp', array('path' => LITHIUM_APP_PATH, 'bootstrap' => false));
+		$this->assertEqual(LITHIUM_APP_PATH . '/webroot', Media::webroot('defaultStyleApp'));
+
+		Libraries::add('customWebRootApp', array(
+			'path' => LITHIUM_APP_PATH,
+			'webroot' => LITHIUM_APP_PATH,
+			'bootstrap' => false
+		));
+		$this->assertEqual(LITHIUM_APP_PATH, Media::webroot('customWebRootApp'));
+
+		Libraries::remove('defaultStyleApp');
+		Libraries::remove('customWebRootApp');
+		$this->assertNull(Media::webroot('defaultStyleApp'));
 	}
 
 	/**

@@ -7,7 +7,7 @@
  */
 namespace lithium\net\http;
 
-use \lithium\core\Libraries;
+use lithium\core\Libraries;
 
 /**
  * Basic Http Service.
@@ -50,10 +50,10 @@ class Service extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'media'    => '\lithium\net\http\Media',
-		'request'  => '\lithium\net\http\Request',
-		'response' => '\lithium\net\http\Response',
-		'socket'   => '\lithium\net\socket\Context'
+		'media'    => 'lithium\net\http\Media',
+		'request'  => 'lithium\net\http\Request',
+		'response' => 'lithium\net\http\Response',
+		'socket'   => 'lithium\net\socket\Context'
 	);
 
 	/**

@@ -85,7 +85,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @var array
 	 */
 	protected static $_formats = array(
-		'array' => '\lithium\util\Collection::toArray'
+		'array' => 'lithium\util\Collection::toArray'
 	);
 
 	/**

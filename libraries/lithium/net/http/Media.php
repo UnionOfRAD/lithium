@@ -323,7 +323,9 @@ class Media extends \lithium\core\StaticObject {
 		if (isset($config['webroot'])) {
 			return $config['webroot'];
 		}
-		return $config['path'] . '/webroot';
+		if (isset($config['path'])) {
+			return $config['path'] . '/webroot';
+		}
 	}
 
 	/**
@@ -562,7 +564,9 @@ class Media extends \lithium\core\StaticObject {
 	 */
 	protected static function _handlers($type = null) {
 		$format = array('view' => false, 'layout' => false);
-		$json   = array('encode' => 'json_encode', 'decode' => 'json_decode');
+		$json   = array('encode' => 'json_encode', 'decode' => function($data) {
+			return json_decode($data, true);
+		});
 		$paths  = array(
 			'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
 			'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',

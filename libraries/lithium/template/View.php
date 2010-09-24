@@ -8,8 +8,8 @@
 
 namespace lithium\template;
 
-use \RuntimeException;
-use \lithium\core\Libraries;
+use RuntimeException;
+use lithium\core\Libraries;
 
 /**
  * As one of the three pillars of the Model-View-Controller design pattern, the `View` class
@@ -133,6 +133,7 @@ class View extends \lithium\core\Object {
 	 */
 	protected function _init() {
 		parent::_init();
+
 		foreach (array('loader', 'renderer') as $key) {
 			if (is_object($this->_config[$key])) {
 				$this->{'_' . $key} = $this->_config[$key];

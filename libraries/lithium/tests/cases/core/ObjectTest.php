@@ -8,13 +8,13 @@
 
 namespace lithium\tests\cases\core;
 
-use \lithium\core\Object;
-use \lithium\tests\mocks\core\MockMethodFiltering;
-use \lithium\tests\mocks\core\MockExposed;
-use \lithium\tests\mocks\core\MockCallable;
-use \lithium\tests\mocks\core\MockObjectForParents;
-use \lithium\tests\mocks\core\MockObjectConfiguration;
-use \lithium\tests\mocks\core\MockInstantiator;
+use lithium\core\Object;
+use lithium\tests\mocks\core\MockMethodFiltering;
+use lithium\tests\mocks\core\MockExposed;
+use lithium\tests\mocks\core\MockCallable;
+use lithium\tests\mocks\core\MockObjectForParents;
+use lithium\tests\mocks\core\MockObjectConfiguration;
+use lithium\tests\mocks\core\MockInstantiator;
 
 class ObjectTest extends \lithium\test\Unit {
 

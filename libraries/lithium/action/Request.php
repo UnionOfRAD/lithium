@@ -393,7 +393,7 @@ class Request extends \lithium\net\http\Message {
 		if ($type === null) {
 			$type = $this->type;
 
-			if (empty($type)) {
+			if (!$type) {
 				$type = $this->env('CONTENT_TYPE');
 			}
 		}
