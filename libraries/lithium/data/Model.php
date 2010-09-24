@@ -316,40 +316,42 @@ class Model extends \lithium\core\StaticObject {
 		if (static::_isBase($class = get_called_class())) {
 			return;
 		}
-		$name = static::_name();
 		$self = static::_object();
-		$defaults = array('meta' => array(), 'finders' => array(), 'schema' => array());
+		$base = get_class_vars(__CLASS__);
 
-		$meta    = $options + $self->_meta;
+		$meta    = array();
 		$schema  = array();
-		$config  = array();
+		$source  = array();
 		$classes = static::$_classes;
 
 		foreach (static::_parents() as $parent) {
-			$base = get_class_vars($parent);
+			$parentConfig = get_class_vars($parent);
 
 			foreach (array('meta', 'schema', 'classes') as $key) {
-				if (isset($base["_{$key}"])) {
-					${$key} += $base["_{$key}"];
+				if (isset($parentConfig["_{$key}"])) {
+					${$key} += $parentConfig["_{$key}"];
 				}
 			}
 			if ($class == __CLASS__) {
 				break;
 			}
 		}
+		$tmp = $options + $meta + $self->_meta;
 
-		if ($meta['connection']) {
-			$conn = $classes['connections']::get($meta['connection']);
-			$config = ($conn) ? $conn->configureClass($class) : array();
+		if ($tmp['connection']) {
+			$conn = $classes['connections']::get($tmp['connection']);
+			$source = ($conn) ? $conn->configureClass($class) : array();
 		}
-		$config += $defaults;
-
+		$source += array('meta' => array(), 'finders' => array(), 'schema' => array());
 		static::$_classes = $classes;
-		$self->_meta = (compact('class', 'name') + $meta + $config['meta']);
-		$self->_meta['initialized'] = false;
-		$self->_schema += $schema + $config['schema'];
+		$name = static::_name();
 
-		$self->_finders += $config['finders'] + $self->_findFilters();
+		$local = compact('class', 'name') + $options + array_diff($self->_meta, $base['_meta']);
+		$self->_meta = ($local + $source['meta'] + $meta);
+		$self->_meta['initialized'] = false;
+		$self->_schema += $schema + $source['schema'];
+
+		$self->_finders += $source['finders'] + $self->_findFilters();
 		static::_relations();
 	}
 
@@ -781,7 +783,6 @@ class Model extends \lithium\core\StaticObject {
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
 			$options = $params + $params['options'] + array('model' => $self, 'type' => 'update');
 			unset($options['options']);
-			var_export($options);
 
 			$query = $self::invokeMethod('_instance', array('query', $options));
 			return $self::connection()->update($query, $options);
@@ -826,9 +827,6 @@ class Model extends \lithium\core\StaticObject {
 		$connections = static::$_classes['connections'];
 		$name = isset($self->_meta['connection']) ? $self->_meta['connection'] : null;
 
-		if (!$name) {
-			throw new ConfigException("Connection name not defined");
-		}
 		if ($conn = $connections::get($name)) {
 			return $conn;
 		}
@@ -962,9 +960,6 @@ class Model extends \lithium\core\StaticObject {
 				$model = $self;
 				$type = $params['type'];
 				$options = array_diff_key($params['options'], $_query);
-
-				$classes = $options['classes'];
-				unset($options['classes']);
 
 				if ($options && !isset($params['options']['conditions'])) {
 					$options = array('conditions' => $options);
