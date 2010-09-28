@@ -260,9 +260,9 @@ class MediaTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testDecode() {
-		$data = (object) array('movies' => array(
-			(object) array('name' => 'Shaun of the Dead', 'year' => 2004),
-			(object) array('name' => 'V for Vendetta', 'year' => 2005)
+		$data = array('movies' => array(
+			array('name' => 'Shaun of the Dead', 'year' => 2004),
+			array('name' => 'V for Vendetta', 'year' => 2005)
 		));
 		$encoded = '{"movies":[{"name":"Shaun of the Dead","year":2004},';
 		$encoded .= '{"name":"V for Vendetta","year":2005}]}';
