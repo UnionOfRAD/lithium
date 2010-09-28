@@ -496,10 +496,10 @@ class Libraries {
 	 * @throws lithium\core\ClassNotFoundException Throws an exception if the class can't be found.
 	 */
 	public static function instance($type, $name, array $options = array()) {
-		if (!$class = static::locate($type, $name)) {
+		if (!$class = (string) static::locate($type, $name)) {
 			throw new ClassNotFoundException("Class '{$name}' of type '{$type}' not found.");
 		}
-		return new $class($options);
+		return class_exists($class) ? new $class($options) : null;
 	}
 
 	/**
