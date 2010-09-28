@@ -212,10 +212,12 @@ class Object {
 		if (is_object($name) || !$name) {
 			return $name;
 		}
+		$name = (string) $name;
+
 		if (isset($this->_classes[$name])) {
 			$name = $this->_classes[$name];
 		}
-		return (is_string($name) && class_exists($name)) ? new $name($config) : null;
+		return class_exists($name) ? new $name($config) : null;
 	}
 
 	/**
