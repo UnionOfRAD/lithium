@@ -198,8 +198,7 @@ class Controller extends \lithium\core\Object {
 	 * Uses results (typically coming from a controller action) to generate content and headers for
 	 * a Response object.
 	 *
-	 * @param string|array $options A string template name (see the 'template' option below), or an
-	 *        array of options, as follows:
+	 * @param array $options An array of options, as follows:
 	 *        - `'data'`: An associative array of variables to be assigned to the template. These
 	 *          are merged on top of any variables set in `Controller::set()`.
 	 *        - `'head'`: If true, only renders the headers of the response, not the body. Defaults
@@ -211,8 +210,7 @@ class Controller extends \lithium\core\Object {
 	 *          action being rendered.
 	 * @return void
 	 */
-	public function render($options = array()) {
-		$options = is_string($options) ? array('template' => $options) : $options;
+	public function render(array $options = array()) {
 		$media = $this->_classes['media'];
 		$class = get_class($this);
 		$name = preg_replace('/Controller$/', '', substr($class, strrpos($class, '\\') + 1));

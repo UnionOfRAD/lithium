@@ -47,7 +47,7 @@ class MockPostsController extends \lithium\action\Controller {
 	}
 
 	public function view2($id = null) {
-		$this->render('view');
+		$this->render(array('template' => 'view'));
 	}
 
 	public function view3($id = null) {
