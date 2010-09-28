@@ -8,12 +8,11 @@
 
 namespace lithium\tests\cases\data\source\http\adapter;
 
-use \lithium\data\source\http\adapter\CouchDb;
-
-use \lithium\data\Model;
-use \lithium\data\model\Query;
-use \lithium\data\Connections;
-use \lithium\data\entity\Document;
+use lithium\data\Model;
+use lithium\data\model\Query;
+use lithium\data\Connections;
+use lithium\data\entity\Document;
+use lithium\data\source\http\adapter\CouchDb;
 
 class CouchDbTest extends \lithium\test\Unit {
 
@@ -22,9 +21,6 @@ class CouchDbTest extends \lithium\test\Unit {
 	protected $_configs = array();
 
 	protected $_testConfig = array(
-		'classes' => array(
-			'socket' => '\lithium\tests\mocks\data\source\http\adapter\MockSocket'
-		),
 		'database' => 'lithium-test',
 		'persistent' => false,
 		'protocol' => 'tcp',
@@ -32,25 +28,25 @@ class CouchDbTest extends \lithium\test\Unit {
 		'login' => 'root',
 		'password' => '',
 		'port' => 80,
-		'timeout' => 2
+		'timeout' => 2,
+		'socket' => 'lithium\tests\mocks\data\source\http\adapter\MockSocket'
 	);
+
+	protected $_model = 'lithium\tests\mocks\data\source\http\adapter\MockCouchPost';
 
 	public function setUp() {
 		$this->_configs = Connections::config();
 
 		Connections::reset();
-		$this->db = new CouchDb(array('classes' => array('socket' => false)));
+		$this->db = new CouchDb(array('socket' => false));
+
 		Connections::config(array(
-			'mock-couchdb-connection' => array(
-				'object' => &$this->db,
-				'adapter' => 'CouchDb'
-			)
+			'mock-couchdb-connection' => array('object' => &$this->db, 'adapter' => 'CouchDb')
 		));
 
-		$options = array(
-			'model' => '\lithium\tests\mocks\data\source\http\adapter\MockCouchPost'
-		);
-		$this->query = new Query($options + array('entity' => new Document($options)));
+		$model = $this->_model;
+		$entity = new Document(compact('model'));
+		$this->query = new Query(compact('model', 'entity'));
 	}
 
 	public function tearDown() {

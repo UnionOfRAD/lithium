@@ -8,8 +8,8 @@
 
 namespace lithium\data\source;
 
-use \lithium\core\Libraries;
-use \lithium\util\String;
+use lithium\core\Libraries;
+use lithium\util\String;
 
 /**
  * Http class to access data sources using \lithium\net\http\Service.
@@ -37,8 +37,8 @@ class Http extends \lithium\data\Source {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'service' => '\lithium\net\http\Service',
-		'relationship' => '\lithium\data\model\Relationship'
+		'service' => 'lithium\net\http\Service',
+		'relationship' => 'lithium\data\model\Relationship'
 	);
 
 	/**
@@ -80,7 +80,7 @@ class Http extends \lithium\data\Source {
 			'timeout'    => 30,
 			'encoding'   => 'UTF-8'
 		);
-		$config = (array) $config + $defaults;
+		$config = $config + $defaults;
 		$config['username'] = $config['login'];
 		parent::__construct($config);
 	}

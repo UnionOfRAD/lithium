@@ -15,9 +15,7 @@ use \lithium\data\model\Query;
 class HttpTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
-		'classes' => array(
-			'socket' => '\lithium\tests\mocks\data\source\http\adapter\MockSocket'
-		),
+		'classes' => array('response' => 'lithium\net\http\Response'),
 		'persistent' => false,
 		'protocol' => 'tcp',
 		'host' => 'localhost',
@@ -25,6 +23,7 @@ class HttpTest extends \lithium\test\Unit {
 		'password' => '',
 		'port' => 80,
 		'timeout' => 2,
+		'socket' => 'lithium\tests\mocks\data\source\http\adapter\MockSocket'
 	);
 
 	public function setUp() {
@@ -92,25 +91,21 @@ class HttpTest extends \lithium\test\Unit {
 		$http = new Http($this->_testConfig);
 		$result = $http->get();
 
-		$expected = 'HTTP/1.1';
 		$result = $http->last->response->protocol;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('HTTP/1.1', $result);
 
-		$expected = '200';
 		$result = $http->last->response->status['code'];
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('200', $result);
 
-		$expected = 'OK';
 		$result = $http->last->response->status['message'];
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('OK', $result);
 
-		$expected = 'text/html';
 		$result = $http->last->response->type;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('text/html', $result);
+		// var_dump($http->last->response);
 
-		$expected = 'UTF-8';
 		$result = $http->last->response->encoding;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('UTF-8', $result);
 	}
 
 	public function testGetPath() {
