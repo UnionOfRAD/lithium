@@ -170,6 +170,10 @@ class Redis extends \lithium\core\Object {
 	/**
 	 * Performs an atomic decrement operation on specified numeric cache item.
 	 *
+	 * Note that if the value of the specified key is *not* an integer, the decrement
+	 * operation will have no effect whatsoever. Redis chooses to not typecast values
+	 * to integers when performing an atomic decrement operation.
+	 *
 	 * @param string $key Key of numeric cache item to decrement
 	 * @param integer $offset Offset to decrement - defaults to 1.
 	 * @return mixed Item's new value on successful decrement, false otherwise
@@ -184,6 +188,10 @@ class Redis extends \lithium\core\Object {
 
 	/**
 	 * Performs an atomic increment operation on specified numeric cache item.
+	 *
+	 * Note that if the value of the specified key is *not* an integer, the increment
+	 * operation will have no effect whatsoever. Redis chooses to not typecast values
+	 * to integers when performing an atomic increment operation.
 	 *
 	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to 1.
