@@ -530,9 +530,7 @@ class Unit extends \lithium\core\Object {
 		$defaults = array('path' => '/', 'name' => '\w+');
 		$expected += $defaults;
 
-		if (empty($headers)) {
-			$headers = headers_list();
-		}
+		$headers = ($headers) ?: headers_list();
 		$value = preg_quote(urlencode($expected['value']), '/');
 
 		$key = explode('.', $expected['key']);
