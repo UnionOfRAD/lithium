@@ -117,14 +117,19 @@ class Redis extends \lithium\core\Object {
 				if ($connection->mset($params['key'])) {
 					$ttl = array();
 
-					foreach ($params['key'] as $k => $v) {
-						$ttl[$k] = $self->invokeMethod('_ttl', array($k, $expiry));
+					if ($expiry) {
+						foreach ($params['key'] as $k => $v) {
+							$ttl[$k] = $self->invokeMethod('_ttl', array($k, $expiry));
+						}
 					}
 					return $ttl;
 				}
 			}
-			if ($connection->set($params['key'], $params['data'])){
-				return $self->invokeMethod('_ttl', array($params['key'], $expiry));
+			if ($result = $connection->set($params['key'], $params['data'])){
+				if ($expiry) {
+					return $self->invokeMethod('_ttl', array($params['key'], $expiry));
+				}
+				return $result;
 			}
 		};
 	}
