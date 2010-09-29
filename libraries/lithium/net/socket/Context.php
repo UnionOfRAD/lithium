@@ -100,7 +100,7 @@ class Context extends \lithium\net\Socket {
 	}
 
 	/**
-	 * Writes to the socket. Does not apply to this implementation.
+	 * Writes to the socket.
 	 *
 	 * @param string $data Data to write.
 	 * @return boolean Success

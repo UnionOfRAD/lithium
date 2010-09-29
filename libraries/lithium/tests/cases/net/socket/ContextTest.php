@@ -25,6 +25,8 @@ class ContextTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->socket = new Context($this->_testConfig);
+		$message = "Could not open {$this->_testUrl} - skipping " . __CLASS__;
+		$this->skipIf(!fopen($this->_testUrl, 'r'), $message);
 	}
 
 	public function tearDown() {
@@ -72,7 +74,10 @@ class ContextTest extends \lithium\test\Unit {
 		$this->assertTrue(is_resource($stream->open()));
 		$this->assertTrue(is_resource($stream->resource()));
 
-		$response = $stream->send(new Request(), array('response' => 'lithium\net\http\Response'));
+		$response = $stream->send(new Request(), array(
+			'response' => 'lithium\net\http\Response'
+		));
+		$this->assertTrue($response instanceof lithium\net\http\Response);
 		$this->assertEqual(trim(file_get_contents($this->_testUrl)), trim($response->body()));
 		$this->assertTrue($stream->eof());
 	}
