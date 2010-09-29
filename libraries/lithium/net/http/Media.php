@@ -416,7 +416,7 @@ class Media extends \lithium\core\StaticObject {
 			if (isset($types[$type])) {
 				$response->headers('Content-type', current((array) $types[$type]));
 			}
-			$response->body($self::invokeMethod('_handle', array($handler, $data, $options)));
+			$response->body($self::invokeMethod('_handle', array($handler, $data, $response)));
 		});
 	}
 
@@ -431,7 +431,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @param array $options Handler-specific options.
 	 * @return mixed
 	 */
-	public static function encode($type, $data, array $options = array()) {
+	public static function encode($type, $data, &$response = null) {
 		$handler = is_array($type) ? $type : static::_handlers($type);
 
 		if (!$handler || !isset($handler['encode'])) {
@@ -450,7 +450,7 @@ class Media extends \lithium\core\StaticObject {
 			$data = is_array($data) ? array_map($cast, $data) : $data;
 		}
 		$method = $handler['encode'];
-		return is_string($method) ? $method($data) : $method($data, $handler, $options);
+		return is_string($method) ? $method($data) : $method($data, $handler, $response);
 	}
 
 	/**
@@ -488,17 +488,18 @@ class Media extends \lithium\core\StaticObject {
 	 * Called by `Media::render()` to render response content. Given a content handler and data,
 	 * calls the content handler and passes in the data, receiving back a rendered content string.
 	 *
+	 * @see lithium\action\Response
 	 * @param array $handler
 	 * @param array $data
-	 * @param array $options
+	 * @param object $response A reference to the `Response` object for this dispatch cycle.
 	 * @return string
 	 * @filter
 	 */
-	protected static function _handle($handler, $data, $options) {
-		$params = compact('handler', 'data', 'options');
-		return static::_filter(__FUNCTION__,  $params, function($self, $params) {
+	protected static function _handle($handler, $data, &$response) {
+		$params = array('response' => &$response) + compact('handler', 'data');
+		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+			$response = $params['response'];
 			$handler = $params['handler'];
-			$options = $params['options'];
 			$data = $params['data'];
 
 			if (isset($options['request'])) {
@@ -508,10 +509,10 @@ class Media extends \lithium\core\StaticObject {
 
 			switch (true) {
 				case $handler['encode']:
-					return $self::encode($handler, $data, $options);
+					return $self::encode($handler, $data, $response);
 				case class_exists($handler['view']):
-					$view = new $handler['view']($handler);
-					return $view->render('all', $data, $options);
+					$view = new $handler['view']($handler + array('response' => &$response));
+					return $view->render('all', $data);
 				case ($handler['template'] === false) && is_string($data):
 					return $data;
 				default:

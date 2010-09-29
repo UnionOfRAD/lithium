@@ -75,10 +75,20 @@ class View extends \lithium\core\Object {
 	 * applicable.  May be empty if this does not apply.  For example, if the View class is
 	 * created to render an email.
 	 *
-	 * @var object Request object instance.
 	 * @see lithium\action\Request
+	 * @var object `Request` object instance.
 	 */
 	protected $_request = null;
+
+	/**
+	 * Holds a reference to the `Response` object that will be returned at the end of the current
+	 * dispatch cycle. Allows headers and other response attributes to be assigned in the templating
+	 * layer.
+	 *
+	 * @see lithium\action\Response
+	 * @var object `Response` object instance.
+	 */
+	protected $_response = null;
 
 	/**
 	 * The object responsible for loading template files.
@@ -99,7 +109,7 @@ class View extends \lithium\core\Object {
 	 *
 	 * @var array Objects to auto-configure.
 	 */
-	protected $_autoConfig = array('request');
+	protected $_autoConfig = array('request', 'response');
 
 	/**
 	 * Constructor.
@@ -117,6 +127,7 @@ class View extends \lithium\core\Object {
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'request' => null,
+			'response' => null,
 			'vars' => array(),
 			'loader' => 'File',
 			'renderer' => 'File',
@@ -144,7 +155,13 @@ class View extends \lithium\core\Object {
 			$this->{'_' . $key} = Libraries::instance('adapter.template.view', $class, $config);
 		}
 
-		$h = function($data) { return htmlspecialchars((string) $data); };
+		if ($this->_response) {
+			$encoding =& $this->_response->encoding;
+		}
+
+		$h = function($data) use (&$encoding) {
+			return htmlspecialchars((string) $data, ENT_QUOTES, $encoding);
+		};
 		$this->outputFilters += compact('h') + $this->_config['outputFilters'];
 	}
 

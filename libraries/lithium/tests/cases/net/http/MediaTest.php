@@ -396,7 +396,7 @@ class MediaTest extends \lithium\test\Unit {
 		Media::render($response, null, compact('request') + array(
 			'layout' => false,
 			'template' => false,
-			'encode' => function($data, $handler, $options) { return $options['foo']; }
+			'encode' => function($data, $handler) { return $handler['request']->foo; }
 		));
 		$this->assertEqual(array('bar'), $response->body);
 	}
@@ -503,6 +503,20 @@ class MediaTest extends \lithium\test\Unit {
 		Libraries::add('foobar', array('path' => __DIR__, 'webroot' => __DIR__));
 		$this->assertEqual(__DIR__, Media::webroot('foobar'));
 		Libraries::remove('foobar');
+	}
+
+	/**
+	 * Tests that the `Response` object can be directly modified from a templating class or encode
+	 * function.
+	 *
+	 * @return void
+	 */
+	public function testResponseModification() {
+		Media::type('my', 'text/x-my', array('view' => 'lithium\tests\mocks\net\http\Template'));
+		$response = new Response();
+
+		Media::render($response, null, array('type' => 'my'));
+		$this->assertEqual('Value', $response->headers('Custom'));
 	}
 }
 
