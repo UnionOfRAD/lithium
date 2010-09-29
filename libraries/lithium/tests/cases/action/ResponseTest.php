@@ -8,9 +8,9 @@
 
 namespace lithium\tests\cases\action;
 
-use \lithium\action\Response;
-use \lithium\tests\mocks\action\MockRequestType;
-use \lithium\tests\mocks\action\MockResponse;
+use lithium\action\Response;
+use lithium\tests\mocks\action\MockRequestType;
+use lithium\tests\mocks\action\MockResponse;
 
 class ResponseTest extends \lithium\test\Unit {
 

@@ -50,7 +50,7 @@ class MediaTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result['options']);
 
-		Media::type('my', 'text/x-my', array('view' => '\my\custom\View', 'layout' => false));
+		Media::type('my', 'text/x-my', array('view' => 'my\custom\View', 'layout' => false));
 
 		$result = Media::types();
 		$this->assertTrue(in_array('my', $result));
@@ -60,7 +60,7 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['content']);
 
 		$expected = array(
-			'view' => '\my\custom\View', 'template' => null, 'layout' => null,
+			'view' => 'my\custom\View', 'template' => null, 'layout' => null,
 			'encode' => null, 'decode' => null, 'cast' => true
 		);
 		$this->assertEqual($expected, $result['options']);

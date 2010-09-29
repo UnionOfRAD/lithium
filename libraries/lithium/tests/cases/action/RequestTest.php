@@ -8,9 +8,9 @@
 
 namespace lithium\tests\cases\action;
 
-use \lithium\action\Request;
-use \lithium\tests\mocks\action\MockIisRequest;
-use \lithium\tests\mocks\action\MockCgiRequest;
+use lithium\action\Request;
+use lithium\tests\mocks\action\MockIisRequest;
+use lithium\tests\mocks\action\MockCgiRequest;
 
 class RequestTest extends \lithium\test\Unit {
 

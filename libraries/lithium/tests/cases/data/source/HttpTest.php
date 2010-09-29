@@ -102,7 +102,6 @@ class HttpTest extends \lithium\test\Unit {
 
 		$result = $http->last->response->type;
 		$this->assertEqual('text/html', $result);
-		// var_dump($http->last->response);
 
 		$result = $http->last->response->encoding;
 		$this->assertEqual('UTF-8', $result);

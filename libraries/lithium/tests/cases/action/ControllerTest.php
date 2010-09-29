@@ -8,12 +8,12 @@
 
 namespace lithium\tests\cases\action;
 
-use \Exception;
-use \lithium\net\http\Media;
-use \lithium\action\Request;
-use \lithium\action\Controller;
-use \lithium\tests\mocks\action\MockPostsController;
-use \lithium\tests\mocks\action\MockControllerRequest;
+use Exception;
+use lithium\net\http\Media;
+use lithium\action\Request;
+use lithium\action\Controller;
+use lithium\tests\mocks\action\MockPostsController;
+use lithium\tests\mocks\action\MockControllerRequest;
 
 class ControllerTest extends \lithium\test\Unit {
 
@@ -97,7 +97,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertFalse($postsController->stopped);
 
 		$postsController = new MockPostsController(array('classes' => array(
-			'response' => '\lithium\tests\mocks\action\MockControllerResponse'
+			'response' => 'lithium\tests\mocks\action\MockControllerResponse'
 		)));
 		$this->assertFalse($postsController->stopped);
 
@@ -122,7 +122,7 @@ class ControllerTest extends \lithium\test\Unit {
 	 */
 	public function testRenderWithAlternateTemplate() {
 		$postsController = new MockPostsController(array('classes' => array(
-			'media' => '\lithium\tests\mocks\action\MockMediaClass'
+			'media' => 'lithium\tests\mocks\action\MockMediaClass'
 		)));
 
 		$result = $postsController(null, array('action' => 'view2'));
@@ -145,7 +145,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$request->params['controller'] = 'lithium\tests\mocks\action\MockPostsController';
 
 		$controller = new MockPostsController(compact('request') + array('classes' => array(
-			'media' => '\lithium\tests\mocks\action\MockMediaClass'
+			'media' => 'lithium\tests\mocks\action\MockMediaClass'
 		)));
 
 		$controller->render();
@@ -176,7 +176,7 @@ class ControllerTest extends \lithium\test\Unit {
 
 	public function testResponseStatus() {
 		$postsController = new MockPostsController(array('classes' => array(
-			'response' => '\lithium\tests\mocks\action\MockControllerResponse'
+			'response' => 'lithium\tests\mocks\action\MockControllerResponse'
 		)));
 		$this->assertFalse($postsController->stopped);
 
@@ -199,7 +199,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$postsController = new MockPostsController(array(
 			'request' => $request,
 			'classes' => array(
-				'response' => '\lithium\tests\mocks\action\MockControllerResponse'
+				'response' => 'lithium\tests\mocks\action\MockControllerResponse'
 			)
 		));
 		$this->assertFalse($postsController->stopped);
@@ -229,7 +229,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$postsController = new MockPostsController(array(
 			'request' => $request,
 			'classes' => array(
-				'response' => '\lithium\tests\mocks\action\MockControllerResponse'
+				'response' => 'lithium\tests\mocks\action\MockControllerResponse'
 			)
 		));
 		$this->assertFalse($postsController->stopped);
@@ -260,7 +260,7 @@ class ControllerTest extends \lithium\test\Unit {
 	 */
 	public function testManuallySettingTemplate() {
 		$postsController = new MockPostsController(array('classes' => array(
-			'media' => '\lithium\tests\mocks\action\MockMediaClass'
+			'media' => 'lithium\tests\mocks\action\MockMediaClass'
 		)));
 		$postsController(new Request(), array('action' => 'changeTemplate'));
 		$result = $postsController->access('_render');
@@ -274,7 +274,7 @@ class ControllerTest extends \lithium\test\Unit {
 
 		$postsController = new MockPostsController(array(
 			'request' => $request,
-			'classes' => array('response' => '\lithium\tests\mocks\action\MockControllerResponse')
+			'classes' => array('response' => 'lithium\tests\mocks\action\MockControllerResponse')
 		));
 		$this->assertFalse($postsController->stopped);
 
@@ -305,7 +305,7 @@ class ControllerTest extends \lithium\test\Unit {
 	public function testDispatchingWithExplicitControllerName() {
 		$request = new Request(array('url' => '/'));
 		$request->params = array(
-			'controller' => '\lithium\tests\mocks\action\MockPostsController',
+			'controller' => 'lithium\tests\mocks\action\MockPostsController',
 			'action' => 'index'
 		);
 

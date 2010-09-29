@@ -8,11 +8,11 @@
 
 namespace lithium\tests\cases\action;
 
-use \lithium\action\Request;
-use \lithium\action\Response;
-use \lithium\net\http\Router;
-use \lithium\action\Dispatcher;
-use \lithium\tests\mocks\action\MockDispatcher;
+use lithium\action\Request;
+use lithium\action\Response;
+use lithium\net\http\Router;
+use lithium\action\Dispatcher;
+use lithium\tests\mocks\action\MockDispatcher;
 
 class DispatcherTest extends \lithium\test\Unit {
 
