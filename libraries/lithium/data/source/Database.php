@@ -36,14 +36,14 @@ abstract class Database extends \lithium\data\Source {
 	 * Strings used to render the given statement
 	 *
 	 * @see lithium\data\source\Database::renderCommand()
-	 * @var string
+	 * @var array
 	 */
 	protected $_strings = array(
 		'create' => "INSERT INTO {:source} ({:fields}) VALUES ({:values});{:comment}",
 		'update' => "UPDATE {:source} SET {:fields} {:conditions};{:comment}",
-		'delete' => "DELETE {:flags} From {:source} {:aliases} {:conditions};{:comment}",
+		'delete' => "DELETE {:flags} FROM {:source} {:alias} {:conditions};{:comment}",
 		'schema' => "CREATE TABLE {:source} (\n{:columns}{:indexes});{:comment}",
-		'join'   => "{:type} JOIN {:source} ON {:constraint}"
+		'join'   => "{:type} JOIN {:source} {:alias} {:constraint} {:conditions}"
 	);
 
 	/**
@@ -52,9 +52,9 @@ abstract class Database extends \lithium\data\Source {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'entity' => '\lithium\data\entity\Record',
-		'set' => '\lithium\data\collection\RecordSet',
-		'relationship' => '\lithium\data\model\Relationship'
+		'entity' => 'lithium\data\entity\Record',
+		'set' => 'lithium\data\collection\RecordSet',
+		'relationship' => 'lithium\data\model\Relationship'
 	);
 
 	/**
@@ -122,7 +122,7 @@ abstract class Database extends \lithium\data\Source {
 	 * Get the last insert id from the database.
 	 * Abstract. Must be defined by child class.
 	 *
-	 * @param \lithium\data\model\Query $context The given query.
+	 * @param lithium\data\model\Query $context The given query.
 	 * @return void
 	 */
 	abstract protected function _insertId($query);
@@ -134,7 +134,7 @@ abstract class Database extends \lithium\data\Source {
 	 *  - 'database' _string_ Name of the database to use. Defaults to `null`.
 	 *  - 'host' _string_ Name/address of server to connect to. Defaults to 'localhost'.
 	 *  - 'login' _string_ Username to use when connecting to server. Defaults to 'root'.
-	 *  - 'password' _string_ Password to use when connecting to server. Defaults to none.
+	 *  - 'password' _string_ Password to use when connecting to server. Defaults to `''`.
 	 *  - 'persistent' _boolean_ If true a persistent connection will be attempted, provided the
 	 *    adapter supports it. Defaults to `true`.
 	 *
@@ -150,7 +150,7 @@ abstract class Database extends \lithium\data\Source {
 			'database'   => null,
 		);
 		$this->_strings += array(
-			'read' => 'SELECT {:fields} From {:source} {:alias} {:joins} {:conditions} {:group} ' .
+			'read' => 'SELECT {:fields} FROM {:source} {:alias} {:joins} {:conditions} {:group} ' .
 			          '{:order} {:limit};{:comment}'
 		);
 		parent::__construct($config + $defaults);
@@ -173,7 +173,7 @@ abstract class Database extends \lithium\data\Source {
 	 *
 	 * @see lithium\data\source\Database::schema()
 	 * @param mixed $value The value to be converted. Arrays will be recursively converted.
-	 * @param array $schema Formatted array from `\lithium\data\source\Database::schema()`
+	 * @param array $schema Formatted array from `lithium\data\source\Database::schema()`
 	 * @return mixed value with converted type
 	 */
 	public function value($value, array $schema = array()) {
@@ -287,7 +287,7 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Updates a record in the database based on the given `Query`.
 	 *
-	 * @param object $query A `\lithium\data\model\Query` object
+	 * @param object $query A `lithium\data\model\Query` object
 	 * @param array $options none
 	 * @return boolean
 	 */
@@ -418,7 +418,7 @@ abstract class Database extends \lithium\data\Source {
 	 * Builds an array of keyed on the fully-namespaced `Model` with array of fields as values
 	 * for the given `Query`
 	 *
-	 * @param object $query A `\lithium\data\model\Query` object
+	 * @param object $query A `lithium\data\model\Query` object
 	 * @param string $resource
 	 * @param string $context
 	 * @return void
@@ -552,7 +552,7 @@ abstract class Database extends \lithium\data\Source {
 	 * Returns a LIMIT statement from the given limit and the offset of the context object.
 	 *
 	 * @param integer $limit An
-	 * @param object $context The `\lithium\data\model\Query` object
+	 * @param object $context The `lithium\data\model\Query` object
 	 * @return string
 	 */
 	public function limit($limit, $context) {
@@ -568,8 +568,8 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Returns a join statement for given array of query objects
 	 *
-	 * @param object|array $joins A single or array of `\lithium\data\model\Query` objects
-	 * @param object $context The parent `\lithium\data\model\Query` object
+	 * @param object|array $joins A single or array of `lithium\data\model\Query` objects
+	 * @param object $context The parent `lithium\data\model\Query` object
 	 * @return string
 	 */
 	public function joins(array $joins, $context) {
