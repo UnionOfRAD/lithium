@@ -28,7 +28,7 @@ class ServiceTest extends \lithium\test\Unit {
 	}
 
 	public function testAllMethodsNoConnection() {
-		$http = new Service(array('classes' => array('socket' => false)));
+		$http = new Service(array('socket' => false));
 		$this->assertFalse($http->get());
 		$this->assertFalse($http->post());
 		$this->assertFalse($http->put());
@@ -191,6 +191,24 @@ class ServiceTest extends \lithium\test\Unit {
 		));
 		$result = (string) $http->last->response;
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testConnection() {
+		$http = new Service($this->_testConfig);
+		$connection = $http->connection();
+		$this->assertEqual('lithium\tests\mocks\net\http\MockSocket', get_class($connection));
+
+		$connection = $http->connection(array('scheme' => 'https'));
+		$config = $connection->config();
+		$this->assertEqual('https', $config['scheme']);
+	}
+
+	public function testSendConfiguringConnection() {
+		$http = new Service($this->_testConfig);
+		$result = $http->send('get', 'some-path/stuff', array(), array('someKey' => 'someValue'));
+		$config = array_pop($http->connection->configs);
+		$this->assertEqual('someValue', $config['someKey']);
+
 	}
 }
 

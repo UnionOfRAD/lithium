@@ -127,8 +127,14 @@ class Service extends \lithium\core\Object {
 		return $this->send(__FUNCTION__, $path, $data, $options);
 	}
 
-	public function &connection() {
-		$config = $this->_config;
+	/**
+	 * Retrieve instance of configured socket
+	 *
+	 * @param array $config options to be passed on to the socket
+	 * @return object
+	 */
+	public function &connection($config = array()) {
+		$config += $this->_config;
 
 		try {
 			$this->connection = Libraries::instance('socket', $config['socket'], $config);
@@ -153,10 +159,10 @@ class Service extends \lithium\core\Object {
 		$options += $defaults + $this->_config;
 		$request = $this->_request($method, $path, $data, $options);
 		$options += array('message' => $request);
-
-		if (!($conn =& $this->connection()) || !$conn->open()) {
+		if (!($conn =& $this->connection($options)) || !$conn->open()) {
 			return;
 		}
+
 		$response = $conn->send($request, $options);
 		$conn->close();
 		$this->last = (object) compact('request', 'response');

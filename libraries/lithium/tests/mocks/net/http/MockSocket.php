@@ -12,6 +12,13 @@ class MockSocket extends \lithium\net\Socket {
 
 	public $data = null;
 
+	public $configs = array();
+
+	public function __construct(array $config = array()) {
+		$this->configs[] = $config;
+		parent::__construct((array) $config);
+	}
+
 	public function open() {
 		return true;
 	}
@@ -55,6 +62,10 @@ class MockSocket extends \lithium\net\Socket {
 
 	public function encoding($charset) {
 		return true;
+	}
+
+	public function config() {
+		return $this->_config;
 	}
 }
 
