@@ -502,17 +502,12 @@ class Media extends \lithium\core\StaticObject {
 			$handler = $params['handler'];
 			$data = $params['data'];
 
-			if (isset($options['request'])) {
-				$options += (array) $options['request']->params;
-				$handler['request'] = $options['request'];
-			}
-
 			switch (true) {
 				case $handler['encode']:
 					return $self::encode($handler, $data, $response);
 				case class_exists($handler['view']):
 					$view = new $handler['view']($handler + array('response' => &$response));
-					return $view->render('all', $data);
+					return $view->render('all', $data, $handler);
 				case ($handler['template'] === false) && is_string($data):
 					return $data;
 				default:
