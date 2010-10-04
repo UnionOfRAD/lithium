@@ -180,7 +180,8 @@ class View extends \lithium\core\Object {
 	public function render($type, $data = null, array $options = array()) {
 		$defaults = array('context' => array(), 'type' => 'html', 'layout' => null);
 		$options += $defaults;
-		$data = ($data) ?: array();
+
+		$data = $data ?: array();
 		$template = null;
 
 		if (is_array($type)) {
