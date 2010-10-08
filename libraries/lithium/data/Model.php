@@ -840,8 +840,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return string
 	 */
 	protected static function _name() {
-		static $name;
-		return $name ?: $name = join('', array_slice(explode("\\", get_called_class()), -1));
+		return basename(str_replace('\\', '/', get_called_class()));
 	}
 
 	/**
