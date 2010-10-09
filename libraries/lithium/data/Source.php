@@ -23,6 +23,14 @@ namespace lithium\data;
 abstract class Source extends \lithium\core\Object {
 
 	/**
+	 * The list of object properties to be automatically assigned from configuration passed to
+	 * `__construct()`.
+	 *
+	 * @var array
+	 */
+	protected $_autoConfig = array('classes' => 'merge');
+
+	/**
 	 * Default entity and set classes used by subclasses of `Source`.
 	 *
 	 * @var array
