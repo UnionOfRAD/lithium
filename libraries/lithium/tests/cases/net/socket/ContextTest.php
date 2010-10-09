@@ -9,7 +9,8 @@
 namespace lithium\tests\cases\net\socket;
 
 use lithium\net\http\Request;
-use \lithium\net\socket\Context;
+use lithium\net\http\Response;
+use lithium\net\socket\Context;
 
 class ContextTest extends \lithium\test\Unit {
 
@@ -75,7 +76,7 @@ class ContextTest extends \lithium\test\Unit {
 		$this->assertTrue(is_resource($stream->resource()));
 
 		$response = $stream->send(new Request(), array('response' => 'lithium\net\http\Response'));
-		$this->assertTrue($response instanceof lithium\net\http\Response);
+		$this->assertTrue($response instanceof Response);
 
 		$this->assertEqual(trim(file_get_contents($this->_testUrl)), trim($response->body()));
 		$this->assertTrue($stream->eof());
