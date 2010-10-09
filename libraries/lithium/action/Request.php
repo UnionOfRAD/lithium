@@ -8,6 +8,7 @@
 
 namespace lithium\action;
 
+use lithium\util\Set;
 use lithium\util\Validator;
 
 /**
@@ -157,8 +158,6 @@ class Request extends \lithium\net\http\Message {
 			unset($_GET['url']);
 		}
 
-		$this->query = $this->data = array();
-
 		if (!empty($this->_config['query'])) {
 			$this->query = $this->_config['query'];
 		}
@@ -168,12 +167,11 @@ class Request extends \lithium\net\http\Message {
 
 		if (!empty($this->_config['data'])) {
 			$this->data = $this->_config['data'];
-		}
-		if (isset($_POST)) {
+		} elseif (isset($_POST)) {
 			$this->data += $_POST;
 		}
 
-		if (!empty($this->data['_method'])) {
+		if (isset($this->data['_method'])) {
 			$this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'] = strtoupper($this->data['_method']);
 			unset($this->data['_method']);
 		}
@@ -185,9 +183,7 @@ class Request extends \lithium\net\http\Message {
 		$method = strtoupper($this->_env['REQUEST_METHOD']);
 
 		if (($method == 'POST' || $method == 'PUT') && !$this->data) {
-			$type = $this->type();
-
-			if ($type && $type !== 'html') {
+			if (($type = $this->type()) && $type !== 'html') {
 				$this->_stream = $this->_stream ?: fopen('php://input', 'r');
 				$media = $this->_classes['media'];
 				$this->data = (array) $media::decode($type, stream_get_contents($this->_stream));
@@ -197,6 +193,7 @@ class Request extends \lithium\net\http\Message {
 
 		if (isset($_FILES) && $_FILES) {
 			$result = array();
+
 			$normalize = function($key, $value) use ($result, &$normalize){
 				foreach ($value as $param => $content) {
 					foreach ($content as $num => $val) {
@@ -226,7 +223,7 @@ class Request extends \lithium\net\http\Message {
 					}
 				}
 			}
-			$this->data = (array) $this->data + $result;
+			$this->data = Set::merge((array) $this->data, $result);
 		}
 	}
 
@@ -471,8 +468,7 @@ class Request extends \lithium\net\http\Message {
 	 * @todo Rewrite me to remove constant dependencies.
 	 */
 	function referer($default = null, $local = false) {
-		$ref = $this->env('HTTP_REFERER');
-		if (!empty($ref)) {
+		if ($ref = $this->env('HTTP_REFERER')) {
 			if (!$local) {
 				return $ref;
 			}
