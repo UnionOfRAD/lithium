@@ -276,7 +276,16 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testIsMobile() {
-		$request = new Request(array('env' => array('HTTP_USER_AGENT' => 'iPhone')));
+		$iPhone = 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like ';
+		$iPhone .= 'Gecko) Version/3.0 Mobile/1A535b Safari/419.3';
+
+		$request = new Request(array('env' => array('HTTP_USER_AGENT' => $iPhone)));
+		$this->assertTrue($request->is('mobile'));
+
+		$android = 'Mozilla/5.0 (Linux; U; Android 0.5; en-us) AppleWebKit/522+ (KHTML, like ';
+		$android .= 'Gecko) Safari/419.3';
+
+		$request = new Request(array('env' => array('HTTP_USER_AGENT' => $android)));
 		$this->assertTrue($request->is('mobile'));
 	}
 
