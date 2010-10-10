@@ -169,18 +169,12 @@ class Controller extends \lithium\core\Object {
 			}
 			$render['template'] = $render['template'] ?: $action;
 
-			try {
-				$result = $self->invokeMethod($action, $args);
-			} catch (Exception $e) {
-				throw $e;
-			}
-
-			if ($result) {
+			if ($result = $self->invokeMethod($action, $args)) {
 				if (is_string($result)) {
 					$self->render(array('text' => $result));
-				} elseif (is_array($result)) {
-					$self->set($result);
+					return $self->response;
 				}
+				$self->set($result);
 			}
 
 			if (!$render['hasRendered'] && $render['auto']) {
