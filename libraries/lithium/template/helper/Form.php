@@ -52,6 +52,7 @@ class Form extends \lithium\template\Helper {
 		'hidden'               => '<input type="hidden" name="{:name}"{:options} />',
 		'field'                => '<div{:wrap}>{:label}{:input}{:error}</div>',
 		'field-checkbox'       => '<div{:wrap}>{:input}{:label}{:error}</div>',
+		'field-radio'          => '<div{:wrap}>{:input}{:label}{:error}</div>',
 		'label'                => '<label for="{:name}"{:options}>{:title}</label>',
 		'legend'               => '<legend>{:content}</legend>',
 		'option-group'         => '<optgroup label="{:label}"{:options}>',
@@ -114,19 +115,30 @@ class Form extends \lithium\template\Helper {
 	 *
 	 * For an example of how to implement these methods, see the `lithium\data\Entity` object.
 	 *
+	 * @see lithium\data\Entity
+	 * @see lithium\data\Collection
+	 * @see lithium\template\helper\Form::create()
 	 * @var mixed A single data object, a `Collection` of multiple data ovjects, or an array of data
 	 *            objects/`Collection`s.
-	 * @see lithium\data\Entity
-	 * @see lithium\template\helper\Form::create()
 	 */
 	protected $_binding = null;
 
-	protected $_formId = false;
+	/**
+	 * Array of options used to create the form to which `$_binding` is currently bound.
+	 * Overwritten when `end()` is called.
+	 *
+	 * @var array
+	 */
+	protected $_bindingOptions = array();
 
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'base' => array(), 'text' => array(), 'textarea' => array(),
-			'select' => array('multiple' => false)
+			'base' => array(),
+			'text' => array(),
+			'textarea' => array(),
+			'select' => array('multiple' => false),
+			'id' => function($name, $options) {
+			}
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -217,46 +229,42 @@ class Form extends \lithium\template\Helper {
 			'action' => null,
 			'method' => $binding ? ($binding->exists() ? 'put' : 'post') : 'post'
 		);
-		if (!isset($options['id'])) {
-			$options['id'] = $this->_context->request()->params['action'];
-		}
-		$this->_formId = $options['id'];
 
-		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, $options);
+		list(, $options, $tpl) = $this->_defaults(__FUNCTION__, null, $options);
 		list($scope, $options) = $this->_options($defaults, $options);
 
 		$_binding =& $this->_binding;
-		$method = __METHOD__;
+		$_options =& $this->_bindingOptions;
 		$params = compact('scope', 'options', 'binding');
+		$extra = array('method' => __METHOD__) + compact('tpl', 'defaults');
 
-		$filter = function($self, $params, $chain) use ($method, $template, $defaults, &$_binding) {
+		$filter = function($self, $params, $chain) use ($extra, &$_binding, &$_options) {
 			$scope = $params['scope'];
 			$options = $params['options'];
 			$_binding = $params['binding'];
 			$append = null;
+			$scope['method'] = strtolower($scope['method']);
 
 			if ($scope['type'] == 'file') {
-				if (strtolower($scope['method']) == 'get') {
+				if ($scope['method'] == 'get') {
 					$scope['method'] = 'post';
 				}
 				$options['enctype'] = 'multipart/form-data';
 			}
 
-			if (!in_array(strtolower($scope['method']), array('get', 'post'))) {
-				$append = $self->hidden('_method', array(
-					'value' => strtoupper($scope['method'])
-				));
+			if (!($scope['method'] == 'get' || $scope['method'] == 'post')) {
+				$append = $self->hidden('_method', array('value' => strtoupper($scope['method'])));
 				$scope['method'] = 'post';
 			}
 
 			$url = $scope['action'] ? array('action' => $scope['action']) : $scope['url'];
 			$options['method'] = strtolower($scope['method']);
+			$args = array($extra['method'], $extra['tpl'], compact('url', 'options', 'append'));
+			$_options = $scope + $options;
 
-			return $self->invokeMethod('_render', array(
-				$method, $template, compact('url', 'options', 'append')
-			));
+			return $self->invokeMethod('_render', $args);
 		};
-		return $this->_filter($method, $params, $filter);
+		return $this->_filter(__METHOD__, $params, $filter);
 	}
 
 	/**
@@ -270,9 +278,11 @@ class Form extends \lithium\template\Helper {
 		$params = compact('options', 'template');
 		$_binding =& $this->_binding;
 		$_context =& $this->_context;
+		$_options =& $this->_bindingOptions;
 
-		$filter = function($self, $params, $chain) use (&$_binding, &$_context) {
+		$filter = function($self, $params, $chain) use (&$_binding, &$_context, &$_options) {
 			unset($_binding);
+			$_options = array();
 			return $_context->strings('form-end');
 		};
 		$result = $this->_filter(__METHOD__, $params, $filter);
@@ -360,16 +370,18 @@ class Form extends \lithium\template\Helper {
 			}
 			return $return;
 		}
-		if (isset($options['list']) && !isset($options['type'])) {
-			$options['type'] = 'select';
-		}
 		$defaults = array(
 			'label' => null,
-			'type' => 'text',
+			'type' => isset($options['list']) ? 'select' : 'text',
 			'template' => 'field',
 			'wrap' => array(),
 			'list' => null,
 		);
+		$type = isset($options['type']) ? $options['type'] : $defaults['type'];
+
+		if ($this->_context->strings('field-' . $type)) {
+			$defaults['template'] = 'field-' . $type;
+		}
 		list($options, $fieldOptions) = $this->_options($defaults, $options);
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 
@@ -380,29 +392,15 @@ class Form extends \lithium\template\Helper {
 		$type = $options['type'];
 		$label = $input = null;
 
-		if (!isset($fieldOptions['id'])) {
-			$fieldOptions['id'] = '';
-			if ($this->_formId) {
-				$fieldOptions['id'] = $this->_formId.'-';
-			}
-			$fieldOptions['id'] .= $name;
-
-		}
-
 		if ($options['label'] === null || $options['label']) {
-			$for = $fieldOptions['id'];
-			if (!isset($options['label'])) {
-				$options['label'] = Inflector::humanize($name);
-			}
-			$label = $this->label($for, $options['label']);
+			$for = isset($fieldOptions['id']) ? $fieldOptions['id'] : '';
+			$label = $options['label'] ?: $options['label'] = Inflector::humanize($name);
+			$label = $this->label($for, $label);
 		}
 
 		switch (true) {
 			case ($type == 'select'):
 				$input = $this->select($name, $options['list'], $fieldOptions);
-			break;
-			case ($type == 'radio'):
-				$input = $this->{'radio-field'}($name, $fieldOptions);
 			break;
 			default:
 				$input = $this->{$type}($name, $fieldOptions);
@@ -514,22 +512,25 @@ class Form extends \lithium\template\Helper {
 	 * @return string Returns a `<input />` tag with the given name and HTML attributes.
 	 */
 	public function checkbox($name, array $options = array()) {
-		$value = '1'; $hidden = true;
-		if (isset($options['value'])) {
-			$value = $options['value'];
-			$hidden = false;
-			unset($options['value']);
-		}
+		$defaults = array('value' => null, 'hidden' => true);
+		$options += $defaults;
+		$default = $options['value'];
+		$out = '';
+
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		list($scope, $options) = $this->_options($defaults, $options);
 
 		if (!isset($options['checked'])) {
-			$options['checked'] = isset($options['value']) ? ($options['value'] == $value) : false;
+			if ($this->_binding && $bound = $this->_binding->data($name)) {
+				$options['checked'] = ($bound != $default);
+			} else {
+				$options['checked'] = ($scope['value'] != $default);
+			}
 		}
-		$out = '';
-		if ($hidden) {
-			$out = $this->hidden($name, array('value' => 0));
+		if ($scope['hidden']) {
+			$out = $this->hidden($name, array('value' => ''));
 		}
-		$options['value'] = $value;
+		$options['value'] = $scope['value'];
 		return $out . $this->_render(__METHOD__, $template, compact('name', 'options'));
 	}
 
@@ -640,7 +641,9 @@ class Form extends \lithium\template\Helper {
 			$options['value'] = $options['default'];
 		}
 		unset($options['default']);
-		$template = isset($this->_templateMap[$method]) ? $this->_templateMap[$method] : $method;
+
+		$tplKey = isset($options['template']) ? $options['template'] : $method;
+		$template = isset($this->_templateMap[$tplKey]) ? $this->_templateMap[$tplKey] : $tplKey;
 		return array($name, $options, $template);
 	}
 }

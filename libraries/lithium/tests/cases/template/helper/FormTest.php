@@ -69,12 +69,12 @@ class FormTest extends \lithium\test\Unit {
 	public function testFormCreation() {
 		$result = $this->form->create();
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts", 'method' => 'post', 'id' => 'index')
+			'form' => array('action' => "{$this->base}posts", 'method' => 'post')
 		));
 
 		$result = $this->form->create(null, array('method' => 'get'));
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts", 'method' => 'get', 'id' => 'index')
+			'form' => array('action' => "{$this->base}posts", 'method' => 'get')
 		));
 
 		$result = $this->form->create(null, array('type' => 'file'));
@@ -82,15 +82,13 @@ class FormTest extends \lithium\test\Unit {
 			'action' => "{$this->base}posts",
 			'enctype' => 'multipart/form-data',
 			'method' => 'post',
-			'id' => 'index'
 		)));
 
 		$result = $this->form->create(null, array('method' => 'get', 'type' => 'file'));
 		$this->assertTags($result, array('form' => array(
 			'action' => "{$this->base}posts",
 			'method' => 'post',
-			'enctype' => 'multipart/form-data',
-			'id' => 'index'
+			'enctype' => 'multipart/form-data'
 		)));
 
 		$result = $this->form->create(null, array('id' => 'Registration'));
@@ -109,13 +107,9 @@ class FormTest extends \lithium\test\Unit {
 
 		$this->assertTags($result, array(
 			'form' => array(
-				'action' => "{$this->base}posts/delete", 'method' => 'post', 'id' => 'index'
+				'action' => "{$this->base}posts/delete", 'method' => 'post',
 			),
-			'input' => array(
-				'type' => "hidden",
-				'name' => '_method',
-				'value' => 'DELETE'
-			)
+			'input' => array('type' => "hidden", 'name' => '_method', 'value' => 'DELETE')
 		));
 
 		$result = $this->form->create(null, array('method' => 'put', 'type' => 'file'));
@@ -123,20 +117,16 @@ class FormTest extends \lithium\test\Unit {
 			'form' => array(
 				'action' => "{$this->base}posts",
 				'method' => 'post',
-				'enctype' => 'multipart/form-data',
-				'id' => 'index'
+				'enctype' => 'multipart/form-data'
 			),
-			'input' => array(
-				'type' => "hidden",
-				'name' => '_method',
-				'value' => 'PUT'
-			)
+			'input' => array('type' => "hidden", 'name' => '_method', 'value' => 'PUT')
 		));
 
 		$record = new Record(array('exists' => true));
 		$result = $this->form->create($record);
+
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts", 'method' => 'post', 'id' => 'index'),
+			'form' => array('action' => "{$this->base}posts", 'method' => 'post'),
 			'input' => array('type' => "hidden", 'name' => '_method', 'value' => 'PUT')
 		));
 	}
@@ -152,11 +142,9 @@ class FormTest extends \lithium\test\Unit {
 			)
 		));
 		$result = $this->form->create($record);
-		$this->assertTags($result, array('form' => array(
-			'action' => "{$this->base}posts",
-			'method' => 'post',
-			'id' => 'index'
-		)));
+		$this->assertTags($result, array(
+			'form' => array('action' => "{$this->base}posts", 'method' => 'post')
+		));
 	}
 
 	public function testFormDataBinding() {
@@ -175,7 +163,7 @@ class FormTest extends \lithium\test\Unit {
 
 		$result = $this->form->create($record);
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts", 'method' => 'post', 'id' => 'index')
+			'form' => array('action' => "{$this->base}posts", 'method' => 'post')
 		));
 
 		$result = $this->form->text('title');
@@ -192,9 +180,7 @@ class FormTest extends \lithium\test\Unit {
 
 	public function testTextBox() {
 		$result = $this->form->text('foo');
-		$this->assertTags($result, array('input' => array(
-			'type' => 'text', 'name' => 'foo'
-		)));
+		$this->assertTags($result, array('input' => array('type' => 'text', 'name' => 'foo')));
 	}
 
 	public function testElementsWithDefaultConfiguration() {
@@ -328,41 +314,32 @@ class FormTest extends \lithium\test\Unit {
 	public function testCheckboxGeneration() {
 		$result = $this->form->checkbox('foo');
 		$this->assertTags($result, array(
-			array('input' => array('type' => 'hidden', 'value' => 0, 'name' => 'foo')),
-			array('input' => array('type' => 'checkbox', 'value' => 1, 'name' => 'foo'))
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
+			array('input' => array('type' => 'checkbox', 'value' => '', 'name' => 'foo'))
 		));
 
 		$result = $this->form->checkbox('foo', array('checked' => false));
 		$this->assertTags($result, array(
-			array('input' => array('type' => 'hidden', 'value' => 0, 'name' => 'foo')),
-			array('input' => array('type' => 'checkbox', 'value' => 1, 'name' => 'foo'))
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
+			array('input' => array('type' => 'checkbox', 'value' => '', 'name' => 'foo'))
 		));
 
 		$result = $this->form->checkbox('foo', array('checked' => true));
 		$this->assertTags($result, array(
-			array('input' => array('type' => 'hidden', 'value' => 0, 'name' => 'foo')),
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
-				'type' => 'checkbox', 'value' => 1, 'name' => 'foo', 'checked' => 'checked'
+				'type' => 'checkbox', 'value' => '', 'name' => 'foo', 'checked' => 'checked'
 			))
 		));
 
-		$result = $this->form->checkbox('foo', array('checked' => true));
-		$this->assertTags($result, array(
-			array('input' => array('type' => 'hidden', 'value' => 0, 'name' => 'foo')),
-			array('input' => array(
-				'type' => 'checkbox', 'value' => 1, 'name' => 'foo', 'checked' => 'checked'
-			))
-		));
-
-		$record = new Record();
-		$record->foo = true;
+		$record = new Record(array('data' => array('foo' => true)));
 		$this->form->create($record);
 
 		$result = $this->form->checkbox('foo');
 		$this->assertTags($result, array(
-			array('input' => array('type' => 'hidden', 'value' => 0, 'name' => 'foo')),
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
-				'type' => 'checkbox', 'value' => 1, 'name' => 'foo', 'checked' => 'checked'
+				'type' => 'checkbox', 'value' => '1', 'name' => 'foo', 'checked' => 'checked'
 			))
 		));
 	}
@@ -370,22 +347,26 @@ class FormTest extends \lithium\test\Unit {
 	public function testCustomCheckbox() {
 		$result = $this->form->checkbox('foo', array('value' => '1'));
 		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array('type' => 'checkbox', 'value' => '1',  'name' => 'foo'))
 		));
 
 		$result = $this->form->checkbox('foo', array('checked' => true, 'value' => '1'));
-		$this->assertTags($result, array('input' => array(
-				'type' => 'checkbox', 'name' => 'foo', 'value' => '1', 'checked' => 'checked'
-		)));
+		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
+			array('input' => array(
+				'type' => 'checkbox', 'value' => '1',  'name' => 'foo', 'checked' => 'checked'
+			))
+		));
 
-		$record = new Record();
-		$record->foo = true;
+		$record = new Record(array('data' => array('foo' => true)));
 		$this->form->create($record);
 
 		$result = $this->form->checkbox('foo', array('value' => '1'));
 		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
-				'type' => 'checkbox', 'value' => '1', 'name' => 'foo', 'checked' => 'checked'
+				'type' => 'checkbox', 'value' => '1',  'name' => 'foo'
 			))
 		));
 	}
@@ -393,38 +374,36 @@ class FormTest extends \lithium\test\Unit {
 	public function testCustomValueCheckbox() {
 		$result = $this->form->checkbox('foo', array('value' => 'HERO'));
 		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array('type' => 'checkbox', 'value' => 'HERO', 'name' => 'foo'))
 		));
 
-		$result = $this->form->checkbox('foo', array('value' => 'HERO'));
-		$this->assertTags($result, array('input' => array(
-				'type' => 'checkbox', 'name' => 'foo', 'value' => 'HERO',
-		)));
-
 		$result = $this->form->checkbox('foo', array('value' => 'nose'));
 		$this->assertTags($result, array(
-			array('input' => array(
-				'type' => 'checkbox', 'value' => 'nose', 'name' => 'foo'
-			))
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
+			array('input' => array('type' => 'checkbox', 'value' => 'nose', 'name' => 'foo'))
 		));
 
-		$record = new Record();
+		$record = new Record(array('data' => array('foo' => 'nose')));
 		$record->foo = 'nose';
 		$this->form->create($record);
 
 		$result = $this->form->checkbox('foo', array('value' => 'nose'));
-		$this->assertTags($result, array('input' => array(
-				'type' => 'checkbox', 'name' => 'foo', 'value' => 'nose', 'checked' => 'checked'
-		)));
+		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
+			array('input' => array('type' => 'checkbox', 'value' => 'nose', 'name' => 'foo'))
+		));
 
-		$record = new Record();
-		$record->foo = 'foot';
+		$record = new Record(array('data' => array('foo' => 'foot')));
 		$this->form->create($record);
 
 		$result = $this->form->checkbox('foo', array('value' => 'nose'));
-		$this->assertTags($result, array('input' => array(
-				'type' => 'checkbox', 'name' => 'foo', 'value' => 'nose'
-		)));
+		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
+			array('input' => array(
+				'type' => 'checkbox', 'value' => 'nose', 'name' => 'foo', 'checked' => 'checked'
+			))
+		));
 	}
 
 	public function testSelectGeneration() {
@@ -557,12 +536,9 @@ class FormTest extends \lithium\test\Unit {
 			'/option',
 			'/select'
 		);
-		$result = $this->form->select('numbers', array(
-			1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth'
-		),array(
-			'value' => array(1,3,4),
-			'multiple' => true
-		));
+		$list = array(1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth');
+		$options = array('value' => array(1, 3, 4), 'multiple' => true);
+		$result = $this->form->select('numbers', $list, $options);
 		$this->assertTags($result, $expected);
 	}
 
@@ -573,13 +549,10 @@ class FormTest extends \lithium\test\Unit {
 		$form = new Form(compact('context'));
 
 		$result = $form->create();
-		$this->assertTags($result, array(
-			'form' => array(
-				'action' => "{$this->base}mock/test/1",
-				'method' => 'post',
-				'id' => 'test'
-			)
-		));
+		$this->assertTags($result, array('form' => array(
+			'action' => "{$this->base}mock/test/1",
+			'method' => 'post',
+		)));
 	}
 
 	public function testFormCreateWithMoreParamsButSpecifiedAction() {
@@ -590,22 +563,37 @@ class FormTest extends \lithium\test\Unit {
 		$form = new Form(compact('context'));
 
 		$result = $form->create(null, array('action' => 'radness'));
-		$this->assertTags($result, array(
-			'form' => array(
-				'action' => "{$this->base}mock/radness",
-				'method' => 'post',
-				'id' => 'test'
-			)
-		));
+		$this->assertTags($result, array('form' => array(
+			'action' => "{$this->base}mock/radness",
+			'method' => 'post',
+		)));
 	}
 
 	public function testFormField() {
 		$result = $this->form->field('name');
 		$this->assertTags($result, array(
 			'div' => array(),
-			'label' => array('for' => 'name'), 'Name', '/label',
-			'input' => array('type' => 'text', 'name' => 'name', 'id' => 'name'),
+			'label' => array('for' => ''), 'Name', '/label',
+			'input' => array('type' => 'text', 'name' => 'name'),
+			'/div'
 		));
+
+		$result = $this->form->field('name', array('type' => 'radio', 'value' => 'foo'));
+		$this->assertTags($result, array(
+			'div' => array(),
+			'input' => array('type' => 'radio', 'name' => 'name', 'value' => 'foo'),
+			'label' => array('for' => ''), 'Name', '/label',
+			'/div'
+		));
+
+		$result = $this->form->field('name', array('type' => 'checkbox'));
+		$expected = array(
+			'<div>',
+			'<input type="hidden" name="name" value="" />',
+			'<input type="checkbox" name="name"  value="" />',
+			'<label for="">Name</label></div>'
+		);
+		$this->assertEqual(join('', $expected), $result);
 	}
 
 	public function testFormFieldWithCustomTemplate() {
@@ -614,7 +602,7 @@ class FormTest extends \lithium\test\Unit {
 		));
 		$this->assertTags($result, array(
 			'div' => array(),
-			'label' => array('for' => 'name'), 'Name', '/label', ':',
+			'label' => array('for' => ''), 'Name', '/label', ':',
 			'input' => array('type' => 'text', 'name' => 'name'),
 		));
 	}
@@ -623,8 +611,8 @@ class FormTest extends \lithium\test\Unit {
 		$result = $this->form->field(array('name' => 'Enter a name'));
 		$this->assertTags($result, array(
 			'div' => array(),
-			'label' => array('for' => 'name'), 'Enter a name', '/label',
-			'input' => array('type' => 'text', 'name' => 'name', 'id' => 'name'),
+			'label' => array('for' => ''), 'Enter a name', '/label',
+			'input' => array('type' => 'text', 'name' => 'name'),
 		));
 	}
 
@@ -636,36 +624,25 @@ class FormTest extends \lithium\test\Unit {
 		));
 		$this->assertTags($result, array(
 			array('div' => array()),
-				array('label' => array('for' => 'name')),
+				array('label' => array('for' => '')),
 					'Enter a name',
 				'/label',
-				array('input' => array('type' => 'text', 'name' => 'name', 'id' => 'name')),
+				array('input' => array('type' => 'text', 'name' => 'name')),
 			'/div',
 
 			array('div' => array()),
-				array('label' => array('for' => 'phone_number')),
+				array('label' => array('for' => '')),
 					'Phone Number',
 				'/label',
-				array('input' => array('type' => 'text', 'name' => 'phone_number', 'id' => 'phone_number')),
+				array('input' => array('type' => 'text', 'name' => 'phone_number')),
 			'/div',
 
 			array('div' => array()),
-				array('label' => array('for' => 'email')),
+				array('label' => array('for' => '')),
 					'Enter a valid email',
 				'/label',
-				array('input' => array('type' => 'text', 'name' => 'email', 'id' => 'email')),
+				array('input' => array('type' => 'text', 'name' => 'email')),
 			'/div'
-		));
-	}
-
-	public function testFormFieldWithCustomTemplate() {
-		$result = $this->form->field('name', array(
-			'template' => '<div{:wrap}>{:label}: {:input}{:error}</div>'
-		));
-		$this->assertTags($result, array(
-			'div' => array(),
-			'label' => array('for' => 'name'), 'Name', '/label', ':',
-			'input' => array('type' => 'text', 'name' => 'name'),
 		));
 	}
 
@@ -699,8 +676,8 @@ class FormTest extends \lithium\test\Unit {
 		));
 		$this->assertTags($result, array(
 			'div' => array(),
-			'label' => array('for' => 'states'), 'States', '/label',
-			'select' => array('name' => 'states', 'id' => 'states'),
+			'label' => array('for' => ''), 'States', '/label',
+			'select' => array('name' => 'states'),
 			array('option' => array('value' => '0', 'selected' => 'selected')),
 			'CA',
 			'/option',
@@ -768,10 +745,12 @@ class FormTest extends \lithium\test\Unit {
 		$record->errors(array('name' => array('Please enter a name')));
 		$this->form->create($record);
 
-		$expected = '<div><label for="index-name">Name</label><input type="text" name="name" id="index-name" />';
-		$expected .= '<div class="error">Please enter a name</div></div>';
 		$result = $this->form->field('name');
-		$this->assertEqual($expected, $result);
+		$this->assertTags($result, array(
+			'<div', 'label' => array('for' => ""), 'Name', '/label',
+			'input' => array('type' => "text", 'name' => "name"),
+			'div' => array('class' => "error"), 'Please enter a name', '/div', '/div'
+		));
 	}
 
 	public function testErrorWithCustomConfiguration() {
@@ -782,9 +761,11 @@ class FormTest extends \lithium\test\Unit {
 		$this->form->create($record);
 
 		$result = $this->form->field('name');
-		$expected = '<div><label for="index-name">Name</label><input type="text" name="name" id="index-name" />';
-		$expected .= '<div class="custom-error-class">Please enter a name</div></div>';
-		$this->assertEqual($expected, $result);
+		$this->assertTags($result, array(
+			'<div', 'label' => array('for' => ""), 'Name', '/label',
+			'input' => array('type' => "text", 'name' => "name"),
+			'div' => array('class' => "custom-error-class"), 'Please enter a name', '/div', '/div'
+		));
 	}
 
 	/**
@@ -796,8 +777,8 @@ class FormTest extends \lithium\test\Unit {
 		$this->form->config(array('templates' => array('field' => '{:label}{:input}{:error}')));
 		$result = $this->form->field('name', array('type' => 'text'));
 		$this->assertTags($result, array(
-			'label' => array('for' => 'name'), 'Name', '/label',
-			'input' => array('type' => 'text', 'name' => 'name', 'id' => 'name')
+			'label' => array('for' => ''), 'Name', '/label',
+			'input' => array('type' => 'text', 'name' => 'name')
 		));
 	}
 
@@ -808,10 +789,10 @@ class FormTest extends \lithium\test\Unit {
 		);
 		$expected = array(
 			'<div',
-				array('label' => array('for' => 'colors')),
+				array('label' => array('for' => '')),
 					'Colors',
 				'/label',
-				'select' => array('name' => 'colors', 'id' => 'colors'),
+				'select' => array('name' => 'colors'),
 					array('option' => array('value' => 'r')),
 						'red',
 					'/option',
@@ -830,10 +811,11 @@ class FormTest extends \lithium\test\Unit {
 	public function testFieldInputIdWithFormId() {
 		$this->form->create(null, array('id' => 'registration'));
 		$result = $this->form->field('name');
+
 		$this->assertTags($result, array(
 			'div' => array(),
-			'label' => array('for' => 'registration-name'), 'Name', '/label',
-			'input' => array('type' => 'text', 'name' => 'name', 'id' => 'registration-name'),
+			'label' => array('for' => ''), 'Name', '/label',
+			'input' => array('type' => 'text', 'name' => 'name'),
 		));
 
 	}
