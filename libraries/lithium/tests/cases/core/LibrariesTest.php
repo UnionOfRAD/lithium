@@ -363,13 +363,6 @@ class LibrariesTest extends \lithium\test\Unit {
 		$library = Libraries::get('lithium');
 		$base = $library['path'] . '/';
 
-		$expected = $base . 'template/view.php';
-		$result = Libraries::path('\lithium\template\view');
-		$this->assertEqual($expected, $result);
-
-		$result = Libraries::path('lithium\template\view');
-		$this->assertEqual($expected, $result);
-
 		$expected = $base . 'template/View.php';
 
 		$result = Libraries::path('\lithium\template\View');
