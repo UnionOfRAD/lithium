@@ -120,7 +120,7 @@ abstract class Helper extends \lithium\core\Object {
 	/**
 	 * Render a string template after applying context filters
 	 * Use examples in the Html::link() method:
-	 * ```return $this->_render(__METHOD__, 'link', compact('title', 'url', 'options'), $scope);```
+	 * `return $this->_render(__METHOD__, 'link', compact('title', 'url', 'options'), $scope);`
 	 *
 	 * @param string $method name of method that is calling the render (for context filters)
 	 * @param string $string template key (in Helper::_strings) to render
@@ -151,21 +151,25 @@ abstract class Helper extends \lithium\core\Object {
 		$defaults = array('escape' => true, 'prepend' => ' ', 'append' => '');
 		$options += $defaults;
 		$result = array();
+
 		foreach ($params as $key => $value) {
-			$result[] = $this->_formatAttr($key, $value, $options);
+			$result[] = $this->_attribute($key, $value, $options);
 		}
 		return $result ? $options['prepend'] . implode(' ', $result) . $options['append'] : '';
 	}
 
 	/**
-	 * Convert a key/value pair to a valid html attribute
+	 * Convert a key/value pair to a valid HTML attribute.
 	 *
-	 * @param string $key
-	 * @param mixed $value
-	 * @param array $options
-	 * @return string
+	 * @param string $key The key name of the HTML attribute.
+	 * @param mixed $value The HTML attribute value.
+	 * @param array $options The options used when converting the key/value pair to attributes:
+	 *              - `'escape'` _boolean_: Indicates whether `$key` and `$value` should be
+	 *                HTML-escaped. Defaults to `true`.
+	 *              - `'format'` _string_: The format string. Defaults to `'%s="%s"'`.
+	 * @return string Returns an HTML attribute/value pair, in the form of `'$key="$value"'`.
 	 */
-	protected function _formatAttr($key, $value, array $options = array()) {
+	protected function _attribute($key, $value, array $options = array()) {
 		$defaults = array('escape' => true, 'format' => '%s="%s"');
 		$options += $defaults;
 
