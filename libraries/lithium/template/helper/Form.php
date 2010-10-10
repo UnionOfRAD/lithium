@@ -8,9 +8,9 @@
 
 namespace lithium\template\helper;
 
-use \lithium\util\Set;
-use \lithium\util\Inflector;
-use \UnexpectedValueException;
+use lithium\util\Set;
+use lithium\util\Inflector;
+use UnexpectedValueException;
 
 /**
  * A helper class to facilitate generating, processing and securing HTML forms. By default, `Form`
@@ -279,6 +279,16 @@ class Form extends \lithium\template\Helper {
 		unset($this->_binding);
 		$this->_binding = null;
 		return $result;
+	}
+
+	/**
+	 * Returns the entity that the `Form` helper is currently bound to.
+	 *
+	 * @see lithium\template\helper\Form::$_binding
+	 * @return object Returns an object, usually an instance of `lithium\data\Entity`.
+	 */
+	public function binding() {
+		return $this->_binding;
 	}
 
 	/**
