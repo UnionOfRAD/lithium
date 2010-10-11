@@ -233,7 +233,10 @@ class DatabaseTest extends \lithium\test\Unit {
 			'type' => 'create',
 			'model' => $this->_model,
 		));
-		$expected = sha1(serialize($query));
+		$hash = $query->export($this->db);
+		ksort($hash);
+		$expected = sha1(serialize($hash));
+
 		$result = $this->db->create($query);
 		$this->assertTrue($result);
 		$result = $query->entity()->id;

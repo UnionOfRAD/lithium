@@ -54,6 +54,8 @@ class MockDatabase extends \lithium\data\source\Database {
 	}
 
 	protected function _insertId($query) {
+		$query = $query->export($this);
+		ksort($query);
 		return sha1(serialize($query));
 	}
 }
