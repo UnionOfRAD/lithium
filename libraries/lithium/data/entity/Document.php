@@ -114,26 +114,6 @@ class Document extends \lithium\data\Entity implements \Iterator {
 	protected $_valid = false;
 
 	/**
-	 * The class dependencies for `Document`.
-	 *
-	 * @var array
-	 */
-	protected $_classes = array(
-		'entity' => __CLASS__,
-		'set' => 'lithium\data\collection\DocumentSet'
-	);
-
-	/**
-	 * Auto configuration properties.
-	 *
-	 * @var array
-	 */
-	protected $_autoConfig = array(
-		'data', 'classes' => 'merge', 'model',
-		'result', 'parent', 'exists', 'stats', 'pathKey'
-	);
-
-	/**
 	 * The keys of this array represent fields which have either already been "boxed" in a wrapper
 	 * object, or verified as not needing to be.
 	 *
@@ -144,6 +124,11 @@ class Document extends \lithium\data\Entity implements \Iterator {
 	protected function _init() {
 		parent::_init();
 		$this->_data = (array) $this->_data;
+
+		if ($model = $this->_model) {
+			$pathKey = $this->_pathKey;
+			$this->_data = $model::connection()->cast($model, $this->_data, compact('pathKey'));
+		}
 	}
 
 	/**
@@ -183,8 +168,8 @@ class Document extends \lithium\data\Entity implements \Iterator {
 
 		if ($model = $this->_model) {
 			$pathKey = $this->_pathKey ? "{$this->_pathKey}.{$name}" : $name;
-			$options = compact('pathKey');
-			$this->_data[$name] = $model::connection()->cast($model, $name, $data, $options);
+			$opts = compact('pathKey') + array('first' => true);
+			$this->_data[$name] = $model::connection()->cast($model, array($name => $data), $opts);
 		}
 
 		$this->_marked[$name] = true;
@@ -220,19 +205,16 @@ class Document extends \lithium\data\Entity implements \Iterator {
 		$nested = array();
 
 		foreach ($this->_data as $key => $val) {
-			$isEntity = is_a($val, $this->_classes['entity']);
-			$isSet = is_a($val, $this->_classes['set']);
-
-			if (!$isEntity && !$isSet) {
+			if (!is_object($val) || !method_exists($val, 'export')) {
 				$data[$key] = $val;
 				continue;
 			}
 			$nestedOptions = $options;
 
-			if ($isSet || isset($this->_modified[$key])) {
+			if (!$this->_exists || isset($this->_modified[$key])) {
 				$nestedOptions = array('atomic' => false) + $nestedOptions;
 			}
-			if (($isEntity || $isSet) && $data[$key] = $val->export($dataSource, $nestedOptions)) {
+			if ($data[$key] = $val->export($dataSource, $nestedOptions)) {
 				$nested[$key] = true;
 			}
 		}
@@ -314,8 +296,8 @@ class Document extends \lithium\data\Entity implements \Iterator {
 		}
 		if ($model = $this->_model) {
 			$pathKey = $this->_pathKey ? "{$this->_pathKey}.{$name}" : $name;
-			$options = compact('pathKey');
-			$value = $model::connection()->cast($model, $name, $value, $options);
+			$options = compact('pathKey') + array('first' => true);
+			$value = $model::connection()->cast($model, array($name => $value), $options);
 		}
 		$this->_data[$name] = $value;
 		$this->_marked[$name] = true;
@@ -331,12 +313,15 @@ class Document extends \lithium\data\Entity implements \Iterator {
 			$key = $path[$i];
 			$next = $current->__get($key);
 
-			if (!$next instanceof Document) {
-				$next = $current->_data[$key] = $this->_relation('entity', $key, array());
+			if ($next === null && ($model = $this->_model)) {
+				$next = $current->_data[$key] = $model::connection()->item($model);
 			}
 			$current = $next;
 		}
-		$current->__set(end($path), $value);
+
+		if (is_object($current)) {
+			$current->__set(end($path), $value);
+		}
 	}
 
 	/**

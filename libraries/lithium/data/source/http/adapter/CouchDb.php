@@ -78,10 +78,13 @@ class CouchDb extends \lithium\data\source\Http {
 	 *         their respective properties in `Model`.
 	 */
 	public function configureClass($class) {
-		return array('meta' => array('key' => 'id'), 'classes' => array(
-			'entity' => $this->_classes['entity'],
-			'set' => $this->_classes['set'],
-		));
+		return array(
+			'meta' => array('key' => 'id', 'locked' => false),
+			'schema' => array(
+				'id' => array('type' => 'integer'),
+				'rev' => array('type' => 'string')
+			)
+		);
 	}
 
 	/**
@@ -103,7 +106,6 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return void
 	 */
 	public function entities($class = null) {
-
 	}
 
 	/**
@@ -472,7 +474,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return void
 	 */
 	protected function _result($type, $query, $config = array()) {
-		$defaults = array('handle' => &$this, 'exists' => true);
+		$defaults = array('exists' => true);
 		$config = compact('query') + $config + $defaults;
 		$class = $this->_classes[$type];
 		return new $class($config);

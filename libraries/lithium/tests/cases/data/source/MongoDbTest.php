@@ -12,6 +12,7 @@ namespace lithium\tests\cases\data\source;
 use lithium\data\source\MongoDb;
 use MongoId;
 use MongoCode;
+use MongoDate;
 use MongoRegex;
 use MongoMaxKey;
 use lithium\data\Model;
@@ -19,6 +20,7 @@ use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\data\entity\Document;
 use lithium\tests\mocks\data\MockPost;
+use lithium\data\collection\DocumentArray;
 use lithium\tests\mocks\data\source\MockMongoConnection;
 
 class MongoDbTest extends \lithium\test\Unit {
@@ -32,6 +34,18 @@ class MongoDbTest extends \lithium\test\Unit {
 		'host' => 'localhost',
 		'port' => '27017',
 		'persistent' => false
+	);
+
+	protected $_schema = array(
+		'_id' => array('type' => 'id'),
+		'guid' => array('type' => 'id'),
+		'title' => array('type' => 'string'),
+		'tags' => array('type' => 'string', 'array' => true),
+		'comments' => array('type' => 'MongoId'),
+		'authors' => array('type' => 'MongoId', 'array' => true),
+		'created' => array('type' => 'MongoDate'),
+		'modified' => array('type' => 'datetime'),
+		'voters' => array('type' => 'id', 'array' => true)
 	);
 
 	protected $_configs = array();
@@ -49,7 +63,8 @@ class MongoDbTest extends \lithium\test\Unit {
 		Connections::add('lithium_mongo_test', array($this->_testConfig));
 
 		$this->db = Connections::get('lithium_mongo_test');
-		$model = '\lithium\tests\mocks\data\source\MockMongoPost';
+		$model = $this->_model;
+		$model::config(array('key' => '_id'));
 
 		$this->query = new Query(compact('model') + array(
 			'entity' => new Document(compact('model'))
@@ -143,11 +158,6 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertTrue(isset($result['key']));
 		$this->assertTrue(isset($result['key']['$in']));
 		$this->assertEqual($conditions['key'], $result['key']['$in']);
-
-		$conditions = array('$where' => array('some' => 'value'));
-		$result = $this->db->conditions($conditions, null);
-		$this->assertTrue(is_array($result));
-		$this->assertEqual($conditions, $result);
 	}
 
 	public function testMongoConditionalOperators() {
@@ -234,6 +244,9 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testUpdate() {
+		$model = $this->_model;
+
+		$this->query->model($model);
 		$this->query->data(array('title' => 'Test Post'));
 		$this->db->create($this->query);
 
@@ -244,7 +257,6 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual('Test Post', $original['title']);
 		$this->assertPattern('/[0-9a-f]{24}/', $original['_id']);
 
-		$model = $this->_model;
 		$this->query = new Query(compact('model') + array(
 			'entity' => new Document(compact('model'))
 		));
@@ -478,6 +490,106 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertTrue($document->save());
 		$this->assertNull($model::first('custom2'));
 		$this->assertEqual(array('_id' => 'custom'), $model::first('custom')->data());
+	}
+
+	/**
+	 * Tests handling type values based on specified schema settings.
+	 *
+	 * @return void
+	 */
+	public function testTypeCasting() {
+		$data = array(
+			'_id' => '4c8f86167675abfabd970300',
+			'title' => 'Foo',
+			'tags' => 'test',
+			'comments' => array(
+				"4c8f86167675abfabdbe0300", "4c8f86167675abfabdbf0300", "4c8f86167675abfabdc00300"
+			),
+			'authors' => '4c8f86167675abfabdb00300',
+			'created' => time(),
+			'modified' => date('Y-m-d H:i:s')
+		);
+		$time = time();
+		$result = $this->db->cast($this->_model, $data, array('schema' => $this->_schema));
+
+		$this->assertEqual(array_keys($data), array_keys($result));
+		$this->assertTrue($result['_id'] instanceOf MongoId);
+		$this->assertEqual('4c8f86167675abfabd970300', (string) $result['_id']);
+
+		$this->assertTrue($result['comments'] instanceOf DocumentArray);
+		$this->assertEqual(3, count($result['comments']));
+
+		$this->assertTrue($result['comments'][0] instanceOf MongoId);
+		$this->assertTrue($result['comments'][1] instanceOf MongoId);
+		$this->assertTrue($result['comments'][2] instanceOf MongoId);
+		$this->assertEqual('4c8f86167675abfabdbe0300', (string) $result['comments'][0]);
+		$this->assertEqual('4c8f86167675abfabdbf0300', (string) $result['comments'][1]);
+		$this->assertEqual('4c8f86167675abfabdc00300', (string) $result['comments'][2]);
+
+		$this->assertEqual($data['comments'], $result['comments']->data());
+		$this->assertEqual(array('test'), $result['tags']->data());
+		$this->assertEqual(array('4c8f86167675abfabdb00300'), $result['authors']->data());
+		$this->assertTrue($result['authors'][0] instanceOf MongoId);
+
+		$this->assertTrue($result['modified'] instanceOf MongoDate);
+		$this->assertTrue($result['created'] instanceOf MongoDate);
+
+		$this->assertEqual($time, $result['modified']->sec);
+		$this->assertEqual($time, $result['created']->sec);
+	}
+
+	public function testCastingConditionsValues() {
+		$query = new Query(array('schema' => $this->_schema));
+
+		$conditions = array('_id' => new MongoId("4c8f86167675abfabdbe0300"));
+		$result = $this->db->conditions($conditions, $query);
+		$this->assertEqual($conditions, $result);
+
+		$conditions = array('_id' => "4c8f86167675abfabdbe0300");
+		$result = $this->db->conditions($conditions, $query);
+
+		$this->assertEqual(array_keys($conditions), array_keys($result));
+		$this->assertTrue($result['_id'] instanceOf MongoId);
+		$this->assertEqual($conditions['_id'], (string) $result['_id']);
+
+		$conditions = array('_id' => array(
+			"4c8f86167675abfabdbe0300", "4c8f86167675abfabdbf0300", "4c8f86167675abfabdc00300"
+		));
+		$result = $this->db->conditions($conditions, $query);
+		$this->assertEqual(3, count($result['_id']['$in']));
+		$this->assertTrue($result['_id']['$in'][0] instanceOf MongoId);
+		$this->assertTrue($result['_id']['$in'][1] instanceOf MongoId);
+		$this->assertTrue($result['_id']['$in'][2] instanceOf MongoId);
+
+		$conditions = array('voters' => array('$all' => array(
+			"4c8f86167675abfabdbf0300", "4c8f86167675abfabdc00300"
+		)));
+		$result = $this->db->conditions($conditions, $query);
+
+		$this->assertEqual(2, count($result['voters']['$all']));
+		$this->assertTrue($result['voters']['$all'][0] instanceOf MongoId);
+		$this->assertTrue($result['voters']['$all'][1] instanceOf MongoId);
+
+		$conditions = array('$or' => array(
+			array('_id' => "4c8f86167675abfabdbf0300"),
+			array('guid' => "4c8f86167675abfabdbf0300")
+		));
+		$result = $this->db->conditions($conditions, $query);
+		$this->assertEqual(array('$or'), array_keys($result));
+		$this->assertEqual(2, count($result['$or']));
+		$this->assertTrue($result['$or'][0]['_id'] instanceOf MongoId);
+		$this->assertTrue($result['$or'][1]['guid'] instanceOf MongoId);
+	}
+
+	public function testUpdateCommands() {
+		$query = new Query(array(
+			'model' => $this->_model,
+			'conditions' => array('_id' => '4c8f86167675abfabdbf0300'),
+			'data' => array(
+				'$inc' => array('rating_count' => 1),
+				'$addToSet' => array('ratings' => '4c8f86167675abfabdbf0300')
+			)
+		));
 	}
 }
 

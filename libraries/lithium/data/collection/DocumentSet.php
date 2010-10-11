@@ -40,8 +40,9 @@ class DocumentSet extends \lithium\data\Collection {
 				$key = $path[$i];
 				$next = $current->__get($key);
 
-				if (!is_object($next)) {
-					$next = $current->_data[$key] = $this->_relation('set', $key, array());
+				if (!is_object($next) && ($model = $this->_model)) {
+					$next = $model::connection()->cast($model, $next);
+					$current->_data[$key] = $next;
 				}
 				$current = $next;
 			}
@@ -112,8 +113,8 @@ class DocumentSet extends \lithium\data\Collection {
 		if (isset($this->_marked[$offset])) {
 			return $this->_data[$offset];
 		}
-		if (is_array($this->_data[$offset])) {
-			$this->_data[$offset] = $this->_relation('entity', $offset, $this->_data[$offset]);
+		if (is_array($data = $this->_data[$offset]) && $model) {
+			$this->_data[$offset] = $model::connection()->cast($model, $data);
 		}
 		$this->_marked[$offset] = true;
 		return $this->_data[$offset];
@@ -185,7 +186,8 @@ class DocumentSet extends \lithium\data\Collection {
 		if (($data = $data ?: $conn->result('next', $this->_result, $this)) === null) {
 			return $this->close();
 		}
-		return $this->_data[] = $conn->cast($model, $key, $data, array('exists' => true));
+		$options = array('exists' => true, 'first' => true);
+		return $this->_data[] = $conn->cast($model, array($key => $data), $options);
 	}
 
 	/**

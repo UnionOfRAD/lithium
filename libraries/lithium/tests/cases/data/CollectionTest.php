@@ -13,6 +13,8 @@ use \lithium\data\collection\DocumentSet;
 
 class CollectionTest extends \lithium\test\Unit {
 
+	protected $_model = 'lithium\tests\mocks\data\model\MockQueryPost';
+
 	public function testGetStats() {
 		$collection = new DocumentSet(array('stats' => array('foo' => 'bar')));
 		$this->assertNull($collection->stats('bar'));
@@ -26,7 +28,7 @@ class CollectionTest extends \lithium\test\Unit {
 	}
 
 	public function testAccessorMethods() {
-		$collection = new DocumentSet(array('model' => 'Foo'));
+		$collection = new DocumentSet(array('model' => $this->_model));
 		$this->assertEqual('Foo', $collection->model());
 		$this->assertEqual(array('model' => 'Foo'), $collection->meta());
 	}

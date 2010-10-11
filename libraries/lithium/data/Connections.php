@@ -141,6 +141,7 @@ class Connections extends \lithium\core\Adaptable {
 	 */
 	public static function get($name = null, array $options = array()) {
 		static $mockAdapter;
+
 		$defaults = array('config' => false, 'autoCreate' => true);
 		$options += $defaults;
 

@@ -12,7 +12,14 @@ use lithium\data\model\Relationship;
 
 class MockDocumentSource extends \lithium\data\Source {
 
-	public function connect() {	}
+	protected $_classes = array(
+		'entity' => 'lithium\data\entity\Document',
+		'array' => 'lithium\data\collection\DocumentArray',
+		'set' => 'lithium\data\collection\DocumentSet',
+		'relationship' => 'lithium\data\model\Relationship'
+	);
+
+	public function connect() {}
 	public function disconnect() {}
 	public function entities($class = null) {}
 	public function describe($entity, array $meta = array()) {}
@@ -37,6 +44,59 @@ class MockDocumentSource extends \lithium\data\Source {
 
 	public function getNext() {
 		return $this->result[$this->point++];
+	}
+
+	public function cast($model, array $data, array $options = array()) {
+		$defaults = array('schema' => null, 'first' => false, 'pathKey' => null, 'arrays' => true);
+		$options += $defaults;
+
+		if ($model && !$options['schema']) {
+			$options['schema'] = $model::schema();
+		}
+		$handlers = array(
+			'id' => function($v) {
+				return is_string($v) && preg_match('/^[0-9a-f]{24}$/', $v) ? new MongoId($v) : $v;
+			},
+			'date' => function($v) {
+				return new MongoDate(is_numeric($v) ? intval($v) : strtotime($v));
+			},
+			'regex' => function($v) {
+				return new MongoRegex($v);
+			}
+		);
+
+		$typeMap = array(
+			'MongoId'   => 'id',
+			'MongoDate' => 'date',
+			'datetime'  => 'date',
+			'timestamp' => 'date',
+		);
+
+		foreach ($data as $key => $value) {
+			if (is_object($value)) {
+				continue;
+			}
+			$schema = isset($options['schema'][$key]) ? $options['schema'][$key] : array();
+			$schema += array('type' => null, 'array' => null);
+			$type = isset($typeMap[$schema['type']]) ? $typeMap[$schema['type']] : $schema['type'];
+			$isArray = (is_array($value) && $schema['array'] !== false);
+
+			if (isset($handlers[$type])) {
+				$handler = $handlers[$type];
+				$value = $isArray ? array_map($handler, $value) : $handler($value);
+			}
+			if ($options['arrays']) {
+				if (is_array($value)) {
+					$arrayType = (array_keys($value) === range(0, count($value) - 1));
+					$options = $arrayType ? array('class' => 'array') + $options : $options;
+					$value = $this->item($model, $value, $options);
+				} elseif ($schema['array']) {
+					$value = $this->item($model, array($value), array('class' => 'array') + $options);
+				}
+			}
+			$data[$key] = $value;
+		}
+		return $options['first'] ? reset($data) : $data;
 	}
 
 	public function result($type, $resource, $context) {

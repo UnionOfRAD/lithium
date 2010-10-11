@@ -412,10 +412,23 @@ class Query extends \lithium\core\Object {
 	}
 
 	public function schema($field = null) {
-		if (!$model = $this->model()) {
-			return null;
+		if (is_array($field)) {
+			$this->_config['schema'] = $field;
+			return $this;
 		}
-		return $model::schema($field);
+
+		if (isset($this->_config['schema'])) {
+			$schema = $this->_config['schema'];
+
+			if ($field) {
+				return isset($schema[$field]) ? $schema[$field] : null;
+			}
+			return $schema;
+		}
+
+		if ($model = $this->model()) {
+			return $model::schema($field);
+		}
 	}
 
 	public function alias($alias = null) {

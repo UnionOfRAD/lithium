@@ -165,6 +165,10 @@ abstract class Database extends \lithium\data\Source {
 	public function name($name) {
 		$open  = reset($this->_quotes);
 		$close = next($this->_quotes);
+		if (preg_match('/^[a-z0-9_-]+\.[a-z0-9_-]+$/i', $name)) {
+			list($first, $second) = explode('.', $name, 2);
+			return "{$open}{$first}{$close}.{$open}{$second}{$close}";
+		}
 		return preg_match('/^[a-z0-9_-]+$/i', $name) ? "{$open}{$name}{$close}" : $name;
 	}
 
@@ -271,6 +275,10 @@ abstract class Database extends \lithium\data\Source {
 					$records = array();
 
 					while ($data = $self->result('next', $result, null)) {
+						// @hack: Fix this to support relationships
+						if ((count($columns) != count($data) && isset($columns[0])) || is_array($columns[0])) {
+							$columns = $columns[0];
+						}
 						$records[] = array_combine($columns, $data);
 					}
 					$self->result('close', $result, null);
@@ -278,7 +286,6 @@ abstract class Database extends \lithium\data\Source {
 				case 'item':
 					return $self->item($query->model(), array(), compact('query', 'result') + array(
 						'class' => 'set',
-						'handle' => $self,
 					));
 			}
 		});
@@ -322,10 +329,6 @@ abstract class Database extends \lithium\data\Source {
 
 			if (is_object($query)) {
 				$data = $query->export($self);
-
-				if (!$data['conditions']) {
-					return false;
-				}
 				$sql = $self->renderCommand('delete', $data, $query);
 			} else {
 				$sql = String::insert($query, $self->value($params['options']));
@@ -375,21 +378,6 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Returns a newly-created `Record` object, bound to a model and populated with default data
-	 * and options.
-	 *
-	 * @param string $model A fully-namespaced class name representing the model class to which the
-	 *               `Record` object will be bound.
-	 * @param array $data The default data with which the new `Record` should be populated.
-	 * @param array $options Any additional options to pass to the `Record`'s constructor.
-	 * @return object Returns a new, un-saved `Record` object bound to the model class specified in
-	 *         `$model`.
-	 */
-	public function item($model, array $data = array(), array $options = array()) {
-		return parent::item($model, $data, array('handle' => $this) + $options);
-	}
-
-	/**
 	 * Returns a given `type` statement for the given data, rendered from `Database::$_strings`.
 	 *
 	 * @param string $type One of `'create'`, `'read'`, `'update'`, `'delete'` or `'join'`.
@@ -402,10 +390,6 @@ abstract class Database extends \lithium\data\Source {
 			$context = $type;
 			$data = $context->export($this);
 			$type = $context->type();
-
-			if (!isset($data['alias'])) {
-				$data['alias'] = "AS {$data['name']}";
-			}
 		}
 		if (!isset($this->_strings[$type])) {
 			throw new InvalidArgumentException("Invalid query type '{$type}'");
@@ -426,18 +410,17 @@ abstract class Database extends \lithium\data\Source {
 	public function schema($query, $resource = null, $context = null) {
 		$model = $query->model();
 		$fields = $query->fields();
-		$relations = $model::relations();
 		$result = array();
 
-		$ns = function($class) use ($model) {
-			static $namespace;
-			$namespace = $namespace ?: preg_replace('/\w+$/', '', $model);
-			return "{$namespace}{$class}";
-		};
+		if (!$model && is_array($fields)) {
+			return array($fields);
+		}
 
 		if (!$fields) {
 			return array($model => array_keys($model::schema()));
 		}
+		$namespace = preg_replace('/\w+$/', '', $model);
+		$relations = $model ? $model::relations() : array();
 
 		foreach ($fields as $scope => $field) {
 			switch (true) {
@@ -447,7 +430,7 @@ abstract class Database extends \lithium\data\Source {
 				case (is_numeric($scope) && isset($relations[$field])):
 					$scope = $field;
 				case (in_array($scope, $relations, true) && $field == '*'):
-					$scope = $ns($scope);
+					$scope = $namespace . $scope;
 					$result[$scope] = array_keys($scope::schema());
 				break;
 				case (in_array($scope, $relations)):
@@ -580,6 +563,23 @@ abstract class Database extends \lithium\data\Source {
 		return $result;
 	}
 
+	public function constraint($constraint, $context) {
+		if (!$constraint) {
+			return "";
+		}
+		if (is_string($constraint)) {
+			return "ON {$constraint}";
+		}
+		$result = array();
+
+		foreach ($constraint as $field => $value) {
+			if (is_string($value)) {
+				$result[] = $this->name($field) . ' = ' . $this->name($value);
+			}
+		}
+		return 'ON ' . join(' AND ', $result);
+	}
+
 	/**
 	 * Return formatted clause for order.
 	 *
@@ -599,25 +599,29 @@ abstract class Database extends \lithium\data\Source {
 			$order = array($order => $direction);
 		}
 
-		if (is_array($order)) {
-			$result = array();
-
-			foreach ($order as $column => $dir) {
-				if (is_int($column)) {
-					$column = $dir;
-					$dir = $direction;
-				}
-				if (!in_array($dir, array('ASC', 'asc', 'DESC', 'desc'))) {
-					$dir = $direction;
-				}
-				if ($field = $model::schema($column)) {
-					$name = $this->name($model::meta('name')) . '.' . $this->name($column);
-					$result[] = "{$name} {$dir}";
-				}
-			}
-			$order = join(', ', $result);
-			return "ORDER BY {$order}";
+		if (!is_array($order)) {
+			return;
 		}
+		$result = array();
+
+		foreach ($order as $column => $dir) {
+			if (is_int($column)) {
+				$column = $dir;
+				$dir = $direction;
+			}
+			$dir = in_array($dir, array('ASC', 'asc', 'DESC', 'desc')) ? $dir : $direction;
+
+			if (!$model) {
+				$result[] = "{$column} {$dir}";
+				continue;
+			}
+			if ($field = $model::schema($column)) {
+				$name = $this->name($model::meta('name')) . '.' . $this->name($column);
+				$result[] = "{$name} {$dir}";
+			}
+		}
+		$order = join(', ', $result);
+		return "ORDER BY {$order}";
 	}
 
 	/**
@@ -628,6 +632,13 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function comment($comment) {
 		return $comment ? "/* {$comment} */" : null;
+	}
+
+	public function alias($alias, $context) {
+		if (!$alias && ($model = $context->model())) {
+			$alias = $model::meta('name');
+		}
+		return $alias ? "AS " . $this->name($alias) : null;
 	}
 
 	protected function _createFields($data, $schema, $context) {

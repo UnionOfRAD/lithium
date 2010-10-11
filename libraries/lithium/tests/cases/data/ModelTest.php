@@ -25,7 +25,7 @@ class ModelTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->_configs = Connections::config();
 		Connections::config(array('mock-source' => array(
-			'type' => '\lithium\tests\mocks\data\MockSource'
+			'type' => 'lithium\tests\mocks\data\MockSource'
 		)));
 		MockPost::config(array('connection' => 'mock-source'));
 		MockTag::config();
@@ -461,8 +461,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual(array('published' => false), $query->conditions());
 
 		$keys = array_keys(array_filter($query->export(Connections::get('mock-source'))));
-		$expected = array('name', 'conditions', 'model', 'source');
-		$this->assertEqual($expected, $keys);
+		$this->assertEqual(array('name', 'conditions', 'model', 'source', 'type'), $keys);
 	}
 
 	public function testFindFirst() {

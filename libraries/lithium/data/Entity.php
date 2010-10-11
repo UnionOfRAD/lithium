@@ -393,14 +393,16 @@ class Entity extends \lithium\core\Object {
 			}
 		}
 
-		if (is_object($data) && $data instanceof Entity) {
+		if (is_object($data) && method_exists($data, 'assignTo')) {
 			$data->assignTo($this, compact('model', 'pathKey'));
 			return $data;
 		}
 
-		$exists = $this->_exists;
-		$options += compact('model', 'data', 'parent', 'exists', 'pathKey');
-		return new $this->_classes[$classType]($options);
+		if ($model) {
+			$exists = $this->_exists;
+			$options += compact('parent', 'exists', 'pathKey');
+			return $model::connection()->cast($model, $data, $options);
+		}
 	}
 }
 

@@ -87,7 +87,7 @@ class SourceTest extends \lithium\test\Unit {
 			Connections::get('test', array('config' => true)) &&
 			Connections::get('test')->isConnected(array('autoConnect' => true))
 		);
-		$this->skipIf(!$isAvailable, "No test connection available");
+		$this->skipIf(!$isAvailable, "No test connection available.");
 	}
 
 	/**

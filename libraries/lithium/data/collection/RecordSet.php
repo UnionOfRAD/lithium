@@ -260,7 +260,7 @@ class RecordSet extends \lithium\data\Collection {
 	 * @return array
 	 */
 	protected function _populate($data = null, $key = null) {
-		if ($this->closed() && !$record || !($model = $this->_model)) {
+		if ($this->closed() && !$data || !($model = $this->_model)) {
 			return;
 		}
 		$conn = $model::connection();

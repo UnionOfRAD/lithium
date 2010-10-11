@@ -93,9 +93,44 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'data', 'classes' => 'merge', 'handle', 'model',
-		'result', 'query', 'parent', 'stats', 'pathKey'
+		'data', 'model', 'result', 'query', 'parent', 'stats', 'pathKey', 'exists'
 	);
+
+	/**
+	 * Class constructor
+	 *
+	 * @param array $config
+	 * @return void
+	 */
+	public function __construct(array $config = array()) {
+		$defaults = array('data' => array(), 'model' => null);
+		parent::__construct($config + $defaults);
+	}
+
+	protected function _init() {
+		parent::_init();
+
+		foreach (array('data', 'classes', 'model', 'result', 'query') as $key) {
+			unset($this->_config[$key]);
+		}
+		if ($model = $this->_model) {
+			$this->_data = $model::connection()->cast($model, $this->_data);
+		}
+	}
+
+	/**
+	 * Configures protected properties of a `Collection` so that it is parented to `$parent`.
+	 *
+	 * @param object $parent
+	 * @param array $config
+	 * @return void
+	 */
+	public function assignTo($parent, array $config = array()) {
+		foreach ($config as $key => $val) {
+			$this->{'_' . $key} = $val;
+		}
+		$this->_parent =& $parent;
+	}
 
 	/**
 	 * Returns the model which this particular collection is based off of.
@@ -199,10 +234,9 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return mixed Returns the set `Entity` object.
 	 */
 	public function offsetSet($offset, $data) {
-		if (is_array($data)) {
-			$class = $this->_classes['entity'];
-			$data = new $class(compact('data'));
-		} else {
+		if (is_array($data) && ($model = $this->_model)) {
+			$data = $model::connection()->cast($model, $data);
+		} elseif (is_object($data)) {
 			$data->assignTo($this);
 		}
 		return $this->_data[] = $data;

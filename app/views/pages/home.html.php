@@ -163,6 +163,7 @@ if (!empty($solutions)) {
 
 <?php	}
 }
+
 ?>
 
 <h4>Additional Resources</h4>

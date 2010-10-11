@@ -15,16 +15,6 @@ namespace lithium\data\entity;
 class Record extends \lithium\data\Entity {
 
 	/**
-	 * Classes used by `Record`.
-	 *
-	 * @var array
-	 */
-	protected $_classes = array(
-		'entity' => __CLASS__,
-		'set' => '\lithium\data\collection\RecordSet'
-	);
-
-	/**
 	 * Overloading for reading inaccessible properties.
 	 *
 	 * @param string $name Property name.
