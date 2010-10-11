@@ -760,6 +760,12 @@ class MongoDb extends \lithium\data\Source {
 			},
 			'regex' => function($v) {
 				return new MongoRegex($v);
+			},
+			'integer' => function($v) {
+				return (integer) $v;
+			},
+			'float' => function($v) {
+				return (float) $v;
 			}
 		);
 
@@ -768,6 +774,7 @@ class MongoDb extends \lithium\data\Source {
 			'MongoDate' => 'date',
 			'datetime'  => 'date',
 			'timestamp' => 'date',
+			'int'       => 'integer'
 		);
 
 		foreach ($data as $key => $value) {
@@ -801,30 +808,6 @@ class MongoDb extends \lithium\data\Source {
 		if (!$this->_isConnected && !$this->connect()) {
 			throw new NetworkException("Could not connect to the database.");
 		}
-	}
-
-	/**
-	 * Used by getter and setter methods to determine whether the value of data is a complex type
-	 * that should be given its own sub-object withih a MongoDB `Document`.
-	 *
-	 * @param mixed $data The data to be tested. This test is used to determine if `$data` should be
-	 *              wrapped in a MongoDB `Document`.
-	 * @return boolean Returns `false` if the value of `$data` is a scalar type or a one-dimensional
-	 *         array of scalar values, otherwise returns `true`.
-	 */
-	protected function _detectType($data) {
-		if (is_object($data) || is_scalar($data) || !$data) {
-			return false;
-		}
-		if (!is_array($data)) {
-			return true;
-		}
-		if (array_keys($data) === range(0, count($data) - 1)) {
-			if (array_filter($data, 'is_scalar') == array_filter($data)) {
-				return false;
-			}
-		}
-		return is_array($data);
 	}
 }
 

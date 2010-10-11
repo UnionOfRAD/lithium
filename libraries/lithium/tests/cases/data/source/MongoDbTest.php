@@ -45,7 +45,9 @@ class MongoDbTest extends \lithium\test\Unit {
 		'authors' => array('type' => 'MongoId', 'array' => true),
 		'created' => array('type' => 'MongoDate'),
 		'modified' => array('type' => 'datetime'),
-		'voters' => array('type' => 'id', 'array' => true)
+		'voters' => array('type' => 'id', 'array' => true),
+		'rank_count' => array('type' => 'integer', 'default' => 0),
+		'rank' => array('type' => 'float', 'default' => 0.0),
 	);
 
 	protected $_configs = array();
@@ -257,9 +259,8 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual('Test Post', $original['title']);
 		$this->assertPattern('/[0-9a-f]{24}/', $original['_id']);
 
-		$this->query = new Query(compact('model') + array(
-			'entity' => new Document(compact('model'))
-		));
+		$options = compact('model');
+		$this->query = new Query($options + array('entity' => new Document($options)));
 		$newData = array('title' => 'New Post Title');
 		$this->query->data($newData);
 		$this->query->conditions(array('_id' => $original['_id']));
@@ -507,7 +508,9 @@ class MongoDbTest extends \lithium\test\Unit {
 			),
 			'authors' => '4c8f86167675abfabdb00300',
 			'created' => time(),
-			'modified' => date('Y-m-d H:i:s')
+			'modified' => date('Y-m-d H:i:s'),
+			'rank_count' => '45',
+			'rank' => '3.45688'
 		);
 		$time = time();
 		$result = $this->db->cast($this->_model, $data, array('schema' => $this->_schema));
@@ -536,6 +539,9 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$this->assertEqual($time, $result['modified']->sec);
 		$this->assertEqual($time, $result['created']->sec);
+
+		$this->assertIdentical(45, $result['rank_count']);
+		$this->assertIdentical(3.45688, $result['rank']);
 	}
 
 	public function testCastingConditionsValues() {
@@ -579,17 +585,6 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual(2, count($result['$or']));
 		$this->assertTrue($result['$or'][0]['_id'] instanceOf MongoId);
 		$this->assertTrue($result['$or'][1]['guid'] instanceOf MongoId);
-	}
-
-	public function testUpdateCommands() {
-		$query = new Query(array(
-			'model' => $this->_model,
-			'conditions' => array('_id' => '4c8f86167675abfabdbf0300'),
-			'data' => array(
-				'$inc' => array('rating_count' => 1),
-				'$addToSet' => array('ratings' => '4c8f86167675abfabdbf0300')
-			)
-		));
 	}
 }
 
