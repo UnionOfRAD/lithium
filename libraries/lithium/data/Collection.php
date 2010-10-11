@@ -8,7 +8,7 @@
 
 namespace lithium\data;
 
-use \RuntimeException;
+use RuntimeException;
 
 /**
  * The `Collection` class extends the generic `lithium\util\Collection` class to provide
@@ -23,7 +23,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 *
 	 * @var object
 	 */
-	public $_parent = null;
+	protected $_parent = null;
 
 	/**
 	 * If this `Collection` instance has a parent document (see `$_parent`), this value indicates
