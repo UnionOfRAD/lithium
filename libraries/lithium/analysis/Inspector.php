@@ -162,14 +162,14 @@ class Inspector extends \lithium\core\StaticObject {
 	 *
 	 * @param mixed $class Class name as a string or object instance.
 	 * @param array $options Set of options:
-	 *        -'self': If true (default), only returns lines of methods defined in `$class`,
-	 *         excluding methods from inherited classes.
-	 *        -'methods': An arbitrary list of methods to search, as a string (single method name)
-	 *         or array of method names.
-	 *        -'filter': If true, filters out lines containing only whitespace or braces. Note: for
-	 *         some reason, the Zend engine does not report `switch` and `try` statements as
-	 *         executable lines, as well as parts of multi-line assignment statements, so they are
-	 *         filtered out as well.
+	 *        - `'self'` _boolean_: If `true` (default), only returns lines of methods defined in
+	 *          `$class`, excluding methods from inherited classes.
+	 *        - `'methods'` _array_: An arbitrary list of methods to search, as a string (single
+	 *          method name) or array of method names.
+	 *        - `'filter'` _boolean_: If `true`, filters out lines containing only whitespace or
+	 *          braces. Note: for some reason, the Zend engine does not report `switch` and `try`
+	 *          statements as executable lines, as well as parts of multi-line assignment
+	 *          statements, so they are filtered out as well.
 	 * @return array Returns an array of the executable line numbers of the class.
 	 */
 	public static function executable($class, array $options = array()) {
@@ -185,7 +185,12 @@ class Inspector extends \lithium\core\StaticObject {
 				function($str) { return preg_quote($str, '/'); },
 				$options['blockOpeners']
 			)));
-			$options['pattern'] = "/^(({$pattern})|\\$(.+)\($)/";
+			$pattern = join('|', array(
+				"({$pattern})",
+				"\\$(.+)\($",
+				"\s*['\"]\w+['\"]\s*=>\s*.+[\{\(]$",
+			));
+			$options['pattern'] = "/^({$pattern})/";
 		}
 
 		if (!$class instanceof ReflectionClass) {
