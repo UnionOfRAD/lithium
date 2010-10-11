@@ -118,7 +118,7 @@ class Form extends \lithium\template\Helper {
 	 * @see lithium\data\Entity
 	 * @see lithium\data\Collection
 	 * @see lithium\template\helper\Form::create()
-	 * @var mixed A single data object, a `Collection` of multiple data ovjects, or an array of data
+	 * @var mixed A single data object, a `Collection` of multiple data objects, or an array of data
 	 *            objects/`Collection`s.
 	 */
 	protected $_binding = null;
@@ -132,15 +132,28 @@ class Form extends \lithium\template\Helper {
 	protected $_bindingOptions = array();
 
 	public function __construct(array $config = array()) {
+		$self =& $this;
+
 		$defaults = array(
 			'base' => array(),
 			'text' => array(),
 			'textarea' => array(),
 			'select' => array('multiple' => false),
-			'id' => function($name, $options) {
-			}
+			'attributes' => array(
+				'id' => function($method, $name, $options) use (&$self) {
+					if (in_array($method, array('create', 'end', 'label', 'error'))) {
+						return;
+					}
+					if (!$name || ($method == 'hidden' && $name = '_method')) {
+						return;
+					}
+					$id = Inflector::camelize($name);
+					$model = ($binding = $self->binding()) ? $binding->model() : null;
+					return $model ? basename(str_replace('\\', '/', $model)) . $id : $id;
+				}
+			)
 		);
-		parent::__construct($config + $defaults);
+		parent::__construct(Set::merge($defaults, $config));
 	}
 
 	/**
@@ -406,7 +419,7 @@ class Form extends \lithium\template\Helper {
 		$label = $input = null;
 
 		if ($options['label'] === null || $options['label']) {
-			$for = isset($fieldOptions['id']) ? $fieldOptions['id'] : '';
+			$for = isset($options['id']) ? $options['id'] : '';
 			$label = $options['label'] ?: $options['label'] = Inflector::humanize($name);
 			$label = $this->label($for, $label);
 		}
@@ -642,6 +655,14 @@ class Form extends \lithium\template\Helper {
 	protected function _defaults($method, $name, $options) {
 		$methodConfig = isset($this->_config[$method]) ? $this->_config[$method] : array();
 		$options += $methodConfig + $this->_config['base'];
+
+		foreach ($this->_config['attributes'] as $key => $generator) {
+			if (!isset($options[$key]) && $generator) {
+				if (($attr = $generator($method, $name, $options)) !== null) {
+					$options[$key] = $attr;
+				}
+			}
+		}
 
 		$hasValue = (
 			(!isset($options['value']) || $options['value'] === null) &&
