@@ -215,14 +215,27 @@ class Form extends \lithium\template\Helper {
 	 *
 	 * @see lithium\template\helper\Form::$_binding
 	 * @see lithium\data\Entity
-	 * @param object $binding
-	 * @param array $options
+	 * @param object $binding The object to bind the form to. This is usually an instance of
+	 *               `Record` or `Document`, or some other class that extends
+	 *               `lithium\data\Entity`.
+	 * @param array $options Other parameters for creating the form. Available options are:
+	 *              - `'url'` _mixed_: A string URL or URL array parameters defining where in the
+	 *                application the form should be submitted to.
+	 *              - `'action'` _string_: This is a shortcut to be used if you wish to only
+	 *                specify the name of the action to submit to, and use the default URL
+	 *                parameters (i.e. the current controller, etc.) for generating the remainder
+	 *                of the URL. Ignored if the `'url'` key is set.
+	 *              - `'type'` _string_: Currently the only valid option is `'file'`. Set this if
+	 *                the form will be used for file uploads.
+	 *              - `'method'` _string_: Represents the HTTP method with which the form will be
+	 *                submitted (`'get'`, `'post'`, `'put'` or `'delete'`). If `'put'` or
+	 *                `'delete'`, the request method is simulated using a hidden input field.
 	 * @return string Returns a `<form />` open tag with the `action` attribute defined by either
 	 *         the `'action'` or `'url'` options (defaulting to the current page if none is
 	 *         specified), the HTTP method is defined by the `'method'` option, and any HTML
 	 *         attributes passed in `$options`.
 	 */
-	public function create(\lithium\data\Entity $binding = null, array $options = array()) {
+	public function create($binding = null, array $options = array()) {
 		$defaults = array(
 			'url' => $this->_context->request()->params,
 			'type' => null,
