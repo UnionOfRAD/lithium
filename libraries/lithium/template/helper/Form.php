@@ -613,7 +613,8 @@ class Form extends \lithium\template\Helper {
 	 *
 	 * @param string $name The name of the field for which to render an error.
 	 * @param mixed $key If more than one error is present for `$name`, a key may be specified.
-	 *              By default, the first available error is used.
+	 *              If `$key` is not set in the array of errors, or if `$key` is `true`, the first
+	 *              available error is used.
 	 * @param array $options Any rendering options or HTML attributes to be used when rendering
 	 *              the error.
 	 * @return string Returns a rendered error message based on the `'error'` string template.
@@ -622,23 +623,26 @@ class Form extends \lithium\template\Helper {
 		$defaults = array('class' => 'error');
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		$options += $defaults;
+		$result = '';
 
 		if (isset($options['value'])) {
 			unset($options['value']);
 		}
+
 		if (!$this->_binding || !$content = $this->_binding->errors($name)) {
 			return null;
 		}
+
 		if (is_array($content)) {
-			if ($key) {
-				$content = !isset($content[$key]) ? reset($content) : $content[$key];
+			$errors = $content;
+
+			if ($key !== null) {
+				$content = !isset($errors[$key]) || $key === true ? reset($errors) : $errors[$key];
 			} else {
-				$return = '';
-				$errors = $content;
 				foreach ($errors as $content) {
-					$return .= $this->_render(__METHOD__, $template, compact('content', 'options'));
+					$result .= $this->_render(__METHOD__, $template, compact('content', 'options'));
 				}
-				return $return;
+				return $result;
 			}
 		}
 		return $this->_render(__METHOD__, $template, compact('content', 'options'));

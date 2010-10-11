@@ -741,6 +741,15 @@ class FormTest extends \lithium\test\Unit {
 			array('div' => array('class' => 'error')), 'Empty', '/div',
 			array('div' => array('class' => 'error')), 'Valid', '/div'
 		));
+
+		$result = $this->form->error('email', 0);
+		$this->assertTags($result, array('div' => array('class' => 'error'), 'Empty', '/div'));
+
+		$result = $this->form->error('email', 1);
+		$this->assertTags($result, array('div' => array('class' => 'error'), 'Valid', '/div'));
+
+		$result = $this->form->error('email', true);
+		$this->assertTags($result, array('div' => array('class' => 'error'), 'Empty', '/div'));
 	}
 
 	public function testFormErrorWithRecordAndSpecificKey() {
