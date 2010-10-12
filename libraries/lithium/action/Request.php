@@ -406,7 +406,7 @@ class Request extends \lithium\net\http\Message {
 		}
 		$detector = $this->_detectors[$flag];
 
-		if (is_callable($detector)) {
+		if (!is_array($detector) && is_callable($detector)) {
 			return $detector($this);
 		}
 		if (!is_array($detector)) {
