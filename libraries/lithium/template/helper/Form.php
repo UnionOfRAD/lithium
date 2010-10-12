@@ -538,7 +538,7 @@ class Form extends \lithium\template\Helper {
 	 * @return string Returns a `<input />` tag with the given name and HTML attributes.
 	 */
 	public function checkbox($name, array $options = array()) {
-		$defaults = array('value' => null, 'hidden' => true);
+		$defaults = array('value' => '1', 'hidden' => true);
 		$options += $defaults;
 		$default = $options['value'];
 		$out = '';
@@ -548,7 +548,7 @@ class Form extends \lithium\template\Helper {
 
 		if (!isset($options['checked'])) {
 			if ($this->_binding && $bound = $this->_binding->data($name)) {
-				$options['checked'] = ($bound != $default);
+				$options['checked'] = !($bound === $default);
 			} else {
 				$options['checked'] = ($scope['value'] != $default);
 			}

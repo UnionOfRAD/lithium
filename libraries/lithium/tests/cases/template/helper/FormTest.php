@@ -319,7 +319,7 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array(
 			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
-				'type' => 'checkbox', 'value' => '', 'name' => 'foo', 'id' => 'Foo'
+				'type' => 'checkbox', 'value' => '1', 'name' => 'foo', 'id' => 'Foo'
 			))
 		));
 
@@ -327,7 +327,7 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array(
 			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
-				'type' => 'checkbox', 'value' => '', 'name' => 'foo', 'id' => 'Foo'
+				'type' => 'checkbox', 'value' => '1', 'name' => 'foo', 'id' => 'Foo'
 			))
 		));
 
@@ -335,7 +335,7 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array(
 			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
-				'type' => 'checkbox', 'value' => '', 'name' => 'foo',
+				'type' => 'checkbox', 'value' => '1', 'name' => 'foo',
 				'checked' => 'checked', 'id' => 'Foo'
 			))
 		));
@@ -375,6 +375,15 @@ class FormTest extends \lithium\test\Unit {
 		$this->form->create($record);
 
 		$result = $this->form->checkbox('foo', array('value' => '1'));
+		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
+			array('input' => array(
+				'type' => 'checkbox', 'value' => '1',  'name' => 'foo',
+				'id' => 'MockFormPostFoo', 'checked' => 'checked'
+			))
+		));
+
+		$result = $this->form->checkbox('foo', array('value' => true));
 		$this->assertTags($result, array(
 			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
@@ -613,7 +622,7 @@ class FormTest extends \lithium\test\Unit {
 		$expected = array(
 			'<div>',
 			'<input type="hidden" name="name" value="" />',
-			'<input type="checkbox" name="name" id="Name"  value="" />',
+			'<input type="checkbox" name="name" id="Name"  value="1" />',
 			'<label for="Name">Name</label></div>'
 		);
 		$this->assertEqual(join('', $expected), $result);
