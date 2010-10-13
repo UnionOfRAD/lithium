@@ -210,10 +210,12 @@ class Route extends \lithium\core\Object {
 			}
 		}
 
-		$match['args'] = isset($match['args']) ?  explode('/', $match['args']) : array();
+		if (isset($match['args'])) {
+			$match['args'] = explode('/', $match['args']);
+		}
 		$result = array_intersect_key($match, $this->_keys) + $this->_params + $this->_defaults;
 
-		if (!$result['action']) {
+		if (isset($result['action']) && !$result['action']) {
 			$result['action'] = 'index';
 		}
 		$request->params = $result;

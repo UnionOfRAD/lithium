@@ -8,8 +8,8 @@
 
 namespace lithium\action;
 
-use \lithium\util\Inflector;
-use \lithium\action\DispatchException;
+use lithium\util\Inflector;
+use lithium\action\DispatchException;
 
 /**
  * The `Controller` class is the fundamental building block of your application's request/response
@@ -107,9 +107,9 @@ class Controller extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'media' => '\lithium\net\http\Media',
-		'router' => '\lithium\net\http\Router',
-		'response' => '\lithium\action\Response'
+		'media' => 'lithium\net\http\Media',
+		'router' => 'lithium\net\http\Router',
+		'response' => 'lithium\action\Response'
 	);
 
 	/**
@@ -157,7 +157,7 @@ class Controller extends \lithium\core\Object {
 			$dispatchParams = $params['dispatchParams'];
 			$options = $params['options'];
 
-			$action = $dispatchParams['action'];
+			$action = isset($dispatchParams['action']) ? $dispatchParams['action'] : 'index';
 			$args = isset($dispatchParams['args']) ? $dispatchParams['args'] : array();
 			$result = null;
 

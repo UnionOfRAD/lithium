@@ -8,10 +8,10 @@
 
 namespace lithium\action;
 
-use \lithium\util\String;
-use \lithium\util\Inflector;
-use \lithium\core\Libraries;
-use \lithium\action\DispatchException;
+use lithium\util\String;
+use lithium\util\Inflector;
+use lithium\core\Libraries;
+use lithium\action\DispatchException;
 
 /**
  * `Dispatcher` is the outermost layer of the framework, responsible for both receiving the initial
@@ -40,7 +40,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @var array
 	 */
 	protected static $_classes = array(
-		'router' => '\lithium\net\http\Router'
+		'router' => 'lithium\net\http\Router'
 	);
 
 	/**
@@ -75,7 +75,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *         configuration, otherwise returns `null`.
 	 */
 	public static function config(array $config = array()) {
-		if (empty($config)) {
+		if (!$config) {
 			return array('rules' => static::$_rules);
 		}
 
