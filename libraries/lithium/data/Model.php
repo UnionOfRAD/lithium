@@ -332,11 +332,11 @@ class Model extends \lithium\core\StaticObject {
 					${$key} += $parentConfig["_{$key}"];
 				}
 			}
-			if ($class == __CLASS__) {
+			if ($parent == __CLASS__) {
 				break;
 			}
 		}
-		$tmp = $options + $meta + $self->_meta;
+		$tmp = $options + $self->_meta + $meta;
 
 		if ($tmp['connection']) {
 			$conn = $classes['connections']::get($tmp['connection']);
