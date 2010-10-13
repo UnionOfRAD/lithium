@@ -263,8 +263,8 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return void
 	 */
 	public function close() {
-		if (!$this->closed() && ($model = $this->_model)) {
-			$this->_result = $model::connection()->result('close', $this->_result, $this);
+		if (!empty($this->_result)) {
+			$this->_result = null;
 		}
 	}
 

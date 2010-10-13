@@ -8,7 +8,6 @@
 
 namespace lithium\data\entity;
 
-use Iterator;
 use lithium\data\Source;
 use lithium\util\Collection;
 

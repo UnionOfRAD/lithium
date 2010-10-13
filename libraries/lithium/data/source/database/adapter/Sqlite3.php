@@ -66,7 +66,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 			'flags'      => NULL,
 			'key'        => NULL
 		);
-		parent::__construct((array) $config + $defaults);
+		parent::__construct($config + $defaults);
 	}
 
 	/**
@@ -167,41 +167,13 @@ class Sqlite3 extends \lithium\data\source\Database {
 	public function encoding($encoding = null) {
 		$encodingMap = array('UTF-8' => 'utf8');
 
-		if (empty($encoding)) {
+		if (!$encoding) {
 			$encoding = $this->connection->querySingle('PRAGMA encoding');
 			return ($key = array_search($encoding, $encodingMap)) ? $key : $encoding;
 		}
 		$encoding = isset($encodingMap[$encoding]) ? $encodingMap[$encoding] : $encoding;
 		$this->connection->exec("PRAGMA encoding = \"{$encoding}\"");
 		return $this->connection->querySingle("PRAGMA encoding");
-	}
-
-	/**
-	 * Handle the result.
-	 *
-	 * @param string $type next|close The current step in the iteration.
-	 * @param mixed $resource The result resource returned from the database.
-	 * @param object $context The given query (an instance of `lithium\data\model\Query`).
-	 * @return mixed Result
-	 */
-	public function result($type, $resource, $context) {
-		if (!($resource instanceof SQLite3Result)) {
-			return null;
-		}
-
-		switch ($type) {
-			case 'next':
-				$result = $resource->fetchArray(SQLITE3_ASSOC);
-			break;
-			case 'close':
-				$resource->finalize();
-				$result = null;
-			break;
-			default:
-				$result = parent::result($type, $resource, $context);
-			break;
-		}
-		return $result;
 	}
 
 	/**
@@ -280,8 +252,8 @@ class Sqlite3 extends \lithium\data\source\Database {
 
 		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use (&$conn) {
 			extract($params);
-			$result = $conn->query($sql);
-			if ( !($result instanceof SQLite3Result) ) {
+
+			if (!($result = $conn->query($sql)) instanceof SQLite3Result) {
 				list($code, $error) = $self->error();
 				throw new QueryException("$sql: $error", $code);
 			}

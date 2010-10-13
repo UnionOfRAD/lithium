@@ -201,6 +201,8 @@ abstract class Source extends \lithium\core\Object {
 	 */
 	abstract public function delete($query, array $options = array());
 
+	abstract public function cast($model, array $data, array $options = array());
+
 	/**
 	 * Returns the list of methods which format values imported from `Query` objects. Should be
 	 * overridden in subclasses.
@@ -241,9 +243,12 @@ abstract class Source extends \lithium\core\Object {
 	 */
 	public function item($model, array $data = array(), array $options = array()) {
 		$defaults = array('class' => 'entity');
-		$type = isset($options['class']) ? $options['class'] : 'entity';
-		$class = isset($this->_classes[$type]) ? $this->_classes[$type] : $this->_classes['entity'];
+		$options += $defaults;
+
+		$type = $options['class'];
+		$class = isset($this->_classes[$type]) ? $this->_classes[$type] : $type;
 		unset($options['class']);
+
 		return new $class(compact('model', 'data') + $options);
 	}
 }

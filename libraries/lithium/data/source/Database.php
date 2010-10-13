@@ -91,17 +91,6 @@ abstract class Database extends \lithium\data\Source {
 	abstract public function encoding($encoding = null);
 
 	/**
-	 * Handle the result return from the
-	 * Abstract. Must be defined by child class.
-	 *
-	 * @param string $type next|close The current step in the iteration.
-	 * @param mixed $resource The result resource returned from the database.
-	 * @param lithium\data\model\Query $context The given query.
-	 * @return void
-	 */
-	abstract public function result($type, $resource, $context);
-
-	/**
 	 * Return the last errors produced by a the execution of a query.
  	 * Abstract. Must be defined by child class.
  	 *
@@ -251,7 +240,7 @@ abstract class Database extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function read($query, array $options = array()) {
-		$defaults = array('return' => 'item');
+		$defaults = array('return' => 'item', 'schema' => array());
 		$options += $defaults;
 
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
@@ -271,17 +260,16 @@ abstract class Database extends \lithium\data\Source {
 				case 'resource':
 					return $result;
 				case 'array':
-					$columns = $self->schema($query, $result);
+					$columns = $args['schema'] ?: $self->schema($query, $result);
 					$records = array();
 
-					while ($data = $self->result('next', $result, null)) {
+					while ($data = $result->next()) {
 						// @hack: Fix this to support relationships
 						if ((count($columns) != count($data) && isset($columns[0])) || is_array($columns[0])) {
 							$columns = $columns[0];
 						}
 						$records[] = array_combine($columns, $data);
 					}
-					$self->result('close', $result, null);
 					return $records;
 				case 'item':
 					return $self->item($query->model(), array(), compact('query', 'result') + array(
@@ -639,6 +627,10 @@ abstract class Database extends \lithium\data\Source {
 			$alias = $model::meta('name');
 		}
 		return $alias ? "AS " . $this->name($alias) : null;
+	}
+
+	public function cast($model, array $data, array $options = array()) {
+		return $data;
 	}
 
 	protected function _createFields($data, $schema, $context) {

@@ -15,17 +15,17 @@ class Company extends \lithium\data\Model {
 
 	public $hasMany = array('Employees');
 
-	protected $_meta = array('connection' => 'test', 'locked' => false);
+	protected $_meta = array('connection' => 'test');
 }
 
 class Employee extends \lithium\data\Model {
 
 	public $belongsTo = array('Company');
 
-	protected $_meta = array('connection' => 'test', 'locked' => false);
+	protected $_meta = array('connection' => 'test');
 
-	public function lastName($document) {
-		$name = explode(' ', $document->name);
+	public function lastName($entity) {
+		$name = explode(' ', $entity->name);
 		return $name[1];
 	}
 }

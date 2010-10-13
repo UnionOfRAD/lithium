@@ -183,7 +183,7 @@ class DocumentSet extends \lithium\data\Collection {
 		}
 		$conn = $model::connection();
 
-		if (($data = $data ?: $conn->result('next', $this->_result, $this)) === null) {
+		if (($data = $data ?: $this->_result->next()) === null) {
 			return $this->close();
 		}
 		$options = array('exists' => true, 'first' => true);

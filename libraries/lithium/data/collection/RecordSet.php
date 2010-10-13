@@ -265,20 +265,25 @@ class RecordSet extends \lithium\data\Collection {
 		}
 		$conn = $model::connection();
 
-		if (!($data = $data ?: $conn->result('next', $this->_result, $this))) {
+		if (!($data = $data ?: $this->_result->next())) {
 			return $this->close();
 		}
+		$key = null;
 		$offset = 0;
 		$recordMap = array();
 
 		foreach ($this->_columns as $model => $fields) {
 			$record = array_combine($fields, array_slice($data, $offset, count($fields)));
+
+			if ($model == $this->_model) {
+				$key = $key = $model::key($record);
+			}
 			$recordMap[$model] = $conn->item($model, $record, array('exists' => true));
 		}
 		$record = reset($recordMap);
 		unset($recordMap[key($recordMap)]);
 
-		if (is_array($key = $model::key($recordMap))) {
+		if (is_array($key)) {
 			$key = count($key) === 1 ? reset($key) : $key;
 		}
 		if (in_array($key, $this->_index)) {
