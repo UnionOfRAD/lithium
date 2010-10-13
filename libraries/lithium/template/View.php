@@ -154,6 +154,7 @@ class View extends \lithium\core\Object {
 			$config = array('view' => $this) + $this->_config;
 			$this->{'_' . $key} = Libraries::instance('adapter.template.view', $class, $config);
 		}
+		$encoding = 'UTF-8';
 
 		if ($this->_response) {
 			$encoding =& $this->_response->encoding;
