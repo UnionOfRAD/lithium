@@ -27,8 +27,8 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @var array Key/value array of short identifier for the fully-namespaced class.
 	 */
 	protected static $_classes = array(
-		'group' => '\lithium\test\Group',
-		'report' => '\lithium\test\Report'
+		'group' => 'lithium\test\Group',
+		'report' => 'lithium\test\Report'
 	);
 
 	/**

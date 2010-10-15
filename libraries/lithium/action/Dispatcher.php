@@ -179,6 +179,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 */
 	protected static function _callable($request, $params, $options) {
 		$params = compact('request', 'params', 'options');
+
 		return static::_filter(__FUNCTION__, $params, function($self, $params, $chain) {
 			$request = $params['request'];
 			$options = $params['options'];
@@ -186,7 +187,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			$class = Libraries::locate('controllers', $params['controller']);
 
 			if (class_exists($class)) {
-				return new $class(compact('request'));
+				return new $class(compact('request') + $options);
 			}
 			throw new DispatchException("Controller '{$params['controller']}' not found");
 		});
