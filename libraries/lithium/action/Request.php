@@ -242,6 +242,19 @@ class Request extends \lithium\net\http\Message {
 	}
 
 	/**
+	 * Allows request parameters to be checked using short-hand notation. See the `__get()` method
+	 * for more details.
+	 *
+	 * @see lithium\action\Request::__get()
+	 * @param string $name The name of the request parameter to check.
+	 * @return boolean Returns true if the key in `$name` is set in the `$params` array, otherwise
+	 *         `false`.
+	 */
+	public function __isset($name) {
+		return isset($this->params[$name]);
+	}
+
+	/**
 	 * Queries PHP's environment settings, and provides an abstraction for standardizing expected
 	 * environment values across varying platforms, as well as specify custom environment flags.
 	 *
