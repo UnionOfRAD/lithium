@@ -165,13 +165,12 @@ class Route extends \lithium\core\Object {
 		$defaults = array(
 			'params'   => array(),
 			'template' => '/',
-			'pattern'  => '^[\/]*$',
+			'pattern'  => '',
 			'match'    => array(),
 			'meta'     => array(),
 			'defaults' => array(),
 			'keys'     => array(),
-			'compile'  => true,
-			'persist'  => array('controller'),
+			'persist'  => array(),
 			'handler'  => null,
 		);
 		parent::__construct($config + $defaults);
@@ -179,12 +178,13 @@ class Route extends \lithium\core\Object {
 
 	protected function _init() {
 		parent::_init();
-
-		$this->_pattern = $this->_pattern ?: rtrim($this->_template, '/');
 		$this->_params += array('action' => 'index');
 
-		if ($this->_config['compile']) {
+		if (!$this->_config['pattern']) {
 			$this->compile();
+		}
+		if ($isKey = isset($this->_keys['controller']) || isset($this->_params['controller'])) {
+			$this->_persist = $this->_persist ?: array('controller');
 		}
 	}
 
@@ -346,11 +346,11 @@ class Route extends \lithium\core\Object {
 	 */
 	public function compile() {
 		$this->_match = $this->_params;
-		$this->_pattern = $this->_template;
-		$this->_pattern = "@^{$this->_pattern}\$@";
+		$this->_pattern = "@^{$this->_template}\$@";
 		$this->_extractMeta();
 
 		if ($this->_template === '/' || $this->_template === '') {
+			$this->_pattern = '@^[\/]*$@';
 			return;
 		}
 		if (!$keys = $this->_compilePatterns($this->_pattern)) {
