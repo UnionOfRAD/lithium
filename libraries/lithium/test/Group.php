@@ -8,8 +8,10 @@
 
 namespace lithium\test;
 
-use \lithium\core\Libraries;
-use \lithium\util\Collection;
+use Exception;
+use lithium\test\Unit;
+use lithium\core\Libraries;
+use lithium\util\Collection;
 
 /**
  * A `Collection` of tests that represents a test group.
@@ -77,7 +79,7 @@ class Group extends \lithium\util\Collection {
 			switch (true) {
 				case !$test:
 					return array();
-				case is_object($test) && $test instanceof \lithium\test\Unit:
+				case is_object($test) && $test instanceof Unit:
 					return array(get_class($test));
 				case is_string($test) && !file_exists(Libraries::path($test)):
 					return $self->invokeMethod('_unitClass', array($test));
@@ -103,7 +105,13 @@ class Group extends \lithium\util\Collection {
 	 */
 	public function tests($params = array(), array $options = array()) {
 		$tests = new Collection();
-		array_map(function($test) use ($tests) { $tests[] = new $test; }, $this->_data);
+
+		foreach ($this->_data as $test) {
+			if (!class_exists($test)) {
+				throw new Exception("Test case '{$test}' not found.");
+			}
+			$tests[] = new $test;
+		}
 		return $tests;
 	}
 
