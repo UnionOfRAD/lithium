@@ -222,14 +222,13 @@ class Unit extends \lithium\core\Object {
 			}
 			$i++;
 		}
-		$result = array(
+		$class = isset($trace[$i - 1]['object']) ? get_class($trace[$i - 1]['object']) : null;
+
+		$result = compact('class', 'message', 'data') + array(
 			'file'      => $trace[$i - 1]['file'],
 			'line'      => $trace[$i - 1]['line'],
 			'method'    => $trace[$i]['function'],
 			'assertion' => $trace[$i - 1]['function'],
-			'class'     => get_class($trace[$i - 1]['object']),
-			'message'   => $message,
-			'data'      => $data,
 		);
 		$this->_result(($expression ? 'pass' : 'fail'), $result);
 		return $expression;
