@@ -8,13 +8,13 @@
 
 namespace lithium\tests\cases\template\view;
 
-use \lithium\template\View;
-use \lithium\action\Request;
-use \lithium\template\Helper;
-use \lithium\template\helper\Html;
-use \lithium\template\view\adapter\Simple;
-use \lithium\net\http\Router;
-use \stdClass;
+use lithium\template\View;
+use lithium\action\Request;
+use lithium\template\Helper;
+use lithium\template\helper\Html;
+use lithium\template\view\adapter\Simple;
+use lithium\net\http\Router;
+use stdClass;
 
 class RendererTest extends \lithium\test\Unit {
 
@@ -22,7 +22,9 @@ class RendererTest extends \lithium\test\Unit {
 		$this->_routes = Router::get();
 		Router::reset();
 		Router::connect('/{:controller}/{:action}');
-		$this->subject = new Simple();
+		$this->subject = new Simple(array('request' => new Request(array(
+			'base' => '', 'env' => array('HTTP_HOST' => 'foo.local')
+		))));
 	}
 
 	public function tearDown() {
@@ -174,9 +176,9 @@ class RendererTest extends \lithium\test\Unit {
 	}
 
 	public function testGetters() {
-		$this->assertNull($this->subject->request());
-		$this->subject = new Simple(array('request' => new Request()));
 		$this->assertTrue($this->subject->request() instanceof Request);
+		$this->subject = new Simple();
+		$this->assertNull($this->subject->request());
 	}
 
 	public function testSetAndData() {
@@ -200,6 +202,27 @@ class RendererTest extends \lithium\test\Unit {
 	public function testView() {
 		$result = $this->subject->view();
 		$this->assertNull($result);
+	}
+
+	public function testHandlers() {
+		$this->assertTrue($this->subject->url());
+		$this->assertPattern('/\/posts\/foo/', $this->subject->url('Posts::foo'));
+
+		$absolute = $this->subject->url('Posts::foo', array('absolute' => true));
+		$this->assertEqual('http://foo.local/posts/foo', $absolute);
+
+		$this->assertFalse(trim($this->subject->scripts()));
+		$this->assertEqual('foobar', trim($this->subject->scripts('foobar')));
+		$this->assertEqual('foobar', trim($this->subject->scripts()));
+
+		$this->assertFalse(trim($this->subject->styles()));
+		$this->assertEqual('foobar', trim($this->subject->styles('foobar')));
+		$this->assertEqual('foobar', trim($this->subject->styles()));
+
+		$this->assertFalse($this->subject->title());
+		$this->assertEqual('Foo', $this->subject->title('Foo'));
+		$this->assertEqual('Bar', $this->subject->title('Bar'));
+		$this->assertEqual('Bar', $this->subject->title());
 	}
 }
 

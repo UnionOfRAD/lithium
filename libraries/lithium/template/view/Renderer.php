@@ -176,8 +176,8 @@ abstract class Renderer extends \lithium\core\Object {
 		$classes =& $this->_classes;
 
 		$this->_handlers += array(
-			'url' => function($url) use (&$classes, &$request) {
-				return $classes['router']::match($url ?: '', $request);
+			'url' => function($url, $ref, array $options = array()) use (&$classes, &$request) {
+				return $classes['router']::match($url ?: '', $request, $options);
 			},
 			'path' => function($path, $ref, array $options = array()) use (&$classes, &$request) {
 				$defaults = array('base' => $request ? $request->env('base') : '');
@@ -248,10 +248,10 @@ abstract class Renderer extends \lithium\core\Object {
 		if (!isset($this->_context[$method]) && !isset($this->_handlers[$method])) {
 			return isset($params[0]) ? $params[0] : null;
 		}
-		if (!isset($this->_handlers[$method]) && empty($params)) {
+		if (!isset($this->_handlers[$method]) && !$params) {
 			return $this->_context[$method];
 		}
-		if (isset($this->_context[$method]) && !empty($params)) {
+		if (isset($this->_context[$method]) && $params) {
 			if (is_array($this->_context[$method])) {
 				$this->_context[$method][] = $params[0];
 			} else {
