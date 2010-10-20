@@ -196,7 +196,7 @@ class MongoDb extends \lithium\data\Source {
 	public function configureClass($class) {
 		return array(
 			'meta' => array('key' => '_id', 'locked' => false),
-			'schema' => array('_id' => array('type' => 'MongoId'))
+			'schema' => array()
 		);
 	}
 
