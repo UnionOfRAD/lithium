@@ -58,7 +58,7 @@ use lithium\util\Collection;
  * {{{$employees = $acme->employees;
  * // returns a Document object with the data in 'employees'}}}
  */
-class Document extends \lithium\data\Entity implements \Iterator {
+class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 
 	/**
 	 * If this `Document` instance has a parent document (see `$_parent`), this value indicates
@@ -112,14 +112,6 @@ class Document extends \lithium\data\Entity implements \Iterator {
 	 */
 	protected $_valid = false;
 
-	/**
-	 * The keys of this array represent fields which have either already been "boxed" in a wrapper
-	 * object, or verified as not needing to be.
-	 *
-	 * @var array
-	 */
-	protected $_marked = array();
-
 	protected function _init() {
 		parent::_init();
 		$this->_data = (array) $this->_data;
@@ -128,6 +120,7 @@ class Document extends \lithium\data\Entity implements \Iterator {
 			$pathKey = $this->_pathKey;
 			$this->_data = $model::connection()->cast($model, $this->_data, compact('pathKey'));
 		}
+		unset($this->_autoConfig);
 	}
 
 	/**
@@ -138,20 +131,19 @@ class Document extends \lithium\data\Entity implements \Iterator {
 	 *         types in sub-`Document` objects.
 	 */
 	public function &__get($name) {
-		$data = null;
-		$null = null;
+		$data  = null;
+		$null  = null;
+		$model = $this->_model;
+		$conn  = $model ? $model::connection() : null;
 
 		if (isset($this->_relationships[$name])) {
 			return $this->_relationships[$name];
-		}
-		if (isset($this->_marked[$name])) {
-			return $this->_data[$name];
 		}
 		if (strpos($name, '.')) {
 			return $this->_getNested($name);
 		}
 
-		if ($model = $this->_model) {
+		if ($model && $conn) {
 			foreach ($model::relations() as $relation => $config) {
 				if ($config && (($linkKey = $config->data('fieldName')) === $name)) {
 					$data = isset($this->_data[$name]) ? $this->_data[$name] : array();
@@ -159,19 +151,17 @@ class Document extends \lithium\data\Entity implements \Iterator {
 					return $this->_relationships[$name];
 				}
 			}
+			if (!isset($this->_data[$name]) && $schema = $model::schema($name)) {
+				$schema = array($name => $schema);
+				$pathKey = $this->_pathKey ? "{$this->_pathKey}.{$name}" : $name;
+				$options = compact('pathKey', 'schema') + array('first' => true);
+				$this->_data[$name] = $conn->cast($model, array($name => null), $options);
+				return $this->_data[$name];
+			}
 		}
 		if (!isset($this->_data[$name])) {
 			return $null;
 		}
-		$data = $this->_data[$name];
-
-		if ($model = $this->_model) {
-			$pathKey = $this->_pathKey ? "{$this->_pathKey}.{$name}" : $name;
-			$opts = compact('pathKey') + array('first' => true);
-			$this->_data[$name] = $model::connection()->cast($model, array($name => $data), $opts);
-		}
-
-		$this->_marked[$name] = true;
 		return $this->_data[$name];
 	}
 
@@ -222,7 +212,7 @@ class Document extends \lithium\data\Entity implements \Iterator {
 
 	public function update($id = null, array $data = array()) {
 		foreach ($this->_data as $key => $val) {
-			if (is_a($val, $this->_classes['entity'])) {
+			if (is_object($val) && method_exists($val, 'update')) {
 				$this->_data[$key]->update(null, isset($data[$key]) ? $data[$key] : array());
 			}
 		}
@@ -299,7 +289,6 @@ class Document extends \lithium\data\Entity implements \Iterator {
 			$value = $model::connection()->cast($model, array($name => $value), $options);
 		}
 		$this->_data[$name] = $value;
-		$this->_marked[$name] = true;
 		$this->_modified[$name] = true;
 	}
 
@@ -370,6 +359,41 @@ class Document extends \lithium\data\Entity implements \Iterator {
 	 */
 	public function offsetGet($offset) {
 		return $this->__get($offset);
+	}
+
+	/**
+	 * Allows document fields to be assigned as array keys, i.e. `$document['_id'] = $id`.
+	 *
+	 * @param mixed $offset String or integer indicating the offset or the name of a field in an
+	 *              individual document.
+	 * @param mixed $value The value to assign to the field.
+	 * @return void
+	 */
+	public function offsetSet($offset, $value) {
+		return $this->__set(array($offset => $value));
+	}
+
+	/**
+	 * Allows document fields to be tested as array keys, i.e. `isset($document['_id'])`.
+	 *
+	 * @param mixed $offset String or integer indicating the offset or the name of a field in an
+	 *              individual document.
+	 * @param mixed $value The value to assign to the field.
+	 * @return boolean Returns `true` if `$offset` is a field in the document, otherwise `false`.
+	 */
+	public function offsetExists($offset) {
+		return $this->__isset($offset);
+	}
+
+	/**
+	 * Allows document fields to be unset as array keys, i.e. `unset($document['_id'])`.
+	 *
+	 * @param mixed $offset String or integer indicating the offset or the name of a field in an
+	 *              individual document.
+	 * @return void
+	 */
+	public function offsetUnset($offset) {
+		return $this->__unset($offset);
 	}
 
 	/**

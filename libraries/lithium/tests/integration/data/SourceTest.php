@@ -64,8 +64,7 @@ class SourceTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * @todo Make less dumb.
-	 *
+	 * @todo Make this less dumb.
 	 */
 	public function tearDown() {
 		try {
@@ -236,7 +235,7 @@ class SourceTest extends \lithium\test\Unit {
 		$companyCopy = Company::find($id)->data();
 		$data = $company->data();
 
-		foreach($data as $key => $value) {
+		foreach ($data as $key => $value) {
 			$this->assertTrue(isset($companyCopy[$key]));
 			$this->assertEqual($data[$key], $companyCopy[$key]);
 		}

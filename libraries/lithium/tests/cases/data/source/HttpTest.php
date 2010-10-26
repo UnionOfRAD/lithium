@@ -8,11 +8,13 @@
 
 namespace lithium\tests\cases\data\source;
 
-use \lithium\data\source\Http;
-use \lithium\data\Connections;
-use \lithium\data\model\Query;
+use lithium\data\source\Http;
+use lithium\data\Connections;
+use lithium\data\model\Query;
 
 class HttpTest extends \lithium\test\Unit {
+
+	protected $_model = 'lithium\tests\mocks\data\source\MockHttpModel';
 
 	protected $_testConfig = array(
 		'classes' => array('response' => 'lithium\net\http\Response'),
@@ -31,9 +33,7 @@ class HttpTest extends \lithium\test\Unit {
 		Connections::reset();
 
 		Connections::config(array(
-			'mock-http-connection' => array(
-				'type' => 'Http',
-			)
+			'mock-http-connection' => array('type' => 'Http')
 		));
 
 		Connections::config(array(
@@ -216,11 +216,10 @@ class HttpTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-
 	public function testCreateWithModel() {
 		$http = new Http($this->_testConfig);
 		$query = new Query(array(
-			'model' => '\lithium\tests\mocks\data\source\MockHttpModel',
+			'model' => $this->_model,
 			'data' => array('title' => 'Test Title')
 		));
 
@@ -240,9 +239,7 @@ class HttpTest extends \lithium\test\Unit {
 
 	public function testReadWithModel() {
 		$http = new Http($this->_testConfig);
-		$query = new Query(array(
-			'model' => '\lithium\tests\mocks\data\source\MockHttpModel',
-		));
+		$query = new Query(array('model' => $this->_model));
 
 		$result = $http->read($query);
 		$expected = join("\r\n", array(
@@ -259,7 +256,7 @@ class HttpTest extends \lithium\test\Unit {
 	public function testReadWithModelConditions() {
 		$http = new Http($this->_testConfig);
 		$query = new Query(array(
-			'model' => '\lithium\tests\mocks\data\source\MockHttpModel',
+			'model' => $this->_model,
 			'conditions' => array('page' => 2)
 		));
 
@@ -279,7 +276,7 @@ class HttpTest extends \lithium\test\Unit {
 	public function testUpdateWithModel() {
 		$http = new Http($this->_testConfig);
 		$query = new Query(array(
-			'model' => '\lithium\tests\mocks\data\source\MockHttpModel',
+			'model' => $this->_model,
 			'data' => array('id' => '1', 'title' => 'Test Title')
 		));
 
@@ -299,10 +296,7 @@ class HttpTest extends \lithium\test\Unit {
 
 	public function testDeleteWithModel() {
 		$http = new Http($this->_testConfig);
-		$query = new Query(array(
-			'model' => '\lithium\tests\mocks\data\source\MockHttpModel',
-			'data' => array('id' => '1')
-		));
+		$query = new Query(array('model' => $this->_model, 'data' => array('id' => '1')));
 
 		$result = $http->delete($query);
 		$expected = join("\r\n", array(

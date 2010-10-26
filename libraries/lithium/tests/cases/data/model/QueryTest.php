@@ -28,7 +28,7 @@ class QueryTest extends \lithium\test\Unit {
 		'order' => 'created DESC',
 		'limit' => 10,
 		'page' => 1,
-		'fields' => array('id','author_id','title'),
+		'fields' => array('id', 'author_id', 'title'),
 		'conditions' => array('author_id' => 12),
 		'comment' => 'Find all posts by author 12'
 	);
@@ -283,7 +283,7 @@ class QueryTest extends \lithium\test\Unit {
 
 		$expected = MockQueryPost::meta('source');
 		$result = $export['source'];
-		$this->assertEqual($expected, $result);
+		$this->assertEqual("{{$expected}}", $result);
 	}
 
 	public function testPagination() {

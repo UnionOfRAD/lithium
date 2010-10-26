@@ -372,30 +372,6 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testPopulateResourceClose() {
-		$resource = new MockDocumentSource();
-		$resource->read();
-
-		$doc = new DocumentSet(array(
-			'model' => 'lithium\tests\mocks\data\model\MockDocumentPost',
-			'result' => $resource
-		));
-
-		$result = $doc->rewind();
-		$this->assertTrue(is_a($result, 'lithium\data\entity\Document'));
-
-		$expected = array('id' => 2, 'name' => 'Moe');
-		$result = $doc->next()->data();
-		$this->assertEqual($expected, $result);
-
-		$expected = array('id' => 3, 'name' => 'Roe');
-		$result = $doc->next()->data();
-		$this->assertEqual($expected, $result);
-
-		$result = $doc->next();
-		$this->assertNull($result);
-	}
-
 	public function testEmptyValues() {
 		$doc = new Document(array(
 			'model' => 'lithium\tests\mocks\data\model\MockDocumentPost',

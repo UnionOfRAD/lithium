@@ -8,6 +8,8 @@
 
 namespace lithium\tests\mocks\data\model;
 
+use lithium\tests\mocks\data\model\mock_database\MockResult;
+
 class MockDatabase extends \lithium\data\source\Database {
 
 	public $sql = null;
@@ -39,7 +41,7 @@ class MockDatabase extends \lithium\data\source\Database {
 		return "'{$value}'";
 	}
 
-	public function cast($model, $data, array $options = array()) {
+	public function cast($model, array $data, array $options = array()) {
 		$defaults = array('first' => false);
 		$options += $defaults;
 		return $options['first'] ? reset($data) : $data;
@@ -50,7 +52,8 @@ class MockDatabase extends \lithium\data\source\Database {
 	}
 
 	protected function _execute($sql) {
-		return $this->sql = $sql;
+		$this->sql = $sql;
+		return new MockResult();
 	}
 
 	protected function _insertId($query) {

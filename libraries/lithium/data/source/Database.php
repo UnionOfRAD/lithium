@@ -215,16 +215,17 @@ abstract class Database extends \lithium\data\Source {
 				$query = String::insert($query, $self->value($params['options']));
 			}
 
-			if ($self->invokeMethod('_execute', array($query))) {
-				if ($entity) {
-					if (($model) && !$model::key($entity)) {
-						$id = $self->invokeMethod('_insertId', array($object));
-					}
-					$entity->update($id);
-				}
-				return true;
+			if (!$self->invokeMethod('_execute', array($query))) {
+				return false;
 			}
-			return false;
+
+			if ($entity) {
+				if (($model) && !$model::key($entity)) {
+					$id = $self->invokeMethod('_insertId', array($object));
+				}
+				$entity->update($id);
+			}
+			return true;
 		});
 	}
 
@@ -235,7 +236,7 @@ abstract class Database extends \lithium\data\Source {
 	 * @param string $options If `$query` is a raw string, contains the values that will be escaped
 	 *               and quoted. Other options:
 	 *               - `'return'` _string_: switch return between `'array'`, `'item'`, or
-	 *                 `'resource'`; defaults to `'item'`.
+	 *                 `'resource'` _string_: Defaults to `'item'`.
 	 * @return mixed Determined by `$options['return']`.
 	 * @filter
 	 */
@@ -255,6 +256,7 @@ abstract class Database extends \lithium\data\Source {
 				$sql = $self->renderCommand($query);
 			}
 			$result = $self->invokeMethod('_execute', array($sql));
+			// var_dump($result);
 
 			switch ($return) {
 				case 'resource':

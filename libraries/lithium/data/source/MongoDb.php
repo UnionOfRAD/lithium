@@ -63,8 +63,9 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	protected $_classes = array(
 		'entity' => 'lithium\data\entity\Document',
-		'array' => 'lithium\data\collection\DocumentArray',
-		'set' => 'lithium\data\collection\DocumentSet',
+		'array'  => 'lithium\data\collection\DocumentArray',
+		'set'    => 'lithium\data\collection\DocumentSet',
+		'result' => 'lithium\data\source\mongo_db\Result',
 		'relationship' => 'lithium\data\model\Relationship'
 	);
 
@@ -97,12 +98,19 @@ class MongoDb extends \lithium\data\Source {
 	protected $_schema = null;
 
 	/**
+	 * An array of closures that handle casting values to specific types.
+	 *
+	 * @var array
+	 */
+	protected $_handlers = array();
+
+	/**
 	 * List of configuration keys which will be automatically assigned to their corresponding
 	 * protected class properties.
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('schema');
+	protected $_autoConfig = array('schema', 'handlers');
 
 	/**
 	 * Instantiates the MongoDB adapter with the default connection information.
@@ -146,6 +154,19 @@ class MongoDb extends \lithium\data\Source {
 
 		$this->_operators += array(
 			'like' => function($key, $value) { return new MongoRegex($value); }
+		);
+
+		$this->_handlers += array(
+			'id' => function($v) {
+				return is_string($v) && preg_match('/^[0-9a-f]{24}$/', $v) ? new MongoId($v) : $v;
+			},
+			'date' => function($v) {
+				return new MongoDate(is_numeric($v) ? intval($v) : strtotime($v));
+			},
+			'regex'   => function($v) { return new MongoRegex($v); },
+			'integer' => function($v) { return (integer) $v; },
+			'float'   => function($v) { return (float) $v; },
+			'boolean' => function($v) { return (boolean) $v; }
 		);
 	}
 
@@ -382,7 +403,7 @@ class MongoDb extends \lithium\data\Source {
 			$grid->delete($data['_id']);
 		}
 		unset($data['file']);
-		return $this->connection->getGridFS()->{$method}($file, $data);
+		return $grid->{$method}($file, $data);
 	}
 
 	/**
@@ -422,7 +443,8 @@ class MongoDb extends \lithium\data\Source {
 			if ($query->calculate()) {
 				return $result;
 			}
-			$result = $result->sort($args['order'])->limit($args['limit'])->skip($args['offset']);
+			$resource = $result->sort($args['order'])->limit($args['limit'])->skip($args['offset']);
+			$result = $self->invokeMethod('_instance', array('result', compact('resource')));
 			$config = compact('result', 'query') + array('class' => 'set');
 			return $self->item($query->model(), array(), $config);
 		});
@@ -534,39 +556,6 @@ class MongoDb extends \lithium\data\Source {
 		);
 		$config += array('link' => $defaultLinks[$type]);
 		return new $relationship($config);
-	}
-
-	/**
-	 * Allows for iteration over result sets.
-	 *
-	 * @param string $type One of 'next' or 'close'.
-	 * @param object $resource The resource to act upon.
-	 * @param object $context
-	 * @return mixed If `$type` is `next` and the resource has a `next` item, that item is
-	 *         returned. Null otherwise.
-	 */
-	public function result($type, $resource, $context) {
-		if (!is_object($resource)) {
-			return null;
-		}
-
-		switch ($type) {
-			case 'next':
-				$result = $resource->hasNext() ? $resource->getNext() : null;
-
-				if ($result instanceof MongoGridFSFile) {
-					$result = array('file' => $result) + $result->file;
-				}
-			break;
-			case 'close':
-				unset($resource);
-				$result = null;
-			break;
-			default:
-				$result = parent::result($type, $resource, $context);
-			break;
-		}
-		return $result;
 	}
 
 	/**
@@ -749,25 +738,10 @@ class MongoDb extends \lithium\data\Source {
 		$options += $defaults;
 
 		if ($model && !$options['schema']) {
-			$options['schema'] = $model::schema();
+			$options['schema'] = $model::schema() ?: array('_id' => array('type' => 'id'));
 		}
-		$handlers = array(
-			'id' => function($v) {
-				return is_string($v) && preg_match('/^[0-9a-f]{24}$/', $v) ? new MongoId($v) : $v;
-			},
-			'date' => function($v) {
-				return new MongoDate(is_numeric($v) ? intval($v) : strtotime($v));
-			},
-			'regex' => function($v) {
-				return new MongoRegex($v);
-			},
-			'integer' => function($v) {
-				return (integer) $v;
-			},
-			'float' => function($v) {
-				return (float) $v;
-			}
-		);
+		$schema = $options['schema'];
+		unset($options['schema']);
 
 		$typeMap = array(
 			'MongoId'   => 'id',
@@ -781,22 +755,24 @@ class MongoDb extends \lithium\data\Source {
 			if (is_object($value)) {
 				continue;
 			}
-			$schema = isset($options['schema'][$key]) ? $options['schema'][$key] : array();
-			$schema += array('type' => null, 'array' => null);
-			$type = isset($typeMap[$schema['type']]) ? $typeMap[$schema['type']] : $schema['type'];
-			$isArray = (is_array($value) && $schema['array'] !== false);
+			$field = (isset($schema[$key]) ? $schema[$key] : array());
+			$field += array('type' => null, 'array' => null);
+			$type = isset($typeMap[$field['type']]) ? $typeMap[$field['type']] : $field['type'];
+			$isObject = ($type == 'object');
+			$isArray = (is_array($value) && $field['array'] !== false && !$isObject);
 
-			if (isset($handlers[$type])) {
-				$handler = $handlers[$type];
+			if (isset($this->_handlers[$type])) {
+				$handler = $this->_handlers[$type];
 				$value = $isArray ? array_map($handler, $value) : $handler($value);
 			}
 			if ($options['arrays']) {
 				if (is_array($value)) {
-					$arrayType = (array_keys($value) === range(0, count($value) - 1));
+					$arrayType = !$isObject && (array_keys($value) === range(0, count($value) - 1));
 					$options = $arrayType ? array('class' => 'array') + $options : $options;
 					$value = $this->item($model, $value, $options);
-				} elseif ($schema['array']) {
-					$value = $this->item($model, array($value), array('class' => 'array') + $options);
+				} elseif ($field['array']) {
+					$options = array('class' => 'array') + $options;
+					$value = $this->item($model, array($value), $options);
 				}
 			}
 			$data[$key] = $value;

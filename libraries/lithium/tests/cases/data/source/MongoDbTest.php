@@ -48,6 +48,9 @@ class MongoDbTest extends \lithium\test\Unit {
 		'voters' => array('type' => 'id', 'array' => true),
 		'rank_count' => array('type' => 'integer', 'default' => 0),
 		'rank' => array('type' => 'float', 'default' => 0.0),
+		'notifications.foo' => array('type' => 'boolean'),
+		'notifications.bar' => array('type' => 'boolean'),
+		'notifications.baz' => array('type' => 'boolean'),
 	);
 
 	protected $_configs = array();
@@ -252,35 +255,27 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->query->data(array('title' => 'Test Post'));
 		$this->db->create($this->query);
 
-		$result = $this->db->read($this->query);
+		$result = $this->db->read(new Query(compact('model')));
 		$original = $result->first()->to('array');
 
 		$this->assertEqual(array('_id', 'title'), array_keys($original));
 		$this->assertEqual('Test Post', $original['title']);
 		$this->assertPattern('/[0-9a-f]{24}/', $original['_id']);
 
-		$options = compact('model');
-		$this->query = new Query($options + array('entity' => new Document($options)));
-		$newData = array('title' => 'New Post Title');
-		$this->query->data($newData);
-		$this->query->conditions(array('_id' => $original['_id']));
+		$this->query = new Query(compact('model') + array(
+			'data' => array('title' => 'New Post Title'),
+			'conditions' => array('_id' => $original['_id'])
+		));
+		$this->assertTrue($this->db->update($this->query));
 
-		$result = $this->db->update($this->query);
-		$this->assertTrue($result);
-
-		$result = $this->db->read($this->query);
-
-		$expected = 1;
-		$this->assertEqual($expected, $result->count());
+		$result = $this->db->read(new Query(compact('model') + array(
+			'conditions' => array('_id' => $original['_id'])
+		)));
+		$this->assertEqual(1, $result->count());
 
 		$updated = $result->first()->to('array');
-		$expected = $original['_id'];
-		$result = $updated['_id'];
-		$this->assertEqual($expected, $result);
-
-		$expected = $newData['title'];
-		$result = $updated['title'];
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($original['_id'], $updated['_id']);
+		$this->assertEqual('New Post Title', $updated['title']);
 	}
 
 	public function testDelete() {

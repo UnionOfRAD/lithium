@@ -8,8 +8,10 @@
 
 namespace lithium\tests\cases\data\collection;
 
+use lithium\data\collection\RecordSet;
 use lithium\tests\mocks\data\collection\MockRecordSet;
 use lithium\tests\mocks\data\source\database\adapter\MockAdapter;
+use lithium\tests\mocks\data\model\mock_database\MockResult;
 use lithium\tests\mocks\data\MockPostObject;
 use lithium\tests\mocks\data\MockModel;
 use lithium\data\Connections;
@@ -19,6 +21,9 @@ use lithium\util\Collection;
  * RecordSet tests
  */
 class RecordSetTest extends \lithium\test\Unit {
+
+	protected $_model = 'lithium\tests\mocks\data\MockModel';
+
 	/**
 	 * RecordSet object to test
 	 *
@@ -56,50 +61,32 @@ class RecordSetTest extends \lithium\test\Unit {
 		foreach($this->_records as $i => $record) {
 			$this->_objectRecords[$i] = new MockPostObject($record);
 		}
+		$result = new MockResult();
+		$result->records = array_merge(array(false), $this->_records);
+		$model = $this->_model;
 
-		$connection = new MockAdapter(array(
-			'records' => $this->_records,
-			'columns' => array('lithium\tests\mocks\data\MockModel' => array('id', 'data')),
-			'autoConnect' => false
-		));
+		$this->_recordSet = new MockRecordSet(compact('result', 'model') + array('exists' => true));
 
-		$this->_recordSet = new MockRecordSet(array(
-			'model'  => 'lithium\tests\mocks\data\MockModel',
-			'handle' => &$connection,
-			'result' => true,
-			'exists' => true,
-		));
-
-		$objectConnection = new MockAdapter(array(
-			'records' => $this->_objectRecords,
-			'columns' => array('lithium\tests\mocks\data\MockPostObject' => array('id', 'data')),
-			'autoConnect' => false
-		));
-
-		$this->_objectRecordSet = new MockRecordSet(array(
-			'model'  => 'lithium\tests\mocks\data\MockModel',
-			'handle' => &$objectConnection,
-			'result' => true,
-			'exists' => true,
+		$result = new MockResult();
+		$result->records = array_merge(array(false), $this->_records);
+		$this->_objectRecordSet = new MockRecordSet(compact('result', 'model') + array(
+			'exists' => true
 		));
 	}
 
 	public function testInit() {
 		$recordSet = new MockRecordSet();
-
-		$this->assertTrue(is_a($recordSet, '\lithium\data\collection\RecordSet'));
+		$this->assertTrue($recordSet instanceof RecordSet);
 
 		$recordSet = new MockRecordSet(array(
-			'model'  => 'lithium\tests\mocks\data\MockModel',
-			'handle' => new MockAdapter(),
+			'model'  => $this->_model,
 			'result' => true,
 			'exists' => true,
 		));
 
-		$this->assertEqual('lithium\tests\mocks\data\MockModel', $recordSet->get('_model'));
+		$this->assertEqual($this->_model, $recordSet->model());
 		$this->assertTrue($recordSet->get('_result'));
 	}
-
 
 	public function testOffsetExists() {
 		$this->assertFalse($this->_recordSet->offsetExists(0));

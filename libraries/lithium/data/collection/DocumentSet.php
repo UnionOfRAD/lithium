@@ -12,8 +12,6 @@ use lithium\data\Source;
 
 class DocumentSet extends \lithium\data\Collection {
 
-	protected $_marked = array();
-
 	/**
 	 * PHP magic method used when setting properties on the `Document` instance, i.e.
 	 * `$document->title = 'Lorem Ipsum'`. If `$value` is a complex data type (i.e. associative
@@ -110,14 +108,13 @@ class DocumentSet extends \lithium\data\Collection {
 		if (!isset($this->_data[$offset]) && !$data = $this->_populate(null, $offset)) {
 			return $null;
 		}
-		if (isset($this->_marked[$offset])) {
-			return $this->_data[$offset];
-		}
 		if (is_array($data = $this->_data[$offset]) && $model) {
 			$this->_data[$offset] = $model::connection()->cast($model, $data);
 		}
-		$this->_marked[$offset] = true;
-		return $this->_data[$offset];
+		if (isset($this->_data[$offset])) {
+			return $this->_data[$offset];
+		}
+		return $null;
 	}
 
 	/**
@@ -186,7 +183,7 @@ class DocumentSet extends \lithium\data\Collection {
 		if (($data = $data ?: $this->_result->next()) === null) {
 			return $this->close();
 		}
-		$options = array('exists' => true, 'first' => true);
+		$options = array('exists' => true, 'first' => true, 'pathKey' => $this->_pathKey);
 		return $this->_data[] = $conn->cast($model, array($key => $data), $options);
 	}
 

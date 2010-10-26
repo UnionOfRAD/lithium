@@ -12,8 +12,6 @@ use lithium\data\Source;
 
 class DocumentArray extends \lithium\data\Collection {
 
-	protected $_marked = array();
-
 	/**
 	 * PHP magic method used to check the presence of a field as document properties, i.e.
 	 * `$document->_id`.
@@ -48,18 +46,7 @@ class DocumentArray extends \lithium\data\Collection {
 	 * @return mixed Value at offset.
 	 */
 	public function offsetGet($offset) {
-		if (isset($this->_marked[$offset])) {
-			return $this->_data[$offset];
-		}
-		if (($model = $this->_model) && ($data = $this->_data[$offset])) {
-			$options = array('pathKey' => $this->_pathKey, 'first' => true);
-			$conn = $model::connection();
-			$this->_data[$offset] = $conn->cast($model, array($this->_pathKey => $data), $options);
-			$this->_marked[$offset] = true;
-		}
-		if (isset($this->_data[$offset])) {
-			return $this->_data[$offset];
-		}
+		return isset($this->_data[$offset]) ? $this->_data[$offset] : null;
 	}
 
 	public function offsetSet($offset, $data) {

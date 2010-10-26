@@ -92,7 +92,7 @@ class RecordSet extends \lithium\data\Collection {
 	 *                value of `$offset`, otheriwse returns `null`.
 	 */
 	public function offsetGet($offset) {
-		if (!is_null($offset) && in_array($offset, $this->_index)) {
+		if ($offset !== null && in_array($offset, $this->_index)) {
 			return $this->_data[array_search($offset, $this->_index)];
 		}
 		if ($this->closed()) {
@@ -270,15 +270,19 @@ class RecordSet extends \lithium\data\Collection {
 		}
 		$key = null;
 		$offset = 0;
-		$recordMap = array();
+		$recordMap = is_object($data) ? array($model => $data) : array();
 
-		foreach ($this->_columns as $model => $fields) {
-			$record = array_combine($fields, array_slice($data, $offset, count($fields)));
+		if (!$recordMap) {
+			foreach ($this->_columns as $model => $fields) {
+				$record = array_combine($fields, array_slice($data, $offset, count($fields)));
 
-			if ($model == $this->_model) {
-				$key = $key = $model::key($record);
+				if ($model == $this->_model) {
+					$key = $key = $model::key($record);
+				}
+				$recordMap[$model] = $conn->item($model, $record, array('exists' => true));
 			}
-			$recordMap[$model] = $conn->item($model, $record, array('exists' => true));
+		} else {
+			$key = $model::key(reset($recordMap));
 		}
 		$record = reset($recordMap);
 		unset($recordMap[key($recordMap)]);
@@ -287,7 +291,9 @@ class RecordSet extends \lithium\data\Collection {
 			$key = count($key) === 1 ? reset($key) : $key;
 		}
 		if (in_array($key, $this->_index)) {
-			return $this->_data[array_search($key, $this->_index)] = $record;
+			$index = array_search($key, $this->_index);
+			$this->_data[$index] = $record;
+			return $this->_data[$index];
 		}
 		$this->_data[] = $record;
 		$this->_index[] = $key;
