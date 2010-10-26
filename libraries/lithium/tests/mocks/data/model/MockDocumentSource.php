@@ -8,6 +8,8 @@
 
 namespace lithium\tests\mocks\data\model;
 
+use MongoId;
+use MongoDate;
 use lithium\data\model\Relationship;
 
 class MockDocumentSource extends \lithium\data\Source {
@@ -25,7 +27,7 @@ class MockDocumentSource extends \lithium\data\Source {
 	public function describe($entity, array $meta = array()) {}
 	public function create($query, array $options = array()) {}
 	public function update($query, array $options = array()) {}
-	public function delete($query, array $options = array() ) {}
+	public function delete($query, array $options = array()) {}
 
 	protected $point = 0;
 	protected $result = null;
@@ -37,9 +39,6 @@ class MockDocumentSource extends \lithium\data\Source {
 			array('id' => 2, 'name' => 'Moe'),
 			array('id' => 3, 'name' => 'Roe')
 		);
-	}
-	public function hasNext() {
-		return (is_array($this->result) && sizeof($this->result) > $this->point);
 	}
 
 	public function getNext() {
@@ -53,6 +52,7 @@ class MockDocumentSource extends \lithium\data\Source {
 		if ($model && !$options['schema']) {
 			$options['schema'] = $model::schema();
 		}
+
 		$handlers = array(
 			'id' => function($v) {
 				return is_string($v) && preg_match('/^[0-9a-f]{24}$/', $v) ? new MongoId($v) : $v;

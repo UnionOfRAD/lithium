@@ -291,6 +291,25 @@ class MySql extends \lithium\data\source\Database {
 		return null;
 	}
 
+	public function alias($alias, $context) {
+		if ($context->type() == 'update' || $context->type() == 'delete') {
+			return;
+		}
+		return parent::alias($alias, $context);
+	}
+
+	/**
+	 * @todo Eventually, this will need to rewrite aliases for DELETE and UPDATE queries, same with
+	 *       order().
+	 * @param string $conditions 
+	 * @param string $context 
+	 * @param array $options 
+	 * @return void
+	 */
+	public function conditions($conditions, $context, array $options = array()) {
+		return parent::conditions($conditions, $context, $options);
+	}
+
 	/**
 	 * Execute a given query.
  	 *
@@ -346,7 +365,7 @@ class MySql extends \lithium\data\source\Database {
 	 */
 	protected function _insertId($query) {
 		$resource = $this->_execute('SELECT LAST_INSERT_ID() AS insertID');
-		list($id) = next($resource);
+		list($id) = $resource->next();
 		return ($id && $id !== '0') ? $id : null;
 	}
 

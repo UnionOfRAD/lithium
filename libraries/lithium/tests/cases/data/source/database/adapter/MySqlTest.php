@@ -234,6 +234,17 @@ class MySqlTest extends \lithium\test\Unit {
 		$delete = new Query(array('type' => 'delete', 'source' => 'companies'));
 		$this->assertTrue($this->db->delete($delete));
 	}
+
+	/**
+	 * Ensures that DELETE queries are not generated with table aliases, as MySQL does not support
+	 * this.
+	 *
+	 * @return void
+	 */
+	public function testDeletesWithoutAliases() {
+		$delete = new Query(array('type' => 'delete', 'source' => 'companies'));
+		$this->assertTrue($this->db->delete($delete));
+	}
 }
 
 ?>

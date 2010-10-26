@@ -129,6 +129,12 @@ class MockSource extends \lithium\data\Source {
 
 	}
 
+	public function cast($model, array $data = array(), array $options = array()) {
+		$defaults = array('first' => false);
+		$options += $defaults;
+		return $options['first'] ? reset($data) : $data;
+	}
+
 	public function relationship($class, $type, $name, array $options = array()) {
 		$keys = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name')) . '_id';
 
