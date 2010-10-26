@@ -350,6 +350,7 @@ class MongoDb extends \lithium\data\Source {
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
 			$query = $params['query'];
 			$options = $params['options'];
+			$data = array();
 
 			$params = $query->export($self);
 			$gridCol = "{$_config['gridPrefix']}.files";
@@ -362,6 +363,7 @@ class MongoDb extends \lithium\data\Source {
 			}
 
 			if (isset($result['ok']) && (boolean) $result['ok'] === true) {
+				$params['data'] += $data;
 				$query->entity()->update($params['data']['_id']);
 				return true;
 			}
