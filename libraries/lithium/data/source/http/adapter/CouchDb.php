@@ -322,13 +322,6 @@ class CouchDb extends \lithium\data\source\Http {
 		return parent::item($model, $this->_format($data), $options);
 	}
 
-	public function cast($model, $key, $value, array $options = array()) {
-		$schema = $model::schema($key);
-		$schema = (array) $schema + array('type' => null, 'array' => false);
-		$type = $schema['type'];
-		return $value;
-	}
-
 	/**
 	 * get result
 	 *

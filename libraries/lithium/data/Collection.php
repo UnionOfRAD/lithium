@@ -93,7 +93,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'data', 'model', 'result', 'query', 'parent', 'stats', 'pathKey', 'exists'
+		'data', 'model', 'result', 'query', 'parent', 'stats', 'pathKey'
 	);
 
 	/**
@@ -114,7 +114,8 @@ abstract class Collection extends \lithium\util\Collection {
 			unset($this->_config[$key]);
 		}
 		if ($model = $this->_model) {
-			$this->_data = $model::connection()->cast($model, $this->_data);
+			$pathKey = $this->_pathKey;
+			$this->_data = $model::connection()->cast($model, $this->_data, compact('pathKey'));
 		}
 	}
 
