@@ -165,12 +165,9 @@ class Request extends \lithium\net\http\Message {
 		$path = str_replace('//', '/', $this->path) . $this->queryString();
 		$body = $this->body();
 		$this->headers('Content-Length', strlen($body));
-		$request = array(
-			"{$this->method} {$path} {$this->protocol}",
-			join("\r\n", $this->headers()),
-			"", $body
-		);
-		return join("\r\n", $request);
+
+		$status = "{$this->method} {$path} {$this->protocol}";
+		return join("\r\n", array($status, join("\r\n", $this->headers()), "", $body));
 	}
 }
 
