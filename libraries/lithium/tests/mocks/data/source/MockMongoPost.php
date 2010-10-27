@@ -14,6 +14,13 @@ class MockMongoPost extends \lithium\data\Model {
 		'connection' => 'lithium_mongo_test',
 		'source' => 'posts'
 	);
+
+	public static function schema($field = null) {
+		if (is_array($field)) {
+			return static::_object()->_schema = $field;
+		}
+		return parent::schema($field);
+	}
 }
 
 ?>

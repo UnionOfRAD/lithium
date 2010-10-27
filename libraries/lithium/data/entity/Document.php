@@ -284,7 +284,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			return $this->_setNested($name, $value);
 		}
 		if ($model = $this->_model) {
-			$pathKey = $this->_pathKey ? "{$this->_pathKey}.{$name}" : $name;
+			$pathKey = $this->_pathKey;
 			$options = compact('pathKey') + array('first' => true);
 			$value = $model::connection()->cast($model, array($name => $value), $options);
 		}

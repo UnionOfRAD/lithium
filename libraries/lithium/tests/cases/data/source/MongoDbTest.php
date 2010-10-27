@@ -581,6 +581,23 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertTrue($result['$or'][0]['_id'] instanceOf MongoId);
 		$this->assertTrue($result['$or'][1]['guid'] instanceOf MongoId);
 	}
+
+	public function testNestedObjectCasting() {
+		$data = array('notifications' => array(
+			'foo' => '',
+			'bar' => '1',
+			'baz' => 0
+		));
+		$model = $this->_model;
+		$schema = $model::schema();
+		$model::schema($this->_schema);
+		$result = $this->db->cast($model, $data);
+		$model::schema($schema);
+
+		$this->assertIdentical(false, $result['notifications']->foo);
+		$this->assertIdentical(true, $result['notifications']->bar);
+		$this->assertIdentical(false, $result['notifications']->baz);
+	}
 }
 
 ?>

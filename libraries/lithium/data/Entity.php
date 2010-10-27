@@ -96,8 +96,7 @@ class Entity extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'classes' => 'merge', 'parent', 'relationship',
-		'handle', 'schema', 'data', 'model', 'exists'
+		'classes' => 'merge', 'parent', 'schema', 'data', 'model', 'exists', 'pathKey'
 	);
 
 	/**

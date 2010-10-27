@@ -757,7 +757,8 @@ class MongoDb extends \lithium\data\Source {
 			if (is_object($value)) {
 				continue;
 			}
-			$field = (isset($schema[$key]) ? $schema[$key] : array());
+			$path = $options['pathKey'] ? "{$options['pathKey']}.{$key}" : $key;
+			$field = (isset($schema[$path]) ? $schema[$path] : array());
 			$field += array('type' => null, 'array' => null);
 			$type = isset($typeMap[$field['type']]) ? $typeMap[$field['type']] : $field['type'];
 			$isObject = ($type == 'object');
@@ -767,15 +768,19 @@ class MongoDb extends \lithium\data\Source {
 				$handler = $this->_handlers[$type];
 				$value = $isArray ? array_map($handler, $value) : $handler($value);
 			}
-			if ($options['arrays']) {
-				if (is_array($value)) {
-					$arrayType = !$isObject && (array_keys($value) === range(0, count($value) - 1));
-					$options = $arrayType ? array('class' => 'array') + $options : $options;
-					$value = $this->item($model, $value, $options);
-				} elseif ($field['array']) {
-					$options = array('class' => 'array') + $options;
-					$value = $this->item($model, array($value), $options);
-				}
+			if (!$options['arrays']) {
+				$data[$key] = $value;
+				continue;
+			}
+			$pathKey = $path;
+
+			if (is_array($value)) {
+				$arrayType = !$isObject && (array_keys($value) === range(0, count($value) - 1));
+				$opts = $arrayType ? array('class' => 'array') + $options : $options;
+				$value = $this->item($model, $value, compact('pathKey') + $opts);
+			} elseif ($field['array']) {
+				$opts = array('class' => 'array') + $options;
+				$value = $this->item($model, array($value), compact('pathKey') + $opts);
 			}
 			$data[$key] = $value;
 		}
