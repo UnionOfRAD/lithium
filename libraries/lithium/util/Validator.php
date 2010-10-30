@@ -8,8 +8,8 @@
 
 namespace lithium\util;
 
-use \lithium\util\Set;
-use \InvalidArgumentException;
+use lithium\util\Set;
+use InvalidArgumentException;
 
 /**
  * The `Validator` class provies static access to commonly used data validation logic. These common
@@ -17,11 +17,11 @@ use \InvalidArgumentException;
  * codes, but also include general checks for regular expressions and booleans and numericality.
  *
  * General data checking is done by using `Validator` statically. Rules can be specified as a
- * parameter to the `rule()` method or automatically accessed via the `is[RuleName]()` method name
+ * parameter to the `rule()` method or accessed directly via the `is[RuleName]()` method name
  * convention:
  *
  * {{{
- * use \lithium\util\Validator;
+ * use lithium\util\Validator;
  *
  * // The following are equivalent:
  * Validator::rule('email', 'foo@example.com');  // true
@@ -30,14 +30,100 @@ use \InvalidArgumentException;
  *
  * Data can also be validated against multiple rules, each having their own associated error
  * message. The rule structure is array-based and hierarchical based on rule names and
- * messages. Resposes match the keys present in `$data` up with an array of rules which they
- * violate.
+ * messages. Resposes match the keys present in the `$data` parameter of `check()` up with an array
+ * of rules which they violate.
  *
  * {{{ embed:lithium\tests\cases\util\ValidatorTest::testCheckMultipleHasFirstError(1-15) }}}
  *
  * See the `check()` method for more information an multi-value datasets. Custom validation rules
  * can also be added to `Validator` at runtime. These can either take the form of regular expression
  * strings or functions supplied to the `add()` method.
+ *
+ * ### Rules
+ *
+ * The `Validator` class includes a series of commonly-used rules by default, any of which may be
+ * used in calls to `rule()` or `check()`, or called directly as a method. Additionally, many rules
+ * have a variety of different _formats_ in which they may be specified. The following is the list
+ * of the built-in rules, but keep in mind that none of them are hard-coded. Any rule may be
+ * overridden by adding a new rule of the same name using the `add()` method.
+ *
+ * - `notEmpty`: Checks that a string contains at least one non-whitespace character.
+ *
+ * - `alphaNumeric`: Checks that a string contains only integer or letters.
+ *
+ * - `lengthBetween`: Checks that a string length is within a specified range. Spaces are included
+ *   in the character count. The available options are `'min'` and `'max'`, which designate the
+ *   minimum and maximum length of the string.
+ *
+ * - `blank`: Checks that a field is left blank **OR** only whitespace characters are present in its
+ *   value. Whitespace characters include spaces, tabs, carriage returns and newlines.
+ *
+ * - `creditCard`: Checks that a value is a valid credit card number. This rule is divided into a
+ *   series of formats: `'amex'`, `'bankcard'`, `'diners'`, `'disc'`, `'electron'`, `'enroute'`,
+ *   `'jcb'`, `'maestro'`, `'mc'`, `'solo'`, `'switch'`, `'visa'`, `'voyager'`, `'fast'`. If no
+ *   format value is specified, the value defaults to `'any'`, which will validate the value if
+ *   _any_ of the available formats match. You can also use the `'fast'` format, which does a
+ *   high-speed, low-fidelity check to ensure that the value looks like a real credit card number.
+ *   This rule includes one option, `'deep'`, which (if set to `true`) validates the value using the
+ *   [Luhn algorithm](http://en.wikipedia.org/wiki/Luhn_algorithm) if the format validation is
+ *   successful. See the `luhn` validator below for more details.
+ *
+ * - `date`: Checks that a value is a valid date that complies with one or more formats. Also
+ *   validates leap years. Possible formats are `'dmy'` (27-12-2010 or 27-12-10 separators can be a
+ *   space, period, dash, forward slash), `'mdy'` (12-27-2010 or 12-27-10 separators can be a space,
+ *   period, dash, forward slash), `'ymd'` (2010-12-27 or 10-12-27 separators can be a space,
+ *   period, dash, forward slash), `'dMy'` (27 December 2010 or 27 Dec 2010), `'Mdy'` (December 27,
+ *   2010 or Dec 27, 2010 comma is optional), `'My'` (December 2010 or Dec 2010) or `'my'` (12/2010
+ *   separators can be a space, period, dash, forward slash).
+ *
+ * - `time`: Checks that a value is a valid time. Validates time as 24hr (HH:MM) or am/pm
+ *   ([ H]H:MM[a|p]m). Does not allow / validate seconds.
+ *
+ * - `boolean`: Checks that a value is a boolean integer or `true` or `false`.
+ *
+ * - `decimal`: Checks that a value is a valid decimal. Takes one option, `'precision'`, which is
+ *   an optional integer value defining the level of precision the decimal number must match.
+ *
+ * - `email`: Checks that a value is (probably) a valid email address. The subject of validating
+ *   an actual email address is complicated and problematic. A regular expression that correctly
+ *   validates addresses against [RFC 5322](http://tools.ietf.org/html/rfc5322) would be several
+ *   pages long, with the drawback of being unable to keep up as new top-level domains are added.
+ *   Instead, this validator uses PHP's internal input filtering API to check the format, and
+ *   provides an option, `'deep'` ( _boolean_) which, if set to `true`, will validate that the email
+ *   address' domain contains a valid MX record. Keep in mind, this is just one of the many ways to
+ *   validate an email address in the overall context of an application. For other ideas or
+ *   examples, [ask Sean](http://seancoates.com/).
+ *
+ * - `ip`: Validates a string as a valid IPv4 or IPv6 address.
+ *
+ * - `money`: Checks that a value is a valid monetary amount. This rule has two formats, `'right'`
+ *   and `'left'`, which indicates which side the monetary symbol (i.e. $) appears on.
+ *
+ * - `numeric`: Checks that a value is numeric.
+ *
+ * - `phone`: Check that a value is a valid phone number, non-locale-specific phone number.
+ *
+ * - `postalCode`: Checks that a given value is a valid US postal code.
+ *
+ * - `inRange`: Checks that a numeric value is within a specified range. This value has two options,
+ *    `'upper'` and `'lower'`, which specify the boundary of the value.
+ *
+ * - `url`: Checks that a value is a valid URL according to
+ *   [RFC 2395](http://www.faqs.org/rfcs/rfc2396.html). Uses PHP's filter API, and accepts any
+ *   options accepted for
+ *   [the validation URL filter](http://www.php.net/manual/en/filter.filters.validate.php).
+ *
+ * - `luhn`: Checks that a value is a valid credit card number according to the
+ *   [Luhn algorithm](http://en.wikipedia.org/wiki/Luhn_algorithm). (See also: the `creditCard`
+ *   validator).
+ *
+ * - `inList`: Checks that a value is in a pre-defined list of values. This validator accepts one
+ *   option, `'list'`, which is an array containing acceptable values.
+ *
+ * - `regex`: Checks that a value appears to be a /-delimited regular expression, possibly
+ *   containing PCRE-compatible options flags.
+ *
+ * - `uuid`: Checks that a value is a valid UUID.
  */
 class Validator extends \lithium\core\StaticObject {
 
@@ -54,11 +140,13 @@ class Validator extends \lithium\core\StaticObject {
 	protected static $_rules = array();
 
 	/**
-	 * Default options used when defining a new validator rule.
+	 * Default options used when defining a new validator rule. Each key contains method-specific
+	 * options that should always be applied, or options that should be applied to all rules in the
+	 * `'defaults'` key.
 	 *
-	 * @var array Options
 	 * @see lithium\util\Validator::add()
 	 * @see lithium\util\Validator::rule()
+	 * @var array
 	 */
 	protected static $_options = array(
 		'defaults' => array('contains' => true)
@@ -94,7 +182,7 @@ class Validator extends \lithium\core\StaticObject {
 				'visa'     => '/^4\\d{12}(\\d{3})?$/',
 				'voyager'  => '/^8699[0-9]{11}$/',
 				'fast'     => '/^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6011[0-9]{12}|3' .
-				              '(?:0[0-5]|[68][0-9])[0-9]{11}|3[47][0-9]{13})$/'
+				              '(?:0[0-5]|[68][0-9])[0-9]{11}|3[47][0-9]{13})$/',
 			),
 			'date'         => array(
 				'dmy'      => '%^(?:(?:31(\\/|-|\\.|\\x20)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)' .
@@ -136,15 +224,13 @@ class Validator extends \lithium\core\StaticObject {
 			),
 			'ip' => function($value, $format = null, array $options = array()) {
 				$options += array('flags' => array());
-				return (boolean) filter_var(
-					$value, FILTER_VALIDATE_IP, array('flags' => $options['flags'])
-				);
+				return (boolean) filter_var($value, FILTER_VALIDATE_IP, $options);
 			},
 			'money'        => array(
 				'right'    => '/^(?!0,?\d)(?:\d{1,3}(?:([, .])\d{3})?(?:\1\d{3})*|(?:\d+))' .
 				              '((?!\1)[,.]\d{2})?(?<!\x{00a2})\p{Sc}?$/u',
 				'left'     => '/^(?!\x{00a2})\p{Sc}?(?!0,?\d)(?:\d{1,3}(?:([, .])\d{3})?' .
-				              '(?:\1\d{3})*|(?:\d+))((?!\1)[,.]\d{2})?$/u'
+				              '(?:\1\d{3})*|(?:\d+))((?!\1)[,.]\d{2})?$/u',
 			),
 			'notEmpty'     => '/[^\s]+/m',
 			'phone'        => '/^\+?[0-9\(\)\-]{10,20}$/',
@@ -155,7 +241,6 @@ class Validator extends \lithium\core\StaticObject {
 			'boolean' => function($value) {
 				$bool = is_bool($value);
 				$filter = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-
 				return ($bool || $filter !== null);
 			},
 			'decimal' => function($value, $format = null, array $options = array()) {
@@ -166,8 +251,7 @@ class Validator extends \lithium\core\StaticObject {
 						return false;
 					}
 				}
-				$filter = filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
-				return ($filter !== null);
+				return (filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) !== null);
 			},
 			'inList' => function($value, $format, $options) {
 				$options += array('list' => array());
@@ -220,19 +304,17 @@ class Validator extends \lithium\core\StaticObject {
 			},
 			'url' => function($value, $format = null, array $options = array()) {
 				$options += array('flags' => array());
-				return (boolean) filter_var(
-					$value, FILTER_VALIDATE_URL, array('flags' => $options['flags'])
-				);
+				return (boolean) filter_var($value, FILTER_VALIDATE_URL, $options);
 			}
 		);
 
-		$emptyCheck = function($self, $params, $chain) {
+		$isEmpty = function($self, $params, $chain) {
 			extract($params);
 			return (empty($value) && $value != '0') ? false : $chain->next($self, $params, $chain);
 		};
 
-		static::$_methodFilters[$class]['alphaNumeric'] = array($emptyCheck);
-		static::$_methodFilters[$class]['notEmpty'] = array($emptyCheck);
+		static::$_methodFilters[$class]['alphaNumeric'] = array($isEmpty);
+		static::$_methodFilters[$class]['notEmpty'] = array($isEmpty);
 
 		static::$_methodFilters[$class]['creditCard'] = array(function($self, $params, $chain) {
 			extract($params);
@@ -247,26 +329,24 @@ class Validator extends \lithium\core\StaticObject {
 			return $options['deep'] ? Validator::isLuhn($value) : true;
 		});
 
-		static::$_methodFilters[$class]['email'] = array(
-			function($self, $params, $chain) {
-				extract($params);
-				$defaults = array('deep' => false);
-				$options += $defaults;
+		static::$_methodFilters[$class]['email'] = array(function($self, $params, $chain) {
+			extract($params);
+			$defaults = array('deep' => false);
+			$options += $defaults;
 
-				if (!$chain->next($self, $params, $chain)) {
-					return false;
-				}
-				if (!$options['deep']) {
-					return true;
-				}
-				list($prefix, $host) = explode('@', $params['value']);
-
-				if (getmxrr($host, $mxhosts)) {
-					return is_array($mxhosts);
-				}
+			if (!$chain->next($self, $params, $chain)) {
 				return false;
 			}
-		);
+			if (!$options['deep']) {
+				return true;
+			}
+			list($prefix, $host) = explode('@', $params['value']);
+
+			if (getmxrr($host, $mxhosts)) {
+				return is_array($mxhosts);
+			}
+			return false;
+		});
 	}
 
 	/**
@@ -348,7 +428,7 @@ class Validator extends \lithium\core\StaticObject {
 			'message' => null,
 			'required' => true,
 			'skipEmpty' => false,
-			'format' => 'any'
+			'format' => 'any',
 		);
 		$errors = array();
 
@@ -456,8 +536,8 @@ class Validator extends \lithium\core\StaticObject {
 	 * @param mixed $value
 	 * @param string $format
 	 * @param string $options
-	 * @return boolean
-	 * @todo Write tests for pre- and post-filtering
+	 * @return boolean Returns `true` or `false` indicating whether the validation rule check
+	 *         succeeded or failed.
 	 */
 	public static function rule($rule, $value, $format = 'any', array $options = array()) {
 		if (!isset(static::$_rules[$rule])) {
@@ -542,232 +622,6 @@ class Validator extends \lithium\core\StaticObject {
 			return $options['all'];
 		};
 	}
-
-	/**
-	 * Checks that a string contains something other than whitespace
-	 *
-	 * Returns true if string contains something other than whitespace
-	 *
-	 * $value can be passed as an array:
-	 * array('check' => 'valueToCheck');
-	 *
-	 * @param mixed $value Value to check
-	 * @return boolean Success
-	 */
-	// public static function isNotEmpty($value) {}
-
-	/**
-	 * Checks that a string contains only integer or letters
-	 *
-	 * Returns true if string contains only integer or letters
-	 *
-	 * $value can be passed as an array:
-	 * array('check' => 'valueToCheck');
-	 *
-	 * @param mixed $value Value to check
-	 * @return boolean Success
-	 */
-	// public static function isAlphaNumeric($value) {}
-
-	/**
-	 * Checks that a string length is within s specified range.
-	 * Spaces are included in the character count.
-	 * Returns true is string matches value min, max, or between min and max,
-	 *
-	 * @param string $value Value to check for length
-	 * @param integer $min Minimum value in range (inclusive)
-	 * @param integer $max Maximum value in range (inclusive)
-	 * @return boolean Success
-	 */
-	// public static function isLengthBetween($value, $min, $max) {}
-
-	/**
-	 * Returns true if field is left blank **OR** only whitespace characters are present in its
-	 * value.  Whitespace characters include spaces, tabs, carriage returns and newlines.
-	 *
-	 * $value can be passed as an array:
-	 * array('check' => 'valueToCheck');
-	 *
-	 * @param mixed $value Value to check
-	 * @return boolean Success
-	 */
-	// public static function isBlank($value) {}
-
-	/**
-	 * Validates credit card numbers. Returns true if `$value` is in the proper credit card format.
-	 *
-	 * @see lithium\util\Validator::isLuhn()
-	 * @param mixed $value credit card number to validate
-	 * @param mixed $type 'all' may be passed as a sting, defaults to fast which checks format of
-	 *                     most major credit cards if an array is used only the values of the array
-	 *                     are checked.  Example: array('amex', 'bankcard', 'maestro')
-	 * @param boolean $deep set to true this will check the Luhn algorithm of the credit card.
-	 * @return boolean Success
-	 */
-	// public static function isCreditCard($value, $format = 'fast', $deep = false) {}
-
-	/**
-	 * Date validation, determines if the string passed is a valid date.
-	 * keys that expect full month, day and year will validate leap years
-	 *
-	 * @param string $value a valid date string
-	 * @param mixed $format Use a string or an array of the keys below. Arrays should be passed
-	 * as array('dmy', 'mdy', etc). Possible values are:
-	 *    - dmy 27-12-2006 or 27-12-06 separators can be a space, period, dash, forward slash
-	 *    - mdy 12-27-2006 or 12-27-06 separators can be a space, period, dash, forward slash
-	 *    - ymd 2006-12-27 or 06-12-27 separators can be a space, period, dash, forward slash
-	 *    - dMy 27 December 2006 or 27 Dec 2006
-	 *    - Mdy December 27, 2006 or Dec 27, 2006 comma is optional
-	 *    - My December 2006 or Dec 2006
-	 *    - my 12/2006 separators can be a space, period, dash, forward slash
-	 * @return boolean Success
-	 */
-	// public static function date($value, $format = 'ymd') {}
-
-	/**
-	 * Time validation, determines if the string passed is a valid time.
-	 * Validates time as 24hr (HH:MM) or am/pm ([H]H:MM[a|p]m)
-	 * Does not allow/validate seconds.
-	 *
-	 * @param string $value a valid time string
-	 * @return boolean Success
-	 */
-	// public static function time($value) {}
-
-	/**
-	 * Boolean validation, determines if value passed is a boolean integer or true/false.
-	 *
-	 * @param string $value a valid boolean
-	 * @return boolean Success
-	 */
-	// public static function isBoolean($value) {}
-
-	/**
-	 * Checks that a value is a valid decimal. If $places is null, the $value is allowed to be a
-	 * scientific float.  If no decimal point is found a false will be returned. Both the sign
-	 * and exponent are optional.
-	 *
-	 * @param integer $value The value the test for decimal
-	 * @param integer $precision if set $value value must have exactly $places after the decimal
-	 *                point
-	 * @return boolean Success
-	 */
-	// public static function isDecimal($value, $format = null) {}
-
-	/**
-	 * Validates for an email address.
-	 *
-	 * @param string $value Value to check
-	 * @param boolean $deep Perform a deeper validation (if true), by also checking availability
-	 *                of host
-	 * @return boolean Success
-	 */
-	// public static function isEmail($value, $deep = false) {}
-
-	/**
-	 * Validates IPv4 addresses.
-	 *
-	 * @param string $value The string to test.
-	 * @return boolean Success
-	 */
-	// public static function isIp($value) {}
-
-	/**
-	 * Checks that a value is a monetary amount.
-	 *
-	 * @param string $value Value to check
-	 * @param string $format Where symbol is located (left/right)
-	 * @return boolean Success
-	 */
-	// public static function isMoney($value, $format = 'left') {}
-
-	/**
-	 * Checks if a value is numeric.
-	 *
-	 * @param string $value Value to check
-	 * @return boolean Success
-	 */
-	// public static function isNumeric($value) {}
-
-	/**
-	 * Check that a value is a valid phone number.
-	 *
-	 * @param mixed $value Value to check (string or array)
-	 * @param string $regex Regular expression to use
-	 * @param string $country Country code (defaults to 'all')
-	 * @return boolean Success
-	 */
-	//public static function isPhone($value, $format = 'any') {}
-
-	/**
-	 * Checks that a given value is a valid postal code.
-	 *
-	 * @param mixed $value Value to check
-	 * @param string $regex Regular expression to use
-	 * @param string $country Country to use for formatting
-	 * @return boolean Success
-	 */
-	// public static function isPostalCode($value, $country = null) {}
-
-	/**
-	 * Validate that a number is in specified range.
-	 * if $lower and $upper are not set, will return true if
-	 * $value is a legal finite on this platform
-	 *
-	 * @param string $value Value to check
-	 * @param integer $lower Lower limit
-	 * @param integer $upper Upper limit
-	 * @return boolean Success
-	 */
-	// public static function isInRange($value, $lower = null, $upper = null) {}
-
-	/**
-	 * Checks that a value is a valid Social Security Number.
-	 *
-	 * @param mixed $value Value to check
-	 * @param string $regex Regular expression to use
-	 * @param string $country Country
-	 * @return boolean Success
-	 */
-	// public static function isSsn($value, $format = null) {}
-
-	/**
-	 * Checks that a value is a valid URL according to
-	 * http://www.w3.org/Addressing/URL/url-spec.txt
-	 *
-	 * The regex checks for the following component parts:
-	 * 	    - A valid, optional, scheme
-	 * 		- A valid ip address OR
-	 * 		- A valid domain name as defined by section 2.3.1 of
-	 * 		  http://www.ietf.org/rfc/rfc1035.txt with an optional port number
-	 *	    - An optional valid path
-	 *	    - An optional query string (get parameters)
-	 *	    - An optional fragment (anchor tag)
-	 *
-	 * @param string $value Value to check
-	 * @return boolean Success
-	 */
-	// public static function url($value, $strict = false) {}
-
-	/**
-	 * Luhn algorithm
-	 *
-	 * Checks that a credit card number is a valid Luhn sequence.
-	 *
-	 * @param mixed $value A string or integer representing a credit card number.
-	 * @link http://en.wikipedia.org/wiki/Luhn_algorithm
-	 * @return boolean Success
-	 */
-	// public static function isLuhn($value) {}
-
-	/**
-	 * Checks if a value is in a given list.
-	 *
-	 * @param string $value Value to check
-	 * @param array $list List to check against
-	 * @return boolean Success
-	 */
-	// public static function isInList($value, $list) {}
 }
 
 ?>
