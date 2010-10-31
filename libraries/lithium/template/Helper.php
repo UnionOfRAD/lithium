@@ -129,10 +129,14 @@ abstract class Helper extends \lithium\core\Object {
 	 * @return string Rendered HTML
 	 */
 	protected function _render($method, $string, $params, array $options = array()) {
-		foreach ($params as $key => $value) {
-			$params[$key] = $this->_context->applyHandler($this, $method, $key, $value, $options);
+		$strings = $this->_strings;
+
+		if ($this->_context) {
+			foreach ($params as $key => $value) {
+				$params[$key] = $this->_context->applyHandler($this, $method, $key, $value, $options);
+			}
+			$strings = $this->_context->strings();
 		}
-		$strings = $this->_context ? $this->_context->strings() : $this->_strings;
 		return String::insert(isset($strings[$string]) ? $strings[$string] : $string, $params);
 	}
 
@@ -146,7 +150,7 @@ abstract class Helper extends \lithium\core\Object {
 	 */
 	protected function _attributes($params, $method = null, array $options = array()) {
 		if (!is_array($params)) {
-			return empty($params) ? '' : ' ' . $params;
+			return !$params ? '' : ' ' . $params;
 		}
 		$defaults = array('escape' => true, 'prepend' => ' ', 'append' => '');
 		$options += $defaults;

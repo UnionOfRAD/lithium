@@ -8,10 +8,10 @@
 
 namespace lithium\tests\cases\template;
 
-use \stdClass;
-use \lithium\template\Helper;
-use \lithium\tests\mocks\template\MockHelper;
-use \lithium\tests\mocks\template\MockRenderer;
+use stdClass;
+use lithium\template\Helper;
+use lithium\tests\mocks\template\MockHelper;
+use lithium\tests\mocks\template\MockRenderer;
 
 class HelperTest extends \lithium\test\Unit {
 
@@ -51,6 +51,15 @@ class HelperTest extends \lithium\test\Unit {
 		));
 		$expected = '<script>//alert("XSS!");</script>';
 		$this->assertEqual($expected, $result);
+
+		$result = $this->helper->escape(array(
+			'<script>alert("XSS!");</script>', '<script>alert("XSS!");</script>'
+		));
+		$expected = array(
+			'&lt;script&gt;alert(&quot;XSS!&quot;);&lt;/script&gt;',
+			'&lt;script&gt;alert(&quot;XSS!&quot;);&lt;/script&gt;'
+		);
+		$this->assertEqual($expected, $result);
 	}
 
 	/**
@@ -82,9 +91,29 @@ class HelperTest extends \lithium\test\Unit {
 		$result = $this->helper->testAttributes($attributes);
 		$this->assertEqual($expected, $result);
 
+		$attributes = ' value="1" title="one"';
+		$result = $this->helper->testAttributes('value="1" title="one"');
+		$this->assertEqual($expected, $result);
+
 		$attributes = array('checked' => true, 'title' => 'one');
 		$expected = ' checked="checked" title="one"';
 		$result = $this->helper->testAttributes($attributes);
+		$this->assertEqual($expected, $result);
+
+		$attributes = array('checked' => false);
+		$result = $this->helper->testAttributes($attributes);
+		$this->assertEqual(' ', $result);
+	}
+
+	public function testAttributeEscaping() {
+		$attributes = array('checked' => true, 'title' => '<foo>');
+		$expected = ' checked="checked" title="&lt;foo&gt;"';
+		$result = $this->helper->testAttributes($attributes);
+		$this->assertEqual($expected, $result);
+
+		$attributes = array('checked' => true, 'title' => '<foo>');
+		$expected = ' checked="checked" title="<foo>"';
+		$result = $this->helper->testAttributes($attributes, null, array('escape' => false));
 		$this->assertEqual($expected, $result);
 	}
 
@@ -103,6 +132,12 @@ class HelperTest extends \lithium\test\Unit {
 		$expected = ' selected="true"';
 		$result = $this->helper->testAttributes($attributes);
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testInstantiationWithNoContext() {
+		$this->helper = new MockHelper();
+		$result = $this->helper->testRender(null, "foo {:bar}", array('bar' => 'baz'));
+		$this->assertEqual("foo baz", $result);
 	}
 
 	public function testRender() {
