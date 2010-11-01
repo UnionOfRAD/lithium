@@ -8,7 +8,7 @@
 
 namespace lithium\storage\session\adapter;
 
-use \lithium\util\Set;
+use lithium\util\Set;
 
 /**
  * A minimal adapter to interface with HTTP cookies.

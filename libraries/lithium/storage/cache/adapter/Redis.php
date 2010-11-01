@@ -68,7 +68,7 @@ class Redis extends \lithium\core\Object {
 		$defaults = array(
 			'prefix' => '',
 			'expiry' => '+1 hour',
-			'server' => '127.0.0.1:6379'
+			'server' => '127.0.0.1:6379',
 		);
 		parent::__construct($config + $defaults);
 	}

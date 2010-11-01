@@ -8,7 +8,7 @@
 
 namespace lithium\storage\session\adapter;
 
-use \lithium\util\String;
+use lithium\util\String;
 
 /**
  * Simple memory session storage engine. Used for testing.

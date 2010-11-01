@@ -54,7 +54,7 @@ class File extends \lithium\core\Object {
 		$defaults = array(
 			'path' => LITHIUM_APP_PATH . '/resources/tmp/cache',
 			'prefix' => '',
-			'expiry' => '+1 hour'
+			'expiry' => '+1 hour',
 		);
 		parent::__construct($config + $defaults);
 	}

@@ -48,7 +48,7 @@ class Apc extends \lithium\core\Object {
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'prefix' => '',
-			'expiry' => '+1 hour'
+			'expiry' => '+1 hour',
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -70,7 +70,7 @@ class Apc extends \lithium\core\Object {
 		$expiry = ($expiry) ?: $this->_config['expiry'];
 
 		return function($self, $params, $chain) use ($expiry) {
-			$cachetime = strtotime($expiry) - date('U');
+			$cachetime = (is_int($expiry) ? $expiry : strtotime($expiry)) - time();
 			$key = $params['key'];
 
 			if (is_array($key)) {
@@ -162,10 +162,10 @@ class Apc extends \lithium\core\Object {
 	 * return boolean True if enabled, false otherwise
 	 */
 	public static function enabled() {
-		if (php_sapi_name() === 'cli') {
-			return (extension_loaded('apc') && ini_get('apc.enable_cli'));
-		}
-		return (extension_loaded('apc') && ini_get('apc.enabled'));
+		$loaded = extension_loaded('apc');
+		$isCli = (php_sapi_name() === 'cli');
+		$enabled = (!$isCli && ini_get('apc.enabled')) || ($isCli && ini_get('apc.enable_cli'));
+		return ($loaded && $enabled);
 	}
 }
 

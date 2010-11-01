@@ -8,7 +8,7 @@
 
 namespace lithium\storage\cache\adapter;
 
-use \lithium\util\Set;
+use lithium\util\Set;
 
 /**
  * A Memcache (libmemcached) cache adapter implementation.
