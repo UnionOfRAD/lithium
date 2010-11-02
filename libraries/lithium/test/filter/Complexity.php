@@ -38,10 +38,9 @@ class Complexity extends \lithium\test\Filter {
 		foreach ($tests->invoke('subject') as $class) {
 			$results[$class] = array();
 
-			if (!$methods = Inspector::methods($class, 'ranges')) {
+			if (!$methods = Inspector::methods($class, 'ranges', array('public' => false))) {
 				continue;
 			}
-
 			foreach ($methods as $method => $lines) {
 				$lines = Inspector::lines($class, $lines);
 				$branches = Parser::tokenize(join("\n", (array) $lines), array(
