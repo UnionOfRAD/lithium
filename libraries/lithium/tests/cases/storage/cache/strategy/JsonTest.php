@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\storage\cache\strategy;
 
-use \lithium\storage\cache\strategy\Json;
+use lithium\storage\cache\strategy\Json;
 
 class JsonTest extends \lithium\test\Unit {
 
@@ -27,7 +27,7 @@ class JsonTest extends \lithium\test\Unit {
 		$expected = array('some' => 'data');
 		$encoded = json_encode($expected);
 		$result = $this->Json->read($encoded);
-		$this->assertEqual((object) $expected, $result);
+		$this->assertEqual($expected, $result);
 	}
 }
 
