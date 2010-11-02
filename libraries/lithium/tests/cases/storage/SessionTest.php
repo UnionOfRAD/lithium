@@ -203,6 +203,49 @@ class SessionTest extends \lithium\test\Unit {
 		$this->expectException("Configuration 'default' has not been defined.");
 		$this->assertFalse(Session::isStarted('default'));
 	}
+
+	public function testReadFilter() {
+		Session::config(array(
+			'primary' => array('adapter' => new Memory(), 'filters' => array()),
+			'secondary' => array('adapter' => new Memory(), 'filters' => array())
+		));
+		Session::applyFilter('read', function($self, $params, $chain) {
+			$result = $chain->next($self, $params, $chain);
+
+			if (isset($params['options']['increment'])) {
+				$result += $params['options']['increment'];
+			}
+			return $result;
+		});
+		Session::write('foo', 'bar');
+		$this->assertEqual('bar', Session::read('foo'));
+
+		Session::write('bar', 1);
+		$this->assertEqual(2, Session::read('bar', array('increment' => 1)));
+	}
+
+	public function testStrategies() {
+		Session::config(array('primary' => array(
+			'adapter' => new Memory(), 'filters' => array(), 'strategies' => array(
+				'lithium\storage\cache\strategy\Json'
+			)
+		)));
+
+		Session::write('test', array('foo' => 'bar'));
+		$this->assertEqual(array('foo' => 'bar'), Session::read('test'));
+
+		$this->assertTrue(Session::check('test'));
+		$this->assertTrue(Session::check('test', array('strategies' => false)));
+
+		$result = Session::read('test', array('strategies' => false));
+		$this->assertEqual('{"foo":"bar"}', $result);
+
+		$result = Session::clear(array('strategies' => false));
+		$this->assertNull(Session::read('test'));
+
+		$this->assertFalse(Session::check('test'));
+		$this->assertFalse(Session::check('test', array('strategies' => false)));
+	}
 }
 
 ?>
