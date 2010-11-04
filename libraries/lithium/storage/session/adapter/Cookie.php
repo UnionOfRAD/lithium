@@ -9,6 +9,7 @@
 namespace lithium\storage\session\adapter;
 
 use lithium\util\Set;
+use lithium\util\Inflector;
 
 /**
  * A minimal adapter to interface with HTTP cookies.
@@ -51,7 +52,10 @@ class Cookie extends \lithium\core\Object {
 	 */
 	protected function _init() {
 		parent::_init();
-		$this->_config['name'] = $this->_config['name'] ?: basename(LITHIUM_APP_PATH) . 'cookie';
+
+		if (!$this->_config['name']) {
+			$this->_config['name'] = Inflector::slug(basename(LITHIUM_APP_PATH)) . 'cookie';
+		}
 	}
 
 	/**
@@ -136,7 +140,7 @@ class Cookie extends \lithium\core\Object {
 	 * @return boolean True on successful write, false otherwise.
 	 */
 	public function write($key, $value = null, array $options = array()) {
-		$expire = !isset($options['expire']) && empty($this->_config['expire']);
+		$expire = (!isset($options['expire']) && empty($this->_config['expire']));
 		$config = $this->_config;
 
 		if ($expire && $key != $config['name']) {
