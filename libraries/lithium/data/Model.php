@@ -648,13 +648,17 @@ class Model extends \lithium\core\StaticObject {
 
 	/**
 	 * An instance method (called on record and document objects) to create or update the record or
-	 * document in the database that corresponds to `$entity`. For example:
+	 * document in the database that corresponds to `$entity`.
+	 *
+	 * For example:
 	 * {{{
 	 * $post = Post::create();
 	 * $post->title = "My post";
 	 * $post->save(null, array('validate' => false));
 	 * }}}
 	 *
+	 * @see lithium\data\Model::$validates
+	 * @see lithium\data\Model::validates()
 	 * @param object $entity The record or document object to be saved in the database. This
 	 *               parameter is implicit and should not be passed under normal circumstances.
 	 *               In the above example, the call to `save()` on the `$post` object is
@@ -664,8 +668,10 @@ class Model extends \lithium\core\StaticObject {
 	 * @param array $options Options:
 	 *        - `'callbacks'` _boolean_: If `false`, all callbacks will be disabled before
 	 *           executing. Defaults to `true`.
-	 *        - `'validate'` _boolean_: If `false`, validation will be skipped, and the record will
-	 *          be immediately saved. Defaults to `true`.
+	 *        - `'validate'` _mixed_: If `false`, validation will be skipped, and the record will
+	 *          be immediately saved. Defaults to `true`. May also be specified as an array, in
+	 *          which case it will replace the default validation rules specified in the
+	 *         `$validates` property of the model.
 	 *        - `'whitelist'` _array_: An array of fields that are allowed to be saved to this
 	 *          record.
 	 *
