@@ -526,7 +526,7 @@ class Unit extends \lithium\core\Object {
 	 * @param array $headers When empty, value of `headers_list()` is used.
 	 */
 	public function assertCookie($expected, $headers = null) {
-		$defaults = array('path' => '/', 'name' => '\w+');
+		$defaults = array('path' => '/', 'name' => '[\w.-]+');
 		$expected += $defaults;
 
 		$headers = ($headers) ?: headers_list();

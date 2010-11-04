@@ -108,14 +108,12 @@ class GroupTest extends \lithium\test\Unit {
 
 	public function testTestsRun() {
 		$group = new Group();
-		$result = $group->add('\lithium\tests\mocks\test\MockUnitTest');
-		$expected = array(
-			'\lithium\tests\mocks\test\MockUnitTest',
-		);
+		$result = $group->add('lithium\tests\mocks\test\MockUnitTest');
+		$expected = array('lithium\tests\mocks\test\MockUnitTest');
 		$this->assertEqual($expected, $result);
 
 		$results = $group->tests();
-		$this->assertTrue(is_a($results, '\lithium\util\Collection'));
+		$this->assertTrue(is_a($results, 'lithium\util\Collection'));
 
 		$results = $group->tests();
 		$this->assertTrue(is_a($results->current(), 'lithium\tests\mocks\test\MockUnitTest'));
@@ -134,8 +132,8 @@ class GroupTest extends \lithium\test\Unit {
 		$result = $results[0][0]['class'];
 		$this->assertEqual($expected, $result);
 
-		$expected = realpath(str_replace('\\', '/', LITHIUM_LIBRARY_PATH)
-			. '/lithium/tests/mocks/test/MockUnitTest.php');
+		$expected = str_replace('\\', '/', LITHIUM_LIBRARY_PATH);
+		$expected = realpath($expected . '/lithium/tests/mocks/test/MockUnitTest.php');
 		$result = $results[0][0]['file'];
 		$this->assertEqual($expected, str_replace('\\', '/', $result));
 	}
