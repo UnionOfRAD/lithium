@@ -208,6 +208,14 @@ class CookieTest extends \lithium\test\Unit {
 		$cookie = new Cookie(array('expire' => null));
 		$this->assertNull($cookie->write('bad', 'val'));
 	}
+
+	public function testNameWithDotCookie() {
+		$cookie = new Cookie(array('name' => 'my.name'));
+		$key = 'key';
+		$value = 'value';
+		$result = $cookie->write($key, $value)->__invoke($cookie, compact('key', 'value'), null);
+		$this->assertCookie(compact('key', 'value'));
+	}
 }
 
 ?>
