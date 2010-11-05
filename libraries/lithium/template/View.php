@@ -241,11 +241,17 @@ class View extends \lithium\core\Object {
 	 * @param string $template Not used in this handler.
 	 * @param array $data Template data.
 	 * @param array $options Renderer options.
+	 * @filter This method can be filtered.
 	 */
 	protected function _layout($template, $data, array $options = array()) {
 		$template = $this->_loader->template('layout', $options);
 		$data = (array) $data + $this->outputFilters;
-		return $this->_renderer->render($template, $data, $options);
+		$params = compact('template', 'data', 'options');
+		$params['renderer'] = $this->_renderer;
+		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) {
+			extract($params);
+			return $renderer->render($template, $data, $options);
+		});
 	}
 }
 
