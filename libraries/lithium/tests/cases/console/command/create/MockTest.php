@@ -45,8 +45,8 @@ class MockTest extends \lithium\test\Unit {
 
 	public function testMockModel() {
 		$this->request->params += array(
-			'command' => 'create', 'action' => 'run',
-			'args' => array('mock', 'model', 'Post')
+			'command' => 'create', 'action' => 'mock',
+			'args' => array('model', 'Post')
 		);
 		$mock = new Mock(array(
 			'request' => $this->request, 'classes' => $this->classes

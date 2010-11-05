@@ -45,8 +45,8 @@ class ViewTest extends \lithium\test\Unit {
 
 	public function testIndexView() {
 		$this->request->params += array(
-			'command' => 'create', 'action' => 'run',
-			'args' => array('view', 'Posts', 'index.html')
+			'command' => 'create', 'action' => 'view',
+			'args' => array('Posts', 'index.html')
 		);
 		$view = new View(array(
 			'request' => $this->request, 'classes' => $this->classes

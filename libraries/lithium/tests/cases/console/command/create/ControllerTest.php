@@ -70,8 +70,8 @@ class ControllerTest extends \lithium\test\Unit {
 
 	public function testRun() {
 		$this->request->params += array(
-			'command' => 'create', 'action' => 'run',
-			'args' => array('controller', 'Posts')
+			'command' => 'create', 'action' => 'controller',
+			'args' => array('Posts')
 		);
 		$controller = new Controller(array(
 			'request' => $this->request, 'classes' => $this->classes

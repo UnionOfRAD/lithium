@@ -46,8 +46,8 @@ class TestTest extends \lithium\test\Unit {
 
 	public function testTestModel() {
 		$this->request->params += array(
-			'command' => 'create', 'action' => 'run',
-			'args' => array('test', 'model', 'Post')
+			'command' => 'create', 'action' => 'test',
+			'args' => array('model', 'Post')
 		);
 		$test = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
@@ -84,6 +84,7 @@ test;
 	}
 
 	public function testTestModelWithMethods() {
+		$this->_cleanUp();
 		mkdir($this->_testPath . '/create_test/models/', 0755, true);
 		file_put_contents($this->_testPath . '/create_test/models/Post.php',
 "<?php
@@ -95,8 +96,8 @@ class Post {
 );
 
 		$this->request->params += array(
-			'command' => 'create', 'action' => 'run',
-			'args' => array('test', 'model', 'Post')
+			'command' => 'create', 'action' => 'test',
+			'args' => array('model', 'Post')
 		);
 		$test = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
