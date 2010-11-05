@@ -256,7 +256,6 @@ abstract class Database extends \lithium\data\Source {
 				$sql = $self->renderCommand($query);
 			}
 			$result = $self->invokeMethod('_execute', array($sql));
-			// var_dump($result);
 
 			switch ($return) {
 				case 'resource':
