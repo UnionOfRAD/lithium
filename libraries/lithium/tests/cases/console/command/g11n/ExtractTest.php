@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\console\command\g11n;
 
-use \lithium\console\command\g11n\Extract;
-use \lithium\console\Request;
+use lithium\console\Request;
+use lithium\console\command\g11n\Extract;
 
 class ExtractTest extends \lithium\test\Unit {
 
@@ -25,7 +25,7 @@ class ExtractTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->command = new Extract(array(
 			'request' => new Request(array('input' => fopen('php://temp', 'w+'))),
-			'classes' => array('response' => '\lithium\tests\mocks\console\MockResponse')
+			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse')
 		));
 		mkdir($this->command->source = "{$this->_path}/source");
 		mkdir($this->command->destination = "{$this->_path}/destination");
@@ -33,6 +33,12 @@ class ExtractTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		$this->_cleanUp();
+	}
+
+	public function testInit() {
+		$command = new Extract();
+		$this->assertEqual(LITHIUM_APP_PATH, $command->source);
+		$this->assertEqual(LITHIUM_APP_PATH . '/resources/g11n', $command->destination);
 	}
 
 	public function testFailRead() {

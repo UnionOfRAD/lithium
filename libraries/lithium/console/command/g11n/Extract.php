@@ -8,9 +8,9 @@
 
 namespace lithium\console\command\g11n;
 
-use \Exception;
-use \DateTime;
-use \lithium\g11n\Catalog;
+use DateTime;
+use Exception;
+use lithium\g11n\Catalog;
 
 /**
  * The `Extract` class is a command for extracting messages from files.
@@ -82,15 +82,9 @@ class Extract extends \lithium\console\Command {
 		));
 
 		if (!$name) {
-			$adapter = $this->in('Adapter:', array(
-				'default' => 'Code'
-			));
-			$path = $this->in('Path:', array(
-				'default' => $this->source
-			));
-			$scope = $this->in('Scope:', array(
-				'default' => $this->scope
-			));
+			$adapter = $this->in('Adapter:', array('default' => 'Code'));
+			$path = $this->in('Path:', array('default' => $this->source));
+			$scope = $this->in('Scope:', array('default' => $this->scope));
 			$name = 'runtime' . uniqid();
 			$configs[$name] = compact('adapter', 'path', 'scope');
 		}
@@ -99,7 +93,7 @@ class Extract extends \lithium\console\Command {
 		try {
 			return Catalog::read($name, 'messageTemplate', 'root', array(
 				'scope' => $configs[$name]['scope'],
-				'lossy' => false
+				'lossy' => false,
 			));
 		} catch (Exception $e) {
 			return false;
@@ -133,15 +127,9 @@ class Extract extends \lithium\console\Command {
 		));
 
 		if (!$name) {
-			$adapter = $this->in('Adapter:', array(
-				'default' => 'Gettext'
-			));
-			$path = $this->in('Path:', array(
-				'default' => $this->destination
-			));
-			$scope = $this->in('Scope:', array(
-				'default' => $this->scope
-			));
+			$adapter = $this->in('Adapter:', array('default' => 'Gettext'));
+			$path = $this->in('Path:', array('default' => $this->destination));
+			$scope = $this->in('Scope:', array('default' => $this->scope));
 			$name = 'runtime' . uniqid();
 			$configs[$name] = compact('adapter', 'path', 'scope');
 			Catalog::config($configs);

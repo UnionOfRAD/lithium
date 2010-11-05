@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\console;
 
-use \lithium\console\Router;
-use \lithium\console\Request;
+use lithium\console\Router;
+use lithium\console\Request;
 
 class RouterTest extends \lithium\test\Unit {
 

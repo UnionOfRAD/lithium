@@ -8,10 +8,10 @@
 
 namespace lithium\tests\cases\console\command;
 
-use \Phar;
-use \lithium\console\command\Library;
-use \lithium\core\Libraries;
-use \lithium\console\Request;
+use Phar;
+use lithium\console\command\Library;
+use lithium\core\Libraries;
+use lithium\console\Request;
 
 class LibraryTest extends \lithium\test\Unit {
 
@@ -42,8 +42,8 @@ class LibraryTest extends \lithium\test\Unit {
 		));
 
 		$this->classes = array(
-			'service' => '\lithium\tests\mocks\console\command\MockLibraryService',
-			'response' => '\lithium\tests\mocks\console\MockResponse'
+			'service' => 'lithium\tests\mocks\console\command\MockLibraryService',
+			'response' => 'lithium\tests\mocks\console\MockResponse'
 		);
 		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
 		$this->library = new Library(array(

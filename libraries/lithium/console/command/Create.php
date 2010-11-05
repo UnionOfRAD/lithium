@@ -8,9 +8,9 @@
 
 namespace lithium\console\command;
 
-use \lithium\core\Libraries;
-use \lithium\util\Inflector;
-use \lithium\util\String;
+use lithium\core\Libraries;
+use lithium\util\Inflector;
+use lithium\util\String;
 
 /**
  * The `create` command allows you to rapidly develop your models, views, controllers, and tests
@@ -48,7 +48,7 @@ class Create extends \lithium\console\Command {
 	public $template = null;
 
 	/**
-	 * Holds library data from `\lithium\core\Libraries::get()`
+	 * Holds library data from `lithium\core\Libraries::get()`.
 	 *
 	 * @var array
 	 */

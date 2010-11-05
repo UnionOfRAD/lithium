@@ -8,7 +8,7 @@
 
 namespace lithium\console\command\create;
 
-use \lithium\util\Inflector;
+use lithium\util\Inflector;
 
 /**
  * Generate a Controller class in the `--library` namespace

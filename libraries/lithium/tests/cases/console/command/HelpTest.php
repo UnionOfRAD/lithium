@@ -2,9 +2,9 @@
 
 namespace lithium\tests\cases\console\command;
 
-use \lithium\console\command\Help;
-use \lithium\console\Request;
-use \lithium\tests\mocks\console\command\MockCommandHelp;
+use lithium\console\command\Help;
+use lithium\console\Request;
+use lithium\tests\mocks\console\command\MockCommandHelp;
 
 class HelpTest extends \lithium\test\Unit {
 
@@ -15,7 +15,7 @@ class HelpTest extends \lithium\test\Unit {
 	protected $_testPath = null;
 
 	public function setUp() {
-		$this->classes = array('response' => '\lithium\tests\mocks\console\MockResponse');
+		$this->classes = array('response' => 'lithium\tests\mocks\console\MockResponse');
 		$this->_backup['cwd'] = getcwd();
 		$this->_backup['_SERVER'] = $_SERVER;
 		$_SERVER['argv'] = array();

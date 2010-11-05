@@ -8,10 +8,10 @@
 
 namespace lithium\tests\cases\console\command;
 
-use \lithium\tests\mocks\console\command\MockCreate;
-use \lithium\console\Request;
-use \lithium\core\Libraries;
-use \lithium\data\Connections;
+use lithium\tests\mocks\console\command\MockCreate;
+use lithium\console\Request;
+use lithium\core\Libraries;
+use lithium\data\Connections;
 
 class CreateTest extends \lithium\test\Unit {
 
@@ -40,7 +40,7 @@ class CreateTest extends \lithium\test\Unit {
 
 		Connections::add('default', array(
 			'type' => null,
-			'adapter' => '\lithium\tests\mocks\data\model\MockDatabase'
+			'adapter' => 'lithium\tests\mocks\data\model\MockDatabase'
 		));
 	}
 

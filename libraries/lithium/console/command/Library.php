@@ -8,10 +8,10 @@
 
 namespace lithium\console\command;
 
-use \Phar;
-use \Exception;
-use \RuntimeException;
-use \lithium\core\Libraries;
+use Phar;
+use Exception;
+use RuntimeException;
+use lithium\core\Libraries;
 
 /**
  * The Library command is used to archive and extract Phar::GZ archives. Requires zlib extension.

@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\console;
 
-use \lithium\console\Response;
-use \lithium\console\Request;
+use lithium\console\Response;
+use lithium\console\Request;
 
 class ResponseTest extends \lithium\test\Unit {
 

@@ -8,9 +8,9 @@
 
 namespace lithium\tests\cases\console;
 
-use \lithium\console\Request;
-use \lithium\tests\mocks\console\MockCommand;
-use \lithium\tests\mocks\console\command\MockCommandHelp;
+use lithium\console\Request;
+use lithium\tests\mocks\console\MockCommand;
+use lithium\tests\mocks\console\command\MockCommandHelp;
 
 class CommandTest extends \lithium\test\Unit {
 
@@ -18,7 +18,7 @@ class CommandTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
-		$this->classes = array('response' => '\lithium\tests\mocks\console\MockResponse');
+		$this->classes = array('response' => 'lithium\tests\mocks\console\MockResponse');
 	}
 
 	public function testConstruct() {

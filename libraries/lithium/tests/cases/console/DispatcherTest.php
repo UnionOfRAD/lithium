@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\console;
 
-use \lithium\console\Dispatcher;
-use \lithium\console\Request;
+use lithium\console\Dispatcher;
+use lithium\console\Request;
 
 class DispatcherTest extends \lithium\test\Unit {
 
@@ -27,8 +27,8 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testEmptyConfigReturnRules() {
 		$result = Dispatcher::config();
 		$expected = array('rules' => array(
-			'command' => array(array('\lithium\util\Inflector', 'camelize')),
-			'action' => array(array('\lithium\util\Inflector', 'camelize', array(false)))
+			'command' => array(array('lithium\util\Inflector', 'camelize')),
+			'action' => array(array('lithium\util\Inflector', 'camelize', array(false)))
 		));
 		$this->assertEqual($expected, $result);
 	}
@@ -36,7 +36,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testConfigWithClasses() {
 		Dispatcher::config(array(
 			'classes' => array(
-				'request' => '\lithium\tests\mocks\console\MockDispatcherRequest'
+				'request' => 'lithium\tests\mocks\console\MockDispatcherRequest'
 			)
 		));
 		$expected = 'run';
@@ -47,7 +47,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testRunWithCommand() {
 		$response = Dispatcher::run(new Request(array(
 			'args' => array(
-				'\lithium\tests\mocks\console\MockDispatcherCommand'
+				'lithium\tests\mocks\console\MockDispatcherCommand'
 			)
 		)));
 		$expected = 'run';
@@ -58,7 +58,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testRunWithPassed() {
 		$response = Dispatcher::run(new Request(array(
 			'args' => array(
-				'\lithium\tests\mocks\console\MockDispatcherCommand',
+				'lithium\tests\mocks\console\MockDispatcherCommand',
 				'with param'
 			)
 		)));
@@ -75,7 +75,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testRunWithAction() {
 		$response = Dispatcher::run(new Request(array(
 			'args' => array(
-				'\lithium\tests\mocks\console\MockDispatcherCommand',
+				'lithium\tests\mocks\console\MockDispatcherCommand',
 				'testAction'
 			)
 		)));
@@ -115,7 +115,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testRunWithCamelizingAction() {
 		$result = Dispatcher::run(new Request(array(
 			'args' => array(
-				'\lithium\tests\mocks\console\command\MockCommandHelp',
+				'lithium\tests\mocks\console\command\MockCommandHelp',
 				'sample-task-with-optional-args'
 			)
 		)));
@@ -123,7 +123,7 @@ class DispatcherTest extends \lithium\test\Unit {
 
 		$result = Dispatcher::run(new Request(array(
 			'args' => array(
-				'\lithium\tests\mocks\console\command\MockCommandHelp',
+				'lithium\tests\mocks\console\command\MockCommandHelp',
 				'sample_task_with_optional_args'
 			)
 		)));

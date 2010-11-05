@@ -18,7 +18,7 @@ class Router extends \lithium\core\Object {
 	/**
 	 * Parse incoming request from console
 	 *
-	 * @param object $request \lithium\console\Request
+	 * @param object $request lithium\console\Request
 	 * @return array $params
 	 *
 	 **/

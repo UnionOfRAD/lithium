@@ -8,9 +8,9 @@
 
 namespace lithium\console\command\create;
 
-use \lithium\core\Libraries;
-use \lithium\util\Inflector;
-use \lithium\analysis\Inspector;
+use lithium\core\Libraries;
+use lithium\util\Inflector;
+use lithium\analysis\Inspector;
 
 /**
  * Generate a Test class in the `--library` namespace

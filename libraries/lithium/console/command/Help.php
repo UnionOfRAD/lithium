@@ -8,10 +8,10 @@
 
 namespace lithium\console\command;
 
-use \lithium\core\Libraries;
-use \lithium\util\Inflector;
-use \lithium\analysis\Inspector;
-use \lithium\analysis\Docblock;
+use lithium\core\Libraries;
+use lithium\util\Inflector;
+use lithium\analysis\Inspector;
+use lithium\analysis\Docblock;
 
 /**
  * Get information about a particular class including methods, properties, and descriptions.

@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\console;
 
-use \lithium\console\Request;
+use lithium\console\Request;
 
 class RequestTest extends \lithium\test\Unit {
 

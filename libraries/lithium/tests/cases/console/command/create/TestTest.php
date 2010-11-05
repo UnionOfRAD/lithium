@@ -8,10 +8,10 @@
 
 namespace lithium\tests\cases\console\command\create;
 
-use \lithium\console\command\Create;
-use \lithium\console\command\create\Test;
-use \lithium\console\Request;
-use \lithium\core\Libraries;
+use lithium\console\command\Create;
+use lithium\console\command\create\Test;
+use lithium\console\Request;
+use lithium\core\Libraries;
 
 class TestTest extends \lithium\test\Unit {
 
@@ -28,7 +28,7 @@ class TestTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		Libraries::cache(false);
-		$this->classes = array('response' => '\lithium\tests\mocks\console\MockResponse');
+		$this->classes = array('response' => 'lithium\tests\mocks\console\MockResponse');
 		$this->_backup['cwd'] = getcwd();
 		$this->_backup['_SERVER'] = $_SERVER;
 		$_SERVER['argv'] = array();

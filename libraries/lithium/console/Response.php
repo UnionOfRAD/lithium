@@ -8,7 +8,7 @@
 
 namespace lithium\console;
 
-use \lithium\util\String;
+use lithium\util\String;
 
 /**
  * The `Response` class is used by other console classes to generate output. It contains stream

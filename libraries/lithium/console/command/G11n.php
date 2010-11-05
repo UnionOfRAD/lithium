@@ -8,7 +8,7 @@
 
 namespace lithium\console\command;
 
-use \lithium\console\command\g11n\Extract;
+use lithium\console\command\g11n\Extract;
 
 /**
  * The `G11n` set of commands deals with the extraction and merging of message templates.

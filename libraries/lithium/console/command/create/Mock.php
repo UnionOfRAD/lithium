@@ -8,7 +8,7 @@
 
 namespace lithium\console\command\create;
 
-use \lithium\util\Inflector;
+use lithium\util\Inflector;
 
 /**
  * Generate a Mock that extends the name of the given class in the `--library` namespace.
