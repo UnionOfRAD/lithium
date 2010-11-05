@@ -73,11 +73,12 @@ class Create extends \lithium\console\Command {
 	 * @return boolean
 	 */
 	public function run($command = null) {
-		$this->template = $this->template ?: $command;
-
-		if ($command && !$this->request->args(1)) {
+		if ($command && !$this->request->args()) {
 			return $this->_default($command);
 		}
+		$this->request->shift();
+		$this->template = $this->template ?: $command;
+
 		if (!$command) {
 			$command = $this->in('What would you like to create?', array(
 				'choices' => array('model', 'view', 'controller', 'test', 'mock')
@@ -111,8 +112,6 @@ class Create extends \lithium\console\Command {
 	 * @return void
 	 */
 	protected function _execute($command) {
-		$this->request->shift(2);
-
 		if (!$class = $this->_instance($command)) {
 			return false;
 		}
@@ -120,10 +119,9 @@ class Create extends \lithium\console\Command {
 		$params = $class->invokeMethod('_params');
 
 		foreach ($params as $i => $param) {
-			if (!$data[$param] = $class->invokeMethod("_{$param}", array($this->request))) {
-				$data[$param] = $this->request->args($i);
-			}
+			$data[$param] = $class->invokeMethod("_{$param}", array($this->request));
 		}
+
 		if ($message = $class->invokeMethod('_save', array($data))) {
 			$this->out($message);
 			return true;
@@ -139,16 +137,17 @@ class Create extends \lithium\console\Command {
 	 */
 	protected function _default($name) {
 		$commands = array(
-			array('model', $name),
-			array('controller', $name),
-			array('test', 'model', $name),
+			array('model', Inflector::classify($name)),
+			array('controller', Inflector::pluralize($name)),
+			array('test', 'model', Inflector::classify($name)),
 			array('test', 'controller', Inflector::pluralize($name))
 		);
-		foreach ($commands as $command) {
-			$this->template = $command[0];
-			$this->request->params['args'] = $command;
+		foreach ($commands as $args) {
+			$command = $this->template = $this->request->params['command'] = array_shift($args);
+			$this->request->params['action'] = array_shift($args);
+			$this->request->params['args'] = $args;
 
-			if (!$this->_execute($command[0])) {
+			if (!$this->_execute($command)) {
 				return false;
 			}
 		}

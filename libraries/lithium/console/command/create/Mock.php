@@ -27,7 +27,7 @@ class Mock extends \lithium\console\command\Create {
      * @return string
      */
 	protected function _namespace($request, $options = array()) {
-		$request->shift();
+		$request->params['command'] = $request->action;
 		return parent::_namespace($request, array('prepend' => 'tests.mocks.'));
 	}
 
@@ -50,8 +50,8 @@ class Mock extends \lithium\console\command\Create {
      * @return string
      */
 	protected function _class($request) {
-		$name = $request->action;
-		$type = $request->command;
+		$type = $request->action;
+		$name = $request->args();
 
 		if ($command = $this->_instance($type)) {
 			$request->params['action'] = $name;

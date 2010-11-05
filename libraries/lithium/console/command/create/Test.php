@@ -29,7 +29,7 @@ class Test extends \lithium\console\command\Create {
      * @return string
      */
 	protected function _namespace($request, $options = array()) {
-		$request->shift();
+		$request->params['command'] = $request->action;
 		return parent::_namespace($request, array('prepend' => 'tests.cases.'));
 	}
 
@@ -41,8 +41,8 @@ class Test extends \lithium\console\command\Create {
      */
 	protected function _use($request) {
 		$namespace = parent::_namespace($request);
-		$class = $request->action;
-		return "\\{$namespace}\\{$class}";
+		$name = $this->_name($request);
+		return "\\{$namespace}\\{$name}";
 	}
 
     /**
@@ -52,13 +52,7 @@ class Test extends \lithium\console\command\Create {
      * @return string
      */
 	protected function _class($request) {
-		$name = $request->action;
-		$type = $request->command;
-
-		if ($command = $this->_instance($type)) {
-			$request->params['action'] = $name;
-			$name = $command->invokeMethod('_class', array($request));
-		}
+		$name = $this->_name($request);
 		return  Inflector::classify("{$name}Test");
 	}
 
@@ -76,13 +70,30 @@ class Test extends \lithium\console\command\Create {
 			return "";
 		}
 		$methods = (array) Inspector::methods($use, 'extents');
-
 		$testMethods = array();
 
 		foreach (array_keys($methods) as $method) {
 			$testMethods[] = "\tpublic function test" . ucwords($method) . "() {}";
 		}
 		return join("\n", $testMethods);
+	}
+
+	/**
+	 * Get the class to be tested
+	 *
+	 * @param string $request
+     * @return string
+	 */
+	protected function _name($request) {
+		$type = $request->action;
+		$name = $request->args();
+
+		if ($command = $this->_instance($type)) {
+			$request->params['action'] = $name;
+			$name = $command->invokeMethod('_class', array($request));
+		}
+		$request->params['action'] = $type;
+		return $name;
 	}
 }
 
