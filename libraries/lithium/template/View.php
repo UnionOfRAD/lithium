@@ -228,11 +228,16 @@ class View extends \lithium\core\Object {
 	 * @param string $template Template to be rendered.
 	 * @param array $data Template data.
 	 * @param array $options Renderer options.
+	 * @filter This method can be filtered.
 	 */
 	protected function _template($template, $data, array $options = array()) {
 		$template = $this->_loader->template('template', $options);
 		$data = $data + $this->outputFilters;
-		return $this->_renderer->render($template, $data, $options);
+		$params = compact('template', 'data', 'options');
+		$_renderer = $this->_renderer;
+		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use (&$_renderer) {
+			return $_renderer->render($params['template'], $params['data'], $params['options']);
+		});
 	}
 
 	/**
@@ -247,10 +252,9 @@ class View extends \lithium\core\Object {
 		$template = $this->_loader->template('layout', $options);
 		$data = (array) $data + $this->outputFilters;
 		$params = compact('template', 'data', 'options');
-		$params['renderer'] = $this->_renderer;
-		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) {
-			extract($params);
-			return $renderer->render($template, $data, $options);
+		$_renderer = $this->_renderer;
+		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use(&$_renderer) {
+			return $_renderer->render($params['template'], $params['data'], $params['options']);
 		});
 	}
 }
