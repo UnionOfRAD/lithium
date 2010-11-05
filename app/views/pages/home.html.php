@@ -154,17 +154,12 @@ foreach ($sanityChecks as $checkName => $check) {
 	<code><?php echo realpath(LITHIUM_APP_PATH . '/config/routes.php'); ?></code>.
 </p>
 
-<?php
-if (!empty($solutions)) {
-	foreach ($solutions as $solution) { ?>
-
-<h4 id="<?php echo $solution['id']; ?>"><?php echo $solution['title']; ?></h4>
-<p><?php echo $solution['content']; ?></p>
-
-<?php	}
-}
-
-?>
+<?php if ($solutions) { ?>
+	<?php foreach ($solutions as $solution) { ?>
+		<h4 id="<?php echo $solution['id']; ?>"><?php echo $solution['title']; ?></h4>
+		<p><?php echo $solution['content']; ?></p>
+	<?php } ?>
+<?php } ?>
 
 <h4>Additional Resources</h4>
 <ul>
