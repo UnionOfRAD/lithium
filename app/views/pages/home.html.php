@@ -169,7 +169,8 @@ if (!empty($solutions)) {
 <h4>Additional Resources</h4>
 <ul>
 	<li><a href="http://lithify.me/docs/lithium">Lithium API</a></li>
-	<li><a href="http://rad-dev.org/lithium/wiki">Lithium Development Wiki</a></li>
-	<li><a href="http://rad-dev.org/lithium">Lithium Source</a></li>
+	<li><a href="http://sphere.lithify.me/">Lithium Community</a></li>
+	<li><a href="http://dev.lithify.me/lithium/wiki">Lithium Development Wiki</a></li>
+	<li><a href="http://dev.lithify.me/lithium/source">Lithium Source</a></li>
 	<li><a href="irc://irc.freenode.net/#li3">#li3 irc channel</a></li>
 </ul>
