@@ -214,12 +214,18 @@ class View extends \lithium\core\Object {
 	 * @param string $template Template to be rendered.
 	 * @param array $data Template data.
 	 * @param array $options Renderer options.
+	 * @filter This method can be filtered.
 	 */
 	protected function _element($template, $data, array $options = array()) {
 		$options += array('controller' => 'elements', 'template' => $template);
 		$template = $this->_loader->template('template', $options);
 		$data = $data + $this->outputFilters;
-		return $this->_renderer->render($template, $data, $options);
+		$params = compact('template', 'data', 'options');
+		$_renderer = $this->_renderer;
+		$filter = function($self, $params, $chain) use (&$_renderer) {
+			return $_renderer->render($params['template'], $params['data'], $params['options']);
+		};
+		return $this->_filter(__METHOD__, $params, $filter);
 	}
 
 	/**
@@ -235,9 +241,10 @@ class View extends \lithium\core\Object {
 		$data = $data + $this->outputFilters;
 		$params = compact('template', 'data', 'options');
 		$_renderer = $this->_renderer;
-		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use (&$_renderer) {
+		$filter = function($self, $params, $chain) use (&$_renderer) {
 			return $_renderer->render($params['template'], $params['data'], $params['options']);
-		});
+		};
+		return $this->_filter(__METHOD__, $params, $filter);
 	}
 
 	/**
@@ -253,9 +260,10 @@ class View extends \lithium\core\Object {
 		$data = (array) $data + $this->outputFilters;
 		$params = compact('template', 'data', 'options');
 		$_renderer = $this->_renderer;
-		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use(&$_renderer) {
+		$filter = function($self, $params, $chain) use (&$_renderer) {
 			return $_renderer->render($params['template'], $params['data'], $params['options']);
-		});
+		};
+		return $this->_filter(__METHOD__, $params, $filter);
 	}
 }
 
