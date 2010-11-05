@@ -8,8 +8,8 @@
 
 namespace lithium;
 
-use \lithium\core\Libraries;
-use \lithium\console\Dispatcher;
+use lithium\core\Libraries;
+use lithium\console\Dispatcher;
 
 /**
  * Determine if we're in an application context by moving up the directory tree looking for

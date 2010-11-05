@@ -29,14 +29,16 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertNull(Libraries::locate('authAdapter', 'Form'));
 
 		$paths = Libraries::paths();
-		$test  = array('authAdapter' => array('lithium\security\auth\adapter\{:name}'));
+		$test = array('authAdapter' => array('lithium\security\auth\adapter\{:name}'));
 		Libraries::paths($test);
-
 		$this->assertEqual($paths + $test, Libraries::paths());
 
 		$class = Libraries::locate('authAdapter', 'Form');
 		$expected = 'lithium\security\auth\adapter\Form';
 		$this->assertEqual($expected, $class);
+
+		Libraries::paths($paths + array('authAdapter' => false));
+		$this->assertEqual($paths, Libraries::paths());
 	}
 
 	public function testPathTransform() {
@@ -227,6 +229,16 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertEqual(realpath($result[__CLASS__]), __FILE__);
 	}
 
+	public function testCacheControl() {
+		$this->assertNull(Libraries::path('Foo'));
+		$cache = Libraries::cache();
+		Libraries::cache(array('Foo' => 'Bar'));
+		$this->assertEqual('Bar', Libraries::path('Foo'));
+
+		Libraries::cache(false);
+		Libraries::cache($cache);
+	}
+
 	/**
 	 * Tests recursive and non-recursive searching through libraries with paths.
 	 *
@@ -292,10 +304,32 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertTrue(count($result) > 30);
 
 		$expected = array(
-			'lithium\template\view\adapter\File', 'lithium\template\view\adapter\Simple'
+			'lithium\template\view\adapter\File',
+			'lithium\template\view\adapter\Simple'
 		);
 		$result = Libraries::locate('adapter.template.view');
 		$this->assertEqual($expected, $result);
+
+		$result = Libraries::locate('test.filter');
+		$this->assertTrue(count($result) >= 4);
+		$this->assertTrue(in_array('lithium\test\filter\Affected', $result));
+		$this->assertTrue(in_array('lithium\test\filter\Complexity', $result));
+		$this->assertTrue(in_array('lithium\test\filter\Coverage', $result));
+		$this->assertTrue(in_array('lithium\test\filter\Profiler', $result));
+
+		foreach (Libraries::paths() as $type => $paths) {
+			if (count($paths) <= 1 || $type == 'libraries') {
+				continue;
+			}
+			$this->assertTrue(count(Libraries::locate($type)) > 1);
+		}
+	}
+
+	public function testServiceLocateInstantiation() {
+		$result = Libraries::instance('adapter.template.view', 'Simple');
+		$this->assertTrue(is_a($result, 'lithium\template\view\adapter\Simple'));
+		$this->expectException("Class 'Foo' of type 'adapter.template.view' not found.");
+		$result = Libraries::instance('adapter.template.view', 'Foo');
 	}
 
 	public function testServiceLocateAllCommands() {
@@ -394,11 +428,10 @@ class LibrariesTest extends \lithium\test\Unit {
 
 	public function testFindingClassesWithCallableFilters() {
 		$result = Libraries::find('lithium', array(
-			'recursive' => true, 'path' => '/tests/cases',
-			'format' => function($file, $config) {
+			'recursive' => true, 'path' => '/tests/cases', 'format' => function($file, $config) {
 				return new SplFileInfo($file);
 			},
-			'filter' =>  function($file) {
+			'filter' => function($file) {
 				if ($file->getFilename() === 'LibrariesTest.php') {
 					return $file;
 				}
@@ -428,21 +461,32 @@ class LibrariesTest extends \lithium\test\Unit {
 	public function testFindWithOptions() {
 		$result = Libraries::find('lithium', array(
 			'path' => '/console/command/create/template',
-			'namespaces' => false, 'suffix' => false,
-			'filter' => false, 'exclude' => false, 'format' => function ($file, $config) {
+			'namespaces' => false,
+			'suffix' => false,
+			'filter' => false,
+			'exclude' => false,
+			'format' => function ($file, $config) {
 				return basename($file);
-			},
+			}
 		));
 		$this->assertTrue(count($result) > 3);
-		$this->assertTrue(array_search('controller.txt.php', $result));
-		$this->assertTrue(array_search('model.txt.php', $result));
-		$this->assertTrue(array_search('plugin.phar.gz', $result));
+		$this->assertTrue(array_search('controller.txt.php', $result) !== false);
+		$this->assertTrue(array_search('model.txt.php', $result) !== false);
+		$this->assertTrue(array_search('plugin.phar.gz', $result) !== false);
 	}
 
 	public function testLocateWithDotSyntax() {
 		$expected = 'app\controllers\PagesController';
 		$result = Libraries::locate('controllers', 'app.Pages');
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testLocatePreFilter() {
+		$result = Libraries::locate('command', null, array('recursive' => false));
+		$this->assertFalse(preg_grep('/\.txt/', $result));
+
+		$result = Libraries::locate('command', null, array('recursive' => true));
+		$this->assertFalse(preg_grep('/\.txt/', $result));
 	}
 }
 
