@@ -186,7 +186,8 @@ class InspectorTest extends \lithium\test\Unit {
 
 	public function testClassDependencies() {
 		$expected = array(
-			'Exception', 'ReflectionClass', 'ReflectionException', 'lithium\\core\\Libraries'
+			'Exception', 'ReflectionClass', 'ReflectionProperty', 'ReflectionException',
+			'lithium\\core\\Libraries'
 		);
 
 		$result = Inspector::dependencies($this->subject(), array('type' => 'static'));
@@ -249,6 +250,24 @@ class InspectorTest extends \lithium\test\Unit {
 			)
 		);
 		$this->assertEqual($expected, $result);
+
+		$result = array_map(
+			function($property) { return $property['name']; },
+			Inspector::properties('lithium\action\Controller')
+		);
+		$this->assertTrue(in_array('request', $result));
+		$this->assertTrue(in_array('response', $result));
+		$this->assertFalse(in_array('_render', $result));
+		$this->assertFalse(in_array('_classes', $result));
+
+		$result = array_map(
+			function($property) { return $property['name']; },
+			Inspector::properties('lithium\action\Controller', array('public' => false))
+		);
+		$this->assertTrue(in_array('request', $result));
+		$this->assertTrue(in_array('response', $result));
+		$this->assertTrue(in_array('_render', $result));
+		$this->assertTrue(in_array('_classes', $result));
 	}
 }
 
