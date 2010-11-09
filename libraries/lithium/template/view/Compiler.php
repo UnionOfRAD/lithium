@@ -27,9 +27,11 @@ class Compiler extends \lithium\core\StaticObject {
 	/**
 	 * The list of syntax replacements to apply to compiled templates.
 	 *
-	 * @var array Key/value pairs of regular expressions. The keys are the regexes,
-	 *      and the values are the resulting expressions along with any capture groups
-	 *      that may have been used in the corresponding regexes.
+	 * Key/value pairs of regular expressions. The keys are the regexes, and the values are the
+	 * resulting expressions along with any capture groups that may have been used in the
+	 * corresponding regexes.
+	 *
+	 * @var array
 	 */
 	protected static $_processors = array(
 		'/\<\?=\s*\$this->(.+?)\s*;?\s*\?>/msx' => '<?php echo $this->$1; ?>',

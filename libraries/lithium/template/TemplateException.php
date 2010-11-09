@@ -9,9 +9,9 @@
 namespace lithium\template;
 
 /**
- * A `NetworkException` may be thrown whenever an unsuccessful attempt is made to connect to a
- * remote service over the network. This may be a web service, a database, or another network
- * resource.
+ * A `TemplateException` is thrown whenever a view template cannot be found, or a called template is
+ * not readible or accessible for rendering. Also used by the view compiler if a compiled template
+ * cannot be written.
  */
 class TemplateException extends \RuntimeException {
 
