@@ -93,7 +93,7 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 		$this->_context = $options['context'] + $this->_context;
 		$this->_data = (array) $data + $this->_vars;
 		$template__ = $template;
-		unset($options, $template, $defaults);
+		unset($options, $template, $defaults, $data);
 
 		if ($this->_config['extract']) {
 			extract($this->_data, EXTR_OVERWRITE);
