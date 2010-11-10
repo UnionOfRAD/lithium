@@ -8,9 +8,12 @@
 
 namespace lithium\tests\cases\util;
 
-use \lithium\util\Inflector;
+use lithium\util\Inflector;
+use lithium\analysis\Inspector;
 
 class InflectorTest extends \lithium\test\Unit {
+
+	public static $_test = 'bar';
 
 	public function tearDown() {
 		Inflector::reset();
@@ -314,6 +317,49 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertEqual(Inflector::pluralize('bord'), 'bords');
 		Inflector::rules('uninflected', 'bord');
 		$this->assertEqual(Inflector::pluralize('bord'), 'bord');
+	}
+
+	/**
+	 * Tests the storage mechanism for `$_underscored`, `$_camelized`,
+	 *  `$_humanized` and `$_pluralized`.
+	 *
+	 * @return void
+	 */
+	public function testStorageMechanism() {
+		Inflector::reset();
+
+		$expected = array('TestField' => 'test_field');
+		$this->assertFalse($this->getProtectedValue('$_underscored'));
+		$this->assertEqual(Inflector::underscore('TestField'), 'test_field');
+		$this->assertEqual($expected, $this->getProtectedValue('$_underscored'));
+		$this->assertEqual(Inflector::underscore('TestField'), 'test_field');
+
+		$expected = array('test_field' => 'TestField');
+		$this->assertFalse($this->getProtectedValue('$_camelized'));
+		$this->assertEqual(Inflector::camelize('test_field', true), 'TestField');
+		$this->assertEqual($expected, $this->getProtectedValue('$_camelized'));
+		$this->assertEqual(Inflector::camelize('test_field', true), 'TestField');
+
+		$expected = array('test_field:_' => 'Test Field');
+		$this->assertFalse($this->getProtectedValue('$_humanized'));
+		$this->assertEqual(Inflector::humanize('test_field'), 'Test Field');
+		$this->assertEqual($expected, $this->getProtectedValue('$_humanized'));
+		$this->assertEqual(Inflector::humanize('test_field'), 'Test Field');
+
+		$expected = array('field' => 'fields');
+		$this->assertFalse($this->getProtectedValue('$_pluralized'));
+		$this->assertEqual(Inflector::pluralize('field'), 'fields');
+		$this->assertEqual($expected, $this->getProtectedValue('$_pluralized'));
+		$this->assertEqual(Inflector::pluralize('field'), 'fields');
+	}
+
+	/**
+	 * This is a helper method for testStorageMechanism to fetch a private
+	 * property of the Inflector class.
+	 */
+	private function getProtectedValue($property) {
+		$info = Inspector::info("lithium\util\Inflector::$property");
+		return $info['value'];
 	}
 }
 
