@@ -110,7 +110,7 @@ class MongoDb extends \lithium\data\Source {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('schema', 'handlers');
+	protected $_autoConfig = array('schema', 'handlers', 'classes' => 'merge');
 
 	/**
 	 * Instantiates the MongoDB adapter with the default connection information.
