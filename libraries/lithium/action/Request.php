@@ -347,11 +347,8 @@ class Request extends \lithium\net\http\Message {
 		if ($this->_acceptContent) {
 			return $this->_acceptContent;
 		}
-		if (strpos($accept = $this->env('HTTP_ACCEPT'), ',') === false) {
-			$accept = array('text/html');
-		} else {
-			$accept = explode(',', $accept);
-		}
+		$accept = $this->env('HTTP_ACCEPT');
+		$accept = (strpos($accept, ',') === false) ? array('text/html') : explode(',', $accept);
 
 		foreach ($accept as $i => $type) {
 			unset($accept[$i]);
@@ -371,6 +368,7 @@ class Request extends \lithium\net\http\Message {
 
 		if (isset($this->params['type'])) {
 			$handler = $media::type($this->params['type']);
+
 			if (isset($handler['options'])) {
 				$type = (array) $handler['content'];
 				$accept = array(current($type) => 1) + $accept;
