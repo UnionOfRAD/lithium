@@ -8,7 +8,7 @@
 
 namespace lithium\tests\integration\storage;
 
-use \lithium\storage\Session;
+use lithium\storage\Session;
 
 class SessionTest extends \lithium\test\Unit {
 

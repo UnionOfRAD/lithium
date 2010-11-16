@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\test;
 
-use \lithium\test\Group;
-use \lithium\util\Collection;
+use lithium\test\Group;
+use lithium\util\Collection;
 
 class GroupTest extends \lithium\test\Unit {
 

@@ -8,9 +8,9 @@
 
 namespace lithium\test\filter;
 
-use \lithium\test\Unit;
-use \lithium\core\Libraries;
-use \lithium\analysis\Inspector;
+use lithium\test\Unit;
+use lithium\core\Libraries;
+use lithium\analysis\Inspector;
 
 /**
  * The `Affected` test filter adds test cases to the tests that are about to be run.

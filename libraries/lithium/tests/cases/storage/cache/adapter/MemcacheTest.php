@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\storage\cache\adapter;
 
-use \lithium\storage\cache\adapter\Memcache;
+use lithium\storage\cache\adapter\Memcache;
 
 class MemcacheTest extends \lithium\test\Unit {
 

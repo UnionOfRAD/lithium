@@ -8,7 +8,7 @@
 
 namespace lithium\core;
 
-use \lithium\util\collection\Filters;
+use lithium\util\collection\Filters;
 
 /**
  * Provides a base class for all static classes in the Lithium framework. Similar to its

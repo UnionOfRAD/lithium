@@ -8,7 +8,7 @@
 
 namespace lithium\analysis\logger\adapter;
 
-use \lithium\util\String;
+use lithium\util\String;
 
 /**
  * The `Cache` logger allows log messages to be written to cache configurations set up in

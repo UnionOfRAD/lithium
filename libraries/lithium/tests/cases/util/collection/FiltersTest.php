@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\util\collection;
 
-use \lithium\util\collection\Filters;
-use \lithium\tests\mocks\util\MockFilters;
+use lithium\util\collection\Filters;
+use lithium\tests\mocks\util\MockFilters;
 
 class FiltersTest extends \lithium\test\Unit {
 

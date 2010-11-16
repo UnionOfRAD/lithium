@@ -8,9 +8,9 @@
 
 namespace lithium\tests\integration\g11n;
 
-use \lithium\g11n\Catalog;
-use \lithium\g11n\catalog\adapter\Memory;
-use \lithium\util\Inflector;
+use lithium\g11n\Catalog;
+use lithium\g11n\catalog\adapter\Memory;
+use lithium\util\Inflector;
 
 class CatalogInflectorTest extends \lithium\test\Unit {
 

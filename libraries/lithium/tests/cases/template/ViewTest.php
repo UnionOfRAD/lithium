@@ -8,9 +8,9 @@
 
 namespace lithium\tests\cases\template;
 
-use \lithium\template\View;
-use \lithium\g11n\catalog\adapter\Memory;
-use \lithium\template\view\adapter\Simple;
+use lithium\template\View;
+use lithium\g11n\catalog\adapter\Memory;
+use lithium\template\view\adapter\Simple;
 
 class TestViewClass extends \lithium\template\View {
 

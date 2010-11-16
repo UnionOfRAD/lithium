@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\security;
 
-use \lithium\security\Auth;
-use \lithium\storage\Session;
+use lithium\security\Auth;
+use lithium\storage\Session;
 
 class AuthTest extends \lithium\test\Unit {
 

@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\storage\cache\adapter;
 
-use \lithium\storage\cache\adapter\Apc;
+use lithium\storage\cache\adapter\Apc;
 
 class ApcTest extends \lithium\test\Unit {
 

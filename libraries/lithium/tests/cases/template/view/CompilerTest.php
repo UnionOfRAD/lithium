@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\template\view;
 
-use \lithium\template\view\Compiler;
+use lithium\template\view\Compiler;
 
 class CompilerTest extends \lithium\test\Unit {
 

@@ -8,7 +8,7 @@
 
 namespace lithium\tests\integration\net\http;
 
-use \lithium\net\http\Service;
+use lithium\net\http\Service;
 
 class ServiceTest extends \lithium\test\Integration {
 

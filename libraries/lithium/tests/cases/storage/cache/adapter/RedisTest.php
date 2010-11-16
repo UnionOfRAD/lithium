@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\storage\cache\adapter;
 
-use \lithium\storage\cache\adapter\Redis;
+use lithium\storage\cache\adapter\Redis;
 
 class RedisTest extends \lithium\test\Unit {
 

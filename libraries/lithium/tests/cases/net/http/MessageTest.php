@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\net\http;
 
-use \lithium\net\http\Message;
+use lithium\net\http\Message;
 
 class MessageTest extends \lithium\test\Unit {
 

@@ -8,7 +8,7 @@
 
 namespace lithium\analysis;
 
-use \lithium\util\String;
+use lithium\util\String;
 
 /**
  * The `Debugger` class provides basic facilities for generating and rendering meta-data about the

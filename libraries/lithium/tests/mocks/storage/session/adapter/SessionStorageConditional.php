@@ -2,7 +2,7 @@
 
 namespace lithium\tests\mocks\storage\session\adapter;
 
-use \lithium\storage\session\adapter\Memory;
+use lithium\storage\session\adapter\Memory;
 
 class SessionStorageConditional extends Memory {
 

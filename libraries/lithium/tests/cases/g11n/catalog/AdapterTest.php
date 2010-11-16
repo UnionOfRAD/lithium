@@ -9,7 +9,7 @@
 namespace lithium\tests\cases\g11n\catalog;
 
 use \Exception;
-use \lithium\tests\mocks\g11n\catalog\MockAdapter;
+use lithium\tests\mocks\g11n\catalog\MockAdapter;
 
 class AdapterTest extends \lithium\test\Unit {
 

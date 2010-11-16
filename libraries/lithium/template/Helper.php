@@ -8,7 +8,7 @@
 
 namespace lithium\template;
 
-use \lithium\util\String;
+use lithium\util\String;
 
 /**
  * Abstract class for template helpers to extend.

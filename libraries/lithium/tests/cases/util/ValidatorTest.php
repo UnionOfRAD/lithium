@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\util;
 
-use \lithium\util\Validator;
+use lithium\util\Validator;
 
 class ValidatorTest extends \lithium\test\Unit {
 

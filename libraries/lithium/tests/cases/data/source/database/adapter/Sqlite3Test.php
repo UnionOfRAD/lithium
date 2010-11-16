@@ -8,9 +8,9 @@
 
 namespace lithium\tests\cases\data\source\database\adapter;
 
-use \lithium\data\Connections;
-use \lithium\data\source\database\adapter\Sqlite3;
-use \lithium\tests\mocks\data\source\database\adapter\MockSqlite3;
+use lithium\data\Connections;
+use lithium\data\source\database\adapter\Sqlite3;
+use lithium\tests\mocks\data\source\database\adapter\MockSqlite3;
 
 class Sqlite3Test extends \lithium\test\Unit {
 

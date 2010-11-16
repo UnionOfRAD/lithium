@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\console;
 
-use \lithium\util\String;
+use lithium\util\String;
 
 class MockResponse extends \lithium\console\Response {
 

@@ -8,10 +8,10 @@
 
 namespace lithium\tests\cases\data\source\database\adapter;
 
-use \lithium\data\Connections;
-use \lithium\data\model\Query;
-use \lithium\data\source\database\adapter\MySql;
-use \lithium\tests\mocks\data\source\database\adapter\MockMySql;
+use lithium\data\Connections;
+use lithium\data\model\Query;
+use lithium\data\source\database\adapter\MySql;
+use lithium\tests\mocks\data\source\database\adapter\MockMySql;
 
 class MySqlTest extends \lithium\test\Unit {
 

@@ -9,7 +9,7 @@
 namespace lithium\tests\cases\g11n\catalog\adapter;
 
 use \Exception;
-use \lithium\g11n\catalog\adapter\Php;
+use lithium\g11n\catalog\adapter\Php;
 
 class PhpTest extends \lithium\test\Unit {
 

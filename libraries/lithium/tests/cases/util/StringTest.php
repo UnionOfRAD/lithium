@@ -8,9 +8,9 @@
 
 namespace lithium\tests\cases\util;
 
-use \lithium\util\String;
-use \lithium\net\http\Request;
-use \lithium\tests\mocks\util\MockStringObject;
+use lithium\util\String;
+use lithium\net\http\Request;
+use lithium\tests\mocks\util\MockStringObject;
 
 class StringTest extends \lithium\test\Unit {
 

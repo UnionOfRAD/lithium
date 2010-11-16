@@ -9,10 +9,10 @@
 namespace lithium\tests\cases\util;
 
 use \stdClass;
-use \lithium\util\Collection;
-use \lithium\tests\mocks\util\MockCollectionMarker;
-use \lithium\tests\mocks\util\MockCollectionObject;
-use \lithium\tests\mocks\util\MockCollectionStringCast;
+use lithium\util\Collection;
+use lithium\tests\mocks\util\MockCollectionMarker;
+use lithium\tests\mocks\util\MockCollectionObject;
+use lithium\tests\mocks\util\MockCollectionStringCast;
 
 class CollectionTest extends \lithium\test\Unit {
 

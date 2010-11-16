@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\storage\session\adapter;
 
-use \lithium\storage\session\adapter\Php;
-use \lithium\tests\mocks\storage\session\adapter\MockPhp;
+use lithium\storage\session\adapter\Php;
+use lithium\tests\mocks\storage\session\adapter\MockPhp;
 
 class PhpTest extends \lithium\test\Unit {
 

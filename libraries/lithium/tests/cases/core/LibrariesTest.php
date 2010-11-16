@@ -9,8 +9,8 @@
 namespace lithium\tests\cases\core;
 
 use \SplFileInfo;
-use \lithium\util\Inflector;
-use \lithium\core\Libraries;
+use lithium\util\Inflector;
+use lithium\core\Libraries;
 
 class LibrariesTest extends \lithium\test\Unit {
 

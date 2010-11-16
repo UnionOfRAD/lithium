@@ -9,11 +9,11 @@
 namespace lithium\test;
 
 use \Exception;
-use \lithium\util\String;
-use \lithium\core\Libraries;
-use \lithium\util\Validator;
-use \lithium\analysis\Debugger;
-use \lithium\analysis\Inspector;
+use lithium\util\String;
+use lithium\core\Libraries;
+use lithium\util\Validator;
+use lithium\analysis\Debugger;
+use lithium\analysis\Inspector;
 use \RecursiveDirectoryIterator;
 use \RecursiveIteratorIterator;
 

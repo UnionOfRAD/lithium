@@ -2,7 +2,7 @@
 
 namespace lithium\tests\integration\data;
 
-use \lithium\data\Connections;
+use lithium\data\Connections;
 
 class MockCompany extends \lithium\data\Model {
 

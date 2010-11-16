@@ -8,7 +8,7 @@
 
 namespace lithium\security\auth\adapter;
 
-use \lithium\core\Libraries;
+use lithium\core\Libraries;
 
 /**
  * The `Http` adapter provides basic and digest authentication based on the HTTP protocol.

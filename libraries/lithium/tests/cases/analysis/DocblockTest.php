@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\analysis;
 
-use \lithium\analysis\Docblock;
-use \lithium\analysis\Inspector;
+use lithium\analysis\Docblock;
+use lithium\analysis\Inspector;
 
 class DocblockTest extends \lithium\test\Unit {
 

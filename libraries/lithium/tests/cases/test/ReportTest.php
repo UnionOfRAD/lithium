@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\test;
 
-use \lithium\test\Report;
-use \lithium\test\Group;
+use lithium\test\Report;
+use lithium\test\Group;
 
 class ReportTest extends \lithium\test\Unit {
 

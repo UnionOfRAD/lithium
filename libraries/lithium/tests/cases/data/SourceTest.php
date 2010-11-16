@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\data;
 
-use \lithium\data\Entity;
-use \lithium\tests\mocks\data\MockSource;
+use lithium\data\Entity;
+use lithium\tests\mocks\data\MockSource;
 
 class SourceTest extends \lithium\test\Unit {
 

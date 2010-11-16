@@ -9,7 +9,7 @@
 
 namespace lithium\tests\cases\data;
 
-use \lithium\data\collection\DocumentSet;
+use lithium\data\collection\DocumentSet;
 
 class CollectionTest extends \lithium\test\Unit {
 

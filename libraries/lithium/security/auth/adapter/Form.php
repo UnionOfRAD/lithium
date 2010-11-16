@@ -8,7 +8,7 @@
 
 namespace lithium\security\auth\adapter;
 
-use \lithium\core\Libraries;
+use lithium\core\Libraries;
 
 /**
  * The `Form` adapter provides basic authentication facilities for checking credentials submitted

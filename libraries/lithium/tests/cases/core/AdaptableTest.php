@@ -8,11 +8,11 @@
 
 namespace lithium\tests\cases\core;
 
-use \lithium\util\Collection;
-use \lithium\core\Adaptable;
-use \lithium\storage\cache\adapter\Memory;
-use \lithium\tests\mocks\core\MockAdapter;
-use \lithium\tests\mocks\core\MockStrategy;
+use lithium\util\Collection;
+use lithium\core\Adaptable;
+use lithium\storage\cache\adapter\Memory;
+use lithium\tests\mocks\core\MockAdapter;
+use lithium\tests\mocks\core\MockStrategy;
 use \SplDoublyLinkedList;
 
 class AdaptableTest extends \lithium\test\Unit {

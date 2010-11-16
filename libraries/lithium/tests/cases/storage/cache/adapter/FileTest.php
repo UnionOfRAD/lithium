@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\storage\cache\adapter;
 
-use \lithium\storage\cache\adapter\File;
+use lithium\storage\cache\adapter\File;
 use \SplFileInfo;
 
 class FileTest extends \lithium\test\Unit {

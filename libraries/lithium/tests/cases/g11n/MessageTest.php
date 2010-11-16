@@ -8,10 +8,10 @@
 
 namespace lithium\tests\cases\g11n;
 
-use \lithium\core\Environment;
-use \lithium\g11n\Message;
-use \lithium\g11n\Catalog;
-use \lithium\g11n\catalog\adapter\Memory;
+use lithium\core\Environment;
+use lithium\g11n\Message;
+use lithium\g11n\Catalog;
+use lithium\g11n\catalog\adapter\Memory;
 
 class MessageTest extends \lithium\test\Unit {
 

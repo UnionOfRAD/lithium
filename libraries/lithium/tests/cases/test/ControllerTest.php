@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\test;
 
-use \lithium\test\Controller;
+use lithium\test\Controller;
 
 class ControllerTest extends \lithium\test\Unit {
 

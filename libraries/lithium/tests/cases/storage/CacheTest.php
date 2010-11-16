@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\storage;
 
-use \lithium\storage\Cache;
-use \lithium\util\Collection;
+use lithium\storage\Cache;
+use lithium\util\Collection;
 use \SplFileInfo;
 
 class CacheTest extends \lithium\test\Unit {

@@ -1,5 +1,5 @@
 <?php
-	use \lithium\util\Inflector;
+	use lithium\util\Inflector;
 	$base = $request->env('base');
 ?>
 <!doctype html>

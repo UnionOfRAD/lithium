@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\analysis\logger\adapter;
 
-use \lithium\util\collection\Filters;
-use \lithium\analysis\logger\adapter\File;
+use lithium\util\collection\Filters;
+use lithium\analysis\logger\adapter\File;
 
 class FileTest extends \lithium\test\Unit {
 

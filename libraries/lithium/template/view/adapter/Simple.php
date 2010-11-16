@@ -10,8 +10,8 @@ namespace lithium\template\view\adapter;
 
 use \Closure;
 use \Exception;
-use \lithium\util\Set;
-use \lithium\util\String;
+use lithium\util\Set;
+use lithium\util\String;
 
 /**
  * This view adapter renders content using simple string substitution, and is only useful for very

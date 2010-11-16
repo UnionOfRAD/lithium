@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\data;
 
-use \lithium\util\Inflector;
+use lithium\util\Inflector;
 
 class MockSource extends \lithium\data\Source {
 

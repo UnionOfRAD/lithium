@@ -8,7 +8,7 @@
 
 namespace lithium\core;
 
-use \lithium\util\collection\Filters;
+use lithium\util\collection\Filters;
 
 /**
  * Base class in Lithium's hierarchy, from which all concrete classes inherit. This class defines

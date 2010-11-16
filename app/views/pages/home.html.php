@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-use \lithium\data\Connections;
+use lithium\data\Connections;
 
 $checkName = null;
 $checkStatus = $solutions = array();

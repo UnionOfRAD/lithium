@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\template\helper;
 
-use \lithium\action\Request;
+use lithium\action\Request;
 
 class MockFormRenderer extends \lithium\template\view\Renderer {
 

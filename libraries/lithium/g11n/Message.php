@@ -8,10 +8,10 @@
 
 namespace lithium\g11n;
 
-use \lithium\core\Environment;
-use \lithium\util\String;
-use \lithium\g11n\Locale;
-use \lithium\g11n\Catalog;
+use lithium\core\Environment;
+use lithium\util\String;
+use lithium\g11n\Locale;
+use lithium\g11n\Catalog;
 
 /**
  * The `Message` class is concerned with an aspect of globalizing static message strings

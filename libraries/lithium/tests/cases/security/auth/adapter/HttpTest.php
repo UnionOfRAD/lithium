@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\security\auth\adapter;
 
-use \lithium\tests\mocks\security\auth\adapter\MockHttp;
-use \lithium\action\Request;
+use lithium\tests\mocks\security\auth\adapter\MockHttp;
+use lithium\action\Request;
 
 class HttpTest extends \lithium\test\Unit {
 

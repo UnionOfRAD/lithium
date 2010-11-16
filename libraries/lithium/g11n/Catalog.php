@@ -8,8 +8,8 @@
 
 namespace lithium\g11n;
 
-use \lithium\core\Libraries;
-use \lithium\util\Collection;
+use lithium\core\Libraries;
+use lithium\util\Collection;
 
 /**
  * Globalization data is not just translated messages, it is validation rules, formats and a lot

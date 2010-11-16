@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\storage\cache\adapter;
 
-use \lithium\storage\cache\adapter\Memory;
+use lithium\storage\cache\adapter\Memory;
 
 class MemoryTest extends \lithium\test\Unit {
 

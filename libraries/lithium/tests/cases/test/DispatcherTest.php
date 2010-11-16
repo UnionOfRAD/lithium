@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\test;
 
-use \lithium\test\Dispatcher;
-use \lithium\util\Collection;
+use lithium\test\Dispatcher;
+use lithium\util\Collection;
 
 class DispatcherTest extends \lithium\test\Unit {
 

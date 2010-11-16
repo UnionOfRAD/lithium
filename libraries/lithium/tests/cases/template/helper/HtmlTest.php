@@ -8,9 +8,9 @@
 
 namespace lithium\tests\cases\template\helper;
 
-use \lithium\net\http\Router;
-use \lithium\template\helper\Html;
-use \lithium\tests\mocks\template\helper\MockHtmlRenderer;
+use lithium\net\http\Router;
+use lithium\template\helper\Html;
+use lithium\tests\mocks\template\helper\MockHtmlRenderer;
 
 class HtmlTest extends \lithium\test\Unit {
 

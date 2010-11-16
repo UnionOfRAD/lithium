@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\core;
 
-use \lithium\core\StaticObject;
-use \lithium\tests\mocks\core\MockStaticInstantiator;
+use lithium\core\StaticObject;
+use lithium\tests\mocks\core\MockStaticInstantiator;
 
 class StaticObjectTest extends \lithium\test\Unit {
 

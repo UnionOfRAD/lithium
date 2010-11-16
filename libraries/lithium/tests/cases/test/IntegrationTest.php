@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\test;
 
-use \lithium\tests\mocks\test\MockIntegrationTest;
+use lithium\tests\mocks\test\MockIntegrationTest;
 
 class IntegrationTest extends \lithium\test\Unit {
 

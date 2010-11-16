@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\net;
 
-use \lithium\net\Message;
+use lithium\net\Message;
 
 class MessageTest extends \lithium\test\Unit {
 

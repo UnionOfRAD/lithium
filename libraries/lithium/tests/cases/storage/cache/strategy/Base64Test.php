@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\storage\cache\strategy;
 
-use \lithium\storage\cache\strategy\Base64;
+use lithium\storage\cache\strategy\Base64;
 
 class Base64Test extends \lithium\test\Unit {
 

@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\template\view\adapter;
 
-use \lithium\template\view\adapter\Simple;
-use \lithium\tests\mocks\util\MockStringObject;
+use lithium\template\view\adapter\Simple;
+use lithium\tests\mocks\util\MockStringObject;
 
 class SimpleTest extends \lithium\test\Unit {
 

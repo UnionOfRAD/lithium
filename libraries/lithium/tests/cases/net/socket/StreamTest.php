@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\net\socket;
 
-use \lithium\net\socket\Stream;
+use lithium\net\socket\Stream;
 
 class StreamTest extends \lithium\test\Unit {
 

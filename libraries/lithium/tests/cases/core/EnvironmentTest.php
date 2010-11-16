@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\core;
 
-use \lithium\core\Environment;
-use \lithium\tests\mocks\core\MockRequest;
+use lithium\core\Environment;
+use lithium\tests\mocks\core\MockRequest;
 
 class EnvironmentTest extends \lithium\test\Unit {
 

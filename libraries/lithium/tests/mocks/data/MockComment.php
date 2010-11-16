@@ -8,9 +8,9 @@
 
 namespace lithium\tests\mocks\data;
 
-use \lithium\data\model\Query;
-use \lithium\data\entity\Record;
-use \lithium\data\collection\RecordSet;
+use lithium\data\model\Query;
+use lithium\data\entity\Record;
+use lithium\data\collection\RecordSet;
 
 class MockComment extends \lithium\tests\mocks\data\MockBase {
 

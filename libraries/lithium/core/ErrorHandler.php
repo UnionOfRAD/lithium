@@ -9,8 +9,8 @@
 namespace lithium\core;
 
 use \Exception;
-use \lithium\util\Collection;
-use \lithium\core\Environment;
+use lithium\util\Collection;
+use lithium\core\Environment;
 
 /**
  * The `ErrorHandler` class allows PHP errors and exceptions to be handled in a uniform way. Using

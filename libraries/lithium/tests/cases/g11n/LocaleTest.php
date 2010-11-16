@@ -8,9 +8,9 @@
 
 namespace lithium\tests\cases\g11n;
 
-use \lithium\g11n\Locale;
-use \lithium\action\Request as ActionRequest;
-use \lithium\console\Request as ConsoleRequest;
+use lithium\g11n\Locale;
+use lithium\action\Request as ActionRequest;
+use lithium\console\Request as ConsoleRequest;
 
 class LocaleTest extends \lithium\test\Unit {
 

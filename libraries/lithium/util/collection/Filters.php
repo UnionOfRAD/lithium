@@ -44,7 +44,7 @@ namespace lithium\util\collection;
  * Within the framework, you can call `applyFilter()` on any object (static or instantiated) and
  * pass the name of the method you would like to filter, along with the filter itself. For example:
  *
- * {{{use \lithium\action\Dispatcher;
+ * {{{use lithium\action\Dispatcher;
  *
  * Dispatcher::applyFilter('run', function($self, $params, $chain) {
  * 	// Custom pre-dispatch logic goes here

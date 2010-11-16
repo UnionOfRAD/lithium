@@ -8,7 +8,7 @@
 
 namespace lithium\core;
 
-use \lithium\util\Set;
+use lithium\util\Set;
 
 /**
  * The `Environment` class allows you to manage multiple configurations for your application,

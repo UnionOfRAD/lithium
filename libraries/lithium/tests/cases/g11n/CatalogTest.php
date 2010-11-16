@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\g11n;
 
-use \lithium\g11n\Catalog;
-use \lithium\g11n\catalog\adapter\Memory;
+use lithium\g11n\Catalog;
+use lithium\g11n\catalog\adapter\Memory;
 
 class CatalogTest extends \lithium\test\Unit {
 

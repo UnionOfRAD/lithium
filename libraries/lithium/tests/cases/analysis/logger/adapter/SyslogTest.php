@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\analysis\logger\adapter;
 
-use \lithium\analysis\Logger;
-use \lithium\analysis\logger\adapter\Syslog;
+use lithium\analysis\Logger;
+use lithium\analysis\logger\adapter\Syslog;
 
 /**
  * Syslog adapter test.

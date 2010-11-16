@@ -2,7 +2,7 @@
 
 namespace lithium\tests\mocks\storage\session\adapter;
 
-use \lithium\storage\session\adapter\Php;
+use lithium\storage\session\adapter\Php;
 
 class MockPhp extends Php {
 

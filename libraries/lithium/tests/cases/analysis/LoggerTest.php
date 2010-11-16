@@ -8,9 +8,9 @@
 
 namespace lithium\tests\cases\analysis;
 
-use \lithium\analysis\Logger;
-use \lithium\util\Collection;
-use \lithium\tests\mocks\analysis\MockLoggerAdapter;
+use lithium\analysis\Logger;
+use lithium\util\Collection;
+use lithium\tests\mocks\analysis\MockLoggerAdapter;
 
 /**
  * Logger adapter test case

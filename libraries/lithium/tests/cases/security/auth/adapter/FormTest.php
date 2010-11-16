@@ -8,9 +8,9 @@
 
 namespace lithium\tests\cases\security\auth\adapter;
 
-use \lithium\action\Request;
-use \lithium\data\entity\Record;
-use \lithium\security\auth\adapter\Form;
+use lithium\action\Request;
+use lithium\data\entity\Record;
+use lithium\security\auth\adapter\Form;
 
 class FormTest extends \lithium\test\Unit {
 

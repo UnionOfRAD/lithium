@@ -8,7 +8,7 @@
 
 namespace lithium\tests\integration\data\source;
 
-use \lithium\data\Connections;
+use lithium\data\Connections;
 
 class MockCouchModel extends \lithium\data\Model {
 	protected $_schema = array(

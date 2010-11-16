@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\template\view\adapter;
 
-use \lithium\template\view\adapter\File;
+use lithium\template\view\adapter\File;
 
 class FileTest extends \lithium\test\Unit {
 

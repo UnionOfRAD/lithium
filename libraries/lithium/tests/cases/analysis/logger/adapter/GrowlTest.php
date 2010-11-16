@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\analysis\logger\adapter;
 
-use \lithium\analysis\logger\adapter\Growl;
+use lithium\analysis\logger\adapter\Growl;
 
 class GrowlTest extends \lithium\test\Unit {
 

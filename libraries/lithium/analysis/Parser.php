@@ -9,8 +9,8 @@
 namespace lithium\analysis;
 
 use \ReflectionClass;
-use \lithium\util\Set;
-use \lithium\util\Collection;
+use lithium\util\Set;
+use lithium\util\Collection;
 
 /**
  * The parser class uses PHP's tokenizer to provide methods and tools for performing static analysis

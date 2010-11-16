@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\net\http;
 
-use \lithium\action\Request;
-use \lithium\net\http\Route;
+use lithium\action\Request;
+use lithium\net\http\Route;
 
 class RouteTest extends \lithium\test\Unit {
 

@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\data\entity;
 
-use \lithium\data\Connections;
-use \lithium\data\entity\Record;
+use lithium\data\Connections;
+use lithium\data\entity\Record;
 
 class RecordTest extends \lithium\test\Unit {
 
