@@ -8,7 +8,8 @@ class MockCompany extends \lithium\data\Model {
 
 	protected $_meta = array(
 		'source' => 'companies',
-		'connection' => 'test');
+		'connection' => 'test'
+	);
 }
 
 

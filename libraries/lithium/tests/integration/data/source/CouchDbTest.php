@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\integration\data;
+namespace lithium\tests\integration\data\source;
 
 use \lithium\data\Connections;
 
@@ -16,7 +16,7 @@ class MockCouchModel extends \lithium\data\Model {
 	);
 }
 
-class CouchDbIntegrationTest extends \lithium\test\Integration {
+class CouchDbTest extends \lithium\test\Integration {
 
 	public function setUp() {
 		MockCouchModel::meta(array('connection' => 'test'));
