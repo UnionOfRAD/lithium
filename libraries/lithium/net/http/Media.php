@@ -320,7 +320,7 @@ class Media extends \lithium\core\StaticObject {
 	 *         example, the `/webroot` directory of the default library would be
 	 *         `LITHIUM_APP_PATH . '/webroot'`.
 	 */
-	public static function webroot($library) {
+	public static function webroot($library = true) {
 		if (!$config = Libraries::get($library)) {
 			return null;
 		}
