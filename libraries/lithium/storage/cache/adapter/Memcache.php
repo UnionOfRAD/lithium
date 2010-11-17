@@ -99,7 +99,7 @@ class Memcache extends \lithium\core\Object {
 		$connection =& static::$connection;
 		$expiry = ($expiry) ?: $this->_config['expiry'];
 
-		return function($self, $params, $chain) use (&$connection, $expiry) {
+		return function($self, $params) use (&$connection, $expiry) {
 			$expires = strtotime($expiry);
 			$key = $params['key'];
 
@@ -124,7 +124,7 @@ class Memcache extends \lithium\core\Object {
 	public function read($key) {
 		$connection =& static::$connection;
 
-		return function($self, $params, $chain) use (&$connection) {
+		return function($self, $params) use (&$connection) {
 			$key = $params['key'];
 
 			if (is_array($key)) {
@@ -143,7 +143,7 @@ class Memcache extends \lithium\core\Object {
 	public function delete($key) {
 		$connection =& static::$connection;
 
-		return function($self, $params, $chain) use (&$connection) {
+		return function($self, $params) use (&$connection) {
 			return $connection->delete($params['key']);
 		};
 	}
@@ -163,7 +163,7 @@ class Memcache extends \lithium\core\Object {
 	public function decrement($key, $offset = 1) {
 		$connection =& static::$connection;
 
-		return function($self, $params, $chain) use (&$connection, $offset) {
+		return function($self, $params) use (&$connection, $offset) {
 			return $connection->decrement($params['key'], $offset);
 		};
 	}
@@ -182,7 +182,7 @@ class Memcache extends \lithium\core\Object {
 	public function increment($key, $offset = 1) {
 		$connection =& static::$connection;
 
-		return function($self, $params, $chain) use (&$connection, $offset) {
+		return function($self, $params) use (&$connection, $offset) {
 			return $connection->increment($params['key'], $offset);
 		};
 	}

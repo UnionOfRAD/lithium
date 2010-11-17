@@ -69,7 +69,7 @@ class Apc extends \lithium\core\Object {
 	public function write($key, $data, $expiry = null) {
 		$expiry = ($expiry) ?: $this->_config['expiry'];
 
-		return function($self, $params, $chain) use ($expiry) {
+		return function($self, $params) use ($expiry) {
 			$cachetime = (is_int($expiry) ? $expiry : strtotime($expiry)) - time();
 			$key = $params['key'];
 
@@ -91,7 +91,7 @@ class Apc extends \lithium\core\Object {
 	 * @return mixed Cached value if successful, false otherwise.
 	 */
 	public function read($key) {
-		return function($self, $params, $chain) {
+		return function($self, $params) {
 			return apc_fetch($params['key']);
 		};
 	}
@@ -107,7 +107,7 @@ class Apc extends \lithium\core\Object {
 	 * @return mixed True on successful delete, false otherwise.
 	 */
 	public function delete($key) {
-		return function($self, $params, $chain) {
+		return function($self, $params) {
 			return apc_delete($params['key']);
 		};
 	}
@@ -124,7 +124,7 @@ class Apc extends \lithium\core\Object {
 	 * @return mixed Item's new value on successful decrement, false otherwise
 	 */
 	public function decrement($key, $offset = 1) {
-		return function($self, $params, $chain) use ($offset) {
+		return function($self, $params) use ($offset) {
 			return apc_dec($params['key'], $offset);
 		};
 	}
@@ -141,7 +141,7 @@ class Apc extends \lithium\core\Object {
 	 * @return mixed Item's new value on successful increment, false otherwise
 	 */
 	public function increment($key, $offset = 1) {
-		return function($self, $params, $chain) use ($offset) {
+		return function($self, $params) use ($offset) {
 			return apc_inc($params['key'], $offset);
 		};
 	}

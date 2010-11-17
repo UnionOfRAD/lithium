@@ -95,7 +95,7 @@ class Cookie extends \lithium\core\Object {
 	public function check($key) {
 		$config = $this->_config;
 
-		return function($self, $params, $chain) use (&$config) {
+		return function($self, $params) use (&$config) {
 			return (isset($_COOKIE[$config['name']][$params['key']]));
 		};
 	}
@@ -111,7 +111,7 @@ class Cookie extends \lithium\core\Object {
 	public function read($key = null, array $options = array()) {
 		$config = $this->_config;
 
-		return function($self, $params, $chain) use (&$config) {
+		return function($self, $params) use (&$config) {
 			$key = $params['key'];
 			if (!$key) {
 				return $_COOKIE;
@@ -148,7 +148,7 @@ class Cookie extends \lithium\core\Object {
 		}
 		$expires = (isset($options['expire'])) ? $options['expire'] : $config['expire'];
 
-		return function($self, $params, $chain) use (&$config, &$expires) {
+		return function($self, $params) use (&$config, &$expires) {
 			$key = $params['key'];
 			$value = $params['value'];
 			$key = is_array($key) ? Set::flatten($key) : array($key => $value);
@@ -187,7 +187,7 @@ class Cookie extends \lithium\core\Object {
 	public function delete($key, array $options = array()) {
 		$config = $this->_config;
 
-		return function($self, $params, $chain) use (&$config) {
+		return function($self, $params) use (&$config) {
 			$key = $params['key'];
 			$key = is_array($key) ? Set::flatten($key) : array($key);
 

@@ -202,7 +202,7 @@ class MySql extends \lithium\data\source\Database {
 	 */
 	public function describe($entity, array $meta = array()) {
 		$params = compact('entity', 'meta');
-		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) {
+		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			extract($params);
 
 			$name = $self->invokeMethod('_entityName', array($entity));

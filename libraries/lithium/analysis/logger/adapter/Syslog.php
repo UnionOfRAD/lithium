@@ -77,7 +77,7 @@ class Syslog extends \lithium\core\Object {
 			$this->_isConnected = true;
 		}
 
-		return function($self, $params, $chain) use ($_priorities) {
+		return function($self, $params) use ($_priorities) {
 			$priority = $_priorities[$params['priority']];
 			return syslog($priority, $params['message']);
 		};

@@ -264,7 +264,7 @@ class Media extends \lithium\core\StaticObject {
 		$options += ($base + $defaults);
 		$params = compact('path', 'type', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params, $chain) {
+		return static::_filter(__FUNCTION__, $params, function($self, $params) {
 			$path = $params['path'];
 			$type = $params['type'];
 			$options = $params['options'];

@@ -56,7 +56,7 @@ class Memory extends \lithium\core\Object {
 	public function read($key) {
 		$cache =& $this->_cache;
 
-		return function($self, $params, $chain) use (&$cache) {
+		return function($self, $params) use (&$cache) {
 			extract($params);
 
 			if (is_array($key)) {
@@ -87,7 +87,7 @@ class Memory extends \lithium\core\Object {
 	public function write($key, $data, $expiry) {
 		$cache =& $this->_cache;
 
-		return function($self, $params, $chain) use (&$cache) {
+		return function($self, $params) use (&$cache) {
 			extract($params);
 
 			if (is_array($key)) {
@@ -109,7 +109,7 @@ class Memory extends \lithium\core\Object {
 	public function delete($key) {
 		$cache =& $this->_cache;
 
-		return function($self, $params, $chain) use (&$cache) {
+		return function($self, $params) use (&$cache) {
 			extract($params);
 			if (isset($cache[$key])) {
 				unset($cache[$key]);
@@ -130,7 +130,7 @@ class Memory extends \lithium\core\Object {
 	public function decrement($key, $offset = 1) {
 		$cache =& $this->_cache;
 
-		return function($self, $params, $chain) use (&$cache, $offset) {
+		return function($self, $params) use (&$cache, $offset) {
 			extract($params);
 			return $cache[$key] -= 1;
 		};
@@ -146,7 +146,7 @@ class Memory extends \lithium\core\Object {
 	public function increment($key, $offset = 1) {
 		$cache =& $this->_cache;
 
-		return function($self, $params, $chain) use (&$cache, $offset) {
+		return function($self, $params) use (&$cache, $offset) {
 			extract($params);
 			return $cache[$key] += 1;
 		};

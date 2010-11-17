@@ -106,7 +106,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 */
 	public function entities($model = null) {
 		$config = $this->_config;
-		$method = function($self, $params, $chain) use ($config) {
+		$method = function($self, $params) use ($config) {
 			return $self->query("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;");
 		};
 		return $this->_filter(__METHOD__, compact('model'), $method);
@@ -127,7 +127,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 */
 	public function describe($entity, array $meta = array()) {
 		$params = compact('entity', 'meta');
-		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) {
+		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			extract($params);
 
 			$name = $self->invokeMethod('_entityName', array($entity));
@@ -250,7 +250,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 		$params = compact('sql', 'options');
 		$conn =& $this->connection;
 
-		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) use (&$conn) {
+		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn) {
 			extract($params);
 
 			if (!($result = $conn->query($sql)) instanceof SQLite3Result) {

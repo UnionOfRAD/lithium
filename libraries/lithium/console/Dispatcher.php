@@ -89,7 +89,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$params = compact('request', 'options');
 		$method = __FUNCTION__;
 
-		return static::_filter($method, $params, function($self, $params, $chain) use ($classes) {
+		return static::_filter($method, $params, function($self, $params) use ($classes) {
 			$request = $params['request'];
 			$options = $params['options'];
 
@@ -118,7 +118,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 */
 	protected static function _callable($request, $params, $options) {
 		$params = compact('request', 'params', 'options');
-		return static::_filter(__FUNCTION__, $params, function($self, $params, $chain) {
+		return static::_filter(__FUNCTION__, $params, function($self, $params) {
 			$request = $params['request'];
 			$params = $params['params'];
 			$name = $params['command'];
@@ -173,7 +173,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 */
 	protected static function _call($callable, $request, $params) {
 		$params = compact('callable', 'request', 'params');
-		return static::_filter(__FUNCTION__, $params, function($self, $params, $chain) {
+		return static::_filter(__FUNCTION__, $params, function($self, $params) {
 			if (is_callable($callable = $params['callable'])) {
 				$request = $params['request'];
 				$params = $params['params'];

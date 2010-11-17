@@ -68,7 +68,7 @@ class XCache extends \lithium\core\Object {
 	public function write($key, $data, $expiry = null) {
 		$expiry = ($expiry) ?: $this->_config['expiry'];
 
-		return function($self, $params, $chain) use ($expiry) {
+		return function($self, $params) use ($expiry) {
 			return xcache_set($params['key'], $params['data'], strtotime($expiry) - time());
 		};
 	}
@@ -80,7 +80,7 @@ class XCache extends \lithium\core\Object {
 	 * @return mixed Cached value if successful, false otherwise
 	 */
 	public function read($key) {
-		return function($self, $params, $chain) {
+		return function($self, $params) {
 			return xcache_get($params['key']);
 		};
 	}
@@ -92,7 +92,7 @@ class XCache extends \lithium\core\Object {
 	 * @return mixed True on successful delete, false otherwise
 	 */
 	public function delete($key) {
-		return function($self, $params, $chain) {
+		return function($self, $params) {
 			return xcache_unset($params['key']);
 		};
 	}
@@ -109,7 +109,7 @@ class XCache extends \lithium\core\Object {
 	 * @return mixed Item's new value on successful decrement, false otherwise
 	 */
 	public function decrement($key, $offset = 1) {
-		return function($self, $params, $chain) use ($offset) {
+		return function($self, $params) use ($offset) {
 			return xcache_dec($params['key'], $offset);
 		};
 	}
@@ -125,7 +125,7 @@ class XCache extends \lithium\core\Object {
 	 * @return mixed Item's new value on successful increment, false otherwise
 	 */
 	public function increment($key, $offset = 1) {
-		return function($self, $params, $chain) use ($offset) {
+		return function($self, $params) use ($offset) {
 			extract($params);
 			return xcache_inc($params['key'], $offset);
 		};

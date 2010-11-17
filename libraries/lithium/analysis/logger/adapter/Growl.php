@@ -111,7 +111,7 @@ class Growl extends \lithium\core\Object {
 		}
 		$_self =& $this;
 
-		return function($self, $params, $chain) use (&$_self) {
+		return function($self, $params) use (&$_self) {
 			return $_self->notify($params['message'], $params['options']);
 		};
 	}

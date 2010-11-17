@@ -55,7 +55,7 @@ class File extends \lithium\core\Object {
 	public function write($type, $message) {
 		$config = $this->_config;
 
-		return function($self, $params, $chain) use (&$config) {
+		return function($self, $params) use (&$config) {
 			$type = $params['priority'];
 			$message = $params['message'];
 			$time = $config['timestamp'] ? date($config['timestamp']) . ' ' : '';

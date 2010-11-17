@@ -72,7 +72,7 @@ class File extends \lithium\core\Object {
 		$path = $this->_config['path'];
 		$expiry = ($expiry) ?: $this->_config['expiry'];
 
-		return function($self, $params, $chain) use (&$path, $expiry) {
+		return function($self, $params) use (&$path, $expiry) {
 			$expiry = strtotime($expiry);
 			$data = "{:expiry:{$expiry}}\n{$params['data']}";
 			$path = "{$path}/{$params['key']}";
@@ -91,7 +91,7 @@ class File extends \lithium\core\Object {
 	public function read($key) {
 		$path = $this->_config['path'];
 
-		return function($self, $params, $chain) use (&$path) {
+		return function($self, $params) use (&$path) {
 			extract($params);
 			$path = "$path/$key";
 			$file = new SplFileInfo($path);
@@ -123,7 +123,7 @@ class File extends \lithium\core\Object {
 	public function delete($key) {
 		$path = $this->_config['path'];
 
-		return function($self, $params, $chain) use (&$path) {
+		return function($self, $params) use (&$path) {
 			extract($params);
 			$path = "$path/$key";
 			$file = new SplFileInfo($path);

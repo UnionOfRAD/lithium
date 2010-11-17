@@ -264,7 +264,7 @@ class Form extends \lithium\template\Helper {
 		$params = compact('scope', 'options', 'binding');
 		$extra = array('method' => __METHOD__) + compact('tpl', 'defaults');
 
-		$filter = function($self, $params, $chain) use ($extra, &$_binding, &$_options) {
+		$filter = function($self, $params) use ($extra, &$_binding, &$_options) {
 			$scope = $params['scope'];
 			$options = $params['options'];
 			$_binding = $params['binding'];
@@ -306,7 +306,7 @@ class Form extends \lithium\template\Helper {
 		$_context =& $this->_context;
 		$_options =& $this->_bindingOptions;
 
-		$filter = function($self, $params, $chain) use (&$_binding, &$_context, &$_options) {
+		$filter = function($self, $params) use (&$_binding, &$_context, &$_options) {
 			unset($_binding);
 			$_options = array();
 			return $_context->strings('form-end');

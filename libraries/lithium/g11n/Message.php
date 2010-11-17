@@ -187,7 +187,7 @@ class Message extends \lithium\core\StaticObject {
 		$params = compact('id', 'count', 'locale', 'options');
 
 		$cache =& static::$_cachedPages;
-		return static::_filter(__METHOD__, $params, function($self, $params, $chain) use (&$cache) {
+		return static::_filter(__METHOD__, $params, function($self, $params) use (&$cache) {
 			extract($params);
 
 			if (!isset($cache[$options['scope']][$locale])) {
