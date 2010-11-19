@@ -62,6 +62,14 @@ class Html extends \lithium\template\Helper {
 	);
 
 	/**
+	 * List of meta tags to cache and to output.
+	 *
+	 * @var array
+	 * @see lithium\template\helper\Html::meta()
+	 */
+	protected $_metaList = array();
+
+	/**
 	 * Used by output handlers to calculate asset paths in conjunction with the `Media` class.
 	 *
 	 * @var array
@@ -185,6 +193,27 @@ class Html extends \lithium\template\Helper {
 		if ($this->_context) {
 			$this->_context->styles($style);
 		}
+	}
+	/**
+	 * Creates a meta tag.
+	 *
+	 * If there is a rendering context, then it also pushes the resulting meta tag to it.
+	 * 
+	 * @param array $meta the meta tag to create
+	 * @return string
+	 * @filter This method can be filtered.
+	 */
+	public function meta(array $options) {
+		$method = __METHOD__;
+		$filter = function($self, $params, $chain) use ($method) {
+			return $self->invokeMethod('_render', array($method, 'meta', $params));
+		};
+		$params = compact('options');
+		$meta = $this->_filter($method, $params, $filter);
+		if($this->_context) {
+			$this->_context->meta($meta);
+		}
+		return $meta;
 	}
 
 	/**

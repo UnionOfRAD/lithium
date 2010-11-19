@@ -52,7 +52,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_context = array(
-		'content' => '', 'title' => '', 'scripts' => array(), 'styles' => array()
+		'content' => '', 'title' => '', 'scripts' => array(), 'styles' => array(), 'meta' => array()
 	);
 
 	/**
@@ -145,7 +145,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 * - `request`: The `Request` object associated with this renderer and passed to the
 	 *              defined handlers.
 	 * - `context`: An array of the current rendering context data, including `content`,
-	 *              `title`, `scripts` and `styles`.
+	 *              `title`, `scripts`, `meta` and `styles`.
 	 *
 	 * @param array $config
 	 * @return void
@@ -157,7 +157,8 @@ abstract class Renderer extends \lithium\core\Object {
 			'handlers' => array(),
 			'request' => null,
 			'context' => array(
-				'content' => '', 'title' => '', 'scripts' => array(), 'styles' => array()
+				'content' => '', 'title' => '', 'scripts' => array(),
+				'styles' => array(), 'meta' => array()
 			)
 		);
 		parent::__construct((array) $config + $defaults);
@@ -194,6 +195,9 @@ abstract class Renderer extends \lithium\core\Object {
 			},
 			'styles' => function($styles) use (&$context) {
 				return "\n\t" . join("\n\t", $context['styles']) . "\n";
+			},
+			'meta' => function($meta) use (&$context) {
+				return "\n\t" . join("\n\t", $context['meta']) . "\n";
 			}
 		);
 		unset($this->_config['view']);
