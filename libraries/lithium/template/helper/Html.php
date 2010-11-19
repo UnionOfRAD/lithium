@@ -195,25 +195,31 @@ class Html extends \lithium\template\Helper {
 		}
 	}
 	/**
-	 * Creates a meta tag.
+	 * Creates a tag for the ```<head>``` section of your document.
 	 *
-	 * If there is a rendering context, then it also pushes the resulting meta tag to it.
+	 * If there is a rendering context, then it also pushes the resulting tag to it.
+	 *
+	 * The ```$options``` must match the named parameters from ```$_strings``` for the
+	 * given ```$tag```.
 	 * 
-	 * @param array $meta the meta tag to create
-	 * @return string
+	 * @param string $tag the name of a key in ```$_strings```
+	 * @param array $options the options required by ```$_strings[$tag]```
+	 * @return mixed a string if successful, otherwise NULL
 	 * @filter This method can be filtered.
 	 */
-	public function meta(array $options) {
-		$method = __METHOD__;
-		$filter = function($self, $params, $chain) use ($method) {
-			return $self->invokeMethod('_render', array($method, 'meta', $params));
-		};
-		$params = compact('options');
-		$meta = $this->_filter($method, $params, $filter);
-		if($this->_context) {
-			$this->_context->meta($meta);
+	public function head($tag, array $options) {
+		if(!isset($this->_strings[$tag])) {
+			return NULL;
 		}
-		return $meta;
+		$method = __METHOD__;
+		$filter = function($self, $options, $chain) use ($method, $tag) {
+			return $self->invokeMethod('_render', array($method, $tag, $options));
+		};
+		$head = $this->_filter($method, $options, $filter);
+		if($this->_context) {
+			$this->_context->head($head);
+		}
+		return $head;
 	}
 
 	/**

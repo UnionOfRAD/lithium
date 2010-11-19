@@ -328,6 +328,19 @@ class HtmlTest extends \lithium\test\Unit {
 		$expected['link']['href'] = 'regex:/http:\/\/.*\/screen\.css\?1234/';
 		$this->assertTags($result, $expected);
 	}
+	/**
+	 * Tests generating random tags for the <head> section
+	 *
+	 * @return void
+	 */
+	public function testHead() {
+		$result = $this->html->head('meta', array('options' => array('author' => 'foo')));
+		$expected = array('meta' => array('author' => 'foo'));
+		$this->assertTags($result, $expected);
+
+		$result = $this->html->head('unexisting-name', array('options' => array('author' => 'foo')));
+		$this->assertNull($result);
+	}
 
 	/**
 	 * Tests generating multiple <link /> or <style /> tags in a single call with an array
