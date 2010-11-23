@@ -151,7 +151,10 @@ class Cookie extends \lithium\core\Object {
 		return function($self, $params) use (&$config, &$expires) {
 			$key = $params['key'];
 			$value = $params['value'];
-			$key = is_array($key) ? Set::flatten($key) : array($key => $value);
+			$key = array($key => $value);
+			if (is_array($value)) {
+				$key = Set::flatten($key);
+			}
 
 			foreach ($key as $name => $val) {
 				$name = explode('.', $name);
@@ -161,14 +164,6 @@ class Cookie extends \lithium\core\Object {
 					$name = current($name);
 				} else {
 					$name = (array_shift($name) . '[' . join('][', $name) . ']');
-				}
-				if (is_array($val)) {
-					foreach ($val as $key => $v) {
-						setcookie($name . "[$key]", $v, strtotime($expires), $config['path'],
-							$config['domain'], $config['secure'], $config['httponly']
-						);
-					}
-					return true;
 				}
 				setcookie($name, $val, strtotime($expires), $config['path'],
 					$config['domain'], $config['secure'], $config['httponly']
