@@ -84,7 +84,11 @@ class CookieTest extends \lithium\test\Unit {
 
 	public function testWriteArrayData() {
 		$key = 'user';
-		$value = array('email' => 'test@localhost', 'name' => 'Testy McTesterson');
+		$value = array(
+			'email' => 'test@localhost',
+			'name' => 'Testy McTesterson',
+			'address' => array('country' => 'Iran', 'city' => 'Mashhad')
+		);
 		$expires = "+2 days";
 		$path = '/';
 
@@ -95,7 +99,11 @@ class CookieTest extends \lithium\test\Unit {
 
 		$expected = compact('expires');
 		$expected += array('key' => 'user.email', 'value' => 'test@localhost');
-		$this->assertCookie($expected, headers_list());
+		$this->assertCookie($expected);
+
+		$expected = compact('expires');
+		$expected += array('key' => 'user.address.country', 'value' => 'Iran');
+		$this->assertCookie($expected);
 	}
 
 	public function testReadDotSyntax() {
