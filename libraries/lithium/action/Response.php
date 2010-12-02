@@ -28,7 +28,10 @@ class Response extends \lithium\net\http\Response {
 	 *
 	 * @var array
 	 */
-	protected $_classes = array('router' => 'lithium\net\http\Router');
+	protected $_classes = array(
+		'router' => 'lithium\net\http\Router',
+		'media' => 'lithium\net\http\Media'
+	);
 
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -105,7 +108,6 @@ class Response extends \lithium\net\http\Response {
 		if (isset($this->headers['location']) && $this->status['code'] === 200) {
 			$code = 302;
 		}
-
 		if (!$status = $this->status($code)) {
 			throw new UnexpectedValueException('Invalid status code');
 		}

@@ -153,7 +153,7 @@ class Response extends \lithium\net\http\Message {
 		if ($data === null) {
 			$data = $key;
 		}
-		if (!empty($data)) {
+		if ($data) {
 			$this->status = array('code' => null, 'message' => null);
 
 			if (is_numeric($data) && isset($this->_statuses[$data])) {
