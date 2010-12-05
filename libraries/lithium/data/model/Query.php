@@ -383,7 +383,7 @@ class Query extends \lithium\core\Object {
 		$defaults = array('data' => array());
 		$options += $defaults;
 
-		$keys = array_merge(array('data'), array_keys($this->_config));
+		$keys = array_keys($this->_config);
 		$methods = $dataSource->methods();
 		$results = array();
 
@@ -396,12 +396,10 @@ class Query extends \lithium\core\Object {
 		foreach ($copy as $item) {
 			$results[$item] = $this->_config[$item];
 		}
-		if (!in_array('data', $methods)) {
-			$entity =& $this->_entity;
-			$data = $entity ? $entity->export($dataSource, $options['data']) : $this->_data;
-			$data = ($list = $this->_config['whitelist']) ? array_intersect_key($data, $list) : $data;
-			$results += compact('data');
-		}
+		$entity =& $this->_entity;
+		$data = $entity ? $entity->export($dataSource, $options['data']) : $this->_data;
+		$data = ($list = $this->_config['whitelist']) ? array_intersect_key($data, $list) : $data;
+		$results = compact('data') + $results;
 
 		$results['type'] = $this->_type;
 		$results['source'] = $dataSource->name($this->_config['source']);
