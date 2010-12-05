@@ -250,7 +250,9 @@ class MongoDb extends \lithium\data\Source {
 			if ($this->connection = $this->server->{$cfg['database']}) {
 				$this->_isConnected = true;
 			}
-		} catch (Exception $e) {}
+		} catch (Exception $e) {
+			throw new NetworkException("Could not connect to the database.", 503, $e);
+		}
 		return $this->_isConnected;
 	}
 
@@ -325,6 +327,9 @@ class MongoDb extends \lithium\data\Source {
 	 * @return mixed The return value of the native method specified in `$method`.
 	 */
 	public function __call($method, $params) {
+		if ((!$this->server) && !$this->connect()) {
+			return null;
+		}
 		return call_user_func_array(array(&$this->server, $method), $params);
 	}
 
