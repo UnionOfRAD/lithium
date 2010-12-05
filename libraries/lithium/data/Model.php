@@ -217,9 +217,10 @@ class Model extends \lithium\core\StaticObject {
 	 * Example:
 	 * {{{
 	 * protected $_schema = array(
-	 *     'name' => array('default' => 'Moe', 'type' => 'string', 'null' => false),
-	 *     'sign' => array('default' => 'bar', 'type' => 'string', 'null' => false),
-	 *     'age'  => array('default' => 0, 'type' => 'number', 'null' => false)
+	 *     '_id'  => array('type' => 'id'), // required for Mongo
+	 *     'name' => array('type' => 'string', 'default' => 'Moe', 'null' => false),
+	 *     'sign' => array('type' => 'string', 'default' => 'bar', 'null' => false),
+	 *     'age'  => array('type' => 'integer', 'default' => 0, 'null' => false)
 	 * );
 	 * }}}
 	 *
@@ -227,6 +228,7 @@ class Model extends \lithium\core\StaticObject {
 	 * configuration that fetches and returns the schema data, as in the following:
 	 *
 	 * {{{
+	 * // config/bootstrap/connections.php:
 	 * Connections::add('default', array(
 	 * 	'type' => 'MongoDb',
 	 * 	'host' => 'localhost',
@@ -240,7 +242,8 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * This example defines an optional MongoDB convention in which the schema for each individual
 	 * collection is stored in a "schemas" collection, where each document contains the name of
-	 * a collection, along with a `'data'` key, which contains the schema for that collection.
+	 * a collection, along with a `'data'` key, which contains the schema for that collection, in
+	 * the format specified above.
 	 *
 	 * @see lithium\data\source\MongoDb::$_schema
 	 * @var array
@@ -751,7 +754,7 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Deletes the data associated with the current `Model`.
 	 *
-	 * @param string $entity Entity to delete.
+	 * @param object $entity Entity to delete.
 	 * @param array $options Options.
 	 * @return boolean Success.
 	 */

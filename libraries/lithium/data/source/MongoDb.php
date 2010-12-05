@@ -89,10 +89,13 @@ class MongoDb extends \lithium\data\Source {
 
 	/**
 	 * A closure or anonymous function which receives an instance of this class, a collection name
-	 * and associated meta information, and returns an array defining the schema for that model,
-	 * where the keys are field names, and the values are arrays defining the type information for
-	 * the field. At a minimum, type arrays must contain a `'type'` key.
+	 * and associated meta information, and returns an array defining the schema for an associated
+	 * model, where the keys are field names, and the values are arrays defining the type
+	 * information for each field. At a minimum, type arrays must contain a `'type'` key. For more
+	 * information on schema definitions, and an example schema callback implementation, see the
+	 * `$_schema` property of the `Model` class.
 	 *
+	 * @see lithium\data\Model::$_schema
 	 * @var Closure
 	 */
 	protected $_schema = null;
