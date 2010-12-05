@@ -183,10 +183,10 @@ class Service extends \lithium\core\Object {
 	 *         string or POST/PUT data, and URL.
 	 */
 	protected function _request($method, $path, $data, $options) {
-		$defaults = array('type' => 'form', 'scheme' => $this->_config['scheme']);
-		$options += $defaults;
+		$defaults = array('type' => 'form');
+		$options += $defaults + $this->_config;
 
-		$request = $this->_instance('request', $this->_config + $options);
+		$request = $this->_instance('request', $options);
 		$request->path = str_replace('//', '/', "{$request->path}{$path}");
 		$request->method = $method = strtoupper($method);
 
