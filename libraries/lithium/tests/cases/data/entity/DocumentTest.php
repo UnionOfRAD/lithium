@@ -31,7 +31,7 @@ class DocumentTest extends \lithium\test\Unit {
 		}
 		Connections::reset();
 
-		Connections::add('mongo', array('type' => 'MongoDb'));
+		Connections::add('mongo', array('type' => 'MongoDb', 'autoConnect' => false));
 		Connections::add('couch', array('type' => 'http', 'adapter' => 'CouchDb'));
 
 		MockDocumentPost::config(array('connection' => 'mongo'));
