@@ -10,13 +10,7 @@ namespace lithium\tests\integration\data;
 
 use Exception;
 use lithium\data\Connections;
-
-class Company extends \lithium\data\Model {
-
-	public $hasMany = array('Employees');
-
-	protected $_meta = array('connection' => 'test');
-}
+use lithium\tests\mocks\data\Company;
 
 class CrudTest extends \lithium\test\Integration {
 

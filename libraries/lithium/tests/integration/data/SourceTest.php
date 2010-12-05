@@ -10,25 +10,8 @@ namespace lithium\tests\integration\data;
 
 use Exception;
 use lithium\data\Connections;
-
-class Company extends \lithium\data\Model {
-
-	public $hasMany = array('Employees');
-
-	protected $_meta = array('connection' => 'test');
-}
-
-class Employee extends \lithium\data\Model {
-
-	public $belongsTo = array('Company');
-
-	protected $_meta = array('connection' => 'test');
-
-	public function lastName($entity) {
-		$name = explode(' ', $entity->name);
-		return $name[1];
-	}
-}
+use lithium\tests\mocks\data\Company;
+use lithium\tests\mocks\data\Employee;
 
 class SourceTest extends \lithium\test\Unit {
 
