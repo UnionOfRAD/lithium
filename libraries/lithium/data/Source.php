@@ -8,6 +8,8 @@
 
 namespace lithium\data;
 
+use lithium\core\NetworkException;
+
 /**
  * This is the base class for Lithium's data abstraction layer.
  *
@@ -107,7 +109,11 @@ abstract class Source extends \lithium\core\Object {
 		$options += $defaults;
 
 		if (!$this->_isConnected && $options['autoConnect']) {
-			$this->connect();
+			try {
+				$this->connect();
+			} catch (NetworkException $e) {
+				$this->_isConnected = false;
+			}
 		}
 		return $this->_isConnected;
 	}
