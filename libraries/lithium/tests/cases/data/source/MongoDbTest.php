@@ -33,7 +33,8 @@ class MongoDbTest extends \lithium\test\Unit {
 		'database' => 'lithium_test',
 		'host' => 'localhost',
 		'port' => '27017',
-		'persistent' => false
+		'persistent' => null,
+		'autoConnect' => false
 	);
 
 	protected $_schema = array(
@@ -60,13 +61,34 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$db = new MongoDb($this->_testConfig);
 		$message = "`{$this->_testConfig['database']}` database or connection unavailable";
-		$this->skipIf(!$db->isConnected(), $message);
+		$this->skipIf(!$db->isConnected(array('autoConnect' => true)), $message);
+	}
+
+	/**
+	 * This hack is a necessary optimization until these tests are properly mocked out.
+	 *
+	 * @param array $options Options for the parent class' method.
+	 * @return void
+	 */
+	public function run(array $options = array()) {
+		$this->_results = array();
+
+		try {
+			$this->skip();
+		} catch (Exception $e) {
+			$this->_handleException($e);
+			return $this->_results;
+		}
+		$this->_configs = Connections::config();
+		$result = parent::run($options);
+		Connections::get('lithium_mongo_test')->dropDB('lithium_test');
+		Connections::reset();
+		Connections::config($this->_configs);
+		return $result;
 	}
 
 	public function setUp() {
-		$this->_configs = Connections::config();
-		Connections::add('lithium_mongo_test', array($this->_testConfig));
-
+		Connections::config(array('lithium_mongo_test' => $this->_testConfig));
 		$this->db = Connections::get('lithium_mongo_test');
 		$model = $this->_model;
 		$model::config(array('key' => '_id'));
@@ -78,25 +100,25 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		unset($this->query);
-		Connections::reset();
-		$this->db->dropDB('lithium_test');
-		Connections::config($this->_configs);
 	}
 
 	public function testBadConnection() {
 		$db = new MongoDb(array('host' => null, 'autoConnect' => false));
+		$this->expectException('Could not connect to the database.');
 		$this->assertFalse($db->connect());
 		$this->assertTrue($db->disconnect());
 	}
 
 	public function testGoodConnectionBadDatabase() {
+		$this->expectException('Could not connect to the database.');
 		$db = new MongoDb(array('database' => null, 'autoConnnect' => false));
-		$this->assertFalse($db->connect());
 	}
 
 	public function testGoodConnectionGoodDatabase() {
 		$db = new MongoDb(array('autoConnect' => false) + $this->_testConfig);
+		$this->assertFalse($db->isConnected());
 		$this->assertTrue($db->connect());
+		$this->assertTrue($db->isConnected());
 	}
 
 	public function testEntities() {

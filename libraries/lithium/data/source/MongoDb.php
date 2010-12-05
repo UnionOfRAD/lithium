@@ -121,15 +121,18 @@ class MongoDb extends \lithium\data\Source {
 	 *        - `'database'` _string_: The name of the database to connect to. Defaults to `null`.
 	 *        - `'host'` _string_: The IP or machine name where Mongo is running, followed by a
 	 *           colon, and the port number. Defaults to `'localhost:27017'`.
-	 *        - `'persistent'` _boolean_: If a persistent connection (if available) should be made.
-	 *            Defaults to `true`.
-	 *        - `'port'`_mixed_: The port number Mongo is listening on. The default is '27017'.
+	 *        - `'persistent'` _mixed_: Determines a persistent connection to attach to. See the
+	 *           `$options` parameter of
+	 *            [`Mongo::__construct()`](http://www.php.net/manual/en/mongo.construct.php) for
+	 *            more information. Defaults to `false`, meaning no persistent connection is made.
 	 *        - `'timeout'` _integer_: The number of milliseconds a connection attempt will wait
 	 *          before timing out and throwing an exception. Defaults to `100`.
 	 *        - `'schema'` _closure_: A closure or anonymous function which returns the schema
 	 *          information for a model class. See the `$_schema` property for more information.
 	 *        - `'gridPrefix'` _string_: The default prefix for MongoDB's `chunks` and `files`
 	 *          collections. Defaults to `'fs'`.
+	 *        - `'replicaSet'` _boolean_: See the documentation for `Mongo::__construct()`. Defaults
+	 *          to `false`.
 	 *
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
@@ -137,12 +140,13 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'persistent' => true,
+			'persistent' => false,
 			'login'      => null,
 			'password'   => null,
 			'host'       => Mongo::DEFAULT_HOST . ':' . Mongo::DEFAULT_PORT,
 			'database'   => null,
 			'timeout'    => 100,
+			'replicaSet' => false,
 			'schema'     => null,
 			'gridPrefix' => 'fs',
 		);
@@ -224,23 +228,26 @@ class MongoDb extends \lithium\data\Source {
 	/**
 	 * Connects to the Mongo server.
 	 *
-	 * @return boolean True if connected, false otherwise.
+	 * @return boolean Returns `true` the connection attempt was successful, otherwise `false`.
 	 */
 	public function connect() {
-		$config = $this->_config;
+		$cfg = $this->_config;
 		$this->_isConnected = false;
 
-		$host = $config['host'];
-		$login = $config['login'] ? "{$config['login']}:{$config['password']}@" : '';
-		$connection = "mongodb://{$login}{$host}" . ($login ? "/{$config['database']}" : '');
+		$host = is_array($cfg['host']) ? join(',', $cfg['host']) : $cfg['host'];
+		$login = $cfg['login'] ? "{$cfg['login']}:{$cfg['password']}@" : '';
+		$connection = "mongodb://{$login}{$host}" . ($login ? "/{$cfg['database']}" : '');
+		$options = array(
+			'connect' => true, 'timeout' => $cfg['timeout'], 'replicaSet' => $cfg['replicaSet']
+		);
 
 		try {
-			$this->server = new Mongo($connection, array(
-				'connect' => true,
-				'persist' => $config['persistent'],
-				'timeout' => $config['timeout']
-			));
-			if ($this->connection = $this->server->{$config['database']}) {
+			if ($persist = $cfg['persistent']) {
+				$options['persist'] = $persist === true ? 'default' : $persist;
+			}
+			$this->server = new Mongo($connection, $options);
+
+			if ($this->connection = $this->server->{$cfg['database']}) {
 				$this->_isConnected = true;
 			}
 		} catch (Exception $e) {}
