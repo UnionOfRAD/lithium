@@ -10,6 +10,7 @@
 namespace lithium\tests\cases\data\source;
 
 use lithium\data\source\MongoDb;
+use Exception;
 use MongoId;
 use MongoCode;
 use MongoDate;
@@ -99,6 +100,9 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
+		try {
+			$this->db->delete($this->query);
+		} catch (Exception $e) {}
 		unset($this->query);
 	}
 
@@ -241,9 +245,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$result = $this->db->read($this->query);
 		$this->assertTrue($result == true);
-
-		$expected = 1;
-		$this->assertEqual($expected, $result->count());
+		$this->assertEqual(1, $result->count());
 
 		$expected = $data['title'];
 		$this->assertEqual($expected, $result->first()->title);

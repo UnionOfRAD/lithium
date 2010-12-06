@@ -521,14 +521,14 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function delete($query, array $options = array()) {
 		$this->_checkConnection();
+		$defaults = array('justOne' => false, 'safe' => false, 'fsync' => false);
+		$options = array_intersect_key($options + $defaults, $defaults);
 
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
 			$query = $params['query'];
 			$options = $params['options'];
-
-			$params = $query->export($self);
-			$conditions = $params['conditions'];
-			return $self->connection->{$params['source']}->remove($conditions);
+			$args = $query->export($self);
+			return $self->connection->{$args['source']}->remove($args['conditions'], $options);
 		});
 	}
 
