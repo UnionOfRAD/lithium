@@ -426,6 +426,25 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	}
 
 	/**
+	 * Adds conversions checks to ensure certain class types and embedded values are properly cast.
+	 *
+	 * @param string $format Currently only `array` is supported.
+	 * @param array $options
+	 * @return mixed
+	 */
+	public function to($format, array $options = array()) {
+		$defaults = array('handlers' => array('MongoId' => function($value) {
+			return (string) $value;
+		}));
+
+		if ($format == 'array') {
+			$options += $defaults;
+			return Collection::toArray($this->_data, $options);
+		}
+		return parent::to($format, $options);
+	}
+
+	/**
 	 * Returns the next `Document` in the set, and advances the object's internal pointer. If the
 	 * end of the set is reached, a new document will be fetched from the data source connection
 	 * handle (`$_handle`). If no more records can be fetched, returns `null`.
@@ -447,16 +466,15 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	/**
 	 * Gets the raw data associated with this `Document`, or single item if `$field` is defined.
 	 *
-	 * @param string $field if included will only return the named item
+	 * @param string $name If included will only return the named item
 	 * @return array Returns a raw array of `Document` data, or individual field value
 	 */
-	public function data($field = null) {
-		if ($field) {
-			return isset($this->_data[$field]) ? $this->_data[$field] : null;
+	public function data($name = null) {
+		if ($name) {
+			return parent::data($name);
 		}
-		return $this->to('array') + array_map(
-			function($relationship) { return $relationship->data(); }, $this->_relationships
-		);
+		$map = function($rel) { return $rel->data(); };
+		return $this->to('array') + array_map($map, $this->_relationships);
 	}
 }
 

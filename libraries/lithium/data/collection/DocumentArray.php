@@ -9,8 +9,28 @@
 namespace lithium\data\collection;
 
 use lithium\data\Source;
+use lithium\util\Collection;
 
 class DocumentArray extends \lithium\data\Collection {
+
+	/**
+	 * Adds conversions checks to ensure certain class types and embedded values are properly cast.
+	 *
+	 * @param string $format Currently only `array` is supported.
+	 * @param array $options
+	 * @return mixed
+	 */
+	public function to($format, array $options = array()) {
+		$defaults = array('handlers' => array('MongoId' => function($value) {
+			return (string) $value;
+		}));
+
+		if ($format == 'array') {
+			$options += $defaults;
+			return Collection::toArray($this->_data, $options);
+		}
+		return parent::to($format, $options);
+	}
 
 	/**
 	 * PHP magic method used to check the presence of a field as document properties, i.e.

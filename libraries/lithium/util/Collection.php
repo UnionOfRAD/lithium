@@ -71,9 +71,9 @@ namespace lithium\util;
  * $result = $tasks->run('now');
  * }}}
  *
- * @link http://us.php.net/manual/en/class.arrayaccess.php
- * @link http://us.php.net/manual/en/class.iterator.php
- * @link http://us.php.net/manual/en/class.countable.php
+ * @link http://us.php.net/manual/en/class.arrayaccess.php PHP Manual: ArrayAccess Interface
+ * @link http://us.php.net/manual/en/class.iterator.php PHP Manual: Iterator Interface
+ * @link http://us.php.net/manual/en/class.countable.php PHP Manual: Countable Interface
  */
 class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator, \Countable {
 
@@ -500,16 +500,25 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 *
 	 * @param mixed $data Either a `Collection` instance, or an array representing a `Collection`'s
 	 *              internal state.
+	 * @param array $options Options used when converting `$data` to an array:
+	 *              - `'handlers'` _array_: An array where the keys are fully-namespaced class
+	 *                names, and the values are closures that take an instance of the class as a
+	 *                parameter, and return an array or scalar value that the instance represents.
 	 * @return array Returns the value of `$data` as a pure PHP array, recursively converting all
 	 *         sub-objects and other values to their closest array or scalar equivalents.
 	 */
-	public static function toArray($data) {
+	public static function toArray($data, array $options = array()) {
+		$defaults = array('handlers' => array());
+		$options += $defaults;
 		$result = array();
 
 		foreach ($data as $key => $item) {
 			switch (true) {
 				case (!is_object($item)):
 					$result[$key] = $item;
+				break;
+				case (isset($options['handlers'][$class = get_class($item)])):
+					$result[$key] = $options['handlers'][$class]($item);
 				break;
 				case (method_exists($item, 'to')):
 					$result[$key] = $item->to('array');
