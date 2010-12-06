@@ -391,6 +391,25 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual('Second document', $documents[1]->title);
 		$this->assertEqual('First document', $documents[2]->title);
 
+		$list = $model::find('list');
+		$this->assertEqual(3, count($list));
+
+		foreach ($list as $id => $title) {
+			$this->assertTrue(is_string($id));
+			$this->assertPattern('/^[a-f0-9]{24}$/', $id);
+			$this->assertNull($title);
+		}
+		$model::config(array('title' => 'title'));
+
+		$list = $model::find('list');
+		$this->assertEqual(3, count($list));
+
+		foreach ($list as $id => $title) {
+			$this->assertTrue(is_string($id));
+			$this->assertPattern('/^[a-f0-9]{24}$/', $id);
+			$this->assertPattern('/^(First|Second|Third) document$/', $title);
+		}
+
 		foreach ($documents as $i => $doc) {
 			$this->assertTrue($doc->delete());
 		}
