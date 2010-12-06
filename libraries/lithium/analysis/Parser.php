@@ -8,7 +8,7 @@
 
 namespace lithium\analysis;
 
-use \ReflectionClass;
+use ReflectionClass;
 use lithium\util\Set;
 use lithium\util\Collection;
 

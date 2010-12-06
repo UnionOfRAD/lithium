@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\analysis;
 
+use lithium\core\Libraries
 use lithium\analysis\Parser;
 
 class ParserTest extends \lithium\test\Unit {
@@ -106,7 +107,7 @@ class ParserTest extends \lithium\test\Unit {
 	}
 
 	public function testFindingTokenPatterns() {
-		$code = file_get_contents(\lithium\core\Libraries::path('lithium\analysis\Parser'));
+		$code = file_get_contents(Libraries::path('lithium\analysis\Parser'));
 
 		$expected = array('tokenize', 'matchToken', '_prepareMatchParams', 'token');
 		$results = array_values(array_unique(array_map(function($i) { return $i[0]; }, Parser::find(
@@ -115,12 +116,7 @@ class ParserTest extends \lithium\test\Unit {
 
 		$this->assertEqual($expected, $results);
 
-		$expected = array(
-			'\ReflectionClass',
-			'\lithium\util\Set',
-			'\lithium\util\Collection'
-		);
-
+		$expected = array('ReflectionClass', 'lithium\util\Set', 'lithium\util\Collection');
 		$results = array_map(
 			function ($i) { return join('', $i); },
 			$results = Parser::find($code, 'use *;', array(
