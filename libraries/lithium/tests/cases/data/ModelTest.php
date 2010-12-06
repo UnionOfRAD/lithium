@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\data;
 
 use lithium\data\Model;
+use lithium\data\model\Query;
 use lithium\data\Connections;
 use lithium\analysis\Inspector;
 use lithium\tests\mocks\data\MockTag;
@@ -200,7 +201,7 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testSimpleFind() {
 		$result = MockPost::find('all');
-		$this->assertTrue($result['query'] instanceof \lithium\data\model\Query);
+		$this->assertTrue($result['query'] instanceof Query);
 	}
 
 	public function testMagicFinders() {
@@ -211,6 +212,11 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = array('id' => 5);
 		$this->assertEqual($expected, $result['query']->conditions());
 		$this->assertEqual('read', $result['query']->type());
+
+		$result = MockPost::findAllByFoo(13, array('order' => array('created_at' => 'desc')));
+		$this->assertFalse($result['query']->data());
+		$this->assertEqual(array('foo' => 13), $result['query']->conditions());
+		$this->assertEqual(array('created_at' => 'desc'), $result['query']->order());
 
 		$this->expectException('/Method findFoo not defined or handled in class/');
 		MockPost::findFoo();

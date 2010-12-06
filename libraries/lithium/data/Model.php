@@ -366,7 +366,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @link http://php.net/manual/en/language.oop5.overloading.php PHP Manual: Overloading
 	 *
 	 * @throws BadMethodCallException On unhandled call, will throw an exception.
-	 * @param string $method Method name caught by `__callStatic`.
+	 * @param string $method Method name caught by `__callStatic()`.
 	 * @param array $params Arguments given to the above `$method` call.
 	 * @return mixed Results of dispatched `Model::find()` call.
 	 */
@@ -395,6 +395,7 @@ class Model extends \lithium\core\StaticObject {
 		$type[0] = strtolower($type[0]);
 
 		$conditions = array($field => array_shift($params));
+		$params = (isset($params[0]) && count($params) == 1) ? $params[0] : $params;
 		return $self::find($type, compact('conditions') + $params);
 	}
 
