@@ -495,8 +495,9 @@ class Request extends \lithium\net\http\Message {
 	 * @return void
 	 */
 	protected function _base() {
+		$app = basename(LITHIUM_APP_PATH);
 		$base = str_replace('\\', '/', dirname($this->env('PHP_SELF')));
-		return rtrim(str_replace(array('/app/webroot', '/webroot'), '', $base), '/');
+		return rtrim(str_replace(array("/{$app}/webroot", '/webroot'), '', $base), '/');
 	}
 }
 
