@@ -622,6 +622,12 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertIdentical(true, $result['notifications']->bar);
 		$this->assertIdentical(false, $result['notifications']->baz);
 	}
+
+	public function testMultiOperationConditions() {
+		$conditions = array('loc' => array('$near' => array(50, 50), '$maxDistance' => 5));
+		$result = $this->db->conditions($conditions, $this->query);
+		$this->assertEqual($conditions, $result);
+	}
 }
 
 ?>

@@ -659,8 +659,9 @@ class MongoDb extends \lithium\data\Source {
 					$operations = $result;
 					break;
 				}
+				$operations += $this->_operator($model, $key, $op, $val, $schema);
 			}
-			$conditions[$key] = $result;
+			$conditions[$key] = $operations;
 		}
 		return $conditions;
 	}
