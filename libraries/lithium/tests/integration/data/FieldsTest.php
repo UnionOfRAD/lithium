@@ -3,6 +3,7 @@
 namespace lithium\tests\integration\data;
 
 use lithium\data\Connections;
+use lithium\data\Entity;
 
 class MockCompany extends \lithium\data\Model {
 
@@ -19,6 +20,10 @@ class FieldsTest extends \lithium\test\Unit {
 		MockCompany::config();
 	}
 
+	public function tearDown() {
+		MockCompany::remove();
+	}
+
 	public function skip() {
 		$isAvailable = (
 			Connections::get('test', array('config' => true)) &&
@@ -29,40 +34,37 @@ class FieldsTest extends \lithium\test\Unit {
 
 	public function testSingleField() {
 		$new = MockCompany::create(array('name' => 'Acme, Inc.'));
+		$key = MockCompany::meta('key');
 		$new->save();
-		$id = $new->id;
+		$id = is_object($new->{$key}) ? (string) $new->{$key} : $new->{$key};
 
 		$entity = MockCompany::first($id);
 
-		$isRecord = $entity instanceof \lithium\data\entity\Record;
-		$this->assertTrue($isRecord);
-		$this->skipIf(!$isRecord, 'Is not record');
+		$this->assertTrue($entity instanceof Entity);
+		$this->skipIf(!$entity instanceof Entity, 'Queried object is not an entity.');
 
-		$expected = array('id' => $id, 'name' => 'Acme, Inc.');
+		$expected = array($key => $id, 'name' => 'Acme, Inc.');
 		$result = $entity->data();
 		$this->assertEqual($expected, $result);
 
-		$entity = MockCompany::first(array('fields' => array('id')));
+		$entity = MockCompany::first(array('fields' => array($key)));
 
-		$isRecord = $entity instanceof \lithium\data\entity\Record;
-		$this->assertTrue($isRecord);
-		$this->skipIf(!$isRecord, 'Is not record');
+		$this->assertTrue($entity instanceof Entity);
+		$this->skipIf(!$entity instanceof Entity, 'Queried object is not an entity.');
 
-		$expected = array('id' => $id);
+		$expected = array($key => $id);
 		$result = $entity->data();
 		$this->assertEqual($expected, $result);
 
 		$entity = MockCompany::find('first',array(
-			'conditions' => array('id' => $id),
-			'fields' => array('id')
+			'conditions' => array($key => $id),
+			'fields' => array($key)
 		));
-		$isRecord = $entity instanceof \lithium\data\entity\Record;
-		$this->assertTrue($isRecord);
-		$this->skipIf(!$isRecord, 'Is not record');
+		$this->assertTrue($entity instanceof Entity);
+		$this->skipIf(!$entity instanceof Entity, 'Queried object is not an entity.');
 
 		$result = $entity->save();
 		$this->assertTrue($result);
-
 		$new->delete();
 	}
 }
