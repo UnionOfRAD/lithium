@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\analysis;
 
-use lithium\core\Libraries
+use lithium\core\Libraries;
 use lithium\analysis\Parser;
 
 class ParserTest extends \lithium\test\Unit {
