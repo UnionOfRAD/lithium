@@ -146,6 +146,23 @@ class FormTest extends \lithium\test\Unit {
 		));
 	}
 
+	/**
+	 * Ensures that password fields aren't rendered with pre-populated values from bound record or
+	 * document objects.
+	 *
+	 * @return void
+	 */
+	public function testPasswordWithBindingValue() {
+		$this->form->create(new Record(array(
+			'model' => $this->_model, 'data' => array('pass' => 'foobar')
+		)));
+		$result = $this->form->password('pass');
+
+		$this->assertTags($result, array(
+			'input' => array('type' => 'password', 'name' => 'pass', 'id' => 'MockFormPostPass')
+		));
+	}
+
 	public function testFormDataBinding() {
 		$this->expectException('The data connection default is not configured');
 		MockFormPost::config(array('connection' => false));

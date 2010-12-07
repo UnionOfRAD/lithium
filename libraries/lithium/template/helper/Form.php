@@ -569,6 +569,7 @@ class Form extends \lithium\template\Helper {
 	 */
 	public function password($name, array $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		unset($options['value']);
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
 	}
 
