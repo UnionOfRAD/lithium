@@ -106,7 +106,7 @@ class Response extends \lithium\net\http\Message {
 		}
 
 		if (isset($this->headers['Content-Type'])) {
-			preg_match('/^(.*?);charset=(.+)/i', $this->headers['Content-Type'], $match);
+			preg_match('/^(.*?);\s*?charset=(.+)/i', $this->headers['Content-Type'], $match);
 
 			if ($match) {
 				$this->type = trim($match[1]);
