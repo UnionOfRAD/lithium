@@ -164,7 +164,7 @@ class Stream extends \lithium\net\Socket {
 
 		if ($this->write($message)) {
 			$body = $this->read();
-			$response = new $options['classes']['response'](compact('body'));
+			$response = new $options['response'](compact('body'));
 			return $response;
 		}
 	}
