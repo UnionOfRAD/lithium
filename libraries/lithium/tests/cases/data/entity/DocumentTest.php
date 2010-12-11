@@ -8,7 +8,8 @@
 
 namespace lithium\tests\cases\data\entity;
 
-use stdClass;
+use MongoId;
+use MongoDate;
 use lithium\data\Connections;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
@@ -573,6 +574,16 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc->update();
 		$doc->nested->evenMore = 'foo!';
 		$this->assertEqual(array('nested' => array('evenMore' => 'foo!')), $doc->export($database));
+	}
+
+	public function testArrayConversion() {
+		$doc = new Document(array('data' => array(
+			'id' => new MongoId(),
+			'date' => new MongoDate()
+		)));
+		$result = $doc->data();
+		$this->assertPattern('/^[a-f0-9]{24}$/', $result['id']);
+		$this->assertEqual(time(), $result['date']);
 	}
 }
 
