@@ -65,6 +65,17 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testHead() {
+		$http = new Service($this->_testConfig);
+		$this->assertEqual('', $http->head());
+		$this->assertEqual('HTTP/1.1', $http->last->response->protocol);
+		$this->assertEqual('200', $http->last->response->status['code']);
+		$this->assertEqual('OK', $http->last->response->status['message']);
+		$this->assertEqual('text/html', $http->last->response->type);
+		$this->assertEqual('UTF-8', $http->last->response->encoding);
+		$this->assertEqual('', $http->last->response->body());
+	}
+
 	public function testGet() {
 		$http = new Service($this->_testConfig);
 		$this->assertEqual('', $http->get());

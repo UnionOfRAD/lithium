@@ -80,6 +80,16 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
+	 * Send HEAD request.
+	 *
+	 * @param array $options
+	 * @return string
+	 */
+	public function head(array $options = array()) {
+		return $this->send(__FUNCTION__, null, array(), $options);
+	}
+
+	/**
 	 * Send GET request.
 	 *
 	 * @param string $path
