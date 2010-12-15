@@ -429,19 +429,24 @@ class Validator extends \lithium\core\StaticObject {
 			'required' => true,
 			'skipEmpty' => false,
 			'format' => 'any',
+			'on' => null,
 		);
 		$errors = array();
+		$events = (array) (isset($options['events']) ? $options['events'] : null);
 
 		foreach ($rules as $field => $rules) {
 			$rules = is_string($rules) ? array('message' => $rules) : $rules;
 			$rules = is_array(current($rules)) ? $rules : array($rules);
 			$errors[$field] = array();
-
 			$options['field'] = $field;
+
 			foreach ($rules as $key => $rule) {
 				$rule += $defaults + compact('values');
 				list($name) = $rule;
 
+				if ($events && $rule['on'] && !array_intersect($events, (array) $rule['on'])) {
+					continue;
+				}
 				if (!isset($values[$field])) {
 					if ($rule['required']) {
 						$errors[$field][] = $rule['message'] ?: $key;

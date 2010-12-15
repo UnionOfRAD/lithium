@@ -1033,6 +1033,41 @@ class ValidatorTest extends \lithium\test\Unit {
 		);
 		$this->assertIdentical(array('title' => array(0)), $result);
 	}
+
+	/**
+	 * Tests that event flags applied to rules only trigger when the corresponding event is passed
+	 * in the `$options` parameter of `check()`.
+	 *
+	 * @return void
+	 */
+	public function testEvents() {
+		$rules = array('number' => array('numeric', 'message' => 'Badness!'));
+		$expected = array('number' => array('Badness!'));
+
+		$result = Validator::check(array('number' => 'o'), $rules);
+		$this->assertEqual($expected, $result);
+
+		$rules['number']['on'] = 'foo';
+		$result = Validator::check(array('number' => 'o'), $rules, array('events' => 'foo'));
+		$this->assertEqual($expected, $result);
+
+		$result = Validator::check(array('number' => 'o'), $rules, array('events' => 'bar'));
+		$this->assertEqual(array(), $result);
+
+		$result = Validator::check(array('number' => 'o'), $rules, array(
+			'events' => array('foo', 'bar')
+		));
+		$this->assertEqual($expected, $result);
+
+		$result = Validator::check(array('number' => 'o'), $rules, array(
+			'events' => array('bar', 'baz')
+		));
+		$this->assertEqual(array(), $result);
+
+		unset($rules['number']['on']);
+		$result = Validator::check(array('number' => 'o'), $rules, array('events' => 'foo'));
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

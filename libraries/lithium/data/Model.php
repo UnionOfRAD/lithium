@@ -732,7 +732,10 @@ class Model extends \lithium\core\StaticObject {
 	 * @return boolean Success.
 	 */
 	public function validates($entity, array $options = array()) {
-		$defaults = array('rules' => $this->validates);
+		$defaults = array(
+			'rules' => $this->validates,
+			'events' => $entity->exists() ? 'update' : 'create',
+		);
 		$options += $defaults;
 		$self = static::_object();
 		$validator = static::$_classes['validator'];
