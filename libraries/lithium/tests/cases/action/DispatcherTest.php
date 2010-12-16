@@ -45,12 +45,64 @@ class DispatcherTest extends \lithium\test\Unit {
 		MockDispatcher::run(new Request(array('url' => '/')));
 	}
 
+	public function testApplyRulesControllerCasing() {
+		$result = Dispatcher::applyRules(array('controller' => 'test', 'action' => 'test'));
+		$expected = array('controller' => 'Test', 'action' => 'test');
+		$this->assertEqual($expected, $result);
+
+		$result = Dispatcher::applyRules(array('controller' => 'Test', 'action' => 'test'));
+		$expected = array('controller' => 'Test', 'action' => 'test');
+		$this->assertEqual($expected, $result);
+
+		$result = Dispatcher::applyRules(array('controller' => 'test_one', 'action' => 'test'));
+		$expected = array('controller' => 'TestOne', 'action' => 'test');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testApplyRulesWithNamespacedController() {
+		$result = Dispatcher::applyRules(array(
+			'controller' => 'li3_test\\Test', 'action' => 'test'
+		));
+		$expected = array(
+			'controller' => 'li3_test\\Test', 'action' => 'test'
+		);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testApplyRulesDotNamespacing() {
+		$result = Dispatcher::applyRules(array(
+			'controller' => 'li3_test.test', 'action' => 'test'
+		));
+		$expected = array(
+			'controller' => 'li3_test.Test', 'action' => 'test'
+		);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testApplyRulesLibraryKeyNamespacing() {
 		$result = Dispatcher::applyRules(array(
 			'library' => 'li3_test', 'controller' => 'test', 'action' => 'test'
 		));
 		$expected = array(
 			'library' => 'li3_test', 'controller' => 'li3_test.Test', 'action' => 'test'
+		);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testApplyRulesNamespacingCollision() {
+		$result = Dispatcher::applyRules(array(
+			'library' => 'li3_one', 'controller' => 'li3_two.test', 'action' => 'test'
+		));
+		$expected = array(
+			'library' => 'li3_one', 'controller' => 'li3_two.Test', 'action' => 'test'
+		);
+		$this->assertEqual($expected, $result);
+
+		$result = Dispatcher::applyRules(array(
+			'library' => 'li3_one', 'controller' => 'li3_two\\Test', 'action' => 'test'
+		));
+		$expected = array(
+			'library' => 'li3_one', 'controller' => 'li3_two\\Test', 'action' => 'test'
 		);
 		$this->assertEqual($expected, $result);
 	}
