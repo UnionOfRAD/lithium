@@ -12,6 +12,7 @@ use lithium\util\String;
 use lithium\util\Inflector;
 use lithium\core\Libraries;
 use lithium\action\DispatchException;
+use lithium\core\ClassNotFoundException;
 
 /**
  * `Dispatcher` is the outermost layer of the framework, responsible for both receiving the initial
@@ -185,15 +186,14 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$params = compact('request', 'params', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
-			$request = $params['request'];
-			$options = $params['options'];
-			$params = $params['params'];
-			$class = Libraries::locate('controllers', $params['controller']);
+			$options = array('request' => $params['request']) + $params['options'];
+			$controller = $params['params']['controller'];
 
-			if (class_exists($class)) {
-				return new $class(compact('request') + $options);
+			try {
+				return Libraries::instance('controllers', $controller, $options);
+			} catch (ClassNotFoundException $e) {
+				throw new DispatchException("Controller '{$controller}' not found", null, $e);
 			}
-			throw new DispatchException("Controller '{$params['controller']}' not found");
 		});
 	}
 
