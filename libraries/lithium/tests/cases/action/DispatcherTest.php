@@ -45,6 +45,16 @@ class DispatcherTest extends \lithium\test\Unit {
 		MockDispatcher::run(new Request(array('url' => '/')));
 	}
 
+	public function testApplyRulesLibraryKeyNamespacing() {
+		$result = Dispatcher::applyRules(array(
+			'library' => 'li3_test', 'controller' => 'test', 'action' => 'test'
+		));
+		$expected = array(
+			'library' => 'li3_test', 'controller' => 'li3_test.Test', 'action' => 'test'
+		);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testConfigManipulation() {
 		$config = MockDispatcher::config();
 		$expected = array('rules' => array());

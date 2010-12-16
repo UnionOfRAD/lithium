@@ -145,6 +145,10 @@ class Dispatcher extends \lithium\core\StaticObject {
 				$controller = $library . '.' . Inflector::camelize($controller);
 			} elseif (strpos($controller, '\\') === false) {
 				$controller = Inflector::camelize($controller);
+
+				if (isset($params['library'])) {
+					$controller = "{$params['library']}.{$controller}";
+				}
 			}
 			$params['controller'] = $controller;
 		}
