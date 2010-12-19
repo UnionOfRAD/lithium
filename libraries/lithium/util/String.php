@@ -57,27 +57,35 @@ class String {
 	}
 
 	/**
-	 * Create a hash from string using given method.  Fallback on next available method.
-	 *
+	 * uses php's hash/hash_hmac depending if a salt is available defaults to sha512
+     * methods are available here: ```http://us.php.net/manual/en/function.hash-algos.php```
+     *
 	 * @param string $string String to hash.
-	 * @param string $type Method to use (sha1/sha256/md5, or any method supported
-	 *        by the `hash()` function).
-	 * @param string $salt
+	 * @param array $options Supported Methods:
+     *      'type' => any hash_algos() returns
+     *      'salt' => salt to attach to the string
+     *      'key'  => if set hash_hmac will be used instead of just hash
+     *      'raw'  => raw output if set to true.
 	 * @return string Hash.
 	 */
-	public static function hash($string, $type = 'sha1', $salt = null) {
-		$string = $salt . $string;
+	public static function hash($string, $options = array()) {
+		$defaults = array(
+            'type' => 'sha512',
+            'salt' => false,
+            'key' => false,
+            'raw' => false
+        );
 
-		switch (true) {
-			case ($type == 'sha1' && function_exists('sha1')):
-				return sha1($string);
-			case ($type == 'sha256' && function_exists('mhash')):
-				return bin2hex(mhash(MHASH_SHA256, $string));
-			case (function_exists('hash')):
-				return hash($type, $string);
-			default:
-		}
-		return md5($string);
+        $options += $defaults;
+
+        if($options['salt']){
+            $string = $options['salt'] . $string;
+        }
+
+        if($options['key']){
+            return hash_hmac($options['type'],$string,$options['key'],$options['raw']);
+        }
+        return hash($options['type'], $string, $options['raw']);
 	}
 
 	/**
