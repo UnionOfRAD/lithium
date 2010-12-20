@@ -201,7 +201,7 @@ class Html extends \lithium\template\Helper {
 	 *
 	 * The ```$options``` must match the named parameters from ```$_strings``` for the
 	 * given ```$tag```.
-	 * 
+	 *
 	 * @param string $tag the name of a key in ```$_strings```
 	 * @param array $options the options required by ```$_strings[$tag]```
 	 * @return mixed a string if successful, otherwise NULL

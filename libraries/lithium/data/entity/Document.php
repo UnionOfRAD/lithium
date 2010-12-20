@@ -249,15 +249,19 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	}
 
 	protected function &_getNested($name) {
-		$null  = null;
-		$current = $this;
+		$current =& $this;
+		$null = null;
 		$path = explode('.', $name);
 		$length = count($path) - 1;
 
 		foreach ($path as $i => $key) {
-			$current =& $current->__get($key);
+			if (is_array($current)) {
+				$current =& $current[$key];
+			} else {
+				$current =& $current->{$key};
+			}
 
-			if (!$current instanceof Document && $i < $length) {
+			if (is_scalar($current) && $i < $length) {
 				return $null;
 			}
 		}

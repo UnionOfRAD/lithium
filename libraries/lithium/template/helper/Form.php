@@ -147,7 +147,7 @@ class Form extends \lithium\template\Helper {
 					if (!$name || ($method == 'hidden' && $name = '_method')) {
 						return;
 					}
-					$id = Inflector::camelize($name);
+					$id = Inflector::camelize(Inflector::slug($name));
 					$model = ($binding = $self->binding()) ? $binding->model() : null;
 					return $model ? basename(str_replace('\\', '/', $model)) . $id : $id;
 				}
@@ -206,8 +206,9 @@ class Form extends \lithium\template\Helper {
 	 */
 	public function config(array $config = array()) {
 		if (!$config) {
+			$keys = array('base' => '', 'text' => '', 'textarea' => '', 'attributes' => '');
 			return array('templates' => $this->_templateMap) + array_intersect_key(
-				$this->_config, array('base' => '', 'text' => '', 'textarea' => '')
+				$this->_config, $keys
 			);
 		}
 		if (isset($config['templates'])) {
@@ -681,6 +682,11 @@ class Form extends \lithium\template\Helper {
 		}
 		unset($options['default']);
 
+		if (strpos($name, '.')) {
+			$name = explode('.', $name);
+			$first = array_shift($name);
+			$name = $first . '[' . join('][', $name) . ']';
+		}
 		$tplKey = isset($options['template']) ? $options['template'] : $method;
 		$template = isset($this->_templateMap[$tplKey]) ? $this->_templateMap[$tplKey] : $tplKey;
 		return array($name, $options, $template);

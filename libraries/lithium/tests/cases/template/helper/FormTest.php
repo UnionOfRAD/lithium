@@ -12,6 +12,7 @@ use stdClass;
 use lithium\action\Request;
 use lithium\net\http\Router;
 use lithium\data\entity\Record;
+use lithium\data\entity\Document;
 use lithium\template\helper\Form;
 use lithium\tests\mocks\template\helper\MockFormPost;
 use lithium\tests\mocks\template\helper\MockFormRenderer;
@@ -232,9 +233,11 @@ class FormTest extends \lithium\test\Unit {
 			'base' => array('class' => 'editable', 'maxlength' => 255),
 			'text' => array('class' => 'locked'),
 			'textarea' => array(),
-			'templates' => array('create' => 'form', 'end' => 'form-end')
+			'templates' => array('create' => 'form', 'end' => 'form-end'),
+			'attributes' => array('id' => $result['attributes']['id'])
 		);
 		$this->assertEqual($expected, $result);
+		$this->assertTrue(is_callable($result['attributes']['id']));
 	}
 
 	public function testFormElementWithDefaultValue() {
@@ -844,10 +847,9 @@ class FormTest extends \lithium\test\Unit {
 	}
 
 	public function testFieldAssumeSelectIfList() {
-		$result = $this->form->field(
-			'colors',
-			array('list' => array('r' => 'red', 'g' => 'green', 'b' => 'blue'))
-		);
+		$result = $this->form->field('colors', array(
+			'list' => array('r' => 'red', 'g' => 'green', 'b' => 'blue')
+		));
 		$expected = array(
 			'<div',
 				array('label' => array('for' => 'Colors')),
@@ -878,9 +880,22 @@ class FormTest extends \lithium\test\Unit {
 			'label' => array('for' => 'Name'), 'Name', '/label',
 			'input' => array('type' => 'text', 'name' => 'name', 'id' => 'Name'),
 		));
-
 	}
 
+	/**
+	 * Tests that inputs for nested objects can be assigned using dot syntax.
+	 *
+	 * @return void
+	 */
+	public function testNestedFieldAccess() {
+		$doc = new Document(array('data' => array('foo' => array('bar' => 'value'))));
+		$this->form->create($doc);
+
+		$result = $this->form->text('foo.bar');
+		$this->assertTags($result, array('input' => array(
+			'type' => 'text', 'name' => 'foo[bar]', 'id' => 'FooBar', 'value' => 'value'
+		)));
+	}
 }
 
 ?>
