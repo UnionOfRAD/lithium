@@ -380,12 +380,12 @@ class Query extends \lithium\core\Object {
 	 * @return array Returns an array containing a data source-specific representation of a query.
 	 */
 	public function export(Source $dataSource, array $options = array()) {
-		$defaults = array('data' => array());
+		$defaults = array('data' => array(), 'keys' => array());
 		$options += $defaults;
 
-		$keys = array_keys($this->_config);
+		$keys = $options['keys'] ?: array_keys($this->_config);
 		$methods = $dataSource->methods();
-		$results = array();
+		$results = array('type' => $this->_type);
 
 		$apply = array_intersect($keys, $methods);
 		$copy = array_diff($keys, $apply);
@@ -401,8 +401,12 @@ class Query extends \lithium\core\Object {
 		$data = ($list = $this->_config['whitelist']) ? array_intersect_key($data, $list) : $data;
 		$results = compact('data') + $results;
 
-		$results['type'] = $this->_type;
-		$results['source'] = $dataSource->name($this->_config['source']);
+		if (isset($results['source'])) {
+			$results['source'] = $dataSource->name($results['source']);
+		}
+		if (!isset($results['fields'])) {
+			return $results;
+		}
 		$created = array('fields', 'values');
 
 		if (is_array($results['fields']) && array_keys($results['fields']) == $created) {
@@ -461,7 +465,8 @@ class Query extends \lithium\core\Object {
 	 * Will return a find first condition on the associated model if a record is connected.
 	 * Called by conditions when it is called as a get and no condition is set.
 	 *
-	 * @return array ([model's primary key'] => [that key set in the record]).
+	 * @return array Returns an array in the following format:
+	 *         `([model's primary key'] => [that key set in the record])`.
 	 */
 	protected function _entityConditions() {
 		if (!$this->_entity || !($model = $this->_config['model'])) {

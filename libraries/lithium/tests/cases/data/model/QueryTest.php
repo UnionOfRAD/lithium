@@ -286,6 +286,26 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual("{{$expected}}", $result);
 	}
 
+	public function testRestrictedKeyExport() {
+		$options = array(
+			'type' => 'update',
+			'data' => array('title' => 'Bar'),
+			'conditions' => array('title' => 'Foo'),
+			'model' => $this->_model,
+		);
+		$query = new Query($options);
+
+		$result = $query->export(Connections::get('mock-database-connection'), array(
+			'keys' => array('data', 'conditions')
+		));
+		$expected = array(
+			'type' => 'update',
+			'data' => array('title' => 'Bar'),
+			'conditions' => "WHERE title = 'Foo'",
+		);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testPagination() {
 		$query = new Query(array('limit' => 5, 'page' => 1));
 		$this->assertEqual(0, $query->offset());
