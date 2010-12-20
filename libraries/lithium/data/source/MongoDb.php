@@ -14,6 +14,7 @@ use MongoCode;
 use MongoDate;
 use MongoDBRef;
 use MongoRegex;
+use MongoBinData;
 use MongoGridFSFile;
 use lithium\util\Inflector;
 use lithium\core\NetworkException;
@@ -173,7 +174,9 @@ class MongoDb extends \lithium\data\Source {
 			'regex'   => function($v) { return new MongoRegex($v); },
 			'integer' => function($v) { return (integer) $v; },
 			'float'   => function($v) { return (float) $v; },
-			'boolean' => function($v) { return (boolean) $v; }
+			'boolean' => function($v) { return (boolean) $v; },
+			'code'    => function($v) { return new MongoCode($v); },
+			'binary'  => function($v) { return new MongoBinData($v); },
 		);
 	}
 
@@ -762,11 +765,13 @@ class MongoDb extends \lithium\data\Source {
 		unset($options['schema']);
 
 		$typeMap = array(
-			'MongoId'   => 'id',
-			'MongoDate' => 'date',
-			'datetime'  => 'date',
-			'timestamp' => 'date',
-			'int'       => 'integer'
+			'MongoId'      => 'id',
+			'MongoDate'    => 'date',
+			'MongoCode'    => 'code',
+			'MongoBinData' => 'binary',
+			'datetime'     => 'date',
+			'timestamp'    => 'date',
+			'int'          => 'integer'
 		);
 
 		foreach ($data as $key => $value) {
