@@ -81,7 +81,7 @@ class Response extends \lithium\net\http\Response {
 				'Cache-Control' => array(
 					'no-store, no-cache, must-revalidate',
 					'post-check=0, pre-check=0',
-					'max-age=0'
+					'max-age=0',
 				),
 				'Pragma' => 'no-cache',
 			);

@@ -265,6 +265,17 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testDetectSsl() {
+		$request = new Request(array('env' => array('SCRIPT_URI' => null, 'HTTPS' => 'off')));
+		$this->assertFalse($request->env('HTTPS'));
+
+		$request = new Request(array('env' => array('SCRIPT_URI' => null, 'HTTPS' => 'on')));
+		$this->assertTrue($request->env('HTTPS'));
+
+		$request = new Request(array('env' => array('SCRIPT_URI' => null, 'HTTPS' => null)));
+		$this->assertFalse($request->env('HTTPS'));
+	}
+
 	public function testContentTypeDetection() {
 		$request = new Request(array('env' => array(
 			'CONTENT_TYPE' => 'application/json; charset=UTF-8',
@@ -340,10 +351,11 @@ class RequestTest extends \lithium\test\Unit {
 	public function testMagicParamsAccess() {
 		$this->assertNull($this->request->action);
 		$this->assertFalse(isset($this->request->params['action']));
+		$this->assertFalse(isset($this->request->action));
 
 		$expected = $this->request->params['action'] = 'index';
-		$result = $this->request->action;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $this->request->action);
+		$this->assertTrue(isset($this->request->action));
 	}
 
 	public function testSingleFileNormalization() {

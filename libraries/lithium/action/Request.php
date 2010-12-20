@@ -280,7 +280,7 @@ class Request extends \lithium\net\http\Message {
 			$val = ($addr = $this->env('HTTP_PC_REMOTE_ADDR')) ? $addr : $val;
 		}
 
-		if ($val !== null && $val !== false) {
+		if ($val !== null && $val !== false && $key !== 'HTTPS') {
 			return $val;
 		}
 
