@@ -35,18 +35,21 @@ class RendererTest extends \lithium\test\Unit {
 	}
 
 	public function testInitialization() {
-		$expected = array('url', 'path', 'options', 'content', 'title', 'scripts', 'styles');
+		$expected = array(
+			'url', 'path', 'options', 'content', 'title', 'scripts', 'styles', 'head'
+		);
 		$result = array_keys($this->subject->handlers());
 		$this->assertEqual($expected, $result);
 
-		$expected = array('content', 'title', 'scripts', 'styles');
+		$expected = array('content', 'title', 'scripts', 'styles', 'head');
 		$result = array_keys($this->subject->context());
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testContextQuerying() {
 		$expected = array(
-			'content' => '', 'title' => '', 'scripts' => array(), 'styles' => array()
+			'content' => '', 'title' => '', 'scripts' => array(),
+			'styles' => array(), 'head' => array()
 		);
 		$this->assertEqual($expected, $this->subject->context());
 		$this->assertEqual('', $this->subject->context('title'));
@@ -89,7 +92,7 @@ class RendererTest extends \lithium\test\Unit {
 		$foo = function($value) { return "Foo: {$value}"; };
 
 		$expected = array(
-			'url', 'path', 'options', 'content', 'title', 'scripts', 'styles', 'foo'
+			'url', 'path', 'options', 'content', 'title', 'scripts', 'styles', 'head', 'foo'
 		);
 		$result = array_keys($this->subject->handlers(compact('foo')));
 		$this->assertEqual($expected, $result);
@@ -223,6 +226,11 @@ class RendererTest extends \lithium\test\Unit {
 		$this->assertEqual('Foo', $this->subject->title('Foo'));
 		$this->assertEqual('Bar', $this->subject->title('Bar'));
 		$this->assertEqual('Bar', $this->subject->title());
+
+		$this->assertFalse(trim($this->subject->head()));
+		$this->assertEqual('foo', trim($this->subject->head('foo')));
+		$this->assertEqual("foo\n\tbar", trim($this->subject->head('bar')));
+		$this->assertEqual("foo\n\tbar", trim($this->subject->head()));
 	}
 }
 
