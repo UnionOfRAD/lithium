@@ -13,6 +13,26 @@ use lithium\util\Collection;
 
 class DocumentArray extends \lithium\data\Collection {
 
+	protected $_exists = false;
+
+	/**
+	 * Holds an array of values that should be processed on initialization.
+	 *
+	 * @var array
+	 */
+	protected $_autoConfig = array(
+		'data', 'model', 'result', 'query', 'parent', 'stats', 'pathKey', 'exists'
+	);
+
+	public function exists() {
+		return $this->_exists;
+	}
+
+	public function update($id = null, array $data = array()) {
+		$this->_exists = true;
+		$this->_data = $data ?: $this->_data;
+	}
+
 	/**
 	 * Adds conversions checks to ensure certain class types and embedded values are properly cast.
 	 *
@@ -71,9 +91,8 @@ class DocumentArray extends \lithium\data\Collection {
 
 	public function offsetSet($offset, $data) {
 		if ($model = $this->_model) {
-			$data = $model::connection()->cast($model, array($this->_pathKey => $data), array(
-				'first' => true
-			));
+			$options = array('first' => true, 'schema' => $model::schema());
+			$data = $model::connection()->cast($this, array($this->_pathKey => $data), $options);
 		}
 		if ($offset) {
 			return $this->_data[$offset] = $data;
@@ -115,17 +134,12 @@ class DocumentArray extends \lithium\data\Collection {
 		return $this->_valid ? $this->offsetGet(key($this->_data)) : null;
 	}
 
-	public function export(Source $dataSource, array $options = array()) {
-		$result = array();
-
-		foreach ($this->_data as $key => $doc) {
-			if (is_object($doc) && method_exists($doc, 'export')) {
-				$result[$key] = $doc->export($dataSource, $options);
-				continue;
-			}
-			$result[$key] = $doc;
-		}
-		return $result;
+	public function export() {
+		return array(
+			'exists' => $this->_exists,
+			'key'  => $this->_pathKey,
+			'data' => $this->_data,
+		);
 	}
 
 	protected function _populate($data = null, $key = null) {}

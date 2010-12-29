@@ -169,14 +169,6 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	}
 
 	public function export() {
-		foreach ($this->_updated as $key => $val) {
-			if (is_a($val, __CLASS__)) {
-				$path = $this->_pathKey ? "{$this->_pathKey}." : '';
-				$this->_updated[$key]->_pathKey = "{$path}{$key}";
-				$this->_updated[$key]->_exists = false;
-			}
-		}
-
 		return parent::export() + array(
 			'key'       => $this->_pathKey,
 			'remove'    => $this->_removed,

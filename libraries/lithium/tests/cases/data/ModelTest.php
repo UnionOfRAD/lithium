@@ -160,7 +160,7 @@ class ModelTest extends \lithium\test\Unit {
 			'link' => 'key',
 			'fields' => true,
 			'fieldName' => 'mockPost',
-			'conditions' => null,
+			'constraint' => array(),
 			'init' => true
 		);
 		$this->assertEqual($expected, MockComment::relations('MockPost')->data());
@@ -174,7 +174,7 @@ class ModelTest extends \lithium\test\Unit {
 			'keys' => array('mock_post_id' => 'id'),
 			'link' => 'key',
 			'fieldName' => 'mockComment',
-			'conditions' => null,
+			'constraint' => array(),
 			'init' => true
 		);
 		$this->assertEqual($expected, MockPost::relations('MockComment')->data());
@@ -467,7 +467,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual(array('published' => false), $query->conditions());
 
 		$keys = array_keys(array_filter($query->export(Connections::get('mock-source'))));
-		$this->assertEqual(array('name', 'conditions', 'model', 'source', 'type'), $keys);
+		$this->assertEqual(array('type', 'name', 'conditions', 'model', 'source'), $keys);
 	}
 
 	public function testFindFirst() {

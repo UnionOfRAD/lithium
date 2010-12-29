@@ -284,7 +284,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$this->assertEqual(array('_id', 'title'), array_keys($original));
 		$this->assertEqual('Test Post', $original['title']);
-		$this->assertPattern('/[0-9a-f]{24}/', $original['_id']);
+		$this->assertPattern('/^[0-9a-f]{24}$/', $original['_id']);
 
 		$this->query = new Query(compact('model') + array(
 			'data' => array('title' => 'New Post Title'),
@@ -441,6 +441,7 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testRelationshipGeneration() {
+		$this->skipIf(true, "Temporarily disabled.");
 		Connections::add('mock-source', $this->_testConfig);
 		$from = 'lithium\tests\mocks\data\MockComment';
 		$to = 'lithium\tests\mocks\data\MockPost';
@@ -551,7 +552,7 @@ class MongoDbTest extends \lithium\test\Unit {
 			'rank' => '3.45688'
 		);
 		$time = time();
-		$result = $this->db->cast($this->_model, $data, array('schema' => $this->_schema));
+		$result = $this->db->cast(null, $data, array('schema' => $this->_schema));
 
 		$this->assertEqual(array_keys($data), array_keys($result));
 		$this->assertTrue($result['_id'] instanceOf MongoId);
@@ -574,6 +575,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$this->assertTrue($result['modified'] instanceOf MongoDate);
 		$this->assertTrue($result['created'] instanceOf MongoDate);
+		$this->assertTrue($result['created']->usec > 0);
 
 		$this->assertEqual($time, $result['modified']->sec);
 		$this->assertEqual($time, $result['created']->sec);
@@ -646,6 +648,44 @@ class MongoDbTest extends \lithium\test\Unit {
 		$conditions = array('loc' => array('$near' => array(50, 50), '$maxDistance' => 5));
 		$result = $this->db->conditions($conditions, $this->query);
 		$this->assertEqual($conditions, $result);
+	}
+
+	public function testCreateWithEmbeddedObjects() {
+		$data = array(
+			'_id' => new MongoId(),
+			'created' => new MongoDate(strtotime('-1 hour')),
+			'list' => array('foo', 'bar', 'baz')
+		);
+		$entity = new Document(compact('data') + array('exists' => false));
+		$query = new Query(array('type' => 'create') + compact('entity'));
+		$result = $query->export($this->db);
+		$this->assertIdentical($data, $result['data']['data']);
+	}
+
+	public function testUpdateWithEmbeddedObjects() {
+		$data = array(
+			'_id' => new MongoId(),
+			'created' => new MongoDate(strtotime('-1 hour')),
+			'list' => array('foo', 'bar', 'baz')
+		);
+		$model = $this->_model;
+		$schema = array('updated' => array('type' => 'MongoDate'));
+		$entity = new Document(compact('data', 'schema', 'model') + array('exists' => true));
+		$entity->updated = time();
+		$entity->list[] = 'dib';
+
+		$query = new Query(array('type' => 'update') + compact('entity'));
+		$result = $query->export($this->db);
+		$this->assertEqual(array('updated'), array_keys($result['data']['update']));
+		$this->assertTrue($result['data']['update']['updated'] instanceof MongoDate);
+	}
+
+	public function testSchemaCallback() {
+		$schema = array('_id' => array('type' => 'id'), 'created' => array('type' => 'date'));
+		$db = new MongoDb(array('autoConnect' => false, 'schema' => function() use ($schema) {
+			return $schema;
+		}));
+		$this->assertEqual($schema, $db->describe(null));
 	}
 }
 

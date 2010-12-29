@@ -63,11 +63,12 @@ class MongoDb extends \lithium\data\Source {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'entity' => 'lithium\data\entity\Document',
-		'array'  => 'lithium\data\collection\DocumentArray',
-		'set'    => 'lithium\data\collection\DocumentSet',
-		'result' => 'lithium\data\source\mongo_db\Result',
-		'relationship' => 'lithium\data\model\Relationship'
+		'entity'   => 'lithium\data\entity\Document',
+		'array'    => 'lithium\data\collection\DocumentArray',
+		'set'      => 'lithium\data\collection\DocumentSet',
+		'result'   => 'lithium\data\source\mongo_db\Result',
+		'exporter' => 'lithium\data\source\mongo_db\Exporter',
+		'relationship' => 'lithium\data\model\Relationship',
 	);
 
 	/**
@@ -169,7 +170,8 @@ class MongoDb extends \lithium\data\Source {
 				return is_string($v) && preg_match('/^[0-9a-f]{24}$/', $v) ? new MongoId($v) : $v;
 			},
 			'date' => function($v) {
-				return new MongoDate(is_numeric($v) ? intval($v) : strtotime($v));
+				$v = is_numeric($v) ? intval($v) : strtotime($v);
+				return (time() == $v) ? new MongoDate() : new MongoDate($v);
 			},
 			'regex'   => function($v) { return new MongoRegex($v); },
 			'integer' => function($v) { return (integer) $v; },
@@ -361,37 +363,40 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean
 	 */
 	public function create($query, array $options = array()) {
+		$defaults = array('safe' => false, 'fsync' => false);
+		$options += $defaults;
 		$this->_checkConnection();
+
 		$params = compact('query', 'options');
 		$_config = $this->_config;
+		$_exp = $this->_classes['exporter'];
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
-			$query = $params['query'];
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config, $_exp) {
+			$query   = $params['query'];
 			$options = $params['options'];
-			$data = array();
-
-			$params = $query->export($self);
+			$data    = $_exp::get('create', $query->entity()->export());
 			$gridCol = "{$_config['gridPrefix']}.files";
+			$source  = $query->source();
 
-			if ($query->source() == $gridCol && isset($params['data']['file'])) {
+			if ($source == $gridCol && isset($data['create']['file'])) {
 				$result = array('ok' => true);
-				$data['_id'] = $self->invokeMethod('_saveFile', array($params));
+				$data['create']['_id'] = $self->invokeMethod('_saveFile', array($data['create']));
 			} else {
-				$result = $self->connection->{$params['source']}->insert($params['data'], true);
+				$result = $self->connection->{$source}->insert($data['create'], $options);
 			}
 
-			if (isset($result['ok']) && (boolean) $result['ok'] === true) {
-				$params['data'] += $data;
-				$query->entity()->update($params['data']['_id']);
+			if ($result === true || isset($result['ok']) && (boolean) $result['ok'] === true) {
+				if ($query->entity()) {
+					$query->entity()->update($data['create']['_id']);
+				}
 				return true;
 			}
 			return false;
 		});
 	}
 
-	protected function _saveFile($params) {
+	protected function _saveFile($data) {
 		$uploadKeys = array('name', 'type', 'tmp_name', 'error', 'size');
-		$data = $params['data'];
 		$grid = $this->connection->getGridFS();
 		$file = null;
 		$method = null;
@@ -401,7 +406,7 @@ class MongoDb extends \lithium\data\Source {
 				if (!$data['file']['error'] && is_uploaded_file($data['file']['tmp_name'])) {
 					$method = 'storeFile';
 					$file = $data['file']['tmp_name'];
-					$data += array('filename' => $data['file']['name']);
+					$data['filename'] = $data['file']['name'];
 				}
 			break;
 			case (is_string($data['file']) && file_exists($data['file'])):
@@ -489,25 +494,31 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean
 	 */
 	public function update($query, array $options = array()) {
-		$this->_checkConnection();
-		$defaults = array('atomic' => true);
+		$defaults = array('upsert' => false, 'multiple' => true, 'safe' => false, 'fsync' => false);
 		$options += $defaults;
+		$this->_checkConnection();
+
 		$params = compact('query', 'options');
 		$_config = $this->_config;
+		$_exp = $this->_classes['exporter'];
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
-			$query = $params['query'];
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config, $_exp) {
 			$options = $params['options'];
-			$args = $query->export($self, $options);
-			$gridCol = "{$_config['gridPrefix']}.files";
+			$query  = $params['query'];
+			$args   = $query->export($self, array('keys' => array('conditions', 'source')));
+			$source = $args['source'];
+			$data   = $args['data'];
 
-			if ($args['source'] == $gridCol && isset($args['data']['file'])) {
-				$args['data']['_id'] = $self->invokeMethod('_saveFile', array($args));
+			if ($query->entity()) {
+				$data = $_exp::get('update', $data);
 			}
-			unset($args['data']['_id']);
-			$update = ($options['atomic']) ? array('$set' => $args['data']) : $args['data'];
 
-			if ($self->connection->{$args['source']}->update($args['conditions'], $update)) {
+			if ($source == "{$_config['gridPrefix']}.files" && isset($data['update']['file'])) {
+				$args['data']['_id'] = $self->invokeMethod('_saveFile', array($data['update']));
+			}
+			$update = $query->entity() ? $_exp::toCommand($data) : $data;
+
+			if ($self->connection->{$source}->update($args['conditions'], $update)) {
 				$query->entity() ? $query->entity()->update() : null;
 				return true;
 			}
@@ -530,7 +541,7 @@ class MongoDb extends \lithium\data\Source {
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
 			$query = $params['query'];
 			$options = $params['options'];
-			$args = $query->export($self);
+			$args = $query->export($self, array('keys' => array('source', 'conditions')));
 			return $self->connection->{$args['source']}->remove($args['conditions'], $options);
 		});
 	}
@@ -644,7 +655,7 @@ class MongoDb extends \lithium\data\Source {
 				continue;
 			}
 			if (!is_array($value)) {
-				$conditions[$key] = $this->cast($model, array($key => $value), $castOpts);
+				$conditions[$key] = $this->cast(null, array($key => $value), $castOpts);
 				continue;
 			}
 			$current = key($value);
@@ -754,14 +765,26 @@ class MongoDb extends \lithium\data\Source {
 		return $order ?: array();
 	}
 
-	public function cast($model, array $data, array $options = array()) {
+	public function cast($entity, array $data, array $options = array()) {
 		$defaults = array('schema' => null, 'first' => false, 'pathKey' => null, 'arrays' => true);
 		$options += $defaults;
+		$model = null;
 
-		if ($model && !$options['schema']) {
-			$options['schema'] = $model::schema() ?: array('_id' => array('type' => 'id'));
+		if (!$data) {
+			return $data;
 		}
-		$schema = $options['schema'];
+		if (is_string($entity)) {
+			$model = $entity;
+			$entity = null;
+			$options['schema'] = $options['schema'] ?: $model::schema();
+		}
+		if ($entity && !$options['schema']) {
+			$options['schema'] = $entity->schema();
+		}
+		if ($entity) {
+			$model = $entity->model();
+		}
+		$schema = $options['schema'] ?: array('_id' => array('type' => 'id'));
 		unset($options['schema']);
 
 		$typeMap = array(
@@ -771,7 +794,7 @@ class MongoDb extends \lithium\data\Source {
 			'MongoBinData' => 'binary',
 			'datetime'     => 'date',
 			'timestamp'    => 'date',
-			'int'          => 'integer'
+			'int'          => 'integer',
 		);
 
 		foreach ($data as $key => $value) {

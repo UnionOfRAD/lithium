@@ -57,7 +57,7 @@ class Relationship extends \lithium\core\Object {
 			'link' => self::LINK_KEY,
 			'fields' => true,
 			'fieldName' => null,
-			'conditions' => null,
+			'constraint' => array(),
 		);
 		parent::__construct($config + $defaults);
 	}

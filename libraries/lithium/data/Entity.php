@@ -25,7 +25,13 @@ use lithium\util\Collection as Col;
 class Entity extends \lithium\core\Object {
 
 	/**
-	 * Namespaced name of model that this record is linked to.
+	 * Fully-namespaced class name of model that this record is bound to. Instance methods declared
+	 * in the model may be called on the entity. See the `Model` class documentation for more
+	 * information.
+	 *
+	 * @see lithium\data\Model
+	 * @see lithium\data\Entity::__call()
+	 * @var string
 	 */
 	protected $_model = null;
 
@@ -59,23 +65,38 @@ class Entity extends \lithium\core\Object {
 	protected $_handle = null;
 
 	/**
-	 * Validation errors
+	 * The list of validation errors associated with this object, where keys are field names, and
+	 * values are arrays containing one or more validation error messages.
+	 *
+	 * @see lithium\data\Entity::errors()
+	 * @var array
 	 */
 	protected $_errors = array();
 
 	/**
-	 * An array of flags to track which fields in this record have been modified, where the keys
-	 * are field names, and the values are always `true`. If, for example, a change to a field is
-	 * reverted, that field's flag should be unset from the list.
+	 * Contains the values of updated fields. These values will be persisted to the backend data
+	 * store when the document is saved.
 	 *
 	 * @var array
 	 */
-	protected $_modified = array();
+	protected $_updated = array();
 
 	/**
-	 * A flag indicating whether or not this record exists. Set to false if this is a newly-created
-	 * record, or if this record has been loaded and subsequently deleted. True if the record has
-	 * been loaded from the database, or has been created and subsequently saved.
+	 * An array of key/value pairs corresponding to fields that should be updated using atomic
+	 * incrementing / decrementing operations. Keys match field names, and values indicate the value
+	 * each field should be incremented or decrememnted by.
+	 *
+	 * @see lithium\data\Entity::increment()
+	 * @see lithium\data\Entity::decrement()
+	 * @var array
+	 */
+	protected $_increment = array();
+
+	/**
+	 * A flag indicating whether or not this entity exists. Set to `false` if this is a
+	 * newly-created entity, or if this entity has been loaded and subsequently deleted. Set to
+	 * `true` if the entity has been loaded from the database, or has been created and subsequently
+	 * saved.
 	 *
 	 * @var boolean
 	 */
@@ -157,13 +178,9 @@ class Entity extends \lithium\core\Object {
 	 */
 	public function __set($name, $value = null) {
 		if (is_array($name) && !$value) {
-			foreach ($name as $key => $value) {
-				$this->__set($key, $value);
-			}
-			return;
+			return array_map(array(&$this, '__set'), array_keys($name), array_values($name));
 		}
-		$this->_modified[$name] = true;
-		$this->_data[$name] = $value;
+		$this->_updated[$name] = $value;
 	}
 
 	/**
@@ -173,7 +190,7 @@ class Entity extends \lithium\core\Object {
 	 * @return mixed Result.
 	 */
 	public function __isset($name) {
-		return array_key_exists($name, $this->_data);
+		return isset($this->_data[$name]) || isset($this->_updated[$name]);
 	}
 
 	/**
@@ -219,7 +236,10 @@ class Entity extends \lithium\core\Object {
 	*         field.
 	*/
 	public function data($name = null) {
-		return empty($name) ? $this->_data : $this->__get($name);
+		if ($name) {
+			return $this->__get($name);
+		}
+		return array_merge($this->_data, $this->_updated);
 	}
 
 	/**
@@ -232,15 +252,14 @@ class Entity extends \lithium\core\Object {
 	}
 
 	public function schema($field = null) {
+		$schema = array();
+
 		switch (true) {
 			case ($this->_schema):
 				$schema = $this->_schema;
 			break;
 			case ($model = $this->_model):
 				$schema = $model::schema();
-			break;
-			default:
-				$schema = array();
 			break;
 		}
 		if ($field) {
@@ -252,18 +271,18 @@ class Entity extends \lithium\core\Object {
 	/**
 	 * Access the errors of the record.
 	 *
-	 * @param array|string $field If an array, overwrites `$this->_errors`. If a string, and $value
-	 *        is not null, sets the corresponding key in $this->_errors to $value
+	 * @see lithium\data\Entity::$_errors
+	 * @param array|string $field If an array, overwrites `$this->_errors`. If a string, and
+	 *        `$value` is not `null`, sets the corresponding key in `$this->_errors` to `$value`.
 	 * @param string $value Value to set.
-	 * @return array|string Either the $this->_errors array, or single value from it.
+	 * @return array|string Either the `$this->_errors` array, or single value from it.
 	 */
 	public function errors($field = null, $value = null) {
 		if ($field === null) {
 			return $this->_errors;
 		}
 		if (is_array($field)) {
-			$this->_errors = $field;
-			return $this->_errors;
+			return ($this->_errors = $field);
 		}
 		if ($value === null && isset($this->_errors[$field])) {
 			return $this->_errors[$field];
@@ -286,34 +305,61 @@ class Entity extends \lithium\core\Object {
 
 	/**
 	 * Called after an `Entity` is saved. Updates the object's internal state to reflect the
-	 * corresponding database record, and sets the `Record`'s primary key, if this is a
-	 * newly-created object.
+	 * corresponding database entity, and sets the `Entity` object's key, if this is a newly-created
+	 * object.
 	 *
 	 * @param mixed $id The ID to assign, where applicable.
 	 * @param array $data Any additional generated data assigned to the object by the database.
 	 * @return void
 	 */
 	public function update($id = null, array $data = array()) {
-		$this->_modified = array();
 		$this->_exists = true;
-
-		if (!$id) {
-			return;
-		}
-
 		$model = $this->_model;
-		$key = $model::meta('key');
+		$key = array();
 
-		if (is_array($key)) {
-			foreach ($key as $i => $k) {
-				$this->_data[$k] = $id[$i];
-			}
-		} else {
-			$this->_data[$key] = $id;
+		if ($id && $model) {
+			$key = $model::meta('key');
+			$key = is_array($key) ? array_combine($key, $id) : array($key => $id);
 		}
-		foreach ($data as $key => $value) {
-			$this->_data[$key] = $value;
+		$this->_data = ($key + $data + $this->_updated + $this->_data);
+		$this->_updated = array();
+	}
+
+	/**
+	 * Safely (atomically) increments the value of the specified field by an arbitrary value.
+	 * Defaults to `1` if no value is specified. Throws an exception if the specified field is
+	 * non-numeric.
+	 *
+	 * @param string $field The name of the field to be incrememnted.
+	 * @param string $value The value to increment the field by. Defaults to `1` if this parameter
+	 *               is not specified.
+	 * @return int Returns the current value of `$field`, based on the value retrieved from the data
+	 *         source when the entity was loaded, plus any increments applied. Note that it may not
+	 *         reflect the most current value in the persistent backend data source.
+	 * @throws UnexpectedValueException Throws an exception when `$field` is set to a non-numeric
+	 *         type.
+	 */
+	public function increment($field, $value = 1) {
+		if (!isset($this->_data[$field])) {
+			return $this->_data[$field] = $value;
 		}
+		if (!is_numeric($this->_data[$field])) {
+			throw new UnexpectedValueException("Field '{$field}' cannot be incremented.");
+		}
+		$this->_data[$field] += $value;
+	}
+
+	/**
+	 * Decrements a field by the specified value. Works identically to `increment()`, but in
+	 * reverse.
+	 *
+	 * @see lithium\data\Entity::increment()
+	 * @param string $field The name of the field to decrement.
+	 * @param string $value The value by which to decrement the field. Defaults to `1`.
+	 * @return int Returns the new value of `$field`, after modification.
+	 */
+	public function decrement($field, $value = 1) {
+		return $this->increment($field, $value * -1);
 	}
 
 	/**
@@ -330,8 +376,13 @@ class Entity extends \lithium\core\Object {
 		return $this->_modified;
 	}
 
-	public function export(Source $dataSource, array $options = array()) {
-		return array_intersect_key($this->_data, $this->_modified);
+	public function export() {
+		return array(
+			'exists'    => $this->_exists,
+			'data'      => $this->_data,
+			'update'    => $this->_updated,
+			'increment' => $this->_increment,
+		);
 	}
 
 	/**
@@ -399,7 +450,7 @@ class Entity extends \lithium\core\Object {
 		if ($model) {
 			$exists = $this->_exists;
 			$options += compact('parent', 'exists', 'pathKey');
-			return $model::connection()->cast($model, $data, $options);
+			return $model::connection()->cast($this, $data, $options);
 		}
 	}
 }

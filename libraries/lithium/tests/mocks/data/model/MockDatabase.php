@@ -41,7 +41,7 @@ class MockDatabase extends \lithium\data\source\Database {
 		return "'{$value}'";
 	}
 
-	public function cast($model, array $data, array $options = array()) {
+	public function cast($entity, array $data, array $options = array()) {
 		$defaults = array('first' => false);
 		$options += $defaults;
 		return $options['first'] ? reset($data) : $data;

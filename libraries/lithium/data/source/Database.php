@@ -241,7 +241,7 @@ abstract class Database extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function read($query, array $options = array()) {
-		$defaults = array('return' => 'item', 'schema' => array());
+		$defaults = array('return' => is_string($query) ? 'array' : 'item', 'schema' => array());
 		$options += $defaults;
 
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
@@ -630,7 +630,7 @@ abstract class Database extends \lithium\data\Source {
 		return $alias ? "AS " . $this->name($alias) : null;
 	}
 
-	public function cast($model, array $data, array $options = array()) {
+	public function cast($entity, array $data, array $options = array()) {
 		return $data;
 	}
 

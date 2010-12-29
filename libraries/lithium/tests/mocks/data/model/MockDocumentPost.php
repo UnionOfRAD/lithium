@@ -20,7 +20,10 @@ class MockDocumentPost extends \lithium\data\Model {
 	public static function __init() {}
 
 	public static function schema($field = null) {
-		return array('_id' => array('type' => 'id'));
+		return array(
+			'_id' => array('type' => 'id'),
+			'foo.bar' => array('type' => 'int')
+		);
 	}
 
 	public function ret($record, $param1 = null, $param2 = null) {

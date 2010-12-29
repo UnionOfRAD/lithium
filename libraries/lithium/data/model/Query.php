@@ -380,7 +380,7 @@ class Query extends \lithium\core\Object {
 	 * @return array Returns an array containing a data source-specific representation of a query.
 	 */
 	public function export(Source $dataSource, array $options = array()) {
-		$defaults = array('data' => array(), 'keys' => array());
+		$defaults = array('keys' => array());
 		$options += $defaults;
 
 		$keys = $options['keys'] ?: array_keys($this->_config);
@@ -397,9 +397,15 @@ class Query extends \lithium\core\Object {
 			$results[$item] = $this->_config[$item];
 		}
 		$entity =& $this->_entity;
-		$data = $entity ? $entity->export($dataSource, $options['data']) : $this->_data;
-		$data = ($list = $this->_config['whitelist']) ? array_intersect_key($data, $list) : $data;
-		$results = compact('data') + $results;
+		$data = $this->_data;
+
+		if ($entity) {
+			$data = $entity->export(array('whitelist' => $this->_config['whitelist']));
+		} elseif ($list = $this->_config['whitelist']) {
+			$list = array_combine($list, $list);
+			$data = array('update' => array_intersect_key($data, $list));
+		}
+		$results['data'] = $data;
 
 		if (isset($results['source'])) {
 			$results['source'] = $dataSource->name($results['source']);

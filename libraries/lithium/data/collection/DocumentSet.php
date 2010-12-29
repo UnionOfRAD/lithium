@@ -8,8 +8,6 @@
 
 namespace lithium\data\collection;
 
-use lithium\data\Source;
-
 class DocumentSet extends \lithium\data\Collection {
 
 	/**
@@ -39,7 +37,7 @@ class DocumentSet extends \lithium\data\Collection {
 				$next = $current->__get($key);
 
 				if (!is_object($next) && ($model = $this->_model)) {
-					$next = $model::connection()->cast($model, $next);
+					$next = $model::connection()->cast($this, $next);
 					$current->_data[$key] = $next;
 				}
 				$current = $next;
@@ -109,7 +107,7 @@ class DocumentSet extends \lithium\data\Collection {
 			return $null;
 		}
 		if (is_array($data = $this->_data[$offset]) && $model) {
-			$this->_data[$offset] = $model::connection()->cast($model, $data);
+			$this->_data[$offset] = $model::connection()->cast($this, $data);
 		}
 		if (isset($this->_data[$offset])) {
 			return $this->_data[$offset];
@@ -159,9 +157,9 @@ class DocumentSet extends \lithium\data\Collection {
 		return $this->_valid ? $this->offsetGet(key($this->_data)) : null;
 	}
 
-	public function export(Source $dataSource, array $options = array()) {
-		$map = function($doc) use ($dataSource, $options) {
-			return is_array($doc) ? $doc : $doc->export($dataSource, $options);
+	public function export(array $options = array()) {
+		$map = function($doc) use ($options) {
+			return is_array($doc) ? $doc : $doc->export();
 		};
 		return array_map($map, $this->_data);
 	}
@@ -184,7 +182,7 @@ class DocumentSet extends \lithium\data\Collection {
 			return $this->close();
 		}
 		$options = array('exists' => true, 'first' => true, 'pathKey' => $this->_pathKey);
-		return $this->_data[] = $conn->cast($model, array($key => $data), $options);
+		return $this->_data[] = $conn->cast($this, array($key => $data), $options);
 	}
 
 	/**

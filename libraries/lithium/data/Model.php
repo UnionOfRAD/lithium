@@ -580,13 +580,18 @@ class Model extends \lithium\core\StaticObject {
 	 * Lazy-initialize the schema for this Model object, if it is not already manually set in the
 	 * object. You can declare `protected $_schema = array(...)` to define the schema manually.
 	 *
-	 * @param string $field Optional. You may pass a field name to get schema information for just
-	 *        one field. Otherwise, an array containing all fields is returned.
+	 * @param mixed $field Optional. You may pass a field name to get schema information for just
+	 *        one field. Otherwise, an array containing all fields is returned. If `false`, the
+	 *        schema is reset to an empty value. If an array, field definitions contained are
+	 *        appended to the schema.
 	 * @return array
 	 */
 	public static function schema($field = null) {
 		$self = static::_object();
 
+		if ($field === false) {
+			return $self->_schema = array();
+		}
 		if (!$self->_schema) {
 			$self->_schema = static::connection()->describe($self::meta('source'), $self->_meta);
 		}
@@ -707,8 +712,8 @@ class Model extends \lithium\core\StaticObject {
 					return false;
 				}
 			}
-			if ($options['whitelist'] || $options['locked']) {
-				$whitelist = $options['whitelist'] ?: array_keys($_schema);
+			if (($whitelist = $options['whitelist']) || $options['locked']) {
+				$whitelist = $whitelist ?: array_keys($_schema);
 			}
 
 			$type = $entity->exists() ? 'update' : 'create';

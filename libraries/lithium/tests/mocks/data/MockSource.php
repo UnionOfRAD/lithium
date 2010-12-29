@@ -129,7 +129,7 @@ class MockSource extends \lithium\data\Source {
 
 	}
 
-	public function cast($model, array $data = array(), array $options = array()) {
+	public function cast($entity, array $data = array(), array $options = array()) {
 		$defaults = array('first' => false);
 		$options += $defaults;
 		return $options['first'] ? reset($data) : $data;
