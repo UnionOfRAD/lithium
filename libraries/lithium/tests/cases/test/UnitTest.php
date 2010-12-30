@@ -540,12 +540,22 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['data']['trace']);
 	}
 
+	public function testCompareIdenticalArray() {
+		$expected = array(
+			'trace' => '[0]',
+			'expected' => array(),
+			'result' => array('two', 'values')
+		);
+		$result = $this->compare('identical', array(), array('two', 'values'));
+		$this->assertEqual($expected, $result);
+	}
+
 	/**
 	 * Always keep second to last.
 	 *
 	 */
 	public function testResults() {
-		$expected = 86;
+		$expected = 87;
 		$result = count($this->results());
 		$this->assertEqual($expected, $result);
 	}
@@ -570,7 +580,7 @@ class UnitTest extends \lithium\test\Unit {
 			'testGetTest', 'testAssertCookie', 'testAssertCookieWithHeaders',
 			'testCompareWithEmptyResult',
 			'testExceptionCatching', 'testErrorHandling', 'testAssertObjects',
-			'testAssertArrayIdentical',
+			'testAssertArrayIdentical', 'testCompareIdenticalArray',
 			'testResults', 'testTestMethods'
 		);
 		$this->assertIdentical($expected, $this->methods());

@@ -782,7 +782,21 @@ class Unit extends \lithium\core\Object {
 					$data[] = $compare;
 				}
 			}
-			return $data;
+			if (!empty($data)) {
+				return $data;
+			}
+		}
+
+		if (!is_scalar($result)) {
+			$data = $this->_compare($type, $result, $expected);
+
+			if (!empty($data)) {
+				return array(
+					'trace' => $data['trace'],
+					'expected' => $data['result'],
+					'result' => $data['expected']
+				);
+			}
 		}
 
 		if ($type === 'identical') {
