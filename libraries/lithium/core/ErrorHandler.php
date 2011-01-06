@@ -8,7 +8,7 @@
 
 namespace lithium\core;
 
-use \Exception;
+use Exception;
 use lithium\util\Collection;
 use lithium\core\Environment;
 
@@ -122,11 +122,15 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	/**
 	 * Configure the `ErrorHandler`.
 	 *
-	 * @param array $config Configuration directives.
+	 * @var array $config Configuration directives.
 	 * @return Current configuration set.
 	 */
-	public static function config(array $config = array()) {
+	public static function config($config = array()) {
 		return (static::$_config = array_merge($config, static::$_config));
+	}
+
+	public static function handler($name, $info) {
+		return static::$_handlers[$name]($info);
 	}
 
 	/**
@@ -241,7 +245,7 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	/**
 	 * Determine frame from the stack trace where the error/exception was first generated.
 	 *
-	 * @param array $stack Stacktrace from error/exception that was produced.
+	 * @var array $stack Stack trace from error/exception that was produced.
 	 * @return string Class where error/exception was generated.
 	 */
 	protected static function _origin(array $stack) {
@@ -252,10 +256,54 @@ class ErrorHandler extends \lithium\core\StaticObject {
 		}
 	}
 
+	public static function apply($class, $method, array $conditions, $handler) {
+		$_self = get_called_class();
+
+		$filter = function($self, $params, $chain) use ($_self, $conditions, $handler) {
+			try {
+				return $chain->next($self, $params, $chain);
+			} catch (Exception $e) {
+				if (!$_self::matches($e, $conditions)) {
+					throw $e;
+				}
+				return $handler($e, $params);
+			}
+		};
+
+		if (is_string($class)) {
+			$class::applyFilter($method, $filter);
+		} else {
+			$class->applyFilter($method, $filter);
+		}
+	}
+
+	public static function matches($info, $conditions) {
+		$checks = static::$_checks;
+		$handler = static::$_exceptionHandler;
+		$info = is_object($info) ? $handler($info, true) : $info;
+
+		foreach (array_keys($conditions) as $key) {
+			if ($key == 'conditions' || $key == 'scope' || $key == 'handler') {
+				continue;
+			}
+			if (!isset($info[$key]) || !isset($checks[$key])) {
+				return false;
+			}
+			if (($check = $checks[$key]) && !$check($conditions, $info)) {
+				return false;
+			}
+		}
+		if ((isset($config['conditions']) && $call = $config['conditions']) && !$call($info)) {
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * Trim down a typical stack trace to class & method calls.
 	 *
-	 * @param array $stack A debug_backtrace() compatible stacktrace output.
+	 * @var array $stack A `debug_backtrace()`-compatible stack trace output.
+	 * @return array Returns a flat stack array containing class and method references.
 	 */
 	protected static function _trace(array $stack) {
 		$result = array();
