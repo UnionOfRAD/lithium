@@ -49,29 +49,29 @@ $summary = array(
 <h4>Summary</h4>
 <table class="metrics"><tbody>
 	<tr>
-		<td class="metric-name">Classes Covered</th>
+		<td class="metric-name">Classes Covered</td>
 		<td class="metric"><?php echo $summary['classes'] ?></td>
 	</tr>
 	<tr>
-		<td class="metric-name">Executable Lines</th>
+		<td class="metric-name">Executable Lines</td>
 		<td class="metric"><?php echo $summary['executable'] ?></td>
 	</tr>
 	<tr>
-		<td class="metric-name">Lines Covered</th>
+		<td class="metric-name">Lines Covered</td>
 		<td class="metric"><?php echo $summary['covered'] ?></td>
 	</tr>
 	<tr>
-		<td class="metric-name">Lines Uncovered</th>
+		<td class="metric-name">Lines Uncovered</td>
 		<td class="metric"><?php echo $summary['uncovered'] ?></td>
 	</tr>
 	<tr>
-		<td class="metric-name">Total Coverage</th>
+		<td class="metric-name">Total Coverage</td>
 		<td class="metric">
 			<?php echo round(($summary['covered'] / $summary['executable']) * 100, 2) ?>%
 		</td>
 	</tr>
 	<tr>
-		<td class="metric-name">Average Per Class</th>
+		<td class="metric-name">Average Per Class</td>
 		<td class="metric">
 			<?php echo round($summary['percentage'] / $summary['classes'], 2) ?>%
 		</td>
