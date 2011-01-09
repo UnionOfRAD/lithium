@@ -37,6 +37,8 @@ class Entity extends \lithium\core\Object {
 
 	/**
 	 * Associative array of the entity's fields and values.
+	 *
+	 * @var array
 	 */
 	protected $_data = array();
 
@@ -162,6 +164,9 @@ class Entity extends \lithium\core\Object {
 					return $this->_relationships[$name];
 				}
 			}
+		}
+		if (isset($this->_updated[$name])) {
+			return $this->_updated[$name];
 		}
 		if (isset($this->_data[$name])) {
 			return $this->_data[$name];

@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\data;
 
 class Employee extends \lithium\data\Model {
 
-	public $belongsTo = array('Company');
+	public $belongsTo = array('Companies');
 
 	protected $_meta = array('connection' => 'test');
 

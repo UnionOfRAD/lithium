@@ -766,7 +766,7 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	public function cast($entity, array $data, array $options = array()) {
-		$defaults = array('schema' => null, 'first' => false, 'pathKey' => null, 'arrays' => true);
+		$defaults = array('schema' => null, 'first' => false, 'pathKey' => null);
 		$options += $defaults;
 		$model = null;
 
@@ -786,49 +786,10 @@ class MongoDb extends \lithium\data\Source {
 		}
 		$schema = $options['schema'] ?: array('_id' => array('type' => 'id'));
 		unset($options['schema']);
+		$exporter = $this->_classes['exporter'];
+		$options += compact('model') + array('handlers' => $this->_handlers);
 
-		$typeMap = array(
-			'MongoId'      => 'id',
-			'MongoDate'    => 'date',
-			'MongoCode'    => 'code',
-			'MongoBinData' => 'binary',
-			'datetime'     => 'date',
-			'timestamp'    => 'date',
-			'int'          => 'integer',
-		);
-
-		foreach ($data as $key => $value) {
-			if (is_object($value)) {
-				continue;
-			}
-			$path = $options['pathKey'] ? "{$options['pathKey']}.{$key}" : $key;
-			$field = (isset($schema[$path]) ? $schema[$path] : array());
-			$field += array('type' => null, 'array' => null);
-			$type = isset($typeMap[$field['type']]) ? $typeMap[$field['type']] : $field['type'];
-			$isObject = ($type == 'object');
-			$isArray = (is_array($value) && $field['array'] !== false && !$isObject);
-
-			if (isset($this->_handlers[$type])) {
-				$handler = $this->_handlers[$type];
-				$value = $isArray ? array_map($handler, $value) : $handler($value);
-			}
-			if (!$options['arrays']) {
-				$data[$key] = $value;
-				continue;
-			}
-			$pathKey = $path;
-
-			if (is_array($value)) {
-				$arrayType = !$isObject && (array_keys($value) === range(0, count($value) - 1));
-				$opts = $arrayType ? array('class' => 'array') + $options : $options;
-				$value = $this->item($model, $value, compact('pathKey') + $opts);
-			} elseif ($field['array']) {
-				$opts = array('class' => 'array') + $options;
-				$value = $this->item($model, array($value), compact('pathKey') + $opts);
-			}
-			$data[$key] = $value;
-		}
-		return $options['first'] ? reset($data) : $data;
+		return parent::cast($entity, $exporter::cast($data, $schema, $this, $options), $options);
 	}
 
 	protected function _checkConnection() {

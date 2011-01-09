@@ -12,6 +12,16 @@ use lithium\util\Set;
 
 class Exporter extends \lithium\core\StaticObject {
 
+	protected static $_map = array(
+		'MongoId'      => 'id',
+		'MongoDate'    => 'date',
+		'MongoCode'    => 'code',
+		'MongoBinData' => 'binary',
+		'datetime'     => 'date',
+		'timestamp'    => 'date',
+		'int'          => 'integer',
+	);
+
 	public static function get($type, $export, array $options = array()) {
 		$defaults = array('whitelist' => array());
 		$options += $defaults;
@@ -20,6 +30,49 @@ class Exporter extends \lithium\core\StaticObject {
 			return;
 		}
 		return static::$method($export, array('finalize' => true) + $options);
+	}
+
+	public static function cast($data, $schema, $database, array $options = array()) {
+		$defaults = array(
+			'pathKey' => null, 'handlers' => array(), 'model' => null, 'arrays' => true
+		);
+		$options += $defaults;
+		$typeMap = static::$_map;
+
+		foreach ($data as $key => $value) {
+			if (is_object($value)) {
+				continue;
+			}
+			$path = $options['pathKey'] ? "{$options['pathKey']}.{$key}" : $key;
+			$field = (isset($schema[$path]) ? $schema[$path] : array());
+			$field += array('type' => null, 'array' => null);
+			$type = isset($typeMap[$field['type']]) ? $typeMap[$field['type']] : $field['type'];
+			$isObject = ($type == 'object');
+			$isArray = (is_array($value) && $field['array'] !== false && !$isObject);
+
+			if (isset($options['handlers'][$type]) && $handler = $options['handlers'][$type]) {
+				$value = $isArray ? array_map($handler, $value) : $handler($value);
+			}
+			if (!$options['arrays']) {
+				$data[$key] = $value;
+				continue;
+			}
+			$pathKey = $path;
+
+			if (!is_array($value) && !$field['array']) {
+				$data[$key] = $value;
+				continue;
+			}
+			if (is_array($value)) {
+				$arrayType = !$isObject && (array_keys($value) === range(0, count($value) - 1));
+				$opts = $arrayType ? array('class' => 'array') + $options : $options;
+			} elseif ($field['array']) {
+				$opts = array('class' => 'array') + $options;
+				$value = array($value);
+			}
+			$data[$key] = $database->item($options['model'], $value, compact('pathKey') + $opts);
+		}
+		return $data;
 	}
 
 	public static function toCommand($changes) {

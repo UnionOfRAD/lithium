@@ -41,6 +41,9 @@ class Record extends \lithium\data\Entity {
 				}
 			}
 		}
+		if (isset($this->_updated[$name])) {
+			return $this->_updated[$name];
+		}
 		if (isset($this->_data[$name])) {
 			return $this->_data[$name];
 		}

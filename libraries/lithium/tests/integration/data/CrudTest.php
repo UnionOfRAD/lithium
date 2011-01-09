@@ -10,7 +10,7 @@ namespace lithium\tests\integration\data;
 
 use Exception;
 use lithium\data\Connections;
-use lithium\tests\mocks\data\Company;
+use lithium\tests\mocks\data\Companies;
 
 class CrudTest extends \lithium\test\Integration {
 
@@ -24,9 +24,9 @@ class CrudTest extends \lithium\test\Integration {
 	);
 
 	public function setUp() {
+		Companies::config();
+		$this->_key = Companies::key();
 		$this->_connection = Connections::get('test');
-		Company::config();
-		$this->_key = Company::meta('key');
 	}
 
 	/**
@@ -49,42 +49,77 @@ class CrudTest extends \lithium\test\Integration {
 	 * @return void
 	 */
 	public function testCreate() {
-		$new = Company::create(array($this->_key => 12345, 'name' => 'Acme, Inc.'));
+		Companies::all()->delete();
+		$this->assertIdentical(0, Companies::count());
 
-		$result = $new->data();
-		$expected = array($this->_key => 12345, 'name' => 'Acme, Inc.');
-		$this->assertEqual($expected[$this->_key], $result[$this->_key]);
-		$this->assertEqual($expected['name'], $result['name']);
+		$new = Companies::create(array('name' => 'Acme, Inc.', 'active' => true));
+		$this->assertEqual($new->data(), array('name' => 'Acme, Inc.', 'active' => true));
 
-		$this->assertFalse($new->exists());
-		$this->assertTrue($new->save());
-		$this->assertTrue($new->exists());
+		$this->assertEqual(
+			array(false, true, true),
+			array($new->exists(), $new->save(), $new->exists())
+		);
+		$this->assertIdentical(1, Companies::count());
 	}
 
 	public function testRead() {
-		$existing = Company::find(12345);
-		$expected = array($this->_key => 12345, 'name' => 'Acme, Inc.');
-		$result = $existing->data();
-		$this->assertEqual($expected[$this->_key], $result[$this->_key]);
-		$this->assertEqual($expected['name'], $result['name']);
+		$existing = Companies::first();
+
+		foreach (Companies::key($existing) as $val) {
+			$this->assertTrue($val);
+		}
+		$this->assertEqual('Acme, Inc.', $existing->name);
+		$this->assertTrue($existing->active);
 		$this->assertTrue($existing->exists());
 	}
 
 	public function testUpdate() {
-		$existing = Company::find(12345);
+		$existing = Companies::first();
+		$this->assertEqual($existing->name, 'Acme, Inc.');
 		$existing->name = 'Big Brother and the Holding Company';
 		$result = $existing->save();
 		$this->assertTrue($result);
 
-		$existing = Company::find(12345);
-		$result = $existing->data();
-		$expected = array($this->_key => 12345, 'name' => 'Big Brother and the Holding Company');
-		$this->assertEqual($expected[$this->_key], $result[$this->_key]);
-		$this->assertEqual($expected['name'], $result['name']);
+		$existing = Companies::first();
+		foreach (Companies::key($existing) as $val) {
+			$this->assertTrue($val);
+		}
+		$this->assertTrue($existing->active);
+		$this->assertEqual('Big Brother and the Holding Company', $existing->name);
 	}
 
 	public function testDelete() {
-		$existing = Company::find(12345);
+		$existing = Companies::first();
+		$this->assertTrue($existing->exists());
 		$this->assertTrue($existing->delete());
+		$this->assertNull(Companies::first(array('conditions' => Companies::key($existing))));
+		$this->assertIdentical(0, Companies::count());
+	}
+
+	public function testCrudMulti() {
+		$large  = Companies::create(array('name' => 'BigBoxMart', 'active' => true));
+		$medium = Companies::create(array('name' => 'Acme, Inc.', 'active' => true));
+		$small  = Companies::create(array('name' => 'Ma & Pa\'s', 'active' => true));
+
+		foreach (array('large', 'medium', 'small') as $key) {
+			$this->assertFalse(${$key}->exists());
+			$this->assertTrue(${$key}->save());
+			$this->assertTrue(${$key}->exists());
+		}
+		$this->assertEqual(3, Companies::count());
+
+		$all = Companies::all();
+		$this->assertEqual(3, $all->count());
+
+		$match = 'BigBoxMart';
+		$filter = function($entity) use (&$match) { return $entity->name == $match; };
+
+		foreach (array('BigBoxMart', 'Acme, Inc.', 'Ma & Pa\'s') as $match) {
+			$this->assertTrue($all->first($filter)->exists());
+		}
+		$this->assertEqual(array(true, true, true), array_values($all->delete()));
+		$this->assertEqual(0, Companies::count());
 	}
 }
+
+?>

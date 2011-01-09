@@ -244,6 +244,7 @@ class ModelTest extends \lithium\test\Unit {
 	public function testFilteredFind() {
 		MockComment::applyFilter('find', function($self, $params, $chain) {
 			$result = $chain->next($self, $params, $chain);
+
 			if ($result != null) {
 				$result->filtered = true;
 			}

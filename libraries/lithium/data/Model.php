@@ -48,14 +48,16 @@ use BadMethodCallException;
  * Post::count(array('published' => true));
  * }}}
  *
- * The actual objects returned from `find()` calls will depend on the type of datasource in use.
- * MongoDB, for example, will return results as a `Document`, while MySQL will return results
- * as a `RecordSet`. Both of these classes extend a common `data\Collection` class, and provide
- * the necessary abstraction to make working with either type completely transparent.
+ * The actual objects returned from `find()` calls will depend on the type of data source in use.
+ * MongoDB, for example, will return results as a `Document` (as will CouchDB), while MySQL will
+ * return results as a `RecordSet`. Both of these classes extend a common `lithium\data\Collection`
+ * class, and provide the necessary abstraction to make working with either type completely
+ * transparent.
  *
  * For data mutation (saving/updating/deleting), the `Model` class acts as a broker to the proper
- * objects. When creating a new record, for example, a call to `Post::create()` will return a
- * `data\model\Record` object, which can then be acted upon.
+ * objects. When creating a new record or document, for example, a call to `Post::create()` will
+ * return an instance of `lithium\data\entity\Record` or `lithium\data\entity\Document`, which can
+ * then be acted upon.
  *
  * Example:
  * {{{

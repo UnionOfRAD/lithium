@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\data;
 
-class Company extends \lithium\data\Model {
+class Companies extends \lithium\data\Model {
 
 	public $hasMany = array('Employees');
 
