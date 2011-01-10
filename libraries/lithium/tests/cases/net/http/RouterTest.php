@@ -220,11 +220,11 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::match(array("Sessions::destroy", 'id' => '03815'));
 		$this->assertEqual('/logout/03815', $result);
 
-		$result = Router::match(array("Sessions::create", 'id' => 'foo'));
-		$this->assertNull($result);
-
 		$result = Router::match("Posts::index");
 		$this->assertEqual('/posts', $result);
+
+		$this->expectException('No parameter match found for routes.');
+		$result = Router::match(array("Sessions::create", 'id' => 'foo'));
 	}
 
 	/**
@@ -242,11 +242,13 @@ class RouterTest extends \lithium\test\Unit {
 		$expected = '/posts/4bbf25bd8ead0e5180130000';
 		$this->assertEqual($expected, $result);
 
+		$this->expectException('No parameter match found for routes.');
 		$result = Router::match(array(
 			'controller' => 'posts', 'action' => 'view', 'id' => '4bbf25bd8ead0e5180130000'
 		));
-		$this->assertNull($result);
+	}
 
+	public function testShorthandParameterMatching() {
 		Router::reset();
 		Router::connect('/posts/{:page:[0-9]+}', array('Posts::index', 'page' => '1'));
 
@@ -290,7 +292,8 @@ class RouterTest extends \lithium\test\Unit {
 		Router::connect('/login', array('controller' => 'sessions', 'action' => 'add'));
 		$result = Router::match(array('controller' => 'sessions', 'action' => 'add'));
 		$this->assertEqual('/login', $result);
-		$this->assertFalse(Router::match(array('controller' => 'sessions', 'action' => 'index')));
+		$this->expectException('No parameter match found for routes.');
+		Router::match(array('controller' => 'sessions', 'action' => 'index'));
 	}
 
 	/**
@@ -302,8 +305,8 @@ class RouterTest extends \lithium\test\Unit {
 		Router::connect('/{:controller}');
 		$this->assertEqual('/posts', Router::match(array('controller' => 'posts')));
 
-		$result = Router::match(array('controller' => 'posts', 'action' => 'view'));
-		$this->assertFalse($result);
+		$this->expectException('No parameter match found for routes.');
+		Router::match(array('controller' => 'posts', 'action' => 'view'));
 	}
 
 	/**
@@ -327,8 +330,8 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::match(array('controller' => 'posts', 'action' => 'view'));
 		$this->assertEqual('/posts/view', $result);
 
-		$result = Router::match(array('controller' => 'posts', 'action' => 'view', 'id' => '2'));
-		$this->assertFalse($result);
+		$this->expectException('No parameter match found for routes.');
+		Router::match(array('controller' => 'posts', 'action' => 'view', 'id' => '2'));
 	}
 
 	/**
