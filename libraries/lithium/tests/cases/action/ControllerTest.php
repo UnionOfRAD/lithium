@@ -151,6 +151,29 @@ class ControllerTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Verifies that data array is passed on to controller's response.
+	 *
+	 * @return void
+	 */
+	public function testRenderWithDataArray() {
+		$request = new Request();
+		$request->params['controller'] = 'lithium\tests\mocks\action\MockPostsController';
+
+		$controller = new MockPostsController(compact('request') + array('classes' => array(
+			'media' => 'lithium\tests\mocks\action\MockMediaClass'
+		)));
+
+		$controller->set(array('set' => 'data'));
+		$controller->render(array('data' => array('render' => 'data')));
+
+		$expected = array(
+			'set' => 'data',
+			'render' => 'data'
+		);
+		$this->assertEqual($expected, $controller->response->data);
+	}
+
+	/**
 	 * Verifies that protected methods (i.e. prefixed with '_'), and methods declared in the
 	 * Controller base class cannot be accessed.
 	 *
