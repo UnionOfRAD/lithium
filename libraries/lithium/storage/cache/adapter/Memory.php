@@ -50,7 +50,7 @@ class Memory extends \lithium\core\Object {
 	 * note that this is not an atomic operation.
 	 *
 	 * @param string $key The key to uniquely identify the cached item.
-	 * @return mixed Cached value if successful, false otherwise.
+	 * @return closure Function returning cached value if successful, `false` otherwise.
 	 * @todo Refactor to use RES_NOTFOUND for return value checks.
 	 */
 	public function read($key) {
@@ -82,7 +82,7 @@ class Memory extends \lithium\core\Object {
 	 * @param string $key The key to uniquely identify the cached item.
 	 * @param mixed $data The value to be cached.
 	 * @param string $expiry A strtotime() compatible cache time.
-	 * @return boolean True on successful write, false otherwise.
+	 * @return closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($key, $data, $expiry) {
 		$cache =& $this->_cache;
@@ -104,7 +104,7 @@ class Memory extends \lithium\core\Object {
 	 * Delete value from the cache
 	 *
 	 * @param string $key The key to uniquely identify the cached item.
-	 * @return mixed True on successful delete, false otherwise.
+	 * @return closure Function returning boolean `true` on successful delete, `false` otherwise.
 	 */
 	public function delete($key) {
 		$cache =& $this->_cache;
@@ -125,7 +125,7 @@ class Memory extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of numeric cache item to decrement.
 	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return mixed Item's new value on successful decrement, false otherwise.
+	 * @return closure Function returning item's new value on successful decrement, `false` otherwise.
 	 */
 	public function decrement($key, $offset = 1) {
 		$cache =& $this->_cache;
@@ -141,7 +141,7 @@ class Memory extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of numeric cache item to increment.
 	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return mixed Item's new value on successful increment, false otherwise.
+	 * @return closure Function returning item's new value on successful increment, `false` otherwise.
 	 */
 	public function increment($key, $offset = 1) {
 		$cache =& $this->_cache;

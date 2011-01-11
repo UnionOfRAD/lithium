@@ -65,7 +65,7 @@ class Syslog extends \lithium\core\Object {
 	 *
 	 * @param string $priority The message priority string. Maps to a `syslogd` priority constant.
 	 * @param string $message The message to write.
-	 * @return boolean Returns `true` on successful write, `false` otherwise.
+	 * @return closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($priority, $message) {
 		$config = $this->_config;

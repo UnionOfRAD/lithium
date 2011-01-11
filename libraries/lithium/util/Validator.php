@@ -595,7 +595,7 @@ class Validator extends \lithium\core\StaticObject {
 	 *              - `'all'` _boolean_: Whether all rule formats should be validated against. If
 	 *                `true`, only return successfully if _all_ formats validate, otherwise, returns
 	 *                `true` if _any_ validates.
-	 * @return boolean Returns true if the rule validation succeeded, otherwise false.
+	 * @return closure Function returning boolean `true` if validation succeeded, `false` otherwise.
 	 */
 	protected static function _checkFormats($rules) {
 		return function($self, $params, $chain) use ($rules) {

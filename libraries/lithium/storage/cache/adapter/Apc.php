@@ -64,7 +64,7 @@ class Apc extends \lithium\core\Object {
 	 * @param mixed $data The value to be cached.
 	 * @param null|string $expiry A strtotime() compatible cache time. If no expiry time is set,
 	 *        then the default cache expiration time set with the cache configuration will be used.
-	 * @return boolean True on successful write, false otherwise.
+	 * @return closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($key, $data, $expiry = null) {
 		$expiry = ($expiry) ?: $this->_config['expiry'];
@@ -88,7 +88,7 @@ class Apc extends \lithium\core\Object {
 	 * containing key/value pairs of the requested data.
 	 *
 	 * @param string|array $key The key to uniquely identify the cached item.
-	 * @return mixed Cached value if successful, false otherwise.
+	 * @return closure Function returning cached value on successful read, `false` otherwise.
 	 */
 	public function read($key) {
 		return function($self, $params) {
@@ -104,7 +104,7 @@ class Apc extends \lithium\core\Object {
 	 * from the user space cache.
 	 *
 	 * @param string|array $key The key to uniquely identify the cached item.
-	 * @return mixed True on successful delete, false otherwise.
+	 * @return closure Function returning `true` on successful delete, `false` otherwise.
 	 */
 	public function delete($key) {
 		return function($self, $params) {
@@ -121,7 +121,7 @@ class Apc extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of numeric cache item to decrement
 	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return mixed Item's new value on successful decrement, false otherwise
+	 * @return closure Function returning item's new value on successful decrement, `false` otherwise
 	 */
 	public function decrement($key, $offset = 1) {
 		return function($self, $params) use ($offset) {
@@ -138,7 +138,7 @@ class Apc extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return mixed Item's new value on successful increment, false otherwise
+	 * @return closure Function returning item's new value on successful increment, `false` otherwise
 	 */
 	public function increment($key, $offset = 1) {
 		return function($self, $params) use ($offset) {
@@ -159,7 +159,7 @@ class Apc extends \lithium\core\Object {
 	 * Determines if the APC extension has been installed and
 	 * if the userspace cache is available.
 	 *
-	 * return boolean True if enabled, false otherwise
+	 * @return boolean `true` if enabled, `false` otherwise
 	 */
 	public static function enabled() {
 		$loaded = extension_loaded('apc');

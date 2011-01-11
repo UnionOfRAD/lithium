@@ -150,7 +150,7 @@ class Memcache extends \lithium\core\Object {
 	 * @param mixed $expiry A Unix timestamp or `strtotime()`-compatible string indicating when
 	 *              `$value` should expire. If no expiry time is set, then the default cache
 	 *              expiration time set with the cache configuration will be used.
-	 * @return boolean Returns `true` on a successful write, `false` otherwise.
+	 * @return closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($key, $value, $expiry = null) {
 		$connection =& $this->connection;
@@ -175,7 +175,7 @@ class Memcache extends \lithium\core\Object {
 	 * containing key/value pairs of the requested data.
 	 *
 	 * @param string|array $key The key to uniquely identify the cached item.
-	 * @return mixed Cached value if successful, false otherwise.
+	 * @return closure Function returning cached value if successful, `null` otherwise.
 	 */
 	public function read($key) {
 		$connection =& $this->connection;
@@ -199,7 +199,7 @@ class Memcache extends \lithium\core\Object {
 	 * Delete value from the cache.
 	 *
 	 * @param string $key The key to uniquely identify the cached item.
-	 * @return mixed True on successful delete, false otherwise.
+	 * @return closure Function returning `true` on successful delete, `false` otherwise.
 	 */
 	public function delete($key) {
 		$connection =& $this->connection;
@@ -219,7 +219,7 @@ class Memcache extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of numeric cache item to decrement
 	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return mixed Item's new value on successful decrement, false otherwise
+	 * @return closure Function returning item's new value on successful decrement, `false` otherwise
 	 */
 	public function decrement($key, $offset = 1) {
 		$connection =& $this->connection;
@@ -238,7 +238,7 @@ class Memcache extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return mixed Item's new value on successful increment, false otherwise
+	 * @return closure Function returning item's new value on successful increment, `false` otherwise
 	 */
 	public function increment($key, $offset = 1) {
 		$connection =& $this->connection;
