@@ -69,8 +69,8 @@ class String {
 	 *          determine which are available on your system.
 	 *        - `'salt'` _string_: A _salt_ value which, if specified, will be prepended to the
 	 *          string.
-	 *        - `'key'` _string_: If specified `hash_hmac()` will be used to has the string, instead
-	 *          of `hash()`, with `'key'` being used as the message key.
+	 *        - `'key'` _string_: If specified `hash_hmac()` will be used to hash the string,
+	 *          instead of `hash()`, with `'key'` being used as the message key.
 	 *        - `'raw'` _boolean_: If `true`, outputs the raw binary result of the hash operation.
 	 *          Defaults to `false`.
 	 * @return string Returns a hashed string.
