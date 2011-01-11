@@ -343,7 +343,9 @@ abstract class Database extends \lithium\data\Source {
 
 		switch ($type) {
 			case 'count':
-				$fields = $this->fields($query->fields(), $query);
+				if (strpos($fields = $this->fields($query->fields(), $query), ',') !== false) {
+					$fields = "*";
+				}
 				$query->fields("COUNT({$fields}) as count", true);
 				$query->map(array($query->model() => array('count')));
 				list($record) = $this->read($query, $options)->data();
