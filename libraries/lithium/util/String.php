@@ -57,33 +57,39 @@ class String {
 	}
 
 	/**
-	 * uses php's hash/hash_hmac depending if a salt is available defaults to sha512
-	 * methods are available here: ```http://us.php.net/manual/en/function.hash-algos.php```
+	 * Uses PHP's hashing functions to create a hash of the string provided, using the options
+	 * specified. The default hash algorithm is SHA-512.
 	 *
-	 * @param string $string String to hash.
-	 * @param array $options Supported Methods:
-	 *      'type' => any hash_algos() returns
-	 *      'salt' => salt to attach to the string
-	 *      'key'  => if set hash_hmac will be used instead of just hash
-	 *      'raw'  => raw output if set to true.
-	 * @return string Hash.
+	 * @link http://php.net/manual/en/function.hash.php PHP Manual: hash()
+	 * @link http://php.net/manual/en/function.hash-hmac.php PHP Manual: hash_hmac()
+	 * @link http://php.net/manual/en/function.hash-algos.php PHP Manual: hash_algos()
+	 * @param string $string The string to hash.
+	 * @param array $options Supported options:
+	 *        - `'type'` _string_: Any valid hashing algorithm. See the `hash_algos()` function to
+	 *          determine which are available on your system.
+	 *        - `'salt'` _string_: A _salt_ value which, if specified, will be prepended to the
+	 *          string.
+	 *        - `'key'` _string_: If specified `hash_hmac()` will be used to has the string, instead
+	 *          of `hash()`, with `'key'` being used as the message key.
+	 *        - `'raw'` _boolean_: If `true`, outputs the raw binary result of the hash operation.
+	 *          Defaults to `false`.
+	 * @return string Returns a hashed string.
 	 */
 	public static function hash($string, array $options = array()) {
 		$defaults = array(
 			'type' => 'sha512',
 			'salt' => false,
 			'key' => false,
-			'raw' => false
+			'raw' => false,
 		);
-
 		$options += $defaults;
 
-		if($options['salt']) {
+		if ($options['salt']) {
 			$string = $options['salt'] . $string;
 		}
 
-		if($options['key']) {
-			return hash_hmac($options['type'], $string,$options['key'], $options['raw']);
+		if ($options['key']) {
+			return hash_hmac($options['type'], $string, $options['key'], $options['raw']);
 		}
 		return hash($options['type'], $string, $options['raw']);
 	}
