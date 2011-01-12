@@ -59,7 +59,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$group = static::_group($items);
 		$report = static::_report($group, $options);
 
-		return static::_filter(__METHOD__, compact('report'), function($self, $params, $chain) {
+		return static::_filter(__FUNCTION__, compact('report'), function($self, $params, $chain) {
 			$environment = Environment::get();
 			Environment::set('test');
 
