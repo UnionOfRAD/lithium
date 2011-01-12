@@ -493,8 +493,8 @@ abstract class Database extends \lithium\data\Source {
 
 		switch(true){
 			case is_string($value):
-		        return $this->name($key) . ' = ' . $this->value($value);
-				break;
+				return $this->name($key) . ' = ' . $this->value($value);
+			break;
 			case (is_numeric($key) && is_string($value)):
 				return $value;
 			break;
@@ -503,23 +503,23 @@ abstract class Database extends \lithium\data\Source {
 				return "{$key} IN ({$value})";
 			break;
 			case is_array($value) && isset($constraintTypes[strtoupper($key)]):
-		        $result = array();
-		        $glue = strtoupper($key);
+				$result = array();
+				$glue = strtoupper($key);
 				foreach($value as $cField => $cValue) {
-					$result[] = $this->_processConditions($cField, $cValue, $schema, strtoupper($key));
+					$result[] = $this->_processConditions($cField, $cValue, $schema, $glue);
 				}
-				return '('.implode(' '.$glue.' ', $result).')';
-				break;
+				return '(' . implode(' ' . $glue . ' ', $result) . ')';
+			break;
 			case (is_string($key) && is_array($value) && isset($this->_operators[key($value)])):
 				foreach ($value as $op => $val) {
 					$result[] = $this->_operator($key, array($op => $val), $schema[$key]);
 				}
-				return '('.implode(' '.$glue.' ', $result).')';
+				return '(' . implode(' ' . $glue . ' ', $result) . ')';
 			break;
 			case is_array($value):
-		        $value = join(', ', $this->value($value, $schema));
-		        return "{$key} IN ({$value})";
-		        break;
+				$value = join(', ', $this->value($value, $schema));
+				return "{$key} IN ({$value})";
+			break;
 			default:
 				if(isset($value)) {
 					$value = $this->value($value, $schema);
@@ -527,7 +527,7 @@ abstract class Database extends \lithium\data\Source {
 				}
 				break;
 		}
-	    return false;
+		return false;
 	}
 
 	/**
