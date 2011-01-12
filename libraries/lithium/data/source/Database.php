@@ -414,11 +414,15 @@ abstract class Database extends \lithium\data\Source {
 		}
 		$namespace = preg_replace('/\w+$/', '', $model);
 		$relations = $model ? $model::relations() : array();
+		$schema = $model::schema();
 
 		foreach ($fields as $scope => $field) {
 			switch (true) {
 				case (is_numeric($scope) && $field == '*'):
 					$result[$model] = array_keys($model::schema());
+				break;
+				case (is_numeric($scope) && isset($schema[$field])):
+					$result[$model][] = $field;
 				break;
 				case (is_numeric($scope) && isset($relations[$field])):
 					$scope = $field;
