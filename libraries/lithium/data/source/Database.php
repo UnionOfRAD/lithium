@@ -76,6 +76,11 @@ abstract class Database extends \lithium\data\Source {
 		'LIKE' => array()
 	);
 
+	protected $_constraintTypes = array(
+		'AND' => true,
+		'OR' => true
+	);
+
 	/**
 	 * A pair of opening/closing quote characters used for quoting identifiers in SQL queries.
 	 *
@@ -474,31 +479,55 @@ abstract class Database extends \lithium\data\Source {
 		foreach ($conditions as $key => $value) {
 			$schema[$key] = isset($schema[$key]) ? $schema[$key] : array();
 
-			switch (true) {
-				case (is_numeric($key) && is_string($value)):
-					$result[] = $value;
-				break;
-				case (is_string($key) && is_object($value)):
-					$value = trim(rtrim($this->renderCommand($value), ';'));
-					$result[] = "{$key} IN ({$value})";
-				break;
-				case (is_string($key) && is_array($value) && isset($ops[key($value)])):
-					foreach ($value as $op => $val) {
-						$result[] = $this->_operator($key, array($op => $val), $schema[$key]);
-					}
-				break;
-				case (is_string($key) && is_array($value)):
-					$value = join(', ', $this->value($value, $schema));
-					$result[] = "{$key} IN ({$value})";
-				break;
-				default:
-					$value = $this->value($value, $schema);
-					$result[] = "{$key} = {$value}";
-				break;
+			$return = $this->_processConditions($key,$value, $schema);
+			if($return){
+				$result[] = $return;
 			}
 		}
 		$result = join(" AND ", $result);
 		return ($options['prepend'] && !empty($result)) ? "WHERE {$result}" : $result;
+	}
+
+	protected function _processConditions($key, $value, $schema, $glue = 'AND'){
+		$constraintTypes = &$this->_constraintTypes;
+
+		switch(true){
+			case is_string($value):
+		        return $this->name($key) . ' = ' . $this->value($value);
+				break;
+			case (is_numeric($key) && is_string($value)):
+				return $value;
+			break;
+			case (is_string($key) && is_object($value)):
+				$value = trim(rtrim($this->renderCommand($value), ';'));
+				return "{$key} IN ({$value})";
+			break;
+			case is_array($value) && isset($constraintTypes[strtoupper($key)]):
+		        $result = array();
+		        $glue = strtoupper($key);
+				foreach($value as $cField => $cValue) {
+					$result[] = $this->_processConditions($cField, $cValue, $schema, strtoupper($key));
+				}
+				return '('.implode(' '.$glue.' ', $result).')';
+				break;
+			case (is_string($key) && is_array($value) && isset($this->_operators[key($value)])):
+				foreach ($value as $op => $val) {
+					$result[] = $this->_operator($key, array($op => $val), $schema[$key]);
+				}
+				return '('.implode(' '.$glue.' ', $result).')';
+			break;
+			case is_array($value):
+		        $value = join(', ', $this->value($value, $schema));
+		        return "{$key} IN ({$value})";
+		        break;
+			default:
+				if(isset($value)) {
+					$value = $this->value($value, $schema);
+					return "{$key} = {$value}";
+				}
+				break;
+		}
+	    return false;
 	}
 
 	/**
