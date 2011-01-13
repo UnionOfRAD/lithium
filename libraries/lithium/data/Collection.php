@@ -87,6 +87,8 @@ abstract class Collection extends \lithium\util\Collection {
 	 */
 	protected $_hasInitialized = false;
 
+	protected $_schema = array();
+
 	/**
 	 * Holds an array of values that should be processed on initialization.
 	 *
@@ -114,8 +116,8 @@ abstract class Collection extends \lithium\util\Collection {
 			unset($this->_config[$key]);
 		}
 		if ($model = $this->_model) {
-			$pathKey = $this->_pathKey;
-			$this->_data = $model::connection()->cast($model, $this->_data, compact('pathKey'));
+			$options = array('pathKey' => $this->_pathKey, 'schema' => $model::schema());
+			$this->_data = $model::connection()->cast($this, $this->_data, $options);
 		}
 	}
 
@@ -140,6 +142,23 @@ abstract class Collection extends \lithium\util\Collection {
 	 */
 	public function model() {
 		return $this->_model;
+	}
+
+	public function schema($field = null) {
+		$schema = array();
+
+		switch (true) {
+			case ($this->_schema):
+				$schema = $this->_schema;
+			break;
+			case ($model = $this->_model):
+				$schema = $model::schema();
+			break;
+		}
+		if ($field) {
+			return isset($self->_schema[$field]) ? $self->_schema[$field] : null;
+		}
+		return $schema;
 	}
 
 	/**
@@ -236,7 +255,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 */
 	public function offsetSet($offset, $data) {
 		if (is_array($data) && ($model = $this->_model)) {
-			$data = $model::connection()->cast($model, $data);
+			$data = $model::connection()->cast($this, $data);
 		} elseif (is_object($data)) {
 			$data->assignTo($this);
 		}

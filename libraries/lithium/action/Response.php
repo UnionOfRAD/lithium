@@ -9,6 +9,7 @@
 namespace lithium\action;
 
 use UnexpectedValueException;
+use BadMethodCallException;
 
 /**
  * A `Response` object is typically instantiated automatically by the `Controller`. It is assigned
@@ -34,22 +35,18 @@ class Response extends \lithium\net\http\Response {
 	);
 
 	public function __construct(array $config = array()) {
-		$defaults = array(
-			'buffer' => 8192, 'request' => null, 'location' => null, 'status' => null
-		);
+		$defaults = array('buffer' => 8192, 'location' => null, 'status' => 0, 'request' => null);
 		parent::__construct($config + $defaults);
 	}
 
 	protected function _init() {
-		$this->status($this->_config['status']);
+		$config = $this->_config;
+		$this->status($config['status']);
 		unset($this->_config['status']);
 
-		if ($this->_config['request'] && is_object($this->_config['request'])) {
-			$this->_type = $this->_config['request']->accepts();
-		}
-		if ($this->_config['location']) {
-			$router = $this->_classes['router'];
-			$location = $router::match($this->_config['location'], $this->_config['request']);
+		if ($config['location']) {
+			$classes = $this->_classes;
+			$location = $classes['router']::match($config['location'], $config['request']);
 			$this->headers('location', $location);
 		}
 		parent::_init();
@@ -62,7 +59,8 @@ class Response extends \lithium\net\http\Response {
 	 * @deprecated
 	 */
 	public function disableCache() {
-		$this->cache(false);
+		$message = 'Request::disableCache() is deprecated. Please use Request::cache(false).';
+		throw new BadMethodCallException($message);
 	}
 
 	/**
@@ -76,7 +74,7 @@ class Response extends \lithium\net\http\Response {
 	 */
 	public function cache($expires) {
 		if ($expires === false) {
-			$headers = array(
+			return $this->headers(array(
 				'Expires' => 'Mon, 26 Jul 1997 05:00:00 GMT',
 				'Cache-Control' => array(
 					'no-store, no-cache, must-revalidate',
@@ -84,16 +82,15 @@ class Response extends \lithium\net\http\Response {
 					'max-age=0',
 				),
 				'Pragma' => 'no-cache',
-			);
-		} else {
-			$expires = is_int($expires) ? $expires : strtotime($expires);
-			$headers = array(
-				'Expires' => gmdate('D, d M Y H:i:s', $expires) . ' GMT',
-				'Cache-Control' => 'max-age=' . ($expires - time()),
-			);
+			));
 		}
+		$expires = is_int($expires) ? $expires : strtotime($expires);
 
-		$this->headers($headers);
+		return $this->headers(array(
+			'Expires' => gmdate('D, d M Y H:i:s', $expires) . ' GMT',
+			'Cache-Control' => 'max-age=' . ($expires - time()),
+			'Pragma' => 'cache',
+		));
 	}
 
 	/**

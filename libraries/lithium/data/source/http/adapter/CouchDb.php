@@ -42,6 +42,8 @@ class CouchDb extends \lithium\data\source\Http {
 		'set' => 'lithium\data\collection\DocumentSet',
 	);
 
+	protected $_handlers = array();
+
 	/**
 	 * Constructor
 	 *
@@ -53,6 +55,15 @@ class CouchDb extends \lithium\data\source\Http {
 		parent::__construct($config + $defaults);
 	}
 
+	protected function _init() {
+		parent::_init();
+		$this->_handlers += array(
+			'integer' => function($v) { return (integer) $v; },
+			'float'   => function($v) { return (float) $v; },
+			'boolean' => function($v) { return (boolean) $v; },
+		);
+	}
+
 	/**
 	 * Ensures that the server connection is closed and resources are freed when the adapter
 	 * instance is destroyed.
@@ -60,11 +71,12 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return void
 	 */
 	public function __destruct() {
-		if ($this->_isConnected) {
-			$this->disconnect();
-			$this->_db = false;
-			unset($this->connection);
+		if (!$this->_isConnected) {
+			return;
 		}
+		$this->disconnect();
+		$this->_db = false;
+		unset($this->connection);
 	}
 
 	/**
@@ -81,7 +93,7 @@ class CouchDb extends \lithium\data\source\Http {
 		return array(
 			'meta' => array('key' => 'id', 'locked' => false),
 			'schema' => array(
-				'id' => array('type' => 'integer'),
+				'id' => array('type' => 'string'),
 				'rev' => array('type' => 'string')
 			)
 		);
@@ -173,9 +185,6 @@ class CouchDb extends \lithium\data\source\Http {
 			$data = $query->data();
 			$data += array('type' => $options['model']::meta('source'));
 
-			if (isset($data['id'])) {
-				return $self->update($query, $options);
-			}
 			$result = $conn->post($config['database'], $data, $request);
 			$result = is_string($result) ? json_decode($result, true) : $result;
 
@@ -213,17 +222,20 @@ class CouchDb extends \lithium\data\source\Http {
 				$_path = '_all_docs';
 				$conditions['include_docs'] = 'true';
 			}
-			$data = (array) $conditions + (array) $limit + (array) $order;
-			$result = json_decode($conn->get("{$config['database']}/{$_path}", $data));
+			$args = (array) $conditions + (array) $limit + (array) $order;
+			$result = json_decode($conn->get("{$config['database']}/{$_path}", $args), true);
+			$data = array();
 
-			if (isset($result->error) && $result->error == 'not_found') {
-				$result = array();
+			if (isset($result['rows'])) {
+				$data = $result['rows'];
 			}
-			$stats['total_rows'] = isset($result->total_rows) ? $result->total_rows : null;
-			$stats['offset'] = isset($result->offset) ? $result->offset : null;
+			unset($result['rows']);
 
-			$options += compact('result', 'stats');
-			return $self->invokeMethod('_result', array('set', $query, $options));
+			$stats = $result + array('total_rows' => null, 'offset' => null);
+			$data = array_map(function($i) { return $i['doc']; }, $data);
+			$opts = compact('stats') + array('class' => 'set', 'exists' => true);
+
+			return $self->item($query->model(), $data, $opts);
 		});
 	}
 
@@ -304,7 +316,12 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return integer Result of the calculation.
 	 */
 	public function calculation($type, $query, array $options = array()) {
-		return $this->read($query, $options)->stats('total_rows');
+		switch ($type) {
+			case 'count':
+				return $this->read($query, $options)->stats('total_rows');
+			default:
+				return null;
+		}
 	}
 
 	/**
@@ -320,6 +337,22 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function item($model, array $data = array(), array $options = array()) {
 		return parent::item($model, $this->_format($data), $options);
+	}
+
+	public function cast($entity, array $data, array $options = array()) {
+		$defaults = array('pathKey' => null, 'model' => null);
+		$options += $defaults;
+		$model = $options['model'] ?: $entity->model();
+
+		foreach ($data as $key => $val) {
+			if (!is_array($val)) {
+				continue;
+			}
+			$pathKey = $options['pathKey'] ? "{$options['pathKey']}.{$key}" : $key;
+			$class = (range(0, count($val) - 1) === array_keys($val)) ? 'array' : 'entity';
+			$data[$key] = $this->item($model, $val, compact('class', 'pathKey') + $options);
+		}
+		return parent::cast($entity, $data, $options);
 	}
 
 	/**
@@ -456,21 +489,6 @@ class CouchDb extends \lithium\data\source\Http {
 		}
 		unset($data['_id'], $data['_rev']);
 		return $data;
-	}
-
-	/**
-	 * Handle the result from read
-	 *
-	 * @param string $type
-	 * @param string $query
-	 * @param string $config
-	 * @return void
-	 */
-	protected function _result($type, $query, $config = array()) {
-		$defaults = array('exists' => true);
-		$config = compact('query') + $config + $defaults;
-		$class = $this->_classes[$type];
-		return new $class($config);
 	}
 }
 
