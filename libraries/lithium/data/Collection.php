@@ -116,7 +116,11 @@ abstract class Collection extends \lithium\util\Collection {
 			unset($this->_config[$key]);
 		}
 		if ($model = $this->_model) {
-			$options = array('pathKey' => $this->_pathKey, 'schema' => $model::schema());
+			$options = array(
+				'pathKey' => $this->_pathKey,
+				'schema' => $model::schema(),
+				'exists' => isset($this->_config['exists']) ? $this->_config['exists'] : null
+			);
 			$this->_data = $model::connection()->cast($this, $this->_data, $options);
 		}
 	}

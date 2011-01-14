@@ -231,7 +231,7 @@ class CouchDb extends \lithium\data\source\Http {
 			}
 			unset($result['rows']);
 
-			$stats = $result + array('total_rows' => null, 'offset' => null);
+			$stats = (array) $result + array('total_rows' => null, 'offset' => null);
 			$data = array_map(function($i) { return $i['doc']; }, $data);
 			$opts = compact('stats') + array('class' => 'set', 'exists' => true);
 
