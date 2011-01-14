@@ -39,7 +39,10 @@ class InspectorTest extends \lithium\test\Unit {
 		)));
 		$this->assertEqual($expected, $result);
 
-		$result = Inspector::methods($class, 'ranges');
+		$this->assertNull(Inspector::methods('\lithium\core\Foo'));
+
+		$result = Inspector::methods('stdClass', 'extents');
+		$this->assertEqual(array(), $result);
 	}
 
 	public function testMethodInspection() {
@@ -182,6 +185,8 @@ class InspectorTest extends \lithium\test\Unit {
 		$this->assertEqual(array('modifiers', 'namespace'), array_keys($result));
 
 		$this->assertNull(Inspector::info('\lithium\analysis\Inspector::$foo'));
+
+		$this->assertNull(Inspector::info('\lithium\core\Foo::$foo'));
 	}
 
 	public function testClassDependencies() {
@@ -268,6 +273,8 @@ class InspectorTest extends \lithium\test\Unit {
 		$this->assertTrue(in_array('response', $result));
 		$this->assertTrue(in_array('_render', $result));
 		$this->assertTrue(in_array('_classes', $result));
+
+		$this->assertNull(Inspector::properties('\lithium\core\Foo'));
 	}
 }
 
