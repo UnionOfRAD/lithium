@@ -518,6 +518,23 @@ class MediaTest extends \lithium\test\Unit {
 		Media::render($response, null, array('type' => 'my'));
 		$this->assertEqual('Value', $response->headers('Custom'));
 	}
+
+	/**
+	 * Tests that `Media::asset()` will not prepend path strings with the base application path if
+	 * it has already been prepended.
+	 *
+	 * @return void
+	 */
+	public function testDuplicateBasePathCheck() {
+		$result = Media::asset('/foo/bar/image.jpg', 'image', array('base' => '/bar'));
+		$this->assertEqual('/bar/foo/bar/image.jpg', $result);
+
+		$result = Media::asset('/foo/bar/image.jpg', 'image', array('base' => '/foo/bar'));
+		$this->assertEqual('/foo/bar/image.jpg', $result);
+
+		$result = Media::asset('foo/bar/image.jpg', 'image', array('base' => 'foo'));
+		$this->assertEqual('foo/img/foo/bar/image.jpg', $result);
+	}
 }
 
 ?>
