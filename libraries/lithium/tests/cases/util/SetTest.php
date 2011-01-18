@@ -16,31 +16,31 @@ class SetTest extends \lithium\test\Unit {
 	public function testDepthWithEmptyData() {
 		$data = array();
 		$result = Set::depth($data);
-		$this->assertEqual($result, 0);
+		$this->assertEqual(0, $result);
 	}
 
 	public function testDepthOneLevelWithDefaults() {
 		$data = array();
 		$result = Set::depth($data);
-		$this->assertEqual($result, 0);
+		$this->assertEqual(0, $result);
 
 		$data = array('one', '2', 'three');
 		$result = Set::depth($data);
-		$this->assertEqual($result, 1);
+		$this->assertEqual(1, $result);
 
 		$data = array('1' => '1.1', '2', '3');
 		$result = Set::depth($data);
-		$this->assertEqual($result, 1);
+		$this->assertEqual(1, $result);
 
 		$data = array('1' => '1.1', '2', '3' => array('3.1' => '3.1.1'));
-		$result = Set::depth($data, false, 0);
-		$this->assertEqual($result, 1);
+		$result = Set::depth($data, array('all' => false));
+		$this->assertEqual(1, $result);
  	}
 
 	public function testDepthTwoLevelsWithDefaults() {
 		$data = array('1' => array('1.1' => '1.1.1'), '2', '3' => array('3.1' => '3.1.1'));
 		$result = Set::depth($data);
-		$this->assertEqual($result, 2);
+		$this->assertEqual(2, $result);
 
 		$data = array('1' => array('1.1' => '1.1.1'), '2', '3' => array('3.1' => array(
 			'3.1.1' => '3.1.1.1'
@@ -55,14 +55,14 @@ class SetTest extends \lithium\test\Unit {
 			)),
 			'3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
 		);
-		$result = Set::depth($data, false, 0);
+		$result = Set::depth($data, array('all' => false));
 		$this->assertEqual($result, 2);
 	}
 
 	public function testDepthTwoLevelsWithAll() {
 		$data = array('1' => '1.1', '2', '3' => array('3.1' => '3.1.1'));
-		$result = Set::depth($data, true);
-		$this->assertEqual($result, 2);
+		$result = Set::depth($data, array('all' => true));
+		$this->assertEqual(2, $result);
 	}
 
 
@@ -70,57 +70,59 @@ class SetTest extends \lithium\test\Unit {
 		$data = array(
 			'1' => array('1.1' => '1.1.1'), '2', '3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
 		);
-		$result = Set::depth($data, true);
-		$this->assertEqual($result, 3);
+		$result = Set::depth($data, array('all' => true));
+		$this->assertEqual(3, $result);
 
 		$data = array(
 			'1' => array('1.1' => '1.1.1'),
 			array('2' => array('2.1' => array('2.1.1' => '2.1.1.1'))),
 			'3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
 		);
-		$result = Set::depth($data, true);
-		$this->assertEqual($result, 4);
+		$result = Set::depth($data, array('all' => true));
+		$this->assertEqual(4, $result);
 
 		$data = array(
 			'1' => array('1.1' => '1.1.1'),
 			array('2' => array('2.1' => array('2.1.1' => array('2.1.1.1')))),
 			'3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
 		);
-		$result = Set::depth($data, true);
-		$this->assertEqual($result, 5);
+		$result = Set::depth($data, array('all' => true));
+		$this->assertEqual(5, $result);
 
-		$data = array('1' => array('1.1' => '1.1.1'), array(
+		$data = array(
+			'1' => array('1.1' => '1.1.1'), array(
 			'2' => array('2.1' => array('2.1.1' => array('2.1.1.1' => '2.1.1.1.1')))),
 			'3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
 		);
-		$result = Set::depth($data, true);
-		$this->assertEqual($result, 5);
+		$result = Set::depth($data, array('all' => true));
+		$this->assertEqual(5, $result);
 	}
 
 	public function testDepthFourLevelsWithAll() {
-		$data = array('1' => array('1.1' => '1.1.1'), array(
+		$data = array(
+			'1' => array('1.1' => '1.1.1'), array(
 			'2' => array('2.1' => array('2.1.1' => '2.1.1.1'))),
 			'3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
 		);
-		$result = Set::depth($data, true);
-		$this->assertEqual($result, 4);
+		$result = Set::depth($data, array('all' => true));
+		$this->assertEqual(4, $result);
 	}
 
 	public function testDepthFiveLevelsWithAll() {
-
-		$data = array('1' => array('1.1' => '1.1.1'), array(
+		$data = array(
+			'1' => array('1.1' => '1.1.1'), array(
 			'2' => array('2.1' => array('2.1.1' => array('2.1.1.1')))),
 			'3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
 		);
-		$result = Set::depth($data, true);
-		$this->assertEqual($result, 5);
+		$result = Set::depth($data, array('all' => true));
+		$this->assertEqual(5, $result);
 
 		$data = array('1' => array('1.1' => '1.1.1'), array(
 			'2' => array('2.1' => array('2.1.1' => array('2.1.1.1' => '2.1.1.1.1')))),
 			'3' => array('3.1' => array('3.1.1' => '3.1.1.1'))
 		);
-		$result = Set::depth($data, true);
-		$this->assertEqual($result, 5);
+		$result = Set::depth($data, array('all' => true));
+		$this->assertEqual(5, $result);
 	}
 
 	public function testFlattenOneLevel() {
@@ -160,7 +162,7 @@ class SetTest extends \lithium\test\Unit {
 		$result = Set::flatten($data);
 		$this->assertEqual($expected, $result);
 
-		$result = Set::flatten(array('Post' => $data[0]['Post']), '/');
+		$result = Set::flatten(array('Post' => $data[0]['Post']), array('separator' => '/'));
 		$expected = array('Post/id' => '1', 'Post/author_id' => '1', 'Post/title' => 'First Post');
 		$this->assertEqual($expected, $result);
 	}
@@ -234,25 +236,25 @@ class SetTest extends \lithium\test\Unit {
 			array('Article' => array('id' => 3, 'title' => 'Article 3'))
 		);
 
-		$this->assertTrue(Set::matches(array('id=2'), $a[1]['Article']));
-		$this->assertFalse(Set::matches(array('id>2'), $a[1]['Article']));
-		$this->assertTrue(Set::matches(array('id>=2'), $a[1]['Article']));
-		$this->assertFalse(Set::matches(array('id>=3'), $a[1]['Article']));
-		$this->assertTrue(Set::matches(array('id<=2'), $a[1]['Article']));
-		$this->assertFalse(Set::matches(array('id<2'), $a[1]['Article']));
-		$this->assertTrue(Set::matches(array('id>1'), $a[1]['Article']));
-		$this->assertTrue(Set::matches(array('id>1', 'id<3', 'id!=0'), $a[1]['Article']));
+		$this->assertTrue(Set::matches($a[1]['Article'], array('id=2')));
+		$this->assertFalse(Set::matches($a[1]['Article'], array('id>2')));
+		$this->assertTrue(Set::matches($a[1]['Article'], array('id>=2')));
+		$this->assertFalse(Set::matches($a[1]['Article'], array('id>=3')));
+		$this->assertTrue(Set::matches($a[1]['Article'], array('id<=2')));
+		$this->assertFalse(Set::matches($a[1]['Article'], array('id<2')));
+		$this->assertTrue(Set::matches($a[1]['Article'], array('id>1')));
+		$this->assertTrue(Set::matches($a[1]['Article'], array('id>1', 'id<3', 'id!=0')));
 
-		$this->assertTrue(Set::matches(array('3'), null, 3));
-		$this->assertTrue(Set::matches(array('5'), null, 5));
+		$this->assertTrue(Set::matches(array(), array('3'), 3));
+		$this->assertTrue(Set::matches(array(), array('5'), 5));
 
-		$this->assertTrue(Set::matches(array('id'), $a[1]['Article']));
-		$this->assertTrue(Set::matches(array('id', 'title'), $a[1]['Article']));
-		$this->assertFalse(Set::matches(array('non-existant'), $a[1]['Article']));
+		$this->assertTrue(Set::matches($a[1]['Article'], array('id')));
+		$this->assertTrue(Set::matches($a[1]['Article'], array('id', 'title')));
+		$this->assertFalse(Set::matches($a[1]['Article'], array('non-existant')));
 
-		$this->assertTrue(Set::matches('/Article[id=2]', $a));
-		$this->assertFalse(Set::matches('/Article[id=4]', $a));
-		$this->assertTrue(Set::matches(array(), $a));
+		$this->assertTrue(Set::matches($a, '/Article[id=2]'));
+		$this->assertFalse(Set::matches($a, '/Article[id=4]'));
+		$this->assertTrue(Set::matches($a, array()));
 	}
 
 	public function testMatchesMultipleLevels() {
@@ -271,8 +273,7 @@ class SetTest extends \lithium\test\Unit {
 				)
 			)
 		);
-		$result = Set::matches($result, '/Article/keep/Comment');
-		$this->assertTrue($result);
+		$this->assertTrue(Set::matches($result, '/Article/keep/Comment'));
 
 		$result = Set::matches($result, '/Article/keep/Comment/fields/user');
 		$this->assertFalse($result);
@@ -281,9 +282,6 @@ class SetTest extends \lithium\test\Unit {
 	public function testExtractReturnsEmptyArray() {
 		$expected = array();
 		$result = Set::extract(array(), '/Post/id');
-		$this->assertIdentical($expected, $result);
-
-		$result = Set::extract('/Post/id', array());
 		$this->assertIdentical($expected, $result);
 
 		$result = Set::extract(array(
@@ -426,7 +424,7 @@ class SetTest extends \lithium\test\Unit {
 		);
 
 		$expected = array(array('a' => $c[2]['a']));
-		$result = Set::extract('/a/II[a=3]/..', $c);
+		$result = Set::extract($c, '/a/II[a=3]/..');
 		$this->assertEqual($expected, $result);
 
 		$expected = array(1, 2, 3, 4, 5);
@@ -582,15 +580,15 @@ class SetTest extends \lithium\test\Unit {
 				'Comment' => array()
 			)
 		);
-		$result = Set::extract('/', $common);
+		$result = Set::extract($common, '/');
 		$this->assertEqual($result, $common);
 
 		$expected = array(1);
-		$result = Set::extract('/Comment/id[:first]', $common);
+		$result = Set::extract($common, '/Comment/id[:first]');
 		$this->assertEqual($expected, $result);
 
 		$expected = array(5);
-		$result = Set::extract('/Comment/id[:last]', $common);
+		$result = Set::extract($common, '/Comment/id[:last]');
 		$this->assertEqual($expected, $result);
 
 		$result = Set::extract($common, '/Comment/id');
@@ -614,15 +612,15 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array(array('Comment' => $common[1]['Comment'][0]));
-		$result = Set::extract('/Comment[addition=]', $common);
+		$result = Set::extract($common, '/Comment[addition=]');
 		$this->assertEqual($expected, $result);
 
 		$expected = array(3);
-		$result = Set::extract('/Article[:last]/id', $common);
+		$result = Set::extract($common, '/Article[:last]/id');
 		$this->assertEqual($expected, $result);
 
 		$expected = array();
-		$result = Set::extract('/User/id', array());
+		$result = Set::extract(array(), '/User/id');
 		$this->assertEqual($expected, $result);
 	}
 
@@ -887,16 +885,13 @@ class SetTest extends \lithium\test\Unit {
 	}
 
 	public function testMerge() {
-		$result = Set::merge(array('foo'));
+		$result = Set::merge(array('foo'), array());
 		$this->assertIdentical($result, array('foo'));
 
-		$result = Set::merge('foo');
-		$this->assertIdentical($result, array('foo'));
-
-		$result = Set::merge('foo', 'bar');
+		$result = Set::merge((array) 'foo', (array) 'bar');
 		$this->assertIdentical($result, array('foo', 'bar'));
 
-		$result = Set::merge('foo', array('user' => 'bob', 'no-bar'));
+		$result = Set::merge((array) 'foo', array('user' => 'bob', 'no-bar'));
 		$this->assertIdentical($result, array('foo', 'user' => 'bob', 'no-bar'));
 
 		$a = array('foo', 'foo2');
@@ -1303,7 +1298,7 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertIdentical($expected, $result);
 	}
 
-	public function testBlend() {
+	public function testAppend() {
 		$array1 = array('ModelOne' => array(
 			'id' => 1001, 'field_one' => 'a1.m1.f1', 'field_two' => 'a1.m1.f2'
 		));
@@ -1311,7 +1306,7 @@ class SetTest extends \lithium\test\Unit {
 			'id' => 1002, 'field_one' => 'a2.m2.f1', 'field_two' => 'a2.m2.f2'
 		));
 
-		$result = Set::blend($array1, $array2);
+		$result = Set::append($array1, $array2);
 
 		$this->assertIdentical($result, $array1 + $array2);
 
@@ -1319,7 +1314,7 @@ class SetTest extends \lithium\test\Unit {
 			'id' => 1003, 'field_one' => 'a3.m1.f1',
 			'field_two' => 'a3.m1.f2', 'field_three' => 'a3.m1.f3'
 		));
-		$result = Set::blend($array1, $array3);
+		$result = Set::append($array1, $array3);
 
 		$expected = array('ModelOne' => array(
 			'id' => 1001, 'field_one' => 'a1.m1.f1',
@@ -1344,14 +1339,14 @@ class SetTest extends \lithium\test\Unit {
 			))
 		);
 
-		$result = Set::blend($array1, $array2);
+		$result = Set::append($array1, $array2);
 		$this->assertIdentical($result, $array1);
 
 		$array3 = array(array('ModelThree' => array(
 			'id' => 1003, 'field_one' => 's3.0.m3.f1', 'field_two' => 's3.0.m3.f2'
 		)));
 
-		$result = Set::blend($array1, $array3);
+		$result = Set::append($array1, $array3);
 		$expected = array(
 			array(
 				'ModelOne' => array(
@@ -1367,13 +1362,13 @@ class SetTest extends \lithium\test\Unit {
 		);
 		$this->assertIdentical($expected, $result);
 
-		$result = Set::blend($array1, null);
+		$result = Set::append($array1, array());
 		$this->assertIdentical($result, $array1);
 
-		$result = Set::blend($array1, $array2);
+		$result = Set::append($array1, $array2);
 		$this->assertIdentical($result, $array1 + $array2);
 
-		$result = Set::blend(array(), array('2'));
+		$result = Set::append(array(), array('2'));
 		$this->assertIdentical(array('2'), $result);
 	}
 
