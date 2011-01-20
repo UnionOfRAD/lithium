@@ -288,7 +288,9 @@ class Media extends \lithium\core\StaticObject {
 			}
 
 			if ($path[0] === '/') {
-				$path = strpos($path, $options['base']) !== 0 ? "{$options['base']}{$path}" : $path;
+				if ($options['base'] && strpos($path, $options['base']) !== 0) {
+					$path = "{$options['base']}{$path}";
+				}
 			} else {
 				$path = String::insert(key($paths), compact('path') + $options);
 			}

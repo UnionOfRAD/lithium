@@ -534,6 +534,9 @@ class MediaTest extends \lithium\test\Unit {
 
 		$result = Media::asset('foo/bar/image.jpg', 'image', array('base' => 'foo'));
 		$this->assertEqual('foo/img/foo/bar/image.jpg', $result);
+
+		$result = Media::asset('/foo/bar/image.jpg', 'image', array('base' => ''));
+		$this->assertEqual('/foo/bar/image.jpg', $result);
 	}
 }
 
