@@ -248,9 +248,18 @@ class Controller extends \lithium\core\Object {
 	/**
 	 * Creates a redirect response.
 	 *
-	 * @param mixed $url
-	 * @param array $options
-	 * @return void
+	 * @see lithium\net\http\Router::match()
+	 * @see lithium\action\Controller::$response
+	 * @param mixed $url Either a string or an array representing the URL to redirect to.
+	 *              Post-processed by `Router::match()`.
+	 * @param array $options Options when performing the redirect. Available options include:
+	 *              - `'status'` _integer_: The HTTP status code associated with the redirect.
+	 *                Defaults to `302`.
+	 *              - `'head'` _boolean_: Determines whether only headers are returned with the
+	 *                response. Defaults to `true`, in which case only headers and no body are
+	 *                returned. Set to `false` to render a body as well.
+	 *              - `'exit'` _boolean_: Exit immediately after rendering. Defaults to `true`.
+	 * @return object Returns the instance of the `Response` object associated with this controller.
 	 * @filter This method can be filtered.
 	 */
 	public function redirect($url, array $options = array()) {
