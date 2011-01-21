@@ -38,7 +38,7 @@ h6 { font-size: 1em; }
 p { margin-bottom: 1em; }
 strong { font-weight: bold; }
 em { font-style: italic; }
-a { text-decoration: none; color: #666; border-bottom: 1px dashed #00bbff; }
+a { text-decoration: none; color: #666; }
 a, h1 a, h2 a { text-decoration: none; }
 a:hover { color: #00bbff; }
 a:visited:hover { color: #ff59ff; }
