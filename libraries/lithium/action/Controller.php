@@ -84,10 +84,18 @@ class Controller extends \lithium\core\Object {
 	 * manually specified. This sets the template to be rendered, and is looked up (by default) as
 	 * `<app-path>/views/<controller>/<action>.<type>.php`, i.e.: `app/views/posts/index.html.php`.
 	 *
-	 * To change the inner-workings of these settings (template paths, default render settings for
+	 * To enable automatic content-type negotiation (i.e. determining the content type of the
+	 * response based on the value of the
+	 * [HTTP Accept header](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html)), set the
+	 * `'negotiate'` flag to `true`. Otherwise, the response will only be based on the `type`
+	 * parameter of the request object (defaulting to `'html'` if no type is present).
+	 *
+	 * Keep in mind that most of these settings may be passed to `Controller::render()` as well. To
+	 * change how these settings operate (i.e. template paths, default render settings for
 	 * individual content types), see the `lithium\net\http\Media` class.
 	 *
 	 * @var array
+	 * @see lithium\action\Controller::render()
 	 * @see lithium\net\http\Media::type()
 	 * @see lithium\net\http\Media::render()
 	 */
@@ -97,7 +105,8 @@ class Controller extends \lithium\core\Object {
 		'auto'        => true,
 		'layout'      => 'default',
 		'template'    => null,
-		'hasRendered' => false
+		'hasRendered' => false,
+		'negotiate'   => false
 	);
 
 	/**
@@ -129,13 +138,16 @@ class Controller extends \lithium\core\Object {
 	protected function _init() {
 		parent::_init();
 		$this->request = $this->request ?: $this->_config['request'];
-		$media = $this->_classes['media'];
+		$this->response = $this->_instance('response', $this->_config['response']);
 
-		if ($this->request && !$this->_render['type']) {
-			$this->_render['type'] = $this->request->accepts() ?: 'html';
+		if (!$this->request || $this->_render['type']) {
+			return;
 		}
-		$config = $this->_config['response'] + array('request' => $this->request);
-		$this->response = $this->_instance('response', $config);
+		if ($this->_render['negotiate']) {
+			$this->_render['type'] = $this->request->accepts();
+			return;
+		}
+		$this->_render['type'] = $this->request->type ?: 'html';
 	}
 
 	/**
@@ -214,22 +226,25 @@ class Controller extends \lithium\core\Object {
 		$media = $this->_classes['media'];
 		$class = get_class($this);
 		$name = preg_replace('/Controller$/', '', substr($class, strrpos($class, '\\') + 1));
+		$key = key($options);
 
-		$defaults = array('status' => null, 'location' => false, 'data' => null, 'head' => false);
-		$options += $defaults + array('controller' => Inflector::underscore($name));
-
-		if ($options['data']) {
+		if (isset($options['data'])) {
 			$this->set($options['data']);
 			unset($options['data']);
 		}
-		$options = $options + $this->_render;
-		$type = key($options);
-		$types = array_flip($media::types());
+		$defaults = array(
+			'status'     => null,
+			'location'   => false,
+			'data'       => null,
+			'head'       => false,
+			'controller' => Inflector::underscore($name),
+		);
+		$options += $this->_render + $defaults;
 
-		if (isset($types[$type])) {
-			$options['type'] = $type;
-			$this->set(current($options));
-			unset($options[$type]);
+		if ($key && $media::type($key)) {
+			$options['type'] = $key;
+			$this->set($options[$key]);
+			unset($options[$key]);
 		}
 
 		$this->_render['hasRendered'] = true;
@@ -246,12 +261,13 @@ class Controller extends \lithium\core\Object {
 	}
 
 	/**
-	 * Creates a redirect response.
+	 * Creates a redirect response by calling `render()` and providing a `'location'` parameter.
 	 *
 	 * @see lithium\net\http\Router::match()
 	 * @see lithium\action\Controller::$response
-	 * @param mixed $url Either a string or an array representing the URL to redirect to.
-	 *              Post-processed by `Router::match()`.
+	 * @param mixed $url The location to redirect to, provided as a string relative to the root of
+	 *              the application, a fully-qualified URL, or an array of routing parameters to be
+	 *              resolved to a URL. Post-processed by `Router::match()`.
 	 * @param array $options Options when performing the redirect. Available options include:
 	 *              - `'status'` _integer_: The HTTP status code associated with the redirect.
 	 *                Defaults to `302`.
@@ -264,7 +280,7 @@ class Controller extends \lithium\core\Object {
 	 */
 	public function redirect($url, array $options = array()) {
 		$router = $this->_classes['router'];
-		$defaults = array('location' => null, 'status' => 302, 'head' => true, 'exit' => true);
+		$defaults = array('location' => null, 'status' => 302, 'head' => true, 'exit' => false);
 		$options += $defaults;
 		$params = compact('url', 'options');
 
