@@ -426,6 +426,32 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE {$conditions};";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
+
+		$query = new Query(array(
+			'type' => 'read', 'model' => $this->_model,
+			'conditions' => array(
+				'field' => array('like' => '%value%')
+			)
+		));
+		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ({field} like '%value%');";
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+
+		$query = new Query(array(
+			'type' => 'read', 'model' => $this->_model,
+			'conditions' => array(
+				'or' => array(
+					'field1' => 'value1',
+					'field2' => 'value2',
+					'and' => array(
+						'sField' => '1',
+						'sField2' => '2'
+					)
+				),
+				'bField' => '3'
+			)
+		));
+		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ({field1} = 'value1' OR {field2} = 'value2' OR ({sField} = 1 AND {sField2} = 2)) AND {bField} = 3;";
+		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
 
 	public function testRawConditions() {
