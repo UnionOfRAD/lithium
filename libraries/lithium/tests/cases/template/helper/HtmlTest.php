@@ -280,6 +280,18 @@ class HtmlTest extends \lithium\test\Unit {
 			'<\/script>\s*$/',
 			$result
 		);
+
+		$result = $this->html->script("foo", array(
+			'async' => true, 'defer' => true, 'onload' => 'init()'
+		));
+
+		$this->assertTags($result, array('script' => array(
+			'type' => 'text/javascript',
+			'src' => '/js/foo.js',
+			'async' => 'async',
+			'defer' => 'defer',
+			'onload' => 'init()'
+		)));
 	}
 
 	/**
