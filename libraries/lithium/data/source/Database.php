@@ -492,11 +492,16 @@ abstract class Database extends \lithium\data\Source {
 		$constraintTypes = &$this->_constraintTypes;
 
 		switch (true) {
-			case is_string($value):
-				return $this->name($key) . ' = ' . $this->value($value);
-			break;
 			case (is_numeric($key) && is_string($value)):
 				return $value;
+			case is_string($value):
+				return $this->name($key) . ' = ' . $this->value($value);
+			case is_numeric($key) && is_array($value):
+				$result = array();
+				foreach($value as $cField => $cValue) {
+					$result[] = $this->_processConditions($cField, $cValue, $schema, $glue);
+				}
+				return '(' . implode(' ' . $glue . ' ', $result) . ')';
 			case (is_string($key) && is_object($value)):
 				$value = trim(rtrim($this->renderCommand($value), ';'));
 				return "{$key} IN ({$value})";
