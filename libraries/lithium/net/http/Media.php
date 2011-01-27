@@ -32,7 +32,7 @@ class Media extends \lithium\core\StaticObject {
 
 	/**
 	 * Maps file extensions to content-types.  Used to set response types and determine request
-	 * types.  Can be modified with Media::type().
+	 * types. Can be modified with `Media::type()`.
 	 *
 	 * @var array
 	 * @see lithium\net\http\Media::type()
@@ -98,50 +98,105 @@ class Media extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Map an extension to a particular content-type (or types) with a set of options.
+	 * Maps a type name to a particular content-type (or multiple types) with a set of options, or
+	 * retrieves information about a type that has been defined.
 	 *
 	 * Examples:
-	 * {{{// Get a list of all available media types:
-	 * Media::types(); // returns array('ai', 'amf', 'atom', ...);
-	 * }}}
+	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(1-2) }}}
 	 *
-	 * {{{// Add a custom media type:
-	 * Media::type('my', 'text/x-my', array('view' => '\my\custom\View', 'layout' => false));
-	 * }}}
+	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(19-20) }}}
 	 *
-	 * {{{// Remove a custom media type:
-	 * Media::type('my', false);
-	 * }}}
+	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(35-36) }}}
 	 *
 	 * Alternatively, can be used to detect the type name of a registered content type:
 	 * {{{
 	 * Media::type('application/json'); // returns 'json'
 	 * Media::type('application/javascript'); // returns 'javascript'
 	 * Media::type('text/javascript'); // also returns 'javascript'
+	 *
+	 * Media::type('text/html'); // returns 'html'
+	 * Media::type('application/xhtml+xml'); // also returns 'html'
 	 * }}}
+	 *
+	 * #### Content negotiation
+	 *
+	 * When creating custom media types, specifying which content-type(s) to match isn't always
+	 * enough. For example, if you wish to serve a different set of templates to mobile web
+	 * browsers, you'd still want those templates served as HTML. You might add something like this:
+	 *
+	 * {{{
+	 * Media::type('mobile', array('application/xhtml+xml', 'text/html'));
+	 * }}}
+	 *
+	 * However, this would cause _all_ requests for HTML content to be interpreted as
+	 * `'mobile'`-type requests. Instead, we can use _content negotiation_ to granularly specify how
+	 * to match a particular type. Content negotiation is the process of examining the HTTP headers
+	 * provided in the request (including the content-types listed in the `Accept` header, and
+	 * optionally other things as well, like the `Accept-Language` or `User-Agent` headers), in
+	 * order to produce the best representation of the requested resource for the client; in other
+	 * words, the resource that most closely matches what the client is asking for.
+	 *
+	 * Content negotiation with media types is made possible through the `'conditions'` key of the
+	 * `$options` parameter, which contains an array of assertions made against the `Request`
+	 * object. Each assertion (array key) can be one of three different things:
+	 *
+	 * - `'type'` _boolean_: In the default routing, some routes have `{:type}` keys, which are
+	 *   designed to match file extensions in URLs. These values act as overrides for the HTTP
+	 *   `Accept` header, allowing different formats to be served with the same content type. For
+	 *    example, if you're serving [ JSONP](http://en.wikipedia.org/wiki/JSON#JSONP), you'll want
+	 *    to serve it with the same content-type as JavaScript (since it is JavaScript), but you
+	 *    probably won't want to use the same template(s) or other settings. Therefore, when serving
+	 *    JSONP content, you can specify that the extension defined in the type must be present in
+	 *    the URL:
+	 *  {{{
+	 *  Media::type('jsonp', array('text/html'), array(
+	 *  	// template settings...
+	 *  	'conditions' => array('type' => true)
+	 *  ));
+	 *  }}}
+	 *  Then, JSONP content will only ever be served when the request URL ends in `.jsonp`.
+	 *
+	 * - `'<prefix>:<key>'` _string_: This type of assertion can be used to match against arbitrary
+	 *   information in the request, including headers (i.e. `'http:user_agent'`), environment
+	 *   varialbes (i.e. `'env:home'`), GET and POST data (i.e. `'query:foo'` or `'data:foo'`,
+	 *   respectively), and the HTTP method (`'http:method'`) of the request. For more information
+	 *   on possible keys, see `lithium\action\Request::get()`.
+	 *
+	 * - `'<detector>'` _boolean_: Uses detector checks added to the `Request` object to make
+	 *   boolean assertions against the request. For example, if a detector called `'iPhone'` is
+	 *   attached, you can add `'iPhone' => true` to the `'conditions'` array in order to filter for
+	 *   iPhone requests only. See `lithium\action\Request::detect()` for more information on adding
+	 *   detectors.
 	 *
 	 * @see lithium\net\http\Media::$_types
 	 * @see lithium\net\http\Media::$_handlers
+	 * @see lithium\net\http\Media::negotiate()
+	 * @see lithium\action\Request::get()
+	 * @see lithium\action\Request::is()
+	 * @see lithium\action\Request::detect()
 	 * @see lithium\util\String::insert()
-	 * @param string $type A file extension for the type, i.e. `'txt'`, `'js'`, or `'atom'`.
-	 *               Alternatively, may be a content type, i.e. `'text/html'`,
-	 *               `'application/atom+xml'`, etc.; in which case, the type name (i.e. '`html'` or
-	 *               `'atom'`) will be returned.
+	 * @param string $type A file-extension-style type name, i.e. `'txt'`, `'js'`, or `'atom'`.
+	 *               Alternatively, a mapped content type, i.e. `'text/html'`,
+	 *               `'application/atom+xml'`, etc.; in which case, the matching type name (i.e.
+	 *               '`html'` or `'atom'`) will be returned.
 	 * @param mixed $content Optional. A string or array containing the content-type(s) that
 	 *        `$type` should map to.  If `$type` is an array of content-types, the first one listed
-	 *        should be the "primary" type.
+	 *        should be the "primary" type, and will be used as the `Content-type` header of any
+	 *        `Response` objects served through this type.
 	 * @param array $options Optional.  The handling options for this media type. Possible keys are:
-	 *        - `'decode'`: A (string) function name or (object) closure that handles
+	 *        - `'decode'` _mixed_: A (string) function name or (object) closure that handles
 	 *          decoding or unserializing content from this format.
-	 *        - `'encode'`: A (string) function name or (object) closure that handles encoding or
-	 *          serializing content into this format.
-	 *        - `'cast'`: Used with `'encode'`. If `true`, all data passed into the specified encode
-	 *           function is first cast to array structures.
-	 *        - `'layout'`: Specifies a `String::insert()`-style path to use when searching for
-	 *          layout files.
-	 *        - `'template'`: Specifies a `String::insert()`-style path to use when searching for
-	 *          template files.
-	 *        - `'view'`: Specifies the view class to use when rendering this content.
+	 *        - `'encode'` _mixed_: A (string) function name or (object) closure that handles
+	 *          encoding or serializing content into this format.
+	 *        - `'cast'` _boolean_: Used with `'encode'`. If `true`, all data passed into the
+	 *          specified encode function is first cast to array structures.
+	 *        - `'layout'` _mixed_: Specifies one or more `String::insert()`-style paths to use when
+	 *          searching for layout files (either a string or array of strings).
+	 *        - `'template'` _mixed_: Specifies one or more `String::insert()`-style paths to use
+	 *          when searching for template files (either a string or array of strings).
+	 *        - `'view'` _string_: Specifies the view class to use when rendering this content.
+	 *        - `'conditions'` _array_: Optional key/value pairs used as assertions in content
+	 *          negotiation. See the above section on **Content Negotiation**.
 	 * @return mixed If `$content` and `$options` are empty, returns an array with `'content'` and
 	 *         `'options'` keys, where `'content'` is the content-type(s) that correspond to
 	 *         `$type` (can be a string or array, if multiple content-types are available), and
@@ -156,6 +211,7 @@ class Media extends \lithium\core\StaticObject {
 			'encode' => false,
 			'decode' => false,
 			'cast'   => true,
+			'conditions' => array(),
 		);
 
 		if ($content === false) {
@@ -165,9 +221,11 @@ class Media extends \lithium\core\StaticObject {
 			if (!$content = static::_types($type)) {
 				return;
 			}
+			if (strpos($type, '/')) {
+				return $content;
+			}
 			if (is_array($content) && isset($content['alias'])) {
-				$type = $content['alias'];
-				$content = static::_types($type);
+				return static::type($content['alias']);
 			}
 			return compact('content') + array('options' => static::_handlers($type));
 		}
@@ -175,6 +233,95 @@ class Media extends \lithium\core\StaticObject {
 			static::$_types[$type] = $content;
 		}
 		static::$_handlers[$type] = $options ? ($options + $defaults) : array();
+	}
+
+	/**
+	 * Performs content-type negotiation on a `Request` object, by iterating over the accepted
+	 * types in sequence, from most preferred to least, and attempting to match each one against a
+	 * content type defined by `Media::type()`, until a match is found. If more than one defined
+	 * type matches for a given content type, they will be checked in the order they were added
+	 * (usually, this corresponds to the order they were defined in the application bootstrapping
+	 * process).
+	 *
+	 * @see lithium\net\http\Media::type()
+	 * @see lithium\net\http\Media::match()
+	 * @see lithium\action\Request
+	 * @param object $request The instance of `lithium\action\Request` which contains the details of
+	 *               the request to be content-negotiated.
+	 * @return string Returns the first matching type name, i.e. `'html'` or `'json'`.
+	 */
+	public static function negotiate($request) {
+		$self = get_called_class();
+
+		$match = function($name) use ($self, $request) {
+			if (($cfg = $self::type($name)) && $self::match($request, compact('name') + $cfg)) {
+				return true;
+			}
+			return false;
+		};
+
+		if (($type = $request->type) && $match($type)) {
+			return $type;
+		}
+
+		foreach ($request->accepts(true) as $type) {
+			if (!$types = (array) static::_types($type)) {
+				continue;
+			}
+			foreach ($types as $name) {
+				if (!$match($name)) {
+					continue;
+				}
+				return $name;
+			}
+		}
+	}
+
+	/**
+	 * Assists `Media::negotiate()` in processing the negotiation conditions of a content type, by
+	 * iterating through the conditions and checking each one against the `Request` object.
+	 *
+	 * @see lithium\net\http\Media::negotiate()
+	 * @see lithium\net\http\Media::type()
+	 * @see lithium\action\Request
+	 * @param object $request The instance of `lithium\action\Request` to be checked against a
+	 *               set of conditions (if applicable).
+	 * @param array $config Represents a content type configuration, which is an array containing 3
+	 *              keys:
+	 *              - `'name'` _string_: The type name, i.e. `'html'` or `'json'`.
+	 *              - `'content'` _mixed_: One or more content types that the configuration
+	 *                represents, i.e. `'text/html'`, `'application/xhtml+xml'` or
+	 *                `'application/json'`, or an array containing multiple content types.
+	 *              - `'options'` _array_: An array containing rendering information, and an
+	 *                optional `'conditions'` key, which contains an array of matching parameters.
+	 *                For more details on these matching parameters, see `Media::type()`.
+	 * @return boolean Returns `true` if the information in `$request` matches the type
+	 *         configuration in `$config`, otherwise false.
+	 */
+	public static function match($request, array $config) {
+		if (!isset($config['options']['conditions'])) {
+			return true;
+		}
+		$conditions = $config['options']['conditions'];
+
+		foreach ($conditions as $key => $value) {
+			switch (true) {
+				case $key == 'type':
+					if ($value !== ($request->type === $config['name'])) {
+						return false;
+					}
+				break;
+				case strpos($key, ':'):
+					if ($request->get($key) !== $value) {
+						return false;
+					}
+				break;
+				case ($request->is($key) !== $value):
+					return false;
+				break;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -390,7 +537,6 @@ class Media extends \lithium\core\StaticObject {
 	 * @param array $options
 	 * @return void
 	 * @filter
-	 * @todo Implement proper exception handling
 	 */
 	public static function render(&$response, $data = null, array $options = array()) {
 		$params = array('response' => &$response) + compact('data', 'options');
@@ -405,15 +551,13 @@ class Media extends \lithium\core\StaticObject {
 
 			$result = null;
 			$type = $options['type'];
-			$hasHandler = isset($handlers[$type]);
-			$handler = $options + ($hasHandler ? $handlers[$type] : array()) + $defaults;
 
-			$filter = function($v) { return $v !== null; };
-			$handler = array_filter($handler, $filter) + $handlers['default'] + $defaults;
-
-			if (!$hasHandler) {
+			if (!isset($handlers[$type])) {
 				throw new MediaException("Unhandled media type '{$type}'");
 			}
+			$handler = $options + $handlers[$type] + $defaults;
+			$filter = function($v) { return $v !== null; };
+			$handler = array_filter($handler, $filter) + $handlers['default'] + $defaults;
 
 			if (isset($types[$type])) {
 				$response->headers('Content-type', current((array) $types[$type]));
@@ -534,14 +678,14 @@ class Media extends \lithium\core\StaticObject {
 	 */
 	protected static function _types($type = null) {
 		$types = static::$_types + array(
-			'atom'         => 'application/atom+xml',
-			'css'          => 'text/css',
-			'form'         => 'application/x-www-form-urlencoded',
-			'htm'          => array('alias' => 'html'),
 			'html'         => array('text/html', 'application/xhtml+xml', '*/*'),
-			'js'           => array('application/javascript', 'text/javascript'),
+			'htm'          => array('alias' => 'html'),
+			'form'         => 'application/x-www-form-urlencoded',
 			'json'         => 'application/json',
 			'rss'          => 'application/rss+xml',
+			'atom'         => 'application/atom+xml',
+			'css'          => 'text/css',
+			'js'           => array('application/javascript', 'text/javascript'),
 			'text'         => 'text/plain',
 			'txt'          => array('alias' => 'text'),
 			'xml'          => array('application/xml', 'text/xml'),
@@ -556,11 +700,17 @@ class Media extends \lithium\core\StaticObject {
 		if (strpos($type, ';')) {
 			list($type) = explode(';', $type);
 		}
+		$result = array();
+
 		foreach ($types as $name => $cTypes) {
 			if ($type == $cTypes || (is_array($cTypes) && in_array($type, $cTypes))) {
-				return $name;
+				$result[] = $name;
 			}
 		}
+		if (count($result) == 1) {
+			return reset($result);
+		}
+		return $result ?: null;
 	}
 
 	/**
@@ -571,26 +721,23 @@ class Media extends \lithium\core\StaticObject {
 	 * @return mixed Array of all handlers, or the handler for a specific type.
 	 */
 	protected static function _handlers($type = null) {
-		$format = array('view' => false, 'layout' => false);
-		$json   = array('encode' => 'json_encode', 'decode' => function($data) {
-			return json_decode($data, true);
-		});
-		$paths  = array(
-			'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
-			'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
-		);
-
 		$handlers = static::$_handlers + array(
-			'default' => compact('paths') + array(
+			'default' => array(
 				'view'     => 'lithium\template\View',
 				'encode'   => false,
 				'decode'   => false,
 				'cast'     => false,
+				'paths'    => array(
+					'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
+					'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
+				)
 			),
 			'html' => array(),
-			'json' => $format + $json + array('cast' => true),
-			'text' => $format + array('cast' => false, 'encode' => function($s) { return $s; }),
-			'form' => $format + array('cast' => true, 'encode' => 'http_build_query'),
+			'json' => array('cast' => true, 'encode' => 'json_encode', 'decode' => function($data) {
+				return json_decode($data, true);
+			}),
+			'text' => array('cast' => false, 'encode' => function($s) { return $s; }),
+			'form' => array('cast' => true, 'encode' => 'http_build_query'),
 		);
 
 		if ($type) {

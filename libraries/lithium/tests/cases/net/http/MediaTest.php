@@ -32,24 +32,25 @@ class MediaTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testMediaTypes() {
-		$result = Media::types();
+		// Get a list of all available media types:
+		$types = Media::types(); // returns array('html', 'json', 'rss', ...);
 
-		$this->assertTrue(is_array($result));
-		$this->assertTrue(in_array('json', $result));
-		$this->assertFalse(in_array('my', $result));
-
-		$this->assertEqual($result, Media::formats());
+		$expected = array(
+			'html', 'htm', 'form', 'json', 'rss', 'atom', 'css', 'js', 'text', 'txt', 'xml'
+		);
+		$this->assertEqual($expected, $types);
+		$this->assertEqual($expected, Media::formats());
 
 		$result = Media::type('json');
 		$expected = 'application/json';
 		$this->assertEqual($expected, $result['content']);
 
 		$expected = array(
-			'view' => false, 'layout' => false, 'cast' => true,
-			'encode' => 'json_encode', 'decode' => $result['options']['decode']
+			'cast' => true, 'encode' => 'json_encode', 'decode' => $result['options']['decode']
 		);
 		$this->assertEqual($expected, $result['options']);
 
+		// Add a custom media type with a custom view class:
 		Media::type('my', 'text/x-my', array('view' => 'my\custom\View', 'layout' => false));
 
 		$result = Media::types();
@@ -61,10 +62,11 @@ class MediaTest extends \lithium\test\Unit {
 
 		$expected = array(
 			'view' => 'my\custom\View', 'template' => null, 'layout' => null,
-			'encode' => null, 'decode' => null, 'cast' => true
+			'encode' => null, 'decode' => null, 'cast' => true, 'conditions' => array()
 		);
 		$this->assertEqual($expected, $result['options']);
 
+		// Remove a custom media type:
 		Media::type('my', false);
 		$result = Media::types();
 		$this->assertFalse(in_array('my', $result));
@@ -77,23 +79,14 @@ class MediaTest extends \lithium\test\Unit {
 	 */
 	public function testContentTypeDetection() {
 		$this->assertNull(Media::type('application/foo'));
-
-		$result = Media::type('application/javascript');
-		$this->assertEqual('js', $result['content']);
-
-		$result = Media::type('*/*');
-		$this->assertEqual('html', $result['content']);
-
-		$result = Media::type('application/json');
-		$this->assertEqual('json', $result['content']);
-
-		$result = Media::type('application/json; charset=UTF-8');
-		$this->assertEqual('json', $result['content']);
+		$this->assertEqual('js', Media::type('application/javascript'));
+		$this->assertEqual('html', Media::type('*/*'));
+		$this->assertEqual('json', Media::type('application/json'));
+		$this->assertEqual('json', Media::type('application/json; charset=UTF-8'));
 
 		$result = Media::type('json');
 		$expected = array('content' => 'application/json', 'options' => array(
-			'view' => false, 'layout' => false, 'cast' => true,
-			'encode' => 'json_encode', 'decode' => $result['options']['decode']
+			'cast' => true, 'encode' => 'json_encode', 'decode' => $result['options']['decode']
 		));
 		$this->assertEqual($expected, $result);
 	}
@@ -537,6 +530,40 @@ class MediaTest extends \lithium\test\Unit {
 
 		$result = Media::asset('/foo/bar/image.jpg', 'image', array('base' => ''));
 		$this->assertEqual('/foo/bar/image.jpg', $result);
+	}
+
+	public function testContentNegotiationByType() {
+		$this->assertEqual('html', Media::type('text/html'));
+
+		Media::type('jsonp', 'text/html', array(
+			'conditions' => array('type' => true)
+		));
+		$this->assertEqual(array('jsonp', 'html'), Media::type('text/html'));
+
+		$config = array('env' => array('HTTP_ACCEPT' => 'text/html,text/plain;q=0.5'));
+		$request = new Request($config);
+		$request->params = array('type' => 'jsonp');
+		$this->assertEqual('jsonp', Media::negotiate($request));
+
+		$request = new Request($config);
+		$this->assertEqual('html', Media::negotiate($request));
+	}
+
+	public function testContentNegotiationByUserAgent() {
+		Media::type('iphone', 'application/xhtml+xml', array(
+			'conditions' => array('mobile' => true)
+		));
+		$request = new Request(array('env' => array(
+			'HTTP_USER_AGENT' => 'Safari',
+			'HTTP_ACCEPT' => 'application/xhtml+xml,text/html'
+		)));
+		$this->assertEqual('html', Media::negotiate($request));
+
+		$request = new Request(array('env' => array(
+			'HTTP_USER_AGENT' => 'iPhone',
+			'HTTP_ACCEPT' => 'application/xhtml+xml,text/html'
+		)));
+		$this->assertEqual('iphone', Media::negotiate($request));
 	}
 }
 

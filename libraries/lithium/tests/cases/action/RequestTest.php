@@ -234,6 +234,14 @@ class RequestTest extends \lithium\test\Unit {
 
 		$this->assertTrue($request->is('cool'));
 		$this->assertFalse($request->is('foo'));
+
+		$request = new Request(array('env' => array(
+			'HTTP_USER_AGENT' => 'Mozilla/5.0 (iPhone; U; XXXXX like Mac OS X; en) AppleWebKit/420+'
+		)));
+
+		$request->detect('iPhone', array('HTTP_USER_AGENT', '/iPhone/'));
+		$isiPhone = $request->is('iPhone'); // returns true if 'iPhone' appears anywhere in the UA
+		$this->assertTrue($isiPhone);
 	}
 
 	public function testDetectWithClosure() {
@@ -859,6 +867,25 @@ class RequestTest extends \lithium\test\Unit {
 
 		$request = new Request(array('env' => array('HTTP_ACCEPT' => null)));
 		$this->assertEqual('html', $request->accepts());
+	}
+
+	/**
+	 * Tests that accepted content-types without a `q` value are sorted in the order they appear in
+	 * the `HTTP_ACCEPT` header.
+	 */
+	public function testAcceptTypeOrder() {
+		$request = new Request(array('env' => array(
+			'HTTP_ACCEPT' => 'application/xhtml+xml,text/html'
+		)));
+		$expected = array('application/xhtml+xml', 'text/html');
+		$this->assertEqual($expected, $request->accepts(true));
+
+		$request = new Request(array('env' => array(
+			'HTTP_USER_AGENT' => 'Safari',
+			'HTTP_ACCEPT' => 'application/xhtml+xml,text/html,text/plain;q=0.9'
+		)));
+		$expected = array('application/xhtml+xml', 'text/html', 'text/plain');
+		$this->assertEqual($expected, $request->accepts(true));
 	}
 
 	public function testParsingAcceptHeader() {
