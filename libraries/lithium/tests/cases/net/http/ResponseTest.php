@@ -90,6 +90,41 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, (string) $response);
 	}
 
+	public function testMessageContentTypeParsing() {
+		// Content type WITHOUT space between type and charset
+		$message = join("\r\n", array(
+			'HTTP/1.1 200 OK',
+			'Content-Type: application/json;charset=iso-8859-1',
+			'',
+			'Test!'
+		));
+		$response = new Response(array('message' => $message));
+		$this->assertEqual('application/json', $response->type);
+		$this->assertEqual('ISO-8859-1', $response->encoding);
+
+		// Content type WITH ONE space between type and charset
+		$message = join("\r\n", array(
+			'HTTP/1.1 200 OK',
+			'Content-Type: application/json; charset=iso-8859-1',
+			'',
+			'Test!'
+		));
+		$response = new Response(array('message' => $message));
+		$this->assertEqual('application/json', $response->type);
+		$this->assertEqual('ISO-8859-1', $response->encoding);
+		
+		// Content type WITH MULTIPLE spaces between type and charset
+		$message = join("\r\n", array(
+			'HTTP/1.1 200 OK',
+			'Content-Type: application/json;     charset=iso-8859-1',
+			'',
+			'Test!'
+		));
+		$response = new Response(array('message' => $message));
+		$this->assertEqual('application/json', $response->type);
+		$this->assertEqual('ISO-8859-1', $response->encoding);
+	}
+
 	public function testEmptyResponse() {
 		$response = new Response(array('message' => "\n"));
 		$result = trim((string) $response);
