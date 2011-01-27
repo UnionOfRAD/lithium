@@ -35,6 +35,7 @@ class Compiler extends \lithium\core\StaticObject {
 	 */
 	protected static $_processors = array(
 		'/\<\?=\s*\$this->(.+?)\s*;?\s*\?>/msx' => '<?php echo $this->$1; ?>',
+		'/\<\?=\s*(\$h\(.+?)\s*;?\s*\?>/msx' => '<?php echo $1; ?>',
 		'/\<\?=\s*(.+?)\s*;?\s*\?>/msx' => '<?php echo $h($1); ?>'
 	);
 

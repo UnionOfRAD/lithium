@@ -36,6 +36,7 @@ class CompilerTest extends \lithium\test\Unit {
 				that breaks over
 				several lines
 			'; ?" . ">
+			<?=\$h('This is pre-escaped content'); ?>
 		");
 	}
 
@@ -51,43 +52,23 @@ class CompilerTest extends \lithium\test\Unit {
 
 		$this->assertTrue(file_exists($template));
 
+		$expected = array(
+			"<?php echo 'this is unescaped content'; ?" . ">",
+			"<?php echo \$h('this is escaped content'); ?" . ">",
+			"<?php echo \$h(\$alsoEscaped); ?" . ">",
+			"<?php echo \$this->escape('this is also escaped content'); ?" . ">",
+			'<?php echo $this->escape(',
+			"'this, too, is escaped content'",
+			'); ?>',
+			"<?php echo \$h('This is",
+			'escaped content',
+			'that breaks over',
+			'several lines',
+			"'); ?>",
+			"<?php echo \$h('This is pre-escaped content'); ?>"
+		);
 		$result = array_map('trim', explode("\n", trim(file_get_contents($template))));
-
-		$expected = "<?php echo 'this is unescaped content'; ?" . ">";
-		$this->assertEqual($expected, $result[0]);
-
-		$expected = "<?php echo \$h('this is escaped content'); ?" . ">";
-		$this->assertEqual($expected, $result[1]);
-
-		$expected = "<?php echo \$h(\$alsoEscaped); ?" . ">";
-		$this->assertEqual($expected, $result[2]);
-
-		$expected = "<?php echo \$this->escape('this is also escaped content'); ?" . ">";
-		$this->assertEqual($expected, $result[3]);
-
-		$expected = '<?php echo $this->escape(';
-		$this->assertEqual($expected, $result[4]);
-
-		$expected = "'this, too, is escaped content'";
-		$this->assertEqual($expected, $result[5]);
-
-		$expected = '); ?>';
-		$this->assertEqual($expected, $result[6]);
-
-		$expected = "<?php echo \$h('This is";
-		$this->assertEqual($expected, $result[7]);
-
-		$expected = 'escaped content';
-		$this->assertEqual($expected, $result[8]);
-
-		$expected = 'that breaks over';
-		$this->assertEqual($expected, $result[9]);
-
-		$expected = 'several lines';
-		$this->assertEqual($expected, $result[10]);
-
-		$expected = "'); ?>";
-		$this->assertEqual($expected, $result[11]);
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testFallbackWithNonWritableDirectory() {
