@@ -27,7 +27,7 @@ class MockPostsController extends \lithium\action\Controller {
 	}
 
 	public function send() {
-		$this->redirect('/posts');
+		$this->redirect('/posts', array('exit' => true));
 	}
 
 	public function type($raw = false) {

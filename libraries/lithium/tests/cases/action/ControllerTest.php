@@ -208,7 +208,7 @@ class ControllerTest extends \lithium\test\Unit {
 
 		$expected = array(
 			'type' => 'json', 'data' => array('data' => 'test'), 'auto' => true,
-			'layout' => 'default', 'template' => 'type', 'hasRendered' => true
+			'layout' => 'default', 'template' => 'type', 'hasRendered' => true, 'negotiate' => false
 		);
 		$result = $postsController->access('_render');
 		$this->assertEqual($expected, $result);
@@ -238,7 +238,7 @@ class ControllerTest extends \lithium\test\Unit {
 
 		$expected = array(
 			'type' => 'json', 'data' => array('data' => 'test'), 'auto' => true,
-			'layout' => 'default', 'template' => 'type', 'hasRendered' => true
+			'layout' => 'default', 'template' => 'type', 'hasRendered' => true, 'negotiate' => false
 		);
 		$result = $postsController->access('_render');
 		$this->assertEqual($expected, $result);
@@ -274,7 +274,8 @@ class ControllerTest extends \lithium\test\Unit {
 
 		$postsController = new MockPostsController(array(
 			'request' => $request,
-			'classes' => array('response' => 'lithium\tests\mocks\action\MockControllerResponse')
+			'classes' => array('response' => 'lithium\tests\mocks\action\MockControllerResponse'),
+			'render' => array('negotiate' => true)
 		));
 		$this->assertFalse($postsController->stopped);
 
@@ -282,7 +283,7 @@ class ControllerTest extends \lithium\test\Unit {
 
 		$expected = array(
 			'type' => 'json', 'data' => array('data' => 'test'), 'auto' => true,
-			'layout' => 'default', 'template' => 'type', 'hasRendered' => true
+			'layout' => 'default', 'template' => 'type', 'hasRendered' => true, 'negotiate' => true
 		);
 		$result = $postsController->access('_render');
 		$this->assertEqual($expected, $result);
