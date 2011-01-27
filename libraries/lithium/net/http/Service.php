@@ -177,7 +177,7 @@ class Service extends \lithium\core\Object {
 		$response = $conn->send($request, $options);
 		$conn->close();
 		$this->last = (object) compact('request', 'response');
-		return ($options['return'] == 'body') ? $response->body() : $response;
+		return ($options['return'] == 'body' && $response) ? $response->body() : $response;
 	}
 
 	/**
