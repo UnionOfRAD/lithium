@@ -53,6 +53,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'HTTP/1.1 200 OK',
 			'Expires: ' . gmdate('D, d M Y H:i:s', $expires) . ' GMT',
 			'Cache-Control: max-age=' . ($expires - time()),
+			'Pragma: cache'
 		);
 		$this->assertEqual($headers, $this->response->testHeaders);
 
@@ -65,6 +66,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'HTTP/1.1 200 OK',
 			'Expires: ' . gmdate('D, d M Y H:i:s', strtotime($expires)) . ' GMT',
 			'Cache-Control: max-age=' . (strtotime($expires) - time()),
+			'Pragma: cache'
 		);
 		$this->assertEqual($headers, $this->response->testHeaders);
 
