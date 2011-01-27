@@ -34,6 +34,11 @@ class Curl extends \lithium\net\Socket {
 	 */
 	public $options = array();
 
+	public function __construct(array $config = array()) {
+		$defaults = array('ignoreExpect' => true);
+		parent::__construct($config + $defaults);
+	}
+
 	/**
 	 * Opens a curl connection and initializes the internal resource handle.
 	 *
@@ -182,6 +187,9 @@ class Curl extends \lithium\net\Socket {
 		$options += $defaults;
 		$this->set(CURLOPT_URL, $message->to('url'));
 
+		if ($this->_config['ignoreExpect']) {
+			$message->headers('Expect', ' ');
+		}
 		if (isset($message->headers)) {
 			$this->set(CURLOPT_HTTPHEADER, $message->headers());
 		}
