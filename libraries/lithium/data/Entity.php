@@ -9,6 +9,7 @@
 namespace lithium\data;
 
 use BadMethodCallException;
+use UnexpectedValueException;
 use lithium\data\Source;
 use lithium\util\Collection as Col;
 
@@ -268,7 +269,7 @@ class Entity extends \lithium\core\Object {
 			break;
 		}
 		if ($field) {
-			return isset($self->_schema[$field]) ? $self->_schema[$field] : null;
+			return isset($schema[$field]) ? $schema[$field] : null;
 		}
 		return $schema;
 	}

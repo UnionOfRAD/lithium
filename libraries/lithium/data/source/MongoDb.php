@@ -773,6 +773,7 @@ class MongoDb extends \lithium\data\Source {
 		if (!$data) {
 			return $data;
 		}
+
 		if (is_string($entity)) {
 			$model = $entity;
 			$entity = null;
