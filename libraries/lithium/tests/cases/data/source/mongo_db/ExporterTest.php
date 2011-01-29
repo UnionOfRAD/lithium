@@ -11,11 +11,53 @@ namespace lithium\tests\cases\data\source\mongo_db;
 
 use MongoId;
 use MongoDate;
+use lithium\data\source\MongoDb;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentArray;
 use lithium\data\source\mongo_db\Exporter;
 
 class ExporterTest extends \lithium\test\Unit {
+
+	protected $_model = 'lithium\tests\mocks\data\source\MockMongoPost';
+
+	protected $_schema = array(
+		'_id' => array('type' => 'id'),
+		'guid' => array('type' => 'id'),
+		'title' => array('type' => 'string'),
+		'tags' => array('type' => 'string', 'array' => true),
+		'comments' => array('type' => 'MongoId'),
+		'authors' => array('type' => 'MongoId', 'array' => true),
+		'created' => array('type' => 'MongoDate'),
+		'modified' => array('type' => 'datetime'),
+		'voters' => array('type' => 'id', 'array' => true),
+		'rank_count' => array('type' => 'integer', 'default' => 0),
+		'rank' => array('type' => 'float', 'default' => 0.0),
+		'notifications.foo' => array('type' => 'boolean'),
+		'notifications.bar' => array('type' => 'boolean'),
+		'notifications.baz' => array('type' => 'boolean'),
+	);
+
+	protected $_handlers = array();
+
+	public function setUp() {
+		$this->_handlers = array(
+			'id' => function($v) {
+				return is_string($v) && preg_match('/^[0-9a-f]{24}$/', $v) ? new MongoId($v) : $v;
+			},
+			'date' => function($v) {
+				$v = is_numeric($v) ? intval($v) : strtotime($v);
+				return (time() == $v) ? new MongoDate() : new MongoDate($v);
+			},
+			'regex'   => function($v) { return new MongoRegex($v); },
+			'integer' => function($v) { return (integer) $v; },
+			'float'   => function($v) { return (float) $v; },
+			'boolean' => function($v) { return (boolean) $v; },
+			'code'    => function($v) { return new MongoCode($v); },
+			'binary'  => function($v) { return new MongoBinData($v); },
+		);
+		$model = $this->_model;
+		$model::resetConnection(true);
+	}
 
 	public function testInvalid() {
 		$this->assertNull(Exporter::get(null, null));
@@ -162,6 +204,108 @@ class ExporterTest extends \lithium\test\Unit {
 			'append2.foo' => 'baz', 'append2.bar' => 'dib', 'deeply.nested' => true
 		));
 		$this->assertEqual($expected, Exporter::get('update', $doc->export()));
+	}
+
+	public function testNestedObjectCasting() {
+		$model = $this->_model;
+		$data = array('notifications' => array('foo' => '', 'bar' => '1', 'baz' => 0, 'dib' => 42));
+
+		$model::schema($this->_schema);
+		$result = Exporter::cast($data, $this->_schema, $model::connection(), compact('model'));
+
+		$this->assertIdentical(false, $result['notifications']->foo);
+		$this->assertIdentical(true, $result['notifications']->bar);
+		$this->assertIdentical(false, $result['notifications']->baz);
+		$this->assertIdentical(42, $result['notifications']->dib);
+	}
+
+	/**
+	 * Tests handling type values based on specified schema settings.
+	 *
+	 * @return void
+	 */
+	public function testTypeCasting() {
+		$data = array(
+			'_id' => '4c8f86167675abfabd970300',
+			'title' => 'Foo',
+			'tags' => 'test',
+			'comments' => array(
+				"4c8f86167675abfabdbe0300", "4c8f86167675abfabdbf0300", "4c8f86167675abfabdc00300"
+			),
+			'authors' => '4c8f86167675abfabdb00300',
+			'created' => time(),
+			'modified' => date('Y-m-d H:i:s'),
+			'rank_count' => '45',
+			'rank' => '3.45688'
+		);
+		$time = time();
+		$model = $this->_model;
+		$handlers = $this->_handlers;
+		$options = compact('model', 'handlers');
+		$result = Exporter::cast($data, $this->_schema, $model::connection(), $options);
+
+		$this->assertEqual(array_keys($data), array_keys($result));
+		$this->assertTrue($result['_id'] instanceOf MongoId);
+		$this->assertEqual('4c8f86167675abfabd970300', (string) $result['_id']);
+
+		$this->assertTrue($result['comments'] instanceOf DocumentArray);
+		$this->assertEqual(3, count($result['comments']));
+
+		$this->assertTrue($result['comments'][0] instanceOf MongoId);
+		$this->assertTrue($result['comments'][1] instanceOf MongoId);
+		$this->assertTrue($result['comments'][2] instanceOf MongoId);
+		$this->assertEqual('4c8f86167675abfabdbe0300', (string) $result['comments'][0]);
+		$this->assertEqual('4c8f86167675abfabdbf0300', (string) $result['comments'][1]);
+		$this->assertEqual('4c8f86167675abfabdc00300', (string) $result['comments'][2]);
+
+		$this->assertEqual($data['comments'], $result['comments']->data());
+		$this->assertEqual(array('test'), $result['tags']->data());
+		$this->assertEqual(array('4c8f86167675abfabdb00300'), $result['authors']->data());
+		$this->assertTrue($result['authors'][0] instanceOf MongoId);
+
+		$this->assertTrue($result['modified'] instanceOf MongoDate);
+		$this->assertTrue($result['created'] instanceOf MongoDate);
+		$this->assertTrue($result['created']->usec > 0);
+
+		$this->assertEqual($time, $result['modified']->sec);
+		$this->assertEqual($time, $result['created']->sec);
+
+		$this->assertIdentical(45, $result['rank_count']);
+		$this->assertIdentical(3.45688, $result['rank']);
+	}
+
+	public function testWithArraySchema() {
+		$model = $this->_model;
+		$model::schema(array(
+			'_id' => array('type' => 'id'),
+			'list' => array('array' => true),
+			'list.foo' => array('type' => 'string'),
+			'list.bar' => array('type' => 'string')
+		));
+		$doc = new Document(compact('model'));
+		$doc->list[] = array('foo' => '!!', 'bar' => '??');
+
+		$data = array('list' => array(array('foo' => '!!', 'bar' => '??')));
+		$this->assertEqual($data, $doc->data());
+
+		$result = Exporter::get('create', $doc->export());
+		$this->assertEqual($data, $result['create']);
+
+		$result = Exporter::get('update', $doc->export());
+		$this->assertEqual($data, $result['update']);
+
+		$doc = new Document(compact('model'));
+		$doc->list = array();
+		$doc->list[] = array('foo' => '!!', 'bar' => '??');
+
+		$data = array('list' => array(array('foo' => '!!', 'bar' => '??')));
+		$this->assertEqual($data, $doc->data());
+
+		$result = Exporter::get('create', $doc->export());
+		$this->assertEqual($result['create'], $data);
+
+		$result = Exporter::get('update', $doc->export());
+		$this->assertEqual($result['update'], $data);
 	}
 
 	/**

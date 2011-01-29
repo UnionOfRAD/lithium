@@ -63,12 +63,12 @@ class Exporter extends \lithium\core\StaticObject {
 				$data[$key] = $value;
 				continue;
 			}
-			if (is_array($value)) {
+			if ($field['array']) {
+				$opts = array('class' => 'array') + $options;
+				$value = is_array($value) ? $value : array($value);
+			} elseif (is_array($value)) {
 				$arrayType = !$isObject && (array_keys($value) === range(0, count($value) - 1));
 				$opts = $arrayType ? array('class' => 'array') + $options : $options;
-			} elseif ($field['array']) {
-				$opts = array('class' => 'array') + $options;
-				$value = array($value);
 			}
 			$data[$key] = $database->item($options['model'], $value, compact('pathKey') + $opts);
 		}
