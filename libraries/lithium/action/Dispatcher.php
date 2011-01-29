@@ -132,7 +132,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @param array $params An array of route parameters to which rules will be applied.
 	 * @return array Returns the `$params` array with formatting rules applied to array values.
 	 */
-	public static function applyRules($params) {
+	public static function applyRules(&$params) {
 		$result = array();
 
 		if (!$params) {
@@ -144,6 +144,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			if (strpos($controller, '.') !== false) {
 				list($library, $controller) = explode('.', $controller);
 				$controller = $library . '.' . Inflector::camelize($controller);
+				$params += compact('library');
 			} elseif (strpos($controller, '\\') === false) {
 				$controller = Inflector::camelize($controller);
 
