@@ -9,7 +9,6 @@
 namespace lithium\console\command;
 
 use lithium\core\Libraries;
-use lithium\test\Group;
 use lithium\test\Dispatcher;
 
 /**
@@ -93,41 +92,6 @@ class Test extends \lithium\console\Command {
 		$this->nl();
 
 		return $stats['success'];
-	}
-
-	/**
-	 * Shows which classes are un-tested.
-	 *
-	 * @return void
-	 */
-	public function missing() {
-		$this->header('Classes with no test case');
-
-		$classes = Libraries::find(true, array(
-			'recursive' => true,
-			'exclude' => '/tests|resources|webroot|index$|^app\\\\config|^app\\\\views/'
-		));
-		$map = function($t) {
-			return str_replace('\tests\cases', '', preg_replace('/Test$/', '', $t));
-		};
-		$tests = array_map($map, Group::all());
-		$classes = array_diff($classes, $tests);
-
-		sort($classes);
-		$this->out($classes);
-	}
-
-	/**
-	 * Show included files.
-	 *
-	 * @return void
-	 */
-	public function included() {
-		$this->header('Included Files');
-		$base = dirname(dirname(dirname(dirname(__DIR__))));
-		$files = str_replace($base, '', get_included_files());
-		sort($files);
-		$this->out($files);
 	}
 
 	/**
