@@ -14,15 +14,15 @@ use lithium\analysis\Inspector;
 use lithium\analysis\Docblock;
 
 /**
- * Get information about a particular class including methods, properties, and descriptions.
- *
+ * Get information about a particular class including methods, properties,
+ * and descriptions.
  */
 class Help extends \lithium\console\Command {
 
 	/**
-	 * Auto run the help command
+	 * Auto run the help command.
 	 *
-	 * @param string $name COMMAND to get help
+	 * @param string $name COMMAND to get help.
 	 * @return void
 	 */
 	public function run($name = null) {
@@ -86,9 +86,9 @@ class Help extends \lithium\console\Command {
 	/**
 	 * Get the api for the class.
 	 *
-	 * @param string $class fully namespaced class in dot notation
+	 * @param string $class fully namespaced class in dot notation.
 	 * @param string $type method|property
-	 * @param string $name the name of the method or property
+	 * @param string $name the name of the method or property.
 	 * @return array
 	 */
 	public function api($class = null, $type = null, $name = null) {
@@ -113,7 +113,7 @@ class Help extends \lithium\console\Command {
 	}
 
 	/**
-	 * Get the methods for the class
+	 * Get the methods for the class.
 	 *
 	 * @param string $class
 	 * @param array $options
@@ -171,7 +171,7 @@ class Help extends \lithium\console\Command {
 	}
 
 	/**
-	 * Get the properties for the class
+	 * Get the properties for the class.
 	 *
 	 * @param string $class
 	 * @param array $options
@@ -234,8 +234,8 @@ class Help extends \lithium\console\Command {
 	/**
 	 * Add left padding for prettier display.
 	 *
-	 * @param string $message the text to render
-	 * @param string $level the level of indentation
+	 * @param string $message the text to render.
+	 * @param string $level the level of indentation.
 	 * @return void
 	 */
 	protected function _pad($message, $level = 1) {
