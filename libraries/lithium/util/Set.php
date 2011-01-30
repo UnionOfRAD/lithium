@@ -547,7 +547,7 @@ class Set {
 			return true;
 		}
 		if (is_string($conditions)) {
-			return (bool) static::extract($data, $conditions);
+			return (boolean) static::extract($data, $conditions);
 		}
 		foreach ($conditions as $condition) {
 			if ($condition === ':last') {

@@ -476,9 +476,9 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @param string $field The name of the field to be incrememnted.
 	 * @param string $value The value to increment the field by. Defaults to `1` if this parameter
 	 *               is not specified.
-	 * @return int Returns the current value of `$field`, based on the value retrieved from the data
-	 *         source when the entity was loaded, plus any increments applied. Note that it may not
-	 *         reflect the most current value in the persistent backend data source.
+	 * @return integer Returns the current value of `$field`, based on the value retrieved from the
+	 *         data source when the entity was loaded, plus any increments applied. Note that it
+	 *         may not reflect the most current value in the persistent backend data source.
 	 * @throws UnexpectedValueException Throws an exception when `$field` is set to a non-numeric
 	 *         type.
 	 */
