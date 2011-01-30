@@ -96,7 +96,11 @@ class FormTest extends \lithium\test\Unit {
 
 		$result = $this->form->create(null, array('id' => 'Registration'));
 		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts", 'method' => 'post', 'id' => 'Registration')
+			'form' => array(
+				'action' => "{$this->base}posts",
+				'method' => 'post',
+				'id' => 'Registration'
+			)
 		));
 	}
 

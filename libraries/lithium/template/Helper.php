@@ -140,7 +140,9 @@ abstract class Helper extends \lithium\core\Object {
 
 		if ($this->_context) {
 			foreach ($params as $key => $value) {
-				$params[$key] = $this->_context->applyHandler($this, $method, $key, $value, $options);
+				$params[$key] = $this->_context->applyHandler(
+					$this, $method, $key, $value, $options
+				);
 			}
 			$strings = $this->_context->strings();
 		}
