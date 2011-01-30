@@ -22,23 +22,12 @@ class Help extends \lithium\console\Command {
 	/**
 	 * Auto run the help command.
 	 *
-	 * @param string $name COMMAND to get help.
+	 * @param string $name Name of the command to return help about.
 	 * @return void
 	 */
 	public function run($name = null) {
 		if (!$name) {
-			$this->out('COMMANDS', 'heading', 2);
-			$commands = Libraries::locate('command', null, array('recursive' => false));
-
-			foreach ($commands as $command) {
-				$info = Inspector::info($command);
-				$name = strtolower(Inflector::slug($info['shortName']));
-				$this->out($this->_pad($name), 'heading');
-				$this->out($this->_pad($info['description']), 2);
-			}
-			$message = 'See `{:command}li3 help COMMAND{:end}`';
-			$message .= ' for more information on a specific command.';
-			$this->out($message, 2);
+			$this->_renderCommands();
 			return true;
 		}
 		$name = Inflector::classify($name);
@@ -51,29 +40,22 @@ class Help extends \lithium\console\Command {
 			$name = join('', array_slice(explode("\\", $name), -1));
 		}
 		$name = strtolower(Inflector::slug($name));
+
 		$methods = $this->_methods($class);
 		$properties = $this->_properties($class);
-
-		$this->out('USAGE', 'heading');
-		$this->out($this->_pad(sprintf("{:command}li3 %s{:end}{:option}%s{:end} [ARGS]",
-			$name ?: 'COMMAND',
-			array_reduce($properties, function($a, $b) {
-				return "{$a} {$b['usage']}";
-			})
-		)));
 		$info = Inspector::info($class);
+
+		$this->_renderUsage($name, $properties);
 
 		if (!empty($info['description'])) {
 			$this->nl();
-			$this->out('DESCRIPTION', 'heading');
-			$this->out($this->_pad(strtok($info['description'], "\n"), 1));
+			$this->_renderDescription($info);
 			$this->nl();
 		}
 
 		if ($properties || $methods) {
 			$this->out('OPTIONS', 'heading');
 		}
-
 		if ($properties) {
 			$this->_render($properties);
 		}
@@ -122,45 +104,54 @@ class Help extends \lithium\console\Command {
 	protected function _methods($class, $options = array()) {
 		$defaults = array('name' => null);
 		$options += $defaults;
-		$methods = Inspector::methods($class)->map(
-			function($item) {
-				if ($item->name[0] === '_') {
-					return;
-				}
 
-				$modifiers = array_values(Inspector::invokeMethod('_modifiers', array($item)));
-				$setAccess = (
-					array_intersect($modifiers, array('private', 'protected')) != array()
-				);
-				if ($setAccess) {
-					$item->setAccessible(true);
-				}
-				$result = compact('modifiers') + array(
-					'docComment' => $item->getDocComment(),
-					'name' => $item->getName(),
-				);
-				if ($setAccess) {
-					$item->setAccessible(false);
-				}
-				return $result;
-			},
-			array('collect' => false)
-		);
+		$map = function($item) {
+			if ($item->name[0] === '_') {
+				return;
+			}
+			$modifiers = array_values(Inspector::invokeMethod('_modifiers', array($item)));
+			$setAccess = array_intersect($modifiers, array('private', 'protected')) != array();
+
+			if ($setAccess) {
+				$item->setAccessible(true);
+			}
+			$result = compact('modifiers') + array(
+				'docComment' => $item->getDocComment(),
+				'name' => $item->getName()
+			);
+			if ($setAccess) {
+				$item->setAccessible(false);
+			}
+			return $result;
+		};
+
+		$methods = Inspector::methods($class)->map($map, array('collect' => false));
 		$results = array();
+
 		foreach ($methods as $method) {
 			$comment = Docblock::comment($method['docComment']);
+
 			$name = $method['name'];
 			$description = $comment['description'];
-			$args = !isset($comment['tags']['params']) ? null : $comment['tags']['params'];
-			$return = !isset($comment['tags']['return']) ? null :
-				trim(strtok($comment['tags']['return'], ' '));
-			$command = $name === 'run' ? null : $name;
-			$command = !$command && !empty($args) ? '[ARGS]' : $command;
-			$usage = "{$command} ";
-			$usage .= empty($args) ? null : join(' ', array_map(function ($a) {
-					return '[' . str_replace('$', '', trim($a)) . ']';
-			}, array_keys($args)));
 
+			$args = $return = null;
+
+			if (isset($comment['tags']['params'])) {
+				$args = $comment['tags']['params'];
+			}
+			if (isset($comment['tags']['return'])) {
+				$return = trim(strtok($comment['tags']['return'], ' '));
+			}
+			$command = $name == 'run' ? null : $name;
+
+			if ($args) {
+				$usage  = $command = $command ?: '[ARGS]';
+				$usage .= ' ' . join(' ', array_map(function($arg) {
+					return '[' . str_replace('$', '', trim($arg)) . ']';
+				}, array_keys($args)));
+			} else {
+				$usage = $command;
+			}
 			$results[$name] = compact('name', 'description', 'return', 'args', 'usage');
 
 			if ($name && $name == $options['name']) {
@@ -180,6 +171,7 @@ class Help extends \lithium\console\Command {
 	protected function _properties($class, $options = array()) {
 		$defaults = array('name' => null);
 		$options += $defaults;
+
 		$properties = Inspector::properties($class);
 		$results = array();
 
@@ -205,7 +197,9 @@ class Help extends \lithium\console\Command {
 	/**
 	 * Output the formatted properties or methods.
 	 *
-	 * @param array $params from _properties|_methods
+	 * @see lithium\console\command\Help::_properties()
+	 * @see lithium\console\command\Help::_methods()
+	 * @param array $params From `_properties()` or `_methods()`.
 	 * @return void
 	 */
 	protected function _render($params) {
@@ -229,6 +223,56 @@ class Help extends \lithium\console\Command {
 			}
 			$this->nl();
 		}
+	}
+
+	/**
+	 * Output the formatted available commands.
+	 *
+	 * @return void
+	 */
+	protected function _renderCommands() {
+		$this->out('COMMANDS', 'heading', 2);
+		$commands = Libraries::locate('command', null, array('recursive' => false));
+
+		foreach ($commands as $command) {
+			$info = Inspector::info($command);
+			$name = strtolower(Inflector::slug($info['shortName']));
+			$this->out($this->_pad($name), 'heading');
+			$this->out($this->_pad($info['description']), 2);
+		}
+
+		$message  = 'See `{:command}li3 help COMMAND{:end}`';
+		$message .= ' for more information on a specific command.';
+		$this->out($message, 2);
+	}
+
+	/**
+	 * Output the formatted usage.
+	 *
+	 * @see lithium\console\command\Help::_properties()
+	 * @param string $name The name of the command.
+	 * @param array $properties From `_properties()`.
+	 * @return void
+	 */
+	protected function _renderUsage($name, $properties) {
+		$this->out('USAGE', 'heading');
+		$this->out($this->_pad(sprintf("{:command}li3 %s{:end}{:option}%s{:end} [ARGS]",
+			$name ?: 'COMMAND',
+			array_reduce($properties, function($a, $b) {
+				return "{$a} {$b['usage']}";
+			})
+		)));
+	}
+
+	/**
+	 * Output the formatted command description.
+	 *
+	 * @param array $info Info from insepcting the class of the command.
+	 * @return void
+	 */
+	protected function _renderDescription($info) {
+		$this->out('DESCRIPTION', 'heading');
+		$this->out($this->_pad(strtok($info['description'], "\n"), 1));
 	}
 
 	/**
