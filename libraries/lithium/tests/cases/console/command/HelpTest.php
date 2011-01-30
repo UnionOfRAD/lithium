@@ -12,8 +12,6 @@ class HelpTest extends \lithium\test\Unit {
 
 	protected $_backup = array();
 
-	protected $_testPath = null;
-
 	public function setUp() {
 		$this->classes = array('response' => 'lithium\tests\mocks\console\MockResponse');
 		$this->_backup['cwd'] = getcwd();
