@@ -31,7 +31,7 @@ class HelpTest extends \lithium\test\Unit {
 		$command = new Help(array('request' => $this->request, 'classes' => $this->classes));
 		$this->assertTrue($command->run());
 
-		$expected = "COMMANDS\n";
+		$expected = "COMMANDS via lithium\n";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);

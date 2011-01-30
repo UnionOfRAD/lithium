@@ -231,13 +231,18 @@ class Help extends \lithium\console\Command {
 	 * @return void
 	 */
 	protected function _renderCommands() {
-		$this->out('COMMANDS', 'heading', 2);
 		$commands = Libraries::locate('command', null, array('recursive' => false));
 
-		foreach ($commands as $command) {
+		foreach ($commands as $key => $command) {
+			$library = strtok($command, '\\');
+
+			if (!$key || strtok($commands[$key - 1] , '\\') != $library) {
+				$this->out("{:heading}COMMANDS{:end} {:blue}via {$library}{:end}");
+			}
 			$info = Inspector::info($command);
 			$name = strtolower(Inflector::slug($info['shortName']));
-			$this->out($this->_pad($name), 'heading');
+
+			$this->out($this->_pad($name) , 'heading');
 			$this->out($this->_pad($info['description']), 2);
 		}
 
