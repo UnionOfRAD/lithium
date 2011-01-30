@@ -9,7 +9,7 @@
 namespace lithium\tests\cases\storage\cache\adapter;
 
 use lithium\storage\cache\adapter\File;
-use \SplFileInfo;
+use SplFileInfo;
 
 class FileTest extends \lithium\test\Unit {
 

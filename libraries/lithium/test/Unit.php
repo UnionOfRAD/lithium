@@ -8,14 +8,14 @@
 
 namespace lithium\test;
 
-use \Exception;
+use Exception;
 use lithium\util\String;
 use lithium\core\Libraries;
 use lithium\util\Validator;
 use lithium\analysis\Debugger;
 use lithium\analysis\Inspector;
-use \RecursiveDirectoryIterator;
-use \RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 /**
  * This is the base class for all test cases. Test are performed using an assertion method. If the

@@ -11,7 +11,7 @@ namespace lithium\tests\cases\test;
 use lithium\tests\mocks\test\MockUnitTest;
 use lithium\tests\mocks\test\cases\MockSkipThrowsException;
 use lithium\tests\mocks\test\cases\MockTestErrorHandling;
-use \Exception;
+use Exception;
 
 class UnitTest extends \lithium\test\Unit {
 

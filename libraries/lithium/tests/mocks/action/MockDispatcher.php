@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\action;
 
-use \stdClass;
+use stdClass;
 
 class MockDispatcher extends \lithium\action\Dispatcher {
 

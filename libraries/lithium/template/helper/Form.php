@@ -19,7 +19,7 @@ use UnexpectedValueException;
  *
  * For example, assuming you have created a `Post` model in your application:
  * {{{// In controller code:
- * use \app\models\Post;
+ * use app\models\Post;
  * $post = Post::find(1);
  * return compact('post');
  *

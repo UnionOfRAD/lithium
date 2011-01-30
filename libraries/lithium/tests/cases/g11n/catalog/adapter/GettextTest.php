@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\g11n\catalog\adapter;
 
-use \Exception;
+use Exception;
 use lithium\tests\mocks\g11n\catalog\adapter\MockGettext;
 
 class GettextTest extends \lithium\test\Unit {

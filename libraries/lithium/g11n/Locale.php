@@ -8,8 +8,8 @@
 
 namespace lithium\g11n;
 
-use \BadMethodCallException;
-use \InvalidArgumentException;
+use BadMethodCallException;
+use InvalidArgumentException;
 
 /**
  * The `Locale` class provides methods to deal with locale identifiers.  The locale

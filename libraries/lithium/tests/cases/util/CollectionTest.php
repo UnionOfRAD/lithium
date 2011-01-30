@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\util;
 
-use \stdClass;
+use stdClass;
 use lithium\util\Collection;
 use lithium\tests\mocks\util\MockCollectionMarker;
 use lithium\tests\mocks\util\MockCollectionObject;

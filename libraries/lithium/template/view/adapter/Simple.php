@@ -8,8 +8,8 @@
 
 namespace lithium\template\view\adapter;
 
-use \Closure;
-use \Exception;
+use Closure;
+use Exception;
 use lithium\util\Set;
 use lithium\util\String;
 

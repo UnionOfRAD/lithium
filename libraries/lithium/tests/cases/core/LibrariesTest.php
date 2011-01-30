@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\core;
 
-use \SplFileInfo;
+use SplFileInfo;
 use lithium\util\Inflector;
 use lithium\core\Libraries;
 

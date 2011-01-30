@@ -9,8 +9,8 @@
 
 namespace lithium\util;
 
-use \Closure;
-use \Exception;
+use Closure;
+use Exception;
 
 /**
  * String manipulation utility class. Includes functionality for hashing, UUID generation,

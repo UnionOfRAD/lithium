@@ -8,9 +8,9 @@
 
 namespace lithium\tests\cases\core;
 
-use \Closure;
-use \Exception;
-use \UnexpectedValueException;
+use Closure;
+use Exception;
+use UnexpectedValueException;
 use lithium\core\ErrorHandler;
 
 class ErrorHandlerTest extends \lithium\test\Unit {

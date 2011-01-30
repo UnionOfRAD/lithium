@@ -8,8 +8,8 @@
 
 namespace lithium\tests\cases\analysis;
 
-use \ReflectionClass;
-use \ReflectionMethod;
+use ReflectionClass;
+use ReflectionMethod;
 use lithium\core\Libraries;
 use lithium\analysis\Inspector;
 

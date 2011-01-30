@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\test\cases;
 
-use \Exception;
+use Exception;
 
 class MockSkipThrowsException extends \lithium\test\Unit {
 

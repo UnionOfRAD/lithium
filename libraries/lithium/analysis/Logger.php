@@ -8,7 +8,7 @@
 
 namespace lithium\analysis;
 
-use \UnexpectedValueException;
+use UnexpectedValueException;
 
 /**
  * The `Logger` class provides a consistent, application-wide interface for configuring and writing
