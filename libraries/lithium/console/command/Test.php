@@ -23,11 +23,17 @@ class Test extends \lithium\console\Command {
 	 * For example:
 	 * {{{
 	 * lithium test lithium/tests/cases/core/ObjectTest.php --filters=Coverage
+	 * lithium test lithium/tests/cases/core/ObjectTest.php --filters=Coverage,Profiler
 	 * }}}
 	 *
-	 * @var string
+	 * @var string Name of a filter or a comma separated list of filter names. Builtin filters:
+	 *      - `Affected`:   Adds tests to the run affected by the classes covered by current tests.
+	 *      - `Complexity`: Calculates the cyclomatic complexity of class methods, and shows
+	 *                      worst-offenders and statistics.
+	 *      - `Coverage`:   Runs code coverage analysis for the executed tests.
+	 *      - `Profiler`:   Tracks timing and memory usage information for each test method.
 	 */
-	public $filters = array();
+	public $filters;
 
 	/**
 	 * Runs tests given a path to a directory or file containing tests. The path to the
@@ -55,6 +61,7 @@ class Test extends \lithium\console\Command {
 			$this->error('Not a valid path.');
 			return false;
 		}
+		$filters = $this->filters ? array_map('trim', explode(',', $this->filters)) : array();
 
 		if (!$libraryPath = $this->_library($path)) {
 			$this->error("No library registered for path `{$path}`.");
@@ -67,8 +74,7 @@ class Test extends \lithium\console\Command {
 
 		error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
 
-		$report = Dispatcher::run($path, array(
-			'filters' => $this->filters,
+		$report = Dispatcher::run($path, compact('filters') + array(
 			'reporter' => 'console',
 			'format' => 'txt'
 		));
