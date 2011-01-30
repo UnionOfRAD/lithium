@@ -28,116 +28,116 @@ class HelpTest extends \lithium\test\Unit {
 	}
 
 	public function testRun() {
-		$help = new Help(array(
+		$command = new Help(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$expected = true;
-		$result = $help->run();
+		$result = $command->run();
 		$this->assertEqual($expected, $result);
 
 		$expected = "COMMANDS\n";
 		$expected = preg_quote($expected);
-		$result = $help->response->output;
+		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
 
 		$expected = preg_quote($expected);
-		$result = $help->response->output;
+		$result = $command->response->output;
 		$pattern = "/\s+test\s+Runs a given set of tests and outputs the results\./ms";
 		$this->assertPattern($pattern, $result);
 
 	}
 
 	public function testRunWithName() {
-		$help = new Help(array(
+		$command = new Help(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$expected = true;
-		$result = $help->run('Test');
+		$result = $command->run('Test');
 		$this->assertEqual($expected, $result);
 
 		$expected = "li3 test --case=CASE --group=GROUP --filters=FILTERS [ARGS]";
 		$expected = preg_quote($expected);
-		$result = $help->response->output;
+		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
 
 		$expected = "OPTIONS\n    --case=CASE\n";
 		$expected = preg_quote($expected);
-		$result = $help->response->output;
+		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
 
 		$expected = "missing\n";
 		$expected = preg_quote($expected);
-		$result = $help->response->output;
+		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
 	}
 
 	public function testApiClass() {
-		$help = new Help(array(
+		$command = new Help(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$expected = null;
-		$result = $help->api('lithium.util.Inflector');
+		$result = $command->api('lithium.util.Inflector');
 		$this->assertEqual($expected, $result);
 
 		$expected = "Utility for modifying format of words";
 		$expected = preg_quote($expected);
-		$result = $help->response->output;
+		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
 	}
 
 	public function testApiMethod() {
-		$help = new Help(array(
+		$command = new Help(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$expected = null;
-		$result = $help->api('lithium.util.Inflector', 'method');
+		$result = $command->api('lithium.util.Inflector', 'method');
 		$this->assertEqual($expected, $result);
 
 		$expected = "rules [type] [config]";
 		$expected = preg_quote($expected);
-		$result = $help->response->output;
+		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
 	}
 
 	public function testApiMethodWithName() {
-		$help = new Help(array(
+		$command = new Help(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$expected = null;
-		$result = $help->api('lithium.util.Inflector', 'method', 'rules');
+		$result = $command->api('lithium.util.Inflector', 'method', 'rules');
 		$this->assertEqual($expected, $result);
 
 		$expected = "rules [type] [config]";
 		$expected = preg_quote($expected);
-		$result = $help->response->output;
+		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
 	}
 
 	public function testApiProperty() {
-		$help = new Help(array(
+		$command = new Help(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$expected = null;
-		$result = $help->api('lithium.net.Message', 'property');
+		$result = $command->api('lithium.net.Message', 'property');
 		$this->assertEqual($expected, $result);
 
 		$expected = "    --host=HOST\n        The hostname for this endpoint.";
 		$expected = preg_quote($expected);
-		$result = $help->response->output;
+		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
 	}
 
 	public function testApiPropertyWithName() {
-		$help = new Help(array(
+		$command = new Help(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$expected = null;
-		$result = $help->api('lithium.net.Message', 'property');
+		$result = $command->api('lithium.net.Message', 'property');
 		$this->assertEqual($expected, $result);
 
 		$expected = "    --host=HOST\n        The hostname for this endpoint.";
 		$expected = preg_quote($expected);
-		$result = $help->response->output;
+		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
 	}
 }
