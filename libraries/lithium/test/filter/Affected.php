@@ -20,7 +20,6 @@ use lithium\analysis\Inspector;
  * 1. Looking at the subject of a test case.
  * 2. Searching the class tree for any classes that directly depend on that subject.
  * 3. Assigning test cases to those classes.
- *
  */
 class Affected extends \lithium\test\Filter {
 
