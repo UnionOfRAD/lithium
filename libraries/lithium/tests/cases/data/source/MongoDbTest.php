@@ -21,6 +21,7 @@ use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\data\entity\Document;
 use lithium\tests\mocks\data\MockPost;
+use lithium\data\collection\DocumentSet;
 use lithium\data\collection\DocumentArray;
 use lithium\tests\mocks\data\source\MockMongoConnection;
 
@@ -245,7 +246,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->db->create($this->query);
 
 		$result = $this->db->read($this->query);
-		$this->assertTrue($result == true);
+		$this->assertTrue($result instanceof DocumentSet);
 		$this->assertEqual(1, $result->count());
 
 		$expected = $data['title'];
