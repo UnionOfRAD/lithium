@@ -166,10 +166,10 @@ abstract class Collection extends \lithium\util\Collection {
 	}
 
 	/**
-	 * Returns a boolean indicating whether an offset exists for the 
+	 * Returns a boolean indicating whether an offset exists for the
 	 * current `Collection`.
 	 *
-	 * @param string $offset String or integer indicating the offset or 
+	 * @param string $offset String or integer indicating the offset or
 	 *               index of an entity in the set.
 	 * @return boolean Result.
 	 */
