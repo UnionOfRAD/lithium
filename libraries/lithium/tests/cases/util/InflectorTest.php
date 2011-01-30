@@ -356,6 +356,9 @@ class InflectorTest extends \lithium\test\Unit {
 	/**
 	 * This is a helper method for testStorageMechanism to fetch a private
 	 * property of the Inflector class.
+	 *
+	 * @param string $property
+	 * @return string The value of the property.
 	 */
 	private function getProtectedValue($property) {
 		$info = Inspector::info("lithium\util\Inflector::$property");

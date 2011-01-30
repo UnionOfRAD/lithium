@@ -143,6 +143,7 @@ class Query extends \lithium\core\Object {
 	 * Generates a schema map of the query's result set, where the keys are fully-namespaced model
 	 * class names, and the values are arrays of field names.
 	 *
+	 * @param array $map
 	 * @return array
 	 */
 	public function map($map = null) {
