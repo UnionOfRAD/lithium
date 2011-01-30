@@ -361,7 +361,7 @@ class InflectorTest extends \lithium\test\Unit {
 	 * @return string The value of the property.
 	 */
 	private function getProtectedValue($property) {
-		$info = Inspector::info("lithium\util\Inflector::$property");
+		$info = Inspector::info("lithium\util\Inflector::{$property}");
 		return $info['value'];
 	}
 }
