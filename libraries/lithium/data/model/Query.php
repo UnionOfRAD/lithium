@@ -394,7 +394,9 @@ class Query extends \lithium\core\Object {
 			$results[$item] = $dataSource->{$item}($this->{$item}(), $this);
 		}
 		foreach ($copy as $item) {
-			$results[$item] = $this->_config[$item];
+			if (in_array($item, $keys)) {
+				$results[$item] = $this->_config[$item];
+			}
 		}
 		$entity =& $this->_entity;
 		$data = $this->_data;
