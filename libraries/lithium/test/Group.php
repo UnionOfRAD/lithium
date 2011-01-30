@@ -61,9 +61,7 @@ class Group extends \lithium\util\Collection {
 			'exclude' => '/mock/',
 			'recursive' => true,
 		);
-		$options += $defaults;
-		$classes = Libraries::locate('tests', null, $options);
-		return $classes;
+		return Libraries::locate('tests', null, $options + $defaults);
 	}
 
 	/**
