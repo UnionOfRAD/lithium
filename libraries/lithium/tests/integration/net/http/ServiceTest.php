@@ -45,3 +45,5 @@ class ServiceTest extends \lithium\test\Integration {
 		$this->assertEqual($expected, $result);
 	}
 }
+
+?>
