@@ -40,7 +40,6 @@ class LoggerTest extends \lithium\test\Unit {
 
 		unlink($base . '/info.log');
 	}
-
 }
 
 ?>

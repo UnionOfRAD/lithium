@@ -93,7 +93,6 @@ class CouchDbTest extends \lithium\test\Integration {
 		$this->assertEqual($data['id'], $updated['id']);
 		$this->assertNotEqual($data['rev'], $updated['rev']);
 	}
-
 }
 
 ?>
