@@ -4,24 +4,16 @@ namespace lithium\tests\integration\data;
 
 use lithium\data\Connections;
 use lithium\data\Entity;
-
-class MockCompany extends \lithium\data\Model {
-
-	protected $_meta = array(
-		'source' => 'companies',
-		'connection' => 'test'
-	);
-}
-
+use lithium\tests\mocks\data\Company;
 
 class FieldsTest extends \lithium\test\Unit {
 
 	public function setUp() {
-		MockCompany::config();
+		Company::config();
 	}
 
 	public function tearDown() {
-		MockCompany::remove();
+		Company::remove();
 	}
 
 	public function skip() {
@@ -33,12 +25,12 @@ class FieldsTest extends \lithium\test\Unit {
 	}
 
 	public function testSingleField() {
-		$new = MockCompany::create(array('name' => 'Acme, Inc.'));
-		$key = MockCompany::meta('key');
+		$new = Company::create(array('name' => 'Acme, Inc.'));
+		$key = Company::meta('key');
 		$new->save();
 		$id = is_object($new->{$key}) ? (string) $new->{$key} : $new->{$key};
 
-		$entity = MockCompany::first($id);
+		$entity = Company::first($id);
 
 		$this->assertTrue($entity instanceof Entity);
 		$this->skipIf(!$entity instanceof Entity, 'Queried object is not an entity.');
@@ -47,7 +39,7 @@ class FieldsTest extends \lithium\test\Unit {
 		$result = $entity->data();
 		$this->assertEqual($expected, $result);
 
-		$entity = MockCompany::first(array('fields' => array($key)));
+		$entity = Company::first(array('fields' => array($key)));
 
 		$this->assertTrue($entity instanceof Entity);
 		$this->skipIf(!$entity instanceof Entity, 'Queried object is not an entity.');
@@ -56,7 +48,7 @@ class FieldsTest extends \lithium\test\Unit {
 		$result = $entity->data();
 		$this->assertEqual($expected, $result);
 
-		$entity = MockCompany::find('first',array(
+		$entity = Company::find('first',array(
 			'conditions' => array($key => $id),
 			'fields' => array($key)
 		));

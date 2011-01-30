@@ -12,13 +12,7 @@ use lithium\template\View;
 use lithium\action\Response;
 use lithium\g11n\catalog\adapter\Memory;
 use lithium\template\view\adapter\Simple;
-
-class TestViewClass extends \lithium\template\View {
-
-	public function renderer() {
-		return $this->_config['renderer'];
-	}
-}
+use lihtium\tests\mocks\template\MockView;
 
 class ViewTest extends \lithium\test\Unit {
 
@@ -30,7 +24,7 @@ class ViewTest extends \lithium\test\Unit {
 
 	public function testInitialization() {
 		$expected = new Simple();
-		$this->_view = new TestViewClass(array('renderer' => $expected));
+		$this->_view = new MockView(array('renderer' => $expected));
 		$result = $this->_view->renderer();
 		$this->assertEqual($expected, $result);
 	}
