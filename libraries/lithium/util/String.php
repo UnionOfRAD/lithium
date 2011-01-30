@@ -338,8 +338,9 @@ class String {
 	 **/
 	protected static function _genSaltBf($count = 10) {
 		$count = (integer) $count;
-		if ($count < 4 || $count > 31)
+		if ($count < 4 || $count > 31) {
 			$count = 10;
+		}
 
 		// We don't use the encode64() method here because it could result
 		// in 2 bits less of entropy depending on the last char.
@@ -386,8 +387,9 @@ class String {
 	 */
 	protected static function _genSaltXDES($count = 18) {
 		$count = (integer) $count;
-		if ($count < 1 || $count > 24)
+		if ($count < 1 || $count > 24) {
 			$count = 16;
+		}
 
 		// Count should be odd to not reveal weak DES keys
 		$count = (1 << $count) - 1;
