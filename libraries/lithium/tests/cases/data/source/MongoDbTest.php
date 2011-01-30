@@ -561,7 +561,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$result = $this->db->conditions($conditions, $query);
 
 		$this->assertEqual(array_keys($conditions), array_keys($result));
-		$this->assertTrue($result['_id'] instanceOf MongoId);
+		$this->assertTrue($result['_id'] instanceof MongoId);
 		$this->assertEqual($conditions['_id'], (string) $result['_id']);
 
 		$conditions = array('_id' => array(
@@ -569,9 +569,9 @@ class MongoDbTest extends \lithium\test\Unit {
 		));
 		$result = $this->db->conditions($conditions, $query);
 		$this->assertEqual(3, count($result['_id']['$in']));
-		$this->assertTrue($result['_id']['$in'][0] instanceOf MongoId);
-		$this->assertTrue($result['_id']['$in'][1] instanceOf MongoId);
-		$this->assertTrue($result['_id']['$in'][2] instanceOf MongoId);
+		$this->assertTrue($result['_id']['$in'][0] instanceof MongoId);
+		$this->assertTrue($result['_id']['$in'][1] instanceof MongoId);
+		$this->assertTrue($result['_id']['$in'][2] instanceof MongoId);
 
 		$conditions = array('voters' => array('$all' => array(
 			"4c8f86167675abfabdbf0300", "4c8f86167675abfabdc00300"
@@ -579,8 +579,8 @@ class MongoDbTest extends \lithium\test\Unit {
 		$result = $this->db->conditions($conditions, $query);
 
 		$this->assertEqual(2, count($result['voters']['$all']));
-		$this->assertTrue($result['voters']['$all'][0] instanceOf MongoId);
-		$this->assertTrue($result['voters']['$all'][1] instanceOf MongoId);
+		$this->assertTrue($result['voters']['$all'][0] instanceof MongoId);
+		$this->assertTrue($result['voters']['$all'][1] instanceof MongoId);
 
 		$conditions = array('$or' => array(
 			array('_id' => "4c8f86167675abfabdbf0300"),
@@ -589,8 +589,8 @@ class MongoDbTest extends \lithium\test\Unit {
 		$result = $this->db->conditions($conditions, $query);
 		$this->assertEqual(array('$or'), array_keys($result));
 		$this->assertEqual(2, count($result['$or']));
-		$this->assertTrue($result['$or'][0]['_id'] instanceOf MongoId);
-		$this->assertTrue($result['$or'][1]['guid'] instanceOf MongoId);
+		$this->assertTrue($result['$or'][0]['_id'] instanceof MongoId);
+		$this->assertTrue($result['$or'][1]['guid'] instanceof MongoId);
 	}
 
 	public function testMultiOperationConditions() {

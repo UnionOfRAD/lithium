@@ -245,15 +245,15 @@ class ExporterTest extends \lithium\test\Unit {
 		$result = Exporter::cast($data, $this->_schema, $model::connection(), $options);
 
 		$this->assertEqual(array_keys($data), array_keys($result));
-		$this->assertTrue($result['_id'] instanceOf MongoId);
+		$this->assertTrue($result['_id'] instanceof MongoId);
 		$this->assertEqual('4c8f86167675abfabd970300', (string) $result['_id']);
 
-		$this->assertTrue($result['comments'] instanceOf DocumentArray);
+		$this->assertTrue($result['comments'] instanceof DocumentArray);
 		$this->assertEqual(3, count($result['comments']));
 
-		$this->assertTrue($result['comments'][0] instanceOf MongoId);
-		$this->assertTrue($result['comments'][1] instanceOf MongoId);
-		$this->assertTrue($result['comments'][2] instanceOf MongoId);
+		$this->assertTrue($result['comments'][0] instanceof MongoId);
+		$this->assertTrue($result['comments'][1] instanceof MongoId);
+		$this->assertTrue($result['comments'][2] instanceof MongoId);
 		$this->assertEqual('4c8f86167675abfabdbe0300', (string) $result['comments'][0]);
 		$this->assertEqual('4c8f86167675abfabdbf0300', (string) $result['comments'][1]);
 		$this->assertEqual('4c8f86167675abfabdc00300', (string) $result['comments'][2]);
@@ -261,10 +261,10 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertEqual($data['comments'], $result['comments']->data());
 		$this->assertEqual(array('test'), $result['tags']->data());
 		$this->assertEqual(array('4c8f86167675abfabdb00300'), $result['authors']->data());
-		$this->assertTrue($result['authors'][0] instanceOf MongoId);
+		$this->assertTrue($result['authors'][0] instanceof MongoId);
 
-		$this->assertTrue($result['modified'] instanceOf MongoDate);
-		$this->assertTrue($result['created'] instanceOf MongoDate);
+		$this->assertTrue($result['modified'] instanceof MongoDate);
+		$this->assertTrue($result['created'] instanceof MongoDate);
 		$this->assertTrue($result['created']->usec > 0);
 
 		$this->assertEqual($time, $result['modified']->sec);
