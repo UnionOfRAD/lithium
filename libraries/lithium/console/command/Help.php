@@ -183,7 +183,7 @@ class Help extends \lithium\console\Command {
 			$usage = strlen($name) == 1 ? "-{$name}" : "--{$name}";
 
 			if ($type != 'boolean') {
-				$usage .= '=' . strtoupper($name);
+				$usage .= "={$type}";
 			}
 			$results[$name] = compact('name', 'description', 'type', 'usage');
 

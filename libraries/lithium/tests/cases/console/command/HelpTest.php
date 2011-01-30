@@ -49,12 +49,12 @@ class HelpTest extends \lithium\test\Unit {
 		$result = $command->run('Test');
 		$this->assertTrue($result);
 
-		$expected = "li3 test --case=CASE --group=GROUP --filters=FILTERS [ARGS]";
+		$expected = "li3 test --case=string --group=string --filters=string [ARGS]";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
 
-		$expected = "OPTIONS\n    --case=CASE\n";
+		$expected = "OPTIONS\n    --case=string\n";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
@@ -138,7 +138,7 @@ class HelpTest extends \lithium\test\Unit {
 		$result = $help->api('lithium.tests.mocks.console.command.MockCommandHelp', 'property');
 		$this->assertEqual($expected, $result);
 
-		$expected = "\-\-long=LONG.*\-\-blong.*\-s";
+		$expected = "\-\-long=string.*\-\-blong.*\-s";
 		$result = $help->response->output;
 		$this->assertPattern("/{$expected}/s", $result);
 	}
