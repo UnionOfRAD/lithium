@@ -198,6 +198,7 @@ class String {
 	 * $check2  = String::checkPassword($password, $hashed2); // True
 	 * }}}
 	 *
+	 * @see lithium\util\String::genSalt()
 	 * @param string $password The password to hash.
 	 * @param string $salt Optional. The salt string.
 	 * @return string The hashed password.
@@ -205,7 +206,6 @@ class String {
 	 *        - 60 chars for Blowfish hashes
 	 *        - 20 chars for XDES hashes
 	 *        - 34 chars for MD5 hashes
-	 * @see lithium\util\String::genSalt()
 	 **/
 	public static function hashPassword($password, $salt = null) {
 		return crypt($password, $salt ?: static::genSalt());
@@ -214,11 +214,11 @@ class String {
 	/**
 	 * Compares a password and its hashed value using PHP's `crypt()`.
 	 *
+	 * @see lithium\util\String::hashPassword()
+	 * @see lithium\util\String::genSalt()
 	 * @param string $password The password to check
 	 * @param string $hash The hashed password to compare
 	 * @return boolean Whether the password is correct or not
-	 * @see lithium\util\String::hashPassword()
-	 * @see lithium\util\String::genSalt()
 	 **/
 	public static function checkPassword($password, $hash) {
 		return $hash == crypt($password, $hash);
@@ -253,6 +253,9 @@ class String {
 	 * consisting in random sequences of alpha numeric characters, combine
 	 * `String::random()` and `String::encode64()` instead.
 	 *
+	 * @link http://php.net/manual/en/function.crypt.php
+	 * @link http://www.postgresql.org/docs/9.0/static/pgcrypto.html
+	 * @see lithium\util\String::hashPassword()
 	 * @param string $type The hash type. Optional. Defaults to '`bf`'.
 	 *        Supported values include:
 	 *        - `'bf'`: Blowfish (128 salt bits, adaptive, max 72 chars)
@@ -263,9 +266,6 @@ class String {
 	 *        - `10` for Blowfish
 	 *        - `18` for XDES
 	 * @return string The salt string.
-	 * @link http://php.net/manual/en/function.crypt.php
-	 * @link http://www.postgresql.org/docs/9.0/static/pgcrypto.html
-	 * @see lithium\util\String::hashPassword()
 	 **/
 	public static function genSalt($type = null, $count = null) {
 		switch (true) {
@@ -292,9 +292,9 @@ class String {
 	 * $salt = String::encode64(String::random(8)); // 64 bits
 	 * }}}
 	 *
+	 * @see lithium\util\String::random()
 	 * @param string $input The input bytes.
 	 * @return string The same bytes in the `/.0-9A-Za-z` alphabet.
-	 * @see lithium\util\String::random()
 	 */
 	public static function encode64($input) {
 		$base64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
