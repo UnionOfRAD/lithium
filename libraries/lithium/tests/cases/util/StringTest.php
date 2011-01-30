@@ -431,8 +431,7 @@ class StringTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = String::tokenize(null);
-		$expected = null;
-		$this->assertEqual($expected, $result);
+		$this->assertNull($result);
 	}
 
 	/**

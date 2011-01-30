@@ -43,9 +43,8 @@ class ResponseTest extends \lithium\test\Unit {
 		$result = $response->status('See Other');
 		$this->assertEqual($expected, $result);
 
-		$expected = false;
 		$result = $response->status('foobar');
-		$this->assertEqual($expected, $result);
+		$this->assertFalse($result);
 	}
 
 	public function testParsingContentTypeWithEncoding() {

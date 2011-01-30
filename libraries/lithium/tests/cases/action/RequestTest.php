@@ -111,9 +111,8 @@ class RequestTest extends \lithium\test\Unit {
 		$_SERVER['HTTPS'] = true;
 		$request = new Request();
 
-		$expected = true;
 		$result = $request->env('HTTPS');
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 	}
 
 	public function testHttpsFromScriptUri() {
@@ -121,9 +120,8 @@ class RequestTest extends \lithium\test\Unit {
 		unset($_SERVER['HTTPS']);
 		$request = new Request();
 
-		$expected = true;
 		$result = $request->env('HTTPS');
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 	}
 
 	public function testRemoteAddr() {
@@ -147,9 +145,8 @@ class RequestTest extends \lithium\test\Unit {
 		$_SERVER['PHP_SELF'] = '/index.php';
 		$request = new Request();
 
-		$expected = null;
 		$result = $request->env('base');
-		$this->assertEqual($expected, $result);
+		$this->assertNull($result);
 	}
 
 	public function testBaseWithDirectory() {
@@ -190,9 +187,8 @@ class RequestTest extends \lithium\test\Unit {
 	public function testCgiPlatform() {
 		$request = new MockCgiRequest();
 
-		$expected = true;
 		$result = $request->env('CGI_MODE');
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 	}
 
 	public function testCgiScriptUrl() {
@@ -215,9 +211,8 @@ class RequestTest extends \lithium\test\Unit {
 		$result = $request->get('data:Article');
 		$this->assertEqual($expected, $result);
 
-		$expected = null;
 		$result = $request->get('not:Post');
-		$this->assertEqual($expected, $result);
+		$this->assertNull($result);
 
 		$expected = '/lithium.com';
 		$result = $request->get('env:base');
@@ -259,18 +254,16 @@ class RequestTest extends \lithium\test\Unit {
 			return true;
 		}));
 
-		$expected = true;
 		$result = $request->is('cool');
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 	}
 
 	public function testDetectWithArrayRegex() {
 		$request = new Request(array('env' => array('SOME_COOL_DETECTION' => 'this is cool')));
 		$request->detect('cool', array('SOME_COOL_DETECTION', '/cool/'));
 
-		$expected = true;
 		$result = $request->is('cool');
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 	}
 
 	public function testDetectSsl() {

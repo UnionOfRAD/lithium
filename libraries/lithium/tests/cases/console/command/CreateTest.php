@@ -63,9 +63,8 @@ class CreateTest extends \lithium\test\Unit {
 		$this->request->params['args'] = array('does_not_exist', 'anywhere');
 		$create = new MockCreate(array('request' => $this->request));
 
-		$expected = false;
 		$result = $create->run('does_not_exist');
-		$this->assertEqual($expected, $result);
+		$this->assertFalse($result);
 
 		$expected = "does_not_exist could not be created.\n";
 		$result = $create->response->error;
@@ -106,9 +105,8 @@ class CreateTest extends \lithium\test\Unit {
 	public function testRunWithoutCommand() {
 		$create = new MockCreate(array('request' => $this->request));
 
-		$expected = false;
 		$result = $create->run();
-		$this->assertEqual($expected, $result);
+		$this->assertFalse($result);
 
 		$expected = "What would you like to create? (model/view/controller/test/mock) \n > ";
 		$result = $create->response->output;
@@ -122,9 +120,8 @@ class CreateTest extends \lithium\test\Unit {
 		);
 		$create = new MockCreate(array('request' => $this->request));
 
-		$expected = false;
 		$result = $create->run('model');
-		$this->assertEqual($expected, $result);
+		$this->assertFalse($result);
 
 		$expected = "model could not be created.\n";
 		$result = $create->response->error;

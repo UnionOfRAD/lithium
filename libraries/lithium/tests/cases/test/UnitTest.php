@@ -30,15 +30,13 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testCompareIsEqual() {
-		$expected = true;
 		$result = $this->compare('equal', 'string', 'string');
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 	}
 
 	public function testCompareIsIdentical() {
-		$expected = true;
 		$result = $this->compare('identical', 'string', 'string');
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 	}
 
 	public function testCompareTypes() {

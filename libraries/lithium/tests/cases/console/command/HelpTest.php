@@ -31,9 +31,8 @@ class HelpTest extends \lithium\test\Unit {
 		$command = new Help(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$expected = true;
 		$result = $command->run();
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($expected, $result);
 
 		$expected = "COMMANDS\n";
 		$expected = preg_quote($expected);
@@ -44,16 +43,14 @@ class HelpTest extends \lithium\test\Unit {
 		$result = $command->response->output;
 		$pattern = "/\s+test\s+Runs a given set of tests and outputs the results\./ms";
 		$this->assertPattern($pattern, $result);
-
 	}
 
 	public function testRunWithName() {
 		$command = new Help(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$expected = true;
 		$result = $command->run('Test');
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 
 		$expected = "li3 test --case=CASE --group=GROUP --filters=FILTERS [ARGS]";
 		$expected = preg_quote($expected);
@@ -75,9 +72,8 @@ class HelpTest extends \lithium\test\Unit {
 		$command = new Help(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$expected = null;
 		$result = $command->api('lithium.util.Inflector');
-		$this->assertEqual($expected, $result);
+		$this->assertNull($result);
 
 		$expected = "Utility for modifying format of words";
 		$expected = preg_quote($expected);
@@ -89,9 +85,8 @@ class HelpTest extends \lithium\test\Unit {
 		$command = new Help(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$expected = null;
 		$result = $command->api('lithium.util.Inflector', 'method');
-		$this->assertEqual($expected, $result);
+		$this->assertNull($result);
 
 		$expected = "rules [type] [config]";
 		$expected = preg_quote($expected);
@@ -103,9 +98,8 @@ class HelpTest extends \lithium\test\Unit {
 		$command = new Help(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$expected = null;
 		$result = $command->api('lithium.util.Inflector', 'method', 'rules');
-		$this->assertEqual($expected, $result);
+		$this->assertNull($result);
 
 		$expected = "rules [type] [config]";
 		$expected = preg_quote($expected);
@@ -117,9 +111,8 @@ class HelpTest extends \lithium\test\Unit {
 		$command = new Help(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$expected = null;
 		$result = $command->api('lithium.net.Message', 'property');
-		$this->assertEqual($expected, $result);
+		$this->assertNull($result);
 
 		$expected = "    --host=HOST\n        The hostname for this endpoint.";
 		$expected = preg_quote($expected);
@@ -131,9 +124,8 @@ class HelpTest extends \lithium\test\Unit {
 		$command = new Help(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$expected = null;
 		$result = $command->api('lithium.net.Message', 'property');
-		$this->assertEqual($expected, $result);
+		$this->assertNull($result);
 
 		$expected = "    --host=HOST\n        The hostname for this endpoint.";
 		$expected = preg_quote($expected);

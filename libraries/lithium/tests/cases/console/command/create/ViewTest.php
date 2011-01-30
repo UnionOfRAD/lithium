@@ -57,9 +57,8 @@ class ViewTest extends \lithium\test\Unit {
 		$result = $view->response->output;
 		$this->assertEqual($expected, $result);
 
-		$expected = true;
 		$result = file_exists($this->_testPath . '/create_test/views/posts/index.html.php');
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 	}
 }
 

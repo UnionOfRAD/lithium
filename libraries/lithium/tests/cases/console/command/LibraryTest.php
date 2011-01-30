@@ -84,9 +84,8 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->library->library = 'library_test';
 
-		$expected = true;
 		$result = $this->library->extract($this->_testPath . '/library_test');
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 
 		$expected = "library_test created in {$this->_testPath} from ";
 		$expected .= realpath(LITHIUM_LIBRARY_PATH)
@@ -104,10 +103,9 @@ class LibraryTest extends \lithium\test\Unit {
 
 		$this->library->library = 'library_test';
 
-		$expected = true;
 		$testPath = "{$this->_testPath}/library_test";
 		$result = $this->library->archive($testPath, $testPath);
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 
 		$expected = "library_test.phar.gz created in {$this->_testPath} from ";
 		$expected .= "{$this->_testPath}/library_test\n";
@@ -124,11 +122,10 @@ class LibraryTest extends \lithium\test\Unit {
 		);
 		$this->library->library = 'library_test';
 
-		$expected = true;
 		$result = $this->library->extract(
 			$this->_testPath . '/library_test.phar.gz', $this->_testPath . '/new'
 		);
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 
 		$this->assertTrue(file_exists($this->_testPath . '/new'));
 
@@ -157,9 +154,8 @@ class LibraryTest extends \lithium\test\Unit {
 		$app = new Library(array('request' => new Request(), 'classes' => $this->classes));
 		$app->library = 'does_not_exist';
 
-		$expected = true;
 		$result = $app->archive();
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 
 		$path = realpath($this->_testPath);
 		$expected = "new.phar.gz created in {$path} from {$path}/new\n";
@@ -179,9 +175,9 @@ class LibraryTest extends \lithium\test\Unit {
 		$app = new Library(array('request' => new Request(), 'classes' => $this->classes));
 		$app->library = 'does_not_exist';
 
-		$expected = true;
 		$result = $app->extract();
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
+
 		$this->assertTrue(file_exists($this->_testPath . '/new'));
 
 		$path = realpath($this->_testPath);
@@ -198,9 +194,8 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->library->library = 'library_plugin_test';
 		$path = $this->_testPath;
 
-		$expected = true;
 		$result = $this->library->extract('plugin', "{$path}/library_test_plugin");
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 
 		$expected = "library_test_plugin created in {$path} from " . realpath(LITHIUM_LIBRARY_PATH);
 		$expected .= "/lithium/console/command/create/template/plugin.phar.gz\n";
@@ -601,9 +596,8 @@ test;
 		$this->library->library = 'library_plugin_test';
 		$path = $this->_testPath;
 
-		$expected = true;
 		$result = $this->library->extract('plugin', "{$path}/library_test_plugin");
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 		$this->library->response->output = null;
 
 		$file = $this->_testPath . '/library_test_plugin/config/library_test_plugin.json';
