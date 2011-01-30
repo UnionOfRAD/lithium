@@ -108,7 +108,7 @@ class DocblockTest extends \lithium\test\Unit {
 	/**
 	 * This docblock has an extra * in the closing element.
 	 *
-	 **/
+	 */
 	public function testBadlyClosedDocblock() {
 		$info = Inspector::info(__METHOD__ . '()');
 		$description = 'This docblock has an extra * in the closing element.';

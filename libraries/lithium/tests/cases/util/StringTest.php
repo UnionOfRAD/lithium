@@ -17,7 +17,7 @@ class StringTest extends \lithium\test\Unit {
 	 * testRandomGenerator method
 	 *
 	 * @return void
-	 **/
+	 */
 	public function testRandomGenerator() {
 		// Disallow allow seeding twice
 		$this->assertFalse(String::seed() && String::seed());

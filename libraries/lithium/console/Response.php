@@ -21,14 +21,14 @@ class Response extends \lithium\core\Object {
 	 * Output stream, STDOUT
 	 *
 	 * @var stream
-	 **/
+	 */
 	public $output = null;
 
 	/**
 	 * Error stream, STDERR
 	 *
 	 * @var stream
-	 **/
+	 */
 	public $error = null;
 
 	/**
@@ -94,7 +94,7 @@ class Response extends \lithium\core\Object {
 	 *
 	 * @return void
 	 *
-	 **/
+	 */
 	public function __destruct() {
 		if ($this->output) {
 			fclose($this->output);

@@ -37,7 +37,7 @@ class String {
 	 * Seeds the random generator if it has yet to be done.
 	 *
 	 * @return boolean Success.
-	 **/
+	 */
 	public static function seed() {
 		// Seeding more than once means less entropy, not more, so bail
 		if (isset(static::$_urandom)) {
@@ -219,7 +219,7 @@ class String {
 	 * @param string $password The password to check
 	 * @param string $hash The hashed password to compare
 	 * @return boolean Whether the password is correct or not
-	 **/
+	 */
 	public static function checkPassword($password, $hash) {
 		return $hash == crypt($password, $hash);
 	}
@@ -266,7 +266,7 @@ class String {
 	 *        - `10` for Blowfish
 	 *        - `18` for XDES
 	 * @return string The salt string.
-	 **/
+	 */
 	public static function genSalt($type = null, $count = null) {
 		switch (true) {
 			case CRYPT_BLOWFISH == 1 && (!$type || $type === 'bf'):
@@ -335,7 +335,7 @@ class String {
 	 * @param integer $count The base-2 logarithm of the iteration count.
 	 *        Defaults to `10`. Can be `4` to `31`.
 	 * @return string $salt
-	 **/
+	 */
 	protected static function _genSaltBf($count = 10) {
 		$count = (integer) $count;
 		if ($count < 4 || $count > 31) {
@@ -412,7 +412,7 @@ class String {
 	 * Generates an MD5 salt for use in `String::hashPassword()`.
 	 *
 	 * @return string The MD5 salt.
-	 **/
+	 */
 	protected static function _genSaltMD5() {
 		$output = '$1$'
 			// 48 bits of salt

@@ -44,7 +44,7 @@ class Request extends \lithium\core\Object {
 	 * Enviroment variables.
 	 *
 	 * @var array
-	 **/
+	 */
 	protected $_env = array();
 
 	/**

@@ -21,7 +21,7 @@ class Router extends \lithium\core\Object {
 	 * @param object $request lithium\console\Request
 	 * @return array $params
 	 *
-	 **/
+	 */
 	public static function parse($request = null) {
 		$params = array(
 			'command' => null, 'action' => 'run', 'args' => array()
