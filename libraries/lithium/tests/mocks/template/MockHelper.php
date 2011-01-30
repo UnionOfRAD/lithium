@@ -11,6 +11,7 @@ namespace lithium\tests\mocks\template;
 class MockHelper extends \lithium\template\Helper {
 
 	protected $_strings = array('link' => '<a href="{:url}"{:options}>{:title}</a>');
+
 	/**
 	 * Hack to expose protected properties for testing.
 	 *
