@@ -463,8 +463,8 @@ class Media extends \lithium\core\StaticObject {
 	/**
 	 * Gets the physical path to the web assets (i.e. `/webroot`) directory of a library.
 	 *
-	 * @param string $library The name of the library for which to find the path, or `true` for the
-	 *               default library.
+	 * @param string|boolean $library The name of the library for which to find the path, or `true`
+	 *        for the default library.
 	 * @return string Returns the physical path to the web assets directory for a library. For
 	 *         example, the `/webroot` directory of the default library would be
 	 *         `LITHIUM_APP_PATH . '/webroot'`.
