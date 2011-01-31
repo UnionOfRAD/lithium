@@ -271,7 +271,7 @@ class Help extends \lithium\console\Command {
 		$method = $methods[$method];
 
 		$params = array_reduce($properties, function($a, $b) {
-			return "{$a} {$b['usage']}";
+			return "{$a} [{$b['usage']}]";
 		});
 		$args = $method['usage'];
 
