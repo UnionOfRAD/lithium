@@ -23,9 +23,12 @@ class Help extends \lithium\console\Command {
 	 * Auto run the help command.
 	 *
 	 * @param string $name Name of the command to return help about.
+	 * @param string $method The method of the command to get help for.
+	 *        This defaults to `'run'` which is the default main method
+	 *        for lithium commands.
 	 * @return void
 	 */
-	public function run($name = null) {
+	public function run($name = null, $method = 'run') {
 		if (!$name) {
 			$this->_renderCommands();
 			return true;
@@ -45,7 +48,7 @@ class Help extends \lithium\console\Command {
 		$properties = $this->_properties($class);
 		$info = Inspector::info($class);
 
-		$this->_renderUsage($name, $properties);
+		$this->_renderUsage($name, $method, $methods, $properties);
 
 		if (!empty($info['description'])) {
 			$this->nl();
@@ -142,15 +145,12 @@ class Help extends \lithium\console\Command {
 			if (isset($comment['tags']['return'])) {
 				$return = trim(strtok($comment['tags']['return'], ' '));
 			}
-			$command = $name == 'run' ? null : $name;
 
-			if ($args) {
-				$usage  = $command = $command ?: '[ARGS]';
-				$usage .= ' ' . join(' ', array_map(function($arg) {
-					return '[' . str_replace('$', '', trim($arg)) . ']';
-				}, array_keys($args)));
-			} else {
-				$usage = $command;
+			$usage = null;
+			if (!empty($method['args'])) {
+				foreach ((array) $method['args'] as $arg => $description) {
+					$usage .= ' ' . trim($arg, ' $');
+				}
 			}
 			$results[$name] = compact('name', 'description', 'return', 'args', 'usage');
 
@@ -176,15 +176,17 @@ class Help extends \lithium\console\Command {
 		$results = array();
 
 		foreach ($properties as &$property) {
+			$name = str_replace('_', '-', Inflector::underscore($property['name']));
+
 			$comment = Docblock::comment($property['docComment']);
 			$description = trim($comment['description']);
 			$type = isset($comment['tags']['var']) ? strtok($comment['tags']['var'], ' ') : null;
-			$name = str_replace('_', '-', Inflector::underscore($property['name']));
-			$usage = strlen($name) == 1 ? "-{$name}" : "--{$name}";
 
+			$usage = strlen($name) == 1 ? "-{$name}" : "--{$name}";
 			if ($type != 'boolean') {
 				$usage .= "={$type}";
 			}
+
 			$results[$name] = compact('name', 'description', 'type', 'usage');
 
 			if ($name == $options['name']) {
@@ -254,18 +256,29 @@ class Help extends \lithium\console\Command {
 	/**
 	 * Output the formatted usage.
 	 *
+	 * @see lithium\console\command\Help::_methods()
 	 * @see lithium\console\command\Help::_properties()
 	 * @param string $name The name of the command.
+	 * @param string $method The method of the command.
+	 * @param string $methods An array of method with associated information.
 	 * @param array $properties From `_properties()`.
 	 * @return void
 	 */
-	protected function _renderUsage($name, $properties) {
+	protected function _renderUsage($name, $method, $methods, $properties) {
 		$this->out('USAGE', 'heading');
-		$this->out($this->_pad(sprintf("{:command}li3 %s{:end}{:option}%s{:end} [ARGS]",
+
+		$template = "{:command}li3 %s{:end}{:command}%s{:end}{:option}%s{:end}";
+		$method = $methods[$method];
+
+		$params = array_reduce($properties, function($a, $b) {
+			return "{$a} {$b['usage']}";
+		});
+		$args = $method['usage'];
+
+		$this->out($this->_pad(sprintf($template,
 			$name ?: 'COMMAND',
-			array_reduce($properties, function($a, $b) {
-				return "{$a} {$b['usage']}";
-			})
+			$params,
+			$args
 		)));
 	}
 

@@ -49,7 +49,7 @@ class HelpTest extends \lithium\test\Unit {
 		$result = $command->run('Test');
 		$this->assertTrue($result);
 
-		$expected = "li3 test --case=string --group=string --filters=string [ARGS]";
+		$expected = "li3 test --case=string --group=string --filters=string";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
@@ -85,7 +85,7 @@ class HelpTest extends \lithium\test\Unit {
 		$result = $command->api('lithium.util.Inflector', 'method');
 		$this->assertNull($result);
 
-		$expected = "rules [type] [config]";
+		$expected = "rules";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
@@ -98,7 +98,7 @@ class HelpTest extends \lithium\test\Unit {
 		$result = $command->api('lithium.util.Inflector', 'method', 'rules');
 		$this->assertNull($result);
 
-		$expected = "rules [type] [config]";
+		$expected = "rules";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
