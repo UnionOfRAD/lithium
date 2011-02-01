@@ -13,6 +13,8 @@ use lithium\test\Dispatcher;
 
 /**
  * Runs a given set of tests and outputs the results.
+ *
+ * @see lithium\test
  */
 class Test extends \lithium\console\Command {
 
