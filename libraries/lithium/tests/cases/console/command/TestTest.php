@@ -27,6 +27,8 @@ class TestTest extends \lithium\test\Unit {
 		$this->_backup['_SERVER'] = $_SERVER;
 		$_SERVER['argv'] = array();
 
+		chdir(LITHIUM_LIBRARY_PATH . '/lithium');
+
 		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
 		$this->request->params = array('library' => 'build_test');
 	}
@@ -58,8 +60,6 @@ class TestTest extends \lithium\test\Unit {
 	}
 
 	public function testRunSingleTestWithRelativePath() {
-		chdir(LITHIUM_LIBRARY_PATH . '/lithium');
-
 		$command = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
