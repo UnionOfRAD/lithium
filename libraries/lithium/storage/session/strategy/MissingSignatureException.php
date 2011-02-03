@@ -14,6 +14,7 @@ namespace lithium\storage\session\strategy;
  */
 class MissingSignatureException extends \RuntimeException {
 
+	protected $code = 403;
 }
 
 ?>
