@@ -11,21 +11,25 @@ namespace lithium\data\source\http\adapter;
 use lithium\core\ConfigException;
 
 /**
- * CouchDb adapter
+ * A data source adapter which allows you to connect to Apache CouchDB.
  *
+ * By default, it will attempt to connect to the CouchDB running on `localhost` on port
+ * 5984 using HTTP version 1.0.
+ *
+ * @link http://couchdb.apache.org
  */
 class CouchDb extends \lithium\data\source\Http {
 
 	/**
-	 * increment value of current result set loop
-	 * used by `result` to handle rows of json responses
+	 * Increment value of current result set loop
+	 * used by `result` to handle rows of json responses.
 	 *
 	 * @var string
 	 */
 	protected $_iterator = 0;
 
 	/**
-	 * True if Database exists
+	 * True if Database exists.
 	 *
 	 * @var boolean
 	 */
@@ -46,7 +50,7 @@ class CouchDb extends \lithium\data\source\Http {
 	protected $_handlers = array();
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 *
 	 * @param array $config
 	 * @return void
@@ -101,7 +105,7 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * Magic for passing methods to http service
+	 * Magic for passing methods to http service.
 	 *
 	 * @param string $method
 	 * @param string $params
@@ -113,7 +117,7 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * entities
+	 * Entities.
 	 *
 	 * @param object $class
 	 * @return void
@@ -122,7 +126,7 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * Describe database, create if it does not exist
+	 * Describe database, create if it does not exist.
 	 *
 	 * @param string $entity
 	 * @param string $meta
@@ -166,7 +170,7 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * Create new document
+	 * Create new document.
 	 *
 	 * @param string $query
 	 * @param string $options
@@ -199,7 +203,7 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * Read from document
+	 * Read from document.
 	 *
 	 * @param string $query
 	 * @param string $options
@@ -246,7 +250,7 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * Update document
+	 * Update document.
 	 *
 	 * @param string $query
 	 * @param string $options
@@ -287,7 +291,7 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * Delete document
+	 * Delete document.
 	 *
 	 * @param string $query
 	 * @param string $options
@@ -362,7 +366,7 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * get result
+	 * Get result.
 	 *
 	 * @param string $type
 	 * @param string $resource
@@ -396,7 +400,7 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * handle conditions
+	 * Handle conditions.
 	 *
 	 * @param string $conditions
 	 * @param string $context
@@ -425,7 +429,7 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * fields for query
+	 * Fields for query.
 	 *
 	 * @param string $fields
 	 * @param string $context
@@ -436,7 +440,7 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * limit for query
+	 * Limit for query.
 	 *
 	 * @param string $limit
 	 * @param string $context
@@ -447,7 +451,7 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * order for query
+	 * Order for query.
 	 *
 	 * @param string $order
 	 * @param string $context
@@ -480,7 +484,7 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * Formats a CouchDb result set into a standard result to be passed to item
+	 * Formats a CouchDb result set into a standard result to be passed to item.
 	 *
 	 * @param string $data data returned from query
 	 * @param string $options
