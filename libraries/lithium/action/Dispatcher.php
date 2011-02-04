@@ -134,10 +134,12 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 */
 	public static function applyRules(&$params) {
 		$result = array();
+		$values = array();
 
 		if (!$params) {
 			return false;
 		}
+
 		if (isset($params['controller']) && is_string($params['controller'])) {
 			$controller = $params['controller'];
 
@@ -152,24 +154,24 @@ class Dispatcher extends \lithium\core\StaticObject {
 					$controller = "{$params['library']}.{$controller}";
 				}
 			}
-			$params['controller'] = $controller;
+			$values = compact('controller');
 		}
+		$values += $params;
 
 		foreach (static::$_rules as $rule => $value) {
 			foreach ($value as $k => $v) {
-				if (!empty($params[$rule])) {
-					$result[$k] = String::insert($v, $params);
+				if (isset($values[$rule])) {
+					$result[$k] = String::insert($v, $values);
 				}
-
 				$match = preg_replace('/\{:\w+\}/', '@', $v);
 				$match = preg_replace('/@/', '.+', preg_quote($match, '/'));
 
-				if (preg_match('/' . $match . '/i', $params[$k])) {
+				if (preg_match('/' . $match . '/i', $values[$k])) {
 					return false;
 				}
 			}
 		}
-		return $result + array_diff_key($params, $result);
+		return $result + $values;
 	}
 
 	/**
