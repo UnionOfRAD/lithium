@@ -190,6 +190,9 @@ class CouchDb extends \lithium\data\source\Http {
 			$data = $query->data();
 			$data += array('type' => $options['model']::meta('source'));
 
+			if (isset($data['id'])) {
+				return $self->update($query, $options);
+			}
 			$result = $conn->post($config['database'], $data, $request);
 			$result = is_string($result) ? json_decode($result, true) : $result;
 
