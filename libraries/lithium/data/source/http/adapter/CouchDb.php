@@ -40,6 +40,7 @@ class CouchDb extends \lithium\data\source\Http {
 		'service' => 'lithium\net\http\Service',
 		'entity' => 'lithium\data\entity\Document',
 		'set' => 'lithium\data\collection\DocumentSet',
+		'array' => 'lithium\data\collection\DocumentArray',
 	);
 
 	protected $_handlers = array();
