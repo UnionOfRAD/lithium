@@ -12,6 +12,7 @@ namespace lithium\data\source\database\adapter;
 use SQLite3 as SQLite;
 use SQLite3Result;
 use lithium\data\model\QueryException;
+use \lithium\data\source\database\adapter\sqlite3\Result;
 
 /**
  * Sqlite database driver
@@ -63,7 +64,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'database'   => '',
-			'flags'      => NULL,
+			'flags'      => SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE,
 			'key'        => NULL
 		);
 		parent::__construct($config + $defaults);
@@ -188,7 +189,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 		if (is_array($value)) {
 			return parent::value($value, $schema);
 		}
-		return $this->connection->escapeString($value);
+		return "'" . $this->connection->escapeString($value) . "'";
 	}
 
 	/**
@@ -257,7 +258,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 				list($code, $error) = $self->error();
 				throw new QueryException("$sql: $error", $code);
 			}
-			return $result;
+			return new Result(array('resource' => $result));
 		});
 	}
 

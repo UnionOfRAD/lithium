@@ -16,14 +16,24 @@ class Result extends \lithium\data\source\database\Result {
 		if (!$this->_resource instanceof SQLite3Result) {
 			return;
 		}
-		return $resource->fetchArray(SQLITE3_ASSOC);
+		return $this->_resource->fetchArray(SQLITE3_ASSOC);
 	}
 
 	protected function _close() {
 		if (!$this->_resource instanceof SQLite3Result) {
 			return;
 		}
-		$resource->finalize();
+		$this->_resource->finalize();
+	}
+
+	public function __call($name, $arguments) {
+		if (!$this->_resource instanceof SQLite3Result) {
+			return;
+		}
+
+		if(is_callable(array($this->_resource, $name))) {
+			return call_user_method_array($name, $this->_resource, $arguments);
+		}
 	}
 }
 
