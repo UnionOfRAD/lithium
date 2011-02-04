@@ -230,14 +230,24 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @param callback $filter The filter to apply.
 	 * @param array $options The available options are:
 	 *              - `'collect'`: If `true`, the results will be returned wrapped
-	 *              in a new Collection object or subclass.
+	 *              in a new `Collection` object or subclass.
 	 * @return array|object The filtered data.
 	 */
 	public function map($filter, array $options = array()) {
+		$defaults = array('collect' => true);
+		$options += $defaults;
+
 		if (!$this->closed()) {
 			while($this->next()) {}
 		}
-		return parent::map($filter, $options);
+		$data = parent::map($filter, $options);
+
+		if ($options['collect']) {
+			foreach (array('_model', '_schema', '_pathKey') as $key) {
+				$data->{$key} = $this->{$key};
+			}
+		}
+		return $data;
 	}
 
 	/**

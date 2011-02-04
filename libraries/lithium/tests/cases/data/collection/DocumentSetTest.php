@@ -69,6 +69,17 @@ class DocumentSetTest extends \lithium\test\Unit {
 
 		$this->assertNull($doc->next());
 	}
+
+	public function testMappingToNewDocumentSet() {
+		$result = new MockResult();
+		$model = $this->_model;
+		$doc = new DocumentSet(compact('model', 'result'));
+
+		$mapped = $doc->map(function($data) { return $data; });
+		$this->assertEqual($doc->data(), $mapped->data());
+		$this->assertEqual($model, $doc->model());
+		$this->assertEqual($model, $mapped->model());
+	}
 }
 
 ?>
