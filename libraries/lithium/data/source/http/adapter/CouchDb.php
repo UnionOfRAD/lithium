@@ -223,19 +223,24 @@ class CouchDb extends \lithium\data\source\Http {
 				$_path = '_all_docs';
 				$conditions['include_docs'] = 'true';
 			}
+			$path = "{$config['database']}/{$_path}";
+
 			$args = (array) $conditions + (array) $limit + (array) $order;
-			$result = json_decode($conn->get("{$config['database']}/{$_path}", $args), true);
-			$data = array();
+			$result = (array) json_decode($conn->get($path, $args), true);
 
-			if (isset($result['rows'])) {
-				$data = $result['rows'];
+			$data = $stats = array();
+
+			if (isset($result['_id'])) {
+				$data = array($result);
+			} elseif (isset($result['rows'])) {
+				$data = array_map(function($row) { return $row['value']; }, $result['rows']);
+
+				unset($result['rows']);
+				$stats = $result;
 			}
-			unset($result['rows']);
 
-			$stats = (array) $result + array('total_rows' => null, 'offset' => null);
-			$data = array_map(function($i) { return $i['doc']; }, $data);
+			$stats += array('total_rows' => null, 'offset' => null);
 			$opts = compact('stats') + array('class' => 'set', 'exists' => true);
-
 			return $self->item($query->model(), $data, $opts);
 		});
 	}
