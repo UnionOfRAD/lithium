@@ -205,8 +205,9 @@ class Controller extends \lithium\core\Object {
 
 	/**
 	 * Uses results (typically coming from a controller action) to generate content and headers for
-	 * a Response object.
+	 * a `Response` object.
 	 *
+	 * @see lithium\action\Controller::$_render
 	 * @param array $options An array of options, as follows:
 	 *        - `'data'`: An associative array of variables to be assigned to the template. These
 	 *          are merged on top of any variables set in `Controller::set()`.
@@ -217,6 +218,9 @@ class Controller extends \lithium\core\Object {
 	 *          controller, i.e. given a `PostsController` object, if template is set to `'view'`,
 	 *          the template path would be `views/posts/view.html.php`. Defaults to the name of the
 	 *          action being rendered.
+	 *
+	 * The options specified here are merged with the values in the `Controller::$_render`
+	 * property. You may refer to it for other options accepted by this method.
 	 * @return void
 	 */
 	public function render(array $options = array()) {
