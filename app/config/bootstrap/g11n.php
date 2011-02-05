@@ -6,8 +6,11 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium;
-
+/**
+ * This bootstrap file contains class configuration for all aspects of globalizing your application,
+ * including localization of text, validation rules, setting timezones and character inflections,
+ * and identifying a user's locale.
+ */
 use lithium\core\Environment;
 use lithium\g11n\Locale;
 use lithium\g11n\Catalog;
@@ -31,13 +34,15 @@ date_default_timezone_set('UTC');
  * globalization related settings.
  *
  * The environment settings are:
- * - `'locale'` The effective locale.
- * - `'locales'` Application locales available mapped to names. The available locales are used
+ *
+ *  - `'locale'` The effective locale.
+ *  - `'locales'` Application locales available mapped to names. The available locales are used
  *               to negotiate he effective locale, the names can be used i.e. when displaying
  *               a menu for choosing the locale to users.
  */
 $locale = 'en';
 $locales = array('en' => 'English');
+
 Environment::set('production', compact('locale', 'locales'));
 Environment::set('development', compact('locale', 'locales'));
 Environment::set('test', array('locale' => 'en', 'locales' => array('en' => 'English')));
@@ -46,26 +51,26 @@ Environment::set('test', array('locale' => 'en', 'locales' => array('en' => 'Eng
  * Globalization (g11n) catalog configuration.  The catalog allows for obtaining and
  * writing globalized data. Each configuration can be adjusted through the following settings:
  *
- *   - `'adapter' The name of a supported adapter. The builtin adapters are _memory_ (a
- *     simple adapter good for runtime data and testing), _gettext_, _cldr_ (for
- *     interfacing with Unicode's common locale data repository) and _code_ (used mainly for
+ *   - `'adapter'` _string_: The name of a supported adapter. The builtin adapters are `Memory` (a
+ *     simple adapter good for runtime data and testing), `Php`, `Gettext`, `Cldr` (for
+ *     interfacing with Unicode's common locale data repository) and `Code` (used mainly for
  *     extracting message templates from source code).
  *
- *   - `'path'` All adapters with the exception of the _memory_ adapter require a directory
+ *   - `'path'` All adapters with the exception of the `Memory` adapter require a directory
  *     which holds the data.
  *
  *   - `'scope'` If you plan on using scoping i.e. for accessing plugin data separately you
- *     need to specify a scope for each configuration, except for those using the _memory_,
- *     _php_ or _gettext_ adapter which handle this internally.
+ *     need to specify a scope for each configuration, except for those using the `Memory`,
+ *     `Php` or `Gettext` adapter which handle this internally.
  */
 Catalog::config(array(
 	'runtime' => array(
 		'adapter' => 'Memory'
 	),
-// 	'app' => array(
-// 		'adapter' => 'Gettext',
-// 		'path' => LITHIUM_APP_PATH . '/resources/g11n'
-// 	),
+	// 'app' => array(
+	// 	'adapter' => 'Gettext',
+	// 	'path' => LITHIUM_APP_PATH . '/resources/g11n'
+	// ),
 	'lithium' => array(
 		'adapter' => 'Php',
 		'path' => LITHIUM_LIBRARY_PATH . '/lithium/g11n/resources/php'
@@ -77,7 +82,7 @@ Catalog::config(array(
  */
 // Inflector::rules('transliteration', Catalog::read(true, 'inflection.transliteration', 'en'));
 
-/*
+/**
  * Inflector configuration examples.  If your application has custom singular or plural rules, or
  * extra non-ASCII characters to transliterate, you can configure that by uncommenting the lines
  * below.
@@ -128,6 +133,7 @@ ActionDispatcher::applyFilter('_callable', function($self, $params, $chain) {
 	Environment::set(Environment::get(), array('locale' => $request->locale));
 	return $controller;
 });
+
 ConsoleDispatcher::applyFilter('_callable', function($self, $params, $chain) {
 	$request = $params['request'];
 	$command = $chain->next($self, $params, $chain);
