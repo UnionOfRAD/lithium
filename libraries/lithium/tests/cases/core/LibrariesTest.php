@@ -14,6 +14,10 @@ use lithium\core\Libraries;
 
 class LibrariesTest extends \lithium\test\Unit {
 
+	public function tearDown() {
+		Libraries::cache(false);
+	}
+
 	public function testNamespaceToFileTranslation() {
 		$result = Libraries::path('\lithium\core\Libraries');
 		$this->assertTrue(strpos($result, '/lithium/core/Libraries.php'));
@@ -316,13 +320,6 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertTrue(in_array('lithium\test\filter\Complexity', $result));
 		$this->assertTrue(in_array('lithium\test\filter\Coverage', $result));
 		$this->assertTrue(in_array('lithium\test\filter\Profiler', $result));
-
-		foreach (Libraries::paths() as $type => $paths) {
-			if (count($paths) <= 1 || $type == 'libraries') {
-				continue;
-			}
-			$this->assertTrue(count(Libraries::locate($type)) > 1);
-		}
 	}
 
 	public function testServiceLocateInstantiation() {
@@ -481,12 +478,55 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testLocatePreFilter() {
-		$result = Libraries::locate('command', null, array('recursive' => false));
-		$this->assertFalse(preg_grep('/\.txt/', $result));
+	public function testLocateCommandInLithium() {
+		$expected = array(
+			'lithium\console\command\Create',
+			'lithium\console\command\G11n',
+			'lithium\console\command\Help',
+			'lithium\console\command\Library',
+			'lithium\console\command\Test'
+		);
+		$result = Libraries::locate('command', null, array(
+			'library' => 'lithium', 'recursive' => false
+		));
+		$this->assertEqual($expected, $result);
+	}
 
-		$result = Libraries::locate('command', null, array('recursive' => true));
-		$this->assertFalse(preg_grep('/\.txt/', $result));
+	public function testLocateCommandInLithiumRecursiveTrue() {
+		$expected = array(
+			'lithium\console\command\Create',
+			'lithium\console\command\G11n',
+			'lithium\console\command\Help',
+			'lithium\console\command\Library',
+			'lithium\console\command\Test',
+			'lithium\console\command\g11n\Extract',
+			'lithium\console\command\create\Controller',
+			'lithium\console\command\create\Mock',
+			'lithium\console\command\create\Model',
+			'lithium\console\command\create\Test',
+			'lithium\console\command\create\View'
+		);
+		$result = Libraries::locate('command', null, array(
+			'library' => 'lithium', 'recursive' => true
+		));
+		$this->assertEqual($expected, $result);
+	}
+
+	function testLocateWithLibrary() {
+	    $expected = array();
+	    $result = (array) Libraries::locate("tests", null, array('library' => 'doesntExist'));
+	    $this->assertIdentical($expected, $result);
+	}
+
+	function testLocateWithLithiumLibrary() {
+	    $expected = (array) Libraries::find('lithium', array(
+		    'path' => '/tests',
+			'preFilter' => '/[A-Z][A-Za-z0-9]+\Test\./',
+	        'recursive' => true,
+	        'filter' => '/cases|integration|functional|mocks/',
+	    ));
+	    $result = (array) Libraries::locate("tests", null, array('library' => 'lithium'));
+	    $this->assertEqual($expected, $result);
 	}
 }
 

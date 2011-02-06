@@ -80,25 +80,19 @@ class Libraries {
 	protected static $_paths = array(
 		'adapter' => array(
 			'{:library}\extensions\adapter\{:namespace}\{:class}\{:name}',
-			'{:library}\extensions\adapter\{:class}\{:name}',
 			'{:library}\{:namespace}\{:class}\adapter\{:name}' => array('libraries' => 'lithium')
 		),
 		'command' => array(
 			'{:library}\extensions\command\{:namespace}\{:class}\{:name}',
-			'{:library}\extensions\command\{:class}\{:name}',
-			'{:library}\extensions\command\{:name}',
 			'{:library}\console\command\{:namespace}\{:class}\{:name}' => array(
 				'libraries' => 'lithium'
 			),
-			'{:library}\console\command\{:class}\{:name}' => array('libraries' => 'lithium'),
-			'{:library}\console\command\{:name}' => array('libraries' => 'lithium'),
 		),
 		'controllers' => array(
 			'{:library}\controllers\{:name}Controller'
 		),
 		'data' => array(
 			'{:library}\extensions\data\{:namespace}\{:class}\{:name}',
-			'{:library}\extensions\data\{:class}\{:name}',
 			'{:library}\data\{:namespace}\{:class}\adapter\{:name}' => array(
 				'libraries' => 'lithium'
 			),
@@ -113,10 +107,12 @@ class Libraries {
 			'{:app}/libraries/{:name}',
 			'{:root}/{:name}'
 		),
-		'models' => '{:library}\models\{:name}',
+		'models' => array(
+			'{:library}\models\{:name}'
+		),
 		'strategy' => array(
 			'{:library}\extensions\strategy\{:namespace}\{:class}\{:name}',
-			'{:library}\extensions\strategy\{:name}',
+			'{:library}\extensions\strategy\{:class}\{:name}',
 			'{:library}\{:namespace}\{:class}\strategy\{:name}' => array('libraries' => 'lithium')
 		),
 		'socket' => array(
@@ -126,13 +122,10 @@ class Libraries {
 		),
 		'test' => array(
 			'{:library}\extensions\test\{:namespace}\{:class}\{:name}',
-			'{:library}\extensions\test\{:class}\{:name}',
 			'{:library}\test\{:namespace}\{:class}\{:name}' => array('libraries' => 'lithium'),
-			'{:library}\test\{:class}\{:name}' => array('libraries' => 'lithium')
 		),
 		'tests' => array(
 			'{:library}\tests\{:namespace}\{:class}\{:name}Test',
-			'{:library}\tests\{:namespace}\{:name}Test'
 		)
 	);
 
@@ -592,9 +585,6 @@ class Libraries {
 	 *         found which match `$type`.
 	 */
 	public static function locate($type, $name = null, array $options = array()) {
-		$defaults = array('type' => 'class');
-		$options += $defaults;
-
 		if (is_object($name) || strpos($name, '\\') !== false) {
 			return $name;
 		}
@@ -604,24 +594,24 @@ class Libraries {
 			return static::$_cachedPaths[$ident];
 		}
 		$params = static::_params($type, $name);
-		extract($params);
 
-		if (!isset(static::$_paths[$type])) {
+		$defaults = array(
+			'type' => 'class',
+			'library' => $params['library'] !== '*' ? $params['library'] : null
+		);
+		$options += $defaults;
+		unset($params['library']);
+		$paths = static::paths($params['type']);
+
+		if (!isset($paths)) {
 			return null;
 		}
-		if (!$name) {
-			$result = static::_locateAll(array('name' => '*') + $params, $options);
+		if ($params['name'] === '*') {
+			$result = static::_locateAll($params, $options);
 			return (static::$_cachedPaths[$ident] = $result);
 		}
-		$paths = (array) static::$_paths[$type];
-
-		if (strpos($name, '.')) {
-			list($params['library'], $params['name']) = explode('.', $name);
-			$params['library'][0] = strtolower($params['library'][0]);
-
-			$result = static::_locateDeferred(null, $paths, $params, $options + array(
-				'library' => $params['library']
-			));
+		if ($options['library']) {
+			$result = static::_locateDeferred(null, $paths, $params, $options);
 			return static::$_cachedPaths[$ident] = $result;
 		}
 		foreach (array(false, true) as $defer) {
@@ -669,12 +659,11 @@ class Libraries {
 	 *         class in any path matching any of the parameters is located.
 	 */
 	protected static function _locateDeferred($defer, $paths, $params, array $options = array()) {
+		$libraries = static::$_configurations;
+
 		if (isset($options['library'])) {
 			$libraries = static::get((array) $options['library']);
-		} else {
-			$libraries = static::$_configurations;
 		}
-
 		foreach ($libraries as $library => $config) {
 			if ($config['defer'] !== $defer && $defer !== null) {
 				continue;
@@ -714,6 +703,7 @@ class Libraries {
 				continue;
 			}
 			foreach ($params as $key => $value) {
+
 				if (($value && $value !== '*') && strpos($tpl, "{:{$key}}") === false) {
 					continue 2;
 				}
@@ -731,11 +721,13 @@ class Libraries {
 	 * @return array
 	 */
 	protected static function _locateAll(array $params, array $options = array()) {
-		$defaults = array('libraries' => null, 'recursive' => true, 'namespaces' => false);
+		$defaults = array(
+			'libraries' => null, 'recursive' => true, 'namespaces' => false
+		);
 		$options += $defaults;
-
 		$paths = (array) static::$_paths[$params['type']];
-		$libraries = static::get($options['libraries'] ? (array) $options['libraries'] : null);
+		$libraries = $options['library'] ? $options['library'] : $options['libraries'];
+		$libraries = static::get((array) $libraries);
 		$flags = array('escape' => '/');
 		$classes = array();
 
@@ -744,6 +736,7 @@ class Libraries {
 
 			foreach (static::_searchPaths($paths, $library, $params) as $tpl) {
 				$options['path'] = str_replace('\\', '/', String::insert($tpl, $params, $flags));
+				$options['path'] = str_replace('*/', '', $options['path']);
 				$classes = array_merge($classes, static::_search($config, $options));
 			}
 		}
@@ -820,7 +813,7 @@ class Libraries {
 		if ($suffix) {
 			$libs = $options['preFilter'] ? preg_grep($options['preFilter'], $libs) : $libs;
 		}
-		return static::_filter($libs, $config, $options + compact('name'));
+		return static::_filter($libs, (array) $config, $options + compact('name'));
 	}
 
 	/**
@@ -864,9 +857,10 @@ class Libraries {
 	 * @return array type, namespace, class, name
 	 */
 	protected static function _params($type, $name = "*") {
-		$namespace = $class = '*';
+		$name = $name ?: "*";
+		$library = $namespace = $class = '*';
 
-		if (strpos($type, '.')) {
+		if (strpos($type, '.') !== false) {
 			$parts = explode('.', $type);
 			$type = array_shift($parts);
 
@@ -883,7 +877,13 @@ class Libraries {
 				break;
 			}
 		}
-		return compact('type', 'namespace', 'class', 'name');
+		if (strpos($name, '.') !== false) {
+			$parts = explode('.', $name);
+			$library = array_shift($parts);
+			$name = array_pop($parts);
+			$namespace = $parts ? join('\\', $parts) : "*";
+		}
+		return compact('library', 'namespace', 'type', 'class', 'name');
 	}
 }
 
