@@ -512,13 +512,13 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	function testLocateWithLibrary() {
+	public function testLocateWithLibrary() {
 	    $expected = array();
 	    $result = (array) Libraries::locate("tests", null, array('library' => 'doesntExist'));
 	    $this->assertIdentical($expected, $result);
 	}
 
-	function testLocateWithLithiumLibrary() {
+	public function testLocateWithLithiumLibrary() {
 	    $expected = (array) Libraries::find('lithium', array(
 		    'path' => '/tests',
 			'preFilter' => '/[A-Z][A-Za-z0-9]+\Test\./',
@@ -527,6 +527,27 @@ class LibrariesTest extends \lithium\test\Unit {
 	    ));
 	    $result = (array) Libraries::locate("tests", null, array('library' => 'lithium'));
 	    $this->assertEqual($expected, $result);
+	}
+
+	public function testLocateWithTestAppLibrary() {
+		$test_app = LITHIUM_APP_PATH . '/resources/tmp/tests/test_app';
+		mkdir($test_app);
+		Libraries::add('test_app', array('path' => $test_app));
+
+		mkdir($test_app . '/tests/cases/models', 0777, true);
+		file_put_contents($test_app . '/tests/cases/models/UserTest.php',
+		"<?php namespace test_app\\tests\\cases\\models;\n
+			class UserTest extends \\lithium\\test\\Unit { public function testMe() {
+				\$this->assertTrue(true);
+			}}"
+		);
+		Libraries::cache(false);
+
+		$expected = array('test_app\\tests\\cases\\models\\UserTest');
+	    $result = (array) Libraries::locate("tests", null, array('library' => 'test_app'));
+	    $this->assertEqual($expected, $result);
+
+		$this->_cleanUp();
 	}
 }
 
