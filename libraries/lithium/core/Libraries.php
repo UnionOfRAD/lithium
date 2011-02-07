@@ -702,12 +702,6 @@ class Libraries {
 			if (isset($opts['libraries']) && !in_array($library, (array) $opts['libraries'])) {
 				continue;
 			}
-			foreach ($params as $key => $value) {
-
-				if (($value && $value !== '*') && strpos($tpl, "{:{$key}}") === false) {
-					continue 2;
-				}
-			}
 			$result[] = $tpl;
 		}
 		return $result;

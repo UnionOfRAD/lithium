@@ -10,6 +10,7 @@ namespace lithium\tests\cases\test;
 
 use lithium\test\Group;
 use lithium\util\Collection;
+use lithium\core\Libraries;
 
 class GroupTest extends \lithium\test\Unit {
 
@@ -106,7 +107,7 @@ class GroupTest extends \lithium\test\Unit {
 		$this->assertTrue(is_a($results->current(), 'lithium\tests\cases\g11n\CatalogTest'));
 	}
 
-	public function testTestsRun() {
+	public function testAddEmptyTestsRun() {
 		$group = new Group();
 		$result = $group->add('lithium\tests\mocks\test\MockUnitTest');
 		$expected = array('lithium\tests\mocks\test\MockUnitTest');
@@ -138,9 +139,63 @@ class GroupTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, str_replace('\\', '/', $result));
 	}
 
-	public function testQueryAllTests() {
+	public function testGroupAllForLithium() {
+		Libraries::cache(false);
 		$result = Group::all(array('library' => 'lithium'));
 		$this->assertTrue(count($result) >= 60);
+	}
+
+	public function testAddTestAppGroup() {
+		$test_app = LITHIUM_APP_PATH . '/resources/tmp/tests/test_app';
+		mkdir($test_app);
+		Libraries::add('test_app', array('path' => $test_app));
+
+		mkdir($test_app . '/tests/cases/models', 0777, true);
+		file_put_contents($test_app . '/tests/cases/models/UserTest.php',
+		"<?php namespace test_app\\tests\\cases\\models;\n
+			class UserTest extends \\lithium\\test\\Unit { public function testMe() {
+				\$this->assertTrue(true);
+			}}"
+		);
+		Libraries::cache(false);
+
+		$expected = (array) Libraries::find('test_app', array(
+			'recursive' => true,
+			'path' => '/tests',
+			'filter' => '/cases|integration|functional/',
+		));
+
+		Libraries::cache(false);
+
+		$group = new Group();
+		$result = $group->add('test_app');
+
+		$this->assertEqual($expected, $result);
+
+		Libraries::cache(false);
+		$this->_cleanUp();
+	}
+
+	public function testRunGroupAllForTestApp() {
+		$test_app = LITHIUM_APP_PATH . '/resources/tmp/tests/test_app';
+		mkdir($test_app);
+		Libraries::add('test_app', array('path' => $test_app));
+
+		mkdir($test_app . '/tests/cases/models', 0777, true);
+		file_put_contents($test_app . '/tests/cases/models/UserTest.php',
+		"<?php namespace test_app\\tests\\cases\\models;\n
+			class UserTest extends \\lithium\\test\\Unit { public function testMe() {
+				\$this->assertTrue(true);
+			}}"
+		);
+		Libraries::cache(false);
+
+		$expected = array('test_app\\tests\\cases\\models\\UserTest');
+		$result = Group::all(array('library' => 'test_app'));
+	    $this->assertEqual($expected, $result);
+
+		Libraries::cache(false);
+		$this->_cleanUp();
 	}
 }
 
