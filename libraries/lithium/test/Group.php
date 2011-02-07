@@ -119,7 +119,7 @@ class Group extends \lithium\util\Collection {
 	 * Resolves a unit test class (or classes) from a class or namespace path string.
 	 *
 	 * @param string $test The path string in which to find the test case(s). This may be a
-	 *               namespace, a Lithium package name, or a fully-namespaced class reference.
+	 *               library, a namespace, or a fully-namespaced class reference.
 	 * @return array Returns an array containing one or more fully-namespaced class references to
 	 *               unit tests.
 	 */
@@ -128,11 +128,6 @@ class Group extends \lithium\util\Collection {
 			return (array) Libraries::find($test, array(
 				'recursive' => true, 'filter' => '/cases|integration|functional/',
 			));
-		}
-		if ($test[0] != '\\' && strpos($test, 'lithium\\') === false) {
-			if (file_exists(Libraries::path($test = "lithium\\tests\cases\\{$test}"))) {
-				return array($test);
-			}
 		}
 		if (preg_match("/Test/", $test)) {
 			return array($test);
