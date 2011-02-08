@@ -99,7 +99,8 @@ class StreamTest extends \lithium\test\Unit {
 		$result = $stream->send($data, array('classes' => array(
 			'response' => '\lithium\net\http\Response'
 		)));
-		$this->assertNotEqual(null, $result);
+		$this->assertTrue($result);
+		$this->assertTrue(!empty($result->headers), 'Response is missing headers.');
 	}
 }
 
