@@ -146,23 +146,20 @@ class Help extends \lithium\console\Command {
 
 			$name = $method['name'];
 			$description = $comment['description'];
+			$args = $method['args'];
 
-			$args = $return = null;
+			$return = null;
 
-			if (isset($comment['tags']['params'])) {
-				$args = $comment['tags']['params'];
+			foreach ($args as &$arg) {
+				if (isset($comment['tags']['params']['$' . $arg['name']])) {
+					$arg['description'] = $comment['tags']['params']['$' . $arg['name']]['text'];
+				}
+				$arg['usage'] = $arg['optional'] ? "[<{$arg['name']}>]" : "<{$arg['name']}>";
 			}
 			if (isset($comment['tags']['return'])) {
 				$return = trim(strtok($comment['tags']['return'], ' '));
 			}
-
-			$usage = null;
-			if (!empty($method['args'])) {
-				foreach ((array) $method['args'] as $arg => $description) {
-					$usage .= ' ' . trim($arg, ' $');
-				}
-			}
-			$results[$name] = compact('name', 'description', 'return', 'args', 'usage');
+			$results[$name] = compact('name', 'description', 'return', 'args');
 
 			if ($name && $name == $options['name']) {
 				return array($name => $results[$name]);
@@ -283,9 +280,11 @@ class Help extends \lithium\console\Command {
 		$method = $methods[$method];
 
 		$params = array_reduce($properties, function($a, $b) {
-			return "{$a} [{$b['usage']}]";
+			return "{$a} {$b['usage']}";
 		});
-		$args = $method['usage'];
+		$args = array_reduce($method['args'], function($a, $b) {
+			return "{$a} {$b['usage']}";
+		});
 
 		$this->out($this->_pad(sprintf($template,
 			$name ?: 'COMMAND',
