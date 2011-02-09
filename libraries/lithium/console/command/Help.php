@@ -193,9 +193,11 @@ class Help extends \lithium\console\Command {
 			$type = isset($comment['tags']['var']) ? strtok($comment['tags']['var'], ' ') : null;
 
 			$usage = strlen($name) == 1 ? "-{$name}" : "--{$name}";
+
 			if ($type != 'boolean') {
 				$usage .= "=<{$type}>";
 			}
+			$usage = "[{$usage}]";
 
 			$results[$name] = compact('name', 'description', 'type', 'usage');
 
@@ -219,7 +221,7 @@ class Help extends \lithium\console\Command {
 			if ($name === 'run' || empty($param['name'])) {
 				continue;
 			}
-			$usage = (!empty($param['usage'])) ? trim($param['usage']) : $param['name'];
+			$usage = (!empty($param['usage'])) ? trim($param['usage'], ' []') : $param['name'];
 			$this->out($this->_pad($usage), 'option');
 
 			if (!empty($param['args'])) {
