@@ -53,7 +53,7 @@ class HelpTest extends \lithium\test\Unit {
 		$result = $help->response->output;
 		$this->assertTrue(strpos($result, $expected) !== false);
 
-		$expected = "OPTIONS\n    --case=<string>\n";
+		$expected = "OPTIONS\n    missing\n";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
