@@ -36,7 +36,7 @@ class Help extends \lithium\console\Command {
 		$command = Inflector::classify($command);
 
 		if (!$class = Libraries::locate('command', $command)) {
-			$this->error("{$command} not found");
+			$this->error("Command `{$command}` not found");
 			return false;
 		}
 		if (strpos($command, '\\') !== false) {
