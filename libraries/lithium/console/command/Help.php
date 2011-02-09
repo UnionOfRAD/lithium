@@ -28,7 +28,7 @@ class Help extends \lithium\console\Command {
 	 *        for lithium commands.
 	 * @return void
 	 */
-	public function run($command = null, $method = 'run') {
+	public function run($command = null) {
 		if (!$command) {
 			$this->_renderCommands();
 			return true;
@@ -48,7 +48,15 @@ class Help extends \lithium\console\Command {
 		$properties = $this->_properties($class);
 		$info = Inspector::info($class);
 
-		$this->_renderUsage($command, $method, $methods, $properties);
+		$this->out('USAGE', 'heading');
+
+		$run = $methods['run'];
+		unset($methods['run']);
+		$this->_renderUsage($command, $run, $properties);
+
+		foreach ($methods as $method) {
+			$this->_renderUsage($command, $method);
+		}
 
 		if (!empty($info['description'])) {
 			$this->nl();
@@ -59,12 +67,12 @@ class Help extends \lithium\console\Command {
 		if ($properties || $methods) {
 			$this->out('OPTIONS', 'heading');
 		}
+		if ($methods) {
+			$this->_render($run['args']);
+			$this->_render($methods);
+		}
 		if ($properties) {
 			$this->_render($properties);
-		}
-		if ($methods) {
-			$this->_render($methods[$method]['args']);
-			$this->_render($methods);
 		}
 		return true;
 	}
@@ -259,27 +267,22 @@ class Help extends \lithium\console\Command {
 	 *
 	 * @see lithium\console\command\Help::_methods()
 	 * @see lithium\console\command\Help::_properties()
-	 * @param string $name The name of the command.
-	 * @param string $method The method of the command.
-	 * @param string $methods An array of method with associated information.
+	 * @param string $command The name of the command.
+	 * @param array $method Information about the method of the command to render usage for.
 	 * @param array $properties From `_properties()`.
 	 * @return void
 	 */
-	protected function _renderUsage($name, $method, $methods, $properties) {
-		$this->out('USAGE', 'heading');
-
-		$template = "{:command}li3 %s{:end}{:command}%s{:end}{:option}%s{:end}";
-		$method = $methods[$method];
-
+	protected function _renderUsage($command, $method, $properties = array()) {
 		$params = array_reduce($properties, function($a, $b) {
 			return "{$a} {$b['usage']}";
 		});
 		$args = array_reduce($method['args'], function($a, $b) {
 			return "{$a} {$b['usage']}";
 		});
-
-		$this->out($this->_pad(sprintf($template,
-			$name ?: 'COMMAND',
+		$this->out($this->_pad(sprintf(
+			"{:command}li3 %s%s{:end}{:command}%s{:end}{:option}%s{:end}",
+			$command ?: 'COMMAND',
+			$method['name'] == 'run' ? '' : " {$method['name']}",
 			$params,
 			$args
 		)));
