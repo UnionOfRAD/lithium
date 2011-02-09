@@ -33,12 +33,12 @@ class Help extends \lithium\console\Command {
 			$this->_renderCommands();
 			return true;
 		}
-		$command = Inflector::classify($command);
-
 		if (!$class = Libraries::locate('command', $command)) {
 			$this->error("Command `{$command}` not found");
 			return false;
 		}
+		$command = Inflector::classify($command);
+
 		if (strpos($command, '\\') !== false) {
 			$command = join('', array_slice(explode("\\", $command), -1));
 		}
