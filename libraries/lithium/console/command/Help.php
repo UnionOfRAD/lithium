@@ -118,7 +118,17 @@ class Help extends \lithium\console\Command {
 			if ($setAccess) {
 				$item->setAccessible(true);
 			}
-			$result = compact('modifiers') + array(
+			$args = array();
+
+			foreach ($item->getParameters() as $arg) {
+				$args[] = array(
+					'name' => $arg->getName(),
+					'optional' => $arg->isOptional(),
+					'default' => $arg->getDefaultValue(),
+					'description' => null
+				);
+			}
+			$result = compact('modifiers', 'args') + array(
 				'docComment' => $item->getDocComment(),
 				'name' => $item->getName()
 			);
