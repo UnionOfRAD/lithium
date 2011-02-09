@@ -223,7 +223,12 @@ class Help extends \lithium\console\Command {
 			$this->out($this->_pad($usage), 'option');
 
 			if ($param['description']) {
-				$this->out($this->_pad($param['description'], 2));
+				$message = $param['description'];
+
+				if (!empty($param['default'])) {
+					$message .= " Defaults to `{$param['default']}`.";
+				}
+				$this->out($this->_pad($message, 2));
 			}
 			$this->nl();
 		}
