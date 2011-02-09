@@ -127,13 +127,10 @@ $sanityChecks = array(
 
 ?>
 
-<?php
+<?php foreach ($sanityChecks as $checkName => $check): ?>
+	<?php echo $check(); ?>
+<?php endforeach; ?>
 
-foreach ($sanityChecks as $checkName => $check) {
-	echo $check();
-}
-
-?>
 <h3>Getting Started</h3>
 <p>
 	This is your application's default home page. To change this template, edit the file
