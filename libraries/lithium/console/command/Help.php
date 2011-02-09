@@ -125,7 +125,6 @@ class Help extends \lithium\console\Command {
 				$args[] = array(
 					'name' => $arg->getName(),
 					'optional' => $arg->isOptional(),
-					'default' => $arg->getDefaultValue(),
 					'description' => null
 				);
 			}
@@ -223,12 +222,7 @@ class Help extends \lithium\console\Command {
 			$this->out($this->_pad($usage), 'option');
 
 			if ($param['description']) {
-				$message = $param['description'];
-
-				if (!empty($param['default'])) {
-					$message .= " Defaults to `{$param['default']}`.";
-				}
-				$this->out($this->_pad($message, 2));
+				$this->out($this->_pad($param['description'], 2));
 			}
 			$this->nl();
 		}
