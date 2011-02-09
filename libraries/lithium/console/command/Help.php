@@ -63,6 +63,7 @@ class Help extends \lithium\console\Command {
 			$this->_render($properties);
 		}
 		if ($methods) {
+			$this->_render($methods[$method]['args']);
 			$this->_render($methods);
 		}
 		return true;
@@ -221,14 +222,6 @@ class Help extends \lithium\console\Command {
 			$usage = (!empty($param['usage'])) ? trim($param['usage'], ' []') : $param['name'];
 			$this->out($this->_pad($usage), 'option');
 
-			if (!empty($param['args'])) {
-				$args = array();
-				foreach ((array) $param['args'] as $arg => $desc) {
-					$arg = str_replace('$', '', trim($arg));
-					$args[] = $this->_pad("{$arg}: {$desc['text']}", 2);
-				}
-				$this->out($args);
-			}
 			if ($param['description']) {
 				$this->out($this->_pad($param['description'], 2));
 			}
