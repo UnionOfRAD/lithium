@@ -50,7 +50,10 @@ class Simple extends \lithium\template\view\Renderer {
 	 * @return string
 	 */
 	public function template($type, $options) {
-		return isset($options[$type]) ? $options[$type] : '';
+		if (isset($options[$type])) {
+			return $options[$type];
+		}
+		return isset($options['template']) ? $options['template'] : '';
 	}
 
 	protected function _toString($data) {

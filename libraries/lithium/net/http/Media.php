@@ -658,8 +658,10 @@ class Media extends \lithium\core\StaticObject {
 				case $handler['encode']:
 					return $self::encode($handler, $data, $response);
 				case class_exists($handler['view']):
-					$view = new $handler['view']($handler + array('response' => &$response));
-					return $view->render('all', $data, $options);
+					$class = $handler['view'];
+					unset($handler['view'], $options['view']);
+					$view = new $class($handler + array('response' => &$response));
+					return $view->render("all", (array) $data, $options);
 				case ($handler['template'] === false) && is_string($data):
 					return $data;
 				default:
@@ -730,6 +732,7 @@ class Media extends \lithium\core\StaticObject {
 				'paths'    => array(
 					'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
 					'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
+					'element'  => '{:library}/views/elements/{:template}.{:type}.php'
 				)
 			),
 			'html' => array(),

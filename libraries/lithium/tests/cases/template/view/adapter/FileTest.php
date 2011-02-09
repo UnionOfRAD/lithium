@@ -83,13 +83,19 @@ class FileTest extends \lithium\test\Unit {
 		));
 		$this->assertPattern('/\/views\/pages\/home\.html\.php$/', $template);
 
-		$template = $file->template('invalid', array('template' => 'foo'));
-		$this->assertNull($template);
-
 		$this->expectException('/Template not found/');
 		$file->template('template', array(
 			'controller' => 'pages', 'template' => 'foo', 'type' => 'html'
 		));
+	}
+
+	public function testInvalidTemplateType() {
+		$file = new File(array('compile' => false, 'paths' => array(
+			'template' => '{:library}/views/{:controller}/{:template}.{:type}.php'
+		)));
+
+		$this->expectException("Invalid template type 'invalid'.");
+		$template = $file->template('invalid', array('template' => 'foo'));
 	}
 }
 

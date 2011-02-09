@@ -72,6 +72,20 @@ class ViewTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testTwoStepRenderWithVariableCapture() {
+		$view = new View(array('loader' => 'Simple', 'renderer' => 'Simple'));
+
+		$result = $view->render(
+			array(
+				array('path' => 'element', 'capture' => array('data' => 'foo')),
+				array('path' => 'template')
+			),
+			array('name' => "Cap'n Crunch"),
+			array('element' => 'Logged in as: {:name}.', 'template' => '--{:foo}--')
+		);
+		$this->assertEqual('--Logged in as: Cap\'n Crunch.--', $result);
+	}
+
 	public function testFullRenderNoLayout() {
 		$view = new View(array('loader' => 'Simple', 'renderer' => 'Simple'));
 		$result = $view->render('all', array('type' => 'auth', 'success' => 'true'), array(

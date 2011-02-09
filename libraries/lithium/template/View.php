@@ -8,8 +8,8 @@
 
 namespace lithium\template;
 
-use RuntimeException;
 use lithium\core\Libraries;
+use lithium\template\TemplateException;
 
 /**
  * As one of the three pillars of the Model-View-Controller design pattern, the `View` class
@@ -104,22 +104,34 @@ class View extends \lithium\core\Object {
 	 */
 	protected $_renderer = null;
 
+	protected $_processes = array(
+		'all' => array('template', 'layout'),
+		'template' => array('template')
+	);
+
+	protected $_steps = array(
+		'template' => array('path' => 'template', 'capture' => array('context' => 'content')),
+		'layout' => array('path' => 'layout', 'conditions' => 'layout')
+	);
+
 	/**
 	 * Auto-configuration parameters.
 	 *
 	 * @var array Objects to auto-configure.
 	 */
-	protected $_autoConfig = array('request', 'response');
+	protected $_autoConfig = array(
+		'request', 'response', 'processes' => 'merge', 'steps' => 'merge'
+	);
 
 	/**
 	 * Constructor.
 	 *
 	 * @param array $config Configuration parameters.
 	 *        The available options are:
-	 *          - `loader`: For locating/reading view, layout and element
-	 *                      templates. Defaults to `File`.
-	 *          - `renderer`: Populates the view/layout with the data set from the controller.
-	 *                        Defaults to `File`.
+	 *          - `'loader'` _mixed_: For locating/reading view, layout and element
+	 *            templates. Defaults to `File`.
+	 *          - `'renderer'` _mixed_: Populates the view/layout with the data set from the
+	 *            controller. Defaults to `'File'`.
 	 *          - `request`: The request object to be made available in the view. Defalts to `null`.
 	 *          - `vars`: Defaults to `array()`.
 	 * @return void
@@ -131,6 +143,8 @@ class View extends \lithium\core\Object {
 			'vars' => array(),
 			'loader' => 'File',
 			'renderer' => 'File',
+			'steps' => array(),
+			'processes' => array(),
 			'outputFilters' => array()
 		);
 		parent::__construct($config + $defaults);
@@ -140,7 +154,6 @@ class View extends \lithium\core\Object {
 	 * Perform initialization of the View.
 	 *
 	 * @return void
-	 * @throws RuntimeException when template adapter cannot be found.
 	 */
 	protected function _init() {
 		parent::_init();
@@ -166,104 +179,104 @@ class View extends \lithium\core\Object {
 		$this->outputFilters += compact('h') + $this->_config['outputFilters'];
 	}
 
-	/**
-	 * Render a layout, template, view or element.
-	 *
-	 * @param string|array $type The view type. Possible values are `element`, `template`,
-	 *        `layout` and `all`.
-	 * @param array $data The data to be made available in the rendered view.
-	 * @param array $options Rendering options:
-	 *        - `context`: Render context
-	 *        - `type`: The media type to render. Defaults to `html`.
-	 *        - `layout`: The layout in which the rendered view should be wrapped in.
-	 * @return string The rendered view that was requested.
-	 */
-	public function render($type, $data = null, array $options = array()) {
-		$defaults = array('context' => array(), 'type' => 'html', 'layout' => null);
+	public function render($process, array $data = array(), array $options = array()) {
+		$defaults = array(
+			'context' => array(),
+			'type' => 'html',
+			'layout' => null,
+			'template' => null,
+		);
 		$options += $defaults;
 
-		$data = $data ?: array();
-		$template = null;
+		$data += isset($options['data']) ? (array) $options['data'] : array();
+		$paths = isset($options['paths']) ? (array) $options['paths'] : array();
+		unset($options['data'], $options['paths']);
+		$params = array_filter($options, function($val) { return $val && is_string($val); });
+		$result = null;
 
-		if (is_array($type)) {
-			list($type, $template) = each($type);
+		foreach ($this->_process($process, $params) as $step) {
+			if (isset($step['conditions']) && $cond = $step['conditions']) {
+				if (is_callable($cond) && !$cond($params, $data, $options)) {
+					continue;
+				}
+				if (is_string($cond) && !(isset($params[$cond]) && $params[$cond])) {
+					continue;
+				}
+			}
+			$result = $this->_step($step, $params, $data, $options);
 		}
-		return $this->{"_" . $type}($template, $data, $options);
+		return $result;
 	}
 
-	/**
-	 * The 'all' render type handler.
-	 *
-	 * @param string $template Not used in this handler. Can be specified as null.
-	 * @param array $data Template data.
-	 * @param array $options Layout rendering options.
-	 */
-	protected function _all($template, $data, array $options = array()) {
-		$content = $this->render('template', $data, $options);
+	protected function _step(array $step, array $params, array &$data, array &$options = array()) {
+		$step += array('path' => null, 'capture' => null);
+		$_renderer = $this->_renderer;
+		$_loader = $this->_loader;
 
-		if (!$options['layout']) {
-			return $content;
+		$params = compact('step', 'params', 'options') + array(
+			'data' => $data + $this->outputFilters
+		);
+
+		$filter = function($self, $params) use (&$_renderer, &$_loader) {
+			$template = $_loader->template($params['step']['path'], $params['params']);
+			return $_renderer->render($template, $params['data'], $params['options']);
+		};
+		$result = $this->_filter(__METHOD__, $params, $filter);
+
+		if ($step['capture'] && is_array($step['capture'])) {
+			switch (key($step['capture'])) {
+				case 'context':
+					$options['context'][current($step['capture'])] = $result;
+				break;
+				case 'data':
+					$data[current($step['capture'])] = $result;
+				break;
+			}
 		}
-		$options['context'] += array('content' => $content);
-		return $this->_layout($template, $data, $options);
+		return $result;
 	}
 
 	/**
-	 * The 'element' render type handler.
+	 * Converts a process name to an array containing the rendering steps to be executed for each
+	 * process.
 	 *
-	 * @param string $template Template to be rendered.
-	 * @param array $data Template data.
-	 * @param array $options Renderer options.
-	 * @filter This method can be filtered.
+	 * @param string $process A named set of rendering steps.
+	 * @param array $params
+	 * @return array A 2-dimensional array that defines the rendering process. The first dimension
+	 *         is a numerically-indexed array containing each rendering step. The second dimension
+	 *         represents the parameters for each step.
 	 */
-	protected function _element($template, $data, array $options = array()) {
-		$options += array('controller' => 'elements', 'template' => $template);
-		$template = $this->_loader->template('template', $options);
-		$data = $data + $this->outputFilters;
-		$params = compact('template', 'data', 'options');
-		$_renderer = $this->_renderer;
-		$filter = function($self, $params, $chain) use (&$_renderer) {
-			return $_renderer->render($params['template'], $params['data'], $params['options']);
-		};
-		return $this->_filter(__METHOD__, $params, $filter);
+	protected function _process($process, &$params) {
+		if (!is_array($process)) {
+			if (!isset($this->_processes[$process])) {
+				throw new TemplateException("Undefined rendering process '{$process}'.");
+			}
+			$process = $this->_processes[$process];
+		}
+		if (is_string(key($process))) {
+			return $this->_convertSteps($process, $params);
+		}
+		$result = array();
+
+		foreach ($process as $step) {
+			if (is_array($step)) {
+				$result[] = $step;
+				continue;
+			}
+			if (!isset($this->_steps[$step])) {
+				throw new TemplateException("Undefined rendering step '{$step}'.");
+			}
+			$result[] = $this->_steps[$step];
+		}
+		return $result;
 	}
 
-	/**
-	 * The 'template' render type handler.
-	 *
-	 * @param string $template Template to be rendered.
-	 * @param array $data Template data.
-	 * @param array $options Renderer options.
-	 * @filter This method can be filtered.
-	 */
-	protected function _template($template, $data, array $options = array()) {
-		$template = $this->_loader->template('template', $options);
-		$data = $data + $this->outputFilters;
-		$params = compact('template', 'data', 'options');
-		$_renderer = $this->_renderer;
-		$filter = function($self, $params, $chain) use (&$_renderer) {
-			return $_renderer->render($params['template'], $params['data'], $params['options']);
-		};
-		return $this->_filter(__METHOD__, $params, $filter);
-	}
-
-	/**
-	 * The 'layout' render type handler.
-	 *
-	 * @param string $template Not used in this handler.
-	 * @param array $data Template data.
-	 * @param array $options Renderer options.
-	 * @filter This method can be filtered.
-	 */
-	protected function _layout($template, $data, array $options = array()) {
-		$template = $this->_loader->template('layout', $options);
-		$data = (array) $data + $this->outputFilters;
-		$params = compact('template', 'data', 'options');
-		$_renderer = $this->_renderer;
-		$filter = function($self, $params, $chain) use (&$_renderer) {
-			return $_renderer->render($params['template'], $params['data'], $params['options']);
-		};
-		return $this->_filter(__METHOD__, $params, $filter);
+	protected function _convertSteps($command, &$params) {
+		if (count($command) == 1) {
+			$params['template'] = current($command);
+			return array(array('path' => key($command)));
+		}
+		return $command;
 	}
 }
 

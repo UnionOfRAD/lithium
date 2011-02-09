@@ -13,8 +13,9 @@ use lithium\core\Libraries;
 use lithium\template\TemplateException;
 
 /**
- * The File adapter implements both template loading and rendering, and uses the `view\Stream` class
- * to auto-escape template output with short tags (i.e. <?=).
+ * The File adapter implements both template loading and rendering, and uses the
+ * `lithium\template\view\Stream` class or `lithium\template\view\Compiler` class to auto-escape
+ * template output with short tags (i.e. `<?=`).
  *
  * For more information about implementing your own template loaders or renderers, see the
  * `lithium\template\View` class.
@@ -31,7 +32,8 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'classes' => 'merge', 'request', 'context', 'strings', 'handlers', 'view', 'compile'
+		'classes' => 'merge', 'request', 'context', 'strings',
+		'handlers', 'view', 'compile', 'paths'
 	);
 
 	/**
@@ -60,6 +62,8 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 */
 	protected $_vars = array();
 
+	protected $_paths = array();
+
 	/**
 	 * `File`'s dependencies. These classes are used by the output handlers to generate URLs
 	 * for dynamic resources and static assets, as well as compiling the templates.
@@ -74,7 +78,9 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	);
 
 	public function __construct(array $config = array()) {
-		$defaults = array('classes' => array(), 'compile' => true, 'extract' => true);
+		$defaults = array(
+			'classes' => array(), 'compile' => true, 'extract' => true, 'paths' => array()
+		);
 		parent::__construct($config + $defaults);
 	}
 
@@ -110,18 +116,13 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 * Returns a template file name
 	 *
 	 * @param string $type
-	 * @param array $options
+	 * @param array $params
 	 * @return string
 	 */
-	public function template($type, $options) {
-		if (!isset($this->_config['paths'][$type])) {
-			return null;
-		}
-		$options = array_filter($options, function($item) { return is_string($item); });
-
-		$library = Libraries::get(isset($options['library']) ? $options['library'] : true);
-		$options['library'] = $library['path'];
-		$path = $this->_paths((array) $this->_config['paths'][$type], $options);
+	public function template($type, array $params) {
+		$library = Libraries::get(isset($params['library']) ? $params['library'] : true);
+		$params['library'] = $library['path'];
+		$path = $this->_paths($type, $params);
 
 		if ($this->_compile) {
 			$compiler = $this->_classes['compiler'];
@@ -153,19 +154,24 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	}
 
 	/**
-	 * Searches a series of path templates for a matching template file, and returns the file name.
+	 * Searches one or more path templates for a matching template file, and returns the file name.
 	 *
-	 * @param array $paths The array of path templates to search.
-	 * @param array $options The set of options keys to be interpolated into the path templates
+	 * @param string $type
+	 * @param array $params The set of options keys to be interpolated into the path templates
 	 *              when searching for the correct file to load.
 	 * @return string Returns the first template file found. Throws an exception if no templates
 	 *         are available.
 	 */
-	protected function _paths($paths, $options) {
-		foreach ($paths as $path) {
-			if (file_exists($path = String::insert($path, $options))) {
-				return $path;
+	protected function _paths($type, array $params) {
+		if (!isset($this->_paths[$type])) {
+			throw new TemplateException("Invalid template type '{$type}'.");
+		}
+
+		foreach ((array) $this->_paths[$type] as $path) {
+			if (!file_exists($path = String::insert($path, $params))) {
+				continue;
 			}
+			return $path;
 		}
 		throw new TemplateException("Template not found at {$path}");
 	}

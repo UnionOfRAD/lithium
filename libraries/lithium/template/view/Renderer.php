@@ -312,7 +312,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 * @return mixed A string or array, depending on whether `$property` is specified.
 	 */
 	public function context($property = null) {
-		if (!empty($property)) {
+		if ($property) {
 			return isset($this->_context[$property]) ? $this->_context[$property] : null;
 		}
 		return $this->_context;
