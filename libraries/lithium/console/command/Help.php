@@ -22,33 +22,33 @@ class Help extends \lithium\console\Command {
 	/**
 	 * Auto run the help command.
 	 *
-	 * @param string $name Name of the command to return help about.
+	 * @param string $command Name of the command to return help about.
 	 * @param string $method The method of the command to get help for.
 	 *        This defaults to `'run'` which is the default main method
 	 *        for lithium commands.
 	 * @return void
 	 */
-	public function run($name = null, $method = 'run') {
-		if (!$name) {
+	public function run($command = null, $method = 'run') {
+		if (!$command) {
 			$this->_renderCommands();
 			return true;
 		}
-		$name = Inflector::classify($name);
+		$command = Inflector::classify($command);
 
-		if (!$class = Libraries::locate('command', $name)) {
-			$this->error("{$name} not found");
+		if (!$class = Libraries::locate('command', $command)) {
+			$this->error("{$command} not found");
 			return false;
 		}
-		if (strpos($name, '\\') !== false) {
-			$name = join('', array_slice(explode("\\", $name), -1));
+		if (strpos($command, '\\') !== false) {
+			$command = join('', array_slice(explode("\\", $command), -1));
 		}
-		$name = strtolower(Inflector::slug($name));
+		$command = strtolower(Inflector::slug($command));
 
 		$methods = $this->_methods($class);
 		$properties = $this->_properties($class);
 		$info = Inspector::info($class);
 
-		$this->_renderUsage($name, $method, $methods, $properties);
+		$this->_renderUsage($command, $method, $methods, $properties);
 
 		if (!empty($info['description'])) {
 			$this->nl();
