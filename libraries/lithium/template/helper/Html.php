@@ -89,8 +89,7 @@ class Html extends \lithium\template\Helper {
 	 * @return string A meta tag containing the specified character set.
 	 */
 	public function charset($charset = 'utf-8') {
-		$options = compact('charset') + array('type' => 'text/html');
-		return $this->_render(__METHOD__, 'charset', $options);
+		return $this->_render(__METHOD__, 'charset', compact('charset'));
 	}
 
 	/**
