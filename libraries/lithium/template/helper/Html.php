@@ -194,6 +194,7 @@ class Html extends \lithium\template\Helper {
 			$this->_context->styles($style);
 		}
 	}
+
 	/**
 	 * Creates a tag for the ```<head>``` section of your document.
 	 *
