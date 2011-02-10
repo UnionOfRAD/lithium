@@ -85,12 +85,11 @@ class Html extends \lithium\template\Helper {
 	/**
 	 * Returns a charset meta-tag.
 	 *
-	 * @param string $charset The character set to be used in the meta tag. Example: `"utf-8"`.
+	 * @param string $charset The character set to be used in the meta tag. Defaults to `utf-8`.
 	 * @return string A meta tag containing the specified character set.
 	 */
-	public function charset($charset = null) {
-		$options = array('type' => 'text/html');
-		$options['charset'] = $charset ?: 'utf-8';
+	public function charset($charset = 'utf-8') {
+		$options = compact('charset') + array('type' => 'text/html');
 		return $this->_render(__METHOD__, 'charset', $options);
 	}
 
