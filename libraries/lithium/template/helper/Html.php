@@ -25,7 +25,7 @@ class Html extends \lithium\template\Helper {
 		'block'            => '<div{:options}>{:content}</div>',
 		'block-end'        => '</div>',
 		'block-start'      => '<div{:options}>',
-		'charset'     => '<meta http-equiv="Content-Type" content="{:type}; charset={:charset}" />',
+		'charset'          => '<meta charset="{:charset}" />',
 		'image'            => '<img src="{:path}"{:options} />',
 		'js-block'         => '<script type="text/javascript"{:options}>{:content}</script>',
 		'js-end'           => '</script>',

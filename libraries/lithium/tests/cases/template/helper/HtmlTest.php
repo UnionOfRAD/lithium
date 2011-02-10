@@ -53,7 +53,8 @@ class HtmlTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests that character set declarations render the correct character set and meta tag.
+	 * Tests that character set declarations render the
+	 * correct character set and short meta tag.
 	 *
 	 * @return void
 	 */
@@ -61,13 +62,13 @@ class HtmlTest extends \lithium\test\Unit {
 		$result = $this->html->charset();
 
 		$this->assertTags($result, array('meta' => array(
-			'http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8'
+			'charset' => 'utf-8'
 		)));
 
 		$result = $this->html->charset('UTF-7');
 
 		$this->assertTags($result, array('meta' => array(
-			'http-equiv' => 'Content-Type', 'content' => 'text/html; charset=UTF-7'
+			'charset' => 'UTF-7'
 		)));
 	}
 
