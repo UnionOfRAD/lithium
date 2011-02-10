@@ -63,6 +63,12 @@ class ViewTest extends \lithium\test\Unit {
 		$expected = "Logged in as: Cap'n Crunch.";
 		$this->assertEqual($expected, $result);
 
+		$result = $view->render('element', array('name' => "Cap'n Crunch"), array(
+			'element' => 'Logged in as: {:name}.'
+		));
+		$expected = "Logged in as: Cap'n Crunch.";
+		$this->assertEqual($expected, $result);
+
 		$xmlHeader = '<' . '?xml version="1.0" ?' . '>' . "\n";
 		$result = $view->render('all', array('type' => 'auth', 'success' => 'true'), array(
 			'layout' => $xmlHeader . "\n{:content}\n",

@@ -14,30 +14,37 @@ use lithium\template\TemplateException;
 /**
  * As one of the three pillars of the Model-View-Controller design pattern, the `View` class
  * (along with other supporting classes) is responsible for taking the data passed from the
- * request and/or controller, inserting this into the requested view/layout, and then presenting
- * the rendered content in the appropriate content-type.
+ * request and/or controller, inserting this into the requested template/layout, and then returning
+ * the rendered content.
  *
  * The `View` class interacts with a variety of other classes in order to achieve maximum
  * flexibility and configurability at all points in the view rendering and presentation
  * process. The `Loader` class is tasked with locating and reading template files which are then
  * passed to the `Renderer` adapter subclass.
  *
- * It is also possible to instantiate and call `View` directly, in cases where you wish to bypass
- * all other parts of the framework and simply return rendered content.
+ * The `View` class operates on _processes_, which define the steps to render a completed view. For
+ * example, the default process, which renders a template wrapped in a layout, is comprised of two
+ * _steps_: the first step renders the main template and captures it to the rendering context, where
+ * it is embedded in the layout in the second step. See the `$_steps` and `$_processes` properties
+ * for more information.
+ *
+ * Using steps and processes, you can create rendering scenarios to suit very complex needs.
+ *
+ * By default, the `View` class is called during the course of the framework's dispatch cycle by the
+ * `Media` class. However, it is also possible to instantiate and call `View` directly, in cases
+ * where you wish to bypass all other parts of the framework and simply return rendered content.
  *
  * A simple example, using the `Simple` renderer/loader for string templates:
  *
  * {{{
  * $view = new View(array('loader' => 'Simple', 'renderer' => 'Simple'));
- * echo $view->render(array('element' => 'Hello, {:name}!'), array(
- *     'name' => "Robert"
- * ));
+ * echo $view->render('element', array('name' => "Robert"), array('element' => 'Hello, {:name}!'));
  *
  * // Output:
  * "Hello, Robert!";
  * }}}
  *
- * (note: This is easily adapted for XML templating).
+ *  _Note_: This is easily adapted for XML templating.
  *
  * Another example, this time of something that could be used in an appliation
  * error handler:
@@ -52,13 +59,12 @@ use lithium\template\TemplateException;
  *
  * echo $View->render('all', array('content' => $info), array(
  *     'template' => '404',
- *     'type' => 'html',
  *     'layout' => 'error'
  * ));
  * }}}
  *
- * @see lithium\view\Renderer
- * @see lithium\view\adapter
+ * @see lithium\template\view\Renderer
+ * @see lithium\template\view\adapter
  * @see lithium\net\http\Media
  */
 class View extends \lithium\core\Object {
@@ -104,14 +110,33 @@ class View extends \lithium\core\Object {
 	 */
 	protected $_renderer = null;
 
+	/**
+	 * View processes are aggregated lists of steps taken to to create a complete, rendered view.
+	 * For example, the default process, `'all'`, renders a template, then renders a layout, using
+	 * the rendered template content. A process can be defined using one or more steps defined in
+	 * the `$_steps` property.
+	 *
+	 * @see lithium\template\View::$_steps
+	 * @see lithium\template\View::render()
+	 * @var array
+	 */
 	protected $_processes = array(
 		'all' => array('template', 'layout'),
-		'template' => array('template')
+		'template' => array('template'),
+		'element' => array('element')
 	);
 
+	/**
+	 * The list of available rendering steps. Each step contains instructions for how to render one
+	 * piece of a multi-step view rendering. The `View` class combines multiple steps into
+	 * _processes_ to create the final output.
+	 *
+	 * @var array
+	 */
 	protected $_steps = array(
 		'template' => array('path' => 'template', 'capture' => array('context' => 'content')),
-		'layout' => array('path' => 'layout', 'conditions' => 'layout')
+		'layout' => array('path' => 'layout', 'conditions' => 'layout'),
+		'element' => array('path' => 'element')
 	);
 
 	/**
