@@ -349,7 +349,9 @@ class HtmlTest extends \lithium\test\Unit {
 		$expected = array('meta' => array('author' => 'foo'));
 		$this->assertTags($result, $expected);
 
-		$result = $this->html->head('unexisting-name', array('options' => array('author' => 'foo')));
+		$result = $this->html->head('unexisting-name', array(
+			'options' => array('author' => 'foo')
+		));
 		$this->assertNull($result);
 	}
 
