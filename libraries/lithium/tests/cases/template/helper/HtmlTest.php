@@ -60,13 +60,11 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public function testCharset() {
 		$result = $this->html->charset();
-
 		$this->assertTags($result, array('meta' => array(
 			'charset' => 'utf-8'
 		)));
 
 		$result = $this->html->charset('UTF-7');
-
 		$this->assertTags($result, array('meta' => array(
 			'charset' => 'UTF-7'
 		)));
