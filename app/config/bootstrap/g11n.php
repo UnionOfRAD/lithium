@@ -124,7 +124,7 @@ foreach (array('phone', 'postalCode', 'ssn') as $name) {
  * the locale of the request or if that is not available retrieving a locale preferred
  * by the client.
  */
-ActionDispatcher::applyFilter('_callable', function($self, $params, $chain) {
+$setLocale = function($self, $params, $chain) {
 	$request = $params['request'];
 	$controller = $chain->next($self, $params, $chain);
 
@@ -133,17 +133,8 @@ ActionDispatcher::applyFilter('_callable', function($self, $params, $chain) {
 	}
 	Environment::set(Environment::get(), array('locale' => $request->locale));
 	return $controller;
-});
-
-ConsoleDispatcher::applyFilter('_callable', function($self, $params, $chain) {
-	$request = $params['request'];
-	$command = $chain->next($self, $params, $chain);
-
-	if (!$request->locale) {
-		$request->params['locale'] = Locale::preferred($request);
-	}
-	Environment::set(Environment::get(), array('locale' => $request->locale));
-	return $command;
-});
+};
+ActionDispatcher::applyFilter('_callable', $setLocale);
+ConsoleDispatcher::applyFilter('_callable', $setLocale);
 
 ?>
