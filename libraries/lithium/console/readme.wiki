@@ -1,4 +1,4 @@
-﻿The console package contains a set of libraries designed for simplifying console
+The console package contains a set of libraries designed for simplifying console
 based interaction with users.
 
 #### Command line overview
