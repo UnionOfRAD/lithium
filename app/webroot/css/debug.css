@@ -403,6 +403,16 @@ pre.lithium-debug {
 	position: relative;
 }
 
+div.lithium-exception-class, div.lithium-exception-location {
+	font-weight: bold;
+}
+
+div.lithium-exception-message {
+	color: #000;
+	background: #f0f0f0;
+	padding: 1em;
+}
+
 div.lithium-stack-trace {
 	background: #fff;
 	border: 4px dotted #ffcc00;
@@ -413,6 +423,19 @@ div.lithium-stack-trace {
 	line-height: 1.5em;
 	overflow: auto;
 	position: relative;
+}
+
+div.lithium-stack-trace ol {
+	counter-reset: item -1;
+}
+
+div.lithium-stack-trace ol li {
+	display: block
+}
+
+div.lithium-stack-trace ol li:before {
+	content: counter(item) ". ";
+	counter-increment: item;
 }
 
 /*--- Code Highlighting ---*/
@@ -440,7 +463,6 @@ div.lithium-code-dump pre, div.lithium-code-dump pre code {
 
 div.lithium-code-dump span.code-highlight {
 	background-color: #ff0;
-	padding: 4px;
 }
 
 /*--- Code Coverage Analysis ---*/
