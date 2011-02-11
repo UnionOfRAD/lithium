@@ -29,8 +29,18 @@ chmod +x /path/to/libraries/lithium/console/li3
 }}}
 
 Once you've followed these steps, save your modified `.profile`, open a new
-shell and that's it. Alternatively, if you are running Bash as your shell, you
-can use `~/.bash_profile` to hold you path changes.
+shell and that's it. If you are running Bash as your shell, you
+can also use `~/.bash_profile` to hold you path changes.
+
+As an alternative to adding the tool to your `$PATH` you can create a permanent
+alias by adding the following line to `~/.bashrc`.
+
+{{{
+alias li3='/path/to/lithium/libraries/lithium/console/li3'
+}}}
+
+Please note that the tool cannot be symlinked into `$PATH`, you must use one of
+the two described techniques to make it systemwide available as `li3`.
 
 **Configuring your %PATH% on Windows**
 
