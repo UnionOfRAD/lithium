@@ -368,10 +368,31 @@ class Request extends \lithium\net\http\Message {
 	}
 
 	/**
-	 * Uses a custom prefix syntax to extract specific data points from the request.
+	 * This method allows easy extraction of any request data using a prefixed key syntax. By
+	 * passing keys in the form of `'prefix:key'`, it is possible to query different information of
+	 * various different types, including GET and POST data, and server environment variables. The
+	 * full list of prefixes is as follows:
 	 *
-	 * @param string $key data:title, env:base
-	 * @return string
+	 * - `'data'`: Retrieves values from POST data.
+	 * - `'params'`: Retrieves query parameters returned from the routing system.
+	 * - `'query'`: Retrieves values from GET data.
+	 * - `'env'`: Retrieves values from the server or environment, such as `'env:https'`, or custom
+	 *   environment values, like `'env:base'`. See the `env()` method for more info.
+	 * - `'http'`: Retrieves header values (i.e. `'http:accept'`), or the HTTP request method (i.e.
+	 *   `'http:method'`).
+	 *
+	 * This method is used in several different places in the framework in order to provide the
+	 * ability to act conditionally on different aspects of the request. See `Media::type()` (the
+	 * section on content negotiation) and the routing system for more information.
+	 *
+	 *  _Note_: All keys should be _lower-cased_, even when getting HTTP headers.
+	 * @see lithium\action\Request::env()
+	 * @see lithium\net\http\Media::type()
+	 * @see lithium\net\http\Router
+	 * @param string $key A prefixed key indiciating what part of the request data the requested
+	 *               value should come from, and the name of the value to retrieve, in lower case.
+	 * @return string Returns the value of a GET, POST, routing or environment variable, or an
+	 *         HTTP header or method name.
 	 */
 	public function get($key) {
 		list($var, $key) = explode(':', $key);
