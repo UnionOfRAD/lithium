@@ -305,7 +305,7 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	 * @var array $stack A `debug_backtrace()`-compatible stack trace output.
 	 * @return array Returns a flat stack array containing class and method references.
 	 */
-	protected static function _trace(array $stack) {
+	public static function trace(array $stack) {
 		$result = array();
 
 		foreach ($stack as $frame) {
