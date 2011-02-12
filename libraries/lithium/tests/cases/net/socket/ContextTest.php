@@ -65,6 +65,10 @@ class ContextTest extends \lithium\test\Unit {
 		$this->assertEqual(false, $this->socket->encoding());
 	}
 
+	public function testEof() {
+		$this->assertTrue(false, $this->socket->eof());
+	}
+
 	public function testMessageInConfig() {
 		$socket = new Context(array('message' => new Request()));
 		$this->assertTrue(is_resource($socket->open()));
@@ -75,11 +79,20 @@ class ContextTest extends \lithium\test\Unit {
 		$this->assertTrue(is_resource($stream->open()));
 		$this->assertTrue(is_resource($stream->resource()));
 
-		$response = $stream->send(new Request(), array('response' => 'lithium\net\http\Response'));
-		$this->assertTrue($response instanceof Response);
-
-		$this->assertEqual(trim(file_get_contents($this->_testUrl)), trim($response->body()));
+		$this->assertTrue($stream->write(null));
+		$result = $stream->read();
+		$this->assertTrue($result);
+		$this->assertPattern("/^HTTP/", $result);
 		$this->assertTrue($stream->eof());
+	}
+
+	public function testSend() {
+		$stream = new Context($this->_testConfig);
+		$this->assertTrue(is_resource($stream->open()));
+		$result = $stream->send(new Request(), array('response' => 'lithium\net\http\Response'));
+		$this->assertTrue($result instanceof Response);
+		$this->assertEqual(trim(file_get_contents($this->_testUrl)), trim($result->body()));
+		$this->assertTrue(!empty($result->headers), 'Response is missing headers.');
 	}
 }
 

@@ -90,13 +90,20 @@ class CurlTest extends \lithium\test\Unit {
 		$this->assertTrue(is_resource($stream->open()));
 		$this->assertTrue(is_resource($stream->resource()));
 
-		$stream->set(CURLOPT_URL, $this->_testUrl);
 		$this->assertTrue($stream->write(null));
-		$this->assertTrue($stream->read());
-
-		$response = $stream->send(new Request(), array('response' => 'lithium\net\http\Response'));
-		$this->assertEqual(trim(file_get_contents($this->_testUrl)), trim($response->body()));
+		$result = $stream->read();
+		$this->assertTrue($result);
+		$this->assertPattern("/^HTTP/", $result);
 		$this->assertNull($stream->eof());
+	}
+
+	public function testSend() {
+		$stream = new Curl($this->_testConfig);
+		$this->assertTrue(is_resource($stream->open()));
+		$result = $stream->send(new Request(), array('response' => 'lithium\net\http\Response'));
+		$this->assertTrue($result instanceof Response);
+		$this->assertEqual(trim(file_get_contents($this->_testUrl)), trim($result->body()));
+		$this->assertTrue(!empty($result->headers), 'Response is missing headers.');
 	}
 }
 

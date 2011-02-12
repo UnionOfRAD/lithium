@@ -108,25 +108,32 @@ class Curl extends \lithium\net\Socket {
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
-		curl_setopt_array($this->_resource, $this->options);
 		return curl_exec($this->_resource);
 	}
 
 	/**
-	 * Reads data from the curl connection.
-	 * The `read` method will utilize the curl options that have been set.
+	 * Writes data to curl options
 	 *
-	 * @link http://php.net/manual/en/function.curl-exec.php PHP Manual: curl_exec()
-	 * @param array $data
-	 * @return mixed Boolean `false` if the resource handle is unavailable, and the result
-	 *         of `curl_exec()` otherwise.
+	 * @param object $message a `lithium\net\Message` object
+	 * @return boolean
 	 */
-	public function write($data) {
+	public function write($message) {
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
-		curl_setopt_array($this->_resource, $this->options);
-		return curl_exec($this->_resource);
+		$this->set(CURLOPT_URL, $message->to('url'));
+
+		if ($options['ignoreExpect']) {
+			$message->headers('Expect', ' ');
+		}
+		if (isset($message->headers)) {
+			$this->set(CURLOPT_HTTPHEADER, $message->headers());
+		}
+		if (isset($message->method) && $message->method == 'POST') {
+			$this->set(array(CURLOPT_POST => true, CURLOPT_POSTFIELDS => $message->body()));
+		}
+		return (boolean) curl_setopt_array($this->_resource, $this->options);
+		;
 	}
 
 	/**
@@ -183,21 +190,14 @@ class Curl extends \lithium\net\Socket {
 	 * @return object a response object based on `\lithium\net\Message`
 	 */
 	public function send($message, array $options = array()) {
-		$defaults = array('response' => $this->_classes['response']);
+		$defaults = array(
+			'response' => $this->_classes['response'],
+			'ignoreExpect' => $this->_config['ignoreExpect']
+		);
 		$options += $defaults;
-		$this->set(CURLOPT_URL, $message->to('url'));
 
-		if ($this->_config['ignoreExpect']) {
-			$message->headers('Expect', ' ');
-		}
-		if (isset($message->headers)) {
-			$this->set(CURLOPT_HTTPHEADER, $message->headers());
-		}
-		if (isset($message->method) && $message->method == 'POST') {
-			$this->set(array(CURLOPT_POST => true, CURLOPT_POSTFIELDS => $message->body()));
-		}
-		if ($message = $this->write($message)) {
-			$message = $message ?: $this->read();
+		if ($this->write($message)) {
+			$message = $this->read();
 			return $this->_instance($options['response'], compact('message'));
 		}
 	}

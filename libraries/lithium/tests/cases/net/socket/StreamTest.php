@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\net\socket;
 
+use lithium\net\http\Request;
 use lithium\net\socket\Stream;
 
 class StreamTest extends \lithium\test\Unit {
@@ -20,6 +21,8 @@ class StreamTest extends \lithium\test\Unit {
 		'timeout' => 2
 	);
 
+	protected $_testUrl = 'http://localhost';
+
 	public function testAllMethodsNoConnection() {
 		$stream = new Stream(array('scheme' => null));
 		$this->assertFalse($stream->open());
@@ -29,7 +32,7 @@ class StreamTest extends \lithium\test\Unit {
 		$this->assertFalse($stream->write(null));
 		$this->assertFalse($stream->read());
 		$this->assertTrue($stream->eof());
-		$this->assertNull($stream->send(''));
+		$this->assertNull($stream->send(new Request()));
 	}
 
 	public function testOpen() {
@@ -76,30 +79,22 @@ class StreamTest extends \lithium\test\Unit {
 
 	public function testWriteAndRead() {
 		$stream = new Stream($this->_testConfig);
-		$result = $stream->open();
-		$data = "GET / HTTP/1.1\r\n";
-		$data .= "Host: localhost\r\n";
-		$data .= "Connection: Close\r\n\r\n";
-		$this->assertTrue($stream->write($data));
+		$this->assertTrue(is_resource($stream->open()));
+		$this->assertTrue(is_resource($stream->resource()));
 
-		$result = $stream->eof();
-		$this->assertFalse($result);
-
+		$this->assertTrue($stream->write(null));
 		$result = $stream->read();
+		$this->assertTrue($result);
 		$this->assertPattern("/^HTTP/", $result);
+		$this->assertTrue($stream->eof());
 	}
 
 	public function testSend() {
 		$stream = new Stream($this->_testConfig);
-		$result = $stream->open();
-		$data = "GET / HTTP/1.1\r\n";
-		$data .= "Host: localhost\r\n";
-		$data .= "Connection: Close\r\n\r\n";
-
-		$result = $stream->send($data, array('classes' => array(
-			'response' => '\lithium\net\http\Response'
-		)));
-		$this->assertTrue($result);
+		$this->assertTrue(is_resource($stream->open()));
+		$result = $stream->send(new Request(), array('response' => 'lithium\net\http\Response'));
+		$this->assertTrue($result instanceof Response);
+		$this->assertEqual(trim(file_get_contents($this->_testUrl)), trim($result->body()));
 		$this->assertTrue(!empty($result->headers), 'Response is missing headers.');
 	}
 }
