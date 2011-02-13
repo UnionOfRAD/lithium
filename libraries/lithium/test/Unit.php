@@ -732,10 +732,9 @@ class Unit extends \lithium\core\Object {
 			$types = array('expected' => gettype($expected), 'result' => gettype($result));
 
 			if ($types['expected'] !== $types['result']) {
-				return array('trace' => $trace,
-					'expected' => trim("({$types['expected']}) " . print_r($expected, true)),
-					'result' => trim("({$types['result']}) " . print_r($result, true))
-				);
+				$expected = trim("({$types['expected']}) " . print_r($expected, true));
+				$result = trim("({$types['result']}) " . print_r($result, true));
+				return compact('trace', 'expected', 'result');
 			}
 		};
 		if ($types = $compareTypes($expected, $result, $trace)) {
