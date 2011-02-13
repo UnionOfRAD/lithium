@@ -728,18 +728,24 @@ class Unit extends \lithium\core\Object {
 	 * @return array Data with the keys `trace'`, `'expected'` and `'result'`.
 	 */
 	protected function _compare($type, $expected, $result = null, $trace = null) {
-		$types = array('expected' => gettype($expected), 'result' => gettype($result));
+		$compareTypes = function($expected, $result, $trace) {
+			$types = array('expected' => gettype($expected), 'result' => gettype($result));
 
-		if ($types['expected'] !== $types['result']) {
-			return array('trace' => $trace,
-				'expected' => trim("({$types['expected']}) " . print_r($expected, true)),
-				'result' => trim("({$types['result']}) " . print_r($result, true))
-			);
+			if ($types['expected'] !== $types['result']) {
+				return array('trace' => $trace,
+					'expected' => trim("({$types['expected']}) " . print_r($expected, true)),
+					'result' => trim("({$types['result']}) " . print_r($result, true))
+				);
+			}
+		};
+		if ($types = $compareTypes($expected, $result, $trace)) {
+			return $types;
 		}
 		$data = array();
 
 		if (!is_scalar($expected)) {
 			foreach ($expected as $key => $value) {
+				$newTrace = "{$trace}[{$key}]";
 				$isObject = false;
 
 				if (is_object($expected)) {
@@ -747,8 +753,13 @@ class Unit extends \lithium\core\Object {
 					$expected = (array) $expected;
 					$result = (array) $result;
 				}
-				$check = array_key_exists($key, $result) ? $result[$key] : array();
-				$newTrace = "{$trace}[{$key}]";
+				if (!array_key_exists($key, $result)) {
+					$trace = (!$key) ? null : $newTrace;
+					$expected = (!$key) ? $expected : $value;
+					$result = ($key) ? null : $result;
+					return compact('trace', 'expected', 'result');
+				}
+				$check = $result[$key];
 
 				if ($isObject) {
 					$newTrace = ($trace) ? "{$trace}->{$key}" : $key;
@@ -757,6 +768,9 @@ class Unit extends \lithium\core\Object {
 				}
 				if ($type === 'identical') {
 					if ($value === $check) {
+						if ($types = $compareTypes($value, $check, $trace)) {
+							return $types;
+						}
 						continue;
 					}
 					if ($check === array()) {
@@ -771,6 +785,9 @@ class Unit extends \lithium\core\Object {
 					}
 				} else {
 					if ($value == $check) {
+						if ($types = $compareTypes($value, $check, $trace)) {
+							return $types;
+						}
 						continue;
 					}
 					if (!is_array($value)) {
@@ -788,7 +805,6 @@ class Unit extends \lithium\core\Object {
 				return $data;
 			}
 		}
-
 		if (!is_scalar($result)) {
 			$data = $this->_compare($type, $result, $expected);
 
@@ -800,14 +816,10 @@ class Unit extends \lithium\core\Object {
 				);
 			}
 		}
-
-		if ($type === 'identical') {
-			if ($expected === $result) {
-				return true;
+		if ((($type === 'identical') ? $expected === $result : $expected == $result)) {
+			if ($types = $compareTypes($expected, $result, $trace)) {
+				return $types;
 			}
-			return compact('trace', 'expected', 'result');
-		}
-		if ($expected == $result) {
 			return true;
 		}
 		return compact('trace', 'expected', 'result');
