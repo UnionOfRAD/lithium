@@ -110,6 +110,7 @@ class RecordTest extends \lithium\test\Unit {
 		$this->assertFalse($this->record->data());
 		$expected = array('id' => 1, 'name' => 'Joe Bloggs', 'address' => 'The Park');
 		$this->record->set($expected);
+		$this->assertEqual($expected, $this->record->data());
 		$this->assertEqual($expected, $this->record->to('array'));
 		$this->assertEqual($expected['name'], $this->record->data('name'));
 	}

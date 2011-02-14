@@ -235,17 +235,17 @@ class Entity extends \lithium\core\Object {
 	}
 
 	/**
-	* Access the data fields of the record. Can also access a $named field.
-	*
-	* @param string $name Optionally included field name.
-	* @return array|string Entire data array if $name is empty, otherwise the value from the named
-	*         field.
-	*/
+	 * Access the data fields of the record. Can also access a $named field.
+	 *
+	 * @param string $name Optionally included field name.
+	 * @return array|string Entire data array if $name is empty, otherwise the value from the named
+	 *         field.
+	 */
 	public function data($name = null) {
 		if ($name) {
 			return $this->__get($name);
 		}
-		return array_merge($this->_data, $this->_updated);
+		return $this->_updated + $this->_data;
 	}
 
 	/**
@@ -352,7 +352,8 @@ class Entity extends \lithium\core\Object {
 		if (!is_numeric($this->_data[$field])) {
 			throw new UnexpectedValueException("Field '{$field}' cannot be incremented.");
 		}
-		$this->_data[$field] += $value;
+		$base = isset($this->_updated[$field]) ? $this->_updated[$field] : $this->_data[$field];
+		return $this->_updated[$field] = ($base + $value);
 	}
 
 	/**
@@ -415,7 +416,7 @@ class Entity extends \lithium\core\Object {
 	public function to($format, array $options = array()) {
 		switch ($format) {
 			case 'array':
-				$result = Col::toArray($this->_data);
+				$result = Col::toArray($this->data());
 			break;
 			default:
 				$result = $this;
