@@ -85,10 +85,13 @@ class Html extends \lithium\template\Helper {
 	/**
 	 * Returns a charset meta-tag.
 	 *
-	 * @param string $charset The character set to be used in the meta tag. Defaults to `utf-8`.
+	 * @param string $charset The character set to be used in the meta tag. Defaults to the
+	 *        encoding of the `Response` object attached to the current context. The
+	 *        default encoding of that object is `UTF-8`.
 	 * @return string A meta tag containing the specified character set.
 	 */
-	public function charset($charset = 'utf-8') {
+	public function charset($charset = null) {
+		$charset = $charset ?: $this->_context->response()->encoding;
 		return $this->_render(__METHOD__, 'charset', compact('charset'));
 	}
 

@@ -10,6 +10,8 @@ namespace lithium\tests\cases\template\helper;
 
 use lithium\net\http\Router;
 use lithium\template\helper\Html;
+use lithium\action\Request;
+use lithium\action\Response;
 use lithium\tests\mocks\template\helper\MockHtmlRenderer;
 
 class HtmlTest extends \lithium\test\Unit {
@@ -34,7 +36,12 @@ class HtmlTest extends \lithium\test\Unit {
 		Router::connect('/{:controller}/{:action}/{:id}.{:type}');
 		Router::connect('/{:controller}/{:action}.{:type}');
 
-		$this->context = new MockHtmlRenderer();
+		$this->context = new MockHtmlRenderer(array(
+			'request' => new Request(array(
+				'base' => '', 'env' => array('HTTP_HOST' => 'foo.local')
+			)),
+			'response' => new Response()
+		));
 		$this->html = new Html(array('context' => &$this->context));
 	}
 
@@ -60,6 +67,11 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public function testCharset() {
 		$result = $this->html->charset();
+		$this->assertTags($result, array('meta' => array(
+			'charset' => 'UTF-8'
+		)));
+
+		$result = $this->html->charset('utf-8');
 		$this->assertTags($result, array('meta' => array(
 			'charset' => 'utf-8'
 		)));
