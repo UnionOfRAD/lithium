@@ -10,6 +10,7 @@ namespace lithium\tests\cases\template\view;
 
 use lithium\template\View;
 use lithium\action\Request;
+use lithium\action\Response;
 use lithium\template\Helper;
 use lithium\template\helper\Html;
 use lithium\template\view\adapter\Simple;
@@ -22,9 +23,12 @@ class RendererTest extends \lithium\test\Unit {
 		$this->_routes = Router::get();
 		Router::reset();
 		Router::connect('/{:controller}/{:action}');
-		$this->subject = new Simple(array('request' => new Request(array(
-			'base' => '', 'env' => array('HTTP_HOST' => 'foo.local')
-		))));
+		$this->subject = new Simple(array(
+			'request' => new Request(array(
+				'base' => '', 'env' => array('HTTP_HOST' => 'foo.local')
+			)),
+			'response' => new Response()
+		));
 	}
 
 	public function tearDown() {
@@ -181,8 +185,10 @@ class RendererTest extends \lithium\test\Unit {
 
 	public function testGetters() {
 		$this->assertTrue($this->subject->request() instanceof Request);
+		$this->assertTrue($this->subject->response() instanceof Response);
 		$this->subject = new Simple();
 		$this->assertNull($this->subject->request());
+		$this->assertNull($this->subject->response());
 	}
 
 	public function testSetAndData() {

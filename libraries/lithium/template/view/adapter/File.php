@@ -32,8 +32,8 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'classes' => 'merge', 'request', 'context', 'strings',
-		'handlers', 'view', 'compile', 'paths'
+		'classes' => 'merge', 'request', 'response', 'context',
+		'strings', 'handlers', 'view', 'compile', 'paths'
 	);
 
 	/**

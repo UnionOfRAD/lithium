@@ -33,7 +33,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'request', 'context', 'strings', 'handlers', 'view', 'classes' => 'merge'
+		'request', 'response', 'context', 'strings', 'handlers', 'view', 'classes' => 'merge'
 	);
 
 	/**
@@ -92,6 +92,13 @@ abstract class Renderer extends \lithium\core\Object {
 	protected $_request = null;
 
 	/**
+	 * The `Response` object instance, if applicable.
+	 *
+	 * @var object The response object.
+	 */
+	protected $_response = null;
+
+	/**
 	 * Automatically matches up template strings by name to output handlers.  A handler can either
 	 * be a string, which represents a method name of the helper, or it can be a closure or callable
 	 * object.  A handler takes 3 parameters: the value to be filtered, the name of the helper
@@ -144,6 +151,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 * - `handlers`: An array of output handlers for string template inputs.
 	 * - `request`: The `Request` object associated with this renderer and passed to the
 	 *              defined handlers.
+	 * - `response`: The `Response` object associated with this renderer.
 	 * - `context`: An array of the current rendering context data, including `content`,
 	 *              `title`, `scripts`, `head` and `styles`.
 	 *
@@ -156,6 +164,7 @@ abstract class Renderer extends \lithium\core\Object {
 			'strings' => array(),
 			'handlers' => array(),
 			'request' => null,
+			'response' => null,
 			'context' => array(
 				'content' => '', 'title' => '', 'scripts' => array(),
 				'styles' => array(), 'head' => array()
@@ -395,6 +404,16 @@ abstract class Renderer extends \lithium\core\Object {
 	 */
 	public function request() {
 		return $this->_request;
+	}
+
+	/**
+	 * Returns the `Response` object associated with this rendering context.
+	 *
+	 * @return object Returns an instance of `lithium\action\Response`, which provides the i.e.
+	 *         the encoding for the document being the result of templates rendered by this context.
+	 */
+	public function response() {
+		return $this->_response;
 	}
 
 	/**
