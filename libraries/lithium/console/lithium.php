@@ -11,7 +11,6 @@
  * a `config` directory with a `bootstrap.php` file in it.  If no application context is found,
  * just boot up the core framework.
  */
-
 $library = dirname(dirname(__DIR__));
 $working = getcwd() ?: __DIR__;
 $app = null;
