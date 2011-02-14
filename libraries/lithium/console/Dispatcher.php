@@ -75,7 +75,6 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *        `null`, an instance will be created.
 	 * @param array $options
 	 * @return object The command action result which is an instance of `lithium\console\Response`.
-	 * @todo Add exception-handling/error page rendering
 	 */
 	public static function run($request = null, $options = array()) {
 		$defaults = array('request' => array());
