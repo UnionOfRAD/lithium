@@ -27,25 +27,25 @@ use BadMethodCallException;
  * static `find()` method, along with some additional utility methods provided for convenience.
  *
  * Classes extending this one should, conventionally, be named as Singular, CamelCase and be
- * placed in the app/models directory. i.e. a posts model would be app/model/Post.php.
+ * placed in the `app/models` directory. i.e. a posts model would be `app/model/Posts.php`.
  *
  * Examples:
  * {{{
  * // Return all 'post' records
- * Post::find('all');
- * Post::all();
+ * Posts::find('all');
+ * Posts::all();
  *
  * // With conditions and a limit
- * Post::find('all', array('conditions' => array('published' => true), 'limit' => 10));
- * Post::all(array('conditions' => array('published' => true), 'limit' => 10));
+ * Posts::find('all', array('conditions' => array('published' => true), 'limit' => 10));
+ * Posts::all(array('conditions' => array('published' => true), 'limit' => 10));
  *
  * // Integer count of all 'post' records
- * Post::find('count');
- * Post::count(); // This is equivalent to the above.
+ * Posts::find('count');
+ * Posts::count(); // This is equivalent to the above.
  *
  * // With conditions
- * Post::find('count', array('conditions' => array('published' => true)));
- * Post::count(array('published' => true));
+ * Posts::find('count', array('conditions' => array('published' => true)));
+ * Posts::count(array('published' => true));
  * }}}
  *
  * The actual objects returned from `find()` calls will depend on the type of data source in use.
@@ -55,13 +55,13 @@ use BadMethodCallException;
  * transparent.
  *
  * For data mutation (saving/updating/deleting), the `Model` class acts as a broker to the proper
- * objects. When creating a new record or document, for example, a call to `Post::create()` will
+ * objects. When creating a new record or document, for example, a call to `Posts::create()` will
  * return an instance of `lithium\data\entity\Record` or `lithium\data\entity\Document`, which can
  * then be acted upon.
  *
  * Example:
  * {{{
- * $post = Post::create();
+ * $post = Posts::create();
  * $post->author = 'Robert';
  * $post->title = 'Newest Post!';
  * $post->content = 'Lithium rocks. That is all.';
@@ -627,16 +627,35 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Instantiates a new record object, initialized with any data passed in. For example:
+	 * Instantiates a new record or document object, initialized with any data passed in. For
+	 * example:
+	 *
 	 * {{{
-	 * $post = Post::create(array("title" => "New post"));
+	 * $post = Posts::create(array("title" => "New post"));
 	 * echo $post->title; // echoes "New post"
 	 * $success = $post->save();
 	 * }}}
 	 *
-	 * @param array $data Any data that this record should be populated with initially.
+	 * Note that while this method creates a new object, there is no effect on the database until
+	 * the `save()` method is called.
+	 *
+	 * In addition, this method can be used to simulate loading a pre-existing object from the
+	 * database, without actually querying the database:
+	 *
+	 * {{{
+	 * $post = Posts::create(array("id" => $id, "moreData" => "foo"), array("exists" => true));
+	 * $post->title = "New title";
+	 * $success = $post->save();
+	 * }}}
+	 *
+	 * This will create an update query against the object with an ID matching `$id`. Also note that
+	 * only the `title` field will be updated.
+	 *
+	 * @param array $data Any data that this object should be populated with initially.
 	 * @param array $options Options to be passed to item.
-	 * @return object Returns a new, **un-saved** record object.
+	 * @return object Returns a new, _un-saved_ record or document object. In addition to the values
+	 *         passed to `$data`, the object will also contain any values assigned to the
+	 *         `'default'` key of each field defined in `$_schema`.
 	 */
 	public static function create(array $data = array(), array $options = array()) {
 		$self = static::_object();
@@ -661,19 +680,45 @@ class Model extends \lithium\core\StaticObject {
 	 * An instance method (called on record and document objects) to create or update the record or
 	 * document in the database that corresponds to `$entity`.
 	 *
-	 * For example:
+	 * For example, to create a new record or document:
 	 * {{{
-	 * $post = Post::create();
+	 * $post = Posts::create(); // Creates a new object, which doesn't exist in the database yet
 	 * $post->title = "My post";
+	 * $success = $post->save();
+	 * }}}
+	 *
+	 * It is also used to update existing database objects, as in the following:
+	 * {{{
+	 * $post = Posts::first($id);
+	 * $post->title = "Revised title";
+	 * $success = $post->save();
+	 * }}}
+	 *
+	 * By default, an object's data will be checked against the validation rules of the model it is
+	 * bound to. Any validation errors that result can then be accessed through the `errors()`
+	 * method.
+	 *
+	 * {{{
+	 * if (!$post->save($someData)) {
+	 * 	return array('errors' => $post->errors());
+	 * }
+	 * }}}
+	 *
+	 * To override the validation checks and save anyway, you can pass the `'validate'` option:
+	 *
+	 * {{{
+	 * $post->title = "We Don't Need No Stinkin' Validation";
+	 * $post->body = "I know what I'm doing.";
 	 * $post->save(null, array('validate' => false));
 	 * }}}
 	 *
 	 * @see lithium\data\Model::$validates
 	 * @see lithium\data\Model::validates()
+	 * @see lithium\data\Model::errors()
 	 * @param object $entity The record or document object to be saved in the database. This
 	 *               parameter is implicit and should not be passed under normal circumstances.
 	 *               In the above example, the call to `save()` on the `$post` object is
-	 *               transparently proxied through to the `Post` model class, and `$post` is passed
+	 *               transparently proxied through to the `Posts` model class, and `$post` is passed
 	 *               in as the `$entity` parameter.
 	 * @param array $data Any data that should be assigned to the record before it is saved.
 	 * @param array $options Options:
@@ -855,7 +900,7 @@ class Model extends \lithium\core\StaticObject {
 
 	/**
 	 * Gets just the class name portion of a fully-name-spaced class name, i.e.
-	 * `app\models\Post::_name()` returns `'Post'`.
+	 * `app\models\Posts::_name()` returns `'Posts'`.
 	 *
 	 * @return string
 	 */
