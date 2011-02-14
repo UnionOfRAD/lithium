@@ -6,11 +6,6 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium;
-
-use lithium\core\Libraries;
-use lithium\console\Dispatcher;
-
 /**
  * Determine if we're in an application context by moving up the directory tree looking for
  * a `config` directory with a `bootstrap.php` file in it.  If no application context is found,
@@ -33,7 +28,7 @@ while (!$app && $working) {
 
 if ($app && is_dir("{$app}/config/bootstrap") && file_exists("{$app}/webroot/index.php")) {
 	include "{$app}/config/bootstrap.php";
-	exit(Dispatcher::run()->status);
+	exit(lithium\console\Dispatcher::run()->status);
 }
 
 define('LITHIUM_LIBRARY_PATH', $library);
@@ -46,14 +41,14 @@ if (!include LITHIUM_LIBRARY_PATH . '/lithium/core/Libraries.php') {
 	throw new ErrorException($message);
 }
 
-Libraries::add('lithium');
+lithium\core\Libraries::add('lithium');
 
 if ($app) {
-	Libraries::add(basename(LITHIUM_APP_PATH), array(
+	lithium\core\Libraries::add(basename(LITHIUM_APP_PATH), array(
 		'path' => LITHIUM_APP_PATH,
 		'default' => true
 	));
 }
-exit(Dispatcher::run()->status);
+exit(lithium\console\Dispatcher::run()->status);
 
 ?>
