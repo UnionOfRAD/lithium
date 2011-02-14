@@ -40,11 +40,6 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * elements array elements of the flag which are present in the route will be modified using a
 	 * `lithium\util\String::insert()`-formatted string.
 	 *
-	 * For example, to implement action prefixes (i.e. `admin_index()`), set a rule named 'admin',
-	 * with a value array containing a modifier key for the `action` element of a route, i.e.:
-	 * `array('action' => 'admin_{:action}')`.  See `lithium\console\Dispatcher::config()` for
-	 * examples on setting rules.
-	 *
 	 * @see lithium\console\Dispatcher::config()
 	 * @see lithium\util\String::insert()
 	 */
@@ -76,7 +71,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *  If `$request` is `null`, a new request object is instantiated based on the value of the
 	 * `'request'` key in the `$_classes` array.
 	 *
-	 * @param object $request An instance of a request object with HTTP request information.  If
+	 * @param object $request An instance of a request object with console request information.  If
 	 *        `null`, an instance will be created.
 	 * @param array $options
 	 * @return object The command action result which is an instance of `lithium\console\Response`.
