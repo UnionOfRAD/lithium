@@ -40,10 +40,10 @@ define('LITHIUM_LIBRARY_PATH', $library);
 define('LITHIUM_APP_PATH', $app ? $working : dirname($library) . '/app');
 
 if (!include LITHIUM_LIBRARY_PATH . '/lithium/core/Libraries.php') {
-	$message  = "Lithium core could not be found.  Check the value of `LITHIUM_LIBRARY_PATH` ";
-	$message .= "in `config/bootstrap.php`. It should point to the directory containing your ";
-	$message .= "`/libraries` directory.";
-	trigger_error($message, E_USER_ERROR);
+	$message  = "Lithium core could not be found.  Check the value of LITHIUM_LIBRARY_PATH in ";
+	$message .= __FILE__ . ".  It should point to the directory containing your ";
+	$message .= "/libraries directory.";
+	throw new ErrorException($message);
 }
 
 Libraries::add('lithium');
