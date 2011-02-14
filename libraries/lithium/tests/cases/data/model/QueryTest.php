@@ -301,7 +301,7 @@ class QueryTest extends \lithium\test\Unit {
 		$expected = array(
 			'type' => 'update',
 			'data' => array('title' => 'Bar'),
-			'conditions' => "WHERE title = 'Foo'",
+			'conditions' => "WHERE {title} = 'Foo'",
 		);
 		$this->assertEqual($expected, $result);
 	}
@@ -381,7 +381,7 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $query->export(Connections::get('mock-database-connection'));
 
 		$this->assertEqual(array('title' => '..'), $result['data']);
-		$this->assertEqual("WHERE title = 'FML'", $result['conditions']);
+		$this->assertEqual("WHERE {title} = 'FML'", $result['conditions']);
 	}
 
 	public function testEntityConditions() {

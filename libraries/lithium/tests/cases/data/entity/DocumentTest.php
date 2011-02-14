@@ -584,7 +584,15 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual('data', $doc->nested->more);
 
 		$modified = $doc->export();
-		$this->assertEqual(array('nested.more' => 'data'), $modified['update']);
+		$this->assertTrue($modified['exists']);
+		$this->assertEqual(array('foo' => 'bar', 'baz' => 'dib'), $modified['data']);
+		$this->assertEqual(array('nested'), array_keys($modified['update']));
+		$this->assertNull($modified['key']);
+
+		$nested = $modified['update']['nested']->export();
+		$this->assertFalse($nested['exists']);
+		$this->assertEqual(array('more' => 'data'), $nested['data']);
+		$this->assertEqual('nested', $nested['key']);
 
 		$doc->update();
 		$result = $doc->export();
@@ -593,13 +601,25 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc->more = 'cowbell';
 		$doc->nested->evenMore = 'cowbell';
 		$modified = $doc->export();
-		$expected = array('nested.evenMore' => 'cowbell', 'more' => 'cowbell');
+		$expected = array('more' => 'cowbell');
 		$this->assertEqual($expected, $modified['update']);
+		$this->assertEqual(array('nested', 'foo', 'baz'), array_keys($modified['data']));
+		$this->assertEqual('bar', $modified['data']['foo']);
+		$this->assertEqual('dib', $modified['data']['baz']);
+
+		$nested = $modified['data']['nested']->export();
+		$this->assertTrue($nested['exists']);
+		$this->assertEqual(array('more' => 'data'), $nested['data']);
+		$this->assertEqual(array('evenMore' => 'cowbell'), $nested['update']);
+		$this->assertEqual('nested', $nested['key']);
 
 		$doc->update();
 		$doc->nested->evenMore = 'foo!';
 		$modified = $doc->export();
-		$this->assertEqual(array('nested.evenMore' => 'foo!'), $modified['update']);
+		$this->assertFalse($modified['update']);
+
+		$nested = $modified['data']['nested']->export();
+		$this->assertEqual(array('evenMore' => 'foo!'), $nested['update']);
 	}
 
 	public function testArrayConversion() {
