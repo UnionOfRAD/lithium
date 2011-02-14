@@ -7,9 +7,13 @@
  */
 
 /**
- * Determine if we're in an application context by moving up the directory tree looking for
- * a `config` directory with a `bootstrap.php` file in it.  If no application context is found,
- * just boot up the core framework.
+ * This console front-controller file is the gateway to your application
+ * through the command line.  It is responsible for intercepting requests, and
+ * handing them off to the `Dispatcher` for processing.
+ *
+ * Determine if we're in an application context by moving up the directory tree
+ * looking for a `config` directory with a `bootstrap.php` file in it.  If no
+ * application context is found, just boot up the core framework.
  */
 $library = dirname(dirname(__DIR__));
 $working = getcwd() ?: __DIR__;
@@ -48,6 +52,30 @@ if ($app) {
 		'default' => true
 	));
 }
+
+/**
+ * The following will dispatch the request and exit with the status code as
+ * provided by the `Response` object returned from `run()`.
+ *
+ * The following will instantiate a new `Request` object and pass it off to the
+ * `Dispatcher` class.  By default, the `Request` will automatically aggregate
+ * all the server / environment settings, and request content (i.e. options and
+ * arguments passed to the command) information.
+ *
+ * The `Request` is then used by the `Dispatcher` (in conjunction with the
+ * `Router`) to determine the correct command to dispatch to. The response
+ * information is then encapsulated in a `Response` object, which is returned
+ * from the command to the `Dispatcher`.
+ *
+ * The `Response` object will contain information about the status code which
+ * is used as the exit code when ending the execution of this script and
+ * returned to the callee.
+ *
+ * @see lithium\console\Request
+ * @see lithium\console\Response
+ * @see lithium\console\Dispatcher
+ * @see lithium\console\Router
+ */
 exit(lithium\console\Dispatcher::run(new lithium\console\Request())->status);
 
 ?>
