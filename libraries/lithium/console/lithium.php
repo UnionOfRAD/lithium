@@ -28,7 +28,7 @@ while (!$app && $working) {
 
 if ($app && is_dir("{$app}/config/bootstrap") && file_exists("{$app}/webroot/index.php")) {
 	include "{$app}/config/bootstrap.php";
-	exit(lithium\console\Dispatcher::run()->status);
+	exit(lithium\console\Dispatcher::run(new lithium\console\Request())->status);
 }
 
 define('LITHIUM_LIBRARY_PATH', $library);
@@ -49,6 +49,6 @@ if ($app) {
 		'default' => true
 	));
 }
-exit(lithium\console\Dispatcher::run()->status);
+exit(lithium\console\Dispatcher::run(new lithium\console\Request())->status);
 
 ?>
