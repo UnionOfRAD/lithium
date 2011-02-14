@@ -39,9 +39,6 @@ alias by adding the following line to `~/.bashrc`.
 alias li3='/path/to/lithium/libraries/lithium/console/li3'
 }}}
 
-Please note that the tool cannot be symlinked into `$PATH`, you must use one of
-the two described techniques to make it systemwide available as `li3`.
-
 **Configuring your %PATH% on Windows**
 
 Please note that if you're on  Windows you've additionally got to add the PHP directory to 
