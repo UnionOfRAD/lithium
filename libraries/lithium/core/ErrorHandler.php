@@ -9,8 +9,8 @@
 namespace lithium\core;
 
 use Exception;
-use lithium\util\Collection;
-use lithium\core\Environment;
+use ErrorException;
+use lithium\util\collection\Filters;
 
 /**
  * The `ErrorHandler` class allows PHP errors and exceptions to be handled in a uniform way. Using
@@ -271,7 +271,7 @@ class ErrorHandler extends \lithium\core\StaticObject {
 		};
 
 		if (is_string($class)) {
-			$class::applyFilter($method, $filter);
+			Filters::apply($class, $method, $filter);
 		} else {
 			$class->applyFilter($method, $filter);
 		}
