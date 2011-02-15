@@ -61,6 +61,8 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	 */
 	protected static $_isRunning = false;
 
+	protected static $_runOptions = array();
+
 	/**
 	 * Setup basic error handling checks/types, as well as register the error and exception
 	 * hanlders.
@@ -89,16 +91,15 @@ class ErrorHandler extends \lithium\core\StaticObject {
 		$self = get_called_class();
 
 		static::$_exceptionHandler = function($exception, $return = false) use ($self) {
-			$info = array('type' => get_class($exception)) + compact('exception');
-
+			$info = compact('exception') + array(
+				'type' => get_class($exception),
+				'stack' => $self::trace($exception->getTrace())
+			);
 			foreach (array('message', 'file', 'line', 'trace') as $key) {
 				$method = 'get' . ucfirst($key);
 				$info[$key] = $exception->{$method}();
 			}
-			if ($return) {
-				return $info;
-			}
-			$self::invokeMethod('handle', array($info));
+			return $return ? $info : $self::handle($info);
 		};
 	}
 
@@ -135,18 +136,32 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	 *
 	 * @return void
 	 */
-	public static function run() {
+	public static function run(array $config = array()) {
+		$defaults = array('trapErrors' => false, 'convertErrors' => true);
+
+		if (static::$_isRunning) {
+			return;
+		}
+		static::$_isRunning = true;
+		static::$_runOptions = $config + $defaults;
 		$self = get_called_class();
 
-		set_error_handler(function($code, $message, $file, $line = 0, $context = null) use ($self) {
+		$trap = function($code, $message, $file, $line = 0, $context = null) use ($self) {
 			$trace = debug_backtrace();
 			$trace = array_slice($trace, 1, count($trace));
-			$self::invokeMethod('handle', array(
-				compact('type', 'code', 'message', 'file', 'line', 'trace', 'context')
-			));
-		});
+			$self::handle(compact('type', 'code', 'message', 'file', 'line', 'trace', 'context'));
+		};
+
+		$convert = function($code, $message, $file, $line = 0, $context = null) use ($self) {
+			throw new ErrorException($message, 500, $code, $file, $line);
+		};
+
+		if (static::$_runOptions['trapErrors']) {
+			set_error_handler($trap);
+		} elseif (static::$_runOptions['convertErrors']) {
+			set_error_handler($convert);
+		}
 		set_exception_handler(static::$_exceptionHandler);
-		static::$_isRunning = true;
 	}
 
 	/**
@@ -250,17 +265,20 @@ class ErrorHandler extends \lithium\core\StaticObject {
 		}
 	}
 
-	public static function apply($class, $method, array $conditions, $handler) {
+	public static function apply($object, array $conditions, $handler) {
+		$conditions = $conditions ?: array('type' => 'Exception');
+		list($class, $method) = is_string($object) ? explode('::', $object) : $object;
+		$wrap = static::$_exceptionHandler;
 		$_self = get_called_class();
 
-		$filter = function($self, $params, $chain) use ($_self, $conditions, $handler) {
+		$filter = function($self, $params, $chain) use ($_self, $conditions, $handler, $wrap) {
 			try {
 				return $chain->next($self, $params, $chain);
 			} catch (Exception $e) {
 				if (!$_self::matches($e, $conditions)) {
 					throw $e;
 				}
-				return $handler($e, $params);
+				return $handler($wrap($e, true), $params);
 			}
 		};
 
