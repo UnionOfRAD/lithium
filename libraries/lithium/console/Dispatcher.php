@@ -191,7 +191,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 				}
 				return $callable($params['action'], $params['args']);
 			}
-			throw new UnexpectedValueException("`{$callable}` not callable.");
+			throw new UnexpectedValueException("Callable `{$callable}` is actually not callable.");
 		});
 	}
 }
