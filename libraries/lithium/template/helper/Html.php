@@ -89,16 +89,16 @@ class Html extends \lithium\template\Helper {
 	 * encoding) were historically synonymous. The terms now have related but
 	 * distinct meanings. Whenever possible Lithium tries to use precise
 	 * terminology. Since HTML uses the term `charset` we expose this method
-	 * under the exact same name. This caters to expectation towards a helper
-	 * for creating HTML. However the rest of the framework will use the term
-	 * `encoding` when talking about character encoding.
+	 * under the exact same name. This caters to the expectation towards a HTML
+	 * helper. However the rest of the framework will use the term `encoding`
+	 * when talking about character encoding.
 	 *
 	 * It is suggested that uppercase letters should be used when specifying
 	 * the encoding. HTML specs don't require it to be uppercase and sites in
 	 * the wild most often use the lowercase variant. On the other hand must
 	 * XML parsers (those may not be relevant in this context anyway) not
-	 * support lowercase encodings. This and the fact that IANA only list
-	 * encodings with uppercase characters lead to the above suggestion.
+	 * support lowercase encodings. This and the fact that IANA lists only
+	 * encodings with uppercase characters led to the above suggestion.
 	 *
 	 * @see lithium\net\http\Response::$encoding
 	 * @link http://www.iana.org/assignments/character-sets
