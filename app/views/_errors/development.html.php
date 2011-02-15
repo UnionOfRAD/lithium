@@ -3,36 +3,37 @@
  * It would be cool if the name of the exception was a link to the API.
  * Also, should we show the exception code? That might be helpful for HTTP exceptions.
  */
+use lithium\core\ErrorHandler;
+use lithium\analysis\Inspector;
+
+$exception = $info['exception'];
+$line = $exception->getLine();
+
+$sourceCode = Inspector::lines($exception->getFile(), range($line - 3, $line + 3));
+$stackTrace = ErrorHandler::trace($exception->getTrace());
+
 ?>
 <h3>Exception</h3>
 <div class="lithium-exception-class"><?=get_class($exception);?></div>
 <div class="lithium-exception-message"><?=$exception->getMessage();?></div>
 
 <h3>Source</h3>
-<div class="lithium-exception-location"><?=$exception->getFile();?>:<?=$exception->getLine();?></div>
+<div class="lithium-exception-location">
+	<?=$exception->getFile(); ?>: <?=$exception->getLine(); ?>
+</div>
 <div class="lithium-code-dump">
-	<?php
-	/**
-	 * I'm not sure if it's preferable to echo HTML elements like this.
-	 */
-	echo '<pre>';
-	foreach ($sourceCode as $lineNumber => $content) {
-		/**
-		 * There must be a better wrap with the span element, I'm just not sure how.
-		 */
-		if ($exception->getLine() === $lineNumber) {
-			echo '<span class="code-highlight">';
-		}
-		echo $lineNumber < 10 ? ' ' . $lineNumber : $lineNumber;
-		echo '. ';
-		echo $content;
-		echo "\n";
-		if ($exception->getLine() === $lineNumber) {
-			echo '</span>';
-		}
-	}
-	echo '</pre>';
-	?>
+	<pre><?php foreach ($sourceCode as $num => $content):
+		$numPad = str_pad($num, 3, ' ');
+
+		if ($line === $num):
+			?><span class="code-highlight"><?php
+		endif;?><?="{$numPad} {$content}\n"; ?><?php
+
+		if ($line === $num):
+			?></span><?php
+		endif;
+
+	endforeach; ?></pre>
 </div>
 
 <?php
@@ -46,7 +47,7 @@
 <div class="lithium-stack-trace">
 	<ol>
 		<?php foreach ($stackTrace as $trace) : ?>
-			<li><?=$trace;?></li>
+			<li><tt><?=$trace; ?>()</tt></li>
 		<?php endforeach; ?>
 	</ol>
 </div>
