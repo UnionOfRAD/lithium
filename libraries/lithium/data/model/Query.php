@@ -530,7 +530,7 @@ class Query extends \lithium\core\Object {
 				$config = array();
 			}
 			if (!$relation = $model::relations($name)) {
-				throw new QueryException("Related model not found");
+				throw new QueryException("Related model not found.");
 			}
 			$config += $relation->data();
 		}

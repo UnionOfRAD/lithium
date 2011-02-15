@@ -70,7 +70,7 @@ class Locale extends \lithium\core\StaticObject {
 		$tags = static::invokeMethod('decompose', $params);
 
 		if (!isset(static::$_tags[$method])) {
-			throw new BadMethodCallException("Invalid locale tag `{$method}`");
+			throw new BadMethodCallException("Invalid locale tag `{$method}`.");
 		}
 		return isset($tags[$method]) ? $tags[$method] : null;
 	}
@@ -109,7 +109,7 @@ class Locale extends \lithium\core\StaticObject {
 		$regex .= '(?:[_-](?P<variant>[a-z]{5,}))?';
 
 		if (!preg_match("/^{$regex}$/i", $locale, $matches)) {
-			throw new InvalidArgumentException("Locale `{$locale}` could not be parsed");
+			throw new InvalidArgumentException("Locale `{$locale}` could not be parsed.");
 		}
 		return array_filter(array_intersect_key($matches, static::$_tags));
 	}

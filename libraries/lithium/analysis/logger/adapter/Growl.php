@@ -90,7 +90,7 @@ class Growl extends \lithium\core\Object {
 				if ($conn = fsockopen($host, $port, $message, $code)) {
 					return $conn;
 				}
-				throw new NetworkException("Growl connection failed: (`{$code}`) `{$message}`");
+				throw new NetworkException("Growl connection failed: (`{$code}`) `{$message}`.");
 			}
 		);
 		parent::__construct($config + $defaults);

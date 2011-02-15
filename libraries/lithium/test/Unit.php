@@ -121,7 +121,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string $message Message to pass if the condition is met.
 	 * @return mixed
 	 */
-	public function skipIf($condition, $message = 'Skipped test `{:class}::{:function}()`') {
+	public function skipIf($condition, $message = 'Skipped test `{:class}::{:function}()`.') {
 		if (!$condition) {
 			return;
 		}

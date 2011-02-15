@@ -49,7 +49,7 @@ class Code extends \lithium\g11n\catalog\Adapter {
 		parent::_init();
 		if (!is_dir($this->_config['path'])) {
 			throw new ConfigException(
-				"Code directory does not exist at `{$this->_config['path']}`"
+				"Code directory does not exist at `{$this->_config['path']}`."
 			);
 		}
 	}

@@ -77,7 +77,7 @@ class Compiler extends \lithium\core\StaticObject {
 		if ($options['fallback']) {
 			return $file;
 		}
-		throw new TemplateException("Could not write compiled template `{$template}` to cache");
+		throw new TemplateException("Could not write compiled template `{$template}` to cache.");
 	}
 
 	/**

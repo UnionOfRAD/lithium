@@ -428,7 +428,7 @@ class Libraries {
 			static::$_cachedPaths[$class] = $path;
 			method_exists($class, '__init') ? $class::__init() : null;
 		} elseif ($require) {
-			throw new RuntimeException("Failed to load `{$class}` from `{$path}`");
+			throw new RuntimeException("Failed to load `{$class}` from `{$path}`.");
 		}
 	}
 

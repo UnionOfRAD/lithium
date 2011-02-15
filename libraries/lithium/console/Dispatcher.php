@@ -130,7 +130,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			if (class_exists($class = Libraries::locate('command', $name))) {
 				return new $class(compact('request'));
 			}
-			throw new UnexpectedValueException("Command `{$name}` not found");
+			throw new UnexpectedValueException("Command `{$name}` not found.");
 		});
 	}
 
@@ -191,7 +191,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 				}
 				return $callable($params['action'], $params['args']);
 			}
-			throw new UnexpectedValueException("`{$callable}` not callable");
+			throw new UnexpectedValueException("`{$callable}` not callable.");
 		});
 	}
 }

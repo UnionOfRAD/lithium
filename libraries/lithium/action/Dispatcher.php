@@ -116,7 +116,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			$params = $self::applyRules($result->params);
 
 			if (!$params) {
-				throw new DispatchException('Could not route request');
+				throw new DispatchException('Could not route request.');
 			}
 			$callable = $self::invokeMethod('_callable', array($result, $params, $options));
 			return $self::invokeMethod('_call', array($callable, $result, $params));
@@ -195,7 +195,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			try {
 				return Libraries::instance('controllers', $controller, $options);
 			} catch (ClassNotFoundException $e) {
-				throw new DispatchException("Controller `{$controller}` not found", null, $e);
+				throw new DispatchException("Controller `{$controller}` not found.", null, $e);
 			}
 		});
 	}
@@ -206,7 +206,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			if (is_callable($callable = $params['callable'])) {
 				return $callable($params['request'], $params['params']);
 			}
-			throw new DispatchException('Result not callable');
+			throw new DispatchException('Result not callable.');
 		});
 	}
 }

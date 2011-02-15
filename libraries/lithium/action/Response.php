@@ -106,7 +106,7 @@ class Response extends \lithium\net\http\Response {
 			$code = 302;
 		}
 		if (!$status = $this->status($code)) {
-			throw new UnexpectedValueException('Invalid status code');
+			throw new UnexpectedValueException('Invalid status code.');
 		}
 		$this->_writeHeader($status);
 
