@@ -472,7 +472,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 */
 	protected static function _class($class) {
 		if (!class_exists($class)) {
-			throw new RuntimeException(sprintf('Class "%s" could not be found.', $class));
+			throw new RuntimeException(sprintf('Class `%s` could not be found.', $class));
 		}
 		return unserialize(sprintf('O:%d:"%s":0:{}', strlen($class), $class));
 	}

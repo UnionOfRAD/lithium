@@ -107,7 +107,7 @@ class Group extends \lithium\util\Collection {
 
 		foreach ($this->_data as $test) {
 			if (!class_exists($test)) {
-				throw new Exception("Test case '{$test}' not found.");
+				throw new Exception("Test case `{$test}` not found.");
 			}
 			$tests[] = new $test;
 		}

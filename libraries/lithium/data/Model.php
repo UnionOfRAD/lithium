@@ -387,7 +387,7 @@ class Model extends \lithium\core\StaticObject {
 		preg_match('/^findBy(?P<field>\w+)$|^find(?P<type>\w+)By(?P<fields>\w+)$/', $method, $args);
 
 		if (!$args) {
-			$message = "Method %s not defined or handled in class %s";
+			$message = "Method `%s` not defined or handled in class `%s`";
 			throw new BadMethodCallException(sprintf($message, $method, get_class($self)));
 		}
 		$field = Inflector::underscore($args['field'] ? $args['field'] : $args['fields']);
@@ -570,7 +570,7 @@ class Model extends \lithium\core\StaticObject {
 		$self = static::_object();
 
 		if (!isset($self->_relationTypes[$type])) {
-			throw new ConfigException("Invalid relationship type '{$type}' specified.");
+			throw new ConfigException("Invalid relationship type `{$type}` specified.");
 		}
 		$rel = static::connection()->relationship(get_called_class(), $type, $name, $config);
 		return static::_object()->_relations[$name] = $rel;
@@ -893,7 +893,7 @@ class Model extends \lithium\core\StaticObject {
 		if ($conn = $connections::get($name)) {
 			return $conn;
 		}
-		throw new ConfigException("The data connection {$name} is not configured");
+		throw new ConfigException("The data connection `{$name}` is not configured");
 	}
 
 	/**

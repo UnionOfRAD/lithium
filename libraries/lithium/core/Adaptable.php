@@ -101,7 +101,7 @@ class Adaptable extends \lithium\core\StaticObject {
 		$config = static::_config($name);
 
 		if ($config === null) {
-			throw new ConfigException("Configuration '{$name}' has not been defined.");
+			throw new ConfigException("Configuration `{$name}` has not been defined.");
 		}
 
 		if (isset($config['object'])) {
@@ -126,7 +126,7 @@ class Adaptable extends \lithium\core\StaticObject {
 		$config = static::_config($name);
 
 		if ($config === null) {
-			throw new ConfigException("Configuration '{$name}' has not been defined.");
+			throw new ConfigException("Configuration `{$name}` has not been defined.");
 		}
 		if (!isset($config['strategies'])) {
 			return null;
@@ -213,11 +213,11 @@ class Adaptable extends \lithium\core\StaticObject {
 	protected static function _class($config, $paths = array()) {
 		if (!$name = $config['adapter']) {
 			$self = get_called_class();
-			throw new ConfigException("No adapter set for configuration in class {$self}.");
+			throw new ConfigException("No adapter set for configuration in class `{$self}`.");
 		}
 		if (!$class = static::_locate($paths, $name)) {
 			$self = get_called_class();
-			throw new ConfigException("Could not find adapter '{$name}' in class {$self}.");
+			throw new ConfigException("Could not find adapter `{$name}` in class `{$self}`.");
 		}
 		return $class;
 	}
@@ -233,11 +233,11 @@ class Adaptable extends \lithium\core\StaticObject {
 	protected static function _strategy($name, $paths = array()) {
 		if (!$name) {
 			$self = get_called_class();
-			throw new ConfigException("No strategy set for configuration in class {$self}.");
+			throw new ConfigException("No strategy set for configuration in class `{$self}`.");
 		}
 		if (!$class = static::_locate($paths, $name)) {
 			$self = get_called_class();
-			throw new ConfigException("Could not find strategy '{$name}' in class {$self}.");
+			throw new ConfigException("Could not find strategy `{$name}` in class `{$self}`.");
 		}
 		return $class;
 	}

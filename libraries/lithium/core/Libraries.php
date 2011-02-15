@@ -280,7 +280,7 @@ class Libraries {
 
 		if (!$config['path']) {
 			if (!$config['path'] = static::_locatePath('libraries', compact('name'))) {
-				throw new ConfigException("Library '{$name}' not found.");
+				throw new ConfigException("Library `{$name}` not found.");
 			}
 		}
 		$config['path'] = str_replace('\\', '/', $config['path']);
@@ -428,7 +428,7 @@ class Libraries {
 			static::$_cachedPaths[$class] = $path;
 			method_exists($class, '__init') ? $class::__init() : null;
 		} elseif ($require) {
-			throw new RuntimeException("Failed to load {$class} from {$path}");
+			throw new RuntimeException("Failed to load `{$class}` from `{$path}`");
 		}
 	}
 
@@ -561,7 +561,7 @@ class Libraries {
 	 */
 	public static function instance($type, $name, array $options = array()) {
 		if (!$class = (string) static::locate($type, $name)) {
-			throw new ClassNotFoundException("Class '{$name}' of type '{$type}' not found.");
+			throw new ClassNotFoundException("Class `{$name}` of type `{$type}` not found.");
 		}
 		return class_exists($class) ? new $class($options) : null;
 	}

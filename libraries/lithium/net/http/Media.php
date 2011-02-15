@@ -553,7 +553,7 @@ class Media extends \lithium\core\StaticObject {
 			$type = $options['type'];
 
 			if (!isset($handlers[$type])) {
-				throw new MediaException("Unhandled media type '{$type}'");
+				throw new MediaException("Unhandled media type `{$type}`");
 			}
 			$handler = $options + $handlers[$type] + $defaults;
 			$filter = function($v) { return $v !== null; };

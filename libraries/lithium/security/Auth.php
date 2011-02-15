@@ -113,7 +113,7 @@ class Auth extends \lithium\core\Adaptable {
 			$config = $self::invokeMethod('_config', array($name));
 
 			if ($config === null) {
-				throw new ConfigException("Configuration '{$name}' has not been defined.");
+				throw new ConfigException("Configuration `{$name}` has not been defined.");
 			}
 			$session = $config['session'];
 

@@ -211,7 +211,7 @@ class Entity extends \lithium\core\Object {
 	 */
 	public function __call($method, $params) {
 		if (!($model = $this->_model) || !method_exists($model, $method)) {
-			$message = "No model bound or unhandled method call '{$method}'.";
+			$message = "No model bound or unhandled method call `{$method}`.";
 			throw new BadMethodCallException($message);
 		}
 		array_unshift($params, $this);

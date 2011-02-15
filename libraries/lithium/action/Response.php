@@ -59,7 +59,7 @@ class Response extends \lithium\net\http\Response {
 	 * @deprecated
 	 */
 	public function disableCache() {
-		$message = 'Request::disableCache() is deprecated. Please use Request::cache(false).';
+		$message = '`Request::disableCache()` is deprecated. Please use `Request::cache(false)`.';
 		throw new BadMethodCallException($message);
 	}
 

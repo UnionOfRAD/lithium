@@ -390,7 +390,7 @@ abstract class Database extends \lithium\data\Source {
 			$type = $context->type();
 		}
 		if (!isset($this->_strings[$type])) {
-			throw new InvalidArgumentException("Invalid query type '{$type}'");
+			throw new InvalidArgumentException("Invalid query type `{$type}`");
 		}
 		$data = array_filter($data);
 		return trim(String::insert($this->_strings[$type], $data, array('clean' => true)));

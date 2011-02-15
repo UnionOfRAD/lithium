@@ -489,7 +489,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		$this->_increment[$field] += $value;
 
 		if (!is_numeric($this->_data[$field])) {
-			throw new UnexpectedValueException("Field '{$field}' cannot be incremented.");
+			throw new UnexpectedValueException("Field `{$field}` cannot be incremented.");
 		}
 		$this->_data[$field] += $value;
 	}

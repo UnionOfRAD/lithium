@@ -173,7 +173,7 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 			}
 			return $path;
 		}
-		throw new TemplateException("Template not found at {$path}");
+		throw new TemplateException("Template not found at `{$path}`");
 	}
 }
 

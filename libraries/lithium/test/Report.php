@@ -241,7 +241,7 @@ class Report extends \lithium\core\Object {
 		$results = array();
 		foreach ($filters as $filter => $options) {
 			if (!$class = Libraries::locate('test.filter', $filter)) {
-				throw new ClassNotFoundException("{$class} is not a valid test filter.");
+				throw new ClassNotFoundException("`{$class}` is not a valid test filter.");
 			}
 			$options['name'] = strtolower(join('', array_slice(explode("\\", $class), -1)));
 			$results[$class] = $options + array('apply' => array(), 'analyze' => array());

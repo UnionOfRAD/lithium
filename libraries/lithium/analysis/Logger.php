@@ -105,7 +105,7 @@ class Logger extends \lithium\core\Adaptable {
 		if ($name = $options['name']) {
 			$methods = array($name => static::adapter($name)->write($priority, $message, $options));
 		} elseif (!isset(static::$_priorities[$priority])) {
-			$message = "Attempted to write log message with invalid priority '{$priority}'.";
+			$message = "Attempted to write log message with invalid priority `{$priority}`.";
 			throw new UnexpectedValueException($message);
 		} else {
 			$methods = static::_configsByPriority($priority, $message, $options);

@@ -214,7 +214,7 @@ class Library extends \lithium\console\Command {
 	 */
 	public function archive($name = null, $result = null) {
 		if (ini_get('phar.readonly') == '1') {
-			throw new RuntimeException('set phar.readonly = 0 in php.ini');
+			throw new RuntimeException('set `phar.readonly` to `0` in `php.ini`');
 		}
 		$from = $name;
 		$to = $name;

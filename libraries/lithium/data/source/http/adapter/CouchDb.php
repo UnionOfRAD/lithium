@@ -153,7 +153,7 @@ class CouchDb extends \lithium\data\source\Http {
 			}
 		}
 		if (!$this->_db) {
-			throw new ConfigException("{$entity} is not available.");
+			throw new ConfigException("`{$entity}` is not available.");
 		}
 	}
 

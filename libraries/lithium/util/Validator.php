@@ -546,7 +546,7 @@ class Validator extends \lithium\core\StaticObject {
 	 */
 	public static function rule($rule, $value, $format = 'any', array $options = array()) {
 		if (!isset(static::$_rules[$rule])) {
-			throw new InvalidArgumentException("Rule '{$rule}' is not a validation rule");
+			throw new InvalidArgumentException("Rule `{$rule}` is not a validation rule");
 		}
 		$defaults = isset(static::$_options[$rule]) ? static::$_options[$rule] : array();
 		$options = (array) $options + $defaults + static::$_options['defaults'];
