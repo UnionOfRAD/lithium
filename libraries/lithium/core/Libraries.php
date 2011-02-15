@@ -249,7 +249,8 @@ class Libraries {
 	 *        - `'transform'`: Defines a custom way to transform a class name into its
 	 *          corresponding file path.  Accepts either an array of two strings which are
 	 *          interpreted as the pattern and replacement for a regex, or an anonymous function,
-	 *          which receives the class name as a parameter, and returns a file path as output.
+	 *          which receives the class name and library configuration arrays as parameters, and
+	 *          returns the full physical file path as output.
 	 * @return array Returns the resulting set of options created for this library.
 	 */
 	public static function add($name, array $config = array()) {

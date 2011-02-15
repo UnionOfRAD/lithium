@@ -266,7 +266,7 @@ code {
 	color: #666;
 }
 table, form, pre > code {
-	margin-top: 12px;
+	margin-top: 0px;
 	margin-bottom: 12px;
 }
 table, form, pre > code, .shadow {
