@@ -258,7 +258,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 
 			if (!($result = $conn->query($sql)) instanceof SQLite3Result) {
 				list($code, $error) = $self->error();
-				throw new QueryException("$sql: $error", $code);
+				throw new QueryException("{$sql}: {$error}", $code);
 			}
 			return new Result(array('resource' => $result));
 		});
