@@ -266,7 +266,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 		$stat = fstat($stream);
 
 		if ($stat['size'] < self::MO_HEADER_SIZE) {
-			throw new RangeException("MO stream caontent has an invalid format.");
+			throw new RangeException("MO stream content has an invalid format.");
 		}
 		$magic = unpack('V1', fread($stream, 4));
 		$magic = hexdec(substr(dechex(current($magic)), -8));
