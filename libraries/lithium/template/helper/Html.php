@@ -25,7 +25,7 @@ class Html extends \lithium\template\Helper {
 		'block'            => '<div{:options}>{:content}</div>',
 		'block-end'        => '</div>',
 		'block-start'      => '<div{:options}>',
-		'charset'          => '<meta charset="{:charset}" />',
+		'charset'          => '<meta charset="{:encoding}" />',
 		'image'            => '<img src="{:path}"{:options} />',
 		'js-block'         => '<script type="text/javascript"{:options}>{:content}</script>',
 		'js-end'           => '</script>',
@@ -85,14 +85,14 @@ class Html extends \lithium\template\Helper {
 	/**
 	 * Returns a charset meta-tag.
 	 *
-	 * @param string $charset The character set to be used in the meta tag. Defaults to the
+	 * @param string $encoding The character set to be used in the meta tag. Defaults to the
 	 *        encoding of the `Response` object attached to the current context. The
 	 *        default encoding of that object is `UTF-8`.
-	 * @return string A meta tag containing the specified character set.
+	 * @return string A meta tag containing the specified encoding.
 	 */
-	public function charset($charset = null) {
-		$charset = $charset ?: $this->_context->response()->encoding;
-		return $this->_render(__METHOD__, 'charset', compact('charset'));
+	public function charset($encoding = null) {
+		$encoding = $encoding ?: $this->_context->response()->encoding;
+		return $this->_render(__METHOD__, 'charset', compact('encoding'));
 	}
 
 	/**
