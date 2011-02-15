@@ -72,21 +72,15 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	public static function __init() {
 		static::$_checks = array(
 			'type'  => function($config, $info) {
-				return (
-					$config['type'] == $info['type'] ||
-					is_subclass_of($info['type'], $config['type'])
-				);
+				return (boolean) array_filter((array) $config['type'], function($type) use ($info) {
+					return $type == $info['type'] || is_subclass_of($info['type'], $type);
+				});
 			},
 			'code' => function($config, $info) {
 				return ($config['code'] & $info['code']);
 			},
 			'stack' => function($config, $info) {
-				foreach ((array) $config['stack'] as $frame) {
-					if (in_array($frame, $info['stack'])) {
-						return true;
-					}
-				}
-				return false;
+				return (boolean) array_intersect((array) $config['stack'], $info['stack']);
 			},
 			'message' => function($config, $info) {
 				return preg_match($config['message'], $info['message']);
