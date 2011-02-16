@@ -40,14 +40,16 @@ if ($apcEnabled) {
 Cache::config(compact('default'));
 
 Dispatcher::applyFilter('run', function($self, $params, $chain) {
-	if ($cache = Cache::read('default', 'core.libraries')) {
+	$key = md5(LITHIUM_APP_PATH) . '.core.libraries';
+
+	if ($cache = Cache::read('default', $key)) {
 		$cache = (array) $cache + Libraries::cache();
 		Libraries::cache($cache);
 	}
 	$result = $chain->next($self, $params, $chain);
 
 	if ($cache != Libraries::cache()) {
-		Cache::write('default', 'core.libraries', Libraries::cache(), '+1 day');
+		Cache::write('default', $key, Libraries::cache(), '+1 day');
 	}
 	return $result;
 });
