@@ -425,19 +425,6 @@ div.lithium-stack-trace {
 	position: relative;
 }
 
-div.lithium-stack-trace ol {
-	counter-reset: item -1;
-}
-
-div.lithium-stack-trace ol li {
-	display: block
-}
-
-div.lithium-stack-trace ol li:before {
-	content: counter(item) ". ";
-	counter-increment: item;
-}
-
 /*--- Code Highlighting ---*/
 div.lithium-code-dump pre {
 	position: relative;
