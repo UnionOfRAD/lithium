@@ -281,6 +281,10 @@ class Adaptable extends \lithium\core\StaticObject {
 		}
 		$env = Environment::get();
 		$config = isset($settings[$env]) ? $settings[$env] : $settings;
+
+		if (isset($settings[$env]) && isset($settings[true])) {
+			$config += $settings[true];
+		}
 		static::$_configurations[$name] += array(static::_initConfig($name, $config));
 		return static::$_configurations[$name][0];
 	}
