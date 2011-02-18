@@ -1,10 +1,16 @@
 <?php
+/**
+ * Lithium: the most rad php framework
+ *
+ * @copyright     Copyright 2011, Union of RAD (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
 
 use lithium\analysis\Inspector;
 
 $exception = $info['exception'];
 
-/*
+/**
  * Set Lithium-esque colors for syntax highlighing.
  * Do these belong here? Maybe they should move to the layout or error bootstrap?
  */
@@ -19,9 +25,9 @@ ini_set('highlight.htm', '#FFFFFF');
  *
  * Should this function belong in a helper or something?
  *
+ * @see lithium\analysis\Inspector::lines()
  * @param string $file Normally a full path to a specific file
  * @param integer $line The central line number to retrieve
- * @see lithium\analysis\Inspector::lines()
  */
 function renderCodeExcerpt($file = null, $line = null) {
 
@@ -67,7 +73,7 @@ function renderCodeExcerpt($file = null, $line = null) {
 
 				if ($line === $num):
 					?><span class="code-highlight"><?php
-				endif;?><?echo "{$content}\n"; ?><?php
+				endif;?><?php echo "{$content}\n"; ?><?php
 
 				if ($line === $num):
 					?></span><?php
@@ -93,22 +99,28 @@ function renderCodeExcerpt($file = null, $line = null) {
 <div class="lithium-exception-class"><?=get_class($exception);?></div>
 <div class="lithium-exception-message"><?=$exception->getMessage();?></div>
 
-<h3>Source</h3>
-<?php renderCodeExcerpt($exception->getFile(), $exception->getLine()); ?>
+<h3 id="source">Source</h3>
+<div id="sourceCode">
+	<?php renderCodeExcerpt($exception->getFile(), $exception->getLine()); ?>
+</div>
 
 <?php
 /**
- * Eventually these code snippets will be hidden by default. Clicking on the title
- * will swap the source code fragment in the main source code area. Maybe we'll add
- * a 'Show All' link or button.
- *
+ * In the future, maybe we'll add a 'Show All' link or button. How would that work?
  * Also we plan to improve the way that closures are displayed in the stack trace.
  */
 ?>
 <h3>Stack Trace</h3>
-<div>
+<div class="lithium-stack-trace">
+	<?php // Should this list be zero based? ?>
 	<ol>
+		<li>
+			<?php // TODO: What should this link title be? ?>
+			<tt><a href="#source" id="0" class="display-source-excerpt">[Exception Thrown]</a></tt>
+			<div id="sourceCode0" style="display: none;"></div>
+		</li>
 		<?php foreach ($exception->getTrace() as $id => $frame) :
+			$id++;
 			$title = null;
 			// Borrowed this snippet from `\lithium\core\ErrorHandler::trace()`.
 			if (isset($frame['function'])) {
@@ -120,9 +132,32 @@ function renderCodeExcerpt($file = null, $line = null) {
 			}
 			?>
 			<li>
-				<tt><?=$title;?>()</tt>
-				<?php renderCodeExcerpt($frame['file'], $frame['line']); ?>
+				<tt><a href="#source" id="<?=$id;?>" class="display-source-excerpt"><?=$title;?>()</a></tt>
+				<div id="sourceCode<?=$id;?>" style="display: none;">
+					<?php renderCodeExcerpt($frame['file'], $frame['line']); ?>
+				</div>
 			</li>
 		<?php endforeach; ?>
 	</ol>
 </div>
+
+<script type="text/javascript">
+	window.onload = function() {
+		// Copy the original source excerpt so we can re-display it when neccesary
+		var content = document.getElementById('sourceCode').innerHTML;
+		document.getElementById('sourceCode0').innerHTML = content;
+
+		// Apply click event handlers
+		var links = document.getElementsByTagName('a');
+		for (i = 0; i < links.length; i++) {
+			// Only apply this to links with the 'display-source-excerpt' class
+			if (links[i].className.indexOf('display-source-excerpt') >= 0) {
+				links[i].onclick = function() {
+					var elementId = 'sourceCode' + this.id;
+					var content = document.getElementById(elementId).innerHTML;
+					document.getElementById('sourceCode').innerHTML = content;
+				}
+			}
+		}
+	}
+</script>
