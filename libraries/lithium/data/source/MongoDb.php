@@ -518,7 +518,7 @@ class MongoDb extends \lithium\data\Source {
 			}
 			$update = $query->entity() ? $_exp::toCommand($data) : $data;
 
-			if ($self->connection->{$source}->update($args['conditions'], $update)) {
+			if ($self->connection->{$source}->update($args['conditions'], $update, $options)) {
 				$query->entity() ? $query->entity()->update() : null;
 				return true;
 			}
