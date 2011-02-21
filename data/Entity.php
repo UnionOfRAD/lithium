@@ -244,7 +244,13 @@ class Entity extends \lithium\core\Object {
 		if ($name) {
 			return $this->__get($name);
 		}
-		return $this->_updated + $this->_data;
+		$return = $this->_updated + $this->_data;
+		foreach($return as $key => $val){
+			if(is_callable(array($val, 'data'))) {
+				$return[$key] = $val->data();
+			}
+		}
+		return $return;
 	}
 
 	/**

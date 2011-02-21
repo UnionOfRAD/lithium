@@ -585,7 +585,10 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function joins(array $joins, $context) {
 		$result = null;
-		foreach ($joins as $join) {
+		foreach ($joins as $model => $join) {
+			if(!is_null($result)) {
+				$result .= ' ';
+			}
 			$result .= $this->renderCommand('join', $join->export($this));
 		}
 		return $result;

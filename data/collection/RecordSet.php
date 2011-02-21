@@ -274,13 +274,23 @@ class RecordSet extends \lithium\data\Collection {
 
 		if (!$recordMap) {
 			foreach ($this->_columns as $model => $fields) {
-				$record = array_combine($fields, array_slice($data, $offset, count($fields)));
+				$fieldCount = count($fields);
+
+				$record = array_combine($fields, array_slice($data, $offset, $fieldCount));
 
 				if ($model == $this->_model) {
-					$key = $key = $model::key($record);
+					$key = $model::key($record);
+					$recordMap[$this->_model] = $record;
+				}else {
+					$record = $conn->item($model, $record, array('exists' => true));
+					$recordMap[$this->_model][$model::meta('name')] = $record;
 				}
-				$recordMap[$model] = $conn->item($model, $record, array('exists' => true));
+
+				$offset += $fieldCount;
 			}
+
+			$model = $this->_model;
+			$recordMap[$model] = $conn->item($model, $recordMap[$model], array('exists' => true));
 		} else {
 			$key = $model::key(reset($recordMap));
 		}
@@ -307,7 +317,20 @@ class RecordSet extends \lithium\data\Collection {
 		if (!($model = $this->_model)) {
 			return array();
 		}
-		return $model::connection()->schema($this->_query, $this->_result, $this);
+
+		if(!$joins = $this->_query->join()) {
+			return $model::connection()->schema($this->_query, $this->_result, $this);
+		}
+		
+		$model = $this->_query->model();
+		$map = $model::connection()->schema($this->_query, $this->_result, $this);
+
+		foreach($joins as $join) {
+			$model = $join->model();
+			$map += $model::connection()->schema($join, $this->_result, $this);
+		}
+
+		return $map;
 	}
 }
 

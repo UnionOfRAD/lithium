@@ -12,6 +12,7 @@ use lithium\util\Set;
 use lithium\util\Inflector;
 use lithium\core\ConfigException;
 use BadMethodCallException;
+	use lithium\data\model\Query;
 
 /**
  * The `Model` class is the starting point for the domain logic of your application.
@@ -428,7 +429,8 @@ class Model extends \lithium\core\StaticObject {
 		$finder = array();
 
 		$defaults = array(
-			'conditions' => null, 'fields' => null, 'order' => null, 'limit' => null, 'page' => 1
+			'conditions' => null, 'fields' => null, 'order' => null, 'limit' => null, 'page' => 1,
+			'joins' => array(), 'relations' => true
 		);
 
 		if ($type === null) {
@@ -442,8 +444,26 @@ class Model extends \lithium\core\StaticObject {
 
 		$options = (array) $options + (array) $self->_query + (array) $defaults;
 		$meta = array('meta' => $self->_meta, 'name' => get_called_class());
-		$params = compact('type', 'options');
 
+		$relations = !$options['relations'] ? array() : $self->relations();
+		foreach($relations as $relation) {
+			switch($relation->type) {
+				case 'hasOne':
+				case 'belongsTo':
+					$options['joins'][$relation->to] = new Query(array(
+						'model' => $relation->to,
+						'constraint' => $relation->constraint
+					));
+				case 'hasMany':
+					$options['joins'][$relation->to] = new Query(array(
+						'model' => $relation->to,
+						'constraint' => $relation->constraint
+					));
+					break;
+			}
+		}
+
+		$params = compact('type', 'options');
 		$filter = function($self, $params) use ($meta) {
 			$options = $params['options'] + array('type' => 'read', 'model' => $meta['name']);
 			$query = $self::invokeMethod('_instance', array('query', $options));
@@ -570,7 +590,7 @@ class Model extends \lithium\core\StaticObject {
 			throw new ConfigException("Invalid relationship type `{$type}` specified.");
 		}
 		$rel = static::connection()->relationship(get_called_class(), $type, $name, $config);
-		return static::_object()->_relations[$name] = $rel;
+		return $self->_relations[$name] = $rel;
 	}
 
 	/**
