@@ -169,7 +169,7 @@ class ModelTest extends \lithium\test\Unit {
 			'link' => 'key',
 			'fields' => true,
 			'fieldName' => 'mockPost',
-			'constraint' => array(),
+			'constraint' => array('MockComment.mockpost_id' => 'MockPost.id'),
 			'init' => true
 		);
 		$this->assertEqual($expected, MockComment::relations('MockPost')->data());
@@ -183,7 +183,7 @@ class ModelTest extends \lithium\test\Unit {
 			'keys' => array('mock_post_id' => 'id'),
 			'link' => 'key',
 			'fieldName' => 'mockComment',
-			'constraint' => array(),
+			'constraint' => array('MockComment.mockpost_id' => 'MockPost.id'),
 			'init' => true
 		);
 		$this->assertEqual($expected, MockPost::relations('MockComment')->data());

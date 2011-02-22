@@ -248,7 +248,10 @@ abstract class Database extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function read($query, array $options = array()) {
-		$defaults = array('return' => is_string($query) ? 'array' : 'item', 'schema' => array());
+		$defaults = array('
+			return' => is_string($query) ? 'array' : 'item', 'schema' => array(),
+			'relations' => true, 'return' => 'item'
+		);
 		$options += $defaults;
 
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
@@ -268,7 +271,7 @@ abstract class Database extends \lithium\data\Source {
 				$conditions = array();
 				$constraint = is_array($relation->constraint) ? $relation->constraint : array();
 				foreach($constraint as $key => $val){
-					$conditions[] = $self->_processConditions($key,$val,$schema);
+					$conditions[] = $key . ' = ' . $val;
 				}
 				$constraint = implode(' AND ', $conditions);
 				switch($relation->type) {
@@ -596,8 +599,6 @@ abstract class Database extends \lithium\data\Source {
 					$result[] = $this->_processConditions($cField, $cValue, $schema, $glue);
 				}
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
-			case is_array($value) && $key == 'field':
-				return $this->name(key($value)) . ' = ' . $this->name(current($value));
 			case (is_string($key) && is_array($value) && isset($this->_operators[key($value)])):
 				foreach ($value as $op => $val) {
 					$result[] = $this->_operator($key, array($op => $val), $schema[$key]);

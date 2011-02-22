@@ -82,28 +82,28 @@ class Relationship extends \lithium\core\Object {
 
 		$constraint = &$config['constraint'];
 		if(empty($constraint)) {
-			$to = $config['to']::meta('name');
-			$from = $config['from']::meta('name');
+			$to = null;
+			$from = null;
 			$fromField = null;
 			$toField = null;
 
 			switch($config['type']){
 				case 'hasOne':
 				case 'hasMany':
+					$to = $config['to']::meta('name');
+					$from = $config['from']::meta('name');
 					$fromField = $config['from']::key();
 					$toField = strtolower($from) . '_id';
 					break;
 				case 'belongsTo':
-					$toField = $config['from']::key();
-					$fromField = strtolower($to) . '_id';
+					$from = $config['to']::meta('name');
+					$to = $config['from']::meta('name');
+					$fromField = $config['to']::key();
+					$toField = strtolower($from) . '_id';
 					break;
 			}
 			
-			$constraint[] = array(
-				'field' => array(
-					$to . '.' . $toField => $from . '.' . $fromField
-				)
-			);
+			$constraint[$to . '.' . $toField] = $from . '.' . $fromField;
 		}
 
 		$this->_config = $config;
