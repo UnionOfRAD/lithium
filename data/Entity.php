@@ -248,6 +248,14 @@ class Entity extends \lithium\core\Object {
 		foreach($return as $key => $val){
 			if(is_callable(array($val, 'data'))) {
 				$return[$key] = $val->data();
+			}else if(is_array($val) && is_numeric(key($val))){
+				$r = array();
+				foreach($val as $k => $v){
+					if(is_callable(array($v, 'data'))) {
+						$r[$k] = $v->data();
+					}
+				}
+				$return[$key] = $r;
 			}
 		}
 		return $return;

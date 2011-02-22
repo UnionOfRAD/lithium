@@ -269,8 +269,10 @@ class RecordSet extends \lithium\data\Collection {
 			return $this->close();
 		}
 		$key = null;
+		$index = false;
 		$offset = 0;
 		$recordMap = is_object($data) ? array($model => $data) : array();
+		$primaryModel = $this->_model;
 
 		if (!$recordMap) {
 			foreach ($this->_columns as $model => $fields) {
@@ -279,11 +281,31 @@ class RecordSet extends \lithium\data\Collection {
 				$record = array_combine($fields, array_slice($data, $offset, $fieldCount));
 
 				if ($model == $this->_model) {
-					$key = $model::key($record);
-					$recordMap[$this->_model] = $record;
+					$key = reset($model::key($record));
+					if (($index = array_search($key, $this->_index)) !== false){
+						$recordMap[$this->_model] = $this->_data[$index];
+						if(is_object($recordMap[$this->_model])) {
+							$recordMap[$this->_model] = $recordMap[$this->_model]->data();
+						}
+					}else {
+						$recordMap[$this->_model] = $record;
+					}
 				}else {
-					$record = $conn->item($model, $record, array('exists' => true));
-					$recordMap[$this->_model][$model::meta('name')] = $record;
+					$relation = $primaryModel::relations($model::meta('name') ?: $model);
+					$useArr = false;
+					switch($relation->type){
+						case 'hasMany':
+							$useArr = true;
+							break;
+					}
+
+					if($useArr === false){
+						$modelName = $model::meta('name');
+						$recordMap[$this->_model][$model::meta('name')] = $record;
+					}else{
+						$recordKey = reset($model::key($record));
+						$recordMap[$this->_model][$model::meta('name')][$recordKey] = $record;
+					}
 				}
 
 				$offset += $fieldCount;
@@ -321,15 +343,13 @@ class RecordSet extends \lithium\data\Collection {
 		if(!$joins = $this->_query->join()) {
 			return $model::connection()->schema($this->_query, $this->_result, $this);
 		}
-		
-		$model = $this->_query->model();
+
+		$model = $this->_model;
 		$map = $model::connection()->schema($this->_query, $this->_result, $this);
 
 		foreach($joins as $join) {
-			$model = $join->model();
-			$map += $model::connection()->schema($join, $this->_result, $this);
+			$map += $model::connection()->schema($this->_query, $join->model(), $join);
 		}
-
 		return $map;
 	}
 }

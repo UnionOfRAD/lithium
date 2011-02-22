@@ -255,6 +255,7 @@ class Query extends \lithium\core\Object {
 			return $this;
 		}else if($limit === false){
 			$this->_config['limit'] = null;
+			return $this;
 		}
 		return $this->_config['limit'];
 	}
@@ -311,6 +312,10 @@ class Query extends \lithium\core\Object {
 	public function group($group = null) {
 		if ($group) {
 			$this->_config['group'] = $group;
+			return $this;
+		}
+		if($group === false){
+			$this->_config['group'] = null;
 			return $this;
 		}
 		return $this->_config['group'];
