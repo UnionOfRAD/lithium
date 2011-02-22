@@ -12,7 +12,6 @@ use lithium\util\Set;
 use lithium\util\Inflector;
 use lithium\core\ConfigException;
 use BadMethodCallException;
-	use lithium\data\model\Query;
 
 /**
  * The `Model` class is the starting point for the domain logic of your application.
@@ -445,22 +444,8 @@ class Model extends \lithium\core\StaticObject {
 		$options = (array) $options + (array) $self->_query + (array) $defaults;
 		$meta = array('meta' => $self->_meta, 'name' => get_called_class());
 
-		$relations = !$options['relations'] ? array() : $self->relations();
-		foreach($relations as $relation) {
-			switch($relation->type) {
-				case 'hasOne':
-				case 'belongsTo':
-					$options['joins'][$relation->to] = new Query(array(
-						'model' => $relation->to,
-						'constraint' => $relation->constraint
-					));
-				case 'hasMany':
-					$options['joins'][$relation->to] = new Query(array(
-						'model' => $relation->to,
-						'constraint' => $relation->constraint
-					));
-					break;
-			}
+		if($options['relations'] === true){
+			$options['relations'] = $self->relations();
 		}
 
 		$params = compact('type', 'options');

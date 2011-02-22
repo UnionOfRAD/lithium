@@ -253,6 +253,8 @@ class Query extends \lithium\core\Object {
 		if ($limit) {
 			$this->_config['limit'] = intval($limit);
 			return $this;
+		}else if($limit === false){
+			$this->_config['limit'] = null;
 		}
 		return $this->_config['limit'];
 	}

@@ -58,7 +58,7 @@ class Relationship extends \lithium\core\Object {
 			'link' => self::LINK_KEY,
 			'fields' => true,
 			'fieldName' => null,
-			'constraint' => null,
+			'constraint' => array(),
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -81,7 +81,7 @@ class Relationship extends \lithium\core\Object {
 		$config['keys'] = $this->_keys($config['keys'], $config);
 
 		$constraint = &$config['constraint'];
-		if(!$constraint) {
+		if(empty($constraint)) {
 			$to = $config['to']::meta('name');
 			$from = $config['from']::meta('name');
 			$fromField = null;
@@ -98,7 +98,12 @@ class Relationship extends \lithium\core\Object {
 					$fromField = strtolower($to) . '_id';
 					break;
 			}
-			$constraint = $to . '.' . $toField . ' = ' . $from . '.' . $fromField;
+			
+			$constraint[] = array(
+				'field' => array(
+					$to . '.' . $toField => $from . '.' . $fromField
+				)
+			);
 		}
 
 		$this->_config = $config;

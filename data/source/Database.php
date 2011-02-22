@@ -11,6 +11,7 @@ namespace lithium\data\source;
 use lithium\util\String;
 use lithium\util\Inflector;
 use InvalidArgumentException;
+use lithium\data\model\Query;
 
 /**
  * The `Database` class provides the base-level abstraction for SQL-oriented relational databases.
@@ -250,6 +251,77 @@ abstract class Database extends \lithium\data\Source {
 		$defaults = array('return' => is_string($query) ? 'array' : 'item', 'schema' => array());
 		$options += $defaults;
 
+		$model = is_object($query) ? $query->model() : null;
+		$schema = !is_null($model) ? $model::schema() : array();
+
+		$addHostSubquery = false;
+		$conditionAssignments = array('root' => array());
+		$relations = is_array($options['relations']) ? $options['relations'] : array();
+		foreach($relations as $relation) {
+			foreach($relation->constraint as $key => $val){
+				if(strpos('.', $key) === false) {
+					continue;
+				}
+				list($model, $field) = explode('.', $val);
+				$conditions[] = $this->_processConditions($key,$val,$schema);
+			}
+			$relation->constraint = implode(' AND ', $conditions);
+
+			switch($relation->type) {
+				case 'hasOne':
+				case 'belongsTo':
+					$query->join($relation->to, new Query(array(
+						'model' => $relation->to,
+						'constraint' => $relation->constraint
+					)));
+					break;
+				case 'hasMany':
+					$query->join($relation->to, new Query(array(
+						'model' => $relation->to,
+						'constraint' => $relation->constraint
+					)));
+
+					if($query->limit()) {
+						$addHostSubquery = true;
+					}
+
+					$model = $relation->to;
+					$name = $model::meta('name');
+					$key = $model::key();
+					$query->conditions(array(
+						array($this->name($name . '.' . $key) => new Query(array(
+							'type' => 'read',
+							'fields' => array($key),
+							'model' => $model,
+							'conditions' => $relation->constraint
+						)))
+					));
+					break;
+			}
+		}
+
+
+		if($addHostSubquery){
+			$model = $query->model();
+			$name = $model::meta('name');
+			$key = $model::key();
+			$conditions = array();
+
+			$query->conditions(array(
+				array($this->name($name . '.' . $key) => new Query(array(
+					'type' => 'read',
+					'fields' => array($key),
+					'model' => $model,
+					'limit' => $query->limit()
+				)))
+			));
+
+			$query->limit(false);
+		}
+
+
+		var_dump($query);
+
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
 			$query = $params['query'];
 			$args = $params['options'];
@@ -260,7 +332,7 @@ abstract class Database extends \lithium\data\Source {
 				$sql = String::insert($query, $self->value($args));
 			} else {
 				$sql = $self->renderCommand($query);
-			}
+			}var_dump($sql);
 			$result = $self->invokeMethod('_execute', array($sql));
 
 			switch ($return) {
@@ -514,6 +586,8 @@ abstract class Database extends \lithium\data\Source {
 					$result[] = $this->_processConditions($cField, $cValue, $schema, $glue);
 				}
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
+			case is_array($value) && $key == 'field':
+				return $this->name(key($value)) . ' = ' . $this->name(current($value));
 			case (is_string($key) && is_array($value) && isset($this->_operators[key($value)])):
 				foreach ($value as $op => $val) {
 					$result[] = $this->_operator($key, array($op => $val), $schema[$key]);
