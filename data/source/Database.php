@@ -356,7 +356,7 @@ abstract class Database extends \lithium\data\Source {
 						));
 
 					//@todo - this is a hack, should have a more formal way to setup the data
-					if(count($hasMany)) {
+					if (count($hasMany)) {
 						count($return);
 					}
 
@@ -449,11 +449,24 @@ abstract class Database extends \lithium\data\Source {
 	 * @return array Returns an array containing the configuration for a model relationship.
 	 */
 	public function relationship($class, $type, $name, array $config = array()) {
-		$singularName = ($type == 'hasMany') ? Inflector::singularize($name) : $name;
-		$keys = $type == 'belongsTo' ? $class::meta('name') : $singularName;
-		$keys = Inflector::underscore($keys) . '_id';
+		$field = Inflector::underscore(Inflector::singularize($name));//($type == 'hasMany') ?  : ;
+		$keys = "{$field}_id";
+		$primary = $class::meta('key');
+
+		if (is_array($primary)) {
+			$keys = array_combine($primary, $primary);
+		} elseif ($type == 'hasMany' || $type == 'hasOne') {
+			if ($type == 'hasMany') {
+				$field = Inflector::pluralize($field);
+			}
+			$secondary = Inflector::underscore(Inflector::singularize($class::meta('name')));
+			$keys = array($primary => "{$secondary}_id");
+		}
+
 		$from = $class;
-		return $this->_instance('relationship', $config + compact('type', 'name', 'keys', 'from'));
+		$fieldName = $field;
+		$config += compact('type', 'name', 'keys', 'from', 'fieldName');
+		return $this->_instance('relationship', $config);
 	}
 
 	/**
@@ -571,11 +584,11 @@ abstract class Database extends \lithium\data\Source {
 			}
 		}
 		$result = join(" AND ", $result);
-		return ($options['prepend'] && !empty($result)) ? "WHERE {$result}" : $result;
+		return ($options['prepend'] && $result) ? "WHERE {$result}" : $result;
 	}
 
-	public function _processConditions($key, $value, $schema, $glue = 'AND'){
-		$constraintTypes = &$this->_constraintTypes;
+	public function _processConditions($key, $value, $schema, $glue = 'AND') {
+		$constraintTypes =& $this->_constraintTypes;
 
 		switch (true) {
 			case (is_numeric($key) && is_string($value)):
