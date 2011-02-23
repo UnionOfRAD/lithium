@@ -6,6 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
+use lithium\analysis\Debugger;
 use lithium\analysis\Inspector;
 
 $exception = $info['exception'];
@@ -125,21 +126,10 @@ function renderCodeExcerpt($file = null, $line = null) {
 			<tt><a href="#source" id="0" class="display-source-excerpt">[Exception Thrown]</a></tt>
 			<div id="sourceCode0" style="display: none;"></div>
 		</li>
-		<?php foreach ($exception->getTrace() as $id => $frame) :
-			$id++;
-			$title = null;
-			// Borrowed this snippet from `\lithium\core\ErrorHandler::trace()`.
-			if (isset($frame['function'])) {
-				if (isset($frame['class'])) {
-					$title = trim($frame['class'], '\\') . '::' . $frame['function'];
-				} else {
-					$title = $frame['function'];
-				}
-			}
-			?>
+		<?php foreach (Debugger::trace(array('format' => 'array', 'trace' => $exception->getTrace())) as $id => $frame) : ?>
 			<li>
-				<tt><a href="#source" id="<?=$id;?>" class="display-source-excerpt"><?=$title;?>()</a></tt>
-				<div id="sourceCode<?=$id;?>" style="display: none;">
+				<tt><a href="#source" id="<?=$id + 1;?>" class="display-source-excerpt"><?=$frame['functionRef'];?></a></tt>
+				<div id="sourceCode<?=$id + 1;?>" style="display: none;">
 					<?php renderCodeExcerpt($frame['file'], $frame['line']); ?>
 				</div>
 			</li>

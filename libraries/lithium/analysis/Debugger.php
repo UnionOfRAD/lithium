@@ -8,7 +8,9 @@
 
 namespace lithium\analysis;
 
+use ReflectionClass;
 use lithium\util\String;
+use lithium\analysis\Inspector;
 
 /**
  * The `Debugger` class provides basic facilities for generating and rendering meta-data about the
@@ -68,6 +70,27 @@ class Debugger extends \lithium\core\Object {
 				}
 			}
 
+			// Display more info about closures. Is this the right place for this?
+			if (strpos($function, '{closure}') !== false) {
+				if ($class = Inspector::classes(array('file' => $backtrace[$i]['file']))) {
+					foreach (Inspector::methods(key($class), 'extents') as $method => $extents) {
+						$line = $backtrace[$i]['line'];
+						if (!($extents[0] <= $line && $line <= $extents[1])) {
+							continue;
+						}
+						$class = key($class);
+						$reference = "{$class}::{$method}";
+						$function = "{$reference}()::{closure}";
+						break;
+					}
+				} else {
+					$reference = $backtrace[$i]['file'];
+					$function = "{$reference}::{closure}";
+				}
+				$line = static::_definition($reference, $backtrace[$i]['line']) ?: '?';
+				$function .= " @ {$line}";
+			}
+
 			if (in_array($function, array('call_user_func_array', 'trigger_error'))) {
 				continue;
 			}
@@ -115,6 +138,41 @@ class Debugger extends \lithium\core\Object {
 			$export = str_replace($replace, $with, $export);
 		}
 		return $export;
+	}
+
+	/**
+	 * Locates original location of closures.
+	 *
+	 * @param mixed $reference File or class name to inspect.
+	 * @param integer $callLine Line number of class reference.
+	 */
+	protected static function _definition($reference, $callLine) {
+		if (file_exists($reference)) {
+			foreach (array_reverse(token_get_all(file_get_contents($reference))) as $token) {
+				if (!is_array($token) || $token[2] > $callLine) {
+					continue;
+				}
+				if ($token[0] === T_FUNCTION) {
+					return $token[2];
+				}
+			}
+		} else {
+			list($class, $method) = explode('::', $reference);
+			$classRef = new ReflectionClass($class);
+			$methodInfo = Inspector::info($reference);
+			$methodDef = join("\n", Inspector::lines($classRef->getFileName(), range(
+				$methodInfo['start'] + 1, $methodInfo['end'] - 1
+			)));
+
+			foreach (array_reverse(token_get_all("<?php {$methodDef} ?>")) as $token) {
+				if (!is_array($token) || $token[2] > $callLine) {
+					continue;
+				}
+				if ($token[0] === T_FUNCTION) {
+					return $token[2] + $methodInfo['start'];
+				}
+			}
+		}
 	}
 }
 
