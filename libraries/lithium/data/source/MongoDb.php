@@ -450,7 +450,6 @@ class MongoDb extends \lithium\data\Source {
 			$query = $params['query'];
 			$options = $params['options'];
 			$args = $query->export($self);
-			$self->connection->resetError();
 			$source = $args['source'];
 
 			if ($group = $args['group']) {
