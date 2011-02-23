@@ -252,22 +252,24 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Default query parameters.
 	 *
-	 * - `conditions`: The conditional query elements, e.g.
+	 * - `'conditions'`: The conditional query elements, e.g.
 	 *                 `'conditions' => array('published' => true)`
-	 * - `fields`: The fields that should be retrieved. When set to `null`, defaults to
+	 * - `'fields'`: The fields that should be retrieved. When set to `null`, defaults to
 	 *             all fields.
-	 * - `order`: The order in which the data will be returned, e.g. `'order' => 'ASC'`.
-	 * - `limit`: The maximum number of records to return.
-	 * - `page`: For pagination of data.
+	 * - `'order'`: The order in which the data will be returned, e.g. `'order' => 'ASC'`.
+	 * - `'limit'`: The maximum number of records to return.
+	 * - `'page'`: For pagination of data.
+	 * - `'with'`: An array of relationship names to be included in the query.
 	 *
 	 * @var array
 	 */
 	protected $_query = array(
 		'conditions' => null,
-		'fields' => null,
-		'order' => null,
-		'limit' => null,
-		'page' => null
+		'fields'     => null,
+		'order'      => null,
+		'limit'      => null,
+		'page'       => null,
+		'with'       => array(),
 	);
 
 	/**
@@ -319,6 +321,7 @@ class Model extends \lithium\core\StaticObject {
 			return;
 		}
 		$self    = static::_object();
+		$query   = array();
 		$meta    = array();
 		$schema  = array();
 		$source  = array();
@@ -327,7 +330,7 @@ class Model extends \lithium\core\StaticObject {
 		foreach (static::_parents() as $parent) {
 			$parentConfig = get_class_vars($parent);
 
-			foreach (array('meta', 'schema', 'classes') as $key) {
+			foreach (array('meta', 'schema', 'classes', 'query') as $key) {
 				if (isset($parentConfig["_{$key}"])) {
 					${$key} += $parentConfig["_{$key}"];
 				}
@@ -426,11 +429,6 @@ class Model extends \lithium\core\StaticObject {
 	public static function find($type, array $options = array()) {
 		$self = static::_object();
 		$finder = array();
-
-		$defaults = array(
-			'conditions' => null, 'fields' => null, 'order' => null, 'limit' => null, 'page' => 1,
-			'joins' => array(), 'relations' => true
-		);
 
 		if ($type === null) {
 			return null;
