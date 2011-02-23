@@ -281,30 +281,25 @@ class RecordSet extends \lithium\data\Collection {
 				$record = array_combine($fields, array_slice($data, $offset, $fieldCount));
 
 				if ($model == $this->_model) {
-					$key = reset($model::key($record));
-					if (($index = array_search($key, $this->_index)) !== false){
+					$key = $model::key($record);
+					if (($index = array_search(reset($key), $this->_index)) !== false) {
 						$recordMap[$this->_model] = $this->_data[$index];
-						if(is_object($recordMap[$this->_model])) {
+						if (is_object($recordMap[$this->_model])) {
 							$recordMap[$this->_model] = $recordMap[$this->_model]->data();
 						}
-					}else {
+					} else {
 						$recordMap[$this->_model] = $record;
 					}
-				}else {
+				} else {
 					$relation = $primaryModel::relations($model::meta('name') ?: $model);
-					$useArr = false;
-					switch($relation->type){
-						case 'hasMany':
-							$useArr = true;
-							break;
-					}
+					$useArr = ($relation->type() == 'hasMany');
 
-					if($useArr === false){
+					if ($useArr === false) {
 						$modelName = $model::meta('name');
 						$recordMap[$this->_model][$model::meta('name')] = $record;
-					}else{
-						$recordKey = reset($model::key($record));
-						$recordMap[$this->_model][$model::meta('name')][$recordKey] = $record;
+					} else {
+						$recordKey = $model::key($record);
+						$recordMap[$this->_model][$model::meta('name')][reset($recordKey)] = $record;
 					}
 				}
 
