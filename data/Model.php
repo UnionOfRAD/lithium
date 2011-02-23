@@ -441,12 +441,8 @@ class Model extends \lithium\core\StaticObject {
 
 		$options = (array) $options + (array) $self->_query + (array) $defaults;
 		$meta = array('meta' => $self->_meta, 'name' => get_called_class());
-
-		if($options['relations'] === true){
-			$options['relations'] = $self->relations();
-		}
-
 		$params = compact('type', 'options');
+
 		$filter = function($self, $params) use ($meta) {
 			$options = $params['options'] + array('type' => 'read', 'model' => $meta['name']);
 			$query = $self::invokeMethod('_instance', array('query', $options));
