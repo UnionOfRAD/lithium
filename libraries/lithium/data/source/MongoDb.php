@@ -517,6 +517,9 @@ class MongoDb extends \lithium\data\Source {
 			}
 			$update = $query->entity() ? $_exp::toCommand($data) : $data;
 
+			if ($options['multiple'] && !preg_grep('/^\$/', array_keys($update))) {
+				$update = array('$set' => $update);
+			}
 			if ($self->connection->{$source}->update($args['conditions'], $update, $options)) {
 				$query->entity() ? $query->entity()->update() : null;
 				return true;

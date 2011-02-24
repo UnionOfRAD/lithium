@@ -23,6 +23,7 @@ use lithium\data\entity\Document;
 use lithium\tests\mocks\data\MockPost;
 use lithium\data\collection\DocumentSet;
 use lithium\data\collection\DocumentArray;
+use lithium\tests\mocks\data\source\MockMongoSource;
 use lithium\tests\mocks\data\source\MockMongoConnection;
 
 class MongoDbTest extends \lithium\test\Unit {
@@ -241,37 +242,50 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testReadNoConditions() {
-		$data = array('title' => 'Test Post');
-		$this->query->data($data);
-		$this->db->create($this->query);
+		$this->db->connect();
+		$connection = $this->db->connection;
+		$this->db->connection = new MockMongoSource();
+		$this->db->connection->resultSets = array(array('ok' => true));
 
+		$data = array('title' => 'Test Post');
+		$options = array('safe' => false, 'fsync' => false);
+		$this->query->data($data);
+		$this->assertIdentical(true, $this->db->create($this->query));
+		$this->assertEqual(compact('data', 'options'), end($this->db->connection->queries));
+
+		$this->db->connection->resultSets = array(array(array('_id' => new MongoId()) + $data));
 		$result = $this->db->read($this->query);
+
 		$this->assertTrue($result instanceof DocumentSet);
 		$this->assertEqual(1, $result->count());
-
-		$expected = $data['title'];
-		$this->assertEqual($expected, $result->first()->title);
+		$this->assertEqual('Test Post', $result->first()->title);
+		$this->db->connection = $connection;
 	}
 
 	public function testReadWithConditions() {
+		$this->db->connect();
+		$connection = $this->db->connection;
+		$this->db->connection = new MockMongoSource();
+		$this->db->connection->resultSets = array(array('ok' => true));
+
 		$data = array('title' => 'Test Post');
+		$options = array('safe' => false, 'fsync' => false);
 		$this->query->data($data);
-		$this->db->create($this->query);
+		$this->assertTrue($this->db->create($this->query));
 		$this->query->data(null);
 
+		$this->db->connection->resultSets = array(array());
 		$this->query->conditions(array('title' => 'Nonexistent Post'));
 		$result = $this->db->read($this->query);
 		$this->assertTrue($result == true);
+		$this->assertEqual(0, $result->count());
 
-		$expected = 0;
-		$this->assertEqual($expected, $result->count());
-
+		$this->db->connection->resultSets = array(array($data));
 		$this->query->conditions($data);
 		$result = $this->db->read($this->query);
 		$this->assertTrue($result == true);
-
-		$expected = 1;
-		$this->assertEqual($expected, $result->count());
+		$this->assertEqual(1, $result->count());
+		$this->db->connection = $connection;
 	}
 
 	public function testUpdate() {
@@ -299,7 +313,8 @@ class MongoDbTest extends \lithium\test\Unit {
 		)));
 		$this->assertEqual(1, $result->count());
 
-		$updated = $result->first()->to('array');
+		$updated = $result->first();
+		$updated = $updated ? $updated->to('array') : array();
 		$this->assertEqual($original['_id'], $updated['_id']);
 		$this->assertEqual('New Post Title', $updated['title']);
 	}
@@ -443,7 +458,6 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testRelationshipGeneration() {
-		$this->skipIf(true, "Temporarily disabled.");
 		Connections::add('mock-source', $this->_testConfig);
 		$from = 'lithium\tests\mocks\data\MockComment';
 		$to = 'lithium\tests\mocks\data\MockPost';
@@ -452,14 +466,16 @@ class MongoDbTest extends \lithium\test\Unit {
 		$to::config(array('connection' => 'mock-source'));
 
 		$result = $this->db->relationship($from, 'belongsTo', 'MockPost');
-		$expected = compact('from', 'to') + array(
+		$expected = array(
 			'name' => 'MockPost',
 			'type' => 'belongsTo',
 			'keys' => array('mockComment' => '_id'),
+			'from' => $from,
 			'link' => 'contained',
-			'conditions' => null,
+			'to'   => $to,
 			'fields' => true,
 			'fieldName' => 'mockPost',
+			'constraint' => null,
 			'init' => true
 		);
 		$this->assertEqual($expected, $result->data());
@@ -505,7 +521,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$duplicate = $model::create(array('_id' => $document->_id), array('exists' => true));
 		$duplicate->values = 'new';
-		$duplicate->save();
+		$this->assertTrue($duplicate->save());
 
 		$document = $model::find((string) $duplicate->_id);
 		$expected = array(
