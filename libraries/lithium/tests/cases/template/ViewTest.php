@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\template;
 
 use lithium\template\View;
+use lithium\action\Response;
 use lithium\g11n\catalog\adapter\Memory;
 use lithium\template\view\adapter\Simple;
 
@@ -49,6 +50,31 @@ class ViewTest extends \lithium\test\Unit {
 		$expected = '&lt;p&gt;Foo, Bar &amp; Baz&lt;/p&gt;';
 		$result = $h('<p>Foo, Bar & Baz</p>');
 		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * Tests that the output-escaping handler correctly inherits its encoding from the `Response`
+	 * object, if provided.
+	 *
+	 * @return void
+	 */
+	public function testEscapeOutputFilterWithInjectedEncoding() {
+		$message = "Multibyte string support must be enabled to test character encodings.";
+		$this->skipIf(!function_exists('mb_convert_encoding'), $message);
+
+		$string = "Joël";
+
+		$response = new Response();
+		$response->encoding = 'UTF-8';
+		$view = new View(compact('response'));
+		$handler = $view->outputFilters['h'];
+		$this->assertTrue(mb_check_encoding($handler($string), "UTF-8"));
+
+		$response = new Response();
+		$response->encoding = 'ISO-8859-1';
+		$view = new View(compact('response'));
+		$handler = $view->outputFilters['h'];
+		$this->assertTrue(mb_check_encoding($handler($string), "ISO-8859-1"));
 	}
 
 	public function testBasicRenderModes() {
