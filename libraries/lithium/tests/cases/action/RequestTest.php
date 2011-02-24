@@ -921,6 +921,15 @@ class RequestTest extends \lithium\test\Unit {
 			'image/x-xbitmap',
 			'*/*;q=0.1'
 		);
+		$android = array(
+			'application/xml',
+			'application/xhtml+xml',
+			'text/html;q=0.9',
+			'text/plain;q=0.8',
+			'image/png',
+			'*/*;q=0.5',
+			'application/youtube-client'
+		);
 		$request = new Request(array('env' => array('HTTP_ACCEPT' => join(',', $chrome))));
 		$this->assertEqual('html', $request->accepts());
 		$this->assertTrue(array_search('text/plain', $request->accepts(true)), 4);
@@ -939,6 +948,9 @@ class RequestTest extends \lithium\test\Unit {
 
 		$result = $request->accepts(true);
 		$this->assertEqual('text/plain', $result[0]);
+
+		$request = new Request(array('env' => array('HTTP_ACCEPT' => join(',', $android))));
+		$this->assertEqual('html', $request->accepts());
 	}
 }
 
