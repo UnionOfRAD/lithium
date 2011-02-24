@@ -31,17 +31,29 @@ class FormTest extends \lithium\test\Unit {
 	}
 
 	public function testLoginWithFilters() {
-		$subject = new Form(array('model' => __CLASS__, 'filters' => array(
-			'username' => 'sha1'
-		)));
+		$subject = new Form(array('model' => __CLASS__, 'filters' => array('username' => 'sha1')));
 		$request = new Request();
 		$request->data = array('username' => 'Person', 'password' => 'password');
 
-		$result = $subject->check($request);
-		$expected = array('username' => sha1('Person'),
+		$expected = array(
+			'username' => sha1('Person'),
 			'password' => 'b109f3bbbc244eb82441917ed06d618b9008dd09b3befd1b5e07394c706a8bb980b1d7'.
-					'785e5976ec049b46df5f1326af5a2ea6d103fd07c95385ffab0cacbc86');
-		$this->assertEqual($expected, $result);
+					'785e5976ec049b46df5f1326af5a2ea6d103fd07c95385ffab0cacbc86'
+		);
+		$this->assertEqual($expected, $subject->check($request));
+	}
+
+	/**
+	 * Tests that attempted exploitation via malformed credential submission.
+	 *
+	 * @return void
+	 */
+	public function testLoginWithArray() {
+		$subject = new Form(array('model' => __CLASS__));
+		$request = new Request();
+		$request->data = array('username' => array('!=' => ''), 'password' => '');
+		$result = $subject->check($request);
+		$this->assertEqual('Array', $result['username']);
 	}
 
 	/**

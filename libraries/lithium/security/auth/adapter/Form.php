@@ -198,7 +198,7 @@ class Form extends \lithium\core\Object {
 	public function check($credentials, array $options = array()) {
 		$model = $this->_model;
 		$query = $this->_query;
-		$conditions = $this->_scope + $this->_filters($credentials->data);
+		$conditions = $this->_scope + $this->_filters(array_map('strval', $credentials->data));
 		$user = $model::$query(compact('conditions'));
 		return $user ? $user->data() : false;
 	}
@@ -246,9 +246,10 @@ class Form extends \lithium\core\Object {
 		foreach ($this->_fields as $key => $field) {
 			$result[$field] = isset($data[$key]) ? $data[$key] : null;
 
-			if (isset($this->_filters[$key])) {
-				$result[$field] = call_user_func($this->_filters[$key], $result[$field]);
+			if (!isset($this->_filters[$key])) {
+				continue;
 			}
+			$result[$field] = call_user_func($this->_filters[$key], $result[$field]);
 		}
 		return isset($this->_filters[0]) ? call_user_func($this->_filters[0], $result) : $result;
 	}
