@@ -601,6 +601,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc->more = 'cowbell';
 		$doc->nested->evenMore = 'cowbell';
 		$modified = $doc->export();
+
 		$expected = array('more' => 'cowbell');
 		$this->assertEqual($expected, $modified['update']);
 		$this->assertEqual(array('nested', 'foo', 'baz'), array_keys($modified['data']));
@@ -630,6 +631,20 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $doc->data();
 		$this->assertPattern('/^[a-f0-9]{24}$/', $result['id']);
 		$this->assertEqual(time(), $result['date']);
+	}
+
+	public function testInitializationWithNestedFields() {
+		$doc = new Document(array('model' => $this->_model, 'data' => array(
+			'simple' => 'value',
+			'nested.foo' => 'first',
+			'nested.bar' => 'second',
+			'really.nested.key' => 'value'
+		)));
+		$this->assertEqual('value', $doc->simple);
+		$this->assertEqual('first', $doc->nested->foo);
+		$this->assertEqual('second', $doc->nested->bar);
+		$this->assertEqual('value', $doc->really->nested->key);
+		$this->assertEqual(array('simple', 'nested', 'really'), array_keys($doc->data()));
 	}
 }
 

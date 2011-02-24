@@ -13,9 +13,9 @@ use lithium\util\Inflector;
 class MockSource extends \lithium\data\Source {
 
 	protected $_classes = array(
-		'entity' => '\lithium\data\entity\Record',
-		'set' => '\lithium\data\collection\RecordSet',
-		'relationship' => '\lithium\data\model\Relationship'
+		'entity' => 'lithium\data\entity\Record',
+		'set' => 'lithium\data\collection\RecordSet',
+		'relationship' => 'lithium\data\model\Relationship'
 	);
 
 	private $_mockPosts = array(

@@ -9,19 +9,29 @@
 namespace lithium\tests\cases\data;
 
 use lithium\data\Model;
+use lithium\data\Entity;
 use lithium\data\model\Query;
 use lithium\data\Connections;
 use lithium\analysis\Inspector;
 use lithium\tests\mocks\data\MockTag;
 use lithium\tests\mocks\data\MockPost;
+use lithium\tests\mocks\data\MockSource;
 use lithium\tests\mocks\data\MockComment;
 use lithium\tests\mocks\data\MockTagging;
 use lithium\tests\mocks\data\MockCreator;
 use lithium\tests\mocks\data\MockPostForValidates;
+use lithium\tests\mocks\data\source\MockMongoConnection;
 
 class ModelTest extends \lithium\test\Unit {
 
 	protected $_configs = array();
+
+	protected $_altSchema = array(
+		'id' => array('type' => 'integer'),
+		'author_id' => array('type' => 'integer'),
+		'title' => array('type' => 'string'),
+		'body' => array('type' => 'text')
+	);
 
 	public function setUp() {
 		$this->_configs = Connections::config();
@@ -397,25 +407,23 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual('mock-source', MockPost::meta('connection'));
 		MockPost::config(array('connection' => false));
 		$this->assertFalse(MockPost::meta('connection'));
+		$schema = MockPost::schema();
 
-		$schema = array(
-			'id' => array('type' => 'integer'),
-			'author_id' => array('type' => 'integer'),
-			'title' => array('type' => 'string'),
-			'body' => array('type' => 'text')
-		);
-		MockPost::overrideSchema($schema);
-		$this->assertEqual($schema, MockPost::schema());
+		MockPost::overrideSchema($this->_altSchema);
+		$this->assertEqual($this->_altSchema, MockPost::schema());
 
 		$post = MockPost::create(array('title' => 'New post'));
-		$this->assertTrue($post instanceof \lithium\data\Entity);
+		$this->assertTrue($post instanceof Entity);
 		$this->assertEqual('New post', $post->title);
+		MockPost::overrideSchema($schema);
 
 		$this->expectException('/Connection name not defined/');
 		$post->save();
 	}
 
 	public function testSave() {
+		$schema = MockPost::schema();
+		MockPost::overrideSchema($this->_altSchema);
 		$data = array('title' => 'New post', 'author_id' => 13);
 		$record = MockPost::create($data);
 		$result = $record->save();
@@ -423,6 +431,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual('create', $result['query']->type());
 		$this->assertEqual($data, $result['query']->data());
 		$this->assertEqual('lithium\tests\mocks\data\MockPost', $result['query']->model());
+		MockPost::overrideSchema($schema);
 	}
 
 	public function testSaveWithFailedValidation() {
@@ -501,6 +510,20 @@ class ModelTest extends \lithium\test\Unit {
 
 		$result = MockPost::count(array('conditions' => array('email' => 'foo@example.com')));
 		$this->assertEqual($query, $result['query']);
+	}
+
+	public function testSettingNestedObjectDefaults() {
+		MockPost::$connection = new MockMongoConnection();
+		$schema = MockPost::schema();
+
+		MockPost::overrideSchema($schema + array('nested.value' => array(
+			'type' => 'string',
+			'default' => 'foo'
+		)));
+		$this->assertEqual('foo', MockPost::create()->nested->value);
+
+		MockPost::overrideSchema($schema);
+		MockPost::$connection = null;
 	}
 }
 

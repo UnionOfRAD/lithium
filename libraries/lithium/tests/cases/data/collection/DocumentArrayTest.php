@@ -33,8 +33,6 @@ class DocumentArrayTest extends \lithium\test\Unit {
 			'data' => array('5', '6', '7')
 		));
 		$array[] = 8;
-		// var_dump($array);
-		// var_dump($array->export());
 	}
 }
 

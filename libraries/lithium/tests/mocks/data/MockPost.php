@@ -12,6 +12,8 @@ class MockPost extends \lithium\tests\mocks\data\MockBase {
 
 	public $hasMany = array('MockComment');
 
+	public static $connection = null;
+
 	public static function resetSchema() {
 		static::_object()->_schema = array();
 	}
@@ -22,6 +24,13 @@ class MockPost extends \lithium\tests\mocks\data\MockBase {
 
 	public static function instances() {
 		return array_keys(static::$_instances);
+	}
+
+	public static function &connection() {
+		if (static::$connection) {
+			return static::$connection;
+		}
+		return parent::connection();
 	}
 }
 
