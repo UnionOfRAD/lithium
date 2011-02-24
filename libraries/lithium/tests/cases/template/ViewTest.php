@@ -34,9 +34,12 @@ class ViewTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testInitializationWithBadClasses() {
+	public function testInitializationWithBadLoader() {
 		$this->expectException("Class 'Badness' of type 'adapter.template.view' not found.");
 		new View(array('loader' => 'Badness'));
+	}
+
+	public function testInitializationWithBadRenderer() {
 		$this->expectException("Class 'Badness' of type 'adapter.template.view' not found.");
 		new View(array('renderer' => 'Badness'));
 	}
