@@ -39,7 +39,9 @@ class FileTest extends \lithium\test\Unit {
 	}
 
 	public function testWithoutTimestamp() {
-		$this->subject = new File(array('path' => $this->path, 'timestamp' => false));
+		$this->subject = new File(array(
+			'path' => $this->path, 'timestamp' => false, 'format' => "{:message}\n"
+		));
 		$priority = 'debug';
 		$message = 'This is a debug message';
 		$function = $this->subject->write($priority, $message);

@@ -65,6 +65,11 @@ class Logger extends \lithium\core\Adaptable {
 	 */
 	protected static $_adapters = 'adapter.analysis.logger';
 
+	/**
+	 * An array of valid message priorities.
+	 *
+	 * @var array
+	 */
 	protected static $_priorities = array(
 		'emergency' => 0,
 		'alert'     => 1,

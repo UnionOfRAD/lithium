@@ -8,59 +8,74 @@
 
 namespace lithium\analysis\logger\adapter;
 
-use \SplFileInfo;
-use \DirectoryIterator;
+use lithium\util\String;
 
 /**
  * A simple log adapter that writes messages to files. By default, messages are written to
  * `app/resources/tmp/logs/<type>.log`, where `<type>` is the log message priority level.
  *
  * {{{
- * lithium\analysis\Logger::config(array(
- * 	'debug' => array('adapter' => 'File')
+ * use lithium\analysis\Logger;
+ *
+ * Logger::config(array(
+ * 	'simple' => array('adapter' => 'File')
  * ));
- * lithium\analysis\Logger::write('debug', 'Something happened!');
+ * Logger::write('debug', 'Something happened!');
  * }}}
  *
  * This will cause the message and the timestamp of the log event to be written to
- * `app/resources/tmp/logs/debug.log`.
+ * `app/resources/tmp/logs/debug.log`. For available configuration options for this adapter, see
+ * the `__construct()` method.
+ *
+ * @see lithium\analysis\logger\adapter\File::__construct()
  */
 class File extends \lithium\core\Object {
 
 	/**
 	 * Class constructor.
 	 *
+	 * @see lithium\util\String::insert()
 	 * @param array $config Settings used to configure the adapter. Available options:
 	 *              - `'path'` _string_: The directory to write log files to. Defaults to
-	 *                `app/resources/tmp/logs`.
-	 *              - `'timestamp'` _string_: The `date()`-compatible format of the timetstamp, or
-	 *                `false` to disable timestamps. Defaults to `'Y-m-d H:i:s'`.
+	 *                `<app>/resources/tmp/logs`.
+	 *              - `'timestamp'` _string_: The `date()`-compatible timestamp format. Defaults to
+	 *                `'Y-m-d H:i:s'`.
+	 *              - `'file'` _closure_: A closure which accepts two parameters: an array
+	 *                containing the current log message details, and an array containing the `File`
+	 *                adapter's current configuration. It must then return a file name to write the
+	 *                log message to. The default will produce a log file name corresponding to the
+	 *                priority of the log message, i.e. `"debug.log"` or `"alert.log"`.
+	 *              - `'format'` _string_: A `String::insert()`-compatible string that specifies how
+	 *                the log message should be formatted. The default format is
+	 *                `"{:timestamp} {:message}\n"`.
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'path' => LITHIUM_APP_PATH . '/resources/tmp/logs',
 			'timestamp' => 'Y-m-d H:i:s',
+			'file' => function($data, $config) { return "{$data['priority']}.log"; },
+			'format' => "{:timestamp} {:message}\n",
 		);
 		parent::__construct($config + $defaults);
 	}
 
 	/**
-	 * Appends $data to file $type.
+	 * Appends a message to a log file.
 	 *
-	 * @param string $type
-	 * @param string $message
-	 * @return boolean `True` on successful write, `false` otherwise.
+	 * @see lithium\analysis\Logger::$_priorities
+	 * @param string $priority The message priority. See `Logger::$_priorities`.
+	 * @param string $message The message to write to the log.
+	 * @return closure Returns a closure that writes to the log, which can be wrapped in filters.
 	 */
-	public function write($type, $message) {
+	public function write($priority, $message) {
 		$config = $this->_config;
 
 		return function($self, $params) use (&$config) {
-			$type = $params['priority'];
-			$message = $params['message'];
-			$time = $config['timestamp'] ? date($config['timestamp']) . ' ' : '';
-			$path = $config['path'];
-			return file_put_contents("{$path}/{$type}.log", "{$time}{$message}\n", FILE_APPEND);
+			$path = $config['path'] . '/' . $config['file']($params, $config);
+			$params['timestamp'] = date($config['timestamp']);
+			$message = String::insert($config['format'], $params);
+			return file_put_contents($path, $message, FILE_APPEND);
 		};
 	}
 }
