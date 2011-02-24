@@ -504,7 +504,7 @@ class MongoDb extends \lithium\data\Source {
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config, $_exp) {
 			$options = $params['options'];
 			$query  = $params['query'];
-			$args   = $query->export($self, array('keys' => array('conditions', 'source')));
+			$args   = $query->export($self, array('keys' => array('conditions', 'source', 'data')));
 			$source = $args['source'];
 			$data   = $args['data'];
 
