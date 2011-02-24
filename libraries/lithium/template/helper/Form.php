@@ -144,7 +144,7 @@ class Form extends \lithium\template\Helper {
 					if (in_array($method, array('create', 'end', 'label', 'error'))) {
 						return;
 					}
-					if (!$name || ($method == 'hidden' && $name = '_method')) {
+					if (!$name || ($method == 'hidden' && $name == '_method')) {
 						return;
 					}
 					$id = Inflector::camelize(Inflector::slug($name));
@@ -555,7 +555,7 @@ class Form extends \lithium\template\Helper {
 			}
 		}
 		if ($scope['hidden']) {
-			$out = $this->hidden($name, array('value' => ''));
+			$out = $this->hidden($name, array('value' => '', 'id' => false));
 		}
 		$options['value'] = $scope['value'];
 		return $out . $this->_render(__METHOD__, $template, compact('name', 'options'));
@@ -661,14 +661,7 @@ class Form extends \lithium\template\Helper {
 	protected function _defaults($method, $name, $options) {
 		$methodConfig = isset($this->_config[$method]) ? $this->_config[$method] : array();
 		$options += $methodConfig + $this->_config['base'];
-
-		foreach ($this->_config['attributes'] as $key => $generator) {
-			if (!isset($options[$key]) && $generator) {
-				if (($attr = $generator($method, $name, $options)) !== null) {
-					$options[$key] = $attr;
-				}
-			}
-		}
+		$options = $this->_generators($method, $name, $options);
 
 		$hasValue = (
 			(!isset($options['value']) || $options['value'] === null) &&
@@ -690,6 +683,36 @@ class Form extends \lithium\template\Helper {
 		$tplKey = isset($options['template']) ? $options['template'] : $method;
 		$template = isset($this->_templateMap[$tplKey]) ? $this->_templateMap[$tplKey] : $tplKey;
 		return array($name, $options, $template);
+	}
+
+	/**
+	 * Iterates over the configured attribute generators, and modifies the settings for a tag.
+	 *
+	 * @param string $method The name of the helper method which was called, i.e. `'text'`,
+	 *               `'select'`, etc.
+	 * @param string $name The name of the field whose attributes are being generated. Some helper
+	 *               methods, such as `create()` and `end()`, are not field-based, and therefore
+	 *               will have no name.
+	 * @param array $options The options and HTML attributes that will be used to generate the
+	 *              helper output.
+	 * @return array Returns the value of the `$options` array, modified by the attribute generators
+	 *         added in the `'attributes'` key of the helper's configuration. Note that if a
+	 *         generator is present for a field whose value is `false`, that field will be removed
+	 *         from the array.
+	 */
+	protected function _generators($method, $name, $options) {
+		foreach ($this->_config['attributes'] as $key => $generator) {
+			if ($generator && !isset($options[$key])) {
+				if (($attr = $generator($method, $name, $options)) !== null) {
+					$options[$key] = $attr;
+				}
+				continue;
+			}
+			if ($generator && $options[$key] === false) {
+				unset($options[$key]);
+			}
+		}
+		return $options;
 	}
 }
 
