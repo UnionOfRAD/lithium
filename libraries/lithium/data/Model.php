@@ -321,9 +321,7 @@ class Model extends \lithium\core\StaticObject {
 		if (static::_isBase($class = get_called_class())) {
 			return;
 		}
-		$self = static::_object();
-		$base = get_class_vars(__CLASS__);
-
+		$self    = static::_object();
 		$meta    = array();
 		$schema  = array();
 		$source  = array();
@@ -342,16 +340,16 @@ class Model extends \lithium\core\StaticObject {
 			}
 		}
 		$tmp = $options + $self->_meta + $meta;
+		$source = array('meta' => array(), 'finders' => array(), 'schema' => array());
 
 		if ($tmp['connection']) {
 			$conn = $classes['connections']::get($tmp['connection']);
-			$source = ($conn) ? $conn->configureClass($class) : array();
+			$source = (($conn) ? $conn->configureClass($class) : array()) + $source;
 		}
-		$source += array('meta' => array(), 'finders' => array(), 'schema' => array());
 		static::$_classes = $classes;
 		$name = static::_name();
 
-		$local = compact('class', 'name') + $options + array_diff($self->_meta, $base['_meta']);
+		$local = compact('class', 'name') + $options + $self->_meta;
 		$self->_meta = ($local + $source['meta'] + $meta);
 		$self->_meta['initialized'] = false;
 		$self->_schema += $schema + $source['schema'];
