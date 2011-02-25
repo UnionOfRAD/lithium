@@ -57,7 +57,6 @@ class Group extends \lithium\util\Collection {
 	 */
 	public static function all(array $options = array()) {
 		$defaults = array(
-			'library' => true,
 			'filter' => '/cases/',
 			'exclude' => '/mock/',
 			'recursive' => true,
