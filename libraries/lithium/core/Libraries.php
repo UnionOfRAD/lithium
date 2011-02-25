@@ -590,6 +590,7 @@ class Libraries {
 			return $name;
 		}
 		$ident = $name ? ($type . '.' . $name) : ($type . '.*');
+		$ident .= $options ? '.' . md5(serialize($options)) : null;
 
 		if (isset(static::$_cachedPaths[$ident])) {
 			return static::$_cachedPaths[$ident];
