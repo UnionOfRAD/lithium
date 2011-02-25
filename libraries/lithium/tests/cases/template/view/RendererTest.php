@@ -82,6 +82,7 @@ class RendererTest extends \lithium\test\Unit {
 		$class = get_class($helper);
 		$path = $this->subject->applyHandler($helper, "{$class}::script", 'path', 'foo/file');
 		$this->assertEqual('/js/foo/file.js', $path);
+		$this->assertEqual('/some/generic/path', $this->subject->path('some/generic/path'));
 	}
 
 	public function testHandlerInsertion() {

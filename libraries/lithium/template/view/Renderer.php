@@ -182,9 +182,13 @@ abstract class Renderer extends \lithium\core\Object {
 			},
 			'path' => function($path, $ref, array $options = array()) use (&$classes, &$request) {
 				$defaults = array('base' => $request ? $request->env('base') : '');
-				list($helper, $methodRef) = $ref;
-				list($class, $method) = explode('::', $methodRef);
-				$type = $helper->contentMap[$method];
+				$type = 'generic';
+
+				if (is_array($ref) && $ref[0] && $ref[1]) {
+					list($helper, $methodRef) = $ref;
+					list($class, $method) = explode('::', $methodRef);
+					$type = $helper->contentMap[$method];
+				}
 				return $classes['media']::asset($path, $type, $options + $defaults);
 			},
 			'options' => '_attributes',
