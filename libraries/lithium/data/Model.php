@@ -443,7 +443,7 @@ class Model extends \lithium\core\StaticObject {
 			$type = 'first';
 		}
 
-		$options += ((array) $self->_query + (array) $defaults);
+		$options = (array) $options + (array) $self->_query + (array) $defaults;
 		$meta = array('meta' => $self->_meta, 'name' => get_called_class());
 		$params = compact('type', 'options');
 
