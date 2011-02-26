@@ -37,7 +37,7 @@ class Route extends \lithium\console\Command {
 		parent::__construct($config);
 
 		Environment::set($this->env);
-		require dirname(dirname(__DIR__)).'/config/routes.php';
+		require LITHIUM_APP_PATH.'/config/routes.php';
 	}
 
 	/**
