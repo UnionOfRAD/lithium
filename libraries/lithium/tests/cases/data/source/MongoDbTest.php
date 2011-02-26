@@ -463,7 +463,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$to = 'lithium\tests\mocks\data\MockPost';
 
 		$from::config(array('connection' => 'mock-source'));
-		$to::config(array('connection' => 'mock-source'));
+		$to::config(array('connection' => 'mock-source', 'key' => '_id'));
 
 		$result = $this->db->relationship($from, 'belongsTo', 'MockPost');
 		$expected = array(

@@ -271,10 +271,10 @@ class MySql extends \lithium\data\source\Database {
 		}
 
 		$result = array();
-		$count = mysql_num_fields($resource);
+		$count = mysql_num_fields($resource->resource());
 
 		for ($i = 0; $i < $count; $i++) {
-			$result[] = mysql_field_name($resource, $i);
+			$result[] = mysql_field_name($resource->resource(), $i);
 		}
 		return $result;
 	}

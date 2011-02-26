@@ -84,6 +84,7 @@ class Query extends \lithium\core\Object {
 			'calculate'  => null,
 			'conditions' => array(),
 			'fields'     => array(),
+			'data'       => array(),
 			'model'      => null,
 			'alias'      => null,
 			'source'     => null,
@@ -398,17 +399,9 @@ class Query extends \lithium\core\Object {
 				$results[$item] = $this->_config[$item];
 			}
 		}
-		$entity =& $this->_entity;
-		$data = $this->_data;
-
-		if ($entity) {
-			$data = $entity->export(array('whitelist' => $this->_config['whitelist']));
-		} elseif ($list = $this->_config['whitelist']) {
-			$list = array_combine($list, $list);
-			$data = array('update' => array_intersect_key($data, $list));
+		if (in_array('data', $keys)) {
+			$results['data'] = $this->_exportData();
 		}
-		$results['data'] = $data;
-
 		if (isset($results['source'])) {
 			$results['source'] = $dataSource->name($results['source']);
 		}
@@ -421,6 +414,32 @@ class Query extends \lithium\core\Object {
 			$results = $results['fields'] + $results;
 		}
 		return $results;
+	}
+
+	/**
+	 * Helper method used by `export()` to extract the data either from a bound entity, or from
+	 * passed configuration, and filter it through a configured whitelist, if present.
+	 *
+	 * @return array
+	 */
+	protected function _exportData() {
+		$data = $this->_entity ? $this->_entity->export() : $this->_data;
+
+		if (!$list = $this->_config['whitelist']) {
+			return $data;
+		}
+		$list = array_combine($list, $list);
+
+		if (!$this->_entity) {
+			return array_intersect_key($data, $list);
+		}
+		foreach ($data as $type => $values) {
+			if (!is_array($values)) {
+				continue;
+			}
+			$data[$type] = array_intersect_key($values, $list);
+		}
+		return $data;
 	}
 
 	public function schema($field = null) {

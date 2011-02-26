@@ -244,6 +244,7 @@ class QueryTest extends \lithium\test\Unit {
 	}
 
 	public function testExport() {
+		MockQueryPost::meta('source', 'foo');
 		$query = new Query($this->_queryArr);
 		$ds = new MockDatabase();
 		$export = $query->export($ds);
@@ -281,9 +282,8 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $export['fields'];
 		$this->assertEqual($expected, $result);
 
-		$expected = MockQueryPost::meta('source');
 		$result = $export['source'];
-		$this->assertEqual("{{$expected}}", $result);
+		$this->assertEqual("{foo}", $result);
 	}
 
 	public function testRestrictedKeyExport() {
