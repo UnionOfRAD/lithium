@@ -270,6 +270,9 @@ class RecordSet extends \lithium\data\Collection {
 
 		$key = null;
 		$index = false;
+<<<<<<< HEAD
+=======
+>>>>>>> Refactoring record mapping in `\data\collection\RecordSet`.
 		$recordMap = is_object($data) ? array($model => $data) : array();
 
 		if (!$recordMap) {
