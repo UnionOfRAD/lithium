@@ -274,24 +274,22 @@ abstract class Source extends \lithium\core\Object {
 		$defaults = array('class' => 'entity');
 		$options += $defaults;
 
-		$type = $options['class'];
-		$class = isset($this->_classes[$type]) ? $this->_classes[$type] : $type;
+		$class = $options['class'];
 		unset($options['class']);
 
-		foreach($data as $key => $val) {
-			switch(true) {
+		foreach ($data as $key => $val) {
+			switch (true) {
 				case is_array($val) && !is_numeric(key($val)):
 					$data[$key] = $this->item($model, $val, $options);
-					break;
+				break;
 				case is_array($val) && is_numeric(key($val)):
 					foreach($val as $k => $v) {
-						$data[$key][$k] = $this->item($model, $v, $options);
+						$data[$key][$k] = is_object($v) ? $v : $this->item($model, $v, $options);
 					}
-					break;
+				break;
 			}
 		}
-
-		return new $class(compact('model', 'data') + $options);
+		return $this->_instance($class, compact('model', 'data') + $options);
 	}
 }
 

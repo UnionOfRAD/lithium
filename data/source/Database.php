@@ -250,7 +250,7 @@ abstract class Database extends \lithium\data\Source {
 	public function read($query, array $options = array()) {
 		$defaults = array('
 			return' => is_string($query) ? 'array' : 'item', 'schema' => array(),
-			'relations' => true, 'return' => 'item'
+			'return' => 'item'
 		);
 		$options += $defaults;
 
@@ -262,70 +262,6 @@ abstract class Database extends \lithium\data\Source {
 
 			$model = is_object($query) ? $query->model() : null;
 			$schema = !is_null($model) ? $model::schema() : array();
-
-			$hasMany = array();
-
-			$addHostSubquery = false;
-			$relations = is_array($args['relations']) ? $args['relations'] : array();
-			foreach($relations as $relation) {
-				$conditions = array();
-				$constraint = is_array($relation->constraint) ? $relation->constraint : array();
-				foreach($constraint as $key => $val){
-					$conditions[] = $key . ' = ' . $val;
-				}
-				$constraint = implode(' AND ', $conditions);
-				switch($relation->type) {
-					case 'hasOne':
-					case 'belongsTo':
-						$query->join($relation->to, new Query(array(
-							'model' => $relation->to,
-							'constraint' => $constraint,
-							'type' => 'LEFT'
-						)));
-						break;
-					case 'hasMany':
-						$query->join($relation->to, new Query(array(
-							'model' => $relation->to,
-							'constraint' => $constraint,
-							'type' => 'LEFT'
-						)));
-
-						$toModel = $relation->to;
-						$hasMany[] = $toModel::meta('name');
-
-						if($query->limit()) {
-							$addHostSubquery = true;
-						}
-						break;
-				}
-			}
-
-			if($addHostSubquery){
-				$model = $query->model();
-				$name = $model::meta('name');
-				$key = $model::key();
-
-				$idOptions = array(
-					'relations' => false,
-					'group' => 'GROUP BY ' . $name . '.' . $key,
-					'fields' => array($name . '.' . $key),
-					'joins' => $query->joins()
-				) + $args;
-
-				$query->fields($idOptions['fields'], true)
-						->group($idOptions['group']);
-	
-				$ids = $self->read($query, $idOptions);
-				$ids = $ids->data();
-				$ids = array_map(function($index) use ($key){
-						return $index[$key];
-					}, $ids);
-
-				$query->fields($args['fields'] ?: false, true)
-						->group($args['group'] ?: false)
-						->limit(false)
-						->conditions(array($name . '.' . $key => $ids));
-			}
 
 			if (is_string($query)) {
 				$sql = String::insert($query, $self->value($args));
@@ -350,18 +286,14 @@ abstract class Database extends \lithium\data\Source {
 					}
 					return $records;
 				case 'item':
-					$return = $self->item($query->model(), array(), compact('query', 'result') +
-						array(
-							'class' => 'set',
-						));
+					return $self->item($query->model(), array(), compact('query', 'result') + array(
+						'class' => 'set',
+					));
 
 					//@todo - this is a hack, should have a more formal way to setup the data
 					if (count($hasMany)) {
 						count($return);
 					}
-
-
-					return $return;
 			}
 		});
 	}

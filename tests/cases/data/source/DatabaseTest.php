@@ -461,6 +461,22 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual("WHERE CUSTOM", $this->db->conditions("CUSTOM", $query));
 	}
 
+	public function testRelationshipGeneration() {
+		$comment = 'lithium\tests\mocks\data\model\MockDatabaseComment';
+
+		$hasMany = $this->db->relationship($this->_model, 'hasMany', 'Comments', array(
+			'to' => $comment
+		));
+		$this->assertEqual(array('id' => 'mock_database_post_id'), $hasMany->keys());
+		$this->assertEqual('comments', $hasMany->fieldName());
+
+		$belongsTo = $this->db->relationship($comment, 'belongsTo', 'Posts', array(
+			'to' => $this->_model
+		));
+		$this->assertEqual(array('post_id' => 'id'), $belongsTo->keys());
+		$this->assertEqual('post', $belongsTo->fieldName());
+	}
+
 	/**
 	 * Tests that various syntaxes for the `'order'` key of the query object produce the correct
 	 * SQL.

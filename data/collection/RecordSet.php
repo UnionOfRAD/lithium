@@ -268,6 +268,7 @@ class RecordSet extends \lithium\data\Collection {
 		if (!($data = $data ?: $this->_result->next())) {
 			return $this->close();
 		}
+
 		$key = null;
 		$index = false;
 		$offset = 0;
@@ -282,6 +283,7 @@ class RecordSet extends \lithium\data\Collection {
 
 				if ($model == $this->_model) {
 					$key = $model::key($record);
+
 					if (($index = array_search(reset($key), $this->_index)) !== false) {
 						$recordMap[$this->_model] = $this->_data[$index];
 						if (is_object($recordMap[$this->_model])) {

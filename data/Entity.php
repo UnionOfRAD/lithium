@@ -10,7 +10,8 @@ namespace lithium\data;
 
 use BadMethodCallException;
 use UnexpectedValueException;
-use lithium\util\Collection as Col;
+use lithium\data\Source;
+use lithium\data\Collection;
 
 /**
  * `Entity` is a smart data object which represents data such as a row or document in a
@@ -244,21 +245,8 @@ class Entity extends \lithium\core\Object {
 		if ($name) {
 			return $this->__get($name);
 		}
-		$return = $this->_updated + $this->_data;
-		foreach($return as $key => $val){
-			if(is_callable(array($val, 'data'))) {
-				$return[$key] = $val->data();
-			}else if(is_array($val) && is_numeric(key($val))){
-				$r = array();
-				foreach($val as $k => $v){
-					if(is_callable(array($v, 'data'))) {
-						$r[$k] = $v->data();
-					}
-				}
-				$return[$key] = $r;
-			}
-		}
-		return $return;
+		$related = array_map(function($rel) { return $rel->data(); }, $this->_relationships);
+		return $related + $this->_updated + $this->_data;
 	}
 
 	/**
@@ -429,7 +417,7 @@ class Entity extends \lithium\core\Object {
 	public function to($format, array $options = array()) {
 		switch ($format) {
 			case 'array':
-				$result = Col::toArray($this->data());
+				$result = Collection::toArray($this->data());
 			break;
 			default:
 				$result = $this;

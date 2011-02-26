@@ -117,7 +117,9 @@ class Query extends \lithium\core\Object {
 			$this->_config['whitelist'] = array_combine($list, $list);
 		}
 		if ($this->_config['with']) {
-			$this->_associate($this->_config['with']);
+			foreach ((array) $this->_config['with'] as $related) {
+				$this->_associate($related);
+			}
 		}
 		$joins = $this->_config['joins'];
 		$this->_config['joins'] = array();
@@ -253,7 +255,8 @@ class Query extends \lithium\core\Object {
 		if ($limit) {
 			$this->_config['limit'] = intval($limit);
 			return $this;
-		}else if($limit === false){
+		}
+		if ($limit === false) {
 			$this->_config['limit'] = null;
 			return $this;
 		}
@@ -314,7 +317,7 @@ class Query extends \lithium\core\Object {
 			$this->_config['group'] = $group;
 			return $this;
 		}
-		if($group === false){
+		if ($group === false) {
 			$this->_config['group'] = null;
 			return $this;
 		}
@@ -493,7 +496,7 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	 * Gets a custom query field which does not have an accessor method.
+	 * Gets or sets a custom query field which does not have an accessor method.
 	 *
 	 * @param string $method Query part.
 	 * @param string $params Query parameters.
@@ -536,18 +539,60 @@ class Query extends \lithium\core\Object {
 		if (!$model = $this->model()) {
 			return;
 		}
-		$queryClass = get_class($this);
+		$class = get_class($this);
+		$hasMany = false;
+		$addHostSubquery = false;
 
 		foreach ((array) $related as $name => $config) {
 			if (is_int($name)) {
 				$name = $config;
 				$config = array();
 			}
-			if (!$relation = $model::relations($name)) {
-				throw new QueryException("Related model not found.");
+			if (!$relationship = $model::relations($name)) {
+				throw new QueryException("Model relationship `{$name}` not found.");
 			}
-			$config += $relation->data();
+			list($name, $query) = $this->_fromRelationship($relationship);
+			$this->join($name, $query);
+			$hasMany = $hasMany || $relationship->type() == 'hasMany';
 		}
+
+		if ($hasMany && $query->limit()) {
+			$model = $query->model();
+			$name = $model::meta('name');
+			$key = $model::key();
+
+			$idOptions = array(
+				'relations' => false,
+				'group' => 'GROUP BY ' . $name . '.' . $key,
+				'fields' => array($name . '.' . $key),
+				'joins' => $query->joins()
+			) + $args;
+
+			$query->fields($idOptions['fields'], true)->group($idOptions['group']);
+
+			$ids = $self->read($query, $idOptions);
+			$ids = array_map(function($index) use ($key) { return $index[$key]; }, $ids->data());
+
+			$fields = $args['fields'] ?: false;
+			$group = $args['group'] ?: false;
+
+			$query->fields($fields, true)->group($group)->limit(false)->conditions(array(
+				"{$name}.{$key}" => $ids
+			));
+		}
+	}
+
+	protected function _fromRelationship($rel) {
+		$name = $rel->name();
+		$this->_config['relationships'][$rel->fieldName()] = $name;
+
+		$constraint = $rel->constraints();
+		$class = get_class($this);
+
+		return array($name, $this->_instance($class, compact('constraint') + array(
+			'type' => 'LEFT',
+			'model' => $rel->to()
+		)));
 	}
 }
 
