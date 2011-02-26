@@ -155,7 +155,9 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @param object $query The given query, usually an instance of `lithium\data\model\Query`.
 	 * @return void
 	 */
-	protected function _insertId($query) {}
+	protected function _insertId($query) {
+		return $this->connection->lastInsertRowID();
+	}
 
 	/**
 	 * Gets or sets the encoding for the connection.
