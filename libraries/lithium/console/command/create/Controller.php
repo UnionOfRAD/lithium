@@ -27,7 +27,7 @@ class Controller extends \lithium\console\command\Create {
      */
 	protected function _use($request) {
 		$request->params['command'] = 'model';
-		return '\\' . $this->_namespace($request) . '\\' . $this->_model($request);
+		return $this->_namespace($request) . '\\' . $this->_model($request);
 	}
 
     /**

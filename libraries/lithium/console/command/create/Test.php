@@ -40,9 +40,7 @@ class Test extends \lithium\console\command\Create {
      * @return string
      */
 	protected function _use($request) {
-		$namespace = parent::_namespace($request);
-		$name = $this->_name($request);
-		return "\\{$namespace}\\{$name}";
+		return parent::_namespace($request) . '\\' . $this->_name($request);
 	}
 
     /**
