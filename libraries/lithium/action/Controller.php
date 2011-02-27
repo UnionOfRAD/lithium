@@ -275,7 +275,9 @@ class Controller extends \lithium\core\Object {
 	 *              - `'head'` _boolean_: Determines whether only headers are returned with the
 	 *                response. Defaults to `true`, in which case only headers and no body are
 	 *                returned. Set to `false` to render a body as well.
-	 *              - `'exit'` _boolean_: Exit immediately after rendering. Defaults to `true`.
+	 *              - `'exit'` _boolean_: Exit immediately after rendering. Defaults to `false`.
+	 *                Because `redirect()` does not exit by default, you should always prefix calls
+	 *                with a `return` statement, so that the action is always immedately exited.
 	 * @return object Returns the instance of the `Response` object associated with this controller.
 	 * @filter This method can be filtered.
 	 */
