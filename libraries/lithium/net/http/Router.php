@@ -194,7 +194,7 @@ class Router extends \lithium\core\StaticObject {
 				return $path;
 			}
 			if (is_string($url = static::_parseString($url, $context))) {
-				return $url;
+				return static::_prefix($url, $context, $options);
 			}
 		}
 		if (isset($url[0]) && is_array($params = static::_parseString($url[0], $context))) {

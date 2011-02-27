@@ -406,6 +406,13 @@ class RouterTest extends \lithium\test\Unit {
 		$expected = '/my/web/path/posts';
 		$this->assertEqual($expected, $result);
 
+		$request = new Request(array('base' => '/my/web/path'));
+		$result = Router::match('/some/where', $request, array('absolute' => true));
+		$prefix  = $this->request->env('HTTPS') ? 'https://' : 'http://';
+		$prefix .= $this->request->env('HTTP_HOST');
+		$this->assertEqual($prefix . '/my/web/path/some/where', $result);
+
+
 		$result = Router::match('mailto:foo@localhost');
 		$expected = 'mailto:foo@localhost';
 		$this->assertEqual($expected, $result);
