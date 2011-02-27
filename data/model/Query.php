@@ -583,15 +583,14 @@ class Query extends \lithium\core\Object {
 	}
 
 	protected function _fromRelationship($rel) {
-		$name = $rel->name();
-		$this->_config['relationships'][$rel->fieldName()] = $name;
+		$model = $rel->to();
+		$this->_config['relationships'][$rel->fieldName()] = $model;
 
 		$constraint = $rel->constraints();
 		$class = get_class($this);
 
-		return array($name, $this->_instance($class, compact('constraint') + array(
+		return array($model, $this->_instance($class, compact('constraint', 'model') + array(
 			'type' => 'LEFT',
-			'model' => $rel->to()
 		)));
 	}
 }

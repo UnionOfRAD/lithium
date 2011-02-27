@@ -270,7 +270,6 @@ class RecordSet extends \lithium\data\Collection {
 
 		$key = null;
 		$index = false;
-
 		$recordMap = is_object($data) ? array($model => $data) : array();
 
 		if (!$recordMap) {
