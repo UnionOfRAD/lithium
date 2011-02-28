@@ -268,7 +268,7 @@ abstract class Database extends \lithium\data\Source {
 				case 'resource':
 					return $result;
 				case 'array':
-					$columns = $args['schema'] ?: $self->schema($query, $result);
+					$columns = $args['schema'] ?: current($self->schema($query, $result));
 					$records = array();
 
 					while ($data = $result->next()) {
