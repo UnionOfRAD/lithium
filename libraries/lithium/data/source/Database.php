@@ -43,7 +43,7 @@ abstract class Database extends \lithium\data\Source {
 		'update' => "UPDATE {:source} SET {:fields} {:conditions};{:comment}",
 		'delete' => "DELETE {:flags} FROM {:source} {:alias} {:conditions};{:comment}",
 		'schema' => "CREATE TABLE {:source} (\n{:columns}{:indexes});{:comment}",
-		'join'   => "{:type} JOIN {:source} {:alias} {:constraint} {:conditions}"
+		'join'   => "{:type} JOIN {:source} {:alias} {:constraint}"
 	);
 
 	/**

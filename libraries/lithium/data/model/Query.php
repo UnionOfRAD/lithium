@@ -118,6 +118,12 @@ class Query extends \lithium\core\Object {
 		if ($this->_config['with']) {
 			$this->_associate($this->_config['with']);
 		}
+		$joins = $this->_config['joins'];
+		$this->_config['joins'] = array();
+
+		foreach ($joins as $i => $join) {
+			$this->join($i, $join);
+		}
 		if ($this->_entity && !$this->_config['model']) {
 			$this->model($this->_entity->model());
 		}
@@ -362,11 +368,15 @@ class Query extends \lithium\core\Object {
 	 * @return array of query objects
 	 */
 	public function join($name = null, $join = null) {
+		if (is_scalar($name) && !$join && isset($this->_config['joins'][$name])) {
+			return $this->_config['joins'][$name];
+		}
 		if ($name && !$join) {
 			$join = $name;
 			$name = null;
 		}
 		if ($join) {
+			$join = is_array($join) ? $this->_instance(get_class($this), $join) : $join;
 			$name ? $this->_config['joins'][$name] = $join : $this->_config['joins'][] = $join;
 			return $this;
 		}

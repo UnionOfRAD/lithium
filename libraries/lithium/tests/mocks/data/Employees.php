@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\data;
 
-class Employee extends \lithium\data\Model {
+class Employees extends \lithium\data\Model {
 
 	public $belongsTo = array('Companies');
 
