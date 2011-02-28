@@ -272,14 +272,7 @@ class RecordSet extends \lithium\data\Collection {
 		$recordMap = is_object($data) ? array($model => $data) : array();
 
 		if (!$recordMap) {
-			$primary = $this->_model;
-			do {
-				list($recordMapPart, $key) = $this->_mapRecord($data, $key);
-				if(!$recordMap || $recordMapPart[$primary] == $recordMap[$primary]) {
-					$recordMap += $recordMapPart;
-				}
-			} while(($data = $this->_result->next()));
-			var_dump($recordMap);exit;
+			list($recordMap, $key) = $this->_mapRecord($data, $key);
 		} else {
 			$key = $model::key(reset($recordMap));
 		}
@@ -300,44 +293,50 @@ class RecordSet extends \lithium\data\Collection {
 	}
 
 	protected function _mapRecord($data, $key) {
-		$offset = 0;
 		$primary = $this->_model;
 		$conn = $primary::connection();
+		$recordMap = array();
+		
+		do {
+			$offset = 0;
+			foreach ($this->_columns as $model => $fields) {
+				$fieldCount = count($fields);
+				$record = array_combine($fields, array_slice($data, $offset, $fieldCount));
 
-		foreach ($this->_columns as $model => $fields) {
-			$fieldCount = count($fields);
-			$record = array_combine($fields, array_slice($data, $offset, $fieldCount));
+				if ($model == $primary) {
+					$key = $model::key($record);
 
-			if ($model == $primary) {
-				$key = $model::key($record);
-
-				if (($index = array_search(reset($key), $this->_index)) !== false) {
-					$recordMap[$this->_model] = $this->_data[$index];
-
-					if (is_object($recordMap[$this->_model])) {
-						$recordMap[$this->_model] = $recordMap[$this->_model]->data();
+					if($recordMap && $recordMap[$primary] != $record) {
+						break 2;
 					}
-				} else {
 					$recordMap[$primary] = $record;
-				}
-			} else {
-				$relation = $primary::relations($model::meta('name') ?: $model);
-				$useArr = ($relation->type() == 'hasMany');
-
-				if ($useArr === false) {
-					$recordMap[$model::meta('name')] = $record;
 				} else {
-					$recordKey = $model::key($record);
-					$recordMap[$model::meta('name')][reset($recordKey)] = $record;
+					$relation = $primary::relations($model::meta('name') ?: $model);
+					$useArr = ($relation->type() == 'hasMany');
+
+					if ($useArr === false) {
+						$relationships[$model::meta('name')] = $record;
+					} else {
+						$recordKey = $model::key($record);
+						$relationships[$model::meta('name')][reset($recordKey)] = $record;
+					}
 				}
+				$offset += $fieldCount;
 			}
-			$offset += $fieldCount;
+		} while(($data = $this->_result->next()));
+
+		$model = $this->_model;
+		foreach($relationships as $name => $rel) {
+			$options = array('exists' => true);
+			if(is_numeric(key($rel))) {
+				$options += array('class' => 'set');
+			}
+			$relationships[$name] = $conn->item($model, $rel, $options);
 		}
 
-//		$model = $this->_model;
-//		$recordMap[$model] = $conn->item($model, $recordMap[$model], array(
-//			'exists' => true, 'relationships' => $relationships
-//		));
+		$recordMap[$model] = $conn->item($model, $recordMap[$model], array(
+			'exists' => true, 'relationships' => $relationships
+		));
 		return array($recordMap, $key);
 	}
 
