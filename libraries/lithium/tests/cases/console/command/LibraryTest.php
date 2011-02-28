@@ -63,9 +63,7 @@ class LibraryTest extends \lithium\test\Unit {
 		$result = $this->library->config('server', 'lab.lithify.me');
 		$this->assertTrue($result);
 
-		$expected = array('servers' => array(
-			'lab.lithify.me' => true
-		));
+		$expected = array('servers' => array('lab.lithify.me' => true));
 		$result = json_decode(file_get_contents($this->testConf), true);
 		$this->assertEqual($expected, $result);
 

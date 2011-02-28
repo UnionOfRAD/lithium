@@ -23,6 +23,11 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertTrue(strpos($result, '/lithium/core/Libraries.php'));
 		$this->assertTrue(file_exists($result));
 		$this->assertFalse(strpos($result, '\\'));
+
+		$result = Libraries::path('lithium\core\Libraries');
+		$this->assertTrue(strpos($result, '/lithium/core/Libraries.php'));
+		$this->assertTrue(file_exists($result));
+		$this->assertFalse(strpos($result, '\\'));
 	}
 
 	public function testPathTemplate() {
@@ -548,6 +553,20 @@ class LibrariesTest extends \lithium\test\Unit {
 	    $this->assertEqual($expected, $result);
 
 		$this->_cleanUp();
+	}
+
+	/**
+	 * Tests that `Libraries::realPath()` correctly resolves paths to files inside Phar archives.
+	 *
+	 * @return void
+	 */
+	public function testPathsInPharArchives() {
+		$config = Libraries::get('lithium');
+		$path = "{$config['path']}/console/command/create/template/app.phar.gz";
+
+		$expected = "phar://{$path}/controllers/HelloWorldController.php";
+		$result = Libraries::realPath($expected);
+		$this->assertEqual($expected, $result);
 	}
 }
 

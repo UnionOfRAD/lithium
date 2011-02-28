@@ -470,15 +470,50 @@ class Libraries {
 			$fullPath = "{$params['path']}/{$path}";
 
 			if (!$options['dirs']) {
-				return static::$_cachedPaths[$class] = realpath($fullPath . $suffix);
+				return static::$_cachedPaths[$class] = static::realPath($fullPath . $suffix);
 			}
 			$list = glob(dirname($fullPath) . '/*');
 			$list = array_map(function($i) { return str_replace('\\', '/', $i); }, $list);
 
 			if (in_array($fullPath . $suffix, $list)) {
-				return static::$_cachedPaths[$class] = realpath($fullPath . $suffix);
+				return static::$_cachedPaths[$class] = static::realPath($fullPath . $suffix);
 			}
-			return is_dir($fullPath) ? realpath($fullPath) : null;
+			return is_dir($fullPath) ? static::realPath($fullPath) : null;
+		}
+	}
+
+	/**
+	 * Wraps the PHP `realpath()` function to add support for finding paths to files inside Phar
+	 * archives.
+	 *
+	 * @param string $path An unresolved path to a file inside a Phar archive which may or may not
+	 *               exist.
+	 * @return string If `$path` is a valid path to a file inside a Phar archive, returns a string
+	 *                in the format `'phar://<path-to-phar>/<path-to-file>'`. Otherwise returns
+	 *                `null`.
+	 */
+	public static function realPath($path) {
+		if (($absolutePath = realpath($path)) !== false) {
+			return $absolutePath;
+		}
+		if (!preg_match('%^phar://([^.]+\.phar(?:\.gz)?)(.+)%', $path, $pathComponents)) {
+			return;
+		}
+		list(, $relativePath, $pharPath) = $pathComponents;
+
+		$pharPath = implode('/', array_reduce(explode('/', $pharPath), function ($parts, $value) {
+			if ($value == '..') {
+				array_pop($parts);
+			} elseif ($value != '.') {
+				$parts[] = $value;
+			}
+			return $parts;
+		}));
+
+		if (($resolvedPath = realpath($relativePath)) !== false) {
+			if (file_exists($absolutePath = "phar://{$resolvedPath}{$pharPath}")) {
+				return $absolutePath;
+			}
 		}
 	}
 
