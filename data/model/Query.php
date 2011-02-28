@@ -584,7 +584,9 @@ class Query extends \lithium\core\Object {
 
 	protected function _fromRelationship($rel) {
 		$model = $rel->to();
-		$this->_config['relationships'][$rel->fieldName()] = $model;
+		$name = $rel->name();
+		$fieldName = $rel->fieldName();
+		$this->_config['relationships'][$name] = compact('model', 'fieldName');
 
 		$constraint = $rel->constraints();
 		$class = get_class($this);

@@ -269,11 +269,17 @@ class RecordSet extends \lithium\data\Collection {
 		}
 
 		$key = null;
-		$index = false;
 		$recordMap = is_object($data) ? array($model => $data) : array();
 
 		if (!$recordMap) {
-			list($recordMap, $key) = $this->_mapRecord($data, $key);
+			$primary = $this->_model;
+			do {
+				list($recordMapPart, $key) = $this->_mapRecord($data, $key);
+				if(!$recordMap || $recordMapPart[$primary] == $recordMap[$primary]) {
+					$recordMap += $recordMapPart;
+				}
+			} while(($data = $this->_result->next()));
+			var_dump($recordMap);exit;
 		} else {
 			$key = $model::key(reset($recordMap));
 		}
@@ -299,7 +305,6 @@ class RecordSet extends \lithium\data\Collection {
 		$conn = $primary::connection();
 
 		foreach ($this->_columns as $model => $fields) {
-
 			$fieldCount = count($fields);
 			$record = array_combine($fields, array_slice($data, $offset, $fieldCount));
 
@@ -320,18 +325,19 @@ class RecordSet extends \lithium\data\Collection {
 				$useArr = ($relation->type() == 'hasMany');
 
 				if ($useArr === false) {
-					$modelName = $model::meta('name');
-					$recordMap[$this->_model][$model::meta('name')] = $record;
+					$recordMap[$model::meta('name')] = $record;
 				} else {
 					$recordKey = $model::key($record);
-					$recordMap[$this->_model][$model::meta('name')][reset($recordKey)] = $record;
+					$recordMap[$model::meta('name')][reset($recordKey)] = $record;
 				}
 			}
 			$offset += $fieldCount;
 		}
 
-		$model = $this->_model;
-		$recordMap[$model] = $conn->item($model, $recordMap[$model], array('exists' => true));
+//		$model = $this->_model;
+//		$recordMap[$model] = $conn->item($model, $recordMap[$model], array(
+//			'exists' => true, 'relationships' => $relationships
+//		));
 		return array($recordMap, $key);
 	}
 
@@ -342,7 +348,6 @@ class RecordSet extends \lithium\data\Collection {
 		if (!($model = $this->_model)) {
 			return array();
 		}
-
 		if (!$joins = $this->_query->join()) {
 			return $model::connection()->schema($this->_query, $this->_result, $this);
 		}

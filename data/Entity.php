@@ -120,7 +120,8 @@ class Entity extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'classes' => 'merge', 'parent', 'schema', 'data', 'model', 'exists', 'pathKey'
+		'classes' => 'merge', 'parent', 'schema', 'data', 'model', 'exists', 'pathKey',
+		'relationships'
 	);
 
 	/**
@@ -135,7 +136,7 @@ class Entity extends \lithium\core\Object {
 	 * @return object Record object.
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('model' => null, 'data' => array());
+		$defaults = array('model' => null, 'data' => array(), 'relationships' => array());
 		parent::__construct($config + $defaults);
 	}
 
