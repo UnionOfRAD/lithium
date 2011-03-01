@@ -22,6 +22,10 @@ use lithium\template\TemplateException;
  * process. The `Loader` class is tasked with locating and reading template files which are then
  * passed to the `Renderer` adapter subclass.
  *
+ * In the default configuration, the `File` adapter acts as both renderer and loader, loading files
+ * from paths defined in _process steps_ (described below) and rendering them as plain PHP files,
+ * augmented with [special syntax](../template).
+ *
  * The `View` class operates on _processes_, which define the steps to render a completed view. For
  * example, the default process, which renders a template wrapped in a layout, is comprised of two
  * _steps_: the first step renders the main template and captures it to the rendering context, where
@@ -57,11 +61,14 @@ use lithium\template\TemplateException;
  *     )
  * ));
  *
- * echo $View->render('all', array('content' => $info), array(
+ * $page = $View->render('all', array('content' => $info), array(
  *     'template' => '404',
  *     'layout' => 'error'
  * ));
  * }}}
+ *
+ * To learn more about processes and process steps, see the `$_processes` and `$_steps` properties,
+ * respectively.
  *
  * @see lithium\template\view\Renderer
  * @see lithium\template\view\adapter
@@ -114,7 +121,8 @@ class View extends \lithium\core\Object {
 	 * View processes are aggregated lists of steps taken to to create a complete, rendered view.
 	 * For example, the default process, `'all'`, renders a template, then renders a layout, using
 	 * the rendered template content. A process can be defined using one or more steps defined in
-	 * the `$_steps` property.
+	 * the `$_steps` property. Each process definition is a simple array of ordered values, where
+	 * each value is a key in the `$_steps` array.
 	 *
 	 * @see lithium\template\View::$_steps
 	 * @see lithium\template\View::render()
@@ -131,6 +139,30 @@ class View extends \lithium\core\Object {
 	 * piece of a multi-step view rendering. The `View` class combines multiple steps into
 	 * _processes_ to create the final output.
 	 *
+	 * Each step is named by its key in the `$_steps` array, and can have the following options:
+	 *
+	 * - `'path'` _string_: Indicates the set of paths to use when loading templates.
+	 *
+	 * - `'conditions'` _mixed_: Make the step dependent on a value being present, or on some other
+	 *    arbitrary condition. If a `'conditions'` is a string, it indicates that a key with that
+	 *    name must be present in the `$options` passed to `render()`, and must be set to a
+	 *    non-empty value. If a closure, it will be executed with the rendering parameters, and must
+	 *    return `true` or `false`. In either case, if the condition is satisfied, the step is
+	 *    processed. Otherwise, it is skipped. See the `_conditions()` method for more information.
+	 *
+	 * - `'capture'` _array_: If specified, allows the results of this rendering step to be assigned
+	 *   to a template variable used in subsequent steps, or to the templating context for use in
+	 *   subsequent steps. If can be specified in the form of `array('context' => '<var-name>')` or
+	 *   `array('data' => '<var-name>')`. If the `'context'` key is used, the results are captured
+	 *   to the rendering context. Likewise with the `'data'` key, results are captured to a
+	 *   template variable.
+	 *
+	 * - `'multi'` _boolean_: If set to `true`, the rendering parameter matching the name of this
+	 *   step can be an array containing multiple values, in which case this step is executed
+	 *   multiple times, once for each value of the array.
+	 *
+	 * @see lithium\template\View::$_processes
+	 * @see lithium\template\View::render()
 	 * @var array
 	 */
 	protected $_steps = array(
@@ -227,7 +259,7 @@ class View extends \lithium\core\Object {
 			if (!$this->_conditions($step, $params, $data, $options)) {
 				continue;
 			}
-			if (isset($step['multi']) && $step['multi'] && isset($options[$name])) {
+			if ($step['multi'] && isset($options[$name])) {
 				foreach ((array) $options[$name] as $value) {
 					$params[$name] = $value;
 					$result = $this->_step($step, $params, $data, $options);
@@ -240,7 +272,7 @@ class View extends \lithium\core\Object {
 	}
 
 	protected function _conditions($step, $params, $data, $options) {
-		if (!isset($step['conditions']) || !$conditions = $step['conditions']) {
+		if (!$conditions = $step['conditions']) {
 			return true;
 		}
 		if (is_callable($conditions) && !$conditions($params, $data, $options)) {
@@ -298,7 +330,7 @@ class View extends \lithium\core\Object {
 			$process = $this->_processes[$process];
 		}
 		if (is_string(key($process))) {
-			return $this->_convertSteps($process, $params) + $defaults;
+			return $this->_convertSteps($process, $params, $defaults);
 		}
 		$result = array();
 
@@ -315,10 +347,10 @@ class View extends \lithium\core\Object {
 		return $result;
 	}
 
-	protected function _convertSteps($command, &$params) {
+	protected function _convertSteps($command, &$params, $defaults) {
 		if (count($command) == 1) {
 			$params['template'] = current($command);
-			return array(array('path' => key($command)));
+			return array(array('path' => key($command)) + $defaults);
 		}
 		return $command;
 	}
