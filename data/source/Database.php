@@ -289,11 +289,6 @@ abstract class Database extends \lithium\data\Source {
 					return $self->item($query->model(), array(), compact('query', 'result') + array(
 						'class' => 'set',
 					));
-
-					//@todo - this is a hack, should have a more formal way to setup the data
-					if (count($hasMany)) {
-						count($return);
-					}
 			}
 		});
 	}
@@ -615,8 +610,9 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function joins(array $joins, $context) {
 		$result = null;
+
 		foreach ($joins as $model => $join) {
-			if(!is_null($result)) {
+			if ($result) {
 				$result .= ' ';
 			}
 			$result .= $this->renderCommand('join', $join->export($this));

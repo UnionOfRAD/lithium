@@ -108,13 +108,13 @@ class Relationship extends \lithium\core\Object {
 
 	protected function _init() {
 		parent::_init();
-		$config = $this->_config;
+		$config =& $this->_config;
 		$type = $config['type'];
 		$name = ($type == 'hasOne') ? Inflector::pluralize($config['name']) : $config['name'];
 
 		if (!$config['to']) {
 			$assoc = preg_replace("/\\w+$/", "", $config['from']) . $name;
-			$config['to'] = class_exists($assoc) ? $assoc : Libraries::locate('models', $assoc);
+			$config['to'] = Libraries::locate('models', $assoc);
 		}
 		if (!$config['fieldName']) {
 			$config['fieldName'] = lcfirst($name);
@@ -122,7 +122,6 @@ class Relationship extends \lithium\core\Object {
 		if (!$config['keys'] || !is_array($config['keys'])) {
 			$config['keys'] = $this->_keys($config['keys']);
 		}
-		$this->_config = $config;
 	}
 
 	public function data($key = null) {

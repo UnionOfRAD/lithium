@@ -45,7 +45,21 @@ class Result extends \lithium\core\Object implements \Iterator {
 		return $this->_iterator;
 	}
 
+	public function prev() {
+		if (!$this->_resource) {
+			return;
+		}
+		if ($this->_current == $this->_prev()) {
+			$this->_iterator--;
+			return $this->_current;
+		}
+	}
+
 	public function next() {
+		if (!$this->_resource) {
+			return;
+		}
+
 		if ($this->_resource->hasNext()) {
 			$result = $this->_resource->getNext();
 			$isFile = ($result instanceof MongoGridFSFile);

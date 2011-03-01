@@ -267,17 +267,8 @@ class RecordSet extends \lithium\data\Collection {
 		if (!($data = $data ?: $this->_result->next())) {
 			return $this->close();
 		}
-
-		$key = null;
-		$recordMap = is_object($data) ? array($model => $data) : array();
-
-		if (!$recordMap) {
-			list($recordMap, $key) = $this->_mapRecord($data, $key);
-		} else {
-			$key = $model::key(reset($recordMap));
-		}
-		$record = reset($recordMap);
-		unset($recordMap[key($recordMap)]);
+		$record = is_object($data) ? $data : $this->_mapRecord($data);
+		$key = $model::key($record);
 
 		if (is_array($key)) {
 			$key = count($key) === 1 ? reset($key) : $key;
@@ -292,52 +283,47 @@ class RecordSet extends \lithium\data\Collection {
 		return $record;
 	}
 
-	protected function _mapRecord($data, $key) {
+	protected function _mapRecord($data) {
 		$primary = $this->_model;
 		$conn = $primary::connection();
-		$recordMap = array();
-		
+		$dataMap = array();
+		$relMap = $this->_query->relationships();
+		$main = null;
+
 		do {
 			$offset = 0;
-			foreach ($this->_columns as $model => $fields) {
+
+			foreach ($this->_columns as $name => $fields) {
 				$fieldCount = count($fields);
 				$record = array_combine($fields, array_slice($data, $offset, $fieldCount));
+				$offset += $fieldCount;
 
-				if ($model == $primary) {
-					$key = $model::key($record);
-
-					if($recordMap && $recordMap[$primary] != $record) {
+				if ($name === 0) {
+					if ($main && $main != $record) {
+						$this->_result->prev();
 						break 2;
 					}
-					$recordMap[$primary] = $record;
-				} else {
-					$relation = $primary::relations($model::meta('name') ?: $model);
-					$useArr = ($relation->type() == 'hasMany');
-
-					if ($useArr === false) {
-						$relationships[$model::meta('name')] = $record;
-					} else {
-						$recordKey = $model::key($record);
-						$relationships[$model::meta('name')][reset($recordKey)] = $record;
-					}
+					$main = $record;
+					continue;
 				}
-				$offset += $fieldCount;
-			}
-		} while(($data = $this->_result->next()));
 
-		$model = $this->_model;
-		foreach($relationships as $name => $rel) {
-			$options = array('exists' => true);
-			if(is_numeric(key($rel))) {
-				$options += array('class' => 'set');
+				if ($relMap[$name]['type'] != 'hasMany') {
+					$dataMap[$name] = $record;
+					continue;
+				}
+				$dataMap[$name][] = $record;
 			}
-			$relationships[$name] = $conn->item($model, $rel, $options);
+		} while ($data = $this->_result->next());
+
+		$options = array('exists' => true);
+		$relationships = array();
+
+		foreach ($dataMap as $name => $rel) {
+			$field = $relMap[$name]['fieldName'];
+			$opts = $relMap[$name]['type'] == 'hasMany' ? array('class' => 'set') : array();
+			$relationships[$field] = $conn->item($relMap[$name]['model'], $rel, $options + $opts);
 		}
-
-		$recordMap[$model] = $conn->item($model, $recordMap[$model], array(
-			'exists' => true, 'relationships' => $relationships
-		));
-		return array($recordMap, $key);
+		return $conn->item($primary, $main, $options + compact('relationships'));
 	}
 
 	protected function _columnMap() {
@@ -352,10 +338,11 @@ class RecordSet extends \lithium\data\Collection {
 		}
 
 		$model = $this->_model;
-		$map = $model::connection()->schema($this->_query, $this->_result, $this);
+		$map = array_values($model::connection()->schema($this->_query, $this->_result, $this));
 
-		foreach($joins as $join) {
-			$map += $model::connection()->schema($this->_query, $join->model(), $join);
+		foreach ($joins as $name => $join) {
+			$part = $model::connection()->schema($this->_query, $join->model(), $join);
+			$map[$name] = reset($part);
 		}
 		return $map;
 	}

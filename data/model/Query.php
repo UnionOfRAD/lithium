@@ -562,7 +562,6 @@ class Query extends \lithium\core\Object {
 			$key = $model::key();
 
 			$idOptions = array(
-				'relations' => false,
 				'group' => 'GROUP BY ' . $name . '.' . $key,
 				'fields' => array($name . '.' . $key),
 				'joins' => $query->joins()
@@ -575,23 +574,22 @@ class Query extends \lithium\core\Object {
 
 			$fields = $args['fields'] ?: false;
 			$group = $args['group'] ?: false;
-
-			$query->fields($fields, true)->group($group)->limit(false)->conditions(array(
-				"{$name}.{$key}" => $ids
-			));
+			$conditions = array("{$name}.{$key}" => $ids);
+			$query->fields($fields, true)->group($group)->limit(false)->conditions($conditions);
 		}
 	}
 
 	protected function _fromRelationship($rel) {
 		$model = $rel->to();
 		$name = $rel->name();
+		$type = $rel->type();
 		$fieldName = $rel->fieldName();
-		$this->_config['relationships'][$name] = compact('model', 'fieldName');
+		$this->_config['relationships'][$name] = compact('type', 'model', 'fieldName');
 
 		$constraint = $rel->constraints();
 		$class = get_class($this);
 
-		return array($model, $this->_instance($class, compact('constraint', 'model') + array(
+		return array($name, $this->_instance($class, compact('constraint', 'model') + array(
 			'type' => 'LEFT',
 		)));
 	}
