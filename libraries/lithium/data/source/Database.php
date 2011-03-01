@@ -268,13 +268,13 @@ abstract class Database extends \lithium\data\Source {
 				case 'resource':
 					return $result;
 				case 'array':
-					$columns = $args['schema'] ?: current($self->schema($query, $result));
+					$columns = $args['schema'] ?: $self->schema($query, $result);
 					$records = array();
 
 					while ($data = $result->next()) {
 						// @hack: Fix this to support relationships
-						if ((count($columns) != count($data) && isset($columns[0])) || is_array($columns[0])) {
-							$columns = $columns[0];
+						if (count($columns) != count($data) && is_array(current($columns))) {
+							$columns = current($columns);
 						}
 						$records[] = array_combine($columns, $data);
 					}
