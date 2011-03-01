@@ -768,7 +768,7 @@ class Model extends \lithium\core\StaticObject {
 		};
 
 		if (!$options['callbacks']) {
-			return $filter($entity, $options);
+			return $filter($entity, $params);
 		}
 		return static::_filter(__FUNCTION__, $params, $filter);
 	}
