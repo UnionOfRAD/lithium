@@ -164,7 +164,10 @@ class Form extends \lithium\template\Helper {
 	 */
 	protected function _init() {
 		parent::_init();
-		$this->_context->handlers(array('wrap' => '_attributes'));
+
+		if ($this->_context) {
+			$this->_context->handlers(array('wrap' => '_attributes'));
+		}
 	}
 
 	/**
@@ -250,8 +253,10 @@ class Form extends \lithium\template\Helper {
 	 *         attributes passed in `$options`.
 	 */
 	public function create($binding = null, array $options = array()) {
+		$request = $this->_context ? $this->_context->request() : null;
+
 		$defaults = array(
-			'url' => $this->_context->request()->params,
+			'url' => $request ? $request->params : array(),
 			'type' => null,
 			'action' => null,
 			'method' => $binding ? ($binding->exists() ? 'put' : 'post') : 'post'

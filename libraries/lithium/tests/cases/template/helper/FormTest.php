@@ -903,6 +903,12 @@ class FormTest extends \lithium\test\Unit {
 			'type' => 'text', 'name' => 'foo[bar]', 'id' => 'FooBar', 'value' => 'value'
 		)));
 	}
+
+	public function testFormCreationWithNoContext() {
+		$this->form = new Form(array('context' => new MockFormRenderer()));
+		$result = $this->form->create(null, array('url' => '/foo'));
+		$this->assertTags($result, array('form' => array('action' => "/foo", 'method'=> "post")));
+	}
 }
 
 ?>
