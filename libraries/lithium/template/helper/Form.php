@@ -392,15 +392,7 @@ class Form extends \lithium\template\Helper {
 	 */
 	public function field($name, array $options = array()) {
 		if (is_array($name)) {
-			$return = '';
-			foreach ($name as $field => $label) {
-				if (is_numeric($field)) {
-					$field = $label;
-					unset($label);
-				}
-				$return .= $this->field($field, compact('label') + $options);
-			}
-			return $return;
+			return $this->_fields($name, $options);
 		}
 		$defaults = array(
 			'label' => null,
@@ -440,6 +432,28 @@ class Form extends \lithium\template\Helper {
 		}
 		$error = ($this->_binding) ? $this->error($name) : null;
 		return $this->_render(__METHOD__, $template, compact('wrap', 'label', 'input', 'error'));
+	}
+
+	/**
+	 * Helper method used by `Form::field()` for iterating over an array of multiple fields.
+	 *
+	 * @see lithium\template\helper\Form::field()
+	 * @param array $fields An array of fields to render.
+	 * @param array $options The array of options to apply to all fields in the `$fields` array. See
+	 *              the `$options` parameter of the `field` method for more information.
+	 * @return string Returns the fields rendered by `field()`, each separated by a newline.
+	 */
+	protected function _fields(array $fields, array $options = array()) {
+		$result = array();
+
+		foreach ($fields as $field => $label) {
+			if (is_numeric($field)) {
+				$field = $label;
+				unset($label);
+			}
+			$result[] = $this->field($field, compact('label') + $options);
+		}
+		return join("\n", $result);
 	}
 
 	/**
