@@ -248,9 +248,8 @@ abstract class Database extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function read($query, array $options = array()) {
-		$defaults = array('
-			return' => is_string($query) ? 'array' : 'item', 'schema' => array(),
-			'return' => 'item'
+		$defaults = array(
+			'return' => is_string($query) ? 'array' : 'item', 'schema' => array()
 		);
 		$options += $defaults;
 

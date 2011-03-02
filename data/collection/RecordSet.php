@@ -344,7 +344,7 @@ class RecordSet extends \lithium\data\Collection {
 			$part = $model::connection()->schema($this->_query, $join->model(), $join);
 			$map[$name] = reset($part);
 		}
-		return $map;
+		return array_filter($map);
 	}
 }
 

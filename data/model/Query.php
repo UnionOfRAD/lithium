@@ -117,9 +117,7 @@ class Query extends \lithium\core\Object {
 			$this->_config['whitelist'] = array_combine($list, $list);
 		}
 		if ($this->_config['with']) {
-			foreach ((array) $this->_config['with'] as $related) {
-				$this->_associate($related);
-			}
+			$this->_associate($this->_config['with']);
 		}
 		$joins = $this->_config['joins'];
 		$this->_config['joins'] = array();
@@ -539,14 +537,11 @@ class Query extends \lithium\core\Object {
 		if (!$model = $this->model()) {
 			return;
 		}
-		$class = get_class($this);
 		$hasMany = false;
-		$addHostSubquery = false;
 
 		foreach ((array) $related as $name => $config) {
 			if (is_int($name)) {
 				$name = $config;
-				$config = array();
 			}
 			if (!$relationship = $model::relations($name)) {
 				throw new QueryException("Model relationship `{$name}` not found.");
@@ -556,26 +551,27 @@ class Query extends \lithium\core\Object {
 			$hasMany = $hasMany || $relationship->type() == 'hasMany';
 		}
 
-		if ($hasMany && $query->limit()) {
-			$model = $query->model();
+		if ($hasMany && $this->limit()) {
+			$model = $this->model();
 			$name = $model::meta('name');
 			$key = $model::key();
 
 			$idOptions = array(
+				'type' => 'read',
+				'model' => $model,
 				'group' => 'GROUP BY ' . $name . '.' . $key,
 				'fields' => array($name . '.' . $key),
-				'joins' => $query->joins()
-			) + $args;
-
-			$query->fields($idOptions['fields'], true)->group($idOptions['group']);
-
-			$ids = $self->read($query, $idOptions);
-			$ids = array_map(function($index) use ($key) { return $index[$key]; }, $ids->data());
-
-			$fields = $args['fields'] ?: false;
-			$group = $args['group'] ?: false;
+				'joins' => $this->joins(),
+				'conditions' => $this->conditions(),
+				'limit' => $this->limit(),
+				'page' => $this->page()
+			);
+			$query = new Query($idOptions);
+			$ids = $model::connection()->read($query);
+			$idData = $ids->data();
+			$ids = array_map(function($index) use ($key) { return $index[$key]; }, $idData);
 			$conditions = array("{$name}.{$key}" => $ids);
-			$query->fields($fields, true)->group($group)->limit(false)->conditions($conditions);
+			$this->limit(false)->conditions($conditions);
 		}
 	}
 
