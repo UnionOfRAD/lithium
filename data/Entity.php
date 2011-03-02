@@ -120,8 +120,8 @@ class Entity extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'classes' => 'merge', 'parent', 'schema', 'data', 'model', 'exists', 'pathKey',
-		'relationships'
+		'classes' => 'merge', 'parent', 'schema', 'data',
+		'model', 'exists', 'pathKey', 'relationships'
 	);
 
 	/**
@@ -247,7 +247,7 @@ class Entity extends \lithium\core\Object {
 			return $this->__get($name);
 		}
 		$related = array_map(function($rel) { return $rel->data(); }, $this->_relationships);
-		return $related + $this->_updated + $this->_data;
+		return array_merge($this->_updated + $this->_data, $related);
 	}
 
 	/**
