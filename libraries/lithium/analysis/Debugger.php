@@ -72,23 +72,7 @@ class Debugger extends \lithium\core\Object {
 
 			// Display more info about closures. Is this the right place for this?
 			if (strpos($function, '{closure}') !== false) {
-				if ($class = Inspector::classes(array('file' => $backtrace[$i]['file']))) {
-					foreach (Inspector::methods(key($class), 'extents') as $method => $extents) {
-						$line = $backtrace[$i]['line'];
-						if (!($extents[0] <= $line && $line <= $extents[1])) {
-							continue;
-						}
-						$class = key($class);
-						$reference = "{$class}::{$method}";
-						$function = "{$reference}()::{closure}";
-						break;
-					}
-				} else {
-					$reference = $backtrace[$i]['file'];
-					$function = "{$reference}::{closure}";
-				}
-				$line = static::_definition($reference, $backtrace[$i]['line']) ?: '?';
-				$function .= " @ {$line}";
+				$function = static::_closureDef($backtrace[$i], $function);
 			}
 
 			if (in_array($function, array('call_user_func_array', 'trigger_error'))) {
@@ -156,23 +140,52 @@ class Debugger extends \lithium\core\Object {
 					return $token[2];
 				}
 			}
-		} else {
-			list($class, $method) = explode('::', $reference);
-			$classRef = new ReflectionClass($class);
-			$methodInfo = Inspector::info($reference);
-			$methodDef = join("\n", Inspector::lines($classRef->getFileName(), range(
-				$methodInfo['start'] + 1, $methodInfo['end'] - 1
-			)));
+			return;
+		}
+		list($class, $method) = explode('::', $reference);
 
-			foreach (array_reverse(token_get_all("<?php {$methodDef} ?>")) as $token) {
-				if (!is_array($token) || $token[2] > $callLine) {
-					continue;
-				}
-				if ($token[0] === T_FUNCTION) {
-					return $token[2] + $methodInfo['start'];
-				}
+		if (!class_exists($class)) {
+			return;
+		}
+
+		$classRef = new ReflectionClass($class);
+		$methodInfo = Inspector::info($reference);
+		$methodDef = join("\n", Inspector::lines($classRef->getFileName(), range(
+			$methodInfo['start'] + 1, $methodInfo['end'] - 1
+		)));
+
+		foreach (array_reverse(token_get_all("<?php {$methodDef} ?>")) as $token) {
+			if (!is_array($token) || $token[2] > $callLine) {
+				continue;
+			}
+			if ($token[0] === T_FUNCTION) {
+				return $token[2] + $methodInfo['start'];
 			}
 		}
+	}
+
+	protected static function _closureDef($frame, $function) {
+		$reference = '::';
+
+		if ($class = Inspector::classes(array('file' => $frame['file']))) {
+			foreach (Inspector::methods(key($class), 'extents') as $method => $extents) {
+				$line = $frame['line'];
+
+				if (!($extents[0] <= $line && $line <= $extents[1])) {
+					continue;
+				}
+				$class = key($class);
+				$reference = "{$class}::{$method}";
+				$function = "{$reference}()::{closure}";
+				break;
+			}
+		} else {
+			$reference = $frame['file'];
+			$function = "{$reference}::{closure}";
+		}
+		$line = static::_definition($reference, $frame['line']) ?: '?';
+		$function .= " @ {$line}";
+		return $function;
 	}
 }
 
