@@ -306,78 +306,70 @@ class CatalogTest extends \lithium\test\Unit {
 		$data = array('house' => 'Haus');
 		Catalog::write('runtime', 'message', 'de', $data);
 		$result = Catalog::read('runtime', 'message', 'de', array('lossy' => false));
-		$expected = array(
-			'house' => array(
-				'id' => 'house',
-				'ids' => array(),
-				'translated' => 'Haus',
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array()
+		$expected = array('house' => array(
+			'id' => 'house',
+			'ids' => array(),
+			'translated' => 'Haus',
+			'flags' => array(),
+			'comments' => array(),
+			'occurrences' => array()
 		));
 		$this->assertEqual($expected, $result);
 
-		$data = array(
-			'house' => array(
-				'id' => 'house',
-				'ids' => array(),
-				'translated' => 'Haus',
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array()
+		$data = array('house' => array(
+			'id' => 'house',
+			'ids' => array(),
+			'translated' => 'Haus',
+			'flags' => array(),
+			'comments' => array(),
+			'occurrences' => array()
 		));
 		Catalog::write('runtime', 'message', 'de', $data);
 		$result = Catalog::read('runtime', 'message', 'de', array('lossy' => false));
-		$expected = array(
-			'house' => array(
-				'id' => 'house',
-				'ids' => array(),
-				'translated' => 'Haus',
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array()
+		$expected = array('house' => array(
+			'id' => 'house',
+			'ids' => array(),
+			'translated' => 'Haus',
+			'flags' => array(),
+			'comments' => array(),
+			'occurrences' => array()
 		));
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testOutputLossyFormat() {
-		$data = array(
-			'house' => array(
-				'id' => 'house',
-				'ids' => array('singular' => 'house'),
-				'translated' => 'Haus',
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array()
+		$data = array('house' => array(
+			'id' => 'house',
+			'ids' => array('singular' => 'house'),
+			'translated' => 'Haus',
+			'flags' => array(),
+			'comments' => array(),
+			'occurrences' => array()
 		));
 		Catalog::write('runtime', 'message', 'de', $data);
 		$result = Catalog::read('runtime', 'message', 'de');
-		$expected = array(
-			'house' => 'Haus'
-		);
+		$expected = array('house' => 'Haus');
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testOutputLosslessFormat() {
-		$data = array(
-			'house' => array(
-				'id' => 'house',
-				'ids' => array('singular' => 'house'),
-				'translated' => 'Haus',
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array()
+		$data = array('house' => array(
+			'id' => 'house',
+			'ids' => array('singular' => 'house'),
+			'translated' => 'Haus',
+			'flags' => array(),
+			'comments' => array(),
+			'occurrences' => array()
 		));
 		Catalog::write('runtime', 'message', 'de', $data);
 		$result = Catalog::read('runtime', 'message', 'de', array('lossy' => false));
-		$expected = array(
-			'house' => array(
-				'id' => 'house',
-				'ids' => array('singular' => 'house'),
-				'translated' => 'Haus',
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array()
+		$expected = array('house' => array(
+			'id' => 'house',
+			'ids' => array('singular' => 'house'),
+			'translated' => 'Haus',
+			'flags' => array(),
+			'comments' => array(),
+			'occurrences' => array()
 		));
 		$this->assertEqual($expected, $result);
 	}
@@ -385,7 +377,7 @@ class CatalogTest extends \lithium\test\Unit {
 	public function testInvalidWrite() {
 		Catalog::reset();
 		$data = array('house'	=> array('id' => 'house'));
-		$this->expectException("Configuration 'runtime' has not been defined.");
+		$this->expectException("Configuration `runtime` has not been defined.");
 		$this->assertFalse(Catalog::write('runtime', 'message', 'de', $data));
 	}
 }

@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\core;
 
+use stdClass;
 use SplFileInfo;
 use lithium\util\Inflector;
 use lithium\core\Libraries;
@@ -143,7 +144,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	* @return void
 	*/
 	public function testAddInvalidLibrary() {
-		$this->expectException("Library 'invalid_foo' not found.");
+		$this->expectException("Library `invalid_foo` not found.");
 		Libraries::add('invalid_foo');
 	}
 
@@ -220,7 +221,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testLibraryLoad() {
-		$this->expectException('Failed to load SomeInvalidLibrary from ');
+		$this->expectException('Failed to load class `SomeInvalidLibrary` from path ``.');
 		Libraries::load('SomeInvalidLibrary', true);
 	}
 
@@ -330,7 +331,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	public function testServiceLocateInstantiation() {
 		$result = Libraries::instance('adapter.template.view', 'Simple');
 		$this->assertTrue(is_a($result, 'lithium\template\view\adapter\Simple'));
-		$this->expectException("Class 'Foo' of type 'adapter.template.view' not found.");
+		$this->expectException("Class `Foo` of type `adapter.template.view` not found.");
 		$result = Libraries::instance('adapter.template.view', 'Foo');
 	}
 
@@ -373,7 +374,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$expected = '\lithium\data\source\Database';
 		$this->assertEqual($expected, $result);
 
-		$expected = new \stdClass();
+		$expected = new stdClass();
 		$result = Libraries::locate(null, $expected);
 		$this->assertEqual($expected, $result);
 	}

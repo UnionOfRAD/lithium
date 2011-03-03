@@ -349,7 +349,7 @@ class DocumentTest extends \lithium\test\Unit {
 	public function testInvalidCall() {
 		$doc = new Document();
 
-		$this->expectException("No model bound or unhandled method call 'medicin'.");
+		$this->expectException("No model bound or unhandled method call `medicin`.");
 		$result = $doc->medicin();
 		$this->assertNull($result);
 	}

@@ -8,12 +8,14 @@
 
 namespace lithium\tests\cases\core;
 
+use SplDoublyLinkedList;
 use lithium\util\Collection;
 use lithium\core\Adaptable;
 use lithium\storage\cache\adapter\Memory;
 use lithium\tests\mocks\core\MockAdapter;
 use lithium\tests\mocks\core\MockStrategy;
-use SplDoublyLinkedList;
+use lithium\tests\mocks\storage\cache\strategy\MockSerializer;
+use lithium\tests\mocks\storage\cache\strategy\MockConfigurizer;
 
 class AdaptableTest extends \lithium\test\Unit {
 
@@ -25,7 +27,7 @@ class AdaptableTest extends \lithium\test\Unit {
 		$this->assertFalse($this->adaptable->config());
 
 		$items = array(array(
-			'adapter' => '\some\adapter',
+			'adapter' => 'some\adapter',
 			'filters' => array('filter1', 'filter2')
 		));
 		$result = $this->adaptable->config($items);
@@ -36,7 +38,7 @@ class AdaptableTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$items = array(array(
-			'adapter' => '\some\adapter',
+			'adapter' => 'some\adapter',
 			'filters' => array('filter1', 'filter2')
 		));
 		$this->adaptable->config($items);
@@ -62,17 +64,13 @@ class AdaptableTest extends \lithium\test\Unit {
 
 	public function testNonExistentConfig() {
 		$adapter = new MockAdapter();
-		$this->expectException("Configuration 'non_existent_config' has not been defined.");
-		$result = $adapter::adapter('non_existent_config');
-		$this->assertNull($result);
+		$this->expectException("Configuration `non_existent_config` has not been defined.");
+		$adapter::adapter('non_existent_config');
 	}
 
 	public function testAdapter() {
 		$adapter = new MockAdapter();
-		$items = array('default' => array(
-			'adapter' => 'Memory',
-			'filters' => array()
-		));
+		$items = array('default' => array('adapter' => 'Memory', 'filters' => array()));
 		$adapter::config($items);
 		$result = $adapter::config();
 		$expected = $items;
@@ -85,10 +83,7 @@ class AdaptableTest extends \lithium\test\Unit {
 
 	public function testConfigAndAdapter() {
 		$adapter = new MockAdapter();
-		$items = array('default' => array(
-			'adapter' => 'Memory',
-			'filters' => array()
-		));
+		$items = array('default' => array('adapter' => 'Memory', 'filters' => array()));
 		$adapter::config($items);
 		$config = $adapter::config();
 
@@ -108,7 +103,7 @@ class AdaptableTest extends \lithium\test\Unit {
 	public function testStrategy() {
 		$strategy = new MockStrategy();
 		$items = array('default' => array(
-			'strategies' => array('\lithium\tests\mocks\storage\cache\strategy\MockSerializer'),
+			'strategies' => array('lithium\tests\mocks\storage\cache\strategy\MockSerializer'),
 			'filters' => array(),
 			'adapter' => null
 		));
@@ -120,9 +115,7 @@ class AdaptableTest extends \lithium\test\Unit {
 		$result = $strategy::strategies('default');
 		$this->assertTrue($result instanceof SplDoublyLinkedList);
 		$this->assertEqual(count($result), 1);
-		$this->assertTrue(
-			$result->top() instanceof \lithium\tests\mocks\storage\cache\strategy\MockSerializer
-		);
+		$this->assertTrue($result->top() instanceof MockSerializer);
 	}
 
 	public function testInvalidStrategy() {
@@ -135,7 +128,7 @@ class AdaptableTest extends \lithium\test\Unit {
 		$strategy::config($items);
 
 		$class = 'lithium\tests\mocks\core\MockStrategy';
-		$message = "Could not find strategy 'InvalidStrategy' in class {$class}.";
+		$message = "Could not find strategy `InvalidStrategy` in class `{$class}`.";
 		$this->expectException($message);
 
 		$result = $strategy::strategies('default');
@@ -146,7 +139,7 @@ class AdaptableTest extends \lithium\test\Unit {
 		$strategy = new MockStrategy();
 		$items = array('default' => array(
 			'strategies' => array(
-				'\lithium\tests\mocks\storage\cache\strategy\MockConfigurizer' => array(
+				'lithium\tests\mocks\storage\cache\strategy\MockConfigurizer' => array(
 					'key1' => 'value1', 'key2' => 'value2'
 				)
 			),
@@ -161,21 +154,19 @@ class AdaptableTest extends \lithium\test\Unit {
 		$result = $strategy::strategies('default');
 		$this->assertTrue($result instanceof SplDoublyLinkedList);
 		$this->assertEqual(count($result), 1);
-		$this->assertTrue(
-			$result->top() instanceof \lithium\tests\mocks\storage\cache\strategy\MockConfigurizer
-		);
+		$this->assertTrue($result->top() instanceof MockConfigurizer);
 	}
 
 	public function testNonExistentStrategyConfiguration() {
 		$strategy = new MockStrategy();
-		$this->expectException("Configuration 'non_existent_config' has not been defined.");
+		$this->expectException("Configuration `non_existent_config` has not been defined.");
 		$result = $strategy::strategies('non_existent_config');
 		$this->assertNull($result);
 	}
 
 	public function testApplyStrategiesNonExistentConfiguration() {
 		$strategy = new MockStrategy();
-		$this->expectException("Configuration 'non_existent_config' has not been defined.");
+		$this->expectException("Configuration `non_existent_config` has not been defined.");
 		$strategy::applyStrategies('method', 'non_existent_config', null);
 	}
 
@@ -184,7 +175,7 @@ class AdaptableTest extends \lithium\test\Unit {
 		$items = array('default' => array(
 			'filters' => array(),
 			'adapter' => null,
-			'strategies' => array('\lithium\tests\mocks\storage\cache\strategy\MockSerializer'),
+			'strategies' => array('lithium\tests\mocks\storage\cache\strategy\MockSerializer'),
 		));
 		$strategy::config($items);
 		$result = $strategy::config();
@@ -203,7 +194,7 @@ class AdaptableTest extends \lithium\test\Unit {
 			'filters' => array(),
 			'adapter' => null,
 			'strategies' => array(
-				'\lithium\tests\mocks\storage\cache\strategy\MockConfigurizer' => $params
+				'lithium\tests\mocks\storage\cache\strategy\MockConfigurizer' => $params
 			)
 		));
 		$strategy::config($items);
@@ -221,8 +212,7 @@ class AdaptableTest extends \lithium\test\Unit {
 			'filters' => array(),
 			'adapter' => null,
 			'strategies' => array(
-				'\lithium\tests\mocks\storage\cache\strategy\MockSerializer',
-				'Base64'
+				'lithium\tests\mocks\storage\cache\strategy\MockSerializer', 'Base64'
 			)
 		));
 		$strategy::config($items);
@@ -274,10 +264,7 @@ class AdaptableTest extends \lithium\test\Unit {
 	public function testEnabled() {
 		$adapter = new MockAdapter();
 
-		$items = array('default' => array(
-			'adapter' => 'Memory',
-			'filters' => array()
-		));
+		$items = array('default' => array('adapter' => 'Memory', 'filters' => array()));
 		$adapter::config($items);
 		$result = $adapter::config();
 		$expected = $items;
@@ -294,16 +281,14 @@ class AdaptableTest extends \lithium\test\Unit {
 	public function testNonExistentAdapter() {
 		$adapter = new MockAdapter();
 
-		$items = array('default' => array(
-			'adapter' => 'NonExistent', 'filters' => array()
-		));
+		$items = array('default' => array('adapter' => 'NonExistent', 'filters' => array()));
 		$adapter::config($items);
 		$result = $adapter::config();
 		$expected = $items;
 		$this->assertEqual($expected, $result);
 
-		$message  = 'Could not find adapter \'NonExistent\' in ';
-		$message .= 'class lithium\tests\mocks\core\MockAdapter.';
+		$message  = 'Could not find adapter `NonExistent` in ';
+		$message .= 'class `lithium\tests\mocks\core\MockAdapter`.';
 		$this->expectException($message);
 
 		$result = $adapter::adapter('default');
@@ -336,7 +321,7 @@ class AdaptableTest extends \lithium\test\Unit {
 		$adapter::config($items);
 
 		$message  = 'No adapter set for configuration in ';
-		$message .= 'class lithium\tests\mocks\core\MockAdapter.';
+		$message .= 'class `lithium\tests\mocks\core\MockAdapter`.';
 		$this->expectException($message);
 		$result = $adapter::adapter('default');
 	}

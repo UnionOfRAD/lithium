@@ -57,10 +57,7 @@ class DispatcherTest extends \lithium\test\Unit {
 
 	public function testRunWithPassed() {
 		$response = Dispatcher::run(new Request(array(
-			'args' => array(
-				'lithium\tests\mocks\console\MockDispatcherCommand',
-				'with param'
-			)
+			'args' => array('lithium\tests\mocks\console\MockDispatcherCommand', 'with param')
 		)));
 
 		$expected = 'run';
@@ -74,10 +71,7 @@ class DispatcherTest extends \lithium\test\Unit {
 
 	public function testRunWithAction() {
 		$response = Dispatcher::run(new Request(array(
-			'args' => array(
-				'lithium\tests\mocks\console\MockDispatcherCommand',
-				'testAction'
-			)
+			'args' => array('lithium\tests\mocks\console\MockDispatcherCommand', 'testAction')
 		)));
 		$expected = 'testAction';
 		$result = $response->testAction;
@@ -85,7 +79,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	}
 
 	public function testInvalidCommand() {
-		$expected = (object) array('status' => "Command `\\this\\command\\is\\fake` not found\n");
+		$expected = (object) array('status' => "Command `\\this\\command\\is\\fake` not found.\n");
 		$result = Dispatcher::run(new Request(array(
 			'args' => array(
 				'\this\command\is\fake',
@@ -97,7 +91,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithCamelizingCommand() {
-		$expected = (object) array('status' => "Command `FooBar` not found\n");
+		$expected = (object) array('status' => "Command `FooBar` not found.\n");
 		$result = Dispatcher::run(new Request(array(
 			'args' => array(
 				'foo-bar',
@@ -105,7 +99,7 @@ class DispatcherTest extends \lithium\test\Unit {
 		)));
 		$this->assertEqual($expected, $result);
 
-		$expected = (object) array('status' => "Command `FooBar` not found\n");
+		$expected = (object) array('status' => "Command `FooBar` not found.\n");
 		$result = Dispatcher::run(new Request(array(
 			'args' => array('foo_bar')
 		)));

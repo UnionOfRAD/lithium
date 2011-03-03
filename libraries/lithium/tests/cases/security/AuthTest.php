@@ -20,7 +20,7 @@ class AuthTest extends \lithium\test\Unit {
 
 		Auth::config(array(
 			'test' => array(
-				'adapter' => '\lithium\tests\mocks\security\auth\adapter\MockAuthAdapter'
+				'adapter' => 'lithium\tests\mocks\security\auth\adapter\MockAuthAdapter'
 			)
 		));
 	}
@@ -73,7 +73,7 @@ class AuthTest extends \lithium\test\Unit {
 	public function testNoConfigurations() {
 		Auth::reset();
 		$this->assertIdentical(array(), Auth::config());
-		$this->expectException("Configuration 'user' has not been defined.");
+		$this->expectException("Configuration `user` has not been defined.");
 		Auth::check('user');
 	}
 }

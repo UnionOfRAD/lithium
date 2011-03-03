@@ -60,7 +60,7 @@ class EntityTest extends \lithium\test\Unit {
 	public function testMethodDispatch() {
 		$entity = new Entity(array('model' => $this->_model, 'data' => array('foo' => true)));
 		$this->assertTrue($entity->validates());
-		$this->expectException("/^No model bound or unhandled method call 'foo'.$/");
+		$this->expectException("/^No model bound or unhandled method call `foo`.$/");
 		$entity->foo();
 	}
 

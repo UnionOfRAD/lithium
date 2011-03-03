@@ -91,7 +91,7 @@ class ResponseTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($headers, $this->response->testHeaders);
 
-		$this->expectException('/^Request::disableCache\(\)/');
+		$this->expectException('/^`Request::disableCache\(\)`.+`Request::cache\(false\)`/');
 		$this->response->disableCache();
 	}
 

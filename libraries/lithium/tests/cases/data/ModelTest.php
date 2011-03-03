@@ -13,6 +13,7 @@ use lithium\data\Entity;
 use lithium\data\model\Query;
 use lithium\data\Connections;
 use lithium\analysis\Inspector;
+use lithium\data\entity\Record;
 use lithium\tests\mocks\data\MockTag;
 use lithium\tests\mocks\data\MockPost;
 use lithium\tests\mocks\data\MockSource;
@@ -228,7 +229,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual(array('foo' => 13), $result['query']->conditions());
 		$this->assertEqual(array('created_at' => 'desc'), $result['query']->order());
 
-		$this->expectException('/Method findFoo not defined or handled in class/');
+		$this->expectException('/Method `findFoo` not defined or handled in class/');
 		MockPost::findFoo();
 	}
 
@@ -239,7 +240,7 @@ class ModelTest extends \lithium\test\Unit {
 	 */
 	public function testSimpleFindFirst() {
 		$result = MockComment::first();
-		$this->assertTrue($result instanceof \lithium\data\entity\Record);
+		$this->assertTrue($result instanceof Record);
 
 		$expected = 'First comment';
 		$this->assertEqual($expected, $result->text);

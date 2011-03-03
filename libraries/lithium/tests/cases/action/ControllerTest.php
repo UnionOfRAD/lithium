@@ -316,7 +316,7 @@ class ControllerTest extends \lithium\test\Unit {
 
 	public function testNonExistentFunction() {
 		$postsController = new MockPostsController();
-		$this->expectException("Action 'foo' not found.");
+		$this->expectException("Action `foo` not found.");
 		$postsController(new Request(), array('action' => 'foo'));
 	}
 }

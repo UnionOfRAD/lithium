@@ -12,7 +12,7 @@ use lithium\template\View;
 use lithium\action\Response;
 use lithium\g11n\catalog\adapter\Memory;
 use lithium\template\view\adapter\Simple;
-use lihtium\tests\mocks\template\MockView;
+use lithium\tests\mocks\template\MockView;
 
 class ViewTest extends \lithium\test\Unit {
 
@@ -30,12 +30,12 @@ class ViewTest extends \lithium\test\Unit {
 	}
 
 	public function testInitializationWithBadLoader() {
-		$this->expectException("Class 'Badness' of type 'adapter.template.view' not found.");
+		$this->expectException("Class `Badness` of type `adapter.template.view` not found.");
 		new View(array('loader' => 'Badness'));
 	}
 
 	public function testInitializationWithBadRenderer() {
-		$this->expectException("Class 'Badness' of type 'adapter.template.view' not found.");
+		$this->expectException("Class `Badness` of type `adapter.template.view` not found.");
 		new View(array('renderer' => 'Badness'));
 	}
 

@@ -319,7 +319,7 @@ class MediaTest extends \lithium\test\Unit {
 		$response = new Response();
 		$response->type('bad');
 
-		$this->expectException("Unhandled media type 'bad'");
+		$this->expectException("Unhandled media type `bad`.");
 		Media::render($response, array('foo' => 'bar'));
 
 		$result = $response->body;
@@ -336,7 +336,7 @@ class MediaTest extends \lithium\test\Unit {
 		$response = new Response();
 		$response->type('xml');
 
-		$this->expectException("Unhandled media type 'xml'");
+		$this->expectException("Unhandled media type `xml`.");
 		Media::render($response, array('foo' => 'bar'));
 
 		$result = $response->body;
