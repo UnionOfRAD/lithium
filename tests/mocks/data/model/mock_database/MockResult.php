@@ -15,6 +15,10 @@ class MockResult extends \lithium\data\source\database\Result {
 	protected function _close() {
 	}
 
+	protected function _prev() {
+		return prev($this->records);
+	}
+
 	protected function _next() {
 		return next($this->records);
 	}
