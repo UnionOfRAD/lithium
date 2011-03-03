@@ -587,6 +587,7 @@ class Query extends \lithium\core\Object {
 
 		return array($name, $this->_instance($class, compact('constraint', 'model') + array(
 			'type' => 'LEFT',
+			'alias' => $rel->name()
 		)));
 	}
 }

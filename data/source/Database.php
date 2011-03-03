@@ -440,7 +440,7 @@ abstract class Database extends \lithium\data\Source {
 		$namespace = preg_replace('/\w+$/', '', $model);
 		$relations = $model ? $model::relations() : array();
 		$schema = $model::schema();
-		$modelName = $model::meta('name');
+		$modelName = (method_exists($context, 'alias') ? $context->alias() : $model::meta('name'));
 
 		foreach ($fields as $scope => $field) {
 			switch (true) {
@@ -462,6 +462,9 @@ abstract class Database extends \lithium\data\Source {
 				break;
 				case (in_array($scope, $relations)):
 					$result[$scope] = $fields;
+				break;
+				case is_array($field) && $scope == $modelName:
+					$result[$model] = $field;
 				break;
 			}
 		}
@@ -570,6 +573,22 @@ abstract class Database extends \lithium\data\Source {
 		$type = $context->type();
 		$model = $context->model();
 		$schema = $model ? (array) $model::schema() : array();
+
+		if(is_array($fields)) {
+			$toMerge = array();
+			$keys = array_keys($fields);
+			$fields = array_filter($fields, function($item) use (&$toMerge, &$keys) {
+				$name = current($keys);
+				next($keys);
+				if(is_array($item)) {
+					foreach($item as $field) {
+						$toMerge[] = $name . '.' . $field;
+					}
+					return false;
+				}
+				return true;
+			}) + $toMerge;
+		}
 
 		if ($type == 'create' || $type == 'update') {
 			$data = $context->data();
