@@ -144,13 +144,6 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		}
 
 		if ($model && $conn) {
-			foreach ($model::relations() as $relation => $config) {
-				if ($config && (($linkKey = $config->data('fieldName')) === $name)) {
-					$data = isset($this->_data[$name]) ? $this->_data[$name] : array();
-					$this->_relationships[$name] = $this->_relationship($config);
-					return $this->_relationships[$name];
-				}
-			}
 			if (!isset($this->_data[$name]) && $schema = $model::schema($name)) {
 				$schema = array($name => $schema);
 				$pathKey = $this->_pathKey ? $this->_pathKey : null;
@@ -162,6 +155,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 				}
 			}
 		}
+
 		if (isset($this->_data[$name])) {
 			return $this->_data[$name];
 		}
@@ -201,22 +195,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @return object Returns a new `Document` object instance.
 	 */
 	protected function _relation($classType, $key, $data, $options = array()) {
-		$options['exists'] = false;
-		return parent::_relation($classType, $key, $data, $options);
-	}
-
-	protected function _relationship($relationship) {
-		$classType = ($relationship->type == 'hasMany') ? 'set' : 'entity';
-		$config = array('model' => $relationship->to, 'parent' => $this, 'exists' => true);
-		$class = $this->_classes[$classType];
-
-		switch ($relationship->link) {
-			case $relationship::LINK_EMBEDDED:
-				$field = $relationship->fieldName;
-				$config['data'] = isset($this->_data[$field]) ? $this->_data[$field] : array();
-			break;
-		}
-		return new $class($config);
+		return parent::_relation($classType, $key, $data, array('exists' => false) + $options);
 	}
 
 	protected function &_getNested($name) {
