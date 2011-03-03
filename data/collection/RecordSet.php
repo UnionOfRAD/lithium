@@ -334,7 +334,8 @@ class RecordSet extends \lithium\data\Collection {
 			return array();
 		}
 		if (!$joins = $this->_query->join()) {
-			return $model::connection()->schema($this->_query, $this->_result, $this);
+			$map = $model::connection()->schema($this->_query, $this->_result, $this);
+			return array_values($map);
 		}
 
 		$model = $this->_model;
