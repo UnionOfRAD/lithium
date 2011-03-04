@@ -70,14 +70,6 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	protected $_pathKey = null;
 
 	/**
-	 * An array containing all related documents, keyed by relationship name, as defined in the
-	 * bound model class.
-	 *
-	 * @var array
-	 */
-	protected $_relations = array();
-
-	/**
 	 * Contains an array of removed fields, where the field names are the keys, and the values are
 	 * always `true`.
 	 *
@@ -124,23 +116,17 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *         types in sub-`Document` objects.
 	 */
 	public function &__get($name) {
-		$data  = null;
-		$null  = null;
-		$model = $this->_model;
-		$conn  = $model ? $model::connection() : null;
-
-		if (isset($this->_relationships[$name])) {
-			return $this->_relationships[$name];
-		}
 		if (strpos($name, '.')) {
 			return $this->_getNested($name);
 		}
-
 		if (isset($this->_removed[$name])) {
+			$null = null;
 			return $null;
 		}
-		if (isset($this->_updated[$name])) {
-			return $this->_updated[$name];
+		if (isset($this->_embedded[$name]) && !isset($this->_relationships[$name])) {
+			$this->_relationships[$name] = $this->_relate(
+				$this->_embedded[$name], isset($this->_data[$name]) ? $this->_data[$name] : array()
+			);
 		}
 
 		if ($model && $conn) {
@@ -155,11 +141,12 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 				}
 			}
 		}
+		return parent::__get($name);
+	}
 
-		if (isset($this->_data[$name])) {
-			return $this->_data[$name];
+	protected function _relate($config, $data) {
+		if ($model = $this->_model) {
 		}
-		return $null;
 	}
 
 	public function export() {
@@ -359,12 +346,11 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	/**
 	 * Allows document fields to be unset as array keys, i.e. `unset($document['_id'])`.
 	 *
-	 * @param mixed $offset String or integer indicating the offset or the name of a field in an
-	 *              individual document.
+	 * @param string $key The name of a field in an individual document.
 	 * @return void
 	 */
-	public function offsetUnset($offset) {
-		return $this->__unset($offset);
+	public function offsetUnset($key) {
+		return $this->__unset($key);
 	}
 
 	/**
@@ -434,20 +420,6 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			$this->_valid = true;
 		}
 		return $this->_valid ? $this->__get(key($this->_data)) : null;
-	}
-
-	/**
-	 * Gets the raw data associated with this `Document`, or single item if `$field` is defined.
-	 *
-	 * @param string $name If included will only return the named item
-	 * @return array Returns a raw array of `Document` data, or individual field value
-	 */
-	public function data($name = null) {
-		if ($name) {
-			return parent::data($name);
-		}
-		$map = function($rel) { return $rel->data(); };
-		return $this->to('array') + array_map($map, $this->_relationships);
 	}
 
 	/**

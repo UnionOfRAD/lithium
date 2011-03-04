@@ -59,15 +59,6 @@ class Entity extends \lithium\core\Object {
 	protected $_parent = null;
 
 	/**
-	 * A reference to the object that originated this record set; usually an instance of
-	 * `lithium\data\Source` or `lithium\data\source\Database`. Used to load column definitions and
-	 * lazy-load records.
-	 *
-	 * @var object
-	 */
-	protected $_handle = null;
-
-	/**
 	 * The list of validation errors associated with this object, where keys are field names, and
 	 * values are arrays containing one or more validation error messages.
 	 *
@@ -147,25 +138,8 @@ class Entity extends \lithium\core\Object {
 	 * @return mixed Result.
 	 */
 	public function &__get($name) {
-		$data = null;
-		$null  = null;
-
 		if (isset($this->_relationships[$name])) {
 			return $this->_relationships[$name];
-		}
-
-		if (($model = $this->_model) && $this->_handle) {
-			foreach ($model::relations() as $relation => $config) {
-				$linkKey = $config->data('fieldName');
-				$type = $config->data('type') == 'hasMany' ? 'set' : 'entity';
-				$class = $this->_classes[$type];
-
-				if ($linkKey === $name) {
-					$data = isset($this->_data[$name]) ? $this->_data[$name] : array();
-					$this->_relationships[$name] = new $class();
-					return $this->_relationships[$name];
-				}
-			}
 		}
 		if (isset($this->_updated[$name])) {
 			return $this->_updated[$name];
@@ -173,6 +147,7 @@ class Entity extends \lithium\core\Object {
 		if (isset($this->_data[$name])) {
 			return $this->_data[$name];
 		}
+		$null = null;
 		return $null;
 	}
 
@@ -395,20 +370,6 @@ class Entity extends \lithium\core\Object {
 	}
 
 	/**
-	 * Configures protected properties of a `Record` so that it is parented to `$parent`.
-	 *
-	 * @param object $parent
-	 * @param array $config
-	 * @return void
-	 */
-	public function assignTo($parent, array $config = array()) {
-		foreach ($config as $key => $val) {
-			$this->{'_' . $key} = $val;
-		}
-		$this->_parent =& $parent;
-	}
-
-	/**
 	 * Converts the data in the record set to a different format, i.e. an array.
 	 *
 	 * @param string $format currently only `array`
@@ -425,42 +386,6 @@ class Entity extends \lithium\core\Object {
 			break;
 		}
 		return $result;
-	}
-
-	/**
-	 * Instantiates a new `Entity` object as a descendant of the current object, and sets all
-	 * default values and internal state.
-	 *
-	 * @param string $classType The type of class to create, either `'entity'` or `'set'`.
-	 * @param string $key The key name to which the related object is assigned.
-	 * @param array $data The internal data of the related object.
-	 * @param array $options Any other options to pass when instantiating the related object.
-	 * @return object Returns a new `Entity` object instance.
-	 */
-	protected function _relation($classType, $key, $data, $options = array()) {
-		$parent = $this;
-		$key = ($key === null) ? count($this->_data) : $key;
-		$pathKey = trim("{$this->_pathKey}.{$key}", '.');
-
-		if (($key || $key === 0) && $model = $this->_model) {
-			foreach ($model::relations() as $name => $relation) {
-				if ($key === $relation->data('fieldName')) {
-					$model = $relation->data('to');
-					break;
-				}
-			}
-		}
-
-		if (is_object($data) && method_exists($data, 'assignTo')) {
-			$data->assignTo($this, compact('model', 'pathKey'));
-			return $data;
-		}
-
-		if ($model) {
-			$exists = $this->_exists;
-			$options += compact('parent', 'exists', 'pathKey');
-			return $model::connection()->cast($this, $data, $options);
-		}
 	}
 }
 

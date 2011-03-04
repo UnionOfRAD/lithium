@@ -541,6 +541,7 @@ class Model extends \lithium\core\StaticObject {
 		if (!$name) {
 			return $self->_relations;
 		}
+
 		if (isset($self->_relationTypes[$name])) {
 			return array_keys(array_filter($self->_relations, function($i) use ($name) {
 				return $i->data('type') == $name;
