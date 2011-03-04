@@ -18,6 +18,8 @@ use lithium\analysis\Inspector;
  */
 class Debugger extends \lithium\core\Object {
 
+	protected static $_closureCache = array();
+
 	/**
 	 * Outputs a stack trace based on the supplied options.
 	 *
@@ -40,7 +42,8 @@ class Debugger extends \lithium\core\Object {
 			'start' => 0,
 			'scope' => array(),
 			'trace' => array(),
-			'includeScope' => true
+			'includeScope' => true,
+			'closures' => true,
 		);
 		$options += $defaults;
 
@@ -70,7 +73,7 @@ class Debugger extends \lithium\core\Object {
 				}
 			}
 
-			if (strpos($function, '{closure}') !== false) {
+			if ($options['closures'] && strpos($function, '{closure}') !== false) {
 				$function = static::_closureDef($backtrace[$i], $function);
 			}
 			if (in_array($function, array('call_user_func_array', 'trigger_error'))) {
@@ -164,6 +167,12 @@ class Debugger extends \lithium\core\Object {
 
 	protected static function _closureDef($frame, $function) {
 		$reference = '::';
+		$frame += array('file' => '??', 'line' => '??');
+		$cacheKey = "{$frame['file']}@{$frame['line']}";
+
+		if (isset(static::$_closureCache[$cacheKey])) {
+			return static::$_closureCache[$cacheKey];
+		}
 
 		if ($class = Inspector::classes(array('file' => $frame['file']))) {
 			foreach (Inspector::methods(key($class), 'extents') as $method => $extents) {
@@ -183,7 +192,7 @@ class Debugger extends \lithium\core\Object {
 		}
 		$line = static::_definition($reference, $frame['line']) ?: '?';
 		$function .= " @ {$line}";
-		return $function;
+		return static::$_closureCache[$cacheKey] = $function;
 	}
 }
 
