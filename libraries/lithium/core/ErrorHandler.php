@@ -221,7 +221,7 @@ class ErrorHandler extends \lithium\core\StaticObject {
 		);
 		$info = (array) $info + $defaults;
 
-		$info['stack'] = static::_trace($info['trace']);
+		$info['stack'] = static::trace($info['trace']);
 		$info['origin'] = static::_origin($info['trace']);
 
 		foreach ($rules as $config) {
