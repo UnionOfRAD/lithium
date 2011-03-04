@@ -556,22 +556,20 @@ class Query extends \lithium\core\Object {
 			$name = $model::meta('name');
 			$key = $model::key();
 
-			$idOptions = array(
+			$query = $this->_instance(get_class($this), array(
 				'type' => 'read',
 				'model' => $model,
-				'group' => 'GROUP BY ' . $name . '.' . $key,
-				'fields' => array($name . '.' . $key),
+				'group' => "{$name}.{$key}",
+				'fields' => array("{$name}.{$key}"),
 				'joins' => $this->joins(),
 				'conditions' => $this->conditions(),
 				'limit' => $this->limit(),
 				'page' => $this->page()
-			);
-			$query = new Query($idOptions);
+			));
 			$ids = $model::connection()->read($query);
 			$idData = $ids->data();
 			$ids = array_map(function($index) use ($key) { return $index[$key]; }, $idData);
-			$conditions = array("{$name}.{$key}" => $ids);
-			$this->limit(false)->conditions($conditions);
+			$this->limit(false)->conditions(array("{$name}.{$key}" => $ids));
 		}
 	}
 

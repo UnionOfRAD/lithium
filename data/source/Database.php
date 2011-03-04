@@ -699,6 +699,13 @@ abstract class Database extends \lithium\data\Source {
 		return "ORDER BY {$order}";
 	}
 
+	public function group($group, $context) {
+		if (!$group) {
+			return null;
+		}
+		return 'GROUP BY ' . join(', ', (array) $group);
+	}
+
 	/**
 	 * Adds formatting to SQL comments before they're embedded in queries.
 	 *
