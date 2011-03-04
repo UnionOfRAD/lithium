@@ -101,7 +101,9 @@ class RecordSet extends \lithium\data\Collection {
 		$model = $this->_model;
 
 		while ($record = $this->_populate(null, $offset)) {
-			if (!is_null($offset) && $offset == $model::key($record)) {
+			$key = $model::key($record);
+			$keySet = $offset == $key || (!$key && in_array($offset, $this->_index));
+			if (!is_null($offset) && $keySet) {
 				return $record;
 			}
 		}
@@ -287,6 +289,10 @@ class RecordSet extends \lithium\data\Collection {
 		}
 		$record = is_object($data) ? $data : $this->_mapRecord($data);
 		$key = $model::key($record);
+
+		if(!$key) {
+			$key = count($this->_data);
+		}
 
 		if (is_array($key)) {
 			$key = count($key) === 1 ? reset($key) : $key;

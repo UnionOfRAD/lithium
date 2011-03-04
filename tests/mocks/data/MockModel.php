@@ -20,7 +20,7 @@ class MockModel extends \lithium\data\Model {
 		} elseif (is_object($values) && isset($values->$key)) {
 			return $values->$key;
 		}
-		return $values[$key];
+		return isset($values[$key]) ? $values[$key] : null;
 	}
 
 	public static function __init() {}

@@ -125,6 +125,24 @@ class RecordSetTest extends \lithium\test\Unit {
 		$this->_recordSet[5];
 	}
 
+	public function testWithNoIndexes() {
+		$records = array(
+			array('data' => 'data1'),
+			array('data' => 'data2'),
+			array('data' => 'data3'),
+			array('data' => 'data4')
+		);
+
+		$result = new MockResult();
+		$result->records = array_merge(array(false), $records);
+		$model = $this->_model;
+
+		$recordSet = new MockRecordSet(compact('result', 'model') + array('exists' => true));
+
+		$this->assertEqual($records, $recordSet->data());
+		$this->assertEqual($records[1]['data'], $recordSet[1]->data);
+	}
+
 	public function testOffsetGetObject() {
 		$result = $this->_objectRecordSet[1];
 		$this->assertEqual(1, $result->id);
