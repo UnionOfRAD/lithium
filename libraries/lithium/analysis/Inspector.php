@@ -383,18 +383,22 @@ class Inspector extends \lithium\core\StaticObject {
 		$options += $defaults;
 
 		$list = get_declared_classes();
+		$files = get_included_files();
 		$classes = array();
 
-		if (!empty($options['file'])) {
+		if ($file = $options['file']) {
 			$loaded = static::_instance('collection', array('data' => array_map(
 				function($class) { return new ReflectionClass($class); }, $list
 			)));
+			$classFiles = $loaded->getFileName();
 
-			if (!in_array($options['file'], $loaded->getFileName())) {
-				include $options['file'];
+			if (in_array($file, $files) && !in_array($file, $classFiles)) {
+				return array();
+			}
+			if (!in_array($file, $classFiles)) {
+				include $file;
 				$list = array_diff(get_declared_classes(), $list);
 			} else {
-				$file = $options['file'];
 				$filter = function($class) use ($file) { return $class->getFileName() == $file; };
 				$list = $loaded->find($filter)->getName();
 			}
