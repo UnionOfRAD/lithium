@@ -212,7 +212,9 @@ class Unit extends \lithium\core\Object {
 			$params['message'] = $this->_message($params);
 			$message = String::insert($message, $params);
 		}
-		$trace = Debugger::trace(array('start' => 1, 'format' => 'array'));
+		$trace = Debugger::trace(array(
+			'start' => 1, 'depth' => 4, 'format' => 'array', 'closures' => !$expression
+		));
 		$methods = $this->methods();
 		$i = 1;
 
@@ -230,7 +232,7 @@ class Unit extends \lithium\core\Object {
 			'method'    => $trace[$i]['function'],
 			'assertion' => $trace[$i - 1]['function'],
 		);
-		$this->_result(($expression ? 'pass' : 'fail'), $result);
+		$this->_result($expression ? 'pass' : 'fail', $result);
 		return $expression;
 	}
 
