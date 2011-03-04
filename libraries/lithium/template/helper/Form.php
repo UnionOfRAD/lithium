@@ -608,7 +608,7 @@ class Form extends \lithium\template\Helper {
 	/**
 	 * Generates an HTML `<label></label>` object.
 	 *
-	 * @param string $name The name of the field that the label is for.
+	 * @param string $name The DOM ID of the field that the label is for.
 	 * @param string $title The content inside the `<label></label>` object.
 	 * @param array $options Besides HTML attributes, this parameter allows one additional flag:
 	 *              - `'escape'` _boolean_: Defaults to `true`. Indicates whether the title of the
