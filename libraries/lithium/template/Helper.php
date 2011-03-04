@@ -42,6 +42,13 @@ abstract class Helper extends \lithium\core\Object {
 	protected $_context = null;
 
 	/**
+	 * This property can be overwritten with any class dependencies a helper subclass has.
+	 *
+	 * @var array
+	 */
+	protected $_classes = array();
+
+	/**
 	 * Auto configuration properties.
 	 *
 	 * @var array
