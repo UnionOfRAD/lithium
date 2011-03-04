@@ -655,6 +655,20 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertEqual(join('', $expected), $result);
 	}
 
+	/**
+	 * Verifies that calls to `field()` with `'type' => 'hidden'` do not produce `<label />`s.
+	 *
+	 * @return void
+	 */
+	public function testHiddenFieldWithNoLabel() {
+		$result = $this->form->field('foo', array('type' => 'hidden'));
+		$this->assertTags($result, array(
+			'div' => array(),
+			'input' => array('type' => 'hidden', 'name' => 'foo', 'id' => 'Foo'),
+			'/div'
+		));
+	}
+
 	public function testFormFieldWithCustomTemplate() {
 		$result = $this->form->field('name', array(
 			'template' => '<div{:wrap}>{:label}: {:input}{:error}</div>'

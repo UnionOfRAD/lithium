@@ -416,7 +416,7 @@ class Form extends \lithium\template\Helper {
 		$type = $options['type'];
 		$label = $input = null;
 
-		if ($options['label'] === null || $options['label']) {
+		if (($options['label'] === null || $options['label']) && $options['type'] != 'hidden') {
 			$for = isset($options['id']) ? $options['id'] : '';
 			$label = $options['label'] ?: $options['label'] = Inflector::humanize($name);
 			$label = $this->label($for, $label);
