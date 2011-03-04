@@ -412,6 +412,37 @@ class RecordSetTest extends \lithium\test\Unit {
 		$result = $this->_objectRecordSet->map($filter);
 		$this->assertEqual($expected, $result->get('_data'));
 	}
+
+	public function testRecordSet() {
+		$expected = array(
+			'post1' => array(
+				'title' => 'My First Post',
+				'content' => 'First Content...'
+			),
+			'post2' => array(
+				'title' => 'My Second Post',
+				'content' => 'Also some foobar text'
+			),
+			'post3' => array(
+				'title' => 'My Third Post',
+				'content' => 'I like to write some foobar foo too'
+			)
+		);
+
+		$posts = new \lithium\data\collection\RecordSet(array('data' => $expected));
+
+		$this->assertEqual($expected['post1'], $posts->first());
+		$this->assertEqual($expected['post1'], $posts->current());
+		$this->assertEqual($expected['post2'], $posts->next());
+		$this->assertEqual($expected['post2'], $posts->current());
+		$this->assertEqual($expected['post1'], $posts->prev());
+		$this->assertEqual($expected['post2'], $posts->next());
+		$this->assertEqual($expected['post3'], $posts->next());
+		$this->assertEqual($expected['post2'], $posts->prev());
+		$this->assertEqual($expected['post1'], $posts->rewind());
+		$this->assertEqual($expected['post1'], $posts['post1']);
+	}
+
 }
 
 ?>

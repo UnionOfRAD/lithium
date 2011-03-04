@@ -190,6 +190,24 @@ class RecordSet extends \lithium\data\Collection {
 	}
 
 	/**
+	 * Returns the previous record in the set, and moves the internal pointer back. A previously
+	 * fetched record is returned. If bounds are reached, returns `null`.
+	 *
+	 * @return object Returns the previous record in the set, or `null`, if bounds are reached.
+	 */
+	public function prev() {
+		$this->_valid = (prev($this->_data) !== false && prev($this->_index) !== false);
+
+		$return = null;
+
+		if ($this->_valid) {
+			$this->_pointer--;
+			$return = $this->current();
+		}
+		return $return;
+	}
+
+	/**
 	 * Converts the data in the record set to a different format, i.e. an array.
 	 *
 	 * @param string $format
@@ -284,8 +302,15 @@ class RecordSet extends \lithium\data\Collection {
 	}
 
 	protected function _mapRecord($data) {
+		$options = array('exists' => true);
+		$relationships = array();
 		$primary = $this->_model;
 		$conn = $primary::connection();
+
+		if(!$this->_query) {
+			return $conn->item($primary, $data, $options + compact('relationships'));
+		}
+
 		$dataMap = array();
 		$relMap = $this->_query->relationships();
 		$main = null;
@@ -315,9 +340,6 @@ class RecordSet extends \lithium\data\Collection {
 			}
 		} while ($data = $this->_result->next());
 
-		$options = array('exists' => true);
-		$relationships = array();
-
 		foreach ($dataMap as $name => $rel) {
 			$field = $relMap[$name]['fieldName'];
 			$opts = $relMap[$name]['type'] == 'hasMany' ? array('class' => 'set') : array();
@@ -333,7 +355,7 @@ class RecordSet extends \lithium\data\Collection {
 		if (!($model = $this->_model)) {
 			return array();
 		}
-		if (!$joins = $this->_query->join()) {
+		if (!is_object($this->_query) || !$joins = $this->_query->join()) {
 			$map = $model::connection()->schema($this->_query, $this->_result, $this);
 			return array_values($map);
 		}

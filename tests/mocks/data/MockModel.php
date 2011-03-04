@@ -17,7 +17,7 @@ class MockModel extends \lithium\data\Model {
 
 		if (method_exists($values, 'to')) {
 			$values = $values->to('array');
-		} elseif (isset($values->$key)) {
+		} elseif (is_object($values) && isset($values->$key)) {
 			return $values->$key;
 		}
 		return $values[$key];

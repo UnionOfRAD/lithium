@@ -12,6 +12,11 @@ class MockResult extends \lithium\data\source\database\Result {
 
 	public $records = array();
 
+	public function __construct(array $config = array()) {
+		$defaults = array('resource' => true);
+		parent::__construct($config + $defaults);
+	}
+
 	protected function _close() {
 	}
 
