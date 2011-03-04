@@ -30,9 +30,6 @@ array_unshift($stack, array(
 	'line' => $exception->getLine()
 ));
 
-/**
- * It would be cool if the name of the exception was a link to the API.
- */
 ?>
 <h3>Exception</h3>
 

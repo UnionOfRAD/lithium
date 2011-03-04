@@ -70,11 +70,9 @@ class Debugger extends \lithium\core\Object {
 				}
 			}
 
-			// Display more info about closures. Is this the right place for this?
 			if (strpos($function, '{closure}') !== false) {
 				$function = static::_closureDef($backtrace[$i], $function);
 			}
-
 			if (in_array($function, array('call_user_func_array', 'trigger_error'))) {
 				continue;
 			}
