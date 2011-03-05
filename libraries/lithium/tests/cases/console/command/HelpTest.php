@@ -28,11 +28,8 @@ class HelpTest extends \lithium\test\Unit {
 	}
 
 	public function testRun() {
-		$command = new Help(array(
-			'request' => $this->request, 'classes' => $this->classes
-		));
-		$result = $command->run();
-		$this->assertTrue($expected, $result);
+		$command = new Help(array('request' => $this->request, 'classes' => $this->classes));
+		$this->assertTrue($command->run());
 
 		$expected = "COMMANDS\n";
 		$expected = preg_quote($expected);
