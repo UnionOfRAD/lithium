@@ -29,15 +29,18 @@ class Route extends \lithium\console\Command {
 	 */
 	public $env = 'development';
 
-
 	/**
 	 * Load the routes file and set the environment.
 	 */
 	public function __construct($config = array()) {
+		if(!isset($config['routes_file'])) {
+			$config['routes_file'] = LITHIUM_APP_PATH.'/config/routes.php';
+		}
+
 		parent::__construct($config);
 
 		Environment::set($this->env);
-		require LITHIUM_APP_PATH.'/config/routes.php';
+		require $this->_config['routes_file'];
 	}
 
 	/**
@@ -119,7 +122,7 @@ class Route extends \lithium\console\Command {
 		$method = 'GET';
 
 		if(empty($url)) {
-			$this->stop(true, 'Please provide a valid URL');
+			$this->error('Please provide a valid URL');
 		}
 
 		if(preg_match('/^(GET|POST|PUT|DELETE) (.+)/i', $url, $matches)) {
