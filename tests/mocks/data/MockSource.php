@@ -135,14 +135,25 @@ class MockSource extends \lithium\data\Source {
 		return $options['first'] ? reset($data) : $data;
 	}
 
-	public function relationship($class, $type, $name, array $options = array()) {
-		$keys = Inflector::underscore($type == 'belongsTo' ? $name : $class::meta('name')) . '_id';
+	public function relationship($class, $type, $name, array $config = array()) {
+		$field = Inflector::underscore(Inflector::singularize($name));//($type == 'hasMany') ?  : ;
+		$keys = "{$field}_id";
+		$primary = $class::meta('key');
 
-		$options += compact('name', 'type', 'keys');
-		$options['from'] = $class;
+		if (is_array($primary)) {
+			$keys = array_combine($primary, $primary);
+		} elseif ($type == 'hasMany' || $type == 'hasOne') {
+			if ($type == 'hasMany') {
+				$field = Inflector::pluralize($field);
+			}
+			$secondary = Inflector::underscore(Inflector::singularize($class::meta('name')));
+			$keys = array($primary => "{$secondary}_id");
+		}
 
-		$relationship = $this->_classes['relationship'];
-		return new $relationship($options);
+		$from = $class;
+		$fieldName = $field;
+		$config += compact('type', 'name', 'keys', 'from', 'fieldName');
+		return $this->_instance('relationship', $config);
 	}
 
 	public function calculation($type, $query, array $options = array()) {

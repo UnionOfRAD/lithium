@@ -168,11 +168,14 @@ class ModelTest extends \lithium\test\Unit {
 			'to' => 'lithium\tests\mocks\data\MockPost',
 			'link' => 'key',
 			'fields' => true,
-			'fieldName' => 'mockPost',
-			'constraint' => array('MockComment.mockpost_id' => 'MockPost.id'),
+			'fieldName' => 'mock_post',
+			'constraint' => array(),
 			'init' => true
 		);
 		$this->assertEqual($expected, MockComment::relations('MockPost')->data());
+
+		$expected = array('MockComment.mock_post_id' => 'MockPost.id');
+		$this->assertEqual($expected, MockComment::relations('MockPost')->constraints());
 
 		$expected = array(
 			'name' => 'MockComment',
@@ -180,13 +183,16 @@ class ModelTest extends \lithium\test\Unit {
 			'from' => 'lithium\tests\mocks\data\MockPost',
 			'to' => 'lithium\tests\mocks\data\MockComment',
 			'fields' => true,
-			'keys' => array('mock_post_id' => 'id'),
+			'keys' => array('id' => 'mock_post_id'),
 			'link' => 'key',
-			'fieldName' => 'mockComment',
-			'constraint' => array('MockComment.mockpost_id' => 'MockPost.id'),
+			'fieldName' => 'mock_comments',
+			'constraint' => array(),
 			'init' => true
 		);
 		$this->assertEqual($expected, MockPost::relations('MockComment')->data());
+
+		$expected = array('MockPost.id' => 'MockComment.mock_post_id');
+		$this->assertEqual($expected, MockPost::relations('MockComment')->constraints());
 	}
 
 	public function testSimpleRecordCreation() {
