@@ -175,6 +175,9 @@ class Sqlite3 extends \lithium\data\source\Database {
 		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			extract($params);
 
+			if(isset($fields)) {
+				return $fields;
+			}
 			$name = $self->invokeMethod('_entityName', array($entity));
 			$columns = $self->read("PRAGMA table_info({$name})", array('return' => 'array'));
 			$fields = array();
