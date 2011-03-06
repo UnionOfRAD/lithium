@@ -444,7 +444,7 @@ abstract class Database extends \lithium\data\Source {
 
 		foreach ($fields as $scope => $field) {
 			switch (true) {
-				case (is_numeric($scope) && $field == '*'):
+				case (is_numeric($scope) && preg_match('/^('.$modelName.'\.)*?\*/', $field)):
 					$result[$model] = array_keys($model::schema());
 				break;
 				case (is_numeric($scope) && isset($schema[$field])):
@@ -587,7 +587,8 @@ abstract class Database extends \lithium\data\Source {
 					return false;
 				}
 				return true;
-			}) + $toMerge;
+			});
+			$fields = array_merge($fields, $toMerge);
 		}
 
 		if ($type == 'create' || $type == 'update') {
