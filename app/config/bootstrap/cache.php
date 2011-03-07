@@ -27,6 +27,11 @@ if (!($apcEnabled = Apc::enabled()) && !is_writable(LITHIUM_APP_PATH . '/resourc
 	return;
 }
 
+/**
+ * This configures the default cache, based on whether ot not APC user caching is enabled. If it is
+ * not, file caching will be used. Most of this code is for getting you up and running only, and
+ * should be replaced with a hard-coded configuration, based on the cache(s) you plan to use.
+ */
 if ($apcEnabled) {
 	$default = array(
 		'adapter' => 'lithium\storage\cache\adapter\Apc',
@@ -39,6 +44,9 @@ if ($apcEnabled) {
 }
 Cache::config(compact('default'));
 
+/**
+ * Caches paths for auto-loaded and service-located classes.
+ */
 Dispatcher::applyFilter('run', function($self, $params, $chain) {
 	$key = md5(LITHIUM_APP_PATH) . '.core.libraries';
 
