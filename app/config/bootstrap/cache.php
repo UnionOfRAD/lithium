@@ -34,15 +34,10 @@ if (!($apcEnabled = Apc::enabled()) && !is_writable($cachePath)) {
  * not, file caching will be used. Most of this code is for getting you up and running only, and
  * should be replaced with a hard-coded configuration, based on the cache(s) you plan to use.
  */
+$default = array('adapter' => 'File', 'strategies' => array('Serializer'));
+
 if ($apcEnabled) {
-	$default = array(
-		'adapter' => 'lithium\storage\cache\adapter\Apc',
-	);
-} else {
-	$default = array(
-		'adapter' => 'lithium\storage\cache\adapter\File',
-		'strategies' => array('Serializer')
-	);
+	$default = array('adapter' => 'Apc');
 }
 Cache::config(compact('default'));
 
