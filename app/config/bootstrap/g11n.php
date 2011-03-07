@@ -11,6 +11,7 @@
  * including localization of text, validation rules, setting timezones and character inflections,
  * and identifying a user's locale.
  */
+use lithium\core\Libraries;
 use lithium\core\Environment;
 use lithium\g11n\Locale;
 use lithium\g11n\Catalog;
@@ -69,7 +70,7 @@ Catalog::config(array(
 	),
 	// 'app' => array(
 	// 	'adapter' => 'Gettext',
-	// 	'path' => LITHIUM_APP_PATH . '/resources/g11n'
+	// 	'path' => Libraries::get(true, 'resources') . '/g11n'
 	// ),
 	'lithium' => array(
 		'adapter' => 'Php',

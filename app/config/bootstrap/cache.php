@@ -23,7 +23,9 @@ if (PHP_SAPI === 'cli') {
  * If APC is not available and the cache directory is not writeable, bail out. This block should be
  * removed post-install, and the cache should be configured with the adapter you plan to use.
  */
-if (!($apcEnabled = Apc::enabled()) && !is_writable(LITHIUM_APP_PATH . '/resources/tmp/cache')) {
+$cachePath = Libraries::get(true, 'resources') . '/tmp/cache';
+
+if (!($apcEnabled = Apc::enabled()) && !is_writable($cachePath)) {
 	return;
 }
 

@@ -6,6 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
+use lithium\core\Libraries;
 use lithium\data\Connections;
 
 $checkName = null;
@@ -37,11 +38,11 @@ $notify = function($status, $message, $solution = null) use (&$checkName, &$chec
 
 $sanityChecks = array(
 	'resourcesWritable' => function() use ($notify) {
-		if (is_writable($path = realpath(LITHIUM_APP_PATH . '/resources'))) {
+		if (is_writable($path = realpath(Libraries::get(true, 'resources')))) {
 			return $notify(true, 'Resources directory is writable.');
 		}
 		return $notify(false, array(
-			"Your resource path (<code>$path</code>) is not writeable. " .
+			"Your resource path (<code>{$path}</code>) is not writeable. " .
 			"To fix this on *nix and Mac OSX, run the following from the command line:",
 			"<code>chmod -R 0777 {$path}</code>"
 		));
