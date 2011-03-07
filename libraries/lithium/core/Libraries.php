@@ -252,6 +252,9 @@ class Libraries {
 	 *          interpreted as the pattern and replacement for a regex, or an anonymous function,
 	 *          which receives the class name and library configuration arrays as parameters, and
 	 *          returns the full physical file path as output.
+	 *        - `'resources'` _string_: If this is the default library, this maybe set to the
+	 *          absolute path to the write-enabled application resources directory, which is used
+	 *          for caching, log files, uploads, etc.
 	 * @return array Returns the resulting set of options created for this library.
 	 */
 	public static function add($name, array $config = array()) {
@@ -276,6 +279,7 @@ class Libraries {
 			static::$_default = $name;
 			$defaults['path'] = LITHIUM_APP_PATH;
 			$defaults['bootstrap'] = false;
+			$defaults['resources'] = LITHIUM_APP_PATH . '/resources';
 		}
 		$config += $defaults;
 
@@ -318,13 +322,20 @@ class Libraries {
 	 * Returns configuration for given name.
 	 *
 	 * @param string $name Registered library to retrieve configuration for.
-	 * @return array Retrieved configuration.
+	 * @param string $key Optional key name. If `$name` is set and is the name of a valid library,
+	 *               returns the given named configuration key, i.e. `'path'`, `'webroot'` or
+	 *               `'resources'`.
+	 * @return mixed A configuation array for one or more libraries, or a string value if `$key` is
+	 *               specified.
 	 */
-	public static function get($name = null) {
+	public static function get($name = null, $key = null) {
 		$configs = static::$_configurations;
 
 		if (!$name) {
 			return $configs;
+		}
+		if ($name === true) {
+			$name = static::$_default;
 		}
 		if (is_array($name)) {
 			foreach ($name as $i => $key) {
@@ -333,10 +344,12 @@ class Libraries {
 			}
 			return $name;
 		}
-		if ($name === true) {
-			$name = static::$_default;
+		$config = isset($configs[$name]) ? $configs[$name] : null;
+
+		if (!$key) {
+			return $config;
 		}
-		return isset($configs[$name]) ? $configs[$name] : null;
+		return isset($config[$key]) ? $config[$key] : null;
 	}
 
 	/**

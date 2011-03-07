@@ -140,7 +140,7 @@ class GroupTest extends \lithium\test\Unit {
 	}
 
 	public function testAddTestAppGroup() {
-		$test_app = LITHIUM_APP_PATH . '/resources/tmp/tests/test_app';
+		$test_app = Libraries::get(true, 'resources') . '/tmp/tests/test_app';
 		mkdir($test_app);
 		Libraries::add('test_app', array('path' => $test_app));
 
@@ -170,7 +170,7 @@ class GroupTest extends \lithium\test\Unit {
 	}
 
 	public function testRunGroupAllForTestApp() {
-		$test_app = LITHIUM_APP_PATH . '/resources/tmp/tests/test_app';
+		$test_app = Libraries::get(true, 'resources') . '/tmp/tests/test_app';
 		mkdir($test_app);
 		Libraries::add('test_app', array('path' => $test_app));
 
@@ -192,7 +192,7 @@ class GroupTest extends \lithium\test\Unit {
 	}
 
 	public function testRunGroupForTestAppModel() {
-		$test_app = LITHIUM_APP_PATH . '/resources/tmp/tests/test_app';
+		$test_app = Libraries::get(true, 'resources') . '/tmp/tests/test_app';
 		mkdir($test_app);
 		Libraries::add('test_app', array('path' => $test_app));
 

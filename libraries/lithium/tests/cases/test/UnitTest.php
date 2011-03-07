@@ -8,10 +8,11 @@
 
 namespace lithium\tests\cases\test;
 
+use Exception;
+use lithium\core\Libraries;
 use lithium\tests\mocks\test\MockUnitTest;
 use lithium\tests\mocks\test\cases\MockSkipThrowsException;
 use lithium\tests\mocks\test\cases\MockTestErrorHandling;
-use Exception;
 
 class UnitTest extends \lithium\test\Unit {
 
@@ -364,7 +365,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testCleanUp() {
-		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$base = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($base), "{$base} is not writable.");
 
 		$this->assertTrue(mkdir("{$base}/cleanup_test"));
@@ -376,7 +377,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testCleanUpWithFullPath() {
-		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$base = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($base), "{$base} is not writable.");
 
 		$this->assertTrue(mkdir("{$base}/cleanup_test"));
@@ -392,7 +393,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testCleanUpWithRelativePath() {
-		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$base = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($base), "{$base} is not writable.");
 
 		$this->assertTrue(mkdir("{$base}/cleanup_test"));
@@ -410,7 +411,7 @@ class UnitTest extends \lithium\test\Unit {
 	public function testSkipIf() {
 		try {
 			$this->skipIf(true, 'skip me');
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			$result = $e->getMessage();
 		}
 		$expected = 'skip me';

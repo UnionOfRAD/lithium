@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\analysis;
 
+use lithium\core\Libraries;
 use lithium\analysis\Logger;
 use lithium\util\Collection;
 use lithium\tests\mocks\analysis\MockLoggerAdapter;
@@ -18,7 +19,7 @@ use lithium\tests\mocks\analysis\MockLoggerAdapter;
 class LoggerTest extends \lithium\test\Unit {
 
 	public function skip() {
-		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->_testPath = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($this->_testPath), "{$this->_testPath} is not readable.");
 	}
 
@@ -64,7 +65,7 @@ class LoggerTest extends \lithium\test\Unit {
 	}
 
 	public function testIntegrationWriteFile() {
-		$base = LITHIUM_APP_PATH . '/resources/tmp/logs';
+		$base = Libraries::get(true, 'resources') . '/tmp/logs';
 		$this->skipIf(!is_writable($base), "{$base} is not writable.");
 
 		$config = array('default' => array(
@@ -95,7 +96,7 @@ class LoggerTest extends \lithium\test\Unit {
 	}
 
 	public function testWriteByName() {
-		$base = LITHIUM_APP_PATH . '/resources/tmp/logs';
+		$base = Libraries::get(true, 'resources') . '/tmp/logs';
 		$this->skipIf(!is_writable($base), "{$base} is not writable.");
 
 		Logger::config(array('default' => array(

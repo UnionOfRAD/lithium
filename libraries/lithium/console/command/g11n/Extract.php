@@ -11,6 +11,7 @@ namespace lithium\console\command\g11n;
 use DateTime;
 use Exception;
 use lithium\g11n\Catalog;
+use lithium\core\Libraries;
 
 /**
  * The `Extract` class is a command for extracting messages from files.
@@ -26,7 +27,7 @@ class Extract extends \lithium\console\Command {
 	public function _init() {
 		parent::_init();
 		$this->source = $this->source ?: LITHIUM_APP_PATH;
-		$this->destination = $this->destination ?: LITHIUM_APP_PATH . '/resources/g11n';
+		$this->destination = $this->destination ?: Libraries::get(true, 'resources') . '/g11n';
 	}
 
 	/**

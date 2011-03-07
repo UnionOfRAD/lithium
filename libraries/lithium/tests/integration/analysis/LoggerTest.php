@@ -8,6 +8,7 @@
 
 namespace lithium\tests\integration\analysis;
 
+use lithium\core\Libraries;
 use lithium\analysis\Logger;
 use lithium\util\Collection;
 use lithium\util\collection\Filters;
@@ -19,12 +20,11 @@ class LoggerTest extends \lithium\test\Unit {
 
 	public function testWriteFilter() {
 
-		$base = LITHIUM_APP_PATH . '/resources/tmp/logs';
+		$base = Libraries::get(true, 'resources') . '/tmp/logs';
 		$this->skipIf(!is_writable($base), "{$base} is not writable.");
 
 		Filters::apply('lithium\analysis\Logger', 'write', function($self, $params, $chain) {
 			$params['message'] = 'Filtered Message';
-
 			return $chain->next($self, $params, $chain);
 		});
 

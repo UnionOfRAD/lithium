@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\storage\session\adapter;
 
+use lithium\core\Libraries;
 use lithium\storage\session\adapter\Php;
 use lithium\tests\mocks\storage\session\adapter\MockPhp;
 
@@ -70,7 +71,7 @@ class PhpTest extends \lithium\test\Unit {
 		$config = array(
 			'session.name' => 'awesome_name', 'session.cookie_lifetime' => 1200,
 			'session.cookie_domain' => 'awesome.domain',
-			'session.save_path' => LITHIUM_APP_PATH . '/resources/tmp/',
+			'session.save_path' => Libraries::get(true, 'resources') . '/tmp/',
 			'somebad.configuration' => 'whoops'
 		);
 

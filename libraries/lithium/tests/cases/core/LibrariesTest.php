@@ -154,7 +154,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testAddNonPrefixedLibrary() {
-		$tmpDir = realpath(LITHIUM_APP_PATH . '/resources/tmp');
+		$tmpDir = realpath(Libraries::get(true, 'resources') . '/tmp');
 		$this->skipIf(!is_writable($tmpDir), "Can't write to resources directory.");
 
 		$fakeDir = $tmpDir . '/fake';
@@ -536,12 +536,12 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testLocateWithTestAppLibrary() {
-		$test_app = LITHIUM_APP_PATH . '/resources/tmp/tests/test_app';
-		mkdir($test_app);
-		Libraries::add('test_app', array('path' => $test_app));
+		$testApp = Libraries::get(true, 'resources') . '/tmp/tests/test_app';
+		mkdir($testApp);
+		Libraries::add('test_app', array('path' => $testApp));
 
-		mkdir($test_app . '/tests/cases/models', 0777, true);
-		file_put_contents($test_app . '/tests/cases/models/UserTest.php',
+		mkdir($testApp . '/tests/cases/models', 0777, true);
+		file_put_contents($testApp . '/tests/cases/models/UserTest.php',
 		"<?php namespace test_app\\tests\\cases\\models;\n
 			class UserTest extends \\lithium\\test\\Unit { public function testMe() {
 				\$this->assertTrue(true);
@@ -562,8 +562,8 @@ class LibrariesTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testPathsInPharArchives() {
-		$config = Libraries::get('lithium');
-		$path = "{$config['path']}/console/command/create/template/app.phar.gz";
+		$base = Libraries::get('lithium', 'path');
+		$path = "{$base}/console/command/create/template/app.phar.gz";
 
 		$expected = "phar://{$path}/controllers/HelloWorldController.php";
 		$result = Libraries::realPath($expected);

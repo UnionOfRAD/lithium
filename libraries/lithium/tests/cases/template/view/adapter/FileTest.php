@@ -8,48 +8,44 @@
 
 namespace lithium\tests\cases\template\view\adapter;
 
+use lithium\core\Libraries;
 use lithium\template\view\adapter\File;
 
 class FileTest extends \lithium\test\Unit {
 
-	protected $_path = '/resources/tmp/tests';
+	protected $_path;
 
 	public function setUp() {
+		$this->_path = Libraries::get(true, 'resources') . '/tmp/tests';
+
 		$template1 = '<' . '?php echo $foo; ?' . '>';
 		$template2 = '<' . '?php echo $this["foo"]; ?' . '>';
-		file_put_contents(LITHIUM_APP_PATH . "{$this->_path}/template1.html.php", $template1);
-		file_put_contents(LITHIUM_APP_PATH . "{$this->_path}/template2.html.php", $template2);
+		file_put_contents("{$this->_path}/template1.html.php", $template1);
+		file_put_contents("{$this->_path}/template2.html.php", $template2);
 	}
 
 	public function tearDown() {
-		unlink(LITHIUM_APP_PATH . "{$this->_path}/template1.html.php");
-		unlink(LITHIUM_APP_PATH . "{$this->_path}/template2.html.php");
+		unlink("{$this->_path}/template1.html.php");
+		unlink("{$this->_path}/template2.html.php");
 	}
 
 	public function testRenderingWithExtraction() {
 		$file = new File();
-		$content = $file->render(LITHIUM_APP_PATH . "{$this->_path}/template1.html.php", array(
-			'foo' => 'bar'
-		));
+
+		$content = $file->render("{$this->_path}/template1.html.php", array('foo' => 'bar'));
 		$this->assertEqual('bar', $content);
 
-		$content = $file->render(LITHIUM_APP_PATH . "{$this->_path}/template2.html.php", array(
-			'foo' => 'bar'
-		));
+		$content = $file->render("{$this->_path}/template2.html.php", array('foo' => 'bar'));
 		$this->assertEqual('bar', $content);
 	}
 
 	public function testRenderingWithNoExtraction() {
 		$file = new File(array('extract' => false));
 		$this->expectException('Undefined variable: foo');
-		$content = $file->render(LITHIUM_APP_PATH . "{$this->_path}/template1.html.php", array(
-			'foo' => 'bar'
-		));
+		$content = $file->render("{$this->_path}/template1.html.php", array('foo' => 'bar'));
 		$this->assertFalse($content);
 
-		$content = $file->render(LITHIUM_APP_PATH . "{$this->_path}/template2.html.php", array(
-			'foo' => 'bar'
-		));
+		$content = $file->render("{$this->_path}/template2.html.php", array('foo' => 'bar'));
 		$this->assertEqual('bar', $content);
 	}
 

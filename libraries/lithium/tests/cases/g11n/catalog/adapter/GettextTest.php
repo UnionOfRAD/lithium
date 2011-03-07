@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\g11n\catalog\adapter;
 
 use Exception;
+use lithium\core\Libraries;
 use lithium\tests\mocks\g11n\catalog\adapter\MockGettext;
 
 class GettextTest extends \lithium\test\Unit {
@@ -18,13 +19,13 @@ class GettextTest extends \lithium\test\Unit {
 	protected $_path;
 
 	public function skip() {
-		$path = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$path = Libraries::get(true, 'resources') . '/tmp/tests';
 		$message = "Path {$path} is not writable.";
 		$this->skipIf(!is_writable($path), $message);
 	}
 
 	public function setUp() {
-		$this->_path = $path = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->_path = $path = Libraries::get(true, 'resources') . '/tmp/tests';
 		mkdir("{$this->_path}/en/LC_MESSAGES", 0755, true);
 		mkdir("{$this->_path}/de/LC_MESSAGES", 0755, true);
 		$this->adapter = new MockGettext(compact('path'));

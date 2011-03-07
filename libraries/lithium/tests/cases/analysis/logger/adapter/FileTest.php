@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\analysis\logger\adapter;
 
+use lithium\core\Libraries;
 use lithium\util\collection\Filters;
 use lithium\analysis\logger\adapter\File;
 
@@ -16,7 +17,7 @@ class FileTest extends \lithium\test\Unit {
 	public $subject;
 
 	public function setUp() {
-		$this->path = LITHIUM_APP_PATH . '/resources/tmp/logs';
+		$this->path = Libraries::get(true, 'resources') . '/tmp/logs';
 		$this->tearDown();
 	}
 

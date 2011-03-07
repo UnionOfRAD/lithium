@@ -9,6 +9,7 @@
 namespace lithium\analysis\logger\adapter;
 
 use lithium\util\String;
+use lithium\core\Libraries;
 
 /**
  * A simple log adapter that writes messages to files. By default, messages are written to
@@ -52,7 +53,7 @@ class File extends \lithium\core\Object {
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'path' => LITHIUM_APP_PATH . '/resources/tmp/logs',
+			'path' => Libraries::get(true, 'resources') . '/tmp/logs',
 			'timestamp' => 'Y-m-d H:i:s',
 			'file' => function($data, $config) { return "{$data['priority']}.log"; },
 			'format' => "{:timestamp} {:message}\n",

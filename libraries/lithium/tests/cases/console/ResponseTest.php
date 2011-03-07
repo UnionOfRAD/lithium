@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\console;
 
+use lithium\core\Libraries;
 use lithium\console\Response;
 use lithium\console\Request;
 
@@ -17,8 +18,8 @@ class ResponseTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->streams = array(
-			'output' => LITHIUM_APP_PATH . '/resources/tmp/tests/output.txt',
-			'error' => LITHIUM_APP_PATH . '/resources/tmp/tests/error.txt'
+			'output' => Libraries::get(true, 'resources') . '/tmp/tests/output.txt',
+			'error' => Libraries::get(true, 'resources') . '/tmp/tests/error.txt'
 		);
 	}
 
@@ -33,15 +34,14 @@ class ResponseTest extends \lithium\test\Unit {
 	public function testConstructWithoutConfig() {
 		$response = new Response();
 		$this->assertTrue(is_resource($response->output));
-
 		$this->assertTrue(is_resource($response->error));
 	}
 
 	public function testConstructWithConfigOutput() {
-		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$base = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($base), "{$base} is not writable.");
-
 		$stream = fopen($this->streams['output'], 'w');
+
 		$response = new Response(array(
 			'output' => $stream
 		));
@@ -50,53 +50,36 @@ class ResponseTest extends \lithium\test\Unit {
 
 	}
 
-	public function testConstructWithConfigErrror() {
-		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+	public function testConstructWithConfigError() {
+		$base = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($base), "{$base} is not writable.");
 
 		$stream = fopen($this->streams['error'], 'w');
-		$response = new Response(array(
-			'error' => $stream
-		));
+		$response = new Response(array('error' => $stream));
 		$this->assertTrue(is_resource($response->error));
 		$this->assertEqual($stream, $response->error);
-
 	}
 
 	public function testOutput() {
-		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$base = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($base), "{$base} is not writable.");
 
-		$response = new Response(array(
-			'output' => fopen($this->streams['output'], 'w+')
-		));
+		$response = new Response(array('output' => fopen($this->streams['output'], 'w+')));
 		$this->assertTrue(is_resource($response->output));
 
-		$expected = 2;
-		$result = $response->output('ok');
-		$this->assertEqual($expected, $result);
 
-		$expected = 'ok';
-		$result = file_get_contents($this->streams['output']);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual(2, $response->output('ok'));
+		$this->assertEqual('ok', file_get_contents($this->streams['output']));
 	}
 
 	public function testError() {
-		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$base = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($base), "{$base} is not writable.");
 
-		$response = new Response(array(
-			'error' => fopen($this->streams['error'], 'w+')
-		));
+		$response = new Response(array('error' => fopen($this->streams['error'], 'w+')));
 		$this->assertTrue(is_resource($response->error));
-
-		$expected = 2;
-		$result = $response->error('ok');
-		$this->assertEqual($expected, $result);
-
-		$expected = 'ok';
-		$result = file_get_contents($this->streams['error']);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual(2, $response->error('ok'));
+		$this->assertEqual('ok', file_get_contents($this->streams['error']));
 	}
 }
 

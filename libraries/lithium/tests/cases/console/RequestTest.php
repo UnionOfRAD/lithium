@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\console;
 
+use lithium\core\Libraries;
 use lithium\console\Request;
 
 class RequestTest extends \lithium\test\Unit {
@@ -18,7 +19,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->streams = array(
-			'input' => LITHIUM_APP_PATH . '/resources/tmp/tests/input.txt',
+			'input' => Libraries::get(true, 'resources') . '/tmp/tests/input.txt'
 		);
 
 		$this->_backups['cwd'] = getcwd();
@@ -52,13 +53,13 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testEnvWorking() {
-		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$base = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_readable($base), "{$base} is not readable.");
 
-		chdir(LITHIUM_APP_PATH . '/resources/tmp/tests');
+		chdir(Libraries::get(true, 'resources') . '/tmp/tests');
 		$request = new Request();
 
-		$expected = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$expected = Libraries::get(true, 'resources') . '/tmp/tests';
 		$result = $request->env('working');
 		$this->assertEqual($expected, $result);
 	}
@@ -120,13 +121,11 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testConstructWithEnv() {
-		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$base = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_readable($base), "{$base} is not writable.");
 
-		chdir(LITHIUM_APP_PATH . '/resources/tmp');
-		$request = new Request(array(
-			'env' => array('working' => '/some/other/path')
-		));
+		chdir(Libraries::get(true, 'resources') . '/tmp');
+		$request = new Request(array('env' => array('working' => '/some/other/path')));
 
 		$expected = '/some/other/path';
 		$result = $request->env('working');
@@ -134,7 +133,7 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testInput() {
-		$base = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$base = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($base), "{$base} is not writable.");
 
 		$stream = fopen($this->streams['input'], 'w+');

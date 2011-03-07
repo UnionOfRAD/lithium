@@ -11,6 +11,7 @@ namespace lithium\storage\cache\adapter;
 use SplFileInfo;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
+use lithium\core\Libraries;
 
 /**
  * A minimal file-based cache.
@@ -28,7 +29,7 @@ use RecursiveDirectoryIterator;
  * This adapter does *not* allow multi-key operations for any methods.
  *
  * The path that the cached files will be written to defaults to
- * `LITHIUM_APP_PATH/resources/tmp/cache`, but is user-configurable on cache configuration.
+ * `<app>/resources/tmp/cache`, but is user-configurable on cache configuration.
  *
  * Note that the cache expiration time is stored within the first few bytes
  * of the cached data, and is transparently added and/or removed when values
@@ -45,14 +46,14 @@ class File extends \lithium\core\Object {
 	 * @param array $config Configuration parameters for this cache adapter. These settings are
 	 *        indexed by name and queryable through `Cache::config('name')`.
 	 *        The defaults are:
-	 *        - 'path' : Path where cached entries live `LITHIUM_APP_PATH . '/resources/tmp/cache'
+	 *        - 'path' : Path where cached entries live `LITHIUM_APP_PATH . '/resources/tmp/cache'`.
 	 *        - 'expiry' : Default expiry time used if none is explicitly set when calling
 	 *          `Cache::write()`.
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'path' => LITHIUM_APP_PATH . '/resources/tmp/cache',
+			'path' => Libraries::get(true, 'resources') . '/tmp/cache',
 			'prefix' => '',
 			'expiry' => '+1 hour',
 		);
@@ -76,10 +77,8 @@ class File extends \lithium\core\Object {
 			$expiry = strtotime($expiry);
 			$data = "{:expiry:{$expiry}}\n{$params['data']}";
 			$path = "{$path}/{$params['key']}";
-
 			return file_put_contents($path, $data);
 		};
-
 	}
 
 	/**
@@ -109,9 +108,7 @@ class File extends \lithium\core\Object {
 				return false;
 			}
 			return preg_replace('/^\{\:expiry\:\d+\}\\n/', '', $data, 1);
-
 		};
-
 	}
 
 	/**
@@ -131,7 +128,6 @@ class File extends \lithium\core\Object {
 			if ($file->isFile() && $file->isReadable())  {
 				return unlink($path);
 			}
-
 			return false;
 		};
 	}
@@ -181,7 +177,6 @@ class File extends \lithium\core\Object {
 			}
 		}
 		return true;
-
 	}
 
 	/**

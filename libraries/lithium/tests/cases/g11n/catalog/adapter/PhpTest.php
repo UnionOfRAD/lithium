@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\g11n\catalog\adapter;
 
 use Exception;
+use lithium\core\Libraries;
 use lithium\g11n\catalog\adapter\Php;
 
 class PhpTest extends \lithium\test\Unit {
@@ -18,7 +19,7 @@ class PhpTest extends \lithium\test\Unit {
 	protected $_path;
 
 	public function skip() {
-		$this->_path = $path = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->_path = $path = Libraries::get(true, 'resources') . '/tmp/tests';
 		$message = "{$path} is not writable.";
 		$this->skipIf(!is_writable($path), $message);
 	}

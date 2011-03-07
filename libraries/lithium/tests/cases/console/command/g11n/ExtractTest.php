@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\console\command\g11n;
 
+use lithium\core\Libraries;
 use lithium\console\Request;
 use lithium\console\command\g11n\Extract;
 
@@ -18,7 +19,7 @@ class ExtractTest extends \lithium\test\Unit {
 	public $command;
 
 	public function skip() {
-		$this->_path = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$this->_path = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($this->_path), "{$this->_path} is not writable.");
 	}
 
@@ -38,7 +39,7 @@ class ExtractTest extends \lithium\test\Unit {
 	public function testInit() {
 		$command = new Extract();
 		$this->assertEqual(LITHIUM_APP_PATH, $command->source);
-		$this->assertEqual(LITHIUM_APP_PATH . '/resources/g11n', $command->destination);
+		$this->assertEqual(Libraries::get(true, 'resources') . '/g11n', $command->destination);
 	}
 
 	public function testFailRead() {

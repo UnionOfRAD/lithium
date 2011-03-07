@@ -900,13 +900,15 @@ class Unit extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _cleanUp($path = null) {
-		$path = $path ?: LITHIUM_APP_PATH . '/resources/tmp/tests';
-		$path = $path[0] !== '/' ? LITHIUM_APP_PATH . '/resources/tmp/' . $path : $path;
+		$path = $path ?: Libraries::get(true, 'resources') . '/tmp/tests';
+		$path = $path[0] !== '/' ? Libraries::get(true, 'resources') . '/tmp/' . $path : $path;
+
 		if (!is_dir($path)) {
 			return;
 		}
 		$dirs = new RecursiveDirectoryIterator($path);
 		$iterator = new RecursiveIteratorIterator($dirs, RecursiveIteratorIterator::CHILD_FIRST);
+
 		foreach ($iterator as $item) {
 			if ($item->getPathname() === "{$path}/empty" || $iterator->isDot()) {
 				continue;

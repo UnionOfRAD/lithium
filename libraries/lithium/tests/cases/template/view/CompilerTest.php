@@ -8,21 +8,22 @@
 
 namespace lithium\tests\cases\template\view;
 
+use lithium\core\Libraries;
 use lithium\template\view\Compiler;
 
 class CompilerTest extends \lithium\test\Unit {
 
 	protected $_path;
 
-	protected $_file = 'resources/tmp/tests/template.html.php';
+	protected $_file = 'tmp/tests/template.html.php';
 
 	public function skip() {
-		$path = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$path = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($path), "{$path} is not writable.");
 	}
 
 	public function setUp() {
-		$this->_path = str_replace('\\', '/', LITHIUM_APP_PATH);
+		$this->_path = str_replace('\\', '/', Libraries::get(true, 'resources'));
 		file_put_contents("{$this->_path}/{$this->_file}", "
 			<?php echo 'this is unescaped content'; ?" . ">
 			<?='this is escaped content'; ?" . ">
@@ -41,7 +42,7 @@ class CompilerTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
-		foreach (glob("{$this->_path}/resources/tmp/cache/templates/*.php") as $file) {
+		foreach (glob("{$this->_path}/tmp/cache/templates/*.php") as $file) {
 			unlink($file);
 		}
 		unlink("{$this->_path}/{$this->_file}");
@@ -88,7 +89,7 @@ class CompilerTest extends \lithium\test\Unit {
 	}
 
 	public function testTemplateCacheHit() {
-		$path = LITHIUM_APP_PATH . '/resources/tmp/cache/templates';
+		$path = Libraries::get(true, 'resources') . '/tmp/cache/templates';
 		$original = Compiler::template("{$this->_path}/{$this->_file}", compact('path'));
 		$cache = glob("{$path}/*");
 		clearstatcache();

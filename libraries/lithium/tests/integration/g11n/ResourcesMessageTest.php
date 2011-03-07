@@ -28,7 +28,8 @@ class ResourcesMessageTest extends \lithium\test\Unit {
 			'lithium' => array(
 				'adapter' => 'Php',
 				'path' => LITHIUM_LIBRARY_PATH . '/lithium/g11n/resources/php'
-		)));
+			)
+		));
 	}
 
 	public function tearDown() {
@@ -46,13 +47,11 @@ class ResourcesMessageTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testPlurals1() {
-		$locales = array(
-			'en'
-		);
+		$locales = array('en');
+
 		foreach ($locales as $locale) {
-			$expected = 2;
 			$result = Catalog::read('lithium', 'message.pluralForms', $locale);
-			$this->assertEqual($expected, $result, "Locale: `{$locale}`\n{:message}");
+			$this->assertEqual(2, $result, "Locale: `{$locale}`\n{:message}");
 
 			$rule = Catalog::read('lithium', 'message.pluralRule', $locale);
 

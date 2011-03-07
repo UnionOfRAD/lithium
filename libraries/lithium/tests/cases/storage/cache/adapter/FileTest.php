@@ -8,8 +8,9 @@
 
 namespace lithium\tests\cases\storage\cache\adapter;
 
-use lithium\storage\cache\adapter\File;
 use SplFileInfo;
+use lithium\core\Libraries;
+use lithium\storage\cache\adapter\File;
 
 class FileTest extends \lithium\test\Unit {
 
@@ -28,21 +29,21 @@ class FileTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function skip() {
-		$directory = new SplFileInfo(LITHIUM_APP_PATH . "/resources/tmp/cache/");
+		$directory = new SplFileInfo(Libraries::get(true, 'resources') . "/tmp/cache/");
 		$accessible = ($directory->isDir() && $directory->isReadable() && $directory->isWritable());
 		$message = 'The File cache adapter path does not have the proper permissions.';
 		$this->skipIf(!$accessible, $message);
 	}
 
 	public function setUp() {
-		$this->_hasEmpty = file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/empty");
+		$this->_hasEmpty = file_exists(Libraries::get(true, 'resources') . "/tmp/cache/empty");
 		$this->File = new File();
 	}
 
 	public function tearDown() {
 		if ($this->_hasEmpty) {
-			touch(LITHIUM_APP_PATH . "/resources/tmp/cache/empty");
-			touch(LITHIUM_APP_PATH . "/resources/tmp/cache/templates/empty");
+			touch(Libraries::get(true, 'resources') . "/tmp/cache/empty");
+			touch(Libraries::get(true, 'resources') . "/tmp/cache/templates/empty");
 		}
 		unset($this->File);
 	}
@@ -66,14 +67,14 @@ class FileTest extends \lithium\test\Unit {
 		$expected = 25;
 		$this->assertEqual($expected, $result);
 
-		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
+		$this->assertTrue(file_exists(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"));
 		$this->assertEqual(
-			file_get_contents(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"),
+			file_get_contents(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"),
 			"{:expiry:$time}\ndata"
 		);
 
-		$this->assertTrue(unlink(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
-		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
+		$this->assertTrue(unlink(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"));
+		$this->assertFalse(file_exists(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"));
 	}
 
 	public function testWriteDefaultCacheExpiry() {
@@ -90,14 +91,14 @@ class FileTest extends \lithium\test\Unit {
 		$expected = 25;
 		$this->assertEqual($expected, $result);
 
-		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
+		$this->assertTrue(file_exists(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"));
 		$this->assertEqual(
-			file_get_contents(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"),
-			"{:expiry:$time}\ndata"
+			file_get_contents(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"),
+			"{:expiry:{$time}}\ndata"
 		);
 
-		$this->assertTrue(unlink(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
-		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
+		$this->assertTrue(unlink(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"));
+		$this->assertFalse(file_exists(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"));
 	}
 
 	public function testRead() {
@@ -107,16 +108,15 @@ class FileTest extends \lithium\test\Unit {
 		$closure = $this->File->read($key);
 		$this->assertTrue(is_callable($closure));
 
-		file_put_contents(LITHIUM_APP_PATH . "/resources/tmp/cache/$key", "{:expiry:$time}\ndata");
-		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
+		$path = Libraries::get(true, 'resources') . "/tmp/cache/{$key}";
+		file_put_contents($path, "{:expiry:$time}\ndata");
+		$this->assertTrue(file_exists($path));
 
 		$params = compact('key');
 		$result = $closure($this->File, $params, null);
-		$expected = 'data';
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('data', $result);
 
-		$this->assertTrue(unlink(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
-		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
+		unlink($path);
 
 		$key = 'non_existent';
 		$params = compact('key');
@@ -133,47 +133,47 @@ class FileTest extends \lithium\test\Unit {
 
 		$closure = $this->File->read($key);
 		$this->assertTrue(is_callable($closure));
+		$path = Libraries::get(true, 'resources') . "/tmp/cache/{$key}";
 
-		file_put_contents(LITHIUM_APP_PATH . "/resources/tmp/cache/$key", "{:expiry:$time}\ndata");
-		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
+		file_put_contents($path, "{:expiry:$time}\ndata");
+		$this->assertTrue(file_exists($path));
 
 		sleep(2);
 		$params = compact('key');
-		$result = $closure($this->File, $params, null);
-		$this->assertFalse($result);
+		$this->assertFalse($closure($this->File, $params, null));
 
 	}
 
 	public function testDelete() {
 		$key = 'key_to_delete';
 		$time = time() + 1;
+		$path = Libraries::get(true, 'resources') . "/tmp/cache/{$key}";
 
-		file_put_contents(LITHIUM_APP_PATH . "/resources/tmp/cache/$key", "{:expiry:$time}\ndata");
-		$this->assertTrue(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
+		file_put_contents($path, "{:expiry:$time}\ndata");
+		$this->assertTrue(file_exists($path));
 
 		$closure = $this->File->delete($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->File, $params, null);
-		$this->assertTrue($result);
+		$this->assertTrue($closure($this->File, $params, null));
 
 		$key = 'non_existent';
 		$params = compact('key');
-		$result = $closure($this->File, $params, null);
-		$this->assertFalse($result);
+		$this->assertFalse($closure($this->File, $params, null));
 	}
 
 	public function testClear() {
 		$key = 'key_to_clear';
 		$time = time() + 1;
-		file_put_contents(LITHIUM_APP_PATH . "/resources/tmp/cache/$key", "{:expiry:$time}\ndata");
+		$path = Libraries::get(true, 'resources') . "/tmp/cache/{$key}";
+		file_put_contents($path, "{:expiry:$time}\ndata");
 
 		$result = $this->File->clear();
 		$this->assertTrue($result);
-		$this->assertFalse(file_exists(LITHIUM_APP_PATH . "/resources/tmp/cache/$key"));
+		$this->assertFalse(file_exists($path));
 
-		$result = touch(LITHIUM_APP_PATH . "/resources/tmp/cache/empty");
+		$result = touch(Libraries::get(true, 'resources') . "/tmp/cache/empty");
 		$this->assertTrue($result);
 	}
 
@@ -188,8 +188,6 @@ class FileTest extends \lithium\test\Unit {
 		$result = $this->File->decrement($key);
 		$this->assertEqual(false, $result);
 	}
-
-
 }
 
 ?>
