@@ -183,7 +183,9 @@ class Controller extends \lithium\core\Object {
 					$self->render(array('text' => $result));
 					return $self->response;
 				}
-				$self->set($result);
+				if (is_array($result)) {
+					$self->set($result);
+				}
 			}
 
 			if (!$render['hasRendered'] && $render['auto']) {
