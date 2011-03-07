@@ -231,22 +231,23 @@ class Libraries {
 	 * that contains the `lithium` directory), however, you can change this on a case-by-case basis
 	 * using the `'path'` key to specify an absolute path to the library's directory.
 	 *
-	 * @param string $name Library name, i.e. `'app'`, `'lithium'`, `'pear'` or `'solar'`.
+	 * @param string $name Library name, i.e. `'app'`, `'lithium'`, `'pear'` or `'aura'`.
 	 * @param array $config Specifies where the library is in the filesystem, and how classes
 	 *        should be loaded from it.  Allowed keys are:
-	 *        - `'bootstrap'`: A file path (relative to `'path'`) to a bootstrap script that should
-	 *          be run when the library is added.
-	 *        - `'defer'`: If true, indicates that, when locating classes, this library should
-	 *          defer to other libraries in order of preference.
-	 *        - `'includePath'`: If `true`, appends the absolutely-resolved value of `'path'` to
-	 *          the PHP include path.
+	 *        - `'bootstrap'` _mixed_: A file path (relative to `'path'`) to a bootstrap script that
+	 *          should be run when the library is added, or `true` to use the default bootstrap
+	 *          path, i.e. `config/bootstrap.php`.
+	 *        - `'defer'` _boolean_: If `true`, indicates that, when locating classes, this library
+	 *          should defer to other libraries in order of preference.
+	 *        - `'includePath'` _mixed_: If `true`, appends the absolutely-resolved value of
+	 *          `'path'` to the PHP include path. If a string, the value is appended to PHP's.
 	 *        - `'loader'`: An auto-loader method associated with the library, if any.
 	 *        - `'path'`: The directory containing the library.
-	 *        - `'prefix'`: The class prefix this library uses, i.e. `'lithium\'`, `'Zend_'` or
-	 *          `'Solar_'`.
-	 *        - `'suffix'`: Gets appended to the end of the file name. For example, most libraries
-	 *          end classes in `'.php'`, but some use `'.class.php'`, or `'.inc.php'`.
-	 *        - `'transform'`: Defines a custom way to transform a class name into its
+	 *        - `'prefix'` _string_: The class prefix this library uses, i.e. `'lithium\'`,
+	 *          `'Zend_'` or `'Solar_'`. If the library has no global prefix, set to `false`.
+	 *        - `'suffix'` _string_: Gets appended to the end of the file name. For example, most
+	 *          libraries end classes in `'.php'`, but some use `'.class.php'`, or `'.inc.php'`.
+	 *        - `'transform'` _closure_: Defines a custom way to transform a class name into its
 	 *          corresponding file path.  Accepts either an array of two strings which are
 	 *          interpreted as the pattern and replacement for a regex, or an anonymous function,
 	 *          which receives the class name and library configuration arrays as parameters, and
