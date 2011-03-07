@@ -112,7 +112,9 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testSchema() {
-		$expected = array($this->_model => array(
+		$model = $this->_model;
+		$modelName = $model::meta('name');
+		$expected = array($modelName => array(
 			'id', 'author_id', 'title', 'created'
 		));
 		$result = $this->db->schema(new Query(array('model' => $this->_model)));
@@ -124,10 +126,11 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$query = new Query(array(
 			'model' => $this->_model,
-			'fields' => array('MockDatabaseComment')
+			'fields' => array('MockDatabaseComment'),
+			'with' => array('MockDatabaseComment')
 		));
 		$expected = array(
-			'lithium\tests\mocks\data\model\MockDatabaseComment' => array(
+			'MockDatabaseComment' => array(
 				'id', 'post_id', 'author_id', 'body', 'created'
 			)
 		);

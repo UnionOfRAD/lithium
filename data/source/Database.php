@@ -427,6 +427,7 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function schema($query, $resource = null, $context = null) {
 		$model = is_scalar($resource) ? $resource : $query->model();
+		$modelName = (method_exists($context, 'alias') ? $context->alias() : $query->alias());
 		$fields = $query->fields();
 		$result = array();
 
@@ -435,38 +436,55 @@ abstract class Database extends \lithium\data\Source {
 		}
 
 		if (!$fields) {
-			return array($model => array_keys($model::schema()));
+			return array($modelName => array_keys($model::schema()));
 		}
+
 		$namespace = preg_replace('/\w+$/', '', $model);
-		$relations = $model ? $model::relations() : array();
+		$relations = array_keys((array) $query->relationships());
+		$joins = (array) $query->joins();
 		$schema = $model::schema();
-		$modelName = (method_exists($context, 'alias') ? $context->alias() : $model::meta('name'));
+		$forJoin = ($modelName != $query->alias());
 
 		foreach ($fields as $scope => $field) {
 			switch (true) {
-				case (is_numeric($scope) && preg_match('/^('.$modelName.'\.)*?\*/', $field)):
-					$result[$model] = array_keys($model::schema());
+				case (is_numeric($scope) && ($field == '*' || $field == $modelName)):
+					$result[$modelName] = array_keys($model::schema());
 				break;
 				case (is_numeric($scope) && isset($schema[$field])):
-					$result[$model][] = $field;
+					$result[$modelName][] = $field;
 				break;
 				case is_numeric($scope) && preg_match('/^' . $modelName . '\./', $field):
 					list($modelName, $field) = explode('.', $field);
-					$result[$model][] = $field;
+					$result[$modelName][] = $field;
 					break;
-				case (is_numeric($scope) && isset($relations[$field])):
-					$scope = $field;
-				case (in_array($scope, $relations, true) && $field == '*'):
-					$scope = $namespace . $scope;
-					$result[$scope] = array_keys($scope::schema());
-				break;
-				case (in_array($scope, $relations)):
-					$result[$scope] = $fields;
-				break;
 				case is_array($field) && $scope == $modelName:
-					$result[$model] = $field;
+					$result[$modelName] = $field;
+				break;
+				case $forJoin;
+					continue;
+				case in_array($scope, $relations) && is_array($field):
+					$join = isset($joins[$scope]) ? $joins[$scope] : null;
+					if($join) {
+						$result[$scope] = reset($this->schema($query, $join->model(), $join));
+					} else {
+						$result[$scope] = $field;
+					}
+				break;
+				case is_numeric($scope) && in_array($field, $relations):
+					$join = isset($joins[$field]) ? $joins[$field] : null;
+					if(!$join) {
+						continue;
+					}
+					$scope = $join->model();
+					$result[$field] = array_keys($scope::schema());
 				break;
 			}
+		}
+		if(!$forJoin) {
+			$sortOrder = array_flip(array($modelName) + $relations);
+			uksort($result, function($a, $b) use($sortOrder) {
+				return $sortOrder[$a] - $sortOrder[$b];
+			});
 		}
 		return $result;
 	}
@@ -573,17 +591,39 @@ abstract class Database extends \lithium\data\Source {
 		$type = $context->type();
 		$model = $context->model();
 		$schema = $model ? (array) $model::schema() : array();
+		$modelNames = (array) $context->name() + array_keys((array) $context->relationships());
 
 		if(is_array($fields)) {
 			$toMerge = array();
 			$keys = array_keys($fields);
-			$fields = array_filter($fields, function($item) use (&$toMerge, &$keys) {
+			$fields = array_filter($fields, function($item) use (&$toMerge, &$keys, $modelNames) {
 				$name = current($keys);
 				next($keys);
+				switch(true) {
+					case is_array($item):
+						foreach($item as $field) {
+							$toMerge[$name][] = $name . '.' . $field;
+						}
+						return false;
+					case in_array($item, $modelNames):
+						$toMerge[$item][] = $item . '.*';
+						return false;
+				}
+				return true;
+			});
+			$fields = array_merge($fields, $toMerge);
+
+			if(count($modelNames) > 1) {
+				$sortOrder = array_flip($modelNames);
+				uksort($fields, function($a, $b) use($sortOrder) {
+					return $sortOrder[$a] - $sortOrder[$b];
+				});
+			}
+
+			$toMerge = array();
+			$fields = array_filter($fields, function($item) use(&$toMerge) {
 				if(is_array($item)) {
-					foreach($item as $field) {
-						$toMerge[] = $name . '.' . $field;
-					}
+					$toMerge = array_merge($toMerge,$item);
 					return false;
 				}
 				return true;

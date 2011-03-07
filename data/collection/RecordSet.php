@@ -361,19 +361,17 @@ class RecordSet extends \lithium\data\Collection {
 		if (!($model = $this->_model)) {
 			return array();
 		}
-		if (!is_object($this->_query) || !$joins = $this->_query->join()) {
+		if (!is_object($this->_query) || !$this->_query->join()) {
 			$map = $model::connection()->schema($this->_query, $this->_result, $this);
 			return array_values($map);
 		}
 
 		$model = $this->_model;
-		$map = array_values($model::connection()->schema($this->_query, $this->_result, $this));
+		$map = $model::connection()->schema($this->_query, $this->_result, $this);
+		$map = array($map[$this->_query->alias()]) + $map;
+		unset($map[$this->_query->alias()]);
 
-		foreach ($joins as $name => $join) {
-			$part = $model::connection()->schema($this->_query, $join->model(), $join);
-			$map[$name] = reset($part);
-		}
-		return array_filter($map);
+		return $map;
 	}
 }
 
