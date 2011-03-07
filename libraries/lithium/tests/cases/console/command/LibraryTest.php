@@ -154,22 +154,21 @@ class LibraryTest extends \lithium\test\Unit {
 		);
 
 		chdir('new');
-		$app = new Library(array(
-			'request' => new Request(), 'classes' => $this->classes
-		));
+		$app = new Library(array('request' => new Request(), 'classes' => $this->classes));
 		$app->library = 'does_not_exist';
 
 		$expected = true;
 		$result = $app->archive();
 		$this->assertEqual($expected, $result);
 
-		$expected = "new.phar.gz created in {$this->_testPath} from ";
-		$expected .= "{$this->_testPath}/new\n";
+		$path = realpath($this->_testPath);
+		$expected = "new.phar.gz created in {$path} from {$path}/new\n";
 		$result = $app->response->output;
 		$this->assertEqual($expected, $result);
 
 		Phar::unlinkArchive($this->_testPath . '/new.phar');
 		Phar::unlinkArchive($this->_testPath . '/new.phar.gz');
+
 		$this->_cleanUp('tests/new');
 		rmdir($this->_testPath . '/new');
 	}
@@ -177,20 +176,17 @@ class LibraryTest extends \lithium\test\Unit {
 	public function testExtractWhenLibraryDoesNotExist() {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		chdir($this->_testPath);
-		$app = new Library(array(
-			'request' => new Request(), 'classes' => $this->classes
-		));
+		$app = new Library(array('request' => new Request(), 'classes' => $this->classes));
 		$app->library = 'does_not_exist';
 
 		$expected = true;
 		$result = $app->extract();
 		$this->assertEqual($expected, $result);
-
 		$this->assertTrue(file_exists($this->_testPath . '/new'));
 
-		$expected = "new created in {$this->_testPath} from ";
-		$expected .= realpath(LITHIUM_LIBRARY_PATH)
-			. "/lithium/console/command/create/template/app.phar.gz\n";
+		$path = realpath($this->_testPath);
+		$tplPath = realpath(LITHIUM_LIBRARY_PATH) . '/lithium/console/command/create/template';
+		$expected = "new created in {$path} from {$tplPath}/app.phar.gz\n";
 		$result = $app->response->output;
 		$this->assertEqual($expected, $result);
 

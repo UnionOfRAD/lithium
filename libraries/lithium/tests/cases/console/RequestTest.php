@@ -59,7 +59,7 @@ class RequestTest extends \lithium\test\Unit {
 		chdir(Libraries::get(true, 'resources') . '/tmp/tests');
 		$request = new Request();
 
-		$expected = Libraries::get(true, 'resources') . '/tmp/tests';
+		$expected = realpath(Libraries::get(true, 'resources') . '/tmp/tests');
 		$result = $request->env('working');
 		$this->assertEqual($expected, $result);
 	}
@@ -78,18 +78,14 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testConstructWithConfigArgv() {
-		$request = new Request(array(
-			'args' => array('/path/to/lithium.php', 'wrong')
-		));
+		$request = new Request(array('args' => array('/path/to/lithium.php', 'wrong')));
 
 		$expected = array('/path/to/lithium.php', 'wrong');
 		$result = $request->argv;
 		$this->assertEqual($expected, $result);
 
 		$_SERVER['argv'] = array('/path/to/lithium.php');
-		$request = new Request(array(
-			'args' => array('one', 'two')
-		));
+		$request = new Request(array('args' => array('one', 'two')));
 
 		$expected = '/path/to/lithium.php';
 		$result = $request->env('script');
@@ -137,33 +133,22 @@ class RequestTest extends \lithium\test\Unit {
 		$this->skipIf(!is_writable($base), "{$base} is not writable.");
 
 		$stream = fopen($this->streams['input'], 'w+');
-		$request = new Request(array(
-			'input' => $stream
-		));
+		$request = new Request(array('input' => $stream));
 		$this->assertTrue(is_resource($request->input));
 		$this->assertEqual($stream, $request->input);
 
-
-		$expected = 2;
-		$result = fwrite($request->input, 'ok');
-		$this->assertEqual($expected, $result);
+		$this->assertEqual(2, fwrite($request->input, 'ok'));
 		rewind($request->input);
 
-		$expected = 'ok';
-		$result = $request->input();
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('ok', $request->input());
 	}
 
 	public function testArgs() {
 		$request = new Request();
 		$request->params = array(
-			'command' => 'one', 'action' => 'two',
-			'args' => array('three', 'four', 'five')
+			'command' => 'one', 'action' => 'two', 'args' => array('three', 'four', 'five')
 		);
-
-		$expected = 'five';
-		$result = $request->args(2);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('five', $request->args(2));
 	}
 
 	public function testShiftDefaultOne() {
@@ -175,8 +160,7 @@ class RequestTest extends \lithium\test\Unit {
 		$request->shift();
 
 		$expected = array('command' => 'two', 'action' => 'three', 'args' => array('four', 'five'));
-		$result = $request->params;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $request->params);
 	}
 
 	public function testShiftTwo() {

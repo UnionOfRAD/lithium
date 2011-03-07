@@ -15,15 +15,21 @@ class CompilerTest extends \lithium\test\Unit {
 
 	protected $_path;
 
-	protected $_file = 'tmp/tests/template.html.php';
+	protected $_file = 'template.html.php';
 
 	public function skip() {
-		$path = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_writable($path), "{$path} is not writable.");
+		$path = realpath(Libraries::get(true, 'resources') . '/tmp/tests');
+		$this->skipIf(!is_writable($path), "Path `{$path}` is not writable.");
+
+		$path = realpath(Libraries::get(true, 'resources') . '/tmp/cache/templates');
+		$this->skipIf(!is_writable($path), "Path `{$path}` is not writable.");
 	}
 
 	public function setUp() {
-		$this->_path = str_replace('\\', '/', Libraries::get(true, 'resources'));
+		$this->_path = realpath(
+			str_replace('\\', '/', Libraries::get(true, 'resources')) . '/tmp/tests'
+		);
+
 		file_put_contents("{$this->_path}/{$this->_file}", "
 			<?php echo 'this is unescaped content'; ?" . ">
 			<?='this is escaped content'; ?" . ">
@@ -42,7 +48,9 @@ class CompilerTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
-		foreach (glob("{$this->_path}/tmp/cache/templates/*.php") as $file) {
+		$path = realpath(Libraries::get(true, 'resources') . '/tmp/cache/templates');
+
+		foreach (glob("{$path}/*.php") as $file) {
 			unlink($file);
 		}
 		unlink("{$this->_path}/{$this->_file}");
@@ -50,7 +58,6 @@ class CompilerTest extends \lithium\test\Unit {
 
 	public function testTemplateContentRewriting() {
 		$template = Compiler::template("{$this->_path}/{$this->_file}");
-
 		$this->assertTrue(file_exists($template));
 
 		$expected = array(
