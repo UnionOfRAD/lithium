@@ -170,10 +170,9 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	protected $_relationTypes = array(
 		'belongsTo' => array('class', 'key', 'conditions', 'fields'),
-		'hasOne'    => array('class', 'key', 'conditions', 'fields', 'dependent'),
+		'hasOne'    => array('class', 'key', 'conditions', 'fields'),
 		'hasMany'   => array(
-			'class', 'key', 'conditions', 'fields', 'order', 'limit',
-			'dependent', 'exclusive', 'finder', 'counter'
+			'class', 'key', 'conditions', 'fields', 'order', 'limit'
 		)
 	);
 
