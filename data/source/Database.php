@@ -429,19 +429,27 @@ abstract class Database extends \lithium\data\Source {
 		$model = is_scalar($resource) ? $resource : $query->model();
 		$modelName = (method_exists($context, 'alias') ? $context->alias() : $query->alias());
 		$fields = $query->fields();
+		$joins = (array) $query->joins();
 		$result = array();
 
 		if (!$model && is_array($fields)) {
 			return array($fields);
 		}
 
-		if (!$fields) {
+		if (!$fields && !$joins) {
 			return array($modelName => array_keys($model::schema()));
 		}
 
-		$namespace = preg_replace('/\w+$/', '', $model);
+		if(!$fields && $joins) {
+			$return = array($modelName => array_keys($model::schema()));
+			foreach($joins as $join) {
+				$model = $join->model();
+				$return[$join->alias()] = array_keys($model::schema());
+			}
+			return $return;
+		}
+
 		$relations = array_keys((array) $query->relationships());
-		$joins = (array) $query->joins();
 		$schema = $model::schema();
 		$forJoin = ($modelName != $query->alias());
 
@@ -460,7 +468,7 @@ abstract class Database extends \lithium\data\Source {
 				case is_array($field) && $scope == $modelName:
 					$result[$modelName] = $field;
 				break;
-				case $forJoin;
+				case $forJoin || !$joins;
 					continue;
 				case in_array($scope, $relations) && is_array($field):
 					$join = isset($joins[$scope]) ? $joins[$scope] : null;
