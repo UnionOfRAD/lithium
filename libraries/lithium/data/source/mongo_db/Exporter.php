@@ -47,11 +47,13 @@ class Exporter extends \lithium\core\StaticObject {
 			$field = (isset($schema[$path]) ? $schema[$path] : array());
 			$field += array('type' => null, 'array' => null);
 			$type = isset($typeMap[$field['type']]) ? $typeMap[$field['type']] : $field['type'];
+
 			$isObject = ($type == 'object');
 			$isArray = (is_array($value) && $field['array'] !== false && !$isObject);
+			$isArray = $field['array'] || $isArray;
 
 			if (isset($options['handlers'][$type]) && $handler = $options['handlers'][$type]) {
-				$value = $isArray ? array_map($handler, $value) : $handler($value);
+				$value = $isArray ? array_map($handler, (array) $value) : $handler($value);
 			}
 			if (!$options['arrays']) {
 				$data[$key] = $value;
@@ -63,8 +65,10 @@ class Exporter extends \lithium\core\StaticObject {
 				$data[$key] = $value;
 				continue;
 			}
+
 			if ($field['array']) {
 				$opts = array('class' => 'array') + $options;
+				$value = ($value === null) ? array() : $value;
 				$value = is_array($value) ? $value : array($value);
 			} elseif (is_array($value)) {
 				$arrayType = !$isObject && (array_keys($value) === range(0, count($value) - 1));

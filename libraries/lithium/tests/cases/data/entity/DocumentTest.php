@@ -646,6 +646,15 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual('value', $doc->really->nested->key);
 		$this->assertEqual(array('simple', 'nested', 'really'), array_keys($doc->data()));
 	}
+
+	public function testIdGetDoesNotSet() {
+		$document = MockDocumentPost::create();
+		$message = 'The `_id` key should not be set.';
+		$this->assertFalse(array_key_exists('_id', $document->data()), $message);
+
+		$document->_id == "";
+		$this->assertFalse(array_key_exists('_id', $document->data()), $message);
+	}
 }
 
 ?>
