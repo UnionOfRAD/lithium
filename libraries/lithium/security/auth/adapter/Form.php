@@ -19,17 +19,17 @@ use lithium\core\Libraries;
  * apply any filters as appropriate (see the `'filters'` configuration setting below), and
  * query a model class using using the filtered data.
  *
- * By default, the adapter uses a model called `User`, and lookup fields called `'username'` and
+ * By default, the adapter uses a model called `Users`, and lookup fields called `'username'` and
  * `'password'`. These can be customized by setting the `'model'` and `'fields'` configuration keys,
- * respectively. The `'model'` key accepts either a model name (i.e. `Customer`), or a
- * fully-namespaced path to a model class (i.e. `\app\models\Customer`). The `'fields'` setting
+ * respectively. The `'model'` key accepts either a model name (i.e. `Customers`), or a
+ * fully-namespaced path to a model class (i.e. `app\models\Customers`). The `'fields'` setting
  * accepts an array of field names to use when looking up a user. An example configuration,
  * including a custom model class and lookup fields might look like the following:
  * {{{
  * 	Auth::config(array(
  * 		'customer' => array(
  * 			'adapter' => 'Form',
- * 			'model' => 'Customer',
+ * 			'model' => 'Customers',
  * 			'fields' => array('email', 'password')
  * 		)
  * 	));
@@ -44,7 +44,7 @@ use lithium\core\Libraries;
  * 	Auth::config(array(
  * 		'customer' => array(
  * 			'adapter' => 'Form',
- * 			'model' => 'Customer',
+ * 			'model' => 'Customers',
  * 			'fields' => array('username' => 'login.username', 'password' => 'login.password'),
  * 			'scope' => array('active' => true)
  * 		)
@@ -76,7 +76,7 @@ class Form extends \lithium\core\Object {
 
 	/**
 	 * The name of the model class to query against. This can either be a model name (i.e.
-	 * `'User'`), or a fully-namespaced class reference (i.e. `'app\models\User'`). When
+	 * `'Users'`), or a fully-namespaced class reference (i.e. `'app\models\Users'`). When
 	 * authenticating users, the magic `first()` method is invoked against the model to return the
 	 * first record found when combining the conditions in the `$_scope` property with the
 	 * authentication data yielded from the `Request` object in `Form::check()`. (Note that the
@@ -141,7 +141,7 @@ class Form extends \lithium\core\Object {
 	 * which model method to call, and this method will receive the authentication query. In return,
 	 * the `Form` adapter expects a `Record` object which implements the `data()` method. See the
 	 * constructor for more information on setting this property. Defaults to `'first'`, which
-	 * calls, for example, `User::first()`.
+	 * calls, for example, `Users::first()`.
 	 *
 	 * @see lithium\security\auth\adapter\Form::__construct()
 	 * @see lithium\data\entity\Record::data()
@@ -176,7 +176,7 @@ class Form extends \lithium\core\Object {
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'model' => 'User', 'query' => 'first', 'filters' => array(), 'fields' => array(
+			'model' => 'Users', 'query' => 'first', 'filters' => array(), 'fields' => array(
 				'username', 'password'
 			)
 		);
