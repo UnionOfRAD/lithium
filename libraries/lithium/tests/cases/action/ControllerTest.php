@@ -41,10 +41,8 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = $postsController->__invoke(null, array('action' => 'index', 'args' => array()));
 
 		$this->assertTrue(is_a($result, 'lithium\action\Response'));
-		$this->assertEqual($result->body(), 'List of posts');
-
-		$headers = array('Content-type' => 'text/plain');
-		$this->assertEqual($result->headers, $headers);
+		$this->assertEqual('List of posts', $result->body());
+		$this->assertEqual(array('Content-type' => 'text/plain; charset=UTF-8'), $result->headers);
 
 		$result2 = $postsController(null, array('action' => 'index', 'args' => array()));
 		$this->assertEqual($result2, $result);
@@ -56,7 +54,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertTrue(is_a($result, 'lithium\action\Response'));
 		$this->assertEqual($result->body, '');
 
-		$headers = array('Content-type' => 'text/html');
+		$headers = array('Content-type' => 'text/html; charset=UTF-8');
 		$this->assertEqual($result->headers, $headers);
 
 		$result = $postsController->access('_render');
@@ -68,7 +66,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertTrue(is_a($result, 'lithium\action\Response'));
 		$this->assertEqual($result->body, "Array\n(\n    [0] => This is a post\n)\n");
 
-		$headers = array('status' => 200, 'Content-type' => 'text/plain');
+		$headers = array('status' => 200, 'Content-type' => 'text/plain; charset=UTF-8');
 		$this->assertEqual($result->headers(), $headers);
 
 		$result = $postsController->access('_render');
@@ -213,13 +211,11 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = $postsController->access('_render');
 		$this->assertEqual($expected, $result);
 
-		$expected = 'application/json';
 		$result = $postsController->response->headers('Content-type');
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('application/json; charset=UTF-8', $result);
 
-		$expected = array('data' => 'test');
 		$result = json_decode($postsController->response->body(), true);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual(array('data' => 'test'), $result);
 	}
 
 	public function testResponseTypeBasedOnRequestParamsType() {
@@ -243,9 +239,8 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = $postsController->access('_render');
 		$this->assertEqual($expected, $result);
 
-		$expected = 'application/json';
 		$result = $postsController->response->headers('Content-type');
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('application/json; charset=UTF-8', $result);
 
 		$expected = array('data' => 'test');
 		$result = json_decode($postsController->response->body(), true);
@@ -288,13 +283,11 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = $postsController->access('_render');
 		$this->assertEqual($expected, $result);
 
-		$expected = 'application/json';
 		$result = $postsController->response->headers('Content-type');
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('application/json; charset=UTF-8', $result);
 
-		$expected = array('data' => 'test');
 		$result = json_decode($postsController->response->body(), true);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual(array('data' => 'test'), $result);
 	}
 
 	/**

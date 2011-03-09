@@ -238,13 +238,11 @@ class MediaTest extends \lithium\test\Unit {
 		$data = array('something');
 		Media::render($response, $data);
 
-		$expected = array('Content-type: application/json');
 		$result = $response->headers();
-		$this->assertEqual($expected, $result);
+		$this->assertEqual(array('Content-type: application/json; charset=UTF-8'), $result);
 
-		$expected = json_encode($data);
 		$result = $response->body();
-		$this->assertEqual($expected, $result);
+		$this->assertEqual(json_encode($data), $result);
 	}
 
 	/**
@@ -290,8 +288,7 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual(array($expected), $result);
 
 		$result = $response->headers['Content-type'];
-		$expected = 'application/csv';
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('application/csv; charset=UTF-8', $result);
 	}
 
 	/**
@@ -304,9 +301,8 @@ class MediaTest extends \lithium\test\Unit {
 		$response->type('text');
 		Media::render($response, "Hello, world!");
 
-		$expected = array("Hello, world!");
 		$result = $response->body;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual(array("Hello, world!"), $result);
 	}
 
 	/**
