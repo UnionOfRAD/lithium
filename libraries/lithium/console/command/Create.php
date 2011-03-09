@@ -18,7 +18,7 @@ use lithium\core\ClassNotFoundException;
  * by generating the minimum code necessary to test and run your application.
  *
  * `li3 create --template=controller Posts`
- * `li3 create --template=model Post`
+ * `li3 create --template=model Posts`
  *
  */
 class Create extends \lithium\console\Command {
@@ -142,9 +142,9 @@ class Create extends \lithium\console\Command {
 	 */
 	protected function _default($name) {
 		$commands = array(
-			array('model', Inflector::classify($name)),
+			array('model', Inflector::pluralize($name)),
 			array('controller', Inflector::pluralize($name)),
-			array('test', 'model', Inflector::classify($name)),
+			array('test', 'model', Inflector::pluralize($name)),
 			array('test', 'controller', Inflector::pluralize($name))
 		);
 		foreach ($commands as $args) {

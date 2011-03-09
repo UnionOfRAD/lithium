@@ -16,8 +16,8 @@ use lithium\core\ClassNotFoundException;
 /**
  * Generate a Test class in the `--library` namespace
  *
- * `li3 create test model Post`
- * `li3 create --library=li3_plugin test model Post`
+ * `li3 create test model Posts`
+ * `li3 create --library=li3_plugin test model Posts`
  *
  */
 class Test extends \lithium\console\command\Create {

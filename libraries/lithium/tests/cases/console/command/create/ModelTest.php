@@ -44,13 +44,13 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testClass() {
 		$this->request->params = array(
-			'command' => 'model', 'action' => 'Post'
+			'command' => 'model', 'action' => 'Posts'
 		);
 		$model = new Model(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
 
-		$expected = 'Post';
+		$expected = 'Posts';
 		$result = $model->invokeMethod('_class', array($this->request));
 		$this->assertEqual($expected, $result);
 	}

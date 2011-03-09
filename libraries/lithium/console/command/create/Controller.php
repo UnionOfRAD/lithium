@@ -67,7 +67,7 @@ class Controller extends \lithium\console\command\Create {
      * @return string
      */
 	protected function _model($request) {
-		return Inflector::classify($request->action);
+		return Inflector::pluralize($request->action);
 	}
 
     /**

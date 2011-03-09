@@ -13,8 +13,8 @@ use lithium\util\Inflector;
 /**
  * Generate a Mock that extends the name of the given class in the `--library` namespace.
  *
- * `li3 create mock model Post`
- * `li3 create --library=li3_plugin mock model Post`
+ * `li3 create mock model Posts`
+ * `li3 create --library=li3_plugin mock model Posts`
  *
  */
 class Mock extends \lithium\console\command\Create {
@@ -39,7 +39,7 @@ class Mock extends \lithium\console\command\Create {
      */
 	protected function _parent($request) {
 		$namespace = parent::_namespace($request);
-		$class = $request->action;
+		$class = Inflector::pluralize($request->action);
 		return "\\{$namespace}\\{$class}";
 	}
 
@@ -57,7 +57,7 @@ class Mock extends \lithium\console\command\Create {
 			$request->params['action'] = $name;
 			$name = $command->invokeMethod('_class', array($request));
 		}
-		return  Inflector::classify("Mock{$name}");
+		return  Inflector::pluralize("Mock{$name}");
 	}
 
     /**

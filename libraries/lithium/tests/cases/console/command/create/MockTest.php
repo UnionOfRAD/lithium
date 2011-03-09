@@ -46,14 +46,14 @@ class MockTest extends \lithium\test\Unit {
 	public function testMockModel() {
 		$this->request->params += array(
 			'command' => 'create', 'action' => 'mock',
-			'args' => array('model', 'Post')
+			'args' => array('model', 'Posts')
 		);
 		$mock = new Mock(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
 		$mock->path = $this->_testPath;
 		$mock->run('mock');
-		$expected = "MockPost created in create_test\\tests\\mocks\\models.\n";
+		$expected = "MockPosts created in create_test\\tests\\mocks\\models.\n";
 		$result = $mock->response->output;
 		$this->assertEqual($expected, $result);
 
@@ -62,7 +62,7 @@ class MockTest extends \lithium\test\Unit {
 
 namespace create_test\tests\mocks\models;
 
-class MockPost extends \create_test\models\Post {
+class MockPosts extends \create_test\models\Posts {
 
 
 }
@@ -71,7 +71,7 @@ class MockPost extends \create_test\models\Post {
 test;
 		$replace = array("<?php", "?>");
 		$result = str_replace($replace, '',
-			file_get_contents($this->_testPath . '/create_test/tests/mocks/models/MockPost.php')
+			file_get_contents($this->_testPath . '/create_test/tests/mocks/models/MockPosts.php')
 		);
 		$this->assertEqual($expected, $result);
 	}

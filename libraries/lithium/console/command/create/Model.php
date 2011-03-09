@@ -13,8 +13,8 @@ use lithium\util\Inflector;
 /**
  * Generate a Model class in the `--library` namespace
  *
- * `li3 create mdoel Post`
- * `li3 create --library=li3_plugin model Post`
+ * `li3 create model Posts`
+ * `li3 create --library=li3_plugin model Posts`
  *
  */
 class Model extends \lithium\console\command\Create {
@@ -26,7 +26,7 @@ class Model extends \lithium\console\command\Create {
      * @return string
      */
 	protected function _class($request) {
-		return Inflector::classify($request->action);
+		return Inflector::pluralize($request->action);
 	}
 }
 
