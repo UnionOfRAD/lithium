@@ -168,6 +168,10 @@ class CouchDbTest extends \lithium\test\Unit {
 		$expected = '';
 		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
+
+		$this->query->conditions(array('id' => 12345, 'path' => '/lithium-test/12345'));
+		$result = $couchdb->read($this->query);
+		$this->assertTrue($result);
 	}
 
 	public function testReadWithViewConditions() {
@@ -332,6 +336,15 @@ class CouchDbTest extends \lithium\test\Unit {
 		$expected = 'rev=1-1';
 		$result = $couchdb->last->request->params;
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testEnabled() {
+		$this->assertEqual(CouchDb::enabled(), true);
+
+		$this->assertEqual(CouchDb::enabled('arrays'), true);
+		$this->assertEqual(CouchDb::enabled('transactions'), false);
+		$this->assertEqual(CouchDb::enabled('booleans'), true);
+		$this->assertEqual(CouchDb::enabled('relationships'), false);
 	}
 }
 
