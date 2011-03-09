@@ -489,7 +489,7 @@ abstract class Database extends \lithium\data\Source {
 			}
 		}
 		if(!$forJoin) {
-			$sortOrder = array_flip(array($modelName) + $relations);
+			$sortOrder = array_flip(array_merge((array)$modelName,$relations));
 			uksort($result, function($a, $b) use($sortOrder) {
 				return $sortOrder[$a] - $sortOrder[$b];
 			});
