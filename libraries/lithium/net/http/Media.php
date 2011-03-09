@@ -578,28 +578,37 @@ class Media extends \lithium\core\StaticObject {
 	 *        arrays or objects.
 	 * @param object $response A reference to the `Response` object for this dispatch cycle.
 	 * @param array $options Handler-specific options.
-	 * @return mixed
+	 * @return mixed Returns the result of `$data`, encoded with the encoding configuration
+	 *               specified by `$type`, the result of which is usually a string.
+	 * @filter
 	 */
 	public static function encode($type, $data, &$response = null) {
-		$handler = is_array($type) ? $type : static::_handlers($type);
+		$params = array('response' => &$response) + compact('type', 'data');
 
-		if (!$handler || !isset($handler['encode'])) {
-			return null;
-		}
+		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+			$type = $params['type'];
+			$data = $params['data'];
+			$response =& $params['response'];
+			$handler = is_array($type) ? $type : $self::invokeMethod('_handlers', array($type));
 
-		$cast = function($data) {
-			if (is_object($data)) {
-				return method_exists($data, 'to') ? $data->to('array') : get_object_vars($data);
+			if (!$handler || !isset($handler['encode'])) {
+				return null;
 			}
-			return $data;
-		};
 
-		if (!isset($handler['cast']) || $handler['cast']) {
-			$data = is_object($data) ? $cast($data) : $data;
-			$data = is_array($data) ? array_map($cast, $data) : $data;
-		}
-		$method = $handler['encode'];
-		return is_string($method) ? $method($data) : $method($data, $handler, $response);
+			$cast = function($data) {
+				if (!is_object($data)) {
+					return $data;
+				}
+				return method_exists($data, 'to') ? $data->to('array') : get_object_vars($data);
+			};
+
+			if (!isset($handler['cast']) || $handler['cast']) {
+				$data = is_object($data) ? $cast($data) : $data;
+				$data = is_array($data) ? array_map($cast, $data) : $data;
+			}
+			$method = $handler['encode'];
+			return is_string($method) ? $method($data) : $method($data, $handler, $response);
+		});
 	}
 
 	/**
