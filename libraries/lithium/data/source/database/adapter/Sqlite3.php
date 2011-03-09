@@ -136,7 +136,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 			$fields = array();
 
 			foreach ($columns as $column) {
-				list($type, $length) = explode('(', $column['type']);
+				list($type, $length) = explode('(', $column['type']) + array('', '');
 				$length = trim($length, ')');
 				$fields[$column['name']] = array(
 					'type' => $type,
