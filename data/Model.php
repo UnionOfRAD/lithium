@@ -591,6 +591,10 @@ class Model extends \lithium\core\StaticObject {
 		}
 		if (!$self->_schema) {
 			$self->_schema = static::connection()->describe($self::meta('source'), $self->_meta);
+			$key = (array) self::meta('key');
+			if ($self->_schema && array_intersect($key, array_keys($self->_schema)) != $key) {
+				throw new ConfigException('Missing key `' . implode(',', $key) . '` from schema.');
+			}
 		}
 		if (is_string($field) && $field) {
 			return isset($self->_schema[$field]) ? $self->_schema[$field] : null;
