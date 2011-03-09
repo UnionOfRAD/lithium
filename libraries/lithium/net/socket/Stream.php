@@ -30,11 +30,11 @@ class Stream extends \lithium\net\Socket {
 	public function open() {
 		$config = $this->_config;
 
-		if (empty($config['scheme']) || empty($config['host'])) {
+		if (!$config['scheme'] || !$config['host']) {
 			return false;
 		}
 		$scheme = ($config['scheme'] !== 'udp') ? 'tcp' : 'udp';
-		$port = ($config['port']) ?: 80;
+		$port = $config['port'] ?: 80;
 		$host = "{$scheme}://{$config['host']}:{$port}";
 		$flags = STREAM_CLIENT_CONNECT;
 
@@ -45,7 +45,7 @@ class Stream extends \lithium\net\Socket {
 			$host, $errorCode, $errorMessage, $config['timeout'], $flags
 		);
 
-		if (!empty($errorCode) || !empty($errorMessage)) {
+		if ($errorCode || $errorMessage) {
 			throw new NetworkException($errorMessage);
 		}
 		$this->timeout($config['timeout']);
@@ -53,7 +53,6 @@ class Stream extends \lithium\net\Socket {
 		if (!empty($config['encoding'])) {
 			$this->encoding($config['encoding']);
 		}
-
 		return $this->_resource;
 	}
 
@@ -67,6 +66,7 @@ class Stream extends \lithium\net\Socket {
 			return true;
 		}
 		fclose($this->_resource);
+
 		if (is_resource($this->_resource)) {
 			$this->close();
 		}
@@ -76,13 +76,10 @@ class Stream extends \lithium\net\Socket {
 	/**
 	 * Determines if the socket resource is at EOF.
 	 *
-	 * @return boolean True if resource pointer is at EOF, false otherwise.
+	 * @return boolean Returns `true` if resource pointer is at its EOF, `false` otherwise.
 	 */
 	public function eof() {
-		if (!is_resource($this->_resource)) {
-			return true;
-		}
-		return feof($this->_resource);
+		return is_resource($this->_resource) ? feof($this->_resource) : true;
 	}
 
 	/**
@@ -97,9 +94,10 @@ class Stream extends \lithium\net\Socket {
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
-		return is_null($length) ? stream_get_contents($this->_resource) : stream_get_contents(
-			$this->_resource, $length, $offset
-		);
+		if (!$length) {
+			return stream_get_contents($this->_resource);
+		}
+		return stream_get_contents($this->_resource, $length, $offset);
 	}
 
 	/**
@@ -144,14 +142,13 @@ class Stream extends \lithium\net\Socket {
 		if (!function_exists('stream_encoding')) {
 			return false;
 		}
-		return is_resource($this->_resource)
-			? stream_encoding($this->_resource, $charset) : false;
+		return is_resource($this->_resource) ? stream_encoding($this->_resource, $charset) : false;
 	}
 
 	/**
 	 * Aggregates read and write methods into a coherent request response
 	 *
-	 * @param mixed $message array or object like `\lithium\net\http\Request`
+	 * @param mixed $message array or object like `lithium\net\http\Request`
 	 * @param array $options
 	 *                - path: path for the current request
 	 *                - classes: array of classes to use
