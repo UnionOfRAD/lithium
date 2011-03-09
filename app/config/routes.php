@@ -13,8 +13,8 @@
  * usually including a controller and action to dispatch matching requests to. For more information,
  * see the `Router` and `Route` classes.
  *
- * @see http://lithium/docs/lithium/net/http/Router
- * @see http://lithium/docs/lithium/net/http/Route
+ * @see lithium\net\http\Router
+ * @see lithium\net\http\Route
  */
 use lithium\net\http\Router;
 use lithium\core\Environment;
