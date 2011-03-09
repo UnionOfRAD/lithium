@@ -34,6 +34,76 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertEqual($model, $collection->model());
 		$this->assertEqual(compact('model'), $collection->meta());
 	}
+
+	public function testOffsetExists() {
+		$collection = new DocumentSet();
+		$this->assertEqual($collection->offsetExists(0), false);
+		$collection->set(array('foo' => 'bar', 'bas' => 'baz'));
+		$this->assertEqual($collection->offsetExists(0), true);
+		$this->assertEqual($collection->offsetExists(1), true);
+	}
+
+	public function testNextRewindCurrent() {
+		$collection = new DocumentSet();
+		$collection->set(array(
+			'title' => 'Lorem Ipsum',
+			'value' => 42,
+			'foo'   => 'bar'
+		));
+		$this->assertEqual('Lorem Ipsum', $collection->current());
+		$this->assertEqual(42, $collection->next());
+		$this->assertEqual('bar', $collection->next());
+		$this->assertEqual('Lorem Ipsum', $collection->rewind());
+		$this->assertEqual(42, $collection->next());
+	}
+
+	public function testEach() {
+		$collection = new DocumentSet();
+		$collection->set(array(
+			'title' => 'Lorem Ipsum',
+			'key'   => 'value',
+			'foo'   => 'bar'
+		));
+		$collection->each(function($value) {
+			return $value . ' test';
+		});
+		$expected = array(
+			'Lorem Ipsum test',
+			'value test',
+			'bar test'
+		);
+		$this->assertEqual($collection->to('array'), $expected);
+	}
+
+	public function testMap() {
+		$collection = new DocumentSet();
+		$collection->set(array(
+			'title' => 'Lorem Ipsum',
+			'key'   => 'value',
+			'foo'   => 'bar'
+		));
+		$results = $collection->map(function($value) {
+			return $value . ' test';
+		});
+		$expected = array(
+			'Lorem Ipsum test',
+			'value test',
+			'bar test'
+		);
+		$this->assertEqual($results->to('array'), $expected);
+		$this->assertNotEqual($results->to('array'), $collection->to('array'));
+	}
+
+	public function testData() {
+		$collection = new DocumentSet();
+		$data = array(
+			'Lorem Ipsum',
+			'value',
+			'bar'
+		);
+		$collection->set($data);
+		$this->assertEqual($data, $collection->data());
+	}
 }
 
 ?>
