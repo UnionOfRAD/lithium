@@ -580,6 +580,9 @@ abstract class Database extends \lithium\data\Source {
 					$value = $this->value($value, $schema);
 					return "{$key} = {$value}";
 				}
+				if (is_null($value)) {
+					return "{$key} IS NULL";
+				}
 				break;
 		}
 		return false;
