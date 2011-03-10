@@ -159,10 +159,17 @@ class ResponseTest extends \lithium\test\Unit {
 		$headers = array('HTTP/1.1 301 Moved Permanently', 'Location: /');
 		$this->assertEqual($headers, $this->response->testHeaders);
 
-		$this->response = new Response(array('location' => array(
-			'controller' => 'foo_bar', 'action' => 'index'
-		)));
+		$this->response = new Response(array(
+			'classes' => array('router' => __CLASS__),
+			'location' => array('controller' => 'foo_bar', 'action' => 'index')
+		));
 		$this->assertEqual(array('location: /foo_bar'), $this->response->headers());
+	}
+
+	public static function match($url) {
+		if ($url == array('controller' => 'foo_bar', 'action' => 'index')) {
+			return '/foo_bar';
+		}
 	}
 }
 

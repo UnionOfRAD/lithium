@@ -490,6 +490,7 @@ class LibrariesTest extends \lithium\test\Unit {
 			'lithium\console\command\G11n',
 			'lithium\console\command\Help',
 			'lithium\console\command\Library',
+			'lithium\console\command\Route',
 			'lithium\console\command\Test'
 		);
 		$result = Libraries::locate('command', null, array(
@@ -504,6 +505,7 @@ class LibrariesTest extends \lithium\test\Unit {
 			'lithium\console\command\G11n',
 			'lithium\console\command\Help',
 			'lithium\console\command\Library',
+			'lithium\console\command\Route',
 			'lithium\console\command\Test',
 			'lithium\console\command\g11n\Extract',
 			'lithium\console\command\create\Controller',
