@@ -602,9 +602,10 @@ abstract class Database extends \lithium\data\Source {
 		$type = $context->type();
 		$model = $context->model();
 		$schema = $model ? (array) $model::schema() : array();
-		$modelNames = (array) $context->name() + array_keys((array) $context->relationships());
+		$modelNames = (array) $context->name();
+		$modelNames = array_merge($modelNames, array_keys((array) $context->relationships()));
 
-		if(is_array($fields) && !$context->join()) {
+		if(is_array($fields)) {
 			$toMerge = array();
 			$keys = array_keys($fields);
 
