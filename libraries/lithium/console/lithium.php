@@ -18,8 +18,8 @@ use lithium\console\Dispatcher;
  */
 
 $library = dirname(dirname(__DIR__));
-$app = null;
 $working = getcwd() ?: __DIR__;
+$app = null;
 
 while (!$app && $working) {
 	if (file_exists($working . '/config/bootstrap.php')) {
@@ -31,21 +31,29 @@ while (!$app && $working) {
 	}
 }
 
-if ($app) {
-	include $app . '/config/bootstrap.php';
-} else {
-	define('LITHIUM_LIBRARY_PATH', $library);
-	define('LITHIUM_APP_PATH', dirname($library) . '/app');
-
-	if (!include LITHIUM_LIBRARY_PATH . '/lithium/core/Libraries.php') {
-		$message  = "Lithium core could not be found.  Check the value of `LITHIUM_LIBRARY_PATH` ";
-		$message .= "in `config/bootstrap.php`. It should point to the directory containing your ";
-		$message .= "`/libraries` directory.";
-		trigger_error($message, E_USER_ERROR);
-	}
-	Libraries::add('lithium');
+if ($app && is_dir("{$app}/config/bootstrap") && file_exists("{$app}/webroot/index.php")) {
+	include "{$app}/config/bootstrap.php";
+	exit(Dispatcher::run()->status);
 }
 
+define('LITHIUM_LIBRARY_PATH', $library);
+define('LITHIUM_APP_PATH', $app ? $working : dirname($library) . '/app');
+
+if (!include LITHIUM_LIBRARY_PATH . '/lithium/core/Libraries.php') {
+	$message  = "Lithium core could not be found.  Check the value of `LITHIUM_LIBRARY_PATH` ";
+	$message .= "in `config/bootstrap.php`. It should point to the directory containing your ";
+	$message .= "`/libraries` directory.";
+	trigger_error($message, E_USER_ERROR);
+}
+
+Libraries::add('lithium');
+
+if ($app) {
+	Libraries::add(basename(LITHIUM_APP_PATH), array(
+		'path' => LITHIUM_APP_PATH,
+		'default' => true
+	));
+}
 exit(Dispatcher::run()->status);
 
 ?>
