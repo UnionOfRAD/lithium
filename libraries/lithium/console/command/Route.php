@@ -33,14 +33,18 @@ class Route extends \lithium\console\Command {
 	 * Load the routes file and set the environment.
 	 */
 	public function __construct($config = array()) {
-		if(!isset($config['routes_file'])) {
-			$config['routes_file'] = LITHIUM_APP_PATH.'/config/routes.php';
-		}
+		$defaults = array('routes_file' => LITHIUM_APP_PATH . '/config/routes.php');
+		parent::__construct($config + $defaults);
+	}
 
-		parent::__construct($config);
-
+	protected function _init() {
+		parent::_init();
 		Environment::set($this->env);
-		require $this->_config['routes_file'];
+
+		if (file_exists($this->_config['routes_file'])) {
+			return require $this->_config['routes_file'];
+		}
+		$this->error("The routes file for this library doesn't exist or can't be found.");
 	}
 
 	/**
@@ -80,16 +84,12 @@ class Route extends \lithium\console\Command {
 	 */
 	public function all() {
 		$routes = Router::get();
-		$columns = array(
-			array('Template', 'Params'),
-			array('--------', '------')
-		);
+		$columns = array(array('Template', 'Params'), array('--------', '------'));
 
-		foreach($routes As $route) {
+		foreach ($routes As $route) {
 			$info = $route->export();
 			$columns[] = array($info['template'], json_encode($info['params']));
 		}
-
 		$this->columns($columns);
 	}
 
@@ -117,30 +117,22 @@ class Route extends \lithium\console\Command {
 	 * @return void
 	 */
 	public function show() {
-
 		$url = join(" ", $this->request->params['args']);
 		$method = 'GET';
 
-		if(empty($url)) {
+		if (!$url) {
 			$this->error('Please provide a valid URL');
 		}
 
-		if(preg_match('/^(GET|POST|PUT|DELETE) (.+)/i', $url, $matches)) {
+		if (preg_match('/^(GET|POST|PUT|DELETE|HEAD|OPTIONS) (.+)/i', $url, $matches)) {
 			$method = strtoupper($matches[1]);
 			$url = $matches[2];
 		}
 
-		$request = new Request(array('env' => array('REQUEST_METHOD' => $method)));
-		$request->url = $url;
-
+		$request = new Request(compact('url') + array('env' => array('REQUEST_METHOD' => $method)));
 		$result = Router::process($request);
-		if(empty($result->params)) {
-			$this->out("No route found");
-		} else {
-			$this->out(json_encode($result->params));
-		}
+		$this->out($result->params ? json_encode($result->params) : "No route found.");
 	}
-
 }
 
 ?>
