@@ -359,7 +359,7 @@ abstract class Database extends \lithium\data\Source {
 					$fields = "*";
 				}
 				$query->fields("COUNT({$fields}) as count", true);
-				$query->map(array($query->model() => array('count')));
+				$query->map(array($query->alias() => array('count')));
 				list($record) = $this->read($query, $options)->data();
 				return isset($record['count']) ? intval($record['count']) : null;
 		}
@@ -580,7 +580,7 @@ abstract class Database extends \lithium\data\Source {
 					$value = $this->value($value, $schema);
 					return "{$key} = {$value}";
 				}
-				if (is_null($value)) {
+				if ($value === null) {
 					return "{$key} IS NULL";
 				}
 				break;
@@ -604,42 +604,51 @@ abstract class Database extends \lithium\data\Source {
 		$schema = $model ? (array) $model::schema() : array();
 		$modelNames = (array) $context->name() + array_keys((array) $context->relationships());
 
-		if(is_array($fields)) {
+		if(is_array($fields) && !$context->join()) {
 			$toMerge = array();
 			$keys = array_keys($fields);
+
 			$fields = array_filter($fields, function($item) use (&$toMerge, &$keys, $modelNames) {
 				$name = current($keys);
 				next($keys);
 				switch(true) {
 					case is_array($item):
 						foreach($item as $field) {
-							$toMerge[$name][] = $name . '.' . $field;
+							$toMerge[$name][] = $field;
 						}
 						return false;
 					case in_array($item, $modelNames):
-						$toMerge[$item][] = $item . '.*';
+						$toMerge[$item][] = '*';
+						return false;
+					case strpos($item, '.') !== false:
+						list($name, $field) = explode('.', $item);
+						$toMerge[$name][] = $field;
+						break;
+					default:
+						$toMerge[reset($modelNames)][] = $item;
 						return false;
 				}
-				return true;
 			});
-			$fields = array_merge($fields, $toMerge);
-
+			$fields = $toMerge;
 			if(count($modelNames) > 1) {
 				$sortOrder = array_flip($modelNames);
 				uksort($fields, function($a, $b) use($sortOrder) {
 					return $sortOrder[$a] - $sortOrder[$b];
 				});
 			}
+			$context->map($fields);
 
 			$toMerge = array();
-			$fields = array_filter($fields, function($item) use(&$toMerge) {
-				if(is_array($item)) {
-					$toMerge = array_merge($toMerge,$item);
-					return false;
+			$keys = array_keys($fields);
+			$fields = array_filter($fields, function($item) use(&$toMerge, &$keys) {
+				$name = current($keys);
+				next($keys);
+				foreach($item as $field) {
+					$toMerge[] = $name . '.' . $field;
 				}
-				return true;
+				return false;
 			});
-			$fields = array_merge($fields, $toMerge);
+			$fields = $toMerge;
 		}
 
 		if ($type == 'create' || $type == 'update') {
