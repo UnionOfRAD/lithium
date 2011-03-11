@@ -600,12 +600,11 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function fields($fields, $context) {
 		$type = $context->type();
-		$model = $context->model();
-		$schema = $model ? (array) $context->schema() : array();
+		$schema = (array) $context->schema();
 		$modelNames = (array) $context->name();
 		$modelNames = array_merge($modelNames, array_keys((array) $context->relationships()));
 
-		if(is_array($fields)) {
+		if (is_array($fields)) {
 			$toMerge = array();
 			$keys = array_keys($fields);
 
@@ -617,7 +616,7 @@ abstract class Database extends \lithium\data\Source {
 						foreach($item as $field) {
 							$toMerge[$name][] = $field;
 						}
-						return false;
+						continue;
 					case in_array($item, $modelNames):
 						if($item == reset($modelNames)) {
 							$schema = $context->schema();
@@ -626,14 +625,19 @@ abstract class Database extends \lithium\data\Source {
 							$schema = $joins[$item]->schema();
 						}
 						$toMerge[$item] = array_keys($schema);
-						return false;
+						continue;
 					case strpos($item, '.') !== false:
 						list($name, $field) = explode('.', $item);
 						$toMerge[$name][] = $field;
-						break;
+						continue;
 					default:
-						$toMerge[reset($modelNames)][] = $item;
-						return false;
+						$mainSchema = array_keys($context->schema());
+						if (in_array($item, $mainSchema)) {
+							$toMerge[reset($modelNames)][] = $item;
+							continue;
+						}
+						$toMerge[0][] = $item;
+						continue;
 				}
 			};
 			array_walk($fields, $groupFields);
@@ -644,7 +648,18 @@ abstract class Database extends \lithium\data\Source {
 					return $sortOrder[$a] - $sortOrder[$b];
 				});
 			}
-			$context->map($fields);
+			$context->map(array_map(function($item) {
+				if (!is_array($item)) {
+					return $item;
+				}
+				foreach($item as $key => $field) {
+					if(strpos($field, ' as ')) {
+						list($real, $as) = explode(' as ', $field);
+						$item[$key] = trim($as);
+					}
+				}
+				return $item;
+			}, $fields));
 
 			$toMerge = array();
 			$keys = array_keys($fields);
@@ -652,7 +667,11 @@ abstract class Database extends \lithium\data\Source {
 				$name = current($keys);
 				next($keys);
 				foreach($item as $field) {
-					$toMerge[] = $name . '.' . $field;
+					if (!is_numeric($name)) {
+						$toMerge[] = $name . '.' . $field;
+						continue;
+					}
+					$toMerge[] = $field;
 				}
 				return false;
 			});

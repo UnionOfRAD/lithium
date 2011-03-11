@@ -356,8 +356,12 @@ class RecordSet extends \lithium\data\Collection {
 
 	protected function _columnMap() {
 		if ($this->_query && $map = $this->_query->map()) {
-			$map = array($map[$this->_query->alias()]) + $map;
-			unset($map[$this->_query->alias()]);
+			if (isset($map[$this->_query->alias()])) {
+				$map = array($map[$this->_query->alias()]) + $map;
+				unset($map[$this->_query->alias()]);
+			} else {
+				$map = array(array_shift($map)) + $map;
+			}
 			return $map;
 		}
 		if (!($model = $this->_model)) {
