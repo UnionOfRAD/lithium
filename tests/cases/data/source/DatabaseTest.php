@@ -152,7 +152,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		)));
 		$fields = 'id, title, created';
 		$table = '{mock_database_posts} AS {MockDatabasePost}';
-		$expected = "SELECT id, title, created FROM {$table};";
+		$expected = "SELECT MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created"
+						. " FROM {$table};";
 		$this->assertEqual($expected, $result);
 
 		$result = $this->db->renderCommand(new Query(array(
@@ -161,7 +162,8 @@ class DatabaseTest extends \lithium\test\Unit {
 			'fields' => array('id', 'title', 'created'),
 			'limit' => 1
 		)));
-		$expected = 'SELECT id, title, created FROM {mock_database_posts} AS {MockDatabasePost} ';
+		$expected = 'SELECT MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created'
+						. ' FROM {mock_database_posts} AS {MockDatabasePost} ';
 		$expected .= 'LIMIT 1;';
 		$this->assertEqual($expected, $result);
 
@@ -172,7 +174,8 @@ class DatabaseTest extends \lithium\test\Unit {
 			'limit' => 1,
 			'conditions' => 'Post.id = 2'
 		)));
-		$expected = 'SELECT id, title, created FROM {mock_database_posts} AS {MockDatabasePost} ';
+		$expected = 'SELECT MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created'
+						. ' FROM {mock_database_posts} AS {MockDatabasePost} ';
 		$expected .= 'WHERE Post.id = 2 LIMIT 1;';
 		$this->assertEqual($expected, $result);
 	}
@@ -193,8 +196,8 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$expected = "SELECT MockDatabasePost.title, MockDatabasePost.body FROM";
 		$expected .= " {mock_database_posts} AS {MockDatabasePost} WHERE Post.id IN";
-		$expected .= " (SELECT post_id FROM {mock_database_taggings} AS {MockDatabaseTagging} ";
-		$expected .= "WHERE MockDatabaseTag.tag IN ('foo', 'bar', 'baz'));";
+		$expected .= " (SELECT MockDatabaseTagging.post_id FROM {mock_database_taggings} AS ";
+		$expected .= "{MockDatabaseTagging} WHERE MockDatabaseTag.tag IN ('foo', 'bar', 'baz'));";
 		$this->assertEqual($expected, $result);
 	}
 

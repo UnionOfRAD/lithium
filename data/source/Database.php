@@ -601,7 +601,7 @@ abstract class Database extends \lithium\data\Source {
 	public function fields($fields, $context) {
 		$type = $context->type();
 		$model = $context->model();
-		$schema = $model ? (array) $model::schema() : array();
+		$schema = $model ? (array) $context->schema() : array();
 		$modelNames = (array) $context->name();
 		$modelNames = array_merge($modelNames, array_keys((array) $context->relationships()));
 
@@ -609,7 +609,7 @@ abstract class Database extends \lithium\data\Source {
 			$toMerge = array();
 			$keys = array_keys($fields);
 
-			$fields = array_filter($fields, function($item) use (&$toMerge, &$keys, $modelNames) {
+			$groupFields = function($item, $key) use (&$toMerge, &$keys, $modelNames, &$context) {
 				$name = current($keys);
 				next($keys);
 				switch(true) {
@@ -619,7 +619,13 @@ abstract class Database extends \lithium\data\Source {
 						}
 						return false;
 					case in_array($item, $modelNames):
-						$toMerge[$item][] = '*';
+						if($item == reset($modelNames)) {
+							$schema = $context->schema();
+						} else {
+							$joins = $context->joins();
+							$schema = $joins[$item]->schema();
+						}
+						$toMerge[$item] = array_keys($schema);
 						return false;
 					case strpos($item, '.') !== false:
 						list($name, $field) = explode('.', $item);
@@ -629,7 +635,8 @@ abstract class Database extends \lithium\data\Source {
 						$toMerge[reset($modelNames)][] = $item;
 						return false;
 				}
-			});
+			};
+			array_walk($fields, $groupFields);
 			$fields = $toMerge;
 			if(count($modelNames) > 1) {
 				$sortOrder = array_flip($modelNames);
@@ -641,7 +648,7 @@ abstract class Database extends \lithium\data\Source {
 
 			$toMerge = array();
 			$keys = array_keys($fields);
-			$fields = array_filter($fields, function($item) use(&$toMerge, &$keys) {
+			array_walk($fields, function($item, $key) use(&$toMerge, &$keys) {
 				$name = current($keys);
 				next($keys);
 				foreach($item as $field) {
