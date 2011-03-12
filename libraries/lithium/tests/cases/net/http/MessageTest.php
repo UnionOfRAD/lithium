@@ -30,7 +30,7 @@ class MessageTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $this->message->headers('Host', false);
-		$this->assertNull($result);
+		$this->assertFalse($result);
 	}
 
 	public function testHeaderKeyValue() {
