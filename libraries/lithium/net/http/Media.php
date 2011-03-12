@@ -59,6 +59,14 @@ class Media extends \lithium\core\StaticObject {
 	protected static $_assets = array();
 
 	/**
+	 * Placeholder for class dependencies. This class' dependencies (i.e. templating classes) are
+	 * typically specified through other configuration.
+	 *
+	 * @var array
+	 */
+	protected static $_classes = array();
+
+	/**
 	 * Returns the list of registered media types.  New types can be set with the `type()` method.
 	 *
 	 * @return array Returns an array of media type extensions or short-names, which comprise the
@@ -569,11 +577,51 @@ class Media extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Configures a template object instance, based on a media handler configuration.
+	 *
+	 * @see lithium\net\http\Media::type()
+	 * @see lithium\template\View::render()
+	 * @see lithium\action\Response
+	 * @param mixed $handler Either a string specifying the name of a media type for which a handler
+	 *              is defined, or an array representing a handler configuration. For more on types
+	 *              and type handlers, see the `type()` method.
+	 * @param mixed $data The data to be rendered. Usually an array.
+	 * @param object $response The `Response` object associated with this dispatch cycle. Usually an
+	 *               instance of `lithium\action\Response`.
+	 * @param array $options Any options that will be passed to the `render()` method of the
+	 *              templating object.
+	 * @return object Returns an instance of a templating object, usually `lithium\template\View`.
+	 */
+	public static function view($handler, $data, &$response = null, array $options = array()) {
+		$params = array('response' => &$response) + compact('handler', 'data', 'options');
+
+		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+			$data = $params['data'];
+			$options = $params['options'];
+			$handler = $params['handler'];
+			$response =& $params['response'];
+
+			if (!is_array($handler)) {
+				$handler = $self::invokeMethod('_handlers', array($handler));
+			}
+			$class = $handler['view'];
+			unset($handler['view']);
+
+			$config = $handler + array('response' => &$response);
+			return $self::invokeMethod('_instance', array($class, $config));
+		});
+	}
+
+	/**
 	 * For media types registered in `$_handlers` which include an `'encode'` setting, encodes data
 	 * according to the specified media type.
 	 *
-	 * @param string $type Specifies the media type into which `$data` will be encoded. This media
-	 *        type must have an `'encode'` setting specified in `Media::$_handlers`.
+	 * @see lithium\net\http\Media::type()
+	 * @param mixed $handler Specifies the media type into which `$data` will be encoded. This media
+	 *              type must have an `'encode'` setting specified in `Media::$_handlers`.
+	 *              Alternatively, `$type` can be an array, in which case it is used as the type
+	 *              handler configuration. See the `type()` method for information on adding type
+	 *              handlers, and the available configuration keys.
 	 * @param mixed $data Arbitrary data you wish to encode. Note that some encoders can only handle
 	 *        arrays or objects.
 	 * @param object $response A reference to the `Response` object for this dispatch cycle.
@@ -582,14 +630,17 @@ class Media extends \lithium\core\StaticObject {
 	 *               specified by `$type`, the result of which is usually a string.
 	 * @filter
 	 */
-	public static function encode($type, $data, &$response = null) {
-		$params = array('response' => &$response) + compact('type', 'data');
+	public static function encode($handler, $data, &$response = null) {
+		$params = array('response' => &$response) + compact('handler', 'data');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
-			$type = $params['type'];
 			$data = $params['data'];
+			$handler = $params['handler'];
 			$response =& $params['response'];
-			$handler = is_array($type) ? $type : $self::invokeMethod('_handlers', array($type));
+
+			if (!is_array($handler)) {
+				$handler = $self::invokeMethod('_handlers', array($handler));
+			}
 
 			if (!$handler || !isset($handler['encode'])) {
 				return null;
@@ -655,6 +706,7 @@ class Media extends \lithium\core\StaticObject {
 	 */
 	protected static function _handle($handler, $data, &$response) {
 		$params = array('response' => &$response) + compact('handler', 'data');
+
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
 			$response = $params['response'];
 			$handler = $params['handler'];
@@ -669,17 +721,15 @@ class Media extends \lithium\core\StaticObject {
 			switch (true) {
 				case $handler['encode']:
 					return $self::encode($handler, $data, $response);
-				case class_exists($handler['view']):
-					$class = $handler['view'];
-					unset($handler['view'], $options['view']);
-					$view = new $class($handler + array('response' => &$response));
-					return $view->render("all", (array) $data, $options);
 				case ($handler['template'] === false) && is_string($data):
 					return $data;
+				case $handler['view']:
+					unset($options['view']);
+					$instance = $self::view($handler, $data, $response, $options);
+					return $instance->render('all', (array) $data, $options);
 				default:
 					throw new MediaException("Could not interpret type settings for handler.");
 			}
-			return $result;
 		});
 	}
 
@@ -744,7 +794,7 @@ class Media extends \lithium\core\StaticObject {
 				'paths'    => array(
 					'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
 					'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
-					'element'  => '{:library}/views/elements/{:template}.{:type}.php'
+					'element'  => '{:library}/views/elements/{:template}.{:type}.php',
 				)
 			),
 			'html' => array(),
