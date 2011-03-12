@@ -111,8 +111,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$response = new Response(array('message' => $message));
 		$this->assertEqual('application/json', $response->type);
 		$this->assertEqual('ISO-8859-1', $response->encoding);
-		
-		// Content type WITH MULTIPLE spaces between type and charset
+
 		$message = join("\r\n", array(
 			'HTTP/1.1 200 OK',
 			'Content-Type: application/json;     charset=iso-8859-1',

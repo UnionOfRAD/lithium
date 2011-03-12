@@ -339,9 +339,9 @@ class Entity extends \lithium\core\Object {
 	 * @param string $field The name of the field to be incrememnted.
 	 * @param string $value The value to increment the field by. Defaults to `1` if this parameter
 	 *               is not specified.
-	 * @return int Returns the current value of `$field`, based on the value retrieved from the data
-	 *         source when the entity was loaded, plus any increments applied. Note that it may not
-	 *         reflect the most current value in the persistent backend data source.
+	 * @return integer Returns the current value of `$field`, based on the value retrieved from the
+	 *         data source when the entity was loaded, plus any increments applied. Note that it may
+	 *         not reflect the most current value in the persistent backend data source.
 	 * @throws UnexpectedValueException Throws an exception when `$field` is set to a non-numeric
 	 *         type.
 	 */
@@ -363,7 +363,7 @@ class Entity extends \lithium\core\Object {
 	 * @see lithium\data\Entity::increment()
 	 * @param string $field The name of the field to decrement.
 	 * @param string $value The value by which to decrement the field. Defaults to `1`.
-	 * @return int Returns the new value of `$field`, after modification.
+	 * @return integer Returns the new value of `$field`, after modification.
 	 */
 	public function decrement($field, $value = 1) {
 		return $this->increment($field, $value * -1);

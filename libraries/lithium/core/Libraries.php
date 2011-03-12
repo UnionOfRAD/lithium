@@ -818,10 +818,6 @@ class Libraries {
 		$defaults = array('libraries' => null, 'recursive' => true, 'namespaces' => false);
 		$options += $defaults;
 
-		if (!isset(static::$_paths[$params['type']])) {
-			var_dump($params['type']);
-			die();
-		}
 		$paths = (array) static::$_paths[$params['type']];
 		$libraries = $options['library'] ? $options['library'] : $options['libraries'];
 		$libraries = static::get((array) $libraries);

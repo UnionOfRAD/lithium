@@ -31,6 +31,9 @@ class Route extends \lithium\console\Command {
 
 	/**
 	 * Load the routes file and set the environment.
+	 *
+	 * @param array $config The default configuration, wherein the absolute path to the routes file
+	 *              to load may be specified, using the `'routes_file'` key.
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('routes_file' => LITHIUM_APP_PATH . '/config/routes.php');
@@ -74,8 +77,6 @@ class Route extends \lithium\console\Command {
 	 * --------                        	------
 	 * /                               	{"controller":"pages","action":"view"}
 	 * /pages/{:args}                  	{"controller":"pages","action":"view"}
-	 * /test/{:args}                   	{"controller":"lithium\\test\\Controller","action":"index"}
-	 * /test                           	{"controller":"lithium\\test\\Controller","action":"index"}
 	 * /{:slug:[\w\-]+}                	{"controller":"posts","action":"show"}
 	 * /{:controller}/{:action}/{:args}	{"action":"index"}
 	 * }}}

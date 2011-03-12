@@ -134,6 +134,16 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	 * This method (`ErrorHandler::run()`) needs to be called as early as possible in the bootstrap
 	 * cycle; immediately after `require`-ing `bootstrap/libraries.php` is your best bet.
 	 *
+	 * @param array $config The configuration with which to start the error handler. Available
+	 *              options include:
+	 *              - `'trapErrors'` _boolean_: Defaults to `false`. If set to `true`, PHP errors
+	 *                will be caught by `ErrorHandler` and handled in-place. Execution will resume
+	 *                in the same context in which the error occurred.
+	 *              - `'convertErrors'` _boolean_: Defaults to `true`, and specifies that all PHP
+	 *                errors should be converted to `ErrorException`s and thrown from the point
+	 *                where the error occurred. The exception will be caught at the first point in
+	 *                the stack trace inside a matching `try`/`catch` block, or that has a matching
+	 *                error handler applied using the `apply()` method.
 	 * @return void
 	 */
 	public static function run(array $config = array()) {

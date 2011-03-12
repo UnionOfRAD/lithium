@@ -79,9 +79,11 @@ class AffectedTest extends \lithium\test\Unit {
 	}
 
 	public function testAnalyze() {
+		$ns = 'lithium\tests\cases';
+
 		$expected = array(
-			'lithium\g11n\Message' => 'lithium\tests\cases\g11n\MessageTest',
-			'lithium\console\command\g11n\Extract' => 'lithium\tests\cases\console\command\g11n\ExtractTest'
+			'lithium\g11n\Message' => "{$ns}\g11n\MessageTest",
+			'lithium\console\command\g11n\Extract' => "{$ns}\console\command\g11n\ExtractTest"
 		);
 
 		$group = new Group();

@@ -24,9 +24,9 @@ class FormTest extends \lithium\test\Unit {
 		$request->data = array('username' => 'Person', 'password' => 'password');
 
 		$result = $subject->check($request);
-		$expected = array('username' => 'Person',
-			'password' => 'b109f3bbbc244eb82441917ed06d618b9008dd09b3befd1b5e07394c706a8bb980b1d7'.
-					'785e5976ec049b46df5f1326af5a2ea6d103fd07c95385ffab0cacbc86');
+		$password = 'b109f3bbbc244eb82441917ed06d618b9008dd09b3befd1b5e07394c706a8bb980b1d7';
+		$password .= '785e5976ec049b46df5f1326af5a2ea6d103fd07c95385ffab0cacbc86';
+		$expected = array('username' => 'Person') + compact('password');
 		$this->assertEqual($expected, $result);
 	}
 
@@ -35,11 +35,9 @@ class FormTest extends \lithium\test\Unit {
 		$request = new Request();
 		$request->data = array('username' => 'Person', 'password' => 'password');
 
-		$expected = array(
-			'username' => sha1('Person'),
-			'password' => 'b109f3bbbc244eb82441917ed06d618b9008dd09b3befd1b5e07394c706a8bb980b1d7'.
-					'785e5976ec049b46df5f1326af5a2ea6d103fd07c95385ffab0cacbc86'
-		);
+		$password = 'b109f3bbbc244eb82441917ed06d618b9008dd09b3befd1b5e07394c706a8bb980b1d7';
+		$password .= '785e5976ec049b46df5f1326af5a2ea6d103fd07c95385ffab0cacbc86';
+		$expected = array('username' => sha1('Person')) + compact('password');
 		$this->assertEqual($expected, $subject->check($request));
 	}
 

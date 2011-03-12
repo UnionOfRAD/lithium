@@ -19,13 +19,15 @@ class RouteTest extends \lithium\test\Unit {
 
 	/**
 	 * Holds config params.
+	 *
+	 * @var array
 	 */
-	protected $_config = array(
-		'routes_file' => ''
-	);
+	protected $_config = array('routes_file' => '');
 
 	/**
 	 * Holds the temporary test path.
+	 *
+	 * @var string
 	 */
 	protected $_testPath = null;
 
@@ -41,8 +43,9 @@ class RouteTest extends \lithium\test\Unit {
 	 * Create a temporary routes.php file for testing and reset the router.
 	 */
 	public function setUp() {
-		$this->_config['routes_file'] = $this->_testPath.'/routes.php';
+		$this->_config['routes_file'] = "{$this->_testPath}/routes.php";
 
+		$testParams = 'array("controller" => "lithium\test\Controller")';
 		$content = array(
 			'<?php',
 			'use lithium\net\http\Router;',
@@ -50,8 +53,8 @@ class RouteTest extends \lithium\test\Unit {
 			'Router::connect("/", "Pages::view");',
 			'Router::connect("/pages/{:args}", "Pages::view");',
 			'if (!Environment::is("production")) {',
-				'Router::connect("/test/{:args}", array("controller" => "lithium\test\Controller"));',
-				'Router::connect("/test", array("controller" => "lithium\test\Controller"));',
+				'Router::connect("/test/{:args}", ' . $testParams . ');',
+				'Router::connect("/test", ' . $testParams . ');',
 			'}',
 			'?>'
 		);
@@ -64,7 +67,7 @@ class RouteTest extends \lithium\test\Unit {
 	 * Delete the temporary routes.php file.
 	 */
 	public function tearDown() {
-		if(file_exists($this->_config['routes_file'])) {
+		if (file_exists($this->_config['routes_file'])) {
 			unlink($this->_config['routes_file']);
 		}
 	}
@@ -274,11 +277,13 @@ class RouteTest extends \lithium\test\Unit {
 	/**
 	 * Remove formatting whitespace, tabs and newlines for better sourcecode
 	 * readability.
+	 *
+	 * @param string $str A string from which to strip spaces
+	 * @return string Returns the value of `$str` with all whitespace removed.
 	 */
 	protected function _strip($str) {
 		return preg_replace('/\s/', '', $str);
 	}
-
 }
 
 ?>

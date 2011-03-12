@@ -12,7 +12,7 @@ namespace lithium\data\source\database\adapter;
 use SQLite3 as SQLite;
 use SQLite3Result;
 use lithium\data\model\QueryException;
-use \lithium\data\source\database\adapter\sqlite3\Result;
+use lithium\data\source\database\adapter\sqlite3\Result;
 
 /**
  * Sqlite database driver
