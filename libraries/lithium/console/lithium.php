@@ -49,7 +49,8 @@ lithium\core\Libraries::add('lithium');
 if ($app) {
 	lithium\core\Libraries::add(basename(LITHIUM_APP_PATH), array(
 		'path' => LITHIUM_APP_PATH,
-		'default' => true
+		'default' => true,
+		'bootstrap' => !file_exists("{$app}/webroot/index.php")
 	));
 }
 
