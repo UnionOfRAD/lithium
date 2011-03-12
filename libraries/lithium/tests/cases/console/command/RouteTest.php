@@ -205,10 +205,9 @@ class RouteTest extends \lithium\test\Unit {
 			'classes' => array('response' => '\lithium\tests\mocks\console\MockResponse'),
 			'request' => $request
 		));
-
 		$command->show();
 
-		$expected = "No route found\n";
+		$expected = "No route found.\n";
 		$this->assertEqual($expected, $command->response->output);
 	}
 
@@ -217,15 +216,12 @@ class RouteTest extends \lithium\test\Unit {
 	 */
 	public function testShowWithValidRoute() {
 		$request = new Request();
-		$request->params = array(
-			'args' => array('/')
-		);
+		$request->params = array('args' => array('/'));
 		$command = new Route(array(
 			'routes_file' => $this->_config['routes_file'],
 			'classes' => array('response' => '\lithium\tests\mocks\console\MockResponse'),
 			'request' => $request
 		));
-
 		$command->show();
 
 		$expected = "{\"controller\":\"pages\",\"action\":\"view\"}\n";
@@ -249,7 +245,7 @@ class RouteTest extends \lithium\test\Unit {
 
 		$command->show();
 
-		$expected = "No route found\n";
+		$expected = "No route found.\n";
 		$this->assertEqual($expected, $command->response->output);
 	}
 
