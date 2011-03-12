@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\core;
 
 use lithium\core\Object;
+use lithium\tests\mocks\core\MockRequest;
 use lithium\tests\mocks\core\MockMethodFiltering;
 use lithium\tests\mocks\core\MockExposed;
 use lithium\tests\mocks\core\MockCallable;
@@ -193,7 +194,7 @@ class ObjectTest extends \lithium\test\Unit {
 
 	public function testInstanceWithObject() {
 		$object = new MockInstantiator();
-		$request = new \lithium\tests\mocks\core\MockRequest();
+		$request = new MockRequest();
 		$expected = 'lithium\tests\mocks\core\MockRequest';
 		$result = get_class($object->instance($request));
 		$this->assertEqual($expected, $result);
@@ -201,8 +202,8 @@ class ObjectTest extends \lithium\test\Unit {
 
 	public function testInstanceFalse() {
 		$object = new MockInstantiator();
-		$result = $object->instance(false);
-		$this->assertFalse($result);
+		$this->expectException('/^Invalid class lookup/');
+		$object->instance(false);
 	}
 }
 

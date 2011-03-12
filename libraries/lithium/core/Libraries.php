@@ -57,6 +57,13 @@ use lithium\core\ClassNotFoundException;
 class Libraries {
 
 	/**
+	 * Stores the closures that represent the method filters. They are indexed by method name.
+	 *
+	 * @var array
+	 */
+	protected static $_methodFilters = array();
+
+	/**
 	 * The list of class libraries registered with the class loader.
 	 *
 	 * @var array
@@ -572,12 +579,54 @@ class Libraries {
 	 * @return object If the class is found, returns an instance of it, otherwise throws an
 	 *         exception.
 	 * @throws lithium\core\ClassNotFoundException Throws an exception if the class can't be found.
+	 * @filter
 	 */
 	public static function instance($type, $name, array $options = array()) {
-		if (!$class = (string) static::locate($type, $name)) {
-			throw new ClassNotFoundException("Class `{$name}` of type `{$type}` not found.");
+		$params = compact('type', 'name', 'options');
+		$_paths =& static::$_paths;
+
+		$implementation = function($self, $params) use (&$_paths) {
+			$name = $params['name'];
+			$type = $params['type'];
+
+			if (!$name && !$type) {
+				$message = "Invalid class lookup: `\$name` and `\$type` are empty.";
+				throw new ClassNotFoundException($message);
+			}
+			if (!is_string($type) && $type !== null && !isset($_paths[$type])) {
+				throw new ClassNotFoundException("Invalid class type `{$type}`.");
+			}
+			if (!$class = $self::locate($type, $name)) {
+				throw new ClassNotFoundException("Class `{$name}` of type `{$type}` not found.");
+			}
+			if (is_object($class)) {
+				return $class;
+			}
+			$success = (is_string($class) && class_exists($class));
+			return $success ? new $class($params['options']) : null;
+		};
+		if (!isset(static::$_methodFilters[__FUNCTION__])) {
+			return $implementation(get_called_class(), $params);
 		}
-		return class_exists($class) ? new $class($options) : null;
+		$class = get_called_class();
+		$method = __FUNCTION__;
+		$data = array_merge(static::$_methodFilters[__FUNCTION__], array($implementation));
+		return Filters::run($class, $params, compact('data', 'class', 'method'));
+	}
+
+	/**
+	 * Apply a closure to a method in `Libraries`.
+	 *
+	 * @see lithium\util\collection\Filters
+	 * @param string $method The name of the method to apply the closure to.
+	 * @param closure $filter The closure that is used to filter the method.
+	 * @return void
+	 */
+	public static function applyFilter($method, $filter = null) {
+		if (!isset(static::$_methodFilters[$method])) {
+			static::$_methodFilters[$method] = array();
+		}
+		static::$_methodFilters[$method][] = $filter;
 	}
 
 	/**
@@ -766,10 +815,13 @@ class Libraries {
 	 * @return array
 	 */
 	protected static function _locateAll(array $params, array $options = array()) {
-		$defaults = array(
-			'libraries' => null, 'recursive' => true, 'namespaces' => false
-		);
+		$defaults = array('libraries' => null, 'recursive' => true, 'namespaces' => false);
 		$options += $defaults;
+
+		if (!isset(static::$_paths[$params['type']])) {
+			var_dump($params['type']);
+			die();
+		}
 		$paths = (array) static::$_paths[$params['type']];
 		$libraries = $options['library'] ? $options['library'] : $options['libraries'];
 		$libraries = static::get((array) $libraries);

@@ -11,6 +11,7 @@ namespace lithium\console\command\create;
 use lithium\core\Libraries;
 use lithium\util\Inflector;
 use lithium\analysis\Inspector;
+use lithium\core\ClassNotFoundException;
 
 /**
  * Generate a Test class in the `--library` namespace
@@ -86,7 +87,13 @@ class Test extends \lithium\console\command\Create {
 		$type = $request->action;
 		$name = $request->args();
 
-		if ($command = $this->_instance($type)) {
+		try {
+			$command = $this->_instance($type);
+		} catch (ClassNotFoundException $e) {
+			$command = null;
+		}
+
+		if ($command) {
 			$request->params['action'] = $name;
 			$name = $command->invokeMethod('_class', array($request));
 		}

@@ -8,6 +8,7 @@
 
 namespace lithium\core;
 
+use lithium\core\Libraries;
 use lithium\util\collection\Filters;
 
 /**
@@ -87,17 +88,14 @@ class StaticObject {
 	 * in `_init` to create the dependencies used in the current class.
 	 *
 	 * @param string|object $name A `classes` key or fully-namespaced class name.
-	 * @param array $config The configuration passed to the constructor.
-	 * @return void
+	 * @param array $options The configuration passed to the constructor.
+	 * @return object
 	 */
-	protected static function _instance($name, array $config = array()) {
-		if (is_object($name) || !$name) {
-			return $name;
-		}
-		if (isset(static::$_classes[$name])) {
+	protected static function _instance($name, array $options = array()) {
+		if (is_string($name) && isset(static::$_classes[$name])) {
 			$name = static::$_classes[$name];
 		}
-		return new $name($config);
+		return Libraries::instance(null, $name, $options);
 	}
 
 	/**

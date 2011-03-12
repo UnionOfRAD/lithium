@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\core;
 
 use lithium\core\StaticObject;
+use lithium\tests\mocks\core\MockRequest;
 use lithium\tests\mocks\core\MockStaticInstantiator;
 
 class StaticObjectTest extends \lithium\test\Unit {
@@ -151,15 +152,15 @@ class StaticObjectTest extends \lithium\test\Unit {
 	}
 
 	public function testInstanceWithObject() {
-		$request = new \lithium\tests\mocks\core\MockRequest();
+		$request = new MockRequest();
 		$expected = 'lithium\tests\mocks\core\MockRequest';
 		$result = get_class(MockStaticInstantiator::instance($request));
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testInstanceFalse() {
-		$result = MockStaticInstantiator::instance(false);
-		$this->assertFalse($result);
+		$this->expectException('/^Invalid class lookup/');
+		MockStaticInstantiator::instance(false);
 	}
 }
 

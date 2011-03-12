@@ -8,9 +8,10 @@
 
 namespace lithium\console\command;
 
+use lithium\util\String;
 use lithium\core\Libraries;
 use lithium\util\Inflector;
-use lithium\util\String;
+use lithium\core\ClassNotFoundException;
 
 /**
  * The `create` command allows you to rapidly develop your models, views, controllers, and tests
@@ -112,7 +113,11 @@ class Create extends \lithium\console\Command {
 	 * @return void
 	 */
 	protected function _execute($command) {
-		if (!$class = $this->_instance($command)) {
+		try {
+			if (!$class = $this->_instance($command)) {
+				return false;
+			}
+		} catch (ClassNotFoundException $e) {
 			return false;
 		}
 		$data = array();
