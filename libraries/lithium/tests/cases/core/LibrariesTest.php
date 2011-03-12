@@ -15,8 +15,16 @@ use lithium\core\Libraries;
 
 class LibrariesTest extends \lithium\test\Unit {
 
+	protected $_cache = array();
+
+	public function setUp() {
+		$this->_cache = Libraries::cache();
+		Libraries::cache(false);
+	}
+
 	public function tearDown() {
 		Libraries::cache(false);
+		Libraries::cache($this->_cache);
 	}
 
 	public function testNamespaceToFileTranslation() {
