@@ -77,19 +77,6 @@ class Session extends \lithium\core\Adaptable {
 	}
 
 	/**
-	 * Checks the validity of a previously-started session by running several checks, including
-	 * comparing the session start time to the expiration time set in the configuration, and any
-	 * security settings.
-	 *
-	 * @todo Implement
-	 * @param string $name Named session configuration.
-	 * @return boolean Returns true if the current session is active and valid.
-	 */
-	public static function isValid($name = null) {
-
-	}
-
-	/**
 	 * Reads a value from a persistent session store.
 	 *
 	 * @param string $key Key to be read
