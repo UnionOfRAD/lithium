@@ -528,6 +528,48 @@ class Unit extends \lithium\core\Object {
 	 * @param array $headers When empty, value of `headers_list()` is used.
 	 */
 	public function assertCookie($expected, $headers = null) {
+		$matched = $this->_cookieMatch($expected, $headers);
+		if (!$matched['match']) {
+			$message = sprintf('%s - Cookie not found in headers.', $matched['pattern']);
+			$this->assert(false, $message, compact('expected', 'result'));
+			return false;
+		}
+		return $this->assert(true, '%s');
+	}
+
+	/**
+	 * Assert Cookie data is *not* set in headers.
+	 *
+	 * The value passed to `exepected` is an array of the cookie data, with at least the key and
+	 * value expected, but can support any of the following keys:
+	 * 	- `key`: the expected key
+	 * 	- `value`: the expected value
+	 * 	- `path`: optionally specifiy a path
+	 * 	- `name`: optionally specify the cookie name
+	 * 	- `expires`: optionally assert a specific expire time
+	 *
+	 * @param array $expected
+	 * @param array $headers When empty, value of `headers_list()` is used.
+	 */
+	public function assertNoCookie($expected, $headers = null) {
+		$matched = $this->_cookieMatch($expected, $headers);
+		if ($matched['match']) {
+			$message = sprintf('%s - Cookie not found in headers.', $matched['pattern']);
+			$this->assert(false, $message, compact('expected', 'result'));
+			return false;
+		}
+		return $this->assert(true, '%s');
+	}
+
+	/**
+	 * Match an `$expected` cookie with the given headers. If no headers are provided, then
+	 * the value of `headers_list()` will be used.
+	 *
+	 * @param array $expected
+	 * @param array $headers When empty, value of `headers_list()` will be used.
+	 * @return boolean True if cookie is found, false otherwise.
+	 */
+	protected function _cookieMatch($expected, $headers) {
 		$defaults = array('path' => '/', 'name' => '[\w.-]+');
 		$expected += $defaults;
 
@@ -555,15 +597,7 @@ class Unit extends \lithium\core\Object {
 				continue;
 			}
 		}
-
-		if (!$match) {
-			$this->assert(false,
-				sprintf('{:message} - Cookie %s not found in headers.', $pattern),
-				compact('expected', 'result')
-			);
-			return false;
-		}
-		return $this->assert(true, '%s');
+		return compact('match', 'pattern');
 	}
 
 	/**
