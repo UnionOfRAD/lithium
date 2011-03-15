@@ -114,11 +114,14 @@ class Cookie extends \lithium\core\Object {
 		return function($self, $params) use (&$config) {
 			$key = $params['key'];
 			if (!$key) {
-				return $_COOKIE;
+				if (isset($_COOKIE[$config['name']])) {
+					return $_COOKIE[$config['name']];
+				}
+				return array();
 			}
 			if (strpos($key, '.') !== false) {
 				$key = explode('.', $key);
-				$result = $_COOKIE[$config['name']];
+				$result = (isset($_COOKIE[$config['name']])) ? $_COOKIE[$config['name']] : array();
 
 				foreach ($key as $k) {
 					if (isset($result[$k])) {
@@ -144,13 +147,14 @@ class Cookie extends \lithium\core\Object {
 	public function write($key, $value = null, array $options = array()) {
 		$expire = (!isset($options['expire']) && empty($this->_config['expire']));
 		$config = $this->_config;
+		$cookieClass = __CLASS__;
 
 		if ($expire && $key != $config['name']) {
 			return null;
 		}
 		$expires = (isset($options['expire'])) ? $options['expire'] : $config['expire'];
 
-		return function($self, $params) use (&$config, &$expires) {
+		return function($self, $params) use (&$config, &$expires, $cookieClass) {
 			$key = $params['key'];
 			$value = $params['value'];
 			$key = array($key => $value);
@@ -159,18 +163,16 @@ class Cookie extends \lithium\core\Object {
 			}
 
 			foreach ($key as $name => $val) {
-				$name = explode('.', $name);
-				$name = $config['name'] ? array_merge(array($config['name']), $name) : $name;
-
-				if (count($name) == 1) {
-					$name = current($name);
-				} else {
-					$name = (array_shift($name) . '[' . join('][', $name) . ']');
-				}
-				setcookie($name, $val, strtotime($expires), $config['path'],
+				$name = $cookieClass::keyFormat($name, $config);
+				$result = setcookie($name, $val, strtotime($expires), $config['path'],
 					$config['domain'], $config['secure'], $config['httponly']
 				);
+
+				if (!$result) {
+					throw new RuntimeException("There was an error setting {$name} cookie.");
+				}
 			}
+			return true;
 		};
 	}
 
@@ -183,25 +185,43 @@ class Cookie extends \lithium\core\Object {
 	 */
 	public function delete($key, array $options = array()) {
 		$config = $this->_config;
+		$cookieClass = __CLASS__;
 
-		return function($self, $params) use (&$config) {
+		return function($self, $params) use (&$config, $cookieClass) {
 			$key = $params['key'];
 			$key = is_array($key) ? Set::flatten($key) : array($key);
 
 			foreach ($key as $name) {
-				$name = explode('.', $name);
-				$name = $config['name'] ? array_merge(array($config['name']), $name) : $name;
+				$name = $cookieClass::keyFormat($name, $config);
 
-				if (count($name) == 1) {
-					$name = current($name);
-				} else {
-					$name = (array_shift($name) . '[' . join('][', $name) . ']');
-				}
-				setcookie($name, "", time() - 1, $config['path'],
+				$result = setcookie($name, "", time() - 1, $config['path'],
 					$config['domain'], $config['secure'], $config['httponly']
 				);
+
+				if (!$result) {
+					throw new RuntimeException("There was an error deleting {$name} cookie.");
+				}
 			}
+			return true;
 		};
+	}
+
+	/**
+	 * Formats the given `$name` argument for use in the cookie adapter.
+	 *
+	 * @param string $name The key to be formatted, e.g. `foo.bar.baz`.
+	 * @return string The formatted key.
+	 */
+	public static function keyFormat($name, $config) {
+		$name = explode('.', $name);
+		$name = $config['name'] ? array_merge(array($config['name']), $name) : $name;
+
+		if (count($name) == 1) {
+			$name = current($name);
+		} else {
+			$name = (array_shift($name) . '[' . join('][', $name) . ']');
+		}
+		return $name;
 	}
 }
 

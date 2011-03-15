@@ -119,7 +119,7 @@ class CookieTest extends \lithium\test\Unit {
 		$this->assertEqual($value, $result);
 
 		$result = $closure($this->cookie, array('key' => null), null);
-		$this->assertEqual($_COOKIE, $result);
+		$this->assertEqual($_COOKIE[$this->name], $result);
 
 		$key = 'does_not_exist';
 		$closure = $this->cookie->read($key);
@@ -160,7 +160,7 @@ class CookieTest extends \lithium\test\Unit {
 		$this->assertEqual($value, $result);
 
 		$result = $closure($this->cookie, array('key' => null), null);
-		$this->assertEqual($_COOKIE, $result);
+		$this->assertEqual($_COOKIE[$this->name], $result);
 
 		$key = 'does_not_exist';
 		$closure = $this->cookie->read($key);
@@ -178,7 +178,7 @@ class CookieTest extends \lithium\test\Unit {
 
 		$params = compact('key');
 		$result = $closure($this->cookie, $params, null);
-		var_dump($result);
+		$this->assertNull($result);
 	}
 
 	public function testCheck() {
@@ -204,10 +204,7 @@ class CookieTest extends \lithium\test\Unit {
 
 	public function testDeleteArrayData() {
 		$key = 'user';
-		$value = array(
-			'email' => 'user@localhost',
-			'name' => 'Ali'
-		);
+		$value = array('email' => 'user@localhost', 'name' => 'Ali');
 		$_COOKIE[$this->name][$key] = $value;
 
 		$closure = $this->cookie->delete($key);
@@ -215,13 +212,13 @@ class CookieTest extends \lithium\test\Unit {
 
 		$params = compact('key');
 		$result = $closure($this->cookie, $params, null);
-		$this->assertNull($result);
+		$this->assertTrue($result);
 
-		$expected = array('key' => 'user.email', 'value' => 'deleted');
-		$this->assertCookie($expected);
+		$expected = array('key' => 'user.name', 'value' => 'Ali');
+		$this->assertNoCookie($expected);
 
-		$expected = array('key' => 'user.name', 'value' => 'deleted');
-		$this->assertCookie($expected);
+		$expected = array('key' => 'user.email', 'value' => 'user@localhost');
+		$this->assertNoCookie($expected);
 	}
 
 	public function testDeleteNonExistentValue() {
@@ -234,7 +231,7 @@ class CookieTest extends \lithium\test\Unit {
 
 		$params = compact('key');
 		$result = $closure($this->cookie, $params, null);
-		$this->assertNull($result);
+		$this->assertTrue($result);
 		$this->assertCookie(compact('key', 'value', 'path'));
 	}
 
