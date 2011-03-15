@@ -31,7 +31,12 @@ class CookieTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
-		$this->_destroyCookie();
+		$this->_destroyCookie($this->name);
+		$cookies = array_keys($_COOKIE);
+
+		foreach ($cookies as $cookie) {
+			setcookie($cookie, "", time()-1);
+		}
 	}
 
 	protected function _destroyCookie($name = null) {
@@ -275,6 +280,7 @@ class CookieTest extends \lithium\test\Unit {
 		$result = $cookie->write($key, $value)->__invoke($cookie, compact('key', 'value'), null);
 		$this->assertCookie(compact('key', 'value'));
 	}
+
 }
 
 ?>
