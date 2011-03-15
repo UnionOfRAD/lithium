@@ -202,6 +202,28 @@ class CookieTest extends \lithium\test\Unit {
 		$this->assertFalse($result);
 	}
 
+	public function testClearCookie() {
+		$key = 'clear_key';
+		$value = 'clear_value';
+		$_COOKIE[$this->name][$key] = $value;
+
+		$closure = $this->cookie->check($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->cookie, $params, null);
+		$this->assertTrue($result);
+
+		$closure = $this->cookie->clear();
+		$this->assertTrue(is_callable($closure));
+
+		$params = array();
+		$result = $closure($this->cookie, $params, null);
+		$this->assertTrue($result);
+		$this->assertNoCookie(compact('key', 'value'));
+
+	}
+
 	public function testDeleteArrayData() {
 		$key = 'user';
 		$value = array('email' => 'user@localhost', 'name' => 'Ali');

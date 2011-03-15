@@ -207,6 +207,36 @@ class Cookie extends \lithium\core\Object {
 	}
 
 	/**
+	 * Clears all cookies.
+	 *
+	 * @param array $options Options array. Not used fro this adapter method.
+	 * @return boolean True on successful clear, false otherwise.
+	 */
+	public function clear(array $options = array()) {
+		$options += array('destroySession' => true);
+		$config = $this->_config;
+
+		return function($self, $params) use (&$config, $options) {
+			$cookies = array_keys($_COOKIE);
+
+			foreach ($cookies as $cookie) {
+				$result = setcookie($cookie, "", time()-1);
+
+				if (!$result) {
+					throw new RuntimeException("There was an error clearing {$cookie} cookie.");
+				}
+			}
+			$_COOKIE = array();
+
+			if ($options['destroySession'] && session_id()) {
+				session_destroy();
+			}
+
+			return true;
+		};
+	}
+
+	/**
 	 * Formats the given `$name` argument for use in the cookie adapter.
 	 *
 	 * @param string $name The key to be formatted, e.g. `foo.bar.baz`.
