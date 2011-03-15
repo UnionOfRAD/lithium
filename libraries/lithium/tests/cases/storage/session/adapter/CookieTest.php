@@ -171,6 +171,16 @@ class CookieTest extends \lithium\test\Unit {
 		$this->assertNull($result);
 	}
 
+	public function testReadNestedKey() {
+		$key = 'User.id';
+		$closure = $this->cookie->read($key);
+		$this->assertTrue(is_callable($closure));
+
+		$params = compact('key');
+		$result = $closure($this->cookie, $params, null);
+		var_dump($result);
+	}
+
 	public function testCheck() {
 		$key = 'read';
 		$value = 'value to be read';

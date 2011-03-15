@@ -121,7 +121,9 @@ class Cookie extends \lithium\core\Object {
 				$result = $_COOKIE[$config['name']];
 
 				foreach ($key as $k) {
-					$result = $result[$k];
+					if (isset($result[$k])) {
+						$result = $result[$k];
+					}
 				}
 				return ($result !== array()) ? $result : null;
 			}
