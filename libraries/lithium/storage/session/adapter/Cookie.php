@@ -185,19 +185,25 @@ class Cookie extends \lithium\core\Object {
 	 */
 	public function delete($key, array $options = array()) {
 		$config = $this->_config;
-		$cookieClass = __CLASS__;
+		$cookieClass = get_called_class();
 
 		return function($self, $params) use (&$config, $cookieClass) {
 			$key = $params['key'];
-			$key = is_array($key) ? Set::flatten($key) : array($key);
-
-			foreach ($key as $name) {
+			$path = '/' . str_replace('.', '/', $config['name'] . '.' . $key) . '/.';
+			$cookies = current(Set::extract($_COOKIE, $path));
+			if (is_array($cookies)) {
+				$cookies = array_keys(Set::flatten($cookies));
+				foreach ($cookies as &$name) {
+					$name = $key . '.' . $name;
+				}
+			} else {
+				$cookies = array($key);
+			}
+			foreach ($cookies as &$name) {
 				$name = $cookieClass::keyFormat($name, $config);
-
-				$result = setcookie($name, "", time() - 1, $config['path'],
+				$result = setcookie($name, "", 1, $config['path'],
 					$config['domain'], $config['secure'], $config['httponly']
 				);
-
 				if (!$result) {
 					throw new RuntimeException("There was an error deleting {$name} cookie.");
 				}
