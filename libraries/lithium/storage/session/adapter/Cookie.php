@@ -243,15 +243,7 @@ class Cookie extends \lithium\core\Object {
 	 * @return string The formatted key.
 	 */
 	public static function keyFormat($name, $config) {
-		$name = explode('.', $name);
-		$name = $config['name'] ? array_merge(array($config['name']), $name) : $name;
-
-		if (count($name) == 1) {
-			$name = current($name);
-		} else {
-			$name = (array_shift($name) . '[' . join('][', $name) . ']');
-		}
-		return $name;
+		return $config['name'] . '[' . str_replace('.', '][', $name) . ']';
 	}
 }
 
