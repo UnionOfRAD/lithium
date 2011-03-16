@@ -221,23 +221,26 @@ class Cookie extends \lithium\core\Object {
 	public function clear(array $options = array()) {
 		$options += array('destroySession' => true);
 		$config = $this->_config;
+		$cookieClass = get_called_class();
 
-		return function($self, $params) use (&$config, $options) {
-			$cookies = array_keys($_COOKIE);
-
-			foreach ($cookies as $cookie) {
-				$result = setcookie($cookie, "", time()-1);
-
+		return function($self, $params) use (&$config, $options, $cookieClass) {
+			if ($options['destroySession'] && session_id()) {
+				session_destroy();
+			}
+			if (!isset($_COOKIE[$config['name']])) {
+				return true;
+			}
+			$cookies = array_keys(Set::flatten($_COOKIE[$config['name']]));
+			foreach ($cookies as $name) {
+				$name = $cookieClass::keyFormat($name, $config);
+				$result = setcookie($name, "", 1, $config['path'],
+					$config['domain'], $config['secure'], $config['httponly']
+				);
 				if (!$result) {
 					throw new RuntimeException("There was an error clearing {$cookie} cookie.");
 				}
 			}
-			$_COOKIE = array();
-
-			if ($options['destroySession'] && session_id()) {
-				session_destroy();
-			}
-
+			unset($_COOKIE[$config['name']]);
 			return true;
 		};
 	}
