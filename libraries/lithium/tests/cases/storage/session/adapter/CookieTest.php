@@ -241,11 +241,11 @@ class CookieTest extends \lithium\test\Unit {
 		$result = $closure($this->cookie, $params, null);
 		$this->assertTrue($result);
 
-		$expected = array('key' => 'user.name', 'value' => 'Ali');
-		$this->assertNoCookie($expected);
+		$expected = array('key' => 'user.name', 'value' => 'deleted');
+		$this->assertCookie($expected);
 
-		$expected = array('key' => 'user.email', 'value' => 'user@localhost');
-		$this->assertNoCookie($expected);
+		$expected = array('key' => 'user.email', 'value' => 'deleted');
+		$this->assertCookie($expected);
 	}
 
 	public function testDeleteNonExistentValue() {
