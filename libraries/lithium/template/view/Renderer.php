@@ -10,6 +10,7 @@ namespace lithium\template\view;
 
 use RuntimeException;
 use lithium\core\Libraries;
+use lithium\core\ClassNotFoundException;
 
 /**
  * The `Renderer` abstract class serves as a base for all concrete `Renderer` adapters.
@@ -290,11 +291,16 @@ abstract class Renderer extends \lithium\core\Object {
 	 * @param array $config
 	 * @return object
 	 */
-	public function helper($name, $config = array()) {
-		if ($class = Libraries::locate('helper', ucfirst($name))) {
-			return $this->_helpers[$name] = new $class($config + array('context' => $this));
+	public function helper($name, array $config = array()) {
+		if (isset($this->_helpers[$name])) {
+			return $this->_helpers[$name];
 		}
-		throw new RuntimeException("Helper `{$name}` not found.");
+		try {
+			$config += array('context' => $this);
+			return $this->_helpers[$name] = Libraries::instance('helper', ucfirst($name), $config);
+		} catch (ClassNotFoundException $e) {
+			throw new RuntimeException("Helper `{$name}` not found.");
+		}
 	}
 
 	/**
@@ -383,7 +389,10 @@ abstract class Renderer extends \lithium\core\Object {
 		if (!(isset($this->_handlers[$name]) && $handler = $this->_handlers[$name])) {
 			return $value;
 		}
+
 		switch (true) {
+			case is_string($handler) && !$helper:
+				$helper = $this->helper('html');
 			case is_string($handler) && is_object($helper):
 				return $helper->invokeMethod($handler, array($value, $method, $options));
 			case is_array($handler) && is_object($handler[0]):

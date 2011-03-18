@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\template\view;
 
+use stdClass;
 use lithium\template\View;
 use lithium\action\Request;
 use lithium\action\Response;
@@ -15,7 +16,6 @@ use lithium\template\Helper;
 use lithium\template\helper\Html;
 use lithium\template\view\adapter\Simple;
 use lithium\net\http\Router;
-use stdClass;
 
 class RendererTest extends \lithium\test\Unit {
 
@@ -61,6 +61,12 @@ class RendererTest extends \lithium\test\Unit {
 		$this->assertEqual(array(), $this->subject->scripts);
 		$this->assertNull($this->subject->foo());
 		$this->assertFalse(isset($this->subject->foo));
+
+		$result = $this->subject->title("<script>alert('XSS');</script>");
+		$this->assertEqual('&lt;script&gt;alert(&#039;XSS&#039;);&lt;/script&gt;', $result);
+
+		$result = $this->subject->title();
+		$this->assertEqual('&lt;script&gt;alert(&#039;XSS&#039;);&lt;/script&gt;', $result);
 
 		$this->subject = new Simple(array('context' => array(
 			'content' => '', 'title' => '', 'scripts' => array(), 'styles' => array(), 'foo' => '!'
@@ -199,11 +205,11 @@ class RendererTest extends \lithium\test\Unit {
 		$result = $this->subject->data();
 		$this->assertEqual($data, $result);
 
-		$result = $this->subject->set(array('more' => new StdClass()));
+		$result = $this->subject->set(array('more' => new stdClass()));
 		$this->assertNull($result);
 
 		$result = $this->subject->data();
-		$this->assertEqual($data + array('more' => new StdClass()), $result);
+		$this->assertEqual($data + array('more' => new stdClass()), $result);
 	}
 
 	/**
