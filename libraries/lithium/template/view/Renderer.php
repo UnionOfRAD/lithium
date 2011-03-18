@@ -202,7 +202,6 @@ abstract class Renderer extends \lithium\core\Object {
 				return $classes['media']::asset($path, $type, $options + $defaults);
 			},
 			'options' => '_attributes',
-			'content' => 'escape',
 			'title'   => 'escape',
 			'scripts' => function($scripts) use (&$context) {
 				return "\n\t" . join("\n\t", $context['scripts']) . "\n";

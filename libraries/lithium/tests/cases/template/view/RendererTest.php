@@ -39,9 +39,7 @@ class RendererTest extends \lithium\test\Unit {
 	}
 
 	public function testInitialization() {
-		$expected = array(
-			'url', 'path', 'options', 'content', 'title', 'scripts', 'styles', 'head'
-		);
+		$expected = array('url', 'path', 'options', 'title', 'scripts', 'styles', 'head');
 		$result = array_keys($this->subject->handlers());
 		$this->assertEqual($expected, $result);
 
@@ -102,9 +100,7 @@ class RendererTest extends \lithium\test\Unit {
 
 		$foo = function($value) { return "Foo: {$value}"; };
 
-		$expected = array(
-			'url', 'path', 'options', 'content', 'title', 'scripts', 'styles', 'head', 'foo'
-		);
+		$expected = array('url', 'path', 'options', 'title', 'scripts', 'styles', 'head', 'foo');
 		$result = array_keys($this->subject->handlers(compact('foo')));
 		$this->assertEqual($expected, $result);
 
