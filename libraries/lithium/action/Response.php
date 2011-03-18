@@ -107,10 +107,7 @@ class Response extends \lithium\net\http\Response {
 		if (isset($this->headers['location']) && $this->status['code'] === 200) {
 			$code = 302;
 		}
-		if (!$status = $this->status($code)) {
-			throw new UnexpectedValueException('Invalid status code.');
-		}
-		$this->_writeHeader($status);
+		$this->_writeHeader($this->status($code) ?: $this->status(500));
 
 		foreach ($this->headers as $name => $value) {
 			$key = strtolower($name);

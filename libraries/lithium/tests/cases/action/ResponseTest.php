@@ -113,12 +113,12 @@ class ResponseTest extends \lithium\test\Unit {
 		$result = ob_get_clean();
 		$this->assertEqual(array('HTTP/1.1 303 See Other'), $this->response->testHeaders);
 
-		$this->expectException('/Invalid status code/');
 		$this->response->status('foobar');
 		ob_start();
 		$this->response->render();
 		$result = ob_get_clean();
-		$this->assertFalse($this->response->testHeaders);
+		$expected = array('HTTP/1.1 500 Internal Server Error');
+		$this->assertEqual($expected, $this->response->testHeaders);
 	}
 
 	/**
