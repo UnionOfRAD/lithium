@@ -17,10 +17,10 @@ use UnexpectedValueException;
  * will simply generate HTML forms and widgets, but by creating a form with a _binding object_,
  * the helper can pre-fill form input values, render error messages, and introspect column types.
  *
- * For example, assuming you have created a `Post` model in your application:
+ * For example, assuming you have created a `Posts` model in your application:
  * {{{// In controller code:
- * use app\models\Post;
- * $post = Post::find(1);
+ * use app\models\Posts;
+ * $post = Posts::find(1);
  * return compact('post');
  *
  * // In view code:
