@@ -223,7 +223,9 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::match("Posts::index");
 		$this->assertEqual('/posts', $result);
 
-		$this->expectException('No parameter match found for routes.');
+		$ex = "No parameter match found for URL ";
+		$ex .= "`('controller' => 'sessions', 'action' => 'create', 'id' => 'foo')`.";
+		$this->expectException($ex);
 		$result = Router::match(array("Sessions::create", 'id' => 'foo'));
 	}
 
@@ -242,7 +244,10 @@ class RouterTest extends \lithium\test\Unit {
 		$expected = '/posts/4bbf25bd8ead0e5180130000';
 		$this->assertEqual($expected, $result);
 
-		$this->expectException('No parameter match found for routes.');
+		$ex = "No parameter match found for URL `(";
+		$ex .= "'controller' => 'posts', 'action' => 'view', 'id' => '4bbf25bd8ead0e5180130000')`.";
+		$this->expectException($ex);
+
 		$result = Router::match(array(
 			'controller' => 'posts', 'action' => 'view', 'id' => '4bbf25bd8ead0e5180130000'
 		));
@@ -292,7 +297,10 @@ class RouterTest extends \lithium\test\Unit {
 		Router::connect('/login', array('controller' => 'sessions', 'action' => 'add'));
 		$result = Router::match(array('controller' => 'sessions', 'action' => 'add'));
 		$this->assertEqual('/login', $result);
-		$this->expectException('No parameter match found for routes.');
+
+		$this->expectException(
+			"No parameter match found for URL `('controller' => 'sessions', 'action' => 'index')`."
+		);
 		Router::match(array('controller' => 'sessions', 'action' => 'index'));
 	}
 
@@ -305,7 +313,9 @@ class RouterTest extends \lithium\test\Unit {
 		Router::connect('/{:controller}');
 		$this->assertEqual('/posts', Router::match(array('controller' => 'posts')));
 
-		$this->expectException('No parameter match found for routes.');
+		$this->expectException(
+			"No parameter match found for URL `('controller' => 'posts', 'action' => 'view')`."
+		);
 		Router::match(array('controller' => 'posts', 'action' => 'view'));
 	}
 
@@ -330,7 +340,9 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::match(array('controller' => 'posts', 'action' => 'view'));
 		$this->assertEqual('/posts/view', $result);
 
-		$this->expectException('No parameter match found for routes.');
+		$ex = "No parameter match found for URL ";
+		$ex .= "`('controller' => 'posts', 'action' => 'view', 'id' => '2')`.";
+		$this->expectException($ex);
 		Router::match(array('controller' => 'posts', 'action' => 'view', 'id' => '2'));
 	}
 

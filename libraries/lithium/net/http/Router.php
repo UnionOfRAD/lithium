@@ -189,9 +189,9 @@ class Router extends \lithium\core\StaticObject {
 	 *         prefixed with the base URL of the application.
 	 */
 	public static function match($url = array(), $context = null, array $options = array()) {
-		if (is_string($path = $url)) {
-			if (strpos($path, '#') === 0 || strpos($path, 'mailto') === 0 || strpos($path, '://')) {
-				return $path;
+		if (is_string($url)) {
+			if (strpos($url, '#') === 0 || strpos($url, 'mailto') === 0 || strpos($url, '://')) {
+				return $url;
 			}
 			if (is_string($url = static::_parseString($url, $context))) {
 				return static::_prefix($url, $context, $options);
@@ -217,7 +217,10 @@ class Router extends \lithium\core\StaticObject {
 			$path = ($options) ? static::_prefix($path, $context, $options) : $path;
 			return $path ?: '/';
 		}
-		throw new RoutingException("No parameter match found for routes.");
+		$match = array("\n", 'array (', ',)', '=> NULL', '(  \'', ',  ');
+		$replace = array('', '(', ')', '=> null', '(\'', ', ');
+		$url = str_replace($match, $replace, var_export($url, true));
+		throw new RoutingException("No parameter match found for URL `{$url}`.");
 	}
 
 	/**
