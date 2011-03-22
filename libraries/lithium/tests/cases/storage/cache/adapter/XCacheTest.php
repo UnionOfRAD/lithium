@@ -241,7 +241,7 @@ class XCacheTest extends \lithium\test\Unit {
 	}
 
 	public function testDecrement() {
-		$time = strtotime('+1 minute');
+		$time = strtotime('+1 minute') - time();
 		$key = 'decrement';
 		$value = 10;
 
@@ -263,7 +263,7 @@ class XCacheTest extends \lithium\test\Unit {
 	}
 
 	public function testDecrementNonIntegerValue() {
-		$time = strtotime('+1 minute');
+		$time = strtotime('+1 minute') - time();
 		$key = 'non_integer';
 		$value = 'no';
 
@@ -293,7 +293,7 @@ class XCacheTest extends \lithium\test\Unit {
 	}
 
 	public function testIncrement() {
-		$time = strtotime('+1 minute');
+		$time = strtotime('+1 minute') - time();
 		$key = 'increment';
 		$value = 10;
 
