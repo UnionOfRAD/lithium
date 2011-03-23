@@ -57,6 +57,17 @@ class Sqlite3 extends \lithium\data\source\Database {
 	);
 
 	/**
+	 * Holds commonly regular expressions used in this class.
+	 *
+	 * @see lithium\data\source\database\adapter\Sqlite3::describe()
+	 * @see lithium\data\source\database\adapter\Sqlite3::_column()
+	 * @var array
+	 */
+	protected $_regex = array(
+		'column' => '(?P<type>[^(]+)(?:\((?P<length>[^)]+)\))?'
+	);
+
+	/**
 	 * Constructs the Sqlite adapter
 	 *
 	 * @see lithium\data\source\Database::__construct()
@@ -169,8 +180,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 			$fields = array();
 
 			foreach ($columns as $column) {
-				$regex = '(?P<type>[a-zA-Z]+)+(\((?P<length>[0-9]+)\))?';
-				preg_match("/{$regex}/", $column['type'], $matches);
+				preg_match("/{$this->_regex['column']}/", $column['type'], $matches);
 
 				$fields[$column['name']] = array(
 					'type' => isset($matches['type']) ? $matches['type'] : null,
@@ -297,7 +307,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 			return $real['type'] . (isset($real['length']) ? "({$real['length']})" : '');
 		}
 
-		if (!preg_match('/(?P<type>[^(]+)(?:\((?P<length>[^)]+)\))?/', $real, $column)) {
+		if (!preg_match("/{$this->_regex['column']}/", $real, $column)) {
 			return $real;
 		}
 		$column = array_intersect_key($column, array('type' => null, 'length' => null));
