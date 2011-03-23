@@ -29,7 +29,7 @@ class Result extends \lithium\data\source\database\Result {
 			return;
 		}
 
-		if(is_callable(array($this->_resource, $name))) {
+		if (is_callable(array($this->_resource, $name))) {
 			return call_user_method_array($name, $this->_resource, $arguments);
 		}
 	}
