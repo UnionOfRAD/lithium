@@ -73,7 +73,7 @@ class GettextTest extends \lithium\test\Unit {
 				),
 				'comments' => array(
 					'comment 1'
-				),
+				)
 			)
 		);
 
@@ -158,7 +158,7 @@ EOD;
 				'flags' => array(),
 				'translated' => array('translated 1-0', 'translated 1-1'),
 				'occurrences' => array(),
-				'comments' => array(),
+				'comments' => array()
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
@@ -244,7 +244,7 @@ EOD;
 				'comments' => array(
 					'extracted comment',
 					'translator comment'
-				),
+				)
 			)
 		);
 		$po = <<<EOD
@@ -463,7 +463,7 @@ EOD;
 				'flags' => array(),
 				'translated' => array('translated 1'),
 				'occurrences' => array(),
-				'comments' => array(),
+				'comments' => array()
 			)
 		);
 		$this->adapter->write('message', 'de', null, $data);
@@ -478,7 +478,7 @@ EOD;
 				'flags' => array(),
 				'translated' => array(),
 				'occurrences' => array(),
-				'comments' => array(),
+				'comments' => array()
 			)
 		);
 		$this->adapter->write('messageTemplate', 'root', null, $data);
@@ -499,7 +499,7 @@ EOD;
 				),
 				'comments' => array(
 					'comment 1'
-				),
+				)
 			)
 		);
 

@@ -41,7 +41,7 @@ class ValidatorTest extends \lithium\test\Unit {
 
 		$fieldValidationRules = array(
 			'number' => array('rule' => array('isInArray')),
-			'name' => array('rule' => array('isInArray')),
+			'name' => array('rule' => array('isInArray'))
 		);
 
 		$result = Validator::check(
@@ -987,7 +987,7 @@ class ValidatorTest extends \lithium\test\Unit {
 			'title' => 'please enter a title',
 			'email' => array(
 				array('notEmpty', 'message' => 'email is empty'),
-				array('email', 'message' => 'email is not valid'),
+				array('email', 'message' => 'email is not valid')
 			)
 		);
 		$data = array('email' => 'something');
@@ -1007,7 +1007,7 @@ class ValidatorTest extends \lithium\test\Unit {
 			'title' => 'please enter a title',
 			'email' => array(
 				array('notEmpty', 'message' => 'email is empty'),
-				array('email', 'message' => 'email is not valid'),
+				array('email', 'message' => 'email is not valid')
 			)
 		);
 		$data = array('title' => 'new title', 'email' => 'something');
@@ -1023,7 +1023,7 @@ class ValidatorTest extends \lithium\test\Unit {
 			'title' => 'please enter a title',
 			'email' => array(
 				array('notEmpty', 'message' => 'email is empty'),
-				array('email', 'message' => 'email is not valid'),
+				array('email', 'message' => 'email is not valid')
 			)
 		);
 		$data = array('title' => 'new title', 'email' => 'something@test.com');

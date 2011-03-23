@@ -343,7 +343,7 @@ class RequestTest extends \lithium\test\Unit {
 				'type' => 'image/jpeg',
 				'tmp_name' => '/private/var/tmp/phpows38J',
 				'error' => 0,
-				'size' => 418,
+				'size' => 418
 		  	)
 		);
 		$request = new Request();
@@ -353,7 +353,7 @@ class RequestTest extends \lithium\test\Unit {
 			'type' => 'image/jpeg',
 			'tmp_name' => '/private/var/tmp/phpows38J',
 			'error' => 0,
-			'size' => 418,
+			'size' => 418
 		));
 		$result = $request->data;
 		$this->assertEqual($expected, $result);
@@ -367,27 +367,27 @@ class RequestTest extends \lithium\test\Unit {
 				'name' => array(
 			  		0 => 'file 2.jpg',
 			  		1 => 'file 3.jpg',
-			  		2 => 'file 4.jpg',
+			  		2 => 'file 4.jpg'
 				),
 				'type' => array(
 			  		0 => 'image/jpeg',
 			  		1 => 'image/jpeg',
-			  		2 => 'image/jpeg',
+			  		2 => 'image/jpeg'
 				),
 				'tmp_name' => array(
 			  		0 => '/private/var/tmp/phpF5vsky',
 			  		1 => '/private/var/tmp/phphRJ2zW',
-			  		2 => '/private/var/tmp/phprI92L1',
+			  		2 => '/private/var/tmp/phprI92L1'
 				),
 				'error' => array(
 			  		0 => 0,
 			  		1 => 0,
-			  		2 => 0,
+			  		2 => 0
 				),
 				'size' => array(
 			  		0 => 418,
 			  		1 => 418,
-			  		2 => 418,
+			  		2 => 418
 				)
 			)
 		);
@@ -399,22 +399,22 @@ class RequestTest extends \lithium\test\Unit {
 				'type' => 'image/jpeg',
 				'tmp_name' => '/private/var/tmp/phpF5vsky',
 				'error' => 0,
-				'size' => 418,
+				'size' => 418
 			),
 			1 => array(
 				'name' => 'file 3.jpg',
 				'type' => 'image/jpeg',
 				'tmp_name' => '/private/var/tmp/phphRJ2zW',
 				'error' => 0,
-				'size' => 418,
+				'size' => 418
 			),
 			2 => array(
 				'name' => 'file 4.jpg',
 				'type' => 'image/jpeg',
 				'tmp_name' => '/private/var/tmp/phprI92L1',
 				'error' => 0,
-				'size' => 418,
-			),
+				'size' => 418
+			)
 		));
 		$result = $request->data;
 		$this->assertEqual($expected, $result);
@@ -425,20 +425,20 @@ class RequestTest extends \lithium\test\Unit {
 	public function testNestedFilesNormalization() {
 		$_FILES = array('Image' => array(
 			'name' => array(
-		  		'file' => 'file 5.jpg',
+		  		'file' => 'file 5.jpg'
 			),
 			'type' => array(
-		  		'file' => 'image/jpeg',
+		  		'file' => 'image/jpeg'
 			),
 			'tmp_name' => array(
-		  		'file' => '/private/var/tmp/phpAmSDL4',
+		  		'file' => '/private/var/tmp/phpAmSDL4'
 			),
 			'error' => array(
-		  		'file' => 0,
+		  		'file' => 0
 			),
 			'size' => array(
-		  		'file' => 418,
-			),
+		  		'file' => 418
+			)
 	  	));
 		$request = new Request();
 
@@ -448,7 +448,7 @@ class RequestTest extends \lithium\test\Unit {
 				'type' => 'image/jpeg',
 				'tmp_name' => '/private/var/tmp/phpAmSDL4',
 				'error' => 0,
-				'size' => 418,
+				'size' => 418
 		  	)
 		));
 
@@ -464,35 +464,35 @@ class RequestTest extends \lithium\test\Unit {
 		  		'files' => array(
 					0 => 'file 6.jpg',
 					1 => 'file 7.jpg',
-					2 => 'file 8.jpg',
-		  		),
+					2 => 'file 8.jpg'
+		  		)
 			),
 			'type' => array(
 		  		'files' => array(
 					0 => 'image/jpeg',
 					1 => 'image/jpeg',
-					2 => 'image/jpeg',
-		  		),
+					2 => 'image/jpeg'
+		  		)
 			),
 			'tmp_name' => array(
 		  		'files' => array(
 					0 => '/private/var/tmp/php2eViak',
 					1 => '/private/var/tmp/phpMsC5Pp',
-					2 => '/private/var/tmp/phpm2nm98',
-		  		),
+					2 => '/private/var/tmp/phpm2nm98'
+		  		)
 			),
 			'error' => array(
 				'files' => array(
 					0 => 0,
 					1 => 0,
-					2 => 0,
-		  		),
+					2 => 0
+		  		)
 			),
 			'size' => array(
 		  		'files' => array(
 					0 => 418,
 					1 => 418,
-					2 => 418,
+					2 => 418
 		  		)
 			)
 		));
@@ -505,22 +505,22 @@ class RequestTest extends \lithium\test\Unit {
 					'type' => 'image/jpeg',
 					'tmp_name' => '/private/var/tmp/php2eViak',
 					'error' => 0,
-					'size' => 418,
+					'size' => 418
 				),
 				1 => array(
 					'name' => 'file 7.jpg',
 					'type' => 'image/jpeg',
 					'tmp_name' => '/private/var/tmp/phpMsC5Pp',
 					'error' => 0,
-					'size' => 418,
+					'size' => 418
 				),
 				2 => array(
 					'name' => 'file 8.jpg',
 					'type' => 'image/jpeg',
 					'tmp_name' => '/private/var/tmp/phpm2nm98',
 					'error' => 0,
-					'size' => 418,
-				),
+					'size' => 418
+				)
 		  	)
 		));
 		$result = $request->data;
@@ -536,89 +536,89 @@ class RequestTest extends \lithium\test\Unit {
 				'type' => 'image/jpeg',
 				'tmp_name' => '/private/var/tmp/phpows38J',
 				'error' => 0,
-				'size' => 418,
+				'size' => 418
 		  	),
 		  	'files' =>  array(
 				'name' => array(
 			  		0 => 'file 2.jpg',
 			  		1 => 'file 3.jpg',
-			  		2 => 'file 4.jpg',
+			  		2 => 'file 4.jpg'
 				),
 				'type' => array(
 			  		0 => 'image/jpeg',
 			  		1 => 'image/jpeg',
-			  		2 => 'image/jpeg',
+			  		2 => 'image/jpeg'
 				),
 				'tmp_name' => array(
 			  		0 => '/private/var/tmp/phpF5vsky',
 			  		1 => '/private/var/tmp/phphRJ2zW',
-			  		2 => '/private/var/tmp/phprI92L1',
+			  		2 => '/private/var/tmp/phprI92L1'
 				),
 				'error' => array(
 			  		0 => 0,
 			  		1 => 0,
-			  		2 => 0,
+			  		2 => 0
 				),
 				'size' => array(
 			  		0 => 418,
 			  		1 => 418,
-			  		2 => 418,
-				),
+			  		2 => 418
+				)
 		  	),
 		  	'Image' => array(
 				'name' => array(
-			  		'file' => 'file 5.jpg',
+			  		'file' => 'file 5.jpg'
 				),
 				'type' => array(
-			  		'file' => 'image/jpeg',
+			  		'file' => 'image/jpeg'
 				),
 				'tmp_name' => array(
-			  		'file' => '/private/var/tmp/phpAmSDL4',
+			  		'file' => '/private/var/tmp/phpAmSDL4'
 				),
 				'error' => array(
-			  		'file' => 0,
+			  		'file' => 0
 				),
 				'size' => array(
-			  		'file' => 418,
-				),
+			  		'file' => 418
+				)
 		  	),
 		  	'Photo' => array(
 				'name' => array(
 			  		'files' => array(
 						0 => 'file 6.jpg',
 						1 => 'file 7.jpg',
-						2 => 'file 8.jpg',
-			  		),
+						2 => 'file 8.jpg'
+			  		)
 				),
 				'type' => array(
 			  		'files' => array(
 						0 => 'image/jpeg',
 						1 => 'image/jpeg',
-						2 => 'image/jpeg',
-			  		),
+						2 => 'image/jpeg'
+			  		)
 				),
 				'tmp_name' => array(
 			  		'files' => array(
 						0 => '/private/var/tmp/php2eViak',
 						1 => '/private/var/tmp/phpMsC5Pp',
-						2 => '/private/var/tmp/phpm2nm98',
-			  		),
+						2 => '/private/var/tmp/phpm2nm98'
+			  		)
 				),
 				'error' => array(
 					'files' => array(
 						0 => 0,
 						1 => 0,
-						2 => 0,
-			  		),
+						2 => 0
+			  		)
 				),
 				'size' => array(
 			  		'files' => array(
 						0 => 418,
 						1 => 418,
-						2 => 418,
-			  		),
-				),
-		  	),
+						2 => 418
+			  		)
+				)
+		  	)
 		);
 		$expected = array(
 			'file' => array(
@@ -626,7 +626,7 @@ class RequestTest extends \lithium\test\Unit {
 				'type' => 'image/jpeg',
 				'tmp_name' => '/private/var/tmp/phpows38J',
 				'error' => 0,
-				'size' => 418,
+				'size' => 418
 		  	),
 			'files' => array(
 				0 => array(
@@ -634,22 +634,22 @@ class RequestTest extends \lithium\test\Unit {
 					'type' => 'image/jpeg',
 					'tmp_name' => '/private/var/tmp/phpF5vsky',
 					'error' => 0,
-					'size' => 418,
+					'size' => 418
 				),
 				1 => array(
 					'name' => 'file 3.jpg',
 					'type' => 'image/jpeg',
 					'tmp_name' => '/private/var/tmp/phphRJ2zW',
 					'error' => 0,
-					'size' => 418,
+					'size' => 418
 				),
 				2 => array(
 					'name' => 'file 4.jpg',
 					'type' => 'image/jpeg',
 					'tmp_name' => '/private/var/tmp/phprI92L1',
 					'error' => 0,
-					'size' => 418,
-				),
+					'size' => 418
+				)
 			),
 			'Image' => array(
 				'file' => array(
@@ -657,7 +657,7 @@ class RequestTest extends \lithium\test\Unit {
 					'type' => 'image/jpeg',
 					'tmp_name' => '/private/var/tmp/phpAmSDL4',
 					'error' => 0,
-					'size' => 418,
+					'size' => 418
 			  	)
 			),
 			'Photo' => array(
@@ -667,22 +667,22 @@ class RequestTest extends \lithium\test\Unit {
 						'type' => 'image/jpeg',
 						'tmp_name' => '/private/var/tmp/php2eViak',
 						'error' => 0,
-						'size' => 418,
+						'size' => 418
 					),
 					1 => array(
 						'name' => 'file 7.jpg',
 						'type' => 'image/jpeg',
 						'tmp_name' => '/private/var/tmp/phpMsC5Pp',
 						'error' => 0,
-						'size' => 418,
+						'size' => 418
 					),
 					2 => array(
 						'name' => 'file 8.jpg',
 						'type' => 'image/jpeg',
 						'tmp_name' => '/private/var/tmp/phpm2nm98',
 						'error' => 0,
-						'size' => 418,
-					),
+						'size' => 418
+					)
 			  	)
 			)
 		);

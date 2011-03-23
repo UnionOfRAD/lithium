@@ -142,7 +142,7 @@ abstract class Database extends \lithium\data\Source {
 			'host'       => 'localhost',
 			'login'      => 'root',
 			'password'   => '',
-			'database'   => null,
+			'database'   => null
 		);
 		$this->_strings += array(
 			'read' => 'SELECT {:fields} FROM {:source} {:alias} {:joins} {:conditions} {:group} ' .
@@ -280,7 +280,7 @@ abstract class Database extends \lithium\data\Source {
 					return $records;
 				case 'item':
 					return $self->item($query->model(), array(), compact('query', 'result') + array(
-						'class' => 'set',
+						'class' => 'set'
 					));
 			}
 		});

@@ -66,7 +66,7 @@ class MongoDb extends \lithium\data\Source {
 		'set'      => 'lithium\data\collection\DocumentSet',
 		'result'   => 'lithium\data\source\mongo_db\Result',
 		'exporter' => 'lithium\data\source\mongo_db\Exporter',
-		'relationship' => 'lithium\data\model\Relationship',
+		'relationship' => 'lithium\data\model\Relationship'
 	);
 
 	/**
@@ -84,7 +84,7 @@ class MongoDb extends \lithium\data\Source {
 		'or'  => '$or',
 		'||'  => '$or',
 		'not' => '$not',
-		'!'   =>  '$not',
+		'!'   =>  '$not'
 	);
 
 	/**
@@ -151,7 +151,7 @@ class MongoDb extends \lithium\data\Source {
 			'timeout'    => 100,
 			'replicaSet' => false,
 			'schema'     => null,
-			'gridPrefix' => 'fs',
+			'gridPrefix' => 'fs'
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -176,7 +176,7 @@ class MongoDb extends \lithium\data\Source {
 			'float'   => function($v) { return (float) $v; },
 			'boolean' => function($v) { return (boolean) $v; },
 			'code'    => function($v) { return new MongoCode($v); },
-			'binary'  => function($v) { return new MongoBinData($v); },
+			'binary'  => function($v) { return new MongoBinData($v); }
 		);
 	}
 
@@ -209,7 +209,7 @@ class MongoDb extends \lithium\data\Source {
 			'arrays' => true,
 			'transactions' => false,
 			'booleans' => true,
-			'relationships' => true,
+			'relationships' => true
 		);
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}

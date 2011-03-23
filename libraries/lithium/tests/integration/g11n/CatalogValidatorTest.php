@@ -43,7 +43,7 @@ class CatalogValidatorTest extends \lithium\test\Unit {
 	public function testMultipleRules() {
 		$data = array(
 			'postalCode' => '/postalCode en_US/',
-			'phone' => '/phone en_US/',
+			'phone' => '/phone en_US/'
 		);
 		Catalog::write('runtime', 'validation', 'en_US', $data);
 

@@ -32,7 +32,7 @@ class ExporterTest extends \lithium\test\Unit {
 		'rank' => array('type' => 'float', 'default' => 0.0),
 		'notifications.foo' => array('type' => 'boolean'),
 		'notifications.bar' => array('type' => 'boolean'),
-		'notifications.baz' => array('type' => 'boolean'),
+		'notifications.baz' => array('type' => 'boolean')
 	);
 
 	protected $_handlers = array();
@@ -55,7 +55,7 @@ class ExporterTest extends \lithium\test\Unit {
 			'float'   => function($v) { return (float) $v; },
 			'boolean' => function($v) { return (boolean) $v; },
 			'code'    => function($v) { return new MongoCode($v); },
-			'binary'  => function($v) { return new MongoBinData($v); },
+			'binary'  => function($v) { return new MongoBinData($v); }
 		);
 		$model = $this->_model;
 		$model::resetConnection(true);

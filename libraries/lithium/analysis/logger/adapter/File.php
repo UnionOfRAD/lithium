@@ -56,7 +56,7 @@ class File extends \lithium\core\Object {
 			'path' => Libraries::get(true, 'resources') . '/tmp/logs',
 			'timestamp' => 'Y-m-d H:i:s',
 			'file' => function($data, $config) { return "{$data['priority']}.log"; },
-			'format' => "{:timestamp} {:message}\n",
+			'format' => "{:timestamp} {:message}\n"
 		);
 		parent::__construct($config + $defaults);
 	}

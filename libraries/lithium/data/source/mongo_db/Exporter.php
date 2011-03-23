@@ -19,7 +19,7 @@ class Exporter extends \lithium\core\StaticObject {
 		'MongoBinData' => 'binary',
 		'datetime'     => 'date',
 		'timestamp'    => 'date',
-		'int'          => 'integer',
+		'int'          => 'integer'
 	);
 
 	public static function get($type, $export, array $options = array()) {
@@ -85,7 +85,7 @@ class Exporter extends \lithium\core\StaticObject {
 			'update'    => '$set',
 			'increment' => '$inc',
 			'remove'    => '$unset',
-			'rename'    => '$rename',
+			'rename'    => '$rename'
 		);
 		$result = array();
 

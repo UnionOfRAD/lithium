@@ -100,7 +100,7 @@ class Message extends \lithium\core\StaticObject {
 			'locale' => Environment::get('locale'),
 			'scope' => null,
 			'default' => null,
-			'noop' => false,
+			'noop' => false
 		);
 		extract($options + $defaults);
 

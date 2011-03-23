@@ -741,7 +741,7 @@ class Model extends \lithium\core\StaticObject {
 			'validate' => true,
 			'whitelist' => null,
 			'callbacks' => true,
-			'locked' => $self->_meta['locked'],
+			'locked' => $self->_meta['locked']
 		);
 		$options += $defaults;
 		$params = compact('entity', 'data', 'options');
@@ -820,7 +820,7 @@ class Model extends \lithium\core\StaticObject {
 	public function validates($entity, array $options = array()) {
 		$defaults = array(
 			'rules' => $this->validates,
-			'events' => $entity->exists() ? 'update' : 'create',
+			'events' => $entity->exists() ? 'update' : 'create'
 		);
 		$options += $defaults;
 		$self = static::_object();

@@ -189,7 +189,7 @@ class Inspector extends \lithium\core\StaticObject {
 			$pattern = join('|', array(
 				"({$pattern})",
 				"\\$(.+)\($",
-				"\s*['\"]\w+['\"]\s*=>\s*.+[\{\(]$",
+				"\s*['\"]\w+['\"]\s*=>\s*.+[\{\(]$"
 			));
 			$options['pattern'] = "/^({$pattern})/";
 		}

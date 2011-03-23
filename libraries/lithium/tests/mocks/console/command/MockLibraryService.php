@@ -114,7 +114,7 @@ class MockLibraryService extends \lithium\net\http\Service {
 					'phar' => 'http://downloads.rad-dev.org/li3_docs.phar.gz'
 				),
 				'requires' => array()
-			),
+			)
 		);
 
 		$extensions = array(
@@ -128,7 +128,7 @@ class MockLibraryService extends \lithium\net\http\Service {
 					)
 				),
 				'created' => '2009-11-30', 'updated' => '2009-11-30',
-				'rating' => '9.9', 'downloads' => '1000',
+				'rating' => '9.9', 'downloads' => '1000'
 			),
 			array(
 				'class' => 'Paginator', 'namespace' => 'app\extensions\helpes',
@@ -140,8 +140,8 @@ class MockLibraryService extends \lithium\net\http\Service {
 					)
 				),
 				'created' => '2009-11-30', 'updated' => '2009-11-30',
-				'rating' => '9.9', 'downloads' => '1000',
-			),
+				'rating' => '9.9', 'downloads' => '1000'
+			)
 		);
 		$data = compact('plugins', 'extensions');
 

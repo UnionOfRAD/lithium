@@ -306,7 +306,7 @@ class Set {
 					$matches[] = array(
 						'trace' => array_merge($context['trace'], (array) $key),
 						'key' => $key,
-						'item' => array_keys($context['item']),
+						'item' => array_keys($context['item'])
 					);
 				} elseif (is_array($context['item']) && isset($context['item'][$token])) {
 					$items = $context['item'][$token];
@@ -330,7 +330,7 @@ class Set {
 								$matches[] = array(
 									'trace' => array_merge($context['trace'], $ctext),
 									'key' => $key,
-									'item' => $item,
+									'item' => $item
 								);
 								break;
 							} else {
@@ -343,7 +343,7 @@ class Set {
 						$matches[] = array(
 							'trace' => array_merge($context['trace'], $ctext),
 							'key' => $key,
-							'item' => $item,
+							'item' => $item
 						);
 					}
 				} elseif (
@@ -353,7 +353,7 @@ class Set {
 					$matches[] = array(
 						'trace' => $context['trace'],
 						'key' => $key,
-						'item' => $context['item'],
+						'item' => $context['item']
 					);
 				}
 			}

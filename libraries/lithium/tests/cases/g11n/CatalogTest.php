@@ -117,7 +117,7 @@ class CatalogTest extends \lithium\test\Unit {
 		);
 		Catalog::write('runtime', 'currency', 'de', $data);
 		$data = array(
-			'GRD' => 'Griechische Drachme',
+			'GRD' => 'Griechische Drachme'
 		);
 		Catalog::write('runtime', 'currency', 'de_CH', $data);
 		$result = Catalog::read('runtime', 'currency', 'de_CH');
@@ -136,7 +136,7 @@ class CatalogTest extends \lithium\test\Unit {
 		);
 		Catalog::write('runtime', 'currency', 'de', $data);
 		$data = array(
-			'GRD' => 'de_CH Griechische Drachme',
+			'GRD' => 'de_CH Griechische Drachme'
 		);
 		Catalog::write('runtime', 'currency', 'de_CH', $data);
 		$result = Catalog::read('runtime', 'currency', 'de_CH');
@@ -271,7 +271,7 @@ class CatalogTest extends \lithium\test\Unit {
 		$result = Catalog::read(array('runtime0', 'runtime2'), 'validation', 'en');
 		$expected = array(
 			'postalCode' => '/postalCode en0/',
-			'ssn' => '/ssn en2/',
+			'ssn' => '/ssn en2/'
 		);
 		$this->assertEqual($expected, $result);
 

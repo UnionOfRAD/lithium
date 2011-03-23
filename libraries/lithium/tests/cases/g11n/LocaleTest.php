@@ -21,7 +21,7 @@ class LocaleTest extends \lithium\test\Unit {
 	 */
 	public function testCompose() {
 		$data = array(
-			'language' => 'en',
+			'language' => 'en'
 		);
 		$expected = 'en';
 
@@ -214,7 +214,7 @@ class LocaleTest extends \lithium\test\Unit {
 	 */
 	public function testComposeDecomposeCompose() {
 		$data = array(
-			'language' => 'en',
+			'language' => 'en'
 		);
 		$expected = 'en';
 

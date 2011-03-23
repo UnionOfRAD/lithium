@@ -19,21 +19,21 @@ class MockSource extends \lithium\data\Source {
 	);
 
 	private $_mockPosts = array(
-		'id' => array('type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL),
+		'id' => array('type' => 'int', 'length' => '10', 'null' => false, 'default' => null),
 		'user_id' => array(
-			'type' => 'int', 'length' => '10', 'null' => true, 'default' => NULL
+			'type' => 'int', 'length' => '10', 'null' => true, 'default' => null
 		),
 		'title' => array(
-			'type' => 'varchar', 'length' => '255', 'null' => true, 'default' => NULL
+			'type' => 'varchar', 'length' => '255', 'null' => true, 'default' => null
 		),
 		'body' => array(
-			'type' => 'text', 'length' => NULL, 'null' => true, 'default' => NULL
+			'type' => 'text', 'length' => null, 'null' => true, 'default' => null
 		),
 		'created' => array(
-			'type' => 'datetime', 'length' => NULL, 'null' => true, 'default' => NULL
+			'type' => 'datetime', 'length' => null, 'null' => true, 'default' => null
 		),
 		'modified' => array(
-			'type' => 'datetime', 'length' => NULL, 'null' => true, 'default' => NULL
+			'type' => 'datetime', 'length' => null, 'null' => true, 'default' => null
 		),
 		'status' => array(
 			'type' => 'tinyint', 'length' => '1', 'null' => false, 'default' => '0'
@@ -42,47 +42,47 @@ class MockSource extends \lithium\data\Source {
 
 	private $_mockComments = array(
 		'id' => array(
-			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
+			'type' => 'int', 'length' => '10', 'null' => false, 'default' => null
 		),
 		'comment_type_id' => array(
-			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
+			'type' => 'int', 'length' => '10', 'null' => false, 'default' => null
 		),
 		'article_id' => array(
-			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
+			'type' => 'int', 'length' => '10', 'null' => false, 'default' => null
 		),
 		'comment_id' => array(
-			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
+			'type' => 'int', 'length' => '10', 'null' => false, 'default' => null
 		),
 		'user_id' => array(
-			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
+			'type' => 'int', 'length' => '10', 'null' => false, 'default' => null
 		),
 		'created' => array(
-			'type' => 'datetime', 'length' => NULL, 'null' => false, 'default' => NULL,
+			'type' => 'datetime', 'length' => null, 'null' => false, 'default' => null
 		),
 		'body' => array(
-			'type' => 'text', 'length' => NULL, 'null' => false, 'default' => NULL,
+			'type' => 'text', 'length' => null, 'null' => false, 'default' => null
 		),
 		'subscribed' => array(
-			'type' => 'tinyint', 'length' => '1', 'null' => false, 'default' => NULL,
+			'type' => 'tinyint', 'length' => '1', 'null' => false, 'default' => null
 		),
 		'published' => array(
-			'type' => 'tinyint', 'length' => '1', 'null' => false, 'default' => NULL,
-		),
+			'type' => 'tinyint', 'length' => '1', 'null' => false, 'default' => null
+		)
 	);
 
 	private $_mockTags = array(
 		'id' => array(
-			'type' => 'int', 'length' => '10', 'null' => false, 'default' => NULL,
+			'type' => 'int', 'length' => '10', 'null' => false, 'default' => null
 		),
 		'linked' => array(
-			'type' => 'int', 'length' => '10', 'null' => true, 'default' => NULL,
+			'type' => 'int', 'length' => '10', 'null' => true, 'default' => null
 		),
 		'name' => array(
-			'type' => 'varchar', 'length' => '20', 'null' => true, 'default' => NULL,
+			'type' => 'varchar', 'length' => '20', 'null' => true, 'default' => null
 		),
 		'keyname' => array(
-			'type' => 'varchar', 'length' => '20', 'null' => true, 'default' => NULL,
-		),
+			'type' => 'varchar', 'length' => '20', 'null' => true, 'default' => null
+		)
 	);
 
 	public function connect() {

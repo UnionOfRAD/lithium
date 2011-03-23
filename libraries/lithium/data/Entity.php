@@ -387,7 +387,7 @@ class Entity extends \lithium\core\Object {
 			'exists'    => $this->_exists,
 			'data'      => $this->_data,
 			'update'    => $this->_updated,
-			'increment' => $this->_increment,
+			'increment' => $this->_increment
 		);
 	}
 

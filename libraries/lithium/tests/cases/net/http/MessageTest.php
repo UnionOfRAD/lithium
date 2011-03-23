@@ -20,7 +20,7 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testHeaderKey() {
 		$expected = array(
-			'Host: localhost:80',
+			'Host: localhost:80'
 		);
 		$result = $this->message->headers('Host: localhost:80');
 		$this->assertEqual($expected, $result);
@@ -35,7 +35,7 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testHeaderKeyValue() {
 		$expected = array(
-			'Connection: Close',
+			'Connection: Close'
 		);
 		$result = $this->message->headers('Connection', 'Close');
 		$this->assertEqual($expected, $result);

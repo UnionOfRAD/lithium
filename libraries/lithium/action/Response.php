@@ -80,9 +80,9 @@ class Response extends \lithium\net\http\Response {
 				'Cache-Control' => array(
 					'no-store, no-cache, must-revalidate',
 					'post-check=0, pre-check=0',
-					'max-age=0',
+					'max-age=0'
 				),
-				'Pragma' => 'no-cache',
+				'Pragma' => 'no-cache'
 			));
 		}
 		$expires = is_int($expires) ? $expires : strtotime($expires);
@@ -90,7 +90,7 @@ class Response extends \lithium\net\http\Response {
 		return $this->headers(array(
 			'Expires' => gmdate('D, d M Y H:i:s', $expires) . ' GMT',
 			'Cache-Control' => 'max-age=' . ($expires - time()),
-			'Pragma' => 'cache',
+			'Pragma' => 'cache'
 		));
 	}
 

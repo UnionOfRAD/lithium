@@ -49,7 +49,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		'rank' => array('type' => 'float', 'default' => 0.0),
 		'notifications.foo' => array('type' => 'boolean'),
 		'notifications.bar' => array('type' => 'boolean'),
-		'notifications.baz' => array('type' => 'boolean'),
+		'notifications.baz' => array('type' => 'boolean')
 	);
 
 	protected $_configs = array();

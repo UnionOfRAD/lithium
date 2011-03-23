@@ -219,7 +219,7 @@ class Media extends \lithium\core\StaticObject {
 			'encode' => false,
 			'decode' => false,
 			'cast'   => true,
-			'conditions' => array(),
+			'conditions' => array()
 		);
 
 		if ($content === false) {
@@ -410,7 +410,7 @@ class Media extends \lithium\core\StaticObject {
 			'path' => array(),
 			'suffix' => null,
 			'check' => false,
-			'library' => true,
+			'library' => true
 		);
 		if (!$base = static::_assets($type)) {
 			$type = 'generic';
@@ -506,7 +506,7 @@ class Media extends \lithium\core\StaticObject {
 			'base' => null,
 			'path' => array(),
 			'suffix' => null,
-			'library' => true,
+			'library' => true
 		);
 		if (!$base = static::_assets($type)) {
 			$type = 'generic';
@@ -753,7 +753,7 @@ class Media extends \lithium\core\StaticObject {
 			'js'           => array('application/javascript', 'text/javascript'),
 			'text'         => 'text/plain',
 			'txt'          => array('alias' => 'text'),
-			'xml'          => array('application/xml', 'text/xml'),
+			'xml'          => array('application/xml', 'text/xml')
 		);
 
 		if (!$type) {
@@ -795,7 +795,7 @@ class Media extends \lithium\core\StaticObject {
 				'paths'    => array(
 					'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
 					'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
-					'element'  => '{:library}/views/elements/{:template}.{:type}.php',
+					'element'  => '{:library}/views/elements/{:template}.{:type}.php'
 				)
 			),
 			'html' => array(),
@@ -803,7 +803,7 @@ class Media extends \lithium\core\StaticObject {
 				return json_decode($data, true);
 			}),
 			'text' => array('cast' => false, 'encode' => function($s) { return $s; }),
-			'form' => array('cast' => true, 'encode' => 'http_build_query'),
+			'form' => array('cast' => true, 'encode' => 'http_build_query')
 		);
 
 		if ($type) {

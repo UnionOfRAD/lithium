@@ -539,7 +539,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		    'path' => '/tests',
 			'preFilter' => '/[A-Z][A-Za-z0-9]+\Test\./',
 	        'recursive' => true,
-	        'filter' => '/cases|integration|functional|mocks/',
+	        'filter' => '/cases|integration|functional|mocks/'
 	    ));
 	    $result = (array) Libraries::locate("tests", null, array('library' => 'lithium'));
 	    $this->assertEqual($expected, $result);

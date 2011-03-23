@@ -16,7 +16,7 @@ class MockCgiRequest extends \lithium\action\Request {
 			'PLATFORM' => 'CGI',
 			'SCRIPT_FILENAME' => false,
 			'DOCUMENT_ROOT' => false,
-			'SCRIPT_URL' => '/lithium/app/webroot/index.php',
+			'SCRIPT_URL' => '/lithium/app/webroot/index.php'
 		);
 	}
 }

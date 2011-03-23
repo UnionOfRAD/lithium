@@ -93,7 +93,7 @@ class Libraries {
 			'{:library}\extensions\command\{:namespace}\{:class}\{:name}',
 			'{:library}\console\command\{:namespace}\{:class}\{:name}' => array(
 				'libraries' => 'lithium'
-			),
+			)
 		),
 		'controllers' => array(
 			'{:library}\controllers\{:name}Controller'
@@ -129,10 +129,10 @@ class Libraries {
 		),
 		'test' => array(
 			'{:library}\extensions\test\{:namespace}\{:class}\{:name}',
-			'{:library}\test\{:namespace}\{:class}\{:name}' => array('libraries' => 'lithium'),
+			'{:library}\test\{:namespace}\{:class}\{:name}' => array('libraries' => 'lithium')
 		),
 		'tests' => array(
-			'{:library}\tests\{:namespace}\{:class}\{:name}Test',
+			'{:library}\tests\{:namespace}\{:class}\{:name}Test'
 		)
 	);
 
@@ -274,7 +274,7 @@ class Libraries {
 			'transform' => null,
 			'bootstrap' => true,
 			'defer' => false,
-			'default' => false,
+			'default' => false
 		);
 		if ($name === 'lithium') {
 			$defaults['defer'] = true;
@@ -417,7 +417,7 @@ class Libraries {
 			'recursive' => false,
 			'filter' => '/^(\w+)?(\\\\[a-z0-9_]+)+\\\\[A-Z][a-zA-Z0-9]+$/',
 			'exclude' => '',
-			'namespaces' => false,
+			'namespaces' => false
 		);
 		$options += $defaults;
 		$libs = array();

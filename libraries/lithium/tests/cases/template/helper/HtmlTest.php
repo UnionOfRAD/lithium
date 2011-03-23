@@ -113,7 +113,7 @@ class HtmlTest extends \lithium\test\Unit {
 		$result = $this->html->link('No-existy', '/posts.xmp', array('type' => 'rong'));
 		$this->assertTags($result, array('link' => array(
 			'href' => 'regex:/.*\/posts\.xmp/',
-			'title' => 'No-existy',
+			'title' => 'No-existy'
 		)));
 
 		$result = $this->html->link('No-existy', '/posts.xpp', array('type' => 'atom'));

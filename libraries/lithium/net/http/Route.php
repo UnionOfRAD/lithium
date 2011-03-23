@@ -171,7 +171,7 @@ class Route extends \lithium\core\Object {
 			'defaults' => array(),
 			'keys'     => array(),
 			'persist'  => array(),
-			'handler'  => null,
+			'handler'  => null
 		);
 		parent::__construct($config + $defaults);
 	}

@@ -174,7 +174,7 @@ class AdaptableTest extends \lithium\test\Unit {
 		$items = array('default' => array(
 			'filters' => array(),
 			'adapter' => null,
-			'strategies' => array('lithium\tests\mocks\storage\cache\strategy\MockSerializer'),
+			'strategies' => array('lithium\tests\mocks\storage\cache\strategy\MockSerializer')
 		));
 		$strategy::config($items);
 		$result = $strategy::config();

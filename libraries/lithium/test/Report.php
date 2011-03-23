@@ -112,7 +112,7 @@ class Report extends \lithium\core\Object {
 			'group' => null,
 			'filters' => array(),
 			'format' => 'txt',
-			'reporter' => 'console',
+			'reporter' => 'console'
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -222,7 +222,7 @@ class Report extends \lithium\core\Object {
 			$data = $this->stats();
 		}
 		$template = Libraries::locate("test.templates.{$config['reporter']}", $template, array(
-			'filter' => false, 'type' => 'file', 'suffix' => ".{$config['format']}.php",
+			'filter' => false, 'type' => 'file', 'suffix' => ".{$config['format']}.php"
 		));
 		$params = compact('template', 'data', 'config');
 

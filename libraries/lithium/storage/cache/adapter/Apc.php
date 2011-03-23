@@ -48,7 +48,7 @@ class Apc extends \lithium\core\Object {
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'prefix' => '',
-			'expiry' => '+1 hour',
+			'expiry' => '+1 hour'
 		);
 		parent::__construct($config + $defaults);
 	}

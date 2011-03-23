@@ -103,7 +103,7 @@ class MySql extends \lithium\data\source\Database {
 			'arrays' => false,
 			'transactions' => false,
 			'booleans' => true,
-			'relationships' => true,
+			'relationships' => true
 		);
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}
@@ -216,7 +216,7 @@ class MySql extends \lithium\data\source\Database {
 
 				$fields[$column['field']] = $match + array(
 					'null'     => ($column['null'] == 'YES' ? true : false),
-					'default'  => $column['default'],
+					'default'  => $column['default']
 				);
 			}
 			return $fields;

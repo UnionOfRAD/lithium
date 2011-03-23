@@ -285,7 +285,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			'offsetId' => null,
 			'offsetTranslated' => null,
 			'sizeHashes' => null,
-			'offsetHashes' => null,
+			'offsetHashes' => null
 		);
 		foreach ($header as &$value) {
 			$value = $this->_readLong($stream, $isBigEndian);

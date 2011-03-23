@@ -227,7 +227,7 @@ class Unit extends \lithium\core\Object {
 			'file'      => $trace[$i - 1]['file'],
 			'line'      => $trace[$i - 1]['line'],
 			'method'    => $trace[$i]['function'],
-			'assertion' => $trace[$i - 1]['function'],
+			'assertion' => $trace[$i - 1]['function']
 		);
 		$this->_result($expression ? 'pass' : 'fail', $result);
 		return $expression;
@@ -739,7 +739,7 @@ class Unit extends \lithium\core\Object {
 				'scope'        => array_filter(array(
 					'functionRef' => __NAMESPACE__ . '\{closure}',
 					'line'        => $lineFlag
-				)),
+				))
 			));
 		}
 		$this->_result('exception', $exception + array(

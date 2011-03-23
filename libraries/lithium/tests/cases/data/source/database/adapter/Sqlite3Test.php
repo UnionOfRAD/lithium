@@ -58,7 +58,7 @@ class Sqlite3Test extends \lithium\test\Unit {
 		  'host' => 'localhost',
 		  'login' => 'root',
 		  'password' => '',
-		  'init' => true,
+		  'init' => true
 		);
 		$this->assertEqual($expected, $result);
 	}

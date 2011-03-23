@@ -16,7 +16,7 @@ class MockPostForValidates extends \lithium\data\Model {
 		'title' => 'please enter a title',
 		'email' => array(
 			array('notEmpty', 'message' => 'email is empty'),
-			array('email', 'message' => 'email is not valid'),
+			array('email', 'message' => 'email is not valid')
 		)
 	);
 }

@@ -400,7 +400,7 @@ class Form extends \lithium\template\Helper {
 			'type' => isset($options['list']) ? 'select' : 'text',
 			'template' => 'field',
 			'wrap' => array(),
-			'list' => null,
+			'list' => null
 		);
 		$type = isset($options['type']) ? $options['type'] : $defaults['type'];
 

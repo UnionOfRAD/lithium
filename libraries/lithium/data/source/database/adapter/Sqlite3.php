@@ -90,7 +90,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 		$defaults = array(
 			'database'   => '',
 			'flags'      => SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE,
-			'key'        => NULL
+			'key'        => null
 		);
 		parent::__construct($config + $defaults);
 	}

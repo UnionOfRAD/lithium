@@ -41,7 +41,7 @@ class HttpTest extends \lithium\test\Unit {
 				'type' => 'Http',
 				'methods' => array(
 					'something' => array('method' => 'get'),
-					'do' => array('method' => 'post'),
+					'do' => array('method' => 'post')
 				)
 			)
 		));

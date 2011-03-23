@@ -139,7 +139,7 @@ class SetTest extends \lithium\test\Unit {
 		$data = array(
 			array(
 				'Post' => array('id' => '1', 'author_id' => '1', 'title' => 'First Post'),
-				'Author' => array('id' => '1', 'user' => 'nate', 'password' => 'foo'),
+				'Author' => array('id' => '1', 'user' => 'nate', 'password' => 'foo')
 			),
 			array(
 				'Post' => array(
@@ -148,7 +148,7 @@ class SetTest extends \lithium\test\Unit {
 					'title' => 'Second Post',
 					'body' => 'Second Post Body'
 				),
-				'Author' => array('id' => '3', 'user' => 'joel', 'password' => null),
+				'Author' => array('id' => '3', 'user' => 'joel', 'password' => null)
 			)
 		);
 
@@ -278,7 +278,7 @@ class SetTest extends \lithium\test\Unit {
 			'Article' => array(
 				'keep' => array(
 					'Comment' =>  array('fields' => array('comment', 'published')),
-					'User' => array('fields' => array('user')),
+					'User' => array('fields' => array('user'))
 				)
 			)
 		);
@@ -348,7 +348,7 @@ class SetTest extends \lithium\test\Unit {
 						'comment' => 'Second Comment for First Article', 'published' => 'Y',
 						'created' => '2007-03-18 10:47:23',
 						'updated' => '2007-03-18 10:49:31'
-					),
+					)
 				),
 				'Tag' => array(
 					array(
@@ -429,7 +429,7 @@ class SetTest extends \lithium\test\Unit {
 		$c = array(
 			array('a' => array('I' => array('a' => 1))),
 			array('a' => array(2)),
-			array('a' => array('II' => array('a' => 3, 'III' => array('a' => array('foo' => 4))))),
+			array('a' => array('II' => array('a' => 3, 'III' => array('a' => array('foo' => 4)))))
 		);
 
 		$expected = array(array('a' => $c[2]['a']));
@@ -490,8 +490,8 @@ class SetTest extends \lithium\test\Unit {
 				2  => array('id' => 2),
 				6  => array('id' => 3),
 				9  => array('id' => 4),
-				3  => array('id' => 5),
-			),
+				3  => array('id' => 5)
+			)
 		);
 
 		$expected = array(1, 2, 3, 4, 5);
@@ -506,8 +506,8 @@ class SetTest extends \lithium\test\Unit {
 				4  => array('id' => 2),
 				6  => array('id' => 3),
 				9  => array('id' => 4),
-				3  => array('id' => 5),
-			),
+				3  => array('id' => 5)
+			)
 		);
 
 		$expected = array(1, 2, 3, 4, 5);
@@ -581,8 +581,8 @@ class SetTest extends \lithium\test\Unit {
 						'article_id' => 2,
 						'text' => 'Comment 5',
 						'addition' => 'foo'
-					),
-				),
+					)
+				)
 			),
 			array(
 				'Article' => array('id' => 3, 'name' => 'Article 3'),
@@ -639,8 +639,8 @@ class SetTest extends \lithium\test\Unit {
 				'Post' => array('id' => 1, 'title' => 'great post'),
 				'Comment' => array(
 					array('id' => 1, 'text' => 'foo', 'User' => array('id' => 1, 'name' => 'bob')),
-					array('id' => 2, 'text' => 'bar', 'User' => array('id' => 2, 'name' => 'tod')),
-				),
+					array('id' => 2, 'text' => 'bar', 'User' => array('id' => 2, 'name' => 'tod'))
+				)
 			),
 			array(
 				'Post' => array('id' => 2, 'title' => 'fun post'),
@@ -858,7 +858,7 @@ class SetTest extends \lithium\test\Unit {
 						'comment' => 'Second Comment for First Article',
 						'published' => 'Y', 'created' => '2007-03-18 10:47:23',
 						'updated' => '2007-03-18 10:49:31'
-					),
+					)
 				),
 				'Tag' => array(
 					array(

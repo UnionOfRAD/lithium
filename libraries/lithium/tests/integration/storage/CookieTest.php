@@ -34,7 +34,7 @@ class CookieTest extends \lithium\test\Unit {
 		Session::config(array(
 			'li3' => array(
 				'adapter' => 'Cookie',
-				'expiry' => '+1 day',
+				'expiry' => '+1 day'
 			)
 		));
 
@@ -100,7 +100,7 @@ class CookieTest extends \lithium\test\Unit {
 		Session::config(array(
 			'default' => array(
 				'adapter' => 'Cookie',
-				'strategies' => array('Hmac' => array('secret' => 'somesecretkey')),
+				'strategies' => array('Hmac' => array('secret' => 'somesecretkey'))
 			)
 		));
 

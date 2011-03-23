@@ -139,7 +139,7 @@ class Code extends \lithium\g11n\catalog\Adapter {
 					$data = $this->_merge($data, array(
 						'id' => $ids['singular'],
 						'ids' => $ids,
-						'occurrences' => array($occurrence),
+						'occurrences' => array($occurrence)
 					));
 					extract($defaults, EXTR_OVERWRITE);
 				} elseif ($token[0] === T_CONSTANT_ENCAPSED_STRING) {

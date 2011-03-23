@@ -43,7 +43,7 @@ class Debugger extends \lithium\core\Object {
 			'scope' => array(),
 			'trace' => array(),
 			'includeScope' => true,
-			'closures' => true,
+			'closures' => true
 		);
 		$options += $defaults;
 

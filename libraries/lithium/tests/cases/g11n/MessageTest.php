@@ -127,7 +127,7 @@ class MessageTest extends \lithium\test\Unit {
 		));
 
 		$data = array(
-			'catalog' => array('Katalog', 'Kataloge'),
+			'catalog' => array('Katalog', 'Kataloge')
 		);
 		Catalog::write('runtime', 'message', 'de', $data);
 
@@ -143,7 +143,7 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testTranslateScope() {
 		$data = array(
-			'catalog' => 'Katalog',
+			'catalog' => 'Katalog'
 		);
 		Catalog::write('runtime', 'message', 'de', $data, array('scope' => 'test'));
 
@@ -175,7 +175,7 @@ class MessageTest extends \lithium\test\Unit {
 		$data = array(
 			'green' => 'grün',
 			'The fish is {:color}.' => 'Der Fisch ist {:color}.',
-			'{:count} bike' => array('{:count} Fahrrad', '{:count} Fahrräder'),
+			'{:count} bike' => array('{:count} Fahrrad', '{:count} Fahrräder')
 		);
 		Catalog::write('runtime', 'message', 'de', $data);
 
@@ -197,11 +197,11 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testTranslateLocales() {
 		$data = array(
-			'catalog' => 'Katalog',
+			'catalog' => 'Katalog'
 		);
 		Catalog::write('runtime', 'message', 'de', $data);
 		$data = array(
-			'catalog' => 'catalogue',
+			'catalog' => 'catalogue'
 		);
 		Catalog::write('runtime', 'message', 'fr', $data);
 
@@ -216,7 +216,7 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testTranslateNoop() {
 		$data = array(
-			'catalog' => 'Katalog',
+			'catalog' => 'Katalog'
 		);
 		Catalog::write('runtime', 'message', 'de', $data);
 

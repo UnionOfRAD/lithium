@@ -55,7 +55,7 @@ class GroupTest extends \lithium\test\Unit {
 			'lithium\tests\cases\g11n\catalog\AdapterTest',
 			'lithium\tests\cases\g11n\catalog\adapter\CodeTest',
 			'lithium\tests\cases\g11n\catalog\adapter\GettextTest',
-			'lithium\tests\cases\g11n\catalog\adapter\PhpTest',
+			'lithium\tests\cases\g11n\catalog\adapter\PhpTest'
 		);
 		$this->assertEqual($expected, $result);
 
@@ -89,7 +89,7 @@ class GroupTest extends \lithium\test\Unit {
 	public function testTests() {
 		$group = new Group();
 		$expected = array(
-			'lithium\tests\cases\g11n\CatalogTest',
+			'lithium\tests\cases\g11n\CatalogTest'
 		);
 		$result = $group->add('lithium\tests\cases\g11n\CatalogTest');
 		$this->assertEqual($expected, $result);
@@ -156,7 +156,7 @@ class GroupTest extends \lithium\test\Unit {
 		$expected = (array) Libraries::find('test_app', array(
 			'recursive' => true,
 			'path' => '/tests',
-			'filter' => '/cases|integration|functional/',
+			'filter' => '/cases|integration|functional/'
 		));
 
 		Libraries::cache(false);

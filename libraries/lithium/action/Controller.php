@@ -240,7 +240,7 @@ class Controller extends \lithium\core\Object {
 			'location'   => false,
 			'data'       => null,
 			'head'       => false,
-			'controller' => Inflector::underscore($name),
+			'controller' => Inflector::underscore($name)
 		);
 		$options += $this->_render + $defaults;
 

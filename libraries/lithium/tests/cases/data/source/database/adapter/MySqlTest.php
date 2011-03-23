@@ -47,7 +47,7 @@ class MySqlTest extends \lithium\test\Unit {
 		$db = new MockMySql(array('autoConnect' => false));
 		$result = $db->get('_config');
 		$expected = array(
-			'autoConnect' => false, 'encoding' => NULL,'persistent' => true,
+			'autoConnect' => false, 'encoding' => null,'persistent' => true,
 			'host' => 'localhost:3306', 'login' => 'root', 'password' => '',
 			'database' => null, 'init' => true
 		);
@@ -70,7 +70,7 @@ class MySqlTest extends \lithium\test\Unit {
 		$this->assertFalse($db->isConnected());
 
 		$db = new MySQL(array(
-			'autoConnect' => false, 'encoding' => NULL,'persistent' => false,
+			'autoConnect' => false, 'encoding' => null,'persistent' => false,
 			'host' => 'localhost:3306', 'login' => 'garbage', 'password' => '',
 			'database' => 'garbage', 'init' => true
 		) + $this->_dbConfig);

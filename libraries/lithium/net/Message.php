@@ -82,7 +82,7 @@ class Message extends \lithium\core\Object {
 			'username' => null,
 			'password' => null,
 			'body' => null,
-			'message' => null,
+			'message' => null
 		);
 		$config += $defaults;
 

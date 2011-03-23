@@ -386,7 +386,7 @@ class DocumentTest extends \lithium\test\Unit {
 				'title' => 'Post',
 				'content' => 'Lorem Ipsum',
 				'parsed' => null,
-				'permanent' => false,
+				'permanent' => false
 			)
 		));
 
@@ -394,7 +394,7 @@ class DocumentTest extends \lithium\test\Unit {
 			'title' => 'Post',
 			'content' => 'Lorem Ipsum',
 			'parsed' => null,
-			'permanent' => false,
+			'permanent' => false
 		);
 		$result = $doc->data();
 		$this->assertEqual($expected, $result);

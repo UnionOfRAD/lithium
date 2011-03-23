@@ -54,7 +54,7 @@ class Service extends \lithium\core\Object {
 	protected $_classes = array(
 		'media'    => 'lithium\net\http\Media',
 		'request'  => 'lithium\net\http\Request',
-		'response' => 'lithium\net\http\Response',
+		'response' => 'lithium\net\http\Response'
 	);
 
 	/**
@@ -75,7 +75,7 @@ class Service extends \lithium\core\Object {
 			'username'   => null,
 			'password'   => null,
 			'encoding'   => 'UTF-8',
-			'socket'     => 'Context',
+			'socket'     => 'Context'
 		);
 		parent::__construct($config + $defaults);
 	}

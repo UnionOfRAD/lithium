@@ -113,7 +113,7 @@ class UnitTest extends \lithium\test\Unit {
 						'trace' => '[0][1][1]',
 						'expected' => 2,
 						'result' => null
-					),
+					)
 				),
 				array(
 					array('trace' => '[1][1][1]',

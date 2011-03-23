@@ -78,7 +78,7 @@ class RecordSetTest extends \lithium\test\Unit {
 		$recordSet = new MockRecordSet(array(
 			'model'  => $this->_model,
 			'result' => true,
-			'exists' => true,
+			'exists' => true
 		));
 
 		$this->assertEqual($this->_model, $recordSet->model());
@@ -206,7 +206,7 @@ class RecordSetTest extends \lithium\test\Unit {
 			1 => array('id' => 1, 'data' => 'new data1'),
 			2 => array('id' => 2, 'data' => 'data2'),
 			3 => array('id' => 3, 'data' => 'data3'),
-			4 => array('id' => 4, 'data' => 'data4'),
+			4 => array('id' => 4, 'data' => 'data4')
 		);
 		$this->assertEqual($expected, $this->_recordSet->to('array'));
 

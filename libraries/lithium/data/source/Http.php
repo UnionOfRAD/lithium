@@ -77,7 +77,7 @@ class Http extends \lithium\data\Source {
 			'password'   => '',
 			'port'       => 80,
 			'timeout'    => 30,
-			'encoding'   => 'UTF-8',
+			'encoding'   => 'UTF-8'
 		);
 		$config = $config + $defaults;
 		$config['username'] = $config['login'];

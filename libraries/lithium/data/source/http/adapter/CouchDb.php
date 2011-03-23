@@ -44,7 +44,7 @@ class CouchDb extends \lithium\data\source\Http {
 		'service' => 'lithium\net\http\Service',
 		'entity' => 'lithium\data\entity\Document',
 		'set' => 'lithium\data\collection\DocumentSet',
-		'array' => 'lithium\data\collection\DocumentArray',
+		'array' => 'lithium\data\collection\DocumentArray'
 	);
 
 	protected $_handlers = array();
@@ -65,7 +65,7 @@ class CouchDb extends \lithium\data\source\Http {
 		$this->_handlers += array(
 			'integer' => function($v) { return (integer) $v; },
 			'float'   => function($v) { return (float) $v; },
-			'boolean' => function($v) { return (boolean) $v; },
+			'boolean' => function($v) { return (boolean) $v; }
 		);
 	}
 
@@ -485,7 +485,7 @@ class CouchDb extends \lithium\data\source\Http {
 			'arrays' => true,
 			'transactions' => false,
 			'booleans' => true,
-			'relationships' => false,
+			'relationships' => false
 		);
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}

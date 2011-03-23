@@ -50,7 +50,7 @@ class MessageTest extends \lithium\test\Unit {
 			'path' => null,
 			'username' => null,
 			'password' => null,
-			'body' => array(),
+			'body' => array()
 		);
 		$result = $this->message->to('array');
 		$this->assertEqual($expected, $result);
@@ -86,7 +86,7 @@ class MessageTest extends \lithium\test\Unit {
 			'path' => null,
 			'username' => null,
 			'password' => null,
-			'body' => array(),
+			'body' => array()
 		);
 		$message = new Message($expected);
 		$result = $message->to('array');

@@ -197,10 +197,10 @@ class RequestTest extends \lithium\test\Unit {
 			'body' => array(),
 			'scheme' => 'http',
 			'host' => 'localhost',
-			'port' => NULL,
+			'port' => null,
 			'path' => '/',
-			'username' => NULL,
-			'password' => NULL,
+			'username' => null,
+			'password' => null
 		);
 		$result = $this->request->to('array');
 		$this->assertEqual($expected, $result);

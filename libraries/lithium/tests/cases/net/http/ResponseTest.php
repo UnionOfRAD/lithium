@@ -167,7 +167,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'Transfer-Encoding: chunked',
 			'Connection: Keep-alive',
 			'',
-			'',
+			''
 		));
 
 		$message = $headers . join("\r\n", array(
@@ -191,7 +191,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'{"id":"88989cafcd81b09f81078eb523832e8e","key":"gwoo","value":' .
 			'{"author":"gwoo","language":"php","preview":"test",' .
 			'"created":"2009-10-27 12:14:12"}}',
-			']}',
+			']}'
 		));
 		$this->assertEqual($expected, $response->body());
 

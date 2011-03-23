@@ -171,7 +171,7 @@ class String {
 			'type' => 'sha512',
 			'salt' => false,
 			'key' => false,
-			'raw' => false,
+			'raw' => false
 		);
 		$options += $defaults;
 
@@ -219,7 +219,7 @@ class String {
 			'after' => '}',
 			'escape' => null,
 			'format' => null,
-			'clean' => false,
+			'clean' => false
 		);
 		$options += $defaults;
 		$format = $options['format'];

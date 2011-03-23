@@ -80,7 +80,7 @@ class Request extends \lithium\net\http\Message {
 		$this->headers = array(
 			'Host' => $this->port ? "{$this->host}:{$this->port}" : $this->host,
 			'Connection' => 'Close',
-			'User-Agent' => 'Mozilla/5.0',
+			'User-Agent' => 'Mozilla/5.0'
 		);
 		$this->headers($config['headers']);
 

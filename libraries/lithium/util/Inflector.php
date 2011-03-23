@@ -402,7 +402,7 @@ class Inflector {
 		$map = static::$_transliteration + array(
 			'/[^\w\s]/' => ' ', '/\\s+/' => $replacement,
 			'/(?<=[a-z])([A-Z])/' => $replacement . '\\1',
-			str_replace(':rep', preg_quote($replacement, '/'), '/^[:rep]+|[:rep]+$/') => '',
+			str_replace(':rep', preg_quote($replacement, '/'), '/^[:rep]+|[:rep]+$/') => ''
 		);
 		return preg_replace(array_keys($map), array_values($map), $string);
 	}

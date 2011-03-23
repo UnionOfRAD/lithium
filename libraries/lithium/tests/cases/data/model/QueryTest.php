@@ -224,7 +224,7 @@ class QueryTest extends \lithium\test\Unit {
 		$entity = new Record();
 		$entity->id = 12;
 		$query = new Query(compact('entity') + array(
-			'model' => $this->_model,
+			'model' => $this->_model
 		));
 
 		$expected = array('id' => 12);
@@ -291,7 +291,7 @@ class QueryTest extends \lithium\test\Unit {
 			'type' => 'update',
 			'data' => array('title' => 'Bar'),
 			'conditions' => array('title' => 'Foo'),
-			'model' => $this->_model,
+			'model' => $this->_model
 		);
 		$query = new Query($options);
 
@@ -301,7 +301,7 @@ class QueryTest extends \lithium\test\Unit {
 		$expected = array(
 			'type' => 'update',
 			'data' => array('title' => 'Bar'),
-			'conditions' => "WHERE {title} = 'Foo'",
+			'conditions' => "WHERE {title} = 'Foo'"
 		);
 		$this->assertEqual($expected, $result);
 	}

@@ -245,7 +245,7 @@ class View extends \lithium\core\Object {
 			'type' => 'html',
 			'layout' => null,
 			'template' => null,
-			'context' => array(),
+			'context' => array()
 		);
 		$options += $defaults;
 

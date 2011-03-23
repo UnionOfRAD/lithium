@@ -75,7 +75,7 @@ class MockDocumentSource extends \lithium\data\Source {
 			'float'   => function($v) { return (float) $v; },
 			'boolean' => function($v) { return (boolean) $v; },
 			'code'    => function($v) { return new MongoCode($v); },
-			'binary'  => function($v) { return new MongoBinData($v); },
+			'binary'  => function($v) { return new MongoBinData($v); }
 		);
 
 		$typeMap = array(

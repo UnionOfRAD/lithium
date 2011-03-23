@@ -49,7 +49,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$defaults = array(
 			'title' => $group,
 			'filters' => array(),
-			'reporter' => 'text',
+			'reporter' => 'text'
 		);
 		$options += $defaults;
 		$isCase = is_string($group) && preg_match('/Test$/', $group);
