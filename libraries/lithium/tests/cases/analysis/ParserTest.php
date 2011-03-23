@@ -116,7 +116,7 @@ class ParserTest extends \lithium\test\Unit {
 
 		$this->assertEqual($expected, $results);
 
-		$expected = array('ReflectionClass', 'lithium\util\Set', 'lithium\util\Collection');
+		$expected = array('lithium\util\Set', 'lithium\util\Collection');
 		$results = array_map(
 			function ($i) { return join('', $i); },
 			$results = Parser::find($code, 'use *;', array(
