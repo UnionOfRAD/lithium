@@ -22,6 +22,14 @@ use lithium\data\source\database\adapter\sqlite3\Result;
 class Sqlite3 extends \lithium\data\source\Database {
 
 	/**
+	 * Pair of opening and closing quote characters used for quoting identifiers in queries.
+	 *
+	 * @link http://www.sqlite.org/lang_keywords.html
+	 * @var array
+	 */
+	protected $_quotes = array('"', '"');
+
+	/**
 	 * Sqlite column type definitions.
 	 *
 	 * @var array
@@ -241,18 +249,6 @@ class Sqlite3 extends \lithium\data\source\Database {
 			return array($this->connection->lastErrorCode(), $this->connection->lastErrorMsg());
 		}
 		return null;
-	}
-
-	/**
-	 * Quotes identifiers.
-	 *
-	 * Currently, this method simply returns the identifier.
-	 *
-	 * @param string $name The identifier to quote.
-	 * @return string The quoted identifier.
-	 */
-	public function name($name) {
-		return $name;
 	}
 
 	/**
