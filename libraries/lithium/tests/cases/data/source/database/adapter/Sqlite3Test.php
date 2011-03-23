@@ -29,7 +29,7 @@ class Sqlite3Test extends \lithium\test\Unit {
 
 		$this->_dbConfig = Connections::get('test', array('config' => true));
 		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'Sqlite3');
-		$message = 'Test database is either unavailable, or not using a Sqlite adapter';
+		$message = 'Test database is either unavailable, or not using a Sqlite3 adapter';
 		$this->skipIf(!$hasDb, $message);
 
 		$isMemory = $this->_dbConfig['database'] == ':memory:';
