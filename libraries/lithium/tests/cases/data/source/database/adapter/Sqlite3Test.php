@@ -27,7 +27,7 @@ class Sqlite3Test extends \lithium\test\Unit {
 	public function skip() {
 		$this->skipIf(!Sqlite3::enabled(), 'Sqlite3 adapter is not enabled.');
 
-		$this->_dbConfig = Connections::get('sqlite3', array('config' => true));
+		$this->_dbConfig = Connections::get('test', array('config' => true));
 		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'Sqlite3');
 		$message = 'Test database is either unavailable, or not using a Sqlite adapter';
 		$this->skipIf(!$hasDb, $message);
