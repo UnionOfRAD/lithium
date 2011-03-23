@@ -112,6 +112,12 @@ class Sqlite3Test extends \lithium\test\Unit {
 		$this->expectException();
 		$this->db->read('SELECT deliberate syntax error');
 	}
+
+	public function testEnabledFeatures() {
+		$this->assertTrue(Sqlite3::enabled());
+		$this->assertTrue(Sqlite3::enabled('relationships'));
+		$this->assertFalse(Sqlite3::enabled('arrays'));
+	}
 }
 
 ?>
