@@ -116,6 +116,7 @@ class Sqlite3Test extends \lithium\test\Unit {
 
 	public function testExecuteException() {
 		$this->expectException();
+		$this->expectException();
 		$this->db->read('SELECT deliberate syntax error');
 	}
 
