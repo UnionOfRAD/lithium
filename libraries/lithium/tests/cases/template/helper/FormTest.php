@@ -8,7 +8,6 @@
 
 namespace lithium\tests\cases\template\helper;
 
-use stdClass;
 use lithium\action\Request;
 use lithium\net\http\Router;
 use lithium\data\entity\Record;

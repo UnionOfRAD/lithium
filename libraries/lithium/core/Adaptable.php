@@ -8,7 +8,6 @@
 
 namespace lithium\core;
 
-use lithium\util\Collection;
 use lithium\core\Environment;
 use SplDoublyLinkedList;
 use lithium\core\ConfigException;

@@ -8,7 +8,6 @@
 
 namespace lithium\tests\cases\data\collection;
 
-use lithium\data\source\MongoDb;
 use lithium\data\collection\DocumentArray;
 
 class DocumentArrayTest extends \lithium\test\Unit {

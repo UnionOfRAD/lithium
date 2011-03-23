@@ -9,7 +9,6 @@
 namespace lithium\test;
 
 use lithium\util\Set;
-use lithium\util\Inflector;
 use lithium\core\Libraries;
 use lithium\core\Environment;
 

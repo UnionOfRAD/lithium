@@ -8,8 +8,6 @@
 
 namespace lithium\data;
 
-use RuntimeException;
-
 /**
  * The `Collection` class extends the generic `lithium\util\Collection` class to provide
  * context-specific features for working with sets of data persisted by a backend data store. This

@@ -2,9 +2,7 @@
 
 namespace lithium\tests\mocks\storage\session\adapter;
 
-use lithium\storage\session\adapter\Memory;
-
-class SessionStorageConditional extends Memory {
+class SessionStorageConditional extends \lithium\storage\session\adapter\Memory {
 
 	public function read($key = null, array $options = array()) {
 		return isset($options['fail']) ? null : parent::read($key, $options);

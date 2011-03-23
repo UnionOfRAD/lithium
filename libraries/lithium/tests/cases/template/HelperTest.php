@@ -8,8 +8,6 @@
 
 namespace lithium\tests\cases\template;
 
-use stdClass;
-use lithium\template\Helper;
 use lithium\tests\mocks\template\MockHelper;
 use lithium\tests\mocks\template\MockRenderer;
 

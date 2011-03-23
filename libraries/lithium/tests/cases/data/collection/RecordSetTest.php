@@ -10,11 +10,8 @@ namespace lithium\tests\cases\data\collection;
 
 use lithium\data\collection\RecordSet;
 use lithium\tests\mocks\data\collection\MockRecordSet;
-use lithium\tests\mocks\data\source\database\adapter\MockAdapter;
 use lithium\tests\mocks\data\model\mock_database\MockResult;
 use lithium\tests\mocks\data\MockPostObject;
-use lithium\tests\mocks\data\MockModel;
-use lithium\data\Connections;
 use lithium\util\Collection;
 
 /**

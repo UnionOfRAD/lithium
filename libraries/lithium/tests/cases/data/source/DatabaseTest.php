@@ -11,7 +11,6 @@ namespace lithium\tests\cases\data\source;
 use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\data\entity\Record;
-use lithium\data\source\Database;
 use lithium\data\collection\RecordSet;
 use lithium\tests\mocks\data\model\MockDatabase;
 use lithium\tests\mocks\data\model\MockDatabasePost;

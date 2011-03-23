@@ -8,7 +8,6 @@
 
 namespace lithium\tests\integration\test;
 
-use lithium\test\filter\Coverage;
 use lithium\test\Group;
 use lithium\test\Report;
 

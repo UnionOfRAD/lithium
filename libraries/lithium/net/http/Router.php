@@ -9,7 +9,6 @@
 namespace lithium\net\http;
 
 use lithium\util\Inflector;
-use lithium\util\Collection;
 use lithium\net\http\RoutingException;
 
 /**

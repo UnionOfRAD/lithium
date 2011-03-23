@@ -10,7 +10,6 @@ namespace lithium\tests\integration\analysis;
 
 use lithium\core\Libraries;
 use lithium\analysis\Logger;
-use lithium\util\Collection;
 use lithium\util\collection\Filters;
 
 /**

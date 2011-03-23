@@ -10,7 +10,6 @@ namespace lithium\tests\cases\data\source\mongo_db;
 
 use MongoId;
 use MongoDate;
-use lithium\data\source\MongoDb;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentArray;
 use lithium\data\source\mongo_db\Exporter;

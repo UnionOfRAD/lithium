@@ -10,7 +10,6 @@ namespace lithium\g11n;
 
 use lithium\core\Environment;
 use lithium\util\String;
-use lithium\g11n\Locale;
 use lithium\g11n\Catalog;
 
 /**

@@ -14,14 +14,10 @@ use MongoId;
 use MongoCode;
 use MongoDate;
 use MongoRegex;
-use MongoMaxKey;
-use lithium\data\Model;
 use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\data\entity\Document;
-use lithium\tests\mocks\data\MockPost;
 use lithium\data\collection\DocumentSet;
-use lithium\data\collection\DocumentArray;
 use lithium\tests\mocks\data\source\MockMongoSource;
 use lithium\tests\mocks\data\source\MockMongoConnection;
 

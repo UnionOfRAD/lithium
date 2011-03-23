@@ -10,7 +10,6 @@ namespace lithium\tests\cases\test\filter;
 
 use lithium\test\filter\Affected;
 use lithium\test\Group;
-use lithium\tests\cases\g11n\CatalogTest;
 use lithium\test\Report;
 
 class AffectedTest extends \lithium\test\Unit {

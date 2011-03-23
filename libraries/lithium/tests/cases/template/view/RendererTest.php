@@ -9,7 +9,6 @@
 namespace lithium\tests\cases\template\view;
 
 use stdClass;
-use lithium\template\View;
 use lithium\action\Request;
 use lithium\action\Response;
 use lithium\template\Helper;

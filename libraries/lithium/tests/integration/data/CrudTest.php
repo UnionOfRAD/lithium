@@ -8,7 +8,6 @@
 
 namespace lithium\tests\integration\data;
 
-use Exception;
 use lithium\data\Connections;
 use lithium\tests\mocks\data\Companies;
 

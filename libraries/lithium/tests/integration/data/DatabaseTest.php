@@ -10,7 +10,6 @@ namespace lithium\tests\integration\data;
 
 use lithium\data\Connections;
 use lithium\data\model\Query;
-use lithium\data\source\Database;
 
 class DatabaseTest extends \lithium\test\Unit {
 

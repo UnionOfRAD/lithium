@@ -9,7 +9,6 @@
 namespace lithium\storage;
 
 use lithium\core\Libraries;
-use lithium\util\Collection;
 
 /**
  * The `Session` static class provides a consistent interface to configure and utilize the

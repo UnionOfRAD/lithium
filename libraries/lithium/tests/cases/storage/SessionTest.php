@@ -9,7 +9,6 @@
 namespace lithium\tests\cases\storage;
 
 use lithium\storage\Session;
-use lithium\util\Collection;
 use lithium\storage\session\adapter\Memory;
 use lithium\tests\mocks\storage\session\adapter\SessionStorageConditional;
 

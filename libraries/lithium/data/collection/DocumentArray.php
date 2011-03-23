@@ -8,7 +8,6 @@
 
 namespace lithium\data\collection;
 
-use lithium\data\Source;
 use lithium\util\Collection;
 
 class DocumentArray extends \lithium\data\Collection {

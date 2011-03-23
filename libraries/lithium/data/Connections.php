@@ -8,8 +8,6 @@
 
 namespace lithium\data;
 
-use Exception;
-use lithium\util\String;
 use lithium\core\Libraries;
 
 /**

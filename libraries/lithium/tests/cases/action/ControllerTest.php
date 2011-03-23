@@ -8,8 +8,6 @@
 
 namespace lithium\tests\cases\action;
 
-use Exception;
-use lithium\net\http\Media;
 use lithium\action\Request;
 use lithium\action\Controller;
 use lithium\tests\mocks\action\MockPostsController;

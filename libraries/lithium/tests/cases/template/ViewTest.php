@@ -10,7 +10,6 @@ namespace lithium\tests\cases\template;
 
 use lithium\template\View;
 use lithium\action\Response;
-use lithium\g11n\catalog\adapter\Memory;
 use lithium\template\view\adapter\Simple;
 use lithium\tests\mocks\template\MockView;
 use lithium\tests\mocks\template\view\adapters\TestRenderer;

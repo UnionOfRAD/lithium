@@ -10,7 +10,6 @@ namespace lithium\tests\cases\analysis;
 
 use lithium\core\Libraries;
 use lithium\analysis\Logger;
-use lithium\util\Collection;
 use lithium\tests\mocks\analysis\MockLoggerAdapter;
 
 /**

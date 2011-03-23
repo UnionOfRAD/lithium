@@ -9,7 +9,6 @@
 namespace lithium\data\source;
 
 use lithium\util\String;
-use lithium\core\Libraries;
 use lithium\util\Inflector;
 use InvalidArgumentException;
 

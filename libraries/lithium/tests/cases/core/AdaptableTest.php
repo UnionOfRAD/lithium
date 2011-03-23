@@ -9,7 +9,6 @@
 namespace lithium\tests\cases\core;
 
 use SplDoublyLinkedList;
-use lithium\util\Collection;
 use lithium\core\Adaptable;
 use lithium\storage\cache\adapter\Memory;
 use lithium\tests\mocks\core\MockAdapter;

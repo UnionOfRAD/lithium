@@ -10,7 +10,6 @@ namespace lithium\template\helper;
 
 use lithium\util\Set;
 use lithium\util\Inflector;
-use UnexpectedValueException;
 
 /**
  * A helper class to facilitate generating, processing and securing HTML forms. By default, `Form`

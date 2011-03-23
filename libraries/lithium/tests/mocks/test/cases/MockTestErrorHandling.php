@@ -8,8 +8,6 @@
 
 namespace lithium\tests\mocks\test\cases;
 
-use Exception;
-
 class MockTestErrorHandling extends \lithium\test\Unit {
 
 	public function testNotEnoughParams() {

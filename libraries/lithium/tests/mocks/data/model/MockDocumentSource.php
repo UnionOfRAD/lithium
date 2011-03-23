@@ -10,7 +10,6 @@ namespace lithium\tests\mocks\data\model;
 
 use MongoId;
 use MongoDate;
-use lithium\data\model\Relationship;
 
 class MockDocumentSource extends \lithium\data\Source {
 

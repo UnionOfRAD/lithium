@@ -8,7 +8,6 @@
 
 namespace lithium\action;
 
-use UnexpectedValueException;
 use BadMethodCallException;
 
 /**

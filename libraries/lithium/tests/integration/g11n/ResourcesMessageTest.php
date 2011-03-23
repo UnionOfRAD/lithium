@@ -9,7 +9,6 @@
 namespace lithium\tests\integration\g11n;
 
 use lithium\g11n\Catalog;
-use lithium\util\Validator;
 
 /**
  * Test for integration of g11n resources. Numbers of rules refer to those documented in

@@ -8,7 +8,6 @@
 
 namespace lithium\tests\cases\data\source\http\adapter;
 
-use lithium\data\Model;
 use lithium\data\model\Query;
 use lithium\data\Connections;
 use lithium\data\entity\Document;

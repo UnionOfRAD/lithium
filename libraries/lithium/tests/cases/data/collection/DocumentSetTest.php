@@ -8,15 +8,12 @@
 
 namespace lithium\tests\cases\data\collection;
 
-use stdClass;
 use lithium\data\Connections;
 use lithium\data\source\MongoDb;
 use lithium\data\source\http\adapter\CouchDb;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
-use lithium\data\collection\DocumentArray;
 use lithium\tests\mocks\data\model\MockDocumentPost;
-use lithium\tests\mocks\data\model\MockDocumentSource;
 use lithium\tests\mocks\data\source\mongo_db\MockResult;
 use lithium\tests\mocks\data\model\MockDocumentMultipleKey;
 
