@@ -52,7 +52,7 @@ class Sqlite3Test extends \lithium\test\Unit {
 		$expected = array(
 		  'autoConnect' => false,
 		  'database' => '',
-		  'flags' => NULL,
+		  'flags' => SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE,
 		  'key' => NULL,
 		  'persistent' => true,
 		  'host' => 'localhost',
