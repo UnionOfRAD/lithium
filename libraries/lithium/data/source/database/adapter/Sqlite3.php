@@ -12,7 +12,6 @@ namespace lithium\data\source\database\adapter;
 use SQLite3 as SQLite;
 use SQLite3Result;
 use lithium\data\model\QueryException;
-use lithium\data\source\database\adapter\sqlite3\Result;
 
 /**
  * Sqlite database driver
@@ -273,11 +272,11 @@ class Sqlite3 extends \lithium\data\source\Database {
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn) {
 			extract($params);
 
-			if (!($result = $conn->query($sql)) instanceof SQLite3Result) {
+			if (!($resource = $conn->query($sql)) instanceof SQLite3Result) {
 				list($code, $error) = $self->error();
 				throw new QueryException("{$sql}: {$error}", $code);
 			}
-			return new Result(array('resource' => $result));
+			return $self->invokeMethod('_instance', array('result', compact('resource')));
 		});
 	}
 
