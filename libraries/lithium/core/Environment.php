@@ -230,7 +230,7 @@ class Environment {
 	 */
 	public static function set($env, $config = null) {
 		if (is_null($config)) {
-			switch(true) {
+			switch (true) {
 				case is_object($env) || is_array($env):
 					static::$_current = static::_detector()->__invoke($env);
 				break;

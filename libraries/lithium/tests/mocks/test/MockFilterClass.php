@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\test;
 
 class MockFilterClass extends \lithium\core\Object{
 	public function __construct($all = false) {
-		if($all) {
+		if ($all) {
 			return true;
 		}
 

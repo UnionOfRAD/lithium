@@ -214,7 +214,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 */
 	public function each($filter) {
 		if (!$this->closed()) {
-			while($this->next()) {}
+			while ($this->next()) {}
 		}
 		return parent::each($filter);
 	}
@@ -236,7 +236,7 @@ abstract class Collection extends \lithium\util\Collection {
 		$options += $defaults;
 
 		if (!$this->closed()) {
-			while($this->next()) {}
+			while ($this->next()) {}
 		}
 		$data = parent::map($filter, $options);
 

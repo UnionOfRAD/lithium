@@ -90,7 +90,7 @@ class Complexity extends \lithium\test\Filter {
 		$packagedResults = array();
 
 		foreach ($filterResults as $result) {
-			foreach($result as $class => $method) {
+			foreach ($result as $class => $method) {
 				if (!isset($packagedResults[$class])) {
 					$packagedResults[$class] = array();
 				}

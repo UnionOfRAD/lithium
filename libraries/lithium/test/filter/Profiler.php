@@ -164,7 +164,7 @@ class Profiler extends \lithium\test\Filter {
 		$totals = array();
 		foreach ($metrics as $class => $data) {
 			foreach ($data as $title => $value) {
-				if(isset(static::$_metrics[$title])) {
+				if (isset(static::$_metrics[$title])) {
 					if (isset($totals[$title]['value'])) {
 						$totals[$title]['value'] += $value;
 					} else {

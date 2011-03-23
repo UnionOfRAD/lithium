@@ -141,7 +141,7 @@ class Redis extends \lithium\core\Object {
 					return $ttl;
 				}
 			}
-			if ($result = $connection->set($params['key'], $params['data'])){
+			if ($result = $connection->set($params['key'], $params['data'])) {
 				if ($expiry) {
 					return $_self->invokeMethod('_ttl', array($params['key'], $expiry));
 				}

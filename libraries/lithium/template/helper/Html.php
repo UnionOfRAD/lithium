@@ -229,15 +229,15 @@ class Html extends \lithium\template\Helper {
 	 * @filter This method can be filtered.
 	 */
 	public function head($tag, array $options) {
-		if(!isset($this->_strings[$tag])) {
-			return NULL;
+		if (!isset($this->_strings[$tag])) {
+			return null;
 		}
 		$method = __METHOD__;
 		$filter = function($self, $options, $chain) use ($method, $tag) {
 			return $self->invokeMethod('_render', array($method, $tag, $options));
 		};
 		$head = $this->_filter($method, $options, $filter);
-		if($this->_context) {
+		if ($this->_context) {
 			$this->_context->head($head);
 		}
 		return $head;

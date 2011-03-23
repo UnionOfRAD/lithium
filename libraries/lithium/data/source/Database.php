@@ -499,7 +499,7 @@ abstract class Database extends \lithium\data\Source {
 				return $this->name($key) . ' = ' . $this->value($value);
 			case is_numeric($key) && is_array($value):
 				$result = array();
-				foreach($value as $cField => $cValue) {
+				foreach ($value as $cField => $cValue) {
 					$result[] = $this->_processConditions($cField, $cValue, $schema, $glue);
 				}
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
@@ -510,7 +510,7 @@ abstract class Database extends \lithium\data\Source {
 				$result = array();
 				$glue = strtoupper($key);
 
-				foreach($value as $cField => $cValue) {
+				foreach ($value as $cField => $cValue) {
 					$result[] = $this->_processConditions($cField, $cValue, $schema, $glue);
 				}
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
