@@ -249,6 +249,7 @@ class Cookie extends \lithium\core\Object {
 	 * Formats the given `$name` argument for use in the cookie adapter.
 	 *
 	 * @param string $name The key to be formatted, e.g. `foo.bar.baz`.
+	 * @param array $config
 	 * @return string The formatted key.
 	 */
 	public static function keyFormat($name, $config) {
