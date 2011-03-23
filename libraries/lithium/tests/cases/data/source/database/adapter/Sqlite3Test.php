@@ -126,6 +126,12 @@ class Sqlite3Test extends \lithium\test\Unit {
 		$this->assertFalse(Sqlite3::enabled('arrays'));
 	}
 
+	public function testValueQuoting() {
+		$result = $this->db->value('exciting news');
+		$expected = "'exciting news'";
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testNameQuoting() {
 		$db = new MockSqlite3(array('autoConnect' => false));
 		$result = $db->name('title');
