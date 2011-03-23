@@ -143,6 +143,12 @@ class Sqlite3 extends \lithium\data\source\Database {
 	/**
 	 * Gets the column schema for a given Sqlite3 table.
 	 *
+	 * A column type may not always be available, i.e. when during creation of
+	 * the column no type was declared. Those columns are internally treated
+	 * by SQLite3 as having a `NONE` affinity. The final schema will contain no
+	 * information about type and length of such columns (both values will be
+	 * `null`).
+	 *
 	 * @param mixed $entity Specifies the table name for which the schema should be returned, or
 	 *        the class name of the model object requesting the schema, in which case the model
 	 *        class will be queried for the correct table name.
@@ -163,11 +169,12 @@ class Sqlite3 extends \lithium\data\source\Database {
 			$fields = array();
 
 			foreach ($columns as $column) {
-				list($type, $length) = explode('(', $column['type']) + array('', '');
-				$length = trim($length, ')');
+				$regex = '(?P<type>[a-zA-Z]+)+(\((?P<length>[0-9]+)\))?';
+				preg_match("/{$regex}/", $column['type'], $matches);
+
 				$fields[$column['name']] = array(
-					'type' => $type,
-					'length' => $length,
+					'type' => isset($matches['type']) ? $matches['type'] : null,
+					'length' => isset($matches['length']) ? $matches['length'] : null,
 					'null'     => ($column['notnull'] == 1 ? true : false),
 					'default'  => $column['dflt_value'],
 				);
