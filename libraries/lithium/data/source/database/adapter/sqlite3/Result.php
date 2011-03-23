@@ -13,17 +13,15 @@ use SQLite3Result;
 class Result extends \lithium\data\source\database\Result {
 
 	protected function _next() {
-		if (!$this->_resource instanceof SQLite3Result) {
-			return;
+		if ($this->_resource instanceof SQLite3Result) {
+			return $this->_resource->fetchArray(SQLITE3_ASSOC);
 		}
-		return $this->_resource->fetchArray(SQLITE3_ASSOC);
 	}
 
 	protected function _close() {
-		if (!$this->_resource instanceof SQLite3Result) {
-			return;
+		if ($this->_resource instanceof SQLite3Result) {
+			$this->_resource->finalize();
 		}
-		$this->_resource->finalize();
 	}
 
 	public function __call($name, $arguments) {
