@@ -195,6 +195,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	/**
 	 * Converts a given value into the proper type based on a given schema definition.
 	 *
+	 * @link http://www.sqlite.org/lang_keywords.html
 	 * @see lithium\data\source\Database::schema()
 	 * @param mixed $value The value to be converted. Arrays will be recursively converted.
 	 * @param array $schema Formatted array from `lithium\data\source\Database::schema()`
