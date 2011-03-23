@@ -108,11 +108,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @return boolean True on success, else false.
 	 */
 	public function disconnect() {
-		if ($this->_isConnected) {
-			$this->_isConnected = !$this->connection->close();
-			return !$this->_isConnected;
-		}
-		return true;
+		return !$this->_isConnected || !($this->_isConnected = !$this->connection->close());
 	}
 
 	/**
