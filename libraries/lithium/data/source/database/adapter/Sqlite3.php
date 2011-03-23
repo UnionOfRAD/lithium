@@ -261,7 +261,6 @@ class Sqlite3 extends \lithium\data\source\Database {
 		if ($this->connection->lastErrorMsg()) {
 			return array($this->connection->lastErrorCode(), $this->connection->lastErrorMsg());
 		}
-		return null;
 	}
 
 	/**
