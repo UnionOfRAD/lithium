@@ -175,8 +175,8 @@ class Sqlite3 extends \lithium\data\source\Database {
 				$fields[$column['name']] = array(
 					'type' => isset($matches['type']) ? $matches['type'] : null,
 					'length' => isset($matches['length']) ? $matches['length'] : null,
-					'null'     => ($column['notnull'] == 1 ? true : false),
-					'default'  => $column['dflt_value'],
+					'null' => $column['notnull'] == 1,
+					'default' => $column['dflt_value']
 				);
 			}
 			return $fields;
