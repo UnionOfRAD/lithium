@@ -96,13 +96,10 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @return boolean True if the database could be connected, else false
 	 */
 	public function connect() {
-		$config = $this->_config;
-		$this->_isConnected = false;
-
-		if ($this->connection = new SQLite($config['database'], $config['flags'], $config['key'])) {
-			$this->_isConnected = true;
-		}
-		return $this->_isConnected;
+		$this->connection = new SQLite(
+			$this->_config['database'], $this->_config['flags'], $this->_config['key']
+		);
+		return $this->_isConnected = (boolean) $this->connection;
 	}
 
 	/**
