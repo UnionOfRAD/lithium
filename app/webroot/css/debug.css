@@ -263,19 +263,7 @@ div.test-result {
 	background: #666;
 	border-radius: 4px;
 }
-.app .test-result {
-	width: 640px;
-	margin-bottom: 0;
-}
-.app .test-result.solution {
-	padding: 0;
-	margin: .5em 0 1.5em 0;
-	color: #111;
-	background: none;
-}
-.app .test-result.solution ol {
-	margin-left: 1.5em;
-}
+
 .test-dashboard .test-result {
 	font-size: 1.15em;
 }
@@ -586,6 +574,19 @@ div.code-coverage-results span.result-good {
 }
 
 /*--- Application Home Page ---*/
+.app .test-result {
+	width: 640px;
+	margin-bottom: 0;
+}
+.app .test-result.solution {
+	padding: 0;
+	margin: .5em 0 1.5em 0;
+	color: #111;
+	background: none;
+}
+.app .test-result.solution ol {
+	margin-left: 1.5em;
+}
 .app .additional-resources {
 	list-style: none;
 	margin: 0;
