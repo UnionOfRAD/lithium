@@ -261,7 +261,11 @@ div.test-result {
 	padding: .75em 1em .55em;
 	color: #FFFFFF;
 	background: #666;
-	text-shadow: 0px 0px 6px rgba(0,0,0,.5);
+	border-radius: 4px;
+}
+.app .test-result {
+	width: 600px;
+	margin-bottom: 0;
 }
 .test-dashboard .test-result {
 	font-size: 1.15em;
