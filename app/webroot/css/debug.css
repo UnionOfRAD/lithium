@@ -302,9 +302,6 @@ div.test-assert, div.test-exception, div.test-skip {
 	margin: 0 0 1.5em -14px;
 	padding: 0 0 0 10px;
 	color: #000000;
-	font-size: 1em;
-	line-height: 1.5em;
-	position: relative;
 	border: 1px solid rgba(0,0,0,.05);
 	border-width: 0 0 0 4px;
 }
