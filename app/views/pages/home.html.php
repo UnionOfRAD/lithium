@@ -12,30 +12,21 @@ use lithium\data\Connections;
 $this->title('Home');
 
 $checkName = null;
-$checkStatus = $solutions = array();
+$checkStatus = array();
 
-$notify = function($status, $message, $solution = null) use (&$checkName, &$checkStatus, &$solutions) {
+$notify = function($status, $message, $solution = null) use (&$checkName, &$checkStatus) {
 	$checkStatus[$checkName] = $status === true;
 
 	if (!is_string($status)) {
 		$status = $status ? 'success' : 'fail';
 	}
-
 	$message = is_array($message) ? join("\n<br />", $message) : $message;
+	$solution = is_array($solution) ? join("\n<br />", $solution) : $solution;
 
-	if (!empty($solution)) {
-		$default = array(
-			'id' => 'help-' . $checkName,
-			'title' => $checkName,
-			'content' => null
-		);
-		if (is_array($solution['content'])) {
-			$solution['content'] = join("\n<br />", $solution['content']);
-		}
-		$solutions[$checkName] = $solution += $default;
-
-	}
-	return "<div class=\"test-result test-result-{$status}\">{$message}</div>";
+	return <<<HTML
+<div class="test-result test-result-{$status}">{$message}</div>
+<div class="test-result solution">{$solution}</div>
+HTML;
 };
 
 $sanityChecks = array(
@@ -43,11 +34,11 @@ $sanityChecks = array(
 		if (is_writable($path = realpath(Libraries::get(true, 'resources')))) {
 			return $notify(true, 'Resources directory is writable.');
 		}
-		return $notify(false, array(
-			"Your resource path <code>$path</code> is not writeable. " .
-			"To fix this on *nix and Mac OSX, run the following from the command line:",
-			"<code>chmod -R 0777 {$path}</code>"
-		));
+		return $notify(false, 'Your resource path is not writeable.',
+			"To fix this on *nix and Mac OSX, run the following from the command line:
+			<code>$ chmod -R 0777 {$path}</code>
+			"
+		);
 	},
 	'database' => function() use ($notify) {
 		$config = Connections::config();
@@ -55,17 +46,19 @@ $sanityChecks = array(
 		$connections = realpath(LITHIUM_APP_PATH . '/config/bootstrap/connections.php');
 
 		if (empty($config)) {
-			return $notify('notice', array('No database connections defined.'), array(
-				'title' => 'Database Connections',
-				'content' => array(
-					'To create a database connection, edit the file <code>' . $boot . '</code>, ',
-					'and uncomment the following line:',
-					'<pre><code>require __DIR__ . \'/bootstrap/connections.php\';</code></pre>',
-					'Then, edit the file <code>' . $connections . '</code>.'
-				)
-			));
+			return $notify('notice', 'No database connection defined.',
+				"To create a database connection:
+				<ol>
+					<li>Edit the file <code>{$boot}</code>.</li>
+					<li>
+						Uncomment the line having
+						<code>require __DIR__ . '/bootstrap/connections.php';</code>.
+					</li>
+					<li>Edit the file <code>{$connections}</code>.</li>
+				</ol>"
+			);
 		}
-		return $notify(true, 'Database connection(s) configured.');
+		return $notify(true, 'Database connection/s configured.');
 	},
 	// 'databaseEnabled' => function() use ($notify, &$checkStatus) {
 	// 	if (!$checkStatus['database']) {
@@ -149,12 +142,6 @@ $sanityChecks = array(
 	<code><?php echo realpath(LITHIUM_APP_PATH . '/config/routes.php'); ?></code>.
 </p>
 
-<?php if ($solutions) { ?>
-	<?php foreach ($solutions as $solution) { ?>
-		<h4 id="<?php echo $solution['id']; ?>"><?php echo $solution['title']; ?></h4>
-		<p><?php echo $solution['content']; ?></p>
-	<?php } ?>
-<?php } ?>
 
 <h3>Sanity Checks</h3>
 <?php foreach ($sanityChecks as $checkName => $check): ?>

@@ -264,8 +264,17 @@ div.test-result {
 	border-radius: 4px;
 }
 .app .test-result {
-	width: 600px;
+	width: 640px;
 	margin-bottom: 0;
+}
+.app .test-result.solution {
+	padding: 0;
+	margin: .5em 0 1.5em 0;
+	color: #111;
+	background: none;
+}
+.app .test-result.solution ol {
+	margin-left: 1.5em;
 }
 .test-dashboard .test-result {
 	font-size: 1.15em;
