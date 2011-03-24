@@ -338,7 +338,7 @@ div.test-skip {
 	display: block;
 	clear: both;
 	white-space: pre;
-	color: #777;
+	color: #111;
 	font-size: .9em;
 	padding: .5em 1em;
 	margin: .5em 0;
@@ -350,10 +350,6 @@ div.test-skip {
 	padding: 0 .5em;
 	margin: .25em 0 .25em .5em;
 	background: #FAFAFA;
-}
-
-div.test-exception span.trace {
-	font-style: italic;
 }
 
 div.test-skip span.content {
