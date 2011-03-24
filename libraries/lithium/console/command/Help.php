@@ -41,16 +41,18 @@ class Help extends \lithium\console\Command {
 		}
 		$command = strtolower(Inflector::slug($command));
 
+		$run = null;
 		$methods = $this->_methods($class);
 		$properties = $this->_properties($class);
 		$info = Inspector::info($class);
 
 		$this->out('USAGE', 'heading');
 
-		$run = $methods['run'];
-		unset($methods['run']);
-		$this->_renderUsage($command, $run, $properties);
-
+		if (isset($methods['run'])) {
+			$run = $methods['run'];
+			unset($methods['run']);
+			$this->_renderUsage($command, $run, $properties);
+		}
 		foreach ($methods as $method) {
 			$this->_renderUsage($command, $method);
 		}
@@ -64,8 +66,10 @@ class Help extends \lithium\console\Command {
 		if ($properties || $methods) {
 			$this->out('OPTIONS', 'heading');
 		}
-		if ($methods) {
+		if ($run) {
 			$this->_render($run['args']);
+		}
+		if ($methods) {
 			$this->_render($methods);
 		}
 		if ($properties) {
