@@ -23,9 +23,6 @@ class Help extends \lithium\console\Command {
 	 * Auto run the help command.
 	 *
 	 * @param string $command Name of the command to return help about.
-	 * @param string $method The method of the command to get help for.
-	 *        This defaults to `'run'` which is the default main method
-	 *        for lithium commands.
 	 * @return void
 	 */
 	public function run($command = null) {
