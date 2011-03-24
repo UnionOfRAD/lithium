@@ -584,3 +584,9 @@ div.code-coverage-results span.result-ok {
 div.code-coverage-results span.result-good {
 	color: #0a0;
 }
+
+/*--- Application Home Page ---*/
+.app .additional-resources {
+	list-style: none;
+	margin: 0;
+}

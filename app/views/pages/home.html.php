@@ -115,10 +115,15 @@ $checks = array(
 <?php endforeach; ?>
 
 <h3>Additional Resources</h3>
-<ul>
-	<li><?php echo $this->html->link('Lithium API', 'http://lithify.me/docs/lithium'); ?></li>
-	<li><?php echo $this->html->link('Lithium Development Wiki', 'http://dev.lithify.me/lithium/wiki'); ?></li>
-	<li><?php echo $this->html->link('#li3 IRC channel', 'irc://irc.freenode.net/#li3'); ?></li>
-	<li><?php echo $this->html->link('Lithium Community', 'http://sphere.lithify.me'); ?></li>
-	<li><?php echo $this->html->link('Lithium Source', 'http://dev.lithify.me/lithium/source'); ?></li>
+<ul class="additional-resources">
+	<li><?php echo $this->html->link('Documentation (Draft)', 'http://dev.lithify.me/drafts/source/en'); ?></li>
+	<li><?php echo $this->html->link('API Documentation', 'http://lithify.me/docs/lithium'); ?></li>
+	<li><?php echo $this->html->link('Development Wiki', 'http://dev.lithify.me/lithium/wiki'); ?></li>
+	<li>
+		<?php echo $this->html->link('#li3 general support', 'irc://irc.freenode.net/#li3'); ?>
+		and
+		<?php echo $this->html->link('#li3-core core discussion', 'irc://irc.freenode.net/#li3-core'); ?>
+		IRC channels
+		(<?php echo $this->html->link('logs', 'http://lithify.me/bot/logs'); ?>)
+	</li>
 </ul>
