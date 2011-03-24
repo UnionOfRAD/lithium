@@ -11,7 +11,10 @@
 
 body.test-dashboard {
 	font-family: Helvetica, Arial, sans-serif;
-	font-size: 16px;
+	font-size: 14px;
+	line-height: 1.5em;
+	color: #0d0d0d;
+	background-color: #fff;
 	margin: 0;
 	min-width: 800px;
 }
@@ -126,7 +129,6 @@ body.test-dashboard .test-menu {
 	padding: .75em 0 1em 1%;
 	width: 20%;
 	background: #f6f6f6;
-	font-size: .85em;
 }
 
 .test-dashboard .test-menu > ul {
