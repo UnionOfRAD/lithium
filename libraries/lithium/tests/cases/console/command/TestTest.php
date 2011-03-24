@@ -10,6 +10,7 @@ namespace lithium\tests\cases\console\command;
 
 use lithium\console\command\Test;
 use lithium\console\Request;
+use lithium\core\Libraries;
 
 class TestTest extends \lithium\test\Unit {
 
@@ -20,6 +21,8 @@ class TestTest extends \lithium\test\Unit {
 	protected $_backup = array();
 
 	public function setUp() {
+		Libraries::cache(false);
+
 		$this->classes = array(
 			'response' => 'lithium\tests\mocks\console\MockResponse'
 		);
@@ -115,6 +118,21 @@ class TestTest extends \lithium\test\Unit {
 		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTestErrorHandling.php';
 		$result = $command->run($path);
 		$this->assertFalse($result);
+	}
+
+	public function testJsonFormat() {
+		$command = new Test(array(
+			'request' => $this->request, 'classes' => $this->classes
+		));
+		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTest.php';
+		$command->format = 'json';
+		$command->run($path);
+
+		$result = $command->response->output;
+		$result = json_decode($result, true);
+
+		$this->assertTrue(isset($result['count']));
+		$this->assertTrue(isset($result['stats']));
 	}
 }
 

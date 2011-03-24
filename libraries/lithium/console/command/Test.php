@@ -37,6 +37,15 @@ class Test extends \lithium\console\Command {
 	public $filters;
 
 	/**
+	 * Format to use for rendering results. Any other format than `txt` will
+	 * cause the command to enter quite mode, surpressing headers and any other
+	 * decoration.
+	 *
+	 * @var string Either `txt` or `json`.
+	 */
+	public $format = 'txt';
+
+	/**
 	 * Runs tests given a path to a directory or file containing tests. The path to the
 	 * test(s) may be absolte or relative to the current working directory.
 	 *
@@ -70,19 +79,22 @@ class Test extends \lithium\console\Command {
 		}
 		$path = $libraryPath;
 
-		$this->header('Test');
-		$this->out(sprintf('Running test(s) in `%s`... ', $path), array('nl' => false));
-
+		if ($this->format == 'txt') {
+			$this->header('Test');
+			$this->out(sprintf('Running test(s) in `%s`... ', $path), array('nl' => false));
+		}
 		error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
 
 		$report = Dispatcher::run($path, compact('filters') + array(
 			'reporter' => 'console',
-			'format' => 'txt'
+			'format' => $this->format
 		));
 		$stats = $report->stats();
 
-		$this->out('done.', 2);
-		$this->out('{:heading}Results{:end}', 0);
+		if ($this->format == 'txt') {
+			$this->out('done.', 2);
+			$this->out('{:heading}Results{:end}', 0);
+		}
 		$this->out($report->render('stats', $stats));
 
 		foreach ($report->filters() as $filter => $options) {
@@ -90,9 +102,10 @@ class Test extends \lithium\console\Command {
 			$this->out($report->render($options['name'], compact('data')));
 		}
 
-		$this->hr();
-		$this->nl();
-
+		if ($this->format == 'txt') {
+			$this->hr();
+			$this->nl();
+		}
 		return $stats['success'];
 	}
 
