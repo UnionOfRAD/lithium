@@ -44,7 +44,7 @@ $sanityChecks = array(
 			return $notify(true, 'Resources directory is writable.');
 		}
 		return $notify(false, array(
-			"Your resource path (<code>{$path}</code>) is not writeable. " .
+			"Your resource path <code>$path</code> is not writeable. " .
 			"To fix this on *nix and Mac OSX, run the following from the command line:",
 			"<code>chmod -R 0777 {$path}</code>"
 		));
