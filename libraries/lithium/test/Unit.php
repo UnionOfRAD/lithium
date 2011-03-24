@@ -107,8 +107,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @return void
 	 */
-	public function skip() {
-	}
+	public function skip() {}
 
 	/**
 	 * Skips test(s) if the condition is met.
