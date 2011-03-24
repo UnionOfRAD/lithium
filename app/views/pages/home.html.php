@@ -63,8 +63,7 @@ $sanityChecks = array(
 		}
 		return $notify(false, 'Your resource path is not writeable.',
 			"To fix this on *nix and Mac OSX, run the following from the command line:
-			<code>$ chmod -R 0777 {$path}</code>
-			"
+			<code>$ chmod -R 0777 {$path}</code>"
 		);
 	},
 	'database' => function() use ($notify) {
