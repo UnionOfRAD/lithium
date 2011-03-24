@@ -205,7 +205,7 @@ a.menu-folder:before {
 	content: '\25B2' !important;
 }
 ul.menu a:hover:before, a.menu-folder:hover:before, ul.metrics li:hover:before {
-	color: #60AF12;
+	color: #00A6F5;
 }
 
 /*--- Benchmarking ---*/
