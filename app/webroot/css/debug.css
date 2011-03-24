@@ -203,9 +203,6 @@ ul.menu a:hover:before, a.menu-folder:hover:before, ul.metrics li:hover:before {
 /*--- Benchmarking ---*/
 table.metrics {
 	border: 1px solid #e6e6e6;
-	-moz-box-shadow: 0 0 6px rgba(0,0,0,.15);
-	-webkit-box-shadow: 0 0 6px rgba(0,0,0,.15);
-	box-shadow: 0 0 6px rgba(0,0,0,.15);
 }
 table.metrics {
 	border-collapse: collapse;
