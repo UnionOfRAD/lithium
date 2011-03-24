@@ -179,7 +179,7 @@ a.test-all {
 	background: #e6e6e6;
 }
 a.test-all:hover {
-	background: #60AF12;
+	background: #00a6f5;
 	-moz-box-shadow: inset 0 0 12px rgba(0,0,0,.25);
 	-webkit-box-shadow: inset 0 0 12px rgba(0,0,0,.25);
 	box-shadow: inset 0 0 12px rgba(0,0,0,.25);
