@@ -71,6 +71,19 @@ class TestTest extends \lithium\test\Unit {
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
+
+		$command = new Test(array(
+			'request' => $this->request, 'classes' => $this->classes
+		));
+
+		$current = basename(getcwd());
+		$path = "../{$current}/tests/mocks/test/cases/MockTest.php";
+		$command->run($path);
+
+		$expected = "1 passes\n0 fails and 0 exceptions\n";
+		$expected = preg_quote($expected);
+		$result = $command->response->output;
+		$this->assertPattern("/{$expected}/", $result);
 	}
 
 	public function testRunMultipleTestsWithAbsolutePath() {

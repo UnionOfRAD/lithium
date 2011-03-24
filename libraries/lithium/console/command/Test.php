@@ -58,7 +58,7 @@ class Test extends \lithium\console\Command {
 		if ($path[0] != '/') {
 			$path = $this->request->env('working') . '/' . $path;
 		}
-		if (!file_exists($path)) {
+		if (!$path = realpath($path)) {
 			$this->error('Not a valid path.');
 			return false;
 		}
