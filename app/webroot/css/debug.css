@@ -274,7 +274,7 @@ div.test-result {
 .test-dashboard .test-result {
 	font-size: 1.15em;
 }
-.test-dashboard .test-result .digit {
+.test-dashboard .digit {
 	font-weight: bold;
 }
 
