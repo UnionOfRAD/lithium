@@ -129,17 +129,12 @@ $sanityChecks = array(
 
 ?>
 
-<?php foreach ($sanityChecks as $checkName => $check): ?>
-	<?php echo $check(); ?>
-<?php endforeach; ?>
-
 <h3>Getting Started</h3>
 <p>
 	This is your application's default home page. To change this template, edit the file
 	<code><?php echo realpath(LITHIUM_APP_PATH . '/views/pages/home.html.php'); ?></code>.
 </p>
 
-<h4>Layout</h4>
 <p>
 	To change the application's
 	<?php echo $this->html->link('layout', 'http://lithify.me/en/docs/lithium/template'); ?>
@@ -147,7 +142,6 @@ $sanityChecks = array(
 	<code><?php echo realpath(LITHIUM_APP_PATH . '/views/layouts/default.html.php'); ?></code>.
 </p>
 
-<h4>Routing</h4>
 <p>
 	To change the
 	<?php echo $this->html->link('routing', 'http://lithify.me/docs/lithium/net/http/Router'); ?>
@@ -162,7 +156,12 @@ $sanityChecks = array(
 	<?php } ?>
 <?php } ?>
 
-<h4>Additional Resources</h4>
+<h3>Sanity Checks</h3>
+<?php foreach ($sanityChecks as $checkName => $check): ?>
+	<?php echo $check(); ?>
+<?php endforeach; ?>
+
+<h3>Additional Resources</h3>
 <ul>
 	<li><?php echo $this->html->link('Lithium API', 'http://lithify.me/docs/lithium'); ?></li>
 	<li><?php echo $this->html->link('Lithium Community', 'http://sphere.lithify.me'); ?></li>
