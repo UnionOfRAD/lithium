@@ -7,8 +7,10 @@ $exceptions = intval($count['exceptions']) ?: 0;
 
 ?>
 <div class="test-result test-result-<?php echo ($success ? 'success' : 'fail') ?>">
-	<?php echo "{$passes} / {$asserts} passes, {$fails} " . ($fails == 1 ? ' fail' : ' fails'); ?>
-	and <?php echo $exceptions ?> <?php echo ($exceptions == 1 ? ' exception' : ' exceptions') ?>
+	<span class="digit"><?php echo $passes; ?></span> /
+	<span class="digit"><?php echo $asserts; ?></span> <?php echo $fails == 1 ? 'pass': 'passes'; ?>,
+	<span class="digit"><?php echo $fails; ?></span> <?php echo $fails == 1 ? 'fail' : 'fails'; ?>
+	and <span class="digit"><?php echo $exceptions ?></span> <?php echo $exceptions == 1 ? ' exception' : ' exceptions'; ?>
 </div>
 
 <?php foreach ((array) $stats['errors'] as $error): ?>

@@ -274,6 +274,9 @@ div.test-result {
 .test-dashboard .test-result {
 	font-size: 1.15em;
 }
+.test-dashboard .test-result .digit {
+	font-weight: bold;
+}
 
 div.test-result-success {
 	background-color: #4ddb4a;
