@@ -586,7 +586,6 @@ test;
 		$this->_cleanUp();
 	}
 
-
 	public function testPushNotValid() {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
