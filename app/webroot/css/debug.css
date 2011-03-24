@@ -302,7 +302,6 @@ div.test-assert, div.test-exception, div.test-skip {
 	margin: 0 0 1.5em -14px;
 	padding: 0 0 0 10px;
 	color: #000000;
-	font-family: 'Andale Mono', Monaco, Courier, monospace !important;
 	font-size: 1em;
 	line-height: 1.5em;
 	position: relative;
@@ -344,6 +343,7 @@ div.test-skip {
 	margin: .5em 0;
 	background: #fafafa;
 	border: 1px solid rgba(0,0,0,.1);
+	font-family: 'Andale Mono', Monaco, Courier, monospace !important;
 }
 
 .test-assert span.trace {
