@@ -98,7 +98,7 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
 			ini_get('phar.readonly') == '1',
-			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+			'INI setting phar.readonly = On'
 		);
 
 		$this->library->library = 'library_test';
@@ -118,7 +118,7 @@ class LibraryTest extends \lithium\test\Unit {
 	public function testExtractWithFullPaths() {
 		$this->skipIf(
 			!file_exists("{$this->_testPath}/library_test.phar.gz"),
-			'Skipped test {:class}::{:function}() - depends on {:class}::testArchive()'
+			'Depends on ' . __CLASS__  . '::testArchive()'
 		);
 		$this->library->library = 'library_test';
 
@@ -147,7 +147,7 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
 			ini_get('phar.readonly') == '1',
-			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+			'INI setting phar.readonly = On'
 		);
 
 		chdir('new');
@@ -290,7 +290,7 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
 			ini_get('phar.readonly') == '1',
-			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+			'INI setting phar.readonly = On'
 		);
 
 		$result = file_put_contents(
@@ -340,7 +340,7 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
 			ini_get('phar.readonly') == '1',
-			'Skipped test {:class}::{:function}() - relies on {:class}::testPush()'
+			'Relies on ' . __CLASS__ . '::testPush()'
 		);
 		$this->library->path = $this->_testPath;
 		$result = $this->library->install('library_test_plugin');
@@ -380,7 +380,7 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
 			ini_get('phar.readonly') == '1',
-			'Skipped test {:class}::{:function}() - relies on {:class}::testPush()'
+			'Relies on ' . __CLASS__  . '::testPush()'
 		);
 		$this->library->path = $this->_testPath;
 		$result = $this->library->install('li3_lab');
@@ -446,7 +446,7 @@ test;
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
 			ini_get('phar.readonly') == '1',
-			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+			'INI setting phar.readonly = On'
 		);
 		$result = $this->library->extract('plugin', $this->_testPath . '/library_test_plugin');
 		$this->assertTrue($result);
@@ -526,7 +526,7 @@ test;
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
 			ini_get('phar.readonly') == '1',
-			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+			'INI setting phar.readonly = On'
 		);
 		$result = $this->library->extract('plugin', $this->_testPath . '/library_test_plugin');
 		$this->assertTrue($result);
@@ -590,7 +590,7 @@ test;
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
 			ini_get('phar.readonly') == '1',
-			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+			'INI setting phar.readonly = On'
 		);
 		$this->library->library = 'library_plugin_test';
 		$path = $this->_testPath;
