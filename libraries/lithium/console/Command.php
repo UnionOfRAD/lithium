@@ -81,8 +81,12 @@ class Command extends \lithium\core\Object {
 		parent::_init();
 
 		$this->request = $this->_config['request'];
-		$this->response = $this->_instance('response', $this->_config['response']);
 
+		if (is_object($this->_config['response'])) {
+			$this->response = $this->_config['response'];
+		} else {
+			$this->response = $this->_instance('response', $this->_config['response']);
+		}
 		if (!empty($this->request->params)) {
 			$params = (array) array_diff_key(
 				$this->request->params, array('command' => null, 'action' => null, 'args' => null)
@@ -280,15 +284,17 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Show help generated from the documented code of the command.
+	 * Invokes `Help` command.
 	 *
 	 * @return boolean
 	 */
 	protected function _help() {
-		$help = new Help($this->_config);
-		$result = $help->run(get_class($this));
-		$this->response = $help->response;
-		return $result;
+		$help = new Help(array(
+			'request' => $this->request,
+			'response' => $this->response,
+			'classes' => $this->_classes
+		));
+		return $help->run(get_class($this));
 	}
 
 	/**
