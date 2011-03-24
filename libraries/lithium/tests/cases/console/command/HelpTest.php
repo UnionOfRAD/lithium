@@ -50,7 +50,7 @@ class HelpTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$expected = "li3 test [--case=<string>] [--group=<string>] [--filters=<string>]";
-		$result = $help->response->output;
+		$result = $command->response->output;
 		$this->assertTrue(strpos($result, $expected) !== false);
 
 		$expected = "OPTIONS\n    missing\n";
