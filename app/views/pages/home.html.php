@@ -158,8 +158,8 @@ $sanityChecks = array(
 <h3>Additional Resources</h3>
 <ul>
 	<li><?php echo $this->html->link('Lithium API', 'http://lithify.me/docs/lithium'); ?></li>
-	<li><?php echo $this->html->link('Lithium Community', 'http://sphere.lithify.me'); ?></li>
 	<li><?php echo $this->html->link('Lithium Development Wiki', 'http://dev.lithify.me/lithium/wiki'); ?></li>
-	<li><?php echo $this->html->link('Lithium Source', 'http://dev.lithify.me/lithium/source'); ?></li>
 	<li><?php echo $this->html->link('#li3 IRC channel', 'irc://irc.freenode.net/#li3'); ?></li>
+	<li><?php echo $this->html->link('Lithium Community', 'http://sphere.lithify.me'); ?></li>
+	<li><?php echo $this->html->link('Lithium Source', 'http://dev.lithify.me/lithium/source'); ?></li>
 </ul>
