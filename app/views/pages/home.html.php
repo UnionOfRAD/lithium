@@ -20,42 +20,34 @@ $notify = function($status, $message, $solution = null) {
 };
 
 $checks = array(
-	'home' => function() use ($notify) {
-		$file = realpath(LITHIUM_APP_PATH . '/views/pages/home.html.php');
+	'change' => function() use ($notify, $self) {
+		$template = $self->html->link('template', 'http://lithify.me/docs/lithium/template');
 
 		return $notify(
 			'notice',
 			"You're using the application's default home page.",
-			"To change this template, edit the file
-			<code>{$file}</code>."
-		);
-	},
-	'layout' => function() use ($notify, $self) {
-		$file = realpath(LITHIUM_APP_PATH . '/views/layouts/default.html.php');
-		$link = $self->html->link('layout', 'http://lithify.me/docs/lithium/template');
-
-		return $notify(
-			'notice',
-			'Change the default layout.',
-			"To change the {$link},
-			this is the file wrapping your content as well as containing header and footer,
-			edit the file <code>{$file}</code>."
+			"To change this {$template}, edit the file
+			<code>views/pages/home.html.php</code>.
+			To change the layout,
+			(that is what's wrapping content)
+			edit the file <code>views/layouts/default.html.php</code>."
 		);
 	},
 	'routing' => function() use ($notify, $self) {
-		$file = realpath(LITHIUM_APP_PATH . '/config/routes.php');
-		$link = $self->html->link('routing', 'http://lithify.me/docs/lithium/net/http/Router');
+		$routing = $self->html->link('routing', 'http://lithify.me/docs/lithium/net/http/Router');
 
 		return $notify(
 			'notice',
 			'Use custom routing.',
-			"To change the {$link} edit the file <code>{$file}</code>."
+			"To change the {$routing} edit the file <code>config/routes.php</code>."
 		);
 	},
 	'resourcesWritable' => function() use ($notify) {
-		if (is_writable($path = realpath(Libraries::get(true, 'resources')))) {
+		if (is_writable($path = Libraries::get(true, 'resources'))) {
 			return $notify('success', 'Resources directory is writable.');
 		}
+		$path = str_replace(dirname(LITHIUM_APP_PATH) . '/', null, $path);
+
 		return $notify(
 			'fail',
 			'Your resource path is not writeable.',
@@ -65,8 +57,6 @@ $checks = array(
 	},
 	'database' => function() use ($notify) {
 		$config = Connections::config();
-		$boot = realpath(LITHIUM_APP_PATH . '/config/bootstrap.php');
-		$connections = realpath(LITHIUM_APP_PATH . '/config/bootstrap/connections.php');
 
 		if (!empty($config)) {
 			return $notify('success', 'Database connection/s configured.');
@@ -76,12 +66,12 @@ $checks = array(
 			'No database connection defined.',
 			"To create a database connection:
 			<ol>
-				<li>Edit the file <code>{$boot}</code>.</li>
+				<li>Edit the file <code>config/bootstrap.php</code>.</li>
 				<li>
 					Uncomment the line having
 					<code>require __DIR__ . '/bootstrap/connections.php';</code>.
 				</li>
-				<li>Edit the file <code>{$connections}</code>.</li>
+				<li>Edit the file <code>config/bootstrap/connections.php</code>.</li>
 			</ol>"
 		);
 	},
