@@ -142,15 +142,16 @@ $sanityChecks = array(
 <h4>Layout</h4>
 <p>
 	To change the application's
-	<em><a href="http://lithify.me/en/docs/lithium/template">layout</a></em> (the file containing
-	the header, footer and default styles), edit the file
+	<?php echo $this->html->link('layout', 'http://lithify.me/en/docs/lithium/template'); ?>
+	(the file containing the header, footer and default styles), edit the file
 	<code><?php echo realpath(LITHIUM_APP_PATH . '/views/layouts/default.html.php'); ?></code>.
 </p>
 
 <h4>Routing</h4>
 <p>
-	To change the <em><a href="http://lithify.me/docs/lithium/net/http/Router">routing</a></em> of
-	the application's default page, edit the file
+	To change the
+	<?php echo $this->html->link('routing', 'http://lithify.me/docs/lithium/net/http/Router'); ?>
+	of the application's default page, edit the file
 	<code><?php echo realpath(LITHIUM_APP_PATH . '/config/routes.php'); ?></code>.
 </p>
 
@@ -163,9 +164,9 @@ $sanityChecks = array(
 
 <h4>Additional Resources</h4>
 <ul>
-	<li><a href="http://lithify.me/docs/lithium">Lithium API</a></li>
-	<li><a href="http://sphere.lithify.me/">Lithium Community</a></li>
-	<li><a href="http://dev.lithify.me/lithium/wiki">Lithium Development Wiki</a></li>
-	<li><a href="http://dev.lithify.me/lithium/source">Lithium Source</a></li>
-	<li><a href="irc://irc.freenode.net/#li3">#li3 irc channel</a></li>
+	<li><?php echo $this->html->link('Lithium API', 'http://lithify.me/docs/lithium'); ?></li>
+	<li><?php echo $this->html->link('Lithium Community', 'http://sphere.lithify.me'); ?></li>
+	<li><?php echo $this->html->link('Lithium Development Wiki', 'http://dev.lithify.me/lithium/wiki'); ?></li>
+	<li><?php echo $this->html->link('Lithium Source', 'http://dev.lithify.me/lithium/source'); ?></li>
+	<li><?php echo $this->html->link('#li3 IRC channel', 'irc://irc.freenode.net/#li3'); ?></li>
 </ul>
