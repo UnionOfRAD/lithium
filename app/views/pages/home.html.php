@@ -20,28 +20,6 @@ $notify = function($status, $message, $solution = null) {
 };
 
 $checks = array(
-	'change' => function() use ($notify, $self) {
-		$template = $self->html->link('template', 'http://lithify.me/docs/lithium/template');
-
-		return $notify(
-			'notice',
-			"You're using the application's default home page.",
-			"To change this {$template}, edit the file
-			<code>views/pages/home.html.php</code>.
-			To change the layout,
-			(that is what's wrapping content)
-			edit the file <code>views/layouts/default.html.php</code>."
-		);
-	},
-	'routing' => function() use ($notify, $self) {
-		$routing = $self->html->link('routing', 'http://lithify.me/docs/lithium/net/http/Router');
-
-		return $notify(
-			'notice',
-			'Use custom routing.',
-			"To change the {$routing} edit the file <code>config/routes.php</code>."
-		);
-	},
 	'resourcesWritable' => function() use ($notify) {
 		if (is_writable($path = Libraries::get(true, 'resources'))) {
 			return $notify('success', 'Resources directory is writable.');
@@ -95,6 +73,28 @@ $checks = array(
 			'Please set <code>register_globals = Off</code> in your <code>php.ini</code> settings.'
 		);
 	},
+	'change' => function() use ($notify, $self) {
+		$template = $self->html->link('template', 'http://lithify.me/docs/lithium/template');
+
+		return $notify(
+			'notice',
+			"You're using the application's default home page.",
+			"To change this {$template}, edit the file
+			<code>views/pages/home.html.php</code>.
+			To change the layout,
+			(that is what's wrapping content)
+			edit the file <code>views/layouts/default.html.php</code>."
+		);
+	},
+	'routing' => function() use ($notify, $self) {
+		$routing = $self->html->link('routing', 'http://lithify.me/docs/lithium/net/http/Router');
+
+		return $notify(
+			'notice',
+			'Use custom routing.',
+			"To change the {$routing} edit the file <code>config/routes.php</code>."
+		);
+	}
 );
 
 ?>
