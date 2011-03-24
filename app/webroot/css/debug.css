@@ -112,13 +112,14 @@ body.test-dashboard a.test-button:active {
 }
 
 body.test-dashboard ul {
+	margin: .25em 0;
 	padding: 0.2em 0 0 0;
 }
 
 body.test-dashboard ul ul li {
 	display: block;
-	margin: 0 0 0 .25em;
-	padding: 0 0 0 0.5em;
+	margin: 0 0 1px .5em;
+	padding: 0.25em 0 0 0.75em;
 	border: 1px solid rgba(0,0,0,0.05);
 	border-width: 0 0 0 1px;
 }
@@ -130,6 +131,13 @@ body.test-dashboard .test-menu {
 	background: #f6f6f6;
 }
 
+.test-dashboard .test-menu > ul {
+	margin-top: 0;
+	padding-top: 1px;
+}
+.test-dashboard .test-menu ul li ul {
+	margin-top: .1em;
+}
 .test-dashboard .test-menu li:hover {
 }
 .test-dashboard .test-menu li > ul {
