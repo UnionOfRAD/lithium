@@ -268,12 +268,12 @@ div.test-result {
 }
 
 div.test-result-success {
-	background-color: #62B212;
+	background-color: #00c51a;
 	border-color: #467F0D;
 }
 
 div.test-result-fail {
-	background-color: #CC1414;
+	background-color: #d13ef2;
 	border-color: #7F0D0D;
 }
 
@@ -282,17 +282,8 @@ div.test-result-exception {
 	border-color: #995F0F;
 }
 div.test-result-notice {
-	background-color: #E5D416;
-	border-color: #B2A511;
-}
-
-div.test-result code {
-	background: rgba(0,0,0,.25);
-	color: rgba(255,255,255,.85);
-	border: none;
-	font-size: .75em;
-	padding: .1em .5em !important;
-	text-shadow: none;
+	background-color: #00a6f5;
+	border-color: #8EA7CF;
 }
 
 div.test-assert, div.test-exception, div.test-skip {
@@ -458,7 +449,7 @@ span.filters a:hover, span.filters a.active {
 }
 
 span.filters a.active {
-	background: #62B212;
+	background: #00a6f5;
 	text-shadow: 0px 0px 6px rgba(0,0,0,.5);
 	color: white;
 }
