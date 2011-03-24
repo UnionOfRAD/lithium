@@ -9,6 +9,8 @@
 use lithium\core\Libraries;
 use lithium\data\Connections;
 
+$this->title('Home');
+
 $checkName = null;
 $checkStatus = $solutions = array();
 
