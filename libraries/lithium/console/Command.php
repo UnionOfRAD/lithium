@@ -102,7 +102,6 @@ class Command extends \lithium\core\Object {
 	 * @param array $args the args from the request
 	 * @param array $options
 	 * @return object The response object associated with this command.
-	 * @todo Implement proper exception catching/throwing.
 	 * @todo Implement filters.
 	 */
 	public function __invoke($action, $args = array(), $options = array()) {
