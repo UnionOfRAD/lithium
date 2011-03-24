@@ -25,12 +25,16 @@ $checks = array(
 			return $notify('success', 'Resources directory is writable.');
 		}
 		$path = str_replace(dirname(LITHIUM_APP_PATH) . '/', null, $path);
+		$solution = null;
 
+		if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+			$solution  = 'To fix this, run the following from the command line: ';
+			$solution .= "<code>$ chmod -R 0777 {$path}</code>.";
+		}
 		return $notify(
 			'fail',
 			'Your resource path is not writeable.',
-			"To fix this on *nix and Mac OSX, run the following from the command line:
-			<code>$ chmod -R 0777 {$path}</code>"
+			$solution
 		);
 	},
 	'database' => function() use ($notify) {
