@@ -25,7 +25,7 @@ use lithium\util\Inflector;
 			<header>
 				<h1>
 					<a href="<?php echo $base ?>/test/">
-						<span class="triangle"></span> Lithium Unit Test Dashboard
+						<span class="triangle"></span> Lithium Test Dashboard
 					</a>
 				</h1>
 				<a class="test-all" href="<?php echo $base ?>/test/all">run all tests</a>
