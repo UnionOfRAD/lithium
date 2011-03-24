@@ -98,6 +98,18 @@ $checks = array(
 			'Use custom routing.',
 			"To change the {$routing} edit the file <code>config/routes.php</code>."
 		);
+	},
+	'tests' => function() use ($notify, $self) {
+		$tests = $self->html->link('run all tests', '/test/all');
+		$dashboard = $self->html->link('test dashboard', '/test');
+		$ticket = $self->html->link('file a ticket', 'http://dev.lithify.me/lithium/tickets');
+
+		return $notify(
+			'notice',
+			'Run the tests.',
+			"Check the builtin {$dashboard} or {$tests} now to ensure Lithium
+			is working as expected. Do not hesitate to {$ticket} in case a test fails."
+		);
 	}
 );
 
