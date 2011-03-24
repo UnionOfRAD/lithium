@@ -120,12 +120,10 @@ class Unit extends \lithium\core\Object {
 	 * @param string $message Message to pass if the condition is met.
 	 * @return mixed
 	 */
-	public function skipIf($condition, $message = 'Skipped test `{:class}::{:function}()`.') {
-		if (!$condition) {
-			return;
+	public function skipIf($condition, $message = false) {
+		if ($condition) {
+			throw new Exception(is_string($message) ? $message : null);
 		}
-		$trace = Debugger::trace(array('start' => 2, 'depth' => 3, 'format' => 'array'));
-		throw new Exception(String::insert($message, array_pop($trace)));
 	}
 
 	/**
