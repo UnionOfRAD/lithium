@@ -24,7 +24,7 @@ body.test-dashboard a {
 }
 
 body.test-dashboard #header h1 {
-	margin: 0;
+	margin: .25em 1% 0 0;
 	float:right;
 	font-weight: normal;
 }
@@ -57,7 +57,7 @@ body.test-dashboard .article {
 
 body.test-dashboard .test-content {
 	float:left;
-	padding: 2em 2% 4em;
+	padding: 0 2% 4em;
 	width: 74%;
 }
 
@@ -260,7 +260,7 @@ ul.metrics li {
 /*--- Test Results ---*/
 div.test-result {
 	clear: both;
-	margin: 1em 0 .5em;
+	margin: 1em 0 1.5em;
 	padding: .75em 1em .55em;
 	color: #FFFFFF;
 	background: #666;
