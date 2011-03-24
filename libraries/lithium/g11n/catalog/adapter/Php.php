@@ -31,19 +31,21 @@ use lithium\core\ConfigException;
  * the one used by the the `Gettext` adapter.
  *
  * {{{
- * | - `<locale>`
- * | | - `message`
- * |   | - `default.php`
- * |   | - `<scope>.php`
- * | | - `validation`
- * |   | - ...
- * | - ...
- * | - `message_default.php`
- * | - `message_<scope>.php`
- * | - `validation_default.php`
- * | - `validation_<scope>.php`
- * | - ...
- * - ...
+ * resources/g11n/php
+ * ├── <locale>
+ * |   ├── message
+ * |   |   ├── default.php
+ * |   |   └── <scope>.php
+ * |   ├── validation
+ * |   |   └── ...
+ * |   └── ...
+ * ├── <locale>
+ * |   └── ...
+ * ├── message_default.php
+ * ├── message_<scope>.php
+ * ├── validation_default.php
+ * ├── validation_<scope>.php
+ * └── ...
  * }}}
  *
  * @see lithium\g11n\catalog\adapter\Gettext

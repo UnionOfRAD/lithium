@@ -22,21 +22,23 @@ use lithium\core\ConfigException;
  * templates are being named.
  *
  * {{{
- * | - `<locale>`
- * | | - `LC_MESSAGES`
- * |   | - `default.po`
- * |   | - `default.mo`
- * |   | - `<scope>.po`
- * |   | - `<scope>.mo`
- * | | - `LC_VALIDATION`
- * |   | - ...
- * | - ...
- * | - `message_default.pot`
- * | - `message_<scope>.pot`
- * | - `validation_default.pot`
- * | - `validation_<scope>.pot`
- * | - ...
- * - ...
+ * resources/g11n/po
+ * ├── <locale>
+ * |   ├── LC_MESSAGES
+ * |   |   ├── default.po
+ * |   |   ├── default.mo
+ * |   |   ├── <scope>.po
+ * |   |   └── <scope>.mo
+ * |   ├── LC_VALIDATION
+ * |   |   └── ...
+ * |   └── ...
+ * ├── <locale>
+ * |   └── ...
+ * ├── message_default.pot
+ * ├── message_<scope>.pot
+ * ├── validation_default.pot
+ * ├── validation_<scope>.pot
+ * └── ...
  * }}}
  *
  * @see lithium\g11n\Locale
