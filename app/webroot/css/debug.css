@@ -304,6 +304,7 @@ div.test-assert, div.test-exception, div.test-skip {
 	color: #000000;
 	border: 1px solid rgba(0,0,0,.05);
 	border-width: 0 0 0 4px;
+	font-size: 16px;
 }
 
 div.test-assert-passed {
@@ -335,7 +336,8 @@ div.test-skip {
 	clear: both;
 	white-space: pre;
 	color: #111;
-	font-size: .9em;
+	font-size: 12px;
+	line-height: 1.5;
 	padding: .5em 1em;
 	margin: .5em 0;
 	background: #fafafa;
