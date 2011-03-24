@@ -38,7 +38,7 @@ class Test extends \lithium\console\Command {
 
 	/**
 	 * Format to use for rendering results. Any other format than `txt` will
-	 * cause the command to enter quite mode, surpressing headers and any other
+	 * cause the command to enter quiet mode, surpressing headers and any other
 	 * decoration.
 	 *
 	 * @var string Either `txt` or `json`.
