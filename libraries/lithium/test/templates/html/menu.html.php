@@ -48,7 +48,11 @@
 		?>
 	<?php endwhile ?>
 
-	<li><a href="<?php echo $base ?>/test/<?php echo join($path, "/") ?>/<?php echo $case ?>" title="run <?php echo $case; ?>"><?php echo $case ?></a></li>
+	<li>
+		<a href="<?php echo $base ?>/test/<?php echo join($path, "/") ?>/<?php echo $case ?>" title="run <?php echo $case; ?>">
+			<?php echo preg_replace('/Test$/', null, $case); ?>
+		</a>
+	</li>
 
 <?php endforeach ?>
 
