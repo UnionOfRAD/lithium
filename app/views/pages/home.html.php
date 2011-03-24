@@ -13,6 +13,7 @@ $this->title('Home');
 
 $checkName = null;
 $checkStatus = array();
+$self = $this;
 
 $notify = function($status, $message, $solution = null) use (&$checkName, &$checkStatus) {
 	$checkStatus[$checkName] = $status === true;
@@ -30,6 +31,32 @@ HTML;
 };
 
 $sanityChecks = array(
+	'home' => function() use ($notify) {
+		$file = realpath(LITHIUM_APP_PATH . '/views/pages/home.html.php');
+
+		return $notify('notice', "You're using the application's default home page.",
+			"To change this template, edit the file
+			<code>{$file}</code>."
+		);
+	},
+	'layout' => function() use ($notify, $self) {
+		$file = realpath(LITHIUM_APP_PATH . '/views/layouts/default.html.php');
+		$link = $self->html->link('layout', 'http://lithify.me/docs/lithium/template');
+
+		return $notify('notice', 'Change the default layout.',
+			"To change the {$link},
+			this is the file wrapping your content as well as containing header and footer,
+			edit the file <code>{$file}</code>."
+		);
+	},
+	'routing' => function() use ($notify, $self) {
+		$file = realpath(LITHIUM_APP_PATH . '/config/routes.php');
+		$link = $self->html->link('routing', 'http://lithify.me/docs/lithium/net/http/Router');
+
+		return $notify('notice', 'Use custom routing.',
+			"To change the {$link} edit the file <code>{$file}</code>."
+		);
+	},
 	'resourcesWritable' => function() use ($notify) {
 		if (is_writable($path = realpath(Libraries::get(true, 'resources')))) {
 			return $notify(true, 'Resources directory is writable.');
@@ -123,30 +150,11 @@ $sanityChecks = array(
 ?>
 
 <h3>Getting Started</h3>
-<p>
-	This is your application's default home page. To change this template, edit the file
-	<code><?php echo realpath(LITHIUM_APP_PATH . '/views/pages/home.html.php'); ?></code>.
-</p>
-
-<p>
-	To change the application's
-	<?php echo $this->html->link('layout', 'http://lithify.me/en/docs/lithium/template'); ?>
-	(the file containing the header, footer and default styles), edit the file
-	<code><?php echo realpath(LITHIUM_APP_PATH . '/views/layouts/default.html.php'); ?></code>.
-</p>
-
-<p>
-	To change the
-	<?php echo $this->html->link('routing', 'http://lithify.me/docs/lithium/net/http/Router'); ?>
-	of the application's default page, edit the file
-	<code><?php echo realpath(LITHIUM_APP_PATH . '/config/routes.php'); ?></code>.
-</p>
-
-
-<h3>Sanity Checks</h3>
-<?php foreach ($sanityChecks as $checkName => $check): ?>
-	<?php echo $check(); ?>
-<?php endforeach; ?>
+<div class="sanity-checks">
+	<?php foreach ($sanityChecks as $checkName => $check): ?>
+		<?php echo $check(); ?>
+	<?php endforeach; ?>
+</div>
 
 <h3>Additional Resources</h3>
 <ul>
