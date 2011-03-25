@@ -64,7 +64,8 @@ Creating your own commands is very easy.
 **Fundamentals**
 
 - All commands inherit from `lithium\console\Command`.
-- Commands are normally placed in your application or plugin's `exentesions/commands` directory.
+
+- Commands are normally placed in your application or plugin's `extensions/command` directory.
 
 Here's an example command:
 {{{<?php
@@ -115,13 +116,8 @@ class HelloWorld extends \lithium\console\Command {
 
 	public function run() {
 		$this->header('Welcome to the Hello World command!');
-		if ($this->recipient) {
-			$this->out('Hello, ' . $this->recipient . '!');
-		} else {
-			$this->out('Hello, World!');
-		}
+		$this->out('Hello, ' . ($this->recipient ?: 'World') . '!');
 	}
-
 }
 
 ?>}}}
