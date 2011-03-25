@@ -22,7 +22,11 @@ class CurlTest extends \lithium\test\Unit {
 		'classes' => array('request' => 'lithium\net\http\Request')
 	);
 
-	protected $_testUrl = 'http://localhost';
+	protected $_testUrl = 'http://example.org';
+
+	public function setUp() {
+		$this->skipIf(!$this->_canConnect('example.org', 80), 'Cannot connect to example.org:80');
+	}
 
 	/**
 	 * Skip the test if curl is not available in your PHP installation.
@@ -129,6 +133,20 @@ class CurlTest extends \lithium\test\Unit {
 		);
 		$this->assertTrue($result instanceof \lithium\net\http\Response);
 		$this->assertPattern("/^HTTP/", (string) $result);
+	}
+
+	protected function _canConnect($host, $port) {
+		$this->expectException();
+		$this->expectException();
+
+		if ($conn = fsockopen($host, $port)) {
+			array_pop($this->_expected);
+			array_pop($this->_expected);
+			fclose($conn);
+
+			return true;
+		}
+		return false;
 	}
 }
 
