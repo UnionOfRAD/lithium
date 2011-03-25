@@ -527,6 +527,8 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testSettingNestedObjectDefaults() {
+		$this->skipIf(!MockMongoConnection::enabled(), 'MongoDb not enabled.');
+
 		MockPost::$connection = new MockMongoConnection();
 		$schema = MockPost::schema();
 

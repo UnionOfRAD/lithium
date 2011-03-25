@@ -11,6 +11,8 @@ namespace lithium\tests\cases\data\entity;
 use MongoId;
 use MongoDate;
 use lithium\data\Connections;
+use lithium\data\source\MongoDb;
+use lithium\data\source\http\adapter\CouchDb;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
 use lithium\data\collection\DocumentArray;
@@ -23,6 +25,11 @@ class DocumentTest extends \lithium\test\Unit {
 	protected $_model = 'lithium\tests\mocks\data\model\MockDocumentPost';
 
 	protected $_preserved = array();
+
+	public function skip() {
+		$this->skipIf(!MongoDb::enabled(), 'MongoDb is not enabled');
+		$this->skipIf(!CouchDb::enabled(), 'CouchDb is not enabled');
+	}
 
 	public function setUp() {
 		if (empty($this->_preserved)) {

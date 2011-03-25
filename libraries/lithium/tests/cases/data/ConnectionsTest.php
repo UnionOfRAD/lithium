@@ -47,8 +47,8 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$expected = $this->config + array('type' => 'database');
 		$this->assertEqual($expected, $result);
 
-		$message = 'Your PHP was not compiled with the MySQL extension';
-		$this->skipIf(!extension_loaded('mysql'), $message);
+		$this->skipIf(!MySql::enabled(), 'MySql is not enabled');
+		$this->skipIf(!$this->_canConnect('localhost', 3306), 'Cannot connect to localhost:3306');
 
 		$this->expectException('/mysql_get_server_info/');
 		$this->expectException('/mysql_select_db/');
@@ -71,8 +71,8 @@ class ConnectionsTest extends \lithium\test\Unit {
 		Connections::add('conn-test-2', $this->config);
 		$this->assertEqual(array('conn-test', 'conn-test-2'), Connections::get());
 
-		$message = 'Your PHP was not compiled with the MySQL extension';
-		$this->skipIf(!extension_loaded('mysql'), $message);
+		$this->skipIf(!MySql::enabled(), 'MySql is not enabled');
+		$this->skipIf(!$this->_canConnect('localhost', 3306), 'Cannot connect to localhost:3306');
 
 		$expected = $this->config + array('type' => 'database', 'filters' => array());
 		$this->assertEqual($expected, Connections::get('conn-test', array('config' => true)));
@@ -87,8 +87,8 @@ class ConnectionsTest extends \lithium\test\Unit {
 		Connections::add('conn-test', $this->config);
 		Connections::add('conn-test-2', $this->config);
 
-		$message = 'Your PHP was not compiled with the MySQL extension';
-		$this->skipIf(!extension_loaded('mysql'), $message);
+		$this->skipIf(!MySql::enabled(), 'MySql is not enabled');
+		$this->skipIf(!$this->_canConnect('localhost', 3306), 'Cannot connect to localhost:3306');
 
 		$this->expectException('/mysql_get_server_info/');
 		$this->expectException('/mysql_select_db/');
@@ -142,6 +142,22 @@ class ConnectionsTest extends \lithium\test\Unit {
 		Connections::reset();
 		$this->assertTrue(Connections::get(false) instanceof Mock);
 	}
+
+	protected function _canConnect($host, $port) {
+		$this->expectException();
+		$this->expectException();
+
+		if ($conn = fsockopen($host, $port)) {
+			array_pop($this->_expected);
+			array_pop($this->_expected);
+			fclose($conn);
+
+			return true;
+		}
+		return false;
+	}
 }
+
+?>
 
 ?>

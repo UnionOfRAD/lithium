@@ -38,6 +38,10 @@ class ExporterTest extends \lithium\test\Unit {
 
 	protected $_handlers = array();
 
+	public function skip() {
+		$this->skipIf(!MongoDb::enabled(), 'MongoDb is not enabled');
+	}
+
 	public function setUp() {
 		$this->_handlers = array(
 			'id' => function($v) {
