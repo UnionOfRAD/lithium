@@ -17,7 +17,7 @@ class ContextTest extends \lithium\test\Unit {
 	protected $_testConfig = array(
 		'persistent' => false,
 		'scheme' => 'http',
-		'host' => 'localhost',
+		'host' => 'example.org',
 		'port' => 80,
 		'timeout' => 4
 		'classes' => array('request' => 'lithium\net\http\Request')
