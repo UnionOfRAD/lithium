@@ -159,5 +159,3 @@ class ConnectionsTest extends \lithium\test\Unit {
 }
 
 ?>
-
-?>
