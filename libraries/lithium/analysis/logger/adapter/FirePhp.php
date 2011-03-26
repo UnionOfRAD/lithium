@@ -13,20 +13,38 @@ use lithium\net\http\Media;
 /**
  * The `FirePhp` logger allows you to log messages to the FirePHP console.
  *
+ * In order to use the FirePhp adapter, you need to add a filter to the dispatcher. The following
+ * should be placed in a bootstrap file:
  * {{{
+ * use lithium\action\Dispatcher;
  * use lithium\analysis\Logger;
  *
  * Logger::config(array(
  * 	'default' => array('adapter' => 'FirePhp')
  * ));
- * Logger::debug('Something happened!');
- * Logger::error('This is not good!');
+ *
+ * Dispatcher::applyFilter('_call', function($self, $params, $chain) {
+ * 	Logger::adapter('default')->bind($params['callable']->response);
+ * 	return $chain->next($self, $params, $chain);
+ * });
  * }}}
  *
  * This will cause the message and other debug settings added to the header of the
  * response, where FirePHP is able to locate and print it accordingly. As this adapter
  * implements the protocol specification directly, you don't need another vendor library to
  * use it.
+ *
+ * Now, in you can use the logger in your application code (like controllers, views and models).
+ *
+ * {{{
+ * class PagesController extends \lithium\action\Controller {
+ * 	public function view() {
+ * 		//...
+ * 		Logger::error("Something bad happened!");
+ * 		//...
+ * 	}
+ * }
+ * }}}
  *
  * Because FirePHP is not a conventional logging destination like a file or a database, you can
  * pass everything (except resources) to the logger and inspect it further in FirePHP. In fact,
@@ -80,27 +98,32 @@ class FirePhp extends \lithium\core\Object {
 	protected $_counter = 1;
 
 	/**
+	 * Holds the response object where the headers will be inserted.
+	 */
+	protected $_response;
+
+	/**
+	 * Binds the response object to the logger and sets the required Wildfire
+	 * protocol headers.
+	 *
+	 * @param object $response An instance of a response object (usually `lithium\action\Response`)
+	 *               with HTTP request information.
+	 */
+	public function bind($response) {
+		$this->_response = $response;
+		$this->_response->headers += $this->_headers;
+	}
+
+	/**
 	 * Appends the message to the response header for FirePHP.
 	 *
 	 * @param string $type
 	 * @param string $message
-	 * @return void
+	 * @return integer The count of the message which was stored in the header.
 	 */
 	public function write($type, $message) {
-		$headers = $this->_headers;
 		$message = $this->_message($type, $message);
-		$log = compact('headers', 'message');
-
-		Media::applyFilter('render', function($self, $params, $chain) use ($log) {
-			extract($log);
-			$response = $params['response'];
-
-			$response->headers += $headers;
-			$response->headers[$message['key']] = $message['content'];
-
-			$params['response'] = $response;
-			return $chain->next($self, $params, $chain);
-		});
+		$this->_response->headers[$message['key']] = $message['content'];
 	}
 
 	/**
