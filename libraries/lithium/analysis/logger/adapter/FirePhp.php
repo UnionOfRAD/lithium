@@ -46,6 +46,10 @@ use lithium\net\http\Media;
  * }
  * }}}
  *
+ * Because this adapter also has a queue implemented, it is possible to log messages even when the
+ * `Response` object was not yet generated. When it gets generated, all messages queued get flushed
+ * to FirePHP instantly.
+ *
  * Because FirePHP is not a conventional logging destination like a file or a database, you can
  * pass everything (except resources) to the logger and inspect it further in FirePHP. In fact,
  * every message that is passed will be encoded via `json_encode()`, so check out this built
@@ -100,7 +104,12 @@ class FirePhp extends \lithium\core\Object {
 	/**
 	 * Holds the response object where the headers will be inserted.
 	 */
-	protected $_response;
+	protected $_response = false;
+
+	/**
+	 * Contains messages that have been written to the log before the bind() call.
+	 */
+	protected $_queue = array();
 
 	/**
 	 * Binds the response object to the logger and sets the required Wildfire
@@ -108,10 +117,17 @@ class FirePhp extends \lithium\core\Object {
 	 *
 	 * @param object $response An instance of a response object (usually `lithium\action\Response`)
 	 *               with HTTP request information.
+	 * @return void
 	 */
 	public function bind($response) {
 		$this->_response = $response;
 		$this->_response->headers += $this->_headers;
+
+		if(!empty($this->_queue)) {
+			foreach($this->_queue As $message) {
+				$this->_write($message);
+			}
+		}
 	}
 
 	/**
@@ -119,10 +135,26 @@ class FirePhp extends \lithium\core\Object {
 	 *
 	 * @param string $type
 	 * @param string $message
-	 * @return integer The count of the message which was stored in the header.
+	 * @return void
 	 */
 	public function write($type, $message) {
 		$message = $this->_message($type, $message);
+
+		if($this->_response) {
+			$this->_response->headers[$message['key']] = $message['content'];
+			$this->_write($message);
+		} else {
+			$this->_queue[] = $message;
+		}
+	}
+
+	/**
+	 * Heper method that writes the message to the response header.
+	 *
+	 * @param array A message containing the key and the content to store.
+	 * @return void
+	 */
+	protected function _write($message) {
 		$this->_response->headers[$message['key']] = $message['content'];
 	}
 
@@ -131,7 +163,7 @@ class FirePhp extends \lithium\core\Object {
 	 *
 	 * @param string $type
 	 * @param string $message
-	 * @return string The string representation of the type and message.
+	 * @return array The string representation of the type and message.
 	 */
 	protected function _message($type, $message) {
 		$key = 'X-Wf-1-1-1-'.$this->_counter++;
