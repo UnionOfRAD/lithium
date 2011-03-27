@@ -174,6 +174,7 @@ class MessageTest extends \lithium\test\Unit {
 	public function testTranslatePlaceholders() {
 		$data = array(
 			'green' => 'grün',
+			'No. {:id}' => 'Nr. {:id}',
 			'The fish is {:color}.' => 'Der Fisch ist {:color}.',
 			'{:count} bike' => array('{:count} Fahrrad', '{:count} Fahrräder')
 		);
@@ -192,6 +193,10 @@ class MessageTest extends \lithium\test\Unit {
 
 		$expected = '7 Fahrräder';
 		$result = Message::translate('{:count} bike', array('locale' => 'de', 'count' => 7));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'Nr. 8';
+		$result = Message::translate('No. {:id}', array('locale' => 'de', 'id' => 8));
 		$this->assertEqual($expected, $result);
 	}
 
