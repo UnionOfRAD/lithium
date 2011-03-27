@@ -102,16 +102,18 @@ class Message extends \lithium\core\StaticObject {
 			'default' => null,
 			'noop' => false
 		);
-		extract($options + $defaults);
+		$options += $defaults;
 
-		if ($noop) {
+		if ($options['noop']) {
 			$result = null;
 		} else {
-			$result = static::_translated($id, abs($count), $locale, compact('scope'));
+			$result = static::_translated($id, abs($options['count']), $options['locale'], array(
+				'scope' => $options['scope']
+			));
 		}
 
-		if ($result || $default) {
-			return String::insert($result ?: $default, $options);
+		if ($result || $options['default']) {
+			return String::insert($result ?: $options['default'], $options);
 		}
 	}
 
