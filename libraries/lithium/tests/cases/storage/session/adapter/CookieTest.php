@@ -126,7 +126,7 @@ class CookieTest extends \lithium\test\Unit {
 		$result = $closure($this->cookie, array('key' => null), null);
 		$this->assertEqual($_COOKIE[$this->name], $result);
 
-		$key = 'does_not_exist';
+		$key = 'does.not.exist';
 		$closure = $this->cookie->read($key);
 		$this->assertTrue(is_callable($closure));
 
@@ -168,16 +168,6 @@ class CookieTest extends \lithium\test\Unit {
 		$this->assertEqual($_COOKIE[$this->name], $result);
 
 		$key = 'does_not_exist';
-		$closure = $this->cookie->read($key);
-		$this->assertTrue(is_callable($closure));
-
-		$params = compact('key');
-		$result = $closure($this->cookie, $params, null);
-		$this->assertNull($result);
-	}
-
-	public function testReadNestedKey() {
-		$key = 'User.id';
 		$closure = $this->cookie->read($key);
 		$this->assertTrue(is_callable($closure));
 
