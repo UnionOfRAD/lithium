@@ -344,7 +344,7 @@ class Request extends \lithium\net\http\Message {
 			return $this->_acceptContent;
 		}
 		$accept = $this->env('HTTP_ACCEPT');
-		$accept = (strpos($accept, ',') === false) ? array('text/html') : explode(',', $accept);
+		$accept = (preg_match('/[a-z,-]/i', $accept)) ? explode(',', $accept) : array('text/html');
 
 		foreach (array_reverse($accept) as $i => $type) {
 			unset($accept[$i]);
