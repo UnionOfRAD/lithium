@@ -602,8 +602,10 @@ class Libraries {
 			if (is_object($class)) {
 				return $class;
 			}
-			$success = (is_string($class) && class_exists($class));
-			return $success ? new $class($params['options']) : null;
+			if (!(is_string($class) && class_exists($class))) {
+				throw new ClassNotFoundException("Class `{$name}` of type `{$type}` not defined.");
+			}
+			return new $class($params['options']);
 		};
 		if (!isset(static::$_methodFilters[__FUNCTION__])) {
 			return $implementation(get_called_class(), $params);
