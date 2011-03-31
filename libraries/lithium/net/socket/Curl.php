@@ -34,6 +34,11 @@ class Curl extends \lithium\net\Socket {
 	 */
 	public $options = array();
 
+	/**
+	 * Constructor
+	 *
+	 * @param array $config
+	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('ignoreExpect' => true);
 		parent::__construct($config + $defaults);
@@ -114,26 +119,30 @@ class Curl extends \lithium\net\Socket {
 	/**
 	 * Writes data to curl options
 	 *
-	 * @param object $message a `lithium\net\Message` object
+	 * @param object $data a `lithium\net\Message` object or array
 	 * @return boolean
 	 */
-	public function write($message) {
+	public function write($data = null) {
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
-		$this->set(CURLOPT_URL, $message->to('url'));
+		if (!is_object($data)) {
+			$data = $this->_instance($this->_classes['request'], (array) $data);
+		}
+		$this->set(CURLOPT_URL, $data->to('url'));
 
-		if ($options['ignoreExpect']) {
-			$message->headers('Expect', ' ');
-		}
-		if (isset($message->headers)) {
-			$this->set(CURLOPT_HTTPHEADER, $message->headers());
-		}
-		if (isset($message->method) && $message->method == 'POST') {
-			$this->set(array(CURLOPT_POST => true, CURLOPT_POSTFIELDS => $message->body()));
+		if (is_a($data, 'lithium\net\http\Message')) {
+			if (!empty($this->_config['ignoreExpect'])) {
+				$data->headers('Expect', ' ');
+			}
+			if (isset($data->headers)) {
+				$this->set(CURLOPT_HTTPHEADER, $data->headers());
+			}
+			if (isset($data->method) && $data->method == 'POST') {
+				$this->set(array(CURLOPT_POST => true, CURLOPT_POSTFIELDS => $data->body()));
+			}
 		}
 		return (boolean) curl_setopt_array($this->_resource, $this->options);
-		;
 	}
 
 	/**
@@ -160,9 +169,7 @@ class Curl extends \lithium\net\Socket {
 	 * @todo implement Curl::encoding($charset)
 	 * @param string $charset
 	 */
-	public function encoding($charset) {
-	}
-
+	public function encoding($charset) {}
 	/**
 	 * Sets the options to be used in subsequent curl requests.
 	 *
@@ -179,27 +186,6 @@ class Curl extends \lithium\net\Socket {
 			$flags = array($flags => $value);
 		}
 		$this->options += $flags;
-	}
-
-	/**
-	 * Aggregates read and write methods into a coherent request response
-	 *
-	 * @param mixed $message a request object based on `\lithium\net\Message`
-	 * @param array $options
-	 *              - '`response`': a fully-namespaced string for the response object
-	 * @return object a response object based on `\lithium\net\Message`
-	 */
-	public function send($message, array $options = array()) {
-		$defaults = array(
-			'response' => $this->_classes['response'],
-			'ignoreExpect' => $this->_config['ignoreExpect']
-		);
-		$options += $defaults;
-
-		if ($this->write($message)) {
-			$message = $this->read();
-			return $this->_instance($options['response'], compact('message'));
-		}
 	}
 }
 

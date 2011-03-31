@@ -28,6 +28,7 @@ abstract class Socket extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_classes = array(
+		'request' => 'lithium\net\Message',
 		'response' => 'lithium\net\Message'
 	);
 
@@ -98,18 +99,6 @@ abstract class Socket extends \lithium\core\Object {
 	abstract public function write($data);
 
 	/**
-	 * Aggregates read and write methods into a coherent request response
-	 *
-	 * @param mixed $request array or object like `\lithium\net\http\Request`
-	 * @params array $options
-	 *                - path: path for the current request
-	 *                - classes: array of classes to use
-	 *                    - response: a class to use for the response
-	 * @return array headers, body, message
-	 */
-	abstract public function send($message, array $options = array());
-
-	/**
 	 * Sets the timeout on the socket *connection*.
 	 *
 	 * @param integer $time Seconds after the connection times out.
@@ -124,6 +113,35 @@ abstract class Socket extends \lithium\core\Object {
 	 * @return boolean `true` if encoding has been set, `false` otherwise.
 	 */
 	abstract public function encoding($charset);
+
+	/**
+	 * Sets the options to be used in subsequent requests.
+	 *
+	 * @param array $flags If $values is an array, $flags will be used as the
+	 *        keys to an associative array of curl options. If $values is not set,
+	 *        then $flags will be used as the associative array.
+	 * @param array $value If set, this array becomes the values for the
+	 *        associative array of curl options.
+	 * @return void
+	 */
+	public function set($flags, $value = null) {}
+
+	/**
+	 * Aggregates read and write methods into a coherent request response
+	 *
+	 * @param mixed $message a request object based on `\lithium\net\Message`
+	 * @param array $options
+	 *              - '`response`': a fully-namespaced string for the response object
+	 * @return object a response object based on `\lithium\net\Message`
+	 */
+	public function send($message = null, array $options = array()) {
+		$defaults = array('response' => $this->_classes['response']);
+		$options += $defaults;
+
+		if ($this->write($message)) {
+			return $this->_instance($options['response'], array('message' => $this->read()));
+		}
+	}
 
 	/**
 	 * Destructor.

@@ -15,13 +15,19 @@ class StreamTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
 		'persistent' => false,
-		'scheme' => 'tcp',
+		'scheme' => 'http',
 		'host' => 'localhost',
 		'port' => 80,
-		'timeout' => 2
+		'timeout' => 2,
+		'classes' => array('request' => 'lithium\net\http\Request')
 	);
 
-	protected $_testUrl = 'http://localhost';
+	public function skip() {
+		$config = $this->_testConfig;
+		$url = "{$config['scheme']}://{$config['host']}";
+		$message = "Could not open {$url} - skipping " . __CLASS__;
+		$this->skipIf(!fopen($url, 'r'), $message);
+	}
 
 	public function testAllMethodsNoConnection() {
 		$stream = new Stream(array('scheme' => null));
@@ -81,21 +87,43 @@ class StreamTest extends \lithium\test\Unit {
 		$stream = new Stream($this->_testConfig);
 		$this->assertTrue(is_resource($stream->open()));
 		$this->assertTrue(is_resource($stream->resource()));
+		$this->assertEqual(82, $stream->write());
+		$this->assertPattern("/^HTTP/", (string) $stream->read());
+	}
 
-		$this->assertTrue($stream->write(null));
-		$result = $stream->read();
-		$this->assertTrue($result);
-		$this->assertPattern("/^HTTP/", $result);
+	public function testSendWithNull() {
+		$stream = new Stream($this->_testConfig);
+		$this->assertTrue(is_resource($stream->open()));
+		$result = $stream->send(
+			new Request($this->_testConfig),
+			array('response' => 'lithium\net\http\Response')
+		);
+		$this->assertTrue($result instanceof \lithium\net\http\Response);
+		$this->assertPattern("/^HTTP/", (string) $result);
 		$this->assertTrue($stream->eof());
 	}
 
-	public function testSend() {
+	public function testSendWithArray() {
 		$stream = new Stream($this->_testConfig);
 		$this->assertTrue(is_resource($stream->open()));
-		$result = $stream->send(new Request(), array('response' => 'lithium\net\http\Response'));
-		$this->assertTrue($result instanceof Response);
-		$this->assertEqual(trim(file_get_contents($this->_testUrl)), trim($result->body()));
-		$this->assertTrue(!empty($result->headers), 'Response is missing headers.');
+		$result = $stream->send($this->_testConfig,
+			array('response' => 'lithium\net\http\Response')
+		);
+		$this->assertTrue($result instanceof \lithium\net\http\Response);
+		$this->assertPattern("/^HTTP/", (string) $result);
+		$this->assertTrue($stream->eof());
+	}
+
+	public function testSendWithObject() {
+		$stream = new Stream($this->_testConfig);
+		$this->assertTrue(is_resource($stream->open()));
+		$result = $stream->send(
+			new Request($this->_testConfig),
+			array('response' => 'lithium\net\http\Response')
+		);
+		$this->assertTrue($result instanceof \lithium\net\http\Response);
+		$this->assertPattern("/^HTTP/", (string) $result);
+		$this->assertTrue($stream->eof());
 	}
 }
 

@@ -105,14 +105,16 @@ class Context extends \lithium\net\Socket {
 	 * @param string $data Data to write.
 	 * @return boolean Success
 	 */
-	public function write($data) {
-		$this->_content = $data;
-		if (is_object($data)) {
-			return stream_context_set_option(
-				$this->_resource, $data->to('context', array('timeout' => $this->_timeout))
-			);
+	public function write($data = null) {
+		if (!is_resource($this->_resource)) {
+			return false;
 		}
-		return true;
+		if (!is_object($data)) {
+			$data = $this->_instance($this->_classes['request'], (array) $data + $this->_config);
+		}
+		return stream_context_set_option(
+			$this->_resource, $data->to('context', array('timeout' => $this->_timeout))
+		);
 	}
 
 	/**
@@ -136,22 +138,6 @@ class Context extends \lithium\net\Socket {
 	 */
 	public function encoding($charset = null) {
 		return false;
-	}
-
-	/**
-	 * Send request and return response data
-	 *
-	 * @param object $message
-	 * @param array $options
-	 * @return string
-	 */
-	public function send($message, array $options = array()) {
-		$defaults = array('response' => $this->_classes['response']);
-		$options += $defaults;
-
-		if ($this->write($message)) {
-			return $this->_instance($options['response'], array('message' => $this->read()));
-		}
 	}
 }
 

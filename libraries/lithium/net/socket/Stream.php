@@ -106,11 +106,14 @@ class Stream extends \lithium\net\Socket {
 	 * @param string $data The string to be written.
 	 * @return mixed False on error, number of bytes written otherwise.
 	 */
-	public function write($data) {
+	public function write($data = null) {
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
-		return fwrite($this->_resource, (string) $data, strlen($data));
+		if (!is_object($data)) {
+			$data = $this->_instance($this->_classes['request'], (array) $data + $this->_config);
+		}
+		return fwrite($this->_resource, (string) $data, strlen((string) $data));
 	}
 
 	/**
@@ -143,26 +146,6 @@ class Stream extends \lithium\net\Socket {
 			return false;
 		}
 		return is_resource($this->_resource) ? stream_encoding($this->_resource, $charset) : false;
-	}
-
-	/**
-	 * Aggregates read and write methods into a coherent request response
-	 *
-	 * @param mixed $message array or object like `lithium\net\http\Request`
-	 * @param array $options
-	 *                - path: path for the current request
-	 *                - classes: array of classes to use
-	 *                    - response: a class to use for the response
-	 * @return boolean response string or object like `\lithium\net\http\Response`
-	 */
-	public function send($message, array $options = array()) {
-		$defaults = array('response' => $this->_classes['response']);
-		$options += $defaults;
-
-		if ($this->write($message)) {
-			$message = $this->read();
-			return $this->_instance($options['response'], compact('message'));
-		}
 	}
 }
 
