@@ -127,7 +127,7 @@ class Curl extends \lithium\net\Socket {
 			return false;
 		}
 		if (!is_object($data)) {
-			$data = $this->_instance($this->_classes['request'], (array) $data);
+			$data = $this->_instance($this->_classes['request'], (array) $data + $this->_config);
 		}
 		$this->set(CURLOPT_URL, $data->to('url'));
 

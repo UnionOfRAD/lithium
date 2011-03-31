@@ -139,7 +139,8 @@ abstract class Socket extends \lithium\core\Object {
 		$options += $defaults;
 
 		if ($this->write($message)) {
-			return $this->_instance($options['response'], array('message' => $this->read()));
+			$config = array('message' => $this->read()) + $this->_config;
+			return $this->_instance($options['response'], $config);
 		}
 	}
 
