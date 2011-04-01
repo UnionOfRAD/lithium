@@ -84,7 +84,7 @@ class Exporter extends \lithium\core\StaticObject {
 			'create'    => null,
 			'update'    => '$set',
 			'increment' => '$inc',
-			'remove'    => '$remove',
+			'remove'    => '$unset',
 			'rename'    => '$rename',
 		);
 		$result = array();
