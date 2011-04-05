@@ -59,22 +59,22 @@ class Cache extends \lithium\core\Object {
 	}
 
 	/**
-	 * Appends `$data` to file `$type`.
+	 * Writes the message to the configured cache adapter.
 	 *
 	 * @param string $type
 	 * @param string $message
 	 * @return boolean True on successful write, false otherwise.
 	 */
 	public function write($type, $message) {
-		$config = $this->_config;
+		$config = $this->_config + $this->_classes;
 
 		return function($self, $params) use ($config) {
 			$params += array('timestamp' => strtotime('now'));
 			$key = $config['key'];
 			$key = is_callable($key) ? $key($params) : String::insert($key, $params);
 
-			$cache = $this->_classes['cache'];
-			$cache::write($config['config'], $key, $params['message'], $config['expiry']);
+			$cache = $config['cache'];
+			return $cache::write($config['config'], $key, $params['message'], $config['expiry']);
 		};
 	}
 }
