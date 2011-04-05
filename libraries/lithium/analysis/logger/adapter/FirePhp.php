@@ -22,7 +22,9 @@ namespace lithium\analysis\logger\adapter;
  * ));
  *
  * Dispatcher::applyFilter('_call', function($self, $params, $chain) {
- * 	Logger::adapter('default')->bind($params['callable']->response);
+ * 	if(isset($params['callable']->response)) {
+ * 		Logger::adapter('default')->bind($params['callable']->response);
+ * 	}
  * 	return $chain->next($self, $params, $chain);
  * });
  * }}}
