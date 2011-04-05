@@ -8,8 +8,6 @@
 
 namespace lithium\analysis\logger\adapter;
 
-use lithium\net\http\Media;
-
 /**
  * The `FirePhp` logger allows you to log messages to the FirePHP console.
  *
@@ -72,9 +70,12 @@ class FirePhp extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_headers = array(
-		'X-Wf-Protocol-1' => 'http://meta.wildfirehq.org/Protocol/JsonStream/0.2',
-		'X-Wf-1-Plugin-1' => 'http://meta.firephp.org/Wildfire/Plugin/FirePHP/Library-FirePHPCore/0.3',
-		'X-Wf-1-Structure-1' => 'http://meta.firephp.org/Wildfire/Structure/FirePHP/FirebugConsole/0.1'
+		'X-Wf-Protocol-1' =>
+			'http://meta.wildfirehq.org/Protocol/JsonStream/0.2',
+		'X-Wf-1-Plugin-1' =>
+			'http://meta.firephp.org/Wildfire/Plugin/FirePHP/Library-FirePHPCore/0.3',
+		'X-Wf-1-Structure-1' =>
+			'http://meta.firephp.org/Wildfire/Structure/FirePHP/FirebugConsole/0.1'
 	);
 
 	/**
@@ -123,8 +124,8 @@ class FirePhp extends \lithium\core\Object {
 		$this->_response = $response;
 		$this->_response->headers += $this->_headers;
 
-		if(!empty($this->_queue)) {
-			foreach($this->_queue As $message) {
+		if (!empty($this->_queue)) {
+			foreach ($this->_queue As $message) {
 				$this->_write($message);
 			}
 		}
@@ -133,14 +134,14 @@ class FirePhp extends \lithium\core\Object {
 	/**
 	 * Appends the message to the response header for FirePHP.
 	 *
-	 * @param string $type
-	 * @param string $message
+	 * @param string $type Representing the message type.
+	 * @param string $message Contains the actual message to store.
 	 * @return void
 	 */
 	public function write($type, $message) {
 		$message = $this->_message($type, $message);
 
-		if($this->_response) {
+		if ($this->_response) {
 			$this->_response->headers[$message['key']] = $message['content'];
 			$this->_write($message);
 		} else {
@@ -151,7 +152,7 @@ class FirePhp extends \lithium\core\Object {
 	/**
 	 * Heper method that writes the message to the response header.
 	 *
-	 * @param array A message containing the key and the content to store.
+	 * @param array $message A message containing the key and the content to store.
 	 * @return void
 	 */
 	protected function _write($message) {
@@ -161,23 +162,22 @@ class FirePhp extends \lithium\core\Object {
 	/**
 	 * Generates a string representation of the type and message, suitable for FirePHP.
 	 *
-	 * @param string $type
-	 * @param string $message
+	 * @param string $type Representing the message type.
+	 * @param string $message Contains the actual message to store.
 	 * @return array The string representation of the type and message.
 	 */
 	protected function _message($type, $message) {
-		$key = 'X-Wf-1-1-1-'.$this->_counter++;
+		$key = 'X-Wf-1-1-1-' . $this->_counter++;
 
 		$content = array(
 			array('Type' => $this->_levels[$type]),
 			$message
 		);
 		$content = json_encode($content);
-		$content = strlen($content).'|'.$content.'|';
+		$content = strlen($content) . '|' . $content . '|';
 
 		return compact('key', 'content');
 	}
-
 }
 
 ?>
