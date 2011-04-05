@@ -126,10 +126,8 @@ class FirePhp extends \lithium\core\Object {
 		$this->_response = $response;
 		$this->_response->headers += $this->_headers;
 
-		if (!empty($this->_queue)) {
-			foreach ($this->_queue As $message) {
-				$this->_write($message);
-			}
+		foreach ($this->_queue As $message) {
+			$this->_write($message);
 		}
 	}
 
@@ -149,6 +147,11 @@ class FirePhp extends \lithium\core\Object {
 		} else {
 			$this->_queue[] = $message;
 		}
+
+		$response = $this->_response;
+		return function($self, $params) use ($response) {
+			return $response ? true : false;
+		};
 	}
 
 	/**
@@ -171,10 +174,7 @@ class FirePhp extends \lithium\core\Object {
 	protected function _message($type, $message) {
 		$key = 'X-Wf-1-1-1-' . $this->_counter++;
 
-		$content = array(
-			array('Type' => $this->_levels[$type]),
-			$message
-		);
+		$content = array(array('Type' => $this->_levels[$type]), $message);
 		$content = json_encode($content);
 		$content = strlen($content) . '|' . $content . '|';
 
