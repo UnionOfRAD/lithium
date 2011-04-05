@@ -81,7 +81,11 @@ class Coverage extends \lithium\test\Filter {
 			$executable = $executableLines[$class];
 			$covered = array_intersect(array_keys($density), $executable);
 			$uncovered = array_diff($executable, $covered);
-			$percentage = round(count($covered) / (count($executable) ?: 1), 4) * 100;
+			if (count($executable)) {
+				$percentage = round(count($covered) / (count($executable) ?: 1), 4) * 100;
+			} else {
+				$percentage = 100;
+			}
 			$result[$class] = compact('class', 'executable', 'covered', 'uncovered', 'percentage');
 		}
 
