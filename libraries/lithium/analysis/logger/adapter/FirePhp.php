@@ -9,10 +9,14 @@
 namespace lithium\analysis\logger\adapter;
 
 /**
- * The `FirePhp` logger allows you to log messages to the FirePHP console.
+ * The `FirePhp` log adapter allows you to log messages to [ FirePHP](http://www.firephp.org/).
  *
- * In order to use the FirePhp adapter, you need to add a filter to the dispatcher. The following
- * should be placed in a bootstrap file:
+ * This allows you to inspect native PHP values and objects inside the FireBug console.
+ *
+ * Because this adapter interacts directly with the `Response` object, some additional code is
+ * required to use it. The simplest way to achieve this is to add a filter to the `Dispatcher`. For
+ * example, the following can be placed in a bootstrap file:
+ *
  * {{{
  * use lithium\action\Dispatcher;
  * use lithium\analysis\Logger;
@@ -22,7 +26,7 @@ namespace lithium\analysis\logger\adapter;
  * ));
  *
  * Dispatcher::applyFilter('_call', function($self, $params, $chain) {
- * 	if(isset($params['callable']->response)) {
+ * 	if (isset($params['callable']->response)) {
  * 		Logger::adapter('default')->bind($params['callable']->response);
  * 	}
  * 	return $chain->next($self, $params, $chain);
@@ -47,22 +51,24 @@ namespace lithium\analysis\logger\adapter;
  * }}}
  *
  * Because this adapter also has a queue implemented, it is possible to log messages even when the
- * `Response` object was not yet generated. When it gets generated, all messages queued get flushed
- * to FirePHP instantly.
+ * `Response` object is not yet generated. When it gets generated (and bound), all queued messages
+ * get flushed instantly.
  *
  * Because FirePHP is not a conventional logging destination like a file or a database, you can
  * pass everything (except resources) to the logger and inspect it further in FirePHP. In fact,
- * every message that is passed will be encoded via `json_encode()`, so check out this built
- * in method for more information on how your message will look like in the FirePHP console.
+ * every message that is passed will be encoded via `json_encode()`, so check out this built-in
+ * method for more information on how your message will be encoded.
  *
  * {{{
  * Logger::debug(array('debug' => 'me));
  * Logger::debug(new \lithium\action\Response());
  * }}}
  *
- * @see http://www.firephp.org/
- * @see http://www.firephp.org/Wiki/Reference/Protocol
- * @see http://php.net/manual/en/function.json-encode.php
+ * @see lithium\action\Response
+ * @see lithium\net\http\Message::headers()
+ * @link http://www.firephp.org/ FirePHP
+ * @link http://www.firephp.org/Wiki/Reference/Protocol FirePHP Protocol Reference
+ * @link http://php.net/manual/en/function.json-encode.php PHP Manual: `json_encode()`
  */
 class FirePhp extends \lithium\core\Object {
 
@@ -72,8 +78,7 @@ class FirePhp extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_headers = array(
-		'X-Wf-Protocol-1' =>
-			'http://meta.wildfirehq.org/Protocol/JsonStream/0.2',
+		'X-Wf-Protocol-1' => 'http://meta.wildfirehq.org/Protocol/JsonStream/0.2',
 		'X-Wf-1-Plugin-1' =>
 			'http://meta.firephp.org/Wildfire/Plugin/FirePHP/Library-FirePHPCore/0.3',
 		'X-Wf-1-Structure-1' =>
@@ -88,13 +93,13 @@ class FirePhp extends \lithium\core\Object {
 	 */
 	protected $_levels = array(
 		'emergency' => 'ERROR',
-		'alert'		=> 'ERROR',
-		'critical' 	=> 'ERROR',
-		'error' 	=> 'ERROR',
-		'warning' 	=> 'WARN',
-		'notice' 	=> 'INFO',
-		'info' 		=> 'INFO',
-		'debug' 	=> 'LOG'
+		'alert'     => 'ERROR',
+		'critical'  => 'ERROR',
+		'error'     => 'ERROR',
+		'warning'   => 'WARN',
+		'notice'    => 'INFO',
+		'info'      => 'INFO',
+		'debug'     => 'LOG'
 	);
 
 	/**
@@ -126,52 +131,57 @@ class FirePhp extends \lithium\core\Object {
 		$this->_response = $response;
 		$this->_response->headers += $this->_headers;
 
-		foreach ($this->_queue As $message) {
+		foreach ($this->_queue as $message) {
 			$this->_write($message);
 		}
 	}
 
 	/**
-	 * Appends the message to the response header for FirePHP.
+	 * Appends a log message to the response header for FirePHP.
 	 *
-	 * @param string $type Representing the message type.
+	 * @param string $priority Represents the message priority.
 	 * @param string $message Contains the actual message to store.
-	 * @return void
+	 * @return boolean Always returns `true`. Note that in order for message-writing to take effect,
+	 *                 the adapter must be bound to the `Response` object instance associated with
+	 *                 the current request. See the `bind()` method.
 	 */
-	public function write($type, $message) {
-		$message = $this->_message($type, $message);
+	public function write($priority, $message) {
+		$_self =& $this;
+		$_response =& $this->_response;
 
-		if ($this->_response) {
-			$this->_response->headers[$message['key']] = $message['content'];
-			$this->_write($message);
-		} else {
-			$this->_queue[] = $message;
-		}
-
-		$response = $this->_response;
-		return function($self, $params) use ($response) {
-			return $response ? true : false;
+		return function($self, $params) use (&$_self, $_response) {
+			$priority = $params['priority'];
+			$message = $params['message'];
+			$message = $_self->invokeMethod('_format', array($priority, $message));
+			$_self->invokeMethod('_write', array($message));
+			return true;
 		};
 	}
 
 	/**
-	 * Heper method that writes the message to the response header.
+	 * Heper method that writes the message to the header of a bound `Response` object. If no
+	 * `Response` object is bound when this method is called, it is stored in a message queue.
 	 *
+	 * @see lithium\analysis\logger\adapter\FirePhp::_format()
 	 * @param array $message A message containing the key and the content to store.
 	 * @return void
 	 */
 	protected function _write($message) {
+		if (!$this->_response) {
+			return $this->_queue[] = $message;
+		}
 		$this->_response->headers[$message['key']] = $message['content'];
 	}
 
 	/**
 	 * Generates a string representation of the type and message, suitable for FirePHP.
 	 *
-	 * @param string $type Representing the message type.
+	 * @param string $priority Represents the message priority.
 	 * @param string $message Contains the actual message to store.
-	 * @return array The string representation of the type and message.
+	 * @return array Returns the encoded string representations of the priority and message, in the
+	 *               `'key'` and `'content'` keys, respectively.
 	 */
-	protected function _message($type, $message) {
+	protected function _format($type, $message) {
 		$key = 'X-Wf-1-1-1-' . $this->_counter++;
 
 		$content = array(array('Type' => $this->_levels[$type]), $message);
