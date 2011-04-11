@@ -19,6 +19,22 @@ use lithium\core\NetworkException;
 class Growl extends \lithium\core\Object {
 
 	/**
+	 * Array that maps `Logger` message priority names to Growl-compatible priority levels.
+	 *
+	 * @var array
+	 */
+	protected $_priorities = array(
+		'emergency' => 2,
+		'alert'     => 1,
+		'critical'  => 1,
+		'error'     => 1,
+		'warning'   => 0,
+		'notice'    => -1,
+		'info'      => -2,
+		'debug'     => -2
+	);
+
+	/**
 	 * The Growl protocol version used to send messages.
 	 */
 	const PROTOCOL_VERSION = 1;
@@ -35,11 +51,11 @@ class Growl extends \lithium\core\Object {
 	const TYPE_NOTIFY = 1;
 
 	/**
-	 * Holds the socket connection resource used to send messages to Growl.
+	 * Holds the connection resource used to send messages to Growl.
 	 *
 	 * @var resource
 	 */
-	public $connection = null;
+	protected $_connection = null;
 
 	/**
 	 * Flag indicating whether the logger has successfully registered with the Growl server.
@@ -49,6 +65,13 @@ class Growl extends \lithium\core\Object {
 	 * @var boolean
 	 */
 	protected $_registered = false;
+
+	/**
+	 * Allow the Growl connection resource to be auto-configured from constructor parameters.
+	 *
+	 * @var array
+	 */
+	protected $_autoConfig = array('connection');
 
 	/**
 	 * Growl logger constructor. Accepts an array of settings which are merged with the default
@@ -78,20 +101,14 @@ class Growl extends \lithium\core\Object {
 	 */
 	public function __construct(array $config = array()) {
 		$name = basename(LITHIUM_APP_PATH);
-		$defaults = array(
-			'name'     => $name,
+
+		$defaults = compact('name') + array(
 			'host'     => '127.0.0.1',
 			'port'     => 9887,
 			'password' => null,
 			'protocol' => 'udp',
 			'title'    => Inflector::humanize($name),
 			'notifications' => array('Errors', 'Messages'),
-			'connection' => function($host, $port) {
-				if ($conn = fsockopen($host, $port, $message, $code)) {
-					return $conn;
-				}
-				throw new NetworkException("Growl connection failed: (`{$code}`) `{$message}`.");
-			}
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -99,7 +116,8 @@ class Growl extends \lithium\core\Object {
 	/**
 	 * Writes `$message` to a new Growl notification.
 	 *
-	 * @param string $type Not used (all notifications are of the same type).
+	 * @param string $priority The `Logger`-based priority of the message. This value is mapped to
+	 *               a Growl-specific priority value if possible.
 	 * @param string $message Message to be shown.
 	 * @param array $options Any options that are passed to the `notify()` method. See the
 	 *              `$options` parameter of `notify()`.
@@ -110,9 +128,16 @@ class Growl extends \lithium\core\Object {
 			return;
 		}
 		$_self =& $this;
+		$_priorities = $this->_priorities;
 
-		return function($self, $params) use (&$_self) {
-			return $_self->notify($params['message'], $params['options']);
+		return function($self, $params) use (&$_self, $_priorities) {
+			$priority = 0;
+			$options = $params['options'];
+
+			if (isset($options['priority']) && isset($_priorities[$options['priority']])) {
+				$priority = $_priorities[$options['priority']];
+			}
+			return $_self->notify($params['message'], compact('priority') + $options);
 		};
 	}
 
@@ -148,7 +173,7 @@ class Growl extends \lithium\core\Object {
 		$data .= join('', $message);
 		$data .= pack('H32', md5($data . $this->_config['password']));
 
-		if (fwrite($this->connection, $data, strlen($data)) === false) {
+		if (fwrite($this->_connection(), $data, strlen($data)) === false) {
 			throw new NetworkException('Could not send notification to Growl Server.');
 		}
 		return true;
@@ -163,30 +188,42 @@ class Growl extends \lithium\core\Object {
 		if ($this->_registered) {
 			return true;
 		}
-
-		if (!$this->connection) {
-			$connection = $this->_config['connection'];
-			$this->connection = $connection(
-				"{$this->_config['protocol']}://{$this->_config['host']}", $this->_config['port']
-			);
-		}
-		$app      = utf8_encode($this->_config['name']);
-		$nameEnc  = $defaultEnc = '';
+		$ct = count($this->_config['notifications']);
+		$app = utf8_encode($this->_config['name']);
+		$nameEnc = $defaultEnc = '';
 
 		foreach ($this->_config['notifications'] as $i => $name) {
 			$name = utf8_encode($name);
 			$nameEnc .= pack('n', strlen($name)) . $name;
 			$defaultEnc .= pack('c', $i);
 		}
-		$data = pack('c2nc2', static::PROTOCOL_VERSION, static::TYPE_REG, strlen($app), $i, $i);
+		$data = pack('c2nc2', static::PROTOCOL_VERSION, static::TYPE_REG, strlen($app), $ct, $ct);
 		$data .= $app . $nameEnc . $defaultEnc;
 		$checksum = pack('H32', md5($data . $this->_config['password']));
 		$data .= $checksum;
 
-		if (fwrite($this->connection, $data, strlen($data)) === false) {
+		if (fwrite($this->_connection(), $data, strlen($data)) === false) {
 			throw new NetworkException('Could not send registration to Growl Server.');
 		}
 		return $this->_registered = true;
+	}
+
+	/**
+	 * Creates a connection to the Growl server using the protocol, host and port configurations
+	 * specified in the constructor.
+	 *
+	 * @return resource Returns a connection resource created by `fsockopen()`.
+	 */
+	protected function _connection() {
+		if ($this->_connection) {
+			return $this->_connection;
+		}
+		$host = "{$this->_config['protocol']}://{$this->_config['host']}";
+
+		if ($this->_connection = fsockopen($host, $this->_config['port'], $message, $code)) {
+			return $this->_connection;
+		}
+		throw new NetworkException("Growl connection failed: (`{$code}`) `{$message}`.");
 	}
 
 	/**
@@ -195,9 +232,9 @@ class Growl extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function __destruct() {
-		if (is_resource($this->connection)) {
-			fclose($this->connection);
-			unset($this->connection);
+		if (is_resource($this->_connection)) {
+			fclose($this->_connection);
+			unset($this->_connection);
 		}
 	}
 }
