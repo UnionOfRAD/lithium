@@ -19,7 +19,7 @@ class ContextTest extends \lithium\test\Unit {
 		'scheme' => 'http',
 		'host' => 'example.org',
 		'port' => 80,
-		'timeout' => 4
+		'timeout' => 4,
 		'classes' => array('request' => 'lithium\net\http\Request')
 	);
 
@@ -45,10 +45,10 @@ class ContextTest extends \lithium\test\Unit {
 		$this->assertEqual(25, $this->socket->timeout(25));
 		$this->assertEqual(25, $this->socket->timeout());
 
-		$stream->open();
-		$this->assertEqual(25, $stream->timeout());
+		$this->socket->open();
+		$this->assertEqual(25, $this->socket->timeout());
 
-		$result = stream_context_get_options($stream->resource());
+		$result = stream_context_get_options($this->socket->resource());
 		$this->assertEqual(25, $result['http']['timeout']);
 	}
 

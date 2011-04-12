@@ -16,7 +16,7 @@ class StreamTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
 		'persistent' => false,
-		'scheme' => 'tcp',
+		'scheme' => 'http',
 		'host' => 'example.org',
 		'port' => 80,
 		'timeout' => 2,
@@ -88,7 +88,9 @@ class StreamTest extends \lithium\test\Unit {
 		$stream = new Stream($this->_testConfig);
 		$this->assertTrue(is_resource($stream->open()));
 		$this->assertTrue(is_resource($stream->resource()));
-		$this->assertEqual(82, $stream->write());
+
+		$result = $stream->write();
+		$this->assertTrue($result == 82 || $result == 84);
 		$this->assertPattern("/^HTTP/", (string) $stream->read());
 	}
 
