@@ -71,7 +71,7 @@ class Growl extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('connection');
+	protected $_autoConfig = array('connection', 'registered');
 
 	/**
 	 * Growl logger constructor. Accepts an array of settings which are merged with the default
@@ -109,6 +109,7 @@ class Growl extends \lithium\core\Object {
 			'protocol' => 'udp',
 			'title'    => Inflector::humanize($name),
 			'notifications' => array('Errors', 'Messages'),
+			'registered' => false,
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -124,9 +125,6 @@ class Growl extends \lithium\core\Object {
 	 * @return boolean `True` on successful write, `false` otherwise.
 	 */
 	public function write($type, $message, array $options = array()) {
-		if (!$this->_register()) {
-			return;
-		}
 		$_self =& $this;
 		$_priorities = $this->_priorities;
 
@@ -148,12 +146,11 @@ class Growl extends \lithium\core\Object {
 	 * @param array $options Options consists of:
 	 *        -'title': The title of the displayed notification. Displays the
 	 *         name of the application's parent folder by default.
-	 * @return boolean `True` on successful write, `false` otherwise.
+	 * @return boolean Always returns `true`.
 	 */
 	public function notify($description = '', $options = array()) {
-		if (!$this->_register()) {
-			return false;
-		}
+		$this->_register();
+
 		$defaults = array('sticky' => false, 'priority' => 0, 'type' => 'Messages');
 		$options += $defaults + array('title' => $this->_config['title']);
 		$type = $options['type'];
@@ -173,16 +170,14 @@ class Growl extends \lithium\core\Object {
 		$data .= join('', $message);
 		$data .= pack('H32', md5($data . $this->_config['password']));
 
-		if (fwrite($this->_connection(), $data, strlen($data)) === false) {
-			throw new NetworkException('Could not send notification to Growl Server.');
-		}
+		$this->_send($data);
 		return true;
 	}
 
 	/**
 	 * Growl server connection registration and initialization.
 	 *
-	 * @return boolean `True` on successful write, `false` otherwise.
+	 * @return void
 	 */
 	protected function _register() {
 		if ($this->_registered) {
@@ -202,10 +197,8 @@ class Growl extends \lithium\core\Object {
 		$checksum = pack('H32', md5($data . $this->_config['password']));
 		$data .= $checksum;
 
-		if (fwrite($this->_connection(), $data, strlen($data)) === false) {
-			throw new NetworkException('Could not send registration to Growl Server.');
-		}
-		return $this->_registered = true;
+		$this->_send($data);
+		$this->_registered = true;
 	}
 
 	/**
@@ -224,6 +217,21 @@ class Growl extends \lithium\core\Object {
 			return $this->_connection;
 		}
 		throw new NetworkException("Growl connection failed: (`{$code}`) `{$message}`.");
+	}
+
+	/**
+	 * Sends binary data to the Growl server.
+	 *
+	 * @throws NetworkException Throws an exception if the server connection could not be written
+	 *         to.
+	 * @param string $data The raw binary data to send to the Growl server.
+	 * @return boolean Always returns `true`.
+	 */
+	protected function _send($data) {
+		if (fwrite($this->_connection(), $data, strlen($data)) === false) {
+			throw new NetworkException('Could not send registration to Growl Server.');
+		}
+		return true;
 	}
 
 	/**
