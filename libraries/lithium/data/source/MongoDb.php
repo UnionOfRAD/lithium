@@ -171,7 +171,7 @@ class MongoDb extends \lithium\data\Source {
 			},
 			'date' => function($v) {
 				$v = is_numeric($v) ? intval($v) : strtotime($v);
-				return (time() == $v) ? new MongoDate() : new MongoDate($v);
+				return (!$v || time() == $v) ? new MongoDate() : new MongoDate($v);
 			},
 			'regex'   => function($v) { return new MongoRegex($v); },
 			'integer' => function($v) { return (integer) $v; },
