@@ -1031,7 +1031,7 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	protected static function _findFilters() {
 		$self = static::_object();
-		$_query =& $self->_query;
+		$_query = $self->_query;
 
 		return array(
 			'first' => function($self, $params, $chain) {
