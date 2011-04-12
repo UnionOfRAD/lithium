@@ -435,6 +435,19 @@ class ModelTest extends \lithium\test\Unit {
 		MockPost::overrideSchema($schema);
 	}
 
+	public function testSaveWithNoCallbacks() {
+		$schema = MockPost::schema();
+		MockPost::overrideSchema($this->_altSchema);
+		$data = array('title' => 'New post', 'author_id' => 13);
+		$record = MockPost::create($data);
+		$result = $record->save(null, array('callbacks' => false));
+
+		$this->assertEqual('create', $result['query']->type());
+		$this->assertEqual($data, $result['query']->data());
+		$this->assertEqual('lithium\tests\mocks\data\MockPost', $result['query']->model());
+		MockPost::overrideSchema($schema);
+	}
+
 	public function testSaveWithFailedValidation() {
 		$data = array('title' => '', 'author_id' => 13);
 		$record = MockPost::create($data);
