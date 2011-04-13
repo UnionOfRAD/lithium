@@ -628,6 +628,28 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertTrue($result['data']['update']['updated'] instanceof MongoDate);
 	}
 
+	/**
+	 * Assert that Mongo and the Mongo Exporter don't mangle manual geospatial queries.
+	 *
+	 * @return void
+	 */
+	public function testGeoQueries() {
+		$coords = array(84.13, 11.38);
+		$coords2 = array_map(function($point) { return $point + 5; }, $coords);
+		$conditions = array('location' => array('$near' => $coords));
+
+		$query = new Query(compact('conditions') + array('model' => $this->_model));
+		$result = $query->export($this->db);
+		$this->assertEqual($result['conditions'], $conditions);
+
+		$conditions = array('location' => array(
+			'$within' => array('$box' => array($coords2, $coords))
+		));
+		$query = new Query(compact('conditions') + array('model' => $this->_model));
+		$result = $query->export($this->db);
+		$this->assertEqual($conditions, $result['conditions']);
+	}
+
 	public function testSchemaCallback() {
 		$schema = array('_id' => array('type' => 'id'), 'created' => array('type' => 'date'));
 		$db = new MongoDb(array('autoConnect' => false, 'schema' => function() use ($schema) {
