@@ -16,7 +16,7 @@ use lithium\util\String;
  * for it to write to, as follows:
  *
  * {{{ lithium\storage\Cache::config(array(
- * 	'storage' => array('adapter' => 'Redis', 'server' => '127.0.0.1:6379')
+ * 	'storage' => array('adapter' => 'Redis', 'host' => '127.0.0.1:6379')
  * ));}}}
  *
  * Then, you can configure the `Cache` logger with the `'storage'` config:
