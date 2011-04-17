@@ -8,6 +8,9 @@
 
 namespace lithium\net;
 
+use ReflectionClass;
+use ReflectionProperty;
+
 /**
  * Base message class for any URI based request/response.
  * @see http://tools.ietf.org/html/rfc3986#section-1.1.1
@@ -117,8 +120,9 @@ class Message extends \lithium\core\Object {
 		switch ($format) {
 			case 'array':
 				$array = array();
-				$r = new \ReflectionClass(get_class($this));
-				foreach ($r->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
+				$class = new ReflectionClass(get_class($this));
+
+				foreach ($class->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
 					$array[$prop->getName()] = $prop->getValue($this);
 				}
 				return $array;

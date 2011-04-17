@@ -121,31 +121,68 @@ class Request extends \lithium\net\http\Message {
 
 	/**
 	 * Converts the data in the record set to a different format, i.e. an array. Available
-	 * options: array, url, context, or string.
+	 * options: array, URL, stream context configuration, or string.
 	 *
-	 * @param string $format Format to convert to.
-	 * @param array $options
-	 * @return mixed
+	 * @see lithium\net\Message::to()
+	 * @param string $format Format to convert to. Should be either `'url'`, which returns a string
+	 *               representation of the URL that this request points to, or `'context'`, which
+	 *               returns an array usable with PHP's `stream_context_create()` function. For
+	 *               more available formats, see the parent method, `lithium\net\Message::to()`.
+	 * @param array $options Allows overriding of specific portions of the URL, as follows. These
+	 *              options should only be specified if you intend to replace the values that are
+	 *              already in the `Request` object.
+	 *              - `'scheme'` _string_: The protocol scheme of the URL.
+	 *              - `'method'` _string_: If applicable, the HTTP method to use in the request.
+	 *                Mainly applies to the `'context'` format.
+	 *              - `'host'` _string_: The host name the request is pointing at.
+	 *              - `'port'` _string_: The host port, if any. If specified, should be prefixed
+	 *                with `':'`.
+	 *              - `'path'` _string_: The URL path.
+	 *              - `'query'` _mixed_: The query string of the URL as a string or array. If passed
+	 *                as a string, should be prefixed with `'?'`.
+	 *              - `'auth'` _string_: Authentication information. See the constructor for
+	 *                details.
+	 *              - `'content'` _string_: The body of the request.
+	 *              - `'headers'` _array_: The request headers.
+	 *              - `'version'` _string_: The HTTP version of the request, where applicable.
+	 * @return mixed Varies; see the `$format` parameter for possible return values.
 	 */
 	public function to($format, array $options = array()) {
+		$defaults = array(
+			'method' => $this->method,
+			'scheme' => $this->scheme,
+			'host' => $this->host,
+			'port' => $this->port ? ":{$this->port}" : '',
+			'path' => $this->path,
+			'query' => $this->queryString(),
+			'auth' => $this->_config['auth'],
+			'content' => $this->body(),
+			'headers' => $this->headers(),
+			'version' => $this->version,
+		);
+		$options += $defaults;
+
+		if ($options['query'] && is_array($options['query'])) {
+			$options['query'] = $this->queryString($options['query']);
+		}
+
 		switch ($format) {
 			case 'url':
-				$query = $this->queryString();
-				$host = $this->host . ($this->port ? ":{$this->port}" : '');
-				return "{$this->scheme}://{$host}{$this->path}{$query}";
+				return String::insert("{:scheme}://{:host}{:port}{:path}{:query}", $options);
 			case 'context':
-				if ($this->_config['auth']) {
+				if ($options['auth']) {
 					$auth = base64_encode("{$this->username}:{$this->password}");
-					$this->headers('Authorization', "{$this->_config['auth']} {$auth}");
+					$this->headers('Authorization', "{$options['auth']} {$auth}");
 				}
-				$content = $this->body();
-				$this->headers('Content-Length', strlen($content));
-				$defaults = array(
-					'method' => $this->method,
-					'header' => $this->headers(), 'content' => $content,
-					'protocol_version' => $this->version, 'ignore_errors' => true
+				$this->headers('Content-Length', strlen($options['content']));
+				$base = array(
+					'content' => $options['content'],
+					'method' => $options['method'],
+					'header' => $options['headers'],
+					'protocol_version' => $options['version'],
+					'ignore_errors' => true
 				);
-				return array('http' => $options + $defaults);
+				return array('http' => array_diff_key($options, $defaults) + $base);
 			default:
 				return parent::to($format, $options);
 		}

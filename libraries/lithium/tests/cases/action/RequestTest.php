@@ -940,6 +940,21 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual(array('text/html'), $request->accepts(true));
 		$this->assertEqual('html', $request->accepts());
 	}
+
+	/**
+	 * Tests that `action\Request` correctly inherits the functionality of the `to()` method
+	 * inherited from `lithium\net\http\Request`.
+	 */
+	public function testConvertToUrl() {
+		$request = new Request(array(
+			'env' => array('HTTP_HOST' => 'foo.com', 'HTTPS' => 'on'),
+			'base' => '/the/base/path',
+			'url' => '/the/url',
+			'query' => array('some' => 'query', 'parameter' => 'values')
+		));
+		$expected = 'https://foo.com/the/base/path/the/url?some=query&parameter=values';
+		$this->assertEqual($expected, $request->to('url'));
+	}
 }
 
 ?>

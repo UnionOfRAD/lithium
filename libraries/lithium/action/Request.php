@@ -25,7 +25,7 @@ use lithium\util\Validator;
  * @see lithium\net\http\Route
  * @see lithium\action\Request::__get()
  */
-class Request extends \lithium\net\http\Message {
+class Request extends \lithium\net\http\Request {
 
 	/**
 	 * Current url of request.
@@ -501,9 +501,8 @@ class Request extends \lithium\net\http\Message {
 	 * @param string $default Default URL to use if HTTP_REFERER cannot be read from headers.
 	 * @param boolean $local If true, restrict referring URLs to local server.
 	 * @return string Referring URL.
-	 * @todo Rewrite me to remove constant dependencies.
 	 */
-	function referer($default = null, $local = false) {
+	public function referer($default = null, $local = false) {
 		if ($ref = $this->env('HTTP_REFERER')) {
 			if (!$local) {
 				return $ref;
@@ -513,6 +512,26 @@ class Request extends \lithium\net\http\Message {
 			}
 		}
 		return ($default != null) ? $default : '/';
+	}
+
+	/**
+	 * Overrides `lithium\net\http\Request::to()` to provide the correct options for generating
+	 * URLs. For information about this method, see the parent implementation.
+	 *
+	 * @see lithium\net\http\Request::to()
+	 * @param string $format The format to convert to.
+	 * @param array $options Override options.
+	 * @return mixed The return value type depends on `$format`.
+	 */
+	public function to($format, array $options = array()) {
+		$defaults = array(
+			'scheme' => $this->env('HTTPS') ? 'https' : 'http',
+			'host' => $this->env('HTTP_HOST'),
+			'path' => $this->_base . $this->url,
+			'query' => $this->query
+		);
+		$options += $defaults;
+		return parent::to($format, $options);
 	}
 
 	/**
