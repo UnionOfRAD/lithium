@@ -25,9 +25,8 @@ class ContextTest extends \lithium\test\Unit {
 
 	protected $_testUrl = 'http://example.org';
 
-	public function setUp() {
-		$this->socket = new Context($this->_testConfig);
-		$this->skipIf(!$this->_canConnect('example.org', 80), 'Cannot connect to example.org:80');
+	public function skip() {
+		$this->skipIf(dns_check_record("example.org") === false, "No internet connection.");
 	}
 
 	public function tearDown() {
@@ -118,20 +117,6 @@ class ContextTest extends \lithium\test\Unit {
 		$this->assertTrue($result instanceof Response);
 		$this->assertPattern("/^HTTP/", (string) $result);
 		$this->assertTrue($stream->eof());
-	}
-
-	protected function _canConnect($host, $port) {
-		$this->expectException();
-		$this->expectException();
-
-		if ($conn = fsockopen($host, $port)) {
-			array_pop($this->_expected);
-			array_pop($this->_expected);
-			fclose($conn);
-
-			return true;
-		}
-		return false;
 	}
 }
 

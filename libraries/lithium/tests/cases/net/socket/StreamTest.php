@@ -24,10 +24,8 @@ class StreamTest extends \lithium\test\Unit {
 	);
 
 	public function skip() {
-		$config = $this->_testConfig;
-		$url = "{$config['scheme']}://{$config['host']}";
-		$message = "Could not open {$url} - skipping " . __CLASS__;
-		$this->skipIf(!fopen($url, 'r'), $message);
+		$host = $this->_testConfig['host'];
+		$this->skipIf(dns_check_record($host) === false, "No internet connection.");
 	}
 
 	public function testAllMethodsNoConnection() {

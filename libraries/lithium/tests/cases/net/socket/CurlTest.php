@@ -24,10 +24,6 @@ class CurlTest extends \lithium\test\Unit {
 
 	protected $_testUrl = 'http://example.org';
 
-	public function setUp() {
-		$this->skipIf(!$this->_canConnect('example.org', 80), 'Cannot connect to example.org:80');
-	}
-
 	/**
 	 * Skip the test if curl is not available in your PHP installation.
 	 *
@@ -41,6 +37,8 @@ class CurlTest extends \lithium\test\Unit {
 		$url = "{$config['scheme']}://{$config['host']}";
 		$message = "Could not open {$url} - skipping " . __CLASS__;
 		$this->skipIf(!curl_init($url), $message);
+
+		$this->skipIf(dns_check_record("example.org") === false, "No internet connection.");
 	}
 
 	public function testAllMethodsNoConnection() {
@@ -133,20 +131,6 @@ class CurlTest extends \lithium\test\Unit {
 		);
 		$this->assertTrue($result instanceof \lithium\net\http\Response);
 		$this->assertPattern("/^HTTP/", (string) $result);
-	}
-
-	protected function _canConnect($host, $port) {
-		$this->expectException();
-		$this->expectException();
-
-		if ($conn = fsockopen($host, $port)) {
-			array_pop($this->_expected);
-			array_pop($this->_expected);
-			fclose($conn);
-
-			return true;
-		}
-		return false;
 	}
 }
 
