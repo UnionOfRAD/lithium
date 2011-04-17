@@ -116,7 +116,10 @@ class Test extends \lithium\console\Command {
 			'recursive' => true,
 			'exclude' => '/tests|resources|webroot|index$|^app\\\\config|^app\\\\views/'
 		));
-		$tests = Group::all();
+		$map = function($t) {
+			return str_replace('\tests\cases', '', preg_replace('/Test$/', '', $t));
+		};
+		$tests = array_map($map, Group::all());
 		$classes = array_diff($classes, $tests);
 
 		sort($classes);
