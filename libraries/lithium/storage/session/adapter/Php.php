@@ -94,11 +94,15 @@ class Php extends \lithium\core\Object {
 	}
 
 	/**
-	 * Obtain the session id.
+	 * Sets or obtains the session ID.
 	 *
-	 * @return mixed Session id, or null if the session has not been started.
+	 * @param string $key Optional. If specified, sets the session ID to the value of `$key`.
+	 * @return mixed Session ID, or `null` if the session has not been started.
 	 */
-	public static function key() {
+	public static function key($key = null) {
+		if ($key) {
+			return session_id($key);
+		}
 		return session_id() ?: null;
 	}
 
