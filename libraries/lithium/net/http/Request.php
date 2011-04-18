@@ -157,7 +157,6 @@ class Request extends \lithium\net\http\Message {
 			'query' => $this->queryString(),
 			'auth' => $this->_config['auth'],
 			'content' => $this->body(),
-			'headers' => $this->headers(),
 			'version' => $this->version,
 		);
 		$options += $defaults;
@@ -178,7 +177,7 @@ class Request extends \lithium\net\http\Message {
 				$base = array(
 					'content' => $options['content'],
 					'method' => $options['method'],
-					'header' => $options['headers'],
+					'header' => $this->headers(),
 					'protocol_version' => $options['version'],
 					'ignore_errors' => true
 				);

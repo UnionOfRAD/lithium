@@ -165,8 +165,7 @@ class RequestTest extends \lithium\test\Unit {
 			'protocol_version' => '1.1',
 			'ignore_errors' => true
 		));
-		$result = $request->to('context');
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $request->to('context'));
 	}
 
 	public function testToStringWithBody() {
