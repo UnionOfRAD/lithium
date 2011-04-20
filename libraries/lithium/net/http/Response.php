@@ -197,36 +197,39 @@ class Response extends \lithium\net\http\Message {
 	* @return string
 	*/
 	protected function _decode($body) {
-		if (stripos($this->headers['Transfer-Encoding'], 'chunked') !== false) {
-			$decoded = null;
-			while($body != '') {
-				$left = strpos($body, "\012");
-				if($left === false) {
-					$decoded .= $body;
-					break;
-				}
-				$chunk = substr($body, 0, $left);
-				$next = strpos($chunk, ';');
-				if($next !== false) {
-					$chunk = substr($chunk, 0, $next);
-				}
-				if($chunk == '') {
-					$decoded .= substr($body, 0, $left);
-					$body = substr($body, $left + 1);
-					continue;
-				}
-				$length = hexdec($chunk);
-				if($length) {
-					$decoded .= substr($body, $left + 1, $length);
-					$body = substr($body, $left + 2 + $length);
-				} else {
-					$body = '';
-				}
-			}
-			return $decoded;
+		if (stripos($this->headers['Transfer-Encoding'], 'chunked') === false) {
+			return $body;
 		}
+		$decoded = null;
 
-		return $body;
+		while ($body != '') {
+			$left = strpos($body, "\012");
+
+			if ($left === false) {
+				$decoded .= $body;
+				break;
+			}
+			$chunk = substr($body, 0, $left);
+			$next = strpos($chunk, ';');
+
+			if ($next !== false) {
+				$chunk = substr($chunk, 0, $next);
+			}
+
+			if ($chunk == '') {
+				$decoded .= substr($body, 0, $left);
+				$body = substr($body, $left + 1);
+				continue;
+			}
+
+			if ($length = hexdec($chunk)) {
+				$decoded .= substr($body, $left + 1, $length);
+				$body = substr($body, $left + 2 + $length);
+			} else {
+				$body = '';
+			}
+		}
+		return $decoded;
 	}
 }
 
