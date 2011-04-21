@@ -689,10 +689,6 @@ abstract class Database extends \lithium\data\Source {
 
 		while (list($field, $value) = each($data)) {
 			$schema += array($field => array('default' => null));
-
-			if ($value === null && $schema[$field]['default'] === null) {
-				continue;
-			}
 			$fields[] = $this->name($field) . ' = ' . $this->value($value, $schema[$field]);
 		}
 		return join(', ', $fields);
