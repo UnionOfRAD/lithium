@@ -855,13 +855,19 @@ abstract class Database extends \lithium\data\Source {
 		$key = $this->name($key);
 		$values = array();
 
-		foreach ((array) $value as $val) {
-			$values[] = $this->value($val, $schema);
+		if(!is_object($value)) {
+			foreach ((array) $value as $val) {
+				$values[] = $this->value($val, $schema);
+			}
 		}
 
 		switch (true) {
 			case (isset($config['format'])):
 				return $key . ' ' . String::insert($config['format'], $values);
+			case (is_object($value) && isset($config['multiple'])):
+				$op = $config['multiple'];
+				$value = trim(rtrim($this->renderCommand($value), ';'));
+				return "{$key} {$op} ({$value})";
 			case (count($values) > 1 && isset($config['multiple'])):
 				$op = $config['multiple'];
 				$values = join(', ', $values);

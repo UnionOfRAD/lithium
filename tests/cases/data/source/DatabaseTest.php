@@ -199,6 +199,26 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected .= " (SELECT MockDatabaseTagging.post_id FROM {mock_database_taggings} AS ";
 		$expected .= "{MockDatabaseTagging} WHERE MockDatabaseTag.tag IN ('foo', 'bar', 'baz'));";
 		$this->assertEqual($expected, $result);
+
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $this->_model,
+			'fields' => array('MockDatabasePost.title', 'MockDatabasePost.body'),
+			'conditions' => array('Post.id' => array('!=' => new Query(array(
+				'type' => 'read',
+				'fields' => array('post_id'),
+				'model' => 'lithium\tests\mocks\data\model\MockDatabaseTagging',
+				'conditions' => array('MockDatabaseTag.tag' => array('foo', 'bar', 'baz')),
+			))))
+		));
+		$result = $this->db->renderCommand($query);
+
+		$expected = "SELECT MockDatabasePost.title, MockDatabasePost.body FROM" .
+					" {mock_database_posts} AS {MockDatabasePost} WHERE ({Post}.{id} NOT IN" .
+					" (SELECT MockDatabaseTagging.post_id FROM {mock_database_taggings} AS " .
+					"{MockDatabaseTagging} WHERE MockDatabaseTag.tag IN " .
+					"('foo', 'bar', 'baz')));";
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testJoin() {
@@ -389,7 +409,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$query = new Query(array(
 			'type' => 'update',
 			'conditions' => array('expires' => array('>=' => '2010-05-13')),
-			'data' => array('published' => false),
+			'data' => array('published' => false, 'comments' => null),
 			'model' => $this->_model
 		));
 		$sql = "UPDATE {mock_database_posts} SET {published} = 0 WHERE ";
