@@ -48,7 +48,8 @@ class HttpTest extends \lithium\test\Unit {
 		$this->assertFalse($result);
 
 		$this->assertPattern('/Digest/', $http->headers[0]);
-		$this->assertPattern('/qop="auth"/', $http->headers[0]);
+		$this->assertPattern('/realm="app",/', $http->headers[0]);
+		$this->assertPattern('/qop="auth",/', $http->headers[0]);
 		$this->assertPattern('/nonce=/', $http->headers[0]);
 	}
 

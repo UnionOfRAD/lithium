@@ -8,8 +8,6 @@
 
 namespace lithium\security\auth\adapter;
 
-use lithium\core\Libraries;
-
 /**
  * The `Http` adapter provides basic and digest authentication based on the HTTP protocol.
  * By default, the adapter uses Http Digest based authentication.
@@ -133,7 +131,7 @@ class Http extends \lithium\core\Object {
 			$nonce = uniqid();
 			$opaque = md5($realm);
 
-			$message = "WWW-Authenticate: Digest realm=\"{$realm}\" qop=\"auth\",";
+			$message = "WWW-Authenticate: Digest realm=\"{$realm}\",qop=\"auth\",";
 			$message .= "nonce=\"{$nonce}\",opaque=\"{$opaque}\"";
 			$this->_writeHeader($message);
 			return;
