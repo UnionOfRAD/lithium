@@ -451,8 +451,8 @@ abstract class Database extends \lithium\data\Source {
 
 		$relations = array_keys((array) $query->relationships());
 		$schema = $model::schema();
+		$pregDotMatch = '/^(' . implode('|', array_merge($relations, array($modelName))). ')\./';
 		$forJoin = ($modelName != $query->alias());
-
 		foreach ($fields as $scope => $field) {
 			switch (true) {
 				case (is_numeric($scope) && ($field == '*' || $field == $modelName)):
@@ -461,9 +461,9 @@ abstract class Database extends \lithium\data\Source {
 				case (is_numeric($scope) && isset($schema[$field])):
 					$result[$modelName][] = $field;
 				break;
-				case is_numeric($scope) && preg_match('/^' . $modelName . '\./', $field):
-					list($modelName, $field) = explode('.', $field);
-					$result[$modelName][] = $field;
+				case is_numeric($scope) && preg_match($pregDotMatch, $field):
+					list($dotModelName, $field) = explode('.', $field);
+					$result[$dotModelName][] = $field;
 					break;
 				case is_array($field) && $scope == $modelName:
 					$result[$modelName] = $field;
@@ -473,9 +473,8 @@ abstract class Database extends \lithium\data\Source {
 				case in_array($scope, $relations) && is_array($field):
 					$join = isset($joins[$scope]) ? $joins[$scope] : null;
 					if($join) {
-						$result[$scope] = reset($this->schema($query, $join->model(), $join));
-					} else {
-						$result[$scope] = $field;
+						$relSchema = $this->schema($query, $join->model(), $join);
+						$result[$scope] = reset($relSchema);
 					}
 				break;
 				case is_numeric($scope) && in_array($field, $relations):
@@ -489,7 +488,7 @@ abstract class Database extends \lithium\data\Source {
 			}
 		}
 		if(!$forJoin) {
-			$sortOrder = array_flip(array_merge((array)$modelName,$relations));
+			$sortOrder = array_flip(array_merge(array($modelName),$relations));
 			uksort($result, function($a, $b) use($sortOrder) {
 				return $sortOrder[$a] - $sortOrder[$b];
 			});
@@ -583,9 +582,7 @@ abstract class Database extends \lithium\data\Source {
 				if ($value === null) {
 					return "{$key} IS NULL";
 				}
-				break;
 		}
-		return false;
 	}
 
 	/**
@@ -787,7 +784,7 @@ abstract class Database extends \lithium\data\Source {
 		return "ORDER BY {$order}";
 	}
 
-	public function group($group, $context) {
+	public function group($group, $context = null) {
 		if (!$group) {
 			return null;
 		}

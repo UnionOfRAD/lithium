@@ -136,6 +136,57 @@ class DatabaseTest extends \lithium\test\Unit {
 		);
 		$result = $this->db->schema($query);
 		$this->assertEqual($expected, $result);
+
+		$options = array(
+			'model' => $this->_model,
+			'with' => 'MockDatabaseComment'
+		);
+		$options['fields'] = array('id', 'title');
+		$result = $this->db->schema(new Query($options));
+		$expected = array($modelName => $options['fields']);
+		$this->assertEqual($expected, $result);
+
+		$options['fields'] = array(
+			'MockDatabasePost.id',
+			'MockDatabasePost.title',
+			'MockDatabaseComment.body'
+		);
+		$result = $this->db->schema(new Query($options));
+		$expected = array(
+			$modelName => array(
+				'id', 'title',
+			),
+			'MockDatabaseComment' => array(
+				'body'
+			));
+		$this->assertEqual($expected, $result);
+
+		$options['fields'] = array(
+			'MockDatabasePost' => array('id', 'title'),
+			'MockDatabaseComment' => array('body', 'created')
+		);
+		$result = $this->db->schema(new Query($options));
+		$expected = array(
+			$modelName => array(
+				'id', 'title',
+			),
+			'MockDatabaseComment' => array(
+				'body', 'created'
+			));
+		$this->assertEqual($expected, $result);
+
+		$options['fields'] = array(
+			'MockDatabasePost', 'MockDatabaseComment'
+		);
+		$result = $this->db->schema(new Query($options));
+		$expected = array(
+			$modelName => array(
+				'id', 'author_id', 'title', 'created'
+			),
+			'MockDatabaseComment' => array(
+				'id', 'post_id', 'author_id', 'body', 'created'
+			));
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testSchemaFromManualFieldList() {
@@ -302,6 +353,27 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testCalculation() {
+		$options = array(
+			'type' => 'read',
+			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost'
+		);
+		$this->expectException('Undefined offset: 0');
+		$result = $this->db->calculation('count', new Query($options), $options);
+		$expected = 'SELECT COUNT(*) as count FROM {mock_database_posts} AS {MockDatabasePost};';
+		$this->assertEqual($expected, $this->db->sql);
+	}
+
+	public function testReadWithQueryStringReturnArrayWithSchema() {
+		$result = $this->db->read('SELECT * FROM {:table} WHERE user_id = {:uid};', array(
+			'table' => 'mock_database_posts',
+			'uid' => '3',
+			'schema' => array('id', 'title', 'text')
+		));
+		$expected = 'SELECT * FROM \'mock_database_posts\' WHERE user_id = 3;';
+		$this->assertEqual($expected, $this->db->sql);
+	}
+
 	public function testReadWithQueryObjectRecordSet() {
 		$query = new Query(array(
 			'type' => 'read',
@@ -462,22 +534,59 @@ class DatabaseTest extends \lithium\test\Unit {
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ";
 		$sql .= "({field} like '%value%');";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
+	}
 
+	public function testConditions() {
 		$query = new Query(array(
 			'type' => 'read', 'model' => $this->_model,
 			'conditions' => array(
 				'or' => array(
 					'field1' => 'value1',
 					'field2' => 'value2',
-					'and' => array('sField' => '1', 'sField2' => '2')
+					'and' => array('sField' => '1', 'sField2' => '2'),
+					array('field1' => 'value2'),
+					array('field2' => null)
 				),
-				'bField' => '3'
+				'bField' => '3',
+				'bField2' => false
 			)
 		));
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ";
-		$sql .= "({field1} = 'value1' OR {field2} = 'value2' OR ({sField} = 1 AND {sField2} = 2))";
-		$sql .= " AND {bField} = 3;";
+		$sql .= "({field1} = 'value1' OR {field2} = 'value2' OR ({sField} = 1 AND {sField2} = 2)";
+		$sql .= " OR ({field1} = 'value2') OR (field2 IS NULL)) AND {bField} = 3 AND bField2 = 0;";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
+	}
+
+	public function testFields() {
+		$query = new Query(array(
+			'model' => $this->_model,
+			'with' => array('MockDatabaseComment')
+		));
+
+		$fields = array('id', 'title');
+		$result = $this->db->fields($fields, $query);
+		$expected = 'MockDatabasePost.id, MockDatabasePost.title';
+		$this->assertEqual($expected,$result);
+
+		$fields = array(
+			'MockDatabasePost' => array('id', 'title', 'created'),
+			'MockDatabaseComment' => array('body')
+		);
+		$result = $this->db->fields($fields, $query);
+		$expected = 'MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created' .
+					', MockDatabaseComment.body';
+		$this->assertEqual($expected,$result);
+
+		$fields = array(
+			'MockDatabasePost',
+			'MockDatabaseComment'
+		);
+		$result = $this->db->fields($fields, $query);
+		$expected = 'MockDatabasePost.id, MockDatabasePost.author_id, MockDatabasePost.title, ' .
+				'MockDatabasePost.created, MockDatabaseComment.id, MockDatabaseComment.post_id, ' .
+				'MockDatabaseComment.author_id, MockDatabaseComment.body, ' .
+				'MockDatabaseComment.created';
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testRawConditions() {
@@ -503,11 +612,33 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual('post', $belongsTo->fieldName());
 	}
 
+	public function testInvalidQueryType() {
+		$this->expectException('Invalid query type `fakeType`.');
+		$this->db->read(new Query(array('type' => 'fakeType')));
+	}
+
+	public function testReadWithRelationship() {
+		$options = array(
+			'type' => 'read',
+			'model' => $this->_model,
+			'with' => array('MockDatabaseComment')
+		);
+		$result = $this->db->read(new Query($options), $options);
+		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ' .
+					'{mock_database_comments} AS {MockDatabaseComment} ON ' .
+					'{MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id};';
+		$this->assertEqual($expected, $this->db->sql);
+	}
+
+	public function testGroup() {
+		$result = $this->db->group(array('id ASC'));
+		$expected = 'GROUP BY id ASC';
+		$this->assertEqual($expected, $result);
+	}
+
 	/**
 	 * Tests that various syntaxes for the `'order'` key of the query object produce the correct
 	 * SQL.
-	 *
-	 * @return void
 	 */
 	public function testQueryOrderSyntaxes() {
 		$query = new Query(array(
