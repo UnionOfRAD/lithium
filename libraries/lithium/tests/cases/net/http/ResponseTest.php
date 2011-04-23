@@ -197,18 +197,11 @@ class ResponseTest extends \lithium\test\Unit {
 		));
 		$this->assertEqual($expected, $response->body());
 
-		$message = $headers . join("\r\n", array('body'));
+		$message = $headers . "\r\nbody";
 
 		$response = new Response(compact('message'));
 		$result = $response->body();
 		$this->assertEqual('body', $result);
-
-		$message = $headers . join("\r\n", array('[part one];', '[part two]'));
-		$expected = '[part two]';
-		$response = new Response(compact('message'));
-
-		$result = $response->body();
-		$this->assertEqual($expected, $result);
 
 		$message = join("\r\n", array(
 			'HTTP/1.1 200 OK',
@@ -230,6 +223,64 @@ class ResponseTest extends \lithium\test\Unit {
 		$result = (string) $response;
 		$this->assertPattern('/^HTTP\/1\.1 200 OK/', $result);
 		$this->assertPattern('/Content-Type: application\/json\s+$/ms', $result);
+	}
+
+	/**
+	 * Creates a chunked gzipped message to test response decoding.
+	 *
+	 * @param string $body Message body.
+	 * @param array $headers Message headers.
+	 * @return string Returns a raw HTTP message with headers and body.
+	 */
+	protected function _createMessage($body, array $headers = array()) {
+		$headers += array(
+			'Connection: close',
+			'Content-Encoding: gzip',
+			'Content-Type: text/html; charset=ISO-8859-15',
+			'Server: Apache/2.2.16 (Debian) mod_ssl/2.2.16 OpenSSL/0.9.8o',
+			'Transfer-Encoding: chunked',
+			'Vary: Accept-Encoding',
+		);
+		return join("\r\n", $headers) . "\r\n\r\n" . $body;
+	}
+
+	public function testWithoutChunksAndComment() {
+		$body = "\n<html>\n    <head>\n        <title>Simple site</title>\n    </head>\n";
+		$body .= "<body>\n        <h1>Simple site</h1>\n        <p>\n            But awesome\n";
+		$body .= "        </p>\n    </body>\n</html>\n";
+		$message =  $this->_createMessage($body);
+		$response = new Response(compact('message'));
+		$this->assertEqual(trim($body), $response->body());
+	}
+
+	public function testWithoutChunksAndCommentInBody() {
+		$body = "\n<html>\n    <head>\n        <title>Simple site</title>\n    </head>";
+		$body .= "\n    <body>\n        <!-- (c) 1998 - 2011 Tweakers.net B.V. --> ";
+		$body .= "\n        <h1>Simple site</h1>\n        <p>\n            But awesome";
+		$body .= "\n        </p>\n    </body>\n</html>\n";
+		$message =  $this->_createMessage($body);
+		$response = new Response(compact('message'));
+		$this->assertEqual(trim($body), $response->body());
+	}
+
+	public function testWithoutChunksAndRandomCommentInHtmlRoot() {
+		$body = "\n<html><!-- This is some random comment -->\n    <head>";
+		$body .= "\n        <title>Simple site</title>\n    </head>\n    <body>";
+		$body .= "\n        <h1>Simple site</h1>\n        <p>\n            But awesome";
+		$body .= "\n        </p>\n    </body>\n</html>\n";
+		$message = $this->_createMessage($body);
+		$response = new Response(compact('message'));
+		$this->assertEqual(trim($body), $response->body());
+	}
+
+	public function testWithoutChunksAndCommentInHtmlRoot() {
+		$body = "\n<!doctype html><!-- (c) 1998 - 2011 Tweakers.net B.V. --> \n<html lang=\"nl\"> ";
+		$body .= "\n    <head>\n        <title>Simple site</title>\n    </head>";
+		$body .= "\n    <body>\n        <h1>Simple site</h1>\n        <p>\n            But awesome";
+		$body .= "\n        </p>\n    </body>\n</html>\n";
+		$message =  $this->_createMessage($body);
+		$response = new Response(compact('message'));
+		$this->assertEqual(trim($body), $response->body());
 	}
 }
 

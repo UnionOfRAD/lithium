@@ -200,36 +200,27 @@ class Response extends \lithium\net\http\Message {
 		if (stripos($this->headers['Transfer-Encoding'], 'chunked') === false) {
 			return $body;
 		}
-		$decoded = null;
+		$pos = 0;
+		$len = strlen($body);
+		$dechunk = null;
+		$newlineAt = strpos($body, "\n", $pos + 1);
+		$chunkLenHex = substr($body, $pos, $newlineAt - $pos);
 
-		while ($body != '') {
-			$left = strpos($body, "\012");
+		while ($pos < $len && $chunkLenHex) {
+			$hex = strtolower(trim(ltrim($chunkLenHex, "0"))) ?: 0;
+			$dec = hexdec($hex);
 
-			if ($left === false) {
-				$decoded .= $body;
-				break;
+			if ($hex != dechex($dec)) {
+				return $body;
 			}
-			$chunk = substr($body, 0, $left);
-			$next = strpos($chunk, ';');
-
-			if ($next !== false) {
-				$chunk = substr($chunk, 0, $next);
-			}
-
-			if ($chunk == '') {
-				$decoded .= substr($body, 0, $left);
-				$body = substr($body, $left + 1);
-				continue;
-			}
-
-			if ($length = hexdec($chunk)) {
-				$decoded .= substr($body, $left + 1, $length);
-				$body = substr($body, $left + 2 + $length);
-			} else {
-				$body = '';
-			}
+			$pos = $newlineAt + 1;
+			$chunkLen = hexdec(rtrim($chunkLenHex, "\r\n"));
+			$dechunk .= substr($body, $pos, $chunkLen);
+			$pos = strpos($body, "\n", $pos + $chunkLen) + 1;
+			$newlineAt = strpos($body, "\n", $pos + 1);
+			$chunkLenHex = substr($body, $pos, $newlineAt - $pos);
 		}
-		return $decoded;
+		return $dechunk;
 	}
 }
 
