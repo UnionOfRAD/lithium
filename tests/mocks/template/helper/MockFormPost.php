@@ -10,6 +10,8 @@ namespace lithium\tests\mocks\template\helper;
 
 class MockFormPost extends \lithium\data\Model {
 
+	public $hasMany = array('MockQueryComment');
+
 	protected $_schema = array(
 		'id' => array('type' => 'integer'),
 		'author_id' => array('type' => 'integer'),

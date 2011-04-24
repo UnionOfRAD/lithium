@@ -115,6 +115,9 @@ class QueryTest extends \lithium\test\Unit {
 		$expected = 5;
 		$result = $query->limit();
 		$this->assertEqual($expected, $result);
+
+		$query->limit(false);
+		$this->assertNull($query->limit());
 	}
 
 	public function testPage() {
@@ -270,7 +273,8 @@ class QueryTest extends \lithium\test\Unit {
 			'page',
 			'source',
 			'type',
-			'whitelist'
+			'whitelist',
+			'relationships'
 		);
 		$result = array_keys($export);
 
@@ -278,7 +282,7 @@ class QueryTest extends \lithium\test\Unit {
 		sort($result);
 		$this->assertEqual($expected, $result);
 
-		$expected = 'id, author_id, title';
+		$expected = 'MockQueryPost.id, MockQueryPost.author_id, MockQueryPost.title';
 		$result = $export['fields'];
 		$this->assertEqual($expected, $result);
 
@@ -341,6 +345,25 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual('gir', $query->join('zim')->dib());
 	}
 
+	public function testWithAssociation() {
+		$query = new Query(array(
+			'model' => $this->_model,
+			'with' => 'MockQueryComment'
+		));
+		$export = $query->export(new MockDatabase());
+		$expected = array(
+			'MockQueryComment' => array(
+				'type' => 'hasMany',
+				'model' => 'lithium\tests\mocks\data\model\MockQueryComment',
+				'fieldName' => 'mock_query_comments'
+			)
+		);
+		$keyExists = isset($export['relationships']);
+		$this->assertTrue($keyExists);
+		$this->skipIf(!$keyExists);
+		$this->assertEqual($expected, $export['relationships']);
+	}
+
 	/**
 	 * Tests that assigning a whitelist to a query properly restricts the list of data fields that
 	 * the query exposes.
@@ -377,6 +400,9 @@ class QueryTest extends \lithium\test\Unit {
 		$query = new Query(compact('calculate', 'group'));
 		$this->assertEqual($group, $query->group());
 		$this->assertEqual($calculate, $query->calculate());
+
+		$query->group(false);
+		$this->assertNull($query->group());
 	}
 
 	public function testInstantiationWithConditionsAndData() {

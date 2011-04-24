@@ -98,7 +98,8 @@ class Query extends \lithium\core\Object {
 			'joins'      => array(),
 			'with'       => array(),
 			'map'        => array(),
-			'whitelist'  => array()
+			'whitelist'  => array(),
+			'relationships' => array()
 		);
 		parent::__construct($config + $defaults);
 	}
