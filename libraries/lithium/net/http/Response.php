@@ -113,13 +113,19 @@ class Response extends \lithium\net\http\Message {
 				$this->encoding = strtoupper(trim($match[2]));
 			}
 		}
-
 		if (isset($this->headers['Transfer-Encoding'])) {
 			$body = $this->_decode($body);
 		}
 		$this->body = $this->body ?: $body;
 	}
 
+	/**
+	 * Accepts an entire HTTP message including headers and body, and parses it into a message body
+	 * an array of headers, and the HTTP status.
+	 *
+	 * @param string $body The full body of the message.
+	 * @return After parsing out other message components, returns just the message body.
+	 */
 	protected function _parseMessage($body) {
 		if (!($parts = explode("\r\n\r\n", $body, 2)) || count($parts) == 1) {
 			return $body;
@@ -143,11 +149,11 @@ class Response extends \lithium\net\http\Message {
 	}
 
 	/**
-	 * Set and get the status for the response
+	 * Set and get the status for the response.
 	 *
 	 * @param string $key
 	 * @param string $data
-	 * @return string
+	 * @return string Returns the full HTTP status, with version, code and message.
 	 */
 	public function status($key = null, $data = null) {
 		if ($data === null) {
@@ -190,37 +196,21 @@ class Response extends \lithium\net\http\Message {
 	}
 
 	/**
-	* Decodes based on transfer encoding body.
+	* Decodes content bodies transferred with HTTP chunked encoding.
 	*
-	* @todo replace with stream wrapper dechunk
-	* @param string $body
-	* @return string
+	* @link http://en.wikipedia.org/wiki/Chunked_transfer_encoding Wikipedia: Chunked encoding
+	* @param string $body A chunked HTTP message body.
+	* @return string Returns the value of `$body` with chunks decoded, but only if the value of the
+	*         `Transfer-Encoding` header is set to `'chunked'`. Otherwise, returns `$body`
+	*         unmodified.
 	*/
 	protected function _decode($body) {
 		if (stripos($this->headers['Transfer-Encoding'], 'chunked') === false) {
 			return $body;
 		}
-		$pos = 0;
-		$len = strlen($body);
-		$dechunk = null;
-		$newlineAt = strpos($body, "\n", $pos + 1);
-		$chunkLenHex = substr($body, $pos, $newlineAt - $pos);
-
-		while ($pos < $len && $chunkLenHex) {
-			$hex = strtolower(trim(ltrim($chunkLenHex, "0"))) ?: 0;
-			$dec = hexdec($hex);
-
-			if ($hex != dechex($dec)) {
-				return $body;
-			}
-			$pos = $newlineAt + 1;
-			$chunkLen = hexdec(rtrim($chunkLenHex, "\r\n"));
-			$dechunk .= substr($body, $pos, $chunkLen);
-			$pos = strpos($body, "\n", $pos + $chunkLen) + 1;
-			$newlineAt = strpos($body, "\n", $pos + 1);
-			$chunkLenHex = substr($body, $pos, $newlineAt - $pos);
-		}
-		return $dechunk;
+		$stream = fopen('data://text/plain,' . $body, 'r');
+		stream_filter_append($stream, 'dechunk');
+		return stream_get_contents($stream);
 	}
 }
 

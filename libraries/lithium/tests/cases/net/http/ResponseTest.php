@@ -182,8 +182,6 @@ class ResponseTest extends \lithium\test\Unit {
 			'1',
 			'',
 			'',
-			'0',
-			'',
 			'',
 		));
 		$response = new Response(compact('message'));
@@ -280,6 +278,14 @@ class ResponseTest extends \lithium\test\Unit {
 		$body .= "\n        </p>\n    </body>\n</html>\n";
 		$message =  $this->_createMessage($body);
 		$response = new Response(compact('message'));
+		$this->assertEqual(trim($body), $response->body());
+	}
+
+	public function testMessageWithNoHeaders() {
+		$body = "\n<html>...</html>\n";
+		$message = "\r\n\r\n{$body}";
+		$response = new Response(compact('message'));
+		$this->assertFalse($response->headers());
 		$this->assertEqual(trim($body), $response->body());
 	}
 }
