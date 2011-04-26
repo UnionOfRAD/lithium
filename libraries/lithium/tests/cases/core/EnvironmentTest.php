@@ -145,6 +145,24 @@ class EnvironmentTest extends \lithium\test\Unit {
 		$this->assertTrue(Environment::is('production'));
 	}
 
+	public function testDotPath() {
+		$data = array(
+			'foo' => array(
+				'bar' => array(
+					'baz' => 123
+				)
+			),
+			'some' => array(
+				'path' => true
+			)
+		);
+		Environment::set('dotPathIndex', $data);
+
+		$this->assertEqual(123, Environment::get('dotPathIndex.foo.bar.baz'));
+		$this->assertEqual($data['foo'], Environment::get('dotPathIndex.foo'));
+		$this->assertTrue(Environment::get('dotPathIndex.some.path'));
+	}
+
 	/**
 	 * Tests calling `get()` and `set()` with `true` as the envrionment name, to automatically
 	 * select the current environment.

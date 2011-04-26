@@ -181,14 +181,30 @@ class Environment {
 			return isset(static::$_configurations[$cur]) ? static::$_configurations[$cur] : null;
 		}
 		if (isset(static::$_configurations[$name])) {
-			return static::$_configurations[$name];
+			return static::_processDotPath($name, static::$_configurations);
 		}
-		if (!isset(static::$_configurations[static::$_current])) {
-			return null;
+		if (!isset(static::$_configurations[$cur])) {
+			return static::_processDotPath($name, static::$_configurations);
 		}
 
-		$config = static::$_configurations[static::$_current];
-		return isset($config[$name]) ? $config[$name] : null;
+		return static::_processDotPath($name, static::$_configurations[$cur]);
+	}
+
+	protected static function _processDotPath($path, &$arrayPointer) {
+		if (isset($arrayPointer[$path])) {
+			return $arrayPointer[$path];
+		}
+		if (strpos($path, '.') === false) {
+			return null;
+		}
+		$pathKeys = explode('.', $path);
+		foreach ($pathKeys as $pathKey) {
+			if(!isset($arrayPointer[$pathKey])) {
+				return false;
+			}
+			$arrayPointer = &$arrayPointer[$pathKey];
+		}
+		return $arrayPointer;
 	}
 
 	/**
