@@ -275,7 +275,9 @@ abstract class Database extends \lithium\data\Source {
 				case 'array':
 					$columns = $args['schema'] ?: $self->schema($query, $result);
 					$records = array();
-
+					if(is_array(reset($columns))) {
+						$columns = reset($columns);
+					}
 					while ($data = $result->next()) {
 						// @hack: Fix this to support relationships
 						if (count($columns) != count($data) && is_array(current($columns))) {
@@ -610,9 +612,7 @@ abstract class Database extends \lithium\data\Source {
 				next($keys);
 				switch(true) {
 					case is_array($item):
-						foreach($item as $field) {
-							$toMerge[$name][] = $field;
-						}
+						$toMerge[$name] = $item;
 						continue;
 					case in_array($item, $modelNames):
 						if($item == reset($modelNames)) {
@@ -628,7 +628,7 @@ abstract class Database extends \lithium\data\Source {
 						$toMerge[$name][] = $field;
 						continue;
 					default:
-						$mainSchema = array_keys($context->schema());
+						$mainSchema = array_keys((array)$context->schema());
 						if (in_array($item, $mainSchema)) {
 							$toMerge[reset($modelNames)][] = $item;
 							continue;

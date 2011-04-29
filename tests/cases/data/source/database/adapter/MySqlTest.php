@@ -36,6 +36,11 @@ class MySqlTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->db = new MySql($this->_dbConfig);
+
+		$lithium = LITHIUM_LIBRARY_PATH . '/lithium';
+		$sqlFile = $lithium . '/tests/mocks/data/source/database/adapter/mysql.sql';
+		$sql = file_get_contents($sqlFile);
+		$this->db->read($sql, array('return' => 'resource'));
 	}
 
 	/**
@@ -75,6 +80,7 @@ class MySqlTest extends \lithium\test\Unit {
 			'database' => 'garbage', 'init' => true
 		) + $this->_dbConfig);
 
+		$this->expectException();
 		$this->assertFalse($db->connect());
 		$this->assertFalse($db->isConnected());
 
