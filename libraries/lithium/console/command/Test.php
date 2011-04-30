@@ -161,7 +161,7 @@ class Test extends \lithium\console\Command {
 				$this->case = $tests[$number];
 			}
 
-			if ($number == 'q') {
+			if ($number === 'q') {
 				return 0;
 			}
 		}
