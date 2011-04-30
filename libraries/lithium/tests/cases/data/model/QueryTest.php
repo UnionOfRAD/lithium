@@ -399,6 +399,14 @@ class QueryTest extends \lithium\test\Unit {
 		$query = new Query(compact('entity'));
 		$this->assertEqual(array('id' => 13), $query->conditions());
 	}
+	
+	public function testInvalidEntityCondition() {
+		$entity = new Record(array('model' => $this->_model, 'exists' => true));
+		$entity->_id = 13;
+		$query = new Query(compact('entity'));
+		$this->expectException('/No matching primary key found/');
+		$query->conditions();
+	}
 
 	public function testAutomaticAliasing() {
 		$query = new Query(array('model' => $this->_model));
