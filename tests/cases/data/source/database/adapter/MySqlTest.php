@@ -32,13 +32,11 @@ class MySqlTest extends \lithium\test\Unit {
 		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'MySql');
 		$message = 'Test database is either unavailable, or not using a MySQL adapter';
 		$this->skipIf(!$hasDb, $message);
-	}
 
-	public function setUp() {
 		$this->db = new MySql($this->_dbConfig);
 
 		$lithium = LITHIUM_LIBRARY_PATH . '/lithium';
-		$sqlFile = $lithium . '/tests/mocks/data/source/database/adapter/mysql.sql';
+		$sqlFile = $lithium . '/tests/mocks/data/source/database/adapter/mysql_companies.sql';
 		$sql = file_get_contents($sqlFile);
 		$this->db->read($sql, array('return' => 'resource'));
 	}
