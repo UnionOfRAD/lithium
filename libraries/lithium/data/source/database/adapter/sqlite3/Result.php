@@ -12,6 +12,12 @@ use SQLite3Result;
 
 class Result extends \lithium\data\source\database\Result {
 
+	protected function _prev() {
+		if ($this->_resource->reset()) {
+			return $this->_next();
+		}
+	}
+
 	protected function _next() {
 		if ($this->_resource instanceof SQLite3Result) {
 			return $this->_resource->fetchArray(SQLITE3_ASSOC);
@@ -30,7 +36,7 @@ class Result extends \lithium\data\source\database\Result {
 		}
 
 		if (is_callable(array($this->_resource, $name))) {
-			return call_user_func_array(array($this->_resource, $name), $arguments);
+			return call_user_func_array(array(&$this->_resource, $name), $arguments);
 		}
 	}
 }
