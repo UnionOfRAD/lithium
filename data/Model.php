@@ -195,11 +195,9 @@ class Model extends \lithium\core\StaticObject {
 	 * @see lithium\data\Connections::add()
 	 */
 	protected $_meta = array(
-		'key' => 'id',
 		'name' => null,
 		'title' => null,
 		'class' => null,
-		'locked' => true,
 		'source' => null,
 		'connection' => 'default',
 		'initialized' => false
