@@ -399,7 +399,7 @@ class QueryTest extends \lithium\test\Unit {
 		$query = new Query(compact('entity'));
 		$this->assertEqual(array('id' => 13), $query->conditions());
 	}
-	
+
 	public function testInvalidEntityCondition() {
 		$entity = new Record(array('model' => $this->_model, 'exists' => true));
 		$entity->_id = 13;

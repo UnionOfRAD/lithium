@@ -511,15 +511,15 @@ class Query extends \lithium\core\Object {
 		if (!$this->_entity || !($model = $this->_config['model'])) {
 			return;
 		}
-		
 		$key = $model::key($this->_entity->data());
-		if(!$key && $this->_type != "create") {
+
+		if (!$key && $this->_type != "create") {
 			throw new ConfigException('No matching primary key found.');
 		}
 		if (is_array($key)) {
 			return $key;
 		}
-		
+
 		$key = $model::meta('key');
 		$val = $this->_entity->{$key};
 		return $val ? array($key => $val) : array();
