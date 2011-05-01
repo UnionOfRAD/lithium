@@ -661,14 +661,14 @@ class Model extends \lithium\core\StaticObject {
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
 			$data = $params['data'];
 			$options = $params['options'];
+			$defaults = array();
 
-			if ($schema = $self::schema()) {
-				foreach ($schema as $field => $config) {
-					if (!isset($data[$field]) && isset($config['default'])) {
-						$data[$field] = $config['default'];
-					}
+			foreach ((array) $self::schema() as $field => $config) {
+				if (isset($config['default'])) {
+					$defaults[$field] = $config['default'];
 				}
 			}
+			$data = Set::merge(Set::expand($defaults), $data);
 			return $self::connection()->item($self, $data, $options);
 		});
 	}

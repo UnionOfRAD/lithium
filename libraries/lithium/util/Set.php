@@ -420,6 +420,38 @@ class Set {
 	}
 
 	/**
+	 * Accepts a one-dimensional array where the keys are separated by a delimiter.
+	 *
+	 * @param array $data The one-dimensional array to expand.
+	 * @param array $options The options used when expanding the array:
+	 *              - `'separator'` _string_: The delimiter to use when separating keys. Defaults
+	 *                to `'.'`.
+	 * @return array Returns a multi-dimensional array expanded from a one dimensional dot-separated
+	 *         array.
+	 */
+	public static function expand(array $data, array $options = array()) {
+		$defaults = array('separator' => '.');
+		$options += $defaults;
+		$result = array();
+
+		foreach ($data as $key => $val) {
+			if (strpos($key, $options['separator']) === false) {
+				$result[$key] = $val;
+				continue;
+			}
+			list($path, $key) = explode($options['separator'], $key, 2);
+			$path = is_numeric($path) ? intval($path) : $path;
+			$result[$path][$key] = $val;
+		}
+		foreach ($result as $key => $value) {
+			if (is_array($value)) {
+				$result[$key] = static::expand($value, $options);
+			}
+		}
+		return $result;
+	}
+
+	/**
 	 * Returns a series of values extracted from an array, formatted in a format string.
 	 *
 	 * @param array $data Source array from which to extract the data.

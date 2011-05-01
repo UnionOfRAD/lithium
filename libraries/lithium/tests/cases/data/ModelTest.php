@@ -538,6 +538,9 @@ class ModelTest extends \lithium\test\Unit {
 		)));
 		$this->assertEqual('foo', MockPost::create()->nested->value);
 
+		$data = array('nested' => array('value' => 'bar'));
+		$this->assertEqual('bar', MockPost::create($data)->nested->value);
+
 		MockPost::overrideSchema($schema);
 		MockPost::$connection = null;
 	}

@@ -162,9 +162,18 @@ class SetTest extends \lithium\test\Unit {
 		$result = Set::flatten($data);
 		$this->assertEqual($expected, $result);
 
-		$result = Set::flatten(array('Post' => $data[0]['Post']), array('separator' => '/'));
-		$expected = array('Post/id' => '1', 'Post/author_id' => '1', 'Post/title' => 'First Post');
+		$result = Set::expand($result);
+		$this->assertEqual($data, $result);
+
+		$result = Set::flatten($data[0], array('separator' => '/'));
+		$expected = array(
+			'Post/id' => '1', 'Post/author_id' => '1', 'Post/title' => 'First Post',
+			'Author/id' => '1', 'Author/user' => 'nate', 'Author/password' => 'foo'
+		);
 		$this->assertEqual($expected, $result);
+
+		$result = Set::expand($expected, array('separator' => '/'));
+		$this->assertEqual($data[0], $result);
 	}
 
 	public function testFormat() {
