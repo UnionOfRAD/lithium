@@ -16,13 +16,13 @@ class CurlTest extends \lithium\test\Unit {
 	protected $_testConfig = array(
 		'persistent' => false,
 		'scheme' => 'http',
-		'host' => 'example.org',
+		'host' => 'google.com',
 		'port' => 80,
 		'timeout' => 2,
 		'classes' => array('request' => 'lithium\net\http\Request')
 	);
 
-	protected $_testUrl = 'http://example.org';
+	protected $_testUrl = 'http://google.com';
 
 	/**
 	 * Skip the test if curl is not available in your PHP installation.
@@ -38,7 +38,7 @@ class CurlTest extends \lithium\test\Unit {
 		$message = "Could not open {$url} - skipping " . __CLASS__;
 		$this->skipIf(!curl_init($url), $message);
 
-		$this->skipIf(dns_check_record("example.org") === false, "No internet connection.");
+		$this->skipIf(dns_check_record("google.com") === false, "No internet connection.");
 	}
 
 	public function testAllMethodsNoConnection() {

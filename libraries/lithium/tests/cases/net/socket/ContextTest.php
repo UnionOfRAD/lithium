@@ -17,37 +17,34 @@ class ContextTest extends \lithium\test\Unit {
 	protected $_testConfig = array(
 		'persistent' => false,
 		'scheme' => 'http',
-		'host' => 'example.org',
+		'host' => 'google.com',
 		'port' => 80,
 		'timeout' => 4,
 		'classes' => array('request' => 'lithium\net\http\Request')
 	);
 
-	protected $_testUrl = 'http://example.org';
+	protected $_testUrl = 'http://google.com';
 
 	public function skip() {
-		$this->skipIf(dns_check_record("example.org") === false, "No internet connection.");
-	}
-
-	public function tearDown() {
-		unset($this->socket);
+		$this->skipIf(dns_check_record("google.com") === false, "No internet connection.");
 	}
 
 	public function testConstruct() {
-		$subject = new Context(array('timeout' => 300));
+		$subject = new Context(array('timeout' => 300) + $this->_testConfig);
 		$this->assertTrue(300, $subject->timeout());
 		unset($subject);
 	}
 
 	public function testGetSetTimeout() {
-		$this->assertEqual(4, $this->socket->timeout());
-		$this->assertEqual(25, $this->socket->timeout(25));
-		$this->assertEqual(25, $this->socket->timeout());
+		$subject = new Context($this->_testConfig);
+		$this->assertEqual(4, $subject->timeout());
+		$this->assertEqual(25, $subject->timeout(25));
+		$this->assertEqual(25, $subject->timeout());
 
-		$this->socket->open();
-		$this->assertEqual(25, $this->socket->timeout());
+		$subject->open();
+		$this->assertEqual(25, $subject->timeout());
 
-		$result = stream_context_get_options($this->socket->resource());
+		$result = stream_context_get_options($subject->resource());
 		$this->assertEqual(25, $result['http']['timeout']);
 	}
 
