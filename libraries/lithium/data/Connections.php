@@ -123,11 +123,11 @@ class Connections extends \lithium\core\Adaptable {
 	 *
 	 * // Gets the instance of the connection object, configured with the settings defined for
 	 * // this object in Connections::add()
-	 * $dbConnection = Connection::get('db');
+	 * $dbConnection = Connections::get('db');
 	 *
 	 * // Gets the connection object, but only if it has already been built.
 	 * // Otherwise returns null.
-	 * $dbConnection = Connection::get('db', array('autoCreate' => false));
+	 * $dbConnection = Connections::get('db', array('autoCreate' => false));
 	 * }}}
 	 *
 	 * @param string $name The name of the connection to get, as defined in the first parameter of
