@@ -6,4 +6,4 @@
 # @license       http://opensource.org/licenses/bsd-license.php The BSD License
 #
 SELF=$0; test -L $0 && SELF=$(readlink -n $0)
-php -f ${SELF/%li3/}lithium.php -- "$@"
+php -f $(dirname $SELF)/lithium.php -- "$@"
