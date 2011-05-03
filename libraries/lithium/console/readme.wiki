@@ -78,7 +78,6 @@ class HelloWorld extends \lithium\console\Command {
 		$this->header('Welcome to the Hello World command!');
 		$this->out('Hello, World!');
 	}
-
 }
 
 ?>}}}
