@@ -24,7 +24,7 @@ class RouterTest extends \lithium\test\Unit {
 		$_SERVER = $this->_backup;
 	}
 
-	public function testParseNoOptions() {
+	public function testParseNoArgumentsNoOptions() {
 		$expected = array(
 			'command' => null, 'action' => 'run', 'args' => array()
 		);
@@ -32,7 +32,7 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testParseWithPassed() {
+	public function testParseArguments() {
 		$expected = array(
 			'command' => 'test', 'action' => 'action',
 			'args' => array('param')
@@ -43,7 +43,7 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testParseWithNamed() {
+	public function testParseXF86StyleLongOptions() {
 		$expected = array(
 			'command' => 'test', 'action' => 'lithium.tests.cases.console.RouterTest',
 			'args' => array(),
@@ -57,7 +57,7 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testParseWithDoubleNamed() {
+	public function testParseGnuStyleLongOptions() {
 		$expected = array(
 			'command' => 'test', 'action' => 'run', 'args' => array(),
 			'case' => 'lithium.tests.cases.console.RouterTest'
@@ -85,7 +85,7 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testParseWithParam() {
+	public function testParseShortOption() {
 		$expected = array(
 			'command' => 'test', 'action' => 'action', 'args' => array(),
 			'i' => true,
