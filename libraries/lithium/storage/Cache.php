@@ -51,9 +51,9 @@ class Cache extends \lithium\core\Adaptable {
 	/**
 	 * Stores configurations for cache adapters
 	 *
-	 * @var object Collection of cache configurations
+	 * @var array
 	 */
-	protected static $_configurations = null;
+	protected static $_configurations = array();
 
 	/**
 	 * Libraries::locate() compatible path to adapters for this class.
