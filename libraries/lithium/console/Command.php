@@ -81,16 +81,12 @@ class Command extends \lithium\core\Object {
 		parent::_init();
 
 		$this->request = $this->_config['request'];
+		$this->response = $this->_instance('response', $this->_config['response']);
 
-		if (is_object($this->_config['response'])) {
-			$this->response = $this->_config['response'];
-		} else {
-			$this->response = $this->_instance('response', $this->_config['response']);
-		}
-		if (!empty($this->request->params)) {
-			$params = (array) array_diff_key(
-				$this->request->params, array('command' => null, 'action' => null, 'args' => null)
-			);
+		if ($this->request->params) {
+			$default = array('command' => null, 'action' => null, 'args' => null);
+			$params = (array) array_diff_key($this->request->params, $default);
+
 			foreach ($params as $key => $param) {
 				$this->{$key} = $param;
 			}
@@ -98,7 +94,7 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Called by the Dispatcher class to invoke an action.
+	 * Called by the `Dispatcher` class to invoke an action.
 	 *
 	 * @see lithium\console\Dispatcher
 	 * @see lithium\console\Response
