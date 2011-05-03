@@ -149,9 +149,14 @@ logic.
 #### Parsing options and arguments
 
 Parsing options and arguments to commands should be simple. In fact, the
-parsing is already done for you.  Command line options in the form of
-`--option=value` are automatically parsed and exposed to your command instance
-through its properties.
+parsing is already done for you.
+
+Short and long (GNU-style) options in the form of `-f`, `--foo` and `--foo=bar`
+are automatically parsed and exposed to your command instance through its
+properties. XF68-style long options (i.e. `-foo`) are not supported by default
+but support can be added by extending the console router.
+
+Arguments are passed directly to the invoked method.
 
 Let's look at an example, going back to the `hello_world` command from earlier:
 

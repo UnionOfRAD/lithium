@@ -43,20 +43,6 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testParseXF86StyleLongOptions() {
-		$expected = array(
-			'command' => 'test', 'action' => 'lithium.tests.cases.console.RouterTest',
-			'args' => array(),
-			'case' => true
-		);
-		$result = Router::parse(new Request(array(
-			'args' => array(
-				'test', '-case', 'lithium.tests.cases.console.RouterTest'
-			)
-		)));
-		$this->assertEqual($expected, $result);
-	}
-
 	public function testParseGnuStyleLongOptions() {
 		$expected = array(
 			'command' => 'test', 'action' => 'run', 'args' => array(),

@@ -36,7 +36,7 @@ class Router extends \lithium\core\Object {
 				$params['command'] = array_shift($args);
 			}
 			while ($arg = array_shift($args)) {
-				if (preg_match('/^-(?P<key>[a-zA-Z0-9]+)$/i', $arg, $match)) {
+				if (preg_match('/^-(?P<key>[a-zA-Z0-9])$/i', $arg, $match)) {
 					$params[$match['key']] = true;
 					continue;
 				}
