@@ -205,9 +205,6 @@ class MySql extends \lithium\data\source\Database {
 		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			extract($params);
 
-			if(isset($fields)) {
-				return $fields;
-			}
 			$name = $self->invokeMethod('_entityName', array($entity));
 			$columns = $self->read("DESCRIBE {$name}", array('return' => 'array', 'schema' => array(
 				'field', 'type', 'null', 'key', 'default', 'extra'
