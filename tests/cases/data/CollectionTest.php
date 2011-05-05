@@ -9,10 +9,11 @@
 namespace lithium\tests\cases\data;
 
 use lithium\data\collection\DocumentSet;
+use lithium\data\Connections;
 
 class CollectionTest extends \lithium\test\Unit {
 
-	protected $_model = 'lithium\tests\mocks\data\model\MockQueryPost';
+	protected $_model = 'lithium\tests\mocks\data\MockPost';
 
 	public function testGetStats() {
 		$collection = new DocumentSet(array('stats' => array('foo' => 'bar')));
@@ -27,6 +28,9 @@ class CollectionTest extends \lithium\test\Unit {
 	}
 
 	public function testAccessorMethods() {
+		Connections::config(array('mock-source' => array(
+			'type' => 'lithium\tests\mocks\data\MockSource'
+		)));
 		$model = $this->_model;
 		$model::config(array('connection' => false, 'key' => 'id'));
 		$collection = new DocumentSet(compact('model'));
