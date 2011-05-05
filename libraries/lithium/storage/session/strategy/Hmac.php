@@ -13,18 +13,17 @@ use lithium\core\ConfigException;
 use lithium\storage\session\strategy\MissingSignatureException;
 
 /**
- * This strategy allows you to sign your `Session` and/or `Cookie` data with a passphrase
+ * This strategy allows you to sign your `Session` and / or `Cookie` data with a passphrase
  * to ensure that it has not been tampered with.
  *
  * Example configuration:
  *
  * {{{
- * Session::config(array(
- *     'default' => array(
- *	       'adapter' => 'Cookie',
- *	       'strategies' => array('Hmac' => array('secret' => 'foobar'))
- *     )
- * ));
+ * Session::config(array('default' => array(
+ *	'adapter' => 'Cookie',
+ *	'strategies' => array('Hmac' => array('secret' => 'foobar'))
+ * )));
+ * }}}
  *
  * This will configure the `HMAC` strategy to be used for all `Session` operations with the
  * `default` named configuration. A hash-based message authentication code (HMAC) will be
