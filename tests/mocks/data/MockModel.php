@@ -30,6 +30,10 @@ class MockModel extends \lithium\data\Model {
 			'columns' => array('lithium\tests\mocks\data\MockModel' => array('id', 'data')),
 			'autoConnect' => false
 		));
+		self::meta(array(
+			'key' => 'id',
+			'locked' => true
+		));
 		return $mock;
 	}
 }
