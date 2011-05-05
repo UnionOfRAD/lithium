@@ -28,7 +28,7 @@ class CollectionTest extends \lithium\test\Unit {
 
 	public function testAccessorMethods() {
 		$model = $this->_model;
-		$model::config(array('connection' => false));
+		$model::config(array('connection' => false, 'key' => 'id'));
 		$collection = new DocumentSet(compact('model'));
 		$this->assertEqual($model, $collection->model());
 		$this->assertEqual(compact('model'), $collection->meta());

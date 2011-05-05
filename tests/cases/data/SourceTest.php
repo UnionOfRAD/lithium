@@ -29,7 +29,9 @@ class SourceTest extends \lithium\test\Unit {
 		$source = new MockSource(array('autoConnect' => true));
 		$name = '{(\'Li\':"∆")}';
 		$this->assertEqual($name, $source->name($name));
-		$this->assertFalse($source->configureClass('Foo'));
+
+		$expected = array('meta' => array('locked' => true, 'key' => 'id'));
+		$this->assertEqual($expected, $source->configureClass('Foo'));
 	}
 
 	public function testConnection() {

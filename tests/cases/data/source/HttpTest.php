@@ -216,13 +216,12 @@ class HttpTest extends \lithium\test\Unit {
 	}
 
 	public function testCreateWithModel() {
+		$model = $this->_model;
+		$model::config(array('key' => 'id'));
 		$http = new Http($this->_testConfig);
-		$query = new Query(array(
-			'model' => $this->_model,
-			'data' => array('title' => 'Test Title')
-		));
-
+		$query = new Query(compact('model') + array('data' => array('title' => 'Test Title')));
 		$result = $http->create($query);
+
 		$expected = join("\r\n", array(
 			'POST /posts HTTP/1.1',
 			'Host: localhost:80',

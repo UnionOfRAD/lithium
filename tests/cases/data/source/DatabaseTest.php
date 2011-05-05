@@ -427,7 +427,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertTrue($this->db->delete($query));
 		$this->assertEqual(1, $query->entity()->id);
 
-		$expected = "DELETE FROM {mock_database_posts} AS {MockDatabasePost} WHERE id = 1;";
+		$expected = "DELETE FROM {mock_database_posts} WHERE id = 1;";
 		$this->assertEqual($expected, $this->db->sql);
 	}
 
@@ -473,7 +473,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'conditions' => array('published' => false),
 			'model' => $this->_model
 		));
-		$sql = 'DELETE FROM {mock_database_posts} AS {MockDatabasePost} WHERE published = 0;';
+		$sql = 'DELETE FROM {mock_database_posts} WHERE published = 0;';
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
 
@@ -484,7 +484,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'data' => array('published' => false, 'comments' => null),
 			'model' => $this->_model
 		));
-		$sql = "UPDATE {mock_database_posts} SET {published} = 0 WHERE ";
+		$sql = "UPDATE {mock_database_posts} SET {published} = 0, {comments} = NULL WHERE ";
 		$sql .= "({expires} >= '2010-05-13');";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
