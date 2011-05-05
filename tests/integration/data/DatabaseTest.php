@@ -58,7 +58,9 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->db = Connections::get('test');
 
 		$mockBase = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/data/source/database/adapter/';
-		$files = array('_galleries.sql', '_images.sql');
+		$files = array('galleries' => '_galleries.sql', 'images' => '_images.sql');
+		$files = array_diff_key($files, array_flip($this->db->entities()));
+
 		foreach($files as $file) {
 			$sqlFile = $mockBase . strtolower($this->_dbConfig['adapter']) . $file;
 			$this->skipIf(!file_exists($sqlFile), "SQL file $sqlFile does not exist.");
@@ -87,7 +89,10 @@ class DatabaseTest extends \lithium\test\Unit {
 			'model' => 'lithium\tests\mocks\data\source\Images',
 			'source' => 'images',
 			'alias' => 'Images',
-			'with' => array('Galleries')
+			'with' => array('Galleries'),
+			'conditions' => array(
+				'gallery_id' => $this->gallery['id']
+			)
 		));
 		$images = $this->db->read($query)->data();
 		reset($this->images);
@@ -100,10 +105,15 @@ class DatabaseTest extends \lithium\test\Unit {
 			next($this->images);
 		}
 
-		$images = Images::find('all', array('with' => 'Galleries'))->data();
+		$images = Images::find('all', array(
+			'with' => 'Galleries',
+			'conditions' => array(
+				'gallery_id' => $this->gallery['id']
+			)
+		))->data();
 		reset($this->images);
 		foreach($images as $key => $image) {
-			$expect = current($this->images) + array(
+			$expect = (array)current($this->images) + array(
 				'gallery' => $this->gallery
 			);
 			ksort($expect);
@@ -119,7 +129,10 @@ class DatabaseTest extends \lithium\test\Unit {
 			'model' => 'lithium\tests\mocks\data\source\Galleries',
 			'source' => 'galleries',
 			'alias' => 'Galleries',
-			'with' => array('Images')
+			'with' => array('Images'),
+			'conditions' => array(
+				'Galleries.id' => $this->gallery['id']
+			)
 		));
 		$galleries = $this->db->read($query)->data();
 		foreach($galleries as $key => $gallery) {
@@ -127,33 +140,52 @@ class DatabaseTest extends \lithium\test\Unit {
 			$this->assertEqual($expect, $gallery);
 		}
 
-		$gallery = Galleries::find('first', array('with' => 'Images'))->data();
+		$gallery = Galleries::find('first', array(
+			'with' => 'Images',
+			'conditions' => array(
+				'Galleries.id' => $this->gallery['id']
+			)
+		))->data();
 		$expect = $this->gallery + array('images' => $this->images);;
 		$this->assertEqual($expect, $gallery);
 	}
 
 	public function testUpdate() {
+		$options = array(
+			'conditions' => array(
+				'gallery_id' => $this->gallery['id']
+			));
 		$uuid = String::uuid($_SERVER);
-		$image = Images::find('first');
+		$image = Images::find('first', $options);
 		$image->title = $uuid;
 		$firstID = $image->id;
 		$image->save();
-		$this->assertEqual($uuid, Images::find('first')->title);
+		$this->assertEqual($uuid, Images::find('first', $options)->title);
 
 		$uuid = String::uuid($_SERVER);
 		Images::update(array('title' => $uuid), array('id' => $firstID));
-		$this->assertEqual($uuid, Images::find('first')->title);
+		$this->assertEqual($uuid, Images::find('first', $options)->title);
 		$this->images[0]['title'] = $uuid;
 	}
 
 	public function testFields() {
 		$fields = array('id', 'image');
-		$image = Images::find('first', array('fields' => $fields));
+		$image = Images::find('first', array(
+			'fields' => $fields,
+			'conditions' => array(
+				'gallery_id' => $this->gallery['id']
+			)
+		));
 		$this->assertEqual($fields, array_keys($image->data()));
 	}
 
 	public function testOrder() {
-		$images = Images::find('all', array('order' => 'id DESC'))->data();
+		$images = Images::find('all', array(
+			'order' => 'id DESC',
+			'conditions' => array(
+				'gallery_id' => $this->gallery['id']
+			)
+		))->data();
 		krsort($this->images);
 		reset($this->images);
 		foreach($images as $image) {

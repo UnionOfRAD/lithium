@@ -41,7 +41,7 @@ abstract class Database extends \lithium\data\Source {
 	protected $_strings = array(
 		'create' => "INSERT INTO {:source} ({:fields}) VALUES ({:values});{:comment}",
 		'update' => "UPDATE {:source} SET {:fields} {:conditions};{:comment}",
-		'delete' => "DELETE {:flags} FROM {:source} {:alias} {:conditions};{:comment}",
+		'delete' => "DELETE {:flags} FROM {:source} {:conditions};{:comment}",
 		'schema' => "CREATE TABLE {:source} (\n{:columns}{:indexes});{:comment}",
 		'join'   => "{:type} JOIN {:source} {:alias} {:constraint}"
 	);

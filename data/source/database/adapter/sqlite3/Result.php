@@ -14,13 +14,17 @@ class Result extends \lithium\data\source\database\Result {
 
 	protected function _prev() {
 		if ($this->_resource->reset()) {
-			return $this->_next();
+			for($i = 0; $i < $this->_iterator - 1; $i++) {
+				$ret = $this->_next();
+				$this->_iterator -= 1;
+			}
+			return $ret;
 		}
 	}
 
 	protected function _next() {
 		if ($this->_resource instanceof SQLite3Result) {
-			return $this->_resource->fetchArray(SQLITE3_ASSOC);
+			return $this->_resource->fetchArray(SQLITE3_NUM);
 		}
 	}
 

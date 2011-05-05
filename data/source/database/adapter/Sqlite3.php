@@ -146,7 +146,13 @@ class Sqlite3 extends \lithium\data\source\Database {
 	public function entities($model = null) {
 		$config = $this->_config;
 		$method = function($self, $params) use ($config) {
-			return $self->query("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;");
+			$sql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
+			$result = $self->invokeMethod('_execute', array($sql));
+			$entities = array();
+			while ($data = $result->next()) {
+				$entities[] = reset($data);
+			}
+			return $entities;
 		};
 		return $this->_filter(__METHOD__, compact('model'), $method);
 	}
@@ -172,7 +178,8 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 */
 	public function describe($entity, array $meta = array()) {
 		$params = compact('entity', 'meta');
-		return $this->_filter(__METHOD__, $params, function($self, $params) {
+		$columns = &$this->_regex;
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($columns) {
 			extract($params);
 
 			$name = $self->invokeMethod('_entityName', array($entity));
@@ -180,7 +187,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 			$fields = array();
 
 			foreach ($columns as $column) {
-				preg_match("/{$this->_regex['column']}/", $column['type'], $matches);
+				preg_match("/{$columns['column']}/", $column['type'], $matches);
 
 				$fields[$column['name']] = array(
 					'type' => isset($matches['type']) ? $matches['type'] : null,
