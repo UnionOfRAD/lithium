@@ -129,6 +129,9 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			);
 		}
 
+		$model = $this->_model;
+		$conn  = $model ? $model::connection() : null;
+
 		if ($model && $conn) {
 			if (!isset($this->_data[$name]) && $schema = $model::schema($name)) {
 				$schema = array($name => $schema);
