@@ -109,8 +109,7 @@ class Adaptable extends \lithium\core\StaticObject {
 		}
 		$class = static::_class($config, static::$_adapters);
 		$settings = static::$_configurations[$name];
-		$settings[0]['object'] = new $class($config);
-
+		$settings[0]['object'] = static::_initAdapter($class, $config);
 		static::$_configurations[$name] = $settings;
 		return static::$_configurations[$name][0]['object'];
 	}
@@ -200,6 +199,21 @@ class Adaptable extends \lithium\core\StaticObject {
 		}
 		$adapter = static::adapter($name);
 		return $adapter::enabled();
+	}
+
+	/**
+	 * Provides an extension point for modifying how adapters are instantiated.
+	 *
+	 * @see lithium\core\Object::__construct()
+	 * @param string $class The fully-namespaced class name of the adapter to instantiate.
+	 * @param array $config The configuration array to be passed to the adapter instance. See the
+	 *              `$config` parameter of `Object::__construct()`.
+	 * @filter This method can be filtered.
+	 */
+	protected static function _initAdapter($class, array $config) {
+		return static::_filter(__FUNCTION__, compact('class', 'config'), function($self, $params) {
+			return new $params['class']($params['config']);
+		});
 	}
 
 	/**
