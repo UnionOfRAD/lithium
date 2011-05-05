@@ -446,8 +446,7 @@ class RecordSetTest extends \lithium\test\Unit {
 				'content' => 'I like to write some foobar foo too'
 			)
 		);
-
-		$posts = new \lithium\data\collection\RecordSet(array('data' => $expected));
+		$posts = new RecordSet(array('data' => $expected));
 
 		$this->assertEqual($expected['post1'], $posts->first());
 		$this->assertEqual($expected['post1'], $posts->current());
