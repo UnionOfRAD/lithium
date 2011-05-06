@@ -221,8 +221,7 @@ class Entity extends \lithium\core\Object {
 		if ($name) {
 			return $this->__get($name);
 		}
-		$related = array_map(function($rel) { return $rel->data(); }, $this->_relationships);
-		return array_merge($this->_updated + $this->_data, $related);
+		return $this->to('array');
 	}
 
 	/**
@@ -377,9 +376,15 @@ class Entity extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function to($format, array $options = array()) {
+		$map = function($obj) {
+			return $obj->data();
+		};
+
 		switch ($format) {
 			case 'array':
-				$result = Collection::toArray($this->data());
+				$data = $this->_updated + $this->_data;
+				$data = array_merge($data, array_map($map, $this->_relationships));
+				$result = Collection::toArray($data);
 			break;
 			default:
 				$result = $this;

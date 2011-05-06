@@ -397,10 +397,14 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			'MongoId' => function($value) { return (string) $value; },
 			'MongoDate' => function($value) { return $value->sec; }
 		));
+		$options += $defaults;
 
 		if ($format == 'array') {
-			$options += $defaults;
-			$data = array_merge($this->_data, $this->_updated);
+			$map = function($obj) {
+				return $obj->data();
+			};
+			$data = $this->_updated + $this->_data;
+			$data = array_merge($data, array_map($map, $this->_relationships));
 			return Collection::toArray(array_diff_key($data, $this->_removed), $options);
 		}
 		return parent::to($format, $options);
