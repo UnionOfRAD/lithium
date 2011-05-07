@@ -121,6 +121,15 @@ class PostsController extends \lithium\action\Controller {
 		}
 		return compact('post');
 	}
+
+	public function delete() {
+		if (!$this->request->is('post') && !$this->request->is('delete')) {
+			$msg = "Posts::delete can only be called with http:post or http:delete.";
+			throw new DispatchException($msg);
+		}
+		Post::find($this->request->id)->delete();
+		$this->redirect('Posts::index');
+	}
 }
 
 
