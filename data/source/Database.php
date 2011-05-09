@@ -603,78 +603,82 @@ abstract class Database extends \lithium\data\Source {
 		$modelNames = (array) $context->name();
 		$modelNames = array_merge($modelNames, array_keys((array) $context->relationships()));
 
-		if (is_array($fields)) {
-			$toMerge = array();
-			$keys = array_keys($fields);
-
-			$groupFields = function($item, $key) use (&$toMerge, &$keys, $modelNames, &$context) {
-				$name = current($keys);
-				next($keys);
-				switch(true) {
-					case is_array($item):
-						$toMerge[$name] = $item;
-						continue;
-					case in_array($item, $modelNames):
-						if($item == reset($modelNames)) {
-							$schema = $context->schema();
-						} else {
-							$joins = $context->joins();
-							$schema = $joins[$item]->schema();
-						}
-						$toMerge[$item] = array_keys($schema);
-						continue;
-					case strpos($item, '.') !== false:
-						list($name, $field) = explode('.', $item);
-						$toMerge[$name][] = $field;
-						continue;
-					default:
-						$mainSchema = array_keys((array)$context->schema());
-						if (in_array($item, $mainSchema)) {
-							$toMerge[reset($modelNames)][] = $item;
-							continue;
-						}
-						$toMerge[0][] = $item;
-						continue;
-				}
-			};
-			array_walk($fields, $groupFields);
-			$fields = $toMerge;
-			if(count($modelNames) > 1) {
-				$sortOrder = array_flip($modelNames);
-				uksort($fields, function($a, $b) use($sortOrder) {
-					return $sortOrder[$a] - $sortOrder[$b];
-				});
-			}
-			$context->map(array_map(function($item) {
-				if (!is_array($item)) {
-					return $item;
-				}
-				foreach($item as $key => $field) {
-					if(strpos($field, ' as ')) {
-						list($real, $as) = explode(' as ', $field);
-						$item[$key] = trim($as);
-					}
-				}
-				return $item;
-			}, $fields));
-
-			$toMerge = array();
-			$keys = array_keys($fields);
-			array_walk($fields, function($item, $key) use(&$toMerge, &$keys) {
-				$name = current($keys);
-				next($keys);
-				foreach($item as $field) {
-					if (!is_numeric($name)) {
-						$toMerge[] = $name . '.' . $field;
-						continue;
-					}
-					$toMerge[] = $field;
-				}
-				return false;
-			});
-			$fields = $toMerge;
+		if (!is_array($fields)) {
+			return $this->_fieldsReturn($type, $context, $fields, $schema);
 		}
+		$toMerge = array();
+		$keys = array_keys($fields);
 
+		$groupFields = function($item, $key) use (&$toMerge, &$keys, $modelNames, &$context) {
+			$name = current($keys);
+			next($keys);
+			switch(true) {
+				case is_array($item):
+					$toMerge[$name] = $item;
+					continue;
+				case in_array($item, $modelNames):
+					if($item == reset($modelNames)) {
+						$schema = $context->schema();
+					} else {
+						$joins = $context->joins();
+						$schema = $joins[$item]->schema();
+					}
+					$toMerge[$item] = array_keys($schema);
+					continue;
+				case strpos($item, '.') !== false:
+					list($name, $field) = explode('.', $item);
+					$toMerge[$name][] = $field;
+					continue;
+				default:
+					$mainSchema = array_keys((array)$context->schema());
+					if (in_array($item, $mainSchema)) {
+						$toMerge[reset($modelNames)][] = $item;
+						continue;
+					}
+					$toMerge[0][] = $item;
+					continue;
+			}
+		};
+		array_walk($fields, $groupFields);
+		$fields = $toMerge;
+		if(count($modelNames) > 1) {
+			$sortOrder = array_flip($modelNames);
+			uksort($fields, function($a, $b) use($sortOrder) {
+				return $sortOrder[$a] - $sortOrder[$b];
+			});
+		}
+		$context->map(array_map(function($item) {
+			if (!is_array($item)) {
+				return $item;
+			}
+			foreach($item as $key => $field) {
+				if(stripos($field, ' as ') !== false) {
+					list($real, $as) = explode(' as ', str_replace(' AS ', ' as ', $field));
+					$item[$key] = trim($as);
+				}
+			}
+			return $item;
+		}, $fields));
+
+		$toMerge = array();
+		$keys = array_keys($fields);
+		array_walk($fields, function($item, $key) use(&$toMerge, &$keys) {
+			$name = current($keys);
+			next($keys);
+			foreach($item as $field) {
+				if (!is_numeric($name)) {
+					$toMerge[] = $name . '.' . $field;
+					continue;
+				}
+				$toMerge[] = $field;
+			}
+			return false;
+		});
+		$fields = $toMerge;
+		return $this->_fieldsReturn($type, $context, $fields, $schema);
+	}
+
+	protected function _fieldsReturn($type, $context, $fields, $schema) {
 		if ($type == 'create' || $type == 'update') {
 			$data = $context->data();
 

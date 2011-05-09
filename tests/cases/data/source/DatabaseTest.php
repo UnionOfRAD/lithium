@@ -587,6 +587,21 @@ class DatabaseTest extends \lithium\test\Unit {
 				'MockDatabaseComment.author_id, MockDatabaseComment.body, ' .
 				'MockDatabaseComment.created';
 		$this->assertEqual($expected, $result);
+
+		$fields = array(
+			'MockDatabasePost as Post',
+			'MockDatabaseComment AS Comment'
+		);
+		$result = $this->db->fields($fields, $query);
+		$expected = 'MockDatabasePost as Post, MockDatabaseComment AS Comment';
+		$this->assertEqual($expected, $result);
+
+		$expected = array(
+			array(
+				'Post', 'Comment'
+			)
+		);
+		$this->assertEqual($expected, $query->map());
 	}
 
 	public function testRawConditions() {
