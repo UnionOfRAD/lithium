@@ -26,7 +26,7 @@ class Model extends \lithium\console\command\Create {
      * @return string
      */
 	protected function _class($request) {
-		return Inflector::pluralize($request->action);
+		return Inflector::camelize(Inflector::pluralize($request->action));
 	}
 }
 

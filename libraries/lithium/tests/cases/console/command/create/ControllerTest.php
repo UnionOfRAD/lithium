@@ -127,7 +127,7 @@ class PostsController extends \lithium\action\Controller {
 			$msg = "Posts::delete can only be called with http:post or http:delete.";
 			throw new DispatchException($msg);
 		}
-		Post::find($this->request->id)->delete();
+		Posts::find($this->request->id)->delete();
 		$this->redirect('Posts::index');
 	}
 }
