@@ -123,8 +123,8 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertTrue($db->isConnected());
 	}
 
-	public function testEntities() {
-		$result = $this->db->entities();
+	public function testSources() {
+		$result = $this->db->sources();
 		$expected = array();
 		$this->assertEqual($expected, $result);
 	}
@@ -501,10 +501,10 @@ class MongoDbTest extends \lithium\test\Unit {
 		$result = $db->delete(null);
 	}
 
-	public function testEntitiesNoConnectionException() {
+	public function testSourcesNoConnectionException() {
 		$db = new MockMongoConnection($this->_testConfig + array('autoConnect' => false));
 		$this->expectException('Could not connect to the database.');
-		$result = $db->entities(null);
+		$result = $db->sources(null);
 	}
 
 	public function testAtomicUpdate() {

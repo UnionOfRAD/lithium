@@ -55,8 +55,7 @@ class MockAdapter extends \lithium\data\source\Database {
 		return true;
 	}
 
-	public function entities($class = null) {
-
+	public function sources($class = null) {
 	}
 
 	public function encoding($encoding = null) {

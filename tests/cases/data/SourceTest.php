@@ -17,7 +17,7 @@ class SourceTest extends \lithium\test\Unit {
 		$source = new MockSource(array('autoConnect' => false));
 		$methods = $source->methods();
 		$expected = array(
-			'connect', 'disconnect', 'entities', 'describe', 'create', 'read', 'update', 'delete',
+			'connect', 'disconnect', 'sources', 'describe', 'create', 'read', 'update', 'delete',
 			'schema', 'result', 'cast', 'relationship', 'calculation', '__construct', '__destruct',
 			'_init', 'isConnected', 'name', 'methods', 'configureClass', 'item', 'applyFilter',
 			'invokeMethod', '__set_state', '_instance', '_filter', '_parents', '_stop'

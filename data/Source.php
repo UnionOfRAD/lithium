@@ -15,7 +15,7 @@ use lithium\core\NetworkException;
  *
  * In addition to utility methods and standardized properties, it defines the implementation tasks
  * for all Lithium classes that work with external data, such as connections to remote resources
- * (`connect()` and `disconnect()`), introspecting available data objects (`entities()` and
+ * (`connect()` and `disconnect()`), introspecting available data objects (`sources()` and
  * `describe()`), and a standard read/write interface (`create()`, `read()`, `update()` and
  * `delete()`).
  *
@@ -139,13 +139,13 @@ abstract class Source extends \lithium\core\Object {
 	abstract public function disconnect();
 
 	/**
-	 * Returns a list of objects (entities) that models can bind to, i.e. a list of tables in the
+	 * Returns a list of objects (sources) that models can bind to, i.e. a list of tables in the
 	 * case of a database, or REST collections, in the case of a web service.
 	 *
 	 * @param string $model The fully-name-spaced class name of the object making the request.
 	 * @return array Returns an array of objects to which models can connect.
 	 */
-	abstract public function entities($class = null);
+	abstract public function sources($class = null);
 
 	/**
 	 * Gets the column schema for a given entity (such as a database table).

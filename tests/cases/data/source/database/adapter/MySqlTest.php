@@ -183,7 +183,7 @@ class MySqlTest extends \lithium\test\Unit {
 	}
 
 	public function testEntityQuerying() {
-		$sources = $this->db->entities();
+		$sources = $this->db->sources();
 		$this->assertTrue(is_array($sources));
 		$this->assertFalse(empty($sources));
 	}

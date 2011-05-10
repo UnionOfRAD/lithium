@@ -59,9 +59,9 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$mockBase = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/data/source/database/adapter/';
 		$files = array('galleries' => '_galleries.sql', 'images' => '_images.sql');
-		$files = array_diff_key($files, array_flip($this->db->entities()));
+		$files = array_diff_key($files, array_flip($this->db->sources()));
 
-		foreach($files as $file) {
+		foreach ($files as $file) {
 			$sqlFile = $mockBase . strtolower($this->_dbConfig['adapter']) . $file;
 			$this->skipIf(!file_exists($sqlFile), "SQL file $sqlFile does not exist.");
 			$sql = file_get_contents($sqlFile);
@@ -74,7 +74,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertTrue($gallery->save());
 		$this->gallery = array('id' => $gallery->id) + $this->gallery;
 
-		foreach($this->images as $key => $image) {
+		foreach ($this->images as $key => $image) {
 			unset($image['id'], $image['gallery_id']);
 			$img = Images::create($image + array('gallery_id' => $gallery->id));
 			$this->assertEqual(true, $img->save());

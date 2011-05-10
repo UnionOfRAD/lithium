@@ -24,7 +24,7 @@ class MockDatabase extends \lithium\data\source\Database {
 		return true;
 	}
 
-	public function entities($class = null) {}
+	public function sources($class = null) {}
 
 	public function describe($entity, array $meta = array()) {}
 

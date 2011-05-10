@@ -25,7 +25,7 @@ class Mock extends \lithium\data\Source {
 		return true;
 	}
 
-	public function entities($class = null) {
+	public function sources($class = null) {
 		return array();
 	}
 

@@ -143,18 +143,19 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @return array Returns an array of objects to which models can connect.
 	 * @filter This method can be filtered.
 	 */
-	public function entities($model = null) {
+	public function sources($model = null) {
 		$config = $this->_config;
-		$method = function($self, $params) use ($config) {
+
+		return $this->_filter(__METHOD__, compact('model'), function($self, $params) use ($config) {
 			$sql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
 			$result = $self->invokeMethod('_execute', array($sql));
-			$entities = array();
+			$sources = array();
+
 			while ($data = $result->next()) {
-				$entities[] = reset($data);
+				$sources[] = reset($data);
 			}
-			return $entities;
-		};
-		return $this->_filter(__METHOD__, compact('model'), $method);
+			return $sources;
+		});
 	}
 
 	/**

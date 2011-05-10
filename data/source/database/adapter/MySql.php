@@ -165,10 +165,10 @@ class MySql extends \lithium\data\source\Database {
 	 * Returns the list of tables in the currently-connected database.
 	 *
 	 * @param string $model The fully-name-spaced class name of the model object making the request.
-	 * @return array Returns an array of objects to which models can connect.
+	 * @return array Returns an array of sources to which models can connect.
 	 * @filter This method can be filtered.
 	 */
-	public function entities($model = null) {
+	public function sources($model = null) {
 		$_config = $this->_config;
 		$params = compact('model');
 
@@ -178,12 +178,12 @@ class MySql extends \lithium\data\source\Database {
 			if (!$result = $self->invokeMethod('_execute', array("SHOW TABLES FROM {$name};"))) {
 				return null;
 			}
-			$entities = array();
+			$sources = array();
 
 			while ($data = $result->next()) {
-				list($entities[]) = $data;
+				list($sources[]) = $data;
 			}
-			return $entities;
+			return $sources;
 		});
 	}
 

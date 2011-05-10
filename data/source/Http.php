@@ -154,12 +154,12 @@ class Http extends \lithium\data\Source {
 	}
 
 	/**
-	 * entities
+	 * Returns available data sources (typically a list of REST resources collections).
 	 *
 	 * @param object $class
 	 * @return array
 	 */
-	public function entities($class = null) {
+	public function sources($class = null) {
 		return array();
 	}
 

@@ -77,9 +77,9 @@ class HttpTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
-	public function testEntities() {
+	public function testSources() {
 		$http = new Http($this->_testConfig);
-		$result = $http->entities();
+		$result = $http->sources();
 	}
 
 	public function testDescribe() {

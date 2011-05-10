@@ -284,7 +284,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @param string $class The fully-name-spaced class name of the model object making the request.
 	 * @return array Returns an array of objects to which models can connect.
 	 */
-	public function entities($class = null) {
+	public function sources($class = null) {
 		$this->_checkConnection();
 		$conn = $this->connection;
 		return array_map(function($col) { return $col->getName(); }, $conn->listCollections());

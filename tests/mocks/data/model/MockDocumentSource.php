@@ -22,7 +22,7 @@ class MockDocumentSource extends \lithium\data\Source {
 
 	public function connect() {}
 	public function disconnect() {}
-	public function entities($class = null) {}
+	public function sources($class = null) {}
 	public function describe($entity, array $meta = array()) {}
 	public function create($query, array $options = array()) {}
 	public function update($query, array $options = array()) {}

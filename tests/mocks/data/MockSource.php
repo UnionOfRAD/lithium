@@ -93,7 +93,7 @@ class MockSource extends \lithium\data\Source {
 		return !($this->_isConnected = false);
 	}
 
-	public function entities($class = null) {
+	public function sources($class = null) {
 		return array('mock_posts', 'mock_comments', 'mock_tags', 'posts_tags');
 	}
 

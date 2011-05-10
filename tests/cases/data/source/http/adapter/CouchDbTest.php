@@ -77,9 +77,9 @@ class CouchDbTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
-	public function testEntities() {
+	public function testSources() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$result = $couchdb->entities();
+		$result = $couchdb->sources();
 		$this->assertNull($result);
 	}
 

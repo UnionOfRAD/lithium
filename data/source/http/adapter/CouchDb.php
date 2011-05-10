@@ -117,12 +117,12 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * Entities.
+	 * Returns an array of object types accessible through this database.
 	 *
 	 * @param object $class
 	 * @return void
 	 */
-	public function entities($class = null) {
+	public function sources($class = null) {
 	}
 
 	/**
