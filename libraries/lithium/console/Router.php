@@ -23,18 +23,12 @@ class Router extends \lithium\core\Object {
 	 *
 	 */
 	public static function parse($request = null) {
-		$params = array(
-			'command' => null, 'action' => 'run', 'args' => array()
-		);
-		if (!empty($request->params)) {
-			$params = $request->params + $params;
-		}
+		$defaults = array('command' => null, 'action' => 'run', 'args' => array());
+		$params = $request ? (array) $request->params + $defaults : $defaults;
 
 		if (!empty($request->argv)) {
 			$args = $request->argv;
-			if (empty($params['command'])) {
-				$params['command'] = array_shift($args);
-			}
+
 			while ($arg = array_shift($args)) {
 				if (preg_match('/^-(?P<key>[a-zA-Z0-9])$/i', $arg, $match)) {
 					$params[$match['key']] = true;
@@ -47,8 +41,10 @@ class Router extends \lithium\core\Object {
 				$params['args'][] = $arg;
 			}
 		}
-		if (!empty($params['args'])) {
-			$params['action'] = array_shift($params['args']);
+		foreach (array('command', 'action') as $param) {
+			if (!empty($params['args'])) {
+				$params[$param] = array_shift($params['args']);
+			}
 		}
 		return $params;
 	}
