@@ -348,8 +348,16 @@ class RecordSet extends \lithium\data\Collection {
 
 		foreach ($dataMap as $name => $rel) {
 			$field = $relMap[$name]['fieldName'];
-			$opts = $relMap[$name]['type'] == 'hasMany' ? array('class' => 'set') : array();
-			$relationships[$field] = $conn->item($relMap[$name]['model'], $rel, $options + $opts);
+			$relModel = $relMap[$name]['model'];
+			if ($relMap[$name]['type'] == 'hasMany') {
+				foreach($rel as &$data) {
+					$data = $conn->item($relModel, $data, $options);
+				}
+				$opts = array('class' => 'set');
+				$relationships[$field] = $conn->item($relModel, $rel, $options + $opts);
+			} else {
+				$relationships[$field] = $conn->item($relModel, $rel, $options);
+			}
 		}
 		return $conn->item($primary, $main, $options + compact('relationships'));
 	}
