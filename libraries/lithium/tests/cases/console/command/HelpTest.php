@@ -4,7 +4,6 @@ namespace lithium\tests\cases\console\command;
 
 use lithium\console\command\Help;
 use lithium\console\Request;
-use lithium\tests\mocks\console\command\MockCommandHelp;
 
 class HelpTest extends \lithium\test\Unit {
 
@@ -110,7 +109,7 @@ class HelpTest extends \lithium\test\Unit {
 		$result = $command->api('lithium.net.Message', 'property');
 		$this->assertNull($result);
 
-		$expected = "    --host=HOST\n        The hostname for this endpoint.";
+		$expected = "    --host=<string>\n        The hostname for this endpoint.";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
@@ -123,7 +122,7 @@ class HelpTest extends \lithium\test\Unit {
 		$result = $command->api('lithium.net.Message', 'property');
 		$this->assertNull($result);
 
-		$expected = "    --host=HOST\n        The hostname for this endpoint.";
+		$expected = "    --host=<string>\n        The hostname for this endpoint.";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
