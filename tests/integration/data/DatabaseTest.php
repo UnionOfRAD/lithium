@@ -95,8 +95,6 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$images = $this->db->read($query)->data();
 		reset($this->images);
-		var_dump($images);
-		die();
 
 		foreach ($images as $key => $image) {
 			$expect = current($this->images) + array(
