@@ -326,6 +326,7 @@ class MySql extends \lithium\data\source\Database {
 		$defaults = array('buffered' => true);
 		$options += $defaults;
 		mysql_select_db($this->_config['database'], $this->connection);
+
 		return $this->_filter(__METHOD__, compact('sql', 'options'), function($self, $params) {
 			$sql = $params['sql'];
 			$options = $params['options'];

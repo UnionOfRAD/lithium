@@ -84,19 +84,21 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testManyToOne() {
-		$query = new Query(array(
+		$opts = array('conditions' => array('gallery_id' => $this->gallery['id']));
+
+		$query = new Query($opts + array(
 			'type' => 'read',
 			'model' => 'lithium\tests\mocks\data\source\Images',
 			'source' => 'images',
 			'alias' => 'Images',
-			'with' => array('Galleries'),
-			'conditions' => array(
-				'gallery_id' => $this->gallery['id']
-			)
+			'with' => array('Galleries')
 		));
 		$images = $this->db->read($query)->data();
 		reset($this->images);
-		foreach($images as $key => $image) {
+		var_dump($images);
+		die();
+
+		foreach ($images as $key => $image) {
 			$expect = current($this->images) + array(
 				'gallery_id' => $this->gallery['id'],
 				'gallery' => $this->gallery
@@ -105,17 +107,11 @@ class DatabaseTest extends \lithium\test\Unit {
 			next($this->images);
 		}
 
-		$images = Images::find('all', array(
-			'with' => 'Galleries',
-			'conditions' => array(
-				'gallery_id' => $this->gallery['id']
-			)
-		))->data();
+		$images = Images::find('all', $opts + array('with' => 'Galleries'))->data();
 		reset($this->images);
-		foreach($images as $key => $image) {
-			$expect = (array)current($this->images) + array(
-				'gallery' => $this->gallery
-			);
+
+		foreach ($images as $key => $image) {
+			$expect = (array) current($this->images) + array('gallery' => $this->gallery);
 			ksort($expect);
 			ksort($image);
 			$this->assertEqual($expect, $image);
@@ -124,45 +120,37 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testOneToMany() {
-		$query = new Query(array(
+		$opts = array('conditions' => array('Galleries.id' => $this->gallery['id']));
+
+		$query = new Query($opts + array(
 			'type' => 'read',
 			'model' => 'lithium\tests\mocks\data\source\Galleries',
 			'source' => 'galleries',
 			'alias' => 'Galleries',
-			'with' => array('Images'),
-			'conditions' => array(
-				'Galleries.id' => $this->gallery['id']
-			)
+			'with' => array('Images')
 		));
 		$galleries = $this->db->read($query)->data();
+
 		foreach($galleries as $key => $gallery) {
 			$expect = $this->gallery + array('images' => $this->images);
 			$this->assertEqual($expect, $gallery);
 		}
 
-		$gallery = Galleries::find('first', array(
-			'with' => 'Images',
-			'conditions' => array(
-				'Galleries.id' => $this->gallery['id']
-			)
-		))->data();
-		$expect = $this->gallery + array('images' => $this->images);;
+		$gallery = Galleries::find('first', $opts + array('with' => 'Images'))->data();
+		$expect = $this->gallery + array('images' => $this->images);
 		$this->assertEqual($expect, $gallery);
 	}
 
 	public function testUpdate() {
-		$options = array(
-			'conditions' => array(
-				'gallery_id' => $this->gallery['id']
-			));
-		$uuid = String::uuid($_SERVER);
+		$options = array('conditions' => array('gallery_id' => $this->gallery['id']));
+		$uuid = String::uuid();
 		$image = Images::find('first', $options);
 		$image->title = $uuid;
 		$firstID = $image->id;
 		$image->save();
 		$this->assertEqual($uuid, Images::find('first', $options)->title);
 
-		$uuid = String::uuid($_SERVER);
+		$uuid = String::uuid();
 		Images::update(array('title' => $uuid), array('id' => $firstID));
 		$this->assertEqual($uuid, Images::find('first', $options)->title);
 		$this->images[0]['title'] = $uuid;
