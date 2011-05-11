@@ -641,6 +641,10 @@ test;
 	}
 
 	public function testNoArchive() {
+		$this->skipIf(
+			ini_get('phar.readonly') == '1',
+			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+		);
 		$result = $this->library->archive(
 			$this->_testPath . '/library_test_plugin',
 			$this->_testPath . '/library_test_plugin'
