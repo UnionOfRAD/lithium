@@ -53,9 +53,10 @@ class DocumentArray extends \lithium\data\Collection {
 	 * @return mixed
 	 */
 	public function to($format, array $options = array()) {
-		$defaults = array('handlers' => array('MongoId' => function($value) {
-			return (string) $value;
-		}));
+		$defaults = array('handlers' => array(
+			'MongoId' => function($value) { return (string) $value; },
+			'MongoDate' => function($value) { return $value->sec; }
+		));
 
 		if ($format == 'array') {
 			$options += $defaults;

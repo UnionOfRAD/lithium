@@ -147,7 +147,7 @@ class DocumentSet extends \lithium\data\Collection {
 	 */
 	public function next() {
 		$prev = key($this->_data);
-		$this->_valid = (next($this->_data) !== false);
+		$this->_valid = !(next($this->_data) === false && key($this->_data) === null);
 		$cur = key($this->_data);
 
 		if (!$this->_valid && $cur !== $prev && $cur !== null) {

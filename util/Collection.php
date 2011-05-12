@@ -401,7 +401,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return mixed The current item after rewinding.
 	 */
 	public function rewind() {
-		$this->_valid = (reset($this->_data) !== false);
+		$this->_valid = !(reset($this->_data) === false && key($this->_data) === null);
 		return current($this->_data);
 	}
 
@@ -411,7 +411,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return mixed The current item after moving.
 	 */
 	public function end() {
-		$this->_valid = (end($this->_data) !== false);
+		$this->_valid = !(end($this->_updated) === false && key($this->_updated) === null);
 		return current($this->_data);
 	}
 
@@ -461,7 +461,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return The current item after moving.
 	 */
 	public function next() {
-		$this->_valid = (next($this->_data) !== false);
+		$this->_valid = !(next($this->_data) === false && key($this->_data) === null);
 		return current($this->_data);
 	}
 

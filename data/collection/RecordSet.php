@@ -226,13 +226,11 @@ class RecordSet extends \lithium\data\Collection {
 		switch ($format) {
 			case 'array':
 				$result = array_map(function($r) { return $r->to('array'); }, $this->_data);
-				if (is_scalar(current($this->_index)) && $options['indexed']) {
-					if (!empty($this->_index) && !empty($result)) {
-						$result = array_combine($this->_index, $result);
-					} else {
-						$result = array();
-					}
+
+				if (!(is_scalar(current($this->_index)) && $options['indexed'])) {
+					break;
 				}
+				$result = ($this->_index && $result) ? array_combine($this->_index, $result) : array();
 			break;
 			default:
 				$result = parent::to($format, $options);
@@ -313,7 +311,7 @@ class RecordSet extends \lithium\data\Collection {
 		$primary = $this->_model;
 		$conn = $primary::connection();
 
-		if(!$this->_query) {
+		if (!$this->_query) {
 			return $conn->item($primary, $data, $options + compact('relationships'));
 		}
 
@@ -349,15 +347,16 @@ class RecordSet extends \lithium\data\Collection {
 		foreach ($dataMap as $name => $rel) {
 			$field = $relMap[$name]['fieldName'];
 			$relModel = $relMap[$name]['model'];
+
 			if ($relMap[$name]['type'] == 'hasMany') {
-				foreach($rel as &$data) {
+				foreach ($rel as &$data) {
 					$data = $conn->item($relModel, $data, $options);
 				}
 				$opts = array('class' => 'set');
 				$relationships[$field] = $conn->item($relModel, $rel, $options + $opts);
-			} else {
-				$relationships[$field] = $conn->item($relModel, $rel, $options);
+				continue;
 			}
+			$relationships[$field] = $conn->item($relModel, $rel, $options);
 		}
 		return $conn->item($primary, $main, $options + compact('relationships'));
 	}
