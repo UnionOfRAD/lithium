@@ -256,6 +256,9 @@ class View extends \lithium\core\Object {
 		$result = null;
 
 		foreach ($this->_process($process, $params) as $name => $step) {
+			if (isset($paths[$name]) && $paths[$name] === false) {
+				continue;
+			}
 			if (!$this->_conditions($step, $params, $data, $options)) {
 				continue;
 			}
@@ -293,7 +296,6 @@ class View extends \lithium\core\Object {
 		$_loader = $this->_loader;
 		$filters = $this->outputFilters;
 		$params = compact('step', 'params', 'options') + array('data' => $data + $filters);
-
 		$filter = function($self, $params) use (&$_renderer, &$_loader) {
 			$template = $_loader->template($params['step']['path'], $params['params']);
 			return $_renderer->render($template, $params['data'], $params['options']);
