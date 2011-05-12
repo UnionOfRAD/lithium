@@ -949,6 +949,15 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array('input' => array(
 			'type' => 'text', 'name' => 'foo[bar]', 'id' => 'FooBar', 'value' => 'value'
 		)));
+
+		$result = $this->form->field('foo.bar');
+		$this->assertTags($result, array(
+			'div' => array(),
+			'label' => array('for' => 'FooBar'), 'Foo Bar', '/label',
+			'input' => array(
+				'type' => 'text', 'name' => 'foo[bar]', 'id' => 'FooBar', 'value' => 'value'
+			),
+		));
 	}
 
 	public function testFormCreationWithNoContext() {

@@ -362,7 +362,7 @@ class Form extends \lithium\template\Helper {
 	 *  echo $this->form->field('name');
 	 *  echo $this->form->field('present', array('type' => 'checkbox'));
 	 *  echo $this->form->field(array('email' => 'Enter a valid email'));
-	 *  echo $this->form->field(array('name','email','phone'),array('div' => false));
+	 *  echo $this->form->field(array('name','email','phone'), array('div' => false));
 	 * }}}
 	 * @param mixed $name The name of the field to render. If the form was bound to an object
 	 *                   passed in `create()`, `$name` should be the name of a field in that object.
@@ -407,7 +407,7 @@ class Form extends \lithium\template\Helper {
 			$defaults['template'] = 'field-' . $type;
 		}
 		list($options, $fieldOptions) = $this->_options($defaults, $options);
-		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		list(, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 
 		if ($options['template'] != $defaults['template']) {
 			$template = $options['template'];
@@ -417,9 +417,10 @@ class Form extends \lithium\template\Helper {
 		$label = $input = null;
 
 		if (($options['label'] === null || $options['label']) && $options['type'] != 'hidden') {
-			$for = isset($options['id']) ? $options['id'] : '';
-			$label = $options['label'] ?: $options['label'] = Inflector::humanize($name);
-			$label = $this->label($for, $label);
+			if (!$options['label']) {
+				$options['label'] = Inflector::humanize(preg_replace('/[\[\]\.]/', '_', $name));
+			}
+			$label = $this->label(isset($options['id']) ? $options['id'] : '', $options['label']);
 		}
 
 		switch (true) {
