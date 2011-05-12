@@ -13,6 +13,7 @@ use lithium\action\Response;
 use lithium\g11n\catalog\adapter\Memory;
 use lithium\template\view\adapter\Simple;
 use lithium\tests\mocks\template\MockView;
+use lithium\tests\mocks\template\view\adapters\TestRenderer;
 
 class ViewTest extends \lithium\test\Unit {
 
@@ -122,6 +123,57 @@ class ViewTest extends \lithium\test\Unit {
 		));
 		$expected = '<auth>true</auth>';
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testNolayout() {
+		$view = new View(array(
+			'loader' => 'lithium\tests\mocks\template\view\adapters\TestRenderer',
+			'renderer' => 'lithium\tests\mocks\template\view\adapters\TestRenderer',
+			'paths' => array(
+				'template' => '{:library}/tests/mocks/template/view/adapters/{:template}.html.php',
+				'layout' => false
+			)
+		));
+		$options = array(
+			'template' => 'testFile',
+			'library' => LITHIUM_LIBRARY_PATH . '/lithium'
+		);
+		$result = $view->render('all', array(), $options);
+		$expected = 'This is a test.';
+		$this->assertEqual($expected, $result);
+
+		$templateData = TestRenderer::$templateData;
+		$expectedPath = LITHIUM_LIBRARY_PATH;
+		$expectedPath .= '/lithium/tests/mocks/template/view/adapters/testFile.html.php';
+		$expected = array (array (
+				'type' => 'template',
+				'params' =>
+				array (
+					'template' => 'testFile',
+					'library' => LITHIUM_LIBRARY_PATH . '/lithium',
+					'type' => 'html',
+				),
+				'return' => $expectedPath
+			));
+		$this->assertEqual($expected, $templateData);
+
+		$renderData = TestRenderer::$renderData;
+		$expected = array (
+			  array (
+				'template' => $expectedPath,
+				'data' => array (),
+				'options' => array (
+					'template' => 'testFile',
+					'library' => $options['library'],
+					'type' => 'html',
+					'layout' => NULL,
+					'context' => array (),
+				)
+			  )
+			);
+		$this->assertTrue($renderData[0]['data']['h'] instanceof \Closure);
+		unset($renderData[0]['data']['h']);
+		$this->assertEqual($expected, $renderData);
 	}
 }
 
