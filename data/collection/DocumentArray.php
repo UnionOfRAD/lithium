@@ -12,7 +12,20 @@ use lithium\util\Collection;
 
 class DocumentArray extends \lithium\data\Collection {
 
+	/**
+	 * Indicates whether this array was part of a document loaded from a data source, or is part of
+	 * a new document, or is in newly-added field of an existing document.
+	 *
+	 * @var boolean
+	 */
 	protected $_exists = false;
+
+	/**
+	 * Contains an array that is matched against .
+	 *
+	 * @var array
+	 */
+	protected $_updated = array();
 
 	/**
 	 * Holds an array of values that should be processed on initialization.

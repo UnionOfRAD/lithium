@@ -37,46 +37,48 @@ class Exporter extends \lithium\core\StaticObject {
 			'pathKey' => null, 'handlers' => array(), 'model' => null, 'arrays' => true
 		);
 		$options += $defaults;
-		$typeMap = static::$_map;
 
 		foreach ($data as $key => $value) {
-			if (is_object($value)) {
-				continue;
-			}
-			$path = $options['pathKey'] ? "{$options['pathKey']}.{$key}" : $key;
-			$field = (isset($schema[$path]) ? $schema[$path] : array());
+			$pathKey = $options['pathKey'] ? "{$options['pathKey']}.{$key}" : $key;
+			$field = (isset($schema[$pathKey]) ? $schema[$pathKey] : array());
 			$field += array('type' => null, 'array' => null);
-			$type = isset($typeMap[$field['type']]) ? $typeMap[$field['type']] : $field['type'];
-
-			$isObject = ($type == 'object');
-			$isArray = (is_array($value) && $field['array'] !== false && !$isObject);
-			$isArray = $field['array'] || $isArray;
-
-			if (isset($options['handlers'][$type]) && $handler = $options['handlers'][$type]) {
-				$value = $isArray ? array_map($handler, (array) $value) : $handler($value);
-			}
-			if (!$options['arrays']) {
-				$data[$key] = $value;
-				continue;
-			}
-			$pathKey = $path;
-
-			if (!is_array($value) && !$field['array']) {
-				$data[$key] = $value;
-				continue;
-			}
-
-			if ($field['array']) {
-				$opts = array('class' => 'array') + $options;
-				$value = ($value === null) ? array() : $value;
-				$value = is_array($value) ? $value : array($value);
-			} elseif (is_array($value)) {
-				$arrayType = !$isObject && (array_keys($value) === range(0, count($value) - 1));
-				$opts = $arrayType ? array('class' => 'array') + $options : $options;
-			}
-			$data[$key] = $database->item($options['model'], $value, compact('pathKey') + $opts);
+			$data[$key] = static::_cast($value, $field, $database, $options + compact('pathKey'));
 		}
 		return $data;
+	}
+
+	protected static function _cast($value, $def, $database, $options) {
+		if (is_object($value)) {
+			return $value;
+		}
+		$pathKey = $options['pathKey'];
+		$typeMap = static::$_map;
+		$type = isset($typeMap[$def['type']]) ? $typeMap[$def['type']] : $def['type'];
+
+		$isObject = ($type == 'object');
+		$isArray = (is_array($value) && $def['array'] !== false && !$isObject);
+		$isArray = $def['array'] || $isArray;
+
+		if (isset($options['handlers'][$type]) && $handler = $options['handlers'][$type]) {
+			$value = $isArray ? array_map($handler, (array) $value) : $handler($value);
+		}
+		if (!$options['arrays']) {
+			return $value;
+		}
+
+		if (!is_array($value) && !$def['array']) {
+			return $value;
+		}
+
+		if ($def['array']) {
+			$opts = array('class' => 'array') + $options;
+			$value = ($value === null) ? array() : $value;
+			$value = is_array($value) ? $value : array($value);
+		} elseif (is_array($value)) {
+			$arrayType = !$isObject && (array_keys($value) === range(0, count($value) - 1));
+			$opts = $arrayType ? array('class' => 'array') + $options : $options;
+		}
+		return $database->item($options['model'], $value, compact('pathKey') + $opts);
 	}
 
 	public static function toCommand($changes) {

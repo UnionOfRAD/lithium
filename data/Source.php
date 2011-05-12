@@ -251,12 +251,10 @@ abstract class Source extends \lithium\core\Object {
 	 *         dependencies.
 	 */
 	public function configureClass($class) {
-		return array(
-			'meta' => array(
-				'key' => 'id',
-				'locked' => true
-			)
-		);
+		return array('meta' => array(
+			'key' => 'id',
+			'locked' => true
+		));
 	}
 
 	/**
@@ -273,7 +271,10 @@ abstract class Source extends \lithium\core\Object {
 	public function item($model, array $data = array(), array $options = array()) {
 		$defaults = array('class' => 'entity');
 		$options += $defaults;
-		return $this->_instance($options['class'], compact('model', 'data') + $options);
+
+		$class = $options['class'];
+		unset($options['class']);
+		return $this->_instance($class, compact('model', 'data') + $options);
 	}
 }
 

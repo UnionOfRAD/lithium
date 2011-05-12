@@ -120,6 +120,7 @@ class MongoDb extends \lithium\data\Source {
 	 *
 	 * @see lithium\data\Connections::add()
 	 * @see lithium\data\source\MongoDb::$_schema
+	 * @link http://php.net/manual/en/mongo.construct.php PHP Manual: Mongo::__construct()
 	 * @param array $config All information required to connect to the database, including:
 	 *        - `'database'` _string_: The name of the database to connect to. Defaults to `null`.
 	 *        - `'host'` _string_: The IP or machine name where Mongo is running, followed by a
@@ -232,8 +233,11 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	/**
-	 * Connects to the Mongo server.
+	 * Connects to the Mongo server. Matches up parameters from the constructor to create a Mongo
+	 * database connection.
 	 *
+	 * @see lithium\data\source\MongoDb::__construct()
+	 * @link http://php.net/manual/en/mongo.construct.php PHP Manual: Mongo::__construct()
 	 * @return boolean Returns `true` the connection attempt was successful, otherwise `false`.
 	 */
 	public function connect() {

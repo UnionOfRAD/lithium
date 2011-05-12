@@ -220,22 +220,21 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @return void
 	 */
 	public function __set($name, $value = null) {
-		if (is_array($name)) {
-			foreach ($name as $key => $val) {
-				$this->__set($key, $val);
+		$data = is_array($name) ? $name : array($name => $value);
+
+		foreach ($data as $key => $val) {
+			if (strpos($key, '.')) {
+				$this->_setNested($key, $val);
+				unset($data[$key]);
 			}
-			return;
+			unset($this->_increment[$key], $this->_removed[$key]);
 		}
-		if (is_string($name) && strpos($name, '.')) {
-			return $this->_setNested($name, $value);
-		}
+
 		if ($model = $this->_model) {
 			$pathKey = $this->_pathKey;
-			$options = compact('pathKey') + array('first' => true);
-			$value = $model::connection()->cast($this, array($name => $value), $options);
+			$data = $model::connection()->cast($this, $data, compact('pathKey'));
 		}
-		$this->_updated[$name] = $value;
-		unset($this->_increment[$name], $this->_removed[$name]);
+		$this->_updated = $data + $this->_updated;
 	}
 
 	protected function _setNested($name, $value) {

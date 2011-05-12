@@ -288,8 +288,10 @@ class Entity extends \lithium\core\Object {
 	/**
 	 * Called after an `Entity` is saved. Updates the object's internal state to reflect the
 	 * corresponding database entity, and sets the `Entity` object's key, if this is a newly-created
-	 * object.
+	 * object. **Do not** call this method if you intend to update the database's copy of the
+	 * entity. Instead, see `Model::save()`.
 	 *
+	 * @see lithium\data\Model::save()
 	 * @param mixed $id The ID to assign, where applicable.
 	 * @param array $data Any additional generated data assigned to the object by the database.
 	 * @return void
