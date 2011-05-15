@@ -62,12 +62,9 @@ class Command extends \lithium\core\Object {
 	 * @param array $config
 	 * @return void
 	 */
-	public function __construct($config = array()) {
-		$defaults = array(
-			'request' => null, 'response' => array(), 'classes' => $this->_classes
-		);
-		$config += $defaults;
-		parent::__construct($config);
+	public function __construct(array $config = array()) {
+		$defaults = array('request' => null, 'response' => array(), 'classes' => $this->_classes);
+		parent::__construct($config + $defaults);
 	}
 
 	/**
@@ -81,15 +78,17 @@ class Command extends \lithium\core\Object {
 		parent::_init();
 
 		$this->request = $this->_config['request'];
-		$this->response = $this->_instance('response', $this->_config['response']);
+		$resp = $this->_config['response'];
+		$this->response = is_object($resp) ? $resp : $this->_instance('response', $resp);
 
-		if ($this->request->params) {
-			$default = array('command' => null, 'action' => null, 'args' => null);
-			$params = (array) array_diff_key($this->request->params, $default);
+		if (!is_object($this->request) || !$this->request->params) {
+			return;
+		}
+		$default = array('command' => null, 'action' => null, 'args' => null);
+		$params = array_diff_key((array) $this->request->params, $default);
 
-			foreach ($params as $key => $param) {
-				$this->{$key} = $param;
-			}
+		foreach ($params as $key => $param) {
+			$this->{$key} = $param;
 		}
 	}
 
