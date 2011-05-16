@@ -144,6 +144,35 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isFoo('foo'));
 	}
 
+	/**
+	 * Tests the regular expression validation for various regex delimiters
+	 *
+	 * @link http://www.php.net/manual/en/regexp.reference.delimiters.php Regex Delimiters
+	 */
+	public function testIsRegex() {
+		$this->assertTrue(Validator::isRegex('/^123$/'));
+		$this->assertTrue(Validator::isRegex('/^abc$/'));
+		$this->assertTrue(Validator::isRegex('/^abc123$/'));
+		$this->assertTrue(Validator::isRegex('@^abc$@'));
+		$this->assertTrue(Validator::isRegex('#^abc$#'));
+		$this->assertFalse(Validator::isRegex('d^abc$d'));
+
+		$this->assertTrue(Validator::isRegex('(^abc$)'));
+		$this->assertTrue(Validator::isRegex('{^abc$}'));
+		$this->assertTrue(Validator::isRegex('[^abc$]'));
+		$this->assertTrue(Validator::isRegex('<^abc$>'));
+		$this->assertTrue(Validator::isRegex(')^abc$)'));
+		$this->assertTrue(Validator::isRegex('}^abc$}'));
+		$this->assertTrue(Validator::isRegex(']^abc$]'));
+		$this->assertTrue(Validator::isRegex('>^abc$>'));
+
+		$this->assertFalse(Validator::isRegex('\\^abc$\\'));
+		$this->assertFalse(Validator::isRegex('(^abc$('));
+		$this->assertFalse(Validator::isRegex('{^abc${'));
+		$this->assertFalse(Validator::isRegex('[^abc$['));
+		$this->assertFalse(Validator::isRegex('<^abc$<'));
+	}
+
 	public function testPrefilterMethodAccess() {
 		$this->assertTrue(Validator::isNotEmpty('0'));
 		$this->assertFalse(Validator::isNotEmpty(''));

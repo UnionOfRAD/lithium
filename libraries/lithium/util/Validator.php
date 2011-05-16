@@ -120,7 +120,7 @@ use InvalidArgumentException;
  * - `inList`: Checks that a value is in a pre-defined list of values. This validator accepts one
  *   option, `'list'`, which is an array containing acceptable values.
  *
- * - `regex`: Checks that a value appears to be a /-delimited regular expression, possibly
+ * - `regex`: Checks that a value appears to be a valid regular expression, possibly
  *   containing PCRE-compatible options flags.
  *
  * - `uuid`: Checks that a value is a valid UUID.
@@ -235,10 +235,11 @@ class Validator extends \lithium\core\StaticObject {
 			'notEmpty'     => '/[^\s]+/m',
 			'phone'        => '/^\+?[0-9\(\)\-]{10,20}$/',
 			'postalCode'   => '/(^|\A\b)[A-Z0-9\s\-]{5,}($|\b\z)/i',
-			'regex'        => '/^\/(.+)\/[gimsxu]*$/',
+			'regex'        => '/^(?:([^[:alpha:]\\\\{<\[\(])(.+)(?:\1))|(?:{(.+)})|(?:<(.+)>)|' .
+			                  '(?:\[(.+)\])|(?:\((.+)\))[gimsxu]*$/',
 			'time'         => '%^((0?[1-9]|1[012])(:[0-5]\d){0,2}([AP]M|[ap]m))$|^([01]\d|2[0-3])' .
 			                  '(:[0-5]\d){0,2}$%',
-			'boolean' => function($value) {
+			'boolean'      => function($value) {
 				$bool = is_bool($value);
 				$filter = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 				return ($bool || $filter !== null);
