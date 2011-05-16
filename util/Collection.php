@@ -514,6 +514,9 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 
 		foreach ($data as $key => $item) {
 			switch (true) {
+				case is_array($item):
+					$result[$key] = static::toArray($item, $options);
+				break;
 				case (!is_object($item)):
 					$result[$key] = $item;
 				break;
@@ -524,7 +527,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 					$result[$key] = $item->to('array');
 				break;
 				case ($vars = get_object_vars($item)):
-					$result[$key] = $vars;
+					$result[$key] = static::toArray($vars, $options);
 				break;
 				case (method_exists($item, '__toString')):
 					$result[$key] = (string) $item;

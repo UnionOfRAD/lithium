@@ -377,11 +377,13 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	}
 
 	public function current() {
-		return current($this->_data);
+		$current = current($this->_data);
+		return isset($this->_removed[key($this->_data)]) ? null : $current;
 	}
 
 	public function key() {
-		return key($this->_data);
+		$key = key($this->_data);
+		return isset($this->_removed[$key]) ? false : $key;
 	}
 
 	/**
@@ -397,15 +399,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			'MongoDate' => function($value) { return $value->sec; }
 		));
 		$options += $defaults;
-
-		if ($format == 'array') {
-			$map = function($obj) {
-				return $obj->data();
-			};
-			$data = $this->_updated + $this->_data;
-			$data = array_merge($data, array_map($map, $this->_relationships));
-			return Collection::toArray(array_diff_key($data, $this->_removed), $options);
-		}
+		$options['internal'] = false;
 		return parent::to($format, $options);
 	}
 
@@ -422,6 +416,9 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		$this->_valid = (next($this->_data) !== false);
 		$cur = key($this->_data);
 
+		if (isset($this->_removed[$cur])) {
+			return $this->next();
+		}
 		if (!$this->_valid && $cur !== $prev && $cur !== null) {
 			$this->_valid = true;
 		}

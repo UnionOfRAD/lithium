@@ -378,15 +378,12 @@ class Entity extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function to($format, array $options = array()) {
-		$map = function($obj) {
-			return $obj->data();
-		};
-
 		switch ($format) {
 			case 'array':
 				$data = $this->_updated + $this->_data;
-				$data = array_merge($data, array_map($map, $this->_relationships));
-				$result = Collection::toArray($data);
+				$rel = array_map(function($obj) { return $obj->data(); }, $this->_relationships);
+				$data = array_merge($data, $rel);
+				$result = Collection::toArray($data, $options);
 			break;
 			default:
 				$result = $this;
