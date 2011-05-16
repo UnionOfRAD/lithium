@@ -1,4 +1,4 @@
-{:heading2}Code Coverage{:end}
+{:heading}Code Coverage{:end}
 <?php
 	foreach ($data as $class => $coverage) {
 		echo ($coverage['percentage'] >= 85 ? "{:success}" : "{:error}");
