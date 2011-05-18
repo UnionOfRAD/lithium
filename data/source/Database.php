@@ -649,33 +649,40 @@ abstract class Database extends \lithium\data\Source {
 				return $sortOrder[$a] - $sortOrder[$b];
 			});
 		}
-		$context->map(array_map(function($item) {
-			if (!is_array($item)) {
-				return $item;
-			}
-			foreach($item as $key => $field) {
-				if(stripos($field, ' as ') !== false) {
-					list($real, $as) = explode(' as ', str_replace(' AS ', ' as ', $field));
-					$item[$key] = trim($as);
+		$mapFields = function() use($fields, $modelNames) {
+			$return = array();
+			foreach($fields as $key => $items) {
+				if(!is_array($items)) {
+					$return[$key] = $items;
+					continue;
+				}
+				if(is_numeric($key)) {
+					$key = reset($modelNames);
+				}
+				$pointer = &$return[$key];
+				foreach($items as $field) {
+					if(stripos($field, ' as ') !== false) {
+						list($real, $as) = explode(' as ', str_replace(' AS ', ' as ', $field));
+						$pointer[] = trim($as);
+						continue;
+					}
+					$pointer[] = $field;
 				}
 			}
-			return $item;
-		}, $fields));
+			return $return;
+		};
+		$context->map($mapFields());
 
 		$toMerge = array();
-		$keys = array_keys($fields);
-		array_walk($fields, function($item, $key) use(&$toMerge, &$keys) {
-			$name = current($keys);
-			next($keys);
-			foreach($item as $field) {
-				if (!is_numeric($name)) {
-					$toMerge[] = $name . '.' . $field;
+		foreach($fields as $scope => $items) {
+			foreach($items as $field) {
+				if (!is_numeric($scope)) {
+					$toMerge[] = $scope . '.' . $field;
 					continue;
 				}
 				$toMerge[] = $field;
 			}
-			return false;
-		});
+		}
 		$fields = $toMerge;
 		return $this->_fieldsReturn($type, $context, $fields, $schema);
 	}

@@ -597,7 +597,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array(
-			array(
+			'MockDatabasePost' => array(
 				'Post', 'Comment'
 			)
 		);
