@@ -73,7 +73,9 @@ abstract class Database extends \lithium\data\Source {
 		'between' => array('format' => 'BETWEEN ? AND ?'),
 		'BETWEEN' => array('format' => 'BETWEEN ? AND ?'),
 		'like' => array(),
-		'LIKE' => array()
+		'LIKE' => array(),
+		'not like' => array(),
+		'NOT LIKE' => array()
 	);
 
 	protected $_constraintTypes = array(

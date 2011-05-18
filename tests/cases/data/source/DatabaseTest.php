@@ -528,11 +528,11 @@ class DatabaseTest extends \lithium\test\Unit {
 		$query = new Query(array(
 			'type' => 'read', 'model' => $this->_model,
 			'conditions' => array(
-				'field' => array('like' => '%value%')
+				'field' => array('like' => '%value%', 'not like' => '%value2%')
 			)
 		));
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ";
-		$sql .= "({field} like '%value%');";
+		$sql .= "({field} like '%value%' AND {field} not like '%value2%');";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
 
