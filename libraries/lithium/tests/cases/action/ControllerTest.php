@@ -285,6 +285,24 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertEqual('foo', $result['template']);
 	}
 
+	public function testSetData() {
+		$postController = new MockPostsController();
+
+		$setData = array('foo' => 'bar');
+		$postController->set($setData);
+		$_render = $postController->access('_render');
+		$data = $_render['data'];
+		$expected = $setData;
+		$this->assertEqual($expected, $data);
+
+		$setData = array('foo' => 'baz');
+		$postController->set($setData);
+		$_render = $postController->access('_render');
+		$data = $_render['data'];
+		$expected = $setData;
+		$this->assertEqual($expected, $data);
+	}
+
 	public function testResponseTypeBasedOnRequestHeaderType() {
 		$request = new MockControllerRequest(array(
 			'env' => array('HTTP_ACCEPT' => 'application/json,*/*')
