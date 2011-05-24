@@ -643,7 +643,7 @@ class Form extends \lithium\template\Helper {
 	 */
 	public function error($name, $key = null, array $options = array()) {
 		$defaults = array('class' => 'error');
-		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		list(, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		$options += $defaults;
 		$result = '';
 

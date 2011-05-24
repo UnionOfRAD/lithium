@@ -960,6 +960,27 @@ class FormTest extends \lithium\test\Unit {
 		));
 	}
 
+	/**
+	 * Tests rendering errors for nested fields.
+	 */
+	public function testNestedFieldError() {
+		$doc = new Document(array('data' => array('foo' => array('bar' => 'value'))));
+		$doc->errors(array('foo.bar' => 'Something bad happened.'));
+
+		$this->form->create($doc);
+		$result = $this->form->field('foo.bar');
+
+		$this->assertTags($result, array(
+			array('div' => array()),
+			'label' => array('for' => 'FooBar'), 'Foo Bar', '/label',
+			'input' => array(
+				'type' => 'text', 'name' => 'foo[bar]', 'id' => 'FooBar', 'value' => 'value'
+			),
+			'div' => array('class' => 'error'), 'Something bad happened.', '/div',
+			array('/div' => array()),
+		));
+	}
+
 	public function testFormCreationWithNoContext() {
 		$this->form = new Form(array('context' => new MockFormRenderer()));
 		$result = $this->form->create(null, array('url' => '/foo'));
