@@ -982,9 +982,14 @@ class FormTest extends \lithium\test\Unit {
 	}
 
 	public function testFormCreationWithNoContext() {
-		$this->form = new Form(array('context' => new MockFormRenderer()));
+		$this->form = new Form(array('context' => new MockFormRenderer(array(
+			'request' => new Request(array('base' => '/bbq'))
+		))));
 		$result = $this->form->create(null, array('url' => '/foo'));
-		$this->assertTags($result, array('form' => array('action' => "/foo", 'method'=> "post")));
+
+		$this->assertTags($result, array('form' => array(
+			'action' => "/bbq/foo", 'method'=> "post"
+		)));
 	}
 }
 
