@@ -198,6 +198,7 @@ class Session extends \lithium\core\Adaptable {
 	 * session adapters.
 	 *
 	 * @param array $options Optional parameters that this method accepts.
+	 * @filter
 	 */
 	public static function clear(array $options = array()) {
 		$defaults = array('name' => null, 'strategies' => true);

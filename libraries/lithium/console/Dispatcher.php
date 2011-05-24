@@ -75,6 +75,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *        `null`, an instance will be created.
 	 * @param array $options
 	 * @return object The command action result which is an instance of `lithium\console\Response`.
+	 * @filter
 	 */
 	public static function run($request = null, $options = array()) {
 		$defaults = array('request' => array());
@@ -109,6 +110,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @param string $params
 	 * @param string $options
 	 * @return class lithium\console\Command
+	 * @filter
 	 */
 	protected static function _callable($request, $params, $options) {
 		$params = compact('request', 'params', 'options');
@@ -164,6 +166,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @param string $request
 	 * @param string $params
 	 * @return void
+	 * @filter
 	 */
 	protected static function _call($callable, $request, $params) {
 		$params = compact('callable', 'request', 'params');

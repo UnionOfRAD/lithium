@@ -653,6 +653,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return object Returns a new, _un-saved_ record or document object. In addition to the values
 	 *         passed to `$data`, the object will also contain any values assigned to the
 	 *         `'default'` key of each field defined in `$_schema`.
+	 * @filter
 	 */
 	public static function create(array $data = array(), array $options = array()) {
 		$self = static::_object();
@@ -729,6 +730,7 @@ class Model extends \lithium\core\StaticObject {
 	 *          record.
 	 *
 	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
+	 * @filter
 	 */
 	public function save($entity, $data = null, array $options = array()) {
 		$self = static::_object();
@@ -813,6 +815,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return boolean Returns `true` if all validation rules on all fields succeed, otherwise
 	 *         `false`. After validation, the messages for any validation failures are assigned to
 	 *         the entity, and accessible through the `errors()` method of the entity object.
+	 * @filter
 	 */
 	public function validates($entity, array $options = array()) {
 		$defaults = array(
@@ -844,6 +847,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @param object $entity Entity to delete.
 	 * @param array $options Options.
 	 * @return boolean Success.
+	 * @filter
 	 */
 	public function delete($entity, array $options = array()) {
 		$self = static::_object();
@@ -871,6 +875,7 @@ class Model extends \lithium\core\StaticObject {
 	 *              the `delete()` method of the corresponding backend database for available
 	 *              options.
 	 * @return boolean Returns `true` if the update operation succeeded, otherwise `false`.
+	 * @filter
 	 */
 	public static function update($data, $conditions = array(), array $options = array()) {
 		$self = static::_object();
@@ -897,6 +902,7 @@ class Model extends \lithium\core\StaticObject {
 	 *              the `delete()` method of the corresponding backend database for available
 	 *              options.
 	 * @return boolean Returns `true` if the remove operation succeeded, otherwise `false`.
+	 * @filter
 	 */
 	public static function remove($conditions = array(), array $options = array()) {
 		$self = static::_object();

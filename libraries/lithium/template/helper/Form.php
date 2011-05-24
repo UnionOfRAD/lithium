@@ -251,6 +251,7 @@ class Form extends \lithium\template\Helper {
 	 *         the `'action'` or `'url'` options (defaulting to the current page if none is
 	 *         specified), the HTTP method is defined by the `'method'` option, and any HTML
 	 *         attributes passed in `$options`.
+	 * @filter
 	 */
 	public function create($binding = null, array $options = array()) {
 		$request = $this->_context ? $this->_context->request() : null;
@@ -304,6 +305,7 @@ class Form extends \lithium\template\Helper {
 	 * object used to generate the corresponding form.
 	 *
 	 * @return string Returns a closing `</form>` tag.
+	 * @filter
 	 */
 	public function end() {
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, array());

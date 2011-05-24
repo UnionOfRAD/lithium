@@ -214,6 +214,7 @@ class Report extends \lithium\core\Object {
 	 * @param string $data array from `_data()` method
 	 * @param array $options Array of options (e.g. rendering type)
 	 * @return string
+	 * @filter
 	 */
 	public function render($template, $data = array()) {
 		$config = $this->_config;

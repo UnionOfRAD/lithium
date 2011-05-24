@@ -96,6 +96,7 @@ class Logger extends \lithium\core\Adaptable {
 	 *         failed.
 	 * @throws UnexpectedValueException If the value of `$priority` is not a defined priority value,
 	 *         an `UnexpectedValueException` will be thrown.
+	 * @filter
 	 */
 	public static function write($priority, $message, array $options = array()) {
 		$defaults = array('name' => null);

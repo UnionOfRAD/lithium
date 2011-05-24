@@ -229,6 +229,13 @@ abstract class Renderer extends \lithium\core\Object {
 		return isset($this->_context[$property]);
 	}
 
+	/**
+	 * Returns a helper object or context value by name.
+	 *
+	 * @param string $property The name of the helper or context value to return.
+	 * @return mixed
+	 * @filter
+	 */
 	public function __get($property) {
 		$context = $this->_context;
 		$helpers = $this->_helpers;

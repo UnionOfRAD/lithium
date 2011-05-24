@@ -44,6 +44,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @return array A compact array of the title, an array of the results, as well
 	 *         as an additional array of the results after the $options['filters']
 	 *         have been applied.
+	 * @filter
 	 */
 	public static function run($group = null, array $options = array()) {
 		$defaults = array(

@@ -26,6 +26,7 @@ class Controller extends \lithium\core\Object {
 	 * @param array $dispatchParams Array of params after being parsed by router.
 	 * @param array $options Some basic options for this controller.
 	 * @return string
+	 * @filter
 	 */
 	public function __invoke($request, $dispatchParams, array $options = array()) {
 		$dispatchParamsDefaults = array('args' => array());

@@ -591,6 +591,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @param array $options Any options that will be passed to the `render()` method of the
 	 *              templating object.
 	 * @return object Returns an instance of a templating object, usually `lithium\template\View`.
+	 * @filter
 	 */
 	public static function view($handler, $data, &$response = null, array $options = array()) {
 		$params = array('response' => &$response) + compact('handler', 'data', 'options');

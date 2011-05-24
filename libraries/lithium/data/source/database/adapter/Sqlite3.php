@@ -280,6 +280,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @param string $sql The sql string to execute
 	 * @param array $options No available options.
 	 * @return resource
+	 * @filter
 	 */
 	protected function _execute($sql, array $options = array()) {
 		$params = compact('sql', 'options');

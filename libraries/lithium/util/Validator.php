@@ -545,6 +545,7 @@ class Validator extends \lithium\core\StaticObject {
 	 * @param string $options
 	 * @return boolean Returns `true` or `false` indicating whether the validation rule check
 	 *         succeeded or failed.
+	 * @filter
 	 */
 	public static function rule($rule, $value, $format = 'any', array $options = array()) {
 		if (!isset(static::$_rules[$rule])) {

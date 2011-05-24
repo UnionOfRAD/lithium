@@ -639,6 +639,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string $method The name of the test method to run.
 	 * @param array $options
 	 * @return void | false
+	 * @filter
 	 */
 	protected function _runTestMethod($method, $options) {
 		try {

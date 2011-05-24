@@ -320,6 +320,7 @@ class MySql extends \lithium\data\source\Database {
 	 *          sends the SQL query query to MySQL without automatically fetching and buffering the
 	 *          result rows as `mysql_query()` does (for less memory usage).
 	 * @return resource Returns the result resource handle if the query is successful.
+	 * @filter
 	 */
 	protected function _execute($sql, array $options = array()) {
 		$defaults = array('buffered' => true);

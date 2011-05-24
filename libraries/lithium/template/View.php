@@ -284,6 +284,9 @@ class View extends \lithium\core\Object {
 		return true;
 	}
 
+	/**
+	 * @filter
+	 */
 	protected function _step(array $step, array $params, array &$data, array &$options = array()) {
 		$step += array('path' => null, 'capture' => null);
 		$_renderer = $this->_renderer;

@@ -175,6 +175,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param string $query
 	 * @param string $options
 	 * @return boolean
+	 * @filter
 	 */
 	public function create($query, array $options = array()) {
 		$defaults = array('model' => $query->model());
@@ -211,6 +212,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param string $query
 	 * @param string $options
 	 * @return object
+	 * @filter
 	 */
 	public function read($query, array $options = array()) {
 		$defaults = array('return' => 'resource', 'model' => $query->model());
@@ -258,6 +260,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param string $query
 	 * @param string $options
 	 * @return boolean
+	 * @filter
 	 */
 	public function update($query, array $options = array()) {
 		$params = compact('query', 'options');
@@ -299,6 +302,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param string $query
 	 * @param string $options
 	 * @return boolean
+	 * @filter
 	 */
 	public function delete($query, array $options = array()) {
 		$params = compact('query', 'options');

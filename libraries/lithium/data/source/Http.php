@@ -108,6 +108,7 @@ class Http extends \lithium\data\Source {
 	 * @param string $method
 	 * @param array $params
 	 * @return mixed
+	 * @filter
 	 */
 	public function __call($method, $params) {
 		if (isset($this->_config['methods'][$method])) {
@@ -180,6 +181,7 @@ class Http extends \lithium\data\Source {
 	 * @param object $query
 	 * @param array $options
 	 * @return void
+	 * @filter
 	 */
 	public function create($query, array $options = array()) {
 		$params = compact('query', 'options');
@@ -212,6 +214,7 @@ class Http extends \lithium\data\Source {
 	 * @param object $query
 	 * @param array $options
 	 * @return string
+	 * @filter
 	 */
 	public function read($query, array $options = array()) {
 		$params = compact('query', 'options');
@@ -246,6 +249,7 @@ class Http extends \lithium\data\Source {
 	 * @param object $query
 	 * @param array $options
 	 * @return string
+	 * @filter
 	 */
 	public function update($query, array $options = array()) {
 		$params = compact('query', 'options');
@@ -278,6 +282,7 @@ class Http extends \lithium\data\Source {
 	 * @param object $query
 	 * @param array $options
 	 * @return string
+	 * @filter
 	 */
 	public function delete($query, array $options = array()) {
 		$params = compact('query', 'options');

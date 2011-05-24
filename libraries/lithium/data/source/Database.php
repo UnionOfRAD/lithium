@@ -293,6 +293,7 @@ abstract class Database extends \lithium\data\Source {
 	 * @param object $query A `lithium\data\model\Query` object
 	 * @param array $options none
 	 * @return boolean
+	 * @filter
 	 */
 	public function update($query, array $options = array()) {
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
@@ -318,6 +319,7 @@ abstract class Database extends \lithium\data\Source {
 	 *              parameter values to be inserted into the query.
 	 * @return boolean Returns `true` on successful query execution (not necessarily if records are
 	 *         deleted), otherwise `false`.
+	 * @filter
 	 */
 	public function delete($query, array $options = array()) {
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {

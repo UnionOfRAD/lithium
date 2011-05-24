@@ -361,6 +361,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @param string $query
 	 * @param string $options
 	 * @return boolean
+	 * @filter
 	 */
 	public function create($query, array $options = array()) {
 		$defaults = array('safe' => false, 'fsync' => false);
@@ -438,6 +439,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @param string $query
 	 * @param string $options
 	 * @return object
+	 * @filter
 	 */
 	public function read($query, array $options = array()) {
 		$this->_checkConnection();
@@ -492,6 +494,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @param string $query
 	 * @param array $options
 	 * @return boolean
+	 * @filter
 	 */
 	public function update($query, array $options = array()) {
 		$defaults = array('upsert' => false, 'multiple' => true, 'safe' => false, 'fsync' => false);
@@ -535,6 +538,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @param string $query
 	 * @param string $options
 	 * @return boolean
+	 * @filter
 	 */
 	public function delete($query, array $options = array()) {
 		$this->_checkConnection();
