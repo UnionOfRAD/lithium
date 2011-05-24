@@ -1067,8 +1067,6 @@ class ValidatorTest extends \lithium\test\Unit {
 	/**
 	 * Tests that event flags applied to rules only trigger when the corresponding event is passed
 	 * in the `$options` parameter of `check()`.
-	 *
-	 * @return void
 	 */
 	public function testEvents() {
 		$rules = array('number' => array('numeric', 'message' => 'Badness!'));
@@ -1097,6 +1095,28 @@ class ValidatorTest extends \lithium\test\Unit {
 		unset($rules['number']['on']);
 		$result = Validator::check(array('number' => 'o'), $rules, array('events' => 'foo'));
 		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * Tests validating nested fields using dot-separated paths.
+	 */
+	public function testNestedFields() {
+		$rules = array(
+			'id' => array('numeric', 'message' => 'Bad ID'),
+			'profile.name' => "Can't be empty",
+			'profile.email' => array('email', 'message' => 'Must be a valid email')
+		);
+		$data = array('id' => 1, 'profile' => array('email' => 'foo'));
+		$result = Validator::check($data, $rules);
+		$expected = array(
+			'profile.name' => array("Can't be empty"),
+			'profile.email' => array('Must be a valid email')
+		);
+		$this->assertEqual($expected, $result);
+
+		$data = array('id' => '.', 'profile' => array('email' => 'foo@bar.com', 'name' => 'Bob'));
+		$result = Validator::check($data, $rules);
+		$this->assertEqual(array('id' => array('Bad ID')), $result);
 	}
 }
 

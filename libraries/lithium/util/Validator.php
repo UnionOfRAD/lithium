@@ -434,6 +434,7 @@ class Validator extends \lithium\core\StaticObject {
 		);
 		$errors = array();
 		$events = (array) (isset($options['events']) ? $options['events'] : null);
+		$values = Set::flatten($values);
 
 		foreach ($rules as $field => $rules) {
 			$rules = is_string($rules) ? array('message' => $rules) : $rules;
