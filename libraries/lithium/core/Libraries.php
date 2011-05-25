@@ -378,11 +378,31 @@ class Libraries {
 	}
 
 	/**
-	 * Finds the classes in a library/namespace/folder
+	 * Finds the classes or namespaces belonging to a particular library. _Note_: This method
+	 * assumes loaded class libraries use a consistent class-to-file naming convention.
 	 *
-	 * @param string $library
-	 * @param string $options
-	 * @return array
+	 * @param mixed $library The name of a library added to the application with `Libraries::add()`,
+	 *              or `true` to search all libraries.
+	 * @param array $options The options this method accepts:
+	 *
+	 *              - `'path'` _string_: A physical filesystem path relative to the directory of the
+	 *                library being searched. If provided, only the classes or namespaces within
+	 *                this path will be returned.
+	 *              - `'recursive'` _boolean_: If `true`, recursively searches all directories
+	 *                (namespaces) in the given library. If `false` (the default), only searches the
+	 *                top level of the given path.
+	 *              - `'filter'` _string_: A regular expression applied to a class after it is
+	 *                transformed into a fully-namespaced class name. The default regular expression
+	 *                filters class names based on the
+	 *                [PSR-0](http://groups.google.com/group/php-standards/web/psr-0-final-proposal)
+	 *                PHP 5.3 naming standard.
+	 *              - `'exclude'` _mixed_: Can be either a regular expression of classes/namespaces
+	 *                to exclude, or a PHP callable to be used with `array_filter()`.
+	 *              - `'namespaces'` _boolean_: Indicates whether namespaces should be included in
+	 *                the search results. If `false` (the default), only classes are returned.
+	 * @return array Returns an array of fully-namespaced class names found in the given library or
+	 *         libraries.
+	 * @todo Patch this to skip paths belonging to nested libraries in recursive searches.
 	 */
 	public static function find($library, array $options = array()) {
 		$format = function($file, $config) {
