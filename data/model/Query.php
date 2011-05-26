@@ -565,7 +565,8 @@ class Query extends \lithium\core\Object {
 				'joins' => $this->joins(),
 				'conditions' => $this->conditions(),
 				'limit' => $this->limit(),
-				'page' => $this->page()
+				'page' => $this->page(),
+				'order' => $this->order()
 			));
 			$ids = $model::connection()->read($query);
 			$idData = $ids->data();
