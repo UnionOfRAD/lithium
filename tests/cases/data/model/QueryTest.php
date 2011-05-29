@@ -362,6 +362,19 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertTrue($keyExists);
 		$this->skipIf(!$keyExists);
 		$this->assertEqual($expected, $export['relationships']);
+
+		$query = new Query(array(
+				'model' => $this->_model,
+				'with' => 'MockQueryComment',
+				'limit' => 3,
+				'order' => 'author_id ASC',
+				'group' => 'author_id'
+			));
+		$expected = 'SELECT MockQueryPost.id FROM {foo} AS {MockQueryPost} LEFT JOIN AS ';
+		$expected .= '{MockQueryComment} ON {MockQueryPost}.{id} = {MockQueryComment}';
+		$expected .= '.{mock_query_post_id} GROUP BY MockQueryPost.id ORDER BY author_id ASC ';
+		$expected .= 'LIMIT 3;';
+		$this->assertEqual($expected, $this->db->sql);
 	}
 
 	/**
