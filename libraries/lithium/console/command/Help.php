@@ -31,7 +31,11 @@ class Help extends \lithium\console\Command {
 			return true;
 		}
 
-		if (!$class = Libraries::locate('command', ucwords($command))) {
+		if (!preg_match('/\\\\/', $command)) {
+			$command = ucwords($command);
+		}
+
+		if (!$class = Libraries::locate('command', $command)) {
 			$this->error("Command `{$command}` not found");
 			return false;
 		}
