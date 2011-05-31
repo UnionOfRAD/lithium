@@ -24,15 +24,6 @@ use lithium\core\ClassNotFoundException;
 class Create extends \lithium\console\Command {
 
 	/**
-	 * Controls the interactive nature of the command.
-	 * When true, the command will ask questions and expect answers to generate the result.
-	 * When false, the command will do its best to determine the result to generate.
-	 *
-	 * @var boolean
-	 */
-	public $i = false;
-
-	/**
 	 * Name of library to use
 	 *
 	 * @var string
@@ -81,11 +72,6 @@ class Create extends \lithium\console\Command {
 		$this->template = $this->template ?: $command;
 
 		if (!$command) {
-			$command = $this->in('What would you like to create?', array(
-				'choices' => array('model', 'view', 'controller', 'test', 'mock')
-			));
-		}
-		if (!$command) {
 			return false;
 		}
 		if ($this->_execute($command)) {
@@ -93,16 +79,6 @@ class Create extends \lithium\console\Command {
 		}
 		$this->error("{$command} could not be created.");
 		return false;
-	}
-
-	/**
-	 * [-i] Ask questions and use answers to create.
-	 *
-	 * @return boolean
-	 */
-	public function interactive() {
-		$this->i = true;
-		return $this->run();
 	}
 
 	/**
@@ -230,7 +206,6 @@ class Create extends \lithium\console\Command {
 	 */
 	protected function _instance($name, array $config = array()) {
 		if ($class = Libraries::locate('command.create', Inflector::camelize($name))) {
-			$this->request->params['i'] = $this->i;
 			$this->request->params['template'] = $this->template;
 
 			return new $class(array(

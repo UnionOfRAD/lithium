@@ -108,9 +108,8 @@ class CreateTest extends \lithium\test\Unit {
 		$result = $create->run();
 		$this->assertFalse($result);
 
-		$expected = "What would you like to create? (model/view/controller/test/mock) \n > ";
 		$result = $create->response->output;
-		$this->assertEqual($expected, $result);
+		$this->assertFalse($result);
 	}
 
 	public function testRunNotSaved() {
