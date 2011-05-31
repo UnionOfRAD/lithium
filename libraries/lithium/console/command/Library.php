@@ -142,7 +142,7 @@ class Library extends \lithium\console\Command {
 		if (empty($key) || empty($value)) {
 			return $this->_settings;
 		}
-		switch($key) {
+		switch ($key) {
 			case 'server':
 				$this->_settings['servers'][$value] = $options;
 			break;
@@ -176,7 +176,7 @@ class Library extends \lithium\console\Command {
 
 		if ($from[0] !== '/') {
 			$from = Libraries::locate('command.create.template', $from, array(
-				'filter' => false, 'type' => 'file', 'suffix' => '.phar.gz',
+				'filter' => false, 'type' => 'file', 'suffix' => '.phar.gz'
 			));
 			if (!$from || is_array($from)) {
 				return false;
@@ -199,11 +199,12 @@ class Library extends \lithium\console\Command {
 	}
 
 	/**
-	 * Helper method for `console\command\Library::extract()` to perform after-extract string replacements.
+	 * Helper method for `console\command\Library::extract()` to perform after-extract string
+	 * replacements.
 	 *
 	 * In the current implementation, it only sets the correct `LITHIUM_LIBRARY_PATH` when the
-	 * app.phar.gz archive was extracted. If you get any errors, please make sure that the console script
-	 * has read and write permissions to the extracted directory.
+	 * app.phar.gz archive was extracted. If you get any errors, please make sure that the console
+	 * script has read and write permissions to the extracted directory.
 	 *
 	 * @param string $extracted contains the path to the extracted archive.
 	 * @return boolean
@@ -212,18 +213,19 @@ class Library extends \lithium\console\Command {
 		$replacements = array(
 			'config/bootstrap/libraries.php' => array(
 				'define(\'LITHIUM_LIBRARY_PATH\', dirname(LITHIUM_APP_PATH) . \'/libraries\');' =>
-				'define(\'LITHIUM_LIBRARY_PATH\', \'' . dirname(Libraries::get('lithium', 'path')) . '\');'
+					'define(\'LITHIUM_LIBRARY_PATH\', \'' .
+					dirname(Libraries::get('lithium', 'path')) . '\');'
 			)
 		);
 
-		foreach($replacements as $filename => $definitions) {
-			$filepath = $extracted.'/'.$filename;
-			if(file_exists($filepath)) {
+		foreach ($replacements as $filename => $definitions) {
+			$filepath = $extracted . '/' . $filename;
+			if (file_exists($filepath)) {
 				$content = file_get_contents($filepath);
-				foreach($definitions as $original => $replacement) {
+				foreach ($definitions as $original => $replacement) {
 					$content = str_replace($original, $replacement, $content);
 				}
-				if(!file_put_contents($filepath, $content)) {
+				if (!file_put_contents($filepath, $content)) {
 					$this->error("Could not replace content in {$filepath}");
 					return false;
 				}
@@ -321,7 +323,7 @@ class Library extends \lithium\console\Command {
 				$out = array(
 					"{$data->summary}",
 					"Version: {$data->version}",
-					"Created: {$data->created}",
+					"Created: {$data->created}"
 				);
 				$this->header($header);
 				$this->out(array_filter($out));
@@ -429,7 +431,7 @@ class Library extends \lithium\console\Command {
 				)),
 				'sources' => array("http://{$this->server}/lab/download/{$name}.phar.gz"),
 				'commands' => array(
-					'install' => array(), 'update' => array(), 'remove' => array(),
+					'install' => array(), 'update' => array(), 'remove' => array()
 				),
 				'requires' => array()
 			);

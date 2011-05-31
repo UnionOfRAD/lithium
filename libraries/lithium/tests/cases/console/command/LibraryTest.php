@@ -102,7 +102,7 @@ class LibraryTest extends \lithium\test\Unit {
 	public function testExtractAndReplace() {
 		$filepath = $this->_testPath . '/library_test/config/bootstrap/libraries.php';
 		$content = file_get_contents($filepath);
-		$expected = 'define(\'LITHIUM_LIBRARY_PATH\', \''.realpath(LITHIUM_LIBRARY_PATH).'\')';
+		$expected = 'define(\'LITHIUM_LIBRARY_PATH\', \'' . realpath(LITHIUM_LIBRARY_PATH) . '\')';
 		$this->assertTrue(strpos($content, $expected));
 	}
 
@@ -617,7 +617,7 @@ test;
 			json_encode(array(
 				'name' => 'library_test_plugin',
 				'version' => '1.0',
-				'summary' => 'something',
+				'summary' => 'something'
 			))
 		);
 		$this->assertTrue($result);
