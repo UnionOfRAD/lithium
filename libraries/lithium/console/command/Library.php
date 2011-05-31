@@ -191,11 +191,45 @@ class Library extends \lithium\console\Command {
 			}
 			if ($archive->extractTo($to)) {
 				$this->out(basename($to) . " created in " . dirname($to) . " from {$from}");
-				return true;
+				return $this->_replaceAfterExtract($to);
 			}
 		}
 		$this->error("Could not extract {$to} from {$from}");
 		return false;
+	}
+
+	/**
+	 * Helper method for `console\command\Library::extract()` to perform after-extract string replacements.
+	 *
+	 * In the current implementation, it only sets the correct `LITHIUM_LIBRARY_PATH` when the
+	 * app.phar.gz archive was extracted. If you get any errors, please make sure that the console script
+	 * has read and write permissions to the extracted directory.
+	 *
+	 * @param string $extracted contains the path to the extracted archive.
+	 * @return boolean
+	 */
+	protected function _replaceAfterExtract($extracted) {
+		$replacements = array(
+			'config/bootstrap/libraries.php' => array(
+				'define(\'LITHIUM_LIBRARY_PATH\', dirname(LITHIUM_APP_PATH) . \'/libraries\');' =>
+				'define(\'LITHIUM_LIBRARY_PATH\', \'' . dirname(Libraries::get('lithium', 'path')) . '\');'
+			)
+		);
+
+		foreach($replacements as $filename => $definitions) {
+			$filepath = $extracted.'/'.$filename;
+			if(file_exists($filepath)) {
+				$content = file_get_contents($filepath);
+				foreach($definitions as $original => $replacement) {
+					$content = str_replace($original, $replacement, $content);
+				}
+				if(!file_put_contents($filepath, $content)) {
+					$this->error("Could not replace content in {$filepath}");
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	/**

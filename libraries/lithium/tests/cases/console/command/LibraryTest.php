@@ -94,6 +94,18 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	/**
+	 * Tests the app extraction and replace functionality to ensure that all paths
+	 * are set correctly after the extraction. It re-uses the test extraction
+	 * generated in the last test (`LibraryTest::testExtract()`).
+	 */
+	public function testExtractAndReplace() {
+		$filepath = $this->_testPath . '/library_test/config/bootstrap/libraries.php';
+		$content = file_get_contents($filepath);
+		$expected = 'define(\'LITHIUM_LIBRARY_PATH\', \''.realpath(LITHIUM_LIBRARY_PATH).'\')';
+		$this->assertTrue(strpos($content, $expected));
+	}
+
 	public function testArchive() {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
