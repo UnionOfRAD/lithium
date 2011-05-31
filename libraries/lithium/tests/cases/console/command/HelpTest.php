@@ -47,7 +47,10 @@ class HelpTest extends \lithium\test\Unit {
 		$command = new Help(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
+
 		$result = $command->run('Test');
+		$this->assertTrue($result);
+		$result = $command->run('test');
 		$this->assertTrue($result);
 
 		$expected = "li3 test [--filters=<string>] [--format=<string>] [<path>]";

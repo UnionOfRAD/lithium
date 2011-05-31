@@ -30,7 +30,8 @@ class Help extends \lithium\console\Command {
 			$this->_renderCommands();
 			return true;
 		}
-		if (!$class = Libraries::locate('command', $command)) {
+
+		if (!$class = Libraries::locate('command', ucwords($command))) {
 			$this->error("Command `{$command}` not found");
 			return false;
 		}
