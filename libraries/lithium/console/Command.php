@@ -347,7 +347,7 @@ class Command extends \lithium\core\Object {
 		}
 		extract($options);
 
-		if($style !== null) {
+		if ($style !== null) {
 			$string = "{:{$style}}{$string}{:end}";
 		}
 		if ($nl) {

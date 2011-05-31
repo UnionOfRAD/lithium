@@ -125,7 +125,7 @@ class Response extends \lithium\core\Object {
 			'purple' => "\033[0;35m",
 			'cyan'   => "\033[0;36m",
 			'white'  => "\033[0;37m",
-			'end'    => "\033[0m",
+			'end'    => "\033[0m"
 		);
 		if ($styles === false) {
 			return array_combine(array_keys($defaults), array_pad(array(), count($defaults), null));

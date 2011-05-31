@@ -10,7 +10,6 @@ namespace lithium\tests\cases\console;
 
 use lithium\core\Libraries;
 use lithium\console\Response;
-use lithium\console\Request;
 
 class ResponseTest extends \lithium\test\Unit {
 

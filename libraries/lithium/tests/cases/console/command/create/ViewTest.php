@@ -8,7 +8,6 @@
 
 namespace lithium\tests\cases\console\command\create;
 
-use lithium\console\command\Create;
 use lithium\console\command\create\View;
 use lithium\console\Request;
 use lithium\core\Libraries;

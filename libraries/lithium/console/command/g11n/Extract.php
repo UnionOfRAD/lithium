@@ -8,7 +8,6 @@
 
 namespace lithium\console\command\g11n;
 
-use DateTime;
 use Exception;
 use lithium\g11n\Catalog;
 use lithium\core\Libraries;
@@ -94,7 +93,7 @@ class Extract extends \lithium\console\Command {
 		try {
 			return Catalog::read($name, 'messageTemplate', 'root', array(
 				'scope' => $configs[$name]['scope'],
-				'lossy' => false,
+				'lossy' => false
 			));
 		} catch (Exception $e) {
 			return false;

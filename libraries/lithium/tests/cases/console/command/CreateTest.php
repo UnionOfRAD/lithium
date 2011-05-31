@@ -92,7 +92,7 @@ class CreateTest extends \lithium\test\Unit {
 			'namespace' => 'create_test\tests\cases\models',
 			'use' => 'create_test\models\Posts',
 			'class' => 'PostTest',
-			'methods' => "\tpublic function testCreate() {\n\n\t}\n",
+			'methods' => "\tpublic function testCreate() {\n\n\t}\n"
 		));
 		$this->assertTrue($result);
 
@@ -149,7 +149,7 @@ class CreateTest extends \lithium\test\Unit {
 	public function testRunWithTestModelCommand() {
 		$this->request->params = array(
 			'library' => 'create_test', 'command' => 'create', 'action' => 'test',
-			'args' => array('model', 'Posts'),
+			'args' => array('model', 'Posts')
 		);
 
 		$create = new MockCreate(array('request' => $this->request));
@@ -167,7 +167,7 @@ class CreateTest extends \lithium\test\Unit {
 	public function testRunWithTestControllerCommand() {
 		$this->request->params = array(
 			'library' => 'create_test', 'command' => 'create', 'action' => 'test',
-			'args' => array('controller', 'Posts'),
+			'args' => array('controller', 'Posts')
 		);
 
 		$create = new MockCreate(array('request' => $this->request));
@@ -185,7 +185,7 @@ class CreateTest extends \lithium\test\Unit {
 	public function testRunWithTestOtherCommand() {
 		$this->request->params = array(
 			'library' => 'create_test', 'command' => 'create', 'action' => 'test',
-			'args' => array('something', 'Posts'),
+			'args' => array('something', 'Posts')
 		);
 
 		$create = new MockCreate(array('request' => $this->request));
@@ -202,7 +202,7 @@ class CreateTest extends \lithium\test\Unit {
 	public function testRunAll() {
 		$this->request->params = array(
 			'library' => 'create_test', 'command' => 'create', 'action' => 'Posts',
-			'args' => array(),
+			'args' => array()
 		);
 
 		$create = new MockCreate(array('request' => $this->request));

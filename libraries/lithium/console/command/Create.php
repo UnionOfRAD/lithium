@@ -213,7 +213,7 @@ class Create extends \lithium\console\Command {
 	 */
 	protected function _template() {
 		$file = Libraries::locate('command.create.template', $this->template, array(
-			'filter' => false, 'type' => 'file', 'suffix' => '.txt.php',
+			'filter' => false, 'type' => 'file', 'suffix' => '.txt.php'
 		));
 		if (!$file || is_array($file)) {
 			return false;
@@ -235,7 +235,7 @@ class Create extends \lithium\console\Command {
 
 			return new $class(array(
 				'request' => $this->request,
-				'classes'=> $this->_classes,
+				'classes'=> $this->_classes
 			));
 		}
 		return parent::_instance($name, $config);

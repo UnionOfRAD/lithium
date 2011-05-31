@@ -94,7 +94,7 @@ class DispatcherTest extends \lithium\test\Unit {
 		$expected = (object) array('status' => "Command `FooBar` not found.\n");
 		$result = Dispatcher::run(new Request(array(
 			'args' => array(
-				'foo-bar',
+				'foo-bar'
 			)
 		)));
 		$this->assertEqual($expected, $result);

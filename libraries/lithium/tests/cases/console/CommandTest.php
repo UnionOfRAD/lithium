@@ -10,7 +10,6 @@ namespace lithium\tests\cases\console;
 
 use lithium\console\Request;
 use lithium\tests\mocks\console\MockCommand;
-use lithium\tests\mocks\console\command\MockCommandHelp;
 
 class CommandTest extends \lithium\test\Unit {
 
