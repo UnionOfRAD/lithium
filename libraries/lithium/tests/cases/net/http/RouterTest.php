@@ -479,6 +479,28 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that the order of the parameters is respected so it can trim
+	 * the URL correctly.
+	 *
+	 * @return void
+	 */
+	public function testParameterOrderIsRespected() {
+		Router::connect('/{:locale}/{:controller}/{:action}/{:args}');
+		Router::connect('/{:controller}/{:action}/{:args}');
+
+		$request = Router::process(new Request(array('url' => 'posts')));
+
+		$url = Router::match('Posts::index', $request);
+		$this->assertEqual($this->request->env('base') . '/posts', $url);
+
+		$request = Router::process(new Request(array('url' => 'fr/posts')));
+
+		$params = array('Posts::index', 'locale' => 'fr');
+		$url = Router::match($params, $request);
+		$this->assertEqual($this->request->env('base') . '/fr/posts', $url);
+	}
+
+	/**
 	 * Tests that a request context with persistent parameters generates URLs where those parameters
 	 * are properly taken into account.
 	 *

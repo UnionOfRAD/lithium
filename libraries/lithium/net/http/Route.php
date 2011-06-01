@@ -300,7 +300,9 @@ class Route extends \lithium\core\Object {
 			$options['args'] = join('/', $options['args']);
 		}
 
-		foreach (array_reverse($options + array('args' => ''), true) as $key => $value) {
+		$options += array('args' => '');
+		foreach (array_reverse($this->_keys, true) as $key) {
+			$value =& $options[$key];
 			$pattern = isset($this->_subPatterns[$key]) ? ":{$this->_subPatterns[$key]}" : '';
 			$rpl = "{:{$key}{$pattern}}";
 			$len = strlen($rpl) * -1;
