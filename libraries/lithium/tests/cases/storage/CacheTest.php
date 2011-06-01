@@ -303,6 +303,9 @@ class CacheTest extends \lithium\test\Unit {
 		$write = function() {
 			return array('+1 minute' => 'read-through write');
 		};
+		$result = Cache::read('default', 'read_through');
+		$this->assertNull($result);
+
 		$result = Cache::read('default', 'read_through', compact('write'));
 		$this->assertEqual('read-through write', $result);
 

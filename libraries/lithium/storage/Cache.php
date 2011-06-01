@@ -25,7 +25,7 @@ namespace lithium\storage;
  *     'local' => array('adapter' => 'Apc'),
  *     'distributed' => array(
  *         'adapter' => 'Memcached',
- *         'servers' => array('127.0.0.1', 11211),
+ *         'host' => '127.0.0.1:11211',
  *     ),
  *     'default' => array('adapter' => 'File')
  * ));}}}
@@ -39,9 +39,9 @@ namespace lithium\storage;
  *
  * This allows a very wide range of flexibility, at the cost of portability.
  *
- * Some cache adapters (e.g. File) do *not* provide the functionality for increment/decrement.
- * Additionally, some cache adapters support multi-key operations for `write`, `read` and `delete`-
- * Please see the individual documentation for cache adapters and the operations that they support.
+ * Some cache adapters (e.g. `File`) do _not_ provide the functionality for increment/decrement.
+ * Additionally, some cache adapters support multi-key operations for `write`, `read` and `delete`
+ * &mdash; please see the individual documentation for cache adapters and the operations that they support.
  *
  * @see lithium\core\Adaptable
  * @see lithium\storage\cache\adapter

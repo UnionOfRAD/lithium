@@ -8,31 +8,31 @@
 
 namespace lithium\storage\cache\adapter;
 
+use Memcached;
 use lithium\util\Set;
 
 /**
- * A Memcache (libmemcached) cache adapter implementation.
+ * A Memcache (libmemcached) cache adapter implementation. Requires
+ * [pecl/memcached](http://pecl.php.net/package/memcached).
  *
- * The Memcache cache adapter is meant to be used through the `Cache` interface,
+ * The `Memcache` cache adapter is meant to be used through the `Cache` interface,
  * which abstracts away key generation, adapter instantiation and filter
  * implementation.
  *
- * A simple configuration of this adapter can be accomplished in `app/config/bootstrap.php`
+ * A simple configuration of this adapter can be accomplished in `app/config/bootstrap/cache.php`
  * as follows:
  *
  * {{{
  * Cache::config(array(
  *     'cache-config-name' => array(
  *         'adapter' => 'Memcached',
- *         'servers' => array(
- *             array('127.0.0.1', 11211, 100)
- *         )
+ *         'host' => '127.0.0.1:11211'
  *     )
  * ));
  * }}}
  *
- * The 'servers' key accepts entries as arrays, where the format is `array(server, port, [weight])`,
- * with the weight being optional.
+ * The `'host'` key accepts entries in multiple formats, depending on the number of Memcache servers
+ * you are connecting to. See the `__construct()` method for more information.
  *
  * This Memcache adapter provides basic support for `write`, `read`, `delete`
  * and `clear` cache functionality, as well as allowing the first four
@@ -40,46 +40,102 @@ use lithium\util\Set;
  *
  * This adapter supports multi-key `write` and `read` operations.
  *
+ * @see lithium\storage\cache\adapter\Memcache::__construct()
  * @see lithium\storage\Cache::key()
  * @see lithium\storage\Cache::adapter()
- *
  */
 class Memcache extends \lithium\core\Object {
 
 	/**
-	 * Memcache object instance used by this adapter.
-	 *
-	 * @var object Memcache object
+	 * The default port used to connect to Memcache servers, if none is specified.
 	 */
-	public static $connection = null;
+	const CONN_DEFAULT_PORT = 11211;
 
 	/**
-	 * Object constructor.
-	 * Instantiates the Memcached object, adds appropriate servers to the pool,
-	 * and configures any optional settings passed.
+	 * `Memcached` object instance used by this adapter.
+	 *
+	 * @var object
+	 */
+	public $connection = null;
+
+	/**
+	 * Object constructor. Instantiates the `Memcached` object, adds appropriate servers to the
+	 * pool, and configures any optional settings passed (see the `_init()` method). When adding
+	 * servers, the following formats are valid for the `'host'` key:
+	 *
+	 * - `'127.0.0.1'`: Configure the adapter to connect to one Memcache server on the default port.
+	 * - `'127.0.0.1:11222'`: Configure the adapter to connect to one Memcache server on a custom
+	 *   port.
+	 * - `array('167.221.1.5:11222' => 200, '167.221.1.6')`: Connect to one server on a
+	 *   custom port with a high selection weight, and a second server on the default port with the
+	 *   default selection weight.
 	 *
 	 * @see lithium\storage\Cache::config()
 	 * @param array $config Configuration parameters for this cache adapter.
-	 *        These settings are indexed by name and queryable
-	 *        through `Cache::config('name')`.
+	 *              These settings are indexed by name and queryable through
+	 *              `Cache::config('name')`. The available options are as follows:
+	 *              - `'expiry'` _mixed_: The default expiration time for cache values, if no value
+	 *                is otherwise set. See the `$expiry` parameter of `Memcache::write()`.
+	 *              - `'host'` _mixed_: Specifies one or more Memcache servers to connect to, with
+	 *                optional server selection weights. See above for example values.
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'prefix' => '',
 			'expiry' => '+1 hour',
-			'servers' => array(
-				array('127.0.0.1', 11211, 100)
-			)
+			'host' => '127.0.0.1',
 		);
+		parent::__construct(Set::merge($defaults, $config));
+	}
 
-		if (is_null(static::$connection)) {
-			static::$connection = new \Memcached();
+	/**
+	 * Handles the actual `Memcached` connection and server connection adding for the adapter
+	 * constructor.
+	 *
+	 * @return void
+	 */
+	protected function _init() {
+		$this->connection = $this->connection ?: new Memcached();
+		$servers = array();
+
+		if (isset($this->_config['servers'])) {
+			$this->connection->addServers($this->_config['servers']);
+			return;
 		}
-		$configuration = Set::merge($defaults, $config);
-		parent::__construct($configuration);
+		$this->connection->addServers($this->_formatHostList($this->_config['host']));
+	}
 
-		static::$connection->addServers($this->_config['servers']);
+	/**
+	 * Formats standard `'host:port'` strings into arrays used by `Memcached`.
+	 *
+	 * @param mixed $host A host string in `'host:port'` format, or an array of host strings
+	 *              optionally paired with relative selection weight values.
+	 * @return array Returns an array of `Memcached` server definitions.
+	 */
+	protected function _formatHostList($host) {
+		$fromString = function($host) {
+			if (strpos($host, ':')) {
+				list($host, $port) = explode(':', $host);
+				return array($host, intval($port));
+			}
+			return array($host, Memcache::CONN_DEFAULT_PORT);
+		};
+
+		if (is_string($host)) {
+			return array($fromString($host));
+		}
+		$servers = array();
+
+		while (list($server, $weight) = each($this->_config['host'])) {
+			if (is_string($weight)) {
+				$servers[] = $fromString($weight);
+				continue;
+			}
+			$server = $fromString($server);
+			$server[] = $weight;
+			$servers[] = $server;
+		}
+		return $servers;
 	}
 
 	/**
@@ -91,16 +147,17 @@ class Memcache extends \lithium\core\Object {
 	 *
 	 * @param string|array $key The key to uniquely identify the cached item.
 	 * @param mixed $value The value to be cached.
-	 * @param null|string $expiry A strtotime() compatible cache time. If no expiry time is set,
-	 *        then the default cache expiration time set with the cache configuration will be used.
-	 * @return boolean True on successful write, false otherwise.
+	 * @param mixed $expiry A Unix timestamp or `strtotime()`-compatible string indicating when
+	 *              `$value` should expire. If no expiry time is set, then the default cache
+	 *              expiration time set with the cache configuration will be used.
+	 * @return boolean Returns `true` on a successful write, `false` otherwise.
 	 */
 	public function write($key, $value, $expiry = null) {
-		$connection =& static::$connection;
+		$connection =& $this->connection;
 		$expiry = ($expiry) ?: $this->_config['expiry'];
 
 		return function($self, $params) use (&$connection, $expiry) {
-			$expires = strtotime($expiry);
+			$expires = is_int($expiry) ? $expiry : strtotime($expiry);
 			$key = $params['key'];
 
 			if (is_array($key)) {
@@ -119,10 +176,9 @@ class Memcache extends \lithium\core\Object {
 	 *
 	 * @param string|array $key The key to uniquely identify the cached item.
 	 * @return mixed Cached value if successful, false otherwise.
-	 * @todo Refactor to use RES_NOTFOUND for return value checks.
 	 */
 	public function read($key) {
-		$connection =& static::$connection;
+		$connection =& $this->connection;
 
 		return function($self, $params) use (&$connection) {
 			$key = $params['key'];
@@ -130,7 +186,12 @@ class Memcache extends \lithium\core\Object {
 			if (is_array($key)) {
 				return $connection->getMulti($key);
 			}
-			return $connection->get($key);
+			if (($result = $connection->get($key)) === false) {
+				if ($connection->getResultCode() === Memcached::RES_NOTFOUND) {
+					$result = null;
+				}
+			}
+			return $result;
 		};
 	}
 
@@ -141,7 +202,7 @@ class Memcache extends \lithium\core\Object {
 	 * @return mixed True on successful delete, false otherwise.
 	 */
 	public function delete($key) {
-		$connection =& static::$connection;
+		$connection =& $this->connection;
 
 		return function($self, $params) use (&$connection) {
 			return $connection->delete($params['key']);
@@ -161,7 +222,7 @@ class Memcache extends \lithium\core\Object {
 	 * @return mixed Item's new value on successful decrement, false otherwise
 	 */
 	public function decrement($key, $offset = 1) {
-		$connection =& static::$connection;
+		$connection =& $this->connection;
 
 		return function($self, $params) use (&$connection, $offset) {
 			return $connection->decrement($params['key'], $offset);
@@ -180,7 +241,7 @@ class Memcache extends \lithium\core\Object {
 	 * @return mixed Item's new value on successful increment, false otherwise
 	 */
 	public function increment($key, $offset = 1) {
-		$connection =& static::$connection;
+		$connection =& $this->connection;
 
 		return function($self, $params) use (&$connection, $offset) {
 			return $connection->increment($params['key'], $offset);
@@ -190,16 +251,16 @@ class Memcache extends \lithium\core\Object {
 	/**
 	 * Clears user-space cache.
 	 *
-	 * @return mixed True on successful clear, false otherwise.
+	 * @return mixed Returns `true` on successful clear, `false` otherwise.
 	 */
 	public function clear() {
-		return static::$connection->flush();
+		return $this->connection->flush();
 	}
 
 	/**
-	 * Determines if the Memcached extension has been installed.
+	 * Determines if the `Memcached` extension has been installed.
 	 *
-	 * @return boolean Returns `true` if the Memcached extension is installed and enabled, `false`
+	 * @return boolean Returns `true` if the `Memcached` extension is installed and enabled, `false`
 	 *         otherwise.
 	 */
 	public static function enabled() {
