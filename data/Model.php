@@ -439,6 +439,10 @@ class Model extends \lithium\core\StaticObject {
 			$type = 'first';
 		}
 
+		if (isset($self->_finders[$type]) && is_array($self->_finders[$type])) {
+			$options = Set::merge($self->_finders[$type], $options);
+		}
+
 		$options = (array) $options + (array) $self->_query;
 		$meta = array('meta' => $self->_meta, 'name' => get_called_class());
 		$params = compact('type', 'options');

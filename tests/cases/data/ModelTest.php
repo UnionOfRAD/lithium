@@ -273,6 +273,23 @@ class ModelTest extends \lithium\test\Unit {
 		$finder = function() {};
 		MockPost::finder('custom', $finder);
 		$this->assertIdentical($finder, MockPost::finder('custom'));
+
+		$finder = array(
+			'fields' => array('id', 'email'),
+			'conditions' => array('id' => 2)
+		);
+		MockPost::finder('arrayTest', $finder);
+		$result = MockPost::find('arrayTest');
+		$expected = $finder + array(
+			'order' => null,
+			'limit' => null,
+			'page' => null,
+			'page' => null,
+			'with' => array(),
+			'type' => 'read',
+			'model' => 'lithium\tests\mocks\data\MockPost'
+		);
+		$this->assertEqual($expected, $result['options']);
 	}
 
 	public function testCustomFindMethods() {
