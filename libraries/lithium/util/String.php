@@ -98,7 +98,7 @@ class String {
 		$format = $options['format'];
 		reset($data);
 
-		if ($format == 'regex' || (empty($format) && !empty($options['escape']))) {
+		if ($format == 'regex' || (!$format && $options['escape'])) {
 			$format = sprintf(
 				'/(?<!%s)%s%%s%s/',
 				preg_quote($options['escape'], '/'),
@@ -107,7 +107,7 @@ class String {
 			);
 		}
 
-		if (empty($format) && key($data) !== 0) {
+		if (!$format && key($data) !== 0) {
 			$replace = array();
 
 			foreach ($data as $key => $value) {
@@ -230,8 +230,8 @@ class String {
 	}
 
 	/**
-	 * Tokenizes a string using `$options['separator']`, ignoring any instance of
-	 * `$options['separator']` that appears between `$options['leftBound']` and
+	 * Tokenizes a string using `$options['separator']`, ignoring any instances of
+	 * `$options['separator']` that appear between `$options['leftBound']` and
 	 * `$options['rightBound']`.
 	 *
 	 * @param string $data The data to tokenize.
@@ -245,7 +245,7 @@ class String {
 		$defaults = array('separator' => ',', 'leftBound' => '(', 'rightBound' => ')');
 		extract($options + $defaults);
 
-		if (empty($data) || is_array($data)) {
+		if (!$data || is_array($data)) {
 			return $data;
 		}
 
@@ -263,48 +263,49 @@ class String {
 				strpos($data, $leftBound, $offset),
 				strpos($data, $rightBound, $offset)
 			);
+
 			for ($i = 0; $i < 3; $i++) {
 				if ($offsets[$i] !== false && ($offsets[$i] < $tmpOffset || $tmpOffset == -1)) {
 					$tmpOffset = $offsets[$i];
 				}
 			}
-			if ($tmpOffset !== -1) {
-				$buffer .= substr($data, $offset, ($tmpOffset - $offset));
-				if ($data{$tmpOffset} == $separator && $depth == 0) {
-					$results[] = $buffer;
-					$buffer = '';
-				} else {
-					$buffer .= $data{$tmpOffset};
-				}
-				if ($leftBound != $rightBound) {
-					if ($data{$tmpOffset} == $leftBound) {
-						$depth++;
-					}
-					if ($data{$tmpOffset} == $rightBound) {
-						$depth--;
-					}
-				} else {
-					if ($data{$tmpOffset} == $leftBound) {
-						if (!$open) {
-							$depth++;
-							$open = true;
-						} else {
-							$depth--;
-							$open = false;
-						}
-					}
-				}
-				$offset = ++$tmpOffset;
-			} else {
+
+			if ($tmpOffset === -1) {
 				$results[] = $buffer . substr($data, $offset);
 				$offset = $length + 1;
+				continue;
 			}
+			$buffer .= substr($data, $offset, ($tmpOffset - $offset));
+
+			if ($data{$tmpOffset} == $separator && $depth == 0) {
+				$results[] = $buffer;
+				$buffer = '';
+			} else {
+				$buffer .= $data{$tmpOffset};
+			}
+
+			if ($leftBound != $rightBound) {
+				if ($data{$tmpOffset} == $leftBound) {
+					$depth++;
+				}
+				if ($data{$tmpOffset} == $rightBound) {
+					$depth--;
+				}
+				$offset = ++$tmpOffset;
+				continue;
+			}
+
+			if ($data{$tmpOffset} == $leftBound) {
+				($open) ? $depth-- : $depth++;
+				$open = !$open;
+			}
+			$offset = ++$tmpOffset;
 		}
 
-		if (empty($results) && !empty($buffer)) {
+		if (!$results && $buffer) {
 			$results[] = $buffer;
 		}
-		return empty($results) ? array() : array_map('trim', $results);
+		return $results ? array_map('trim', $results) : array();
 	}
 }
 
