@@ -182,7 +182,7 @@ class Validator extends \lithium\core\StaticObject {
 				'visa'     => '/^4\\d{12}(\\d{3})?$/',
 				'voyager'  => '/^8699[0-9]{11}$/',
 				'fast'     => '/^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6011[0-9]{12}|3' .
-				              '(?:0[0-5]|[68][0-9])[0-9]{11}|3[47][0-9]{13})$/',
+				              '(?:0[0-5]|[68][0-9])[0-9]{11}|3[47][0-9]{13})$/'
 			),
 			'date'         => array(
 				'dmy'      => '%^(?:(?:31(\\/|-|\\.|\\x20)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)' .
@@ -230,7 +230,7 @@ class Validator extends \lithium\core\StaticObject {
 				'right'    => '/^(?!0,?\d)(?:\d{1,3}(?:([, .])\d{3})?(?:\1\d{3})*|(?:\d+))' .
 				              '((?!\1)[,.]\d{2})?(?<!\x{00a2})\p{Sc}?$/u',
 				'left'     => '/^(?!\x{00a2})\p{Sc}?(?!0,?\d)(?:\d{1,3}(?:([, .])\d{3})?' .
-				              '(?:\1\d{3})*|(?:\d+))((?!\1)[,.]\d{2})?$/u',
+				              '(?:\1\d{3})*|(?:\d+))((?!\1)[,.]\d{2})?$/u'
 			),
 			'notEmpty'     => '/[^\s]+/m',
 			'phone'        => '/^\+?[0-9\(\)\-]{10,20}$/',
@@ -430,7 +430,7 @@ class Validator extends \lithium\core\StaticObject {
 			'required' => true,
 			'skipEmpty' => false,
 			'format' => 'any',
-			'on' => null,
+			'on' => null
 		);
 		$errors = array();
 		$events = (array) (isset($options['events']) ? $options['events'] : null);
@@ -604,21 +604,19 @@ class Validator extends \lithium\core\StaticObject {
 			$options += $defaults;
 
 			$formats = (array) $format;
-			$success = false;
 
-			if (in_array($format, array(null, 'all', 'any'))) {
-				$formats = array_keys($rules);
-				$options['all'] = ($format == 'all');
-			}
+			$ruleIndexes = array_keys($rules);
+			$options['all'] = ($format == 'all');
 
-			foreach ($formats as $name) {
-				if (!isset($rules[$name])) {
+			foreach ($ruleIndexes as $index) {
+				if (!isset($rules[$index])) {
 					continue;
 				}
-				$check = $rules[$name];
+				$check = $rules[$index];
+				$format = isset($formats[$index]) ? $formats[$index] : null;
 
 				$regexPassed = (is_string($check) && preg_match($check, $value));
-				$closurePassed = (is_object($check) && $check($value, $name, $options));
+				$closurePassed = (is_object($check) && $check($value, $format, $options));
 
 				if (!$options['all'] && ($regexPassed || $closurePassed)) {
 					return true;

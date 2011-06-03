@@ -27,7 +27,6 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isPhone('800-999-5555'));
 
 		$this->assertTrue(Validator::isUrl('http://google.com'));
-		$this->assertTrue(Validator::isUrl('google.com', 'loose'));
 	}
 
 	public function testFieldOption() {
@@ -108,6 +107,25 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isUuid('1c0a5832-6025-11de-8a39-0800200c9a66'));
 		$this->assertFalse(Validator::isUuid('zc0a5832-6025-11de-8a39-0800200c9a66'));
 		$this->assertFalse(Validator::isUuid('1-1c0a5832-6025-11de-8a39-0800200c9a66'));
+	}
+
+	public function testCustomWithFormat() {
+		$rFormat = null;
+		$function = function(&$value, $format = null, array $options = array()) use (&$rFormat) {
+			$rFormat = $format;
+			if ($format == 'string') {
+				return true;
+			}
+		};
+		Validator::add('test', $function);
+		$validations = array(
+			'inputName' => array( array( 'test', 'message' => 'foobar', 'format' => 'string' ) )
+		);
+		$values = array(
+			'inputName' => 'blah'
+		);
+		$this->assertFalse((bool) Validator::check($values, $validations));
+		$this->assertEqual($rFormat, 'string');
 	}
 
 	/**
