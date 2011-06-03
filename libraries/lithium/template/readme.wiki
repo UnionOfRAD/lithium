@@ -54,7 +54,7 @@ echo $this->html->link('Google', 'http://www.google.com');
 In a template, `$this` refers to the `Renderer` object. By using `$this->html`
 for the first time, the renderer will create an instance of the helper and store
 it so that the next time the helper is invoked the renderer will not have to
-re-instanciate the helper.
+re-instantiate the helper.
 
 Using such an approach, helpers can easily be loaded as needed without any
 performance impact.
@@ -125,16 +125,25 @@ template. For more information on the load order of classes, see
 Elements are reusable view snippets that you can use in several views and layouts.
 You can reference it like so: 
 {{{
+echo $this->_render('element', 'menu');
+}}} 
+
+Where `menu` is the name of your element file, in this example `app/views/elements/menu.html.php`.  When using `$this->_render()`, all of the variables set in the controller are available to the element template.  You can pass variables declared in the view or additional static content using the third parameter to `$this->_render()`:
+{{{
+$var1 = 'something';
+echo $this->_render('element', 'menu', array(
+	'var1' => $var1,
+	'var2' => 'something else'
+));
+}}}
+
+If you need the element template to not have access to existing data passed to the parent template, use the alternate syntax that calls the `View` render method directly:
+{{{
 echo $this->view()->render(
 	array('element' => 'menu'), 
 	array('var1' => $var1, 'var2' => $var2)
 );
-}}} 
-
-Where `menu` is the name of your element file, in this example `app/views/elements/menu.html.php`
-and `var1` and `var2` are variables either declared in the view or set in the controller (as
-per the normal way of passing variables to views with `return` or `$this->set`) that you want the
-element to be able to access. For short syntax you can use `compact('var1','var2')`.
+}}}
 
 **More info**
 
