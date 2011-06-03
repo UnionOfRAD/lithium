@@ -2,15 +2,14 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2010, Union of RAD (http://union-of-rad.org)
- *                Copyright 2009, Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @license       http://opensource.org/licenses/mit-license.php The MIT License
+ * @copyright     Copyright 2011, Union of RAD (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
 namespace lithium\security;
 
-use \lithium\security\Crypto;
-use \lithium\storage\Session;
+use lithium\security\Crypto;
+use lithium\storage\Session;
 
 /**
  * Password utility class that makes use of PHP's `crypt()` function. Includes a
@@ -18,6 +17,7 @@ use \lithium\storage\Session;
  * passwords.
  */
 class Nonce {
+
 	protected static $_salt;
 
 	/**
@@ -27,7 +27,7 @@ class Nonce {
 	 * @param mixed $id Optional. The integer id or string key that identifies the
 	 *              data to which the action is applied.
 	 * @return void
-	 **/
+	 */
 	public static function create($action, $id = null) {
 		$salt = static::$_salt ?: static::_salt();
 		return hash_hmac('sha256', "$action$id", $salt);

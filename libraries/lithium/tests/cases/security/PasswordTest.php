@@ -2,20 +2,19 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2010, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2011, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
 namespace lithium\tests\cases\security;
 
-use \lithium\security\Password;
+use lithium\security\Password;
 
 class PasswordTest extends \lithium\test\Unit {
+
 	/**
 	 * testPassword method
-	 *
-	 * @return void
-	 **/
+	 */
 	public function testPassword() {
 		$pass = 'Lithium rocks!';
 
@@ -52,15 +51,15 @@ class PasswordTest extends \lithium\test\Unit {
 			}
 		}
 	}
-	
+
 	/**
 	 * testPasswordMaxLength method
 	 *
 	 * @return void
-	 **/
+	 */
 	public function testPasswordMaxLength() {
 		foreach (array('bf' => 72) as $method => $length) {
-			$salt = Password::genSalt($method);
+			$salt = Password::salt($method);
 			$pass = str_repeat('a', $length);
 			$this->assertIdentical(Password::hash($pass, $salt), Password::hash($pass . 'a', $salt));
 		}

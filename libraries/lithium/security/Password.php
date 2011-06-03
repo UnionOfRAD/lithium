@@ -2,14 +2,13 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2010, Union of RAD (http://union-of-rad.org)
- *                Copyright 2009, Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @license       http://opensource.org/licenses/mit-license.php The MIT License
+ * @copyright     Copyright 2011, Union of RAD (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
 namespace lithium\security;
 
-use \lithium\security\Crypto;
+use lithium\security\Crypto;
 
 /**
  * Password utility class that makes use of PHP's `crypt()` function. Includes a

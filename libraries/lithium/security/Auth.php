@@ -51,7 +51,7 @@ class Auth extends \lithium\core\Adaptable {
 	 * @var array Associative array of class names & their namespaces.
 	 */
 	protected static $_classes = array(
-		'session' => '\lithium\storage\Session'
+		'session' => 'lithium\storage\Session'
 	);
 
 	/**
