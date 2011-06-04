@@ -10,7 +10,7 @@ namespace lithium\security\validation;
 
 use UnexpectedValueException;
 use lithium\security\Password;
-use lithium\security\Crypto;
+use lithium\util\String;
 use lithium\util\Set;
 
 /**
@@ -86,15 +86,15 @@ class RequestToken {
 	 * Generates (or regenerates) a cryptographically-secure token to be used for the life of the
 	 * client session, and stores the token using the `Session` class.
 	 *
-	 * @see lithium\security\Crypto::hash()
+	 * @see lithium\util\String::hash()
 	 * @param array $options An array of options to be used when generating or storing the token:
 	 *              - `'regenerate'` _boolean_: If `true`, will force the regeneration of a the
 	 *                token, even if one is already available in the session. Defaults to `false`.
 	 *              - `'sessionKey'` _string_: The key used for session storage and retrieval.
 	 *                Defaults to `'security.token'`.
 	 *              - `'salt'` _string_: If the token is being generated (or regenerated), sets a
-	 *                custom salt value to be used by `Crypto::hash()`.
-	 *              - `'type'` _string_: The hashing algorithm used by `Crypto::hash()` when
+	 *                custom salt value to be used by `String::hash()`.
+	 *              - `'type'` _string_: The hashing algorithm used by `String::hash()` when
 	 *                generating the token. Defaults to `'sha512'`.
 	 * @return string Returns a cryptographically-secure client session token.
 	 */
@@ -109,7 +109,7 @@ class RequestToken {
 		$session = static::$_classes['session'];
 
 		if ($options['regenerate'] || !($token = $session::read($options['sessionKey']))) {
-			$token = Crypto::hash(uniqid(microtime(true)), $options);
+			$token = String::hash(uniqid(microtime(true)), $options);
 			$session::write($options['sessionKey'], $token);
 		}
 		return $token;

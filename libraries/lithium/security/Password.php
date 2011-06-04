@@ -8,7 +8,7 @@
 
 namespace lithium\security;
 
-use lithium\security\Crypto;
+use lithium\util\String;
 
 /**
  * `Password` utility class that makes use of PHP's `crypt()` function. Includes a
@@ -133,7 +133,7 @@ class Password {
 	 * the resulting salts are prefixed with information expected by PHP's
 	 * `crypt()`. To get an arbitrarily long, cryptographically strong salt
 	 * consisting in random sequences of alpha numeric characters, use
-	 * `lithium\security\Crypto::random()` instead.
+	 * `lithium\util\String::random()` instead.
 	 *
 	 * @param string $type The hash type. Optional. Defaults to the best
 	 *        available option. Supported values, along with their maximum
@@ -150,7 +150,7 @@ class Password {
 	 * @link http://www.postgresql.org/docs/9.0/static/pgcrypto.html
 	 * @see lithium\security\Password::hash()
 	 * @see lithium\security\Password::check()
-	 * @see lithium\security\Crypto::random()
+	 * @see lithium\util\String::random()
 	 */
 	public static function salt($type = null, $count = null) {
 		switch (true) {
@@ -165,7 +165,7 @@ class Password {
 
 	/**
 	 * Generates a Blowfish salt for use in `lithium\security\Password::hash()`. _Note_: Does not
-	 * use the `'encode'` option of `Crypto::random()` because it could result in 2 bits less of
+	 * use the `'encode'` option of `String::random()` because it could result in 2 bits less of
 	 * entropy depending on the last character.
 	 *
 	 * @param integer $count The base-2 logarithm of the iteration count.
@@ -179,7 +179,7 @@ class Password {
 		$base64 = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		$i = 0;
 
-		$input = Crypto::random(16);
+		$input = String::random(16);
 		$output = '';
 
 		do {
@@ -222,7 +222,7 @@ class Password {
 
 		$output = '_' . $base64[$count & 0x3f] . $base64[($count >> 6) & 0x3f];
 		$output .= $base64[($count >> 12) & 0x3f] . $base64[($count >> 18) & 0x3f];
-		$output .= Crypto::random(3, array('encode' => Crypto::ENCODE_BASE_64));
+		$output .= String::random(3, array('encode' => String::ENCODE_BASE_64));
 
 		return $output;
 	}
@@ -233,7 +233,7 @@ class Password {
 	 * @return string The MD5 salt.
 	 */
 	protected static function _genSaltMD5() {
-		return '$1$' . Crypto::random(6, array('encode' => Crypto::ENCODE_BASE_64));
+		return '$1$' . String::random(6, array('encode' => String::ENCODE_BASE_64));
 	}
 }
 
