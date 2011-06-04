@@ -42,8 +42,6 @@ class Security extends \lithium\template\Helper {
 	public function requestToken(array $options = array()) {
 		$defaults = array('name' => 'security.token', 'id' => false);
 		$options += $defaults;
-
-		$password = $this->_classes['password'];
 		$requestToken = $this->_classes['requestToken'];
 
 		$flags = array_intersect_key($this->_config, array('sessionKey' => '', 'salt' => ''));

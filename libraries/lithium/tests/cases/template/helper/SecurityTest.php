@@ -17,7 +17,7 @@ class SecurityTest extends \lithium\test\Unit {
 
 	public $context;
 
-	public static function get($token) {
+	public static function key($token) {
 		return 'WORKING';
 	}
 
