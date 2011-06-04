@@ -45,7 +45,6 @@ class RequestTokenTest extends \lithium\test\Unit {
 		$this->assertEqual($new, RequestToken::config());
 	}
 
-
 	/**
 	 * Tests proper generation of secure tokens.
 	 */
@@ -77,7 +76,9 @@ class RequestTokenTest extends \lithium\test\Unit {
 		}
 	}
 
-	
+	/**
+	 * Tests extracting a key from a `Request` object and matching it against a token.
+	 */
 	public function testTokenFromRequestObject() {
 		$request = new Request(array('data' => array(
 			'security' => array('token' => RequestToken::key())
