@@ -18,7 +18,7 @@
 		if ($coverage['percentage'] == 100) {
 			continue;
 		}
-		echo "\n{:heading3}Coverage analysis{:end}\n";
+		echo "\n{:heading}Coverage analysis{:end}\n";
 
 		foreach ($coverage['output'] as $file => $lines) {
 			echo "\n{$file}:\n";
