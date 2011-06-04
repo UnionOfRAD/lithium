@@ -8,6 +8,7 @@
 
 namespace lithium\util;
 
+use COM;
 use Closure;
 use Exception;
 
@@ -127,7 +128,7 @@ class String {
 				return static::$_source = function($bytes) use (&$fp) {
 					return fread($fp, $bytes);
 				};
-			case class_exists('COM', 0):
+			case class_exists('COM', false):
 				try {
 					$com = new COM('CAPICOM.Utilities.1');
 					return static::$_source = function($bytes) use ($com) {
