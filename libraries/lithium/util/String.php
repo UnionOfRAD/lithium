@@ -10,7 +10,6 @@ namespace lithium\util;
 
 use Closure;
 use Exception;
-use lithium\security\Crypto;
 
 /**
  * String manipulation utility class. Includes functionality for generating UUIDs,
@@ -59,11 +58,13 @@ class String {
 	}
 
 	/**
+	 * This method is deprecated, and has been replaced by `lithium\security\Crypto::hash()`.
+	 *
 	 * @deprecated
 	 * @see lithium\security\Crypto::hash()
 	 */
 	public static function hash($string, array $options = array()) {
-		return Crypto::hash($string, $options);
+		throw new Exception('This method has been moved to the security\Crypto class.');
 	}
 
 	/**
