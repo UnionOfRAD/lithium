@@ -36,7 +36,7 @@ class PasswordTest extends \lithium\test\Unit {
 			$hashPattern = ${$method . 'Hash'};
 
 			for ($i = 0; $i < $count; $i++) {
-				$salt = Password::genSalt($method, $log2);
+				$salt = Password::salt($method, $log2);
 				$this->assertPattern($saltPattern, $salt);
 				$this->assertFalse(in_array($salt, $salts));
 				$salts[] = $salt;
@@ -54,8 +54,6 @@ class PasswordTest extends \lithium\test\Unit {
 
 	/**
 	 * testPasswordMaxLength method
-	 *
-	 * @return void
 	 */
 	public function testPasswordMaxLength() {
 		foreach (array('bf' => 72) as $method => $length) {

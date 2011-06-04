@@ -19,6 +19,11 @@ use Exception;
 class Crypto {
 
 	/**
+	 * Option flag used in `Crypto::random()`.
+	 */
+	const ENCODE_BASE_64 = 1;
+
+	/**
 	 * A closure which, given a number of bytes, returns that amount of
 	 * random bytes.
 	 *
@@ -31,76 +36,69 @@ class Crypto {
 	 * (when available) a cryptographically strong random number generator.
 	 *
 	 * {{{
-	 * $bits = String::random(8); // 64 bits
+	 * $bits = Crypto::random(8); // 64 bits
 	 * $hex = bin2hex($bits); // [0-9a-f]+
 	 * }}}
 	 *
-	 * @param integer $bytes The number of random bytes to generate
-	 * @return string Random bytes
-	 */
-	public static function random($bytes) {
-		$source = static::$_source ?: static::_source();
-		return $source($bytes);
-	}
-
-	/**
-	 * Generates random bytes encoded into an `./0-9A-Za-z` alphabet, for use
-	 * as salt when hashing passwords for instance.
+	 * Optionally base64-encodes the resulting random string per the following:
 	 *
-	 * Note: this is not the same as `base64_encode()`, which encodes bytes
-	 * using an `A-Za-z0-9+/` alphabet.
+	 *  _The alphabet used by `base64_encode()` is different than the one we should be using. When
+	 * considering the meaty part of the resulting string, however, a bijection allows to go the
+	 * from one to another. Given that we're working on random bytes, we can use safely use
+	 * `base64_encode()` without losing any entropy._
 	 *
 	 * @param integer $bytes The number of random bytes to generate.
-	 * @return string The random bytes encoded in the `./0-9A-Za-z` alphabet.
-	 * @see lithium\security\Crypto::random()
+	 * @param array $options The options used when generating random bytes:
+	 *              - `'encode'` _integer_: If specified, and set to `Crypto::ENCODE_BASE_64`, the
+	 *                resulting value will be base64-encoded, per the notes above.
+	 * @return string Returns a string of random bytes.
 	 */
-	public static function random64($bytes) {
-		// The alphabet used by base64_encode() is different than the one we
-		// should be using. When considering the meaty part of the resulting
-		// string, however, a bijection allows to go the from one to another.
-		// Given that we're working on random bytes, we can use safely use
-		// base64_encode() without losing any entropy, sparing ourselves the
-		// hassle of maintaining more code than needed.
-		$encoded = base64_encode(static::random($bytes));
-		return strtr(rtrim($encoded, '='), '+', '.');
+	public static function random($bytes, array $options = array()) {
+		$defaults = array('encode' => null);
+		$options += $defaults;
+
+		$source = static::$_source ?: static::_source();
+		$result = $source($bytes);
+
+		if ($options['encode'] != static::ENCODE_BASE_64) {
+			return $result;
+		}
+		return strtr(rtrim(base64_encode($result), '='), '+', '.');
 	}
 
 	/**
-	 * Initializes Crypto::$_source using the best available random
-	 * number generator.
+	 * Initializes `Crypto::$_source` using the best available random number generator.
 	 *
-	 * When available, /dev/urandom and COM gets used on *unix and
-	 * Windows systems, respectively.
+	 * When available, `/dev/urandom` and COM gets used on *nix and
+	 * [Windows systems](http://msdn.microsoft.com/en-us/library/aa388182%28VS.85%29.aspx?ppud=4),
+	 * respectively.
 	 *
 	 * If all else fails, a Mersenne Twister gets used. (Strictly
 	 * speaking, this fallback is inadequate, but good enough.)
 	 *
-	 * @return Closure The random number generator.
+	 * @see lithium\security\Crypto::$_source
+	 * @return closure Returns a closure containing a random number generator.
 	 */
 	protected static function _source() {
 		switch (true) {
-			case isset(static::$_source);
+			case isset(static::$_source):
 				return static::$_source;
-
 			case is_readable('/dev/urandom') && $fp = fopen('/dev/urandom', 'rb'):
 				return static::$_source = function($bytes) use (&$fp) {
 					return fread($fp, $bytes);
 				};
-
 			case class_exists('COM', 0):
-				// http://msdn.microsoft.com/en-us/library/aa388182(VS.85).aspx
 				try {
 					$com = new COM('CAPICOM.Utilities.1');
 					return static::$_source = function($bytes) use ($com) {
-						return base64_decode($com->GetRandom($bytes,0));
+						return base64_decode($com->GetRandom($bytes, 0));
 					};
 				} catch (Exception $e) {
 				}
-
 			default:
-				// fallback to using mt_rand() if all else fails
 				return static::$_source = function($bytes) {
 					$rand = '';
+
 					for ($i = 0; $i < $bytes; $i++) {
 						$rand .= chr(mt_rand(0, 255));
 					}
@@ -140,7 +138,6 @@ class Crypto {
 		if ($options['salt']) {
 			$string = $options['salt'] . $string;
 		}
-
 		if ($options['key']) {
 			return hash_hmac($options['type'], $string, $options['key'], $options['raw']);
 		}

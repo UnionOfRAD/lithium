@@ -11,25 +11,26 @@ namespace lithium\security;
 use lithium\security\Crypto;
 
 /**
- * Password utility class that makes use of PHP's `crypt()` function. Includes a
+ * `Password` utility class that makes use of PHP's `crypt()` function. Includes a
  * cryptographically strong salt generator, and utility functions to hash and check
  * passwords.
  */
 class Password {
+
 	/**
-	 * The default log2 number of iterations for Blowfish encryption
+	 * The default log2 number of iterations for Blowfish encryption.
 	 */
 	const BF = 10;
 
 	/**
-	 * The default log2 number of iterations for XDES encryption
+	 * The default log2 number of iterations for XDES encryption.
 	 */
 	const XDES = 18;
 
 	/**
 	 * Hashes a password using PHP's `crypt()` and an optional salt. If no
 	 * salt is supplied, a cryptographically strong salt will be generated
-	 * using `lithium\security\Password::genSalt()`.
+	 * using `lithium\security\Password::salt()`.
 	 *
 	 * Using this function is the proper way to hash a password. Using naive
 	 * methods such as sha1 or md5, as is done in many web applications, is
@@ -55,13 +56,13 @@ class Password {
 	 * $check   = Password::check($password, $hashed);
 	 *
 	 * // Use a stronger custom salt:
-	 * $salt    = Password::genSalt('bf', 16); // 2^16 iterations
+	 * $salt    = Password::salt('bf', 16); // 2^16 iterations
 	 * $hashed  = Password::hash($password, $salt); // Very slow
 	 * $check   = Password::check($password, $hashed); // Very slow
 	 *
 	 * // Forward/backward compatibility
-	 * $salt1   = Password::genSalt('bf', 6);
-	 * $salt2   = Password::genSalt('bf', 12);
+	 * $salt1   = Password::salt('bf', 6);
+	 * $salt2   = Password::salt('bf', 12);
 	 * $hashed1 = Password::hash($password, $salt1); // Fast
 	 * $hashed2 = Password::hash($password, $salt2); // Slow
 	 * $check1  = Password::check($password, $hashed1); // True
@@ -76,23 +77,34 @@ class Password {
 	 *        - 20 chars long for XDES hashes
 	 *        - 34 chars long for MD5 hashes
 	 * @see lithium\security\Password::check()
-	 * @see lithium\security\Password::genSalt()
+	 * @see lithium\security\Password::salt()
 	 */
 	public static function hash($password, $salt = null) {
-		return crypt($password, $salt ?: static::genSalt());
+		return crypt($password, $salt ?: static::salt());
 	}
 
 	/**
-	 * Compares a password and its hashed value using PHP's `crypt()`.
+	 * Compares a password and its hashed value using PHP's `crypt()`. Rather than a simple string
+	 * comparison, this method uses a constant-time algorithm to defend against
+	 * [timing attacks](http://codahale.com/a-lesson-in-timing-attacks/).
 	 *
-	 * @param string $password The password to check
-	 * @param string $hash The hashed password to compare it to
-	 * @return boolean Whether the password is correct or not
+	 * @param string $password The password to check.
+	 * @param string $hash The hashed password to compare it to.
+	 * @return boolean Returns a boolean indiciating whether the password is correct.
 	 * @see lithium\security\Password::hash()
-	 * @see lithium\security\Password::genSalt()
+	 * @see lithium\security\Password::salt()
 	 */
 	public static function check($password, $hash) {
-		return $hash == crypt($password, $hash);
+		$password = crypt($password, $hash);
+		$result = true;
+
+		if (($length = strlen($password)) != strlen($hash)) {
+			return false;
+		}
+		for ($i = 0; $i < $length; $i++) {
+			$result = $result && ($password[$i] === $hash[$i]);
+		}
+		return $result;
 	}
 
 	/**
@@ -113,21 +125,21 @@ class Password {
 	 * probably too fast. The defaults generate about 10 hashes per second
 	 * using a dual-core 2.2GHz CPU.
 	 *
-	 * Note1: this salt generator is different from naive salt implementations
+	 *  _Note 1_: this salt generator is different from naive salt implementations
 	 * (e.g. `md5(microtime())`) in that it uses all of the available bits of
 	 * entropy for the supplied salt method.
 	 *
-	 * Note2: this method should not be use to generate custom salts. Indeed,
+	 *  _Note2_: this method should not be use to generate custom salts. Indeed,
 	 * the resulting salts are prefixed with information expected by PHP's
 	 * `crypt()`. To get an arbitrarily long, cryptographically strong salt
-	 * consisting in random bits encoded as alpha numeric characters, use
-	 * `lithium\security\Crypto::random64()` instead.
+	 * consisting in random sequences of alpha numeric characters, use
+	 * `lithium\security\Crypto::random()` instead.
 	 *
 	 * @param string $type The hash type. Optional. Defaults to the best
 	 *        available option. Supported values, along with their maximum
 	 *        password lengths, include:
-	 *        - `'bf'`: Blowfish (128 salt bits, first 72 chars considered)
-	 *        - `'xdes'`: XDES (24 salt bits, unlimited length)
+	 *        - `'bf'`: Blowfish (128 salt bits, max 72 chars)
+	 *        - `'xdes'`: XDES (24 salt bits, max 8 chars)
 	 *        - `'md5'`: MD5 (48 salt bits, unlimited length)
 	 * @param integer $count Optional. The base-2 logarithm of the iteration
 	 *        count, for adaptive algorithms. Defaults to:
@@ -138,12 +150,12 @@ class Password {
 	 * @link http://www.postgresql.org/docs/9.0/static/pgcrypto.html
 	 * @see lithium\security\Password::hash()
 	 * @see lithium\security\Password::check()
-	 * @see lithium\security\Crypto::random64()
+	 * @see lithium\security\Crypto::random()
 	 */
-	public static function genSalt($type = null, $count = null) {
+	public static function salt($type = null, $count = null) {
 		switch (true) {
 			case CRYPT_BLOWFISH == 1 && (!$type || $type === 'bf'):
-				return static::_genSaltBF($count);
+				return static::_genSaltBf($count);
 			case CRYPT_EXT_DES == 1 && (!$type || $type === 'xdes'):
 				return static::_genSaltXDES($count);
 			default:
@@ -152,23 +164,22 @@ class Password {
 	}
 
 	/**
-	 * Generates a Blowfish salt for use in `lithium\security\Password::hash()`.
+	 * Generates a Blowfish salt for use in `lithium\security\Password::hash()`. _Note_: Does not
+	 * use the `'encode'` option of `Crypto::random()` because it could result in 2 bits less of
+	 * entropy depending on the last character.
 	 *
 	 * @param integer $count The base-2 logarithm of the iteration count.
 	 *        Defaults to `10`. Can be `4` to `31`.
-	 * @return string The Blowfish salt
+	 * @return string The Blowfish salt.
 	 */
-	protected static function _genSaltBf($count = null) {
+	protected static function _genSaltBf($count = 10) {
 		$count = (integer) $count;
-		if ($count < 4 || $count > 31)
-			$count = static::BF;
+		$count = ($count < 4 || $count > 31) ? 10 : $count;
 
-		// We don't use the random64() method here because it can result
-		// in 2 bits less of entropy depending on the last char.
 		$base64 = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		$i = 0;
 
-		$input = Crypto::random(16); // 128 bits of salt
+		$input = Crypto::random(16);
 		$output = '';
 
 		do {
@@ -191,40 +202,27 @@ class Password {
 			$output .= $base64[$c2 & 0x3f];
 		} while (1);
 
-		return '$2a$'
-			// iterations, zeroized
-			. chr(ord('0') + $count / 10) . chr(ord('0') + $count % 10)
-			// 128 bits of salt, encoded
-			. '$' . $output;
+		return '$2a$' . chr(ord('0') + $count / 10) . chr(ord('0') + $count % 10) . '$' . $output;
 	}
 
 	/**
 	 * Generates an Extended DES salt for use in `lithium\security\Password::hash()`.
 	 *
-	 * @param integer $count The base-2 logarithm of the iteration count.
-	 *        Defaults to `18`. Can be `1` to `24`. 1 will be stripped
-	 *        from the non-log value, e.g. 2^18 - 1, to ensure we don't
-	 *        use a weak DES key.
+	 * @param integer $count The base-2 logarithm of the iteration count. Defaults to `18`. Can be
+	 *                `1` to `24`. 1 will be stripped from the non-log value, e.g. 2^18 - 1, to
+	 *                ensure we don't use a weak DES key.
 	 * @return string The XDES salt.
 	 */
-	protected static function _genSaltXDES($count = null) {
+	protected static function _genSaltXDES($count = 18) {
 		$count = (integer) $count;
-		if ($count < 1 || $count > 24)
-			$count = static::XDES;
+		$count = ($count < 1 || $count > 24) ? 16 : $count;
 
-		// Count should be odd to not reveal weak DES keys
 		$count = (1 << $count) - 1;
-
 		$base64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
-		$output = '_'
-			// iterations, encoded
-			. $base64[$count & 0x3f]
-			. $base64[($count >> 6) & 0x3f]
-			. $base64[($count >> 12) & 0x3f]
-			. $base64[($count >> 18) & 0x3f]
-			// 24 bits of salt, encoded
-			. Crypto::random64(3);
+		$output = '_' . $base64[$count & 0x3f] . $base64[($count >> 6) & 0x3f];
+		$output .= $base64[($count >> 12) & 0x3f] . $base64[($count >> 18) & 0x3f];
+		$output .= Crypto::random(3, array('encode' => Crypto::ENCODE_BASE_64));
 
 		return $output;
 	}
@@ -235,10 +233,7 @@ class Password {
 	 * @return string The MD5 salt.
 	 */
 	protected static function _genSaltMD5() {
-		$output = '$1$'
-			// 48 bits of salt, encoded
-			. Crypto::random64(6);
-		return $output;
+		return '$1$' . Crypto::random(6, array('encode' => Crypto::ENCODE_BASE_64));
 	}
 }
 
