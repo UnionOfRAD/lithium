@@ -296,11 +296,15 @@ class Route extends \lithium\core\Object {
 		$template = $this->_template;
 		$trimmed = true;
 
-		if (isset($options['args']) && is_array($options['args'])) {
-			$options['args'] = join('/', $options['args']);
+		if (isset($options['args'])) {
+			if (is_array($options['args'])) {
+				$options['args'] = join('/', array_map('urlencode', $options['args']));
+			} else {
+				$options['args'] = urlencode($options['args']);
+			}
 		}
-
 		$options += array('args' => '');
+
 		foreach (array_reverse($this->_keys, true) as $key) {
 			$value =& $options[$key];
 			$pattern = isset($this->_subPatterns[$key]) ? ":{$this->_subPatterns[$key]}" : '';
@@ -317,8 +321,11 @@ class Route extends \lithium\core\Object {
 				$template = str_replace("/{$rpl}", '', $template);
 				continue;
 			}
+			if ($key !== 'args') {
+				$value = urlencode($value);
+				$trimmed = false;
+			}
 			$template = str_replace($rpl, $value, $template);
-			$trimmed = ($key == 'args') ? $trimmed : false;
 		}
 		return $template;
 	}

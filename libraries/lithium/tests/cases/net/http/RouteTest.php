@@ -13,14 +13,9 @@ use lithium\net\http\Route;
 
 class RouteTest extends \lithium\test\Unit {
 
-	public function setUp() {
-	}
-
 	/**
 	 * Tests the creation of routes for the base URL (i.e. '/'), and that they are matched
 	 * properly given the correct parameters.
-	 *
-	 * @return void
 	 */
 	public function testBaseRouteMatching() {
 		$route = new Route(array(
@@ -41,8 +36,6 @@ class RouteTest extends \lithium\test\Unit {
 	/**
 	 * Tests that a request for the base URL (i.e. '/') returns the proper parameters, as defined
 	 * by the base route.
-	 *
-	 * @return void
 	 */
 	public function testBaseRouteParsing() {
 		$params = array('controller' => 'posts', 'action' => 'archive', 'page' => 1);
@@ -66,8 +59,6 @@ class RouteTest extends \lithium\test\Unit {
 	/**
 	 * Tests that simple routes with only a `{:controller}` parameter are properly matched, and
 	 * anything including extra parameters or an action other than the default action are ignored.
-	 *
-	 * @return void
 	 */
 	public function testSimpleRouteMatching() {
 		$route = new Route(array('template' => '/{:controller}'));
@@ -86,8 +77,6 @@ class RouteTest extends \lithium\test\Unit {
 	/**
 	 * Tests that requests for base-level resource URLs (i.e. `'/posts'`) are properly parsed into
 	 * the correct controller and action parameters.
-	 *
-	 * @return void
 	 */
 	public function testSimpleRouteParsing() {
 		$route = new Route(array('template' => '/{:controller}'));
@@ -265,8 +254,6 @@ class RouteTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that routes can be composed of manual regular expressions.
-	 *
-	 * @return void
 	 */
 	public function testManualRouteDefinition() {
 		$route = new Route(array(
@@ -291,8 +278,6 @@ class RouteTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests exporting a the details of a compiled route to an array.
-	 *
-	 * @return void
 	 */
 	public function testRouteExporting() {
 		$result = new Route(array(
@@ -319,8 +304,6 @@ class RouteTest extends \lithium\test\Unit {
 	/**
 	 * Tests creating a route with a custom pattern that accepts URLs in two formats but only
 	 * generates them in one.
-	 *
-	 * @return void
 	 */
 	public function testRoutingMultipleMatch() {
 		$route = new Route(array(
@@ -350,9 +333,7 @@ class RouteTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests creating a route with a custom regex sub-pattern in a template
-	 *
-	 * @return void
+	 * Tests creating a route with a custom regex sub-pattern in a template.
 	 */
 	public function testCustomSubPattern() {
 		$route = new Route(array('template' => '/{:controller}/{:action}/{:user:\d+}'));
@@ -413,8 +394,6 @@ class RouteTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that route templates with elements containing repetition patterns are correctly parsed.
-	 *
-	 * @return void
 	 */
 	public function testPatternsWithRepetition() {
 		$route = new Route(array('template' => '/{:id:[0-9a-f]{24}}.{:type}'));
@@ -427,8 +406,6 @@ class RouteTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that route handlers are able to modify route parameters.
-	 *
-	 * @return void
 	 */
 	public function testHandlerModification() {
 		$route = new Route(array(
@@ -447,8 +424,6 @@ class RouteTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that requests can be routed based on HTTP method verbs or HTTP headers.
-	 *
-	 * @return void
 	 */
 	public function testHeaderAndMethodBasedRouting() {
 		$parameters = array('controller' => 'users', 'action' => 'edit');
@@ -482,8 +457,6 @@ class RouteTest extends \lithium\test\Unit {
 	/**
 	 * Tests that a successful match against a route with template `'/'` operating at the root of
 	 * a domain never returns an empty string.
-	 *
-	 * @return void
 	 */
 	public function testMatchingEmptyRoute() {
 		$route = new Route(array(
@@ -502,8 +475,6 @@ class RouteTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that routes with optional trailing elements have unnecessary slashes trimmed.
-	 *
-	 * @return void
 	 */
 	public function testTrimmingEmptyPathElements() {
 		$route = new Route(array(
@@ -516,6 +487,28 @@ class RouteTest extends \lithium\test\Unit {
 
 		$url = $route->match(array('controller' => 'posts'));
 		$this->assertEqual("/posts", $url);
+	}
+
+	/**
+	 * Tests that the individual string elements of a URL are properly escaped.
+	 */
+	public function testUrlElementEscaping() {
+		$route = new Route(array(
+			'template' => '/{:controller}/{:id:[0-9]+}/{:args}',
+			'params' => array('action' => 'index', 'id' => null)
+		));
+
+		$result = $route->match(array('controller' => '<script>alert("Injection!")</script>'));
+		$this->assertEqual('/%3Cscript%3Ealert%28%22Injection%21%22%29%3C%2Fscript%3E', $result);
+
+		$result = $route->match(array('controller' => 'foo', 'args' => '<bar>'));
+		$this->assertEqual('/foo/%3Cbar%3E', $result);
+
+		$result = $route->match(array('controller' => 'foo', 'args' => '<bar>'));
+		$this->assertEqual('/foo/%3Cbar%3E', $result);
+
+		$result = $route->match(array('controller' => 'foo', 'args' => array('<bar>', '<foo>')));
+		$this->assertEqual('/foo/%3Cbar%3E/%3Cfoo%3E', $result);
 	}
 }
 
