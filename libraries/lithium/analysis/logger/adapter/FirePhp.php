@@ -112,7 +112,7 @@ class FirePhp extends \lithium\core\Object {
 	/**
 	 * Holds the response object where the headers will be inserted.
 	 */
-	protected $_response = false;
+	protected $_response = null;
 
 	/**
 	 * Contains messages that have been written to the log before the bind() call.
@@ -147,9 +147,8 @@ class FirePhp extends \lithium\core\Object {
 	 */
 	public function write($priority, $message) {
 		$_self =& $this;
-		$_response =& $this->_response;
 
-		return function($self, $params) use (&$_self, $_response) {
+		return function($self, $params) use (&$_self) {
 			$priority = $params['priority'];
 			$message = $params['message'];
 			$message = $_self->invokeMethod('_format', array($priority, $message));
