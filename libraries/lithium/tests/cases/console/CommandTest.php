@@ -207,6 +207,17 @@ class CommandTest extends \lithium\test\Unit {
 		$result = $command->response->output;
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testInWithBadInput(){
+		$command = new MockCommand(array('request' => $this->request));
+		fwrite($command->request->input, "f\n");
+		fwrite($command->request->input, 'y');
+		rewind($command->request->input);
+
+		$expected = "y";
+		$result = $command->in('Everything Cool?', array('choices' => array('y', 'n')));
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
