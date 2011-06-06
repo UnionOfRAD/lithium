@@ -200,8 +200,8 @@ class Command extends \lithium\core\Object {
 		do  {
 			$result = trim($this->request->input());
 		} while (
-			$result == null && !empty($options['quit']) && $result != $options['quit']
-			&& !empty($options['options']) && array_search($result, $options['options'])
+			!empty($options['quit']) && $result != $options['quit'] 
+			&& !empty($options['choices']) && !in_array($result, $options['choices'], true)
 		);
 
 		if ($options['default'] != null && empty($result)) {
