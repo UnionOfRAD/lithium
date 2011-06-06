@@ -3,7 +3,5 @@
 	<strong><?php echo $error['class'] ?>::<?php echo $error['method']?>()</strong>
 	on line <?php echo $error['line'] ?>:
 
-	<span class="content">
-		<?php echo htmlspecialchars($error['message'], ENT_QUOTES, 'UTF-8') ?>
-	</span>
+	<span class="content"><?php echo htmlspecialchars($error['message'], ENT_QUOTES, 'UTF-8') ?></span>
 </div>
