@@ -19,6 +19,22 @@ $notify = function($status, $message, $solution = null) {
 	return $html;
 };
 
+$support = function($classes) {
+	$result = '';
+
+	foreach ($classes as $class => $enabled) {
+		$name = substr($class, strrpos($class, '\\') + 1);
+		$url = 'http://lithify.me/docs/' . str_replace('\\', '/', $class);
+		$status = $enabled ? '&#x2714;' : '&#x2718;';
+		$enabled = $enabled ? ' enabled' : '';
+
+		$item = "<div class=\"indicator{$enabled}\">{$status}</div>";
+		$item .= "<a href=\"{$url}\">{$name}</a>";
+		$result .= "<p>{$item}</p>";
+	}
+	return $result;
+};
+
 $checks = array(
 	'resourcesWritable' => function() use ($notify) {
 		if (is_writable($path = Libraries::get(true, 'resources'))) {
@@ -109,6 +125,33 @@ $checks = array(
 			'Run the tests.',
 			"Check the builtin {$dashboard} or {$tests} now to ensure Lithium
 			is working as expected. Do not hesitate to {$ticket} in case a test fails."
+		);
+	},
+	'dbSupport' => function() use ($notify, $support) {
+		$paths = array('data.source', 'adapter.data.source.database', 'adapter.data.source.http');
+		$list = array();
+
+		foreach ($paths as $path) {
+			$list = array_merge($list, Libraries::locate($path, null, array('recursive' => false)));
+		}
+		$list = array_filter($list, function($class) { return method_exists($class, 'enabled'); });
+		$map = array_combine($list, array_map(function($c) { return $c::enabled(); }, $list));
+
+		return $notify(
+			'notice',
+			'Database support',
+			'<div class="test-result solution">' . $support($map) . '</div>'
+		);
+	},
+	'cacheSupport' => function() use ($notify, $support) {
+		$list = Libraries::locate('adapter.storage.cache', null, array('recursive' => false));
+		$list = array_filter($list, function($class) { return method_exists($class, 'enabled'); });
+		$map = array_combine($list, array_map(function($c) { return $c::enabled(); }, $list));
+
+		return $notify(
+			'notice',
+			'Cache support',
+			'<div class="test-result solution">' . $support($map) . '</div>'
 		);
 	}
 );

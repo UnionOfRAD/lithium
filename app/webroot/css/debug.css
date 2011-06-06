@@ -601,3 +601,10 @@ div.code-coverage-results span.result-good {
 	list-style: none;
 	margin: 0;
 }
+.app .indicator {
+	float: right;
+	color: #a00;
+}
+.app .indicator.enabled {
+	color: #0a0;
+}
