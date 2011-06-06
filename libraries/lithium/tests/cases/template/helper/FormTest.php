@@ -40,8 +40,6 @@ class FormTest extends \lithium\test\Unit {
 
 	/**
 	 * Initialize test by creating a new object instance with a default context.
-	 *
-	 * @return void
 	 */
 	public function setUp() {
 		$this->_routes = Router::get();
@@ -105,8 +103,6 @@ class FormTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests creating forms with non-browser compatible HTTP methods, required for REST interfaces.
-	 *
-	 * @return void
 	 */
 	public function testRestFormCreation() {
 		$result = $this->form->create(null, array('action' => 'delete', 'method' => 'delete'));
@@ -153,8 +149,6 @@ class FormTest extends \lithium\test\Unit {
 	/**
 	 * Ensures that password fields aren't rendered with pre-populated values from bound record or
 	 * document objects.
-	 *
-	 * @return void
 	 */
 	public function testPasswordWithBindingValue() {
 		$this->form->create(new Record(array(
@@ -660,8 +654,6 @@ class FormTest extends \lithium\test\Unit {
 
 	/**
 	 * Verifies that calls to `field()` with `'type' => 'hidden'` do not produce `<label />`s.
-	 *
-	 * @return void
 	 */
 	public function testHiddenFieldWithNoLabel() {
 		$result = $this->form->field('foo', array('type' => 'hidden'));
@@ -695,8 +687,6 @@ class FormTest extends \lithium\test\Unit {
 	/**
 	 * Demonstrates that the options for a `<label />` element can be passed through the `field()`
 	 * method, using the label text as a key.
-	 *
-	 * @return void
 	 */
 	public function testFieldLabelWithOptions() {
 		$result = $this->form->field('name', array(
@@ -887,8 +877,6 @@ class FormTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that the string template form `Form::field()` can be overridden.
-	 *
-	 * @return void
 	 */
 	public function testFieldTemplateOverride() {
 		$this->form->config(array('templates' => array('field' => '{:label}{:input}{:error}')));
@@ -899,6 +887,10 @@ class FormTest extends \lithium\test\Unit {
 		));
 	}
 
+	/**
+	 * Tests that the `field()` method properly renders a `<select />` element if the `'list'`
+	 * option is passed.
+	 */
 	public function testFieldAssumeSelectIfList() {
 		$result = $this->form->field('colors', array(
 			'list' => array('r' => 'red', 'g' => 'green', 'b' => 'blue')
@@ -937,8 +929,6 @@ class FormTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that inputs for nested objects can be assigned using dot syntax.
-	 *
-	 * @return void
 	 */
 	public function testNestedFieldAccess() {
 		$doc = new Document(array('data' => array('foo' => array('bar' => 'value'))));
@@ -955,7 +945,7 @@ class FormTest extends \lithium\test\Unit {
 			'label' => array('for' => 'FooBar'), 'Foo Bar', '/label',
 			'input' => array(
 				'type' => 'text', 'name' => 'foo[bar]', 'id' => 'FooBar', 'value' => 'value'
-			),
+			)
 		));
 	}
 
