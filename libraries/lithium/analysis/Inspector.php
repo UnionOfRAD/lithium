@@ -354,10 +354,11 @@ class Inspector extends \lithium\core\StaticObject {
 	 *
 	 * @param string $class Class whose inheritance chain will be returned
 	 * @param array $options Option consists of:
-	 *        -'autoLoad': Whether or not to call __autoload by default. Defaults to true.
+	 *        - `'autoLoad'` _boolean_: Whether or not to call `__autoload` by default. Defaults
+	 *          to `true`.
 	 * @return array An array of the name of the parent classes of the passed `$class` parameter,
-	 *         or false on error.
-	 * @link http://php.net/manual/en/function.class-parents.php
+	 *         or `false` on error.
+	 * @link http://php.net/manual/en/function.class-parents.php PHP Manual: `class_parents()`.
 	 */
 	public static function parents($class, array $options = array()) {
 		$defaults = array('autoLoad' => false);
