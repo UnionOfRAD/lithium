@@ -65,6 +65,9 @@ class PhpTest extends \lithium\test\Unit {
 
 		$result = ini_get('session.cookie_lifetime');
 		$this->assertEqual(0, (integer) $result);
+
+		$result = ini_get('session.cookie_httponly');
+		$this->assertTrue(1, (integer) $result);
 	}
 
 	public function testCustomConfiguration() {
@@ -90,7 +93,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertFalse($result);
 
 		$result = ini_get('session.cookie_httponly');
-		$this->assertFalse($result);
+		$this->assertTrue($result);
 
 		$result = ini_get('session.save_path');
 		$this->assertEqual($config['session.save_path'], $result);

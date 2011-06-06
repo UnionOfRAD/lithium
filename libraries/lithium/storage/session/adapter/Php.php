@@ -28,7 +28,7 @@ class Php extends \lithium\core\Object {
 	 * @var array Keys are session ini settings, with the `session.` namespace.
 	 */
 	protected $_defaults = array(
-		'session.cookie_lifetime' => '0'
+		'session.cookie_lifetime' => '0', 'session.cookie_httponly' => true
 	);
 
 	/**
