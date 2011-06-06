@@ -184,17 +184,13 @@ class Command extends \lithium\core\Object {
 	public function in($prompt = null, $options = array()) {
 		$defaults = array('choices' => null, 'default' => null, 'quit' => 'q');
 		$options += $defaults;
-
 		$choices = null;
+
 		if (is_array($options['choices'])) {
 			$choices = '(' . implode('/', $options['choices']) . ')';
 		}
-
-		if ($options['default'] == null) {
-			$this->out("{$prompt} {$choices} \n > ", false);
-		} else {
-			$this->out("{$prompt} {$choices} \n [{$options['default']}] > ", false);
-		}
+		$default = $options['default'] ? "[{$options['default']}] " : '';
+		$this->out("{$prompt} {$choices} \n {$default}> ", false);
 		$result = null;
 
 		do  {
@@ -204,8 +200,8 @@ class Command extends \lithium\core\Object {
 			&& !empty($options['choices']) && !in_array($result, $options['choices'], true)
 		);
 
-		if ($options['default'] != null && empty($result)) {
-			return $options['default'] ;
+		if ($options['default'] && !$result) {
+			return $options['default'];
 		}
 		return $result;
 	}
@@ -288,12 +284,8 @@ class Command extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function stop($status = 0, $message = null) {
-		if (!is_null($message)) {
-			if ($status == 0) {
-				$this->out($message);
-			} else {
-				$this->error($message);
-			}
+		if ($message) {
+			($status == 0) ? $this->out($message) : $this->error($message);
 		}
 		exit($status);
 	}
@@ -327,6 +319,7 @@ class Command extends \lithium\core\Object {
 	 */
 	protected function _response($type, $string, $options) {
 		$defaults = array('nl' => 1, 'style' => null);
+
 		if (!is_array($options)) {
 			if (!$options || is_int($options)) {
 				$options = array('nl' => $options);
