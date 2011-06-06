@@ -75,7 +75,7 @@ class ReportTest extends \lithium\test\Unit {
 		$report->run();
 
 		$result = $report->render("stats");
-		$this->assertPattern("/1 \/ 1 passes, 0  fails	and 0  exceptions/", $result);
+		$this->assertPattern("#1./.*1.*passes,.*0.*fails.*0.*exceptions#s", $result);
 	}
 
 	public function testSingleFilter() {
