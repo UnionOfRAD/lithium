@@ -218,7 +218,8 @@ class Report extends \lithium\core\Object {
 	 */
 	public function render($template, $data = array()) {
 		$config = $this->_config;
-		if ($template == "stats") {
+
+		if ($template == "stats" && !$data) {
 			$data = $this->stats();
 		}
 		$template = Libraries::locate("test.templates.{$config['reporter']}", $template, array(
@@ -235,11 +236,12 @@ class Report extends \lithium\core\Object {
 	}
 
 	public function filters(array $filters = array()) {
-		if (!empty($this->_filters) && empty($filters)) {
+		if ($this->_filters && !$filters) {
 			return $this->_filters;
 		}
 		$filters += (array) $this->_config['filters'];
 		$results = array();
+
 		foreach ($filters as $filter => $options) {
 			if (!$class = Libraries::locate('test.filter', $filter)) {
 				throw new ClassNotFoundException("`{$class}` is not a valid test filter.");

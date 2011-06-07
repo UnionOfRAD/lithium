@@ -46,18 +46,122 @@ class Test extends \lithium\console\Command {
 	public $format = 'txt';
 
 	/**
+	 * An array of closures, mapped by type, which are set up to handle different test output
+	 * formats.
+	 *
+	 * @var array
+	 */
+	protected $_handlers = array();
+
+	/**
+	 * Initializes the output handlers.
+	 *
+	 * @see lithium\console\command\Test::$_handlers
+	 * @return void
+	 */
+	protected function _init() {
+		parent::_init();
+		$self = $this;
+		$this->_handlers += array(
+			'txt' => function($runner, $path) use ($self) {
+				$message = sprintf('Running test(s) in `%s`... ', ltrim($path, '\\'));
+				$self->header('Test');
+				$self->out($message, array('nl' => false));
+
+				$report = $runner();
+				$self->out('done.', 2);
+				$self->out('{:heading}Results{:end}', 0);
+				$self->out($report->render('stats', $report->stats()));
+
+				foreach ($report->filters() as $filter => $options) {
+					$data = $report->results['filters'][$filter];
+					$self->out($report->render($options['name'], compact('data')));
+				}
+
+				$self->hr();
+				$self->nl();
+				return $report;
+			},
+			'json' => function($runner, $path) use ($self) {
+				$report = $runner();
+
+				if ($results = $report->filters()) {
+					$filters = array();
+
+					foreach ($results as $filter => $options) {
+						$filters[$options['name']] = $report->results['filters'][$filter];
+					}
+				}
+				$self->out($report->render('stats', $report->stats() + compact('filters')));
+				return $report;
+			}
+		);
+	}
+
+	/**
 	 * Runs tests given a path to a directory or file containing tests. The path to the
-	 * test(s) may be absolte or relative to the current working directory.
+	 * test(s) may be absolute or relative to the current working directory.
 	 *
 	 * {{{
-	 * lithium test lithium/tests/cases/core/ObjectTest.php
-	 * lithium test lithium/tests/cases/core
+	 * li3 test lithium/tests/cases/core/ObjectTest.php
+	 * li3 test lithium/tests/cases/core
+	 * }}}
+	 *
+	 * If you are in the working directory of an application or plugin and wish to run all tests,
+	 * simply execute the following:
+	 *
+	 * {{{
+	 * li3 test tests/cases
 	 * }}}
 	 *
 	 * @param string $path Absolute or relative path to tests.
 	 * @return boolean Will exit with status `1` if one or more tests failed otherwise with `0`.
 	 */
 	public function run($path = null) {
+		if (!$path = $this->_path($path)) {
+			return false;
+		}
+		$handlers = $this->_handlers;
+
+		if (!isset($handlers[$this->format]) || !is_callable($handlers[$this->format])) {
+			$this->error(sprintf('No handler for format `%s`... ', $this->format));
+			return false;
+		}
+		$filters = $this->filters ? array_map('trim', explode(',', $this->filters)) : array();
+		$params = compact('filters') + array('reporter' => 'console', 'format' => $this->format);
+
+		$runner = function() use ($path, $params) {
+			error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
+			return Dispatcher::run($path, $params);
+		};
+		$report = $handlers[$this->format]($runner, $path);
+		$stats = $report->stats();
+		return $stats['success'];
+	}
+
+	/**
+	 * Finds a library for given path.
+	 *
+	 * @param string $path Normalized (to slashes) absolute or relative path.
+	 * @return string Returns the library's path on success, or `null` on failure.
+	 */
+	protected function _library($path) {
+		foreach (Libraries::get() as $name => $library) {
+			if (strpos($path, $library['path']) !== 0) {
+				continue;
+			}
+			$path = str_replace(array($library['path'], '.php'), null, $path);
+			return '\\' . $name . str_replace('/', '\\', $path);
+		}
+	}
+
+	/**
+	 * Validates an absolute or relative path to test cases.
+	 *
+	 * @param string $path The directory or file path to one or more test cases
+	 * @return string Returns a fully-resolved physical path, or `false`, if an error occurs.
+	 */
+	protected function _path($path) {
 		$path = str_replace('\\', '/', $path);
 
 		if (!$path) {
@@ -71,57 +175,12 @@ class Test extends \lithium\console\Command {
 			$this->error('Not a valid path.');
 			return false;
 		}
-		$filters = $this->filters ? array_map('trim', explode(',', $this->filters)) : array();
 
 		if (!$libraryPath = $this->_library($path)) {
 			$this->error("No library registered for path `{$path}`.");
 			return false;
 		}
-		$path = $libraryPath;
-
-		if ($this->format == 'txt') {
-			$this->header('Test');
-			$this->out(sprintf('Running test(s) in `%s`... ', $path), array('nl' => false));
-		}
-		error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
-
-		$report = Dispatcher::run($path, compact('filters') + array(
-			'reporter' => 'console',
-			'format' => $this->format
-		));
-		$stats = $report->stats();
-
-		if ($this->format == 'txt') {
-			$this->out('done.', 2);
-			$this->out('{:heading}Results{:end}', 0);
-		}
-		$this->out($report->render('stats', $stats));
-
-		foreach ($report->filters() as $filter => $options) {
-			$data = $report->results['filters'][$filter];
-			$this->out($report->render($options['name'], compact('data')));
-		}
-
-		if ($this->format == 'txt') {
-			$this->hr();
-			$this->nl();
-		}
-		return $stats['success'];
-	}
-
-	/**
-	 * Finds a library for given path.
-	 *
-	 * @param string $path Normalized (to slashes) absolute or relative path.
-	 * @return string|void The library's path on success.
-	 */
-	protected function _library($path) {
-		foreach (Libraries::get() as $name => $library) {
-			if (strpos($path, $library['path']) === 0) {
-				$path = str_replace(array($library['path'], '.php'), null, $path);
-				return '\\' . $name . str_replace('/', '\\', $path);
-			}
-		}
+		return $libraryPath;
 	}
 }
 
