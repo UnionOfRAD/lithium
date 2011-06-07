@@ -294,6 +294,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	public function __unset($name) {
 		$this->_removed[$name] = true;
 		unset($this->_updated[$name]);
+		unset($this->_data[$name]);
 	}
 
 	/**
