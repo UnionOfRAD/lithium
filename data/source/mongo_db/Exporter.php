@@ -34,12 +34,12 @@ class Exporter extends \lithium\core\StaticObject {
 
 	public static function cast($data, $schema, $database, array $options = array()) {
 		$defaults = array(
-			'pathKey' => null, 'handlers' => array(), 'model' => null, 'arrays' => true
+			'handlers' => array(), 'model' => null, 'arrays' => true
 		);
 		$options += $defaults;
 
 		foreach ($data as $key => $value) {
-			$pathKey = $options['pathKey'] ? "{$options['pathKey']}.{$key}" : $key;
+			$pathKey = isset($options['pathKey']) ? "{$options['pathKey']}.{$key}" : $key;
 			$field = (isset($schema[$pathKey]) ? $schema[$pathKey] : array());
 			$field += array('type' => null, 'array' => null);
 			$data[$key] = static::_cast($value, $field, $database, $options + compact('pathKey'));

@@ -215,7 +215,6 @@ class ExporterTest extends \lithium\test\Unit {
 
 		$model::schema($this->_schema);
 		$result = Exporter::cast($data, $this->_schema, $model::connection(), compact('model'));
-
 		$this->assertIdentical(false, $result['notifications']->foo);
 		$this->assertIdentical(true, $result['notifications']->bar);
 		$this->assertIdentical(false, $result['notifications']->baz);
@@ -268,7 +267,7 @@ class ExporterTest extends \lithium\test\Unit {
 
 		$this->assertTrue($result['modified'] instanceof MongoDate);
 		$this->assertTrue($result['created'] instanceof MongoDate);
-		$this->assertTrue($result['created']->usec > 0);
+		$this->assertTrue($result['created']->sec > 0);
 
 		$this->assertEqual($time, $result['modified']->sec);
 		$this->assertEqual($time, $result['created']->sec);
