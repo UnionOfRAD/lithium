@@ -6,6 +6,11 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-require 'webroot/index.php';
+namespace lithium\data\source\database;
+
+class QueryBuilder extends \lithium\core\Object {
+
+	
+}
 
 ?>
