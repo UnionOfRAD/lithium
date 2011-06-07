@@ -132,18 +132,17 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		$conn  = $model ? $model::connection() : null;
 
 		if ($model && $conn && $schema = $model::schema($name)) {
-			switch (true) {
-				case (isset($this->_updated[$name])) :
-					return $this->_updated[$name];
-				case (!isset($this->_data[$name])) :
-					$schema = array($name => $schema);
-					$pathKey = $this->_pathKey ? $this->_pathKey : null;
-					$options = compact('pathKey', 'schema') + array('first' => true);
-					if (($value = $conn->cast($this, array($name => null), $options)) !== null) {
-						$this->_data[$name] = $value;
-						return $this->_data[$name];
-					}
-					break;
+			if (isset($this->_updated[$name])) {
+				return $this->_updated[$name];
+			}
+			if (!isset($this->_data[$name])) {
+				$schema = array($name => $schema);
+				$pathKey = $this->_pathKey ? $this->_pathKey : null;
+				$options = compact('pathKey', 'schema') + array('first' => true);
+				if (($value = $conn->cast($this, array($name => null), $options)) !== null) {
+					$this->_data[$name] = $value;
+					return $this->_data[$name];
+				}
 			}
 		}
 		return parent::__get($name);
