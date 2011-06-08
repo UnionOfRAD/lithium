@@ -579,6 +579,37 @@ class LibrariesTest extends \lithium\test\Unit {
 		$result = Libraries::realPath($expected);
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testClassInstanceWithSubnamespace() {
+		$testApp = Libraries::get(true, 'resources') . '/tmp/tests/test_app';
+		mkdir($testApp);
+		$paths = array("/controllers", "/controllers/admin");
+
+		foreach ($paths as $path) {
+			$namespace = str_replace('/', '\\', $path);
+			$dotsyntax = str_replace('/', '.', trim($path, '/'));
+			$class = 'Posts';
+
+			Libraries::add('test_app', array('path' => $testApp));
+
+			mkdir($testApp . $path, 0777, true);
+			file_put_contents($testApp . $path . "/{$class}Controller.php",
+			"<?php namespace test_app{$namespace};\n
+				class {$class}Controller extends \\lithium\\action\\Controller {
+				public function index() {
+					return true;
+				}}"
+			);
+			Libraries::cache(false);
+
+			$expected = "test_app{$namespace}\\{$class}Controller";
+			$instance = Libraries::instance($dotsyntax, "Posts", array('library' => 'test_app'));
+		    $result = get_class($instance);
+		    $this->assertEqual($expected, $result, "{$path} did not work");
+		}
+
+		$this->_cleanUp();
+	}
 }
 
 ?>

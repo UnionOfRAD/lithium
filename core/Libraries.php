@@ -96,7 +96,7 @@ class Libraries {
 			)
 		),
 		'controllers' => array(
-			'{:library}\controllers\{:name}Controller'
+			'{:library}\controllers\{:namespace}\{:class}\{:name}Controller'
 		),
 		'data' => array(
 			'{:library}\extensions\data\{:namespace}\{:class}\{:name}',
@@ -716,7 +716,6 @@ class Libraries {
 			return static::$_cachedPaths[$ident];
 		}
 		$params = static::_params($type, $name);
-
 		$defaults = array(
 			'type' => 'class',
 			'library' => $params['library'] !== '*' ? $params['library'] : null
