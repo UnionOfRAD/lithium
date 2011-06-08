@@ -407,8 +407,10 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc->fat = true;
 		$doc->set(array('hair' => true, 'fast' => false));
 
-		$expected = array('tall', 'fat', 'hair', 'fast');
-		$this->assertEqual($expected, array_keys($doc->data()));
+		$expected = array('fast', 'fat', 'hair', 'tall');
+		$result = array_keys($doc->data());
+		sort($result);
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testIsset() {
@@ -649,7 +651,9 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual('first', $doc->nested->foo);
 		$this->assertEqual('second', $doc->nested->bar);
 		$this->assertEqual('value', $doc->really->nested->key);
-		$this->assertEqual(array('simple', 'nested', 'really'), array_keys($doc->data()));
+		$result = array_keys($doc->data());
+		sort($result);
+		$this->assertEqual(array('nested', 'really', 'simple'), $result);
 	}
 
 	public function testIdGetDoesNotSet() {
