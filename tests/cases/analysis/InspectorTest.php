@@ -162,13 +162,11 @@ class InspectorTest extends \lithium\test\Unit {
 
 		$this->assertNull(Inspector::info('\lithium\util'));
 
-		$result = Inspector::info('\lithium\analysis\Inspector');
-		$this->assertTrue(strpos(
-			str_replace('\\', '/', $result['file']),
-			'lithium/analysis/Inspector.php'
-		));
-		$this->assertEqual('lithium\analysis', $result['namespace']);
-		$this->assertEqual('Inspector', $result['shortName']);
+		$info = Inspector::info('\lithium\analysis\Inspector');
+		$result = str_replace('\\', '/', $info['file']);
+		$this->assertTrue(strpos($result, '/analysis/Inspector.php'));
+		$this->assertEqual('lithium\analysis', $info['namespace']);
+		$this->assertEqual('Inspector', $info['shortName']);
 
 		$result = Inspector::info('\lithium\analysis\Inspector::$_methodMap');
 		$this->assertEqual('_methodMap', $result['name']);
