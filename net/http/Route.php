@@ -296,12 +296,8 @@ class Route extends \lithium\core\Object {
 		$template = $this->_template;
 		$trimmed = true;
 
-		if (isset($options['args'])) {
-			if (is_array($options['args'])) {
-				$options['args'] = join('/', array_map('urlencode', $options['args']));
-			} else {
-				$options['args'] = urlencode($options['args']);
-			}
+		if (isset($options['args']) && is_array($options['args'])) {
+			$options['args'] = join('/', $options['args']);
 		}
 		$options += array('args' => '');
 
@@ -322,7 +318,6 @@ class Route extends \lithium\core\Object {
 				continue;
 			}
 			if ($key !== 'args') {
-				$value = urlencode($value);
 				$trimmed = false;
 			}
 			$template = str_replace($rpl, $value, $template);

@@ -488,28 +488,6 @@ class RouteTest extends \lithium\test\Unit {
 		$url = $route->match(array('controller' => 'posts'));
 		$this->assertEqual("/posts", $url);
 	}
-
-	/**
-	 * Tests that the individual string elements of a URL are properly escaped.
-	 */
-	public function testUrlElementEscaping() {
-		$route = new Route(array(
-			'template' => '/{:controller}/{:id:[0-9]+}/{:args}',
-			'params' => array('action' => 'index', 'id' => null)
-		));
-
-		$result = $route->match(array('controller' => '<script>alert("Injection!")</script>'));
-		$this->assertEqual('/%3Cscript%3Ealert%28%22Injection%21%22%29%3C%2Fscript%3E', $result);
-
-		$result = $route->match(array('controller' => 'foo', 'args' => '<bar>'));
-		$this->assertEqual('/foo/%3Cbar%3E', $result);
-
-		$result = $route->match(array('controller' => 'foo', 'args' => '<bar>'));
-		$this->assertEqual('/foo/%3Cbar%3E', $result);
-
-		$result = $route->match(array('controller' => 'foo', 'args' => array('<bar>', '<foo>')));
-		$this->assertEqual('/foo/%3Cbar%3E/%3Cfoo%3E', $result);
-	}
 }
 
 ?>

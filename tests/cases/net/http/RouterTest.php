@@ -290,8 +290,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests matching routes where the route template is a static string with no insert parameters.
-	 *
-	 * @return void
 	 */
 	public function testRouteMatchingWithNoInserts() {
 		Router::connect('/login', array('controller' => 'sessions', 'action' => 'add'));
@@ -306,8 +304,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Test matching routes with only insert parameters and no default values.
-	 *
-	 * @return void
 	 */
 	public function testRouteMatchingWithOnlyInserts() {
 		Router::connect('/{:controller}');
@@ -321,8 +317,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Test matching routes with insert parameters which have default values.
-	 *
-	 * @return void
 	 */
 	public function testRouteMatchingWithInsertsAndDefaults() {
 		Router::connect('/{:controller}/{:action}', array('action' => 'archive'));
@@ -348,8 +342,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests matching routes and returning an absolute (protocol + hostname) URL.
-	 *
-	 * @return void
 	 */
 	public function testRouteMatchAbsoluteUrl() {
 		Router::connect('/login', array('controller' => 'sessions', 'action' => 'add'));
@@ -389,8 +381,6 @@ class RouterTest extends \lithium\test\Unit {
 	/**
 	 * Tests getting routes using `Router::get()`, and checking to see if the routes returned match
 	 * the routes connected.
-	 *
-	 * @return void
 	 */
 	public function testRouteRetrieval() {
 		$expected = Router::connect('/hello', array('controller' => 'posts', 'action' => 'index'));
@@ -481,8 +471,6 @@ class RouterTest extends \lithium\test\Unit {
 	/**
 	 * Tests that the order of the parameters is respected so it can trim
 	 * the URL correctly.
-	 *
-	 * @return void
 	 */
 	public function testParameterOrderIsRespected() {
 		Router::connect('/{:locale}/{:controller}/{:action}/{:args}');
@@ -503,8 +491,6 @@ class RouterTest extends \lithium\test\Unit {
 	/**
 	 * Tests that a request context with persistent parameters generates URLs where those parameters
 	 * are properly taken into account.
-	 *
-	 * @return void
 	 */
 	public function testParameterPersistence() {
 		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}', array(), array(
@@ -531,8 +517,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that persistent parameters can be overridden with nulled-out values.
-	 *
-	 * @return void
 	 */
 	public function testOverridingPersistentParameters() {
 		Router::connect(

@@ -219,6 +219,16 @@ class View extends \lithium\core\Object {
 	protected function _init() {
 		parent::_init();
 
+		$encoding = 'UTF-8';
+
+		if ($this->_response) {
+			$encoding =& $this->_response->encoding;
+		}
+		$h = function($data) use (&$encoding) {
+			return htmlspecialchars((string) $data, ENT_QUOTES, $encoding);
+		};
+		$this->outputFilters += compact('h') + $this->_config['outputFilters'];
+
 		foreach (array('loader', 'renderer') as $key) {
 			if (is_object($this->_config[$key])) {
 				$this->{'_' . $key} = $this->_config[$key];
@@ -228,16 +238,6 @@ class View extends \lithium\core\Object {
 			$config = array('view' => $this) + $this->_config;
 			$this->{'_' . $key} = Libraries::instance('adapter.template.view', $class, $config);
 		}
-		$encoding = 'UTF-8';
-
-		if ($this->_response) {
-			$encoding =& $this->_response->encoding;
-		}
-
-		$h = function($data) use (&$encoding) {
-			return htmlspecialchars((string) $data, ENT_QUOTES, $encoding);
-		};
-		$this->outputFilters += compact('h') + $this->_config['outputFilters'];
 	}
 
 	public function render($process, array $data = array(), array $options = array()) {

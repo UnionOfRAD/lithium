@@ -15,6 +15,7 @@ use lithium\template\Helper;
 use lithium\template\helper\Html;
 use lithium\template\view\adapter\Simple;
 use lithium\net\http\Router;
+use lithium\template\View;
 
 class RendererTest extends \lithium\test\Unit {
 
@@ -32,6 +33,7 @@ class RendererTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		Router::reset();
+
 		foreach ($this->_routes as $route) {
 			Router::connect($route);
 		}
@@ -68,16 +70,39 @@ class RendererTest extends \lithium\test\Unit {
 		$this->subject = new Simple(array('context' => array(
 			'content' => '', 'title' => '', 'scripts' => array(), 'styles' => array(), 'foo' => '!'
 		)));
-		$result = $this->subject->foo();
-		$this->assertEqual('!', $result);
+		$this->assertEqual('!', $this->subject->foo());
 		$this->assertTrue(isset($this->subject->foo));
+	}
+
+	/**
+	 * Tests that URLs are properly escaped by the URL handler.
+	 */
+	public function testUrlAutoEscaping() {
+		Router::connect('/{:controller}/{:action}/{:id}');
+
+		$this->assertEqual('/<foo>/<bar>', $this->subject->url('/<foo>/<bar>'));
+		$result = $this->subject->url(array('Controller::action', 'id' => '<script />'));
+		$this->assertEqual('/controller/action/<script />', $result);
+
+		$this->subject = new Simple(array(
+			'response' => new Response(), 'view' => new View(), 'request' => new Request(array(
+				'base' => '', 'env' => array('HTTP_HOST' => 'foo.local')
+			))
+		));
+
+		$this->assertEqual('/&lt;foo&gt;/&lt;bar&gt;', $this->subject->url('/<foo>/<bar>'));
+		$result = $this->subject->url(array('Controller::action', 'id' => '<script />'));
+		$this->assertEqual('/controller/action/&lt;script /&gt;', $result);
+
+		$result = $this->subject->url(array('Posts::index', '?' => array(
+			'foo' => 'bar', 'baz' => 'dib'
+		)));
+		$this->assertEqual('/posts?foo=bar&baz=dib', $result);
 	}
 
 	/**
 	 * Tests built-in content handlers for generating URLs, paths to static assets, and handling
 	 * output of elements written to the request context.
-	 *
-	 * @return void
 	 */
 	public function testCoreHandlers() {
 		$url = $this->subject->applyHandler(null, null, 'url', array(
