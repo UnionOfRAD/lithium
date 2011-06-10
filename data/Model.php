@@ -818,7 +818,8 @@ class Model extends \lithium\core\StaticObject {
 	public function validates($entity, array $options = array()) {
 		$defaults = array(
 			'rules' => $this->validates,
-			'events' => $entity->exists() ? 'update' : 'create'
+			'events' => $entity->exists() ? 'update' : 'create',
+			'model' => get_called_class()
 		);
 		$options += $defaults;
 		$self = static::_object();

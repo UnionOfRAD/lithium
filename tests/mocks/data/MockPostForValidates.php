@@ -8,6 +8,8 @@
 
 namespace lithium\tests\mocks\data;
 
+use lithium\util\Validator;
+
 class MockPostForValidates extends \lithium\data\Model {
 
 	protected $_meta = array('source' => 'mock_posts', 'connection' => 'mock-source');
@@ -16,9 +18,21 @@ class MockPostForValidates extends \lithium\data\Model {
 		'title' => 'please enter a title',
 		'email' => array(
 			array('notEmpty', 'message' => 'email is empty'),
-			array('email', 'message' => 'email is not valid')
+			array('email', 'message' => 'email is not valid'),
+			array('modelIsSet', 'required' => false, 'message' => 'model is not set')
 		)
 	);
+
+	public static function __init() {
+		parent::__init();
+		$class = __CLASS__;
+		Validator::add('modelIsSet', function($value, $format, $options) use ($class){
+				if (isset($options['model']) && $options['model'] = $class) {
+					return true;
+				}
+				return false;
+			});
+	}
 }
 
 ?>
