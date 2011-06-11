@@ -42,7 +42,7 @@ class Password {
 	 *   resulting in the same hash; this prevents a potential attacker from
 	 *   compromising user accounts by using a database of most commonly used
 	 *   passwords.
-	 * - The salt generator's count interator can be increased within Lithium
+	 * - The salt generator's count iterator can be increased within Lithium
 	 *   or your application as computer hardware becomes faster; this results
 	 *   in slower hash generation, without invalidating existing passwords.
 	 *

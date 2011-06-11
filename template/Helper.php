@@ -131,7 +131,7 @@ abstract class Helper extends \lithium\core\Object {
 	 *
 	 * @param string $method name of method that is calling the render (for context filters)
 	 * @param string $string template key (in Helper::_strings) to render
-	 * @param array $params associatied array of template inserts {:key} will be replaced by value
+	 * @param array $params associated array of template inserts {:key} will be replaced by value
 	 * @param array $options
 	 * @return string Rendered HTML
 	 */

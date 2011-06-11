@@ -78,7 +78,7 @@ class Entity extends \lithium\core\Object {
 	/**
 	 * An array of key/value pairs corresponding to fields that should be updated using atomic
 	 * incrementing / decrementing operations. Keys match field names, and values indicate the value
-	 * each field should be incremented or decrememnted by.
+	 * each field should be incremented or decremented by.
 	 *
 	 * @see lithium\data\Entity::increment()
 	 * @see lithium\data\Entity::decrement()
@@ -314,7 +314,7 @@ class Entity extends \lithium\core\Object {
 	 * Defaults to `1` if no value is specified. Throws an exception if the specified field is
 	 * non-numeric.
 	 *
-	 * @param string $field The name of the field to be incrememnted.
+	 * @param string $field The name of the field to be incremented.
 	 * @param string $value The value to increment the field by. Defaults to `1` if this parameter
 	 *               is not specified.
 	 * @return integer Returns the current value of `$field`, based on the value retrieved from the

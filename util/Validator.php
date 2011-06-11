@@ -12,7 +12,7 @@ use lithium\util\Set;
 use InvalidArgumentException;
 
 /**
- * The `Validator` class provies static access to commonly used data validation logic. These common
+ * The `Validator` class provides static access to commonly used data validation logic. These common
  * routines cover HTML form input data such as phone and credit card numbers, dates and postal
  * codes, but also include general checks for regular expressions and booleans and numericality.
  *
@@ -30,7 +30,7 @@ use InvalidArgumentException;
  *
  * Data can also be validated against multiple rules, each having their own associated error
  * message. The rule structure is array-based and hierarchical based on rule names and
- * messages. Resposes match the keys present in the `$data` parameter of `check()` up with an array
+ * messages. Responses match the keys present in the `$data` parameter of `check()` up with an array
  * of rules which they violate.
  *
  * {{{ embed:lithium\tests\cases\util\ValidatorTest::testCheckMultipleHasFirstError(1-15) }}}

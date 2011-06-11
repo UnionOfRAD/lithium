@@ -31,7 +31,7 @@ namespace lithium\storage;
  * ));}}}
  *
  * Each adapter provides a consistent interface for the basic cache operations of `write`, `read`,
- * `delete` and `clear`, which can be used interchangably between all adapters. Some adapters
+ * `delete` and `clear`, which can be used interchangeably between all adapters. Some adapters
  * may provide additional methods that are not consistently available across other adapters.
  * To make use of these, it is always possible to call:
  *
@@ -234,7 +234,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * from the given cache configuration.
 	 *
 	 * @param string $name
-	 * @param string $key Key of numeric cache item to dercrement
+	 * @param string $key Key of numeric cache item to decrement
 	 * @param integer $offset Offset to decrement - defaults to 1.
 	 * @param mixed $options Options for this method.
 	 * @return integer|boolean Item's new value on successful decrement, false otherwise

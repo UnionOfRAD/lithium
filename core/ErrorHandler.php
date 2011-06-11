@@ -65,7 +65,7 @@ class ErrorHandler extends \lithium\core\StaticObject {
 
 	/**
 	 * Setup basic error handling checks/types, as well as register the error and exception
-	 * hanlders.
+	 * handlers.
 	 *
 	 * Called on static class initialization (i.e. when first loaded).
 	 *

@@ -10,7 +10,7 @@ namespace lithium\template;
 
 /**
  * A `TemplateException` is thrown whenever a view template cannot be found, or a called template is
- * not readible or accessible for rendering. Also used by the view compiler if a compiled template
+ * not readable or accessible for rendering. Also used by the view compiler if a compiled template
  * cannot be written.
  */
 class TemplateException extends \RuntimeException {

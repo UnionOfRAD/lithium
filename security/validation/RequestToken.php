@@ -154,7 +154,7 @@ class RequestToken {
 	 * @param array $options The options to use when matching the key to the token:
 	 *              - `'sessionKey'` _string_: The key used when reading the token from the session.
 	 * @return boolean Returns `true` if the hash key is a cryptographic match to the stored
-	 *         session token. Returns `false` on failure, which indiciates a forged request attempt.
+	 *         session token. Returns `false` on failure, which indicates a forged request attempt.
 	 */
 	public static function check($key, array $options = array()) {
 		$defaults = array('sessionKey' => 'security.token');
