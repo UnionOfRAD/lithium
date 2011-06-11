@@ -538,7 +538,6 @@ class Query extends \lithium\core\Object {
 		if (!$model = $this->model()) {
 			return;
 		}
-		$hasMany = false;
 
 		foreach ((array) $related as $name => $config) {
 			if (is_int($name)) {
@@ -549,29 +548,6 @@ class Query extends \lithium\core\Object {
 			}
 			list($name, $query) = $this->_fromRelationship($relationship);
 			$this->join($name, $query);
-			$hasMany = $hasMany || $relationship->type() == 'hasMany';
-		}
-
-		if ($hasMany && $this->limit()) {
-			$model = $this->model();
-			$name = $model::meta('name');
-			$key = $model::key();
-
-			$query = $this->_instance(get_class($this), array(
-				'type' => 'read',
-				'model' => $model,
-				'group' => "{$name}.{$key}",
-				'fields' => array("{$name}.{$key}"),
-				'joins' => $this->joins(),
-				'conditions' => $this->conditions(),
-				'limit' => $this->limit(),
-				'page' => $this->page(),
-				'order' => $this->order()
-			));
-			$ids = $model::connection()->read($query);
-			$idData = $ids->data();
-			$ids = array_map(function($index) use ($key) { return $index[$key]; }, $idData);
-			$this->limit(false)->conditions(array("{$name}.{$key}" => $ids));
 		}
 	}
 
