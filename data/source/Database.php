@@ -266,6 +266,35 @@ abstract class Database extends \lithium\data\Source {
 			if (is_string($query)) {
 				$sql = String::insert($query, $self->value($args));
 			} else {
+				$relationships = $query->relationships();
+				$hasMany = false;
+				foreach ($relationships as $relationship) {
+					$hasMany = $hasMany || $relationship['type'] == 'hasMany';
+				}
+				if ($hasMany && $query->limit() && !isset($args['subquery'])) {
+					$name = $model::meta('name');
+					$key = $model::key();
+
+					$subQuery = $self->invokeMethod('_instance', array(
+							get_class($query), array(
+								'type' => 'read',
+								'model' => $model,
+								'group' => "{$name}.{$key}",
+								'fields' => array("{$name}.{$key}"),
+								'joins' => $query->joins(),
+								'conditions' => $query->conditions(),
+								'limit' => $query->limit(),
+								'page' => $query->page(),
+								'order' => $query->order()
+							)
+						));
+					$ids = $self->read($subQuery, array('subquery' => true));
+					$idData = $ids->data();
+					$ids = array_map(function($index) use ($key) {
+							return $index[$key];
+						}, $idData);
+					$query->limit(false)->conditions(array("{$name}.{$key}" => $ids));
+				}
 				$sql = $self->renderCommand($query);
 			}
 			$result = $self->invokeMethod('_execute', array($sql));
@@ -491,7 +520,7 @@ abstract class Database extends \lithium\data\Source {
 			}
 		}
 		if (!$forJoin) {
-			$sortOrder = array_flip(array_merge(array($modelName),$relations));
+			$sortOrder = array_flip(array_merge(array($modelName), $relations));
 			uksort($result, function($a, $b) use ($sortOrder) {
 				return $sortOrder[$a] - $sortOrder[$b];
 			});
