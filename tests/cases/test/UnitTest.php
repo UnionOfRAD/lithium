@@ -145,10 +145,11 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testRun() {
+		$file = realpath(LITHIUM_LIBRARY_PATH) . '/lithium/tests/mocks/test/MockUnitTest.php';
 		$test = new MockUnitTest();
 		$expected = array(
 			'result' => 'pass',
-			'file' => realpath(LITHIUM_LIBRARY_PATH) . '/lithium/tests/mocks/test/MockUnitTest.php',
+			'file' => realpath($file),
 			'line' => 14,
 			'method' => 'testNothing',
 			'assertion' => 'assertTrue',

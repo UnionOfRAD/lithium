@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\template\helper;
 
+use Exception;
 use lithium\action\Request;
 use lithium\net\http\Router;
 use lithium\data\entity\Record;
@@ -163,7 +164,12 @@ class FormTest extends \lithium\test\Unit {
 
 	public function testFormDataBinding() {
 		$this->expectException('The data connection default is not configured');
-		MockFormPost::config(array('connection' => false));
+
+		try {
+			MockFormPost::config(array('connection' => false));
+		} catch (Exception $e) {
+			MockFormPost::config(array('connection' => false));
+		}
 
 		$record = new Record(array('model' => $this->_model, 'data' => array(
 			'id' => '5',

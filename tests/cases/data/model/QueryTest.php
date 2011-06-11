@@ -346,10 +346,12 @@ class QueryTest extends \lithium\test\Unit {
 	}
 
 	public function testWithAssociation() {
-		$query = new Query(array(
-			'model' => $this->_model,
-			'with' => 'MockQueryComment'
+		$model = $this->_model;
+		$model::bind('hasMany', 'MockQueryComment', array(
+			'class' => 'lithium\tests\mocks\data\model\MockQueryComment'
 		));
+
+		$query = new Query(compact('model') + array('with' => 'MockQueryComment'));
 		$export = $query->export(new MockDatabase());
 		$expected = array(
 			'MockQueryComment' => array(
