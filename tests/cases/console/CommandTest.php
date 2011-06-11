@@ -201,6 +201,14 @@ class CommandTest extends \lithium\test\Unit {
 		$expected = "What up dog?  \n [y] > ";
 		$result = $command->response->output;
 		$this->assertEqual($expected, $result);
+
+		fwrite($command->request->input, "\n");
+		fwrite($command->request->input, 'n');
+		rewind($command->request->input);
+
+		$expected = "y";
+		$result = $command->in('R U Sure?', array('choices' => array('y', 'n'), 'default' => 'y'));
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testInWithOptions() {
