@@ -8,8 +8,6 @@
 
 namespace lithium\data\source\database\adapter\my_sql;
 
-use lithium\data\source\database;
-
 class Result extends \lithium\data\source\database\Result {
 
 	public function prev() {
