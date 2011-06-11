@@ -411,7 +411,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return mixed The current item after moving.
 	 */
 	public function end() {
-		$this->_valid = !(end($this->_updated) === false && key($this->_updated) === null);
+		$this->_valid = !(end($this->_data) === false && key($this->_data) === null);
 		return current($this->_data);
 	}
 
