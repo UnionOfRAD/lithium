@@ -19,7 +19,7 @@ class Result extends \lithium\data\source\database\Result {
 
 	protected function _prev() {
 		if ($this->_resource && $this->_iterator) {
-			if(mysql_data_seek($this->_resource, $this->_iterator -1)) {
+			if (mysql_data_seek($this->_resource, $this->_iterator -1)) {
 				return mysql_fetch_row($this->_resource);
 			}
 		}
@@ -28,7 +28,7 @@ class Result extends \lithium\data\source\database\Result {
 	protected function _next() {
 		if ($this->_resource) {
 			$inRange = $this->_iterator < mysql_num_rows($this->_resource);
-			if($inRange && mysql_data_seek($this->_resource, $this->_iterator)) {
+			if ($inRange && mysql_data_seek($this->_resource, $this->_iterator)) {
 				return mysql_fetch_row($this->_resource);
 			}
 		}
