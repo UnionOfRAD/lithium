@@ -90,7 +90,7 @@ class Password {
 	 *
 	 * @param string $password The password to check.
 	 * @param string $hash The hashed password to compare it to.
-	 * @return boolean Returns a boolean indiciating whether the password is correct.
+	 * @return boolean Returns a boolean indicating whether the password is correct.
 	 * @see lithium\security\Password::hash()
 	 * @see lithium\security\Password::salt()
 	 */
