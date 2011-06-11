@@ -11,6 +11,7 @@ namespace lithium\tests\cases\console\command\g11n;
 use lithium\core\Libraries;
 use lithium\console\Request;
 use lithium\console\command\g11n\Extract;
+use lithium\g11n\Catalog;
 
 class ExtractTest extends \lithium\test\Unit {
 
@@ -25,11 +26,18 @@ class ExtractTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->command = new Extract(array(
-			'request' => new Request(array('input' => fopen('php://temp', 'w+'))),
-			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse')
-		));
+				'request' => new Request(array('input' => fopen('php://temp', 'w+'))),
+				'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse')
+			));
 		mkdir($this->command->source = "{$this->_path}/source");
 		mkdir($this->command->destination = "{$this->_path}/destination");
+	}
+
+	protected function _writeInput(array $input = array()) {
+		foreach ($input as $input) {
+			fwrite($this->command->request->input, $input . "\n");
+		}
+		rewind($this->command->request->input);
 	}
 
 	public function tearDown() {
@@ -43,7 +51,9 @@ class ExtractTest extends \lithium\test\Unit {
 	}
 
 	public function testFailRead() {
+		$this->_writeInput(array('', '', '', ''));
 		$result = $this->command->run();
+
 		$expected = 1;
 		$this->assertIdentical($expected, $result);
 
@@ -62,6 +72,9 @@ class ExtractTest extends \lithium\test\Unit {
 EOD;
 		file_put_contents($file, $data);
 
+		$configs = Catalog::config();
+		$configKey = key($configs);
+		$this->_writeInput(array($configKey, 'q', '', '', '', 'y'));
 		$result = $this->command->run();
 		$expected = 1;
 		$this->assertIdentical($expected, $result);
@@ -71,7 +84,6 @@ EOD;
 		$this->assertEqual($expected, $result);
 	}
 
-
 	public function testDefaultConfiguration() {
 		$file = "{$this->_path}/source/a.html.php";
 		$data = <<<EOD
@@ -80,6 +92,11 @@ EOD;
 EOD;
 		file_put_contents($file, $data);
 
+		$configs = Catalog::config();
+		$configKey1 = key($configs);
+		next($configs);
+		$configKey2 = key($configs);
+		$this->_writeInput(array($configKey1, $configKey2, '', 'y'));
 		$result = $this->command->run();
 		$expected = 0;
 		$this->assertIdentical($expected, $result);
@@ -96,7 +113,7 @@ EOD;
 		$expected = '/msgid "Apples are green\."/';
 		$this->assertPattern($expected, $result);
 
-		$expected = '#/resources/tmp/tests/source/a.html.php:2#';
+		$expected = '#/resources/tmp/tests/source(/|\\\\)a.html.php:2#';
 		$this->assertPattern($expected, $result);
 
 		$result = $this->command->response->error;

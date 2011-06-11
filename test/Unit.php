@@ -931,8 +931,9 @@ class Unit extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _cleanUp($path = null) {
-		$path = $path ?: Libraries::get(true, 'resources') . '/tmp/tests';
-		$path = $path[0] !== '/' ? Libraries::get(true, 'resources') . '/tmp/' . $path : $path;
+		$resources = Libraries::get(true, 'resources');
+		$path = $path ?: $resources . '/tmp/tests';
+		$path = preg_match('/^\w:|^\//', $path) ? $path : $resources . '/tmp/' . $path;
 
 		if (!is_dir($path)) {
 			return;

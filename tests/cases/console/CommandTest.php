@@ -180,6 +180,15 @@ class CommandTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testQuit() {
+		$command = new MockCommand(array('request' => $this->request));
+		fwrite($command->request->input, "q\n");
+		rewind($command->request->input);
+
+		$result = $command->in('This should return bool false');
+		$this->assertFalse($result);
+	}
+
 	public function testInWithDefaultOption() {
 		$command = new MockCommand(array('request' => $this->request));
 		fwrite($command->request->input, '  ');

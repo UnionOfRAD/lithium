@@ -191,14 +191,17 @@ class Command extends \lithium\core\Object {
 		}
 		$default = $options['default'] ? "[{$options['default']}] " : '';
 		$this->out("{$prompt} {$choices} \n {$default}> ", false);
-		$result = null;
 
 		do  {
 			$result = trim($this->request->input());
 		} while (
-			!empty($options['quit']) && $result != $options['quit'] 
+			!empty($options['quit']) && $result != $options['quit']
 			&& !empty($options['choices']) && !in_array($result, $options['choices'], true)
 		);
+
+		if ($result == $options['quit']) {
+			return false;
+		}
 
 		if ($options['default'] && !$result) {
 			return $options['default'];
