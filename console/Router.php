@@ -10,7 +10,7 @@ namespace lithium\console;
 
 /**
  * The `Router` class uses an instance of `lithium\console\Request`, which represents an incoming
- * command-line invokation, to parse the correct command, and sub-command(s) and parameters, which
+ * command-line invocation, to parse the correct command, and sub-command(s) and parameters, which
  * are used by `lithium\console\Dispatcher` to load and execute the proper `Command` class.
  */
 class Router extends \lithium\core\Object {

@@ -63,7 +63,7 @@ abstract class Source extends \lithium\core\Object {
 	 * Constructor. Sets defaults and returns object.
 	 *
 	 * Options defined:
-	 * - 'autoConnect' `boolean` If true, a connection is made on initialisation. Defaults to true.
+	 * - 'autoConnect' `boolean` If true, a connection is made on initialization. Defaults to true.
 	 *
 	 * @param array $config
 	 * @return Source object

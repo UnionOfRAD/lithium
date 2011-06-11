@@ -134,7 +134,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 *
 	 * - A `to()` method, which handles the actual conversion.
 	 *
-	 * Once a class implements these methods, it may be registered per the followng:
+	 * Once a class implements these methods, it may be registered per the following:
 	 * {{{
 	 * Collection::formats('\lithium\net\http\Media');
 	 * }}}

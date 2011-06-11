@@ -172,7 +172,7 @@ class Libraries {
 	 *
 	 * Supposing you wanted to have the option of further organizing jobs by class type (some jobs
 	 * are related to updating caches, others to sending notifications, etc.), you can specify
-	 * mulitple paths per class type, with varying levels of specificity:
+	 * multiple paths per class type, with varying levels of specificity:
 	 * {{{
 	 * Libraries::paths(array('job' => array(
 	 * 	'{:library}\extensions\job\{:class}\{:name}',
@@ -479,7 +479,7 @@ class Libraries {
 	 * @param string $class The class name to locate the physical file for. If `$options['dirs']` is
 	 *        set to `true`, `$class` may also be a namespace name, in which case the corresponding
 	 *        directory will be located.
-	 * @param array $options Options for converting `$class` to a phyiscal path:
+	 * @param array $options Options for converting `$class` to a physical path:
 	 *        - `'dirs'`: Defaults to `false`. If `true`, will attempt to case-sensitively look up
 	 *          directories in addition to files (in which case `$class` is assumed to actually be a
 	 *          namespace).
