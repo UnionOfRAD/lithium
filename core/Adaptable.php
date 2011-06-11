@@ -311,7 +311,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @param string $name The name of the configuration which is being accessed. This is the key
 	 *               name containing the specific set of configuration passed into `config()`.
 	 * @param array $config Contains the configuration assigned to `$name`. If this configuration is
-	 *              segregated by environment, then this will contian the configuration for the
+	 *              segregated by environment, then this will contain the configuration for the
 	 *              current environment.
 	 * @return array Returns the final array of settings for the given named configuration.
 	 */

@@ -94,7 +94,7 @@ abstract class Socket extends \lithium\core\Object {
 	 * Writes data to the socket.
 	 *
 	 * @param mixed $data
-	 * @return boolean `true` if data has been succesfully written, `false` otherwise.
+	 * @return boolean `true` if data has been successfully written, `false` otherwise.
 	 */
 	abstract public function write($data);
 
@@ -102,7 +102,7 @@ abstract class Socket extends \lithium\core\Object {
 	 * Sets the timeout on the socket *connection*.
 	 *
 	 * @param integer $time Seconds after the connection times out.
-	 * @return booelan `true` if timeout has been set, `false` otherwise.
+	 * @return Boolean `true` if timeout has been set, `false` otherwise.
 	 */
 	abstract public function timeout($time);
 

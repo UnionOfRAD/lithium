@@ -536,11 +536,11 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert Cookie data is *not* set in headers.
 	 *
-	 * The value passed to `exepected` is an array of the cookie data, with at least the key and
+	 * The value passed to `expected` is an array of the cookie data, with at least the key and
 	 * value expected, but can support any of the following keys:
 	 * 	- `key`: the expected key
 	 * 	- `value`: the expected value
-	 * 	- `path`: optionally specifiy a path
+	 * 	- `path`: optionally specify a path
 	 * 	- `name`: optionally specify the cookie name
 	 * 	- `expires`: optionally assert a specific expire time
 	 *

@@ -18,7 +18,7 @@ use UnexpectedValueException;
  *
  * When configuring adapters, you may specify one or more priorities for each, using the
  * `'priority'` key. This key can be a single priority level (string), or an array of multiple
- * levels. When a log message is written, all adpaters that are configured to accept the priority
+ * levels. When a log message is written, all adapters that are configured to accept the priority
  * level with which the message was written will receive the message.
  *
  * {{{
@@ -37,7 +37,7 @@ use UnexpectedValueException;
  *
  * {{{ Logger::write('alert', 'This is an alert-level message that will be logged in 2 places'); }}}
  *
- * Messages can also be written using the log priorty as a method name:
+ * Messages can also be written using the log priority as a method name:
  *
  * {{{ Logger::alert('This is an alert-level message that will be logged in 2 places'); }}}
  *

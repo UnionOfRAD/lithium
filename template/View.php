@@ -193,7 +193,7 @@ class View extends \lithium\core\Object {
 	 *            templates. Defaults to `File`.
 	 *          - `'renderer'` _mixed_: Populates the view/layout with the data set from the
 	 *            controller. Defaults to `'File'`.
-	 *          - `request`: The request object to be made available in the view. Defalts to `null`.
+	 *          - `request`: The request object to be made available in the view. Defaults to `null`.
 	 *          - `vars`: Defaults to `array()`.
 	 * @return void
 	 */
