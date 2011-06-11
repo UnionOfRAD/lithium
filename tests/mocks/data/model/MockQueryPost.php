@@ -10,6 +10,8 @@ namespace lithium\tests\mocks\data\model;
 
 class MockQueryPost extends \lithium\data\Model {
 
+	public $hasMany = array('MockQueryComment');
+
 	protected $_meta = array(
 		'source' => false,
 		'connection' => 'mock-database-connection'
