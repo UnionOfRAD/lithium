@@ -355,10 +355,11 @@ class Entity extends \lithium\core\Object {
 	 */
 	public function modified() {
 		if (!$this->_exists) {
-			$keys = array_keys($this->_data);
-			return array_combine($keys, array_fill(0, count($keys), true));
+			$keys = array_keys($this->_data + $this->_updated);
+		} else {
+			$keys = array_keys($this->_updated);
 		}
-		return $this->_modified;
+		return array_combine($keys, array_fill(0, count($keys), true));
 	}
 
 	public function export() {
