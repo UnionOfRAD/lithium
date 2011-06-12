@@ -138,6 +138,7 @@ class Filters extends \lithium\util\Collection {
 	 * @see lithium\util\collection\Filters::apply()
 	 * @param string $class Fully-namespaced class name.
 	 * @param string $method Method name.
+	 * @return boolean
 	 */
 	public static function hasApplied($class, $method) {
 		return isset(static::$_lazyFilters[$class][$method]);

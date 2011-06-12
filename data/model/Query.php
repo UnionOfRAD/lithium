@@ -76,9 +76,7 @@ class Query extends \lithium\core\Object {
 	 * This means that any information may be passed into the constructor may be used by the backend
 	 * data source executing the query (or ignored, if support is not implemented). This is useful
 	 * if, for example, you wish to extend a core data source and implement custom fucntionality.
-	 *
 	 * @param array $config
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -397,7 +395,8 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Convert the query's properties to the data sources' syntax and return it as an array.
 	 *
-	 * @param object $dataSource Instance of the data source to use for conversion.
+	 * @param \lithium\data\Source $dataSource Instance of the data source to use
+	 *                      for conversion.
 	 * @param array $options Options to use when exporting the data.
 	 * @return array Returns an array containing a data source-specific representation of a query.
 	 */
@@ -498,10 +497,10 @@ class Query extends \lithium\core\Object {
 	 * Gets or sets a custom query field which does not have an accessor method.
 	 *
 	 * @param string $method Query part.
-	 * @param string $params Query parameters.
+	 * @param array $params Query parameters.
 	 * @return mixed Returns the value as set in the `Query` object's constructor.
 	 */
-	public function __call($method, $params = array()) {
+	public function __call($method, array $params = array()) {
 		if ($params) {
 			$this->_config[$method] = current($params);
 			return $this;

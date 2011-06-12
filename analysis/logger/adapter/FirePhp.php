@@ -175,7 +175,7 @@ class FirePhp extends \lithium\core\Object {
 	/**
 	 * Generates a string representation of the type and message, suitable for FirePHP.
 	 *
-	 * @param string $priority Represents the message priority.
+	 * @param string $type Represents the message priority.
 	 * @param string $message Contains the actual message to store.
 	 * @return array Returns the encoded string representations of the priority and message, in the
 	 *               `'key'` and `'content'` keys, respectively.

@@ -340,7 +340,6 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *
 	 * @param mixed $offset String or integer indicating the offset or the name of a field in an
 	 *              individual document.
-	 * @param mixed $value The value to assign to the field.
 	 * @return boolean Returns `true` if `$offset` is a field in the document, otherwise `false`.
 	 */
 	public function offsetExists($offset) {
@@ -433,8 +432,8 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * non-numeric.
 	 *
 	 * @param string $field The name of the field to be incrememnted.
-	 * @param string $value The value to increment the field by. Defaults to `1` if this parameter
-	 *               is not specified.
+	 * @param integer|string $value The value to increment the field by. Defaults to `1` if this
+	 *               parameter is not specified.
 	 * @return integer Returns the current value of `$field`, based on the value retrieved from the
 	 *         data source when the entity was loaded, plus any increments applied. Note that it
 	 *         may not reflect the most current value in the persistent backend data source.

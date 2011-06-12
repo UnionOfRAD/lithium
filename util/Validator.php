@@ -542,7 +542,7 @@ class Validator extends \lithium\core\StaticObject {
 	 * @param string $rule
 	 * @param mixed $value
 	 * @param string $format
-	 * @param string $options
+	 * @param array $options
 	 * @return boolean Returns `true` or `false` indicating whether the validation rule check
 	 *         succeeded or failed.
 	 * @filter
@@ -589,12 +589,6 @@ class Validator extends \lithium\core\StaticObject {
 	 * and an array specifying which formats within the rule to use.
 	 *
 	 * @param array $rules All available rules.
-	 * @param array $formats The list of rules to check against.
-	 * @param mixed $value The value to perform validation on.
-	 * @param array $options Validation options to be passed to rules defined as closures.
-	 *              - `'all'` _boolean_: Whether all rule formats should be validated against. If
-	 *                `true`, only return successfully if _all_ formats validate, otherwise, returns
-	 *                `true` if _any_ validates.
 	 * @return closure Function returning boolean `true` if validation succeeded, `false` otherwise.
 	 */
 	protected static function _checkFormats($rules) {

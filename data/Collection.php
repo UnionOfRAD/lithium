@@ -98,9 +98,7 @@ abstract class Collection extends \lithium\util\Collection {
 
 	/**
 	 * Class constructor
-	 *
 	 * @param array $config
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('data' => array(), 'model' => null);

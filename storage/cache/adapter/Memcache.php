@@ -78,12 +78,11 @@ class Memcache extends \lithium\core\Object {
 	 *                is otherwise set. See the `$expiry` parameter of `Memcache::write()`.
 	 *              - `'host'` _mixed_: Specifies one or more Memcache servers to connect to, with
 	 *                optional server selection weights. See above for example values.
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'expiry' => '+1 hour',
-			'host' => '127.0.0.1',
+			'host' => '127.0.0.1'
 		);
 		parent::__construct(Set::merge($defaults, $config));
 	}
@@ -219,7 +218,7 @@ class Memcache extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of numeric cache item to decrement
 	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return closure Function returning item's new value on successful decrement, `false` otherwise
+	 * @return closure Function returning item's new value on successful decrement, else `false`
 	 */
 	public function decrement($key, $offset = 1) {
 		$connection =& $this->connection;
@@ -238,7 +237,7 @@ class Memcache extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return closure Function returning item's new value on successful increment, `false` otherwise
+	 * @return closure Function returning item's new value on successful increment, else `false`
 	 */
 	public function increment($key, $offset = 1) {
 		$connection =& $this->connection;

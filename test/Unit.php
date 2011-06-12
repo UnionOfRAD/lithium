@@ -116,8 +116,9 @@ class Unit extends \lithium\core\Object {
 	 * otherwise processing continues as normal.
 	 * For other methods, only the remainder of the method is skipped, when the condition is met.
 	 *
+	 * @throws Exception
 	 * @param boolean $condition
-	 * @param string $message Message to pass if the condition is met.
+	 * @param string|boolean $message Message to pass if the condition is met.
 	 * @return mixed
 	 */
 	public function skipIf($condition, $message = false) {
@@ -194,9 +195,9 @@ class Unit extends \lithium\core\Object {
 	 * General assert method used by others for common output.
 	 *
 	 * @param boolean $expression
-	 * @param string $message The message to output. If the message is not a string, then it will be
-	 *        converted to '{:message}'. Use '{:message}' in the string and it will use the `$data`
-	 *        to format the message with `String::insert()`.
+	 * @param string|boolean $message The message to output. If the message is not a string,
+	 *        then it will be converted to '{:message}'. Use '{:message}' in the string and it
+	 *        will use the `$data` to format the message with `String::insert()`.
 	 * @param array $data
 	 * @return void
 	 */
@@ -239,7 +240,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param mixed $expected
 	 * @param mixed $result
-	 * @param string $message
+	 * @param string|boolean $message
 	 */
 	public function assertEqual($expected, $result, $message = false) {
 		$data = ($expected != $result) ? $this->_compare('equal', $expected, $result) : null;
@@ -251,7 +252,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param mixed $expected
 	 * @param mixed $result
-	 * @param string $message
+	 * @param string|boolean $message
 	 */
 	public function assertNotEqual($expected, $result, $message = false) {
 		$this->assert($result != $expected, $message, compact('expected', 'result'));
@@ -262,7 +263,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param mixed $expected
 	 * @param mixed $result
-	 * @param string $message
+	 * @param string|boolean $message
 	 */
 	public function assertIdentical($expected, $result, $message = false) {
 		$data = ($expected !== $result) ? $this->_compare('identical', $expected, $result) : null;
@@ -386,6 +387,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param string $string An HTML/XHTML/XML string
 	 * @param array $expected An array, see above
+	 * @return boolean|void
 	 * @access public
 	 */
 	function assertTags($string, $expected) {
@@ -522,6 +524,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param array $expected
 	 * @param array $headers When empty, value of `headers_list()` is used.
+	 * @return boolean|void
 	 */
 	public function assertCookie($expected, $headers = null) {
 		$matched = $this->_cookieMatch($expected, $headers);
@@ -546,6 +549,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param array $expected
 	 * @param array $headers When empty, value of `headers_list()` is used.
+	 * @return boolean|void
 	 */
 	public function assertNoCookie($expected, $headers = null) {
 		$matched = $this->_cookieMatch($expected, $headers);

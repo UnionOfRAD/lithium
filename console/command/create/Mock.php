@@ -19,13 +19,13 @@ use lithium\util\Inflector;
  */
 class Mock extends \lithium\console\command\Create {
 
-    /**
-     * Get the namespace for the mock.
-     *
-     * @param string $request
-     * @param string $options
-     * @return string
-     */
+	/**
+	 * Get the namespace for the mock.
+	 *
+	 * @param string $request
+	 * @param array|string $options
+	 * @return string
+	 */
 	protected function _namespace($request, $options = array()) {
 		$request->params['command'] = $request->action;
 		return parent::_namespace($request, array('prepend' => 'tests.mocks.'));

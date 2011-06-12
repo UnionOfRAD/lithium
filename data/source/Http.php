@@ -63,7 +63,6 @@ class Http extends \lithium\data\Source {
 	 * Constructor
 	 *
 	 * @param array $config
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -167,8 +166,8 @@ class Http extends \lithium\data\Source {
 	 * Describe data source.
 	 *
 	 * @param string $entity
-	 * @param string $meta
-	 * @return void
+	 * @param array $meta
+	 * @return array - returns an empty array
 	 */
 	public function describe($entity, array $meta = array()) {
 		return array();

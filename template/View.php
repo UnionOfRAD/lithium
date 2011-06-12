@@ -195,7 +195,6 @@ class View extends \lithium\core\Object {
 	 *            controller. Defaults to `'File'`.
 	 *          - `request`: The request object to be made available in the view. Defaults to `null`.
 	 *          - `vars`: Defaults to `array()`.
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -289,6 +288,11 @@ class View extends \lithium\core\Object {
 
 	/**
 	 * @filter
+	 * @param array $step
+	 * @param array $params
+	 * @param array $data associative array for template data.
+	 * @param array $options
+	 * @return _renderer.render
 	 */
 	protected function _step(array $step, array $params, array &$data, array &$options = array()) {
 		$step += array('path' => null, 'capture' => null);

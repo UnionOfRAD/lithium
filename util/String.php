@@ -198,9 +198,9 @@ class String {
 	 * }}}
 	 *
 	 * @param string $str A string containing variable place-holders.
-	 * @param string $data A key, value array where each key stands for a place-holder variable
+	 * @param array $data A key, value array where each key stands for a place-holder variable
 	 *                     name to be replaced with value.
-	 * @param string $options Available options are:
+	 * @param array $options Available options are:
 	 *        - `'after'`: The character or string after the name of the variable place-holder
 	 *          (defaults to `null`).
 	 *        - `'before'`: The character or string in front of the name of the variable
@@ -288,7 +288,7 @@ class String {
 	 * and unneeded mark-up around place-holders that did not get replaced by `Set::insert()`.
 	 *
 	 * @param string $str The string to clean.
-	 * @param string $options Available options are:
+	 * @param array $options Available options are:
 	 *        - `'after'`: characters marking the end of targeted substring.
 	 *        - `'andText'`: (defaults to `true`).
 	 *        - `'before'`: characters marking the start of targeted substring.

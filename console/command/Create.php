@@ -85,8 +85,7 @@ class Create extends \lithium\console\Command {
 	 * Execute the given sub-command for the current request.
 	 *
 	 * @param string $command The sub-command name. example: Model, Controller, Test
-	 * @param string $params
-	 * @return void
+	 * @return boolean
 	 */
 	protected function _execute($command) {
 		try {
@@ -220,8 +219,8 @@ class Create extends \lithium\console\Command {
 	/**
 	 * Save a template with the current params. Writes file to `Create::$path`.
 	 *
-	 * @param string $params
-	 * @return boolean
+	 * @param array $params
+	 * @return boolean|string
 	 */
 	protected function _save(array $params = array()) {
 		$defaults = array('namespace' => null, 'class' => null);

@@ -49,7 +49,6 @@ class File extends \lithium\core\Object {
 	 *        - 'path' : Path where cached entries live `LITHIUM_APP_PATH . '/resources/tmp/cache'`.
 	 *        - 'expiry' : Default expiry time used if none is explicitly set when calling
 	 *          `Cache::write()`.
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

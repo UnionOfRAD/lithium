@@ -84,7 +84,6 @@ class Object {
 	 *              - `'init'` _boolean_: Controls constructor behavior for calling the `_init()`
 	 *                method. If `false`, the method is not called, otherwise it is. Defaults to
 	 *                `true`.
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('init' => true);

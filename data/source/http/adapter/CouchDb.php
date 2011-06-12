@@ -51,9 +51,7 @@ class CouchDb extends \lithium\data\source\Http {
 
 	/**
 	 * Constructor.
-	 *
 	 * @param array $config
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('port' => 5984, 'version' => 1);
@@ -108,7 +106,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * Magic for passing methods to http service.
 	 *
 	 * @param string $method
-	 * @param string $params
+	 * @param array $params
 	 * @return void
 	 */
 	public function __call($method, $params = array()) {
@@ -128,8 +126,9 @@ class CouchDb extends \lithium\data\source\Http {
 	/**
 	 * Describe database, create if it does not exist.
 	 *
+	 * @throws ConfigException
 	 * @param string $entity
-	 * @param string $meta
+	 * @param array $meta
 	 * @return void
 	 */
 	public function describe($entity, array $meta = array()) {
@@ -173,7 +172,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * Create new document.
 	 *
 	 * @param string $query
-	 * @param string $options
+	 * @param array $options
 	 * @return boolean
 	 * @filter
 	 */
@@ -210,7 +209,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * Read from document.
 	 *
 	 * @param string $query
-	 * @param string $options
+	 * @param array $options
 	 * @return object
 	 * @filter
 	 */
@@ -258,7 +257,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * Update document.
 	 *
 	 * @param string $query
-	 * @param string $options
+	 * @param array $options
 	 * @return boolean
 	 * @filter
 	 */
@@ -300,7 +299,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * Delete document.
 	 *
 	 * @param string $query
-	 * @param string $options
+	 * @param array $options
 	 * @return boolean
 	 * @filter
 	 */
@@ -493,9 +492,8 @@ class CouchDb extends \lithium\data\source\Http {
 	/**
 	 * Formats a CouchDb result set into a standard result to be passed to item.
 	 *
-	 * @param string $data data returned from query
-	 * @param string $options
-	 * @return void
+	 * @param array $data data returned from query
+	 * @return array
 	 */
 	protected function _format(array $data) {
 		if (isset($data['_id'])) {

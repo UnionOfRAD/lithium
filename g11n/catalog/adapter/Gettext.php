@@ -78,7 +78,6 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 *
 	 * @param array $config Available configuration options are:
 	 *        - `'path'`: The path to the directory holding the data.
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('path' => null);
@@ -417,7 +416,6 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 *
 	 * @param resource $stream
 	 * @param array $data
-	 * @param array $meta
 	 * @return boolean Success.
 	 */
 	protected function _compilePot($stream, array $data) {

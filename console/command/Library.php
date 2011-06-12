@@ -135,8 +135,9 @@ class Library extends \lithium\console\Command {
 	 *
 	 * @param string $key (server)
 	 * @param string $value value of key
-	 * @param string $options [optional]
-	 * @return void
+	 * @param boolean|string $options [optional]
+	 * @return bool|int|array array _settings when $key and $value aren't set and
+	 *         int bytes written when content is written or bool false on failure
 	 */
 	public function config($key = null, $value = null, $options = true) {
 		if (empty($key) || empty($value)) {
@@ -520,8 +521,7 @@ class Library extends \lithium\console\Command {
 	/**
 	 * Update installed plugins. For plugins, runs update commands specified in Formula.
 	 *
-	 * @param string $name
-	 * @return boolean
+	 * @todo implement
 	 */
 	public function update() {
 		$this->error('Please implement me');

@@ -309,8 +309,8 @@ class Help extends \lithium\console\Command {
 	 * Add left padding for prettier display.
 	 *
 	 * @param string $message the text to render.
-	 * @param string $level the level of indentation.
-	 * @return void
+	 * @param integer|string $level the level of indentation.
+	 * @return string
 	 */
 	protected function _pad($message, $level = 1) {
 		$padding = str_repeat(' ', $level * 4);

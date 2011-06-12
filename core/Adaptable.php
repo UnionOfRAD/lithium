@@ -207,6 +207,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @param string $class The fully-namespaced class name of the adapter to instantiate.
 	 * @param array $config The configuration array to be passed to the adapter instance. See the
 	 *              `$config` parameter of `Object::__construct()`.
+	 * @return lithium\core\Adaptable._filter|adapter class
 	 * @filter This method can be filtered.
 	 */
 	protected static function _initAdapter($class, array $config) {

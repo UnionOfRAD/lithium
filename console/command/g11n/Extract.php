@@ -59,8 +59,7 @@ class Extract extends \lithium\console\Command {
 	/**
 	 * Extracts translatable strings from multiple files.
 	 *
-	 * @param array $files Absolute paths to files.
-	 * @return array
+	 * @return array|boolean
 	 */
 	protected function _extract() {
 		$message[] = 'A `Catalog` class configuration with an adapter that is capable of';

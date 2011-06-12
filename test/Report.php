@@ -211,8 +211,7 @@ class Report extends \lithium\core\Object {
 	 * Renders the test output (e.g. layouts and filter templates)
 	 *
 	 * @param string $template name of the template (eg: layout)
-	 * @param string $data array from `_data()` method
-	 * @param array $options Array of options (e.g. rendering type)
+	 * @param string|array $data array from `_data()` method
 	 * @return string
 	 * @filter
 	 */

@@ -142,7 +142,7 @@ abstract class Source extends \lithium\core\Object {
 	 * Returns a list of objects (sources) that models can bind to, i.e. a list of tables in the
 	 * case of a database, or REST collections, in the case of a web service.
 	 *
-	 * @param string $model The fully-name-spaced class name of the object making the request.
+	 * @param string $class The fully-name-spaced class name of the object making the request.
 	 * @return array Returns an array of objects to which models can connect.
 	 */
 	abstract public function sources($class = null);
@@ -163,7 +163,10 @@ abstract class Source extends \lithium\core\Object {
 
 	/**
 	 * Defines or modifies the default settings of a relationship between two models.
-	 *
+	 * @param $class the primary model of the relationship
+	 * @param $type the type of the relationship (hasMany, hasOne, belongsTo)
+	 * @param $name the name of the relationship
+	 * @param array $options relationship options
 	 * @return array Returns an array containing the configuration for a model relationship.
 	 */
 	abstract public function relationship($class, $type, $name, array $options = array());

@@ -269,7 +269,7 @@ class Model extends \lithium\core\StaticObject {
 		'order'      => null,
 		'limit'      => null,
 		'page'       => null,
-		'with'       => array(),
+		'with'       => array()
 	);
 
 	/**
@@ -298,7 +298,6 @@ class Model extends \lithium\core\StaticObject {
 	 * Sets default connection options and connects default finders.
 	 *
 	 * @param array $options
-	 * @return void
 	 * @todo Merge in inherited config from AppModel and other parent classes.
 	 */
 	public static function __init() {
@@ -415,7 +414,7 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * @param string $type The find type, which is looked up in `Model::$_finders`. By default it
 	 *        accepts `all`, `first`, `list` and `count`,
-	 * @param string $options Options for the query. By default, accepts:
+	 * @param array $options Options for the query. By default, accepts:
 	 *        - `conditions`: The conditional query elements, e.g.
 	 *                 `'conditions' => array('published' => true)`
 	 *        - `fields`: The fields that should be retrieved. When set to `null`, defaults to
@@ -423,7 +422,7 @@ class Model extends \lithium\core\StaticObject {
 	 *        - `order`: The order in which the data will be returned, e.g. `'order' => 'ASC'`.
 	 *        - `limit`: The maximum number of records to return.
 	 *        - `page`: For pagination of data.
-	 * @return void
+	 * @return mixed
 	 * @filter This method can be filtered.
 	 */
 	public static function find($type, array $options = array()) {
@@ -1084,6 +1083,7 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * @deprecated
 	 * @see lithium\data\Model::connection()
+	 * @return connection object
 	 */
 	protected static function &_connection() {
 		return static::connection();

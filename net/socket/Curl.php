@@ -95,7 +95,7 @@ class Curl extends \lithium\net\Socket {
 
 	/**
 	 * EOF is unimplemented for this socket adapter
-	 *
+	 * @return null
 	 */
 	public function eof() {
 		return null;

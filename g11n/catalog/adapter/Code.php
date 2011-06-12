@@ -32,7 +32,6 @@ class Code extends \lithium\g11n\catalog\Adapter {
 	 * @param array $config Available configuration options are:
 	 *        - `'path'`: The path to the directory holding the data.
 	 *        - `'scope'`: Scope to use.
-	 * @return object
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('path' => null, 'scope' => null);
@@ -66,7 +65,6 @@ class Code extends \lithium\g11n\catalog\Adapter {
 			return null;
 		}
 		$path = $this->_config['path'];
-		$data = array();
 
 		switch ($category) {
 			case 'messageTemplate':

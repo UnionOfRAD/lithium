@@ -52,7 +52,7 @@ class Group extends \lithium\util\Collection {
 	/**
 	 * Get all test cases. By default, does not include function or integration tests.
 	 *
-	 * @param string $options
+	 * @param array $options
 	 * @return array
 	 */
 	public static function all(array $options = array()) {
@@ -68,7 +68,7 @@ class Group extends \lithium\util\Collection {
 	 * Add a tests to the group.
 	 *
 	 * @param string $test The test to be added.
-	 * @param string $options Method options. Currently not used in this method.
+	 * @param array $options Method options. Currently not used in this method.
 	 * @return array Updated list of tests contained within this collection.
 	 */
 	public function add($test = null, array $options = array()) {
@@ -96,8 +96,8 @@ class Group extends \lithium\util\Collection {
 	/**
 	 * Get the collection of tests
 	 *
-	 * @param string $params
-	 * @param string $options
+	 * @param string|array $params
+	 * @param array $options
 	 * @return lithium\util\Collection
 	 */
 	public function tests($params = array(), array $options = array()) {

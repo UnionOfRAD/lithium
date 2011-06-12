@@ -58,9 +58,7 @@ class Command extends \lithium\core\Object {
 
 	/**
 	 * Constructor.
-	 *
 	 * @param array $config
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('request' => null, 'response' => array(), 'classes' => $this->_classes);
@@ -178,10 +176,10 @@ class Command extends \lithium\core\Object {
 	 * result is part of `$options['choices']`.
 	 *
 	 * @param string $prompt
-	 * @param string $options
-	 * @return string
+	 * @param array $options
+	 * @return string|boolean
 	 */
-	public function in($prompt = null, $options = array()) {
+	public function in($prompt = null, array $options = array()) {
 		$defaults = array('choices' => null, 'default' => null, 'quit' => 'q');
 		$options += $defaults;
 		$choices = null;

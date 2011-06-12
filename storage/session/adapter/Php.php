@@ -38,7 +38,6 @@ class Php extends \lithium\core\Object {
 	 *
 	 * @param array $config Unified constructor configuration parameters. You can set
 	 *        the `session.*` PHP ini settings here as key/value pairs.
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		parent::__construct($config + $this->_defaults);

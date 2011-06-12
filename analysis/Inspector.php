@@ -224,6 +224,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 *        - `'ranges'`: Returns a two-dimensional array where each key is a method name,
 	 *         and each value is an array of line numbers which are contained in the method.
 	 * @param array $options
+	 * @return mixed array|null|object
 	 */
 	public static function methods($class, $format = null, array $options = array()) {
 		$defaults = array('methods' => array(), 'group' => true, 'self' => true);
@@ -281,6 +282,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 * @param array $options Set of options:
 	 *        -'self': If true (default), only returns properties defined in `$class`,
 	 *         excluding properties from inherited classes.
+	 * @return mixed object lithium\analysis\Inspector._items.map|null
 	 */
 	public static function properties($class, array $options = array()) {
 		$defaults = array('properties' => array(), 'self' => true);
@@ -523,7 +525,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 * Helper method to determine if a class applies to a list of modifiers.
 	 *
 	 * @param string $inspector ReflectionClass instance.
-	 * @param string $list List of modifiers to test.
+	 * @param array|string $list List of modifiers to test.
 	 * @return boolean Test result.
 	 */
 	protected static function _modifiers($inspector, $list = array()) {

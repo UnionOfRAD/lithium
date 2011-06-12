@@ -140,7 +140,6 @@ class MongoDb extends \lithium\data\Source {
 	 *
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
-	 * @return object The adapter instance.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -361,7 +360,7 @@ class MongoDb extends \lithium\data\Source {
 	 * Create new document
 	 *
 	 * @param string $query
-	 * @param string $options
+	 * @param array $options
 	 * @return boolean
 	 * @filter
 	 */
@@ -439,7 +438,7 @@ class MongoDb extends \lithium\data\Source {
 	 * Read from document
 	 *
 	 * @param string $query
-	 * @param string $options
+	 * @param array $options
 	 * @return object
 	 * @filter
 	 */
@@ -538,7 +537,7 @@ class MongoDb extends \lithium\data\Source {
 	 * Delete document
 	 *
 	 * @param string $query
-	 * @param string $options
+	 * @param array $options
 	 * @return boolean
 	 * @filter
 	 */

@@ -626,7 +626,6 @@ class Media extends \lithium\core\StaticObject {
 	 * @param mixed $data Arbitrary data you wish to encode. Note that some encoders can only handle
 	 *        arrays or objects.
 	 * @param object $response A reference to the `Response` object for this dispatch cycle.
-	 * @param array $options Handler-specific options.
 	 * @return mixed Returns the result of `$data`, encoded with the encoding configuration
 	 *               specified by `$type`, the result of which is usually a string.
 	 * @filter

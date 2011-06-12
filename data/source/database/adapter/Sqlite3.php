@@ -84,7 +84,6 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 *
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
-	 * @return The adapter instance.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

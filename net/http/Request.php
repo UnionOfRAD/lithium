@@ -59,7 +59,6 @@ class Request extends \lithium\net\http\Message {
 	 *        - auth: the Authorization method (Basic|Digest)
 	 *        - username: the username for auth
 	 *        - password: the password for auth
-	 * @return object
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

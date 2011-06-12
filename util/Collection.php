@@ -236,7 +236,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @see lithium\util\Collection::$_formats
 	 * @param string $format By default the only supported value is `'array'`. However, additional
 	 *               format handlers can be registered using the `formats()` method.
-	 * @param $options Options for converting this collection:
+	 * @param array $options Options for converting this collection:
 	 *        - `'internal'` _boolean_: Indicates whether the current internal representation of the
 	 *          collection should be exported. Defaults to `false`, which uses the standard iterator
 	 *          interfaces. This is useful for exporting record sets, where records are lazy-loaded,

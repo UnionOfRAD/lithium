@@ -18,9 +18,7 @@ class MockConfigurizer extends \lithium\core\Object {
 
 	/**
 	 * Constructor.
-	 *
 	 * @param array $config
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		static::$parameters = $config;

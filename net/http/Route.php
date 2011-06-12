@@ -232,7 +232,7 @@ class Route extends \lithium\core\Object {
 	 * Matches a set of parameters against the route, and returns a URL string if the route matches
 	 * the parameters, or false if it does not match.
 	 *
-	 * @param string $options
+	 * @param array $options
 	 * @param string $context
 	 * @return mixed
 	 */
@@ -345,7 +345,6 @@ class Route extends \lithium\core\Object {
 	 * Compiles URL templates into regular expression patterns for matching against request URLs,
 	 * and extracts template parameters into match-parameter arrays.
 	 *
-	 * @param array $options
 	 * @return void
 	 */
 	public function compile() {

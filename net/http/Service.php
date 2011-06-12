@@ -60,9 +60,7 @@ class Service extends \lithium\core\Object {
 	/**
 	 * Initializes a new `Service` instance with the default HTTP request settings and
 	 * transport- and format-handling classes.
-	 *
 	 * @param array $config
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

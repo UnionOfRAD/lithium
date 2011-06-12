@@ -75,7 +75,6 @@ class Redis extends \lithium\core\Object {
 	 *          connection when attempting to connect to the Redis server. If `true`, it will
 	 *          attempt to reuse an existing connection when connecting, and the connection will
 	 *          not close when the request is terminated. Defaults to `false`.
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -192,7 +191,7 @@ class Redis extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of numeric cache item to decrement
 	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return closure Function returning item's new value on successful decrement, `false` otherwise
+	 * @return closure Function returning item's new value on successful decrement, else `false`
 	 */
 	public function decrement($key, $offset = 1) {
 		$connection =& $this->connection;
@@ -211,7 +210,7 @@ class Redis extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return closure Function returning item's new value on successful increment, `false` otherwise
+	 * @return closure Function returning item's new value on successful increment, else `false`
 	 */
 	public function increment($key, $offset = 1) {
 		$connection =& $this->connection;

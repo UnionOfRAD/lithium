@@ -49,7 +49,6 @@ class Response extends \lithium\core\Object {
 	 *              - request object lithium\console\Request
 	 *              - output stream
 	 *              _ error stream
-	 * @return void
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('output' => null, 'error' => null);

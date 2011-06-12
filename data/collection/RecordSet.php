@@ -151,7 +151,7 @@ class RecordSet extends \lithium\data\Collection {
 	/**
 	 * Returns the currently pointed to record in the set.
 	 *
-	 * @return `Record`
+	 * @return object `Record`
 	 */
 	public function current() {
 		return $this->_data[$this->_pointer];
@@ -230,7 +230,8 @@ class RecordSet extends \lithium\data\Collection {
 				if (!(is_scalar(current($this->_index)) && $options['indexed'])) {
 					break;
 				}
-				$result = ($this->_index && $result) ? array_combine($this->_index, $result) : array();
+				$indexAndResult = ($this->_index && $result);
+				$result =  $indexAndResult ? array_combine($this->_index, $result) : array();
 			break;
 			default:
 				$result = parent::to($format, $options);
@@ -288,7 +289,7 @@ class RecordSet extends \lithium\data\Collection {
 		$record = is_object($data) ? $data : $this->_mapRecord($data);
 		$key = $model::key($record);
 
-		if(!$key) {
+		if (!$key) {
 			$key = count($this->_data);
 		}
 

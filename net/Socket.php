@@ -49,7 +49,6 @@ abstract class Socket extends \lithium\core\Object {
 	 *              - `'password'`: Password for a login (defaults to `''`).
 	 *              - `'port'`: Host port (defaults to `80`).
 	 *              - `'timeout'`: Seconds after opening the socket times out (defaults to `30`).
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

@@ -53,7 +53,6 @@ class Syslog extends \lithium\core\Object {
 	 *              - `'facility'` _integer_: A flag specifying the program to use to log the
 	 *                messages. See the `openlog()` documentation for more information. Defaults to
 	 *                `LOG_USER`.
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('identity' => false, 'options'  => LOG_ODELAY, 'facility' => LOG_USER);

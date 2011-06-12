@@ -88,7 +88,7 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 * Renders content from a template file provided by `template()`.
 	 *
 	 * @param string $template
-	 * @param string $data
+	 * @param array|string $data
 	 * @param array $options
 	 * @return string
 	 */

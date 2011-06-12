@@ -39,7 +39,6 @@ class Cookie extends \lithium\core\Object {
 	 * Takes care of setting appropriate configurations for this object.
 	 *
 	 * @param array $config Optional configuration parameters.
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		parent::__construct($config + $this->_defaults);
@@ -70,7 +69,7 @@ class Cookie extends \lithium\core\Object {
 	/**
 	 * Determines if cookies are enabled.
 	 *
-	 * return boolean True
+	 * @return boolean True
 	 * @todo Implement
 	 */
 	public function isEnabled() {

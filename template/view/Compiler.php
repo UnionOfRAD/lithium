@@ -44,7 +44,7 @@ class Compiler extends \lithium\core\StaticObject {
 	 * Compiles a template and writes it to a cache file, which is used for inclusion.
 	 *
 	 * @param string $file The full path to the template that will be compiled.
-	 * @param string $options Options for compilation include:
+	 * @param array $options Options for compilation include:
 	 *        - `path`: Path where the compiled template should be written.
 	 *        - `fallback`: Boolean indicating that if the compilation failed for some
 	 *                      reason (e.g. `path` is not writable), that the compiled template

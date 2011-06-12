@@ -97,7 +97,6 @@ class Growl extends \lithium\core\Object {
 	 *                `Logger::write()`.
 	 *              - `'notification'` _array_: A list of message types you wish to register with
 	 *                Growl to be able to send. Defaults to `array('Errors', 'Messages')`.
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$name = basename(LITHIUM_APP_PATH);
@@ -109,7 +108,7 @@ class Growl extends \lithium\core\Object {
 			'protocol' => 'udp',
 			'title'    => Inflector::humanize($name),
 			'notifications' => array('Errors', 'Messages'),
-			'registered' => false,
+			'registered' => false
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -117,7 +116,7 @@ class Growl extends \lithium\core\Object {
 	/**
 	 * Writes `$message` to a new Growl notification.
 	 *
-	 * @param string $priority The `Logger`-based priority of the message. This value is mapped to
+	 * @param string $type The `Logger`-based priority of the message. This value is mapped to
 	 *               a Growl-specific priority value if possible.
 	 * @param string $message Message to be shown.
 	 * @param array $options Any options that are passed to the `notify()` method. See the

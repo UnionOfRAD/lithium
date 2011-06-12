@@ -49,7 +49,6 @@ class File extends \lithium\core\Object {
 	 *              - `'format'` _string_: A `String::insert()`-compatible string that specifies how
 	 *                the log message should be formatted. The default format is
 	 *                `"{:timestamp} {:message}\n"`.
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
