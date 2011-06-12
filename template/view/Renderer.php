@@ -155,7 +155,6 @@ abstract class Renderer extends \lithium\core\Object {
 	 * - `response`: The `Response` object associated with this renderer.
 	 * - `context`: An array of the current rendering context data, including `content`,
 	 *              `title`, `scripts`, `head` and `styles`.
-	 *
 	 * @param array $config
 	 */
 	public function __construct(array $config = array()) {

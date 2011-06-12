@@ -93,7 +93,7 @@ class Docblock extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Parses `param` docblock tags to separate out the parameter type from the description.
+	 * Parses `@param` docblock tags to separate out the parameter type from the description.
 	 *
 	 * @param array $params An array of `@param` tags, as parsed from the `tags()` method.
 	 * @return array Returns an array where each key is a parameter name, and each value is an
