@@ -261,17 +261,12 @@ abstract class Database extends \lithium\data\Source {
 			unset($args['return']);
 
 			$model = is_object($query) ? $query->model() : null;
-			$schema = !is_null($model) ? $model::schema() : array();
 
 			if (is_string($query)) {
 				$sql = String::insert($query, $self->value($args));
 			} else {
-				$relationships = $query->relationships();
-				$hasMany = false;
-				foreach ($relationships as $relationship) {
-					$hasMany = $hasMany || $relationship['type'] == 'hasMany';
-				}
-				if ($hasMany && $query->limit() && !isset($args['subquery'])) {
+				$limit = $query->limit();
+				if ($model && $limit && !isset($args['subquery']) && $model::relations('hasMany')) {
 					$name = $model::meta('name');
 					$key = $model::key();
 
