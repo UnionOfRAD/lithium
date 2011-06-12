@@ -213,8 +213,7 @@ class Library extends \lithium\console\Command {
 		$replacements = array(
 			'config/bootstrap/libraries.php' => array(
 				'define(\'LITHIUM_LIBRARY_PATH\', dirname(LITHIUM_APP_PATH) . \'/libraries\');' =>
-					'define(\'LITHIUM_LIBRARY_PATH\', \'' .
-					dirname(Libraries::get('lithium', 'path')) . '\');'
+					'define(\'LITHIUM_LIBRARY_PATH\', \'' . LITHIUM_LIBRARY_PATH . '\');'
 			)
 		);
 

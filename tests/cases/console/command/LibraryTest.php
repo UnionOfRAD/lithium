@@ -87,9 +87,9 @@ class LibraryTest extends \lithium\test\Unit {
 		$result = $this->library->extract($this->_testPath . '/library_test');
 		$this->assertTrue($result);
 
+		$path = '/lithium/console/command/create/template/app.phar.gz';
 		$expected = "library_test created in {$this->_testPath} from ";
-		$expected .= realpath(LITHIUM_LIBRARY_PATH)
-			. "/lithium/console/command/create/template/app.phar.gz\n";
+		$expected .= realpath(LITHIUM_LIBRARY_PATH . $path) . "\n";
 		$result = $this->library->response->output;
 		$this->assertEqual($expected, $result);
 	}
@@ -102,16 +102,14 @@ class LibraryTest extends \lithium\test\Unit {
 	public function testExtractAndReplace() {
 		$filepath = $this->_testPath . '/library_test/config/bootstrap/libraries.php';
 		$content = file_get_contents($filepath);
+		$lines = explode("\n", $content);
 		$expected = 'define(\'LITHIUM_LIBRARY_PATH\', \'' . realpath(LITHIUM_LIBRARY_PATH) . '\')';
 		$this->assertTrue(strpos($content, $expected));
 	}
 
 	public function testArchive() {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
-		$this->skipIf(
-			ini_get('phar.readonly') == '1',
-			'INI setting phar.readonly = On'
-		);
+		$this->skipIf(ini_get('phar.readonly') == '1', 'INI setting phar.readonly = On');
 
 		$this->library->library = 'library_test';
 
@@ -193,7 +191,7 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->assertTrue(file_exists($this->_testPath . '/new'));
 
 		$path = realpath($this->_testPath);
-		$tplPath = realpath(LITHIUM_LIBRARY_PATH) . '/lithium/console/command/create/template';
+		$tplPath = realpath(LITHIUM_LIBRARY_PATH . '/lithium/console/command/create/template');
 		$expected = "new created in {$path} from {$tplPath}/app.phar.gz\n";
 		$result = $app->response->output;
 		$this->assertEqual($expected, $result);
@@ -209,8 +207,9 @@ class LibraryTest extends \lithium\test\Unit {
 		$result = $this->library->extract('plugin', "{$path}/library_test_plugin");
 		$this->assertTrue($result);
 
-		$expected = "library_test_plugin created in {$path} from " . realpath(LITHIUM_LIBRARY_PATH);
-		$expected .= "/lithium/console/command/create/template/plugin.phar.gz\n";
+		$expected = "library_test_plugin created in {$path} from ";
+		$target = '/lithium/console/command/create/template/plugin.phar.gz';
+		$expected .= realpath(LITHIUM_LIBRARY_PATH . $target) . "\n";
 		$result = $this->library->response->output;
 		$this->assertEqual($expected, $result);
 
