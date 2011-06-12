@@ -19,8 +19,6 @@ class ValidatorTest extends \lithium\test\Unit {
 	/**
 	 * Tests static method call routing to enable patterns defined in Validator::$_rules to be
 	 * called as methods.
-	 *
-	 * @return void
 	 */
 	public function testCustomMethodDispatching() {
 		$this->assertTrue(Validator::isRegex('/^abc$/'));
@@ -65,8 +63,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that new methods can be called on Validator by adding rules using Validator::add().
-	 *
-	 * @return void
 	 */
 	public function testAddCustomRegexMethods() {
 		$this->assertNull(Validator::rules('foo'));
@@ -83,8 +79,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that the rules state is reset when calling `Validator::__init()`.
-	 *
-	 * @return void
 	 */
 	public function testStateReset() {
 		$this->assertNull(Validator::rules('foo'));
@@ -98,8 +92,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that valid and invalid UUIDs are properly detected.
-	 *
-	 * @return void
 	 */
 	public function testUuid() {
 		$this->assertTrue(Validator::isUuid('1c0a5830-6025-11de-8a39-0800200c9a66'));
@@ -130,8 +122,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that new formats can be added to existing regex methods using Validator::add().
-	 *
-	 * @return void
 	 */
 	public function testAddCustomRegexFormats() {
 		$this->assertTrue(Validator::isPhone('1234567890'));
@@ -148,8 +138,6 @@ class ValidatorTest extends \lithium\test\Unit {
 	/**
 	 * Tests that setting the `'contain'` rule option to false correctly requires a string to be
 	 * an exact match of the regex, with no additional characters outside.
-	 *
-	 * @return void
 	 */
 	public function testRegexContainment() {
 		$this->assertTrue(Validator::isIp('127.0.0.1', null, array('contains' => false)));
@@ -199,8 +187,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that the 'notEmpty' rule validates correct values
-	 *
-	 * @return void
 	 */
 	public function testNotEmptyRule() {
 		$this->assertTrue(Validator::isNotEmpty('abcdefg'));
@@ -216,8 +202,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests the the 'alphaNumeric' rule validates correct values.
-	 *
-	 * @return void
 	 */
 	public function testAlphaNumeric() {
 		$this->assertTrue(Validator::isAlphaNumeric('frferrf'));
@@ -242,8 +226,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests the the 'lengthBetween' rule validates correct values.
-	 *
-	 * @return void
 	 */
 	public function testIsLengthBetweenRule() {
 		$this->assertTrue(Validator::isLengthBetween('abcde', null, array('min' => 1, 'max' => 7)));
@@ -275,8 +257,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Test basic decimal number validation.
-	 *
-	 * @return void
 	 */
 	function testDecimal() {
 		$this->assertTrue(Validator::isDecimal('0.0'));
@@ -299,9 +279,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Test decimal validation with precision specified.
-	 *
-	 * @access public
-	 * @return void
 	 */
 	public function testDecimalWithPlaces() {
 		$this->assertTrue(Validator::isDecimal('.27', null, array('precision' => '2')));
@@ -408,8 +385,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests email address validation, with additional hostname lookup
-	 *
-	 * @return void
 	 */
 	public function testEmailDomainCheck() {
 		$this->skipIf(dns_check_record("lithify.me", "ANY") === false, "No internet connection.");
@@ -423,8 +398,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests 'inList' validation.
-	 *
-	 * @return void
 	 */
 	function testInList() {
 		$this->assertTrue(Validator::isInList('one', null, array('list' => array('one', 'two'))));
@@ -435,8 +408,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests credit card validation for numbers in various vendors' formats.
-	 *
-	 * @return void
 	 */
 	public function testCreditCardValidation() {
 
