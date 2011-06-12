@@ -227,7 +227,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @param array $options The available options are:
 	 *              - `'collect'`: If `true`, the results will be returned wrapped
 	 *              in a new `Collection` object or subclass.
-	 * @return array|object The filtered data.
+	 * @return object The filtered data.
 	 */
 	public function map($filter, array $options = array()) {
 		$defaults = array('collect' => true);

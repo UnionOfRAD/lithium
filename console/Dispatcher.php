@@ -52,7 +52,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * Used to set configuration parameters for the Dispatcher.
 	 *
 	 * @param array $config
-	 * @return array|void If no parameters are passed, returns an associative array with the
+	 * @return array If no parameters are passed, returns an associative array with the
 	 *         current configuration, otherwise returns null.
 	 */
 	public static function config($config = array()) {

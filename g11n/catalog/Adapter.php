@@ -23,7 +23,7 @@ class Adapter extends \lithium\core\Object {
 	 * @param string $category A category.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
-	 * @return array|void
+	 * @return null This currently does nothing.
 	 */
 	public function read($category, $locale, $scope) {
 		return null;
@@ -42,7 +42,7 @@ class Adapter extends \lithium\core\Object {
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
 	 * @param array $data The data to write.
-	 * @return boolean
+	 * @return false This currently does nothing.
 	 */
 	public function write($category, $locale, $scope, array $data) {
 		return false;

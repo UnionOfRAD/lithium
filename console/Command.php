@@ -148,7 +148,7 @@ class Command extends \lithium\core\Object {
 	 *        array as :
 	 *        - nl : number of new lines to add at the end
 	 *        - style : the style name to wrap around the
-	 * @return integer|void
+	 * @return integer
 	 */
 	public function out($output = null, $options = array('nl' => 1)) {
 		$options = is_int($options) ? array('nl' => $options) : $options;
@@ -165,7 +165,7 @@ class Command extends \lithium\core\Object {
 	 *        array as :
 	 *        - nl : number of new lines to add at the end
 	 *        - style : the style name to wrap around the
-	 * @return integer|void
+	 * @return integer
 	 */
 	public function error($error = null, $options = array('nl' => 1)) {
 		return $this->_response('error', $error, $options);
@@ -177,7 +177,8 @@ class Command extends \lithium\core\Object {
 	 *
 	 * @param string $prompt
 	 * @param array $options
-	 * @return string|boolean
+	 * @return string Returns the result of the input data. If the input is equal to the `quit`
+	 *          option boolean `false` is returned
 	 */
 	public function in($prompt = null, array $options = array()) {
 		$defaults = array('choices' => null, 'default' => null, 'quit' => 'q');

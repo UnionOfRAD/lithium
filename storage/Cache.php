@@ -205,7 +205,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to 1.
 	 * @param mixed $options Options for this method.
-	 * @return integer|boolean Item's new value on successful increment, false otherwise
+	 * @return mixed Item's new value on successful increment, false otherwise.
 	 * @filter This method may be filtered.
 	 */
 	public static function increment($name, $key, $offset = 1, array $options = array()) {
@@ -237,7 +237,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param string $key Key of numeric cache item to decrement
 	 * @param integer $offset Offset to decrement - defaults to 1.
 	 * @param mixed $options Options for this method.
-	 * @return integer|boolean Item's new value on successful decrement, false otherwise
+	 * @return mixed Item's new value on successful decrement, false otherwise.
 	 * @filter This method may be filtered.
 	 */
 	public static function decrement($name, $key, $offset = 1, array $options = array()) {

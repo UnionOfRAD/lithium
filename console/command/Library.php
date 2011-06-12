@@ -136,8 +136,8 @@ class Library extends \lithium\console\Command {
 	 * @param string $key (server)
 	 * @param string $value value of key
 	 * @param boolean|string $options [optional]
-	 * @return bool|int|array array _settings when $key and $value aren't set and
-	 *         int bytes written when content is written or bool false on failure
+	 * @return mixed Returns all settings if `$key` and `$value` aren't set. The only option for
+	 * `$key` right now is 'server'. Returns the bytes written to the configuration file.
 	 */
 	public function config($key = null, $value = null, $options = true) {
 		if (empty($key) || empty($value)) {

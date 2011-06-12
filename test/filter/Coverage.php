@@ -28,7 +28,7 @@ class Coverage extends \lithium\test\Filter {
 	 *              the documentation for `collect()` for further options.  Options affecting this
 	 *              method are:
 	 *              -'method': The name of method to attach to, defaults to 'run'.
-	 * @return object|void Returns the instance of `$tests` with code coverage analysis
+	 * @return object Returns the instance of `$tests` with code coverage analysis
 	 *                     triggers applied.
 	 */
 	public static function apply($report, $tests, array $options = array()) {
@@ -52,7 +52,7 @@ class Coverage extends \lithium\test\Filter {
 	 * @param object $report The report instance running this filter and aggregating results
 	 * @param array $classes A list of classes to analyze coverage on. By default, gets all
 	 *              defined subclasses of lithium\test\Unit which are currently in memory.
-	 * @return array|void Returns an array indexed by file and line, showing the number of
+	 * @return array Returns an array indexed by file and line, showing the number of
 	 *                    instances each line was called.
 	 */
 	public static function analyze($report, array $classes = array()) {

@@ -61,7 +61,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * configuration settings.
 	 *
 	 * @param array $config Configurations, indexed by name.
-	 * @return object|void `Collection` of configurations or void if setting configurations.
+	 * @return object `Collection` of configurations or void if setting configurations.
 	 */
 	public static function config($config = null) {
 		if ($config && is_array($config)) {
@@ -189,7 +189,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * & loaded, as well as having the memcache server up & available.
 	 *
 	 * @param string $name The named configuration whose adapter will be checked.
-	 * @return boolean|null  True if adapter is enabled, false if not. This method will
+	 * @return boolean  True if adapter is enabled, false if not. This method will
 	 *         return null if no configuration under the given $name exists.
 	 */
 	public static function enabled($name) {
@@ -207,7 +207,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @param string $class The fully-namespaced class name of the adapter to instantiate.
 	 * @param array $config The configuration array to be passed to the adapter instance. See the
 	 *              `$config` parameter of `Object::__construct()`.
-	 * @return lithium\core\Adaptable._filter|adapter class
+	 * @return object The adapter's class.
 	 * @filter This method can be filtered.
 	 */
 	protected static function _initAdapter($class, array $config) {
@@ -261,7 +261,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 *
 	 * @param string|array $paths Paths that Libraries::locate() will utilize.
 	 * @param string $name The name of the class to be located.
-	 * @return null|string Fully-namespaced path to the class, or null if not found.
+	 * @return string Fully-namespaced path to the class, or null if not found.
 	 */
 	protected static function _locate($paths, $name) {
 		foreach ((array) $paths as $path) {

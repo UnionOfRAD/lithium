@@ -59,7 +59,7 @@ class Extract extends \lithium\console\Command {
 	/**
 	 * Extracts translatable strings from multiple files.
 	 *
-	 * @return array|boolean
+	 * @return array Returns the catalog specified. Returns boolean `false` when an error occurs.
 	 */
 	protected function _extract() {
 		$message[] = 'A `Catalog` class configuration with an adapter that is capable of';

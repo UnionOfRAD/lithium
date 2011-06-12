@@ -91,7 +91,7 @@ class Message extends \lithium\core\StaticObject {
 	 *              - `'default'`: Is used as a fall back if `_translated()` returns
 	 *                             without a result.
 	 *              - `'noop'`: If `true` no whatsoever lookup takes place.
-	 * @return string|void The translation or the value of the `'default'` option if none
+	 * @return string The translation or the value of the `'default'` option if none
 	 *                     could be found.
 	 */
 	public static function translate($id, array $options = array()) {
@@ -180,7 +180,7 @@ class Message extends \lithium\core\StaticObject {
 	 * @param string $locale The target locale.
 	 * @param array $options Passed through to `Catalog::read()`. Valid options are:
 	 *              - `'scope'`: The scope of the message.
-	 * @return string|void The translation or `null` if none could be found or the plural
+	 * @return string The translation or `null` if none could be found or the plural
 	 *         form could not be determined.
 	 * @filter
 	 */

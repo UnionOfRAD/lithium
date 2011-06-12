@@ -214,8 +214,7 @@ class Entity extends \lithium\core\Object {
 	 * Access the data fields of the record. Can also access a $named field.
 	 *
 	 * @param string $name Optionally included field name.
-	 * @return array|string Entire data array if $name is empty, otherwise the value from the named
-	 *         field.
+	 * @return mixed Entire data array if $name is empty, otherwise the value from the named field.
 	 */
 	public function data($name = null) {
 		if ($name) {
@@ -257,7 +256,7 @@ class Entity extends \lithium\core\Object {
 	 * @param array|string $field If an array, overwrites `$this->_errors`. If a string, and
 	 *        `$value` is not `null`, sets the corresponding key in `$this->_errors` to `$value`.
 	 * @param string $value Value to set.
-	 * @return array|string Either the `$this->_errors` array, or single value from it.
+	 * @return mixed Either the `$this->_errors` array, or single value from it.
 	 */
 	public function errors($field = null, $value = null) {
 		if ($field === null) {

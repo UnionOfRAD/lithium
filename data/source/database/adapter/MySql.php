@@ -226,7 +226,7 @@ class MySql extends \lithium\data\source\Database {
 	 * Gets or sets the encoding for the connection.
 	 *
 	 * @param $encoding
-	 * @return boolean|string If setting the encoding; returns true on success, else false.
+	 * @return mixed If setting the encoding; returns true on success, else false.
 	 *         When getting, returns the encoding.
 	 */
 	public function encoding($encoding = null) {

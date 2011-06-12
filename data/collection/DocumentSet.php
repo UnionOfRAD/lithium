@@ -142,7 +142,7 @@ class DocumentSet extends \lithium\data\Collection {
 	 * of the set is reached, a new document will be fetched from the data source connection handle
 	 * If no more documents can be fetched, returns `null`.
 	 *
-	 * @return object|null Returns the next document in the set, or `null`, if no more documents are
+	 * @return mixed Returns the next document in the set, or `null`, if no more documents are
 	 *         available.
 	 */
 	public function next() {

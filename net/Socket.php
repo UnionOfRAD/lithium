@@ -64,7 +64,7 @@ abstract class Socket extends \lithium\core\Object {
 	/**
 	 * Opens the socket and sets `Socket::$_resource`.
 	 *
-	 * @return booelan|resource The open resource on success, `false` otherwise.
+	 * @return mixed The open resource on success, `false` otherwise.
 	 */
 	abstract public function open();
 
@@ -155,7 +155,7 @@ abstract class Socket extends \lithium\core\Object {
 	/**
 	 * Returns the resource.
 	 *
-	 * @return resource|void
+	 * @return resource
 	 */
 	public function resource() {
 		return $this->_resource;

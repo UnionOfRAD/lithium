@@ -409,7 +409,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * end of the set is reached, a new document will be fetched from the data source connection
 	 * handle (`$_handle`). If no more records can be fetched, returns `null`.
 	 *
-	 * @return object|null Returns the next record in the set, or `null`, if no more records are
+	 * @return mixed Returns the next record in the set, or `null`, if no more records are
 	 *         available.
 	 */
 	public function next() {

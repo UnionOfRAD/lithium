@@ -220,7 +220,8 @@ class Create extends \lithium\console\Command {
 	 * Save a template with the current params. Writes file to `Create::$path`.
 	 *
 	 * @param array $params
-	 * @return boolean|string
+	 * @return string A result string on success of writing the file. If any errors occur along
+	 * the way such as missing information boolean false is returned.
 	 */
 	protected function _save(array $params = array()) {
 		$defaults = array('namespace' => null, 'class' => null);

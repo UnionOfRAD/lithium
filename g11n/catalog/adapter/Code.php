@@ -58,7 +58,8 @@ class Code extends \lithium\g11n\catalog\Adapter {
 	 * @param string $category A category. `'messageTemplate'` is the only category supported.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
-	 * @return array|void
+	 * @return array Returns the message template. If the scope is not equal to the current scope
+	 * or `$category` is not `'messageTemplate'` null is returned.
 	 */
 	public function read($category, $locale, $scope) {
 		if ($scope != $this->_config['scope']) {

@@ -29,7 +29,7 @@ class Memory extends \lithium\g11n\catalog\Adapter {
 	 * @param string $category A category.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
-	 * @return array|void
+	 * @return array
 	 */
 	public function read($category, $locale, $scope) {
 		$scope = $scope ?: 'default';

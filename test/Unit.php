@@ -387,7 +387,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param string $string An HTML/XHTML/XML string
 	 * @param array $expected An array, see above
-	 * @return boolean|void
+	 * @return boolean
 	 * @access public
 	 */
 	function assertTags($string, $expected) {
@@ -524,7 +524,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param array $expected
 	 * @param array $headers When empty, value of `headers_list()` is used.
-	 * @return boolean|void
+	 * @return boolean
 	 */
 	public function assertCookie($expected, $headers = null) {
 		$matched = $this->_cookieMatch($expected, $headers);
@@ -549,7 +549,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param array $expected
 	 * @param array $headers When empty, value of `headers_list()` is used.
-	 * @return boolean|void
+	 * @return boolean
 	 */
 	public function assertNoCookie($expected, $headers = null) {
 		$matched = $this->_cookieMatch($expected, $headers);
@@ -641,7 +641,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param string $method The name of the test method to run.
 	 * @param array $options
-	 * @return void | false
+	 * @return mixed
 	 * @filter
 	 */
 	protected function _runTestMethod($method, $options) {

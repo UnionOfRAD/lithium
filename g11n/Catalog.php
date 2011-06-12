@@ -39,7 +39,7 @@ class Catalog extends \lithium\core\Adaptable {
 	 * Sets configurations for this Adaptable implementation.
 	 *
 	 * @param array $config Configurations, indexed by name.
-	 * @return object|void `Collection` of configurations or void if setting configurations.
+	 * @return array `Collection` of configurations or void if setting configurations.
 	 */
 	public static function config($config = null) {
 		$defaults = array('scope' => null);
@@ -75,7 +75,7 @@ class Catalog extends \lithium\core\Adaptable {
 	 * @param array $options Valid options are:
 	 *        - `'scope'`: The scope to use.
 	 *        - `'lossy'`: Whether or not to use the compact and lossy format, defaults to `true`.
-	 * @return array|void If available the requested data, else `null`.
+	 * @return array If available the requested data, else `null`.
 	 */
 	public static function read($name, $category, $locale, array $options = array()) {
 		$defaults = array('scope' => null, 'lossy' => true);

@@ -208,7 +208,7 @@ class Inflector {
 	 *
 	 * @param string $type Either `'transliteration'`, `'uninflected'`, `'singular'` or `'plural'`.
 	 * @param array $config
-	 * @return array|void If `$config` is empty, returns the rules list specified
+	 * @return mixed If `$config` is empty, returns the rules list specified
 	 *         by `$type`, otherwise returns `null`.
 	 */
 	public static function rules($type, $config = array()) {

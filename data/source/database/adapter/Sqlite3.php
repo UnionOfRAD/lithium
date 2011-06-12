@@ -215,7 +215,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 *
 	 * @param string $encoding If setting the encoding, this is the name of the encoding to set,
 	 *               i.e. `'utf8'` or `'UTF-8'` (both formats are valid).
-	 * @return boolean|string If setting the encoding; returns `true` on success, or `false` on
+	 * @return mixed If setting the encoding; returns `true` on success, or `false` on
 	 *         failure. When getting, returns the encoding as a string.
 	 */
 	public function encoding($encoding = null) {

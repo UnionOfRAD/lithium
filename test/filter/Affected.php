@@ -32,7 +32,7 @@ class Affected extends \lithium\test\Filter {
 	 * @param object $report Instance of Report which is calling apply.
 	 * @param array $tests The test to apply this filter on
 	 * @param array $options Not used.
-	 * @return object|void Returns the instance of `$tests`.
+	 * @return object Returns the instance of `$tests`.
 	 */
 	public static function apply($report, $tests, array $options = array()) {
 		$affected = array();

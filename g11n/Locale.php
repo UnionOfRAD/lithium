@@ -64,7 +64,7 @@ class Locale extends \lithium\core\StaticObject {
 	 *
 	 * @param string $method
 	 * @param array $params
-	 * @return string|void
+	 * @return mixed
 	 */
 	public static function __callStatic($method, $params = array()) {
 		$tags = static::invokeMethod('decompose', $params);
@@ -79,7 +79,7 @@ class Locale extends \lithium\core\StaticObject {
 	 * Composes a locale from locale tags.  This is the pendant to `Locale::decompose()`.
 	 *
 	 * @param array $tags An array as obtained from `Locale::decompose()`.
-	 * @return string|void A locale with tags separated by underscores or `null`
+	 * @return string A locale with tags separated by underscores or `null`
 	 *         if none of the passed tags could be used to compose a locale.
 	 */
 	public static function compose($tags) {
@@ -181,7 +181,7 @@ class Locale extends \lithium\core\StaticObject {
 	 * @link http://www.ietf.org/rfc/rfc4647.txt
 	 * @param array $locales Locales to match against `$locale`.
 	 * @param string $locale A locale in it's canonical form (i.e. `'zh_Hans_HK_REVISED'`).
-	 * @return string|void The matched locale.
+	 * @return string The matched locale.
 	 */
 	public static function lookup($locales, $locale) {
 		$tags = static::decompose($locale);
@@ -203,7 +203,7 @@ class Locale extends \lithium\core\StaticObject {
 	 * @see lithium\g11n\Locale::lookup()
 	 * @param object|array $request An action or console request object or an array of locales.
 	 * @param array $available A list of locales to negotiate the preferred locale with.
-	 * @return string|void The preferred locale in it's canonical form (i.e. `'fr_CA'`).
+	 * @return string The preferred locale in it's canonical form (i.e. `'fr_CA'`).
 	 */
 	public static function preferred($request, $available = null) {
 		if (is_array($request)) {
