@@ -76,7 +76,6 @@ class Query extends \lithium\core\Object {
 	 * This means that any information may be passed into the constructor may be used by the backend
 	 * data source executing the query (or ignored, if support is not implemented). This is useful
 	 * if, for example, you wish to extend a core data source and implement custom fucntionality.
-	 *
 	 * @param array $config
 	 */
 	public function __construct(array $config = array()) {
