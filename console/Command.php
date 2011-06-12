@@ -175,7 +175,7 @@ class Command extends \lithium\core\Object {
 
 	/**
 	 * Handles input. Will continue to loop until `$options['quit']` or
-	 * result is part of `$options['options']`.
+	 * result is part of `$options['choices']`.
 	 *
 	 * @param string $prompt
 	 * @param string $options
@@ -190,20 +190,21 @@ class Command extends \lithium\core\Object {
 			$choices = '(' . implode('/', $options['choices']) . ')';
 		}
 		$default = $options['default'] ? "[{$options['default']}] " : '';
-		$this->out("{$prompt} {$choices} \n {$default}> ", false);
 
-		do  {
+		do {
+			$this->out("{$prompt} {$choices} \n {$default}> ", false);
 			$result = trim($this->request->input());
 		} while (
-			!empty($options['quit']) && $result != $options['quit']
-			&& !empty($options['choices']) && !in_array($result, $options['choices'], true)
+			!empty($options['choices']) && !in_array($result, $options['choices'], true)
+			&& (empty($options['quit']) || $result !== $options['quit'])
+			&& ($options['default'] == null || $result !== '')
 		);
 
 		if ($result == $options['quit']) {
 			return false;
 		}
 
-		if ($options['default'] && !$result) {
+		if ($options['default'] !== null && $result == '') {
 			return $options['default'];
 		}
 		return $result;
