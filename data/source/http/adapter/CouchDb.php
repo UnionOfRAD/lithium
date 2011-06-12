@@ -51,7 +51,6 @@ class CouchDb extends \lithium\data\source\Http {
 
 	/**
 	 * Constructor.
-	 *
 	 * @param array $config
 	 */
 	public function __construct(array $config = array()) {

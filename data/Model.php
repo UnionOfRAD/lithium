@@ -297,7 +297,6 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Sets default connection options and connects default finders.
 	 *
-	 * @todo Merge in inherited config from AppModel and other parent classes.
 	 * @param array $options
 	 * @return void
 	 */

@@ -388,7 +388,6 @@ class Unit extends \lithium\core\Object {
 	 * @param string $string An HTML/XHTML/XML string
 	 * @param array $expected An array, see above
 	 * @return boolean
-	 * @access public
 	 */
 	function assertTags($string, $expected) {
 		$regex = array();
