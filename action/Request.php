@@ -410,12 +410,40 @@ class Request extends \lithium\net\http\Request {
 	}
 
 	/**
-	 * Detects properties of the request and returns a boolean response.
+	 * Provides a simple syntax for making assertions about the properties of a request.
+	 * By default, the `Request` object is configured with several different types of assertions,
+	 * which are individually known as _detectors_. Detectors are invoked by calling the `is()` and
+	 * passing the name of the detector flag, i.e. `$request->is('<name>')`, which returns `true` or
+	 * `false`, depending on whether or not the the properties (usually headers or data) contained
+	 * in the request match the detector. The default detectors include the following:
+	 *
+	 * - `'mobile'`: Uses a regular expression to match common mobile browser user agents.
+	 * - `'ajax'`: Checks to see if the `X-Requested-With` header is present, and matches the value
+	 *    `'XMLHttpRequest'`.
+	 * - `'flash'`: Checks to see if the user agent is `'Shockwave Flash'`.
+	 * - `'ssl'`: Verifies that the request is SSL-secured.
+	 * - `'get'` / `'post'` / `'put'` / `'delete'` / `'head'` / `'options'`: Checks that the HTTP
+	 *   request method matches the one specified.
+	 *
+	 * In addition to the above, this method also accepts media type names (see `Media::type()`) to
+	 * make assertions against the format of the request body (for POST or PUT requests), i.e.
+	 * `$request->is('json')`. This will return `true` if the client has made a POST request with
+	 * JSON data.
+	 *
+	 * For information about adding custom detectors or overriding the ones in the core, see the
+	 * `detect()` method.
+	 *
+	 * While these detectors are useful in controllers or other similar contexts, they're also
+	 * useful when performing _content negotiation_, which is the process of modifying the response
+	 * format to suit the client (see the `'conditions'` field of the `$options` parameter in
+	 * `Media::type()`).
 	 *
 	 * @see lithium\action\Request::detect()
-	 * @todo Remove $content and refer to Media class instead
-	 * @param string $flag
-	 * @return boolean
+	 * @see lithium\net\http\Media::type()
+	 * @param string $flag The name of the flag to check, which should be the name of a valid
+	 *               detector (that is either built-in or defined with `detect()`).
+	 * @return boolean Returns `true` if the detector check succeeds (see the details for the
+	 *         built-in detectors above, or `detect()`), otherwise `false`.
 	 */
 	public function is($flag) {
 		$media = $this->_classes['media'];
