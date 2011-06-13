@@ -1,6 +1,5 @@
-
-The console package contains a set of classes required to route and dispatch
-incoming console requests. Moreover it contains the console front-controller
+**The console package contains a set of classes required to route and dispatch
+incoming console requests.** Moreover it contains the console front-controller
 file (`lithium.php`) as well as wrappers for both *nix and Windows environments
 (`li3` and `li3.bat` respectively), allowing to easily invoke the
 console front-controller from the command line.
@@ -17,7 +16,6 @@ complete access to your application. This is especially useful to reuse
 existing logic in an application's model when creating a command to be run as
 i.e. a cron-job.
 
------
 
 ## Invoking the front-controller ##
 
@@ -53,14 +51,12 @@ by sourcing the modified profile through the following command.
 
 If you can't or don't want to modify your `$PATH` you use two other techniques
 to make the wrapper available as just `li3`.  You can either symlink the
-wrapper into one of the paths found in the `$PATH` environment variable or
-create a permanent alias by adding an alias to i.e. the `.bashrc` file in your
-home directory.
+wrapper into one of the paths found in the `$PATH` environment variable
 
     $ cd /path/to/a/directory/in/your/path
-    $ ln -s /path/to/libraries/lithium/console .
+    $ ln -s /path/to/libraries/lithium/console
 
-
+or create a permanent alias by adding an alias to i.e. the `.bashrc` file in your home directory.
 
     alias li3='/path/to/lithium/libraries/lithium/console/li3'
 
@@ -75,7 +71,7 @@ home directory.
  * Open the _Advanced_ tab.
  * Clicking the _Environment Variables_ button open a dialog where you can edit the variables.
  * Double click the _PATH_ entry in order to edit it.
- * Add `;C:\path\to\php;C:\path\to\libraries\lithium\console` to the end of the value.
+ * Add `C:\path\to\php;C:\path\to\libraries\lithium\console` to the end of the value.
 
 ### Finishing up ###
 
@@ -87,7 +83,6 @@ list of available commands.
     $ li3
     $ li3.bat
 
------
 
 ## Built-in commands ##
 
@@ -100,7 +95,6 @@ the `help` command.
     $ li3 help create
     $ li3 help g11n
 
------
 
 ## Creating custom commands ##
 

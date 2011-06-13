@@ -1,4 +1,3 @@
-
 ## Special syntax ##
 
 Views have a special syntax for outputting escaped text. The standard way to
@@ -43,7 +42,6 @@ An example would be something like:
  * [Introduction to PHP streams](http://www.php.net/intro.stream)
  * [Stream examples](http://www.php.net/stream.examples)
 
-----
 
 ## Using helpers ##
 
@@ -62,11 +60,10 @@ performance impact.
 
 **More info**
 
- * [ HTML helper](template/helper/Html)
- * [ Form helper](template/helper/Form)
- * [ Helper base class](template/Helper)
+ * [HTML helper](template/helper/Html)
+ * [Form helper](template/helper/Form)
+ * [Helper base class](template/Helper)
 
-----
 
 ## Creating custom helpers ##
 
@@ -98,7 +95,6 @@ You can then use your helper in templates as follows:
 Your custom helper will then be auto-loaded into the templating engine from your application or a
 plugin.
 
-----
 
 ## Extending core helpers ##
 
@@ -125,7 +121,6 @@ Your custom `Form` helper will now be invoked in all instances where `$this->for
 template. For more information on the load order of classes, see
 the `locate()` method of the `Libraries` class (`core/Libraries::locate`)
 
-----
 
 ## Rendering elements ##
 
@@ -155,6 +150,6 @@ If you need the element template to not have access to existing data passed to t
 
 **More info**
 
- *  `View` (`template/View`)
- *  `Renderer` (`template/view/Renderer`)
- *  `File adapter` (`template/view/adapter/File`)
+ *  [View](template/View)
+ *  [Renderer](template/view/Renderer)
+ *  [File adapter](template/view/adapter/File)
