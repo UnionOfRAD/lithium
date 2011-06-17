@@ -235,8 +235,6 @@ class Growl extends \lithium\core\Object {
 
 	/**
 	 * Destructor method. Closes and releases the socket connection to Growl.
-	 *
-	 * @return void
 	 */
 	public function __destruct() {
 		if (is_resource($this->_connection)) {
