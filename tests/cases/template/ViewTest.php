@@ -165,8 +165,8 @@ class ViewTest extends \lithium\test\Unit {
 					'template' => 'testFile',
 					'library' => $options['library'],
 					'type' => 'html',
-					'layout' => NULL,
-					'context' => array (),
+					'layout' => null,
+					'context' => array()
 				)
 			  )
 			);

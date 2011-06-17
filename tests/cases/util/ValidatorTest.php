@@ -124,7 +124,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$values = array(
 			'inputName' => 'blah'
 		);
-		$this->assertFalse((bool) Validator::check($values, $validations));
+		$this->assertFalse((boolean) Validator::check($values, $validations));
 		$this->assertEqual($rFormat, 'string');
 	}
 
