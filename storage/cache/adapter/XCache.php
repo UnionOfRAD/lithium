@@ -46,7 +46,8 @@ namespace lithium\storage\cache\adapter;
 class XCache extends \lithium\core\Object {
 
 	/**
-	 * Class constructor
+	 * Class constructor.
+	 *
 	 * @param array $config
 	 */
 	public function __construct(array $config = array()) {
