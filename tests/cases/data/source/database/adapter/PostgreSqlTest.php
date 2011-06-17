@@ -10,33 +10,33 @@ namespace lithium\tests\cases\data\source\database\adapter;
 
 use lithium\data\Connections;
 use lithium\data\model\Query;
-use lithium\data\source\database\adapter\MySql;
-use lithium\tests\mocks\data\source\database\adapter\MockMySql;
+use lithium\data\source\database\adapter\PostgreSql;
+use lithium\tests\mocks\data\source\database\adapter\MockPostgreSql;
 
-class MySqlTest extends \lithium\test\Unit {
+class PostgreSqlTest extends \lithium\test\Unit {
 
 	protected $_dbConfig = array();
 
 	public $db = null;
 
 	/**
-	 * Skip the test if a MySQL adapter configuration is unavailable.
+	 * Skip the test if a PostgreSql adapter configuration is unavailable.
 	 *
 	 * @return void
 	 * @todo Tie into the Environment class to ensure that the test database is being used.
 	 */
 	public function skip() {
-		$this->skipIf(!MySql::enabled(), 'MySQL Extension is not loaded');
+		$this->skipIf(!PostgreSql::enabled(), 'PostgreSql Extension is not loaded');
 
 		$this->_dbConfig = Connections::get('test', array('config' => true));
-		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'MySql');
-		$message = 'Test database is either unavailable, or not using a MySQL adapter';
+		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'PostgreSql');
+		$message = 'Test database is either unavailable, or not using a PostgreSql adapter';
 		$this->skipIf(!$hasDb, $message);
 
-		$this->db = new MySql($this->_dbConfig);
+		$this->db = new PostgreSql($this->_dbConfig);
 
 		$lithium = LITHIUM_LIBRARY_PATH . '/lithium';
-		$sqlFile = $lithium . '/tests/mocks/data/source/database/adapter/mysql_companies.sql';
+		$sqlFile = $lithium . '/tests/mocks/data/source/database/adapter/postgresql_companies.sql';
 		$sql = file_get_contents($sqlFile);
 		$this->db->read($sql, array('return' => 'resource'));
 	}
@@ -47,7 +47,7 @@ class MySqlTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testConstructorDefaults() {
-		$db = new MockMySql(array('autoConnect' => false));
+		$db = new MockPostgreSql(array('autoConnect' => false));
 		$result = $db->get('_config');
 		$expected = array(
 			'autoConnect' => false, 'encoding' => null,'persistent' => true,
@@ -64,7 +64,7 @@ class MySqlTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testDatabaseConnection() {
-		$db = new MySql(array('autoConnect' => false) + $this->_dbConfig);
+		$db = new PostgreSql(array('autoConnect' => false) + $this->_dbConfig);
 
 		$this->assertTrue($db->connect());
 		$this->assertTrue($db->isConnected());
@@ -72,7 +72,7 @@ class MySqlTest extends \lithium\test\Unit {
 		$this->assertTrue($db->disconnect());
 		$this->assertFalse($db->isConnected());
 
-		$db = new MySQL(array(
+		$db = new PostgreSql(array(
 			'autoConnect' => false, 'encoding' => null,'persistent' => false,
 			'host' => 'localhost:3306', 'login' => 'garbage', 'password' => '',
 			'database' => 'garbage', 'init' => true
@@ -177,9 +177,9 @@ class MySqlTest extends \lithium\test\Unit {
 	}
 
 	public function testEnabledFeatures() {
-		$this->assertTrue(MySql::enabled());
-		$this->assertTrue(MySql::enabled('relationships'));
-		$this->assertFalse(MySql::enabled('arrays'));
+		$this->assertTrue(PostgreSql::enabled());
+		$this->assertTrue(PostgreSql::enabled('relationships'));
+		$this->assertFalse(PostgreSql::enabled('arrays'));
 	}
 
 	public function testEntityQuerying() {
@@ -240,7 +240,7 @@ class MySqlTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Ensures that DELETE queries are not generated with table aliases, as MySQL does not support
+	 * Ensures that DELETE queries are not generated with table aliases, as PostgreSql does not support
 	 * this.
 	 *
 	 * @return void
