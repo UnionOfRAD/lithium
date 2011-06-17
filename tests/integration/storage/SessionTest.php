@@ -30,6 +30,10 @@ class SessionTest extends \lithium\test\Unit {
 		}
 	}
 
+	public function skip() {
+		$this->skipIf(PHP_SAPI == 'cli', 'No session support in cli SAPI');
+	}
+
 	public function testWriteAndRead() {
 		Session::config(array(
 			'default' => array('adapter' => 'Php')
