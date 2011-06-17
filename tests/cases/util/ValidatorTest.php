@@ -26,7 +26,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isRegex('/^abc$/'));
 		$this->assertTrue(Validator::isPhone('800-999-5555'));
 
-		$this->assertTrue(Validator::isUrl('http://google.com'));
+		$this->assertTrue(Validator::isUrl('http://example.com'));
 	}
 
 	public function testFieldOption() {
