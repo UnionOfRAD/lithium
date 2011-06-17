@@ -9,4 +9,5 @@ class MockEmployees extends \lithium\data\Model {
 		'connection' => 'test'
 	);
 }
+
 ?>

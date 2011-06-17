@@ -459,7 +459,6 @@ class RecordSetTest extends \lithium\test\Unit {
 		$this->assertEqual($expected['post1'], $posts->rewind());
 		$this->assertEqual($expected['post1'], $posts['post1']);
 	}
-
 }
 
 ?>

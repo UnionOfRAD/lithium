@@ -129,7 +129,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$galleries = $this->db->read($query)->data();
 
-		foreach($galleries as $key => $gallery) {
+		foreach ($galleries as $key => $gallery) {
 			$expect = $this->gallery + array('images' => $this->images);
 			$this->assertEqual($expect, $gallery);
 		}
@@ -174,7 +174,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		))->data();
 		krsort($this->images);
 		reset($this->images);
-		foreach($images as $image) {
+
+		foreach ($images as $image) {
 			$this->assertEqual(current($this->images), $image);
 			next($this->images);
 		}

@@ -90,7 +90,7 @@ class FieldsTest extends \lithium\test\Unit {
 		$result = $new->save();
 		$this->skipIf(!$result, 'Could not save MockEmployee');
 		$eId = (string) $new->{$eKey};
-		
+
 		$entity = MockCompany::first(array(
 			'with' => 'Employee',
 			'conditions' => array(
