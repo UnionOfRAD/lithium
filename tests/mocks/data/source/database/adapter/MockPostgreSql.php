@@ -24,11 +24,11 @@ class MockPostgreSql extends \lithium\data\source\database\adapter\PostgreSql {
 	protected $_describe = array(
 		array(
 		  'Field' => 'id',
-		  'Type' => 'int(10)',
+		  'Type' => 'integer',
 		  'Null' => 'NO',
 		  'Key' => 'PRI',
 		  'Default' => null,
-		  'Extra' => 'auto_increment'
+		  'Extra' => 'serial'
 		),
 		array(
 		  'Field' => 'name',
@@ -36,11 +36,11 @@ class MockPostgreSql extends \lithium\data\source\database\adapter\PostgreSql {
 		  'Null' => 'NO',
 		  'Key' => '',
 		  'Default' => null,
-		  'Extra' => ''
+		  'Extra' => 'serial'
 		),
 		array(
 		  'Field' => 'priority',
-		  'Type' => 'int(10)',
+		  'Type' => 'integer',
 		  'Null' => 'NO',
 		  'Key' => '',
 		  'Default' => '-1',
@@ -48,7 +48,7 @@ class MockPostgreSql extends \lithium\data\source\database\adapter\PostgreSql {
 		),
 		array(
 		  'Field' => 'parent_id',
-		  'Type' => 'int(10)',
+		  'Type' => 'integer',
 		  'Null' => 'NO',
 		  'Key' => '',
 		  'Default' => '0',
@@ -56,7 +56,7 @@ class MockPostgreSql extends \lithium\data\source\database\adapter\PostgreSql {
 		),
 		array(
 		  'Field' => 'active',
-		  'Type' => 'tinyint(1)',
+		  'Type' => 'integer',
 		  'Null' => 'NO',
 		  'Key' => '',
 		  'Default' => '1',
@@ -80,7 +80,7 @@ class MockPostgreSql extends \lithium\data\source\database\adapter\PostgreSql {
 		),
 		array(
 		  'Field' => 'type',
-		  'Type' => 'char(20)',
+		  'Type' => 'varchar(20)',
 		  'Null' => 'NO',
 		  'Key' => '',
 		  'Default' => 'post',
@@ -88,7 +88,7 @@ class MockPostgreSql extends \lithium\data\source\database\adapter\PostgreSql {
 		),
 		array(
 		  'Field' => 'max',
-		  'Type' => 'bigint(20)',
+		  'Type' => 'integer',
 		  'Null' => 'NO',
 		  'Key' => '',
 		  'Default' => '0',
