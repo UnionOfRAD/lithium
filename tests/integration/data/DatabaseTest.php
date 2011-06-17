@@ -10,7 +10,6 @@ namespace lithium\tests\integration\data;
 
 use lithium\data\Connections;
 use lithium\data\model\Query;
-use lithium\data\source\Database;
 use lithium\tests\mocks\data\source\Images;
 use lithium\tests\mocks\data\source\Galleries;
 use lithium\util\String;

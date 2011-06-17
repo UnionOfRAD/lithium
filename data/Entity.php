@@ -10,7 +10,6 @@ namespace lithium\data;
 
 use BadMethodCallException;
 use UnexpectedValueException;
-use lithium\data\Source;
 use lithium\data\Collection;
 
 /**

@@ -8,7 +8,6 @@
 
 namespace lithium\security\validation;
 
-use UnexpectedValueException;
 use lithium\security\Password;
 use lithium\util\String;
 use lithium\util\Set;
