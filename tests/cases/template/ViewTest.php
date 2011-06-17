@@ -150,7 +150,7 @@ class ViewTest extends \lithium\test\Unit {
 				array (
 					'template' => 'testFile',
 					'library' => LITHIUM_LIBRARY_PATH . '/lithium',
-					'type' => 'html',
+					'type' => 'html'
 				),
 				'return' => $expectedPath
 			));

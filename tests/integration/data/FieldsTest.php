@@ -108,8 +108,8 @@ class FieldsTest extends \lithium\test\Unit {
 			array (
 				0 => array (
 					'id' => $eId,
-					'name' => 'John Doe',
-				),
+					'name' => 'John Doe'
+				)
 			)
 		);
 		$this->assertEqual($expected, $entity->data());

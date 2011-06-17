@@ -37,7 +37,7 @@ class DatabaseTest extends \lithium\test\Unit {
 				'gallery_id' => null,
 				'image' => 'me.bmp',
 				'title' => 'Me.'
-			),
+			)
 		);
 
 	public $gallery = array(
