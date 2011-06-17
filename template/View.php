@@ -288,12 +288,14 @@ class View extends \lithium\core\Object {
 	}
 
 	/**
-	 * @filter
+	 * Performs a rendering step.
+	 *
 	 * @param array $step
 	 * @param array $params
 	 * @param array $data associative array for template data.
 	 * @param array $options
-	 * @return _renderer.render
+	 * @return string
+	 * @filter
 	 */
 	protected function _step(array $step, array $params, array &$data, array &$options = array()) {
 		$step += array('path' => null, 'capture' => null);
