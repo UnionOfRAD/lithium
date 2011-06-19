@@ -542,7 +542,7 @@ class Set {
 	 * Checks to see if all the values in the array are numeric.
 	 *
 	 * @param array $array The array to check.  If null, the value of the current Set object.
-	 * @return boolean `true` if values are numeric, `false` otherwise.
+	 * @return mixed `true` if values are numeric, `false` if not and `null` if the array to check is empty.
 	 */
 	public static function isNumeric($array = null) {
 		if (empty($array)) {
