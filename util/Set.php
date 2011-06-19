@@ -546,7 +546,7 @@ class Set {
 	 */
 	public static function isNumeric($array = null) {
 		if (empty($array)) {
-			return null;
+			return false;
 		}
 		if ($array === range(0, count($array) - 1)) {
 			return true;
