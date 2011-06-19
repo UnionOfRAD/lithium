@@ -801,7 +801,7 @@ class SetTest extends \lithium\test\Unit {
 
 		$data = array(1 => 'one');
 		$this->assertFalse(Set::isNumeric($data));
-
+		
 		$data = array('one');
 		$this->assertFalse(Set::isNumeric($data));
 
@@ -825,6 +825,16 @@ class SetTest extends \lithium\test\Unit {
 
 		$data = array('one', 2 => 'two', 3 => 'three', 4 => 'four', 'a' => 'five');
 		$this->assertFalse(Set::isNumeric(array_keys($data)));
+		
+		$data = array();
+		$expected = false;
+		$result = Set::isNumeric($data);
+		$this->assertIdentical($expected, $result);
+		
+		$data = array(1, 2, 3);
+		$expected = true;
+		$result = Set::isNumeric($data);
+		$this->assertIdentical($expected, $result);
 	}
 
 	public function testCheckKeys() {
