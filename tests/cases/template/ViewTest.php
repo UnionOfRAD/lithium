@@ -150,7 +150,7 @@ class ViewTest extends \lithium\test\Unit {
 				array (
 					'template' => 'testFile',
 					'library' => LITHIUM_LIBRARY_PATH . '/lithium',
-					'type' => 'html',
+					'type' => 'html'
 				),
 				'return' => $expectedPath
 			));
@@ -165,8 +165,8 @@ class ViewTest extends \lithium\test\Unit {
 					'template' => 'testFile',
 					'library' => $options['library'],
 					'type' => 'html',
-					'layout' => NULL,
-					'context' => array (),
+					'layout' => null,
+					'context' => array()
 				)
 			  )
 			);

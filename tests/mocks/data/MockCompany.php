@@ -16,3 +16,5 @@ class MockCompany extends \lithium\data\Model {
 		'connection' => 'test'
 	);
 }
+
+?>

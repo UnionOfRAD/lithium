@@ -522,6 +522,7 @@ class Library extends \lithium\console\Command {
 	 * Update installed plugins. For plugins, runs update commands specified in Formula.
 	 *
 	 * @todo implement
+	 * @return void
 	 */
 	public function update() {
 		$this->error('Please implement me');

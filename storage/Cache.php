@@ -41,7 +41,8 @@ namespace lithium\storage;
  *
  * Some cache adapters (e.g. `File`) do _not_ provide the functionality for increment/decrement.
  * Additionally, some cache adapters support multi-key operations for `write`, `read` and `delete`
- * &mdash; please see the individual documentation for cache adapters and the operations that they support.
+ * &mdash; please see the individual documentation for cache adapters and the operations that
+ * they support.
  *
  * @see lithium\core\Adaptable
  * @see lithium\storage\cache\adapter
