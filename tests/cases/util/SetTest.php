@@ -825,6 +825,9 @@ class SetTest extends \lithium\test\Unit {
 
 		$data = array('one', 2 => 'two', 3 => 'three', 4 => 'four', 'a' => 'five');
 		$this->assertFalse(Set::isNumeric(array_keys($data)));
+		
+		$data = array();
+		$this->assertNull(Set::isNumeric($data));
 	}
 
 	public function testCheckKeys() {
