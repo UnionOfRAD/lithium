@@ -1,8 +1,8 @@
-CREATE TABLE IF NOT EXISTS `companies` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
-  `active` tinyint(1) DEFAULT NULL,
-  `created` datetime DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+CREATE TABLE companies (
+  id serial NOT NULL,
+  "name" varchar(255) DEFAULT NULL,
+  active integer DEFAULT NULL,
+  created timestamp DEFAULT NULL,
+  modified timestamp DEFAULT NULL,
+  CONSTRAINT companies_pk PRIMARY KEY (id)
+);
