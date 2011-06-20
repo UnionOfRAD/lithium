@@ -114,6 +114,21 @@ class Sqlite3Test extends \lithium\test\Unit {
 
 	}
 
+	public function testDescribe() {
+		$sql = 'CREATE TABLE [foo] ([bar] VARCHAR(20) NOT NULL DEFAULT baz);';
+		$this->db->read($sql, array('return' => 'resource'));
+		$result = $this->db->describe('foo');
+		$expected = array(
+		  'bar' => array (
+		  'type' => 'VARCHAR',
+		  'length' => '20',
+		  'null' => true,
+		  'default' => 'baz'
+		  )
+		);
+    $this->assertEqual($expected, $result);
+	}
+
 	public function testExecuteException() {
 		$this->expectException();
 		$this->expectException();
