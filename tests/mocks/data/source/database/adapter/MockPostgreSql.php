@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\data\source\database\adapter;
 
-class MockMySql extends \lithium\data\source\database\adapter\PostgreSql {
+class MockPostgreSql extends \lithium\data\source\database\adapter\PostgreSql {
 
 	public function get($var) {
 		return $this->{$var};
