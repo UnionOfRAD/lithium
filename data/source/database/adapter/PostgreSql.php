@@ -24,7 +24,7 @@ class PostgreSql extends \lithium\data\source\Database {
 		'entity' => 'lithium\data\entity\Record',
 		'set' => 'lithium\data\collection\RecordSet',
 		'relationship' => 'lithium\data\model\Relationship',
-		'result' => 'lithium\data\source\database\adapter\postgre_sql\Result'
+		'result' => 'lithium\data\source\database\adapter\postgresql\Result'
 	);
 
 	/**
