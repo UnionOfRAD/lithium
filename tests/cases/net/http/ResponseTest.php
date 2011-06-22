@@ -182,7 +182,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'1',
 			'',
 			'',
-			'',
+			''
 		));
 		$response = new Response(compact('message'));
 
@@ -237,7 +237,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'Content-Type: text/html; charset=ISO-8859-15',
 			'Server: Apache/2.2.16 (Debian) mod_ssl/2.2.16 OpenSSL/0.9.8o',
 			'Transfer-Encoding: chunked',
-			'Vary: Accept-Encoding',
+			'Vary: Accept-Encoding'
 		);
 		return join("\r\n", $headers) . "\r\n\r\n" . $body;
 	}

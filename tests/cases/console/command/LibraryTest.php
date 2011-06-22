@@ -409,7 +409,7 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->skipIf(strpos(shell_exec('git --version'), 'git version') === false,
 			'The git is not installed.'
 		);
-		$this->skipIf(dns_check_record("google.com") === false, "No internet connection.");
+		$this->skipIf(dns_check_record("lithify.me") === false, "No internet connection.");
 
 		$this->library->path = $this->_testPath;
 		$result = $this->library->install('li3_docs');
@@ -654,7 +654,7 @@ test;
 	public function testNoArchive() {
 		$this->skipIf(
 			ini_get('phar.readonly') == '1',
-			'Skipped test {:class}::{:function}() - INI setting phar.readonly = On'
+			'INI setting phar.readonly = On'
 		);
 		$result = $this->library->archive(
 			$this->_testPath . '/library_test_plugin',

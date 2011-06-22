@@ -972,7 +972,7 @@ class FormTest extends \lithium\test\Unit {
 				'type' => 'text', 'name' => 'foo[bar]', 'id' => 'FooBar', 'value' => 'value'
 			),
 			'div' => array('class' => 'error'), 'Something bad happened.', '/div',
-			array('/div' => array()),
+			array('/div' => array())
 		));
 	}
 

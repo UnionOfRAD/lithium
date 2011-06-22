@@ -154,7 +154,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
 			$modelName => array(
-				'id', 'title',
+				'id', 'title'
 			),
 			'MockDatabaseComment' => array(
 				'body'
@@ -168,7 +168,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
 			$modelName => array(
-				'id', 'title',
+				'id', 'title'
 			),
 			'MockDatabaseComment' => array(
 				'body', 'created'
@@ -259,7 +259,7 @@ class DatabaseTest extends \lithium\test\Unit {
 				'type' => 'read',
 				'fields' => array('post_id'),
 				'model' => 'lithium\tests\mocks\data\model\MockDatabaseTagging',
-				'conditions' => array('MockDatabaseTag.tag' => array('foo', 'bar', 'baz')),
+				'conditions' => array('MockDatabaseTag.tag' => array('foo', 'bar', 'baz'))
 			))))
 		));
 		$result = $this->db->renderCommand($query);

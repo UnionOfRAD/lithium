@@ -163,6 +163,7 @@ abstract class Source extends \lithium\core\Object {
 
 	/**
 	 * Defines or modifies the default settings of a relationship between two models.
+	 *
 	 * @param $class the primary model of the relationship
 	 * @param $type the type of the relationship (hasMany, hasOne, belongsTo)
 	 * @param $name the name of the relationship

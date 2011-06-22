@@ -156,7 +156,7 @@ class Request extends \lithium\net\http\Message {
 			'query' => $this->queryString(),
 			'auth' => $this->_config['auth'],
 			'content' => $this->body(),
-			'version' => $this->version,
+			'version' => $this->version
 		);
 		$options += $defaults;
 

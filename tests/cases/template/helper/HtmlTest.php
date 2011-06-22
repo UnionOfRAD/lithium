@@ -314,9 +314,9 @@ class HtmlTest extends \lithium\test\Unit {
 		$result = $this->html->image('test.gif');
 		$this->assertTags($result, array('img' => array('src' => '/img/test.gif', 'alt' => '')));
 
-		$result = $this->html->image('http://google.com/logo.gif');
+		$result = $this->html->image('http://example.com/logo.gif');
 		$this->assertTags($result, array('img' => array(
-			'src' => 'http://google.com/logo.gif', 'alt' => ''
+			'src' => 'http://example.com/logo.gif', 'alt' => ''
 		)));
 
 		$result = $this->html->image(array(

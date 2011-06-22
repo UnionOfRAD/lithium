@@ -26,7 +26,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isRegex('/^abc$/'));
 		$this->assertTrue(Validator::isPhone('800-999-5555'));
 
-		$this->assertTrue(Validator::isUrl('http://google.com'));
+		$this->assertTrue(Validator::isUrl('http://example.com'));
 	}
 
 	public function testFieldOption() {
@@ -124,7 +124,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$values = array(
 			'inputName' => 'blah'
 		);
-		$this->assertFalse((bool) Validator::check($values, $validations));
+		$this->assertFalse((boolean) Validator::check($values, $validations));
 		$this->assertEqual($rFormat, 'string');
 	}
 
@@ -412,7 +412,7 @@ class ValidatorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testEmailDomainCheck() {
-		$this->skipIf(dns_check_record("google.com") === false, "No internet connection.");
+		$this->skipIf(dns_check_record("lithify.me") === false, "No internet connection.");
 
 		$this->assertTrue(Validator::isEmail('abc.efg@rad-dev.org', null, array('deep' => true)));
 		$this->assertFalse(Validator::isEmail('abc.efg@invalidfoo.com', null, array(

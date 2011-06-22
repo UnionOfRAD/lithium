@@ -1,4 +1,4 @@
-﻿
+
 #### Special syntax
 
 Views have a special syntax for outputting escaped text. The standard way to
@@ -48,7 +48,7 @@ An example would be something like: {{{
 
 Helpers are lazy-loaded by the current renderer. To use a helper, you can
 reference it by its name like this: {{{
-echo $this->html->link('Google', 'http://www.google.com');
+echo $this->html->link('Example', 'http://www.example.com');
 }}}
 
 In a template, `$this` refers to the `Renderer` object. By using `$this->html`

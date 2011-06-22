@@ -10,7 +10,6 @@ namespace lithium\tests\integration\data;
 
 use lithium\data\Connections;
 use lithium\data\model\Query;
-use lithium\data\source\Database;
 use lithium\tests\mocks\data\source\Images;
 use lithium\tests\mocks\data\source\Galleries;
 use lithium\util\String;
@@ -38,7 +37,7 @@ class DatabaseTest extends \lithium\test\Unit {
 				'gallery_id' => null,
 				'image' => 'me.bmp',
 				'title' => 'Me.'
-			),
+			)
 		);
 
 	public $gallery = array(
@@ -129,7 +128,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$galleries = $this->db->read($query)->data();
 
-		foreach($galleries as $key => $gallery) {
+		foreach ($galleries as $key => $gallery) {
 			$expect = $this->gallery + array('images' => $this->images);
 			$this->assertEqual($expect, $gallery);
 		}
@@ -174,7 +173,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		))->data();
 		krsort($this->images);
 		reset($this->images);
-		foreach($images as $image) {
+
+		foreach ($images as $image) {
 			$this->assertEqual(current($this->images), $image);
 			next($this->images);
 		}

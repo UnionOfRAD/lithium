@@ -56,8 +56,8 @@ class Response extends \lithium\net\http\Response {
 	/**
 	 * Disables HTTP caching for web clients and proxies.
 	 *
-	 * @return void
 	 * @deprecated
+	 * @return void
 	 */
 	public function disableCache() {
 		$message = '`Request::disableCache()` is deprecated. Please use `Request::cache(false)`.';

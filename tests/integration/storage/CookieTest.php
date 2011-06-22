@@ -30,6 +30,10 @@ class CookieTest extends \lithium\test\Unit {
 		}
 	}
 
+	public function skip() {
+		$this->skipIf(PHP_SAPI == 'cli', 'No cookie support in cli SAPI');
+	}
+
 	public function testCookieWriteReadDelete() {
 		Session::config(array(
 			'li3' => array(

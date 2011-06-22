@@ -53,7 +53,7 @@ class Sqlite3Test extends \lithium\test\Unit {
 		  'autoConnect' => false,
 		  'database' => '',
 		  'flags' => SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE,
-		  'key' => NULL,
+		  'key' => null,
 		  'persistent' => true,
 		  'host' => 'localhost',
 		  'login' => 'root',
