@@ -178,8 +178,8 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 */
 	public function describe($entity, array $meta = array()) {
 		$params = compact('entity', 'meta');
-		$columns = &$this->_regex;
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($columns) {
+		$regex = &$this->_regex;
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($regex) {
 			extract($params);
 
 			$name = $self->invokeMethod('_entityName', array($entity));
@@ -187,7 +187,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 			$fields = array();
 
 			foreach ($columns as $column) {
-				preg_match("/{$columns['column']}/", $column['type'], $matches);
+				preg_match("/{$regex['column']}/", $column['type'], $matches);
 
 				$fields[$column['name']] = array(
 					'type' => isset($matches['type']) ? $matches['type'] : null,
