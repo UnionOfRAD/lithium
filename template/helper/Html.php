@@ -134,6 +134,9 @@ class Html extends \lithium\template\Helper {
 	 */
 	public function link($title, $url = null, array $options = array()) {
 		$defaults = array('escape' => true, 'type' => null);
+		if (is_array($url)) {
+			$url = array_merge(array('http:method' => 'GET'), $url);
+		}
 		list($scope, $options) = $this->_options($defaults, $options);
 
 		if (isset($scope['type']) && $type = $scope['type']) {
