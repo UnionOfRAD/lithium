@@ -941,6 +941,17 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual('html', $request->accepts());
 	}
 
+	public function testLocaleDetection() {
+		$request = new Request();
+		$this->assertNull($request->locale());
+
+		$request->params['locale'] = 'fr';
+		$this->assertEqual('fr', $request->locale());
+
+		$request->locale('de');
+		$this->assertEqual('de', $request->locale());
+	}
+
 	/**
 	 * Tests that `action\Request` correctly inherits the functionality of the `to()` method
 	 * inherited from `lithium\net\http\Request`.
