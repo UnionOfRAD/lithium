@@ -1,6 +1,7 @@
 namespace {:namespace};
 
 use {:use};
+use lithium\action\DispatchException;
 
 class {:class} extends \lithium\action\Controller {
 
