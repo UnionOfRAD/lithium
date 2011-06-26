@@ -273,6 +273,9 @@ class Route extends \lithium\core\Object {
 		if (array_intersect_key($options, $this->_match) != $this->_match) {
 			return false;
 		}
+		if (!isset($this->_match['http:method'])) {
+			unset($options['http:method']); // only matters if its set in the route
+		}
 		if (array_diff_key(array_diff_key($options, $this->_match), $this->_keys) !== array()) {
 			return false;
 		}
