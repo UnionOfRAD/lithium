@@ -38,7 +38,7 @@ class {:class} extends \lithium\action\Controller {
 	public function delete() {
 		if (!$this->request->is('post') && !$this->request->is('delete')) {
 			$msg = "{:name}::delete can only be called with http:post or http:delete.";
-			throw new DispatchException($msg);
+			throw new \lithium\action\DispatchException($msg);
 		}
 		{:model}::find($this->request->id)->delete();
 		$this->redirect('{:name}::index');
