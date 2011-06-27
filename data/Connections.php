@@ -101,7 +101,6 @@ class Connections extends \lithium\core\Adaptable {
 		$defaults = array(
 			'type'     => null,
 			'adapter'  => null,
-			'host'     => 'localhost',
 			'login'    => '',
 			'password' => ''
 		);

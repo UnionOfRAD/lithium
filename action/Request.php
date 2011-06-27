@@ -129,6 +129,13 @@ class Request extends \lithium\net\http\Request {
 	protected $_acceptContent = array();
 
 	/**
+	 * Holds the value of the current locale, set through the `locale()` method.
+	 *
+	 * @var string
+	 */
+	protected $_locale = null;
+
+	/**
 	 * Pulls request data from superglobals.
 	 *
 	 * @return void
@@ -558,8 +565,27 @@ class Request extends \lithium\net\http\Request {
 			'path' => $this->_base . $this->url,
 			'query' => $this->query
 		);
-		$options += $defaults;
-		return parent::to($format, $options);
+		return parent::to($format, $options + $defaults);
+	}
+
+	/**
+	 * Sets or returns the current locale string. For more information, see
+	 * "[Globalization](http://lithify.me/docs/manual/07_globalization)" in the manual.
+	 *
+	 * @param string $locale An optional locale string like `'en'`, `'en_US'` or `'de_DE'`. If
+	 *               specified, will overwrite the existing locale.
+	 * @return Returns the currently set locale string.
+	 */
+	public function locale($locale = null) {
+		if ($locale) {
+			$this->_locale = $locale;
+		}
+		if ($this->_locale) {
+			return $this->_locale;
+		}
+		if (isset($this->params['locale'])) {
+			return $this->params['locale'];
+		}
 	}
 
 	/**

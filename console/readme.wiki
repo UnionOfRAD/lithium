@@ -109,7 +109,7 @@ $ li3 help g11n
 Creating your own commands is very easy. A few fundamentals:
 
 - All commands inherit from `lithium\console\Command`.
-- Commands are normally placed in your application or library's `extensions/commands` directory.
+- Commands are normally placed in your application or library's `extensions/command` directory.
 
 Here's an example command:
 
