@@ -129,7 +129,7 @@ class PostgreSql extends \lithium\data\source\Database {
 		if ($this->connection) {
 			$this->_isConnected = true;
             if ( isset($config['schema']) ){
-                pg_query($this->connection,"set search_path=\"{$config['schema']}\";");
+                $this->_execute("SET search_path TO " . $config['schema']);
             }
 		}
 
