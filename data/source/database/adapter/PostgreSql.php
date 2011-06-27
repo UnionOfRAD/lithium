@@ -24,7 +24,7 @@ class PostgreSql extends \lithium\data\source\Database {
 		'entity' => 'lithium\data\entity\Record',
 		'set' => 'lithium\data\collection\RecordSet',
 		'relationship' => 'lithium\data\model\Relationship',
-		'result' => 'lithium\data\source\database\adapter\postgresql\Result'
+		'result' => 'lithium\data\source\database\adapter\postgre_sql\Result'
 	);
 
 	/**
@@ -129,7 +129,7 @@ class PostgreSql extends \lithium\data\source\Database {
 		if ($this->connection) {
 			$this->_isConnected = true;
             if ( isset($config['schema']) ){
-                $this->_execute("SET search_path TO " . $config['schema']);
+                pg_query($this->connection,"set search_path=\"{$config['schema']}\";");
             }
 		}
 
