@@ -370,8 +370,9 @@ class PostgreSql extends \lithium\data\source\Database {
 		$model = $query->model();
 		$columns = $model::schema();
 		foreach ($columns as $column) {
-			if (isset($column['sequence'])) {
-				$id = $this->_execute("SELECT currval('{$column['sequence']}') as max");
+            if (isset($column['sequence'])) {
+    			$resource = $this->_execute("SELECT currval('{$column['sequence']}') as max");
+				list($id) = $resource->next();
 				break;
 			}
 		}
