@@ -296,8 +296,9 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @return array
 	 */
 	public function error() {
-		if (pg_last_error($this->connection)) {
-			return array(0, pg_last_error($this->connection));
+        $lastError = pg_last_error($this->connection);
+		if ($lastError) {
+			return array(0, $lastError);
 		}
 		return null;
 	}
