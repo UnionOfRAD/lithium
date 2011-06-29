@@ -13,7 +13,7 @@ use lithium\data\model\QueryException;
 /**
  * Extends the `Database` class to implement the necessary SQL-formatting and resultset-fetching
  * features for working with PostgreSQL databases.
- *
+ *  
  * For more information on configuring the database connection, see the `__construct()` method.
  *
  * @see lithium\data\source\database\adapter\PostgreSQL::__construct()
@@ -73,8 +73,12 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('host' => 'localhost:5432', 'encoding' => null);
+    public function __construct(array $config = array()) {
+		$defaults = array(
+					'host' => 'localhost',
+					'port' => 5432, 
+					'encoding' => null, 
+					'schema' => 'public');
 		parent::__construct($config + $defaults);
 	}
 
@@ -105,7 +109,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @return boolean Returns `true` if a database connection could be established, otherwise
 	 *         `false`.
 	 */
-	public function connect() {
+    public function connect() {
 		$config = $this->_config;
 		$this->_isConnected = false;
 
@@ -128,9 +132,8 @@ class PostgreSql extends \lithium\data\source\Database {
 
 		if ($this->connection) {
 			$this->_isConnected = true;
-            if ( isset($config['schema']) ){
-                pg_query($this->connection,"set search_path=\"{$config['schema']}\";");
-            }
+            
+            pg_query($this->connection,"set search_path=\"{$config['schema']}\";");
 		}
 
 		if ($config['encoding']) {
@@ -192,16 +195,20 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *         - `'type'`: The field type name
 	 * @filter This method can be filtered.
 	 */
-	public function describe($entity, array $meta = array()) {
+    public function describe($entity, array $meta = array()) {
 		$params = compact('entity', 'meta');
-		return $this->_filter(__METHOD__, $params, function($self, $params) {
+		$_config = $this->_config;
+
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
 			extract($params);
 
 			$name = $self->invokeMethod('_entityName', array($entity));
+			$schema = $_config['schema'];
+
 			$columns = $self->read("SELECT DISTINCT column_name AS field, data_type AS type, is_nullable AS null,
 					column_default AS default, ordinal_position AS position, character_maximum_length AS char_length,
 					character_octet_length AS oct_length FROM information_schema.columns
-				WHERE table_name = '{$name}' ORDER BY position;", array('return' => 'array', 'schema' => array(
+				WHERE table_name = '{$name}' and table_schema = '{$schema}' ORDER BY position;", array('return' => 'array', 'schema' => array(
 				'field', 'type', 'null', 'default', 'position', 'char_length', 'oct_length'
 			)));
 
@@ -214,6 +221,13 @@ class PostgreSql extends \lithium\data\source\Database {
 					'null'     => ($column['null'] == 'YES' ? true : false),
 					'default'  => $column['default']
 				);
+				
+				if (isset($fields[$column['field']]['default'])) {
+					if (preg_match("/^nextval\('(.+?)'::regclass\)/i", $fields[$column['field']]['default'], $seq_match)) {
+						$fields[$column['field']]['default'] = null;
+						$fields[$column['field']]['sequence'] = end($seq_match);
+					}
+				}
 			}
 
 			return $fields;
@@ -352,11 +366,15 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @return mixed Returns the last inserted ID key for an auto-increment column or a column
 	 *         bound to a sequence.
 	 */
-	protected function _insertId($query, $field = 'id') {
-		// inspired by cakephp
-		$seq = "{$column->table}_{$field}_seq";
-		$recource = $this->_execute("SELECT currval('{$seq}') as max");
-		list($id) = $resource->next();
+    protected function _insertId($query) {
+		$model = $query->model();
+		$columns = $model::schema();
+		foreach ($columns as $column) {
+			if (isset($column['sequence'])) {
+				$id = $this->_execute("SELECT currval('{$column['sequence']}') as max");
+				break;
+			}
+		}
 		return ($id && $id !== '0') ? $id : null;
 	}
 
