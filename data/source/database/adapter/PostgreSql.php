@@ -297,7 +297,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 */
 	public function error() {
 		if (pg_last_error($this->connection)) {
-			return array(pg_last_error($this->connection), pg_last_error($this->connection));
+			return array(0, pg_last_error($this->connection));
 		}
 		return null;
 	}
@@ -342,7 +342,7 @@ class PostgreSql extends \lithium\data\source\Database {
 				return $self->invokeMethod('_instance', array('result', compact('resource')));
 			}
 			list($code, $error) = $self->error();
-			throw new QueryException("{$sql}: {$error}", $code);
+			throw new QueryException("SQL: {$sql} \r\n {$error}", $code);
 		});
 	}
 
