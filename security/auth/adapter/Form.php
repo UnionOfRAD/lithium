@@ -274,7 +274,7 @@ class Form extends \lithium\core\Object {
 
 		$password = function($form, $data) {
 			return Password::check($form, $data);
-		}
+		};
 		$config['validators'] += compact('password');
 
 		parent::__construct($config + $defaults);
@@ -401,17 +401,17 @@ class Form extends \lithium\core\Object {
 	 */
 	protected function _validate($user, array $data) {
 		foreach ($this->_validators as $field => $validator) {
-			if ($validator === false) {
+			if ($validator === false || !isset($this->_fields[$field])) {
 				continue;
 			}
-			$value = isset($data[$field]) ? $data[$field] : null;
-			$dataKey = isset($this->_fields[$field]) ? $this->_fields[$field] : $key;
 
+			$value = isset($data[$field]) ? $data[$field] : null;
 			if (!is_callable($validator)) {
-				$message = "Authentication validator for `{$key}` is not callable.";
+				$message = "Authentication validator for `{$field}` is not callable.";
 				throw new UnexpectedValueException($message);
 			}
-			if (!call_user_func($validator, $value, $user->data($dataKey))) {
+
+			if (!call_user_func($validator, $value, $user->data($this->_fields[$field]))) {
 				return false;
 			}
 		}
