@@ -60,12 +60,14 @@ class FormTest extends \lithium\test\Unit {
 
 		$subject = new Form(array(
 			'model' => __CLASS__,
-			'validators' => array(),
 			'fields' => array('username', 'password', 'date'),
 			'filters' => array(
 				'date' => function($date) {
 					return "{$date['year']}-{$date['month']}-{$date['day']}";
 				}
+			),
+			'validators' => array(
+				'password' => false
 			)
 		));
 
@@ -75,6 +77,41 @@ class FormTest extends \lithium\test\Unit {
 
 		$expected = array('username' => 'bob', 'password' => 'foo', 'date' => '2011-06-29');
 		$this->assertEqual($expected, $subject->check((object) compact('data')));
+	}
+
+	public function testGenericFilter() {
+		$subject = new Form(array(
+			'model' => __CLASS__,
+			'fields' => array('username', 'password', 'group'),
+			'filters' => array(
+				function($form) {
+					$form['group'] = 'admins';
+					return $form;
+				}
+			),
+			'validators' => array(
+				'password' => false
+			),
+		));
+
+		$data = array('username' => 'bob', 'password' => 's3cure', 'group' => 'editors');
+		$result = $subject->check((object) compact('data'));
+		$expected = array('username' => 'bob', 'password' => 's3cure', 'group' => 'admins');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testUncallableGenericFilter() {
+		$subject = new Form(array(
+			'model' => __CLASS__,
+			'fields' => array('username', 'password', 'group'),
+			'filters' => array(
+				null
+			)
+		));
+
+		$this->expectException('Authentication filter is not callable.');
+		$data = array('username' => 'bob', 'password' => 's3cure', 'group' => 'editors');
+		$subject->check((object) compact('data'));
 	}
 
 	/**
@@ -119,6 +156,18 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $subject->check($request));
 	}
 
+	public function testDefaultValidator() {
+		$subject = new Form(array(
+			'model' => __CLASS__,
+			'fields' => array('username', 'password', 'group'),
+		));
+
+		$data = array('username' => 'bob', 'password' => 's3cure', 'group' => 'editors');
+		$result = $subject->check((object) compact('data'));
+		$expected = array('username' => 'bob', 'group' => 'editors');
+		$this->assertEqual($expected, $result);
+	}
+
 	/**
 	 * Tests that parameter validators are correctly applied to form data after the authentication
 	 * query has occurred.
@@ -160,10 +209,70 @@ class FormTest extends \lithium\test\Unit {
 			)
 		));
 
-		$data = array('username' => 'Bob', 'password' => 's3cure', 'group' => 'editors');
+		$data = array('username' => 'bob', 'password' => 's3cure', 'group' => 'editors');
 		$result = $subject->check((object) compact('data'));
-		$this->assertEqual(array('username' => 'Bob'), $result);
+		$this->assertEqual(array('username' => 'bob'), $result);
 	}
+
+	public function testParameterValidatorsFail() {
+		$subject = new Form(array(
+			'model' => __CLASS__,
+			'fields' => array('username', 'password', 'group'),
+			'validators' => array(
+				'password' => function($form, $data) { return false; },
+			)
+		));
+
+		$data = array('username' => 'bob', 'password' => 's3cure', 'group' => 'editors');
+		$result = $subject->check((object) compact('data'));
+		$this->assertFalse($result);
+	}
+
+	public function testUncallableValidator() {
+		$subject = new Form(array(
+			'model' => __CLASS__,
+			'fields' => array('username', 'password', 'group'),
+			'validators' => array(
+				'password' => null
+			)
+		));
+
+		$this->expectException('Authentication validator for `password` is not callable.');
+		$data = array('username' => 'bob', 'password' => 's3cure', 'group' => 'editors');
+		$subject->check((object) compact('data'));
+	}
+
+	public function testGenericValidator() {
+		$self = $this;
+		$subject = new Form(array(
+			'model' => __CLASS__,
+			'fields' => array('username', 'password', 'group'),
+			'validators' => array(
+				function($data, $user) use ($self) {
+					return true;
+				}
+			)
+		));
+
+		$data = array('username' => 'bob', 'password' => 's3cure', 'group' => 'editors');
+		$result = $subject->check((object) compact('data'));
+		$this->assertEqual(array_keys($data), array_keys($result));
+	}
+
+	public function testUncallableGenericValidator() {
+		$subject = new Form(array(
+			'model' => __CLASS__,
+			'fields' => array('username', 'password', 'group'),
+			'validators' => array(
+				'uncallable'
+			)
+		));
+
+		$this->expectException('Authentication validator is not callable.');
+		$data = array('username' => 'bob', 'password' => 's3cure', 'group' => 'editors');
+		$subject->check((object) compact('data'));
+	}
+
 }
 
 ?>
