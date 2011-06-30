@@ -267,13 +267,16 @@ class Form extends \lithium\core\Object {
 			'model' => 'Users',
 			'query' => 'first',
 			'filters' => array(),
-			'validators' => array(
-				'password' => function($form, $data) {
-					return Password::check($form, $data);
-				}
-			),
+			'validators' => array(),
 			'fields' => array('username', 'password')
 		);
+		$config += $defaults;
+
+		$password = function($form, $data) {
+			return Password::check($form, $data);
+		}
+		$config['validators'] += compact('password');
+
 		parent::__construct($config + $defaults);
 	}
 
