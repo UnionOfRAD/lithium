@@ -121,7 +121,7 @@ class FormTest extends \lithium\test\Unit {
 					return $form;
 				}
 			),
-			'validators' => array('password' => false),
+			'validators' => array('password' => false)
 		));
 
 		$request = (object) array('data' => array(
@@ -197,7 +197,7 @@ class FormTest extends \lithium\test\Unit {
 	public function testDefaultValidator() {
 		$subject = new Form(array(
 			'model' => __CLASS__,
-			'fields' => array('username', 'password', 'group'),
+			'fields' => array('username', 'password', 'group')
 		));
 
 		$request = (object) array('data' => array(
@@ -322,7 +322,6 @@ class FormTest extends \lithium\test\Unit {
 		$this->expectException('Authentication validator is not callable.');
 		$subject->check($request);
 	}
-
 }
 
 ?>
