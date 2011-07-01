@@ -15,6 +15,12 @@ class ApcTest extends \lithium\test\Unit {
 	/**
 	 * Skip the test if APC extension is unavailable.
 	 *
+	 * Note: for some reason the Zend Server reports the APC extension as loaded,
+	 * but subsequent test cases fail because `apc_inc()` and `apc_dec()` are not
+	 * working as expected. As a result, we skip APC tests if this happens. Please
+	 * make sure your APC adapter works correctly before building functionality on
+	 * top of it!
+	 *
 	 * @return void
 	 */
 	public function skip() {
