@@ -315,7 +315,7 @@ class Form extends \lithium\core\Object {
 		$data = $this->_filters($credentials->data);
 
 		$conditions = $this->_scope + array_diff_key($data, $this->_validators);
-		$user = $model::$query(compact('conditions'));
+		$user = $model::$query(compact('conditions') + $options);
 
 		if (!$user) {
 			return false;

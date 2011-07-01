@@ -15,6 +15,9 @@ use lithium\security\auth\adapter\Form;
 class FormTest extends \lithium\test\Unit {
 
 	public static function first(array $options = array()) {
+        if (!empty($options['data'])) {
+            return new Record(array('data' => $options['data']));
+        }
 		return new Record(array('data' => $options['conditions']));
 	}
 
