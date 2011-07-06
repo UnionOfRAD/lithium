@@ -41,6 +41,9 @@ namespace lithium\analysis\logger\adapter;
  * Now, in you can use the logger in your application code (like controllers, views and models).
  *
  * {{{
+ * //...
+ * use lithium\analysis\Logger;
+ * //...
  * class PagesController extends \lithium\action\Controller {
  * 	public function view() {
  * 		//...
@@ -60,9 +63,11 @@ namespace lithium\analysis\logger\adapter;
  * method for more information on how your message will be encoded.
  *
  * {{{
- * Logger::debug(array('debug' => 'me));
+ * Logger::debug(array('debug' => 'me'));
  * Logger::debug(new \lithium\action\Response());
  * }}}
+ *
+ * Make sure you have the Firebug `Console` and `Net` panels enabled to use FirePHP adapter.
  *
  * @see lithium\action\Response
  * @see lithium\net\http\Message::headers()

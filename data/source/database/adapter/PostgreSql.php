@@ -20,7 +20,7 @@ use lithium\data\model\QueryException;
  */
 class PostgreSql extends \lithium\data\source\Database {
 
-	protected $_classes = array(
+    protected $_classes = array(
 		'entity' => 'lithium\data\entity\Record',
 		'set' => 'lithium\data\collection\RecordSet',
 		'relationship' => 'lithium\data\model\Relationship',
@@ -41,7 +41,7 @@ class PostgreSql extends \lithium\data\source\Database {
 		'datetime' => array('name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
 		'timestamp' => array(
 			'name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
-			),
+		),
 		'time' => array('name' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
 		'date' => array('name' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
 		'binary' => array('name' => 'bytea'),
@@ -73,12 +73,13 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
 	 */
-    public function __construct(array $config = array()) {
+	public function __construct(array $config = array()) {
 		$defaults = array(
-					'host' => 'localhost',
-					'port' => 5432, 
-					'encoding' => null, 
-					'schema' => 'public');
+			'host' => 'localhost',
+			'port' => 5432, 
+			'encoding' => null, 
+			'schema' => 'public'
+		);
 		parent::__construct($config + $defaults);
 	}
 
@@ -109,7 +110,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @return boolean Returns `true` if a database connection could be established, otherwise
 	 *         `false`.
 	 */
-    public function connect() {
+	public function connect() {
 		$config = $this->_config;
 		$this->_isConnected = false;
 
@@ -132,8 +133,7 @@ class PostgreSql extends \lithium\data\source\Database {
 
 		if ($this->connection) {
 			$this->_isConnected = true;
-            
-            pg_query($this->connection,"set search_path=\"{$config['schema']}\";");
+			pg_query($this->connection,"SET search_path=\"{$config['schema']}\";");
 		}
 
 		if ($config['encoding']) {
@@ -195,7 +195,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *         - `'type'`: The field type name
 	 * @filter This method can be filtered.
 	 */
-    public function describe($entity, array $meta = array()) {
+	public function describe($entity, array $meta = array()) {
 		$params = compact('entity', 'meta');
 		$_config = $this->_config;
 
@@ -208,9 +208,12 @@ class PostgreSql extends \lithium\data\source\Database {
 			$columns = $self->read("SELECT DISTINCT column_name AS field, data_type AS type, is_nullable AS null,
 					column_default AS default, ordinal_position AS position, character_maximum_length AS char_length,
 					character_octet_length AS oct_length FROM information_schema.columns
-				WHERE table_name = '{$name}' and table_schema = '{$schema}' ORDER BY position;", array('return' => 'array', 'schema' => array(
-				'field', 'type', 'null', 'default', 'position', 'char_length', 'oct_length'
-			)));
+					WHERE table_name = '{$name}' and table_schema = '{$schema}' ORDER BY position;", 
+					array(
+							'return' => 'array',
+							'schema' => array('field','type', 'null', 'default', 'position', 'char_length', 'oct_length')
+					)
+			);
 
 			$fields = array();
 
@@ -296,7 +299,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @return array
 	 */
 	public function error() {
-        $lastError = pg_last_error($this->connection);
+		$lastError = pg_last_error($this->connection);
 		if ($lastError) {
 			return array(0, $lastError);
 		}
@@ -442,6 +445,22 @@ class PostgreSql extends \lithium\data\source\Database {
 			$entity = $entity::meta('name');
 		}
 		return $entity;
+	}
+	/**
+	 * Returns a LIMIT statement from the given limit and the offset of the context object.
+	 *
+	 * @param integer $limit An
+	 * @param object $context The `lithium\data\model\Query` object
+	 * @return string
+	 */
+	public function limit($limit, $context) {
+		if (!$limit) {
+			return;
+		}
+		if ($offset = $context->offset() ?: '') {
+			$offset  = 'OFFSET '.$offset;
+		}
+		return "LIMIT {$limit}{$offset}";
 	}
 }
 
