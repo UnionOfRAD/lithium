@@ -458,7 +458,7 @@ class PostgreSql extends \lithium\data\source\Database {
 			return;
 		}
 		if ($offset = $context->offset() ?: '') {
-			$offset  = 'OFFSET '.$offset;
+			$offset  = ' OFFSET '.$offset;
 		}
 		return "LIMIT {$limit}{$offset}";
 	}
