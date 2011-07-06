@@ -7,6 +7,7 @@
  */
 
 use lithium\util\Inflector;
+use lithium\net\http\Router;
 
 ?>
 <!doctype html>
@@ -24,11 +25,15 @@ use lithium\util\Inflector;
 		<div id="header">
 			<header>
 				<h1>
-					<a href="<?php echo $base ?>/test/">
+					<a href="<?php echo Router::match(array('controller' => 'lithium\test\Controller')); ?>">
 						<span class="triangle"></span> Lithium Test Dashboard
 					</a>
 				</h1>
-				<a class="test-all" href="<?php echo $base ?>/test/all">run all tests</a>
+				<a class="test-all" href="
+					<?php echo Router::match(array(
+						'controller' => 'lithium\test\Controller',
+						'args' => 'all'
+					)); ?>">run all tests</a>
 			</header>
 		</div>
 
