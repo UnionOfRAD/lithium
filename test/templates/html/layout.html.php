@@ -30,7 +30,7 @@ use lithium\net\http\Router;
 					</a>
 				</h1>
 				<a class="test-all" href="
-					<?php echo Router::match(array(
+					<?php echo $base; ?><?php echo Router::match(array(
 						'controller' => 'lithium\test\Controller',
 						'args' => 'all'
 					)); ?>">run all tests</a>
