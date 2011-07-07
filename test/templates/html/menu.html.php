@@ -1,4 +1,13 @@
 <?php
+/**
+ * Lithium: the most rad php framework
+ *
+ * @copyright     Copyright 2011, Union of RAD (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
+use lithium\net\http\Router;
+
 	$depth = 0;
 	$prev = array();
 	$current = null;
@@ -37,7 +46,11 @@
 
 	<?php while ($depth < count($path)): ?>
 		<li>
-			<a class="menu-folder" title="run '<?php echo $path[$depth]; ?>' tests" href="<?php echo $base ?>/test/<?php echo join(array_slice($path, 0, $depth+1), "/") ?>">
+			<a class="menu-folder" title="run '<?php echo $path[$depth]; ?>' tests" href="
+				<?php echo Router::match(array(
+					'controller' => 'lithium\test\Controller',
+					'args' => join(array_slice($path, 0, $depth+1), '/')
+				)); ?>">
 				<?php echo $path[$depth] ?>
 			</a>
 			<ul>
@@ -49,7 +62,10 @@
 	<?php endwhile ?>
 
 	<li>
-		<a href="<?php echo $base ?>/test/<?php echo join($path, "/") ?>/<?php echo $case ?>" title="run <?php echo $case; ?>">
+		<a href="<?php echo Router::match(array(
+			'controller' => 'lithium\test\Controller',
+			'args' => join($path, '/') . '/' . $case));
+		?>" title="run <?php echo $case; ?>">
 			<?php echo preg_replace('/Test$/', null, $case); ?>
 		</a>
 	</li>
