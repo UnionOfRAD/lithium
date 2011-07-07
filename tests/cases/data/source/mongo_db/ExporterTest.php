@@ -314,6 +314,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$model = $this->_model;
 		$model::schema(array(
 				'_id' => array('type' => 'id'),
+				'bar' => array('array' => true),
 				'foo' => array('array' => true),
 				'foo.foo' => array('type' => 'integer'),
 				'foo.bar' => array('type' => 'integer')
