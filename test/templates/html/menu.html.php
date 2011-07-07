@@ -47,7 +47,7 @@ use lithium\net\http\Router;
 	<?php while ($depth < count($path)): ?>
 		<li>
 			<a class="menu-folder" title="run '<?php echo $path[$depth]; ?>' tests" href="
-				<?php echo Router::match(array(
+				<?php echo $base; ?><?php echo Router::match(array(
 					'controller' => 'lithium\test\Controller',
 					'args' => join(array_slice($path, 0, $depth+1), '/')
 				)); ?>">
@@ -62,7 +62,7 @@ use lithium\net\http\Router;
 	<?php endwhile ?>
 
 	<li>
-		<a href="<?php echo Router::match(array(
+		<a href="<?php echo $base; ?><?php echo Router::match(array(
 			'controller' => 'lithium\test\Controller',
 			'args' => join($path, '/') . '/' . $case));
 		?>" title="run <?php echo $case; ?>">
