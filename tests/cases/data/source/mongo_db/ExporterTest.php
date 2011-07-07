@@ -310,6 +310,21 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertEqual($result['update'], $data);
 	}
 
+	public function testWithArraySchemaReusedName() {
+		$model = $this->_model;
+		$model::schema(array(
+				'_id' => array('type' => 'id'),
+				'foo' => array('array' => true),
+				'foo.foo' => array('type' => 'integer'),
+				'foo.bar' => array('type' => 'integer')
+			));
+		$doc = new Document(compact('model'));
+		$doc->foo[] = array('foo' => 1, 'bar' => 100);
+
+		$expected = array('foo' => array(array('foo' => 1, 'bar' => 100)));
+		$this->assertEqual($expected, $doc->data());
+	}
+
 	/**
 	 * @todo Implement me.
 	 */
