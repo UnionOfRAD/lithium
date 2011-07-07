@@ -1,7 +1,7 @@
 <?php
 /**
  * Lithium: the most rad php framework
- * 
+ *
  * @copyright     Copyright 2011, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
@@ -13,14 +13,14 @@ use lithium\data\model\QueryException;
 /**
  * Extends the `Database` class to implement the necessary SQL-formatting and resultset-fetching
  * features for working with PostgreSQL databases.
- *  
+ *
  * For more information on configuring the database connection, see the `__construct()` method.
  *
- * @see lithium\data\source\database\adapter\PostgreSQL::__construct()
+ * @see lithium\data\source\database\adapter\PostgreSql::__construct()
  */
 class PostgreSql extends \lithium\data\source\Database {
 
-    protected $_classes = array(
+	protected $_classes = array(
 		'entity' => 'lithium\data\entity\Record',
 		'set' => 'lithium\data\collection\RecordSet',
 		'relationship' => 'lithium\data\model\Relationship',
@@ -38,7 +38,9 @@ class PostgreSql extends \lithium\data\source\Database {
 		'text' => array('name' => 'text'),
 		'integer' => array('name' => 'integer', 'formatter' => 'intval'),
 		'float' => array('name' => 'float', 'formatter' => 'floatval'),
-		'datetime' => array('name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
+		'datetime' => array(
+			'name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
+		),
 		'timestamp' => array(
 			'name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
 		),
@@ -76,8 +78,8 @@ class PostgreSql extends \lithium\data\source\Database {
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'host' => 'localhost',
-			'port' => 5432, 
-			'encoding' => null, 
+			'port' => 5432,
+			'encoding' => null,
 			'schema' => 'public'
 		);
 		parent::__construct($config + $defaults);
@@ -88,8 +90,8 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *
 	 * @param string $feature Test for support for a specific feature, i.e. `"transactions"` or
 	 *               `"arrays"`.
-	 * @return boolean Returns `true` if the particular feature (or if PostgreSQL) support is enabled,
-	 *         otherwise `false`.
+	 * @return boolean Returns `true` if the particular feature (or if PostgreSQL) support is
+	 *         enabled, otherwise `false`.
 	 */
 	public static function enabled($feature = null) {
 		if (!$feature) {
@@ -113,17 +115,16 @@ class PostgreSql extends \lithium\data\source\Database {
 	public function connect() {
 		$config = $this->_config;
 		$this->_isConnected = false;
-
-		if ( isset($config['port']) ) {
-			$conn  = "host='{$config['host']}' port='{$config['port']}' dbname='{$config['database']}' ";
-		} else {
-			$conn  = "host='{$config['host']}' dbname='{$config['database']}' ";
-		}
-		$conn .= "user='{$config['login']}' password='{$config['password']}'";
+		$port = null;
 
 		if (!$config['database']) {
 			return false;
 		}
+		if ($config['port']) {
+			$port = " port='{$config['port']}'";
+		}
+		$conn = "host='{$config['host']}'{$port} dbname='{$config['database']}' ";
+		$conn .= "user='{$config['login']}' password='{$config['password']}'";
 
 		if (!$config['persistent']) {
 			$this->connection = pg_connect($conn, PGSQL_CONNECT_FORCE_NEW);
@@ -139,7 +140,6 @@ class PostgreSql extends \lithium\data\source\Database {
 		if ($config['encoding']) {
 			$this->encoding($config['encoding']);
 		}
-
 		return $this->_isConnected;
 	}
 
@@ -169,8 +169,10 @@ class PostgreSql extends \lithium\data\source\Database {
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
 			$name = $self->name($_config['database']);
+			$sql = "select table_name from information_schema.tables where ";
+			$sql .= "table_type = 'BASE TABLE' and table_catalog='{$name}';";
 
-			if (!$result = $self->invokeMethod('_execute', array("select table_name from information_schema.tables where table_type = 'BASE TABLE' and table_catalog='{$name}';"))) {
+			if (!$result = $self->invokeMethod('_execute', array($sql))) {
 				return null;
 			}
 			$sources = array();
@@ -204,16 +206,18 @@ class PostgreSql extends \lithium\data\source\Database {
 
 			$name = $self->invokeMethod('_entityName', array($entity));
 			$schema = $_config['schema'];
+			$sql = "SELECT DISTINCT column_name AS field, data_type AS type, is_nullable AS null, ";
+			$sql .= "column_default AS default, ordinal_position AS position, ";
+			$sql .= "character_maximum_length AS char_length, character_octet_length AS oct_length";
+			$sql .= " FROM information_schema.columns WHERE table_name = '{$name}' ";
+			$sql .= "and table_schema = '{$schema}' ORDER BY position;";
 
-			$columns = $self->read("SELECT DISTINCT column_name AS field, data_type AS type, is_nullable AS null,
-					column_default AS default, ordinal_position AS position, character_maximum_length AS char_length,
-					character_octet_length AS oct_length FROM information_schema.columns
-					WHERE table_name = '{$name}' and table_schema = '{$schema}' ORDER BY position;", 
-					array(
-							'return' => 'array',
-							'schema' => array('field','type', 'null', 'default', 'position', 'char_length', 'oct_length')
-					)
-			);
+			$columns = $self->read($sql, array(
+				'return' => 'array',
+				'schema' => array(
+					'field', 'type', 'null', 'default', 'position', 'char_length', 'oct_length'
+				)
+			));
 
 			$fields = array();
 
@@ -224,15 +228,16 @@ class PostgreSql extends \lithium\data\source\Database {
 					'null'     => ($column['null'] == 'YES' ? true : false),
 					'default'  => $column['default']
 				);
-				
+
 				if (isset($fields[$column['field']]['default'])) {
-					if (preg_match("/^nextval\('(.+?)'::regclass\)/i", $fields[$column['field']]['default'], $seq_match)) {
+					$default = $fields[$column['field']]['default'];
+
+					if (preg_match("/^nextval\('(.+?)'::regclass\)/i", $default, $seqMatch)) {
 						$fields[$column['field']]['default'] = null;
-						$fields[$column['field']]['sequence'] = end($seq_match);
+						$fields[$column['field']]['sequence'] = end($seqMatch);
 					}
 				}
 			}
-
 			return $fields;
 		});
 	}
@@ -299,8 +304,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @return array
 	 */
 	public function error() {
-		$lastError = pg_last_error($this->connection);
-		if ($lastError) {
+		if ($lastError = pg_last_error($this->connection)) {
 			return array(0, $lastError);
 		}
 		return null;
@@ -458,7 +462,7 @@ class PostgreSql extends \lithium\data\source\Database {
 			return;
 		}
 		if ($offset = $context->offset() ?: '') {
-			$offset  = ' OFFSET '.$offset;
+			$offset = ' OFFSET ' . $offset;
 		}
 		return "LIMIT {$limit}{$offset}";
 	}

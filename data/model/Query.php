@@ -395,8 +395,8 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Convert the query's properties to the data sources' syntax and return it as an array.
 	 *
-	 * @param \lithium\data\Source $dataSource Instance of the data source to use
-	 *                      for conversion.
+	 * @param object $dataSource An instance of `lithium\data\Source` to use for exporting the query
+	 *               parameters.
 	 * @param array $options Options to use when exporting the data.
 	 * @return array Returns an array containing a data source-specific representation of a query.
 	 */
