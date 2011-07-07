@@ -17,10 +17,10 @@ use lithium\analysis\Inspector;
  * state of an application in its current context.
  */
 class Debugger extends \lithium\core\Object {
-	
+
 	/**
 	 * Used for temporary closure caching.
-	 * 
+	 *
 	 * @see lithium\analysis\Debugger::_closureDef()
 	 * @var array
 	 */
