@@ -16,14 +16,14 @@ class MemoryTest extends \lithium\test\Unit {
 	 * Initializes a new `Memory` adapter.
 	 */
 	public function setUp() {
-		$this->memory = new Memory();
+		$this->Memory = new Memory();
 	}
 
 	/**
 	 * Unset the memory adapter.
 	 */
 	public function tearDown() {
-		unset($this->memory);
+		unset($this->Memory);
 	}
 
 	/**
@@ -52,40 +52,40 @@ class MemoryTest extends \lithium\test\Unit {
 	 * This adapter is always started when a new object is generated.
 	 */
 	public function testIsStarted() {
-		$this->assertTrue($this->memory->isStarted());
+		$this->assertTrue($this->Memory->isStarted());
 	}
 
 	/**
 	 * Test if reading from the memory adapter works as expected.
 	 */
 	public function testRead() {
-		$this->memory->read();
+		$this->Memory->read();
 
 		$key = 'read_test';
 		$value = 'value to be read';
 
-		$this->memory->_session[$key] = $value;
+		$this->Memory->_session[$key] = $value;
 
-		$closure = $this->memory->read($key);
+		$closure = $this->Memory->read($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->memory, $params, null);
+		$result = $closure($this->Memory, $params, null);
 
 		$this->assertIdentical($value, $result);
 
 		$key = 'non-existent';
-		$closure = $this->memory->read($key);
+		$closure = $this->Memory->read($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->memory, $params, null);
+		$result = $closure($this->Memory, $params, null);
 		$this->assertNull($result);
 
-		$closure = $this->memory->read();
+		$closure = $this->Memory->read();
 		$this->assertTrue(is_callable($closure));
 
-		$result = $closure($this->memory, array('key' => null), null);
+		$result = $closure($this->Memory, array('key' => null), null);
 		$expected = array('read_test' => 'value to be read');
 		$this->assertEqual($expected, $result);
 	}
@@ -97,37 +97,37 @@ class MemoryTest extends \lithium\test\Unit {
 		$key = 'write-test';
 		$value = 'value to be written';
 
-		$closure = $this->memory->write($key, $value);
+		$closure = $this->Memory->write($key, $value);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key', 'value');
-		$result = $closure($this->memory, $params, null);
-		$this->assertEqual($this->memory->_session[$key], $value);
+		$result = $closure($this->Memory, $params, null);
+		$this->assertEqual($this->Memory->_session[$key], $value);
 	}
 
 	/**
 	 * Checks if the session data is empty on creation.
 	 */
 	public function testCheck() {
-		$this->memory->read();
+		$this->Memory->read();
 
 		$key = 'read';
 		$value = 'value to be read';
-		$this->memory->_session[$key] = $value;
+		$this->Memory->_session[$key] = $value;
 
-		$closure = $this->memory->check($key);
+		$closure = $this->Memory->check($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->memory, $params, null);
+		$result = $closure($this->Memory, $params, null);
 		$this->assertTrue($result);
 
 		$key = 'does_not_exist';
-		$closure = $this->memory->check($key);
+		$closure = $this->Memory->check($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->memory, $params, null);
+		$result = $closure($this->Memory, $params, null);
 		$this->assertFalse($result);
 	}
 
@@ -135,26 +135,26 @@ class MemoryTest extends \lithium\test\Unit {
 	 * Test key deletion.
 	 */
 	public function testDelete() {
-		$this->memory->read();
+		$this->Memory->read();
 
 		$key = 'delete_test';
 		$value = 'value to be deleted';
 
-		$this->memory->_session[$key] = $value;
+		$this->Memory->_session[$key] = $value;
 
-		$closure = $this->memory->delete($key);
+		$closure = $this->Memory->delete($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->memory, $params, null);
+		$result = $closure($this->Memory, $params, null);
 		$this->assertFalse($result);
 
 		$key = 'non-existent';
-		$closure = $this->memory->delete($key);
+		$closure = $this->Memory->delete($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->memory, $params, null);
+		$result = $closure($this->Memory, $params, null);
 		$this->assertFalse($result);
 	}
 
@@ -162,11 +162,11 @@ class MemoryTest extends \lithium\test\Unit {
 	 * Checks if erasing the whole session array works as expected.
 	 */
 	public function testClear() {
-		$this->memory->_session['foobar'] = 'foo';
-		$closure = $this->memory->clear();
+		$this->Memory->_session['foobar'] = 'foo';
+		$closure = $this->Memory->clear();
 		$this->assertTrue(is_callable($closure));
-		$result = $closure($this->memory, array(), null);
-		$this->assertTrue(empty($this->memory->_session));
+		$result = $closure($this->Memory, array(), null);
+		$this->assertTrue(empty($this->Memory->_session));
 	}
 }
 
