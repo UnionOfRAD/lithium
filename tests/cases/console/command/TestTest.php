@@ -49,6 +49,34 @@ class TestTest extends \lithium\test\Unit {
 		$this->assertFalse($result);
 	}
 
+	public function testRunWithInvalidPath() {
+		$command = new Test(array(
+			'request' => $this->request, 'classes' => $this->classes
+		));
+		$path = 'Foobar/lithium/tests/mocks/test/cases/MockTest.php';
+		$command->run($path);
+		$this->assertEqual("Not a valid path.\n", $command->response->error);
+	}
+
+	public function testRunWithInvalidHandler() {
+		$command = new Test(array(
+			'request' => $this->request,
+			'classes' => $this->classes
+		));
+		$command->format = 'foobar';
+		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTest.php';
+		$command->run($path);
+		$this->assertEqual("No handler for format `foobar`... \n", $command->response->error);
+	}
+
+	public function testRunWithFilter() {
+		$command = new Test(array(
+			'request' => $this->request, 'classes' => $this->classes
+		));
+		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTest.php';
+		$command->run($path);
+	}
+
 	public function testRunSingleTestWithAbsolutePath() {
 		$command = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
