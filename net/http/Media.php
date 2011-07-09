@@ -802,7 +802,11 @@ class Media extends \lithium\core\StaticObject {
 				return json_decode($data, true);
 			}),
 			'text' => array('cast' => false, 'encode' => function($s) { return $s; }),
-			'form' => array('cast' => true, 'encode' => 'http_build_query')
+			'form' => array('cast' => true, 'encode' => 'http_build_query', 'decode' => function($data) {
+				$decoded = array();
+				parse_str($data, $decoded);
+				return $decoded;
+			})
 		);
 
 		if ($type) {
