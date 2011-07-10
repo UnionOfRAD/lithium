@@ -153,7 +153,10 @@ class FormTest extends \lithium\test\Unit {
 	 * Tests that attempted exploitation via malformed credential submission is not possible.
 	 */
 	public function testLoginWithArray() {
-		$subject = new Form(array('model' => __CLASS__, 'validators' => array()));
+		$subject = new Form(array(
+			'model' => __CLASS__,
+			'validators' => array('password' => false)
+		));
 
 		$request = (object) array('data' => array(
 			'username' => array('!=' => ''), 'password' => ''
@@ -197,7 +200,8 @@ class FormTest extends \lithium\test\Unit {
 	public function testDefaultValidator() {
 		$subject = new Form(array(
 			'model' => __CLASS__,
-			'fields' => array('username', 'password', 'group')
+			'fields' => array('username', 'password', 'group'),
+			'validators' => array('password' => false)
 		));
 
 		$request = (object) array('data' => array(
@@ -278,9 +282,7 @@ class FormTest extends \lithium\test\Unit {
 	public function testUncallableValidator() {
 		$subject = new Form(array(
 			'model' => __CLASS__,
-			'validators' => array(
-				'password' => true
-			)
+			'validators' => array('password' => true)
 		));
 
 		$request = (object) array('data' => array('username' => 'Bob'));
@@ -312,9 +314,7 @@ class FormTest extends \lithium\test\Unit {
 	public function testUncallableGenericValidator() {
 		$subject = new Form(array(
 			'model' => __CLASS__,
-			'validators' => array(
-				true
-			)
+			'validators' => array(true, 'password' => false)
 		));
 
 		$request = (object) array('data' => array('username' => 'Bob'));

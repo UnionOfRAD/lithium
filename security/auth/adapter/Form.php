@@ -401,11 +401,11 @@ class Form extends \lithium\core\Object {
 	 */
 	protected function _validate($user, array $data) {
 		foreach ($this->_validators as $field => $validator) {
-			if ($validator === false || !isset($this->_fields[$field])) {
+			if ($validator === false || !isset($this->_fields[$field]) || $field === 0) {
 				continue;
 			}
-
 			$value = isset($data[$field]) ? $data[$field] : null;
+
 			if (!is_callable($validator)) {
 				$message = "Authentication validator for `{$field}` is not callable.";
 				throw new UnexpectedValueException($message);
