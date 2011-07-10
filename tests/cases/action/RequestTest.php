@@ -965,6 +965,15 @@ class RequestTest extends \lithium\test\Unit {
 		));
 		$expected = 'https://foo.com/the/base/path/the/url?some=query&parameter=values';
 		$this->assertEqual($expected, $request->to('url'));
+
+		$request = new Request(array(
+			'env' => array('HTTP_HOST' => 'foo.com'),
+			'base' => '/',
+			'url' => '/',
+			'query' => array()
+		));
+		$expected = 'http://foo.com/';
+		$this->assertEqual($expected, $request->to('url'));
 	}
 }
 
