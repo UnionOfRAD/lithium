@@ -527,6 +527,46 @@ class FormTest extends \lithium\test\Unit {
 			'/select'
 		));
 	}
+	
+	public function testRecursiveSelect() {
+		$list = array(
+			'Linux' => array(
+				'1' => 'Ubuntu 10.10',
+				'2' => 'CentOS 5'
+			),
+			'Other' => array(
+				'4' => 'Solaris',
+				'5' => 'Windows Server 2010 R2'
+			)
+		);
+		$result = $this->form->select('opsys', $list, array('empty' => 
+			'Select one', 'value' => '5'
+		));
+
+		$this->assertTags($result, array(
+			'select' => array('name' => 'opsys', 'id' => 'Opsys'),
+			array('option' => array('value' => '')),
+			'Select one',
+			'/option',			
+			array('optgroup' => array('label' => 'Linux')),
+			array('option' => array('value' => '1')),
+			'Ubuntu 10.10',
+			'/option',
+			array('option' => array('value' => '2')),
+			'CentOS 5',
+			'/option',
+			'/optgroup',
+			array('optgroup' => array('label' => 'Other')),
+			array('option' => array('value' => '4')),
+			'Solaris',
+			'/option',
+			array('option' => array('value' => '5', 'selected' => 'selected')),
+			'Windows Server 2010 R2',
+			'/option',
+			'/optgroup',
+			'/select'
+		));
+	}
 
 	public function testTemplateRemapping() {
 		$result = $this->form->password('passwd');

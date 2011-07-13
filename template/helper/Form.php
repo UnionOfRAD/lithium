@@ -530,21 +530,37 @@ class Form extends \lithium\template\Helper {
 		}
 		$startTemplate = ($scope['multiple']) ? 'select-multi-start' : 'select-start';
 		$output = $this->_render(__METHOD__, $startTemplate, compact('name', 'options'));
-
-		foreach ($list as $value => $title) {
-			$selected = false;
-
-			if (is_array($scope['value']) && in_array($value, $scope['value'])) {
-				$selected = true;
-			} elseif ($scope['value'] == $value) {
-				$selected = true;
+		
+		$parseOptions = function($self, $method, $list) use (&$scope, &$parseOptions) {
+			$output = "";
+			foreach($list as $value => $title) {
+				if(is_array($title)) {
+					$label = $value;
+					$options = array();
+					$output .= $self->invokeMethod('_render', array($method, 'option-group', compact('label', 'options')));
+					$output .= $parseOptions($self, $method, $title);
+					$output .= $self->invokeMethod('_render', array($method, 'option-group-end', array()));
+				} else {
+					$selected = false;
+					
+					if (is_array($scope['value']) && in_array($value, $scope['value'])) {
+						$selected = true;
+					} elseif ($scope['value'] == $value) {
+						$selected = true;
+					}
+					$options = $selected ? array('selected' => true) : array();
+					
+					$output .= $self->invokeMethod('_render', array(
+						$method, 
+						'select-option', 
+						compact('value', 'title', 'options')
+					));
+				}
 			}
-			$options = $selected ? array('selected' => true) : array();
-
-			$output .= $this->_render(__METHOD__, 'select-option', compact(
-				'value', 'title', 'options'
-			));
-		}
+			return $output;
+		};
+		$output .= $parseOptions($this, __METHOD__, $list);
+		
 		return $output . $this->_context->strings('select-end');
 	}
 
