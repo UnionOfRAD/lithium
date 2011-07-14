@@ -292,13 +292,20 @@ class Entity extends \lithium\core\Object {
 	 * @see lithium\data\Model::save()
 	 * @param mixed $id The ID to assign, where applicable.
 	 * @param array $data Any additional generated data assigned to the object by the database.
+	 * @param array $options Method options:
+	 *              - `'materialize'` _boolean_: Determines whether or not the flag should be set
+	 *                that indicates that this entity exists in the data store. Defaults to `true`.
 	 * @return void
 	 */
-	public function update($id = null, array $data = array()) {
-		$this->_exists = true;
+	public function sync($id = null, array $data = array(), array $options = array()) {
+		$defaults = array('materialize' => true);
+		$options += $defaults;
 		$model = $this->_model;
 		$key = array();
 
+		if ($options['materialize']) {
+			$this->_exists = true;
+		}
 		if ($id && $model) {
 			$key = $model::meta('key');
 			$key = is_array($key) ? array_combine($key, $id) : array($key => $id);

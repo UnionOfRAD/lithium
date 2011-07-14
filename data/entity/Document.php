@@ -164,15 +164,31 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		return parent::export() + array('key' => $this->_pathKey, 'remove' => $this->_removed);
 	}
 
-	public function update($id = null, array $data = array()) {
-		parent::update($id, $data);
+	/**
+	 * Extends the parent implementation to ensure that child documents are properly synced as well.
+	 *
+	 * @param mixed $id
+	 * @param array $data
+	 * @param array Options when calling this method:
+	 *              - `'recursive'` _boolean_: If `true` attempts to sync nested objects as well.
+	 *                Otherwise, only syncs the current object. Defaults to `true`.
+	 * @return void
+	 */
+	public function sync($id = null, array $data = array(), array $options = array()) {
+		$defaults = array('recursive' => true);
+		$options += $defaults;
 
-		foreach ($this->_data as $key => $val) {
-			if (is_object($val) && method_exists($val, 'update')) {
-				$this->_data[$key]->update(null, isset($data[$key]) ? $data[$key] : array());
+		if (!$options['recursive']) {
+			return parent::sync($id, $data, $options);
+		}
+
+		foreach ($this->_updated as $key => $val) {
+			if (is_object($val) && method_exists($val, 'sync')) {
+				$nested = isset($data[$key]) ? $data[$key] : array();
+				$this->_updated[$key]->sync(null, $nested, $options);
 			}
 		}
-		$this->_removed = array();
+		parent::sync($id, $data, $options);
 	}
 
 	/**

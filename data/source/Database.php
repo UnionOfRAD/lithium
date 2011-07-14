@@ -231,7 +231,7 @@ abstract class Database extends \lithium\data\Source {
 				if (($model) && !$model::key($entity)) {
 					$id = $self->invokeMethod('_insertId', array($object));
 				}
-				$entity->update($id);
+				$entity->sync($id);
 			}
 			return true;
 		});
@@ -335,7 +335,7 @@ abstract class Database extends \lithium\data\Source {
 
 			if ($self->invokeMethod('_execute', array($sql))) {
 				if ($query->entity()) {
-					$query->entity()->update();
+					$query->entity()->sync();
 				}
 				return true;
 			}

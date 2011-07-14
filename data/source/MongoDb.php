@@ -392,7 +392,7 @@ class MongoDb extends \lithium\data\Source {
 
 			if ($result === true || isset($result['ok']) && (boolean) $result['ok'] === true) {
 				if ($query->entity()) {
-					$query->entity()->update($data['create']['_id']);
+					$query->entity()->sync($data['create']['_id']);
 				}
 				return true;
 			}
@@ -528,7 +528,7 @@ class MongoDb extends \lithium\data\Source {
 				$update = array('$set' => $update);
 			}
 			if ($self->connection->{$source}->update($args['conditions'], $update, $options)) {
-				$query->entity() ? $query->entity()->update() : null;
+				$query->entity() ? $query->entity()->sync() : null;
 				return true;
 			}
 			return false;
