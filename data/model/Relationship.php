@@ -61,7 +61,7 @@ class Relationship extends \lithium\core\Object {
 	 * In this case, the relationship is bound to the `Users` model, but `'Author'` would be the
 	 * relationship name. This is the name with which the relationship is referenced in the
 	 * originating model.
-	 *             - `'keys'` _array_: An array of fields that define the relationship, where the
+	 *             - `'key'` _mixed_: An array of fields that define the relationship, where the
 	 *               keys are fields in the originating model, and the values are fields in the
 	 *               target model. If the relationship is not deined by keys, this array should be
 	 *               empty.
@@ -94,7 +94,7 @@ class Relationship extends \lithium\core\Object {
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'name' => null,
-			'keys' => array(),
+			'key' => array(),
 			'type' => null,
 			'to'   => null,
 			'from' => null,
@@ -110,17 +110,16 @@ class Relationship extends \lithium\core\Object {
 		parent::_init();
 		$config =& $this->_config;
 		$type = $config['type'];
+
 		$name = ($type == 'hasOne') ? Inflector::pluralize($config['name']) : $config['name'];
+		$config['fieldName'] = $config['fieldName'] ?: lcfirst($name);
 
 		if (!$config['to']) {
 			$assoc = preg_replace("/\\w+$/", "", $config['from']) . $name;
 			$config['to'] = Libraries::locate('models', $assoc);
 		}
-		if (!$config['fieldName']) {
-			$config['fieldName'] = lcfirst($name);
-		}
-		if (!$config['keys'] || !is_array($config['keys'])) {
-			$config['keys'] = $this->_keys($config['keys']);
+		if (!$config['key'] || !is_array($config['key'])) {
+			$config['key'] = $this->_keys($config['key']);
 		}
 	}
 
@@ -137,7 +136,7 @@ class Relationship extends \lithium\core\Object {
 		$relFrom = $config['from']::meta('name');
 		$relTo   = $config['name'];
 
-		foreach ($this->_config['keys'] as $from => $to) {
+		foreach ($this->_config['key'] as $from => $to) {
 			$constraints["{$relFrom}.{$from}"] = "{$relTo}.{$to}";
 		}
 		return $constraints + (array) $this->_config['constraint'];

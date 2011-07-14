@@ -21,7 +21,8 @@ class DocumentArray extends \lithium\data\Collection {
 	protected $_exists = false;
 
 	/**
-	 * Contains an array that is matched against .
+	 * Contains the updated value of the array. This value will be persisted to the backend data
+	 * store when the array is saved.
 	 *
 	 * @var array
 	 */
@@ -36,13 +37,18 @@ class DocumentArray extends \lithium\data\Collection {
 		'data', 'model', 'result', 'query', 'parent', 'stats', 'pathKey', 'exists'
 	);
 
+	protected function _init() {
+		parent::_init();
+		$this->_updated = $this->_data;
+	}
+
 	public function exists() {
 		return $this->_exists;
 	}
 
 	public function sync($id = null, array $data = array()) {
 		$this->_exists = true;
-		$this->_data = $data ?: $this->_data;
+		$this->_data = $this->_updated;
 	}
 
 	/**
@@ -60,7 +66,7 @@ class DocumentArray extends \lithium\data\Collection {
 
 		if ($format == 'array') {
 			$options += $defaults;
-			return Collection::toArray($this->_data, $options);
+			return Collection::toArray($this->_updated, $options);
 		}
 		return parent::to($format, $options);
 	}
@@ -73,7 +79,7 @@ class DocumentArray extends \lithium\data\Collection {
 	 * @return boolean Returns `true` if the field specified in `$name` exists, otherwise `false`.
 	 */
 	public function __isset($name) {
-		return isset($this->_data[$name]);
+		return isset($this->_updated[$name]);
 	}
 
 	/**
@@ -89,7 +95,7 @@ class DocumentArray extends \lithium\data\Collection {
 	 * @return void
 	 */
 	public function __unset($name) {
-		unset($this->_data[$name]);
+		unset($this->_updated[$name]);
 	}
 
 	/**
@@ -99,7 +105,7 @@ class DocumentArray extends \lithium\data\Collection {
 	 * @return mixed Value at offset.
 	 */
 	public function offsetGet($offset) {
-		return isset($this->_data[$offset]) ? $this->_data[$offset] : null;
+		return isset($this->_updated[$offset]) ? $this->_updated[$offset] : null;
 	}
 
 	public function offsetSet($offset, $data) {
@@ -108,9 +114,9 @@ class DocumentArray extends \lithium\data\Collection {
 			$data = $model::connection()->cast($this, array($this->_pathKey => $data), $options);
 		}
 		if ($offset) {
-			return $this->_data[$offset] = $data;
+			return $this->_updated[$offset] = $data;
 		}
-		return $this->_data[] = $data;
+		return $this->_updated[] = $data;
 	}
 
 	/**
@@ -120,12 +126,12 @@ class DocumentArray extends \lithium\data\Collection {
 	 */
 	public function rewind() {
 		$data = parent::rewind();
-		$key = key($this->_data);
+		$key = key($this->_updated);
 		return $this->offsetGet($key);
 	}
 
 	public function current() {
-		return $this->offsetGet(key($this->_data));
+		return $this->offsetGet(key($this->_updated));
 	}
 
 	/**
@@ -137,25 +143,27 @@ class DocumentArray extends \lithium\data\Collection {
 	 *         available.
 	 */
 	public function next() {
-		$prev = key($this->_data);
-		$this->_valid = (next($this->_data) !== false);
-		$cur = key($this->_data);
+		$prev = key($this->_updated);
+		$this->_valid = (next($this->_updated) !== false);
+		$cur = key($this->_updated);
 
 		if (!$this->_valid && $cur !== $prev && $cur !== null) {
 			$this->_valid = true;
 		}
-		return $this->_valid ? $this->offsetGet(key($this->_data)) : null;
+		return $this->_valid ? $this->offsetGet(key($this->_updated)) : null;
 	}
 
 	public function export() {
 		return array(
 			'exists' => $this->_exists,
 			'key'  => $this->_pathKey,
-			'data' => $this->_data
+			'data' => $this->_data,
+			'update' => $this->_updated
 		);
 	}
 
-	protected function _populate($data = null, $key = null) {}
+	protected function _populate($data = null, $key = null) {
+	}
 }
 
 ?>
