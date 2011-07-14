@@ -172,8 +172,6 @@ class ExporterTest extends \lithium\test\Unit {
 	/**
 	 * Tests that when an existing object is attached as a value of another existing object, the
 	 * whole sub-object is re-written to the new value.
-	 *
-	 * @return void
 	 */
 	public function testAppendExistingObjects() {
 		$doc = new Document(array('exists' => true, 'data' => array(
@@ -188,15 +186,15 @@ class ExporterTest extends \lithium\test\Unit {
 		$result = Exporter::get('update', $doc->export());
 		$expected = array('update' => array('deeply' => array('foo' => 'bar')));
 		$this->assertEqual($expected, $result);
-		$doc->update();
 
 		$expected = array('$set' => array('deeply' => array('foo' => 'bar')));
 		$this->assertEqual($expected, Exporter::toCommand($result));
 
+		$doc->sync();
 		$doc->append2 = new Document(array('exists' => false, 'data' => array('foo' => 'bar')));
 		$expected = array('update' => array('append2' => array('foo' => 'bar')));
 		$this->assertEqual($expected, Exporter::get('update', $doc->export()));
-		$doc->update();
+		$doc->sync();
 
 		$this->assertFalse(Exporter::get('update', $doc->export()));
 		$doc->append2->foo = 'baz';
@@ -206,6 +204,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$expected = array('update' => array(
 			'append2.foo' => 'baz', 'append2.bar' => 'dib', 'deeply.nested' => true
 		));
+
 		$this->assertEqual($expected, Exporter::get('update', $doc->export()));
 	}
 

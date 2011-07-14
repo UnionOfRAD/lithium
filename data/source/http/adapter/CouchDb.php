@@ -198,7 +198,7 @@ class CouchDb extends \lithium\data\source\Http {
 
 			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
 				$result = $self->invokeMethod('_format', array($result, $options));
-				$query->entity()->update($result['id'], $result);
+				$query->entity()->sync($result['id'], $result);
 				return true;
 			}
 			return false;
@@ -285,7 +285,7 @@ class CouchDb extends \lithium\data\source\Http {
 
 			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
 				$result = $self->invokeMethod('_format', array($result, $options));
-				$query->entity()->update($result['id'], array('rev' => $result['rev']));
+				$query->entity()->sync($result['id'], array('rev' => $result['rev']));
 				return true;
 			}
 			if (isset($result['error'])) {
