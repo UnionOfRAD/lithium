@@ -201,15 +201,13 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc = new Document(array('model' => $this->_model));
 		$doc->id = 123;
 		$doc->type = 'father';
+
 		$doc->set(array('children' => array(
 			array('id' => 124, 'type' => 'child', 'children' => null),
 			array('id' => 125, 'type' => 'child', 'children' => null)
 		)));
 
 		$this->assertEqual('father', $doc->type);
-
-		$this->assertTrue(is_object($doc->children), 'children is not an object');
-
 		$this->assertTrue($doc->children instanceof DocumentArray);
 
 		$expected = array('id' => 124, 'type' => 'child', 'children' => null);
@@ -279,7 +277,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc->_id = 3;
 		$this->assertFalse($doc->exists());
 
-		$doc->update(12);
+		$doc->sync(12);
 		$this->assertTrue($doc->exists());
 		$this->assertEqual(12, $doc->_id);
 	}
@@ -295,7 +293,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc->id = 3;
 		$this->assertFalse($doc->exists());
 
-		$doc->update(array(12, '1-2'));
+		$doc->sync(array(12, '1-2'));
 		$this->assertTrue($doc->exists());
 
 		$this->assertEqual(12, $doc->id);
@@ -545,8 +543,7 @@ class DocumentTest extends \lithium\test\Unit {
 
 		$expected = array(
 			'data' => array('foo' => 'bar', 'baz' => 'dib'),
-			'update' => array(),
-			'remove' => array(),
+			'update' => array('foo' => 'bar', 'baz' => 'dib'),
 			'increment' => array(),
 			'key' => '',
 			'exists' => false
@@ -555,10 +552,25 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that documents nested within existing documents also exist, and vice versa.
+	 */
+	public function testNestedObjectExistence() {
+		$model = $this->_model;
+		$data = array('foo' => array('bar' => 'bar', 'baz' => 'dib'));
+		$doc = new Document(compact('model', 'data') + array('exists' => false));
+
+		$this->assertFalse($doc->exists());
+		$this->assertFalse($doc->foo->exists());
+
+		$doc = new Document(compact('model', 'data') + array('exists' => true));
+
+		$this->assertTrue($doc->exists());
+		$this->assertTrue($doc->foo->exists());
+	}
+
+	/**
 	 * Tests that a modified `Document` exports the proper fields in a newly-appended nested
 	 * `Document`.
-	 *
-	 * @return void
 	 */
 	public function testModifiedExport() {
 		$model = $this->_model;
@@ -571,13 +583,13 @@ class DocumentTest extends \lithium\test\Unit {
 		$expected = array('foo' => 'bar', 'baz' => 'dib', 'nested.more' => 'data');
 		$this->assertFalse($newData['exists']);
 		$this->assertEqual(array('foo' => 'bar', 'baz' => 'dib'), $newData['data']);
-		$this->assertEqual(1, count($newData['update']));
+		$this->assertEqual(3, count($newData['update']));
 		$this->assertTrue($newData['update']['nested'] instanceof Document);
 
 		$result = $newData['update']['nested']->export();
 		$this->assertFalse($result['exists']);
 		$this->assertEqual(array('more' => 'data'), $result['data']);
-		$this->assertFalse($result['update']);
+		$this->assertEqual(array('more' => 'data'), $result['update']);
 		$this->assertEqual('nested', $result['key']);
 
 		$doc = new Document(compact('model') + array('exists' => true, 'data' => array(
@@ -585,7 +597,7 @@ class DocumentTest extends \lithium\test\Unit {
 		)));
 
 		$result = $doc->export();
-		$this->assertFalse($result['update']);
+		$this->assertEqual($result['data'], $result['update']);
 
 		$doc->nested = array('more' => 'data');
 		$this->assertEqual('data', $doc->nested->more);
@@ -593,7 +605,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$modified = $doc->export();
 		$this->assertTrue($modified['exists']);
 		$this->assertEqual(array('foo' => 'bar', 'baz' => 'dib'), $modified['data']);
-		$this->assertEqual(array('nested'), array_keys($modified['update']));
+		$this->assertEqual(array('nested', 'foo', 'baz'), array_keys($modified['update']));
 		$this->assertNull($modified['key']);
 
 		$nested = $modified['update']['nested']->export();
@@ -601,33 +613,34 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual(array('more' => 'data'), $nested['data']);
 		$this->assertEqual('nested', $nested['key']);
 
-		$doc->update();
+		$doc->sync();
 		$result = $doc->export();
-		$this->assertFalse($result['update']);
+		$this->assertEqual($result['data'], $result['update']);
 
 		$doc->more = 'cowbell';
 		$doc->nested->evenMore = 'cowbell';
 		$modified = $doc->export();
 
-		$expected = array('more' => 'cowbell');
+		$expected = array('more' => 'cowbell') + $modified['data'];
 		$this->assertEqual($expected, $modified['update']);
 		$this->assertEqual(array('nested', 'foo', 'baz'), array_keys($modified['data']));
 		$this->assertEqual('bar', $modified['data']['foo']);
 		$this->assertEqual('dib', $modified['data']['baz']);
+		$this->assertTrue($modified['exists']);
 
 		$nested = $modified['data']['nested']->export();
 		$this->assertTrue($nested['exists']);
 		$this->assertEqual(array('more' => 'data'), $nested['data']);
-		$this->assertEqual(array('evenMore' => 'cowbell'), $nested['update']);
+		$this->assertEqual(array('evenMore' => 'cowbell') + $nested['data'], $nested['update']);
 		$this->assertEqual('nested', $nested['key']);
 
-		$doc->update();
+		$doc->sync();
 		$doc->nested->evenMore = 'foo!';
 		$modified = $doc->export();
-		$this->assertFalse($modified['update']);
+		$this->assertEqual($modified['data'], $modified['update']);
 
 		$nested = $modified['data']['nested']->export();
-		$this->assertEqual(array('evenMore' => 'foo!'), $nested['update']);
+		$this->assertEqual(array('evenMore' => 'foo!') + $nested['data'], $nested['update']);
 	}
 
 	public function testArrayConversion() {
@@ -638,6 +651,31 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $doc->data();
 		$this->assertPattern('/^[a-f0-9]{24}$/', $result['id']);
 		$this->assertEqual(time(), $result['date']);
+	}
+
+	public function testArrayInterface() {
+		$doc = new Document();
+		$doc->field = 'value';
+		$this->assertEqual('value', $doc['field']);
+
+		$doc['field'] = 'newvalue';
+		$this->assertEqual('newvalue', $doc->field);
+
+		unset($doc['field']);
+		$this->assertNull($doc->field);
+	}
+
+	/**
+	 * Tests that unassigned fields with default schema values are auto-populated at access time.
+	 */
+	public function testSchemaValueInitialization() {
+		$doc = new Document(array('schema' => array(
+			'foo' => array('type' => 'string', 'default' => 'bar')
+		)));
+		$this->assertFalse($doc->data());
+
+		$this->assertEqual('bar', $doc->foo);
+		$this->assertEqual(array('foo' => 'bar'), $doc->data());
 	}
 
 	public function testInitializationWithNestedFields() {
@@ -654,6 +692,22 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = array_keys($doc->data());
 		sort($result);
 		$this->assertEqual(array('nested', 'really', 'simple'), $result);
+	}
+
+	public function testWithArraySchemaReusedName() {
+		$model = $this->_model;
+		$schema = array(
+			'_id' => array('type' => 'id'),
+			'bar' => array('array' => true),
+			'foo' => array('type' => 'object', 'array' => true),
+			'foo.foo' => array('type' => 'integer'),
+			'foo.bar' => array('type' => 'integer')
+		);
+		$doc = new Document(compact('model', 'schema'));
+		$doc->foo[] = array('foo' => 1, 'bar' => 100);
+
+		$expected = array('foo' => array(array('foo' => 1, 'bar' => 100)));
+		$this->assertEqual($expected, $doc->data());
 	}
 
 	public function testIdGetDoesNotSet() {

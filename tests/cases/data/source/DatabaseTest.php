@@ -617,13 +617,13 @@ class DatabaseTest extends \lithium\test\Unit {
 		$hasMany = $this->db->relationship($this->_model, 'hasMany', 'Comments', array(
 			'to' => $comment
 		));
-		$this->assertEqual(array('id' => 'mock_database_post_id'), $hasMany->keys());
+		$this->assertEqual(array('id' => 'mock_database_post_id'), $hasMany->key());
 		$this->assertEqual('comments', $hasMany->fieldName());
 
 		$belongsTo = $this->db->relationship($comment, 'belongsTo', 'Posts', array(
 			'to' => $this->_model
 		));
-		$this->assertEqual(array('post_id' => 'id'), $belongsTo->keys());
+		$this->assertEqual(array('post_id' => 'id'), $belongsTo->key());
 		$this->assertEqual('post', $belongsTo->fieldName());
 	}
 

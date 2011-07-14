@@ -464,7 +464,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$expected = array(
 			'name' => 'MockPost',
 			'type' => 'belongsTo',
-			'keys' => array('mockComment' => '_id'),
+			'key' => array('mockComment' => '_id'),
 			'from' => $from,
 			'link' => 'contained',
 			'to'   => $to,
@@ -620,26 +620,9 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$query = new Query(array('type' => 'update') + compact('entity'));
 		$result = $query->export($this->db);
-		$this->assertEqual(array('updated'), array_keys($result['data']['update']));
+		$expected = array('updated', '_id', 'created', 'list');
+		$this->assertEqual($expected, array_keys($result['data']['update']));
 		$this->assertTrue($result['data']['update']['updated'] instanceof MongoDate);
-	}
-
-	/**
-	 * Test that subobjects are properly casted on createing a new Document
-	 *
-	 * @return void
-	 */
-	public function testSubobjectCastingOnSave() {
-		$model = $this->_model; // 'lithium\tests\mocks\data\source\MockMongoPost'
-		$schema = array('sub.foo' => array('type'=>'boolean'), 'bar' => array('type'=>'boolean'));
-		$data = array('sub' => array('foo' => '0'), 'bar' => '1');
-		$entity = new Document(compact('data', 'schema', 'model'));
-		$this->assertIdentical(true, $entity->bar);
-		$this->assertIdentical(false, $entity->sub->foo);
-		$data = array('sub.foo' => '1', 'bar' => '0');
-		$entity = new Document(compact('data', 'schema', 'model'));
-		$this->assertIdentical(false, $entity->bar);
-		$this->assertIdentical(true, $entity->sub->foo);
 	}
 
 	/**
