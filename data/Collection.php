@@ -93,7 +93,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'data', 'model', 'result', 'query', 'parent', 'stats', 'pathKey'
+		'data', 'model', 'result', 'query', 'parent', 'stats', 'pathKey', 'schema'
 	);
 
 	/**

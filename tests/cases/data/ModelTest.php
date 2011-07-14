@@ -163,7 +163,7 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = array(
 			'name' => 'MockPost',
 			'type' => 'belongsTo',
-			'keys' => array('mock_post_id' => 'id'),
+			'key' => array('mock_post_id' => 'id'),
 			'from' => 'lithium\tests\mocks\data\MockComment',
 			'to' => 'lithium\tests\mocks\data\MockPost',
 			'link' => 'key',
@@ -183,7 +183,7 @@ class ModelTest extends \lithium\test\Unit {
 			'from' => 'lithium\tests\mocks\data\MockPost',
 			'to' => 'lithium\tests\mocks\data\MockComment',
 			'fields' => true,
-			'keys' => array('id' => 'mock_post_id'),
+			'key' => array('id' => 'mock_post_id'),
 			'link' => 'key',
 			'fieldName' => 'mock_comments',
 			'constraint' => array(),

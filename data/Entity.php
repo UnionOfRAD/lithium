@@ -130,6 +130,11 @@ class Entity extends \lithium\core\Object {
 		parent::__construct($config + $defaults);
 	}
 
+	protected function _init() {
+		parent::_init();
+		$this->_updated = $this->_data;
+	}
+
 	/**
 	 * Overloading for reading inaccessible properties.
 	 *
@@ -142,9 +147,6 @@ class Entity extends \lithium\core\Object {
 		}
 		if (isset($this->_updated[$name])) {
 			return $this->_updated[$name];
-		}
-		if (isset($this->_data[$name])) {
-			return $this->_data[$name];
 		}
 		$null = null;
 		return $null;
@@ -171,7 +173,7 @@ class Entity extends \lithium\core\Object {
 	 * @return mixed Result.
 	 */
 	public function __isset($name) {
-		return isset($this->_data[$name]) || isset($this->_updated[$name]);
+		return isset($this->_updated[$name]);
 	}
 
 	/**
@@ -200,11 +202,12 @@ class Entity extends \lithium\core\Object {
 	 * $record->set(array('title' => 'Lorem Ipsum', 'value' => 42));
 	 * }}}
 	 *
-	 * @param $values An associative array of fields and values to assign to the `Record`.
+	 * @param array $data An associative array of fields and values to assign to this `Entity`
+	 *        instance.
 	 * @return void
 	 */
-	public function set($values) {
-		foreach ($values as $name => $value) {
+	public function set(array $data) {
+		foreach ($data as $name => $value) {
 			$this->__set($name, $value);
 		}
 	}
@@ -310,8 +313,7 @@ class Entity extends \lithium\core\Object {
 			$key = $model::meta('key');
 			$key = is_array($key) ? array_combine($key, $id) : array($key => $id);
 		}
-		$this->_data = ($key + $data + $this->_updated + $this->_data);
-		$this->_updated = array();
+		$this->_data = $this->_updated = ($key + $data + $this->_updated);
 	}
 
 	/**
@@ -329,14 +331,13 @@ class Entity extends \lithium\core\Object {
 	 *         type.
 	 */
 	public function increment($field, $value = 1) {
-		if (!isset($this->_data[$field])) {
-			return $this->_data[$field] = $value;
+		if (!isset($this->_updated[$field])) {
+			return $this->_updated[$field] = $value;
 		}
-		if (!is_numeric($this->_data[$field])) {
+		if (!is_numeric($this->_updated[$field])) {
 			throw new UnexpectedValueException("Field '{$field}' cannot be incremented.");
 		}
-		$base = isset($this->_updated[$field]) ? $this->_updated[$field] : $this->_data[$field];
-		return $this->_updated[$field] = ($base + $value);
+		return $this->_updated[$field] += $value;
 	}
 
 	/**
@@ -359,11 +360,7 @@ class Entity extends \lithium\core\Object {
 	 *         always `true`.
 	 */
 	public function modified() {
-		if (!$this->_exists) {
-			$keys = array_keys($this->_data + $this->_updated);
-		} else {
-			$keys = array_keys($this->_updated);
-		}
+		$keys = array_keys($this->_updated);
 		return array_combine($keys, array_fill(0, count($keys), true));
 	}
 
@@ -386,7 +383,7 @@ class Entity extends \lithium\core\Object {
 	public function to($format, array $options = array()) {
 		switch ($format) {
 			case 'array':
-				$data = $this->_updated + $this->_data;
+				$data = $this->_updated;
 				$rel = array_map(function($obj) { return $obj->data(); }, $this->_relationships);
 				$data = array_merge($data, $rel);
 				$result = Collection::toArray($data, $options);

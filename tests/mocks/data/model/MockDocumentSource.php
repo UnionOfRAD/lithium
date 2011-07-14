@@ -48,6 +48,7 @@ class MockDocumentSource extends \lithium\data\Source {
 		$defaults = array('schema' => null, 'first' => false, 'pathKey' => null, 'arrays' => true);
 		$options += $defaults;
 		$model = null;
+		$exists = false;
 
 		if (!$data) {
 			return $data;
@@ -57,8 +58,12 @@ class MockDocumentSource extends \lithium\data\Source {
 			$options['schema'] = $entity->schema() ?: array('_id' => array('type' => 'id'));
 		}
 		if ($entity) {
+			if (!is_a($entity, $this->_classes['set'])) {
+				$exists = $entity->exists();
+			}
 			$model = $entity->model();
 		}
+		$options['exists'] = $exists;
 		$schema = $options['schema'];
 		unset($options['schema']);
 
@@ -137,9 +142,9 @@ class MockDocumentSource extends \lithium\data\Source {
 	}
 
 	public function relationship($class, $type, $name, array $options = array()) {
-		$keys = Inflector::camelize($type == 'belongsTo' ? $name : $class::meta('name'));
+		$key = Inflector::camelize($type == 'belongsTo' ? $name : $class::meta('name'));
 
-		$options += compact('name', 'type', 'keys');
+		$options += compact('name', 'type', 'key');
 		$options['from'] = $class;
 
 		$relationship = $this->_classes['relationship'];
