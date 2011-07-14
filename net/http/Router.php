@@ -150,7 +150,7 @@ class Router extends \lithium\core\StaticObject {
 	 * Alternatively to using a full array, you can specify routes using a more compact syntax. The
 	 * above example can be written as:
 	 *
-	 * {{{ $url = Router::match('User::login'); // still returns /login }}}
+	 * {{{ $url = Router::match('Users::login'); // still returns /login }}}
 	 *
 	 * You can combine this with more complicated routes; for example:
 	 * {{{
