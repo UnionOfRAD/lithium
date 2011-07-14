@@ -40,7 +40,7 @@ class DocumentArray extends \lithium\data\Collection {
 		return $this->_exists;
 	}
 
-	public function update($id = null, array $data = array()) {
+	public function sync($id = null, array $data = array()) {
 		$this->_exists = true;
 		$this->_data = $data ?: $this->_data;
 	}
