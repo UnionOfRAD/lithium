@@ -71,6 +71,10 @@ class MongoDbTest extends \lithium\test\Unit {
 	public function run(array $options = array()) {
 		$this->_results = array();
 
+		if(Connections::get('lithium_mongo_test', array('config' => true))) {
+			$this->_testConfig = Connections::get('lithium_mongo_test', array('config' => true));
+		}
+
 		try {
 			$this->skip();
 		} catch (Exception $e) {
