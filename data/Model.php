@@ -854,7 +854,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @param object $entity Entity who's title should be returned.
 	 * @return string The Entity's title.
 	 */
-	public static function title($entity) {
+	public function title($entity) {
 	    $self = static::_object();
 	    $meta = $self::meta();
         
