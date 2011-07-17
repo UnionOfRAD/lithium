@@ -27,7 +27,9 @@ class LoggerTest extends \lithium\test\Unit {
 			return $chain->next($self, $params, $chain);
 		});
 
-		$config = array('default' => array('adapter' => 'File', 'timestamp' => false));
+		$config = array('default' => array(
+			'adapter' => 'File', 'timestamp' => false,	'format' => "{:message}\n"
+		));
 		Logger::config($config);
 
 		$result = Logger::write('info', 'Original Message');
