@@ -257,6 +257,19 @@ class StringTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Test that an empty array is not added to the string
+	 *
+	 * @return void
+	 */
+	public function testInsertWithEmptyArray() {
+		$result = String::insert("Hey, what are you tryin' to {:action} on us?",
+			array('action' => array())
+		);
+		$expected = "Hey, what are you tryin' to  on us?";
+		$this->assertEqual($expected, $result);
+	}
+
+	/**
 	 * test Clean Insert
 	 *
 	 * @return void
