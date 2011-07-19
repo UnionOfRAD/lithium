@@ -21,12 +21,12 @@ class DocumentArray extends \lithium\data\Collection {
 	protected $_exists = false;
 
 	/**
-	 * Contains the updated value of the array. This value will be persisted to the backend data
-	 * store when the array is saved.
+	 * Contains the original database value of the array. This value will be compared with the
+	 * current value (`$_data`) to calculate the changes that should be sent to the database.
 	 *
 	 * @var array
 	 */
-	protected $_updated = array();
+	protected $_original = array();
 
 	/**
 	 * Holds an array of values that should be processed on initialization.
@@ -39,7 +39,7 @@ class DocumentArray extends \lithium\data\Collection {
 
 	protected function _init() {
 		parent::_init();
-		$this->_updated = $this->_data;
+		$this->_original = $this->_data;
 	}
 
 	public function exists() {
@@ -48,7 +48,7 @@ class DocumentArray extends \lithium\data\Collection {
 
 	public function sync($id = null, array $data = array()) {
 		$this->_exists = true;
-		$this->_data = $this->_updated;
+		$this->_original = $this->_data;
 	}
 
 	/**
@@ -66,7 +66,7 @@ class DocumentArray extends \lithium\data\Collection {
 
 		if ($format == 'array') {
 			$options += $defaults;
-			return Collection::toArray($this->_updated, $options);
+			return Collection::toArray($this->_data, $options);
 		}
 		return parent::to($format, $options);
 	}
@@ -79,7 +79,7 @@ class DocumentArray extends \lithium\data\Collection {
 	 * @return boolean Returns `true` if the field specified in `$name` exists, otherwise `false`.
 	 */
 	public function __isset($name) {
-		return isset($this->_updated[$name]);
+		return isset($this->_data[$name]);
 	}
 
 	/**
@@ -95,7 +95,7 @@ class DocumentArray extends \lithium\data\Collection {
 	 * @return void
 	 */
 	public function __unset($name) {
-		unset($this->_updated[$name]);
+		unset($this->_data[$name]);
 	}
 
 	/**
@@ -105,7 +105,7 @@ class DocumentArray extends \lithium\data\Collection {
 	 * @return mixed Value at offset.
 	 */
 	public function offsetGet($offset) {
-		return isset($this->_updated[$offset]) ? $this->_updated[$offset] : null;
+		return isset($this->_data[$offset]) ? $this->_data[$offset] : null;
 	}
 
 	public function offsetSet($offset, $data) {
@@ -114,9 +114,9 @@ class DocumentArray extends \lithium\data\Collection {
 			$data = $model::connection()->cast($this, array($this->_pathKey => $data), $options);
 		}
 		if ($offset) {
-			return $this->_updated[$offset] = $data;
+			return $this->_data[$offset] = $data;
 		}
-		return $this->_updated[] = $data;
+		return $this->_data[] = $data;
 	}
 
 	/**
@@ -126,39 +126,16 @@ class DocumentArray extends \lithium\data\Collection {
 	 */
 	public function rewind() {
 		$data = parent::rewind();
-		$key = key($this->_updated);
+		$key = key($this->_data);
 		return $this->offsetGet($key);
-	}
-
-	public function current() {
-		return $this->offsetGet(key($this->_updated));
-	}
-
-	/**
-	 * Returns the next document in the set, and advances the object's internal pointer. If the end
-	 * of the set is reached, a new document will be fetched from the data source connection handle
-	 * (`$_handle`). If no more documents can be fetched, returns `null`.
-	 *
-	 * @return object Returns the next document in the set, or `null`, if no more documents are
-	 *         available.
-	 */
-	public function next() {
-		$prev = key($this->_updated);
-		$this->_valid = (next($this->_updated) !== false);
-		$cur = key($this->_updated);
-
-		if (!$this->_valid && $cur !== $prev && $cur !== null) {
-			$this->_valid = true;
-		}
-		return $this->_valid ? $this->offsetGet(key($this->_updated)) : null;
 	}
 
 	public function export() {
 		return array(
 			'exists' => $this->_exists,
 			'key'  => $this->_pathKey,
-			'data' => $this->_data,
-			'update' => $this->_updated
+			'data' => $this->_original,
+			'update' => $this->_data
 		);
 	}
 
