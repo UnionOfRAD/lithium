@@ -352,6 +352,30 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 		}
 		return $data;
 	}
+	
+	/**
+	 * Sorts the objects in the collection.
+	 *
+	 * @param mixed $field The field to sort the data on, can also be a callback
+	 * to a custom sort function.
+	 * @param array $options The available options are:
+	 *              - No options yet implemented
+	 * @return $this, useful for chaining this with other methods.
+	 */
+	public function sort($sorter = 'sort', array $options = array()) {
+		// Sort the data
+		if (is_string($sorter) && strpos($sorter, 'sort') !== false && is_callable($sorter)) {
+			call_user_func($sorter, &$this->_data);
+		} else if (is_callable($sorter)) {
+			usort($this->_data, $sorter);
+		} else {
+			// TODO: Complain
+			return false;
+		}
+		
+		// Return $this so sort can be used in a chained fashion. $col->sort('name')->to('array');
+		return $this;
+	}
 
 	/**
 	 * Checks whether or not an offset exists.
