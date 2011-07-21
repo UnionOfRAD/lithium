@@ -100,7 +100,6 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @return mixed Returns the value returned from the callable object retrieved from
 	 *         `Dispatcher::_callable()`, which is either a string or an instance of
 	 *         `lithium\action\Response`.
-	 * @todo Add exception-handling/error page rendering
 	 * @filter
 	 */
 	public static function run($request, array $options = array()) {

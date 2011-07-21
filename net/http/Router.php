@@ -17,14 +17,20 @@ use lithium\net\http\RoutingException;
  *
  * Using `Route` objects, these two operations can be handled in a reciprocally consistent way.
  * For example, if you wanted the `/login` URL to be routed to
- * `app\controllers\UsersController::login()`, you could set up a route like the following in
- * `app/config/routes.php`:
+ * `myapp\controllers\SessionsController::add()`, you could set up a route like the following in
+ * `config/routes.php`:
+ *
  * {{{
  * use lithium\net\http\Router;
  *
- * Router::connect('/login', array('controller' => 'users', 'action' => 'login'));}}}
+ * Router::connect('/login', array('controller' => 'sessions', 'action' => 'add'));
  *
- * Not only would that correctly route all requests for `/login` to `UsersController::index()`, but
+ * // -- or --
+ *
+ * Router::connect('/login', 'Sessions::add');
+ * }}}
+ *
+ * Not only would that correctly route all requests for `/login` to `SessionsController::add()`, but
  * any time the framework generated a route with matching parameters, `Router` would return the
  * correct short URL.
  *

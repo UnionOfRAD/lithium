@@ -29,8 +29,10 @@ use Exception;
  * (i.e. arrays) including other `Document` objects.
  *
  * After installing MongoDB, you can connect to it as follows:
- * {{{//app/config/bootstrap/connections.php:
- * Connections::add('default', array('type' => 'MongoDb', 'database' => 'myDb'));}}}
+ * {{{
+ * // config/bootstrap/connections.php:
+ * Connections::add('default', array('type' => 'MongoDb', 'database' => 'myDb'));
+ * }}}
  *
  * By default, it will attempt to connect to a Mongo instance running on `localhost` on port
  * 27017. See `__construct()` for details on the accepted configuration settings.
