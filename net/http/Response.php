@@ -21,13 +21,6 @@ class Response extends \lithium\net\http\Message {
 	public $status = array('code' => 200, 'message' => 'OK');
 
 	/**
-	 * Headers.
-	 *
-	 * @var array
-	 */
-	public $headers = array();
-
-	/**
 	 * Content Type.
 	 *
 	 * @var string
@@ -40,13 +33,6 @@ class Response extends \lithium\net\http\Message {
 	 * @var string
 	 */
 	public $encoding = 'UTF-8';
-
-	/**
-	 * The body.
-	 *
-	 * @var array
-	 */
-	public $body = array();
 
 	/**
 	 * Status codes.
@@ -95,16 +81,28 @@ class Response extends \lithium\net\http\Message {
 		504 => 'Gateway Time-out'
 	);
 
+	/**
+	 * Adds config values to the public properties when a new object is created.
+	 *
+	 * @param array $config
+	 */
+	public function __construct(array $config = array()) {
+		$defaults = array('message' => null);
+		$config += $defaults;
+		parent::__construct($config);
+	}
+
+	/**
+	 * Initialize the Response
+	 *
+	 * @return void
+	 */
 	protected function _init() {
 		parent::_init();
-		$body = $this->_config['body'];
 
-		if ($this->_config['body'] && !$this->_config['message']) {
-			$this->body = $this->_config['body'];
-		} elseif (($body = $this->_config['message']) && !$this->_config['body']) {
-			$body = $this->_parseMessage($body);
+		if ($this->_config['message']) {
+			$this->body = $this->_parseMessage($this->_config['message']);
 		}
-
 		if (isset($this->headers['Content-Type'])) {
 			preg_match('/^(.*?);\s*?charset=(.+)/i', $this->headers['Content-Type'], $match);
 
@@ -114,9 +112,8 @@ class Response extends \lithium\net\http\Message {
 			}
 		}
 		if (isset($this->headers['Transfer-Encoding'])) {
-			$body = $this->_decode($body);
+			$this->body = $this->_decode($this->body);
 		}
-		$this->body = $this->body ?: $body;
 	}
 
 	/**
