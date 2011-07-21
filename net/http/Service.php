@@ -146,11 +146,16 @@ class Service extends \lithium\core\Object {
 	public function &connection($config = array()) {
 		$config += $this->_config;
 
-		try {
-			$this->connection = Libraries::instance('socket', $config['socket'], $config);
-		} catch (ClassNotFoundException $e) {
-			$this->connection = null;
+		if(empty($this->connection)) {
+			try {
+				$this->connection = Libraries::instance('socket', $config['socket'], $config);
+			} catch (ClassNotFoundException $e) {
+				$this->connection = null;
+			}
+		} else {
+			$this->connection->_config = array_merge($this->connection->_config, $config);
 		}
+
 		return $this->connection;
 	}
 
