@@ -22,8 +22,6 @@ class CurlTest extends \lithium\test\Unit {
 		'classes' => array('request' => 'lithium\net\http\Request')
 	);
 
-	protected $_testUrl = 'http://lithify.me';
-
 	/**
 	 * Skip the test if curl is not available in your PHP installation.
 	 *
@@ -38,7 +36,8 @@ class CurlTest extends \lithium\test\Unit {
 		$message = "Could not open {$url} - skipping " . __CLASS__;
 		$this->skipIf(!curl_init($url), $message);
 
-		$this->skipIf(dns_check_record("lithify.me") === false, "No internet connection.");
+		$host = $this->_testConfig['host'];
+		$this->skipIf(dns_check_record($host, "ANY") === false, "No internet connection.");
 	}
 
 	public function testAllMethodsNoConnection() {
