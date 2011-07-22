@@ -349,58 +349,7 @@ class Route extends \lithium\core\Object {
 	 */
 	public function compile() {
 		$this->_match = $this->_params;
-		$this->_extractMeta();
-
-		if ($this->_template === '/' || $this->_template === '') {
-			$this->_pattern = '@^[\/]*$@';
-			return;
-		}
-		$this->_pattern = "@^{$this->_template}\$@";			
 		
-		preg_match_all('@\{:(?P<params>[^}]+([^{]+(\{[0-9,]+\})?)*)\}@', $this->_pattern, $keys);
-		if (!$keys = $keys['params']) {
-			return;
-		}
-
-		$this->_pattern = str_replace('.{', '\.{', $this->_pattern);
-
-		if (strpos($this->_pattern, '{:args}') !== false) {
-			$this->_pattern = str_replace('/{:args}', '(?:/(?P<args>.*))?', $this->_pattern);
-			$this->_pattern = str_replace('{:args}', '(?:/(?P<args>.*))?', $this->_pattern);
-			$this->_keys['args'] = 'args';
-		}
-
-		$shortKeys = array();
-		foreach ($keys as $i => $param) {
-			$paramName = $param;
-
-			if (strpos($param, ':')) {
-				list($paramName, $pattern) = explode(':', $param, 2);
-				$this->_subPatterns[$paramName] = $pattern;
-				$shortKeys[$i] = $paramName;
-			} else {
-				$pattern = '[^\/]+';
-			}
-			$req = (array_key_exists($paramName, $this->_params) ? '?' : '');
-
-			$regex = "(?P<{$paramName}>{$pattern}){$req}";
-			$this->_pattern = str_replace("/{:{$param}}", "(?:/{$regex}){$req}", $this->_pattern);
-			$this->_pattern = str_replace("{:{$param}}", $regex, $this->_pattern);
-		}
-		$shortKeys += $keys;
-		ksort($shortKeys);
-
-		$this->_keys = array_combine($shortKeys, $shortKeys);
-		$this->_defaults = array_intersect_key($this->_params, $this->_keys);
-		$this->_match = array_diff_key($this->_params, $this->_defaults);
-	}
-
-	/**
-	 * Extracts HTTP method / header parameters from default parameter list.
-	 *
-	 * @return void
-	 */
-	protected function _extractMeta() {
 		foreach ($this->_params as $key => $value) {
 			if (!strpos($key, ':')) {
 				continue;
@@ -408,6 +357,59 @@ class Route extends \lithium\core\Object {
 			unset($this->_params[$key]);
 			$this->_meta[$key] = $value;
 		}
+
+		if ($this->_template === '/' || $this->_template === '') {
+			$this->_pattern = '@^[\/]*$@';
+			return;
+		}
+		$this->_pattern = "@^{$this->_template}\$@";			
+		
+		preg_match_all('@([/.])?\{:([^:}]+):?((?:[^{]+(?:\{[0-9,]+\})?)*)\}@', $this->_pattern, $m);
+		if (!$params = $m[2]) {
+			return;
+		}
+		$slashes = $m[1];
+		$regexs = $m[3];
+		unset($m);
+
+		$this->_keys = array();
+		foreach ($params as $i => $param) {
+			$search = $param;
+			$isargs = false;
+			
+			$this->_keys[$param] = $param;
+			
+			if($param === 'args' && !$regexs[$i]) {
+				$pattern = '.*';
+				$isargs = true;
+			} elseif ($regexs[$i]) {
+				$pattern = $regexs[$i];
+				$search .= ':' . $pattern;
+				$this->_subPatterns[$param] = $pattern;
+			} else {
+				$pattern = '[^\/]+';
+			}
+			$req = $isargs ? '?' : (array_key_exists($param, $this->_params) ? '?' : '');
+
+			if ($slashes[$i] == '/') {
+				$this->_pattern = str_replace(
+				//	"/{:{$search}}", "(?:/(?P<{$param}>{$pattern})){$req}", $this->_pattern
+					"/{:{$search}}", "(?:/(?P<{$param}>{$pattern}){$req}){$req}", $this->_pattern
+				);
+			} elseif ($slashes[$i] == '.') {
+				$this->_pattern = str_replace(
+				//	".{:{$search}}", "(?:\\.(?P<{$param}>{$pattern})){$req}", $this->_pattern
+					".{:{$search}}", "\\.(?P<{$param}>{$pattern}){$req}", $this->_pattern
+				);
+			} else {
+				$this->_pattern = str_replace(
+					"{:{$search}}", "(?P<{$param}>{$pattern}){$req}", $this->_pattern
+				);
+			}
+		}
+		
+		$this->_defaults = array_intersect_key($this->_params, $this->_keys);
+		$this->_match = array_diff_key($this->_params, $this->_defaults);
 	}
 }
 
