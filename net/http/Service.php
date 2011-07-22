@@ -144,7 +144,8 @@ class Service extends \lithium\core\Object {
 	 * @return object
 	 */
 	public function &connection($config = array()) {
-		$config += $this->_config;
+		$defaults = array('classes' => $this->_classes);
+		$config += $defaults + $this->_config;
 
 		if(empty($this->connection)) {
 			try {
@@ -170,7 +171,7 @@ class Service extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function send($method, $path = null, $data = array(), array $options = array()) {
-		$defaults = array('return' => 'body', 'classes' => $this->_classes);
+		$defaults = array('return' => 'body');
 		$options += $defaults + $this->_config;
 		$request = $this->_request($method, $path, $data, $options);
 		$options += array('message' => $request);
