@@ -47,6 +47,9 @@ class SocketTest extends \lithium\test\Integration {
 	}
 
 	public function testCurlAdapter() {
+		$message = 'Your PHP installation was not compiled with curl support.';
+		$this->skipIf(!function_exists('curl_init'), $message);
+				
 		$socket = new Curl($this->_testConfig);
 		$this->assertTrue($socket->open());
 		$response = $socket->send();

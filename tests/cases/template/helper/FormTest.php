@@ -986,6 +986,15 @@ class FormTest extends \lithium\test\Unit {
 			'action' => "/bbq/foo", 'method'=> "post"
 		)));
 	}
+
+	/**
+	 * Tests that magic method support can be used to automatically generate a `<button />` tag
+	 * based on the default string template.
+	 */
+	public function testAutoMagicButton() {
+		$result = $this->form->button('Foo!', array('id' => 'bar'));
+		$this->assertTags($result, array('button' => array('id' => 'bar'), 'Foo!', '/button'));
+	}
 }
 
 ?>

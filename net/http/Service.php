@@ -170,7 +170,7 @@ class Service extends \lithium\core\Object {
 		$request = $this->_request($method, $path, $data, $options);
 		$options += array('message' => $request);
 
-		if (!($conn =& $this->connection($options)) || !$conn->open()) {
+		if (!($conn = $this->connection($options)) || !$conn->open()) {
 			return;
 		}
 
@@ -199,18 +199,19 @@ class Service extends \lithium\core\Object {
 		$request = $this->_instance('request', $options);
 		$request->path = str_replace('//', '/', "{$request->path}{$path}");
 		$request->method = $method = strtoupper($method);
+		$hasBody = in_array($method, array('POST', 'PUT'));
 
 		$media = $this->_classes['media'];
 		$type = null;
 
-		if (in_array($options['type'], $media::types()) && $data && !is_string($data)) {
+		if ($data && in_array($options['type'], $media::types())) {
 			$type = $media::type($options['type']);
 			$contentType = (array) $type['content'];
 			$request->headers(array('Content-Type' => current($contentType)));
-			$data = Media::encode($options['type'], $data, $options);
+			$data = $hasBody && !is_string($data) ?
+				Media::encode($options['type'], $data, $options) : $data;
 		}
-		in_array($method, array('POST', 'PUT'))
-			? $request->body($data) : $request->params = $data;
+		$hasBody ? $request->body($data) : $request->query = $data;
 		return $request;
 	}
 }

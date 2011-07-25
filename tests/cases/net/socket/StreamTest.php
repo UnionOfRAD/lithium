@@ -25,7 +25,7 @@ class StreamTest extends \lithium\test\Unit {
 
 	public function skip() {
 		$host = $this->_testConfig['host'];
-		$this->skipIf(dns_check_record($host) === false, "No internet connection.");
+		$this->skipIf(dns_check_record($host, "ANY") === false, "No internet connection.");
 	}
 
 	public function testAllMethodsNoConnection() {

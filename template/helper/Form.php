@@ -37,7 +37,7 @@ class Form extends \lithium\template\Helper {
 	 * @var array
 	 */
 	protected $_strings = array(
-		'button'               => '<input type="{:type}"{:options} />',
+		'button'               => '<button{:options}>{:name}</button>',
 		'checkbox'             => '<input type="checkbox" name="{:name}"{:options} />',
 		'checkbox-multi'       => '<input type="checkbox" name="{:name}[]"{:options} />',
 		'checkbox-multi-end'   => '',

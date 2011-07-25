@@ -57,13 +57,13 @@ class Response extends \lithium\core\Object {
 		$this->output = $config['output'];
 
 		if (!is_resource($this->output)) {
-			$this->output = fopen('php://stdout', 'r');;
+			$this->output = fopen('php://stdout', 'r');
 		}
 
 		$this->error = $config['error'];
 
 		if (!is_resource($this->error)) {
-			$this->error = fopen('php://stderr', 'r');;
+			$this->error = fopen('php://stderr', 'r');
 		}
 		parent::__construct($config);
 	}

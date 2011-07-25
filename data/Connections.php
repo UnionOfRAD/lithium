@@ -17,7 +17,7 @@ use lithium\core\Libraries;
  *
  * While connections can be added and removed dynamically during the course of your application
  * (using `Connections::add()`), it is most typical to define all connections at once, in
- * `app/config/bootstrap/connections.php`.
+ * `config/bootstrap/connections.php`.
  *
  * THe `Connections` class handles adapter classes efficiently by only loading adapter classes and
  * creating instances when they are requested (using `Connections::get()`).
@@ -43,7 +43,7 @@ class Connections extends \lithium\core\Adaptable {
 	protected static $_adapters = 'data.source';
 
 	/**
-	 * Add connection configurations to your app in `/app/config/bootstrap/connections.php`
+	 * Add connection configurations to your app in `config/bootstrap/connections.php`
 	 *
 	 * For example:
 	 * {{{

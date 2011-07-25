@@ -12,7 +12,7 @@ use lithium\core\ConfigException;
 
 /**
  * The `Auth` class provides a common interface to authenticate user credentials from different
- * sources against different storage backends in a common way. As with most other adapter-driven
+ * sources against different storage backends in a uniform way. As with most other adapter-driven
  * classes in the framework, `Auth` allows you to specify one or more named configurations,
  * including an adapter, which can be referenced by name in your application.
  *

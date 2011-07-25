@@ -42,19 +42,55 @@ class ResourcesMessageTest extends \lithium\test\Unit {
 	 *
 	 * Germanic family:
 	 * - English (en)
+	 * - German (de)
 	 *
 	 * @return void
 	 */
 	public function testPlurals1() {
-		$locales = array('en');
-
+		$locales = array(
+			'en', 'de'
+		);
 		foreach ($locales as $locale) {
-			$result = Catalog::read('lithium', 'message.pluralForms', $locale);
-			$this->assertEqual(2, $result, "Locale: `{$locale}`\n{:message}");
+			$expected = 2;
+			$result = Catalog::read(true, 'message.pluralForms', $locale);
+			$this->assertEqual($expected, $result, "Locale: `{$locale}`\n{:message}");
 
-			$rule = Catalog::read('lithium', 'message.pluralRule', $locale);
+			$rule = Catalog::read(true, 'message.pluralRule', $locale);
 
 			$expected  = '10111111111111111111111111111111111111111111111111';
+			$expected .= '11111111111111111111111111111111111111111111111111';
+			$expected .= '11111111111111111111111111111111111111111111111111';
+			$expected .= '11111111111111111111111111111111111111111111111111';
+			$result = '';
+
+			for ($n = 0; $n < 200; $n++) {
+				$result .= $rule($n);
+			}
+			$this->assertIdentical($expected, $result, "Locale: `{$locale}`\n{:message}");
+		}
+	}
+
+	/**
+	 * Tests the plural rule #2 which applies to the following languages
+	 * grouped by family and sorted alphabetically.
+	 *
+	 * Romanic family:
+	 * - French (fr)
+	 *
+	 * @return void
+	 */
+	public function testPlurals2() {
+		$locales = array(
+			'fr'
+		);
+		foreach ($locales as $locale) {
+			$expected = 2;
+			$result = Catalog::read(true, 'message.pluralForms', $locale);
+			$this->assertEqual($expected, $result, "Locale: `{$locale}`\n{:message}");
+
+			$rule = Catalog::read(true, 'message.pluralRule', $locale);
+
+			$expected  = '00111111111111111111111111111111111111111111111111';
 			$expected .= '11111111111111111111111111111111111111111111111111';
 			$expected .= '11111111111111111111111111111111111111111111111111';
 			$expected .= '11111111111111111111111111111111111111111111111111';

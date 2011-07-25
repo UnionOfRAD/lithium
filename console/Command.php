@@ -226,11 +226,47 @@ class Command extends \lithium\core\Object {
 	/**
 	 * Writes rows of columns.
 	 *
-	 * @param array $rows
-	 * @param string $separator Defaults to `"\t"`.
+	 * This method expects asceding integer values as the keys, which map to the
+	 * appropriate columns. Currently, there is no special "header" option, but you
+	 * can define them for your own.
+	 *
+	 * Example Usage:
+	 *
+	 * {{{
+	 * $output = array(
+	 *     array('Name', 'Age'),
+	 *     array('----', '---'),
+	 * );
+	 * foreach($users as $user) {
+	 *     $output[] = array($user->name, $user->age);
+	 * }
+	 * $this->columns($output);
+	 * }}}
+	 *
+	 * Would render something similar to:
+	 *
+	 * {{{
+	 * Name       Age
+	 * ----       ---
+	 * Jane Doe   22
+	 * Foo Bar    18
+	 * }}}
+	 *
+	 * This method also calculates the needed space between the columns. All option
+	 * params given also get passed down to the `out()` method, which allow custom
+	 * formatting. Passing something like `$this->columns($output, array('style' => 'red)`
+	 * would print the table in red.
+	 *
+	 * @param array $rows The rows to print, with each column as an array element.
+	 * @param array $options Optional params:
+	 *      - separator : Different column separator, defaults to `\t`
+	 *      - style : the style name to wrap around the columns output
+	 * @see \lithium\console\Response::styles()
 	 * @return void
 	 */
-	public function columns($rows, $separator = "\t") {
+	public function columns($rows, $options = array()) {
+		$defaults = array('separator' => "\t");
+		$config = $options + $defaults;
 		$lengths = array_reduce($rows, function($columns, $row) {
 			foreach ((array) $row as $key => $val) {
 				if (!isset($columns[$key]) || strlen($val) > $columns[$key]) {
@@ -239,15 +275,15 @@ class Command extends \lithium\core\Object {
 			}
 			return $columns;
 		});
-		$rows = array_reduce($rows, function($rows, $row) use ($lengths, $separator) {
+		$rows = array_reduce($rows, function($rows, $row) use ($lengths, $config) {
 			$text = '';
 			foreach ((array) $row as $key => $val) {
-				$text = $text . str_pad($val, $lengths[$key]) . $separator;
+				$text = $text . str_pad($val, $lengths[$key]) . $config['separator'];
 			}
 			$rows[] = $text;
 			return $rows;
 		});
-		$this->out($rows);
+		$this->out($rows, $config);
 	}
 
 	/**

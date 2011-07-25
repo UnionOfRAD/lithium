@@ -56,7 +56,7 @@ class StaticObject {
 
 	/**
 	 * Calls a method on this object with the given parameters. Provides an OO wrapper for
-	 * `call_user_func_array()`, and improves performance by using straight method calls in most
+	 * `forward_static_call_array()`, and improves performance by using straight method calls in most
 	 * cases.
 	 *
 	 * @param string $method Name of the method to call.
@@ -78,7 +78,7 @@ class StaticObject {
 			case 5:
 				return static::$method($params[0], $params[1], $params[2], $params[3], $params[4]);
 			default:
-				return call_user_func_array(array(get_called_class(), $method), $params);
+				return forward_static_call_array(array(get_called_class(), $method), $params);
 		}
 	}
 

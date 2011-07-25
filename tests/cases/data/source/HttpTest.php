@@ -19,7 +19,7 @@ class HttpTest extends \lithium\test\Unit {
 	protected $_testConfig = array(
 		'classes' => array('response' => 'lithium\net\http\Response'),
 		'persistent' => false,
-		'protocol' => 'tcp',
+		'scheme' => 'tcp',
 		'host' => 'localhost',
 		'login' => 'root',
 		'password' => '',

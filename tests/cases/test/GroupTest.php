@@ -109,8 +109,6 @@ class GroupTest extends \lithium\test\Unit {
 
 		$results = $group->tests();
 		$this->assertTrue(is_a($results, 'lithium\util\Collection'));
-
-		$results = $group->tests();
 		$this->assertTrue(is_a($results->current(), 'lithium\tests\mocks\test\MockUnitTest'));
 
 		$results = $group->tests()->run();

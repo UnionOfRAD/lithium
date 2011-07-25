@@ -16,9 +16,9 @@ use lithium\core\ClassNotFoundException;
 /**
  * Manages all aspects of class and file location, naming and mapping. Implements auto-loading for
  * the Lithium core, as well as all applications, plugins and vendor libraries registered.
- * Typically, libraries and plugins are registered in `app/config/bootstrap/libraries.php`.
+ * Typically, libraries and plugins are registered in `config/bootstrap/libraries.php`.
  *
- * By convention, plugins and vendor libraries are typically located in `app/libraries` or
+ * By convention, plugins and vendor libraries are typically located in `app-path/libraries` or
  * `/libraries` (the former may override the latter). By default, `Libraries` will use its own
  * autoloader for all plugins and vendor libraries, but can be configured to use others on a
  * per-library basis.

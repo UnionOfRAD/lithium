@@ -37,10 +37,6 @@ use InvalidArgumentException;
  *     Should be all upper-cased and is optional.
  *  - `VARIANT` Should be all upper-cased and is optional.
  *
- * @method string|void language(string $locale) Parses a locale and returns it's language tag.
- * @method string|void script(string $locale) Parses a locale and returns it's script tag.
- * @method string|void territory(string $locale) Parses a locale and returns it's territory tag.
- * @method string|void variant(string $locale) Parses a locale and returns it's variant tag.
  * @link http://www.unicode.org/reports/tr35/tr35-12.html#Identifiers
  * @link http://www.rfc-editor.org/rfc/bcp/bcp47.txt
  * @link http://www.iana.org/assignments/language-subtag-registry
@@ -60,8 +56,16 @@ class Locale extends \lithium\core\StaticObject {
 	);
 
 	/**
-	 * Magic method enabling tag methods.
+	 * Magic method enabling `language`, `script`, `territory` and `variant`
+	 * methods to parse and retrieve individual tags from a locale.
 	 *
+	 * {{{
+	 *     Locale::language('en_US'); // returns 'en'
+	 *     Locale::territory('en_US'); // returns 'US'
+	 * }}}
+	 *
+	 * @see lithium\g11n\Locale::$_tags
+	 * @see lithium\g11n\Locale::decompose()
 	 * @param string $method
 	 * @param array $params
 	 * @return mixed

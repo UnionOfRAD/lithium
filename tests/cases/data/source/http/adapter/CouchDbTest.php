@@ -22,7 +22,7 @@ class CouchDbTest extends \lithium\test\Unit {
 	protected $_testConfig = array(
 		'database' => 'lithium-test',
 		'persistent' => false,
-		'protocol' => 'tcp',
+		'scheme' => 'tcp',
 		'host' => 'localhost',
 		'login' => 'root',
 		'password' => '',
@@ -116,7 +116,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array();
-		$result = $couchdb->last->request->params;
+		$result = $couchdb->last->request->query;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -132,7 +132,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array();
-		$result = $couchdb->last->request->params;
+		$result = $couchdb->last->request->query;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -147,8 +147,8 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
 
-		$expected = 'include_docs=true';
-		$result = $couchdb->last->request->params;
+		$expected = '?include_docs=true';
+		$result = $couchdb->last->request->queryString();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -165,7 +165,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = '';
-		$result = $couchdb->last->request->params;
+		$result = $couchdb->last->request->queryString();
 		$this->assertEqual($expected, $result);
 
 		$this->query->conditions(array('id' => 12345, 'path' => '/lithium-test/12345'));
@@ -187,8 +187,8 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
 
-		$expected = 'limit=10&descending=true';
-		$result = $couchdb->last->request->params;
+		$expected = '?limit=10&descending=true';
+		$result = $couchdb->last->request->queryString();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -317,7 +317,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = array();
-		$result = $couchdb->last->request->params;
+		$result = $couchdb->last->request->query;
 		$this->assertEqual($expected, $result);
 	}
 
@@ -332,8 +332,8 @@ class CouchDbTest extends \lithium\test\Unit {
 		$result = $couchdb->last->request->path;
 		$this->assertEqual($expected, $result);
 
-		$expected = 'rev=1-1';
-		$result = $couchdb->last->request->params;
+		$expected = '?rev=1-1';
+		$result = $couchdb->last->request->queryString();
 		$this->assertEqual($expected, $result);
 	}
 

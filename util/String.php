@@ -239,6 +239,7 @@ class String {
 			$replace = array();
 
 			foreach ($data as $key => $value) {
+				$value = empty($value) ? null : $value;
 				$replace["{$options['before']}{$key}{$options['after']}"] = $value;
 			}
 			$str = strtr($str, $replace);
@@ -271,9 +272,7 @@ class String {
 					$value = '';
 				}
 			}
-			if (!is_array($value)) {
-				$str = str_replace($hashVal, $value, $str);
-			}
+			$str = str_replace($hashVal, (string) $value, $str);
 		}
 
 		if (!isset($options['format']) && isset($options['before'])) {
