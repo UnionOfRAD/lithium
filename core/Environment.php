@@ -278,7 +278,7 @@ class Environment {
 	protected static function _detector() {
 		return static::$_detector ?: function($request) {
 			switch (true) {
-				case (preg_match('/^test\//', $request->url)):
+				case (preg_match('/^test\//', $request->url) && in_array($request->env('SERVER_ADDR'), array('::1', '127.0.0.1'))):
 					return 'test';
 				case (in_array($request->env('SERVER_ADDR'), array('::1', '127.0.0.1'))):
 					return 'development';
