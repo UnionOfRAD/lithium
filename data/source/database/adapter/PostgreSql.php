@@ -358,7 +358,6 @@ class PostgreSql extends \lithium\data\source\Database {
 		return null;
 	}
 
-
 	/**
 	 * @todo Eventually, this will need to rewrite aliases for DELETE and UPDATE queries, same with
 	 *       order().
@@ -497,6 +496,7 @@ class PostgreSql extends \lithium\data\source\Database {
 		}
 		return $entity;
 	}
+
 	/**
 	 * Returns a LIMIT statement from the given limit and the offset of the context object.
 	 *
