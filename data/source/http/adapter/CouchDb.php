@@ -220,7 +220,6 @@ class CouchDb extends \lithium\data\source\Http {
 		$params = compact('query', 'options');
 		$conn =& $this->connection;
 		$config = $this->_config;
-
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
 			$query = $params['query'];
 			$options = $params['options'];
@@ -242,7 +241,7 @@ class CouchDb extends \lithium\data\source\Http {
 			if (isset($result['_id'])) {
 				$data = array($result);
 			} elseif (isset($result['rows'])) {
-				$data = array_map(function($row) { return $row['value']; }, $result['rows']);
+				$data = array_map(function($row) { return $row['doc']; }, $result['rows']);
 
 				unset($result['rows']);
 				$stats = $result;
