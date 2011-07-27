@@ -28,6 +28,17 @@ class PostgreSql extends \lithium\data\source\Database {
 	);
 
 	/**
+	 * Index of basic SQL commands
+	 *
+	 * @var array
+	 * @access protected
+	 */
+	protected $_commands = array(
+			'begin' => 'BEGIN',
+			'commit' => 'COMMIT',
+			'rollback' => 'ROLLBACK'
+	);
+	/**
 	 * PostgreSQL column type definitions.
 	 *
 	 * @var array
@@ -266,13 +277,50 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @see lithium\data\source\Database::schema()
 	 * @param mixed $value The value to be converted. Arrays will be recursively converted.
 	 * @param array $schema Formatted array from `lithium\data\source\Database::schema()`
-	 * @return mixed Value with converted type.
+	 * @return mixed value with converted type
 	 */
 	public function value($value, array $schema = array()) {
+		/* @todo check it
 		if (($result = parent::value($value, $schema)) !== null) {
 			return $result;
 		}
-		return "'" . pg_escape_string($this->connection,(string) $value) . "'";
+		*/
+
+		if (is_array($value)) {
+			foreach ($value as $key => $val) {
+				$value[$key] = $this->value($val, isset($schema[$key]) ? $schema[$key] : $schema);
+			}
+			return $value;
+		}
+		if ($value === null || (is_array($value) && empty($value))) {
+			return 'NULL';
+		}
+
+		switch ($type = isset($schema['type']) ? $schema['type'] : $this->_introspectType($value)) {
+			case 'float':
+				return floatval($value);
+			case 'integer':
+				return intval($value);
+			case 'binary':
+				$value = pg_escape_bytea($this->connection,$value);
+				break;
+			case 'boolean':
+				return $this->_boolean($value);
+				break;
+			case 'date':
+			case 'datetime':
+			case 'timestamp':
+			case 'time':
+			case 'inet':
+				if ($value === '') {
+					//return $read ? 'NULL' : 'DEFAULT';
+					return 'NULL';
+				}
+			default:
+				return "'" . pg_escape_string($this->connection,(string) $value) . "'";
+			break;
+		}
+		return "'" . $value . "'";
 	}
 
 	/**
@@ -410,10 +458,9 @@ class PostgreSql extends \lithium\data\source\Database {
 		}
 
 		switch (true) {
-			case in_array($column['type'], array('date', 'time', 'datetime', 'timestamp')):
+			case in_array($column['type'], array('date', 'time', 'datetime', 'timestamp','boolean')):
 				return $column;
-			case ($column['type'] == 'tinyint' && $column['length'] == '1'):
-			case ($column['type'] == 'boolean'):
+			case ($column['type'] == 'smallint' && $column['length'] == '1'):
 				return array('type' => 'boolean');
 			break;
 			case (strpos($column['type'], 'int') !== false):
@@ -428,7 +475,7 @@ class PostgreSql extends \lithium\data\source\Database {
 			case (strpos($column['type'], 'blob') !== false || $column['type'] == 'binary'):
 				$column['type'] = 'binary';
 			break;
-			case preg_match('/float|double|decimal/', $column['type']):
+			case preg_match('/float|float4|float8|double|double precision|decimal|real|numeric/', $column['type']):
 				$column['type'] = 'float';
 			break;
 			default:
@@ -465,6 +512,29 @@ class PostgreSql extends \lithium\data\source\Database {
 			$offset = ' OFFSET ' . $offset;
 		}
 		return "LIMIT {$limit}{$offset}";
+	}
+
+	/**
+	 * Translates between PHP boolean values and PostgreSQL boolean values
+	 *
+	 * @param mixed $data Value to be translated
+	 * @param boolean $quote True to quote value, false otherwise
+	 * @return mixed Converted boolean value
+	 */
+	protected function _boolean($data, $quote = true) {
+		switch (true) {
+			case ($data === true || $data === false):
+				return $data;
+			case ($data === 't' || $data === 'f'):
+				return ($data === 't')?'true':'false';
+			case ($data === 'true' || $data === 'false'):
+				return ($data === 'true');
+			case ($data === 'TRUE' || $data === 'FALSE'):
+				return ($data === 'TRUE');
+			default:
+				return (bool) $data;
+				break;
+		}
 	}
 }
 
