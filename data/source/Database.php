@@ -575,7 +575,7 @@ abstract class Database extends \lithium\data\Source {
 				}
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
 			case is_array($value):
-				$value = join(', ', $this->value($value, $schema));
+				$value = join(', ', $this->value($value, $schema[$key]));
 				return "{$key} IN ({$value})";
 			default:
 				if (isset($value)) {

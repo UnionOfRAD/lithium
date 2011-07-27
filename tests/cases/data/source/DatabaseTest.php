@@ -95,6 +95,9 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$result = $this->db->value('1.1', array('type' => 'float'));
 		$this->assertIdentical(1.1, $result);
+		
+		$result = $this->db->value('1', array('type' => 'string'));
+		$this->assertIdentical("'1'", $result);
 	}
 
 	public function testValueByIntrospect() {
@@ -554,6 +557,16 @@ class DatabaseTest extends \lithium\test\Unit {
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ";
 		$sql .= "({field1} = 'value1' OR {field2} = 'value2' OR ({sField} = 1 AND {sField2} = 2)";
 		$sql .= " OR ({field1} = 'value2') OR (field2 IS NULL)) AND {bField} = 3 AND bField2 = 0;";
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+		
+		// Test the case where schema has to be used in an IN clause to properly transport
+		// ambiguous values.  
+		$query = new Query(array(
+			'type' => 'read', 'model' => $this->_model,
+			'conditions' => array('title' => array('0900'))
+		));
+		
+		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE title IN ('0900');";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
 
