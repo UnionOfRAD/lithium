@@ -464,7 +464,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$expected = array(
 			'name' => 'MockPost',
 			'type' => 'belongsTo',
-			'keys' => array('mockComment' => '_id'),
+			'key' => array('mockComment' => '_id'),
 			'from' => $from,
 			'link' => 'contained',
 			'to'   => $to,
@@ -620,7 +620,8 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$query = new Query(array('type' => 'update') + compact('entity'));
 		$result = $query->export($this->db);
-		$this->assertEqual(array('updated'), array_keys($result['data']['update']));
+		$expected = array('updated', '_id', 'created', 'list');
+		$this->assertEqual($expected, array_keys($result['data']['update']));
 		$this->assertTrue($result['data']['update']['updated'] instanceof MongoDate);
 	}
 

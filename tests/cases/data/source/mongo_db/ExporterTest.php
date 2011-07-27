@@ -81,6 +81,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertTrue($doc->_id instanceof MongoId);
 
 		$result = Exporter::get('create', $doc->export());
+		$data = $doc->export();
 		$this->assertTrue($result['create']['_id'] instanceof MongoId);
 		$this->assertTrue($result['create']['created'] instanceof MongoDate);
 		$this->assertIdentical(time(), $result['create']['created']->sec);
@@ -127,13 +128,20 @@ class ExporterTest extends \lithium\test\Unit {
 	}
 
 	public function testUpdateWithSubObjects() {
-		$doc = new Document(array('exists' => true, 'data' => array(
-			'numbers' => new DocumentArray(array('data' => array(7, 8, 9))),
-			'deeply' => new Document(array(
-				'pathKey' => 'deeply', 'exists' => true, 'data' => array('nested' => 'object')
+		$model = $this->_model;
+		$exists = true;
+		$model::config(array('key' => '_id'));
+
+		$doc = new Document(compact('model', 'exists') + array('data' => array(
+			'numbers' => new DocumentArray(compact('model', 'exists') + array(
+				'data' => array(7, 8, 9), 'pathKey' => 'numbers'
+			)),
+			'deeply' => new Document(compact('model', 'exists') + array(
+				'pathKey' => 'deeply', 'data' => array('nested' => 'object')
 			)),
 			'foo' => 'bar'
 		)));
+
 		$doc->field = 'value';
 		$doc->deeply->nested = 'foo';
 		$doc->newObject = new Document(array(
@@ -144,10 +152,12 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertEqual('subValue', $doc->newObject->subField);
 
 		$result = Exporter::get('update', $doc->export());
-		$this->assertFalse(isset($result['update']['foo']));
-		$this->assertEqual('value', $result['update']['field']);
-		$this->assertEqual(array('subField' => 'subValue'), $result['update']['newObject']);
-		$this->assertEqual('foo', $result['update']['deeply.nested']);
+		$expected = array(
+			'newObject' => array('subField' => 'subValue'),
+			'field' => 'value',
+			'deeply.nested' => 'foo'
+		);
+		$this->assertEqual($expected, $result['update']);
 	}
 
 	public function testFieldRemoval() {
@@ -165,15 +175,12 @@ class ExporterTest extends \lithium\test\Unit {
 		$expected = array(
 			'foo' => true, 'flagged' => true, 'numbers' => true, 'deeply.nested' => true
 		);
-		$this->assertEqual($expected, $result['remove']);
-		$this->assertEqual(array('bar' => 'dib'), $result['update']);
+		$this->assertEqual(array('update' => array('bar' => 'dib')), $result);
 	}
 
 	/**
 	 * Tests that when an existing object is attached as a value of another existing object, the
 	 * whole sub-object is re-written to the new value.
-	 *
-	 * @return void
 	 */
 	public function testAppendExistingObjects() {
 		$doc = new Document(array('exists' => true, 'data' => array(
@@ -188,15 +195,15 @@ class ExporterTest extends \lithium\test\Unit {
 		$result = Exporter::get('update', $doc->export());
 		$expected = array('update' => array('deeply' => array('foo' => 'bar')));
 		$this->assertEqual($expected, $result);
-		$doc->update();
 
 		$expected = array('$set' => array('deeply' => array('foo' => 'bar')));
 		$this->assertEqual($expected, Exporter::toCommand($result));
 
+		$doc->sync();
 		$doc->append2 = new Document(array('exists' => false, 'data' => array('foo' => 'bar')));
 		$expected = array('update' => array('append2' => array('foo' => 'bar')));
 		$this->assertEqual($expected, Exporter::get('update', $doc->export()));
-		$doc->update();
+		$doc->sync();
 
 		$this->assertFalse(Exporter::get('update', $doc->export()));
 		$doc->append2->foo = 'baz';
@@ -206,6 +213,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$expected = array('update' => array(
 			'append2.foo' => 'baz', 'append2.bar' => 'dib', 'deeply.nested' => true
 		));
+
 		$this->assertEqual($expected, Exporter::get('update', $doc->export()));
 	}
 
@@ -280,9 +288,9 @@ class ExporterTest extends \lithium\test\Unit {
 		$model = $this->_model;
 		$model::schema(array(
 			'_id' => array('type' => 'id'),
-			'list' => array('array' => true),
-			'list.foo' => array('type' => 'string'),
-			'list.bar' => array('type' => 'string')
+			'list' => array('type' => 'string', 'array' => true),
+			'obj.foo' => array('type' => 'string'),
+			'obj.bar' => array('type' => 'string')
 		));
 		$doc = new Document(compact('model'));
 		$doc->list[] = array('foo' => '!!', 'bar' => '??');
@@ -308,6 +316,47 @@ class ExporterTest extends \lithium\test\Unit {
 
 		$result = Exporter::get('update', $doc->export());
 		$this->assertEqual($result['update'], $data);
+	}
+
+	/**
+	 * Test that subobjects are properly casted on creating a new Document
+	 */
+	public function testSubObjectCastingOnSave() {
+		$model = $this->_model;
+		$model::schema(array(
+			'sub.foo' => array('type' => 'boolean'),
+			'bar' => array('type' => 'boolean')
+		));
+		$data = array('sub' => array('foo' => 0), 'bar' => 1);
+		$doc = new Document(compact('data', 'model'));
+
+		$this->assertIdentical(true, $doc->bar);
+		$this->assertIdentical(false, $doc->sub->foo);
+
+		$data = array('sub.foo' => '1', 'bar' => '0');
+		$doc = new Document(compact('data', 'model', 'schema'));
+
+		$this->assertIdentical(false, $doc->bar);
+		$this->assertIdentical(true, $doc->sub->foo);
+	}
+
+	/**
+	 * Tests that a nested key on a previously saved document gets updated properly.
+	 */
+	public function testExistingNestedKeyOverwrite() {
+		$doc = new Document(array('model' => $this->_model));
+		$doc->{'this.that'} = 'value1';
+		$this->assertEqual(array('this' => array('that' => 'value1')), $doc->data());
+
+		$result = Exporter::get('create', $doc->export());
+		$this->assertEqual(array('create' => array('this' => array('that' => 'value1'))), $result);
+
+		$doc->sync();
+		$doc->{'this.that'} = 'value2';
+		$this->assertEqual(array('this' => array('that' => 'value2')), $doc->data());
+
+		$result = Exporter::get('update', $doc->export());
+		$this->assertEqual(array('update' => array('this.that' => 'value2')), $result);
 	}
 
 	/**

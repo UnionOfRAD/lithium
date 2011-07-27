@@ -137,7 +137,7 @@ class Library extends \lithium\console\Command {
 	 * @param string $value value of key
 	 * @param boolean|string $options [optional]
 	 * @return mixed Returns all settings if `$key` and `$value` aren't set. The only option for
-	 * `$key` right now is 'server'. Returns the bytes written to the configuration file.
+	 *         `$key` right now is 'server'. Returns the bytes written to the configuration file.
 	 */
 	public function config($key = null, $value = null, $options = true) {
 		if (empty($key) || empty($value)) {

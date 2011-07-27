@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\data\source\database\adapter;
 
+use lithium\core\Libraries;
 use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\data\source\database\adapter\PostgreSql;
@@ -28,15 +29,16 @@ class PostgreSqlTest extends \lithium\test\Unit {
 	public function skip() {
 		$this->skipIf(!PostgreSql::enabled(), 'PostgreSql Extension is not loaded');
 
-		$this->_dbConfig = Connections::get('test', array('config' => true));
-		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'PostgreSql');
+		$config = Connections::get('test', array('config' => true));
+		$hasDb = (isset($config['adapter']) && $config['adapter'] == 'PostgreSql');
 		$message = 'Test database is either unavailable, or not using a PostgreSql adapter';
 		$this->skipIf(!$hasDb, $message);
 
+		$this->_dbConfig = $config;
 		$this->db = new PostgreSql($this->_dbConfig);
 
-		$lithium = LITHIUM_LIBRARY_PATH . '/lithium';
-		$sqlFile = $lithium . '/tests/mocks/data/source/database/adapter/postgresql_companies.sql';
+		$path = Libraries::get('lithium', 'path');
+		$sqlFile = "{$path}/tests/mocks/data/source/database/adapter/postgresql_companies.sql";
 		$sql = file_get_contents($sqlFile);
 		$this->db->read($sql, array('return' => 'resource'));
 	}
@@ -240,8 +242,8 @@ class PostgreSqlTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Ensures that DELETE queries are not generated with table aliases, as PostgreSql does not support
-	 * this.
+	 * Ensures that DELETE queries are not generated with table aliases, as PostgreSql does not
+	 * support this.
 	 *
 	 * @return void
 	 */

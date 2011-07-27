@@ -316,8 +316,7 @@ class Http extends \lithium\data\Source {
 	 */
 	public function relationship($class, $type, $name, array $options = array()) {
 		if (isset($this->_classes['relationship'])) {
-			$class = $this->_classes['relationship'];
-			return ($class) ? new $class() : null;
+			return $this->_instance('relationship', compact('type', 'name') + $options);
 		}
 		return null;
 	}

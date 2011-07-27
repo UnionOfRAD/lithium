@@ -231,7 +231,7 @@ abstract class Database extends \lithium\data\Source {
 				if (($model) && !$model::key($entity)) {
 					$id = $self->invokeMethod('_insertId', array($object));
 				}
-				$entity->update($id);
+				$entity->sync($id);
 			}
 			return true;
 		});
@@ -261,11 +261,35 @@ abstract class Database extends \lithium\data\Source {
 			unset($args['return']);
 
 			$model = is_object($query) ? $query->model() : null;
-			$schema = !is_null($model) ? $model::schema() : array();
 
 			if (is_string($query)) {
 				$sql = String::insert($query, $self->value($args));
 			} else {
+				$limit = $query->limit();
+				if ($model && $limit && !isset($args['subquery']) && $model::relations('hasMany')) {
+					$name = $model::meta('name');
+					$key = $model::key();
+
+					$subQuery = $self->invokeMethod('_instance', array(
+							get_class($query), array(
+								'type' => 'read',
+								'model' => $model,
+								'group' => "{$name}.{$key}",
+								'fields' => array("{$name}.{$key}"),
+								'joins' => $query->joins(),
+								'conditions' => $query->conditions(),
+								'limit' => $query->limit(),
+								'page' => $query->page(),
+								'order' => $query->order()
+							)
+						));
+					$ids = $self->read($subQuery, array('subquery' => true));
+					$idData = $ids->data();
+					$ids = array_map(function($index) use ($key) {
+							return $index[$key];
+						}, $idData);
+					$query->limit(false)->conditions(array("{$name}.{$key}" => $ids));
+				}
 				$sql = $self->renderCommand($query);
 			}
 			$result = $self->invokeMethod('_execute', array($sql));
@@ -311,7 +335,7 @@ abstract class Database extends \lithium\data\Source {
 
 			if ($self->invokeMethod('_execute', array($sql))) {
 				if ($query->entity()) {
-					$query->entity()->update();
+					$query->entity()->sync();
 				}
 				return true;
 			}
@@ -379,22 +403,22 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function relationship($class, $type, $name, array $config = array()) {
 		$field = Inflector::underscore(Inflector::singularize($name));//($type == 'hasMany') ?  : ;
-		$keys = "{$field}_id";
+		$key = "{$field}_id";
 		$primary = $class::meta('key');
 
 		if (is_array($primary)) {
-			$keys = array_combine($primary, $primary);
+			$key = array_combine($primary, $primary);
 		} elseif ($type == 'hasMany' || $type == 'hasOne') {
 			if ($type == 'hasMany') {
 				$field = Inflector::pluralize($field);
 			}
 			$secondary = Inflector::underscore(Inflector::singularize($class::meta('name')));
-			$keys = array($primary => "{$secondary}_id");
+			$key = array($primary => "{$secondary}_id");
 		}
 
 		$from = $class;
 		$fieldName = $field;
-		$config += compact('type', 'name', 'keys', 'from', 'fieldName');
+		$config += compact('type', 'name', 'key', 'from', 'fieldName');
 		return $this->_instance('relationship', $config);
 	}
 
@@ -491,7 +515,7 @@ abstract class Database extends \lithium\data\Source {
 			}
 		}
 		if (!$forJoin) {
-			$sortOrder = array_flip(array_merge(array($modelName),$relations));
+			$sortOrder = array_flip(array_merge(array($modelName), $relations));
 			uksort($result, function($a, $b) use ($sortOrder) {
 				return $sortOrder[$a] - $sortOrder[$b];
 			});

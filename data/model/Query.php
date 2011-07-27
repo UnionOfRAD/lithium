@@ -76,7 +76,6 @@ class Query extends \lithium\core\Object {
 	 * This means that any information may be passed into the constructor may be used by the backend
 	 * data source executing the query (or ignored, if support is not implemented). This is useful
 	 * if, for example, you wish to extend a core data source and implement custom fucntionality.
-	 *
 	 * @param array $config
 	 */
 	public function __construct(array $config = array()) {
@@ -396,8 +395,8 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Convert the query's properties to the data sources' syntax and return it as an array.
 	 *
-	 * @param \lithium\data\Source $dataSource Instance of the data source to use
-	 *                      for conversion.
+	 * @param object $dataSource An instance of `lithium\data\Source` to use for exporting the query
+	 *               parameters.
 	 * @param array $options Options to use when exporting the data.
 	 * @return array Returns an array containing a data source-specific representation of a query.
 	 */
@@ -538,7 +537,6 @@ class Query extends \lithium\core\Object {
 		if (!$model = $this->model()) {
 			return;
 		}
-		$hasMany = false;
 
 		foreach ((array) $related as $name => $config) {
 			if (is_int($name)) {
@@ -549,29 +547,6 @@ class Query extends \lithium\core\Object {
 			}
 			list($name, $query) = $this->_fromRelationship($relationship);
 			$this->join($name, $query);
-			$hasMany = $hasMany || $relationship->type() == 'hasMany';
-		}
-
-		if ($hasMany && $this->limit()) {
-			$model = $this->model();
-			$name = $model::meta('name');
-			$key = $model::key();
-
-			$query = $this->_instance(get_class($this), array(
-				'type' => 'read',
-				'model' => $model,
-				'group' => "{$name}.{$key}",
-				'fields' => array("{$name}.{$key}"),
-				'joins' => $this->joins(),
-				'conditions' => $this->conditions(),
-				'limit' => $this->limit(),
-				'page' => $this->page(),
-				'order' => $this->order()
-			));
-			$ids = $model::connection()->read($query);
-			$idData = $ids->data();
-			$ids = array_map(function($index) use ($key) { return $index[$key]; }, $idData);
-			$this->limit(false)->conditions(array("{$name}.{$key}" => $ids));
 		}
 	}
 
