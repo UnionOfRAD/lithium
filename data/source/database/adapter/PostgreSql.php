@@ -28,6 +28,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	);
 
 	/**
+<<<<<<< HEAD
 	 * Index of basic SQL commands
 	 *
 	 * @var array
@@ -39,6 +40,8 @@ class PostgreSql extends \lithium\data\source\Database {
 			'rollback' => 'ROLLBACK'
 	);
 	/**
+=======
+>>>>>>> c00c2b4d9eb158bf6a2bd4e1a827f1dc7af256cb
 	 * PostgreSQL column type definitions.
 	 *
 	 * @var array
@@ -497,6 +500,7 @@ class PostgreSql extends \lithium\data\source\Database {
 		}
 		return $entity;
 	}
+
 	/**
 	 * Returns a LIMIT statement from the given limit and the offset of the context object.
 	 *
