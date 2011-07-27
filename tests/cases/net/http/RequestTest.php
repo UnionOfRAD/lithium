@@ -106,10 +106,12 @@ class RequestTest extends \lithium\test\Unit {
 		$result = $this->request->queryString(array('param' => 'value'));
 		$this->assertEqual($expected, $result);
 
+		$expected = "?param=value";
+		$this->request->query = array('param' => 'value');
 		$result = $this->request->queryString();
 		$this->assertEqual($expected, $result);
 
-		$expected = "?param2=value2";
+		$expected = "?param=value&param2=value2";
 		$result = $this->request->queryString(array('param2' => 'value2'));
 		$this->assertEqual($expected, $result);
 	}
@@ -185,7 +187,7 @@ class RequestTest extends \lithium\test\Unit {
 	public function testToArray() {
 		$expected = array(
 			'method' => 'GET',
-			'params' => array(),
+			'query' => array(),
 			'headers' => array(
 				'Host' => 'localhost',
 				'Connection' => 'Close',
@@ -199,6 +201,7 @@ class RequestTest extends \lithium\test\Unit {
 			'host' => 'localhost',
 			'port' => null,
 			'path' => '/',
+			'auth' => null,
 			'username' => null,
 			'password' => null
 		);

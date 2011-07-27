@@ -975,6 +975,18 @@ class RequestTest extends \lithium\test\Unit {
 		$expected = 'http://foo.com/';
 		$this->assertEqual($expected, $request->to('url'));
 	}
+
+	public function testConvertToUrl2() {
+		$request = new Request(array(
+			'env' => array('HTTP_HOST' => 'foo.com', 'HTTPS' => 'on'),
+			'base' => '/the/base/path',
+			'url' => '/posts',
+			'params' => array('controller' => 'posts', 'action' => 'index'),
+			'query' => array('some' => 'query', 'parameter' => 'values')
+		));
+		$expected = 'https://foo.com/the/base/path/posts?some=query&parameter=values';
+		$this->assertEqual($expected, $request->to('url'));
+	}
 }
 
 ?>

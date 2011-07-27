@@ -62,7 +62,7 @@ abstract class Helper extends \lithium\core\Object {
 	 */
 	protected $_minimized = array(
 		'compact', 'checked', 'declare', 'readonly', 'disabled', 'selected', 'defer', 'ismap',
-		'nohref', 'noshade', 'nowrap', 'multiple', 'noresize', 'async'
+		'nohref', 'noshade', 'nowrap', 'multiple', 'noresize', 'async', 'autofocus'
 	);
 
 	public function __construct(array $config = array()) {

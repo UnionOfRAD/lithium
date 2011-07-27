@@ -19,7 +19,7 @@ class Message extends \lithium\net\Message {
 	 *
 	 * @var string
 	 */
-	public $protocol = 'HTTP/1.1';
+	public $protocol = null;
 
 	/**
 	 * Specification version number
@@ -36,13 +36,6 @@ class Message extends \lithium\net\Message {
 	public $headers = array();
 
 	/**
-	 * body
-	 *
-	 * @var array
-	 */
-	public $body = array();
-
-	/**
 	 * Content-Type
 	 *
 	 * @var string
@@ -55,6 +48,43 @@ class Message extends \lithium\net\Message {
 	 * @var array
 	 */
 	protected $_classes = array('media' => 'lithium\net\http\Media');
+
+	/**
+	 * Adds config values to the public properties when a new object is created.
+	 *
+	 * @param array $config Configuration options : default value
+	 * - `scheme`: http
+	 * - `host`: localhost
+	 * - `port`: null
+	 * - `username`: null
+	 * - `password`: null
+	 * - `path`: null
+	 * - `version`: 1.1
+	 * - `headers`: array
+	 * - `body`: null
+	 */
+	public function __construct(array $config = array()) {
+		$defaults = array(
+			'scheme' => 'http',
+			'host' => 'localhost',
+			'port' => null,
+			'username' => null,
+			'password' => null,
+			'path' => null,
+			'protocol' => null,
+			'version' => '1.1',
+			'headers' => array(),
+			'body' => null
+		);
+		$config += $defaults;
+		parent::__construct($config);
+
+		if (strpos($this->host, '/') !== false) {
+			list($this->host, $this->path) = explode('/', $this->host, 2);
+		}
+		$this->path = str_replace('//', '/', "/{$this->path}/");
+		$this->protocol = $this->protocol ?: "HTTP/{$this->version}";
+	}
 
 	/**
 	 * Add a header to rendered output, or return a single header or full header list.

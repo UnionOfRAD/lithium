@@ -402,6 +402,31 @@ class RouteTest extends \lithium\test\Unit {
 
 		$this->assertEqual(array('id' => 'id', 'type' => 'type'), $data['keys']);
 		$this->assertEqual(array('id' => '[0-9a-f]{24}'), $data['subPatterns']);
+
+		$route = new Route(array('template' => '/{:key:[a-z]{5}[0-9]{2,3}}'));
+		$data = $route->export();
+		$this->assertEqual('@^(?:/(?P<key>[a-z]{5}[0-9]{2,3}))$@', $data['pattern']);
+		$this->assertEqual(array('key' => '[a-z]{5}[0-9]{2,3}'), $data['subPatterns']);
+
+		$this->assertEqual('/abcde13', $route->match(array('key' => 'abcde13')));
+		$this->assertFalse($route->match(array('key' => 'abcdef13')));
+
+		$route = new Route(array('template' => '/{:key:z[a-z]{5}[0-9]{2,3}0}/{:val:[0-9]{2}}'));
+		$data = $route->export();
+
+		$expected = '@^(?:/(?P<key>z[a-z]{5}[0-9]{2,3}0))(?:/(?P<val>[0-9]{2}))$@';
+		$this->assertEqual($expected, $data['pattern']);
+
+		$expected = array('key' => 'z[a-z]{5}[0-9]{2,3}0', 'val' => '[0-9]{2}');
+		$this->assertEqual($expected, $data['subPatterns']);
+
+		$result = $route->match(array('key' => 'zgheug910', 'val' => '13'));
+		$this->assertEqual('/zgheug910/13', $result);
+		$this->assertFalse($route->match(array('key' => 'zgheu910', 'val' => '13')));
+
+		$result = $route->match(array('key' => 'zgheug9410', 'val' => '13'));
+		$this->assertEqual('/zgheug9410/13', $result);
+		$this->assertFalse($route->match(array('key' => 'zgheug941', 'val' => '13')));
 	}
 
 	/**
