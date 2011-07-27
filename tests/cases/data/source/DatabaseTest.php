@@ -559,8 +559,6 @@ class DatabaseTest extends \lithium\test\Unit {
 		$sql .= " OR ({field1} = 'value2') OR (field2 IS NULL)) AND {bField} = 3 AND bField2 = 0;";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 		
-		// Test the case where schema has to be used in an IN clause to properly transport
-		// ambiguous values.  
 		$query = new Query(array(
 			'type' => 'read', 'model' => $this->_model,
 			'conditions' => array('title' => array('0900'))
