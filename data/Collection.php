@@ -260,19 +260,16 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return $this, useful for chaining this with other methods.
 	 */
 	public function sort($field = 'id', array $options = array()) {
-		// Populate the collection by forcing it to load all members, by default the 
-		// collection is lazy loaded see offsetGet.
 		$this->offsetGet(null);
 
-		// Support for sorting by field or callback
 		if (is_string($field)) {
 			$sorter = function ($a, $b) use ($field) {
 				if (is_array($a)) {
-					$a = (object)$a;
+					$a = (object) $a;
 				}
 				
 				if (is_array($b)) {
-					$b = (object)$b;
+					$b = (object) $b;
 				}
 				
 				return strcmp($a->$field, $b->$field);
