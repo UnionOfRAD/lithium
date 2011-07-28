@@ -53,6 +53,32 @@ class ResponseTest extends \lithium\test\Unit {
 		)));
 		$this->assertEqual('text/xml', $response->type);
 		$this->assertEqual('UTF-8', $response->encoding);
+
+		$response = new Response(array('headers' => array(
+			'Content-Type' => 'application/soap+xml; charset=iso-8859-1'
+		)));
+		$this->assertEqual('application/soap+xml', $response->type);
+		$this->assertEqual('ISO-8859-1', $response->encoding);
+
+		// Content type WITHOUT space between type and charset
+		$response = new Response(array('headers' => array(
+			'Content-Type' => 'application/json;charset=iso-8859-1'
+		)));
+		$this->assertEqual('application/json', $response->type);
+		$this->assertEqual('ISO-8859-1', $response->encoding);
+
+		// Content type WITH ONE space between type and charset
+		$response = new Response(array('headers' => array(
+			'Content-Type' => 'application/json; charset=iso-8859-1',
+		)));
+		$this->assertEqual('application/json', $response->type);
+		$this->assertEqual('ISO-8859-1', $response->encoding);
+
+		$response = new Response(array('headers' => array(
+			'Content-Type' => 'application/json;     charset=iso-8859-1',
+		)));
+		$this->assertEqual('application/json', $response->type);
+		$this->assertEqual('ISO-8859-1', $response->encoding);
 	}
 
 	public function testParsingContentTypeWithoutEncoding() {
@@ -76,53 +102,20 @@ class ResponseTest extends \lithium\test\Unit {
 			'HTTP/1.1 200 OK',
 			'Header: Value',
 			'Connection: close',
-			'Content-Type: text/html;charset=iso-8859-1',
+			'Content-Type: application/json;charset=iso-8859-1',
 			'',
 			'Test!'
 		));
 
 		$response = new Response(compact('message'));
 		$this->assertEqual($message, (string) $response);
+		$this->assertEqual('application/json', $response->type);
 		$this->assertEqual('ISO-8859-1', $response->encoding);
 
 		$body = 'Not a Message';
 		$expected = join("\r\n", array('HTTP/1.1 200 OK', '', '', 'Not a Message'));
 		$response = new Response(compact('body'));
 		$this->assertEqual($expected, (string) $response);
-	}
-
-	public function testMessageContentTypeParsing() {
-		// Content type WITHOUT space between type and charset
-		$message = join("\r\n", array(
-			'HTTP/1.1 200 OK',
-			'Content-Type: application/json;charset=iso-8859-1',
-			'',
-			'Test!'
-		));
-		$response = new Response(array('message' => $message));
-		$this->assertEqual('application/json', $response->type);
-		$this->assertEqual('ISO-8859-1', $response->encoding);
-
-		// Content type WITH ONE space between type and charset
-		$message = join("\r\n", array(
-			'HTTP/1.1 200 OK',
-			'Content-Type: application/json; charset=iso-8859-1',
-			'',
-			'Test!'
-		));
-		$response = new Response(array('message' => $message));
-		$this->assertEqual('application/json', $response->type);
-		$this->assertEqual('ISO-8859-1', $response->encoding);
-
-		$message = join("\r\n", array(
-			'HTTP/1.1 200 OK',
-			'Content-Type: application/json;     charset=iso-8859-1',
-			'',
-			'Test!'
-		));
-		$response = new Response(array('message' => $message));
-		$this->assertEqual('application/json', $response->type);
-		$this->assertEqual('ISO-8859-1', $response->encoding);
 	}
 
 	public function testEmptyResponse() {
