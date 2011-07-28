@@ -105,7 +105,13 @@ class Auth extends \lithium\core\Adaptable {
 	 * @filter
 	 */
 	public static function check($name, $credentials = null, array $options = array()) {
-		$defaults = array('checkSession' => true, 'writeSession' => true);
+		$defaults = array(
+			'checkSession' => true,
+			'writeSession' => true,
+			'message' => 'You are not permitted to access this area.',
+			'redirect' => '/'
+		);
+		$options += $defaults;
 		$options += $defaults;
 		$params = compact('name', 'credentials', 'options');
 

@@ -7,9 +7,13 @@
  */
 namespace lithium\security\auth\adapter;
 
-use lithium\core\Libraries;
-use UnexpectedValueException;
-use lithium\security\Password;
+//use lithium\core\Libraries;
+//use UnexpectedValueException;
+//use lithium\security\Password;
+use lithium\g11n\Message;
+use lithium\security\auth\db\Acos;
+use lithium\security\auth\db\Aros;
+use lithium\security\auth\db\Permissions;
 
 /**
  * The `Form` adapter provides basic authentication facilities for checking credentials submitted
@@ -132,6 +136,8 @@ use lithium\security\Password;
  * is specified with no key, it will apply to all data submitted. See the `$_validators` property
  * and the `_validate()` method for more information.
  *
+ * ## Code
+ * big thanx for authors of Form, and extensins li3_acces and li3_login
  * @see lithium\net\http\Request::$data
  * @see lithium\data\Model::find()
  * @see lithium\util\String::hash()
@@ -139,71 +145,12 @@ use lithium\security\Password;
 
 class Acl extends \lithium\core\Object {
 
-	/**
-	 * The name of the model class to query against. This can either be a model name (i.e.
-	 * `'Users'`), or a fully-namespaced class reference (i.e. `'app\models\Users'`). When
-	 * authenticating users, the magic `first()` method is invoked against the model to return the
-	 * first record found when combining the conditions in the `$_scope` property with the
-	 * authentication data yielded from the `Request` object in `Form::check()`. (Note that the
-	 * model method called is configurable using the `$_query` property).
-	 *
-	 * @see lithium\security\auth\adapter\Form::$_query
-	 * @var string
-	 */
+/**
+ * The name of the requester model.
+ *
+ * @var array
+ */
 	protected $_model = array();
-
-/**
-	 * Additional data to apply to the model query conditions when looking up users, i.e.
-	 * `array('active' => true)` to disallow authenticating against inactive user accounts.
-	 *
-	 * @var array
-	 */
-	protected $_scope = array();
-
-	/**
-	 * Callback filters to apply to request data before using it in the authentication query. Each
-	 * key in the array must match a request field specified in the `$_fields` property, and each
-	 * value must either be a reference to a function or method name, or a closure. For example, to
-	 * automatically hash passwords using simple SHA 512 hashing, the `Form` adapter could be
-	 * configured with the following: `array('password' => array('lithium\util\String', 'hash'))`.
-	 *
-	 * Optionally, you can specify a callback with no key, which will receive (and can modify) the
-	 * entire credentials array before the query is executed, as in the following example:
-	 *
-	 * {{{
-	 * 	Auth::config(array(
-	 * 		'members' => array(
-	 * 			'adapter' => 'Form',
-	 * 			'model' => 'Member',
-	 * 			'fields' => array('email', 'password'),
-	 * 			'filters' => array(function($data) {
-	 * 				// If the user is outside the company, then their account must have the
-	 * 				// 'private' field set to true in order to log in:
-	 * 				if (!preg_match('/@mycompany\.com$/', $data['email'])) {
-	 * 					$data['private'] = true;
-	 * 				}
-	 * 				return $data;
-	 * 			})
-	 * 		)
-	 * 	));
-	 * }}}
-	 *
-	 * @see lithium\security\auth\adapter\Form::$_fields
-	 * @var array
-	 */
-	protected $_filters = array();
-/**
-	 * If you require custom model logic in your authentication query, use this setting to specify
-	 * which model method to call, and this method will receive the authentication query. In return,
-	 * the `Form` adapter expects a `Record` object which implements the `data()` method. See the
-	 * constructor for more information on setting this property. Defaults to `'first'`, which
-	 * calls, for example, `Users::first()`.
-	 *
-	 * @see lithium\security\auth\adapter\Form::__construct()
-	 * @see lithium\data\entity\Record::data()
-	 * @var string
-	 */
-	protected $_query = 'first';
 
 	/**
 	 * List of configuration properties to automatically assign to the properties of the adapter
@@ -211,42 +158,49 @@ class Acl extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('model', 'fields', 'scope', 'filters', 'validators', 'query');
+	protected $_autoConfig = array('creditials', 'model');
 
-	/**
-	 * Sets the initial configuration for the `Form` adapter, as detailed below.
-	 *
-	 * @see lithium\security\auth\adapter\Form::$_model
-	 * @see lithium\security\auth\adapter\Form::$_fields
-	 * @see lithium\security\auth\adapter\Form::$_filters
-	 * @see lithium\security\auth\adapter\Form::$_validators
-	 * @see lithium\security\auth\adapter\Form::$_query
-	 * @param array $config Sets the configuration for the adapter, which has the following options:
-	 *              - `'model'` _string_: The name of the model class to use. See the `$_model`
-	 *                property for details.
-	 *              - `'fields'` _array_: The model fields to query against when taking input from
-	 *                the request data. See the `$_fields` property for details.
-	 *              - `'scope'` _array_: Any additional conditions used to constrain the
-	 *                authentication query. For example, if active accounts in an application have
-	 *                an `active` field which must be set to `true`, you can specify
-	 *                `'scope' => array('active' => true)`. See the `$_scope` property for more
-	 *                details.
-	 *              - `'filters'` _array_: Named callbacks to apply to request data before the user
-	 *                lookup query is generated. See the `$_filters` property for more details.
-	 *              - `'validators'` _array_: Named callbacks to apply to fields in request data and
-	 *                corresponding fields in database data in order to do programmatic
-	 *                authentication checks after the query has occurred. See the `$_validators`
-	 *                property for more details.
-	 *              - `'query'` _string_: Determines the model method to invoke for authentication
-	 *                checks. See the `$_query` property for more details.
-	 */
+	protected static $_session = null;
+
+	protected static $_time = null;
+
+	protected static $_user = null;
+
+/**
+ * Sets the initial configuration for the `Form` adapter, as detailed below.
+ *
+ * @see lithium\security\auth\adapter\Form::$_model
+ * @see lithium\security\auth\adapter\Form::$_fields
+ * @see lithium\security\auth\adapter\Form::$_filters
+ * @see lithium\security\auth\adapter\Form::$_validators
+ * @see lithium\security\auth\adapter\Form::$_query
+ * @param array $config Sets the configuration for the adapter, which has the following options:
+ *              - `'model'` _string_: The name of the model class to use. See the `$_model`
+ *                property for details.
+ *              - `'fields'` _array_: The model fields to query against when taking input from
+ *                the request data. See the `$_fields` property for details.
+ *              - `'scope'` _array_: Any additional conditions used to constrain the
+ *                authentication query. For example, if active accounts in an application have
+ *                an `active` field which must be set to `true`, you can specify
+ *                `'scope' => array('active' => true)`. See the `$_scope` property for more
+ *                details.
+ *              - `'filters'` _array_: Named callbacks to apply to request data before the user
+ *                lookup query is generated. See the `$_filters` property for more details.
+ *              - `'validators'` _array_: Named callbacks to apply to fields in request data and
+ *                corresponding fields in database data in order to do programmatic
+ *                authentication checks after the query has occurred. See the `$_validators`
+ *                property for more details.
+ *              - `'query'` _string_: Determines the model method to invoke for authentication
+ *                checks. See the `$_query` property for more details.
+ */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'creditials' => 'default',
-			'model' => array(
+			'model' => 'Users',
+			'acl' => array(
 				'Aros' => 'aros',
 				'Acos' => 'acos',
-				'ArosAcos' => 'aros_acos'
+				'Permissions' => 'aros_acos'
 			)
 		);
 		$config += $defaults;
@@ -273,7 +227,6 @@ class Acl extends \lithium\core\Object {
 				$this->_fields[$val] = $val;
 			}
 		}
-		$this->_model = Libraries::locate('models', $this->_model);
 	}
 
 	/**
@@ -289,18 +242,145 @@ class Acl extends \lithium\core\Object {
 	 * @return array Returns an array containing user information on success, or `false` on failure.
 	 */
 	public function check($credentials, array $options = array()) {
-		$model = $this->_model;
-		$query = $this->_query;
+		// do cred przekazujemy nazwe konfiruracji autha ktora dokonala autoryzacji
+		// do aro przekazjemy szczegoly
+		//$model = $this->_model;
+		//$query = $this->_query;
 		//$data = $this->_filters($credentials->data);
-		$data = $credentials->data;
-
+//		if (empty($credentials)) {
+//			throw new ConfigException('No credentials defined for adapter.');
+//		}
+		// 1. take session
+		if ($requester = Session::read($credentials)) {
+			self::$_session = $requester;
+			if(!isset($options['aro']) && empty($options['aro'])){
+				$options['aro'] = array(
+						//'parent_id' => NULL,
+						'model' => $this->_model,
+						'foreign_key' => $requester->id
+				);
+			}
+		}
 		//$conditions = $this->_scope + array_diff_key($data, $this->_validators);
-		$user = $model::$query(compact('conditions') + $options);
-
+		// 2. take aro aco node
 		if (!$user) {
 			return false;
 		}
+		return self::_check($options['aro'], $options['aco']);
 		//return $this->_validate($user, $data);
+	}
+
+/**
+ * Checks if the given $aro has access to action $action in $aco
+ *
+ * @param string $aro ARO The requesting object identifier.
+ * @param string $aco ACO The controlled object identifier.
+ * @param string $action Action (defaults to *)
+ * @return boolean Success (true if ARO has access to action in ACO, false otherwise)
+ * @access public
+ * @link http://book.cakephp.org/view/1249/Checking-Permissions-The-ACL-Component
+ */
+	private static function _check($aro, $aco, $action = "*") {
+		if ($aro == null || $aco == null) {
+			return false;
+		}
+
+		//$permKeys = $this->_getAcoKeys($this->Aros->Permission->schema());
+		$aroPath = Aros::node($aro);
+		$acoPath = Acos::node($aco);
+
+		if (empty($aroPath) || empty($acoPath)) {
+			throw new \Exception($t("Auth\Acl::check() - Failed ARO/ACO node lookup in permissions check.  Node references:\nAro: ", true) . print_r($aro, true) . "\nAco: " . print_r($aco, true));
+			return false;
+		}
+
+		if ($acoPath == null || $acoPath == array()) {
+			throw new \Exception($t("Auth\Acl::check() - Failed ACO node lookup in permissions check.  Node references:\nAro: ", true) . print_r($aro, true) . "\nAco: " . print_r($aco, true));
+			return false;
+		}
+
+		$aroNode = $aroPath[0];
+		$acoNode = $acoPath[0];
+
+//		if ($action != '*' && !in_array('_' . $action, $permKeys)) {
+//			trigger_error(sprintf(__("ACO permissions key %s does not exist in DbAcl::check()", true), $action), E_USER_NOTICE);
+//			return false;
+//		}
+
+		$inherited = array();
+		$acoIDs = Set::extract($acoPath, '{n}.' . $this->Aco->alias . '.id');
+
+		$count = count($aroPath);
+		for ($i = 0 ; $i < $count; $i++) {
+			$permAlias = $this->Aro->Permission->alias;
+
+			$perms = $this->Aro->Permission->find('all', array(
+				'conditions' => array(
+					"{$permAlias}.aro_id" => $aroPath[$i][$this->Aro->alias]['id'],
+					"{$permAlias}.aco_id" => $acoIDs
+				),
+				'order' => array($this->Aco->alias . '.lft' => 'desc'),
+				'recursive' => 0
+			));
+
+			if (empty($perms)) {
+				continue;
+			} else {
+				$perms = Set::extract($perms, '{n}.' . $this->Aro->Permission->alias);
+				foreach ($perms as $perm) {
+//					if ($action == '*') {
+
+						foreach ($permKeys as $key) {
+							if (!empty($perm)) {
+								if ($perm[$key] == -1) {
+									return false;
+								} elseif ($perm[$key] == 1) {
+									$inherited[$key] = 1;
+								}
+							}
+						}
+
+						if (count($inherited) === count($permKeys)) {
+							return true;
+						}
+//					} else {
+//						switch ($perm['_' . $action]) {
+//							case -1:
+//								return false;
+//							case 0:
+//								continue;
+//							break;
+//							case 1:
+//								return true;
+//							break;
+//						}
+//					}
+				}
+			}
+		}
+		return false;
+	}
+
+/**
+ * A pass-through method called by `Auth`. Returns the value of `$data`, which is written to
+ * a user's session. When implementing a custom adapter, this method may be used to modify or
+ * reject data before it is written to the session.
+ *
+ * @param array $data User data to be written to the session.
+ * @param array $options Adapter-specific options. Not implemented in the `Form` adapter.
+ * @return array Returns the value of `$data`.
+ */
+	public function set($data, array $options = array()) {
+		return $data;
+	}
+
+/**
+ * Called by `Auth` when a user session is terminated. Not implemented in the `Form` adapter.
+ *
+ * @param array $options Adapter-specific options. Not implemented in the `Form` adapter.
+ * @return void
+ */
+	public function clear(array $options = array()) {
 	}
 }
 ?>
