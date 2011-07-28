@@ -53,12 +53,6 @@ class ResponseTest extends \lithium\test\Unit {
 		)));
 		$this->assertEqual('text/xml', $response->type);
 		$this->assertEqual('UTF-8', $response->encoding);
-
-		$response = new Response(array('headers' => array(
-			'Content-Type' => 'text/xml;charset=UTF-8'
-		)));
-		$this->assertEqual('text/xml', $response->type);
-		$this->assertEqual('UTF-8', $response->encoding);
 	}
 
 	public function testConstructionWithBody() {
