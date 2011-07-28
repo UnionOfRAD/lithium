@@ -233,17 +233,14 @@ class CouchDb extends \lithium\data\source\Http {
 				$conditions['include_docs'] = 'true';
 			}
 			$path = "{$config['database']}/{$_path}";
-
 			$args = (array) $conditions + (array) $limit + (array) $order;
 			$result = (array) json_decode($conn->get($path, $args), true);
-
 			$data = $stats = array();
 
 			if (isset($result['_id'])) {
 				$data = array($result);
 			} elseif (isset($result['rows'])) {
-				$data = array_map(function($row) { return $row['value']; }, $result['rows']);
-
+				$data = $result['rows'];
 				unset($result['rows']);
 				$stats = $result;
 			}
@@ -273,7 +270,6 @@ class CouchDb extends \lithium\data\source\Http {
 			$params = $query->export($self);
 			extract($params, EXTR_OVERWRITE);
 			list($_path, $conditions) = (array) $conditions;
-
 			$data = $query->data();
 
 			foreach (array('id', 'rev') as $key) {
@@ -353,9 +349,24 @@ class CouchDb extends \lithium\data\source\Http {
 	 *         in `$model`.
 	 */
 	public function item($model, array $data = array(), array $options = array()) {
+		$data = isset($data['doc']) ? $data['doc'] : $data;
 		return parent::item($model, $this->_format($data), $options);
 	}
 
+	/**
+	 * Casts data into proper format when added to a collection or entity object.
+	 *
+	 * @param mixed $entity The entity or collection for which data is being cast, or the name of
+	 *              the model class to which the entity/collection is bound.
+	 * @param array $data An array of data being assigned.
+	 * @param array $options Any associated options with, for example, instantiating new objects in
+	 *              which to wrap the data. Options implemented by `cast()` itself:
+	 *              - `first` _boolean_: Used when only one value is passed to `cast()`. Even though
+	 *                that value must be wrapped in an array, setting the `'first'` option to `true`
+	 *                causes only that one value to be returned.
+	 * @return mixed Returns the value of `$data`, cast to the proper format according to the schema
+	 *         definition of the model class specified by `$model`.
+	 */
 	public function cast($entity, array $data, array $options = array()) {
 		$defaults = array('pathKey' => null, 'model' => null);
 		$options += $defaults;
@@ -370,40 +381,6 @@ class CouchDb extends \lithium\data\source\Http {
 			$data[$key] = $this->item($model, $val, compact('class', 'pathKey') + $options);
 		}
 		return parent::cast($entity, $data, $options);
-	}
-
-	/**
-	 * Get result.
-	 *
-	 * @param string $type
-	 * @param string $resource
-	 * @param string $context
-	 * @return array
-	 */
-	public function result($type, $resource, $context) {
-		if (!is_object($resource) || isset($resource->error)) {
-			return;
-		}
-		switch ($type) {
-			case 'next':
-				if (!isset($resource->rows)) {
-					return $this->_format((array) $resource);
-				}
-				if (isset($resource->rows[$this->_iterator]->doc)) {
-					return $this->_format((array) $resource->rows[$this->_iterator++]->doc);
-				}
-				if (isset($resource->rows[$this->_iterator]->value)) {
-					$data = (array) $resource->rows[$this->_iterator]->value;
-					$data['id'] = $resource->rows[$this->_iterator++]->id;
-					return $this->_format($data);
-				}
-			break;
-			case 'close':
-				unset($resource);
-				$this->_iterator = 0;
-			break;
-		}
-		return;
 	}
 
 	/**
