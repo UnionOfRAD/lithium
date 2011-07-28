@@ -104,11 +104,13 @@ class Response extends \lithium\net\http\Message {
 			$this->body = $this->_parseMessage($this->_config['message']);
 		}
 		if (isset($this->headers['Content-Type'])) {
-			preg_match('/^(.*?);\s*?charset=(.+)/i', $this->headers['Content-Type'], $match);
+			preg_match('/([-\w\/+]+)(;\s*?charset=(.+))?/i', $this->headers['Content-Type'], $match);
 
-			if ($match) {
+			if (isset($match[1])) {
 				$this->type = trim($match[1]);
-				$this->encoding = strtoupper(trim($match[2]));
+			}
+			if (isset($match[3])) {
+				$this->encoding = strtoupper(trim($match[3]));
 			}
 		}
 		if (isset($this->headers['Transfer-Encoding'])) {
