@@ -349,7 +349,12 @@ class CouchDb extends \lithium\data\source\Http {
 	 *         in `$model`.
 	 */
 	public function item($model, array $data = array(), array $options = array()) {
-		$data = isset($data['doc']) ? $data['doc'] : $data;
+		if (isset($data['doc'])) {
+			return parent::item($model, $this->_format($data['doc']), $options);
+		}
+		if (isset($data['value'])) {
+			return parent::item($model, $this->_format($data['value']), $options);
+		}
 		return parent::item($model, $this->_format($data), $options);
 	}
 
