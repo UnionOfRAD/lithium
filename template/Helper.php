@@ -158,15 +158,17 @@ abstract class Helper extends \lithium\core\Object {
 	 * @return string
 	 */
 	protected function _attributes($params, $method = null, array $options = array()) {
-		if (!is_array($params)) {
-			return !$params ? '' : ' ' . $params;
-		}
 		$defaults = array('escape' => true, 'prepend' => ' ', 'append' => '');
 		$options += $defaults;
 		$result = array();
 
+		if (!is_array($params)) {
+			return !$params ? '' : $options['prepend'] . $params;
+		}
 		foreach ($params as $key => $value) {
-			$result[] = $this->_attribute($key, $value, $options);
+			if ($next = $this->_attribute($key, $value, $options)) {
+				$result[] = $next;
+			}
 		}
 		return $result ? $options['prepend'] . implode(' ', $result) . $options['append'] : '';
 	}

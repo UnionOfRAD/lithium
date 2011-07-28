@@ -100,7 +100,7 @@ class HelperTest extends \lithium\test\Unit {
 
 		$attributes = array('checked' => false);
 		$result = $this->helper->testAttributes($attributes);
-		$this->assertEqual(' ', $result);
+		$this->assertEqual('', $result);
 	}
 
 	public function testAttributeEscaping() {

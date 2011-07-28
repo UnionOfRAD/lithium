@@ -466,6 +466,7 @@ class FormTest extends \lithium\test\Unit {
 
 	public function testSelectGeneration() {
 		$result = $this->form->select('foo');
+
 		$this->assertTags($result, array(
 			'select' => array('name' => 'foo', 'id' => 'Foo'), '/select'
 		));
@@ -692,7 +693,7 @@ class FormTest extends \lithium\test\Unit {
 		$expected = array(
 			'<div>',
 			'<input type="hidden" name="name" value="" />',
-			'<input type="checkbox" name="name" id="Name"  value="1" />',
+			'<input type="checkbox" name="name" id="Name" value="1" />',
 			'<label for="Name">Name</label></div>'
 		);
 		$this->assertEqual(join('', $expected), $result);
