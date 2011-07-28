@@ -528,7 +528,11 @@ class FormTest extends \lithium\test\Unit {
 			'/select'
 		));
 	}
-	
+
+	/**
+	 * Tests that calling `select()` with nested arrays will produce lists of `<option />`s wrapped
+	 * in `<optgroup />` elements.
+	 */
 	public function testRecursiveSelect() {
 		$list = array(
 			'Linux' => array(
@@ -540,15 +544,15 @@ class FormTest extends \lithium\test\Unit {
 				'5' => 'Windows Server 2010 R2'
 			)
 		);
-		$result = $this->form->select('opsys', $list, array('empty' => 
-			'Select one', 'value' => '5'
+		$result = $this->form->select('opsys', $list, array(
+			'empty' =>  'Select one', 'value' => '5'
 		));
 
 		$this->assertTags($result, array(
 			'select' => array('name' => 'opsys', 'id' => 'Opsys'),
 			array('option' => array('value' => '')),
 			'Select one',
-			'/option',			
+			'/option',
 			array('optgroup' => array('label' => 'Linux')),
 			array('option' => array('value' => '1')),
 			'Ubuntu 10.10',
