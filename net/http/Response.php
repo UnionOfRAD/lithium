@@ -127,19 +127,19 @@ class Response extends \lithium\net\http\Message {
 	 */
 	protected function _parseMessage($body) {
 		if (!($parts = explode("\r\n\r\n", $body, 2)) || count($parts) == 1) {
-			return $body;
+			return trim($body);
 		}
 		list($headers, $body) = $parts;
 		$headers = str_replace("\r", "", explode("\n", $headers));
 
 		if (array_filter($headers) == array()) {
-			return $body;
+			return trim($body);
 		}
 		preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)\s+(.*)/i', array_shift($headers), $match);
 		$this->headers($headers);
 
 		if (!$match) {
-			return $body;
+			return trim($body);
 		}
 		list($line, $this->version, $code, $message) = $match;
 		$this->status = compact('code', 'message') + $this->status;
@@ -209,7 +209,7 @@ class Response extends \lithium\net\http\Message {
 		}
 		$stream = fopen('data://text/plain,' . $body, 'r');
 		stream_filter_append($stream, 'dechunk');
-		return stream_get_contents($stream);
+		return trim(stream_get_contents($stream));
 	}
 }
 
