@@ -547,11 +547,13 @@ abstract class Database extends \lithium\data\Source {
 	public function _processConditions($key, $value, $schema, $glue = 'AND') {
 		$constraintTypes =& $this->_constraintTypes;
 
+
+
 		switch (true) {
 			case (is_numeric($key) && is_string($value)):
 				return $value;
 			case is_string($value):
-				return $this->name($key) . ' = ' . $this->value($value);
+				return $this->name($key) . ' = ' . $this->value($value, $schema[$key]);
 			case is_numeric($key) && is_array($value):
 				$result = array();
 				foreach ($value as $cField => $cValue) {
@@ -579,7 +581,7 @@ abstract class Database extends \lithium\data\Source {
 				return "{$key} IN ({$value})";
 			default:
 				if (isset($value)) {
-					$value = $this->value($value, $schema);
+					$value = $this->value($value, $schema[$key]);
 					return "{$key} = {$value}";
 				}
 				if ($value === null) {

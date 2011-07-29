@@ -544,19 +544,19 @@ class DatabaseTest extends \lithium\test\Unit {
 			'type' => 'read', 'model' => $this->_model,
 			'conditions' => array(
 				'or' => array(
-					'field1' => 'value1',
-					'field2' => 'value2',
-					'and' => array('sField' => '1', 'sField2' => '2'),
-					array('field1' => 'value2'),
-					array('field2' => null)
+					'id' => 'value1',
+					'title' => 'value2',
+					'and' => array('author_id' => '1', 'created' => '2'),
+					array('title' => 'value2'),
+					array('title' => null)
 				),
-				'bField' => '3',
-				'bField2' => false
+				'id' => '3',
+				'author_id' => false
 			)
 		));
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ";
-		$sql .= "({field1} = 'value1' OR {field2} = 'value2' OR ({sField} = 1 AND {sField2} = 2)";
-		$sql .= " OR ({field1} = 'value2') OR (field2 IS NULL)) AND {bField} = 3 AND bField2 = 0;";
+		$sql .= "({id} = 0 OR {title} = 'value2' OR ({author_id} = 1 AND {created} = '2')";
+		$sql .= " OR ({title} = 'value2') OR (title IS NULL)) AND {id} = 3 AND author_id = 0;";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 		
 		$query = new Query(array(
