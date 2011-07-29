@@ -554,7 +554,7 @@ class Unit extends \lithium\core\Object {
 	public function assertNoCookie($expected, $headers = null) {
 		$matched = $this->_cookieMatch($expected, $headers);
 		if ($matched['match']) {
-			$message = sprintf('%s - Cookie not found in headers.', $matched['pattern']);
+			$message = sprintf('%s - Cookie found in headers.', $matched['pattern']);
 			$this->assert(false, $message, compact('expected', 'result'));
 			return false;
 		}
