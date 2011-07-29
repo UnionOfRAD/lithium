@@ -27,9 +27,8 @@ class SocketTest extends \lithium\test\Integration {
 	);
 
 	public function skip() {
-		$config = $this->_testConfig;
-		$message = "Could not open {$config['host']} - skipping " . __CLASS__;
-		$this->skipIf($config['host'] == gethostbyname($config['host']), $message);
+		$message = "No internet connection established.";
+		$this->skipIf(!$this->_hasNetwork($this->_testConfig), $message);
 	}
 
 	public function testContextAdapter() {

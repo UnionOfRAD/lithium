@@ -961,6 +961,36 @@ class Unit extends \lithium\core\Object {
 	public function results() {
 		return $this->_results;
 	}
+
+	/**
+	 * Checks for a working internet connection.
+	 *
+	 * This method is used to check for a working connection to lithify.me, both
+	 * testing for proper dns resolution and reading the actual URL.
+	 *
+	 * @param array $options Override the default URI to check.
+	 * @return boolean True if a network connection is established, false otherwise.
+	 */
+	protected function _hasNetwork($config = array()) {
+		$defaults = array(
+			'scheme' => 'http',
+			'host' => 'lithify.me'
+		);
+		$config += $defaults;
+
+		$url = "{$config['scheme']}://{$config['host']}";
+		$failed = false;
+
+		set_error_handler(function($errno, $errstr) use (&$failed) {
+			$failed = true;
+		});
+
+		$dnsCheck = dns_check_record($config['host'], "ANY");
+		$fileCheck = fopen($url, "r");
+
+		restore_error_handler();
+		return !$failed;
+	}
 }
 
 ?>
