@@ -95,7 +95,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$result = $this->db->value('1.1', array('type' => 'float'));
 		$this->assertIdentical(1.1, $result);
-		
+
 		$result = $this->db->value('1', array('type' => 'string'));
 		$this->assertIdentical("'1'", $result);
 	}
@@ -558,12 +558,12 @@ class DatabaseTest extends \lithium\test\Unit {
 		$sql .= "({id} = 0 OR {title} = 'value2' OR ({author_id} = 1 AND {created} = '2')";
 		$sql .= " OR ({title} = 'value2') OR (title IS NULL)) AND {id} = 3 AND author_id = 0;";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
-		
+
 		$query = new Query(array(
 			'type' => 'read', 'model' => $this->_model,
 			'conditions' => array('title' => array('0900'))
 		));
-		
+
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE title IN ('0900');";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}

@@ -547,8 +547,6 @@ abstract class Database extends \lithium\data\Source {
 	public function _processConditions($key, $value, $schema, $glue = 'AND') {
 		$constraintTypes =& $this->_constraintTypes;
 
-
-
 		switch (true) {
 			case (is_numeric($key) && is_string($value)):
 				return $value;
