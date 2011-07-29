@@ -197,6 +197,54 @@ class SessionTest extends \lithium\test\Integration {
 		$this->assertTrue(Session::write($key, $value, $config));
 		$this->assertEqual($value, Session::read($key, $config));
 	}
+
+	public function testStrategiesCookieAdapter() {
+		$key = 'test_key';
+		$value = 'test_value';
+
+		Session::config(array(
+			'strategy' => array(
+				'adapter' => 'Cookie',
+				'strategies' => array('Hmac' => array('secret' => 'somesecretkey'))
+			)
+		));
+
+		$result = Session::write($key, $value, array('name' => 'strategy'));
+		$this->assertTrue($result);
+
+		$result = Session::read($key, array('name' => 'strategy'));
+		$this->assertEqual($value, $result);
+
+		$this->assertTrue(Session::delete($key));
+
+		$result = Session::read($key);
+		$this->assertNull($result);
+
+		Session::write($key, $value);
+		$result = Session::read($key);
+		$this->assertEqual($value, $result);
+		$this->assertTrue(Session::delete($key));
+	}
+
+	public function testHmacStrategy() {
+		$key = 'test';
+		$value = 'value';
+		$name = 'hmac_test';
+
+		Session::config(array(
+			'default' => array(
+				'adapter' => 'Cookie',
+				'strategies' => array('Hmac' => array('secret' => 'somesecretkey')),
+				'name' => $name
+			)
+		));
+
+		$cache = $_COOKIE;
+		$_COOKIE[$name]['injectedkey'] = 'hax0r';
+		$this->expectException('/Possible data tampering - HMAC signature does not match data./');
+		$result = Session::read($key);
+		$_COOKIE = $cache;
+	}
 }
 
 ?>
