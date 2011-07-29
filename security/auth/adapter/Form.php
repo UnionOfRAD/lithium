@@ -404,14 +404,16 @@ class Form extends \lithium\core\Object {
 			if ($validator === false || !isset($this->_fields[$field]) || $field === 0) {
 				continue;
 			}
-			$value = isset($data[$field]) ? $data[$field] : null;
 
 			if (!is_callable($validator)) {
 				$message = "Authentication validator for `{$field}` is not callable.";
 				throw new UnexpectedValueException($message);
 			}
 
-			if (!call_user_func($validator, $value, $user->data($this->_fields[$field]))) {
+			$field = $this->_fields[$field];
+			$value = isset($data[$field]) ? $data[$field] : null;
+
+			if (!call_user_func($validator, $value, $user->data($field))) {
 				return false;
 			}
 		}
