@@ -274,6 +274,7 @@ class QueryTest extends \lithium\test\Unit {
 			'source',
 			'type',
 			'whitelist',
+			'blacklist',
 			'relationships'
 		);
 		$result = array_keys($export);
@@ -393,6 +394,47 @@ class QueryTest extends \lithium\test\Unit {
 		$query = new Query(compact('data') + array('whitelist' => array('foo', 'bar')));
 		$this->assertEqual(array('foo' => 1, 'bar' => 2), $query->data());
 	}
+
+	/**
+	 * Tests that assigning a blacklist to a query properly restricts the list of data fields that
+	 * the query exposes.
+	 *
+	 * @return void
+	 */
+	public function testBlacklisting() {
+		$data = array('foo' => 1, 'bar' => 2);
+		$query = new Query(compact('data'));
+		$this->assertEqual($data, $query->data());
+
+		$query = new Query(compact('data') + array('blacklist' => array('foo')));
+		$this->assertEqual(array('bar' => 2), $query->data());
+	}
+
+	/**
+	 * Tests the ability to combine whitelists and blacklists.
+	 *
+	 * @return void
+	 */
+	public function testWhiteandBlacklistingTogether() {
+		$data = array('foo' => 1, 'bar' => 2, 'baz' => 3, 'foz' => 4);
+
+		$query = new Query(compact('data'));
+		$this->assertEqual($data, $query->data());
+
+		$query = new Query(compact('data') + array(
+			'whitelist' => array('foo', 'bar', 'baz'),
+			'blacklist' => array('baz')
+		));
+		$this->assertEqual(array('foo' => 1, 'bar' => 2), $query->data());
+
+		$query = new Query(compact('data') + array(
+			'blacklist' => array('foo'),
+			'whitelist' => array('foo', 'bar')
+		));
+		$this->assertEqual(array('bar' => 2), $query->data());
+	}
+
+
 
 	/**
 	 * Tests basic property accessors and mutators.

@@ -98,6 +98,7 @@ class Query extends \lithium\core\Object {
 			'with'       => array(),
 			'map'        => array(),
 			'whitelist'  => array(),
+			'blacklist' => array(),
 			'relationships' => array()
 		);
 		parent::__construct($config + $defaults);
@@ -115,6 +116,9 @@ class Query extends \lithium\core\Object {
 		}
 		if ($list = $this->_config['whitelist']) {
 			$this->_config['whitelist'] = array_combine($list, $list);
+		}
+		if ($list = $this->_config['blacklist']) {
+			$this->_config['blacklist'] = array_combine($list, $list);
 		}
 		if ($this->_config['with']) {
 			$this->_associate($this->_config['with']);
@@ -366,7 +370,14 @@ class Query extends \lithium\core\Object {
 			return $this;
 		}
 		$data = $bind ? $bind->data() : $this->_data;
-		return ($list = $this->_config['whitelist']) ? array_intersect_key($data, $list) : $data;
+
+		if ($whitelist = $this->_config['whitelist']) {
+			$data = array_intersect_key($data, $whitelist);
+		}
+		if ($blacklist = $this->_config['blacklist']) {
+			$data = array_diff_key($data, $blacklist);
+		}
+		return $data;
 	}
 
 	/**
@@ -439,16 +450,27 @@ class Query extends \lithium\core\Object {
 
 	/**
 	 * Helper method used by `export()` to extract the data either from a bound entity, or from
-	 * passed configuration, and filter it through a configured whitelist, if present.
-	 *
+	 * passed configuration, and - if present - filter it through a configured whitelist and/or
+	 * blacklist.
+	 * 
 	 * @return array
 	 */
 	protected function _exportData() {
 		$data = $this->_entity ? $this->_entity->export() : $this->_data;
 
-		if (!$list = $this->_config['whitelist']) {
-			return $data;
+		$whitelist = $this->_config['whitelist'];
+		$blacklist = $this->_config['blacklist'];
+
+		if ($whitelist) {
+			$data = $this->_whitelist($whitelist, $data);
 		}
+		if ($blacklist) {
+			$data = $this->_blacklist($blacklist, $data);
+		}
+		return $data;
+	}
+
+	protected function _whitelist($list, $data) {
 		$list = array_combine($list, $list);
 
 		if (!$this->_entity) {
@@ -459,6 +481,21 @@ class Query extends \lithium\core\Object {
 				continue;
 			}
 			$data[$type] = array_intersect_key($values, $list);
+		}
+		return $data;
+	}
+
+	protected function _blacklist($list, $data) {
+		$list = array_combine($list, $list);
+
+		if (!$this->_entity) {
+			return array_diff_key($data, $list);
+		}
+		foreach ($data as $type => $values) {
+			if (!is_array($values)) {
+				continue;
+			}
+			$data[$type] = array_diff_key($values, $list);
 		}
 		return $data;
 	}

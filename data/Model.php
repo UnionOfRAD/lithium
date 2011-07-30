@@ -734,6 +734,11 @@ class Model extends \lithium\core\StaticObject {
 	 *         `$validates` property of the model.
 	 *        - `'whitelist'` _array_: An array of fields that are allowed to be saved to this
 	 *          record.
+	 *        - `'blacklist'` _array_: As the name suggests, this option provides the opposite
+	 *          functionality of `'whitelist'`. Both lists play along nicely.  You could for
+	 *          example provide a `'whitelist'` and then filter some values in that list via
+	 *          `'blacklist`'. Keep in mind, `'whitelist'` will always be processed first. See
+	 *          QueryTest::testWhiteandBlacklistingTogether() for example usage.
 	 *
 	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
 	 * @filter
@@ -746,6 +751,7 @@ class Model extends \lithium\core\StaticObject {
 		$defaults = array(
 			'validate' => true,
 			'whitelist' => null,
+			'blacklist' => null,
 			'callbacks' => true,
 			'locked' => $self->_meta['locked']
 		);
