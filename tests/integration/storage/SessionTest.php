@@ -10,7 +10,7 @@ namespace lithium\tests\integration\storage;
 
 use lithium\storage\Session;
 
-class SessionTest extends \lithium\test\Unit {
+class SessionTest extends \lithium\test\Integration {
 
 	public function setUp() {
 		Session::reset();

@@ -15,7 +15,7 @@ use lithium\util\collection\Filters;
 /**
  * Logger adapter integration test cases
  */
-class LoggerTest extends \lithium\test\Unit {
+class LoggerTest extends \lithium\test\Integration {
 
 	public function testWriteFilter() {
 
