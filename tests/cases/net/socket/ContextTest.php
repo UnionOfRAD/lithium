@@ -24,8 +24,8 @@ class ContextTest extends \lithium\test\Unit {
 	);
 
 	public function skip() {
-		$host = $this->_testConfig['host'];
-		$this->skipIf(dns_check_record($host, "ANY") === false, "No internet connection.");
+		$message = "No internet connection established.";
+		$this->skipIf(!$this->_hasNetwork($this->_testConfig), $message);
 	}
 
 	public function testConstruct() {
