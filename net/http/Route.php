@@ -349,7 +349,7 @@ class Route extends \lithium\core\Object {
 	 */
 	public function compile() {
 		$this->_match = $this->_params;
-		
+
 		foreach ($this->_params as $key => $value) {
 			if (!strpos($key, ':')) {
 				continue;
@@ -362,10 +362,10 @@ class Route extends \lithium\core\Object {
 			$this->_pattern = '@^/*$@';
 			return;
 		}
-		$this->_pattern = "@^{$this->_template}\$@";			
-		
-		//preg_match_all('@(.)\{:([^:}]+):?((?:[^{]+(?:\{[0-9,]+\})?)*)\}@', $this->_pattern, $m);
-		preg_match_all('@([/.])?\{:([^:}]+):?((?:[^{]+(?:\{[0-9,]+\})?)*)\}@S', $this->_pattern, $m);
+		$this->_pattern = "@^{$this->_template}\$@";
+		$match = '@([/.])?\{:([^:}]+):?((?:[^{]+(?:\{[0-9,]+\})?)*)\}@S';
+		preg_match_all($match, $this->_pattern, $m);
+
 		if (!$tokens = $m[0]) {
 			return;
 		}
@@ -373,49 +373,30 @@ class Route extends \lithium\core\Object {
 		$params = $m[2];
 		$regexs = $m[3];
 		unset($m);
-
 		$this->_keys = array();
+
 		foreach ($params as $i => $param) {
 			$this->_keys[$param] = $param;
 
 			if ($regexs[$i]) {
 				$regex = $regexs[$i];
 				$this->_subPatterns[$param] = $regex;
-			} elseif($param == 'args') {
+			} elseif ($param == 'args') {
 				$regex = '.*';
 			} else {
-				// $regex = '[^/]+';
 				$regex = '[^\/]+';
 			}
 			$req = $param === 'args' || array_key_exists($param, $this->_params) ? '?' : '';
-			
-			/*$slash = $slashes[$i];
-			static $preg_quote = array('' => '', '/' => '/', '.' => '\\.');
-			if(!isset($preg_quote[$slash])) $preg_quote[$slash] = preg_quote($slash);
 
-			$this->_pattern = str_replace(
-				"{$tokens[$i]}",
-				$slash != '' ? 
-					"(?:{$preg_quote[$slash]}(?P<{$param}>{$regex})){$req}" :
-					"(?P<{$param}>{$regex}){$req}",
-			 	$this->_pattern
-			);/**/
-			
 			if ($slashes[$i] === '/') {
-				$this->_pattern = str_replace(
-					"{$tokens[$i]}", "(?:/(?P<{$param}>{$regex}){$req}){$req}", $this->_pattern
-				);
+				$pattern = "(?:/(?P<{$param}>{$regex}){$req}){$req}";
 			} elseif ($slashes[$i] === '.') {
-				$this->_pattern = str_replace(
-					"{$tokens[$i]}", "\\.(?P<{$param}>{$regex}){$req}", $this->_pattern
-				);
+				$pattern = "\\.(?P<{$param}>{$regex}){$req}";
 			} else {
-				$this->_pattern = str_replace(
-					"{$tokens[$i]}", "(?P<{$param}>{$regex}){$req}", $this->_pattern
-				);
-			}/**/
+				$pattern = "(?P<{$param}>{$regex}){$req}";
+			}
+			$this->_pattern = str_replace("{$tokens[$i]}", $pattern, $this->_pattern);
 		}
-		
 		$this->_defaults = array_intersect_key($this->_params, $this->_keys);
 		$this->_match = array_diff_key($this->_params, $this->_defaults);
 	}
