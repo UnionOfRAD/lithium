@@ -36,8 +36,8 @@ class CurlTest extends \lithium\test\Unit {
 		$message = "Could not open {$url} - skipping " . __CLASS__;
 		$this->skipIf(!curl_init($url), $message);
 
-		$host = $this->_testConfig['host'];
-		$this->skipIf(dns_check_record($host, "ANY") === false, "No internet connection.");
+		$message = "No internet connection established.";
+		$this->skipIf(!$this->_hasNetwork($this->_testConfig), $message);
 	}
 
 	public function testAllMethodsNoConnection() {

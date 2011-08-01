@@ -37,39 +37,34 @@ class Form extends \lithium\template\Helper {
 	 * @var array
 	 */
 	protected $_strings = array(
-		'button'               => '<button{:options}>{:name}</button>',
-		'checkbox'             => '<input type="checkbox" name="{:name}"{:options} />',
-		'checkbox-multi'       => '<input type="checkbox" name="{:name}[]"{:options} />',
-		'checkbox-multi-end'   => '',
-		'checkbox-multi-start' => '',
-		'error'                => '<div{:options}>{:content}</div>',
-		'errors'               => '{:content}',
-		'element'              => '<input type="{:type}" name="{:name}"{:options} />',
-		'file'                 => '<input type="file" name="{:name}"{:options} />',
-		'form'                 => '<form action="{:url}"{:options}>{:append}',
-		'form-end'             => '</form>',
-		'hidden'               => '<input type="hidden" name="{:name}"{:options} />',
-		'field'                => '<div{:wrap}>{:label}{:input}{:error}</div>',
-		'field-checkbox'       => '<div{:wrap}>{:input}{:label}{:error}</div>',
-		'field-radio'          => '<div{:wrap}>{:input}{:label}{:error}</div>',
-		'label'                => '<label for="{:name}"{:options}>{:title}</label>',
-		'legend'               => '<legend>{:content}</legend>',
-		'option-group'         => '<optgroup label="{:label}"{:options}>',
-		'option-group-end'     => '</optgroup>',
-		'password'             => '<input type="password" name="{:name}"{:options} />',
-		'radio'                => '<input type="radio" name="{:name}" {:options} />',
-		'select-start'         => '<select name="{:name}"{:options}>',
-		'select-multi-start'   => '<select name="{:name}[]"{:options}>',
-		'select-empty'         => '<option value=""{:options}>&nbsp;</option>',
-		'select-option'        => '<option value="{:value}"{:options}>{:title}</option>',
-		'select-end'           => '</select>',
-		'submit'               => '<input type="submit" value="{:title}"{:options} />',
-		'submit-image'         => '<input type="image" src="{:url}"{:options} />',
-		'text'                 => '<input type="text" name="{:name}"{:options} />',
-		'textarea'             => '<textarea name="{:name}"{:options}>{:value}</textarea>',
-		'fieldset'             => '<fieldset{:options}>{:content}</fieldset>',
-		'fieldset-start'       => '<fieldset><legend>{:content}</legend>',
-		'fieldset-end'         => '</fieldset>'
+		'button'         => '<button{:options}>{:name}</button>',
+		'checkbox'       => '<input type="checkbox" name="{:name}"{:options} />',
+		'checkbox-multi' => '<input type="checkbox" name="{:name}[]"{:options} />',
+		'checkbox-multi-group' => '{:raw}',
+		'error'          => '<div{:options}>{:content}</div>',
+		'errors'         => '{:raw}',
+		'input'          => '<input type="{:type}" name="{:name}"{:options} />',
+		'file'           => '<input type="file" name="{:name}"{:options} />',
+		'form'           => '<form action="{:url}"{:options}>{:append}',
+		'form-end'       => '</form>',
+		'hidden'         => '<input type="hidden" name="{:name}"{:options} />',
+		'field'          => '<div{:wrap}>{:label}{:input}{:error}</div>',
+		'field-checkbox' => '<div{:wrap}>{:input}{:label}{:error}</div>',
+		'field-radio'    => '<div{:wrap}>{:input}{:label}{:error}</div>',
+		'label'          => '<label for="{:name}"{:options}>{:title}</label>',
+		'legend'         => '<legend>{:content}</legend>',
+		'option-group'   => '<optgroup label="{:label}"{:options}>{:raw}</optgroup>',
+		'password'       => '<input type="password" name="{:name}"{:options} />',
+		'radio'          => '<input type="radio" name="{:name}" {:options} />',
+		'select'         => '<select name="{:name}"{:options}>{:raw}</select>',
+		'select-empty'   => '<option value=""{:options}>&nbsp;</option>',
+		'select-multi'   => '<select name="{:name}[]"{:options}>{:raw}</select>',
+		'select-option'  => '<option value="{:value}"{:options}>{:title}</option>',
+		'submit'         => '<input type="submit" value="{:title}"{:options} />',
+		'submit-image'   => '<input type="image" src="{:url}"{:options} />',
+		'text'           => '<input type="text" name="{:name}"{:options} />',
+		'textarea'       => '<textarea name="{:name}"{:options}>{:value}</textarea>',
+		'fieldset'       => '<fieldset{:options}><legend>{:content}</legend>{:raw}</fieldset>',
 	);
 
 	/**
@@ -351,7 +346,7 @@ class Form extends \lithium\template\Helper {
 		$params += array(null, array());
 		list($name, $options) = $params;
 		list($name, $options, $template) = $this->_defaults($type, $name, $options);
-		$template = $this->_context->strings($template) ? $template : 'element';
+		$template = $this->_context->strings($template) ? $template : 'input';
 		return $this->_render($type, $template, compact('type', 'name', 'options', 'value'));
 	}
 
@@ -528,24 +523,48 @@ class Form extends \lithium\template\Helper {
 		if ($scope['empty']) {
 			$list = array('' => ($scope['empty'] === true) ? '' : $scope['empty']) + $list;
 		}
-		$startTemplate = ($scope['multiple']) ? 'select-multi-start' : 'select-start';
-		$output = $this->_render(__METHOD__, $startTemplate, compact('name', 'options'));
+		if ($template == __FUNCTION__ && $scope['multiple']) {
+			$template = 'select-multi';
+		}
+		$raw = $this->_selectOptions($list, $scope);
+		return $this->_render(__METHOD__, $template, compact('name', 'options', 'raw'));
+	}
+
+	/**
+	 * Generator method used by `select()` to produce `<option />` and `<optgroup />` elements.
+	 * Generally, this method should not need to be called directly, but through `select()`.
+	 *
+	 * @param array $list Either a flat key/value array of select menu options, or an array which
+	 *              contains key/value elements and/or elements where the keys are `<optgroup />`
+	 *              titles and the values are sub-arrays of key/value pairs representing nested
+	 *              `<option />` elements.
+	 * @param array $scope An array of options passed to the parent scope, including the currently
+	 *              selected value of the associated form element.
+	 * @return string Returns a string of `<option />` and (optionally) `<optgroup />` tags to be
+	 *         embedded in a select element.
+	 */
+	protected function _selectOptions(array $list, array $scope) {
+		$result = "";
 
 		foreach ($list as $value => $title) {
-			$selected = false;
+			if (is_array($title)) {
+				$label = $value;
+				$options = array();
 
-			if (is_array($scope['value']) && in_array($value, $scope['value'])) {
-				$selected = true;
-			} elseif ($scope['value'] == $value) {
-				$selected = true;
+				$raw = $this->_selectOptions($title, $scope);
+				$params = compact('label', 'options', 'raw');
+				$result .= $this->_render('select', 'option-group', $params);
+				continue;
 			}
+			$selected = (
+				(is_array($scope['value']) && in_array($value, $scope['value'])) ||
+				($scope['value'] == $value)
+			);
 			$options = $selected ? array('selected' => true) : array();
-
-			$output .= $this->_render(__METHOD__, 'select-option', compact(
-				'value', 'title', 'options'
-			));
+			$params = compact('value', 'title', 'options');
+			$result .= $this->_render('select', 'select-option',  $params);
 		}
-		return $output . $this->_context->strings('select-end');
+		return $result;
 	}
 
 	/**

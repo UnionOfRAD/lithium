@@ -16,7 +16,7 @@ use lithium\g11n\Catalog;
  *
  * @link https://developer.mozilla.org/en/Localization_and_Plurals
  */
-class ResourcesMessageTest extends \lithium\test\Unit {
+class ResourcesMessageTest extends \lithium\test\Integration {
 
 	protected $_backups = array();
 

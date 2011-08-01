@@ -11,7 +11,7 @@ namespace lithium\tests\integration\g11n;
 use lithium\g11n\Catalog;
 use lithium\util\Validator;
 
-class ResourcesValidatorTest extends \lithium\test\Unit {
+class ResourcesValidatorTest extends \lithium\test\Integration {
 
 	protected $_backups = array();
 

@@ -387,7 +387,8 @@ class ValidatorTest extends \lithium\test\Unit {
 	 * Tests email address validation, with additional hostname lookup
 	 */
 	public function testEmailDomainCheck() {
-		$this->skipIf(dns_check_record("lithify.me", "ANY") === false, "No internet connection.");
+		$message = "No internet connection established.";
+		$this->skipIf(!$this->_hasNetwork(), $message);
 
 		$this->assertTrue(Validator::isEmail('abc.efg@rad-dev.org', null, array('deep' => true)));
 		$this->assertFalse(Validator::isEmail('abc.efg@invalidfoo.com', null, array(

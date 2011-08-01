@@ -299,6 +299,25 @@ class RouteTest extends \lithium\test\Unit {
 			'handler' => null
 		);
 		$this->assertEqual($expected, $result);
+
+		$result = new Route(array(
+			'template' => '/images/image_{:width}x{:height}.{:format}',
+			'params' => array('format' => 'png')
+		));
+		$expected = array(
+			'template' => '/images/image_{:width}x{:height}.{:format}',
+			'pattern' => '@^/images/image_(?P<width>[^\\/]+)x(?P<height>[^\\/]+)\\.(?P<format>[^\\/]+)?$@',
+			'params' => array('format' => 'png', 'action' => 'index'),
+			'match' => array('action' => 'index'),
+			'meta' => array(),
+			'keys' => array('width' => 'width', 'height' => 'height', 'format' => 'format'),
+			'defaults' => array('format' => 'png'),
+			'subPatterns' => array(),
+			'persist' => array(),
+			'handler' => null
+		);
+		$result = $result->export();
+		$this->assertEqual($expected, $result);
 	}
 
 	/**
