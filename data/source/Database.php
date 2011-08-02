@@ -908,7 +908,7 @@ abstract class Database extends \lithium\data\Source {
 	 * @return string Returns the name of the column type which `$value` most likely belongs to.
 	 */
 	protected function _introspectType($value) {
-	  $colstrlgt = (bool)isset($this->_columns['string']['length']) ? $col_str_lgt = $this->_columns['string']['length'] : '';
+	  $colstrlgt = (boolean) isset($this->_columns['string']['length']) ? $col_str_lgt = $this->_columns['string']['length'] : '';
 		switch (true) {
 			case (is_bool($value)):
 				return 'boolean';
@@ -916,7 +916,7 @@ abstract class Database extends \lithium\data\Source {
 				return 'float';
 			case (is_int($value) || preg_match('/^\d+$/', $value)):
 				return 'integer';
-			case ( (bool)( is_string($value) && strlen($value) <= $colstrlgt ) ? ( $col_str_lgt = $colstrlgt ) : ( $col_str_lgt = '' ) ): 
+			case ( (boolean)( is_string($value) && strlen($value) <= $colstrlgt ) ? ( $col_str_lgt = $colstrlgt ) : ( $col_str_lgt = '' ) ): 
 			default:
 				return 'text';
 		}
