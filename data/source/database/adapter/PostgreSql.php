@@ -31,13 +31,13 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * Index of basic SQL commands
 	 *
 	 * @var array
-	 * @access protected
 	 */
 	protected $_commands = array(
-			'begin' => 'BEGIN',
-			'commit' => 'COMMIT',
-			'rollback' => 'ROLLBACK'
+		'begin' => 'BEGIN',
+		'commit' => 'COMMIT',
+		'rollback' => 'ROLLBACK'
 	);
+
 	/**
 	 * PostgreSQL column type definitions.
 	 *
@@ -277,22 +277,17 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @see lithium\data\source\Database::schema()
 	 * @param mixed $value The value to be converted. Arrays will be recursively converted.
 	 * @param array $schema Formatted array from `lithium\data\source\Database::schema()`
-	 * @return mixed value with converted type
+	 * @return mixed Value with converted type.
 	 */
 	public function value($value, array $schema = array()) {
-		/* @todo check it
-		if (($result = parent::value($value, $schema)) !== null) {
-			return $result;
-		}
-		*/
-
 		if (is_array($value)) {
 			foreach ($value as $key => $val) {
 				$value[$key] = $this->value($val, isset($schema[$key]) ? $schema[$key] : $schema);
 			}
 			return $value;
 		}
-		if ($value === null || (is_array($value) && empty($value))) {
+
+		if ($value === null || (is_array($value) && !$value)) {
 			return 'NULL';
 		}
 
@@ -302,11 +297,11 @@ class PostgreSql extends \lithium\data\source\Database {
 			case 'integer':
 				return intval($value);
 			case 'binary':
-				$value = pg_escape_bytea($this->connection,$value);
-				break;
+				$value = pg_escape_bytea($this->connection, $value);
+			break;
 			case 'boolean':
 				return $this->_boolean($value);
-				break;
+			break;
 			case 'date':
 			case 'datetime':
 			case 'timestamp':
