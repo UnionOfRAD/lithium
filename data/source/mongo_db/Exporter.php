@@ -42,7 +42,7 @@ class Exporter extends \lithium\core\StaticObject {
 			$pathKey = isset($options['pathKey']) ? "{$options['pathKey']}.{$key}" : $key;
 			$field = (isset($schema[$pathKey]) ? $schema[$pathKey] : array());
 			$field += array('type' => null, 'array' => null);
-			$data[$key] = static::_cast($value, $field, $database, $options + compact('pathKey'));
+			$data[$key] = static::_cast($value, $field, $database, compact('pathKey') + $options);
 		}
 		return $data;
 	}
