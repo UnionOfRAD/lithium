@@ -96,16 +96,28 @@ class Request extends \lithium\net\http\Message {
 	 * @param string $format
 	 * @return array
 	 */
-	public function queryString($params = array(), $format = "{:key}={:value}&") {
+	public function queryString($params = array(), $format = null) {
 		$params = empty($params) ? (array) $this->query : (array) $this->query + (array) $params;
+		$params = array_filter($params);
+
+		if (empty($params)) {
+			return null;
+		}
+		if (!$format) {
+			return "?" . http_build_query($params);
+		}
 		$query = null;
 
-		foreach (array_filter($params) as $key => $value) {
+		foreach ($params as $key => $value) {
+			if (is_array($value)) {
+				foreach ($value as $val) {
+					$values = array('key' => urlencode("{$key}[]"), 'value' => urlencode($val));
+					$query .= String::insert($format, $values);
+				}
+				continue;
+			}
 			$values = array('key' => urlencode($key), 'value' => urlencode($value));
 			$query .= String::insert($format, $values);
-		}
-		if (!$query) {
-			return null;
 		}
 		return "?" . substr($query, 0, -1);
 	}
