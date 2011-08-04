@@ -9,11 +9,11 @@
 namespace lithium\tests\mocks\core;
 
 class MockRequest extends \lithium\core\Object {
-	
+
 	public $url = null;
-	
+
 	public $params = array();
-	
+
 	public $argv = array();
 
 	public function env($key) {
