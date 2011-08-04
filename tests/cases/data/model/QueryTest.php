@@ -501,7 +501,7 @@ class QueryTest extends \lithium\test\Unit {
 				'source' => 'posts',
 				'alias' => 'Post',
 				'constraint' => array(
-					"Comment.post_id" => array(' <= ' => "Post.id")
+					'Comment.post_id' => array(' <= ' => 'Post.id')
 				)
 			))
 		));
