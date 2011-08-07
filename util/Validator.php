@@ -454,17 +454,21 @@ class Validator extends \lithium\core\StaticObject {
 					if ($rule['required']) {
 						$errors[$field][] = $rule['message'] ?: $key;
 					}
+					if ($rule['last']) {
+						break;
+					}
 					continue;
 				}
 				if (empty($values[$field]) && $rule['skipEmpty']) {
 					continue;
 				}
+
 				if (!static::rule($name, $values[$field], $rule['format'], $rule + $options)) {
 					$errors[$field][] = $rule['message'] ?: $key;
 					
 					if ($rule['last']) {
 						break;
-					} 
+					}
 				}
 			}
 		}
