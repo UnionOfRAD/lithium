@@ -9,6 +9,7 @@
 namespace lithium\console;
 
 use Exception;
+use lithium\core\Environment;
 use lithium\console\command\Help;
 
 /**
@@ -74,7 +75,6 @@ class Command extends \lithium\core\Object {
 	 */
 	protected function _init() {
 		parent::_init();
-
 		$this->request = $this->_config['request'];
 		$resp = $this->_config['response'];
 		$this->response = is_object($resp) ? $resp : $this->_instance('response', $resp);
@@ -103,6 +103,9 @@ class Command extends \lithium\core\Object {
 	 */
 	public function __invoke($action, $args = array(), $options = array()) {
 		try {
+			$message = 'Lithium console started in the ' . Environment::get() .' environment.';
+			$message .= ' Use the --env=environment key to alter this.';
+			$this->out($message);
 			$this->response->status = 1;
 			$result = $this->invokeMethod($action, $args);
 

@@ -104,7 +104,8 @@ class Response extends \lithium\net\http\Message {
 			$this->body = $this->_parseMessage($this->_config['message']);
 		}
 		if (isset($this->headers['Content-Type'])) {
-			preg_match('/([-\w\/+]+)(;\s*?charset=(.+))?/i', $this->headers['Content-Type'], $match);
+			$pattern = '/([-\w\/+]+)(;\s*?charset=(.+))?/i';
+			preg_match($pattern, $this->headers['Content-Type'], $match);
 
 			if (isset($match[1])) {
 				$this->type = trim($match[1]);
