@@ -56,12 +56,14 @@ class Php extends \lithium\core\Object {
 		if (!isset($config['session.name'])) {
 			$config['session.name'] = basename(LITHIUM_APP_PATH);
 		}
-		foreach ($config as $key => $value) {
-			if (strpos($key, 'session.') === false) {
-				continue;
-			}
-			if (ini_set($key, $value) === false) {
-				throw new ConfigException("Could not initialize the session.");
+		if(!self::isStarted()) {
+			foreach ($config as $key => $value) {
+				if (strpos($key, 'session.') === false) {
+					continue;
+				}
+				if (ini_set($key, $value) === false) {
+					throw new ConfigException("Could not initialize the session.");
+				}
 			}
 		}
 	}
