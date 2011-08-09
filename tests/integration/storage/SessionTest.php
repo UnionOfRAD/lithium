@@ -16,6 +16,10 @@ class SessionTest extends \lithium\test\Integration {
 		$this->skipIf(PHP_SAPI == 'cli', 'No session support in cli SAPI');
 	}
 
+	public function tearDown() {
+		Session::clear();
+	}
+
 	public function testPhpReadWriteDelete() {
 		$config = array('name' => 'phpInt');
 
