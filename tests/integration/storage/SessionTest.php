@@ -142,6 +142,15 @@ class SessionTest extends \lithium\test\Integration {
 		$this->assertTrue(Session::delete($key, $config));
 		$this->assertNull(Session::read($key, $config));
 
+		Session::clear($config);
+
+		$this->assertTrue(Session::write('foo', 'bar', $config));
+		$this->assertEqual('bar', Session::read('foo', $config));
+		$this->assertTrue(Session::write('foo', 'bar1', $config));
+		$this->assertEqual('bar1', Session::read('foo', $config));
+
+		Session::clear($config);
+
 		$this->assertTrue(Session::write($key, $value, $config));
 		$this->assertEqual($value, Session::read($key, $config));
 
