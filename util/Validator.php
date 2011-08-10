@@ -430,7 +430,8 @@ class Validator extends \lithium\core\StaticObject {
 			'required' => true,
 			'skipEmpty' => false,
 			'format' => 'any',
-			'on' => null
+			'on' => null,
+			'last' => false
 		);
 		$errors = array();
 		$events = (array) (isset($options['events']) ? $options['events'] : null);
@@ -453,13 +454,21 @@ class Validator extends \lithium\core\StaticObject {
 					if ($rule['required']) {
 						$errors[$field][] = $rule['message'] ?: $key;
 					}
+					if ($rule['last']) {
+						break;
+					}
 					continue;
 				}
 				if (empty($values[$field]) && $rule['skipEmpty']) {
 					continue;
 				}
+
 				if (!static::rule($name, $values[$field], $rule['format'], $rule + $options)) {
 					$errors[$field][] = $rule['message'] ?: $key;
+					
+					if ($rule['last']) {
+						break;
+					}
 				}
 			}
 		}
