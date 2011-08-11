@@ -466,26 +466,19 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual($order, $query->order());
 	}
 
-	public function testRenderArrayJoin() {
+	/**
+	 * The `Query` object shouldn't overwrite custom values with model-supplied values.
+	 */
+	public function testQueryWithCustomAlias() {
 		$model = 'lithium\tests\mocks\data\model\MockQueryComment';
 
 		$query = new Query(compact('model') + array(
-			'type' => 'read',
-			'source' => 'comments',
-			'alias' => 'Comment',
-			'conditions' => array('Comment.id' => 1),
-			'joins' => array(array(
-				'type' => 'INNER',
-				'source' => 'posts',
-				'alias' => 'Post',
-				'constraint' => array('Comment.post_id' => 'Post.id')
-			))
+			'source' => 'my_custom_table',
+			'alias' => 'MyCustomAlias'
 		));
-
-		$expected = "SELECT * FROM AS {Comment} INNER JOIN {posts} AS {Post} ON ";
-		$expected .= "{Comment}.{post_id} = {Post}.{id} WHERE Comment.id = 1;";
-		$result = Connections::get('mock-database-connection')->renderCommand($query);
-		$this->assertEqual($expected, $result);
+		$result = $query->export(Connections::get('mock-database-connection'));
+		$this->assertEqual('{my_custom_table}', $result['source']);
+		$this->assertEqual('AS {MyCustomAlias}', $result['alias']);
 	}
 }
 

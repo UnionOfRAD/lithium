@@ -89,6 +89,7 @@ class Query extends \lithium\core\Object {
 			'source'     => null,
 			'order'      => null,
 			'offset'     => null,
+			'name'       => null,
 			'limit'      => null,
 			'page'       => null,
 			'group'      => null,
@@ -178,8 +179,9 @@ class Query extends \lithium\core\Object {
 	public function model($model = null) {
 		if ($model) {
 			$this->_config['model'] = $model;
-			$this->_config['source'] = $model::meta('source');
-			$this->_config['name'] = $model::meta('name');
+			$this->_config['source'] = $this->_config['source'] ?: $model::meta('source');
+			$this->_config['alias'] = $this->_config['alias'] ?: $model::meta('name');
+			$this->_config['name'] = $this->_config['name'] ?: $this->_config['alias'];
 			return $this;
 		}
 		return $this->_config['model'];

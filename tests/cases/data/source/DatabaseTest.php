@@ -674,6 +674,53 @@ class DatabaseTest extends \lithium\test\Unit {
 		$sql .= 'ORDER BY {MockDatabasePost}.{created} ASC;';
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
+
+	/**
+	 * Tests that complex model constraints with custom operators render correct constraint strings.
+	 */
+	public function testRenderArrayJoinConstraintComplex() {
+		$model = 'lithium\tests\mocks\data\model\MockQueryComment';
+
+		$query = new Query(compact('model') + array(
+			'type' => 'read',
+			'source' => 'comments',
+			'alias' => 'Comments',
+			'conditions' => array('Comment.id' => 1),
+			'joins' => array(array(
+				'type' => 'INNER',
+				'source' => 'posts',
+				'alias' => 'Post',
+				'constraint' => array("Comment.post_id" => array('<=' => "Post.id"))
+			))
+		));
+
+		$expected = "SELECT * FROM {comments} AS {Comments} INNER JOIN {posts} AS {Post} ON ";
+		$expected .= "{Comment}.{post_id} <= {Post}.{id} WHERE Comment.id = 1;";
+		$result = Connections::get('mock-database-connection')->renderCommand($query);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testRenderArrayJoin() {
+		$model = 'lithium\tests\mocks\data\model\MockQueryComment';
+
+		$query = new Query(compact('model') + array(
+			'type' => 'read',
+			'source' => 'comments',
+			'alias' => 'Comment',
+			'conditions' => array('Comment.id' => 1),
+			'joins' => array(array(
+				'type' => 'INNER',
+				'source' => 'posts',
+				'alias' => 'Post',
+				'constraint' => array('Comment.post_id' => 'Post.id')
+			))
+		));
+
+		$expected = "SELECT * FROM {comments} AS {Comment} INNER JOIN {posts} AS {Post} ON ";
+		$expected .= "{Comment}.{post_id} = {Post}.{id} WHERE Comment.id = 1;";
+		$result = Connections::get('mock-database-connection')->renderCommand($query);
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

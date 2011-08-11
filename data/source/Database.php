@@ -79,7 +79,9 @@ abstract class Database extends \lithium\data\Source {
 
 	protected $_constraintTypes = array(
 		'AND' => true,
-		'OR' => true
+		'and' => true,
+		'OR' => true,
+		'or' => true
 	);
 
 	/**
@@ -480,6 +482,7 @@ abstract class Database extends \lithium\data\Source {
 		$schema = $model::schema();
 		$pregDotMatch = '/^(' . implode('|', array_merge($relations, array($modelName))) . ')\./';
 		$forJoin = ($modelName != $query->alias());
+
 		foreach ($fields as $scope => $field) {
 			switch (true) {
 				case (is_numeric($scope) && ($field == '*' || $field == $modelName)):
@@ -666,6 +669,7 @@ abstract class Database extends \lithium\data\Source {
 		};
 		array_walk($fields, $groupFields);
 		$fields = $toMerge;
+
 		if (count($modelNames) > 1) {
 			$sortOrder = array_flip($modelNames);
 			uksort($fields, function($a, $b) use ($sortOrder) {
@@ -769,8 +773,20 @@ abstract class Database extends \lithium\data\Source {
 		$result = array();
 
 		foreach ($constraint as $field => $value) {
+			$field = $this->name($field);
+
 			if (is_string($value)) {
-				$result[] = $this->name($field) . ' = ' . $this->name($value);
+				$result[] = $field . ' = ' . $this->name($value);
+				continue;
+			}
+			if (!is_array($value)) {
+				continue;
+			}
+			foreach ($value as $operator => $val) {
+				if (isset($this->_operators[$operator])) {
+					$val = $this->name($val);
+					$result[] = "{$field} {$operator} {$val}";
+				}
 			}
 		}
 		return 'ON ' . join(' AND ', $result);
