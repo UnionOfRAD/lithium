@@ -297,9 +297,8 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Sets default connection options and connects default finders.
 	 *
-	 * @todo Merge in inherited config from AppModel and other parent classes.
 	 * @param array $options
-	 * @return void
+	 * @todo Merge in inherited config from AppModel and other parent classes.
 	 */
 	public static function __init() {
 		static::config();
@@ -847,6 +846,20 @@ class Model extends \lithium\core\StaticObject {
 		};
 		return static::_filter(__FUNCTION__, $params, $filter);
 	}
+	
+	/**
+	 * Returns the title of an entity indicated by the meta title setting.  
+	 * Override to provide more robust functionality, such as formatted first and last names, etc.
+	 *
+	 * @param object $entity Entity who's title should be returned.
+	 * @return string The Entity's title.
+	 */
+	public function title($entity) {
+	    $self = static::_object();
+	    $meta = $self::meta();
+        
+        return $entity->{$meta['title']};	    
+	}
 
 	/**
 	 * Deletes the data associated with the current `Model`.
@@ -1060,7 +1073,7 @@ class Model extends \lithium\core\StaticObject {
 
 				foreach ($chain->next($self, $params, $chain) as $entity) {
 					$key = $entity->{$name};
-					$result[is_scalar($key) ? $key : (string) $key] = $entity->{$meta['title']};
+					$result[is_scalar($key) ? $key : (string) $key] = $entity->title();
 				}
 				return $result;
 			},

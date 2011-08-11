@@ -157,7 +157,7 @@ abstract class Collection extends \lithium\util\Collection {
 			break;
 		}
 		if ($field) {
-			return isset($self->_schema[$field]) ? $self->_schema[$field] : null;
+			return isset($schema[$field]) ? $schema[$field] : null;
 		}
 		return $schema;
 	}
