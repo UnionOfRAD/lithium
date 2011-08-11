@@ -319,7 +319,7 @@ class ExporterTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Test that subobjects are properly casted on creating a new Document
+	 * Test that sub-objects are properly casted on creating a new `Document`.
 	 */
 	public function testSubObjectCastingOnSave() {
 		$model = $this->_model;
