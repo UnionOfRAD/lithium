@@ -246,6 +246,40 @@ abstract class Collection extends \lithium\util\Collection {
 		}
 		return $data;
 	}
+	
+	/**
+	 * Sorts the objects in the collection, useful in situations where
+	 * you are already using the underlying datastore to sort results.
+	 *
+	 * Overriden to load any data that has not yet been loaded.
+	 *
+	 * @param mixed $field The field to sort the data on, can also be a callback
+	 * to a custom sort function.
+	 * @param array $options The available options are:
+	 *              - No options yet implemented
+	 * @return $this, useful for chaining this with other methods.
+	 */
+	public function sort($field = 'id', array $options = array()) {
+		$this->offsetGet(null);
+
+		if (is_string($field)) {
+			$sorter = function ($a, $b) use ($field) {
+				if (is_array($a)) {
+					$a = (object) $a;
+				}
+				
+				if (is_array($b)) {
+					$b = (object) $b;
+				}
+				
+				return strcmp($a->$field, $b->$field);
+			};
+		} else if (is_callable($field)) {
+			$sorter = $field;
+		}
+
+		return parent::sort($sorter, $options);
+	}
 
 	/**
 	 * Converts the current state of the data structure to an array.
