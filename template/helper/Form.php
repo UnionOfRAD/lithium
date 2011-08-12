@@ -665,29 +665,41 @@ class Form extends \lithium\template\Helper {
 		$defaults = array('class' => 'error');
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		$options += $defaults;
-		$result = '';
 
-		if (isset($options['value'])) {
-			unset($options['value']);
-		}
+		$_binding =& $this->_binding;
+		$params = compact('name', 'key', 'options', 'template');
 
-		if (!$this->_binding || !$content = $this->_binding->errors($name)) {
-			return null;
-		}
+		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$_binding) {
+			$options = $params['options'];
+			$template = $params['template'];
 
-		if (is_array($content)) {
+			if (isset($options['value'])) {
+				unset($options['value']);
+			}
+			if (!$_binding || !$content = $_binding->errors($params['name'])) {
+				return null;
+			}
+			$result = '';
+
+			if (!is_array($content)) {
+				$args = array(__METHOD__, $template, compact('content', 'options'));
+				return $self->invokeMethod('_render', $args);
+			}
 			$errors = $content;
 
-			if ($key !== null) {
-				$content = !isset($errors[$key]) || $key === true ? reset($errors) : $errors[$key];
-			} else {
+			if ($params['key'] === null) {
 				foreach ($errors as $content) {
-					$result .= $this->_render(__METHOD__, $template, compact('content', 'options'));
+					$args = array(__METHOD__, $template, compact('content', 'options'));
+					$result .= $self->invokeMethod('_render', $args);
 				}
 				return $result;
 			}
-		}
-		return $this->_render(__METHOD__, $template, compact('content', 'options'));
+
+			$key = $params['key'];
+			$content = !isset($errors[$key]) || $key === true ? reset($errors) : $errors[$key];
+			$args = array(__METHOD__, $template, compact('content', 'options'));
+			return $self->invokeMethod('_render', $args);
+		});
 	}
 
 	/**
