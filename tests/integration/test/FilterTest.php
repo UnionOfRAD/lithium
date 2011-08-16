@@ -13,6 +13,10 @@ use lithium\test\Report;
 
 class FilterTest extends \lithium\test\Integration {
 
+	public function skip() {
+		$this->skipIf(!extension_loaded('xdebug'), 'Xdebug is not enabled');
+	}
+
 	public function setUp() {
 		$this->report = new Report(array(
 			'title' => '\lithium\tests\mocks\test\MockFilterTest',
