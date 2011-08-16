@@ -43,6 +43,14 @@ class ComplexityTest extends \lithium\test\Unit {
 	);
 
 	/**
+	 * Skip the tests if Xdebug extension is not loaded
+	 *
+	 */
+	public function skip() {
+		$this->skipIf(!extension_loaded('xdebug'), 'Xdebug is not enabled');
+	}
+
+	/**
 	 * Set up a new report which will later be used in the tests.
 	 *
 	 * @see lithium\test\Report
