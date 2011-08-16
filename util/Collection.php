@@ -364,11 +364,10 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 */
 	public function sort($sorter = 'sort', array $options = array()) {
 		if (is_string($sorter) && strpos($sorter, 'sort') !== false && is_callable($sorter)) {
-			call_user_func($sorter, &$this->_data);
+			call_user_func_array($sorter, array(&$this->_data));
 		} else if (is_callable($sorter)) {
 			usort($this->_data, $sorter);
 		}
-
 		return $this;
 	}
 
