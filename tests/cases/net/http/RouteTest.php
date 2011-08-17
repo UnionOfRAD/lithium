@@ -479,46 +479,47 @@ class RouteTest extends \lithium\test\Unit {
 		$this->assertEqual($parameters + array('id' => '54'), $route->parse($request)->params);
 	}
 
-  /**
-   * Test matching routes based on HTTP method verbs.
-   */
-  public function testMethodBasedMatching() {
-    $parameters = array('controller' => 'users', 'action' => 'edit');
+	/**
+	 * Test matching routes based on HTTP method verbs.
+	 */
+	public function testMethodBasedMatching() {
+		$parameters = array('controller' => 'users', 'action' => 'edit');
 
-    $route = new Route(array(
-      'template' => '/method',
-      'params' => $parameters + array('http:method' => 'POST')
-    ));
+		$route = new Route(array(
+			'template' => '/method',
+			'params' => $parameters + array('http:method' => 'POST')
+		));
 
-    $this->assertFalse($route->match($parameters));
-    $this->assertEqual('/method', $route->match($parameters + array('http:method' => 'POST')));
+		$this->assertFalse($route->match($parameters));
+		$this->assertEqual('/method', $route->match($parameters + array('http:method' => 'POST')));
 
-    $route = new Route(array(
-      'template' => '/method/{:controller}/{:id:[0-9]+}',
-      'params' => $parameters + array('http:method' => array('POST', 'PUT'))
-    ));
+		$route = new Route(array(
+			'template' => '/method/{:controller}/{:id:[0-9]+}',
+			'params' => $parameters + array('http:method' => array('POST', 'PUT'))
+		));
 
-    $this->assertFalse($route->match($parameters));
-    $this->assertFalse($route->match($parameters + array('id' => '54')));
-    $this->assertFalse($route->match($parameters + array('id' => '54', 'unknown' => '42')));
-    $this->assertFalse($route->match($parameters + array('id' => '54') + array('http:method' => 'GET')));
-    $this->assertEqual('/method/users/54', $route->match($parameters + array('id' => '54') + array('http:method' => 'POST')));
-    $this->assertEqual('/method/users/54', $route->match($parameters + array('id' => '54') + array('http:method' => 'PUT')));
-  }
+		$this->assertFalse($route->match($parameters));
+		$this->assertFalse($route->match($parameters + array('id' => '54')));
+		$this->assertFalse($route->match($parameters + array('id' => '54', 'unknown' => '42')));
+		$this->assertFalse($route->match($parameters + array('id' => '54') + array('http:method' => 'GET')));
+		$this->assertEqual('/method/users/54', $route->match($parameters + array('id' => '54') + array('http:method' => 'POST')));
+		$this->assertEqual('/method/users/54', $route->match($parameters + array('id' => '54') + array('http:method' => 'PUT')));
+	}
 
-  /**
-   * Test matching routes that do not specify HTTP methods against specifically requested methods.
-   */
-  public function testUnspecificMethodBasedMatching() {
-    $parameters = array('controller' => 'users', 'action' => 'edit');
+	/**
+	 * Test matching routes that do not specify HTTP methods against specifically requested methods.
+	 */
+	public function testUnspecificMethodBasedMatching() {
+		$parameters = array('controller' => 'users', 'action' => 'edit');
 
-    $route = new Route(array(
-      'template' => '/nomethod',
-      'params' => $parameters    ));
+		$route = new Route(array(
+			'template' => '/nomethod',
+			'params' => $parameters
+		));
 
-    $this->assertEqual('/nomethod', $route->match($parameters));
-    $this->assertEqual('/nomethod', $route->match($parameters + array('http:method' => 'POST')));
-  }
+		$this->assertEqual('/nomethod', $route->match($parameters));
+		$this->assertEqual('/nomethod', $route->match($parameters + array('http:method' => 'POST')));
+	}
 
 	/**
 	 * Tests that a successful match against a route with template `'/'` operating at the root of
