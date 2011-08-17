@@ -279,12 +279,20 @@ class Route extends \lithium\core\Object {
 		if (array_intersect_key($options, $this->_match) != $this->_match) {
 			return false;
 		}
-		if (array_diff_key(array_diff_key(array_diff_key($options, $this->_match), $this->_keys), $this->_meta) !== array()) {
-			return false;
-		}
+    if (!$this->_meta) {
+      foreach ($options as $key => $value) {
+        if (strpos($key, ':')) {
+          unset($options[$key]);
+        }
+      }
+    }
+    if (array_diff_key(array_diff_key(array_diff_key($options, $this->_match), $this->_keys), $this->_meta) !== array()) {
+      return false;
+    }
 		if (isset($this->_meta) && array_intersect_key($this->_meta, $options) != $this->_meta) {
-			return false;
-		}
+        return false;
+    }
+
 		$options += $this->_defaults;
 
 		if (array_intersect_key($this->_keys, $options) + $args !== $this->_keys + $args) {

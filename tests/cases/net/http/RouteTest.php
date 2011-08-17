@@ -500,9 +500,24 @@ class RouteTest extends \lithium\test\Unit {
 
     $this->assertFalse($route->match($parameters));
     $this->assertFalse($route->match($parameters + array('id' => '54')));
+    $this->assertFalse($route->match($parameters + array('id' => '54', 'unknown' => '42')));
     $this->assertFalse($route->match($parameters + array('id' => '54') + array('http:method' => 'GET')));
     $this->assertEqual('/method/users/54', $route->match($parameters + array('id' => '54') + array('http:method' => 'POST')));
     $this->assertEqual('/method/users/54', $route->match($parameters + array('id' => '54') + array('http:method' => 'PUT')));
+  }
+
+  /**
+   * Test matching routes that do not specify HTTP methods against specifically requested methods.
+   */
+  public function testUnspecificMethodBasedMatching() {
+    $parameters = array('controller' => 'users', 'action' => 'edit');
+
+    $route = new Route(array(
+      'template' => '/nomethod',
+      'params' => $parameters    ));
+
+    $this->assertEqual('/nomethod', $route->match($parameters));
+    $this->assertEqual('/nomethod', $route->match($parameters + array('http:method' => 'POST')));
   }
 
 	/**
