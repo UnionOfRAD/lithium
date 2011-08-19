@@ -284,7 +284,6 @@ class ModelTest extends \lithium\test\Unit {
 			'order' => null,
 			'limit' => null,
 			'page' => null,
-			'page' => null,
 			'with' => array(),
 			'type' => 'read',
 			'model' => 'lithium\tests\mocks\data\MockPost'

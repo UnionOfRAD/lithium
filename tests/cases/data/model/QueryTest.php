@@ -487,6 +487,30 @@ class QueryTest extends \lithium\test\Unit {
 		$result = Connections::get('mock-database-connection')->renderCommand($query);
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testRenderArrayJoinConstraintComplex() {
+		$model = 'lithium\tests\mocks\data\model\MockQueryComment';
+
+		$query = new Query(compact('model') + array(
+			'type' => 'read',
+			'source' => 'comments',
+			'alias' => 'Comment',
+			'conditions' => array('Comment.id' => 1),
+			'joins' => array(array(
+				'type' => 'INNER',
+				'source' => 'posts',
+				'alias' => 'Post',
+				'constraint' => array(
+					'Comment.post_id' => array(' <= ' => 'Post.id')
+				)
+			))
+		));
+
+		$expected = "SELECT * FROM AS {Comment} INNER JOIN {posts} AS {Post} ON";
+		$expected .= "{Comment}.{post_id} <= {Post}.{id} WHERE Comment.id = 1;";
+		$result = Connections::get('mock-database-connection')->renderCommand($query);
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
