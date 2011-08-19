@@ -13,8 +13,12 @@ use lithium\test\Report;
 
 class FilterTest extends \lithium\test\Integration {
 
+	/**
+	 * Skip the tests if the xdebug extension is not loaded. The `Coverage`
+	 * filter depends on the extension.
+	 */
 	public function skip() {
-		$this->skipIf(!extension_loaded('xdebug'), 'Xdebug is not enabled');
+		$this->skipIf(!extension_loaded('xdebug'), 'The `xdebug` extension is not loaded.');
 	}
 
 	public function setUp() {
