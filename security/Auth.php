@@ -112,7 +112,6 @@ class Auth extends \lithium\core\Adaptable {
 			'redirect' => '/'
 		);
 		$options += $defaults;
-		$options += $defaults;
 		$params = compact('name', 'credentials', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
