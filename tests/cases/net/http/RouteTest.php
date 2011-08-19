@@ -532,6 +532,17 @@ class RouteTest extends \lithium\test\Unit {
 		$url = $route->match(array('controller' => 'posts'));
 		$this->assertEqual("/posts", $url);
 	}
+
+	public function testUrlEncodedArgs() {
+		$route = new Route(array('template' => '/{:controller}/{:action}/{:args}'));
+		$request = new Request();
+		$request->url = '/posts/index/Food%20%26%20Dining';
+		$result = $route->parse($request);
+		$expected = array(
+			'controller' => 'posts', 'action' => 'index', 'args' => array('Food%20%26%20Dining')
+		);
+		$this->assertEqual($expected, $result->params);
+	}
 }
 
 ?>
