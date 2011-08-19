@@ -29,6 +29,9 @@ class PostgreSql extends \lithium\data\source\Database {
 
 	/**
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 9f6bf0dc7b6201511ff4cdbffe41701a5f7dbdce
 	 * Index of basic SQL commands
 	 *
 	 * @var array
@@ -40,8 +43,11 @@ class PostgreSql extends \lithium\data\source\Database {
 			'rollback' => 'ROLLBACK'
 	);
 	/**
+<<<<<<< HEAD
+=======
 =======
 >>>>>>> c00c2b4d9eb158bf6a2bd4e1a827f1dc7af256cb
+>>>>>>> 9f6bf0dc7b6201511ff4cdbffe41701a5f7dbdce
 	 * PostgreSQL column type definitions.
 	 *
 	 * @var array
@@ -360,7 +366,6 @@ class PostgreSql extends \lithium\data\source\Database {
 		}
 		return null;
 	}
-
 
 	/**
 	 * @todo Eventually, this will need to rewrite aliases for DELETE and UPDATE queries, same with
