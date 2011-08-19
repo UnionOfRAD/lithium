@@ -953,7 +953,25 @@ class ValidatorTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result);
 	}
+	
+	public function testCheckWithLastRule() {
+		$rules = array(
+			'title' => array('please enter a title'),
+			'email' => array(
+				array('notEmpty', 'message' => 'email is empty', 'last' => true),
+				array('email', 'message' => 'email is invalid'),
+			)
+		);
+		$result = Validator::check(array(), $rules);
+		$this->assertFalse(empty($result));
 
+		$expected = array(
+			'title' => array('title is empty'),
+			'email' => array('email is empty')
+		);
+		$this->assertEqual($expected, $result);
+	}
+	
 	public function testCheckMultipleHasFirstError() {
 		$rules = array(
 			'title' => 'please enter a title',

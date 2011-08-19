@@ -389,6 +389,20 @@ class RecordSetTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $this->_recordSet->to('json'));
 	}
 
+	public function testRecordSetFindFilter() {
+		$expected = array(
+			0 => array('id' => 1, 'data' => 'data1'),
+			1 => array('id' => 2, 'data' => 'data2'),
+			2 => array('id' => 3, 'data' => 'data3'),
+			3 => array('id' => 4, 'data' => 'data4')
+		);
+
+		$records = $this->_recordSet->find(function($item) {
+			return true; 
+		});
+		$this->assertEqual($expected, $records->to('array'));
+	}
+
 	public function testEach() {
 		$filter = function($rec) {
 			$rec->more_data = "More Data{$rec->id}";

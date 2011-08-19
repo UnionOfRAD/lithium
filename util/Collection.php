@@ -354,6 +354,24 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	}
 
 	/**
+	 * Sorts the objects in the collection.
+	 *
+	 * @param callable $sorter The sorter for the data, can either be a sort function like
+	 * natsort or a compare function like strcmp.
+	 * @param array $options The available options are:
+	 *              - No options yet implemented
+	 * @return $this, useful for chaining this with other methods.
+	 */
+	public function sort($sorter = 'sort', array $options = array()) {
+		if (is_string($sorter) && strpos($sorter, 'sort') !== false && is_callable($sorter)) {
+			call_user_func_array($sorter, array(&$this->_data));
+		} else if (is_callable($sorter)) {
+			usort($this->_data, $sorter);
+		}
+		return $this;
+	}
+
+	/**
 	 * Checks whether or not an offset exists.
 	 *
 	 * @param string $offset An offset to check for.

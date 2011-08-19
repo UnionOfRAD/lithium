@@ -226,7 +226,7 @@ class RecordSet extends \lithium\data\Collection {
 		switch ($format) {
 			case 'array':
 				$result = array_map(function($r) { return $r->to('array'); }, $this->_data);
-
+				
 				if (!(is_scalar(current($this->_index)) && $options['indexed'])) {
 					break;
 				}
@@ -251,6 +251,23 @@ class RecordSet extends \lithium\data\Collection {
 	public function each($filter) {
 		$this->offsetGet(null);
 		return parent::each($filter);
+	}
+
+	/**
+	 * Filters a copy of the items in the collection.
+	 *
+	 * Overridden to load any data that has not yet been loaded.
+	 *
+	 * @param callback $filter Callback to use for filtering.
+	 * @param array $options The available options are:
+	 *              - `'collect'`: If `true`, the results will be returned wrapped
+	 *              in a new `Collection` object or subclass.
+	 * @return mixed The filtered items. Will be an array unless `'collect'` is defined in the
+	 * `$options` argument, then an instance of this class will be returned.
+	 */
+	public function find($filter, array $options = array()) {
+		$this->offsetGet(null);
+		return parent::find($filter, $options);
 	}
 
 	/**
