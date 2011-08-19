@@ -28,26 +28,17 @@ class PostgreSql extends \lithium\data\source\Database {
 	);
 
 	/**
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 9f6bf0dc7b6201511ff4cdbffe41701a5f7dbdce
 	 * Index of basic SQL commands
 	 *
 	 * @var array
-	 * @access protected
 	 */
 	protected $_commands = array(
-			'begin' => 'BEGIN',
-			'commit' => 'COMMIT',
-			'rollback' => 'ROLLBACK'
+		'begin' => 'BEGIN',
+		'commit' => 'COMMIT',
+		'rollback' => 'ROLLBACK'
 	);
+
 	/**
-<<<<<<< HEAD
-=======
-=======
->>>>>>> c00c2b4d9eb158bf6a2bd4e1a827f1dc7af256cb
->>>>>>> 9f6bf0dc7b6201511ff4cdbffe41701a5f7dbdce
 	 * PostgreSQL column type definitions.
 	 *
 	 * @var array
@@ -228,8 +219,8 @@ class PostgreSql extends \lithium\data\source\Database {
 			$schema = $_config['schema'];
 			$sql = "SELECT DISTINCT column_name AS field, data_type AS type, is_nullable AS null, ";
 			$sql .= "column_default AS default, ordinal_position AS position, ";
-			$sql .= "character_maximum_length AS char_length, character_octet_length AS oct_length";
-			$sql .= " FROM information_schema.columns WHERE table_name = '{$name}' ";
+			$sql .= "character_maximum_length AS char_length, character_octet_length AS oct_length ";
+			$sql .= "FROM information_schema.columns WHERE table_name = '{$name}' ";
 			$sql .= "and table_schema = '{$schema}' ORDER BY position;";
 
 			$columns = $self->read($sql, array(
@@ -289,19 +280,14 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @return mixed value with converted type
 	 */
 	public function value($value, array $schema = array()) {
-		/* @todo check it
-		if (($result = parent::value($value, $schema)) !== null) {
-			return $result;
-		}
-		*/
-
 		if (is_array($value)) {
 			foreach ($value as $key => $val) {
 				$value[$key] = $this->value($val, isset($schema[$key]) ? $schema[$key] : $schema);
 			}
 			return $value;
 		}
-		if ($value === null || (is_array($value) && empty($value))) {
+
+		if ($value === null || (is_array($value) && !$value)) {
 			return 'NULL';
 		}
 
@@ -311,11 +297,11 @@ class PostgreSql extends \lithium\data\source\Database {
 			case 'integer':
 				return intval($value);
 			case 'binary':
-				$value = pg_escape_bytea($this->connection,$value);
-				break;
+				$value = pg_escape_bytea($this->connection, $value);
+			break;
 			case 'boolean':
 				return $this->_boolean($value);
-				break;
+			break;
 			case 'date':
 			case 'datetime':
 			case 'timestamp':
@@ -430,12 +416,12 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @return mixed Returns the last inserted ID key for an auto-increment column or a column
 	 *         bound to a sequence.
 	 */
-    protected function _insertId($query) {
+	protected function _insertId($query) {
 		$model = $query->model();
 		$columns = $model::schema();
 		foreach ($columns as $column) {
-            if (isset($column['sequence'])) {
-    			$resource = $this->_execute("SELECT currval('{$column['sequence']}') as max");
+			if (isset($column['sequence'])) {
+				$resource = $this->_execute("SELECT currval('{$column['sequence']}') as max");
 				list($id) = $resource->next();
 				break;
 			}
