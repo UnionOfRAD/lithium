@@ -521,7 +521,7 @@ class PostgreSql extends \lithium\data\source\Database {
 			case ($data === true || $data === false):
 				return $data;
 			case ($data === 't' || $data === 'f'):
-				return ($data === 't')?'true':'false';
+				return ($data === 't') ? 'true' : 'false';
 			case ($data === 'true' || $data === 'false'):
 				return ($data === 'true');
 			case ($data === 'TRUE' || $data === 'FALSE'):
