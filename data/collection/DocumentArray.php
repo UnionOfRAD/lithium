@@ -21,11 +21,12 @@ class DocumentArray extends \lithium\data\Collection {
 	protected $_exists = false;
 
 	/**
-	 * Contains an array that is matched against .
+	 * Contains the original database value of the array. This value will be compared with the
+	 * current value (`$_data`) to calculate the changes that should be sent to the database.
 	 *
 	 * @var array
 	 */
-	protected $_updated = array();
+	protected $_original = array();
 
 	/**
 	 * Holds an array of values that should be processed on initialization.
@@ -36,13 +37,18 @@ class DocumentArray extends \lithium\data\Collection {
 		'data', 'model', 'result', 'query', 'parent', 'stats', 'pathKey', 'exists'
 	);
 
+	protected function _init() {
+		parent::_init();
+		$this->_original = $this->_data;
+	}
+
 	public function exists() {
 		return $this->_exists;
 	}
 
-	public function update($id = null, array $data = array()) {
+	public function sync($id = null, array $data = array()) {
 		$this->_exists = true;
-		$this->_data = $data ?: $this->_data;
+		$this->_original = $this->_data;
 	}
 
 	/**
@@ -124,38 +130,17 @@ class DocumentArray extends \lithium\data\Collection {
 		return $this->offsetGet($key);
 	}
 
-	public function current() {
-		return $this->offsetGet(key($this->_data));
-	}
-
-	/**
-	 * Returns the next document in the set, and advances the object's internal pointer. If the end
-	 * of the set is reached, a new document will be fetched from the data source connection handle
-	 * (`$_handle`). If no more documents can be fetched, returns `null`.
-	 *
-	 * @return object Returns the next document in the set, or `null`, if no more documents are
-	 *         available.
-	 */
-	public function next() {
-		$prev = key($this->_data);
-		$this->_valid = (next($this->_data) !== false);
-		$cur = key($this->_data);
-
-		if (!$this->_valid && $cur !== $prev && $cur !== null) {
-			$this->_valid = true;
-		}
-		return $this->_valid ? $this->offsetGet(key($this->_data)) : null;
-	}
-
 	public function export() {
 		return array(
 			'exists' => $this->_exists,
 			'key'  => $this->_pathKey,
-			'data' => $this->_data
+			'data' => $this->_original,
+			'update' => $this->_data
 		);
 	}
 
-	protected function _populate($data = null, $key = null) {}
+	protected function _populate($data = null, $key = null) {
+	}
 }
 
 ?>

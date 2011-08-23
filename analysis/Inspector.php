@@ -225,7 +225,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 *        - `'ranges'`: Returns a two-dimensional array where each key is a method name,
 	 *         and each value is an array of line numbers which are contained in the method.
 	 * @param array $options
-	 * @return array
+	 * @return mixed array|null|object
 	 */
 	public static function methods($class, $format = null, array $options = array()) {
 		$defaults = array('methods' => array(), 'group' => true, 'self' => true);
@@ -283,7 +283,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 * @param array $options Set of options:
 	 *        -'self': If true (default), only returns properties defined in `$class`,
 	 *         excluding properties from inherited classes.
-	 * @return array
+	 * @return mixed object lithium\analysis\Inspector._items.map|null
 	 */
 	public static function properties($class, array $options = array()) {
 		$defaults = array('properties' => array(), 'self' => true);

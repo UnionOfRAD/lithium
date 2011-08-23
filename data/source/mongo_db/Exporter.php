@@ -12,7 +12,15 @@ use lithium\util\Set;
 
 class Exporter extends \lithium\core\StaticObject {
 
-	protected static $_map = array(
+	protected static $_commands = array(
+		'create'    => null,
+		'update'    => '$set',
+		'increment' => '$inc',
+		'remove'    => '$unset',
+		'rename'    => '$rename'
+	);
+
+	protected static $_types = array(
 		'MongoId'      => 'id',
 		'MongoDate'    => 'date',
 		'MongoCode'    => 'code',
@@ -34,13 +42,16 @@ class Exporter extends \lithium\core\StaticObject {
 
 	public static function cast($data, $schema, $database, array $options = array()) {
 		$defaults = array(
-			'handlers' => array(), 'model' => null, 'arrays' => true
+			'handlers' => array(),
+			'model' => null,
+			'arrays' => true,
+			'pathKey' => null
 		);
 		$options += $defaults;
 
 		foreach ($data as $key => $value) {
-			$pathKey = isset($options['pathKey']) ? "{$options['pathKey']}.{$key}" : $key;
-			$field = (isset($schema[$pathKey]) ? $schema[$pathKey] : array());
+			$pathKey = $options['pathKey'] ? "{$options['pathKey']}.{$key}" : $key;
+			$field = isset($schema[$pathKey]) ? $schema[$pathKey] : array();
 			$field += array('type' => null, 'array' => null);
 			$data[$key] = static::_cast($value, $field, $database, compact('pathKey') + $options);
 		}
@@ -52,7 +63,7 @@ class Exporter extends \lithium\core\StaticObject {
 			return $value;
 		}
 		$pathKey = $options['pathKey'];
-		$typeMap = static::$_map;
+		$typeMap = static::$_types;
 		$type = isset($typeMap[$def['type']]) ? $typeMap[$def['type']] : $def['type'];
 
 		$isObject = ($type == 'object');
@@ -78,20 +89,14 @@ class Exporter extends \lithium\core\StaticObject {
 			$arrayType = !$isObject && (array_keys($value) === range(0, count($value) - 1));
 			$opts = $arrayType ? array('class' => 'array') + $options : $options;
 		}
+		unset($opts['handlers'], $opts['first']);
 		return $database->item($options['model'], $value, compact('pathKey') + $opts);
 	}
 
 	public static function toCommand($changes) {
-		$map = array(
-			'create'    => null,
-			'update'    => '$set',
-			'increment' => '$inc',
-			'remove'    => '$unset',
-			'rename'    => '$rename'
-		);
 		$result = array();
 
-		foreach ($map as $from => $to) {
+		foreach (static::$_commands as $from => $to) {
 			if (!isset($changes[$from])) {
 				continue;
 			}
@@ -105,9 +110,8 @@ class Exporter extends \lithium\core\StaticObject {
 	}
 
 	protected static function _create($export, array $options) {
-		$export += array('data' => array(), 'update' => array(), 'remove' => array(), 'key' => '');
-		$data = array_merge($export['data'], $export['update']);
-		$data = array_diff_key($data, $export['remove']);
+		$export += array('data' => array(), 'update' => array(), 'key' => '');
+		$data = $export['update'];
 
 		$result = array('create' => array());
 		$localOpts = array('finalize' => false) + $options;
@@ -120,45 +124,86 @@ class Exporter extends \lithium\core\StaticObject {
 		return ($options['finalize']) ? array('create' => $data) : $data;
 	}
 
+	/**
+	 * Calculates changesets for update operations, and produces an array which can be converted to
+	 * a set of native MongoDB update operations.
+	 *
+	 * @todo Implement remove and rename.
+	 * @param array $export An array of fields exported from a call to `Document::export()`, and
+	 *              should contain the following keys:
+	 *              - `'data'` _array_: An array representing the original data loaded from the
+	 *                 database for the document.
+	 *              - `'update'` _array_: An array representing the current state of the document,
+	 *                containing any modifications made.
+	 *              - `'key'` _string_: If this is a nested document, this is a dot-separated path
+	 *                from the root-level document.
+	 * @return array Returns an array representing the changes to be made to the document. These
+	 *         are converted to database-native commands by the `toCommand()` method.
+	 */
 	protected static function _update($export) {
-		$export += array('update' => array(), 'remove' => array(), 'key' => '');
+		$export += array(
+			'data' => array(),
+			'update' => array(),
+			'remove' => array(),
+			'rename' => array(),
+			'key' => ''
+		);
 		$path = $export['key'] ? "{$export['key']}." : "";
-		$data = $export['update'];
+		$result = array('update' => array(), 'remove' => array());
+
+		$left = static::_diff($export['data'], $export['update']);
+		$right = static::_diff($export['update'], $export['data']);
+
+		$objects = array_filter($export['update'], function($value) {
+			return (is_object($value) && method_exists($value, 'export'));
+		});
+
+		foreach (array_merge($right, $objects) as $key => $value) {
+			$result = static::_append($result, "{$path}{$key}", $value);
+		}
+		return array_filter($result);
+	}
+
+	/**
+	 * Handle diffing operations between `Document` object states. Implemented because all of PHP's
+	 * array comparison functions are broken when working with objects.
+	 *
+	 * @param array $left The left-hand comparison array.
+	 * @param array $right The right-hand comparison array.
+	 * @return array Returns an array of the differences of `$left` compared to `$right`.
+	 */
+	protected static function _diff($left, $right) {
 		$result = array();
 
-		if (!$export['exists']) {
-			$data = array_merge($export['data'], $data);
-		}
-		$data = array_diff_key($data, $export['remove']);
-		$nested = array_diff_key($export['data'], $data);
-
-		foreach ($export['remove'] as $key => $val) {
-			$result['remove']["{$path}{$key}"] = $val;
-		}
-
-		foreach ($data as $key => $val) {
-			if (is_object($val) && method_exists($val, 'export')) {
-				$result = static::_appendObject($result, $path, $key, $val);
-				continue;
-			}
-			$result['update']["{$path}{$key}"] = $val;
-		}
-
-		foreach (array_diff_key($nested, $export['remove']) as $key => $val) {
-			if (is_object($val) && method_exists($val, 'export')) {
-				$result = static::_appendObject($result, $path, $key, $val);
+		foreach ($left as $key => $value) {
+			if (!isset($right[$key]) || $left[$key] !== $right[$key]) {
+				$result[$key] = $value;
 			}
 		}
 		return $result;
 	}
 
-	protected static function _appendObject($changes, $path, $key, $object) {
-		$options =  array('finalize' => false);
+	/**
+	 * Handles appending nested objects to document changesets.
+	 *
+	 * @param array $changes The full set of changes to be made to the database.
+	 * @param string $key The key of the field to append, which may be a dot-separated path if the
+	 *               value is or is contained within a nested object.
+	 * @param mixed $value The value to append to the changeset. Can be a scalar value, array, a
+	 *              nested object, or part of a nested object.
+	 * @return array Returns the value of `$changes`, with any new changed values appended.
+	 */
+	protected static function _append($changes, $key, $value) {
+		$options = array('finalize' => false);
 
-		if ($object->exists()) {
-			return Set::merge($changes, static::_update($object->export()));
+		if (!is_object($value) || !method_exists($value, 'export')) {
+			$changes['update'][$key] = $value;
+			return $changes;
 		}
-		$changes['update']["{$path}{$key}"] = static::_create($object->export(), $options);
+		if ($value->exists()) {
+			return Set::merge($changes, static::_update($value->export()));
+		}
+		$changes['update'][$key] = static::_create($value->export(), $options);
 		return $changes;
 	}
 }

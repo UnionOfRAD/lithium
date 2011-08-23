@@ -297,7 +297,6 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Sets default connection options and connects default finders.
 	 *
-	 * @todo Merge in inherited config from AppModel and other parent classes.
 	 * @param array $options
 	 * @return void
 	 */
@@ -492,15 +491,21 @@ class Model extends \lithium\core\StaticObject {
 		if (is_array($key)) {
 			$self->_meta = $key + $self->_meta;
 		}
+
 		if (!$self->_meta['initialized']) {
 			$self->_meta['initialized'] = true;
+
 			if ($self->_meta['source'] === null) {
 				$self->_meta['source'] = Inflector::tableize($self->_meta['name']);
 			}
-			$titleKeys = array('title', 'name', $self->_meta['key']);
+			$titleKeys = array('title', 'name');
+
+			if (isset($self->_meta['key'])) {
+				$titleKeys = array_merge($titleKeys, (array) $self->_meta['key']);
+			}
 			$self->_meta['title'] = $self->_meta['title'] ?: static::hasField($titleKeys);
 		}
-		if (is_array($key) || empty($key) || !empty($value)) {
+		if (is_array($key) || !$key || $value) {
 			return $self->_meta;
 		}
 		return isset($self->_meta[$key]) ? $self->_meta[$key] : null;
