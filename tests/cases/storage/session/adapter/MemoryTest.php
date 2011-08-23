@@ -147,7 +147,7 @@ class MemoryTest extends \lithium\test\Unit {
 
 		$params = compact('key');
 		$result = $closure($this->Memory, $params, null);
-		$this->assertFalse($result);
+		$this->assertTrue($result);
 
 		$key = 'non-existent';
 		$closure = $this->Memory->delete($key);
@@ -155,7 +155,7 @@ class MemoryTest extends \lithium\test\Unit {
 
 		$params = compact('key');
 		$result = $closure($this->Memory, $params, null);
-		$this->assertFalse($result);
+		$this->assertTrue($result);
 	}
 
 	/**

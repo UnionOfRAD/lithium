@@ -47,7 +47,7 @@ class PasswordTest extends \lithium\test\Unit {
 				$this->assertFalse(in_array($hash, $hashes));
 				$hashes[] = $hash;
 
-				$this->assertTrue(Password::check($pass, $hash));
+				$this->assertTrue(Password::check($pass, $hash), "{$method} failed");
 			}
 		}
 	}

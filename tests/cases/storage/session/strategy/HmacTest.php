@@ -41,7 +41,7 @@ class HmacTest extends \lithium\test\Unit {
 		$result = $this->Hmac->write($value, compact('key', 'class'));
 		$this->assertEqual($value, $result);
 
-		$signature = hash_hmac('sha1', serialize($oldData + array($key => $value)), $this->secret);
+		$signature = hash_hmac('sha1', serialize(array($key => $value) + $oldData), $this->secret);
 		$signedData = MockCookieSession::data();
 		$this->assertEqual($signedData, $oldData + array('__signature' => $signature));
 	}
