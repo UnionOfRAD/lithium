@@ -62,13 +62,6 @@ class PostgreSql extends \lithium\data\source\Database {
 	);
 
 	/**
-	 * Pair of opening and closing quote characters used for quoting identifiers in queries.
-	 *
-	 * @var array
-	 */
-	protected $_quotes = array('"', '"');
-
-	/**
 	 * Constructs the PostgreSQL adapter and sets the default port to 3306.
 	 *
 	 * @see lithium\data\source\Database::__construct()
