@@ -139,9 +139,10 @@ class Message extends \lithium\net\Message {
 		if (strpos($type, '/')) {
 			$media = $this->_classes['media'];
 
-			if ($data = $media::type($type)) {
-				$type = is_array($data) ? reset($data) : $data;
+			if (!$data = $media::type($type)) {
+				return $this->_type;
 			}
+			$type = is_array($data) ? reset($data) : $data;
 		}
 		return $this->_type = $type;
 	}

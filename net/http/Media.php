@@ -744,7 +744,7 @@ class Media extends \lithium\core\StaticObject {
 		$types = static::$_types + array(
 			'html'         => array('text/html', 'application/xhtml+xml', '*/*'),
 			'htm'          => array('alias' => 'html'),
-			'form'         => 'application/x-www-form-urlencoded',
+			'form'         => array('application/x-www-form-urlencoded', 'multipart/form-data'),
 			'json'         => 'application/json',
 			'rss'          => 'application/rss+xml',
 			'atom'         => 'application/atom+xml',
@@ -762,7 +762,7 @@ class Media extends \lithium\core\StaticObject {
 			return isset($types[$type]) ? $types[$type] : null;
 		}
 		if (strpos($type, ';')) {
-			list($type) = explode(';', $type);
+			list($type) = explode(';', $type, 2);
 		}
 		$result = array();
 
