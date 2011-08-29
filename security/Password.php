@@ -32,7 +32,7 @@ class Password {
 	 * salt is supplied, a cryptographically strong salt will be generated
 	 * using `lithium\security\Password::salt()`.
 	 *
-	 * Using this function is the proper way to hash a password. Using naive
+	 * Using this function is the proper way to hash a password. Using native
 	 * methods such as sha1 or md5, as is done in many web applications, is
 	 * improper due to the lack of a cryptographically strong salt.
 	 *
