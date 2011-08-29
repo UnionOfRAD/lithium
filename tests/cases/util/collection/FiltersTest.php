@@ -63,6 +63,16 @@ class FiltersTest extends \lithium\test\Unit {
 		$result = $class::filteredMethod();
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testLazyApplyInheritance() {
+		$class = 'lithium\tests\mocks\util\MockFilters';
+		$child = 'lithium\tests\mocks\util\MockFiltersExtended';
+		Filters::apply($class, 'filteredMethod', function($self, $params, $chain) {
+			return md5($chain->next($self, $params, $chain));
+		});
+		$this->assertEqual(md5('Working?'), $child::filteredMethod());
+	}
+
 }
 
 ?>
