@@ -50,11 +50,7 @@ class Exporter extends \lithium\core\StaticObject {
 		$options += $defaults;
 
 		foreach ($data as $key => $value) {
-			$pathKey = !empty($options['pathKey']) ? "{$options['pathKey']}.{$key}" : $key;
-
-			if (is_object($value)) {
-				continue;
-			}
+			$pathKey = $options['pathKey'] ? "{$options['pathKey']}.{$key}" : $key;
 			$field = isset($schema[$pathKey]) ? $schema[$pathKey] : array();
 			$field += array('type' => null, 'array' => null);
 			$data[$key] = static::_cast($value, $field, $database, compact('pathKey') + $options);
@@ -63,11 +59,13 @@ class Exporter extends \lithium\core\StaticObject {
 	}
 
 	protected static function _cast($value, $def, $database, $options) {
-		if (!$options['pathKey'] && !$def['type'] && !$def['array']) {
+		if (is_object($value)) {
 			return $value;
 		}
+		$pathKey = $options['pathKey'];
 		$typeMap = static::$_types;
 		$type = isset($typeMap[$def['type']]) ? $typeMap[$def['type']] : $def['type'];
+
 		$isObject = ($type == 'object');
 		$isArray = (is_array($value) && $def['array'] !== false && !$isObject);
 		$isArray = $def['array'] || $isArray;
@@ -78,9 +76,11 @@ class Exporter extends \lithium\core\StaticObject {
 		if (!$options['arrays']) {
 			return $value;
 		}
+
 		if (!is_array($value) && !$def['array']) {
 			return $value;
 		}
+
 		if ($def['array']) {
 			$opts = array('class' => 'array') + $options;
 			$value = ($value === null) ? array() : $value;
@@ -90,7 +90,7 @@ class Exporter extends \lithium\core\StaticObject {
 			$opts = $arrayType ? array('class' => 'array') + $options : $options;
 		}
 		unset($opts['handlers'], $opts['first']);
-		return $database->item($options['model'], $value, $opts);
+		return $database->item($options['model'], $value, compact('pathKey') + $opts);
 	}
 
 	public static function toCommand($changes) {

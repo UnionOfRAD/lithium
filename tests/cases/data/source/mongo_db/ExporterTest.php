@@ -220,8 +220,8 @@ class ExporterTest extends \lithium\test\Unit {
 	public function testNestedObjectCasting() {
 		$model = $this->_model;
 		$data = array('notifications' => array('foo' => '', 'bar' => '1', 'baz' => 0, 'dib' => 42));
-		$model::schema($this->_schema);
 
+		$model::schema($this->_schema);
 		$result = Exporter::cast($data, $this->_schema, $model::connection(), compact('model'));
 		$this->assertIdentical(false, $result['notifications']->foo);
 		$this->assertIdentical(true, $result['notifications']->bar);
@@ -357,72 +357,6 @@ class ExporterTest extends \lithium\test\Unit {
 
 		$result = Exporter::get('update', $doc->export());
 		$this->assertEqual(array('update' => array('this.that' => 'value2')), $result);
-	}
-
-	public function testCastingNestedArray() {
-		$data = array(
-			array(
-				'_id' => 'Ok-cool',
-				'_title' => array('Ok', 'cool'),
-				'comment_count' => 2,
-				'comments' => array(
-					array(
-						'created' => '1314045379',
-						'user' => array(
-						  '_id' => 'bob',
-						  'email' => 'bob@example.com',
-						),
-						'rating' => 0,
-						'endorsements' => array(),
-						'comments' => array(
-							array(
-								'created' => '1314045388',
-								'user' => array(
-								  '_id' => 'bob',
-								  'email' => 'bob@example.com',
-								),
-								'rating' => 0,
-								'endorsements' => array(),
-								'comments' => array(),
-								'comment_count' => 0,
-								'content' => 'sweet',
-							),
-						),
-						'comment_count' => 1,
-						'content' => 'nice comment'
-					),
-				),
-				'content' => 'This is working well.',
-				'created' => '1314045372',
-				'endorsements' => array(),
-				'rating' => 2,
-				'tags' => '',
-				'title' => 'Ok cool',
-				'type' => 'post',
-				'user_id' => 'bob'
-			)
-		);
-		$schema = array(
-			'_id' => array('type' => 'string', array('primary' => true)),
-			'created' => array('type' => 'date'),
-			'title' => array('type' => 'string', 'length' => 250),
-			'content' => array('type' => 'text'),
-			'rating' => array('type' => 'numeric', 'default' => 0),
-			'comment_count' => array('type' => 'numeric', 'default' => 0),
-			'type' => array('type' => 'string', 'default' => 'post'),
-			'user_id' => array('type' => 'string', 'default' => null),
-		);
-		$model = $this->_model;
-		$model::schema($schema);
-		$database = $model::connection();
-		$exists = true;
-		$first = true;
-		$pathKey = null;
-		$handlers = $this->_handlers;
-		$options = compact('exists', 'first', 'pathKey', 'model', 'handlers');
-		$result = Exporter::cast($data, $schema, $database, $options);
-		$expected = $data;
-		$this->assertEqual($expected, $result);
 	}
 
 	/**
