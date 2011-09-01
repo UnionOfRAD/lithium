@@ -700,6 +700,35 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	/**
+	 * Tests that complex model constraints with custom operators render correct constraint strings.
+	 */
+	public function testRenderArrayJoinConstraintComplexArray() {
+		$model = 'lithium\tests\mocks\data\model\MockQueryComment';
+
+		$query = new Query(compact('model') + array(
+			'type' => 'read',
+			'source' => 'comments',
+			'alias' => 'Comments',
+			'conditions' => array('Comment.id' => 1),
+			'joins' => array(array(
+				'type' => 'LEFT',
+				'source' => 'posts',
+				'alias' => 'Post',
+				'constraint' => array(
+					"Comment.post_id" => array('<=' => "Post.id"),
+					"Comment.post_id" => array('=>' => "Post.id")
+				)
+			))
+		));
+
+		$expected = "SELECT * FROM {comments} AS {Comments} LEFT JOIN {posts} AS {Post} ON ";
+		$expected .= "({Comment}.{post_id} <= {Post}.{id} && {Comment}.{post_id} => {Post}.{id}) ";
+		$expected .= "WHERE Comment.id = 1;";
+		$result = Connections::get('mock-database-connection')->renderCommand($query);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testRenderArrayJoin() {
 		$model = 'lithium\tests\mocks\data\model\MockQueryComment';
 
