@@ -433,6 +433,11 @@ class Validator extends \lithium\core\StaticObject {
 			'on' => null,
 			'last' => false
 		);
+
+		if (isset($options['last']) && $options['last'] === true) {
+			$defaults['last'] = true;
+		}
+
 		$errors = array();
 		$events = (array) (isset($options['events']) ? $options['events'] : null);
 		$values = Set::flatten($values);
