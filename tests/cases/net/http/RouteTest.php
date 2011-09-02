@@ -543,6 +543,13 @@ class RouteTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result->params);
 	}
+
+	public function testContinuationRoute() {
+		$route = new Route();
+		$this->assertFalse($route->canContinue());
+		$route = new Route(array('continue' => true));
+		$this->assertTrue($route->canContinue());
+	}
 }
 
 ?>

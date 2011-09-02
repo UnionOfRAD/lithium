@@ -129,10 +129,20 @@ class Router extends \lithium\core\StaticObject {
 	 *         typically include `'controller'` and `'action'` keys.
 	 */
 	public static function parse($request) {
+		$url = $request->url;
+
 		foreach (static::$_configurations as $route) {
-			if ($match = $route->parse($request)) {
-				return $match;
+			if (!$match = $route->parse($request, compact('url'))) {
+				continue;
 			}
+			$request = $match;
+
+			if ($route->canContinue() && isset($request->params['args'])) {
+				$url = '/' . join('/', $request->params['args']);
+				unset($request->params['args']);
+				continue;
+			}
+			return $request;
 		}
 	}
 
