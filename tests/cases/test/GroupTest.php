@@ -124,11 +124,10 @@ class GroupTest extends \lithium\test\Unit {
 		$expected = 'lithium\tests\mocks\test\MockUnitTest';
 		$result = $results[0][0]['class'];
 		$this->assertEqual($expected, $result);
-
-		$expected = str_replace('\\', '/', LITHIUM_LIBRARY_PATH);
-		$expected = realpath($expected . '/lithium/tests/mocks/test/MockUnitTest.php');
+		
+		$expected = realpath(LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/MockUnitTest.php');
 		$result = $results[0][0]['file'];
-		$this->assertEqual($expected, str_replace('\\', '/', $result));
+		$this->assertEqual(str_replace('\\', '/', $expected), str_replace('\\', '/', $result));
 	}
 
 	public function testGroupAllForLithium() {
