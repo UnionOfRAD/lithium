@@ -155,7 +155,19 @@ class Form extends \lithium\core\Object {
 	/**
 	 * The list of fields to extract from the `Request` object and use when querying the database.
 	 * This can either be a simple array of field names, or a set of key/value pairs, which map
-	 * the field names in the request to
+	 * the field names in the request to database field names.
+	 *
+	 * For example, if you had a form field name `username`, which mapped to a database field named
+	 * username, you could use the following in the `'fields'` configuration:
+	 *
+	 * {{{ embed:lithium\tests\cases\security\auth\adapter\FormTest::testMixedFieldMapping(3-3) }}}
+	 *
+	 * This is especially relevant for document databases, where you may want to map a form field to
+	 * a nested document field:
+	 *
+	 * {{{
+	 * 'fields' => array('username' => 'login.username', 'password'),
+	 * }}}
 	 *
 	 * @var array
 	 */
