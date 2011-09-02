@@ -68,8 +68,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests generating routes with required parameters which are not present in the URL.
-	 *
-	 * @return void
 	 */
 	public function testConnectingWithRequiredParams() {
 		$result = Router::connect('/{:controller}/{:action}', array(
@@ -109,8 +107,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests basic options for connecting routes.
-	 *
-	 * @return void
 	 */
 	public function testBasicRouteMatching() {
 		Router::connect('/hello', array('controller' => 'posts', 'action' => 'index'));
@@ -149,8 +145,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that URLs specified as "Controller::action" are interpreted properly.
-	 *
-	 * @return void
 	 */
 	public function testStringActions() {
 		Router::connect('/login', array('controller' => 'sessions', 'action' => 'create'));
@@ -201,8 +195,6 @@ class RouterTest extends \lithium\test\Unit {
 	/**
 	 * Tests that URLs specified as "Controller::action" and including additional parameters are
 	 * interpreted properly.
-	 *
-	 * @return void
 	 */
 	public function testEmbeddedStringActions() {
 		Router::connect('/logout/{:id:[0-9]{5,6}}', array(
@@ -232,8 +224,6 @@ class RouterTest extends \lithium\test\Unit {
 	/**
 	 * Tests that routes can be created with shorthand strings, i.e. `'Controller::action'` and
 	 * `array('Controller::action', 'id' => '...')`.
-	 *
-	 * @return void
 	 */
 	public function testStringParameterConnect() {
 		Router::connect('/posts/{:id:[0-9a-f]{24}}', 'Posts::edit');
@@ -273,8 +263,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that routing is fully reset when calling `Router::reset()`.
-	 *
-	 * @return void
 	 */
 	public function testResettingRoutes() {
 		Router::connect('/{:controller}', array('controller' => 'posts'));
@@ -541,8 +529,6 @@ class RouterTest extends \lithium\test\Unit {
 	/**
 	 * Tests passing a closure handler to `Router::connect()` to bypass or augment default
 	 * dispatching.
-	 *
-	 * @return void
 	 */
 	public function testRouteHandler() {
 		Router::connect('/login', 'Users::login');
@@ -563,8 +549,6 @@ class RouterTest extends \lithium\test\Unit {
 	/**
 	 * Tests that a successful match against a route with template `'/'` operating at the root of
 	 * a domain never returns an empty string.
-	 *
-	 * @return void
 	 */
 	public function testMatchingEmptyRoute() {
 		Router::connect('/', 'Users::view');
@@ -581,8 +565,6 @@ class RouterTest extends \lithium\test\Unit {
 	/**
 	 * Tests routing based on content type extensions, with HTML being the default when types are
 	 * not defined.
-	 *
-	 * @return void
 	 */
 	public function testTypeBasedRouting() {
 		Router::connect('/{:controller}/{:id:[0-9]+}', array(
@@ -606,8 +588,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that routes can be connected and correctly match based on HTTP headers or method verbs.
-	 *
-	 * @return void
 	 */
 	public function testHttpMethodBasedRouting() {
 		Router::connect('/{:controller}/{:id:[0-9]+}', array(
@@ -642,8 +622,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that the class dependency configuration can be modified.
-	 *
-	 * @return void
 	 */
 	public function testCustomConfiguration() {
 		$old = Router::config();
@@ -654,6 +632,29 @@ class RouterTest extends \lithium\test\Unit {
 
 		Router::config($old);
 		$this->assertEqual($old, Router::config());
+	}
+
+	/**
+	 * Tests that continuation routes properly fall through and aggregate multiple route parameters.
+	 */
+	public function testRouteContinuations() {
+		Router::connect('/{:locale:en|de|it|jp}/{:args}', array(), array('continue' => true));
+		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}');
+
+		$request = new Request(array('url' => '/en/posts/view/1138'));
+		$result = Router::process($request)->params;
+		$expected = array (
+			'controller' => 'posts', 'action' => 'view', 'id' => '1138', 'locale' => 'en'
+		);
+		$this->assertEqual($expected, $result);
+
+		Router::reset();
+		Router::connect('/{:args}/{:locale:en|de|it|jp}', array(), array('continue' => true));
+		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}');
+
+		$request = new Request(array('url' => '/posts/view/1138/en'));
+		$result = Router::process($request)->params;
+		$this->assertEqual($expected, $result);
 	}
 }
 
