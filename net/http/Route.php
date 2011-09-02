@@ -171,7 +171,8 @@ class Route extends \lithium\core\Object {
 			'defaults' => array(),
 			'keys'     => array(),
 			'persist'  => array(),
-			'handler'  => null
+			'handler'  => null,
+			'continue' => false
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -193,11 +194,17 @@ class Route extends \lithium\core\Object {
 	 *
 	 * @param object $request A request object, usually an instance of `lithium\net\http\Request`,
 	 *        containing the details of the request to be routed.
+	 * @param array $options Used to determine the operation of the method, and override certain
+	 *              values in the `Request` object:
+	 *              - `'url'` _string_: If present, will be used to match in place of the `$url`
+	 *                 property of `$request`.
 	 * @return mixed If this route matches `$request`, returns an array of the execution details
 	 *         contained in the route, otherwise returns false.
 	 */
-	public function parse($request) {
-		$url = '/' . trim($request->url, '/');
+	public function parse($request, array $options = array()) {
+		$defaults = array('url' => $request->url);
+		$options += $defaults;
+		$url = '/' . trim($options['url'], '/');
 
 		if (!preg_match($this->_pattern, $url, $match)) {
 			return false;
@@ -218,8 +225,8 @@ class Route extends \lithium\core\Object {
 		if (isset($result['action']) && !$result['action']) {
 			$result['action'] = 'index';
 		}
-		$request->params = $result;
-		$request->persist = $this->_persist;
+		$request->params = $result + (array) $request->params;
+		$request->persist = array_unique(array_merge($request->persist, $this->_persist));
 
 		if ($this->_handler) {
 			$handler = $this->_handler;
@@ -256,6 +263,17 @@ class Route extends \lithium\core\Object {
 			}
 		}
 		return $this->_write($options, $defaults + $this->_defaults + array('args' => '')) . $query;
+	}
+
+	/**
+	 * Returns a boolean value indicating whether this is a continuation route. If `true`, this
+	 * route will allow incoming requests to "fall through" to other routes, aggregating parameters
+	 * for both this route and any subsequent routes.
+	 *
+	 * @return boolean Returns the value of `$_config['continue']`.
+	 */
+	public function canContinue() {
+		return $this->_config['continue'];
 	}
 
 	/**
