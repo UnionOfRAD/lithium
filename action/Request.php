@@ -152,7 +152,8 @@ class Request extends \lithium\net\http\Request {
 			$mobile = array_merge($mobile, (array) $this->_config['detectors']['mobile'][1]);
 		}
 		$this->_detectors['mobile'][1] = $mobile;
-		$this->_env += (array) $_SERVER + (array) $_ENV + array('REQUEST_METHOD' => 'GET');
+		$defaults = array('REQUEST_METHOD' => 'GET', 'CONTENT_TYPE' => 'text/html');
+		$this->_env += (array) $_SERVER + (array) $_ENV + $defaults;
 		$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
 		$this->_env['PLATFORM'] = isset($envs[PHP_SAPI]) ? $envs[PHP_SAPI] : null;
 		$this->_base = isset($this->_base) ? $this->_base : $this->_base();
@@ -163,34 +164,33 @@ class Request extends \lithium\net\http\Request {
 		} elseif (!empty($_GET['url']) ) {
 			$this->url = rtrim($_GET['url'], '/');
 			unset($_GET['url']);
+		} elseif (isset($_SERVER['REQUEST_URI']) && strlen(trim($_SERVER['REQUEST_URI'])) > 0) {
+			$this->url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 		}
-
 		if (!empty($this->_config['query'])) {
 			$this->query = $this->_config['query'];
 		}
 		if (isset($_GET)) {
 			$this->query += $_GET;
 		}
-
 		if (!empty($this->_config['data'])) {
 			$this->data = $this->_config['data'];
-		} elseif (isset($_POST)) {
+		}
+		if (isset($_POST)) {
 			$this->data += $_POST;
 		}
-
 		if (isset($this->data['_method'])) {
 			$this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'] = strtoupper($this->data['_method']);
 			unset($this->data['_method']);
 		}
-
 		if (!empty($this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
 			$this->_env['REQUEST_METHOD'] = $this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'];
 		}
+		$type = $this->type($this->_env['CONTENT_TYPE']);
+		$this->method = $method = strtoupper($this->_env['REQUEST_METHOD']);
 
-		$method = strtoupper($this->_env['REQUEST_METHOD']);
-
-		if (($method == 'POST' || $method == 'PUT') && !$this->data) {
-			if (($type = $this->type()) && $type !== 'html') {
+		if (!$this->data && ($method == 'POST' || $method == 'PUT')) {
+			if ($type !== 'html') {
 				$this->_stream = $this->_stream ?: fopen('php://input', 'r');
 				$media = $this->_classes['media'];
 				$this->data = (array) $media::decode($type, stream_get_contents($this->_stream));

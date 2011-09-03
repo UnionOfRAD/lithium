@@ -15,7 +15,7 @@
  */
 return array(
 	'pluralForms' => 2,
-	'pluralRule' => function ($n) { return $n == 1 ? 0 : 1; }
+	'pluralRule' => function ($n) { return $n > 1 ? 1 : 0; }
 );
 
 ?>

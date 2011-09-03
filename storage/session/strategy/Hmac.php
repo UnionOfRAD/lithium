@@ -77,7 +77,7 @@ class Hmac extends \lithium\core\Object {
 		$class = $options['class'];
 
 		$futureData = $class::read(null, array('strategies' => false));
-		$futureData += array($options['key'] => $data);
+		$futureData = array($options['key'] => $data) + $futureData;
 		unset($futureData['__signature']);
 
 		$signature = static::_signature($futureData);

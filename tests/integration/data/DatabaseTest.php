@@ -14,7 +14,7 @@ use lithium\tests\mocks\data\source\Images;
 use lithium\tests\mocks\data\source\Galleries;
 use lithium\util\String;
 
-class DatabaseTest extends \lithium\test\Unit {
+class DatabaseTest extends \lithium\test\Integration {
 
 	public $db = null;
 	protected $_dbConfig;

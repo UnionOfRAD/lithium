@@ -239,6 +239,15 @@ class String {
 			$replace = array();
 
 			foreach ($data as $key => $value) {
+				$value = (is_array($value) || $value instanceof Closure) ? '' : $value;
+
+				try {
+					if (is_object($value) && method_exists($value, '__toString')) {
+						$value = (string) $value;
+					}
+				} catch (Exception $e) {
+					$value = '';
+				}
 				$replace["{$options['before']}{$key}{$options['after']}"] = $value;
 			}
 			$str = strtr($str, $replace);
@@ -263,17 +272,7 @@ class String {
 				continue;
 			}
 			$str = preg_replace($key, $hashVal, $str);
-
-			if (is_object($value) && !$value instanceof Closure) {
-				try {
-					$value = $value->__toString();
-				} catch (Exception $e) {
-					$value = '';
-				}
-			}
-			if (!is_array($value)) {
-				$str = str_replace($hashVal, $value, $str);
-			}
+			$str = str_replace($hashVal, $value, $str);
 		}
 
 		if (!isset($options['format']) && isset($options['before'])) {

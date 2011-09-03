@@ -23,10 +23,9 @@ class ContextTest extends \lithium\test\Unit {
 		'classes' => array('request' => 'lithium\net\http\Request')
 	);
 
-	protected $_testUrl = 'http://lithify.me';
-
 	public function skip() {
-		$this->skipIf(dns_check_record("lithify.me", "ANY") === false, "No internet connection.");
+		$message = "No internet connection established.";
+		$this->skipIf(!$this->_hasNetwork($this->_testConfig), $message);
 	}
 
 	public function testConstruct() {

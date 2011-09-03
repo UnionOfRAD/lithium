@@ -21,13 +21,6 @@ class Response extends \lithium\net\http\Message {
 	public $status = array('code' => 200, 'message' => 'OK');
 
 	/**
-	 * Headers.
-	 *
-	 * @var array
-	 */
-	public $headers = array();
-
-	/**
 	 * Content Type.
 	 *
 	 * @var string
@@ -40,13 +33,6 @@ class Response extends \lithium\net\http\Message {
 	 * @var string
 	 */
 	public $encoding = 'UTF-8';
-
-	/**
-	 * The body.
-	 *
-	 * @var array
-	 */
-	public $body = array();
 
 	/**
 	 * Status codes.
@@ -95,28 +81,42 @@ class Response extends \lithium\net\http\Message {
 		504 => 'Gateway Time-out'
 	);
 
+	/**
+	 * Adds config values to the public properties when a new object is created.
+	 *
+	 * @param array $config
+	 */
+	public function __construct(array $config = array()) {
+		$defaults = array('message' => null);
+		$config += $defaults;
+		parent::__construct($config);
+	}
+
+	/**
+	 * Initialize the Response
+	 *
+	 * @return void
+	 */
 	protected function _init() {
 		parent::_init();
-		$body = $this->_config['body'];
 
-		if ($this->_config['body'] && !$this->_config['message']) {
-			$this->body = $this->_config['body'];
-		} elseif (($body = $this->_config['message']) && !$this->_config['body']) {
-			$body = $this->_parseMessage($body);
+		if ($this->_config['message']) {
+			$this->body = $this->_parseMessage($this->_config['message']);
 		}
-
 		if (isset($this->headers['Content-Type'])) {
-			preg_match('/^(.*?);\s*?charset=(.+)/i', $this->headers['Content-Type'], $match);
+			$pattern = '/([-\w\/+]+)(;\s*?charset=(.+))?/i';
+			preg_match($pattern, $this->headers['Content-Type'], $match);
 
-			if ($match) {
+			if (isset($match[1])) {
 				$this->type = trim($match[1]);
-				$this->encoding = strtoupper(trim($match[2]));
+			}
+			if (isset($match[3])) {
+				$this->encoding = strtoupper(trim($match[3]));
 			}
 		}
 		if (isset($this->headers['Transfer-Encoding'])) {
-			$body = $this->_decode($body);
+			$this->body = $this->_decode($this->body);
 		}
-		$this->body = $this->body ?: $body;
 	}
 
 	/**
@@ -128,19 +128,19 @@ class Response extends \lithium\net\http\Message {
 	 */
 	protected function _parseMessage($body) {
 		if (!($parts = explode("\r\n\r\n", $body, 2)) || count($parts) == 1) {
-			return $body;
+			return trim($body);
 		}
 		list($headers, $body) = $parts;
 		$headers = str_replace("\r", "", explode("\n", $headers));
 
 		if (array_filter($headers) == array()) {
-			return $body;
+			return trim($body);
 		}
 		preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)\s+(.*)/i', array_shift($headers), $match);
 		$this->headers($headers);
 
 		if (!$match) {
-			return $body;
+			return trim($body);
 		}
 		list($line, $this->version, $code, $message) = $match;
 		$this->status = compact('code', 'message') + $this->status;
@@ -210,7 +210,7 @@ class Response extends \lithium\net\http\Message {
 		}
 		$stream = fopen('data://text/plain,' . $body, 'r');
 		stream_filter_append($stream, 'dechunk');
-		return stream_get_contents($stream);
+		return trim(stream_get_contents($stream));
 	}
 }
 

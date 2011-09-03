@@ -18,9 +18,7 @@ class ApcTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function skip() {
-		$extensionExists = extension_loaded('apc');
-		$message = 'The apc extension is not installed.';
-		$this->skipIf(!$extensionExists, $message);
+		$this->skipIf(!Apc::enabled(), 'APC is either not loaded or not enabled.');
 	}
 
 	public function setUp() {

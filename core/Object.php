@@ -23,7 +23,7 @@ use lithium\util\collection\Filters;
  *   high-overhead or difficult to test operations out of the constructor. This method is called
  *   automatically by `Object::__construct()`, but may be disabled by passing `'init' => false` to
  *   the constructor. The initializer is also used for automatically assigning object properties.
- *   See the documentation for the `_init()` method for more details.
+ *   See the documentation on the `_init()` method for more details.
  * - **Filters**: The `Object` class implements two methods which allow an object to easily
  *   implement filterable methods. The `_filter()` method allows methods to be implemented as
  *   filterable, and the `applyFilter()` method allows filters to be wrapped around them.
@@ -95,9 +95,9 @@ class Object {
 	}
 
 	/**
-	 * Initializer function called by the constructor unless constructor `'init'` flag set to
-	 * `false`. May be used for testing purposes, where objects need to be manipulated in an
-	 * un-initialized state, or for high-overhead operations that require more control that the
+	 * Initializer function called by the constructor unless the constructor `'init'` flag is set
+	 * to `false`. May be used for testing purposes, where objects need to be manipulated in an
+	 * un-initialized state, or for high-overhead operations that require more control than the
 	 * constructor provides. Additionally, this method iterates over the `$_autoConfig` property
 	 * to automatically assign configuration settings to their corresponding properties.
 	 *
@@ -122,11 +122,9 @@ class Object {
 			if (!isset($this->_config[$key]) && !isset($this->_config[$flag])) {
 				continue;
 			}
-			$property = "_{$key}";
-
+			
 			if ($flag === 'merge') {
-				$property = '_' . $key;
-				$this->{$property} = $this->_config[$key] + $this->{$property};
+				$this->{"_{$key}"} = $this->_config[$key] + $this->{"_{$key}"};
 			} else {
 				$this->{"_$flag"} = $this->_config[$flag];
 			}

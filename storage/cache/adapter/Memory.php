@@ -51,7 +51,6 @@ class Memory extends \lithium\core\Object {
 	 *
 	 * @param string $key The key to uniquely identify the cached item.
 	 * @return closure Function returning cached value if successful, `false` otherwise.
-	 * @todo Refactor to use RES_NOTFOUND for return value checks.
 	 */
 	public function read($key) {
 		$cache =& $this->_cache;

@@ -10,6 +10,7 @@ namespace lithium\tests\cases\action;
 
 use lithium\action\Request;
 use lithium\tests\mocks\action\MockIisRequest;
+use lithium\tests\mocks\action\MockNginxRequest;
 use lithium\tests\mocks\action\MockCgiRequest;
 
 class RequestTest extends \lithium\test\Unit {
@@ -288,6 +289,12 @@ class RequestTest extends \lithium\test\Unit {
 		)));
 		$this->assertEqual('application/json; charset=UTF-8', $request->env('CONTENT_TYPE'));
 		$this->assertEqual('json', $request->type());
+	}
+
+	public function testTypeforNginx() {
+		$request = new MockNginxRequest();
+
+		$this->assertEqual('html', $request->type());
 	}
 
 	public function testRefererDefault() {
@@ -964,6 +971,27 @@ class RequestTest extends \lithium\test\Unit {
 			'query' => array('some' => 'query', 'parameter' => 'values')
 		));
 		$expected = 'https://foo.com/the/base/path/the/url?some=query&parameter=values';
+		$this->assertEqual($expected, $request->to('url'));
+
+		$request = new Request(array(
+			'env' => array('HTTP_HOST' => 'foo.com'),
+			'base' => '/',
+			'url' => '/',
+			'query' => array()
+		));
+		$expected = 'http://foo.com/';
+		$this->assertEqual($expected, $request->to('url'));
+	}
+
+	public function testConvertToUrl2() {
+		$request = new Request(array(
+			'env' => array('HTTP_HOST' => 'foo.com', 'HTTPS' => 'on'),
+			'base' => '/the/base/path',
+			'url' => '/posts',
+			'params' => array('controller' => 'posts', 'action' => 'index'),
+			'query' => array('some' => 'query', 'parameter' => 'values')
+		));
+		$expected = 'https://foo.com/the/base/path/posts?some=query&parameter=values';
 		$this->assertEqual($expected, $request->to('url'));
 	}
 }

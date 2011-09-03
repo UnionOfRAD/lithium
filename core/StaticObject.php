@@ -56,8 +56,8 @@ class StaticObject {
 
 	/**
 	 * Calls a method on this object with the given parameters. Provides an OO wrapper for
-	 * `forward_static_call_array()`, and improves performance by using straight method calls in most
-	 * cases.
+	 * `forward_static_call_array()`, and improves performance by using straight method calls
+	 * in most cases.
 	 *
 	 * @param string $method Name of the method to call.
 	 * @param array $params Parameter list to use when calling `$method`.

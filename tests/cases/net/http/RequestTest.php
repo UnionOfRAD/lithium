@@ -106,10 +106,12 @@ class RequestTest extends \lithium\test\Unit {
 		$result = $this->request->queryString(array('param' => 'value'));
 		$this->assertEqual($expected, $result);
 
+		$expected = "?param=value";
+		$this->request->query = array('param' => 'value');
 		$result = $this->request->queryString();
 		$this->assertEqual($expected, $result);
 
-		$expected = "?param2=value2";
+		$expected = "?param=value&param2=value2";
 		$result = $this->request->queryString(array('param2' => 'value2'));
 		$this->assertEqual($expected, $result);
 	}
@@ -185,7 +187,7 @@ class RequestTest extends \lithium\test\Unit {
 	public function testToArray() {
 		$expected = array(
 			'method' => 'GET',
-			'params' => array(),
+			'query' => array(),
 			'headers' => array(
 				'Host' => 'localhost',
 				'Connection' => 'Close',
@@ -199,6 +201,7 @@ class RequestTest extends \lithium\test\Unit {
 			'host' => 'localhost',
 			'port' => null,
 			'path' => '/',
+			'auth' => null,
 			'username' => null,
 			'password' => null
 		);
@@ -230,6 +233,21 @@ class RequestTest extends \lithium\test\Unit {
 			'ignore_errors' => true
 		));
 		$result = $this->request->to('context');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testQueryStringWithArrayValues() {
+		$expected = "?param%5B0%5D=value1&param%5B1%5D=value2";
+		$result = $this->request->queryString(array('param' => array('value1', 'value2')));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testQueryStringWithArrayValuesCustomFormat() {
+		$expected = "?param%5B%5D:value1/param%5B%5D:value2";
+		$result = $this->request->queryString(
+			array('param' => array('value1', 'value2')),
+			"{:key}:{:value}/"
+		);
 		$this->assertEqual($expected, $result);
 	}
 }

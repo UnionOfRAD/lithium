@@ -466,6 +466,7 @@ class FormTest extends \lithium\test\Unit {
 
 	public function testSelectGeneration() {
 		$result = $this->form->select('foo');
+
 		$this->assertTags($result, array(
 			'select' => array('name' => 'foo', 'id' => 'Foo'), '/select'
 		));
@@ -524,6 +525,50 @@ class FormTest extends \lithium\test\Unit {
 			array('option' => array('value' => '2')),
 			'second',
 			'/option',
+			'/select'
+		));
+	}
+
+	/**
+	 * Tests that calling `select()` with nested arrays will produce lists of `<option />`s wrapped
+	 * in `<optgroup />` elements.
+	 */
+	public function testRecursiveSelect() {
+		$list = array(
+			'Linux' => array(
+				'1' => 'Ubuntu 10.10',
+				'2' => 'CentOS 5'
+			),
+			'Other' => array(
+				'4' => 'Solaris',
+				'5' => 'Windows Server 2010 R2'
+			)
+		);
+		$result = $this->form->select('opsys', $list, array(
+			'empty' =>  'Select one', 'value' => '5'
+		));
+
+		$this->assertTags($result, array(
+			'select' => array('name' => 'opsys', 'id' => 'Opsys'),
+			array('option' => array('value' => '')),
+			'Select one',
+			'/option',
+			array('optgroup' => array('label' => 'Linux')),
+			array('option' => array('value' => '1')),
+			'Ubuntu 10.10',
+			'/option',
+			array('option' => array('value' => '2')),
+			'CentOS 5',
+			'/option',
+			'/optgroup',
+			array('optgroup' => array('label' => 'Other')),
+			array('option' => array('value' => '4')),
+			'Solaris',
+			'/option',
+			array('option' => array('value' => '5', 'selected' => 'selected')),
+			'Windows Server 2010 R2',
+			'/option',
+			'/optgroup',
 			'/select'
 		));
 	}
@@ -652,7 +697,7 @@ class FormTest extends \lithium\test\Unit {
 		$expected = array(
 			'<div>',
 			'<input type="hidden" name="name" value="" />',
-			'<input type="checkbox" name="name" id="Name"  value="1" />',
+			'<input type="checkbox" name="name" id="Name" value="1" />',
 			'<label for="Name">Name</label></div>'
 		);
 		$this->assertEqual(join('', $expected), $result);
@@ -985,6 +1030,15 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array('form' => array(
 			'action' => "/bbq/foo", 'method'=> "post"
 		)));
+	}
+
+	/**
+	 * Tests that magic method support can be used to automatically generate a `<button />` tag
+	 * based on the default string template.
+	 */
+	public function testAutoMagicButton() {
+		$result = $this->form->button('Foo!', array('id' => 'bar'));
+		$this->assertTags($result, array('button' => array('id' => 'bar'), 'Foo!', '/button'));
 	}
 }
 

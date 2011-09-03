@@ -322,6 +322,28 @@ class FormTest extends \lithium\test\Unit {
 		$this->expectException('Authentication validator is not callable.');
 		$subject->check($request);
 	}
+
+	public function testValidatorWithFieldMapping() {
+		$subject = new Form(array(
+				'model' => __CLASS__,
+				'fields' => array('name' => 'user.name', 'password' => 'user.password'),
+				'validators' => array(
+					'password' => function ($form, $data) {
+						if ($form == $data) {
+							return true;
+						}
+						return false;
+					}
+				)
+			));
+		$request = (object) array(
+			'data' => array(
+				'name' => 'Foo',
+				'password' => 'bar'
+			)
+		);
+		$this->assertTrue($subject->check($request));
+	}
 }
 
 ?>

@@ -7,7 +7,7 @@ use lithium\data\Entity;
 use lithium\tests\mocks\data\MockEmployees;
 use lithium\tests\mocks\data\MockCompany;
 
-class FieldsTest extends \lithium\test\Unit {
+class FieldsTest extends \lithium\test\Integration {
 
 	public function setUp() {
 		Company::config();

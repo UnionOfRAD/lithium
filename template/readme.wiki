@@ -71,7 +71,7 @@ You can also create your own custom helper very easily by extending the `Helper`
 placing your helper in the correct namespace. By default, helpers belong in the
 `<library>\extensions\helper` namespace, but this can be changed through configuration (see the
 [the `Libraries` class](core/Libraries)). For example, consider the following class, saved as
-`app/extensions/helper/Custom.php`:
+`extensions/helper/Custom.php`:
 {{{
 <?php
 
@@ -101,7 +101,7 @@ Because your application and plugins have a higher order-of-precedence than the 
 classes like helpers can be extended and replaced seamlessly, without any changes to your templates.
 
 For example, to add or replace methods in the `Form` helper, you can add the following to
-`app/extensions/helper/Form.php`:
+`extensions/helper/Form.php`:
 
 {{{
 <?php
@@ -128,7 +128,7 @@ You can reference it like so:
 echo $this->_render('element', 'menu');
 }}} 
 
-Where `menu` is the name of your element file, in this example `app/views/elements/menu.html.php`.  When using `$this->_render()`, all of the variables set in the controller are available to the element template.  You can pass variables declared in the view or additional static content using the third parameter to `$this->_render()`:
+Where `menu` is the name of your element file, in this example `views/elements/menu.html.php`.  When using `$this->_render()`, all of the variables set in the controller are available to the element template.  You can pass variables declared in the view or additional static content using the third parameter to `$this->_render()`:
 {{{
 $var1 = 'something';
 echo $this->_render('element', 'menu', array(

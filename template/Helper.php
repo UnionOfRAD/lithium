@@ -62,7 +62,7 @@ abstract class Helper extends \lithium\core\Object {
 	 */
 	protected $_minimized = array(
 		'compact', 'checked', 'declare', 'readonly', 'disabled', 'selected', 'defer', 'ismap',
-		'nohref', 'noshade', 'nowrap', 'multiple', 'noresize', 'async'
+		'nohref', 'noshade', 'nowrap', 'multiple', 'noresize', 'async', 'autofocus'
 	);
 
 	public function __construct(array $config = array()) {
@@ -158,15 +158,17 @@ abstract class Helper extends \lithium\core\Object {
 	 * @return string
 	 */
 	protected function _attributes($params, $method = null, array $options = array()) {
-		if (!is_array($params)) {
-			return !$params ? '' : ' ' . $params;
-		}
 		$defaults = array('escape' => true, 'prepend' => ' ', 'append' => '');
 		$options += $defaults;
 		$result = array();
 
+		if (!is_array($params)) {
+			return !$params ? '' : $options['prepend'] . $params;
+		}
 		foreach ($params as $key => $value) {
-			$result[] = $this->_attribute($key, $value, $options);
+			if ($next = $this->_attribute($key, $value, $options)) {
+				$result[] = $next;
+			}
 		}
 		return $result ? $options['prepend'] . implode(' ', $result) . $options['append'] : '';
 	}

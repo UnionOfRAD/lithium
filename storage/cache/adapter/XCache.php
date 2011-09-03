@@ -15,7 +15,7 @@ namespace lithium\storage\cache\adapter;
  * which abstracts away key generation, adapter instantiation and filter
  * implementation.
  *
- * A simple configuration of this adapter can be accomplished in `app/config/bootstrap/cache.php`
+ * A simple configuration of this adapter can be accomplished in `config/bootstrap/cache.php`
  * as follows:
  *
  * {{{

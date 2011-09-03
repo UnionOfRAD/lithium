@@ -75,11 +75,11 @@ class Controller extends \lithium\core\Object {
 	 * - The `'layout'` key specifies the name of the layout to be used (defaults to `'default'`).
 	 *   Typically, layout files are looked up as
 	 *   `<app-path>/views/layouts/<layout-name>.<type>.php`. Based on the default settings, the
-	 *   actual path would be `app/views/layouts/default.html.php`.
+	 *   actual path would be `path-to-app/views/layouts/default.html.php`.
 	 * - Though typically introspected from the action that is executed, the `'template'` key can be
 	 *   manually specified. This sets the template to be rendered, and is looked up (by default) as
 	 *   `<app-path>/views/<controller>/<action>.<type>.php`, i.e.:
-	 *   `app/views/posts/index.html.php`.
+	 *   `path-to-app/views/posts/index.html.php`.
 	 * - To enable automatic content-type negotiation (i.e. determining the content type of the
 	 *   response based on the value of the
 	 *   [HTTP Accept header](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html)), set the
@@ -154,7 +154,6 @@ class Controller extends \lithium\core\Object {
 	 * @param array $dispatchParams The array of parameters that will be passed to the action.
 	 * @param array $options The dispatch options for this action.
 	 * @return object Returns the response object associated with this controller.
-	 * @todo Implement proper exception catching/throwing
 	 * @filter This method can be filtered.
 	 */
 	public function __invoke($request, $dispatchParams, array $options = array()) {
