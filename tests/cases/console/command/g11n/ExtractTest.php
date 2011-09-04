@@ -74,7 +74,7 @@ EOD;
 
 		$configs = Catalog::config();
 		$configKey = key($configs);
-		$this->_writeInput(array($configKey, 'q', '', '', '', 'y'));
+		$this->_writeInput(array($configKey, '', '', '', '', 'y'));
 		$result = $this->command->run();
 		$expected = 1;
 		$this->assertIdentical($expected, $result);

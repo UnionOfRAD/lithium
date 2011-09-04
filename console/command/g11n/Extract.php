@@ -68,26 +68,12 @@ class Extract extends \lithium\console\Command {
 		$this->out($message);
 		$this->out();
 
-		$configs = (array) Catalog::config();
-
-		$this->out('Available `Catalog` Configurations:');
-		foreach ($configs as $name => $config) {
-			$this->out(" - {$name}");
-		}
-		$this->out();
-
-		$name = $this->in('Please choose a configuration or hit [enter] to add one:', array(
-			'choices' => array_keys($configs)
+		$name = $this->_configuration(array(
+			'adapter' => 'Code',
+			'path' => $this->source,
+			'scope' => $this->scope
 		));
-
-		if (!$name) {
-			$adapter = $this->in('Adapter:', array('default' => 'Code'));
-			$path = $this->in('Path:', array('default' => $this->source));
-			$scope = $this->in('Scope:', array('default' => $this->scope));
-			$name = 'runtime' . uniqid();
-			$configs[$name] = compact('adapter', 'path', 'scope');
-		}
-		Catalog::config($configs);
+		$configs = Catalog::config();
 
 		try {
 			return Catalog::read($name, 'messageTemplate', 'root', array(
@@ -113,26 +99,13 @@ class Extract extends \lithium\console\Command {
 		$this->out($message);
 		$this->out();
 
-		$configs = (array) Catalog::config();
-
-		$this->out('Available `Catalog` Configurations:');
-		foreach ($configs as $name => $config) {
-			$this->out(" - {$name}");
-		}
-		$this->out();
-
-		$name = $this->in('Please choose a configuration or hit [enter] to add one:', array(
-			'choices' => array_keys($configs)
+		$name = $this->_configuration(array(
+			'adapter' => 'Gettext',
+			'path' => $this->destination,
+			'scope' => $this->scope
 		));
 
-		if (!$name) {
-			$adapter = $this->in('Adapter:', array('default' => 'Gettext'));
-			$path = $this->in('Path:', array('default' => $this->destination));
-			$scope = $this->in('Scope:', array('default' => $this->scope));
-			$name = 'runtime' . uniqid();
-			$configs[$name] = compact('adapter', 'path', 'scope');
-			Catalog::config($configs);
-		} else {
+		if ($name != 'temporary') {
 			$scope = $this->in('Scope:', array('default' => $this->scope));
 		}
 
@@ -151,6 +124,49 @@ class Extract extends \lithium\console\Command {
 		} catch (Exception $e) {
 			return false;
 		}
+	}
+
+	/**
+	 * Helps in selecting or - if required - adding a new `Catalog` collection
+	 * used for extracting or writing the template. A special configuration
+	 * with the name `temporary` may be created. Should a configuration with
+	 * that same name exist prior to entering this method it will be unset.
+	 *
+	 * @param array $options Options paired with defaults to prompt for.
+	 * @return string The name of the selected or newly created configuration.
+	 */
+	protected function _configuration(array $options = array()) {
+		$configs = (array) Catalog::config();
+
+		if (isset($configs['temporary'])) {
+			unset($configs['temporary']);
+		}
+
+		if ($configs) {
+			$this->out('Available `Catalog` Configurations:');
+			$prompt = 'Please choose a configuration or hit enter to add a new one:';
+
+			foreach ($configs as $name => $config) {
+				$this->out(" - {$name}");
+			}
+		} else {
+			$this->out(' - No configuration found. -');
+			$prompt = 'Please hit enter to add a temporary configuration:';
+		}
+		$this->out();
+
+		$name = $this->in($prompt, array(
+			'choices' => array_keys($configs),
+			'default' => 'temporary'
+		));
+
+		if ($name == 'temporary') {
+			foreach ($options as $option => $default) {
+				$configs[$name][$option] = $this->in(ucfirst($option) . ':', compact('default'));
+			}
+			Catalog::config($configs);
+		}
+		return $name;
 	}
 }
 
