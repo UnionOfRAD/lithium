@@ -155,13 +155,12 @@ class Help extends \lithium\console\Command {
 		$methods = Inspector::methods($class)->map($map, array('collect' => false));
 		$results = array();
 
-		foreach ($methods as $method) {
+		foreach (array_filter($methods) as $method) {
 			$comment = Docblock::comment($method['docComment']);
 
 			$name = $method['name'];
 			$description = $comment['description'];
 			$args = $method['args'];
-
 			$return = null;
 
 			foreach ($args as &$arg) {

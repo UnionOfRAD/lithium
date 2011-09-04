@@ -13,7 +13,7 @@ use lithium\data\Connections;
 use lithium\tests\mocks\data\Company;
 use lithium\tests\mocks\data\Employee;
 
-class SourceTest extends \lithium\test\Unit {
+class SourceTest extends \lithium\test\Integration {
 
 	protected $_connection = null;
 

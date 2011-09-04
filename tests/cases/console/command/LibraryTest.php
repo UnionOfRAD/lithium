@@ -409,7 +409,9 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->skipIf(strpos(shell_exec('git --version'), 'git version') === false,
 			'Git is not installed.'
 		);
-		$this->skipIf(dns_check_record("lithify.me", "ANY") === false, "No internet connection.");
+
+		$message = "No internet connection established.";
+		$this->skipIf(!$this->_hasNetwork(), $message);
 
 		$this->library->path = $this->_testPath;
 		$result = $this->library->install('li3_docs');

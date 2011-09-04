@@ -133,7 +133,7 @@ class Message extends \lithium\net\Message {
 	 *         on the content type of the request.
 	 */
 	public function type($type = null) {
-		if ($type === null) {
+		if ($type == null && $type !== false) {
 			return $this->_type;
 		}
 		if (strpos($type, '/')) {

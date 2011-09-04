@@ -10,8 +10,17 @@ namespace lithium\tests\mocks\core;
 
 class MockRequest extends \lithium\core\Object {
 
+	public $url = null;
+
+	public $params = array();
+
+	public $argv = array();
+
 	public function env($key) {
-		return $this->_config[$key];
+		if(isset($this->_config[$key])) {
+			return $this->_config[$key];
+		}
+		return null;
 	}
 }
 

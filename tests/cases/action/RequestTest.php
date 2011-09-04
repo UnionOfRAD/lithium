@@ -10,6 +10,7 @@ namespace lithium\tests\cases\action;
 
 use lithium\action\Request;
 use lithium\tests\mocks\action\MockIisRequest;
+use lithium\tests\mocks\action\MockNginxRequest;
 use lithium\tests\mocks\action\MockCgiRequest;
 
 class RequestTest extends \lithium\test\Unit {
@@ -288,6 +289,12 @@ class RequestTest extends \lithium\test\Unit {
 		)));
 		$this->assertEqual('application/json; charset=UTF-8', $request->env('CONTENT_TYPE'));
 		$this->assertEqual('json', $request->type());
+	}
+
+	public function testTypeforNginx() {
+		$request = new MockNginxRequest();
+
+		$this->assertEqual('html', $request->type());
 	}
 
 	public function testRefererDefault() {

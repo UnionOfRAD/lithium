@@ -219,8 +219,8 @@ class PostgreSql extends \lithium\data\source\Database {
 			$schema = $_config['schema'];
 			$sql = "SELECT DISTINCT column_name AS field, data_type AS type, is_nullable AS null, ";
 			$sql .= "column_default AS default, ordinal_position AS position, ";
-			$sql .= "character_maximum_length AS char_length, character_octet_length AS oct_length";
-			$sql .= " FROM information_schema.columns WHERE table_name = '{$name}' ";
+			$sql .= "character_maximum_length AS char_length, character_octet_length AS oct_length ";
+			$sql .= "FROM information_schema.columns WHERE table_name = '{$name}' ";
 			$sql .= "and table_schema = '{$schema}' ORDER BY position;";
 
 			$columns = $self->read($sql, array(
@@ -277,7 +277,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @see lithium\data\source\Database::schema()
 	 * @param mixed $value The value to be converted. Arrays will be recursively converted.
 	 * @param array $schema Formatted array from `lithium\data\source\Database::schema()`
-	 * @return mixed Value with converted type.
+	 * @return mixed value with converted type
 	 */
 	public function value($value, array $schema = array()) {
 		if (is_array($value)) {
@@ -353,7 +353,6 @@ class PostgreSql extends \lithium\data\source\Database {
 		return null;
 	}
 
-
 	/**
 	 * @todo Eventually, this will need to rewrite aliases for DELETE and UPDATE queries, same with
 	 *       order().
@@ -417,12 +416,12 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @return mixed Returns the last inserted ID key for an auto-increment column or a column
 	 *         bound to a sequence.
 	 */
-    protected function _insertId($query) {
+	protected function _insertId($query) {
 		$model = $query->model();
 		$columns = $model::schema();
 		foreach ($columns as $column) {
-            if (isset($column['sequence'])) {
-    			$resource = $this->_execute("SELECT currval('{$column['sequence']}') as max");
+			if (isset($column['sequence'])) {
+				$resource = $this->_execute("SELECT currval('{$column['sequence']}') as max");
 				list($id) = $resource->next();
 				break;
 			}
@@ -492,6 +491,7 @@ class PostgreSql extends \lithium\data\source\Database {
 		}
 		return $entity;
 	}
+
 	/**
 	 * Returns a LIMIT statement from the given limit and the offset of the context object.
 	 *
@@ -521,7 +521,7 @@ class PostgreSql extends \lithium\data\source\Database {
 			case ($data === true || $data === false):
 				return $data;
 			case ($data === 't' || $data === 'f'):
-				return ($data === 't')?'true':'false';
+				return ($data === 't') ? 'true' : 'false';
 			case ($data === 'true' || $data === 'false'):
 				return ($data === 'true');
 			case ($data === 'TRUE' || $data === 'FALSE'):

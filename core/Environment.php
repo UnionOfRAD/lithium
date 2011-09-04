@@ -277,8 +277,18 @@ class Environment {
 	 */
 	protected static function _detector() {
 		return static::$_detector ?: function($request) {
+			$isLocal = in_array($request->env('SERVER_ADDR'), array('::1', '127.0.0.1'));
+			$isCli = is_array($request->argv) && !empty($request->argv);
 			switch (true) {
-				case (in_array($request->env('SERVER_ADDR'), array('::1', '127.0.0.1'))):
+				case (isset($request->params['env'])):
+					return $request->params['env'];
+				case ($isCli && $request->argv[0] == 'test'):
+					return 'test';
+				case ($isCli):
+					return 'development';
+				case (preg_match('/^test\//', $request->url) && $isLocal):
+					return 'test';
+				case ($isLocal):
 					return 'development';
 				case (preg_match('/^test/', $request->env('HTTP_HOST'))):
 					return 'test';

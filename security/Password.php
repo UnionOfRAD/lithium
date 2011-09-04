@@ -71,6 +71,7 @@ class Password {
 	 *
 	 * @see lithium\security\Password::check()
 	 * @see lithium\security\Password::salt()
+	 * @link http://php.net/manual/function.crypt.php
 	 * @param string $password The password to hash.
 	 * @param string $salt Optional. The salt string.
 	 * @return string The hashed password.

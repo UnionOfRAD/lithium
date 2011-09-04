@@ -107,6 +107,7 @@ class Memory extends \lithium\core\Object {
 		return function($self, $params) use (&$session) {
 			extract($params);
 			unset($session[$key]);
+			return !isset($session[$key]);
 		};
 	}
 

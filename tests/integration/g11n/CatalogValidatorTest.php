@@ -12,7 +12,7 @@ use lithium\g11n\Catalog;
 use lithium\g11n\catalog\adapter\Memory;
 use lithium\util\Validator;
 
-class CatalogValidatorTest extends \lithium\test\Unit {
+class CatalogValidatorTest extends \lithium\test\Integration {
 
 	protected $_backups = array();
 

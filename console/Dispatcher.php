@@ -9,6 +9,7 @@
 namespace lithium\console;
 
 use lithium\core\Libraries;
+use lithium\core\Environment;
 use UnexpectedValueException;
 
 /**
@@ -82,9 +83,8 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$options += $defaults;
 		$classes = static::$_classes;
 		$params = compact('request', 'options');
-		$method = __FUNCTION__;
 
-		return static::_filter($method, $params, function($self, $params) use ($classes) {
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($classes) {
 			$request = $params['request'];
 			$options = $params['options'];
 
@@ -170,6 +170,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 */
 	protected static function _call($callable, $request, $params) {
 		$params = compact('callable', 'request', 'params');
+		Environment::set($request);
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
 			if (is_callable($callable = $params['callable'])) {
 				$request = $params['request'];

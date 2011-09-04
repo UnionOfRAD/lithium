@@ -110,7 +110,7 @@ class Message extends \lithium\core\Object {
 		$default = array('buffer' => null);
 		$options += $default;
 		$this->body = array_merge((array) $this->body, (array) $data);
-		$body = trim(join("\r\n", $this->body));
+		$body = join("\r\n", $this->body);
 		return ($options['buffer']) ? str_split($body, $options['buffer']) : $body;
 	}
 

@@ -235,6 +235,21 @@ class RequestTest extends \lithium\test\Unit {
 		$result = $this->request->to('context');
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testQueryStringWithArrayValues() {
+		$expected = "?param%5B0%5D=value1&param%5B1%5D=value2";
+		$result = $this->request->queryString(array('param' => array('value1', 'value2')));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testQueryStringWithArrayValuesCustomFormat() {
+		$expected = "?param%5B%5D:value1/param%5B%5D:value2";
+		$result = $this->request->queryString(
+			array('param' => array('value1', 'value2')),
+			"{:key}:{:value}/"
+		);
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

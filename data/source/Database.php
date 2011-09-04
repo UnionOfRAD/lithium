@@ -575,7 +575,7 @@ abstract class Database extends \lithium\data\Source {
 			case (is_numeric($key) && is_string($value)):
 				return $value;
 			case is_string($value):
-				return $this->name($key) . ' = ' . $this->value($value);
+				return $this->name($key) . ' = ' . $this->value($value, $schema[$key]);
 			case is_numeric($key) && is_array($value):
 				$result = array();
 				foreach ($value as $cField => $cValue) {
@@ -599,11 +599,11 @@ abstract class Database extends \lithium\data\Source {
 				}
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
 			case is_array($value):
-				$value = join(', ', $this->value($value, $schema));
+				$value = join(', ', $this->value($value, $schema[$key]));
 				return "{$key} IN ({$value})";
 			default:
 				if (isset($value)) {
-					$value = $this->value($value, $schema);
+					$value = $this->value($value, $schema[$key]);
 					return "{$key} = {$value}";
 				}
 				if ($value === null) {

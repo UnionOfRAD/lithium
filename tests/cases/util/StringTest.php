@@ -463,6 +463,13 @@ class StringTest extends \lithium\test\Unit {
 		$result = String::hash($string, compact('type'));
 		$this->assertEqual($expected, $result);
 	}
+
+	/**
+	 * Verifies that `String::insert()` doesn't completely ignore empty values.
+	 */
+	public function testInsertingEmptyValues() {
+		$this->assertEqual('value="0"', String::insert('value="{:value}"', array('value' => 0)));
+	}
 }
 
 ?>

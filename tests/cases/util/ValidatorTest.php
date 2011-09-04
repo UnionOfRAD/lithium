@@ -387,7 +387,8 @@ class ValidatorTest extends \lithium\test\Unit {
 	 * Tests email address validation, with additional hostname lookup
 	 */
 	public function testEmailDomainCheck() {
-		$this->skipIf(dns_check_record("lithify.me", "ANY") === false, "No internet connection.");
+		$message = "No internet connection established.";
+		$this->skipIf(!$this->_hasNetwork(), $message);
 
 		$this->assertTrue(Validator::isEmail('abc.efg@rad-dev.org', null, array('deep' => true)));
 		$this->assertFalse(Validator::isEmail('abc.efg@invalidfoo.com', null, array(
@@ -952,7 +953,25 @@ class ValidatorTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result);
 	}
+	
+	public function testCheckWithLastRule() {
+		$rules = array(
+			'title' => array('please enter a title'),
+			'email' => array(
+				array('notEmpty', 'message' => 'email is empty', 'last' => true),
+				array('email', 'message' => 'email is invalid'),
+			)
+		);
+		$result = Validator::check(array(), $rules);
+		$this->assertFalse(empty($result));
 
+		$expected = array(
+			'title' => array('title is empty'),
+			'email' => array('email is empty')
+		);
+		$this->assertEqual($expected, $result);
+	}
+	
 	public function testCheckMultipleHasFirstError() {
 		$rules = array(
 			'title' => 'please enter a title',

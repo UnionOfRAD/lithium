@@ -94,6 +94,26 @@ class EnvironmentTest extends \lithium\test\Unit {
 		Environment::set($request);
 		$isProduction = Environment::is('production'); // returns true if not running locally
 		$this->assertTrue($isProduction);
+
+		$request = new MockRequest(array('SERVER_ADDR' => '::1'));
+		$request->url = 'test/myTest';
+		Environment::set($request);
+		$this->assertTrue(Environment::is('test'));
+
+		$request = new MockRequest();
+		$request->argv = array(0 => 'test');
+		Environment::set($request);
+		$this->assertTrue(Environment::is('test'));
+
+		$request = new MockRequest();
+		$request->argv = array(0 => 'something');
+		Environment::set($request);
+		$this->assertTrue(Environment::is('development'));
+
+		$request = new MockRequest();
+		$request->params = array('env' => 'production');
+		Environment::set($request);
+		$this->assertTrue(Environment::is('production'));
 	}
 
 	/**

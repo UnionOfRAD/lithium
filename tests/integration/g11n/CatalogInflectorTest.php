@@ -12,7 +12,7 @@ use lithium\g11n\Catalog;
 use lithium\g11n\catalog\adapter\Memory;
 use lithium\util\Inflector;
 
-class CatalogInflectorTest extends \lithium\test\Unit {
+class CatalogInflectorTest extends \lithium\test\Integration {
 
 	protected $_backups = array();
 
