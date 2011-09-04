@@ -16,8 +16,6 @@ class LocaleTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests composing of a locale from tags.
-	 *
-	 * @return void
 	 */
 	public function testCompose() {
 		$data = array(
@@ -74,8 +72,6 @@ class LocaleTest extends \lithium\test\Unit {
 	/**
 	 * Tests parsing of locales formatted strictly according to
 	 * the definition of the unicode locale identifier.
-	 *
-	 * @return void
 	 */
 	public function testDecomposeStrict() {
 		$expected =  array(
@@ -127,8 +123,6 @@ class LocaleTest extends \lithium\test\Unit {
 	/**
 	 * Tests parsing of locales formatted loosely according to
 	 * the definition of the unicode locale identifier.
-	 *
-	 * @return void
 	 */
 	public function testDecomposeLoose() {
 		$expected =  array(
@@ -161,8 +155,6 @@ class LocaleTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests failing of parsing invalid locales.
-	 *
-	 * @return void
 	 */
 	public function testDecomposeFail()  {
 		$this->expectException();
@@ -184,8 +176,6 @@ class LocaleTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests parsing of locales using shortcut methods.
-	 *
-	 * @return void
 	 */
 	public function testDecomposeUsingShortcutMethods() {
 		$this->assertEqual('zh', Locale::language('zh_Hans_HK_REVISED'));
@@ -209,8 +199,6 @@ class LocaleTest extends \lithium\test\Unit {
 	/**
 	 * Tests if the ouput of `compose()` can be used as the input for `decompose()`
 	 * and vice versa.
-	 *
-	 * @return void
 	 */
 	public function testComposeDecomposeCompose() {
 		$data = array(
@@ -244,8 +232,6 @@ class LocaleTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests cascading of locales.
-	 *
-	 * @return void
 	 */
 	public function testCascade() {
 		$expected = array('root');
@@ -269,8 +255,6 @@ class LocaleTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests formatting of locale.
-	 *
-	 * @return void
 	 */
 	public function testCanonicalize() {
 		$this->assertEqual('en_US', Locale::canonicalize('en-US'));
