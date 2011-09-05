@@ -779,7 +779,6 @@ class MongoDb extends \lithium\data\Source {
 		$defaults = array('schema' => null, 'first' => false);
 		$options += $defaults;
 		$model = null;
-		$exists = false;
 
 		if (!$data) {
 			return $data;
@@ -792,16 +791,11 @@ class MongoDb extends \lithium\data\Source {
 		} elseif ($entity) {
 			$options['schema'] = $options['schema'] ?: $entity->schema();
 			$model = $entity->model();
-
-			if (is_a($entity, $this->_classes['entity'])) {
-				$exists = $entity->exists();
-			}
 		}
 		$schema = $options['schema'] ?: array('_id' => array('type' => 'id'));
 		unset($options['schema']);
-
 		$exporter = $this->_classes['exporter'];
-		$options += compact('model', 'exists') + array('handlers' => $this->_handlers);
+		$options += compact('model') + array('handlers' => $this->_handlers);
 		return parent::cast($entity, $exporter::cast($data, $schema, $this, $options), $options);
 	}
 

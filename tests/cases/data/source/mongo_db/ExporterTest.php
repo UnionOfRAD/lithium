@@ -172,9 +172,6 @@ class ExporterTest extends \lithium\test\Unit {
 		unset($doc->foo, $doc->flagged, $doc->numbers, $doc->deeply->nested);
 
 		$result = Exporter::get('update', $doc->export());
-		$expected = array(
-			'foo' => true, 'flagged' => true, 'numbers' => true, 'deeply.nested' => true
-		);
 		$this->assertEqual(array('update' => array('bar' => 'dib')), $result);
 	}
 
