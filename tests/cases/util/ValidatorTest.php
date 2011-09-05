@@ -243,16 +243,23 @@ class ValidatorTest extends \lithium\test\Unit {
 	public function testBooleanValidation() {
 		$this->assertTrue(Validator::isBoolean(true));
 		$this->assertTrue(Validator::isBoolean(false));
+		$this->assertTrue(Validator::isBoolean('true'));
+		$this->assertTrue(Validator::isBoolean('false'));
 		$this->assertTrue(Validator::isBoolean(0));
 		$this->assertTrue(Validator::isBoolean(1));
 		$this->assertTrue(Validator::isBoolean('0'));
 		$this->assertTrue(Validator::isBoolean('1'));
+		$this->assertTrue(Validator::isBoolean('on'));
+		$this->assertTrue(Validator::isBoolean('off'));
+		$this->assertTrue(Validator::isBoolean('yes'));
+		$this->assertTrue(Validator::isBoolean('no'));
 
 		$this->assertFalse(Validator::isBoolean('11'));
 		$this->assertFalse(Validator::isBoolean('-1'));
 		$this->assertFalse(Validator::isBoolean(-1));
 		$this->assertFalse(Validator::isBoolean(11));
 		$this->assertFalse(Validator::isBoolean(null));
+		$this->assertFalse(Validator::isBoolean('test'));
 	}
 
 	/**

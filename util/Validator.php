@@ -79,7 +79,11 @@ use InvalidArgumentException;
  * - `time`: Checks that a value is a valid time. Validates time as 24hr (HH:MM) or am/pm
  *   ([ H]H:MM[a|p]m). Does not allow / validate seconds.
  *
- * - `boolean`: Checks that a value is a boolean integer or `true` or `false`.
+ * - `boolean`: Checks that the value is or looks like a boolean value. The following types of
+ *   values are interpreted as boolean and will pass the check.
+ *   - boolean (`true`, `false`, `'true'`, `'false'`)
+ *   - boolean number (`1`, `0`, `'1`', `'0`')
+ *   - boolean text string (`'on'`, `'off'`, `'yes'`, `'no'`)
  *
  * - `decimal`: Checks that a value is a valid decimal. Takes one option, `'precision'`, which is
  *   an optional integer value defining the level of precision the decimal number must match.
