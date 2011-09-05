@@ -78,6 +78,11 @@ class CrudTest extends \lithium\test\Integration {
 		$existing->name = 'Big Brother and the Holding Company';
 		$result = $existing->save();
 		$this->assertTrue($result);
+		unset($existing->name);
+		$existing->save();
+		$existing = Companies::first();
+		$this->assertFalse(isset($existing->name));
+		
 
 		$existing = Companies::first();
 		foreach (Companies::key($existing) as $val) {
