@@ -166,8 +166,8 @@ class Request extends \lithium\net\http\Request {
 			unset($_GET['url']);
 		} elseif (isset($this->_env['REQUEST_URI']) && strlen(trim($this->_env['REQUEST_URI'])) > 0) {
 			$this->url = parse_url($this->_env['REQUEST_URI'], PHP_URL_PATH);
+			$this->url = str_replace(trim($this->_base, '/'), '', $this->url);
 		}
-		$this->url = str_replace(trim($this->_base, '/'), '', $this->url);
 		
 		if (!empty($this->_config['query'])) {
 			$this->query = $this->_config['query'];
