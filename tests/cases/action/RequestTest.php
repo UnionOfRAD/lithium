@@ -141,9 +141,10 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual('/lithium.com', $request->env('base'));
 	}
 	
-	public function testRequestToBaseWithDirectory() {
-		$request = new Request(array('url' => '/test_app', 'env' => array(
-			'PHP_SELF' => '/test_app/app/webroot/index.php'
+	public function testRequestToBaseWithDirectory() {		
+		$request = new Request(array('env' => array(
+			'PHP_SELF' => '/test_app/app/webroot/index.php',
+			'REQUEST_URI' => '/test_app'
 		)));
 		$this->assertEqual('/test_app', $request->env('base'));
 		$this->assertEqual('/', $request->url);	
