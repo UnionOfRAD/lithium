@@ -703,6 +703,20 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertEqual(join('', $expected), $result);
 	}
 
+	public function testFormFieldWithCustomConfig() {
+		$this->form->config(array('field' => array('class' => 'custom-field')));
+		$result = $this->form->field('username');
+
+		$this->assertTags($result, array(
+			'div' => array(),
+			'label' => array('for' => 'Username'),
+			'Username',
+			'/label',
+			'input' => array('type' => 'text', 'name' => 'username', 'class' => 'custom-field', 'id' => 'Username'),
+			'/div'
+		));
+	}
+
 	/**
 	 * Verifies that calls to `field()` with `'type' => 'hidden'` do not produce `<label />`s.
 	 */
