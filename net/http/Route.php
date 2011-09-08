@@ -179,8 +179,10 @@ class Route extends \lithium\core\Object {
 
 	protected function _init() {
 		parent::_init();
-		$this->_params += array('action' => 'index');
 
+		if (!$this->_config['continue']) {
+			$this->_params += array('action' => 'index');
+		}
 		if (!$this->_config['pattern']) {
 			$this->compile();
 		}
@@ -245,9 +247,11 @@ class Route extends \lithium\core\Object {
 	 */
 	public function match(array $options = array(), $context = null) {
 		$defaults = array('action' => 'index');
-		$options += $defaults;
 		$query = null;
 
+		if (!$this->_config['continue']) {
+			$options += $defaults;
+		}
 		if (isset($options['?'])) {
 			$query = $options['?'];
 			$query = '?' . (is_array($query) ? http_build_query($query) : $query);
@@ -262,7 +266,12 @@ class Route extends \lithium\core\Object {
 				return false;
 			}
 		}
-		return $this->_write($options, $defaults + $this->_defaults + array('args' => '')) . $query;
+		$defaults = $this->_defaults + $defaults;
+
+		if ($this->_config['continue']) {
+			return $this->_write(array('args' => '{:args}') + $options, $this->_defaults) . $query;
+		}
+		return $this->_write($options, $defaults + array('args' => '')) . $query;
 	}
 
 	/**
@@ -291,7 +300,11 @@ class Route extends \lithium\core\Object {
 		if (array_intersect_key($options, $this->_match) != $this->_match) {
 			return false;
 		}
-		if (array_diff_key(array_diff_key($options, $this->_match), $this->_keys) !== array()) {
+		if (!$this->_config['continue']) {
+			if (array_diff_key(array_diff_key($options, $this->_match), $this->_keys) !== array()) {
+				return false;
+			}
+		} elseif (!array_intersect_key($this->_keys, $options)) {
 			return false;
 		}
 		$options += $this->_defaults;
@@ -395,28 +408,45 @@ class Route extends \lithium\core\Object {
 
 		foreach ($params as $i => $param) {
 			$this->_keys[$param] = $param;
-
-			if ($regexs[$i]) {
-				$regex = $regexs[$i];
-				$this->_subPatterns[$param] = $regex;
-			} elseif ($param == 'args') {
-				$regex = '.*';
-			} else {
-				$regex = '[^\/]+';
-			}
-			$req = $param === 'args' || array_key_exists($param, $this->_params) ? '?' : '';
-
-			if ($slashes[$i] === '/') {
-				$pattern = "(?:/(?P<{$param}>{$regex}){$req}){$req}";
-			} elseif ($slashes[$i] === '.') {
-				$pattern = "\\.(?P<{$param}>{$regex}){$req}";
-			} else {
-				$pattern = "(?P<{$param}>{$regex}){$req}";
-			}
-			$this->_pattern = str_replace("{$tokens[$i]}", $pattern, $this->_pattern);
+			$this->_pattern = $this->_regex($regexs[$i], $param, $tokens[$i], $slashes[$i]);
 		}
 		$this->_defaults = array_intersect_key($this->_params, $this->_keys);
 		$this->_match = array_diff_key($this->_params, $this->_defaults);
+	}
+
+	/**
+	 * Generates a sub-expression capture group for a route regex, using an optional user-supplied
+	 * matching pattern.
+	 *
+	 * @param string $regex An optional user-supplied match pattern. If a route is defined like
+	 *               `"/{:id:\d+}"`, then the value will be `"\d+"`.
+	 * @param string $param The parameter name which the capture group is assigned to, i.e.
+	 *               `'controller'`, `'id'` or `'args'`.
+	 * @param string $prefix The prefix character that separates the parameter from the other
+	 *               elements of the route. Usually `'.'` or `'/'`.
+	 * @param string $token The full token representing a matched element in a route template, i.e.
+	 *               `'/{:action}'`, `'/{:path:js|css}'`, or `'.{:type}'`.
+	 * @return string Returns the full route template, with the value of `$token` replaced with a
+	 *         generated regex capture group.
+	 */
+	protected function _regex($regex, $param, $token, $prefix) {
+		if ($regex) {
+			$this->_subPatterns[$param] = $regex;
+		} elseif ($param == 'args') {
+			$regex = '.*';
+		} else {
+			$regex = '[^\/]+';
+		}
+		$req = $param === 'args' || array_key_exists($param, $this->_params) ? '?' : '';
+
+		if ($prefix === '/') {
+			$pattern = "(?:/(?P<{$param}>{$regex}){$req}){$req}";
+		} elseif ($prefix === '.') {
+			$pattern = "\\.(?P<{$param}>{$regex}){$req}";
+		} else {
+			$pattern = "(?P<{$param}>{$regex}){$req}";
+		}
+		return str_replace($token, $pattern, $this->_pattern);
 	}
 }
 
