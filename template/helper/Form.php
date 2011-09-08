@@ -398,16 +398,16 @@ class Form extends \lithium\template\Helper {
 			'list' => null
 		);
 		$type = isset($options['type']) ? $options['type'] : $defaults['type'];
-
 		if ($this->_context->strings('field-' . $type)) {
-			$defaults['template'] = 'field-' . $type;
+			$options['template'] = 'field-' . $type;
 		}
-		list($options, $fieldOptions) = $this->_options($defaults, $options);
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		list($options, $fieldOptions) = $this->_options($defaults, $options);
 
 		if ($options['template'] != $defaults['template']) {
 			$template = $options['template'];
 		}
+
 		$wrap = $options['wrap'];
 		$type = $options['type'];
 		$label = $input = null;

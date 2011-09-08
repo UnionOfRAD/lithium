@@ -161,9 +161,7 @@ class Controller extends \lithium\core\Object {
 		$params = compact('request', 'dispatchParams', 'options');
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$render) {
-			$request = $params['request'];
 			$dispatchParams = $params['dispatchParams'];
-			$options = $params['options'];
 
 			$action = isset($dispatchParams['action']) ? $dispatchParams['action'] : 'index';
 			$args = isset($dispatchParams['args']) ? $dispatchParams['args'] : array();
