@@ -161,11 +161,9 @@ class Request extends \lithium\net\http\Request {
 
 		if (isset($this->_config['url'])) {
 			$this->url = rtrim($this->_config['url'], '/');
-		} elseif (!empty($_GET['url']) ) {
+		} elseif (isset($_GET['url'])) {
 			$this->url = rtrim($_GET['url'], '/');
 			unset($_GET['url']);
-		} elseif (isset($_SERVER['REQUEST_URI']) && strlen(trim($_SERVER['REQUEST_URI'])) > 0) {
-			$this->url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 		}
 		if (!empty($this->_config['query'])) {
 			$this->query = $this->_config['query'];
