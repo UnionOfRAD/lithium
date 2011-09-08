@@ -547,8 +547,18 @@ class RouteTest extends \lithium\test\Unit {
 	public function testContinuationRoute() {
 		$route = new Route();
 		$this->assertFalse($route->canContinue());
+
 		$route = new Route(array('continue' => true));
 		$this->assertTrue($route->canContinue());
+
+		$route = new Route(array(
+			'template' => '/admin/{:args}',
+			'continue' => true,
+			'params' => array('admin' => true)
+		));
+
+		$result = $route->match(array('admin' => true, 'args' => ''));
+		$this->assertEqual('/admin/{:args}', $result);
 	}
 }
 

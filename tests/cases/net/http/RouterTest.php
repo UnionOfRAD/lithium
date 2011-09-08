@@ -139,8 +139,7 @@ class RouterTest extends \lithium\test\Unit {
 		}
 
 		$this->request->url = '/posts/view/1';
-		$result = Router::parse($this->request);
-		$this->assertNull($result);
+		$this->assertNull(Router::parse($this->request));
 	}
 
 	/**
@@ -308,10 +307,10 @@ class RouterTest extends \lithium\test\Unit {
 	 */
 	public function testRouteMatchingWithInsertsAndDefaults() {
 		Router::connect('/{:controller}/{:action}', array('action' => 'archive'));
-		$this->assertEqual('/posts', Router::match(array('controller' => 'posts')));
+		$this->assertEqual('/posts/index', Router::match(array('controller' => 'posts')));
 
 		$result = Router::match(array('controller' => 'posts', 'action' => 'archive'));
-		$this->assertEqual('/posts/archive', $result);
+		$this->assertEqual('/posts', $result);
 
 		Router::reset();
 		Router::connect('/{:controller}/{:action}', array('controller' => 'users'));
@@ -648,6 +647,9 @@ class RouterTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result);
 
+		$request = new Request(array('url' => '/en/foo/bar/baz'));
+		$this->assertNull(Router::parse($request));
+
 		Router::reset();
 		Router::connect('/{:args}/{:locale:en|de|it|jp}', array(), array('continue' => true));
 		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}');
@@ -655,6 +657,17 @@ class RouterTest extends \lithium\test\Unit {
 		$request = new Request(array('url' => '/posts/view/1138/en'));
 		$result = Router::process($request)->params;
 		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * Tests that URLs are properly generated with route continuations.
+	 */
+	public function testReversingContinuations() {
+		Router::connect('/{:locale:en|de|it|jp}/{:args}', array(), array('continue' => true));
+		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}');
+
+		$result = Router::match(array('Posts::view', 'id' => 5, 'locale' => 'de'));
+		$this->assertEqual($result, '/de/posts/view/5');
 	}
 }
 
