@@ -161,7 +161,10 @@ class Encrypt extends \lithium\core\Object {
 	 * @return string A Base64 encoded and encrypted string.
 	 */
 	protected function _encrypt($decrypted = array()) {
-		extract($this->_config);
+		$cipher = $this->_config['cipher'];
+		$secret = $this->_config['secret'];
+		$mode   = $this->_config['mode'];
+		$vector = $this->_config['vector'];
 
 		$encrypted = mcrypt_encrypt($cipher, $secret, serialize($decrypted), $mode, $vector);
 		$data = base64_encode($encrypted) . base64_encode($vector);
@@ -176,7 +179,10 @@ class Encrypt extends \lithium\core\Object {
 	 * @return array The cleartext data.
 	 */
 	protected function _decrypt($encrypted) {
-		extract($this->_config);
+		$cipher = $this->_config['cipher'];
+		$secret = $this->_config['secret'];
+		$mode   = $this->_config['mode'];
+		$vector = $this->_config['vector'];
 
 		$vectorSize = strlen(base64_encode(str_repeat(" ", static::_vectorSize($cipher, $mode))));
 		$vector = base64_decode(substr($encrypted, -$vectorSize));
