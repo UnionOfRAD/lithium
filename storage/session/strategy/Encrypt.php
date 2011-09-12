@@ -61,9 +61,11 @@ class Encrypt extends \lithium\core\Object {
 			'mode' => MCRYPT_MODE_CBC
 		);
 		parent::__construct($config + $defaults);
-		$this->_config['vector'] = static::_vector($this->_config['cipher'], $this->_config['mode']);
+
+		extract($this->_config);
+		$this->_config['vector'] = static::_vector($cipher, $mode);
 	}
-	
+
 	/**
 	 * Read encryption method.
 	 *
@@ -73,17 +75,17 @@ class Encrypt extends \lithium\core\Object {
 	 */
 	public function read($data, array $options = array()) {
 		$class = $options['class'];
-		
+
 		$encrypted = $class::read(null, array('strategies' => false));
 		$key = isset($options['key']) ? $options['key'] : null;
-		
+
 		if (!isset($encrypted['__encrypted']) || !$encrypted['__encrypted']) {
 			return isset($encrypted[$key]) ? $encrypted[$key] : null;
 		}
-		
+
 		$current = $this->_decrypt($encrypted['__encrypted']);
-		
-		if($key) {
+
+		if ($key) {
 			return isset($current[$key]) ? $current[$key] : null;
 		} else {
 			return $current;
@@ -121,7 +123,7 @@ class Encrypt extends \lithium\core\Object {
 
 		$futureData = $this->read(null, array('key' => null) + $options) ?: array();
 		unset($futureData[$options['key']]);
-		
+
 		$payload = empty($futureData) ? null : $this->_encrypt($futureData);
 
 		$class::write('__encrypted', $payload, array('strategies' => false) + $options);
@@ -145,10 +147,10 @@ class Encrypt extends \lithium\core\Object {
 	 */
 	protected function _encrypt($decrypted = array()) {
 		extract($this->_config);
-		
+
 		$encrypted = mcrypt_encrypt($cipher, $secret, serialize($decrypted), $mode, $vector);
 		$data = base64_encode($encrypted) . base64_encode($vector);
-		
+
 		return $data;
 	}
 
@@ -160,7 +162,7 @@ class Encrypt extends \lithium\core\Object {
 	 */
 	protected function _decrypt($encrypted) {
 		extract($this->_config);
-		
+
 		$vectorSize = strlen(base64_encode(str_repeat(" ", static::_vectorSize($cipher, $mode))));
 		$vector = base64_decode(substr($encrypted, -$vectorSize));
 		$data = base64_decode(substr($encrypted, 0, -$vectorSize));
@@ -180,7 +182,7 @@ class Encrypt extends \lithium\core\Object {
 	 * @link http://www.php.net/manual/en/function.mcrypt-create-iv.php
 	 */
 	protected static function _vector($cipher, $mode) {
-		if(static::$_vector) {
+		if (static::$_vector) {
 			return static::$_vector;
 		}
 
@@ -199,3 +201,5 @@ class Encrypt extends \lithium\core\Object {
 		return mcrypt_get_iv_size($cipher, $mode);
 	}
 }
+
+?>
