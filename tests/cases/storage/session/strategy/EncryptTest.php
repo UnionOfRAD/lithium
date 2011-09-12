@@ -68,7 +68,7 @@ class EncryptTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 		
 		$cookie = MockCookieSession::data();
-		$result = $encrypt->read($key, array('class' => $this->mock));
+		$result = $encrypt->read($key, array('class' => $this->mock, 'key' => $key));
 		
 		$this->assertEqual($value, $result);
 		$this->assertNotEqual($cookie['__encrypted'], $result);
@@ -84,7 +84,7 @@ class EncryptTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$cookie = MockCookieSession::data();
-		$result = $encrypt->read($key, array('class' => $this->mock));
+		$result = $encrypt->read($key, array('class' => $this->mock, 'key' => $key));
 
 		$this->assertEqual($value, $result);
 		

@@ -75,15 +75,16 @@ class Encrypt extends \lithium\core\Object {
 		$class = $options['class'];
 		
 		$encrypted = $class::read(null, array('strategies' => false));
+		$key = isset($options['key']) ? $options['key'] : null;
 		
 		if (!isset($encrypted['__encrypted']) || !$encrypted['__encrypted']) {
-			return isset($encrypted[$data]) ? $encrypted[$data] : null;
+			return isset($encrypted[$key]) ? $encrypted[$key] : null;
 		}
 		
 		$current = $this->_decrypt($encrypted['__encrypted']);
 		
-		if($data) {
-			return isset($current[$data]) ? $current[$data] : null;
+		if($key) {
+			return isset($current[$key]) ? $current[$key] : null;
 		} else {
 			return $current;
 		}
@@ -99,7 +100,7 @@ class Encrypt extends \lithium\core\Object {
 	public function write($data, array $options = array()) {
 		$class = $options['class'];
 
-		$futureData = $this->read(null, $options) ?: array();
+		$futureData = $this->read(null, array('key' => null) + $options) ?: array();
 		$futureData = array($options['key'] => $data) + $futureData;
 
 		$payload = empty($futureData) ? null : $this->_encrypt($futureData);
@@ -118,7 +119,7 @@ class Encrypt extends \lithium\core\Object {
 	public function delete($data, array $options = array()) {
 		$class = $options['class'];
 
-		$futureData = $this->read(null, $options) ?: array();
+		$futureData = $this->read(null, array('key' => null) + $options) ?: array();
 		unset($futureData[$options['key']]);
 		
 		$payload = empty($futureData) ? null : $this->_encrypt($futureData);
