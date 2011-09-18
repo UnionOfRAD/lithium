@@ -103,9 +103,11 @@ class Command extends \lithium\core\Object {
 	 */
 	public function __invoke($action, $args = array(), $options = array()) {
 		try {
-			$message = 'Lithium console started in the ' . Environment::get() .' environment.';
-			$message .= ' Use the --env=environment key to alter this.';
-			$this->out($message);
+			if (!$this->request->env) {
+				$message = 'Lithium console started in the ' . Environment::get() .' environment.';
+				$message .= ' Use the --env=environment key to alter this.';
+				$this->out($message);
+			}
 			$this->response->status = 1;
 			$result = $this->invokeMethod($action, $args);
 
