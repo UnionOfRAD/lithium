@@ -286,6 +286,9 @@ abstract class Database extends \lithium\data\Source {
 							)
 						));
 					$ids = $self->read($subQuery, array('subquery' => true));
+					if (!$ids->count()) {
+						return false;
+					}
 					$idData = $ids->data();
 					$ids = array_map(function($index) use ($key) {
 							return $index[$key];
