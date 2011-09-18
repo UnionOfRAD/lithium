@@ -24,10 +24,13 @@ class Stream extends \lithium\net\Socket {
 	/**
 	 * Opens a socket and initializes the internal resource handle.
 	 *
-	 * @return mixed False if the Socket configuration does not contain the
-	 *		   'protocol' or 'host' settings,  socket resource otherwise.
+	 * @param array $options update the config settings
+	 * @return mixed Returns `false` if the socket configuration does not contain the
+	 *         `'scheme'` or `'host'` settings, or if configuration fails, otherwise returns a
+	 *         resource stream. Throws exception if there is a network error.
 	 */
-	public function open() {
+	public function open(array $options = array()) {
+		parent::open($options);
 		$config = $this->_config;
 
 		if (!$config['scheme'] || !$config['host']) {
@@ -44,7 +47,6 @@ class Stream extends \lithium\net\Socket {
 		$this->_resource = stream_socket_client(
 			$host, $errorCode, $errorMessage, $config['timeout'], $flags
 		);
-
 		if ($errorCode || $errorMessage) {
 			throw new NetworkException($errorMessage);
 		}
