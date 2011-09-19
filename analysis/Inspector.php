@@ -206,7 +206,7 @@ class Inspector extends \lithium\core\StaticObject {
 			$lines = array_intersect_key($file, array_flip($result));
 			$result = array_keys(array_filter($lines, function($line) use ($options) {
 				$line = trim($line);
-				$empty = (strpos($line, '//') === 0 || preg_match($options['pattern'], $line));
+				$empty = (preg_match('/^\/(\/|\*)/', $line) || preg_match($options['pattern'], $line));
 				return $empty ? false : (str_replace($options['empty'], '', $line) != '');
 			}));
 		}
