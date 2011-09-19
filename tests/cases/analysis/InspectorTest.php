@@ -76,7 +76,10 @@ class InspectorTest extends \lithium\test\Unit {
 	public function testExecutableLines() {
 		do {
 			// These lines should be ignored
-                        /* Should also ignore C-style comments like this */                    
+                        /* Should also ignore C-style comments like this */
+                        /**
+                         * And also multi-line comments like this
+                         */
 		} while (false);
 
 		$result = Inspector::executable($this, array('methods' => __FUNCTION__));
