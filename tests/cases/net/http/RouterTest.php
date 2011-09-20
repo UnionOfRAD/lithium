@@ -657,6 +657,15 @@ class RouterTest extends \lithium\test\Unit {
 		$request = new Request(array('url' => '/posts/view/1138/en'));
 		$result = Router::process($request)->params;
 		$this->assertEqual($expected, $result);
+
+		Router::reset();
+		Router::connect('/{:locale:en|de|it|jp}/{:args}', array(), array('continue' => true));
+		Router::connect('/', 'Pages::view');
+
+		$request = new Request(array('url' => '/en'));
+		$result = Router::process($request)->params;
+		$expected = array('locale' => 'en', 'controller' => 'pages', 'action' => 'view');
+		$this->assertEqual($expected, $result);
 	}
 
 	/**
@@ -668,6 +677,13 @@ class RouterTest extends \lithium\test\Unit {
 
 		$result = Router::match(array('Posts::view', 'id' => 5, 'locale' => 'de'));
 		$this->assertEqual($result, '/de/posts/view/5');
+
+		Router::reset();
+		Router::connect('/{:locale:en|de|it|jp}/{:args}', array(), array('continue' => true));
+		Router::connect('/pages/{:args}', 'Pages::view');
+
+		$result = Router::match(array('Pages::view', 'locale' => 'en', 'args' => array('about')));
+		$this->assertEqual('/en/pages/about', $result);
 	}
 }
 
