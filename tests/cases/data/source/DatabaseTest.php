@@ -656,6 +656,17 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $this->db->sql);
 	}
 
+	public function testReadWithHasManyAndLimit() {
+		$options = array(
+			'type' => 'read',
+			'model' => $this->_model,
+			'with' => array('MockDatabaseComment'),
+			'limit' => 1
+		);
+		$result = $this->db->read(new Query($options), $options);
+		$this->assertFalse($result);
+	}
+
 	public function testGroup() {
 		$result = $this->db->group(array('id ASC'));
 		$expected = 'GROUP BY id ASC';

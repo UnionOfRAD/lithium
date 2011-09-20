@@ -156,17 +156,9 @@ class Request extends \lithium\net\http\Request {
 		$this->_env += (array) $_SERVER + (array) $_ENV + $defaults;
 		$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
 		$this->_env['PLATFORM'] = isset($envs[PHP_SAPI]) ? $envs[PHP_SAPI] : null;
-		$this->_base = isset($this->_base) ? $this->_base : $this->_base();
-		$this->url = '/';
+		$this->_base = $this->_base();
+		$this->url = $this->_url();
 
-		if (isset($this->_config['url'])) {
-			$this->url = rtrim($this->_config['url'], '/');
-		} elseif (!empty($_GET['url']) ) {
-			$this->url = rtrim($_GET['url'], '/');
-			unset($_GET['url']);
-		} elseif (isset($_SERVER['REQUEST_URI']) && strlen(trim($_SERVER['REQUEST_URI'])) > 0) {
-			$this->url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-		}
 		if (!empty($this->_config['query'])) {
 			$this->query = $this->_config['query'];
 		}
@@ -197,41 +189,7 @@ class Request extends \lithium\net\http\Request {
 				fclose($this->_stream);
 			}
 		}
-
-		if (isset($_FILES) && $_FILES) {
-			$result = array();
-
-			$normalize = function($key, $value) use ($result, &$normalize){
-				foreach ($value as $param => $content) {
-					foreach ($content as $num => $val) {
-						if (is_numeric($num)) {
-							$result[$key][$num][$param] = $val;
-							continue;
-						}
-						if (is_array($val)) {
-							foreach ($val as $next => $one) {
-								$result[$key][$num][$next][$param] = $one;
-							}
-							continue;
-						}
-						$result[$key][$num][$param] = $val;
-					}
-				}
-				return $result;
-			};
-			foreach ($_FILES as $key => $value) {
-				if (isset($value['name'])) {
-					if (is_string($value['name'])) {
-						$result[$key] = $value;
-						continue;
-					}
-					if (is_array($value['name'])) {
-						$result += $normalize($key, $value);
-					}
-				}
-			}
-			$this->data = Set::merge((array) $this->data, $result);
-		}
+		$this->data = Set::merge((array) $this->data, $this->_parseFiles());
 	}
 
 	/**
@@ -589,12 +547,78 @@ class Request extends \lithium\net\http\Request {
 	}
 
 	/**
+	 * Find the base path of the current request.
+	 *
 	 * @todo Replace string directory names with configuration.
-	 * @return void
+	 * @return string
 	 */
 	protected function _base() {
+		if (isset($this->_base)) {
+			return $this->_base;
+		}
 		$base = str_replace('\\', '/', dirname($this->env('PHP_SELF')));
 		return rtrim(str_replace(array("/app/webroot", '/webroot'), '', $base), '/');
+	}
+
+	/**
+	 * Return the full url of the current request.
+	 *
+	 * @return string
+	 */
+	protected function _url() {
+		if (isset($this->_config['url'])) {
+			return rtrim($this->_config['url'], '/');
+		}
+		if (!empty($_GET['url']) ) {
+			return rtrim($_GET['url'], '/');
+		}
+		if ($uri = $this->env('REQUEST_URI')) {
+			return str_replace($this->env('base'), '/', parse_url($uri, PHP_URL_PATH));
+		}
+		return '/';
+	}
+
+	/**
+	 * Normalize the data in $_FILES
+	 *
+	 * @return array
+	 */
+	protected function _parseFiles() {
+		if (isset($_FILES) && $_FILES) {
+			$result = array();
+
+			$normalize = function($key, $value) use ($result, &$normalize){
+				foreach ($value as $param => $content) {
+					foreach ($content as $num => $val) {
+						if (is_numeric($num)) {
+							$result[$key][$num][$param] = $val;
+							continue;
+						}
+						if (is_array($val)) {
+							foreach ($val as $next => $one) {
+								$result[$key][$num][$next][$param] = $one;
+							}
+							continue;
+						}
+						$result[$key][$num][$param] = $val;
+					}
+				}
+				return $result;
+			};
+			foreach ($_FILES as $key => $value) {
+				if (isset($value['name'])) {
+					if (is_string($value['name'])) {
+						$result[$key] = $value;
+						continue;
+					}
+					if (is_array($value['name'])) {
+						$result += $normalize($key, $value);
+					}
+				}
+			}
+			return $result;
+		}
+		return array();
 	}
 }
 
