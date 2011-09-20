@@ -684,6 +684,13 @@ class RouterTest extends \lithium\test\Unit {
 
 		$result = Router::match(array('Pages::view', 'locale' => 'en', 'args' => array('about')));
 		$this->assertEqual('/en/pages/about', $result);
+
+		Router::reset();
+		Router::connect('/admin/{:args}', array('admin' => true), array('continue' => true));
+		Router::connect('/login', 'Users::login');
+
+		$result = Router::match(array('Users::login', 'admin' => true));
+		$this->assertEqual('/admin/login', $result);
 	}
 }
 
