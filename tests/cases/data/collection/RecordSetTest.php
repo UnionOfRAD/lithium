@@ -383,22 +383,10 @@ class RecordSetTest extends \lithium\test\Unit {
 			4 => array('id' => 4, 'data' => 'data4')
 		);
 		$this->assertEqual($expected, $this->_recordSet->to('array'));
-		
-		$expected = array(
-			array('id' => 1, 'data' => 'data1'),
-			array('id' => 2, 'data' => 'data2'),
-			array('id' => 3, 'data' => 'data3'),
-			array('id' => 4, 'data' => 'data4')
-		);
-		$this->assertEqual($expected, $this->_recordSet->to('array', array('indexed' => false)));
 
 		$expected = '{"1":{"id":1,"data":"data1"},"2":{"id":2,"data":"data2"},'
 			. '"3":{"id":3,"data":"data3"},"4":{"id":4,"data":"data4"}}';
 		$this->assertEqual($expected, $this->_recordSet->to('json'));
-		
-		$expected = '[{"id":1,"data":"data1"},{"id":2,"data":"data2"},'
-			.	'{"id":3,"data":"data3"},{"id":4,"data":"data4"}]';
-		$this->assertEqual($expected, $this->_recordSet->to('json', array('indexed' => false)));
 	}
 
 	public function testRecordSetFindFilter() {
