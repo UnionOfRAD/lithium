@@ -222,6 +222,9 @@ class Route extends \lithium\core\Object {
 		if (isset($match['args'])) {
 			$match['args'] = explode('/', $match['args']);
 		}
+		if (isset($this->_keys['args'])) {
+			$match += array('args' => array());
+		}
 		$result = array_intersect_key($match, $this->_keys) + $this->_params + $this->_defaults;
 
 		if (isset($result['action']) && !$result['action']) {

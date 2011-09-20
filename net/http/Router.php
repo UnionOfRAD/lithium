@@ -223,6 +223,7 @@ class Router extends \lithium\core\StaticObject {
 				$stack[] = $match;
 				$export = $route->export();
 				$keys = $export['match'] + $export['keys'] + $export['defaults'];
+				unset($keys['args']);
 				$url = array_diff_key($url, $keys);
 				continue;
 			}
