@@ -435,7 +435,8 @@ class Validator extends \lithium\core\StaticObject {
 			'skipEmpty' => false,
 			'format' => 'any',
 			'on' => null,
-			'last' => false
+			'last' => false,
+			'if' => null
 		);
 		$errors = array();
 		$events = (array) (isset($options['events']) ? $options['events'] : null);
@@ -451,6 +452,9 @@ class Validator extends \lithium\core\StaticObject {
 				$rule += $defaults + compact('values');
 				list($name) = $rule;
 
+				if ($rule['if'] && is_object($rule['if']) && $rule['if']($values, $rules, $options)) {
+					continue;
+				}
 				if ($events && $rule['on'] && !array_intersect($events, (array) $rule['on'])) {
 					continue;
 				}

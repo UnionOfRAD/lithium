@@ -1125,6 +1125,25 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testIfs() {
+		$rules = array('number' => array('numeric', 'message' => 'Badness!'));
+		$expected = array('number' => array('Badness!'));
+
+		$result = Validator::check(array('number' => 'o'), $rules);
+		$this->assertEqual($expected, $result);
+
+		$rules['number']['if'] = function ($values, $rules, $options = array()) { return empty($values['name'])? true: false; };
+		$result = Validator::check(array('name' => 'foo', 'number' => 'o'), $rules);
+		$this->assertEqual($expected, $result);
+
+		$result = Validator::check(array('name' => '', 'number' => 'o'), $rules);
+		$this->assertEqual(array(), $result);
+
+		$rules['number']['if'] = '';
+		$result = Validator::check(array('number' => 'o'), $rules);
+		$this->assertEqual($expected, $result);
+	}
+
 	/**
 	 * Tests validating nested fields using dot-separated paths.
 	 */
