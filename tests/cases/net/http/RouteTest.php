@@ -560,6 +560,22 @@ class RouteTest extends \lithium\test\Unit {
 		$result = $route->match(array('admin' => true, 'args' => ''));
 		$this->assertEqual('/admin/{:args}', $result);
 	}
+
+	public function testContinuationRouteWithParameters() {
+		$route = new Route(array(
+			'template' => '/admin/{:args}',
+			'continue' => true,
+			'params' => array('admin' => true)
+		));
+
+		$result = $route->match(array(
+			'admin' => true, 'controller' => 'users', 'action' => 'login'
+		));
+		$this->assertEqual('/admin/{:args}', $result);
+
+		$result = $route->match(array('controller' => 'users', 'action' => 'login'));
+		$this->assertFalse($result);
+	}
 }
 
 ?>

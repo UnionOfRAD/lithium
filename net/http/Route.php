@@ -307,8 +307,6 @@ class Route extends \lithium\core\Object {
 			if (array_diff_key(array_diff_key($options, $this->_match), $this->_keys) !== array()) {
 				return false;
 			}
-		} elseif (!array_intersect_key($this->_keys, $options)) {
-			return false;
 		}
 		$options += $this->_defaults;
 
