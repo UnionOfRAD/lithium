@@ -147,12 +147,15 @@ class ExporterTest extends \lithium\test\Unit {
 		$doc->newObject = new Document(array(
 			'exists' => false, 'data' => array('subField' => 'subValue')
 		));
-
 		$this->assertEqual('foo', $doc->deeply->nested);
 		$this->assertEqual('subValue', $doc->newObject->subField);
 
+		$doc->numbers = array(8, 9);
+
 		$result = Exporter::get('update', $doc->export());
+		var_dump($result);
 		$expected = array(
+			'numbers' => array(8, 9),
 			'newObject' => array('subField' => 'subValue'),
 			'field' => 'value',
 			'deeply.nested' => 'foo'
@@ -168,14 +171,22 @@ class ExporterTest extends \lithium\test\Unit {
 			)),
 			'foo' => 'bar'
 		)));
-		$doc->set(array('flagged' => true, 'foo' => 'baz', 'bar' => 'dib'));
-		unset($doc->foo, $doc->flagged, $doc->numbers, $doc->deeply->nested);
 
+		unset($doc->numbers);
 		$result = Exporter::get('update', $doc->export());
 		$expected = array(
-			'foo' => true, 'flagged' => true, 'numbers' => true, 'deeply.nested' => true
+			'numbers' => true
 		);
-		$this->assertEqual(array('update' => array('bar' => 'dib')), $result);
+		$this->assertEqual($expected, $result['remove']);
+
+		$doc->set(array('flagged' => true, 'foo' => 'baz', 'bar' => 'dib'));
+		unset($doc->foo, $doc->flagged, $doc->numbers, $doc->deeply->nested);
+		$result = Exporter::get('update', $doc->export());
+		$expected = array(
+			'foo' => true, 'deeply.nested' => true, 'numbers' => true
+		);
+		$this->assertEqual($expected, $result['remove']);
+		$this->assertEqual(array('bar' => 'dib'), $result['update']);
 	}
 
 	/**
