@@ -955,6 +955,27 @@ class ValidatorTest extends \lithium\test\Unit {
 		$result = Validator::check($data, $rules);
 		$this->assertTrue(empty($result));
 	}
+	
+	public function testCheckSkipEmpty() {
+		$rules = array(
+			'email' => array('email', 'skipEmpty' => true, 'message' => 'email is not valid')
+		);
+		
+		// empty string should pass
+		$data = array('email' => '');
+		$result = Validator::check($data, $rules);
+		$this->assertTrue(empty($result));
+		
+		// null value should pass
+		$data = array('email' => null);
+		$result = Validator::check($data, $rules);
+		$this->assertTrue(empty($result));
+		
+		// string with spaces should NOT pass
+		$data = array('email' => ' ');
+		$result = Validator::check($data, $rules);
+		$this->assertFalse(empty($result));
+	}
 
 	public function testCheckMultipleHasErrors() {
 		$rules = array(
