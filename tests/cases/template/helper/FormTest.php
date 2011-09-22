@@ -712,7 +712,12 @@ class FormTest extends \lithium\test\Unit {
 			'label' => array('for' => 'Username'),
 			'Username',
 			'/label',
-			'input' => array('type' => 'text', 'name' => 'username', 'class' => 'custom-field', 'id' => 'Username'),
+			'input' => array(
+				'type' => 'text',
+				'name' => 'username',
+				'class' => 'custom-field',
+				'id' => 'Username'
+			),
 			'/div'
 		));
 	}

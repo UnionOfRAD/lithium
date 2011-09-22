@@ -64,7 +64,7 @@ class Form extends \lithium\template\Helper {
 		'submit-image'   => '<input type="image" src="{:url}"{:options} />',
 		'text'           => '<input type="text" name="{:name}"{:options} />',
 		'textarea'       => '<textarea name="{:name}"{:options}>{:value}</textarea>',
-		'fieldset'       => '<fieldset{:options}><legend>{:content}</legend>{:raw}</fieldset>',
+		'fieldset'       => '<fieldset{:options}><legend>{:content}</legend>{:raw}</fieldset>'
 	);
 
 	/**

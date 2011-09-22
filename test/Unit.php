@@ -967,7 +967,7 @@ class Unit extends \lithium\core\Object {
 	 * This method is used to check for a working connection to lithify.me, both
 	 * testing for proper dns resolution and reading the actual URL.
 	 *
-	 * @param array $options Override the default URI to check.
+	 * @param array $config Override the default URI to check.
 	 * @return boolean True if a network connection is established, false otherwise.
 	 */
 	protected function _hasNetwork($config = array()) {

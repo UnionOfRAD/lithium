@@ -469,7 +469,7 @@ class Validator extends \lithium\core\StaticObject {
 
 				if (!static::rule($name, $values[$field], $rule['format'], $rule + $options)) {
 					$errors[$field][] = $rule['message'] ?: $key;
-					
+
 					if ($rule['last']) {
 						break;
 					}

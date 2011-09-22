@@ -9,7 +9,6 @@
 namespace lithium\tests\cases\data;
 
 use lithium\data\collection\DocumentSet;
-use lithium\data\entity\Document;
 use lithium\data\Connections;
 
 class CollectionTest extends \lithium\test\Unit {
@@ -108,7 +107,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$collection->set($data);
 		$this->assertEqual($data, $collection->data());
 	}
-	
+
 	// Tests the sort method in \lithium\data\Collection
 	public function testSort() {
 		$collection = new DocumentSet();
@@ -119,9 +118,9 @@ class CollectionTest extends \lithium\test\Unit {
 			array('id' => 4, 'name' => 'Katarina'),
 			array('id' => 5, 'name' => 'Nunu')
 		));
-		
+
 		$collection->sort('name');
-		
+
 		$idsSorted = $collection->map(function ($v) { return $v['id']; })->to('array');
 		$this->assertEqual($idsSorted, array(1,4,5,3,2));
 	}

@@ -69,13 +69,13 @@ class ResponseTest extends \lithium\test\Unit {
 
 		// Content type WITH ONE space between type and charset
 		$response = new Response(array('headers' => array(
-			'Content-Type' => 'application/json; charset=iso-8859-1',
+			'Content-Type' => 'application/json; charset=iso-8859-1'
 		)));
 		$this->assertEqual('application/json', $response->type);
 		$this->assertEqual('ISO-8859-1', $response->encoding);
 
 		$response = new Response(array('headers' => array(
-			'Content-Type' => 'application/json;     charset=iso-8859-1',
+			'Content-Type' => 'application/json;     charset=iso-8859-1'
 		)));
 		$this->assertEqual('application/json', $response->type);
 		$this->assertEqual('ISO-8859-1', $response->encoding);

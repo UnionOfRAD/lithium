@@ -398,7 +398,7 @@ class RecordSetTest extends \lithium\test\Unit {
 		);
 
 		$records = $this->_recordSet->find(function($item) {
-			return true; 
+			return true;
 		});
 		$this->assertEqual($expected, $records->to('array'));
 	}

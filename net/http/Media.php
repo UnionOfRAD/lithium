@@ -798,15 +798,23 @@ class Media extends \lithium\core\StaticObject {
 				)
 			),
 			'html' => array(),
-			'json' => array('cast' => true, 'encode' => 'json_encode', 'decode' => function($data) {
-				return json_decode($data, true);
-			}),
+			'json' => array(
+				'cast' => true,
+				'encode' => 'json_encode',
+				'decode' => function($data) {
+					return json_decode($data, true);
+				}
+			),
 			'text' => array('cast' => false, 'encode' => function($s) { return $s; }),
-			'form' => array('cast' => true, 'encode' => 'http_build_query', 'decode' => function($data) {
-				$decoded = array();
-				parse_str($data, $decoded);
-				return $decoded;
-			})
+			'form' => array(
+				'cast' => true,
+				'encode' => 'http_build_query',
+				'decode' => function($data) {
+					$decoded = array();
+					parse_str($data, $decoded);
+					return $decoded;
+				}
+			)
 		);
 
 		if ($type) {
