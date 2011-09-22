@@ -30,7 +30,7 @@ class RequestTest extends \lithium\test\Unit {
 	public function tearDown() {
 		$_SERVER = $this->_server;
 		$_ENV = $this->_env;
-		unset($this->Request);
+		unset($this->request);
 	}
 
 	public function testInitData() {
@@ -139,6 +139,36 @@ class RequestTest extends \lithium\test\Unit {
 			'PHP_SELF' => '/lithium.com/app/webroot/index.php'
 		)));
 		$this->assertEqual('/lithium.com', $request->env('base'));
+	}
+
+	public function testRequestWithoutUrlQueryParam() {
+		unset($_GET['url']);
+		$request = new Request(array('env' => array(
+			'PHP_SELF' => '/test_app/app/webroot/index.php',
+			'REQUEST_URI' => '/test_app'
+		)));
+		$this->assertEqual('/test_app', $request->env('base'));
+		$this->assertEqual('/', $request->url);	
+	}
+	
+	public function testRequestWithoutUrlQueryParamAndNoApp() {
+		unset($_GET['url']);
+		$request = new Request(array('env' => array(
+			'PHP_SELF' => '/test_app/webroot/index.php',
+			'REQUEST_URI' => '/test_app'
+		)));
+		$this->assertEqual('/test_app', $request->env('base'));
+		$this->assertEqual('/', $request->url);	
+	}
+	
+	public function testRequestWithoutUrlQueryParamAndNoAppOrWebroot() {
+		unset($_GET['url']);
+		$request = new Request(array('env' => array(
+			'PHP_SELF' => '/test_app/index.php',
+			'REQUEST_URI' => '/test_app'
+		)));
+		$this->assertEqual('/test_app', $request->env('base'));
+		$this->assertEqual('/', $request->url);	
 	}
 
 	public function testBaseWithAppAndOtherDirectory() {

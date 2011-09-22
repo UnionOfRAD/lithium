@@ -243,16 +243,23 @@ class ValidatorTest extends \lithium\test\Unit {
 	public function testBooleanValidation() {
 		$this->assertTrue(Validator::isBoolean(true));
 		$this->assertTrue(Validator::isBoolean(false));
+		$this->assertTrue(Validator::isBoolean('true'));
+		$this->assertTrue(Validator::isBoolean('false'));
 		$this->assertTrue(Validator::isBoolean(0));
 		$this->assertTrue(Validator::isBoolean(1));
 		$this->assertTrue(Validator::isBoolean('0'));
 		$this->assertTrue(Validator::isBoolean('1'));
+		$this->assertTrue(Validator::isBoolean('on'));
+		$this->assertTrue(Validator::isBoolean('off'));
+		$this->assertTrue(Validator::isBoolean('yes'));
+		$this->assertTrue(Validator::isBoolean('no'));
 
 		$this->assertFalse(Validator::isBoolean('11'));
 		$this->assertFalse(Validator::isBoolean('-1'));
 		$this->assertFalse(Validator::isBoolean(-1));
 		$this->assertFalse(Validator::isBoolean(11));
 		$this->assertFalse(Validator::isBoolean(null));
+		$this->assertFalse(Validator::isBoolean('test'));
 	}
 
 	/**
@@ -427,6 +434,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('348498616319346', 'amex', array(
 			'deep' => true
 		)));
+		$this->assertFalse(Validator::isCreditCard('5610376649499352', 'amex'));
 
 		/**
 		 * BankCard
@@ -441,6 +449,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('5610139705753702', 'bankcard'));
 		$this->assertTrue(Validator::isCreditCard('5602226032150551', 'bankcard'));
 		$this->assertTrue(Validator::isCreditCard('5602223993735777', 'bankcard'));
+		$this->assertFalse(Validator::isCreditCard('30155483651028', 'bankcard'));
 
 		/**
 		 * Diners Club 14
@@ -493,6 +502,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('5577265786122391', 'diners'));
 		$this->assertTrue(Validator::isCreditCard('5534061404676989', 'diners'));
 		$this->assertTrue(Validator::isCreditCard('5545313588374502', 'diners'));
+		$this->assertFalse(Validator::isCreditCard('6011802876467237', 'diners'));
 
 		/**
 		 * Discover
@@ -507,6 +517,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('6509735979634270', 'disc'));
 		$this->assertTrue(Validator::isCreditCard('6011422366775856', 'disc'));
 		$this->assertTrue(Validator::isCreditCard('6500976374623323', 'disc'));
+		$this->assertFalse(Validator::isCreditCard('201496944158937', 'disc'));
 
 		/**
 		 * enRoute
@@ -521,6 +532,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('201402662758866', 'enroute'));
 		$this->assertTrue(Validator::isCreditCard('214981579370225', 'enroute'));
 		$this->assertTrue(Validator::isCreditCard('201447595859877', 'enroute'));
+		$this->assertFalse(Validator::isCreditCard('210034762247893', 'enroute'));
 
 		/**
 		 * JCB 15 digit
@@ -569,6 +581,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('3528274546125962', 'jcb'));
 		$this->assertTrue(Validator::isCreditCard('3528890967705733', 'jcb'));
 		$this->assertTrue(Validator::isCreditCard('3337198811307545', 'jcb'));
+		$this->assertFalse(Validator::isCreditCard('5020147409985219', 'jcb'));
 
 		/**
 		 * Maestro (debit card)
@@ -583,6 +596,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('5020565359718977', 'maestro'));
 		$this->assertTrue(Validator::isCreditCard('6339931536544062', 'maestro'));
 		$this->assertTrue(Validator::isCreditCard('6465028615704406', 'maestro'));
+		$this->assertFalse(Validator::isCreditCard('5580424361774366', 'maestro'));
 
 		/**
 		 * MasterCard
@@ -612,6 +626,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('5467639122779531', 'mc'));
 		$this->assertTrue(Validator::isCreditCard('5297350261550024', 'mc'));
 		$this->assertTrue(Validator::isCreditCard('5162739131368058', 'mc'));
+		$this->assertFalse(Validator::isCreditCard('6767432107064987', 'mc'));
 
 		/**
 		 * Solo 16
@@ -654,6 +669,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('6334933119080706440', 'solo'));
 		$this->assertTrue(Validator::isCreditCard('6334647959628261714', 'solo'));
 		$this->assertTrue(Validator::isCreditCard('6334527312384101382', 'solo'));
+		$this->assertFalse(Validator::isCreditCard('5641829171515733', 'solo'));
 
 		/**
 		 * Switch 16
@@ -786,6 +802,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('4936196077254804290', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('6759558831206830183', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('5641827998830403137', 'switch'));
+		$this->assertFalse(Validator::isCreditCard('4024007174754', 'switch'));
 
 		/**
 		 * Visa 13 digit
@@ -884,6 +901,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('4916845885268360', 'visa'));
 		$this->assertTrue(Validator::isCreditCard('4394514669078434', 'visa'));
 		$this->assertTrue(Validator::isCreditCard('4485611378115042', 'visa'));
+		$this->assertFalse(Validator::isCreditCard('869940697287073', 'visa'));
 
 		/**
 		 * Visa Electron
@@ -903,6 +921,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('4175009797419290', 'electron'));
 		$this->assertTrue(Validator::isCreditCard('4175005028142917', 'electron'));
 		$this->assertTrue(Validator::isCreditCard('4913940802385364', 'electron'));
+		$this->assertFalse(Validator::isCreditCard('869940697287073', 'electron'));
 
 		/**
 		 * Voyager
@@ -912,6 +931,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('869958670174621', 'voyager'));
 		$this->assertTrue(Validator::isCreditCard('869921250068209', 'voyager'));
 		$this->assertTrue(Validator::isCreditCard('869972521242198', 'voyager'));
+		$this->assertFalse(Validator::isCreditCard('370482756063980', 'voyager'));
 
 		$this->assertTrue(Validator::isLuhn('869972521242198'));
 		$this->assertFalse(Validator::isLuhn(false));

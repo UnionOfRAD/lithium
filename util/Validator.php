@@ -79,7 +79,11 @@ use InvalidArgumentException;
  * - `time`: Checks that a value is a valid time. Validates time as 24hr (HH:MM) or am/pm
  *   ([ H]H:MM[a|p]m). Does not allow / validate seconds.
  *
- * - `boolean`: Checks that a value is a boolean integer or `true` or `false`.
+ * - `boolean`: Checks that the value is or looks like a boolean value. The following types of
+ *   values are interpreted as boolean and will pass the check.
+ *   - boolean (`true`, `false`, `'true'`, `'false'`)
+ *   - boolean number (`1`, `0`, `'1`', `'0`')
+ *   - boolean text string (`'on'`, `'off'`, `'yes'`, `'no'`)
  *
  * - `decimal`: Checks that a value is a valid decimal. Takes one option, `'precision'`, which is
  *   an optional integer value defining the level of precision the decimal number must match.
@@ -363,7 +367,7 @@ class Validator extends \lithium\core\StaticObject {
 		if (!isset($args[0])) {
 			return false;
 		}
-		$args += array(1 => 'any', 2 => array());
+		$args = array_filter($args) + array(0 => $args[0], 1 => 'any', 2 => array());
 		$rule = preg_replace("/^is([A-Z][A-Za-z0-9]+)$/", '$1', $method);
 		$rule[0] = strtolower($rule[0]);
 		return static::rule($rule, $args[0], $args[1], $args[2]);
@@ -602,21 +606,20 @@ class Validator extends \lithium\core\StaticObject {
 	 */
 	protected static function _checkFormats($rules) {
 		return function($self, $params, $chain) use ($rules) {
-			extract($params);
+			$value = $params['value'];
+			$format = $params['format'];
+			$options = $params['options'];
+
 			$defaults = array('all' => true);
 			$options += $defaults;
 
 			$formats = (array) $format;
+			$options['all'] = ($format == 'any');
 
-			$ruleIndexes = array_keys($rules);
-			$options['all'] = ($format == 'all');
-
-			foreach ($ruleIndexes as $index) {
-				if (!isset($rules[$index])) {
+			foreach ($rules as $index => $check) {
+				if (!$options['all'] && !(in_array($index, $formats) || isset($formats[$index]))) {
 					continue;
 				}
-				$check = $rules[$index];
-				$format = isset($formats[$index]) ? $formats[$index] : null;
 
 				$regexPassed = (is_string($check) && preg_match($check, $value));
 				$closurePassed = (is_object($check) && $check($value, $format, $options));
