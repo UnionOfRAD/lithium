@@ -204,7 +204,7 @@ class MySql extends \lithium\data\source\Database {
 		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			extract($params);
 
-			$name = $self->invokeMethod('_entityName', array($entity));
+			$name = $self->invokeMethod('_entityName', array($entity, array('quoted' => true)));
 			$columns = $self->read("DESCRIBE {$name}", array('return' => 'array', 'schema' => array(
 				'field', 'type', 'null', 'key', 'default', 'extra'
 			)));
@@ -419,19 +419,6 @@ class MySql extends \lithium\data\source\Database {
 			break;
 		}
 		return $column;
-	}
-
-	/**
-	 * Helper method that retrieves an entity's name via its metadata.
-	 *
-	 * @param string $entity Entity name.
-	 * @return string Name.
-	 */
-	protected function _entityName($entity) {
-		if (class_exists($entity, false) && method_exists($entity, 'meta')) {
-			$entity = $entity::meta('name');
-		}
-		return $entity;
 	}
 }
 

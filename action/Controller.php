@@ -256,7 +256,6 @@ class Controller extends \lithium\core\Object {
 			return;
 		}
 		$data = $this->_render['data'];
-		$data = (isset($data[0]) && count($data) == 1) ? $data[0] : $data;
 		$media::render($this->response, $data, $options + array('request' => $this->request));
 	}
 

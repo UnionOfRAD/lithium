@@ -21,8 +21,6 @@ class MySqlTest extends \lithium\test\Unit {
 
 	/**
 	 * Skip the test if a MySQL adapter configuration is unavailable.
-	 *
-	 * @return void
 	 * @todo Tie into the Environment class to ensure that the test database is being used.
 	 */
 	public function skip() {
@@ -43,8 +41,6 @@ class MySqlTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that the object is initialized with the correct default values.
-	 *
-	 * @return void
 	 */
 	public function testConstructorDefaults() {
 		$db = new MockMySql(array('autoConnect' => false));
@@ -60,8 +56,6 @@ class MySqlTest extends \lithium\test\Unit {
 	/**
 	 * Tests that this adapter can connect to the database, and that the status is properly
 	 * persisted.
-	 *
-	 * @return void
 	 */
 	public function testDatabaseConnection() {
 		$db = new MySql(array('autoConnect' => false) + $this->_dbConfig);
@@ -168,9 +162,6 @@ class MySqlTest extends \lithium\test\Unit {
 	public function testAbstractColumnResolution() {
 	}
 
-	public function testDescribe() {
-	}
-
 	public function testExecuteException() {
 		$this->expectException();
 		$this->db->read('SELECT deliberate syntax error');
@@ -242,12 +233,25 @@ class MySqlTest extends \lithium\test\Unit {
 	/**
 	 * Ensures that DELETE queries are not generated with table aliases, as MySQL does not support
 	 * this.
-	 *
-	 * @return void
 	 */
 	public function testDeletesWithoutAliases() {
 		$delete = new Query(array('type' => 'delete', 'source' => 'companies'));
 		$this->assertTrue($this->db->delete($delete));
+	}
+
+	/**
+	 * Tests that describing a table's schema returns the correct column meta-information.
+	 */
+	public function testDescribe() {
+		$result = $this->db->describe('companies');
+		$expected = array(
+			'id' => array('type' => 'integer', 'length' => 11, 'null' => false, 'default' => null),
+			'name' => array('type' => 'string', 'length' => 255, 'null' => true, 'default' => null),
+			'active' => array('type' => 'boolean', 'null' => true, 'default' => null),
+			'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
+			'modified' => array('type' => 'datetime', 'null' => true, 'default' => null)
+		);
+		$this->assertEqual($expected, $result);
 	}
 }
 
