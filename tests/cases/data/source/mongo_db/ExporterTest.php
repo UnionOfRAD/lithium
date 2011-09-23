@@ -155,6 +155,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$doc->field = 'value';
 		$doc->objects[1]->foo = 'dib';
 		$doc->deeply->nested = 'foo';
+		$doc->deeply->nestedAgain = 'bar';
 		$doc->newObject = new Document(array(
 			'exists' => false, 'data' => array('subField' => 'subValue')
 		));
@@ -162,16 +163,25 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertEqual('subValue', $doc->newObject->subField);
 
 		$doc->numbers = array(8, 9);
+		$doc->numbers[] = 10;
+		$doc->numbers->append(11);
 
 		$result = Exporter::get('update', $doc->export());
 		$expected = array(
-			'numbers' => array(8, 9),
+			'numbers' => array(8, 9, 10, 11),
 			'newObject' => array('subField' => 'subValue'),
 			'field' => 'value',
 			'deeply.nested' => 'foo',
+			'deeply.nestedAgain' => 'bar',
 			'objects.1.foo' => 'dib'
 		);
 		$this->assertEqual($expected, $result['update']);
+
+		$doc->objects[] = array('foo' => 'dob');
+		$exist = $doc->objects->find(function ($data) {
+			return (strcmp($data->foo, 'dob') === 0);
+		}, array('collect' => false));
+		$this->assertTrue(!empty($exist));
 	}
 
 	public function testFieldRemoval() {
