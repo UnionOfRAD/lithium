@@ -82,7 +82,7 @@ use InvalidArgumentException;
  * - `boolean`: Checks that the value is or looks like a boolean value. The following types of
  *   values are interpreted as boolean and will pass the check.
  *   - boolean (`true`, `false`, `'true'`, `'false'`)
- *   - boolean number (`1`, `0`, `'1`', `'0`')
+ *   - boolean number (`1`, `0`, `'1'`, `'0'`)
  *   - boolean text string (`'on'`, `'off'`, `'yes'`, `'no'`)
  *
  * - `decimal`: Checks that a value is a valid decimal. Takes one option, `'precision'`, which is
