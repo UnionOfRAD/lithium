@@ -122,7 +122,7 @@ class Object {
 			if (!isset($this->_config[$key]) && !isset($this->_config[$flag])) {
 				continue;
 			}
-			
+
 			if ($flag === 'merge') {
 				$this->{"_{$key}"} = $this->_config[$key] + $this->{"_{$key}"};
 			} else {

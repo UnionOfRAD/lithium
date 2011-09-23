@@ -442,6 +442,7 @@ class Validator extends \lithium\core\StaticObject {
 		$options += $defaults;
 		$params = compact('values', 'rules', 'options');
 
+<<<<<<< HEAD
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
 			$values = $params['values'];
 			$rules = $params['rules'];
@@ -463,6 +464,14 @@ class Validator extends \lithium\core\StaticObject {
 
 					if ($events && $rule['on'] && !array_intersect($events, (array) $rule['on'])) {
 						continue;
+=======
+				if ($events && $rule['on'] && !array_intersect($events, (array) $rule['on'])) {
+					continue;
+				}
+				if (!array_key_exists($field, $values)) {
+					if ($rule['required']) {
+						$errors[$field][] = $rule['message'] ?: $key;
+>>>>>>> upstream/master
 					}
 					if (!isset($values[$field])) {
 						if ($rule['required']) {
@@ -477,12 +486,20 @@ class Validator extends \lithium\core\StaticObject {
 						continue;
 					}
 
+<<<<<<< HEAD
 					if (!$self::rule($name, $values[$field], $rule['format'], $rule + $options)) {
 						$errors[$field][] = $rule['message'] ?: $key;
 					
 						if ($rule['last']) {
 							break;
 						}
+=======
+				if (!static::rule($name, $values[$field], $rule['format'], $rule + $options)) {
+					$errors[$field][] = $rule['message'] ?: $key;
+
+					if ($rule['last']) {
+						break;
+>>>>>>> upstream/master
 					}
 				}
 			}

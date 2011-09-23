@@ -148,9 +148,9 @@ class RequestTest extends \lithium\test\Unit {
 			'REQUEST_URI' => '/test_app'
 		)));
 		$this->assertEqual('/test_app', $request->env('base'));
-		$this->assertEqual('/', $request->url);	
+		$this->assertEqual('/', $request->url);
 	}
-	
+
 	public function testRequestWithoutUrlQueryParamAndNoApp() {
 		unset($_GET['url']);
 		$request = new Request(array('env' => array(
@@ -158,9 +158,9 @@ class RequestTest extends \lithium\test\Unit {
 			'REQUEST_URI' => '/test_app'
 		)));
 		$this->assertEqual('/test_app', $request->env('base'));
-		$this->assertEqual('/', $request->url);	
+		$this->assertEqual('/', $request->url);
 	}
-	
+
 	public function testRequestWithoutUrlQueryParamAndNoAppOrWebroot() {
 		unset($_GET['url']);
 		$request = new Request(array('env' => array(
@@ -168,7 +168,7 @@ class RequestTest extends \lithium\test\Unit {
 			'REQUEST_URI' => '/test_app'
 		)));
 		$this->assertEqual('/test_app', $request->env('base'));
-		$this->assertEqual('/', $request->url);	
+		$this->assertEqual('/', $request->url);
 	}
 
 	public function testBaseWithAppAndOtherDirectory() {

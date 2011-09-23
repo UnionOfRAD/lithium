@@ -938,8 +938,14 @@ abstract class Database extends \lithium\data\Source {
 	 * @param string $entity
 	 * @return string
 	 */
-	protected function _entityName($entity) {
-		return $this->name($entity);
+	protected function _entityName($entity, array $options = array()) {
+		$defaults = array('quoted' => false);
+		$options += $defaults;
+
+		if (class_exists($entity, false) && method_exists($entity, 'meta')) {
+			$entity = $entity::meta('source');
+		}
+		return $options['quoted'] ? $this->name($entity) : $entity;
 	}
 
 	/**
