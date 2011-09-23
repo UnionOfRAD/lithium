@@ -123,6 +123,9 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 		$this->assertEqual(ErrorHandler::isRunning(), false);
 		ErrorHandler::run();
 		$this->assertEqual(ErrorHandler::isRunning(), true);
+		$result = ErrorHandler::run();
+		$this->assertEqual(ErrorHandler::isRunning(), true);
+		$this->assertNull($result);
 		ErrorHandler::stop();
 		$this->assertEqual(ErrorHandler::isRunning(), false);
 	}
@@ -147,10 +150,17 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 
 	public function testErrorTrapping() {
 		ErrorHandler::stop();
+		$self = $this;
+		ErrorHandler::config(array(array(
+			'handler' => function($info) use ($self) {
+				$self->errors[] = $info;
+			})
+		));
 		ErrorHandler::run(array('trapErrors' => true));
 
-		// Undefined offset error shouldn't surface.
+		$this->assertEqual(0, count($this->errors));
 		list($foo, $bar) = array('baz');
+		$this->assertEqual(1, count($this->errors));
 	}
 
 	public function testRenderedOutput() {
