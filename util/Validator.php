@@ -426,7 +426,6 @@ class Validator extends \lithium\core\StaticObject {
 	 * @return array Returns an array containing all validation failures for data in `$values`,
 	 *         where each key matches a key in `$values`, and each value is an array of that
 	 *         element's validation errors.
-	 * @filter
 	 */
 	public static function check(array $values, array $rules, array $options = array()) {
 		$defaults = array(
@@ -438,73 +437,46 @@ class Validator extends \lithium\core\StaticObject {
 			'on' => null,
 			'last' => false
 		);
+		$errors = array();
+		$events = (array) (isset($options['events']) ? $options['events'] : null);
+		$values = Set::flatten($values);
 
-		$options += $defaults;
-		$params = compact('values', 'rules', 'options');
+		foreach ($rules as $field => $rules) {
+			$rules = is_string($rules) ? array('message' => $rules) : $rules;
+			$rules = is_array(current($rules)) ? $rules : array($rules);
+			$errors[$field] = array();
+			$options['field'] = $field;
 
-<<<<<<< HEAD
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
-			$values = $params['values'];
-			$rules = $params['rules'];
-			$options = $params['options'];
-			
-			$errors = array();
-			$events = (array) (isset($options['events']) ? $options['events'] : null);
-			$values = Set::flatten($values);
+			foreach ($rules as $key => $rule) {
+				$rule += $defaults + compact('values');
+				list($name) = $rule;
 
-			foreach ($rules as $field => $rules) {
-				$rules = is_string($rules) ? array('message' => $rules) : $rules;
-				$rules = is_array(current($rules)) ? $rules : array($rules);
-				$errors[$field] = array();
-				$options['field'] = $field;
-
-				foreach ($rules as $key => $rule) {
-					$rule += $options + compact('values');
-					list($name) = $rule;
-
-					if ($events && $rule['on'] && !array_intersect($events, (array) $rule['on'])) {
-						continue;
-=======
 				if ($events && $rule['on'] && !array_intersect($events, (array) $rule['on'])) {
 					continue;
 				}
 				if (!array_key_exists($field, $values)) {
 					if ($rule['required']) {
 						$errors[$field][] = $rule['message'] ?: $key;
->>>>>>> upstream/master
 					}
-					if (!isset($values[$field])) {
-						if ($rule['required']) {
-							$errors[$field][] = $rule['message'] ?: $key;
-						}
-						if ($rule['last']) {
-							break;
-						}
-						continue;
+					if ($rule['last']) {
+						break;
 					}
-					if (empty($values[$field]) && $rule['skipEmpty']) {
-						continue;
-					}
+					continue;
+				}
+				if (empty($values[$field]) && $rule['skipEmpty']) {
+					continue;
+				}
 
-<<<<<<< HEAD
-					if (!$self::rule($name, $values[$field], $rule['format'], $rule + $options)) {
-						$errors[$field][] = $rule['message'] ?: $key;
-					
-						if ($rule['last']) {
-							break;
-						}
-=======
 				if (!static::rule($name, $values[$field], $rule['format'], $rule + $options)) {
 					$errors[$field][] = $rule['message'] ?: $key;
 
 					if ($rule['last']) {
 						break;
->>>>>>> upstream/master
 					}
 				}
 			}
-			return array_filter($errors);
-		});
+		}
+		return array_filter($errors);
 	}
 
 	/**
