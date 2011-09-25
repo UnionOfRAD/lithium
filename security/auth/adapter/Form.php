@@ -287,7 +287,7 @@ class Form extends \lithium\core\Object {
 		$password = function($form, $data) {
 			return Password::check($form, $data);
 		};
-		$config['validators'] += compact('password');
+		$config['validators'] = array_filter($config['validators'] + compact('password'));
 
 		parent::__construct($config + $defaults);
 	}
