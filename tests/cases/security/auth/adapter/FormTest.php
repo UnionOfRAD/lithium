@@ -95,6 +95,21 @@ class FormTest extends \lithium\test\Unit {
 		$expected = array('username' => 'bob', 'date' => '2011-06-29');
 		$result = $subject->check($request);
 		$this->assertEqual($expected, $result);
+
+		$subject = new Form(array(
+			'model' => __CLASS__,
+			'filters' => array('password' => 'sha1'),
+			'validators' => array('password' => false)
+		));
+
+		$request = (object) array('data' => array(
+			'username' => 'Person',
+			'password' => '123456'
+		));
+
+		$expected = array('username' => 'Person', 'password' => sha1('123456'));
+		$result = $subject->check($request);
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testUncallableFilter() {
