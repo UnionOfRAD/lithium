@@ -37,6 +37,7 @@ class FormTest extends \lithium\test\Unit {
 	public function testLogin() {
 		$subject = new Form(array(
 			'model' => __CLASS__,
+			'fields' => array('username'),
 			'validators' => array('password' => false)
 		));
 
@@ -61,6 +62,7 @@ class FormTest extends \lithium\test\Unit {
 	public function testLoginWithFilters() {
 		$subject = new Form(array(
 			'model' => __CLASS__,
+			'fields' => array('username'),
 			'filters' => array('username' => 'sha1'),
 			'validators' => array('password' => false)
 		));
@@ -129,7 +131,7 @@ class FormTest extends \lithium\test\Unit {
 	public function testGenericFilter() {
 		$subject = new Form(array(
 			'model' => __CLASS__,
-			'fields' => array('username', 'password', 'group'),
+			'fields' => array('username', 'secret', 'group'),
 			'filters' => array(
 				function($form) {
 					unset($form['secret']);
@@ -224,7 +226,7 @@ class FormTest extends \lithium\test\Unit {
 		));
 
 		$result = $subject->check($request);
-		$expected = array('username' => 'Bob', 'group' => 'editors');
+		$expected = array('username' => 'Bob', 'password' => 's3cure', 'group' => 'editors');
 		$this->assertEqual($expected, $result);
 	}
 
