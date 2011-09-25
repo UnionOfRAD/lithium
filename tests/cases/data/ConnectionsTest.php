@@ -37,6 +37,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
+		Connections::reset();
 		foreach ($this->_backup as $name => $config) {
 			Connections::add($name, $config);
 		}
