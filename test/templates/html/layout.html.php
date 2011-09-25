@@ -19,6 +19,28 @@ use lithium\util\Inflector;
 		<link rel="stylesheet" href="<?php echo $base; ?>/css/debug.css" />
 		<link href="<?php echo $base; ?>/favicon.ico" type="image/x-icon" rel="icon" />
 		<link href="<?php echo $base; ?>/favicon.ico" type="image/x-icon" rel="shortcut icon" />
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+		<script type="text/javascript">
+			$(function() {
+				var current = window.location.pathname;
+				$('.menu A').each(function(){
+					if (current == $(this).attr('href')) {
+						$(this).parent().attr('id', 'current');
+						if ($(this).hasClass('menu-folder')) {
+							window.location.replace('#current');
+						} else {
+							$(this).parents().each(function(){
+								if ($(this).children('.menu-folder').attr('id', 'parent').length) {
+									return false;
+								}
+							});
+							window.location.replace('#parent');
+						}
+						return false;
+					}
+				});
+			});
+		</script>
 	</head>
 	<body class="test-dashboard">
 		<div id="header">
