@@ -289,6 +289,10 @@ class Form extends \lithium\core\Object {
 		};
 		$config['validators'] += compact('password');
 
+		$config['validators'] = array_filter($config['validators'], function($validator) {
+			return $validator !== false;
+		});
+
 		parent::__construct($config + $defaults);
 	}
 
@@ -413,7 +417,7 @@ class Form extends \lithium\core\Object {
 	 */
 	protected function _validate($user, array $data) {
 		foreach ($this->_validators as $field => $validator) {
-			if ($validator === false || !isset($this->_fields[$field]) || $field === 0) {
+			if (!isset($this->_fields[$field]) || $field === 0) {
 				continue;
 			}
 

@@ -37,6 +37,7 @@ class FormTest extends \lithium\test\Unit {
 	public function testLogin() {
 		$subject = new Form(array(
 			'model' => __CLASS__,
+			'fields' => array('username'),
 			'validators' => array('password' => false)
 		));
 
@@ -61,6 +62,7 @@ class FormTest extends \lithium\test\Unit {
 	public function testLoginWithFilters() {
 		$subject = new Form(array(
 			'model' => __CLASS__,
+			'fields' => array('username'),
 			'filters' => array('username' => 'sha1'),
 			'validators' => array('password' => false)
 		));
@@ -95,6 +97,21 @@ class FormTest extends \lithium\test\Unit {
 		$expected = array('username' => 'bob', 'date' => '2011-06-29');
 		$result = $subject->check($request);
 		$this->assertEqual($expected, $result);
+
+		$subject = new Form(array(
+			'model' => __CLASS__,
+			'filters' => array('password' => 'sha1'),
+			'validators' => array('password' => false)
+		));
+
+		$request = (object) array('data' => array(
+			'username' => 'Person',
+			'password' => '123456'
+		));
+
+		$expected = array('username' => 'Person', 'password' => sha1('123456'));
+		$result = $subject->check($request);
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testUncallableFilter() {
@@ -114,7 +131,7 @@ class FormTest extends \lithium\test\Unit {
 	public function testGenericFilter() {
 		$subject = new Form(array(
 			'model' => __CLASS__,
-			'fields' => array('username', 'password', 'group'),
+			'fields' => array('username', 'secret', 'group'),
 			'filters' => array(
 				function($form) {
 					unset($form['secret']);
@@ -209,7 +226,7 @@ class FormTest extends \lithium\test\Unit {
 		));
 
 		$result = $subject->check($request);
-		$expected = array('username' => 'Bob', 'group' => 'editors');
+		$expected = array('username' => 'Bob', 'password' => 's3cure', 'group' => 'editors');
 		$this->assertEqual($expected, $result);
 	}
 
