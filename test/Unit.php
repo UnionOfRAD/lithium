@@ -1011,7 +1011,9 @@ class Unit extends \lithium\core\Object {
 		$iterator = new RecursiveIteratorIterator($dirs, RecursiveIteratorIterator::CHILD_FIRST);
 
 		foreach ($iterator as $item) {
-			if ($item->getPathname() === $path . DIRECTORY_SEPARATOR . 'empty' || $iterator->isDot()) {
+			$empty = $item->getPathname() === $path . DIRECTORY_SEPARATOR . 'empty';
+
+			if ($empty || $iterator->isDot()) {
 				continue;
 			}
 			($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname());
