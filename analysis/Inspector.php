@@ -344,7 +344,7 @@ class Inspector extends \lithium\core\StaticObject {
 			}
 			$data = "\n" . file_get_contents($data);
 		}
-		$c = explode("\n", $data);
+		$c = explode("\n", str_replace("\r\n", "\n", $data));
 
 		if (!count($c) || !count($lines)) {
 			return null;
@@ -437,7 +437,7 @@ class Inspector extends \lithium\core\StaticObject {
 		$join = function ($i) { return join('', $i); };
 
 		foreach ((array) $classes as $class) {
-			$data = explode("\n", file_get_contents(Libraries::path($class)));
+			$data = explode("\n", str_replace("\r\n", "\n", file_get_contents(Libraries::path($class))));
 			$data = "<?php \n" . join("\n", preg_grep('/^\s*use /', $data)) . "\n ?>";
 
 			$classes = array_map($join, Parser::find($data, 'use *;', array(

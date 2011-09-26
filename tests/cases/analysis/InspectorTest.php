@@ -10,6 +10,7 @@ namespace lithium\tests\cases\analysis;
 
 use ReflectionMethod;
 use lithium\analysis\Inspector;
+use lithium\core\Libraries;
 
 class InspectorTest extends \lithium\test\Unit {
 
@@ -93,13 +94,34 @@ class InspectorTest extends \lithium\test\Unit {
 		$expected = array(__LINE__ - 2 => "\tpublic function testLineIntrospection() {");
 		$this->assertEqual($expected, $result);
 
-		$result = Inspector::lines(__CLASS__, array(14));
-		$expected = array(14 => 'class InspectorTest extends \lithium\test\Unit {');
+		$result = Inspector::lines(__CLASS__, array(15));
+		$expected = array(15 => 'class InspectorTest extends \lithium\test\Unit {');
 		$this->assertEqual($expected, $result);
 
 		$this->expectException('/Missing argument 2/');
 		$this->assertNull(Inspector::lines('\lithium\core\Foo'));
 		$this->assertNull(Inspector::lines(__CLASS__, array()));
+	}
+
+	/**
+	 * Tests reading specific line numbers of a file that has CRLF line endings.
+	 *
+	 * @return void
+	 */
+	public function testLineIntrospectionWithCRLFLineEndings() {
+		$tmpPath = Libraries::get(true, 'resources').'/tmp/tests/inspector_crlf.tmp';
+		$contents = implode("\r\n", array('one', 'two', 'three', 'four', 'five'));
+		file_put_contents($tmpPath, $contents);
+
+		$result = Inspector::lines($tmpPath, array(2));
+		$expected = array(2 => 'two');
+		$this->assertEqual($expected, $result);
+
+		$result = Inspector::lines($tmpPath, array(1,5));
+		$expected = array(1 => 'one', 5 => 'five');
+		$this->assertEqual($expected, $result);
+
+		unlink($tmpPath);
 	}
 
 	/**
