@@ -273,6 +273,7 @@ class ExporterTest extends \lithium\test\Unit {
 			'comments' => array(
 				"4c8f86167675abfabdbe0300", "4c8f86167675abfabdbf0300", "4c8f86167675abfabdc00300"
 			),
+			'empty_array' => array(),
 			'authors' => '4c8f86167675abfabdb00300',
 			'created' => time(),
 			'modified' => date('Y-m-d H:i:s'),
@@ -307,6 +308,8 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertTrue($result['modified'] instanceof MongoDate);
 		$this->assertTrue($result['created'] instanceof MongoDate);
 		$this->assertTrue($result['created']->sec > 0);
+
+		$this->assertTrue($result['empty_array'] instanceof DocumentArray);
 
 		$this->assertEqual($time, $result['modified']->sec);
 		$this->assertEqual($time, $result['created']->sec);
