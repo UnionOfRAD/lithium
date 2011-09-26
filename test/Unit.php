@@ -988,11 +988,15 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Removes everything from `resources/tmp/tests` directory.
-	 * Call from inside of your test method or `tearDown()`.
+	 * Removes everything from `resources/tmp/tests` directory. Call from
+	 * inside of your test method or `tearDown()`.
 	 *
-	 * @param string $path path to directory of contents to remove
-	 *               if first character is NOT `/` prepend `LITHIUM_APP_PATH/resources/tmp/`
+	 * Uses `DIRECTORY_SEPARATOR` as `getPathname()` is used in a a direct
+	 * string comparison. The method may contain slashes and backslashes.
+	 *
+	 * @param string $path Path to directory with contents to remove. If first
+	 *        character is NOT a slash (`/`) or a Windows drive letter (`C:`)
+	 *        prepends `LITHIUM_APP_PATH/resources/tmp/`.
 	 * @return void
 	 */
 	protected function _cleanUp($path = null) {
@@ -1007,9 +1011,6 @@ class Unit extends \lithium\core\Object {
 		$iterator = new RecursiveIteratorIterator($dirs, RecursiveIteratorIterator::CHILD_FIRST);
 
 		foreach ($iterator as $item) {
-			/*
-			 * Uses DIRECTORY_SEPARATOR to ensure correct path on Windows
-			 */
 			if ($item->getPathname() === $path . DIRECTORY_SEPARATOR . 'empty' || $iterator->isDot()) {
 				continue;
 			}
