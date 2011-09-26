@@ -229,7 +229,11 @@ class Controller extends \lithium\core\Object {
 		$key = key($options);
 
 		if (isset($options['data'])) {
-			$this->set($options['data']);
+			if (is_scalar($options[$key])) {
+				$this->_render['data'] = $options[$key];
+			} else {
+				$this->set($options['data']);
+			}
 			unset($options['data']);
 		}
 		$defaults = array(
@@ -243,7 +247,11 @@ class Controller extends \lithium\core\Object {
 
 		if ($key && $media::type($key)) {
 			$options['type'] = $key;
-			$this->set($options[$key]);
+			if (is_scalar($options[$key])) {
+				$this->_render['data'] = $options[$key];
+			} else {
+				$this->set($options[$key]);
+			}
 			unset($options[$key]);
 		}
 

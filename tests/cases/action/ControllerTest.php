@@ -185,8 +185,34 @@ class ControllerTest extends \lithium\test\Unit {
 		)));
 
 		$expected = array(array('id' => 1));
-		$controller->render(array('data' => $expected));
 
+		$controller->render(array('data' => $expected));
+		$this->assertEqual($expected, $controller->response->data);
+
+		$controller->render(array('json' => $expected));
+		$this->assertEqual($expected, $controller->response->data);
+
+	}
+	
+	/**
+	 * Verifies that Controller does not convert data to an array when data is a scalar value
+	 *
+	 * @return void
+	 */
+	public function testRenderWithScalarData() {
+		$request = new Request();
+		$request->params['controller'] = 'lithium\tests\mocks\action\MockPostsController';
+
+		$controller = new MockPostsController(compact('request') + array('classes' => array(
+			'media' => 'lithium\tests\mocks\action\MockMediaClass'
+		)));
+
+		$expected = 'Hello World';
+		
+		$controller->render(array('json' => $expected));
+		$this->assertEqual($expected, $controller->response->data);
+		
+		$controller->render(array('data' => $expected));
 		$this->assertEqual($expected, $controller->response->data);
 	}
 
