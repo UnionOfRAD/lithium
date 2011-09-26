@@ -26,9 +26,7 @@ class CookieTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->cookie = new Cookie();
-		$app_path = str_replace("\\", "/", LITHIUM_APP_PATH);
-		$path = explode('/', $app_path);
-		$this->name = end($path) . 'cookie';
+		$this->name = basename(LITHIUM_APP_PATH) . 'cookie';
 	}
 
 	public function tearDown() {
