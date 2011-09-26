@@ -180,6 +180,7 @@ abstract class Collection extends \lithium\util\Collection {
 		if ($schema) {
 			return $field ? $schema->fields($field) : $schema;
 		}
+		return $schema;
 	}
 
 	/**
@@ -367,8 +368,10 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return mixed Returns the set `Entity` object.
 	 */
 	public function offsetSet($offset, $data) {
-		if (is_array($data) && ($schema = $this->schema())) {
-			$data = $schema->cast($this, $data);
+		if (is_array($data) && ($model = $this->_model)) {
+			$data = $model::connection()->cast($this, $data);
+		} elseif (is_object($data)) {
+			$data->assignTo($this);
 		}
 		return $this->_data[] = $data;
 	}
