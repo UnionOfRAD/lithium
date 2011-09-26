@@ -94,7 +94,7 @@ class Exporter extends \lithium\core\StaticObject {
 		} elseif (is_array($value)) {
 			$arrayType = !$isObject && (array_keys($value) === range(0, count($value) - 1));
 			$emptyArray = is_array($value) && empty($value);
-			$opts = $arrayType || $emptyArray ? array('class' => 'array') + $options : $options;
+			$opts = ($arrayType || $emptyArray) ? array('class' => 'array') + $options : $options;
 		}
 
 		unset($opts['handlers'], $opts['first']);
