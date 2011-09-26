@@ -79,7 +79,7 @@ use lithium\security\Password;
  * 	'default' => array(
  * 		'adapter' => 'Form',
  * 		'filters' => array('password' => array('lithium\util\String', 'hash')),
- * 		'validators' => array()
+ * 		'validators' => array('password' => false)
  * 	)
  * ));
  * }}}
