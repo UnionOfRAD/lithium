@@ -335,16 +335,16 @@ class Inspector extends \lithium\core\StaticObject {
 	 * @todo Add an $options parameter with a 'context' flag, to pull in n lines of context.
 	 */
 	public static function lines($data, $lines) {
-		if (!strpos($data, PHP_EOL)) {
+		if (!strpos($data, "\n")) {
 			if (!file_exists($data)) {
 				$data = Libraries::path($data);
 				if (!file_exists($data)) {
 					return null;
 				}
 			}
-			$data = PHP_EOL . file_get_contents($data);
+			$data = "\n" . file_get_contents($data);
 		}
-		$c = explode(PHP_EOL, $data);
+		$c = explode("\n", $data);
 
 		if (!count($c) || !count($lines)) {
 			return null;
