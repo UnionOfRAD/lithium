@@ -60,9 +60,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertTrue(empty($id));
 
 		$result = ini_get('session.name');
-		$app_path = str_replace("\\", "/", LITHIUM_APP_PATH);
-		$path = explode('/', $app_path);
-		$this->assertEqual(end($path), $result);
+		$this->assertEqual(basename(LITHIUM_APP_PATH), $result);
 
 		$result = ini_get('session.cookie_lifetime');
 		$this->assertEqual(0, (integer) $result);
