@@ -195,6 +195,54 @@ abstract class Collection extends \lithium\util\Collection {
 	}
 
 	/**
+	 * Overrides parent `find()` implementation to enable key/value-based filtering of entity
+	 * objects contained in this collection.
+	 *
+	 * @param mixed $filter Callback to use for filtering, or array of key/value pairs which entity
+	 *              properties will be matched against.
+	 * @param array $options Options to modify the behavior of this method. See the documentation
+	 *              for the `$options` parameter of `lithium\util\Collection::find()`.
+	 * @return mixed The filtered items. Will be an array unless `'collect'` is defined in the
+	 * `$options` argument, then an instance of this class will be returned.
+	 */
+	public function find($filter, array $options = array()) {
+		if (is_array($filter)) {
+			$filter = $this->_filterFromArray($filter);
+		}
+		return parent::find($filter, $options);
+	}
+
+	/**
+	 * Overrides parent `first()` implementation to enable key/value-based filtering.
+	 *
+	 * @param mixed $filter In addition to a callback (see parent), can also be an array where the
+	 *              keys and values must match the property values of the objects being inspected.
+	 * @return object Returns the first object found matching the filter criteria.
+	 */
+	public function first($filter = null) {
+		return parent::first(is_array($filter) ? $this->_filterFromArray($filter) : $filter);
+	}
+
+	/**
+	 * Creates a filter based on an array of key/value pairs that must match the items in a
+	 * `Collection`.
+	 *
+	 * @param array $filter An array of key/value pairs used to filter `Collection` items.
+	 * @return closure Returns a closure that wraps the array and attempts to match each value
+	 *         against `Collection` item properties.
+	 */
+	protected function _filterFromArray(array $filter) {
+		return function($item) use ($filter) {
+			foreach ($filter as $key => $val) {
+				if ($item->{$key} != $val) {
+					return false;
+				}
+			}
+			return true;
+		};
+	}
+
+	/**
 	 * Returns meta information for this `Collection`.
 	 *
 	 * @return array
@@ -301,8 +349,6 @@ abstract class Collection extends \lithium\util\Collection {
 	public function offsetSet($offset, $data) {
 		if (is_array($data) && ($model = $this->_model)) {
 			$data = $model::connection()->cast($this, $data);
-		} elseif (is_object($data)) {
-			$data->assignTo($this);
 		}
 		return $this->_data[] = $data;
 	}
