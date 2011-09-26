@@ -24,7 +24,7 @@ class DocumentSetTest extends \lithium\test\Unit {
 
 	protected $_model = 'lithium\tests\mocks\data\model\MockDocumentPost';
 
-	protected $_preserved = array();
+	protected $_backup = array();
 
 	public function skip() {
 		$this->skipIf(!MongoDb::enabled(), 'MongoDb is not enabled');
@@ -32,9 +32,9 @@ class DocumentSetTest extends \lithium\test\Unit {
 	}
 
 	public function setUp() {
-		if (empty($this->_preserved)) {
+		if (empty($this->_backup)) {
 			foreach (Connections::get() as $conn) {
-				$this->_preserved[$conn] = Connections::get($conn, array('config' => true));
+				$this->_backup[$conn] = Connections::get($conn, array('config' => true));
 			}
 		}
 		Connections::reset();
@@ -47,7 +47,7 @@ class DocumentSetTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
-		foreach ($this->_preserved as $name => $config) {
+		foreach ($this->_backup as $name => $config) {
 			Connections::add($name, $config);
 		}
 	}
