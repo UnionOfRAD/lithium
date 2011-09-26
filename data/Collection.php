@@ -283,11 +283,12 @@ abstract class Collection extends \lithium\util\Collection {
 
 	/**
 	 * Converts the current state of the data structure to an array.
-	 *
+	 * 
+	 * @param array $options Options for converting this `Collection`.
 	 * @return array Returns the array value of the data in this `Collection`.
 	 */
-	public function data() {
-		return $this->to('array');
+	public function data(array $options = array()) {
+		return $this->to('array', $options);
 	}
 
 	/**
