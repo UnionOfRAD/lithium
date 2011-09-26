@@ -15,6 +15,24 @@ class CollectionTest extends \lithium\test\Unit {
 
 	protected $_model = 'lithium\tests\mocks\data\MockPost';
 
+	protected $_preserved = array();
+
+	public function setUp() {
+		if (empty($this->_preserved)) {
+			foreach (Connections::get() as $conn) {
+				$this->_preserved[$conn] = Connections::get($conn, array('config' => true));
+			}
+		}
+		Connections::reset();
+	}
+
+	public function tearDown() {
+		Connections::reset();
+		foreach ($this->_preserved as $name => $config) {
+			Connections::add($name, $config);
+		}
+	}
+
 	public function testGetStats() {
 		$collection = new DocumentSet(array('stats' => array('foo' => 'bar')));
 		$this->assertNull($collection->stats('bar'));
