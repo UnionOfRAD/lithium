@@ -720,6 +720,18 @@ class FormTest extends \lithium\test\Unit {
 			),
 			'/div'
 		));
+
+		// makesure of baseline
+		$this->assertTags($this->form->end(), array(
+			'/form'
+		));
+
+		// change the form
+		$this->form->config(array('templates' => array('form-end' => "</table></form>")));
+		$this->assertTags($this->form->end(), array(
+			'/table',
+			'/form'
+		));
 	}
 
 	/**
