@@ -721,17 +721,10 @@ class FormTest extends \lithium\test\Unit {
 			'/div'
 		));
 
-		// makesure of baseline
-		$this->assertTags($this->form->end(), array(
-			'/form'
-		));
+		$this->assertTags($this->form->end(), array('/form'));
 
-		// change the form
-		$this->form->config(array('templates' => array('form-end' => "</table></form>")));
-		$this->assertTags($this->form->end(), array(
-			'/table',
-			'/form'
-		));
+		$this->form->config(array('templates' => array('end' => "</table></form>")));
+		$this->assertTags($this->form->end(), array('/table', '/form'));
 	}
 
 	/**
@@ -961,6 +954,7 @@ class FormTest extends \lithium\test\Unit {
 	 * Tests that the string template form `Form::field()` can be overridden.
 	 */
 	public function testFieldTemplateOverride() {
+		$result = $this->form->field('name', array('type' => 'text'));
 		$this->form->config(array('templates' => array('field' => '{:label}{:input}{:error}')));
 		$result = $this->form->field('name', array('type' => 'text'));
 		$this->assertTags($result, array(

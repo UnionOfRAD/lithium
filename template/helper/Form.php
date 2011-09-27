@@ -308,10 +308,10 @@ class Form extends \lithium\template\Helper {
 		$_context =& $this->_context;
 		$_options =& $this->_bindingOptions;
 
-		$filter = function($self, $params) use (&$_binding, &$_context, &$_options) {
+		$filter = function($self, $params) use (&$_binding, &$_context, &$_options, $template) {
 			unset($_binding);
 			$_options = array();
-			return $_context->strings('form-end');
+			return $self->invokeMethod('_render', array('end', $params['template'], array()));
 		};
 		$result = $this->_filter(__METHOD__, $params, $filter);
 		unset($this->_binding);
