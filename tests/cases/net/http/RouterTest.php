@@ -674,9 +674,13 @@ class RouterTest extends \lithium\test\Unit {
 	public function testReversingContinuations() {
 		Router::connect('/{:locale:en|de|it|jp}/{:args}', array(), array('continue' => true));
 		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}');
+		Router::connect('/{:controller}/{:action}/{:args}');
 
 		$result = Router::match(array('Posts::view', 'id' => 5, 'locale' => 'de'));
 		$this->assertEqual($result, '/de/posts/view/5');
+
+		$result = Router::match(array('Posts::index', 'locale' => 'en', '?' => array('page' => 2)));
+		$this->assertEqual('/en/posts?page=2', $result);
 
 		Router::reset();
 		Router::connect('/{:locale:en|de|it|jp}/{:args}', array(), array('continue' => true));
