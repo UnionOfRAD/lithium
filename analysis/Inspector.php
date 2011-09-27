@@ -344,7 +344,7 @@ class Inspector extends \lithium\core\StaticObject {
 			}
 			$data = "\n" . file_get_contents($data);
 		}
-		$c = explode("\n", str_replace("\r\n", "\n", $data));
+		$c = preg_split('/\r?\n/', $data);
 
 		if (!count($c) || !count($lines)) {
 			return null;
