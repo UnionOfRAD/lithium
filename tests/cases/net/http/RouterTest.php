@@ -696,6 +696,41 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::match(array('Users::login', 'admin' => true));
 		$this->assertEqual('/admin/login', $result);
 	}
+
+	/**
+	 * Tests that multiple continuation routes can be applied to the same URL.
+	 */
+	public function testStackedContinuationRoutes() {
+		Router::connect('/admin/{:args}', array('admin' => true), array('continue' => true));
+		Router::connect('/{:locale:en|de|it|jp}/{:args}', array(), array('continue' => true));
+		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}', array('id' => null));
+
+		$request = new Request(array('url' => '/en/foo/bar/5'));
+		$expected = array('controller' => 'foo', 'action' => 'bar', 'id' => '5', 'locale' => 'en');
+		$this->assertEqual($expected, Router::process($request)->params);
+
+		$request = new Request(array('url' => '/admin/foo/bar/5'));
+		$expected = array('controller' => 'foo', 'action' => 'bar', 'id' => '5', 'admin' => true);
+		$this->assertEqual($expected, Router::process($request)->params);
+
+		$request = new Request(array('url' => '/admin/de/foo/bar/5'));
+		$expected = array(
+			'controller' => 'foo', 'action' => 'bar', 'id' => '5', 'locale' => 'de', 'admin' => true
+		);
+		$this->assertEqual($expected, Router::process($request)->params);
+
+		$request = new Request(array('url' => '/en/admin/foo/bar/5'));
+		$this->assertFalse(Router::process($request)->params);
+
+		$result = Router::match(array('Foo::bar', 'id' => 5));
+		$this->assertEqual('/foo/bar/5', $result);
+
+		$result = Router::match(array('Foo::bar', 'id' => 5, 'admin' => true));
+		$this->assertEqual('/admin/foo/bar/5', $result);
+
+		$result = Router::match(array('Foo::bar', 'id' => 5, 'admin' => true, 'locale' => 'jp'));
+		$this->assertEqual('/admin/jp/foo/bar/5', $result);
+	}
 }
 
 ?>

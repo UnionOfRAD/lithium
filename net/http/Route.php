@@ -254,11 +254,12 @@ class Route extends \lithium\core\Object {
 
 		if (!$this->_config['continue']) {
 			$options += $defaults;
-		}
-		if (isset($options['?'])) {
-			$query = $options['?'];
-			$query = '?' . (is_array($query) ? http_build_query($query) : $query);
-			unset($options['?']);
+
+			if (isset($options['?'])) {
+				$query = $options['?'];
+				$query = '?' . (is_array($query) ? http_build_query($query) : $query);
+				unset($options['?']);
+			}
 		}
 
 		if (!$options = $this->_matchKeys($options)) {
@@ -272,7 +273,7 @@ class Route extends \lithium\core\Object {
 		$defaults = $this->_defaults + $defaults;
 
 		if ($this->_config['continue']) {
-			return $this->_write(array('args' => '{:args}') + $options, $this->_defaults) . $query;
+			return $this->_write(array('args' => '{:args}') + $options, $this->_defaults);
 		}
 		return $this->_write($options, $defaults + array('args' => '')) . $query;
 	}

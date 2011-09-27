@@ -576,6 +576,20 @@ class RouteTest extends \lithium\test\Unit {
 		$result = $route->match(array('controller' => 'users', 'action' => 'login'));
 		$this->assertFalse($result);
 	}
+
+	/**
+	 * Tests that continuation routes don't append query strings.
+	 */
+	public function testContinuationRouteWithQueryString() {
+		$route = new Route(array(
+			'template' => '/admin/{:args}',
+			'continue' => true,
+			'params' => array('admin' => true)
+		));
+
+		$result = $route->match(array('Posts::index', 'admin' => true, '?' => array('page' => 2)));
+		$this->assertEqual('/admin/{:args}', $result);
+	}
 }
 
 ?>
