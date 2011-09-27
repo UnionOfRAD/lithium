@@ -335,16 +335,16 @@ class Inspector extends \lithium\core\StaticObject {
 	 * @todo Add an $options parameter with a 'context' flag, to pull in n lines of context.
 	 */
 	public static function lines($data, $lines) {
-		if (!strpos($data, PHP_EOL)) {
+		if (!strpos($data, "\n")) {
 			if (!file_exists($data)) {
 				$data = Libraries::path($data);
 				if (!file_exists($data)) {
 					return null;
 				}
 			}
-			$data = PHP_EOL . file_get_contents($data);
+			$data = "\n" . file_get_contents($data);
 		}
-		$c = explode(PHP_EOL, $data);
+		$c = preg_split('/\r?\n/', $data);
 
 		if (!count($c) || !count($lines)) {
 			return null;
@@ -437,7 +437,7 @@ class Inspector extends \lithium\core\StaticObject {
 		$join = function ($i) { return join('', $i); };
 
 		foreach ((array) $classes as $class) {
-			$data = explode("\n", file_get_contents(Libraries::path($class)));
+			$data = explode("\n", str_replace("\r\n", "\n", file_get_contents(Libraries::path($class))));
 			$data = "<?php \n" . join("\n", preg_grep('/^\s*use /', $data)) . "\n ?>";
 
 			$classes = array_map($join, Parser::find($data, 'use *;', array(
