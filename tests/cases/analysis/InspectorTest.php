@@ -114,7 +114,7 @@ class InspectorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testLineIntrospectionWithCRLFLineEndings() {
-		$tmpPath = Libraries::get(true, 'resources').'/tmp/tests/inspector_crlf.tmp';
+		$tmpPath = Libraries::get(true, 'resources') . '/tmp/tests/inspector_crlf.tmp';
 		$contents = implode("\r\n", array('one', 'two', 'three', 'four', 'five'));
 		file_put_contents($tmpPath, $contents);
 
