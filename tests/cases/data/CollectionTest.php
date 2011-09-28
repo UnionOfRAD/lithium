@@ -15,6 +15,24 @@ class CollectionTest extends \lithium\test\Unit {
 
 	protected $_model = 'lithium\tests\mocks\data\MockPost';
 
+	protected $_backup = array();
+
+	public function setUp() {
+		if (empty($this->_backup)) {
+			foreach (Connections::get() as $conn) {
+				$this->_backup[$conn] = Connections::get($conn, array('config' => true));
+			}
+		}
+		Connections::reset();
+	}
+
+	public function tearDown() {
+		Connections::reset();
+		foreach ($this->_backup as $name => $config) {
+			Connections::add($name, $config);
+		}
+	}
+
 	public function testGetStats() {
 		$collection = new DocumentSet(array('stats' => array('foo' => 'bar')));
 		$this->assertNull($collection->stats('bar'));
@@ -106,6 +124,23 @@ class CollectionTest extends \lithium\test\Unit {
 		);
 		$collection->set($data);
 		$this->assertEqual($data, $collection->data());
+	}
+
+	// Tests the sort method in \lithium\data\Collection
+	public function testSort() {
+		$collection = new DocumentSet();
+		$collection->set(array(
+			array('id' => 1, 'name' => 'Annie'),
+			array('id' => 2, 'name' => 'Zilean'),
+			array('id' => 3, 'name' => 'Trynamere'),
+			array('id' => 4, 'name' => 'Katarina'),
+			array('id' => 5, 'name' => 'Nunu')
+		));
+
+		$collection->sort('name');
+
+		$idsSorted = $collection->map(function ($v) { return $v['id']; })->to('array');
+		$this->assertEqual($idsSorted, array(1,4,5,3,2));
 	}
 }
 

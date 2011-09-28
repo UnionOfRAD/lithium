@@ -255,10 +255,16 @@ class MediaTest extends \lithium\test\Unit {
 			array('name' => 'Shaun of the Dead', 'year' => 2004),
 			array('name' => 'V for Vendetta', 'year' => 2005)
 		));
-		$encoded = '{"movies":[{"name":"Shaun of the Dead","year":2004},';
-		$encoded .= '{"name":"V for Vendetta","year":2005}]}';
+		$jsonEncoded = '{"movies":[{"name":"Shaun of the Dead","year":2004},';
+		$jsonEncoded .= '{"name":"V for Vendetta","year":2005}]}';
 
-		$result = Media::decode('json', $encoded);
+		$result = Media::decode('json', $jsonEncoded);
+		$this->assertEqual($data, $result);
+
+		$formEncoded = 'movies%5B0%5D%5Bname%5D=Shaun+of+the+Dead&movies%5B0%5D%5Byear%5D=2004';
+		$formEncoded .= '&movies%5B1%5D%5Bname%5D=V+for+Vendetta&movies%5B1%5D%5Byear%5D=2005';
+
+		$result = Media::decode('form', $formEncoded);
 		$this->assertEqual($data, $result);
 	}
 

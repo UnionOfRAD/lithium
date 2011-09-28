@@ -71,18 +71,24 @@ class Message extends \lithium\core\Object {
 	/**
 	 * Adds config values to the public properties when a new object is created.
 	 *
-	 * @param array $config
+	 * @param array $config Configuration options : default value
+	 * - `scheme`: tcp
+	 * - `host`: localhost
+	 * - `port`: null
+	 * - `username`: null
+	 * - `password`: null
+	 * - `path`: null
+	 * - `body`: null
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'scheme' => 'tcp',
 			'host' => 'localhost',
 			'port' => null,
-			'path' => null,
 			'username' => null,
 			'password' => null,
-			'body' => null,
-			'message' => null
+			'path' => null,
+			'body' => null
 		);
 		$config += $defaults;
 
@@ -104,7 +110,7 @@ class Message extends \lithium\core\Object {
 		$default = array('buffer' => null);
 		$options += $default;
 		$this->body = array_merge((array) $this->body, (array) $data);
-		$body = trim(join("\r\n", $this->body));
+		$body = join("\r\n", $this->body);
 		return ($options['buffer']) ? str_split($body, $options['buffer']) : $body;
 	}
 

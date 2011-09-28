@@ -53,7 +53,7 @@ class Sqlite3Test extends \lithium\test\Unit {
 		  'autoConnect' => false,
 		  'database' => '',
 		  'flags' => SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE,
-		  'key' => NULL,
+		  'key' => null,
 		  'persistent' => true,
 		  'host' => 'localhost',
 		  'login' => 'root',
@@ -112,6 +112,21 @@ class Sqlite3Test extends \lithium\test\Unit {
 
 	public function testAbstractColumnResolution() {
 
+	}
+
+	public function testDescribe() {
+		$sql = 'CREATE TABLE [foo] ([bar] VARCHAR(20) NOT NULL DEFAULT baz);';
+		$this->db->read($sql, array('return' => 'resource'));
+		$result = $this->db->describe('foo');
+		$expected = array(
+		  'bar' => array (
+		  'type' => 'VARCHAR',
+		  'length' => '20',
+		  'null' => true,
+		  'default' => 'baz'
+		  )
+		);
+    $this->assertEqual($expected, $result);
 	}
 
 	public function testExecuteException() {

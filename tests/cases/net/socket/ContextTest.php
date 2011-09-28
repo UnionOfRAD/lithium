@@ -17,16 +17,15 @@ class ContextTest extends \lithium\test\Unit {
 	protected $_testConfig = array(
 		'persistent' => false,
 		'scheme' => 'http',
-		'host' => 'google.com',
+		'host' => 'lithify.me',
 		'port' => 80,
 		'timeout' => 4,
 		'classes' => array('request' => 'lithium\net\http\Request')
 	);
 
-	protected $_testUrl = 'http://google.com';
-
 	public function skip() {
-		$this->skipIf(dns_check_record("google.com") === false, "No internet connection.");
+		$message = "No internet connection established.";
+		$this->skipIf(!$this->_hasNetwork($this->_testConfig), $message);
 	}
 
 	public function testConstruct() {

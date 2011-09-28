@@ -15,10 +15,10 @@ use lithium\g11n\catalog\adapter\Memory;
 
 class MessageTest extends \lithium\test\Unit {
 
-	protected $_backups = array();
+	protected $_backup = array();
 
 	public function setUp() {
-		$this->_backups['catalogConfig'] = Catalog::config();
+		$this->_backup['catalogConfig'] = Catalog::config();
 		Catalog::reset();
 		Catalog::config(array(
 			'runtime' => array('adapter' => new Memory())
@@ -26,7 +26,7 @@ class MessageTest extends \lithium\test\Unit {
 		$data = function($n) { return $n == 1 ? 0 : 1; };
 		Catalog::write('runtime', 'message.pluralRule', 'root', $data);
 
-		$this->_backups['environment'] = Environment::get('test');
+		$this->_backup['environment'] = Environment::get('test');
 		Environment::set('test', array('locale' => 'en'));
 		Environment::set('test');
 		Message::cache(false);
@@ -34,9 +34,9 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		Catalog::reset();
-		Catalog::config($this->_backups['catalogConfig']);
+		Catalog::config($this->_backup['catalogConfig']);
 
-		Environment::set('test', $this->_backups['environment']);
+		Environment::set('test', $this->_backup['environment']);
 	}
 
 	public function testTranslateBasic() {

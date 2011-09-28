@@ -79,7 +79,9 @@ abstract class Database extends \lithium\data\Source {
 
 	protected $_constraintTypes = array(
 		'AND' => true,
-		'OR' => true
+		'and' => true,
+		'OR' => true,
+		'or' => true
 	);
 
 	/**
@@ -231,7 +233,7 @@ abstract class Database extends \lithium\data\Source {
 				if (($model) && !$model::key($entity)) {
 					$id = $self->invokeMethod('_insertId', array($object));
 				}
-				$entity->update($id);
+				$entity->sync($id);
 			}
 			return true;
 		});
@@ -261,11 +263,38 @@ abstract class Database extends \lithium\data\Source {
 			unset($args['return']);
 
 			$model = is_object($query) ? $query->model() : null;
-			$schema = !is_null($model) ? $model::schema() : array();
 
 			if (is_string($query)) {
 				$sql = String::insert($query, $self->value($args));
 			} else {
+				$limit = $query->limit();
+				if ($model && $limit && !isset($args['subquery']) && $model::relations('hasMany')) {
+					$name = $model::meta('name');
+					$key = $model::key();
+
+					$subQuery = $self->invokeMethod('_instance', array(
+							get_class($query), array(
+								'type' => 'read',
+								'model' => $model,
+								'group' => "{$name}.{$key}",
+								'fields' => array("{$name}.{$key}"),
+								'joins' => $query->joins(),
+								'conditions' => $query->conditions(),
+								'limit' => $query->limit(),
+								'page' => $query->page(),
+								'order' => $query->order()
+							)
+						));
+					$ids = $self->read($subQuery, array('subquery' => true));
+					if (!$ids->count()) {
+						return false;
+					}
+					$idData = $ids->data();
+					$ids = array_map(function($index) use ($key) {
+							return $index[$key];
+						}, $idData);
+					$query->limit(false)->conditions(array("{$name}.{$key}" => $ids));
+				}
 				$sql = $self->renderCommand($query);
 			}
 			$result = $self->invokeMethod('_execute', array($sql));
@@ -311,7 +340,7 @@ abstract class Database extends \lithium\data\Source {
 
 			if ($self->invokeMethod('_execute', array($sql))) {
 				if ($query->entity()) {
-					$query->entity()->update();
+					$query->entity()->sync();
 				}
 				return true;
 			}
@@ -379,22 +408,22 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function relationship($class, $type, $name, array $config = array()) {
 		$field = Inflector::underscore(Inflector::singularize($name));//($type == 'hasMany') ?  : ;
-		$keys = "{$field}_id";
+		$key = "{$field}_id";
 		$primary = $class::meta('key');
 
 		if (is_array($primary)) {
-			$keys = array_combine($primary, $primary);
+			$key = array_combine($primary, $primary);
 		} elseif ($type == 'hasMany' || $type == 'hasOne') {
 			if ($type == 'hasMany') {
 				$field = Inflector::pluralize($field);
 			}
 			$secondary = Inflector::underscore(Inflector::singularize($class::meta('name')));
-			$keys = array($primary => "{$secondary}_id");
+			$key = array($primary => "{$secondary}_id");
 		}
 
 		$from = $class;
 		$fieldName = $field;
-		$config += compact('type', 'name', 'keys', 'from', 'fieldName');
+		$config += compact('type', 'name', 'key', 'from', 'fieldName');
 		return $this->_instance('relationship', $config);
 	}
 
@@ -456,6 +485,7 @@ abstract class Database extends \lithium\data\Source {
 		$schema = $model::schema();
 		$pregDotMatch = '/^(' . implode('|', array_merge($relations, array($modelName))) . ')\./';
 		$forJoin = ($modelName != $query->alias());
+
 		foreach ($fields as $scope => $field) {
 			switch (true) {
 				case (is_numeric($scope) && ($field == '*' || $field == $modelName)):
@@ -491,7 +521,7 @@ abstract class Database extends \lithium\data\Source {
 			}
 		}
 		if (!$forJoin) {
-			$sortOrder = array_flip(array_merge(array($modelName),$relations));
+			$sortOrder = array_flip(array_merge(array($modelName), $relations));
 			uksort($result, function($a, $b) use ($sortOrder) {
 				return $sortOrder[$a] - $sortOrder[$b];
 			});
@@ -551,7 +581,7 @@ abstract class Database extends \lithium\data\Source {
 			case (is_numeric($key) && is_string($value)):
 				return $value;
 			case is_string($value):
-				return $this->name($key) . ' = ' . $this->value($value);
+				return $this->name($key) . ' = ' . $this->value($value, $schema[$key]);
 			case is_numeric($key) && is_array($value):
 				$result = array();
 				foreach ($value as $cField => $cValue) {
@@ -575,11 +605,11 @@ abstract class Database extends \lithium\data\Source {
 				}
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
 			case is_array($value):
-				$value = join(', ', $this->value($value, $schema));
+				$value = join(', ', $this->value($value, $schema[$key]));
 				return "{$key} IN ({$value})";
 			default:
 				if (isset($value)) {
-					$value = $this->value($value, $schema);
+					$value = $this->value($value, $schema[$key]);
 					return "{$key} = {$value}";
 				}
 				if ($value === null) {
@@ -642,6 +672,7 @@ abstract class Database extends \lithium\data\Source {
 		};
 		array_walk($fields, $groupFields);
 		$fields = $toMerge;
+
 		if (count($modelNames) > 1) {
 			$sortOrder = array_flip($modelNames);
 			uksort($fields, function($a, $b) use ($sortOrder) {
@@ -745,8 +776,20 @@ abstract class Database extends \lithium\data\Source {
 		$result = array();
 
 		foreach ($constraint as $field => $value) {
+			$field = $this->name($field);
+
 			if (is_string($value)) {
-				$result[] = $this->name($field) . ' = ' . $this->name($value);
+				$result[] = $field . ' = ' . $this->name($value);
+				continue;
+			}
+			if (!is_array($value)) {
+				continue;
+			}
+			foreach ($value as $operator => $val) {
+				if (isset($this->_operators[$operator])) {
+					$val = $this->name($val);
+					$result[] = "{$field} {$operator} {$val}";
+				}
 			}
 		}
 		return 'ON ' . join(' AND ', $result);
@@ -895,8 +938,14 @@ abstract class Database extends \lithium\data\Source {
 	 * @param string $entity
 	 * @return string
 	 */
-	protected function _entityName($entity) {
-		return $this->name($entity);
+	protected function _entityName($entity, array $options = array()) {
+		$defaults = array('quoted' => false);
+		$options += $defaults;
+
+		if (class_exists($entity, false) && method_exists($entity, 'meta')) {
+			$entity = $entity::meta('source');
+		}
+		return $options['quoted'] ? $this->name($entity) : $entity;
 	}
 
 	/**

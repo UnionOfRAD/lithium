@@ -14,7 +14,7 @@ class Result extends \lithium\data\source\database\Result {
 
 	protected function _prev() {
 		if ($this->_resource->reset()) {
-			for($i = 0; $i < $this->_iterator - 1; $i++) {
+			for ($i = 0; $i < $this->_iterator - 1; $i++) {
 				$ret = $this->_next();
 				$this->_iterator -= 1;
 			}

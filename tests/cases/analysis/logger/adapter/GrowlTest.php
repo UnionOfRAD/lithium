@@ -17,7 +17,7 @@ class GrowlTest extends \lithium\test\Unit {
 
 		$growl = new Growl(compact('connection') + array(
 			'name' => 'Lithium',
-			'title' => 'Lithium log',
+			'title' => 'Lithium log'
 		));
 		$writer = $growl->write('info', 'info: Test message.', array());
 		$params = array('message' => 'info: Test message.', 'options' => array());
@@ -74,7 +74,7 @@ class GrowlTest extends \lithium\test\Unit {
 
 		$growl = new Growl(compact('connection') + array(
 			'name' => 'Lithium',
-			'title' => 'Lithium log',
+			'title' => 'Lithium log'
 		));
 		$writer = $growl->write('info', 'info: Test message.', array());
 		$params = array('message' => 'info: Test message.', 'options' => array('sticky' => true));
@@ -100,7 +100,7 @@ class GrowlTest extends \lithium\test\Unit {
 
 		$growl = new Growl(compact('connection') + array(
 			'name' => 'Lithium',
-			'title' => 'Lithium log',
+			'title' => 'Lithium log'
 		));
 		$writer = $growl->write('info', 'info: Test message.', array());
 		$params = array('message' => 'info: Test message.', 'options' => array(

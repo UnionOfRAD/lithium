@@ -89,6 +89,7 @@ class Query extends \lithium\core\Object {
 			'source'     => null,
 			'order'      => null,
 			'offset'     => null,
+			'name'       => null,
 			'limit'      => null,
 			'page'       => null,
 			'group'      => null,
@@ -178,8 +179,9 @@ class Query extends \lithium\core\Object {
 	public function model($model = null) {
 		if ($model) {
 			$this->_config['model'] = $model;
-			$this->_config['source'] = $model::meta('source');
-			$this->_config['name'] = $model::meta('name');
+			$this->_config['source'] = $this->_config['source'] ?: $model::meta('source');
+			$this->_config['alias'] = $this->_config['alias'] ?: $model::meta('name');
+			$this->_config['name'] = $this->_config['name'] ?: $this->_config['alias'];
 			return $this;
 		}
 		return $this->_config['model'];
@@ -537,7 +539,6 @@ class Query extends \lithium\core\Object {
 		if (!$model = $this->model()) {
 			return;
 		}
-		$hasMany = false;
 
 		foreach ((array) $related as $name => $config) {
 			if (is_int($name)) {
@@ -548,29 +549,6 @@ class Query extends \lithium\core\Object {
 			}
 			list($name, $query) = $this->_fromRelationship($relationship);
 			$this->join($name, $query);
-			$hasMany = $hasMany || $relationship->type() == 'hasMany';
-		}
-
-		if ($hasMany && $this->limit()) {
-			$model = $this->model();
-			$name = $model::meta('name');
-			$key = $model::key();
-
-			$query = $this->_instance(get_class($this), array(
-				'type' => 'read',
-				'model' => $model,
-				'group' => "{$name}.{$key}",
-				'fields' => array("{$name}.{$key}"),
-				'joins' => $this->joins(),
-				'conditions' => $this->conditions(),
-				'limit' => $this->limit(),
-				'page' => $this->page(),
-				'order' => $this->order()
-			));
-			$ids = $model::connection()->read($query);
-			$idData = $ids->data();
-			$ids = array_map(function($index) use ($key) { return $index[$key]; }, $idData);
-			$this->limit(false)->conditions(array("{$name}.{$key}" => $ids));
 		}
 	}
 

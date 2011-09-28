@@ -32,7 +32,7 @@ class Password {
 	 * salt is supplied, a cryptographically strong salt will be generated
 	 * using `lithium\security\Password::salt()`.
 	 *
-	 * Using this function is the proper way to hash a password. Using naive
+	 * Using this function is the proper way to hash a password. Using naïve
 	 * methods such as sha1 or md5, as is done in many web applications, is
 	 * improper due to the lack of a cryptographically strong salt.
 	 *
@@ -69,6 +69,9 @@ class Password {
 	 * $check2  = Password::check($password, $hashed2); // True
 	 * }}}
 	 *
+	 * @see lithium\security\Password::check()
+	 * @see lithium\security\Password::salt()
+	 * @link http://php.net/manual/function.crypt.php
 	 * @param string $password The password to hash.
 	 * @param string $salt Optional. The salt string.
 	 * @return string The hashed password.
@@ -76,8 +79,6 @@ class Password {
 	 *        - 60 chars long for Blowfish hashes
 	 *        - 20 chars long for XDES hashes
 	 *        - 34 chars long for MD5 hashes
-	 * @see lithium\security\Password::check()
-	 * @see lithium\security\Password::salt()
 	 */
 	public static function hash($password, $salt = null) {
 		return crypt($password, $salt ?: static::salt());
@@ -88,11 +89,11 @@ class Password {
 	 * comparison, this method uses a constant-time algorithm to defend against
 	 * [timing attacks](http://codahale.com/a-lesson-in-timing-attacks/).
 	 *
+	 * @see lithium\security\Password::hash()
+	 * @see lithium\security\Password::salt()
 	 * @param string $password The password to check.
 	 * @param string $hash The hashed password to compare it to.
 	 * @return boolean Returns a boolean indicating whether the password is correct.
-	 * @see lithium\security\Password::hash()
-	 * @see lithium\security\Password::salt()
 	 */
 	public static function check($password, $hash) {
 		$password = crypt($password, $hash);
@@ -135,6 +136,11 @@ class Password {
 	 * consisting in random sequences of alpha numeric characters, use
 	 * `lithium\util\String::random()` instead.
 	 *
+	 * @link http://php.net/manual/en/function.crypt.php
+	 * @link http://www.postgresql.org/docs/9.0/static/pgcrypto.html
+	 * @see lithium\security\Password::hash()
+	 * @see lithium\security\Password::check()
+	 * @see lithium\util\String::random()
 	 * @param string $type The hash type. Optional. Defaults to the best
 	 *        available option. Supported values, along with their maximum
 	 *        password lengths, include:
@@ -146,11 +152,6 @@ class Password {
 	 *        - `10` for Blowfish
 	 *        - `18` for XDES
 	 * @return string The salt string.
-	 * @link http://php.net/manual/en/function.crypt.php
-	 * @link http://www.postgresql.org/docs/9.0/static/pgcrypto.html
-	 * @see lithium\security\Password::hash()
-	 * @see lithium\security\Password::check()
-	 * @see lithium\util\String::random()
 	 */
 	public static function salt($type = null, $count = null) {
 		switch (true) {

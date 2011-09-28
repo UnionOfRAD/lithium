@@ -15,7 +15,7 @@ namespace lithium\storage\cache\adapter;
  * which abstracts away key generation, adapter instantiation and filter
  * implementation.
  *
- * A simple configuration of this adapter can be accomplished in `app/config/bootstrap.php`
+ * A simple configuration of this adapter can be accomplished in `config/bootstrap/cache.php`
  * as follows:
  *
  * {{{
@@ -40,7 +40,8 @@ namespace lithium\storage\cache\adapter;
 class Apc extends \lithium\core\Object {
 
 	/**
-	 * Class constructor
+	 * Class constructor.
+	 *
 	 * @param array $config
 	 */
 	public function __construct(array $config = array()) {

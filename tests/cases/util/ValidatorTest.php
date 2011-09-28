@@ -19,14 +19,12 @@ class ValidatorTest extends \lithium\test\Unit {
 	/**
 	 * Tests static method call routing to enable patterns defined in Validator::$_rules to be
 	 * called as methods.
-	 *
-	 * @return void
 	 */
 	public function testCustomMethodDispatching() {
 		$this->assertTrue(Validator::isRegex('/^abc$/'));
 		$this->assertTrue(Validator::isPhone('800-999-5555'));
 
-		$this->assertTrue(Validator::isUrl('http://google.com'));
+		$this->assertTrue(Validator::isUrl('http://example.com'));
 	}
 
 	public function testFieldOption() {
@@ -65,8 +63,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that new methods can be called on Validator by adding rules using Validator::add().
-	 *
-	 * @return void
 	 */
 	public function testAddCustomRegexMethods() {
 		$this->assertNull(Validator::rules('foo'));
@@ -83,8 +79,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that the rules state is reset when calling `Validator::__init()`.
-	 *
-	 * @return void
 	 */
 	public function testStateReset() {
 		$this->assertNull(Validator::rules('foo'));
@@ -98,8 +92,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that valid and invalid UUIDs are properly detected.
-	 *
-	 * @return void
 	 */
 	public function testUuid() {
 		$this->assertTrue(Validator::isUuid('1c0a5830-6025-11de-8a39-0800200c9a66'));
@@ -124,14 +116,12 @@ class ValidatorTest extends \lithium\test\Unit {
 		$values = array(
 			'inputName' => 'blah'
 		);
-		$this->assertFalse((bool) Validator::check($values, $validations));
+		$this->assertFalse((boolean) Validator::check($values, $validations));
 		$this->assertEqual($rFormat, 'string');
 	}
 
 	/**
 	 * Tests that new formats can be added to existing regex methods using Validator::add().
-	 *
-	 * @return void
 	 */
 	public function testAddCustomRegexFormats() {
 		$this->assertTrue(Validator::isPhone('1234567890'));
@@ -148,8 +138,6 @@ class ValidatorTest extends \lithium\test\Unit {
 	/**
 	 * Tests that setting the `'contain'` rule option to false correctly requires a string to be
 	 * an exact match of the regex, with no additional characters outside.
-	 *
-	 * @return void
 	 */
 	public function testRegexContainment() {
 		$this->assertTrue(Validator::isIp('127.0.0.1', null, array('contains' => false)));
@@ -199,8 +187,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that the 'notEmpty' rule validates correct values
-	 *
-	 * @return void
 	 */
 	public function testNotEmptyRule() {
 		$this->assertTrue(Validator::isNotEmpty('abcdefg'));
@@ -216,8 +202,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests the the 'alphaNumeric' rule validates correct values.
-	 *
-	 * @return void
 	 */
 	public function testAlphaNumeric() {
 		$this->assertTrue(Validator::isAlphaNumeric('frferrf'));
@@ -242,8 +226,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests the the 'lengthBetween' rule validates correct values.
-	 *
-	 * @return void
 	 */
 	public function testIsLengthBetweenRule() {
 		$this->assertTrue(Validator::isLengthBetween('abcde', null, array('min' => 1, 'max' => 7)));
@@ -261,22 +243,27 @@ class ValidatorTest extends \lithium\test\Unit {
 	public function testBooleanValidation() {
 		$this->assertTrue(Validator::isBoolean(true));
 		$this->assertTrue(Validator::isBoolean(false));
+		$this->assertTrue(Validator::isBoolean('true'));
+		$this->assertTrue(Validator::isBoolean('false'));
 		$this->assertTrue(Validator::isBoolean(0));
 		$this->assertTrue(Validator::isBoolean(1));
 		$this->assertTrue(Validator::isBoolean('0'));
 		$this->assertTrue(Validator::isBoolean('1'));
+		$this->assertTrue(Validator::isBoolean('on'));
+		$this->assertTrue(Validator::isBoolean('off'));
+		$this->assertTrue(Validator::isBoolean('yes'));
+		$this->assertTrue(Validator::isBoolean('no'));
 
 		$this->assertFalse(Validator::isBoolean('11'));
 		$this->assertFalse(Validator::isBoolean('-1'));
 		$this->assertFalse(Validator::isBoolean(-1));
 		$this->assertFalse(Validator::isBoolean(11));
 		$this->assertFalse(Validator::isBoolean(null));
+		$this->assertFalse(Validator::isBoolean('test'));
 	}
 
 	/**
 	 * Test basic decimal number validation.
-	 *
-	 * @return void
 	 */
 	function testDecimal() {
 		$this->assertTrue(Validator::isDecimal('0.0'));
@@ -299,9 +286,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Test decimal validation with precision specified.
-	 *
-	 * @access public
-	 * @return void
 	 */
 	public function testDecimalWithPlaces() {
 		$this->assertTrue(Validator::isDecimal('.27', null, array('precision' => '2')));
@@ -408,11 +392,10 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests email address validation, with additional hostname lookup
-	 *
-	 * @return void
 	 */
 	public function testEmailDomainCheck() {
-		$this->skipIf(dns_check_record("google.com") === false, "No internet connection.");
+		$message = "No internet connection established.";
+		$this->skipIf(!$this->_hasNetwork(), $message);
 
 		$this->assertTrue(Validator::isEmail('abc.efg@rad-dev.org', null, array('deep' => true)));
 		$this->assertFalse(Validator::isEmail('abc.efg@invalidfoo.com', null, array(
@@ -423,8 +406,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests 'inList' validation.
-	 *
-	 * @return void
 	 */
 	function testInList() {
 		$this->assertTrue(Validator::isInList('one', null, array('list' => array('one', 'two'))));
@@ -435,8 +416,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests credit card validation for numbers in various vendors' formats.
-	 *
-	 * @return void
 	 */
 	public function testCreditCardValidation() {
 
@@ -455,6 +434,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('348498616319346', 'amex', array(
 			'deep' => true
 		)));
+		$this->assertFalse(Validator::isCreditCard('5610376649499352', 'amex'));
 
 		/**
 		 * BankCard
@@ -469,6 +449,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('5610139705753702', 'bankcard'));
 		$this->assertTrue(Validator::isCreditCard('5602226032150551', 'bankcard'));
 		$this->assertTrue(Validator::isCreditCard('5602223993735777', 'bankcard'));
+		$this->assertFalse(Validator::isCreditCard('30155483651028', 'bankcard'));
 
 		/**
 		 * Diners Club 14
@@ -521,6 +502,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('5577265786122391', 'diners'));
 		$this->assertTrue(Validator::isCreditCard('5534061404676989', 'diners'));
 		$this->assertTrue(Validator::isCreditCard('5545313588374502', 'diners'));
+		$this->assertFalse(Validator::isCreditCard('6011802876467237', 'diners'));
 
 		/**
 		 * Discover
@@ -535,6 +517,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('6509735979634270', 'disc'));
 		$this->assertTrue(Validator::isCreditCard('6011422366775856', 'disc'));
 		$this->assertTrue(Validator::isCreditCard('6500976374623323', 'disc'));
+		$this->assertFalse(Validator::isCreditCard('201496944158937', 'disc'));
 
 		/**
 		 * enRoute
@@ -549,6 +532,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('201402662758866', 'enroute'));
 		$this->assertTrue(Validator::isCreditCard('214981579370225', 'enroute'));
 		$this->assertTrue(Validator::isCreditCard('201447595859877', 'enroute'));
+		$this->assertFalse(Validator::isCreditCard('210034762247893', 'enroute'));
 
 		/**
 		 * JCB 15 digit
@@ -597,6 +581,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('3528274546125962', 'jcb'));
 		$this->assertTrue(Validator::isCreditCard('3528890967705733', 'jcb'));
 		$this->assertTrue(Validator::isCreditCard('3337198811307545', 'jcb'));
+		$this->assertFalse(Validator::isCreditCard('5020147409985219', 'jcb'));
 
 		/**
 		 * Maestro (debit card)
@@ -611,6 +596,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('5020565359718977', 'maestro'));
 		$this->assertTrue(Validator::isCreditCard('6339931536544062', 'maestro'));
 		$this->assertTrue(Validator::isCreditCard('6465028615704406', 'maestro'));
+		$this->assertFalse(Validator::isCreditCard('5580424361774366', 'maestro'));
 
 		/**
 		 * MasterCard
@@ -640,6 +626,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('5467639122779531', 'mc'));
 		$this->assertTrue(Validator::isCreditCard('5297350261550024', 'mc'));
 		$this->assertTrue(Validator::isCreditCard('5162739131368058', 'mc'));
+		$this->assertFalse(Validator::isCreditCard('6767432107064987', 'mc'));
 
 		/**
 		 * Solo 16
@@ -682,6 +669,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('6334933119080706440', 'solo'));
 		$this->assertTrue(Validator::isCreditCard('6334647959628261714', 'solo'));
 		$this->assertTrue(Validator::isCreditCard('6334527312384101382', 'solo'));
+		$this->assertFalse(Validator::isCreditCard('5641829171515733', 'solo'));
 
 		/**
 		 * Switch 16
@@ -814,6 +802,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('4936196077254804290', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('6759558831206830183', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('5641827998830403137', 'switch'));
+		$this->assertFalse(Validator::isCreditCard('4024007174754', 'switch'));
 
 		/**
 		 * Visa 13 digit
@@ -912,6 +901,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('4916845885268360', 'visa'));
 		$this->assertTrue(Validator::isCreditCard('4394514669078434', 'visa'));
 		$this->assertTrue(Validator::isCreditCard('4485611378115042', 'visa'));
+		$this->assertFalse(Validator::isCreditCard('869940697287073', 'visa'));
 
 		/**
 		 * Visa Electron
@@ -931,6 +921,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('4175009797419290', 'electron'));
 		$this->assertTrue(Validator::isCreditCard('4175005028142917', 'electron'));
 		$this->assertTrue(Validator::isCreditCard('4913940802385364', 'electron'));
+		$this->assertFalse(Validator::isCreditCard('869940697287073', 'electron'));
 
 		/**
 		 * Voyager
@@ -940,6 +931,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('869958670174621', 'voyager'));
 		$this->assertTrue(Validator::isCreditCard('869921250068209', 'voyager'));
 		$this->assertTrue(Validator::isCreditCard('869972521242198', 'voyager'));
+		$this->assertFalse(Validator::isCreditCard('370482756063980', 'voyager'));
 
 		$this->assertTrue(Validator::isLuhn('869972521242198'));
 		$this->assertFalse(Validator::isLuhn(false));
@@ -963,6 +955,27 @@ class ValidatorTest extends \lithium\test\Unit {
 		$result = Validator::check($data, $rules);
 		$this->assertTrue(empty($result));
 	}
+	
+	public function testCheckSkipEmpty() {
+		$rules = array(
+			'email' => array('email', 'skipEmpty' => true, 'message' => 'email is not valid')
+		);
+		
+		// empty string should pass
+		$data = array('email' => '');
+		$result = Validator::check($data, $rules);
+		$this->assertTrue(empty($result));
+		
+		// null value should pass
+		$data = array('email' => null);
+		$result = Validator::check($data, $rules);
+		$this->assertTrue(empty($result));
+		
+		// string with spaces should NOT pass
+		$data = array('email' => ' ');
+		$result = Validator::check($data, $rules);
+		$this->assertFalse(empty($result));
+	}
 
 	public function testCheckMultipleHasErrors() {
 		$rules = array(
@@ -978,6 +991,24 @@ class ValidatorTest extends \lithium\test\Unit {
 		$expected = array(
 			'title' => array('please enter a title'),
 			'email' => array('email is empty', 'email is not valid')
+		);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testCheckWithLastRule() {
+		$rules = array(
+			'title' => array('please enter a title'),
+			'email' => array(
+				array('notEmpty', 'message' => 'email is empty', 'last' => true),
+				array('email', 'message' => 'email is invalid')
+			)
+		);
+		$result = Validator::check(array(), $rules);
+		$this->assertFalse(empty($result));
+
+		$expected = array(
+			'title' => array('title is empty'),
+			'email' => array('email is empty')
 		);
 		$this->assertEqual($expected, $result);
 	}

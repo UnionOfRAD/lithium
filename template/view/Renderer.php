@@ -484,6 +484,8 @@ abstract class Renderer extends \lithium\core\Object {
 	 * @return string Returns a the rendered template content as a string.
 	 */
 	protected function _render($type, $template, array $data = array(), array $options = array()) {
+		$library = $this->_request->library;
+		$options += compact('library');
 		return $this->_view->render($type, $data + $this->_data, compact('template') + $options);
 	}
 }

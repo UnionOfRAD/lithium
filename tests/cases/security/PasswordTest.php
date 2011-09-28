@@ -47,7 +47,7 @@ class PasswordTest extends \lithium\test\Unit {
 				$this->assertFalse(in_array($hash, $hashes));
 				$hashes[] = $hash;
 
-				$this->assertTrue(Password::check($pass, $hash));
+				$this->assertTrue(Password::check($pass, $hash), "{$method} failed");
 			}
 		}
 	}
@@ -59,7 +59,10 @@ class PasswordTest extends \lithium\test\Unit {
 		foreach (array('bf' => 72) as $method => $length) {
 			$salt = Password::salt($method);
 			$pass = str_repeat('a', $length);
-			$this->assertIdentical(Password::hash($pass, $salt), Password::hash($pass . 'a', $salt));
+
+			$expected = Password::hash($pass, $salt);
+			$result = Password::hash($pass . 'a', $salt);
+			$this->assertIdentical($expected, $result);
 		}
 	}
 }

@@ -11,12 +11,12 @@ namespace lithium\tests\integration\g11n;
 use lithium\g11n\Catalog;
 use lithium\util\Validator;
 
-class ResourcesValidatorTest extends \lithium\test\Unit {
+class ResourcesValidatorTest extends \lithium\test\Integration {
 
-	protected $_backups = array();
+	protected $_backup = array();
 
 	public function setUp() {
-		$this->_backups['catalogConfig'] = Catalog::config();
+		$this->_backup['catalogConfig'] = Catalog::config();
 		Catalog::reset();
 		Catalog::config(array(
 			'lithium' => array(
@@ -28,7 +28,7 @@ class ResourcesValidatorTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		Catalog::reset();
-		Catalog::config($this->_backups['catalogConfig']);
+		Catalog::config($this->_backup['catalogConfig']);
 	}
 
 	public function testDaDk() {

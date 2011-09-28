@@ -193,8 +193,9 @@ class View extends \lithium\core\Object {
 	 *            templates. Defaults to `File`.
 	 *          - `'renderer'` _mixed_: Populates the view/layout with the data set from the
 	 *            controller. Defaults to `'File'`.
-	 *          - `request`: The request object to be made available in the view. Defaults to `null`.
-	 *          - `vars`: Defaults to `array()`.
+	 *          - `'request'`: The request object to be made available in the view.
+	 *            Defaults to `null`.
+	 *          - `'vars'`: Defaults to `array()`.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -287,12 +288,14 @@ class View extends \lithium\core\Object {
 	}
 
 	/**
-	 * @filter
+	 * Performs a rendering step.
+	 *
 	 * @param array $step
 	 * @param array $params
 	 * @param array $data associative array for template data.
 	 * @param array $options
-	 * @return _renderer.render
+	 * @return string
+	 * @filter
 	 */
 	protected function _step(array $step, array $params, array &$data, array &$options = array()) {
 		$step += array('path' => null, 'capture' => null);

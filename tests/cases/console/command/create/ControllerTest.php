@@ -88,6 +88,7 @@ class ControllerTest extends \lithium\test\Unit {
 namespace create_test\controllers;
 
 use create_test\models\Posts;
+use lithium\action\DispatchException;
 
 class PostsController extends \lithium\action\Controller {
 

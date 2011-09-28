@@ -230,6 +230,18 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	/**
+	 * Checks if erasing the whole session array works as expected.
+	 */
+	public function testClear() {
+		$_SESSION['foo'] = 'bar';
+		$this->assertFalse(empty($_SESSION));
+		$closure = $this->Php->clear();
+		$this->assertTrue(is_callable($closure));
+		$result = $closure($this->Php, array(), null);
+		$this->assertTrue(empty($_SESSION));
+	}
+
 	public function testCheckThrowException() {
 		$Php = new MockPhp(array('init' => false));
 		$this->expectException('/Could not start session./');

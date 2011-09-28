@@ -15,44 +15,31 @@
  * looking for a `config` directory with a `bootstrap.php` file in it.  If no
  * application context is found, just boot up the core framework.
  */
-$library = dirname(dirname(__DIR__));
-$working = getcwd() ?: __DIR__;
+$params = getopt("", array("app::"));
+$working = $params ? array_pop($params) : getcwd();
 $app = null;
 
-while (!$app && $working) {
-	if (file_exists($working . '/config/bootstrap.php')) {
-		$app = $working;
-	} elseif (file_exists($working . '/app/config/bootstrap.php')) {
-		$app = $working . '/app';
-	} else {
-		$working = ($parent = dirname($working)) != $working ? $parent : false;
+/**
+ * If we're not running inside an application (i.e. a self-bootstrapping library), bootstrap the
+ * core automatically with the default settings.
+ */
+$bootstrap = function() use ($working) {
+	define('LITHIUM_LIBRARY_PATH', dirname(dirname(__DIR__)));
+	define('LITHIUM_APP_PATH', $working);
+
+	if (!include LITHIUM_LIBRARY_PATH . '/lithium/core/Libraries.php') {
+		$message  = "Lithium core could not be found.  Check the value of LITHIUM_LIBRARY_PATH in ";
+		$message .= __FILE__ . ".  It should point to the directory containing your ";
+		$message .= "/libraries directory.";
+		throw new ErrorException($message);
 	}
-}
 
-if ($app && is_dir("{$app}/config/bootstrap") && file_exists("{$app}/webroot/index.php")) {
-	include "{$app}/config/bootstrap.php";
-	exit(lithium\console\Dispatcher::run(new lithium\console\Request())->status);
-}
-
-define('LITHIUM_LIBRARY_PATH', $library);
-define('LITHIUM_APP_PATH', $app ? $working : dirname($library) . '/app');
-
-if (!include LITHIUM_LIBRARY_PATH . '/lithium/core/Libraries.php') {
-	$message  = "Lithium core could not be found.  Check the value of LITHIUM_LIBRARY_PATH in ";
-	$message .= __FILE__ . ".  It should point to the directory containing your ";
-	$message .= "/libraries directory.";
-	throw new ErrorException($message);
-}
-
-lithium\core\Libraries::add('lithium');
-
-if ($app) {
-	lithium\core\Libraries::add(basename(LITHIUM_APP_PATH), array(
-		'path' => LITHIUM_APP_PATH,
+	lithium\core\Libraries::add('lithium');
+	lithium\core\Libraries::add(basename($working), array(
 		'default' => true,
-		'bootstrap' => !file_exists("{$app}/webroot/index.php")
+		'path' => $working
 	));
-}
+};
 
 /**
  * The following will dispatch the request and exit with the status code as
@@ -77,6 +64,42 @@ if ($app) {
  * @see lithium\console\Dispatcher
  * @see lithium\console\Router
  */
-exit(lithium\console\Dispatcher::run(new lithium\console\Request())->status);
+$run = function() {
+	return lithium\console\Dispatcher::run(new lithium\console\Request())->status;
+};
+
+/**
+ * Look to see if there's a bootstrap file. If there is, this is either a Lithium application or
+ * plugin.
+ */
+if (file_exists("{$working}/config/bootstrap.php")) {
+	$app = $working;
+} elseif (file_exists("{$working}/app/config/bootstrap.php")) {
+	$app = "{$working}/app";
+}
+
+/**
+ * Attempt to bootstrap the application and execute the request. On failure, use the default
+ * bootstrap.
+ */
+if ($app) {
+	foreach (array("bootstrap.php", "bootstrap/libraries.php") as $file) {
+		if (!file_exists($path = "{$app}/config/{$file}")) {
+			continue;
+		}
+		if (preg_match("/^define\([\"']LITHIUM_LIBRARY_PATH[\"']/m", file_get_contents($path))) {
+			include "{$app}/config/bootstrap.php";
+			exit($run());
+		}
+	}
+}
+
+/**
+ * We're not running inside a Lithium application. Use the default bootstrap and execute the
+ * request.
+ */
+$bootstrap();
+$app ? include "{$app}/config/bootstrap.php" : null;
+exit($run());
 
 ?>

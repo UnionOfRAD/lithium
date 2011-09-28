@@ -95,6 +95,9 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$result = $this->db->value('1.1', array('type' => 'float'));
 		$this->assertIdentical(1.1, $result);
+
+		$result = $this->db->value('1', array('type' => 'string'));
+		$this->assertIdentical("'1'", $result);
 	}
 
 	public function testValueByIntrospect() {
@@ -154,7 +157,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
 			$modelName => array(
-				'id', 'title',
+				'id', 'title'
 			),
 			'MockDatabaseComment' => array(
 				'body'
@@ -168,7 +171,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
 			$modelName => array(
-				'id', 'title',
+				'id', 'title'
 			),
 			'MockDatabaseComment' => array(
 				'body', 'created'
@@ -259,7 +262,7 @@ class DatabaseTest extends \lithium\test\Unit {
 				'type' => 'read',
 				'fields' => array('post_id'),
 				'model' => 'lithium\tests\mocks\data\model\MockDatabaseTagging',
-				'conditions' => array('MockDatabaseTag.tag' => array('foo', 'bar', 'baz')),
+				'conditions' => array('MockDatabaseTag.tag' => array('foo', 'bar', 'baz'))
 			))))
 		));
 		$result = $this->db->renderCommand($query);
@@ -541,19 +544,27 @@ class DatabaseTest extends \lithium\test\Unit {
 			'type' => 'read', 'model' => $this->_model,
 			'conditions' => array(
 				'or' => array(
-					'field1' => 'value1',
-					'field2' => 'value2',
-					'and' => array('sField' => '1', 'sField2' => '2'),
-					array('field1' => 'value2'),
-					array('field2' => null)
+					'id' => 'value1',
+					'title' => 'value2',
+					'and' => array('author_id' => '1', 'created' => '2'),
+					array('title' => 'value2'),
+					array('title' => null)
 				),
-				'bField' => '3',
-				'bField2' => false
+				'id' => '3',
+				'author_id' => false
 			)
 		));
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ";
-		$sql .= "({field1} = 'value1' OR {field2} = 'value2' OR ({sField} = 1 AND {sField2} = 2)";
-		$sql .= " OR ({field1} = 'value2') OR (field2 IS NULL)) AND {bField} = 3 AND bField2 = 0;";
+		$sql .= "({id} = 0 OR {title} = 'value2' OR ({author_id} = 1 AND {created} = '2')";
+		$sql .= " OR ({title} = 'value2') OR (title IS NULL)) AND {id} = 3 AND author_id = 0;";
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+
+		$query = new Query(array(
+			'type' => 'read', 'model' => $this->_model,
+			'conditions' => array('title' => array('0900'))
+		));
+
+		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE title IN ('0900');";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
 
@@ -617,13 +628,13 @@ class DatabaseTest extends \lithium\test\Unit {
 		$hasMany = $this->db->relationship($this->_model, 'hasMany', 'Comments', array(
 			'to' => $comment
 		));
-		$this->assertEqual(array('id' => 'mock_database_post_id'), $hasMany->keys());
+		$this->assertEqual(array('id' => 'mock_database_post_id'), $hasMany->key());
 		$this->assertEqual('comments', $hasMany->fieldName());
 
 		$belongsTo = $this->db->relationship($comment, 'belongsTo', 'Posts', array(
 			'to' => $this->_model
 		));
-		$this->assertEqual(array('post_id' => 'id'), $belongsTo->keys());
+		$this->assertEqual(array('post_id' => 'id'), $belongsTo->key());
 		$this->assertEqual('post', $belongsTo->fieldName());
 	}
 
@@ -645,6 +656,17 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $this->db->sql);
 	}
 
+	public function testReadWithHasManyAndLimit() {
+		$options = array(
+			'type' => 'read',
+			'model' => $this->_model,
+			'with' => array('MockDatabaseComment'),
+			'limit' => 1
+		);
+		$result = $this->db->read(new Query($options), $options);
+		$this->assertFalse($result);
+	}
+
 	public function testGroup() {
 		$result = $this->db->group(array('id ASC'));
 		$expected = 'GROUP BY id ASC';
@@ -662,6 +684,53 @@ class DatabaseTest extends \lithium\test\Unit {
 		$sql = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} ';
 		$sql .= 'ORDER BY {MockDatabasePost}.{created} ASC;';
 		$this->assertEqual($sql, $this->db->renderCommand($query));
+	}
+
+	/**
+	 * Tests that complex model constraints with custom operators render correct constraint strings.
+	 */
+	public function testRenderArrayJoinConstraintComplex() {
+		$model = 'lithium\tests\mocks\data\model\MockQueryComment';
+
+		$query = new Query(compact('model') + array(
+			'type' => 'read',
+			'source' => 'comments',
+			'alias' => 'Comments',
+			'conditions' => array('Comment.id' => 1),
+			'joins' => array(array(
+				'type' => 'INNER',
+				'source' => 'posts',
+				'alias' => 'Post',
+				'constraint' => array("Comment.post_id" => array('<=' => "Post.id"))
+			))
+		));
+
+		$expected = "SELECT * FROM {comments} AS {Comments} INNER JOIN {posts} AS {Post} ON ";
+		$expected .= "{Comment}.{post_id} <= {Post}.{id} WHERE Comment.id = 1;";
+		$result = Connections::get('mock-database-connection')->renderCommand($query);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testRenderArrayJoin() {
+		$model = 'lithium\tests\mocks\data\model\MockQueryComment';
+
+		$query = new Query(compact('model') + array(
+			'type' => 'read',
+			'source' => 'comments',
+			'alias' => 'Comment',
+			'conditions' => array('Comment.id' => 1),
+			'joins' => array(array(
+				'type' => 'INNER',
+				'source' => 'posts',
+				'alias' => 'Post',
+				'constraint' => array('Comment.post_id' => 'Post.id')
+			))
+		));
+
+		$expected = "SELECT * FROM {comments} AS {Comment} INNER JOIN {posts} AS {Post} ON ";
+		$expected .= "{Comment}.{post_id} = {Post}.{id} WHERE Comment.id = 1;";
+		$result = Connections::get('mock-database-connection')->renderCommand($query);
+		$this->assertEqual($expected, $result);
 	}
 }
 

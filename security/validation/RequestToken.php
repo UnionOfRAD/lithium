@@ -8,7 +8,6 @@
 
 namespace lithium\security\validation;
 
-use UnexpectedValueException;
 use lithium\security\Password;
 use lithium\util\String;
 use lithium\util\Set;
@@ -57,7 +56,7 @@ class RequestToken {
 	 * @var array
 	 */
 	protected static $_classes = array(
-		'session' => 'lithium\storage\Session',
+		'session' => 'lithium\storage\Session'
 	);
 
 	/**
@@ -103,7 +102,7 @@ class RequestToken {
 			'regenerate' => false,
 			'sessionKey' => 'security.token',
 			'salt' => null,
-			'type' => 'sha512',
+			'type' => 'sha512'
 		);
 		$options += $defaults;
 		$session = static::$_classes['session'];

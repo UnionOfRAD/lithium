@@ -29,8 +29,10 @@ use Exception;
  * (i.e. arrays) including other `Document` objects.
  *
  * After installing MongoDB, you can connect to it as follows:
- * {{{//app/config/bootstrap/connections.php:
- * Connections::add('default', array('type' => 'MongoDb', 'database' => 'myDb'));}}}
+ * {{{
+ * // config/bootstrap/connections.php:
+ * Connections::add('default', array('type' => 'MongoDb', 'database' => 'myDb'));
+ * }}}
  *
  * By default, it will attempt to connect to a Mongo instance running on `localhost` on port
  * 27017. See `__construct()` for details on the accepted configuration settings.
@@ -390,7 +392,7 @@ class MongoDb extends \lithium\data\Source {
 
 			if ($result === true || isset($result['ok']) && (boolean) $result['ok'] === true) {
 				if ($query->entity()) {
-					$query->entity()->update($data['create']['_id']);
+					$query->entity()->sync($data['create']['_id']);
 				}
 				return true;
 			}
@@ -526,7 +528,7 @@ class MongoDb extends \lithium\data\Source {
 				$update = array('$set' => $update);
 			}
 			if ($self->connection->{$source}->update($args['conditions'], $update, $options)) {
-				$query->entity() ? $query->entity()->update() : null;
+				$query->entity() ? $query->entity()->sync() : null;
 				return true;
 			}
 			return false;
@@ -582,9 +584,9 @@ class MongoDb extends \lithium\data\Source {
 	 * @return array
 	 */
 	public function relationship($class, $type, $name, array $config = array()) {
-		$keys = Inflector::camelize($type == 'belongsTo' ? $class::meta('name') : $name, false);
+		$key = Inflector::camelize($type == 'belongsTo' ? $class::meta('name') : $name, false);
 
-		$config += compact('name', 'type', 'keys');
+		$config += compact('name', 'type', 'key');
 		$config['from'] = $class;
 		$relationship = $this->_classes['relationship'];
 
@@ -774,9 +776,10 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	public function cast($entity, array $data, array $options = array()) {
-		$defaults = array('schema' => null, 'first' => false, 'pathKey' => null);
+		$defaults = array('schema' => null, 'first' => false);
 		$options += $defaults;
 		$model = null;
+		$exists = false;
 
 		if (!$data) {
 			return $data;
@@ -786,18 +789,19 @@ class MongoDb extends \lithium\data\Source {
 			$model = $entity;
 			$entity = null;
 			$options['schema'] = $options['schema'] ?: $model::schema();
-		}
-		if ($entity && !$options['schema']) {
-			$options['schema'] = $entity->schema();
-		}
-		if ($entity) {
+		} elseif ($entity) {
+			$options['schema'] = $options['schema'] ?: $entity->schema();
 			$model = $entity->model();
+
+			if (is_a($entity, $this->_classes['entity'])) {
+				$exists = $entity->exists();
+			}
 		}
 		$schema = $options['schema'] ?: array('_id' => array('type' => 'id'));
 		unset($options['schema']);
-		$exporter = $this->_classes['exporter'];
-		$options += compact('model') + array('handlers' => $this->_handlers);
 
+		$exporter = $this->_classes['exporter'];
+		$options += compact('model', 'exists') + array('handlers' => $this->_handlers);
 		return parent::cast($entity, $exporter::cast($data, $schema, $this, $options), $options);
 	}
 

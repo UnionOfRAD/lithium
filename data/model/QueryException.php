@@ -9,10 +9,10 @@
 namespace lithium\data\model;
 
 /**
- * The `MediaException` is thrown when a request is made to render content in a format not
- * supported.
+ * The `QueryException` is thrown when a CRUD operation on the database returns an
+ * error.
  *
- * @see lithium\net\http\Media
+ * @see lithium\data\model\Query
  */
 class QueryException extends \RuntimeException {
 
