@@ -126,7 +126,7 @@ class InspectorTest extends \lithium\test\Unit {
 		$expected = array(1 => 'one', 5 => 'five');
 		$this->assertEqual($expected, $result);
 
-		unlink($tmpPath);
+		$this->_cleanUp();
 	}
 
 	/**
