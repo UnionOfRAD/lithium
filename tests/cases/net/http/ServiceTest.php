@@ -212,6 +212,8 @@ class ServiceTest extends \lithium\test\Unit {
 		$connection = $http->connection(array('scheme' => 'https'));
 		$config = $connection->config();
 		$this->assertEqual('https', $config['scheme']);
+
+		$this->assertEqual($http->connection(), $connection);
 	}
 
 	public function testSendConfiguringConnection() {
