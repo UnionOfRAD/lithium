@@ -83,8 +83,13 @@ class Service extends \lithium\core\Object {
 	 *
 	 */
 	protected function _init() {
-		$config = $this->_config;
-		$this->connection = Libraries::instance('socket', $config['socket'], $config);
+		$config = array('classes' => $this->_classes) + $this->_config;
+
+		try {
+			$this->connection = Libraries::instance('socket', $config['socket'], $config);
+		} catch(ClassNotFoundException $e) {
+			$this->connection = null;
+		}
 	}
 
 	/**
@@ -169,7 +174,7 @@ class Service extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function send($method, $path = null, $data = array(), array $options = array()) {
-		$defaults = array('return' => 'body', 'classes' => $this->_classes);
+		$defaults = array('return' => 'body');
 		$options += $defaults;
 		$request = $this->_request($method, $path, $data, $options);
 		$options += array('message' => $request);

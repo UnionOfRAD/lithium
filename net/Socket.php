@@ -68,7 +68,8 @@ abstract class Socket extends \lithium\core\Object {
 	 * @return mixed The open resource on success, `false` otherwise.
 	 */
 	public function open(array $options = array()) {
-		$this->_config = $options + $this->_config;
+		parent::__construct($options + $this->_config);
+		return false;
 	}
 
 	/**
