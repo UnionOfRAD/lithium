@@ -13,15 +13,15 @@ use lithium\console\Request;
 
 class DispatcherTest extends \lithium\test\Unit {
 
-	protected $_backups = array();
+	protected $_backup = array();
 
 	public function setUp() {
-		$this->_backups['_SERVER'] = $_SERVER;
+		$this->_backup['_SERVER'] = $_SERVER;
 		$_SERVER['argv'] = array();
 	}
 
 	public function tearDown() {
-		$_SERVER = $this->_backups['_SERVER'];
+		$_SERVER = $this->_backup['_SERVER'];
 	}
 
 	public function testEmptyConfigReturnRules() {

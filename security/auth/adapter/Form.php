@@ -79,7 +79,7 @@ use lithium\security\Password;
  * 	'default' => array(
  * 		'adapter' => 'Form',
  * 		'filters' => array('password' => array('lithium\util\String', 'hash')),
- * 		'validators' => array()
+ * 		'validators' => array('password' => false)
  * 	)
  * ));
  * }}}
@@ -287,7 +287,7 @@ class Form extends \lithium\core\Object {
 		$password = function($form, $data) {
 			return Password::check($form, $data);
 		};
-		$config['validators'] += compact('password');
+		$config['validators'] = array_filter($config['validators'] + compact('password'));
 
 		parent::__construct($config + $defaults);
 	}
@@ -413,7 +413,7 @@ class Form extends \lithium\core\Object {
 	 */
 	protected function _validate($user, array $data) {
 		foreach ($this->_validators as $field => $validator) {
-			if ($validator === false || !isset($this->_fields[$field]) || $field === 0) {
+			if (!isset($this->_fields[$field]) || $field === 0) {
 				continue;
 			}
 

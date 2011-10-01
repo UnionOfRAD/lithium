@@ -165,7 +165,8 @@ class RequestTest extends \lithium\test\Unit {
 			),
 			'content' => '',
 			'protocol_version' => '1.1',
-			'ignore_errors' => true
+			'ignore_errors' => true,
+			'follow_location' => true
 		));
 		$this->assertEqual($expected, $request->to('context'));
 	}
@@ -230,7 +231,8 @@ class RequestTest extends \lithium\test\Unit {
 				'User-Agent: Mozilla/5.0'
 			),
 			'protocol_version' => '1.1',
-			'ignore_errors' => true
+			'ignore_errors' => true,
+			'follow_location' => true
 		));
 		$result = $this->request->to('context');
 		$this->assertEqual($expected, $result);

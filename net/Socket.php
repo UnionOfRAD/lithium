@@ -64,9 +64,13 @@ abstract class Socket extends \lithium\core\Object {
 	/**
 	 * Opens the socket and sets `Socket::$_resource`.
 	 *
+	 * @param array $options update the config settings
 	 * @return mixed The open resource on success, `false` otherwise.
 	 */
-	abstract public function open();
+	public function open(array $options = array()) {
+		parent::__construct($options + $this->_config);
+		return false;
+	}
 
 	/**
 	 * Closes the socket and unsets `Socket::$_resource`.

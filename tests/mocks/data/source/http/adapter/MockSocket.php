@@ -12,7 +12,8 @@ class MockSocket extends \lithium\net\Socket {
 
 	protected $_data = null;
 
-	public function open() {
+	public function open(array $options = array()) {
+		parent::open($options);
 		return true;
 	}
 

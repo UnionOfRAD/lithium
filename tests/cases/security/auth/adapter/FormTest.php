@@ -37,6 +37,7 @@ class FormTest extends \lithium\test\Unit {
 	public function testLogin() {
 		$subject = new Form(array(
 			'model' => __CLASS__,
+			'fields' => array('username'),
 			'validators' => array('password' => false)
 		));
 
@@ -61,13 +62,12 @@ class FormTest extends \lithium\test\Unit {
 	public function testLoginWithFilters() {
 		$subject = new Form(array(
 			'model' => __CLASS__,
+			'fields' => array('username'),
 			'filters' => array('username' => 'sha1'),
 			'validators' => array('password' => false)
 		));
 
-		$request = (object) array('data' => array(
-			'username' => 'Person'
-		));
+		$request = (object) array('data' => array('username' => 'Person'));
 
 		$expected = array('username' => sha1('Person'));
 		$result = $subject->check($request);
@@ -114,7 +114,7 @@ class FormTest extends \lithium\test\Unit {
 	public function testGenericFilter() {
 		$subject = new Form(array(
 			'model' => __CLASS__,
-			'fields' => array('username', 'password', 'group'),
+			'fields' => array('username', 'password', 'group', 'secret'),
 			'filters' => array(
 				function($form) {
 					unset($form['secret']);
@@ -127,11 +127,31 @@ class FormTest extends \lithium\test\Unit {
 		$request = (object) array('data' => array(
 			'username' => 'bob',
 			'group' => 'editors',
-			'secret' => 'value'
+			'secret' => 'value',
+			'password' => 'foo!'
 		));
 
 		$result = $subject->check($request);
-		$expected = array('username' => 'bob', 'group' => 'editors');
+		$expected = array('username' => 'bob', 'group' => 'editors', 'password' => 'foo!');
+		$this->assertEqual($expected, $result);
+
+		$subject = new Form(array(
+			'model' => __CLASS__,
+			'fields' => array('username', 'password', 'group', 'secret'),
+			'validators' => array('password' => false)
+		));
+
+		$request = (object) array('data' => array(
+			'username' => 'bob',
+			'group' => 'editors',
+			'secret' => 'value',
+			'password' => 'foo!'
+		));
+
+		$result = $subject->check($request);
+		$expected = array(
+			'username' => 'bob', 'group' => 'editors', 'password' => 'foo!', 'secret' => 'value'
+		);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -209,7 +229,7 @@ class FormTest extends \lithium\test\Unit {
 		));
 
 		$result = $subject->check($request);
-		$expected = array('username' => 'Bob', 'group' => 'editors');
+		$expected = array('username' => 'Bob', 'group' => 'editors', 'password' => 's3cure');
 		$this->assertEqual($expected, $result);
 	}
 
@@ -323,25 +343,40 @@ class FormTest extends \lithium\test\Unit {
 		$subject->check($request);
 	}
 
+	/**
+	 * Tests that the `Form` adapter can be configured to do simple hash-based password
+	 * authentication.
+	 */
+	public function testHashedPasswordAuth() {
+		$subject = new Form(array(
+			'model' => __CLASS__,
+			'filters' => array('password' => 'sha1'),
+			'validators' => array('password' => false)
+		));
+
+		$request = (object) array('data' => array('username' => 'Bob', 'password' => 's3kr1t'));
+		$expected = array(
+			'username' => 'Bob',
+			'password' => 'ff44e879c7e013b38e4b970e8a5d47c7f283eed1'
+		);
+		$this->assertEqual($expected, $subject->check($request));
+	}
+
 	public function testValidatorWithFieldMapping() {
 		$subject = new Form(array(
-				'model' => __CLASS__,
-				'fields' => array('name' => 'user.name', 'password' => 'user.password'),
-				'validators' => array(
-					'password' => function ($form, $data) {
-						if ($form == $data) {
-							return true;
-						}
-						return false;
+			'model' => __CLASS__,
+			'fields' => array('name' => 'user.name', 'password' => 'user.password'),
+			'validators' => array(
+				'password' => function ($form, $data) {
+					if ($form == $data) {
+						return true;
 					}
-				)
-			));
-		$request = (object) array(
-			'data' => array(
-				'name' => 'Foo',
-				'password' => 'bar'
+					return false;
+				}
 			)
-		);
+		));
+
+		$request = (object) array('data' => array('name' => 'Foo', 'password' => 'bar'));
 		$this->assertTrue($subject->check($request));
 	}
 }

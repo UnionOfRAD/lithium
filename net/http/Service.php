@@ -79,6 +79,33 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
+	 * Initialize connection
+	 *
+	 */
+	protected function _init() {
+		$config = array('classes' => $this->_classes) + $this->_config;
+
+		try {
+			$this->connection = Libraries::instance('socket', $config['socket'], $config);
+		} catch(ClassNotFoundException $e) {
+			$this->connection = null;
+		}
+	}
+
+	/**
+	 * Magic method to handle other HTTP methods.
+	 *
+	 * @param string $method
+	 * @param string $params
+	 * @return void
+	 * @author gwoo
+	 */
+	public function __call($method, $params = array()) {
+		array_unshift($params, $method);
+		return $this->invokeMethod('send', $params);
+	}
+
+	/**
 	 * Send HEAD request.
 	 *
 	 * @param array $options
@@ -137,23 +164,6 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
-	 * Retrieve instance of configured socket
-	 *
-	 * @param array $config options to be passed on to the socket
-	 * @return object
-	 */
-	public function &connection($config = array()) {
-		$config += $this->_config;
-
-		try {
-			$this->connection = Libraries::instance('socket', $config['socket'], $config);
-		} catch (ClassNotFoundException $e) {
-			$this->connection = null;
-		}
-		return $this->connection;
-	}
-
-	/**
 	 * Send request and return response data.
 	 *
 	 * @param string $method
@@ -164,17 +174,16 @@ class Service extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function send($method, $path = null, $data = array(), array $options = array()) {
-		$defaults = array('return' => 'body', 'classes' => $this->_classes);
-		$options += $defaults + $this->_config;
+		$defaults = array('return' => 'body');
+		$options += $defaults;
 		$request = $this->_request($method, $path, $data, $options);
 		$options += array('message' => $request);
 
-		if (!($conn = $this->connection($options)) || !$conn->open()) {
+		if (!$this->connection || !$this->connection->open($options)) {
 			return;
 		}
-
-		$response = $conn->send($request, $options);
-		$conn->close();
+		$response = $this->connection->send($request, $options);
+		$this->connection->close();
 		$this->last = (object) compact('request', 'response');
 		return ($options['return'] == 'body' && $response) ? $response->body() : $response;
 	}
@@ -194,7 +203,6 @@ class Service extends \lithium\core\Object {
 	protected function _request($method, $path, $data, $options) {
 		$defaults = array('type' => 'form');
 		$options += $defaults + $this->_config;
-
 		$request = $this->_instance('request', $options);
 		$request->path = str_replace('//', '/', "{$request->path}{$path}");
 		$request->method = $method = strtoupper($method);

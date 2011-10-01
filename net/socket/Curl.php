@@ -47,11 +47,13 @@ class Curl extends \lithium\net\Socket {
 	/**
 	 * Opens a curl connection and initializes the internal resource handle.
 	 *
+	 * @param array $options update the config settings
 	 * @return mixed Returns `false` if the socket configuration does not contain the
 	 *         `'scheme'` or `'host'` settings, or if configuration fails, otherwise returns a
-	 *         curl resource.
+	 *         resource stream.
 	 */
-	public function open() {
+	public function open(array $options = array()) {
+		parent::open($options);
 		$config = $this->_config;
 
 		if (empty($config['scheme']) || empty($config['host'])) {

@@ -41,10 +41,17 @@ class Context extends \lithium\net\Socket {
 	/**
 	 * Opens the socket and sets its timeout value.
 	 *
-	 * @return boolean Success.
+	 * @return mixed Returns `false` if the socket configuration does not contain the
+	 *         `'scheme'` or `'host'` settings, or if configuration fails, otherwise returns a
+	 *         resource stream.
 	 */
-	public function open() {
+	public function open(array $options = array()) {
+		parent::open($options);
 		$config = $this->_config;
+
+		if (!$config['scheme'] || !$config['host']) {
+			return false;
+		}
 		$url = "{$config['scheme']}://{$config['host']}:{$config['port']}";
 		$context = array($config['scheme'] => array('timeout' => $this->_timeout));
 
