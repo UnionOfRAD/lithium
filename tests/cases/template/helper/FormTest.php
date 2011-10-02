@@ -417,7 +417,8 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array(
 			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
-				'type' => 'checkbox', 'value' => '1',  'name' => 'foo', 'id' => 'MockFormPostFoo'
+				'type' => 'checkbox', 'value' => '1',  'name' => 'foo', 
+				'id' => 'MockFormPostFoo', 'checked' => 'checked'
 			))
 		));
 	}
@@ -440,14 +441,14 @@ class FormTest extends \lithium\test\Unit {
 		));
 
 		$record = new Record(array('model' => $this->_model, 'data' => array('foo' => 'nose')));
-		$record->foo = 'nose';
 		$this->form->create($record);
 
 		$result = $this->form->checkbox('foo', array('value' => 'nose'));
 		$this->assertTags($result, array(
 			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
-				'type' => 'checkbox', 'value' => 'nose', 'name' => 'foo', 'id' => 'MockFormPostFoo'
+				'type' => 'checkbox', 'value' => 'nose', 'name' => 'foo',
+				'id' => 'MockFormPostFoo', 'checked' => 'checked'
 			))
 		));
 
@@ -458,8 +459,7 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array(
 			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
-				'type' => 'checkbox', 'value' => 'nose', 'name' => 'foo',
-				'checked' => 'checked', 'id' => 'MockFormPostFoo'
+				'type' => 'checkbox', 'value' => 'nose', 'name' => 'foo', 'id' => 'MockFormPostFoo'
 			))
 		));
 	}

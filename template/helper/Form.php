@@ -589,9 +589,7 @@ class Form extends \lithium\template\Helper {
 
 		if (!isset($options['checked'])) {
 			if ($this->_binding && $bound = $this->_binding->data($name)) {
-				$options['checked'] = !($bound === $default);
-			} else {
-				$options['checked'] = ($scope['value'] != $default);
+				$options['checked'] = ($bound == $default);
 			}
 		}
 		if ($scope['hidden']) {
