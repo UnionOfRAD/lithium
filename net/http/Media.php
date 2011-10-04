@@ -674,7 +674,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @return mixed
 	 */
 	public static function decode($type, $data, array $options = array()) {
-		if ((!$handler = static::_handlers($type)) || !isset($handler['decode'])) {
+		if ((!$handler = static::_handlers($type)) || !isset($handler['decode']) || empty($handler['decode'])) {
 			return null;
 		}
 		$method = $handler['decode'];
