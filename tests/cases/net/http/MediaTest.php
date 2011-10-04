@@ -246,6 +246,18 @@ class MediaTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that a decode handler is not called when the Media type has none configured.
+	 *
+	 * @return void
+	 */
+	public function testNoDecode() {
+		Media::type('my', 'text/x-my', array('decode' => false));
+
+		$result = Media::decode('my', 'Hello World');
+		$this->assertEqual(null, $result);
+	}
+
+	/**
 	 * Tests that types with decode handlers can properly decode content.
 	 *
 	 * @return void
