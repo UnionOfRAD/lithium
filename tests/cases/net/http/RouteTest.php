@@ -543,6 +543,53 @@ class RouteTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result->params);
 	}
+
+	public function testContinuationRoute() {
+		$route = new Route();
+		$this->assertFalse($route->canContinue());
+
+		$route = new Route(array('continue' => true));
+		$this->assertTrue($route->canContinue());
+
+		$route = new Route(array(
+			'template' => '/admin/{:args}',
+			'continue' => true,
+			'params' => array('admin' => true)
+		));
+
+		$result = $route->match(array('admin' => true, 'args' => ''));
+		$this->assertEqual('/admin/{:args}', $result);
+	}
+
+	public function testContinuationRouteWithParameters() {
+		$route = new Route(array(
+			'template' => '/admin/{:args}',
+			'continue' => true,
+			'params' => array('admin' => true)
+		));
+
+		$result = $route->match(array(
+			'admin' => true, 'controller' => 'users', 'action' => 'login'
+		));
+		$this->assertEqual('/admin/{:args}', $result);
+
+		$result = $route->match(array('controller' => 'users', 'action' => 'login'));
+		$this->assertFalse($result);
+	}
+
+	/**
+	 * Tests that continuation routes don't append query strings.
+	 */
+	public function testContinuationRouteWithQueryString() {
+		$route = new Route(array(
+			'template' => '/admin/{:args}',
+			'continue' => true,
+			'params' => array('admin' => true)
+		));
+
+		$result = $route->match(array('Posts::index', 'admin' => true, '?' => array('page' => 2)));
+		$this->assertEqual('/admin/{:args}', $result);
+	}
 }
 
 ?>
