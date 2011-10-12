@@ -28,7 +28,7 @@ class ServiceTest extends \lithium\test\Unit {
 	}
 
 	public function testAllMethodsNoConnection() {
-		$http = new Service(array('socket' => false));
+		$http = new Service(array('init' => false));
 		$this->assertFalse($http->get());
 		$this->assertFalse($http->post());
 		$this->assertFalse($http->put());
@@ -206,20 +206,36 @@ class ServiceTest extends \lithium\test\Unit {
 
 	public function testConnection() {
 		$http = new Service($this->_testConfig);
-		$connection = $http->connection();
+		$connection = $http->connection;
 		$this->assertEqual('lithium\tests\mocks\net\http\MockSocket', get_class($connection));
 
-		$connection = $http->connection(array('scheme' => 'https'));
-		$config = $connection->config();
+		$http->connection->open(array('scheme' => 'https'));
+		$config = $http->connection->config();
 		$this->assertEqual('https', $config['scheme']);
 	}
 
 	public function testSendConfiguringConnection() {
 		$http = new Service($this->_testConfig);
 		$result = $http->send('get', 'some-path/stuff', array(), array('someKey' => 'someValue'));
-		$config = array_pop($http->connection->configs);
+		$config = $http->connection->config();
 		$this->assertEqual('someValue', $config['someKey']);
+	}
 
+	public function testMagicMethod() {
+		$http = new Service($this->_testConfig);
+		$response = $http->patch('some-path/stuff');
+		$expected = "http://localhost:80/some-path/stuff";
+		$result = $http->last->request->to('url');
+		$this->assertEqual($expected, $result);
+
+		$response = $http->patch(
+			'some-path/stuff',
+			array('someData' => 'someValue'),
+			array('return' => 'response')
+		);
+		$result = $http->last->request;
+		$this->assertEqual('PATCH', $result->method);
+		$this->assertEqual('lithium\net\http\Response', get_class($response));
 	}
 }
 

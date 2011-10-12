@@ -14,7 +14,7 @@ use lithium\core\ConfigException;
  * This strategy allows you to encrypt your `Session` and / or `Cookie` data so that it
  * is not stored in cleartext on the client side. You must provide a secret key, otherwise
  * an exception is raised.
- * 
+ *
  * To use this class, you need to have the `mcrypt` extension enabled.
  *
  * Example configuration:
@@ -26,7 +26,7 @@ use lithium\core\ConfigException;
  * )));
  * }}}
  *
- * By default, this strategy uses the AES algorithm in the CBC mode. This means that an 
+ * By default, this strategy uses the AES algorithm in the CBC mode. This means that an
  * initialization vector has to be generated and transported with the payload data. This
  * is done transparently, but you may want to keep this in mind (the ECB mode doesn't require
  * an itialization vector but is not recommended to use as it's insecure). You can override this
@@ -42,7 +42,7 @@ use lithium\core\ConfigException;
  *	))
  * )));
  * }}}
- * 
+ *
  * Please keep in mind that it is generally not a good idea to store sensitive information in
  * cookies (or generally on the client side) and this class is no exception to the rule. It allows
  * you to store client side data in a more secure way, but 100% security can't be achieved.
@@ -64,7 +64,7 @@ class Encrypt extends \lithium\core\Object {
 	 * @param array $config Configuration array. You can override the default cipher and mode.
 	 */
 	public function __construct(array $config = array()) {
-		if(!static::enabled()) {
+		if (!static::enabled()) {
 			throw new ConfigException("The Mcrypt extension is not installed or enabled.");
 		}
 		if (!isset($config['secret'])) {
@@ -83,7 +83,7 @@ class Encrypt extends \lithium\core\Object {
 
 	/**
 	 * Read encryption method.
-	 * 
+	 *
 	 * @param array $data the Data being read.
 	 * @param array $options Options for this method.
 	 * @return mixed Returns the decrypted key or the dataset.
@@ -157,7 +157,7 @@ class Encrypt extends \lithium\core\Object {
 	/**
 	 * Serialize and encrypt a given data array.
 	 *
-	 * @param array The cleartext data to be encrypted.
+	 * @param array $decrypted The cleartext data to be encrypted.
 	 * @return string A Base64 encoded and encrypted string.
 	 */
 	protected function _encrypt($decrypted = array()) {
@@ -175,7 +175,7 @@ class Encrypt extends \lithium\core\Object {
 	/**
 	 * Decrypt and unserialize a previously encrypted string.
 	 *
-	 * @param string a Base64 encoded and encrypted string.
+	 * @param string $encrypted The base64 encoded and encrypted string.
 	 * @return array The cleartext data.
 	 */
 	protected function _decrypt($encrypted) {
@@ -197,8 +197,8 @@ class Encrypt extends \lithium\core\Object {
 	/**
 	 * Generates an initialization vector.
 	 *
-	 * @param string The cipher for the initialization vector.
-	 * @param string The mode for the initialization vector.
+	 * @param string $cipher The cipher for the initialization vector.
+	 * @param string $mode The mode for the initialization vector.
 	 * @return string Returns an initialization vector.
 	 * @link http://www.php.net/manual/en/function.mcrypt-create-iv.php
 	 */
@@ -214,8 +214,8 @@ class Encrypt extends \lithium\core\Object {
 	/**
 	 * Returns the vector size vor a given cipher and mode.
 	 *
-	 * @param string The cipher for the initialization vector.
-	 * @param string The mode for the initialization vector.
+	 * @param string $cipher The cipher for the initialization vector.
+	 * @param string $mode The mode for the initialization vector.
 	 * @return number The vector size.
 	 */
 	protected static function _vectorSize($cipher, $mode) {

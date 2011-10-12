@@ -246,7 +246,7 @@ abstract class Collection extends \lithium\util\Collection {
 		}
 		return $data;
 	}
-	
+
 	/**
 	 * Sorts the objects in the collection, useful in situations where
 	 * you are already using the underlying datastore to sort results.
@@ -267,11 +267,11 @@ abstract class Collection extends \lithium\util\Collection {
 				if (is_array($a)) {
 					$a = (object) $a;
 				}
-				
+
 				if (is_array($b)) {
 					$b = (object) $b;
 				}
-				
+
 				return strcmp($a->$field, $b->$field);
 			};
 		} else if (is_callable($field)) {

@@ -170,6 +170,25 @@ class ControllerTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $controller->response->data);
 	}
+	
+	/**
+	 * Verifies that Controller does not modify data when passed an array (or RecordSet) with a single element
+	 *
+	 * @return void
+	 */
+	public function testRenderWithDataSingleIndexedArray() {
+		$request = new Request();
+		$request->params['controller'] = 'lithium\tests\mocks\action\MockPostsController';
+
+		$controller = new MockPostsController(compact('request') + array('classes' => array(
+			'media' => 'lithium\tests\mocks\action\MockMediaClass'
+		)));
+
+		$expected = array(array('id' => 1));
+		$controller->render(array('data' => $expected));
+
+		$this->assertEqual($expected, $controller->response->data);
+	}
 
 	/**
 	 * Verifies that protected methods (i.e. prefixed with '_'), and methods declared in the

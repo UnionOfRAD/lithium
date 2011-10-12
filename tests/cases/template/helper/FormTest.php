@@ -237,10 +237,14 @@ class FormTest extends \lithium\test\Unit {
 			'text' => array('class' => 'locked'),
 			'textarea' => array(),
 			'templates' => array('create' => 'form', 'end' => 'form-end'),
-			'attributes' => array('id' => $result['attributes']['id'])
+			'attributes' => array(
+				'id' => $result['attributes']['id'],
+				'name' => $result['attributes']['name']
+			)
 		);
 		$this->assertEqual($expected, $result);
 		$this->assertTrue(is_callable($result['attributes']['id']));
+		$this->assertTrue(is_callable($result['attributes']['name']));
 	}
 
 	public function testFormElementWithDefaultValue() {
@@ -417,7 +421,8 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array(
 			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
-				'type' => 'checkbox', 'value' => '1',  'name' => 'foo', 'id' => 'MockFormPostFoo'
+				'type' => 'checkbox', 'value' => '1',  'name' => 'foo', 
+				'id' => 'MockFormPostFoo', 'checked' => 'checked'
 			))
 		));
 	}
@@ -440,14 +445,14 @@ class FormTest extends \lithium\test\Unit {
 		));
 
 		$record = new Record(array('model' => $this->_model, 'data' => array('foo' => 'nose')));
-		$record->foo = 'nose';
 		$this->form->create($record);
 
 		$result = $this->form->checkbox('foo', array('value' => 'nose'));
 		$this->assertTags($result, array(
 			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
-				'type' => 'checkbox', 'value' => 'nose', 'name' => 'foo', 'id' => 'MockFormPostFoo'
+				'type' => 'checkbox', 'value' => 'nose', 'name' => 'foo',
+				'id' => 'MockFormPostFoo', 'checked' => 'checked'
 			))
 		));
 
@@ -458,8 +463,7 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array(
 			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
-				'type' => 'checkbox', 'value' => 'nose', 'name' => 'foo',
-				'checked' => 'checked', 'id' => 'MockFormPostFoo'
+				'type' => 'checkbox', 'value' => 'nose', 'name' => 'foo', 'id' => 'MockFormPostFoo'
 			))
 		));
 	}
@@ -712,9 +716,19 @@ class FormTest extends \lithium\test\Unit {
 			'label' => array('for' => 'Username'),
 			'Username',
 			'/label',
-			'input' => array('type' => 'text', 'name' => 'username', 'class' => 'custom-field', 'id' => 'Username'),
+			'input' => array(
+				'type' => 'text',
+				'name' => 'username',
+				'class' => 'custom-field',
+				'id' => 'Username'
+			),
 			'/div'
 		));
+
+		$this->assertTags($this->form->end(), array('/form'));
+
+		$this->form->config(array('templates' => array('end' => "</table></form>")));
+		$this->assertTags($this->form->end(), array('/table', '/form'));
 	}
 
 	/**
@@ -944,6 +958,7 @@ class FormTest extends \lithium\test\Unit {
 	 * Tests that the string template form `Form::field()` can be overridden.
 	 */
 	public function testFieldTemplateOverride() {
+		$result = $this->form->field('name', array('type' => 'text'));
 		$this->form->config(array('templates' => array('field' => '{:label}{:input}{:error}')));
 		$result = $this->form->field('name', array('type' => 'text'));
 		$this->assertTags($result, array(
@@ -1053,6 +1068,16 @@ class FormTest extends \lithium\test\Unit {
 	public function testAutoMagicButton() {
 		$result = $this->form->button('Foo!', array('id' => 'bar'));
 		$this->assertTags($result, array('button' => array('id' => 'bar'), 'Foo!', '/button'));
+	}
+
+	/**
+	 * Tests that field references passed to `label()` in dot-separated format correctly translate
+	 * to DOM ID values.
+	 */
+	public function testLabelIdGeneration() {
+		$this->assertTags($this->form->label('user.name'), array(
+			'label' => array('for' => 'UserName'), 'User Name', '/label'
+		));
 	}
 }
 

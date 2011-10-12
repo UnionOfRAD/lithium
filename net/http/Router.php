@@ -92,8 +92,6 @@ class Router extends \lithium\core\StaticObject {
 				unset($params[0]);
 				$params = $tmp + $params;
 			}
-			$params += array('action' => 'index');
-
 			if (is_callable($options)) {
 				$options = array('handler' => $options);
 			}
@@ -129,11 +127,23 @@ class Router extends \lithium\core\StaticObject {
 	 *         typically include `'controller'` and `'action'` keys.
 	 */
 	public static function parse($request) {
+		$orig = $request->params;
+		$url  = $request->url;
+
 		foreach (static::$_configurations as $route) {
-			if ($match = $route->parse($request)) {
-				return $match;
+			if (!$match = $route->parse($request, compact('url'))) {
+				continue;
 			}
+			$request = $match;
+
+			if ($route->canContinue() && isset($request->params['args'])) {
+				$url = '/' . join('/', $request->params['args']);
+				unset($request->params['args']);
+				continue;
+			}
+			return $request;
 		}
+		$request->params = $orig;
 	}
 
 	/**
@@ -194,21 +204,12 @@ class Router extends \lithium\core\StaticObject {
 	 *         prefixed with the base URL of the application.
 	 */
 	public static function match($url = array(), $context = null, array $options = array()) {
-		if (is_string($url)) {
-			if (strpos($url, '#') === 0 || strpos($url, 'mailto') === 0 || strpos($url, '://')) {
-				return $url;
-			}
-			if (is_string($url = static::_parseString($url, $context))) {
-				return static::_prefix($url, $context, $options);
-			}
+		if (is_string($url = static::_prepareParams($url, $context, $options))) {
+			return $url;
 		}
-		if (isset($url[0]) && is_array($params = static::_parseString($url[0], $context))) {
-			unset($url[0]);
-			$url = $params + $url;
-		}
-		$url = static::_persist($url, $context);
 		$defaults = array('action' => 'index');
 		$url += $defaults;
+		$stack = array();
 
 		$base = isset($context) ? $context->env('base') : '';
 		$suffix = isset($url['#']) ? "#{$url['#']}" : null;
@@ -218,14 +219,64 @@ class Router extends \lithium\core\StaticObject {
 			if (!$match = $route->match($url, $context)) {
 				continue;
 			}
+			if ($route->canContinue()) {
+				$stack[] = $match;
+				$export = $route->export();
+				$keys = $export['match'] + $export['keys'] + $export['defaults'];
+				unset($keys['args']);
+				$url = array_diff_key($url, $keys);
+				continue;
+			}
+			if ($stack) {
+				$stack[] = $match;
+				$match = static::_compileStack($stack);
+			}
 			$path = rtrim("{$base}{$match}{$suffix}", '/') ?: '/';
 			$path = ($options) ? static::_prefix($path, $context, $options) : $path;
 			return $path ?: '/';
 		}
+		$url = static::_formatError($url);
+		throw new RoutingException("No parameter match found for URL `{$url}`.");
+	}
+
+	protected static function _compileStack($stack) {
+		$result = null;
+
+		foreach (array_reverse($stack) as $fragment) {
+			if ($result) {
+				$result = str_replace('{:args}', ltrim($result, '/'), $fragment);
+				continue;
+			}
+			$result = $fragment;
+		}
+		return $result;
+	}
+
+	protected static function _formatError($url) {
 		$match = array("\n", 'array (', ',)', '=> NULL', '(  \'', ',  ');
 		$replace = array('', '(', ')', '=> null', '(\'', ', ');
-		$url = str_replace($match, $replace, var_export($url, true));
-		throw new RoutingException("No parameter match found for URL `{$url}`.");
+		return str_replace($match, $replace, var_export($url, true));
+	}
+
+	protected static function _prepareParams($url, $context, array $options) {
+		if (is_string($url)) {
+			if (strpos($url, '://')) {
+				return $url;
+			}
+			foreach (array('#', '//', 'mailto') as $prefix) {
+				if (strpos($url, $prefix) === 0) {
+					return $url;
+				}
+			}
+			if (is_string($url = static::_parseString($url, $context))) {
+				return static::_prefix($url, $context, $options);
+			}
+		}
+		if (isset($url[0]) && is_array($params = static::_parseString($url[0], $context))) {
+			unset($url[0]);
+			$url = $params + $url;
+		}
+		return static::_persist($url, $context);
 	}
 
 	/**

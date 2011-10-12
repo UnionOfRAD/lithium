@@ -25,19 +25,20 @@ class ConnectionsTest extends \lithium\test\Unit {
 		'database' => 'db'
 	);
 
-	protected $_preserved = array();
+	protected $_backup = array();
 
 	public function setUp() {
-		if (empty($this->_preserved)) {
+		if (empty($this->_backup)) {
 			foreach (Connections::get() as $conn) {
-				$this->_preserved[$conn] = Connections::get($conn, array('config' => true));
+				$this->_backup[$conn] = Connections::get($conn, array('config' => true));
 			}
 		}
 		Connections::reset();
 	}
 
 	public function tearDown() {
-		foreach ($this->_preserved as $name => $config) {
+		Connections::reset();
+		foreach ($this->_backup as $name => $config) {
 			Connections::add($name, $config);
 		}
 	}

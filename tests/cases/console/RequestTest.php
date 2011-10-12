@@ -15,15 +15,15 @@ class RequestTest extends \lithium\test\Unit {
 
 	public $streams;
 
-	protected $_backups = array();
+	protected $_backup = array();
 
 	public function setUp() {
 		$this->streams = array(
 			'input' => Libraries::get(true, 'resources') . '/tmp/tests/input.txt'
 		);
 
-		$this->_backups['cwd'] = getcwd();
-		$this->_backups['_SERVER'] = $_SERVER;
+		$this->_backup['cwd'] = getcwd();
+		$this->_backup['_SERVER'] = $_SERVER;
 		$_SERVER['argv'] = array();
 	}
 
@@ -33,8 +33,8 @@ class RequestTest extends \lithium\test\Unit {
 				unlink($path);
 			}
 		}
-		$_SERVER = $this->_backups['_SERVER'];
-		chdir($this->_backups['cwd']);
+		$_SERVER = $this->_backup['_SERVER'];
+		chdir($this->_backup['cwd']);
 	}
 
 	public function testConstructWithoutConfig() {

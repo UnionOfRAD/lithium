@@ -15,11 +15,11 @@ class MockSocket extends \lithium\net\Socket {
 	public $configs = array();
 
 	public function __construct(array $config = array()) {
-		$this->configs[] = $config;
 		parent::__construct((array) $config);
 	}
 
-	public function open() {
+	public function open(array $options = array()) {
+		parent::open($options);
 		return true;
 	}
 

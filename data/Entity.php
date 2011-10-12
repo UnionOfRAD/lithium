@@ -360,8 +360,7 @@ class Entity extends \lithium\core\Object {
 	 *         always `true`.
 	 */
 	public function modified() {
-		$keys = array_keys($this->_updated);
-		return array_combine($keys, array_fill(0, count($keys), true));
+		return array_fill_keys(array_keys($this->_updated), true);
 	}
 
 	public function export() {

@@ -68,8 +68,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests generating routes with required parameters which are not present in the URL.
-	 *
-	 * @return void
 	 */
 	public function testConnectingWithRequiredParams() {
 		$result = Router::connect('/{:controller}/{:action}', array(
@@ -109,8 +107,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests basic options for connecting routes.
-	 *
-	 * @return void
 	 */
 	public function testBasicRouteMatching() {
 		Router::connect('/hello', array('controller' => 'posts', 'action' => 'index'));
@@ -143,14 +139,11 @@ class RouterTest extends \lithium\test\Unit {
 		}
 
 		$this->request->url = '/posts/view/1';
-		$result = Router::parse($this->request);
-		$this->assertNull($result);
+		$this->assertNull(Router::parse($this->request));
 	}
 
 	/**
 	 * Tests that URLs specified as "Controller::action" are interpreted properly.
-	 *
-	 * @return void
 	 */
 	public function testStringActions() {
 		Router::connect('/login', array('controller' => 'sessions', 'action' => 'create'));
@@ -201,8 +194,6 @@ class RouterTest extends \lithium\test\Unit {
 	/**
 	 * Tests that URLs specified as "Controller::action" and including additional parameters are
 	 * interpreted properly.
-	 *
-	 * @return void
 	 */
 	public function testEmbeddedStringActions() {
 		Router::connect('/logout/{:id:[0-9]{5,6}}', array(
@@ -232,8 +223,6 @@ class RouterTest extends \lithium\test\Unit {
 	/**
 	 * Tests that routes can be created with shorthand strings, i.e. `'Controller::action'` and
 	 * `array('Controller::action', 'id' => '...')`.
-	 *
-	 * @return void
 	 */
 	public function testStringParameterConnect() {
 		Router::connect('/posts/{:id:[0-9a-f]{24}}', 'Posts::edit');
@@ -273,8 +262,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that routing is fully reset when calling `Router::reset()`.
-	 *
-	 * @return void
 	 */
 	public function testResettingRoutes() {
 		Router::connect('/{:controller}', array('controller' => 'posts'));
@@ -320,10 +307,10 @@ class RouterTest extends \lithium\test\Unit {
 	 */
 	public function testRouteMatchingWithInsertsAndDefaults() {
 		Router::connect('/{:controller}/{:action}', array('action' => 'archive'));
-		$this->assertEqual('/posts', Router::match(array('controller' => 'posts')));
+		$this->assertEqual('/posts/index', Router::match(array('controller' => 'posts')));
 
 		$result = Router::match(array('controller' => 'posts', 'action' => 'archive'));
-		$this->assertEqual('/posts/archive', $result);
+		$this->assertEqual('/posts', $result);
 
 		Router::reset();
 		Router::connect('/{:controller}/{:action}', array('controller' => 'users'));
@@ -541,8 +528,6 @@ class RouterTest extends \lithium\test\Unit {
 	/**
 	 * Tests passing a closure handler to `Router::connect()` to bypass or augment default
 	 * dispatching.
-	 *
-	 * @return void
 	 */
 	public function testRouteHandler() {
 		Router::connect('/login', 'Users::login');
@@ -563,8 +548,6 @@ class RouterTest extends \lithium\test\Unit {
 	/**
 	 * Tests that a successful match against a route with template `'/'` operating at the root of
 	 * a domain never returns an empty string.
-	 *
-	 * @return void
 	 */
 	public function testMatchingEmptyRoute() {
 		Router::connect('/', 'Users::view');
@@ -581,8 +564,6 @@ class RouterTest extends \lithium\test\Unit {
 	/**
 	 * Tests routing based on content type extensions, with HTML being the default when types are
 	 * not defined.
-	 *
-	 * @return void
 	 */
 	public function testTypeBasedRouting() {
 		Router::connect('/{:controller}/{:id:[0-9]+}', array(
@@ -606,8 +587,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that routes can be connected and correctly match based on HTTP headers or method verbs.
-	 *
-	 * @return void
 	 */
 	public function testHttpMethodBasedRouting() {
 		Router::connect('/{:controller}/{:id:[0-9]+}', array(
@@ -642,8 +621,6 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that the class dependency configuration can be modified.
-	 *
-	 * @return void
 	 */
 	public function testCustomConfiguration() {
 		$old = Router::config();
@@ -654,6 +631,105 @@ class RouterTest extends \lithium\test\Unit {
 
 		Router::config($old);
 		$this->assertEqual($old, Router::config());
+	}
+
+	/**
+	 * Tests that continuation routes properly fall through and aggregate multiple route parameters.
+	 */
+	public function testRouteContinuations() {
+		Router::connect('/{:locale:en|de|it|jp}/{:args}', array(), array('continue' => true));
+		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}');
+
+		$request = new Request(array('url' => '/en/posts/view/1138'));
+		$result = Router::process($request)->params;
+		$expected = array (
+			'controller' => 'posts', 'action' => 'view', 'id' => '1138', 'locale' => 'en'
+		);
+		$this->assertEqual($expected, $result);
+
+		$request = new Request(array('url' => '/en/foo/bar/baz'));
+		$this->assertNull(Router::parse($request));
+
+		Router::reset();
+		Router::connect('/{:args}/{:locale:en|de|it|jp}', array(), array('continue' => true));
+		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}');
+
+		$request = new Request(array('url' => '/posts/view/1138/en'));
+		$result = Router::process($request)->params;
+		$this->assertEqual($expected, $result);
+
+		Router::reset();
+		Router::connect('/{:locale:en|de|it|jp}/{:args}', array(), array('continue' => true));
+		Router::connect('/', 'Pages::view');
+
+		$request = new Request(array('url' => '/en'));
+		$result = Router::process($request)->params;
+		$expected = array('locale' => 'en', 'controller' => 'pages', 'action' => 'view');
+		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * Tests that URLs are properly generated with route continuations.
+	 */
+	public function testReversingContinuations() {
+		Router::connect('/{:locale:en|de|it|jp}/{:args}', array(), array('continue' => true));
+		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}');
+		Router::connect('/{:controller}/{:action}/{:args}');
+
+		$result = Router::match(array('Posts::view', 'id' => 5, 'locale' => 'de'));
+		$this->assertEqual($result, '/de/posts/view/5');
+
+		$result = Router::match(array('Posts::index', 'locale' => 'en', '?' => array('page' => 2)));
+		$this->assertEqual('/en/posts?page=2', $result);
+
+		Router::reset();
+		Router::connect('/{:locale:en|de|it|jp}/{:args}', array(), array('continue' => true));
+		Router::connect('/pages/{:args}', 'Pages::view');
+
+		$result = Router::match(array('Pages::view', 'locale' => 'en', 'args' => array('about')));
+		$this->assertEqual('/en/pages/about', $result);
+
+		Router::reset();
+		Router::connect('/admin/{:args}', array('admin' => true), array('continue' => true));
+		Router::connect('/login', 'Users::login');
+
+		$result = Router::match(array('Users::login', 'admin' => true));
+		$this->assertEqual('/admin/login', $result);
+	}
+
+	/**
+	 * Tests that multiple continuation routes can be applied to the same URL.
+	 */
+	public function testStackedContinuationRoutes() {
+		Router::connect('/admin/{:args}', array('admin' => true), array('continue' => true));
+		Router::connect('/{:locale:en|de|it|jp}/{:args}', array(), array('continue' => true));
+		Router::connect('/{:controller}/{:action}/{:id:[0-9]+}', array('id' => null));
+
+		$request = new Request(array('url' => '/en/foo/bar/5'));
+		$expected = array('controller' => 'foo', 'action' => 'bar', 'id' => '5', 'locale' => 'en');
+		$this->assertEqual($expected, Router::process($request)->params);
+
+		$request = new Request(array('url' => '/admin/foo/bar/5'));
+		$expected = array('controller' => 'foo', 'action' => 'bar', 'id' => '5', 'admin' => true);
+		$this->assertEqual($expected, Router::process($request)->params);
+
+		$request = new Request(array('url' => '/admin/de/foo/bar/5'));
+		$expected = array(
+			'controller' => 'foo', 'action' => 'bar', 'id' => '5', 'locale' => 'de', 'admin' => true
+		);
+		$this->assertEqual($expected, Router::process($request)->params);
+
+		$request = new Request(array('url' => '/en/admin/foo/bar/5'));
+		$this->assertFalse(Router::process($request)->params);
+
+		$result = Router::match(array('Foo::bar', 'id' => 5));
+		$this->assertEqual('/foo/bar/5', $result);
+
+		$result = Router::match(array('Foo::bar', 'id' => 5, 'admin' => true));
+		$this->assertEqual('/admin/foo/bar/5', $result);
+
+		$result = Router::match(array('Foo::bar', 'id' => 5, 'admin' => true, 'locale' => 'jp'));
+		$this->assertEqual('/admin/jp/foo/bar/5', $result);
 	}
 }
 

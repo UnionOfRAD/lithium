@@ -171,15 +171,18 @@ class Route extends \lithium\core\Object {
 			'defaults' => array(),
 			'keys'     => array(),
 			'persist'  => array(),
-			'handler'  => null
+			'handler'  => null,
+			'continue' => false
 		);
 		parent::__construct($config + $defaults);
 	}
 
 	protected function _init() {
 		parent::_init();
-		$this->_params += array('action' => 'index');
 
+		if (!$this->_config['continue']) {
+			$this->_params += array('action' => 'index');
+		}
 		if (!$this->_config['pattern']) {
 			$this->compile();
 		}
@@ -193,11 +196,17 @@ class Route extends \lithium\core\Object {
 	 *
 	 * @param object $request A request object, usually an instance of `lithium\net\http\Request`,
 	 *        containing the details of the request to be routed.
+	 * @param array $options Used to determine the operation of the method, and override certain
+	 *              values in the `Request` object:
+	 *              - `'url'` _string_: If present, will be used to match in place of the `$url`
+	 *                 property of `$request`.
 	 * @return mixed If this route matches `$request`, returns an array of the execution details
 	 *         contained in the route, otherwise returns false.
 	 */
-	public function parse($request) {
-		$url = '/' . trim($request->url, '/');
+	public function parse($request, array $options = array()) {
+		$defaults = array('url' => $request->url);
+		$options += $defaults;
+		$url = '/' . trim($options['url'], '/');
 
 		if (!preg_match($this->_pattern, $url, $match)) {
 			return false;
@@ -213,13 +222,16 @@ class Route extends \lithium\core\Object {
 		if (isset($match['args'])) {
 			$match['args'] = explode('/', $match['args']);
 		}
+		if (isset($this->_keys['args'])) {
+			$match += array('args' => array());
+		}
 		$result = array_intersect_key($match, $this->_keys) + $this->_params + $this->_defaults;
 
 		if (isset($result['action']) && !$result['action']) {
 			$result['action'] = 'index';
 		}
-		$request->params = $result;
-		$request->persist = $this->_persist;
+		$request->params = $result + (array) $request->params;
+		$request->persist = array_unique(array_merge($request->persist, $this->_persist));
 
 		if ($this->_handler) {
 			$handler = $this->_handler;
@@ -238,13 +250,16 @@ class Route extends \lithium\core\Object {
 	 */
 	public function match(array $options = array(), $context = null) {
 		$defaults = array('action' => 'index');
-		$options += $defaults;
 		$query = null;
 
-		if (isset($options['?'])) {
-			$query = $options['?'];
-			$query = '?' . (is_array($query) ? http_build_query($query) : $query);
-			unset($options['?']);
+		if (!$this->_config['continue']) {
+			$options += $defaults;
+
+			if (isset($options['?'])) {
+				$query = $options['?'];
+				$query = '?' . (is_array($query) ? http_build_query($query) : $query);
+				unset($options['?']);
+			}
 		}
 
 		if (!$options = $this->_matchKeys($options)) {
@@ -255,7 +270,23 @@ class Route extends \lithium\core\Object {
 				return false;
 			}
 		}
-		return $this->_write($options, $defaults + $this->_defaults + array('args' => '')) . $query;
+		$defaults = $this->_defaults + $defaults;
+
+		if ($this->_config['continue']) {
+			return $this->_write(array('args' => '{:args}') + $options, $this->_defaults);
+		}
+		return $this->_write($options, $defaults + array('args' => '')) . $query;
+	}
+
+	/**
+	 * Returns a boolean value indicating whether this is a continuation route. If `true`, this
+	 * route will allow incoming requests to "fall through" to other routes, aggregating parameters
+	 * for both this route and any subsequent routes.
+	 *
+	 * @return boolean Returns the value of `$_config['continue']`.
+	 */
+	public function canContinue() {
+		return $this->_config['continue'];
 	}
 
 	/**
@@ -273,8 +304,10 @@ class Route extends \lithium\core\Object {
 		if (array_intersect_key($options, $this->_match) != $this->_match) {
 			return false;
 		}
-		if (array_diff_key(array_diff_key($options, $this->_match), $this->_keys) !== array()) {
-			return false;
+		if (!$this->_config['continue']) {
+			if (array_diff_key(array_diff_key($options, $this->_match), $this->_keys) !== array()) {
+				return false;
+			}
 		}
 		$options += $this->_defaults;
 
@@ -377,28 +410,45 @@ class Route extends \lithium\core\Object {
 
 		foreach ($params as $i => $param) {
 			$this->_keys[$param] = $param;
-
-			if ($regexs[$i]) {
-				$regex = $regexs[$i];
-				$this->_subPatterns[$param] = $regex;
-			} elseif ($param == 'args') {
-				$regex = '.*';
-			} else {
-				$regex = '[^\/]+';
-			}
-			$req = $param === 'args' || array_key_exists($param, $this->_params) ? '?' : '';
-
-			if ($slashes[$i] === '/') {
-				$pattern = "(?:/(?P<{$param}>{$regex}){$req}){$req}";
-			} elseif ($slashes[$i] === '.') {
-				$pattern = "\\.(?P<{$param}>{$regex}){$req}";
-			} else {
-				$pattern = "(?P<{$param}>{$regex}){$req}";
-			}
-			$this->_pattern = str_replace("{$tokens[$i]}", $pattern, $this->_pattern);
+			$this->_pattern = $this->_regex($regexs[$i], $param, $tokens[$i], $slashes[$i]);
 		}
 		$this->_defaults = array_intersect_key($this->_params, $this->_keys);
 		$this->_match = array_diff_key($this->_params, $this->_defaults);
+	}
+
+	/**
+	 * Generates a sub-expression capture group for a route regex, using an optional user-supplied
+	 * matching pattern.
+	 *
+	 * @param string $regex An optional user-supplied match pattern. If a route is defined like
+	 *               `"/{:id:\d+}"`, then the value will be `"\d+"`.
+	 * @param string $param The parameter name which the capture group is assigned to, i.e.
+	 *               `'controller'`, `'id'` or `'args'`.
+	 * @param string $prefix The prefix character that separates the parameter from the other
+	 *               elements of the route. Usually `'.'` or `'/'`.
+	 * @param string $token The full token representing a matched element in a route template, i.e.
+	 *               `'/{:action}'`, `'/{:path:js|css}'`, or `'.{:type}'`.
+	 * @return string Returns the full route template, with the value of `$token` replaced with a
+	 *         generated regex capture group.
+	 */
+	protected function _regex($regex, $param, $token, $prefix) {
+		if ($regex) {
+			$this->_subPatterns[$param] = $regex;
+		} elseif ($param == 'args') {
+			$regex = '.*';
+		} else {
+			$regex = '[^\/]+';
+		}
+		$req = $param === 'args' || array_key_exists($param, $this->_params) ? '?' : '';
+
+		if ($prefix === '/') {
+			$pattern = "(?:/(?P<{$param}>{$regex}){$req}){$req}";
+		} elseif ($prefix === '.') {
+			$pattern = "\\.(?P<{$param}>{$regex}){$req}";
+		} else {
+			$pattern = "(?P<{$param}>{$regex}){$req}";
+		}
+		return str_replace($token, $pattern, $this->_pattern);
 	}
 }
 

@@ -292,7 +292,12 @@ class CollectionTest extends \lithium\test\Unit {
 
 		// Numeric sort using custom function
 		$collection = new Collection(array('data' => array(5,3,4,1,2)));
-		$collection->sort(function ($a,$b) { if ($a == $b) { return 0; } return ($b > $a ? 1 : -1); });
+		$collection->sort(function ($a,$b) {
+			if ($a == $b) {
+				return 0;
+			}
+			return ($b > $a ? 1 : -1);
+		});
 		$expected = array(5,4,3,2,1);
 		$this->assertEqual($expected, $collection->to('array'));
 

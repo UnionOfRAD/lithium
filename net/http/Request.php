@@ -161,7 +161,11 @@ class Request extends \lithium\net\http\Message {
 			'auth' => $this->_config['auth'],
 			'headers' => array(),
 			'body' => null,
-			'version' => $this->version
+			'version' => $this->version,
+			'ignore_errors' => isset($this->_config['ignore_errors'])
+				? $this->_config['ignore_errors'] : true,
+			'follow_location' => isset($this->_config['follow_location'])
+				? $this->_config['follow_location'] : true
 		);
 		$options += $defaults;
 
@@ -181,7 +185,8 @@ class Request extends \lithium\net\http\Message {
 					'method' => $options['method'],
 					'header' => $this->headers($options['headers']),
 					'protocol_version' => $options['version'],
-					'ignore_errors' => true
+					'ignore_errors' => $options['ignore_errors'],
+					'follow_location' => $options['follow_location']
 				);
 				return array('http' => array_diff_key($options, $defaults) + $base);
 			default:

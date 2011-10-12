@@ -82,7 +82,7 @@ use InvalidArgumentException;
  * - `boolean`: Checks that the value is or looks like a boolean value. The following types of
  *   values are interpreted as boolean and will pass the check.
  *   - boolean (`true`, `false`, `'true'`, `'false'`)
- *   - boolean number (`1`, `0`, `'1`', `'0`')
+ *   - boolean number (`1`, `0`, `'1'`, `'0'`)
  *   - boolean text string (`'on'`, `'off'`, `'yes'`, `'no'`)
  *
  * - `decimal`: Checks that a value is a valid decimal. Takes one option, `'precision'`, which is
@@ -454,7 +454,7 @@ class Validator extends \lithium\core\StaticObject {
 				if ($events && $rule['on'] && !array_intersect($events, (array) $rule['on'])) {
 					continue;
 				}
-				if (!isset($values[$field])) {
+				if (!array_key_exists($field, $values)) {
 					if ($rule['required']) {
 						$errors[$field][] = $rule['message'] ?: $key;
 					}
@@ -469,7 +469,7 @@ class Validator extends \lithium\core\StaticObject {
 
 				if (!static::rule($name, $values[$field], $rule['format'], $rule + $options)) {
 					$errors[$field][] = $rule['message'] ?: $key;
-					
+
 					if ($rule['last']) {
 						break;
 					}
