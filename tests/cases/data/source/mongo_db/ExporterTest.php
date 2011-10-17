@@ -131,6 +131,12 @@ class ExporterTest extends \lithium\test\Unit {
 		$model = $this->_model;
 		$exists = true;
 		$model::config(array('key' => '_id'));
+		$model::schema(array(
+			'numbers' => array('type' => 'integer', 'array' => true),
+			'objects' => array('type' => 'object', 'array' => true),
+			'deeply' => array('type' => 'object', 'array' => true),
+			'foo' => array('type' => 'string'),
+		));
 
 		$doc = new Document(compact('model', 'exists') + array('data' => array(
 			'numbers' => new DocumentArray(compact('model', 'exists') + array(
