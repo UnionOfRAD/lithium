@@ -132,10 +132,13 @@ class ExporterTest extends \lithium\test\Unit {
 		$exists = true;
 		$model::config(array('key' => '_id'));
 		$model::schema(array(
+			'forceArray' => array('type' => 'string', 'array' => true),
+			'array' => array('type' => 'string', 'array' => true),
+			'dictionary' => array('type' => 'string', 'array' => true),
 			'numbers' => array('type' => 'integer', 'array' => true),
 			'objects' => array('type' => 'object', 'array' => true),
 			'deeply' => array('type' => 'object', 'array' => true),
-			'foo' => array('type' => 'string'),
+			'foo' => array('type' => 'string')
 		));
 
 		$doc = new Document(compact('model', 'exists') + array('data' => array(
@@ -158,6 +161,9 @@ class ExporterTest extends \lithium\test\Unit {
 			'foo' => 'bar'
 		)));
 
+		$doc->dictionary[] = 'A word';
+		$doc->forceArray = 'Word';
+		$doc->array = array('one');
 		$doc->field = 'value';
 		$doc->objects[1]->foo = 'dib';
 		$doc->objects[] = array('foo' => 'diz');
@@ -176,6 +182,9 @@ class ExporterTest extends \lithium\test\Unit {
 
 		$result = Exporter::get('update', $doc->export());
 		$expected = array(
+			'array' => array('one'),
+			'dictionary' => array('A Word'),
+			'forceArray' => array('Word'),
 			'numbers' => array(8, 9, 10, 11),
 			'newObject' => array('subField' => 'subValue'),
 			'field' => 'value',
