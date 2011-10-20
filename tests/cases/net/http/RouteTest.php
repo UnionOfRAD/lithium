@@ -590,6 +590,37 @@ class RouteTest extends \lithium\test\Unit {
 		$result = $route->match(array('Posts::index', 'admin' => true, '?' => array('page' => 2)));
 		$this->assertEqual('/admin/{:args}', $result);
 	}
+
+	/**
+	 * Tests correct regex backtracking.
+	 */
+	public function testValidPatternGeneration() {
+		$route = new Route(array(
+			'template' => '/posts/list/{:foobar:[0-9a-f]{5}}/todday/fooo',
+			'params' => array('controller' => 'posts', 'action' => 'archive')
+		));
+
+		$expected = '@^/posts/list(?:/(?P<foobar>[0-9a-f]{5}))/todday/fooo$@';
+		$result = $route->export();
+		$this->assertEqual($expected, $result['pattern']);
+	}
+
+	/**
+	 * Tests fix for route parameter matching.
+	 */
+	public function testTwoParameterRoutes() {
+		$route = new Route(array(
+			'template' => '/personnel/{:personnel_id}/position/{:position_id}/actions/create',
+			'params' => array('controller' => 'actions', 'action' => 'create'),
+		));
+
+		$route->compile();
+		$data = $route->export(); $actual = $data['pattern'];
+		$expected = '@^/personnel(?:/(?P<personnel_id>[^\\/]+))/position(?:/';
+		$expected .= '(?P<position_id>[^\\/]+))/actions/create$@';
+
+		$this->assertEqual($expected, $actual);
+	}
 }
 
 ?>
