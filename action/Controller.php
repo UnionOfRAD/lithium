@@ -201,6 +201,22 @@ class Controller extends \lithium\core\Object {
 	public function set($data = array()) {
 		$this->_render['data'] = (array) $data + $this->_render['data'];
 	}
+	
+	/**
+	 * Assign a template variable by reference.
+	 *
+	 * This allows you to bind a variable to a template in a parent controller or _init method
+	 * and it can be changed or manipulated in other methods and the user won't have to remember
+	 * to always set it manually. This is an alternative to Controller::set()
+	 *
+	 * @param  string $name
+	 * @param  mixed  $value
+	 * @return object For chaining
+	 */
+	public function bind($name, &$value) {
+		$this->_render['data'][$name] =& $value;
+		return $this;
+	}
 
 	/**
 	 * Uses results (typically coming from a controller action) to generate content and headers for

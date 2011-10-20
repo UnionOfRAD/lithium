@@ -422,7 +422,7 @@ abstract class Database extends \lithium\data\Source {
 		}
 
 		$from = $class;
-		$fieldName = $field;
+		$fieldName = $name;
 		$config += compact('type', 'name', 'key', 'from', 'fieldName');
 		return $this->_instance('relationship', $config);
 	}
