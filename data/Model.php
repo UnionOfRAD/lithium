@@ -667,7 +667,6 @@ class Model extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	public static function create(array $data = array(), array $options = array()) {
-		$self = static::_object();
 		$params = compact('data', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
@@ -862,7 +861,6 @@ class Model extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	public function delete($entity, array $options = array()) {
-		$self = static::_object();
 		$params = compact('entity', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
@@ -890,7 +888,6 @@ class Model extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	public static function update($data, $conditions = array(), array $options = array()) {
-		$self = static::_object();
 		$params = compact('data', 'conditions', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
@@ -917,7 +914,6 @@ class Model extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	public static function remove($conditions = array(), array $options = array()) {
-		$self = static::_object();
 		$params = compact('conditions', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
