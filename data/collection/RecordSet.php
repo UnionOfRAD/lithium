@@ -360,20 +360,18 @@ class RecordSet extends \lithium\data\Collection {
 					$dataMap[$name] = $record;
 					continue;
 				}
-				
-				// Remove nulls caused by left joins from hasMany relations
-                		if (array_filter($record)) {
-                    			$dataMap[$name][] = $record;
-                		}
+
+				if (array_filter($record)) {
+					$dataMap[$name][] = $record;
+				}
 			}
 		} while ($data = $this->_result->next());
-		
-		// Insert an empty array where all hasMany records for a relationship were null
-	        foreach (array_filter(array_keys($this->_columns)) as $name) {
-	            if (! array_key_exists($name, $dataMap)) {
-	                $dataMap[$name] = array();
-	            }
-	        }
+
+		foreach (array_filter(array_keys($this->_columns)) as $name) {
+			if (!array_key_exists($name, $dataMap)) {
+				$dataMap[$name] = array();
+			}
+		}
 
 		foreach ($dataMap as $name => $rel) {
 			$field = $relMap[$name]['fieldName'];
