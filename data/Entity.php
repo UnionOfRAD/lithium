@@ -384,7 +384,9 @@ class Entity extends \lithium\core\Object {
 			case 'array':
 				$data = $this->_updated;
 				$rel = array_map(function($obj) { return $obj->data(); }, $this->_relationships);
-				$data = array_merge($data, $rel);
+				if (!empty($rel)) {
+					$data = array_merge($data, $rel);
+				}
 				$result = Collection::toArray($data, $options);
 			break;
 			default:
