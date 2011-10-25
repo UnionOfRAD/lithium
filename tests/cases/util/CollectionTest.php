@@ -328,7 +328,7 @@ class CollectionTest extends \lithium\test\Unit {
 			}
 		}
 	
-		$expected = array('Hello', 'Hello again!');
+		$expected = array(0 => 'Hello', 6 => 'Hello again!');
 		$results = $collection->to('array');
 		$this->assertIdentical($expected, $results);
 	}

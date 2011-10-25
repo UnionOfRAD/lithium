@@ -413,6 +413,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 */
 	public function offsetUnset($offset) {
 		unset($this->_data[$offset]);
+		prev($this->_data);
 	}
 
 	/**
