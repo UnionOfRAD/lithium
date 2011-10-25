@@ -282,6 +282,7 @@ abstract class Database extends \lithium\data\Source {
 				$sql = String::insert($query, $self->value($args));
 			} else {
 				$limit = $query->limit();
+
 				if ($model && $limit && !isset($args['subquery']) && $model::relations('hasMany')) {
 					$name = $model::meta('name');
 					$key = $model::key();
@@ -299,12 +300,12 @@ abstract class Database extends \lithium\data\Source {
 					)));
 					$ids = $self->read($subQuery, array('subquery' => true));
 
-					if (!$ids->count()) {
-						return false;
+					if ($ids->count()) {
+						$query->limit(false)->conditions(array("{$name}.{$key}" => array_map(
+							function($index) use ($key) { return $index[$key]; },
+							$ids->data()
+						)));
 					}
-					$idData = $ids->data();
-					$ids = array_map(function($index) use ($key) { return $index[$key]; }, $idData);
-					$query->limit(false)->conditions(array("{$name}.{$key}" => $ids));
 				}
 				$sql = $self->renderCommand($query);
 			}
