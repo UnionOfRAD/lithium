@@ -306,6 +306,33 @@ class CollectionTest extends \lithium\test\Unit {
 		$result = $collection->sort('blahgah');
 		$this->assertEqual($collection->to('array'), $result->to('array'));
 	}
+
+	public function testUnsetInForeach() {
+		$data = array(
+			'Hello',
+			'Delete me',
+			'Delete me',
+			'Delete me',
+			'Delete me',
+			'Delete me',
+			'Hello again!',
+			'Delete me'
+		);
+		$collection = new Collection(array('data' => $data));
+		
+		$this->assertIdentical($data, $collection->to('array'));
+		
+		foreach ($collection as $i => $word) {
+			if ($word == 'Delete me') {
+				echo "hello";
+				unset($collection[$i]);
+			}
+		}
+	
+		$expected = array('Hello', 'Hello again!');
+		$results = $collection->to('array');
+		$this->assertIdentical($expected, $results);
+	}
 }
 
 ?>

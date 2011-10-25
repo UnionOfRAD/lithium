@@ -33,6 +33,31 @@ class DocumentArrayTest extends \lithium\test\Unit {
 		));
 		$array[] = 8;
 	}
+
+	public function testUnsetInForeach() {
+		$data = array(
+			'Hello',
+			'Delete me',
+			'Delete me',
+			'Delete me',
+			'Delete me',
+			'Delete me',
+			'Hello again!',
+			'Delete me'
+		);
+		$doc = new DocumentArray(array('data' => $data));
+		
+		$this->assertIdentical($data, $doc->data());
+		
+		foreach ($doc as $i => $word) {
+			if ($word == 'Delete me') {
+				unset($doc->$i);
+			}
+		}
+	
+		$expected = array('Hello', 'Hello again!');
+		$this->assertIdentical($expected, $doc->data());
+	}
 }
 
 ?>
