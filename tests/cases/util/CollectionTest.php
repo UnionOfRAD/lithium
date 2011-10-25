@@ -324,7 +324,6 @@ class CollectionTest extends \lithium\test\Unit {
 		
 		foreach ($collection as $i => $word) {
 			if ($word == 'Delete me') {
-				echo "hello";
 				unset($collection[$i]);
 			}
 		}
