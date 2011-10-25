@@ -664,7 +664,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'limit' => 1
 		);
 		$result = $this->db->read(new Query($options), $options);
-		$this->assertFalse($result);
+		$this->assertTrue($result instanceof RecordSet);
 	}
 
 	public function testGroup() {

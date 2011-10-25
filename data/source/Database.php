@@ -286,14 +286,13 @@ abstract class Database extends \lithium\data\Source {
 							)
 						));
 					$ids = $self->read($subQuery, array('subquery' => true));
-					if (!$ids->count()) {
-						return false;
+					if ($ids->count()) {
+						$idData = $ids->data();
+						$ids = array_map(function($index) use ($key) {
+								return $index[$key];
+							}, $idData);
+						$query->limit(false)->conditions(array("{$name}.{$key}" => $ids));
 					}
-					$idData = $ids->data();
-					$ids = array_map(function($index) use ($key) {
-							return $index[$key];
-						}, $idData);
-					$query->limit(false)->conditions(array("{$name}.{$key}" => $ids));
 				}
 				$sql = $self->renderCommand($query);
 			}
