@@ -79,14 +79,16 @@ class MongoDb extends \lithium\data\Source {
 	protected $_operators = array(
 		'<'   => '$lt',
 		'>'   => '$gt',
-		'<='  =>  '$lte',
+		'<='  => '$lte',
 		'>='  => '$gte',
 		'!='  => array('single' => '$ne', 'multiple' => '$nin'),
 		'<>'  => array('single' => '$ne', 'multiple' => '$nin'),
 		'or'  => '$or',
 		'||'  => '$or',
 		'not' => '$not',
-		'!'   =>  '$not'
+		'!'   => '$not',
+		'and' => '$and',
+		'&&'  => '$and'
 	);
 
 	/**
@@ -671,12 +673,23 @@ class MongoDb extends \lithium\data\Source {
 		$castOpts = compact('schema') + array('first' => true, 'arrays' => false);
 
 		foreach ($conditions as $key => $value) {
+			$operator = null;
 			if ($key === '$or' || $key === 'or' || $key === '||') {
-				foreach ($value as $i => $or) {
-					$value[$i] = $this->_conditions($or, $model, $schema, $context);
+				$operator = '$or';
+			}
+			if ($key === '$and' || $key === 'and' || $key === '&&') {
+				$operator = '$and';
+			}
+			if ($key === '$nor' || $key === 'nor') {
+				$operator = '$nor';
+			}
+			if ($operator) {
+				foreach ($value as $i => $op) {
+					$value[$i] = $this->_conditions($op, $model, $schema, $context);
 				}
 				unset($conditions[$key]);
-				$conditions['$or'] = $value;
+
+				$conditions[$operator] = $value;
 				continue;
 			}
 			if (is_object($value)) {
