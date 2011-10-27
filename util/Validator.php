@@ -446,7 +446,7 @@ class Validator extends \lithium\core\StaticObject {
 			$values = $params['values'];
 			$rules = $params['rules'];
 			$options = $params['options'];
-			
+
 			$errors = array();
 			$events = (array) (isset($options['events']) ? $options['events'] : null);
 			$values = Set::flatten($values);
@@ -464,7 +464,7 @@ class Validator extends \lithium\core\StaticObject {
 					if ($events && $rule['on'] && !array_intersect($events, (array) $rule['on'])) {
 						continue;
 					}
-					if (!isset($values[$field])) {
+					if (!array_key_exists($field, $values)) {
 						if ($rule['required']) {
 							$errors[$field][] = $rule['message'] ?: $key;
 						}
@@ -479,7 +479,7 @@ class Validator extends \lithium\core\StaticObject {
 
 					if (!$self::rule($name, $values[$field], $rule['format'], $rule + $options)) {
 						$errors[$field][] = $rule['message'] ?: $key;
-					
+
 						if ($rule['last']) {
 							break;
 						}
