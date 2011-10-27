@@ -96,6 +96,7 @@ class DocumentArray extends \lithium\data\Collection {
 	 */
 	public function __unset($name) {
 		unset($this->_data[$name]);
+		prev($this->_data);
 	}
 
 	/**
