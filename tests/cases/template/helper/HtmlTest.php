@@ -280,6 +280,10 @@ class HtmlTest extends \lithium\test\Unit {
 		$expected = '<script type="text/javascript" src="http://example.com/jquery.js"></script>';
 		$this->assertEqual($result, $expected);
 
+        $result = $this->html->script('//example.com/jquery.js');
+		$expected = '<script type="text/javascript" src="//example.com/jquery.js"></script>';
+		$this->assertEqual($result, $expected);
+
 		$result = $this->html->script(array('prototype', 'scriptaculous'));
 		$this->assertPattern(
 			'/^\s*<script\s+type="text\/javascript"\s+src=".*js\/prototype\.js"[^<>]*><\/script>/',
