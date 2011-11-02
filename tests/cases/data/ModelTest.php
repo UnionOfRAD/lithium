@@ -32,6 +32,14 @@ class ModelTest extends \lithium\test\Unit {
 		'body' => array('type' => 'text')
 	);
 
+	// this is for testing with arrays
+	protected $_arySchema = array(
+		'_id' => array('type' => 'id'),
+		'values.foo.haha' => array('type' => 'integer'),
+		'values.bar.haha' => array('type' => 'integer'),
+		'values.baz.haha' => array('type' => 'integer')
+	);
+
 	public function setUp() {
 		$this->_configs = Connections::config();
 		Connections::config(array('mock-source' => array(
@@ -43,6 +51,7 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
+
 		Connections::config(array('mock-source' => false));
 		Connections::config($this->_configs);
 	}
@@ -477,6 +486,32 @@ class ModelTest extends \lithium\test\Unit {
 
 		$this->assertIdentical(false, $result);
 	}
+
+	public function testSaveWithArray() {
+		$schema = MockPost::schema();
+		MockPost::overrideSchema($this->_arySchema);
+		$items = array(
+				'foo' => array('haha' => 1),
+				'bar' => array('haha' => 1),
+				'baz' => array('haha' => 1)
+		);
+		$data = compact('items');
+		$record = MockPost::create($data);
+		$this->assertEqual(1, $record->items->foo->haha );
+		$this->assertTrue($record->save(null, array('callbacks' => false)));
+		$this->assertEqual(1, $record->items->foo->haha);
+/*
+		$anotherRecord = MockPost::find('first', array('_id' => $record->_id));
+		$this->assertEqual(1, $anotherRecord->items->foo->haha);
+		$anotherRecord->items->foo->haha = 3;
+		$this->assertTrue($anotherRecord->save());
+
+		$yetAnother = MockPost::find('first', array('_id' => $record->_id));
+		$this->assertEqual(3, $yetAnother->items->foo->haha);
+		MockPost::overrideSchema($schema);
+*/
+	}
+
 
 	public function testImplicitKeyFind() {
 		$result = MockPost::find(10);
