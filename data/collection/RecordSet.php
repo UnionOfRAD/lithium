@@ -358,9 +358,18 @@ class RecordSet extends \lithium\data\Collection {
 					$dataMap[$name] = $record;
 					continue;
 				}
-				$dataMap[$name][] = $record;
+
+				if (array_filter($record)) {
+					$dataMap[$name][] = $record;
+				}
 			}
 		} while ($data = $this->_result->next());
+
+		foreach (array_filter(array_keys($this->_columns)) as $name) {
+			if (!array_key_exists($name, $dataMap)) {
+				$dataMap[$name] = array();
+			}
+		}
 
 		foreach ($dataMap as $name => $rel) {
 			$field = $relMap[$name]['fieldName'];

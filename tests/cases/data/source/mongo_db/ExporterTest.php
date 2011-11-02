@@ -131,6 +131,15 @@ class ExporterTest extends \lithium\test\Unit {
 		$model = $this->_model;
 		$exists = true;
 		$model::config(array('key' => '_id'));
+		$model::schema(array(
+			'forceArray' => array('type' => 'string', 'array' => true),
+			'array' => array('type' => 'string', 'array' => true),
+			'dictionary' => array('type' => 'string', 'array' => true),
+			'numbers' => array('type' => 'integer', 'array' => true),
+			'objects' => array('type' => 'object', 'array' => true),
+			'deeply' => array('type' => 'object', 'array' => true),
+			'foo' => array('type' => 'string')
+		));
 
 		$doc = new Document(compact('model', 'exists') + array('data' => array(
 			'numbers' => new DocumentArray(compact('model', 'exists') + array(
@@ -152,9 +161,15 @@ class ExporterTest extends \lithium\test\Unit {
 			'foo' => 'bar'
 		)));
 
+		$doc->dictionary[] = 'A word';
+		$doc->forceArray = 'Word';
+		$doc->array = array('one');
 		$doc->field = 'value';
 		$doc->objects[1]->foo = 'dib';
+		$doc->objects[] = array('foo' => 'diz');
 		$doc->deeply->nested = 'foo';
+		$doc->deeply->nestedAgain = 'bar';
+		$doc->array = array('one');
 		$doc->newObject = new Document(array(
 			'exists' => false, 'data' => array('subField' => 'subValue')
 		));
@@ -162,16 +177,30 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertEqual('subValue', $doc->newObject->subField);
 
 		$doc->numbers = array(8, 9);
+		$doc->numbers[] = 10;
+		$doc->numbers->append(11);
 
 		$result = Exporter::get('update', $doc->export());
 		$expected = array(
-			'numbers' => array(8, 9),
+			'array' => array('one'),
+			'dictionary' => array('A Word'),
+			'forceArray' => array('Word'),
+			'numbers' => array(8, 9, 10, 11),
 			'newObject' => array('subField' => 'subValue'),
 			'field' => 'value',
 			'deeply.nested' => 'foo',
-			'objects.1.foo' => 'dib'
+			'deeply.nestedAgain' => 'bar',
+			'array' => array('one'),
+			'objects.1.foo' => 'dib',
+			'objects.2' => array('foo' => 'diz')
 		);
 		$this->assertEqual($expected, $result['update']);
+
+		$doc->objects[] = array('foo' => 'dob');
+		$exist = $doc->objects->find(function ($data) {
+			return (strcmp($data->foo, 'dob') === 0);
+		}, array('collect' => false));
+		$this->assertTrue(!empty($exist));
 	}
 
 	public function testFieldRemoval() {
@@ -263,6 +292,7 @@ class ExporterTest extends \lithium\test\Unit {
 			'comments' => array(
 				"4c8f86167675abfabdbe0300", "4c8f86167675abfabdbf0300", "4c8f86167675abfabdc00300"
 			),
+			'empty_array' => array(),
 			'authors' => '4c8f86167675abfabdb00300',
 			'created' => time(),
 			'modified' => date('Y-m-d H:i:s'),
@@ -297,6 +327,8 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertTrue($result['modified'] instanceof MongoDate);
 		$this->assertTrue($result['created'] instanceof MongoDate);
 		$this->assertTrue($result['created']->sec > 0);
+
+		$this->assertTrue($result['empty_array'] instanceof DocumentArray);
 
 		$this->assertEqual($time, $result['modified']->sec);
 		$this->assertEqual($time, $result['created']->sec);

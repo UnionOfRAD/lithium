@@ -444,14 +444,23 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testSave() {
 		$schema = MockPost::schema();
-		MockPost::overrideSchema($this->_altSchema);
-		$data = array('title' => 'New post', 'author_id' => 13);
+	 	MockPost::overrideSchema($this->_altSchema);
+		MockPost::resetSchema();
+		$data = array('title' => 'New post', 'author_id' => 13, 'foo' => 'bar');
 		$record = MockPost::create($data);
 		$result = $record->save();
 
 		$this->assertEqual('create', $result['query']->type());
 		$this->assertEqual($data, $result['query']->data());
 		$this->assertEqual('lithium\tests\mocks\data\MockPost', $result['query']->model());
+
+		$record->tags = array("baz", "qux");
+		$otherData = array('body' => 'foobar');
+		$result = $record->save($otherData);
+		$data['body'] = 'foobar';
+		$data['tags'] = array("baz", "qux");
+		$this->assertNotEqual($data, $result['query']->data());
+
 		MockPost::overrideSchema($schema);
 	}
 
