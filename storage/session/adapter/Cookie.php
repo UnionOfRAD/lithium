@@ -8,6 +8,7 @@
 
 namespace lithium\storage\session\adapter;
 
+use RuntimeException;
 use lithium\util\Set;
 use lithium\util\Inflector;
 
