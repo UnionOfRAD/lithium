@@ -153,7 +153,7 @@ class ExporterTest extends \lithium\test\Unit {
 					new Document(
 						compact('model', 'exists') + array('data' => array('foo' => 'baz'))
 					)
-				), 'pathKey' => 'numbers'
+				), 'pathKey' => 'objects'
 			)),
 			'deeply' => new Document(compact('model', 'exists') + array(
 				'pathKey' => 'deeply', 'data' => array('nested' => 'object')
