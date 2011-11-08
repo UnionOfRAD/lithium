@@ -11,6 +11,7 @@ namespace lithium\data\source;
 use lithium\util\String;
 use lithium\util\Inflector;
 use InvalidArgumentException;
+use lithium\data\model\QueryException;
 
 /**
  * The `Database` class provides the base-level abstraction for SQL-oriented relational databases.
@@ -786,11 +787,12 @@ abstract class Database extends \lithium\data\Source {
 			if (!is_array($value)) {
 				continue;
 			}
-			foreach ($value as $operator => $val) {
-				if (isset($this->_operators[$operator])) {
-					$val = $this->name($val);
-					$result[] = "{$field} {$operator} {$val}";
+			foreach ($value as $op => $val) {
+				if (!isset($this->_operators[$op])) {
+					throw new QueryException("Unsupported operator `{$op}` used in constraint.");
 				}
+				$val = $this->name($val);
+				$result[] = "{$field} {$op} {$val}";
 			}
 		}
 		return 'ON ' . join(' AND ', $result);
