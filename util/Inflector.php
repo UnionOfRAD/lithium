@@ -164,7 +164,7 @@ class Inflector {
 			'child' => 'children', 'corpus' => 'corpuses', 'cow' => 'cows',
 			'ganglion' => 'ganglions', 'genie' => 'genies', 'genus' => 'genera',
 			'graffito' => 'graffiti', 'hoof' => 'hoofs', 'loaf' => 'loaves', 'man' => 'men',
-			'money' => 'monies', 'mongoose' => 'mongooses', 'move' => 'moves',
+			'leaf' => 'leaves', 'money' => 'monies', 'mongoose' => 'mongooses', 'move' => 'moves',
 			'mythos' => 'mythoi', 'numen' => 'numina', 'occiput' => 'occiputs',
 			'octopus' => 'octopuses', 'opus' => 'opuses', 'ox' => 'oxen', 'penis' => 'penises',
 			'person' => 'people', 'sex' => 'sexes', 'soliloquy' => 'soliloquies',

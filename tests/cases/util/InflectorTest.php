@@ -59,6 +59,7 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertEqual(Inflector::singularize('gloves'), 'glove');
 		$this->assertEqual(Inflector::singularize('doves'), 'dove');
 		$this->assertEqual(Inflector::singularize('lives'), 'life');
+		$this->assertEqual(Inflector::singularize('leaves'), 'leaf');
 		$this->assertEqual(Inflector::singularize('knives'), 'knife');
 		$this->assertEqual(Inflector::singularize('wolves'), 'wolf');
 		$this->assertEqual(Inflector::singularize('shelves'), 'shelf');
@@ -104,6 +105,7 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertEqual(Inflector::pluralize('person'), 'people');
 		$this->assertEqual(Inflector::pluralize('people'), 'people');
 		$this->assertEqual(Inflector::pluralize('glove'), 'gloves');
+		$this->assertEqual(Inflector::pluralize('leaf'), 'leaves');
 		$this->assertEqual(Inflector::pluralize(''), '');
 
 		$result = Inflector::pluralize('errata');
