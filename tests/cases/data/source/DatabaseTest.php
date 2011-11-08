@@ -775,17 +775,35 @@ class DatabaseTest extends \lithium\test\Unit {
 				'source' => 'posts',
 				'alias' => 'Post',
 				'constraint' => array(
-					"Comment.post_id" => array('<=' => "Post.id"),
-					"Comment.post_id" => array('=>' => "Post.id")
+					"Comment.post_id" => array(
+						'<=' => "Post.id",
+						'>=' => "Post.id"
+					)
 				)
 			))
 		));
 
 		$expected = "SELECT * FROM {comments} AS {Comments} LEFT JOIN {posts} AS {Post} ON ";
-		$expected .= "({Comment}.{post_id} <= {Post}.{id} && {Comment}.{post_id} => {Post}.{id}) ";
+		$expected .= "{Comment}.{post_id} <= {Post}.{id} AND {Comment}.{post_id} >= {Post}.{id} ";
 		$expected .= "WHERE Comment.id = 1;";
 		$result = Connections::get('mock-database-connection')->renderCommand($query);
 		$this->assertEqual($expected, $result);
+
+		$query = new Query(compact('model') + array(
+			'type' => 'read',
+			'source' => 'comments',
+			'alias' => 'Comments',
+			'joins' => array(array(
+				'type' => 'LEFT',
+				'source' => 'posts',
+				'alias' => 'Post',
+				'constraint' => array(
+					"Comment.post_id" => array('=>' => "Post.id")
+				)
+			))
+		));
+		$this->expectException("Unsupported operator `=>` used in constraint.");
+		Connections::get('mock-database-connection')->renderCommand($query);
 	}
 
 	public function testRenderArrayJoin() {
