@@ -9,6 +9,7 @@
 namespace lithium\console\command;
 
 use lithium\core\Libraries;
+use lithium\core\Environment;
 use lithium\util\Inflector;
 use lithium\analysis\Inspector;
 use lithium\analysis\Docblock;
@@ -26,6 +27,10 @@ class Help extends \lithium\console\Command {
 	 * @return void
 	 */
 	public function run($command = null) {
+	    $message = 'Lithium console started in the ' . Environment::get() . ' environment.';
+		$message .= ' Use the --env=environment key to alter this.';
+		$this->out($message);
+
 		if (!$command) {
 			$this->_renderCommands();
 			return true;
