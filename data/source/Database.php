@@ -11,6 +11,7 @@ namespace lithium\data\source;
 use lithium\util\String;
 use lithium\util\Inflector;
 use InvalidArgumentException;
+use lithium\data\model\QueryException;
 
 /**
  * The `Database` class provides the base-level abstraction for SQL-oriented relational databases.
@@ -158,12 +159,14 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Field name handler to ensure proper escaping.
 	 *
-	 * @param string $name
-	 * @return string
+	 * @param string $name Field or identifier name.
+	 * @return string Returns `$name` quoted according to the rules and quote characters of the
+	 *         database adapter subclass.
 	 */
 	public function name($name) {
 		$open  = reset($this->_quotes);
 		$close = next($this->_quotes);
+
 		if (preg_match('/^[a-z0-9_-]+\.[a-z0-9_-]+$/i', $name)) {
 			list($first, $second) = explode('.', $name, 2);
 			return "{$open}{$first}{$close}.{$open}{$second}{$close}";
@@ -783,11 +786,12 @@ abstract class Database extends \lithium\data\Source {
 			if (!is_array($value)) {
 				continue;
 			}
-			foreach ($value as $operator => $val) {
-				if (isset($this->_operators[$operator])) {
-					$val = $this->name($val);
-					$result[] = "{$field} {$operator} {$val}";
+			foreach ($value as $op => $val) {
+				if (!isset($this->_operators[$op])) {
+					throw new QueryException("Unsupported operator `{$op}` used in constraint.");
 				}
+				$val = $this->name($val);
+				$result[] = "{$field} {$op} {$val}";
 			}
 		}
 		return 'ON ' . join(' AND ', $result);
