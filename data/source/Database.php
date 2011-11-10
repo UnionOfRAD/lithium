@@ -11,7 +11,6 @@ namespace lithium\data\source;
 use lithium\util\String;
 use lithium\util\Inflector;
 use InvalidArgumentException;
-use lithium\data\model\QueryException;
 
 /**
  * The `Database` class provides the base-level abstraction for SQL-oriented relational databases.
@@ -287,9 +286,6 @@ abstract class Database extends \lithium\data\Source {
 							)
 						));
 					$ids = $self->read($subQuery, array('subquery' => true));
-					if (!$ids->count()) {
-						return false;
-					}
 					$idData = $ids->data();
 					$ids = array_map(function($index) use ($key) {
 							return $index[$key];
@@ -787,12 +783,11 @@ abstract class Database extends \lithium\data\Source {
 			if (!is_array($value)) {
 				continue;
 			}
-			foreach ($value as $op => $val) {
-				if (!isset($this->_operators[$op])) {
-					throw new QueryException("Unsupported operator `{$op}` used in constraint.");
+			foreach ($value as $operator => $val) {
+				if (isset($this->_operators[$operator])) {
+					$val = $this->name($val);
+					$result[] = "{$field} {$operator} {$val}";
 				}
-				$val = $this->name($val);
-				$result[] = "{$field} {$op} {$val}";
 			}
 		}
 		return 'ON ' . join(' AND ', $result);
@@ -944,14 +939,8 @@ abstract class Database extends \lithium\data\Source {
 	 * @param array $options
 	 * @return string
 	 */
-	protected function _entityName($entity, array $options = array()) {
-		$defaults = array('quoted' => false);
-		$options += $defaults;
-
-		if (class_exists($entity, false) && method_exists($entity, 'meta')) {
-			$entity = $entity::meta('source');
-		}
-		return $options['quoted'] ? $this->name($entity) : $entity;
+	protected function _entityName($entity) {
+		return $this->name($entity);
 	}
 
 	/**
