@@ -123,6 +123,18 @@ class DispatcherTest extends \lithium\test\Unit {
 		)));
 		$this->assertTrue($result);
 	}
+
+	public function testEnvironmentIsSet() {
+		$expected = 'production';
+		$response = Dispatcher::run(new Request(array(
+			'args' => array(
+				'lithium\tests\mocks\console\MockDispatcherCommand',
+				'testEnv', '--env=production'
+			)
+		)));
+		$result = $response->environment;
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

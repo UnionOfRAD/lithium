@@ -8,6 +8,8 @@
 
 namespace lithium\tests\mocks\console;
 
+use lithium\core\Environment;
+
 class MockDispatcherCommand extends \lithium\console\Command {
 
 	protected $_classes = array(
@@ -25,6 +27,10 @@ class MockDispatcherCommand extends \lithium\console\Command {
 
 	public function testAction() {
 		$this->response->testAction = __FUNCTION__;
+	}
+
+	public function testEnv() {
+		$this->response->environment = Environment::get();
 	}
 }
 
