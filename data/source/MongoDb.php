@@ -415,10 +415,6 @@ class MongoDb extends \lithium\data\Source {
 					$data['filename'] = $data['file']['name'];
 				}
 			break;
-			case (is_string($data['file']) && file_exists($data['file'])):
-				$method = 'storeFile';
-				$file = $data['file'];
-			break;
 			case $data['file']:
 				$method = 'storeBytes';
 				$file = $data['file'];
