@@ -385,7 +385,7 @@ class Route extends \lithium\core\Object {
 			$this->_pattern = '@^/*$@';
 			return;
 		}
-		$this->_pattern = '@^' . $this->_template . '\$@';
+		$this->_pattern = '@^' . $this->_template . '$@';
 		preg_match_all('@([/.])?\{:([^:}]+):?((?:[^{]+(?:\{[0-9,]+\})?)*?)\}@S', $this->_pattern, $m);
 
 		if (!$tokens = $m[0]) {
@@ -428,7 +428,8 @@ class Route extends \lithium\core\Object {
 		} else {
 			$regex = '[^\/]+';
 		}
-		$req = $param === 'args' || array_key_exists($param, $this->_params) ? '?' : '';
+		$req = '';
+		($param === 'args' || array_key_exists($param, $this->_params)) and $req = '?';
 
 		if ($prefix === '/') {
 			$pattern = "(?:/(?P<{$param}>{$regex}){$req}){$req}";
