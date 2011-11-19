@@ -40,8 +40,7 @@ class Curl extends \lithium\net\Socket {
 	 * @param array $config
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('ignoreExpect' => true);
-		parent::__construct($config + $defaults);
+		parent::__construct($config + array('ignoreExpect' => true)); // Defaults
 	}
 
 	/**
@@ -60,7 +59,7 @@ class Curl extends \lithium\net\Socket {
 			return false;
 		}
 
-		$url = "{$config['scheme']}://{$config['host']}";
+		$url = $config['scheme'] . '://' . $config['host'];
 		$this->_resource = curl_init($url);
 		curl_setopt($this->_resource, CURLOPT_PORT, $config['port']);
 		curl_setopt($this->_resource, CURLOPT_HEADER, true);
@@ -72,9 +71,7 @@ class Curl extends \lithium\net\Socket {
 		$this->_isConnected = true;
 		$this->timeout($config['timeout']);
 
-		if (isset($config['encoding'])) {
-			$this->encoding($config['encoding']);
-		}
+		isset($config['encoding']) and $this->encoding($config['encoding']);
 		return $this->_resource;
 	}
 
@@ -89,9 +86,7 @@ class Curl extends \lithium\net\Socket {
 		}
 		curl_close($this->_resource);
 
-		if (is_resource($this->_resource)) {
-			$this->close();
-		}
+    is_resource($this->_resource) and $this->close();
 		return true;
 	}
 
@@ -129,21 +124,13 @@ class Curl extends \lithium\net\Socket {
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
-		if (!is_object($data)) {
-			$data = $this->_instance($this->_classes['request'], (array) $data + $this->_config);
-		}
+		(!is_object($data)) and $data = $this->_instance($this->_classes['request'], (array) $data + $this->_config);
 		$this->set(CURLOPT_URL, $data->to('url'));
 
 		if (is_a($data, 'lithium\net\http\Message')) {
-			if (!empty($this->_config['ignoreExpect'])) {
-				$data->headers('Expect', ' ');
-			}
-			if (isset($data->headers)) {
-				$this->set(CURLOPT_HTTPHEADER, $data->headers());
-			}
-			if (isset($data->method) && $data->method == 'POST') {
-				$this->set(array(CURLOPT_POST => true, CURLOPT_POSTFIELDS => $data->body()));
-			}
+			(!empty($this->_config['ignoreExpect'])) and $data->headers('Expect', ' ');
+			isset($data->headers) and $this->set(CURLOPT_HTTPHEADER, $data->headers());
+			(isset($data->method) && $data->method == 'POST') and $this->set(array(CURLOPT_POST => true, CURLOPT_POSTFIELDS => $data->body()));
 		}
 		return (boolean) curl_setopt_array($this->_resource, $this->options);
 	}
@@ -185,9 +172,7 @@ class Curl extends \lithium\net\Socket {
 	 * @return void
 	 */
 	public function set($flags, $value = null) {
-		if ($value !== null) {
-			$flags = array($flags => $value);
-		}
+		($value !== null) and $flags = array($flags => $value);
 		$this->options += $flags;
 	}
 }
