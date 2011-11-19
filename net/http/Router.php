@@ -64,9 +64,7 @@ class Router extends \lithium\core\StaticObject {
 		if (!$config) {
 			return array('classes' => static::$_classes);
 		}
-		if (isset($config['classes'])) {
-			static::$_classes = $config['classes'] + static::$_classes;
-		}
+		isset($config['classes']) and static::$_classes = $config['classes'] + static::$_classes;
 	}
 
 	/**
@@ -85,16 +83,13 @@ class Router extends \lithium\core\StaticObject {
 	 */
 	public static function connect($template, $params = array(), $options = array()) {
 		if (!is_object($template)) {
-			if (is_string($params)) {
-				$params = static::_parseString($params, false);
-			}
+			is_string($params) and $params = static::_parseString($params, false);
+
 			if (isset($params[0]) && is_array($tmp = static::_parseString($params[0], false))) {
 				unset($params[0]);
 				$params = $tmp + $params;
 			}
-			if (is_callable($options)) {
-				$options = array('handler' => $options);
-			}
+			is_callable($options) and $options = array('handler' => $options);
 			$class = static::$_classes['route'];
 			$template = new $class(compact('template', 'params') + $options);
 		}
@@ -207,14 +202,15 @@ class Router extends \lithium\core\StaticObject {
 		if (is_string($url = static::_prepareParams($url, $context, $options))) {
 			return $url;
 		}
-		$defaults = array('action' => 'index');
-		$url += $defaults;
-		$stack = array();
+		$url += array('action' => 'index'); // Defaults
 
-		$base = isset($context) ? $context->env('base') : '';
-		$suffix = isset($url['#']) ? "#{$url['#']}" : null;
+		$base = '';
+		$suffix = null;
+		isset($context) and $base = $context->env('base');
+		isset($url['#']) and $suffix = '#' . $url['#'];
 		unset($url['#']);
 
+		$stack = array();
 		foreach (static::$_configurations as $route) {
 			if (!$match = $route->match($url, $context)) {
 				continue;
@@ -231,9 +227,10 @@ class Router extends \lithium\core\StaticObject {
 				$stack[] = $match;
 				$match = static::_compileStack($stack);
 			}
-			$path = rtrim("{$base}{$match}{$suffix}", '/') ?: '/';
-			$path = ($options) ? static::_prefix($path, $context, $options) : $path;
-			return $path ?: '/';
+			($path = rtrim($base . $match . $suffix, '/')) or $path = '/';
+			$options and $path = static::_prefix($path, $context, $options);
+			($path) or $path = '/';
+			return $path;
 		}
 		$url = static::_formatError($url);
 		throw new RoutingException("No parameter match found for URL `{$url}`.");
@@ -298,7 +295,8 @@ class Router extends \lithium\core\StaticObject {
 		}
 		$options += $defaults;
 
-		return ($options['absolute']) ? "{$options['scheme']}{$options['host']}{$path}" : $path;
+		($options['absolute']) and $path = $options['scheme'] . $options['host'] . $path;
+		return $path;
 	}
 
 	/**
@@ -318,16 +316,14 @@ class Router extends \lithium\core\StaticObject {
 	 * @return array Returns the modified URL array.
 	 */
 	protected static function _persist($url, $context) {
-		if (!$context || !isset($context->persist)) {
-			return $url;
-		}
-		foreach ($context->persist as $key) {
-			$url += array($key => $context->params[$key]);
-
-			if ($url[$key] === null) {
-				unset($url[$key]);
+		if ($context && isset($context->persist)) {
+			foreach ($context->persist as $key) {
+				$url += array($key => $context->params[$key]);
+				if ($url[$key] === null) {
+					unset($url[$key]);
+				}
 			}
-		}
+		} 
 		return $url;
 	}
 
@@ -338,10 +334,10 @@ class Router extends \lithium\core\StaticObject {
 	 * @return lithium\net\http\Route
 	 */
 	public static function get($route = null) {
-		if ($route === null) {
-			return static::$_configurations;
-		}
-		return isset(static::$_configurations[$route]) ? static::$_configurations[$route] : null;
+		$return = null;
+		($route === null) and $return = static::$_configurations;
+		isset(static::$_configurations[$route]) and $return = static::$_configurations[$route];
+		return $return;
 	}
 
 	/**
@@ -362,9 +358,10 @@ class Router extends \lithium\core\StaticObject {
 	 */
 	protected static function _parseString($path, $context) {
 		if (!preg_match('/^[A-Za-z0-9_]+::[A-Za-z0-9_]+$/', $path)) {
-			$base = $context ? $context->env('base') : '';
+			$base = '';
+			$context and $base = $context->env('base');
 			$path = trim($path, '/');
-			return $context !== false ? "{$base}/{$path}" : null;
+			return $context !== false ? $base . '/' . $path : null;
 		}
 		list($controller, $action) = explode('::', $path, 2);
 		$controller = Inflector::underscore($controller);

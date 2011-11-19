@@ -87,9 +87,7 @@ class Response extends \lithium\net\http\Message {
 	 * @param array $config
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('message' => null);
-		$config += $defaults;
-		parent::__construct($config);
+		parent::__construct($config + array('message' => null)); // Defaults
 	}
 
 	/**
@@ -97,26 +95,16 @@ class Response extends \lithium\net\http\Message {
 	 *
 	 * @return void
 	 */
-	protected function _init() {
+	protected function _init() { 
 		parent::_init();
 
-		if ($this->_config['message']) {
-			$this->body = $this->_parseMessage($this->_config['message']);
-		}
+		$this->_config['message'] and $this->body = $this->_parseMessage($this->_config['message']);
 		if (isset($this->headers['Content-Type'])) {
-			$pattern = '/([-\w\/+]+)(;\s*?charset=(.+))?/i';
-			preg_match($pattern, $this->headers['Content-Type'], $match);
-
-			if (isset($match[1])) {
-				$this->type = trim($match[1]);
-			}
-			if (isset($match[3])) {
-				$this->encoding = strtoupper(trim($match[3]));
-			}
+			preg_match('/([-\w\/+]+)(;\s*?charset=(.+))?/i', $this->headers['Content-Type'], $match);
+			isset($match[1]) and $this->type = trim($match[1]);
+			isset($match[3]) and $this->encoding = strtoupper(trim($match[3]));
 		}
-		if (isset($this->headers['Transfer-Encoding'])) {
-			$this->body = $this->_decode($this->body);
-		}
+		isset($this->headers['Transfer-Encoding']) and $this->body = $this->_decode($this->body);
 	}
 
 	/**
@@ -127,13 +115,13 @@ class Response extends \lithium\net\http\Message {
 	 * @return After parsing out other message components, returns just the message body.
 	 */
 	protected function _parseMessage($body) {
-		if (!($parts = explode("\r\n\r\n", $body, 2)) || count($parts) == 1) {
+		if (!($parts = explode("\r\n\r\n", $body, 2)) || 1 === count($parts)) {
 			return trim($body);
 		}
 		list($headers, $body) = $parts;
-		$headers = str_replace("\r", "", explode("\n", $headers));
+		$headers = str_replace("\r", '', explode("\n", $headers));
 
-		if (array_filter($headers) == array()) {
+		if (array_filter($headers) === array()) {
 			return trim($body);
 		}
 		preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)\s+(.*)/i', array_shift($headers), $match);
@@ -144,7 +132,7 @@ class Response extends \lithium\net\http\Message {
 		}
 		list($line, $this->version, $code, $message) = $match;
 		$this->status = compact('code', 'message') + $this->status;
-		$this->protocol = "HTTP/{$this->version}";
+		$this->protocol = 'HTTP/' . $this->version;
 		return $body;
 	}
 
@@ -156,9 +144,7 @@ class Response extends \lithium\net\http\Message {
 	 * @return string Returns the full HTTP status, with version, code and message.
 	 */
 	public function status($key = null, $data = null) {
-		if ($data === null) {
-			$data = $key;
-		}
+		$data === null and $data = $key;
 		if ($data) {
 			$this->status = array('code' => null, 'message' => null);
 
@@ -178,7 +164,7 @@ class Response extends \lithium\net\http\Message {
 		if (isset($this->status[$key])) {
 			return $this->status[$key];
 		}
-		return "{$this->protocol} {$this->status['code']} {$this->status['message']}";
+		return $this->protocol . ' ' . $this->status['code'] . ' ' . $this->status['message'];
 	}
 
 	/**
@@ -187,12 +173,9 @@ class Response extends \lithium\net\http\Message {
 	* @return string
 	*/
 	public function __toString() {
-		if ($this->type != 'text/html' && !isset($this->headers['Content-Type'])) {
-			$this->headers['Content-Type'] = $this->type;
-		}
-		$first = "{$this->protocol} {$this->status['code']} {$this->status['message']}";
-		$response = array($first, join("\r\n", $this->headers()), "", $this->body());
-		return join("\r\n", $response);
+		($this->type != 'text/html' && !isset($this->headers['Content-Type'])) and $this->headers['Content-Type'] = $this->type;
+		return join("\r\n", array($this->protocol . ' ' . $this->status['code'] . ' ' . $this->status['message'],
+			join("\r\n", $this->headers()), '', $this->body()));
 	}
 
 	/**

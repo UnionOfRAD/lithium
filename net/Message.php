@@ -81,7 +81,7 @@ class Message extends \lithium\core\Object {
 	 * - `body`: null
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array(
+		$config += array(
 			'scheme' => 'tcp',
 			'host' => 'localhost',
 			'port' => null,
@@ -89,8 +89,7 @@ class Message extends \lithium\core\Object {
 			'password' => null,
 			'path' => null,
 			'body' => null
-		);
-		$config += $defaults;
+		); // Defaults
 
 		foreach (array_filter($config) as $key => $value) {
 			$this->{$key} = $value;
@@ -107,8 +106,7 @@ class Message extends \lithium\core\Object {
 	 * @return array
 	 */
 	public function body($data = null, $options = array()) {
-		$default = array('buffer' => null);
-		$options += $default;
+		$options += array('buffer' => null); // Defaults
 		$this->body = array_merge((array) $this->body, (array) $data);
 		$body = join("\r\n", $this->body);
 		return ($options['buffer']) ? str_split($body, $options['buffer']) : $body;
@@ -125,19 +123,19 @@ class Message extends \lithium\core\Object {
 	public function to($format, array $options = array()) {
 		switch ($format) {
 			case 'array':
-				$array = array();
 				$class = new ReflectionClass(get_class($this));
 
+				$array = array();
 				foreach ($class->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
 					$array[$prop->getName()] = $prop->getValue($this);
 				}
 				return $array;
 			case 'url':
-				$host = $this->host . ($this->port ? ":{$this->port}" : '');
-				return "{$this->scheme}://{$host}{$this->path}";
+				$host = $this->host;
+				$this->port and  $host = $host . ':' . $this->port;
+				return $this->scheme . '://' . $host . $this->path;
 			case 'context':
-				$defaults = array('content' => $this->body(), 'ignore_errors' => true);
-				return array($this->scheme => $options + $defaults);
+				return array($this->scheme => $options + array('content' => $this->body(), 'ignore_errors' => true));
 			case 'string':
 			default:
 				return (string) $this;

@@ -180,15 +180,9 @@ class Route extends \lithium\core\Object {
 	protected function _init() {
 		parent::_init();
 
-		if (!$this->_config['continue']) {
-			$this->_params += array('action' => 'index');
-		}
-		if (!$this->_config['pattern']) {
-			$this->compile();
-		}
-		if ($isKey = isset($this->_keys['controller']) || isset($this->_params['controller'])) {
-			$this->_persist = $this->_persist ?: array('controller');
-		}
+		(!$this->_config['continue']) and $this->_params += array('action' => 'index');
+		(!$this->_config['pattern']) and $this->compile();
+		($isKey = isset($this->_keys['controller']) || isset($this->_params['controller'])) and $this->_persist = $this->_persist ?: array('controller');
 	}
 
 	/**
@@ -299,8 +293,6 @@ class Route extends \lithium\core\Object {
 	 *         failure, returns `false`.
 	 */
 	protected function _matchKeys($options) {
-		$args = array('args' => 'args');
-
 		if (array_intersect_key($options, $this->_match) != $this->_match) {
 			return false;
 		}
@@ -309,8 +301,9 @@ class Route extends \lithium\core\Object {
 				return false;
 			}
 		}
-		$options += $this->_defaults;
 
+		$options += $this->_defaults;
+		$args = array('args' => 'args');
 		if (array_intersect_key($this->_keys, $options) + $args !== $this->_keys + $args) {
 			return false;
 		}
@@ -329,30 +322,27 @@ class Route extends \lithium\core\Object {
 		$template = $this->_template;
 		$trimmed = true;
 
-		if (isset($options['args']) && is_array($options['args'])) {
-			$options['args'] = join('/', $options['args']);
-		}
+		(isset($options['args']) && is_array($options['args'])) and $options['args'] = join('/', $options['args']);
 		$options += array('args' => '');
 
 		foreach (array_reverse($this->_keys, true) as $key) {
 			$value =& $options[$key];
-			$pattern = isset($this->_subPatterns[$key]) ? ":{$this->_subPatterns[$key]}" : '';
-			$rpl = "{:{$key}{$pattern}}";
+			$pattern = '';
+			isset($this->_subPatterns[$key]) and $pattern = ':' . $this->_subPatterns[$key];
+			$rpl = '{:' . $key . $pattern . '}';
 			$len = strlen($rpl) * -1;
 
 			if ($trimmed && isset($defaults[$key]) && $value == $defaults[$key]) {
-				if (substr($template, $len) == $rpl) {
+				if (substr($template, $len) === $rpl) {
 					$template = rtrim(substr($template, 0, $len), '/');
 					continue;
 				}
 			}
 			if ($value === null) {
-				$template = str_replace("/{$rpl}", '', $template);
+				$template = str_replace('/' . $rpl, '', $template);
 				continue;
 			}
-			if ($key !== 'args') {
-				$trimmed = false;
-			}
+			$key !== 'args' and $trimmed = false;
 			$template = str_replace($rpl, $value, $template);
 		}
 		return $template;
@@ -395,9 +385,8 @@ class Route extends \lithium\core\Object {
 			$this->_pattern = '@^/*$@';
 			return;
 		}
-		$this->_pattern = "@^{$this->_template}\$@";
-		$match = '@([/.])?\{:([^:}]+):?((?:[^{]+(?:\{[0-9,]+\})?)*?)\}@S';
-		preg_match_all($match, $this->_pattern, $m);
+		$this->_pattern = '@^' . $this->_template . '$@';
+		preg_match_all('@([/.])?\{:([^:}]+):?((?:[^{]+(?:\{[0-9,]+\})?)*?)\}@S', $this->_pattern, $m);
 
 		if (!$tokens = $m[0]) {
 			return;
@@ -439,7 +428,8 @@ class Route extends \lithium\core\Object {
 		} else {
 			$regex = '[^\/]+';
 		}
-		$req = $param === 'args' || array_key_exists($param, $this->_params) ? '?' : '';
+		$req = '';
+		($param === 'args' || array_key_exists($param, $this->_params)) and $req = '?';
 
 		if ($prefix === '/') {
 			$pattern = "(?:/(?P<{$param}>{$regex}){$req}){$req}";

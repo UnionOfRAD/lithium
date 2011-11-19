@@ -51,14 +51,13 @@ abstract class Socket extends \lithium\core\Object {
 	 *              - `'timeout'`: Seconds after opening the socket times out (defaults to `30`).
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array(
+		parent::__construct($config + array(
 			'persistent' => false,
 			'scheme'     => 'tcp',
 			'host'       => 'localhost',
 			'port'       => 80,
 			'timeout'    => 30
-		);
-		parent::__construct($config + $defaults);
+		)); // Defaults
 	}
 
 	/**
@@ -138,11 +137,9 @@ abstract class Socket extends \lithium\core\Object {
 	 * @return object a response object based on `\lithium\net\Message`
 	 */
 	public function send($message = null, array $options = array()) {
-		$defaults = array('response' => $this->_classes['response']);
-		$options += $defaults;
-
 		if ($this->write($message)) {
 			$config = array('message' => $this->read()) + $this->_config;
+			$options += array('response' => $this->_classes['response']); // Defaults
 			return $this->_instance($options['response'], $config);
 		}
 	}

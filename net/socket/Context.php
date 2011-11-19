@@ -33,8 +33,7 @@ class Context extends \lithium\net\Socket {
 	 * @param array $config
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('mode' => 'r', 'message' => null);
-		parent::__construct($config + $defaults);
+		parent::__construct($config + array('mode' => 'r', 'message' => null)); // Defaults
 		$this->timeout($this->_config['timeout']);
 	}
 
@@ -52,7 +51,7 @@ class Context extends \lithium\net\Socket {
 		if (!$config['scheme'] || !$config['host']) {
 			return false;
 		}
-		$url = "{$config['scheme']}://{$config['host']}:{$config['port']}";
+		$url = $config['scheme'] . '://' . $config['host'] . ':' . $config['port'];
 		$context = array($config['scheme'] => array('timeout' => $this->_timeout));
 
 		if (is_object($config['message'])) {
@@ -73,9 +72,7 @@ class Context extends \lithium\net\Socket {
 			return true;
 		}
 		fclose($this->_resource);
-		if (is_resource($this->_resource)) {
-			$this->close();
-		}
+		is_resource($this->_resource) and $this->close();
 		return true;
 	}
 
@@ -101,8 +98,8 @@ class Context extends \lithium\net\Socket {
 			return false;
 		}
 		$meta = stream_get_meta_data($this->_resource);
-		$headers = isset($meta['wrapper_data'])
-			? join("\r\n", $meta['wrapper_data']) . "\r\n\r\n" : null;
+		$headers = null;
+		isset($meta['wrapper_data']) and $headers = join("\r\n", $meta['wrapper_data']) . "\r\n\r\n";
 		return $headers . stream_get_contents($this->_resource);
 	}
 
@@ -116,9 +113,7 @@ class Context extends \lithium\net\Socket {
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
-		if (!is_object($data)) {
-			$data = $this->_instance($this->_classes['request'], (array) $data + $this->_config);
-		}
+		(!is_object($data)) and $data = $this->_instance($this->_classes['request'], (array) $data + $this->_config);
 		return stream_context_set_option(
 			$this->_resource, $data->to('context', array('timeout' => $this->_timeout))
 		);
@@ -131,9 +126,7 @@ class Context extends \lithium\net\Socket {
 	 * @return booelan `true` if timeout has been set, `false` otherwise.
 	 */
 	public function timeout($time = null) {
-		if ($time !== null) {
-			$this->_timeout = $time;
-		}
+		($time !== null) and $this->_timeout = $time;
 		return $this->_timeout;
 	}
 

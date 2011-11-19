@@ -63,7 +63,7 @@ class Service extends \lithium\core\Object {
 	 * @param array $config
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array(
+		parent::__construct($config + array(
 			'persistent' => false,
 			'scheme'     => 'http',
 			'host'       => 'localhost',
@@ -74,8 +74,7 @@ class Service extends \lithium\core\Object {
 			'password'   => null,
 			'encoding'   => 'UTF-8',
 			'socket'     => 'Context'
-		);
-		parent::__construct($config + $defaults);
+		)); // Defaults
 	}
 
 	/**
@@ -174,8 +173,7 @@ class Service extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function send($method, $path = null, $data = array(), array $options = array()) {
-		$defaults = array('return' => 'body');
-		$options += $defaults;
+		$options += array('return' => 'body'); // Defaults
 		$request = $this->_request($method, $path, $data, $options);
 		$options += array('message' => $request);
 
@@ -185,7 +183,7 @@ class Service extends \lithium\core\Object {
 		$response = $this->connection->send($request, $options);
 		$this->connection->close();
 		$this->last = (object) compact('request', 'response');
-		return ($options['return'] == 'body' && $response) ? $response->body() : $response;
+		return ($options['return'] === 'body' && $response) ? $response->body() : $response;
 	}
 
 	/**
@@ -201,10 +199,9 @@ class Service extends \lithium\core\Object {
 	 *         string or POST/PUT data, and URL.
 	 */
 	protected function _request($method, $path, $data, $options) {
-		$defaults = array('type' => 'form');
-		$options += $defaults + $this->_config;
+		$options += array('type' => 'form') + $this->_config; // Defaults
 		$request = $this->_instance('request', $options);
-		$request->path = str_replace('//', '/', "{$request->path}{$path}");
+		$request->path = str_replace('//', '/', $request->path . $path);
 		$request->method = $method = strtoupper($method);
 		$hasBody = in_array($method, array('POST', 'PUT'));
 
@@ -215,8 +212,7 @@ class Service extends \lithium\core\Object {
 			$type = $media::type($options['type']);
 			$contentType = (array) $type['content'];
 			$request->headers(array('Content-Type' => current($contentType)));
-			$data = $hasBody && !is_string($data) ?
-				Media::encode($options['type'], $data, $options) : $data;
+			($hasBody && !is_string($data)) and $data = Media::encode($options['type'], $data, $options);
 		}
 		$hasBody ? $request->body($data) : $request->query = $data;
 		return $request;

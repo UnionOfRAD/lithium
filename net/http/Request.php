@@ -64,7 +64,7 @@ class Request extends \lithium\net\http\Message {
 	 * - `body`: null
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array(
+		$config += array(
 			'scheme' => 'http',
 			'host' => 'localhost',
 			'port' => null,
@@ -77,12 +77,11 @@ class Request extends \lithium\net\http\Message {
 			'body' => null,
 			'auth' => null,
 			'method' => 'GET'
-		);
-		$config += $defaults;
+		); // Defaults
 		parent::__construct($config);
 
 		$this->headers = array(
-			'Host' => $this->port ? "{$this->host}:{$this->port}" : $this->host,
+			'Host' => $this->port ? $this->host . ':' . $this->port : $this->host,
 			'Connection' => 'Close',
 			'User-Agent' => 'Mozilla/5.0'
 		);
@@ -97,21 +96,20 @@ class Request extends \lithium\net\http\Message {
 	 * @return array
 	 */
 	public function queryString($params = array(), $format = null) {
-		$params = empty($params) ? (array) $this->query : (array) $this->query + (array) $params;
-		$params = array_filter($params);
+		$params = array_filter(empty($params) ? (array) $this->query : (array) $this->query + (array) $params);
 
 		if (empty($params)) {
 			return null;
 		}
 		if (!$format) {
-			return "?" . http_build_query($params);
+			return '?' . http_build_query($params);
 		}
-		$query = null;
 
+		$query = null;
 		foreach ($params as $key => $value) {
 			if (is_array($value)) {
 				foreach ($value as $val) {
-					$values = array('key' => urlencode("{$key}[]"), 'value' => urlencode($val));
+					$values = array('key' => urlencode($key . '[]'), 'value' => urlencode($val));
 					$query .= String::insert($format, $values);
 				}
 				continue;
@@ -119,7 +117,7 @@ class Request extends \lithium\net\http\Message {
 			$values = array('key' => urlencode($key), 'value' => urlencode($value));
 			$query .= String::insert($format, $values);
 		}
-		return "?" . substr($query, 0, -1);
+		return '?' . substr($query, 0, -1);
 	}
 
 	/**
@@ -172,23 +170,19 @@ class Request extends \lithium\net\http\Message {
 		switch ($format) {
 			case 'url':
 				$options['query'] = $this->queryString($options['query']);
-				return String::insert("{:scheme}://{:host}{:port}{:path}{:query}", $options);
+				return String::insert('{:scheme}://{:host}{:port}{:path}{:query}', $options);
 			case 'context':
-				if ($options['auth']) {
-					$auth = base64_encode("{$this->username}:{$this->password}");
-					$this->headers('Authorization', "{$options['auth']} {$auth}");
-				}
+				$options['auth'] and $this->headers('Authorization', $options['auth'] . ' ' . base64_encode($this->username . ':' . $this->password));
 				$body = $this->body($options['body']);
 				$this->headers('Content-Length', strlen($body));
-				$base = array(
+				return array('http' => array_diff_key($options, $defaults) + array(
 					'content' => $body,
 					'method' => $options['method'],
 					'header' => $this->headers($options['headers']),
 					'protocol_version' => $options['version'],
 					'ignore_errors' => $options['ignore_errors'],
 					'follow_location' => $options['follow_location']
-				);
-				return array('http' => array_diff_key($options, $defaults) + $base);
+				));
 			default:
 				return parent::to($format, $options);
 		}
@@ -201,16 +195,13 @@ class Request extends \lithium\net\http\Message {
 	 */
 	public function __toString() {
 		if (!empty($this->_config['auth'])) {
-			$this->headers('Authorization', "{$this->_config['auth']} " . base64_encode(
-				"{$this->username}:{$this->password}"
-			));
+			$this->headers('Authorization', $this->_config['auth'] . ' ' . base64_encode($this->username . ':' . $this->password));
 		}
 		$path = str_replace('//', '/', $this->path) . $this->queryString();
 		$body = $this->body();
 		$this->headers('Content-Length', strlen($body));
 
-		$status = "{$this->method} {$path} {$this->protocol}";
-		return join("\r\n", array($status, join("\r\n", $this->headers()), "", $body));
+		return join("\r\n", array($this->method . ' ' . $path . ' ' . $this->protocol, join("\r\n", $this->headers()), '', $body));
 	}
 }
 

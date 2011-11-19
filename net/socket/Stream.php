@@ -38,12 +38,10 @@ class Stream extends \lithium\net\Socket {
 		}
 		$scheme = ($config['scheme'] !== 'udp') ? 'tcp' : 'udp';
 		$port = $config['port'] ?: 80;
-		$host = "{$scheme}://{$config['host']}:{$port}";
+		$host = $scheme . '://' . $config['host'] . ':' . $port;
 		$flags = STREAM_CLIENT_CONNECT;
 
-		if ($config['persistent']) {
-			$flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT;
-		}
+		$config['persistent'] and $flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT;
 		$this->_resource = stream_socket_client(
 			$host, $errorCode, $errorMessage, $config['timeout'], $flags
 		);
@@ -52,9 +50,7 @@ class Stream extends \lithium\net\Socket {
 		}
 		$this->timeout($config['timeout']);
 
-		if (!empty($config['encoding'])) {
-			$this->encoding($config['encoding']);
-		}
+		(!empty($config['encoding'])) and $this->encoding($config['encoding']);
 		return $this->_resource;
 	}
 
@@ -69,9 +65,7 @@ class Stream extends \lithium\net\Socket {
 		}
 		fclose($this->_resource);
 
-		if (is_resource($this->_resource)) {
-			$this->close();
-		}
+		is_resource($this->_resource) and $this->close();
 		return true;
 	}
 
@@ -112,9 +106,7 @@ class Stream extends \lithium\net\Socket {
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
-		if (!is_object($data)) {
-			$data = $this->_instance($this->_classes['request'], (array) $data + $this->_config);
-		}
+		(!is_object($data)) and $data = $this->_instance($this->_classes['request'], (array) $data + $this->_config);
 		return fwrite($this->_resource, (string) $data, strlen((string) $data));
 	}
 
