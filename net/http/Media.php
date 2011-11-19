@@ -212,16 +212,6 @@ class Media extends \lithium\core\StaticObject {
 	 *         handled.  If `$content` or `$options` are non-empty, returns `null`.
 	 */
 	public static function type($type, $content = null, array $options = array()) {
-		$defaults = array(
-			'view' => false,
-			'template' => false,
-			'layout' => false,
-			'encode' => false,
-			'decode' => false,
-			'cast'   => true,
-			'conditions' => array()
-		);
-
 		if ($content === false) {
 			unset(static::$_types[$type], static::$_handlers[$type]);
 		}
@@ -237,10 +227,18 @@ class Media extends \lithium\core\StaticObject {
 			}
 			return compact('content') + array('options' => static::_handlers($type));
 		}
-		if ($content) {
-			static::$_types[$type] = $content;
-		}
-		static::$_handlers[$type] = $options ? ($options + $defaults) : array();
+		$content and static::$_types[$type] = $content;
+		static::$_handlers[$type] = array();
+		
+		$options and static::$_handlers[$type] = ($options + 
+			array('view' => false,
+						'template' => false,
+						'layout' => false,
+						'encode' => false,
+						'decode' => false,
+						'cast' => true,
+						'conditions' => array()
+			)); // Defaults
 	}
 
 	/**
@@ -262,10 +260,7 @@ class Media extends \lithium\core\StaticObject {
 		$self = get_called_class();
 
 		$match = function($name) use ($self, $request) {
-			if (($cfg = $self::type($name)) && $self::match($request, compact('name') + $cfg)) {
-				return true;
-			}
-			return false;
+			return (($cfg = $self::type($name)) && $self::match($request, compact('name') + $cfg));
 		};
 
 		if (($type = $request->type) && $match($type)) {
@@ -313,20 +308,16 @@ class Media extends \lithium\core\StaticObject {
 		$conditions = $config['options']['conditions'];
 
 		foreach ($conditions as $key => $value) {
-			switch (true) {
-				case $key == 'type':
-					if ($value !== ($request->type === $config['name'])) {
-						return false;
-					}
-				break;
-				case strpos($key, ':'):
-					if ($request->get($key) !== $value) {
-						return false;
-					}
-				break;
-				case ($request->is($key) !== $value):
+			if ($key === 'type') {
+				if ($value !== ($request->type === $config['name'])) {
 					return false;
-				break;
+				}
+			} elseif (false !== strpos($key, ':')) {
+				if ($request->get($key) !== $value) {
+					return false;
+				}
+			} elseif ($request->is($key) !== $value) {
+				return false;
 			}
 		}
 		return true;
@@ -352,20 +343,19 @@ class Media extends \lithium\core\StaticObject {
 	 *         are both non-empty, returns `null`.
 	 */
 	public static function assets($type = null, $options = array()) {
-		$defaults = array('suffix' => null, 'filter' => null, 'path' => array());
-
 		if (!$type) {
 			return static::_assets();
 		}
 		if ($options === false) {
 			unset(static::$_assets[$type]);
 		}
+		$base = static::_assets($type); 
 		if (!$options) {
-			return static::_assets($type);
+			return $base;
 		}
-		$options = (array) $options + $defaults;
+		$options = (array) $options +  array('suffix' => null, 'filter' => null, 'path' => array()); // Defaults
 
-		if ($base = static::_assets($type)) {
+		if ($base) {
 			$options = array_merge($base, array_filter($options));
 		}
 		static::$_assets[$type] = $options;
@@ -403,20 +393,19 @@ class Media extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	public static function asset($path, $type, array $options = array()) {
-		$defaults = array(
-			'base' => null,
-			'timestamp' => false,
+		if (!$base = static::_assets($type)) {
+			$type = 'generic';
+			$base = static::_assets('generic');
+		}
+		$options += ($base + array(
+			'base' => null, 
+			'timestamp' => false, 
 			'filter' => null,
 			'path' => array(),
 			'suffix' => null,
 			'check' => false,
 			'library' => true
-		);
-		if (!$base = static::_assets($type)) {
-			$type = 'generic';
-			$base = static::_assets('generic');
-		}
-		$options += ($base + $defaults);
+			)); // Defaults
 		$params = compact('path', 'type', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
@@ -434,18 +423,11 @@ class Media extends \lithium\core\StaticObject {
 			$config['default'] ? end($paths) : reset($paths);
 			$options['library'] = basename($config['path']);
 
-			if ($options['suffix'] && strpos($path, $options['suffix']) === false) {
-				$path .= $options['suffix'];
-			}
-
-			if ($options['check'] || $options['timestamp']) {
-				$file = $self::path($path, $type, $options);
-			}
+			($options['suffix'] && strpos($path, $options['suffix']) === false)  and $path .= $options['suffix'];
+			($options['check'] || $options['timestamp']) and $file = $self::path($path, $type, $options);
 
 			if ($path[0] === '/') {
-				if ($options['base'] && strpos($path, $options['base']) !== 0) {
-					$path = "{$options['base']}{$path}";
-				}
+				($options['base'] && strpos($path, $options['base']) !== 0) and $path = "{$options['base']}{$path}";
 			} else {
 				$path = String::insert(key($paths), compact('path') + $options);
 			}
@@ -464,6 +446,7 @@ class Media extends \lithium\core\StaticObject {
 				$separator = (strpos($path, '?') !== false) ? '&' : '?';
 				$path .= $separator . filemtime($file);
 			}
+			
 			return $path;
 		});
 	}
@@ -502,17 +485,16 @@ class Media extends \lithium\core\StaticObject {
 	 * @return string Returns the physical filesystem path to an asset in the `/webroot` directory.
 	 */
 	public static function path($path, $type, array $options = array()) {
-		$defaults = array(
-			'base' => null,
-			'path' => array(),
-			'suffix' => null,
-			'library' => true
-		);
 		if (!$base = static::_assets($type)) {
 			$type = 'generic';
 			$base = static::_assets('generic');
 		}
-		$options += ($base + $defaults);
+		$options += ($base + array(
+			'base' => null,
+			'path' => array(),
+			'suffix' => null,
+			'library' => true
+		)); // Defaults
 		$config = Libraries::get($options['library']);
 		$root = static::webroot($options['library']);
 		$paths = $options['path'];
@@ -520,9 +502,7 @@ class Media extends \lithium\core\StaticObject {
 		$config['default'] ? end($paths) : reset($paths);
 		$options['library'] = basename($config['path']);
 
-		if ($qOffset = strpos($path, '?')) {
-			$path = substr($path, 0, $qOffset);
-		}
+		($qOffset = strpos($path, '?')) and $path = substr($path, 0, $qOffset);
 
 		if ($path[0] === '/') {
 			$file = $root . $path;
@@ -602,9 +582,8 @@ class Media extends \lithium\core\StaticObject {
 			$handler = $params['handler'];
 			$response =& $params['response'];
 
-			if (!is_array($handler)) {
-				$handler = $self::invokeMethod('_handlers', array($handler));
-			}
+			(!is_array($handler)) and $handler = $self::invokeMethod('_handlers', array($handler));
+
 			$class = $handler['view'];
 			unset($handler['view']);
 
@@ -638,9 +617,7 @@ class Media extends \lithium\core\StaticObject {
 			$handler = $params['handler'];
 			$response =& $params['response'];
 
-			if (!is_array($handler)) {
-				$handler = $self::invokeMethod('_handlers', array($handler));
-			}
+			(!is_array($handler)) and $handler = $self::invokeMethod('_handlers', array($handler));
 
 			if (!$handler || !isset($handler['encode'])) {
 				return null;
@@ -654,8 +631,8 @@ class Media extends \lithium\core\StaticObject {
 			};
 
 			if (!isset($handler['cast']) || $handler['cast']) {
-				$data = is_object($data) ? $cast($data) : $data;
-				$data = is_array($data) ? array_map($cast, $data) : $data;
+				is_object($data) and $data = $cast($data);
+				is_array($data) and array_map($cast, $data);
 			}
 			$method = $handler['encode'];
 			return is_string($method) ? $method($data) : $method($data, $handler, $response);
@@ -718,17 +695,16 @@ class Media extends \lithium\core\StaticObject {
 				unset($options['request']);
 			}
 
-			switch (true) {
-				case $handler['encode']:
-					return $self::encode($handler, $data, $response);
-				case ($handler['template'] === false) && is_string($data):
-					return $data;
-				case $handler['view']:
-					unset($options['view']);
-					$instance = $self::view($handler, $data, $response, $options);
-					return $instance->render('all', (array) $data, $options);
-				default:
-					throw new MediaException("Could not interpret type settings for handler.");
+			if ($handler['encode']) {
+				return $self::encode($handler, $data, $response);
+			} elseif ($handler['template'] === false && is_string($data)) {
+				return $data;
+			} elseif ($handler['view']) {
+				unset($options['view']);
+				$instance = $self::view($handler, $data, $response, $options);
+				return $instance->render('all', (array) $data, $options);				 
+			} else {
+				throw new MediaException("Could not interpret type settings for handler.");
 			}
 		});
 	}
@@ -761,17 +737,15 @@ class Media extends \lithium\core\StaticObject {
 		if (strpos($type, '/') === false) {
 			return isset($types[$type]) ? $types[$type] : null;
 		}
-		if (strpos($type, ';')) {
-			list($type) = explode(';', $type, 2);
-		}
-		$result = array();
+		strpos($type, ';') and list($type) = explode(';', $type, 2);
 
+		$result = array();
 		foreach ($types as $name => $cTypes) {
 			if ($type == $cTypes || (is_array($cTypes) && in_array($type, $cTypes))) {
 				$result[] = $name;
 			}
 		}
-		if (count($result) == 1) {
+		if (1 === count($result)) {
 			return reset($result);
 		}
 		return $result ?: null;
@@ -855,5 +829,4 @@ class Media extends \lithium\core\StaticObject {
 		return $assets;
 	}
 }
-
 ?>
