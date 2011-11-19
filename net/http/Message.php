@@ -64,7 +64,7 @@ class Message extends \lithium\net\Message {
 	 * - `body`: null
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array(
+		parent::__construct($config + array(
 			'scheme' => 'http',
 			'host' => 'localhost',
 			'port' => null,
@@ -75,15 +75,11 @@ class Message extends \lithium\net\Message {
 			'version' => '1.1',
 			'headers' => array(),
 			'body' => null
-		);
-		$config += $defaults;
-		parent::__construct($config);
+		));
 
-		if (strpos($this->host, '/') !== false) {
-			list($this->host, $this->path) = explode('/', $this->host, 2);
-		}
-		$this->path = str_replace('//', '/', "/{$this->path}/");
-		$this->protocol = $this->protocol ?: "HTTP/{$this->version}";
+		(strpos($this->host, '/') !== false) and list($this->host, $this->path) = explode('/', $this->host, 2);
+		$this->path = str_replace('//', '/', '/' . $this->path . '/');
+		$this->protocol or $this->protocol = 'HTTP/' . $this->version;
 	}
 
 	/**
@@ -117,10 +113,10 @@ class Message extends \lithium\net\Message {
 				}
 			}
 		}
-		$headers = array();
 
+		$headers = array();
 		foreach ($this->headers as $key => $value) {
-			$headers[] = "{$key}: {$value}";
+			$headers[] = $key . ': ' . $value;
 		}
 		return $headers;
 	}
