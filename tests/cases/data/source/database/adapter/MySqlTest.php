@@ -253,6 +253,17 @@ class MySqlTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result);
 	}
+
+	/**
+	* Tests SQL vars.
+	* */
+	public function testSqlVars() {
+		$this->assertTrue($this->db->read('SET @var = 42'));
+
+		$result = $this->db->read('SELECT @var AS result;');
+		$expected = array(array('result' => 42));
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

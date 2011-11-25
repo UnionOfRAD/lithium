@@ -299,6 +299,10 @@ abstract class Database extends \lithium\data\Source {
 			}
 			$result = $self->invokeMethod('_execute', array($sql));
 
+			// @hack: If the query was not supposed to return anything (ie. a SET statement), MySQL returns true.
+			if(is_string($query) AND $result === true)
+				return true;
+
 			switch ($return) {
 				case 'resource':
 					return $result;
