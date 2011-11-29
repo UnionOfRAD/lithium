@@ -13,57 +13,111 @@ use lithium\security\Password;
 class PasswordTest extends \lithium\test\Unit {
 
 	/**
-	 * testPassword method
+	 * The password to be encrypted.
 	 */
-	public function testPassword() {
-		$pass = 'Lithium rocks!';
+	protected $_password = 'lith1um';
 
-		$bfSalt = "{^\\$2a\\$06\\$[0-9A-Za-z./]{22}$}";
-		$bfHash = "{^\\$2a\\$06\\$[0-9A-Za-z./]{53}$}";
+	/**
+	 * Tests the `Password::hash()` method with both generated and
+	 * custom salts.
+	 */
+	public function testHash() {
+		$this->skipIf(!CRYPT_BLOWFISH, 'Blowfish is not supported.');
 
-		$xdesSalt = "{^_zD..[0-9A-Za-z./]{4}$}";
-		$xdesHash = "{^_zD..[0-9A-Za-z./]{15}$}";
+		$salt = '$2a$07$l1th1um1saw3some12345678$';
+		$expected = '$2a$07$l1th1um1saw3some12345uDt5Wuw5uzI5lCIn3HM1QkB7cJLou4Hy';
+		$result = Password::hash($this->_password, $salt);
+		$this->assertEqual($expected, $result);
 
-		$md5Salt = "{^\\$1\\$[0-9A-Za-z./]{8}$}";
-		$md5Hash = "{^\\$1\\$[0-9A-Za-z./]{8}\\$[0-9A-Za-z./]{22}$}";
-
-		// Make it faster than the default settings, else we'll be there tomorrow
-		foreach (array('bf' => 6, 'xdes' => 10, 'md5' => null) as $method => $log2) {
-			$salts = array();
-			$hashes = array();
-			$count = 20;
-			$saltPattern = ${$method . 'Salt'};
-			$hashPattern = ${$method . 'Hash'};
-
-			for ($i = 0; $i < $count; $i++) {
-				$salt = Password::salt($method, $log2);
-				$this->assertPattern($saltPattern, $salt);
-				$this->assertFalse(in_array($salt, $salts));
-				$salts[] = $salt;
-
-				$hash = Password::hash($pass, $salt);
-				$this->assertPattern($hashPattern, $hash);
-				$this->assertEqual(substr($hash, 0, strlen($salt)), $salt);
-				$this->assertFalse(in_array($hash, $hashes));
-				$hashes[] = $hash;
-
-				$this->assertTrue(Password::check($pass, $hash), "{$method} failed");
-			}
-		}
+		$result = Password::hash($this->_password);
+		$this->assertNotEqual($expected, $result);
 	}
 
 	/**
-	 * testPasswordMaxLength method
+	 * Tests the `Password::check()` method to make sure that it returns
+	 * either true or false, depending on the input.
 	 */
-	public function testPasswordMaxLength() {
-		foreach (array('bf' => 72) as $method => $length) {
-			$salt = Password::salt($method);
-			$pass = str_repeat('a', $length);
+	public function testCheck() {
+		$this->skipIf(!CRYPT_BLOWFISH, 'Blowfish is not supported.');
 
-			$expected = Password::hash($pass, $salt);
-			$result = Password::hash($pass . 'a', $salt);
-			$this->assertIdentical($expected, $result);
-		}
+		$salt = '$2a$07$l1th1um1saw3some12345678$';
+		$hash = Password::hash($this->_password, $salt);
+		$this->assertTrue(Password::check($this->_password, $hash));
+
+		$hash = Password::hash($this->_password);
+		$this->assertTrue(Password::check($this->_password, $hash));
+
+		$wrong = 'wr0ng';
+		$this->assertFalse(Password::check($wrong, $hash));
+	}
+
+	/**
+	 * Tests salting passwords with the Blowfish algorithm.
+	 *
+	 * It also contains tests to prove that password longer than 72 characters
+	 * are translated into the same hash.
+	 */
+	public function testSaltBlowfish() {
+		$this->skipIf(!CRYPT_BLOWFISH, 'Blowfish is not supported.');
+
+		$saltPattern = "{^\\$2a\\$06\\$[0-9A-Za-z./]{22}$}";
+		$hashPattern = "{^\\$2a\\$06\\$[0-9A-Za-z./]{53}$}";
+
+		$log2 = 6;
+		$salt = Password::salt('bf', $log2);
+		$this->assertPattern($saltPattern, $salt);
+		$this->assertNotEqual($salt, Password::salt('bf', $log2));
+
+		$hash = Password::hash($this->_password, $salt);
+		$hash2 = Password::hash($this->_password, Password::salt('bf', $log2));
+		$this->assertPattern($hashPattern, $hash);
+		$this->assertNotEqual($hash, $hash2);
+
+		$maxLength = 72;
+		$salt = Password::salt('bf');
+		$password = str_repeat('a', $maxLength);
+		$expected = Password::hash($password, $salt);
+		$result = Password::hash($password . 'a',  $salt);
+		$this->assertIdentical($expected, $result);
+	}
+
+	/**
+	 * Tests salting passwords with the Extended-DES algorithm.
+	 */
+	public function testSaltXDES() {
+		$this->skipIf(!CRYPT_EXT_DES, 'Extended-DES is not supported.');
+
+		$saltPattern = "{^_[0-9A-Za-z./]{8}$}";
+		$hashPattern = "{^_[0-9A-Za-z./]{19}$}";
+
+		$log2 = 18;
+		$salt = Password::salt('xdes', $log2);
+		$this->assertPattern($saltPattern, $salt);
+		$this->assertNotEqual($salt, Password::salt('xdes', $log2));
+
+		$hash = Password::hash($this->_password, $salt);
+		$hash2 = Password::hash($this->_password, Password::salt('xdes', $log2));
+		$this->assertPattern($hashPattern, $hash);
+		$this->assertNotEqual($hash, $hash2);
+	}
+
+	/**
+	 * Tests salting passwords with the MD5 algorithm.
+	 */
+	public function testSaltMD5() {
+		$this->skipIf(!CRYPT_MD5, 'MD5 is not supported.');
+
+		$saltPattern = "{^\\$1\\$[0-9A-Za-z./]{8}$}";
+		$hashPattern = "{^\\$1\\$[0-9A-Za-z./]{8}\\$[0-9A-Za-z./]{22}$}";
+
+		$salt = Password::salt('md5', null);
+		$this->assertPattern($saltPattern, $salt);
+		$this->assertNotEqual($salt, Password::salt('md5', null));
+
+		$hash = Password::hash($this->_password, $salt);
+		$hash2 = Password::hash($this->_password, Password::salt('md5', null));
+		$this->assertPattern($hashPattern, $hash);
+		$this->assertNotEqual($hash, $hash2);
 	}
 }
 
