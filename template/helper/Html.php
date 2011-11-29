@@ -34,6 +34,7 @@ class Html extends \lithium\template\Helper {
 		'list'             => '<ul{:options}>{:content}</ul>',
 		'list-item'        => '<li{:options}>{:content}</li>',
 		'meta'             => '<meta{:options}/>',
+		'meta-tag'         => '<meta name="{:name}" content="{:value}"/>',
 		'meta-link'        => '<link href="{:url}"{:options} />',
 		'para'             => '<p{:options}>{:content}</p>',
 		'para-start'       => '<p{:options}>',
@@ -112,6 +113,30 @@ class Html extends \lithium\template\Helper {
 	public function charset($encoding = null) {
 		$encoding = $encoding ?: $this->_context->response()->encoding;
 		return $this->_render(__METHOD__, 'charset', compact('encoding'));
+	}
+
+	/**
+	 * Returns a meta tag for declaring meta data about the HTML document.
+	 *
+	 * Meta elements are typically used to specify page description, keywords,
+	 * author of the document, last modified, and other metadata.
+	 *
+	 * The <meta> tag always goes inside the head element.
+	 *
+	 * The metadata can be used by browsers (how to display content or reload page),
+	 * search engines (keywords), or other web services.
+	 *
+	 * @link http://www.w3schools.com/tags/tag_meta.asp
+	 *
+	 * @param string $name Provides a name for the information in the
+	 * content attribute. Can either be `author`, `description`, `keywords`
+	 * `generator`, `revised`
+	 *
+	 * @param string $value Specifies the content of the meta information
+	 * @return string A meta tag containing the specified named/value.
+	 */
+	public function meta($name = null, $value = null) {
+		return $this->_render(__METHOD__, 'meta-tag', compact('name', 'value'));
 	}
 
 	/**

@@ -53,7 +53,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_context = array(
-		'content' => '', 'title' => '', 'scripts' => array(), 'styles' => array(), 'head' => array()
+		'content' => '', 'title' => '', 'scripts' => array(), 'styles' => array(), 'metas' => array(), 'head' => array()
 	);
 
 	/**
@@ -166,7 +166,7 @@ abstract class Renderer extends \lithium\core\Object {
 			'response' => null,
 			'context' => array(
 				'content' => '', 'title' => '', 'scripts' => array(),
-				'styles' => array(), 'head' => array()
+				'styles' => array(), 'metas' => array(), 'head' => array()
 			)
 		);
 		parent::__construct((array) $config + $defaults);
@@ -208,6 +208,9 @@ abstract class Renderer extends \lithium\core\Object {
 			},
 			'styles' => function($styles) use (&$context) {
 				return "\n\t" . join("\n\t", $context['styles']) . "\n";
+			},
+			'metas' => function($styles) use (&$context) {
+				return "\n\t" . join("\n\t", $context['metas']) . "\n";
 			},
 			'head' => function($head) use (&$context) {
 				return "\n\t" . join("\n\t", $context['head']) . "\n";
