@@ -547,13 +547,29 @@ class MongoDb extends \lithium\data\Source {
 		$this->_checkConnection();
 		$defaults = array('justOne' => false, 'safe' => false, 'fsync' => false);
 		$options = array_intersect_key($options + $defaults, $defaults);
+		$_config = $this->_config;
 
-		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
+		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) use ($_config) {
 			$query = $params['query'];
 			$options = $params['options'];
 			$args = $query->export($self, array('keys' => array('source', 'conditions')));
+			$source = $args['source'];
+
+			if ($source == "{$_config['gridPrefix']}.files") {
+				return $self->invokeMethod('_deleteFile', array($args['conditions']));
+			}
+
 			return $self->connection->{$args['source']}->remove($args['conditions'], $options);
 		});
+	}
+
+	protected function _deleteFile($conditions, $options = array()) {
+		$defaults = array('safe' => true);
+		$options += $defaults;
+
+		$grid = $this->connection->getGridFS();
+		
+		return $grid->remove($conditions, $options);
 	}
 
 	/**
