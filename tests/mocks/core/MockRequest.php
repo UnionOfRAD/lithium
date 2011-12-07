@@ -16,6 +16,13 @@ class MockRequest extends \lithium\core\Object {
 
 	public $argv = array();
 
+	public function __get($key) {
+		if (isset($this->params[$key])) {
+			return $this->params[$key];
+		}
+		return null;
+	}
+
 	public function env($key) {
 		if (isset($this->_config[$key])) {
 			return $this->_config[$key];

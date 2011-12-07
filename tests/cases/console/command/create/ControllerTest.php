@@ -106,7 +106,7 @@ class PostsController extends \lithium\action\Controller {
 		$post = Posts::create();
 
 		if (($this->request->data) && $post->save($this->request->data)) {
-			$this->redirect(array('Posts::view', 'args' => array($post->id)));
+			return $this->redirect(array('Posts::view', 'args' => array($post->id)));
 		}
 		return compact('post');
 	}
@@ -115,10 +115,10 @@ class PostsController extends \lithium\action\Controller {
 		$post = Posts::find($this->request->id);
 
 		if (!$post) {
-			$this->redirect('Posts::index');
+			return $this->redirect('Posts::index');
 		}
 		if (($this->request->data) && $post->save($this->request->data)) {
-			$this->redirect(array('Posts::view', 'args' => array($post->id)));
+			return $this->redirect(array('Posts::view', 'args' => array($post->id)));
 		}
 		return compact('post');
 	}
@@ -129,7 +129,7 @@ class PostsController extends \lithium\action\Controller {
 			throw new DispatchException($msg);
 		}
 		Posts::find($this->request->id)->delete();
-		$this->redirect('Posts::index');
+		return $this->redirect('Posts::index');
 	}
 }
 
