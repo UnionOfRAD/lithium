@@ -1079,6 +1079,23 @@ class FormTest extends \lithium\test\Unit {
 			'label' => array('for' => 'UserName'), 'User Name', '/label'
 		));
 	}
+
+    /**
+     * Test that field already defined template strings with special types (e.g. radio, checkbox, 
+     * etc.) and passed customize template, and the template must apply.
+     */
+	public function testRadioTypeFieldWithCustomTemplate() {
+		$result = $this->form->field('name', array(
+			'template' => '<span{:wrap}>{:label}: {:input}{:error}</span>',
+			'type' => 'radio'
+		));
+		$this->assertTags($result, array(
+			'span' => array(),
+			'label' => array('for' => 'Name'), 'Name', '/label', ':',
+			'input' => array('type' => 'radio', 'name' => 'name', 'id' => 'Name')
+		));
+	}
+
 }
 
 ?>

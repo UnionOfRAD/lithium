@@ -406,6 +406,7 @@ class Form extends \lithium\template\Helper {
 			'list' => null
 		);
 		$type = isset($options['type']) ? $options['type'] : $defaults['type'];
+		$custom_template = isset($options['template']) ? $options['template'] : null;
 
 		if ($this->_context->strings('field-' . $type)) {
 			$options['template'] = 'field-' . $type;
@@ -415,6 +416,9 @@ class Form extends \lithium\template\Helper {
 
 		if ($options['template'] != $defaults['template']) {
 			$template = $options['template'];
+		}
+		if ($custom_template) {
+			$template = $custom_template;
 		}
 
 		$wrap = $options['wrap'];
