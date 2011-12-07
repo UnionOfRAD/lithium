@@ -168,18 +168,20 @@ class Exporter extends \lithium\core\StaticObject {
 		foreach ($left as $key => $value) {
 			$result = static::_append($result, "{$path}{$key}", $value, 'remove');
 		}
+		$data = (array) $right + (array) $objects;
 
-		foreach (array_merge($right, $objects) as $key => $value) {
+		foreach ($data as $key => $value) {
 			$original = $export['data'];
 			$isArray = is_object($value) && get_class($value) == static::$_classes['array'];
 			if ($isArray && isset($original[$key]) && $value->data() != $original[$key]->data()) {
+				$value = $value->data();
+			}
+			if ($isArray && !isset($original[$key])) {
 				 $value = $value->data();
 			}
 			$result = static::_append($result, "{$path}{$key}", $value, 'update');
 		}
-
 		return array_filter($result);
-
 	}
 
 	/**

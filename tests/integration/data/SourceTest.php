@@ -10,19 +10,19 @@ namespace lithium\tests\integration\data;
 
 use Exception;
 use lithium\data\Connections;
-use lithium\tests\mocks\data\Company;
-use lithium\tests\mocks\data\Employee;
+use lithium\tests\mocks\data\Companies;
+use lithium\tests\mocks\data\Employees;
 
 class SourceTest extends \lithium\test\Integration {
 
 	protected $_connection = null;
 
 	protected $_classes = array(
-		'employee' => 'lithium\tests\mocks\data\Employee',
-		'company' => 'lithium\tests\mocks\data\Company'
+		'employees' => 'lithium\tests\mocks\data\Employees',
+		'companies' => 'lithium\tests\mocks\data\Companies'
 	);
 
-	public $companyData = array(
+	public $companiesData = array(
 		array('name' => 'StuffMart', 'active' => true),
 		array('name' => 'Ma \'n Pa\'s Data Warehousing & Bait Shop', 'active' => false)
 	);
@@ -32,8 +32,8 @@ class SourceTest extends \lithium\test\Integration {
 	 *
 	 */
 	public function setUp() {
-		Company::config();
-		Employee::config();
+		Companies::config();
+		Employees::config();
 		$this->_connection = Connections::get('test');
 
 		if (strpos(get_class($this->_connection), 'CouchDb')) {
@@ -41,14 +41,14 @@ class SourceTest extends \lithium\test\Integration {
 		}
 
 		try {
-			foreach (Company::all() as $company) {
-				$company->delete();
+			foreach (Companies::all() as $companies) {
+				$companies->delete();
 			}
 		} catch (Exception $e) {}
 	}
 
 	protected function _loadViews() {
-		Company::create()->save();
+		Companies::create()->save();
 	}
 
 	/**
@@ -56,8 +56,8 @@ class SourceTest extends \lithium\test\Integration {
 	 */
 	public function tearDown() {
 		try {
-			foreach (Company::all() as $company) {
-				$company->delete();
+			foreach (Companies::all() as $companies) {
+				$companies->delete();
 			}
 		} catch (Exception $e) {
 			$this->assertTrue(false, $e->getMessage());
@@ -84,8 +84,8 @@ class SourceTest extends \lithium\test\Integration {
 	 * @return void
 	 */
 	public function testSingleReadWriteWithKey() {
-		$key = Company::meta('key');
-		$new = Company::create(array($key => 12345, 'name' => 'Acme, Inc.'));
+		$key = Companies::meta('key');
+		$new = Companies::create(array($key => 12345, 'name' => 'Acme, Inc.'));
 
 		$result = $new->data();
 		$expected = array($key => 12345, 'name' => 'Acme, Inc.');
@@ -96,19 +96,19 @@ class SourceTest extends \lithium\test\Integration {
 		$this->assertTrue($new->save());
 		$this->assertTrue($new->exists());
 
-		$existing = Company::find(12345);
+		$existing = Companies::find(12345);
 		$result = $existing->data();
 		$this->assertEqual($expected[$key], $result[$key]);
 		$this->assertEqual($expected['name'], $result['name']);
 		$this->assertTrue($existing->exists());
 
-		$existing->name = 'Big Brother and the Holding Company';
+		$existing->name = 'Big Brother and the Holding Companies';
 		$result = $existing->save();
 		$this->assertTrue($result);
 
-		$existing = Company::find(12345);
+		$existing = Companies::find(12345);
 		$result = $existing->data();
-		$expected['name'] = 'Big Brother and the Holding Company';
+		$expected['name'] = 'Big Brother and the Holding Companies';
 		$this->assertEqual($expected[$key], $result[$key]);
 		$this->assertEqual($expected['name'], $result['name']);
 
@@ -116,15 +116,15 @@ class SourceTest extends \lithium\test\Integration {
 	}
 
 	public function testRewind() {
-		$key = Company::meta('key');
-		$new = Company::create(array($key => 12345, 'name' => 'Acme, Inc.'));
+		$key = Companies::meta('key');
+		$new = Companies::create(array($key => 12345, 'name' => 'Acme, Inc.'));
 
 		$result = $new->data();
 		$this->assertTrue($result !== null);
 		$this->assertTrue($new->save());
 		$this->assertTrue($new->exists());
 
-		$result = Company::all(12345);
+		$result = Companies::all(12345);
 		$this->assertTrue($result !== null);
 
 		$result = $result->rewind();
@@ -134,8 +134,8 @@ class SourceTest extends \lithium\test\Integration {
 
 	public function testFindFirstWithFieldsOption() {
 		return;
-		$key = Company::meta('key');
-		$new = Company::create(array($key => 1111, 'name' => 'Test find first with fields.'));
+		$key = Companies::meta('key');
+		$new = Companies::create(array($key => 1111, 'name' => 'Test find first with fields.'));
 		$result = $new->data();
 
 		$expected = array($key => 1111, 'name' => 'Test find first with fields.');
@@ -145,7 +145,7 @@ class SourceTest extends \lithium\test\Integration {
 		$this->assertTrue($new->save());
 		$this->assertTrue($new->exists());
 
-		$result = Company::find('first', array('fields' => array('name')));
+		$result = Companies::find('first', array('fields' => array('name')));
 		$this->assertFalse(is_null($result));
 
 		$this->skipIf(is_null($result), 'No result returned to test');
@@ -157,22 +157,22 @@ class SourceTest extends \lithium\test\Integration {
 
 	public function testReadWriteMultiple() {
 		$companies = array();
-		$key = Company::meta('key');
+		$key = Companies::meta('key');
 
-		foreach ($this->companyData as $data) {
-			$companies[] = Company::create($data);
+		foreach ($this->companiesData as $data) {
+			$companies[] = Companies::create($data);
 			$this->assertTrue(end($companies)->save());
 			$this->assertTrue(end($companies)->{$key});
 		}
 
-		$this->assertIdentical(2, Company::count());
-		$this->assertIdentical(1, Company::count(array('active' => true)));
-		$this->assertIdentical(1, Company::count(array('active' => false)));
-		$this->assertIdentical(0, Company::count(array('active' => null)));
-		$all = Company::all();
-		$this->assertIdentical(2, Company::count());
+		$this->assertIdentical(2, Companies::count());
+		$this->assertIdentical(1, Companies::count(array('active' => true)));
+		$this->assertIdentical(1, Companies::count(array('active' => false)));
+		$this->assertIdentical(0, Companies::count(array('active' => null)));
+		$all = Companies::all();
+		$this->assertIdentical(2, Companies::count());
 
-		$expected = count($this->companyData);
+		$expected = count($this->companiesData);
 		$this->assertEqual($expected, $all->count());
 		$this->assertEqual($expected, count($all));
 
@@ -180,17 +180,17 @@ class SourceTest extends \lithium\test\Integration {
 		$this->assertTrue(strlen($id) > 0);
 		$this->assertTrue($all->data());
 
-		foreach ($companies as $company) {
-			$this->assertTrue($company->delete());
+		foreach ($companies as $companies) {
+			$this->assertTrue($companies->delete());
 		}
-		$this->assertIdentical(0, Company::count());
+		$this->assertIdentical(0, Companies::count());
 	}
 
 	public function testEntityFields() {
-		foreach ($this->companyData as $data) {
-			Company::create($data)->save();
+		foreach ($this->companiesData as $data) {
+			Companies::create($data)->save();
 		}
-		$all = Company::all();
+		$all = Companies::all();
 
 		$result = $all->first(function($doc) { return $doc->name == 'StuffMart'; });
 		$this->assertEqual('StuffMart', $result->name);
@@ -215,17 +215,17 @@ class SourceTest extends \lithium\test\Integration {
 	 * @return void
 	 */
 	public function testGetRecordByGeneratedId() {
-		$key = Company::meta('key');
-		$company = Company::create(array('name' => 'Test Company'));
-		$this->assertTrue($company->save());
+		$key = Companies::meta('key');
+		$companies = Companies::create(array('name' => 'Test Companies'));
+		$this->assertTrue($companies->save());
 
-		$id = (string) $company->{$key};
-		$companyCopy = Company::find($id)->data();
-		$data = $company->data();
+		$id = (string) $companies->{$key};
+		$companiesCopy = Companies::find($id)->data();
+		$data = $companies->data();
 
 		foreach ($data as $key => $value) {
-			$this->assertTrue(isset($companyCopy[$key]));
-			$this->assertEqual($data[$key], $companyCopy[$key]);
+			$this->assertTrue(isset($companiesCopy[$key]));
+			$this->assertEqual($data[$key], $companiesCopy[$key]);
 		}
 	}
 
@@ -239,22 +239,22 @@ class SourceTest extends \lithium\test\Integration {
 		$message = "Relationships are not supported by this adapter.";
 		$this->skipIf(!$connection::enabled('relationships'), $message);
 
-		$this->assertEqual(array('Employees'), array_keys(Company::relations()));
-		$this->assertEqual(array('Company'), array_keys(Employee::relations()));
+		$this->assertEqual(array('Employeess'), array_keys(Companies::relations()));
+		$this->assertEqual(array('Companies'), array_keys(Employees::relations()));
 
-		$this->assertEqual(array('Employees'), Company::relations('hasMany'));
-		$this->assertEqual(array('Company'), Employee::relations('belongsTo'));
+		$this->assertEqual(array('Employeess'), Companies::relations('hasMany'));
+		$this->assertEqual(array('Companies'), Employees::relations('belongsTo'));
 
-		$this->assertFalse(Company::relations('belongsTo'));
-		$this->assertFalse(Company::relations('hasOne'));
+		$this->assertFalse(Companies::relations('belongsTo'));
+		$this->assertFalse(Companies::relations('hasOne'));
 
-		$this->assertFalse(Employee::relations('hasMany'));
-		$this->assertFalse(Employee::relations('hasOne'));
+		$this->assertFalse(Employees::relations('hasMany'));
+		$this->assertFalse(Employees::relations('hasOne'));
 
-		$result = Company::relations('Employees');
+		$result = Companies::relations('Employeess');
 
 		$this->assertEqual('hasMany', $result->data('type'));
-		$this->assertEqual($this->_classes['employee'], $result->data('to'));
+		$this->assertEqual($this->_classes['employees'], $result->data('to'));
 	}
 
 	public function testRelationshipQuerying() {
@@ -262,19 +262,19 @@ class SourceTest extends \lithium\test\Integration {
 		$message = "Relationships are not supported by this adapter.";
 		$this->skipIf(!$connection::enabled('relationships'), $message);
 
-		foreach ($this->companyData as $data) {
-			Company::create($data)->save();
+		foreach ($this->companiesData as $data) {
+			Companies::create($data)->save();
 		}
-		$stuffMart = Company::findFirstByName('StuffMart');
-		$maAndPas = Company::findFirstByName('Ma \'n Pa\'s Data Warehousing & Bait Shop');
+		$stuffMart = Companies::findFirstByName('StuffMart');
+		$maAndPas = Companies::findFirstByName('Ma \'n Pa\'s Data Warehousing & Bait Shop');
 
-		$this->assertEqual($this->_classes['employee'], $stuffMart->employees->model());
-		$this->assertEqual($this->_classes['employee'], $maAndPas->employees->model());
+		$this->assertEqual($this->_classes['employees'], $stuffMart->employees->model());
+		$this->assertEqual($this->_classes['employees'], $maAndPas->employees->model());
 
 		foreach (array('Mr. Smith', 'Mr. Jones', 'Mr. Brown') as $name) {
-			$stuffMart->employees[] = Employee::create(compact('name'));
+			$stuffMart->employees[] = Employees::create(compact('name'));
 		}
-		$expected = Company::key($stuffMart) + array(
+		$expected = Companies::key($stuffMart) + array(
 			'name' => 'StuffMart', 'active' => true, 'employees' => array(
 				array('name' => 'Mr. Smith'),
 				array('name' => 'Mr. Jones'),
@@ -285,26 +285,26 @@ class SourceTest extends \lithium\test\Integration {
 		$this->assertTrue($stuffMart->save());
 		$this->assertEqual('Smith', $stuffMart->employees[0]->lastName());
 
-		$stuffMartReloaded = Company::findFirstByName('StuffMart');
+		$stuffMartReloaded = Companies::findFirstByName('StuffMart');
 		$this->assertEqual('Smith', $stuffMartReloaded->employees[0]->lastName());
 
 		foreach (array('Ma', 'Pa') as $name) {
-			$maAndPas->employees[] = Employee::create(compact('name'));
+			$maAndPas->employees[] = Employees::create(compact('name'));
 		}
 		$maAndPas->save();
 	}
 
 	public function testAbstractTypeHandling() {
-		$key = Company::meta('key');
+		$key = Companies::meta('key');
 
-		foreach ($this->companyData as $data) {
-			$companies[] = Company::create($data);
+		foreach ($this->companiesData as $data) {
+			$companies[] = Companies::create($data);
 			$this->assertTrue(end($companies)->save());
 			$this->assertTrue(end($companies)->{$key});
 		}
 
-		foreach (Company::all() as $company) {
-			$this->assertTrue($company->delete());
+		foreach (Companies::all() as $companies) {
+			$this->assertTrue($companies->delete());
 		}
 	}
 }

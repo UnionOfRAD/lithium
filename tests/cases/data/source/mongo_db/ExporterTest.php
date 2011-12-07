@@ -380,6 +380,29 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertEqual(array('update' => array('this.that' => 'value2')), $result);
 	}
 
+	public function testUpdatingArraysAndExporting() {
+		$new = new Document(array('data' => array('name' => 'Acme, Inc.', 'active' => true)));
+
+		$expected = array('name' => 'Acme, Inc.', 'active' => true);
+		$result = $new->data();
+		$this->assertEqual($expected, $result);
+
+		$new->foo = new DocumentArray(array('data' => array('bar')));
+		$expected = array('name' => 'Acme, Inc.', 'active' => true, 'foo' => array('bar'));
+		$result = $new->data();
+		$this->assertEqual($expected, $result);
+
+		$expected = 'bar';
+		$result = $new->foo[0];
+		$this->assertEqual($expected, $result);
+
+		$new->foo[1] = 'baz';
+
+		$expected = 'baz';
+		$result = $new->data();
+		$this->assertEqual($expected, $result['foo'][1]);
+	}
+
 	/**
 	 * @todo Implement me.
 	 */

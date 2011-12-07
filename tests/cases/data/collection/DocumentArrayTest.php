@@ -25,13 +25,17 @@ class DocumentArrayTest extends \lithium\test\Unit {
 		}
 	}
 
-	public function testExport() {
+	public function testAddValueAndExport() {
 		$array = new DocumentArray(array(
 			'model' => $this->_model,
-			'pathKey' => 'foo.bar',
-			'data' => array('5', '6', '7')
+			'pathKey' => 'foo',
+			'data' => array('bar')
 		));
-		$array[] = 8;
+		$array[] = 'baz';
+
+		$expected = array('bar', 'baz');
+		$result = $array->data();
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testUnsetInForeach() {
@@ -46,15 +50,15 @@ class DocumentArrayTest extends \lithium\test\Unit {
 			'Delete me'
 		);
 		$doc = new DocumentArray(array('data' => $data));
-		
+
 		$this->assertIdentical($data, $doc->data());
-		
+
 		foreach ($doc as $i => $word) {
 			if ($word == 'Delete me') {
 				unset($doc->$i);
 			}
 		}
-	
+
 		$expected = array(0 => 'Hello', 6 => 'Hello again!');
 		$this->assertIdentical($expected, $doc->data());
 	}
