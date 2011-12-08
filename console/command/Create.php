@@ -244,7 +244,7 @@ class Create extends \lithium\console\Command {
 		if (file_exists($file)) {
 			$prompt = "{$file} already exists. Overwrite?";
 			$choices = array('y', 'n');
-			if ($this->in($prompt, compact('choices')) == 'n') {
+			if ($this->in($prompt, compact('choices')) != 'y') {
 				return "{$params['class']} skipped.";
 			}
 		}
