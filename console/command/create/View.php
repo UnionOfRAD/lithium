@@ -47,7 +47,7 @@ class View extends \lithium\console\command\Create {
 			if (file_exists($file)) {
 				$prompt = "{$file} already exists. Overwrite?";
 				$choices = array('y', 'n');
-				if ($this->in($prompt, $choices) == 'n') {
+				if ($this->in($prompt, compact('choices')) == 'n') {
 					return "{$params['file']} skipped.";
 				}
 			}
