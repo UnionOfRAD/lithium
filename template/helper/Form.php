@@ -452,7 +452,6 @@ class Form extends \lithium\template\Helper {
 			switch (true) {
 				case is_numeric($field):
 					$field = $label;
-					unset($label);
 				break;
 				case is_array($label):
 					$opts = $label + $opts;
