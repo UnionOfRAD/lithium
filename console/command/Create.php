@@ -241,6 +241,13 @@ class Create extends \lithium\console\Command {
 		if ((!is_dir($directory)) && !mkdir($directory, 0755, true)) {
 			return false;
 		}
+		if (file_exists($file)) {
+			$prompt = "{$file} already exists. Overwrite?";
+			$choices = array('y', 'n');
+			if ($this->in($prompt, $choices) == 'n') {
+				return "{$params['class']} skipped.";
+			}
+		}
 		if (file_put_contents($file, "<?php\n\n{$result}\n\n?>")) {
 			return "{$params['class']} created in {$params['namespace']}.";
 		}

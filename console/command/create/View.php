@@ -44,7 +44,13 @@ class View extends \lithium\console\command\Create {
 				}
 			}
 			$directory = str_replace($this->_library['path'] . '/', '', $directory);
-
+			if (file_exists($file)) {
+				$prompt = "{$file} already exists. Overwrite?";
+				$choices = array('y', 'n');
+				if ($this->in($prompt, $choices) == 'n') {
+					return "{$params['file']} skipped.";
+				}
+			}
 			if (file_put_contents($file, "<?php\n\n{$result}\n\n?>")) {
 				return "{$params['file']}.php created in {$directory}.";
 			}
