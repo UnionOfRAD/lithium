@@ -1190,6 +1190,27 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testValidationWithArrays() {
+		$rules = array(
+			'foo' => array('arrayTest', 'message' => 'fail')
+		);
+		Validator::add('arrayTest', function($value, $format, $options) {
+			return ($value == array('bar' => 1));
+		});
+
+		$data = array('foo' => array('bar' => 1));
+		$result = Validator::check($data, $rules);
+		$this->assertTrue(empty($result));
+
+		$data = array('foo' => null);
+		$result = Validator::check($data, $rules);
+		$this->assertFalse(empty($result));
+
+		$data = array('foo' => array('bar' => 'baz'));
+		$result = Validator::check($data, $rules);
+		$this->assertFalse(empty($result));
+	}
+
 	/**
 	 * Tests validating nested fields using dot-separated paths.
 	 */

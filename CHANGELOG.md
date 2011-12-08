@@ -197,6 +197,14 @@
 - The bulitin test framework now handles circular references in expectations or results
   correctly. The display format of fails has been changed to that of `print_r()`.
 
+- Validator can now validate whole arrays:
+  ```
+  $value = array('complex' => true, 'foo' => 'bar');
+  Validator::add('arrayHasComplexFooKeys', function($value, $format, $options) {
+      return isset($value['complex'], $value['foo']);
+  });
+  ```
+
 ### Changed
 
 - The `persist` option for the MongoDb adapter has been removed. Persistent connection
