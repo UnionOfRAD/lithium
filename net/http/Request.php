@@ -158,7 +158,9 @@ class Request extends \lithium\net\http\Message {
 			'port' => $this->port ? ":{$this->port}" : '',
 			'path' => $this->path,
 			'query' => null,
-			'auth' => $this->_config['auth'],
+			'auth' => $this->auth,
+			'username' => $this->username,
+			'password' => $this->password,
 			'headers' => array(),
 			'body' => null,
 			'version' => $this->version,
@@ -169,15 +171,31 @@ class Request extends \lithium\net\http\Message {
 		);
 		$options += $defaults;
 
+		if (!empty($options['auth'])) {
+			$auth = null;
+			if (is_array($options['auth']) && isset($options['auth']['nonce'])) {
+				$data = $options['auth'];
+				$nc = '00000001';
+				$cnonce = md5(time());
+				$a1 = md5("{$options['username']}:{$data['realm']}:{$options['password']}");
+				$a2 = md5($options['method'] . ':' . $options['path']);
+				$nonce = "{$data['nonce']}:{$nc}:{$cnonce}:{$data['qop']}";
+				$response = md5("{$a1}:{$nonce}:{$a2}");
+				$auth = "username=\"{$options['username']}\", response=\"{$response}\", ";
+				$auth .= "uri=\"{$options['path']}\", realm=\"{$data['realm']}\", ";
+				$auth .= "qop=\"{$data['qop']}\", nc={$nc}, cnonce=\"{$cnonce}\", ";
+				$auth .= "nonce=\"{$data['nonce']}\", opaque=\"{$data['opaque']}\"";
+				$this->headers('Authorization', "Digest {$auth}");
+			} else if (is_string($options['auth']) && $options['auth'] == 'Basic') {
+				$auth = base64_encode("{$options['username']}:{$options['password']}");
+				$this->headers('Authorization', "Basic {$auth}");
+			}
+		}
 		switch ($format) {
 			case 'url':
 				$options['query'] = $this->queryString($options['query']);
 				return String::insert("{:scheme}://{:host}{:port}{:path}{:query}", $options);
 			case 'context':
-				if ($options['auth']) {
-					$auth = base64_encode("{$this->username}:{$this->password}");
-					$this->headers('Authorization', "{$options['auth']} {$auth}");
-				}
 				$body = $this->body($options['body']);
 				$this->headers('Content-Length', strlen($body));
 				$base = array(
@@ -189,6 +207,12 @@ class Request extends \lithium\net\http\Message {
 					'follow_location' => $options['follow_location']
 				);
 				return array('http' => array_diff_key($options, $defaults) + $base);
+			case 'string':
+				$path = str_replace('//', '/', $this->path) . $this->queryString();
+				$body = $this->body();
+				$this->headers('Content-Length', strlen($body));
+				$status = "{$this->method} {$path} {$this->protocol}";
+				return join("\r\n", array($status, join("\r\n", $this->headers()), "", $body));
 			default:
 				return parent::to($format, $options);
 		}
@@ -200,17 +224,7 @@ class Request extends \lithium\net\http\Message {
 	 * @return string
 	 */
 	public function __toString() {
-		if (!empty($this->_config['auth'])) {
-			$this->headers('Authorization', "{$this->_config['auth']} " . base64_encode(
-				"{$this->username}:{$this->password}"
-			));
-		}
-		$path = str_replace('//', '/', $this->path) . $this->queryString();
-		$body = $this->body();
-		$this->headers('Content-Length', strlen($body));
-
-		$status = "{$this->method} {$path} {$this->protocol}";
-		return join("\r\n", array($status, join("\r\n", $this->headers()), "", $body));
+		return $this->to('string');
 	}
 }
 

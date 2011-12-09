@@ -283,6 +283,23 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertFalse($response->headers());
 		$this->assertEqual(trim($body), $response->body());
 	}
+
+	public function testDigestParsing() {
+		$auth = 'Digest realm="app",';
+		$auth .= 'qop="auth",nonce="4ee1617b8756e",opaque="dd7bcee161192cb8fba765eb595eba87"';
+		$headers = array("WWW-Authenticate" => $auth);
+		$response = new Response(compact('headers'));
+		$expected = array("WWW-Authenticate" => $auth);
+		$result = $response->headers;
+		$this->assertEqual($expected, $result);
+
+		$expected = array(
+			'realm' => 'app', 'qop' => 'auth', 'nonce' => '4ee1617b8756e',
+			'opaque' => 'dd7bcee161192cb8fba765eb595eba87'
+		);
+		$result = $response->digest();
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

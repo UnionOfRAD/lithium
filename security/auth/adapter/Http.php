@@ -113,7 +113,6 @@ class Http extends \lithium\core\Object {
 			'cnonce' => null, 'qop' => null, 'uri' => null,
 			'response' => null
 		);
-
 		$result = array_map(function ($string) use (&$data) {
 			$parts = explode('=', trim($string), 2) + array('', '');
 			$data[$parts[0]] = trim($parts[1], '"');
@@ -121,7 +120,6 @@ class Http extends \lithium\core\Object {
 
 		$users = $this->_config['users'];
 		$password = !empty($users[$data['username']]) ? $users[$data['username']] : null;
-
 		$user = md5("{$data['username']}:{$realm}:{$password}");
 		$nonce = "{$data['nonce']}:{$data['nc']}:{$data['cnonce']}:{$data['qop']}";
 		$req = md5($request->env('REQUEST_METHOD') . ':' . $data['uri']);
@@ -134,7 +132,7 @@ class Http extends \lithium\core\Object {
 			$message = "WWW-Authenticate: Digest realm=\"{$realm}\",qop=\"auth\",";
 			$message .= "nonce=\"{$nonce}\",opaque=\"{$opaque}\"";
 			$this->_writeHeader($message);
-			return;
+			return false;
 		}
 		return array('username' => $data['username'], 'password' => $password);
 	}

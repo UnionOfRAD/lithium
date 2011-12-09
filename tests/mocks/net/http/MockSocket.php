@@ -32,6 +32,32 @@ class MockSocket extends \lithium\net\Socket {
 	}
 
 	public function read() {
+		if ($this->data->path == '/http_auth/') {
+			if (is_array($this->data->auth)) {
+				$request = $this->data->to('array');
+				$data = $this->data->auth;
+				$data['nc'] = '00000001';
+				$data['cnonce'] = md5(time());
+				$username = $this->data->username;
+				$password = $this->data->password;
+				$user = md5("{$username}:{$data['realm']}:{$password}");
+				$nonce = "{$data['nonce']}:{$data['nc']}:{$data['cnonce']}:{$data['qop']}";
+				$req = md5($this->data->method . ':' . $this->data->path);
+				$hash = md5("{$user}:{$nonce}:{$req}");
+				preg_match('/response="(.*?)"/', $this->data->headers('Authorization'), $matches);
+				list($match, $response) = $matches;
+
+				if ($hash == $response) {
+					return 'success';
+				}
+			}
+			$header = 'Digest realm="app",qop="auth",nonce="4bca0fbca7bd0",'
+				. 'opaque="d3fb67a7aa4d887ec4bf83040a820a46";';
+			$this->data->headers('WWW-Authenticate', $header);
+			$status = "GET HTTP/1.1 401 Authorization Required";
+			$response = array($status, join("\r\n", $this->data->headers()), "", "not authorized");
+			return join("\r\n", $response);
+		}
 		return $this->data;
 	}
 

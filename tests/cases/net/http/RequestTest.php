@@ -252,6 +252,33 @@ class RequestTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testDigest() {
+		$request = new Request(array(
+			'path' => 'http_auth',
+			'auth' => array(
+				'realm' => 'app',
+				'qop' => 'auth',
+				'nonce' => '4bca0fbca7bd0',
+				'opaque' => 'd3fb67a7aa4d887ec4bf83040a820a46'
+			),
+			'username' => 'gwoo',
+			'password' => 'li3'
+		));
+		$cnonce = md5(time());
+		$user = md5("gwoo:app:li3");
+		$nonce = "4bca0fbca7bd0:00000001:{$cnonce}:auth";
+		$req = md5("GET:/http_auth/");
+		$hash = md5("{$user}:{$nonce}:{$req}");
+
+		$request->to('url');
+		preg_match('/response="(.*?)"/', $request->headers('Authorization'), $matches);
+		list($match, $response) = $matches;
+
+		$expected = $hash;
+		$result = $response;
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
