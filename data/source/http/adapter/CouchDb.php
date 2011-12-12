@@ -128,6 +128,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 *
 	 * @throws ConfigException
 	 * @param string $entity
+	 * @param array $schema Any schema data pre-defined by the model.
 	 * @param array $meta
 	 * @return void
 	 */

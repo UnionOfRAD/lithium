@@ -97,7 +97,7 @@ class MockSource extends \lithium\data\Source {
 		return array('mock_posts', 'mock_comments', 'mock_tags', 'posts_tags');
 	}
 
-	public function describe($entity, array $meta = array()) {
+	public function describe($table, array $schema = array(), array $meta = array()) {
 		$var = "_" . Inflector::camelize($entity, false);
 		if ($this->{$var}) {
 			return $this->{$var};
