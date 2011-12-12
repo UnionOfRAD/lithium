@@ -36,8 +36,8 @@ class DocumentSet extends \lithium\data\Collection {
 				$key = $path[$i];
 				$next = $current->__get($key);
 
-				if (!is_object($next) && ($model = $this->_model)) {
-					$next = $model::connection()->cast($this, $next);
+				if ($schema = $this->schema()) {
+					$next = $schema->cast($this, $next);
 					$current->_data[$key] = $next;
 				}
 				$current = $next;
@@ -107,7 +107,7 @@ class DocumentSet extends \lithium\data\Collection {
 			return $null;
 		}
 		if (is_array($data = $this->_data[$offset]) && $model) {
-			$this->_data[$offset] = $model::connection()->cast($this, $data);
+			$this->_data[$offset] = $schema->cast($this, $data);
 		}
 		if (isset($this->_data[$offset])) {
 			return $this->_data[$offset];

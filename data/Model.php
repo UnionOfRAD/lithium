@@ -603,19 +603,22 @@ class Model extends \lithium\core\StaticObject {
 		$self = static::_object();
 
 		if ($field === false) {
-			return $self->_schema = array();
+			return $self->_schema = null;
 		}
-		if (!$self->_schema) {
-			$self->_schema = static::connection()->describe($self::meta('source'), $self->_meta);
+		if (!is_object($self->_schema)) {
+			$source = $self::meta('source');
+			$self->_schema = static::connection()->describe($source, $self->_schema, $self->_meta);
 			$key = (array) self::meta('key');
-			if ($self->_schema && array_intersect($key, array_keys($self->_schema)) != $key) {
-				throw new ConfigException('Missing key `' . implode(',', $key) . '` from schema.');
+
+			if ($self->_schema && $self->_schema->fields() && !$self->_schema->has($key)) {
+				$message = 'Missing key `' . implode('`, `', $key) . '` from schema.';
+				throw new ConfigException($message);
 			}
 		}
-		if (is_string($field) && $field) {
-			return isset($self->_schema[$field]) ? $self->_schema[$field] : null;
+		if (!$self->_schema) {
+			return;
 		}
-		return $self->_schema;
+		return $field ? $self->_schema->fields($field) : $self->_schema;
 	}
 
 	/**
