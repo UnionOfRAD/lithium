@@ -131,7 +131,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$model = $this->_model;
 		$exists = true;
 		$model::config(array('key' => '_id'));
-		$model::schema(array(
+		$schema = new Schema(array('fields' => array(
 			'forceArray' => array('type' => 'string', 'array' => true),
 			'array' => array('type' => 'string', 'array' => true),
 			'dictionary' => array('type' => 'string', 'array' => true),
@@ -139,31 +139,31 @@ class ExporterTest extends \lithium\test\Unit {
 			'objects' => array('type' => 'object', 'array' => true),
 			'deeply' => array('type' => 'object', 'array' => true),
 			'foo' => array('type' => 'string')
-		));
+		)));
+		$config = compact('model', 'schema', 'exists');
 
-		$doc = new Document(compact('model', 'exists') + array('data' => array(
-			'numbers' => new DocumentArray(compact('model', 'exists') + array(
+		$doc = new Document($config + array('data' => array(
+			'numbers' => new DocumentArray(compact('model', 'exists', 'schema') + array(
 				'data' => array(7, 8, 9), 'pathKey' => 'numbers'
 			)),
-			'objects' => new DocumentArray(compact('model', 'exists') + array(
-				'data' => array(
-					new Document(
-						compact('model', 'exists') + array('data' => array('foo' => 'bar'))
-					),
-					new Document(
-						compact('model', 'exists') + array('data' => array('foo' => 'baz'))
-					)
-				), 'pathKey' => 'objects'
-			)),
-			'deeply' => new Document(compact('model', 'exists') + array(
-				'pathKey' => 'deeply', 'data' => array('nested' => 'object')
-			)),
+			'objects' => new DocumentArray($config + array('pathKey' => 'objects', 'data' => array(
+				new Document($config + array('data' => array('foo' => 'bar'))),
+				new Document($config + array('data' => array('foo' => 'baz')))
+			))),
+			'deeply' => new Document($config + array('pathKey' => 'deeply', 'data' => array(
+				'nested' => 'object'
+			))),
 			'foo' => 'bar'
 		)));
 
 		$doc->dictionary[] = 'A word';
 		$doc->forceArray = 'Word';
+		var_dump('--');
+		var_dump($doc->array);
 		$doc->array = array('one');
+		var_dump('---');
+		var_dump($doc->array);
+		var_dump('--');
 		$doc->field = 'value';
 		$doc->objects[1]->foo = 'dib';
 		$doc->objects[] = array('foo' => 'diz');
@@ -271,8 +271,8 @@ class ExporterTest extends \lithium\test\Unit {
 		$model = $this->_model;
 		$data = array('notifications' => array('foo' => '', 'bar' => '1', 'baz' => 0, 'dib' => 42));
 
-		$model::schema($this->_schema);
-		$result = Exporter::cast($data, $this->_schema, $model::connection(), compact('model'));
+		$schema = new Schema(array('fields' => $this->_schema));
+		$result = Exporter::cast($data, $schema, $model::connection(), compact('model'));
 		$this->assertIdentical(false, $result['notifications']->foo);
 		$this->assertIdentical(true, $result['notifications']->bar);
 		$this->assertIdentical(false, $result['notifications']->baz);
