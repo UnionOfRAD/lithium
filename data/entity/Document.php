@@ -111,9 +111,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 
 		if (isset($this->_embedded[$name]) && !isset($this->_relationships[$name])) {
 			$item = isset($this->_data[$name]) ? $this->_data[$name] : array();
-			var_dump($this->_relationships[$name]);
-			die('#WINNING');
-			// $this->_relationships[$name] = $this->_relate($this->_embedded[$name], $item);
+			$this->_relationships[$name] = $this->_relate($this->_embedded[$name], $item);
 		}
 		$result = parent::__get($name);
 
@@ -298,9 +296,9 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			unset($this->_increment[$key]);
 		}
 
-		if ($data && $model = $this->_model) {
+		if ($data && $schema = $this->schema()) {
 			$pathKey = $this->_pathKey;
-			$data = $model::connection()->cast($this, $data, compact('pathKey'));
+			$data = $schema->cast($this, $data, compact('pathKey'));
 		}
 
 		foreach ($data as $key => $value) {
