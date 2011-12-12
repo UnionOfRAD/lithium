@@ -85,7 +85,22 @@ abstract class Collection extends \lithium\util\Collection {
 	 */
 	protected $_hasInitialized = false;
 
-	protected $_schema = array();
+	/**
+	 * Indicates whether this array was part of a document loaded from a data source, or is part of
+	 * a new document, or is in newly-added field of an existing document.
+	 *
+	 * @var boolean
+	 */
+	protected $_exists = false;
+
+	/**
+	 * If the `Collection` has a schema object assigned (rather than loading one from a model), it
+	 * will be assigned here.
+	 *
+	 * @see lithium\data\Schema
+	 * @var object
+	 */
+	protected $_schema = null;
 
 	/**
 	 * Holds an array of values that should be processed on initialization.
@@ -93,7 +108,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'data', 'model', 'result', 'query', 'parent', 'stats', 'pathKey', 'schema'
+		'data', 'model', 'result', 'query', 'parent', 'stats', 'pathKey', 'exists', 'schema'
 	);
 
 	/**
@@ -112,13 +127,10 @@ abstract class Collection extends \lithium\util\Collection {
 		foreach (array('data', 'classes', 'model', 'result', 'query') as $key) {
 			unset($this->_config[$key]);
 		}
-		if ($model = $this->_model) {
-			$options = array(
-				'pathKey' => $this->_pathKey,
-				'schema' => $model::schema(),
-				'exists' => isset($this->_config['exists']) ? $this->_config['exists'] : null
-			);
-			$this->_data = $model::connection()->cast($this, $this->_data, $options);
+		if ($schema = $this->schema()) {
+			$exists = isset($this->_config['exists']) ? $this->_config['exists'] : null;
+			$pathKey = $this->_pathKey;
+			$this->_data = $schema->cast($this, $this->_data, compact('exists', 'pathKey'));
 		}
 	}
 
@@ -165,10 +177,9 @@ abstract class Collection extends \lithium\util\Collection {
 				$schema = $model::schema();
 			break;
 		}
-		if ($field) {
-			return isset($self->_schema[$field]) ? $self->_schema[$field] : null;
+		if ($schema) {
+			return $field ? $schema->fields($field) : $schema;
 		}
-		return $schema;
 	}
 
 	/**
@@ -356,8 +367,8 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return mixed Returns the set `Entity` object.
 	 */
 	public function offsetSet($offset, $data) {
-		if (is_array($data) && ($model = $this->_model)) {
-			$data = $model::connection()->cast($this, $data);
+		if (is_array($data) && ($schema = $this->schema())) {
+			$data = $schema->cast($this, $data);
 		}
 		return $this->_data[] = $data;
 	}
