@@ -29,7 +29,7 @@ class Mock extends \lithium\data\Source {
 		return array();
 	}
 
-	public function describe($entity, array $meta = array()) {
+	public function describe($entity, array $schema = array(), array $meta = array()) {
 		return array();
 	}
 
