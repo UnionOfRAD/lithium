@@ -296,9 +296,9 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			unset($this->_increment[$key]);
 		}
 
-		if ($data && $model = $this->_model) {
+		if ($data && $schema = $this->schema()) {
 			$pathKey = $this->_pathKey;
-			$data = $model::connection()->cast($this, $data, compact('pathKey'));
+			$data = $schema->cast($this, $data, compact('pathKey'));
 		}
 
 		foreach ($data as $key => $value) {

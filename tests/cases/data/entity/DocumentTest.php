@@ -31,7 +31,7 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 
 	public function setUp() {
-		if (empty($this->_backup)) {
+		if (!$this->_backup) {
 			foreach (Connections::get() as $conn) {
 				$this->_backup[$conn] = Connections::get($conn, array('config' => true));
 			}

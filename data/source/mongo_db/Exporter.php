@@ -55,15 +55,12 @@ class Exporter extends \lithium\core\StaticObject {
 
 		foreach ($data as $key => $value) {
 			$pathKey = $options['pathKey'] ? "{$options['pathKey']}.{$key}" : $key;
-
-			$field = isset($schema[$pathKey]) ? $schema[$pathKey] : array();
-			$field += array('type' => null, 'array' => null);
-			$data[$key] = static::_cast($value, $field, $database, compact('pathKey') + $options);
+			$data[$key] = static::_cast($schema, $value, $database, compact('pathKey') + $options);
 		}
 		return $data;
 	}
 
-	protected static function _cast($value, $def, $database, $options) {
+	protected static function _cast($schema, $value, $database, $options) {
 		if (is_object($value)) {
 			return $value;
 		}
@@ -119,7 +116,7 @@ class Exporter extends \lithium\core\StaticObject {
 
 	protected static function _create($export, array $options) {
 		$export += array('data' => array(), 'update' => array(), 'key' => '');
-		$data = $export['update'];
+		$data = Set::merge($export['data'], $export['update']);
 
 		$result = array('create' => array());
 		$localOpts = array('finalize' => false) + $options;
