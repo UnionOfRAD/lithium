@@ -319,15 +319,15 @@ class CollectionTest extends \lithium\test\Unit {
 			'Delete me'
 		);
 		$collection = new Collection(array('data' => $data));
-		
+
 		$this->assertIdentical($data, $collection->to('array'));
-		
+
 		foreach ($collection as $i => $word) {
 			if ($word == 'Delete me') {
 				unset($collection[$i]);
 			}
 		}
-	
+
 		$expected = array(0 => 'Hello', 6 => 'Hello again!');
 		$results = $collection->to('array');
 		$this->assertIdentical($expected, $results);

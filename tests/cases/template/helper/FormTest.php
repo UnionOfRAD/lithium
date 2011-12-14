@@ -421,7 +421,7 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array(
 			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
-				'type' => 'checkbox', 'value' => '1',  'name' => 'foo', 
+				'type' => 'checkbox', 'value' => '1',  'name' => 'foo',
 				'id' => 'MockFormPostFoo', 'checked' => 'checked'
 			))
 		));

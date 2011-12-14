@@ -304,9 +304,11 @@ class RouteTest extends \lithium\test\Unit {
 			'template' => '/images/image_{:width}x{:height}.{:format}',
 			'params' => array('format' => 'png')
 		));
+		
+		$pattern = '@^/images/image_(?P<width>[^\\/]+)x(?P<height>[^\\/]+)\\.(?P<format>[^\\/]+)?$@';
 		$expected = array(
 			'template' => '/images/image_{:width}x{:height}.{:format}',
-			'pattern' => '@^/images/image_(?P<width>[^\\/]+)x(?P<height>[^\\/]+)\\.(?P<format>[^\\/]+)?$@',
+			'pattern' => $pattern,
 			'params' => array('format' => 'png', 'action' => 'index'),
 			'match' => array('action' => 'index'),
 			'meta' => array(),
@@ -611,7 +613,7 @@ class RouteTest extends \lithium\test\Unit {
 	public function testTwoParameterRoutes() {
 		$route = new Route(array(
 			'template' => '/personnel/{:personnel_id}/position/{:position_id}/actions/create',
-			'params' => array('controller' => 'actions', 'action' => 'create'),
+			'params' => array('controller' => 'actions', 'action' => 'create')
 		));
 
 		$route->compile();

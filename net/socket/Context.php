@@ -41,6 +41,7 @@ class Context extends \lithium\net\Socket {
 	/**
 	 * Opens the socket and sets its timeout value.
 	 *
+	 * @param array $options Update the config settings.
 	 * @return mixed Returns `false` if the socket configuration does not contain the
 	 *         `'scheme'` or `'host'` settings, or if configuration fails, otherwise returns a
 	 *         resource stream.

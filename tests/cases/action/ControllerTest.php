@@ -170,9 +170,10 @@ class ControllerTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $controller->response->data);
 	}
-	
+
 	/**
-	 * Verifies that Controller does not modify data when passed an array (or RecordSet) with a single element
+	 * Verifies that the Controller does not modify data when passed an array (or RecordSet)
+	 * with a single element.
 	 *
 	 * @return void
 	 */

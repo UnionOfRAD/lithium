@@ -9,21 +9,21 @@
 namespace lithium\net;
 
 /**
- * Abstract class for connecting to sockets with various adapters
- * Curl, Stream, Context adapters are available.
+ * Abstract class for connecting to sockets with various adapters.
  *
+ * Currently, Curl, Stream and Context adapters are available.
  */
 abstract class Socket extends \lithium\core\Object {
 
 	/**
-	 * the resource for the current connection
+	 * The resource for the current connection.
 	 *
 	 * @var resource
 	 */
 	protected $_resource = null;
 
 	/**
-	 * the classes for the socket
+	 * The classes for the socket.
 	 *
 	 * @var array
 	 */
@@ -33,8 +33,9 @@ abstract class Socket extends \lithium\core\Object {
 	);
 
 	/**
-	 * Auto config
+	 * Auto config.
 	 *
+	 * @var array
 	 */
 	protected $_autoConfig = array('classes' => 'merge');
 
@@ -64,7 +65,7 @@ abstract class Socket extends \lithium\core\Object {
 	/**
 	 * Opens the socket and sets `Socket::$_resource`.
 	 *
-	 * @param array $options update the config settings
+	 * @param array $options Update the config settings.
 	 * @return mixed The open resource on success, `false` otherwise.
 	 */
 	public function open(array $options = array()) {
