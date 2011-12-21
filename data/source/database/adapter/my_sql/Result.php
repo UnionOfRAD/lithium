@@ -78,7 +78,9 @@ class Result extends \lithium\core\Object implements \Iterator {
 		}
 		
 		// We are current in the iteration, fetch the next row
-		if ($this->_resource instanceof \PDOStatement && $this->_iterator < $this->_resource->rowCount() && $result = $this->_resource->fetch(\PDO::FETCH_ASSOC)) {
+		if ($this->_resource instanceof PDOStatement && $this->_iterator < $this->_resource->rowCount()
+				&& $result = $this->_resource->fetch(PDO::FETCH_ASSOC)) {
+	
 			$this->_iterator++;
 			$this->_maxIteration = $this->_iterator;
 			$this->_previousResultsCache[$this->_iterator] = $result;
