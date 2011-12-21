@@ -9,6 +9,7 @@
 namespace lithium\data\source\database\adapter;
 
 use lithium\data\model\QueryException;
+use PDO, PDOStatement, PDOException;
 
 /**
  * Extends the `Database` class to implement the necessary SQL-formatting and resultset-fetching
@@ -21,7 +22,7 @@ use lithium\data\model\QueryException;
 class MySql extends \lithium\data\source\Database {
 	
 	/**
-	 * @var \PDO
+	 * @var PDO
 	 */
 	public $connection;
 
@@ -128,15 +129,15 @@ class MySql extends \lithium\data\source\Database {
 		}
 
 		$options = array(
-			\PDO::ATTR_PERSISTENT => $config['persistent'],
-			\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
+			PDO::ATTR_PERSISTENT => $config['persistent'],
+			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 		);
 		
 		try {
 			list($host, $port) = array(1 => "3306") + explode(':', $host);
 			$dsn = sprintf("mysql:host=%s;port=%s;dbname=%s", $host, $port, $config['database']);
-			$this->connection = new \PDO($dsn, $config['login'], $config['password'], $options);
-		} catch (\PDOException $e) {
+			$this->connection = new PDO($dsn, $config['login'], $config['password'], $options);
+		} catch (PDOException $e) {
 			return false;
 		}
 
@@ -146,7 +147,7 @@ class MySql extends \lithium\data\source\Database {
 			$this->encoding($config['encoding']);
 		}
 		
-		$info = $this->connection->getAttribute(\PDO::ATTR_SERVER_VERSION);
+		$info = $this->connection->getAttribute(PDO::ATTR_SERVER_VERSION);
 
 		$this->_useAlias = (boolean) version_compare($info, "4.1", ">=");
 		return $this->_isConnected;
@@ -345,9 +346,9 @@ class MySql extends \lithium\data\source\Database {
 			$sql = $params['sql'];
 			$options = $params['options'];
 
-			$conn->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, $options['buffered']);
+			$conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, $options['buffered']);
 
-			if (!($resource = $conn->query($sql)) instanceof \PDOStatement) {
+			if (!($resource = $conn->query($sql)) instanceof PDOStatement) {
 				list($code, $error) = $self->error();
 				throw new QueryException("{$sql}: {$error}", $code);
 			}
@@ -356,7 +357,7 @@ class MySql extends \lithium\data\source\Database {
 	}
 
 	protected function _results($results) {
-		/* @var $results \PDOStatement */
+		/* @var $results PDOStatement */
 		$numFields = $results->columnCount();
 		$index = $j = 0;
 

@@ -8,6 +8,8 @@
 
 namespace lithium\data\source\database\adapter\my_sql;
 
+use PDO, PDOStatement;
+
 class Result extends \lithium\core\Object implements \Iterator {
 	protected $_previousResultsCache = null;
 
@@ -18,7 +20,7 @@ class Result extends \lithium\core\Object implements \Iterator {
 	protected $_current = null;
 
 	/**
-	 * @var \PDOStatement
+	 * @var PDOStatement
 	 */
 	protected $_resource = null;
 
