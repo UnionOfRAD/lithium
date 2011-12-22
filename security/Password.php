@@ -173,9 +173,9 @@ class Password {
 	 *        Defaults to `10`. Can be `4` to `31`.
 	 * @return string The Blowfish salt.
 	 */
-	protected static function _genSaltBf($count = 10) {
+	protected static function _genSaltBf($count) {
 		$count = (integer) $count;
-		$count = ($count < 4 || $count > 31) ? 10 : $count;
+		$count = ($count < 4 || $count > 31) ? static::BF : $count;
 
 		$base64 = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		$i = 0;
@@ -203,7 +203,7 @@ class Password {
 			$output .= $base64[$c2 & 0x3f];
 		} while (1);
 
-		return '$2a$' . chr(ord('0') + $count / 10) . chr(ord('0') + $count % 10) . '$' . $output;
+		return '$2a$' . chr(ord('0') + $count / static::BF) . chr(ord('0') + $count % static::BF) . '$' . $output;
 	}
 
 	/**
@@ -214,9 +214,9 @@ class Password {
 	 *                ensure we don't use a weak DES key.
 	 * @return string The XDES salt.
 	 */
-	protected static function _genSaltXDES($count = 18) {
+	protected static function _genSaltXDES($count) {
 		$count = (integer) $count;
-		$count = ($count < 1 || $count > 24) ? 16 : $count;
+		$count = ($count < 1 || $count > 24) ? static::XDES : $count;
 
 		$count = (1 << $count) - 1;
 		$base64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
