@@ -173,7 +173,7 @@ class Password {
 	 *        Defaults to `10`. Can be `4` to `31`.
 	 * @return string The Blowfish salt.
 	 */
-	protected static function _genSaltBf($count) {
+	protected static function _genSaltBf($count = null) {
 		$count = (integer) $count;
 		$count = ($count < 4 || $count > 31) ? static::BF : $count;
 
@@ -214,7 +214,7 @@ class Password {
 	 *                ensure we don't use a weak DES key.
 	 * @return string The XDES salt.
 	 */
-	protected static function _genSaltXDES($count) {
+	protected static function _genSaltXDES($count = null) {
 		$count = (integer) $count;
 		$count = ($count < 1 || $count > 24) ? static::XDES : $count;
 
