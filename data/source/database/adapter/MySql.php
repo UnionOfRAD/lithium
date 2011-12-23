@@ -9,7 +9,7 @@
 namespace lithium\data\source\database\adapter;
 
 use lithium\data\model\QueryException;
-use PDO, PDOStatement, PDOException;
+use \PDO, \PDOStatement, \PDOException;
 
 /**
  * Extends the `Database` class to implement the necessary SQL-formatting and resultset-fetching
@@ -20,7 +20,7 @@ use PDO, PDOStatement, PDOException;
  * @see lithium\data\source\database\adapter\MySql::__construct()
  */
 class MySql extends \lithium\data\source\Database {
-	
+
 	/**
 	 * @var PDO
 	 */
@@ -132,7 +132,7 @@ class MySql extends \lithium\data\source\Database {
 			PDO::ATTR_PERSISTENT => $config['persistent'],
 			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 		);
-		
+
 		try {
 			list($host, $port) = array(1 => "3306") + explode(':', $host);
 			$dsn = sprintf("mysql:host=%s;port=%s;dbname=%s", $host, $port, $config['database']);
@@ -146,7 +146,7 @@ class MySql extends \lithium\data\source\Database {
 		if ($config['encoding']) {
 			$this->encoding($config['encoding']);
 		}
-		
+
 		$info = $this->connection->getAttribute(PDO::ATTR_SERVER_VERSION);
 
 		$this->_useAlias = (boolean) version_compare($info, "4.1", ">=");
@@ -216,7 +216,7 @@ class MySql extends \lithium\data\source\Database {
 				'field', 'type', 'null', 'key', 'default', 'extra'
 			)));
 			$fields = array();
-			
+
 			foreach ($columns as $column) {
 				$match = $self->invokeMethod('_column', array($column['type']));
 
@@ -338,11 +338,13 @@ class MySql extends \lithium\data\source\Database {
 	protected function _execute($sql, array $options = array()) {
 		$defaults = array('buffered' => true);
 		$options += $defaults;
-		$this->connection->exec('USE ' .$this->_config['database']);
-		
+		$this->connection->exec('USE ' . $this->_config['database']);
+
 		$conn = $this->connection;
 
-		return $this->_filter(__METHOD__, compact('sql', 'options'), function($self, $params) use ($conn) {
+		$params = compact('sql', 'options');
+
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($conn) {
 			$sql = $params['sql'];
 			$options = $params['options'];
 
