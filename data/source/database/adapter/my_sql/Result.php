@@ -53,7 +53,6 @@ class Result extends \lithium\core\Object implements \Iterator {
 			return;
 		}
 		
-		// Turn the current iterator back
 		$this->_iterator--;
 		
 		// Return the previous result from the previous results cache
@@ -66,18 +65,37 @@ class Result extends \lithium\core\Object implements \Iterator {
 	}
 
 	public function next() {
-		if (!$this->_resource && empty($this->_previousResultsCache)) {
-			return;
+		if ($this->_validResultSet()) {
+			if (($result = $this->_fetchFromCache()) || ($result = $this->_fetchFromResource())) {
+				return $result;
+			}
+			
+			unset($this->_resource);
+			$this->_resource = null;
 		}
 		
-		// If we are calling ->next() after calling ->prev() 
-		// we must return from the cache till we catch up
+		return;
+	}
+	
+	protected function _validResultSet() {
+		if (!$this->_resource && empty($this->_previousResultsCache)) {
+			return false;
+		}
+		
+		return true;
+	}
+
+
+	protected function _fetchFromCache() {
 		if ($this->_iterator < $this->_maxIteration) {
 			$this->_iterator++;
 			return $this->_previousResultsCache[$this->_iterator];
 		}
 		
-		// We are current in the iteration, fetch the next row
+		return false;
+	}
+	
+	protected function _fetchFromResource() {
 		if ($this->_resource instanceof PDOStatement && $this->_iterator < $this->_resource->rowCount()
 				&& $result = $this->_resource->fetch(PDO::FETCH_ASSOC)) {
 	
@@ -87,10 +105,8 @@ class Result extends \lithium\core\Object implements \Iterator {
 			
 			return $result;
 		}
-		unset($this->_resource);
-		$this->_resource = null;
 		
-		return;
+		return false;
 	}
 }
 
