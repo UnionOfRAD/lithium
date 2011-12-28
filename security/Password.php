@@ -95,7 +95,7 @@ class Password {
 	 * @return boolean Returns a boolean indicating whether the password is correct.
 	 */
 	public static function check($password, $hash) {
-		return String::compareConstant(crypt($password, $hash), $hash);
+		return String::compare(crypt($password, $hash), $hash);
 	}
 
 	/**

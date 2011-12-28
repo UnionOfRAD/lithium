@@ -111,7 +111,7 @@ class Hmac extends \lithium\core\Object {
 		$currentSignature = $currentData['__signature'];
 		$signature = static::_signature($currentData);
 
-		if (!String::compareConstant($signature, $currentSignature)) {
+		if (!String::compare($signature, $currentSignature)) {
 			$message = "Possible data tampering: HMAC signature does not match data.";
 			throw new RuntimeException($message);
 		}

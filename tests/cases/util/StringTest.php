@@ -464,10 +464,10 @@ class StringTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testCompareConstant() {
-		$this->assertTrue(String::compareConstant('Foo', 'Foo'));
-		$this->assertFalse(String::compareConstant('Foo', 'foo'));
-		$this->assertFalse(String::compareConstant('1', 1));
+	public function testCompare() {
+		$this->assertTrue(String::compare('Foo', 'Foo'));
+		$this->assertFalse(String::compare('Foo', 'foo'));
+		$this->assertFalse(String::compare('1', 1));
 	}
 
 	/**

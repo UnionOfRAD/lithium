@@ -193,7 +193,7 @@ class String {
 	 * @param string $right The right side of the comparison.
 	 * @return boolean Returns a boolean indicating whether the two strings are equal.
 	 */
-	public static function compareConstant($left, $right) {
+	public static function compare($left, $right) {
 		$result = true;
 
 		if (($length = strlen($left)) != strlen($right)) {
