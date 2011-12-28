@@ -106,7 +106,7 @@ class Cache extends \lithium\core\Adaptable {
 		if (is_callable($conditions) && !$conditions()) {
 			return false;
 		}
-		$key = static::key($key);
+		$key = static::key($key, $data);
 
 		if (is_array($key)) {
 			$expiry = $data;
