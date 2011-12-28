@@ -86,8 +86,7 @@ class Password {
 
 	/**
 	 * Compares a password and its hashed value using PHP's `crypt()`. Rather than a simple string
-	 * comparison, this method uses a constant-time algorithm to defend against
-	 * [timing attacks](http://codahale.com/a-lesson-in-timing-attacks/).
+	 * comparison, this method uses a constant-time algorithm to defend against timing attacks.
 	 *
 	 * @see lithium\security\Password::hash()
 	 * @see lithium\security\Password::salt()
@@ -96,16 +95,7 @@ class Password {
 	 * @return boolean Returns a boolean indicating whether the password is correct.
 	 */
 	public static function check($password, $hash) {
-		$password = crypt($password, $hash);
-		$result = true;
-
-		if (($length = strlen($password)) != strlen($hash)) {
-			return false;
-		}
-		for ($i = 0; $i < $length; $i++) {
-			$result = $result && ($password[$i] === $hash[$i]);
-		}
-		return $result;
+		return String::compareConstant(crypt($password, $hash), $hash);
 	}
 
 	/**
