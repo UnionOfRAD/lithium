@@ -464,6 +464,12 @@ class StringTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testCompare() {
+		$this->assertTrue(String::compare('Foo', 'Foo'));
+		$this->assertFalse(String::compare('Foo', 'foo'));
+		$this->assertFalse(String::compare('1', 1));
+	}
+
 	/**
 	 * Verifies that `String::insert()` doesn't completely ignore empty values.
 	 */
