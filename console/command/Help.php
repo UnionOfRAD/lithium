@@ -44,7 +44,6 @@ class Help extends \lithium\console\Command {
 			$this->error("Command `{$command}` not found");
 			return false;
 		}
-		$command = Inflector::classify($command);
 
 		if (strpos($command, '\\') !== false) {
 			$command = join('', array_slice(explode("\\", $command), -1));
