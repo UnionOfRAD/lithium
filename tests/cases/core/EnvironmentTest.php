@@ -101,12 +101,16 @@ class EnvironmentTest extends \lithium\test\Unit {
 		$this->assertTrue(Environment::is('test'));
 
 		$request = new MockRequest();
-		$request->argv = array(0 => 'test');
+		$request->command = 'test';
 		Environment::set($request);
 		$this->assertTrue(Environment::is('test'));
 
 		$request = new MockRequest();
-		$request->argv = array(0 => 'something');
+		$request->env = 'test';
+		Environment::set($request);
+		$this->assertTrue(Environment::is('test'));
+
+		$request = new MockRequest(array('TERM' => true));
 		Environment::set($request);
 		$this->assertTrue(Environment::is('development'));
 
