@@ -464,7 +464,7 @@ class Validator extends \lithium\core\StaticObject {
 					if ($events && $rule['on'] && !array_intersect($events, (array) $rule['on'])) {
 						continue;
 					}
-					if (!isset($values[$field])) {
+					if (!array_key_exists($field, $values)) {
 						if ($rule['required']) {
 							$errors[$field][] = $rule['message'] ?: $key;
 						}
