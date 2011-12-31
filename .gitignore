@@ -2,3 +2,4 @@
 app/libraries/*
 app/resources/tmp/*
 .*.sw[op]
+/nbproject/private/
