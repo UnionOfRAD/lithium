@@ -306,6 +306,17 @@ abstract class Collection extends \lithium\util\Collection {
 		}
 		return $this->_data[] = $data;
 	}
+	
+	/**
+	 * Return's the pointer or resource that is used to load entities from the backend 
+	 * data source that originated this collection. This is useful in many cases for
+	 * additional methods related to debugging queries.
+	 * 
+	 * @return object The pointer or resource from the data source
+	*/
+	public function result() {
+		return $this->_result;
+	}
 
 	/**
 	 * Gets the stat or stats associated with this `Collection`.
