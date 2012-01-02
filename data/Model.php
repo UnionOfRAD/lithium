@@ -749,6 +749,7 @@ class Model extends \lithium\core\StaticObject {
 
 		$defaults = array(
 			'validate' => true,
+			'events' => $entity->exists() ? 'update' : 'create',
 			'whitelist' => null,
 			'callbacks' => true,
 			'locked' => $self->_meta['locked']
@@ -764,7 +765,9 @@ class Model extends \lithium\core\StaticObject {
 				$entity->set($params['data']);
 			}
 			if ($rules = $options['validate']) {
-				if (!$entity->validates(is_array($rules) ? compact('rules') : array())) {
+				$events = $options['events'];
+				$validateOpts = is_array($rules) ? compact('rules','events') : compact('events');
+				if (!$entity->validates($validateOpts)) {
 					return false;
 				}
 			}

@@ -19,7 +19,12 @@ class MockPostForValidates extends \lithium\data\Model {
 		'email' => array(
 			array('notEmpty', 'message' => 'email is empty'),
 			array('email', 'message' => 'email is not valid'),
-			array('modelIsSet', 'required' => false, 'message' => 'model is not set')
+			array('modelIsSet', 'required' => false, 'message' => 'model is not set'),
+			array('inList', 'list' => array('something@test.com','foo@bar.com'),
+				'on' => 'custom_event', 'message' => 'email is not in 1st list'),
+			array('inList', 'list' => array(
+				'something@test.com'),
+				'on' => 'another_custom_event', 'message' => 'email is not in 2nd list')
 		)
 	);
 
