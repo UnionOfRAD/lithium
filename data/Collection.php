@@ -144,7 +144,16 @@ abstract class Collection extends \lithium\util\Collection {
 	public function model() {
 		return $this->_model;
 	}
-
+	
+	/**
+	 * Returns the object's parent `Document` object.
+	 *
+	 * @return object
+	 */
+	public function parent() {
+		return $this->_parent;
+	}
+	
 	public function schema($field = null) {
 		$schema = array();
 
