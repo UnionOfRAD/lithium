@@ -567,6 +567,44 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertIdentical(false, $result);
 	}
 
+	public function testSaveFailedWithValidationByModelDefinition() {
+		$post = MockPostForValidates::create();
+
+		$result = $post->save();
+		$this->assertTrue($result === false);
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
+
+		$expected = array(
+			'title' => array('please enter a title'),
+			'email' => array('email is empty', 'email is not valid')
+		);
+		$result = $post->errors();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSaveFailedWithValidationByModelDefinitionAndTriggeredCustomEvents() {
+		$post = MockPostForValidates::create();
+		$events = array('custom_event','another_custom_event');
+
+		$result = $post->save(null,compact('events'));
+		$this->assertTrue($result === false);
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
+
+		$expected = array(
+			'title' => array('please enter a title'),
+			'email' => array(
+				'email is empty',
+				'email is not valid',
+				'email is not in 1st list',
+				'email is not in 2nd list'
+				)
+		);
+		$result = $post->errors();
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testImplicitKeyFind() {
 		$result = MockPost::find(10);
 		$this->assertEqual('read', $result['query']->type());
