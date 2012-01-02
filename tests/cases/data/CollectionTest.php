@@ -210,6 +210,21 @@ class CollectionTest extends \lithium\test\Unit {
 		$idsSorted = $collection->map(function ($v) { return $v['id']; })->to('array');
 		$this->assertEqual($idsSorted, array(1,4,5,3,2));
 	}
+	
+	/**
+	 * Tests `Collection::closed` && `Collection::close`.
+	 *
+	 * @return void
+	 */
+	public function testClosed() {
+		$collection = new DocumentSet();
+		$this->assertTrue($collection->closed());
+		
+		$collection = new DocumentSet(array('result' => 'foo'));
+		$this->assertFalse($collection->closed());
+		$collection->close();
+		$this->assertTrue($collection->closed());
+	}
 }
 
 ?>
