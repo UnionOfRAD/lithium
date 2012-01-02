@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\data;
 
+use \stdClass;
 use lithium\data\collection\DocumentSet;
 use lithium\data\Connections;
 
@@ -224,6 +225,20 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertFalse($collection->closed());
 		$collection->close();
 		$this->assertTrue($collection->closed());
+	}
+	
+	/**
+	 * Tests `Collection::assignTo`.
+	 *
+	 * @return void
+	 */
+	public function testAssignTo() {
+		$parent = new stdClass;
+		$config = array('valid' => false, 'model' => $this->_model);
+		$collection = new DocumentSet;
+		$collection->assignTo($parent, $config);
+		$this->assertEqual($this->_model, $collection->model());
+		$this->assertEqual($parent, $collection->parent());
 	}
 }
 
