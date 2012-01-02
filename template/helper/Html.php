@@ -37,10 +37,10 @@ class Html extends \lithium\template\Helper {
 		'meta-link'        => '<link href="{:url}"{:options} />',
 		'para'             => '<p{:options}>{:content}</p>',
 		'para-start'       => '<p{:options}>',
-		'script'           => '<script type="text/javascript" src="{:path}"{:options}></script>',
+		'script'           => '<script type="text/javascript" src="{:base}{:path}"{:options}></script>',
 		'style'            => '<style type="text/css"{:options}>{:content}</style>',
 		'style-import'     => '<style type="text/css"{:options}>@import url({:url});</style>',
-		'style-link'       => '<link rel="{:type}" type="text/css" href="{:path}"{:options} />',
+		'style-link'       => '<link rel="{:type}" type="text/css" href="{:base}{:path}"{:options} />',
 		'table-header'     => '<th{:options}>{:content}</th>',
 		'table-header-row' => '<tr{:options}>{:content}</tr>',
 		'table-cell'       => '<td{:options}>{:content}</td>',
@@ -166,9 +166,11 @@ class Html extends \lithium\template\Helper {
 			return ($scope['inline']) ? join("\n\t", $path) . "\n" : null;
 		}
 		$m = __METHOD__;
-		$params = compact('path', 'options');
+		$base = isset($options['base']) ? $options['base'] : null;
+		$params = compact('path', 'options', 'base');
 
 		$script = $this->_filter(__METHOD__, $params, function($self, $params, $chain) use ($m) {
+			unset($params['options']['base']);
 			return $self->invokeMethod('_render', array($m, 'script', $params));
 		});
 		if ($scope['inline']) {
@@ -200,9 +202,11 @@ class Html extends \lithium\template\Helper {
 		}
 		$method = __METHOD__;
 		$type = $scope['type'];
-		$params = compact('type', 'path', 'options');
+		$base = (isset($options['base'])) ? $options['base'] : null;
+		$params = compact('type', 'path', 'options', 'base');
 		$filter = function($self, $params, $chain) use ($defaults, $method) {
 			$template = ($params['type'] == 'import') ? 'style-import' : 'style-link';
+			unset($params['options']['base']);
 			return $self->invokeMethod('_render', array($method, $template, $params));
 		};
 		$style = $this->_filter($method, $params, $filter);
