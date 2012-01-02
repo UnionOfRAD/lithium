@@ -8,103 +8,120 @@
 
 namespace lithium\data\source\database\adapter\my_sql;
 
-use \PDO, \PDOStatement;
+use \PDO;
+use \PDOStatement;
 
+/**
+ *
+ */
 class Result extends \lithium\core\Object implements \Iterator {
-	protected $_previousResultsCache = null;
 
+	/**
+	 * Contains the cached result set.
+	 */
+	protected $_cache = null;
+
+	/**
+	 * The current position of the iterator.
+	 */
 	protected $_iterator = 0;
 
-	protected $_maxIteration = 0;
-
+	/**
+	 * Contains the current element of the result set.
+	 */
 	protected $_current = null;
 
 	/**
-	 * @var PDOStatement
+	 * The bound resource.
 	 */
 	protected $_resource = null;
 
+	/**
+	 * Autoconfig.
+	 */
 	protected $_autoConfig = array('resource');
 
+	/**
+	 * Returns the used resource.
+	 */
 	public function resource() {
 		return $this->_resource;
 	}
 
+	/**
+	 * Rewinds the result set to the first position.
+	 */
 	public function rewind() {
 		$this->_iterator = 0;
 		$this->_current = null;
-		return null;
 	}
 
+	/**
+	 * Checks wheter the result is valid or not.
+	 */
 	public function valid() {
-		return $this->_current;
+		return $this->_resource || !empty($this->_cache);
 	}
 
+	/**
+	 * Contains the current result.
+	 */
 	public function current() {
 		return $this->_current;
 	}
 
+	/**
+	 *
+	 */
 	public function key() {
 		return $this->_iterator;
 	}
 
+	/**
+	 * Fetches the previous element from the cache.
+	 */
 	public function prev() {
 		if (!$this->_resource) {
 			return;
 		}
 
-		$this->_iterator--;
-
-		// Return the previous result from the previous results cache
-		if (isset($this->_previousResultsCache[$this->_iterator])) {
-			$this->_current = $this->_previousResultsCache[$this->_iterator];
-			return $this->_current;
-		} else {
-			return;
+		if (isset($this->_cache[--$this->_iterator])) {
+			return $this->_current = $this->_cache[$this->_iterator];
 		}
 	}
 
+	/**
+	 * Fetches the next element from the resource.
+	 */
 	public function next() {
-		if ($this->_validResultSet()) {
+		if ($this->valid()) {
 			if (($result = $this->_fetchFromCache()) || ($result = $this->_fetchFromResource())) {
-				return $result;
+				return $this->_current = $result;
 			}
 
-			unset($this->_resource);
 			$this->_resource = null;
 		}
-
-		return;
 	}
 
-	protected function _validResultSet() {
-		if (!$this->_resource && empty($this->_previousResultsCache)) {
-			return false;
-		}
-
-		return true;
-	}
-
-
+	/**
+	 * Returns the result from the primed cache.
+	 */
 	protected function _fetchFromCache() {
-		if ($this->_iterator < $this->_maxIteration) {
-			$this->_iterator++;
-			return $this->_previousResultsCache[$this->_iterator];
+		if ($this->_iterator < count($this->_cache)) {
+			return $this->_cache[++$this->_iterator];
 		}
 
 		return false;
 	}
 
+	/**
+	 * Fetches the result from the resource and caches it. 
+	 */	
 	protected function _fetchFromResource() {
 		if ($this->_resource instanceof PDOStatement
 				&& $this->_iterator < $this->_resource->rowCount()
-				&& $result = $this->_resource->fetch(PDO::FETCH_ASSOC)) {
-
-			$this->_iterator++;
-			$this->_maxIteration = $this->_iterator;
-			$this->_previousResultsCache[$this->_iterator] = $result;
-
-			return $result;
+				&& $result = $this->_resource->fetch(PDO::FETCH_NUM)) {
+			return $this->_cache[++$this->_iterator] = $result;
 		}
 
 		return false;
