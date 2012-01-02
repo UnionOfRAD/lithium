@@ -34,8 +34,6 @@ class CollectionTest extends \lithium\test\Unit {
 	
 	/**
 	 * Setup method run before every test method.
-	 *
-	 * @return void
 	 */
 	public function setUp() {
 		if (empty($this->_backup)) {
@@ -48,8 +46,6 @@ class CollectionTest extends \lithium\test\Unit {
 	
 	/**
 	 * Teardown method run after every test method.
-	 *
-	 * @return void
 	 */
 	public function tearDown() {
 		Connections::reset();
@@ -60,8 +56,6 @@ class CollectionTest extends \lithium\test\Unit {
 	
 	/**
 	 * Tests `Collection::stats`.
-	 *
-	 * @return void
 	 */
 	public function testGetStats() {
 		$collection = new DocumentSet(array('stats' => array('foo' => 'bar')));
@@ -72,8 +66,6 @@ class CollectionTest extends \lithium\test\Unit {
 	
 	/**
 	 * Tests Collection with invalid data.
-	 *
-	 * @return void
 	 */
 	public function testInvalidData() {
 		$this->expectException('Error creating new Collection instance; data format invalid.');
@@ -82,8 +74,6 @@ class CollectionTest extends \lithium\test\Unit {
 	
 	/**
 	 * Tests Collection accessors (getters/setters).
-	 *
-	 * @return void
 	 */
 	public function testAccessorMethods() {
 		Connections::config(array('mock-source' => array(
@@ -98,8 +88,6 @@ class CollectionTest extends \lithium\test\Unit {
 	
 	/**
 	 * Tests `Collection::offsetExists`.
-	 *
-	 * @return void
 	 */
 	public function testOffsetExists() {
 		$collection = new DocumentSet();
@@ -111,8 +99,6 @@ class CollectionTest extends \lithium\test\Unit {
 	
 	/**
 	 * Tests `Collection::rewind` and `Collection::current`.
-	 *
-	 * @return void
 	 */
 	public function testNextRewindCurrent() {
 		$collection = new DocumentSet();
@@ -130,8 +116,6 @@ class CollectionTest extends \lithium\test\Unit {
 	
 	/**
 	 * Tests `Collection::each`.
-	 *
-	 * @return void
 	 */
 	public function testEach() {
 		$collection = new DocumentSet();
@@ -153,8 +137,6 @@ class CollectionTest extends \lithium\test\Unit {
 	
 	/**
 	 * Tests `Collection::map`.
-	 *
-	 * @return void
 	 */
 	public function testMap() {
 		$collection = new DocumentSet();
@@ -177,8 +159,6 @@ class CollectionTest extends \lithium\test\Unit {
 	
 	/**
 	 * Tests `Collection::data`.
-	 *
-	 * @return void
 	 */
 	public function testData() {
 		$collection = new DocumentSet();
@@ -193,8 +173,6 @@ class CollectionTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests `Collection::sort`.
-	 *
-	 * @return void
 	 */
 	public function testSort() {
 		$collection = new DocumentSet();
@@ -214,8 +192,6 @@ class CollectionTest extends \lithium\test\Unit {
 	
 	/**
 	 * Tests `Collection::closed` && `Collection::close`.
-	 *
-	 * @return void
 	 */
 	public function testClosed() {
 		$collection = new DocumentSet();
@@ -229,8 +205,6 @@ class CollectionTest extends \lithium\test\Unit {
 	
 	/**
 	 * Tests `Collection::assignTo`.
-	 *
-	 * @return void
 	 */
 	public function testAssignTo() {
 		$parent = new stdClass;
