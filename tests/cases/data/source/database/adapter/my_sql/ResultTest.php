@@ -74,6 +74,7 @@ class ResultTest extends \lithium\test\Unit {
 		$resource = $this->db->connection->query("SELECT id, name FROM companies;");
 		$result = new Result(compact('resource'));
 
+		$this->assertNull($result->prev());
 		$this->assertEqual($this->_mockData[1], $result->next());
 		$this->assertEqual($this->_mockData[2], $result->next());
 		$this->assertEqual($this->_mockData[1], $result->prev());
@@ -113,5 +114,17 @@ class ResultTest extends \lithium\test\Unit {
 		$this->assertEqual($this->_mockData[1], $result->current());
 	}
 
+	public function testKey() {
+		$resource = $this->db->connection->query("SELECT id, name FROM companies;");
+		$result = new Result(compact('resource'));
+
+		$this->assertEqual(0, $result->key());
+		$result->next();
+		$this->assertEqual(1, $result->key());
+		$result->next();
+		$this->assertEqual(2, $result->key());
+		$result->rewind();
+		$this->assertEqual(0, $result->key());
+	}
 
 }

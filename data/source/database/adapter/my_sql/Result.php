@@ -99,12 +99,10 @@ class Result extends \lithium\core\Object implements \Iterator {
 	 * @return array The previous result (or `null` if there is none).
 	 */
 	public function prev() {
-		if (!$this->_resource) {
-			return null;
-		}
-
-		if (isset($this->_cache[--$this->_iterator])) {
-			return $this->_current = $this->_cache[$this->_iterator];
+		if($this->valid()) {
+			if (isset($this->_cache[--$this->_iterator])) {
+				return $this->_current = $this->_cache[$this->_iterator];
+			}
 		}
 	}
 
