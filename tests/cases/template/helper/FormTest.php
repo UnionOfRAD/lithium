@@ -958,7 +958,6 @@ class FormTest extends \lithium\test\Unit {
 	 * Tests that the string template form `Form::field()` can be overridden.
 	 */
 	public function testFieldTemplateOverride() {
-		$result = $this->form->field('name', array('type' => 'text'));
 		$this->form->config(array('templates' => array('field' => '{:label}{:input}{:error}')));
 		$result = $this->form->field('name', array('type' => 'text'));
 		$this->assertTags($result, array(
@@ -1081,7 +1080,7 @@ class FormTest extends \lithium\test\Unit {
 	}
 
     /**
-     * Test that field already defined template strings with special types (e.g. radio, checkbox, 
+     * Test that field already defined template strings with special types (e.g. radio, checkbox,
      * etc.) and passed customize template, and the template must apply.
      */
 	public function testRadioTypeFieldWithCustomTemplate() {
@@ -1095,7 +1094,6 @@ class FormTest extends \lithium\test\Unit {
 			'input' => array('type' => 'radio', 'name' => 'name', 'id' => 'Name')
 		));
 	}
-
 }
 
 ?>

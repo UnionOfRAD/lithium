@@ -398,34 +398,26 @@ class Form extends \lithium\template\Helper {
 		if (is_array($name)) {
 			return $this->_fields($name, $options);
 		}
+		list(, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		$defaults = array(
 			'label' => null,
 			'type' => isset($options['list']) ? 'select' : 'text',
-			'template' => 'field',
+			'template' => $template,
 			'wrap' => array(),
 			'list' => null
 		);
-		$type = isset($options['type']) ? $options['type'] : $defaults['type'];
-		$custom_template = isset($options['template']) ? $options['template'] : null;
-
-		if ($this->_context->strings('field-' . $type)) {
-			$options['template'] = 'field-' . $type;
-		}
-		list(, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		list($options, $field) = $this->_options($defaults, $options);
 
-		if ($options['template'] != $defaults['template']) {
-			$template = $options['template'];
-		}
-		if ($custom_template) {
-			$template = $custom_template;
-		}
-
+		$label = $input = null;
 		$wrap = $options['wrap'];
 		$type = $options['type'];
 		$list = $options['list'];
-		$label = $input = null;
+		$tempalte = $options['template'];
+		$notText = $template == 'field' && $type != 'text';
 
+		if ($notText && $this->_context->strings('field-' . $type)) {
+			$template = 'field-' . $type;
+		}
 		if (($options['label'] === null || $options['label']) && $options['type'] != 'hidden') {
 			if (!$options['label']) {
 				$options['label'] = Inflector::humanize(preg_replace('/[\[\]\.]/', '_', $name));
