@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2011, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -340,7 +340,7 @@ class MySql extends \lithium\data\source\Database {
 	protected function _execute($sql, array $options = array()) {
 		$defaults = array('buffered' => true);
 		$options += $defaults;
-		$this->connection->exec('USE ' . $this->_config['database']);
+		$this->connection->exec("USE  `{$this->_config['database']}`");
 
 		$conn = $this->connection;
 

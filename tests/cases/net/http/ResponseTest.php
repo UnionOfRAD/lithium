@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2011, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -248,7 +248,7 @@ class ResponseTest extends \lithium\test\Unit {
 
 	public function testWithoutChunksAndCommentInBody() {
 		$body = "\n<html>\n    <head>\n        <title>Simple site</title>\n    </head>";
-		$body .= "\n    <body>\n        <!-- (c) 1998 - 2011 Tweakers.net B.V. --> ";
+		$body .= "\n    <body>\n        <!-- (c) 1998 - 2012 Tweakers.net B.V. --> ";
 		$body .= "\n        <h1>Simple site</h1>\n        <p>\n            But awesome";
 		$body .= "\n        </p>\n    </body>\n</html>\n";
 		$message =  $this->_createMessage($body);
@@ -267,7 +267,7 @@ class ResponseTest extends \lithium\test\Unit {
 	}
 
 	public function testWithoutChunksAndCommentInHtmlRoot() {
-		$body = "\n<!doctype html><!-- (c) 1998 - 2011 Tweakers.net B.V. --> \n<html lang=\"nl\"> ";
+		$body = "\n<!doctype html><!-- (c) 1998 - 2012 Tweakers.net B.V. --> \n<html lang=\"nl\"> ";
 		$body .= "\n    <head>\n        <title>Simple site</title>\n    </head>";
 		$body .= "\n    <body>\n        <h1>Simple site</h1>\n        <p>\n            But awesome";
 		$body .= "\n        </p>\n    </body>\n</html>\n";

@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2011, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -144,7 +144,16 @@ abstract class Collection extends \lithium\util\Collection {
 	public function model() {
 		return $this->_model;
 	}
-
+	
+	/**
+	 * Returns the object's parent `Document` object.
+	 *
+	 * @return object
+	 */
+	public function parent() {
+		return $this->_parent;
+	}
+	
 	public function schema($field = null) {
 		$schema = array();
 
@@ -305,6 +314,17 @@ abstract class Collection extends \lithium\util\Collection {
 			$data->assignTo($this);
 		}
 		return $this->_data[] = $data;
+	}
+	
+	/**
+	 * Return's the pointer or resource that is used to load entities from the backend 
+	 * data source that originated this collection. This is useful in many cases for
+	 * additional methods related to debugging queries.
+	 * 
+	 * @return object The pointer or resource from the data source
+	*/
+	public function result() {
+		return $this->_result;
 	}
 
 	/**
