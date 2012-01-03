@@ -98,8 +98,7 @@ class ResultTest extends \lithium\test\Unit {
 		$this->assertEqual($this->_mockData[1], $result->next());
 		$this->assertEqual($this->_mockData[2], $result->next());
 		$result->rewind();
-		$this->assertNull($result->current());
-		$this->assertEqual($this->_mockData[1], $result->next());
+		$this->assertEqual($this->_mockData[1], $result->current());
 	}
 	
 	public function testCurrent() {
