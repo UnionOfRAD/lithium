@@ -736,6 +736,10 @@ class Model extends \lithium\core\StaticObject {
 	 *          be immediately saved. Defaults to `true`. May also be specified as an array, in
 	 *          which case it will replace the default validation rules specified in the
 	 *         `$validates` property of the model.
+	 *        - `'events'` _mixed_: A string or array defining one or more validation _events_.
+	 *          Events are different contexts in which data events can occur, and correspond to the
+	 *          optional `'on'` key in validation rules. They will be passed to the validates()
+	 *          method if `'validate'` is not `false`.
 	 *        - `'whitelist'` _array_: An array of fields that are allowed to be saved to this
 	 *          record.
 	 *
