@@ -8,8 +8,8 @@
 
 namespace lithium\data\source\database\adapter\my_sql;
 
-use \PDO;
-use \PDOStatement;
+use PDO;
+use PDOStatement;
 
 /**
  * This class is a wrapper around the MySQL result returned and can be used to iterate over it.

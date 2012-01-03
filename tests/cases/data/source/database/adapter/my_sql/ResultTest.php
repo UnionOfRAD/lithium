@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\data\source\database\adapter\my_sql;
 
-use \PDOStatement;
+use PDOStatement;
 use lithium\data\Connections;
 use lithium\data\source\database\adapter\MySql;
 use lithium\data\source\database\adapter\my_sql\Result;
