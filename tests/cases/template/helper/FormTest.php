@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2011, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -958,7 +958,6 @@ class FormTest extends \lithium\test\Unit {
 	 * Tests that the string template form `Form::field()` can be overridden.
 	 */
 	public function testFieldTemplateOverride() {
-		$result = $this->form->field('name', array('type' => 'text'));
 		$this->form->config(array('templates' => array('field' => '{:label}{:input}{:error}')));
 		$result = $this->form->field('name', array('type' => 'text'));
 		$this->assertTags($result, array(
@@ -1077,6 +1076,22 @@ class FormTest extends \lithium\test\Unit {
 	public function testLabelIdGeneration() {
 		$this->assertTags($this->form->label('user.name'), array(
 			'label' => array('for' => 'UserName'), 'User Name', '/label'
+		));
+	}
+
+    /**
+     * Test that field already defined template strings with special types (e.g. radio, checkbox,
+     * etc.) and passed customize template, and the template must apply.
+     */
+	public function testRadioTypeFieldWithCustomTemplate() {
+		$result = $this->form->field('name', array(
+			'template' => '<span{:wrap}>{:label}: {:input}{:error}</span>',
+			'type' => 'radio'
+		));
+		$this->assertTags($result, array(
+			'span' => array(),
+			'label' => array('for' => 'Name'), 'Name', '/label', ':',
+			'input' => array('type' => 'radio', 'name' => 'name', 'id' => 'Name')
 		));
 	}
 }

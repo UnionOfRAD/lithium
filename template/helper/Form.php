@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2011, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -398,30 +398,26 @@ class Form extends \lithium\template\Helper {
 		if (is_array($name)) {
 			return $this->_fields($name, $options);
 		}
+		list(, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		$defaults = array(
 			'label' => null,
 			'type' => isset($options['list']) ? 'select' : 'text',
-			'template' => 'field',
+			'template' => $template,
 			'wrap' => array(),
 			'list' => null
 		);
-		$type = isset($options['type']) ? $options['type'] : $defaults['type'];
-
-		if ($this->_context->strings('field-' . $type)) {
-			$options['template'] = 'field-' . $type;
-		}
-		list(, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		list($options, $field) = $this->_options($defaults, $options);
 
-		if ($options['template'] != $defaults['template']) {
-			$template = $options['template'];
-		}
-
+		$label = $input = null;
 		$wrap = $options['wrap'];
 		$type = $options['type'];
 		$list = $options['list'];
-		$label = $input = null;
+		$tempalte = $options['template'];
+		$notText = $template == 'field' && $type != 'text';
 
+		if ($notText && $this->_context->strings('field-' . $type)) {
+			$template = 'field-' . $type;
+		}
 		if (($options['label'] === null || $options['label']) && $options['type'] != 'hidden') {
 			if (!$options['label']) {
 				$options['label'] = Inflector::humanize(preg_replace('/[\[\]\.]/', '_', $name));
