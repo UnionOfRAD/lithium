@@ -16,9 +16,7 @@ class EncryptTest extends \lithium\test\Unit {
 	public $secret = 'foobar';
 
 	/**
-	 * Skip the test if Mcrypt extension is unavailable.
-	 *
-	 * @return void
+	 * Skip the test if the mcrypt extension is unavailable.
 	 */
 	public function skip() {
 		$this->skipIf(!Encrypt::enabled(), 'The Mcrypt extension is not installed or enabled.');
@@ -28,7 +26,7 @@ class EncryptTest extends \lithium\test\Unit {
 		$this->mock = 'lithium\tests\mocks\storage\session\strategy\MockCookieSession';
 		MockCookieSession::reset();
 	}
-
+	
 	public function testConstructException() {
 		$this->expectException('/Encrypt strategy requires a secret key./');
 		$encrypt = new Encrypt();
@@ -96,6 +94,7 @@ class EncryptTest extends \lithium\test\Unit {
 		$result = $encrypt->read($key, array('class' => $this->mock));
 		$this->assertFalse($result);
 	}
+
 }
 
 ?>

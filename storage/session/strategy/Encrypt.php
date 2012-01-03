@@ -47,6 +47,11 @@ use lithium\core\ConfigException;
  * cookies (or generally on the client side) and this class is no exception to the rule. It allows
  * you to store client side data in a more secure way, but 100% security can't be achieved.
  *
+ * Also note that if you provide a secret that is shorter than the maximum key length of the algorithm
+ * used, the secret will be hashed to make it more secure. This also means that if you want to use your
+ * own hashing algorithm, make sure it has the maximum key length of the algorithm used. See the
+ * `Encrypt::_hashSecret()` method for more information on this.
+ *
  * @link http://php.net/manual/en/book.mcrypt.php The mcrypt extension.
  * @link http://www.php.net/manual/en/mcrypt.ciphers.php List of supported ciphers.
  * @link http://www.php.net/manual/en/mcrypt.constants.php List of supported modes.
@@ -162,9 +167,9 @@ class Encrypt extends \lithium\core\Object {
 	 */
 	protected function _encrypt($decrypted = array()) {
 		$cipher = $this->_config['cipher'];
-		$secret = $this->_config['secret'];
 		$mode   = $this->_config['mode'];
 		$vector = $this->_config['vector'];
+		$secret = $this->_hashSecret($this->_config['secret']);
 
 		$encrypted = mcrypt_encrypt($cipher, $secret, serialize($decrypted), $mode, $vector);
 		$data = base64_encode($encrypted) . base64_encode($vector);
@@ -180,9 +185,9 @@ class Encrypt extends \lithium\core\Object {
 	 */
 	protected function _decrypt($encrypted) {
 		$cipher = $this->_config['cipher'];
-		$secret = $this->_config['secret'];
 		$mode   = $this->_config['mode'];
 		$vector = $this->_config['vector'];
+		$secret = $this->_hashSecret($this->_config['secret']);
 
 		$vectorSize = strlen(base64_encode(str_repeat(" ", static::_vectorSize($cipher, $mode))));
 		$vector = base64_decode(substr($encrypted, -$vectorSize));
@@ -192,6 +197,42 @@ class Encrypt extends \lithium\core\Object {
 		$data = unserialize(trim($decrypted));
 
 		return $data;
+	}
+
+	/**
+	 * Hashes the given secret to make it more secure.
+	 *
+	 * This method figures out the appropriate key size for the chosen encryption algorithm and
+	 * then tries to find the best hashing method for it. Note that if the key has already the
+	 * needed length, it is considered to be hashed (secure) already and is therefore not hashed
+	 * again. This lets you change the hashing method in your own code if you like.
+	 *
+	 * The default `MCRYPT_RIJNDAEL_256` key should be 32 byte long and therefore `sha256` is the
+	 * preferred hashing algorithm.
+	 *
+	 * @link http://www.php.net/manual/de/function.mcrypt-get-key-size.php
+	 * @param string $key The possibly too weak key.
+	 * @return string The hashed (raw) key.
+	 */
+	protected function _hashSecret($key) {
+		$size = mcrypt_get_key_size($this->_config['cipher'], $this->_config['mode']);
+		
+		if(strlen($key) >= $size) {
+			return $key;
+		}
+
+		switch($size) {
+			case $size >= 32:
+				$algorithm = 'sha256';
+				break;
+			case $size >= 20:
+				$algorithm = 'sha1';
+				break;
+			default:
+				$algorithm = 'md5';
+		}
+
+		return hash($algorithm, $key, true);
 	}
 
 	/**
