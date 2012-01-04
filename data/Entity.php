@@ -11,6 +11,7 @@ namespace lithium\data;
 use BadMethodCallException;
 use UnexpectedValueException;
 use lithium\data\Collection;
+use lithium\util\Set;
 
 /**
  * `Entity` is a smart data object which represents data such as a row or document in a
@@ -384,7 +385,7 @@ class Entity extends \lithium\core\Object {
 			case 'array':
 				$data = $this->_updated;
 				$rel = array_map(function($obj) { return $obj->data(); }, $this->_relationships);
-				$data = array_merge($data, $rel);
+				$data = Set::merge($data, $rel);
 				$result = Collection::toArray($data, $options);
 			break;
 			default:
