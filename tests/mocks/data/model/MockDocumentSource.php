@@ -17,13 +17,16 @@ class MockDocumentSource extends \lithium\data\Source {
 		'entity' => 'lithium\data\entity\Document',
 		'array' => 'lithium\data\collection\DocumentArray',
 		'set' => 'lithium\data\collection\DocumentSet',
-		'relationship' => 'lithium\data\model\Relationship'
+		'relationship' => 'lithium\data\model\Relationship',
+		'schema' => 'lithium\data\source\mongo_db\Schema'
 	);
 
 	public function connect() {}
 	public function disconnect() {}
 	public function sources($class = null) {}
-	public function describe($entity, array $schema = array(), array $meta = array()) {}
+	public function describe($entity, $schema = array(), array $meta = array()) {
+		return $this->_instance('schema');
+	}
 	public function create($query, array $options = array()) {}
 	public function update($query, array $options = array()) {}
 	public function delete($query, array $options = array()) {}
