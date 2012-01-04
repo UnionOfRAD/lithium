@@ -68,6 +68,11 @@ class PhpTest extends \lithium\test\Unit {
 
 		$result = ini_get('session.cookie_httponly');
 		$this->assertTrue(1, (integer) $result);
+
+		$php = new Php(array(
+			'session.name' => '<>!@#.1234'
+		));
+		$this->assertFalse(is_numeric($php->_config['session.name']));
 	}
 
 	public function testCustomConfiguration() {
