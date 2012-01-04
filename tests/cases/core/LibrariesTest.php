@@ -487,8 +487,8 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testLocateWithDotSyntax() {
-		$expected = 'app\controllers\PagesController';
-		$result = Libraries::locate('controllers', 'app.Pages');
+		$expected = 'lithium\template\helper\Html';
+		$result = Libraries::locate('helper', 'lithium.Html');
 		$this->assertEqual($expected, $result);
 	}
 
