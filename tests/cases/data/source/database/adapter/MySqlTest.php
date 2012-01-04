@@ -253,54 +253,7 @@ class MySqlTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result);
 	}
-	
-	public function testResultSetMovement() {
-		$this->assertTrue($this->db->create(
-			'INSERT INTO companies (name) VALUES (?)',
-			array('Test 1')
-		));
-		$this->assertTrue($this->db->create(
-			'INSERT INTO companies (name) VALUES (?)',
-			array('Test 2')
-		));
-		$this->assertTrue($this->db->create(
-			'INSERT INTO companies (name) VALUES (?)',
-			array('Test 3')
-		));
-		
-		$result = $this->db->read('SELECT * From companies AS Company WHERE name IN ("Test 1", "Test 2", "Test 3")', array(
-			'return' => 'resource'
-		));
-		
-		$row = $result->next();
-		$this->assertEqual('Test 1', $row['name']);
-		
-		$row = $result->next();
-		$this->assertEqual('Test 2', $row['name']);
-		
-		$row = $result->prev();
-		$this->assertEqual('Test 1', $row['name']);
-		
-		$row = $result->next();
-		$this->assertEqual('Test 2', $row['name']);
-		
-		$row = $result->next();
-		$this->assertEqual('Test 3', $row['name']);
-		
-		$row = $result->next();
-		$this->assertNull($row);
-		
-		$result->rewind();
-		$row = $result->next();
-		$this->assertEqual('Test 1', $row['name']);
-		
-		$result->next(); $result->next();
 
-		$row = $result->next();
-		$this->assertNull($row);
-		
-		$this->assertTrue($this->db->delete('DELETE From companies WHERE name IN ("Test 1", "Test 2", "Test 3")'));
-	}
 }
 
 ?>

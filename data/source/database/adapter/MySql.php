@@ -8,8 +8,10 @@
 
 namespace lithium\data\source\database\adapter;
 
+use PDO;
+use PDOStatement;
+use PDOException;
 use lithium\data\model\QueryException;
-use \PDO, \PDOStatement, \PDOException;
 
 /**
  * Extends the `Database` class to implement the necessary SQL-formatting and resultset-fetching
