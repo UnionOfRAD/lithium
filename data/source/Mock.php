@@ -17,6 +17,13 @@ namespace lithium\data\source;
  */
 class Mock extends \lithium\data\Source {
 
+	protected $_classes = array(
+		'entity' => 'lithium\data\Entity',
+		'set' => 'lithium\data\Collection',
+		'relationship' => 'lithium\data\model\Relationship',
+		'schema' => 'lithium\data\Schema'
+	);
+
 	public function connect() {
 		return true;
 	}
@@ -29,8 +36,8 @@ class Mock extends \lithium\data\Source {
 		return array();
 	}
 
-	public function describe($entity, array $schema = array(), array $meta = array()) {
-		return array();
+	public function describe($entity, $schema = array(), array $meta = array()) {
+		return $this->_instance('schema', compact('fields'));
 	}
 
 	public function relationship($class, $type, $name, array $options = array()) {

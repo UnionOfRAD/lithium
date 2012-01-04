@@ -98,7 +98,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * will be assigned here.
 	 *
 	 * @see lithium\data\Schema
-	 * @var object
+	 * @var lithium\data\Schema
 	 */
 	protected $_schema = null;
 
