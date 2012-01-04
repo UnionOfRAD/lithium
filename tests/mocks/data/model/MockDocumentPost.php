@@ -13,17 +13,22 @@ use lithium\data\collection\DocumentSet;
 
 class MockDocumentPost extends \lithium\data\Model {
 
-	protected $_meta = array('connection' => 'mongo');
+	protected $_meta = array(
+		'connection' => 'mongo',
+		'initialized' => true
+	);
 
 	protected static $_connection;
 
 	public static function __init() {}
 
 	public static function schema($field = null) {
-		return array(
+		$schema = parent::schema();
+		$schema->append(array(
 			'_id' => array('type' => 'id'),
 			'foo.bar' => array('type' => 'int')
-		);
+		));
+		return $schema;
 	}
 
 	public function ret($record, $param1 = null, $param2 = null) {
