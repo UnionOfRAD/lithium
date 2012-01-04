@@ -14,6 +14,7 @@ use lithium\data\source\MongoDb;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentArray;
 use lithium\data\source\mongo_db\Exporter;
+use lithium\data\source\mongo_db\Schema;
 
 class ExporterTest extends \lithium\test\Unit {
 
@@ -81,7 +82,6 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertTrue($doc->_id instanceof MongoId);
 
 		$result = Exporter::get('create', $doc->export());
-		$data = $doc->export();
 		$this->assertTrue($result['create']['_id'] instanceof MongoId);
 		$this->assertTrue($result['create']['created'] instanceof MongoDate);
 		$this->assertIdentical(time(), $result['create']['created']->sec);
@@ -143,7 +143,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$config = compact('model', 'schema', 'exists');
 
 		$doc = new Document($config + array('data' => array(
-			'numbers' => new DocumentArray(compact('model', 'exists', 'schema') + array(
+			'numbers' => new DocumentArray($config + array(
 				'data' => array(7, 8, 9), 'pathKey' => 'numbers'
 			)),
 			'objects' => new DocumentArray($config + array('pathKey' => 'objects', 'data' => array(
@@ -155,15 +155,9 @@ class ExporterTest extends \lithium\test\Unit {
 			))),
 			'foo' => 'bar'
 		)));
-
-		$doc->dictionary[] = 'A word';
+		$doc->dictionary[] = 'A Word';
 		$doc->forceArray = 'Word';
-		var_dump('--');
-		var_dump($doc->array);
 		$doc->array = array('one');
-		var_dump('---');
-		var_dump($doc->array);
-		var_dump('--');
 		$doc->field = 'value';
 		$doc->objects[1]->foo = 'dib';
 		$doc->objects[] = array('foo' => 'diz');
@@ -272,7 +266,8 @@ class ExporterTest extends \lithium\test\Unit {
 		$data = array('notifications' => array('foo' => '', 'bar' => '1', 'baz' => 0, 'dib' => 42));
 
 		$schema = new Schema(array('fields' => $this->_schema));
-		$result = Exporter::cast($data, $schema, $model::connection(), compact('model'));
+		$result = $schema->cast(null, $data, compact('model'));
+
 		$this->assertIdentical(false, $result['notifications']->foo);
 		$this->assertIdentical(true, $result['notifications']->bar);
 		$this->assertIdentical(false, $result['notifications']->baz);
@@ -303,7 +298,8 @@ class ExporterTest extends \lithium\test\Unit {
 		$model = $this->_model;
 		$handlers = $this->_handlers;
 		$options = compact('model', 'handlers');
-		$result = Exporter::cast($data, $this->_schema, $model::connection(), $options);
+		$schema = new Schema(array('fields' => $this->_schema));
+		$result = $schema->cast(null, $data, $options);
 
 		$this->assertEqual(array_keys($data), array_keys($result));
 		$this->assertTrue($result['_id'] instanceof MongoId);
@@ -377,6 +373,7 @@ class ExporterTest extends \lithium\test\Unit {
 	public function testSubObjectCastingOnSave() {
 		$model = $this->_model;
 		$model::schema(array(
+			'_id' => array('type' => 'id'),
 			'sub.foo' => array('type' => 'boolean'),
 			'bar' => array('type' => 'boolean')
 		));

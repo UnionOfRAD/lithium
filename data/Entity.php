@@ -244,9 +244,8 @@ class Entity extends \lithium\core\Object {
 
 	public function schema($field = null) {
 		$schema = array();
-
 		switch (true) {
-			case ($this->_schema):
+			case (is_object($this->_schema)):
 				$schema = $this->_schema;
 			break;
 			case ($model = $this->_model):
@@ -371,7 +370,7 @@ class Entity extends \lithium\core\Object {
 		return array_fill_keys(array_keys($this->_updated), true);
 	}
 
-	public function export() {
+	public function export(array $options = array()) {
 		return array(
 			'exists'    => $this->_exists,
 			'data'      => $this->_data,

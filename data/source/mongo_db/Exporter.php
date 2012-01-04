@@ -9,6 +9,7 @@
 namespace lithium\data\source\mongo_db;
 
 use lithium\util\Set;
+use lithium\data\source\mongo_db\Schema;
 
 class Exporter extends \lithium\core\StaticObject {
 
@@ -24,16 +25,6 @@ class Exporter extends \lithium\core\StaticObject {
 		'rename'    => '$rename'
 	);
 
-	protected static $_types = array(
-		'MongoId'      => 'id',
-		'MongoDate'    => 'date',
-		'MongoCode'    => 'code',
-		'MongoBinData' => 'binary',
-		'datetime'     => 'date',
-		'timestamp'    => 'date',
-		'int'          => 'integer'
-	);
-
 	public static function get($type, $export, array $options = array()) {
 		$defaults = array('whitelist' => array());
 		$options += $defaults;
@@ -42,60 +33,6 @@ class Exporter extends \lithium\core\StaticObject {
 			return;
 		}
 		return static::$method($export, array('finalize' => true) + $options);
-	}
-
-	public static function cast($data, $schema, $database, array $options = array()) {
-		$defaults = array(
-			'handlers' => array(),
-			'model' => null,
-			'arrays' => true,
-			'pathKey' => null
-		);
-		$options += $defaults;
-
-		foreach ($data as $key => $value) {
-			$pathKey = $options['pathKey'] ? "{$options['pathKey']}.{$key}" : $key;
-			$data[$key] = static::_cast($schema, $value, $database, compact('pathKey') + $options);
-		}
-		return $data;
-	}
-
-	protected static function _cast($schema, $value, $database, $options) {
-		if (is_object($value)) {
-			return $value;
-		}
-		$pathKey = $options['pathKey'];
-
-		$typeMap = static::$_types;
-		$type = isset($typeMap[$def['type']]) ? $typeMap[$def['type']] : $def['type'];
-
-		$isObject = ($type == 'object');
-		$isArray = (is_array($value) && $def['array'] !== false && !$isObject);
-		$isArray = $def['array'] || $isArray;
-
-		if (isset($options['handlers'][$type]) && $handler = $options['handlers'][$type]) {
-			$value = $isArray ? array_map($handler, (array) $value) : $handler($value);
-		}
-		if (!$options['arrays']) {
-			return $value;
-		}
-
-		if (!is_array($value) && !$def['array']) {
-			return $value;
-		}
-
-		if ($def['array']) {
-			$opts = array('class' => 'array') + $options;
-			$value = ($value === null) ? array() : $value;
-			$value = is_array($value) ? $value : array($value);
-		} elseif (is_array($value)) {
-			$arrayType = !$isObject && (array_keys($value) === range(0, count($value) - 1));
-			$emptyArray = is_array($value) && empty($value);
-			$opts = ($arrayType || $emptyArray) ? array('class' => 'array') + $options : $options;
-		}
-
-		unset($opts['handlers'], $opts['first']);
-		return $database->item($options['model'], $value, compact('pathKey') + $opts);
 	}
 
 	public static function toCommand($changes) {
@@ -117,8 +54,10 @@ class Exporter extends \lithium\core\StaticObject {
 	protected static function _create($export, array $options) {
 		$export += array('data' => array(), 'update' => array(), 'key' => '');
 		$data = Set::merge($export['data'], $export['update']);
+		if (array_keys($data) == range(0, count($data) - 1)) {
+			$data = $export['update'];
+		}
 
-		$result = array('create' => array());
 		$localOpts = array('finalize' => false) + $options;
 
 		foreach ($data as $key => $val) {
@@ -166,9 +105,9 @@ class Exporter extends \lithium\core\StaticObject {
 		foreach ($left as $key => $value) {
 			$result = static::_append($result, "{$path}{$key}", $value, 'remove');
 		}
-		$data = (array) $right + (array) $objects;
 
-		foreach ($data as $key => $value) {
+		$update = $right + $objects;
+		foreach ($update as $key => $value) {
 			$original = $export['data'];
 			$isArray = is_object($value) && get_class($value) == static::$_classes['array'];
 			if ($isArray && isset($original[$key]) && $value->data() != $original[$key]->data()) {
@@ -180,6 +119,7 @@ class Exporter extends \lithium\core\StaticObject {
 			$result = static::_append($result, "{$path}{$key}", $value, 'update');
 		}
 		return array_filter($result);
+
 	}
 
 	/**
@@ -233,7 +173,7 @@ class Exporter extends \lithium\core\StaticObject {
 			$changes[$change][$key] = true;
 			return $changes;
 		}
-		$changes['update'][$key] = static::_create($value->export(), $options);
+		$changes[$change][$key] = static::_create($value->export(), $options);
 		return $changes;
 	}
 }

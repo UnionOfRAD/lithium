@@ -26,7 +26,9 @@ class MockDatabase extends \lithium\data\source\Database {
 
 	public function sources($class = null) {}
 
-	public function describe($entity, array $meta = array()) {}
+	public function describe($entity, $schema = array(), array $meta = array()) {
+		return $this->_instance('schema', array('fields' => array()));
+	}
 
 	public function encoding($encoding = null) {}
 
