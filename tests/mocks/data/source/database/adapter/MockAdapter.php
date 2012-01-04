@@ -62,7 +62,7 @@ class MockAdapter extends \lithium\data\source\Database {
 		return $encoding ?: '';
 	}
 
-	public function describe($entity, array $meta = array()) {
+	public function describe($entity, $schema = array(), array $meta = array()) {
 		return array();
 	}
 
