@@ -67,7 +67,7 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 		return $this->_fields[$field]['type'];
 	}
 
-	public function cast($object, $data) {
+	public function cast($object, $data, array $options = array()) {
 		return $data;
 	}
 

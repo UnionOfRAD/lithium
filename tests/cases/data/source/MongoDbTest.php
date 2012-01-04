@@ -129,8 +129,8 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testDescribe() {
-		$result = $this->db->describe('test');
-		$expected = array();
+		$result = $this->db->describe('test')->fields();
+		$expected = array('_id' => array('type' => 'id'));
 		$this->assertEqual($expected, $result);
 	}
 
@@ -408,7 +408,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		foreach ($list as $id => $title) {
 			$this->assertTrue(is_string($id));
 			$this->assertPattern('/^[a-f0-9]{24}$/', $id);
-			$this->assertNull($title);
+			$this->assertEqual($id, (string) $title);
 		}
 		$model::config(array('title' => 'title'));
 
