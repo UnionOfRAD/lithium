@@ -291,7 +291,8 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertTrue(in_array('lithium\net', $result));
 		$this->assertTrue(in_array('lithium\test', $result));
 		$this->assertTrue(in_array('lithium\util', $result));
-		$this->assertFalse(in_array('lithium\foo', $result));
+		$this->assertFalse(in_array('lithium\readme', $result));
+		$this->assertFalse(in_array('lithium\readme.wiki', $result));
 	}
 
 	public function testFindingClassesWithExclude() {
