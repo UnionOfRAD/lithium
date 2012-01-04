@@ -388,6 +388,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testServiceLocateApp() {
+		$this->skipIf(!preg_match('/app$/', LITHIUM_APP_PATH), 'Running in standalone mode.');
 		$result = Libraries::locate('controllers', 'HelloWorld');
 		$expected = 'app\controllers\HelloWorldController';
 		$this->assertEqual($expected, $result);
