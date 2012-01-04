@@ -126,7 +126,10 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			}
 			if (isset($field['array']) && $field['array'] && ($model = $this->_model)) {
 				$this->_updated[$name] = $model::connection()->item($model, array(), array(
-					'class' => 'array'
+					'class' => 'array',
+					'schema' => $this->schema(),
+					'pathKey' => $this->_pathKey ? $this->_pathKey . '.' . $name : $name,
+					'model' => $this->_model
 				));
 				return $this->_updated[$name];
 			}
@@ -135,14 +138,14 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		return $null;
 	}
 
-	public function export() {
+	public function export(array $options = array()) {
 		foreach ($this->_updated as $key => $val) {
 			if ($val instanceof self) {
 				$path = $this->_pathKey ? "{$this->_pathKey}." : '';
 				$this->_updated[$key]->_pathKey = "{$path}{$key}";
 			}
 		}
-		return parent::export() + array('key' => $this->_pathKey);
+		return parent::export($options) + array('key' => $this->_pathKey);
 	}
 
 	/**
@@ -298,7 +301,8 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 
 		if ($data && $schema = $this->schema()) {
 			$pathKey = $this->_pathKey;
-			$data = $schema->cast($this, $data, compact('pathKey'));
+			$model = $this->_model;
+			$data = $schema->cast($this, $data, compact('pathKey', 'model'));
 		}
 
 		foreach ($data as $key => $value) {

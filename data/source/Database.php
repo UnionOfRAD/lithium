@@ -54,7 +54,8 @@ abstract class Database extends \lithium\data\Source {
 	protected $_classes = array(
 		'entity' => 'lithium\data\entity\Record',
 		'set' => 'lithium\data\collection\RecordSet',
-		'relationship' => 'lithium\data\model\Relationship'
+		'relationship' => 'lithium\data\model\Relationship',
+		'schema' => 'lithium\data\Schema'
 	);
 
 	/**

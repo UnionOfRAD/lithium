@@ -161,7 +161,7 @@ abstract class Source extends \lithium\core\Object {
 	 *         field, containing the following keys:
 	 *         - `'type'`: The field type name
 	 */
-	abstract public function describe($entity, array $schema = array(), array $meta = array());
+	abstract public function describe($entity, $schema = array(), array $meta = array());
 
 	/**
 	 * Defines or modifies the default settings of a relationship between two models.

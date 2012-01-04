@@ -694,17 +694,19 @@ class ModelTest extends \lithium\test\Unit {
 
 		MockPost::$connection = new MockMongoConnection();
 		$schema = MockPost::schema();
-
-		MockPost::overrideSchema($schema + array('nested.value' => array(
-			'type' => 'string',
-			'default' => 'foo'
-		)));
+		$originalSchema = $schema;
+		$schema->append(array(
+			'nested.value' => array(
+				'type' => 'string',
+				'default' => 'foo'
+			)
+		));
 		$this->assertEqual('foo', MockPost::create()->nested->value);
 
 		$data = array('nested' => array('value' => 'bar'));
 		$this->assertEqual('bar', MockPost::create($data)->nested->value);
 
-		MockPost::overrideSchema($schema);
+		MockPost::overrideSchema($originalSchema);
 		MockPost::$connection = null;
 	}
 }

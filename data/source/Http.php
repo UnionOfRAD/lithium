@@ -192,7 +192,7 @@ class Http extends \lithium\data\Source {
 	 * @param array $meta
 	 * @return array - returns an empty array
 	 */
-	public function describe($entity, array $schema = array(), array $meta = array()) {
+	public function describe($entity, $schema = array(), array $meta = array()) {
 		return array();
 	}
 

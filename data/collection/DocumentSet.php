@@ -107,6 +107,7 @@ class DocumentSet extends \lithium\data\Collection {
 			return $null;
 		}
 		if (is_array($data = $this->_data[$offset]) && $model) {
+			$schema = $this->schema() ?: $model::schema();
 			$this->_data[$offset] = $schema->cast($this, $data);
 		}
 		if (isset($this->_data[$offset])) {
@@ -176,13 +177,16 @@ class DocumentSet extends \lithium\data\Collection {
 		if ($this->closed() || !($model = $this->_model)) {
 			return;
 		}
-		$conn = $model::connection();
 
 		if (($data = $data ?: $this->_result->next()) === null) {
 			return $this->close();
 		}
+
+		$schema = $this->schema();
 		$options = array('exists' => true, 'first' => true, 'pathKey' => $this->_pathKey);
-		return $this->_data[] = $conn->cast($this, array($key => $data), $options);
+		$options += compact('model');
+		$result = $schema->cast($this, array($key => $data), $options);
+		return $this->_data[] = reset($result);
 	}
 
 	/**

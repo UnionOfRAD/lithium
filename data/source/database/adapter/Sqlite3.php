@@ -24,7 +24,8 @@ class Sqlite3 extends \lithium\data\source\Database {
 		'entity' => 'lithium\data\entity\Record',
 		'set' => 'lithium\data\collection\RecordSet',
 		'relationship' => 'lithium\data\model\Relationship',
-		'result' => 'lithium\data\source\database\adapter\sqlite3\Result'
+		'result' => 'lithium\data\source\database\adapter\sqlite3\Result',
+		'schema' => 'lithium\data\Schema'
 	);
 
 	/**
@@ -177,11 +178,12 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 *         - `'type'`: The field type name
 	 * @filter This method can be filtered.
 	 */
-	public function describe($entity, array $schema = array(), array $meta = array()) {
+	public function describe($entity, $schema = array(), array $meta = array()) {
 		$params = compact('entity', 'meta');
 		$regex = $this->_regex;
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($regex) {
-			extract($params);
+			$entity = $params['entity'];
+			$meta = $params['meta'];
 
 			$name = $self->invokeMethod('_entityName', array($entity, array('quoted' => true)));
 			$columns = $self->read("PRAGMA table_info({$name})", array('return' => 'array'));
@@ -197,7 +199,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 					'default' => $column['dflt_value']
 				);
 			}
-			return $fields;
+			return $self->invokeMethod('_instance', array('schema', compact('fields')));
 		});
 	}
 
