@@ -20,11 +20,13 @@ class LibrariesTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->_cache = Libraries::cache();
 		Libraries::cache(false);
+		$this->hasApp = preg_match('/app$/', LITHIUM_APP_PATH);
 	}
 
 	public function tearDown() {
 		Libraries::cache(false);
 		Libraries::cache($this->_cache);
+		unset($this->hasApp);
 	}
 
 	public function testNamespaceToFileTranslation() {
@@ -388,6 +390,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testServiceLocateApp() {
+		$this->skipIf(!$this->hasApp, 'Running in standalone mode.');
 		$result = Libraries::locate('controllers', 'HelloWorld');
 		$expected = 'app\controllers\HelloWorldController';
 		$this->assertEqual($expected, $result);
@@ -487,8 +490,8 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testLocateWithDotSyntax() {
-		$expected = 'app\controllers\PagesController';
-		$result = Libraries::locate('controllers', 'app.Pages');
+		$expected = 'lithium\template\helper\Html';
+		$result = Libraries::locate('helper', 'lithium.Html');
 		$this->assertEqual($expected, $result);
 	}
 
