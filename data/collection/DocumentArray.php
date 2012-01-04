@@ -22,6 +22,16 @@ class DocumentArray extends \lithium\data\Collection {
 
 	protected function _init() {
 		parent::_init();
+		$pathKey = $this->_pathKey;
+		$model = $this->_model;
+		if (!$this->_schema && $model) {
+			$this->_schema = $model::schema();
+		}
+		if (is_object($this->_schema)) {
+			foreach ($this->_data as &$data) {
+				$data = $this->_schema->cast($this, $data, compact('pathKey', 'model'));
+			}
+		}
 		$this->_original = $this->_data;
 	}
 
@@ -99,7 +109,8 @@ class DocumentArray extends \lithium\data\Collection {
 
 	public function offsetSet($offset, $data) {
 		if ($schema = $this->schema()) {
-			$data = $schema->cast($this, array($this->_pathKey => $data));
+			$options = array('pathKey' => $this->_pathKey);
+			$data = $schema->cast($this, array($offset => $data), $options);
 			$data = reset($data);
 		}
 		return $offset ? ($this->_data[$offset] = $data) : ($this->_data[] = $data);

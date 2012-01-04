@@ -358,7 +358,11 @@ class Model extends \lithium\core\StaticObject {
 		$local = compact('class', 'name') + $options + $self->_meta;
 		$self->_meta = ($local + $source['meta'] + $meta);
 		$self->_meta['initialized'] = false;
-		$self->_schema += $schema + $source['schema'];
+
+		if ($self->_schema) {
+			$self->schema()->append($schema + $source['schema']);
+		}
+
 
 		$self->_finders += $source['finders'] + $self->_findFilters();
 		static::_relations();
@@ -605,10 +609,11 @@ class Model extends \lithium\core\StaticObject {
 		if ($field === false) {
 			return $self->_schema = null;
 		}
-		if (!is_object($self->_schema) && $connection = static::connection()) {
-			$self->_schema = $connection->describe($self::meta('source'), $self->_schema, $self->_meta);
-			$key = (array) self::meta('key');
 
+		$source = $self::meta('source');
+		if (!is_object($self->_schema)) {
+			$self->_schema = static::connection()->describe($source, $self->_schema, $self->_meta);
+			$key = (array) self::meta('key');
 			if ($self->_schema && $self->_schema->fields() && !$self->_schema->has($key)) {
 				$message = 'Missing key `' . implode('`, `', $key) . '` from schema.';
 				throw new ConfigException($message);
