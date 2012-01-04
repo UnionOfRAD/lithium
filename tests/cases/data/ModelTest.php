@@ -387,6 +387,95 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertIdentical(array(), $post->errors());
 	}
 
+	public function testValidatesCustomEventFalse() {
+		$post = MockPostForValidates::create();
+		$events = 'custom_event';
+
+		$result = $post->validates(compact('events'));
+		$this->assertTrue($result === false);
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
+
+		$expected = array(
+			'title' => array('please enter a title'),
+			'email' => array(
+				'email is empty',
+				'email is not valid',
+				'email is not in 1st list'
+				)
+		);
+		$result = $post->errors();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testValidatesCustomEventValid() {
+		$post = MockPostForValidates::create(array(
+			'title' => 'new post', 'email' => 'something@test.com'
+		));
+
+		$events = 'custom_event';
+
+		$result = $post->validates(compact('events'));
+		$this->assertTrue($result === true);
+		$result = $post->errors();
+		$this->assertTrue(empty($result));
+	}
+
+	public function testValidatesCustomEventsFalse() {
+		$post = MockPostForValidates::create();
+
+		$events = array('custom_event','another_custom_event');
+
+		$result = $post->validates(compact('events'));
+		$this->assertTrue($result === false);
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
+
+		$expected = array(
+			'title' => array('please enter a title'),
+			'email' => array(
+				'email is empty',
+				'email is not valid',
+				'email is not in 1st list',
+				'email is not in 2nd list'
+				)
+		);
+		$result = $post->errors();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testValidatesCustomEventsFirstValid() {
+		$post = MockPostForValidates::create(array(
+			'title' => 'new post', 'email' => 'foo@bar.com'
+		));
+
+		$events = array('custom_event','another_custom_event');
+
+		$result = $post->validates(compact('events'));
+		$this->assertTrue($result === false);
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
+
+		$expected = array(
+			'email' => array('email is not in 2nd list')
+		);
+		$result = $post->errors();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testValidatesCustomEventsValid() {
+		$post = MockPostForValidates::create(array(
+			'title' => 'new post', 'email' => 'something@test.com'
+		));
+
+		$events = array('custom_event','another_custom_event');
+
+		$result = $post->validates(compact('events'));
+		$this->assertTrue($result === true);
+		$result = $post->errors();
+		$this->assertTrue(empty($result));
+	}
+
 	public function testDefaultValuesFromSchema() {
 		$creator = MockCreator::create();
 		$expected = array(
@@ -476,6 +565,44 @@ class ModelTest extends \lithium\test\Unit {
 		)));
 
 		$this->assertIdentical(false, $result);
+	}
+
+	public function testSaveFailedWithValidationByModelDefinition() {
+		$post = MockPostForValidates::create();
+
+		$result = $post->save();
+		$this->assertTrue($result === false);
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
+
+		$expected = array(
+			'title' => array('please enter a title'),
+			'email' => array('email is empty', 'email is not valid')
+		);
+		$result = $post->errors();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSaveFailedWithValidationByModelDefinitionAndTriggeredCustomEvents() {
+		$post = MockPostForValidates::create();
+		$events = array('custom_event','another_custom_event');
+
+		$result = $post->save(null,compact('events'));
+		$this->assertTrue($result === false);
+		$result = $post->errors();
+		$this->assertTrue(!empty($result));
+
+		$expected = array(
+			'title' => array('please enter a title'),
+			'email' => array(
+				'email is empty',
+				'email is not valid',
+				'email is not in 1st list',
+				'email is not in 2nd list'
+				)
+		);
+		$result = $post->errors();
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testImplicitKeyFind() {
