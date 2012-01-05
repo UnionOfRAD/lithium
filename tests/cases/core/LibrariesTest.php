@@ -119,8 +119,11 @@ class LibrariesTest extends \lithium\test\Unit {
 
 		$result = Libraries::get();
 		$this->assertTrue(isset($result['lithium']));
-		$this->assertTrue(isset($result['app']));
 		$this->assertEqual($expected, $result['lithium']);
+		
+		if ($this->hasApp) {
+			$this->assertTrue(isset($result['app']));
+		}
 	}
 
 	/**
