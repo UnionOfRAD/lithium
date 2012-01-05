@@ -112,6 +112,11 @@ class LibrariesTest extends \lithium\test\Unit {
 			'default' => false
 		);
 
+		if (!$this->hasApp) {
+			$expected['resources'] = str_replace('\\', '/', realpath(realpath(LITHIUM_LIBRARY_PATH) . '/lithium/resources'));
+			$expected['default'] = true;
+		}
+
 		$this->assertEqual($expected, $result);
 		$this->assertNull(Libraries::get('foo'));
 
