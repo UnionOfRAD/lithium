@@ -16,7 +16,7 @@ use lithium\data\source\database\adapter\my_sql\Result;
 class ResultTest extends \lithium\test\Unit {
 
 	public $db = null;
-	
+
 	protected $_mockData = array(
 		1 => array(1, 'Foo Company'),
 		2 => array(2, 'Bar Company')
@@ -35,13 +35,13 @@ class ResultTest extends \lithium\test\Unit {
 
 		$this->db = new MySql($dbConfig);
 	}
-	
+
 	public function setUp() {
 		$lithium = LITHIUM_LIBRARY_PATH . '/lithium';
 		$sqlFile = $lithium . '/tests/mocks/data/source/database/adapter/mysql_companies.sql';
 		$sql = file_get_contents($sqlFile);
 		$this->db->read($sql, array('return' => 'resource'));
-		
+
 		foreach($this->_mockData as $entry) {
 			$sql = "INSERT INTO companies (name) VALUES ('".$entry[1]."')";
 			$this->db->read($sql, array('return' => 'resource'));
@@ -51,25 +51,25 @@ class ResultTest extends \lithium\test\Unit {
 	public function tearDown() {
 		$this->db->read('DROP TABLE companies', array('return' => 'resource'));
 	}
-	
+
 	public function testConstruct() {
 		$result = new Result();
 		$this->assertNull($result->resource());
-		
+
 		$resource = new PDOStatement;
 		$result = new Result(compact('resource'));
 		$this->assertTrue($result->resource() instanceof PDOStatement);
 	}
-	
+
 	public function testNext() {
 		$resource = $this->db->connection->query("SELECT id, name FROM companies;");
 		$result = new Result(compact('resource'));
-		
+
 		$this->assertEqual($this->_mockData[1], $result->next());
 		$this->assertEqual($this->_mockData[2], $result->next());
 		$this->assertNull($result->next());
 	}
-	
+
 	public function testPrev() {
 		$resource = $this->db->connection->query("SELECT id, name FROM companies;");
 		$result = new Result(compact('resource'));
@@ -82,16 +82,16 @@ class ResultTest extends \lithium\test\Unit {
 		$this->assertEqual($this->_mockData[1], $result->prev());
 		$this->assertNull($result->prev());
 	}
-	
+
 	public function testValid() {
 		$result = new Result();
 		$this->assertFalse($result->valid());
-		
+
 		$resource = $this->db->connection->query("SELECT id, name FROM companies;");
 		$result = new Result(compact('resource'));
 		$this->assertTrue($result->valid());
 	}
-	
+
 	public function testRewind() {
 		$resource = $this->db->connection->query("SELECT id, name FROM companies;");
 		$result = new Result(compact('resource'));
@@ -101,7 +101,7 @@ class ResultTest extends \lithium\test\Unit {
 		$result->rewind();
 		$this->assertEqual($this->_mockData[1], $result->current());
 	}
-	
+
 	public function testCurrent() {
 		$resource = $this->db->connection->query("SELECT id, name FROM companies;");
 		$result = new Result(compact('resource'));
@@ -125,6 +125,49 @@ class ResultTest extends \lithium\test\Unit {
 		$this->assertEqual(2, $result->key());
 		$result->rewind();
 		$this->assertEqual(0, $result->key());
+	}
+
+	/**
+	 * Test that a Result object can be used in a foreach loop
+	 */
+	public function testResultForeach() {
+
+		$result = $this->db->read('SELECT name, active FROM companies', array(
+			'return' => 'resource'
+		));
+
+		$rows = array();
+		foreach($result as $row) {
+			$rows[] = $row;
+		}
+
+		$expected = array(
+			array('Foo Company', NULL),
+			array('Bar Company', NULL),
+		);
+
+		$this->assertEqual($expected, $rows);
+	}
+
+	/**
+	 * Test that an empty Result object can be used in a foreach loop
+	 */
+	public function testEmptyResultForeach() {
+
+		$this->db->delete('DELETE FROM companies');
+
+		$result = $this->db->read('SELECT name, active FROM companies', array(
+			'return' => 'resource'
+		));
+
+		$rows = array();
+		foreach($result as $row) {
+			$rows[] = $row;
+		}
+
+		$expected = array();
+
+		$this->assertEqual($expected, $rows);
 	}
 
 }

@@ -72,7 +72,12 @@ class Result extends \lithium\core\Object implements \Iterator {
 	 * @return boolean Returns whether the result is valid or not.
 	 */
 	public function valid() {
-		return $this->_resource || !empty($this->_cache);
+		if ($this->_resource) {
+			$rowCount = $this->_resource->rowCount();
+			return $rowCount > 0 && $this->_iterator <= $rowCount;
+		}
+
+		return false;
 	}
 
 	/**
@@ -81,6 +86,11 @@ class Result extends \lithium\core\Object implements \Iterator {
 	 * @return array The current result (or `null` if there is none).
 	 */
 	public function current() {
+
+		if (!$this->_current) {
+			$this->next();
+		}
+
 		return $this->_current;
 	}
 
@@ -99,7 +109,7 @@ class Result extends \lithium\core\Object implements \Iterator {
 	 * @return array The previous result (or `null` if there is none).
 	 */
 	public function prev() {
-		if($this->valid()) {
+		if(!empty($this->_cache)) {
 			if (isset($this->_cache[--$this->_iterator])) {
 				return $this->_current = $this->_cache[$this->_iterator];
 			}
@@ -136,7 +146,7 @@ class Result extends \lithium\core\Object implements \Iterator {
 	 * Fetches the result from the resource and caches it.
 	 *
 	 * @return array the fetched result (or `false` if it is not valid).
-	 */	
+	 */
 	protected function _fetchFromResource() {
 		if ($this->_resource instanceof PDOStatement
 				&& $this->_iterator < $this->_resource->rowCount()
