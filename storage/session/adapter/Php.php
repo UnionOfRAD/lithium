@@ -11,7 +11,6 @@ namespace lithium\storage\session\adapter;
 use lithium\util\Set;
 use RuntimeException;
 use lithium\core\ConfigException;
-use lithium\util\Inflector;
 
 /**
  * A minimal adapter to interface with native PHP sessions.
@@ -30,7 +29,7 @@ class Php extends \lithium\core\Object {
 	 */
 	protected $_defaults = array(
 		'session.cookie_lifetime' => '0',
-		'session.cookie_httponly' => true,
+		'session.cookie_httponly' => true
 	);
 
 	/**
@@ -42,7 +41,9 @@ class Php extends \lithium\core\Object {
 	 *        the `session.*` PHP ini settings here as key/value pairs.
 	 */
 	public function __construct(array $config = array()) {
-		$this->_defaults['session.name'] = basename(LITHIUM_APP_PATH);
+		if (empty($config['session.name'])) {
+			$config['session.name'] = basename(LITHIUM_APP_PATH);
+		}
 		parent::__construct($config + $this->_defaults);
 	}
 
@@ -56,11 +57,6 @@ class Php extends \lithium\core\Object {
 		$config = $this->_config;
 		unset($config['adapter'], $config['strategies'], $config['filters'], $config['init']);
 
-		$config['session.name'] = Inflector::slug($config['session.name']);
-		if (is_numeric($config['session.name'])) {
-			$config['session.name'] = 'lithium' . $config['session.name'];
-		}
-
 		foreach ($config as $key => $value) {
 			if (strpos($key, 'session.') === false) {
 				continue;
@@ -69,7 +65,6 @@ class Php extends \lithium\core\Object {
 				throw new ConfigException("Could not initialize the session.");
 			}
 		}
-		$this->_config = $config;
 	}
 
 	/**
