@@ -87,10 +87,12 @@ class LibrariesTest extends \lithium\test\Unit {
 		$all = Libraries::find('lithium', array('recursive' => true));
 		$result = array_values(preg_grep('/^lithium\\\\tests\\\\cases\\\\/', $all));
 		$this->assertIdentical($tests, $result);
-
-		$tests = Libraries::find('app', array('recursive' => true, 'path' => '/tests/cases'));
-		$result = preg_grep('/^app\\\\tests\\\\cases\\\\/', $tests);
-		$this->assertIdentical($tests, $result);
+		
+		if ($this->hasApp) {
+			$tests = Libraries::find('app', array('recursive' => true, 'path' => '/tests/cases'));
+			$result = preg_grep('/^app\\\\tests\\\\cases\\\\/', $tests);
+			$this->assertIdentical($tests, $result);
+		}
 	}
 
 	/**
@@ -117,8 +119,11 @@ class LibrariesTest extends \lithium\test\Unit {
 
 		$result = Libraries::get();
 		$this->assertTrue(isset($result['lithium']));
-		$this->assertTrue(isset($result['app']));
 		$this->assertEqual($expected, $result['lithium']);
+		
+		if ($this->hasApp) {
+			$this->assertTrue(isset($result['app']));
+		}
 	}
 
 	/**
