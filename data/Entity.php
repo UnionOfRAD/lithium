@@ -177,25 +177,35 @@ class Entity extends \lithium\core\Object {
 		return isset($this->_updated[$name]);
 	}
 
-	/**
-	 * Magic method that allows calling of model methods on this record instance, i.e.:
-	 * {{{
-	 * $record->validates();
-	 * }}}
-	 *
-	 * @param string $method
-	 * @param array $params
-	 * @return mixed
-	 */
-	public function __call($method, $params) {
-		if (!($model = $this->_model) || !method_exists($model, $method)) {
-			$message = "No model bound or unhandled method call `{$method}`.";
-			throw new BadMethodCallException($message);
-		}
-		array_unshift($params, $this);
-		$class = $model::invokeMethod('_object');
-		return call_user_func_array(array(&$class, $method), $params);
-	}
+    /**
+     * Magic method that allows calling of model methods on this record instance, i.e.:
+     * {{{
+     * $record->validates();
+     * }}}
+     *
+     * @see lithium\data\Model::instanceMethods
+     * @param string $method
+     * @param array $params
+     * @return mixed
+     */
+    public function __call($method, $params) {
+        if ($model = $this->_model) {
+            $callback = false;
+            $methods = $model::instanceMethods();
+            if (method_exists($model, $method)) {
+                $class = $model::invokeMethod('_object');
+                $callback = array(&$class, $method);
+            } elseif (isset($methods[$method]) && is_callable($methods[$method])) {
+                $callback = $methods[$method];
+            }
+            if ($callback) {
+                array_unshift($params, $this);
+                return call_user_func_array($callback, $params);
+            }
+        }
+        $message = "No model bound or unhandled method call `{$method}`.";
+        throw new BadMethodCallException($message);
+    }
 
 	/**
 	 * Allows several properties to be assigned at once, i.e.:
