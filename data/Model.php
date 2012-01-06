@@ -295,11 +295,11 @@ class Model extends \lithium\core\StaticObject {
 	protected static $_baseClasses = array(__CLASS__ => true);
 
 	/**
-     * Stores all custom instance methods created by `Model::instanceMethods`.
-     *
-     * @var array
-     */
-    protected static $_instanceMethods = array();
+	 * Stores all custom instance methods created by `Model::instanceMethods`.
+	 *
+	 * @var array
+	 */
+	protected static $_instanceMethods = array();
 
 	/**
 	 * Sets default connection options and connects default finders.
@@ -692,28 +692,28 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-     * Getter and setter for custom instance methods. This is used in `Entity::__call`.
-     *
-     * {{{
-     * Model::instanceMethods(array(
-     *     'method_name' => array('Class', 'method'),
-     *     'another_method' => array($object, 'method')
-     * ));
-     * }}}
-     *
-     * @param array $methods
-     * @return array
-     */
-    public static function instanceMethods(array $methods = null) {
-        $class = get_called_class();
-        if (!isset(static::$_instanceMethods[$class])) {
-            static::$_instanceMethods[$class] = array();
-        }
-        if (!is_null($methods)) {
-            static::$_instanceMethods[$class] = $methods + static::$_instanceMethods[$class];
-        }
-        return static::$_instanceMethods[$class];
-    }
+	 * Getter and setter for custom instance methods. This is used in `Entity::__call`.
+	 *
+	 * {{{
+	 * Model::instanceMethods(array(
+	 *     'method_name' => array('Class', 'method'),
+	 *     'another_method' => array($object, 'method')
+	 * ));
+	 * }}}
+	 *
+	 * @param array $methods
+	 * @return array
+	 */
+	public static function instanceMethods(array $methods = null) {
+		$class = get_called_class();
+		if (!isset(static::$_instanceMethods[$class])) {
+			static::$_instanceMethods[$class] = array();
+		}
+		if (!is_null($methods)) {
+			static::$_instanceMethods[$class] = $methods + static::$_instanceMethods[$class];
+		}
+		return static::$_instanceMethods[$class];
+	}
 
 	/**
 	 * An instance method (called on record and document objects) to create or update the record or
