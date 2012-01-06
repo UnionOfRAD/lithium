@@ -246,7 +246,7 @@ class Validator extends \lithium\core\StaticObject {
 			'boolean'      => function($value) {
 				$bool = is_bool($value);
 				$filter = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-				return ($bool || $filter !== null);
+				return ($bool || $filter !== null || empty($value));
 			},
 			'decimal' => function($value, $format = null, array $options = array()) {
 				if (isset($options['precision'])) {
