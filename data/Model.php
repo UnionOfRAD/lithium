@@ -697,7 +697,8 @@ class Model extends \lithium\core\StaticObject {
 	 * {{{
 	 * Model::instanceMethods(array(
 	 *     'method_name' => array('Class', 'method'),
-	 *     'another_method' => array($object, 'method')
+	 *     'another_method' => array($object, 'method'),
+	 *     'closure_callback' => function($entity) {}
 	 * ));
 	 * }}}
 	 *

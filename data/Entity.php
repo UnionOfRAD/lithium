@@ -190,17 +190,15 @@ class Entity extends \lithium\core\Object {
 	 */
 	public function __call($method, $params) {
 		if ($model = $this->_model) {
-			$callback = false;
 			$methods = $model::instanceMethods();
+			array_unshift($params, $this);
+
 			if (method_exists($model, $method)) {
 				$class = $model::invokeMethod('_object');
-				$callback = array(&$class, $method);
-			} elseif (isset($methods[$method]) && is_callable($methods[$method])) {
-				$callback = $methods[$method];
+				return call_user_func_array(array(&$class, $method), $params);
 			}
-			if ($callback) {
-				array_unshift($params, $this);
-				return call_user_func_array($callback, $params);
+			if (isset($methods[$method]) && is_callable($methods[$method])) {
+				return call_user_func_array($methods[$method], $params);
 			}
 		}
 		$message = "No model bound or unhandled method call `{$method}`.";
