@@ -88,6 +88,26 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual('mock-source', MockPost::meta('connection'));
 	}
 
+	public function testInstanceMethods() {
+	    $methods = MockPost::instanceMethods();
+	    $this->assertTrue(empty($methods));
+
+	    MockPost::instanceMethods(array(
+	       'first' => array('lithium\tests\mocks\data\source\MockMongoPost', 'testInstanceMethods'),
+	       'second' => function($entity) {}
+	    ));
+
+	    $methods = MockPost::instanceMethods();
+	    $this->assertEqual(2, count($methods));
+
+	    MockPost::instanceMethods(array(
+	       'third' => function($entity) {}
+	    ));
+
+	    $methods = MockPost::instanceMethods();
+	    $this->assertEqual(3, count($methods));
+	}
+
 	public function testMetaInformation() {
 		$expected = array(
 			'class'       => 'lithium\tests\mocks\data\MockPost',
