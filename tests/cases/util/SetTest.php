@@ -1110,10 +1110,12 @@ class SetTest extends \lithium\test\Unit {
 	}
 
 	public function testCheck() {
-		$set = array(
-			'My Index 1' => array('First' => 'The first item')
-		);
-		$this->assertTrue(Set::check($set, 'My Index 1.First'));
+		$set = array('My Index 1' => array(
+			'First' => 'The first item'
+		));
+		$result = Set::check($set, 'My Index 1.First');
+		$this->assertTrue($result);
+
 		$this->assertTrue(Set::check($set, 'My Index 1'));
 		$this->assertTrue(Set::check($set, array()));
 
