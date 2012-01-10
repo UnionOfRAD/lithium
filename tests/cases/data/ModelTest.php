@@ -89,23 +89,23 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testInstanceMethods() {
-	    $methods = MockPost::instanceMethods();
-	    $this->assertTrue(empty($methods));
+		$methods = MockPost::instanceMethods();
+		$this->assertTrue(empty($methods));
 
-	    MockPost::instanceMethods(array(
-	       'first' => array('lithium\tests\mocks\data\source\MockMongoPost', 'testInstanceMethods'),
-	       'second' => function($entity) {}
-	    ));
+		MockPost::instanceMethods(array(
+			'first' => array('lithium\tests\mocks\data\source\MockMongoPost', 'testInstanceMethods'),
+			'second' => function($entity) {}
+		));
 
-	    $methods = MockPost::instanceMethods();
-	    $this->assertEqual(2, count($methods));
+		$methods = MockPost::instanceMethods();
+		$this->assertEqual(2, count($methods));
 
-	    MockPost::instanceMethods(array(
-	       'third' => function($entity) {}
-	    ));
+		MockPost::instanceMethods(array(
+			'third' => function($entity) {}
+		));
 
-	    $methods = MockPost::instanceMethods();
-	    $this->assertEqual(3, count($methods));
+		$methods = MockPost::instanceMethods();
+		$this->assertEqual(3, count($methods));
 	}
 
 	public function testMetaInformation() {
@@ -142,11 +142,23 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testSchemaLoading() {
+		
+		$meta = array(
+			'title' => null,
+			'class' => null,
+			'source' => null,
+			'connection' => 'mock-source',
+			'initialized' => false
+		);
 		$result = MockPost::schema();
 		$this->assertTrue($result);
 
+		MockPost::connection()->count = 0;
 		MockPost::resetSchema();
+		MockPost::resetMeta($meta);
 		$this->assertEqual($result, MockPost::schema());
+		$this->assertEqual(1, MockPost::connection()->count);
+		MockPost::resetMeta($meta);
 	}
 
 	public function testFieldIntrospection() {

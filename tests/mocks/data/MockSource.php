@@ -18,6 +18,8 @@ class MockSource extends \lithium\data\Source {
 		'relationship' => 'lithium\data\model\Relationship'
 	);
 
+	public $count = 0;
+
 	private $_mockPosts = array(
 		'id' => array('type' => 'int', 'length' => '10', 'null' => false, 'default' => null),
 		'user_id' => array(
@@ -98,6 +100,7 @@ class MockSource extends \lithium\data\Source {
 	}
 
 	public function describe($entity, array $meta = array()) {
+		$this->count++;
 		$var = "_" . Inflector::camelize($entity, false);
 		if ($this->{$var}) {
 			return $this->{$var};

@@ -18,6 +18,10 @@ class MockPost extends \lithium\tests\mocks\data\MockBase {
 		static::_object()->_schema = array();
 	}
 
+	public static function resetMeta($config = array()) {
+		static::_object()->_meta = $config + static::_object()->_meta;
+	}
+
 	public static function overrideSchema(array $schema = array()) {
 		static::_object()->_schema = $schema;
 	}
