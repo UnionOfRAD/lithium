@@ -270,15 +270,16 @@ class MongoDb extends \lithium\data\Source {
 	/**
 	 * Disconnect from the Mongo server.
 	 *
-	 * @return boolean True on successful disconnect, false otherwise.
+	 * Don't call the Mongo->close() method. The driver documentation states this should not
+	 * be necessary since it auto disconnects when out of scope.
+	 * With version 1.2.7, when using replica sets, close() can cause a segmentation fault.
+	 *
+	 * @return boolean True
 	 */
 	public function disconnect() {
 		if ($this->server && $this->server->connected) {
-			try {
-				$this->_isConnected = !$this->server->close();
-			} catch (Exception $e) {}
+			$this->_isConnected = false;
 			unset($this->connection, $this->server);
-			return !$this->_isConnected;
 		}
 		return true;
 	}
