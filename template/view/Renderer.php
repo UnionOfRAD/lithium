@@ -305,9 +305,6 @@ abstract class Renderer extends \lithium\core\Object {
 			$config += array('context' => $this);
 			return $this->_helpers[$name] = Libraries::instance('helper', ucfirst($name), $config);
 		} catch (ClassNotFoundException $e) {
-			if (ob_get_length()) {
-				ob_end_clean();
-			}
 			throw new RuntimeException("Helper `{$name}` not found.");
 		}
 	}

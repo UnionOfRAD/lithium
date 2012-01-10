@@ -236,10 +236,10 @@ class RouterTest extends \lithium\test\Unit {
 		$ex = "No parameter match found for URL `(";
 		$ex .= "'controller' => 'posts', 'action' => 'view', 'id' => '4bbf25bd8ead0e5180130000')`.";
 		$this->expectException($ex);
-
 		$result = Router::match(array(
 			'controller' => 'posts', 'action' => 'view', 'id' => '4bbf25bd8ead0e5180130000'
 		));
+		$this->assertFalse(ob_get_length());
 	}
 
 	public function testShorthandParameterMatching() {
