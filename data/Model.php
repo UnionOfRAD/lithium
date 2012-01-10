@@ -498,13 +498,15 @@ class Model extends \lithium\core\StaticObject {
 		if (is_array($key)) {
 			$self->_meta = $key + $self->_meta;
 		}
+		if ($self->_meta['source'] === null) {
+			$self->_meta['source'] = Inflector::tableize($self->_meta['name']);
+		}
+		if ($key == 'source') {
+			return $self->_meta['source'];
+		}
 
 		if (!$self->_meta['initialized']) {
 			$self->_meta['initialized'] = true;
-
-			if ($self->_meta['source'] === null) {
-				$self->_meta['source'] = Inflector::tableize($self->_meta['name']);
-			}
 			$titleKeys = array('title', 'name');
 
 			if (isset($self->_meta['key'])) {
@@ -600,8 +602,8 @@ class Model extends \lithium\core\StaticObject {
 	 * @return array
 	 */
 	public static function schema($field = null) {
-		$self = static::_object();
 
+		$self = static::_object();
 		if ($field === false) {
 			return $self->_schema = array();
 		}
