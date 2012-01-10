@@ -253,6 +253,9 @@ class Router extends \lithium\core\StaticObject {
 	}
 
 	protected static function _formatError($url) {
+		if (ob_get_length()) {
+			ob_end_clean();
+		}
 		$match = array("\n", 'array (', ',)', '=> NULL', '(  \'', ',  ');
 		$replace = array('', '(', ')', '=> null', '(\'', ', ');
 		return str_replace($match, $replace, var_export($url, true));
