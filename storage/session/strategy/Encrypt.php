@@ -22,7 +22,7 @@ use lithium\core\ConfigException;
  * {{{
  * Session::config(array('default' => array(
  *	'adapter' => 'Cookie',
- *	'strategies' => array('Encrypt' => array('secret' => 'foobar'))
+ *	'strategies' => array('Encrypt' => array('secret' => 'f00bar$l1thium'))
  * )));
  * }}}
  *
@@ -36,9 +36,9 @@ use lithium\core\ConfigException;
  * Session::config(array('default' => array(
  *	'adapter' => 'Cookie',
  *	'strategies' => array('Encrypt' => array(
- *		'cipher' => MCRYPT_RIJNDAEL_128,
+ *		'cipher' => MCRYPT_RIJNDAEL_256,
  *		'mode' 	 => MCRYPT_MODE_ECB, // Don't use ECB when you don't have to!
- *		'secret'	 => 'foobar'
+ *		'secret'	 => 'f00bar$l1thium'
  *	))
  * )));
  * }}}
@@ -47,10 +47,10 @@ use lithium\core\ConfigException;
  * cookies (or generally on the client side) and this class is no exception to the rule. It allows
  * you to store client side data in a more secure way, but 100% security can't be achieved.
  *
- * Also note that if you provide a secret that is shorter than the maximum key length of the algorithm
- * used, the secret will be hashed to make it more secure. This also means that if you want to use your
- * own hashing algorithm, make sure it has the maximum key length of the algorithm used. See the
- * `Encrypt::_hashSecret()` method for more information on this.
+ * Also note that if you provide a secret that is shorter than the maximum key length of the
+ * algorithm used, the secret will be hashed to make it more secure. This also means that if you
+ * want to use your own hashing algorithm, make sure it has the maximum key length of the algorithm
+ * used. See the `Encrypt::_hashSecret()` method for more information on this.
  *
  * @link http://php.net/manual/en/book.mcrypt.php The mcrypt extension.
  * @link http://www.php.net/manual/en/mcrypt.ciphers.php List of supported ciphers.
@@ -64,6 +64,19 @@ class Encrypt extends \lithium\core\Object {
 	protected static $_vector = null;
 
 	/**
+	 * Holds the crypto resource after initialization.
+	 */
+	protected static $_resource = null;
+
+	/**
+	 * Default configuration.
+	 */
+	protected $_defaults = array(
+		'cipher' => MCRYPT_RIJNDAEL_128,
+		'mode' => MCRYPT_MODE_CBC
+	);
+
+	/**
 	 * Constructor.
 	 *
 	 * @param array $config Configuration array. You can override the default cipher and mode.
@@ -75,15 +88,22 @@ class Encrypt extends \lithium\core\Object {
 		if (!isset($config['secret'])) {
 			throw new ConfigException("Encrypt strategy requires a secret key.");
 		}
-		$defaults = array(
-			'cipher' => MCRYPT_RIJNDAEL_256,
-			'mode' => MCRYPT_MODE_CBC
-		);
-		parent::__construct($config + $defaults);
+		parent::__construct($config + $this->_defaults);
 
 		$cipher = $this->_config['cipher'];
 		$mode = $this->_config['mode'];
-		$this->_config['vector'] = static::_vector($cipher, $mode);
+
+		static::$_resource = mcrypt_module_open($cipher, '', $mode, '');
+		$this->_config['vector'] = static::_vector();
+	}
+
+	/**
+	 * Destructor.
+	 *
+	 * Closes the crypto resource when it is no longer needed.
+	 */
+	public function __destruct() {
+		mcrypt_module_close(static::$_resource);
 	}
 
 	/**
@@ -151,15 +171,6 @@ class Encrypt extends \lithium\core\Object {
 	}
 
 	/**
-	 * Determines if the Mcrypt extension has been installed.
-	 *
-	 * @return boolean `true` if enabled, `false` otherwise
-	 */
-	public static function enabled() {
-		return extension_loaded('mcrypt');
-	}
-
-	/**
 	 * Serialize and encrypt a given data array.
 	 *
 	 * @param array $decrypted The cleartext data to be encrypted.
@@ -171,10 +182,11 @@ class Encrypt extends \lithium\core\Object {
 		$vector = $this->_config['vector'];
 		$secret = $this->_hashSecret($this->_config['secret']);
 
-		$encrypted = mcrypt_encrypt($cipher, $secret, serialize($decrypted), $mode, $vector);
-		$data = base64_encode($encrypted) . base64_encode($vector);
+		mcrypt_generic_init(static::$_resource, $secret, $vector);
+		$encrypted = mcrypt_generic(static::$_resource, serialize($decrypted));
+		mcrypt_generic_deinit(static::$_resource);
 
-		return $data;
+		return base64_encode($encrypted) . base64_encode($vector);
 	}
 
 	/**
@@ -189,78 +201,74 @@ class Encrypt extends \lithium\core\Object {
 		$vector = $this->_config['vector'];
 		$secret = $this->_hashSecret($this->_config['secret']);
 
-		$vectorSize = strlen(base64_encode(str_repeat(" ", static::_vectorSize($cipher, $mode))));
+		$vectorSize = strlen(base64_encode(str_repeat(" ", static::_vectorSize())));
 		$vector = base64_decode(substr($encrypted, -$vectorSize));
 		$data = base64_decode(substr($encrypted, 0, -$vectorSize));
 
-		$decrypted = mcrypt_decrypt($cipher, $secret, $data, $mode, $vector);
-		$data = unserialize(trim($decrypted));
+		mcrypt_generic_init(static::$_resource, $secret, $vector);
+		$decrypted = mdecrypt_generic(static::$_resource, $data);
+		mcrypt_generic_deinit(static::$_resource);
 
-		return $data;
+		return unserialize(trim($decrypted));
 	}
 
 	/**
-	 * Hashes the given secret to make it more secure.
+	 * Determines if the Mcrypt extension has been installed.
+	 *
+	 * @return boolean `true` if enabled, `false` otherwise.
+	 */
+	public static function enabled() {
+		return extension_loaded('mcrypt');
+	}
+
+	/**
+	 * Hashes the given secret to make harder to detect.
 	 *
 	 * This method figures out the appropriate key size for the chosen encryption algorithm and
-	 * then tries to find the best hashing method for it. Note that if the key has already the
-	 * needed length, it is considered to be hashed (secure) already and is therefore not hashed
-	 * again. This lets you change the hashing method in your own code if you like.
+	 * then hashes the given key accordingly. Note that if the key has already the needed length,
+	 * it is considered to be hashed (secure) already and is therefore not hashed again. This lets
+	 * you change the hashing method in your own code if you like.
 	 *
-	 * The default `MCRYPT_RIJNDAEL_256` key should be 32 byte long and therefore `sha256` is the
-	 * preferred hashing algorithm.
+	 * The default `MCRYPT_RIJNDAEL_128` key should be 32 byte long `sha256` is used as the hashing
+	 * algorithm. If the key size is shorter than the one generated by `sha256`, the first n bytes
+	 * will be used.
 	 *
-	 * @link http://www.php.net/manual/de/function.mcrypt-get-key-size.php
+	 * @link http://www.php.net/manual/de/function.mcrypt-enc-get-key-size.php
 	 * @param string $key The possibly too weak key.
 	 * @return string The hashed (raw) key.
 	 */
 	protected function _hashSecret($key) {
-		$size = mcrypt_get_key_size($this->_config['cipher'], $this->_config['mode']);
+		$size = mcrypt_enc_get_key_size(static::$_resource);
 
-		if(strlen($key) >= $size) {
+		if (strlen($key) >= $size) {
 			return $key;
 		}
 
-		switch($size) {
-			case $size >= 32:
-				$algorithm = 'sha256';
-				break;
-			case $size >= 20:
-				$algorithm = 'sha1';
-				break;
-			default:
-				$algorithm = 'md5';
-		}
-
-		return hash($algorithm, $key, true);
+		return substr(hash('sha256', $key, true), 0, $size);
 	}
 
 	/**
 	 * Generates an initialization vector.
 	 *
-	 * @param string $cipher The cipher for the initialization vector.
-	 * @param string $mode The mode for the initialization vector.
 	 * @return string Returns an initialization vector.
 	 * @link http://www.php.net/manual/en/function.mcrypt-create-iv.php
 	 */
-	protected static function _vector($cipher, $mode) {
+	protected static function _vector() {
 		if (static::$_vector) {
 			return static::$_vector;
 		}
 
-		$size = static::_vectorSize($cipher, $mode);
-		return static::$_vector = mcrypt_create_iv($size, MCRYPT_DEV_URANDOM);
+		return static::$_vector = mcrypt_create_iv(static::_vectorSize(), MCRYPT_DEV_URANDOM);
 	}
 
 	/**
 	 * Returns the vector size vor a given cipher and mode.
 	 *
-	 * @param string $cipher The cipher for the initialization vector.
-	 * @param string $mode The mode for the initialization vector.
 	 * @return number The vector size.
+	 * @link http://www.php.net/manual/en/function.mcrypt-enc-get-iv-size.php
 	 */
-	protected static function _vectorSize($cipher, $mode) {
-		return mcrypt_get_iv_size($cipher, $mode);
+	protected static function _vectorSize() {
+		return mcrypt_enc_get_iv_size(static::$_resource);
 	}
 }
 
