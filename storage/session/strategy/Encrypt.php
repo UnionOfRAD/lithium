@@ -128,7 +128,7 @@ class Encrypt extends \lithium\core\Object {
 		$payload = empty($futureData) ? null : $this->_encrypt($futureData);
 
 		$class::write('__encrypted', $payload, array('strategies' => false) + $options);
-		return $data;
+		return $payload;
 	}
 
 	/**
@@ -216,7 +216,7 @@ class Encrypt extends \lithium\core\Object {
 	 */
 	protected function _hashSecret($key) {
 		$size = mcrypt_get_key_size($this->_config['cipher'], $this->_config['mode']);
-		
+
 		if(strlen($key) >= $size) {
 			return $key;
 		}
