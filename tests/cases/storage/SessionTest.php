@@ -11,7 +11,7 @@ namespace lithium\tests\cases\storage;
 use lithium\storage\Session;
 use lithium\storage\session\adapter\Memory;
 use lithium\tests\mocks\storage\session\adapter\SessionStorageConditional;
-
+use lithium\tests\mocks\storage\session\strategy\MockEncrypt;
 
 /**
  *
@@ -245,6 +245,47 @@ class SessionTest extends \lithium\test\Unit {
 		$this->assertFalse(Session::check('test'));
 		$this->assertFalse(Session::check('test', array('strategies' => false)));
 	}
+
+	public function testEncryptedStrategy() {
+		$this->skipIf(!MockEncrypt::enabled(), 'The Mcrypt extension is not installed or enabled.');
+
+		$key = 'foobar';
+		$adapter = new Memory();
+		Session::config(array('primary' => array(
+			'adapter' => $adapter, 'filters' => array(), 'strategies' => array(
+				'lithium\tests\mocks\storage\session\strategy\MockEncrypt' => array(
+					'secret' => $key
+				)
+			)
+		)));
+
+		$encrypt = new MockEncrypt(array('secret' => $key));
+
+		$value = array('foo' => 'bar');
+
+		Session::write('test', $value);
+		$this->assertEqual(array('foo' => 'bar'), Session::read('test'));
+
+		$this->assertTrue(Session::check('test'));
+		$this->assertTrue(Session::check('test', array('strategies' => false)));
+
+		$result = Session::read('test', array('strategies' => false));
+		$this->assertNotEqual($value, $result);
+		$this->assertTrue(is_string($result));
+
+		$result = $encrypt->decrypt($result);
+		$this->assertEqual(array('test' => $value), $result);
+
+		$result = Session::read('test');
+		$this->assertEqual($value, $result);
+
+		$result = Session::clear(array('strategies' => false));
+		$this->assertNull(Session::read('test'));
+
+		$this->assertFalse(Session::check('test'));
+		$this->assertFalse(Session::check('test', array('strategies' => false)));
+	}
+
 }
 
 ?>
