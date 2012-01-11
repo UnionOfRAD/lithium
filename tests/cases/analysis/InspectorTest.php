@@ -97,6 +97,11 @@ class InspectorTest extends \lithium\test\Unit {
 		$expected = array(14 => 'class InspectorTest extends \lithium\test\Unit {');
 		$this->assertEqual($expected, $result);
 
+		$lines = 'This is the first line.' . PHP_EOL . 'And this the second.';
+		$result = Inspector::lines($lines, array(2));
+		$expected = array(2 => 'And this the second.');
+		$this->assertEqual($expected, $result);
+
 		$this->expectException('/Missing argument 2/');
 		$this->assertNull(Inspector::lines('\lithium\core\Foo'));
 		$this->assertNull(Inspector::lines(__CLASS__, array()));
@@ -188,7 +193,7 @@ class InspectorTest extends \lithium\test\Unit {
 	public function testClassDependencies() {
 		$expected = array(
 			'Exception', 'ReflectionClass', 'ReflectionProperty', 'ReflectionException',
-			'lithium\\core\\Libraries'
+			'SplFileObject', 'lithium\\core\\Libraries'
 		);
 
 		$result = Inspector::dependencies($this->subject(), array('type' => 'static'));
