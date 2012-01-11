@@ -8,11 +8,21 @@
 
 namespace lithium\data\source\database\adapter\my_sql;
 
-use \PDO;
-use \PDOStatement;
+use PDO;
+use PDOStatement;
 
 /**
+ * This class is a wrapper around the MySQL result returned and can be used to iterate over it.
  *
+ * It also provides a simple caching mechanism which stores the result after the first load.
+ * You are then free to iterate over the result back and forth through the provided methods
+ * and don't have to think about hitting the database too often.
+ *
+ * On initialization, it needs a `PDOStatement` to operate on. You are then free to use all
+ * methods provided by the `Iterator` interface.
+ *
+ * @link http://php.net/manual/de/class.pdostatement.php The PDOStatement class.
+ * @link http://php.net/manual/de/class.iterator.php The Iterator interface.
  */
 class Result extends \lithium\core\Object implements \Iterator {
 
@@ -53,25 +63,41 @@ class Result extends \lithium\core\Object implements \Iterator {
 	 */
 	public function rewind() {
 		$this->_iterator = 0;
-		$this->_current = null;
+		$this->_current = isset($this->_cache[1]) ? $this->_cache[1] : null;
 	}
 
 	/**
 	 * Checks wheter the result is valid or not.
+	 *
+	 * @return boolean Returns whether the result is valid or not.
 	 */
 	public function valid() {
-		return $this->_resource || !empty($this->_cache);
+		if ($this->_resource) {
+			$rowCount = $this->_resource->rowCount();
+			return $rowCount > 0 && $this->_iterator <= $rowCount;
+		}
+
+		return false;
 	}
 
 	/**
 	 * Contains the current result.
+	 *
+	 * @return array The current result (or `null` if there is none).
 	 */
 	public function current() {
+
+		if (!$this->_current) {
+			$this->next();
+		}
+
 		return $this->_current;
 	}
 
 	/**
+	 * Returns the current key position on the result.
 	 *
+	 * @return int The current iterator position.
 	 */
 	public function key() {
 		return $this->_iterator;
@@ -79,14 +105,14 @@ class Result extends \lithium\core\Object implements \Iterator {
 
 	/**
 	 * Fetches the previous element from the cache.
+	 *
+	 * @return array The previous result (or `null` if there is none).
 	 */
 	public function prev() {
-		if (!$this->_resource) {
-			return;
-		}
-
-		if (isset($this->_cache[--$this->_iterator])) {
-			return $this->_current = $this->_cache[$this->_iterator];
+		if(!empty($this->_cache)) {
+			if (isset($this->_cache[--$this->_iterator])) {
+				return $this->_current = $this->_cache[$this->_iterator];
+			}
 		}
 	}
 
@@ -105,6 +131,8 @@ class Result extends \lithium\core\Object implements \Iterator {
 
 	/**
 	 * Returns the result from the primed cache.
+	 *
+	 * @return array The cached result (or `false` if it has not been cached yet).
 	 */
 	protected function _fetchFromCache() {
 		if ($this->_iterator < count($this->_cache)) {
@@ -115,8 +143,10 @@ class Result extends \lithium\core\Object implements \Iterator {
 	}
 
 	/**
-	 * Fetches the result from the resource and caches it. 
-	 */	
+	 * Fetches the result from the resource and caches it.
+	 *
+	 * @return array the fetched result (or `false` if it is not valid).
+	 */
 	protected function _fetchFromResource() {
 		if ($this->_resource instanceof PDOStatement
 				&& $this->_iterator < $this->_resource->rowCount()

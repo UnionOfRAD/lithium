@@ -295,6 +295,13 @@ class Model extends \lithium\core\StaticObject {
 	protected static $_baseClasses = array(__CLASS__ => true);
 
 	/**
+	 * Stores all custom instance methods created by `Model::instanceMethods`.
+	 *
+	 * @var array
+	 */
+	protected static $_instanceMethods = array();
+
+	/**
 	 * Sets default connection options and connects default finders.
 	 *
 	 * @param array $options
@@ -685,6 +692,31 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Getter and setter for custom instance methods. This is used in `Entity::__call`.
+	 *
+	 * {{{
+	 * Model::instanceMethods(array(
+	 *     'method_name' => array('Class', 'method'),
+	 *     'another_method' => array($object, 'method'),
+	 *     'closure_callback' => function($entity) {}
+	 * ));
+	 * }}}
+	 *
+	 * @param array $methods
+	 * @return array
+	 */
+	public static function instanceMethods(array $methods = null) {
+		$class = get_called_class();
+		if (!isset(static::$_instanceMethods[$class])) {
+			static::$_instanceMethods[$class] = array();
+		}
+		if (!is_null($methods)) {
+			static::$_instanceMethods[$class] = $methods + static::$_instanceMethods[$class];
+		}
+		return static::$_instanceMethods[$class];
+	}
+
+	/**
 	 * An instance method (called on record and document objects) to create or update the record or
 	 * document in the database that corresponds to `$entity`.
 	 *
@@ -736,6 +768,10 @@ class Model extends \lithium\core\StaticObject {
 	 *          be immediately saved. Defaults to `true`. May also be specified as an array, in
 	 *          which case it will replace the default validation rules specified in the
 	 *         `$validates` property of the model.
+	 *        - `'events'` _mixed_: A string or array defining one or more validation _events_.
+	 *          Events are different contexts in which data events can occur, and correspond to the
+	 *          optional `'on'` key in validation rules. They will be passed to the validates()
+	 *          method if `'validate'` is not `false`.
 	 *        - `'whitelist'` _array_: An array of fields that are allowed to be saved to this
 	 *          record.
 	 *
@@ -749,6 +785,7 @@ class Model extends \lithium\core\StaticObject {
 
 		$defaults = array(
 			'validate' => true,
+			'events' => $entity->exists() ? 'update' : 'create',
 			'whitelist' => null,
 			'callbacks' => true,
 			'locked' => $self->_meta['locked']
@@ -764,7 +801,9 @@ class Model extends \lithium\core\StaticObject {
 				$entity->set($params['data']);
 			}
 			if ($rules = $options['validate']) {
-				if (!$entity->validates(is_array($rules) ? compact('rules') : array())) {
+				$events = $options['events'];
+				$validateOpts = is_array($rules) ? compact('rules','events') : compact('events');
+				if (!$entity->validates($validateOpts)) {
 					return false;
 				}
 			}

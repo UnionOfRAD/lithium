@@ -11,6 +11,7 @@ namespace lithium\data;
 use BadMethodCallException;
 use UnexpectedValueException;
 use lithium\data\Collection;
+use lithium\util\Set;
 
 /**
  * `Entity` is a smart data object which represents data such as a row or document in a
@@ -182,18 +183,26 @@ class Entity extends \lithium\core\Object {
 	 * $record->validates();
 	 * }}}
 	 *
+	 * @see lithium\data\Model::instanceMethods
 	 * @param string $method
 	 * @param array $params
 	 * @return mixed
 	 */
 	public function __call($method, $params) {
-		if (!($model = $this->_model) || !method_exists($model, $method)) {
-			$message = "No model bound or unhandled method call `{$method}`.";
-			throw new BadMethodCallException($message);
+		if ($model = $this->_model) {
+			$methods = $model::instanceMethods();
+			array_unshift($params, $this);
+
+			if (method_exists($model, $method)) {
+				$class = $model::invokeMethod('_object');
+				return call_user_func_array(array(&$class, $method), $params);
+			}
+			if (isset($methods[$method]) && is_callable($methods[$method])) {
+				return call_user_func_array($methods[$method], $params);
+			}
 		}
-		array_unshift($params, $this);
-		$class = $model::invokeMethod('_object');
-		return call_user_func_array(array(&$class, $method), $params);
+		$message = "No model bound or unhandled method call `{$method}`.";
+		throw new BadMethodCallException($message);
 	}
 
 	/**
@@ -384,7 +393,7 @@ class Entity extends \lithium\core\Object {
 			case 'array':
 				$data = $this->_updated;
 				$rel = array_map(function($obj) { return $obj->data(); }, $this->_relationships);
-				$data = array_merge($data, $rel);
+				$data = $rel + $data;
 				$result = Collection::toArray($data, $options);
 			break;
 			default:

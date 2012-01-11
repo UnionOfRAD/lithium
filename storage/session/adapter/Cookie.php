@@ -10,7 +10,6 @@ namespace lithium\storage\session\adapter;
 
 use RuntimeException;
 use lithium\util\Set;
-use lithium\util\Inflector;
 
 /**
  * A minimal adapter to interface with HTTP cookies.
@@ -30,7 +29,7 @@ class Cookie extends \lithium\core\Object {
 	 *		strtotime-compatible string instead of an epochal timestamp.
 	 */
 	protected $_defaults = array(
-		'expire' => '+2 days', 'path' => '/', 'name' => null,
+		'expire' => '+2 days', 'path' => '/',
 		'domain' => '', 'secure' => false, 'httponly' => false
 	);
 
@@ -42,20 +41,10 @@ class Cookie extends \lithium\core\Object {
 	 * @param array $config Optional configuration parameters.
 	 */
 	public function __construct(array $config = array()) {
-		parent::__construct($config + $this->_defaults);
-	}
-
-	/**
-	 * Initialization of the cookie adapter.
-	 *
-	 * @return void
-	 */
-	protected function _init() {
-		parent::_init();
-
-		if (!$this->_config['name']) {
-			$this->_config['name'] = Inflector::slug(basename(LITHIUM_APP_PATH)) . 'cookie';
+		if (empty($config['name'])) {
+			$config['name'] = basename(LITHIUM_APP_PATH) . 'cookie';
 		}
+		parent::__construct($config + $this->_defaults);
 	}
 
 	/**

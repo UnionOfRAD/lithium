@@ -20,11 +20,13 @@ class LibrariesTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->_cache = Libraries::cache();
 		Libraries::cache(false);
+		$this->hasApp = preg_match('/app$/', LITHIUM_APP_PATH);
 	}
 
 	public function tearDown() {
 		Libraries::cache(false);
 		Libraries::cache($this->_cache);
+		unset($this->hasApp);
 	}
 
 	public function testNamespaceToFileTranslation() {
@@ -85,10 +87,12 @@ class LibrariesTest extends \lithium\test\Unit {
 		$all = Libraries::find('lithium', array('recursive' => true));
 		$result = array_values(preg_grep('/^lithium\\\\tests\\\\cases\\\\/', $all));
 		$this->assertIdentical($tests, $result);
-
-		$tests = Libraries::find('app', array('recursive' => true, 'path' => '/tests/cases'));
-		$result = preg_grep('/^app\\\\tests\\\\cases\\\\/', $tests);
-		$this->assertIdentical($tests, $result);
+		
+		if ($this->hasApp) {
+			$tests = Libraries::find('app', array('recursive' => true, 'path' => '/tests/cases'));
+			$result = preg_grep('/^app\\\\tests\\\\cases\\\\/', $tests);
+			$this->assertIdentical($tests, $result);
+		}
 	}
 
 	/**
@@ -110,13 +114,21 @@ class LibrariesTest extends \lithium\test\Unit {
 			'default' => false
 		);
 
+		if (!$this->hasApp) {
+			$expected['resources'] = str_replace('\\', '/', realpath(realpath(LITHIUM_LIBRARY_PATH) . '/lithium/resources'));
+			$expected['default'] = true;
+		}
+
 		$this->assertEqual($expected, $result);
 		$this->assertNull(Libraries::get('foo'));
 
 		$result = Libraries::get();
 		$this->assertTrue(isset($result['lithium']));
-		$this->assertTrue(isset($result['app']));
 		$this->assertEqual($expected, $result['lithium']);
+		
+		if ($this->hasApp) {
+			$this->assertTrue(isset($result['app']));
+		}
 	}
 
 	/**
@@ -287,11 +299,12 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testFindingClassesAndNamespaces() {
-		$result = Libraries::find('app', array('namespaces' => true));
-		$this->assertTrue(in_array('app\config', $result));
-		$this->assertTrue(in_array('app\controllers', $result));
-		$this->assertTrue(in_array('app\models', $result));
-		$this->assertFalse(in_array('app\index', $result));
+		$result = Libraries::find('lithium', array('namespaces' => true));
+		$this->assertTrue(in_array('lithium\net', $result));
+		$this->assertTrue(in_array('lithium\test', $result));
+		$this->assertTrue(in_array('lithium\util', $result));
+		$this->assertFalse(in_array('lithium\readme', $result));
+		$this->assertFalse(in_array('lithium\readme.wiki', $result));
 	}
 
 	public function testFindingClassesWithExclude() {
@@ -388,6 +401,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testServiceLocateApp() {
+		$this->skipIf(!$this->hasApp, 'Running in standalone mode.');
 		$result = Libraries::locate('controllers', 'HelloWorld');
 		$expected = 'app\controllers\HelloWorldController';
 		$this->assertEqual($expected, $result);
@@ -487,8 +501,8 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testLocateWithDotSyntax() {
-		$expected = 'app\controllers\PagesController';
-		$result = Libraries::locate('controllers', 'app.Pages');
+		$expected = 'lithium\template\helper\Html';
+		$result = Libraries::locate('helper', 'lithium.Html');
 		$this->assertEqual($expected, $result);
 	}
 

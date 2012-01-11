@@ -718,6 +718,26 @@ class DocumentTest extends \lithium\test\Unit {
 		$document->_id == "";
 		$this->assertFalse(array_key_exists('_id', $document->data()), $message);
 	}
+
+	/**
+	 * Ensures that the data returned from the `data()` method matches the
+	 * internal state of the object.
+	 */
+	public function testEnsureArrayExportFidelity() {
+		$data = array(
+			'department_3' => 0,
+			4 => 0,
+			5 => 0,
+			6 => 0,
+			'6x' => 0,
+			7 => 0,
+			8 => 0,
+			10 => 0,
+			12 => 0
+		);
+		$doc = new Document(compact('data'));
+		$this->assertIdentical($data, $doc->data());
+	}
 }
 
 ?>
