@@ -12,6 +12,7 @@ use Exception;
 use ReflectionClass;
 use ReflectionProperty;
 use ReflectionException;
+use SplFileObject;
 use lithium\core\Libraries;
 
 /**
@@ -335,16 +336,23 @@ class Inspector extends \lithium\core\StaticObject {
 	 * @todo Add an $options parameter with a 'context' flag, to pull in n lines of context.
 	 */
 	public static function lines($data, $lines) {
-		if (!strpos($data, PHP_EOL)) {
+		$c = array();
+
+		if (strpos($data, PHP_EOL) !== false) {
+			$c = explode(PHP_EOL, PHP_EOL . $data); 
+		} else {
 			if (!file_exists($data)) {
 				$data = Libraries::path($data);
 				if (!file_exists($data)) {
 					return null;
 				}
 			}
-			$data = PHP_EOL . file_get_contents($data);
+
+			$file = new SplFileObject($data);
+			foreach ($file as $current) {
+				$c[$file->key()+1] = rtrim($file->current());
+			}
 		}
-		$c = explode(PHP_EOL, $data);
 
 		if (!count($c) || !count($lines)) {
 			return null;
