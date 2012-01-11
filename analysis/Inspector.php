@@ -338,8 +338,8 @@ class Inspector extends \lithium\core\StaticObject {
 	public static function lines($data, $lines) {
 		$c = array();
 
-		if(strpos($data, PHP_EOL) !== false) {
-			$c = explode(PHP_EOL, $data); 
+		if (strpos($data, PHP_EOL) !== false) {
+			$c = explode(PHP_EOL, PHP_EOL . $data); 
 		} else {
 			if (!file_exists($data)) {
 				$data = Libraries::path($data);
@@ -349,7 +349,7 @@ class Inspector extends \lithium\core\StaticObject {
 			}
 
 			$file = new SplFileObject($data);
-			foreach($file as $current) {
+			foreach ($file as $current) {
 				$c[$file->key()+1] = rtrim($file->current());
 			}
 		}
