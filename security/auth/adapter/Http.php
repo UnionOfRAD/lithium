@@ -24,7 +24,7 @@ namespace lithium\security\auth\adapter;
  * }}}
  *
  * @link http://tools.ietf.org/html/rfc2068#section-14.8
- * @see `\lithium\action\Request`
+ * @see lithium\action\Request
  */
 class Http extends \lithium\core\Object {
 
