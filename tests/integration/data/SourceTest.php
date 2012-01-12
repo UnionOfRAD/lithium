@@ -15,6 +15,8 @@ use lithium\tests\mocks\data\Employees;
 
 class SourceTest extends \lithium\test\Integration {
 
+	protected $_database = null;
+
 	protected $_connection = null;
 
 	protected $_classes = array(
@@ -28,60 +30,41 @@ class SourceTest extends \lithium\test\Integration {
 	);
 
 	/**
-	 * @todo Make less dumb.
-	 *
+	 * Creating the test database
 	 */
 	public function setUp() {
-		Companies::config();
-		Employees::config();
-		$this->_connection = Connections::get('test');
-
-		if (strpos(get_class($this->_connection), 'CouchDb')) {
-			$this->_loadViews();
-		}
-
-		try {
-			foreach (Companies::all() as $companies) {
-				$companies->delete();
-			}
-		} catch (Exception $e) {}
-	}
-
-	protected function _loadViews() {
-		Companies::create()->save();
+		$this->_connection->connection->put($this->_database);
 	}
 
 	/**
-	 * @todo Make this less dumb.
+	 * Dropping the test database
 	 */
 	public function tearDown() {
-		try {
-			foreach (Companies::all() as $companies) {
-				$companies->delete();
-			}
-		} catch (Exception $e) {
-			$this->assertTrue(false, $e->getMessage());
-		}
+		$this->_connection->connection->delete($this->_database);
 	}
 
 	/**
 	 * Skip the test if no test database connection available.
-	 *
-	 * @return void
 	 */
 	public function skip() {
+		$connection = 'lithium_couch_test';
+		$config = Connections::get($connection, array('config' => true));
 		$isAvailable = (
-			Connections::get('test', array('config' => true)) &&
-			Connections::get('test')->isConnected(array('autoConnect' => true))
+			$config &&
+			Connections::get($connection)->isConnected(array('autoConnect' => true))
 		);
-		$this->skipIf(!$isAvailable, "No test connection available.");
+		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
+
+		Companies::config();
+		Employees::config();
+		$this->_key = Companies::key();
+		$this->_database = $config['database'];
+		$this->_connection = Connections::get($connection);
 	}
 
 	/**
 	 * Tests that a single record with a manually specified primary key can be created, persisted
 	 * to an arbitrary data store, re-read and updated.
-	 *
-	 * @return void
 	 */
 	public function testSingleReadWriteWithKey() {
 		$key = Companies::meta('key');
@@ -162,7 +145,7 @@ class SourceTest extends \lithium\test\Integration {
 		foreach ($this->companiesData as $data) {
 			$companies[] = Companies::create($data);
 			$this->assertTrue(end($companies)->save());
-			$this->assertTrue(end($companies)->{$key});
+			$this->assertTrue(end($companies)->$key);
 		}
 
 		$this->assertIdentical(2, Companies::count());
