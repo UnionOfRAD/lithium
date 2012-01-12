@@ -13,27 +13,42 @@ use lithium\tests\mocks\data\Companies;
 
 class DocumentTest extends \lithium\test\Integration {
 
+	protected $_database;
+
 	protected $_connection = null;
 
 	protected $_key = null;
 
+	/**
+	 * Creating the test database
+	 */
 	public function setUp() {
-		Companies::config();
-		$this->_key = Companies::key();
-		$this->_connection = Connections::get('test');
+		$this->_connection->connection->put($this->_database);
+	}
+
+	/**
+	 * Dropping the test database
+	 */
+	public function tearDown() {
+		$this->_connection->connection->delete($this->_database);
 	}
 
 	/**
 	 * Skip the test if no test database connection available.
-	 *
-	 * @return void
 	 */
 	public function skip() {
+		$connection = 'lithium_couch_test';
+		$config = Connections::get($connection, array('config' => true));
 		$isAvailable = (
-			Connections::get('test', array('config' => true)) &&
-			Connections::get('test')->isConnected(array('autoConnect' => true))
+			$config &&
+			Connections::get($connection)->isConnected(array('autoConnect' => true))
 		);
-		$this->skipIf(!$isAvailable, "No test connection available.");
+		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
+
+		Companies::config();
+		$this->_key = Companies::key();
+		$this->_database = $config['database'];
+		$this->_connection = Connections::get($connection);
 	}
 
 	public function testUpdateWithNewArray() {
