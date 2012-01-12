@@ -446,8 +446,7 @@ class Validator extends \lithium\core\StaticObject {
 		$params = compact('values', 'rules', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
-			
-			
+
 			$values = $params['values'];
 			$rules = $params['rules'];
 			$options = $params['options'];
@@ -485,7 +484,7 @@ class Validator extends \lithium\core\StaticObject {
 						continue;
 					}
 
-					$value = ($rule['raw'])? $rawValues[$field] : $values[$field];
+					$value = ($rule['raw']) ? $rawValues[$field] : $values[$field];
 					if (!$self::rule($name, $value, $rule['format'], $rule + $options)) {
 						$errors[$field][] = $rule['message'] ?: $key;
 
