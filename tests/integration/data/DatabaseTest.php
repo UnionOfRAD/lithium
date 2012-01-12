@@ -41,9 +41,25 @@ class DatabaseTest extends \lithium\test\Integration {
 			)
 		);
 
-	public $gallery = array(
-			'name' => 'Foo Gallery'
-		);
+	public $gallery = array('name' => 'Foo Gallery');
+
+	public function setUp() {
+		$mockBase = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/data/source/database/adapter/';
+		$files = array('galleries' => '_galleries.sql', 'images' => '_images.sql');
+		$files = array_diff_key($files, array_flip($this->db->sources()));
+
+		foreach ($files as $file) {
+			$sqlFile = $mockBase . strtolower($this->_dbConfig['adapter']) . $file;
+			$this->skipIf(!file_exists($sqlFile), "SQL file $sqlFile does not exist.");
+			$sql = file_get_contents($sqlFile);
+			$this->db->read($sql, array('return' => 'resource'));
+		}
+	}
+
+	public function tearDown() {
+		$this->db->read('DROP TABLE IF EXISTS `images`;');
+		$this->db->read('DROP TABLE IF EXISTS `galleries`;');
+	}
 
 	public function skip() {
 		$connection = 'lithium_mysql_test';
@@ -63,17 +79,6 @@ class DatabaseTest extends \lithium\test\Integration {
 			!($this->db instanceof Database),
 			"The {$connection} connection is not a relational database."
 		);
-
-		$mockBase = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/data/source/database/adapter/';
-		$files = array('galleries' => '_galleries.sql', 'images' => '_images.sql');
-		$files = array_diff_key($files, array_flip($this->db->sources()));
-
-		foreach ($files as $file) {
-			$sqlFile = $mockBase . strtolower($this->_dbConfig['adapter']) . $file;
-			$this->skipIf(!file_exists($sqlFile), "SQL file $sqlFile does not exist.");
-			$sql = file_get_contents($sqlFile);
-			$this->db->read($sql, array('return' => 'resource'));
-		}
 	}
 
 	public function testCreateData() {
@@ -91,6 +96,7 @@ class DatabaseTest extends \lithium\test\Integration {
 	}
 
 	public function testManyToOne() {
+		$this->_createGalleryWithImages();
 		$opts = array('conditions' => array('gallery_id' => $this->gallery['id']));
 
 		$query = new Query($opts + array(
@@ -125,6 +131,7 @@ class DatabaseTest extends \lithium\test\Integration {
 	}
 
 	public function testOneToMany() {
+		$this->_createGalleryWithImages();
 		$opts = array('conditions' => array('Galleries.id' => $this->gallery['id']));
 
 		$query = new Query($opts + array(
@@ -147,6 +154,7 @@ class DatabaseTest extends \lithium\test\Integration {
 	}
 
 	public function testUpdate() {
+		$this->_createGalleryWithImages();
 		$options = array('conditions' => array('gallery_id' => $this->gallery['id']));
 		$uuid = String::uuid();
 		$image = Images::find('first', $options);
@@ -162,6 +170,7 @@ class DatabaseTest extends \lithium\test\Integration {
 	}
 
 	public function testFields() {
+		$this->_createGalleryWithImages();
 		$fields = array('id', 'image');
 		$image = Images::find('first', array(
 			'fields' => $fields,
@@ -173,6 +182,7 @@ class DatabaseTest extends \lithium\test\Integration {
 	}
 
 	public function testOrder() {
+		$this->_createGalleryWithImages();
 		$images = Images::find('all', array(
 			'order' => 'id DESC',
 			'conditions' => array(
@@ -191,6 +201,23 @@ class DatabaseTest extends \lithium\test\Integration {
 	public function testRemove() {
 		$this->assertTrue(Galleries::remove());
 		$this->assertTrue(Images::remove());
+	}
+
+	protected function _createGallery() {
+		$gallery = Galleries::create($this->gallery);
+		$gallery->save();
+		return $gallery;
+	}
+	protected function _createGalleryWithImages() {
+		$gallery = $this->_createGallery();
+
+		foreach ($this->images as $key => $image) {
+			unset($image['id'], $image['gallery_id']);
+			$img = Images::create($image + array('gallery_id' => $gallery->id));
+			$this->assertEqual(true, $img->save());
+			$this->images[$key]['id'] = $img->id;
+			$this->images[$key]['gallery_id'] = $gallery->id;
+		}
 	}
 }
 
