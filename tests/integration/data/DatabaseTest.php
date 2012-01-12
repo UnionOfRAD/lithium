@@ -10,6 +10,7 @@ namespace lithium\tests\integration\data;
 
 use lithium\data\Connections;
 use lithium\data\model\Query;
+use lithium\data\source\Database;
 use lithium\tests\mocks\data\source\Images;
 use lithium\tests\mocks\data\source\Galleries;
 use lithium\util\String;
@@ -45,16 +46,23 @@ class DatabaseTest extends \lithium\test\Integration {
 		);
 
 	public function skip() {
-		$this->_dbConfig = Connections::get('test', array('config' => true));
+		$connection = 'lithium_mysql_test';
+		$this->_dbConfig = Connections::get($connection, array(
+			'config' => true
+		));
 		$isAvailable = (
-			$this->_dbConfig && Connections::get('test')->isConnected(array('autoConnect' => true))
+			$this->_dbConfig &&
+			Connections::get($connection)->isConnected(array(
+				'autoConnect' => true
+			))
 		);
-		$this->skipIf(!$isAvailable, "No test connection available.");
+		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
 
-		$isDatabase = Connections::get('test') instanceof Database;
-		$this->skipIf(!$isDatabase, "The 'test' connection is not a relational database.");
-
-		$this->db = Connections::get('test');
+		$this->db = Connections::get($connection);
+		$this->skipIf(
+			!($this->db instanceof Database),
+			"The {$connection} connection is not a relational database."
+		);
 
 		$mockBase = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/data/source/database/adapter/';
 		$files = array('galleries' => '_galleries.sql', 'images' => '_images.sql');
