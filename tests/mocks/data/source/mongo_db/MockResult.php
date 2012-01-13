@@ -18,19 +18,6 @@ class MockResult extends \lithium\data\source\mongo_db\Result {
 		array('_id' => '6c8f86167675abfabdbf0302', 'title' => 'dib')
 	);
 
-	public function hasNext() {
-		if (!is_array($this->_data)) {
-			return false;
-		}
-		return key($this->_data) !== null && key($this->_data) < count($this->_data);
-	}
-
-	public function getNext() {
-		$result = current($this->_data);
-		next($this->_data);
-		return $result;
-	}
-
 	public function next() {
 		return $this->_next();
 	}
