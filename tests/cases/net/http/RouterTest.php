@@ -731,6 +731,22 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::match(array('Foo::bar', 'id' => 5, 'admin' => true, 'locale' => 'jp'));
 		$this->assertEqual('/admin/jp/foo/bar/5', $result);
 	}
+
+	/**
+	 * Tests that continuations can be used for route suffixes.
+	 */
+	public function testSuffixContinuation() {
+		Router::connect("/{:args}.{:type}", array(), array('continue' => true));
+		Router::connect('/{:controller}/{:id:[0-9]+}', array('action' => 'view'));
+
+		$result = Router::match(array(
+			'controller' => 'versions',
+			'action' => 'view',
+			'id' => 13,
+			'type' => 'jsonp'
+		));
+		$this->assertEqual('/versions/13.jsonp', $result);
+	}
 }
 
 ?>
