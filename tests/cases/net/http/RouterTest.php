@@ -746,6 +746,13 @@ class RouterTest extends \lithium\test\Unit {
 			'type' => 'jsonp'
 		));
 		$this->assertEqual('/versions/13.jsonp', $result);
+
+		$result = Router::match(array(
+			'controller' => 'versions',
+			'action' => 'view',
+			'id' => 13
+		));
+		$this->assertEqual('/versions/13', $result);
 	}
 }
 
