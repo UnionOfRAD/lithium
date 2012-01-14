@@ -226,12 +226,12 @@ class RecordSet extends \lithium\data\Collection {
 		switch ($format) {
 			case 'array':
 				$result = array_map(function($r) { return $r->to('array'); }, $this->_data);
-				
+
 				if (!(is_scalar(current($this->_index)) && $options['indexed'])) {
 					break;
 				}
 				$indexAndResult = ($this->_index && $result);
-				$result =  $indexAndResult ? array_combine($this->_index, $result) : array();
+				$result = $indexAndResult ? array_combine($this->_index, $result) : array();
 			break;
 			default:
 				$result = parent::to($format, $options);

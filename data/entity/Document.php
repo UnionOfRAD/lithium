@@ -150,7 +150,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *
 	 * @param mixed $id
 	 * @param array $data
-	 * @param array Options when calling this method:
+	 * @param array $options Options when calling this method:
 	 *              - `'recursive'` _boolean_: If `true` attempts to sync nested objects as well.
 	 *                Otherwise, only syncs the current object. Defaults to `true`.
 	 * @return void

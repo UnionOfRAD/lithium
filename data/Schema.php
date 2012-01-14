@@ -49,8 +49,8 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 	/**
 	 * Detects properties of a field, i.e. if it supports arrays.
 	 *
-	 * @param string $condition 
-	 * @param string $field 
+	 * @param string $condition
+	 * @param string $field
 	 * @return void
 	 */
 	public function is($condition, $field) {
@@ -75,7 +75,7 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 	 * Appends additional fields to the schema. Will not overwrite existing fields if any conflicts
 	 * arise.
 	 *
-	 * @param array $schema New schema data.
+	 * @param array $fields New schema data.
 	 * @return void
 	 */
 	public function append(array $fields) {

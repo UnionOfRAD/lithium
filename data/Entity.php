@@ -11,7 +11,6 @@ namespace lithium\data;
 use BadMethodCallException;
 use UnexpectedValueException;
 use lithium\data\Collection;
-use lithium\util\Set;
 
 /**
  * `Entity` is a smart data object which represents data such as a row or document in a
