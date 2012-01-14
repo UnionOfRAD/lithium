@@ -605,9 +605,8 @@ class Model extends \lithium\core\StaticObject {
 		if ($field === false) {
 			return $self->_schema = null;
 		}
-		if (!is_object($self->_schema)) {
-			$source = $self::meta('source');
-			$self->_schema = static::connection()->describe($source, $self->_schema, $self->_meta);
+		if (!is_object($self->_schema) && $connection = static::connection()) {
+			$self->_schema = $connection->describe($self::meta('source'), $self->_schema, $self->_meta);
 			$key = (array) self::meta('key');
 
 			if ($self->_schema && $self->_schema->fields() && !$self->_schema->has($key)) {

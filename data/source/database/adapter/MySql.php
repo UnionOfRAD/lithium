@@ -209,7 +209,7 @@ class MySql extends \lithium\data\source\Database {
 	 *         - `'type'`: The field type name
 	 * @filter This method can be filtered.
 	 */
-	public function describe($table, array $schema = array(), array $meta = array()) {
+	public function describe($entity, array $schema = array(), array $meta = array()) {
 		$params = compact('entity', 'meta');
 		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			extract($params);

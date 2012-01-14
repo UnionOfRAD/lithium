@@ -188,6 +188,7 @@ class Http extends \lithium\data\Source {
 	 * Describe data source.
 	 *
 	 * @param string $entity
+	 * @param array $schema
 	 * @param array $meta
 	 * @return array - returns an empty array
 	 */
