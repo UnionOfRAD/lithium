@@ -16,6 +16,8 @@ class Result extends \lithium\core\Object implements \Iterator {
 
 	protected $_resource = null;
 
+	protected $_current = null;
+
 	protected $_data = array();
 		
 	protected $_autoConfig = array('resource');
@@ -54,6 +56,7 @@ class Result extends \lithium\core\Object implements \Iterator {
 			$this->_current = $this->_data[$this->_iterator];
 			return $this->_current;
 		}
+		return null;
 	}
 
 	public function next() {
@@ -72,6 +75,7 @@ class Result extends \lithium\core\Object implements \Iterator {
 		}
 		unset($this->_resource);
 		$this->_resource = null;
+		return null;
 	}
 
 	public function __destruct() {
