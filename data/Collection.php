@@ -379,7 +379,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * additional methods related to debugging queries.
 	 *
 	 * @return object The pointer or resource from the data source
-	*/
+	 */
 	public function result() {
 		return $this->_result;
 	}

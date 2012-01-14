@@ -109,10 +109,11 @@ class Result extends \lithium\core\Object implements \Iterator {
 	 * @return array The previous result (or `null` if there is none).
 	 */
 	public function prev() {
-		if (!empty($this->_cache)) {
-			if (isset($this->_cache[--$this->_iterator])) {
-				return $this->_current = $this->_cache[$this->_iterator];
-			}
+		if (!$this->_cache) {
+			return;
+		}
+		if (isset($this->_cache[--$this->_iterator])) {
+			return $this->_current = $this->_cache[$this->_iterator];
 		}
 	}
 
@@ -148,12 +149,15 @@ class Result extends \lithium\core\Object implements \Iterator {
 	 * @return array the fetched result (or `false` if it is not valid).
 	 */
 	protected function _fetchFromResource() {
-		if ($this->_resource instanceof PDOStatement
-				&& $this->_iterator < $this->_resource->rowCount()
-				&& $result = $this->_resource->fetch(PDO::FETCH_NUM)) {
+		$isValidResource = (
+			$this->_resource instanceof PDOStatement &&
+			$this->_iterator < $this->_resource->rowCount() &&
+			$result = $this->_resource->fetch(PDO::FETCH_NUM)
+		);
+
+		if ($isValidResource) {
 			return $this->_cache[++$this->_iterator] = $result;
 		}
-
 		return false;
 	}
 }
