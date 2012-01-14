@@ -66,7 +66,7 @@ class MongoDb extends \lithium\data\Source {
 		'result'       => 'lithium\data\source\mongo_db\Result',
 		'schema'       => 'lithium\data\Schema',
 		'exporter'     => 'lithium\data\source\mongo_db\Exporter',
-		'relationship' => 'lithium\data\model\Relationship',
+		'relationship' => 'lithium\data\model\Relationship'
 	);
 
 	/**
@@ -537,10 +537,7 @@ class MongoDb extends \lithium\data\Source {
 	protected function _deleteFile($conditions, $options = array()) {
 		$defaults = array('safe' => true);
 		$options += $defaults;
-
-		$grid = $this->connection->getGridFS();
-
-		return $grid->remove($conditions, $options);
+		return $this->connection->getGridFS()->remove($conditions, $options);
 	}
 
 	/**

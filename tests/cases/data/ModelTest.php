@@ -540,7 +540,7 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testSave() {
 		$schema = MockPost::schema();
-	 	MockPost::overrideSchema($this->_altSchema);
+		MockPost::overrideSchema($this->_altSchema);
 		MockPost::resetSchema();
 		$data = array('title' => 'New post', 'author_id' => 13, 'foo' => 'bar');
 		$record = MockPost::create($data);

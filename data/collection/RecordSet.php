@@ -233,7 +233,7 @@ class RecordSet extends \lithium\data\Collection {
 					break;
 				}
 				$indexAndResult = ($this->_index && $result);
-				$result =  $indexAndResult ? array_combine($this->_index, $result) : array();
+				$result = $indexAndResult ? array_combine($this->_index, $result) : array();
 			break;
 			default:
 				$result = parent::to($format, $options);
