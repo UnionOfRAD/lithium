@@ -314,8 +314,15 @@ class Route extends \lithium\core\Object {
 			}
 		}
 		$options += $this->_defaults;
-		$diff = array_diff_key(array_intersect_key($this->_keys, $options) + $args, $this->_keys + $args);
-		return $diff ? false : $options;
+		$base = $this->_keys + $args;
+		$match = array_intersect_key($this->_keys, $options) + $args;
+		sort($base);
+		sort($match);
+
+		if ($base !== $match) {
+			return false;
+		}
+		return $options;
 	}
 
 	/**
