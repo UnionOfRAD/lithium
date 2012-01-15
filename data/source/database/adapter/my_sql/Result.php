@@ -97,7 +97,7 @@ class Result extends \lithium\core\Object implements \Iterator {
 	/**
 	 * Returns the current key position on the result.
 	 *
-	 * @return int The current iterator position.
+	 * @return integer The current iterator position.
 	 */
 	public function key() {
 		return $this->_iterator;
@@ -109,7 +109,7 @@ class Result extends \lithium\core\Object implements \Iterator {
 	 * @return array The previous result (or `null` if there is none).
 	 */
 	public function prev() {
-		if(!empty($this->_cache)) {
+		if (!empty($this->_cache)) {
 			if (isset($this->_cache[--$this->_iterator])) {
 				return $this->_current = $this->_cache[$this->_iterator];
 			}

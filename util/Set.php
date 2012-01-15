@@ -51,7 +51,8 @@ class Set {
 	}
 
 	/**
-	 * Checks if a particular path is set in an array. Tests by key name, or dot-delimited key name, i.e.:
+	 * Checks if a particular path is set in an array. Tests by key name, or dot-delimited key
+	 * name, i.e.:
 	 *
 	 * {{{ embed:lithium\tests\cases\util\SetTest::testCheck(1-4) }}}
 	 *

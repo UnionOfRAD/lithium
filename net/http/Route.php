@@ -424,10 +424,10 @@ class Route extends \lithium\core\Object {
 	 *               `"/{:id:\d+}"`, then the value will be `"\d+"`.
 	 * @param string $param The parameter name which the capture group is assigned to, i.e.
 	 *               `'controller'`, `'id'` or `'args'`.
-	 * @param string $prefix The prefix character that separates the parameter from the other
-	 *               elements of the route. Usually `'.'` or `'/'`.
 	 * @param string $token The full token representing a matched element in a route template, i.e.
 	 *               `'/{:action}'`, `'/{:path:js|css}'`, or `'.{:type}'`.
+	 * @param string $prefix The prefix character that separates the parameter from the other
+	 *               elements of the route. Usually `'.'` or `'/'`.
 	 * @return string Returns the full route template, with the value of `$token` replaced with a
 	 *         generated regex capture group.
 	 */
