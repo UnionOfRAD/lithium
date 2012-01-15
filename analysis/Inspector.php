@@ -339,7 +339,7 @@ class Inspector extends \lithium\core\StaticObject {
 		$c = array();
 
 		if (strpos($data, PHP_EOL) !== false) {
-			$c = explode(PHP_EOL, PHP_EOL . $data); 
+			$c = explode(PHP_EOL, PHP_EOL . $data);
 		} else {
 			if (!file_exists($data)) {
 				$data = Libraries::path($data);

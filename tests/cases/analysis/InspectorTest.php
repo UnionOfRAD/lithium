@@ -77,6 +77,15 @@ class InspectorTest extends \lithium\test\Unit {
 	public function testExecutableLines() {
 		do {
 			// These lines should be ignored
+			//
+
+			/* And these as well are ignored */
+
+			/**
+			 * Testing never proves the absence of faults,
+			 * it only shows their presence.
+			 * - Dijkstra
+			 */
 		} while (false);
 
 		$result = Inspector::executable($this, array('methods' => __FUNCTION__));
