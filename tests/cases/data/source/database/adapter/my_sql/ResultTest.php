@@ -42,8 +42,8 @@ class ResultTest extends \lithium\test\Unit {
 		$sql = file_get_contents($sqlFile);
 		$this->db->read($sql, array('return' => 'resource'));
 
-		foreach($this->_mockData as $entry) {
-			$sql = "INSERT INTO companies (name) VALUES ('".$entry[1]."')";
+		foreach ($this->_mockData as $entry) {
+			$sql = "INSERT INTO companies (name) VALUES ('" . $entry[1] . "')";
 			$this->db->read($sql, array('return' => 'resource'));
 		}
 	}
@@ -137,13 +137,13 @@ class ResultTest extends \lithium\test\Unit {
 		));
 
 		$rows = array();
-		foreach($result as $row) {
+		foreach ($result as $row) {
 			$rows[] = $row;
 		}
 
 		$expected = array(
-			array('Foo Company', NULL),
-			array('Bar Company', NULL),
+			array('Foo Company', null),
+			array('Bar Company', null)
 		);
 
 		$this->assertEqual($expected, $rows);
@@ -161,7 +161,7 @@ class ResultTest extends \lithium\test\Unit {
 		));
 
 		$rows = array();
-		foreach($result as $row) {
+		foreach ($result as $row) {
 			$rows[] = $row;
 		}
 
@@ -169,5 +169,6 @@ class ResultTest extends \lithium\test\Unit {
 
 		$this->assertEqual($expected, $rows);
 	}
-
 }
+
+?>

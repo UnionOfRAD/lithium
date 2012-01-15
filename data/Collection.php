@@ -144,7 +144,7 @@ abstract class Collection extends \lithium\util\Collection {
 	public function model() {
 		return $this->_model;
 	}
-	
+
 	/**
 	 * Returns the object's parent `Document` object.
 	 *
@@ -153,7 +153,7 @@ abstract class Collection extends \lithium\util\Collection {
 	public function parent() {
 		return $this->_parent;
 	}
-	
+
 	public function schema($field = null) {
 		$schema = array();
 
@@ -315,12 +315,12 @@ abstract class Collection extends \lithium\util\Collection {
 		}
 		return $this->_data[] = $data;
 	}
-	
+
 	/**
-	 * Return's the pointer or resource that is used to load entities from the backend 
+	 * Return's the pointer or resource that is used to load entities from the backend
 	 * data source that originated this collection. This is useful in many cases for
 	 * additional methods related to debugging queries.
-	 * 
+	 *
 	 * @return object The pointer or resource from the data source
 	*/
 	public function result() {

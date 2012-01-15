@@ -549,8 +549,9 @@ class MongoDb extends \lithium\data\Source {
 		$defaults = array('justOne' => false, 'safe' => false, 'fsync' => false);
 		$options = array_intersect_key($options + $defaults, $defaults);
 		$_config = $this->_config;
+		$params = compact('query', 'options');
 
-		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) use ($_config) {
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
 			$query = $params['query'];
 			$options = $params['options'];
 			$args = $query->export($self, array('keys' => array('source', 'conditions')));
@@ -569,7 +570,7 @@ class MongoDb extends \lithium\data\Source {
 		$options += $defaults;
 
 		$grid = $this->connection->getGridFS();
-		
+
 		return $grid->remove($conditions, $options);
 	}
 
