@@ -91,6 +91,9 @@ class ErrorHandler extends \lithium\core\StaticObject {
 		$self = get_called_class();
 
 		static::$_exceptionHandler = function($exception, $return = false) use ($self) {
+			if (ob_get_length()) {
+				ob_end_clean();
+			}
 			$info = compact('exception') + array(
 				'type' => get_class($exception),
 				'stack' => $self::trace($exception->getTrace())

@@ -1011,6 +1011,15 @@ class RequestTest extends \lithium\test\Unit {
 		));
 		$expected = 'http://foo.com/';
 		$this->assertEqual($expected, $request->to('url'));
+
+		$request = new Request(array(
+			'url' => 'foo/bar',
+			'base' => null,
+			'env' => array('HTTP_HOST' => 'example.com'),
+		));
+
+		$expected = 'http://example.com/foo/bar';
+		$this->assertEqual($expected, $request->to('url'));
 	}
 
 	public function testConvertToUrl2() {

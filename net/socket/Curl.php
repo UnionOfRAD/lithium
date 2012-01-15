@@ -188,7 +188,7 @@ class Curl extends \lithium\net\Socket {
 		if ($value !== null) {
 			$flags = array($flags => $value);
 		}
-		$this->options += $flags;
+		$this->options = $flags + $this->options;
 	}
 }
 

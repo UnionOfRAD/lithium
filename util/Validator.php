@@ -423,6 +423,8 @@ class Validator extends \lithium\core\StaticObject {
 	 *    Additionally, two special values can be used: either `'any'`, which means that all formats
 	 *    will be checked and the rule will pass if any format passes, or `'all'`, which requires
 	 *    all formats to pass in order for the rule check to succeed.
+	 *  - `'raw'` _boolean_: If the value being validated is an array or another format which you
+	 *    do not want flattened before validation set this option to `true`.
 	 * @return array Returns an array containing all validation failures for data in `$values`,
 	 *         where each key matches a key in `$values`, and each value is an array of that
 	 *         element's validation errors.
@@ -432,6 +434,7 @@ class Validator extends \lithium\core\StaticObject {
 		$defaults = array(
 			'notEmpty',
 			'message' => null,
+			'raw' => false,
 			'required' => true,
 			'skipEmpty' => false,
 			'format' => 'any',
@@ -443,12 +446,15 @@ class Validator extends \lithium\core\StaticObject {
 		$params = compact('values', 'rules', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+
 			$values = $params['values'];
 			$rules = $params['rules'];
 			$options = $params['options'];
 
 			$errors = array();
 			$events = (array) (isset($options['events']) ? $options['events'] : null);
+
+			$rawValues = $values;
 			$values = Set::flatten($values);
 
 			foreach ($rules as $field => $rules) {
@@ -458,13 +464,17 @@ class Validator extends \lithium\core\StaticObject {
 				$options['field'] = $field;
 
 				foreach ($rules as $key => $rule) {
+
 					$rule += $options + compact('values');
 					list($name) = $rule;
 
+					if (empty($values[$field]) && empty($rawValues[$field]) && $rule['skipEmpty']) {
+						continue;
+					}
 					if ($events && $rule['on'] && !array_intersect($events, (array) $rule['on'])) {
 						continue;
 					}
-					if (!isset($values[$field])) {
+					if (!isset($values[$field]) && !isset($rawValues[$field])) {
 						if ($rule['required']) {
 							$errors[$field][] = $rule['message'] ?: $key;
 						}
@@ -473,11 +483,9 @@ class Validator extends \lithium\core\StaticObject {
 						}
 						continue;
 					}
-					if (empty($values[$field]) && $rule['skipEmpty']) {
-						continue;
-					}
 
-					if (!$self::rule($name, $values[$field], $rule['format'], $rule + $options)) {
+					$value = ($rule['raw']) ? $rawValues[$field] : $values[$field];
+					if (!$self::rule($name, $value, $rule['format'], $rule + $options)) {
 						$errors[$field][] = $rule['message'] ?: $key;
 
 						if ($rule['last']) {

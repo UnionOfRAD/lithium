@@ -198,10 +198,9 @@ class Media extends \lithium\core\StaticObject {
 	 *          encoding or serializing content into this format.
 	 *        - `'cast'` _boolean_: Used with `'encode'`. If `true`, all data passed into the
 	 *          specified encode function is first cast to array structures.
-	 *        - `'layout'` _mixed_: Specifies one or more `String::insert()`-style paths to use when
-	 *          searching for layout files (either a string or array of strings).
-	 *        - `'template'` _mixed_: Specifies one or more `String::insert()`-style paths to use
-	 *          when searching for template files (either a string or array of strings).
+	 *        - `'paths'` _array_: Lists `'template'` and `'layout'` keyed sub-arrays of single or
+	 *          multiple (either a string or array of strings) `String::insert()` style paths to 
+	 *          use when searching for layout and template files.
 	 *        - `'view'` _string_: Specifies the view class to use when rendering this content.
 	 *        - `'conditions'` _array_: Optional key/value pairs used as assertions in content
 	 *          negotiation. See the above section on **Content Negotiation**.
