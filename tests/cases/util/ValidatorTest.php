@@ -1167,6 +1167,23 @@ class ValidatorTest extends \lithium\test\Unit {
 		$data = array('id' => '.', 'profile' => array('email' => 'foo@bar.com', 'name' => 'Bob'));
 		$result = Validator::check($data, $rules);
 		$this->assertEqual(array('id' => array('Bad ID')), $result);
+
+		Validator::add('checkNameNotStupid', function($value) {
+			return $value['name'] != 'Stupid';
+		});
+		$rules = array(
+			'profile' => array("checkNameNotStupid", 'raw' => true, 'message' => "Name is stupid")
+		);
+		$data = array('id' => 1, 'profile' => array('email' => 'foo', 'name' => 'Stupid'));
+		$result = Validator::check($data, $rules);
+		$expected = array(
+			'profile' => array("Name is stupid")
+		);
+		$this->assertEqual($expected, $result);
+		$data = array('id' => 1, 'profile' => array('email' => 'foo', 'name' => 'I am not stupid'));
+		$result = Validator::check($data, $rules);
+		$this->assertTrue(empty($result));
+
 	}
 }
 
