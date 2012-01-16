@@ -520,7 +520,7 @@ class Request extends \lithium\net\http\Request {
 		$defaults = array(
 			'scheme' => $this->env('HTTPS') ? 'https' : 'http',
 			'host' => $this->env('HTTP_HOST'),
-			'path' => $this->_base . $this->url,
+			'path' => $this->_base . '/' . $this->url,
 			'query' => $this->query
 		);
 		return parent::to($format, $options + $defaults);
