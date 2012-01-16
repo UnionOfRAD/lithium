@@ -14,10 +14,12 @@ class Result extends \lithium\core\Object implements \Iterator {
 
 	protected $_iterator = 0;
 
-	protected $_current = null;
-
 	protected $_resource = null;
 
+	protected $_current = null;
+
+	protected $_data = array();
+		
 	protected $_autoConfig = array('resource');
 
 	public function __construct(array $config = array()) {
@@ -30,7 +32,10 @@ class Result extends \lithium\core\Object implements \Iterator {
 	}
 
 	public function rewind() {
-		return null;
+		if (isset($this->_data[1])) {
+			$this->_iterator = 1;
+			$this->_current = $this->_data[1];
+		}
 	}
 
 	public function valid() {
@@ -46,27 +51,31 @@ class Result extends \lithium\core\Object implements \Iterator {
 	}
 
 	public function prev() {
-		if (!$this->_resource) {
-			return;
-		}
-		if ($this->_current == $this->_prev()) {
+		if (isset($this->_data[$this->_iterator-1])) {
 			$this->_iterator--;
+			$this->_current = $this->_data[$this->_iterator];
 			return $this->_current;
 		}
+		return null;
 	}
 
 	public function next() {
-		if (!$this->_resource) {
-			return;
+		if (isset($this->_data[$this->_iterator + 1])) {
+			$this->_iterator++;
+			$this->_current = $this->_data[$this->_iterator];
+			return $this->_current;
 		}
-
 		if ($this->_resource->hasNext()) {
+			$this->_iterator++;
 			$result = $this->_resource->getNext();
 			$isFile = ($result instanceof MongoGridFSFile);
-			return $isFile ? array('file' => $result) + $result->file : $result;
+			$this->_current = $isFile ? array('file' => $result) + $result->file : $result;
+			$this->_data[$this->_iterator] = $this->_current;
+			return $this->_current;
 		}
 		unset($this->_resource);
 		$this->_resource = null;
+		return null;
 	}
 
 	public function __destruct() {
