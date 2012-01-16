@@ -194,6 +194,7 @@ class Request extends \lithium\net\http\Message {
 		switch ($format) {
 			case 'url':
 				$options['query'] = $this->queryString($options['query']);
+				$options['path'] = str_replace('//', '/', $options['path']);
 				return String::insert("{:scheme}://{:host}{:port}{:path}{:query}", $options);
 			case 'context':
 				$body = $this->body($options['body']);
