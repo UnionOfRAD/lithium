@@ -146,6 +146,15 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 		// Undefined offset error shouldn't surface.
 		list($foo, $bar) = array('baz');
 	}
+
+	public function testRenderedOutput() {
+		ob_start();
+		echo 'Some Output';
+		$subject = new ErrorHandlerTest();
+		ErrorHandler::apply(array($subject, 'throwException'), array(), function($details) {});
+		$subject->throwException();
+		$this->assertFalse(ob_get_length());
+	}
 }
 
 ?>
