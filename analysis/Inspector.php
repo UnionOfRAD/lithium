@@ -203,11 +203,19 @@ class Inspector extends \lithium\core\StaticObject {
 		$result = array_filter(static::methods($class, 'ranges', $options));
 
 		if ($options['filter'] && $class->getFileName()) {
-			$file = explode("\n", "\n" . file_get_contents($class->getFileName()));
+			$file = file_get_contents($class->getFileName());
+			preg_match_all('/^\s*\/\*(.*)\*\//msU', $file, $multilineComments);                        
+			$replacements = array();
+                        
+			foreach ($multilineComments[1] as $multilineComment) {
+				$replacements[] = preg_replace('/^/m', '// ', $multilineComment);
+			}
+
+			$file = explode("\n", "\n" . str_replace($multilineComments[1], $replacements, $file));
 			$lines = array_intersect_key($file, array_flip($result));
 			$result = array_keys(array_filter($lines, function($line) use ($options) {
 				$line = trim($line);
-				$empty = (strpos($line, '//') === 0 || preg_match($options['pattern'], $line));
+				$empty = (preg_match('/^\/(\/|\*)/', $line) || preg_match($options['pattern'], $line));
 				return $empty ? false : (str_replace($options['empty'], '', $line) != '');
 			}));
 		}
