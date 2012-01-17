@@ -176,8 +176,11 @@ class Inspector extends \lithium\core\StaticObject {
 	 */
 	public static function executable($class, array $options = array()) {
 		$defaults = array(
-			'self' => true, 'filter' => true, 'methods' => array(),
-			'empty' => array(' ', "\t", '}', ')', ';'), 'pattern' => null,
+			'self' => true,
+			'filter' => true,
+			'methods' => array(),
+			'empty' => array(' ', "\t", '}', ')', ';'),
+			'pattern' => null,
 			'blockOpeners' => array('switch (', 'try {', '} else {', 'do {', '} while')
 		);
 		$options += $defaults;
