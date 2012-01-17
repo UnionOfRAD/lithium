@@ -206,8 +206,7 @@ class Inspector extends \lithium\core\StaticObject {
 		$result = array_filter(static::methods($class, 'ranges', $options));
 
 		if ($options['filter'] && $class->getFileName()) {
-			$file = explode("\n", "\n" . file_get_contents($class->getFileName()));
-			$lines = array_intersect_key($file, array_flip($result));
+			$lines = static::lines($class->getFileName(), $result);
 			$start = key($lines);
 
 			$code = implode("\n", $lines);
