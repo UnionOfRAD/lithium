@@ -280,7 +280,7 @@ class Inflector {
 			$regexIrregular = static::_enclose(join( '|', array_keys($irregular)));
 			static::$_plural += compact('regexUninflected', 'regexIrregular');
 		}
-		if (preg_match('/^(' . $regexUninflected . ')$/i', $word, $regs)) {
+		if (preg_match('/(' . $regexUninflected . ')$/i', $word, $regs)) {
 			return static::$_pluralized[$word] = $word;
 		}
 		if (preg_match('/(.*)\\b(' . $regexIrregular . ')$/i', $word, $regs)) {
