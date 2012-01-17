@@ -216,17 +216,17 @@ class Inspector extends \lithium\core\StaticObject {
 			foreach ($tokens as $token) {
 				if (is_array($token)) {
 					if (!in_array($token[0], array(T_COMMENT, T_DOC_COMMENT, T_WHITESPACE))) {
-						array_push($tmp, $token[2]);
+						$tmp[] = $token[2];
 					}
 				}
 			}
 
-			$lines_without_comments = array_values(array_map(
+			$filteredLines = array_values(array_map(
 				function($ln) use ($start) { return $ln + $start - 1; },
 				array_unique($tmp))
 			);
 
-			$lines = array_intersect_key($lines, array_flip($lines_without_comments));
+			$lines = array_intersect_key($lines, array_flip($filteredLines));
 
 			$result = array_keys(array_filter($lines, function($line) use ($options) {
 				$line = trim($line);
