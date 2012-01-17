@@ -176,8 +176,11 @@ class Inspector extends \lithium\core\StaticObject {
 	 */
 	public static function executable($class, array $options = array()) {
 		$defaults = array(
-			'self' => true, 'filter' => true, 'methods' => array(),
-			'empty' => array(' ', "\t", '}', ')', ';'), 'pattern' => null,
+			'self' => true,
+			'filter' => true,
+			'methods' => array(),
+			'empty' => array(' ', "\t", '}', ')', ';'),
+			'pattern' => null,
 			'blockOpeners' => array('switch (', 'try {', '} else {', 'do {', '} while')
 		);
 		$options += $defaults;
@@ -203,11 +206,31 @@ class Inspector extends \lithium\core\StaticObject {
 		$result = array_filter(static::methods($class, 'ranges', $options));
 
 		if ($options['filter'] && $class->getFileName()) {
-			$file = explode("\n", "\n" . file_get_contents($class->getFileName()));
-			$lines = array_intersect_key($file, array_flip($result));
+			$lines = static::lines($class->getFileName(), $result);
+			$start = key($lines);
+
+			$code = implode("\n", $lines);
+			$tokens = token_get_all('<?php' . $code);
+			$tmp = array();
+
+			foreach ($tokens as $token) {
+				if (is_array($token)) {
+					if (!in_array($token[0], array(T_COMMENT, T_DOC_COMMENT, T_WHITESPACE))) {
+						$tmp[] = $token[2];
+					}
+				}
+			}
+
+			$filteredLines = array_values(array_map(
+				function($ln) use ($start) { return $ln + $start - 1; },
+				array_unique($tmp))
+			);
+
+			$lines = array_intersect_key($lines, array_flip($filteredLines));
+
 			$result = array_keys(array_filter($lines, function($line) use ($options) {
 				$line = trim($line);
-				$empty = (strpos($line, '//') === 0 || preg_match($options['pattern'], $line));
+				$empty = preg_match($options['pattern'], $line);
 				return $empty ? false : (str_replace($options['empty'], '', $line) != '');
 			}));
 		}
@@ -339,7 +362,7 @@ class Inspector extends \lithium\core\StaticObject {
 		$c = array();
 
 		if (strpos($data, PHP_EOL) !== false) {
-			$c = explode(PHP_EOL, PHP_EOL . $data); 
+			$c = explode(PHP_EOL, PHP_EOL . $data);
 		} else {
 			if (!file_exists($data)) {
 				$data = Libraries::path($data);
