@@ -205,9 +205,30 @@ class Inspector extends \lithium\core\StaticObject {
 		if ($options['filter'] && $class->getFileName()) {
 			$file = explode("\n", "\n" . file_get_contents($class->getFileName()));
 			$lines = array_intersect_key($file, array_flip($result));
+			$start = key($lines);
+
+			$code = implode("\n", $lines);
+			$tokens = token_get_all('<?php' . $code);
+			$tmp = array();
+
+			foreach ($tokens as $token) {
+				if (is_array($token)) {
+					if (!in_array($token[0], array(T_COMMENT, T_DOC_COMMENT, T_WHITESPACE))) {
+						array_push($tmp, $token[2]);
+					}
+				}
+			}
+
+			$lines_without_comments = array_values(array_map(
+				function($ln) use ($start) { return $ln + $start - 1; },
+				array_unique($tmp))
+			);
+
+			$lines = array_intersect_key($lines, array_flip($lines_without_comments));
+
 			$result = array_keys(array_filter($lines, function($line) use ($options) {
 				$line = trim($line);
-				$empty = (strpos($line, '//') === 0 || preg_match($options['pattern'], $line));
+				$empty = preg_match($options['pattern'], $line);
 				return $empty ? false : (str_replace($options['empty'], '', $line) != '');
 			}));
 		}
