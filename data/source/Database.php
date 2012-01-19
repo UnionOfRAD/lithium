@@ -473,16 +473,17 @@ abstract class Database extends \lithium\data\Source {
 		}
 
 		if (!$fields && !$joins) {
-			return array($modelName => array_keys($model::schema()));
+			return array($modelName => $model::schema()->names());
 		}
 
 		if (!$fields && $joins) {
-			$return = array($modelName => array_keys($model::schema()));
+			$result = array($modelName => $model::schema()->names());
+
 			foreach ($joins as $join) {
 				$model = $join->model();
-				$return[$join->alias()] = array_keys($model::schema());
+				$result[$join->alias()] = $model::schema()->names();
 			}
-			return $return;
+			return $result;
 		}
 
 		$relations = array_keys((array) $query->relationships());
@@ -493,7 +494,7 @@ abstract class Database extends \lithium\data\Source {
 		foreach ($fields as $scope => $field) {
 			switch (true) {
 				case (is_numeric($scope) && ($field == '*' || $field == $modelName)):
-					$result[$modelName] = array_keys($model::schema());
+					$result[$modelName] = $model::schema()->names();
 				break;
 				case (is_numeric($scope) && isset($schema[$field])):
 					$result[$modelName][] = $field;
@@ -520,7 +521,7 @@ abstract class Database extends \lithium\data\Source {
 						continue;
 					}
 					$scope = $join->model();
-					$result[$field] = array_keys($scope::schema());
+					$result[$field] = $scope::schema()->names();
 				break;
 			}
 		}
@@ -567,8 +568,7 @@ abstract class Database extends \lithium\data\Source {
 		$result = array();
 
 		foreach ($conditions as $key => $value) {
-			$schema[$key] = isset($schema[$key]) ? $schema[$key] : array();
-			$return = $this->_processConditions($key,$value, $schema);
+			$return = $this->_processConditions($key, $value, $schema);
 
 			if ($return) {
 				$result[] = $return;
@@ -580,7 +580,7 @@ abstract class Database extends \lithium\data\Source {
 
 	public function _processConditions($key, $value, $schema, $glue = 'AND') {
 		$constraintTypes =& $this->_constraintTypes;
-		$fieldMeta = !empty($schema[$key]) ? $schema[$key] : array();
+		$fieldMeta = $schema->fields($key) ?: array();
 
 		switch (true) {
 			case (is_numeric($key) && is_string($value)):
@@ -659,14 +659,15 @@ abstract class Database extends \lithium\data\Source {
 						$joins = $context->joins();
 						$schema = $joins[$item]->schema();
 					}
-					$toMerge[$item] = array_keys($schema);
+					$toMerge[$item] = $schema->names();
 					continue;
 				case strpos($item, '.') !== false:
 					list($name, $field) = explode('.', $item);
 					$toMerge[$name][] = $field;
 					continue;
 				default:
-					$mainSchema = array_keys((array)$context->schema());
+					$mainSchema = $context->schema()->names();
+
 					if (in_array($item, $mainSchema)) {
 						$toMerge[reset($modelNames)][] = $item;
 						continue;
