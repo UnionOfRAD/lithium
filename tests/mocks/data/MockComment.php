@@ -8,6 +8,7 @@
 
 namespace lithium\tests\mocks\data;
 
+use lithium\data\Schema;
 use lithium\data\model\Query;
 use lithium\data\entity\Record;
 use lithium\data\collection\RecordSet;
@@ -17,6 +18,13 @@ class MockComment extends \lithium\tests\mocks\data\MockBase {
 	public $belongsTo = array('MockPost');
 
 	protected $_meta = array('key' => 'comment_id');
+
+	public static function resetSchema($array = false) {
+		if ($array) {
+			static::_object()->_schema = array();
+		}
+		static::_object()->_schema = new Schema();
+	}
 
 	public static function find($type, array $options = array()) {
 		$defaults = array(

@@ -30,9 +30,10 @@ class MySql extends \lithium\data\source\Database {
 
 	protected $_classes = array(
 		'entity' => 'lithium\data\entity\Record',
-		'set' => 'lithium\data\collection\RecordSet',
+		'set'    => 'lithium\data\collection\RecordSet',
 		'relationship' => 'lithium\data\model\Relationship',
-		'result' => 'lithium\data\source\database\adapter\my_sql\Result'
+		'result' => 'lithium\data\source\database\adapter\my_sql\Result',
+		'schema' => 'lithium\data\Schema'
 	);
 
 	/**
@@ -227,7 +228,7 @@ class MySql extends \lithium\data\source\Database {
 					'default'  => $column['default']
 				);
 			}
-			return $fields;
+			return $this->_instance('schema', compact('fields'));
 		});
 	}
 

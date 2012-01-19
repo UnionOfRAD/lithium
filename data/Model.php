@@ -358,11 +358,7 @@ class Model extends \lithium\core\StaticObject {
 		$local = compact('class', 'name') + $options + $self->_meta;
 		$self->_meta = ($local + $source['meta'] + $meta);
 		$self->_meta['initialized'] = false;
-
-		if ($self->_schema) {
-			$self->schema()->append($schema + $source['schema']);
-		}
-
+		$self->schema()->append($schema + $source['schema']);
 
 		$self->_finders += $source['finders'] + $self->_findFilters();
 		static::_relations();
@@ -605,22 +601,24 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function schema($field = null) {
 		$self = static::_object();
-
-		if ($field === false) {
-			return $self->_schema = null;
-		}
-
 		$source = $self::meta('source');
+
 		if (!is_object($self->_schema)) {
 			$self->_schema = static::connection()->describe($source, $self->_schema, $self->_meta);
+
+			if (!is_object($self->_schema)) {
+				$class = get_called_class();
+				throw new ConfigException("Could not load schema object for model `{$class}`.");
+			}
 			$key = (array) self::meta('key');
+
 			if ($self->_schema && $self->_schema->fields() && !$self->_schema->has($key)) {
-				$message = 'Missing key `' . implode('`, `', $key) . '` from schema.';
-				throw new ConfigException($message);
+				$key = implode('`, `', $key);
+				throw new ConfigException("Missing key `{$key}` from schema.");
 			}
 		}
-		if (!$self->_schema) {
-			return;
+		if ($field === false) {
+			return $self->_schema->reset();
 		}
 		return $field ? $self->_schema->fields($field) : $self->_schema;
 	}
@@ -681,20 +679,9 @@ class Model extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	public static function create(array $data = array(), array $options = array()) {
-		$params = compact('data', 'options');
-
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
-			$data = $params['data'];
-			$options = $params['options'];
-			$defaults = array();
-
-			foreach ((array) $self::schema() as $field => $config) {
-				if (isset($config['default'])) {
-					$defaults[$field] = $config['default'];
-				}
-			}
-			$data = Set::merge(Set::expand($defaults), $data);
-			return $self::connection()->item($self, $data, $options);
+		return static::_filter(__FUNCTION__, compact('data', 'options'), function($self, $params) {
+			$data = Set::merge(Set::expand($self::schema()->defaults()), $params['data']);
+			return $self::connection()->item($self, $data, $params['options']);
 		});
 	}
 
@@ -714,8 +701,12 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function instanceMethods(array $methods = null) {
 		$class = get_called_class();
+
 		if (!isset(static::$_instanceMethods[$class])) {
 			static::$_instanceMethods[$class] = array();
+		}
+		if ($methods === array()) {
+			return static::$_instanceMethods[$class] = array();
 		}
 		if (!is_null($methods)) {
 			static::$_instanceMethods[$class] = $methods + static::$_instanceMethods[$class];
@@ -815,7 +806,7 @@ class Model extends \lithium\core\StaticObject {
 				}
 			}
 			if (($whitelist = $options['whitelist']) || $options['locked']) {
-				$whitelist = $whitelist ?: array_keys($_schema);
+				$whitelist = $whitelist ?: array_keys($_schema->fields());
 			}
 
 			$type = $entity->exists() ? 'update' : 'create';
