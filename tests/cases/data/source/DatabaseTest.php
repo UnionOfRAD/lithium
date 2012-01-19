@@ -126,13 +126,11 @@ class DatabaseTest extends \lithium\test\Unit {
 	public function testSchema() {
 		$model = $this->_model;
 		$modelName = $model::meta('name');
-		$expected = array($modelName => array(
-			'id', 'author_id', 'title', 'created'
-		));
-		$result = $this->db->schema(new Query(array('model' => $this->_model)));
+		$expected = array($modelName => array('id', 'author_id', 'title', 'created'));
+		$result = $this->db->schema(new Query(compact('model')));
 		$this->assertEqual($expected, $result);
 
-		$query = new Query(array('model' =>  $this->_model, 'fields' => '*'));
+		$query = new Query(compact('model') + array('fields' => '*'));
 		$result = $this->db->schema($query);
 		$this->assertEqual($expected, $result);
 
@@ -165,12 +163,9 @@ class DatabaseTest extends \lithium\test\Unit {
 		);
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
-			$modelName => array(
-				'id', 'title'
-			),
-			'MockDatabaseComment' => array(
-				'body'
-			));
+			$modelName => array('id', 'title'),
+			'MockDatabaseComment' => array('body')
+		);
 		$this->assertEqual($expected, $result);
 
 		$options['fields'] = array(
@@ -179,25 +174,17 @@ class DatabaseTest extends \lithium\test\Unit {
 		);
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
-			$modelName => array(
-				'id', 'title'
-			),
-			'MockDatabaseComment' => array(
-				'body', 'created'
-			));
+			$modelName => array('id', 'title'),
+			'MockDatabaseComment' => array('body', 'created')
+		);
 		$this->assertEqual($expected, $result);
 
-		$options['fields'] = array(
-			'MockDatabasePost', 'MockDatabaseComment'
-		);
+		$options['fields'] = array('MockDatabasePost', 'MockDatabaseComment');
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
-			$modelName => array(
-				'id', 'author_id', 'title', 'created'
-			),
-			'MockDatabaseComment' => array(
-				'id', 'post_id', 'author_id', 'body', 'created'
-			));
+			$modelName => array('id', 'author_id', 'title', 'created'),
+			'MockDatabaseComment' => array('id', 'post_id', 'author_id', 'body', 'created')
+		);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -208,16 +195,15 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testSimpleQueryRender() {
+		$fieldList = 'MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created';
+		$table = '{mock_database_posts} AS {MockDatabasePost}';
+
 		$result = $this->db->renderCommand(new Query(array(
 			'type' => 'read',
 			'model' => $this->_model,
 			'fields' => array('id', 'title', 'created')
 		)));
-		$fields = 'id, title, created';
-		$table = '{mock_database_posts} AS {MockDatabasePost}';
-		$expected = "SELECT MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created"
-						. " FROM {$table};";
-		$this->assertEqual($expected, $result);
+		$this->assertEqual("SELECT {$fieldList} FROM {$table};", $result);
 
 		$result = $this->db->renderCommand(new Query(array(
 			'type' => 'read',
@@ -225,10 +211,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'fields' => array('id', 'title', 'created'),
 			'limit' => 1
 		)));
-		$expected = 'SELECT MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created'
-						. ' FROM {mock_database_posts} AS {MockDatabasePost} ';
-		$expected .= 'LIMIT 1;';
-		$this->assertEqual($expected, $result);
+		$this->assertEqual("SELECT {$fieldList} FROM {$table} LIMIT 1;", $result);
 
 		$result = $this->db->renderCommand(new Query(array(
 			'type' => 'read',
@@ -237,10 +220,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'limit' => 1,
 			'conditions' => 'Post.id = 2'
 		)));
-		$expected = 'SELECT MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created'
-						. ' FROM {mock_database_posts} AS {MockDatabasePost} ';
-		$expected .= 'WHERE Post.id = 2 LIMIT 1;';
-		$this->assertEqual($expected, $result);
+		$this->assertEqual("SELECT {$fieldList} FROM {$table} WHERE Post.id = 2 LIMIT 1;", $result);
 	}
 
 	public function testNestedQueryConditions() {
@@ -374,8 +354,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$expected = "SELECT * from mock_database_posts AS MockDatabasePost;";
-		$result = $this->db->sql;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $this->db->sql);
 	}
 
 	public function testCalculation() {

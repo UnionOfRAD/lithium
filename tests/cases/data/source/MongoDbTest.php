@@ -18,6 +18,8 @@ use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
+use lithium\tests\mocks\data\MockPost;
+use lithium\tests\mocks\data\MockComment;
 use lithium\tests\mocks\data\source\MockMongoSource;
 use lithium\tests\mocks\data\source\MockMongoConnection;
 
@@ -88,6 +90,10 @@ class MongoDbTest extends \lithium\test\Unit {
 		Connections::config(array('lithium_mongo_test' => $this->_testConfig));
 		$this->db = Connections::get('lithium_mongo_test');
 		$model = $this->_model;
+
+		MockPost::resetSchema(true);
+		MockComment::resetSchema(true);
+
 		$model::config(array('key' => '_id'));
 		$model::resetConnection(false);
 
