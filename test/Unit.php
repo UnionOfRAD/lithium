@@ -511,6 +511,48 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
+	 * Assert that the code passed in a closure throws an exception matching the passed expected
+	 * exception.
+	 *
+	 * The value passed to `exepected` is either an exception class name or the expected message.
+	 *
+	 * @param mixed $expected A string indicating what the error text is expected to be.  This can
+	 *              be an exact string, a /-delimited regular expression, or true, indicating that
+	 *              any error text is acceptable.
+	 * @param closure $closure A closure containing the code that should throw the exception.
+	 * @param string $message
+	 * @return boolean
+	 */
+	public function assertException($expected, $closure, $message = '{:message}') {
+		try {
+			$closure();
+			$message = sprintf('An exception "%s" was expected but not thrown.', $expected);
+			return $this->assert(false, $message, compact('expected', 'result'));
+		} catch (Exception $e) {
+			$class = get_class($e);
+			$eMessage = $e->getMessage();
+
+			if (get_class($e) == $expected) {
+				$result = $class;
+				return $this->assert(true, $message, compact('expected', 'result'));
+			} else {
+				if ($eMessage == $expected) {
+					$result = $eMessage;
+					return $this->assert(true, $message, compact('expected', 'result'));
+				} else if (Validator::isRegex($expected) && preg_match($expected, $eMessage)) {
+					$result = $eMessage;
+					return $this->assert(true, $message, compact('expected', 'result'));
+				}
+			}
+
+			$message = sprintf(
+				'Exception "%s" was expected. Exception "%s" with message "%s" was thrown instead.',
+				$expected, get_class($e), $eMessage);
+			return $this->assert(false, $message);
+		}
+	}
+
+	/**
 	 * Assert Cookie data is properly set in headers.
 	 *
 	 * The value passed to `exepected` is an array of the cookie data, with at least the key and

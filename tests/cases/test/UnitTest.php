@@ -344,6 +344,62 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['message']);
 	}
 
+	public function testAssertException() {
+		$closure = function() {
+			throw new Exception('Test exception message.');
+		};
+
+		$expected = 'Test exception message.';
+		$this->assertException($expected, $closure);
+
+		$expected = 'Exception';
+		$this->assertException($expected, $closure);
+
+		$expected = '/Test/';
+		$this->assertException($expected, $closure);
+	}
+
+	public function testAssertExceptionNotThrown() {
+		$closure = function() {};
+		$expected = 'Exception';
+		$this->assertException($expected, $closure);
+
+		$expected = 'fail';
+		$result = array_pop($this->_results);
+		$this->assertEqual($expected, $result['result']);
+
+		$expected = 'testAssertExceptionNotThrown';
+		$this->assertEqual($expected, $result['method']);
+
+		$expected = 'assertException';
+		$this->assertEqual($expected, $result['assertion']);
+
+		$expected = 'An exception "Exception" was expected but not thrown.';
+		$this->assertEqual($expected, $result['message']);
+	}
+
+	public function testAssertExceptionWrongException() {
+		$closure = function() {
+			throw new Exception('incorrect');
+		};
+
+		$expected = 'correct';
+		$this->assertException($expected, $closure);
+
+		$expected = 'fail';
+		$result = array_pop($this->_results);
+		$this->assertEqual($expected, $result['result']);
+
+		$expected = 'testAssertExceptionWrongException';
+		$this->assertEqual($expected, $result['method']);
+
+		$expected = 'assertException';
+		$this->assertEqual($expected, $result['assertion']);
+
+		$expected = 'Exception "correct" was expected. Exception "Exception" with message "incorrect" was thrown instead.';
+		$this->assertEqual($expected, $result['message']);
+	}
+
 	public function testIdenticalArrayFail() {
 		$expected = array('1', '2', '3');
 		$result = array(1, '2', '3');;
@@ -565,7 +621,7 @@ class UnitTest extends \lithium\test\Unit {
 	 *
 	 */
 	public function testResults() {
-		$expected = 90;
+		$expected = 101;
 		$result = count($this->results());
 		$this->assertEqual($expected, $result);
 	}
@@ -584,7 +640,9 @@ class UnitTest extends \lithium\test\Unit {
 			'testAssertIdenticalArray',
 			'testAssertNull', 'testAssertNoPattern', 'testAssertPattern', 'testAssertTags',
 			'testAssertTagsNoClosingTag', 'testAssertTagsMissingAttribute',
-			'testAssertTagsString', 'testAssertTagsFailTextEqual', 'testIdenticalArrayFail',
+			'testAssertTagsString', 'testAssertTagsFailTextEqual',
+			'testAssertException', 'testAssertExceptionNotThrown',
+			'testAssertExceptionWrongException', 'testIdenticalArrayFail',
 			'testCleanUp', 'testCleanUpWithFullPath', 'testCleanUpWithRelativePath',
 			'testSkipIf', 'testExpectException', 'testHandleException', 'testExpectExceptionRegex',
 			'testExpectExceptionNotThrown', 'testExpectExceptionPostNotThrown',
