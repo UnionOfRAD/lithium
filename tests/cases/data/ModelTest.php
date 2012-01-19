@@ -36,6 +36,7 @@ class ModelTest extends \lithium\test\Unit {
 		Connections::config(array('mock-source' => array(
 			'type' => 'lithium\tests\mocks\data\MockSource'
 		)));
+		MockPost::resetSchema(true);
 		MockPost::config(array('connection' => 'mock-source'));
 		MockTag::config();
 		MockComment::config();
@@ -88,23 +89,24 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testInstanceMethods() {
-	    $methods = MockPost::instanceMethods();
-	    $this->assertTrue(empty($methods));
+		MockPost::instanceMethods(array());
+		$methods = MockPost::instanceMethods();
+		$this->assertTrue(empty($methods));
 
-	    MockPost::instanceMethods(array(
-	       'first' => array('lithium\tests\mocks\data\source\MockMongoPost', 'testInstanceMethods'),
-	       'second' => function($entity) {}
-	    ));
+		MockPost::instanceMethods(array(
+			'first' => array('lithium\tests\mocks\data\source\MockMongoPost', 'testInstanceMethods'),
+			'second' => function($entity) {}
+		));
 
-	    $methods = MockPost::instanceMethods();
-	    $this->assertEqual(2, count($methods));
+		$methods = MockPost::instanceMethods();
+		$this->assertEqual(2, count($methods));
 
-	    MockPost::instanceMethods(array(
-	       'third' => function($entity) {}
-	    ));
+		MockPost::instanceMethods(array(
+			'third' => function($entity) {}
+		));
 
-	    $methods = MockPost::instanceMethods();
-	    $this->assertEqual(3, count($methods));
+		$methods = MockPost::instanceMethods();
+		$this->assertEqual(3, count($methods));
 	}
 
 	public function testMetaInformation() {
@@ -457,7 +459,7 @@ class ModelTest extends \lithium\test\Unit {
 				'email is not valid',
 				'email is not in 1st list',
 				'email is not in 2nd list'
-				)
+			)
 		);
 		$result = $post->errors();
 		$this->assertEqual($expected, $result);
@@ -534,8 +536,21 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testModelWithNoBackend() {
 		$this->assertEqual('mock-source', MockPost::meta('connection'));
-		$this->expectException('/^The data connection `invalid` is not configured.$/');
-		MockPost::config(array('connection' => 'invalid'));
+
+		MockPost::config(array('connection' => false));
+		$this->assertFalse(MockPost::meta('connection'));
+		$schema = MockPost::schema();
+
+		MockPost::overrideSchema($this->_altSchema);
+		$this->assertEqual($this->_altSchema, MockPost::schema()->fields());
+
+		$post = MockPost::create(array('title' => 'New post'));
+		$this->assertTrue($post instanceof Entity);
+		$this->assertEqual('New post', $post->title);
+		MockPost::overrideSchema($schema->fields());
+
+		$this->expectException('/Connection name not defined/');
+		$post->save();
 	}
 
 	public function testSave() {
@@ -549,15 +564,18 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual('create', $result['query']->type());
 		$this->assertEqual($data, $result['query']->data());
 		$this->assertEqual('lithium\tests\mocks\data\MockPost', $result['query']->model());
+		MockPost::overrideSchema($this->_altSchema);
 
 		$record->tags = array("baz", "qux");
 		$otherData = array('body' => 'foobar');
 		$result = $record->save($otherData);
 		$data['body'] = 'foobar';
 		$data['tags'] = array("baz", "qux");
+
+		$expected = array('title' => 'New post', 'author_id' => 13, 'body' => 'foobar');
 		$this->assertNotEqual($data, $result['query']->data());
 
-		MockPost::overrideSchema($schema);
+		MockPost::overrideSchema($schema->fields());
 	}
 
 	public function testSaveWithNoCallbacks() {
@@ -570,7 +588,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual('create', $result['query']->type());
 		$this->assertEqual($data, $result['query']->data());
 		$this->assertEqual('lithium\tests\mocks\data\MockPost', $result['query']->model());
-		MockPost::overrideSchema($schema);
+		MockPost::overrideSchema($schema->fields());
 	}
 
 	public function testSaveWithFailedValidation() {
@@ -690,24 +708,19 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testSettingNestedObjectDefaults() {
-		$this->skipIf(!MockMongoConnection::enabled(), 'MongoDb not enabled.');
-
-		MockPost::$connection = new MockMongoConnection();
-		$schema = MockPost::schema();
-		$originalSchema = $schema;
-		$schema->append(array(
+		$original = MockPost::schema()->fields();
+		$schema = MockPost::schema()->append(array(
 			'nested.value' => array(
 				'type' => 'string',
 				'default' => 'foo'
 			)
 		));
-		$this->assertEqual('foo', MockPost::create()->nested->value);
+		$this->assertEqual('foo', MockPost::create()->nested['value']);
 
 		$data = array('nested' => array('value' => 'bar'));
-		$this->assertEqual('bar', MockPost::create($data)->nested->value);
+		$this->assertEqual('bar', MockPost::create($data)->nested['value']);
 
-		MockPost::overrideSchema($originalSchema);
-		MockPost::$connection = null;
+		MockPost::overrideSchema($original);
 	}
 }
 

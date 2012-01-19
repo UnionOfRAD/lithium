@@ -299,7 +299,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			unset($this->_increment[$key]);
 		}
 
-		if ($data && $schema = $this->schema()) {
+		if ($data && ($schema = $this->schema())) {
 			$pathKey = $this->_pathKey;
 			$model = $this->_model;
 			$data = $schema->cast($this, $data, compact('pathKey', 'model'));
