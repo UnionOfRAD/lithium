@@ -55,7 +55,7 @@ class MongoDbTest extends \lithium\test\Unit {
 	protected $_configs = array();
 
 	public function skip() {
-		$this->skipIf(!MongoDb::enabled(), 'MongoDb is not enabled');
+		$this->skipIf(!MongoDb::enabled(), 'The `MongoDb` class is not enabled.');
 
 		$db = new MongoDb($this->_testConfig);
 		$message = "`{$this->_testConfig['database']}` database or connection unavailable";

@@ -16,14 +16,12 @@ class MemcacheTest extends \lithium\test\Unit {
 	protected $_conn = null;
 
 	/**
-	 * Skip the test if Memcached extension is unavailable.
-	 *
-	 * @return void
+	 * Skip the test if the adapter is enabled. If it is not it means the
+	 * libmemcached extension is unavailable. Also checks for a running
+	 * Memcached server.
 	 */
 	public function skip() {
-		$extensionExists = extension_loaded('memcached');
-		$message = 'The libmemcached extension is not installed.';
-		$this->skipIf(!$extensionExists, $message);
+		$this->skipIf(!Memcache::enabled(), 'The `Memcache` adapter is not enabled.');
 
 		$conn = new Memcached();
 		$conn->addServer('127.0.0.1', 11211);
