@@ -9,13 +9,15 @@
 namespace lithium\tests\cases\data;
 
 use lithium\data\Entity;
+use lithium\data\Schema;
 
 class EntityTest extends \lithium\test\Unit {
 
-	protected $_model = 'lithium\tests\mocks\data\source\MockMongoPost';
+	protected $_model = 'lithium\tests\mocks\data\MockPost';
 
 	public function testSchemaAccess() {
-		$schema = array('foo' => array('type' => 'string'));
+		$fields = array('foo' => array('type' => 'string'));
+		$schema = new Schema(compact('fields'));
 		$entity = new Entity(compact('schema'));
 		$this->assertEqual($schema, $entity->schema());
 	}
@@ -58,7 +60,8 @@ class EntityTest extends \lithium\test\Unit {
 
 	public function testMethodDispatch() {
 		$model = $this->_model;
-		$entity = new Entity(array('model' => $model, 'data' => array('foo' => true)));
+		$data = array('foo' => true);
+		$entity = new Entity(compact('model', 'data'));
 		$this->assertTrue($entity->validates());
 
 		$model::instanceMethods(array(

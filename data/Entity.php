@@ -243,7 +243,8 @@ class Entity extends \lithium\core\Object {
 	}
 
 	public function schema($field = null) {
-		$schema = array();
+		$schema = null;
+
 		switch (true) {
 			case (is_object($this->_schema)):
 				$schema = $this->_schema;
@@ -252,10 +253,10 @@ class Entity extends \lithium\core\Object {
 				$schema = $model::schema();
 			break;
 		}
-		if ($field) {
-			return isset($schema[$field]) ? $schema[$field] : null;
+		if ($schema) {
+			return $field ? $schema->fields($field) : $schema;
 		}
-		return $schema;
+		return array();
 	}
 
 	/**
@@ -377,6 +378,20 @@ class Entity extends \lithium\core\Object {
 			'update'    => $this->_updated,
 			'increment' => $this->_increment
 		);
+	}
+
+	/**
+	 * Configures protected properties of an `Entity` so that it is parented to `$parent`.
+	 *
+	 * @param object $parent
+	 * @param array $config
+	 * @return void
+	 */
+	public function assignTo($parent, array $config = array()) {
+		foreach ($config as $key => $val) {
+			$this->{'_' . $key} = $val;
+		}
+		$this->_parent =& $parent;
 	}
 
 	/**

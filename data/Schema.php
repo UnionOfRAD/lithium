@@ -2,12 +2,16 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2011, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
 namespace lithium\data;
 
+/**
+ * This class encapsulates a schema definition, usually for a model class, and is comprised of named fields and
+ * types.
+ */
 class Schema extends \lithium\core\Object implements \ArrayAccess {
 
 	protected $_fields = array();
@@ -28,6 +32,24 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 			return isset($field[$key]) ? $field[$key] : null;
 		}
 		return $field;
+	}
+
+	public function names() {
+		return array_keys($this->_fields);
+	}
+
+	public function defaults($name = null) {
+		if ($name) {
+			return isset($this->_fields[$name]['default']) ? $this->_fields[$name]['default'] : null;
+		}
+		$defaults = array();
+
+		foreach ($this->_fields as $key => $value) {
+			if (isset($value['default'])) {
+				$defaults[$key] = $value['default'];
+			}
+		}
+		return $defaults;
 	}
 
 	public function meta($name = null) {
@@ -71,6 +93,10 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 		return $data;
 	}
 
+	public function reset() {
+		$this->_fields = array();
+	}
+
 	/**
 	 * Appends additional fields to the schema. Will not overwrite existing fields if any conflicts
 	 * arise.
@@ -83,6 +109,21 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 			throw new Exception("Schema cannot be modified.");
 		}
 		$this->_fields += $fields;
+	}
+
+	/**
+	 * Merges another `Schema` object into the current one.
+	 *
+	 * @param object $schema Another `Schema` class object to be merged into the current one. If this schema
+	 *               contains field names that conflict with existing field names, the existing fields will not
+	 *               be overwritten.
+	 * @return void
+	 */
+	public function merge($schema) {
+		if ($this->_locked) {
+			throw new Exception("Schema cannot be modified.");
+		}
+		$this->_fields += $schema->fields();
 	}
 
 	public function offsetGet($key) {

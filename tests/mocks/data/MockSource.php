@@ -86,6 +86,12 @@ class MockSource extends \lithium\data\Source {
 		)
 	);
 
+	protected $_postsTags = array(
+		'id' => array('type' => 'int'),
+		'post_id' => array('type' => 'int'),
+		'tag_id' => array('type' => 'int'),
+	);
+
 	protected $_mockCreators = array(
 		'id' => array('type' => 'int'),
 		'name' => array(
