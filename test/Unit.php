@@ -235,6 +235,15 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
+	 * Generates a failed test with the passed message.
+	 *
+	 * @param string $message
+	 */
+	public function fail($message = false) {
+		$this->assert(false, $message);
+	}
+
+	/**
 	 * Checks that the actual result is equal, but not neccessarily identical, to the expected
 	 * result.
 	 *

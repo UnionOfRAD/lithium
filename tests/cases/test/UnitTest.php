@@ -161,6 +161,23 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result[0]);
 	}
 
+	public function testFail() {
+		$this->fail('Test failed.');
+
+		$result = array_pop($this->_results);
+		$expected = 'fail';
+		$this->assertEqual($expected, $result['result']);
+
+		$expected = 'testFail';
+		$this->assertEqual($expected, $result['method']);
+
+		$expected = 'fail';
+		$this->assertEqual($expected, $result['assertion']);
+
+		$expected = 'Test failed.';
+		$this->assertEqual($expected, $result['message']);
+	}
+
 	public function testAssertNotEqual() {
 		$expected = true;
 		$result = true;
@@ -621,7 +638,7 @@ class UnitTest extends \lithium\test\Unit {
 	 *
 	 */
 	public function testResults() {
-		$expected = 101;
+		$expected = 105;
 		$result = count($this->results());
 		$this->assertEqual($expected, $result);
 	}
@@ -636,8 +653,8 @@ class UnitTest extends \lithium\test\Unit {
 			'testCompareTypes', 'testAssertEqualNumeric',
 			'testAssertEqualNumericFail', 'testAssertEqualAssociativeArray',
 			'testAssertEqualThreeDFail', 'testAssertWithCustomMessage',
-			'testSubject', 'testRun', 'testAssertNotEqual', 'testAssertIdentical',
-			'testAssertIdenticalArray',
+			'testSubject', 'testRun', 'testFail', 'testAssertNotEqual',
+			'testAssertIdentical', 'testAssertIdenticalArray',
 			'testAssertNull', 'testAssertNoPattern', 'testAssertPattern', 'testAssertTags',
 			'testAssertTagsNoClosingTag', 'testAssertTagsMissingAttribute',
 			'testAssertTagsString', 'testAssertTagsFailTextEqual',
