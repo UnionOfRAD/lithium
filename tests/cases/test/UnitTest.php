@@ -438,6 +438,17 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertTrue(empty($this->_expected));
 	}
 
+	public function testExpectExceptionNotThrown() {
+		$this->expectException('test');
+	}
+
+	public function testExpectExceptionPostNotThrown() {
+		$result = end($this->_results);
+		$expected = 'testExpectExceptionNotThrown';
+		$this->assertEqual($expected, $result['method'],
+			'expectException in a method with no exception should result in a failed test.');
+	}
+
 	public function testGetTest() {
 		$test = static::get('lithium\test\Unit');
 		$this->assertEqual($test, __CLASS__);
@@ -554,7 +565,7 @@ class UnitTest extends \lithium\test\Unit {
 	 *
 	 */
 	public function testResults() {
-		$expected = 89;
+		$expected = 90;
 		$result = count($this->results());
 		$this->assertEqual($expected, $result);
 	}
@@ -576,6 +587,7 @@ class UnitTest extends \lithium\test\Unit {
 			'testAssertTagsString', 'testAssertTagsFailTextEqual', 'testIdenticalArrayFail',
 			'testCleanUp', 'testCleanUpWithFullPath', 'testCleanUpWithRelativePath',
 			'testSkipIf', 'testExpectException', 'testHandleException', 'testExpectExceptionRegex',
+			'testExpectExceptionNotThrown', 'testExpectExceptionPostNotThrown',
 			'testGetTest', 'testAssertCookie', 'testAssertCookieWithHeaders',
 			'testCompareWithEmptyResult',
 			'testExceptionCatching', 'testErrorHandling', 'testAssertObjects',
