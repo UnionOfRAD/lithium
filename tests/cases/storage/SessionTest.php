@@ -285,7 +285,6 @@ class SessionTest extends \lithium\test\Unit {
 		$this->assertFalse(Session::check('test'));
 		$this->assertFalse(Session::check('test', array('strategies' => false)));
 	}
-
 }
 
 ?>

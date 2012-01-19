@@ -226,7 +226,7 @@ class RecordSet extends \lithium\data\Collection {
 		switch ($format) {
 			case 'array':
 				$result = array_map(function($r) { return $r->to('array'); }, $this->_data);
-				
+
 				if (!(is_scalar(current($this->_index)) && $options['indexed'])) {
 					break;
 				}

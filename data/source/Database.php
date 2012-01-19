@@ -937,6 +937,7 @@ abstract class Database extends \lithium\data\Source {
 	 * Returns a fully-qualified table name (i.e. with prefix), quoted.
 	 *
 	 * @param string $entity
+	 * @param array $options
 	 * @return string
 	 */
 	protected function _entityName($entity, array $options = array()) {
