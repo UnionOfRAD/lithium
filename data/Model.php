@@ -190,6 +190,8 @@ class Model extends \lithium\core\StaticObject {
 	 *   `'user_profiles'`.
 	 * - `title`: The field or key used as the title for each record. Defaults to `'title'` or
 	 *   `'name'`, if those fields are available.
+	 * - `locked`: If set to `true` `$_schema` keys are evalueted to `Model::save()` as
+	 *   `whitelist` option if such is not present
 	 *
 	 * @var array
 	 * @see lithium\data\Connections::add()
