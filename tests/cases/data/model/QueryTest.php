@@ -35,21 +35,11 @@ class QueryTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->db = new MockDatabase();
-		$this->_configs = Connections::config();
-
-		Connections::reset();
-		Connections::config(array('mock-database-connection' => array(
-			'object' => &$this->db,
-			'adapter' => 'MockDatabase'
-		)));
-
 		MockQueryPost::config();
 		MockQueryComment::config();
-	}
 
-	public function tearDown() {
-		Connections::reset();
-		Connections::config($this->_configs);
+		MockQueryPost::$connection = $this->db;
+		MockQueryComment::$connection = $this->db;
 	}
 
 	/**
@@ -299,7 +289,7 @@ class QueryTest extends \lithium\test\Unit {
 		);
 		$query = new Query($options);
 
-		$result = $query->export(Connections::get('mock-database-connection'), array(
+		$result = $query->export($this->db, array(
 			'keys' => array('data', 'conditions')
 		));
 		$expected = array(
@@ -427,7 +417,7 @@ class QueryTest extends \lithium\test\Unit {
 			'model' => 'lithium\tests\mocks\data\model\MockQueryPost'
 		);
 		$query = new Query($options);
-		$result = $query->export(Connections::get('mock-database-connection'));
+		$result = $query->export($this->db);
 
 		$this->assertEqual(array('title' => '..'), $result['data']);
 		$this->assertEqual("WHERE {title} = 'FML'", $result['conditions']);
@@ -476,7 +466,7 @@ class QueryTest extends \lithium\test\Unit {
 			'source' => 'my_custom_table',
 			'alias' => 'MyCustomAlias'
 		));
-		$result = $query->export(Connections::get('mock-database-connection'));
+		$result = $query->export($this->db);
 		$this->assertEqual('{my_custom_table}', $result['source']);
 		$this->assertEqual('AS {MyCustomAlias}', $result['alias']);
 	}

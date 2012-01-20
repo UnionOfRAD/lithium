@@ -8,9 +8,11 @@
 
 namespace lithium\tests\mocks\data;
 
-class MockCreator extends \lithium\data\Model {
+class MockCreator extends \lithium\tests\mocks\data\MockBase {
 
-	protected $_meta = array('connection' => 'mock-source');
+	public static $connection = null;
+
+	protected $_meta = array('connection' => false);
 
 	protected $_schema = array(
 		'name' => array(
