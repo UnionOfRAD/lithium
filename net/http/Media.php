@@ -8,6 +8,7 @@
 
 namespace lithium\net\http;
 
+use lithium\util\Set;
 use lithium\util\String;
 use lithium\core\Libraries;
 use lithium\net\http\MediaException;
@@ -114,7 +115,7 @@ class Media extends \lithium\core\StaticObject {
 	 *
 	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(19-20) }}}
 	 *
-	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(35-36) }}}
+	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(40-41) }}}
 	 *
 	 * Alternatively, can be used to detect the type name of a registered content type:
 	 * {{{
@@ -192,17 +193,24 @@ class Media extends \lithium\core\StaticObject {
 	 *        should be the "primary" type, and will be used as the `Content-type` header of any
 	 *        `Response` objects served through this type.
 	 * @param array $options Optional.  The handling options for this media type. Possible keys are:
+	 *        - `'view'` _string_: Specifies the view class to use when rendering this content.
+	 *          Note that no `'view'` class is specified by default.  If you want to
+	 *          render templates using Lithium's default view class, use
+	 *          `'lithium\template\View'`
 	 *        - `'decode'` _mixed_: A (string) function name or (object) closure that handles
 	 *          decoding or unserializing content from this format.
 	 *        - `'encode'` _mixed_: A (string) function name or (object) closure that handles
 	 *          encoding or serializing content into this format.
 	 *        - `'cast'` _boolean_: Used with `'encode'`. If `true`, all data passed into the
 	 *          specified encode function is first cast to array structures.
-	 *        - `'layout'` _mixed_: Specifies one or more `String::insert()`-style paths to use when
-	 *          searching for layout files (either a string or array of strings).
-	 *        - `'template'` _mixed_: Specifies one or more `String::insert()`-style paths to use
-	 *          when searching for template files (either a string or array of strings).
-	 *        - `'view'` _string_: Specifies the view class to use when rendering this content.
+	 *        - `'paths'` _array_: Optional key/value pairs mapping paths for
+	 *          `'template'`, `'layout'`, and `'element'` template files.  Any keys ommitted
+	 *          will use the default path.  The values should be `String::insert()`-style
+	 *          paths or an array of `String::insert()`-style paths.  If it is an array,
+	 *          each path will be tried in the order specified until a template is found.
+	 *          This is useful for allowing custom templates while falling back on
+	 *          default templates if no custom template was found.  If you want to
+	 *          render templates without a layout, use a `false` value for `'layout'`.
 	 *        - `'conditions'` _array_: Optional key/value pairs used as assertions in content
 	 *          negotiation. See the above section on **Content Negotiation**.
 	 * @return mixed If `$content` and `$options` are empty, returns an array with `'content'` and
@@ -214,8 +222,11 @@ class Media extends \lithium\core\StaticObject {
 	public static function type($type, $content = null, array $options = array()) {
 		$defaults = array(
 			'view' => false,
-			'template' => false,
-			'layout' => false,
+			'paths' => array(
+				'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
+				'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
+				'element'  => '{:library}/views/elements/{:template}.{:type}.php'
+			),
 			'encode' => false,
 			'decode' => false,
 			'cast'   => true,
@@ -240,7 +251,7 @@ class Media extends \lithium\core\StaticObject {
 		if ($content) {
 			static::$_types[$type] = $content;
 		}
-		static::$_handlers[$type] = $options ? ($options + $defaults) : array();
+		static::$_handlers[$type] = $options ? Set::merge($defaults, $options) : array();
 	}
 
 	/**
