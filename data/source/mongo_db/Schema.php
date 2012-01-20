@@ -56,17 +56,24 @@ class Schema extends \lithium\data\Schema {
 
 	public function cast($object, $data, array $options = array()) {
 		$defaults = array(
-			'pathKey' => null, 'model' => null, 'schema' => $this, 'database' => null
+			'pathKey' => null,
+			'model' => null,
+			'schema' => $this,
+			'database' => null
 		);
 		$options += $defaults;
 		$basePathKey = $options['pathKey'];
+
 		if (is_scalar($data)) {
 			return $this->_castType($data, $basePathKey);
 		}
-
 		$model = method_exists($object, 'model') ? $object->model() : null;
 		$model = $model ? $model : $options['model'];
-		$database = $model ? $model::connection() : $options['database'];
+		$database = $options['database'] ?: null;
+
+		if ($model && !$database) {
+			$database = $model::connection();
+		}
 
 		foreach ($data as $key => $val) {
 			if (is_object($val)) {
@@ -74,6 +81,7 @@ class Schema extends \lithium\data\Schema {
 			}
 			$pathKey = $basePathKey ? $basePathKey . '.' . $key : $key;
 			$isArray = $this->is('array', $pathKey) || $this->type($pathKey) == 'array';
+
 			if (is_array($val) || $isArray) {
 				$val = (array) $val;
 				$numericArray = !$val || array_keys($val) === range(0, count($val) - 1);

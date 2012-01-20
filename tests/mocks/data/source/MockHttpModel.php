@@ -8,12 +8,16 @@
 
 namespace lithium\tests\mocks\data\source;
 
+use lithium\data\source\Http;
+
 class MockHttpModel extends \lithium\data\Model {
 
 	protected $_meta = array(
 		'source' => 'posts',
-		'connection' => 'mock-http-connection'
+		'connection' => false
 	);
+
+	public static $connection = null;
 
 	protected $_schema = array(
 		'id' => array('type' => 'integer', 'key' => 'primary'),
@@ -23,6 +27,14 @@ class MockHttpModel extends \lithium\data\Model {
 		'created' => array('type' => 'datetime'),
 		'updated' => array('type' => 'datetime')
 	);
+
+	public static function &connection() {
+		if (static::$connection) {
+			return static::$connection;
+		}
+		$result = new Http();
+		return $result;
+	}
 }
 
 ?>

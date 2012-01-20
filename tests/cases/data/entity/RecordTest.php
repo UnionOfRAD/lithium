@@ -8,27 +8,18 @@
 
 namespace lithium\tests\cases\data\entity;
 
-use lithium\data\Connections;
 use lithium\data\entity\Record;
 
 class RecordTest extends \lithium\test\Unit {
 
-	protected $_configs = array();
+	protected $_database = 'lithium\tests\mocks\data\MockSource';
 
 	public function setUp() {
-		$this->_configs = Connections::config();
-
-		Connections::config(array('mock-source' => array(
-			'type' => '\lithium\tests\mocks\data\MockSource'
-		)));
+		$database = $this->_database;
 		$model = 'lithium\tests\mocks\data\MockPost';
-		$model::config(array('connection' => 'mock-source', 'key' => 'id'));
+		$model::config(array('connection' => false, 'key' => 'id'));
+		$model::$connection = new $database();
 		$this->record = new Record(compact('model'));
-	}
-
-	public function tearDown() {
-		Connections::reset();
-		Connections::config($this->_configs);
 	}
 
 	/**
