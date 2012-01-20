@@ -1118,15 +1118,6 @@ class Model extends \lithium\core\StaticObject {
 			}
 		);
 	}
-
-	/**
-	 * @deprecated
-	 * @see lithium\data\Model::connection()
-	 * @return connection object
-	 */
-	protected static function &_connection() {
-		return static::connection();
-	}
 }
 
 ?>
