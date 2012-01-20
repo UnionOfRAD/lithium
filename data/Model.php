@@ -386,7 +386,7 @@ class Model extends \lithium\core\StaticObject {
 
 		if ($method == 'all' || $isFinder) {
 			if ($params && is_scalar($params[0])) {
-				$params[0] = array('conditions' => array($self->_meta['key'] => $params[0]));
+				$params[0] = array('conditions' => static::key($params[0]));
 			}
 			return $self::find($method, $params ? $params[0] : array());
 		}
@@ -441,7 +441,7 @@ class Model extends \lithium\core\StaticObject {
 		}
 
 		if ($type != 'all' && is_scalar($type) && !isset($self->_finders[$type])) {
-			$options['conditions'] = array($self->_meta['key'] => $type);
+			$options['conditions'] = static::key($type);
 			$type = 'first';
 		}
 
@@ -526,7 +526,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return mixed Key value.
 	 */
 	public static function key($values = array()) {
-		$key = static::_object()->_meta['key'];
+		$key = static::meta('key');
 
 		if (is_object($values) && method_exists($values, 'to')) {
 			$values = $values->to('array');
@@ -686,16 +686,17 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Getter and setter for custom instance methods. This is used in `Entity::__call`.
+	 * Getter and setter for custom instance methods. This is used in `Entity::__call()`.
 	 *
 	 * {{{
 	 * Model::instanceMethods(array(
-	 *     'method_name' => array('Class', 'method'),
-	 *     'another_method' => array($object, 'method'),
-	 *     'closure_callback' => function($entity) {}
+	 *     'methodName' => array('Class', 'method'),
+	 *     'anotherMethod' => array($object, 'method'),
+	 *     'closureCallback' => function($entity) {}
 	 * ));
 	 * }}}
 	 *
+	 * @see lithium\data\Entity::__call()
 	 * @param array $methods
 	 * @return array
 	 */
@@ -1048,11 +1049,14 @@ class Model extends \lithium\core\StaticObject {
 	 * @todo See if this can be rewritten to be lazy.
 	 */
 	protected static function _relations() {
-		$self = static::_object();
-
-		if (!$self->_meta['connection']) {
+		try {
+			if (!static::connection()) {
+				return;
+			}
+		} catch (ConfigExcepton $e) {
 			return;
 		}
+		$self = static::_object();
 
 		foreach ($self->_relationTypes as $type => $keys) {
 			foreach (Set::normalize($self->{$type}) as $name => $config) {

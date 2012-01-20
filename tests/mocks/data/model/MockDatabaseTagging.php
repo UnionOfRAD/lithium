@@ -8,13 +8,13 @@
 
 namespace lithium\tests\mocks\data\model;
 
-class MockDatabaseTagging extends \lithium\data\Model {
+class MockDatabaseTagging extends \lithium\tests\mocks\data\MockBase {
+
+	public static $connection = null;
 
 	public $belongsTo = array('MockDatabasePost', 'MockDatabaseTag');
 
-	protected $_meta = array(
-		'connection' => 'mock-database-connection'
-	);
+	protected $_meta = array('connection' => false);
 
 	protected $_schema = array(
 		'id' => array('type' => 'integer'),

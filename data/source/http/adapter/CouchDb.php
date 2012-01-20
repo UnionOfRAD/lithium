@@ -54,7 +54,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param array $config
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('port' => 5984, 'version' => 1);
+		$defaults = array('port' => 5984, 'version' => 1, 'database' => null);
 		parent::__construct($config + $defaults);
 	}
 

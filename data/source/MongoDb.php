@@ -215,14 +215,21 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean Returns `true` the connection attempt was successful, otherwise `false`.
 	 */
 	public function connect() {
+		if ($this->server && $this->server->connected && $this->connection) {
+			return $this->_isConnected = true;
+		}
+
 		$cfg = $this->_config;
 		$this->_isConnected = false;
 
 		$host = is_array($cfg['host']) ? join(',', $cfg['host']) : $cfg['host'];
 		$login = $cfg['login'] ? "{$cfg['login']}:{$cfg['password']}@" : '';
 		$connection = "mongodb://{$login}{$host}" . ($login ? "/{$cfg['database']}" : '');
+
 		$options = array(
-			'connect' => true, 'timeout' => $cfg['timeout'], 'replicaSet' => $cfg['replicaSet']
+			'connect' => true,
+			'timeout' => $cfg['timeout'],
+			'replicaSet' => $cfg['replicaSet']
 		);
 
 		try {
@@ -275,23 +282,15 @@ class MongoDb extends \lithium\data\Source {
 	 *
 	 * @see lithium\data\source\MongoDb::$_schema
 	 * @param mixed $collection Specifies a collection name for which the schema should be queried.
-	 * @param mixed $schema Any schema data pre-defined by the model.
+	 * @param mixed $fields Any schema data pre-defined by the model.
 	 * @param array $meta Any meta information pre-defined in the model.
 	 * @return array Returns an associative array describing the given collection's schema.
 	 */
-	public function describe($collection, $schema = array(), array $meta = array()) {
-		switch (true) {
-			case is_object($collection) && method_exists($collection, 'schema'):
-				$schema = $collection->schema();
-				return is_object($schema) ? $schema : $this->describe(null, $schema);
-			case is_object($this->_schema) && !$schema:
-				return $this->_schema;
-			case is_object($this->_schema) && is_array($schema):
-				$this->_schema->append($schema);
-				return $this->_schema;
-			default:
-				return $this->_instance('schema', array('fields' => $schema));
+	public function describe($collection, $fields = array(), array $meta = array()) {
+		if (!$fields && ($func = $this->_schema)) {
+			$fields = $func($this, $collection, $meta);
 		}
+		return $this->_instance('schema', compact('fields'));
 	}
 
 	/**
@@ -539,7 +538,6 @@ class MongoDb extends \lithium\data\Source {
 			if ($source == "{$_config['gridPrefix']}.files") {
 				return $self->invokeMethod('_deleteFile', array($args['conditions']));
 			}
-
 			return $self->connection->{$args['source']}->remove($args['conditions'], $options);
 		});
 	}
@@ -627,22 +625,34 @@ class MongoDb extends \lithium\data\Source {
 	 * @return array Transformed conditions
 	 */
 	public function conditions($conditions, $context) {
-		$schema = $this->describe($context);
-		$model = $context ? $context->model(): null;
-
 		if (!$conditions) {
 			return array();
 		}
 		if ($code = $this->_isMongoCode($conditions)) {
 			return $code;
 		}
+		$schema = null;
+		$model = null;
+
+		if ($context) {
+			$schema = $context->schema();
+			$model = $context->model();
+		}
 		return $this->_conditions($conditions, $model, $schema, $context);
 	}
 
 	protected function _conditions($conditions, $model, $schema, $context) {
-		$castOpts = compact('schema', 'model') + array('first' => true, 'database' => $this);
+		$castOpts = compact('model') + array('first' => true, 'database' => $this);
+		$cast = function($value) use (&$schema, &$castOpts) {
+			if (!$schema) {
+				return $value;
+			}
+			return $schema->cast(null, $value, $castOpts);
+		};
+
 		foreach ($conditions as $key => $value) {
 			$castOpts['pathKey'] = $key;
+
 			if ($key === '$or' || $key === 'or' || $key === '||') {
 				foreach ($value as $i => $or) {
 					$value[$i] = $this->_conditions($or, $model, $schema, $context);
@@ -655,14 +665,14 @@ class MongoDb extends \lithium\data\Source {
 				continue;
 			}
 			if (!is_array($value)) {
-				$conditions[$key] = $schema->cast(null, $value, $castOpts);
+				$conditions[$key] = $cast($value);
 				continue;
 			}
 			$current = key($value);
 			$isOpArray = (isset($this->_operators[$current]) || $current[0] === '$');
 
 			if (!$isOpArray) {
-				$conditions[$key] = array('$in' => $schema->cast(null, $value, $castOpts));
+				$conditions[$key] = array('$in' => $cast($value));
 				continue;
 			}
 			$operations = array();
@@ -680,21 +690,27 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	protected function _isMongoCode($conditions) {
+		if (is_string($conditions)) {
+			$conditions = new MongoCode($conditions);
+		}
 		if ($conditions instanceof MongoCode) {
 			return array('$where' => $conditions);
-		}
-		if (is_string($conditions)) {
-			return array('$where' => new MongoCode($conditions));
 		}
 	}
 
 	protected function _operator($model, $key, $op, $value, $schema) {
 		$castOpts = compact('schema', 'model');
 		$castOpts += array('first' => true, 'arrays' => false, 'database' => $this);
+		$cast = function($pair) use ($model, &$schema, &$castOpts) {
+			if (!$schema) {
+				return $value;
+			}
+			return $schema->cast($model, $pair, $castOpts);
+		};
 
 		switch (true) {
 			case !isset($this->_operators[$op]):
-				return array($op => $schema->cast($model, array($key => $value), $castOpts));
+				return array($op => $cast(array($key => $value)));
 			case is_callable($this->_operators[$op]):
 				return $this->_operators[$op]($key, $value);
 			case is_array($this->_operators[$op]):
@@ -744,25 +760,27 @@ class MongoDb extends \lithium\data\Source {
 	 * @return mixed Formatted `order` clause.
 	 */
 	public function order($order, $context) {
-		switch (true) {
-			case !$order:
-				return array();
-			case is_string($order):
-				return array($order => 1);
-			case is_array($order):
-				foreach ($order as $key => $value) {
-					if (!is_string($key)) {
-						unset($order[$key]);
-						$order[$value] = 1;
-						continue;
-					}
-					if (is_string($value)) {
-						$order[$key] = strtoupper($value) == 'ASC' ? 1 : -1;
-					}
-				}
-			break;
+		if (!$order) {
+			return array();
 		}
-		return $order ?: array();
+		if (is_string($order)) {
+			return array($order => 1);
+		}
+		if (!is_array($order)) {
+			return $order ?: array();
+		}
+
+		foreach ($order as $key => $value) {
+			if (!is_string($key)) {
+				unset($order[$key]);
+				$order[$value] = 1;
+				continue;
+			}
+			if (is_string($value)) {
+				$order[$key] = strtolower($value) == 'asc' ? 1 : -1;
+			}
+		}
+		return $order;
 	}
 
 	protected function _checkConnection() {
