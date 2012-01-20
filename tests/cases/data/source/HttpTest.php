@@ -9,7 +9,6 @@
 namespace lithium\tests\cases\data\source;
 
 use lithium\data\source\Http;
-use lithium\data\Connections;
 use lithium\data\model\Query;
 
 class HttpTest extends \lithium\test\Unit {
@@ -28,29 +27,16 @@ class HttpTest extends \lithium\test\Unit {
 		'socket' => 'lithium\tests\mocks\data\source\http\adapter\MockSocket'
 	);
 
+	protected $_connectionConfig = array(
+		'methods' => array(
+			'something' => array('method' => 'get'),
+			'do' => array('method' => 'post')
+		)
+	);
+
 	public function setUp() {
-		$this->_configs = Connections::config();
-		Connections::reset();
-
-		Connections::config(array(
-			'mock-http-connection' => array('type' => 'Http')
-		));
-
-		Connections::config(array(
-			'mock-http-conn' => array(
-				'type' => 'Http',
-				'methods' => array(
-					'something' => array('method' => 'get'),
-					'do' => array('method' => 'post')
-				)
-			)
-		));
-	}
-
-	public function tearDown() {
-		Connections::reset();
-		Connections::config($this->_configs);
-		unset($this->query);
+		$model = $this->_model;
+		$model::$connection = new Http($this->_connectionConfig);
 	}
 
 	public function testAllMethodsNoConnection() {
@@ -309,7 +295,7 @@ class HttpTest extends \lithium\test\Unit {
 	}
 
 	public function testCustomGetMethod() {
-		$conn = Connections::get('mock-http-conn');
+		$conn = new Http($this->_connectionConfig);
 
 		$result = $conn->something();
 		$expected = join("\r\n", array(
@@ -324,7 +310,7 @@ class HttpTest extends \lithium\test\Unit {
 	}
 
 	public function testCustomPostMethod() {
-		$conn = Connections::get('mock-http-conn');
+		$conn = new Http($this->_connectionConfig);
 
 		$result = $conn->do(array('title' => 'sup'));
 		$expected = join("\r\n", array(

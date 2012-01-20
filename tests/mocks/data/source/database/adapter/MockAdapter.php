@@ -62,8 +62,8 @@ class MockAdapter extends \lithium\data\source\Database {
 		return $encoding ?: '';
 	}
 
-	public function describe($entity, $schema = array(), array $meta = array()) {
-		return array();
+	public function describe($entity, $fields = array(), array $meta = array()) {
+		return $this->_instance('schema', compact('fields', 'meta'));
 	}
 
 	public function create($record, array $options = array()) {
