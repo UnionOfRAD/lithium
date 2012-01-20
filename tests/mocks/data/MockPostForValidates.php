@@ -12,7 +12,7 @@ use lithium\util\Validator;
 
 class MockPostForValidates extends \lithium\data\Model {
 
-	protected $_meta = array('source' => 'mock_posts', 'connection' => 'mock-source');
+	protected $_meta = array('source' => 'mock_posts', 'connection' => false);
 
 	public $validates = array(
 		'title' => 'please enter a title',
@@ -20,11 +20,18 @@ class MockPostForValidates extends \lithium\data\Model {
 			array('notEmpty', 'message' => 'email is empty'),
 			array('email', 'message' => 'email is not valid'),
 			array('modelIsSet', 'required' => false, 'message' => 'model is not set'),
-			array('inList', 'list' => array('something@test.com','foo@bar.com'),
-				'on' => 'custom_event', 'message' => 'email is not in 1st list'),
-			array('inList', 'list' => array(
-				'something@test.com'),
-				'on' => 'another_custom_event', 'message' => 'email is not in 2nd list')
+			array(
+				'inList',
+				'list' => array('something@test.com','foo@bar.com'),
+				'on' => 'customEvent',
+				'message' => 'email is not in 1st list'
+			),
+			array(
+				'inList',
+				'list' => array('something@test.com'),
+				'on' => 'anotherCustomEvent',
+				'message' => 'email is not in 2nd list'
+			)
 		)
 	);
 

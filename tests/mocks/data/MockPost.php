@@ -16,12 +16,7 @@ class MockPost extends \lithium\tests\mocks\data\MockBase {
 
 	public static $connection = null;
 
-	public static function resetSchema($array = false) {
-		if ($array) {
-			static::_object()->_schema = array();
-		}
-		static::_object()->_schema = new Schema();
-	}
+	protected $_meta = array('connection' => false);
 
 	public static function overrideSchema(array $fields = array()) {
 		static::_object()->_schema = new Schema(compact('fields'));
@@ -29,13 +24,6 @@ class MockPost extends \lithium\tests\mocks\data\MockBase {
 
 	public static function instances() {
 		return array_keys(static::$_instances);
-	}
-
-	public static function &connection() {
-		if (static::$connection) {
-			return static::$connection;
-		}
-		return parent::connection();
 	}
 }
 

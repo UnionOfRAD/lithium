@@ -257,10 +257,7 @@ abstract class Source extends \lithium\core\Object {
 	 *         dependencies.
 	 */
 	public function configureClass($class) {
-		return array('meta' => array(
-			'key' => 'id',
-			'locked' => true
-		));
+		return array('meta' => array('key' => 'id', 'locked' => true));
 	}
 
 	/**

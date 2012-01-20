@@ -25,22 +25,14 @@ class DatabaseTest extends \lithium\test\Unit {
 	protected $_model = 'lithium\tests\mocks\data\model\MockDatabasePost';
 
 	public function setUp() {
-		$this->db = new MockDatabase();
-		$this->_configs = Connections::config();
-
-		Connections::reset();
-		Connections::config(array('mock-database-connection' => array(
-			'object' => &$this->db,
-			'adapter' => 'MockDatabase'
-		)));
-
 		MockDatabasePost::config();
 		MockDatabaseComment::config();
-	}
+		MockDatabaseTagging::config();
 
-	public function tearDown() {
-		Connections::reset();
-		Connections::config($this->_configs);
+		$this->db = new MockDatabase();
+		MockDatabasePost::$connection = $this->db;
+		MockDatabaseComment::$connection = $this->db;
+		MockDatabaseTagging::$connection = $this->db;
 	}
 
 	public function testDefaultConfig() {
@@ -734,7 +726,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$expected = "SELECT * FROM {comments} AS {Comments} INNER JOIN {posts} AS {Post} ON ";
 		$expected .= "{Comment}.{post_id} <= {Post}.{id} WHERE Comment.id = 1;";
-		$result = Connections::get('mock-database-connection')->renderCommand($query);
+		$result = $this->db->renderCommand($query);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -765,7 +757,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected = "SELECT * FROM {comments} AS {Comments} LEFT JOIN {posts} AS {Post} ON ";
 		$expected .= "{Comment}.{post_id} <= {Post}.{id} AND {Comment}.{post_id} >= {Post}.{id} ";
 		$expected .= "WHERE Comment.id = 1;";
-		$result = Connections::get('mock-database-connection')->renderCommand($query);
+		$result = $this->db->renderCommand($query);
 		$this->assertEqual($expected, $result);
 
 		$query = new Query(compact('model') + array(
@@ -782,7 +774,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			))
 		));
 		$this->expectException("Unsupported operator `=>` used in constraint.");
-		Connections::get('mock-database-connection')->renderCommand($query);
+		$this->db->renderCommand($query);
 	}
 
 	public function testRenderArrayJoin() {
@@ -803,7 +795,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$expected = "SELECT * FROM {comments} AS {Comment} INNER JOIN {posts} AS {Post} ON ";
 		$expected .= "{Comment}.{post_id} = {Post}.{id} WHERE Comment.id = 1;";
-		$result = Connections::get('mock-database-connection')->renderCommand($query);
+		$result = $this->db->renderCommand($query);
 		$this->assertEqual($expected, $result);
 	}
 }
