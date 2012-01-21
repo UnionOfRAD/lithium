@@ -259,8 +259,6 @@ class SessionTest extends \lithium\test\Unit {
 			)
 		)));
 
-		$encrypt = new MockEncrypt(array('secret' => $key));
-
 		$value = array('foo' => 'bar');
 
 		Session::write('test', $value);
@@ -269,12 +267,10 @@ class SessionTest extends \lithium\test\Unit {
 		$this->assertTrue(Session::check('test'));
 		$this->assertTrue(Session::check('test', array('strategies' => false)));
 
-		$result = Session::read('test', array('strategies' => false));
-		$this->assertNotEqual($value, $result);
-		$this->assertTrue(is_string($result));
+		$encrypted = Session::read('test', array('strategies' => false));
 
-		$result = $encrypt->decrypt($result);
-		$this->assertEqual(array('test' => $value), $result);
+		$this->assertNotEqual($value, $encrypted);
+		$this->assertTrue(is_string($encrypted));
 
 		$result = Session::read('test');
 		$this->assertEqual($value, $result);
@@ -284,8 +280,15 @@ class SessionTest extends \lithium\test\Unit {
 
 		$this->assertFalse(Session::check('test'));
 		$this->assertFalse(Session::check('test', array('strategies' => false)));
-	}
 
+		$savedData = array('test' => $value);
+
+		$encrypt = new MockEncrypt(array('secret' => $key));
+		$result = $encrypt->encrypt($savedData);
+		$this->assertEqual($encrypted, $result);
+		$result = $encrypt->decrypt($encrypted);
+		$this->assertEqual($savedData, $result);
+	}
 }
 
 ?>
