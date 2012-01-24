@@ -241,7 +241,7 @@ class Request extends \lithium\net\http\Request {
 		$val = array_key_exists($key, $this->_env) ? $this->_env[$key] : getenv($key);
 		$this->_env[$key] = $val;
 
-		if ($key == 'REMOTE_ADDR' && $val == $this->env('SERVER_ADDR')) {
+		if ($key == 'REMOTE_ADDR') {
 			$val = ($addr = $this->env('HTTP_PC_REMOTE_ADDR')) ? $addr : $val;
 		}
 
