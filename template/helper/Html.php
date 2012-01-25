@@ -150,9 +150,21 @@ class Html extends \lithium\template\Helper {
 	 * `"/"`, the path will be relative to the base path of your application.  Otherwise, the path
 	 * will be relative to your JavaScript path, usually `webroot/js`.
 	 *
+	 * Available options are:
+	 *     - `inline`: if set to false tag will be appended to context's `script` key and it will
+	 *       be available by calling `$this->scripts()` in your layout or template.
+	 *       Otherwise returns `script` tag as a string
+	 *     - `options`: Array of key, value pairs which are evalueted to `<script/>`'s tag properties
+	 *
+	 * {{{ $this->html->script('jquey.js', array('inline' => false, array('onload' => 'init()')) }}}
+	 *
+	 * Then when calling `$this->scripts()` in your layout or template u will ge something like:
+	 *
+	 * {{{ <script type="text/javascript" src="/js/jquery.js" onload="init()"></script> }}}
+	 *
 	 * @param mixed $path String path to JavaScript file, or an array of paths.
 	 * @param array $options
-	 * @return string
+	 * @return mixed string|null return null if inline option is set to false
 	 * @filter This method can be filtered.
 	 */
 	public function script($path, array $options = array()) {
