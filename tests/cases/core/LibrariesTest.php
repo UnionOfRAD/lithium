@@ -352,7 +352,7 @@ class LibrariesTest extends \lithium\test\Unit {
 
 	public function testServiceLocateInstantiation() {
 		$result = Libraries::instance('adapter.template.view', 'Simple');
-		$this->assertTrue(is_a($result, 'lithium\template\view\adapter\Simple'));
+		$this->assertTrue($result instanceof \lithium\template\view\adapter\Simple);
 		$this->expectException("Class `Foo` of type `adapter.template.view` not found.");
 		$result = Libraries::instance('adapter.template.view', 'Foo');
 	}

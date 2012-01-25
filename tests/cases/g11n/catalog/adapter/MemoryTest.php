@@ -8,7 +8,6 @@
 
 namespace lithium\tests\cases\g11n\catalog\adapter;
 
-use lithium\core\Libraries;
 use lithium\g11n\catalog\adapter\Memory;
 
 class MemoryTest extends \lithium\test\Unit {
@@ -45,7 +44,6 @@ class MemoryTest extends \lithium\test\Unit {
 		$result = $this->adapter->read('messageTemplate', 'root', null);
 		$this->assertFalse($result);
 	}
-
 }
 
 ?>

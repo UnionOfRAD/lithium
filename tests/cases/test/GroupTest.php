@@ -97,10 +97,10 @@ class GroupTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$results = $group->tests();
-		$this->assertTrue(is_a($results, '\lithium\util\Collection'));
+		$this->assertTrue($results instanceof \lithium\util\Collection);
 
 		$results = $group->tests();
-		$this->assertTrue(is_a($results->current(), 'lithium\tests\cases\g11n\CatalogTest'));
+		$this->assertTrue($results->current() instanceof \lithium\tests\cases\g11n\CatalogTest);
 	}
 
 	public function testAddEmptyTestsRun() {
@@ -110,8 +110,8 @@ class GroupTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$results = $group->tests();
-		$this->assertTrue(is_a($results, 'lithium\util\Collection'));
-		$this->assertTrue(is_a($results->current(), 'lithium\tests\mocks\test\MockUnitTest'));
+		$this->assertTrue($results instanceof \lithium\util\Collection);
+		$this->assertTrue($results->current() instanceof \lithium\tests\mocks\test\MockUnitTest);
 
 		$results = $group->tests()->run();
 

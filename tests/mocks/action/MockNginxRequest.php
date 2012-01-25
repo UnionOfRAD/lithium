@@ -14,6 +14,7 @@ class MockNginxRequest extends \lithium\action\Request {
 		$safari  = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7) AppleWebKit/534.48.3 ';
 		$safari .= '(KHTML, like Gecko) Version/5.1 Safari/534.48.3';
 		parent::_init();
+
 		$this->_env = array(
 			'FCGI_ROLE' => 'RESPONDER',
 			'PATH_INFO' => '',

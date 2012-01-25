@@ -1015,10 +1015,7 @@ class RequestTest extends \lithium\test\Unit {
 		$request = new Request(array(
 			'url' => 'foo/bar',
 			'base' => null,
-			'env' => array(
-				'HTTP_HOST' => 'example.com',
-				'PHP_SELF' => '/index.php'
-			),
+			'env' => array('HTTP_HOST' => 'example.com', 'PHP_SELF' => '/index.php')
 		));
 
 		$expected = 'http://example.com/foo/bar';

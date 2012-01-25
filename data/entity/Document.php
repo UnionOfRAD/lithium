@@ -136,8 +136,9 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	}
 
 	public function export() {
+		$className = __CLASS__;
 		foreach ($this->_updated as $key => $val) {
-			if (is_a($val, __CLASS__)) {
+			if ($val instanceof $className) {
 				$path = $this->_pathKey ? "{$this->_pathKey}." : '';
 				$this->_updated[$key]->_pathKey = "{$path}{$key}";
 			}
@@ -301,8 +302,9 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			$data = $model::connection()->cast($this, $data, compact('pathKey'));
 		}
 
+		$className = __CLASS__;
 		foreach ($data as $key => $value) {
-			if (is_a($value, __CLASS__)) {
+			if ($value instanceof $className) {
 				if (!$options['init']) {
 					$value->_exists = false;
 				}
