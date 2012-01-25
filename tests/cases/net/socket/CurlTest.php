@@ -131,6 +131,13 @@ class CurlTest extends \lithium\test\Unit {
 		$this->assertTrue($result instanceof \lithium\net\http\Response);
 		$this->assertPattern("/^HTTP/", (string) $result);
 	}
+
+	public function testSettingOfOptions() {
+		$stream = new Curl($this->_testConfig);
+		$stream->set('DummyFlag', 'Dummy Value');
+		$stream->set('DummyFlag', 'Changed Dummy Value');
+		$this->assertEqual('Changed Dummy Value', $stream->options['DummyFlag']);
+	}
 }
 
 ?>

@@ -15,6 +15,8 @@ use lithium\g11n\Catalog;
 
 class ExtractTest extends \lithium\test\Unit {
 
+	protected $_backup = array();
+
 	protected $_path;
 
 	public $command;
@@ -25,6 +27,9 @@ class ExtractTest extends \lithium\test\Unit {
 	}
 
 	public function setUp() {
+		$this->_backup['catalogConfig'] = Catalog::config();
+		Catalog::reset();
+
 		$this->command = new Extract(array(
 				'request' => new Request(array('input' => fopen('php://temp', 'w+'))),
 				'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse')
@@ -33,15 +38,17 @@ class ExtractTest extends \lithium\test\Unit {
 		mkdir($this->command->destination = "{$this->_path}/destination");
 	}
 
+	public function tearDown() {
+		Catalog::config($this->_backup['catalogConfig']);
+
+		$this->_cleanUp();
+	}
+
 	protected function _writeInput(array $input = array()) {
 		foreach ($input as $input) {
 			fwrite($this->command->request->input, $input . "\n");
 		}
 		rewind($this->command->request->input);
-	}
-
-	public function tearDown() {
-		$this->_cleanUp();
 	}
 
 	public function testInit() {
