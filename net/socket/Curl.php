@@ -134,7 +134,7 @@ class Curl extends \lithium\net\Socket {
 		}
 		$this->set(CURLOPT_URL, $data->to('url'));
 
-		if (is_a($data, 'lithium\net\http\Message')) {
+		if ($data instanceof \lithium\net\http\Message) {
 			if (!empty($this->_config['ignoreExpect'])) {
 				$data->headers('Expect', ' ');
 			}

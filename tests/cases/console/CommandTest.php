@@ -39,7 +39,7 @@ class CommandTest extends \lithium\test\Unit {
 
 		$result = $response;
 		$expected = 'lithium\console\Response';
-		$this->assertTrue(is_a($result, $expected));
+		$this->assertTrue($result instanceof $expected);
 
 		$expected = 'testRun';
 		$result = $response->testAction;

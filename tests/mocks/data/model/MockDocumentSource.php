@@ -58,7 +58,7 @@ class MockDocumentSource extends \lithium\data\Source {
 			$options['schema'] = $entity->schema() ?: array('_id' => array('type' => 'id'));
 		}
 		if ($entity) {
-			if (!is_a($entity, $this->_classes['set'])) {
+			if (!($entity instanceof $this->_classes['set'])) {
 				$exists = $entity->exists();
 			}
 			$model = $entity->model();

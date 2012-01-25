@@ -12,6 +12,9 @@ class MockNginxRequest extends \lithium\action\Request {
 
 	protected function _init() {
 		parent::_init();
+		$httpUserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7)';
+		$httpUserAgent .= 'AppleWebKit/534.48.3 (KHTML, like Gecko) Version/5.1 Safari/534.48.3';
+
 		$this->_env = array(
 			'FCGI_ROLE' => 'RESPONDER',
 			'PATH_INFO' => '',
@@ -33,7 +36,7 @@ class MockNginxRequest extends \lithium\action\Request {
 			'SERVER_PORT' => '80',
 			'SERVER_NAME' => 'sandbox.local',
 			'HTTP_HOST' => 'sandbox.local',
-			'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7) AppleWebKit/534.48.3 (KHTML, like Gecko) Version/5.1 Safari/534.48.3',
+			'HTTP_USER_AGENT' => $httpUserAgent,
 			'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 			'HTTP_ACCEPT_LANGUAGE' => 'en-us',
 			'HTTP_ACCEPT_ENCODING' => 'gzip, deflate',

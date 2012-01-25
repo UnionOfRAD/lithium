@@ -8,7 +8,7 @@
 
 namespace lithium\tests\cases\data;
 
-use \stdClass;
+use stdClass;
 use lithium\data\collection\DocumentSet;
 use lithium\data\Connections;
 
@@ -16,14 +16,14 @@ use lithium\data\Connections;
  * lithium\data\Connections Test.
  */
 class CollectionTest extends \lithium\test\Unit {
-	
+
 	/**
 	 * Used model.
 	 *
 	 * @var string
 	 */
 	protected $_model = 'lithium\tests\mocks\data\MockPost';
-	
+
 	/**
 	 * Used for storing connections in CollectionTest::setUp,
 	 * restored in Collection::tearDown.
@@ -31,7 +31,7 @@ class CollectionTest extends \lithium\test\Unit {
 	 * @var array
 	 */
 	protected $_backup = array();
-	
+
 	/**
 	 * Setup method run before every test method.
 	 */
@@ -43,7 +43,7 @@ class CollectionTest extends \lithium\test\Unit {
 		}
 		Connections::reset();
 	}
-	
+
 	/**
 	 * Teardown method run after every test method.
 	 */
@@ -53,7 +53,7 @@ class CollectionTest extends \lithium\test\Unit {
 			Connections::add($name, $config);
 		}
 	}
-	
+
 	/**
 	 * Tests `Collection::stats`.
 	 */
@@ -63,7 +63,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertEqual('bar', $collection->stats('foo'));
 		$this->assertEqual(array('foo' => 'bar'), $collection->stats());
 	}
-	
+
 	/**
 	 * Tests Collection with invalid data.
 	 */
@@ -71,7 +71,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->expectException('Error creating new Collection instance; data format invalid.');
 		$collection = new DocumentSet(array('data' => 'foo'));
 	}
-	
+
 	/**
 	 * Tests Collection accessors (getters/setters).
 	 */
@@ -85,7 +85,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertEqual($model, $collection->model());
 		$this->assertEqual(compact('model'), $collection->meta());
 	}
-	
+
 	/**
 	 * Tests `Collection::offsetExists`.
 	 */
@@ -96,7 +96,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertEqual($collection->offsetExists(0), true);
 		$this->assertEqual($collection->offsetExists(1), true);
 	}
-	
+
 	/**
 	 * Tests `Collection::rewind` and `Collection::current`.
 	 */
@@ -113,7 +113,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertEqual('Lorem Ipsum', $collection->rewind());
 		$this->assertEqual(42, $collection->next());
 	}
-	
+
 	/**
 	 * Tests `Collection::each`.
 	 */
@@ -134,7 +134,7 @@ class CollectionTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($collection->to('array'), $expected);
 	}
-	
+
 	/**
 	 * Tests `Collection::map`.
 	 */
@@ -156,7 +156,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertEqual($results->to('array'), $expected);
 		$this->assertNotEqual($results->to('array'), $collection->to('array'));
 	}
-	
+
 	/**
 	 * Tests `Collection::data`.
 	 */
@@ -189,25 +189,25 @@ class CollectionTest extends \lithium\test\Unit {
 		$idsSorted = $collection->map(function ($v) { return $v['id']; })->to('array');
 		$this->assertEqual($idsSorted, array(1,4,5,3,2));
 	}
-	
+
 	/**
 	 * Tests `Collection::closed` && `Collection::close`.
 	 */
 	public function testClosed() {
 		$collection = new DocumentSet();
 		$this->assertTrue($collection->closed());
-		
+
 		$collection = new DocumentSet(array('result' => 'foo'));
 		$this->assertFalse($collection->closed());
 		$collection->close();
 		$this->assertTrue($collection->closed());
 	}
-	
+
 	/**
 	 * Tests `Collection::assignTo`.
 	 */
 	public function testAssignTo() {
-		$parent = new stdClass;
+		$parent = new stdClass();
 		$config = array('valid' => false, 'model' => $this->_model);
 		$collection = new DocumentSet;
 		$collection->assignTo($parent, $config);
