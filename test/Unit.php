@@ -544,14 +544,14 @@ class Unit extends \lithium\core\Object {
 			if (get_class($e) == $expected) {
 				$result = $class;
 				return $this->assert(true, $message, compact('expected', 'result'));
-			} else {
-				if ($eMessage == $expected) {
-					$result = $eMessage;
-					return $this->assert(true, $message, compact('expected', 'result'));
-				} else if (Validator::isRegex($expected) && preg_match($expected, $eMessage)) {
-					$result = $eMessage;
-					return $this->assert(true, $message, compact('expected', 'result'));
-				}
+			}
+			if ($eMessage == $expected) {
+				$result = $eMessage;
+				return $this->assert(true, $message, compact('expected', 'result'));
+			}
+			if (Validator::isRegex($expected) && preg_match($expected, $eMessage)) {
+				$result = $eMessage;
+				return $this->assert(true, $message, compact('expected', 'result'));
 			}
 
 			$message = sprintf(
