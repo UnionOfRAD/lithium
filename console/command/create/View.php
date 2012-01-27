@@ -19,7 +19,37 @@ use lithium\util\String;
  *
  */
 class View extends \lithium\console\command\Create {
+	
+	/**
+	 * Returns the name of the controller class, minus `'Controller'`.
+	 *
+	 * @param string $request
+	 * @return string
+	 */
+	protected function _name($request) {
+		return Inflector::camelize(Inflector::pluralize($request->action));
+	}
 
+    /**
+     * Get the plural data variable that is sent down from controller method.
+     *
+     * @param string $request
+     * @return string
+     */
+	protected function _plural($request) {
+		return Inflector::pluralize(Inflector::camelize($request->action, false));
+	}
+	
+	/**
+     * Get the singular data variable that is sent down from controller methods.
+     *
+     * @param string $request
+     * @return string
+     */
+	protected function _singular($request) {
+		return Inflector::singularize(Inflector::camelize($request->action, false));
+	}
+	
     /**
      * Override the save method to handle view specific params.
      *
