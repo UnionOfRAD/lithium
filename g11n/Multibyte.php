@@ -10,23 +10,27 @@ use lithium\core\Libraries;
 
 /**
  * The `Multibyte` class helps operating with UTF-8 encoded strings. Here
- * multibyte is synonymous with UTF-8 the most widespread multibyte encoding
- * in web application development.
+ * multibyte is synonymous to UTF-8 which is probably the most widespread
+ * multibyte encoding in recent web application development.
  *
- * Over time - as the understanding of the importance of the problem evolved -
- * a variety of extensions has been created. While each achieves its goal
- * through a different implementation they still all try to solve that one
- * problem that comes with multibyte encoded strings.
-
- * So - that problem is targeted by extensions out there. Something left to a
- * framework is to provide means allowing code to stay portable. As already
- * mentioned this is an evolution and thus certain extensions are more
- * wide-spread and enabled in some environments while others are not. This
- * class - as with any adapter based class - allows to adapt to those different
- * environments by just changing the configuration and not the code.
+ * Over time - as the importance of multibyte encoding support grew - a variety
+ * of extensions appeared. While each achieves its goal somewhat differently
+ * and might be preferred over the other, they still all do that one thing.
  *
- * Technically this class is not so much an abstraction as it very it does very
- * little to abstract away the specifics of the adapters.
+ * What can a framework provide, those extensions aren't? It can provide
+ * abstractions that allow portable code. While this might not be a requirement
+ * for application code, it's a definite must for the framework's core code.
+ *
+ * As previously mentioned extensions appeared in a semi-evolutionary way. This
+ * leaves us with the situation where extensions are heterogeneously spread out
+ * over environments. There certainly is no clear winner and we're left with
+ * the situation of "supporting them all".
+ *
+ * Technically this class does very little in terms of abstraction. Its main
+ * purpose is to allow adapting to changing environments: virtually creating
+ * something you can rely on, something that's always there while it actually
+ * is there only in one way or the other. And - yes - some convenience methods
+ * are also on board.
  */
 class Multibyte extends \lithium\core\Adaptable {
 
