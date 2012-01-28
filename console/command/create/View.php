@@ -20,14 +20,14 @@ use lithium\util\String;
  */
 class View extends \lithium\console\command\Create {
 	
-	/**
-	 * Returns the name of the controller class, minus `'Controller'`.
-	 *
-	 * @param string $request
-	 * @return string
-	 */
+    /**
+     * Returns the name of the controller class, minus `'Controller'`.
+     *
+     * @param string $request
+     * @return string
+     */
 	protected function _name($request) {
-		return Inflector::camelize(Inflector::pluralize($request->action));
+    		return Inflector::camelize(Inflector::pluralize($request->action));
 	}
 
     /**
@@ -40,7 +40,7 @@ class View extends \lithium\console\command\Create {
 		return Inflector::pluralize(Inflector::camelize($request->action, false));
 	}
 	
-	/**
+    /**
      * Get the singular data variable that is sent down from controller methods.
      *
      * @param string $request

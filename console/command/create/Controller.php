@@ -40,12 +40,12 @@ class Controller extends \lithium\console\command\Create {
 		return $this->_name($request) . 'Controller';
 	}
 
-	/**
-	 * Returns the name of the controller class, minus `'Controller'`.
-	 *
-	 * @param string $request
-	 * @return string
-	 */
+    /**
+     * Returns the name of the controller class, minus `'Controller'`.
+     *
+     * @param string $request
+     * @return string
+     */
 	protected function _name($request) {
 		return Inflector::camelize(Inflector::pluralize($request->action));
 	}
