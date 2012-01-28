@@ -128,6 +128,19 @@ use InvalidArgumentException;
  *   containing PCRE-compatible options flags.
  *
  * - `uuid`: Checks that a value is a valid UUID.
+ *
+ * ### UTF-8 encoded input strings
+ *
+ * All rules operating on strings have been created with the possibility of
+ * UTF-8 encoded input in mind. A default PHP binary and an enabled Lithium
+ * g11n bootstrap will make these rules work correctly in any case. Should you
+ * ever experience odd behavior following paragraph with implementation
+ * details might help you to track to the cause.
+ *
+ * The rules `alphaNumeric` and `money` rely on additional functionality of
+ * PCRE to validate UTF-8 encoded strings. As no PCRE feature detection is
+ * done, having this feature enabled in PCRE isn't optional. Please ensure
+ * you've got PCRE compiled with UTF-8 support.
  */
 class Validator extends \lithium\core\StaticObject {
 
