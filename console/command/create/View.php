@@ -81,7 +81,7 @@ class View extends \lithium\console\command\Create {
 					return "{$params['file']} skipped.";
 				}
 			}
-			if (file_put_contents($file, "<?php\n\n{$result}\n\n?>")) {
+			if (file_put_contents($file, $result)) {
 				return "{$params['file']}.php created in {$directory}.";
 			}
 		}
