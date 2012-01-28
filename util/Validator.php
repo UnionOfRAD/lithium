@@ -9,6 +9,7 @@
 namespace lithium\util;
 
 use lithium\util\Set;
+use lithium\g11n\Multibyte;
 use InvalidArgumentException;
 
 /**
@@ -134,13 +135,18 @@ use InvalidArgumentException;
  * All rules operating on strings have been created with the possibility of
  * UTF-8 encoded input in mind. A default PHP binary and an enabled Lithium
  * g11n bootstrap will make these rules work correctly in any case. Should you
- * ever experience odd behavior following paragraph with implementation
+ * ever experience odd behavior following paragraphs with implementation
  * details might help you to track to the cause.
  *
  * The rules `alphaNumeric` and `money` rely on additional functionality of
  * PCRE to validate UTF-8 encoded strings. As no PCRE feature detection is
  * done, having this feature enabled in PCRE isn't optional. Please ensure
  * you've got PCRE compiled with UTF-8 support.
+ *
+ * The `lengthBetween` rule optionally makes use of Lithim's `Multibyte` class
+ * to validate UTF-8 encoded strings if it iss configured. Make sure you've did
+ * configured it g11n boostrap to make this rule automatically work with UTF-8
+ * encoded strings.
  */
 class Validator extends \lithium\core\StaticObject {
 
@@ -276,7 +282,7 @@ class Validator extends \lithium\core\StaticObject {
 				return in_array($value, $options['list']);
 			},
 			'lengthBetween' => function($value, $format, $options) {
-				$length = strlen($value);
+				$length = Multibyte::config() ? Multibyte::strlen($value) : strlen($value);
 				$options += array('min' => 1, 'max' => 255);
 				return ($length >= $options['min'] && $length <= $options['max']);
 			},
