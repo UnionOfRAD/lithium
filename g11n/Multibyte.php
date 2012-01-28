@@ -9,21 +9,24 @@ namespace lithium\g11n;
 use lithium\core\Libraries;
 
 /**
- * The `Multibyte` class provides methods to operate on UTF-8 encoded strings.
- * Here multibyte is synonymous with UTF-8. This class has become necessary as
- * over time more and more extensions of dealing with multibyte encoded strings
- * in PHP have been created. While these extensions have different
- * implementations they all still try to solve one problem.
+ * The `Multibyte` class helps operating with UTF-8 encoded strings. Here
+ * multibyte is synonymous with UTF-8 the most widespread multibyte encoding
+ * in web application development.
  *
- * This class is not so much an abstraction as abstracts very little away from
- * the actual functions being used. With this class Lithium provides a way to
- * make your and the framworks's code more portable when it is required work
- * with multibyte encoded strings.
+ * Over time - as the understanding of the importance of the problem evolved -
+ * a variety of extensions has been created. While each achieves its goal
+ * through a different implementation they still all try to solve that one
+ * problem that comes with multibyte encoded strings.
+
+ * So - that problem is targeted by extensions out there. Something left to a
+ * framework is to provide means allowing code to stay portable. As already
+ * mentioned this is an evolution and thus certain extensions are more
+ * wide-spread and enabled in some environments while others are not. This
+ * class - as with any adapter based class - allows to adapt to those different
+ * environments by just changing the configuration and not the code.
  *
- * While some environments will feature extension X and other extension Y the
- * only thing you've got to do is is using/switching to the right adapter.
- *
- * @see lithium\util\Validator
+ * Technically this class is not so much an abstraction as it very it does very
+ * little to abstract away the specifics of the adapters.
  */
 class Multibyte extends \lithium\core\Adaptable {
 
