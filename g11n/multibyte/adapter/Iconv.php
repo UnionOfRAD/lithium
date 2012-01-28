@@ -10,8 +10,7 @@ namespace lithium\g11n\multibyte\adapter;
 
 /**
  * The `Iconv` class is an adapter which uses certain string functions from
- * `ext/iconv`. You will need to have the extension installed to use this
- * adapter.
+ * `ext/iconv`. You will need to have the extension installed to use this adapter.
  *
  * No known limitations affecting used functionality. Returns `false` when
  * seeing badly formed UTF-8 sequences. Additionally triggers an error.

@@ -57,11 +57,11 @@ class MultibyteTest extends \lithium\test\Unit {
 
 	/**
 	 * Verifies the behavior of `Multibyte::is()` when dealing with valid,
-	 * invalid UTF-8 strings as well as edge cases. This test uses the strss
+	 * invalid UTF-8 strings as well as edge cases. This test uses the stress
 	 * test created by Markus Kuhn.
 	 *
 	 * This test is "special" in that it doesn't prove that the method returns
-	 * correct results in any case it shows how it actually behaves. It is no
+	 * correct results in any case - it shows how it actually behaves. It is no
 	 * requirement that the method successfully detects each and any string as
 	 * valid/invalid UTF-8. But: following a list which could be seen as goals
 	 * we'd like to achieve. Please adapt the list when modifying the method.
@@ -176,7 +176,7 @@ class MultibyteTest extends \lithium\test\Unit {
 	 * These items should be detected as *invalid* UTF-8 (but currently aren't):
 	 *  - lines 101-263 in nearly all remaining sections.
 	 *
-	 * @see lihtium\tests\cases\g11n\MultibyteTest::testIsBehavioral()
+	 * @see lithium\tests\cases\g11n\MultibyteTest::testIsBehavioral()
 	 */
 	public function testIsQuickBehavioral() {
 		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/resources/utf8_decoder_stress_test.txt';

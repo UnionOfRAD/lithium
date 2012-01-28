@@ -10,8 +10,7 @@ namespace lithium\g11n\multibyte\adapter;
 
 /**
  * The `Intl` class is an adapter which uses certain string functions from
- * `ext/intl`. You will need to have the extension installed to use this
- * adapter.
+ * `ext/intl`. You will need to have the extension installed to use this adapter.
  *
  * Internally works with a fixed encoding of UTF-8. This means you can't use
  * this adapter for anything different than UTF-8 encoded strings. Silently

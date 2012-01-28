@@ -10,8 +10,7 @@ namespace lithium\g11n\multibyte\adapter;
 
 /**
  * The `Mbstring` class is an adapter which uses certain string functions from
- * `ext/mbstring`. You will need to have the extension installed to use this
- * adapter.
+ * `ext/mbstring`. You will need to have the extension installed to use this adapter.
  *
  * No known limitations affecting used functionality. Silently strips
  * out badly formed UTF-8 sequences.

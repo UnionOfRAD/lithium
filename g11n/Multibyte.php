@@ -13,7 +13,7 @@ use lithium\core\Libraries;
  * Here multibyte is synonymous with UTF-8. This class has become necessary as
  * over time more and more extensions of dealing with multibyte encoded strings
  * in PHP have been created. While these extensions have different
- * implementions they all still try to solve one problem.
+ * implementations they all still try to solve one problem.
  *
  * This class is not so much an abstraction as abstracts very little away from
  * the actual functions being used. With this class Lithium provides a way to
@@ -23,7 +23,7 @@ use lithium\core\Libraries;
  * While some environments will feature extension X and other extension Y the
  * only thing you've got to do is is using/switching to the right adapter.
  *
- * @see lithiumm\util\Validator
+ * @see lithium\util\Validator
  */
 class Multibyte extends \lithium\core\Adaptable {
 
