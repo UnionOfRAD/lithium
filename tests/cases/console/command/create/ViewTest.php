@@ -44,7 +44,7 @@ class ViewTest extends \lithium\test\Unit {
 
 	public function testRun() {
 		$this->request->params += array(
-			'command' => 'create', 'template' => 'testplate', 'action' => 'view',
+			'command' => 'create', 'template' => 'test-view', 'action' => 'view',
 			'args' => array('Posts', 'index.html')
 		);
 
@@ -52,7 +52,7 @@ class ViewTest extends \lithium\test\Unit {
 		if (!is_dir($plateFolder)) {
 			mkdir($plateFolder, 0755, true);
 		}
-		file_put_contents($plateFolder . '/testplate.txt.php', '|{:name}|{:plural}|{:singular}|');
+		file_put_contents($plateFolder . '/test-view.txt.php', '|{:name}|{:plural}|{:singular}|');
 
 		$view = new View(array(
 			'request' => $this->request, 'classes' => $this->classes
