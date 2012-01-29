@@ -10,6 +10,7 @@ namespace lithium\core;
 
 use RuntimeException;
 use lithium\util\String;
+use lithium\util\collection\Filters;
 use lithium\core\ConfigException;
 use lithium\core\ClassNotFoundException;
 
