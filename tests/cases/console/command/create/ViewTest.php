@@ -41,18 +41,19 @@ class ViewTest extends \lithium\test\Unit {
 		chdir($this->_backup['cwd']);
 		$this->_cleanUp();
 	}
-	
+
 	public function testRun() {
 		$this->request->params += array(
-			'command' => 'create', 'template' => 'testplate', 'action' => 'view', 
+			'command' => 'create', 'template' => 'testplate', 'action' => 'view',
 			'args' => array('Posts', 'index.html')
 		);
-		
+
 		$plateFolder = $this->_testPath . '/create_test/extensions/command/create/template';
-		if (!is_dir($plateFolder)) 
-				mkdir($plateFolder, 0755, true);
+		if (!is_dir($plateFolder)) {
+			mkdir($plateFolder, 0755, true);
+		}
 		file_put_contents($plateFolder . '/testplate.txt.php', '|{:name}|{:plural}|{:singular}|');
-		
+
 		$view = new View(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
@@ -61,7 +62,7 @@ class ViewTest extends \lithium\test\Unit {
 		$expected = "index.html.php created in views/posts.\n";
 		$result = $view->response->output;
 		$this->assertEqual($expected, $result);
-		
+
 		$expected = '|Posts|posts|post|';
 		$result = file_get_contents($this->_testPath . '/create_test/views/posts/index.html.php');
 		$this->assertEqual($expected, $result);
