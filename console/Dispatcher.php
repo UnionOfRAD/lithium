@@ -13,6 +13,9 @@ use lithium\core\Environment;
 use UnexpectedValueException;
 
 /**
+ * The `Dispatcher` is the outermost layer of the framework, responsible for both receiving the
+ * initial console request and returning back a response at the end of the request's life cycle.
+ *
  * The console dispatcher is responsible for accepting requests from scripts called from the command
  * line, and executing the appropriate `Command` class(es). The `run()` method accepts an instance
  * of `lithium\console\Request`, which encapsulates the console environment and any command-line
@@ -22,8 +25,10 @@ use UnexpectedValueException;
 class Dispatcher extends \lithium\core\StaticObject {
 
 	/**
-	 * Fully-namespaced router class reference.  Class must implement a `parse()` method,
-	 * which must return an array with (at a minimum) 'command' and 'action' keys.
+	 * Fully-namespaced router class reference.
+	 *
+	 * Class must implement a `parse()` method, which must return an array with (at a minimum)
+	 * 'command' and 'action' keys.
 	 *
 	 * @see lithium\console\Router::parse()
 	 * @var array
@@ -35,6 +40,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 
 	/**
 	 * Contains pre-process format strings for changing Dispatcher's behavior based on 'rules'.
+	 *
 	 * Each key in the array represents a 'rule'; if a key that matches the rule is present (and
 	 * not empty) in a route, (i.e. the result of `lithium\console\Router::parse()`) then the rule's
 	 * value will be applied to the route before it is dispatched.  When applying a rule, any array
@@ -43,6 +49,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *
 	 * @see lithium\console\Dispatcher::config()
 	 * @see lithium\util\String::insert()
+	 * @var array
 	 */
 	protected static $_rules = array(
 		'command' => array(array('lithium\util\Inflector', 'camelize')),
@@ -52,7 +59,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	/**
 	 * Used to set configuration parameters for the Dispatcher.
 	 *
-	 * @param array $config
+	 * @param array $config Optional configuration params.
 	 * @return array If no parameters are passed, returns an associative array with the
 	 *         current configuration, otherwise returns null.
 	 */
@@ -69,6 +76,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 
 	/**
 	 * Dispatches a request based on a request object (an instance of `lithium\console\Request`).
+	 *
 	 *  If `$request` is `null`, a new request object is instantiated based on the value of the
 	 * `'request'` key in the `$_classes` array.
 	 *
@@ -76,7 +84,6 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *        `null`, an instance will be created.
 	 * @param array $options
 	 * @return object The command action result which is an instance of `lithium\console\Response`.
-	 * @filter
 	 */
 	public static function run($request = null, $options = array()) {
 		$defaults = array('request' => array());
@@ -102,13 +109,12 @@ class Dispatcher extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Determines Command to use for current request.
+	 * Determines which command to use for current request.
 	 *
-	 * @param string $request
-	 * @param string $params
-	 * @param string $options
-	 * @return class lithium\console\Command
-	 * @filter
+	 * @param object $request An instance of a `Request` object.
+	 * @param array $params Request params that can be accessed inside the filter.
+	 * @param array $options
+	 * @return class lithium\console\Command Returns the instantiated command object.
 	 */
 	protected static function _callable($request, $params, $options) {
 		$params = compact('request', 'params', 'options');
@@ -129,9 +135,10 @@ class Dispatcher extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Attempts to apply a set of formatting rules from `$_rules` to a `$params` array, where each
-	 * formatting rule is applied if the key of the rule in `$_rules` is present and not empty in
-	 * `$params`.  Also performs sanity checking against `$params` to ensure that no value
+	 * Attempts to apply a set of formatting rules from `$_rules` to a `$params` array.
+	 *
+	 * Each formatting rule is applied if the key of the rule in `$_rules` is present and not empty
+	 * in `$params`.  Also performs sanity checking against `$params` to ensure that no value
 	 * matching a rule is present unless the rule check passes.
 	 *
 	 * @param array $params An array of route parameters to which rules will be applied.
@@ -158,13 +165,14 @@ class Dispatcher extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Call class method
+	 * Calls a given command with the appropriate action.
 	 *
-	 * @param string $callable
-	 * @param string $request
-	 * @param string $params
-	 * @return void
-	 * @filter
+	 * This method is reponsible for calling a `$callable` command and returning its result.
+	 *
+	 * @param string $callable The callable command.
+	 * @param string $request The associated `Request` object.
+	 * @param string $params Additional params that should be passed along.
+	 * @return mixed Returns the result of the called action, typically `true` or `false`.
 	 */
 	protected static function _call($callable, $request, $params) {
 		$params = compact('callable', 'request', 'params');

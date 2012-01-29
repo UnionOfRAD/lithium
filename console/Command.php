@@ -13,6 +13,7 @@ use lithium\console\command\Help;
 
 /**
  * All Commands to be run from the Lithium console must extend this class.
+ *
  * The `run` method is automatically called if it exists. Otherwise, if a method does not exist
  * the `Help` command will be run.
  *
@@ -66,7 +67,9 @@ class Command extends \lithium\core\Object {
 
 	/**
 	 * Constructor.
+	 *
 	 * @param array $config
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('request' => null, 'response' => array(), 'classes' => $this->_classes);
@@ -74,9 +77,11 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Initializer.  Populates the `response` property with a new instance of the `Response`
-	 * class passing it configuration and assigns the values from named parameters of the
-	 * request (if applicable) to properties of the command.
+	 * Command Initializer.
+	 *
+	 * Populates the `$response` property with a new instance of the `Response` class passing it
+	 * configuration and assigns the values from named parameters of the request (if applicable) to
+	 * properties of the command.
 	 *
 	 * @return void
 	 */
@@ -102,8 +107,8 @@ class Command extends \lithium\core\Object {
 	 *
 	 * @see lithium\console\Dispatcher
 	 * @see lithium\console\Response
-	 * @param string $action name of the method to run
-	 * @param array $args the args from the request
+	 * @param string $action The name of the method to run.
+	 * @param array $args The arguments from the request.
 	 * @param array $options
 	 * @return object The response object associated with this command.
 	 * @todo Implement filters.
@@ -125,6 +130,7 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
+	 * Invokes the `Help` command.
 	 *
 	 * The invoked Help command will take over request and response objects of
 	 * the originally invoked command. Thus the response of the Help command
@@ -142,9 +148,9 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Writes string to output stream.
+	 * Writes a string to the output stream.
 	 *
-	 * @param string $output
+	 * @param string $output The string to write.
 	 * @param integer|string|array $options
 	 *        integer as the number of new lines.
 	 *        string as the style
@@ -154,14 +160,13 @@ class Command extends \lithium\core\Object {
 	 * @return integer
 	 */
 	public function out($output = null, $options = array('nl' => 1)) {
-		$options = is_int($options) ? array('nl' => $options) : $options;
 		return $this->_response('output', $output, $options);
 	}
 
 	/**
-	 * Writes string to error stream.
+	 * Writes a string to error stream.
 	 *
-	 * @param string $error
+	 * @param string $error The string to write.
 	 * @param integer|string|array $options
 	 *        integer as the number of new lines.
 	 *        string as the style
@@ -213,10 +218,12 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Add text with horizontal line before and after stream.
+	 * Writes a header to the output stream.
 	 *
-	 * @param string $text
-	 * @param integer $line
+	 * In addition to the actual text, horizontal lines before and afterwards are written.
+	 *
+	 * @param string $text The heading text.
+	 * @param integer $line The length of the line. Defaults to 80.
 	 * @return void
 	 */
 	public function header($text, $line = 80) {
@@ -228,9 +235,9 @@ class Command extends \lithium\core\Object {
 	/**
 	 * Writes rows of columns.
 	 *
-	 * This method expects asceding integer values as the keys, which map to the
-	 * appropriate columns. Currently, there is no special "header" option, but you
-	 * can define them for your own.
+	 * This method expects asceding integer values as the keys, which map to the appropriate
+	 * columns. Currently, there is no special "header" option, but you can define them for your
+	 * own.
 	 *
 	 * Example Usage:
 	 *
@@ -254,10 +261,9 @@ class Command extends \lithium\core\Object {
 	 * Foo Bar    18
 	 * }}}
 	 *
-	 * This method also calculates the needed space between the columns. All option
-	 * params given also get passed down to the `out()` method, which allow custom
-	 * formatting. Passing something like `$this->columns($output, array('style' => 'red)`
-	 * would print the table in red.
+	 * This method also calculates the needed space between the columns. All option params given
+	 * also get passed down to the `out()` method, which allow custom formatting. Passing something
+	 * like `$this->columns($output, array('style' => 'red)` would print the table in red.
 	 *
 	 * @see \lithium\console\Response::styles()
 	 * @param array $rows The rows to print, with each column as an array element.
@@ -289,9 +295,9 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Add newlines ("\n") to output stream.
+	 * Add newlines ("\n") to the output stream.
 	 *
-	 * @param integer $number
+	 * @param integer $number The number of new lines to print.
 	 * @return integer
 	 */
 	public function nl($number = 1) {
@@ -299,10 +305,10 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Add horizontal line to output stream
+	 * Adds a horizontal line to output stream.
 	 *
-	 * @param integer $length
-	 * @param integer $newlines
+	 * @param integer $length The length of the line, defaults to 80.
+	 * @param integer $newlines How many new lines to print afterwards, defaults to 1.
 	 * @return integer
 	 */
 	public function hr($length = 80, $newlines = 1) {
@@ -321,8 +327,8 @@ class Command extends \lithium\core\Object {
 	/**
 	 * Stop execution, by exiting the script.
 	 *
-	 * @param integer $status
-	 * @param boolean $message
+	 * @param integer $status Numeric value that will be used on `exit()`.
+	 * @param boolean $message An optional message that will be written to the stream.
 	 * @return void
 	 */
 	public function stop($status = 0, $message = null) {
