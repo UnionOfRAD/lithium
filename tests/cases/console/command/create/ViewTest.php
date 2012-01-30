@@ -42,22 +42,30 @@ class ViewTest extends \lithium\test\Unit {
 		$this->_cleanUp();
 	}
 
-	public function testIndexView() {
+	public function testRun() {
 		$this->request->params += array(
-			'command' => 'create', 'action' => 'view',
+			'command' => 'create', 'template' => 'test-view', 'action' => 'view',
 			'args' => array('Posts', 'index.html')
 		);
+
+		$plateFolder = $this->_testPath . '/create_test/extensions/command/create/template';
+		if (!is_dir($plateFolder)) {
+			mkdir($plateFolder, 0755, true);
+		}
+		file_put_contents($plateFolder . '/test-view.txt.php', '|{:name}|{:plural}|{:singular}|');
+
 		$view = new View(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-
+		$view->path = $this->_testPath;
 		$view->run('view');
 		$expected = "index.html.php created in views/posts.\n";
 		$result = $view->response->output;
 		$this->assertEqual($expected, $result);
 
-		$result = file_exists($this->_testPath . '/create_test/views/posts/index.html.php');
-		$this->assertTrue($result);
+		$expected = '|Posts|posts|post|';
+		$result = file_get_contents($this->_testPath . '/create_test/views/posts/index.html.php');
+		$this->assertEqual($expected, $result);
 	}
 }
 
