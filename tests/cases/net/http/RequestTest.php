@@ -82,7 +82,7 @@ class RequestTest extends \lithium\test\Unit {
 			'params' => array('param' => 'value')
 		));
 
-		$expected = '/base/path/';
+		$expected = '/base/path';
 		$result = $request->path;
 		$this->assertEqual($expected, $result);
 	}
@@ -268,7 +268,7 @@ class RequestTest extends \lithium\test\Unit {
 		$cnonce = md5(time());
 		$user = md5("gwoo:app:li3");
 		$nonce = "4bca0fbca7bd0:00000001:{$cnonce}:auth";
-		$req = md5("GET:/http_auth/");
+		$req = md5("GET:/http_auth");
 		$hash = md5("{$user}:{$nonce}:{$req}");
 
 		$request->to('url');
@@ -277,6 +277,16 @@ class RequestTest extends \lithium\test\Unit {
 
 		$expected = $hash;
 		$result = $response;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testParseUrlToConfig() {
+	    $url = "http://localhost/path/one.php?param=1&param=2";
+	    $config = parse_url($url);
+		$request = new Request($config);
+
+	    $expected = $url;
+	    $result = $request->to('url');
 		$this->assertEqual($expected, $result);
 	}
 }

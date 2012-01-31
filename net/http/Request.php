@@ -97,7 +97,12 @@ class Request extends \lithium\net\http\Message {
 	 * @return array
 	 */
 	public function queryString($params = array(), $format = null) {
-		$params = empty($params) ? (array) $this->query : (array) $this->query + (array) $params;
+		if (empty($params)) {
+			if (is_string($this->query)) {
+				return "?" . $this->query;
+			}
+		}
+		$params = $this->query + (array) $params;
 		$params = array_filter($params);
 
 		if (empty($params)) {
