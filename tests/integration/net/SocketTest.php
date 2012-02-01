@@ -17,7 +17,7 @@ class SocketTest extends \lithium\test\Integration {
 	protected $_testConfig = array(
 		'persistent' => false,
 		'scheme' => 'http',
-		'host' => 'www.lithify.me',
+		'host' => 'google.com',
 		'port' => 80,
 		'timeout' => 1,
 		'classes' => array(
@@ -37,12 +37,12 @@ class SocketTest extends \lithium\test\Integration {
 		$response = $socket->send();
 		$this->assertTrue($response instanceof \lithium\net\http\Response);
 
-		$expected = 'www.lithify.me';
+		$expected = 'google.com';
 		$result = $response->host;
 		$this->assertEqual($expected, $result);
 
 		$result = $response->body();
-		$this->assertPattern("/<title[^>]*>.*Lithium.*<\/title>/im", (string) $result);
+		$this->assertPattern("/<title[^>]*>.*Google.*<\/title>/im", (string) $result);
 	}
 
 	public function testCurlAdapter() {
@@ -54,12 +54,12 @@ class SocketTest extends \lithium\test\Integration {
 		$response = $socket->send();
 		$this->assertTrue($response instanceof \lithium\net\http\Response);
 
-		$expected = 'www.lithify.me';
+		$expected = 'google.com';
 		$result = $response->host;
 		$this->assertEqual($expected, $result);
 
 		$result = $response->body();
-		$this->assertPattern("/<title[^>]*>.*Lithium.*<\/title>/im", (string) $result);
+		$this->assertPattern("/<title[^>]*>.*<\/title>/im", (string) $result);
 	}
 
 	public function testStreamAdapter() {
@@ -68,12 +68,12 @@ class SocketTest extends \lithium\test\Integration {
 		$response = $socket->send();
 		$this->assertTrue($response instanceof \lithium\net\http\Response);
 
-		$expected = 'www.lithify.me';
+		$expected = 'google.com';
 		$result = $response->host;
 		$this->assertEqual($expected, $result);
 
 		$result = $response->body();
-		$this->assertPattern("/<title[^>]*>.*Lithium.*<\/title>/im", (string) $result);
+		$this->assertPattern("/<title[^>]*>.*<\/title>/im", (string) $result);
 	}
 }
 
