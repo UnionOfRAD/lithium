@@ -964,7 +964,7 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Checks for a working internet connection.
 	 *
-	 * This method is used to check for a working connection to lithify.me, both
+	 * This method is used to check for a working connection to google.com, both
 	 * testing for proper dns resolution and reading the actual URL.
 	 *
 	 * @param array $config Override the default URI to check.
@@ -973,7 +973,7 @@ class Unit extends \lithium\core\Object {
 	protected function _hasNetwork($config = array()) {
 		$defaults = array(
 			'scheme' => 'http',
-			'host' => 'lithify.me'
+			'host' => 'google.com'
 		);
 		$config += $defaults;
 
