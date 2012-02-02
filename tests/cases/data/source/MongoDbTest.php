@@ -77,9 +77,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$model::config(array('key' => '_id'));
 		$model::$connection = $this->db;
 
-		$this->query = new Query(compact('model') + array(
-			'entity' => new Document(compact('model'))
-		));
+		$this->query = new Query(compact('model') + array('entity' => new Document(compact('model'))));
 	}
 
 	public function tearDown() {
@@ -487,25 +485,24 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function testMongoIdPreservation() {
 		$model = $this->_model;
-		$model::config(array('source' => 'ordered_docs'));
-		$mongo = new MongoDb($this->_testConfig);
-		$model::$connection = $mongo;
+		$model::resetSchema(true);
+		$model::config(array('locked' => false));
 
-		$post = $model::create(array('title' => 'A post'));
+		$post = $model::create(array('_id' => new MongoId(), 'title' => 'A post'));
 		$post->save();
-		$id = $post->_id;
+		$result = array_pop($this->db->connection->queries);
+		$data = $result['data'];
 
-		$data = $mongo->connection->ordered_docs->findOne(array('_id' => $id));
 		$this->assertEqual('A post', $data['title']);
-		$this->assertEqual($id, (string) $data['_id']);
 		$this->assertTrue($data['_id'] instanceof MongoId);
 
+		$post->sync();
 		$post->title = 'An updated post';
 		$post->save();
 
-		$data = $mongo->connection->ordered_docs->findOne(array('_id' => new MongoId($id)));
-		$this->assertEqual('An updated post', $data['title']);
-		$this->assertEqual($id, (string) $data['_id']);
+		$result = array_pop($this->db->connection->queries);
+		$this->assertEqual(array('_id' => $post->_id), $result['conditions']);
+		$this->assertEqual(array('$set' => array('title' => 'An updated post')), $result['update']);
 	}
 
 	public function testRelationshipGeneration() {
@@ -533,31 +530,31 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testCreateNoConnectionException() {
-		$db = new MongoDb(array('host' => '__invalid__'));
+		$db = new MongoDb(array('host' => '__invalid__', 'autoConnect' => false));
 		$this->expectException('Could not connect to the database.');
 		$result = $db->create(null);
 	}
 
 	public function testReadNoConnectionException() {
-		$db = new MongoDb(array('host' => '__invalid__'));
+		$db = new MongoDb(array('host' => '__invalid__', 'autoConnect' => false));
 		$this->expectException('Could not connect to the database.');
 		$result = $db->read(null);
 	}
 
 	public function testUpdateNoConnectionException() {
-		$db = new MongoDb(array('host' => '__invalid__'));
+		$db = new MongoDb(array('host' => '__invalid__', 'autoConnect' => false));
 		$this->expectException('Could not connect to the database.');
 		$result = $db->update(null);
 	}
 
 	public function testDeleteNoConnectionException() {
-		$db = new MongoDb(array('host' => '__invalid__'));
+		$db = new MongoDb(array('host' => '__invalid__', 'autoConnect' => false));
 		$this->expectException('Could not connect to the database.');
 		$result = $db->delete(null);
 	}
 
 	public function testSourcesNoConnectionException() {
-		$db = new MongoDb(array('host' => null));
+		$db = new MongoDb(array('host' => null, 'autoConnect' => false));
 		$this->expectException('Could not connect to the database.');
 		$result = $db->sources(null);
 	}

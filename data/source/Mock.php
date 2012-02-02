@@ -36,7 +36,7 @@ class Mock extends \lithium\data\Source {
 		return array();
 	}
 
-	public function describe($entity, $schema = array(), array $meta = array()) {
+	public function describe($entity, $fields = array(), array $meta = array()) {
 		return $this->_instance('schema', compact('fields'));
 	}
 

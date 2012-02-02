@@ -307,8 +307,8 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 
 		foreach ($data as $key => $value) {
 			if (is_a($value, __CLASS__)) {
-				if (!$options['init']) {
-					$value->_exists = false;
+				if ($options['init']) {
+					$value->_exists = $this->_exists;
 				}
 				$value->_pathKey = ($this->_pathKey ? "{$this->_pathKey}." : '') . $key;
 				$value->_model = $value->_model ?: $this->_model;
