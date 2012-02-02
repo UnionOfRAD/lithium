@@ -8,15 +8,14 @@
 
 namespace lithium\tests\mocks\data\source\http\adapter;
 
-class MockCouchPost extends \lithium\data\Model {
+class MockCouchPost extends \lithium\tests\mocks\data\MockBase {
 
-	protected $_meta = array(
-		'source' => 'posts',
-		'connection' => 'mock-couchdb-connection'
-	);
+	public static $connection;
+
+	protected $_meta = array('source' => 'posts', 'connection' => false, 'key' => 'id');
 
 	protected $_schema = array(
-		'id' => array('type' => 'integer', 'key' => 'primary'),
+		'id' => array('type' => 'integer'),
 		'author_id' => array('type' => 'integer'),
 		'title' => array('type' => 'string', 'length' => 255),
 		'body' => array('type' => 'text'),

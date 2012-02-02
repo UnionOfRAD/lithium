@@ -10,49 +10,28 @@ namespace lithium\tests\cases\data\entity;
 
 use MongoId;
 use MongoDate;
-use lithium\data\Connections;
+use lithium\data\Schema;
 use lithium\data\source\MongoDb;
-use lithium\data\source\http\adapter\CouchDb;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
 use lithium\data\collection\DocumentArray;
 use lithium\tests\mocks\data\model\MockDocumentPost;
 use lithium\tests\mocks\data\model\MockDocumentMultipleKey;
+use lithium\tests\mocks\data\source\MockMongoConnection;
+use lithium\tests\mocks\data\model\MockDocumentSource;
 
 class DocumentTest extends \lithium\test\Unit {
 
 	protected $_model = 'lithium\tests\mocks\data\model\MockDocumentPost';
 
-	protected $_backup = array();
-
-	public function skip() {
-		$this->skipIf(!MongoDb::enabled(), 'MongoDb is not enabled');
-		$this->skipIf(!CouchDb::enabled(), 'CouchDb is not enabled');
-	}
-
 	public function setUp() {
-		if (!$this->_backup) {
-			foreach (Connections::get() as $conn) {
-				$this->_backup[$conn] = Connections::get($conn, array('config' => true));
-			}
-		}
-		Connections::reset();
-
-		Connections::add('mongo', array('type' => 'MongoDb', 'autoConnect' => false));
-		Connections::add('couch', array('type' => 'http', 'adapter' => 'CouchDb'));
-
-		MockDocumentPost::config(array('connection' => 'mongo'));
-		MockDocumentMultipleKey::config(array('connection' => 'couch'));
-	}
-
-	public function tearDown() {
-		foreach ($this->_backup as $name => $config) {
-			Connections::add($name, $config);
-		}
+		MockDocumentPost::$connection = new MongoDb(array('autoConnect' => false));
+		MockDocumentPost::$connection->connection = new MockMongoConnection();
+		MockDocumentMultipleKey::$connection = new MockDocumentSource();
 	}
 
 	public function testFindAllAndIterate() {
-		$set = MockDocumentPost::find('all');
+		$set = MockDocumentPost::all();
 
 		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
 		$result = $set->current()->data();
@@ -669,9 +648,9 @@ class DocumentTest extends \lithium\test\Unit {
 	 * Tests that unassigned fields with default schema values are auto-populated at access time.
 	 */
 	public function testSchemaValueInitialization() {
-		$doc = new Document(array('schema' => array(
+		$doc = new Document(array('schema' => new Schema(array('fields' => array(
 			'foo' => array('type' => 'string', 'default' => 'bar')
-		)));
+		)))));
 		$this->assertFalse($doc->data());
 
 		$this->assertEqual('bar', $doc->foo);

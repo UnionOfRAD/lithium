@@ -49,13 +49,12 @@ class DocumentArrayTest extends \lithium\test\Unit {
 			'Hello again!',
 			'Delete me'
 		);
-		$doc = new DocumentArray(array('data' => $data));
-
+		$doc = new DocumentArray(compact('data'));
 		$this->assertIdentical($data, $doc->data());
 
 		foreach ($doc as $i => $word) {
 			if ($word == 'Delete me') {
-				unset($doc->$i);
+				unset($doc->{$i});
 			}
 		}
 
