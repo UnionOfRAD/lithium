@@ -703,7 +703,7 @@ class MongoDb extends \lithium\data\Source {
 		$castOpts += array('first' => true, 'arrays' => false, 'database' => $this);
 		$cast = function($pair) use ($model, &$schema, &$castOpts) {
 			if (!$schema) {
-				return $value;
+				return $castOpts['first'] ? reset($pair) : $pair;
 			}
 			return $schema->cast($model, $pair, $castOpts);
 		};

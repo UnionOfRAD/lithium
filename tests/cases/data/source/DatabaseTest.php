@@ -8,13 +8,13 @@
 
 namespace lithium\tests\cases\data\source;
 
-use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\data\entity\Record;
 use lithium\data\collection\RecordSet;
 use lithium\tests\mocks\data\model\MockDatabase;
 use lithium\tests\mocks\data\model\MockDatabasePost;
 use lithium\tests\mocks\data\model\MockDatabaseComment;
+use lithium\tests\mocks\data\model\MockDatabaseTagging;
 
 class DatabaseTest extends \lithium\test\Unit {
 
@@ -108,6 +108,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 	public function testSchema() {
 		$model = $this->_model;
+		$model::config();
 		$modelName = $model::meta('name');
 		$expected = array($modelName => array('id', 'author_id', 'title', 'created'));
 		$result = $this->db->schema(new Query(compact('model')));
