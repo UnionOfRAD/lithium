@@ -216,9 +216,7 @@ class QueryTest extends \lithium\test\Unit {
 	public function testConditionFromRecord() {
 		$entity = new Record();
 		$entity->id = 12;
-		$query = new Query(compact('entity') + array(
-			'model' => $this->_model
-		));
+		$query = new Query(compact('entity') + array('model' => $this->_model));
 
 		$expected = array('id' => 12);
 		$result = $query->conditions();

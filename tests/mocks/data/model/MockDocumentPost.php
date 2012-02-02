@@ -11,12 +11,9 @@ namespace lithium\tests\mocks\data\model;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
 
-class MockDocumentPost extends \lithium\data\Model {
+class MockDocumentPost extends \lithium\tests\mocks\data\MockBase {
 
-	protected $_meta = array(
-		'connection' => 'mongo',
-		'initialized' => true
-	);
+	protected $_meta = array('connection' => false, 'initialized' => true, 'key' => '_id');
 
 	protected static $_connection;
 
@@ -26,6 +23,7 @@ class MockDocumentPost extends \lithium\data\Model {
 		$schema = parent::schema();
 		$schema->append(array(
 			'_id' => array('type' => 'id'),
+			'foo' => array('type' => 'object'),
 			'foo.bar' => array('type' => 'int')
 		));
 		return $schema;
@@ -43,13 +41,6 @@ class MockDocumentPost extends \lithium\data\Model {
 
 	public function medicin($record) {
 		return 'lithium';
-	}
-
-	public static function &connection() {
-		if (!static::$_connection) {
-			static::$_connection = new MockDocumentSource();
-		}
-		return static::$_connection;
 	}
 
 	public static function find($type = 'all', array $options = array()) {
