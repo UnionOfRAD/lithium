@@ -35,16 +35,6 @@ class HttpTest extends \lithium\test\Unit {
 		Connections::config(array(
 			'mock-http-connection' => array('type' => 'Http')
 		));
-
-		Connections::config(array(
-			'mock-http-conn' => array(
-				'type' => 'Http',
-				'methods' => array(
-					'something' => array('method' => 'get'),
-					'do' => array('method' => 'post')
-				)
-			)
-		));
 	}
 
 	public function tearDown() {
