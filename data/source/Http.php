@@ -118,15 +118,16 @@ class Http extends \lithium\data\Source {
 			}
 			$conn =& $this->connection;
 			$filter = function($self, $params) use (&$conn, $string) {
-				$query = $params[0];
 				$options = $params[1];
-				$data = array();
 
-				if ($query) {
+				if($params[0] instanceof \lithium\data\model\Query) {
+					$query = $params[0];
 					$options += array_filter($query->export($self), function($v) {
 						return $v !== null;
 					});
 					$data = $query->data();
+				} else {
+					$data = in_array($string['method'], array('post', 'put')) ? (array) $params[0] : array();
 				}
 				$path = String::insert($string['path'], $options + $data, array('clean' => true));
 				return $conn->{$string['method']}($path, $data, $options);

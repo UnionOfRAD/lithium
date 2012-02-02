@@ -308,6 +308,24 @@ class HttpTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testCustomGetMethod() {
+		$config = $this->_testConfig + array('methods' => array(
+			'something' => array('method' => 'get', 'path' => '/something')
+		));
+		$http = new Http($config);
+
+		$result = $http->something();
+		$expected = join("\r\n", array(
+			'GET /something HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'', ''
+		));
+		$result = (string) $http->last->request;
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testCustomGetMethodWithModel() {
 		$config = $this->_testConfig + array('methods' => array(
 			'something' => array('method' => 'get', 'path' => '/something')
@@ -322,6 +340,26 @@ class HttpTest extends \lithium\test\Unit {
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'', ''
+		));
+		$result = (string) $http->last->request;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testCustomPostMethod() {
+		$config = $this->_testConfig + array('methods' => array(
+			'do' => array('method' => 'post', 'path' => '/do')
+		));
+		$http = new Http($config);
+
+		$result = $http->do(array('title' => 'sup'));
+		$expected = join("\r\n", array(
+			'POST /do HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'Content-Type: application/x-www-form-urlencoded',
+			'Content-Length: 9',
+			'', 'title=sup'
 		));
 		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
