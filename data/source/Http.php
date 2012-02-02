@@ -28,7 +28,7 @@ class Http extends \lithium\data\Source {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('classes' => 'merge');
+	protected $_autoConfig = array('classes' => 'merge', 'methods' => 'merge');
 
 	/**
 	 * Fully-namespaced class references
@@ -109,19 +109,27 @@ class Http extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function __call($method, $params) {
-		if (isset($this->_config['methods'][$method])) {
+		if (isset($this->_methods[$method])) {
 			$params += array(array(), array());
-			$string = $this->_config['methods'][$method];
+			$string = $this->_methods[$method];
 
 			if (!isset($string['path'])) {
 				$string['path'] = $method;
 			}
 			$conn =& $this->connection;
 			$filter = function($self, $params) use (&$conn, $string) {
-				$data = in_array($string['method'], array('post', 'put'))
-					? (array) $params[0] : array();
-				$path = String::insert($string['path'], $data, array('clean' => true));
-				return $conn->{$string['method']}($path, $data, $params[1]);
+				$query = $params[0];
+				$options = $params[1];
+				$data = array();
+
+				if ($query) {
+					$options += array_filter($query->export($self), function($v) {
+						return $v !== null;
+					});
+					$data = $query->data();
+				}
+				$path = String::insert($string['path'], $options + $data, array('clean' => true));
+				return $conn->{$string['method']}($path, $data, $options);
 			};
 			return $this->_filter(__METHOD__, $params, $filter);
 		}
