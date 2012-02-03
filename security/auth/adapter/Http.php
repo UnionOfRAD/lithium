@@ -45,7 +45,7 @@ class Http extends \lithium\core\Object {
 
 	/**
 	 * Called by the `Auth` class to run an authentication check against the HTTP data using the
-	 * credientials in a data container (a `Request` object), and returns an array of user
+	 * credentials in a data container (a `Request` object), and returns an array of user
 	 * information on success, or `false` on failure.
 	 *
 	 * @param object $request A env container which wraps the authentication credentials used

@@ -103,7 +103,7 @@ class Form extends \lithium\template\Helper {
 	 *
 	 * - schema(): Returns an array defining the objects fields and their data types.
 	 * - data(): Returns an associative array of the data that this object represents.
-	 * - errors(): Returns an associatie array of validation errors for the current data set, where
+	 * - errors(): Returns an associate array of validation errors for the current data set, where
 	 *             the keys match keys from `schema()`, and the values are either strings (in cases
 	 *             where a field only has one error) or an array (in case of multiple errors),
 	 *
@@ -183,7 +183,7 @@ class Form extends \lithium\template\Helper {
 	 * $this->form->config(array('label' => array('class' => 'foo')));
 	 * }}}
 	 *
-	 * Note that this can be overridden on a case-by-case basis, and when overridding, values are
+	 * Note that this can be overridden on a case-by-case basis, and when overriding, values are
 	 * not merged or combined. Therefore, if you wanted a particular `<label />` to have both `foo`
 	 * and `bar` as classes, you would have to specify `'class' => 'foo bar'`.
 	 *
@@ -412,7 +412,7 @@ class Form extends \lithium\template\Helper {
 		$wrap = $options['wrap'];
 		$type = $options['type'];
 		$list = $options['list'];
-		$tempalte = $options['template'];
+		$template = $options['template'];
 		$notText = $template == 'field' && $type != 'text';
 
 		if ($notText && $this->_context->strings('field-' . $type)) {

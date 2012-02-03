@@ -24,7 +24,7 @@ use lithium\core\Libraries;
  * appropriate cache adapter.
  *
  * This adapter does *not* provide increment/decrement functionality. For such
- * functionality, please use a more approrpiate cache adapter.
+ * functionality, please use a more appropriate cache adapter.
  *
  * This adapter does *not* allow multi-key operations for any methods.
  *

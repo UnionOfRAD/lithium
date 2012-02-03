@@ -64,7 +64,7 @@ class Hmac extends \lithium\core\Object {
 	/**
 	 * Write strategy method.
 	 * Adds an HMAC signature to the data. Note that this will transform the
-	 * passed `$data` to an array, and add a `__signature` key with the HMAC-caculated
+	 * passed `$data` to an array, and add a `__signature` key with the HMAC-calculated
 	 * value.
 	 *
 	 * @see lithium\storage\Session

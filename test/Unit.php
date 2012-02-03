@@ -280,7 +280,7 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Checks that the result evalutes to true.
+	 * Checks that the result evaluates to true.
 	 *
 	 * For example:
 	 * {{{
@@ -303,7 +303,7 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Checks that the result evalutes to false.
+	 * Checks that the result evaluates to false.
 	 *
 	 * For example:
 	 * {{{

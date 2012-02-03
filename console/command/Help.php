@@ -300,7 +300,7 @@ class Help extends \lithium\console\Command {
 	/**
 	 * Output the formatted command description.
 	 *
-	 * @param array $info Info from insepcting the class of the command.
+	 * @param array $info Info from inspecting the class of the command.
 	 * @return void
 	 */
 	protected function _renderDescription($info) {

@@ -166,7 +166,7 @@ class Media extends \lithium\core\StaticObject {
 	 *
 	 * - `'<prefix>:<key>'` _string_: This type of assertion can be used to match against arbitrary
 	 *   information in the request, including headers (i.e. `'http:user_agent'`), environment
-	 *   varialbes (i.e. `'env:home'`), GET and POST data (i.e. `'query:foo'` or `'data:foo'`,
+	 *   variables (i.e. `'env:home'`), GET and POST data (i.e. `'query:foo'` or `'data:foo'`,
 	 *   respectively), and the HTTP method (`'http:method'`) of the request. For more information
 	 *   on possible keys, see `lithium\action\Request::get()`.
 	 *

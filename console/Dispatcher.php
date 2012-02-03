@@ -167,7 +167,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	/**
 	 * Calls a given command with the appropriate action.
 	 *
-	 * This method is reponsible for calling a `$callable` command and returning its result.
+	 * This method is responsible for calling a `$callable` command and returning its result.
 	 *
 	 * @param string $callable The callable command.
 	 * @param string $request The associated `Request` object.

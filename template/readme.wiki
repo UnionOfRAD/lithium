@@ -9,7 +9,7 @@ This is where a lot of confusion comes in, because it is commonly misunderstood
 that Lithium depends on `short_open_tags`, however, that's not the case. The
 contents of a view are processed through a [ tokenizer](template/view/Compiler) before
 it is included by PHP. The file is then `compiled` into the final PHP+HTML (or whatever
-other content type that is requsted), which is then passed off to be fully rendered
+other content type that is requested), which is then passed off to be fully rendered
 by the two-step view to its final form.
 
 See the PHP [ manual](http://php.net/manual/en/book.tokenizer.php) to learn more about tokens.

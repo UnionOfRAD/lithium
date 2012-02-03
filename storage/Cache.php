@@ -10,7 +10,7 @@ namespace lithium\storage;
 
 /**
  * The `Cache` static class provides a consistent interface to configure and utilize the different
- * cache adatpers included with Lithium, as well as your own adapters.
+ * cache adapters included with Lithium, as well as your own adapters.
  *
  * The Cache layer of Lithium inherits from the common `Adaptable` class, which provides the generic
  * configuration setting & retrieval logic, as well as the logic required to locate & instantiate
@@ -276,7 +276,7 @@ class Cache extends \lithium\core\Adaptable {
 	}
 
 	/**
-	 * Remove all cache keys from specified confiuration.
+	 * Remove all cache keys from specified configuration.
 	 *
 	 * This method is non-filterable.
 	 *
