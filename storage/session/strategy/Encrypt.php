@@ -29,7 +29,7 @@ use lithium\core\ConfigException;
  * By default, this strategy uses the AES algorithm in the CBC mode. This means that an
  * initialization vector has to be generated and transported with the payload data. This
  * is done transparently, but you may want to keep this in mind (the ECB mode doesn't require
- * an itialization vector but is not recommended to use as it's insecure). You can override this
+ * an initialization vector but is not recommended to use as it's insecure). You can override this
  * defaults by passing a different `cipher` and/or `mode` to the config like this:
  *
  * {{{
@@ -177,8 +177,6 @@ class Encrypt extends \lithium\core\Object {
 	 * @return string A Base64 encoded and encrypted string.
 	 */
 	protected function _encrypt($decrypted = array()) {
-		$cipher = $this->_config['cipher'];
-		$mode   = $this->_config['mode'];
 		$vector = $this->_config['vector'];
 		$secret = $this->_hashSecret($this->_config['secret']);
 
@@ -196,9 +194,6 @@ class Encrypt extends \lithium\core\Object {
 	 * @return array The cleartext data.
 	 */
 	protected function _decrypt($encrypted) {
-		$cipher = $this->_config['cipher'];
-		$mode   = $this->_config['mode'];
-		$vector = $this->_config['vector'];
 		$secret = $this->_hashSecret($this->_config['secret']);
 
 		$vectorSize = strlen(base64_encode(str_repeat(" ", static::_vectorSize())));
