@@ -136,7 +136,7 @@ class MySql extends \lithium\data\source\Database {
 		);
 
 		try {
-			list($host, $port) = array(1 => "3306") + explode(':', $host);
+			list($host, $port) = explode(':', $host) + array(1 => "3306");
 			$dsn = sprintf("mysql:host=%s;port=%s;dbname=%s", $host, $port, $config['database']);
 			$this->connection = new PDO($dsn, $config['login'], $config['password'], $options);
 		} catch (PDOException $e) {
