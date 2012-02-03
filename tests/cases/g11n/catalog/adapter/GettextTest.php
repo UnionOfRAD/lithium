@@ -105,10 +105,7 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
-
-		$this->assertTrue(is_callable($result['pluralRule']));
 		unset($result['pluralRule']);
-
 		$this->assertEqual($expected, $result);
 	}
 
@@ -142,10 +139,7 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
-
-		$this->assertTrue(is_callable($result['pluralRule']));
 		unset($result['pluralRule']);
-
 		$this->assertEqual($expected, $result);
 	}
 
@@ -170,8 +164,6 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
-
-		$this->assertTrue(is_callable($result['pluralRule']));
 		unset($result['pluralRule']);
 
 		$this->assertEqual($expected, $result);
@@ -215,10 +207,7 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
-
-		$this->assertTrue(is_callable($result['pluralRule']));
 		unset($result['pluralRule']);
-
 		$this->assertEqual($expected, $result);
 	}
 
@@ -274,10 +263,7 @@ msgstr "translated 1"
 EOD;
 		file_put_contents($file, $po);
 		$result = $this->adapter->read('message', 'de', null);
-
-		$this->assertTrue(is_callable($result['pluralRule']));
 		unset($result['pluralRule']);
-
 		$this->assertEqual($catalog, $result);
 
 		unlink($file);
@@ -319,10 +305,7 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
-
-		$this->assertTrue(is_callable($result['pluralRule']));
 		unset($result['pluralRule']);
-
 		$this->assertEqual($expected, $result);
 
 		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
@@ -349,10 +332,7 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
-
-		$this->assertTrue(is_callable($result['pluralRule']));
 		unset($result['pluralRule']);
-
 		$this->assertEqual($expected, $result);
 
 		$data = <<<EOD
@@ -388,10 +368,7 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
-
-		$this->assertTrue(is_callable($result['pluralRule']));
 		unset($result['pluralRule']);
-
 		$this->assertEqual($expected, $result);
 	}
 
@@ -405,10 +382,7 @@ EOD;
 		file_put_contents($file, $data);
 
 		$result = $this->adapter->read('message', 'de', null);
-
-		$this->assertTrue(is_callable($result['pluralRule']));
 		unset($result['pluralRule']);
-
 		$this->assertTrue(isset($result[$dummy]));
 
 		$data = <<<EOD
@@ -418,10 +392,7 @@ EOD;
 		file_put_contents($file, $data);
 
 		$result = $this->adapter->read('message', 'de', null);
-
-		$this->assertTrue(is_callable($result['pluralRule']));
 		unset($result['pluralRule']);
-
 		$this->assertEqual($result['singular 1']['translated'], $dummy);
 	}
 
@@ -458,10 +429,7 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
-
-		$this->assertTrue(is_callable($result['pluralRule']));
 		unset($result['pluralRule']);
-
 		$this->assertEqual($expected, $result);
 	}
 
@@ -549,15 +517,11 @@ EOD;
 
 		$this->adapter->write('message', 'de', null, $data);
 		$result = $this->adapter->read('message', 'de', null);
-
-		$this->assertTrue(is_callable($result['pluralRule']));
 		unset($result['pluralRule']);
-
 		$this->assertEqual($data, $result);
 
 		$this->adapter->write('messageTemplate', 'root', null, $data);
 		$result = $this->adapter->read('messageTemplate', 'root', null);
-		$this->assertTrue(is_callable($result['pluralRule']));
 		unset($result['pluralRule']);
 		$this->assertEqual($data, $result);
 	}
@@ -639,10 +603,7 @@ EOD;
 
 		file_put_contents($file, $po);
 		$result = $this->adapter->read('validation', 'de', null);
-
-		$this->assertTrue(is_callable($result['pluralRule']));
 		unset($result['pluralRule']);
-
 		$this->assertEqual($catalog, $result);
 
 		unlink($file);
@@ -737,8 +698,6 @@ msgstr "this is the{$escaped}translation"
 EOD;
 			file_put_contents($file, $po);
 			$result = $this->adapter->read('message', 'de', null);
-
-			$this->assertTrue(is_callable($result['pluralRule']));
 			unset($result['pluralRule']);
 
 			$message  = "`{$unescaped}` (ASCII octal {$ord}) was not escaped to `{$escaped}`";
@@ -840,8 +799,9 @@ EOD;
 		file_put_contents($file, $data);
 
 		$result = $this->adapter->read('message', 'de', null);
-		$this->assertEqual(true, $result['pluralRule'](3));
-		$this->assertEqual(0, $result['pluralRule'](1));
+		$this->assertTrue(is_callable($result['pluralRule']['translated']));
+		$this->assertEqual(true, $result['pluralRule']['translated'](3));
+		$this->assertEqual(0, $result['pluralRule']['translated'](1));
 	}
 }
 
