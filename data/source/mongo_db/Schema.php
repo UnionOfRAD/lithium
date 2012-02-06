@@ -67,8 +67,7 @@ class Schema extends \lithium\data\Schema {
 		if (is_scalar($data)) {
 			return $this->_castType($data, $basePathKey);
 		}
-		$model = method_exists($object, 'model') ? $object->model() : null;
-		$model = $model ? $model : $options['model'];
+		$model = method_exists($object, 'model') ? $object->model() : $options['model'];
 		$database = $options['database'] ?: null;
 
 		if ($model && !$database) {
