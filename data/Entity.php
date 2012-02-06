@@ -246,11 +246,11 @@ class Entity extends \lithium\core\Object {
 		$schema = null;
 
 		switch (true) {
-			case (is_object($this->_schema)):
-				$schema = $this->_schema;
-			break;
 			case ($model = $this->_model):
 				$schema = $model::schema();
+			break;
+			case (is_object($this->_schema)):
+				$schema = $this->_schema;
 			break;
 		}
 		if ($schema) {
