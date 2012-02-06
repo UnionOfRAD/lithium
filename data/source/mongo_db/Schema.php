@@ -19,13 +19,13 @@ class Schema extends \lithium\data\Schema {
 	protected $_handlers = array();
 
 	protected $_types = array(
-		'MongoId' => 'id',
-		'MongoDate' => 'date',
-		'MongoCode' => 'code',
+		'MongoId'      => 'id',
+		'MongoDate'    => 'date',
+		'MongoCode'    => 'code',
 		'MongoBinData' => 'binary',
-		'datetime' => 'date',
-		'timestamp' => 'date',
-		'int' => 'integer'
+		'datetime'     => 'date',
+		'timestamp'    => 'date',
+		'int'          => 'integer'
 	);
 
 	public function __construct(array $config = array()) {
@@ -54,6 +54,14 @@ class Schema extends \lithium\data\Schema {
 		);
 	}
 
+	public function type($field) {
+		if (!isset($this->_fields[$field]['type'])) {
+			return null;
+		}
+		$type = $this->_fields[$field]['type'];
+		return isset($this->_types[$type]) ? $this->_types[$type] : $type;
+	}
+
 	public function cast($object, $data, array $options = array()) {
 		$defaults = array(
 			'pathKey' => null,
@@ -63,15 +71,13 @@ class Schema extends \lithium\data\Schema {
 		);
 		$options += $defaults;
 		$basePathKey = $options['pathKey'];
+		$model = (!$options['model'] && $object) ? $object->model() : $options['model'];
 
 		if (is_scalar($data)) {
 			return $this->_castType($data, $basePathKey);
 		}
-		$model = method_exists($object, 'model') ? $object->model() : null;
-		$model = $model ? $model : $options['model'];
-		$database = $options['database'] ?: null;
 
-		if ($model && !$database) {
+		if ($model && !($database = $options['database'])) {
 			$database = $model::connection();
 		}
 
@@ -80,13 +86,14 @@ class Schema extends \lithium\data\Schema {
 				continue;
 			}
 			$pathKey = $basePathKey ? $basePathKey . '.' . $key : $key;
-			$isArray = $this->is('array', $pathKey) || $this->type($pathKey) == 'array';
+			$isArray = $this->is('array', $pathKey);
 
 			if (is_array($val) || $isArray) {
 				$val = (array) $val;
 				$numericArray = !$val || array_keys($val) === range(0, count($val) - 1);
 				$options['class'] = 'entity';
-				if (($isArray && $numericArray) || $numericArray) {
+
+				if ($isArray || $numericArray) {
 					$options['class'] = 'array';
 				}
 				unset($options['first']);
@@ -99,14 +106,12 @@ class Schema extends \lithium\data\Schema {
 		return $data;
 	}
 
-	protected function _castType($val, $pathKey) {
+	protected function _castType($val, $field) {
 		if (!is_scalar($val)) {
 			return $val;
 		}
-		$type = $this->type($pathKey);
-		$type = isset($this->_types[$type]) ? $this->_types[$type] : $type;
-		$handler = isset($this->_handlers[$type]) ? $this->_handlers[$type] : null;
-		return $handler ? $handler($val) : $val;
+		$type = $this->type($field);
+		return isset($this->_handlers[$type]) ? $this->_handlers[$type]($val) : $val;
 	}
 }
 

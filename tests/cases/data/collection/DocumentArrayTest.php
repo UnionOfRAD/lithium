@@ -60,6 +60,17 @@ class DocumentArrayTest extends \lithium\test\Unit {
 
 		$expected = array(0 => 'Hello', 6 => 'Hello again!');
 		$this->assertIdentical($expected, $doc->data());
+
+		$doc = new DocumentArray(compact('data'));
+
+		foreach ($doc as $i => $word) {
+			if ($word == 'Delete me') {
+				unset($doc[$i]);
+			}
+		}
+		$expected = array(0 => 'Hello', 6 => 'Hello again!');
+		$this->assertIdentical($expected, $doc->data());
+	}
 	}
 }
 
