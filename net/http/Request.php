@@ -90,41 +90,49 @@ class Request extends \lithium\net\http\Message {
 	}
 
 	/**
-	 * Get the queryString.
+	 * Get the full query string queryString.
 	 *
 	 * @param array $params
 	 * @param string $format
-	 * @return array
+	 * @return string
 	 */
 	public function queryString($params = array(), $format = null) {
-		if (empty($params)) {
-			if (is_string($this->query)) {
-				return "?" . $this->query;
-			}
-		}
-		$params = $this->query + (array) $params;
-		$params = array_filter($params);
+		$result = array();
 
-		if (empty($params)) {
-			return null;
-		}
-		if (!$format) {
-			return "?" . http_build_query($params);
-		}
-		$query = null;
-
-		foreach ($params as $key => $value) {
-			if (is_array($value)) {
-				foreach ($value as $val) {
-					$values = array('key' => urlencode("{$key}[]"), 'value' => urlencode($val));
-					$query .= String::insert($format, $values);
-				}
+		foreach (array_filter(array($this->query, $params)) as $query) {
+			if (is_string($query)) {
+				$result[] = $query;
 				continue;
 			}
-			$values = array('key' => urlencode($key), 'value' => urlencode($value));
-			$query .= String::insert($format, $values);
+			$query = array_filter($query);
+
+			if (!$format) {
+				$result[] = http_build_query($query);
+			}
+			if ($format) {
+				$q = null;
+
+				foreach ($params as $key => $value) {
+					if (is_array($value)) {
+						foreach ($value as $val) {
+							$q .= String::insert($format, array(
+								'key' => urlencode("{$key}[]"),
+								'value' => urlencode($val)
+							));
+						}
+						continue;
+					}
+					$q .= String::insert($format, array(
+						'key' => urlencode($key),
+						'value' => urlencode($value)
+					));
+				}
+				$result[] = substr($q, 0, -1);
+			}
+
 		}
-		return "?" . substr($query, 0, -1);
+		$result = array_filter($result);
+		return (!empty($result)) ? "?" . join("&", $result) : null;
 	}
 
 	/**
@@ -214,7 +222,7 @@ class Request extends \lithium\net\http\Message {
 				);
 				return array('http' => array_diff_key($options, $defaults) + $base);
 			case 'string':
-				$path = str_replace('//', '/', $this->path) . $this->queryString();
+				$path = str_replace('//', '/', $this->path) . $this->queryString($options['query']);
 				$body = $this->body();
 				$this->headers('Content-Length', strlen($body));
 				$status = "{$this->method} {$path} {$this->protocol}";

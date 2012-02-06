@@ -281,12 +281,26 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testParseUrlToConfig() {
-	    $url = "http://localhost/path/one.php?param=1&param=2";
-	    $config = parse_url($url);
+		$url = "http://localhost/path/one.php?param=1&param=2";
+		$config = parse_url($url);
 		$request = new Request($config);
 
-	    $expected = $url;
-	    $result = $request->to('url');
+		$expected = $url;
+		$result = $request->to('url');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testQueryParamsConstructed() {
+		$url = "http://localhost/path/one.php?param=1&param=2";
+		$config = parse_url($url);
+		$request = new Request($config);
+
+		$expected = "?param=1&param=2";
+		$result = $request->queryString();
+		$this->assertEqual($expected, $result);
+
+		$expected = "?param=1&param=2&param3=3";
+		$result = $request->queryString(array('param3' => 3));
 		$this->assertEqual($expected, $result);
 	}
 }
