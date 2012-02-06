@@ -50,7 +50,7 @@ use lithium\template\TemplateException;
  *
  *  _Note_: This is easily adapted for XML templating.
  *
- * Another example, this time of something that could be used in an appliation
+ * Another example, this time of something that could be used in an application
  * error handler:
  *
  * {{{

@@ -9,6 +9,10 @@
 namespace lithium\tests\mocks\storage\session\strategy;
 
 class MockEncrypt extends \lithium\storage\session\strategy\Encrypt {
+	public function encrypt($decrypted = array()) {
+		return parent::_encrypt($decrypted);
+	}
+
 	public function decrypt($encrypted) {
 		return parent::_decrypt($encrypted);
 	}

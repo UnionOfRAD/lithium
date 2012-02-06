@@ -16,7 +16,7 @@ class CurlTest extends \lithium\test\Unit {
 	protected $_testConfig = array(
 		'persistent' => false,
 		'scheme' => 'http',
-		'host' => 'lithify.me',
+		'host' => 'google.com',
 		'port' => 80,
 		'timeout' => 2,
 		'classes' => array('request' => 'lithium\net\http\Request')
@@ -130,6 +130,13 @@ class CurlTest extends \lithium\test\Unit {
 		);
 		$this->assertTrue($result instanceof \lithium\net\http\Response);
 		$this->assertPattern("/^HTTP/", (string) $result);
+	}
+
+	public function testSettingOfOptions() {
+		$stream = new Curl($this->_testConfig);
+		$stream->set('DummyFlag', 'Dummy Value');
+		$stream->set('DummyFlag', 'Changed Dummy Value');
+		$this->assertEqual('Changed Dummy Value', $stream->options['DummyFlag']);
 	}
 }
 

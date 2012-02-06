@@ -22,45 +22,45 @@ use lithium\core\ClassNotFoundException;
  */
 class Test extends \lithium\console\command\Create {
 
-    /**
-     * Get the namespace for the test case.
-     *
-     * @param string $request
-     * @param array $options
-     * @return string
-     */
+	/**
+	 * Get the namespace for the test case.
+	 *
+	 * @param string $request
+	 * @param array $options
+	 * @return string
+	 */
 	protected function _namespace($request, $options = array()) {
 		$request->params['command'] = $request->action;
 		return parent::_namespace($request, array('prepend' => 'tests.cases.'));
 	}
 
-    /**
-     * Get the class used by the test case.
-     *
-     * @param string $request
-     * @return string
-     */
+	/**
+	 * Get the class used by the test case.
+	 *
+	 * @param string $request
+	 * @return string
+	 */
 	protected function _use($request) {
 		return parent::_namespace($request) . '\\' . $this->_name($request);
 	}
 
-    /**
-     * Get the class name for the test case.
-     *
-     * @param string $request
-     * @return string
-     */
+	/**
+	 * Get the class name for the test case.
+	 *
+	 * @param string $request
+	 * @return string
+	 */
 	protected function _class($request) {
 		$name = $this->_name($request);
 		return  Inflector::classify("{$name}Test");
 	}
 
-    /**
-     * Get the methods to test.
-     *
-     * @param string $request
-     * @return string
-     */
+	/**
+	 * Get the methods to test.
+	 *
+	 * @param string $request
+	 * @return string
+	 */
 	protected function _methods($request) {
 		$use = $this->_use($request);
 		$path = Libraries::path($use);
@@ -81,7 +81,7 @@ class Test extends \lithium\console\command\Create {
 	 * Get the class to be tested
 	 *
 	 * @param string $request
-     * @return string
+	 * @return string
 	 */
 	protected function _name($request) {
 		$type = $request->action;

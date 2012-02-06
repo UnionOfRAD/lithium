@@ -311,7 +311,7 @@ class Form extends \lithium\core\Object {
 
 	/**
 	 * Called by the `Auth` class to run an authentication check against a model class using the
-	 * credientials in a data container (a `Request` object), and returns an array of user
+	 * credentials in a data container (a `Request` object), and returns an array of user
 	 * information on success, or `false` on failure.
 	 *
 	 * @param object $credentials A data container which wraps the authentication credentials used

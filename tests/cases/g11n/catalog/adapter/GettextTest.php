@@ -105,6 +105,7 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
+		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -138,6 +139,7 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
+		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -162,6 +164,8 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
+		unset($result['pluralRule']);
+
 		$this->assertEqual($expected, $result);
 	}
 
@@ -203,6 +207,7 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
+		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -258,6 +263,7 @@ msgstr "translated 1"
 EOD;
 		file_put_contents($file, $po);
 		$result = $this->adapter->read('message', 'de', null);
+		unset($result['pluralRule']);
 		$this->assertEqual($catalog, $result);
 
 		unlink($file);
@@ -299,6 +305,7 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
+		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
 
 		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
@@ -325,6 +332,7 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
+		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
 
 		$data = <<<EOD
@@ -360,6 +368,7 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
+		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -373,6 +382,7 @@ EOD;
 		file_put_contents($file, $data);
 
 		$result = $this->adapter->read('message', 'de', null);
+		unset($result['pluralRule']);
 		$this->assertTrue(isset($result[$dummy]));
 
 		$data = <<<EOD
@@ -382,6 +392,7 @@ EOD;
 		file_put_contents($file, $data);
 
 		$result = $this->adapter->read('message', 'de', null);
+		unset($result['pluralRule']);
 		$this->assertEqual($result['singular 1']['translated'], $dummy);
 	}
 
@@ -418,6 +429,7 @@ EOD;
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
+		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -505,10 +517,12 @@ EOD;
 
 		$this->adapter->write('message', 'de', null, $data);
 		$result = $this->adapter->read('message', 'de', null);
+		unset($result['pluralRule']);
 		$this->assertEqual($data, $result);
 
 		$this->adapter->write('messageTemplate', 'root', null, $data);
 		$result = $this->adapter->read('messageTemplate', 'root', null);
+		unset($result['pluralRule']);
 		$this->assertEqual($data, $result);
 	}
 
@@ -589,6 +603,7 @@ EOD;
 
 		file_put_contents($file, $po);
 		$result = $this->adapter->read('validation', 'de', null);
+		unset($result['pluralRule']);
 		$this->assertEqual($catalog, $result);
 
 		unlink($file);
@@ -683,6 +698,8 @@ msgstr "this is the{$escaped}translation"
 EOD;
 			file_put_contents($file, $po);
 			$result = $this->adapter->read('message', 'de', null);
+			unset($result['pluralRule']);
+
 			$message  = "`{$unescaped}` (ASCII octal {$ord}) was not escaped to `{$escaped}`";
 			$message .= "\n{:message}";
 			$this->assertEqual($catalog, $result, $message);
@@ -769,6 +786,22 @@ EOD;
 		$this->adapter->write('message', 'de', null, $catalog);
 		$result = file_get_contents($file);
 		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
+	}
+
+	public function testPluralRule() {
+		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
+		$data = <<<EOD
+msgid "singular 1"
+msgid_plural "plural 1"
+msgstr[0] "translated 1-0"
+msgstr[1] "translated 1-1"
+EOD;
+		file_put_contents($file, $data);
+
+		$result = $this->adapter->read('message', 'de', null);
+		$this->assertTrue(is_callable($result['pluralRule']['translated']));
+		$this->assertEqual(true, $result['pluralRule']['translated'](3));
+		$this->assertEqual(0, $result['pluralRule']['translated'](1));
 	}
 }
 

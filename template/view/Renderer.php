@@ -459,7 +459,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 * rendered within a template, or an element or template could set a variable which would be
 	 * made available in the layout.
 	 *
-	 * @param array $data An arroy of key/value pairs representing local variables that should be
+	 * @param array $data An array of key/value pairs representing local variables that should be
 	 *              made available to all other templates rendered in this rendering context.
 	 * @return void
 	 */

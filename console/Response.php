@@ -35,7 +35,7 @@ class Response extends \lithium\core\Object {
 	 * Status code, most often used for setting an exit status.
 	 *
 	 * It should be expected that only status codes in the range of 0-255
-	 * can be properly evalutated.
+	 * can be properly evaluated.
 	 *
 	 * @var integer
 	 * @see lithium\console\Command

@@ -466,7 +466,7 @@ class Library extends \lithium\console\Command {
 
 		if (!file_exists("phar://{$file}/config/{$name}.json")) {
 			$this->error(array(
-				"The forumla for {$name} is missing.", "Run li3 library formulate {$name}"
+				"The formula for {$name} is missing.", "Run li3 library formulate {$name}"
 			));
 			return false;
 		}
@@ -477,7 +477,7 @@ class Library extends \lithium\console\Command {
 		);
 		if (!$isValid) {
 			$this->error(array(
-				"The forumla for {$name} is not valid.", "Run li3 library formulate {$name}"
+				"The formula for {$name} is not valid.", "Run li3 library formulate {$name}"
 			));
 			return false;
 		}

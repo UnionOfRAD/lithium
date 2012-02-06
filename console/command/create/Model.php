@@ -19,12 +19,12 @@ use lithium\util\Inflector;
  */
 class Model extends \lithium\console\command\Create {
 
-    /**
-     * Get the class name for the model.
-     *
-     * @param string $request
-     * @return string
-     */
+	/**
+	 * Get the class name for the model.
+	 *
+	 * @param string $request
+	 * @return string
+	 */
 	protected function _class($request) {
 		return Inflector::camelize(Inflector::pluralize($request->action));
 	}

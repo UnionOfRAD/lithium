@@ -120,6 +120,12 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			fclose($stream);
 
 			if ($data) {
+				$data['pluralRule'] = array(
+					'id' => 'pluralRule',
+					'translated' => function($count) {
+						return $count != 1;
+					}
+				);
 				return $data;
 			}
 		}

@@ -241,7 +241,7 @@ class Request extends \lithium\net\http\Request {
 		$val = array_key_exists($key, $this->_env) ? $this->_env[$key] : getenv($key);
 		$this->_env[$key] = $val;
 
-		if ($key == 'REMOTE_ADDR' && $val == $this->env('SERVER_ADDR')) {
+		if ($key == 'REMOTE_ADDR') {
 			$val = ($addr = $this->env('HTTP_PC_REMOTE_ADDR')) ? $addr : $val;
 		}
 
@@ -354,7 +354,7 @@ class Request extends \lithium\net\http\Request {
 	 * @see lithium\action\Request::env()
 	 * @see lithium\net\http\Media::type()
 	 * @see lithium\net\http\Router
-	 * @param string $key A prefixed key indiciating what part of the request data the requested
+	 * @param string $key A prefixed key indicating what part of the request data the requested
 	 *               value should come from, and the name of the value to retrieve, in lower case.
 	 * @return string Returns the value of a GET, POST, routing or environment variable, or an
 	 *         HTTP header or method name.

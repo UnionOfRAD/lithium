@@ -126,7 +126,7 @@ class Html extends \lithium\template\Helper {
 	 *
 	 * @param string $title The content to be wrapped by an `<a />` tag.
 	 * @param mixed $url Can be a string representing a URL relative to the base of your Lithium
-	 *              applcation, an external URL (starts with `'http://'` or `'https://'`), an anchor
+	 *              application, an external URL (starts with `'http://'` or `'https://'`), an anchor
 	 *              name starting with `'#'` (i.e. `'#top'`), or an array defining a set of request
 	 *              parameters that should be matched against a route in `Router`.
 	 * @param array $options Array of HTML s and other options.

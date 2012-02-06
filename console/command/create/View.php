@@ -20,12 +20,42 @@ use lithium\util\String;
  */
 class View extends \lithium\console\command\Create {
 
-    /**
-     * Override the save method to handle view specific params.
-     *
-     * @param array $params
-     * @return mixed
-     */
+	/**
+	 * Returns the name of the controller class, minus `'Controller'`.
+	 *
+	 * @param string $request
+	 * @return string
+	 */
+	protected function _name($request) {
+    		return Inflector::camelize(Inflector::pluralize($request->action));
+	}
+
+	/**
+	 * Get the plural data variable that is sent down from controller method.
+	 *
+	 * @param string $request
+	 * @return string
+	 */
+	protected function _plural($request) {
+		return Inflector::pluralize(Inflector::camelize($request->action, false));
+	}
+
+	/**
+	 * Get the singular data variable that is sent down from controller methods.
+	 *
+	 * @param string $request
+	 * @return string
+	 */
+	protected function _singular($request) {
+		return Inflector::singularize(Inflector::camelize($request->action, false));
+	}
+
+	/**
+	 * Override the save method to handle view specific params.
+	 *
+	 * @param array $params
+	 * @return mixed
+	 */
 	protected function _save(array $params = array()) {
 		$params['path'] = Inflector::underscore($this->request->action);
 		$params['file'] = $this->request->args(0);
@@ -51,7 +81,7 @@ class View extends \lithium\console\command\Create {
 					return "{$params['file']} skipped.";
 				}
 			}
-			if (file_put_contents($file, "<?php\n\n{$result}\n\n?>")) {
+			if (is_int(file_put_contents($file, $result))) {
 				return "{$params['file']}.php created in {$directory}.";
 			}
 		}

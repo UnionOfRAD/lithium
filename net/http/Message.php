@@ -82,7 +82,7 @@ class Message extends \lithium\net\Message {
 		if (strpos($this->host, '/') !== false) {
 			list($this->host, $this->path) = explode('/', $this->host, 2);
 		}
-		$this->path = str_replace('//', '/', "/{$this->path}/");
+		$this->path = str_replace('//', '/', "/{$this->path}");
 		$this->protocol = $this->protocol ?: "HTTP/{$this->version}";
 	}
 
