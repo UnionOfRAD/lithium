@@ -111,9 +111,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 
 		if (isset($this->_embedded[$name]) && !isset($this->_relationships[$name])) {
 			$item = isset($this->_data[$name]) ? $this->_data[$name] : array();
-			var_dump($this->_relationships[$name]);
-			die('#WINNING');
-			// $this->_relationships[$name] = $this->_relate($this->_embedded[$name], $item);
+			$this->_relationships[$name] = $this->_relate($this->_embedded[$name], $item);
 		}
 		$result = parent::__get($name);
 
@@ -128,7 +126,10 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			}
 			if (isset($field['array']) && $field['array'] && ($model = $this->_model)) {
 				$this->_updated[$name] = $model::connection()->item($model, array(), array(
-					'class' => 'array'
+					'class' => 'array',
+					'schema' => $this->schema(),
+					'pathKey' => $this->_pathKey ? $this->_pathKey . '.' . $name : $name,
+					'model' => $this->_model
 				));
 				return $this->_updated[$name];
 			}
@@ -137,14 +138,14 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		return $null;
 	}
 
-	public function export() {
+	public function export(array $options = array()) {
 		foreach ($this->_updated as $key => $val) {
 			if (is_a($val, __CLASS__)) {
 				$path = $this->_pathKey ? "{$this->_pathKey}." : '';
 				$this->_updated[$key]->_pathKey = "{$path}{$key}";
 			}
 		}
-		return parent::export() + array('key' => $this->_pathKey);
+		return parent::export($options) + array('key' => $this->_pathKey);
 	}
 
 	/**
@@ -152,7 +153,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *
 	 * @param mixed $id
 	 * @param array $data
-	 * @param array Options when calling this method:
+	 * @param array $options Options when calling this method:
 	 *              - `'recursive'` _boolean_: If `true` attempts to sync nested objects as well.
 	 *                Otherwise, only syncs the current object. Defaults to `true`.
 	 * @return void
@@ -298,9 +299,10 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			unset($this->_increment[$key]);
 		}
 
-		if ($data && $model = $this->_model) {
+		if ($data && ($schema = $this->schema())) {
 			$pathKey = $this->_pathKey;
-			$data = $model::connection()->cast($this, $data, compact('pathKey'));
+			$model = $this->_model;
+			$data = $schema->cast($this, $data, compact('pathKey', 'model'));
 		}
 
 		foreach ($data as $key => $value) {

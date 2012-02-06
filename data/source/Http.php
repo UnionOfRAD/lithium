@@ -36,6 +36,7 @@ class Http extends \lithium\data\Source {
 	 * @var array
 	 */
 	protected $_classes = array(
+		'schema'  => 'lithium\data\Schema',
 		'service' => 'lithium\net\http\Service',
 		'relationship' => 'lithium\data\model\Relationship'
 	);
@@ -166,11 +167,12 @@ class Http extends \lithium\data\Source {
 	 * Describe data source.
 	 *
 	 * @param string $entity
+	 * @param array $fields
 	 * @param array $meta
 	 * @return array - returns an empty array
 	 */
-	public function describe($entity, array $meta = array()) {
-		return array();
+	public function describe($entity, $fields = array(), array $meta = array()) {
+		return $this->_instance('schema', compact('fields', 'meta'));
 	}
 
 	/**

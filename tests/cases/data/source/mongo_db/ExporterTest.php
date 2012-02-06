@@ -14,6 +14,7 @@ use lithium\data\source\MongoDb;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentArray;
 use lithium\data\source\mongo_db\Exporter;
+use lithium\data\source\mongo_db\Schema;
 
 class ExporterTest extends \lithium\test\Unit {
 
@@ -81,7 +82,6 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertTrue($doc->_id instanceof MongoId);
 
 		$result = Exporter::get('create', $doc->export());
-		$data = $doc->export();
 		$this->assertTrue($result['create']['_id'] instanceof MongoId);
 		$this->assertTrue($result['create']['created'] instanceof MongoDate);
 		$this->assertIdentical(time(), $result['create']['created']->sec);
@@ -131,30 +131,39 @@ class ExporterTest extends \lithium\test\Unit {
 		$model = $this->_model;
 		$exists = true;
 		$model::config(array('key' => '_id'));
+		$schema = new Schema(array('fields' => array(
+			'forceArray' => array('type' => 'string', 'array' => true),
+			'array' => array('type' => 'string', 'array' => true),
+			'dictionary' => array('type' => 'string', 'array' => true),
+			'numbers' => array('type' => 'integer', 'array' => true),
+			'objects' => array('type' => 'object', 'array' => true),
+			'deeply' => array('type' => 'object', 'array' => true),
+			'foo' => array('type' => 'string')
+		)));
+		$config = compact('model', 'schema', 'exists');
 
-		$doc = new Document(compact('model', 'exists') + array('data' => array(
-			'numbers' => new DocumentArray(compact('model', 'exists') + array(
+		$doc = new Document($config + array('data' => array(
+			'numbers' => new DocumentArray($config + array(
 				'data' => array(7, 8, 9), 'pathKey' => 'numbers'
 			)),
-			'objects' => new DocumentArray(compact('model', 'exists') + array(
-				'data' => array(
-					new Document(
-						compact('model', 'exists') + array('data' => array('foo' => 'bar'))
-					),
-					new Document(
-						compact('model', 'exists') + array('data' => array('foo' => 'baz'))
-					)
-				), 'pathKey' => 'numbers'
-			)),
-			'deeply' => new Document(compact('model', 'exists') + array(
-				'pathKey' => 'deeply', 'data' => array('nested' => 'object')
-			)),
+			'objects' => new DocumentArray($config + array('pathKey' => 'objects', 'data' => array(
+				new Document($config + array('data' => array('foo' => 'bar'))),
+				new Document($config + array('data' => array('foo' => 'baz')))
+			))),
+			'deeply' => new Document($config + array('pathKey' => 'deeply', 'data' => array(
+				'nested' => 'object'
+			))),
 			'foo' => 'bar'
 		)));
-
+		$doc->dictionary[] = 'A Word';
+		$doc->forceArray = 'Word';
+		$doc->array = array('one');
 		$doc->field = 'value';
 		$doc->objects[1]->foo = 'dib';
+		$doc->objects[] = array('foo' => 'diz');
 		$doc->deeply->nested = 'foo';
+		$doc->deeply->nestedAgain = 'bar';
+		$doc->array = array('one');
 		$doc->newObject = new Document(array(
 			'exists' => false, 'data' => array('subField' => 'subValue')
 		));
@@ -162,16 +171,30 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertEqual('subValue', $doc->newObject->subField);
 
 		$doc->numbers = array(8, 9);
+		$doc->numbers[] = 10;
+		$doc->numbers->append(11);
 
 		$result = Exporter::get('update', $doc->export());
 		$expected = array(
-			'numbers' => array(8, 9),
+			'array' => array('one'),
+			'dictionary' => array('A Word'),
+			'forceArray' => array('Word'),
+			'numbers' => array(8, 9, 10, 11),
 			'newObject' => array('subField' => 'subValue'),
 			'field' => 'value',
 			'deeply.nested' => 'foo',
-			'objects.1.foo' => 'dib'
+			'deeply.nestedAgain' => 'bar',
+			'array' => array('one'),
+			'objects.1.foo' => 'dib',
+			'objects.2' => array('foo' => 'diz')
 		);
 		$this->assertEqual($expected, $result['update']);
+
+		$doc->objects[] = array('foo' => 'dob');
+		$exist = $doc->objects->find(function ($data) {
+			return (strcmp($data->foo, 'dob') === 0);
+		}, array('collect' => false));
+		$this->assertTrue(!empty($exist));
 	}
 
 	public function testFieldRemoval() {
@@ -242,8 +265,9 @@ class ExporterTest extends \lithium\test\Unit {
 		$model = $this->_model;
 		$data = array('notifications' => array('foo' => '', 'bar' => '1', 'baz' => 0, 'dib' => 42));
 
-		$model::schema($this->_schema);
-		$result = Exporter::cast($data, $this->_schema, $model::connection(), compact('model'));
+		$schema = new Schema(array('fields' => $this->_schema));
+		$result = $schema->cast(null, $data, compact('model'));
+
 		$this->assertIdentical(false, $result['notifications']->foo);
 		$this->assertIdentical(true, $result['notifications']->bar);
 		$this->assertIdentical(false, $result['notifications']->baz);
@@ -263,6 +287,7 @@ class ExporterTest extends \lithium\test\Unit {
 			'comments' => array(
 				"4c8f86167675abfabdbe0300", "4c8f86167675abfabdbf0300", "4c8f86167675abfabdc00300"
 			),
+			'empty_array' => array(),
 			'authors' => '4c8f86167675abfabdb00300',
 			'created' => time(),
 			'modified' => date('Y-m-d H:i:s'),
@@ -273,7 +298,8 @@ class ExporterTest extends \lithium\test\Unit {
 		$model = $this->_model;
 		$handlers = $this->_handlers;
 		$options = compact('model', 'handlers');
-		$result = Exporter::cast($data, $this->_schema, $model::connection(), $options);
+		$schema = new Schema(array('fields' => $this->_schema));
+		$result = $schema->cast(null, $data, $options);
 
 		$this->assertEqual(array_keys($data), array_keys($result));
 		$this->assertTrue($result['_id'] instanceof MongoId);
@@ -297,6 +323,8 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertTrue($result['modified'] instanceof MongoDate);
 		$this->assertTrue($result['created'] instanceof MongoDate);
 		$this->assertTrue($result['created']->sec > 0);
+
+		$this->assertTrue($result['empty_array'] instanceof DocumentArray);
 
 		$this->assertEqual($time, $result['modified']->sec);
 		$this->assertEqual($time, $result['created']->sec);
@@ -345,6 +373,7 @@ class ExporterTest extends \lithium\test\Unit {
 	public function testSubObjectCastingOnSave() {
 		$model = $this->_model;
 		$model::schema(array(
+			'_id' => array('type' => 'id'),
 			'sub.foo' => array('type' => 'boolean'),
 			'bar' => array('type' => 'boolean')
 		));

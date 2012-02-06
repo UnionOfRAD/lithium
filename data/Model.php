@@ -358,7 +358,7 @@ class Model extends \lithium\core\StaticObject {
 		$local = compact('class', 'name') + $options + $self->_meta;
 		$self->_meta = ($local + $source['meta'] + $meta);
 		$self->_meta['initialized'] = false;
-		$self->_schema += $schema + $source['schema'];
+		$self->schema()->append($schema + $source['schema']);
 
 		$self->_finders += $source['finders'] + $self->_findFilters();
 		static::_relations();
@@ -386,7 +386,7 @@ class Model extends \lithium\core\StaticObject {
 
 		if ($method == 'all' || $isFinder) {
 			if ($params && is_scalar($params[0])) {
-				$params[0] = array('conditions' => array($self->_meta['key'] => $params[0]));
+				$params[0] = array('conditions' => static::key($params[0]));
 			}
 			return $self::find($method, $params ? $params[0] : array());
 		}
@@ -441,7 +441,7 @@ class Model extends \lithium\core\StaticObject {
 		}
 
 		if ($type != 'all' && is_scalar($type) && !isset($self->_finders[$type])) {
-			$options['conditions'] = array($self->_meta['key'] => $type);
+			$options['conditions'] = static::key($type);
 			$type = 'first';
 		}
 
@@ -526,7 +526,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return mixed Key value.
 	 */
 	public static function key($values = array()) {
-		$key = static::_object()->_meta['key'];
+		$key = static::meta('key');
 
 		if (is_object($values) && method_exists($values, 'to')) {
 			$values = $values->to('array');
@@ -601,21 +601,26 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function schema($field = null) {
 		$self = static::_object();
+		$source = $self::meta('source');
 
-		if ($field === false) {
-			return $self->_schema = array();
-		}
-		if (!$self->_schema) {
-			$self->_schema = static::connection()->describe($self::meta('source'), $self->_meta);
+		if (!is_object($self->_schema)) {
+			$self->_schema = static::connection()->describe($source, $self->_schema, $self->_meta);
+
+			if (!is_object($self->_schema)) {
+				$class = get_called_class();
+				throw new ConfigException("Could not load schema object for model `{$class}`.");
+			}
 			$key = (array) self::meta('key');
-			if ($self->_schema && array_intersect($key, array_keys($self->_schema)) != $key) {
-				throw new ConfigException('Missing key `' . implode(',', $key) . '` from schema.');
+
+			if ($self->_schema && $self->_schema->fields() && !$self->_schema->has($key)) {
+				$key = implode('`, `', $key);
+				throw new ConfigException("Missing key `{$key}` from schema.");
 			}
 		}
-		if (is_string($field) && $field) {
-			return isset($self->_schema[$field]) ? $self->_schema[$field] : null;
+		if ($field === false) {
+			return $self->_schema->reset();
 		}
-		return $self->_schema;
+		return $field ? $self->_schema->fields($field) : $self->_schema;
 	}
 
 	/**
@@ -674,41 +679,35 @@ class Model extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	public static function create(array $data = array(), array $options = array()) {
-		$params = compact('data', 'options');
-
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
-			$data = $params['data'];
-			$options = $params['options'];
-			$defaults = array();
-
-			foreach ((array) $self::schema() as $field => $config) {
-				if (isset($config['default'])) {
-					$defaults[$field] = $config['default'];
-				}
-			}
-			$data = Set::merge(Set::expand($defaults), $data);
-			return $self::connection()->item($self, $data, $options);
+		return static::_filter(__FUNCTION__, compact('data', 'options'), function($self, $params) {
+			$data = Set::merge(Set::expand($self::schema()->defaults()), $params['data']);
+			return $self::connection()->item($self, $data, $params['options']);
 		});
 	}
 
 	/**
-	 * Getter and setter for custom instance methods. This is used in `Entity::__call`.
+	 * Getter and setter for custom instance methods. This is used in `Entity::__call()`.
 	 *
 	 * {{{
 	 * Model::instanceMethods(array(
-	 *     'method_name' => array('Class', 'method'),
-	 *     'another_method' => array($object, 'method'),
-	 *     'closure_callback' => function($entity) {}
+	 *     'methodName' => array('Class', 'method'),
+	 *     'anotherMethod' => array($object, 'method'),
+	 *     'closureCallback' => function($entity) {}
 	 * ));
 	 * }}}
 	 *
+	 * @see lithium\data\Entity::__call()
 	 * @param array $methods
 	 * @return array
 	 */
 	public static function instanceMethods(array $methods = null) {
 		$class = get_called_class();
+
 		if (!isset(static::$_instanceMethods[$class])) {
 			static::$_instanceMethods[$class] = array();
+		}
+		if ($methods === array()) {
+			return static::$_instanceMethods[$class] = array();
 		}
 		if (!is_null($methods)) {
 			static::$_instanceMethods[$class] = $methods + static::$_instanceMethods[$class];
@@ -808,7 +807,7 @@ class Model extends \lithium\core\StaticObject {
 				}
 			}
 			if (($whitelist = $options['whitelist']) || $options['locked']) {
-				$whitelist = $whitelist ?: array_keys($_schema);
+				$whitelist = $whitelist ?: array_keys($_schema->fields());
 			}
 
 			$type = $entity->exists() ? 'update' : 'create';
@@ -1050,11 +1049,14 @@ class Model extends \lithium\core\StaticObject {
 	 * @todo See if this can be rewritten to be lazy.
 	 */
 	protected static function _relations() {
-		$self = static::_object();
-
-		if (!$self->_meta['connection']) {
+		try {
+			if (!static::connection()) {
+				return;
+			}
+		} catch (ConfigExcepton $e) {
 			return;
 		}
+		$self = static::_object();
 
 		foreach ($self->_relationTypes as $type => $keys) {
 			foreach (Set::normalize($self->{$type}) as $name => $config) {
@@ -1119,15 +1121,6 @@ class Model extends \lithium\core\StaticObject {
 				return $self::connection()->calculation('count', $query, $options);
 			}
 		);
-	}
-
-	/**
-	 * @deprecated
-	 * @see lithium\data\Model::connection()
-	 * @return connection object
-	 */
-	protected static function &_connection() {
-		return static::connection();
 	}
 }
 

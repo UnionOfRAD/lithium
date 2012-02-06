@@ -25,22 +25,14 @@ class DatabaseTest extends \lithium\test\Unit {
 	protected $_model = 'lithium\tests\mocks\data\model\MockDatabasePost';
 
 	public function setUp() {
-		$this->db = new MockDatabase();
-		$this->_configs = Connections::config();
-
-		Connections::reset();
-		Connections::config(array('mock-database-connection' => array(
-			'object' => &$this->db,
-			'adapter' => 'MockDatabase'
-		)));
-
 		MockDatabasePost::config();
 		MockDatabaseComment::config();
-	}
+		MockDatabaseTagging::config();
 
-	public function tearDown() {
-		Connections::reset();
-		Connections::config($this->_configs);
+		$this->db = new MockDatabase();
+		MockDatabasePost::$connection = $this->db;
+		MockDatabaseComment::$connection = $this->db;
+		MockDatabaseTagging::$connection = $this->db;
 	}
 
 	public function testDefaultConfig() {
@@ -117,13 +109,11 @@ class DatabaseTest extends \lithium\test\Unit {
 	public function testSchema() {
 		$model = $this->_model;
 		$modelName = $model::meta('name');
-		$expected = array($modelName => array(
-			'id', 'author_id', 'title', 'created'
-		));
-		$result = $this->db->schema(new Query(array('model' => $this->_model)));
+		$expected = array($modelName => array('id', 'author_id', 'title', 'created'));
+		$result = $this->db->schema(new Query(compact('model')));
 		$this->assertEqual($expected, $result);
 
-		$query = new Query(array('model' =>  $this->_model, 'fields' => '*'));
+		$query = new Query(compact('model') + array('fields' => '*'));
 		$result = $this->db->schema($query);
 		$this->assertEqual($expected, $result);
 
@@ -156,12 +146,9 @@ class DatabaseTest extends \lithium\test\Unit {
 		);
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
-			$modelName => array(
-				'id', 'title'
-			),
-			'MockDatabaseComment' => array(
-				'body'
-			));
+			$modelName => array('id', 'title'),
+			'MockDatabaseComment' => array('body')
+		);
 		$this->assertEqual($expected, $result);
 
 		$options['fields'] = array(
@@ -170,25 +157,17 @@ class DatabaseTest extends \lithium\test\Unit {
 		);
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
-			$modelName => array(
-				'id', 'title'
-			),
-			'MockDatabaseComment' => array(
-				'body', 'created'
-			));
+			$modelName => array('id', 'title'),
+			'MockDatabaseComment' => array('body', 'created')
+		);
 		$this->assertEqual($expected, $result);
 
-		$options['fields'] = array(
-			'MockDatabasePost', 'MockDatabaseComment'
-		);
+		$options['fields'] = array('MockDatabasePost', 'MockDatabaseComment');
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
-			$modelName => array(
-				'id', 'author_id', 'title', 'created'
-			),
-			'MockDatabaseComment' => array(
-				'id', 'post_id', 'author_id', 'body', 'created'
-			));
+			$modelName => array('id', 'author_id', 'title', 'created'),
+			'MockDatabaseComment' => array('id', 'post_id', 'author_id', 'body', 'created')
+		);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -199,16 +178,15 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testSimpleQueryRender() {
+		$fieldList = 'MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created';
+		$table = '{mock_database_posts} AS {MockDatabasePost}';
+
 		$result = $this->db->renderCommand(new Query(array(
 			'type' => 'read',
 			'model' => $this->_model,
 			'fields' => array('id', 'title', 'created')
 		)));
-		$fields = 'id, title, created';
-		$table = '{mock_database_posts} AS {MockDatabasePost}';
-		$expected = "SELECT MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created"
-						. " FROM {$table};";
-		$this->assertEqual($expected, $result);
+		$this->assertEqual("SELECT {$fieldList} FROM {$table};", $result);
 
 		$result = $this->db->renderCommand(new Query(array(
 			'type' => 'read',
@@ -216,10 +194,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'fields' => array('id', 'title', 'created'),
 			'limit' => 1
 		)));
-		$expected = 'SELECT MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created'
-						. ' FROM {mock_database_posts} AS {MockDatabasePost} ';
-		$expected .= 'LIMIT 1;';
-		$this->assertEqual($expected, $result);
+		$this->assertEqual("SELECT {$fieldList} FROM {$table} LIMIT 1;", $result);
 
 		$result = $this->db->renderCommand(new Query(array(
 			'type' => 'read',
@@ -228,10 +203,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'limit' => 1,
 			'conditions' => 'Post.id = 2'
 		)));
-		$expected = 'SELECT MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created'
-						. ' FROM {mock_database_posts} AS {MockDatabasePost} ';
-		$expected .= 'WHERE Post.id = 2 LIMIT 1;';
-		$this->assertEqual($expected, $result);
+		$this->assertEqual("SELECT {$fieldList} FROM {$table} WHERE Post.id = 2 LIMIT 1;", $result);
 	}
 
 	public function testNestedQueryConditions() {
@@ -365,8 +337,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$expected = "SELECT * from mock_database_posts AS MockDatabasePost;";
-		$result = $this->db->sql;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $this->db->sql);
 	}
 
 	public function testCalculation() {
@@ -720,8 +691,55 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$expected = "SELECT * FROM {comments} AS {Comments} INNER JOIN {posts} AS {Post} ON ";
 		$expected .= "{Comment}.{post_id} <= {Post}.{id} WHERE Comment.id = 1;";
-		$result = Connections::get('mock-database-connection')->renderCommand($query);
+		$result = $this->db->renderCommand($query);
 		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * Tests that complex model constraints with custom operators render correct constraint strings.
+	 */
+	public function testRenderArrayJoinConstraintComplexArray() {
+		$model = 'lithium\tests\mocks\data\model\MockQueryComment';
+
+		$query = new Query(compact('model') + array(
+			'type' => 'read',
+			'source' => 'comments',
+			'alias' => 'Comments',
+			'conditions' => array('Comment.id' => 1),
+			'joins' => array(array(
+				'type' => 'LEFT',
+				'source' => 'posts',
+				'alias' => 'Post',
+				'constraint' => array(
+					"Comment.post_id" => array(
+						'<=' => "Post.id",
+						'>=' => "Post.id"
+					)
+				)
+			))
+		));
+
+		$expected = "SELECT * FROM {comments} AS {Comments} LEFT JOIN {posts} AS {Post} ON ";
+		$expected .= "{Comment}.{post_id} <= {Post}.{id} AND {Comment}.{post_id} >= {Post}.{id} ";
+		$expected .= "WHERE Comment.id = 1;";
+		$result = $this->db->renderCommand($query);
+		$this->assertEqual($expected, $result);
+
+		$query = new Query(compact('model') + array(
+			'type' => 'read',
+			'source' => 'comments',
+			'alias' => 'Comments',
+			'joins' => array(array(
+				'type' => 'LEFT',
+				'source' => 'posts',
+				'alias' => 'Post',
+				'constraint' => array(
+					"Comment.post_id" => array('=>' => "Post.id")
+				)
+			))
+		));
+		$this->expectException("Unsupported operator `=>` used in constraint.");
+		$this->db->renderCommand($query);
 	}
 
 	public function testRenderArrayJoin() {
@@ -742,7 +760,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$expected = "SELECT * FROM {comments} AS {Comment} INNER JOIN {posts} AS {Post} ON ";
 		$expected .= "{Comment}.{post_id} = {Post}.{id} WHERE Comment.id = 1;";
-		$result = Connections::get('mock-database-connection')->renderCommand($query);
+		$result = $this->db->renderCommand($query);
 		$this->assertEqual($expected, $result);
 	}
 }

@@ -10,13 +10,21 @@ namespace lithium\tests\mocks\data\source\mongo_db;
 
 class MockResult extends \lithium\data\source\mongo_db\Result {
 
-	protected $_autoConfig = array('data');
+	public $query = array();
+
+	protected $_autoConfig = array('data', 'name');
+
+	protected $_name = '';
 
 	protected $_data = array(
 		array('_id' => '4c8f86167675abfabdbf0300', 'title' => 'bar'),
 		array('_id' => '5c8f86167675abfabdbf0301', 'title' => 'foo'),
 		array('_id' => '6c8f86167675abfabdbf0302', 'title' => 'dib')
 	);
+
+	public function getName() {
+		return $this->_name;
+	}
 
 	public function hasNext() {
 		if (!is_array($this->_data)) {
@@ -46,6 +54,30 @@ class MockResult extends \lithium\data\source\mongo_db\Result {
 		$result = current($this->_data) ?: null;
 		next($this->_data);
 		return $result;
+	}
+
+	public function fields(array $fields = array()) {
+		$this->query[__FUNCTION__] = $fields;
+		return $this;
+	}
+
+	public function limit($num) {
+		$this->query[__FUNCTION__] = $num;
+		return $this;
+	}
+
+	public function skip($num) {
+		$this->query[__FUNCTION__] = $num;
+		return $this;
+	}
+
+	public function sort(array $fields = array()) {
+		$this->query[__FUNCTION__] = $fields;
+		return $this;
+	}
+
+	public function count() {
+		return reset($this->_data);
 	}
 }
 

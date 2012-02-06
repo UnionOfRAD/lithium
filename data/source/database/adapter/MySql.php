@@ -30,9 +30,10 @@ class MySql extends \lithium\data\source\Database {
 
 	protected $_classes = array(
 		'entity' => 'lithium\data\entity\Record',
-		'set' => 'lithium\data\collection\RecordSet',
+		'set'    => 'lithium\data\collection\RecordSet',
 		'relationship' => 'lithium\data\model\Relationship',
-		'result' => 'lithium\data\source\database\adapter\my_sql\Result'
+		'result' => 'lithium\data\source\database\adapter\my_sql\Result',
+		'schema' => 'lithium\data\Schema'
 	);
 
 	/**
@@ -142,7 +143,6 @@ class MySql extends \lithium\data\source\Database {
 		} catch (PDOException $e) {
 			return false;
 		}
-
 		$this->_isConnected = true;
 
 		if ($config['encoding']) {
@@ -150,7 +150,6 @@ class MySql extends \lithium\data\source\Database {
 		}
 
 		$info = $this->connection->getAttribute(PDO::ATTR_SERVER_VERSION);
-
 		$this->_useAlias = (boolean) version_compare($info, "4.1", ">=");
 		return $this->_isConnected;
 	}
@@ -164,7 +163,6 @@ class MySql extends \lithium\data\source\Database {
 		if ($this->_isConnected) {
 			unset($this->connection);
 			$this->_isConnected = false;
-			return true;
 		}
 		return true;
 	}
@@ -208,7 +206,7 @@ class MySql extends \lithium\data\source\Database {
 	 *         - `'type'`: The field type name
 	 * @filter This method can be filtered.
 	 */
-	public function describe($entity, array $meta = array()) {
+	public function describe($table,  $schema = array(), array $meta = array()) {
 		$params = compact('entity', 'meta');
 		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			extract($params);
@@ -227,7 +225,7 @@ class MySql extends \lithium\data\source\Database {
 					'default'  => $column['default']
 				);
 			}
-			return $fields;
+			return $this->_instance('schema', compact('fields'));
 		});
 	}
 
@@ -247,8 +245,9 @@ class MySql extends \lithium\data\source\Database {
 			return ($key = array_search($encoding, $encodingMap)) ? $key : $encoding;
 		}
 		$encoding = isset($encodingMap[$encoding]) ? $encodingMap[$encoding] : $encoding;
+
 		try {
-			$this->connection->exec("SET NAMES '$encoding'");
+			$this->connection->exec("SET NAMES '{$encoding}'");
 			return true;
 		} catch (PDOException $e) {
 			return false;
@@ -303,7 +302,6 @@ class MySql extends \lithium\data\source\Database {
 		if ($error = $this->connection->errorInfo()) {
 			return array($error[1], $error[2]);
 		}
-		return null;
 	}
 
 	public function alias($alias, $context) {
@@ -349,7 +347,6 @@ class MySql extends \lithium\data\source\Database {
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($conn) {
 			$sql = $params['sql'];
 			$options = $params['options'];
-
 			$conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, $options['buffered']);
 
 			if (!($resource = $conn->query($sql)) instanceof PDOStatement) {

@@ -177,14 +177,14 @@ class Query extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function model($model = null) {
-		if ($model) {
-			$this->_config['model'] = $model;
-			$this->_config['source'] = $this->_config['source'] ?: $model::meta('source');
-			$this->_config['alias'] = $this->_config['alias'] ?: $model::meta('name');
-			$this->_config['name'] = $this->_config['name'] ?: $this->_config['alias'];
-			return $this;
+		if (!$model) {
+			return $this->_config['model'];
 		}
-		return $this->_config['model'];
+		$this->_config['model'] = $model;
+		$this->_config['source'] = $this->_config['source'] ?: $model::meta('source');
+		$this->_config['alias'] = $this->_config['alias'] ?: $model::meta('name');
+		$this->_config['name'] = $this->_config['name'] ?: $this->_config['alias'];
+		return $this;
 	}
 
 	/**
@@ -196,13 +196,13 @@ class Query extends \lithium\core\Object {
 	 * @return array Returns an array of all conditions applied to this query.
 	 */
 	public function conditions($conditions = null) {
-		if ($conditions) {
-			$conditions = (array) $conditions;
-			$this->_config['conditions'] = (array) $this->_config['conditions'];
-			$this->_config['conditions'] = array_merge($this->_config['conditions'], $conditions);
-			return $this;
+		if (!$conditions) {
+			return $this->_config['conditions'] ?: $this->_entityConditions();
 		}
-		return $this->_config['conditions'] ?: $this->_entityConditions();
+		$conditions = (array) $conditions;
+		$this->_config['conditions'] = (array) $this->_config['conditions'];
+		$this->_config['conditions'] = array_merge($this->_config['conditions'], $conditions);
+		return $this;
 	}
 
 	/**
@@ -397,8 +397,8 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Convert the query's properties to the data sources' syntax and return it as an array.
 	 *
-	 * @param \lithium\data\Source $dataSource Instance of the data source to use
-	 *                      for conversion.
+	 * @param object $dataSource Instance of the data source (`lithium\data\Source`) to use for
+	 *               conversion.
 	 * @param array $options Options to use when exporting the data.
 	 * @return array Returns an array containing a data source-specific representation of a query.
 	 */
@@ -465,14 +465,7 @@ class Query extends \lithium\core\Object {
 	}
 
 	public function schema($field = null) {
-		if (is_array($field)) {
-			$this->_config['schema'] = $field;
-			return $this;
-		}
-
-		if (isset($this->_config['schema'])) {
-			$schema = $this->_config['schema'];
-
+		if ((isset($this->_config['schema'])) && ($schema = $this->_config['schema'])) {
 			if ($field) {
 				return isset($schema[$field]) ? $schema[$field] : null;
 			}

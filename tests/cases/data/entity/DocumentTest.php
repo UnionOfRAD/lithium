@@ -31,7 +31,7 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 
 	public function setUp() {
-		if (empty($this->_backup)) {
+		if (!$this->_backup) {
 			foreach (Connections::get() as $conn) {
 				$this->_backup[$conn] = Connections::get($conn, array('config' => true));
 			}
@@ -723,6 +723,7 @@ class DocumentTest extends \lithium\test\Unit {
 	 * Ensures that the data returned from the `data()` method matches the
 	 * internal state of the object.
 	 */
+
 	public function testEnsureArrayExportFidelity() {
 		$data = array(
 			'department_3' => 0,

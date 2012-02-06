@@ -13,14 +13,6 @@ use lithium\util\Collection;
 class DocumentArray extends \lithium\data\Collection {
 
 	/**
-	 * Indicates whether this array was part of a document loaded from a data source, or is part of
-	 * a new document, or is in newly-added field of an existing document.
-	 *
-	 * @var boolean
-	 */
-	protected $_exists = false;
-
-	/**
 	 * Contains the original database value of the array. This value will be compared with the
 	 * current value (`$_data`) to calculate the changes that should be sent to the database.
 	 *
@@ -28,17 +20,18 @@ class DocumentArray extends \lithium\data\Collection {
 	 */
 	protected $_original = array();
 
-	/**
-	 * Holds an array of values that should be processed on initialization.
-	 *
-	 * @var array
-	 */
-	protected $_autoConfig = array(
-		'data', 'model', 'result', 'query', 'parent', 'stats', 'pathKey', 'exists'
-	);
-
 	protected function _init() {
 		parent::_init();
+		$pathKey = $this->_pathKey;
+		$model = $this->_model;
+		if (!$this->_schema && $model) {
+			$this->_schema = $model::schema();
+		}
+		if (is_object($this->_schema)) {
+			foreach ($this->_data as &$data) {
+				$data = $this->_schema->cast($this, $data, compact('pathKey', 'model'));
+			}
+		}
 		$this->_original = $this->_data;
 	}
 
@@ -46,8 +39,13 @@ class DocumentArray extends \lithium\data\Collection {
 		return $this->_exists;
 	}
 
-	public function sync($id = null, array $data = array()) {
-		$this->_exists = true;
+	public function sync($id = null, array $data = array(), array $options = array()) {
+		$defaults = array('materialize' => true);
+		$options += $defaults;
+
+		if ($options['materialize']) {
+			$this->_exists = true;
+		}
 		$this->_original = $this->_data;
 	}
 
@@ -110,14 +108,12 @@ class DocumentArray extends \lithium\data\Collection {
 	}
 
 	public function offsetSet($offset, $data) {
-		if ($model = $this->_model) {
-			$options = array('first' => true, 'schema' => $model::schema());
-			$data = $model::connection()->cast($this, array($this->_pathKey => $data), $options);
+		if ($schema = $this->schema()) {
+			$options = array('pathKey' => $this->_pathKey);
+			$data = $schema->cast($this, array($offset => $data), $options);
+			$data = reset($data);
 		}
-		if ($offset) {
-			return $this->_data[$offset] = $data;
-		}
-		return $this->_data[] = $data;
+		return $offset ? ($this->_data[$offset] = $data) : ($this->_data[] = $data);
 	}
 
 	/**

@@ -226,12 +226,12 @@ class RecordSet extends \lithium\data\Collection {
 		switch ($format) {
 			case 'array':
 				$result = array_map(function($r) { return $r->to('array'); }, $this->_data);
-				
+
 				if (!(is_scalar(current($this->_index)) && $options['indexed'])) {
 					break;
 				}
 				$indexAndResult = ($this->_index && $result);
-				$result =  $indexAndResult ? array_combine($this->_index, $result) : array();
+				$result = $indexAndResult ? array_combine($this->_index, $result) : array();
 			break;
 			default:
 				$result = parent::to($format, $options);
@@ -358,9 +358,18 @@ class RecordSet extends \lithium\data\Collection {
 					$dataMap[$name] = $record;
 					continue;
 				}
-				$dataMap[$name][] = $record;
+
+				if (array_filter($record)) {
+					$dataMap[$name][] = $record;
+				}
 			}
 		} while ($data = $this->_result->next());
+
+		foreach (array_filter(array_keys($this->_columns)) as $name) {
+			if (!array_key_exists($name, $dataMap)) {
+				$dataMap[$name] = array();
+			}
+		}
 
 		foreach ($dataMap as $name => $rel) {
 			$field = $relMap[$name]['fieldName'];

@@ -11,7 +11,6 @@ namespace lithium\data;
 use BadMethodCallException;
 use UnexpectedValueException;
 use lithium\data\Collection;
-use lithium\util\Set;
 
 /**
  * `Entity` is a smart data object which represents data such as a row or document in a
@@ -244,20 +243,20 @@ class Entity extends \lithium\core\Object {
 	}
 
 	public function schema($field = null) {
-		$schema = array();
+		$schema = null;
 
 		switch (true) {
-			case ($this->_schema):
+			case (is_object($this->_schema)):
 				$schema = $this->_schema;
 			break;
 			case ($model = $this->_model):
 				$schema = $model::schema();
 			break;
 		}
-		if ($field) {
-			return isset($schema[$field]) ? $schema[$field] : null;
+		if ($schema) {
+			return $field ? $schema->fields($field) : $schema;
 		}
-		return $schema;
+		return array();
 	}
 
 	/**
@@ -372,13 +371,27 @@ class Entity extends \lithium\core\Object {
 		return array_fill_keys(array_keys($this->_updated), true);
 	}
 
-	public function export() {
+	public function export(array $options = array()) {
 		return array(
 			'exists'    => $this->_exists,
 			'data'      => $this->_data,
 			'update'    => $this->_updated,
 			'increment' => $this->_increment
 		);
+	}
+
+	/**
+	 * Configures protected properties of an `Entity` so that it is parented to `$parent`.
+	 *
+	 * @param object $parent
+	 * @param array $config
+	 * @return void
+	 */
+	public function assignTo($parent, array $config = array()) {
+		foreach ($config as $key => $val) {
+			$this->{'_' . $key} = $val;
+		}
+		$this->_parent =& $parent;
 	}
 
 	/**
