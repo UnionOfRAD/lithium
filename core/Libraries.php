@@ -972,7 +972,9 @@ class Libraries {
 	 * @return array type, namespace, class, name
 	 */
 	protected static function _params($type, $name = "*") {
-		$name = $name ?: "*";
+		if (!$name) {
+			$name = '*';
+		}
 		$library = $namespace = $class = '*';
 
 		if (strpos($type, '.') !== false) {
