@@ -566,10 +566,10 @@ class MongoDbTest extends \lithium\test\Unit {
 		$data = array('initial' => 'one', 'values' => 'two');
 
 		$this->db->connection = new MockMongoConnection();
-		$this->db->connection->results = array(true);
+		$this->db->connection->results = array(true, true);
 
 		$document = $model::create($data);
-		$document->save();
+		$this->assertTrue($document->save());
 
 		$duplicate = $model::create(array('_id' => $document->_id), array('exists' => true));
 		$duplicate->values = 'new';
