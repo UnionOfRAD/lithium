@@ -60,7 +60,6 @@ class ExporterTest extends \lithium\test\Unit {
 			'binary'  => function($v) { return new MongoBinData($v); }
 		);
 		$model = $this->_model;
-		$model::resetConnection(true);
 	}
 
 	public function testInvalid() {
@@ -174,6 +173,8 @@ class ExporterTest extends \lithium\test\Unit {
 		$doc->numbers[] = 10;
 		$doc->numbers->append(11);
 
+		$export = $doc->export();
+
 		$result = Exporter::get('update', $doc->export());
 		$expected = array(
 			'array' => array('one'),
@@ -191,9 +192,10 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['update']);
 
 		$doc->objects[] = array('foo' => 'dob');
-		$exist = $doc->objects->find(function ($data) {
-			return (strcmp($data->foo, 'dob') === 0);
-		}, array('collect' => false));
+		$exist = $doc->objects->find(
+			function ($data) { return (strcmp($data->foo, 'dob') === 0); },
+			array('collect' => false)
+		);
 		$this->assertTrue(!empty($exist));
 	}
 
@@ -430,6 +432,28 @@ class ExporterTest extends \lithium\test\Unit {
 		$expected = 'baz';
 		$result = $new->data();
 		$this->assertEqual($expected, $result['foo'][1]);
+	}
+
+	/**
+	 * Tests that arrays of nested objects can be appended to and will be updated using the proper
+	 * MongoDB operators.
+	 */
+	public function testAppendingNestedObjectArray() {
+		$schema = new Schema(array('fields' => array(
+			'accounts' => array('type' => 'object', 'array' => true),
+			'accounts.name' => array('type' => 'string')
+		)));
+
+		$model = $this->_model;
+		$doc = new Document(compact('schema', 'model'));
+		$this->assertEqual(array(), $doc->accounts->data());
+		$doc->sync();
+
+		$data = array('name' => 'New account');
+		$doc->accounts[] = new Document(compact('data'));
+
+		$result = Exporter::get('update', $doc->export());
+		$this->assertEqual(array('$set' => array('accounts.0' => $data)), $result);
 	}
 
 	/**
