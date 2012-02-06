@@ -120,7 +120,7 @@ class Http extends \lithium\data\Source {
 			$filter = function($self, $params) use (&$conn, $string) {
 				$options = $params[1];
 
-				if($params[0] instanceof \lithium\data\model\Query) {
+				if(is_object($params[0])) {
 					$query = $params[0];
 					$options += array_filter($query->export($self), function($v) {
 						return $v !== null;
