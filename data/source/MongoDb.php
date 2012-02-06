@@ -708,7 +708,6 @@ class MongoDb extends \lithium\data\Source {
 			return $schema->cast($model, $value, $castOpts);
 		};
 
-		$valueArray = is_array($value);
         switch (true) {
 			case !isset($this->_operators[$op]):
 				$operator = $op;
@@ -716,7 +715,7 @@ class MongoDb extends \lithium\data\Source {
 			case is_callable($this->_operators[$op]):
 				return $this->_operators[$op]($key, $value);
 			case is_array($this->_operators[$op]):
-				$format = ($valueArray) ? 'multiple' : 'single';
+				$format = (is_array($value)) ? 'multiple' : 'single';
 				$operator = $this->_operators[$op][$format];
 			break;
 			default:
