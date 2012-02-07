@@ -24,12 +24,10 @@ class DocumentArray extends \lithium\data\Collection {
 		parent::_init();
 		$pathKey = $this->_pathKey;
 		$model = $this->_model;
-		if (!$this->_schema && $model) {
-			$this->_schema = $model::schema();
-		}
-		if (is_object($this->_schema)) {
+
+		if (is_object($schema = $this->schema())) {
 			foreach ($this->_data as &$data) {
-				$data = $this->_schema->cast($this, $data, compact('pathKey', 'model'));
+				$data = $schema->cast($this, $data, compact('pathKey', 'model'));
 			}
 		}
 		$this->_original = $this->_data;
