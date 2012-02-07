@@ -1,5 +1,10 @@
 language: php
+
 php:
   - 5.3
   - 5.4
+
 script: console/li3 test tests/cases
+
+notifications:
+    irc: "irc.freenode.org#li3-core"
