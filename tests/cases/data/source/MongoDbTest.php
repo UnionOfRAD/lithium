@@ -595,6 +595,31 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$this->assertEqual($data + compact('_id'), $queries['insert']['data']);
 		$this->assertEqual(compact('_id'), $queries['find']['conditions']);
+		
+		//set schema in model and test if entity calls corresponding schema and casts correctly
+		$model::setSchema(array(
+			'_id' => array('type' => 'id'),
+			'foo' => array('type' => 'date', 'default' => ''),
+			'bar' => array('type' => 'date'),
+		));
+		$this->db->connection->results = array(true);
+
+		$document = $model::create();
+		$this->assertTrue($document->foo instanceof MongoDate);
+		$document->bar = '';
+		$this->assertTrue($document->bar instanceof MongoDate);
+		$this->assertTrue($document->save());
+		$data = array('foo' => new MongoDate(), 'bar' => new MongoDate());
+		array_push($this->db->connection->results, new MockResult(array(
+			'data' => array($data)
+		)));
+		$foundDocument = $model::first(array('conditions' => array('_id' => (string)$document->_id)));
+		$this->assertTrue($document->foo instanceof MongoDate);
+		$this->assertTrue($document->bar instanceof MongoDate);
+		//update founded document
+		$foundDocument->bar = '';
+		$this->assertTrue($foundDocument->bar instanceof MongoDate);
+		
 	}
 
 	/**
@@ -624,7 +649,11 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testCastingConditionsValues() {
-		$query = new Query(array('schema' => new Schema(array('fields' => $this->_schema))));
+		$model = $this->_model;
+		$model::setSchema($this->_schema);
+		
+		$query = new Query(compact('model'));
+		//$query = new Query(array('schema' => new Schema(array('fields' => $this->_schema))));
 
 		$conditions = array('_id' => new MongoId("4c8f86167675abfabdbe0300"));
 		$result = $this->db->conditions($conditions, $query);
@@ -664,6 +693,25 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual(2, count($result['$or']));
 		$this->assertTrue($result['$or'][0]['_id'] instanceof MongoId);
 		$this->assertTrue($result['$or'][1]['guid'] instanceof MongoId);
+		
+		//test cast conditional values with conditional operations
+		$conditions = array(
+			'title' => "foo",
+			'_id' => array('$ne' => "4c8f86167675abfabdbf0300"),
+		);
+		$result = $this->db->conditions($conditions, $query);
+		$this->assertEqual(2, count($result));
+		$this->assertEqual($result['title'], "foo");
+		$this->assertTrue($result['_id']['$ne'] instanceof MongoId);
+
+		$conditions = array(
+			'title' => "foo",
+			'_id' => array('!=' => "4c8f86167675abfabdbf0300"),
+		);
+		$result = $this->db->conditions($conditions, $query);
+		$this->assertEqual(2, count($result));
+		$this->assertEqual($result['title'], "foo");
+		$this->assertTrue($result['_id']['$ne'] instanceof MongoId);
 	}
 
 	public function testMultiOperationConditions() {
