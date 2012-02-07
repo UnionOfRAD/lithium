@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\data\collection;
 
+use lithium\data\source\mongo_db\Schema;
 use lithium\data\collection\DocumentArray;
 
 class DocumentArrayTest extends \lithium\test\Unit {
@@ -15,11 +16,18 @@ class DocumentArrayTest extends \lithium\test\Unit {
 	protected $_model = 'lithium\tests\mocks\data\model\MockDocumentPost';
 
 	public function testInitialCasting() {
-		$array = new DocumentArray(array(
-			'model' => $this->_model,
+		$model = $this->_model;
+		$schema = new Schema(array('fields' => array(
+			'_id' => array('type' => 'id'),
+			'foo' => array('type' => 'object'),
+			'foo.bar' => array('type' => 'int')
+		)));
+
+		$array = new DocumentArray(compact('model', 'schema') + array(
 			'pathKey' => 'foo.bar',
 			'data' => array('5', '6', '7')
 		));
+
 		foreach ($array as $value) {
 			$this->assertTrue(is_int($value));
 		}
@@ -71,6 +79,20 @@ class DocumentArrayTest extends \lithium\test\Unit {
 		$expected = array(0 => 'Hello', 6 => 'Hello again!');
 		$this->assertIdentical($expected, $doc->data());
 	}
+
+	public function testArrayOfObjects() {
+		$schema = new Schema();
+		$first  = (object) array('name' => 'First');
+		$second = (object) array('name' => 'Second');
+		$third  = (object) array('name' => 'Third');
+		$doc = new DocumentArray(compact('schema') + array(
+			'data' => array($first, $second, $third)
+		));
+
+		$this->assertTrue(is_object($doc[0]));
+		$this->assertTrue(is_object($doc[1]));
+		$this->assertTrue(is_object($doc[2]));
+		$this->assertEqual(3, count($doc));
 	}
 }
 

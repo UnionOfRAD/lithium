@@ -72,6 +72,7 @@ class Schema extends \lithium\data\Schema {
 		$options += $defaults;
 		$basePathKey = $options['pathKey'];
 		$model = (!$options['model'] && $object) ? $object->model() : $options['model'];
+		$database = $options['database'];
 
 		if (is_scalar($data)) {
 			return $this->_castType($data, $basePathKey);
@@ -82,26 +83,31 @@ class Schema extends \lithium\data\Schema {
 		}
 
 		foreach ($data as $key => $val) {
-			if (is_object($val)) {
-				continue;
-			}
 			$pathKey = $basePathKey ? $basePathKey . '.' . $key : $key;
 			$isArray = $this->is('array', $pathKey);
+			$valIsArray = is_array($val);
 
-			if (is_array($val) || $isArray) {
-				$val = (array) $val;
-				$numericArray = !$val || array_keys($val) === range(0, count($val) - 1);
-				$options['class'] = 'entity';
-
-				if ($isArray || $numericArray) {
-					$options['class'] = 'array';
-				}
-				unset($options['first']);
-				$val = $database->item($options['model'], $val, compact('pathKey') + $options);
-				$data[$key] = $val;
+			if ((is_object($val) || is_object($data)) && !$isArray) {
 				continue;
 			}
-			$data[$key] = $this->_castType($val, $pathKey);
+			if (!$valIsArray && !$isArray) {
+				$data[$key] = $this->_castType($val, $pathKey);
+				continue;
+			}
+			$numericArray = false;
+
+			if ($valIsArray) {
+				$numericArray = !$val || array_keys($val) === range(0, count($val) - 1);
+			}
+			$options['class'] = 'entity';
+
+			if ($isArray || $numericArray) {
+				$options['class'] = 'array';
+				$val = $valIsArray ? $val : array($val);
+			}
+			unset($options['first']);
+			$val = $database->item($options['model'], $val, compact('pathKey') + $options);
+			$data[$key] = $val;
 		}
 		return $data;
 	}
