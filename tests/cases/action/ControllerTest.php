@@ -22,9 +22,12 @@ class ControllerTest extends \lithium\test\Unit {
 	 */
 	public function testConstructionWithCustomRequest() {
 		$request = new MockControllerRequest();
+		$request->type('test');
 		$postsController = new MockPostsController(compact('request'));
 		$result = get_class($postsController->request);
 		$this->assertEqual($result, 'lithium\tests\mocks\action\MockControllerRequest');
+		$render = $postsController->access('_render');
+		$this->assertEqual($request->type(), $render['type']);
 	}
 
 	/**
