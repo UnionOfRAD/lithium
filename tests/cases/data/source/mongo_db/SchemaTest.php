@@ -18,8 +18,14 @@ use lithium\data\source\mongo_db\Schema;
 
 class SchemaTest extends \lithium\test\Unit {
 
+	public $db;
+
 	public function skip() {
 		$this->skipIf(!MongoDb::enabled(), 'MongoDb is not enabled');
+	}
+
+	public function setUp() {
+		$this->db = new MongoDb(array('autoConnect' => false));
 	}
 
 	public function testIdArray() {
@@ -27,7 +33,14 @@ class SchemaTest extends \lithium\test\Unit {
 			'_id' => array('type' => 'id'),
 			'users' => array('type' => 'id', 'array' => true)
 		)));
-		$result = $schema->cast(null, array('users' => new MongoId()));
+
+		$result = $schema->cast(null, array('users' => new MongoId()), array(
+			'database' => $this->db
+		));
+
+		$this->assertEqual(array('users'), array_keys($result));
+		$this->assertEqual(1, count($result['users']));
+		$this->assertTrue($result['users'][0] instanceof MongoId);
 	}
 }
 
