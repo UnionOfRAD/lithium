@@ -114,6 +114,14 @@ class Test extends \lithium\console\Command {
 	 * li3 test tests/cases
 	 * }}}
 	 *
+	 * If you are in the working directory of an application and wish to run a plugin, execute one
+	 * of the following:
+	 *
+	 * {{{
+	 * li3 test libraries/<plugin>/tests/cases
+	 * li3 test <plugin>/tests/cases
+	 * }}}
+	 *
 	 * @param string $path Absolute or relative path to tests.
 	 * @return boolean Will exit with status `1` if one or more tests failed otherwise with `0`.
 	 */
@@ -143,16 +151,16 @@ class Test extends \lithium\console\Command {
 	 * Finds a library for given path.
 	 *
 	 * @param string $path Normalized (to slashes) absolute or relative path.
-	 * @return string Returns the library's path on success, or `null` on failure.
+	 * @return string the name of the library
 	 */
 	protected function _library($path) {
 		foreach (Libraries::get() as $name => $library) {
 			if (strpos($path, $library['path']) !== 0) {
 				continue;
 			}
-			$path = str_replace(array($library['path'], '.php'), null, $path);
-			return '\\' . $name . str_replace('/', '\\', $path);
+			return $name;
 		}
+		return null;
 	}
 
 	/**
@@ -168,19 +176,39 @@ class Test extends \lithium\console\Command {
 			$this->error('Please provide a path to tests.');
 			return false;
 		}
+		if ($path[0] == '/') {
+			$library = $this->_library($path);
+		}
 		if ($path[0] != '/') {
-			$path = $this->request->env('working') . '/' . $path;
-		}
-		if (!$path = realpath($path)) {
-			$this->error('Not a valid path.');
-			return false;
-		}
+			$library = basename($this->request->env('working'));
+			$parts = explode('/', str_replace("../", "", $path));
+			$plugin = array_shift($parts);
 
-		if (!$libraryPath = $this->_library($path)) {
-			$this->error("No library registered for path `{$path}`.");
+			if ($plugin == 'libraries') {
+				$plugin = array_shift($parts);
+			}
+			if ($plugin != 'tests') {
+				$library = $plugin;
+				$path = join('/', $parts);
+			}
+		}
+		if (empty($library)) {
+			$this->error("No library found in `{$path}`.");
 			return false;
 		}
-		return $libraryPath;
+		if (!$config = Libraries::get($library)) {
+			$this->error("Library `{$library}` does not exist.");
+			return false;
+		}
+		$path = str_replace($config['path'], null, $path);
+		$realpath = $config['path'] . '/' . $path;
+
+		if (!realpath($realpath)) {
+			$this->error("{$realpath} not found.");
+			return false;
+		}
+		$class = str_replace(".php", "", str_replace('/', '\\', ltrim($path, '/')));
+		return $config['prefix'] . $class;
 	}
 }
 
