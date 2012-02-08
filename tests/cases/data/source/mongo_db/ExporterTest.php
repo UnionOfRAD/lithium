@@ -158,6 +158,10 @@ class ExporterTest extends \lithium\test\Unit {
 		$doc->newObject = new Document(array(
 			'exists' => false, 'data' => array('subField' => 'subValue')
 		));
+		$doc->docArray = array(
+			array('test' => 'one', 'another' => 'two'),
+			array('three' => 'four')
+		);
 		$this->assertEqual('foo', $doc->deeply->nested);
 		$this->assertEqual('subValue', $doc->newObject->subField);
 
@@ -168,6 +172,10 @@ class ExporterTest extends \lithium\test\Unit {
 			'numbers' => array(8, 9),
 			'newObject' => array('subField' => 'subValue'),
 			'field' => 'value',
+			'docArray' => array(
+				array('test' => 'one', 'another' => 'two'),
+				array('three' => 'four')
+			),
 			'deeply.nested' => 'foo',
 			'objects.1.foo' => 'dib'
 		);
