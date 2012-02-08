@@ -98,12 +98,60 @@ class LibraryTest extends \lithium\test\Unit {
 	 * Tests the app extraction and replace functionality to ensure that all paths
 	 * are set correctly after the extraction. It re-uses the test extraction
 	 * generated in the last test (`LibraryTest::testExtract()`).
+	 *
+	 * Note that we can't properly test the case where the `LITHIUM_LIBRARY_PATH`
+	 * is in a different location because it's a constant and can't
+	 * be altered for testing.
 	 */
 	public function testExtractAndReplace() {
 		$filepath = $this->_testPath . '/library_test/config/bootstrap/libraries.php';
+		if (dirname(LITHIUM_APP_PATH) . '/libraries' !== LITHIUM_LIBRARY_PATH) {
+			$expected = 'define(\'LITHIUM_LIBRARY_PATH\', \'';
+			$expected .= realpath(LITHIUM_LIBRARY_PATH) . '\')';
+		} else {
+			$expected = 'define(\'LITHIUM_LIBRARY_PATH\', ';
+			$expected .= 'dirname(LITHIUM_APP_PATH) . \'/libraries\')';
+		}
+		$this->_assertFileContents($filepath, $expected);
+
+		$filepath = $this->_testPath . '/library_test/controllers/PagesController.php';
+		$expected = "namespace library_test\\";
+		$this->_assertFileContents($filepath, $expected);
+
+		$this->library->library = 'replace_test';
+		$this->library->lithiumLibraryPath = 'dirname(LITHIUM_APP_PATH)';
+		$result = $this->library->extract(
+			'test-app-replacements',
+			$this->_testPath . '/replace_test'
+		);
+		$this->assertTrue($result);
+
+		$path = '/lithium/console/command/create/template/test-app-replacements.phar.gz';
+		$expected = "replace_test created in {$this->_testPath} from ";
+		$expected .= realpath(LITHIUM_LIBRARY_PATH . $path) . "\n";
+		$result = $this->library->response->output;
+		$this->assertEqual($expected, $result);
+
+		$filepath = $this->_testPath . '/replace_test/config/bootstrap/libraries.php';
+		$expected = 'define(\'LITHIUM_LIBRARY_PATH\', dirname(LITHIUM_APP_PATH))';
+		$this->_assertFileContents($filepath, $expected);
+
+		$filepath = $this->_testPath . '/replace_test/controllers/PagesController.php';
+		$expected = "namespace replace_test\\";
+		$this->_assertFileContents($filepath, $expected);
+
+		$filepath = $this->_testPath . '/replace_test/.htaccess';
+		$expected = "just a test";
+		$this->_assertFileContents($filepath, $expected);
+
+		$filepath = $this->_testPath . '/replace_test/webroot/css/lithium.css';
+		$expected = "Carbon:";
+		$this->_assertFileContents($filepath, $expected);
+	}
+
+	protected function _assertFileContents($filepath, $expected) {
 		$content = file_get_contents($filepath);
 		$lines = explode("\n", $content);
-		$expected = 'define(\'LITHIUM_LIBRARY_PATH\', \'' . realpath(LITHIUM_LIBRARY_PATH) . '\')';
 		$this->assertTrue(strpos($content, $expected));
 	}
 

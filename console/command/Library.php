@@ -12,6 +12,7 @@ use Phar;
 use Exception;
 use RuntimeException;
 use lithium\core\Libraries;
+use lithium\util\String;
 
 /**
  * The Library command is used to archive and extract Phar::GZ archives. Requires zlib extension.
@@ -82,6 +83,41 @@ class Library extends \lithium\console\Command {
 	 * @var string
 	 */
 	public $filter = '/\.(php|htaccess|jpg|png|gif|css|js|ico|json|ini)|(empty)$/';
+
+	/**
+	 * Namespace used for newly extracted libraries.
+	 * Will default to the basename of the directory
+	 * the library is being extracted to.
+	 *
+	 * @var string
+	 */
+	public $namespace = null;
+
+	/**
+	 * When extracting a library, custom replacements
+	 * can be made on the extracted files that
+	 * are defined in this json file.
+	 *
+	 * @var string
+	 */
+	public $replacementsFile = '_replacements.json';
+
+	/**
+	 * The path to use for the `LITHIUM_LIBRARY_PATH`
+	 * in extracted templates.  It defaults to the
+	 * current value of the `LITHIUM_LIBRARY_PATH`
+	 * constant.  If `LITHIUM_LIBRARY_PATH` is not the same
+	 * as `dirname(LITHIUM_APP_PATH) . '/libraries'` then
+	 * the value of `LITHIUM_LIBRARY_PATH` will be hard-coded
+	 * to the `config/bootstrap/libraries.php` file in the
+	 * extracted library.  If you want it to use a custom
+	 * value, then pass it to this option.  For example,
+	 * if you keep your apps in the same directory as your
+	 * libraries, you could set it to `dirname(LITHIUM_APP_PATH)`
+	 *
+	 * @var string
+	 */
+	public $lithiumLibraryPath = LITHIUM_LIBRARY_PATH;
 
 	/**
 	 * Holds settings from conf file
@@ -156,9 +192,13 @@ class Library extends \lithium\console\Command {
 	 * If both parameters exist, then the first will be the template archive and the second will be
 	 * the name of the extracted archive
 	 *
-	 * `li3 library extract myapp` : uses the command/create/template/app.phar.gz
-	 * `li3 library extract another_archive myapp`
-	 * `li3 library extract plugin li3_plugin` : uses the command/create/template/plugin.phar.gz
+	 * - `li3 library extract myapp` : uses command/create/template/app.phar.gz
+	 * - `li3 library extract another_archive myapp` : uses
+	 *       command/create/template/another_archive.phar.gz
+	 * - `li3 library extract plugin li3_plugin` : uses command/create/template/plugin.phar.gz
+	 * - `li3 library extract /full/path/to/a.phar.gz myapp` : paths that begin with a '/'
+	 *       can extract from archives outside of the default command/create/template/
+	 *       location
 	 *
 	 * @param string $name if only param, command/create/template/app.phar.gz extracted to $name
 	 *     otherwise, the template name or full path to extract `from` phar.gz.
@@ -192,11 +232,46 @@ class Library extends \lithium\console\Command {
 			}
 			if ($archive->extractTo($to)) {
 				$this->out(basename($to) . " created in " . dirname($to) . " from {$from}");
-				return $this->_replaceAfterExtract($to);
+
+				if (empty($this->namespace)) {
+					$this->namespace = basename($to);
+				}
+
+				$replacements = $this->_findReplacements($to);
+				return $this->_replaceAfterExtract($to, compact('namespace', 'replacements'));
 			}
 		}
 		$this->error("Could not extract {$to} from {$from}");
 		return false;
+	}
+
+	/**
+	 * Helper method for `console\command\Library::extract()` to gather
+	 * replacements to perform on the newly extracted files
+	 *
+	 * It looks for a json file specified by `$this->replacementsFile`
+	 * which defaults to _replacements.json.
+	 *
+	 * Running eval on a php file to get the `$replacements`
+	 * would be more flexible than using json, but definitely much more of a
+	 * security hole if the library is not trusted.
+	 *
+	 * @param string $base File path to the extracted library
+	 * @return array A multi-dimensional array.  Keys on the top level
+	 *     are filenames or glob-style paths.  Those hold an array
+	 *     with keys being the search param and values being the
+	 *     replacement values
+	 */
+	protected function _findReplacements($base = null) {
+		$replacements = null;
+		if (file_exists($base . '/' . $this->replacementsFile)) {
+			$replacementsFilename = $base . '/' . $this->replacementsFile;
+			$replacements = json_decode(file_get_contents($replacementsFilename), true);
+			if ($replacements !== false) {
+				unlink($base . '/' . $this->replacementsFile);
+			}
+		}
+		return $replacements;
 	}
 
 	/**
@@ -208,30 +283,118 @@ class Library extends \lithium\console\Command {
 	 * script has read and write permissions to the extracted directory.
 	 *
 	 * @param string $extracted contains the path to the extracted archive.
+	 * @param array $options Valid options are:
+	 *     - `'replacements'`: an array of string replacements indexed by filename.
+	 *       It's also possible to use glob-style wildcards in the filename such
+	 *       as `*` or `*.php` or `resources/g11n/*`.  If the filename starts
+	 *       with `*`, then that filename pattern will be recursively found
+	 *       in every sub-directory.  Additionally, each replacement can
+	 *       use `String::insert()` style strings that will be replaced
+	 *       with the data in the `data` option.
+	 *     - `'data'`: an array with data that will be used to replace
+	 *       `String::insert`-style placeholders in the `replacements` option.
+	 *       By default, this includes 'namespace' and 'library' which are
+	 *       both set to the extracted library's namespace.
 	 * @return boolean
 	 */
-	protected function _replaceAfterExtract($extracted) {
-		$replacements = array(
-			'config/bootstrap/libraries.php' => array(
-				'define(\'LITHIUM_LIBRARY_PATH\', dirname(LITHIUM_APP_PATH) . \'/libraries\');' =>
-					'define(\'LITHIUM_LIBRARY_PATH\', \'' . LITHIUM_LIBRARY_PATH . '\');'
-			)
-		);
+	protected function _replaceAfterExtract($extracted, $options = array()) {
+		$namespace = $this->namespace;
+		$library = $namespace;
+		$data = compact('namespace', 'library');
+		$replacements = array();
+		extract($options);
+
+		if (empty($replacements)) {
+			$replacements = array(
+				'config/bootstrap/libraries.php' => array(
+					"Libraries::add('app'" => "Libraries::add('{:namespace}'"
+				),
+				'*.php' => array(
+					"namespace app\\" => "namespace {:namespace}\\"
+				)
+			);
+		}
+
+		if (dirname(LITHIUM_APP_PATH) . '/libraries' !== $this->lithiumLibraryPath) {
+			if ($this->lithiumLibraryPath[0] === '/') {
+				$this->lithiumLibraryPath = "'" . $this->lithiumLibraryPath . "'";
+			}
+			$search = 'define(\'LITHIUM_LIBRARY_PATH\', ';
+			$search .= 'dirname(LITHIUM_APP_PATH) . \'/libraries\');';
+			$replace = 'define(\'LITHIUM_LIBRARY_PATH\', ';
+			$replace .= $this->lithiumLibraryPath . ');';
+
+			if (!isset($replacements['config/bootstrap/libraries.php'])) {
+				$replacements['config/bootstrap/libraries.php'] = array();
+			}
+			$replacements['config/bootstrap/libraries.php'][$search] = $replace;
+		}
 
 		foreach ($replacements as $filename => $definitions) {
-			$filepath = $extracted . '/' . $filename;
-			if (file_exists($filepath)) {
-				$content = file_get_contents($filepath);
-				foreach ($definitions as $original => $replacement) {
-					$content = str_replace($original, $replacement, $content);
-				}
-				if (!file_put_contents($filepath, $content)) {
-					$this->error("Could not replace content in {$filepath}");
-					return false;
+			foreach ($definitions as $search => $replace) {
+				unset($definitions[$search]);
+				$search = String::insert($search, $data);
+				$replace = String::insert($replace, $data);
+				$definitions[$search] = $replace;
+			}
+			$paths = $this->_wildcardPaths($filename, $extracted);
+			foreach ($paths as $filepath) {
+				if (file_exists($filepath)) {
+					$content = file_get_contents($filepath);
+					if ($content === '') {
+						continue;
+					}
+					$content = str_replace(
+						array_keys($definitions),
+						array_values($definitions),
+						$content
+					);
+					if (!file_put_contents($filepath, $content)) {
+						$this->error("Could not replace content in {$filepath}");
+						return false;
+					}
 				}
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Utility function that will return an array of
+	 * file paths relative to the `$base` path that
+	 * are found using a glob-style asterisk wildcards
+	 * such as `*` or `*.php` or `resources/g11n/*`.  If the path starts
+	 * with `*`, then that filename pattern will be recursively found
+	 * in every sub-directory.
+	 *
+	 * @param string $path
+	 * @param string $base Base directory to search for matching files
+	 * @return array
+	 */
+	protected function _wildcardPaths($path, $base = '') {
+		if (strpos($path, '*') === false) {
+			return array($base .  '/' . $path);
+		}
+		if ($path[0] === '*') {
+			$paths = array();
+			$dirs = array($base);
+			while (!empty($dirs)) {
+				$dir = array_shift($dirs);
+				$paths = array_merge($paths, glob($dir . '/' . $path));
+				$dirs = array_merge(
+					$dirs,
+					array_filter(glob($dir . '/*'), function($path) {
+						return is_dir($path);
+					})
+				);
+			}
+		} else {
+			$paths = array_filter(glob($base .  '/' . $path), function($path) {
+				$basename = basename($path);
+				return $basename !== '.' && $basename !== '..';
+			});
+		}
+		return $paths;
 	}
 
 	/**
@@ -240,8 +403,8 @@ class Library extends \lithium\console\Command {
 	 * directory will be archive with the name provided. If both params, the first is the
 	 * name or path to the library to archive and the second is the name of the resulting archive
 	 *
-	 * `li3 library archive my_archive` : archives current working directory to my_archive.phar.gz
-	 * `li3 library archive myapp my_archive` : archives 'myapp' to 'my_archive.phar.gz'
+	 * - `li3 library archive my_archive` : archives current working directory to my_archive.phar.gz
+	 * - `li3 library archive myapp my_archive` : archives 'myapp' to 'my_archive.phar.gz'
 	 *
 	 * @param string $name if only param, the archive name for the current working directory
 	 *     otherwise, The library name or path to the directory to compress.
