@@ -138,6 +138,20 @@ class CurlTest extends \lithium\test\Unit {
 		$stream->set('DummyFlag', 'Changed Dummy Value');
 		$this->assertEqual('Changed Dummy Value', $stream->options['DummyFlag']);
 	}
+
+	public function testSendPostThenGet() {
+		$postConfig = array('method' => 'POST', 'body' => '{"body"}');
+		$stream = new Curl($this->_testConfig);
+		$this->assertTrue(is_resource($stream->open()));
+		$this->assertTrue($stream->write(new Request($postConfig + $this->_testConfig)));
+		$this->assertTrue(isset($stream->options[CURLOPT_POST]));
+		$this->assertTrue($stream->close());
+
+		$this->assertTrue(is_resource($stream->open()));
+		$this->assertTrue($stream->write(new Request($this->_testConfig)));
+		$this->assertFalse(isset($stream->options[CURLOPT_POST]));
+		$this->assertTrue($stream->close());
+	}
 }
 
 ?>

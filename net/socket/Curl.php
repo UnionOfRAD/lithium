@@ -53,6 +53,7 @@ class Curl extends \lithium\net\Socket {
 	 *         resource stream.
 	 */
 	public function open(array $options = array()) {
+		$this->options = array();
 		parent::open($options);
 		$config = $this->_config;
 
@@ -62,9 +63,11 @@ class Curl extends \lithium\net\Socket {
 
 		$url = "{$config['scheme']}://{$config['host']}";
 		$this->_resource = curl_init($url);
-		curl_setopt($this->_resource, CURLOPT_PORT, $config['port']);
-		curl_setopt($this->_resource, CURLOPT_HEADER, true);
-		curl_setopt($this->_resource, CURLOPT_RETURNTRANSFER, true);
+		$this->set(array(
+			CURLOPT_PORT => $config['port'],
+			CURLOPT_HEADER =>  true,
+			CURLOPT_RETURNTRANSFER => true
+		));
 
 		if (!is_resource($this->_resource)) {
 			return false;
