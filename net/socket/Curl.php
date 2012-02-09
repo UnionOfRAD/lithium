@@ -63,9 +63,11 @@ class Curl extends \lithium\net\Socket {
 
 		$url = "{$config['scheme']}://{$config['host']}";
 		$this->_resource = curl_init($url);
-		$this->set(CURLOPT_PORT, $config['port']);
-		$this->set(CURLOPT_HEADER, true);
-		$this->set(CURLOPT_RETURNTRANSFER, true);
+		$this->set(array(
+			CURLOPT_PORT => $config['port'],
+			CURLOPT_HEADER =>  true,
+			CURLOPT_RETURNTRANSFER => true
+		));
 
 		if (!is_resource($this->_resource)) {
 			return false;
