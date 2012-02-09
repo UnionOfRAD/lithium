@@ -226,6 +226,21 @@ class HttpTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testCustomActionWithoutMethod() {
+		$http = new Http($this->_testConfig);
+
+		$result = $http->something();
+		$expected = join("\r\n", array(
+			'GET /something HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'', ''
+		));
+		$result = (string) $http->last->request;
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testCustomGetMethod() {
 		$config = $this->_testConfig + array('methods' => array(
 			'something' => array('method' => 'get', 'path' => '/something')
