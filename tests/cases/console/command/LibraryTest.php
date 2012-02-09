@@ -641,7 +641,7 @@ test;
 		$result = $this->library->push('library_test_plugin');
 		$this->assertFalse($result);
 
-		$expected = "/The forumla for library_test_plugin is not valid/";
+		$expected = "/The formula for library_test_plugin is not valid./";
 		$result = $this->library->response->error;
 		$this->assertPattern($expected, $result);
 
