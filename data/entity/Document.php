@@ -138,9 +138,8 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	}
 
 	public function export() {
-		$className = __CLASS__;
 		foreach ($this->_updated as $key => $val) {
-			if ($val instanceof $className) {
+			if ($val instanceof self) {
 				$path = $this->_pathKey ? "{$this->_pathKey}." : '';
 				$this->_updated[$key]->_pathKey = "{$path}{$key}";
 			}
