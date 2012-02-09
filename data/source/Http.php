@@ -198,7 +198,11 @@ class Http extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function create($query, array $options = array()) {
-		return $this->__call(__FUNCTION__, array($query, $options));
+		$function = __FUNCTION__;
+		$params = compact('query', 'options');
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($function) {
+			return $self->__call($function, array_values($params));
+		});
 	}
 
 	/**
@@ -210,7 +214,11 @@ class Http extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function read($query, array $options = array()) {
-		return $this->__call(__FUNCTION__, array($query, $options));
+		$function = __FUNCTION__;
+		$params = compact('query', 'options');
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($function) {
+			return $self->__call($function, array_values($params));
+		});
 	}
 
 	/**
@@ -222,7 +230,11 @@ class Http extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function update($query, array $options = array()) {
-		return $this->__call(__FUNCTION__, array($query, $options));
+		$function = __FUNCTION__;
+		$params = compact('query', 'options');
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($function) {
+			return $self->__call($function, array_values($params));
+		});
 	}
 
 	/**
@@ -234,7 +246,11 @@ class Http extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function delete($query, array $options = array()) {
-		return $this->__call(__FUNCTION__, array($query, $options));
+		$function = __FUNCTION__;
+		$params = compact('query', 'options');
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($function) {
+			return $self->__call($function, array_values($params));
+		});
 	}
 
 	/**
