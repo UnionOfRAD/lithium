@@ -125,20 +125,19 @@ class Http extends \lithium\data\Source {
 
 		$conn =& $this->connection;
 		$filter = function($self, $params) use (&$conn, $string) {
-			$data = array();
 			list($query, $options) = $params;
 
 			if(is_object($query)) {
 				$options += array_filter($query->export($self), function($v) {
 					return $v !== null;
 				});
-				$data += $query->data();
+				$data = $query->data();
 			} else {
-				$data = in_array($string['method'], array('post', 'put')) ? (array) $params[0] : array();
+				$data = in_array($string['method'], array('post', 'put')) ? (array) $query : array();
 			}
 
 			$options += array('conditions' => null, 'limit' => null);
-			$data = (array) $options['conditions'] + (array) $options['limit'];
+			$data += (array) $options['conditions'] + (array) $options['limit'];
 			$path = String::insert($string['path'], $options + $data, array('clean' => true));
 			return $conn->{$string['method']}($path, $data, $options);
 		};
