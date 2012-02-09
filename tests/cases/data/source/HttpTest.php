@@ -203,8 +203,8 @@ class HttpTest extends \lithium\test\Unit {
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Content-Type: application/x-www-form-urlencoded',
-			'Content-Length: 21',
-			'', 'id=1&title=Test+Title'
+			'Content-Length: 16',
+			'', 'title=Test+Title'
 		));
 		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);

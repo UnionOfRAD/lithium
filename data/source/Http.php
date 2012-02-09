@@ -136,9 +136,14 @@ class Http extends \lithium\data\Source {
 				$data = in_array($string['method'], array('post', 'put')) ? (array) $query : array();
 			}
 
-			$options += array('conditions' => null, 'limit' => null);
-			$data += (array) $options['conditions'] + (array) $options['limit'];
+			preg_match_all('/\{:(\w+)\}/', $string['path'], $matches);
+			$keys = array_flip($matches[1]);
 			$path = String::insert($string['path'], $options + $data, array('clean' => true));
+
+
+			$options += array('conditions' => null, 'limit' => null);
+			$data = array_diff_assoc($data, $keys);
+			$data += (array) $options['conditions'] + (array) $options['limit'];
 			return $conn->{$string['method']}($path, $data, $options);
 		};
 		return $this->_filter(__METHOD__, $params, $filter);
