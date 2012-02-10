@@ -8,6 +8,7 @@
 
 namespace lithium\data\entity;
 
+use RuntimeException;
 use UnexpectedValueException;
 
 /**
@@ -110,10 +111,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		}
 
 		if (isset($this->_embedded[$name]) && !isset($this->_relationships[$name])) {
-			$item = isset($this->_data[$name]) ? $this->_data[$name] : array();
-			var_dump($this->_relationships[$name]);
-			die('#WINNING');
-			// $this->_relationships[$name] = $this->_relate($this->_embedded[$name], $item);
+			throw new RuntimeException("Not implemented.");
 		}
 		$result = parent::__get($name);
 
