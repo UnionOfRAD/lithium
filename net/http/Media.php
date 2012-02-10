@@ -657,11 +657,15 @@ class Media extends \lithium\core\StaticObject {
 				return null;
 			}
 
-			$cast = function($data) {
+			$cast = function($data) use ($response) {
 				if (!is_object($data)) {
 					return $data;
 				}
-				return method_exists($data, 'to') ? $data->to('array') : get_object_vars($data);
+				if (is_array($response)) {
+					return method_exists($data, 'to') ? $data->to('array', $response) : get_object_vars($data);
+				} else {
+					return method_exists($data, 'to') ? $data->to('array') : get_object_vars($data);
+				}
 			};
 
 			if (!isset($handler['cast']) || $handler['cast']) {
