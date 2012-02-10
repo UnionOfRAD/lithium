@@ -345,7 +345,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$data = array('title' => 'New Item');
 		$result = $this->db->item($model, $data);
 
-		$this->assertTrue($result instanceof \lithium\data\entity\Document);
+		$this->assertTrue($result instanceof Document);
 
 		$expected = $data;
 		$result = $result->to('array');

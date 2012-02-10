@@ -12,6 +12,7 @@ use stdClass;
 use SplFileInfo;
 use lithium\util\Inflector;
 use lithium\core\Libraries;
+use lithium\template\view\adapter\Simple;
 
 class LibrariesTest extends \lithium\test\Unit {
 
@@ -352,7 +353,7 @@ class LibrariesTest extends \lithium\test\Unit {
 
 	public function testServiceLocateInstantiation() {
 		$result = Libraries::instance('adapter.template.view', 'Simple');
-		$this->assertTrue($result instanceof \lithium\template\view\adapter\Simple);
+		$this->assertTrue($result instanceof Simple);
 		$this->expectException("Class `Foo` of type `adapter.template.view` not found.");
 		$result = Libraries::instance('adapter.template.view', 'Foo');
 	}

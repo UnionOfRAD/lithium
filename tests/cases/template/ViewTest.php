@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\template;
 
+use Closure;
 use lithium\template\View;
 use lithium\action\Response;
 use lithium\template\view\adapter\Simple;
@@ -170,7 +171,7 @@ class ViewTest extends \lithium\test\Unit {
 				)
 			  )
 			);
-		$this->assertTrue($renderData[0]['data']['h'] instanceof \Closure);
+		$this->assertTrue($renderData[0]['data']['h'] instanceof Closure);
 		unset($renderData[0]['data']['h']);
 		$this->assertEqual($expected, $renderData);
 	}

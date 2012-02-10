@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\net\socket;
 
+use lithium\net\http\Response;
 use lithium\net\http\Request;
 use lithium\net\socket\Curl;
 
@@ -107,7 +108,7 @@ class CurlTest extends \lithium\test\Unit {
 			new Request($this->_testConfig),
 			array('response' => 'lithium\net\http\Response')
 		);
-		$this->assertTrue($result instanceof \lithium\net\http\Response);
+		$this->assertTrue($result instanceof Response);
 		$this->assertPattern("/^HTTP/", (string) $result);
 	}
 
@@ -117,7 +118,7 @@ class CurlTest extends \lithium\test\Unit {
 		$result = $stream->send($this->_testConfig,
 			array('response' => 'lithium\net\http\Response')
 		);
-		$this->assertTrue($result instanceof \lithium\net\http\Response);
+		$this->assertTrue($result instanceof Response);
 		$this->assertPattern("/^HTTP/", (string) $result);
 	}
 
@@ -128,7 +129,7 @@ class CurlTest extends \lithium\test\Unit {
 			new Request($this->_testConfig),
 			array('response' => 'lithium\net\http\Response')
 		);
-		$this->assertTrue($result instanceof \lithium\net\http\Response);
+		$this->assertTrue($result instanceof Response);
 		$this->assertPattern("/^HTTP/", (string) $result);
 	}
 

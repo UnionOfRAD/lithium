@@ -8,6 +8,8 @@
 
 namespace lithium\net\socket;
 
+use lithium\net\http\Message;
+
 /**
  * A Curl-based socket adapter
  *
@@ -137,7 +139,7 @@ class Curl extends \lithium\net\Socket {
 		}
 		$this->set(CURLOPT_URL, $data->to('url'));
 
-		if ($data instanceof \lithium\net\http\Message) {
+		if ($data instanceof Message) {
 			if (!empty($this->_config['ignoreExpect'])) {
 				$data->headers('Expect', ' ');
 			}

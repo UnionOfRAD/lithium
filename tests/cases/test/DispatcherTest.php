@@ -8,31 +8,36 @@
 
 namespace lithium\tests\cases\test;
 
+use lithium\test\Group;
+use lithium\test\Report;
 use lithium\test\Dispatcher;
 use lithium\util\Collection;
+use lithium\tests\mocks\test\cases\MockTest;
+use lithium\tests\mocks\test\cases\MockTestErrorHandling;
+use lithium\tests\mocks\test\cases\MockSkipThrowsException;
 
 class DispatcherTest extends \lithium\test\Unit {
 
 	public function testRunDefaults() {
 		$report = Dispatcher::run();
-		$this->assertTrue($report instanceof \lithium\test\Report);
+		$this->assertTrue($report instanceof Report);
 
 		$result = $report->group;
-		$this->assertTrue($result instanceof \lithium\test\Group);
+		$this->assertTrue($result instanceof Group);
 	}
 
 	public function testRunWithReporter() {
 		$report = Dispatcher::run(null, array('reporter' => 'html'));
-		$this->assertTrue($report instanceof \lithium\test\Report);
+		$this->assertTrue($report instanceof Report);
 
 		$result = $report->group;
-		$this->assertTrue($result instanceof \lithium\test\Group);
+		$this->assertTrue($result instanceof Group);
 	}
 
 	public function testRunCaseWithString() {
-		$report = Dispatcher::run('\lithium\tests\mocks\test\MockUnitTest');
+		$report = Dispatcher::run('lithium\tests\mocks\test\MockUnitTest');
 
-		$expected = '\lithium\tests\mocks\test\MockUnitTest';
+		$expected = 'lithium\tests\mocks\test\MockUnitTest';
 		$result = $report->title;
 		$this->assertEqual($expected, $result);
 
@@ -46,19 +51,15 @@ class DispatcherTest extends \lithium\test\Unit {
 	}
 
 	public function testRunGroupWithString() {
-		$report = Dispatcher::run('\lithium\tests\mocks\test');
+		$report = Dispatcher::run('lithium\tests\mocks\test');
 
-		$expected = '\lithium\tests\mocks\test';
+		$expected = 'lithium\tests\mocks\test';
 		$result = $report->title;
 		$this->assertEqual($expected, $result);
 
-		$expected = new Collection(array(
-			'data' => array(
-				new \lithium\tests\mocks\test\cases\MockSkipThrowsException(),
-				new \lithium\tests\mocks\test\cases\MockTest(),
-				new \lithium\tests\mocks\test\cases\MockTestErrorHandling()
-			)
-		));
+		$expected = new Collection(array('data' => array(
+			new MockSkipThrowsException(), new MockTest(), new MockTestErrorHandling()
+		)));
 		$result = $report->group->tests();
 		$this->assertEqual($expected, $result);
 

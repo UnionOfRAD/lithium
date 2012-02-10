@@ -10,6 +10,8 @@ namespace lithium\g11n;
 
 use BadMethodCallException;
 use InvalidArgumentException;
+use lithium\action\Request as ActionRequest;
+use lithium\console\Request as ConsoleRequest;
 
 /**
  * The `Locale` class provides methods to deal with locale identifiers.  The locale
@@ -208,13 +210,14 @@ class Locale extends \lithium\core\StaticObject {
 	 * @param object|array $request An action or console request object or an array of locales.
 	 * @param array $available A list of locales to negotiate the preferred locale with.
 	 * @return string The preferred locale in it's canonical form (i.e. `'fr_CA'`).
+	 * @todo Rewrite this to remove hard-coded class names.
 	 */
 	public static function preferred($request, $available = null) {
 		if (is_array($request)) {
 			$result = $request;
-		} elseif ($request instanceof \lithium\action\Request) {
+		} elseif ($request instanceof ActionRequest) {
 			$result = static::_preferredAction($request);
-		} elseif ($request instanceof \lithium\console\Request) {
+		} elseif ($request instanceof ConsoleRequest) {
 			$result = static::_preferredConsole($request);
 		} else {
 			return null;

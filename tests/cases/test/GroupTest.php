@@ -9,8 +9,15 @@
 namespace lithium\tests\cases\test;
 
 use lithium\test\Group;
-use lithium\util\Collection;
 use lithium\core\Libraries;
+use lithium\util\Collection;
+use lithium\tests\cases\data\ModelTest;
+use lithium\tests\cases\core\ObjectTest;
+use lithium\tests\cases\g11n\CatalogTest;
+use lithium\tests\mocks\test\MockUnitTest;
+use lithium\tests\mocks\test\cases\MockTest;
+use lithium\tests\mocks\test\cases\MockTestErrorHandling;
+use lithium\tests\mocks\test\cases\MockSkipThrowsException;
 
 class GroupTest extends \lithium\test\Unit {
 
@@ -26,13 +33,9 @@ class GroupTest extends \lithium\test\Unit {
 		$data = (array) "\lithium\\tests\mocks\\test";
 		$group = new Group(compact('data'));
 
-		$expected = new Collection(array(
-			'data' => array(
-				new \lithium\tests\mocks\test\cases\MockSkipThrowsException(),
-				new \lithium\tests\mocks\test\cases\MockTest(),
-				new \lithium\tests\mocks\test\cases\MockTestErrorHandling()
-			)
-		));
+		$expected = new Collection(array('data' => array(
+			new MockSkipThrowsException(), new MockTest(), new MockTestErrorHandling()
+		)));
 		$result = $group->tests();
 		$this->assertEqual($expected, $result);
 	}
@@ -77,13 +80,9 @@ class GroupTest extends \lithium\test\Unit {
 
 	public function testAddByMixedThroughConstructor() {
 		$group = new Group(array('data' => array(
-			'lithium\tests\cases\data\ModelTest',
-			new \lithium\tests\cases\core\ObjectTest()
+			'lithium\tests\cases\data\ModelTest', new ObjectTest()
 		)));
-		$expected = new Collection(array('data' => array(
-			new \lithium\tests\cases\data\ModelTest(),
-			new \lithium\tests\cases\core\ObjectTest()
-		)));
+		$expected = new Collection(array('data' => array(new ModelTest(), new ObjectTest())));
 		$result = $group->tests();
 		$this->assertEqual($expected, $result);
 	}
@@ -97,10 +96,10 @@ class GroupTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$results = $group->tests();
-		$this->assertTrue($results instanceof \lithium\util\Collection);
+		$this->assertTrue($results instanceof Collection);
 
 		$results = $group->tests();
-		$this->assertTrue($results->current() instanceof \lithium\tests\cases\g11n\CatalogTest);
+		$this->assertTrue($results->current() instanceof CatalogTest);
 	}
 
 	public function testAddEmptyTestsRun() {
@@ -110,8 +109,8 @@ class GroupTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$results = $group->tests();
-		$this->assertTrue($results instanceof \lithium\util\Collection);
-		$this->assertTrue($results->current() instanceof \lithium\tests\mocks\test\MockUnitTest);
+		$this->assertTrue($results instanceof Collection);
+		$this->assertTrue($results->current() instanceof MockUnitTest);
 
 		$results = $group->tests()->run();
 

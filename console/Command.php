@@ -265,7 +265,7 @@ class Command extends \lithium\core\Object {
 	 * also get passed down to the `out()` method, which allow custom formatting. Passing something
 	 * like `$this->columns($output, array('style' => 'red)` would print the table in red.
 	 *
-	 * @see \lithium\console\Response::styles()
+	 * @see lithium\console\Response::styles()
 	 * @param array $rows The rows to print, with each column as an array element.
 	 * @param array $options Optional params:
 	 *      - separator : Different column separator, defaults to `\t`

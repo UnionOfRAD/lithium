@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\console;
 
 use lithium\console\Request;
+use lithium\console\Response;
 use lithium\tests\mocks\console\MockCommand;
 
 class CommandTest extends \lithium\test\Unit {
@@ -38,8 +39,7 @@ class CommandTest extends \lithium\test\Unit {
 		$response = $command('testRun');
 
 		$result = $response;
-		$expected = 'lithium\console\Response';
-		$this->assertTrue($result instanceof $expected);
+		$this->assertTrue($result instanceof Response);
 
 		$expected = 'testRun';
 		$result = $response->testAction;
