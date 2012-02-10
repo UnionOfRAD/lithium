@@ -301,9 +301,8 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			$data = $model::connection()->cast($this, $data, compact('pathKey'));
 		}
 
-		$className = __CLASS__;
 		foreach ($data as $key => $value) {
-			if ($value instanceof $className) {
+			if ($value instanceof self) {
 				if (!$options['init']) {
 					$value->_exists = false;
 				}
