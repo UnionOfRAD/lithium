@@ -26,7 +26,7 @@ class EncryptTest extends \lithium\test\Unit {
 		$this->mock = 'lithium\tests\mocks\storage\session\strategy\MockCookieSession';
 		MockCookieSession::reset();
 	}
-	
+
 	public function testConstructException() {
 		$this->expectException('/Encrypt strategy requires a secret key./');
 		$encrypt = new Encrypt();
@@ -94,7 +94,6 @@ class EncryptTest extends \lithium\test\Unit {
 		$result = $encrypt->read($key, array('class' => $this->mock));
 		$this->assertFalse($result);
 	}
-
 }
 
 ?>

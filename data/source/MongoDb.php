@@ -569,7 +569,7 @@ class MongoDb extends \lithium\data\Source {
 		$options += $defaults;
 
 		$grid = $this->connection->getGridFS();
-		
+
 		return $grid->remove($conditions, $options);
 	}
 
@@ -810,7 +810,7 @@ class MongoDb extends \lithium\data\Source {
 			$options['schema'] = $options['schema'] ?: $entity->schema();
 			$model = $entity->model();
 
-			if (is_a($entity, $this->_classes['entity'])) {
+			if ($entity instanceof $this->_classes['entity']) {
 				$exists = $entity->exists();
 			}
 		}

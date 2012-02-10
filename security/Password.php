@@ -193,7 +193,12 @@ class Password {
 			$output .= $base64[$c2 & 0x3f];
 		} while (1);
 
-		return '$2a$' . chr(ord('0') + $count / static::BF) . chr(ord('0') + $count % static::BF) . '$' . $output;
+		$result = '$2a$';
+		$result .= chr(ord('0') + $count / static::BF);
+		$result .= chr(ord('0') + $count % static::BF);
+		$result .= '$' . $output;
+
+		return $result;
 	}
 
 	/**

@@ -15,18 +15,18 @@ class DispatcherTest extends \lithium\test\Unit {
 
 	public function testRunDefaults() {
 		$report = Dispatcher::run();
-		$this->assertTrue(is_a($report, '\lithium\test\Report'));
+		$this->assertTrue($report instanceof \lithium\test\Report);
 
 		$result = $report->group;
-		$this->assertTrue(is_a($result, '\lithium\test\Group'));
+		$this->assertTrue($result instanceof \lithium\test\Group);
 	}
 
 	public function testRunWithReporter() {
 		$report = Dispatcher::run(null, array('reporter' => 'html'));
-		$this->assertTrue(is_a($report, '\lithium\test\Report'));
+		$this->assertTrue($report instanceof \lithium\test\Report);
 
 		$result = $report->group;
-		$this->assertTrue(is_a($result, '\lithium\test\Group'));
+		$this->assertTrue($result instanceof \lithium\test\Group);
 	}
 
 	public function testRunCaseWithString() {

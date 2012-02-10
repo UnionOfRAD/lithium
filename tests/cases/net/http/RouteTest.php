@@ -304,8 +304,10 @@ class RouteTest extends \lithium\test\Unit {
 			'template' => '/images/image_{:width}x{:height}.{:format}',
 			'params' => array('format' => 'png')
 		));
-		
-		$pattern = '@^/images/image_(?P<width>[^\\/]+)x(?P<height>[^\\/]+)\\.(?P<format>[^\\/]+)?$@';
+
+		$pattern = '@^/images/image_(?P<width>[^\\/]+)x(?P<height>';
+		$pattern .= '[^\\/]+)\\.(?P<format>[^\\/]+)?$@';
+
 		$expected = array(
 			'template' => '/images/image_{:width}x{:height}.{:format}',
 			'pattern' => $pattern,

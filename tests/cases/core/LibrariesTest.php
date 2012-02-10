@@ -87,7 +87,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$all = Libraries::find('lithium', array('recursive' => true));
 		$result = array_values(preg_grep('/^lithium\\\\tests\\\\cases\\\\/', $all));
 		$this->assertIdentical($tests, $result);
-		
+
 		if ($this->hasApp) {
 			$tests = Libraries::find('app', array('recursive' => true, 'path' => '/tests/cases'));
 			$result = preg_grep('/^app\\\\tests\\\\cases\\\\/', $tests);
@@ -115,7 +115,8 @@ class LibrariesTest extends \lithium\test\Unit {
 		);
 
 		if (!$this->hasApp) {
-			$expected['resources'] = str_replace('\\', '/', realpath(realpath(LITHIUM_LIBRARY_PATH) . '/lithium/resources'));
+			$path = realpath(realpath(LITHIUM_LIBRARY_PATH) . '/lithium/resources');
+			$expected['resources'] = str_replace('\\', '/', $path);
 			$expected['default'] = true;
 		}
 
@@ -125,7 +126,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$result = Libraries::get();
 		$this->assertTrue(isset($result['lithium']));
 		$this->assertEqual($expected, $result['lithium']);
-		
+
 		if ($this->hasApp) {
 			$this->assertTrue(isset($result['app']));
 		}
@@ -351,7 +352,7 @@ class LibrariesTest extends \lithium\test\Unit {
 
 	public function testServiceLocateInstantiation() {
 		$result = Libraries::instance('adapter.template.view', 'Simple');
-		$this->assertTrue(is_a($result, 'lithium\template\view\adapter\Simple'));
+		$this->assertTrue($result instanceof \lithium\template\view\adapter\Simple);
 		$this->expectException("Class `Foo` of type `adapter.template.view` not found.");
 		$result = Libraries::instance('adapter.template.view', 'Foo');
 	}

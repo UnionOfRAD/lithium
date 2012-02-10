@@ -139,7 +139,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 
 	public function export() {
 		foreach ($this->_updated as $key => $val) {
-			if (is_a($val, __CLASS__)) {
+			if ($val instanceof self) {
 				$path = $this->_pathKey ? "{$this->_pathKey}." : '';
 				$this->_updated[$key]->_pathKey = "{$path}{$key}";
 			}
@@ -152,7 +152,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *
 	 * @param mixed $id
 	 * @param array $data
-	 * @param array Options when calling this method:
+	 * @param array $options Options when calling this method:
 	 *              - `'recursive'` _boolean_: If `true` attempts to sync nested objects as well.
 	 *                Otherwise, only syncs the current object. Defaults to `true`.
 	 * @return void
@@ -303,8 +303,9 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			$data = $model::connection()->cast($this, $data, compact('pathKey'));
 		}
 
+		$className = __CLASS__;
 		foreach ($data as $key => $value) {
-			if (is_a($value, __CLASS__)) {
+			if ($value instanceof $className) {
 				if (!$options['init']) {
 					$value->_exists = false;
 				}
