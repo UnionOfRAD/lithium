@@ -37,7 +37,8 @@ $bootstrap = function() use ($working) {
 	lithium\core\Libraries::add('lithium');
 	lithium\core\Libraries::add(basename($working), array(
 		'default' => true,
-		'path' => $working
+		'path' => $working,
+		'resources' => sys_get_temp_dir()
 	));
 };
 
