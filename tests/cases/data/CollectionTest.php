@@ -65,14 +65,6 @@ class CollectionTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests Collection with invalid data.
-	 */
-	public function testInvalidData() {
-		$this->expectException('Error creating new Collection instance; data format invalid.');
-		$collection = new DocumentSet(array('data' => 'foo'));
-	}
-
-	/**
 	 * Tests Collection accessors (getters/setters).
 	 */
 	public function testAccessorMethods() {
