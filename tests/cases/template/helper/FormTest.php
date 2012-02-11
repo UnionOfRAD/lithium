@@ -55,7 +55,7 @@ class FormTest extends \lithium\test\Unit {
 		$this->context = new MockFormRenderer(compact('request'));
 		$this->form = new Form(array('context' => $this->context));
 
-		$this->base = trim($this->context->request()->env('base'), '/') . '/';
+		$this->base = $this->context->request()->env('base') . '/';
 	}
 
 	public function tearDown() {
