@@ -121,8 +121,7 @@ class RecordSetTest extends \lithium\test\Unit {
 		$recordSet = new MockRecordSet();
 		$this->assertEqual(array(), $recordSet->data());
 
-		$this->expectException();
-		$this->_recordSet[5];
+		$this->assertNull($this->_recordSet[5]);
 	}
 
 	public function testWithNoIndexes() {
@@ -160,8 +159,7 @@ class RecordSetTest extends \lithium\test\Unit {
 		$this->assertEqual(4, $result->id);
 		$this->assertEqual('data4', $result->data);
 
-		$this->expectException();
-		$this->_objectRecordSet[5];
+		$this->assertNull($this->_objectRecordSet[5]);
 	}
 
 	public function testOffsetGetBackwards() {
@@ -262,8 +260,7 @@ class RecordSetTest extends \lithium\test\Unit {
 		$this->_objectRecordSet[0];
 		unset($this->_objectRecordSet[1]);
 
-		$this->expectException();
-		$this->_objectRecordSet[1];
+		$this->assertNull($this->_objectRecordSet[1]);
 
 		$result = $this->_objectRecordSet[2];
 		$this->assertEqual(2, $result->id);
@@ -350,13 +347,14 @@ class RecordSetTest extends \lithium\test\Unit {
 
 	public function testNextWithWhile() {
 		$counter = 0;
+
 		while ($record = $this->_recordSet->next()) {
 			$this->assertEqual($this->_records[$counter], $record->to('array'));
 			$counter++;
 		}
 
-
 		$counter = 0;
+
 		while ($record = $this->_objectRecordSet->next()) {
 			$this->assertEqual($this->_objectRecords[$counter]->id, $record->id);
 			$this->assertEqual($this->_objectRecords[$counter]->data, $record->data);

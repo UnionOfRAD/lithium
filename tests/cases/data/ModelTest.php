@@ -535,20 +535,8 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testModelWithNoBackend() {
 		$this->assertEqual('mock-source', MockPost::meta('connection'));
-		MockPost::config(array('connection' => false));
-		$this->assertFalse(MockPost::meta('connection'));
-		$schema = MockPost::schema();
-
-		MockPost::overrideSchema($this->_altSchema);
-		$this->assertEqual($this->_altSchema, MockPost::schema());
-
-		$post = MockPost::create(array('title' => 'New post'));
-		$this->assertTrue($post instanceof Entity);
-		$this->assertEqual('New post', $post->title);
-		MockPost::overrideSchema($schema);
-
-		$this->expectException('/Connection name not defined/');
-		$post->save();
+		$this->expectException('/^The data connection `invalid` is not configured.$/');
+		MockPost::config(array('connection' => 'invalid'));
 	}
 
 	public function testSave() {

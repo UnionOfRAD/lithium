@@ -85,20 +85,14 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	public function testDescribe() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$this->expectException('/companies is not available/');
-		$result = $couchdb->describe('companies');
-		$this->assertNull($result);
+		$this->assertNull($couchdb->describe('companies'));
 	}
 
 	public function testItem() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$data = array(
-			'_id' => 'a1', '_rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1'
-		);
-		$expected = array(
-			'id' => 'a1', 'rev' => '1-2',
-			'author' => 'author 1', 'body' => 'body 1'
-		);
+		$data = array('_id' => 'a1', '_rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1');
+		$expected = array('id' => 'a1', 'rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1');
+
 		$item = $couchdb->item($this->query->model(), $data);
 		$result = $item->data();
 		$this->assertEqual($expected, $result);

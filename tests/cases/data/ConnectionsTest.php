@@ -17,8 +17,8 @@ use lithium\data\source\database\adapter\MySql;
 class ConnectionsTest extends \lithium\test\Unit {
 
 	public $config = array(
-		'type'     => 'database',
-		'adapter'  => 'MySql',
+		'type'     => 'Mock',
+		'adapter'  => null,
 		'host'     => 'localhost',
 		'login'    => '--user--',
 		'password' => '--pass--',
@@ -28,7 +28,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 	protected $_backup = array();
 
 	public function setUp() {
-		if (empty($this->_backup)) {
+		if (!$this->_backup) {
 			foreach (Connections::get() as $conn) {
 				$this->_backup[$conn] = Connections::get($conn, array('config' => true));
 			}
@@ -38,33 +38,22 @@ class ConnectionsTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		Connections::reset();
-		foreach ($this->_backup as $name => $config) {
-			Connections::add($name, $config);
-		}
+		Connections::config($this->_backup);
 	}
 
 	public function testConnectionCreate() {
-		$result = Connections::add('conn-test', array('type' => 'database') + $this->config);
-		$expected = $this->config + array('type' => 'database');
+		$result = Connections::add('conn-test', array('type' => 'Mock') + $this->config);
+		$expected = $this->config + array('type' => 'Mock');
 		$this->assertEqual($expected, $result);
 
-		$this->skipIf(!MySql::enabled(), 'MySql is not enabled');
-		$this->skipIf(!$this->_canConnect('localhost', 3306), 'Cannot connect to localhost:3306');
-
-		$this->expectException('/mysql_get_server_info/');
-		$this->expectException('/mysql_select_db/');
-		$this->expectException('/mysql_pconnect/');
 		$result = Connections::get('conn-test');
-		$this->assertTrue($result instanceof MySql);
+		$this->assertTrue($result instanceof Mock);
 
 		$result = Connections::add('conn-test-2', $this->config);
 		$this->assertEqual($expected, $result);
 
-		$this->expectException('/mysql_get_server_info/');
-		$this->expectException('/mysql_select_db/');
-		$this->expectException('/mysql_pconnect/');
 		$result = Connections::get('conn-test-2');
-		$this->assertTrue($result instanceof MySql);
+		$this->assertTrue($result instanceof Mock);
 	}
 
 	public function testConnectionGetAndReset() {
@@ -88,17 +77,11 @@ class ConnectionsTest extends \lithium\test\Unit {
 		Connections::add('conn-test', $this->config);
 		Connections::add('conn-test-2', $this->config);
 
-		$this->skipIf(!MySql::enabled(), 'MySql is not enabled');
-		$this->skipIf(!$this->_canConnect('localhost', 3306), 'Cannot connect to localhost:3306');
-
-		$this->expectException('/mysql_get_server_info/');
-		$this->expectException('/mysql_select_db/');
-		$this->expectException('/mysql_pconnect/');
 		$result = Connections::get('conn-test');
-		$this->assertTrue($result instanceof MySql);
+		$this->assertTrue($result instanceof Mock);
 
 		$result = Connections::get('conn-test');
-		$this->assertTrue($result instanceof MySql);
+		$this->assertTrue($result instanceof Mock);
 
 		$this->assertNull(Connections::get('conn-test-2', array('autoCreate' => false)));
 	}
