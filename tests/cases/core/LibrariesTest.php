@@ -182,7 +182,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$fakeDir = $tmpDir . '/fake';
 		$fake = "<?php class Fake {} ?>";
 		$fakeFilename = $fakeDir . '/fake.php';
-		mkdir($fakeDir);
+		mkdir($fakeDir, 0777, true);
 		file_put_contents($fakeFilename, $fake);
 
 		Libraries::add('bad', array(
@@ -563,7 +563,7 @@ class LibrariesTest extends \lithium\test\Unit {
 
 	public function testLocateWithTestAppLibrary() {
 		$testApp = Libraries::get(true, 'resources') . '/tmp/tests/test_app';
-		mkdir($testApp);
+		mkdir($testApp, 0777, true);
 		Libraries::add('test_app', array('path' => $testApp));
 
 		mkdir($testApp . '/tests/cases/models', 0777, true);

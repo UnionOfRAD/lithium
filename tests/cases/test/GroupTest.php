@@ -139,11 +139,11 @@ class GroupTest extends \lithium\test\Unit {
 	}
 
 	public function testAddTestAppGroup() {
-		$test_app = Libraries::get(true, 'resources') . '/tmp/tests/test_app';
-		mkdir($test_app);
-		Libraries::add('test_app', array('path' => $test_app));
+		$testApp = Libraries::get(true, 'resources') . '/tmp/tests/test_app';
+		mkdir($testApp, 0777, true);
+		Libraries::add('test_app', array('path' => $testApp));
 
-		mkdir($test_app . '/tests/cases/models', 0777, true);
+		mkdir($testApp . '/tests/cases/models', 0777, true);
 		file_put_contents($test_app . '/tests/cases/models/UserTest.php',
 		"<?php namespace test_app\\tests\\cases\\models;\n
 			class UserTest extends \\lithium\\test\\Unit { public function testMe() {
