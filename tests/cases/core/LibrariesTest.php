@@ -116,8 +116,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		);
 
 		if (!$this->hasApp) {
-			$path = realpath(realpath(LITHIUM_LIBRARY_PATH) . '/lithium/resources');
-			$expected['resources'] = str_replace('\\', '/', $path);
+			$expected['resources'] = sys_get_temp_dir();
 			$expected['default'] = true;
 		}
 
