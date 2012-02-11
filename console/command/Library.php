@@ -340,11 +340,13 @@ class Library extends \lithium\console\Command {
 	 */
 	public function install($name = null) {
 		$results = array();
+
 		foreach ($this->_settings['servers'] as $server => $enabled) {
-			if (!$enabled) { continue; }
-			$service = $this->_instance('service', array(
-				'host' => $server, 'port' => $this->port
-			));
+			if (!$enabled) {
+				continue;
+			}
+			$service = $this->_instance('service', array('host' => $server, 'port' => $this->port));
+
 			if ($plugin = json_decode($service->get("lab/{$name}.json"))) {
 				break;
 			}
@@ -382,12 +384,12 @@ class Library extends \lithium\console\Command {
 			$url = parse_url($source);
 
 			if (!empty($url['scheme']) && $url['scheme'] == 'git' && $hasGit()) {
-				$result = shell_exec(
-					"cd {$this->path} && git clone {$source} {$plugin->name}"
-				);
+				$cmd = "cd {$this->path} && git clone --quiet {$source} {$plugin->name}";
+				$result = shell_exec($cmd);
+
 				if (is_dir("{$this->path}/{$plugin->name}")) {
 					$this->out("{$plugin->name} installed to {$this->path}/{$plugin->name}");
-					$this->out("Remember to update the bootstrap.");
+					$this->out("Remember to update your bootstrap.");
 					return true;
 				}
 			}

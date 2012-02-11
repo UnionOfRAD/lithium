@@ -389,10 +389,7 @@ class LibraryTest extends \lithium\test\Unit {
 
 	public function testNoInstalLab() {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
-		$this->skipIf(
-			ini_get('phar.readonly') == '1',
-			'Relies on ' . __CLASS__  . '::testPush()'
-		);
+		$this->skipIf(ini_get('phar.readonly') == '1', 'Relies on ' . __CLASS__  . '::testPush()');
 		$this->library->path = $this->_testPath;
 		$result = $this->library->install('li3_lab');
 
@@ -406,9 +403,8 @@ class LibraryTest extends \lithium\test\Unit {
 	}
 
 	public function testInstallDocs() {
-		$this->skipIf(strpos(shell_exec('git --version'), 'git version') === false,
-			'Git is not installed.'
-		);
+		$hasGit = strpos(shell_exec('git --version'), 'git version');
+		$this->skipIf($hasGit === false, 'Git is not installed.');
 
 		$message = "No internet connection established.";
 		$this->skipIf(!$this->_hasNetwork(), $message);
