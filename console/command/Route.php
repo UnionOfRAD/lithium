@@ -7,8 +7,9 @@
  */
 namespace lithium\console\command;
 
-use lithium\net\http\Router;
+use lithium\core\Libraries;
 use lithium\action\Request;
+use lithium\net\http\Router;
 use lithium\core\Environment;
 
 /**
@@ -33,10 +34,10 @@ class Route extends \lithium\console\Command {
 	 * Load the routes file and set the environment.
 	 *
 	 * @param array $config The default configuration, wherein the absolute path to the routes file
-	 *              to load may be specified, using the `'routes_file'` key.
+	 *              to load may be specified, using the `'routes'` key.
 	 */
 	public function __construct($config = array()) {
-		$defaults = array('routes_file' => LITHIUM_APP_PATH . '/config/routes.php');
+		$defaults = array('routes' => Libraries::get(true, 'path') . '/config/routes.php');
 		parent::__construct($config + $defaults);
 	}
 
@@ -44,8 +45,8 @@ class Route extends \lithium\console\Command {
 		parent::_init();
 		Environment::set($this->env);
 
-		if (file_exists($this->_config['routes_file'])) {
-			return require $this->_config['routes_file'];
+		if (file_exists($this->_config['routes'])) {
+			return require $this->_config['routes'];
 		}
 		$this->error("The routes file for this library doesn't exist or can't be found.");
 	}

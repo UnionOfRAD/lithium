@@ -11,6 +11,7 @@ namespace lithium\tests\cases\console\command;
 use lithium\console\command\Route;
 use lithium\console\Request;
 use lithium\net\http\Router;
+use lithium\core\Libraries;
 
 /**
  * The RouteTest class tests the "li3 route" command.
@@ -22,7 +23,7 @@ class RouteTest extends \lithium\test\Unit {
 	 *
 	 * @var array
 	 */
-	protected $_config = array('routes_file' => '');
+	protected $_config = array('routes' => null);
 
 	/**
 	 * Holds the temporary test path.
@@ -35,7 +36,12 @@ class RouteTest extends \lithium\test\Unit {
 	 * Set the testPath and check if it is writable (skip if not).
 	 */
 	public function skip() {
-		$this->_testPath = LITHIUM_APP_PATH . '/resources/tmp/tests';
+		$path = Libraries::get(true, 'resources');
+
+		if (is_writable($path) && !is_dir("{$path}/tmp/tests")) {
+			mkdir("{$path}/tmp/test", 0777, true);
+		}
+		$this->_testPath = "{$path}/tmp/tests";
 		$this->skipIf(!is_writable($this->_testPath), "{$this->_testPath} is not writable.");
 	}
 
@@ -43,7 +49,7 @@ class RouteTest extends \lithium\test\Unit {
 	 * Create a temporary routes.php file for testing and reset the router.
 	 */
 	public function setUp() {
-		$this->_config['routes_file'] = "{$this->_testPath}/routes.php";
+		$this->_config['routes'] = "{$this->_testPath}/routes.php";
 
 		$testParams = 'array("controller" => "lithium\test\Controller")';
 		$content = array(
@@ -58,7 +64,7 @@ class RouteTest extends \lithium\test\Unit {
 			'}',
 			'?>'
 		);
-		file_put_contents($this->_config['routes_file'], join("\n", $content));
+		file_put_contents($this->_config['routes'], join("\n", $content));
 
 		Router::reset();
 	}
@@ -67,8 +73,8 @@ class RouteTest extends \lithium\test\Unit {
 	 * Delete the temporary routes.php file.
 	 */
 	public function tearDown() {
-		if (file_exists($this->_config['routes_file'])) {
-			unlink($this->_config['routes_file']);
+		if (file_exists($this->_config['routes'])) {
+			unlink($this->_config['routes']);
 		}
 	}
 
@@ -77,15 +83,14 @@ class RouteTest extends \lithium\test\Unit {
 	 * and if overriding works as expected.
 	 */
 	public function testEnvironment() {
-		$command = new Route();
+		$command = new Route(array('routes' => $this->_config['routes']));
 		$expected = 'development';
 		$this->assertEqual($expected, $command->env);
 
 		$request = new Request();
 		$request->params['env'] = 'production';
-		$command = new Route(array('request' => $request));
-		$expected = 'production';
-		$this->assertEqual($expected, $command->env);
+		$command = new Route(compact('request') + array('routes' => $this->_config['routes']));
+		$this->assertEqual('production', $command->env);
 	}
 
 	/**
@@ -95,17 +100,14 @@ class RouteTest extends \lithium\test\Unit {
 	public function testRouteLoading() {
 		$this->assertFalse(Router::get());
 
-		$command = new Route(array('routes_file' => $this->_config['routes_file']));
+		$command = new Route(array('routes' => $this->_config['routes']));
 		$this->assertEqual(4, count(Router::get()));
 
 		Router::reset();
 
 		$request = new Request();
 		$request->params['env'] = 'production';
-		$command = new Route(array(
-			'routes_file' => $this->_config['routes_file'],
-			'request' => $request
-		));
+		$command = new Route(compact('request') + array('routes' => $this->_config['routes']));
 		$this->assertEqual(2, count(Router::get()));
 	}
 
@@ -118,8 +120,8 @@ class RouteTest extends \lithium\test\Unit {
 	 */
 	public function testAllWithoutEnvironment() {
 		$command = new Route(array(
-			'routes_file' => $this->_config['routes_file'],
-			'classes' => array('response' => '\lithium\tests\mocks\console\MockResponse'),
+			'routes' => $this->_config['routes'],
+			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse'),
 			'request' => new Request()
 		));
 
@@ -145,10 +147,9 @@ class RouteTest extends \lithium\test\Unit {
 		$request->params = array(
 			'env' => 'production'
 		);
-		$command = new Route(array(
-			'routes_file' => $this->_config['routes_file'],
-			'classes' => array('response' => '\lithium\tests\mocks\console\MockResponse'),
-			'request' => $request
+		$command = new Route(compact('request') + array(
+			'routes' => $this->_config['routes'],
+			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse')
 		));
 
 		$command->all();
@@ -164,8 +165,8 @@ class RouteTest extends \lithium\test\Unit {
 	 */
 	public function testRun() {
 		$command = new Route(array(
-			'routes_file' => $this->_config['routes_file'],
-			'classes' => array('response' => '\lithium\tests\mocks\console\MockResponse'),
+			'routes' => $this->_config['routes'],
+			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse'),
 			'request' => new Request()
 		));
 
@@ -184,8 +185,8 @@ class RouteTest extends \lithium\test\Unit {
 	 */
 	public function testShowWithNoRoute() {
 		$command = new Route(array(
-			'routes_file' => $this->_config['routes_file'],
-			'classes' => array('response' => '\lithium\tests\mocks\console\MockResponse'),
+			'routes' => $this->_config['routes'],
+			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse'),
 			'request' => new Request()
 		));
 
@@ -203,10 +204,9 @@ class RouteTest extends \lithium\test\Unit {
 		$request->params = array(
 			'args' => array('/foobar')
 		);
-		$command = new Route(array(
-			'routes_file' => $this->_config['routes_file'],
-			'classes' => array('response' => '\lithium\tests\mocks\console\MockResponse'),
-			'request' => $request
+		$command = new Route(compact('request') + array(
+			'routes' => $this->_config['routes'],
+			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse'),
 		));
 		$command->show();
 
@@ -220,10 +220,9 @@ class RouteTest extends \lithium\test\Unit {
 	public function testShowWithValidRoute() {
 		$request = new Request();
 		$request->params = array('args' => array('/'));
-		$command = new Route(array(
-			'routes_file' => $this->_config['routes_file'],
-			'classes' => array('response' => '\lithium\tests\mocks\console\MockResponse'),
-			'request' => $request
+		$command = new Route(compact('request') + array(
+			'routes' => $this->_config['routes'],
+			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse'),
 		));
 		$command->show();
 
@@ -240,10 +239,9 @@ class RouteTest extends \lithium\test\Unit {
 			'env' => 'production',
 			'args' => array('/test')
 		);
-		$command = new Route(array(
-			'routes_file' => $this->_config['routes_file'],
-			'classes' => array('response' => '\lithium\tests\mocks\console\MockResponse'),
-			'request' => $request
+		$command = new Route(compact('request') + array(
+			'routes' => $this->_config['routes'],
+			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse'),
 		));
 
 		$command->show();
@@ -262,10 +260,9 @@ class RouteTest extends \lithium\test\Unit {
 		$request->params = array(
 			'args' => array('post', '/')
 		);
-		$command = new Route(array(
-			'routes_file' => $this->_config['routes_file'],
-			'classes' => array('response' => '\lithium\tests\mocks\console\MockResponse'),
-			'request' => $request
+		$command = new Route(compact('request') + array(
+			'routes' => $this->_config['routes'],
+			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse'),
 		));
 
 		$command->show();
