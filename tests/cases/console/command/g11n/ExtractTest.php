@@ -31,16 +31,15 @@ class ExtractTest extends \lithium\test\Unit {
 		Catalog::reset();
 
 		$this->command = new Extract(array(
-				'request' => new Request(array('input' => fopen('php://temp', 'w+'))),
-				'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse')
-			));
+			'request' => new Request(array('input' => fopen('php://temp', 'w+'))),
+			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse')
+		));
 		mkdir($this->command->source = "{$this->_path}/source");
 		mkdir($this->command->destination = "{$this->_path}/destination");
 	}
 
 	public function tearDown() {
 		Catalog::config($this->_backup['catalogConfig']);
-
 		$this->_cleanUp();
 	}
 
@@ -53,7 +52,7 @@ class ExtractTest extends \lithium\test\Unit {
 
 	public function testInit() {
 		$command = new Extract();
-		$this->assertEqual(LITHIUM_APP_PATH, $command->source);
+		$this->assertEqual(Libraries::get(true, 'path'), $command->source);
 		$this->assertEqual(Libraries::get(true, 'resources') . '/g11n', $command->destination);
 	}
 
@@ -120,7 +119,7 @@ EOD;
 		$expected = '/msgid "Apples are green\."/';
 		$this->assertPattern($expected, $result);
 
-		$expected = '#/resources/tmp/tests/source(/|\\\\)a.html.php:2#';
+		$expected = '#/tmp/tests/source(/|\\\\)a.html.php:2#';
 		$this->assertPattern($expected, $result);
 
 		$result = $this->command->response->error;
