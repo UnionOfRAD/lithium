@@ -196,7 +196,7 @@ class MediaTest extends \lithium\test\Unit {
 	}
 
 	public function testMultiLibraryAssetPaths() {
-		$result = Media::asset('path/file', 'js', array('library' => 'app', 'base' => '/app/base'));
+		$result = Media::asset('path/file', 'js', array('library' => true, 'base' => '/app/base'));
 		$expected = '/app/base/js/path/file.js';
 		$this->assertEqual($expected, $result);
 
@@ -220,22 +220,44 @@ class MediaTest extends \lithium\test\Unit {
 		$expected = '/base/path/file.js';
 		$this->assertEqual($expected, $result);
 
+		$resources = Libraries::get(true, 'resources');
+		$cssPath = "{$resources}/media_test/webroot/css";
+		$this->skipIf(!is_writable($resources), "Cannot write test app to resources directory.");
+
+		if (!is_dir($cssPath)) {
+			mkdir($cssPath, 0777, true);
+		}
+
+		Libraries::add('media_test', array('path' => "{$resources}/media_test"));
+
 		$result = Media::asset('/foo/bar', 'js', array('base' => '/base', 'check' => true));
 		$this->assertFalse($result);
 
-		$result = Media::asset('/css/debug', 'css', array('base' => '/base', 'check' => true));
+		file_put_contents("{$cssPath}/debug.css", "html, body { background-color: black; }");
+		$result = Media::asset('/css/debug', 'css', array(
+			'library' => 'media_test', 'base' => '/base', 'check' => true
+		));
 		$expected = '/base/css/debug.css';
 		$this->assertEqual($expected, $result);
 
-		$result = Media::asset('/css/debug.css', 'css', array('base' => '/base', 'check' => true));
+		$result = Media::asset('/css/debug.css', 'css', array(
+			'library' => 'media_test', 'base' => '/base', 'check' => true
+		));
 		$expected = '/base/css/debug.css';
 		$this->assertEqual($expected, $result);
 
 		$result = Media::asset('/css/debug.css?foo', 'css', array(
-			'base' => '/base', 'check' => true
+			'library' => 'media_test', 'base' => '/base', 'check' => true
 		));
 		$expected = '/base/css/debug.css?foo';
 		$this->assertEqual($expected, $result);
+
+		Libraries::remove('media_test');
+		unlink("{$cssPath}/debug.css");
+
+		foreach (array($cssPath, dirname($cssPath)) as $path) {
+			rmdir($path);
+		}
 	}
 
 	public function testRender() {
@@ -510,12 +532,24 @@ class MediaTest extends \lithium\test\Unit {
 	}
 
 	public function testGetLibraryWebroot() {
-		$this->assertTrue(is_dir(Media::webroot(true)));
 		$this->assertNull(Media::webroot('foobar'));
 
 		Libraries::add('foobar', array('path' => __DIR__, 'webroot' => __DIR__));
 		$this->assertEqual(__DIR__, Media::webroot('foobar'));
 		Libraries::remove('foobar');
+
+		$resources = Libraries::get(true, 'resources');
+		$webroot = "{$resources}/media_test/webroot";
+		$this->skipIf(!is_writable($resources), "Cannot write test app to resources directory.");
+
+		if (!is_dir($webroot)) {
+			mkdir($webroot, 0777, true);
+		}
+
+		Libraries::add('media_test', array('path' => "{$resources}/media_test"));
+		$this->assertTrue(is_dir(Media::webroot('media_test')));
+		Libraries::remove('media_test');
+		rmdir($webroot);
 	}
 
 	/**
