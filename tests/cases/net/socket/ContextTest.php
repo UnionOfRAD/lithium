@@ -68,7 +68,7 @@ class ContextTest extends \lithium\test\Unit {
 	}
 
 	public function testMessageInConfig() {
-		$socket = new Context($this->_testConfig + array('message' => new Request()));
+		$socket = new Context(array('message' => new Request($this->_testConfig)));
 		$this->assertTrue(is_resource($socket->open()));
 	}
 
