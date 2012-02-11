@@ -55,8 +55,7 @@ class FormTest extends \lithium\test\Unit {
 		$this->context = new MockFormRenderer(compact('request'));
 		$this->form = new Form(array('context' => $this->context));
 
-		$base = trim($this->context->request()->env('base'), '/') . '/';
-		$this->base = ($base == '/') ? $base : '/' . $base;
+		$this->base = trim($this->context->request()->env('base'), '/') . '/';
 	}
 
 	public function tearDown() {
@@ -69,9 +68,9 @@ class FormTest extends \lithium\test\Unit {
 
 	public function testFormCreation() {
 		$result = $this->form->create();
-		$this->assertTags($result, array(
-			'form' => array('action' => "{$this->base}posts", 'method' => 'post')
-		));
+		$this->assertTags($result, array('form' => array(
+			'action' => "{$this->base}posts", 'method' => 'post'
+		)));
 
 		$result = $this->form->create(null, array('method' => 'get'));
 		$this->assertTags($result, array(
