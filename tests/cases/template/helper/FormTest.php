@@ -162,8 +162,6 @@ class FormTest extends \lithium\test\Unit {
 	}
 
 	public function testFormDataBinding() {
-		$this->expectException('The data connection default is not configured');
-
 		try {
 			MockFormPost::config(array('connection' => false));
 		} catch (Exception $e) {
