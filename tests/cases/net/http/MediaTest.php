@@ -148,7 +148,8 @@ class MediaTest extends \lithium\test\Unit {
 		$result = Media::asset('this.file.should.not.exist', 'css', array('check' => true));
 		$this->assertFalse($result);
 
-		$result = Media::asset('debug', 'css', array('check' => 'true', 'library' => 'app'));
+		$this->skipIf(!Libraries::get(true, 'webroot'), "No webroot directory in default library.");
+		$result = Media::asset('debug', 'css', array('check' => 'true', 'library' => true));
 		$expected = '/css/debug.css';
 		$this->assertEqual($expected, $result);
 
