@@ -18,7 +18,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->_session = isset($_SESSION) ? $_SESSION : array();
 		$this->_destroySession();
 
-		$this->Php = new Php();
+		$this->php = new Php();
 		$this->_destroySession();
 
 		/* Garbage collection */
@@ -50,7 +50,7 @@ class PhpTest extends \lithium\test\Unit {
 	}
 
 	public function testEnabled() {
-		$php = $this->Php;
+		$php = $this->php;
 		$this->_destroySession(session_name());
 		$this->assertFalse($php::enabled());
 	}
@@ -106,38 +106,38 @@ class PhpTest extends \lithium\test\Unit {
 	}
 
 	public function testIsStarted() {
-		$result = $this->Php->isStarted();
+		$result = $this->php->isStarted();
 		$this->assertFalse($result);
 
-		$this->Php->read();
+		$this->php->read();
 
-		$result = $this->Php->isStarted();
+		$result = $this->php->isStarted();
 		$this->assertTrue($result);
 
 		$this->_destroySession(session_name());
-		$result = $this->Php->isStarted();
+		$result = $this->php->isStarted();
 		$this->assertFalse($result);
 	}
 
 	public function testIsStartedNoInit() {
 		$this->_destroySession(session_name());
 
-		$Php = new Php(array('init' => false));
-		$result = $Php->isStarted();
+		$php = new Php(array('init' => false));
+		$result = $php->isStarted();
 		$this->assertFalse($result);
 
-		$Php = new Php();
-		$Php->read();
-		$result = $Php->isStarted();
+		$php = new Php();
+		$php->read();
+		$result = $php->isStarted();
 		$this->assertTrue($result);
 	}
 
 	public function testKey() {
-		$result = $this->Php->key();
+		$result = $this->php->key();
 		$this->assertEqual(session_id(), $result);
 
 		$this->_destroySession(session_name());
-		$result = $this->Php->key();
+		$result = $this->php->key();
 		$this->assertNull($result);
 	}
 
@@ -145,91 +145,91 @@ class PhpTest extends \lithium\test\Unit {
 		$key = 'write-test';
 		$value = 'value to be written';
 
-		$closure = $this->Php->write($key, $value);
+		$closure = $this->php->write($key, $value);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key', 'value');
-		$result = $closure($this->Php, $params, null);
+		$result = $closure($this->php, $params, null);
 
 		$this->assertEqual($_SESSION[$key], $value);
 	}
 
 	public function testRead() {
-		$this->Php->read();
+		$this->php->read();
 
 		$key = 'read_test';
 		$value = 'value to be read';
 
 		$_SESSION[$key] = $value;
 
-		$closure = $this->Php->read($key);
+		$closure = $this->php->read($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Php, $params, null);
+		$result = $closure($this->php, $params, null);
 
 		$this->assertIdentical($value, $result);
 
 		$key = 'non-existent';
-		$closure = $this->Php->read($key);
+		$closure = $this->php->read($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Php, $params, null);
+		$result = $closure($this->php, $params, null);
 		$this->assertNull($result);
 
-		$closure = $this->Php->read();
+		$closure = $this->php->read();
 		$this->assertTrue(is_callable($closure));
 
-		$result = $closure($this->Php, array('key' => null), null);
+		$result = $closure($this->php, array('key' => null), null);
 		$expected = array('read_test' => 'value to be read');
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testCheck() {
-		$this->Php->read();
+		$this->php->read();
 
 		$key = 'read';
 		$value = 'value to be read';
 		$_SESSION[$key] = $value;
 
-		$closure = $this->Php->check($key);
+		$closure = $this->php->check($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Php, $params, null);
+		$result = $closure($this->php, $params, null);
 		$this->assertTrue($result);
 
 		$key = 'does_not_exist';
-		$closure = $this->Php->check($key);
+		$closure = $this->php->check($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Php, $params, null);
+		$result = $closure($this->php, $params, null);
 		$this->assertFalse($result);
 	}
 
 	public function testDelete() {
-		$this->Php->read();
+		$this->php->read();
 
 		$key = 'delete_test';
 		$value = 'value to be deleted';
 
 		$_SESSION[$key] = $value;
 
-		$closure = $this->Php->delete($key);
+		$closure = $this->php->delete($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Php, $params, null);
+		$result = $closure($this->php, $params, null);
 		$this->assertTrue($result);
 
 		$key = 'non-existent';
-		$closure = $this->Php->delete($key);
+		$closure = $this->php->delete($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Php, $params, null);
+		$result = $closure($this->php, $params, null);
 		$this->assertTrue($result);
 	}
 
@@ -239,54 +239,54 @@ class PhpTest extends \lithium\test\Unit {
 	public function testClear() {
 		$_SESSION['foo'] = 'bar';
 		$this->assertFalse(empty($_SESSION));
-		$closure = $this->Php->clear();
+		$closure = $this->php->clear();
 		$this->assertTrue(is_callable($closure));
-		$result = $closure($this->Php, array(), null);
+		$result = $closure($this->php, array(), null);
 		$this->assertTrue(empty($_SESSION));
 	}
 
 	public function testCheckThrowException() {
-		$Php = new MockPhp(array('init' => false));
+		$php = new MockPhp(array('init' => false));
 		$this->expectException('/Could not start session./');
-		$Php->check('whatever');
+		$php->check('whatever');
 	}
 
 	public function testReadThrowException() {
-		$Php = new MockPhp(array('init' => false));
+		$php = new MockPhp(array('init' => false));
 		$this->expectException('/Could not start session./');
-		$Php->read('whatever');
+		$php->read('whatever');
 	}
 
 	public function testWriteThrowException() {
-		$Php = new MockPhp(array('init' => false));
+		$php = new MockPhp(array('init' => false));
 		$this->expectException('/Could not start session./');
-		$Php->write('whatever', 'value');
+		$php->write('whatever', 'value');
 	}
 
 	public function testDeleteThrowException() {
-		$Php = new MockPhp(array('init' => false));
+		$php = new MockPhp(array('init' => false));
 		$this->expectException('/Could not start session./');
-		$Php->delete('whatever');
+		$php->delete('whatever');
 	}
 
 	public function testReadDotSyntax() {
-		$this->Php->read();
+		$this->php->read();
 
 		$key = 'dot';
 		$value = array('syntax' => array('key' => 'value'));
 
 		$_SESSION[$key] = $value;
 
-		$closure = $this->Php->read($key);
+		$closure = $this->php->read($key);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key');
-		$result = $closure($this->Php, $params, null);
+		$result = $closure($this->php, $params, null);
 
 		$this->assertIdentical($value, $result);
 
 		$params = array('key' => 'dot.syntax');
-		$result = $closure($this->Php, $params, null);
+		$result = $closure($this->php, $params, null);
 
 		$this->assertIdentical($value['syntax'], $result);
 	}
@@ -295,11 +295,11 @@ class PhpTest extends \lithium\test\Unit {
 		$key = 'dot.syntax';
 		$value = 'value to be written';
 
-		$closure = $this->Php->write($key, $value);
+		$closure = $this->php->write($key, $value);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key', 'value');
-		$result = $closure($this->Php, $params, null);
+		$result = $closure($this->php, $params, null);
 
 		$this->assertEqual($_SESSION['dot']['syntax'], $value);
 	}

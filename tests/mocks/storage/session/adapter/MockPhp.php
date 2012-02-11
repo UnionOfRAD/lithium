@@ -18,7 +18,7 @@ class MockPhp extends \lithium\storage\session\adapter\Php {
 	 *
 	 * @return boolean false.
 	 */
-	protected static function _startup() {
+	protected static function _start() {
 		return false;
 	}
 }
