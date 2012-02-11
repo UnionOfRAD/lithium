@@ -18,7 +18,16 @@ use lithium\tests\mocks\analysis\MockLoggerAdapter;
 class LoggerTest extends \lithium\test\Unit {
 
 	public function skip() {
-		$this->_testPath = Libraries::get(true, 'resources') . '/tmp/tests';
+		$path = Libraries::get(true, 'resources');
+
+		if (is_writable($path)) {
+			foreach (array("{$path}/tmp/tests", "{$path}/tmp/logs") as $dir) {
+				if (!is_dir($dir)) {
+					mkdir($dir, 0777, true);
+				}
+			}
+		}
+		$this->_testPath = "{$path}/tmp/tests";
 		$this->skipIf(!is_writable($this->_testPath), "{$this->_testPath} is not readable.");
 	}
 
