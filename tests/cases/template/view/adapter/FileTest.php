@@ -61,7 +61,14 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertFalse(isset($file['title']));
 	}
 
+	/**
+	 * @todo Rewrite this test to generate a temporary template in the resources
+	 *       directory.
+	 */
 	public function testTemplateLocating() {
+		$path = Libraries::get(true, 'path') . '/views/pages/home.html.php';
+		$this->skipIf(!file_exists($path), 'No default app template.');
+
 		$file = new File(array('paths' => array(
 			'template' => '{:library}/views/{:controller}/{:template}.{:type}.php'
 		)));
