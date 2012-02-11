@@ -518,8 +518,13 @@ class UnitTest extends \lithium\test\Unit {
 	public function testExpectExceptionPostNotThrown() {
 		$result = end($this->_results);
 		$expected = 'testExpectExceptionNotThrown';
-		$this->assertEqual($expected, $result['method'],
-			'expectException in a method with no exception should result in a failed test.');
+		$msg = 'expectException in a method with no exception should result in a failed test.';
+
+		$this->assertEqual($expected, $result['method'], $msg);
+		$this->assertEqual('fail', $result['result'], $msg);
+		$this->assertEqual('Expected exception matching `test` uncaught.', $result['message']);
+
+		unset($this->_results[key($this->_results)]);
 	}
 
 	public function testGetTest() {
@@ -638,7 +643,7 @@ class UnitTest extends \lithium\test\Unit {
 	 *
 	 */
 	public function testResults() {
-		$expected = 105;
+		$expected = 107;
 		$result = count($this->results());
 		$this->assertEqual($expected, $result);
 	}

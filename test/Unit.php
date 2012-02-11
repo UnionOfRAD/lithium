@@ -707,11 +707,23 @@ class Unit extends \lithium\core\Object {
 			try {
 				$method = $params['method'];
 				$lineFlag = __LINE__ + 1;
-				$self->$method();
+				$self->{$method}();
 			} catch (Exception $e) {
 				$self->invokeMethod('_handleException', array($e));
 			}
 		});
+
+		foreach ($this->_expected as $expected) {
+			$this->_result('fail', compact('method') + array(
+				'class' => get_class($this),
+				'message' => "Expected exception matching `{$expected}` uncaught.",
+				'data' => array(),
+				'file' => null,
+				'line' => null,
+				'assertion' => 'expectException'
+			));
+		}
+		$this->_expected = array();
 		$this->tearDown();
 
 		return $passed;

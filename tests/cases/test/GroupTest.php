@@ -144,7 +144,7 @@ class GroupTest extends \lithium\test\Unit {
 		Libraries::add('test_app', array('path' => $testApp));
 
 		mkdir($testApp . '/tests/cases/models', 0777, true);
-		file_put_contents($test_app . '/tests/cases/models/UserTest.php',
+		file_put_contents($testApp . '/tests/cases/models/UserTest.php',
 		"<?php namespace test_app\\tests\\cases\\models;\n
 			class UserTest extends \\lithium\\test\\Unit { public function testMe() {
 				\$this->assertTrue(true);
