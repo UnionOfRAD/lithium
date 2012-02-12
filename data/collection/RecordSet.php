@@ -185,7 +185,9 @@ class RecordSet extends \lithium\data\Collection {
 		$return = null;
 
 		if ($this->_valid) {
-			$this->_pointer++;
+			if (count($this->_data) > 1) {
+				$this->_pointer++;
+			}
 			$return = $this->current();
 		}
 		return $return;
