@@ -1120,7 +1120,7 @@ class Model extends \lithium\core\StaticObject {
 
 				foreach ($chain->next($self, $params, $chain) as $entity) {
 					$key = $entity->{$name};
-					$result[is_scalar($key) ? $key : (string) $key] = $entity->{$meta['title']};
+					$result[is_scalar($key) ? $key : (string) $key] = $entity->title();
 				}
 				return $result;
 			},

@@ -35,7 +35,9 @@ class MockComment extends \lithium\tests\mocks\data\MockBase {
 			return new RecordSet(array(
 				'query'    => $query,
 				'data'    => array_map(
-					function($data) { return new Record(compact('data')); },
+					function($data) {
+						return new Record(compact('data') + array('model' => __CLASS__));
+					},
 					array(
 						array('comment_id' => 1, 'author_id' => 123, 'text' => 'First comment'),
 						array('comment_id' => 2, 'author_id' => 241, 'text' => 'Second comment'),
