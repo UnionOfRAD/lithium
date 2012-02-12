@@ -519,6 +519,24 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * The `title()` method is invoked whenever an `Entity` object is cast or coerced
+	 * to a string. This method can also be called on the entity directly, i.e. `$post->title()`.
+	 *
+	 * By default, when generating the title for an object, it uses the the field specified in
+	 * the `'title'` key of the model's meta data definition. Override this method to generate
+	 * custom titles for objects of this model's type.
+	 *
+	 * @see lithium\data\Model::$_meta
+	 * @see lithium\data\Entity::__toString()
+	 * @param object $entity The `Entity` instance on which the title method is called.
+	 * @return string Returns the title representation of the entity on which this method is called.
+	 */
+	public function title($entity) {
+		$field = static::meta('title');
+		return $entity->{$field};
+	}
+
+	/**
 	 * If no values supplied, returns the name of the `Model` key. If values
 	 * are supplied, returns the key value.
 	 *
