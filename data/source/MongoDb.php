@@ -136,11 +136,15 @@ class MongoDb extends \lithium\data\Source {
 	 * list of active connections.
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array(
+		$host = 'localhost:27017';
+
+		if (class_exists('Mongo', false)) {
+			$host = Mongo::DEFAULT_HOST . ':' . Mongo::DEFAULT_PORT;
+		}
+		$defaults = compact('host') + array(
 			'persistent' => false,
 			'login'      => null,
 			'password'   => null,
-			'host'       => Mongo::DEFAULT_HOST . ':' . Mongo::DEFAULT_PORT,
 			'database'   => null,
 			'timeout'    => 100,
 			'replicaSet' => false,
