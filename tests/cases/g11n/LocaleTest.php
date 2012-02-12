@@ -269,7 +269,9 @@ class LocaleTest extends \lithium\test\Unit {
 	}
 
 	public function testPreferredFromConsoleRequestLang() {
-		$request = new ConsoleRequest(array('env' => array('LANG' => 'es_ES@euro')));
+		$request = new ConsoleRequest(array('env' => array(
+			'LANG' => 'es_ES@euro', 'LANGUAGE' => null, 'LC_ALL' => null
+		)));
 		$result = Locale::preferred($request);
 		$this->assertEqual('es_ES', $result);
 	}
