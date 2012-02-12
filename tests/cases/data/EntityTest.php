@@ -108,7 +108,7 @@ class EntityTest extends \lithium\test\Unit {
 	 */
 	public function testStringCasting() {
 		$model = $this->_model;
-		$old = $model::meta('title');
+		$old = $model::meta('title') ?: 'title';
 
 		$model::meta('title', 'firstName');
 		$object = new Entity(compact('model'));
