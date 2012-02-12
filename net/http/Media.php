@@ -436,7 +436,7 @@ class Media extends \lithium\core\StaticObject {
 			$options = $params['options'];
 			$library = $options['library'];
 
-			if (preg_match('/^[a-z0-9-]+:\/\//i', $path)) {
+			if (preg_match('/^(?:[a-z0-9-]+:)?\/\//i', $path)) {
 				return $path;
 			}
 			$config = Libraries::get($library);

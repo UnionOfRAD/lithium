@@ -141,6 +141,10 @@ class MediaTest extends \lithium\test\Unit {
 		$expected = 'scheme://host/subpath/file';
 		$this->assertEqual($expected, $result);
 
+		$result = Media::asset('//host/subpath/file', 'js', array('base' => '/base'));
+		$expected = '//host/subpath/file';
+		$this->assertEqual($expected, $result);
+
 		$result = Media::asset('subpath/file', 'js');
 		$expected = '/js/subpath/file.js';
 		$this->assertEqual($expected, $result);
