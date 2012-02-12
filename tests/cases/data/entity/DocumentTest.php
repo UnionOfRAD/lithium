@@ -623,6 +623,8 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 
 	public function testArrayConversion() {
+		$this->skipIf(!MongoDb::enabled(), "MongoDB not enabled, skipping conversion tests.");
+
 		$doc = new Document(array('data' => array(
 			'id' => new MongoId(),
 			'date' => new MongoDate()
