@@ -19,9 +19,7 @@ class MessageTest extends \lithium\test\Unit {
 	}
 
 	public function testHeaderKey() {
-		$expected = array(
-			'Host: localhost:80'
-		);
+		$expected = array('Host: localhost:80');
 		$result = $this->message->headers('Host: localhost:80');
 		$this->assertEqual($expected, $result);
 
@@ -34,9 +32,7 @@ class MessageTest extends \lithium\test\Unit {
 	}
 
 	public function testHeaderKeyValue() {
-		$expected = array(
-			'Connection: Close'
-		);
+		$expected = array('Connection: Close');
 		$result = $this->message->headers('Connection', 'Close');
 		$this->assertEqual($expected, $result);
 	}
@@ -48,10 +44,24 @@ class MessageTest extends \lithium\test\Unit {
 	}
 
 	public function testHeaderArrayKeyValue() {
-		$expected = array(
-			'Cache-Control: no-cache'
-		);
+		$expected = array('Cache-Control: no-cache');
 		$result = $this->message->headers(array('Cache-Control' => 'no-cache'));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testMultiValueHeader() {
+		$expected = array(
+			'Cache-Control: no-store, no-cache, must-revalidate',
+			'Cache-Control: post-check=0, pre-check=0',
+			'Cache-Control: max-age=0'
+		);
+		$result = $this->message->headers(array(
+			'Cache-Control' => array(
+				'no-store, no-cache, must-revalidate',
+				'post-check=0, pre-check=0',
+				'max-age=0'
+			)
+		));
 		$this->assertEqual($expected, $result);
 	}
 

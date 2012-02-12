@@ -120,6 +120,12 @@ class Message extends \lithium\net\Message {
 		$headers = array();
 
 		foreach ($this->headers as $key => $value) {
+			if (is_array($value)) {
+				foreach ($value as $val) {
+					$headers[] = "{$key}: {$val}";
+				}
+				continue;
+			}
 			$headers[] = "{$key}: {$value}";
 		}
 		return $headers;

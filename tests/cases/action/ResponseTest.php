@@ -71,7 +71,16 @@ class ResponseTest extends \lithium\test\Unit {
 
 		$this->response->body = 'Created';
 		$this->response->status(201);
-		$this->response->cache(false);
+		$result = $this->response->cache(false);
+
+		$expected = array(
+			'Expires: Mon, 26 Jul 1997 05:00:00 GMT',
+			'Cache-Control: no-store, no-cache, must-revalidate',
+			'Cache-Control: post-check=0, pre-check=0',
+			'Cache-Control: max-age=0',
+			'Pragma: no-cache'
+		);
+		$this->assertEqual($expected, $result);
 
 		ob_start();
 		$this->response->render();
