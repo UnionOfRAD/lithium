@@ -372,7 +372,7 @@ class Form extends \lithium\core\Object {
 			$result[$to] = isset($data[$from]) ? $data[$from] : null;
 
 			if (!isset($this->_filters[$from])) {
-				$result[$to] = !is_scalar($result[$to]) ? strval($result[$to]) : $result[$to];
+				$result[$to] = is_scalar($result[$to]) ? $result[$to] : null;
 				continue;
 			}
 			if ($this->_filters[$from] === false) {

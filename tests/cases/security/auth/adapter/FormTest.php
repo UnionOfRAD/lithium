@@ -183,7 +183,7 @@ class FormTest extends \lithium\test\Unit {
 		));
 
 		$result = $subject->check($request);
-		$this->assertEqual('Array', $result['username']);
+		$this->assertNull($result['username']);
 	}
 
 	/**
