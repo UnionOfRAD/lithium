@@ -98,9 +98,6 @@ class ResponseTest extends \lithium\test\Unit {
 			'Pragma: no-cache'
 		);
 		$this->assertEqual($headers, $this->response->testHeaders);
-
-		$this->expectException('/^`Request::disableCache\(\)`.+`Request::cache\(false\)`/');
-		$this->response->disableCache();
 	}
 
 	/**
