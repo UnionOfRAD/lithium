@@ -4,6 +4,9 @@ php:
   - 5.3
   - 5.4
 
+before_script:
+    - ./tests/ci_depends.sh
+
 script: console/li3 test tests/cases
 
 notifications:
