@@ -61,12 +61,13 @@ class EntityTest extends \lithium\test\Unit {
 	public function testMethodDispatch() {
 		$model = $this->_model;
 		$data = array('foo' => true);
+
 		$entity = new Entity(compact('model', 'data'));
 		$this->assertTrue($entity->validates());
 
-		$model::instanceMethods(array(
-			'testInstanceMethod' => function($entity) { return 'testInstanceMethod'; }
-		));
+		$model::instanceMethods(array('testInstanceMethod' => function($entity) {
+			return 'testInstanceMethod';
+		}));
 		$this->assertEqual('testInstanceMethod', $entity->testInstanceMethod($entity));
 
 		$this->expectException("/^No model bound or unhandled method call `foo`.$/");
@@ -100,6 +101,25 @@ class EntityTest extends \lithium\test\Unit {
 		$data = array('foo' => 'bar', 'baz' => 'dib');
 		$entity->set($data);
 		$this->assertEqual(array('foo' => true, 'baz' => true), $entity->modified());
+	}
+
+	/**
+	 * Tests that an entity can be cast to a string based on its bound model's meta data.
+	 */
+	public function testStringCasting() {
+		$model = $this->_model;
+		$old = $model::meta('title');
+
+		$model::meta('title', 'firstName');
+		$object = new Entity(compact('model'));
+
+		$object->firstName = 'Bob';
+		$this->assertEqual('Bob', (string) $object);
+
+		$object->firstName = 'Rob';
+		$this->assertEqual('Rob', (string) $object);
+
+		$model::meta('title', $old);
 	}
 }
 
