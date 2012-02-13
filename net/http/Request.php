@@ -89,6 +89,15 @@ class Request extends \lithium\net\http\Message {
 		$this->headers($config['headers']);
 	}
 
+	/**
+	 * Add body parts and encodes it into formated string
+	 *
+	 * @see lithium\net\Message::body()
+	 * @param mixed $data
+	 * @param array $options
+	 *        - `'buffer'`: split the body string
+	 * @return array
+	 */
 	public function body($data = null, $options = array()) {
 		$default = array('buffer' => null);
 		$options += $default;

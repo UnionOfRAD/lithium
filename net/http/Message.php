@@ -159,6 +159,13 @@ class Message extends \lithium\net\Message {
 		return $this->_type = $type;
 	}
 
+	/**
+	 * Encodes the body based on the type
+	 *
+	 * @see lithium\net\http\Message::type()
+	 * @param mixed $body
+	 * @return string
+	 */
 	protected function _encode($body) {
 		$media = $this->_classes['media'];
 		if($type = $media::type($this->_type)) {
@@ -170,6 +177,12 @@ class Message extends \lithium\net\Message {
 		return $body;
 	}
 
+	/**
+	 * Decodes the body based on the type
+	 *
+	 * @param string $body
+	 * @return mixed
+	 */
 	protected function _decode($body) {
 		$media = $this->_classes['media'];
 		if($type = $media::type($this->_type)) {
