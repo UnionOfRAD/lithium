@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\data\source;
 
 class Images extends \lithium\data\Model {
 
-	protected $_meta = array('connection' => 'test');
+	protected $_meta = array('connection' => 'lithium_mysql_test');
 
 	public $belongsTo = array('Galleries');
 }
