@@ -121,6 +121,20 @@ class Response extends \lithium\net\http\Message {
 	}
 
 	/**
+	 * Decodes the body based on the type
+	 *
+	 * @param string $body
+	 * @return mixed
+	 */
+	protected function _decode($body) {
+		$media = $this->_classes['media'];
+		if($type = $media::type($this->_type)) {
+			$body = $media::decode($this->_type, $body) ?: $body;
+		}
+		return $body;
+	}
+
+	/**
 	 * Set and get the status for the response.
 	 *
 	 * @param string $key

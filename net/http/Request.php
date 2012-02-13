@@ -90,6 +90,24 @@ class Request extends \lithium\net\http\Message {
 	}
 
 	/**
+	 * Encodes the body based on the type
+	 *
+	 * @see lithium\net\http\Message::type()
+	 * @param mixed $body
+	 * @return string
+	 */
+	protected function _encode($body) {
+		$media = $this->_classes['media'];
+		if($type = $media::type($this->_type)) {
+			$body = $media::encode($this->_type, $body) ?: $body;
+		}
+		if(is_array($body)) {
+			$body = join("\r\n", $body);
+		}
+		return $body;
+	}
+
+	/**
 	 * Add body parts and encodes it into formated string
 	 *
 	 * @see lithium\net\Message::body()

@@ -158,38 +158,5 @@ class Message extends \lithium\net\Message {
 		$this->headers('Content-Type', $contentType);
 		return $this->_type = $type;
 	}
-
-	/**
-	 * Encodes the body based on the type
-	 *
-	 * @see lithium\net\http\Message::type()
-	 * @param mixed $body
-	 * @return string
-	 */
-	protected function _encode($body) {
-		$media = $this->_classes['media'];
-		if($type = $media::type($this->_type)) {
-			$body = $media::encode($this->_type, $body) ?: $body;
-		}
-		if(is_array($body)) {
-			$body = join("\r\n", $body);
-		}
-		return $body;
-	}
-
-	/**
-	 * Decodes the body based on the type
-	 *
-	 * @param string $body
-	 * @return mixed
-	 */
-	protected function _decode($body) {
-		$media = $this->_classes['media'];
-		if($type = $media::type($this->_type)) {
-			$body = $media::decode($this->_type, $body) ?: $body;
-		}
-		return $body;
-	}
 }
-
 ?>
