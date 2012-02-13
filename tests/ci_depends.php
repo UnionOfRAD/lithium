@@ -3,7 +3,6 @@
 <?php
 
 set_time_limit(0);
-ini_set('phar.readonly', 0);
 
 $installer = new PhpExtensions();
 
@@ -13,12 +12,10 @@ if (isset($argv[1]) && 'APC' === strtoupper($argv[1])) {
     $installer->install('xcache');
 }
 
-$installer->install('memcache');
 $installer->install('memcached');
 $installer->install('mongo');
 
-class PhpExtensions
-{
+class PhpExtensions {
     protected $extensions;
     protected $phpVersion;
     protected $iniPath;
@@ -27,12 +24,6 @@ class PhpExtensions
         $this->phpVersion = phpversion();
         $this->iniPath = php_ini_loaded_file();
         $this->extensions = array(
-        'memcache' => array(
-            'url' => 'http://pecl.php.net/get/memcache-2.2.6.tgz',
-            'php_version' => array(),
-            'cfg' => array('--enable-memcache'),
-            'ini' => array('extension=memcache.so'),
-        ),
         'memcached' => array(
             'url' => 'http://pecl.php.net/get/memcached-1.0.2.tgz',
             'php_version' => array(
@@ -66,8 +57,8 @@ class PhpExtensions
                 'extension=xcache.so',
                 'xcache.cacher=false',
                 'xcache.admin.enable_auth=0',
-                'xcache.var_size=1M',
-            ),
+                'xcache.var_size=1M'
+            )
 		),
 		'mongo' => array(
 			'url' => 'http://pecl.php.net/get/mongo-1.2.7.tgz',
@@ -83,7 +74,6 @@ class PhpExtensions
         if (array_key_exists($name, $this->extensions)) {
             $extension = $this->extensions[$name];
 
-
             echo "== extension: $name ==\n";
 
             foreach ($extension['php_version'] as $version) {
@@ -94,7 +84,6 @@ class PhpExtensions
                         $version[1],
                         $this->phpVersion
                     );
-
                     return;
                 }
             }
