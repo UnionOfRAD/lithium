@@ -77,7 +77,9 @@ class MongoDbTest extends \lithium\test\Unit {
 		$model::config(array('key' => '_id'));
 		$model::$connection = $this->db;
 
-		$this->query = new Query(compact('model') + array('entity' => new Document(compact('model'))));
+		$this->query = new Query(compact('model') + array(
+			'entity' => new Document(compact('model'))
+		));
 	}
 
 	public function tearDown() {
@@ -485,24 +487,25 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function testMongoIdPreservation() {
 		$model = $this->_model;
-		$model::resetSchema(true);
-		$model::config(array('locked' => false));
+		$model::config(array('source' => 'ordered_docs'));
+		$mongo = new MongoDb($this->_testConfig);
+		$model::$connection = $mongo;
 
-		$post = $model::create(array('_id' => new MongoId(), 'title' => 'A post'));
+		$post = $model::create(array('title' => 'A post'));
 		$post->save();
-		$result = array_pop($this->db->connection->queries);
-		$data = $result['data'];
+		$id = $post->_id;
 
+		$data = $mongo->connection->ordered_docs->findOne(array('_id' => $id));
 		$this->assertEqual('A post', $data['title']);
+		$this->assertEqual($id, (string) $data['_id']);
 		$this->assertTrue($data['_id'] instanceof MongoId);
 
-		$post->sync();
 		$post->title = 'An updated post';
 		$post->save();
 
-		$result = array_pop($this->db->connection->queries);
-		$this->assertEqual(array('_id' => $post->_id), $result['conditions']);
-		$this->assertEqual(array('$set' => array('title' => 'An updated post')), $result['update']);
+		$data = $mongo->connection->ordered_docs->findOne(array('_id' => new MongoId($id)));
+		$this->assertEqual('An updated post', $data['title']);
+		$this->assertEqual($id, (string) $data['_id']);
 	}
 
 	public function testRelationshipGeneration() {
@@ -530,31 +533,31 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testCreateNoConnectionException() {
-		$db = new MongoDb(array('host' => '__invalid__', 'autoConnect' => false));
+		$db = new MongoDb(array('host' => '__invalid__'));
 		$this->expectException('Could not connect to the database.');
 		$result = $db->create(null);
 	}
 
 	public function testReadNoConnectionException() {
-		$db = new MongoDb(array('host' => '__invalid__', 'autoConnect' => false));
+		$db = new MongoDb(array('host' => '__invalid__'));
 		$this->expectException('Could not connect to the database.');
 		$result = $db->read(null);
 	}
 
 	public function testUpdateNoConnectionException() {
-		$db = new MongoDb(array('host' => '__invalid__', 'autoConnect' => false));
+		$db = new MongoDb(array('host' => '__invalid__'));
 		$this->expectException('Could not connect to the database.');
 		$result = $db->update(null);
 	}
 
 	public function testDeleteNoConnectionException() {
-		$db = new MongoDb(array('host' => '__invalid__', 'autoConnect' => false));
+		$db = new MongoDb(array('host' => '__invalid__'));
 		$this->expectException('Could not connect to the database.');
 		$result = $db->delete(null);
 	}
 
 	public function testSourcesNoConnectionException() {
-		$db = new MongoDb(array('host' => null, 'autoConnect' => false));
+		$db = new MongoDb(array('host' => null));
 		$this->expectException('Could not connect to the database.');
 		$result = $db->sources(null);
 	}
@@ -566,10 +569,10 @@ class MongoDbTest extends \lithium\test\Unit {
 		$data = array('initial' => 'one', 'values' => 'two');
 
 		$this->db->connection = new MockMongoConnection();
-		$this->db->connection->results = array(true, true);
+		$this->db->connection->results = array(true);
 
 		$document = $model::create($data);
-		$this->assertTrue($document->save());
+		$document->save();
 
 		$duplicate = $model::create(array('_id' => $document->_id), array('exists' => true));
 		$duplicate->values = 'new';
@@ -592,6 +595,31 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$this->assertEqual($data + compact('_id'), $queries['insert']['data']);
 		$this->assertEqual(compact('_id'), $queries['find']['conditions']);
+		
+		//set schema in model and test if entity calls corresponding schema and casts correctly
+		$model::setSchema(array(
+			'_id' => array('type' => 'id'),
+			'foo' => array('type' => 'date', 'default' => ''),
+			'bar' => array('type' => 'date'),
+		));
+		$this->db->connection->results = array(true);
+
+		$document = $model::create();
+		$this->assertTrue($document->foo instanceof MongoDate);
+		$document->bar = '';
+		$this->assertTrue($document->bar instanceof MongoDate);
+		$this->assertTrue($document->save());
+		$data = array('foo' => new MongoDate(), 'bar' => new MongoDate());
+		array_push($this->db->connection->results, new MockResult(array(
+			'data' => array($data)
+		)));
+		$foundDocument = $model::first(array('conditions' => array('_id' => (string)$document->_id)));
+		$this->assertTrue($document->foo instanceof MongoDate);
+		$this->assertTrue($document->bar instanceof MongoDate);
+		//update founded document
+		$foundDocument->bar = '';
+		$this->assertTrue($foundDocument->bar instanceof MongoDate);
+		
 	}
 
 	/**
@@ -621,7 +649,11 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testCastingConditionsValues() {
-		$query = new Query(array('schema' => new Schema(array('fields' => $this->_schema))));
+		$model = $this->_model;
+		$model::setSchema($this->_schema);
+		
+		$query = new Query(compact('model'));
+		//$query = new Query(array('schema' => new Schema(array('fields' => $this->_schema))));
 
 		$conditions = array('_id' => new MongoId("4c8f86167675abfabdbe0300"));
 		$result = $this->db->conditions($conditions, $query);
@@ -661,6 +693,25 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual(2, count($result['$or']));
 		$this->assertTrue($result['$or'][0]['_id'] instanceof MongoId);
 		$this->assertTrue($result['$or'][1]['guid'] instanceof MongoId);
+		
+		//test cast conditional values with conditional operations
+		$conditions = array(
+			'title' => "foo",
+			'_id' => array('$ne' => "4c8f86167675abfabdbf0300"),
+		);
+		$result = $this->db->conditions($conditions, $query);
+		$this->assertEqual(2, count($result));
+		$this->assertEqual($result['title'], "foo");
+		$this->assertTrue($result['_id']['$ne'] instanceof MongoId);
+
+		$conditions = array(
+			'title' => "foo",
+			'_id' => array('!=' => "4c8f86167675abfabdbf0300"),
+		);
+		$result = $this->db->conditions($conditions, $query);
+		$this->assertEqual(2, count($result));
+		$this->assertEqual($result['title'], "foo");
+		$this->assertTrue($result['_id']['$ne'] instanceof MongoId);
 	}
 
 	public function testMultiOperationConditions() {

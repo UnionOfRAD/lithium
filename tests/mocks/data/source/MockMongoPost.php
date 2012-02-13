@@ -15,6 +15,11 @@ class MockMongoPost extends \lithium\tests\mocks\data\MockBase {
 	protected $_meta = array('source' => 'posts', 'connection' => false);
 
 	public static $connection;
+	
+	//allow to simply set protected schema array in mock
+	public static function setSchema(array $schema = array()) {
+		static::_object()->_schema = $schema;
+	}
 }
 
 ?>

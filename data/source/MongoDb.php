@@ -136,15 +136,11 @@ class MongoDb extends \lithium\data\Source {
 	 * list of active connections.
 	 */
 	public function __construct(array $config = array()) {
-		$host = 'localhost:27017';
-
-		if (class_exists('Mongo', false)) {
-			$host = Mongo::DEFAULT_HOST . ':' . Mongo::DEFAULT_PORT;
-		}
-		$defaults = compact('host') + array(
+		$defaults = array(
 			'persistent' => false,
 			'login'      => null,
 			'password'   => null,
+			'host'       => Mongo::DEFAULT_HOST . ':' . Mongo::DEFAULT_PORT,
 			'database'   => null,
 			'timeout'    => 100,
 			'replicaSet' => false,
@@ -682,11 +678,11 @@ class MongoDb extends \lithium\data\Source {
 			$operations = array();
 
 			foreach ($value as $op => $val) {
-				if (is_object($result = $this->_operator($model, $key, $op, $val, $schema))) {
+                if (is_object($result = $this->_operator($model, $key, $op, $val, $schema))) {
 					$operations = $result;
 					break;
 				}
-				$operations += $this->_operator($model, $key, $op, $val, $schema);
+                $operations += $result;
 			}
 			$conditions[$key] = $operations;
 		}
@@ -705,16 +701,17 @@ class MongoDb extends \lithium\data\Source {
 	protected function _operator($model, $key, $op, $value, $schema) {
 		$castOpts = compact('schema', 'model');
 		$castOpts += array('first' => true, 'arrays' => false, 'database' => $this);
-		$cast = function($pair) use ($model, &$schema, &$castOpts) {
+		$cast = function($value) use ($model, &$schema, &$castOpts) {
 			if (!$schema) {
-				return $castOpts['first'] ? reset($pair) : $pair;
+				return $value;
 			}
-			return $schema->cast($model, $pair, $castOpts);
+			return $schema->cast($model, $value, $castOpts);
 		};
 
-		switch (true) {
+        switch (true) {
 			case !isset($this->_operators[$op]):
-				return array($op => $cast(array($key => $value)));
+				$operator = $op;
+                break;
 			case is_callable($this->_operators[$op]):
 				return $this->_operators[$op]($key, $value);
 			case is_array($this->_operators[$op]):
@@ -722,10 +719,11 @@ class MongoDb extends \lithium\data\Source {
 				$operator = $this->_operators[$op][$format];
 			break;
 			default:
-				$operator = $this->_operators[$op];
+                $operator = $this->_operators[$op];
 			break;
 		}
-		return array($operator => $value);
+        $castOpts += array('pathKey' => $key);
+        return array($operator => $cast($value));
 	}
 
 	/**
