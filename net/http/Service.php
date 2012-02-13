@@ -210,22 +210,14 @@ class Service extends \lithium\core\Object {
 	protected function _request($method, $path, $data, $options) {
 		$defaults = array('type' => 'form');
 		$options += $defaults + $this->_config;
+
 		$request = $this->_instance('request', $options);
 		$request->path = str_replace('//', '/', "{$request->path}{$path}");
 		$request->method = $method = strtoupper($method);
+
 		$hasBody = in_array($method, array('POST', 'PUT'));
-
-		$media = $this->_classes['media'];
-		$type = null;
-
-		if ($data && in_array($options['type'], $media::types())) {
-			$type = $media::type($options['type']);
-			$contentType = (array) $type['content'];
-			$request->headers(array('Content-Type' => current($contentType)));
-			$data = $hasBody && !is_string($data) ?
-				Media::encode($options['type'], $data, $options) : $data;
-		}
 		$hasBody ? $request->body($data) : $request->query = $data;
+		$hasBody ? $request->type($options['type']) : null;
 		return $request;
 	}
 }

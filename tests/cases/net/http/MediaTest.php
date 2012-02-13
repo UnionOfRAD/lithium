@@ -271,7 +271,7 @@ class MediaTest extends \lithium\test\Unit {
 		Media::render($response, $data);
 
 		$result = $response->headers();
-		$this->assertEqual(array('Content-type: application/json; charset=UTF-8'), $result);
+		$this->assertEqual(array('Content-Type: application/json; charset=UTF-8'), $result);
 
 		$result = $response->body();
 		$this->assertEqual(json_encode($data), $result);
@@ -337,7 +337,7 @@ class MediaTest extends \lithium\test\Unit {
 		$expected .= 'Jane,Doe,"124 Main St.","Anytown, CA",91724' . "\n";
 		$this->assertEqual(array($expected), $result);
 
-		$result = $response->headers['Content-type'];
+		$result = $response->headers['Content-Type'];
 		$this->assertEqual('application/csv; charset=UTF-8', $result);
 	}
 

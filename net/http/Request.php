@@ -89,6 +89,15 @@ class Request extends \lithium\net\http\Message {
 		$this->headers($config['headers']);
 	}
 
+	public function body($data = null, $options = array()) {
+		$default = array('buffer' => null);
+		$options += $default;
+		$this->body = array_merge((array) $this->body, (array) $data);
+
+		$body = $this->_encode($this->body);
+		return ($options['buffer']) ? str_split($body, $options['buffer']) : $body;
+	}
+
 	/**
 	 * Get the full query string queryString.
 	 *
