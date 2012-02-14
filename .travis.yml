@@ -2,6 +2,7 @@ language: php
 
 env:
   - OPCODE_CACHE=apc
+ #- OPCODE_CACHE=xcache
 
 php:
   - 5.3
