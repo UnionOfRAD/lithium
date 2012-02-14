@@ -47,11 +47,10 @@ class PhpExtensions {
             ),
         ),
         'xcache' => array(
-            'url' => 'http://xcache.lighttpd.net/pub/Releases/1.2.2/xcache-1.2.2.tar.gz',
-            'php_version' => array(
-                // xcache does not build with Travis CI (as of 2012-01-09)
-                array('<', '5'),
-            ),
+            'url' => 'http://xcache.lighttpd.net/pub/Releases/1.3.2/xcache-1.3.2.tar.gz',
+			'php_version' => array(
+				array('<', '5.4')
+			),
             'cfg' => array('--enable-xcache'),
             'ini' => array(
                 'extension=xcache.so',
