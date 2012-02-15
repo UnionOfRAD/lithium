@@ -240,14 +240,24 @@ class Request extends \lithium\net\http\Message {
 				$this->headers('Authorization', "Basic {$auth}");
 			}
 		}
+
+		if(in_array($options['method'], array('POST', 'PUT'))) {
+			$media = $this->_classes['media'];
+			$contentType = $media::type($this->_type);
+			$contentType = is_array($contentType) ? reset($contentType) : $contentType;
+			$contentType = is_array($contentType) ? reset($contentType) : $contentType;
+			$this->headers('Content-Type', $contentType);
+		}
+
+		$body = $this->body($options['body']);
+		$this->headers('Content-Length', strlen($body));
+
 		switch ($format) {
 			case 'url':
 				$options['query'] = $this->queryString($options['query']);
 				$options['path'] = str_replace('//', '/', $options['path']);
 				return String::insert("{:scheme}://{:host}{:port}{:path}{:query}", $options);
 			case 'context':
-				$body = $this->body($options['body']);
-				$this->headers('Content-Length', strlen($body));
 				$base = array(
 					'content' => $body,
 					'method' => $options['method'],
@@ -259,8 +269,6 @@ class Request extends \lithium\net\http\Message {
 				return array('http' => array_diff_key($options, $defaults) + $base);
 			case 'string':
 				$path = str_replace('//', '/', $this->path) . $this->queryString($options['query']);
-				$body = $this->body();
-				$this->headers('Content-Length', strlen($body));
 				$status = "{$this->method} {$path} {$this->protocol}";
 				return join("\r\n", array($status, join("\r\n", $this->headers()), "", $body));
 			default:

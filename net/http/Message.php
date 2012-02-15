@@ -142,21 +142,16 @@ class Message extends \lithium\net\Message {
 		if ($type == null && $type !== false) {
 			return $this->_type;
 		}
+		if (strpos($type, '/')) {
+			$media = $this->_classes['media'];
 
-		$media = $this->_classes['media'];
-		if(!$data = $media::type($type)) {
-			return $this->_type = $type;
+			if (!$data = $media::type($type)) {
+				return $this->_type;
+			}
+			$type = is_array($data) ? reset($data) : $data;
 		}
-
-		if(is_array($data)) {
-			$contentType = reset($data);
-			$contentType = is_array($contentType) ? reset($contentType) : $contentType;
-		} else {
-			$contentType = $type = $data;
-		}
-
-		$this->headers('Content-Type', $contentType);
 		return $this->_type = $type;
 	}
 }
+
 ?>
