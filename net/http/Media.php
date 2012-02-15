@@ -249,7 +249,7 @@ class Media extends \lithium\core\StaticObject {
 			return compact('content') + array('options' => static::_handlers($type));
 		}
 		if ($content) {
-			static::$_types[$type] = $content;
+			static::$_types[$type] = (array)$content;
 		}
 		static::$_handlers[$type] = $options ? Set::merge($defaults, $options) : array();
 	}
@@ -581,7 +581,7 @@ class Media extends \lithium\core\StaticObject {
 			if (isset($types[$type])) {
 				$header = current((array) $types[$type]);
 				$header .= $response->encoding ? "; charset={$response->encoding}" : '';
-				$response->headers('Content-type', $header);
+				$response->headers('Content-Type', $header);
 			}
 			$response->body($self::invokeMethod('_handle', array($handler, $data, $response)));
 		});
@@ -756,12 +756,12 @@ class Media extends \lithium\core\StaticObject {
 			'html'         => array('text/html', 'application/xhtml+xml', '*/*'),
 			'htm'          => array('alias' => 'html'),
 			'form'         => array('application/x-www-form-urlencoded', 'multipart/form-data'),
-			'json'         => 'application/json',
-			'rss'          => 'application/rss+xml',
-			'atom'         => 'application/atom+xml',
-			'css'          => 'text/css',
+			'json'         => array('application/json'),
+			'rss'          => array('application/rss+xml'),
+			'atom'         => array('application/atom+xml'),
+			'css'          => array('text/css'),
 			'js'           => array('application/javascript', 'text/javascript'),
-			'text'         => 'text/plain',
+			'text'         => array('text/plain'),
 			'txt'          => array('alias' => 'text'),
 			'xml'          => array('application/xml', 'text/xml')
 		);

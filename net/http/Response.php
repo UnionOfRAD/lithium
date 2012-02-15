@@ -103,20 +103,35 @@ class Response extends \lithium\net\http\Message {
 		if ($this->_config['message']) {
 			$this->body = $this->_parseMessage($this->_config['message']);
 		}
+		if (isset($this->headers['Transfer-Encoding'])) {
+			$this->body = $this->_httpChunkedDecode($this->body);
+		}
 		if (isset($this->headers['Content-Type'])) {
 			$pattern = '/([-\w\/+]+)(;\s*?charset=(.+))?/i';
 			preg_match($pattern, $this->headers['Content-Type'], $match);
 
 			if (isset($match[1])) {
 				$this->type = trim($match[1]);
+				$this->body = $this->_decode($this->body);
 			}
 			if (isset($match[3])) {
 				$this->encoding = strtoupper(trim($match[3]));
 			}
 		}
-		if (isset($this->headers['Transfer-Encoding'])) {
-			$this->body = $this->_decode($this->body);
+	}
+
+	/**
+	 * Decodes the body based on the type
+	 *
+	 * @param string $body
+	 * @return mixed
+	 */
+	protected function _decode($body) {
+		$media = $this->_classes['media'];
+		if($type = $media::type($this->_type)) {
+			$body = $media::decode($this->_type, $body) ?: $body;
 		}
+		return $body;
 	}
 
 	/**
@@ -213,7 +228,7 @@ class Response extends \lithium\net\http\Message {
 	*         `Transfer-Encoding` header is set to `'chunked'`. Otherwise, returns `$body`
 	*         unmodified.
 	*/
-	protected function _decode($body) {
+	protected function _httpChunkedDecode($body) {
 		if (stripos($this->headers['Transfer-Encoding'], 'chunked') === false) {
 			return $body;
 		}

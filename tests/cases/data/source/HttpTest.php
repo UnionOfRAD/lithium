@@ -85,6 +85,7 @@ class HttpTest extends \lithium\test\Unit {
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
+			'Content-Type: application/x-www-form-urlencoded',
 			'', ''
 		));
 		$result = (string) $http->last->request;
@@ -113,6 +114,7 @@ class HttpTest extends \lithium\test\Unit {
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
+			'Content-Type: application/x-www-form-urlencoded',
 			'', ''
 		));
 		$result = (string) $http->last->request;
@@ -182,7 +184,6 @@ class HttpTest extends \lithium\test\Unit {
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
-			'Content-Type: application/x-www-form-urlencoded',
 			'', ''
 		));
 		$result = (string) $http->last->request;

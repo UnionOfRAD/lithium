@@ -41,7 +41,7 @@ class ControllerTest extends \lithium\test\Unit {
 
 		$this->assertTrue($result instanceof Response);
 		$this->assertEqual('List of posts', $result->body());
-		$this->assertEqual(array('Content-type' => 'text/plain; charset=UTF-8'), $result->headers);
+		$this->assertEqual(array('Content-Type' => 'text/plain; charset=UTF-8'), $result->headers);
 
 		$result2 = $postsController(null, array('action' => 'index', 'args' => array()));
 		$this->assertEqual($result2, $result);
@@ -53,7 +53,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertTrue($result instanceof Response);
 		$this->assertEqual($result->body, '');
 
-		$headers = array('Content-type' => 'text/html; charset=UTF-8');
+		$headers = array('Content-Type' => 'text/html; charset=UTF-8');
 		$this->assertEqual($result->headers, $headers);
 
 		$result = $postsController->access('_render');
@@ -65,7 +65,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertTrue($result instanceof Response);
 		$this->assertEqual($result->body, "Array\n(\n    [0] => This is a post\n)\n");
 
-		$headers = array('status' => 200, 'Content-type' => 'text/plain; charset=UTF-8');
+		$headers = array('status' => 200, 'Content-Type' => 'text/plain; charset=UTF-8');
 		$this->assertEqual($result->headers(), $headers);
 
 		$result = $postsController->access('_render');
@@ -253,7 +253,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = $postsController->access('_render');
 		$this->assertEqual($expected, $result);
 
-		$result = $postsController->response->headers('Content-type');
+		$result = $postsController->response->headers('Content-Type');
 		$this->assertEqual('application/json; charset=UTF-8', $result);
 
 		$result = json_decode($postsController->response->body(), true);
@@ -281,7 +281,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = $postsController->access('_render');
 		$this->assertEqual($expected, $result);
 
-		$result = $postsController->response->headers('Content-type');
+		$result = $postsController->response->headers('Content-Type');
 		$this->assertEqual('application/json; charset=UTF-8', $result);
 
 		$expected = array('data' => 'test');
@@ -343,7 +343,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = $postsController->access('_render');
 		$this->assertEqual($expected, $result);
 
-		$result = $postsController->response->headers('Content-type');
+		$result = $postsController->response->headers('Content-Type');
 		$this->assertEqual('application/json; charset=UTF-8', $result);
 
 		$result = json_decode($postsController->response->body(), true);
