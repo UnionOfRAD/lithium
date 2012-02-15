@@ -42,7 +42,7 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, Media::formats());
 
 		$result = Media::type('json');
-		$expected = 'application/json';
+		$expected = array('application/json');
 		$this->assertEqual($expected, $result['content']);
 
 		$expected = array(
@@ -57,7 +57,7 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertTrue(in_array('my', $result));
 
 		$result = Media::type('my');
-		$expected = 'text/x-my';
+		$expected = array('text/x-my');
 		$this->assertEqual($expected, $result['content']);
 
 		$expected = array(
@@ -90,7 +90,7 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual('json', Media::type('application/json; charset=UTF-8'));
 
 		$result = Media::type('json');
-		$expected = array('content' => 'application/json', 'options' => array(
+		$expected = array('content' => array('application/json'), 'options' => array(
 			'cast' => true, 'encode' => 'json_encode', 'decode' => $result['options']['decode']
 		));
 		$this->assertEqual($expected, $result);
@@ -517,7 +517,7 @@ class MediaTest extends \lithium\test\Unit {
 	 */
 	public function testTypeAliasResolution() {
 		$resolved = Media::type('text');
-		$this->assertEqual('text/plain', $resolved['content']);
+		$this->assertEqual(array('text/plain'), $resolved['content']);
 		unset($resolved['options']['encode']);
 
 		$result = Media::type('txt');

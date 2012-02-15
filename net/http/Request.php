@@ -240,13 +240,11 @@ class Request extends \lithium\net\http\Message {
 				$this->headers('Authorization', "Basic {$auth}");
 			}
 		}
-
 		if(in_array($options['method'], array('POST', 'PUT'))) {
 			$media = $this->_classes['media'];
-			$contentType = $media::type($this->_type);
-			$contentType = is_array($contentType) ? reset($contentType) : $contentType;
-			$contentType = is_array($contentType) ? reset($contentType) : $contentType;
-			$this->headers('Content-Type', $contentType);
+			if($type = $media::type($this->_type)) {
+				$this->headers('Content-Type', $type['content'][0]);
+			}
 		}
 
 		$body = $this->body($options['body']);
