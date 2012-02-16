@@ -8,8 +8,6 @@
 
 namespace lithium\action;
 
-use BadMethodCallException;
-
 /**
  * A `Response` object is typically instantiated automatically by the `Controller`. It is assigned
  * any headers set in the course of the request, as well as any content rendered by the

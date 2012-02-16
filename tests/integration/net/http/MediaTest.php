@@ -8,7 +8,6 @@
 
 namespace lithium\tests\integration\net\http;
 
-use lithium\template\View;
 use lithium\net\http\Media;
 use lithium\net\http\Response;
 
@@ -27,7 +26,7 @@ class MediaTest extends \lithium\test\Integration {
 				'layout' => false,
 				'template' => array(
 					'{:library}/tests/mocks/template/view/adapters/{:template}.{:type}.php',
-					'{:library}/tests/mocks/template/view/adapters/{:template}.html.php',
+					'{:library}/tests/mocks/template/view/adapters/{:template}.html.php'
 				)
 			)
 		));
@@ -59,7 +58,7 @@ class MediaTest extends \lithium\test\Integration {
 				'layout' => '{:library}/tests/mocks/template/view/adapters/testLayoutFile.html.php',
 				'template' => array(
 					'{:library}/tests/mocks/template/view/adapters/{:template}.{:type}.php',
-					'{:library}/tests/mocks/template/view/adapters/{:template}.html.php',
+					'{:library}/tests/mocks/template/view/adapters/{:template}.html.php'
 				)
 			)
 		));

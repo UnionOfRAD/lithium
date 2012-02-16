@@ -101,14 +101,14 @@ class Http extends \lithium\data\Source {
 	}
 
 	/**
-	 * Pass methods to service connection. Path and method are determined from Http::$_method. If not
-	 * set, a GET request with the $method as the path will be used.
+	 * Pass methods to service connection. Path and method are determined from Http::$_method. If
+	 * not set, a GET request with the $method as the path will be used.
 	 *
+	 * @see lithium\data\source\Http::$_method
 	 * @param string $method
 	 * @param array $params
 	 * @return mixed
 	 * @filter
-	 * @see lithium\data\source\Http::$_method
 	 */
 	public function __call($method, $params) {
 		$params += array(array(), array());
@@ -120,20 +120,21 @@ class Http extends \lithium\data\Source {
 		}
 
 		if (!isset($string['path'])) {
-			$string['path'] = '/'.$method;
+			$string['path'] = '/' . $method;
 		}
 
 		$conn =& $this->connection;
 		$filter = function($self, $params) use (&$conn, $string) {
 			list($query, $options) = $params;
 
-			if(is_object($query)) {
+			if (is_object($query)) {
 				$options += array_filter($query->export($self), function($v) {
 					return $v !== null;
 				});
 				$data = $query->data();
 			} else {
-				$data = in_array($string['method'], array('post', 'put')) ? (array) $query : array();
+				$data = in_array($string['method'], array('post', 'put')) ?
+					(array) $query : array();
 			}
 
 			preg_match_all('/\{:(\w+)\}/', $string['path'], $matches);
