@@ -90,6 +90,42 @@ class Request extends \lithium\net\http\Message {
 	}
 
 	/**
+	 * Encodes the body based on the type
+	 *
+	 * @see lithium\net\http\Message::type()
+	 * @param mixed $body
+	 * @return string
+	 */
+	protected function _encode($body) {
+		$media = $this->_classes['media'];
+		if($type = $media::type($this->_type)) {
+			$body = $media::encode($this->_type, $body) ?: $body;
+		}
+		if(is_array($body)) {
+			$body = join("\r\n", $body);
+		}
+		return $body;
+	}
+
+	/**
+	 * Add body parts and encodes it into formated string
+	 *
+	 * @see lithium\net\Message::body()
+	 * @param mixed $data
+	 * @param array $options
+	 *        - `'buffer'`: split the body string
+	 * @return array
+	 */
+	public function body($data = null, $options = array()) {
+		$default = array('buffer' => null);
+		$options += $default;
+		$this->body = array_merge((array) $this->body, (array) $data);
+
+		$body = $this->_encode($this->body);
+		return ($options['buffer']) ? str_split($body, $options['buffer']) : $body;
+	}
+
+	/**
 	 * Get the full query string queryString.
 	 *
 	 * @param array $params
@@ -204,14 +240,22 @@ class Request extends \lithium\net\http\Message {
 				$this->headers('Authorization', "Basic {$auth}");
 			}
 		}
+		if(in_array($options['method'], array('POST', 'PUT'))) {
+			$media = $this->_classes['media'];
+			if($type = $media::type($this->_type)) {
+				$this->headers('Content-Type', $type['content'][0]);
+			}
+		}
+
+		$body = $this->body($options['body']);
+		$this->headers('Content-Length', strlen($body));
+
 		switch ($format) {
 			case 'url':
 				$options['query'] = $this->queryString($options['query']);
 				$options['path'] = str_replace('//', '/', $options['path']);
 				return String::insert("{:scheme}://{:host}{:port}{:path}{:query}", $options);
 			case 'context':
-				$body = $this->body($options['body']);
-				$this->headers('Content-Length', strlen($body));
 				$base = array(
 					'content' => $body,
 					'method' => $options['method'],
@@ -223,8 +267,6 @@ class Request extends \lithium\net\http\Message {
 				return array('http' => array_diff_key($options, $defaults) + $base);
 			case 'string':
 				$path = str_replace('//', '/', $this->path) . $this->queryString($options['query']);
-				$body = $this->body();
-				$this->headers('Content-Length', strlen($body));
 				$status = "{$this->method} {$path} {$this->protocol}";
 				return join("\r\n", array($status, join("\r\n", $this->headers()), "", $body));
 			default:
