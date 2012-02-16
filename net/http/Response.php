@@ -128,7 +128,7 @@ class Response extends \lithium\net\http\Message {
 	 */
 	protected function _decode($body) {
 		$media = $this->_classes['media'];
-		if($type = $media::type($this->_type)) {
+		if ($type = $media::type($this->_type)) {
 			$body = $media::decode($this->_type, $body) ?: $body;
 		}
 		return $body;

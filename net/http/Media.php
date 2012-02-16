@@ -249,7 +249,7 @@ class Media extends \lithium\core\StaticObject {
 			return compact('content') + array('options' => static::_handlers($type));
 		}
 		if ($content) {
-			static::$_types[$type] = (array)$content;
+			static::$_types[$type] = (array) $content;
 		}
 		static::$_handlers[$type] = $options ? Set::merge($defaults, $options) : array();
 	}

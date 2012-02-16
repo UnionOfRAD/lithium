@@ -98,10 +98,10 @@ class Request extends \lithium\net\http\Message {
 	 */
 	protected function _encode($body) {
 		$media = $this->_classes['media'];
-		if($type = $media::type($this->_type)) {
+		if ($type = $media::type($this->_type)) {
 			$body = $media::encode($this->_type, $body) ?: $body;
 		}
-		if(is_array($body)) {
+		if (is_array($body)) {
 			$body = join("\r\n", $body);
 		}
 		return $body;
@@ -240,9 +240,9 @@ class Request extends \lithium\net\http\Message {
 				$this->headers('Authorization', "Basic {$auth}");
 			}
 		}
-		if(in_array($options['method'], array('POST', 'PUT'))) {
+		if (in_array($options['method'], array('POST', 'PUT'))) {
 			$media = $this->_classes['media'];
-			if($type = $media::type($this->_type)) {
+			if ($type = $media::type($this->_type)) {
 				$this->headers('Content-Type', $type['content'][0]);
 			}
 		}

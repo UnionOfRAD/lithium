@@ -162,7 +162,7 @@ class CrudTest extends \lithium\test\Integration {
 	protected static function _createCompany() {
 		Companies::create(array(
 			'name' => 'Acme, Inc.',
-			'active' => true,
+			'active' => true
 		))->save();
 	}
 }

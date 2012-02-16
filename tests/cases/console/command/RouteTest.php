@@ -206,7 +206,7 @@ class RouteTest extends \lithium\test\Unit {
 		);
 		$command = new Route(compact('request') + array(
 			'routes' => $this->_config['routes'],
-			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse'),
+			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse')
 		));
 		$command->show();
 
@@ -222,7 +222,7 @@ class RouteTest extends \lithium\test\Unit {
 		$request->params = array('args' => array('/'));
 		$command = new Route(compact('request') + array(
 			'routes' => $this->_config['routes'],
-			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse'),
+			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse')
 		));
 		$command->show();
 
@@ -241,7 +241,7 @@ class RouteTest extends \lithium\test\Unit {
 		);
 		$command = new Route(compact('request') + array(
 			'routes' => $this->_config['routes'],
-			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse'),
+			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse')
 		));
 
 		$command->show();
@@ -262,7 +262,7 @@ class RouteTest extends \lithium\test\Unit {
 		);
 		$command = new Route(compact('request') + array(
 			'routes' => $this->_config['routes'],
-			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse'),
+			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse')
 		));
 
 		$command->show();
