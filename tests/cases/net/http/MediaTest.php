@@ -51,7 +51,10 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['options']);
 
 		// Add a custom media type with a custom view class:
-		Media::type('my', 'text/x-my', array('view' => 'my\custom\View', 'paths' => array('layout' => false)));
+		Media::type('my', 'text/x-my', array(
+			'view' => 'my\custom\View',
+			'paths' => array('layout' => false)
+		));
 
 		$result = Media::types();
 		$this->assertTrue(in_array('my', $result));

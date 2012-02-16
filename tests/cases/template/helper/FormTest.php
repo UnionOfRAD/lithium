@@ -467,18 +467,24 @@ class FormTest extends \lithium\test\Unit {
 
 	public function testRadioGeneration() {
 		$result = $this->form->radio('foo');
-		$this->assertTags($result, array(
-			array('input' => array('type' => 'radio', 'value' => '1', 'name' => 'foo', 'id' => 'Foo'))
+		$this->assertTags($result, array(array(
+			'input' => array('type' => 'radio', 'value' => '1', 'name' => 'foo', 'id' => 'Foo'))
 		));
 
 		$result = $this->form->radio('foo', array('checked' => false));
-		$this->assertTags($result, array(
-			array('input' => array('type' => 'radio', 'value' => '1', 'name' => 'foo', 'id' => 'Foo'))
+		$this->assertTags($result, array(array(
+			'input' => array('type' => 'radio', 'value' => '1', 'name' => 'foo', 'id' => 'Foo'))
 		));
 
 		$result = $this->form->radio('foo', array('checked' => true));
-		$this->assertTags($result, array(
-			array('input' => array('type' => 'radio', 'value' => '1', 'name' => 'foo', 'checked' => 'checked', 'id' => 'Foo'))
+		$this->assertTags($result, array(array(
+			'input' => array(
+				'type' => 'radio',
+				'value' => '1',
+				'name' => 'foo',
+				'checked' => 'checked',
+				'id' => 'Foo')
+			)
 		));
 
 		$record = new Record(array('model' => $this->_model, 'data' => array('foo' => true)));

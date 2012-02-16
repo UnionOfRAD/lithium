@@ -9,7 +9,6 @@
 namespace lithium\tests\cases\data;
 
 use lithium\data\Model;
-use lithium\data\Entity;
 use lithium\data\model\Query;
 use lithium\data\Connections;
 use lithium\data\entity\Record;
