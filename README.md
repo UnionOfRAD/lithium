@@ -32,3 +32,7 @@ Lithium gives you full control over your application, from filters to dynamicall
 Every component of the Lithium framework stack is replaceable through the robust plugin architecture. Swap out the default ORM / ODM implementation for [Doctrine 2](http://dev.lithify.me/li3_doctrine/) or [PHP ActiveRecord](http://dev.lithify.me/li3_activerecord). Don't like the templating? Use [ Twig](http://dev.lithify.me/li3_twig), [ Mustache](https://github.com/bobthecow/mustache.php), or roll your own.
 
 If you don't even need to write a full application, build a micro-app in a single file using the routing system, without giving up the maintainability of the framework's structure.
+
+Build status
+-----------
+[![Build Status](https://secure.travis-ci.org/UnionOfRAD/lithium.png)](http://travis-ci.org/UnionOfRAD/lithium)

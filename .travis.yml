@@ -1,11 +1,14 @@
 language: php
 
+env:
+  - OPCODE_CACHE=apc
+ #- OPCODE_CACHE=xcache
+
 php:
   - 5.3
   - 5.4
 
-before_script:
-    - ./tests/ci_depends.sh
+before_script: php tests/ci_depends.php $OPCODE_CACHE
 
 script: console/li3 test tests/cases
 
