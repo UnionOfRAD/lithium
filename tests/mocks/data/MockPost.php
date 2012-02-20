@@ -16,7 +16,7 @@ class MockPost extends \lithium\tests\mocks\data\MockBase {
 
 	public static $connection = null;
 
-	protected $_meta = array('connection' => false);
+	protected $_meta = array('connection' => false, 'key' => 'id');
 
 	public static function overrideSchema(array $fields = array()) {
 		static::_object()->_schema = new Schema(compact('fields'));
