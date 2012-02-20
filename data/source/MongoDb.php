@@ -112,12 +112,29 @@ class MongoDb extends \lithium\data\Source {
 	protected $_schema = null;
 
 	/**
+	 * Array of named callable objects representing different strategies for performing specific
+	 * types of queries. For example, MongoDB reads support default finds, finds combined with
+	 * updates (i.e. the `findAndModify` command), aggregation, and group queries.
+	 *
+	 * @var array
+	 */
+	protected $_strategies = array();
+
+	/**
+	 * The list of query strategies to use when performing a read.
+	 *
+	 * @see lithium\data\source\MongoDb::$_strategies
+	 * @var array
+	 */
+	protected $_readStrategies = array('calculate', 'group', 'findAndModify', 'find');
+
+	/**
 	 * List of configuration keys which will be automatically assigned to their corresponding
 	 * protected class properties.
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('schema', 'classes' => 'merge');
+	protected $_autoConfig = array('readStrategies', 'schema', 'classes' => 'merge', 'strategies');
 
 	/**
 	 * Instantiates the MongoDB adapter with the default connection information.
@@ -170,6 +187,70 @@ class MongoDb extends \lithium\data\Source {
 		$this->_operators += array('like' => function($key, $value) {
 			return new MongoRegex($value);
 		});
+
+		$this->_strategies = array(
+			'find' => function($source, $query, array $options) {
+				$keys = array('conditions', 'fields', 'order', 'limit', 'offset');
+				$args = $query->export($source, $keys);
+				$collection = $source->collection($query);
+
+				$result = $collection->find($args['conditions'], $args['fields']);
+				$val = $result->sort($args['order'])->limit($args['limit'])->skip($args['offset']);
+
+				$result = $source->invokeMethod('_instance', array('result', array(
+					'resource' => $val
+				)));
+
+				$config = compact('result', 'query') + array('class' => 'set');
+				return $source->item($query->model(), array(), $config);
+			},
+			'findAndModify' => function($source, $query, array $options) {
+				$update = $query->update();
+				$remove = $query->remove();
+
+				if (!isset($update) && !isset($remove)) {
+					return;
+				}
+				$args = $query->export($source, array('conditions', 'order', 'fields'));
+
+				$result = $source->connection->command(compact('update', 'remove') + array(
+					'findAndModify' => $query->source(),
+					'query'  => $args['conditions'],
+					'sort'   => $args['order'],
+					'new'    => $query->new(),
+					'fields' => $args['fields'],
+					'upsert' => $query->upsert()
+				));
+				return $source->item($query->model(), $result['value'], compact('query'));
+			},
+			'calculate' => function($source, $query, array $options) {
+				if (!$query->calculate()) {
+					return;
+				}
+				$query = $query->export($source, array('conditions'));
+				return $source->collection($query)->find($query['conditions']);
+			},
+			'group' => function($source, $query, array $options) {
+				if (!($key = $query->group()) || !$reduce = $query->reduce()) {
+					return;
+				}
+				$col     = $source->collection($query);
+				$key     = $source->group($key, $query);
+				$init    = $query->initial();
+				$options = $query->export($source, array('conditions', 'finalize'));
+
+				if (isset($options['conditions'])) {
+					$options['condition'] = $options['conditions'];
+					unset($options['conditions']);
+				}
+				$stats = $col->group($key, $init, $reduce, $options) + array('retval' => null);
+				$data = $stats['retval'];
+				unset($stats['retval']);
+
+				$config = array('class' => 'set') + compact('query', 'stats');
+				return $source->item($query->model(), $data, $config);
+			}
+		);
 	}
 
 	/**
@@ -198,9 +279,9 @@ class MongoDb extends \lithium\data\Source {
 			return extension_loaded('mongo');
 		}
 		$features = array(
-			'arrays' => true,
-			'transactions' => false,
-			'booleans' => true,
+			'arrays'        => true,
+			'transactions'  => false,
+			'booleans'      => true,
 			'relationships' => true
 		);
 		return isset($features[$feature]) ? $features[$feature] : null;
@@ -346,7 +427,7 @@ class MongoDb extends \lithium\data\Source {
 	 * applicable to this data source.
 	 *
 	 * @internal param mixed $query
-	 * @internal param \lithium\data\source\resource $resource
+	 * @internal param lithium\data\source\Resource $resource
 	 * @internal param object $context
 	 * @return array
 	 */
@@ -355,9 +436,26 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	/**
-	 * Create new document
+	 * Returns the collection to be used for a given query.
 	 *
-	 * @param string $query
+	 * @param object $query `Query` object instance containing the information about the collection
+	 *               to be used.
+	 * @return object Returns a `MongoCollection` instance based in the source information in
+	 *         `$query`.
+	 */
+	public function collection($query) {
+		$source = $query->source();
+
+		if ($source == "{$this->_config['gridPrefix']}.files") {
+			return $this->connection->getGridFS();
+		}
+		return $this->connection->{$source};
+	}
+
+	/**
+	 * Create a new document in a collection.
+	 *
+	 * @param object $query
 	 * @param array $options
 	 * @return boolean
 	 * @filter
@@ -429,59 +527,29 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	/**
-	 * Read from document
+	 * Read documents from a collection.
 	 *
-	 * @param string $query
+	 * @param object $query
 	 * @param array $options
 	 * @return object
 	 * @filter
 	 */
 	public function read($query, array $options = array()) {
 		$this->_checkConnection();
-		$defaults = array('return' => 'resource');
+		$defaults = array();
 		$options += $defaults;
-
 		$params = compact('query', 'options');
-		$_config = $this->_config;
+		$_strategies = array($this->_strategies, $this->_readStrategies);
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
-			$query = $params['query'];
-			$options = $params['options'];
-			$args = $query->export($self);
-			$source = $args['source'];
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_strategies) {
+			list($strategies, $readStrategies) = $_strategies;
 
-			if ($group = $args['group']) {
-				$result = $self->invokeMethod('_group', array($group, $args, $options));
-				$config = array('class' => 'set') + compact('query') + $result;
-				return $self->item($query->model(), $config['data'], $config);
+			foreach ($readStrategies as $name) {
+				if ($result = $strategies[$name]($self, $params['query'], $params['options'])) {
+					return $result;
+				}
 			}
-			$collection = $self->connection->{$source};
-
-			if ($source == "{$_config['gridPrefix']}.files") {
-				$collection = $self->connection->getGridFS();
-			}
-			$result = $collection->find($args['conditions'], $args['fields']);
-
-			if ($query->calculate()) {
-				return $result;
-			}
-
-			$resource = $result->sort($args['order'])->limit($args['limit'])->skip($args['offset']);
-			$result = $self->invokeMethod('_instance', array('result', compact('resource')));
-			$config = compact('result', 'query') + array('class' => 'set');
-			return $self->item($query->model(), array(), $config);
 		});
-	}
-
-	protected function _group($group, $args, $options) {
-		$conditions = $args['conditions'];
-		$group += array('$reduce' => $args['reduce'], 'initial' => $args['initial']);
-		$command = array('group' => $group + array('ns' => $args['source'], 'cond' => $conditions));
-
-		$stats = $this->connection->command($command);
-		$data = isset($stats['retval']) ? $stats['retval'] : null;
-		unset($stats['retval']);
-		return compact('data', 'stats');
 	}
 
 	/**
@@ -617,7 +685,7 @@ class MongoDb extends \lithium\data\Source {
 			return;
 		}
 		if (is_string($group) && strpos($group, 'function') === 0) {
-			return array('$keyf' => new MongoCode($group));
+			return new MongoCode($group);
 		}
 		$group = (array) $group;
 
@@ -627,7 +695,21 @@ class MongoDb extends \lithium\data\Source {
 				unset($group[$i]);
 			}
 		}
-		return array('key' => $group);
+		return $group;
+	}
+
+	/**
+	 * Ensures that code for a finalize function in a group query is wrapped in a `MongoCode`
+	 * object.
+	 *
+	 * @param mixed $finalize Either a string containing a JavaScript function, or a `MongoCode`
+	 *              instance.
+	 * @param object $context A `Query` object representing the group query being executed.
+	 * @return object Returns a `MongoCode` instance representing the finalize function in a group
+	 *         query.
+	 */
+	public function finalize($finalize, $context) {
+		return is_string($finalize) ? new MongoCode($finalize) : $finalize;
 	}
 
 	/**
