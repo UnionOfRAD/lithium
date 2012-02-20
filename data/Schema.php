@@ -8,6 +8,8 @@
 
 namespace lithium\data;
 
+use RuntimeException;
+
 /**
  * This class encapsulates a schema definition, usually for a model class, and is comprised
  * of named fields and types.
@@ -21,6 +23,21 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 	protected $_locked = false;
 
 	protected $_autoConfig = array('fields', 'meta', 'locked');
+
+	protected function _init() {
+		parent::_init();
+
+		foreach ($this->_fields as $key => $type) {
+			if (is_string($type)) {
+				$this->_fields[$key] = compact('type');
+				continue;
+			}
+			if (isset($this->_fields[$key][0]) && !isset($this->_fields[$key]['type'])) {
+				$this->_fields[$key]['type'] = $this->_fields[$key][0];
+				unset($this->_fields[$key][0]);
+			}
+		}
+	}
 
 	public function fields($name = null, $key = null) {
 		if (!$name) {
@@ -40,7 +57,10 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 
 	public function defaults($name = null) {
 		if ($name) {
-			return isset($this->_fields[$name]['default']) ? $this->_fields[$name]['default'] : null;
+			if (isset($this->_fields[$name]['default'])) {
+				return $this->_fields[$name]['default'];
+			}
+			return null;
 		}
 		$defaults = array();
 
@@ -73,7 +93,7 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 	 *
 	 * @param string $condition
 	 * @param string $field
-	 * @return void
+	 * @return boolean
 	 */
 	public function is($condition, $field) {
 		if (!isset($this->_fields[$field])) {
@@ -106,7 +126,7 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 	 */
 	public function append(array $fields) {
 		if ($this->_locked) {
-			throw new Exception("Schema cannot be modified.");
+			throw new RuntimeException("Schema cannot be modified.");
 		}
 		$this->_fields += $fields;
 	}
@@ -121,7 +141,7 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 	 */
 	public function merge($schema) {
 		if ($this->_locked) {
-			throw new Exception("Schema cannot be modified.");
+			throw new RuntimeException("Schema cannot be modified.");
 		}
 		$this->_fields += $schema->fields();
 	}
@@ -132,7 +152,7 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 
 	public function offsetSet($key, $value) {
 		if ($this->_locked) {
-			throw new Exception("Schema cannot be modified.");
+			throw new RuntimeException("Schema cannot be modified.");
 		}
 		$this->_fields[$key] = $value;
 	}
