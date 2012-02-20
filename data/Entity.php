@@ -246,11 +246,11 @@ class Entity extends \lithium\core\Object {
 		$schema = null;
 
 		switch (true) {
-			case (is_object($this->_schema)):
-				$schema = $this->_schema;
-			break;
 			case ($model = $this->_model):
 				$schema = $model::schema();
+			break;
+			case (is_object($this->_schema)):
+				$schema = $this->_schema;
 			break;
 		}
 		if ($schema) {
@@ -409,24 +409,11 @@ class Entity extends \lithium\core\Object {
 				$data = $rel + $data;
 				$result = Collection::toArray($data, $options);
 			break;
-			case 'string':
-				$result = $this->__toString();
-			break;
 			default:
 				$result = $this;
 			break;
 		}
 		return $result;
-	}
-
-	/**
-	 * Returns a string representation of the `Entity` instance, based on the result of the
-	 * `'title'` meta value of the bound model class.
-	 *
-	 * @return string Returns the generated title of the object.
-	 */
-	public function __toString() {
-		return $this->__call('title', array());
 	}
 }
 
