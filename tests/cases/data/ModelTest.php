@@ -8,7 +8,9 @@
 
 namespace lithium\tests\cases\data;
 
+use stdClass;
 use lithium\data\Model;
+use lithium\data\Entity;
 use lithium\data\model\Query;
 use lithium\data\entity\Record;
 use lithium\tests\mocks\data\MockTag;
@@ -334,6 +336,11 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual('id', MockPost::key());
 		$this->assertEqual(array('id' => 5), MockPost::key(5));
 		$this->assertEqual(array('post_id' => 2, 'tag_id' => 5), $result);
+
+		$key = new stdClass();
+		$key->foo = 'bar';
+
+		$this->assertEqual(array('id' => $key), MockPost::key($key));
 	}
 
 	public function testValidatesFalse() {
@@ -546,10 +553,6 @@ class ModelTest extends \lithium\test\Unit {
 		$post = MockPost::create(array('title' => 'New post'));
 		$this->assertTrue($post instanceof Entity);
 		$this->assertEqual('New post', $post->title);
-		MockPost::overrideSchema($schema->fields());
-
-		$this->expectException('/Connection name not defined/');
-		$post->save();
 	}
 
 	public function testSave() {
@@ -717,6 +720,16 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual('bar', MockPost::create($data)->nested['value']);
 
 		MockPost::overrideSchema($original);
+	}
+
+	/**
+	 * Tests that objects can be passed as keys to `Model::find()` and be properly translated to
+	 * query conditions.
+	 */
+	public function testFindByObjectKey() {
+		$key = (object) array('foo' => 'bar');
+		$result = MockPost::find($key);
+		$this->assertEqual(array('id' => $key), $result['query']->conditions());
 	}
 }
 

@@ -385,7 +385,7 @@ class Model extends \lithium\core\StaticObject {
 		}
 
 		if ($method == 'all' || $isFinder) {
-			if ($params && is_scalar($params[0])) {
+			if ($params && !is_array($params[0])) {
 				$params[0] = array('conditions' => static::key($params[0]));
 			}
 			return $self::find($method, $params ? $params[0] : array());
@@ -439,13 +439,14 @@ class Model extends \lithium\core\StaticObject {
 		if ($type === null) {
 			return null;
 		}
+		$isFinder = is_string($type) && isset($self->_finders[$type]);
 
-		if ($type != 'all' && is_scalar($type) && !isset($self->_finders[$type])) {
+		if ($type != 'all' && !is_array($type) && !$isFinder) {
 			$options['conditions'] = static::key($type);
 			$type = 'first';
 		}
 
-		if (isset($self->_finders[$type]) && is_array($self->_finders[$type])) {
+		if ($isFinder && is_array($self->_finders[$type])) {
 			$options = Set::merge($self->_finders[$type], $options);
 		}
 
