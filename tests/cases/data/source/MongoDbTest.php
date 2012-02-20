@@ -174,6 +174,36 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertTrue(isset($result['key']));
 		$this->assertTrue(isset($result['key']['$in']));
 		$this->assertEqual($conditions['key'], $result['key']['$in']);
+
+		// test conditional operators (and, or, nor)
+		$conditions = array('$or' => array(
+			array('key' => 'value'),
+			array('other key' => 'another value')
+		));
+		$result = $this->db->conditions($conditions, null);
+		$this->assertTrue(isset($result['$or']));
+		$this->assertEqual($conditions['$or'][0]['key'], $result['$or'][0]['key']);
+
+		$conditions = array('$and' => array(
+			array('key' => 'value'),
+			array('other key' => 'another value')
+		));
+		$result = $this->db->conditions($conditions, null);
+		$this->assertTrue(isset($result['$and']));
+		$this->assertEqual($conditions['$and'][0]['key'], $result['$and'][0]['key']);
+
+		$conditions = array('$nor' => array(
+			array('key' => 'value'),
+			array('other key' => 'another value')
+		));
+		$result = $this->db->conditions($conditions, null);
+		$this->assertTrue(isset($result['$nor']));
+		$this->assertEqual($conditions['$nor'][0]['key'], $result['$nor'][0]['key']);
+
+		$conditions = array('key' => array('or' => array(1, 2)));
+		$result = $this->db->conditions($conditions, null);
+		$this->assertTrue(isset($result['key']['$or']));
+
 	}
 
 	public function testMongoConditionalOperators() {
