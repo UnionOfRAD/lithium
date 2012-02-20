@@ -35,4 +35,4 @@ If you don't even need to write a full application, build a micro-app in a singl
 
 Build status
 -----------
-[![Build Status](https://secure.travis-ci.org/UnionOfRAD/lithium.png)](http://travis-ci.org/UnionOfRAD/lithium)
+[![Build Status](https://secure.travis-ci.org/UnionOfRAD/lithium.png?branch=master)](http://travis-ci.org/UnionOfRAD/lithium)
