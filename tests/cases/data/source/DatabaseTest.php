@@ -483,6 +483,29 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testOrderOnRelated() {
+		$query = new Query(array(
+			'model' => $this->_model,
+			'with' => array('MockDatabaseComment')
+		));
+
+		$result = $this->db->order('MockDatabaseComment.created DESC', $query);
+		$expected = 'ORDER BY MockDatabaseComment.created DESC';
+		$this->assertEqual($expected, $result);
+
+		$result = $this->db->order(array('MockDatabaseComment.created' => 'DESC'), $query);
+		$expected = 'ORDER BY MockDatabaseComment.created DESC';
+		$this->assertEqual($expected, $result);
+
+		$result = $this->db->order(array('MockDatabasePost.title' => 'ASC', 'MockDatabaseComment.created' => 'DESC'), $query);
+		$expected = 'ORDER BY MockDatabasePost.title ASC, MockDatabaseComment.created DESC';
+		$this->assertEqual($expected, $result);
+
+		$result = $this->db->order(array('title' => 'ASC', 'MockDatabaseComment.created' => 'DESC'), $query);
+		$expected = 'ORDER BY {MockDatabasePost}.{title} ASC, MockDatabaseComment.created DESC';
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testScopedDelete() {
 		$query = new Query(array(
 			'type' => 'delete',
