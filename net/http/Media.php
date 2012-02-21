@@ -115,7 +115,7 @@ class Media extends \lithium\core\StaticObject {
 	 *
 	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(19-20) }}}
 	 *
-	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(40-41) }}}
+	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(44-45) }}}
 	 *
 	 * Alternatively, can be used to detect the type name of a registered content type:
 	 * {{{
@@ -213,6 +213,13 @@ class Media extends \lithium\core\StaticObject {
 	 *          render templates without a layout, use a `false` value for `'layout'`.
 	 *        - `'conditions'` _array_: Optional key/value pairs used as assertions in content
 	 *          negotiation. See the above section on **Content Negotiation**.
+	 *        - `'responseType'` _string_: Optional default type to use for responses to
+	 *          this type.  Primarily used by `lithium\action\Controller::_init()`
+	 *          when setting the `$_render['type']`.  It is almost always
+	 *          the same as the request type with 'form' being a notable
+	 *          exception.  However, the HTTP way is to use content negotion and the
+	 *          Accept header to determine the appropriate response type.  See the above
+	 *          section on **Content Negotiation**.
 	 * @return mixed If `$content` and `$options` are empty, returns an array with `'content'` and
 	 *         `'options'` keys, where `'content'` is the content-type(s) that correspond to
 	 *         `$type` (can be a string or array, if multiple content-types are available), and
@@ -230,7 +237,8 @@ class Media extends \lithium\core\StaticObject {
 			'encode' => false,
 			'decode' => false,
 			'cast'   => true,
-			'conditions' => array()
+			'conditions' => array(),
+			'responseType' => null
 		);
 
 		if ($content === false) {
@@ -824,7 +832,8 @@ class Media extends \lithium\core\StaticObject {
 					$decoded = array();
 					parse_str($data, $decoded);
 					return $decoded;
-				}
+				},
+				'responseType' => 'html'
 			)
 		);
 

@@ -70,7 +70,8 @@ class MediaTest extends \lithium\test\Unit {
 				'layout' => false,
 				'element' => '{:library}/views/elements/{:template}.{:type}.php'
 			),
-			'encode' => null, 'decode' => null, 'cast' => true, 'conditions' => array()
+			'encode' => null, 'decode' => null, 'cast' => true,
+			'conditions' => array(), 'responseType' => null
 		);
 		$this->assertEqual($expected, $result['options']);
 
