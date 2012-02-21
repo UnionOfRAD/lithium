@@ -8,6 +8,8 @@
 
 namespace lithium\tests\integration\net\http;
 
+use lithium\action\Controller;
+use lithium\action\Request;
 use lithium\net\http\Media;
 use lithium\net\http\Response;
 
@@ -70,6 +72,26 @@ class MediaTest extends \lithium\test\Integration {
 			'template' => 'testTypeFile'
 		));
 		$this->assertEqual("Layout top.\nThis is a type test.Layout bottom.", $response->body());
+	}
+
+	public function testControllerResponseType() {
+		$request = new Request();
+		$request->type = 'text/html';
+		$controller = new Controller(compact('request'));
+		$controller->render(array('head' => true));
+		$this->assertEqual('html', $controller->response->type());
+
+		$request = new Request();
+		$request->type = 'multipart/form-data';
+		$controller = new Controller(compact('request'));
+		$controller->render(array('head' => true));
+		$this->assertEqual('html', $controller->response->type());
+
+		$request = new Request();
+		$request->type = 'application/json';
+		$controller = new Controller(compact('request'));
+		$controller->render(array('head' => true));
+		$this->assertEqual('json', $controller->response->type());
 	}
 }
 
