@@ -87,8 +87,16 @@ class MongoDb extends \lithium\data\Source {
 		'not' => '$not',
 		'!'   => '$not',
 		'and' => '$and',
-		'&&'  => '$and'
+		'&&'  => '$and',
+		'nor' => 'nor'
 	);
+
+	/**
+	 * List of comparison operators to use when performing boolean logic in a query.
+	 *
+	 * @var array
+	 */
+	protected $_boolean = array('&&', '||', 'and', '$and', 'or', '$or', 'nor', '$nor');
 
 	/**
 	 * A closure or anonymous function which receives an instance of this class, a collection name
@@ -649,6 +657,7 @@ class MongoDb extends \lithium\data\Source {
 
 	protected function _conditions($conditions, $model, $schema, $context) {
 		$castOpts = compact('model') + array('first' => true, 'database' => $this);
+		$ops = $this->_operators;
 		$cast = function($value) use (&$schema, &$castOpts) {
 			if (!$schema) {
 				return $value;
@@ -657,26 +666,19 @@ class MongoDb extends \lithium\data\Source {
 		};
 
 		foreach ($conditions as $key => $value) {
-			$castOpts['pathKey'] = $key;
+			if (in_array($key, $this->_boolean)) {
+				$operator = isset($ops[$key]) ? $ops[$key] : $key;
 
-			$operator = null;
-			if ($key === '$or' || $key === 'or' || $key === '||') {
-				$operator = '$or';
-			}
-			if ($key === '$and' || $key === 'and' || $key === '&&') {
-				$operator = '$and';
-			}
-			if ($key === '$nor' || $key === 'nor') {
-				$operator = '$nor';
-			}
-			if ($operator) {
-				foreach ($value as $i => $or) {
-					$value[$i] = $this->_conditions($or, $model, $schema, $context);
+				foreach ($value as $i => $compare) {
+					$value[$i] = $this->_conditions($compare, $model, $schema, $context);
 				}
 				unset($conditions[$key]);
 				$conditions[$operator] = $value;
 				continue;
 			}
+			/**
+			 * @todo Catch Document/Array objects used in conditions and extract their values.
+			 */
 			if (is_object($value)) {
 				continue;
 			}
