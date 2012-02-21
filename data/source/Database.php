@@ -834,7 +834,9 @@ abstract class Database extends \lithium\data\Source {
 			if ($field = $model::schema($column)) {
 				$name = $this->name($model::meta('name')) . '.' . $this->name($column);
 				$result[] = "{$name} {$dir}";
+				continue;
 			}
+			$result[] = "{$column} {$dir}";
 		}
 		$order = join(', ', $result);
 		return "ORDER BY {$order}";
