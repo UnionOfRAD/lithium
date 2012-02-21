@@ -46,7 +46,7 @@ class MockMongoConnection {
 		return $this->_record(__FUNCTION__, compact('conditions', 'options'));
 	}
 
-	public function find($conditions, $fields) {
+	public function find($conditions, $fields = null) {
 		return $this->_record(__FUNCTION__, compact('conditions', 'fields'));
 	}
 

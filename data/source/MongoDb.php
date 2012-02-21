@@ -227,8 +227,8 @@ class MongoDb extends \lithium\data\Source {
 				if (!$query->calculate()) {
 					return;
 				}
-				$query = $query->export($source, array('conditions'));
-				return $source->collection($query)->find($query['conditions']);
+				$args = $query->export($source, array('conditions'));
+				return $source->collection($query)->find($args['conditions']);
 			},
 			'group' => function($source, $query, array $options) {
 				if (!($key = $query->group()) || !$reduce = $query->reduce()) {
