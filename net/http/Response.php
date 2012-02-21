@@ -21,13 +21,6 @@ class Response extends \lithium\net\http\Message {
 	public $status = array('code' => 200, 'message' => 'OK');
 
 	/**
-	 * Content Type.
-	 *
-	 * @var string
-	 */
-	public $type = 'text/html';
-
-	/**
 	 * Character encoding.
 	 *
 	 * @var string
@@ -111,8 +104,10 @@ class Response extends \lithium\net\http\Message {
 			preg_match($pattern, $this->headers['Content-Type'], $match);
 
 			if (isset($match[1])) {
-				$this->type = trim($match[1]);
-				$this->body = $this->_decode($this->body);
+				$this->type(trim($match[1]));
+				if (is_string($this->body) && trim($this->body) !== '') {
+					$this->body = $this->_decode($this->body);
+				}
 			}
 			if (isset($match[3])) {
 				$this->encoding = strtoupper(trim($match[3]));
@@ -243,9 +238,6 @@ class Response extends \lithium\net\http\Message {
 	* @return string
 	*/
 	public function __toString() {
-		if ($this->type != 'text/html' && !isset($this->headers['Content-Type'])) {
-			$this->headers['Content-Type'] = $this->type;
-		}
 		$first = "{$this->protocol} {$this->status['code']} {$this->status['message']}";
 		$response = array($first, join("\r\n", $this->headers()), "", $this->body());
 		return join("\r\n", $response);
