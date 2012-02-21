@@ -200,6 +200,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['update']);
 
 		$doc->objects[] = array('foo' => 'dob');
+
 		$exist = $doc->objects->find(
 			function ($data) { return (strcmp($data->foo, 'dob') === 0); },
 			array('collect' => false)
@@ -218,17 +219,12 @@ class ExporterTest extends \lithium\test\Unit {
 
 		unset($doc->numbers);
 		$result = Exporter::get('update', $doc->export());
-		$expected = array(
-			'numbers' => true
-		);
-		$this->assertEqual($expected, $result['remove']);
+		$this->assertEqual(array('numbers' => true), $result['remove']);
 
 		$doc->set(array('flagged' => true, 'foo' => 'baz', 'bar' => 'dib'));
 		unset($doc->foo, $doc->flagged, $doc->numbers, $doc->deeply->nested);
 		$result = Exporter::get('update', $doc->export());
-		$expected = array(
-			'foo' => true, 'deeply.nested' => true, 'numbers' => true
-		);
+		$expected = array('foo' => true, 'deeply.nested' => true, 'numbers' => true);
 		$this->assertEqual($expected, $result['remove']);
 		$this->assertEqual(array('bar' => 'dib'), $result['update']);
 	}

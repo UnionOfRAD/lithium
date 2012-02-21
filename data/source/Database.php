@@ -432,6 +432,18 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
+	 * Determines the set of methods to be used when exporting query values.
+	 *
+	 * @return array
+	 */
+	public function methods() {
+		$result = parent::methods();
+		$key = array_search('schema', $result);
+		unset($result[$key]);
+		return $result;
+	}
+
+	/**
 	 * Returns a given `type` statement for the given data, rendered from `Database::$_strings`.
 	 *
 	 * @param string $type One of `'create'`, `'read'`, `'update'`, `'delete'` or `'join'`.
@@ -448,8 +460,9 @@ abstract class Database extends \lithium\data\Source {
 		if (!isset($this->_strings[$type])) {
 			throw new InvalidArgumentException("Invalid query type `{$type}`.");
 		}
+		$template = $this->_strings[$type];
 		$data = array_filter($data);
-		return trim(String::insert($this->_strings[$type], $data, array('clean' => true)));
+		return trim(String::insert($template, $data, array('clean' => true)));
 	}
 
 	/**

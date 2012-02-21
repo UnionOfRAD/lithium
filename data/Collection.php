@@ -167,7 +167,7 @@ abstract class Collection extends \lithium\util\Collection {
 	}
 
 	public function schema($field = null) {
-		$schema = array();
+		$schema = null;
 
 		switch (true) {
 			case ($this->_schema):
@@ -180,7 +180,6 @@ abstract class Collection extends \lithium\util\Collection {
 		if ($schema) {
 			return $field ? $schema->fields($field) : $schema;
 		}
-		return $schema;
 	}
 
 	/**

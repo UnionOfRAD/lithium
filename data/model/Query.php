@@ -61,6 +61,15 @@ class Query extends \lithium\core\Object {
 	protected $_data = array();
 
 	/**
+	 * A query can be assigned its own custom schema object, using the `schema()` method. If this
+	 * is not assigned, then the model associated with the query will be used to get the schema
+	 * information.
+	 *
+	 * @var object
+	 */
+	protected $_schema = null;
+
+	/**
 	 * Auto configuration properties.
 	 *
 	 * @var array
@@ -81,6 +90,7 @@ class Query extends \lithium\core\Object {
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'calculate'  => null,
+			'schema'     => null,
 			'conditions' => array(),
 			'fields'     => array(),
 			'data'       => array(),
@@ -465,13 +475,13 @@ class Query extends \lithium\core\Object {
 	}
 
 	public function schema($field = null) {
-		if ((isset($this->_config['schema'])) && ($schema = $this->_config['schema'])) {
-			if ($field) {
-				return isset($schema[$field]) ? $schema[$field] : null;
-			}
-			return $schema;
+		if (is_object($field)) {
+			$this->_schema = $field;
+			return;
 		}
-
+		if ($schema = $this->_schema) {
+			return $field ? $schema[$field] : $schema;
+		}
 		if ($model = $this->model()) {
 			return $model::schema($field);
 		}
