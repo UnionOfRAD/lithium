@@ -66,15 +66,15 @@ class Schema extends \lithium\data\Schema {
 		$defaults = array(
 			'pathKey' => null,
 			'model' => null,
-			'schema' => $this,
-			'database' => null
+			'database' => null,
+			'wrap' => true
 		);
 		$options += $defaults;
 		$basePathKey = $options['pathKey'];
 		$model = (!$options['model'] && $object) ? $object->model() : $options['model'];
 		$database = $options['database'];
 
-		if (is_scalar($data)) {
+		if (is_scalar($data) || !$data) {
 			return $this->_castType($data, $basePathKey);
 		}
 
@@ -104,9 +104,15 @@ class Schema extends \lithium\data\Schema {
 			if ($isArray || $numericArray) {
 				$options['class'] = 'array';
 				$val = $valIsArray ? $val : array($val);
+				$keys = array_fill(0, count($val), $pathKey);
+				$val = array_map(array(&$this, '_castType'), $val, $keys);
 			}
 			unset($options['first']);
-			$val = $database->item($options['model'], $val, compact('pathKey') + $options);
+
+			if ($database && $options['wrap']) {
+				$config = compact('pathKey') + array_diff_key($options, $defaults);
+				$val = $database->item($options['model'], $val, $config);
+			}
 			$data[$key] = $val;
 		}
 		return $data;

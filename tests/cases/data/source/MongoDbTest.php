@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\data\source;
 
+use lithium\data\source\mongo_db\Schema;
 use lithium\data\source\MongoDb;
 use Exception;
 use stdClass;
@@ -15,7 +16,6 @@ use MongoId;
 use MongoCode;
 use MongoDate;
 use MongoRegex;
-use lithium\data\Schema;
 use lithium\data\model\Query;
 use lithium\data\entity\Document;
 use lithium\tests\mocks\data\MockPost;
@@ -39,20 +39,20 @@ class MongoDbTest extends \lithium\test\Unit {
 	);
 
 	protected $_schema = array(
-		'_id' => array('type' => 'id'),
-		'guid' => array('type' => 'id'),
-		'title' => array('type' => 'string'),
-		'tags' => array('type' => 'string', 'array' => true),
-		'comments' => array('type' => 'MongoId'),
-		'authors' => array('type' => 'MongoId', 'array' => true),
-		'created' => array('type' => 'MongoDate'),
-		'modified' => array('type' => 'datetime'),
-		'voters' => array('type' => 'id', 'array' => true),
-		'rank_count' => array('type' => 'integer', 'default' => 0),
-		'rank' => array('type' => 'float', 'default' => 0.0),
-		'notifications.foo' => array('type' => 'boolean'),
-		'notifications.bar' => array('type' => 'boolean'),
-		'notifications.baz' => array('type' => 'boolean')
+		'_id'               => 'id',
+		'guid'              => 'id',
+		'title'             => 'string',
+		'tags'              => array('type' => 'string', 'array' => true),
+		'comments'          => 'MongoId',
+		'authors'           => array('type' => 'MongoId', 'array' => true),
+		'created'           => 'MongoDate',
+		'modified'          => 'datetime',
+		'voters'            => array('type' => 'id', 'array' => true),
+		'rank_count'        => array('type' => 'integer', 'default' => 0),
+		'rank'              => array('type' => 'float', 'default' => 0.0),
+		'notifications.foo' => 'boolean',
+		'notifications.bar' => 'boolean',
+		'notifications.baz' => 'boolean'
 	);
 
 	protected $_configs = array();
@@ -126,11 +126,6 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testCreateFail() {
-		$this->expectException('no elements in doc');
-		$result = $this->db->create($this->query);
-	}
-
 	public function testCreateSuccess() {
 		array_push($this->db->connection->results, true);
 		$this->query->data(array('title' => 'Test Post'));
@@ -175,7 +170,6 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertTrue(isset($result['key']['$in']));
 		$this->assertEqual($conditions['key'], $result['key']['$in']);
 
-		// test conditional operators (and, or, nor)
 		$conditions = array('$or' => array(
 			array('key' => 'value'),
 			array('other key' => 'another value')
@@ -202,8 +196,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$conditions = array('key' => array('or' => array(1, 2)));
 		$result = $this->db->conditions($conditions, null);
-		$this->assertTrue(isset($result['key']['$or']));
-
+		$this->assertEqual(array('key' => array('$or' => array(1, 2))), $result);
 	}
 
 	public function testMongoConditionalOperators() {
@@ -347,9 +340,10 @@ class MongoDbTest extends \lithium\test\Unit {
 			'type' => 'update',
 			'collection' => 'posts',
 			'conditions' => array('_id' => '4f188fb17675ab167900010e'),
-				'update' => array('$set' => array('title' => 'New Post Title')
-			),
-			'options' => array('upsert' => false, 'multiple' => true, 'safe' => false, 'fsync' => false)
+			'update' => array('$set' => array('title' => 'New Post Title')),
+			'options' => array(
+				'upsert' => false, 'multiple' => true, 'safe' => false, 'fsync' => false
+			)
 		);
 
 		array_push($this->db->connection->results, new MockResult(array(
@@ -601,27 +595,51 @@ class MongoDbTest extends \lithium\test\Unit {
 		$document = $model::create($data);
 		$this->assertTrue($document->save());
 
+		$result = array_shift($this->db->connection->queries);
+		$expected = array(
+			'type' => 'insert',
+			'collection' => 'posts',
+			'data' => array('initial' => 'one', 'values' => 'two', '_id' => $document->_id),
+			'options' => array(
+				'validate' => true, 'events' => 'create', 'whitelist' => null, 'callbacks' => true,
+				'locked' => false, 'safe' => false, 'fsync' => false
+			)
+		);
+		$this->assertEqual($expected, $result);
+
 		$duplicate = $model::create(array('_id' => $document->_id), array('exists' => true));
 		$duplicate->values = 'new';
 		$this->assertTrue($duplicate->save());
 
-		array_push($this->db->connection->results, new MockResult(array(
-			'data' => array($data)
-		)));
-		$document = $model::find((string) $duplicate->_id);
+		$result = array_shift($this->db->connection->queries);
+		$expected = array(
+			'type' => 'update',
+			'collection' => 'posts',
+			'conditions' => array('_id' => $document->_id),
+			'update' => array('$set' => array('values' => 'new')),
+			'options' => array(
+				'validate' => true, 'events' => 'update', 'whitelist' => null,
+				'callbacks' => true, 'locked' => false, 'upsert' => false, 'multiple' => true,
+				'safe' => false, 'fsync' => false,
+			)
+		);
+		$this->assertEqual($expected, $result);
+
+		array_push($this->db->connection->results, new MockResult(array('data' => array(
+			array('_id' => $duplicate->_id, 'initial' => 'one', 'values' => 'new')
+		))));
+
+		$document = $model::find($duplicate->_id);
 		$expected = array('_id' => (string) $duplicate->_id, 'initial' => 'one', 'values' => 'new');
 		$this->assertEqual($expected, $document->data());
-		$queries = array();
 
-		foreach (array('find', 'update', 'insert') as $key) {
-			$queries[$key] = array_pop($this->db->connection->queries);
-			$this->assertEqual($key, $queries[$key]['type']);
-			$this->assertEqual('posts', $queries[$key]['collection']);
-		}
-		$_id = $queries['insert']['data']['_id'];
-
-		$this->assertEqual($data + compact('_id'), $queries['insert']['data']);
-		$this->assertEqual(compact('_id'), $queries['find']['conditions']);
+		$result = array_shift($this->db->connection->queries);
+		$expected = array(
+			'type' => 'find', 'collection' => 'posts', 'fields' => array(), 'conditions' => array(
+				'_id' => $duplicate->_id
+			)
+		);
+		$this->assertEqual($expected, $result);
 	}
 
 	/**
@@ -630,24 +648,14 @@ class MongoDbTest extends \lithium\test\Unit {
 	 */
 	public function testPreserveId() {
 		$model = $this->_model;
-		$model::config(array('source' => 'posts'));
+		$document = $model::create(array('_id' => 'custom'), array('exists' => true));
 
-		$document = $model::create(array('_id' => 'custom'));
-		$document->save();
+		array_push($this->db->connection->results, true);
+		$this->assertTrue($document->save(array('_id' => 'custom2', 'foo' => 'bar')));
 
-		$document->_id = 'custom2';
-		$document->foo = 'bar';
-		$this->assertTrue($document->save());
-
-		array_push($this->db->connection->results, new MockResult(array(
-			'data' => array()
-		)));
-		$this->assertNull($model::first('custom2'));
-
-		array_push($this->db->connection->results, new MockResult(array(
-			'data' => array(array('_id' => new MongoId('custom'), 'foo' => 'bar'))
-		)));
-		$this->assertEqual(array('_id' => 'custom'), $model::first('custom')->data());
+		$result = array_shift($this->db->connection->queries);
+		$expected = array('$set' => array('foo' => 'bar'));
+		$this->assertEqual($expected, $result['update']);
 	}
 
 	public function testCastingConditionsValues() {
@@ -669,18 +677,22 @@ class MongoDbTest extends \lithium\test\Unit {
 		));
 		$result = $this->db->conditions($conditions, $query);
 		$this->assertEqual(3, count($result['_id']['$in']));
-		$this->assertTrue($result['_id']['$in'][0] instanceof MongoId);
-		$this->assertTrue($result['_id']['$in'][1] instanceof MongoId);
-		$this->assertTrue($result['_id']['$in'][2] instanceof MongoId);
+
+		foreach (array(0, 1, 2) as $i) {
+			$this->assertTrue($result['_id']['$in'][$i] instanceof MongoId);
+		}
 
 		$conditions = array('voters' => array('$all' => array(
 			"4c8f86167675abfabdbf0300", "4c8f86167675abfabdc00300"
 		)));
 		$result = $this->db->conditions($conditions, $query);
-
 		$this->assertEqual(2, count($result['voters']['$all']));
-		$this->assertTrue($result['voters']['$all'][0] instanceof MongoId);
-		$this->assertTrue($result['voters']['$all'][1] instanceof MongoId);
+		$result = $result['voters']['$all'];
+
+		foreach (array(0, 1) as $i) {
+			$this->assertTrue($result[$i] instanceof MongoId);
+			$this->assertEqual($conditions['voters']['$all'][$i], (string) $result[$i]);
+		}
 
 		$conditions = array('$or' => array(
 			array('_id' => "4c8f86167675abfabdbf0300"),
@@ -689,8 +701,12 @@ class MongoDbTest extends \lithium\test\Unit {
 		$result = $this->db->conditions($conditions, $query);
 		$this->assertEqual(array('$or'), array_keys($result));
 		$this->assertEqual(2, count($result['$or']));
-		$this->assertTrue($result['$or'][0]['_id'] instanceof MongoId);
-		$this->assertTrue($result['$or'][1]['guid'] instanceof MongoId);
+
+
+		foreach (array('_id', 'guid') as $i => $key) {
+			$this->assertTrue($result['$or'][$i][$key] instanceof MongoId);
+			$this->assertEqual($conditions['$or'][$i][$key], (string) $result['$or'][$i][$key]);
+		}
 	}
 
 	public function testMultiOperationConditions() {
@@ -718,7 +734,8 @@ class MongoDbTest extends \lithium\test\Unit {
 			'list' => array('foo', 'bar', 'baz')
 		);
 		$model = $this->_model;
-		$schema = array('updated' => array('type' => 'MongoDate'));
+		$fields = array('updated' => array('type' => 'MongoDate'));
+		$schema = new Schema(compact('fields'));
 		$entity = new Document(compact('data', 'schema', 'model') + array('exists' => true));
 		$entity->updated = time();
 		$entity->list[] = 'dib';

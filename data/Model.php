@@ -639,6 +639,9 @@ class Model extends \lithium\core\StaticObject {
 		if ($field === false) {
 			return $self->_schema->reset();
 		}
+		if (is_array($field)) {
+			return $self->_schema->append($field);
+		}
 		return $field ? $self->_schema->fields($field) : $self->_schema;
 	}
 
@@ -821,6 +824,7 @@ class Model extends \lithium\core\StaticObject {
 			if ($rules = $options['validate']) {
 				$events = $options['events'];
 				$validateOpts = is_array($rules) ? compact('rules','events') : compact('events');
+
 				if (!$entity->validates($validateOpts)) {
 					return false;
 				}

@@ -107,8 +107,7 @@ class DocumentSet extends \lithium\data\Collection {
 			return $null;
 		}
 		if (is_array($data = $this->_data[$offset]) && $model) {
-			$schema = $this->schema() ?: $model::schema();
-			$this->_data[$offset] = $schema->cast($this, $data);
+			$this->_data[$offset] = $this->schema()->cast($this, $data);
 		}
 		if (isset($this->_data[$offset])) {
 			return $this->_data[$offset];

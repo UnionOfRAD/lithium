@@ -449,7 +449,6 @@ class MongoDb extends \lithium\data\Source {
 			$options = $params['options'];
 			$args = $query->export($self);
 			$source = $args['source'];
-			$schema = $self->describe(null);
 
 			if ($group = $args['group']) {
 				$result = $self->invokeMethod('_group', array($group, $args, $options));
@@ -466,9 +465,10 @@ class MongoDb extends \lithium\data\Source {
 			if ($query->calculate()) {
 				return $result;
 			}
+
 			$resource = $result->sort($args['order'])->limit($args['limit'])->skip($args['offset']);
 			$result = $self->invokeMethod('_instance', array('result', compact('resource')));
-			$config = compact('result', 'query', 'schema') + array('class' => 'set');
+			$config = compact('result', 'query') + array('class' => 'set');
 			return $self->item($query->model(), array(), $config);
 		});
 	}
@@ -655,14 +655,21 @@ class MongoDb extends \lithium\data\Source {
 		return $this->_conditions($conditions, $model, $schema, $context);
 	}
 
-	protected function _conditions($conditions, $model, $schema, $context) {
-		$castOpts = compact('model') + array('first' => true, 'database' => $this);
+	/**
+	 * Protected helper method used to format conditions.
+	 *
+	 * @param array $conditions The conditions array to be processed.
+	 * @param string $model The name of the model class used in the query.
+	 * @param object $schema The object containing the schema definition.
+	 * @param object $context The `Query` object.
+	 * @return array Processed query conditions.
+	 */
+	protected function _conditions(array $conditions, $model, $schema, $context) {
 		$ops = $this->_operators;
+		$castOpts = array('first' => true, 'database' => $this, 'wrap' => false);
+
 		$cast = function($value) use (&$schema, &$castOpts) {
-			if (!$schema) {
-				return $value;
-			}
-			return $schema->cast(null, $value, $castOpts);
+			return $schema ? $schema->cast(null, $value, $castOpts) : $value;
 		};
 
 		foreach ($conditions as $key => $value) {
@@ -683,26 +690,18 @@ class MongoDb extends \lithium\data\Source {
 				continue;
 			}
 			if (!is_array($value)) {
-				$conditions[$key] = $cast($value);
+				$value = $cast(array($key => $value));
+				$conditions[$key] = reset($value);
 				continue;
 			}
 			$current = key($value);
-			$isOpArray = (isset($this->_operators[$current]) || $current[0] === '$');
 
-			if (!$isOpArray) {
-				$conditions[$key] = array('$in' => $cast($value));
+			if (!isset($ops[$current]) && $current[0] !== '$') {
+				$value = $cast(array($key => $value));
+				$conditions[$key] = array('$in' => reset($value));
 				continue;
 			}
-			$operations = array();
-
-			foreach ($value as $op => $val) {
-				if (is_object($result = $this->_operator($model, $key, $op, $val, $schema))) {
-					$operations = $result;
-					break;
-				}
-				$operations += $this->_operator($model, $key, $op, $val, $schema);
-			}
-			$conditions[$key] = $operations;
+			$conditions[$key] = $this->_operators($key, $value, $schema);
 		}
 		return $conditions;
 	}
@@ -716,37 +715,40 @@ class MongoDb extends \lithium\data\Source {
 		}
 	}
 
-	protected function _operator($model, $key, $op, $value, $schema) {
-		$castOpts = compact('schema', 'model');
-		$castOpts += array('first' => true, 'arrays' => false, 'database' => $this);
-		$cast = function($pair) use ($model, &$schema, &$castOpts) {
-			if (!$schema) {
-				return $castOpts['first'] ? reset($pair) : $pair;
-			}
-			return $schema->cast($model, $pair, $castOpts);
+	protected function _operators($field, $operators, $schema) {
+		$castOpts = compact('schema');
+		$castOpts += array('first' => true, 'database' => $this, 'wrap' => false);
+
+		$cast = function($value) use (&$schema, &$castOpts) {
+			return $schema ? $schema->cast(null, $value, $castOpts) : $value;
 		};
 
-		switch (true) {
-			case !isset($this->_operators[$op]):
-				return array($op => $cast(array($key => $value)));
-			case is_callable($this->_operators[$op]):
-				return $this->_operators[$op]($key, $value);
-			case is_array($this->_operators[$op]):
-				$format = (is_array($value)) ? 'multiple' : 'single';
-				$operator = $this->_operators[$op][$format];
-			break;
-			default:
-				$operator = $this->_operators[$op];
-			break;
+		foreach ($operators as $key => $value) {
+			if (!isset($this->_operators[$key])) {
+				$value = $cast(array($field => $value));
+				$operators[$key] = reset($value);
+				continue;
+			}
+			$operator = $this->_operators[$key];
+
+			if (is_array($operator)) {
+				$operator = $operator[is_array($value) ? 'multiple' : 'single'];
+			}
+			if (is_callable($operator)) {
+				return $operator($key, $value, $schema);
+			}
+			unset($operators[$key]);
+			$value = $cast(array($field => $value));
+			$operators[$operator] = reset($value);
 		}
-		return array($operator => $value);
+		return $operators;
 	}
 
 	/**
 	 * Return formatted identifiers for fields.
 	 *
-	 * MongoDB does nt require field identifer escaping; as a result,
-	 * this method is not implemented.
+	 * MongoDB does nt require field identifer escaping; as a result, this method is not
+	 * implemented.
 	 *
 	 * @param array $fields Fields to be parsed
 	 * @param object $context
@@ -759,11 +761,11 @@ class MongoDb extends \lithium\data\Source {
 	/**
 	 * Return formatted clause for limit.
 	 *
-	 * MongoDB does nt require limit identifer formatting; as a result,
-	 * this method is not implemented.
+	 * MongoDB doesn't require limit identifer formatting; as a result, this method is not
+	 * implemented.
 	 *
-	 * @param mixed $limit The `limit` clause to be formatted
-	 * @param object $context
+	 * @param mixed $limit The `limit` clause to be formatted.
+	 * @param object $context The `Query` object instance.
 	 * @return mixed Formatted `limit` clause.
 	 */
 	public function limit($limit, $context) {
@@ -785,9 +787,8 @@ class MongoDb extends \lithium\data\Source {
 			return array($order => 1);
 		}
 		if (!is_array($order)) {
-			return $order ?: array();
+			return array();
 		}
-
 		foreach ($order as $key => $value) {
 			if (!is_string($key)) {
 				unset($order[$key]);
