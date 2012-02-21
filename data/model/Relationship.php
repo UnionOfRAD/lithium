@@ -10,6 +10,7 @@ namespace lithium\data\model;
 
 use lithium\core\Libraries;
 use lithium\util\Inflector;
+use lithium\core\ConfigException;
 use lithium\core\ClassNotFoundException;
 
 /**
@@ -148,14 +149,26 @@ class Relationship extends \lithium\core\Object {
 
 	protected function _keys($keys) {
 		$config = $this->_config;
+		$hasRel = ($related = ($config['type'] == 'belongsTo') ? $config['to'] : $config['from']);
 
-		if (!($related = ($config['type'] == 'belongsTo') ? $config['to'] : $config['from'])) {
+		if (!$hasRel || !$keys) {
 			return array();
 		}
-		if (class_exists($related)) {
-			return array_combine((array) $keys, (array) $related::key());
+		if (!class_exists($related)) {
+			throw new ClassNotFoundException("Related model class '{$related}' not found.");
 		}
-		throw new ClassNotFoundException("Related model class '{$related}' not found.");
+		if (!$related::key()) {
+			throw new ConfigException("No key defined for related model `{$related}`.");
+		}
+		$keys = (array) $keys;
+		$related = (array) $related::key();
+
+		if (count($keys) != count($related)) {
+			$msg  = "Unmatched keys in relationship `{$config['name']}` between models ";
+			$msg .= "`{$config['from']}` and `{$config['to']}`.";
+			throw new ConfigException($msg);
+		}
+		return array_combine($keys, $related);
 	}
 }
 
