@@ -22,7 +22,14 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 
 	protected $_locked = false;
 
+	protected $_types = array();
+
 	protected $_autoConfig = array('fields', 'meta', 'locked');
+
+	public function __construct(array $config = array()) {
+		$defaults = array('fields' => array());
+		parent::__construct($config + $defaults);
+	}
 
 	protected function _init() {
 		parent::_init();
@@ -106,7 +113,8 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 		if (!isset($this->_fields[$field]['type'])) {
 			return null;
 		}
-		return $this->_fields[$field]['type'];
+		$type = $this->_fields[$field]['type'];
+		return isset($this->_types[$type]) ? $this->_types[$type] : $type;
 	}
 
 	public function cast($object, $data, array $options = array()) {

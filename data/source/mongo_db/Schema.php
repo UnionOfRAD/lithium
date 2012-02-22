@@ -14,7 +14,7 @@ use MongoDate;
 use MongoRegex;
 use MongoBinData;
 
-class Schema extends \lithium\data\Schema {
+class Schema extends \lithium\data\DocumentSchema {
 
 	protected $_handlers = array();
 
@@ -52,70 +52,6 @@ class Schema extends \lithium\data\Schema {
 			'code'    => function($v) { return new MongoCode($v); },
 			'binary'  => function($v) { return new MongoBinData($v); }
 		);
-	}
-
-	public function type($field) {
-		if (!isset($this->_fields[$field]['type'])) {
-			return null;
-		}
-		$type = $this->_fields[$field]['type'];
-		return isset($this->_types[$type]) ? $this->_types[$type] : $type;
-	}
-
-	public function cast($object, $data, array $options = array()) {
-		$defaults = array(
-			'pathKey' => null,
-			'model' => null,
-			'database' => null,
-			'wrap' => true
-		);
-		$options += $defaults;
-		$basePathKey = $options['pathKey'];
-		$model = (!$options['model'] && $object) ? $object->model() : $options['model'];
-		$database = $options['database'];
-
-		if (is_scalar($data) || !$data) {
-			return $this->_castType($data, $basePathKey);
-		}
-
-		if ($model && !($database = $options['database'])) {
-			$database = $model::connection();
-		}
-
-		foreach ($data as $key => $val) {
-			$pathKey = $basePathKey ? $basePathKey . '.' . $key : $key;
-			$isArray = $this->is('array', $pathKey);
-			$valIsArray = is_array($val);
-
-			if ((is_object($val) || is_object($data)) && !$isArray) {
-				continue;
-			}
-			if (!$valIsArray && !$isArray) {
-				$data[$key] = $this->_castType($val, $pathKey);
-				continue;
-			}
-			$numericArray = false;
-
-			if ($valIsArray) {
-				$numericArray = !$val || array_keys($val) === range(0, count($val) - 1);
-			}
-			$options['class'] = 'entity';
-
-			if ($isArray || $numericArray) {
-				$options['class'] = 'array';
-				$val = $valIsArray ? $val : array($val);
-				$keys = array_fill(0, count($val), $pathKey);
-				$val = array_map(array(&$this, '_castType'), $val, $keys);
-			}
-			unset($options['first']);
-
-			if ($database && $options['wrap']) {
-				$config = compact('pathKey') + array_diff_key($options, $defaults);
-				$val = $database->item($options['model'], $val, $config);
-			}
-			$data[$key] = $val;
-		}
-		return $data;
 	}
 
 	protected function _castType($val, $field) {

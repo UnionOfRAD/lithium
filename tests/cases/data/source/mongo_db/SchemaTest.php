@@ -28,7 +28,7 @@ class SchemaTest extends \lithium\test\Unit {
 		$this->db = new MongoDb(array('autoConnect' => false));
 	}
 
-	public function testIdArray() {
+	public function testCastingIdArray() {
 		$schema = new Schema(array('fields' => array(
 			'_id' => array('type' => 'id'),
 			'users' => array('type' => 'id', 'array' => true)
@@ -41,6 +41,14 @@ class SchemaTest extends \lithium\test\Unit {
 		$this->assertEqual(array('users'), array_keys($result));
 		$this->assertEqual(1, count($result['users']));
 		$this->assertTrue($result['users'][0] instanceof MongoId);
+	}
+
+	public function testCastingEmptyValues() {
+		$schema = new Schema(array('fields' => array(
+			'_id' => array('type' => 'id'),
+			'foo' => array('type' => 'string', 'array' => true)
+		)));
+		$result = $schema->cast(null, null, array('database' => $this->db));
 	}
 }
 
