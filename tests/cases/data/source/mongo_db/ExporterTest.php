@@ -60,6 +60,7 @@ class ExporterTest extends \lithium\test\Unit {
 			'binary'  => function($v) { return new MongoBinData($v); }
 		);
 		$model = $this->_model;
+		$model::$connection = new MongoDb(array('autoConnect' => false));
 	}
 
 	public function testInvalid() {

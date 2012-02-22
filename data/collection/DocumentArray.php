@@ -101,17 +101,20 @@ class DocumentArray extends \lithium\data\Collection {
 	 * @param string $offset The offset to retrieve.
 	 * @return mixed Value at offset.
 	 */
-	public function offsetGet($offset) {
-		return isset($this->_data[$offset]) ? $this->_data[$offset] : null;
+	public function &offsetGet($offset) {
+		$null = null;
+
+		if (!isset($this->_data[$offset])) {
+			return $null;
+		}
+		return $this->_data[$offset];
 	}
 
 	public function offsetSet($offset, $data) {
 		if ($schema = $this->schema()) {
-			$options = array('pathKey' => $this->_pathKey);
-			$data = $schema->cast($this, array($offset => $data), $options);
-			$data = reset($data);
+			$data = $schema->cast($this, $data, array('pathKey' => $this->_pathKey));
 		}
-		return $offset ? ($this->_data[$offset] = $data) : ($this->_data[] = $data);
+		($offset === null) ? $this->_data[] = $data : $this->_data[$offset] = $data;
 	}
 
 	/**

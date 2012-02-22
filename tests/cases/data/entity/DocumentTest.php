@@ -10,11 +10,11 @@ namespace lithium\tests\cases\data\entity;
 
 use MongoId;
 use MongoDate;
-use lithium\data\Schema;
 use lithium\data\source\MongoDb;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
 use lithium\data\collection\DocumentArray;
+use lithium\data\source\mongo_db\Schema;
 use lithium\tests\mocks\data\model\MockDocumentPost;
 use lithium\tests\mocks\data\model\MockDocumentMultipleKey;
 use lithium\tests\mocks\data\source\MockMongoConnection;
@@ -709,13 +709,13 @@ class DocumentTest extends \lithium\test\Unit {
 
 	public function testWithArraySchemaReusedName() {
 		$model = $this->_model;
-		$schema = array(
+		$schema = new Schema(array('fields' => array(
 			'_id' => array('type' => 'id'),
 			'bar' => array('array' => true),
 			'foo' => array('type' => 'object', 'array' => true),
 			'foo.foo' => array('type' => 'integer'),
 			'foo.bar' => array('type' => 'integer')
-		);
+		)));
 		$doc = new Document(compact('model', 'schema'));
 		$doc->foo[] = array('foo' => 1, 'bar' => 100);
 

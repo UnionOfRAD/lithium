@@ -176,16 +176,16 @@ class DocumentSet extends \lithium\data\Collection {
 		if ($this->closed() || !($model = $this->_model)) {
 			return;
 		}
-
 		if (($data = $data ?: $this->_result->next()) === null) {
 			return $this->close();
 		}
 
-		$schema = $this->schema();
-		$options = array('exists' => true, 'first' => true, 'pathKey' => $this->_pathKey);
-		$options += compact('model');
-		$result = $schema->cast($this, array($key => $data), $options);
-		return $this->_data[] = reset($result);
+		if ($schema = $this->schema()) {
+			$options = array('exists' => true, 'first' => true, 'pathKey' => $this->_pathKey);
+			$options += compact('model');
+			$result = $schema->cast($this, array($key => $data), $options);
+			return $this->_data[] = reset($result);
+		}
 	}
 
 	/**
