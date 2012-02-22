@@ -8,6 +8,8 @@
 
 namespace lithium\tests\mocks\data\source\http\adapter;
 
+use lithium\data\DocumentSchema;
+
 class MockCouchPost extends \lithium\tests\mocks\data\MockBase {
 
 	public static $connection;
@@ -22,6 +24,13 @@ class MockCouchPost extends \lithium\tests\mocks\data\MockBase {
 		'created' => array('type' => 'datetime'),
 		'updated' => array('type' => 'datetime')
 	);
+
+	public static function resetSchema($array = false) {
+		if ($array) {
+			return static::_object()->_schema = array();
+		}
+		static::_object()->_schema = new DocumentSchema();
+	}
 }
 
 ?>
