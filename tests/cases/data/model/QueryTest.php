@@ -259,6 +259,7 @@ class QueryTest extends \lithium\test\Unit {
 			'offset',
 			'order',
 			'page',
+			'schema',
 			'source',
 			'type',
 			'whitelist',
