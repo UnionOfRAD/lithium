@@ -53,14 +53,6 @@ class Schema extends \lithium\data\DocumentSchema {
 			'binary'  => function($v) { return new MongoBinData($v); }
 		);
 	}
-
-	protected function _castType($val, $field) {
-		if (!is_scalar($val)) {
-			return $val;
-		}
-		$type = $this->type($field);
-		return isset($this->_handlers[$type]) ? $this->_handlers[$type]($val) : $val;
-	}
 }
 
 ?>
