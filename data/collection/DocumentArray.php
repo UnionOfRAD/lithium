@@ -112,7 +112,9 @@ class DocumentArray extends \lithium\data\Collection {
 
 	public function offsetSet($offset, $data) {
 		if ($schema = $this->schema()) {
-			$data = $schema->cast($this, $data, array('pathKey' => $this->_pathKey));
+			$model = $this->_model;
+			$pathKey = $this->_pathKey;
+			$data = $schema->cast($this, $data, compact('model', 'pathKey'));
 		}
 		($offset === null) ? $this->_data[] = $data : $this->_data[$offset] = $data;
 	}

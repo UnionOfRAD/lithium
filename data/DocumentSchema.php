@@ -53,7 +53,8 @@ class DocumentSchema extends \lithium\data\Schema {
 			if ($val instanceof $classes['array'] || $val instanceof $classes['entity']) {
 				continue;
 			}
-			$pathKey = $basePathKey ? $basePathKey . '.' . $key : $key;
+			$fieldName = is_int($key) ? null : $key;
+			$pathKey = $basePathKey ? "{$basePathKey}.{$fieldName}" : $fieldName;
 			$isArray = $this->is('array', $pathKey);
 			$valIsArray = is_array($val);
 
