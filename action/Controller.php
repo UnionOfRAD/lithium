@@ -144,7 +144,7 @@ class Controller extends \lithium\core\Object {
 			$this->_render['type'] = $this->request->accepts();
 			return;
 		}
-		$this->_render['type'] = $this->request->type ?: 'html';
+		$this->_render['type'] = $this->request->get('params:type') ?: 'html';
 	}
 
 	/**
