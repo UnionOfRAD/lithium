@@ -44,51 +44,54 @@ class DocumentSchema extends \lithium\data\Schema {
 		if (is_scalar($data) || !$data) {
 			return $this->_castType($data, $basePathKey);
 		}
-
 		if ($model && !($database = $options['database'])) {
 			$database = $model::connection();
 		}
 
 		foreach ($data as $key => $val) {
+			$fieldName = is_int($key) ? null : $key;
+			$pathKey = $basePathKey ? "{$basePathKey}.{$fieldName}" : $fieldName;
+
 			if ($val instanceof $classes['array'] || $val instanceof $classes['entity']) {
 				continue;
 			}
-			$fieldName = is_int($key) ? null : $key;
-			$pathKey = $basePathKey ? "{$basePathKey}.{$fieldName}" : $fieldName;
-			$isArray = $this->is('array', $pathKey);
-			$valIsArray = is_array($val);
-
-			if ((is_object($val) || is_object($data)) && !$isArray) {
+			if ((is_object($val) || is_object($data)) && !$this->is('array', $pathKey)) {
 				continue;
 			}
-			if (!$valIsArray && !$isArray) {
-				$data[$key] = $this->_castType($val, $pathKey);
-				continue;
-			}
-			$numericArray = false;
-
-			if ($valIsArray) {
-				$numericArray = !$val || array_keys($val) === range(0, count($val) - 1);
-			}
-			$options['class'] = 'entity';
-
-			if ($isArray || $numericArray) {
-				if ($val) {
-					$val = $valIsArray ? $val : array($val);
-					$keys = array_fill(0, count($val), $pathKey);
-					$val = array_map(array(&$this, '_castType'), $val, $keys);
-				}
-				$options['class'] = 'array';
-			}
-			unset($options['first']);
-
-			if ($database && $options['wrap']) {
-				$config = compact('pathKey') + array_diff_key($options, $defaults);
-				$val = $database->item($options['model'], $val, $config);
-			}
-			$data[$key] = $val;
+			$data[$key] = $this->_castArray($val, $pathKey, $database, $options, $defaults);
 		}
 		return $data;
+	}
+
+	protected function _castArray($val, $pathKey, $database, $options, $defaults) {
+		$isArray = $this->is('array', $pathKey);
+		$valIsArray = is_array($val);
+
+		if (!$valIsArray && !$isArray) {
+			return $this->_castType($val, $pathKey);
+		}
+		$numericArray = false;
+
+		if ($valIsArray) {
+			$numericArray = !$val || array_keys($val) === range(0, count($val) - 1);
+		}
+		$options['class'] = 'entity';
+
+		if ($isArray || $numericArray) {
+			if ($val) {
+				$val = $valIsArray ? $val : array($val);
+				$keys = array_fill(0, count($val), $pathKey);
+				$val = array_map(array(&$this, '_castType'), $val, $keys);
+			}
+			$options['class'] = 'array';
+		}
+		unset($options['first']);
+
+		if ($database && $options['wrap']) {
+			$config = compact('pathKey') + array_diff_key($options, $defaults);
+			$val = $database->item($options['model'], $val, $config);
+		}
+		return $val;
 	}
 
 	protected function _castType($val, $field) {
