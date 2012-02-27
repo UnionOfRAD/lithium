@@ -155,10 +155,9 @@ class MediaTest extends \lithium\test\Unit {
 		$result = Media::asset('this.file.should.not.exist', 'css', array('check' => true));
 		$this->assertFalse($result);
 
-		$this->skipIf(!Libraries::get(true, 'webroot'), "No webroot directory in default library.");
+		$this->skipIf(!is_dir(Media::webroot(true)), "No webroot directory in default library.");
 		$result = Media::asset('debug', 'css', array('check' => 'true', 'library' => true));
-		$expected = '/css/debug.css';
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('/css/debug.css', $result);
 
 		$result = Media::asset('debug', 'css', array('timestamp' => true));
 		$this->assertPattern('%^/css/debug\.css\?\d+$%', $result);
@@ -166,8 +165,7 @@ class MediaTest extends \lithium\test\Unit {
 		$result = Media::asset('debug.css?type=test', 'css', array(
 			'check' => 'true', 'base' => 'foo'
 		));
-		$expected = 'foo/css/debug.css?type=test';
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('foo/css/debug.css?type=test', $result);
 
 		$result = Media::asset('debug.css?type=test', 'css', array(
 			'check' => 'true', 'base' => 'foo', 'timestamp' => true
