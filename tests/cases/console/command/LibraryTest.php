@@ -318,7 +318,7 @@ class LibraryTest extends \lithium\test\Unit {
 
 	public function testFormulateNoPath() {
 		$isWin = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-		$this->skipIf($isWin, 'Windows doesn\'t support access modes.');
+		$this->skipIf($isWin, 'Permissions cannot be modified on Windows.');
 		
 		$path = $this->_testPath . '/library_test_no_plugin';
 		umask(0);
