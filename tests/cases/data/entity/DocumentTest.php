@@ -93,6 +93,32 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testSetAndCoerceArray() {
+		$schema = new Schema(array('fields' => array(
+			'forceArray' => array('type' => 'string', 'array' => true),
+			'array' => array('type' => 'string', 'array' => true),
+			'dictionary' => array('type' => 'string', 'array' => true),
+			'numbers' => array('type' => 'integer', 'array' => true),
+			'objects' => array('type' => 'object', 'array' => true),
+			'deeply' => array('type' => 'object', 'array' => true),
+			'foo' => array('type' => 'string')
+		)));
+		$exists = true;
+
+		$doc = new Document(compact('schema', 'exists'));
+		$doc->array = array(1, 2, 3);
+		$doc->forceArray = 'foo';
+		$result = $doc->export();
+
+		$this->assertTrue($result['update']['forceArray'] instanceof DocumentArray);
+		$this->assertTrue($result['update']['array'] instanceof DocumentArray);
+		$this->assertIdentical(array('foo'), $result['update']['forceArray']->data());
+
+		$doc->forceArray = false;
+		$result = $doc->export();
+		$this->assertIdentical(array(), $result['update']['forceArray']->data());
+	}
+
 	public function testNestedKeyGetSet() {
 		$doc = new Document(array('model' => $this->_model, 'data' => array(
 			'name' => 'Bob', 'location' => 'New York, NY', 'profile' => array(
