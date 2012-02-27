@@ -471,7 +471,7 @@ class MediaTest extends \lithium\test\Unit {
 
 	public function testCustomWebroot() {
 		Libraries::add('defaultStyleApp', array('path' => LITHIUM_APP_PATH, 'bootstrap' => false));
-		$this->assertEqual(LITHIUM_APP_PATH . '/webroot', Media::webroot('defaultStyleApp'));
+		$this->assertEqual(realpath(LITHIUM_APP_PATH . '/webroot'), realpath(Media::webroot('defaultStyleApp')));
 
 		Libraries::add('customWebRootApp', array(
 			'path' => LITHIUM_APP_PATH,
