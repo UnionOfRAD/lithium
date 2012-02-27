@@ -75,6 +75,8 @@ class DocumentSchema extends \lithium\data\Schema {
 				$val = $valIsArray ? $val : array($val);
 				$keys = array_fill(0, count($val), $pathKey);
 				$val = array_map(array(&$this, '_castType'), $val, $keys);
+			} else {
+				$val = array();
 			}
 			$class = 'array';
 		}
@@ -87,12 +89,23 @@ class DocumentSchema extends \lithium\data\Schema {
 		return $val;
 	}
 
-	protected function _castType($val, $field) {
-		if (!is_scalar($val)) {
-			return $val;
+	/**
+	 * Casts a scalar (non-object/array) value to its corresponding database-native value or custom
+	 * value object based on a handler assigned to `$field`'s data type.
+	 *
+	 * @param mixed $value The value to be cast.
+	 * @param string $field The name of the field that `$value` is or will be stored in. If it is a
+	 *               nested field, `$field` should be the full dot-separated path to the
+	 *               sub-object's field.
+	 * @return mixed Returns the result of `$value`, modified by a matching handler data type
+	 *               handler, if available.
+	 */
+	protected function _castType($value, $field) {
+		if (!is_scalar($value)) {
+			return $value;
 		}
 		$type = $this->type($field);
-		return isset($this->_handlers[$type]) ? $this->_handlers[$type]($val) : $val;
+		return isset($this->_handlers[$type]) ? $this->_handlers[$type]($value) : $value;
 	}
 }
 
