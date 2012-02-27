@@ -61,6 +61,9 @@ class ExporterTest extends \lithium\test\Unit {
 		);
 		$model = $this->_model;
 		$model::$connection = new MongoDb(array('autoConnect' => false));
+
+		$model::schema(false);
+		$model::schema($this->_schema);
 	}
 
 	public function testInvalid() {
@@ -271,9 +274,7 @@ class ExporterTest extends \lithium\test\Unit {
 	public function testNestedObjectCasting() {
 		$model = $this->_model;
 		$data = array('notifications' => array('foo' => '', 'bar' => '1', 'baz' => 0, 'dib' => 42));
-
-		$schema = new Schema(array('fields' => $this->_schema));
-		$result = $schema->cast(null, $data, compact('model'));
+		$result = $model::schema()->cast(null, $data, compact('model'));
 
 		$this->assertIdentical(false, $result['notifications']->foo);
 		$this->assertIdentical(true, $result['notifications']->bar);
@@ -444,13 +445,13 @@ class ExporterTest extends \lithium\test\Unit {
 	 * MongoDB operators.
 	 */
 	public function testAppendingNestedObjectArray() {
-		$schema = new Schema(array('fields' => array(
+		$model = $this->_model;
+		$model::schema(false);
+		$model::schema(array(
 			'accounts' => array('type' => 'object', 'array' => true),
 			'accounts.name' => array('type' => 'string')
-		)));
-
-		$model = $this->_model;
-		$doc = new Document(compact('schema', 'model'));
+		));
+		$doc = new Document(compact('model'));
 		$this->assertEqual(array(), $doc->accounts->data());
 		$doc->sync();
 
@@ -458,7 +459,12 @@ class ExporterTest extends \lithium\test\Unit {
 		$doc->accounts[] = new Document(compact('data'));
 
 		$result = Exporter::get('update', $doc->export());
-		$this->assertEqual(array('$set' => array('accounts.0' => $data)), $result);
+		$expected = array('update' => array('accounts.0' => $data));
+		$this->assertEqual($expected, $result);
+
+		$result = Exporter::toCommand($result);
+		$expected = array('$set' => array('accounts.0' => $data));
+		$this->assertEqual($expected, $result);
 	}
 
 	/**
