@@ -52,7 +52,7 @@ class ExtractTest extends \lithium\test\Unit {
 
 	public function testInit() {
 		$command = new Extract();
-		$this->assertEqual(Libraries::get(true, 'path'), $command->source);
+		$this->assertEqual(realpath(Libraries::get(true, 'path')), $command->source);
 		$this->assertEqual(Libraries::get(true, 'resources') . '/g11n', $command->destination);
 	}
 
