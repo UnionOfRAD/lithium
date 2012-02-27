@@ -574,8 +574,20 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertFalse($doc->foo->exists());
 
 		$doc = new Document(compact('model', 'data') + array('exists' => true));
-
 		$this->assertTrue($doc->exists());
+		$this->assertTrue($doc->foo->exists());
+
+		$doc = new Document(compact('model', 'data') + array('exists' => true));
+		$subDoc = new Document(array('data' => array('bar' => 'stuff')));
+
+		$this->assertTrue($doc->foo->exists());
+		$this->assertFalse($subDoc->exists());
+
+		$doc->foo = $subDoc;
+		$this->assertTrue($doc->exists());
+		$this->assertFalse($doc->foo->exists());
+
+		$doc->sync();
 		$this->assertTrue($doc->foo->exists());
 	}
 

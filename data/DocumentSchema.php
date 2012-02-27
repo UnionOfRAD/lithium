@@ -29,23 +29,15 @@ class DocumentSchema extends \lithium\data\Schema {
 	}
 
 	public function cast($object, $data, array $options = array()) {
-		$defaults = array(
-			'pathKey' => null,
-			'model' => null,
-			'database' => null,
-			'wrap' => true
-		);
+		$defaults = array('pathKey' => null, 'model' => null, 'wrap' => true, 'first' => false);
 		$options += $defaults;
+
 		$basePathKey = $options['pathKey'];
 		$model = (!$options['model'] && $object) ? $object->model() : $options['model'];
-		$database = $options['database'];
 		$classes = $this->_classes;
 
 		if (is_scalar($data) || !$data) {
 			return $this->_castType($data, $basePathKey);
-		}
-		if ($model && !($database = $options['database'])) {
-			$database = $model::connection();
 		}
 
 		foreach ($data as $key => $val) {
@@ -58,38 +50,39 @@ class DocumentSchema extends \lithium\data\Schema {
 			if ((is_object($val) || is_object($data)) && !$this->is('array', $pathKey)) {
 				continue;
 			}
-			$data[$key] = $this->_castArray($val, $pathKey, $database, $options, $defaults);
+			$data[$key] = $this->_castArray($object, $val, $pathKey, $options, $defaults);
 		}
 		return $data;
 	}
 
-	protected function _castArray($val, $pathKey, $database, $options, $defaults) {
-		$isArray = $this->is('array', $pathKey);
+	protected function _castArray($object, $val, $pathKey, $options, $defaults) {
+		$isArray = $this->is('array', $pathKey) && (!$object instanceof $this->_classes['array']);
+		$isObject = ($this->type($pathKey) == 'object');
 		$valIsArray = is_array($val);
+		$numericArray = false;
+		$class = 'entity';
 
 		if (!$valIsArray && !$isArray) {
 			return $this->_castType($val, $pathKey);
 		}
-		$numericArray = false;
 
 		if ($valIsArray) {
 			$numericArray = !$val || array_keys($val) === range(0, count($val) - 1);
 		}
-		$options['class'] = 'entity';
 
-		if ($isArray || $numericArray) {
+		if (($isArray && !$isObject) || $numericArray) {
 			if ($val) {
 				$val = $valIsArray ? $val : array($val);
 				$keys = array_fill(0, count($val), $pathKey);
 				$val = array_map(array(&$this, '_castType'), $val, $keys);
 			}
-			$options['class'] = 'array';
+			$class = 'array';
 		}
-		unset($options['first']);
 
-		if ($database && $options['wrap']) {
-			$config = compact('pathKey') + array_diff_key($options, $defaults);
-			$val = $database->item($options['model'], $val, $config);
+		if ($options['wrap']) {
+			$config  = array('data' => $val, 'model' => $options['model']);
+			$config += compact('pathKey') + array_diff_key($options, $defaults);
+			$val = $this->_instance($class, $config);
 		}
 		return $val;
 	}
