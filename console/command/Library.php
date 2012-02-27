@@ -230,6 +230,7 @@ class Library extends \lithium\console\Command {
 				$this->error($e->getMessage());
 				return false;
 			}
+			
 			if ($archive->extractTo($to)) {
 				$this->out(basename($to) . " created in " . dirname($to) . " from {$from}");
 

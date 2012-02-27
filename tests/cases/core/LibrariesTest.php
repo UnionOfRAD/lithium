@@ -31,15 +31,18 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testNamespaceToFileTranslation() {
+		$DS = DIRECTORY_SEPARATOR;
+		$invalidDS = $ds == '/' ? '\\' : '/';
+		
 		$result = Libraries::path('\lithium\core\Libraries');
-		$this->assertTrue(strpos($result, '/lithium/core/Libraries.php'));
+		$this->assertTrue(strpos($result, "${DS}lithium${DS}core${DS}Libraries.php"));
 		$this->assertTrue(file_exists($result));
-		$this->assertFalse(strpos($result, '\\'));
-
+		$this->assertFalse(strpos($result, $invalidDS));
+		
 		$result = Libraries::path('lithium\core\Libraries');
-		$this->assertTrue(strpos($result, '/lithium/core/Libraries.php'));
+		$this->assertTrue(strpos($result, "${DS}lithium${DS}core${DS}Libraries.php"));
 		$this->assertTrue(file_exists($result));
-		$this->assertFalse(strpos($result, '\\'));
+		$this->assertFalse(strpos($result, $invalidDS));
 	}
 
 	public function testPathTemplate() {
@@ -423,7 +426,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$library = Libraries::get('lithium');
 		$base = $library['path'] . '/';
 
-		$expected = $base . 'template/View.php';
+		$expected = realpath($base . 'template/View.php');
 
 		$result = Libraries::path('\lithium\template\View');
 		$this->assertEqual($expected, $result);
@@ -431,7 +434,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$result = Libraries::path('lithium\template\View');
 		$this->assertEqual($expected, $result);
 
-		$expected = $base . 'template/view';
+		$expected = realpath($base . 'template/view');
 
 		$result = Libraries::path('\lithium\template\view', array('dirs' => true));
 		$this->assertEqual($expected, $result);
@@ -445,7 +448,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$base = $library['path'] . '/';
 
 		$result = Libraries::path('lithium\template\View', array('dirs' => true));
-		$expected = $base . 'template/View.php';
+		$expected = realpath($base . 'template/View.php');
 		$this->assertEqual($expected, $result);
 
 		$result = Libraries::path('lithium\template\views', array('dirs' => true));
@@ -588,7 +591,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	 */
 	public function testPathsInPharArchives() {
 		$base = Libraries::get('lithium', 'path');
-		$path = "{$base}/console/command/create/template/app.phar.gz";
+		$path = realpath("{$base}/console/command/create/template/app.phar.gz");
 
 		$expected = "phar://{$path}/controllers/HelloWorldController.php";
 		$result = Libraries::realPath($expected);
