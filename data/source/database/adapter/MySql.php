@@ -285,12 +285,14 @@ class MySql extends \lithium\data\source\Database {
 		}
 
 		$result = array();
-		$count = $resource->resource()->columnCount();
-
-		for ($i = 0; $i < $count; $i++) {
+		if($resource != null){
+                    $count = $resource->resource()->columnCount();
+                    
+                    for ($i = 0; $i < $count; $i++) {
 			$meta = $resource->resource()->getColumnMeta($i);
 			$result[] = $meta['name'];
-		}
+                    }
+                }
 		return $result;
 	}
 
