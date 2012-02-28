@@ -157,8 +157,7 @@ class Model extends \lithium\core\StaticObject {
 	protected $_relations = array();
 
 	/**
-	 * List of relation types and the configuration fields that these relations
-	 * require/accept.
+	 * List of relation types.
 	 *
 	 * Valid relation types are:
 	 *
@@ -168,13 +167,7 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * @var array
 	 */
-	protected $_relationTypes = array(
-		'belongsTo' => array('class', 'key', 'conditions', 'fields'),
-		'hasOne'    => array('class', 'key', 'conditions', 'fields'),
-		'hasMany'   => array(
-			'class', 'key', 'conditions', 'fields', 'order', 'limit'
-		)
-	);
+	protected $_relationTypes = array('belongsTo', 'hasOne', 'hasMany');
 
 	/**
 	 * Specifies all meta-information for this model class, including the name of the data source it
@@ -577,7 +570,7 @@ class Model extends \lithium\core\StaticObject {
 			return $self->_relations;
 		}
 
-		if (isset($self->_relationTypes[$name])) {
+		if (in_array($name, $self->_relationTypes)) {
 			return array_keys(array_filter($self->_relations, function($i) use ($name) {
 				return $i->data('type') == $name;
 			}));
@@ -601,7 +594,7 @@ class Model extends \lithium\core\StaticObject {
 	public static function bind($type, $name, array $config = array()) {
 		$self = static::_object();
 
-		if (!isset($self->_relationTypes[$type])) {
+		if (!in_array($type, $self->_relationTypes)) {
 			throw new ConfigException("Invalid relationship type `{$type}` specified.");
 		}
 		$rel = static::connection()->relationship(get_called_class(), $type, $name, $config);
@@ -1081,7 +1074,7 @@ class Model extends \lithium\core\StaticObject {
 		}
 		$self = static::_object();
 
-		foreach ($self->_relationTypes as $type => $keys) {
+		foreach ($self->_relationTypes as $type) {
 			foreach (Set::normalize($self->{$type}) as $name => $config) {
 				static::bind($type, $name, (array) $config);
 			}
