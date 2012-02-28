@@ -783,6 +783,10 @@ abstract class Database extends \lithium\data\Source {
 				$result[] = $field . ' = ' . $this->name($value);
 				continue;
 			}
+			if ($value === null) {
+	                	$result[] = "{$field} IS NULL";
+	                	continue;
+	            	}
 			if (!is_array($value)) {
 				continue;
 			}
