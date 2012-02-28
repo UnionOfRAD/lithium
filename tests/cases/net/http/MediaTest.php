@@ -19,8 +19,6 @@ class MediaTest extends \lithium\test\Unit {
 
 	/**
 	 * Reset the `Media` class to its default state.
-	 *
-	 * @return void
 	 */
 	public function setUp() {
 		Media::reset();
@@ -28,8 +26,6 @@ class MediaTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests setting, getting and removing custom media types.
-	 *
-	 * @return void
 	 */
 	public function testMediaTypes() {
 		// Get a list of all available media types:
@@ -82,8 +78,6 @@ class MediaTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that `Media` will return the correct type name of recognized, registered content types.
-	 *
-	 * @return void
 	 */
 	public function testContentTypeDetection() {
 		$this->assertNull(Media::type('application/foo'));
@@ -181,11 +175,11 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual('foo/media_test/css/debug.css?type=test', $result);
 
 		$result = Media::asset('debug.css?type=test', 'css', array(
-			'check' => 'true', 'base' => 'foo', 'timestamp' => true
+			'check' => true, 'base' => 'foo', 'timestamp' => true, 'library' => 'media_test'
 		));
-		$this->assertPattern('%^foo/css/debug\.css\?type=test&\d+$%', $result);
+		$this->assertPattern('%^foo/media_test/css/debug\.css\?type=test&\d+$%', $result);
 
-		$file = Media::path('css/debug.css', 'bar');
+		$file = Media::path('css/debug.css', 'bar', array('library' => 'media_test'));
 		$this->assertTrue(file_exists($file));
 
 		$result = Media::asset('this.file.should.not.exist', 'css', array('check' => true));
@@ -302,8 +296,6 @@ class MediaTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that a decode handler is not called when the Media type has none configured.
-	 *
-	 * @return void
 	 */
 	public function testNoDecode() {
 		Media::type('my', 'text/x-my', array('decode' => false));
@@ -314,8 +306,6 @@ class MediaTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that types with decode handlers can properly decode content.
-	 *
-	 * @return void
 	 */
 	public function testDecode() {
 		$data = array('movies' => array(
