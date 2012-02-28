@@ -41,13 +41,14 @@ class FileTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
-		$resources = Libraries::get(true, 'resources');
+		$resources = realpath(Libraries::get(true, 'resources'));
 		$paths = array("{$resources}/tmp/cache", "{$resources}/tmp/cache/templates");
 
 		if ($this->_hasEmpty) {
 			foreach ($paths as $path) {
+				$path = realpath($path);
 				if (is_dir($path) && is_writable($path)) {
-					touch("/{$resources}/empty");
+					touch("{$resources}/empty");
 				}
 			}
 		}

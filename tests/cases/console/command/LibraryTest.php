@@ -112,8 +112,8 @@ class LibraryTest extends \lithium\test\Unit {
 			$expected = 'define(\'LITHIUM_LIBRARY_PATH\', ';
 			$expected .= 'dirname(LITHIUM_APP_PATH) . \'/libraries\')';
 		}
-		$this->_assertFileContents($filepath, $expected);
-
+		$this->_assertFileContents(realpath($filepath), $expected);
+		
 		$filepath = $this->_testPath . '/library_test/controllers/PagesController.php';
 		$expected = "namespace library_test\\";
 		$this->_assertFileContents($filepath, $expected);
@@ -216,7 +216,7 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$path = realpath($this->_testPath);
-		$expected = "new.phar.gz created in {$path} from {$path}/new\n";
+		$expected = "new.phar.gz created in {$path} from {$path}" . DIRECTORY_SEPARATOR . "new\n";
 		$result = $app->response->output;
 		$this->assertEqual($expected, $result);
 
@@ -224,7 +224,6 @@ class LibraryTest extends \lithium\test\Unit {
 		Phar::unlinkArchive($this->_testPath . '/new.phar.gz');
 
 		$this->_cleanUp('tests/new');
-		rmdir($this->_testPath . '/new');
 	}
 
 	public function testExtractWhenLibraryDoesNotExist() {
@@ -240,7 +239,7 @@ class LibraryTest extends \lithium\test\Unit {
 
 		$path = realpath($this->_testPath);
 		$tplPath = realpath(LITHIUM_LIBRARY_PATH . '/lithium/console/command/create/template');
-		$expected = "new created in {$path} from {$tplPath}/app.phar.gz\n";
+		$expected = "new created in {$path} from {$tplPath}" . DIRECTORY_SEPARATOR . "app.phar.gz\n";
 		$result = $app->response->output;
 		$this->assertEqual($expected, $result);
 
@@ -318,6 +317,9 @@ class LibraryTest extends \lithium\test\Unit {
 	}
 
 	public function testFormulateNoPath() {
+		$isWin = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+		$this->skipIf($isWin, 'Permissions cannot be modified on Windows.');
+		
 		$path = $this->_testPath . '/library_test_no_plugin';
 		umask(0);
 		mkdir($path, 655);
