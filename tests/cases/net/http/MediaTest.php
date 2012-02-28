@@ -139,7 +139,7 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual('/foo.exe', Media::asset('foo.exe', 'bar'));
 	}
 
-	public function testAssetPathGeneration() {
+	public function testAssetAbsoluteRelativePaths() {
 		$result = Media::asset('scheme://host/subpath/file', 'js');
 		$expected = 'scheme://host/subpath/file';
 		$this->assertEqual($expected, $result);
@@ -151,21 +151,34 @@ class MediaTest extends \lithium\test\Unit {
 		$result = Media::asset('subpath/file', 'js');
 		$expected = '/js/subpath/file.js';
 		$this->assertEqual($expected, $result);
+	}
 
-		$result = Media::asset('this.file.should.not.exist', 'css', array('check' => true));
-		$this->assertFalse($result);
+	public function testAssetPathGeneration() {
+		$resources = Libraries::get(true, 'resources');
+		$this->skipIf(!is_writable($resources), "Cannot write test app to resources directory.");
+		$paths = array("{$resources}/media_test/webroot/css", "{$resources}/media_test/webroot/js");
 
-		$this->skipIf(!is_dir(Media::webroot(true)), "No webroot directory in default library.");
-		$result = Media::asset('debug', 'css', array('check' => 'true', 'library' => true));
-		$this->assertEqual('/css/debug.css', $result);
+		foreach ($paths as $path) {
+			if (!is_dir($path)) {
+				mkdir($path, 0777, true);
+			}
+		}
+		touch("{$paths[0]}/debug.css");
 
-		$result = Media::asset('debug', 'css', array('timestamp' => true));
-		$this->assertPattern('%^/css/debug\.css\?\d+$%', $result);
+		Libraries::add('media_test', array('path' => "{$resources}/media_test"));
+
+		$result = Media::asset('debug', 'css', array('check' => true, 'library' => 'media_test'));
+		$this->assertEqual('/media_test/css/debug.css', $result);
+
+		$result = Media::asset('debug', 'css', array(
+			'timestamp' => true, 'library' => 'media_test'
+		));
+		$this->assertPattern('%^/media_test/css/debug\.css\?\d+$%', $result);
 
 		$result = Media::asset('debug.css?type=test', 'css', array(
-			'check' => 'true', 'base' => 'foo'
+			'check' => true, 'base' => 'foo', 'library' => 'media_test'
 		));
-		$this->assertEqual('foo/css/debug.css?type=test', $result);
+		$this->assertEqual('foo/media_test/css/debug.css?type=test', $result);
 
 		$result = Media::asset('debug.css?type=test', 'css', array(
 			'check' => 'true', 'base' => 'foo', 'timestamp' => true
@@ -174,6 +187,15 @@ class MediaTest extends \lithium\test\Unit {
 
 		$file = Media::path('css/debug.css', 'bar');
 		$this->assertTrue(file_exists($file));
+
+		$result = Media::asset('this.file.should.not.exist', 'css', array('check' => true));
+		$this->assertFalse($result);
+
+		unlink("{$paths[0]}/debug.css");
+
+		foreach (array_merge($paths, array(dirname($paths[0]))) as $path) {
+			rmdir($path);
+		}
 	}
 
 	public function testCustomAssetPathGeneration() {
