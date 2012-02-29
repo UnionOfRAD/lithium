@@ -540,6 +540,12 @@ class DocumentTest extends \lithium\test\Unit {
 			$this->assertEqual(next($keys), $key);
 			$this->assertEqual(next($values), $value);
 		}
+		reset($keys);
+		reset($values);
+		foreach ($doc as $key => $value) {
+			$this->assertEqual(next($keys), $key);
+			$this->assertEqual(next($values), $value);
+		}
 	}
 
 	public function testExport() {
