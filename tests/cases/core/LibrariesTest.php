@@ -628,6 +628,71 @@ class LibrariesTest extends \lithium\test\Unit {
 
 		$this->_cleanUp();
 	}
+
+	/**
+	 * Tests that `Libraries::map()` and `Libraries::unmap()`
+	 *
+	 */
+	public function testMapUnmap() {
+		$testApp = Libraries::get(true, 'resources') . '/tmp/tests/test_app';
+		mkdir($testApp, 0777, true);
+		Libraries::add('test_app', array('path' => $testApp));
+
+		mkdir($testApp. '/lib', 0777);
+		mkdir($testApp. '/_patch', 0777);
+
+		file_put_contents($testApp . '/lib/LibTest.php',
+		"<?php namespace test_app\\lib;\n
+			class LibTest{ public function testMe() {
+				return 'core class';
+			}}"
+		);
+
+		file_put_contents($testApp . '/_patch/PatchedLibTest.php',
+		"<?php namespace test_app\\lib;\n
+			class LibTest{ public function testMe() {
+				return 'patched class';
+			}}"
+		);
+		
+		$expected = $result = Libraries::realPath($testApp . '/lib/LibTest.php');
+		$result = Libraries::path('test_app\\lib\\LibTest');
+
+		$this->assertEqual($expected, $result);
+
+		Libraries::map(array(
+			'test_app\\lib\\LibTest' => $testApp . '/_patch/PatchedLibTest.php'
+		));
+
+		$expected = $result = Libraries::realPath($testApp . '/_patch/PatchedLibTest.php');
+		$result = Libraries::path('test_app\\lib\\LibTest');
+
+		Libraries::unmap(array('test_app\\lib\\LibTest'));
+
+		$expected = $result = Libraries::realPath($testApp . '/lib/LibTest.php');
+		$result = Libraries::path('test_app\\lib\\LibTest');
+
+		$this->assertEqual($expected, $result);
+
+		Libraries::map(array(
+			'test_app\\lib\\LibTest' => $testApp . '/_patch/PatchedLibTest.php'
+		));
+		Libraries::unmap('test_app\\lib\\LibTest');
+
+		$expected = $result = Libraries::realPath($testApp . '/lib/LibTest.php');
+		$result = Libraries::path('test_app\\lib\\LibTest');
+
+		Libraries::map(array(
+			'test_app\\lib\\LibTest' => $testApp . '/_patch/PatchedLibTest.php'
+		));
+
+		$object = new \test_app\lib\LibTest();
+		
+		$result = $object->testMe();
+		$this->assertEqual('patched class', $result); 
+
+		$this->_cleanUp();
+	}
 }
 
 ?>

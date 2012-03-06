@@ -157,6 +157,16 @@ class Libraries {
 	protected static $_cachedPaths = array();
 
 	/**
+	 * Holds associations between fully-namespaced class names and file's paths mapped 
+	 * with `lithium\core\Libraries::map()`.
+	 *
+	 * @var array
+	 * @see lithium\core\Libraries::map()
+	 * @see lithium\core\Libraries::unmap()
+	 */
+	protected static $_map = array();
+
+	/**
 	 * Accessor method for the class path templates which `Libraries` uses to look up and load
 	 * classes. Using this method, you can define your own types of classes, or modify the default
 	 * organization of built-in class types.
@@ -475,6 +485,44 @@ class Libraries {
 	}
 
 	/**
+	 * Associtates fully-namespaced class names to their corresponding paths on
+	 * the file system.
+	 *
+	 * Once a class is associtated to a path using `lithium\core\Libraries::map()`
+         * the PSR-0 loader or custom class loader setted using the `transform` or `loader`
+	 * option of `lithium\core\Libraries::add()` are ignored and the associtated path
+	 * is used instead.
+	 *
+	 * @param array $array An array of fully-namespaced class names (as keys) and
+	 *                     their correponding file's paths (as values).
+	 *
+	 * @return void
+	 */
+	public static function map(array $array) {
+		foreach ($array as $key => $value) {
+			unset(static::$_cachedPaths[$key]);
+		}
+		static::$_map = array_merge(static::$_map, $array);
+	}
+
+	/**
+	 * Unmap fully-namespaced class names mapped using `lithium\core\Libraries::map()`.
+	 *
+	 * @param mixed $array An array of fully-namespaced class names or
+	 *		       a string with a fully-namespaced class name.
+	 *
+	 * @see lithium\core\Libraries::map()
+	 */
+	public static function unmap($array) {
+		if (!is_array($array)) {
+			$array = array($array);
+		}
+		foreach ($array as $value) {
+			unset(static::$_map[$value]);
+		}
+	}
+
+	/**
 	 * Get the corresponding physical file path for a class or namespace name.
 	 *
 	 * @param string $class The class name to locate the physical file for. If `$options['dirs']` is
@@ -494,6 +542,9 @@ class Libraries {
 
 		if (isset(static::$_cachedPaths[$class]) && !$options['dirs']) {
 			return static::$_cachedPaths[$class];
+		}
+		if (isset(static::$_map[$class]) && !$options['dirs']) {
+			return static::$_map[$class];
 		}
 		foreach (static::$_configurations as $name => $config) {
 			$params = $options + $config;
