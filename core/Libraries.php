@@ -489,35 +489,35 @@ class Libraries {
 	 * the file system.
 	 *
 	 * Once a class is associtated to a path using `lithium\core\Libraries::map()`
-         * the PSR-0 loader or custom class loader setted using the `transform` or `loader`
+	 * the PSR-0 loader or custom class loader setted using the `transform` or `loader`
 	 * option of `lithium\core\Libraries::add()` are ignored and the associtated path
 	 * is used instead.
 	 *
-	 * @param array $array An array of fully-namespaced class names (as keys) and
+	 * @param array $classes An array of fully-namespaced class names (as keys) and
 	 *                     their correponding file's paths (as values).
 	 *
 	 * @return void
 	 */
-	public static function map(array $array) {
-		foreach ($array as $key => $value) {
+	public static function map(array $classes) {
+		foreach ($classes as $key => $value) {
 			unset(static::$_cachedPaths[$key]);
 		}
-		static::$_map = array_merge(static::$_map, $array);
+		static::$_map = array_merge(static::$_map, $classes);
 	}
 
 	/**
 	 * Unmap fully-namespaced class names mapped using `lithium\core\Libraries::map()`.
 	 *
-	 * @param mixed $array An array of fully-namespaced class names or
+	 * @param mixed $classes An array of fully-namespaced class names or
 	 *		       a string with a fully-namespaced class name.
 	 *
 	 * @see lithium\core\Libraries::map()
 	 */
-	public static function unmap($array) {
-		if (!is_array($array)) {
-			$array = array($array);
+	public static function unmap($classes) {
+		if (!is_array($classes)) {
+			$classes = array($classes);
 		}
-		foreach ($array as $value) {
+		foreach ($classes as $value) {
 			unset(static::$_map[$value]);
 		}
 	}
