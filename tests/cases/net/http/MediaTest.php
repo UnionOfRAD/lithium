@@ -354,6 +354,26 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual('application/csv; charset=UTF-8', $result);
 	}
 
+	public function testEmptyEncode() {
+		$handler = Media::type('empty', 'empty/encode');
+		$this->assertNull(Media::encode($handler, array()));
+
+		$handler = Media::type('empty', 'empty/encode', array(
+			'encode' => null
+		));
+		$this->assertNull(Media::encode($handler, array()));
+
+		$handler = Media::type('empty', 'empty/encode', array(
+			'encode' => false
+		));
+		$this->assertNull(Media::encode($handler, array()));
+
+		$handler = Media::type('empty', 'empty/encode', array(
+			'encode' => ""
+		));
+		$this->assertNull(Media::encode($handler, array()));
+	}
+
 	/**
 	 * Tests that rendering plain text correctly returns the render data as-is.
 	 *
@@ -483,7 +503,10 @@ class MediaTest extends \lithium\test\Unit {
 
 	public function testCustomWebroot() {
 		Libraries::add('defaultStyleApp', array('path' => LITHIUM_APP_PATH, 'bootstrap' => false));
-		$this->assertEqual(realpath(LITHIUM_APP_PATH . '/webroot'), realpath(Media::webroot('defaultStyleApp')));
+		$this->assertEqual(
+			realpath(LITHIUM_APP_PATH . '/webroot'),
+			realpath(Media::webroot('defaultStyleApp'))
+		);
 
 		Libraries::add('customWebRootApp', array(
 			'path' => LITHIUM_APP_PATH,

@@ -763,7 +763,7 @@ class Media extends \lithium\core\StaticObject {
 			'js'           => array('application/javascript', 'text/javascript'),
 			'text'         => array('text/plain'),
 			'txt'          => array('alias' => 'text'),
-			'xml'          => array('application/xml', 'text/xml')
+			'xml'          => array('application/xml', 'application/soap+xml', 'text/xml')
 		);
 
 		if (!$type) {
