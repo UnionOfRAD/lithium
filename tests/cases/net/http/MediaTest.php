@@ -68,7 +68,7 @@ class MediaTest extends \lithium\test\Unit {
 			),
 			'encode' => null, 'decode' => null, 'cast' => true, 'conditions' => array()
 		);
-		$this->assertEqual($expected, $result['options']);
+		$this->assertIdentical($expected, $result['options']);
 
 		// Remove a custom media type:
 		Media::type('my', false);
@@ -483,7 +483,10 @@ class MediaTest extends \lithium\test\Unit {
 
 	public function testCustomWebroot() {
 		Libraries::add('defaultStyleApp', array('path' => LITHIUM_APP_PATH, 'bootstrap' => false));
-		$this->assertEqual(realpath(LITHIUM_APP_PATH . '/webroot'), realpath(Media::webroot('defaultStyleApp')));
+		$this->assertEqual(
+			realpath(LITHIUM_APP_PATH . '/webroot'),
+			realpath(Media::webroot('defaultStyleApp'))
+		);
 
 		Libraries::add('customWebRootApp', array(
 			'path' => LITHIUM_APP_PATH,

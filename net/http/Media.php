@@ -227,8 +227,8 @@ class Media extends \lithium\core\StaticObject {
 				'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
 				'element'  => '{:library}/views/elements/{:template}.{:type}.php'
 			),
-			'encode' => false,
-			'decode' => false,
+			'encode' => null,
+			'decode' => null,
 			'cast'   => true,
 			'conditions' => array()
 		);
@@ -799,8 +799,8 @@ class Media extends \lithium\core\StaticObject {
 		$handlers = static::$_handlers + array(
 			'default' => array(
 				'view'     => 'lithium\template\View',
-				'encode'   => false,
-				'decode'   => false,
+				'encode'   => null,
+				'decode'   => null,
 				'cast'     => false,
 				'paths'    => array(
 					'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
