@@ -685,6 +685,26 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual(array('post_id' => 'id'), $belongsTo->key());
 		$this->assertEqual('post', $belongsTo->fieldName());
 	}
+	
+	public function testRelationshipGenerationWithNullConstraint() {
+		$postRevision = 'lithium\tests\mocks\data\model\MockDatabasePostRevision';
+
+		$hasMany = $this->db->relationship($this->_model, 'hasMany', 'PostRevisions', array(
+			'to' => $postRevision,
+			'constraint' => array(
+				'MockDatabasePostRevision.deleted' => null
+			)
+		));		
+		$this->assertEqual(array('id' => 'mock_database_post_id'), $hasMany->key());
+		$this->assertEqual('post_revisions', $hasMany->fieldName());
+		$this->assertEqual(array('MockDatabasePost.id' => 'PostRevisions.mock_database_post_id', 'MockDatabasePostRevision.deleted' => null), $hasMany->constraints());
+
+		$belongsTo = $this->db->relationship($postRevision, 'belongsTo', 'Posts', array(
+			'to' => $this->_model
+		));
+		$this->assertEqual(array('post_id' => 'id'), $belongsTo->key());
+		$this->assertEqual('post', $belongsTo->fieldName());
+	}
 
 	public function testInvalidQueryType() {
 		$this->expectException('Invalid query type `fakeType`.');
@@ -701,6 +721,20 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ' .
 					'{mock_database_comments} AS {MockDatabaseComment} ON ' .
 					'{MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id};';
+		$this->assertEqual($expected, $this->db->sql);
+	}
+	
+	public function testReadWithRelationshipWithNullConstraint() {
+		$options = array(
+			'type' => 'read',
+			'model' => $this->_model,
+			'with' => array('MockDatabasePostRevision')
+		);
+		$result = $this->db->read(new Query($options), $options);
+		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ' .
+					'{mock_database_post_revisions} AS {MockDatabasePostRevision} ON ' .
+					'{MockDatabasePost}.{id} = {MockDatabasePostRevision}.{mock_database_post_id} AND ' .
+					'{MockDatabasePostRevision}.{deleted} IS NULL;';
 		$this->assertEqual($expected, $this->db->sql);
 	}
 
