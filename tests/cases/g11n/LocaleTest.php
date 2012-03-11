@@ -220,6 +220,30 @@ class LocaleTest extends \lithium\test\Unit {
 			'zh_Hans_HK_REVISED'
 		);
 		$this->assertEqual('zh_Hans_HK', $result);
+
+		$result = Locale::lookup(
+			array('en', 'en_UK', 'en_US', 'es', 'es_AR'),
+			'en'
+		);
+		$this->assertEqual('en', $result);
+
+		$result = Locale::lookup(
+			array('en', 'en_UK', 'en_US', 'es', 'es_AR'),
+			'en_UK'
+		);
+		$this->assertEqual('en_UK', $result);
+
+		$result = Locale::lookup(
+			array('en', 'en_UK', 'en_US', 'es', 'es_AR'),
+			'es_ES'
+		);
+		$this->assertEqual('es', $result);
+
+		$result = Locale::lookup(
+			array('en', 'en_UK', 'en_US', 'es_AR'),
+			'es_ES'
+		);
+		$this->assertEqual('es_AR', $result);
 	}
 
 	public function testPreferredFromActionRequest() {
@@ -345,6 +369,12 @@ class LocaleTest extends \lithium\test\Unit {
 			array('zh_Hans_HK_REVISED', 'zh_Hans_HK', 'zh', 'en')
 		);
 		$this->assertEqual('zh', $result);
+
+		$result = Locale::preferred(
+			array('es_ES', 'en'),
+			array('da', 'en_GB', 'en', 'es_AR')
+		);
+		$this->assertEqual('es_AR', $result);
 	}
 }
 
