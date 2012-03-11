@@ -703,6 +703,20 @@ class DatabaseTest extends \lithium\test\Unit {
 					'{MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id};';
 		$this->assertEqual($expected, $this->db->sql);
 	}
+    
+    public function testReadWithRelationshipWithNullContraint() {
+        $options = array(
+			'type' => 'read',
+			'model' => $this->_model,
+			'with' => array('MockDatabasePostRevision')
+		);
+		$result = $this->db->read(new Query($options), $options);
+		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ' .
+					'{mock_database_post_revisions} AS {MockDatabasePostRevision} ON ' .
+					'{MockDatabasePost}.{id} = {MockDatabasePostRevision}.{mock_database_post_id} AND ' .
+                    '{MockDatabasePostRevision}.{deleted} IS NULL;';
+		$this->assertEqual($expected, $this->db->sql);
+    }
 
 	public function testReadWithHasManyAndLimit() {
 		$options = array(
