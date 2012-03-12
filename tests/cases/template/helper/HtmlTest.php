@@ -280,7 +280,7 @@ class HtmlTest extends \lithium\test\Unit {
 		$expected = '<script type="text/javascript" src="http://example.com/jquery.js"></script>';
 		$this->assertEqual($result, $expected);
 
-        $result = $this->html->script('//example.com/jquery.js');
+		$result = $this->html->script('//example.com/jquery.js');
 		$expected = '<script type="text/javascript" src="//example.com/jquery.js"></script>';
 		$this->assertEqual($result, $expected);
 
