@@ -15,6 +15,7 @@ use lithium\tests\mocks\data\model\MockDatabase;
 use lithium\tests\mocks\data\model\MockDatabasePost;
 use lithium\tests\mocks\data\model\MockDatabaseComment;
 use lithium\tests\mocks\data\model\MockDatabaseTagging;
+use lithium\tests\mocks\data\model\MockDatabasePostRevision;
 
 class DatabaseTest extends \lithium\test\Unit {
 
@@ -28,11 +29,13 @@ class DatabaseTest extends \lithium\test\Unit {
 		MockDatabasePost::config();
 		MockDatabaseComment::config();
 		MockDatabaseTagging::config();
+		MockDatabasePostRevision::config();
 
 		$this->db = new MockDatabase();
 		MockDatabasePost::$connection = $this->db;
 		MockDatabaseComment::$connection = $this->db;
 		MockDatabaseTagging::$connection = $this->db;
+		MockDatabasePostRevision::$connection = $this->db;
 	}
 
 	public function testDefaultConfig() {
@@ -240,11 +243,11 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$result = $this->db->renderCommand($query);
 
-		$expected = "SELECT MockDatabasePost.title, MockDatabasePost.body FROM" .
-					" {mock_database_posts} AS {MockDatabasePost} WHERE ({Post}.{id} NOT IN" .
-					" (SELECT MockDatabaseTagging.post_id FROM {mock_database_taggings} AS " .
-					"{MockDatabaseTagging} WHERE MockDatabaseTag.tag IN " .
-					"('foo', 'bar', 'baz')));";
+		$expected = "SELECT MockDatabasePost.title, MockDatabasePost.body FROM";
+		$expected .= " {mock_database_posts} AS {MockDatabasePost} WHERE ({Post}.{id} NOT IN";
+		$expected .= " (SELECT MockDatabaseTagging.post_id FROM {mock_database_taggings} AS ";
+		$expected .= "{MockDatabaseTagging} WHERE MockDatabaseTag.tag IN ";
+		$expected .= "('foo', 'bar', 'baz')));";
 		$this->assertEqual($expected, $result);
 
 		$query = new Query(array(
@@ -342,10 +345,7 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testCalculation() {
-		$options = array(
-			'type' => 'read',
-			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost'
-		);
+		$options = array('type' => 'read', 'model' => $this->_model);
 		$this->expectException('Undefined offset: 0');
 		$result = $this->db->calculation('count', new Query($options), $options);
 		$expected = 'SELECT COUNT(*) as count FROM {mock_database_posts} AS {MockDatabasePost};';
@@ -363,10 +363,7 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testReadWithQueryObjectRecordSet() {
-		$query = new Query(array(
-			'type' => 'read',
-			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost'
-		));
+		$query = new Query(array('type' => 'read', 'model' => $this->_model));
 		$result = $this->db->read($query);
 		$this->assertTrue($result instanceof RecordSet);
 
@@ -376,10 +373,7 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testReadWithQueryObjectArray() {
-		$query = new Query(array(
-			'type' => 'read',
-			'model' => 'lithium\tests\mocks\data\model\MockDatabasePost'
-		));
+		$query = new Query(array('type' => 'read', 'model' => $this->_model));
 		$result = $this->db->read($query, array('return' => 'array'));
 		$this->assertTrue(is_array($result));
 
@@ -604,8 +598,8 @@ class DatabaseTest extends \lithium\test\Unit {
 			'MockDatabaseComment' => array('body')
 		);
 		$result = $this->db->fields($fields, $query);
-		$expected = 'MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created' .
-					', MockDatabaseComment.body';
+		$expected = 'MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created';
+		$expected .= ', MockDatabaseComment.body';
 		$this->assertEqual($expected,$result);
 
 		$fields = array(
@@ -613,25 +607,18 @@ class DatabaseTest extends \lithium\test\Unit {
 			'MockDatabaseComment'
 		);
 		$result = $this->db->fields($fields, $query);
-		$expected = 'MockDatabasePost.id, MockDatabasePost.author_id, MockDatabasePost.title, ' .
-				'MockDatabasePost.created, MockDatabaseComment.id, MockDatabaseComment.post_id, ' .
-				'MockDatabaseComment.author_id, MockDatabaseComment.body, ' .
-				'MockDatabaseComment.created';
+		$expected = 'MockDatabasePost.id, MockDatabasePost.author_id, MockDatabasePost.title, ';
+		$expected .= 'MockDatabasePost.created, MockDatabaseComment.id, ';
+		$expected .= 'MockDatabaseComment.post_id, MockDatabaseComment.author_id, ';
+		$expected .= 'MockDatabaseComment.body, MockDatabaseComment.created';
 		$this->assertEqual($expected, $result);
 
-		$fields = array(
-			'MockDatabasePost as Post',
-			'MockDatabaseComment AS Comment'
-		);
+		$fields = array('MockDatabasePost as Post', 'MockDatabaseComment AS Comment');
 		$result = $this->db->fields($fields, $query);
 		$expected = 'MockDatabasePost as Post, MockDatabaseComment AS Comment';
 		$this->assertEqual($expected, $result);
 
-		$expected = array(
-			'MockDatabasePost' => array(
-				'Post', 'Comment'
-			)
-		);
+		$expected = array('MockDatabasePost' => array('Post', 'Comment'));
 		$this->assertEqual($expected, $query->map());
 	}
 
@@ -657,19 +644,22 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual(array('post_id' => 'id'), $belongsTo->key());
 		$this->assertEqual('post', $belongsTo->fieldName());
 	}
-	
+
 	public function testRelationshipGenerationWithNullConstraint() {
 		$postRevision = 'lithium\tests\mocks\data\model\MockDatabasePostRevision';
 
 		$hasMany = $this->db->relationship($this->_model, 'hasMany', 'PostRevisions', array(
 			'to' => $postRevision,
-			'constraint' => array(
-				'MockDatabasePostRevision.deleted' => null
-			)
-		));		
+			'constraint' => array('MockDatabasePostRevision.deleted' => null)
+		));
 		$this->assertEqual(array('id' => 'mock_database_post_id'), $hasMany->key());
 		$this->assertEqual('post_revisions', $hasMany->fieldName());
-		$this->assertEqual(array('MockDatabasePost.id' => 'PostRevisions.mock_database_post_id', 'MockDatabasePostRevision.deleted' => null), $hasMany->constraints());
+
+		$expected = array(
+			'MockDatabasePost.id' => 'PostRevisions.mock_database_post_id',
+			'MockDatabasePostRevision.deleted' => null
+		);
+		$this->assertEqual($expected, $hasMany->constraints());
 
 		$belongsTo = $this->db->relationship($postRevision, 'belongsTo', 'Posts', array(
 			'to' => $this->_model
@@ -690,12 +680,12 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('MockDatabaseComment')
 		);
 		$result = $this->db->read(new Query($options), $options);
-		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ' .
-					'{mock_database_comments} AS {MockDatabaseComment} ON ' .
-					'{MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id};';
+		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ';
+		$expected .= '{mock_database_comments} AS {MockDatabaseComment} ON ';
+		$expected .= '{MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id};';
 		$this->assertEqual($expected, $this->db->sql);
 	}
-	
+
 	public function testReadWithRelationshipWithNullConstraint() {
 		$options = array(
 			'type' => 'read',
@@ -703,10 +693,10 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('MockDatabasePostRevision')
 		);
 		$result = $this->db->read(new Query($options), $options);
-		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ' .
-					'{mock_database_post_revisions} AS {MockDatabasePostRevision} ON ' .
-					'{MockDatabasePost}.{id} = {MockDatabasePostRevision}.{mock_database_post_id} AND ' .
-					'{MockDatabasePostRevision}.{deleted} IS NULL;';
+		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ';
+		$expected .= '{mock_database_post_revisions} AS {MockDatabasePostRevision} ON ';
+		$expected .= '{MockDatabasePost}.{id} = {MockDatabasePostRevision}.{mock_database_post_id}';
+		$expected .= ' AND {MockDatabasePostRevision}.{deleted} IS NULL;';
 		$this->assertEqual($expected, $this->db->sql);
 	}
 

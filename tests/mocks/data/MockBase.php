@@ -9,6 +9,7 @@
 namespace lithium\tests\mocks\data;
 
 use lithium\data\Schema;
+use lithium\tests\mocks\data\model\MockDatabase;
 
 class MockBase extends \lithium\data\Model {
 
@@ -29,10 +30,11 @@ class MockBase extends \lithium\data\Model {
 	}
 
 	public static function &connection() {
-		if (static::$connection) {
-			return static::$connection;
+		if (!static::$connection) {
+			$connection = new MockDatabase();
+			return $connection;
 		}
-		return parent::connection();
+		return static::$connection;
 	}
 }
 
