@@ -13,6 +13,7 @@ use lithium\data\Connections;
 use lithium\data\source\Http;
 use lithium\data\source\Mock;
 use lithium\data\source\database\adapter\MySql;
+use lithium\data\source\database\adapter\PostgreSql;
 
 class ConnectionsTest extends \lithium\test\Unit {
 
@@ -24,6 +25,8 @@ class ConnectionsTest extends \lithium\test\Unit {
 		'password' => '--pass--',
 		'database' => 'db'
 	);
+
+	protected $_port = null;
 
 	protected $_backup = array();
 
@@ -61,8 +64,18 @@ class ConnectionsTest extends \lithium\test\Unit {
 		Connections::add('conn-test-2', $this->config);
 		$this->assertEqual(array('conn-test', 'conn-test-2'), Connections::get());
 
-		$this->skipIf(!MySql::enabled(), 'MySql is not enabled');
-		$this->skipIf(!$this->_canConnect('localhost', 3306), 'Cannot connect to localhost:3306');
+		$enabled = (MySql::enabled() || PostgreSql::enabled());
+		$this->skipIf(!$enabled, 'MySql or PostgreSQL is not enabled');
+
+		if (MySql::enabled()) {
+			$this->_port = 3306;
+		}
+		if (PostgreSql::enabled()) {
+			$this->_port = 5432;
+		}
+
+		$msg = "Cannot connect to localhost:{$this->_port}";
+		$this->skipIf(!$this->_canConnect('localhost', $this->_port), $msg);
 
 		$expected = $this->config + array('type' => 'database', 'filters' => array());
 		$this->assertEqual($expected, Connections::get('conn-test', array('config' => true)));
