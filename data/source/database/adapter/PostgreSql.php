@@ -243,9 +243,14 @@ class PostgreSql extends \lithium\data\source\Database {
 			foreach ($columns as $column) {
 				$match = $self->invokeMethod('_column', array($column['type']));
 
+				if (preg_match('/nextval\([\'"]?([\w.]+)/', $column['default'])) {
+					$default = null;
+				} else {
+					$default = $column['default'];
+				}
 				$fields[$column['field']] = $match + array(
 					'null'	   => ($column['null'] == 'YES' ? true : false),
-					'default'  => $column['default']
+					'default'  => $default
 				);
 				if ($fields[$column['field']]['type'] == 'string') {
 					$fields[$column['field']]['length'] = $column['char_length'];
@@ -417,9 +422,10 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *		   bound to a sequence.
 	 */
 	protected function _insertId($query) {
-		$name = $self->invokeMethod('_entityName', array($entity));
-		$field = $query->model()->primaryKey;
-		$sequence = "{$name}_{$field}_seq";
+		$model = $query->model();
+		$field = $model::key();
+		$source = $model::meta('source');
+		$sequence = "{$source}_{$field}_seq";
 		$id = $this->connection->lastInsertId($sequence);
 		return ($id && $id !== '0') ? $id : null;
 	}
