@@ -182,7 +182,8 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testSimpleQueryRender() {
-		$fieldList = 'MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created';
+		$fieldList = '{MockDatabasePost}.{id}, {MockDatabasePost}.{title},'
+						. ' {MockDatabasePost}.{created}';
 		$table = '{mock_database_posts} AS {MockDatabasePost}';
 
 		$result = $this->db->renderCommand(new Query(array(
@@ -224,10 +225,11 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$result = $this->db->renderCommand($query);
 
-		$expected = "SELECT MockDatabasePost.title, MockDatabasePost.body FROM";
-		$expected .= " {mock_database_posts} AS {MockDatabasePost} WHERE Post.id IN";
-		$expected .= " (SELECT MockDatabaseTagging.post_id FROM {mock_database_taggings} AS ";
-		$expected .= "{MockDatabaseTagging} WHERE MockDatabaseTag.tag IN ('foo', 'bar', 'baz'));";
+		$expected = "SELECT {MockDatabasePost}.{title}, {MockDatabasePost}.{body} FROM";
+		$expected .= " {mock_database_posts} AS {MockDatabasePost} WHERE {Post}.{id} IN";
+		$expected .= " (SELECT {MockDatabaseTagging}.{post_id} FROM {mock_database_taggings} AS ";
+		$expected .= "{MockDatabaseTagging} WHERE {MockDatabaseTag}.{tag} IN";
+		$expected .= " ('foo', 'bar', 'baz'));";
 		$this->assertEqual($expected, $result);
 
 		$query = new Query(array(
@@ -243,10 +245,10 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$result = $this->db->renderCommand($query);
 
-		$expected = "SELECT MockDatabasePost.title, MockDatabasePost.body FROM";
+		$expected = "SELECT {MockDatabasePost}.{title}, {MockDatabasePost}.{body} FROM";
 		$expected .= " {mock_database_posts} AS {MockDatabasePost} WHERE ({Post}.{id} NOT IN";
-		$expected .= " (SELECT MockDatabaseTagging.post_id FROM {mock_database_taggings} AS ";
-		$expected .= "{MockDatabaseTagging} WHERE MockDatabaseTag.tag IN ";
+		$expected .= " (SELECT {MockDatabaseTagging}.{post_id} FROM {mock_database_taggings} AS ";
+		$expected .= "{MockDatabaseTagging} WHERE {MockDatabaseTag}.{tag} IN ";
 		$expected .= "('foo', 'bar', 'baz')));";
 		$this->assertEqual($expected, $result);
 
@@ -272,16 +274,16 @@ class DatabaseTest extends \lithium\test\Unit {
 			'conditions' => array('MockDatabaseTag.tag' => array('foo', 'bar', 'baz')),
 			'joins' => array(new Query(array(
 				'model' => 'lithium\tests\mocks\data\model\MockDatabaseTag',
-				'constraint' => 'MockDatabaseTagging.tag_id = MockDatabaseTag.id'
+				'constraint' => '{MockDatabaseTagging}.{tag_id} = {MockDatabaseTag}.{id}'
 			)))
 		));
 		$result = $this->db->renderCommand($query);
 
-		$expected = "SELECT MockDatabasePost.title, MockDatabasePost.body FROM";
+		$expected = "SELECT {MockDatabasePost}.{title}, {MockDatabasePost}.{body} FROM";
 		$expected .= " {mock_database_posts} AS {MockDatabasePost} JOIN {mock_database_tags} AS";
 		$expected .= " {MockDatabaseTag} ON ";
-		$expected .= "MockDatabaseTagging.tag_id = MockDatabaseTag.id";
-		$expected .= " WHERE MockDatabaseTag.tag IN ('foo', 'bar', 'baz');";
+		$expected .= "{MockDatabaseTagging}.{tag_id} = {MockDatabaseTag}.{id}";
+		$expected .= " WHERE {MockDatabaseTag}.{tag} IN ('foo', 'bar', 'baz');";
 		$this->assertEqual($expected, $result);
 	}
 
@@ -395,7 +397,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual(1, $query->entity()->id);
 
 		$expected = "UPDATE {mock_database_posts} SET";
-		$expected .= " {id} = 1, {title} = 'new post', {body} = 'the body' WHERE id = 1;";
+		$expected .= " {id} = 1, {title} = 'new post', {body} = 'the body' WHERE {id} = 1;";
 		$this->assertEqual($expected, $this->db->sql);
 	}
 
@@ -409,7 +411,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertTrue($this->db->delete($query));
 		$this->assertEqual(1, $query->entity()->id);
 
-		$expected = "DELETE FROM {mock_database_posts} WHERE id = 1;";
+		$expected = "DELETE FROM {mock_database_posts} WHERE {id} = 1;";
 		$this->assertEqual($expected, $this->db->sql);
 	}
 
@@ -490,7 +492,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'conditions' => array('published' => false),
 			'model' => $this->_model
 		));
-		$sql = 'DELETE FROM {mock_database_posts} WHERE published = 0;';
+		$sql = 'DELETE FROM {mock_database_posts} WHERE {published} = 0;';
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
 
@@ -570,7 +572,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ";
 		$sql .= "({id} = 0 OR {title} = 'value2' OR ({author_id} = 1 AND {created} = '2')";
-		$sql .= " OR ({title} = 'value2') OR (title IS NULL)) AND {id} = 3 AND author_id = 0;";
+		$sql .= " OR ({title} = 'value2') OR ({title} IS NULL)) AND {id} = 3 AND {author_id} = 0;";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 
 		$query = new Query(array(
@@ -578,7 +580,8 @@ class DatabaseTest extends \lithium\test\Unit {
 			'conditions' => array('title' => array('0900'))
 		));
 
-		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE title IN ('0900');";
+		$sql = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost}' .
+				' WHERE {title} IN (\'0900\');';
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
 
@@ -590,7 +593,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$fields = array('id', 'title');
 		$result = $this->db->fields($fields, $query);
-		$expected = 'MockDatabasePost.id, MockDatabasePost.title';
+		$expected = '{MockDatabasePost}.{id}, {MockDatabasePost}.{title}';
 		$this->assertEqual($expected,$result);
 
 		$fields = array(
@@ -598,8 +601,8 @@ class DatabaseTest extends \lithium\test\Unit {
 			'MockDatabaseComment' => array('body')
 		);
 		$result = $this->db->fields($fields, $query);
-		$expected = 'MockDatabasePost.id, MockDatabasePost.title, MockDatabasePost.created';
-		$expected .= ', MockDatabaseComment.body';
+		$expected = '{MockDatabasePost}.{id}, {MockDatabasePost}.{title},';
+		$expected .= ' {MockDatabasePost}.{created}, {MockDatabaseComment}.{body}';
 		$this->assertEqual($expected,$result);
 
 		$fields = array(
@@ -607,10 +610,11 @@ class DatabaseTest extends \lithium\test\Unit {
 			'MockDatabaseComment'
 		);
 		$result = $this->db->fields($fields, $query);
-		$expected = 'MockDatabasePost.id, MockDatabasePost.author_id, MockDatabasePost.title, ';
-		$expected .= 'MockDatabasePost.created, MockDatabaseComment.id, ';
-		$expected .= 'MockDatabaseComment.post_id, MockDatabaseComment.author_id, ';
-		$expected .= 'MockDatabaseComment.body, MockDatabaseComment.created';
+		$expected = '{MockDatabasePost}.{id}, {MockDatabasePost}.{author_id},';
+		$expected .= ' {MockDatabasePost}.{title}, {MockDatabasePost}.{created},';
+		$expected .= ' {MockDatabaseComment}.{id}, {MockDatabaseComment}.{post_id},';
+		$expected .= ' {MockDatabaseComment}.{author_id}, {MockDatabaseComment}.{body},';
+		$expected .= ' {MockDatabaseComment}.{created}';
 		$this->assertEqual($expected, $result);
 
 		$fields = array('MockDatabasePost as Post', 'MockDatabaseComment AS Comment');
@@ -750,7 +754,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 
 		$expected = "SELECT * FROM {comments} AS {Comments} INNER JOIN {posts} AS {Post} ON ";
-		$expected .= "{Comment}.{post_id} <= {Post}.{id} WHERE Comment.id = 1;";
+		$expected .= "{Comment}.{post_id} <= {Post}.{id} WHERE {Comment}.{id} = 1;";
 		$result = $this->db->renderCommand($query);
 		$this->assertEqual($expected, $result);
 	}
@@ -781,7 +785,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$expected = "SELECT * FROM {comments} AS {Comments} LEFT JOIN {posts} AS {Post} ON ";
 		$expected .= "{Comment}.{post_id} <= {Post}.{id} AND {Comment}.{post_id} >= {Post}.{id} ";
-		$expected .= "WHERE Comment.id = 1;";
+		$expected .= "WHERE {Comment}.{id} = 1;";
 		$result = $this->db->renderCommand($query);
 		$this->assertEqual($expected, $result);
 
@@ -819,7 +823,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 
 		$expected = "SELECT * FROM {comments} AS {Comment} INNER JOIN {posts} AS {Post} ON ";
-		$expected .= "{Comment}.{post_id} = {Post}.{id} WHERE Comment.id = 1;";
+		$expected .= "{Comment}.{post_id} = {Post}.{id} WHERE {Comment}.{id} = 1;";
 		$result = $this->db->renderCommand($query);
 		$this->assertEqual($expected, $result);
 	}
