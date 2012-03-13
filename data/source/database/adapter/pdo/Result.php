@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\data\source\database\adapter\my_sql;
+namespace lithium\data\source\database\adapter\pdo;
 
 use PDO;
 use PDOStatement;

@@ -251,7 +251,7 @@ class PostgreSql extends \lithium\data\source\Database {
 					$fields[$column['field']]['length'] = $column['char_length'];
 				}
 			}
-			return $self->invokeMethod('_instance', array('schema', compact('fields')));
+			return $self-pdo>invokeMethod('_instance', array('schema', compact('fields')));
 		});
 	}
 
