@@ -256,7 +256,9 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function read($query, array $options = array()) {
 		$defaults = array(
-			'return' => is_string($query) ? 'array' : 'item', 'schema' => array()
+			'return' => is_string($query) ? 'array' : 'item',
+			'schema' => array(),
+			'quotes' => $this->_quotes
 		);
 		$options += $defaults;
 
@@ -280,7 +282,7 @@ abstract class Database extends \lithium\data\Source {
 							get_class($query), array(
 								'type' => 'read',
 								'model' => $model,
-								'group' => "{$name}.{$key}",
+								'group' => $self->name("{$name}.{$key}"),
 								'fields' => array("{$name}.{$key}"),
 								'joins' => $query->joins(),
 								'conditions' => $query->conditions(),
@@ -608,7 +610,7 @@ abstract class Database extends \lithium\data\Source {
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
 			case (is_string($key) && is_object($value)):
 				$value = trim(rtrim($this->renderCommand($value), ';'));
-				return "{$key} IN ({$value})";
+				return "{$this->name($key)} IN ({$value})";
 			case is_array($value) && isset($constraintTypes[strtoupper($key)]):
 				$result = array();
 				$glue = strtoupper($key);
@@ -624,8 +626,9 @@ abstract class Database extends \lithium\data\Source {
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
 			case is_array($value):
 				$value = join(', ', $this->value($value, $fieldMeta));
-				return "{$key} IN ({$value})";
+				return "{$this->name($key)} IN ({$value})";
 			default:
+				$key = $this->name($key);
 				if (isset($value)) {
 					$value = $this->value($value, $fieldMeta);
 					return "{$key} = {$value}";
@@ -657,7 +660,6 @@ abstract class Database extends \lithium\data\Source {
 		}
 		$toMerge = array();
 		$keys = array_keys($fields);
-
 		$groupFields = function($item, $key) use (&$toMerge, &$keys, $modelNames, &$context) {
 			$name = current($keys);
 			next($keys);
@@ -726,7 +728,9 @@ abstract class Database extends \lithium\data\Source {
 		foreach ($fields as $scope => $items) {
 			foreach ($items as $field) {
 				if (!is_numeric($scope)) {
-					$toMerge[] = $scope . '.' . $field;
+					$open  = reset($this->_quotes);
+					$close = next($this->_quotes);
+					$toMerge[] = $open . $scope . $close . '.' . $open . $field . $close;
 					continue;
 				}
 				$toMerge[] = $field;
@@ -796,7 +800,6 @@ abstract class Database extends \lithium\data\Source {
 
 		foreach ($constraint as $field => $value) {
 			$field = $this->name($field);
-
 			if (is_string($value)) {
 				$result[] = $field . ' = ' . $this->name($value);
 				continue;
