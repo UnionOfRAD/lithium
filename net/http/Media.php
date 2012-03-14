@@ -653,7 +653,7 @@ class Media extends \lithium\core\StaticObject {
 				$handler = $self::invokeMethod('_handlers', array($handler));
 			}
 
-			if (!$handler || !isset($handler['encode'])) {
+			if (!$handler || empty($handler['encode'])) {
 				return null;
 			}
 

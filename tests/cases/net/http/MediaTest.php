@@ -522,6 +522,12 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual($json, Media::encode(array('encode' => 'json_encode'), $data));
 	}
 
+	public function testEncodeNotCallable() {
+		$data = array('foo' => 'bar');
+		$result = Media::encode(array('encode' => false), $data);
+		$this->assertNull($result);
+	}
+
 	/**
 	 * Tests that calling `Media::type()` to retrieve the details of a type that is aliased to
 	 * another type, automatically resolves to the settings of the type being pointed at.
