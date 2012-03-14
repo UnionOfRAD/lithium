@@ -271,7 +271,7 @@ class QueryTest extends \lithium\test\Unit {
 		sort($result);
 		$this->assertEqual($expected, $result);
 
-		$expected = 'MockQueryPost.id, MockQueryPost.author_id, MockQueryPost.title';
+		$expected = '{MockQueryPost}.{id}, {MockQueryPost}.{author_id}, {MockQueryPost}.{title}';
 		$result = $export['fields'];
 		$this->assertEqual($expected, $result);
 
