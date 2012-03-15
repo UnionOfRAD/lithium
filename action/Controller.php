@@ -220,7 +220,7 @@ class Controller extends \lithium\core\Object {
 	 *
 	 * The options specified here are merged with the values in the `Controller::$_render`
 	 * property. You may refer to it for other options accepted by this method.
-	 * @return void
+	 * @return object Returns the `Response` object associated with this `Controller` instance.
 	 */
 	public function render(array $options = array()) {
 		$media = $this->_classes['media'];
@@ -257,6 +257,8 @@ class Controller extends \lithium\core\Object {
 		}
 		$data = $this->_render['data'];
 		$media::render($this->response, $data, $options + array('request' => $this->request));
+
+		return $this->response;
 	}
 
 	/**
