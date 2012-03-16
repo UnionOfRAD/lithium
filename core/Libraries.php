@@ -157,7 +157,7 @@ class Libraries {
 	protected static $_cachedPaths = array();
 
 	/**
-	 * Holds associations between fully-namespaced class names and file's paths mapped 
+	 * Holds associations between fully-namespaced class names and file's paths mapped
 	 * with `lithium\core\Libraries::map()`.
 	 *
 	 * @var array

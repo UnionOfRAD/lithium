@@ -33,12 +33,12 @@ class LibrariesTest extends \lithium\test\Unit {
 	public function testNamespaceToFileTranslation() {
 		$DS = DIRECTORY_SEPARATOR;
 		$invalidDS = $DS == '/' ? '\\' : '/';
-		
+
 		$result = Libraries::path('\lithium\core\Libraries');
 		$this->assertTrue(strpos($result, "${DS}lithium${DS}core${DS}Libraries.php"));
 		$this->assertTrue(file_exists($result));
 		$this->assertFalse(strpos($result, $invalidDS));
-		
+
 		$result = Libraries::path('lithium\core\Libraries');
 		$this->assertTrue(strpos($result, "${DS}lithium${DS}core${DS}Libraries.php"));
 		$this->assertTrue(file_exists($result));
@@ -654,7 +654,7 @@ class LibrariesTest extends \lithium\test\Unit {
 				return 'patched class';
 			}}"
 		);
-		
+
 		$expected = $result = Libraries::realPath($testApp . '/lib/LibTest.php');
 		$result = Libraries::path('test_app\\lib\\LibTest');
 
@@ -687,9 +687,9 @@ class LibrariesTest extends \lithium\test\Unit {
 		));
 
 		$object = new \test_app\lib\LibTest();
-		
+
 		$result = $object->testMe();
-		$this->assertEqual('patched class', $result); 
+		$this->assertEqual('patched class', $result);
 
 		$this->_cleanUp();
 	}
