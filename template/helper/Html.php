@@ -251,7 +251,7 @@ class Html extends \lithium\template\Helper {
 	 * @return string
 	 * @filter This method can be filtered.
 	 */
- 	public function image($path, array $options = array()) {
+	public function image($path, array $options = array()) {
 		$defaults = array('alt' => '');
 		$options += $defaults;
 		$path = is_array($path) ? $this->_context->url($path) : $path;

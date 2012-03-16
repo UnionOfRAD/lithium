@@ -174,7 +174,7 @@ class Set {
 		$defaults = array('all' => false, 'count' => 0);
 		$options += $defaults;
 
- 		if (!$data) {
+		if (!$data) {
 			return 0;
 		}
 

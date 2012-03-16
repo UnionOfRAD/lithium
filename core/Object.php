@@ -136,7 +136,7 @@ class Object {
 	 *
 	 * @see lithium\core\Object::_filter()
 	 * @see lithium\util\collection\Filters
- 	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
+	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
 	 *        method name as a string, or an array of method names.
 	 * @param closure $filter The closure that is used to filter the method(s).
 	 * @return void

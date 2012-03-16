@@ -170,7 +170,7 @@ class Code extends \lithium\g11n\catalog\Adapter {
 	 * @param array $item Item to merge into $data.
 	 * @return array The merged data.
 	 */
-    protected function _merge(array $data, array $item) {
+	protected function _merge(array $data, array $item) {
 		$filter = function ($value) use (&$filter) {
 			if (is_array($value)) {
 				return array_map($filter, $value);
@@ -184,8 +184,8 @@ class Code extends \lithium\g11n\catalog\Adapter {
 				$item[$field] = $filter($item[$field]);
 			}
 		}
-        return parent::_merge($data, $item);
-    }
+		return parent::_merge($data, $item);
+	}
 }
 
 ?>

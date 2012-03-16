@@ -119,14 +119,14 @@ class Sqlite3Test extends \lithium\test\Unit {
 		$this->db->read($sql, array('return' => 'resource'));
 		$result = $this->db->describe('foo');
 		$expected = array(
-		  'bar' => array (
-		  'type' => 'VARCHAR',
-		  'length' => '20',
-		  'null' => true,
-		  'default' => 'baz'
-		  )
+			'bar' => array(
+				'type' => 'VARCHAR',
+				'length' => '20',
+				'null' => true,
+				'default' => 'baz'
+			)
 		);
-    $this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testExecuteException() {

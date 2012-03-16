@@ -327,8 +327,8 @@ class MySql extends \lithium\data\source\Database {
 
 	/**
 	 * Execute a given query.
- 	 *
- 	 * @see lithium\data\source\Database::renderCommand()
+	 *
+	 * @see lithium\data\source\Database::renderCommand()
 	 * @param string $sql The sql string to execute
 	 * @param array $options Available options:
 	 *        - 'buffered': If set to `false` uses mysql_unbuffered_query which

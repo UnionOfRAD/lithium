@@ -113,7 +113,7 @@ class LibraryTest extends \lithium\test\Unit {
 			$expected .= 'dirname(LITHIUM_APP_PATH) . \'/libraries\')';
 		}
 		$this->_assertFileContents(realpath($filepath), $expected);
-		
+
 		$filepath = $this->_testPath . '/library_test/controllers/PagesController.php';
 		$expected = "namespace library_test\\";
 		$this->_assertFileContents($filepath, $expected);

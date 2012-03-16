@@ -35,7 +35,7 @@ class SetTest extends \lithium\test\Unit {
 		$data = array('1' => '1.1', '2', '3' => array('3.1' => '3.1.1'));
 		$result = Set::depth($data, array('all' => false));
 		$this->assertEqual(1, $result);
- 	}
+	}
 
 	public function testDepthTwoLevelsWithDefaults() {
 		$data = array('1' => array('1.1' => '1.1.1'), '2', '3' => array('3.1' => '3.1.1'));
