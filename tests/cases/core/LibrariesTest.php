@@ -31,16 +31,16 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testNamespaceToFileTranslation() {
-		$DS = DIRECTORY_SEPARATOR;
-		$invalidDS = $DS == '/' ? '\\' : '/';
+		$ds = DIRECTORY_SEPARATOR;
+		$invalidDS = $ds == '/' ? '\\' : '/';
 
 		$result = Libraries::path('\lithium\core\Libraries');
-		$this->assertTrue(strpos($result, "${DS}lithium${DS}core${DS}Libraries.php"));
+		$this->assertTrue(strpos($result, "${ds}lithium${ds}core${ds}Libraries.php"));
 		$this->assertTrue(file_exists($result));
 		$this->assertFalse(strpos($result, $invalidDS));
 
 		$result = Libraries::path('lithium\core\Libraries');
-		$this->assertTrue(strpos($result, "${DS}lithium${DS}core${DS}Libraries.php"));
+		$this->assertTrue(strpos($result, "${ds}lithium${ds}core${ds}Libraries.php"));
 		$this->assertTrue(file_exists($result));
 		$this->assertFalse(strpos($result, $invalidDS));
 	}
