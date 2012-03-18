@@ -34,7 +34,7 @@ class MockPostsController extends \lithium\action\Controller {
 		return array('data' => 'test');
 	}
 
-	public function not_found($id = null) {
+	public function notFound($id = null) {
 		$this->response->status(404);
 		$this->render(array('json' => $this->response->status));
 	}

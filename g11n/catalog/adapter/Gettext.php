@@ -512,8 +512,8 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 		if (empty($item['id']) || ctype_space($item['id'])) {
 			return $data;
 		}
-        return parent::_merge($data, $item);
-    }
+		return parent::_merge($data, $item);
+	}
 }
 
 ?>

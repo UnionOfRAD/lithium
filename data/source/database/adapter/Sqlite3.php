@@ -285,8 +285,8 @@ class Sqlite3 extends \lithium\data\source\Database {
 
 	/**
 	 * Execute a given query.
- 	 *
- 	 * @see lithium\data\source\Database::renderCommand()
+	 *
+	 * @see lithium\data\source\Database::renderCommand()
 	 * @param string $sql The sql string to execute
 	 * @param array $options No available options.
 	 * @return resource

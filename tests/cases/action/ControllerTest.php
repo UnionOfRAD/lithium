@@ -220,7 +220,7 @@ class ControllerTest extends \lithium\test\Unit {
 		)));
 		$this->assertFalse($postsController->stopped);
 
-		$postsController(null, array('action' => 'not_found'));
+		$postsController(null, array('action' => 'notFound'));
 
 		$result = $postsController->access('_render');
 		$this->assertTrue($result['hasRendered']);

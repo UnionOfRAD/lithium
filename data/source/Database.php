@@ -104,16 +104,16 @@ abstract class Database extends \lithium\data\Source {
 
 	/**
 	 * Return the last errors produced by a the execution of a query.
- 	 * Abstract. Must be defined by child class.
- 	 *
+	 * Abstract. Must be defined by child class.
+	 *
 	 */
 	abstract public function error();
 
 	/**
 	 * Execute a given query
- 	 * Abstract. Must be defined by child class.
- 	 *
- 	 * @see lithium\data\source\Database::renderCommand()
+	 * Abstract. Must be defined by child class.
+	 *
+	 * @see lithium\data\source\Database::renderCommand()
 	 * @param string $sql The sql string to execute
 	 * @return resource
 	 */

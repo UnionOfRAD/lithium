@@ -1184,10 +1184,10 @@ class FormTest extends \lithium\test\Unit {
 		));
 	}
 
-    /**
-     * Test that field already defined template strings with special types (e.g. radio, checkbox,
-     * etc.) and passed customize template, and the template must apply.
-     */
+	/**
+	 * Test that field already defined template strings with special types (e.g. radio, checkbox,
+	 * etc.) and passed customize template, and the template must apply.
+	 */
 	public function testRadioTypeFieldWithCustomTemplate() {
 		$result = $this->form->field('name', array(
 			'template' => '<span{:wrap}>{:label}: {:input}{:error}</span>',

@@ -224,7 +224,7 @@ class Library extends \lithium\console\Command {
 				return false;
 			}
 		}
-		
+
 		if (file_exists($from)) {
 			try {
 				$archive = new Phar($from);
@@ -232,7 +232,7 @@ class Library extends \lithium\console\Command {
 				$this->error($e->getMessage());
 				return false;
 			}
-			
+
 			if ($archive->extractTo($to)) {
 				$this->out(basename($to) . " created in " . dirname($to) . " from {$from}");
 
@@ -323,7 +323,7 @@ class Library extends \lithium\console\Command {
 			if ($pathinfo['dirname'] != '.') {
 				$this->lithiumLibraryPath = "'" . $this->lithiumLibraryPath . "'";
 			}
-			
+
 			$search = 'define(\'LITHIUM_LIBRARY_PATH\', ';
 			$search .= 'dirname(LITHIUM_APP_PATH) . \'/libraries\');';
 			$replace = 'define(\'LITHIUM_LIBRARY_PATH\', ';
@@ -712,7 +712,7 @@ class Library extends \lithium\console\Command {
 		if ($name && $pathinfo['dirname'] != '.') {
 			return $name;
 		}
-		
+
 		$library = Libraries::get($name);
 
 		if (!empty($library['path'])) {

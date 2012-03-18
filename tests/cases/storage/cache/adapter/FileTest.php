@@ -85,16 +85,16 @@ class FileTest extends \lithium\test\Unit {
 	}
 
 	public function testWriteDefaultCacheExpiry() {
-		$File = new File(array('expiry' => '+1 minute'));
+		$file = new File(array('expiry' => '+1 minute'));
 		$key = 'default_keykey';
 		$data = 'data';
 		$time = time() + 60;
 
-		$closure = $File->write($key, $data);
+		$closure = $file->write($key, $data);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key', 'data');
-		$result = $closure($File, $params, null);
+		$result = $closure($file, $params, null);
 		$expected = 25;
 		$this->assertEqual($expected, $result);
 

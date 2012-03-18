@@ -81,8 +81,8 @@ class CookieTest extends \lithium\test\Unit {
 	}
 
 	public function testCustomCookieName() {
-		$Cookie = new Cookie(array('name' => 'test'));
-		$this->assertEqual('test', $Cookie->key());
+		$cookie = new Cookie(array('name' => 'test'));
+		$this->assertEqual('test', $cookie->key());
 	}
 
 
