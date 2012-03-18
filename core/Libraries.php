@@ -341,7 +341,7 @@ class Libraries {
 	 *
 	 * @param string $name Registered library to retrieve configuration for.
 	 * @param string $key Optional key name. If `$name` is set and is the name of a valid library,
-	 *               returns the given named configuration key, i.e. `'path'`, `'webroot'` or
+	 *               returns the given named configuration key, i.e. `'path'` or
 	 *               `'resources'`.
 	 * @return mixed A configuation array for one or more libraries, or a string value if `$key` is
 	 *               specified.
