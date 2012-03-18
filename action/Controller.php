@@ -255,10 +255,10 @@ class Controller extends \lithium\core\Object {
 		if ($options['head']) {
 			return;
 		}
-		$data = $this->_render['data'];
-		$media::render($this->response, $data, $options + array('request' => $this->request));
-
-		return $this->response;
+		$response = $media::render($this->response, $this->_render['data'], $options + array(
+			'request' => $this->request
+		));
+		return ($this->response = $response ?: $this->response);
 	}
 
 	/**

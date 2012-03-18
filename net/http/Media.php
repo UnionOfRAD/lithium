@@ -549,22 +549,26 @@ class Media extends \lithium\core\StaticObject {
 	 * Renders data (usually the result of a controller action) and generates a string
 	 * representation of it, based on the type of expected output.
 	 *
-	 * @param object $response A reference to a Response object into which the operation will be
+	 * @param object $response A Response object into which the operation will be
 	 *        rendered. The content of the render operation will be assigned to the `$body`
-	 *        property of the object, and the `'Content-type'` header will be set accordingly.
-	 * @param mixed $data
-	 * @param array $options
-	 * @return void
+	 *        property of the object, the `'Content-type'` header will be set accordingly, and it
+	 *        will be returned.
+	 * @param mixed $data The data (usually an associative array) to be rendered in the response.
+	 * @param array $options Any options specific to the response being rendered, such as type
+	 *              information, keys (i.e. controller and action) used to generate template paths,
+	 *              etc.
+	 * @return object Returns a modified `Response` object with headers and body defined.
 	 * @filter
 	 */
-	public static function render(&$response, $data = null, array $options = array()) {
-		$params = array('response' => &$response) + compact('data', 'options');
-		$types = static::_types();
+	public static function render($response, $data = null, array $options = array()) {
+		$params   = compact('response', 'data', 'options');
+		$types    = static::_types();
 		$handlers = static::_handlers();
+		$func     = __FUNCTION__;
 
-		static::_filter(__FUNCTION__, $params, function($self, $params) use ($types, $handlers) {
+		return static::_filter($func, $params, function($self, $params) use ($types, $handlers) {
 			$defaults = array('encode' => null, 'template' => null, 'layout' => '', 'view' => null);
-			$response =& $params['response'];
+			$response = $params['response'];
 			$data = $params['data'];
 			$options = $params['options'] + array('type' => $response->type());
 
@@ -584,6 +588,8 @@ class Media extends \lithium\core\StaticObject {
 				$response->headers('Content-Type', $header);
 			}
 			$response->body($self::invokeMethod('_handle', array($handler, $data, $response)));
+
+			return $response;
 		});
 	}
 
