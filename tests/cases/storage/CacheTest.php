@@ -203,19 +203,16 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testCacheReadWithConditions() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array()
-		));
+		$config = array('default' => array('adapter' => 'Memory', 'filters' => array()));
 		Cache::config($config);
+
 		$result = Cache::config();
 		$expected = $config;
 		$this->assertEqual($expected, $result);
 
-		$conditions = function() {
+		$result = Cache::read('default', 'some_key', array('conditions' => function() {
 			return false;
-		};
-
-		$result = Cache::read('default', 'some_key', compact('conditions'));
+		}));
 		$this->assertFalse($result);
 
 		$conditions = function() use (&$config) {
@@ -226,8 +223,7 @@ class CacheTest extends \lithium\test\Unit {
 		$result = Cache::read('default', 'some_key', compact('conditions'));
 		$this->assertTrue($result);
 
-		$result = Cache::read('non_existing', 'key_value', compact('conditions'));
-		$this->assertFalse($result);
+		$this->assertFalse(Cache::read('non_existing', 'key_value', compact('conditions')));
 	}
 
 	public function testCacheIncrementDecrementWithConditions() {
@@ -313,8 +309,7 @@ class CacheTest extends \lithium\test\Unit {
 		$write = function() {
 			return array('+1 minute' => 'read-through write');
 		};
-		$result = Cache::read('default', 'read_through');
-		$this->assertNull($result);
+		$this->assertNull(Cache::read('default', 'read_through'));
 
 		$result = Cache::read('default', 'read_through', compact('write'));
 		$this->assertIdentical('read-through write', $result);
@@ -328,6 +323,15 @@ class CacheTest extends \lithium\test\Unit {
 
 		$result = Cache::read('default', 'string_read_through');
 		$this->assertIdentical('string read-through write', $result);
+
+		$this->assertNull(Cache::read('default', 'string_read_through_2'));
+
+		$result = Cache::read('default', 'string_read_through_2', array('write' => array(
+			'+1 minute' => function() {
+				return 'read-through write 2';
+			}
+		)));
+		$this->assertIdentical('read-through write 2', $result);
 	}
 
 	public function testCacheReadAndWrite() {

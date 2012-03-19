@@ -101,8 +101,8 @@ class Cache extends \lithium\core\Adaptable {
 		if (!isset($settings[$name])) {
 			return false;
 		}
-
 		$conditions = $options['conditions'];
+
 		if (is_callable($conditions) && !$conditions()) {
 			return false;
 		}
@@ -140,8 +140,8 @@ class Cache extends \lithium\core\Adaptable {
 		if (!isset($settings[$name])) {
 			return false;
 		}
-
 		$conditions = $options['conditions'];
+
 		if (is_callable($conditions) && !$conditions()) {
 			return false;
 		}
@@ -151,15 +151,18 @@ class Cache extends \lithium\core\Adaptable {
 		$filters = $settings[$name]['filters'];
 		$result = static::_filter(__FUNCTION__, $params, $method, $filters);
 
-		if ($result === null && $options['write']) {
-			$write = (is_callable($options['write'])) ? $options['write']() : $options['write'];
+		if ($result === null && ($write = $options['write'])) {
+			$write = is_callable($write) ? $write() : $write;
 			list($expiry, $value) = each($write);
+			$value = is_callable($value) ? $value() : $value;
 
-			return static::write($name, $key, $value, $expiry);
+			if (static::write($name, $key, $value, $expiry)) {
+				$result = $value;
+			}
 		}
 
 		if ($options['strategies']) {
-			$options = array('key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__);
+			$options = compact('key') + array('mode' => 'LIFO', 'class' => __CLASS__);
 			$result = static::applyStrategies(__FUNCTION__, $name, $result, $options);
 		}
 		return $result;
@@ -181,8 +184,8 @@ class Cache extends \lithium\core\Adaptable {
 		if (!isset($settings[$name])) {
 			return false;
 		}
-
 		$conditions = $options['conditions'];
+
 		if (is_callable($conditions) && !$conditions()) {
 			return false;
 		}
