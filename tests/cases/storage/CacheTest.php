@@ -317,17 +317,17 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertNull($result);
 
 		$result = Cache::read('default', 'read_through', compact('write'));
-		$this->assertEqual('read-through write', $result);
+		$this->assertIdentical('read-through write', $result);
 
 		$result = Cache::read('default', 'read_through');
-		$this->assertEqual('read-through write', $result);
+		$this->assertIdentical('read-through write', $result);
 
 		$write = array('+1 minute' => 'string read-through write');
 		$result = Cache::read('default', 'string_read_through', compact('write'));
-		$this->assertEqual('string read-through write', $result);
+		$this->assertIdentical('string read-through write', $result);
 
 		$result = Cache::read('default', 'string_read_through');
-		$this->assertEqual('string read-through write', $result);
+		$this->assertIdentical('string read-through write', $result);
 	}
 
 	public function testCacheReadAndWrite() {
