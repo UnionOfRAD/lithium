@@ -151,7 +151,6 @@ class LibraryTest extends \lithium\test\Unit {
 
 	protected function _assertFileContents($filepath, $expected) {
 		$content = file_get_contents($filepath);
-		$lines = explode("\n", $content);
 		$this->assertTrue(strpos($content, $expected));
 	}
 
