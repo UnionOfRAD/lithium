@@ -11,6 +11,7 @@ namespace lithium\net\http;
 use lithium\util\Set;
 use lithium\util\String;
 use lithium\core\Libraries;
+use lithium\core\Environment;
 use lithium\net\http\MediaException;
 
 /**
@@ -32,6 +33,21 @@ use lithium\net\http\MediaException;
 class Media extends \lithium\core\StaticObject {
 
 	/**
+	 * Stores the name of the default assets. When adding assets, if the `'default'`
+	 * option flag is set to `true`, the name of the assets will be assigned.
+	 * To retrieve the default library's configuration, use `Media::assets(true)`.
+	 *
+	 * @see lithium\net\http\Media::assets()
+	 * @var string
+	 */
+	protected static $_default = null;
+	/**
+	 * The assets location configuration 
+	 *
+	 * @var array
+	 */
+	protected static $_assets = array();
+	/**
 	 * Maps file extensions to content-types.  Used to set response types and determine request
 	 * types. Can be modified with `Media::type()`.
 	 *
@@ -52,12 +68,12 @@ class Media extends \lithium\core\StaticObject {
 	 *
 	 * For each type, the corresponding array key maps to the general type name, i.e. `'js'` or
 	 * `'image'`. Each type contains a set of keys which define their locations and default
-	 * behavior. For more information how each key works, see `Media::assets()`.
+	 * behavior. For more information how each key works, see `Media::extensions()`.
 	 *
 	 * @var array
-	 * @see lithium\net\http\Media::assets()
+	 * @see lithium\net\http\Media::extensions()
 	 */
-	protected static $_assets = array();
+	protected static $_extensions = array();
 
 	/**
 	 * Placeholder for class dependencies. This class' dependencies (i.e. templating classes) are
@@ -362,35 +378,36 @@ class Media extends \lithium\core\StaticObject {
 	 *         returns an associative array with the options for `$type`. If `$type` and `$options`
 	 *         are both non-empty, returns `null`.
 	 */
-	public static function assets($type = null, $options = array()) {
+	public static function extensions($type = null, $options = array()) {
 		$defaults = array('suffix' => null, 'filter' => null, 'path' => array());
 
 		if (!$type) {
-			return static::_assets();
+			return static::_extensions();
 		}
 		if ($options === false) {
-			unset(static::$_assets[$type]);
+			unset(static::$_extensions[$type]);
 		}
 		if (!$options) {
-			return static::_assets($type);
+			return static::_extensions($type);
 		}
 		$options = (array) $options + $defaults;
 
-		if ($base = static::_assets($type)) {
+		if ($base = static::_extensions($type)) {
 			$options = array_merge($base, array_filter($options));
 		}
-		static::$_assets[$type] = $options;
+		static::$_extensions[$type] = $options;
 	}
 
 	/**
 	 * Calculates the web-accessible path to a static asset, usually a JavaScript, CSS or image
 	 * file.
 	 *
+	 * @see lithium\net\http\Media::$_extensions
 	 * @see lithium\net\http\Media::$_assets
 	 * @see lithium\action\Request::env()
 	 * @param string $path The path to the asset, relative to the given `$type`s path and without a
 	 *        suffix. If the path contains a URI Scheme (eg. `http://`), no path munging will occur.
-	 * @param string $type The asset type. See `Media::$_assets` or `Media::assets()`.
+	 * @param string $type The asset type. See `Media::$_extensions` or `Media::extensions()`.
 	 * @param array $options Contains setting for finding and handling the path, where the keys are
 	 *        the following:
 	 *        - `'base'`: The base URL of your application. Defaults to `null` for no base path.
@@ -401,11 +418,11 @@ class Media extends \lithium\core\StaticObject {
 	 *        - `'filter'`: An array of key/value pairs representing simple string replacements to
 	 *          be done on a path once it is generated.
 	 *        - `'path'`: An array of paths to search for the asset in. The paths should use
-	 *          `String::insert()` formatting. See `Media::$_assets` for more.
+	 *          `String::insert()` formatting. See `Media::$_extensions` for more.
 	 *        - `suffix`: The suffix to attach to the path, generally a file extension.
 	 *        - `'timestamp'`: Appends the last modified time of the file to the path if `true`.
 	 *          Defaults to `false`.
-	 *        - `'library'`: The name of the library from which to load the asset. Defaults to
+	 *        - `'assets'`: The name of the assets from which to load the asset. Defaults to
 	 *           `true`, for the default library.
 	 * @return string Returns the publicly-accessible absolute path to the static asset. If checking
 	 *         for the asset's existence (`$options['check']`), returns `false` if it does not exist
@@ -421,29 +438,38 @@ class Media extends \lithium\core\StaticObject {
 			'path' => array(),
 			'suffix' => null,
 			'check' => false,
-			'library' => true
+			'assets' => true
 		);
-		if (!$base = static::_assets($type)) {
+		if (!$base = static::_extensions($type)) {
 			$type = 'generic';
-			$base = static::_assets('generic');
+			$base = static::_extensions('generic');
 		}
 		$options += ($base + $defaults);
+
+		if($config = static::assets($options['assets'])){
+			$base = $config['base'];
+			if(preg_match('/^(?:[a-z0-9-]+:)?\/\//i', $base)){
+				$options['base'] = $base;
+			}
+			else{
+				$options['base'] = $options['base'] . $base;
+			}
+		}
+
 		$params = compact('path', 'type', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
 			$path = $params['path'];
 			$type = $params['type'];
 			$options = $params['options'];
-			$library = $options['library'];
 
 			if (preg_match('/^(?:[a-z0-9-]+:)?\/\//i', $path)) {
 				return $path;
 			}
-			$config = Libraries::get($library);
+
 			$paths = $options['path'];
 
-			$config['default'] ? end($paths) : reset($paths);
-			$options['library'] = basename($config['path']);
+			reset($paths);
 
 			if ($options['suffix'] && strpos($path, $options['suffix']) === false) {
 				$path .= $options['suffix'];
@@ -480,24 +506,19 @@ class Media extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Gets the physical path to the web assets (i.e. `/webroot`) directory of a library.
+	 * Gets the physical path to the web assets (i.e. `/webroot`) directory.
 	 *
-	 * @param string|boolean $library The name of the library for which to find the path, or `true`
-	 *        for the default library.
-	 * @return string Returns the physical path to the web assets directory for a library. For
-	 *         example, the `/webroot` directory of the default library would be
+	 * @param string|boolean $assets The name of assets for which to find the path, or `true`
+	 *        for default assets.
+	 * @return string Returns the physical path to the web assets directory for assets. For
+	 *         example, the `/webroot` directory of the default assets would be
 	 *         `LITHIUM_APP_PATH . '/webroot'`.
 	 */
-	public static function webroot($library = true) {
-		if (!$config = Libraries::get($library)) {
+	public static function webroot($assets = true) {
+		if (!$config = static::assets($assets)) {
 			return null;
 		}
-		if (isset($config['webroot'])) {
-			return $config['webroot'];
-		}
-		if (isset($config['path'])) {
-			return $config['path'] . '/webroot';
-		}
+		return $config['path'];
 	}
 
 	/**
@@ -517,19 +538,16 @@ class Media extends \lithium\core\StaticObject {
 			'base' => null,
 			'path' => array(),
 			'suffix' => null,
-			'library' => true
+			'assets' => true
 		);
 		if (!$base = static::_assets($type)) {
 			$type = 'generic';
-			$base = static::_assets('generic');
+			$base = static::_extensions('generic');
 		}
 		$options += ($base + $defaults);
-		$config = Libraries::get($options['library']);
-		$root = static::webroot($options['library']);
+		$config = static::assets($options['assets']);
+		$root = static::webroot($options['assets']);
 		$paths = $options['path'];
-
-		$config['default'] ? end($paths) : reset($paths);
-		$options['library'] = basename($config['path']);
 
 		if ($qOffset = strpos($path, '?')) {
 			$path = substr($path, 0, $qOffset);
@@ -538,9 +556,8 @@ class Media extends \lithium\core\StaticObject {
 		if ($path[0] === '/') {
 			$file = $root . $path;
 		} else {
-			$template = str_replace('{:library}/', '', key($paths));
 			$insert = array('base' => $root) + compact('path');
-			$file = String::insert($template, $insert);
+			$file = String::insert(key($paths), $insert);
 		}
 		return realpath($file);
 	}
@@ -708,6 +725,7 @@ class Media extends \lithium\core\StaticObject {
 		foreach (get_class_vars(__CLASS__) as $name => $value) {
 			static::${$name} = array();
 		}
+		static::$_default = null;
 	}
 
 	/**
@@ -847,29 +865,102 @@ class Media extends \lithium\core\StaticObject {
 	 * @return mixed An array of all paths, or a single array of paths for the
 	 *               given type.
 	 */
-	protected static function _assets($type = null) {
-		$assets = static::$_assets + array(
+	protected static function _extensions($type = null) {
+		$extensions = static::$_extensions + array(
 			'js' => array('suffix' => '.js', 'filter' => null, 'path' => array(
-				'{:base}/{:library}/js/{:path}' => array('base', 'library', 'path'),
 				'{:base}/js/{:path}' => array('base', 'path')
 			)),
 			'css' => array('suffix' => '.css', 'filter' => null, 'path' => array(
-				'{:base}/{:library}/css/{:path}' => array('base', 'library', 'path'),
 				'{:base}/css/{:path}' => array('base', 'path')
 			)),
 			'image' => array('suffix' => null, 'filter' => null, 'path' => array(
-				'{:base}/{:library}/img/{:path}' => array('base', 'library', 'path'),
 				'{:base}/img/{:path}' => array('base', 'path')
 			)),
 			'generic' => array('suffix' => null, 'filter' => null, 'path' => array(
-				'{:base}/{:library}/{:path}' => array('base', 'library', 'path'),
 				'{:base}/{:path}' => array('base', 'path')
 			))
 		);
 		if ($type) {
-			return isset($assets[$type]) ? $assets[$type] : null;
+			return isset($extensions[$type]) ? $extensions[$type] : null;
 		}
-		return $assets;
+		return $extensions;
+	}
+
+	/**
+	 * Add assets configurations
+	 *
+	 * For example:
+	 * {{{
+	 * Media::assets('app', array(
+	 *     'path' => '/var/www/website/app/webroot/extradir',
+	 *     'base' => '/extradir'
+	 * ));
+	 * }}}
+	 *
+ 	 * {{{
+	 * Media::assets('cdn', array(
+	 *     'path' => null,
+	 *     'base' => 'http://my.cdn.com/project1/assets'
+	 * ));
+	 * }}}
+	 *
+	 * @param string $name The name by which this assets is referenced. Use this name to
+	 *        retrieve the configuration using `Media::assets()`.
+	 * @param array $config Contains all configuration information to use for
+	 *        reaching assets :
+	 *        - `'path'` _string_: The filesytem root path of the assets if applicable.
+	 *        - `'base'` _string_: The base url of the assets
+	 *        if $config is equals to false, the assets is removed 
+	 * @return array Returns the stored configuration array.
+	 */
+	public static function assets($name, $config = array()) {
+		if (!$config) {
+			if($config === false){
+				unset(static::$_assets[$name]);
+				return true;
+			}
+			return static::_assets($name);
+		}
+		if (isset($config['default']) && $config['default']) {
+			static::$_default = $name;
+		}
+		static::$_assets[$name] = $config + array('base' => '', 'path' => null);
+		return static::$_assets[$name];
+	}
+
+	/**
+	 * Gets an array of settings for the given named configuration in the current
+	 * environment.
+	 *
+	 * @see LF\Core\Environment
+	 * @param string $name Named configuration.
+	 * @return array Settings for the named configuration.
+	 */
+	public static function _assets($name) {
+		if ($name === true) {
+			$name = static::$_default;
+		}
+		if (!isset(static::$_assets[$name])) {
+			return null;
+		}
+		$settings = static::$_assets[$name];
+
+		if (isset($settings[0])) {
+			return $settings[0];
+		}
+		$env = Environment::get();
+
+		if (isset($settings[$env])) {
+			$config = $settings[$env];
+			if (isset($settings[true])) {
+				$config += $settings[true];
+			}
+		} else {
+			$config = $settings;
+		}
+
+		static::$_assets[$name] += array($config);
+		return static::$_assets[$name][0];
 	}
 }
 
