@@ -12,6 +12,7 @@ use lithium\action\Request;
 use lithium\net\http\Route;
 use lithium\net\http\Router;
 use lithium\action\Response;
+use lithium\action\Dispatcher;
 
 class RouterTest extends \lithium\test\Unit {
 
@@ -753,6 +754,19 @@ class RouterTest extends \lithium\test\Unit {
 			'id' => 13
 		));
 		$this->assertEqual('/versions/13', $result);
+	}
+
+	public function testSubmoduleRoutes() {
+		Router::connect('/users', array('controller' => 'submodule.Users'));
+		Router::connect('/users/{:action}', array('controller' => 'submodule.Users'));
+
+		$response = Dispatcher::run(new Request(array(
+			'url' => '/users/login'
+		)));
+		
+		$request = $response->request->params;
+		$result = Router::match($request);
+		$this->assertEqual('/users/login', $result);
 	}
 }
 

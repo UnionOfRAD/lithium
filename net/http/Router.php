@@ -215,6 +215,10 @@ class Router extends \lithium\core\StaticObject {
 		$suffix = isset($url['#']) ? "#{$url['#']}" : null;
 		unset($url['#']);
 
+		if (is_array($url) && isset($url['library'])) {
+			unset($url['library']);
+		}
+
 		foreach (static::$_configurations as $route) {
 			if (!$match = $route->match($url, $context)) {
 				continue;
