@@ -376,6 +376,75 @@ class LocaleTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual('es_AR', $result);
 	}
+
+	// https://github.com/UnionOfRAD/lithium/issues/386
+	public function testPreferredStarWithQ() {
+		$available = array('fr', 'de');
+
+		// Yandex
+		$request = new ActionRequest(array(
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => 'ru, uk;q=0.8, be;q=0.8, en;q=0.7, *;q=0.01')
+		));
+		$result = Locale::preferred($request, $available);
+		$this->assertNull($result);
+
+		// Exabot
+		$request = new ActionRequest(array(
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => 'en;q=0.9,*;q=0.8')
+		));
+		$result = Locale::preferred($request, $available);
+		$this->assertNull($result);
+	}
+
+	// https://github.com/UnionOfRAD/lithium/issues/386
+	public function testPreferredEmpty() {
+		$available = array('fr', 'de');
+
+		// Java
+		$request = new ActionRequest(array(
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => '')
+		));
+		$result = Locale::preferred($request, $available);
+		$this->assertNull($result);
+	}
+
+	// https://github.com/UnionOfRAD/lithium/issues/386
+	public function testPreferredMalformedWithChrome() {
+		$available = array('fr', 'de');
+
+		// A random Firefox 4
+		$header = 'de-DE,de;q=0.7,chrome://global/locale/intl.properties;q=0.3';
+		$request = new ActionRequest(array(
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => $header)
+		));
+		$result = Locale::preferred($request, $available);
+		$this->assertIdentical('de', $result);
+	}
+
+	// https://github.com/UnionOfRAD/lithium/issues/386
+	public function testPreferredMalformedSquid() {
+		$available = array('fr', 'de');
+
+		// Squid?
+		$header = 'fr,fr-fr;q=0.8,en-us;q=0.5,en;q=0.3,x-ns14sRVhG$uNxh';
+		$request = new ActionRequest(array(
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => $header)
+		));
+		$result = Locale::preferred($request, $available);
+		$this->assertIdentical('fr', $result);
+	}
+
+	// https://github.com/UnionOfRAD/lithium/issues/386
+	public function testPreferredMalformedSpanish() {
+		$available = array('fr', 'de');
+
+		// A Chrome 17
+		$request = new ActionRequest(array(
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => 'es-419,es;q=0.8')
+		));
+		$result = Locale::preferred($request, $available);
+		$this->assertNull($result);
+	}
 }
 
 ?>
