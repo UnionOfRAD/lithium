@@ -754,6 +754,29 @@ class RouterTest extends \lithium\test\Unit {
 		));
 		$this->assertEqual('/versions/13', $result);
 	}
+
+	/**
+	 * Tests that routes with unicode characters are correctly parsed.
+	 */
+	public function testUnicodeParameters() {
+		Router::reset();
+		Router::connect('/{:slug:[\w\-\%]+}', array('controller' => 'users', 'action' => 'view'));
+
+		$unicode = 'clément';
+		$slug = rawurlencode('clément');
+		$params = array('controller' => 'users', 'action' => 'view', 'slug' => $slug);
+
+		$result = Router::match($params);
+		$this->assertEqual('/' . $slug, $result);
+
+		$request = new Request(array('url' => '/'.$unicode));
+		$result = Router::parse($request, array('url' => $request->url));
+		$this->assertEqual(array('controller' => 'users', 'action' => 'view', 'slug' => $unicode), $result->params);
+
+		$request = new Request(array('url' => '/'.$slug));
+		$result = Router::parse($request, array('url' => $request->url));
+		$this->assertEqual(array('controller' => 'users', 'action' => 'view', 'slug' => $slug), $result->params);
+	}
 }
 
 ?>
