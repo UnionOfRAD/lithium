@@ -19,7 +19,7 @@ use lithium\core\Libraries;
  * (using `Connections::add()`), it is most typical to define all connections at once, in
  * `config/bootstrap/connections.php`.
  *
- * THe `Connections` class handles adapter classes efficiently by only loading adapter classes and
+ * The `Connections` class handles adapter classes efficiently by only loading adapter classes and
  * creating instances when they are requested (using `Connections::get()`).
  *
  * Adapters are usually subclasses of `lithium\data\Source`.
