@@ -182,7 +182,7 @@ class Response extends \lithium\net\http\Message {
 		$keys = implode('|', array_keys($params));
 		$regex = '@(' . $keys . ')=(?:([\'"])([^\2]+?)\2|([^\s,]+))@';
 		preg_match_all($regex, $header, $matches, PREG_SET_ORDER);
-		$result = array();
+		$results = array();
 
 		foreach ($matches as $m) {
 			$results[$m[1]] = $m[3] ? $m[3] : $m[4];
