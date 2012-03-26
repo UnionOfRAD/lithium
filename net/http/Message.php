@@ -47,7 +47,10 @@ class Message extends \lithium\net\Message {
 	 *
 	 * @var array
 	 */
-	protected $_classes = array('media' => 'lithium\net\http\Media');
+	protected $_classes = array(
+		'media' => 'lithium\net\http\Media',
+		'auth' => 'lithium\net\http\Auth'
+	);
 
 	/**
 	 * Adds config values to the public properties when a new object is created.
