@@ -148,6 +148,14 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
+	 * Reset the response
+	 */
+	public function run() {
+		$resp = $this->_config['response'];
+		$this->response = is_object($resp) ? $resp : $this->_instance('response', $resp);
+	}
+
+	/**
 	 * Writes a string to the output stream.
 	 *
 	 * @param string $output The string to write.

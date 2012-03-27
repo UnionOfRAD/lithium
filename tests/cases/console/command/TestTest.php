@@ -186,6 +186,29 @@ class TestTest extends \lithium\test\Unit {
 		$this->assertTrue(isset($result['count']));
 		$this->assertTrue(isset($result['stats']));
 	}
+
+	public function testResetedOuputWithUnexistingPath() {
+		$command = new Test(array(
+			'request' => $this->request, 'classes' => $this->classes
+		));
+
+		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTest.php';
+		$command->run($path);
+
+		$expected = "1 passes\n0 fails and 0 exceptions\n";
+		$expected = preg_quote($expected);
+		$result = $command->response->output;
+		$this->assertPattern("/{$expected}/", $result);
+
+		$current = basename(getcwd());
+		$path = "{$current}/tests/mocks/test/cases/MockUnexistingTest.php";
+		$result = $command->run($path);
+		$this->assertFalse($result);
+
+		$expected = null;
+		$result = $command->response->output;
+		$this->assertIdentical($expected, $result);
+	}
 }
 
 ?>

@@ -126,6 +126,7 @@ class Test extends \lithium\console\Command {
 	 * @return boolean Will exit with status `1` if one or more tests failed otherwise with `0`.
 	 */
 	public function run($path = null) {
+		parent::run();
 		if (!$path = $this->_path($path)) {
 			return false;
 		}

@@ -65,6 +65,7 @@ class Create extends \lithium\console\Command {
 	 * @return boolean
 	 */
 	public function run($command = null) {
+		parent::run();
 		if ($command && !$this->request->args()) {
 			return $this->_default($command);
 		}

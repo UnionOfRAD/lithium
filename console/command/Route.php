@@ -58,6 +58,7 @@ class Route extends \lithium\console\Command {
 	 * @return void
 	 */
 	public function run() {
+		parent::run();
 		$this->all();
 	}
 

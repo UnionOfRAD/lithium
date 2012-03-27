@@ -20,7 +20,9 @@ class G11n extends \lithium\console\Command {
 	 *
 	 * @return void
 	 */
-	public function run() {}
+	public function run() {
+		parent::run();
+	}
 
 	/**
 	 * Runs the `Extract` command.

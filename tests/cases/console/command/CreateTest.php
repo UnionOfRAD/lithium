@@ -215,6 +215,25 @@ class CreateTest extends \lithium\test\Unit {
 		$result = $this->_testPath . '/create_test/tests/cases/controllers/PostsControllerTest.php';
 		$this->assertTrue(file_exists($result));
 	}
+
+	public function testResetedErrorWithNullCommand() {
+		$this->request->params['args'] = array('does_not_exist', 'anywhere');
+		$create = new MockCreate(array('request' => $this->request));
+
+		$result = $create->run('does_not_exist');
+		$this->assertFalse($result);
+
+		$expected = "does_not_exist could not be created.\n";
+		$result = $create->response->error;
+		$this->assertEqual($expected, $result);
+
+		$result = $create->run(null);
+		$this->assertFalse($result);
+
+		$expected = null;
+		$result = $create->response->error;
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
