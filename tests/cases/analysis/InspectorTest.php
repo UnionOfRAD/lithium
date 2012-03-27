@@ -308,6 +308,13 @@ class InspectorTest extends \lithium\test\Unit {
 
 		$this->assertNull(Inspector::properties('\lithium\core\Foo'));
 	}
+
+	public function testExecutableLinesOnEmptyClass() {
+		$clname = "EmptyClass";
+		eval("namespace lithium\\tests\\cases\\analysis; class EmptyClass{}; \$class = new EmptyClass();");
+		$result = Inspector::executable($class);
+		$this->assertEqual(array(), $result);
+	}
 }
 
 ?>
