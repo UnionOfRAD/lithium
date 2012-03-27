@@ -377,30 +377,38 @@ class LocaleTest extends \lithium\test\Unit {
 		$this->assertEqual('es_AR', $result);
 	}
 
-	// https://github.com/UnionOfRAD/lithium/issues/386
+	/**
+	 * When the Accept-Language contains `*;q=0.01` it's been seen as `q` and
+	 * raises an exception.
+	 *
+	 * @see https://github.com/UnionOfRAD/lithium/issues/386
+	 */
 	public function testPreferredStarWithQ() {
 		$available = array('fr', 'de');
 
-		// Yandex
+		$yandex = 'ru, uk;q=0.8, be;q=0.8, en;q=0.7, *;q=0.01';
 		$request = new ActionRequest(array(
-			'env' => array('HTTP_ACCEPT_LANGUAGE' => 'ru, uk;q=0.8, be;q=0.8, en;q=0.7, *;q=0.01')
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => $yandex)
 		));
 		$result = Locale::preferred($request, $available);
 		$this->assertNull($result);
 
-		// Exabot
+		$exabot = 'en;q=0.9,*;q=0.8';
 		$request = new ActionRequest(array(
-			'env' => array('HTTP_ACCEPT_LANGUAGE' => 'en;q=0.9,*;q=0.8')
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => $exabot)
 		));
 		$result = Locale::preferred($request, $available);
 		$this->assertNull($result);
 	}
 
-	// https://github.com/UnionOfRAD/lithium/issues/386
+	/**
+	 * When the Accept-Language is empty, it should return `null`.
+	 *
+	 * @see https://github.com/UnionOfRAD/lithium/issues/386
+	 */
 	public function testPreferredEmpty() {
 		$available = array('fr', 'de');
 
-		// Java
 		$request = new ActionRequest(array(
 			'env' => array('HTTP_ACCEPT_LANGUAGE' => '')
 		));
@@ -408,39 +416,53 @@ class LocaleTest extends \lithium\test\Unit {
 		$this->assertNull($result);
 	}
 
-	// https://github.com/UnionOfRAD/lithium/issues/386
-	public function testPreferredMalformedWithChrome() {
+	/**
+	 * A random Firefox 4 sent us this Accept-Language header which is
+	 * malformed.
+	 *
+	 * @see https://github.com/UnionOfRAD/lithium/issues/386
+	 */
+	public function testPreferredMalformedContainingChrome() {
 		$available = array('fr', 'de');
 
-		// A random Firefox 4
-		$header = 'de-DE,de;q=0.7,chrome://global/locale/intl.properties;q=0.3';
+		$random_firefox_4 = 'de-DE,de;q=0.7,chrome://global/locale/intl.properties;q=0.3';
 		$request = new ActionRequest(array(
-			'env' => array('HTTP_ACCEPT_LANGUAGE' => $header)
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => $random_firefox_4)
 		));
 		$result = Locale::preferred($request, $available);
 		$this->assertIdentical('de', $result);
 	}
 
-	// https://github.com/UnionOfRAD/lithium/issues/386
+	/**
+	 * A very strange Accept-Language which might be coming from a proxy, this
+	 * rule `x-ns…` must be ignored.
+	 *
+	 * @see https://github.com/UnionOfRAD/lithium/issues/386
+	 */
 	public function testPreferredMalformedSquid() {
 		$available = array('fr', 'de');
 
-		// Squid?
-		$header = 'fr,fr-fr;q=0.8,en-us;q=0.5,en;q=0.3,x-ns14sRVhG$uNxh';
+		$squid = 'fr,fr-fr;q=0.8,en-us;q=0.5,en;q=0.3,x-ns14sRVhG$uNxh';
 		$request = new ActionRequest(array(
-			'env' => array('HTTP_ACCEPT_LANGUAGE' => $header)
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => $squid)
 		));
 		$result = Locale::preferred($request, $available);
 		$this->assertIdentical('fr', $result);
 	}
 
-	// https://github.com/UnionOfRAD/lithium/issues/386
+	/**
+	 * An Accept-Language coming from a Chrome user which contains an invalid
+	 * item `es-419` causing `preferred` to fail with an exception while it
+	 * should ignored.
+	 *
+	 * @see https://github.com/UnionOfRAD/lithium/issues/386
+	 */
 	public function testPreferredMalformedSpanish() {
 		$available = array('fr', 'de');
 
-		// A Chrome 17
+		$chrome = 'es-419,es;q=0.8';
 		$request = new ActionRequest(array(
-			'env' => array('HTTP_ACCEPT_LANGUAGE' => 'es-419,es;q=0.8')
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => $chrome)
 		));
 		$result = Locale::preferred($request, $available);
 		$this->assertNull($result);
