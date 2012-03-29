@@ -440,7 +440,7 @@ class Request extends \lithium\net\http\Request {
 
 	/**
 	 * Sets/Gets the content type. If `'type'` is null, the method will attempt to determine the
-	 * type first, from the params, then from the environment setting
+	 * type from the params, then from the environment setting
 	 *
 	 * @param string $type a full content type i.e. `'application/json'` or simple name `'json'`
 	 * @return string A simple content type name, i.e. `'html'`, `'xml'`, `'json'`, etc., depending
