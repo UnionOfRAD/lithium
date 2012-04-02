@@ -622,6 +622,28 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testCompareIdenticalMixedArray() {
+		$array1 = array(
+			'command' => 'test',
+			'action' => 'action',
+			'args' => array(),
+			'long' => 'something',
+			'i' => 1
+		);
+
+		$array2 = array(
+			'command' => 'test',
+			'action' => 'action',
+			'long' => 'something',
+			'args' => array(),
+			'i' => 1
+		);
+
+		$result = $this->compare('identical', $array1, $array2);
+		$expected = array('trace' => null, 'expected' => $array1, 'result' => $array2);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function imethods() {
 		return array('testCompareIdenticalArray');
 	}
@@ -643,7 +665,7 @@ class UnitTest extends \lithium\test\Unit {
 	 *
 	 */
 	public function testResults() {
-		$expected = 107;
+		$expected = 108;
 		$result = count($this->results());
 		$this->assertEqual($expected, $result);
 	}
@@ -671,7 +693,7 @@ class UnitTest extends \lithium\test\Unit {
 			'testGetTest', 'testAssertCookie', 'testAssertCookieWithHeaders',
 			'testCompareWithEmptyResult',
 			'testExceptionCatching', 'testErrorHandling', 'testAssertObjects',
-			'testAssertArrayIdentical', 'testCompareIdenticalArray',
+			'testAssertArrayIdentical', 'testCompareIdenticalArray','testCompareIdenticalMixedArray',
 			'testCompareEqualNullArray', 'testCompareIdenticalNullArray',
 			'testResults', 'testTestMethods'
 		);
