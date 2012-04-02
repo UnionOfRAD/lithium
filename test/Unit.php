@@ -900,8 +900,7 @@ class Unit extends \lithium\core\Object {
 			if (!empty($data)) {
 				return $data;
 			}
-		}
-		elseif (!is_scalar($result)) {
+		} elseif (!is_scalar($result)) {
 			$data = $this->_compare($type, $result, $expected);
 
 			if (!empty($data)) {
