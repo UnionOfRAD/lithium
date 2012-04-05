@@ -187,7 +187,7 @@ abstract class Renderer extends \lithium\core\Object {
 
 		$this->_handlers += array(
 			'url' => function($url, $ref, array $options = array()) use (&$classes, &$request, $h) {
-				$url = $classes['router']::match($url ?: '', $request, $options);
+				$url = $classes['router']::match($url ?: '', $request , $options);
 				return $h ? str_replace('&amp;', '&', $h($url)) : $url;
 			},
 			'path' => function($path, $ref, array $options = array()) use (&$classes, &$request) {

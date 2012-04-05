@@ -777,6 +777,714 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::parse($request, array('url' => $request->url));
 		$this->assertEqual(array('controller' => 'users', 'action' => 'view', 'slug' => $slug), $result->params);
 	}
+
+	/**
+	 * Tests getting routes using `lihitum\net\http\Router::get()` using locations
+	 */
+	public function testRouteRetrievalWithLocation() {
+		Router::beginLocation('loc1');
+		$expected = Router::connect('/hello', array('controller' => 'posts', 'action' => 'index'));
+		Router::endLocation();
+		$result = Router::get(0);
+		$this->assertIdentical(null, $result);
+
+		$result = Router::get(0, 'loc1');
+		$this->assertIdentical($expected, $result);
+
+		Router::beginLocation('loc1');
+		Router::connect('/helloworld', array('controller' => 'posts', 'action' => 'index'));
+		Router::endLocation();
+
+		Router::beginLocation('loc2');
+		Router::connect('/hello', array('controller' => 'posts', 'action' => 'index'));
+		Router::endLocation();
+
+		$result = count(Router::get(true));
+		$this->assertEqual(0, $result);
+
+		$result = count(Router::get(true, 'loc1'));
+		$this->assertEqual(2, $result);
+
+		$result = count(Router::get());
+		$this->assertEqual(3, $result);
+	}
+
+	/**
+	 * Tests location creation with `lihtium\net\http\Router::location`
+	 */
+	public function testLocation() {
+		Router::location('app', array(
+			'absolute' => false,
+			'base' => '/web/app'
+		));
+		Router::location('tests', array(
+			'absolute' => true,
+			'host' => 'www.hostname.com',
+			'scheme' => 'http://',
+			'base' => '/web/tests'
+		));
+
+		$expected = array(
+			'absolute' => false,
+			'host' => null,
+			'scheme' => null,
+			'base' => '/web/app',
+			'pattern' => '@^.*$@',
+			'params' => array(),
+			'values' => array()
+		);
+		$result = Router::location('app');
+		$this->assertEqual($expected, $result);
+
+		$expected = array(
+			'absolute' => true,
+			'host' => 'www.hostname.com',
+			'scheme' => 'http://',
+			'base' => '/web/tests',
+			'pattern' => '@^http://www\.hostname\.com$@',
+			'params' => array(),
+			'values' => array()
+		);
+		$result = Router::location('tests');
+		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * Tests location compilation with `lihtium\net\http\Router::compileLocation`
+	 */
+	public function testCompileLocation() {
+		$result = Router::compileLocation(array(
+			'absolute' => true,
+			'host' => 'www.hostname.com',
+			'scheme' => 'http://',
+			'base' => '/web/tests'
+		));
+
+		$expected = array(
+			'absolute' => true,
+			'host' => 'www.hostname.com',
+			'scheme' => 'http://',
+			'base' => '/web/tests',
+			'pattern' => '@^http://www\.hostname\.com$@',
+			'params' => array()
+		);
+		$this->assertEqual($expected, $result);
+
+		$result = Router::compileLocation(array(
+			'absolute' => true,
+			'host' => '{:subdomain:[a-z]+}.{:domain}.{:tld}',
+			'scheme' => 'http://',
+			'base' => '/web/tests'
+		));
+
+		$expected = array(
+			'absolute' => true,
+			'host' => '{:subdomain:[a-z]+}.{:domain}.{:tld}',
+			'scheme' => 'http://',
+			'base' => '/web/tests',
+			'pattern' => '@^http://(?P<subdomain>[a-z]+)\\.(?P<domain>.+?)\\.(?P<tld>.+?)$@',
+			'params' => array('subdomain', 'domain', 'tld')
+		);
+		$this->assertEqual($expected, $result);
+
+		$result = Router::compileLocation(array(
+			'absolute' => true,
+			'host' => '{:subdomain:[a-z]+}.{:domain}.{:tld}',
+			'scheme' => '{:scheme:https://}',
+			'base' => ''
+		));
+
+		$expected = array(
+			'absolute' => true,
+			'host' => '{:subdomain:[a-z]+}.{:domain}.{:tld}',
+			'scheme' => '{:scheme:https://}',
+			'base' => '',
+			'pattern' => '@^(?P<scheme>https://)(?P<subdomain>[a-z]+)\\.(?P<domain>.+?)\\.(?P<tld>.+?)$@',
+			'params' => array('scheme', 'subdomain', 'domain', 'tld')
+		);
+		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * Tests location parsing with `lihtium\net\http\Router::location`
+	 */
+	public function testParseLocation() {
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => '{:subdomain:[a-z]+}.{:domain}.{:tld}',
+			'scheme' => 'http://',
+			'base' => '/web/tests'
+		));
+
+		$result = Router::location('app', null, array(
+			'subdomain' => 'admin',
+			'domain' => 'myserver',
+			'tld' => 'com'
+		));
+
+		$expected = array(
+			'absolute' => true,
+			'host' => 'admin.myserver.com',
+			'scheme' => 'http://',
+			'base' => '/web/tests',
+			'pattern' => '@^http://(?P<subdomain>[a-z]+)\\.(?P<domain>.+?)\\.(?P<tld>.+?)$@',
+			'params' => array('subdomain', 'domain', 'tld'),
+			'values' => array()
+		);
+		$this->assertEqual($expected, $result);
+
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => '{:subdomain:[a-z]+}.{:domain}.{:tld}',
+			'scheme' => '{:scheme:https://}',
+			'base' => ''
+		));
+
+		$result = Router::location('app', null, array(
+			'scheme' => 'https://',
+			'subdomain' => 'admin',
+			'domain' => 'myserver',
+			'tld' => 'co.uk'
+		));
+
+		$expected = array(
+			'absolute' => true,
+			'host' => 'admin.myserver.co.uk',
+			'scheme' => 'https://',
+			'base' => '',
+			'pattern' => '@^(?P<scheme>https://)(?P<subdomain>[a-z]+)\\.(?P<domain>.+?)\\.(?P<tld>.+?)$@',
+			'params' => array('scheme', 'subdomain', 'domain', 'tld'),
+			'values' => array()
+		);
+		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * Tests location parsing with `lihtium\net\http\Router::location` with missing vars
+	 */
+	public function testParseWithNotValidSchemeVariable() {
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => '{:subdomain:[a-z]+}.{:domain}.{:tld}',
+			'scheme' => '{:scheme:https://}',
+			'base' => ''
+		));
+
+		$result = Router::location('app', null, array(
+			'scheme' => 'http://',
+			'subdomain' => 'admin',
+			'domain' => 'myserver',
+			'tld' => 'co.uk'
+		));
+
+		$expected = array(
+			'absolute' => true,
+			'host' => 'admin.myserver.co.uk',
+			'scheme' => '{:scheme:https://}',
+			'base' => '',
+			'pattern' => '@^(?P<scheme>https://)(?P<subdomain>[a-z]+)\\.(?P<domain>.+?)\\.(?P<tld>.+?)$@',
+			'params' => array('scheme', 'subdomain', 'domain', 'tld'),
+			'values' => array()
+		);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testMatchWithLocationAndAbsoluteBase() {
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => 'app.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		$result = Router::match('/controller/action/hello', null, array('location' => 'app'));
+		$this->assertEqual('http://app.mysite.com/prefix/controller/action/hello', $result);
+	}
+
+	public function testMatchWithLocationAndRelativeBase() {
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => 'app.mysite.com',
+			'scheme' => 'http://',
+			'base' => 'prefix'
+		));
+		$result = Router::match('/controller/action/hello', null, array('location' => 'app'));
+		$this->assertEqual('http://app.mysite.com/prefix/controller/action/hello', $result);
+	}
+
+	public function testMatchWithLocationAndAbsoluteBase2() {
+		$this->request = new Request(array('base' => '/lihtium'));
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => 'app.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		$result = Router::match('/controller/action/hello', $this->request, array('location' => 'app'));
+		$this->assertEqual('http://app.mysite.com/prefix/controller/action/hello', $result);
+	}
+
+	public function testMatchWithLocationAndRelativeBase2() {
+		$this->request = new Request(array('base' => '/lihtium'));
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => 'app.mysite.com',
+			'scheme' => 'http://',
+			'base' => 'prefix'
+		));
+
+		$result = Router::match('/controller/action/hello', $this->request, array('location' => 'app'));
+		$this->assertEqual('http://app.mysite.com/lihtium/prefix/controller/action/hello', $result);
+	}
+
+	public function testMatchDoubleColonWithLocation() {
+		Router::location('tests', array(
+			'absolute' => true,
+			'host' => 'tests.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		Router::beginLocation('tests');
+		Router::connect('/user/view/{:args}', array('User::view'));
+		Router::endLocation();
+
+		Router::setLocation('tests');
+		$result = Router::match(array('User::view', 'args' => 'bob'), null, array('location' => 'tests'));
+		$this->assertEqual('http://tests.mysite.com/prefix/user/view/bob', $result);
+	}
+
+	public function testUnexistingRouteForLocation() {
+		Router::location('tests', array(
+			'absolute' => true,
+			'host' => 'tests.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => 'app.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		Router::beginLocation('tests');
+		Router::connect('/user/view/{:args}', array('User::view'));
+		Router::endLocation();
+
+		Router::setLocation('tests');
+		$this->expectException('/No parameter match found for URL/');
+		$result = Router::match(array('User::view', 'args' => 'bob'), null, array('location' => 'app'));
+		$this->assertEqual('http://app.mysite.com/prefix/user/view/bob', $result);
+	}
+
+	public function testMatchWithSetLocation() {
+		Router::location('tests', array(
+			'absolute' => true,
+			'host' => 'tests.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		Router::setLocation('tests');
+		$result = Router::match('/controller/action/hello');
+		$this->assertEqual('http://tests.mysite.com/prefix/controller/action/hello', $result);
+	}
+
+	public function testLocationOnRelativeUrl() {
+		Router::location('tests', array(
+			'absolute' => false,
+			'host' => 'tests.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+		
+		Router::setLocation('tests');
+		$result = Router::match('/controller/action/hello');
+		$this->assertEqual('/prefix/controller/action/hello', $result);
+	}
+
+	public function testLocationWithAbsoluteBaseAndRequest() {
+		$request = new Request(array('base' => '/request/base'));
+		Router::location('tests', array(
+			'absolute' => false,
+			'host' => 'tests.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+		
+		Router::setLocation('tests');
+		$result = Router::match('/controller/action/hello', $request);
+		$this->assertEqual('/prefix/controller/action/hello', $result);
+	}
+
+	public function testLocationWithRelativeBaseAndRequest() {
+		$request = new Request(array('base' => '/request/base'));
+		Router::location('tests', array(
+			'absolute' => false,
+			'host' => 'tests.mysite.com',
+			'scheme' => 'http://',
+			'base' => 'prefix'
+		));
+		
+		Router::setLocation('tests');
+		$result = Router::match('/controller/action/hello', $request);
+		$this->assertEqual('/request/base/prefix/controller/action/hello', $result);
+	}
+
+	/**
+	 * When a location is created with empty `'host'`, `'scheme'` or both,
+	 * the Request `'host'`, `'scheme'` must be used instead (if provided)
+	 * when a absolute url is asked
+	 */
+	public function testOverrideEmptyLocationOptionWithRequest() {
+		$request = new Request(array(
+			'env' => array(
+				'HTTP_HOST' => 'request.mysite.com',
+				'HTTPS' => true,
+			),
+			'base' => '/request/base'
+		));
+		Router::location('app', array('absolute' => true));
+		
+		Router::setLocation('app');
+		$result = Router::match('/controller/action/hello', $request);
+		$this->assertEqual('https://request.mysite.com/request/base/controller/action/hello', $result);
+
+		Router::setLocation('tests');
+		$result = Router::match('/controller/action/hello', $request);
+		$this->assertEqual('/request/base/controller/action/hello', $result);
+	}
+
+	public function testParseWithUrlRelativeLocation() {
+
+		Router::connect('/home/welcome', array('Home::default'));
+
+		Router::beginLocation('app');
+		Router::connect('/home/welcome', array('Home::app'));
+		Router::endLocation();
+
+		Router::beginLocation('tests');
+		Router::connect('/home/welcome', array('Home::tests'));
+		Router::endLocation();
+
+		Router::location('tests', array(
+			'absolute' => false,
+			'host' => 'tests.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		Router::location('app', array(
+			'absolute' => false,
+			'host' => 'app.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		$request = new Request();
+		 
+		$request->url = '/home/welcome';
+		$result = Router::process($request);
+		$expected = array(
+			'controller' => 'home',
+			'action' => 'default'
+		);
+		$this->assertEqual($expected, $result->params);
+		$this->assertEqual(false, Router::getLocation());
+
+		Router::reset();
+
+		Router::beginLocation('app');
+		Router::connect('/home/welcome', array('Home::app'));
+		Router::endLocation();
+
+		Router::beginLocation('tests');
+		Router::connect('/home/welcome', array('Home::tests'));
+		Router::endLocation();
+
+		Router::location('tests', array(
+			'absolute' => false,
+			'host' => 'tests.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		Router::location('app', array(
+			'absolute' => false,
+			'host' => 'app.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		$request = new Request();
+		 
+		$request->url = '/home/welcome';
+		$result = Router::process($request);
+		$expected = array(
+			'controller' => 'home',
+			'action' => 'tests'
+		);
+		$this->assertEqual($expected, $result->params);
+		$this->assertEqual('tests', Router::getLocation());
+
+		Router::reset();
+
+		Router::beginLocation('app');
+		Router::connect('/home/welcome', array('Home::app'));
+		Router::endLocation();
+
+		Router::beginLocation('tests');
+		Router::connect('/home/welcome', array('Home::tests'));
+		Router::endLocation();
+
+		Router::location('app', array(
+			'absolute' => false,
+			'host' => 'app.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		Router::location('tests', array(
+			'absolute' => false,
+			'host' => 'tests.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		$request = new Request();
+		 
+		$request->url = '/home/welcome';
+		$result = Router::process($request);
+		$expected = array(
+			'controller' => 'home',
+			'action' => 'app'
+		);
+		$this->assertEqual($expected, $result->params);
+		$this->assertEqual('app', Router::getLocation());
+	}
+
+	public function testParseWithUrlAbsoluteLocation() {
+
+		Router::connect('/home/welcome', array('Home::default'));
+
+		Router::beginLocation('app');
+		Router::connect('/home/welcome', array('Home::app'));
+		Router::endLocation();
+
+		Router::beginLocation('tests');
+		Router::connect('/home/welcome', array('Home::tests'));
+		Router::endLocation();
+
+		Router::location('tests', array(
+			'absolute' => true,
+			'host' => 'tests.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => 'app.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		$request = new Request(array('env' => array(
+			'HTTP_HOST' => 'app.mysite.com',
+			'HTTPS' => false 
+		)));
+		 
+		$request->url = '/home/welcome';
+		$result = Router::process($request);
+		$expected = array(
+			'controller' => 'home',
+			'action' => 'app'
+		);
+		$this->assertEqual($expected, $result->params);
+		$this->assertEqual('app', Router::getLocation());
+	}
+
+	public function testParseWithHttpsLocation() {
+
+		Router::connect('/home/welcome', array('Home::default'));
+
+		Router::beginLocation('app');
+		Router::connect('/home/welcome', array('Home::app'));
+		Router::endLocation();
+
+		Router::beginLocation('tests');
+		Router::connect('/home/welcome', array('Home::tests'));
+		Router::endLocation();
+
+		Router::location('tests', array(
+			'absolute' => true,
+			'host' => 'tests.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => 'app.mysite.com',
+			'scheme' => 'http://',
+			'base' => '/prefix'
+		));
+
+		$request = new Request(array('env' => array(
+			'HTTP_HOST' => 'app.mysite.com',
+			'HTTPS' => true 
+		)));
+		 
+		$request->url = '/home/welcome';
+		$result = Router::process($request);
+		$expected = array(
+			'controller' => 'home',
+			'action' => 'default'
+		);
+		$this->assertEqual($expected, $result->params);
+
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => 'app.mysite.com',
+			'scheme' => 'https://',
+			'base' => '/prefix'
+		));
+
+		$result = Router::process($request);
+		$expected = array(
+			'controller' => 'home',
+			'action' => 'app'
+		);
+		$this->assertEqual($expected, $result->params);
+	}
+
+	/**
+	 * This test should work
+	 */
+	/*
+	public function testMatchEnvWithRequest() {
+		$request = new Request(array(
+			'host' => 'www.amiga.com',
+			'scheme' => 'http://'
+		));
+		Location::url('app', array(
+			'absolute' => false,
+			'host' => 'www.atari.com',
+			'scheme' => 'http://',
+			'base' => '/web'
+		));
+		$result = Location::match('app', $request);
+		$this->assertTrue($result);
+
+		Location::url('app', array(
+			'absolute' => true,
+			'host' => 'www.atari.com',
+			'scheme' => 'http://',
+			'base' => '/web'
+		));
+		$result = Location::match('app', $request);
+		$this->assertFalse($result);
+
+		Location::url('app', array(
+			'absolute' => true,
+			'host' => 'www.amiga.com',
+			'scheme' => 'http://',
+			'base' => '/web'
+		));
+		$result = Location::match('app', $request);
+		$this->assertTrue($result);
+	}*/
+
+	public function testMatchEnvWithGlobalRequest() {
+		$request = new Request(array('env' => array(
+			'HTTP_HOST' => 'www.amiga.com',
+			'HTTPS' => false
+		)));
+		Router::location('app', array(
+			'absolute' => false,
+			'host' => 'www.atari.com',
+			'scheme' => 'http://',
+			'base' => '/web'
+		));
+		$result = Router::matchLocation('app', $request);
+		$this->assertTrue($result);
+
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => 'www.atari.com',
+			'scheme' => 'http://',
+			'base' => '/web'
+		));
+		$result = Router::matchLocation('app', $request);
+		$this->assertFalse($result);
+
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => 'www.amiga.com',
+			'scheme' => 'http://',
+			'base' => '/web'
+		));
+		$result = Router::matchLocation('app', $request);
+		$this->assertTrue($result);
+	}
+	/**
+	 * Test subdomained location
+	 */
+	public function testLocationWithSubdomain() {
+		$request = new Request(array('env' => array(
+			'HTTP_HOST' => 'www.amiga.com',
+			'HTTPS' => false
+		)));
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => '{:subdomain}.amiga.{:tld}',
+			'scheme' => 'http://',
+			'base' => ''
+		));
+		$result = Router::matchLocation('app', $request);
+		$expected = array(
+			'subdomain' => 'www',
+			'tld' => 'com'
+		);
+		$this->assertEqual($expected, $result);
+	}
+	/**
+	 * Test subdomained location and the populated request params
+	 */
+	public function testLocationPopulatedParamsWithSubdomain() {
+		$request = new Request(array(
+			'url' => '/home/index',
+			'env' => array(
+				'HTTP_HOST' => 'bob.amiga.com',
+				'HTTPS' => false
+			)
+		));
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => '{:subdomain}.amiga.{:tld}',
+			'scheme' => 'http://',
+			'base' => ''
+		));
+
+		Router::beginLocation('app');
+		Router::connect('/home/index', array('Home::index'));
+		Router::endLocation();
+
+		Router::parse($request);
+		$expected = array(
+			'controller' => 'home',
+			'action' => 'index',
+			'subdomain' => 'bob',
+			'tld' => 'com'
+		);
+		$this->assertEqual($expected, $request->params);
+
+		$result = Router::location('app');
+		$this->assertEqual($expected, $result['values']);
+	}
 }
 
 ?>

@@ -12,6 +12,7 @@ use lithium\util\Set;
 use lithium\util\String;
 use lithium\core\Libraries;
 use lithium\net\http\MediaException;
+use lithium\core\Configurable;
 
 /**
  * The `Media` class facilitates content-type mapping (mapping between content-types and file
@@ -30,6 +31,23 @@ use lithium\net\http\MediaException;
  * }}}
  */
 class Media extends \lithium\core\StaticObject {
+
+	/**
+	 * Contain the configuration of router locations.
+	 *
+	 * @var array of locations
+	 */
+	protected static $_locations = null;
+
+	/**
+	 * Stores the name of the location to use for building assets paths.
+	 * If set to `false`, no location is used.
+	 *
+	 * @see LF\Net\Http\Media::location()
+	 * @see lithium\net\http\Media::setLocation()
+	 * @var string
+	 */
+	protected static $_location = false;
 
 	/**
 	 * Maps file extensions to content-types.  Used to set response types and determine request
@@ -423,11 +441,35 @@ class Media extends \lithium\core\StaticObject {
 			'check' => false,
 			'library' => true
 		);
-		if (!$base = static::_assets($type)) {
+		if (!$paths = static::_assets($type)) {
 			$type = 'generic';
-			$base = static::_assets('generic');
+			$paths = static::_assets('generic');
 		}
-		$options += ($base + $defaults);
+
+		$base = isset($options['base']) ? rtrim($options['base'], '/') : '';
+		$options += array('location' => static::getLocation());
+		$name = $options['location'];
+
+		if($name && $config = static::location($name)){
+			$defaults = array_merge($defaults, $config);
+
+			if(preg_match('/^((?:[a-z0-9-]+:)?\/\/)([^\/]*)/i', $base, $match)){
+				$defaults = array_merge($defaults, array('scheme' => $match[1], 'host' => $match[2]));
+			}
+			$host = '';
+			if($defaults['absolute']){
+				$host = $defaults['scheme'] . $defaults['host'];
+			}
+			if (substr($defaults['base'], 0, 1) != '/'){
+				$options['base'] = $host . $base . ($defaults['base'] ? '/' . $defaults['base'] : '');
+			}
+			else{
+				$options['base'] = $host . rtrim($defaults['base'], '/');
+			}	
+		}
+
+		$options += ($paths + $defaults);
+
 		$params = compact('path', 'type', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
@@ -484,11 +526,19 @@ class Media extends \lithium\core\StaticObject {
 	 *
 	 * @param string|boolean $library The name of the library for which to find the path, or `true`
 	 *        for the default library.
+	 * @param string|boolean $location The name of the to use to find the path.
 	 * @return string Returns the physical path to the web assets directory for a library. For
 	 *         example, the `/webroot` directory of the default library would be
 	 *         `LITHIUM_APP_PATH . '/webroot'`.
 	 */
-	public static function webroot($library = true) {
+	public static function webroot($library = true, $location = false) {
+		if ($location){
+			if($config = static::location($location)) {
+				return $config['path'];
+			}
+			return null;
+		}
+
 		if (!$config = Libraries::get($library)) {
 			return null;
 		}
@@ -517,20 +567,25 @@ class Media extends \lithium\core\StaticObject {
 			'base' => null,
 			'path' => array(),
 			'suffix' => null,
-			'library' => true
+			'library' => true,
+			'location' => false
 		);
 		if (!$base = static::_assets($type)) {
 			$type = 'generic';
 			$base = static::_assets('generic');
 		}
 		$options += ($base + $defaults);
-		$config = Libraries::get($options['library']);
-		$root = static::webroot($options['library']);
+
 		$paths = $options['path'];
+		if($options['location']){
+			$root = static::webroot(false, $options['location']);
+		}
+		else{
+			$config = Libraries::get($options['library']);
+			$root = static::webroot($options['library']);
 
-		$config['default'] ? end($paths) : reset($paths);
-		$options['library'] = basename($config['path']);
-
+			$config['default'] ? end($paths) : reset($paths);
+		}
 		if ($qOffset = strpos($path, '?')) {
 			$path = substr($path, 0, $qOffset);
 		}
@@ -542,6 +597,7 @@ class Media extends \lithium\core\StaticObject {
 			$insert = array('base' => $root) + compact('path');
 			$file = String::insert($template, $insert);
 		}
+		
 		return realpath($file);
 	}
 
@@ -705,8 +761,11 @@ class Media extends \lithium\core\StaticObject {
 	 * @return void
 	 */
 	public static function reset() {
-		foreach (get_class_vars(__CLASS__) as $name => $value) {
-			static::${$name} = array();
+		static::$_handlers = array();
+		static::$_types = array();
+		static::$_location = false;
+		if (isset(static::$_locations)) {
+			static::$_locations->reset();
 		}
 	}
 
@@ -870,6 +929,82 @@ class Media extends \lithium\core\StaticObject {
 			return isset($assets[$type]) ? $assets[$type] : null;
 		}
 		return $assets;
+	}
+
+	/**
+	 * Add path location configurations
+	 *
+	 * For example:
+	 * {{{
+	 * Media::location('app', array(
+	 *     'path' => '/var/www/website/app/webroot/extradir',
+	 *     'base' => '/extradir'
+	 * ));
+	 * }}}
+	 *
+ 	 * {{{
+	 * Media::location('cdn', array(
+	 *     'path' => null,
+	 *     'base' => 'http://my.cdn.com/project1/assets'
+	 * ));
+	 * }}}
+	 *
+	 * @param string $name The name by which this assets is referenced.
+	 * @param array $params Contains all configuration information to use for reaching assets :
+	 *        - `'base'`: The base url of the assets.
+	 *        - `'check'`: Check for the existence of the file before returning. Defaults to
+	 *          `false`.
+	 *        - `'filter'`: An array of key/value pairs representing simple string replacements to
+	 *          be done on a path once it is generated.
+	 *        - `'path'` _string_: The filesytem root path of the assets if applicable.
+	 *          `String::insert()` formatting. See `Media::$_assets` for more.
+	 *        - `suffix`: The suffix to attach to the path, generally a file extension.
+	 *        - `'timestamp'`: Appends the last modified time of the file to the path if `true`.
+	 *          Defaults to `false`.
+	 *        - `'base'` _string_: The base url of the assets
+	 *        if $params is equals to false, the location is removed
+	 * @return array Returns the stored configuration array.
+	 */
+	public static function location($name = null, $params = null) {
+		if (!isset(static::$_locations)) {
+			static::$_locations = new Configurable();
+			static::$_locations->initConfig = function($name, $config) {
+				$defaults =array(
+					'absolute' => false,
+					'host' => 'localhost',
+					'scheme' => 'http://',
+					'base' => '',
+					'path' => '',
+					'timestamp' => false,
+					'filter' => null,
+					'suffix' => null,
+					'check' => false
+				);
+				return $config + $defaults;
+			};
+		}
+		if (is_array($params) || $params === false) {
+			return static::$_locations->set($name, $params);
+		}
+		return static::$_locations->get($name);
+	}
+
+	/**
+	 * Set the name of location to use for building assets urls
+	 *
+	 * @var string $location The name of location
+	 */
+	public static function setLocation($location) {
+		static::$_location = $location;
+	}
+
+	/**
+	 * Returns the name of the current location
+	 *
+	 * @return string
+	 */
+	public static function getLocation() {
+		return static::$_location;
 	}
 }
 

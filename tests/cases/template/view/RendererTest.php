@@ -15,6 +15,7 @@ use lithium\template\Helper;
 use lithium\template\helper\Html;
 use lithium\template\view\adapter\Simple;
 use lithium\net\http\Router;
+use lithium\net\http\Media;
 use lithium\template\View;
 
 class RendererTest extends \lithium\test\Unit {
@@ -22,6 +23,8 @@ class RendererTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->_routes = Router::get();
 		Router::reset();
+		$this->_media = Media::getLocation();
+		Media::reset();
 		Router::connect('/{:controller}/{:action}');
 		$this->subject = new Simple(array(
 			'request' => new Request(array(
@@ -33,10 +36,11 @@ class RendererTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		Router::reset();
-
+		Media::reset();
 		foreach ($this->_routes as $route) {
 			Router::connect($route);
 		}
+		$this->_media = Media::setLocation($this->_media);
 	}
 
 	public function testInitialization() {

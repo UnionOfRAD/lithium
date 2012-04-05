@@ -138,6 +138,11 @@ abstract class Helper extends \lithium\core\Object {
 	protected function _render($method, $string, $params, array $options = array()) {
 		$strings = $this->_strings;
 
+		if(isset($params['options']['location'])) {
+			$options['location'] = $params['options']['location'];
+			unset($params['options']['location']);
+		}
+
 		if ($this->_context) {
 			foreach ($params as $key => $value) {
 				$params[$key] = $this->_context->applyHandler(
