@@ -1136,8 +1136,7 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * When a location is created with empty `'host'`, `'scheme'` or both,
-	 * the Request `'host'`, `'scheme'` must be used instead (if provided)
-	 * when a absolute url is asked
+	 * the Request's `'host'` and/or `'scheme'` must be used instead (if provided)
 	 */
 	public function testOverrideEmptyLocationOptionWithRequest() {
 		$request = new Request(array(
@@ -1158,7 +1157,10 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual('/request/base/controller/action/hello', $result);
 	}
 
-	public function testParseWithUrlRelativeLocation() {
+	/**
+	 * Test Router::process with location and absolute = false
+	 */
+	public function testProcessWithUrlRelativeLocation() {
 
 		Router::connect('/home/welcome', array('Home::default'));
 
@@ -1266,7 +1268,10 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual('app', Router::getLocation());
 	}
 
-	public function testParseWithUrlAbsoluteLocation() {
+	/**
+	 * Test Router::process with location and absolute = true
+	 */
+	public function testProcessWithUrlAbsoluteLocation() {
 
 		Router::connect('/home/welcome', array('Home::default'));
 
@@ -1307,7 +1312,10 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual('app', Router::getLocation());
 	}
 
-	public function testParseWithHttpsLocation() {
+	/**
+	 * Test Router::process with HTTPS scheme
+	 */
+	public function testProcessWithHttpsLocation() {
 
 		Router::connect('/home/welcome', array('Home::default'));
 
@@ -1398,6 +1406,9 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}*/
 
+	/**
+	 * Test environment based location
+	 */
 	public function testMatchEnvWithGlobalRequest() {
 		$request = new Request(array('env' => array(
 			'HTTP_HOST' => 'www.amiga.com',
@@ -1451,8 +1462,9 @@ class RouterTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result);
 	}
+
 	/**
-	 * Test subdomained location and the populated request params
+	 * Test Router::process on subdomained location and check the populated request params
 	 */
 	public function testLocationPopulatedParamsWithSubdomain() {
 		$request = new Request(array(
@@ -1473,7 +1485,7 @@ class RouterTest extends \lithium\test\Unit {
 		Router::connect('/home/index', array('Home::index'));
 		Router::endLocation();
 
-		Router::parse($request);
+		Router::process($request);
 		$expected = array(
 			'controller' => 'home',
 			'action' => 'index',
@@ -1484,6 +1496,48 @@ class RouterTest extends \lithium\test\Unit {
 
 		$result = Router::location('app');
 		$this->assertEqual($expected, $result['values']);
+	}
+
+	/**
+	 * Test Router::match on subdomained location
+	 */
+	public function testMatchWithLocationAndSubdomain() {
+		$request = new Request(array(
+			'url' => '/home/index',
+			'env' => array(
+				'HTTP_HOST' => 'bob.amiga.com',
+				'HTTPS' => false
+			)
+		));
+		Router::location('app', array(
+			'absolute' => true,
+			'host' => '{:subdomain}.amiga.{:tld}',
+			'scheme' => 'http://',
+			'base' => '/'
+		));
+
+		Router::beginLocation('app');
+		Router::connect('/home/index', array('Home::index'));
+		Router::endLocation();
+
+		Router::process($request);
+		$expected = 'http://bob.amiga.com/home/index';
+		$result = Router::match('/home/index', $request);
+		$this->assertEqual($expected, $result);
+
+		$expected = 'http://bob.amiga.com/home/index';
+		$result = Router::match('/home/index', $request, array('location' => 'app'));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'http://max.amiga.com/home/index';
+		$result = Router::match('/home/index', $request, array(
+			'location' => array(
+				'app' => array(
+					'subdomain' => 'max'
+				)
+			)
+		));
+		$this->assertEqual($expected, $result);
 	}
 }
 

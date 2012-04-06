@@ -33,14 +33,14 @@ use lithium\core\Configurable;
 class Media extends \lithium\core\StaticObject {
 
 	/**
-	 * Contain the configuration of router locations.
+	 * Contain the configuration of locations.
 	 *
 	 * @var array of locations
 	 */
 	protected static $_locations = null;
 
 	/**
-	 * Stores the name of the location to use for building assets paths.
+	 * Stores the name of the location in use.
 	 * If set to `false`, no location is used.
 	 *
 	 * @see LF\Net\Http\Media::location()

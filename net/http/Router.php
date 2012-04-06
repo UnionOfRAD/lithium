@@ -46,14 +46,14 @@ use lithium\core\Configurable;
 class Router extends \lithium\core\StaticObject {
 
 	/**
-	 * Contain the configuration of router locations.
+	 * Contain the configuration of locations.
 	 *
 	 * @var array of locations
 	 */
 	protected static $_locations = null;
 
 	/**
-	 * Stores the name of the location to use.
+	 * Stores the name of the location in use.
 	 * If set to `false`, no location is used.
 	 * saved
 	 * @see lithium\net\http\Router::location()
@@ -272,9 +272,12 @@ class Router extends \lithium\core\StaticObject {
 		}
 
 		$options += array('location' => static::getLocation());
+		$vars = array();
 		$name = $options['location'];
-
-		if($name && $config = static::location($name)) {
+		if(is_array($name)){
+			list($name, $vars) = each($name);
+		}
+		if($name && $config = static::location($name, null, $vars)) {
 			$config['host'] = $config['host'] ?: $defaults['host'];
 			$config['scheme'] = $config['scheme'] ?: $defaults['scheme'];
 			$defaults = array_merge($defaults, $config);
@@ -531,6 +534,7 @@ class Router extends \lithium\core\StaticObject {
 	 * ));
 	 * }}}
 	 *
+	 * NOTICE : The following shouldn't be used directly
 	 * To get the parsed location with some variables, use it as following : 
 	 * {{{
 	 * Router::location('app', null, array(
