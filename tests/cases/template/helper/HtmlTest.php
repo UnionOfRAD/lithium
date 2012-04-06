@@ -502,7 +502,7 @@ class HtmlTest extends \lithium\test\Unit {
 		$this->html->link('home', '/home');
 		$this->assertFalse(isset($result['options']['location']));
 
-		$expected = array('app' => array('domain' => 'bob');
+		$expected = array('app' => array('domain' => 'bob'));
 		$this->html->link('home', '/home', array('location' => $expected ));
 		$this->assertEqual($expected, $result['options']['location']);
 	}
