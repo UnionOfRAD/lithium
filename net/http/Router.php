@@ -152,30 +152,24 @@ class Router extends \lithium\core\StaticObject {
 	 *
 	 * @see lithium\action\Request
 	 * @see lithium\net\http\Router::connect()
-	 * @see lithium\net\http\Location
+	 * @see lithium\net\http\Router::location()
 	 * @param object $request A request object containing URL and environment data.
 	 * @return array Returns an array of parameters specifying how the given request should be
 	 *         routed. The keys returned depend on the `Route` object that was matched, but
 	 *         typically include `'controller'` and `'action'` keys.
 	 */
 	public static function parse($request) {
-		$configs = static::location();
-		$locations = array(false);
-		$configs += array_fill_keys(array_keys(static::$_configurations), array('absolute' => false));
-		foreach($configs as $key => $config){
-			if($config['absolute'] && static::matchLocation($key, $request)){
-				return static::_parse($request, array($key));
+		$configs = array_filter(array_keys(static::$_configurations));
+		$configs[] = false;
+		foreach($configs as $name){
+			if(!$config = static::location($name)){
+				$config = array('absolute' => false);
 			}
-			$locations[] = $key;
-		}
-		return static::_parse($request, $locations);
-	}
-
-	protected static function _parse($request, array $locations) {
-		foreach($locations as $name){
 			$orig = $request->params;
 			$url  = $request->url;
-			if(isset(static::$_configurations[$name])){
+			if((!$config['absolute']
+				|| static::matchLocation($name, $request))
+				&& isset(static::$_configurations[$name])){
 				foreach (static::$_configurations[$name] as $route) {
 					if (!$match = $route->parse($request, compact('url'))) {
 						continue;
@@ -265,8 +259,8 @@ class Router extends \lithium\core\StaticObject {
 
 		$base = $context ? rtrim($context->env('base'), '/') : '';
 		if ($context) {
-			//$scheme = $context->scheme ?: ($context->env('HTTPS') ? 'https://' : 'http://');
-			//$host = $context->host ?: $context->env('HTTP_HOST');
+			//$defaults['scheme'] = $context->scheme ? $context->scheme . '://' : ($context->env('HTTPS') ? 'https://' : 'http://');
+			//$defaults['host'] = $context->host ?: $context->env('HTTP_HOST');
 			$defaults['host'] = $context->env('HTTP_HOST');
 			$defaults['scheme'] = $context->env('HTTPS') ? 'https://' : 'http://';
 		}
@@ -635,8 +629,8 @@ class Router extends \lithium\core\StaticObject {
 	public static function compileLocation(array $config) {
 		$defaults =array(
 			'absolute' => false,
-			'host' => null,
-			'scheme' => null,
+			'host' => 'localhost',
+			'scheme' => 'http://',
 			'base' => '',
 			'pattern' => '',
 			'params' => array()
@@ -674,8 +668,8 @@ class Router extends \lithium\core\StaticObject {
 	 * @return mixed The url location or parsed url location if $vars is not empty
 	 */
 	public static function matchLocation($name, $request) {
-		//$scheme = $request->scheme ?: ($request->env('HTTPS') ? 'https://' : 'http://');
-		//$host = $request->host ?: $request->env('HTTP_HOST');
+		//$scheme = $request->scheme . '://';
+		//$host = $request->host;
 		$scheme = $request->env('HTTPS') ? 'https://' : 'http://';
 		$host = $request->env('HTTP_HOST');
 

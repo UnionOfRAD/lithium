@@ -810,7 +810,7 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests location creation with `lihtium\net\http\Router::location`
+	 * Tests location creation with `lithium\net\http\Router::location`
 	 */
 	public function testLocation() {
 		Router::location('app', array(
@@ -850,7 +850,7 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests location compilation with `lihtium\net\http\Router::compileLocation`
+	 * Tests location compilation with `lithium\net\http\Router::compileLocation`
 	 */
 	public function testCompileLocation() {
 		$result = Router::compileLocation(array(
@@ -906,7 +906,7 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests location parsing with `lihtium\net\http\Router::location`
+	 * Tests location parsing with `lithium\net\http\Router::location`
 	 */
 	public function testParseLocation() {
 		Router::location('app', array(
@@ -960,7 +960,7 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests location parsing with `lihtium\net\http\Router::location` with missing vars
+	 * Tests location parsing with `lithium\net\http\Router::location` with missing vars
 	 */
 	public function testParseWithNotValidSchemeVariable() {
 		Router::location('app', array(
@@ -1013,7 +1013,7 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	public function testMatchWithLocationAndAbsoluteBase2() {
-		$this->request = new Request(array('base' => '/lihtium'));
+		$this->request = new Request(array('base' => '/lithium'));
 		Router::location('app', array(
 			'absolute' => true,
 			'host' => 'app.mysite.com',
@@ -1026,7 +1026,7 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	public function testMatchWithLocationAndRelativeBase2() {
-		$this->request = new Request(array('base' => '/lihtium'));
+		$this->request = new Request(array('base' => '/lithium'));
 		Router::location('app', array(
 			'absolute' => true,
 			'host' => 'app.mysite.com',
@@ -1035,7 +1035,7 @@ class RouterTest extends \lithium\test\Unit {
 		));
 
 		$result = Router::match('/controller/action/hello', $this->request, array('location' => 'app'));
-		$this->assertEqual('http://app.mysite.com/lihtium/prefix/controller/action/hello', $result);
+		$this->assertEqual('http://app.mysite.com/lithium/prefix/controller/action/hello', $result);
 	}
 
 	public function testMatchDoubleColonWithLocation() {
@@ -1192,19 +1192,21 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::process($request);
 		$expected = array(
 			'controller' => 'home',
-			'action' => 'default'
+			'action' => 'app'
 		);
 		$this->assertEqual($expected, $result->params);
-		$this->assertEqual(false, Router::getLocation());
+		$this->assertEqual('app', Router::getLocation());
 
 		Router::reset();
 
-		Router::beginLocation('app');
-		Router::connect('/home/welcome', array('Home::app'));
-		Router::endLocation();
-
 		Router::beginLocation('tests');
 		Router::connect('/home/welcome', array('Home::tests'));
+		Router::endLocation();
+
+		Router::connect('/home/welcome', array('Home::default'));
+
+		Router::beginLocation('app');
+		Router::connect('/home/welcome', array('Home::app'));
 		Router::endLocation();
 
 		Router::location('tests', array(
@@ -1231,41 +1233,6 @@ class RouterTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result->params);
 		$this->assertEqual('tests', Router::getLocation());
-
-		Router::reset();
-
-		Router::beginLocation('app');
-		Router::connect('/home/welcome', array('Home::app'));
-		Router::endLocation();
-
-		Router::beginLocation('tests');
-		Router::connect('/home/welcome', array('Home::tests'));
-		Router::endLocation();
-
-		Router::location('app', array(
-			'absolute' => false,
-			'host' => 'app.mysite.com',
-			'scheme' => 'http://',
-			'base' => '/prefix'
-		));
-
-		Router::location('tests', array(
-			'absolute' => false,
-			'host' => 'tests.mysite.com',
-			'scheme' => 'http://',
-			'base' => '/prefix'
-		));
-
-		$request = new Request();
-		 
-		$request->url = '/home/welcome';
-		$result = Router::process($request);
-		$expected = array(
-			'controller' => 'home',
-			'action' => 'app'
-		);
-		$this->assertEqual($expected, $result->params);
-		$this->assertEqual('app', Router::getLocation());
 	}
 
 	/**
@@ -1303,6 +1270,7 @@ class RouterTest extends \lithium\test\Unit {
 		)));
 		 
 		$request->url = '/home/welcome';
+
 		$result = Router::process($request);
 		$expected = array(
 			'controller' => 'home',
