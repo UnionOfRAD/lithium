@@ -43,7 +43,7 @@ class Media extends \lithium\core\StaticObject {
 	 * Stores the name of the location in use.
 	 * If set to `false`, no location is used.
 	 *
-	 * @see LF\Net\Http\Media::location()
+	 * @see lithium\net\http\Media::location()
 	 * @see lithium\net\http\Media::setLocation()
 	 * @var string
 	 */
