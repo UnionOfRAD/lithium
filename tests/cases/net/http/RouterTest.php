@@ -903,6 +903,19 @@ class RouterTest extends \lithium\test\Unit {
 			'params' => array('scheme', 'subdomain', 'domain', 'tld')
 		);
 		$this->assertEqual($expected, $result);
+
+		$result = Router::compileLocation(array(
+			'absolute' => true
+		));
+		$expected = array(
+			'absolute' => true,
+			'host' => null,
+			'scheme' => null,
+			'base' => '',
+			'pattern' => '@^http://localhost$@',
+			'params' => array()
+		);
+		$this->assertEqual($expected, $result);
 	}
 
 	/**

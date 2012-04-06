@@ -629,12 +629,13 @@ class Router extends \lithium\core\StaticObject {
 	public static function compileLocation(array $config) {
 		$defaults =array(
 			'absolute' => false,
-			'host' => 'localhost',
-			'scheme' => 'http://',
+			'host' => null,
+			'scheme' => null,
 			'base' => '',
 			'pattern' => '',
 			'params' => array()
 		);
+
 		$config += $defaults;
 
 		if (!$config['absolute']) {
@@ -655,6 +656,8 @@ class Router extends \lithium\core\StaticObject {
 					}
 				}
 			}
+			$pattern['host'] = $pattern['host'] ?: 'localhost';
+			$pattern['scheme'] = $pattern['scheme'] ?: 'http://';
 			$config['pattern'] = "@^{$pattern['scheme']}{$pattern['host']}\$@";
 		}
 		return $config;
