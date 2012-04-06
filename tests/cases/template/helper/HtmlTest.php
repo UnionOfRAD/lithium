@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\template\helper;
 
 use lithium\net\http\Router;
+use lithium\net\http\Media;
 use lithium\template\helper\Html;
 use lithium\action\Request;
 use lithium\action\Response;
@@ -35,7 +36,8 @@ class HtmlTest extends \lithium\test\Unit {
 		Router::reset();
 		Router::connect('/{:controller}/{:action}/{:id}.{:type}');
 		Router::connect('/{:controller}/{:action}.{:type}');
-
+		$this->_media = Media::getLocation();
+		Media::reset();
 		$this->context = new MockHtmlRenderer(array(
 			'request' => new Request(array(
 				'base' => '', 'env' => array('HTTP_HOST' => 'foo.local')
@@ -52,10 +54,11 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public function tearDown() {
 		Router::reset();
-
+		Media::reset();
 		foreach ($this->_routes as $route) {
 			Router::connect($route);
 		}
+		$this->_media = Media::setLocation($this->_media);
 		unset($this->html);
 	}
 
@@ -441,6 +444,67 @@ class HtmlTest extends \lithium\test\Unit {
 		$this->assertNulL($this->html->script(array('foo', 'bar'), array('inline' => false)));
 		$result = $this->context->scripts();
 		$this->assertTags($result, $expected);
+	}
+
+	public function testLocationOption() {
+
+		$result = array();
+
+		$this->context = new MockHtmlRenderer(array(
+			'request' => new Request(array(
+				'base' => '', 'env' => array('HTTP_HOST' => 'foo.local')
+			)),
+			'response' => new Response(),
+			'handlers' => array(
+				'url' => function($url, $ref, array $options = array()) use (&$result) {
+					$result = compact('options');
+				},
+				'path' => function($path, $ref, array $options = array()) use (&$result) {
+					$result = compact('options');
+				}
+			)
+		));
+		$this->html = new Html(array('context' => &$this->context));
+		
+		$this->html->link('home', '/home');
+		$this->assertFalse(isset($result['options']['location']));
+		$this->html->link('home', '/home', array('location' => 'app'));
+		$this->assertEqual('app', $result['options']['location']);
+
+		$this->html->link(
+			'RSS Feed',
+			array('controller' => 'posts', 'type' => 'rss'),
+			array('type' => 'rss')
+		);
+		$this->assertFalse(isset($result['options']['location']));
+		$this->html->link(
+			'RSS Feed',
+			array('controller' => 'posts', 'type' => 'rss'),
+			array('type' => 'rss', 'location' => 'app')
+		);
+		$this->assertEqual('app', $result['options']['location']);
+
+		$this->html->script('script.js');
+		$this->assertFalse(isset($result['options']['location']));
+		$this->html->script('script.js', array('location' => 'app'));
+		$this->assertEqual('app', $result['options']['location']);
+
+		$this->html->image('test.gif');
+		$this->assertFalse(isset($result['options']['location']));
+		$this->html->image('test.gif', array('location' => 'app'));
+		$this->assertEqual('app', $result['options']['location']);
+
+		$this->html->style('screen');
+		$this->assertFalse(isset($result['options']['location']));
+		$this->html->style('screen', array('location' => 'app'));
+		$this->assertEqual('app', $result['options']['location']);
+
+		$this->html->link('home', '/home');
+		$this->assertFalse(isset($result['options']['location']));
+
+		$expected = array('app' => array('domain' => 'bob'));
+		$this->html->link('home', '/home', array('location' => $expected ));
+		$this->assertEqual($expected, $result['options']['location']);
 	}
 }
 
