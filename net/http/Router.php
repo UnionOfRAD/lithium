@@ -275,7 +275,14 @@ class Router extends \lithium\core\StaticObject {
 		$vars = array();
 		$name = $options['location'];
 		if(is_array($name)){
-			list($name, $vars) = each($name);
+			list($tmp, $vars) = each($name);
+			if(!is_array($vars)){
+				$vars = $name;
+				$name = static::getLocation();
+			}
+			else{
+				$name = $tmp;
+			}
 		}
 		if($name && $config = static::location($name, null, $vars)) {
 			$config['host'] = $config['host'] ?: $defaults['host'];

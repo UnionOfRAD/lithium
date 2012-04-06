@@ -1532,12 +1532,27 @@ class RouterTest extends \lithium\test\Unit {
 		$expected = 'http://max.amiga.com/home/index';
 		$result = Router::match('/home/index', $request, array(
 			'location' => array(
+				'subdomain' => 'max'
+			)
+		));
+		$this->assertEqual($expected, $result);
+
+		Router::setLocation(false);
+		$result = Router::match('/home/index', $request, array(
+			'location' => array(
 				'app' => array(
 					'subdomain' => 'max'
 				)
 			)
 		));
 		$this->assertEqual($expected, $result);
+
+		$result = Router::match('/home/index', $request, array(
+			'location' => array(
+				'subdomain' => 'max'
+			)
+		));
+		$this->assertNotEqual($expected, $result);
 	}
 }
 
