@@ -1,5 +1,4 @@
 #!/usr/bin/env php
-
 <?php
 
 set_time_limit(0);
@@ -11,18 +10,25 @@ if (isset($argv[1]) && 'APC' === strtoupper($argv[1])) {
 } else {
 	$installer->install('xcache');
 }
-
 $installer->install('mongo');
 
 class PhpExtensions {
-	protected $extensions;
-	protected $phpVersion;
-	protected $iniPath;
 
+	protected $_extensions;
+
+	protected $_phpVersion;
+
+	protected $_iniPath;
+
+	/**
+	 * Constructor.
+	 *
+	 * @return void
+	 */
 	public function __construct() {
-		$this->phpVersion = phpversion();
-		$this->iniPath = php_ini_loaded_file();
-		$this->extensions = array(
+		$this->_phpVersion = phpversion();
+		$this->_iniPath = php_ini_loaded_file();
+		$this->_extensions = array(
 			'memcached' => array(
 				'url' => 'http://pecl.php.net/get/memcached-2.0.1.tgz',
 				'require' => array(),
@@ -66,46 +72,44 @@ class PhpExtensions {
     }
 
 	public function install($name) {
-		if (array_key_exists($name, $this->extensions)) {
-			$extension = $this->extensions[$name];
+		if (array_key_exists($name, $this->_extensions)) {
+			$extension = $this->_extensions[$name];
 			echo $name;
 
 			if (isset($extension['require']['php'])) {
 				$version = $extension['require']['php'];
-				if (!version_compare($this->phpVersion, $version[1], $version[0])) {
-					printf(
-						" => not installed, requires a PHP version %s %s (%s installed)\n",
-						$version[0],
-						$version[1],
-						$this->phpVersion
-					);
+				if (!version_compare($this->_phpVersion, $version[1], $version[0])) {
+					$message = " => not installed, requires a PHP version %s %s (%s installed)\n";
+					printf($message, $version[0], $version[1], $this->_phpVersion);
 					return;
 				}
 			}
 
-			$this->system(sprintf("wget %s > /dev/null 2>&1", $extension['url']));
+			$this->_system(sprintf('wget %s > /dev/null 2>&1', $extension['url']));
 			$file = basename($extension['url']);
-			$this->system(sprintf("tar -xzf %s > /dev/null 2>&1", $file));
-			$folder = basename($file, ".tgz");
-			$folder = basename($folder, ".tar.gz");
-			$this->system(sprintf(
-				'sh -c "cd %s && phpize && ./configure %s && make && sudo make install" > /dev/null 2>&1',
-				$folder,
-				implode(' ', $extension['configure'])
-			));
+
+			$this->_system(sprintf('tar -xzf %s > /dev/null 2>&1', $file));
+			$folder = basename($file, '.tgz');
+			$folder = basename($folder, '.tar.gz');
+
+			$message  = 'sh -c "cd %s && phpize && ./configure %s ';
+			$message .= '&& make && sudo make install" > /dev/null 2>&1';
+			$this->_system(sprintf($message, $folder, implode(' ', $extension['configure'])));
+
 			foreach ($extension['ini'] as $ini) {
-				$this->system(sprintf("echo %s >> %s", $ini, $this->iniPath));
+				$this->_system(sprintf("echo %s >> %s", $ini, $this->_iniPath));
 			}
 			printf("=> installed (%s)\n", $folder);
 		}
 	}
 
-	private function system($cmd) {
-		$ret = 0;
-		system($cmd, $ret);
-		if (0 !== $ret) {
-			printf("=> Command '%s' failed !", $cmd);
-			exit($ret);
+	protected function _system($command) {
+		$return = 0;
+		system($command, $return);
+
+		if (0 !== $return) {
+			printf("=> Command '%s' failed !", $command);
+			exit($return);
 		}
 	}
 }
