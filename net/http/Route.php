@@ -150,6 +150,14 @@ class Route extends \lithium\core\Object {
 	protected $_handler = null;
 
 	/**
+	 * Array of closures used to format route parameters when compiling URLs.
+	 *
+	 * @see lithium\net\http\Router::formatters()
+	 * @var array
+	 */
+	protected $_formatters = array();
+
+	/**
 	 * Auto configuration properties. Also used as the list of properties to return when exporting
 	 * this `Route` object to an array.
 	 *
@@ -157,7 +165,7 @@ class Route extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'template', 'pattern', 'params', 'match', 'meta',
+		'template', 'pattern', 'params', 'match', 'meta', 'formatters',
 		'keys', 'defaults', 'subPatterns', 'persist', 'handler'
 	);
 
@@ -172,7 +180,8 @@ class Route extends \lithium\core\Object {
 			'keys'     => array(),
 			'persist'  => array(),
 			'handler'  => null,
-			'continue' => false
+			'continue' => false,
+			'formatters' => array()
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -336,10 +345,6 @@ class Route extends \lithium\core\Object {
 	protected function _write($options, $defaults) {
 		$template = $this->_template;
 		$trimmed = true;
-
-		if (isset($options['args']) && is_array($options['args'])) {
-			$options['args'] = join('/', $options['args']);
-		}
 		$options += array('args' => '');
 
 		foreach (array_reverse($this->_keys, true) as $key) {
@@ -353,6 +358,9 @@ class Route extends \lithium\core\Object {
 					$template = rtrim(substr($template, 0, $len), '/');
 					continue;
 				}
+			}
+			if (isset($this->_formatters[$key])) {
+				$value = $this->_formatters[$key]($value);
 			}
 			if ($value === null) {
 				$template = str_replace("/{$rpl}", '', $template);
@@ -377,6 +385,9 @@ class Route extends \lithium\core\Object {
 		$result = array();
 
 		foreach ($this->_autoConfig as $key) {
+			if ($key === 'formatters') {
+				continue;
+			}
 			$result[$key] = $this->{'_' . $key};
 		}
 		return $result;

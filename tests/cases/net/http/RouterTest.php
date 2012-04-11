@@ -777,6 +777,25 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::parse($request, array('url' => $request->url));
 		$this->assertEqual(array('controller' => 'users', 'action' => 'view', 'slug' => $slug), $result->params);
 	}
+
+	/**
+	 * Tests default route formatters, and setting/getting new formatters.
+	 */
+	public function testRouteFormatters() {
+		$formatters = Router::formatters();
+		$this->assertEqual(array('args', 'controller'), array_keys($formatters));
+
+		$this->assertEqual('foo/bar', $formatters['args'](array('foo', 'bar')));
+		$this->assertEqual('list_items', $formatters['controller']('ListItems'));
+
+		Router::formatters(array('action' => function($value) { return strtolower($value); }));
+		$formatters = Router::formatters();
+		$this->assertEqual(array('action', 'args', 'controller'), array_keys($formatters));
+
+		Router::formatters(array('action' => null));
+		$formatters = Router::formatters();
+		$this->assertEqual(array('args', 'controller'), array_keys($formatters));
+	}
 }
 
 ?>

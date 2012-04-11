@@ -209,7 +209,12 @@ class RouteTest extends \lithium\test\Unit {
 	}
 
 	public function testRouteMatchingWithEmptyTrailingParams() {
-		$route = new Route(array('template' => '/{:controller}/{:action}/{:args}'));
+		$route = new Route(array(
+			'template' => '/{:controller}/{:action}/{:args}',
+			'formatters' => array('args' => function($value) {
+				return is_array($value) ? join('/', $value) : $value;
+			})
+		));
 
 		$result = $route->match(array('controller' => 'posts'));
 		$this->assertEqual('/posts', $result);
