@@ -70,12 +70,28 @@ class Router extends \lithium\core\StaticObject {
 		'route' => 'lithium\net\http\Route'
 	);
 
+	/**
+	 * Flag for generating Unicode-capable routes. Turn this off if you don't need it, or if you're
+	 * using a broken OS distribution (i.e. CentOS).
+	 */
+	protected static $_unicode = true;
+
+	/**
+	 * Modify `Router` configuration settings and dependencies.
+	 *
+	 * @param array $config Optional array to override configuration. Acceptable keys are
+	 *              `'classes'` and `'unicode'`.
+	 * @return array Returns the current configuration settings.
+	 */
 	public static function config($config = array()) {
 		if (!$config) {
-			return array('classes' => static::$_classes);
+			return array('classes' => static::$_classes, 'unicode' => static::$_unicode);
 		}
 		if (isset($config['classes'])) {
 			static::$_classes = $config['classes'] + static::$_classes;
+		}
+		if (isset($config['unicode'])) {
+			static::$_unicode = $config['unicode'];
 		}
 	}
 
@@ -108,7 +124,8 @@ class Router extends \lithium\core\StaticObject {
 			$options = array('handler' => $options);
 		}
 		$config = compact('template', 'params') + $options + array(
-			'formatters' => static::formatters()
+			'formatters' => static::formatters(),
+			'unicode' => static::$_unicode
 		);
 		return (static::$_configurations[] = static::_instance('route', $config));
 	}

@@ -165,7 +165,7 @@ class Route extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'template', 'pattern', 'params', 'match', 'meta', 'formatters',
+		'template', 'pattern', 'params', 'match', 'meta',
 		'keys', 'defaults', 'subPatterns', 'persist', 'handler'
 	);
 
@@ -181,7 +181,8 @@ class Route extends \lithium\core\Object {
 			'persist'  => array(),
 			'handler'  => null,
 			'continue' => false,
-			'formatters' => array()
+			'formatters' => array(),
+			'unicode'  => true
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -216,8 +217,9 @@ class Route extends \lithium\core\Object {
 		$defaults = array('url' => $request->url);
 		$options += $defaults;
 		$url = '/' . trim($options['url'], '/');
+		$pattern = $this->_pattern;
 
-		if (!preg_match($this->_pattern, $url, $match)) {
+		if (!preg_match($pattern, $url, $match)) {
 			return false;
 		}
 		foreach ($this->_meta as $key => $compare) {
@@ -359,8 +361,8 @@ class Route extends \lithium\core\Object {
 					continue;
 				}
 			}
-			if (isset($this->_formatters[$key])) {
-				$value = $this->_formatters[$key]($value);
+			if (isset($this->_config['formatters'][$key])) {
+				$value = $this->_config['formatters'][$key]($value);
 			}
 			if ($value === null) {
 				$template = str_replace("/{$rpl}", '', $template);
@@ -416,6 +418,10 @@ class Route extends \lithium\core\Object {
 		}
 		$this->_pattern = "@^{$this->_template}\$@";
 		$match = '@([/.])?\{:([^:}]+):?((?:[^{]+(?:\{[0-9,]+\})?)*?)\}@S';
+
+		if ($this->_config['unicode']) {
+			$this->_pattern .= 'u';
+		}
 		preg_match_all($match, $this->_pattern, $m);
 
 		if (!$tokens = $m[0]) {

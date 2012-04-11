@@ -37,7 +37,7 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::connect('/hello', array('controller' => 'posts', 'action' => 'index'));
 		$expected = array(
 			'template' => '/hello',
-			'pattern' => '@^/hello$@',
+			'pattern' => '@^/hello$@u',
 			'params' => array('controller' => 'posts', 'action' => 'index'),
 			'match' => array('controller' => 'posts', 'action' => 'index'),
 			'meta' => array(),
@@ -53,7 +53,7 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertTrue($result instanceof Route);
 		$expected = array(
 			'template' => '/{:controller}/{:action}',
-			'pattern' => '@^(?:/(?P<controller>[^\\/]+))(?:/(?P<action>[^\\/]+)?)?$@',
+			'pattern' => '@^(?:/(?P<controller>[^\\/]+))(?:/(?P<action>[^\\/]+)?)?$@u',
 			'params' => array('action' => 'view'),
 			'defaults' => array('action' => 'view'),
 			'match' => array(),
@@ -75,7 +75,7 @@ class RouterTest extends \lithium\test\Unit {
 		));
 		$expected = array(
 			'template' => '/{:controller}/{:action}',
-			'pattern' => '@^(?:/(?P<controller>[^\\/]+))(?:/(?P<action>[^\\/]+)?)?$@',
+			'pattern' => '@^(?:/(?P<controller>[^\\/]+))(?:/(?P<action>[^\\/]+)?)?$@u',
 			'keys' => array('controller' => 'controller', 'action' => 'action'),
 			'params' => array('action' => 'view', 'required' => true),
 			'defaults' => array('action' => 'view'),
@@ -92,7 +92,7 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::connect('/{:controller}/{:action}', array('action' => 'archive'));
 		$expected = array(
 			'template' => '/{:controller}/{:action}',
-			'pattern' => '@^(?:/(?P<controller>[^\/]+))(?:/(?P<action>[^\/]+)?)?$@',
+			'pattern' => '@^(?:/(?P<controller>[^\/]+))(?:/(?P<action>[^\/]+)?)?$@u',
 			'keys' => array('controller' => 'controller', 'action' => 'action'),
 			'params' => array('action' => 'archive'),
 			'match' => array(),
@@ -624,7 +624,7 @@ class RouterTest extends \lithium\test\Unit {
 	 */
 	public function testCustomConfiguration() {
 		$old = Router::config();
-		$config = array('classes' => array('route' => 'my\custom\Route'));
+		$config = array('classes' => array('route' => 'my\custom\Route'), 'unicode' => true);
 
 		Router::config($config);
 		$this->assertEqual($config, Router::config());
@@ -753,29 +753,6 @@ class RouterTest extends \lithium\test\Unit {
 			'id' => 13
 		));
 		$this->assertEqual('/versions/13', $result);
-	}
-
-	/**
-	 * Tests that routes with unicode characters are correctly parsed.
-	 */
-	public function testUnicodeParameters() {
-		Router::reset();
-		Router::connect('/{:slug:[\w\-\%]+}', array('controller' => 'users', 'action' => 'view'));
-
-		$unicode = 'clément';
-		$slug = rawurlencode('clément');
-		$params = array('controller' => 'users', 'action' => 'view', 'slug' => $slug);
-
-		$result = Router::match($params);
-		$this->assertEqual('/' . $slug, $result);
-
-		$request = new Request(array('url' => '/'.$unicode));
-		$result = Router::parse($request, array('url' => $request->url));
-		$this->assertEqual(array('controller' => 'users', 'action' => 'view', 'slug' => $unicode), $result->params);
-
-		$request = new Request(array('url' => '/'.$slug));
-		$result = Router::parse($request, array('url' => $request->url));
-		$this->assertEqual(array('controller' => 'users', 'action' => 'view', 'slug' => $slug), $result->params);
 	}
 
 	/**
