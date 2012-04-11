@@ -210,7 +210,7 @@ class Inspector extends \lithium\core\StaticObject {
 			$start = key($lines);
 
 			$code = implode("\n", $lines);
-			$tokens = token_get_all('<?php' . $code);
+			$tokens = token_get_all('<' . '?php' . $code);
 			$tmp = array();
 
 			foreach ($tokens as $token) {
