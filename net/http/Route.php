@@ -150,6 +150,14 @@ class Route extends \lithium\core\Object {
 	protected $_handler = null;
 
 	/**
+	 * Array of closures used to format route parameters when compiling URLs.
+	 *
+	 * @see lithium\net\http\Router::formatters()
+	 * @var array
+	 */
+	protected $_formatters = array();
+
+	/**
 	 * Auto configuration properties. Also used as the list of properties to return when exporting
 	 * this `Route` object to an array.
 	 *
@@ -172,7 +180,9 @@ class Route extends \lithium\core\Object {
 			'keys'     => array(),
 			'persist'  => array(),
 			'handler'  => null,
-			'continue' => false
+			'continue' => false,
+			'formatters' => array(),
+			'unicode'  => true
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -207,8 +217,9 @@ class Route extends \lithium\core\Object {
 		$defaults = array('url' => $request->url);
 		$options += $defaults;
 		$url = '/' . trim($options['url'], '/');
+		$pattern = $this->_pattern;
 
-		if (!preg_match($this->_pattern, $url, $match)) {
+		if (!preg_match($pattern, $url, $match)) {
 			return false;
 		}
 		foreach ($this->_meta as $key => $compare) {
@@ -336,10 +347,6 @@ class Route extends \lithium\core\Object {
 	protected function _write($options, $defaults) {
 		$template = $this->_template;
 		$trimmed = true;
-
-		if (isset($options['args']) && is_array($options['args'])) {
-			$options['args'] = join('/', $options['args']);
-		}
 		$options += array('args' => '');
 
 		foreach (array_reverse($this->_keys, true) as $key) {
@@ -353,6 +360,9 @@ class Route extends \lithium\core\Object {
 					$template = rtrim(substr($template, 0, $len), '/');
 					continue;
 				}
+			}
+			if (isset($this->_config['formatters'][$key])) {
+				$value = $this->_config['formatters'][$key]($value);
 			}
 			if ($value === null) {
 				$template = str_replace("/{$rpl}", '', $template);
@@ -377,6 +387,9 @@ class Route extends \lithium\core\Object {
 		$result = array();
 
 		foreach ($this->_autoConfig as $key) {
+			if ($key === 'formatters') {
+				continue;
+			}
 			$result[$key] = $this->{'_' . $key};
 		}
 		return $result;
@@ -405,6 +418,10 @@ class Route extends \lithium\core\Object {
 		}
 		$this->_pattern = "@^{$this->_template}\$@";
 		$match = '@([/.])?\{:([^:}]+):?((?:[^{]+(?:\{[0-9,]+\})?)*?)\}@S';
+
+		if ($this->_config['unicode']) {
+			$this->_pattern .= 'u';
+		}
 		preg_match_all($match, $this->_pattern, $m);
 
 		if (!$tokens = $m[0]) {
