@@ -599,6 +599,39 @@ class FormTest extends \lithium\test\Unit {
 			'/option',
 			'/select'
 		));
+
+		// Select options should be int/string agnostic		
+		$int_string_taglist = array(
+			'select' => array('name' => 'numbers', 'id' => 'Numbers'),
+			array('option' => array('value' => '0')),
+			'Zero',
+			'/option',
+			array('option' => array('value' => '1', 'selected' => 'selected')),
+			'One',
+			'/option',
+			array('option' => array('value' => '2')),
+			'Two',
+			'/option',
+			'/select'			
+		);
+
+		// Check int keys, string value
+		$result = $this->form->select(
+			'numbers',
+			array(0 => 'Zero', 1 => 'One', 2 => 'Two'),
+			array('id' => 'Numbers', 'value' => '1')
+		);
+
+		$this->assertTags($result, $int_string_taglist);
+
+		// Check string keys, int value
+		$result = $this->form->select(
+			'numbers',
+			array('0' => 'Zero', '1' => 'One', '2' => 'Two'),
+			array('id' => 'Numbers', 'value' => 1)
+		);
+
+		$this->assertTags($result, $int_string_taglist);
 	}
 
 	public function testSelectWithEmptyOption() {
