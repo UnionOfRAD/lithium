@@ -582,7 +582,7 @@ class Form extends \lithium\template\Helper {
 		$defaults = array('value' => '1', 'hidden' => true);
 		$options += $defaults;
 		$default = $options['value'];
-        $dataname = $name;
+		$dataname = $name;
 		$out = '';
 
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);

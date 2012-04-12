@@ -383,17 +383,17 @@ class FormTest extends \lithium\test\Unit {
 			))
 		));
 
-        $document = new Document(array('model' => $this->_model, 'data' => array('subdocument' => array('foo' => true))));
-        $this->form->create($document);
+		$document = new Document(array('model' => $this->_model, 'data' => array('subdocument' => array('foo' => true))));
+		$this->form->create($document);
 
-        $result = $this->form->checkbox('subdocument.foo');
-        $this->assertTags($result, array(
-            array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'subdocument[foo]')),
-            array('input' => array(
-                'type' => 'checkbox', 'value' => '1', 'name' => 'subdocument[foo]',
-                'checked' => 'checked', 'id' => 'MockFormPostSubdocumentFoo'
-            ))            
-        ));
+		$result = $this->form->checkbox('subdocument.foo');
+		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'subdocument[foo]')),
+			array('input' => array(
+				'type' => 'checkbox', 'value' => '1', 'name' => 'subdocument[foo]',
+				'checked' => 'checked', 'id' => 'MockFormPostSubdocumentFoo'
+			))
+		));
 	}
 
 	public function testCustomCheckbox() {
