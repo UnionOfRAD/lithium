@@ -268,7 +268,7 @@ class PostgreSql extends \lithium\data\source\Database {
 			return ($key = array_search($encoding, $encodingMap)) ? $key : $encoding;
 		}
 		$encoding = isset($encodingMap[$encoding]) ? $encodingMap[$encoding] : $encoding;
-		return pg_set_client_encoding($encoding, $this->connection);
+		return pg_set_client_encoding($this->connection, $encoding);
 	}
 
 	/**
