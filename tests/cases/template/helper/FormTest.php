@@ -599,9 +599,14 @@ class FormTest extends \lithium\test\Unit {
 			'/option',
 			'/select'
 		));
+	}
 
-		// Select options should be int/string agnostic		
-		$int_string_taglist = array(
+	/**
+	 * When trying to determine which option of a select box should be selected, we should be 
+	 * int/string agnostic because it all looks the same in HTML.
+	 */
+	public function testSelectTypeAgnosticism() {
+		$taglist = array(
 			'select' => array('name' => 'numbers', 'id' => 'Numbers'),
 			array('option' => array('value' => '0')),
 			'Zero',
@@ -615,23 +620,21 @@ class FormTest extends \lithium\test\Unit {
 			'/select'			
 		);
 
-		// Check int keys, string value
 		$result = $this->form->select(
 			'numbers',
 			array(0 => 'Zero', 1 => 'One', 2 => 'Two'),
 			array('id' => 'Numbers', 'value' => '1')
 		);
 
-		$this->assertTags($result, $int_string_taglist);
+		$this->assertTags($result, $taglist);
 
-		// Check string keys, int value
 		$result = $this->form->select(
 			'numbers',
 			array('0' => 'Zero', '1' => 'One', '2' => 'Two'),
 			array('id' => 'Numbers', 'value' => 1)
 		);
 
-		$this->assertTags($result, $int_string_taglist);
+		$this->assertTags($result, $taglist);
 	}
 
 	public function testSelectWithEmptyOption() {
