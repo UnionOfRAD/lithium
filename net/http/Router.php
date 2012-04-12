@@ -23,7 +23,7 @@ use lithium\net\http\RoutingException;
  * {{{
  * use lithium\net\http\Router;
  *
- * Router::connect('/login', array('controller' => 'sessions', 'action' => 'add'));
+ * Router::connect('/login', array('controller' => 'Sessions', 'action' => 'add'));
  *
  * // -- or --
  *
@@ -120,6 +120,8 @@ class Router extends \lithium\core\StaticObject {
 			unset($params[0]);
 			$params = $tmp + $params;
 		}
+		$params = static::_parseController($params);
+
 		if (is_callable($options)) {
 			$options = array('handler' => $options);
 		}
@@ -325,6 +327,20 @@ class Router extends \lithium\core\StaticObject {
 		return str_replace($match, $replace, var_export($url, true));
 	}
 
+	protected static function _parseController(array $params) {
+		if (!isset($params['controller'])) {
+			return $params;
+		}
+		if (strpos($params['controller'], '.')) {
+			$separated = explode('.', $params['controller'], 2);
+			list($params['library'], $params['controller']) = $separated;
+		}
+		if (strpos($params['controller'], '\\') === false) {
+			$params['controller'] = Inflector::camelize($params['controller']);
+		}
+		return $params;
+	}
+
 	protected static function _prepareParams($url, $context, array $options) {
 		if (is_string($url)) {
 			if (strpos($url, '://')) {
@@ -343,7 +359,7 @@ class Router extends \lithium\core\StaticObject {
 			unset($url[0]);
 			$url = $params + $url;
 		}
-		return static::_persist($url, $context);
+		return static::_persist(static::_parseController($url), $context);
 	}
 
 	/**
@@ -434,7 +450,6 @@ class Router extends \lithium\core\StaticObject {
 			return $context !== false ? "{$base}/{$path}" : null;
 		}
 		list($controller, $action) = explode('::', $path, 2);
-		$controller = Inflector::underscore($controller);
 		return compact('controller', 'action');
 	}
 }
