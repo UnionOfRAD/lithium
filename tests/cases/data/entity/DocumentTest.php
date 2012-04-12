@@ -134,12 +134,15 @@ class DocumentTest extends \lithium\test\Unit {
 
 
 		$doc->id = 5;
+		$doc->content = null;
+		$doc->new = null;
 		$expected = array(
 			'id' => true,
 			'name' => false,
-			'content' => false,
+			'content' => true,
+			'new' => true,
 		);
-
+		
 		$this->assertEqual($expected, $doc->modified());
 	}
 
