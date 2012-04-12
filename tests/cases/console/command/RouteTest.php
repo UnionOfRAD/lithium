@@ -128,8 +128,8 @@ class RouteTest extends \lithium\test\Unit {
 		$command->all();
 
 		$expected = 'TemplateParams--------------
-			/{"controller":"pages","action":"view"}
-			/pages/{:args}{"controller":"pages","action":"view"}
+			/{"controller":"Pages","action":"view"}
+			/pages/{:args}{"controller":"Pages","action":"view"}
 			/test/{:args}{"controller":"lithium\\test\\\\Controller","action":"index"}
 			/test{"controller":"lithium\\test\\\\Controller","action":"index"}';
 		$this->assertEqual($this->_strip($expected),$this->_strip($command->response->output));
@@ -155,8 +155,8 @@ class RouteTest extends \lithium\test\Unit {
 		$command->all();
 
 		$expected = 'TemplateParams--------------
-			/{"controller":"pages","action":"view"}
-			/pages/{:args}{"controller":"pages","action":"view"}';
+			/{"controller":"Pages","action":"view"}
+			/pages/{:args}{"controller":"Pages","action":"view"}';
 		$this->assertEqual($this->_strip($expected),$this->_strip($command->response->output));
 	}
 
@@ -173,8 +173,8 @@ class RouteTest extends \lithium\test\Unit {
 		$command->run();
 
 		$expected = 'TemplateParams--------------
-			/{"controller":"pages","action":"view"}
-			/pages/{:args}{"controller":"pages","action":"view"}
+			/{"controller":"Pages","action":"view"}
+			/pages/{:args}{"controller":"Pages","action":"view"}
 			/test/{:args}{"controller":"lithium\\test\\\\Controller","action":"index"}
 			/test{"controller":"lithium\\test\\\\Controller","action":"index"}';
 		$this->assertEqual($this->_strip($expected),$this->_strip($command->response->output));
@@ -226,7 +226,7 @@ class RouteTest extends \lithium\test\Unit {
 		));
 		$command->show();
 
-		$expected = "{\"controller\":\"pages\",\"action\":\"view\"}\n";
+		$expected = "{\"controller\":\"Pages\",\"action\":\"view\"}\n";
 		$this->assertEqual($expected, $command->response->output);
 	}
 
@@ -267,7 +267,7 @@ class RouteTest extends \lithium\test\Unit {
 
 		$command->show();
 
-		$expected = "{\"controller\":\"pages\",\"action\":\"view\"}\n";
+		$expected = "{\"controller\":\"Pages\",\"action\":\"view\"}\n";
 		$this->assertEqual($expected, $command->response->output);
 	}
 
