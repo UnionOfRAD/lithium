@@ -381,6 +381,18 @@ class FormTest extends \lithium\test\Unit {
 				'checked' => 'checked', 'id' => 'MockFormPostFoo'
 			))
 		));
+
+		$document = new Document(array('model' => $this->_model, 'data' => array('subdocument' => array('foo' => true))));
+		$this->form->create($document);
+
+		$result = $this->form->checkbox('subdocument.foo');
+		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'subdocument[foo]')),
+			array('input' => array(
+				'type' => 'checkbox', 'value' => '1', 'name' => 'subdocument[foo]',
+				'checked' => 'checked', 'id' => 'MockFormPostSubdocumentFoo'
+			))
+		));
 	}
 
 	public function testCustomCheckbox() {
@@ -598,6 +610,42 @@ class FormTest extends \lithium\test\Unit {
 			'/option',
 			'/select'
 		));
+	}
+
+	/**
+	 * When trying to determine which option of a select box should be selected, we should be
+	 * int/string agnostic because it all looks the same in HTML.
+	 */
+	public function testSelectTypeAgnosticism() {
+		$taglist = array(
+			'select' => array('name' => 'numbers', 'id' => 'Numbers'),
+			array('option' => array('value' => '0')),
+			'Zero',
+			'/option',
+			array('option' => array('value' => '1', 'selected' => 'selected')),
+			'One',
+			'/option',
+			array('option' => array('value' => '2')),
+			'Two',
+			'/option',
+			'/select'
+		);
+
+		$result = $this->form->select(
+			'numbers',
+			array(0 => 'Zero', 1 => 'One', 2 => 'Two'),
+			array('id' => 'Numbers', 'value' => '1')
+		);
+
+		$this->assertTags($result, $taglist);
+
+		$result = $this->form->select(
+			'numbers',
+			array('0' => 'Zero', '1' => 'One', '2' => 'Two'),
+			array('id' => 'Numbers', 'value' => 1)
+		);
+
+		$this->assertTags($result, $taglist);
 	}
 
 	public function testSelectWithEmptyOption() {
