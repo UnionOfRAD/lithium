@@ -260,7 +260,12 @@ class Validator extends \lithium\core\StaticObject {
 			},
 			'inList' => function($value, $format, $options) {
 				$options += array('list' => array());
-				return in_array($value, $options['list']);
+				foreach ($options['list'] as $list_val) {
+					if ((string) $value == (string) $list_val) {
+						return true;
+					}
+				}
+				return false;
 			},
 			'lengthBetween' => function($value, $format, $options) {
 				$length = strlen($value);
