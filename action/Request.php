@@ -259,7 +259,7 @@ class Request extends \lithium\net\http\Request {
 				}
 				return false;
 			case 'SERVER_ADDR':
-				if ($this->_env['SERVER_ADDR'] == '') {
+				if (empty($this->_env['SERVER_ADDR']) && !empty($this->_env['LOCAL_ADDR'])) {
 					return $this->_env['LOCAL_ADDR'];
 				}
 				return $this->_env['SERVER_ADDR'];
