@@ -265,7 +265,7 @@ abstract class Database extends \lithium\data\Source {
 	public function read($query, array $options = array()) {
 		$defaults = array(
 			'return' => is_string($query) ? 'array' : 'item',
-			'schema' => array(),
+			'schema' => null,
 			'quotes' => $this->_quotes
 		);
 		$options += $defaults;
