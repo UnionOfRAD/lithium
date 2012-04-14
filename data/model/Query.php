@@ -70,6 +70,15 @@ class Query extends \lithium\core\Object {
 	protected $_schema = null;
 
 	/**
+	 * Classes used by `Query`.
+	 *
+	 * @var array
+	 */
+	protected $_classes = array(
+		'schema' => 'lithium\data\Schema'
+	);
+
+	/**
 	 * Auto configuration properties.
 	 *
 	 * @var array
@@ -484,6 +493,8 @@ class Query extends \lithium\core\Object {
 		}
 		if ($model = $this->model()) {
 			return $model::schema($field);
+		} else {
+			return $this->_instance('schema');
 		}
 	}
 
