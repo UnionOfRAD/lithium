@@ -495,7 +495,7 @@ class Query extends \lithium\core\Object {
 			return $model::schema($field);
 		}
 		else {
-			return $this->_instance('schema', compact('fields'));
+			return $this->_instance('schema');
 		}
 	}
 
