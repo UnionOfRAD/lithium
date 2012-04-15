@@ -206,7 +206,7 @@ class MySql extends \lithium\data\source\Database {
 	 *         - `'type'`: The field type name
 	 * @filter This method can be filtered.
 	 */
-	public function describe($table,  $schema = array(), array $meta = array()) {
+	public function describe($entity,  $schema = array(), array $meta = array()) {
 		$params = compact('entity', 'meta');
 		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			extract($params);
@@ -225,7 +225,7 @@ class MySql extends \lithium\data\source\Database {
 					'default'  => $column['default']
 				);
 			}
-			return $this->_instance('schema', compact('fields'));
+			return $self->invokeMethod('_instance', array('schema', compact('fields')));
 		});
 	}
 

@@ -243,7 +243,7 @@ class MySqlTest extends \lithium\test\Unit {
 	 * Tests that describing a table's schema returns the correct column meta-information.
 	 */
 	public function testDescribe() {
-		$result = $this->db->describe('companies');
+		$result = $this->db->describe('companies')->fields();
 		$expected = array(
 			'id' => array('type' => 'integer', 'length' => 11, 'null' => false, 'default' => null),
 			'name' => array('type' => 'string', 'length' => 255, 'null' => true, 'default' => null),
