@@ -1,14 +1,12 @@
 #!/usr/bin/env php
 <?php
 
-$installer = new PhpExtensions();
-
 if (isset($argv[1]) && 'APC' === strtoupper($argv[1])) {
-	$installer->install('apc');
+	PhpExtensions::install('apc');
 } else {
-	$installer->install('xcache');
+	PhpExtensions::install('xcache');
 }
-$installer->install('mongo');
+PhpExtensions::install('mongo');
 
 class PhpExtensions {
 
@@ -17,7 +15,7 @@ class PhpExtensions {
 	 *
 	 * @var array Extensions to build keyed by extension name.
 	 */
-	protected $_extensions = array(
+	protected static $_extensions = array(
 		'memcached' => array(
 			'url' => 'http://pecl.php.net/get/memcached-2.0.1.tgz',
 			'require' => array(),
@@ -68,9 +66,9 @@ class PhpExtensions {
 	 * @param string $name The name of the extension to install.
 	 * @return void
 	 */
-	public function install($name) {
-		if (array_key_exists($name, $this->_extensions)) {
-			$extension = $this->_extensions[$name];
+	public static function install($name) {
+		if (array_key_exists($name, static::$_extensions)) {
+			$extension = static::$_extensions[$name];
 			echo $name;
 
 			if (isset($extension['require']['php'])) {
@@ -83,25 +81,25 @@ class PhpExtensions {
 				}
 			}
 
-			$this->_system(sprintf('wget %s > /dev/null 2>&1', $extension['url']));
+			static::_system(sprintf('wget %s > /dev/null 2>&1', $extension['url']));
 			$file = basename($extension['url']);
 
-			$this->_system(sprintf('tar -xzf %s > /dev/null 2>&1', $file));
+			static::_system(sprintf('tar -xzf %s > /dev/null 2>&1', $file));
 			$folder = basename($file, '.tgz');
 			$folder = basename($folder, '.tar.gz');
 
 			$message  = 'sh -c "cd %s && phpize && ./configure %s ';
 			$message .= '&& make && sudo make install" > /dev/null 2>&1';
-			$this->_system(sprintf($message, $folder, implode(' ', $extension['configure'])));
+			static::_system(sprintf($message, $folder, implode(' ', $extension['configure'])));
 
 			foreach ($extension['ini'] as $ini) {
-				$this->_system(sprintf("echo %s >> %s", $ini, php_ini_loaded_file()));
+				static::_system(sprintf("echo %s >> %s", $ini, php_ini_loaded_file()));
 			}
 			printf("=> installed (%s)\n", $folder);
 		}
 	}
 
-	protected function _system($command) {
+	protected static function _system($command) {
 		$return = 0;
 		system($command, $return);
 
