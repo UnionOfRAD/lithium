@@ -11,6 +11,7 @@ if (isset($argv[1]) && 'APC' === strtoupper($argv[1])) {
 $installer->install('mongo');
 
 class PhpExtensions {
+
 	/**
 	 * Holds build, configure and install instructions for PHP extensions.
 	 *
