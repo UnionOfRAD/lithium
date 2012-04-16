@@ -77,36 +77,37 @@ class PhpExtensions {
 	 * @return void
 	 */
 	public static function install($name) {
-		if (array_key_exists($name, static::$_extensions)) {
-			$extension = static::$_extensions[$name];
-			echo $name;
-
-			if (isset($extension['require']['php'])) {
-				$version = $extension['require']['php'];
-
-				if (!version_compare(PHP_VERSION, $version[1], $version[0])) {
-					$message = " => not installed, requires a PHP version %s %s (%s installed)\n";
-					printf($message, $version[0], $version[1], PHP_VERSION);
-					return;
-				}
-			}
-
-			static::_system(sprintf('wget %s > /dev/null 2>&1', $extension['url']));
-			$file = basename($extension['url']);
-
-			static::_system(sprintf('tar -xzf %s > /dev/null 2>&1', $file));
-			$folder = basename($file, '.tgz');
-			$folder = basename($folder, '.tar.gz');
-
-			$message  = 'sh -c "cd %s && phpize && ./configure %s ';
-			$message .= '&& make && sudo make install" > /dev/null 2>&1';
-			static::_system(sprintf($message, $folder, implode(' ', $extension['configure'])));
-
-			foreach ($extension['ini'] as $ini) {
-				static::_system(sprintf("echo %s >> %s", $ini, php_ini_loaded_file()));
-			}
-			printf("=> installed (%s)\n", $folder);
+		if (!isset(static::$_extensions[$name])) {
+			return;
 		}
+		$extension = static::$_extensions[$name];
+		echo $name;
+
+		if (isset($extension['require']['php'])) {
+			$version = $extension['require']['php'];
+
+			if (!version_compare(PHP_VERSION, $version[1], $version[0])) {
+				$message = " => not installed, requires a PHP version %s %s (%s installed)\n";
+				printf($message, $version[0], $version[1], PHP_VERSION);
+				return;
+			}
+		}
+
+		static::_system(sprintf('wget %s > /dev/null 2>&1', $extension['url']));
+		$file = basename($extension['url']);
+
+		static::_system(sprintf('tar -xzf %s > /dev/null 2>&1', $file));
+		$folder = basename($file, '.tgz');
+		$folder = basename($folder, '.tar.gz');
+
+		$message  = 'sh -c "cd %s && phpize && ./configure %s ';
+		$message .= '&& make && sudo make install" > /dev/null 2>&1';
+		static::_system(sprintf($message, $folder, implode(' ', $extension['configure'])));
+
+		foreach ($extension['ini'] as $ini) {
+			static::_system(sprintf("echo %s >> %s", $ini, php_ini_loaded_file()));
+		}
+		printf("=> installed (%s)\n", $folder);
 	}
 
 	/**
