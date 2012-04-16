@@ -1,8 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-set_time_limit(0);
-
 $installer = new PhpExtensions();
 
 if (isset($argv[1]) && 'APC' === strtoupper($argv[1])) {
