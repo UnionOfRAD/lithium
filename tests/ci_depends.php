@@ -14,7 +14,7 @@ class PhpExtensions {
 	/**
 	 * Holds build, configure and install instructions for PHP extensions.
 	 *
-	 * @var array Extensions to build keyed by extension identifier.
+	 * @var array Extensions to build keyed by extension name.
 	 */
 	protected $_extensions = array(
 		'memcached' => array(
@@ -59,22 +59,14 @@ class PhpExtensions {
 	);
 
 	/**
-	 * After instantiation holds the path to loaded PHP configuration file.
+	 * Install extension by given name.
+	 *
+	 * Uses configration retrieved as per `php_ini_loaded_file()`.
 	 *
 	 * @see http://php.net/php_ini_loaded_file
-	 * @var string Path to loaded PHP configuration file i.e. `/usr/local/php/php.ini`.
-	 */
-	protected $_iniPath;
-
-	/**
-	 * Constructor.
-	 *
+	 * @param string $name The name of the extension to install.
 	 * @return void
 	 */
-	public function __construct() {
-		$this->_iniPath = php_ini_loaded_file();
-    }
-
 	public function install($name) {
 		if (array_key_exists($name, $this->_extensions)) {
 			$extension = $this->_extensions[$name];
@@ -102,7 +94,7 @@ class PhpExtensions {
 			$this->_system(sprintf($message, $folder, implode(' ', $extension['configure'])));
 
 			foreach ($extension['ini'] as $ini) {
-				$this->_system(sprintf("echo %s >> %s", $ini, $this->_iniPath));
+				$this->_system(sprintf("echo %s >> %s", $ini, php_ini_loaded_file()));
 			}
 			printf("=> installed (%s)\n", $folder);
 		}
