@@ -13,11 +13,67 @@ if (isset($argv[1]) && 'APC' === strtoupper($argv[1])) {
 $installer->install('mongo');
 
 class PhpExtensions {
+	/**
+	 * Holds build, configure and install instructions for PHP extensions.
+	 *
+	 * @var array Extensions to build keyed by extension identifier.
+	 */
+	protected $_extensions = array(
+		'memcached' => array(
+			'url' => 'http://pecl.php.net/get/memcached-2.0.1.tgz',
+			'require' => array(),
+			'configure' => array(),
+			'ini' => array(
+				'extension=memcached.so'
+			)
+		),
+		'apc' => array(
+			'url' => 'http://pecl.php.net/get/APC-3.1.10.tgz',
+			'require' => array(),
+			'configure' => array(),
+			'ini' => array(
+				'extension=apc.so',
+				'apc.enabled=1',
+				'apc.enable_cli=1'
+			)
+		),
+		'xcache' => array(
+			'url' => 'http://xcache.lighttpd.net/pub/Releases/1.3.2/xcache-1.3.2.tar.gz',
+			'require' => array(
+				'php' => array('<', '5.4')
+			),
+			'configure' => array('--enable-xcache'),
+			'ini' => array(
+				'extension=xcache.so',
+				'xcache.cacher=false',
+				'xcache.admin.enable_auth=0',
+				'xcache.var_size=1M'
+			)
+		),
+		'mongo' => array(
+			'url' => 'http://pecl.php.net/get/mongo-1.2.7.tgz',
+			'require' => array(),
+			'configure' => array(),
+			'ini' => array(
+				'extension=mongo.so'
+			)
+		)
+	);
 
-	protected $_extensions;
-
+	/**
+	 * After instantiation holds the current PHP version.
+	 *
+	 * @see http://php.net/phpversion
+	 * @var string Current PHP version.
+	 */
 	protected $_phpVersion;
 
+	/**
+	 * After instantiation holds the path to loaded PHP configuration file.
+	 *
+	 * @see http://php.net/php_ini_loaded_file
+	 * @var string Path to loaded PHP configuration file i.e. `/usr/local/php/php.ini`.
+	 */
 	protected $_iniPath;
 
 	/**
@@ -28,47 +84,6 @@ class PhpExtensions {
 	public function __construct() {
 		$this->_phpVersion = phpversion();
 		$this->_iniPath = php_ini_loaded_file();
-		$this->_extensions = array(
-			'memcached' => array(
-				'url' => 'http://pecl.php.net/get/memcached-2.0.1.tgz',
-				'require' => array(),
-				'configure' => array(),
-				'ini' => array(
-					'extension=memcached.so'
-				)
-			),
-			'apc' => array(
-				'url' => 'http://pecl.php.net/get/APC-3.1.10.tgz',
-				'require' => array(),
-				'configure' => array(),
-				'ini' => array(
-					'extension=apc.so',
-					'apc.enabled=1',
-					'apc.enable_cli=1'
-				)
-			),
-			'xcache' => array(
-				'url' => 'http://xcache.lighttpd.net/pub/Releases/1.3.2/xcache-1.3.2.tar.gz',
-				'require' => array(
-					'php' => array('<', '5.4')
-				),
-				'configure' => array('--enable-xcache'),
-				'ini' => array(
-					'extension=xcache.so',
-					'xcache.cacher=false',
-					'xcache.admin.enable_auth=0',
-					'xcache.var_size=1M'
-				)
-			),
-			'mongo' => array(
-				'url' => 'http://pecl.php.net/get/mongo-1.2.7.tgz',
-				'require' => array(),
-				'configure' => array(),
-				'ini' => array(
-					'extension=mongo.so'
-				)
-			)
-		);
     }
 
 	public function install($name) {
