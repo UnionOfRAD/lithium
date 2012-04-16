@@ -42,7 +42,7 @@ class RouteTest extends \lithium\test\Unit {
 			mkdir("{$path}/tmp/tests", 0777, true);
 		}
 		$this->_testPath = "{$path}/tmp/tests";
-		$this->skipIf(!is_writable($this->_testPath), "{$this->_testPath} is not writable.");
+		$this->skipIf(!is_writable($this->_testPath), "Path `{$this->_testPath}` is not writable.");
 	}
 
 	/**

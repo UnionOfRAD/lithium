@@ -438,7 +438,7 @@ class UnitTest extends \lithium\test\Unit {
 
 	public function testCleanUp() {
 		$base = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
 		$this->assertTrue(mkdir("{$base}/cleanup_test"));
 		$this->assertTrue(touch("{$base}/cleanup_test/file"));
@@ -450,7 +450,7 @@ class UnitTest extends \lithium\test\Unit {
 
 	public function testCleanUpWithFullPath() {
 		$base = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
 		$this->assertTrue(mkdir("{$base}/cleanup_test"));
 		$this->assertTrue(touch("{$base}/cleanup_test/file"));
@@ -466,7 +466,7 @@ class UnitTest extends \lithium\test\Unit {
 
 	public function testCleanUpWithRelativePath() {
 		$base = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
 		$this->assertTrue(mkdir("{$base}/cleanup_test"));
 		$this->assertTrue(touch("{$base}/cleanup_test/file"));

@@ -23,7 +23,7 @@ class ExtractTest extends \lithium\test\Unit {
 
 	public function skip() {
 		$this->_path = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_writable($this->_path), "{$this->_path} is not writable.");
+		$this->skipIf(!is_writable($this->_path), "Path `{$this->_path}` is not writable.");
 	}
 
 	public function setUp() {

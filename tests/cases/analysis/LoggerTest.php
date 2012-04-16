@@ -28,7 +28,7 @@ class LoggerTest extends \lithium\test\Unit {
 			}
 		}
 		$this->_testPath = "{$path}/tmp/tests";
-		$this->skipIf(!is_writable($this->_testPath), "{$this->_testPath} is not readable.");
+		$this->skipIf(!is_writable($this->_testPath), "Path `{$this->_testPath}` is not readable.");
 	}
 
 	public function setUp() {
@@ -74,7 +74,7 @@ class LoggerTest extends \lithium\test\Unit {
 
 	public function testIntegrationWriteFile() {
 		$base = Libraries::get(true, 'resources') . '/tmp/logs';
-		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
 		$config = array('default' => array(
 			'adapter' => 'File', 'timestamp' => false, 'format' => "{:message}\n"
@@ -105,7 +105,7 @@ class LoggerTest extends \lithium\test\Unit {
 
 	public function testWriteByName() {
 		$base = Libraries::get(true, 'resources') . '/tmp/logs';
-		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
 		Logger::config(array('default' => array(
 			'adapter' => 'File',
