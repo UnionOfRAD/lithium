@@ -1,5 +1,11 @@
 #!/usr/bin/env php
 <?php
+/**
+ * Lithium: the most rad php framework
+ *
+ * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
 
 if (isset($argv[1]) && 'APC' === strtoupper($argv[1])) {
 	PhpExtensions::install('apc');
@@ -8,6 +14,10 @@ if (isset($argv[1]) && 'APC' === strtoupper($argv[1])) {
 }
 PhpExtensions::install('mongo');
 
+/**
+ * Class to install native PHP extensions mainly
+ * for preparing test runs.
+ */
 class PhpExtensions {
 
 	/**
@@ -99,6 +109,12 @@ class PhpExtensions {
 		}
 	}
 
+	/**
+	 * Executes given command, reports and exits in case it fails.
+	 *
+	 * @param string $command The command to execute.
+	 * @return void
+	 */
 	protected static function _system($command) {
 		$return = 0;
 		system($command, $return);
