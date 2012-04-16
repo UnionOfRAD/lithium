@@ -39,7 +39,7 @@ class RouteTest extends \lithium\test\Unit {
 		$path = Libraries::get(true, 'resources');
 
 		if (is_writable($path) && !is_dir("{$path}/tmp/tests")) {
-			mkdir("{$path}/tmp/test", 0777, true);
+			mkdir("{$path}/tmp/tests", 0777, true);
 		}
 		$this->_testPath = "{$path}/tmp/tests";
 		$this->skipIf(!is_writable($this->_testPath), "{$this->_testPath} is not writable.");
