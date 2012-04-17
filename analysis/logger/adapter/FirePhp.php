@@ -60,7 +60,7 @@ namespace lithium\analysis\logger\adapter;
  * method for more information on how your message will be encoded.
  *
  * {{{
- * Logger::debug(array('debug' => 'me));
+ * Logger::debug(array('debug' => 'me'));
  * Logger::debug(new \lithium\action\Response());
  * }}}
  *
