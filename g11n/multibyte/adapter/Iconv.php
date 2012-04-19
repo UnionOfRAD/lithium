@@ -38,6 +38,44 @@ class Iconv extends \lithium\core\Object {
 	public function strlen($string) {
 		return iconv_strlen($string, 'UTF-8');
 	}
+
+	/**
+	 * Here used as a multibyte enabled equivalent of `strpos()`.
+	 *
+	 * @link http://php.net/manual/en/function.iconv-strpos.php
+	 * @param string $haystack
+	 * @param string $needle
+	 * @param integer $offset
+	 * @return integer|boolean
+	 */
+	public function strpos($haystack, $needle, $offset) {
+		return iconv_strpos($haystack, $needle, $offset, 'UTF-8');
+	}
+
+	/**
+	 * Here used as a multibyte enabled equivalent of `strrpos()`.
+	 *
+	 * @link http://php.net/manual/en/function.iconv-strpos.php
+	 * @param string $haystack
+	 * @param string $needle
+	 * @return integer|boolean
+	 */
+	public function strrpos($haystack, $needle) {
+		return iconv_strrpos($haystack, $needle, 'UTF-8');
+	}
+
+	/**
+	 * Here used as a multibyte enabled equivalent of `substr()`.
+	 *
+	 * @link http://php.net/manual/en/function.iconv-substr.php
+	 * @param string $string
+	 * @param integer $start
+	 * @param integer $length
+	 * @return string|boolean
+	 */
+	public function substr($string, $start, $length) {
+		return iconv_substr($string, $start, $length, 'UTF-8');
+	}
 }
 
 ?>

@@ -38,6 +38,44 @@ class Mbstring extends \lithium\core\Object {
 	public function strlen($string) {
 		return mb_strlen($string, 'UTF-8');
 	}
+
+	/**
+	 * Here used as a multibyte enabled equivalent of `strpos()`.
+	 *
+	 * @link http://php.net/manual/en/function.mb-strpos.php
+	 * @param string $haystack
+	 * @param string $needle
+	 * @param integer $offset
+	 * @return integer|boolean
+	 */
+	public function strpos($haystack, $needle, $offset) {
+		return mb_strpos($haystack, $needle, $offset, 'UTF-8');
+	}
+
+	/**
+	 * Here used as a multibyte enabled equivalent of `strrpos()`.
+	 *
+	 * @link http://php.net/manual/en/function.mb-strpos.php
+	 * @param string $haystack
+	 * @param string $needle
+	 * @return integer|boolean
+	 */
+	public function strrpos($haystack, $needle) {
+		return mb_strrpos($haystack, $needle, 0, 'UTF-8');
+	}
+
+	/**
+	 * Here used as a multibyte enabled equivalent of `substr()`.
+	 *
+	 * @link http://php.net/manual/en/function.mb-substr.php
+	 * @param string $string
+	 * @param integer $start
+	 * @param integer $length
+	 * @return string|boolean
+	 */
+	public function substr($string, $start, $length) {
+		return mb_substr($string, $start, $length, 'UTF-8');
+	}
 }
 
 ?>

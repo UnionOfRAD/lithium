@@ -89,6 +89,73 @@ class Multibyte extends \lithium\core\Adaptable {
 		$options += $defaults;
 		return static::adapter($options['name'])->strlen($string);
 	}
+
+	/**
+	 * Finds the position of the _first_ occurrence of a string within a string.
+	 * Multibyte enabled version of `strpos()`.
+	 *
+	 * Not all adapters must support interpreting - thus applying - passed
+	 * numeric values as ordinal values of a character.
+	 *
+	 * @link http://php.net/manual/en/function.strpos.php
+	 * @param string $haystack The string being checked.
+	 * @param string $needle The string to find in the haystack.
+	 * @param integer $offset If specified, search will start this number of
+	 *                characters counted from the beginning of the string. The
+	 *                offset cannot be negative.
+	 * @param array $options Allows for selecting the adapter to use via the
+	 *               `name` options. Will use the `'default'` adapter by default.
+	 * @return integer Returns the numeric position of the first occurrence of
+	 *                 the needle in the haystack string. If needle is not found,
+	 *                 it returns `false`.
+	 */
+	public static function strpos($haystack, $needle, $offset = 0, array $options = array()) {
+		$defaults = array('name' => 'default');
+		$options += $defaults;
+		return static::adapter($options['name'])->strpos($haystack, $needle, $offset);
+	}
+
+	/**
+	 * Finds the position of the _last_ occurrence of a string within a string.
+	 * Multibyte enabled version of `strrpos()`.
+	 *
+	 * Not all adapters must support interpreting - thus applying - passed
+	 * numeric values as ordinal values of a character. The `Iconv` adapter
+	 * doesn't support an offset as `strpos()` does - this constitutes the
+	 * lowest common denominator here.
+	 *
+	 * @link http://php.net/manual/en/function.strrpos.php
+	 * @param string $haystack The string being checked.
+	 * @param string $needle The string to find in the haystack.
+	 * @param array $options Allows for selecting the adapter to use via the
+	 *               `name` options. Will use the `'default'` adapter by default.
+	 * @return integer Returns the numeric position of the last occurrence of
+	 *                 the needle in the haystack string. If needle is not found,
+	 *                 it returns `false`.
+	 */
+	public static function strrpos($haystack, $needle, array $options = array()) {
+		$defaults = array('name' => 'default');
+		$options += $defaults;
+		return static::adapter($options['name'])->strrpos($haystack, $needle);
+	}
+
+	/**
+	 * Returns the portion of string specified by the start and length parameters.
+	 * Multibyte enabled version of `substr()`.
+	 *
+	 * @link http://php.net/manual/en/function.substr.php
+	 * @param string $string The string to extract the substring from.
+	 * @param integer $start Position of first character in string (offset).
+	 * @param integer $length Maximum numbers of characters to use from string.
+	 * @param array $options Allows for selecting the adapter to use via the
+	 *               `name` options. Will use the `'default'` adapter by default.
+	 * @return string The substring extracted from given string.
+	 */
+	public static function substr($string, $start, $length = null, array $options = array()) {
+		$defaults = array('name' => 'default');
+		$options += $defaults;
+		return static::adapter($options['name'])->substr($string, $start, $length);
+	}
 }
 
 ?>

@@ -268,8 +268,45 @@ class MultibyteTest extends \lithium\test\Unit {
 
 	public function testStrlen() {
 		Multibyte::strlen('test');
+
 		$result = $this->adapter->testStrlenArgs;
 		$expected = array('test');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testStrpos() {
+		Multibyte::strpos('abcab', 'c');
+
+		$result = $this->adapter->testStrposArgs;
+		$expected = array('abcab', 'c', 0);
+		$this->assertEqual($expected, $result);
+
+		Multibyte::strpos('abcab', 'c', 23);
+
+		$result = $this->adapter->testStrposArgs;
+		$expected = array('abcab', 'c', 23);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testStrrpos() {
+		Multibyte::strrpos('abcab', 'c');
+
+		$result = $this->adapter->testStrrposArgs;
+		$expected = array('abcab', 'c');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSubstr() {
+		Multibyte::substr('abcab', 1);
+
+		$result = $this->adapter->testSubstrArgs;
+		$expected = array('abcab', 1, null);
+		$this->assertEqual($expected, $result);
+
+		Multibyte::substr('abcab', 1, 2);
+
+		$result = $this->adapter->testSubstrArgs;
+		$expected = array('abcab', 1, 2);
 		$this->assertEqual($expected, $result);
 	}
 }
