@@ -572,7 +572,9 @@ class Request extends \lithium\net\http\Request {
 			return rtrim($_GET['url'], '/');
 		}
 		if ($uri = $this->env('REQUEST_URI')) {
-			return str_replace($this->env('base'), '/', parse_url($uri, PHP_URL_PATH));
+			return trim(preg_replace(
+				'/^' . preg_quote($this->env('base'), '/') . '/', '', parse_url($uri, PHP_URL_PATH)
+			), '/') ?: '/';
 		}
 		return '/';
 	}
