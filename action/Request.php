@@ -258,6 +258,11 @@ class Request extends \lithium\net\http\Request {
 					return (!empty($this->_env['HTTPS']) && $this->_env['HTTPS'] !== 'off');
 				}
 				return false;
+			case 'SERVER_ADDR':
+				if (empty($this->_env['SERVER_ADDR']) && !empty($this->_env['LOCAL_ADDR'])) {
+					return $this->_env['LOCAL_ADDR'];
+				}
+				return $this->_env['SERVER_ADDR'];
 			case 'SCRIPT_FILENAME':
 				if ($this->_env['PLATFORM'] == 'IIS') {
 					return str_replace('\\\\', '\\', $this->env('PATH_TRANSLATED'));
