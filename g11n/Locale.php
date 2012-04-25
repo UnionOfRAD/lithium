@@ -191,12 +191,22 @@ class Locale extends \lithium\core\StaticObject {
 	 */
 	public static function lookup($locales, $locale) {
 		$tags = static::decompose($locale);
-
-		while (count($tags) > 0) {
+		$count = count($tags);
+		while ($count > 0) {
+			if (($key = array_search(static::compose($tags), $locales)) !== false) {
+				return $locales[$key];
+			} elseif ($count == 1) {
+				foreach($locales as $currentLocale) {
+					if (strpos($currentLocale, current($tags) . '_') === 0) {
+						return $currentLocale;
+					}
+				}
+			}
 			if (($key = array_search(static::compose($tags), $locales)) !== false) {
 				return $locales[$key];
 			}
 			array_pop($tags);
+			$count = count($tags);
 		}
 	}
 
@@ -241,11 +251,11 @@ class Locale extends \lithium\core\StaticObject {
 	 * @return array Preferred locales in their canonical form (i.e. `'fr_CA'`).
 	 */
 	protected static function _preferredAction($request) {
-		$regex  = '(?P<locale>[\w\-]+)+(?:;q=(?P<quality>[0-9]+\.[0-9]+))?';
+		$regex  = '/^\s*(?P<locale>\w\w(?:[-]\w\w)?)(?:;q=(?P<quality>[0-9]+\.[0-9]+))?\s*$/';
 		$result = array();
 
 		foreach (explode(',', $request->env('HTTP_ACCEPT_LANGUAGE')) as $part) {
-			if (preg_match("/{$regex}/", $part, $matches)) {
+			if (preg_match($regex, $part, $matches)) {
 				$locale = static::canonicalize($matches['locale']);
 				$quality = isset($matches['quality']) ? $matches['quality'] : 1;
 				$result[$locale] = $quality;

@@ -297,7 +297,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'realm' => 'app', 'qop' => 'auth', 'nonce' => '4ee1617b8756e',
 			'opaque' => 'dd7bcee161192cb8fba765eb595eba87'
 		);
-		$result = $response->digest();
+		$result = array_filter($response->digest());
 		$this->assertEqual($expected, $result);
 	}
 }

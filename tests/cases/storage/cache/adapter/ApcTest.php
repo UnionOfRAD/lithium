@@ -75,15 +75,15 @@ class ApcTest extends \lithium\test\Unit {
 	}
 
 	public function testWriteDefaultCacheTime() {
-		$Apc = new Apc(array('expiry' => '+5 seconds'));
+		$apc = new Apc(array('expiry' => '+5 seconds'));
 		$key = 'key';
 		$data = 'value';
 
-		$closure = $Apc->write($key, $data);
+		$closure = $apc->write($key, $data);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key', 'data');
-		$result = $closure($Apc, $params, null);
+		$result = $closure($apc, $params, null);
 		$expected = $data;
 		$this->assertTrue($result);
 

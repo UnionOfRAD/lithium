@@ -158,14 +158,14 @@ class QueryTest extends \lithium\test\Unit {
 		$record->title = 'Lorem Ipsum';
 
 		$query->entity($record);
-		$query_record = $query->entity();
+		$queryRecord = $query->entity();
 
 		$expected = 12;
-		$result = $query_record->id;
+		$result = $queryRecord->id;
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Lorem Ipsum';
-		$result = $query_record->title;
+		$result = $queryRecord->title;
 		$this->assertEqual($expected, $result);
 
 		$this->assertTrue($record == $query->entity());

@@ -41,13 +41,14 @@ class FileTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
-		$resources = Libraries::get(true, 'resources');
+		$resources = realpath(Libraries::get(true, 'resources'));
 		$paths = array("{$resources}/tmp/cache", "{$resources}/tmp/cache/templates");
 
 		if ($this->_hasEmpty) {
 			foreach ($paths as $path) {
+				$path = realpath($path);
 				if (is_dir($path) && is_writable($path)) {
-					touch("/{$resources}/empty");
+					touch("{$resources}/empty");
 				}
 			}
 		}
@@ -84,16 +85,16 @@ class FileTest extends \lithium\test\Unit {
 	}
 
 	public function testWriteDefaultCacheExpiry() {
-		$File = new File(array('expiry' => '+1 minute'));
+		$file = new File(array('expiry' => '+1 minute'));
 		$key = 'default_keykey';
 		$data = 'data';
 		$time = time() + 60;
 
-		$closure = $File->write($key, $data);
+		$closure = $file->write($key, $data);
 		$this->assertTrue(is_callable($closure));
 
 		$params = compact('key', 'data');
-		$result = $closure($File, $params, null);
+		$result = $closure($file, $params, null);
 		$expected = 25;
 		$this->assertEqual($expected, $result);
 

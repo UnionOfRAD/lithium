@@ -221,24 +221,15 @@ class Request extends \lithium\net\http\Message {
 		$options += $defaults;
 
 		if (!empty($options['auth'])) {
-			$auth = null;
-			if (is_array($options['auth']) && isset($options['auth']['nonce'])) {
-				$data = $options['auth'];
-				$nc = '00000001';
-				$cnonce = md5(time());
-				$a1 = md5("{$options['username']}:{$data['realm']}:{$options['password']}");
-				$a2 = md5($options['method'] . ':' . $options['path']);
-				$nonce = "{$data['nonce']}:{$nc}:{$cnonce}:{$data['qop']}";
-				$response = md5("{$a1}:{$nonce}:{$a2}");
-				$auth = "username=\"{$options['username']}\", response=\"{$response}\", ";
-				$auth .= "uri=\"{$options['path']}\", realm=\"{$data['realm']}\", ";
-				$auth .= "qop=\"{$data['qop']}\", nc={$nc}, cnonce=\"{$cnonce}\", ";
-				$auth .= "nonce=\"{$data['nonce']}\", opaque=\"{$data['opaque']}\"";
-				$this->headers('Authorization', "Digest {$auth}");
-			} else if (is_string($options['auth']) && $options['auth'] == 'Basic') {
-				$auth = base64_encode("{$options['username']}:{$options['password']}");
-				$this->headers('Authorization', "Basic {$auth}");
+			$data = array();
+
+			if (is_array($options['auth']) && !empty($options['auth']['nonce'])) {
+				$data = array('method' => $options['method'], 'uri' => $options['path']);
+				$data += $options['auth'];
 			}
+			$auth = $this->_classes['auth'];
+			$data = $auth::encode($options['username'], $options['password'], $data);
+			$this->headers('Authorization', $auth::header($data));
 		}
 		if (in_array($options['method'], array('POST', 'PUT'))) {
 			$media = $this->_classes['media'];

@@ -213,6 +213,7 @@ class Library extends \lithium\console\Command {
 			$from = $name;
 			$to = $result;
 		}
+
 		$to = $this->_toPath($to);
 
 		if ($from[0] !== '/') {
@@ -223,6 +224,7 @@ class Library extends \lithium\console\Command {
 				return false;
 			}
 		}
+
 		if (file_exists($from)) {
 			try {
 				$archive = new Phar($from);
@@ -230,6 +232,7 @@ class Library extends \lithium\console\Command {
 				$this->error($e->getMessage());
 				return false;
 			}
+
 			if ($archive->extractTo($to)) {
 				$this->out(basename($to) . " created in " . dirname($to) . " from {$from}");
 
@@ -316,9 +319,11 @@ class Library extends \lithium\console\Command {
 		}
 
 		if (dirname(LITHIUM_APP_PATH) . '/libraries' !== $this->lithiumLibraryPath) {
-			if ($this->lithiumLibraryPath[0] === '/') {
+			$pathinfo = pathinfo($this->lithiumLibraryPath);
+			if ($pathinfo['dirname'] != '.') {
 				$this->lithiumLibraryPath = "'" . $this->lithiumLibraryPath . "'";
 			}
+
 			$search = 'define(\'LITHIUM_LIBRARY_PATH\', ';
 			$search .= 'dirname(LITHIUM_APP_PATH) . \'/libraries\');';
 			$replace = 'define(\'LITHIUM_LIBRARY_PATH\', ';
@@ -696,13 +701,18 @@ class Library extends \lithium\console\Command {
 	/**
 	 * Take a name and return the path.
 	 *
+	 * If the name already appears to be a path, it is returned directly. Otherwise, the
+	 * `Library` class is used to find the associated path.
+	 *
 	 * @param string $name
 	 * @return string
 	 */
 	protected function _toPath($name = null) {
-		if ($name && $name[0] === '/') {
+		$pathinfo = pathinfo($name);
+		if ($name && $pathinfo['dirname'] != '.') {
 			return $name;
 		}
+
 		$library = Libraries::get($name);
 
 		if (!empty($library['path'])) {

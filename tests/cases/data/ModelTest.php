@@ -269,11 +269,11 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result->text);
 	}
 
-    public function testSimpleFindList() {
+	public function testSimpleFindList() {
 		$result = MockComment::find('list');
 		$this->assertTrue(!empty($result));
 		$this->assertTrue(is_array($result));
-    }
+	}
 
 	public function testFilteredFind() {
 		MockComment::applyFilter('find', function($self, $params, $chain) {

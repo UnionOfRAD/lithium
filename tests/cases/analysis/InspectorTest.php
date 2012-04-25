@@ -11,6 +11,7 @@ namespace lithium\tests\cases\analysis;
 use ReflectionMethod;
 use lithium\analysis\Inspector;
 use lithium\core\Libraries;
+use lithium\tests\mocks\analysis\MockEmptyClass;
 
 class InspectorTest extends \lithium\test\Unit {
 
@@ -93,6 +94,11 @@ class InspectorTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testExecutableLinesOnEmptyClass() {
+		$result = Inspector::executable(new MockEmptyClass());
+		$this->assertEqual(array(), $result);
+	}
+
 	/**
 	 * Tests reading specific line numbers of a file.
 	 *
@@ -103,8 +109,8 @@ class InspectorTest extends \lithium\test\Unit {
 		$expected = array(__LINE__ - 2 => "\tpublic function testLineIntrospection() {");
 		$this->assertEqual($expected, $result);
 
-		$result = Inspector::lines(__CLASS__, array(15));
-		$expected = array(15 => 'class InspectorTest extends \lithium\test\Unit {');
+		$result = Inspector::lines(__CLASS__, array(16));
+		$expected = array(16 => 'class InspectorTest extends \lithium\test\Unit {');
 		$this->assertEqual($expected, $result);
 
 		$lines = 'This is the first line.' . PHP_EOL . 'And this the second.';

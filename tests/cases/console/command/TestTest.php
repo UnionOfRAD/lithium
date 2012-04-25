@@ -41,6 +41,11 @@ class TestTest extends \lithium\test\Unit {
 		chdir($this->_backup['cwd']);
 	}
 
+	public function skip() {
+		$isWin = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+		$this->skipIf($isWin, 'The test command needs to be refactored to work on windows.');
+	}
+
 	public function testRunWithoutPath() {
 		$command = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
