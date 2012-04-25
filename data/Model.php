@@ -301,7 +301,6 @@ class Model extends \lithium\core\StaticObject {
 	 * @return void
 	 */
 	public static function __init() {
-		static::config();
 	}
 
 	/**
@@ -319,7 +318,13 @@ class Model extends \lithium\core\StaticObject {
 		if (static::_isBase($class = get_called_class())) {
 			return;
 		}
-		$self    = static::_object();
+
+		if (!isset(static::$_instances[$class])) {
+			$self = static::$_instances[$class] = new $class();
+		} else {
+			$self = static::$_instances[$class];
+		}
+
 		$query   = array();
 		$meta    = array();
 		$schema  = array();
@@ -1054,6 +1059,7 @@ class Model extends \lithium\core\StaticObject {
 
 		if (!isset(static::$_instances[$class])) {
 			static::$_instances[$class] = new $class();
+			static::config();
 		}
 		return static::$_instances[$class];
 	}

@@ -19,6 +19,7 @@ use lithium\tests\mocks\data\MockComment;
 use lithium\tests\mocks\data\MockTagging;
 use lithium\tests\mocks\data\MockCreator;
 use lithium\tests\mocks\data\MockPostForValidates;
+use lithium\tests\mocks\data\MockBadConnection;
 
 class ModelTest extends \lithium\test\Unit {
 
