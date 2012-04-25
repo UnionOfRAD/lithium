@@ -732,6 +732,12 @@ class ModelTest extends \lithium\test\Unit {
 		$result = MockPost::find($key);
 		$this->assertEqual(array('id' => $key), $result['query']->conditions());
 	}
+
+	public function testLiveConfiguration() {
+		MockBadConnection::config(array('connection' => false));
+		$result = MockBadConnection::meta('connection');
+		$this->assertFalse($result);
+	}
 }
 
 ?>
