@@ -13,6 +13,7 @@ use lithium\action\Response;
 use lithium\net\http\Router;
 use lithium\action\Dispatcher;
 use lithium\tests\mocks\action\MockDispatcher;
+use lithium\util\Inflector;
 
 class DispatcherTest extends \lithium\test\Unit {
 
@@ -129,6 +130,50 @@ class DispatcherTest extends \lithium\test\Unit {
 
 		$result = end(MockDispatcher::$dispatched);
 		$expected = array('action' => 'admin_test', 'controller' => 'Test', 'admin' => true);
+		$this->assertEqual($expected, $result->params);
+
+		MockDispatcher::config(array('rules' => array(
+			'action' => array('action' => function($params) {
+				return Inflector::camelize(strtolower($params['action']), false);
+			})
+		)));
+
+		MockDispatcher::$dispatched = array();
+		Router::reset();
+		Router::connect('/', array('controller' => 'test', 'action' => 'TeST-camelize'));
+		MockDispatcher::run(new Request(array('url' => '/')));
+
+		$result = end(MockDispatcher::$dispatched);
+		$expected = array('action' => 'testCamelize', 'controller' => 'Test');
+		$this->assertEqual($expected, $result->params);
+
+		MockDispatcher::config(array('rules' => function($params) {
+			if (isset($params['admin'])) {
+				return array('special' => array('action' => 'special_{:action}'));
+			}
+			return array();
+		}));
+
+		MockDispatcher::$dispatched = array();
+		Router::reset();
+		Router::connect('/', array('controller' => 'test', 'action' => 'test', 'admin' => true));
+		Router::connect('/special', array(
+			'controller' => 'test', 'action' => 'test',
+			'admin' => true, 'special' => true
+		));
+		MockDispatcher::run(new Request(array('url' => '/')));
+
+		$result = end(MockDispatcher::$dispatched);
+		$expected = array('action' => 'test', 'controller' => 'Test', 'admin' => true);
+		$this->assertEqual($expected, $result->params);
+
+		MockDispatcher::run(new Request(array('url' => '/special')));
+
+		$result = end(MockDispatcher::$dispatched);
+		$expected = array(
+			'action' => 'special_test', 'controller' => 'Test',
+			'admin' => true, 'special' => true
+		);
 		$this->assertEqual($expected, $result->params);
 	}
 
