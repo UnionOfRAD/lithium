@@ -34,7 +34,8 @@ class Router extends \lithium\core\Object {
 					$params[$match['key']] = true;
 					continue;
 				}
-				if (preg_match('/^--(?P<key>[a-z0-9-]+)(?:=(?P<val>.+))?$/i', $arg, $match)) {
+				if (preg_match('/^--(?P<key>[a-z0-9_\-]+)(?:=(?P<val>.+))?$/i', $arg, $match)) {
+					$match['key'] = str_replace('-', '_', $match['key']);
 					$params[$match['key']] = !isset($match['val']) ? true : $match['val'];
 					continue;
 				}
