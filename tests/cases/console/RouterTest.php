@@ -71,6 +71,28 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testParseUnderscoredOrDashedOption() {
+		$expected = array(
+			'command' => 'test', 'action' => 'run', 'args' => array(),
+			'foo_bar' => 'something'
+		);
+		$result = Router::parse(new Request(array(
+			'args' => array(
+				'test', 'run',
+				'--foo_bar=something'
+			)
+		)));
+		$this->assertEqual($expected, $result);
+
+		$result = Router::parse(new Request(array(
+			'args' => array(
+				'test', 'run',
+				'--foo-bar=something'
+			)
+		)));
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testParseShortOption() {
 		$expected = array(
 			'command' => 'test', 'action' => 'action', 'args' => array(),
