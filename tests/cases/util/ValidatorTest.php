@@ -12,7 +12,7 @@ use lithium\util\Validator;
 
 class ValidatorTest extends \lithium\test\Unit {
 
-	function setUp() {
+	public function setUp() {
 		Validator::__init();
 	}
 
