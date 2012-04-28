@@ -40,14 +40,14 @@ class MockSocket extends \lithium\net\Socket {
 				$data['cnonce'] = md5(time());
 				$username = $this->data->username;
 				$password = $this->data->password;
-				$user = md5("{$username}:{$data['realm']}:{$password}");
-				$nonce = "{$data['nonce']}:{$data['nc']}:{$data['cnonce']}:{$data['qop']}";
-				$req = md5($this->data->method . ':' . $this->data->path);
-				$hash = md5("{$user}:{$nonce}:{$req}");
+				$part1 = md5("{$username}:{$data['realm']}:{$password}");
+				$part2 = "{$data['nonce']}:{$data['nc']}:{$data['cnonce']}:{$data['qop']}";
+				$part3 = md5($this->data->method . ':' . $this->data->path);
+				$hash = md5("{$part1}:{$part2}:{$part3}");
 				preg_match('/response="(.*?)"/', $this->data->headers('Authorization'), $matches);
 				list($match, $response) = $matches;
 
-				if ($hash == $response) {
+				if ($hash === $response) {
 					return 'success';
 				}
 			}

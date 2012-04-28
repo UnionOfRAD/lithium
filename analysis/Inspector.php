@@ -205,12 +205,12 @@ class Inspector extends \lithium\core\StaticObject {
 		$options += array('group' => false);
 		$result = array_filter(static::methods($class, 'ranges', $options));
 
-		if ($options['filter'] && $class->getFileName()) {
+		if ($options['filter'] && $class->getFileName() && $result) {
 			$lines = static::lines($class->getFileName(), $result);
 			$start = key($lines);
 
 			$code = implode("\n", $lines);
-			$tokens = token_get_all('<?php' . $code);
+			$tokens = token_get_all('<' . '?php' . $code);
 			$tmp = array();
 
 			foreach ($tokens as $token) {

@@ -222,9 +222,9 @@ class String {
 	 *                     name to be replaced with value.
 	 * @param array $options Available options are:
 	 *        - `'after'`: The character or string after the name of the variable place-holder
-	 *          (defaults to `null`).
+	 *          (defaults to `}`).
 	 *        - `'before'`: The character or string in front of the name of the variable
-	 *          place-holder (defaults to `':'`).
+	 *          place-holder (defaults to `'{:'`).
 	 *        - `'clean'`: A boolean or array with instructions for `String::clean()`.
 	 *        - `'escape'`: The character or string used to escape the before character or string
 	 *          (defaults to `'\'`).

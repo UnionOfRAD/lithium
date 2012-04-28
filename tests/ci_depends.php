@@ -25,22 +25,16 @@ class PhpExtensions {
 		$this->iniPath = php_ini_loaded_file();
 		$this->extensions = array(
 			'memcached' => array(
-				'url' => 'http://pecl.php.net/get/memcached-1.0.2.tgz',
-				'require' => array(
-					// memcached 1.0.2 does not build on PHP 5.4
-					'php' => array('<', '5.4')
-				),
+				'url' => 'http://pecl.php.net/get/memcached-2.0.1.tgz',
+				'require' => array(),
 				'configure' => array(),
 				'ini' => array(
 					'extension=memcached.so'
 				)
 			),
 			'apc' => array(
-				'url' => 'http://pecl.php.net/get/APC-3.1.9.tgz',
-				'require' => array(
-					// apc 3.1.9 causes a segfault on PHP 5.4
-					'php' => array('<', '5.4')
-				),
+				'url' => 'http://pecl.php.net/get/APC-3.1.10.tgz',
+				'require' => array(),
 				'configure' => array(),
 				'ini' => array(
 					'extension=apc.so',

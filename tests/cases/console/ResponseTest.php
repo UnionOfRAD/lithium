@@ -38,7 +38,7 @@ class ResponseTest extends \lithium\test\Unit {
 
 	public function testConstructWithConfigOutput() {
 		$base = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 		$stream = fopen($this->streams['output'], 'w');
 
 		$response = new Response(array(
@@ -51,7 +51,7 @@ class ResponseTest extends \lithium\test\Unit {
 
 	public function testConstructWithConfigError() {
 		$base = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
 		$stream = fopen($this->streams['error'], 'w');
 		$response = new Response(array('error' => $stream));
@@ -61,7 +61,7 @@ class ResponseTest extends \lithium\test\Unit {
 
 	public function testOutput() {
 		$base = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
 		$response = new Response(array('output' => fopen($this->streams['output'], 'w+')));
 		$this->assertTrue(is_resource($response->output));
@@ -73,7 +73,7 @@ class ResponseTest extends \lithium\test\Unit {
 
 	public function testError() {
 		$base = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
 		$response = new Response(array('error' => fopen($this->streams['error'], 'w+')));
 		$this->assertTrue(is_resource($response->error));

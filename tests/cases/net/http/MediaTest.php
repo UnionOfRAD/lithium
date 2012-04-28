@@ -488,7 +488,7 @@ class MediaTest extends \lithium\test\Unit {
 
 	public function testRenderWithOptionsMerging() {
 		$base = Libraries::get(true, 'resources') . '/tmp';
-		$this->skipIf(!is_writable($base), "{$base} is not writable.");
+		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
 		$request = new Request();
 		$request->params['controller'] = 'pages';
