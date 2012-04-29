@@ -132,6 +132,14 @@ class Model extends \lithium\core\StaticObject {
 	protected static $_instances = array();
 
 	/**
+	 * List of initialized instances.
+	 *
+	 * @see lithium\data\Model::_init();
+	 * @var array
+	 */
+	protected static $_initialized = array();
+
+	/**
 	 * Stores the filters that are applied to the model instances stored in `Model::$_instances`.
 	 *
 	 * @var array
@@ -304,26 +312,42 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Configures the model for use. This method is called by `Model::__init()`.
+	 * Configures the model for use.
 	 *
-	 * This method will set the `Model::$_schema`, `Model::$_meta`, `Model::$_finders` class
-	 * attributes, as well as obtain a handle to the configured persistent storage connection.
+	 * This method will set the `Model::$_meta` class attributes, as well as obtain a handle
+	 * to the configured persistent storage connection.
 	 *
-	 * @param array $options Possible options are:
-	 * - `meta`: Meta-information for this model, such as the connection.
-	 * - `finders`: Custom finders for this model.
-	 * @return void
+	 * @param array $options Meta-information for this model, such as the connection.
 	 */
 	public static function config(array $options = array()) {
 		if (static::_isBase($class = get_called_class())) {
 			return;
 		}
-
+				
 		if (!isset(static::$_instances[$class])) {
 			$self = static::$_instances[$class] = new $class();
 		} else {
 			$self = static::$_instances[$class];
 		}
+
+		$self->_meta = $options + $self->_meta;
+		static::$_initialized[$class] = false;
+	}
+
+	/**
+	 * Init default connection options and connects default finders.
+	 *
+	 * This method will set the `Model::$_schema`, `Model::$_meta`, `Model::$_finders` class
+	 * attributes, as well as obtain a handle to the configured persistent storage connection
+	 *
+	 */
+	protected static function _init($class){
+		$self = static::$_instances[$class];
+		if (isset(static::$_initialized[$class]) && static::$_initialized[$class]) {
+			return $self;
+		}
+
+		static::$_initialized[$class] = true;
 
 		$query   = array();
 		$meta    = array();
@@ -343,7 +367,8 @@ class Model extends \lithium\core\StaticObject {
 				break;
 			}
 		}
-		$tmp = $options + $self->_meta + $meta;
+
+		$tmp = $self->_meta + $meta;
 		$source = array('meta' => array(), 'finders' => array(), 'schema' => array());
 
 		if ($tmp['connection']) {
@@ -353,13 +378,15 @@ class Model extends \lithium\core\StaticObject {
 		static::$_classes = $classes;
 		$name = static::_name();
 
-		$local = compact('class', 'name') + $options + $self->_meta;
+		$local = compact('class', 'name') + $self->_meta;
 		$self->_meta = ($local + $source['meta'] + $meta);
 		$self->_meta['initialized'] = false;
 		$self->schema()->append($schema + $source['schema']);
 
 		$self->_finders += $source['finders'] + $self->_findFilters();
+
 		static::_relations();
+		return $self;
 	}
 
 	/**
@@ -1061,7 +1088,8 @@ class Model extends \lithium\core\StaticObject {
 			static::$_instances[$class] = new $class();
 			static::config();
 		}
-		return static::$_instances[$class];
+		$object = static::_init($class);
+		return $object;
 	}
 
 	/**
