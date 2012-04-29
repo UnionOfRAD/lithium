@@ -36,8 +36,8 @@ class CouchDbTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->db = new CouchDb(array('socket' => false));
 		$model = $this->_model;
-		$model::$connection = $this->db;
 		$model::resetSchema();
+		$model::$connection = $this->db;
 
 		$entity = new Document(compact('model'));
 		$this->query = new Query(compact('model', 'entity'));
