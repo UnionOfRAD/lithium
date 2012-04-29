@@ -314,8 +314,7 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Configures the model for use.
 	 *
-	 * This method will set the `Model::$_meta` class attributes, as well as obtain a handle
-	 * to the configured persistent storage connection.
+	 * This method will set the `Model::$_meta` class attributes.
 	 *
 	 * @param array $options Meta-information for this model, such as the connection.
 	 */
