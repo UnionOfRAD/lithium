@@ -19,6 +19,7 @@ use lithium\tests\mocks\data\MockComment;
 use lithium\tests\mocks\data\MockTagging;
 use lithium\tests\mocks\data\MockCreator;
 use lithium\tests\mocks\data\MockPostForValidates;
+use lithium\tests\mocks\data\MockBadConnection;
 
 class ModelTest extends \lithium\test\Unit {
 
@@ -730,6 +731,12 @@ class ModelTest extends \lithium\test\Unit {
 		$key = (object) array('foo' => 'bar');
 		$result = MockPost::find($key);
 		$this->assertEqual(array('id' => $key), $result['query']->conditions());
+	}
+
+	public function testLiveConfiguration() {
+		MockBadConnection::config(array('connection' => false));
+		$result = MockBadConnection::meta('connection');
+		$this->assertFalse($result);
 	}
 }
 
