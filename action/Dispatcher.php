@@ -50,14 +50,42 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * Each key in the array represents a 'rule'; if a key that matches the rule is present (and
 	 * not empty) in a route, (i.e. the result of `lithium\net\http\Router::parse()`) then the
 	 * rule's value will be applied to the route before it is dispatched.  When applying a rule, any
-	 * array elements array elements of the flag which are present in the route will be modified
-	 * using a `lithium\util\String::insert()`-formatted string.
+	 * array elements of the flag which are present in the route will be modified
+	 * using a `lithium\util\String::insert()`-formatted string.  Alternatively,
+	 * a callback can be used to do custom transformations other than the
+	 * default `lithium\util\String::insert()`.
 	 *
 	 * For example, to implement action prefixes (i.e. `admin_index()`), set a rule named 'admin',
 	 * with a value array containing a modifier key for the `action` element of a route, i.e.:
 	 * `array('action' => 'admin_{:action}')`. Now, if the `'admin'` key is present and not empty
 	 * in the parameters returned from routing, the value of `'action'` will be rewritten per the
 	 * settings in the rule.
+	 *
+	 * Here's another example.  To support normalizing actions,
+	 * set a rule named 'action' with a value array containing a callback that uses
+	 * `lithium\util\Inflector` to camelize the action:
+	 *
+	 * {{{
+	 * use lithium\action\Dispatcher;
+	 * use lithium\util\Inflector;
+	 *
+	 * Dispatcher::config(array('rules' => array(
+	 * 	'action' => array('action' => function($params) {
+	 * 		return Inflector::camelize(strtolower($params['action']), false);
+	 * 	})
+	 * )));
+	 * }}}
+	 *
+	 * The rules can be a callback as well:
+	 *
+	 * {{{
+	 * Dispatcher::config(array('rules' => function($params) {
+	 * 	if (isset($params['admin'])) {
+	 * 		return array('special' => array('action' => 'special_{:action}'));
+	 * 	}
+	 * 	return array();
+	 * }));
+	 * }}}
 	 *
 	 * @see lithium\action\Dispatcher::config()
 	 * @see lithium\util\String::insert()
@@ -82,6 +110,10 @@ class Dispatcher extends \lithium\core\StaticObject {
 
 		foreach ($config as $key => $val) {
 			$key = "_{$key}";
+			if (!is_array($val)) {
+				static::${$key} = $val;
+				continue;
+			}
 			if (isset(static::${$key})) {
 				static::${$key} = $val + static::${$key};
 			}
@@ -135,6 +167,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	public static function applyRules(&$params) {
 		$result = array();
 		$values = array();
+		$rules = static::$_rules;
 
 		if (!$params) {
 			return false;
@@ -158,17 +191,24 @@ class Dispatcher extends \lithium\core\StaticObject {
 		}
 		$values += $params;
 
-		foreach (static::$_rules as $rule => $value) {
+		if (is_callable($rules)) {
+			$rules = $rules($params);
+		}
+		foreach ($rules as $rule => $value) {
+			if (!isset($values[$rule])) {
+				continue;
+			}
 			foreach ($value as $k => $v) {
-				if (isset($values[$rule])) {
-					$result[$k] = String::insert($v, $values);
+				if (is_callable($v)) {
+					$result[$k] = $v($values);
+					continue;
 				}
 				$match = preg_replace('/\{:\w+\}/', '@', $v);
 				$match = preg_replace('/@/', '.+', preg_quote($match, '/'));
-
 				if (preg_match('/' . $match . '/i', $values[$k])) {
-					return false;
+					continue;
 				}
+				$result[$k] = String::insert($v, $values);
 			}
 		}
 		return $result + $values;
