@@ -16,11 +16,13 @@ namespace lithium\console;
 class Router extends \lithium\core\Object {
 
 	/**
-	 * Parse incoming request from console
+	 * Parse incoming request from console. Short and long (GNU-style) options
+	 * in the form of `-f`, `--foo`, `--foo-bar` and `--foo=bar` are parsed.
+	 * XF68-style long options (i.e. `-foo`) are not supported but support
+	 * can be added by extending this class.
 	 *
 	 * @param object $request lithium\console\Request
 	 * @return array $params
-	 *
 	 */
 	public static function parse($request = null) {
 		$defaults = array('command' => null, 'action' => 'run', 'args' => array());
