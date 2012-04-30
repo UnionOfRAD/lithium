@@ -30,6 +30,23 @@ class FormTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Used by `testValidatorWithFieldMapping` and makes sure that the
+	 * custom password field name isn't sent in the query
+	 *
+	 * @param array $options
+	 * @return object
+	 */
+	public static function validatorFieldMappingTest(array $options = array()) {
+		if (isset($options['conditions']['user.password'])) {
+			return null;
+		}
+		return new Record(array('data' => array(
+			'user.name' => 'Foo',
+			'user.password' => 'bar'
+		)));
+	}
+
+	/**
 	 * Tests a simple user lookup. Note that we're not using the password validator; due to the
 	 * limitations of this classes first() mock method, password will not be in the dataset
 	 * returned by Form::check().
@@ -365,6 +382,7 @@ class FormTest extends \lithium\test\Unit {
 	public function testValidatorWithFieldMapping() {
 		$subject = new Form(array(
 			'model' => __CLASS__,
+			'query' => 'validatorFieldMappingTest',
 			'fields' => array('name' => 'user.name', 'password' => 'user.password'),
 			'validators' => array(
 				'password' => function ($form, $data) {
