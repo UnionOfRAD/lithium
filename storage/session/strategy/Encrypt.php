@@ -148,7 +148,6 @@ class Encrypt extends \lithium\core\Object {
 		$payload = empty($futureData) ? null : $this->_encrypt($futureData);
 
 		$class::write('__encrypted', $payload, array('strategies' => false) + $options);
-		return $payload;
 	}
 
 	/**
@@ -167,7 +166,6 @@ class Encrypt extends \lithium\core\Object {
 		$payload = empty($futureData) ? null : $this->_encrypt($futureData);
 
 		$class::write('__encrypted', $payload, array('strategies' => false) + $options);
-		return $data;
 	}
 
 	/**
