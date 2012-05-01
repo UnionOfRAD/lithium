@@ -417,7 +417,7 @@ class Route extends \lithium\core\Object {
 			return;
 		}
 		$this->_pattern = "@^{$this->_template}\$@";
-		$match = '@([/.])?\{:([^:}]+):?((?:[^{]+(?:\{[0-9,]+\})?)*?)\}@S';
+		$match = '@([/.])?\{:([^:}]+):?((?:[^{]+?(?:\{[0-9,]+\})?)*?)\}@S';
 
 		if ($this->_config['unicode']) {
 			$this->_pattern .= 'u';
