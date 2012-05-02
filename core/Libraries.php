@@ -843,7 +843,7 @@ class Libraries {
 			}
 
 			foreach (static::_searchPaths($paths, $library, $params) as $tpl) {
-                $params['library'] = rtrim($config['prefix'], '\\');
+				$params['library'] = rtrim($config['prefix'], '\\');
 				$class = str_replace('\\*', '', String::insert($tpl, $params));
 
 				if (file_exists($file = Libraries::path($class, $options))) {
