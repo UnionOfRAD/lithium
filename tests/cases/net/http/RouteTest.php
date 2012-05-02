@@ -377,6 +377,24 @@ class RouteTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests creating a route with a custom sub-pattern and trailing route
+	 */
+	public function testCustomSubPatternWithTrailing() {
+		$route = new Route(array('template' => '/{:controller}/{:action}/{:id:[0-9]+}/abcdefghijklm'));
+
+		$request = new Request();
+		$request->url = '/users/view/10/abcdefghijklm';
+		$expected = array('controller' => 'users', 'action' => 'view', 'id' => '10');
+
+		$result = $route->parse($request);
+		$this->assertEqual($expected, $result->params);
+
+		$request->url = '/users/view/a/abcdefghijklm';
+		$result = $route->parse($request);
+		$this->assertFalse($result);
+	}
+
+	/**
 	 * Tests that routes with querystrings are correctly processed.
 	 */
 	public function testRoutesWithQueryStrings() {

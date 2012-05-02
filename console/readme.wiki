@@ -151,7 +151,7 @@ logic.
 Parsing options and arguments to commands should be simple. In fact, the
 parsing is already done for you.
 
-Short and long (GNU-style) options in the form of `-f`, `--foo` and `--foo=bar`
+Short and long (GNU-style) options in the form of `-f`, `--foo`, `--foo-bar` and `--foo=bar`
 are automatically parsed and exposed to your command instance through its
 properties. XF68-style long options (i.e. `-foo`) are not supported by default
 but support can be added by extending the console router.

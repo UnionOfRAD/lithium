@@ -114,6 +114,38 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+
+	public function testSyncModified() {
+		$doc = new Document();
+		$doc->id = 4;
+		$doc->name = 'Four';
+		$doc->content = 'Lorem ipsum four';
+
+		$expected = array(
+			'id' => true,
+			'name' => true,
+			'content' => true,
+		);
+		
+		$this->assertEqual($expected, $doc->modified());
+		$doc->sync();
+
+		$this->assertEqual(array_fill_keys(array_keys($expected), false), $doc->modified());
+
+
+		$doc->id = 5;
+		$doc->content = null;
+		$doc->new = null;
+		$expected = array(
+			'id' => true,
+			'name' => false,
+			'content' => true,
+			'new' => true,
+		);
+		
+		$this->assertEqual($expected, $doc->modified());
+	}
+
 	public function testNestedKeyGetSet() {
 		$doc = new Document(array('model' => $this->_model, 'data' => array(
 			'name' => 'Bob', 'location' => 'New York, NY', 'profile' => array(
