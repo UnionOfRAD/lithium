@@ -136,7 +136,11 @@ class Request extends \lithium\net\http\Request {
 	protected $_locale = null;
 
 	/**
-	 * Pulls request data from superglobals.
+	 * Initialize request object, pulling request data from superglobals.
+	 *
+	 * Defines an artificial `'PLATFORM'` environment variable as either
+	 * `'IIS'`, `'CGI'` or `null` to allow checking for the SAPI in a
+	 * normalized way.
 	 *
 	 * @return void
 	 */
