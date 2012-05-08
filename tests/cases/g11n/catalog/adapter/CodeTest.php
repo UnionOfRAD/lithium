@@ -20,7 +20,7 @@ class CodeTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->_path = $path = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_writable($this->_path), "{$this->_path} is not writable.");
+		$this->skipIf(!is_writable($this->_path), "Path `{$this->_path}` is not writable.");
 
 		$this->adapter = new Code(compact('path'));
 

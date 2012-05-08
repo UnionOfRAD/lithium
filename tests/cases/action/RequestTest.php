@@ -145,17 +145,24 @@ class RequestTest extends \lithium\test\Unit {
 		unset($_GET['url']);
 		$request = new Request(array('env' => array(
 			'PHP_SELF' => '/test_app/app/webroot/index.php',
-			'REQUEST_URI' => '/test_app'
+			'REQUEST_URI' => '/test_app/'
 		)));
 		$this->assertEqual('/test_app', $request->env('base'));
 		$this->assertEqual('/', $request->url);
+
+		$request = new Request(array('env' => array(
+			'PHP_SELF' => '/test_app/app/webroot/index.php',
+			'REQUEST_URI' => '/test_app/pages/test_app'
+		)));
+		$this->assertEqual('/test_app', $request->env('base'));
+		$this->assertEqual('pages/test_app', $request->url);
 	}
 
 	public function testRequestWithoutUrlQueryParamAndNoApp() {
 		unset($_GET['url']);
 		$request = new Request(array('env' => array(
 			'PHP_SELF' => '/test_app/webroot/index.php',
-			'REQUEST_URI' => '/test_app'
+			'REQUEST_URI' => '/test_app/'
 		)));
 		$this->assertEqual('/test_app', $request->env('base'));
 		$this->assertEqual('/', $request->url);
@@ -165,7 +172,7 @@ class RequestTest extends \lithium\test\Unit {
 		unset($_GET['url']);
 		$request = new Request(array('env' => array(
 			'PHP_SELF' => '/test_app/index.php',
-			'REQUEST_URI' => '/test_app'
+			'REQUEST_URI' => '/test_app/'
 		)));
 		$this->assertEqual('/test_app', $request->env('base'));
 		$this->assertEqual('/', $request->url);
