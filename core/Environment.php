@@ -283,7 +283,7 @@ class Environment {
 					return $request->env;
 				case ($request->command == 'test'):
 					return 'test';
-				case ($request->env('TERM')):
+				case ($request->env('PLATFORM') == 'CLI'):
 					return 'development';
 				case (preg_match('/^test\//', $request->url) && $isLocal):
 					return 'test';

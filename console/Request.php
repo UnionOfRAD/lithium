@@ -73,8 +73,13 @@ class Request extends \lithium\core\Object {
 	}
 
 	/**
-	 * Initialize request object
+	 * Initialize request object, pulling request data from superglobals.
 	 *
+	 * Defines an artificial `'PLATFORM'` environment variable as `'CLI'` to
+	 * allow checking for the SAPI in a normalized way. This is also for
+	 * establishing consistency with this class' sister classes.
+	 *
+	 * @see lithium\action\Request::_init()
 	 * @return void
 	 */
 	protected function _init() {
@@ -82,6 +87,7 @@ class Request extends \lithium\core\Object {
 		$this->_env['working'] = getcwd() ?: null;
 		$argv = (array) $this->env('argv');
 		$this->_env['script'] = array_shift($argv);
+		$this->_env['PLATFORM'] = 'CLI';
 		$this->argv += $argv + (array) $this->_config['args'];
 		$this->input = $this->_config['input'];
 
