@@ -213,10 +213,12 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isAlphaNumeric('אกあアꀀ豈'));
 		$this->assertTrue(Validator::isAlphaNumeric('ǅᾈᾨ'));
 		$this->assertTrue(Validator::isAlphaNumeric('ÆΔΩЖÇ'));
-
+		$this->assertTrue(Validator::isAlphaNumeric('日本語でも'));
+		$this->assertTrue(Validator::isAlphaNumeric('をありがとうございました'));
 
 		$this->assertFalse(Validator::isAlphaNumeric('12 234'));
 		$this->assertFalse(Validator::isAlphaNumeric('dfd 234'));
+		$this->assertFalse(Validator::isAlphaNumeric('こんにちは！'));
 		$this->assertFalse(Validator::isAlphaNumeric("\n"));
 		$this->assertFalse(Validator::isAlphaNumeric("\t"));
 		$this->assertFalse(Validator::isAlphaNumeric("\r"));
