@@ -67,6 +67,20 @@ class HelpTest extends \lithium\test\Unit {
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
+
+		$expected = "Command `TestWithDashes` not found";
+		$expected = preg_quote($expected);
+		$result = $command->run('test-with-dashes');
+		$this->assertFalse($result);
+		$result = $command->response->error;
+		$this->assertPattern("/{$expected}/", $result);
+
+		$expected = "Command `TestWithUnderscores` not found";
+		$expected = preg_quote($expected);
+		$result = $command->run('test_with_underscores');
+		$this->assertFalse($result);
+		$result = $command->response->error;
+		$this->assertPattern("/{$expected}/", $result);
 	}
 
 	public function testApiClass() {
