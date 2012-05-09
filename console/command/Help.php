@@ -27,7 +27,7 @@ class Help extends \lithium\console\Command {
 	 * @return void
 	 */
 	public function run($command = null) {
-	    $message = 'Lithium console started in the ' . Environment::get() . ' environment.';
+		$message = 'Lithium console started in the ' . Environment::get() . ' environment.';
 		$message .= ' Use the --env=environment key to alter this.';
 		$this->out($message);
 
@@ -37,7 +37,7 @@ class Help extends \lithium\console\Command {
 		}
 
 		if (!preg_match('/\\\\/', $command)) {
-			$command = ucwords($command);
+			$command = Inflector::camelize($command);
 		}
 
 		if (!$class = Libraries::locate('command', $command)) {
