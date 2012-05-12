@@ -141,8 +141,9 @@ class Form extends \lithium\template\Helper {
 					if (!$name || ($method == 'hidden' && $name == '_method')) {
 						return;
 					}
-					$id = Inflector::camelize(Inflector::slug($name));
-					$model = ($binding = $self->binding()) ? $binding->model() : null;
+					$info = $self->binding($name);
+					$model = $info->class;
+					$id = Inflector::camelize(Inflector::slug($info->name));
 					return $model ? basename(str_replace('\\', '/', $model)) . $id : $id;
 				},
 				'name' => function($method, $name, $options) {
@@ -153,7 +154,21 @@ class Form extends \lithium\template\Helper {
 					$first = array_shift($name);
 					return $first . '[' . join('][', $name) . ']';
 				}
-			)
+			),
+			'binding' => function($object, $name = null) {
+				$result = compact('name') + array(
+					'data' => null, 'errors' => null, 'class' => null
+				);
+
+				if (is_object($object)) {
+					$result = compact('name') + array(
+						'data'   => $object->data($name),
+						'errors' => $object->errors($name),
+						'class'  => $object->model()
+					);
+				}
+				return (object) $result;
+			}
 		);
 		parent::__construct(Set::merge($defaults, $config));
 	}
@@ -234,8 +249,8 @@ class Form extends \lithium\template\Helper {
 	 *
 	 * @see lithium\template\helper\Form::$_binding
 	 * @see lithium\data\Entity
-	 * @param object $binding The object to bind the form to. This is usually an instance of
-	 *               `Record` or `Document`, or some other class that extends
+	 * @param mixed $bindings List of objects, or the object to bind the form to. This is usually an
+	 *               instance of `Record` or `Document`, or some other class that extends
 	 *               `lithium\data\Entity`.
 	 * @param array $options Other parameters for creating the form. Available options are:
 	 *              - `'url'` _mixed_: A string URL or URL array parameters defining where in the
@@ -255,8 +270,9 @@ class Form extends \lithium\template\Helper {
 	 *         attributes passed in `$options`.
 	 * @filter
 	 */
-	public function create($binding = null, array $options = array()) {
+	public function create($bindings = null, array $options = array()) {
 		$request = $this->_context ? $this->_context->request() : null;
+		$binding = is_array($bindings) ? reset($bindings) : $bindings;
 
 		$defaults = array(
 			'url' => $request ? $request->params : array(),
@@ -270,13 +286,13 @@ class Form extends \lithium\template\Helper {
 
 		$_binding =& $this->_binding;
 		$_options =& $this->_bindingOptions;
-		$params = compact('scope', 'options', 'binding');
+		$params = compact('scope', 'options', 'bindings');
 		$extra = array('method' => __METHOD__) + compact('tpl', 'defaults');
 
 		$filter = function($self, $params) use ($extra, &$_binding, &$_options) {
 			$scope = $params['scope'];
 			$options = $params['options'];
-			$_binding = $params['binding'];
+			$_binding = $params['bindings'];
 			$append = null;
 			$scope['method'] = strtolower($scope['method']);
 
@@ -312,12 +328,10 @@ class Form extends \lithium\template\Helper {
 	public function end() {
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, array());
 		$params = compact('options', 'template');
-		$_binding =& $this->_binding;
 		$_context =& $this->_context;
 		$_options =& $this->_bindingOptions;
 
-		$filter = function($self, $params) use (&$_binding, &$_context, &$_options, $template) {
-			unset($_binding);
+		$filter = function($self, $params) use (&$_context, &$_options, $template) {
 			$_options = array();
 			return $self->invokeMethod('_render', array('end', $params['template'], array()));
 		};
@@ -330,11 +344,36 @@ class Form extends \lithium\template\Helper {
 	/**
 	 * Returns the entity that the `Form` helper is currently bound to.
 	 *
+	 * @param string $name If specified, match this field name against the list of bindings
+	 * @param string $key If $name specified, where to store relevant $_binding key
 	 * @see lithium\template\helper\Form::$_binding
 	 * @return object Returns an object, usually an instance of `lithium\data\Entity`.
 	 */
-	public function binding() {
-		return $this->_binding;
+	public function binding($name = null) {
+		if (!$this->_binding) {
+			return $this->_config['binding'](null, $name);
+		}
+
+		$binding = $this->_binding;
+		$model = null;
+		$key = $name;
+
+		if (is_array($binding)) {
+			switch (true) {
+				case strpos($name, '.'):
+					list($model, $key) = explode('.', $name, 2);
+					$binding = isset($binding[$model]) ? $binding[$model] : reset($binding);
+				break;
+				case isset($binding[$name]):
+					$binding = $binding[$name];
+					$key = null;
+				break;
+				default:
+					$binding = reset($binding);
+				break;
+			}
+		}
+		return $key ? $this->_config['binding']($binding, $key) : $binding;
 	}
 
 	/**
@@ -587,10 +626,8 @@ class Form extends \lithium\template\Helper {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		list($scope, $options) = $this->_options($defaults, $options);
 
-		if (!isset($options['checked'])) {
-			if ($this->_binding && $bound = $this->_binding->data($name)) {
-				$options['checked'] = ($bound == $default);
-			}
+		if (!isset($options['checked']) && ($bound = $this->binding($name)->data)) {
+			$options['checked'] = ($bound == $default);
 		}
 		if ($scope['hidden']) {
 			$out = $this->hidden($name, array('value' => '', 'id' => false));
@@ -618,10 +655,8 @@ class Form extends \lithium\template\Helper {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		list($scope, $options) = $this->_options($defaults, $options);
 
-		if (!isset($options['checked'])) {
-			if ($this->_binding && $bound = $this->_binding->data($name)) {
-				$options['checked'] = ($bound == $default);
-			}
+		if (!isset($options['checked']) && ($bound = $this->binding($name)->data)) {
+			$options['checked'] = ($bound == $default);
 		}
 
 		$options['value'] = $scope['value'];
@@ -697,18 +732,16 @@ class Form extends \lithium\template\Helper {
 		$defaults = array('class' => 'error');
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		$options += $defaults;
-
-		$_binding =& $this->_binding;
 		$params = compact('name', 'key', 'options', 'template');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$_binding) {
+		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			$options = $params['options'];
 			$template = $params['template'];
 
 			if (isset($options['value'])) {
 				unset($options['value']);
 			}
-			if (!$_binding || !$content = $_binding->errors($params['name'])) {
+			if (!$content = $self->binding($params['name'])->errors) {
 				return null;
 			}
 			$result = '';
@@ -749,7 +782,7 @@ class Form extends \lithium\template\Helper {
 
 		$hasValue = (
 			(!isset($options['value']) || $options['value'] === null) &&
-			$name && $this->_binding && $value = $this->_binding->data($name)
+			$name && $value = $this->binding($name)->data
 		);
 		if ($hasValue) {
 			$options['value'] = $value;
