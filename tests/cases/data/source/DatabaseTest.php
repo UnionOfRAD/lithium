@@ -98,6 +98,15 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$result = $this->db->value('1', array('type' => 'string'));
 		$this->assertIdentical("'1'", $result);
+
+		$result = $this->db->value('CURRENT_TIMESTAMP', array('type' => 'timestamp'));
+		$this->assertIdentical('NULL', $result);
+
+		$result = $this->db->value('1234567', array('type' => 'timestamp'));
+		$this->assertIdentical(date('Y-m-d H:i:s', 1234567), $result);
+
+		$result = $this->db->value('now', array('type' => 'timestamp'));
+		$this->assertIdentical(time(), $result);
 	}
 
 	public function testValueByIntrospect() {
