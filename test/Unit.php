@@ -1010,7 +1010,15 @@ class Unit extends \lithium\core\Object {
 			if ($item->getPathname() === "{$path}/empty" || $iterator->isDot()) {
 				continue;
 			}
-			($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname());
+			
+			if (!(	($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname()))) {
+				// if file to unlink is readonly, it throws a exception (Permission denied) on Windows
+				// solution: remove readonly flag and try again
+				// see: http://stringoftheseus.com/blog/2010/12/22/php-unlink-permisssion-denied-error-on-windows/
+				// note: this will still report an exception, but the test will be ok. Try/catch won't solve it
+				@chmod($item->getPathname(), 0777);
+				($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname());
+			}
 		}
 	}
 
