@@ -57,17 +57,19 @@ class MockTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = <<<'test'
-
-
 namespace create_test\tests\mocks\models;
 
 class MockPosts extends \create_test\models\Posts {
 
 
 }
-
-
 test;
+		/* empty lines before and after are done via \n\n
+		 * adding empty lines above results in failing tests 
+		 * on environments (esp. windows) where autocrlf is set to true
+		 */
+		$expected = "\n\n" . $expected . "\n\n";
+
 		$replace = array("<?php", "?>");
 		$result = str_replace($replace, '',
 			file_get_contents($this->_testPath . '/create_test/tests/mocks/models/MockPosts.php')

@@ -58,8 +58,6 @@ class TestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = <<<'test'
-
-
 namespace create_test\tests\cases\models;
 
 use create_test\models\Posts;
@@ -72,9 +70,12 @@ class PostsTest extends \lithium\test\Unit {
 
 
 }
-
-
 test;
+		/* empty lines before and after are done via \n\n
+		 * adding empty lines above results in failing tests 
+		 * on environments (esp. windows) where autocrlf is set to true
+		 */
+		$expected = "\n\n" . $expected . "\n\n";
 		$replace = array("<?php", "?>");
 		$result = str_replace($replace, '',
 			file_get_contents($this->_testPath . '/create_test/tests/cases/models/PostsTest.php')
@@ -107,8 +108,6 @@ class Post{$id}s {
 		$this->assertEqual($expected, $result);
 
 		$expected = <<<test
-
-
 namespace create_test\\tests\\cases\\models;
 
 use create_test\\models\\Post{$id}s;
@@ -121,9 +120,12 @@ class Post{$id}sTest extends \\lithium\\test\\Unit {
 
 	public function testSomeMethod() {}
 }
-
-
 test;
+		/* empty lines before and after are done via \n\n
+		 * adding empty lines above results in failing tests 
+		 * on environments (esp. windows) where autocrlf is set to true
+		 */
+		$expected = "\n\n" . $expected . "\n\n";
 		$replace = array("<?php", "?>");
 		$path = "create_test/tests/cases/models/Post{$id}sTest.php";
 		$result = str_replace($replace, '', file_get_contents("{$this->_testPath}/{$path}"));
