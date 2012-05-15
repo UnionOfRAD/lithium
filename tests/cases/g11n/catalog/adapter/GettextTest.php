@@ -278,6 +278,9 @@ EOD;
 msgid "singular 1"
 msgstr "translated 1"
 EOD;
+		// compensate for windows, where LF is written but in the compare
+		// text above CRLF could be present (due to core.autocrlf true)
+		$po = preg_replace('/\r/', '', $po);
 		$result = file_get_contents($file);
 		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
 	}
@@ -610,6 +613,9 @@ EOD;
 
 		$this->adapter->write('validation', 'de', null, $catalog);
 		$result = file_get_contents($file);
+		// compensate for windows, where LF is written but in the compare
+		// text above CRLF could be present (due to core.autocrlf true)
+		$po = preg_replace('/\r/', '', $po);
 		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
 	}
 
@@ -710,6 +716,10 @@ EOD;
 			$result = file_get_contents($file);
 			$message  = "`{$escaped}` was not unescaped to `{$unescaped}` (ASCII octal {$ord})";
 			$message .= "\n{:message}";
+			
+			// compensate for windows, where LF is written but in the compare
+			// text above CRLF could be present (due to core.autocrlf true)
+			$po = preg_replace('/\r/', '', $po);
 			$this->assertPattern('/' . preg_quote($po, '/') . '/', $result, $message);
 
 			unlink($file);
@@ -737,6 +747,9 @@ EOD;
 
 		$this->adapter->write('message', 'de', null, $catalog);
 		$result = file_get_contents($file);
+		// compensate for windows, where LF is written but in the compare
+		// text above CRLF could be present (due to core.autocrlf true)
+		$po = preg_replace('/\r/', '', $po);
 		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
 	}
 
@@ -761,6 +774,9 @@ EOD;
 
 		$this->adapter->write('message', 'de', null, $catalog);
 		$result = file_get_contents($file);
+		// compensate for windows, where LF is written but in the compare
+		// text above CRLF could be present (due to core.autocrlf true)
+		$po = preg_replace('/\r/', '', $po);
 		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
 	}
 
@@ -785,6 +801,9 @@ EOD;
 
 		$this->adapter->write('message', 'de', null, $catalog);
 		$result = file_get_contents($file);
+		// compensate for windows, where LF is written but in the compare
+		// text above CRLF could be present (due to core.autocrlf true)
+		$po = preg_replace('/\r/', '', $po);
 		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
 	}
 
