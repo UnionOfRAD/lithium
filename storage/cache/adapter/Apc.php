@@ -161,7 +161,7 @@ class Apc extends \lithium\core\Object {
 	 * @return boolean `true` if enabled, `false` otherwise
 	 */
 	public static function enabled() {
-		$loaded = extension_loaded('apc');
+		$loaded = extension_loaded('apc') && function_exists('apc_dec');
 		$isCli = (php_sapi_name() === 'cli');
 		$enabled = (!$isCli && ini_get('apc.enabled')) || ($isCli && ini_get('apc.enable_cli'));
 		return ($loaded && $enabled);
