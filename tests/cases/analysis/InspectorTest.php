@@ -11,6 +11,7 @@ namespace lithium\tests\cases\analysis;
 use ReflectionMethod;
 use lithium\analysis\Inspector;
 use lithium\core\Libraries;
+use lithium\tests\mocks\analysis\MockEmptyClass;
 
 class InspectorTest extends \lithium\test\Unit {
 
@@ -26,8 +27,8 @@ class InspectorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testBasicMethodInspection() {
-		$class = '\lithium\analysis\Inspector';
-		$parent = '\lithium\core\StaticObject';
+		$class = 'lithium\analysis\Inspector';
+		$parent = 'lithium\core\StaticObject';
 
 		$expected = array_diff(get_class_methods($class), get_class_methods($parent));
 		$result = array_keys(Inspector::methods($class, 'extents'));
@@ -38,7 +39,7 @@ class InspectorTest extends \lithium\test\Unit {
 		)));
 		$this->assertEqual($expected, $result);
 
-		$this->assertNull(Inspector::methods('\lithium\core\Foo'));
+		$this->assertNull(Inspector::methods('lithium\core\Foo'));
 
 		$result = Inspector::methods('stdClass', 'extents');
 		$this->assertEqual(array(), $result);
@@ -93,6 +94,11 @@ class InspectorTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testExecutableLinesOnEmptyClass() {
+		$result = Inspector::executable(new MockEmptyClass());
+		$this->assertEqual(array(), $result);
+	}
+
 	/**
 	 * Tests reading specific line numbers of a file.
 	 *
@@ -103,8 +109,8 @@ class InspectorTest extends \lithium\test\Unit {
 		$expected = array(__LINE__ - 2 => "\tpublic function testLineIntrospection() {");
 		$this->assertEqual($expected, $result);
 
-		$result = Inspector::lines(__CLASS__, array(15));
-		$expected = array(15 => 'class InspectorTest extends \lithium\test\Unit {');
+		$result = Inspector::lines(__CLASS__, array(16));
+		$expected = array(16 => 'class InspectorTest extends \lithium\test\Unit {');
 		$this->assertEqual($expected, $result);
 
 		$lines = 'This is the first line.' . PHP_EOL . 'And this the second.';
@@ -113,7 +119,7 @@ class InspectorTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$this->expectException('/Missing argument 2/');
-		$this->assertNull(Inspector::lines('\lithium\core\Foo'));
+		$this->assertNull(Inspector::lines('lithium\core\Foo'));
 		$this->assertNull(Inspector::lines(__CLASS__, array()));
 	}
 
@@ -172,9 +178,9 @@ class InspectorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testTypeDetection() {
-		$this->assertEqual('namespace', Inspector::type('\lithium\util'));
-		$this->assertEqual('namespace', Inspector::type('\lithium\analysis'));
-		$this->assertEqual('class', Inspector::type('\lithium\analysis\Inspector'));
+		$this->assertEqual('namespace', Inspector::type('lithium\util'));
+		$this->assertEqual('namespace', Inspector::type('lithium\analysis'));
+		$this->assertEqual('class', Inspector::type('lithium\analysis\Inspector'));
 		$this->assertEqual('property', Inspector::type('Inspector::$_classes'));
 		$this->assertEqual('method', Inspector::type('Inspector::type'));
 		$this->assertEqual('method', Inspector::type('Inspector::type()'));

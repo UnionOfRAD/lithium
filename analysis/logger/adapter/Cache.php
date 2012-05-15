@@ -40,7 +40,7 @@ class Cache extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'cache' => '\lithium\storage\Cache'
+		'cache' => 'lithium\storage\Cache'
 	);
 
 	/**

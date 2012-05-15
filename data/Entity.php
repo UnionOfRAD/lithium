@@ -173,7 +173,7 @@ class Entity extends \lithium\core\Object {
 	 * @return mixed Result.
 	 */
 	public function __isset($name) {
-		return isset($this->_updated[$name]);
+		return isset($this->_updated[$name]) || isset($this->_relationships[$name]);
 	}
 
 	/**

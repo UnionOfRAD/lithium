@@ -159,7 +159,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 */
 	public static function formats($format, $handler = null) {
 		if ($format === false) {
-			return static::$_formats = array('array' => '\lithium\util\Collection::toArray');
+			return static::$_formats = array('array' => 'lithium\util\Collection::toArray');
 		}
 		if ((is_null($handler)) && class_exists($format)) {
 			return static::$_formats[] = $format;

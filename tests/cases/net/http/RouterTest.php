@@ -38,7 +38,7 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::connect('/hello', array('controller' => 'posts', 'action' => 'index'));
 		$expected = array(
 			'template' => '/hello',
-			'pattern' => '@^/hello$@',
+			'pattern' => '@^/hello$@u',
 			'params' => array('controller' => 'posts', 'action' => 'index'),
 			'match' => array('controller' => 'posts', 'action' => 'index'),
 			'meta' => array(),
@@ -54,7 +54,7 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertTrue($result instanceof Route);
 		$expected = array(
 			'template' => '/{:controller}/{:action}',
-			'pattern' => '@^(?:/(?P<controller>[^\\/]+))(?:/(?P<action>[^\\/]+)?)?$@',
+			'pattern' => '@^(?:/(?P<controller>[^\\/]+))(?:/(?P<action>[^\\/]+)?)?$@u',
 			'params' => array('action' => 'view'),
 			'defaults' => array('action' => 'view'),
 			'match' => array(),
@@ -76,7 +76,7 @@ class RouterTest extends \lithium\test\Unit {
 		));
 		$expected = array(
 			'template' => '/{:controller}/{:action}',
-			'pattern' => '@^(?:/(?P<controller>[^\\/]+))(?:/(?P<action>[^\\/]+)?)?$@',
+			'pattern' => '@^(?:/(?P<controller>[^\\/]+))(?:/(?P<action>[^\\/]+)?)?$@u',
 			'keys' => array('controller' => 'controller', 'action' => 'action'),
 			'params' => array('action' => 'view', 'required' => true),
 			'defaults' => array('action' => 'view'),
@@ -93,7 +93,7 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::connect('/{:controller}/{:action}', array('action' => 'archive'));
 		$expected = array(
 			'template' => '/{:controller}/{:action}',
-			'pattern' => '@^(?:/(?P<controller>[^\/]+))(?:/(?P<action>[^\/]+)?)?$@',
+			'pattern' => '@^(?:/(?P<controller>[^\/]+))(?:/(?P<action>[^\/]+)?)?$@u',
 			'keys' => array('controller' => 'controller', 'action' => 'action'),
 			'params' => array('action' => 'archive'),
 			'match' => array(),
@@ -625,7 +625,7 @@ class RouterTest extends \lithium\test\Unit {
 	 */
 	public function testCustomConfiguration() {
 		$old = Router::config();
-		$config = array('classes' => array('route' => 'my\custom\Route'));
+		$config = array('classes' => array('route' => 'my\custom\Route'), 'unicode' => true);
 
 		Router::config($config);
 		$this->assertEqual($config, Router::config());
@@ -756,6 +756,10 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual('/versions/13', $result);
 	}
 
+	/**
+	 * Tests submodules
+	 */
+
 	public function testSubmoduleRoutes() {
 		Router::connect('/users', array('controller' => 'submodule.Users'));
 		Router::connect('/users/{:action}', array('controller' => 'submodule.Users'));
@@ -767,6 +771,25 @@ class RouterTest extends \lithium\test\Unit {
 		$request = $response->request->params;
 		$result = Router::match($request);
 		$this->assertEqual('/users/login', $result);
+	}
+
+	/**
+	 * Tests default route formatters, and setting/getting new formatters.
+	 */
+	public function testRouteFormatters() {
+		$formatters = Router::formatters();
+		$this->assertEqual(array('args', 'controller'), array_keys($formatters));
+
+		$this->assertEqual('foo/bar', $formatters['args'](array('foo', 'bar')));
+		$this->assertEqual('list_items', $formatters['controller']('ListItems'));
+
+		Router::formatters(array('action' => function($value) { return strtolower($value); }));
+		$formatters = Router::formatters();
+		$this->assertEqual(array('action', 'args', 'controller'), array_keys($formatters));
+
+		Router::formatters(array('action' => null));
+		$formatters = Router::formatters();
+		$this->assertEqual(array('args', 'controller'), array_keys($formatters));
 	}
 }
 

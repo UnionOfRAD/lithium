@@ -118,6 +118,13 @@ class View extends \lithium\core\Object {
 	protected $_renderer = null;
 
 	/**
+	 * Path used to look up view loading and rendering adapters.
+	 *
+	 * @var string
+	 */
+	protected $_adapters = 'adapter.template.view';
+
+	/**
 	 * View processes are aggregated lists of steps taken to to create a complete, rendered view.
 	 * For example, the default process, `'all'`, renders a template, then renders a layout, using
 	 * the rendered template content. A process can be defined using one or more steps defined in
@@ -236,7 +243,7 @@ class View extends \lithium\core\Object {
 			}
 			$class = $this->_config[$key];
 			$config = array('view' => $this) + $this->_config;
-			$this->{'_' . $key} = Libraries::instance('adapter.template.view', $class, $config);
+			$this->{'_' . $key} = Libraries::instance($this->_adapters, $class, $config);
 		}
 	}
 
