@@ -17,7 +17,7 @@ use lithium\tests\mocks\util\MockCollectionStringCast;
 class CollectionTest extends \lithium\test\Unit {
 
 	public function setUp() {
-		Collection::formats('\lithium\net\http\Media');
+		Collection::formats('lithium\net\http\Media');
 	}
 
 	public function testArrayLike() {

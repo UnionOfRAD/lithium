@@ -19,7 +19,7 @@ class RecordTest extends \lithium\test\Unit {
 		$this->_configs = Connections::config();
 
 		Connections::config(array('mock-source' => array(
-			'type' => '\lithium\tests\mocks\data\MockSource'
+			'type' => 'lithium\tests\mocks\data\MockSource'
 		)));
 		$model = 'lithium\tests\mocks\data\MockPost';
 		$model::config(array('connection' => 'mock-source', 'key' => 'id'));

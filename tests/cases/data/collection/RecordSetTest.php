@@ -371,7 +371,7 @@ class RecordSetTest extends \lithium\test\Unit {
 	}
 
 	public function testTo() {
-		Collection::formats('\lithium\net\http\Media');
+		Collection::formats('lithium\net\http\Media');
 
 		$this->assertFalse(isset($this->_recordSet[0]));
 		$expected = array(

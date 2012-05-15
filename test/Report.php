@@ -26,7 +26,7 @@ use lithium\core\ClassNotFoundException;
  * {{{
  * $report = new Report(array(
  *     'title' => 'Test Report Title',
- *     'group' => new Group(array('data' => array('\lithium\tests\cases\net\http\MediaTest'))),
+ *     'group' => new Group(array('data' => array('lithium\tests\cases\net\http\MediaTest'))),
  *     'format' => 'html',
  *     'reporter' => 'html'
  * ));
@@ -46,7 +46,7 @@ use lithium\core\ClassNotFoundException;
  * {{{
  * $report = new Report(array(
  *     'title' => 'Test Report Title',
- *     'group' => new Group(array('data' => array('\lithium\tests\cases\net\http\MediaTest'))),
+ *     'group' => new Group(array('data' => array('lithium\tests\cases\net\http\MediaTest'))),
  *     'filters' => array('Complexity')
  * ));
  *

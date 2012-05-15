@@ -37,7 +37,7 @@ class MockCommand extends \lithium\console\Command {
 	protected $_dontShow = null;
 
 	protected $_classes = array(
-		'response' => '\lithium\tests\mocks\console\MockResponse'
+		'response' => 'lithium\tests\mocks\console\MockResponse'
 	);
 
 	public function testRun() {

@@ -15,12 +15,12 @@ class ReportTest extends \lithium\test\Unit {
 
 	public function testInit() {
 		$report = new Report(array(
-			'title' => '\lithium\tests\mocks\test\MockUnitTest',
-			'group' => new Group(array('data' => array('\lithium\tests\mocks\test\MockUnitTest')))
+			'title' => 'lithium\tests\mocks\test\MockUnitTest',
+			'group' => new Group(array('data' => array('lithium\tests\mocks\test\MockUnitTest')))
 		));
 		$report->run();
 
-		$expected = '\lithium\tests\mocks\test\MockUnitTest';
+		$expected = 'lithium\tests\mocks\test\MockUnitTest';
 		$result = $report->title;
 		$this->assertEqual($expected, $result);
 
@@ -35,9 +35,9 @@ class ReportTest extends \lithium\test\Unit {
 
 	public function testFilters() {
 		$report = new Report(array(
-			'title' => '\lithium\tests\mocks\test\MockFilterClassTest',
+			'title' => 'lithium\tests\mocks\test\MockFilterClassTest',
 			'group' => new Group(
-				array('data' => array('\lithium\tests\mocks\test\MockFilterClassTest'))
+				array('data' => array('lithium\tests\mocks\test\MockFilterClassTest'))
 			),
 			'filters' => array("Complexity" => ""),
 			'format' => 'html',
@@ -53,8 +53,8 @@ class ReportTest extends \lithium\test\Unit {
 
 	public function testStats() {
 		$report = new Report(array(
-			'title' => '\lithium\tests\mocks\test\MockUnitTest',
-			'group' => new Group(array('data' => array('\lithium\tests\mocks\test\MockUnitTest')))
+			'title' => 'lithium\tests\mocks\test\MockUnitTest',
+			'group' => new Group(array('data' => array('lithium\tests\mocks\test\MockUnitTest')))
 		));
 		$report->run();
 
@@ -67,8 +67,8 @@ class ReportTest extends \lithium\test\Unit {
 
 	public function testRender() {
 		$report = new Report(array(
-			'title' => '\lithium\tests\mocks\test\MockUnitTest',
-			'group' => new Group(array('data' => array('\lithium\tests\mocks\test\MockUnitTest'))),
+			'title' => 'lithium\tests\mocks\test\MockUnitTest',
+			'group' => new Group(array('data' => array('lithium\tests\mocks\test\MockUnitTest'))),
 			'format' => 'html',
 			'reporter' => 'html'
 		));
@@ -80,9 +80,9 @@ class ReportTest extends \lithium\test\Unit {
 
 	public function testSingleFilter() {
 		$report = new Report(array(
-			'title' => '\lithium\tests\mocks\test\MockFilterClassTest',
+			'title' => 'lithium\tests\mocks\test\MockFilterClassTest',
 			'group' => new Group(array(
-				'data' => array('\lithium\tests\mocks\test\MockFilterClassTest')
+				'data' => array('lithium\tests\mocks\test\MockFilterClassTest')
 			)),
 			'filters' => array("Complexity" => "")
 		));
