@@ -233,6 +233,11 @@ EOD;
 		$this->assertFalse($result);
 	}
 
+	/**
+	 * Note: The file is written by the testsubject with LF line endings, 
+	 * also on Windows. Files written in the tests have an EOL depending
+	 * on the platform / git config core.autocrlf
+	 */
 	public function testReadAndWritePoWithFlagsAndComments() {
 		$this->adapter->mo = false;
 
@@ -278,6 +283,9 @@ EOD;
 msgid "singular 1"
 msgstr "translated 1"
 EOD;
+		if ($this->_isEolCrLf()) {
+			$po = str_replace("\r\n", "\n", $po);
+		}
 		$result = file_get_contents($file);
 		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
 	}
@@ -581,6 +589,11 @@ EOD;
 		$this->assertPattern("%{$expected}%", $result);
 	}
 
+	/**
+	 * Note: The file is written by the testsubject with LF line endings, 
+	 * also on Windows. Files written in the tests have an EOL depending
+	 * on the platform / git config core.autocrlf
+	 */
 	public function testReadAndWritePoValidation() {
 		$this->adapter->mo = false;
 		mkdir("{$this->_path}/de/LC_VALIDATION", 0755, true);
@@ -610,9 +623,17 @@ EOD;
 
 		$this->adapter->write('validation', 'de', null, $catalog);
 		$result = file_get_contents($file);
+		if ($this->_isEolCrLf()) {
+			$po = str_replace("\r\n", "\n", $po);
+		}
 		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
 	}
 
+	/**
+	 * Note: The file is written by the testsubject with LF line endings, 
+	 * also on Windows. Files written in the tests have an EOL depending
+	 * on the platform / git config core.autocrlf
+	 */
 	public function testWrittenPoHasShortFilePaths() {
 		$this->adapter->mo = false;
 
@@ -710,12 +731,21 @@ EOD;
 			$result = file_get_contents($file);
 			$message  = "`{$escaped}` was not unescaped to `{$unescaped}` (ASCII octal {$ord})";
 			$message .= "\n{:message}";
+			
+			if ($this->_isEolCrLf()) {
+				$po = str_replace("\r\n", "\n", $po);
+			}
 			$this->assertPattern('/' . preg_quote($po, '/') . '/', $result, $message);
 
 			unlink($file);
 		}
 	}
 
+	/**
+	 * Note: The file is written by the testsubject with LF line endings, 
+	 * also on Windows. Files written in the tests have an EOL depending
+	 * on the platform / git config core.autocrlf
+	 */
 	public function testCrLfToLfOnWrite() {
 		$this->adapter->mo = false;
 		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
@@ -737,9 +767,17 @@ EOD;
 
 		$this->adapter->write('message', 'de', null, $catalog);
 		$result = file_get_contents($file);
+		if ($this->_isEolCrLf()) {
+			$po = str_replace("\r\n", "\n", $po);
+		}
 		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
 	}
 
+	/**
+	 * Note: The file is written by the testsubject with LF line endings, 
+	 * also on Windows. Files written in the tests have an EOL depending
+	 * on the platform / git config core.autocrlf
+	 */
 	public function testFixEscapedSingleQuoteOnWrite() {
 		$this->adapter->mo = false;
 		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
@@ -761,9 +799,17 @@ EOD;
 
 		$this->adapter->write('message', 'de', null, $catalog);
 		$result = file_get_contents($file);
+		if ($this->_isEolCrLf()) {
+			$po = str_replace("\r\n", "\n", $po);
+		}
 		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
 	}
 
+	/**
+	 * Note: The file is written by the testsubject with LF line endings, 
+	 * also on Windows. Files written in the tests have an EOL depending
+	 * on the platform / git config core.autocrlf
+	 */
 	public function testFixDoubleEscapedOnWrite() {
 		$this->adapter->mo = false;
 		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
@@ -785,6 +831,9 @@ EOD;
 
 		$this->adapter->write('message', 'de', null, $catalog);
 		$result = file_get_contents($file);
+		if ($this->_isEolCrLf()) {
+			$po = str_replace("\r\n", "\n", $po);
+		}
 		$this->assertPattern('/' . preg_quote($po, '/') . '/', $result);
 	}
 

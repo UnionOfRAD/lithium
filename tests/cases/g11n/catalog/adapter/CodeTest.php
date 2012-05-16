@@ -162,7 +162,10 @@ EOD;
 		$this->assertEqual($expected, $result);
 
 		$expected = "escaping\n\t4";
-		$result = $results["escaping\n\t4"]['ids']['singular'];
+		if ($this->_isEolCrLf()) {
+			$expected = "escaping\r\n\t4";
+		}
+		$result = $results[$expected]['ids']['singular'];
 		$this->assertEqual($expected, $result);
 	}
 
