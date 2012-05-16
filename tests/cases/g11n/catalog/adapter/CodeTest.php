@@ -161,18 +161,11 @@ EOD;
 		$result = $results['escaping\r\n3']['ids']['singular'];
 		$this->assertEqual($expected, $result);
 
-		$expected = <<<'test'
-escaping
-	4
-test;
-		// due to autocrlf true on Windows the following fails:
-//		$expected = "escaping\n\t4";
-		$result = null;
-		if (isset($results["escaping\n\t4"])) {
-			$result = $results["escaping\n\t4"]['ids']['singular'];
-		} else {
-			$result = $results["escaping\r\n\t4"]['ids']['singular'];
+		$expected = "escaping\n\t4";
+		if ($this->_isEolCrLf()) {
+			$expected = "escaping\r\n\t4";
 		}
+		$result = $results[$expected]['ids']['singular'];
 		$this->assertEqual($expected, $result);
 	}
 

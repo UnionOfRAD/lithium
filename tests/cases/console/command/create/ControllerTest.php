@@ -67,7 +67,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = $model->invokeMethod('_use', array($this->request));
 		$this->assertEqual($expected, $result);
 	}
-
+ 
 	public function testRun() {
 		$this->request->params += array(
 			'command' => 'create', 'action' => 'controller',
@@ -131,12 +131,7 @@ class PostsController extends \lithium\action\Controller {
 	}
 }
 test;
-		/* empty lines before and after are done via \n\n
-		 * adding empty lines above results in failing tests 
-		 * on environments (esp. windows) where autocrlf is set to true
-		 */
-		$expected = "\n\n" . $expected . "\n\n";
-		$replace = array("<?php", "?>");
+		$replace = array("<?php\n\n", "\n\n?>");
 		$result = str_replace($replace, '',
 			file_get_contents($this->_testPath . '/create_test/controllers/PostsController.php')
 		);
