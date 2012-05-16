@@ -1060,6 +1060,26 @@ class Unit extends \lithium\core\Object {
 		restore_error_handler();
 		return !$failed;
 	}
+	
+	/**
+	 * Provides how end-of-lines (EOL) are represented, either CRLF or LF
+	 *
+	 * The distinctions is required for some string testing, and
+	 * is caused by platform differences between Windows and Unix/Linux.
+	 * The git config core.autocrlf also plays a role how EOLs are handled
+	 * between the working copy and the repository; simply testing on which
+	 * platform the test is run is thus not sufficient.
+	 */
+	protected function _Eol() {
+		return <<<EMPTYLINE
+
+
+EMPTYLINE;
+	}
+	
+	protected function _isEolCrLf() {
+		return $this->_Eol() == "\r\n";
+	}
 }
 
 ?>

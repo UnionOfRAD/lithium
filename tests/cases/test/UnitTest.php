@@ -659,13 +659,35 @@ class UnitTest extends \lithium\test\Unit {
 		$result = $this->compare('identical', array(), array(null));
 		$this->assertEqual($expected, $result);
 	}
-
+	
+	public function testEol() {
+		$expected = '/^\r?\n$/m';
+		$result = $this->_Eol();
+		$this->assertPattern($expected, $result);
+		
+		$result = <<<MULTILINE
+line 1
+line 2
+MULTILINE;
+	
+		if ($this->_Eol() == "\r\n") {
+			$this->assertTrue($this->_isEolCrLf());
+			$expected = "line 1\r\nline 2";
+			$this->assertEqual($expected, $result);
+		} else {
+			$this->assertFalse($this->_isEolCrLf());
+			$expected = "line 1\nline 2";
+			$this->assertEqual($expected, $result);
+		}
+		
+	}
+	
 	/**
 	 * Always keep second to last.
 	 *
 	 */
 	public function testResults() {
-		$expected = 108;
+		$expected = 111;
 		$result = count($this->results());
 		$this->assertEqual($expected, $result);
 	}
@@ -695,7 +717,7 @@ class UnitTest extends \lithium\test\Unit {
 			'testExceptionCatching', 'testErrorHandling', 'testAssertObjects',
 			'testAssertArrayIdentical', 'testCompareIdenticalArray','testCompareIdenticalMixedArray',
 			'testCompareEqualNullArray', 'testCompareIdenticalNullArray',
-			'testResults', 'testTestMethods'
+			'testEol', 'testResults', 'testTestMethods'
 		);
 		$this->assertIdentical($expected, $this->methods());
 	}
