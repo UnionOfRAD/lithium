@@ -37,9 +37,11 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @param string $group If set, this test group is run. If not set, a group test may
 	 *        also be run by passing the 'group' option to the $options parameter.
 	 * @param array $options Options array for the test run. Valid options are:
-	 *        - 'case': The fully namespaced test case to be run.
-	 *        - 'group': The fully namespaced test group to be run.
-	 *        - 'filters': An array of filters that the test output should be run through.
+	 *        - `'case'`: The fully namespaced test case to be run.
+	 *        - `'group'`: The fully namespaced test group to be run.
+	 *        - `'filters'`: An array of filters that the test output should be run through.
+	 *        - `'reporter'`: The reporter to use, defaults to `'console'`.
+	 *        - `'format'`: The format of the reporter template to use, defaults to `'txt'`.
 	 * @return array A compact array of the title, an array of the results, as well
 	 *         as an additional array of the results after the $options['filters']
 	 *         have been applied.
@@ -49,7 +51,8 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$defaults = array(
 			'title' => $group,
 			'filters' => array(),
-			'reporter' => 'text'
+			'reporter' => 'console',
+			'format' => 'txt'
 		);
 		$options += $defaults;
 		$isCase = is_string($group) && preg_match('/Test$/', $group);

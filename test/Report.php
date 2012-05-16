@@ -103,16 +103,18 @@ class Report extends \lithium\core\Object {
 	 * Construct Report Object
 	 *
 	 * @param array $config Options array for the test run. Valid options are:
-	 *        - 'group': The test group with items to be run.
-	 *		  - 'filters': An array of filters that the test output should be run through.
+	 *        - `'group'`: The test group with items to be run.
+	 *        - `'filters'`: An array of filters that the test output should be run through.
+	 *        - `'reporter'`: The reporter to use, defaults to `'console'`.
+	 *        - `'format'`: The format of the reporter template to use, defaults to `'txt'`.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'title' => null,
 			'group' => null,
 			'filters' => array(),
-			'format' => 'txt',
-			'reporter' => 'console'
+			'reporter' => 'console',
+			'format' => 'txt'
 		);
 		parent::__construct($config + $defaults);
 	}
