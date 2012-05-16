@@ -991,6 +991,11 @@ class Unit extends \lithium\core\Object {
 	 * Removes everything from `resources/tmp/tests` directory.
 	 * Call from inside of your test method or `tearDown()`.
 	 *
+	 * If the file to unlink is readonly, it throws a exception (Permission denied) on Windows.
+	 * Solution: remove readonly flag and try again.
+	 * See: http://stringoftheseus.com/blog/2010/12/22/php-unlink-permisssion-denied-error-on-windows/
+	 * Note: this will still report an exception, but the test will be ok. Try/catch won't solve it.
+	 *
 	 * @param string $path path to directory of contents to remove
 	 *               if first character is NOT `/` prepend `LITHIUM_APP_PATH/resources/tmp/`
 	 * @return void
@@ -1012,10 +1017,6 @@ class Unit extends \lithium\core\Object {
 			}
 			
 			if (!(	($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname()))) {
-				// if file to unlink is readonly, it throws a exception (Permission denied) on Windows
-				// solution: remove readonly flag and try again
-				// see: http://stringoftheseus.com/blog/2010/12/22/php-unlink-permisssion-denied-error-on-windows/
-				// note: this will still report an exception, but the test will be ok. Try/catch won't solve it
 				@chmod($item->getPathname(), 0777);
 				($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname());
 			}
