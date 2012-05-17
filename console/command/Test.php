@@ -61,28 +61,70 @@ class Test extends \lithium\console\Command {
 	 */
 	protected function _init() {
 		parent::_init();
-		$self = $this;
-		$this->_handlers += array(
-			'txt' => function($runner, $path) use ($self) {
-				$message = sprintf('Running test(s) in `%s`... ', ltrim($path, '\\'));
-				$self->header('Test');
-				$self->out($message, array('nl' => false));
+		$command = $this;
 
-				$report = $runner();
-				$self->out('done.', 2);
-				$self->out('{:heading}Results{:end}', 0);
-				$self->out($report->render('stats', $report->stats()));
+		$this->_handlers += array(
+			'txt' => function($runner, $path) use ($command) {
+				$command->header('Test');
+				$command->out(null, 1);
+
+				$command->out('{:heading}Configuration{:end}');
+				$command->out('Namespace   ' . trim($path, '\\'));
+				$command->out('Filters     ' . $command->filters, 2);
+
+				$command->out('{:heading}Run{:end}');
+
+				$i = 0;
+				$columns = 60;
+
+				$report = $runner(array(
+					'progress' => function($self, $params, $chain) use ($command, &$i, $columns) {
+						$return = $chain->next($self, $params, $chain);
+
+						foreach ($self->results() as $result) {
+							$skip = isset($result['method']);
+							$skip = $skip && $result['method'] != $params['method'];
+
+							if ($skip) {
+								continue;
+							}
+
+							switch ($result['result']) {
+								case 'pass':
+									$command->out('.', false);
+								break;
+								case 'fail':
+									$command->out('{:red}F{:end}', false);
+								break;
+								case 'skip':
+									$command->out('{:cyan}S{:end}', false);
+								break;
+								default:
+									$command->out('{:yellow}?{:end}', false);
+								break;
+							}
+
+							$i++;
+							if ($i % $columns === 0) {
+								$this->out();
+							}
+						}
+						return $return;
+					}
+				));
+				$this->out('', 2);
+				$command->out('{:heading}Results{:end}', 0);
+				$command->out($report->render('stats', $report->stats()));
 
 				foreach ($report->filters() as $filter => $options) {
 					$data = $report->results['filters'][$filter];
-					$self->out($report->render($options['name'], compact('data')));
+					$command->out($report->render($options['name'], compact('data')));
 				}
 
-				$self->hr();
-				$self->nl();
+				$command->nl();
 				return $report;
 			},
-			'json' => function($runner, $path) use ($self) {
+			'json' => function($runner, $path) use ($command) {
 				$report = $runner();
 
 				if ($results = $report->filters()) {
@@ -92,7 +134,7 @@ class Test extends \lithium\console\Command {
 						$filters[$options['name']] = $report->results['filters'][$filter];
 					}
 				}
-				$self->out($report->render('stats', $report->stats() + compact('filters')));
+				$command->out($report->render('stats', $report->stats() + compact('filters')));
 				return $report;
 			}
 		);
@@ -137,10 +179,9 @@ class Test extends \lithium\console\Command {
 		}
 		$filters = $this->filters ? array_map('trim', explode(',', $this->filters)) : array();
 		$params = compact('filters') + array('reporter' => 'console', 'format' => $this->format);
-
-		$runner = function() use ($path, $params) {
+		$runner = function($options) use ($path, $params) {
 			error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
-			return Dispatcher::run($path, $params);
+			return Dispatcher::run($path, $params + $options);
 		};
 		$report = $handlers[$this->format]($runner, $path);
 		$stats = $report->stats();
