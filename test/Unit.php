@@ -1070,6 +1070,9 @@ class Unit extends \lithium\core\Object {
 	 * The git config core.autocrlf also plays a role how EOLs are handled
 	 * between the working copy and the repository; simply testing on which
 	 * platform the test is run is thus not sufficient.
+	 * 
+	 * The usage of PHP_EOL does not suffice, as this only takes the platform
+	 * into account and not how the files emerge from a git repository.
 	 */
 	protected function _Eol() {
 		return <<<EMPTYLINE
