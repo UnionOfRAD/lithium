@@ -218,15 +218,27 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Writes a header to the output stream.
+	 * Writes a header to the output stream. In addition to the actual text,
+	 * horizontal lines before and afterwards are written. The lines will have
+	 * the same length as the text. This behavior can be modified by providing
+	 * the length of lines as a second paramerter.
 	 *
-	 * In addition to the actual text, horizontal lines before and afterwards are written.
+	 * Given the text `'Lithium'` this generates following output:
+	 *
+	 * {{{
+	 * -------
+	 * Lihtium
+	 * -------
+	 * }}}
 	 *
 	 * @param string $text The heading text.
-	 * @param integer $line The length of the line. Defaults to 80.
+	 * @param integer $line The length of the line. Defaults to the length of text.
 	 * @return void
 	 */
-	public function header($text, $line = 80) {
+	public function header($text, $line = null) {
+		if (!$line) {
+			$line = strlen($text);
+		}
 		$this->hr($line);
 		$this->out($text, 1, 'heading');
 		$this->hr($line);
