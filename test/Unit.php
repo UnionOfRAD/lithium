@@ -691,7 +691,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param string $method The name of the test method to run.
 	 * @param array $options
-	 * @return mixed
+	 * @return array Results of test runs - so far.
 	 * @filter
 	 */
 	protected function _runTestMethod($method, $options) {
@@ -703,7 +703,7 @@ class Unit extends \lithium\core\Object {
 		}
 		$params = compact('options', 'method');
 
-		$passed = $this->_filter(__CLASS__ . '::run', $params, function($self, $params, $chain) {
+		$this->_filter(__CLASS__ . '::run', $params, function($self, $params, $chain) {
 			try {
 				$method = $params['method'];
 				$lineFlag = __LINE__ + 1;
@@ -726,7 +726,7 @@ class Unit extends \lithium\core\Object {
 		$this->_expected = array();
 		$this->tearDown();
 
-		return $passed;
+		return $this->_results;
 	}
 
 	/**
