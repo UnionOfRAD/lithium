@@ -102,8 +102,8 @@ class Test extends \lithium\console\Command {
 						$command->out(sprintf(
 							'[%s] %s::%s()',
 							$colorize(sprintf('%9s', $result['result'])),
-							$result['class'],
-							$result['method']
+							isset($result['class']) ? $result['class'] : '??',
+							isset($result['method']) ? $result['method'] : '??'
 						));
 					};
 				} else {
