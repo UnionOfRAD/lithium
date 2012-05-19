@@ -53,7 +53,7 @@ class HelpTest extends \lithium\test\Unit {
 		$result = $command->run('test');
 		$this->assertTrue($result);
 
-		$expected = "li3 test [--filters=<string>] [--format=<string>] [<path>]";
+		$expected = "li3 test [--filters=<string>] [--format=<string>] [--verbose] [<path>]";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
