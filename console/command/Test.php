@@ -46,6 +46,13 @@ class Test extends \lithium\console\Command {
 	public $format = 'txt';
 
 	/**
+	 * Enable verbose output especially for the `txt` format.
+	 *
+	 * @var boolean
+	 */
+	public $verbose = false;
+
+	/**
 	 * An array of closures, mapped by type, which are set up to handle different test output
 	 * formats.
 	 *
@@ -70,44 +77,57 @@ class Test extends \lithium\console\Command {
 
 				$command->out('{:heading}Run{:end}');
 
-				$i = 0;
-				$columns = 60;
-
-				$report = $runner(array(
-					'progress' => function($self, $params, $chain) use ($command, &$i, $columns) {
-						$return = $chain->next($self, $params, $chain);
-
-						foreach ($self->results() as $result) {
-							$skip = isset($result['method']);
-							$skip = $skip && $result['method'] != $params['method'];
-
-							if ($skip) {
-								continue;
-							}
-
-							switch ($result['result']) {
-								case 'pass':
-									$command->out('.', false);
-								break;
-								case 'fail':
-									$command->out('{:red}F{:end}', false);
-								break;
-								case 'skip':
-									$command->out('{:cyan}S{:end}', false);
-								break;
-								default:
-									$command->out('{:yellow}?{:end}', false);
-								break;
-							}
-
-							$i++;
-							if ($i % $columns === 0) {
-								$command->out();
-							}
-						}
-						return $return;
+				$colorize = function($result) {
+					switch (trim($result)) {
+						case '.':
+							return $result;
+						case 'pass':
+							return "{:green}{$result}{:end}";
+						case 'F':
+						case 'fail':
+							return "{:red}{$result}{:end}";
+						case 'S':
+						case 'skip':
+							return "{:cyan}{$result}{:end}";
+						default:
+							return "{:yellow}{$result}{:end}";
 					}
-				));
+				};
+
+				if ($command->verbose) {
+					$reporter = function($result) use ($command, $colorize) {
+						$command->out(sprintf(
+							'[%s] %s::%s()',
+							$colorize(sprintf('%7s', $result['result'])),
+							$result['class'],
+							$result['method']
+						));
+					};
+				} else {
+					$i = 0;
+					$columns = 60;
+
+					$reporter = function($result) use ($command, &$i, $columns, $colorize) {
+						$shorten = array('fail', 'skip');
+
+						if ($result['result'] == 'pass') {
+							$symbol = '.';
+						} elseif (in_array($result['result'], $shorten)) {
+							$symbol = strtoupper($result['result'][0]);
+						} else {
+							$symbol = '?';
+						}
+						$command->out($colorize($symbol), false);
+
+						$i++;
+						if ($i % $columns === 0) {
+							$command->out();
+						}
+					};
+				}
+
+				$report = $runner(compact('reporter'));
+
 				$command->out(null, 2);
 				$command->out('{:heading}Results{:end}', 0);
 				$command->out($report->render('stats', $report->stats()));
@@ -174,7 +194,7 @@ class Test extends \lithium\console\Command {
 			return false;
 		}
 		$filters = $this->filters ? array_map('trim', explode(',', $this->filters)) : array();
-		$params = compact('filters') + array('reporter' => 'console', 'format' => $this->format);
+		$params = compact('filters') + array('format' => $this->format);
 		$runner = function($options = array()) use ($path, $params) {
 			error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
 			return Dispatcher::run($path, $params + $options);
