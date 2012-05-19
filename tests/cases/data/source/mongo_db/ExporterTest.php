@@ -26,6 +26,10 @@ class ExporterTest extends \lithium\test\Unit {
 		'title' => array('type' => 'string'),
 		'tags' => array('type' => 'string', 'array' => true),
 		'comments' => array('type' => 'MongoId'),
+        'accounts' => array('type' => 'object', 'array' => true),
+        'accounts._id' => array('type' => 'id'),
+        'accounts.name' => array('type' => 'string'),
+        'accounts.created' => array('type' => 'date'),
 		'authors' => array('type' => 'MongoId', 'array' => true),
 		'created' => array('type' => 'MongoDate'),
 		'modified' => array('type' => 'datetime'),
@@ -295,6 +299,16 @@ class ExporterTest extends \lithium\test\Unit {
 			'comments' => array(
 				"4c8f86167675abfabdbe0300", "4c8f86167675abfabdbf0300", "4c8f86167675abfabdc00300"
 			),
+            'accounts' => array(array(
+                    '_id' => "4fb6e2dd3e91581fe6e75736",
+                    'name' => 'Foo',
+                    'created' => time()
+                ),array(
+                    '_id' => "4fb6e2df3e91581fe6e75737",
+                    'name' => 'Bar',
+                    'created' => time()
+                )                
+            ),
 			'empty_array' => array(),
 			'authors' => '4c8f86167675abfabdb00300',
 			'created' => time(),
@@ -321,7 +335,20 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertTrue($result['comments'][2] instanceof MongoId);
 		$this->assertEqual('4c8f86167675abfabdbe0300', (string) $result['comments'][0]);
 		$this->assertEqual('4c8f86167675abfabdbf0300', (string) $result['comments'][1]);
-		$this->assertEqual('4c8f86167675abfabdc00300', (string) $result['comments'][2]);
+		$this->assertEqual('4c8f86167675abfabdc00300', (string) $result['comments'][2]);       
+
+        $this->assertTrue($result['accounts'] instanceof DocumentArray);
+		$this->assertEqual(2, count($result['accounts']));
+        
+        $this->assertTrue($result['accounts'][0]['_id'] instanceof MongoId);
+        $this->assertEqual('4fb6e2dd3e91581fe6e75736', (string) $result['accounts'][0]['_id']);        
+        $this->assertTrue($result['accounts'][1]['_id'] instanceof MongoId);
+        $this->assertEqual('4fb6e2df3e91581fe6e75737', (string) $result['accounts'][1]['_id']);  
+        
+        $this->assertTrue($result['accounts'][0]['created'] instanceof MongoDate);
+		$this->assertTrue($result['accounts'][0]['created']->sec > 0);
+        $this->assertTrue($result['accounts'][1]['created'] instanceof MongoDate);
+		$this->assertTrue($result['accounts'][1]['created']->sec > 0);
 
 		$this->assertEqual($data['comments'], $result['comments']->data());
 		$this->assertEqual(array('test'), $result['tags']->data());
