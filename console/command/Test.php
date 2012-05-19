@@ -86,6 +86,9 @@ class Test extends \lithium\console\Command {
 						case 'F':
 						case 'fail':
 							return "{:red}{$result}{:end}";
+						case 'E':
+						case 'exception':
+							return "{:purple}{$result}{:end}";
 						case 'S':
 						case 'skip':
 							return "{:cyan}{$result}{:end}";
@@ -98,7 +101,7 @@ class Test extends \lithium\console\Command {
 					$reporter = function($result) use ($command, $colorize) {
 						$command->out(sprintf(
 							'[%s] %s::%s()',
-							$colorize(sprintf('%7s', $result['result'])),
+							$colorize(sprintf('%9s', $result['result'])),
 							$result['class'],
 							$result['method']
 						));
@@ -108,7 +111,7 @@ class Test extends \lithium\console\Command {
 					$columns = 60;
 
 					$reporter = function($result) use ($command, &$i, $columns, $colorize) {
-						$shorten = array('fail', 'skip');
+						$shorten = array('fail', 'skip', 'exception');
 
 						if ($result['result'] == 'pass') {
 							$symbol = '.';
