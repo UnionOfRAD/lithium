@@ -281,21 +281,6 @@ class Model extends \lithium\core\StaticObject {
 	protected $_finders = array();
 
 	/**
-	 * List of base model classes. Any classes which are declared to be base model classes (i.e.
-	 * extended but not directly interacted with) must be present in this list. Models can declare
-	 * themselves as base models using the following code:
-	 * {{{
-	 * public static function __init() {
-	 * 	static::_isBase(__CLASS__, true);
-	 * 	parent::__init();
-	 * }
-	 * }}}
-	 *
-	 * @var array
-	 */
-	protected static $_baseClasses = array(__CLASS__ => true);
-
-	/**
 	 * Stores all custom instance methods created by `Model::instanceMethods`.
 	 *
 	 * @var array
@@ -319,10 +304,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @param array $options Meta-information for this model, such as the connection.
 	 */
 	public static function config(array $options = array()) {
-		if (static::_isBase($class = get_called_class())) {
-			return;
-		}
-				
+		$class = get_called_class();		
 		if (!isset(static::$_instances[$class])) {
 			$self = static::$_instances[$class] = new $class();
 		} else {
@@ -1112,20 +1094,6 @@ class Model extends \lithium\core\StaticObject {
 				static::bind($type, $name, (array) $config);
 			}
 		}
-	}
-
-	/**
-	 * Helper function for setting/getting base class settings.
-	 *
-	 * @param string $class Classname.
-	 * @param boolean $set If `true`, then the `$class` will be set.
-	 * @return boolean Success.
-	 */
-	protected static function _isBase($class = null, $set = false) {
-		if ($set) {
-			static::$_baseClasses[$class] = true;
-		}
-		return isset(static::$_baseClasses[$class]);
 	}
 
 	/**

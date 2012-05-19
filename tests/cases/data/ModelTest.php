@@ -54,11 +54,12 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testClassInitialization() {
-		$expected = MockPost::instances();
 		MockPost::config();
+		$expected = MockPost::instances();
 		$this->assertEqual($expected, MockPost::instances());
 
 		Model::config();
+		$expected = MockPost::instances();
 		$this->assertEqual($expected, MockPost::instances());
 
 		$this->assertEqual('mock_posts', MockPost::meta('source'));
