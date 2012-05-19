@@ -40,8 +40,7 @@ class ReportTest extends \lithium\test\Unit {
 				array('data' => array('lithium\tests\mocks\test\MockFilterClassTest'))
 			),
 			'filters' => array("Complexity" => ""),
-			'format' => 'html',
-			'reporter' => 'html'
+			'format' => 'html'
 		));
 
 		$expected = array('lithium\test\filter\Complexity' => array(
@@ -67,10 +66,9 @@ class ReportTest extends \lithium\test\Unit {
 
 	public function testRender() {
 		$report = new Report(array(
-			'title' => 'lithium\tests\mocks\test\MockUnitTest',
-			'group' => new Group(array('data' => array('lithium\tests\mocks\test\MockUnitTest'))),
-			'format' => 'html',
-			'reporter' => 'html'
+			'title' => '\lithium\tests\mocks\test\MockUnitTest',
+			'group' => new Group(array('data' => array('\lithium\tests\mocks\test\MockUnitTest'))),
+			'format' => 'html'
 		));
 		$report->run();
 
