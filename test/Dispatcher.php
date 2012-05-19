@@ -52,8 +52,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 			'title' => $group,
 			'filters' => array(),
 			'format' => 'txt',
-			'reporter' => null,
-			'progress' => null
+			'reporter' => null
 		);
 		$options += $defaults;
 		$isCase = is_string($group) && preg_match('/Test$/', $group);

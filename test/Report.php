@@ -113,8 +113,7 @@ class Report extends \lithium\core\Object {
 			'group' => null,
 			'filters' => array(),
 			'format' => 'txt',
-			'reporter' => null,
-			'progress' => null
+			'reporter' => null
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -136,10 +135,6 @@ class Report extends \lithium\core\Object {
 	 */
 	public function run() {
 		$tests = $this->group->tests();
-
-		if (is_callable($this->_config['progress'])) {
-			$tests->invoke('applyFilter', array('run', $this->_config['progress']));
-		}
 
 		foreach ($this->filters() as $filter => $options) {
 			$this->results['filters'][$filter] = array();
