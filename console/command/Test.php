@@ -68,10 +68,6 @@ class Test extends \lithium\console\Command {
 				$command->header('Test');
 				$command->out(null, 1);
 
-				$command->out('{:heading}Configuration{:end}');
-				$command->out('Namespace   ' . trim($path, '\\'));
-				$command->out('Filters     ' . $command->filters, 2);
-
 				$command->out('{:heading}Run{:end}');
 
 				$i = 0;
