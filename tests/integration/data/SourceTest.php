@@ -239,43 +239,6 @@ class SourceTest extends \lithium\test\Integration {
 		$this->assertEqual($this->_classes['employees'], $result->data('to'));
 	}
 
-	public function testRelationshipQuerying() {
-		$connection = $this->_connection;
-		$message = "Relationships are not supported by this adapter.";
-		$this->skipIf(!$connection::enabled('relationships'), $message);
-
-		foreach ($this->companiesData as $data) {
-			Companies::create($data)->save();
-		}
-		$stuffMart = Companies::findFirstByName('StuffMart');
-		$maAndPas = Companies::findFirstByName('Ma \'n Pa\'s Data Warehousing & Bait Shop');
-
-		$this->assertEqual($this->_classes['employees'], $stuffMart->employees->model());
-		$this->assertEqual($this->_classes['employees'], $maAndPas->employees->model());
-
-		foreach (array('Mr. Smith', 'Mr. Jones', 'Mr. Brown') as $name) {
-			$stuffMart->employees[] = Employees::create(compact('name'));
-		}
-		$expected = Companies::key($stuffMart) + array(
-			'name' => 'StuffMart', 'active' => true, 'employees' => array(
-				array('name' => 'Mr. Smith'),
-				array('name' => 'Mr. Jones'),
-				array('name' => 'Mr. Brown')
-			)
-		);
-		$this->assertEqual($expected, $stuffMart->data());
-		$this->assertTrue($stuffMart->save());
-		$this->assertEqual('Smith', $stuffMart->employees[0]->lastName());
-
-		$stuffMartReloaded = Companies::findFirstByName('StuffMart');
-		$this->assertEqual('Smith', $stuffMartReloaded->employees[0]->lastName());
-
-		foreach (array('Ma', 'Pa') as $name) {
-			$maAndPas->employees[] = Employees::create(compact('name'));
-		}
-		$maAndPas->save();
-	}
-
 	public function testAbstractTypeHandling() {
 		$key = Companies::meta('key');
 
