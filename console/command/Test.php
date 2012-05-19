@@ -102,13 +102,13 @@ class Test extends \lithium\console\Command {
 
 							$i++;
 							if ($i % $columns === 0) {
-								$this->out();
+								$command->out();
 							}
 						}
 						return $return;
 					}
 				));
-				$this->out('', 2);
+				$command->out(null, 2);
 				$command->out('{:heading}Results{:end}', 0);
 				$command->out($report->render('stats', $report->stats()));
 
