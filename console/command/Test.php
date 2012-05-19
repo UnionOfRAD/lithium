@@ -19,7 +19,7 @@ use lithium\test\Dispatcher;
 class Test extends \lithium\console\Command {
 
 	/**
-	 * Filters.
+	 * List of filters to apply before/during/after test run, separated by commas.
 	 *
 	 * For example:
 	 * {{{
