@@ -11,7 +11,6 @@ namespace lithium\analysis\logger\adapter;
 use lithium\util\Inflector;
 use lithium\core\NetworkException;
 use lithium\core\Libraries;
-use Closure;
 
 /**
  * The `Growl` logger implements support for the Growl notification system for Mac OS X.
@@ -125,7 +124,7 @@ class Growl extends \lithium\core\Object {
 	 * @param string $message Message to be shown.
 	 * @param array $options Any options that are passed to the `notify()` method. See the
 	 *              `$options` parameter of `notify()`.
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return \Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($priority, $message, array $options = array()) {
 		$_self =& $this;

@@ -8,8 +8,6 @@
 
 namespace lithium\util\collection;
 
-use Closure;
-
 /**
  * The `Filters` class is the basis of Lithium's method filtering system: an efficient way to enable
  * event-driven communication between classes without tight coupling and without depending on a
@@ -124,7 +122,7 @@ class Filters extends \lithium\util\Collection {
 	 *               be applied. The class name specified in `$class` **must** extend
 	 *               `StaticObject`, or else statically implement the `applyFilter()` method.
 	 * @param string $method The method to which the filter will be applied.
-	 * @param Closure $filter The filter to apply to the class method.
+	 * @param \Closure $filter The filter to apply to the class method.
 	 * @return void
 	 */
 	public static function apply($class, $method, $filter) {

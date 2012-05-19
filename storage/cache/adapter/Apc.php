@@ -19,7 +19,6 @@ if (!class_exists('\lithium\storage\cache\Adapter')) {
 	require_once LITHIUM_LIBRARY_PATH . '/lithium/storage/cache/Adapter.php';
 }
 
-use Closure;
 use lithium\storage\Cache;
 
 /**

@@ -170,7 +170,7 @@ class Html extends \lithium\template\Helper {
 	 *              you'd like to place them in the `<head />` along with your other scripts.
 	 *              - any other options specified are rendered as HTML attributes of the element.
 	 * @return string
-	 * @filter This method can be filtered.
+	 * @filter
 	 */
 	public function script($path, array $options = array()) {
 		$defaults = array('inline' => true);
@@ -215,7 +215,7 @@ class Html extends \lithium\template\Helper {
 	 *              defined in `Html::$_strings`.
 	 *              - any other options specified are rendered as HTML attributes of the element.
 	 * @return string CSS <link /> or <style /> tag, depending on the type of link.
-	 * @filter This method can be filtered.
+	 * @filter
 	 */
 	public function style($path, array $options = array()) {
 		$defaults = array('type' => 'stylesheet', 'inline' => true);
@@ -255,7 +255,7 @@ class Html extends \lithium\template\Helper {
 	 * @param string $tag the name of a key in `$_strings`
 	 * @param array $options the options required by `$_strings[$tag]`
 	 * @return mixed a string if successful, otherwise `null`
-	 * @filter This method can be filtered.
+	 * @filter
 	 */
 	public function head($tag, array $options) {
 		if (!isset($this->_strings[$tag])) {
@@ -282,7 +282,7 @@ class Html extends \lithium\template\Helper {
 	 *               as an external url used as the `src` attribute.
 	 * @param array $options Array of HTML attributes.
 	 * @return string Returns a formatted `<img />` tag.
-	 * @filter This method can be filtered.
+	 * @filter
 	 */
 	public function image($path, array $options = array()) {
 		$defaults = array('alt' => '');

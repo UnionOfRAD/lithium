@@ -106,31 +106,41 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual("{Model}.{name name}", $result);
 	}
 
-	public function testValueWithSchema() {
+	public function testNullValueWithSchemaFormatter() {
 		$result = $this->_db->value(null);
 		$this->assertIdentical('NULL', $result);
+	}
 
+	public function testStringValueWithSchemaFormatter() {
 		$result = $this->_db->value('string', array('type' => 'string'));
 		$this->assertEqual("'string'", $result);
 
+		$result = $this->_db->value('1', array('type' => 'string'));
+		$this->assertIdentical("'1'", $result);
+	}
+
+	public function testBooleanValueWithSchemaFormatter() {
 		$result = $this->_db->value('true', array('type' => 'boolean'));
 		$this->assertIdentical(1, $result);
+	}
 
+	public function testNumericValueWithSchemaFormatter() {
 		$result = $this->_db->value('1', array('type' => 'integer'));
 		$this->assertIdentical(1, $result);
 
 		$result = $this->_db->value('1.1', array('type' => 'float'));
 		$this->assertIdentical(1.1, $result);
+	}
 
-		$result = $this->_db->value('1', array('type' => 'string'));
-		$this->assertIdentical("'1'", $result);
-
+	public function testObjectValueWithSchemaFormatter() {
 		$result = $this->_db->value((object) 'REGEXP "^fo$"');
 		$this->assertIdentical('REGEXP "^fo$"', $result);
 
 		$result = $this->_db->value((object) 'CURRENT_TIMESTAMP', array('type' => 'timestamp'));
 		$this->assertIdentical('CURRENT_TIMESTAMP', $result);
+	}
 
+	public function testDateTimeValueWithSchemaFormatter() {
 		$result = $this->_db->value('2012-05-25 22:44:00', array('type' => 'timestamp'));
 		$this->assertIdentical("'2012-05-25 22:44:00'", $result);
 
@@ -174,13 +184,17 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertPattern("/^'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'/", $result);
 	}
 
-	public function testValueByIntrospect() {
+	public function testStringValueByIntrospection() {
 		$result = $this->_db->value("string");
 		$this->assertIdentical("'string'", $result);
+	}
 
+	public function testBooleanValueByIntrospection() {
 		$result = $this->_db->value(true);
 		$this->assertIdentical(1, $result);
+	}
 
+	public function testNumericValueByIntrospection() {
 		$result = $this->_db->value('1');
 		$this->assertIdentical(1, $result);
 

@@ -165,7 +165,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *
 	 * @param string $model The fully-name-spaced class name of the model object making the request.
 	 * @return array Returns an array of sources to which models can connect.
-	 * @filter This method can be filtered.
+	 * @filter
 	 */
 	public function sources($model = null) {
 		$_config = $this->_config;
@@ -201,7 +201,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *         array keys are the available fields, and the values are arrays describing each
 	 *         field, containing the following keys:
 	 *         - `'type'`: The field type name
-	 * @filter This method can be filtered.
+	 * @filter
 	 */
 	public function describe($entity, $fields = array(), array $meta = array()) {
 		$schema = $this->_config['schema'];

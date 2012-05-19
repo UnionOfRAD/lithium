@@ -147,7 +147,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @return boolean `true` on successful cache write, `false` otherwise. When writing
 	 *                 multiple items and an error occurs writing any of the items the
 	 *                 whole operation fails and this method will return `false`.
-	 * @filter This method may be filtered.
+	 * @filter
 	 */
 	public static function write($name, $key, $data = null, $expiry = null, array $options = array()) {
 		$options += array('conditions' => null, 'strategies' => true);
@@ -218,7 +218,7 @@ class Cache extends \lithium\core\Adaptable {
 	 *               multiple keys a results array is returned mapping keys to
 	 *               retrieved values. Keys where the value couldn't successfully
 	 *               been read will not be contained in the results array.
-	 * @filter This method may be filtered.
+	 * @filter
 	 */
 	public static function read($name, $key, array $options = array()) {
 		$options += array('conditions' => null, 'strategies' => true, 'write' => null);
@@ -285,7 +285,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @return boolean `true` on successful cache delete, `false` otherwise. When deleting
 	 *                 multiple items and an error occurs deleting any of the items the
 	 *                 whole operation fails and this method will return `false`.
-	 * @filter This method may be filtered.
+	 * @filter
 	 */
 	public static function delete($name, $key, array $options = array()) {
 		$options += array('conditions' => null, 'strategies' => true);
@@ -323,7 +323,7 @@ class Cache extends \lithium\core\Adaptable {
 	 *              - `'conditions'`: A function or item that must return or evaluate to
 	 *                                `true` in order to continue operation.
 	 * @return integer|boolean Item's new value on successful increment, false otherwise.
-	 * @filter This method may be filtered.
+	 * @filter
 	 */
 	public static function increment($name, $key, $offset = 1, array $options = array()) {
 		$options += array('conditions' => null);
@@ -355,7 +355,7 @@ class Cache extends \lithium\core\Adaptable {
 	 *              - `'conditions'`: A function or item that must return or evaluate to
 	 *                                `true` in order to continue operation.
 	 * @return integer|boolean Item's new value on successful decrement, false otherwise.
-	 * @filter This method may be filtered.
+	 * @filter
 	 */
 	public static function decrement($name, $key, $offset = 1, array $options = array()) {
 		$options += array('conditions' => null);

@@ -223,7 +223,7 @@ class Report extends \lithium\core\Object {
 	public function render($template, $data = array()) {
 		$config = $this->_config;
 
-		if ($template === "stats" && !$data) {
+		if ($template === 'stats' && !$data) {
 			$data = $this->stats();
 		}
 		$template = Libraries::locate('test.templates', $template, array(

@@ -9,7 +9,6 @@
 namespace lithium\util;
 
 use COM;
-use Closure;
 use Exception;
 
 /**
@@ -48,7 +47,7 @@ class String {
 	 * A closure which, given a number of bytes, returns that amount of
 	 * random bytes.
 	 *
-	 * @var Closure
+	 * @var \Closure
 	 */
 	protected static $_source;
 
@@ -118,7 +117,7 @@ class String {
 	 * speaking, this fallback is inadequate, but good enough.)
 	 *
 	 * @see lithium\util\String::$_source
-	 * @return Closure Returns a closure containing a random number generator.
+	 * @return \Closure Returns a closure containing a random number generator.
 	 */
 	protected static function _source() {
 		switch (true) {

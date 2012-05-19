@@ -204,14 +204,15 @@ class Locale extends \lithium\core\StaticObject {
 	 */
 	public static function lookup($locales, $locale) {
 		$tags = static::decompose($locale);
-		$count = count($tags);
-		while ($count > 0) {
+
+		while (($count = count($tags)) > 0) {
 			if (($key = array_search(static::compose($tags), $locales)) !== false) {
 				return $locales[$key];
-			} elseif ($count === 1) {
-				foreach ($locales as $currentLocale) {
-					if (strpos($currentLocale, current($tags) . '_') === 0) {
-						return $currentLocale;
+			}
+			if ($count === 1) {
+				foreach ($locales as $current) {
+					if (strpos($current, current($tags) . '_') === 0) {
+						return $current;
 					}
 				}
 			}
@@ -219,7 +220,6 @@ class Locale extends \lithium\core\StaticObject {
 				return $locales[$key];
 			}
 			array_pop($tags);
-			$count = count($tags);
 		}
 	}
 
@@ -274,14 +274,11 @@ class Locale extends \lithium\core\StaticObject {
 				$result[$quality][] = $locale;
 			}
 		}
-
 		krsort($result);
-		$return = array();
 
-		foreach ($result as $locales) {
-			$return = array_merge($return, array_values($locales));
-		}
-		return $return;
+		return array_reduce($result, function($carry, $item) {
+			return array_merge($carry, array_values($item));
+		}, array());
 	}
 
 	/**

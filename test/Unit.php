@@ -19,7 +19,6 @@ use lithium\analysis\Debugger;
 use lithium\analysis\Inspector;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use Closure;
 
 /**
  * This is the base class for all test cases. Test are performed using an assertion method.
@@ -171,7 +170,8 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * Installs a temporary error handler that will convert regular errors to
 	 * exceptions in order to make both errors and exceptions be handled
-	 * in a unified way.
+	 * in a unified way. ErrorExceptions created like this, will get the
+	 * error's code as their severity. As this comes closest to their meaning.
 	 *
 	 * The error handler honors the PHP `error_level` and will not convert errors
 	 * to exceptions if they are masked by the `error_level`. This allows test
@@ -457,7 +457,7 @@ class Unit extends \lithium\core\Object {
 	 * @param mixed $expected A string indicating what the error text is expected to be.  This can
 	 *              be an exact string, a /-delimited regular expression, or true, indicating that
 	 *              any error text is acceptable.
-	 * @param Closure $closure A closure containing the code that should throw the exception.
+	 * @param \Closure $closure A closure containing the code that should throw the exception.
 	 * @param string $message
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
@@ -501,7 +501,7 @@ class Unit extends \lithium\core\Object {
 	 * @param mixed $expected A string indicating what the error text is not expected to be. This
 	 *              can be an exact string, a /-delimited regular expression, or true, indicating
 	 *              that any error text is acceptable.
-	 * @param Closure $closure A closure containing the code that should throw the exception.
+	 * @param \Closure $closure A closure containing the code that should throw the exception.
 	 * @param string $message
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */

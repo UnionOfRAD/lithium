@@ -10,7 +10,6 @@ namespace lithium\net\http;
 
 use lithium\util\Inflector;
 use lithium\net\http\RoutingException;
-use Closure;
 
 /**
  * The two primary responsibilities of the `Router` class are to generate URLs from parameter lists,
@@ -659,11 +658,11 @@ class Router extends \lithium\core\StaticObject {
 	 * the specified scope.
 	 *
 	 * @param string $name Name of the scope to use.
-	 * @param array $closure A closure to execute inside the scope.
+	 * @param \Closure $closure A closure to execute inside the scope.
 	 * @return mixed Returns the previous scope if if `$name` is not null and `$closure` is null,
 	 *         returns the default used scope if `$name` is null, otherwise returns `null`.
 	 */
-	public static function scope($name = null, Closure $closure = null) {
+	public static function scope($name = null, \Closure $closure = null) {
 		if ($name === null) {
 			return static::$_scope;
 		}

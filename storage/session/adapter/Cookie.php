@@ -11,7 +11,6 @@ namespace lithium\storage\session\adapter;
 use RuntimeException;
 use lithium\util\Set;
 use lithium\core\Libraries;
-use Closure;
 
 /**
  * A minimal adapter to interface with HTTP cookies.
@@ -82,7 +81,7 @@ class Cookie extends \lithium\core\Object {
 	 * Checks if a value has been set in the cookie.
 	 *
 	 * @param string $key Key of the entry to be checked.
-	 * @return Closure Function returning boolean `true` if the key exists, `false` otherwise.
+	 * @return \Closure Function returning boolean `true` if the key exists, `false` otherwise.
 	 */
 	public function check($key) {
 		$config = $this->_config;
@@ -98,7 +97,7 @@ class Cookie extends \lithium\core\Object {
 	 * @param null|string $key Key of the entry to be read. If $key is null, returns
 	 *        all cookie key/value pairs that have been set.
 	 * @param array $options Options array. Not used in this adapter.
-	 * @return Closure Function returning data in the session if successful, `null` otherwise.
+	 * @return \Closure Function returning data in the session if successful, `null` otherwise.
 	 */
 	public function read($key = null, array $options = array()) {
 		$config = $this->_config;
@@ -135,7 +134,7 @@ class Cookie extends \lithium\core\Object {
 	 * @param string $key Key of the item to be stored.
 	 * @param mixed $value The value to be stored.
 	 * @param array $options Options array.
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return \Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($key, $value = null, array $options = array()) {
 		$expire = (!isset($options['expire']) && empty($this->_config['expire']));
@@ -174,7 +173,7 @@ class Cookie extends \lithium\core\Object {
 	 *
 	 * @param string $key The key to be deleted from the cookie store.
 	 * @param array $options Options array.
-	 * @return Closure Function returning boolean `true` on successful delete, `false` otherwise.
+	 * @return \Closure Function returning boolean `true` on successful delete, `false` otherwise.
 	 */
 	public function delete($key, array $options = array()) {
 		$config = $this->_config;

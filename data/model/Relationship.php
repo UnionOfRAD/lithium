@@ -100,7 +100,7 @@ class Relationship extends \lithium\core\Object {
 	 *          other database-native value. If an array, maps fields from the related object
 	 *          either to fields elsewhere, or to arbitrary expressions. In either case, _the
 	 *          values specified here will be literally interpreted by the database_.
-	 *        - `'strategy'` _closure_: An anonymous function used by an instantiating class,
+	 *        - `'strategy'` _\Closure_: An anonymous function used by an instantiating class,
 	 *          such as a database object, to provide additional, dynamic configuration, after
 	 *          the `Relationship` instance has finished configuring itself.
 	 * @return void

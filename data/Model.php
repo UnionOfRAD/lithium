@@ -613,7 +613,8 @@ class Model extends \lithium\core\StaticObject {
 	 *        - `limit`: The maximum number of records to return.
 	 *        - `page`: For pagination of data.
 	 * @return mixed
-	 * @filter This method can be filtered.
+	 * @filter Allows to execute logic before queriny (i.e. for rewriting of $options)
+	 *         or after i.e. for caching results.
 	 */
 	public static function find($type, array $options = array()) {
 		$self = static::_object();
@@ -1237,7 +1238,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @param object $entity Entity to delete.
 	 * @param array $options Options.
 	 * @return boolean Success.
-	 * @filter
+	 * @filter Good for executing logic for i.e. invalidating cached results.
 	 */
 	public function delete($entity, array $options = array()) {
 		$params = compact('entity', 'options');
@@ -1387,8 +1388,8 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Iterates through relationship types to construct relation map.
 	 *
-	 * @return void
 	 * @todo See if this can be rewritten to be lazy.
+	 * @return void
 	 */
 	protected static function _relationsToLoad() {
 		try {

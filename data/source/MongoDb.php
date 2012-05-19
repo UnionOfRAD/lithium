@@ -133,7 +133,7 @@ class MongoDb extends \lithium\data\Source {
 	 *            more information. Defaults to `false`, meaning no persistent connection is made.
 	 *        - `'timeout'` _integer_: The number of milliseconds a connection attempt will wait
 	 *          before timing out and throwing an exception. Defaults to `100`.
-	 *        - `'schema'` _closure_: A closure or anonymous function which returns the schema
+	 *        - `'schema'` _\Closure_: A closure or anonymous function which returns the schema
 	 *          information for a model class. See the `$_schema` property for more information.
 	 *        - `'gridPrefix'` _string_: The default prefix for MongoDB's `chunks` and `files`
 	 *          collections. Defaults to `'fs'`.

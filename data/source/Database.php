@@ -411,6 +411,11 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Converts a given value into the proper type based on a given schema definition.
 	 *
+	 * Will bypass any formatters and casting - effectively forcing the engine "to keep its
+	 * hands off" - when `$value` is an object with the property `scalar` (created by casting
+	 * a scalar value to an object i.e. `(object) 'foo')`. This feature allows to construct
+	 * values or queries that are not (yet) supported by the engine.
+	 *
 	 * @see lithium\data\source\Database::schema()
 	 * @param mixed $value The value to be converted. Arrays will be recursively converted.
 	 * @param array $schema Formatted array from `lithium\data\source\Database::schema()`
@@ -467,11 +472,17 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Provide an associative array of Closures to be used as the "formatter" key inside of the
+	 * Provide an associative array of Closures to be used as the `'formatter'` key inside of the
 	 * `Database::$_columns` specification. Each Closure should return the appropriately quoted
-	 * or unquoted value and accept one or two parameters:
-	 *  - @param mixed $value to be formatted
-	 *  - @param mixed $format to apply to $value
+	 * or unquoted value and accept one or two parameters: `$format`, the format to apply to value
+	 * and `$value`, the value to be formatted.
+	 *
+	 * Example formatter function:
+	 * ```
+	 * function($format, $value) {
+	 *	return is_numeric($value) ? (integer) $value : false;
+	 * }
+	 * ```
 	 *
 	 * @see lithium\data\source\Database::$_columns
 	 * @see lithium\data\source\Database::_init()

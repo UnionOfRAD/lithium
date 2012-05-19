@@ -9,7 +9,6 @@
 namespace lithium\analysis\logger\adapter;
 
 use lithium\util\String;
-use Closure;
 
 /**
  * The `Cache` logger allows log messages to be written to cache configurations set up in
@@ -75,7 +74,7 @@ class Cache extends \lithium\core\Object {
 	 *
 	 * @param string $priority
 	 * @param string $message
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return \Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($priority, $message) {
 		$config = $this->_config + $this->_classes;

@@ -13,7 +13,6 @@ use lithium\util\String;
 use lithium\util\collection\Filters;
 use lithium\core\ConfigException;
 use lithium\core\ClassNotFoundException;
-use Closure;
 
 /**
  * Manages all aspects of class and file location, naming and mapping. Implements auto-loading for
@@ -269,7 +268,7 @@ class Libraries {
 	 *          `'Zend_'` or `'Solar_'`. If the library has no global prefix, set to `false`.
 	 *        - `'suffix'` _string_: Gets appended to the end of the file name. For example, most
 	 *          libraries end classes in `'.php'`, but some use `'.class.php'`, or `'.inc.php'`.
-	 *        - `'transform'` _closure_: Defines a custom way to transform a class name into its
+	 *        - `'transform'` _\Closure_: Defines a custom way to transform a class name into its
 	 *          corresponding file path.  Accepts either an array of two strings which are
 	 *          interpreted as the pattern and replacement for a regex, or an anonymous function,
 	 *          which receives the class name and library configuration arrays as parameters, and
@@ -719,7 +718,7 @@ class Libraries {
 	 *
 	 * @see lithium\util\collection\Filters
 	 * @param string $method The name of the method to apply the closure to.
-	 * @param Closure $filter The closure that is used to filter the method.
+	 * @param \Closure $filter The closure that is used to filter the method.
 	 * @return void
 	 */
 	public static function applyFilter($method, $filter = null) {

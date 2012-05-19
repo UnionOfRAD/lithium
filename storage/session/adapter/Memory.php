@@ -9,7 +9,6 @@
 namespace lithium\storage\session\adapter;
 
 use lithium\util\String;
-use Closure;
 
 /**
  * Simple memory session storage engine. Used for testing.
@@ -48,7 +47,7 @@ class Memory extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of the entry to be checked.
 	 * @param array $options Options array. Not used for this adapter method.
-	 * @return Closure Function returning boolean `true` if the key exists, `false` otherwise.
+	 * @return \Closure Function returning boolean `true` if the key exists, `false` otherwise.
 	 */
 	public function check($key, array $options = array()) {
 		$session =& $this->_session;
@@ -63,7 +62,7 @@ class Memory extends \lithium\core\Object {
 	 * @param null|string $key Key of the entry to be read. If no key is passed, all
 	 *        current session data is returned.
 	 * @param array $options Options array. Not used for this adapter method.
-	 * @return Closure Function returning data in the session if successful, `false` otherwise.
+	 * @return \Closure Function returning data in the session if successful, `false` otherwise.
 	 */
 	public function read($key = null, array $options = array()) {
 		$session = $this->_session;
@@ -82,7 +81,7 @@ class Memory extends \lithium\core\Object {
 	 * @param string $key Key of the item to be stored.
 	 * @param mixed $value The value to be stored.
 	 * @param array $options Options array. Not used for this adapter method.
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return \Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($key, $value, array $options = array()) {
 		$session =& $this->_session;
@@ -97,7 +96,7 @@ class Memory extends \lithium\core\Object {
 	 *
 	 * @param string $key The key to be deleted
 	 * @param array $options Options array. Not used for this adapter method.
-	 * @return Closure Function returning boolean `true` on successful delete, `false` otherwise
+	 * @return \Closure Function returning boolean `true` on successful delete, `false` otherwise
 	 */
 	public function delete($key, array $options = array()) {
 		$session =& $this->_session;
@@ -112,7 +111,7 @@ class Memory extends \lithium\core\Object {
 	 * Clears all keys from the session.
 	 *
 	 * @param array $options Options array. Not used for this adapter method.
-	 * @return Closure Function that clears the session
+	 * @return \Closure Function that clears the session
 	 */
 	public function clear(array $options = array()) {
 		$session =& $this->_session;
