@@ -31,7 +31,7 @@ class Controller extends \lithium\core\Object {
 	public function __invoke($request, $dispatchParams, array $options = array()) {
 		$dispatchParamsDefaults = array('args' => array());
 		$dispatchParams += $dispatchParamsDefaults;
-		$defaults = array('reporter' => 'html', 'format' => 'html', 'timeout' => 0);
+		$defaults = array('format' => 'html', 'timeout' => 0);
 		$options += (array) $request->query + $defaults;
 		$params = compact('request', 'dispatchParams', 'options');
 
