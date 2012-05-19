@@ -17,18 +17,17 @@ use lithium\core\ClassNotFoundException;
  * obtain the results and stats (passes, fails, exceptions, skips) of the test run.
  *
  * While Lithium already comes with a text-based as well as web-based test interface, you
- * may use or extend the `Report` class to create your own test reporter functionality. In
+ * may use or extend the `Report` class to create your own test report functionality. In
  * addition, you can also create your own custom templates for displaying results in a different
  * format, such as json.
  *
- * Example usage, for built-in HTML format/reporter:
+ * Example usage, for built-in HTML format:
  *
  * {{{
  * $report = new Report(array(
  *     'title' => 'Test Report Title',
  *     'group' => new Group(array('data' => array('lithium\tests\cases\net\http\MediaTest'))),
- *     'format' => 'html',
- *     'reporter' => 'html'
+ *     'format' => 'html'
  * ));
  *
  * $report->run();
@@ -105,16 +104,16 @@ class Report extends \lithium\core\Object {
 	 * @param array $config Options array for the test run. Valid options are:
 	 *        - `'group'`: The test group with items to be run.
 	 *        - `'filters'`: An array of filters that the test output should be run through.
-	 *        - `'reporter'`: The reporter to use, defaults to `'console'`.
-	 *        - `'format'`: The format of the reporter template to use, defaults to `'txt'`.
+	 *        - `'format'`: The format of the template to use, defaults to `'txt'`.
+	 *        - `'reporter'`: The reporter to use.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'title' => null,
 			'group' => null,
 			'filters' => array(),
-			'reporter' => 'console',
 			'format' => 'txt',
+			'reporter' => null,
 			'progress' => null
 		);
 		parent::__construct($config + $defaults);
@@ -146,7 +145,9 @@ class Report extends \lithium\core\Object {
 			$this->results['filters'][$filter] = array();
 			$tests = $filter::apply($this, $tests, $options['apply']) ?: $tests;
 		}
-		$this->results['group'] = $tests->run();
+		$this->results['group'] = $tests->run(array(
+			'reporter' => $this->_config['reporter']
+		));
 
 		foreach ($this->filters() as $filter => $options) {
 			$this->results['filters'][$filter] = $filter::analyze($this, $options['analyze']);
@@ -228,7 +229,7 @@ class Report extends \lithium\core\Object {
 		if ($template == "stats" && !$data) {
 			$data = $this->stats();
 		}
-		$template = Libraries::locate("test.templates.{$config['reporter']}", $template, array(
+		$template = Libraries::locate('test.templates', $template, array(
 			'filter' => false, 'type' => 'file', 'suffix' => ".{$config['format']}.php"
 		));
 		$params = compact('template', 'data', 'config');

@@ -40,8 +40,8 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *        - `'case'`: The fully namespaced test case to be run.
 	 *        - `'group'`: The fully namespaced test group to be run.
 	 *        - `'filters'`: An array of filters that the test output should be run through.
-	 *        - `'reporter'`: The reporter to use, defaults to `'console'`.
-	 *        - `'format'`: The format of the reporter template to use, defaults to `'txt'`.
+	 *        - `'format'`: The format of the template to use, defaults to `'txt'`.
+	 *        - `'reporter'`: The reporter to use.
 	 * @return array A compact array of the title, an array of the results, as well
 	 *         as an additional array of the results after the $options['filters']
 	 *         have been applied.
@@ -51,8 +51,8 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$defaults = array(
 			'title' => $group,
 			'filters' => array(),
-			'reporter' => 'console',
 			'format' => 'txt',
+			'reporter' => null,
 			'progress' => null
 		);
 		$options += $defaults;
