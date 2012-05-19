@@ -100,8 +100,9 @@ class Test extends \lithium\console\Command {
 				if ($command->verbose) {
 					$reporter = function($result) use ($command, $colorize) {
 						$command->out(sprintf(
-							'[%s] %s::%s()',
+							'[%s] on line %4d in %s::%s()',
 							$colorize(sprintf('%9s', $result['result'])),
+							isset($result['line']) ? $result['line'] : '??',
 							isset($result['class']) ? $result['class'] : '??',
 							isset($result['method']) ? $result['method'] : '??'
 						));
