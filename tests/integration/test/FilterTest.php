@@ -31,17 +31,15 @@ class FilterTest extends \lithium\test\Integration {
 	}
 
 	public function testSingleTest() {
-		$this->report->filters(array("Coverage" => ""));
+		$this->report->filters(array('Coverage' => null));
 
 		$this->report->run();
-
-		$expected = 40;
 
 		$filter = $this->report->results['filters']['lithium\test\filter\Coverage'];
 		$data = $filter['lithium\tests\mocks\test\MockFilterClass'];
 		$result = $data['percentage'];
 
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result > 65 && $result < 70);
 	}
 
 	public function testSingleTestWithMultipleFilters() {
