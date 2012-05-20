@@ -22,21 +22,15 @@ use RecursiveIteratorIterator;
  * assertion is correct, the test passes, otherwise it fails. Most assertions take an expected
  * result, a received result, and a message (to describe the failure) as parameters.
  *
+ * Unit tests are used to check a small unit of functionality, such as if a
+ * method returns an expected result for a known input, or whether an adapter
+ * can successfully open a connection.
+ *
  * Available assertions are (see `assert<assertion-name>` methods for details): Equal, False,
  * Identical, NoPattern, NotEqual, Null, Pattern, Tags, True.
  *
  * If an assertion is expected to produce an exception, the `expectException` method should be
  * called before it.
- *
- * Both _case_ (unit) and _integration_ tests extend this class. These two test types can loosely
- * be defined as follows:
- *  - Case: These tests are used to check a small unit of functionality, such as if a method
- *    returns an expected result for a known input, or whether an adapter can successfully open a
- *    connection.
- *  - Integration: These are tests for determining that different parts of the framework will work
- *    together (integrate) as expected. For example, a model has CRUD functionality with its
- *    underlying data source.
- *
  */
 class Unit extends \lithium\core\Object {
 
