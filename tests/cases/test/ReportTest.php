@@ -57,7 +57,7 @@ class ReportTest extends \lithium\test\Unit {
 		));
 		$report->run();
 
-		$expected = 1;
+		$expected = 2;
 		$result = $report->stats();
 		$this->assertEqual($expected, $result['count']['asserts']);
 		$this->assertEqual($expected, $result['count']['passes']);
