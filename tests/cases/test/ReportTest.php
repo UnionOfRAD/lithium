@@ -68,12 +68,12 @@ class ReportTest extends \lithium\test\Unit {
 		$report = new Report(array(
 			'title' => '\lithium\tests\mocks\test\MockUnitTest',
 			'group' => new Group(array('data' => array('\lithium\tests\mocks\test\MockUnitTest'))),
-			'format' => 'html'
+			'format' => 'txt'
 		));
 		$report->run();
 
-		$result = $report->render("stats");
-		$this->assertPattern("#1.*1.*passes,.*0.*fails.*0.*exceptions#s", $result);
+		$result = $report->render('stats');
+		$this->assertPattern('#2.*2.*passes.*0.*fails.*0.*exceptions#s', $result);
 	}
 
 	public function testSingleFilter() {
