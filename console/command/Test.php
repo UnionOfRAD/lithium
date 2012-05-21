@@ -250,7 +250,7 @@ class Test extends \lithium\console\Command {
 			}
 		}
 		if (empty($library)) {
-			$this->error("No library found in `{$path}`.");
+			$this->error("No library found in path `{$path}`.");
 			return false;
 		}
 		if (!$config = Libraries::get($library)) {
@@ -261,7 +261,7 @@ class Test extends \lithium\console\Command {
 		$realpath = $config['path'] . '/' . $path;
 
 		if (!realpath($realpath)) {
-			$this->error("{$realpath} not found.");
+			$this->error("Path `{$realpath}` not found.");
 			return false;
 		}
 		$class = str_replace(".php", "", str_replace('/', '\\', ltrim($path, '/')));
