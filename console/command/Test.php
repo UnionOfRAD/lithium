@@ -218,7 +218,6 @@ class Test extends \lithium\console\Command {
 			}
 			return $name;
 		}
-		return null;
 	}
 
 	/**
