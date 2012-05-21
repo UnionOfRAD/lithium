@@ -22,10 +22,10 @@ class CatalogInflectorTest extends \lithium\test\Integration {
 		Catalog::config(array(
 			'runtime' => array('adapter' => new Memory())
 		));
-		Inflector::reset();
 	}
 
 	public function tearDown() {
+		Inflector::reset();
 		Catalog::reset();
 		Catalog::config($this->_backup['catalogConfig']);
 	}
