@@ -5,19 +5,26 @@ $asserts = intval($count['asserts']) ?: 0;
 $fails = intval($count['fails']) ?: 0;
 $exceptions = intval($count['exceptions']) ?: 0;
 
-echo "\n" . ($success ? '{:success}' : '') . "{$passes} / {$asserts} passes\n";
+if ($success) {
+	echo "{:green}OK{:end}\n";
+} else {
+	echo "{:red}FAIL{:end}\n";
+}
+echo "\n";
+
+echo "{$passes} / {$asserts} passes\n";
 echo "{$fails} " . ($fails == 1 ? 'fail' : 'fails');
 echo " and {$exceptions} ";
-echo ($exceptions == 1 ? 'exception' : 'exceptions') . ($success ? '{:end}' : '') . "\n";
+echo ($exceptions == 1 ? 'exception' : 'exceptions') . "\n";
 
 foreach ((array) $stats['errors'] as $error) {
 	if ($error['result'] == 'fail') {
-		echo "\n{:error}Assertion `{$error['assertion']}` failed in ";
+		echo "\nAssertion `{$error['assertion']}` failed in ";
 		echo "`{$error['class']}::{$error['method']}()` on line ";
-		echo "{$error['line']}:{:end}\n{$error['message']}";
+		echo "{$error['line']}:\n{$error['message']}";
 	} elseif ($error['result'] == 'exception') {
-		echo "{:error}Exception thrown in `{$error['class']}::{$error['method']}()` ";
-		echo "on line {$error['line']}:{:end}\n{$error['message']}";
+		echo "Exception thrown in `{$error['class']}::{$error['method']}()` ";
+		echo "on line {$error['line']}:\n{$error['message']}";
 		if (isset($error['trace']) && !empty($error['trace'])) {
 			echo "Trace: {$error['trace']}\n";
 		}
@@ -25,8 +32,8 @@ foreach ((array) $stats['errors'] as $error) {
 }
 foreach ((array) $stats['skips'] as $skip) {
 	$trace = $skip['trace'][1];
-	echo "{:cyan}Skip `{$trace['class']}::{$trace['function']}()` ";
-	echo "on line {$trace['line']}:{:end}\n";
+	echo "Skip `{$trace['class']}::{$trace['function']}()` ";
+	echo "on line {$trace['line']}:\n";
 	echo "{$skip['message']}\n";
 }
 

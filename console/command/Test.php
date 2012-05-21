@@ -130,8 +130,8 @@ class Test extends \lithium\console\Command {
 				}
 
 				$report = $runner(compact('reporter'));
-
 				$command->out(null, 2);
+
 				$command->out($report->render('stats', $report->stats()));
 
 				foreach ($report->filters() as $filter => $options) {
