@@ -10,6 +10,7 @@ namespace lithium\console\command;
 
 use lithium\core\Libraries;
 use lithium\test\Dispatcher;
+use lithium\test\Unit;
 
 /**
  * Runs a given set of tests and outputs the results.
@@ -181,15 +182,28 @@ class Test extends \lithium\console\Command {
 	 * li3 test <plugin>/tests/cases
 	 * }}}
 	 *
-	 * @param string $path Absolute or relative path to tests.
+	 *
+	 * This will run `<library>/tests/cases/<package>/<class>Test.php`:
+	 *
+	 * {{{
+	 * li3 test <library>/<package>/<class>.php
+	 * }}}
+	 *
+	 * @param string $path Absolute or relative path to tests or a file which
+	 *                     corresponding test should be run.
 	 * @return boolean Will exit with status `1` if one or more tests failed otherwise with `0`.
 	 */
 	public function run($path = null) {
 		if (!$path = $this->_path($path)) {
 			return false;
 		}
+		if (strpos($path, 'tests') === false) {
+			if (!$path = Unit::get($path)) {
+				$this->error('Cannot map path to test path.');
+				return false;
+			}
+		}
 		$handlers = $this->_handlers;
-
 		if (!isset($handlers[$this->format]) || !is_callable($handlers[$this->format])) {
 			$this->error(sprintf('No handler for format `%s`... ', $this->format));
 			return false;
