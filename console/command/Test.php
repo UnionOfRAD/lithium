@@ -227,7 +227,7 @@ class Test extends \lithium\console\Command {
 	 * @return string Returns a fully-resolved physical path, or `false`, if an error occurs.
 	 */
 	protected function _path($path) {
-		$path = str_replace('\\', '/', $path);
+		$path = rtrim(str_replace('\\', '/', $path), '/');
 
 		if (!$path) {
 			$this->error('Please provide a path to tests.');
