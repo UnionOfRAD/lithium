@@ -1047,7 +1047,10 @@ class Unit extends \lithium\core\Object {
 		});
 
 		checkdnsrr($config['host'], 'ANY');
-		fopen($url, 'r');
+
+		if ($handle = fopen($url, 'r')) {
+			fclose($handle);
+		}
 
 		restore_error_handler();
 		return !$failed;
