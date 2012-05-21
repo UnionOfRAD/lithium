@@ -66,7 +66,7 @@ class Unit extends \lithium\core\Object {
 
 		$library = array_shift($parts);
 		$name = array_pop($parts);
-		$type = "tests.cases." . implode('.', $parts);
+		$type = 'tests.cases.' . implode('.', $parts);
 
 		return Libraries::locate($type, $name, compact('library'));
 	}
