@@ -221,10 +221,23 @@ class Test extends \lithium\console\Command {
 	}
 
 	/**
-	 * Validates an absolute or relative path to test cases.
+	 * Validates and gets a fully-namespaced class path from an absolute or
+	 * relative physical path to a directory or file. The final class path may
+	 * be partial in that in doesn't contain the class name.
 	 *
-	 * @param string $path The directory or file path to one or more test cases
-	 * @return string Returns a fully-resolved physical path, or `false`, if an error occurs.
+	 * This method can be thought of the reverse of `Libraries::path()`.
+	 *
+	 * {{{
+	 * lithium/tests/cases/core/ObjectTest.php -> lithium\tests\cases\core\ObjectTest
+	 * lithium/tests/cases/core                -> lithium\tests\cases\core
+	 * lithium/core/Object.php                 -> lithium\core\Object
+	 * lithium/core/                           -> lithium\core
+	 * lithium/core                            -> lithium\core
+	 * }}}
+	 *
+	 * @see lithium\core\Libraries::path()
+	 * @param string $path The directory of or file path to one or more classes.
+	 * @return string Returns a fully-namespaced class path, or `false`, if an error occurs.
 	 */
 	protected function _path($path) {
 		$path = rtrim(str_replace('\\', '/', $path), '/');
@@ -237,6 +250,11 @@ class Test extends \lithium\console\Command {
 			$library = $this->_library($path);
 		}
 		if ($path[0] != '/') {
+			$libraries = array_reduce(Libraries::get(), function($v, $w) {
+				$v[] = basename($w['path']);
+				return $v;
+			});
+
 			$library = basename($this->request->env('working'));
 			$parts = explode('/', str_replace("../", "", $path));
 			$plugin = array_shift($parts);
@@ -244,7 +262,7 @@ class Test extends \lithium\console\Command {
 			if ($plugin == 'libraries') {
 				$plugin = array_shift($parts);
 			}
-			if ($plugin != 'tests') {
+			if (in_array($plugin, $libraries)) {
 				$library = $plugin;
 				$path = join('/', $parts);
 			}
