@@ -138,8 +138,6 @@ class Test extends \lithium\console\Command {
 					$data = $report->results['filters'][$filter];
 					$command->out($report->render($options['name'], compact('data')));
 				}
-
-				$command->nl();
 				return $report;
 			},
 			'json' => function($runner, $path) use ($command) {
