@@ -1046,8 +1046,8 @@ class Unit extends \lithium\core\Object {
 			$failed = true;
 		});
 
-		$dnsCheck = dns_check_record($config['host'], "ANY");
-		$fileCheck = fopen($url, "r");
+		$dnsCheck = dns_check_record($config['host'], 'ANY');
+		$fileCheck = fopen($url, 'r');
 
 		restore_error_handler();
 		return !$failed;
