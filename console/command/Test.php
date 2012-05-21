@@ -75,8 +75,6 @@ class Test extends \lithium\console\Command {
 				$command->header('Test');
 				$command->out(null, 1);
 
-				$command->out('{:heading}Run{:end}');
-
 				$colorize = function($result) {
 					switch (trim($result)) {
 						case '.':
@@ -133,7 +131,6 @@ class Test extends \lithium\console\Command {
 				$report = $runner(compact('reporter'));
 
 				$command->out(null, 2);
-				$command->out('{:heading}Results{:end}', 0);
 				$command->out($report->render('stats', $report->stats()));
 
 				foreach ($report->filters() as $filter => $options) {
