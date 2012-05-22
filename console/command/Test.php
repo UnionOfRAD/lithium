@@ -224,6 +224,7 @@ class Test extends \lithium\console\Command {
 			}
 		}
 		$handlers = $this->_handlers;
+
 		if (!isset($handlers[$this->format]) || !is_callable($handlers[$this->format])) {
 			$this->error(sprintf('No handler for format `%s`... ', $this->format));
 			return false;
