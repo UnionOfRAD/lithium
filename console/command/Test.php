@@ -59,6 +59,14 @@ class Test extends \lithium\console\Command {
 	public $verbose = false;
 
 	/**
+	 * Enable plain to prevent any headers or similar decoration being output.
+	 * Good for command calls embedded into other scripts.
+	 *
+	 * @var boolean
+	 */
+	public $plain = false;
+
+	/**
 	 * An array of closures, mapped by type, which are set up to handle different test output
 	 * formats.
 	 *
@@ -78,9 +86,10 @@ class Test extends \lithium\console\Command {
 
 		$this->_handlers += array(
 			'txt' => function($runner, $path) use ($command) {
-				$command->header('Test');
-				$command->out(null, 1);
-
+				if (!$command->plain) {
+					$command->header('Test');
+					$command->out(null, 1);
+				}
 				$colorize = function($result) {
 					switch (trim($result)) {
 						case '.':
@@ -133,15 +142,23 @@ class Test extends \lithium\console\Command {
 						}
 					};
 				}
-
 				$report = $runner(compact('reporter'));
-				$command->out(null, 2);
 
-				$command->out($report->render('stats', $report->stats()));
+				if (!$command->plain) {
+					$stats = $report->stats();
 
-				foreach ($report->filters() as $filter => $options) {
-					$data = $report->results['filters'][$filter];
-					$command->out($report->render($options['name'], compact('data')));
+					$command->out(null, 2);
+					$command->out($report->render('result', $stats));
+					$command->out($report->render('errors', $stats));
+
+					if ($command->verbose) {
+						$command->out($report->render('skips', $stats));
+					}
+
+					foreach ($report->filters() as $filter => $options) {
+						$data = $report->results['filters'][$filter];
+						$command->out($report->render($options['name'], compact('data')));
+					}
 				}
 				return $report;
 			},
