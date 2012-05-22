@@ -296,7 +296,9 @@ class Model extends \lithium\core\StaticObject {
 	 * @param array $options Meta-information for this model, such as the connection.
 	 */
 	public static function config(array $options = array()) {
-		$class = get_called_class();
+		if (($class = get_called_class()) === __CLASS__) {
+			return;
+		}
 		
 		if (!isset(static::$_instances[$class])) {
 			static::$_instances[$class] = new $class();
