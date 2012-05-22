@@ -991,6 +991,11 @@ class Unit extends \lithium\core\Object {
 	 * Removes everything from `resources/tmp/tests` directory.
 	 * Call from inside of your test method or `tearDown()`.
 	 *
+	 * If the file to unlink is readonly, it throws a exception (Permission denied) on Windows.
+	 * Solution: remove readonly flag and try again.
+	 * See: http://stringoftheseus.com/blog/2010/12/22/php-unlink-permisssion-denied-error-on-windows/
+	 * Note: this will still report an exception, but the test will be ok. Try/catch won't solve it.
+	 *
 	 * @param string $path path to directory of contents to remove
 	 *               if first character is NOT `/` prepend `LITHIUM_APP_PATH/resources/tmp/`
 	 * @return void
@@ -1010,7 +1015,11 @@ class Unit extends \lithium\core\Object {
 			if ($item->getPathname() === "{$path}/empty" || $iterator->isDot()) {
 				continue;
 			}
-			($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname());
+			
+			if (!(	($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname()))) {
+				@chmod($item->getPathname(), 0777);
+				($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname());
+			}
 		}
 	}
 
@@ -1051,6 +1060,29 @@ class Unit extends \lithium\core\Object {
 
 		restore_error_handler();
 		return !$failed;
+	}
+	
+	/**
+	 * Provides how end-of-lines (EOL) are represented, either CRLF or LF
+	 *
+	 * The distinctions is required for some string testing, and
+	 * is caused by platform differences between Windows and Unix/Linux.
+	 * The git config core.autocrlf also plays a role how EOLs are handled
+	 * between the working copy and the repository; simply testing on which
+	 * platform the test is run is thus not sufficient.
+	 * 
+	 * The usage of PHP_EOL does not suffice, as this only takes the platform
+	 * into account and not how the files emerge from a git repository.
+	 */
+	protected function _Eol() {
+		return <<<EMPTYLINE
+
+
+EMPTYLINE;
+	}
+	
+	protected function _isEolCrLf() {
+		return $this->_Eol() == "\r\n";
 	}
 }
 

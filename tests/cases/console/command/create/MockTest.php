@@ -57,18 +57,14 @@ class MockTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = <<<'test'
-
-
 namespace create_test\tests\mocks\models;
 
 class MockPosts extends \create_test\models\Posts {
 
 
 }
-
-
 test;
-		$replace = array("<?php", "?>");
+		$replace = array("<?php\n\n", "\n\n?>");
 		$result = str_replace($replace, '',
 			file_get_contents($this->_testPath . '/create_test/tests/mocks/models/MockPosts.php')
 		);

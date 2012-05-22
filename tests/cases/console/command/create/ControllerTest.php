@@ -67,7 +67,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = $model->invokeMethod('_use', array($this->request));
 		$this->assertEqual($expected, $result);
 	}
-
+ 
 	public function testRun() {
 		$this->request->params += array(
 			'command' => 'create', 'action' => 'controller',
@@ -83,8 +83,6 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = <<<'test'
-
-
 namespace create_test\controllers;
 
 use create_test\models\Posts;
@@ -132,10 +130,8 @@ class PostsController extends \lithium\action\Controller {
 		return $this->redirect('Posts::index');
 	}
 }
-
-
 test;
-		$replace = array("<?php", "?>");
+		$replace = array("<?php\n\n", "\n\n?>");
 		$result = str_replace($replace, '',
 			file_get_contents($this->_testPath . '/create_test/controllers/PostsController.php')
 		);
