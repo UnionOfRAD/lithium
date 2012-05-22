@@ -20,6 +20,11 @@ use lithium\test\Unit;
 class Test extends \lithium\console\Command {
 
 	/**
+	 * Used as the exit code for errors where no test was mapped to file.
+	 */
+	const EXIT_NO_TEST = 4;
+
+	/**
 	 * List of filters to apply before/during/after test run, separated by commas.
 	 *
 	 * For example:
@@ -195,10 +200,11 @@ class Test extends \lithium\console\Command {
 		if (!$path = $this->_path($path)) {
 			return false;
 		}
-		if (strpos($path, 'tests') === false) {
+		if (stripos($path, 'test') === false) {
 			if (!$path = Unit::get($path)) {
+				var_dump('?');
 				$this->error('Cannot map path to test path.');
-				return false;
+				return static::EXIT_NO_TEST;
 			}
 		}
 		$handlers = $this->_handlers;
