@@ -59,7 +59,7 @@ class Test extends \lithium\console\Command {
 	public $verbose = false;
 
 	/**
-	 * Enable plain to prevent any headers or similar decoration being output.
+	 * Enable plain mode to prevent any headers or similar decoration being output.
 	 * Good for command calls embedded into other scripts.
 	 *
 	 * @var boolean
