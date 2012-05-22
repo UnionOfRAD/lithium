@@ -60,9 +60,9 @@ class TestTest extends \lithium\test\Unit {
 		));
 		$path = 'Foobar/lithium/tests/mocks/test/cases/MockTest.php';
 		$command->run($path);
-		$expected = "Library `Foobar` does not exist.\n";
+		$expected = "Path `.*` not found.\n";
 		$result = $command->response->error;
-		$this->assertEqual($expected, $result);
+		$this->assertPattern("/{$expected}/", $result);
 	}
 
 	public function testRunWithInvalidLibrary() {
@@ -73,7 +73,7 @@ class TestTest extends \lithium\test\Unit {
 		$command->format = 'foobar';
 		$path = LITHIUM_LIBRARY_PATH . '/bob/tests/mocks/test/cases/MockTest.php';
 		$command->run($path);
-		$expected = "No library found in `";
+		$expected = "No library found in path `";
 		$expected .= LITHIUM_LIBRARY_PATH . "/bob/tests/mocks/test/cases/MockTest.php`.\n";
 		$result = $command->response->error;
 		$this->assertEqual($expected, $result);
