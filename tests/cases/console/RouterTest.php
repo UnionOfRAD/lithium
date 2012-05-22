@@ -71,6 +71,20 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testParseGnuStyleLongOptionsContainingDash() {
+		$expected = array(
+			'command' => 'test', 'action' => 'run', 'args' => array(),
+			'foo-bar' => 'something'
+		);
+		$result = Router::parse(new Request(array(
+			'args' => array(
+				'test', 'run',
+				'--foo-bar=something'
+			)
+		)));
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testParseShortOption() {
 		$expected = array(
 			'command' => 'test', 'action' => 'action', 'args' => array(),

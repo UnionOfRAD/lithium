@@ -494,8 +494,7 @@ class Libraries {
 	 * is used instead.
 	 *
 	 * @param array $classes An array of fully-namespaced class names (as keys) and
-	 *                     their correponding file's paths (as values).
-	 *
+	 *        their correponding file's paths (as values).
 	 * @return void
 	 */
 	public static function map(array $classes) {
@@ -508,10 +507,9 @@ class Libraries {
 	/**
 	 * Unmap fully-namespaced class names mapped using `lithium\core\Libraries::map()`.
 	 *
-	 * @param mixed $classes An array of fully-namespaced class names or
-	 *		       a string with a fully-namespaced class name.
-	 *
 	 * @see lithium\core\Libraries::map()
+	 * @param mixed $classes An array of fully-namespaced class names or
+	 *        a string with a fully-namespaced class name.
 	 */
 	public static function unmap($classes) {
 		if (!is_array($classes)) {
@@ -843,7 +841,7 @@ class Libraries {
 			}
 
 			foreach (static::_searchPaths($paths, $library, $params) as $tpl) {
-				$params['library'] = $library;
+				$params['library'] = rtrim($config['prefix'], '\\');
 				$class = str_replace('\\*', '', String::insert($tpl, $params));
 
 				if (file_exists($file = Libraries::path($class, $options))) {

@@ -365,10 +365,19 @@ class Entity extends \lithium\core\Object {
 	 * Gets the array of fields modified on this entity.
 	 *
 	 * @return array Returns an array where the keys are entity field names, and the values are
-	 *         always `true`.
+	 *         `true` for changed fields.
 	 */
 	public function modified() {
-		return array_fill_keys(array_keys($this->_updated), true);
+		$fields = array_fill_keys(array_keys($this->_data), false);
+		foreach ($this->_updated as $field => $value) {
+			if (is_object($value) && method_exists($value, 'modified')) {
+				$modified = $value->modified();
+				$fields[$field] = $modified === true || is_array($modified) && in_array(true, $modified, true);
+			} else {
+				$fields[$field] = !isset($fields[$field]) || $this->_data[$field] !== $this->_updated[$field];
+			}
+		}
+		return $fields;
 	}
 
 	public function export() {

@@ -92,7 +92,7 @@ class EnvironmentTest extends \lithium\test\Unit {
 
 		$request = new MockRequest(array('SERVER_ADDR' => '1.1.1.1', 'HTTP_HOST' => 'www.com'));
 		Environment::set($request);
-		$isProduction = Environment::is('production'); // returns true if not running locally
+		$isProduction = Environment::is('production');
 		$this->assertTrue($isProduction);
 
 		$request = new MockRequest(array('SERVER_ADDR' => '::1'));
@@ -110,7 +110,7 @@ class EnvironmentTest extends \lithium\test\Unit {
 		Environment::set($request);
 		$this->assertTrue(Environment::is('test'));
 
-		$request = new MockRequest(array('TERM' => true));
+		$request = new MockRequest(array('PLATFORM' => 'CLI'));
 		Environment::set($request);
 		$this->assertTrue(Environment::is('development'));
 
