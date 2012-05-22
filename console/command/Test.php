@@ -217,9 +217,8 @@ class Test extends \lithium\console\Command {
 		if (!$path = $this->_path($path)) {
 			return false;
 		}
-		if (stripos($path, 'test') === false) {
+		if (!preg_match('/(tests|Test\.php)/', $path)) {
 			if (!$path = Unit::get($path)) {
-				var_dump('?');
 				$this->error('Cannot map path to test path.');
 				return static::EXIT_NO_TEST;
 			}
