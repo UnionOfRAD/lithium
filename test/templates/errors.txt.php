@@ -11,7 +11,7 @@ foreach ((array) $stats['errors'] as $error) {
 		echo " Method  : {$error['method']}()\n";
 		echo " Line    : {$error['line']}\n";
 		echo " ________\n";
-		echo "{$error['message']}";
+		echo "{$error['message']}\n";
 		echo " ________\n";
 		echo "\n";
 	} elseif ($error['result'] == 'exception') {
