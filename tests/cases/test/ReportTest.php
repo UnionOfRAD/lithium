@@ -72,7 +72,7 @@ class ReportTest extends \lithium\test\Unit {
 		));
 		$report->run();
 
-		$result = $report->render('stats');
+		$result = $report->render('result', $report->stats());
 		$this->assertPattern('#2.*2.*passes.*0.*fails.*0.*exceptions#s', $result);
 	}
 
