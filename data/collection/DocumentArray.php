@@ -46,9 +46,66 @@ class DocumentArray extends \lithium\data\Collection {
 		return $this->_exists;
 	}
 
-	public function sync($id = null, array $data = array()) {
+	/**
+	 * Called after an `Entity` is saved. Updates the object's internal state to reflect the
+	 * corresponding database entity. **Do not** call this method if you intend
+	 * to update the database's copy of the entity. Instead, see `Model::save()`.
+	 *
+	 * @see lithium\data\Model::save()
+	 * @see lithium\data\Entity::sync()
+	 * @param mixed $id Ignored, used to compatibility with `Entity::sync()`
+	 * @param array $data Ignored, used to compatibility with `Entity::sync()`
+	 * @param array $options Options when calling this method:
+	 *              - `'recursive'` _boolean_: If `true` attempts to sync nested objects as well.
+	 *                Otherwise, only syncs the current object. Defaults to `true`.
+	 * @return void
+	 */
+	public function sync($id = null, array $data = array(), array $options = array()) {
+		$defaults = array('recursive' => true);
+		$options += $defaults;
 		$this->_exists = true;
+
+		if (!$options['recursive']) {
+			$this->_original = $this->_data;
+			return;
+		}
+
+		foreach ($this->_data as $key => $val) {
+			if (is_object($val) && method_exists($val, 'sync')) {
+				$nested = isset($data[$key]) ? $data[$key] : array();
+				$this->_data[$key]->sync(null, $nested, $options);
+			}
+		}
+
 		$this->_original = $this->_data;
+	}
+
+	/**
+	 * Determines if the `DocumentArray` has been modified since it was last saved
+	 *
+	 * @return boolean
+	 */
+	public function modified() {
+		if (count($this->_original) !== count($this->_data)) {
+			return true;
+		}
+		foreach ($this->_original as $key => $doc) {
+			$updated = $this->_data[$key];
+			if (!isset($updated)) {
+				return true;
+			}
+			if ($doc !== $updated) {
+				return true;
+			}
+			if (!is_object($updated) || !method_exists($updated, 'modified')) {
+				continue;
+			}
+			$modified = $this->_data[$key]->modified();
+			if (in_array(true, $modified)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
