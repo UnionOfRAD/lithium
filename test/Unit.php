@@ -1017,12 +1017,12 @@ class Unit extends \lithium\core\Object {
 			}
 			if ($item->isDir()) {
 				rmdir($item->getPathname());
-			} else {
-				if (!is_writeable($item->getPathname())) {
-					chmod($item->getPathname(), 0777);
-				}
-				unlink($item->getPathname());
-			}		
+				continue;
+			}
+			if (!$item->isWritable()) {
+				chmod($item->getPathname(), 0777);
+			}
+			unlink($item->getPathname());
 		}
 	}
 
