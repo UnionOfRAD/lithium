@@ -477,6 +477,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	public function prev() {
 		if (!prev($this->_data)) {
 			end($this->_data);
+			$this->_valid = !(key($this->_data) === null);
 		}
 		return current($this->_data);
 	}
