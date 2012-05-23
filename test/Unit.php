@@ -249,8 +249,11 @@ class Unit extends \lithium\core\Object {
 	 * called to get rid of any EOL differences.
 	 */
 	protected function _suppressEolIssues(&$expected, &$result) {
-			$expected = preg_replace('/\r\n/', "\n", $expected);
-			$result = preg_replace('/\r\n/', "\n", $result);
+		if (!is_string($expected) && !is_string($result)) {
+			continue;
+		}
+		$expected = preg_replace('/\r\n/', "\n", $expected);
+		$result = preg_replace('/\r\n/', "\n", $result);
 	}
 	
 	/**
@@ -262,9 +265,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string|boolean $message
 	 */
 	public function assertEqual($expected, $result, $message = false) {
-		if (is_string($expected) && is_string($result)) {
-			$this->_suppressEolIssues($expected, $result);
-		}
+		$this->_suppressEolIssues($expected, $result);
 		$data = ($expected != $result) ? $this->_compare('equal', $expected, $result) : null;
 		$this->assert($expected == $result, $message, $data);
 	}
@@ -277,9 +278,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string|boolean $message
 	 */
 	public function assertNotEqual($expected, $result, $message = false) {
-		if (is_string($expected) && is_string($result)) {
-			$this->_suppressEolIssues($expected, $result);
-		}
+		$this->_suppressEolIssues($expected, $result);
 		$this->assert($result != $expected, $message, compact('expected', 'result'));
 	}
 
@@ -362,9 +361,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string $message
 	 */
 	public function assertNoPattern($expected, $result, $message = '{:message}') {
-		if (is_string($expected) && is_string($result)) {
-			$this->_suppressEolIssues($expected, $result);
-		}
+		$this->_suppressEolIssues($expected, $result);
 		$this->assert(!preg_match($expected, $result), $message, compact('expected', 'result'));
 	}
 
@@ -376,9 +373,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string $message
 	 */
 	public function assertPattern($expected, $result, $message = '{:message}') {
-		if (is_string($expected) && is_string($result)) {
-			$this->_suppressEolIssues($expected, $result);
-		}
+		$this->_suppressEolIssues($expected, $result);
 		$this->assert(!!preg_match($expected, $result), $message, compact('expected', 'result'));
 	}
 
