@@ -991,6 +991,11 @@ class Unit extends \lithium\core\Object {
 	 * Removes everything from `resources/tmp/tests` directory.
 	 * Call from inside of your test method or `tearDown()`.
 	 *
+	 * If the file to unlink is readonly, it throws a exception (Permission denied) on Windows.
+	 * So, the file is checked before an unlink is tried. (this will make the tests run slower
+	 * but is prefered over a if (!unlink { chmod; unlink }.
+	 * See: http://stringoftheseus.com/blog/2010/12/22/php-unlink-permisssion-denied-error-on-windows/
+	 *
 	 * @param string $path path to directory of contents to remove
 	 *               if first character is NOT `/` prepend `LITHIUM_APP_PATH/resources/tmp/`
 	 * @return void
@@ -1010,7 +1015,14 @@ class Unit extends \lithium\core\Object {
 			if ($item->getPathname() === "{$path}/empty" || $iterator->isDot()) {
 				continue;
 			}
-			($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname());
+			if ($item->isDir()) {
+				rmdir($item->getPathname());
+			} else {
+				if (!is_writeable($item->getPathname())) {
+					chmod($item->getPathname(), 0777);
+				}
+				unlink($item->getPathname());
+			}		
 		}
 	}
 
