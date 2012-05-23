@@ -394,6 +394,9 @@ class Form extends \lithium\template\Helper {
 		list($name, $options) = $params;
 		list($name, $options, $template) = $this->_defaults($type, $name, $options);
 		$template = $this->_context->strings($template) ? $template : 'input';
+		if (isset($options['value']) && is_object($options['value'])) {
+			unset($options['value']);
+		}
 		return $this->_render($type, $template, compact('type', 'name', 'options', 'value'));
 	}
 

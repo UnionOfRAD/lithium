@@ -264,7 +264,7 @@ class FormTest extends \lithium\test\Unit {
 	}
 
 	public function testFormInputField() {
-		$result = $this->form->file('upload');
+		$result = $this->form->file('upload', array('value' => new Document()));
 		$this->assertTags($result, array('input' => array(
 			'type' => 'file', 'name' => 'upload', 'id' => 'Upload'
 		)));
