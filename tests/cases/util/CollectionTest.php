@@ -173,6 +173,16 @@ class CollectionTest extends \lithium\test\Unit {
 
 		$this->assertNull($collection->offsetUnset('bar'));
 		$this->assertFalse($collection->offsetExists('bar'));
+
+		$data = array('Hello', 2, 3, null, 6, false, true, 0);
+		$collection = new Collection(array('data' => $data));
+		
+		$cpt = 0;
+		foreach ($collection as $i => $word) {
+			$this->assertTrue(isset($collection[$cpt]));
+			$cpt++;
+		}
+		$this->assertIdentical(8, $cpt);
 	}
 
 	/**
@@ -198,6 +208,25 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertEqual('bar', $collection->prev());
 		$this->assertTrue($collection->valid());
 		$this->assertEqual('dib', $collection->end());
+		$this->assertTrue($collection->valid());
+
+		$collection = new Collection(array('data' => array(0, 1, 2, 3, 4)));
+		$this->assertIdentical(0, $collection->first());
+		$this->assertIdentical(0, $collection->rewind());
+		$this->assertIdentical(1, $collection->next());
+		$this->assertIdentical(2, $collection->next());
+		$this->assertIdentical(3, $collection->next());
+		$this->assertIdentical(2, $collection->prev());
+		$this->assertIdentical(2, $collection->current());
+		$this->assertIdentical(3, $collection->next());
+		$this->assertIdentical(4, $collection->next());
+		$this->assertIdentical(3, $collection->prev());
+		$this->assertIdentical(4, $collection->next());
+		$this->assertTrue($collection->valid());
+		$this->assertFalse($collection->next());
+		$this->assertFalse($collection->valid());
+		$this->assertFalse($collection->current());
+		$this->assertIdentical(4, $collection->prev());
 		$this->assertTrue($collection->valid());
 	}
 
@@ -308,6 +337,21 @@ class CollectionTest extends \lithium\test\Unit {
 	}
 
 	public function testUnsetInForeach() {
+		$data = array('Delete me');
+		$collection = new Collection(array('data' => $data));
+
+		$this->assertIdentical($data, $collection->to('array'));
+
+		$cpt = 0;
+		foreach ($collection as $i => $word) {
+			if ($word == 'Delete me') {
+				unset($collection[$i]);
+			}
+			$cpt++;
+		}
+		$this->assertEqual(1, $cpt);
+		$this->assertIdentical(array(), $collection->to('array'));
+
 		$data = array(
 			'Hello',
 			'Delete me',
@@ -327,10 +371,62 @@ class CollectionTest extends \lithium\test\Unit {
 				unset($collection[$i]);
 			}
 		}
-
 		$expected = array(0 => 'Hello', 6 => 'Hello again!');
 		$results = $collection->to('array');
 		$this->assertIdentical($expected, $results);
+
+		$data = array(
+			'Delete me',
+			'Hello',
+			'Delete me',
+			'Delete me',
+			'Delete me',
+			'Delete me',
+			'Hello again!',
+			'Delete me'
+		);
+		$collection = new Collection(array('data' => $data));
+
+		$this->assertIdentical($data, $collection->to('array'));
+
+		foreach ($collection as $i => $word) {
+			if ($word == 'Delete me') {
+				unset($collection[$i]);
+			}
+		}
+
+		$expected = array(1 => 'Hello', 6 => 'Hello again!');
+		$results = $collection->to('array');
+		$this->assertIdentical($expected, $results);
+	}
+
+	public function testCount() {
+		$collection = new Collection(array('data' => array(5, 3, 4, 1, 2)));
+		$this->assertIdentical(5, count($collection));
+
+		$collection = new Collection(array('data' => array()));
+		$this->assertIdentical(0, count($collection));
+
+		$collection = new Collection(array('data' => array(5 ,null, 4, true, false, 'bob')));
+		$this->assertIdentical(6, count($collection));
+
+		unset($collection[1]);
+		unset($collection[2]);
+
+		$this->assertIdentical(4, count($collection));
+
+		$first  = (object) array('name' => 'First');
+		$second = (object) array('name' => 'Second');
+		$third  = (object) array('name' => 'Third');
+
+		$doc = new Collection(array(
+			'data' => array($first, $second, $third)
+		));
+
+		$this->assertTrue(is_object($doc[0]));
+		$this->assertTrue(is_object($doc[1]));
+		$this->assertTrue(is_object($doc[2]));
+		$this->assertEqual(3, count($doc));
 	}
 }
 
