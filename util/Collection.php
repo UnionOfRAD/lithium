@@ -32,7 +32,7 @@ namespace lithium\util;
  *
  * $coll = new Collection(array('data' => array(0, 1, 2, 3, 4)));
  *
- * $coll->first();   // 1 (the first non-empty value)
+ * $coll->first();   // 0
  * $coll->current(); // 0
  * $coll->next();    // 1
  * $coll->next();    // 2
@@ -378,7 +378,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return boolean `true` if offset exists, `false` otherwise.
 	 */
 	public function offsetExists($offset) {
-		return isset($this->_data[$offset]);
+		return array_key_exists($offset, $this->_data);
 	}
 
 	/**
@@ -412,8 +412,11 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return void
 	 */
 	public function offsetUnset($offset) {
-		unset($this->_data[$offset]);
 		prev($this->_data);
+		if (key($this->_data) === null) {
+			$this->rewind();
+		}
+		unset($this->_data[$offset]);
 	}
 
 	/**
@@ -422,7 +425,8 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return mixed The current item after rewinding.
 	 */
 	public function rewind() {
-		$this->_valid = !(reset($this->_data) === false && key($this->_data) === null);
+		reset($this->_data);
+		$this->_valid = !(key($this->_data) === null);
 		return current($this->_data);
 	}
 
@@ -432,7 +436,8 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return mixed The current item after moving.
 	 */
 	public function end() {
-		$this->_valid = !(end($this->_data) === false && key($this->_data) === null);
+		end($this->_data);
+		$this->_valid = !(key($this->_data) === null);
 		return current($this->_data);
 	}
 
@@ -448,7 +453,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	/**
 	 * Returns the current item.
 	 *
-	 * @return mixed The current item.
+	 * @return mixed The current item or `false` on failure.
 	 */
 	public function current() {
 		return current($this->_data);
@@ -457,7 +462,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	/**
 	 * Returns the key of the current item.
 	 *
-	 * @return scalar Scalar on success `0` on failure.
+	 * @return scalar Scalar on success or `null` on failure.
 	 */
 	public function key() {
 		return key($this->_data);
@@ -467,11 +472,12 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * Moves backward to the previous item.  If already at the first item,
 	 * moves to the last one.
 	 *
-	 * @return mixed The current item after moving.
+	 * @return mixed The current item after moving or the last item on failure.
 	 */
 	public function prev() {
 		if (!prev($this->_data)) {
 			end($this->_data);
+			$this->_valid = !(key($this->_data) === null);
 		}
 		return current($this->_data);
 	}
@@ -479,10 +485,11 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	/**
 	 * Move forwards to the next item.
 	 *
-	 * @return The current item after moving.
+	 * @return The current item after moving or `false` on failure.
 	 */
 	public function next() {
-		$this->_valid = !(next($this->_data) === false && key($this->_data) === null);
+		next($this->_data);
+		$this->_valid = !(key($this->_data) === null);
 		return current($this->_data);
 	}
 
