@@ -171,10 +171,11 @@ EOD;
 	public function testReadMessageTemplateTNoEscapingLineEnding() {
 		$results = $this->adapter->read('messageTemplate', 'root', null);
 
-		$expected = "escaping\n\t4";
+		$expectedLR = "escaping\n\t4";
+		$expectedCRLF = "escaping\r\n\t4";
 		$resultLR = $results["escaping\n\t4"]['ids']['singular'];
 		$resultCRLF = $results["escaping\r\n\t4"]['ids']['singular'];
-		$this->assertEqual($expected, $resultLR || $resultCRLF);
+		$this->assertTrue($expectedLR === $resultLR || $expectedCRLF === $resultCRLF);
 	}
 
 	public function testReadMessageTemplateTnSimple() {
