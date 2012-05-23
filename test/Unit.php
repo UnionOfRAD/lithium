@@ -248,12 +248,12 @@ class Unit extends \lithium\core\Object {
 	 * in assertEqual, assertNotEqual, assertPattern and assertNotPattern this function is
 	 * called to get rid of any EOL differences.
 	 */
-	protected function _suppressEolIssues(&$expected, &$result) {
-		if (!is_string($expected) && !is_string($result)) {
-			continue;
+	protected function _normalizeLineEndings($expected, $result) {
+		if (is_string($expected) && is_string($result)) {
+			$expected = preg_replace('/\r\n/', "\n", $expected);
+			$result = preg_replace('/\r\n/', "\n", $result);
 		}
-		$expected = preg_replace('/\r\n/', "\n", $expected);
-		$result = preg_replace('/\r\n/', "\n", $result);
+		return array($expected, $result);
 	}
 	
 	/**
@@ -265,7 +265,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string|boolean $message
 	 */
 	public function assertEqual($expected, $result, $message = false) {
-		$this->_suppressEolIssues($expected, $result);
+		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$data = ($expected != $result) ? $this->_compare('equal', $expected, $result) : null;
 		$this->assert($expected == $result, $message, $data);
 	}
@@ -278,7 +278,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string|boolean $message
 	 */
 	public function assertNotEqual($expected, $result, $message = false) {
-		$this->_suppressEolIssues($expected, $result);
+		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$this->assert($result != $expected, $message, compact('expected', 'result'));
 	}
 
@@ -361,7 +361,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string $message
 	 */
 	public function assertNoPattern($expected, $result, $message = '{:message}') {
-		$this->_suppressEolIssues($expected, $result);
+		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$this->assert(!preg_match($expected, $result), $message, compact('expected', 'result'));
 	}
 
@@ -373,7 +373,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string $message
 	 */
 	public function assertPattern($expected, $result, $message = '{:message}') {
-		$this->_suppressEolIssues($expected, $result);
+		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$this->assert(!!preg_match($expected, $result), $message, compact('expected', 'result'));
 	}
 
