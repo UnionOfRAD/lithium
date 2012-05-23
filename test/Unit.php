@@ -988,6 +988,11 @@ class Unit extends \lithium\core\Object {
 	 * Uses `DIRECTORY_SEPARATOR` as `getPathname()` is used in a a direct
 	 * string comparison. The method may contain slashes and backslashes.
 	 *
+	 * If the file to unlink is readonly, it throws a exception (Permission denied) on Windows.
+	 * So, the file is checked before an unlink is tried. (this will make the tests run slower
+	 * but is prefered over a if (!unlink { chmod; unlink }.
+	 * See: http://stringoftheseus.com/blog/2010/12/22/php-unlink-permisssion-denied-error-on-windows/
+	 *
 	 * @param string $path Path to directory with contents to remove. If first
 	 *        character is NOT a slash (`/`) or a Windows drive letter (`C:`)
 	 *        prepends `LITHIUM_APP_PATH/resources/tmp/`.
@@ -1010,7 +1015,14 @@ class Unit extends \lithium\core\Object {
 			if ($empty || $iterator->isDot()) {
 				continue;
 			}
-			($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname());
+			if ($item->isDir()) {
+				rmdir($item->getPathname());
+				continue;
+			}
+			if (!$item->isWritable()) {
+				chmod($item->getPathname(), 0777);
+			}
+			unlink($item->getPathname());
 		}
 	}
 
