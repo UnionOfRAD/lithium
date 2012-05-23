@@ -414,10 +414,18 @@ class RecordSetTest extends \lithium\test\Unit {
 
 		$this->assertEqual($expected, $this->_recordSet->to('array', array('indexed' => false)));
 
-		$expected = '[{"id":1,"data":"data1"},{"id":2,"data":"data2"}' .
-					',{"id":3,"data":"data3"},{"id":4,"data":"data4"}]';
+		$expected = '{"1":{"id":1,"data":"data1"},"2":{"id":2,"data":"data2"},' .
+		'"3":{"id":3,"data":"data3"},"4":{"id":4,"data":"data4"}}';
 
-		$result = $this->_recordSet->to('json', array('indexed' => false, 'indexed' => false));
+		$this->assertEqual($expected, $this->_recordSet->to('json'));
+
+		$result = $this->_recordSet->to('json');
+		$this->assertEqual($expected, $result);
+		
+		$expected = '[{"id":1,"data":"data1"},{"id":2,"data":"data2"},' .
+		'{"id":3,"data":"data3"},{"id":4,"data":"data4"}]';
+
+		$result = $this->_recordSet->to('json', array('indexed' => false));
 		$this->assertEqual($expected, $result);
 	}
 
