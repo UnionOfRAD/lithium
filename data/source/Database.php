@@ -286,27 +286,24 @@ abstract class Database extends \lithium\data\Source {
 					$name = $model::meta('name');
 					$key = $model::key();
 
-					$subQuery = $self->invokeMethod('_instance', array(
-							get_class($query), array(
-								'type' => 'read',
-								'model' => $model,
-								'group' => $self->name("{$name}.{$key}"),
-								'fields' => array("{$name}.{$key}"),
-								'joins' => $query->joins(),
-								'conditions' => $query->conditions(),
-								'limit' => $query->limit(),
-								'page' => $query->page(),
-								'order' => $query->order()
-							)
-						));
+					$subQuery = $self->invokeMethod('_instance', array(get_class($query), array(
+						'type' => 'read',
+						'model' => $model,
+						'group' => $self->name("{$name}.{$key}"),
+						'fields' => array("{$name}.{$key}"),
+						'joins' => $query->joins(),
+						'conditions' => $query->conditions(),
+						'limit' => $query->limit(),
+						'page' => $query->page(),
+						'order' => $query->order()
+					)));
 					$ids = $self->read($subQuery, array('subquery' => true));
+
 					if (!$ids->count()) {
 						return false;
 					}
 					$idData = $ids->data();
-					$ids = array_map(function($index) use ($key) {
-							return $index[$key];
-						}, $idData);
+					$ids = array_map(function($index) use ($key) { return $index[$key]; }, $idData);
 					$query->limit(false)->conditions(array("{$name}.{$key}" => $ids));
 				}
 				$sql = $self->renderCommand($query);

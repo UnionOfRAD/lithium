@@ -276,24 +276,10 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Custom find query properties, indexed by name.
 	 *
+	 * @see lithium\data\Model::finder()
 	 * @var array
 	 */
 	protected $_finders = array();
-
-	/**
-	 * List of base model classes. Any classes which are declared to be base model classes (i.e.
-	 * extended but not directly interacted with) must be present in this list. Models can declare
-	 * themselves as base models using the following code:
-	 * {{{
-	 * public static function __init() {
-	 * 	static::_isBase(__CLASS__, true);
-	 * 	parent::__init();
-	 * }
-	 * }}}
-	 *
-	 * @var array
-	 */
-	protected static $_baseClasses = array(__CLASS__ => true);
 
 	/**
 	 * Stores all custom instance methods created by `Model::instanceMethods`.
@@ -303,15 +289,6 @@ class Model extends \lithium\core\StaticObject {
 	protected static $_instanceMethods = array();
 
 	/**
-	 * Sets default connection options and connects default finders.
-	 *
-	 * @param array $options
-	 * @return void
-	 */
-	public static function __init() {
-	}
-
-	/**
 	 * Configures the model for use.
 	 *
 	 * This method will set the `Model::$_meta` class attributes.
@@ -319,17 +296,14 @@ class Model extends \lithium\core\StaticObject {
 	 * @param array $options Meta-information for this model, such as the connection.
 	 */
 	public static function config(array $options = array()) {
-		if (static::_isBase($class = get_called_class())) {
+		if (($class = get_called_class()) === __CLASS__) {
 			return;
 		}
-				
+		
 		if (!isset(static::$_instances[$class])) {
-			$self = static::$_instances[$class] = new $class();
-		} else {
-			$self = static::$_instances[$class];
+			static::$_instances[$class] = new $class();
 		}
-
-		$self->_meta = $options + $self->_meta;
+		static::$_instances[$class]->_meta = $options + static::$_instances[$class]->_meta;
 		static::$_initialized[$class] = false;
 	}
 
@@ -339,13 +313,15 @@ class Model extends \lithium\core\StaticObject {
 	 * This method will set the `Model::$_schema`, `Model::$_meta`, `Model::$_finders` class
 	 * attributes, as well as obtain a handle to the configured persistent storage connection
 	 *
+	 * @param string $class The fully-namespaced class name to initialize.
+	 * @return object Returns the initialized model instance.
 	 */
-	protected static function _init($class){
+	protected static function _init($class) {
 		$self = static::$_instances[$class];
+
 		if (isset(static::$_initialized[$class]) && static::$_initialized[$class]) {
 			return $self;
 		}
-
 		static::$_initialized[$class] = true;
 
 		$query   = array();
@@ -434,15 +410,16 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * Examples:
 	 * {{{
-	 * Model::find('all'); // returns all records
-	 * Model::find('count'); // returns a count of all records
+	 * Posts::find('all'); // returns all records
+	 * Posts::find('count'); // returns a count of all records
 	 *
 	 * // The first ten records that have 'author' set to 'Lithium'
-	 * Model::find('all', array(
-	 *     'conditions' => array('author' => "Lithium"), 'limit' => 10
+	 * Posts::find('all', array(
+	 *     'conditions' => array('author' => "Bob"), 'limit' => 10
 	 * ));
 	 * }}}
 	 *
+	 * @see lithium\data\Model::$_finders
 	 * @param string $type The find type, which is looked up in `Model::$_finders`. By default it
 	 *        accepts `all`, `first`, `list` and `count`,
 	 * @param array $options Options for the query. By default, accepts:
@@ -494,16 +471,16 @@ class Model extends \lithium\core\StaticObject {
 	 * or a closure that accepts an array of query options, and a closure to execute.
 	 *
 	 * @param string $name The finder name, e.g. `first`.
-	 * @param string $options If you are setting a finder, this is the finder definition.
-	 * @return mixed Finder definition if querying, null otherwise.
+	 * @param string $finder If you are setting a finder, this is the finder definition.
+	 * @return mixed Returns finder definition if querying, or `null` if setting.
 	 */
-	public static function finder($name, $options = null) {
+	public static function finder($name, $finder = null) {
 		$self = static::_object();
 
-		if (empty($options)) {
+		if (!$finder) {
 			return isset($self->_finders[$name]) ? $self->_finders[$name] : null;
 		}
-		$self->_finders[$name] = $options;
+		$self->_finders[$name] = $finder;
 	}
 
 	/**
@@ -1112,20 +1089,6 @@ class Model extends \lithium\core\StaticObject {
 				static::bind($type, $name, (array) $config);
 			}
 		}
-	}
-
-	/**
-	 * Helper function for setting/getting base class settings.
-	 *
-	 * @param string $class Classname.
-	 * @param boolean $set If `true`, then the `$class` will be set.
-	 * @return boolean Success.
-	 */
-	protected static function _isBase($class = null, $set = false) {
-		if ($set) {
-			static::$_baseClasses[$class] = true;
-		}
-		return isset(static::$_baseClasses[$class]);
 	}
 
 	/**

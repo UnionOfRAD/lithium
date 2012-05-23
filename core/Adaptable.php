@@ -141,18 +141,15 @@ class Adaptable extends \lithium\core\StaticObject {
 		$stack = new SplDoublyLinkedList();
 
 		foreach ($config['strategies'] as $key => $strategy) {
-			$arguments = array();
-
-			if (is_array($strategy)) {
-				$name = $key;
-				$class = static::_strategy($name, static::$_strategies);
-				$index = (isset($config['strategies'][$name])) ? $name : $class;
-				$arguments = $config['strategies'][$index];
-			} else {
+			if (!is_array($strategy)) {
 				$name = $strategy;
 				$class = static::_strategy($name, static::$_strategies);
+				$stack->push(new $class());
+				continue;
 			}
-			$stack->push(new $class($arguments));
+			$class = static::_strategy($key, static::$_strategies);
+			$index = (isset($config['strategies'][$key])) ? $key : $class;
+			$stack->push(new $class($config['strategies'][$index]));
 		}
 		return $stack;
 	}
@@ -168,7 +165,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @return mixed Result of application of strategies to data. If no strategies
 	 *         have been configured, this method will simply return the original data.
 	 */
-	public static function applyStrategies($method, $name, $data, array $options = array()){
+	public static function applyStrategies($method, $name, $data, array $options = array()) {
 		$options += array('mode' => null);
 
 		if (!$strategies = static::strategies($name)) {
