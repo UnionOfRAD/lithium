@@ -10,50 +10,55 @@ namespace lithium\tests\mocks\data\source\mongo_db;
 
 class MockResult extends \lithium\data\source\mongo_db\Result {
 
-	public $query = array();
-
-	protected $_autoConfig = array('data', 'name');
-
-	protected $_name = '';
-
 	protected $_data = array(
 		array('_id' => '4c8f86167675abfabdbf0300', 'title' => 'bar'),
 		array('_id' => '5c8f86167675abfabdbf0301', 'title' => 'foo'),
 		array('_id' => '6c8f86167675abfabdbf0302', 'title' => 'dib')
 	);
 
+	protected $_init = false;
+
+	protected $_autoConfig = array('data', 'name');
+
+	protected $_name = '';
+
+	public $query = array();
+
+
+	public function hasNext() {
+		return ($this->_iterator < count($this->_data));
+	}
+
+	public function getNext() {
+		$this->_fetchFromResource();
+		return $this->_current;
+	}
+
+	/**
+	 * Fetches the result from the resource and caches it.
+	 *
+	 * @return boolean Return `true` on success or `false` if it is not valid.
+	 */
+	protected function _fetchFromResource() {
+		if ($this->_iterator < count($this->_data)) {
+			$result = current($this->_data);
+			$this->_key = $this->_iterator;
+			$this->_current = $this->_cache[$this->_iterator++] = $result;
+			next($this->_data);
+			return true;
+		}
+		return false;
+	}
+
 	public function getName() {
 		return $this->_name;
 	}
 
-	public function hasNext() {
-		if (!is_array($this->_data)) {
-			return false;
-		}
-		return key($this->_data) !== null && key($this->_data) < count($this->_data);
-	}
-
-	public function getNext() {
-		$result = current($this->_data);
-		next($this->_data);
-		return $result;
-	}
-
-	public function next() {
-		return $this->_next();
-	}
-
-	public function __call($method, array $params) {
-		return $this;
-	}
+	/*public function __call($method, $arguments) {
+		exit();
+	}*/
 
 	protected function _close() {
-	}
-
-	protected function _next() {
-		$result = current($this->_data) ?: null;
-		next($this->_data);
-		return $result;
 	}
 
 	public function fields(array $fields = array()) {

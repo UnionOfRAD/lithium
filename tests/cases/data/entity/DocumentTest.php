@@ -13,7 +13,6 @@ use MongoDate;
 use lithium\data\source\MongoDb;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
-use lithium\data\collection\DocumentArray;
 use lithium\data\source\mongo_db\Schema;
 use lithium\tests\mocks\data\model\MockDocumentPost;
 use lithium\tests\mocks\data\model\MockDocumentMultipleKey;
@@ -102,7 +101,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$expected = array(
 			'id' => true,
 			'name' => true,
-			'content' => true,
+			'content' => true
 		);
 
 		$this->assertEqual($expected, $doc->modified());
@@ -118,7 +117,7 @@ class DocumentTest extends \lithium\test\Unit {
 			'id' => true,
 			'name' => false,
 			'content' => true,
-			'new' => true,
+			'new' => true
 		);
 
 		$this->assertEqual($expected, $doc->modified());
@@ -141,8 +140,8 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc->forceArray = 'foo';
 		$result = $doc->export();
 
-		$this->assertTrue($result['update']['forceArray'] instanceof DocumentArray);
-		$this->assertTrue($result['update']['array'] instanceof DocumentArray);
+		$this->assertTrue($result['update']['forceArray'] instanceof DocumentSet);
+		$this->assertTrue($result['update']['array'] instanceof DocumentSet);
 		$this->assertIdentical(array('foo'), $result['update']['forceArray']->data());
 
 		$doc->forceArray = false;
@@ -244,7 +243,7 @@ class DocumentTest extends \lithium\test\Unit {
 		)));
 
 		$this->assertEqual('father', $doc->type);
-		$this->assertTrue($doc->children instanceof DocumentArray);
+		$this->assertTrue($doc->children instanceof DocumentSet);
 
 		$expected = array('id' => 124, 'type' => 'child', 'children' => null);
 		$result = $doc->children[0]->data();
@@ -290,7 +289,7 @@ class DocumentTest extends \lithium\test\Unit {
 	public function testRewindNoData() {
 		$doc = new DocumentSet();
 		$result = $doc->rewind();
-		$this->assertNull($result);
+		$this->assertFalse($result);
 	}
 
 	public function testRewindData() {
@@ -331,7 +330,6 @@ class DocumentTest extends \lithium\test\Unit {
 
 		$doc->sync(array(12, '1-2'));
 		$this->assertTrue($doc->exists());
-
 		$this->assertEqual(12, $doc->id);
 		$this->assertEqual('1-2', $doc->rev);
 	}
@@ -364,7 +362,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual(12, $doc->id);
 		$this->assertEqual('Joe', $doc->name);
 
-		$this->assertTrue($doc->sons instanceof DocumentArray, 'arr is not an array');
+		$this->assertTrue($doc->sons instanceof DocumentSet, 'arr is not an array');
 		$this->assertEqual(array('Moe', 'Greg'), $doc->sons->data());
 	}
 

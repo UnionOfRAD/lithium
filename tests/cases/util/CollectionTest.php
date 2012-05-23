@@ -20,6 +20,10 @@ class CollectionTest extends \lithium\test\Unit {
 		Collection::formats('lithium\net\http\Media');
 	}
 
+    public function tearDown() {
+		Collection::formats(false);
+	}
+
 	public function testArrayLike() {
 		$collection = new Collection();
 		$collection[] = 'foo';
@@ -176,7 +180,7 @@ class CollectionTest extends \lithium\test\Unit {
 
 		$data = array('Hello', 2, 3, null, 6, false, true, 0);
 		$collection = new Collection(array('data' => $data));
-		
+
 		$cpt = 0;
 		foreach ($collection as $i => $word) {
 			$this->assertTrue(isset($collection[$cpt]));
