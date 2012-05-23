@@ -133,13 +133,12 @@ abstract class Renderer extends \lithium\core\Object {
 	protected $_vars = array();
 
 	/**
-	 * Render the template with given data.
-	 * Abstract. Must be added to subclasses.
+	 * Render the template with given data. Abstract; must be added to subclasses.
 	 *
 	 * @param string $template
 	 * @param array|string $data
 	 * @param array $options
-	 * @return void
+	 * @return string Returns the result of the rendered template.
 	 */
 	abstract public function render($template, $data = array(), array $options = array());
 

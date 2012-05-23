@@ -30,7 +30,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 * @var array
 	 */
 	protected static $_classes = array(
-		'collection' => '\lithium\util\Collection'
+		'collection' => 'lithium\util\Collection'
 	);
 
 	/**

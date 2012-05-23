@@ -54,6 +54,9 @@ class Php extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _init() {
+		if (static::isStarted()) {
+			return true;
+		}
 		$config = $this->_config;
 		unset($config['adapter'], $config['strategies'], $config['filters'], $config['init']);
 

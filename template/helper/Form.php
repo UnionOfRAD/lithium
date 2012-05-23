@@ -597,7 +597,8 @@ class Form extends \lithium\template\Helper {
 			}
 			$selected = (
 				(is_array($scope['value']) && in_array($value, $scope['value'])) ||
-				($scope['value'] == $value)
+				($scope['empty'] && empty($scope['value']) && $value === '') ||
+				($scope['value'] === (is_integer($value) ? (string) $value : $value) )
 			);
 			$options = $selected ? array('selected' => true) : array();
 			$params = compact('value', 'title', 'options');

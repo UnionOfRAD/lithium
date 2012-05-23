@@ -23,7 +23,7 @@ class LibraryTest extends \lithium\test\Unit {
 
 	public function skip() {
 		$this->_testPath = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_writable($this->_testPath), "{$this->_testPath} is not writable.");
+		$this->skipIf(!is_writable($this->_testPath), "Path `{$this->_testPath}` is not writable.");
 	}
 
 	public function setUp() {
@@ -151,7 +151,6 @@ class LibraryTest extends \lithium\test\Unit {
 
 	protected function _assertFileContents($filepath, $expected) {
 		$content = file_get_contents($filepath);
-		$lines = explode("\n", $content);
 		$this->assertTrue(strpos($content, $expected));
 	}
 

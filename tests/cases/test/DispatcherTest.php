@@ -27,7 +27,11 @@ class DispatcherTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithReporter() {
-		$report = Dispatcher::run(null, array('reporter' => 'html'));
+		$report = Dispatcher::run(null, array(
+			'reporter' => function($info) {
+				return $info;
+			}
+		));
 		$this->assertTrue($report instanceof Report);
 
 		$result = $report->group;

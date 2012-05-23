@@ -17,7 +17,6 @@ namespace lithium\test;
  * with. Example: the `Session` class and the `Php` adapter. Unit tests will ensure that
  * both the `Session` and `Php` classes behave correctly under isolation, while an integration
  * test ensures that the two classes interact and interface correctly.
- *
  */
 class Integration extends \lithium\test\Unit {
 

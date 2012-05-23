@@ -27,8 +27,8 @@ class InspectorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testBasicMethodInspection() {
-		$class = '\lithium\analysis\Inspector';
-		$parent = '\lithium\core\StaticObject';
+		$class = 'lithium\analysis\Inspector';
+		$parent = 'lithium\core\StaticObject';
 
 		$expected = array_diff(get_class_methods($class), get_class_methods($parent));
 		$result = array_keys(Inspector::methods($class, 'extents'));
@@ -39,7 +39,7 @@ class InspectorTest extends \lithium\test\Unit {
 		)));
 		$this->assertEqual($expected, $result);
 
-		$this->assertNull(Inspector::methods('\lithium\core\Foo'));
+		$this->assertNull(Inspector::methods('lithium\core\Foo'));
 
 		$result = Inspector::methods('stdClass', 'extents');
 		$this->assertEqual(array(), $result);
@@ -119,7 +119,7 @@ class InspectorTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$this->expectException('/Missing argument 2/');
-		$this->assertNull(Inspector::lines('\lithium\core\Foo'));
+		$this->assertNull(Inspector::lines('lithium\core\Foo'));
 		$this->assertNull(Inspector::lines(__CLASS__, array()));
 	}
 
@@ -178,9 +178,9 @@ class InspectorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testTypeDetection() {
-		$this->assertEqual('namespace', Inspector::type('\lithium\util'));
-		$this->assertEqual('namespace', Inspector::type('\lithium\analysis'));
-		$this->assertEqual('class', Inspector::type('\lithium\analysis\Inspector'));
+		$this->assertEqual('namespace', Inspector::type('lithium\util'));
+		$this->assertEqual('namespace', Inspector::type('lithium\analysis'));
+		$this->assertEqual('class', Inspector::type('lithium\analysis\Inspector'));
 		$this->assertEqual('property', Inspector::type('Inspector::$_classes'));
 		$this->assertEqual('method', Inspector::type('Inspector::type'));
 		$this->assertEqual('method', Inspector::type('Inspector::type()'));

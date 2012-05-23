@@ -22,7 +22,7 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function skip() {
 		$this->_testPath = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_writable($this->_testPath), "{$this->_testPath} is not readable.");
+		$this->skipIf(!is_writable($this->_testPath), "Path `{$this->_testPath}` is not readable.");
 	}
 
 	public function setUp() {

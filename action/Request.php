@@ -267,6 +267,11 @@ class Request extends \lithium\net\http\Request {
 					return (!empty($this->_env['HTTPS']) && $this->_env['HTTPS'] !== 'off');
 				}
 				return false;
+			case 'SERVER_ADDR':
+				if (empty($this->_env['SERVER_ADDR']) && !empty($this->_env['LOCAL_ADDR'])) {
+					return $this->_env['LOCAL_ADDR'];
+				}
+				return $this->_env['SERVER_ADDR'];
 			case 'SCRIPT_FILENAME':
 				if ($this->_env['PLATFORM'] == 'IIS') {
 					return str_replace('\\\\', '\\', $this->env('PATH_TRANSLATED'));
@@ -449,7 +454,7 @@ class Request extends \lithium\net\http\Request {
 
 	/**
 	 * Sets/Gets the content type. If `'type'` is null, the method will attempt to determine the
-	 * type first, from the params, then from the environment setting
+	 * type from the params, then from the environment setting
 	 *
 	 * @param string $type a full content type i.e. `'application/json'` or simple name `'json'`
 	 * @return string A simple content type name, i.e. `'html'`, `'xml'`, `'json'`, etc., depending
@@ -581,7 +586,9 @@ class Request extends \lithium\net\http\Request {
 			return rtrim($_GET['url'], '/');
 		}
 		if ($uri = $this->env('REQUEST_URI')) {
-			return str_replace($this->env('base'), '/', parse_url($uri, PHP_URL_PATH));
+			return trim(preg_replace(
+				'/^' . preg_quote($this->env('base'), '/') . '/', '', parse_url($uri, PHP_URL_PATH)
+			), '/') ?: '/';
 		}
 		return '/';
 	}

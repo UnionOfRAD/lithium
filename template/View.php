@@ -118,6 +118,13 @@ class View extends \lithium\core\Object {
 	protected $_renderer = null;
 
 	/**
+	 * Path used to look up view loading and rendering adapters.
+	 *
+	 * @var string
+	 */
+	protected $_adapters = 'adapter.template.view';
+
+	/**
 	 * View processes are aggregated lists of steps taken to to create a complete, rendered view.
 	 * For example, the default process, `'all'`, renders a template, then renders a layout, using
 	 * the rendered template content. A process can be defined using one or more steps defined in
@@ -187,21 +194,35 @@ class View extends \lithium\core\Object {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $config Configuration parameters.
-	 *        The available options are:
-	 *          - `'loader'` _mixed_: For locating/reading view, layout and element
-	 *            templates. Defaults to `File`.
-	 *          - `'renderer'` _mixed_: Populates the view/layout with the data set from the
-	 *            controller. Defaults to `'File'`.
-	 *          - `'request'`: The request object to be made available in the view.
-	 *            Defaults to `null`.
-	 *          - `'vars'`: Defaults to `array()`.
+	 * @see lithium\template\View::$_steps
+	 * @see lithium\template\View::$_processes
+	 * @param array $config Class configuration parameters The available options are:
+	 *         - `'loader'` _mixed_: Instance or name of the class used for locating and reading
+	 *           template content. Defaults to `File`, which reads template content from PHP files.
+	 *         - `'renderer'` _mixed_: Instance or name of the class that populates template
+	 *           content with the data passed in to the view layer, typically from a controller.
+	 *           Defaults to `'File'`, which executes templates as standard PHP files, using path
+	 *           information returned from the `loader` class. Both `loader` and `renderer`
+	 *           classes are looked up using the `'adapter.template.view'` path, which locates
+	 *           classes in the `extensions\adapter\template\view` sub-namespace of an application
+	 *           or plugin.
+	 *         - `'request'`: The `Request` object to be made available in the templates.
+	 *           Defaults to `null`.
+	 *         - `'steps'` _array_: The array of step configurations to add to the built-in
+	 *           configurations. Will be merged with the defaults, with any configurations passed
+	 *           in overwriting built-in steps. See the `$_steps` property for more information.
+	 *         - `'processes'` _array_: The array of process steps to add to the built-in
+	 *           configurations. Will be merged with the defaults, with any configurations passed
+	 *           in overwriting built-in processes. See the `$_processes` property for more
+	 *           information.
+	 *         - `'outputFilters'` _array_: An array of filters to be used when handling output. By
+	 *           default, the class is initialized with one filter, `h`, which is used in automatic
+	 *           output escaping.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'request' => null,
 			'response' => null,
-			'vars' => array(),
 			'loader' => 'File',
 			'renderer' => 'File',
 			'steps' => array(),
@@ -213,6 +234,9 @@ class View extends \lithium\core\Object {
 
 	/**
 	 * Perform initialization of the View.
+	 *
+	 * Looks up and initializes loader and renderer classes, and initializes the output escape
+	 * handler, matching the encoding from the `Response` object.
 	 *
 	 * @return void
 	 */
@@ -236,21 +260,53 @@ class View extends \lithium\core\Object {
 			}
 			$class = $this->_config[$key];
 			$config = array('view' => $this) + $this->_config;
-			$this->{'_' . $key} = Libraries::instance('adapter.template.view', $class, $config);
+			$this->{'_' . $key} = Libraries::instance($this->_adapters, $class, $config);
 		}
 	}
 
+	/**
+	 * Executes a named rendering process by running each process step in sequence and aggregating
+	 * the results. The `View` class comes with 3 built-in processes: `'all'`, `'template'`, and
+	 * `'element'`. The `'all'` process is the default two-step rendered view, where a template is
+	 * wrapped in a layout containing a header and footer.
+	 *
+	 * @see lithium\template\View::_conditions()
+	 * @see lithium\template\View::$_processes
+	 * @see lithium\template\View::$_steps
+	 * @param string $process A named set of rendering steps defined in the `$_processes` array.
+	 * @param array $data An associative array of data to be rendered in the set of templates.
+	 * @param array $options Options used when rendering. Available keys are as follows:
+	 *              - `'type'` _string_: The type of content to render. Defaults to `'html'`.
+	 *              - `'layout'` _string_: The name of the layout to use in the default two-step
+	 *                 rendering process. Defaults to `null`.
+	 *              - `'template'` _string_: The name of the template to render. Defaults to `null`.
+	 *              - `'context'` _array_: An associative array of information to inject into the
+	 *                 rendering context.
+	 *              - `'paths'` _array_: A nested array of paths to use for rendering steps. The
+	 *                top-level keys should match the `'path'` key in a step configuration (i.e.:
+	 *                `'template'`, `'layout'`, or `'element'`), and the second level is an array
+	 *                of path template strings to search (can be a string if there's only one path).
+	 *                These path strings generally take the following form:
+	 *                `'{:library}/views/{:controller}/{:template}.{:type}.php'`. These template
+	 *                strings are specific to the `File` loader, but can take any form useful to the
+	 *                template loader being used.
+	 * @return string Returns the result of the rendering process, typically by rendering a template
+	 *         first, then rendering a layout (using the default configuration of the `'all'`
+	 *         process).
+	 */
 	public function render($process, array $data = array(), array $options = array()) {
 		$defaults = array(
 			'type' => 'html',
 			'layout' => null,
 			'template' => null,
-			'context' => array()
+			'context' => array(),
+			'paths' => array(),
+			'data' => array()
 		);
 		$options += $defaults;
 
-		$data += isset($options['data']) ? (array) $options['data'] : array();
-		$paths = isset($options['paths']) ? (array) $options['paths'] : array();
+		$data += $options['data'];
+		$paths = $options['paths'];
 		unset($options['data'], $options['paths']);
 		$params = array_filter($options, function($val) { return $val && is_string($val); });
 		$result = null;
@@ -274,7 +330,24 @@ class View extends \lithium\core\Object {
 		return $result;
 	}
 
-	protected function _conditions($step, $params, $data, $options) {
+	/**
+	 * Evaluates a step condition to determine if the step should be executed.
+	 *
+	 * @see lithium\template\View::$_steps
+	 * @param array $step The array of instructions that define a rendering step.
+	 * @param array $params The parameters associated with this rendering operation, as passed to
+	 *              `render()` (filtered from the `$options` parameter).
+	 * @param array $data The associative array of template variables passed to `render()`.
+	 * @param array $options The `$options` parameter, as passed to `render()`.
+	 * @return boolean Returns `true` if the step should be executed, or `false` if the step should
+	 *         be skipped. If the step array has a `'conditions'` key which is a string, it checks
+	 *         to see if the rendering options (`$options`) contain a key of the same name, and if
+	 *         that key evaluates to `true`. If `'conditions'` is a closure, that closure is
+	 *         executed with the rendering parameters (`$params`, `$data`, and `$options`), and the
+	 *         result is determined by the return value of the closure. If a step definition has no
+	 *         `'conditions'` key, it is always executed.
+	 */
+	protected function _conditions(array $step, array $params, array $data, array $options) {
 		if (!$conditions = $step['conditions']) {
 			return true;
 		}
@@ -290,10 +363,15 @@ class View extends \lithium\core\Object {
 	/**
 	 * Performs a rendering step.
 	 *
-	 * @param array $step
-	 * @param array $params
+	 * @see lithium\template\view\adapter\File::template()
+	 * @see lithium\template\view\Renderer::render()
+	 * @see lithium\template\view\adapter\File::render()
+	 * @param array $step The array defining the step configuration to render.
+	 * @param array $params An associative array of string values used in the template lookup
+	 *              process. See the `$params` argument of `File::template()`.
 	 * @param array $data associative array for template data.
-	 * @param array $options
+	 * @param array $options An associative array of options to pass to the renderer. See the
+	 *              `$options` parameter of `Renderer::render()` or `File::render()`.
 	 * @return string
 	 * @filter
 	 */
@@ -303,6 +381,7 @@ class View extends \lithium\core\Object {
 		$_loader = $this->_loader;
 		$filters = $this->outputFilters;
 		$params = compact('step', 'params', 'options') + array('data' => $data + $filters);
+
 		$filter = function($self, $params) use (&$_renderer, &$_loader) {
 			$template = $_loader->template($params['step']['path'], $params['params']);
 			return $_renderer->render($template, $params['data'], $params['options']);
@@ -359,7 +438,19 @@ class View extends \lithium\core\Object {
 		return $result;
 	}
 
-	protected function _convertSteps($command, &$params, $defaults) {
+	/**
+	 * Handles API backward compatibility by converting an array-based rendering instruction passed
+	 * to `render()` as a process, to a set of rendering steps, rewriting any associated rendering
+	 * parameters as necessary.
+	 *
+	 * @param array $command A deprecated rendering instruction, i.e.
+	 *              `array('template' => '/path/to/template')`.
+	 * @param array $params The array of associated rendering parameters, passed by reference.
+	 * @param array $defaults Default step rendering options to be merged with the passed rendering
+	 *              instruction information.
+	 * @return array Returns a converted set of rendering steps, to be executed in `render()`.
+	 */
+	protected function _convertSteps(array $command, array &$params, $defaults) {
 		if (count($command) == 1) {
 			$params['template'] = current($command);
 			return array(array('path' => key($command)) + $defaults);

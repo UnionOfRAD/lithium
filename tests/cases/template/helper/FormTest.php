@@ -601,13 +601,16 @@ class FormTest extends \lithium\test\Unit {
 	}
 
 	public function testSelectWithEmptyOption() {
-		$result = $this->form->select('numbers', array('1' => 'first', '2' => 'second'), array(
+		$result = $this->form->select('numbers', array('zero', 'first', 'second'), array(
 			'empty' => true
 		));
 
 		$this->assertTags($result, array(
 			'select' => array('id' => 'Numbers', 'name' => 'numbers'),
 			array('option' => array('value' => '', 'selected' => 'selected')),
+			'/option',
+			array('option' => array('value' => '0')),
+			'zero',
 			'/option',
 			array('option' => array('value' => '1')),
 			'first',
@@ -618,7 +621,7 @@ class FormTest extends \lithium\test\Unit {
 			'/select'
 		));
 
-		$result = $this->form->select('numbers', array('1' => 'first', '2' => 'second'), array(
+		$result = $this->form->select('numbers', array('zero', 'first', 'second'), array(
 			'empty' => '> Make a selection'
 		));
 
@@ -626,6 +629,9 @@ class FormTest extends \lithium\test\Unit {
 			'select' => array('name' => 'numbers', 'id' => 'Numbers'),
 			array('option' => array('value' => '', 'selected' => 'selected')),
 			'&gt; Make a selection',
+			'/option',
+			array('option' => array('value' => '0')),
+			'zero',
 			'/option',
 			array('option' => array('value' => '1')),
 			'first',
@@ -959,7 +965,7 @@ class FormTest extends \lithium\test\Unit {
 			'div' => array(),
 			'label' => array('for' => 'States'), 'States', '/label',
 			'select' => array('name' => 'states', 'id' => 'States'),
-			array('option' => array('value' => '0', 'selected' => 'selected')),
+			array('option' => array('value' => '0')),
 			'CA',
 			'/option',
 			array('option' => array('value' => '1')),

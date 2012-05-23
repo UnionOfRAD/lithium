@@ -13,7 +13,7 @@ use lithium\core\Environment;
 class MockDispatcherCommand extends \lithium\console\Command {
 
 	protected $_classes = array(
-		'response' => '\lithium\tests\mocks\console\MockResponse'
+		'response' => 'lithium\tests\mocks\console\MockResponse'
 	);
 
 	public function testRun() {

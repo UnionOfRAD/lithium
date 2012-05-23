@@ -10,6 +10,7 @@ namespace lithium\console\command;
 
 use lithium\core\Libraries;
 use lithium\test\Dispatcher;
+use lithium\test\Unit;
 
 /**
  * Runs a given set of tests and outputs the results.
@@ -19,7 +20,12 @@ use lithium\test\Dispatcher;
 class Test extends \lithium\console\Command {
 
 	/**
-	 * Filters.
+	 * Used as the exit code for errors where no test was mapped to file.
+	 */
+	const EXIT_NO_TEST = 4;
+
+	/**
+	 * List of filters to apply before/during/after test run, separated by commas.
 	 *
 	 * For example:
 	 * {{{
@@ -46,6 +52,21 @@ class Test extends \lithium\console\Command {
 	public $format = 'txt';
 
 	/**
+	 * Enable verbose output especially for the `txt` format.
+	 *
+	 * @var boolean
+	 */
+	public $verbose = false;
+
+	/**
+	 * Enable plain mode to prevent any headers or similar decoration being output.
+	 * Good for command calls embedded into other scripts.
+	 *
+	 * @var boolean
+	 */
+	public $plain = false;
+
+	/**
 	 * An array of closures, mapped by type, which are set up to handle different test output
 	 * formats.
 	 *
@@ -61,28 +82,87 @@ class Test extends \lithium\console\Command {
 	 */
 	protected function _init() {
 		parent::_init();
-		$self = $this;
+		$command = $this;
+
 		$this->_handlers += array(
-			'txt' => function($runner, $path) use ($self) {
-				$message = sprintf('Running test(s) in `%s`... ', ltrim($path, '\\'));
-				$self->header('Test');
-				$self->out($message, array('nl' => false));
-
-				$report = $runner();
-				$self->out('done.', 2);
-				$self->out('{:heading}Results{:end}', 0);
-				$self->out($report->render('stats', $report->stats()));
-
-				foreach ($report->filters() as $filter => $options) {
-					$data = $report->results['filters'][$filter];
-					$self->out($report->render($options['name'], compact('data')));
+			'txt' => function($runner, $path) use ($command) {
+				if (!$command->plain) {
+					$command->header('Test');
+					$command->out(null, 1);
 				}
+				$colorize = function($result) {
+					switch (trim($result)) {
+						case '.':
+							return $result;
+						case 'pass':
+							return "{:green}{$result}{:end}";
+						case 'F':
+						case 'fail':
+							return "{:red}{$result}{:end}";
+						case 'E':
+						case 'exception':
+							return "{:purple}{$result}{:end}";
+						case 'S':
+						case 'skip':
+							return "{:cyan}{$result}{:end}";
+						default:
+							return "{:yellow}{$result}{:end}";
+					}
+				};
 
-				$self->hr();
-				$self->nl();
+				if ($command->verbose) {
+					$reporter = function($result) use ($command, $colorize) {
+						$command->out(sprintf(
+							'[%s] on line %4s in %s::%s()',
+							$colorize(sprintf('%9s', $result['result'])),
+							isset($result['line']) ? $result['line'] : '??',
+							isset($result['class']) ? $result['class'] : '??',
+							isset($result['method']) ? $result['method'] : '??'
+						));
+					};
+				} else {
+					$i = 0;
+					$columns = 60;
+
+					$reporter = function($result) use ($command, &$i, $columns, $colorize) {
+						$shorten = array('fail', 'skip', 'exception');
+
+						if ($result['result'] == 'pass') {
+							$symbol = '.';
+						} elseif (in_array($result['result'], $shorten)) {
+							$symbol = strtoupper($result['result'][0]);
+						} else {
+							$symbol = '?';
+						}
+						$command->out($colorize($symbol), false);
+
+						$i++;
+						if ($i % $columns === 0) {
+							$command->out();
+						}
+					};
+				}
+				$report = $runner(compact('reporter'));
+
+				if (!$command->plain) {
+					$stats = $report->stats();
+
+					$command->out(null, 2);
+					$command->out($report->render('result', $stats));
+					$command->out($report->render('errors', $stats));
+
+					if ($command->verbose) {
+						$command->out($report->render('skips', $stats));
+					}
+
+					foreach ($report->filters() as $filter => $options) {
+						$data = $report->results['filters'][$filter];
+						$command->out($report->render($options['name'], compact('data')));
+					}
+				}
 				return $report;
 			},
-			'json' => function($runner, $path) use ($self) {
+			'json' => function($runner, $path) use ($command) {
 				$report = $runner();
 
 				if ($results = $report->filters()) {
@@ -92,7 +172,7 @@ class Test extends \lithium\console\Command {
 						$filters[$options['name']] = $report->results['filters'][$filter];
 					}
 				}
-				$self->out($report->render('stats', $report->stats() + compact('filters')));
+				$command->out($report->render('stats', $report->stats() + compact('filters')));
 				return $report;
 			}
 		);
@@ -122,12 +202,26 @@ class Test extends \lithium\console\Command {
 	 * li3 test <plugin>/tests/cases
 	 * }}}
 	 *
-	 * @param string $path Absolute or relative path to tests.
+	 *
+	 * This will run `<library>/tests/cases/<package>/<class>Test.php`:
+	 *
+	 * {{{
+	 * li3 test <library>/<package>/<class>.php
+	 * }}}
+	 *
+	 * @param string $path Absolute or relative path to tests or a file which
+	 *                     corresponding test should be run.
 	 * @return boolean Will exit with status `1` if one or more tests failed otherwise with `0`.
 	 */
 	public function run($path = null) {
 		if (!$path = $this->_path($path)) {
 			return false;
+		}
+		if (!preg_match('/(tests|Test\.php)/', $path)) {
+			if (!$path = Unit::get($path)) {
+				$this->error('Cannot map path to test path.');
+				return static::EXIT_NO_TEST;
+			}
 		}
 		$handlers = $this->_handlers;
 
@@ -136,11 +230,10 @@ class Test extends \lithium\console\Command {
 			return false;
 		}
 		$filters = $this->filters ? array_map('trim', explode(',', $this->filters)) : array();
-		$params = compact('filters') + array('reporter' => 'console', 'format' => $this->format);
-
-		$runner = function() use ($path, $params) {
+		$params = compact('filters') + array('format' => $this->format);
+		$runner = function($options = array()) use ($path, $params) {
 			error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
-			return Dispatcher::run($path, $params);
+			return Dispatcher::run($path, $params + $options);
 		};
 		$report = $handlers[$this->format]($runner, $path);
 		$stats = $report->stats();
@@ -160,17 +253,29 @@ class Test extends \lithium\console\Command {
 			}
 			return $name;
 		}
-		return null;
 	}
 
 	/**
-	 * Validates an absolute or relative path to test cases.
+	 * Validates and gets a fully-namespaced class path from an absolute or
+	 * relative physical path to a directory or file. The final class path may
+	 * be partial in that in doesn't contain the class name.
 	 *
-	 * @param string $path The directory or file path to one or more test cases
-	 * @return string Returns a fully-resolved physical path, or `false`, if an error occurs.
+	 * This method can be thought of the reverse of `Libraries::path()`.
+	 *
+	 * {{{
+	 * lithium/tests/cases/core/ObjectTest.php -> lithium\tests\cases\core\ObjectTest
+	 * lithium/tests/cases/core                -> lithium\tests\cases\core
+	 * lithium/core/Object.php                 -> lithium\core\Object
+	 * lithium/core/                           -> lithium\core
+	 * lithium/core                            -> lithium\core
+	 * }}}
+	 *
+	 * @see lithium\core\Libraries::path()
+	 * @param string $path The directory of or file path to one or more classes.
+	 * @return string Returns a fully-namespaced class path, or `false`, if an error occurs.
 	 */
 	protected function _path($path) {
-		$path = str_replace('\\', '/', $path);
+		$path = rtrim(str_replace('\\', '/', $path), '/');
 
 		if (!$path) {
 			$this->error('Please provide a path to tests.');
@@ -180,6 +285,11 @@ class Test extends \lithium\console\Command {
 			$library = $this->_library($path);
 		}
 		if ($path[0] != '/') {
+			$libraries = array_reduce(Libraries::get(), function($v, $w) {
+				$v[] = basename($w['path']);
+				return $v;
+			});
+
 			$library = basename($this->request->env('working'));
 			$parts = explode('/', str_replace("../", "", $path));
 			$plugin = array_shift($parts);
@@ -187,13 +297,13 @@ class Test extends \lithium\console\Command {
 			if ($plugin == 'libraries') {
 				$plugin = array_shift($parts);
 			}
-			if ($plugin != 'tests') {
+			if (in_array($plugin, $libraries)) {
 				$library = $plugin;
 				$path = join('/', $parts);
 			}
 		}
 		if (empty($library)) {
-			$this->error("No library found in `{$path}`.");
+			$this->error("No library found in path `{$path}`.");
 			return false;
 		}
 		if (!$config = Libraries::get($library)) {
@@ -204,7 +314,7 @@ class Test extends \lithium\console\Command {
 		$realpath = $config['path'] . '/' . $path;
 
 		if (!realpath($realpath)) {
-			$this->error("{$realpath} not found.");
+			$this->error("Path `{$realpath}` not found.");
 			return false;
 		}
 		$class = str_replace(".php", "", str_replace('/', '\\', ltrim($path, '/')));
