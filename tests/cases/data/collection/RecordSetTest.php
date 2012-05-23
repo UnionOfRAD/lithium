@@ -20,6 +20,7 @@ use lithium\util\Collection;
 class RecordSetTest extends \lithium\test\Unit {
 
 	protected $_model = 'lithium\tests\mocks\data\MockModel';
+	protected $_model2 = 'lithium\tests\mocks\data\MockModelCompositePk';
 
 	/**
 	 * RecordSet object to test
@@ -214,7 +215,6 @@ class RecordSetTest extends \lithium\test\Unit {
 	}
 
 	public function testOffsetSetWithLoadedData() {
-		$this->_recordSet[0];
 		$this->_recordSet[1] = array('id' => 1, 'data' => 'new data1');
 
 		$expected = array(
@@ -225,7 +225,6 @@ class RecordSetTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $this->_recordSet->to('array'));
 
-		$this->_objectRecordSet[0];
 		$this->_objectRecordSet[1] = new MockPostObject(array('id' => 1, 'data' => 'new data1'));
 
 		$result = $this->_objectRecordSet[1];
@@ -246,7 +245,6 @@ class RecordSetTest extends \lithium\test\Unit {
 	}
 
 	public function testOffsetUnset() {
-		$this->_recordSet[0];
 		unset($this->_recordSet[1]);
 
 		$expected = array(
@@ -256,7 +254,6 @@ class RecordSetTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $this->_recordSet->to('array'));
 
-		$this->_objectRecordSet[0];
 		unset($this->_objectRecordSet[1]);
 
 		$this->assertNull($this->_objectRecordSet[1]);
@@ -275,13 +272,11 @@ class RecordSetTest extends \lithium\test\Unit {
 	}
 
 	public function testRewind() {
-		$this->_recordSet[0];
 		$this->_recordSet->rewind();
 
 		$expected = array('id' => 1, 'data' => 'data1');
 		$this->assertEqual($expected, $this->_recordSet->current()->to('array'));
 
-		$this->_objectRecordSet[0];
 		$this->_objectRecordSet->rewind();
 
 		$result = $this->_objectRecordSet->current();
@@ -690,7 +685,7 @@ class RecordSetTest extends \lithium\test\Unit {
 
 		$this->assertEqual($data[1], $payments[array('client_id' => 2, 'invoice_id' => 5)]);
 	}
-/*
+
 	public function testRecordWithCombinedPkAndLazyLoading() {
 
 		$records = array(
@@ -733,7 +728,7 @@ class RecordSetTest extends \lithium\test\Unit {
 					'{"client_id":4,"invoice_id":7,"title":"Payment3"}]';
 
 		$this->assertEqual($expected, $payments->to('json'));
-	}*/
+	}
 }
 
 ?>
