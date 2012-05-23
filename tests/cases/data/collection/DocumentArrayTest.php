@@ -110,6 +110,14 @@ class DocumentArrayTest extends \lithium\test\Unit {
 		$this->assertEqual(3, count($doc));
 	}
 
+	public function testOffsetSet() {
+		$data   = array('change me', 'foo', 'bar');
+		$doc    = new DocumentArray(compact('data'));
+		$doc[0] = 'new me';
+		$expected = array(0 => 'new me', 1 => 'foo', 2 => 'bar');
+		$this->assertIdentical($expected, $doc->data());
+	}
+
 	public function testPopulateResourceClose() {
 		$resource = new MockResult();
 
