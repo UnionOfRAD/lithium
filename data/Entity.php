@@ -435,7 +435,7 @@ class Entity extends \lithium\core\Object {
 	 * @return string Returns the generated title of the object.
 	 */
 	public function __toString() {
-		return $this->__call('title', array());
+		return (string) $this->__call('title', array());
 	}
 }
 

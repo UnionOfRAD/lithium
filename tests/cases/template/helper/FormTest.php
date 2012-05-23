@@ -264,10 +264,15 @@ class FormTest extends \lithium\test\Unit {
 	}
 
 	public function testFormInputField() {
+		$tag = array('input' => array('type' => 'file', 'name' => 'upload', 'id' => 'Upload'));
+
 		$result = $this->form->file('upload');
-		$this->assertTags($result, array('input' => array(
-			'type' => 'file', 'name' => 'upload', 'id' => 'Upload'
-		)));
+		$this->assertTags($result, $tag);
+
+		$value = new Document(array('model' => $this->_model));
+		$result = $this->form->file('upload', compact('value'));
+		$tag['input']['value'] = '';
+		$this->assertTags($result, $tag);
 	}
 
 	public function testHiddenFieldWithId() {
