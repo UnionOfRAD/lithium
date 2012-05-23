@@ -63,7 +63,6 @@ class MongoDb extends \lithium\data\Source {
 	protected $_classes = array(
 		'entity'       => 'lithium\data\entity\Document',
 		'array'        => 'lithium\data\collection\DocumentArray',
-		'set'          => 'lithium\data\collection\DocumentSet',
 		'result'       => 'lithium\data\source\mongo_db\Result',
 		'schema'       => 'lithium\data\source\mongo_db\Schema',
 		'exporter'     => 'lithium\data\source\mongo_db\Exporter',
@@ -207,7 +206,7 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	/**
-	 * Configures a model class by overriding the default dependencies for `'set'` and
+	 * Configures a model class by overriding the default dependencies for `'array'` and
 	 * `'entity'` , and sets the primary key to `'_id'`, in keeping with Mongo's conventions.
 	 *
 	 * @see lithium\data\Model::$_meta
@@ -452,7 +451,7 @@ class MongoDb extends \lithium\data\Source {
 
 			if ($group = $args['group']) {
 				$result = $self->invokeMethod('_group', array($group, $args, $options));
-				$config = array('class' => 'set') + compact('query') + $result;
+				$config = array('class' => 'array') + compact('query') + $result;
 				return $self->item($query->model(), $config['data'], $config);
 			}
 			$collection = $self->connection->{$source};
@@ -468,7 +467,7 @@ class MongoDb extends \lithium\data\Source {
 
 			$resource = $result->sort($args['order'])->limit($args['limit'])->skip($args['offset']);
 			$result = $self->invokeMethod('_instance', array('result', compact('resource')));
-			$config = compact('result', 'query') + array('class' => 'set');
+			$config = compact('result', 'query') + array('class' => 'array');
 			return $self->item($query->model(), array(), $config);
 		});
 	}

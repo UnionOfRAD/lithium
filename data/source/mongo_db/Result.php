@@ -10,69 +10,22 @@ namespace lithium\data\source\mongo_db;
 
 use MongoGridFSFile;
 
-class Result extends \lithium\core\Object implements \Iterator {
+class Result extends \lithium\data\source\Result {
 
-	protected $_iterator = 0;
-
-	protected $_current = null;
-
-	protected $_resource = null;
-
-	protected $_autoConfig = array('resource');
-
-	public function __construct(array $config = array()) {
-		$defaults = array('resource' => null);
-		parent::__construct($config + $defaults);
-	}
-
-	public function resource() {
-		return $this->_resource;
-	}
-
-	public function rewind() {
-		return null;
-	}
-
-	public function valid() {
-		return !empty($this->_resource);
-	}
-
-	public function current() {
-		return $this->_current;
-	}
-
-	public function key() {
-		return $this->_iterator;
-	}
-
-	public function prev() {
-		if (!$this->_resource) {
-			return;
-		}
-		if ($this->_current == $this->_prev()) {
-			$this->_iterator--;
-			return $this->_current;
-		}
-	}
-
-	public function next() {
-		if (!$this->_resource) {
-			return;
-		}
-
-		if ($this->_resource->hasNext()) {
+	/**
+	 * Fetches the result from the resource and caches it.
+	 *
+	 * @return boolean Return `true` on success or `false` if it is not valid.
+	 */
+	protected function _fetchFromResource() {
+		if ($this->_resource && $this->_resource->hasNext()) {
 			$result = $this->_resource->getNext();
 			$isFile = ($result instanceof MongoGridFSFile);
-			return $isFile ? array('file' => $result) + $result->file : $result;
+			$result = $isFile ? array('file' => $result) + $result->file : $result;
+			$this->_key = $this->_iterator;
+			$this->_current = $this->_cache[$this->_iterator++] = $result;
+			return true;
 		}
-		unset($this->_resource);
-		$this->_resource = null;
-	}
-
-	public function __destruct() {
-		unset($this->_resource);
-		$this->_resource = null;
+		return false;
 	}
 }
-
-?>
