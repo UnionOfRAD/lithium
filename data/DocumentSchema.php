@@ -42,7 +42,12 @@ class DocumentSchema extends \lithium\data\Schema {
 
 		foreach ($data as $key => $val) {
 			$fieldName = is_int($key) ? null : $key;
-			$pathKey = $basePathKey ? "{$basePathKey}.{$fieldName}" : $fieldName;
+
+			if($fieldName) {
+				$pathKey = $basePathKey ? "{$basePathKey}.{$fieldName}" : $fieldName;
+			} else {
+				$pathKey = $basePathKey;	
+			}
 
 			if ($val instanceof $classes['array'] || $val instanceof $classes['entity']) {
 				continue;
@@ -82,7 +87,7 @@ class DocumentSchema extends \lithium\data\Schema {
 		}
 
 		if ($options['wrap']) {
-			$config  = array('data' => $val, 'model' => $options['model']);
+			$config = array('data' => $val, 'model' => $options['model'], 'schema' => $this);
 			$config += compact('pathKey') + array_diff_key($options, $defaults);
 			$val = $this->_instance($class, $config);
 		}
