@@ -238,6 +238,25 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
+	 * Fixes some issues regarding the used EOL character(s).
+	 *
+	 * On linux EOL is LF, on Windows it is normally CRLF, but the latter may depend also
+	 * on the git config core.autocrlf setting. As some tests use heredoc style (<<<) to
+	 * specify multiline expectations, this EOL issue may cause tests to fail only because
+	 * of a difference in EOL's used.
+	 *
+	 * in assertEqual, assertNotEqual, assertPattern and assertNotPattern this function is
+	 * called to get rid of any EOL differences.
+	 */
+	protected function _normalizeLineEndings($expected, $result) {
+		if (is_string($expected) && is_string($result)) {
+			$expected = preg_replace('/\r\n/', "\n", $expected);
+			$result = preg_replace('/\r\n/', "\n", $result);
+		}
+		return array($expected, $result);
+	}
+	
+	/**
 	 * Checks that the actual result is equal, but not neccessarily identical, to the expected
 	 * result.
 	 *
@@ -246,6 +265,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string|boolean $message
 	 */
 	public function assertEqual($expected, $result, $message = false) {
+		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$data = ($expected != $result) ? $this->_compare('equal', $expected, $result) : null;
 		$this->assert($expected == $result, $message, $data);
 	}
@@ -258,6 +278,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string|boolean $message
 	 */
 	public function assertNotEqual($expected, $result, $message = false) {
+		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$this->assert($result != $expected, $message, compact('expected', 'result'));
 	}
 
@@ -340,6 +361,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string $message
 	 */
 	public function assertNoPattern($expected, $result, $message = '{:message}') {
+		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$this->assert(!preg_match($expected, $result), $message, compact('expected', 'result'));
 	}
 
@@ -351,6 +373,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string $message
 	 */
 	public function assertPattern($expected, $result, $message = '{:message}') {
+		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$this->assert(!!preg_match($expected, $result), $message, compact('expected', 'result'));
 	}
 
@@ -988,6 +1011,11 @@ class Unit extends \lithium\core\Object {
 	 * Uses `DIRECTORY_SEPARATOR` as `getPathname()` is used in a a direct
 	 * string comparison. The method may contain slashes and backslashes.
 	 *
+	 * If the file to unlink is readonly, it throws a exception (Permission denied) on Windows.
+	 * So, the file is checked before an unlink is tried. (this will make the tests run slower
+	 * but is prefered over a if (!unlink { chmod; unlink }.
+	 * See: http://stringoftheseus.com/blog/2010/12/22/php-unlink-permisssion-denied-error-on-windows/
+	 *
 	 * @param string $path Path to directory with contents to remove. If first
 	 *        character is NOT a slash (`/`) or a Windows drive letter (`C:`)
 	 *        prepends `LITHIUM_APP_PATH/resources/tmp/`.
@@ -1010,7 +1038,14 @@ class Unit extends \lithium\core\Object {
 			if ($empty || $iterator->isDot()) {
 				continue;
 			}
-			($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname());
+			if ($item->isDir()) {
+				rmdir($item->getPathname());
+				continue;
+			}
+			if (!$item->isWritable()) {
+				chmod($item->getPathname(), 0777);
+			}
+			unlink($item->getPathname());
 		}
 	}
 
