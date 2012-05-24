@@ -59,6 +59,16 @@ class Test extends \lithium\console\Command {
 	public $verbose = false;
 
 	/**
+	 * Enable output displaying skipped tests in the `txt` format.
+	 *
+	 * This can be seen as a little verbose mode. The `verbose` shows
+	 * the skipped tests by default.
+	 *
+	 * @var boolean
+	 */
+	public $showskipped = false;
+	
+	/**
 	 * Enable plain mode to prevent any headers or similar decoration being output.
 	 * Good for command calls embedded into other scripts.
 	 *
@@ -151,7 +161,7 @@ class Test extends \lithium\console\Command {
 					$command->out($report->render('result', $stats));
 					$command->out($report->render('errors', $stats));
 
-					if ($command->verbose) {
+					if ($command->verbose || $command->showskipped) {
 						$command->out($report->render('skips', $stats));
 					}
 
