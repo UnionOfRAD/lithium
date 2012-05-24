@@ -596,6 +596,38 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
 
+	public function testHaving() {
+		$query = new Query(array(
+			'type' => 'read', 'model' => $this->_model,
+			'having' => array(
+				'or' => array(
+					'id' => 'value1',
+					'title' => 'value2',
+					'and' => array('author_id' => '1', 'created' => '2'),
+					array('title' => 'value2'),
+					array('title' => null)
+				),
+				'id' => '3',
+				'author_id' => false
+			)
+		));
+		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} HAVING ";
+		$sql .= "({MockDatabasePost}.{id} = 0 OR {MockDatabasePost}.{title} = 'value2' OR ";
+		$sql .= "({MockDatabasePost}.{author_id} = 1 AND {MockDatabasePost}.{created} = '2') OR ";
+		$sql .= "({MockDatabasePost}.{title} = 'value2') OR ({MockDatabasePost}.{title} IS NULL)) AND ";
+		$sql .= "{MockDatabasePost}.{id} = 3 AND {MockDatabasePost}.{author_id} = 0;";
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+
+		$query = new Query(array(
+			'type' => 'read', 'model' => $this->_model,
+			'having' => array('title' => array('0900'))
+		));
+
+		$sql = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost}' .
+				' HAVING {title} IN (\'0900\');';
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+	}
+
 	public function testReadConditionsWithModel() {
 		$model = $this->_model;
 		$options = array(
@@ -658,6 +690,13 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertFalse($this->db->conditions(5, $query));
 		$this->assertFalse($this->db->conditions(null, $query));
 		$this->assertEqual("WHERE CUSTOM", $this->db->conditions("CUSTOM", $query));
+	}
+
+	public function testRawHaving() {
+		$query = new Query(array('type' => 'read', 'model' => $this->_model, 'having' => null));
+		$this->assertFalse($this->db->having(5, $query));
+		$this->assertFalse($this->db->having(null, $query));
+		$this->assertEqual("HAVING CUSTOM", $this->db->having("CUSTOM", $query));
 	}
 
 	public function testRelationshipGeneration() {

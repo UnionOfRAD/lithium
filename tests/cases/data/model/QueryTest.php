@@ -213,6 +213,20 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testHaving() {
+		$query = new Query($this->_queryArr);
+
+		$expected = array();
+		$result = $query->having();
+		$this->assertEqual($expected, $result);
+
+		$query->having(array('count' => 5));
+
+		$expected = array('count' => 5);
+		$result = $query->having();
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testConditionFromRecord() {
 		$entity = new Record();
 		$entity->id = 12;
@@ -248,6 +262,7 @@ class QueryTest extends \lithium\test\Unit {
 			'calculate',
 			'comment',
 			'conditions',
+			'having',
 			'data',
 			'fields',
 			'group',
