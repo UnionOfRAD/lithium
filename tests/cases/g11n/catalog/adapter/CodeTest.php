@@ -160,10 +160,22 @@ EOD;
 		$expected = 'escaping\r\n3';
 		$result = $results['escaping\r\n3']['ids']['singular'];
 		$this->assertEqual($expected, $result);
+	}
 
-		$expected = "escaping\n\t4";
-		$result = $results["escaping\n\t4"]['ids']['singular'];
-		$this->assertEqual($expected, $result);
+	/**
+	 * Due to different EOL handling on linux and windows, combined with
+	 * the git config core.autocrlf setting, the test file may be written
+	 * with either LF or CRLF as line endings, which has an effect on the
+	 * key where the data is stored.
+	 */
+	public function testReadMessageTemplateTNoEscapingLineEnding() {
+		$results = $this->adapter->read('messageTemplate', 'root', null);
+
+		$expectedLR = "escaping\n\t4";
+		$expectedCRLF = "escaping\r\n\t4";
+		$resultLR = $results["escaping\n\t4"]['ids']['singular'];
+		$resultCRLF = $results["escaping\r\n\t4"]['ids']['singular'];
+		$this->assertTrue($expectedLR === $resultLR || $expectedCRLF === $resultCRLF);
 	}
 
 	public function testReadMessageTemplateTnSimple() {
