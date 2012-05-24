@@ -153,9 +153,9 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	 *
 	 * @return boolean Return `true` on success or `false` otherwise.
 	 */
-	function _fetch(){
+	function _fetch() {
 		$this->_init = true;
-		if($this->_fetchFromCache() || $this->_fetchFromResource()){
+		if($this->_fetchFromCache() || $this->_fetchFromResource()) {
 			return true;
 		}
 		return false;
@@ -180,7 +180,7 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	/**
 	 * Close the resource.
 	 */
-	public function close(){
+	public function close() {
 		unset($this->_resource);
 		$this->_resource = null;
 	}

@@ -414,16 +414,16 @@ class RecordSetTest extends \lithium\test\Unit {
 
 		$this->assertEqual($expected, $this->_recordSet->to('array', array('indexed' => false)));
 
-		$expected = '{"1":{"id":1,"data":"data1"},"2":{"id":2,"data":"data2"},' .
-		'"3":{"id":3,"data":"data3"},"4":{"id":4,"data":"data4"}}';
+		$expected = '{"1":{"id":1,"data":"data1"},"2":{"id":2,"data":"data2"},';
+		$expected .= '"3":{"id":3,"data":"data3"},"4":{"id":4,"data":"data4"}}';
 
 		$this->assertEqual($expected, $this->_recordSet->to('json'));
 
 		$result = $this->_recordSet->to('json');
 		$this->assertEqual($expected, $result);
 		
-		$expected = '[{"id":1,"data":"data1"},{"id":2,"data":"data2"},' .
-		'{"id":3,"data":"data3"},{"id":4,"data":"data4"}]';
+		$expected = '[{"id":1,"data":"data1"},{"id":2,"data":"data2"},';
+		$expected .= '{"id":3,"data":"data3"},{"id":4,"data":"data4"}]';
 
 		$result = $this->_recordSet->to('json', array('indexed' => false));
 		$this->assertEqual($expected, $result);
@@ -542,7 +542,7 @@ class RecordSetTest extends \lithium\test\Unit {
 		$model = $this->_model;
 
 		$cpt = 0;
-		while($result->valid()){
+		while($result->valid()) {
 			$result->current();
 			$result->next();
 			$cpt++;
@@ -550,7 +550,9 @@ class RecordSetTest extends \lithium\test\Unit {
 		$this->assertEqual(4, $cpt);
 
 		$cpt = 0;
-		foreach($result as $value){$cpt++;}
+		foreach($result as $value) {
+			$cpt++;
+		}
 		$this->assertEqual(4, $cpt);
 		$result->rewind();
 
@@ -570,7 +572,9 @@ class RecordSetTest extends \lithium\test\Unit {
 
 		$result->rewind();
 		$i = 0;
-		foreach($result as $r){$i++;}
+		foreach($result as $r) {
+			$i++;
+		}
 		$this->assertEqual(0, $i);
 
 		$records = array(
@@ -582,7 +586,7 @@ class RecordSetTest extends \lithium\test\Unit {
 		$result = new MockResult(array('records' => $records));
 
 		$i = 0;
-		foreach($result as $s){
+		foreach($result as $s) {
 			$this->assertEqual($records[$i], $s);
 			$i++;
 		}
@@ -599,7 +603,7 @@ class RecordSetTest extends \lithium\test\Unit {
 		$result = new MockResult(array('records' => $records));
 
 		$i = 0;
-		foreach($result as $s){
+		foreach($result as $s) {
 			$this->assertEqual($records[$i], $s);
 			$i++;
 		}
@@ -619,7 +623,7 @@ class RecordSetTest extends \lithium\test\Unit {
 		$cpt = 0;
 		foreach ($recordSet as $i => $word) {
 			$array = $word->to('array');
-			if($array['data'] == 'delete'){
+			if($array['data'] == 'delete') {
 				unset($recordSet[$i]);
 			}
 			$cpt++;
@@ -646,7 +650,7 @@ class RecordSetTest extends \lithium\test\Unit {
 
 		foreach ($recordSet as $i => $word) {
 			$array = $word->to('array');
-			if($array['data'] == 'delete'){
+			if($array['data'] == 'delete') {
 				unset($recordSet[$i]);
 			}
 		}

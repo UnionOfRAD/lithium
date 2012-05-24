@@ -26,13 +26,12 @@ class MockRecordSet extends \lithium\data\collection\RecordSet {
 	 */
 	public function reset() {
 		$this->_closed = false;
-		if(is_object($this->_result) && method_exists($this->_result, 'rewind')){
+		if(is_object($this->_result) && method_exists($this->_result, 'rewind')) {
 			$this->_init = false;
 			$this->_started = false;
 			$this->_valid = false;
 			$this->_data = array();
 			$this->_index = array();
-			$this->_flipped = array();
 			$this->_result->rewind();
 			$this->_columns = $this->_columnMap();
 			return true;

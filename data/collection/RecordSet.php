@@ -23,13 +23,6 @@ class RecordSet extends \lithium\data\Collection {
 	protected $_index = array();
 
 	/**
-	 * The internal pointer to indicate which `Record` is the current record.
-	 *
-	 * @var integer
-	 */
-	protected $_pointer = 0;
-
-	/**
 	 * A 2D array of column-mapping information, where the top-level key is the fully-namespaced
 	 * model name, and the sub-arrays are column names.
 	 *
@@ -170,7 +163,7 @@ class RecordSet extends \lithium\data\Collection {
 		unset($options['indexed']);
 
 		$this->offsetGet(null);
-		if(!$options['internal'] && !is_scalar(current($this->_index))){
+		if(!$options['internal'] && !is_scalar(current($this->_index))) {
 			$options['internal'] = true;
 		}
 		return $result = parent::to($format, $options);
@@ -235,12 +228,12 @@ class RecordSet extends \lithium\data\Collection {
 			return;
 		}
 
-		if(!$this->_result->valid()){
+		if(!$this->_result->valid()) {
 			return $this->close();
 		}
 
 		$data = $this->_result->current();
-		if($this->_query){
+		if($this->_query) {
 			$data = $this->_mapRecord($data);
 		}
 		$result = $this->_set($data, $key);
