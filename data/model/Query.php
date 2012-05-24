@@ -82,6 +82,7 @@ class Query extends \lithium\core\Object {
 		$defaults = array(
 			'calculate'  => null,
 			'conditions' => array(),
+			'having'     => array(),
 			'fields'     => array(),
 			'data'       => array(),
 			'model'      => null,
@@ -203,6 +204,24 @@ class Query extends \lithium\core\Object {
 			return $this;
 		}
 		return $this->_config['conditions'] ?: $this->_entityConditions();
+	}
+
+	/**
+	 * Set and get method for havings.
+	 *
+	 * If no havings are set in query, it will ask the bound entity for condition array.
+	 *
+	 * @param mixed $having String or array to append to existing having.
+	 * @return array Returns an array of all having applied to this query.
+	 */
+	public function having($having = null) {
+		if ($having) {
+			$having = (array) $having;
+			$this->_config['having'] = (array) $this->_config['having'];
+			$this->_config['having'] = array_merge($this->_config['having'], $having);
+			return $this;
+		}
+		return $this->_config['having'] ?: $this->_entityConditions();
 	}
 
 	/**

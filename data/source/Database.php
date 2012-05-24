@@ -150,7 +150,7 @@ abstract class Database extends \lithium\data\Source {
 		);
 		$this->_strings += array(
 			'read' => 'SELECT {:fields} FROM {:source} {:alias} {:joins} {:conditions} {:group} ' .
-			          '{:order} {:limit};{:comment}'
+			          '{:having} {:order} {:limit};{:comment}'
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -580,6 +580,51 @@ abstract class Database extends \lithium\data\Source {
 		}
 		$result = join(" AND ", $result);
 		return ($options['prepend'] && $result) ? "WHERE {$result}" : $result;
+	}
+
+	/**
+	 * Returns a string of formatted havings to be inserted into the query statement. If the
+	 * query havings are defined as an array, key pairs are converted to SQL strings.
+	 *
+	 * Conversion rules are as follows:
+	 *
+	 * - If `$key` is numeric and `$value` is a string, `$value` is treated as a literal SQL
+	 *   fragment and returned.
+	 *
+	 * @param string|array $having The havings for this query.
+	 * @param object $context The current `lithium\data\model\Query` instance.
+	 * @param array $options
+	 *               - `prepend` _boolean_: Whether the return string should be prepended with the
+	 *                 `HAVING` keyword.
+	 * @return string Returns the `HAVING` clause of an SQL query.
+	 */
+	public function having($having, $context, array $options = array()) {
+		$defaults = array('prepend' => true);
+		$ops = $this->_operators;
+		$options += $defaults;
+		$model = $context->model();
+		$schema = $model ? $model::schema() : array();
+
+		switch (true) {
+			case empty($having):
+				return '';
+			case is_string($having):
+				return ($options['prepend']) ? "HAVING {$having}" : $having;
+			case !is_array($having):
+				return '';
+		}
+		$result = array();
+
+		foreach ($having as $key => $value) {
+			$schema[$key] = isset($schema[$key]) ? $schema[$key] : array();
+			$return = $this->_processConditions($key,$value, $schema);
+
+			if ($return) {
+				$result[] = $return;
+			}
+		}
+		$result = join(" AND ", $result);
+		return ($options['prepend'] && $result) ? "HAVING {$result}" : $result;
 	}
 
 	public function _processConditions($key, $value, $schema, $glue = 'AND') {
