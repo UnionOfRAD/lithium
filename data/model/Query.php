@@ -101,6 +101,7 @@ class Query extends \lithium\core\Object {
 			'calculate'  => null,
 			'schema'     => null,
 			'conditions' => array(),
+			'having'     => array(),
 			'fields'     => array(),
 			'data'       => array(),
 			'model'      => null,
@@ -221,6 +222,22 @@ class Query extends \lithium\core\Object {
 		$conditions = (array) $conditions;
 		$this->_config['conditions'] = (array) $this->_config['conditions'];
 		$this->_config['conditions'] = array_merge($this->_config['conditions'], $conditions);
+		return $this;
+	}
+
+	/**
+	 * Set and get method for havings.
+	 *
+	 * @param mixed $having String or array to append to existing having.
+	 * @return array Returns an array of all having applied to this query.
+	 */
+	public function having($having = null) {
+		if (!$having) {
+			return $this->_config['having'];
+		}
+		$having = (array) $having;
+		$this->_config['having'] = (array) $this->_config['having'];
+		$this->_config['having'] = array_merge($this->_config['having'], $having);
 		return $this;
 	}
 

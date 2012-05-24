@@ -152,7 +152,7 @@ abstract class Database extends \lithium\data\Source {
 		);
 		$this->_strings += array(
 			'read' => 'SELECT {:fields} FROM {:source} {:alias} {:joins} {:conditions} {:group} ' .
-			          '{:order} {:limit};{:comment}'
+			          '{:having} {:order} {:limit};{:comment}'
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -572,7 +572,50 @@ abstract class Database extends \lithium\data\Source {
 	 * @return string Returns the `WHERE` clause of an SQL query.
 	 */
 	public function conditions($conditions, $context, array $options = array()) {
-		$defaults = array('prepend' => true);
+		$defaults = array('prepend' => 'WHERE');
+		$options += $defaults;
+		return $this->_conditions($conditions, $context, $options);
+	}
+
+	/**
+	 * Returns a string of formatted havings to be inserted into the query statement. If the
+	 * query havings are defined as an array, key pairs are converted to SQL strings.
+	 *
+	 * Conversion rules are as follows:
+	 *
+	 * - If `$key` is numeric and `$value` is a string, `$value` is treated as a literal SQL
+	 *   fragment and returned.
+	 *
+	 * @param string|array $having The havings for this query.
+	 * @param object $context The current `lithium\data\model\Query` instance.
+	 * @param array $options
+	 *               - `prepend` _boolean_: Whether the return string should be prepended with the
+	 *                 `HAVING` keyword.
+	 * @return string Returns the `HAVING` clause of an SQL query.
+	 */
+	public function having($conditions, $context, array $options = array()) {
+		$defaults = array('prepend' => 'HAVING');
+		$options += $defaults;
+		return $this->_conditions($conditions, $context, $options);
+	}
+
+	/**
+	 * Returns a string of formatted conditions to be inserted into the query statement. If the
+	 * query conditions are defined as an array, key pairs are converted to SQL strings.
+	 *
+	 * Conversion rules are as follows:
+	 *
+	 * - If `$key` is numeric and `$value` is a string, `$value` is treated as a literal SQL
+	 *   fragment and returned.
+	 *
+	 * @param string|array $conditions The conditions for this query.
+	 * @param object $context The current `lithium\data\model\Query` instance.
+	 * @param array $options
+	 *               - `prepend` mixed: The string to prepend or false for no prepending
+	 * @return string Returns an SQL conditions clause.
+	 */
+	protected function _conditions($conditions, $context, array $options = array()) {
+		$defaults = array('prepend' => false);
 		$ops = $this->_operators;
 		$options += $defaults;
 		$model = $context->model();
@@ -582,7 +625,7 @@ abstract class Database extends \lithium\data\Source {
 			case empty($conditions):
 				return '';
 			case is_string($conditions):
-				return ($options['prepend']) ? "WHERE {$conditions}" : $conditions;
+				return $options['prepend'] ? $options['prepend'] . " {$conditions}" : $conditions;
 			case !is_array($conditions):
 				return '';
 		}
@@ -596,7 +639,7 @@ abstract class Database extends \lithium\data\Source {
 			}
 		}
 		$result = join(" AND ", $result);
-		return ($options['prepend'] && $result) ? "WHERE {$result}" : $result;
+		return ($options['prepend'] && $result) ? $options['prepend'] . " {$result}" : $result;
 	}
 
 	public function _processConditions($key, $value, $context, $schema, $glue = 'AND') {
