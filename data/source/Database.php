@@ -572,6 +572,7 @@ abstract class Database extends \lithium\data\Source {
 
 		foreach ($conditions as $key => $value) {
 			$schema[$key] = isset($schema[$key]) ? $schema[$key] : array();
+			$key = (strpos($key, '.') !== FALSE) ? $key : ($context->alias() . "." . $key);
 			$return = $this->_processConditions($key,$value, $schema);
 
 			if ($return) {
