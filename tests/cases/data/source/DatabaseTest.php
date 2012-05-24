@@ -580,8 +580,10 @@ class DatabaseTest extends \lithium\test\Unit {
 			)
 		));
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ";
-		$sql .= "({id} = 0 OR {title} = 'value2' OR ({author_id} = 1 AND {created} = '2')";
-		$sql .= " OR ({title} = 'value2') OR ({title} IS NULL)) AND {id} = 3 AND {author_id} = 0;";
+		$sql .= "({MockDatabasePost}.{id} = 0 OR {MockDatabasePost}.{title} = 'value2' OR ";
+		$sql .= "({MockDatabasePost}.{author_id} = 1 AND {MockDatabasePost}.{created} = '2') OR ";
+		$sql .= "({MockDatabasePost}.{title} = 'value2') OR ({MockDatabasePost}.{title} IS NULL)) AND ";
+		$sql .= "{MockDatabasePost}.{id} = 3 AND {MockDatabasePost}.{author_id} = 0;";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 
 		$query = new Query(array(
@@ -592,6 +594,22 @@ class DatabaseTest extends \lithium\test\Unit {
 		$sql = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost}' .
 				' WHERE {title} IN (\'0900\');';
 		$this->assertEqual($sql, $this->db->renderCommand($query));
+	}
+
+	public function testReadConditionsWithModel() {
+		$model = $this->_model;
+		$options = array(
+			'type' => 'read',
+			'model' => $this->_model,
+			'conditions' => array('id' => 1, 'MockDatabaseComment.id' => 2),
+			'with' => array('MockDatabaseComment')
+		);
+		$result = $this->db->read(new Query($options), $options);
+		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ';
+		$expected .= '{mock_database_comments} AS {MockDatabaseComment} ON ';
+		$expected .= '{MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id} ';
+		$expected .= 'WHERE {MockDatabasePost}.{id} = 1 AND {MockDatabaseComment}.{id} = 2;';
+		$this->assertEqual($expected, $this->db->sql);
 	}
 
 	public function testFields() {

@@ -589,7 +589,7 @@ abstract class Database extends \lithium\data\Source {
 		$result = array();
 
 		foreach ($conditions as $key => $value) {
-			$return = $this->_processConditions($key, $value, $schema);
+			$return = $this->_processConditions($key, $value, $context, $schema);
 
 			if ($return) {
 				$result[] = $return;
@@ -599,19 +599,25 @@ abstract class Database extends \lithium\data\Source {
 		return ($options['prepend'] && $result) ? "WHERE {$result}" : $result;
 	}
 
-	public function _processConditions($key, $value, $schema, $glue = 'AND') {
+	public function _processConditions($key, $value, $context, $schema, $glue = 'AND') {
 		$constraintTypes =& $this->_constraintTypes;
 		$fieldMeta = $schema->fields($key) ?: array();
 
 		switch (true) {
 			case (is_numeric($key) && is_string($value)):
 				return $value;
-			case is_string($value):
-				return $this->name($key) . ' = ' . $this->value($value, $fieldMeta);
+			case is_scalar($value) || is_null($value):
+				if ($context->type() == 'read' && ($alias = $context->alias()) && !strpos($key, '.')) {
+					$key = $alias . "." . $key;
+				}
+				if (isset($value)) {
+					return $this->name($key) . ' = ' . $this->value($value, $fieldMeta);
+				}
+				return $this->name($key) . " IS NULL";
 			case is_numeric($key) && is_array($value):
 				$result = array();
 				foreach ($value as $cField => $cValue) {
-					$result[] = $this->_processConditions($cField, $cValue, $schema, $glue);
+					$result[] = $this->_processConditions($cField, $cValue, $context, $schema, $glue);
 				}
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
 			case (is_string($key) && is_object($value)):
@@ -622,7 +628,7 @@ abstract class Database extends \lithium\data\Source {
 				$glue = strtoupper($key);
 
 				foreach ($value as $cField => $cValue) {
-					$result[] = $this->_processConditions($cField, $cValue, $schema, $glue);
+					$result[] = $this->_processConditions($cField, $cValue, $context, $schema, $glue);
 				}
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
 			case (is_string($key) && is_array($value) && isset($this->_operators[key($value)])):
@@ -633,15 +639,6 @@ abstract class Database extends \lithium\data\Source {
 			case is_array($value):
 				$value = join(', ', $this->value($value, $fieldMeta));
 				return "{$this->name($key)} IN ({$value})";
-			default:
-				$key = $this->name($key);
-				if (isset($value)) {
-					$value = $this->value($value, $fieldMeta);
-					return "{$key} = {$value}";
-				}
-				if ($value === null) {
-					return "{$key} IS NULL";
-				}
 		}
 	}
 
