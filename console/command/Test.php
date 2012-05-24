@@ -52,21 +52,13 @@ class Test extends \lithium\console\Command {
 	public $format = 'txt';
 
 	/**
-	 * Enable verbose output especially for the `txt` format.
+	 * Enable verbose output especially for the `txt` format. Options are `high` 
+	 * (default if none given) for full details and `skipped` for only information
+	 * on the skipped tests.
 	 *
-	 * @var boolean
+	 * @var string
 	 */
 	public $verbose = false;
-
-	/**
-	 * Enable output displaying skipped tests in the `txt` format.
-	 *
-	 * This can be seen as a little verbose mode. The `verbose` shows
-	 * the skipped tests by default.
-	 *
-	 * @var boolean
-	 */
-	public $showskipped = false;
 	
 	/**
 	 * Enable plain mode to prevent any headers or similar decoration being output.
@@ -83,6 +75,16 @@ class Test extends \lithium\console\Command {
 	 * @var array
 	 */
 	protected $_handlers = array();
+	
+	public function verboseLevel() {
+		if ($this->verbose === false) {
+			return false;
+		}
+		if ($this->verbose === 'skipped') {
+				return 'skipped';
+		}
+		return 'high';
+	}
 
 	/**
 	 * Initializes the output handlers.
@@ -120,7 +122,7 @@ class Test extends \lithium\console\Command {
 					}
 				};
 
-				if ($command->verbose) {
+				if ($command->verboseLevel() == 'high') {
 					$reporter = function($result) use ($command, $colorize) {
 						$command->out(sprintf(
 							'[%s] on line %4s in %s::%s()',
@@ -161,7 +163,7 @@ class Test extends \lithium\console\Command {
 					$command->out($report->render('result', $stats));
 					$command->out($report->render('errors', $stats));
 
-					if ($command->verbose || $command->showskipped) {
+					if ($command->verboseLevel()) {
 						$command->out($report->render('skips', $stats));
 					}
 
