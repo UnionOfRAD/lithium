@@ -288,7 +288,6 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->query->model($model);
 		$this->query->data(array('title' => 'Test Post'));
 		$this->db->create($this->query);
-		sleep(3);
 
 		$result = $this->db->read(new Query(compact('model')));
 		$original = $result->first()->to('array');
