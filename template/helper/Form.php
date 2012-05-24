@@ -418,7 +418,7 @@ class Form extends \lithium\template\Helper {
 	 *                parameters. By default, the label text is a human-friendly version of `$name`.
 	 *                However, you can specify the label manually as a string, or both the label
 	 *                text and options as an array, i.e.:
-	 *                `array('label text' => array('class' => 'foo', 'any' => 'other options'))`.
+	 *                `array('Your Label Title' => array('class' => 'foo', 'other' => 'options'))`.
 	 *              - `'type'` _string_: The type of form field to render. Available default options
 	 *                are: `'text'`, `'textarea'`, `'select'`, `'checkbox'`, `'password'` or
 	 *                `'hidden'`, as well as any arbitrary type (i.e. HTML5 form fields).
