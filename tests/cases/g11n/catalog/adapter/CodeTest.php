@@ -173,9 +173,16 @@ EOD;
 
 		$expectedLR = "escaping\n\t4";
 		$expectedCRLF = "escaping\r\n\t4";
-		$resultLR = $results["escaping\n\t4"]['ids']['singular'];
-		$resultCRLF = $results["escaping\r\n\t4"]['ids']['singular'];
-		$this->assertTrue($expectedLR === $resultLR || $expectedCRLF === $resultCRLF);
+
+		$assertLR = (
+			isset($results["escaping\n\t4"]['ids']['singular']) &&
+			$results["escaping\n\t4"]['ids']['singular'] === $expectedLR
+		);
+		$assertCRLF = (
+			isset($results["escaping\r\n\t4"]['ids']['singular']) &&
+			$results["escaping\r\n\t4"]['ids']['singular'] === $expectedCRLF
+		);
+		$this->assertTrue($assertLR || $assertCRLF);
 	}
 
 	public function testReadMessageTemplateTnSimple() {
