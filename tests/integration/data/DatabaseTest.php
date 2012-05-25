@@ -98,6 +98,39 @@ class DatabaseTest extends \lithium\test\Integration {
 		);
 	}
 
+	public function testConnectWithNoDatabase() {
+		$config = $this->_dbConfig;
+		$config['database'] = null;
+		$connection = 'no_database';
+		Connections::add($connection, $config);
+		$this->expectException("/No Database configured/");
+		Connections::get($connection)->connect();
+	}
+
+	public function testConnectWithWrongHost() {
+		$config = $this->_dbConfig;
+		$config['host'] = 'unknown.host.nowhere';
+		$connection = 'wrong_host';
+		Connections::add($connection, $config);
+        $this->expectException('/Unable to connect to host `unknown.host.nowhere`/');
+		Connections::get($connection)->connect();
+	}
+
+	public function testConnectWithWrongPassword() {
+		$config = $this->_dbConfig;
+		$config['login'] = 'wrong_login';
+		$config['password'] = 'wrong_pass';
+		$connection = 'wrong_passord';
+		Connections::add($connection, $config);
+        $this->expectException('/Host connected, but could not access database/');
+		Connections::get($connection)->connect();
+	}
+
+	public function testExecuteException() {
+		$this->expectException("/You have an error(.*?)near '\* FROM table'/");
+		$this->db->read('SELECT * FROM * FROM table');
+	}
+
 	public function testCreateData() {
 		$gallery = Galleries::create($this->gallery);
 		$this->assertTrue($gallery->save());

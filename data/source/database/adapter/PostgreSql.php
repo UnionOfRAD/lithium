@@ -166,20 +166,6 @@ class PostgreSql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Disconnects the adapter from the database.
-	 *
-	 * @return boolean True on success, else false.
-	 */
-	public function disconnect() {
-		if ($this->_isConnected) {
-			unset($this->connection);
-			$this->_isConnected = false;
-			return true;
-		}
-		return true;
-	}
-
-	/**
 	 * Returns the list of tables in the currently-connected database.
 	 *
 	 * @param string $model The fully-name-spaced class name of the model object making the request.
