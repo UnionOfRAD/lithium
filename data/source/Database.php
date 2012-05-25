@@ -8,9 +8,13 @@
 
 namespace lithium\data\source;
 
+use PDO;
+use PDOException;
 use lithium\util\String;
 use lithium\util\Inflector;
 use InvalidArgumentException;
+use lithium\core\NetworkException;
+use lithium\core\ConfigException;
 
 /**
  * The `Database` class provides the base-level abstraction for SQL-oriented relational databases.
@@ -21,6 +25,11 @@ use InvalidArgumentException;
  * @see lithium\data\model\Query
  */
 abstract class Database extends \lithium\data\Source {
+
+	/**
+	 * @var PDO
+	 */
+	public $connection;
 
 	/**
 	 * The supported column types and their default values
@@ -153,6 +162,49 @@ abstract class Database extends \lithium\data\Source {
 			          '{:order} {:limit};{:comment}'
 		);
 		parent::__construct($config + $defaults);
+	}
+
+	public function connect() {
+		$this->_isConnected = false;
+		$config = $this->_config;
+
+		if (empty($config['dsn'])) {
+			throw new ConfigException('No DSN setup for DB Connection');
+		} else {
+			$dsn = $config['dsn'];
+		}
+
+		//Construct Options
+		$options = array(
+			PDO::ATTR_PERSISTENT => $config['persistent'],
+			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+		);
+		if (array_key_exists('options', $config)) {
+		   $options = array_merge($options, $config['options']);
+		}
+
+		//Connect
+		try {
+			$this->connection = new PDO($dsn, $config['login'], $config['password'], $options);
+		} catch (PDOException $e) {
+			preg_match('/SQLSTATE\[(.+?)\]/', $e->getMessage(), $code);
+			$code = empty($code[1]) ? 0 : $code[1];
+			switch (true) {
+			case $code == 'HY000':
+			case substr($code, 0, 2) == '08':
+				throw new NetworkException($e->getMessage());
+				break;
+			case in_array($code, array('28000', '4200')):
+			default:
+				throw new ConfigException($e->getMessage());
+				break;
+			}
+		}
+		$this->_isConnected = true;
+		if ($this->_config['encoding']) {
+			$this->encoding($this->_config['encoding']);
+	   	}
+		return $this->_isConnected;
 	}
 
 	/**

@@ -12,6 +12,7 @@ use PDO;
 use PDOStatement;
 use PDOException;
 use lithium\data\model\QueryException;
+use lithium\core\ConfigException;
 
 /**
  * Extends the `Database` class to implement the necessary SQL-formatting and resultset-fetching
@@ -22,11 +23,6 @@ use lithium\data\model\QueryException;
  * @see lithium\data\source\database\adapter\MySql::__construct()
  */
 class MySql extends \lithium\data\source\Database {
-
-	/**
-	 * @var PDO
-	 */
-	public $connection;
 
 	protected $_classes = array(
 		'entity' => 'lithium\data\entity\Record',
@@ -119,39 +115,24 @@ class MySql extends \lithium\data\source\Database {
 	 * Connects to the database using the options provided to the class constructor.
 	 *
 	 * @return boolean Returns `true` if a database connection could be established, otherwise
-	 *         `false`.
+	 *		 `false`.
 	 */
 	public function connect() {
-		$config = $this->_config;
-		$this->_isConnected = false;
-		$host = $config['host'];
-
-		if (!$config['database']) {
-			return false;
+		if (!$this->_config['database']) {
+			throw new ConfigException('No Database configured');
 		}
-
-		$options = array(
-			PDO::ATTR_PERSISTENT => $config['persistent'],
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-		);
-
-		try {
+		//Construct the DSN
+		if (empty($this->_config['dsn'])) {
+			$host = $this->_config['host'];
 			list($host, $port) = explode(':', $host) + array(1 => "3306");
-			$dsn = sprintf("mysql:host=%s;port=%s;dbname=%s", $host, $port, $config['database']);
-			$this->connection = new PDO($dsn, $config['login'], $config['password'], $options);
-		} catch (PDOException $e) {
-			return false;
+			$this->_config['dsn'] = sprintf("mysql:host=%s;port=%s;dbname=%s", $host, $port, $this->_config['database']);
 		}
+		if (parent::connect()) {
 
-		$this->_isConnected = true;
+			$info = $this->connection->getAttribute(PDO::ATTR_SERVER_VERSION);
 
-		if ($config['encoding']) {
-			$this->encoding($config['encoding']);
+			$this->_useAlias = (boolean) version_compare($info, "4.1", ">=");
 		}
-
-		$info = $this->connection->getAttribute(PDO::ATTR_SERVER_VERSION);
-
-		$this->_useAlias = (boolean) version_compare($info, "4.1", ">=");
 		return $this->_isConnected;
 	}
 
