@@ -23,11 +23,6 @@ use lithium\data\model\QueryException;
  */
 class MySql extends \lithium\data\source\Database {
 
-	/**
-	 * @var PDO
-	 */
-	public $connection;
-
 	protected $_classes = array(
 		'entity' => 'lithium\data\entity\Record',
 		'set' => 'lithium\data\collection\RecordSet',
@@ -119,40 +114,22 @@ class MySql extends \lithium\data\source\Database {
 	 * Connects to the database using the options provided to the class constructor.
 	 *
 	 * @return boolean Returns `true` if a database connection could be established, otherwise
-	 *         `false`.
+	 *     `false`.
 	 */
 	public function connect() {
-		$config = $this->_config;
-		$this->_isConnected = false;
-		$host = $config['host'];
-
-		if (!$config['database']) {
-			return false;
-		}
-
-		$options = array(
-			PDO::ATTR_PERSISTENT => $config['persistent'],
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-		);
-
-		try {
+		if (!$this->_config['dsn']) {
+			$host = $this->_config['host'];
 			list($host, $port) = explode(':', $host) + array(1 => "3306");
-			$dsn = sprintf("mysql:host=%s;port=%s;dbname=%s", $host, $port, $config['database']);
-			$this->connection = new PDO($dsn, $config['login'], $config['password'], $options);
-		} catch (PDOException $e) {
-			return false;
+			$dsn = "mysql:host=%s;port=%s;dbname=%s";
+			$this->_config['dsn'] = sprintf($dsn, $host, $port, $this->_config['database']);
 		}
-
-		$this->_isConnected = true;
-
-		if ($config['encoding']) {
-			$this->encoding($config['encoding']);
+		if (!parent::connect()) {
+			return false;
 		}
 
 		$info = $this->connection->getAttribute(PDO::ATTR_SERVER_VERSION);
-
 		$this->_useAlias = (boolean) version_compare($info, "4.1", ">=");
-		return $this->_isConnected;
+		return true;
 	}
 
 	/**

@@ -8,9 +8,13 @@
 
 namespace lithium\data\source;
 
+use PDO;
+use PDOException;
 use lithium\util\String;
 use lithium\util\Inflector;
 use InvalidArgumentException;
+use lithium\core\NetworkException;
+use lithium\core\ConfigException;
 
 /**
  * The `Database` class provides the base-level abstraction for SQL-oriented relational databases.
@@ -21,6 +25,11 @@ use InvalidArgumentException;
  * @see lithium\data\model\Query
  */
 abstract class Database extends \lithium\data\Source {
+
+	/**
+	 * @var PDO
+	 */
+	public $connection;
 
 	/**
 	 * The supported column types and their default values
@@ -146,13 +155,56 @@ abstract class Database extends \lithium\data\Source {
 			'host'       => 'localhost',
 			'login'      => 'root',
 			'password'   => '',
-			'database'   => null
+			'database'   => null,
+			'encoding'   => null,
+			'dsn'        => null,
+			'options'    => array()
 		);
 		$this->_strings += array(
 			'read' => 'SELECT {:fields} FROM {:source} {:alias} {:joins} {:conditions} {:group} ' .
 			          '{:order} {:limit};{:comment}'
 		);
 		parent::__construct($config + $defaults);
+	}
+
+	public function connect() {
+		$this->_isConnected = false;
+		$config = $this->_config;
+
+		if (!$config['database']) {
+			throw new ConfigException('No Database configured');
+		}
+		if (!$config['dsn']) {
+			throw new ConfigException('No DSN setup for DB Connection');
+		}
+		$dsn = $config['dsn'];
+
+		$options = $config['options'] + array(
+			PDO::ATTR_PERSISTENT => $config['persistent'],
+			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+		);
+
+		try {
+			$this->connection = new PDO($dsn, $config['login'], $config['password'], $options);
+		} catch (PDOException $e) {
+			preg_match('/SQLSTATE\[(.+?)\]/', $e->getMessage(), $code);
+			$code = $code[1] ?: 0;
+			switch (true) {
+			case $code == 'HY000' || substr($code, 0, 2) == '08':
+				$msg = "Unable to connect to host `{$config['host']}`.";
+				throw new NetworkException($msg, null, $e);
+			case in_array($code, array('28000', '42000')):
+				$msg = "Host connected, but could not access database `{$config['database']}`.";
+				throw new ConfigException($msg, null, $e);
+			}
+			throw new ConfigException("An unknown configuration error has occured.", null, $e);
+		}
+		$this->_isConnected = true;
+
+		if ($this->_config['encoding']) {
+			$this->encoding($this->_config['encoding']);
+	   	}
+		return $this->_isConnected;
 	}
 
 	/**
