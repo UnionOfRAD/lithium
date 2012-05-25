@@ -244,6 +244,19 @@ class Model extends \lithium\core\StaticObject {
 	 * a collection, along with a `'data'` key, which contains the schema for that collection, in
 	 * the format specified above.
 	 *
+	 * When defining `'$_schema'` where the data source is MongoDB, the types map to database types as follows:
+	 *
+	 * {{{
+	 *	id      => MongoId
+	 *	date    => MongoDate
+	 *	regex   => MongoRegex
+	 *	integer => integer
+	 *	float   => float
+	 *	boolean => boolean
+	 *	code    => MongoCode
+	 *	binary  => MongoBinData
+	 * }}}
+	 *
 	 * @see lithium\data\source\MongoDb::$_schema
 	 * @var array
 	 */
