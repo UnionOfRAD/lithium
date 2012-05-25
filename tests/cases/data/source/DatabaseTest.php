@@ -11,6 +11,7 @@ namespace lithium\tests\cases\data\source;
 use lithium\data\model\Query;
 use lithium\data\entity\Record;
 use lithium\data\collection\RecordSet;
+use lithium\data\source\database\Expr;
 use lithium\tests\mocks\data\model\MockDatabase;
 use lithium\tests\mocks\data\model\MockDatabasePost;
 use lithium\tests\mocks\data\model\MockDatabaseComment;
@@ -94,14 +95,29 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->value('1', array('type' => 'string'));
 		$this->assertIdentical("'1'", $result);
 
-		$result = $this->db->value('CURRENT_TIMESTAMP', array('type' => 'timestamp'));
-		$this->assertIdentical('NULL', $result);
+		$result = $this->db->value(new Expr('CURRENT_TIMESTAMP'), array('type' => 'timestamp'));
+		$this->assertIdentical('CURRENT_TIMESTAMP', $result);
 
-		$result = $this->db->value('1234567', array('type' => 'timestamp'));
-		$this->assertIdentical(date('Y-m-d H:i:s', 1234567), $result);
+		$result = $this->db->value(new Expr('REGEXP "^fo$"'));
+		$this->assertIdentical('REGEXP "^fo$"', $result);
+
+		$result = $this->db->value('Hello World', array('type' => 'timestamp'));
+		$this->assertIdentical("'1970-01-01 01:00:00'", $result);
+
+		$result = $this->db->value('2012-05-25 22:44:00', array('type' => 'timestamp'));
+		$this->assertIdentical("'2012-05-25 22:44:00'", $result);
+
+		$result = $this->db->value('2012-05-25', array('type' => 'date'));
+		$this->assertIdentical("'2012-05-25'", $result);
 
 		$result = $this->db->value('now', array('type' => 'timestamp'));
-		$this->assertIdentical(time(), $result);
+		$this->assertPattern("/^'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'/", $result);
+
+		$result = $this->db->value('now', array('type' => 'date'));
+		$this->assertPattern("/^'\d{4}-\d{2}-\d{2}'/", $result);
+
+		$result = $this->db->value('now', array('type' => 'time'));
+		$this->assertPattern("/^'\d{2}:\d{2}:\d{2}'/", $result);
 	}
 
 	public function testValueByIntrospect() {
@@ -571,7 +587,9 @@ class DatabaseTest extends \lithium\test\Unit {
 				'or' => array(
 					'id' => 'value1',
 					'title' => 'value2',
-					'and' => array('author_id' => '1', 'created' => '2'),
+					'and' => array(
+						'author_id' => '1', 
+						'created' => '2012-05-25 23:41:00'),
 					array('title' => 'value2'),
 					array('title' => null)
 				),
@@ -581,7 +599,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ";
 		$sql .= "({MockDatabasePost}.{id} = 0 OR {MockDatabasePost}.{title} = 'value2' OR ";
-		$sql .= "({MockDatabasePost}.{author_id} = 1 AND {MockDatabasePost}.{created} = '2') OR ";
+		$sql .= "({MockDatabasePost}.{author_id} = 1 AND {MockDatabasePost}.{created} = '2012-05-25 23:41:00') OR ";
 		$sql .= "({MockDatabasePost}.{title} = 'value2') OR ({MockDatabasePost}.{title} IS NULL)) AND ";
 		$sql .= "{MockDatabasePost}.{id} = 3 AND {MockDatabasePost}.{author_id} = 0;";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
@@ -603,7 +621,9 @@ class DatabaseTest extends \lithium\test\Unit {
 				'or' => array(
 					'id' => 'value1',
 					'title' => 'value2',
-					'and' => array('author_id' => '1', 'created' => '2'),
+					'and' => array(
+						'author_id' => '1', 
+						'created' => '2012-05-25 23:41:00'),
 					array('title' => 'value2'),
 					array('title' => null)
 				),
@@ -613,7 +633,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} HAVING ";
 		$sql .= "({MockDatabasePost}.{id} = 0 OR {MockDatabasePost}.{title} = 'value2' OR ";
-		$sql .= "({MockDatabasePost}.{author_id} = 1 AND {MockDatabasePost}.{created} = '2') OR ";
+		$sql .= "({MockDatabasePost}.{author_id} = 1 AND {MockDatabasePost}.{created} = '2012-05-25 23:41:00') OR ";
 		$sql .= "({MockDatabasePost}.{title} = 'value2') OR ({MockDatabasePost}.{title} IS NULL)) AND ";
 		$sql .= "{MockDatabasePost}.{id} = 3 AND {MockDatabasePost}.{author_id} = 0;";
 		$this->assertEqual($sql, $this->db->renderCommand($query));

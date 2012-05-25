@@ -12,9 +12,41 @@ use lithium\tests\mocks\data\model\mock_database\MockResult;
 
 class MockDatabase extends \lithium\data\source\Database {
 
+	/**
+	 * Mock column type definitions.
+	 *
+	 * @var array
+	 */
+	protected $_columns = array(
+		'primary_key' => array('name' => 'NOT NULL AUTO_INCREMENT'),
+		'string' => array('name' => 'varchar', 'length' => 255),
+		'text' => array('name' => 'text'),
+		'integer' => array('name' => 'int', 'length' => 11, 'formatter' => 'intval'),
+		'float' => array('name' => 'float', 'formatter' => 'floatval'),
+		'datetime' => array('name' => 'datetime', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
+		'timestamp' => array(
+			'name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
+		),
+		'time' => array('name' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
+		'date' => array('name' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
+		'binary' => array('name' => 'blob'),
+		'boolean' => array('name' => 'tinyint', 'length' => 1)
+	);
+
 	public $sql = null;
 
+	public $connection = null;
+
 	protected $_quotes = array('{', '}');
+
+	public function __construct(array $config = array()) {
+		parent::__construct($config);
+		$this->connection = $this;
+	}
+
+	public function quote($value) {
+		return "'{$value}'";
+	}
 
 	public function connect() {
 		return true;
