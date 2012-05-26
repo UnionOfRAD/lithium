@@ -191,7 +191,7 @@ abstract class Database extends \lithium\data\Source {
 			return $value;
 		}
 
-		if (is_object($value)) {
+		if (isset($value->scalar)) {
 			return $value->scalar;
 		}
 
