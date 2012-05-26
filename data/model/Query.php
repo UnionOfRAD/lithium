@@ -402,7 +402,14 @@ class Query extends \lithium\core\Object {
 			$bind ? $bind->set($data) : $this->_data = array_merge($this->_data, $data);
 			return $this;
 		}
-		$data = $bind ? $bind->data() : $this->_data;
+		$data = $this->_data;
+		
+		if($bind) {
+			$data = $bind->to('array', array(
+				'handlers' => array(
+					'stdClass' => function($item){return $item;}
+			)));
+		}
 		return ($list = $this->_config['whitelist']) ? array_intersect_key($data, $list) : $data;
 	}
 
