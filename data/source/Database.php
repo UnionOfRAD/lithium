@@ -190,24 +190,22 @@ abstract class Database extends \lithium\data\Source {
 			}
 			return $value;
 		}
+
+		if (isset($value->scalar)) {
+			return $value->scalar;
+		}
+
 		if ($value === null) {
 			return 'NULL';
 		}
+
 		switch ($type = isset($schema['type']) ? $schema['type'] : $this->_introspectType($value)) {
 			case 'boolean':
-				return $this->_toNativeBoolean($value);
 			case 'float':
-				return floatval($value);
 			case 'integer':
-				return intval($value);
-			case 'timestamp':
-				if ($value === 'CURRENT_TIMESTAMP') {
-					return 'NULL';
-				} else if (is_numeric($value)) {
-					return date('Y-m-d H:i:s', $value);
-				} else {
-					return strtotime($value);
-				}
+				return $this->_cast($type, $value);
+			default:
+				return $this->connection->quote($this->_cast($type, $value));
 		}
 	}
 
@@ -940,6 +938,36 @@ abstract class Database extends \lithium\data\Source {
 
 	public function cast($entity, array $data, array $options = array()) {
 		return $data;
+	}
+
+	/**
+	 * Cast a value according to a column type.
+	 *
+	 * @param string $type Name of the column type
+	 * @param string $value Value to cast
+	 *
+	 * @return mixed Casted value
+	 *
+	 */
+	protected function _cast($type, $value) {
+		if (is_object($value) || $value === null) {
+			return $value;
+		}
+		if ($type == 'boolean') {
+			return $this->_toNativeBoolean($value);
+		}
+		if (!isset($this->_columns[$type]) || !isset($this->_columns[$type]['formatter'])) {
+			return $value;
+		}
+
+		$column = $this->_columns[$type];
+
+		switch ($column['formatter']) {
+			case 'date':
+				return $column['formatter']($column['format'], strtotime($value));
+			default:
+				return $column['formatter']($value);
+		}
 	}
 
 	protected function _createFields($data, $schema, $context) {
