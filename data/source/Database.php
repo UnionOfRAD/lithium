@@ -713,7 +713,7 @@ abstract class Database extends \lithium\data\Source {
 				case is_array($item):
 					$toMerge[$name] = $item;
 					continue;
-				case is_object($item):
+				case isset($item->scalar):
 					$toMerge[$name] = array($item->scalar);
 					continue;
 				case in_array($item, $modelNames):
