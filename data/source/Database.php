@@ -965,10 +965,8 @@ abstract class Database extends \lithium\data\Source {
 		switch ($column['formatter']) {
 			case 'date':
 				return $column['formatter']($column['format'], strtotime($value));
-			break;
 			default:
 				return $column['formatter']($value);
-			break;
 		}
 	}
 
