@@ -40,6 +40,10 @@ class DocumentArray extends \lithium\data\Collection {
 		if ($options['materialize']) {
 			$this->_exists = true;
 		}
+
+		while (!$this->closed()) {
+			$this->_populate();
+		}
 		$this->_original = $this->_data;
 	}
 
@@ -64,6 +68,9 @@ class DocumentArray extends \lithium\data\Collection {
 	}
 
 	public function export(array $options = array()) {
+		while (!$this->closed()) {
+			$this->_populate();
+		}
 		return array(
 			'exists' => $this->_exists,
 			'key'  => $this->_pathKey,
@@ -76,7 +83,6 @@ class DocumentArray extends \lithium\data\Collection {
 	 * Lazy-loads a document from a query using a reference to a database adapter and a query
 	 * result resource.
 	 *
-	 * @param array $data Unused
 	 * @param mixed $offset
 	 * @return array
 	 */
@@ -85,13 +91,15 @@ class DocumentArray extends \lithium\data\Collection {
 			return;
 		}
 
-		if(!$this->_result->valid()){
-			return $this->close();
-		}
-
-		$data = $this->_result->current();
-		$result = $this->_set($data, $offset, array('exists' => true));
-		$this->_result->next();
+		do {
+			if(!$this->_result->valid()){
+				return $this->close();
+			}
+			$data = $this->_result->current();
+			$result = $this->_set($data, null, array('exists' => true));
+			$this->_original[] = $result;
+			$this->_result->next();
+		} while ($offset !== null && !array_key_exists($offset, $this->_original));
 
 		return $result;
 	}

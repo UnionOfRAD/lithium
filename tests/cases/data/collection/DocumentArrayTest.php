@@ -141,6 +141,21 @@ class DocumentArrayTest extends \lithium\test\Unit {
 		$this->assertFalse($doc->next());
 	}
 
+	public function testOffsetGetBackwards() {
+		$resource = new MockResult();
+		$doc = new DocumentArray(array('model' => $this->_model, 'result' => $resource));
+		$model = $this->_model;
+
+		$expected = array('_id' => '6c8f86167675abfabdbf0302', 'title' => 'dib');
+		$this->assertEqual($expected, $doc[2]->data());
+
+		$expected = array('_id' => '5c8f86167675abfabdbf0301', 'title' => 'foo');
+		$this->assertEqual($expected, $doc[1]->data());
+
+		$expected = array('_id' => '4c8f86167675abfabdbf0300', 'title' => 'bar');
+		$this->assertEqual($expected, $doc[0]->data());
+	}
+
 	public function testMappingToNewDocumentArray() {
 		$result = new MockResult();
 		$model = $this->_model;
