@@ -204,7 +204,6 @@ abstract class Database extends \lithium\data\Source {
 			case 'float':
 			case 'integer':
 				return $this->_cast($type, $value);
-				break;
 			default:
 				return $this->connection->quote($this->_cast($type, $value));
 		}
