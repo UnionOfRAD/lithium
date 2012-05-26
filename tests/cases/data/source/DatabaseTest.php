@@ -706,6 +706,16 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$expected = array('MockDatabasePost' => array('Post', 'Comment'));
 		$this->assertEqual($expected, $query->map());
+
+		$fields = array(array('count(MockDatabasePost.id)'));
+		$expected = 'count(MockDatabasePost.id)';
+		$result = $this->db->fields($fields, $query);
+		$this->assertEqual($expected, $result);
+
+		$fields = array((object) 'count(MockDatabasePost.id)');
+		$expected = 'count(MockDatabasePost.id)';
+		$result = $this->db->fields($fields, $query);
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testRawConditions() {
