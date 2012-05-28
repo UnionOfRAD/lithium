@@ -118,7 +118,6 @@ class MySql extends \lithium\data\source\Database {
 	 *                 `false`.
 	 */
 	public function connect() {
-		//Construct the DSN
 		if (!$this->_config['dsn']) {
 			$host = $this->_config['host'];
 			list($host, $port) = explode(':', $host) + array(1 => "3306");

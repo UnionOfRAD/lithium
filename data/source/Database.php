@@ -179,13 +179,11 @@ abstract class Database extends \lithium\data\Source {
 		}
 		$dsn = $config['dsn'];
 
-		//Construct Options
 		$options = $config['options'] + array(
 			PDO::ATTR_PERSISTENT => $config['persistent'],
 			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 		);
 
-		//Connect
 		try {
 			$this->connection = new PDO($dsn, $config['login'], $config['password'], $options);
 		} catch (PDOException $e) {
@@ -195,11 +193,9 @@ abstract class Database extends \lithium\data\Source {
 			case $code == 'HY000' || substr($code, 0, 2) == '08':
 				$msg = "Unable to connect to host `{$config['host']}`.";
 				throw new NetworkException($msg, null, $e);
-				break;
 			case in_array($code, array('28000', '4200')):
 				$msg = "Host connected, but could not access database `{$config['database']}`.";
 				throw new ConfigException($msg, null, $e);
-				break;
 			}
 			throw new ConfigException("An unknown configuration error has occured.", null, $e);
 		}
