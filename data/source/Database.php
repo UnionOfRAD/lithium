@@ -155,7 +155,10 @@ abstract class Database extends \lithium\data\Source {
 			'host'       => 'localhost',
 			'login'      => 'root',
 			'password'   => '',
-			'database'   => null
+			'database'   => null,
+			'encoding'   => null,
+			'dsn'        => null,
+			'options'    => array(),
 		);
 		$this->_strings += array(
 			'read' => 'SELECT {:fields} FROM {:source} {:alias} {:joins} {:conditions} {:group} ' .
@@ -168,39 +171,40 @@ abstract class Database extends \lithium\data\Source {
 		$this->_isConnected = false;
 		$config = $this->_config;
 
-		if (empty($config['dsn'])) {
-			throw new ConfigException('No DSN setup for DB Connection');
-		} else {
-			$dsn = $config['dsn'];
+		if (!$config['database']) {
+			throw new ConfigException('No Database configured');
 		}
+		if (!$config['dsn']) {
+			throw new ConfigException('No DSN setup for DB Connection');
+		}
+		$dsn = $config['dsn'];
 
 		//Construct Options
-		$options = array(
+		$options = $config['options'] + array(
 			PDO::ATTR_PERSISTENT => $config['persistent'],
 			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 		);
-		if (array_key_exists('options', $config)) {
-		   $options = array_merge($options, $config['options']);
-		}
 
 		//Connect
 		try {
 			$this->connection = new PDO($dsn, $config['login'], $config['password'], $options);
 		} catch (PDOException $e) {
 			preg_match('/SQLSTATE\[(.+?)\]/', $e->getMessage(), $code);
-			$code = empty($code[1]) ? 0 : $code[1];
+			$code = $code[1] ?: 0;
 			switch (true) {
-			case $code == 'HY000':
-			case substr($code, 0, 2) == '08':
-				throw new NetworkException($e->getMessage());
+			case $code == 'HY000' || substr($code, 0, 2) == '08':
+				$msg = "Unable to connect to host `{$config['host']}`.";
+				throw new NetworkException($msg, null, $e);
 				break;
 			case in_array($code, array('28000', '4200')):
-			default:
-				throw new ConfigException($e->getMessage());
+				$msg = "Host connected, but could not access database `{$config['database']}`.";
+				throw new ConfigException($msg, null, $e);
 				break;
 			}
+			throw new ConfigException("An unknown configuration error has occured.", null, $e);
 		}
 		$this->_isConnected = true;
+
 		if ($this->_config['encoding']) {
 			$this->encoding($this->_config['encoding']);
 	   	}
