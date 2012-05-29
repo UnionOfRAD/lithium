@@ -20,6 +20,10 @@ class CollectionTest extends \lithium\test\Unit {
 		Collection::formats('lithium\net\http\Media');
 	}
 
+    public function tearDown() {
+		Collection::formats(false);
+	}
+
 	public function testArrayLike() {
 		$collection = new Collection();
 		$collection[] = 'foo';

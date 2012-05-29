@@ -10,6 +10,7 @@ namespace lithium\data\source\database\adapter\pdo;
 
 use PDO;
 use PDOStatement;
+use PDOException;
 
 /**
  * This class is a wrapper around the MySQL result returned and can be used to iterate over it.
@@ -35,16 +36,16 @@ class Result extends \lithium\data\source\Result {
 	 */
 	protected function _fetchFromResource() {
 		if ($this->_resource instanceof PDOStatement) {
-			$rowCount = $this->_resource->rowCount();
-			if($rowCount > 0 && $this->_iterator < $rowCount) {
+			try {
 				$mode = $this->named ? PDO::FETCH_NAMED : PDO::FETCH_NUM;
-				$result = $this->_resource->fetch($mode);
-				$this->_key = $this->_iterator;
-				$this->_current = $this->_cache[$this->_iterator++] = $result;
-				return true;
-			}
-			$this->_resource = null;
+				if ($result = $this->_resource->fetch($mode)) {
+					$this->_key = $this->_iterator;
+					$this->_current = $this->_cache[$this->_iterator++] = $result;
+					return true;
+				}
+			} catch (PDOException $e) {}
 		}
+		$this->_resource = null;
 		return false;
 	}
 
