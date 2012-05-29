@@ -344,9 +344,9 @@ class Form extends \lithium\template\Helper {
 	/**
 	 * Returns the entity that the `Form` helper is currently bound to.
 	 *
+	 * @see lithium\template\helper\Form::$_binding
 	 * @param string $name If specified, match this field name against the list of bindings
 	 * @param string $key If $name specified, where to store relevant $_binding key
-	 * @see lithium\template\helper\Form::$_binding
 	 * @return object Returns an object, usually an instance of `lithium\data\Entity`.
 	 */
 	public function binding($name = null) {

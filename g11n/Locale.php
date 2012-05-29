@@ -196,7 +196,7 @@ class Locale extends \lithium\core\StaticObject {
 			if (($key = array_search(static::compose($tags), $locales)) !== false) {
 				return $locales[$key];
 			} elseif ($count == 1) {
-				foreach($locales as $currentLocale) {
+				foreach ($locales as $currentLocale) {
 					if (strpos($currentLocale, current($tags) . '_') === 0) {
 						return $currentLocale;
 					}
