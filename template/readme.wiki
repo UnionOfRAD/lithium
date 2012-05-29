@@ -2,7 +2,7 @@
 
 Views have a special syntax for outputting escaped text. The standard way to
 output escaped text in your views from Lithium is as follows: {{{
-<?=$variable;?>
+<?=$variable; ?>
 }}}
 
 This is where a lot of confusion comes in, because it is commonly misunderstood
@@ -22,16 +22,16 @@ familiar syntax and it helps developers focus more on what data _should not_ be
 escaped vs. what data _needs_ to be escaped.
 
 One special case situation to take _important_ note of, is the use of
-`<?=$this->foo()?>`. In this scenario, the code is translated to
+`<?=$this->foo(); ?>`. In this scenario, the code is translated to
 `<?php echo $this->foo(); ?>` rather than being filtered through `$h()` as with
 the former explanation. When direct access to a method or property on `$this` is
 contained in the shorthands syntax, it will be output as normal without being
 filtered. This is to make it easier to work with helpers that return markup.
 
 An example would be something like: {{{
-<?=$this->form->create();?>
+<?=$this->form->create(); ?>
 ... my form here ...
-<?=$this->form->end();?>
+<?=$this->form->end(); ?>
 }}}
 
 **Note:** `$h()` is the HTML escape function used in views.
@@ -88,7 +88,7 @@ class Custom extends \lithium\template\Helper {
 
 You can then use your helper in templates as follows:
 {{{
-<?=$this->custom->greeting("World"); ?>
+<?=$this->custom->greeting('World'); ?>
 }}}
 
 Your custom helper will then be auto-loaded into the templating engine from your application or a
@@ -122,10 +122,10 @@ template. For more information on the load order of classes, see
 #### Rendering elements
 
 Elements are reusable view snippets that you can use in several views and layouts.
-You can reference it like so: 
+You can reference it like so:
 {{{
 echo $this->_render('element', 'menu');
-}}} 
+}}}
 
 Where `menu` is the name of your element file, in this example `views/elements/menu.html.php`.  When using `$this->_render()`, all of the variables set in the controller are available to the element template.  You can pass variables declared in the view or additional static content using the third parameter to `$this->_render()`:
 {{{
@@ -139,7 +139,7 @@ echo $this->_render('element', 'menu', array(
 If you need the element template to not have access to existing data passed to the parent template, use the alternate syntax that calls the `View` render method directly:
 {{{
 echo $this->view()->render(
-	array('element' => 'menu'), 
+	array('element' => 'menu'),
 	array('var1' => $var1, 'var2' => $var2)
 );
 }}}
