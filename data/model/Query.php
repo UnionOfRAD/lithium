@@ -427,8 +427,8 @@ class Query extends \lithium\core\Object {
 
 		$keys = $options['keys'] ?: array_keys($this->_config);
 		$methods = $dataSource->methods();
-		$results = array('type' => $this->_type);
-
+		$results = array();
+		
 		$apply = array_intersect($keys, $methods);
 		$copy = array_diff($keys, $apply);
 
@@ -438,6 +438,9 @@ class Query extends \lithium\core\Object {
 		foreach ($copy as $item) {
 			if (in_array($item, $keys)) {
 				$results[$item] = $this->_config[$item];
+			}
+			if ($item == 'type') {
+				$results['type'] = $this->_type;
 			}
 		}
 		if (in_array('data', $keys)) {

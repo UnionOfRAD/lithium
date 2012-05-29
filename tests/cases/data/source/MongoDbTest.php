@@ -774,6 +774,10 @@ class MongoDbTest extends \lithium\test\Unit {
 		}));
 		$this->assertEqual($schema, $db->describe(null)->fields());
 	}
+	
+	public function testMapReduce() {
+		
+	}
 }
 
 ?>

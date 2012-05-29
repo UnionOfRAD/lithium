@@ -12,6 +12,7 @@ use Mongo;
 use MongoCode;
 use MongoRegex;
 use lithium\util\Inflector;
+use lithium\core\Libraries;
 use lithium\core\NetworkException;
 use Exception;
 use lithium\data\source\mongo_db\Schema;
@@ -126,7 +127,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @see lithium\data\source\MongoDb::$_strategies
 	 * @var array
 	 */
-	protected $_readStrategies = array('calculate', 'group', 'findAndModify', 'find');
+	protected $_readStrategies = array('mapReduce', 'calculate', 'group', 'findAndModify', 'find');
 
 	/**
 	 * List of configuration keys which will be automatically assigned to their corresponding
@@ -191,7 +192,7 @@ class MongoDb extends \lithium\data\Source {
 		$this->_strategies = array(
 			'find' => function($source, $query, array $options) {
 				$keys = array('conditions', 'fields', 'order', 'limit', 'offset');
-				$args = $query->export($source, $keys);
+				$args = $query->export($source, compact('keys'));
 				$collection = $source->collection($query);
 
 				$result = $collection->find($args['conditions'], $args['fields']);
@@ -211,7 +212,8 @@ class MongoDb extends \lithium\data\Source {
 				if (!isset($update) && !isset($remove)) {
 					return;
 				}
-				$args = $query->export($source, array('conditions', 'order', 'fields'));
+				$keys = array('conditions', 'order', 'fields');
+				$args = $query->export($source, compact('keys'));
 
 				$result = $source->connection->command(compact('update', 'remove') + array(
 					'findAndModify' => $query->source(),
@@ -227,7 +229,8 @@ class MongoDb extends \lithium\data\Source {
 				if (!$query->calculate()) {
 					return;
 				}
-				$args = $query->export($source, array('conditions'));
+				$keys = array('conditions');
+				$args = $query->export($source, compact('keys'));
 				return $source->collection($query)->find($args['conditions']);
 			},
 			'group' => function($source, $query, array $options) {
@@ -237,7 +240,8 @@ class MongoDb extends \lithium\data\Source {
 				$col     = $source->collection($query);
 				$key     = $source->group($key, $query);
 				$init    = $query->initial();
-				$options = $query->export($source, array('conditions', 'finalize'));
+				$keys    = array('conditions', 'finalize');
+				$options = $query->export($source, compact('keys'));
 
 				if (isset($options['conditions'])) {
 					$options['condition'] = $options['conditions'];
@@ -247,6 +251,28 @@ class MongoDb extends \lithium\data\Source {
 				$data = $stats['retval'];
 				unset($stats['retval']);
 
+				$config = array('class' => 'set') + compact('query', 'stats');
+				return $source->item($query->model(), $data, $config);
+			},
+			'mapReduce' => function($source, $query, array $options) {
+				if (!$query->map() || !$query->reduce()) {
+					return;
+				}
+				
+				// Note: 'mapreduce' MUST come first so it can be passed first to command()
+				$keys = array('mapreduce', 'conditions', 'query', 'source', 'out', 'map', 'reduce', 'finalize');
+				$args = $query->export($source, compact('keys')) + array_fill_keys($keys, null);
+				$args['query'] = $args['query'] ?: $args['conditions'];
+				$args['mapreduce'] = $args['mapreduce'] ?: $args['source'];
+				$args['out'] = $args['out'] ?: array('inline' => true);
+				unset($args['source']);
+				unset($args['conditions']);
+				
+				$stats = $source->connection->command($args);
+				
+				$data = $stats['results'];
+				unset($stats['results']);
+				
 				$config = array('class' => 'set') + compact('query', 'stats');
 				return $source->item($query->model(), $data, $config);
 			}
@@ -696,6 +722,75 @@ class MongoDb extends \lithium\data\Source {
 			}
 		}
 		return $group;
+	}
+	
+	/**
+	 * Sets the collection for the "mapreduce" key. This is collection that the map/reduce
+	 * is performed on. If a `Model` class name has been passed, the collection will be used
+	 * from that model's settings. If any other string is passed, it will use that collection.
+	 *
+	 * @param mixed $mapreduce A `Model` class name string or any collection name
+	 * @param object $context A `Query` object representing the group query being executed.
+	 * @return object Returns a `MongoCode` instance representing the finalize function in a group
+	 *         query.
+	 */
+	public function mapreduce($mapreduce, $context) {
+		$model = Libraries::locate('models', $mapreduce);
+		return is_string($model) ? $model::meta('source'):$mapreduce;
+	}
+	
+	/**
+	 * Sets the output method and collection for the map/reduce.
+	 * The array key is the output method, ie. `replace` or `merge` etc.
+	 * The array value is the collection name.
+	 * 
+	 * If the collection name is a model name, the proper collection name for
+	 * that model will be used. Otherwise, the passed string will be used as
+	 * the output collection.
+	 * 
+	 * If only a string was passed then the `replace` output method will be used.
+	 * If the 'inline' was passeds, then array('inline' => true) will be returned
+	 * as it is assumed that was desired. To use an actual collection called "inline"
+	 * an array would need to be passed with the output type as the key.
+	 *
+	 * @param mixed $out An array or `Model` class name string or any collection name
+	 * @param object $context A `Query` object representing the group query being executed.
+	 * @return object Returns a `MongoCode` instance representing the finalize function in a group
+	 *         query.
+	 */
+	public function out($out, $context) {
+		$model = is_array($out) ? Libraries::locate('models', end($out)):Libraries::locate('models', $out);
+		$collection = is_string($model) ? $model::meta('source'):$out;
+		$out = is_string($collection) ? array('replace' => $collection):$collection;
+		return $collection == 'inline' || empty($collection) ? array('inline' => true):$out;
+	}
+	
+	/**
+	 * Ensures that code for a map function in a query is wrapped in a `MongoCode`
+	 * object.
+	 *
+	 * @param mixed $map Either a string containing a JavaScript function, or a `MongoCode`
+	 *              instance.
+	 * @param object $context A `Query` object representing the group query being executed.
+	 * @return object Returns a `MongoCode` instance representing the finalize function in a group
+	 *         query.
+	 */
+	public function map($map, $context) {
+		return is_string($map) ? new MongoCode($map) : $map;
+	}
+	
+	/**
+	 * Ensures that code for a reduce function in a query is wrapped in a `MongoCode`
+	 * object.
+	 *
+	 * @param mixed $reduce Either a string containing a JavaScript function, or a `MongoCode`
+	 *              instance.
+	 * @param object $context A `Query` object representing the group query being executed.
+	 * @return object Returns a `MongoCode` instance representing the finalize function in a group
+	 *         query.
+	 */
+	public function reduce($reduce, $context) {
+		return is_string($reduce) ? new MongoCode($reduce) : $reduce;
 	}
 
 	/**
