@@ -15,6 +15,7 @@ use lithium\data\entity\Document;
 use lithium\data\collection\DocumentArray;
 use lithium\data\source\mongo_db\Exporter;
 use lithium\data\source\mongo_db\Schema;
+use lithium\tests\mocks\data\source\mongo_db\MockResult;
 
 class ExporterTest extends \lithium\test\Unit {
 
@@ -132,6 +133,24 @@ class ExporterTest extends \lithium\test\Unit {
 			'deeply' => new Document(array('exists' => true, 'data' => array('nested' => 'object')))
 		)));
 		$this->assertFalse(Exporter::get('update', $doc->export()));
+	}
+
+	public function testUpdateFromResourceLoading() {
+		$resource = new MockResult();
+		$doc = new DocumentArray(array('model' => $this->_model, 'result' => $resource));
+		$this->assertFalse(Exporter::get('update', $doc->export()));
+
+		$this->assertEqual('dib', $doc[2]->title);
+		$doc[2]->title = 'bob';
+		$this->assertEqual('6c8f86167675abfabdbf0302', $doc[2]->_id);
+		$this->assertEqual('bob', $doc[2]->title);
+
+		$doc[0]->title = 'bill';
+		$this->assertEqual('4c8f86167675abfabdbf0300', $doc[0]->_id);
+		$this->assertEqual('bill', $doc[0]->title);
+		$expected = Exporter::get('update', $doc->export());
+		$this->assertTrue(Exporter::get('update', $doc->export()));
+		$this->assertEqual(2, count($expected['update']));
 	}
 
 	public function testUpdateWithSubObjects() {

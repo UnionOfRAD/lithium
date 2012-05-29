@@ -23,19 +23,22 @@ class RecordSet extends \lithium\data\Collection {
 	protected $_index = array();
 
 	/**
-	 * The internal pointer to indicate which `Record` is the current record.
-	 *
-	 * @var integer
-	 */
-	protected $_pointer = 0;
-
-	/**
 	 * A 2D array of column-mapping information, where the top-level key is the fully-namespaced
 	 * model name, and the sub-arrays are column names.
 	 *
 	 * @var array
 	 */
 	protected $_columns = array();
+
+	/**
+	 * Class constructor.
+	 *
+	 * @param array $config
+	 */
+	public function __construct(array $config = array()) {
+		$this->_autoConfig[] = 'index';
+		parent::__construct($config);
+	}
 
 	/**
 	 * Initializes the record set and uses the database connection to get the column list contained
@@ -69,10 +72,11 @@ class RecordSet extends \lithium\data\Collection {
 	 * @return boolean Returns true if the record's ID is found in the set, otherwise false.
 	 */
 	public function offsetExists($offset) {
-		if (in_array($offset, $this->_index)) {
+		$this->offsetGet($offset);
+		if(in_array($offset, $this->_index, true)) {
 			return true;
 		}
-		return parent::offsetExists($offset);
+		return false;
 	}
 
 	/**
@@ -92,22 +96,23 @@ class RecordSet extends \lithium\data\Collection {
 	 *                value of `$offset`, otheriwse returns `null`.
 	 */
 	public function offsetGet($offset) {
-		if ($offset !== null && in_array($offset, $this->_index)) {
+		if ($offset !== null && in_array($offset, $this->_index, true)) {
 			return $this->_data[array_search($offset, $this->_index)];
 		}
 		if ($this->closed()) {
 			return null;
 		}
-		$model = $this->_model;
-
-		while ($record = $this->_populate(null, $offset)) {
-			$key = $model::key($record);
-			$keySet = $offset == $key || (!$key && in_array($offset, $this->_index));
-			if (!is_null($offset) && $keySet) {
-				return $record;
+		if($model = $this->_model) {
+			$offsetKey = $model::key($offset);
+			while ($record = $this->_populate($offset)) {
+				$curKey = $model::key($record);
+				$keySet = $offsetKey == $curKey;
+				if (!is_null($offset) && $keySet) {
+					return $record;
+				}
 			}
 		}
-		$this->close();
+		return $this->close();
 	}
 
 	/**
@@ -117,44 +122,14 @@ class RecordSet extends \lithium\data\Collection {
 	 * @param mixed $data The value to set.
 	 * @return mixed The value which was set.
 	 */
-	public function offsetSet($offset, $data) {
-		return $this->_populate($data, $offset);
-	}
-
-	/**
-	 * Unsets an offset.
-	 *
-	 * @param string $offset The offset to unset.
-	 * @return void
-	 */
 	public function offsetUnset($offset) {
+		$this->offsetGet($offset);
 		unset($this->_index[$index = array_search($offset, $this->_index)]);
-		unset($this->_data[$index]);
-	}
-
-	/**
-	 * Reset the set's iterator and return the first record in the set.
-	 * The next call of `current()` will get the first record in the set.
-	 *
-	 * @return object `Record`
-	 */
-	public function rewind() {
-		$this->_pointer = 0;
-		reset($this->_index);
-
-		if ($record = parent::rewind()) {
-			return $record;
+		prev($this->_data);
+		if(key($this->_data) === null) {
+			$this->rewind();
 		}
-		return empty($this->_data) ? null : $this->_data[$this->_pointer];
-	}
-
-	/**
-	 * Returns the currently pointed to record in the set.
-	 *
-	 * @return object `Record`
-	 */
-	public function current() {
-		return $this->_data[$this->_pointer];
+		unset($this->_data[$index]);
 	}
 
 	/**
@@ -164,51 +139,14 @@ class RecordSet extends \lithium\data\Collection {
 	 * @return mixed
 	 */
 	public function key($full = false) {
-		$key = $this->_index[$this->_pointer];
-		return (is_array($key) && !$full) ? reset($key) : $key;
-	}
-
-	/**
-	 * Returns the next record in the set, and advances the object's internal pointer. If the end of
-	 * the set is reached, a new record will be fetched from the data source connection handle.
-	 * If no more records can be fetched, returns `null`.
-	 *
-	 * @return object Returns the next record in the set, or `null`, if no more records are
-	 *                available.
-	 */
-	public function next() {
-		$this->_valid = (next($this->_data) !== false && next($this->_index) !== false);
-
-		if (!$this->_valid) {
-			$this->_valid = !is_null($this->_populate());
+		if ($this->_started === false) {
+			$this->current();
 		}
-		$return = null;
-
-		if ($this->_valid) {
-			if (count($this->_data) > 1) {
-				$this->_pointer++;
-			}
-			$return = $this->current();
+		if($this->_valid) {
+			$key = $this->_index[key($this->_data)];
+			return (is_array($key) && !$full) ? reset($key) : $key;
 		}
-		return $return;
-	}
-
-	/**
-	 * Returns the previous record in the set, and moves the internal pointer back. A previously
-	 * fetched record is returned. If bounds are reached, returns `null`.
-	 *
-	 * @return object Returns the previous record in the set, or `null`, if bounds are reached.
-	 */
-	public function prev() {
-		$this->_valid = (prev($this->_data) !== false && prev($this->_index) !== false);
-
-		$return = null;
-
-		if ($this->_valid) {
-			$this->_pointer--;
-			$return = $this->current();
-		}
-		return $return;
+		return null;
 	}
 
 	/**
@@ -219,27 +157,16 @@ class RecordSet extends \lithium\data\Collection {
 	 * @return mixed
 	 */
 	public function to($format, array $options = array()) {
-		$defaults = array('indexed' => true);
-		$options += $defaults;
+		$default = array('indexed' => true);
+		$options += $default;
+		$options['internal'] = !$options['indexed'];
+		unset($options['indexed']);
 
-		$result = null;
 		$this->offsetGet(null);
-
-		switch ($format) {
-			case 'array':
-				$result = array_map(function($r) { return $r->to('array'); }, $this->_data);
-
-				if (!(is_scalar(current($this->_index)) && $options['indexed'])) {
-					break;
-				}
-				$indexAndResult = ($this->_index && $result);
-				$result = $indexAndResult ? array_combine($this->_index, $result) : array();
-			break;
-			default:
-				$result = parent::to($format, $options);
-			break;
+		if(!$options['internal'] && !is_scalar(current($this->_index))) {
+			$options['internal'] = true;
 		}
-		return $result;
+		return $result = parent::to($format, $options);
 	}
 
 	/**
@@ -293,20 +220,36 @@ class RecordSet extends \lithium\data\Collection {
 	 * Lazy-loads records from a query using a reference to a database adapter and a query
 	 * result resource.
 	 *
-	 * @param array $data
 	 * @param mixed $key
 	 * @return array
 	 */
-	protected function _populate($data = null, $key = null) {
-		if ($this->closed() && !$data || !($model = $this->_model)) {
+	protected function _populate($key = null) {
+		if ($this->closed() || !($model = $this->_model)) {
 			return;
 		}
 
-		if (!($data = $data ?: $this->_result->next())) {
+		if(!$this->_result->valid()) {
 			return $this->close();
 		}
-		$record = is_object($data) ? $data : $this->_mapRecord($data);
-		$key = $model::key($record);
+
+		$data = $this->_result->current();
+		if($this->_query) {
+			$data = $this->_mapRecord($data);
+		}
+		$result = $this->_set($data, $key);
+		$this->_result->next();
+
+		return $result;
+	}
+
+	protected function _set($data = null, $offset = null, $options = array()) {
+		if (!($model = $this->_model)) {
+			return;
+		}
+
+		$conn = $model::connection();
+		$data = is_object($data) ? $data : $conn->item($model, $data);
+		$key = $model::key($data);
 
 		if (!$key) {
 			$key = count($this->_data);
@@ -317,12 +260,12 @@ class RecordSet extends \lithium\data\Collection {
 		}
 		if (in_array($key, $this->_index)) {
 			$index = array_search($key, $this->_index);
-			$this->_data[$index] = $record;
+			$this->_data[$index] = $data;
 			return $this->_data[$index];
 		}
-		$this->_data[] = $record;
+		$this->_data[] = $data;
 		$this->_index[] = $key;
-		return $record;
+		return $data;
 	}
 
 	protected function _mapRecord($data) {

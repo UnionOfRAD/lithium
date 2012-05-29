@@ -43,7 +43,6 @@ class CouchDb extends \lithium\data\source\Http {
 	protected $_classes = array(
 		'service' => 'lithium\net\http\Service',
 		'entity'  => 'lithium\data\entity\Document',
-		'set'     => 'lithium\data\collection\DocumentSet',
 		'array'   => 'lithium\data\collection\DocumentArray',
 		'schema'  => 'lithium\data\DocumentSchema'
 	);
@@ -251,7 +250,7 @@ class CouchDb extends \lithium\data\source\Http {
 				$data[$key] = $self->item($model, $val, array('exists' => true));
 			}
 			$stats += array('total_rows' => null, 'offset' => null);
-			$opts = compact('stats') + array('class' => 'set', 'exists' => true);
+			$opts = compact('stats') + array('class' => 'array', 'exists' => true);
 			return $self->item($query->model(), $data, $opts);
 		});
 	}

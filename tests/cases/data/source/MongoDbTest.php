@@ -20,7 +20,7 @@ use lithium\data\model\Query;
 use lithium\data\entity\Document;
 use lithium\tests\mocks\data\MockPost;
 use lithium\tests\mocks\data\MockComment;
-use lithium\data\collection\DocumentSet;
+use lithium\data\collection\DocumentArray;
 use lithium\tests\mocks\data\source\MockMongoSource;
 use lithium\tests\mocks\data\source\MockMongoConnection;
 use lithium\tests\mocks\data\source\mongo_db\MockResult;
@@ -261,7 +261,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->db->connection->resultSets = array(array(array('_id' => new MongoId()) + $data));
 		$result = $this->db->read($this->query);
 
-		$this->assertTrue($result instanceof DocumentSet);
+		$this->assertTrue($result instanceof DocumentArray);
 		$this->assertEqual(1, $result->count());
 		$this->assertEqual('Test Post', $result->first()->title);
 		$this->db->connection = $connection;
@@ -380,7 +380,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		array_push($this->db->connection->results, new MockResult(array(
 			'data' => array()
 		)));
-		$this->assertNull($this->db->read($this->query)->first());
+		$this->assertFalse($this->db->read($this->query)->first());
 
 		$result = array_pop($this->db->connection->queries);
 		$conditions = array('_id' => $this->query->entity()->_id);

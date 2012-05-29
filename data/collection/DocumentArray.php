@@ -33,16 +33,16 @@ class DocumentArray extends \lithium\data\Collection {
 		$this->_original = $this->_data;
 	}
 
-	public function exists() {
-		return $this->_exists;
-	}
-
 	public function sync($id = null, array $data = array(), array $options = array()) {
 		$defaults = array('materialize' => true);
 		$options += $defaults;
 
 		if ($options['materialize']) {
 			$this->_exists = true;
+		}
+
+		while (!$this->closed()) {
+			$this->_populate();
 		}
 		$this->_original = $this->_data;
 	}
@@ -67,71 +67,10 @@ class DocumentArray extends \lithium\data\Collection {
 		return parent::to($format, $options);
 	}
 
-	/**
-	 * PHP magic method used to check the presence of a field as document properties, i.e.
-	 * `$document->_id`.
-	 *
-	 * @param $name The field name, as specified with an object property.
-	 * @return boolean Returns `true` if the field specified in `$name` exists, otherwise `false`.
-	 */
-	public function __isset($name) {
-		return isset($this->_data[$name]);
-	}
-
-	/**
-	 * PHP magic method used when unset() is called on a `Document` instance.
-	 * Use case for this would be when you wish to edit a document and remove a field, i.e.:
-	 * {{{
-	 * 	$doc = Post::find($id);
-	 * 	unset($doc->fieldName);
-	 * 	$doc->save();
-	 * }}}
-	 *
-	 * @param unknown_type $name
-	 * @return void
-	 */
-	public function __unset($name) {
-		unset($this->_data[$name]);
-		prev($this->_data);
-	}
-
-	/**
-	 * Returns the value at specified offset.
-	 *
-	 * @param string $offset The offset to retrieve.
-	 * @return mixed Value at offset.
-	 */
-	public function &offsetGet($offset) {
-		$null = null;
-
-		if (!isset($this->_data[$offset])) {
-			return $null;
+	public function export(array $options = array()) {
+		while (!$this->closed()) {
+			$this->_populate();
 		}
-		return $this->_data[$offset];
-	}
-
-	public function offsetSet($offset, $data) {
-		if ($schema = $this->schema()) {
-			$model = $this->_model;
-			$key = $this->_pathKey;
-			$data = $schema->cast($this, array($key => $data), compact('model'));
-			$data = reset($data);
-		}
-		($offset === null) ? $this->_data[] = $data : $this->_data[$offset] = $data;
-	}
-
-	/**
-	 * Rewinds the collection of sub-`Document`s to the beginning and returns the first one found.
-	 *
-	 * @return object Returns the first `Document` object instance in the collection.
-	 */
-	public function rewind() {
-		$data = parent::rewind();
-		$key = key($this->_data);
-		return $this->offsetGet($key);
-	}
-
-	public function export() {
 		return array(
 			'exists' => $this->_exists,
 			'key'  => $this->_pathKey,
@@ -140,7 +79,29 @@ class DocumentArray extends \lithium\data\Collection {
 		);
 	}
 
-	protected function _populate($data = null, $key = null) {
+	/**
+	 * Lazy-loads a document from a query using a reference to a database adapter and a query
+	 * result resource.
+	 *
+	 * @param mixed $offset
+	 * @return array
+	 */
+	protected function _populate($offset = null) {
+		if ($this->closed() || !($model = $this->_model)) {
+			return;
+		}
+
+		do {
+			if(!$this->_result->valid()){
+				return $this->close();
+			}
+			$data = $this->_result->current();
+			$result = $this->_set($data, null, array('exists' => true));
+			$this->_original[] = $result;
+			$this->_result->next();
+		} while ($offset !== null && !array_key_exists($offset, $this->_original));
+
+		return $result;
 	}
 }
 

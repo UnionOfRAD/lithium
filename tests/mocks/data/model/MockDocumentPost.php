@@ -9,7 +9,7 @@
 namespace lithium\tests\mocks\data\model;
 
 use lithium\data\entity\Document;
-use lithium\data\collection\DocumentSet;
+use lithium\data\collection\DocumentArray;
 
 class MockDocumentPost extends \lithium\tests\mocks\data\MockBase {
 
@@ -53,7 +53,7 @@ class MockDocumentPost extends \lithium\tests\mocks\data\MockBase {
 			break;
 			case 'all':
 			default :
-				return new DocumentSet(array(
+				return new DocumentArray(array(
 					'data' => array(
 						array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
 						array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),

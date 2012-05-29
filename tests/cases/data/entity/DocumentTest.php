@@ -12,7 +12,6 @@ use MongoId;
 use MongoDate;
 use lithium\data\source\MongoDb;
 use lithium\data\entity\Document;
-use lithium\data\collection\DocumentSet;
 use lithium\data\collection\DocumentArray;
 use lithium\data\source\mongo_db\Schema;
 use lithium\tests\mocks\data\model\MockDocumentPost;
@@ -190,7 +189,7 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 
 	public function testWithData() {
-		$doc = new DocumentSet(array('model' => $this->_model, 'data' => array(
+		$doc = new DocumentArray(array('model' => $this->_model, 'data' => array(
 			array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
 			array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
 			array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
@@ -217,7 +216,7 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 
 	public function testSetMultiple() {
-		$doc = new DocumentSet(array('model' => $this->_model));
+		$doc = new DocumentArray(array('model' => $this->_model));
 		$doc->set(array(
 			array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
 			array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
@@ -288,13 +287,13 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 
 	public function testRewindNoData() {
-		$doc = new DocumentSet();
+		$doc = new DocumentArray();
 		$result = $doc->rewind();
-		$this->assertNull($result);
+		$this->assertFalse($result);
 	}
 
 	public function testRewindData() {
-		$doc = new DocumentSet(array('model' => $this->_model, 'data' => array(
+		$doc = new DocumentArray(array('model' => $this->_model, 'data' => array(
 			array('id' => 1, 'name' => 'One'),
 			array('id' => 2, 'name' => 'Two'),
 			array('id' => 3, 'name' => 'Three')

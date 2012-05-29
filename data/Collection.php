@@ -76,14 +76,10 @@ abstract class Collection extends \lithium\util\Collection {
 	protected $_stats = array();
 
 	/**
-	 * By default, query results are not fetched until the collection is iterated. Set to `true`
-	 * when the collection has begun iterating and fetching entities.
-	 *
-	 * @see lithium\data\Collection::rewind()
-	 * @see lithium\data\Collection::_populate()
-	 * @var boolean
+	 * Setted to `true` when the collection has begun iterating.
+	 * @var integer
 	 */
-	protected $_hasInitialized = false;
+	protected $_started = false;
 
 	/**
 	 * Indicates whether this array was part of a document loaded from a data source, or is part of
@@ -166,6 +162,15 @@ abstract class Collection extends \lithium\util\Collection {
 		return $this->_parent;
 	}
 
+	/**
+	 * A flag indicating whether or not the items of this collection exists.
+	 *
+	 * @return boolean `True` if exists, `false` otherwise.
+	 */
+	public function exists() {
+		return $this->_exists;
+	}
+
 	public function schema($field = null) {
 		$schema = null;
 
@@ -191,25 +196,100 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return boolean Result.
 	 */
 	public function offsetExists($offset) {
-		return ($this->offsetGet($offset) !== null);
+		$this->offsetGet($offset);
+		return array_key_exists($offset, $this->_data);
 	}
 
 	/**
-	 * Reset the set's iterator and return the first entity in the set.
-	 * The next call of `current()` will get the first entity in the set.
+	 * Gets a record from the record set using PHP's array syntax, i.e. `$documents[5]`. Using loose
+	 * typing, integer keys can be accessed using strings and vice-versa.
 	 *
-	 * @return object Returns the first `Entity` instance in the set.
+	 * @param mixed $offset String or integer indicating the offset or index of a document in the set
+	 * @return object Returns an object in the document set.
+	 */
+	public function offsetGet($offset) {
+		$data = null;
+		if (!array_key_exists($offset, $this->_data) && !$data = $this->_populate($offset)) {
+			return null;
+		}
+		if ($data && $this->_model) {
+			$this->_data[$offset] = $this->schema()->cast($this, $this->_data[$offset]);
+		}
+		if (array_key_exists($offset, $this->_data)) {
+			return $this->_data[$offset];
+		}
+		return null;
+	}
+
+	/**
+	 * Adds the specified object to the `Collection` instance, and assigns associated metadata to
+	 * the added object.
+	 *
+	 * @param string $offset The offset to assign the value to.
+	 * @param mixed $data The entity object to add.
+	 * @return mixed Returns the set `Entity` object.
+	 */
+	public function offsetSet($offset, $data) {
+		$this->offsetGet($offset);
+		return $this->_set($data, $offset);
+	}
+
+	protected function _set($data = null, $offset = null, $options = array()) {
+		if ($schema = $this->schema()) {
+			$model = $this->_model;
+			$pathKey = $this->_pathKey;
+			$options =  compact('model', 'pathKey' ) + $options;
+			$result = $schema->cast($this, array($offset => $data), $options);
+			$data = reset($result);
+		}
+		($offset === null) ? $this->_data[] = $data : $this->_data[$offset] = $data;
+		if (is_object($data)) {
+			$data->assignTo($this);
+		}
+		return $data;
+	}
+
+	/**
+	 * Rewinds the collection to the beginning.
 	 */
 	public function rewind() {
-		$this->_valid = (reset($this->_data) || count($this->_data));
+		$this->_started = true;
+		reset($this->_data);
+		$this->_valid = !empty($this->_data) || !is_null($this->_populate());
+		return current($this->_data);
+	}
 
-		if (!$this->_valid && !$this->_hasInitialized) {
-			$this->_hasInitialized = true;
+	/**
+	 * Returns the currently pointed to record in the set.
+	 *
+	 * @return object `Record`
+	 */
+	public function current() {
+		if (!$this->_started) {
+			$this->rewind();
+		}
+		if(!$this->_valid) {
+			return false;
+		}
+		return current($this->_data);
+	}
 
-			if ($entity = $this->_populate()) {
-				$this->_valid = true;
-				return $entity;
-			}
+	/**
+	 * Returns the next document in the set, and advances the object's internal pointer. If the end
+	 * of the set is reached, a new document will be fetched from the data source connection handle
+	 * If no more documents can be fetched, returns `null`.
+	 *
+	 * @return mixed Returns the next document in the set, or `false`, if no more documents are
+	 *         available.
+	 */
+	public function next() {
+		if($this->_started === false) {
+			$this->current();
+		}
+		next($this->_data);
+		$this->_valid = !(key($this->_data) === null);
+		if (!$this->_valid) {
+			$this->_valid = !is_null($this->_populate());
 		}
 		return current($this->_data);
 	}
@@ -359,23 +439,6 @@ abstract class Collection extends \lithium\util\Collection {
 	}
 
 	/**
-	 * Adds the specified object to the `Collection` instance, and assigns associated metadata to
-	 * the added object.
-	 *
-	 * @param string $offset The offset to assign the value to.
-	 * @param mixed $data The entity object to add.
-	 * @return mixed Returns the set `Entity` object.
-	 */
-	public function offsetSet($offset, $data) {
-		if (is_array($data) && ($model = $this->_model)) {
-			$data = $model::connection()->cast($this, $data);
-		} elseif (is_object($data)) {
-			$data->assignTo($this);
-		}
-		return $this->_data[] = $data;
-	}
-
-	/**
 	 * Return's the pointer or resource that is used to load entities from the backend
 	 * data source that originated this collection. This is useful in many cases for
 	 * additional methods related to debugging queries.
@@ -408,6 +471,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 */
 	public function close() {
 		if (!empty($this->_result)) {
+			unset($this->_result);
 			$this->_result = null;
 		}
 	}
@@ -438,15 +502,12 @@ abstract class Collection extends \lithium\util\Collection {
 	 * data and wraps it in the appropriate object type, which is added into the `Collection` and
 	 * returned.
 	 *
-	 * @param mixed $data Data (in an array or object) that is manually added to the data
-	 *              collection. If `null`, data is automatically fetched from the associated backend
-	 *              data source, if available.
 	 * @param mixed $key String, integer or array key representing the unique key of the data
 	 *              object. If `null`, the key will be extracted from the data passed or fetched,
 	 *              using the associated `Model` class.
 	 * @return object Returns a `Record` or `Document` object, or other `Entity` object.
 	 */
-	abstract protected function _populate($data = null, $key = null);
+	abstract protected function _populate($key = null);
 }
 
 ?>

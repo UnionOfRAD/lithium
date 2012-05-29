@@ -72,7 +72,7 @@ use BadMethodCallException;
  * @see lithium\data\entity\Record
  * @see lithium\data\entity\Document
  * @see lithium\data\collection\RecordSet
- * @see lithium\data\collection\DocumentSet
+ * @see lithium\data\collection\DocumentArray
  * @see lithium\data\Connections
  */
 class Model extends \lithium\core\StaticObject {
