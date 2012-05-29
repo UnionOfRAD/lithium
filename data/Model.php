@@ -331,8 +331,9 @@ class Model extends \lithium\core\StaticObject {
 	 * attributes, as well as obtain a handle to the configured persistent storage connection.
 	 *
 	 * @param array $options Possible options are:
-	 * - `meta`: Meta-information for this model, such as the connection.
-	 * - `finders`: Custom finders for this model.
+	 *     - `meta`: Meta-information for this model, such as the connection.
+	 *     - `finders`: Custom finders for this model.
+	 *
 	 * @return void
 	 */
 	public static function config(array $options = array()) {
@@ -495,7 +496,7 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Set/get method for `Model` metadata.
+	 * Gets or sets Model's metadata.
 	 *
 	 * @see lithium\data\Model::$_meta
 	 * @param string $key Model metadata key.
@@ -659,8 +660,8 @@ class Model extends \lithium\core\StaticObject {
 	 * example:
 	 *
 	 * {{{
-	 * $post = Posts::create(array("title" => "New post"));
-	 * echo $post->title; // echoes "New post"
+	 * $post = Posts::create(array('title' => 'New post'));
+	 * echo $post->title; // echoes 'New post'
 	 * $success = $post->save();
 	 * }}}
 	 *
@@ -671,8 +672,8 @@ class Model extends \lithium\core\StaticObject {
 	 * database, without actually querying the database:
 	 *
 	 * {{{
-	 * $post = Posts::create(array("id" => $id, "moreData" => "foo"), array("exists" => true));
-	 * $post->title = "New title";
+	 * $post = Posts::create(array('id' => $id, 'moreData' => 'foo'), array('exists' => true));
+	 * $post->title = 'New title';
 	 * $success = $post->save();
 	 * }}}
 	 *
