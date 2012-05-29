@@ -247,6 +247,9 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * in assertEqual, assertNotEqual, assertPattern and assertNotPattern this function is
 	 * called to get rid of any EOL differences.
+	 *
+	 * @param mixed $expected
+	 * @param mixed $result
 	 */
 	protected function _normalizeLineEndings($expected, $result) {
 		if (is_string($expected) && is_string($result)) {
@@ -255,7 +258,7 @@ class Unit extends \lithium\core\Object {
 		}
 		return array($expected, $result);
 	}
-	
+
 	/**
 	 * Checks that the actual result is equal, but not neccessarily identical, to the expected
 	 * result.
