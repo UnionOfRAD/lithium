@@ -201,7 +201,7 @@ class Controller extends \lithium\core\Object {
 	/**
 	 * This method is used to pass along any data from the controller to the view and layout
 	 *
-	 * @param array $data sets of `'variable name' => 'variable value'` to pass to view layer.
+	 * @param array $data sets of `<variable name> => <variable value>` to pass to view layer.
 	 * @return void
 	 */
 	public function set($data = array()) {

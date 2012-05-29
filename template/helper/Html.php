@@ -125,7 +125,7 @@ class Html extends \lithium\template\Helper {
 	 * If `$url` is empty, `$title` is used in its place.
 	 *
 	 * @param string $title The content to be wrapped by an `<a />` tag,
-	 * or the `title` attribute of a meta-link `<link />`.
+	 *               or the `title` attribute of a meta-link `<link />`.
 	 * @param mixed $url Can be a string representing a URL relative to the base of your Lithium
 	 *              application, an external URL (starts with `'http://'` or `'https://'`), an
 	 *              anchor name starting with `'#'` (i.e. `'#top'`), or an array defining a set
