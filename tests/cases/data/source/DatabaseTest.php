@@ -100,8 +100,11 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->value((object) 'REGEXP "^fo$"');
 		$this->assertIdentical('REGEXP "^fo$"', $result);
 
+		$date = date_default_timezone_get();
+		date_default_timezone_set('UTC');
 		$result = $this->db->value('Hello World', array('type' => 'timestamp'));
-		$this->assertIdentical("'1970-01-01 01:00:00'", $result);
+		$this->assertIdentical("'1970-01-01 00:00:00'", $result);
+		date_default_timezone_set($date);
 
 		$result = $this->db->value('2012-05-25 22:44:00', array('type' => 'timestamp'));
 		$this->assertIdentical("'2012-05-25 22:44:00'", $result);
