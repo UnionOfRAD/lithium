@@ -37,6 +37,10 @@ class MockDatabase extends \lithium\data\source\Database {
 
 	public $sql = null;
 
+	public $logs = array();
+
+	public $log = false;
+
 	protected $_quotes = array('{', '}');
 
 	public function __construct(array $config = array()) {
@@ -87,6 +91,9 @@ class MockDatabase extends \lithium\data\source\Database {
 
 	protected function _execute($sql) {
 		$this->sql = $sql;
+		if($this->log) {
+			$this->logs[] = $sql;
+		}
 		return new MockResult();
 	}
 
