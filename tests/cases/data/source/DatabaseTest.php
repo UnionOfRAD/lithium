@@ -957,7 +957,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-    public function testModelFindBy() {
+	public function testModelFindBy() {
 		$this->db->log = true;
 		MockDatabasePost::findById(5, array('with' => 'MockDatabaseComment'));
 		$this->db->log = false;
