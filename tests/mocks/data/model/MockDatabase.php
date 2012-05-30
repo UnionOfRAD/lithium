@@ -91,7 +91,7 @@ class MockDatabase extends \lithium\data\source\Database {
 
 	protected function _execute($sql) {
 		$this->sql = $sql;
-		if($this->log) {
+		if ($this->log) {
 			$this->logs[] = $sql;
 		}
 		return new MockResult();
