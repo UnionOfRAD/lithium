@@ -961,12 +961,20 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->db->log = true;
 		MockDatabasePost::findById(5, array('with' => 'MockDatabaseComment'));
 		$this->db->log = false;
+
 		$result = MockDatabasePost::$connection->logs[0];
 		$expected = "SELECT {MockDatabasePost}.{id} FROM {mock_database_posts} AS ";
 		$expected .= "{MockDatabasePost} LEFT JOIN {mock_database_comments} AS ";
 		$expected .= "{MockDatabaseComment} ON {MockDatabasePost}.{id} = ";
 		$expected .= "{MockDatabaseComment}.{mock_database_post_id} WHERE ";
 		$expected .= "{MockDatabasePost}.{id} = 5 GROUP BY {MockDatabasePost}.{id} LIMIT 1;";
+		$this->assertEqual($expected, $result);
+
+		$result = MockDatabasePost::$connection->logs[1];
+		$expected = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} ";
+		$expected .= "LEFT JOIN {mock_database_comments} AS {MockDatabaseComment} ON ";
+		$expected .= "{MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id} ";
+		$expected .= "WHERE {MockDatabasePost}.{id} = 5 LIMIT 1;";
 		$this->assertEqual($expected, $result);
 	}
 }
