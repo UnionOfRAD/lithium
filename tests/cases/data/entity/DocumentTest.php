@@ -104,7 +104,7 @@ class DocumentTest extends \lithium\test\Unit {
 			'name' => true,
 			'content' => true,
 		);
-		
+
 		$this->assertEqual($expected, $doc->modified());
 		$doc->sync();
 
@@ -120,7 +120,7 @@ class DocumentTest extends \lithium\test\Unit {
 			'content' => true,
 			'new' => true,
 		);
-		
+
 		$this->assertEqual($expected, $doc->modified());
 	}
 
@@ -320,7 +320,7 @@ class DocumentTest extends \lithium\test\Unit {
 
 	public function testUpdateWithMultipleKeys() {
 		$model = 'lithium\tests\mocks\data\model\MockDocumentMultipleKey';
-		$model::config(array('key' => array('id', 'rev'), 'foo' => true));
+		$model::config(array('meta' => array('key' => array('id', 'rev'), 'foo' => true)));
 		$doc = new Document(compact('model'));
 
 		$result = $model::meta('key');

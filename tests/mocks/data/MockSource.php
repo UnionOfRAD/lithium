@@ -124,7 +124,8 @@ class MockSource extends \lithium\data\Source {
 	}
 
 	public function describe($entity, $schema = array(), array $meta = array()) {
-		$fields = $this->{'_' . Inflector::camelize($entity, false)};
+		$source = '_' . Inflector::camelize($entity, false);
+		$fields = isset($this->$source) ? $this->$source : array();
 		return $this->_instance('schema', compact('fields'));
 	}
 

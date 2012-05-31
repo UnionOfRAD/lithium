@@ -133,7 +133,7 @@ class HttpTest extends \lithium\test\Unit {
 
 	public function testCreateWithModel() {
 		$model = $this->_model;
-		$model::config(array('key' => 'id'));
+		$model::config(array('meta' => array('key' => 'id')));
 		$http = new Http($this->_testConfig);
 		$query = new Query(compact('model') + array('data' => array('title' => 'Test Title')));
 		$result = $http->create($query);

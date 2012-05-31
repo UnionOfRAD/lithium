@@ -42,8 +42,8 @@ class DocumentSetTest extends \lithium\test\Unit {
 		Connections::add('mongo', array('type' => 'MongoDb', 'autoConnect' => false));
 		Connections::add('couch', array('type' => 'http', 'adapter' => 'CouchDb'));
 
-		MockDocumentPost::config(array('connection' => 'mongo'));
-		MockDocumentMultipleKey::config(array('connection' => 'couch'));
+		MockDocumentPost::config(array('meta' => array('connection' => 'mongo')));
+		MockDocumentMultipleKey::config(array('meta' => array('connection' => 'couch')));
 	}
 
 	public function tearDown() {
