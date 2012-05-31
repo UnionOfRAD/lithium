@@ -289,21 +289,46 @@ class Model extends \lithium\core\StaticObject {
 	protected static $_instanceMethods = array();
 
 	/**
-	 * Configures the model for use.
+	 * Holds an array of values that should be processed on `Model::config()`. Each value should
+	 * have a matching protected property (prefixed with `_`) defined in the class. If the
+	 * property is an array, the property name should be the key and the value should be `'merge'`.
 	 *
-	 * This method will set the `Model::$_meta` class attributes.
-	 *
-	 * @param array $options Meta-information for this model, such as the connection.
+	 * @see LF\Data\Model::config()
+	 * @see LF\Data\Model::reset()
+	 * @var array
 	 */
-	public static function config(array $options = array()) {
+	protected static $_autoConfig = array('meta', 'finders', 'query', 'schema', 'classes');
+
+	/**
+	 * Configures the model for use. This method will set the `Model::$_schema`, `Model::$_meta`,
+	 * `Model::$_finders` class attributes, as well as obtain a handle to the configured
+	 * persistent storage connection.
+	 *
+	 * @param array $config Possible options are:
+	 *        - `meta`: Meta-information for this model, such as the connection.
+	 *        - `finders`: Custom finders for this model.
+	 *        - `query`: Default query parameters.
+	 *        - `schema`: A `Schema` instance for this model.
+	 *        - `classes`: Classes used by this model.
+	 */
+	public static function config(array $config = array()) {
 		if (($class = get_called_class()) === __CLASS__) {
 			return;
 		}
-		
+
 		if (!isset(static::$_instances[$class])) {
 			static::$_instances[$class] = new $class();
 		}
-		static::$_instances[$class]->_meta = $options + static::$_instances[$class]->_meta;
+		$self = static::$_instances[$class];
+
+		foreach (static::$_autoConfig as $key) {
+			if (isset($config[$key])) {
+				$_key = "_{$key}";
+				$val = $config[$key];
+				$self->$_key = is_array($val) ? $val + $self->$_key : $val;
+			}
+		}
+
 		static::$_initialized[$class] = false;
 	}
 
@@ -325,6 +350,7 @@ class Model extends \lithium\core\StaticObject {
 		static::$_initialized[$class] = true;
 
 		$query   = array();
+		$finders = array();
 		$meta    = array();
 		$schema  = array();
 		$source  = array();
@@ -333,9 +359,10 @@ class Model extends \lithium\core\StaticObject {
 		foreach (static::_parents() as $parent) {
 			$parentConfig = get_class_vars($parent);
 
-			foreach (array('meta', 'schema', 'classes', 'query') as $key) {
+			foreach (static::$_autoConfig as $key) {
 				if (isset($parentConfig["_{$key}"])) {
-					${$key} += $parentConfig["_{$key}"];
+					$val = $parentConfig["_{$key}"];
+					${$key} = is_array($val) ? ${$key} + $val : $val;
 				}
 			}
 			if ($parent == __CLASS__) {
@@ -356,6 +383,10 @@ class Model extends \lithium\core\StaticObject {
 		$local = compact('class', 'name') + $self->_meta;
 		$self->_meta = ($local + $source['meta'] + $meta);
 		$self->_meta['initialized'] = false;
+
+		if (is_object($schema)) {
+			$schema = $schema->fields();
+		}
 		$self->schema()->append($schema + $source['schema']);
 
 		$self->_finders += $source['finders'] + $self->_findFilters();
@@ -481,6 +512,30 @@ class Model extends \lithium\core\StaticObject {
 			return isset($self->_finders[$name]) ? $self->_finders[$name] : null;
 		}
 		$self->_finders[$name] = $finder;
+	}
+
+	/**
+	 * Gets or sets the default query for the model.
+	 *
+	 * @param array $query.  Possible options are:
+	 *        - `'conditions'`: The conditional query elements, e.g.
+	 *          `'conditions' => array('published' => true)`
+	 *        - `'fields'`: The fields that should be retrieved. When set to `null`, defaults to
+	 *          all fields.
+	 *        - `'order'`: The order in which the data will be returned, e.g. `'order' => 'ASC'`.
+	 *        - `'limit'`: The maximum number of records to return.
+	 *        - `'page'`: For pagination of data.
+	 *        - `'with'`: An array of relationship names to be included in the query.
+	 *
+	 * @return mixed Returns the query definition if querying, or `null` if setting.
+	 */
+	public static function query($query = null) {
+		$self = static::_object();
+
+		if (!$query) {
+			return $self->_query;
+		}
+		$self->_query += $query;
 	}
 
 	/**
@@ -1133,6 +1188,22 @@ class Model extends \lithium\core\StaticObject {
 				return $self::connection()->calculation('count', $query, $options);
 			}
 		);
+	}
+
+	/**
+	 * Reseting the instance to it's default states or with some new configuration options.
+	 *
+	 * @param array $config Possible options are:
+	 *        - `meta`: Meta-information for this model, such as the connection.
+	 *        - `finders`: Custom finders for this model.
+	 *        - `query`: Default query parameters.
+	 *        - `schema`: A `Schema` instance for this model.
+	 *        - `classes`: Classes used by this model.
+	 */
+	public static function reset(array $config = array()) {
+		$class = get_called_class();
+		static::$_instances[$class] = new $class();
+		static::config($config);
 	}
 }
 
