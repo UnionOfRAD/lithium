@@ -246,6 +246,31 @@ class SessionTest extends \lithium\test\Unit {
 		$this->assertFalse(Session::check('test', array('strategies' => false)));
 	}
 
+	public function testMultipleStrategies() {
+		Session::config(array(
+			'primary' => array(
+				'adapter' => new Memory(),
+				'filters' => array(),
+				'strategies' => array()
+			),
+			'secondary' => array(
+				'adapter' => new Memory(),
+				'filters' => array(),
+				'strategies' => array('lithium\storage\cache\strategy\Json')
+			)
+		));
+
+		Session::write('test', array('foo' => 'bar'));
+		$result = Session::read('test');
+		$this->assertEqual(array('foo' => 'bar'), $result);
+
+		$result = Session::read('test', array('name' => 'primary', 'strategies' => false));
+		$this->assertEqual(array('foo' => 'bar'), $result);
+
+		$result = Session::read('test', array('name' => 'secondary', 'strategies' => false));
+		$this->assertEqual('{"foo":"bar"}', $result);
+	}
+
 	public function testEncryptedStrategy() {
 		$this->skipIf(!MockEncrypt::enabled(), 'The Mcrypt extension is not installed or enabled.');
 
