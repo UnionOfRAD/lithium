@@ -173,7 +173,9 @@ class FormTest extends \lithium\test\Unit {
 			'id' => '5',
 			'author_id' => '2',
 			'title' => 'This is a saved post',
-			'body' => 'This is the body of the saved post'
+			'body' => 'This is the body of the saved post',
+			'zeroInt' => 0,
+			'zeroString' => "0"
 		)));
 
 		$result = $this->form->create($record);
@@ -185,6 +187,18 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array('input' => array(
 			'type' => 'text', 'name' => 'title',
 			'value' => 'This is a saved post', 'id' => 'MockFormPostTitle'
+		)));
+
+
+		$result = $this->form->text('zeroInt');
+		$this->assertTags($result, array('input' => array(
+			'type' => 'text', 'name' => 'zeroInt',
+			'value' => '0', 'id' => 'MockFormPostZeroInt'
+		)));
+		$result = $this->form->text('zeroString');
+		$this->assertTags($result, array('input' => array(
+			'type' => 'text', 'name' => 'zeroString',
+			'value' => '0', 'id' => 'MockFormPostZeroString'
 		)));
 
 		$this->assertEqual('</form>', $this->form->end());
@@ -382,12 +396,16 @@ class FormTest extends \lithium\test\Unit {
 			))
 		));
 
-		$document = new Document(array('model' => $this->_model, 'data' => array('subdocument' => array('foo' => true))));
+		$document = new Document(array('model' => $this->_model, 'data' =>
+			array('subdocument' => array('foo' => true))
+		));
 		$this->form->create($document);
 
 		$result = $this->form->checkbox('subdocument.foo');
 		$this->assertTags($result, array(
-			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'subdocument[foo]')),
+			array('input' => array(
+				'type' => 'hidden', 'value' => '', 'name' => 'subdocument[foo]')
+			),
 			array('input' => array(
 				'type' => 'checkbox', 'value' => '1', 'name' => 'subdocument[foo]',
 				'checked' => 'checked', 'id' => 'MockFormPostSubdocumentFoo'
@@ -614,7 +632,8 @@ class FormTest extends \lithium\test\Unit {
 
 	/**
 	 * When trying to determine which option of a select box should be selected, we should be
-	 * int/string agnostic because it all looks the same in HTML.
+	 * integer/string agnostic because it all looks the same in HTML.
+	 *
 	 */
 	public function testSelectTypeAgnosticism() {
 		$taglist = array(
