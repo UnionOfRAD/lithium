@@ -1191,19 +1191,11 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Reseting the instance to it's default states or with some new configuration options.
-	 *
-	 * @param array $config Possible options are:
-	 *        - `meta`: Meta-information for this model, such as the connection.
-	 *        - `finders`: Custom finders for this model.
-	 *        - `query`: Default query parameters.
-	 *        - `schema`: A `Schema` instance for this model.
-	 *        - `classes`: Classes used by this model.
+	 * Reseting the model
 	 */
-	public static function reset(array $config = array()) {
+	public static function reset() {
 		$class = get_called_class();
-		static::$_instances[$class] = new $class();
-		static::config($config);
+		unset(static::$_instances[$class]);
 	}
 }
 

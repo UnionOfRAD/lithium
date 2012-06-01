@@ -96,15 +96,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual('mock_posts', MockPost::meta('source'));
 		$this->assertTrue(MockPost::meta('connection'));
 
-		MockPost::reset(array('meta' => array('source' => 'post')));
-		$this->assertEqual('post', MockPost::meta('source'));
-
-		MockPost::reset(array('meta' => array('source' => false)));
-		$this->assertIdentical(false, MockPost::meta('source'));
-
-		MockPost::reset(array('meta' => array('source' => null)));
-		$this->assertIdentical('mock_posts', MockPost::meta('source'));
-
+		MockPost::config(array('meta' => array('source' => 'toreset')));
 		MockPost::reset();
 		$this->assertEqual('mock_posts', MockPost::meta('source'));
 		$this->assertFalse(MockPost::meta('connection'));
@@ -139,18 +131,9 @@ class ModelTest extends \lithium\test\Unit {
 		$finder = array(
 			'fields' => array('id', 'title')
 		);
-		MockPost::reset(array('finders' => array('myFinder' => $finder)));
-		$result = MockPost::find('myFinder');
-		$expected = $finder + array(
-			'order' => null,
-			'limit' => null,
-			'conditions' => null,
-			'page' => null,
-			'with' => array(),
-			'type' => 'read',
-			'model' => 'lithium\tests\mocks\data\MockPost'
-		);
-		$this->assertEqual($expected, $result['options']);
+		MockPost::reset();
+		$result = MockPost::finder('myFinder');
+		$this->assertNull($result);
 	}
 
 	public function testInstanceMethods() {
@@ -217,6 +200,9 @@ class ModelTest extends \lithium\test\Unit {
 		$result = MockPost::schema();
 		$this->assertTrue($result);
 		$this->assertEqual($result->fields(), MockPost::schema()->fields());
+
+		MockPost::config(array('schema' => $this->_altSchema));
+		$this->assertEqual($this->_altSchema->fields(), MockPost::schema()->fields());
 	}
 
 	public function testFieldIntrospection() {

@@ -26,9 +26,8 @@ class RecordTest extends \lithium\test\Unit {
 				'id' => 'int', 'title' => 'string', 'body' => 'text'
 		)));
 		$model::config(array(
-			'meta' => array(
-				'connection' => false, 'key' => 'id', 'locked' => true),
-				'schema' => $schema
+			'meta' => array('connection' => false, 'key' => 'id', 'locked' => true),
+			'schema' => $schema
 		));
 		$model::$connection = new $database();
 		$this->record = new Record(compact('model'));
