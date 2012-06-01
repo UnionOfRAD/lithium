@@ -294,7 +294,6 @@ class Model extends \lithium\core\StaticObject {
 	 * property is an array, the property name should be the key and the value should be `'merge'`.
 	 *
 	 * @see LF\Data\Model::config()
-	 * @see LF\Data\Model::reset()
 	 * @var array
 	 */
 	protected static $_autoConfig = array('meta', 'finders', 'query', 'schema', 'classes');
