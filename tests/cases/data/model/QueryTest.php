@@ -35,9 +35,6 @@ class QueryTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->db = new MockDatabase();
-		MockQueryPost::config();
-		MockQueryComment::config();
-
 		MockQueryPost::$connection = $this->db;
 		MockQueryComment::$connection = $this->db;
 	}
