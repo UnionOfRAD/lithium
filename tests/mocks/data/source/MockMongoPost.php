@@ -17,13 +17,6 @@ class MockMongoPost extends \lithium\tests\mocks\data\MockBase {
 
 	public static $connection;
 
-	public static function resetSchema($array = false) {
-		if ($array) {
-			return static::_object()->_schema = array();
-		}
-		static::_object()->_schema = new Schema();
-	}
-
 	public static function schema($field = null) {
 		$result = parent::schema($field);
 

@@ -137,7 +137,7 @@ class ExporterTest extends \lithium\test\Unit {
 	public function testUpdateWithSubObjects() {
 		$model = $this->_model;
 		$exists = true;
-		$model::config(array('key' => '_id'));
+		$model::config(array('meta' => array('key' => '_id')));
 		$schema = new Schema(array('fields' => array(
 			'forceArray' => array('type' => 'string', 'array' => true),
 			'array' => array('type' => 'string', 'array' => true),

@@ -17,13 +17,6 @@ class MockBase extends \lithium\data\Model {
 
 	public static $connection = null;
 
-	public static function resetSchema($array = false) {
-		if ($array) {
-			return static::_object()->_schema = array();
-		}
-		static::_object()->_schema = new Schema();
-	}
-
 	public static function &connection() {
 		if (!static::$connection) {
 			$connection = new MockDatabase();
