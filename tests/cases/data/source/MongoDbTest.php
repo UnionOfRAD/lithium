@@ -71,10 +71,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->db->server = (object) array('connected' => true);
 		$this->db->connection = new MockMongoConnection();
 
-		MockPost::resetSchema(true);
-		MockComment::resetSchema(true);
-
-		$model::config(array('key' => '_id'));
+		$model::config(array('meta' => array('key' => '_id')));
 		$model::$connection = $this->db;
 
 		$this->query = new Query(compact('model') + array('entity' => new Document(compact('model'))));
@@ -82,6 +79,8 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		unset($this->query);
+		MockPost::reset();
+		MockComment::reset();
 	}
 
 	public function testBadConnection() {
@@ -437,7 +436,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function testDocumentSorting() {
 		$model = $this->_model;
-		$model::config(array('source' => 'ordered_docs', 'locked' => false));
+		$model::config(array('meta' => array('source' => 'ordered_docs', 'locked' => false)));
 
 		$first = array('title' => 'First document',  'position' => 1);
 		$second = array('title' => 'Second document', 'position' => 2);
@@ -509,8 +508,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function testMongoIdPreservation() {
 		$model = $this->_model;
-		$model::resetSchema(true);
-		$model::config(array('locked' => false));
+		$model::config(array('meta' => array('locked' => false)));
 
 		$post = $model::create(array('_id' => new MongoId(), 'title' => 'A post'));
 		$post->save();
@@ -535,7 +533,11 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$from::$connection = $this->db;
 		$to::$connection = $this->db;
-		$to::config(array('key' => '_id'));
+
+		$from::config(array(
+			'schema' => new Schema(array('fields' => array('comment_id')))
+		));
+		$to::config(array('meta' => array('key' => '_id')));
 
 		$result = $this->db->relationship($from, 'belongsTo', 'MockPost');
 		$expected = array(
@@ -585,8 +587,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function testAtomicUpdate() {
 		$model = $this->_model;
-		$model::config(array('source' => 'posts'));
-		$model::resetSchema();
+		$model::config(array('meta' => array('source' => 'posts')));
 		$data = array('initial' => 'one', 'values' => 'two');
 
 		$this->db->connection = new MockMongoConnection();

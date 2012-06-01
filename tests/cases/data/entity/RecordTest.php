@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\data\entity;
 
 use lithium\data\entity\Record;
+use lithium\data\Schema;
 
 class RecordTest extends \lithium\test\Unit {
 
@@ -20,8 +21,14 @@ class RecordTest extends \lithium\test\Unit {
 		$database = $this->_database;
 		$model = $this->_model;
 
-		$model::overrideSchema(array('id' => 'int', 'title' => 'string', 'body' => 'text'));
-		$model::config(array('connection' => false, 'key' => 'id', 'locked' => true));
+		$schema = new Schema(array(
+			'fields' => array(
+				'id' => 'int', 'title' => 'string', 'body' => 'text'
+		)));
+		$model::config(array(
+			'meta' => array('connection' => false, 'key' => 'id', 'locked' => true),
+			'schema' => $schema
+		));
 		$model::$connection = new $database();
 		$this->record = new Record(compact('model'));
 	}

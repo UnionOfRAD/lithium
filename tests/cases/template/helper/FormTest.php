@@ -164,9 +164,9 @@ class FormTest extends \lithium\test\Unit {
 
 	public function testFormDataBinding() {
 		try {
-			MockFormPost::config(array('connection' => false));
+			MockFormPost::config(array('meta' => array('connection' => false)));
 		} catch (Exception $e) {
-			MockFormPost::config(array('connection' => false));
+			MockFormPost::config(array('meta' => array('connection' => false)));
 		}
 
 		$record = new Record(array('model' => $this->_model, 'data' => array(
