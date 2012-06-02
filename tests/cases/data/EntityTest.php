@@ -95,6 +95,53 @@ class EntityTest extends \lithium\test\Unit {
 		$entity->foo();
 	}
 
+	public function testMagicMethodDispatch() {
+		$model = $this->_model;
+		$data = array('foo' => true);
+		$entity = new Entity(compact('model', 'data'));
+
+		$this->assertTrue($model::isStatic('relations'));
+		$this->assertTrue($model::isStatic('hasField'));
+		$this->assertTrue($model::isStatic('key'));
+		$this->assertTrue($model::isStatic('meta'));
+
+		$this->assertFalse($model::isStatic('save'));
+		$this->assertFalse($model::isStatic('delete'));
+		$this->assertFalse($model::isStatic('validates'));
+		$this->assertFalse($model::isStatic('title'));
+
+		$this->assertTrue($entity->isStatic('relations'));
+		$this->assertFalse($entity->isStatic('save'));
+
+		$result = $model::relations();
+		$this->assertTrue(isset($result['MockComment']));
+
+		$result = $entity->relations();
+		$this->assertTrue(isset($result['MockComment']));
+
+		$result = $model::key();
+		$this->assertEqual('id', $result);
+
+		$result = $entity->key();
+		$this->assertEqual('id', $result);
+
+		$result = $entity->staticMethod('bob');
+		$this->assertEqual('bob', $result[0]);
+		$this->assertFalse(isset($result[1]));
+
+		$result = $entity->instanceMethod('bob');
+		$this->assertTrue($result[0] instanceof Entity);
+		$this->assertEqual('bob', $result[1]);
+		$this->assertFalse(isset($result[2]));
+
+		$this->assertTrue($model::isStatic('staticMethod'));
+		$this->assertFalse($model::isStatic('instanceMethod'));
+
+		$parent = 'lithium\tests\mocks\data\MockBase';
+		$this->assertNull($parent::isStatic('staticMethod'));
+		$this->assertNull($parent::isStatic('instanceMethod'));
+	}
+
 	public function testErrors() {
 		$entity = new Entity();
 		$errors = array('foo' => 'Something bad happened.');

@@ -8,8 +8,6 @@
 
 namespace lithium\tests\mocks\data;
 
-use lithium\data\Schema;
-
 class MockPost extends \lithium\tests\mocks\data\MockBase {
 
 	public $hasMany = array('MockComment');
@@ -20,6 +18,14 @@ class MockPost extends \lithium\tests\mocks\data\MockBase {
 
 	public static function instances() {
 		return array_keys(static::$_instances);
+	}
+
+	public static function staticMethod() {
+		return func_get_args();
+	}
+
+	public function instanceMethod() {
+		return func_get_args();
 	}
 }
 

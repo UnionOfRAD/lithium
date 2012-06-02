@@ -189,13 +189,16 @@ class Entity extends \lithium\core\Object {
 	 */
 	public function __call($method, $params) {
 		if ($model = $this->_model) {
-			$methods = $model::instanceMethods();
+			if ($model::isStatic($method)) {
+				$class = $model::invokeMethod('_object');
+				return call_user_func_array(array(&$class, $method), $params);
+			}
 			array_unshift($params, $this);
-
 			if (method_exists($model, $method)) {
 				$class = $model::invokeMethod('_object');
 				return call_user_func_array(array(&$class, $method), $params);
 			}
+			$methods = $model::instanceMethods();
 			if (isset($methods[$method]) && is_callable($methods[$method])) {
 				return call_user_func_array($methods[$method], $params);
 			}
@@ -287,8 +290,8 @@ class Entity extends \lithium\core\Object {
 	/**
 	 * A flag indicating whether or not this record exists.
 	 *
-	 * @return boolean `True` if the record was `read` from the data-source, or has been `create`d
-	 *         and `save`d. Otherwise `false`.
+	 * @return boolean `true` if the record was read from the data-source, or has been created
+	 *         and saved. Otherwise `false`.
 	 */
 	public function exists() {
 		return $this->_exists;
@@ -372,9 +375,13 @@ class Entity extends \lithium\core\Object {
 		foreach ($this->_updated as $field => $value) {
 			if (is_object($value) && method_exists($value, 'modified')) {
 				$modified = $value->modified();
-				$fields[$field] = $modified === true || is_array($modified) && in_array(true, $modified, true);
+				$fields[$field] = (
+					$modified === true || is_array($modified) && in_array(true, $modified, true)
+				);
 			} else {
-				$fields[$field] = !isset($fields[$field]) || $this->_data[$field] !== $this->_updated[$field];
+				$fields[$field] = (
+					!isset($fields[$field]) || $this->_data[$field] !== $this->_updated[$field]
+				);
 			}
 		}
 		return $fields;
