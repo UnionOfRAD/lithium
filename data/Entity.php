@@ -290,8 +290,8 @@ class Entity extends \lithium\core\Object {
 	/**
 	 * A flag indicating whether or not this record exists.
 	 *
-	 * @return boolean `True` if the record was `read` from the data-source, or has been `create`d
-	 *         and `save`d. Otherwise `false`.
+	 * @return boolean `true` if the record was read from the data-source, or has been created
+	 *         and saved. Otherwise `false`.
 	 */
 	public function exists() {
 		return $this->_exists;
@@ -375,9 +375,12 @@ class Entity extends \lithium\core\Object {
 		foreach ($this->_updated as $field => $value) {
 			if (is_object($value) && method_exists($value, 'modified')) {
 				$modified = $value->modified();
-				$fields[$field] = $modified === true || is_array($modified) && in_array(true, $modified, true);
+				$fields[$field] = $modified === true 
+					|| is_array($modified) 
+					&& in_array(true, $modified, true);
 			} else {
-				$fields[$field] = !isset($fields[$field]) || $this->_data[$field] !== $this->_updated[$field];
+				$fields[$field] = !isset($fields[$field])
+					|| $this->_data[$field] !== $this->_updated[$field];
 			}
 		}
 		return $fields;

@@ -1216,7 +1216,7 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Check if a method is the static.
 	 *
-	 * @param string Name of the method to check.
+	 * @param string $method Name of the method to check.
 	 * @return boolean Return true if it's a static method, false if it's not static method or
 	 *         null if the method doesn't exists in the class.
 	 */
