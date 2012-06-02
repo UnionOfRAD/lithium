@@ -189,13 +189,16 @@ class Entity extends \lithium\core\Object {
 	 */
 	public function __call($method, $params) {
 		if ($model = $this->_model) {
-			$methods = $model::instanceMethods();
+			if ($model::isStatic($method)) {
+				$class = $model::invokeMethod('_object');
+				return call_user_func_array(array(&$class, $method), $params);
+			}
 			array_unshift($params, $this);
-
 			if (method_exists($model, $method)) {
 				$class = $model::invokeMethod('_object');
 				return call_user_func_array(array(&$class, $method), $params);
 			}
+			$methods = $model::instanceMethods();
 			if (isset($methods[$method]) && is_callable($methods[$method])) {
 				return call_user_func_array($methods[$method], $params);
 			}

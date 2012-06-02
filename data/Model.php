@@ -12,6 +12,8 @@ use lithium\util\Set;
 use lithium\util\Inflector;
 use lithium\core\ConfigException;
 use BadMethodCallException;
+use ReflectionClass;
+use ReflectionMethod;
 
 /**
  * The `Model` class is the starting point for the domain logic of your application.
@@ -289,6 +291,13 @@ class Model extends \lithium\core\StaticObject {
 	protected static $_instanceMethods = array();
 
 	/**
+	 * Stores all public static methods for this `Model`.
+	 *
+	 * @var array
+	 */
+	protected static $_staticMethods = array();
+
+	/**
 	 * Holds an array of values that should be processed on `Model::config()`. Each value should
 	 * have a matching protected property (prefixed with `_`) defined in the class. If the
 	 * property is an array, the property name should be the key and the value should be `'merge'`.
@@ -297,6 +306,21 @@ class Model extends \lithium\core\StaticObject {
 	 * @var array
 	 */
 	protected static $_autoConfig = array('meta', 'finders', 'query', 'schema', 'classes');
+
+	/**
+	 * Initialize the class by populating `Model::$_staticMethods` with all the public static
+	 * methods of the model.
+	 */
+	public static function __init() {
+		$class = get_called_class();
+		$ref = new ReflectionClass($class);
+		$methods = $ref->getMethods(ReflectionMethod::IS_PUBLIC);
+		foreach ($methods as $method) {
+			if ($method->isStatic()) {
+				static::$_staticMethods[$method->getName()] = true;
+			}
+		}
+	}
 
 	/**
 	 * Configures the model for use. This method will set the `Model::$_schema`, `Model::$_meta`,
@@ -1187,6 +1211,21 @@ class Model extends \lithium\core\StaticObject {
 				return $self::connection()->calculation('count', $query, $options);
 			}
 		);
+	}
+
+	/**
+	 * Check if a method is the static.
+	 *
+	 * @param string Name of the method to check.
+	 * @return boolean Return true if it's a static method, false if it's not static method or
+	 *         null if the method doesn't exists in the class.
+	 */
+	public static function isStatic($method) {
+		$class = get_called_class();
+		if (!method_exists($class, $method)) {
+			return null;
+		}
+		return isset(static::$_staticMethods[$method]);
 	}
 
 	/**
