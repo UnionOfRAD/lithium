@@ -181,6 +181,57 @@ class DatabaseTest extends \lithium\test\Integration {
 		$this->assertEqual($fields, array_keys($image->data()));
 	}
 
+	/**
+	 * Images has no schema, so li3 derives it from the database.
+	 * Images2 has a schema, but with `title` and `image` swapped in sequence
+	 *
+	 * Swapping fields in a defined schema compared too the database should
+	 * not hurt. Now it hurst (data is mapped by field sequence, not by fieldname,
+	 * and as a bonus prevents the tests hereafter from running.
+	 */
+	public function testSelectWithAndWithoutSchema() {
+		$this->_createGalleryWithImages();
+
+		$images1 = Images::first();
+		$images2 = Images2::first();
+
+		$this->assertEqual($images1->id, $images2->id);
+		$this->assertEqual($images1->gallery_id, $images2->gallery_id);
+		$this->assertEqual($images1->image, $images2->image);
+		$this->assertEqual($images1->title, $images2->title);
+	}
+
+	/**
+	 * Too many fields in a defined schema should hurt, but
+	 * in a decent way. Now it dies somewhere...
+	 */
+	public function testSchemaHasTooManyFields() {
+		$this->_createGalleryWithImages();
+
+		$images1 = Images::first();
+		$images2 = Images3::first();
+
+		$this->assertEqual($images1->id, $images2->id);
+		$this->assertEqual($images1->gallery_id, $images2->gallery_id);
+		$this->assertEqual($images1->image, $images2->image);
+		$this->assertEqual($images1->title, $images2->title);
+	}
+
+	/**
+	 * Missing fields in a defined schema does not hurt.
+	 * You will only miss the last field(s) of the table.
+	 */
+	public function testSchemaHasTooFewFields() {
+		$this->_createGalleryWithImages();
+
+		$images1 = Images::first();
+		$images2 = Images4::first();
+
+		$this->assertEqual($images1->id, $images2->id);
+		$this->assertEqual($images1->gallery_id, $images2->gallery_id);
+		$this->assertEqual($images1->image, $images2->image);
+	}
+
 	public function testOrder() {
 		$this->_createGalleryWithImages();
 		$images = Images::find('all', array(
