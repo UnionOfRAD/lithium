@@ -786,10 +786,14 @@ class Form extends \lithium\template\Helper {
 			(!isset($options['value']) || $options['value'] === null) &&
 			$name && $value = $this->binding($name)->data
 		);
-		if ($hasValue) {
+		$isZero = (isset($value) && ($value === 0 || $value === "0"));
+		if ($hasValue || $isZero) {
 			$options['value'] = $value;
 		}
-		if (isset($options['default']) && empty($options['value'])) {
+		if (isset($options['value']) && !$isZero) {
+			$isZero = ($options['value'] === 0 || $options['value'] === "0");
+		}
+		if (isset($options['default']) && empty($options['value']) && !$isZero) {
 			$options['value'] = $options['default'];
 		}
 		unset($options['default']);
