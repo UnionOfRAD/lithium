@@ -253,6 +253,42 @@ class MySqlTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result);
 	}
+
+	/**
+	 * mysql_companies2.sql is almost identical to mysql_companies.sql, but the the two
+	 * fields `name` and `active` are swapped. The test is almost identical to
+	 * testRawSqlQuerying (expecting the same fields in the same sequences), emulating
+	 * that the tables are different from the known schema.
+	 */
+	public function testRawSqlSwappedColumns() {
+		$lithium = LITHIUM_LIBRARY_PATH . '/lithium';
+		$sqlFile = $lithium . '/tests/mocks/data/source/database/adapter/mysql_companies2.sql';
+		$sql = file_get_contents($sqlFile);
+		$this->db->read($sql, array('return' => 'resource'));
+
+		$this->assertTrue($this->db->create(
+				'INSERT INTO companies2 (name, active) VALUES (?, ?)',
+				array('Test', 1)
+		));
+
+		$result = $this->db->read('SELECT * From companies2 AS Company WHERE name = {:name}', array(
+				'name' => 'Test',
+				'return' => 'array'
+		));
+		$this->assertEqual(1, count($result));
+		$expected = array('id', 'name', 'active', 'created', 'modified');
+		$this->assertEqual($expected, array_keys($result[0]));
+
+		$this->assertTrue(is_numeric($result[0]['id']));
+		unset($result[0]['id']);
+
+		$expected = array('name' => 'Test', 'active' => '1', 'created' => null, 'modified' => null);
+		$this->assertIdentical($expected, $result[0]);
+
+		$this->assertTrue($this->db->delete('DELETE From companies2 WHERE name = {:name}', array(
+				'name' => 'Test'
+		)));
+	}
 }
 
 ?>
