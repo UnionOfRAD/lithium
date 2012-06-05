@@ -13,6 +13,8 @@ use lithium\action\Request;
 
 class HttpTest extends \lithium\test\Unit {
 
+	public $request;
+
 	public function setUp() {
 		$this->request = new Request();
 	}
