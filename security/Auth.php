@@ -127,12 +127,8 @@ class Auth extends \lithium\core\Adaptable {
 		$defaults = array(
 			'checkSession' => true,
 			'writeSession' => true,
-			'persist' => static::_config('persist')
+			'persist' => $config['session']['persist'] ?: static::_config('persist')
 		);
-
-		if(!empty($config['session']['persist'])) {
-			$defaults['persist'] = $config['session']['persist'];
-		}
 
 		$options += $defaults;
 		$params = compact('name', 'credentials', 'options');
@@ -154,15 +150,16 @@ class Auth extends \lithium\core\Adaptable {
 			}
 
 			if (($credentials) && $data = $self::adapter($name)->check($credentials, $options)) {
-				if(empty($options['persist'])) {
-					unset($data['password']);
-				} else {
-					foreach($data as $key => $value) {
-						if(!in_array($key, $options['persist'])) {
+				if ($options['persist']) {
+					foreach ($data as $key => $value) {
+						if (!in_array($key, $options['persist'])) {
 							unset($data[$key]);
 						}
-					}
+					}				
+				} else {
+					unset($data['password']);
 				}
+
 				return ($options['writeSession']) ? $self::set($name, $data) : $data;
 			}
 			return false;
