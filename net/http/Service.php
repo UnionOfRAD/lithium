@@ -206,7 +206,11 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
-	 * Send request and return response data.
+	 * Send request and return response data. Will open the connection if
+	 * needed and always close it after sending the request.
+	 *
+	 * Will automatically authenticate when receiving a `401` HTTP status code
+	 * then continue retrying sending initial request.
 	 *
 	 * @param string $method
 	 * @param string $path
