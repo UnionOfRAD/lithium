@@ -69,6 +69,7 @@ class Service extends \lithium\core\Object {
 	 * transport- and format-handling classes.
 	 *
 	 * @param array $config
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -87,8 +88,9 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
-	 * Initialize connection
+	 * Initialize connection.
 	 *
+	 * @return void
 	 */
 	protected function _init() {
 		$config = array('classes' => $this->_classes) + $this->_config;
@@ -110,6 +112,7 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @param string $method
 	 * @param string $params
+	 * @return mixed
 	 */
 	public function __call($method, $params = array()) {
 		array_unshift($params, $method);
