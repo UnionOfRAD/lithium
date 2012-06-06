@@ -150,6 +150,23 @@ class CollectionTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests `Collection::reduce`.
+	 */
+	public function testReduce() {
+		$collection = new DocumentSet();
+		$collection->set(array(
+			'title' => 'Lorem Ipsum',
+			'key'   => 'value',
+			'foo'   => 'bar'
+		));
+		$result = $collection->reduce(function($memo, $value) {
+			return trim($memo . ' ' . $value);
+		}, '');
+		$expected = 'Lorem Ipsum value bar';
+		$this->assertEqual($expected, $result);
+	}
+
+	/**
 	 * Tests `Collection::data`.
 	 */
 	public function testData() {

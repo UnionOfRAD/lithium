@@ -273,6 +273,20 @@ class RecordSet extends \lithium\data\Collection {
 	}
 
 	/**
+	 * Reduce, or fold, a collection down to a single value
+	 *
+	 * Overriden to load any data that has not yet been loaded.
+	 *
+	 * @param callback $filter The filter to apply.
+	 * @param mixed $initial Initial value
+	 * @return mixed A single reduced value
+	 */
+	public function reduce($filter, $initial = false) {
+		$this->offsetGet(null);
+		return parent::reduce($filter, $initial);
+	}
+
+	/**
 	 * Applies a callback to a copy of all data in the collection
 	 * and returns the result.
 	 *
