@@ -124,7 +124,7 @@ class CollectionTest extends \lithium\test\Unit {
 			'value test',
 			'bar test'
 		);
-		$this->assertEqual($collection->to('array'), $expected);
+		$this->assertEqual($expected, $collection->to('array'));
 	}
 
 	/**
