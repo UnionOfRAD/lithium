@@ -257,6 +257,22 @@ abstract class Collection extends \lithium\util\Collection {
 	}
 
 	/**
+	 * Reduce, or fold, a collection down to a single value
+	 *
+	 * Overridden to load any data that has not yet been loaded.
+	 *
+	 * @param callback $filter The filter to apply.
+	 * @param mixed $initial Initial value
+	 * @return mixed A single reduced value
+	 */
+	public function reduce($filter, $initial = false) {
+		if (!$this->closed()) {
+			while ($this->next()) {}
+		}
+		return parent::reduce($filter);
+	}
+
+	/**
 	 * Sorts the objects in the collection, useful in situations where
 	 * you are already using the underlying datastore to sort results.
 	 *
