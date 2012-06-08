@@ -115,7 +115,7 @@ class MySql extends \lithium\data\source\Database {
 	 * Connects to the database using the options provided to the class constructor.
 	 *
 	 * @return boolean Returns `true` if a database connection could be established, otherwise
-	 *                 `false`.
+	 *     `false`.
 	 */
 	public function connect() {
 		if (!$this->_config['dsn']) {

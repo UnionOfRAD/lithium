@@ -193,7 +193,7 @@ abstract class Database extends \lithium\data\Source {
 			case $code == 'HY000' || substr($code, 0, 2) == '08':
 				$msg = "Unable to connect to host `{$config['host']}`.";
 				throw new NetworkException($msg, null, $e);
-			case in_array($code, array('28000', '4200')):
+			case in_array($code, array('28000', '42000')):
 				$msg = "Host connected, but could not access database `{$config['database']}`.";
 				throw new ConfigException($msg, null, $e);
 			}
