@@ -89,6 +89,13 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual('UTF-8', $response->encoding); //default
 	}
 
+	public function testParsingContentTypeWithVersionNumber() {
+		$response = new Response(array('headers' => array(
+			'Content-Type' => 'application/x-amz-json-1.0'
+		)));
+		$this->assertEqual('application/x-amz-json-1.0', $response->type);
+	}
+
 	public function testConstructionWithBody() {
 		$response = new Response(array('message' => "Content-type: image/jpeg\r\n\r\nimage data"));
 		$this->assertEqual("image data", $response->body());

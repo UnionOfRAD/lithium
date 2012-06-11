@@ -107,7 +107,7 @@ class Response extends \lithium\net\http\Message {
 			$this->body = $this->_httpChunkedDecode($this->body);
 		}
 		if (isset($this->headers['Content-Type'])) {
-			$pattern = '/([-\w\/+]+)(;\s*?charset=(.+))?/i';
+			$pattern = '/([-\w\/\.+]+)(;\s*?charset=(.+))?/i';
 			preg_match($pattern, $this->headers['Content-Type'], $match);
 
 			if (isset($match[1])) {
