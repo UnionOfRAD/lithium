@@ -260,7 +260,7 @@ class Route extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function match(array $options = array(), $context = null) {
-		$defaults = array('action' => 'index');
+		$defaults = array('action' => 'index', 'http:method' => 'GET');
 		$query = null;
 
 		if (!$this->_config['continue']) {
@@ -272,6 +272,12 @@ class Route extends \lithium\core\Object {
 				unset($options['?']);
 			}
 		}
+
+        // check http method
+        if (isset($this->_meta['http:method']) && $options['http:method'] != $this->_meta['http:method'] ) {
+            return false;
+        }
+        unset($options['http:method']);
 
 		if (!$options = $this->_matchKeys($options)) {
 			return false;
@@ -402,8 +408,6 @@ class Route extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function compile() {
-		$this->_match = $this->_params;
-
 		foreach ($this->_params as $key => $value) {
 			if (!strpos($key, ':')) {
 				continue;
@@ -411,6 +415,8 @@ class Route extends \lithium\core\Object {
 			unset($this->_params[$key]);
 			$this->_meta[$key] = $value;
 		}
+
+        $this->_match = $this->_params;
 
 		if ($this->_template === '/' || $this->_template === '') {
 			$this->_pattern = '@^/*$@';
