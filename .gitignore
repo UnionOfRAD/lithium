@@ -1,4 +1,5 @@
+# OS X
 .DS_Store
-app/libraries/*
-app/resources/tmp/*
-.*.sw[op]
+
+# Vim
+.*.sw[a-z]
