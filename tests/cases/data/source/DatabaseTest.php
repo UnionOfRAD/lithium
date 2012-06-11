@@ -49,6 +49,9 @@ class DatabaseTest extends \lithium\test\Unit {
 			'login'         => 'root',
 			'password'      => '',
 			'database'      => null,
+			'encoding'      => null,
+			'dsn'           => null,
+			'options'       => array(),
 			'autoConnect'   => true,
 			'init'          => true
 		);
@@ -64,6 +67,9 @@ class DatabaseTest extends \lithium\test\Unit {
 			'login'         => 'bob',
 			'password'      => '',
 			'database'      => null,
+			'encoding'      => null,
+			'dsn'           => null,
+			'options'       => array(),
 			'autoConnect'   => true,
 			'init'          => true
 		);
