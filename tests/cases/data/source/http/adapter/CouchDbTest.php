@@ -70,8 +70,7 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	public function testDisconnect() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$result = $couchdb->connect();
-		$this->assertTrue($result);
+		$couchdb->connect();
 
 		$result = $couchdb->disconnect();
 		$this->assertTrue($result);
