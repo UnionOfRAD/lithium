@@ -8,10 +8,12 @@
 
 namespace lithium\tests\mocks\test\cases;
 
+use Exception;
+
 class MockSetUpThrowsException extends \lithium\test\Unit {
 
 	public function setUp() {
-		throw new Exception();
+		throw new Exception('setUp throws exception');
 	}
 
 	public function testNothing() {
