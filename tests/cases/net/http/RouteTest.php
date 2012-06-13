@@ -542,8 +542,7 @@ class RouteTest extends \lithium\test\Unit {
 		$this->assertEqual('/', $url);
 	}
 
-
-    /**
+	/**
      * Test route matching for routes with specified request method (http:method)
      */
     public function testMatchWithRequestMethod() {
@@ -615,8 +614,6 @@ class RouteTest extends \lithium\test\Unit {
 
 
     }
-
-
 
 	/**
 	 * Tests that routes with optional trailing elements have unnecessary slashes trimmed.

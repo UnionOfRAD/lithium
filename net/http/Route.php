@@ -273,8 +273,7 @@ class Route extends \lithium\core\Object {
 			}
 		}
 
-        // check http method
-        if (isset($this->_meta['http:method']) && $options['http:method'] != $this->_meta['http:method'] ) {
+        if (isset($this->_meta['http:method']) && $options['http:method'] != $this->_meta['http:method']) {
             return false;
         }
         unset($options['http:method']);
