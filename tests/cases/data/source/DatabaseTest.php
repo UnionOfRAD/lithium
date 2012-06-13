@@ -646,8 +646,42 @@ class DatabaseTest extends \lithium\test\Unit {
 			'conditions' => array('title' => array('0900'))
 		));
 
-		$sql = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost}' .
-				' WHERE {title} IN (\'0900\');';
+		$sql = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost}';
+		$sql .= ' WHERE {title} IN (\'0900\');';
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+
+		$sql = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ';
+		$sql .= 'lower(title) = \'test\';';
+
+		$query = new Query(array(
+			'type' => 'read', 'model' => $this->_model,
+			'conditions' => array('lower(title)' => 'test')
+		));
+		
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+
+		$query = new Query(array(
+			'type' => 'read', 'model' => $this->_model,
+			'conditions' => array( (object) 'lower(title) = \'test\'')
+		));
+
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+
+		$sql = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ';
+		$sql .= 'lower(title) = REGEXP \'^test$\';';
+
+		$query = new Query(array(
+			'type' => 'read', 'model' => $this->_model,
+			'conditions' => array( (object) 'lower(title) = REGEXP \'^test$\'')
+		));
+
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+
+		$query = new Query(array(
+			'type' => 'read', 'model' => $this->_model,
+			'conditions' => array( 'lower(title)' => (object) 'REGEXP \'^test$\'')
+		));
+
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
 
