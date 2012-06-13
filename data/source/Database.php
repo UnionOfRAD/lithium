@@ -712,9 +712,15 @@ abstract class Database extends \lithium\data\Source {
 		switch (true) {
 			case (is_numeric($key) && is_string($value)):
 				return $value;
+			case is_object($value) && isset($value->scalar):
+				if (is_numeric($key)) {
+					return $this->value($value);
+				}
 			case is_scalar($value) || is_null($value):
-				if ($context->type() == 'read' && ($alias = $context->alias()) && !strpos($key, '.')) {
-					$key = $alias . "." . $key;
+				if ($context->type() == 'read' && ($alias = $context->alias())) {
+					if (preg_match('/^[a-z0-9_-]+$/i', $key)) {
+						$key = $alias . "." . $key;
+					}
 				}
 				if (isset($value)) {
 					return $this->name($key) . ' = ' . $this->value($value, $fieldMeta);
