@@ -350,11 +350,12 @@ abstract class Database extends \lithium\data\Source {
 					$name = $model::meta('name');
 					$key = $model::key();
 
+					$fieldname = $self->name("{$name}.{$key}");
 					$subQuery = $self->invokeMethod('_instance', array(get_class($query), array(
 						'type' => 'read',
 						'model' => $model,
-						'group' => $self->name("{$name}.{$key}"),
-						'fields' => array("{$name}.{$key}"),
+						'fields' => array((object) "DISTINCT({$fieldname})"),
+						'group' => $query->group(),
 						'joins' => $query->joins(),
 						'conditions' => $query->conditions(),
 						'limit' => $query->limit(),
@@ -365,7 +366,7 @@ abstract class Database extends \lithium\data\Source {
 
 					if ($ids->count()) {
 						$query->limit(false)->conditions(array("{$name}.{$key}" => array_map(
-							function($index) use ($key) { return $index[$key]; },
+							function($index) { return current($index); },
 							$ids->data()
 						)));
 					}
