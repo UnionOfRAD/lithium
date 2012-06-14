@@ -255,7 +255,7 @@ class Unit extends \lithium\core\Object {
 		}
 		return array($expected, $result);
 	}
-	
+
 	/**
 	 * Checks that the actual result is equal, but not neccessarily identical, to the expected
 	 * result.
@@ -1005,11 +1005,11 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Removes everything from `resources/tmp/tests` directory. Call from
-	 * inside of your test method or `tearDown()`.
+	 * Removes everything from `resources/tmp/tests` directory. Call from inside of your test
+	 * method or `tearDown()`.
 	 *
-	 * Uses `DIRECTORY_SEPARATOR` as `getPathname()` is used in a a direct
-	 * string comparison. The method may contain slashes and backslashes.
+	 * Uses `DIRECTORY_SEPARATOR` as `getPathname()` is used in a a direct string comparison.
+	 * The method may contain slashes and backslashes.
 	 *
 	 * If the file to unlink is readonly, it throws a exception (Permission denied) on Windows.
 	 * So, the file is checked before an unlink is tried. (this will make the tests run slower

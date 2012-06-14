@@ -100,7 +100,7 @@ class Coverage extends \lithium\test\Filter {
 	 * @param array $result The raw line number results
 	 * @return array
 	 */
-	protected static function collectLines($result) {
+	public static function collectLines($result) {
 		$output = null;
 		$aggregate = array('covered' => 0, 'executable' => 0);
 
