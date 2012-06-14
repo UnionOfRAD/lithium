@@ -498,7 +498,6 @@ class UnitTest extends \lithium\test\Unit {
 	 * `strtotime(): It is not safe to rely on the system's timezone settings. You are
 	 * *required* to use the date.timezone setting or the date_default_timezone_set() function.`
 	 * See also http://www.php.net/manual/en/function.date-default-timezone-get.php
-	 * Nuff said...
 	 */
 	public function testAssertCookie() {
 		$expected = array(
@@ -671,7 +670,6 @@ class UnitTest extends \lithium\test\Unit {
 		$result = $this->test->methods();
 		$this->assertIdentical($expected, $result);
 	}
-
 }
 
 ?>
