@@ -332,27 +332,27 @@ class InflectorTest extends \lithium\test\Unit {
 		Inflector::reset();
 
 		$expected = array('TestField' => 'test_field');
-		$this->assertFalse($this->getProtectedValue('$_underscored'));
+		$this->assertFalse($this->_getProtectedValue('$_underscored'));
 		$this->assertEqual(Inflector::underscore('TestField'), 'test_field');
-		$this->assertEqual($expected, $this->getProtectedValue('$_underscored'));
+		$this->assertEqual($expected, $this->_getProtectedValue('$_underscored'));
 		$this->assertEqual(Inflector::underscore('TestField'), 'test_field');
 
 		$expected = array('test_field' => 'TestField');
-		$this->assertFalse($this->getProtectedValue('$_camelized'));
+		$this->assertFalse($this->_getProtectedValue('$_camelized'));
 		$this->assertEqual(Inflector::camelize('test_field', true), 'TestField');
-		$this->assertEqual($expected, $this->getProtectedValue('$_camelized'));
+		$this->assertEqual($expected, $this->_getProtectedValue('$_camelized'));
 		$this->assertEqual(Inflector::camelize('test_field', true), 'TestField');
 
 		$expected = array('test_field:_' => 'Test Field');
-		$this->assertFalse($this->getProtectedValue('$_humanized'));
+		$this->assertFalse($this->_getProtectedValue('$_humanized'));
 		$this->assertEqual(Inflector::humanize('test_field'), 'Test Field');
-		$this->assertEqual($expected, $this->getProtectedValue('$_humanized'));
+		$this->assertEqual($expected, $this->_getProtectedValue('$_humanized'));
 		$this->assertEqual(Inflector::humanize('test_field'), 'Test Field');
 
 		$expected = array('field' => 'fields');
-		$this->assertFalse($this->getProtectedValue('$_pluralized'));
+		$this->assertFalse($this->_getProtectedValue('$_pluralized'));
 		$this->assertEqual(Inflector::pluralize('field'), 'fields');
-		$this->assertEqual($expected, $this->getProtectedValue('$_pluralized'));
+		$this->assertEqual($expected, $this->_getProtectedValue('$_pluralized'));
 		$this->assertEqual(Inflector::pluralize('field'), 'fields');
 	}
 
@@ -363,7 +363,7 @@ class InflectorTest extends \lithium\test\Unit {
 	 * @param string $property
 	 * @return string The value of the property.
 	 */
-	private function getProtectedValue($property) {
+	protected function _getProtectedValue($property) {
 		$info = Inspector::info("lithium\util\Inflector::{$property}");
 		return $info['value'];
 	}

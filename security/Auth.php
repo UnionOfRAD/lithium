@@ -155,7 +155,7 @@ class Auth extends \lithium\core\Adaptable {
 						if (!in_array($key, $options['persist'])) {
 							unset($data[$key]);
 						}
-					}				
+					}
 				} else {
 					unset($data['password']);
 				}

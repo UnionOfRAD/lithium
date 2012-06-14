@@ -58,7 +58,7 @@ class MockLibraryService extends \lithium\net\http\Service {
 		}
 	}
 
-	private function __data($type, $key = null) {
+	protected function __data($type, $key = null) {
 		$resources = Libraries::get(true, 'resources');
 
 		$plugins = array(

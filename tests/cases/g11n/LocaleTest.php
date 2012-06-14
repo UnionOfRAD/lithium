@@ -425,9 +425,9 @@ class LocaleTest extends \lithium\test\Unit {
 	public function testPreferredMalformedContainingChrome() {
 		$available = array('fr', 'de');
 
-		$random_firefox_4 = 'de-DE,de;q=0.7,chrome://global/locale/intl.properties;q=0.3';
+		$randomFirefox4 = 'de-DE,de;q=0.7,chrome://global/locale/intl.properties;q=0.3';
 		$request = new ActionRequest(array(
-			'env' => array('HTTP_ACCEPT_LANGUAGE' => $random_firefox_4)
+			'env' => array('HTTP_ACCEPT_LANGUAGE' => $randomFirefox4)
 		));
 		$result = Locale::preferred($request, $available);
 		$this->assertIdentical('de', $result);
