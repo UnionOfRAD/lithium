@@ -44,7 +44,6 @@ class CouchDb extends \lithium\data\source\Http {
 		'service' => 'lithium\net\http\Service',
 		'entity'  => 'lithium\data\entity\Document',
 		'set'     => 'lithium\data\collection\DocumentSet',
-		'array'   => 'lithium\data\collection\DocumentArray',
 		'schema'  => 'lithium\data\DocumentSchema'
 	);
 
@@ -387,7 +386,7 @@ class CouchDb extends \lithium\data\source\Http {
 				continue;
 			}
 			$pathKey = $options['pathKey'] ? "{$options['pathKey']}.{$key}" : $key;
-			$class = (range(0, count($val) - 1) === array_keys($val)) ? 'array' : 'entity';
+			$class = (range(0, count($val) - 1) === array_keys($val)) ? 'set' : 'entity';
 			$data[$key] = $this->item($model, $val, compact('class', 'pathKey') + $options);
 		}
 		return parent::cast($entity, $data, $options);

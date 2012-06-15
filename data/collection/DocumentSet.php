@@ -8,142 +8,100 @@
 
 namespace lithium\data\collection;
 
+use lithium\util\Collection;
+
 class DocumentSet extends \lithium\data\Collection {
 
 	/**
-	 * Allows several properties to be assigned at once.
+	 * Contains the original database value of the array. This value will be compared with the
+	 * current value (`$_data`) to calculate the changes that should be sent to the database.
 	 *
-	 * For example:
-	 * {{{
-	 * $doc->set(array('title' => 'Lorem Ipsum', 'value' => 42));
-	 * }}}
-	 *
-	 * @param $values An associative array of fields and values to assign to the `Document`.
-	 * @return void
+	 * @var array
 	 */
-	public function set($values) {
-		foreach ($values as $key => $val) {
-			$this[$key] = $val;
-		}
-	}
+	protected $_original = array();
 
-	/**
-	 * Allows document fields to be accessed as array keys, i.e. `$document['_id']`.
-	 *
-	 * @param mixed $offset String or integer indicating the offset or index of a document in a set,
-	 *              or the name of a field in an individual document.
-	 * @return mixed Returns either a sub-object in the document, or a scalar field value.
-	 */
-	public function offsetGet($offset) {
-		$data = null;
-		$null  = null;
+	protected function _init() {
+		parent::_init();
+		$pathKey = $this->_pathKey;
 		$model = $this->_model;
 
-		if (!isset($this->_data[$offset]) && !$data = $this->_populate(null, $offset)) {
-			return $null;
+		if (is_object($schema = $this->schema())) {
+			foreach ($this->_data as &$data) {
+				$data = $schema->cast($this, $data, compact('pathKey', 'model'));
+			}
 		}
-		if (is_array($data = $this->_data[$offset]) && $model) {
-			$this->_data[$offset] = $this->schema()->cast($this, $data);
+		$this->_original = $this->_data;
+	}
+
+	public function sync($id = null, array $data = array(), array $options = array()) {
+		$defaults = array('materialize' => true);
+		$options += $defaults;
+
+		if ($options['materialize']) {
+			$this->_exists = true;
 		}
-		if (isset($this->_data[$offset])) {
-			return $this->_data[$offset];
+
+		while (!$this->closed()) {
+			$this->_populate();
 		}
-		return $null;
+		$this->_original = $this->_data;
 	}
 
 	/**
-	 * Rewinds the collection of sub-`Document`s to the beginning and returns the first one found.
+	 * Adds conversions checks to ensure certain class types and embedded values are properly cast.
 	 *
-	 * @return object Returns the first `Document` object instance in the collection.
+	 * @param string $format Currently only `array` is supported.
+	 * @param array $options
+	 * @return mixed
 	 */
-	public function rewind() {
-		$data = parent::rewind() ?: $this->_populate();
-		$key = key($this->_data);
+	public function to($format, array $options = array()) {
+		$defaults = array('handlers' => array(
+			'MongoId' => function($value) { return (string) $value; },
+			'MongoDate' => function($value) { return $value->sec; }
+		));
 
-		if (is_object($data)) {
-			return $data;
+		if ($format == 'array') {
+			$options += $defaults;
+			return Collection::toArray($this->_data, $options);
 		}
-
-		if (isset($this->_data[$key])) {
-			return $this->offsetGet($key);
-		}
-	}
-
-	public function current() {
-		return $this->offsetGet(key($this->_data));
-	}
-
-	/**
-	 * Returns the next document in the set, and advances the object's internal pointer. If the end
-	 * of the set is reached, a new document will be fetched from the data source connection handle
-	 * If no more documents can be fetched, returns `null`.
-	 *
-	 * @return mixed Returns the next document in the set, or `null`, if no more documents are
-	 *         available.
-	 */
-	public function next() {
-		$prev = key($this->_data);
-		$this->_valid = !(next($this->_data) === false && key($this->_data) === null);
-		$cur = key($this->_data);
-
-		if (!$this->_valid && $cur !== $prev && $cur !== null) {
-			$this->_valid = true;
-		}
-		$this->_valid = $this->_valid ?: !is_null($this->_populate());
-		return $this->_valid ? $this->offsetGet(key($this->_data)) : null;
+		return parent::to($format, $options);
 	}
 
 	public function export(array $options = array()) {
-		$map = function($doc) use ($options) {
-			return is_array($doc) ? $doc : $doc->export();
-		};
-		return array_map($map, $this->_data);
+		while (!$this->closed()) {
+			$this->_populate();
+		}
+		return array(
+			'exists' => $this->_exists,
+			'key'  => $this->_pathKey,
+			'data' => $this->_original,
+			'update' => $this->_data
+		);
 	}
 
 	/**
 	 * Lazy-loads a document from a query using a reference to a database adapter and a query
 	 * result resource.
 	 *
-	 * @param array $data
-	 * @param mixed $key
+	 * @param mixed $offset
 	 * @return array
 	 */
-	protected function _populate($data = null, $key = null) {
+	protected function _populate($offset = null) {
 		if ($this->closed() || !($model = $this->_model)) {
 			return;
 		}
-		if (($data = $data ?: $this->_result->next()) === null) {
-			return $this->close();
-		}
 
-		if ($schema = $this->schema()) {
-			$options = array('exists' => true, 'first' => true, 'pathKey' => $this->_pathKey);
-			$options += compact('model');
-			$result = $schema->cast($this, array($key => $data), $options);
-			return $this->_data[] = reset($result);
-		}
-	}
+		do {
+			if (!$this->_result->valid()) {
+				return $this->close();
+			}
+			$data = $this->_result->current();
+			$result = $this->_set($data, null, array('exists' => true));
+			$this->_original[] = $result;
+			$this->_result->next();
+		} while ($offset !== null && !array_key_exists($offset, $this->_original));
 
-	/**
-	 * Instantiates a new `Document` object as a descendant of the current object, and sets all
-	 * default values and internal state.
-	 *
-	 * @param string $classType The type of class to create, either `'entity'` or `'set'`.
-	 * @param string $key The key name to which the related object is assigned.
-	 * @param array $data The internal data of the related object.
-	 * @param array $options Any other options to pass when instantiating the related object.
-	 * @return object Returns a new `Document` object instance.
-	 */
-	protected function _relation($classType, $key, $data, $options = array()) {
-		$parent = $this;
-		$model = $this->_model;
-
-		if (is_object($data) && $data instanceof Document) {
-			$data->assignTo($this, compact('model', 'pathKey'));
-			return $data;
-		}
-		$options += compact('model', 'data', 'parent');
-		return new $this->_classes[$classType]($options);
+		return $result;
 	}
 }
 

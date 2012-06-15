@@ -10,19 +10,21 @@ namespace lithium\tests\mocks\data;
 
 use lithium\tests\mocks\data\source\database\adapter\MockAdapter;
 
-class MockModel extends \lithium\data\Model {
+class MockModelCompositePk extends \lithium\data\Model {
 
 	public static function __init() {}
 
 	public static function &connection($records = null) {
 		$mock = new MockAdapter(compact('records') + array(
 			'columns' => array(
-				'lithium\tests\mocks\data\MockModel' => array('id', 'data')
+				'lithium\tests\mocks\data\MockModelCompositePk' => array(
+					'client_id', 'invoice_id', 'payment'
+				)
 			),
 			'autoConnect' => false
 		));
 		self::meta(array(
-			'key' => 'id',
+			'key' => array('client_id', 'invoice_id'),
 			'locked' => true
 		));
 		return $mock;

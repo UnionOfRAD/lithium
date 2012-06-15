@@ -9,7 +9,6 @@
 namespace lithium\tests\cases\data;
 
 use stdClass;
-use lithium\data\Connections;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
 
@@ -59,7 +58,8 @@ class CollectionTest extends \lithium\test\Unit {
 	public function testOffsetExists() {
 		$collection = new DocumentSet();
 		$this->assertEqual($collection->offsetExists(0), false);
-		$collection->set(array('foo' => 'bar', 'bas' => 'baz'));
+
+		$collection = new DocumentSet(array('data' => array('bar', 'baz', 'bob' => 'bill')));
 		$this->assertEqual($collection->offsetExists(0), true);
 		$this->assertEqual($collection->offsetExists(1), true);
 	}
@@ -68,12 +68,11 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::rewind` and `Collection::current`.
 	 */
 	public function testNextRewindCurrent() {
-		$collection = new DocumentSet();
-		$collection->set(array(
+		$collection = new DocumentSet(array('data' => array(
 			'title' => 'Lorem Ipsum',
 			'value' => 42,
 			'foo'   => 'bar'
-		));
+		)));
 		$this->assertEqual('Lorem Ipsum', $collection->current());
 		$this->assertEqual(42, $collection->next());
 		$this->assertEqual('bar', $collection->next());
@@ -85,12 +84,11 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::each`.
 	 */
 	public function testEach() {
-		$collection = new DocumentSet();
-		$collection->set(array(
-			'title' => 'Lorem Ipsum',
-			'key'   => 'value',
-			'foo'   => 'bar'
-		));
+		$collection = new DocumentSet(array('data' => array(
+			'Lorem Ipsum',
+			'value',
+			'bar'
+		)));
 		$collection->each(function($value) {
 			return $value . ' test';
 		});
@@ -106,12 +104,11 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::map`.
 	 */
 	public function testMap() {
-		$collection = new DocumentSet();
-		$collection->set(array(
-			'title' => 'Lorem Ipsum',
-			'key'   => 'value',
-			'foo'   => 'bar'
-		));
+		$collection = new DocumentSet(array('data' => array(
+			'Lorem Ipsum',
+			'value',
+			'bar'
+		)));
 		$results = $collection->map(function($value) {
 			return $value . ' test';
 		});
@@ -128,13 +125,12 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::data`.
 	 */
 	public function testData() {
-		$collection = new DocumentSet();
 		$data = array(
 			'Lorem Ipsum',
 			'value',
 			'bar'
 		);
-		$collection->set($data);
+		$collection = new DocumentSet(array('data' => $data));
 		$this->assertEqual($data, $collection->data());
 	}
 
@@ -142,14 +138,13 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests the sort method in `lithium\data\Collection`.
 	 */
 	public function testSort() {
-		$collection = new DocumentSet();
-		$collection->set(array(
+		$collection = new DocumentSet(array('data' => array(
 			array('id' => 1, 'name' => 'Annie'),
 			array('id' => 2, 'name' => 'Zilean'),
 			array('id' => 3, 'name' => 'Trynamere'),
 			array('id' => 4, 'name' => 'Katarina'),
 			array('id' => 5, 'name' => 'Nunu')
-		));
+		)));
 
 		$collection->sort('name');
 		$idsSorted = $collection->map(function ($v) { return $v['id']; })->to('array');
@@ -160,14 +155,13 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests that arrays can be used to filter objects in `find()` and `first()` methods.
 	 */
 	public function testArrayFiltering() {
-		$collection = new DocumentSet();
-		$collection->set(array(
+		$collection = new DocumentSet(array('data' => array(
 			new Document(array('data' => array('id' => 1, 'name' => 'Annie', 'active' => 1))),
 			new Document(array('data' => array('id' => 2, 'name' => 'Zilean', 'active' => 1))),
 			new Document(array('data' => array('id' => 3, 'name' => 'Trynamere', 'active' => 0))),
 			new Document(array('data' => array('id' => 4, 'name' => 'Katarina', 'active' => 1))),
 			new Document(array('data' => array('id' => 5, 'name' => 'Nunu', 'active' => 0)))
-		));
+		)));
 		$result = $collection->find(array('active' => 1))->data();
 		$expected = array(
 			0 => array('id' => 1, 'name' => 'Annie', 'active' => 1),

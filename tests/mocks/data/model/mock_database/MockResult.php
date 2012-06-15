@@ -8,24 +8,29 @@
 
 namespace lithium\tests\mocks\data\model\mock_database;
 
-class MockResult extends \lithium\data\source\database\Result {
+class MockResult extends \lithium\data\source\Result {
 
-	public $records = array();
+	protected $_records = array();
 
-	public function __construct(array $config = array()) {
-		$defaults = array('resource' => true);
-		parent::__construct($config + $defaults);
+	protected $_autoConfig = array('resource', 'records');
+
+	/**
+	 * Fetches the result from the resource and caches it.
+	 *
+	 * @return boolean Return `true` on success or `false` if it is not valid.
+	 */
+	protected function _fetchFromResource() {
+		if ($this->_iterator < count($this->_records)) {
+			$result = current($this->_records);
+			$this->_key = $this->_iterator;
+			$this->_current = $this->_cache[$this->_iterator++] = $result;
+			next($this->_records);
+			return true;
+		}
+		return false;
 	}
 
 	protected function _close() {
-	}
-
-	protected function _prev() {
-		return prev($this->records);
-	}
-
-	protected function _next() {
-		return next($this->records);
 	}
 }
 

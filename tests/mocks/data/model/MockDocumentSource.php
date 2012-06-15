@@ -8,14 +8,10 @@
 
 namespace lithium\tests\mocks\data\model;
 
-use MongoId;
-use MongoDate;
-
 class MockDocumentSource extends \lithium\data\Source {
 
 	protected $_classes = array(
 		'entity' => 'lithium\data\entity\Document',
-		'array' => 'lithium\data\collection\DocumentArray',
 		'set' => 'lithium\data\collection\DocumentSet',
 		'relationship' => 'lithium\data\model\Relationship',
 		'schema' => 'lithium\data\source\mongo_db\Schema'

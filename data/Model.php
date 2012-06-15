@@ -426,6 +426,7 @@ class Model extends \lithium\core\StaticObject {
 			$message = "Method `%s` not defined or handled in class `%s`.";
 			throw new BadMethodCallException(sprintf($message, $method, get_class($self)));
 		}
+
 		$field = Inflector::underscore($args['field'] ? $args['field'] : $args['fields']);
 		$type = isset($args['type']) ? $args['type'] : 'first';
 		$type[0] = strtolower($type[0]);

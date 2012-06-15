@@ -9,12 +9,11 @@
 namespace lithium\data\source\mongo_db;
 
 use lithium\util\Set;
-use lithium\data\source\mongo_db\Schema;
 
 class Exporter extends \lithium\core\StaticObject {
 
 	protected static $_classes = array(
-		'array' => 'lithium\data\collection\DocumentArray'
+		'set' => 'lithium\data\collection\DocumentSet'
 	);
 
 	protected static $_commands = array(
@@ -109,7 +108,7 @@ class Exporter extends \lithium\core\StaticObject {
 
 		foreach ($update as $key => $value) {
 			$original = $export['data'];
-			$isArray = is_object($value) && get_class($value) == static::$_classes['array'];
+			$isArray = is_object($value) && get_class($value) == static::$_classes['set'];
 
 			if ($isArray && isset($original[$key]) && $value->data() != $original[$key]->data()) {
 				$value = $value->data();
