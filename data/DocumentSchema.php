@@ -8,17 +8,11 @@
 
 namespace lithium\data;
 
-use MongoId;
-use MongoCode;
-use MongoDate;
-use MongoRegex;
-use MongoBinData;
-
 class DocumentSchema extends \lithium\data\Schema {
 
 	protected $_classes = array(
 		'entity' => 'lithium\data\entity\Document',
-		'array' => 'lithium\data\collection\DocumentArray'
+		'set'    => 'lithium\data\collection\DocumentSet'
 	);
 
 	protected $_handlers = array();
@@ -43,13 +37,13 @@ class DocumentSchema extends \lithium\data\Schema {
 		foreach ($data as $key => $val) {
 			$fieldName = is_int($key) ? null : $key;
 
-			if($fieldName) {
+			if ($fieldName) {
 				$pathKey = $basePathKey ? "{$basePathKey}.{$fieldName}" : $fieldName;
 			} else {
-				$pathKey = $basePathKey;	
+				$pathKey = $basePathKey;
 			}
 
-			if ($val instanceof $classes['array'] || $val instanceof $classes['entity']) {
+			if ($val instanceof $classes['set'] || $val instanceof $classes['entity']) {
 				continue;
 			}
 			if ((is_object($val) || is_object($data)) && !$this->is('array', $pathKey)) {
@@ -61,7 +55,7 @@ class DocumentSchema extends \lithium\data\Schema {
 	}
 
 	protected function _castArray($object, $val, $pathKey, $options, $defaults) {
-		$isArray = $this->is('array', $pathKey) && (!$object instanceof $this->_classes['array']);
+		$isArray = $this->is('array', $pathKey) && (!$object instanceof $this->_classes['set']);
 		$isObject = ($this->type($pathKey) == 'object');
 		$valIsArray = is_array($val);
 		$numericArray = false;
@@ -83,7 +77,7 @@ class DocumentSchema extends \lithium\data\Schema {
 			} else {
 				$val = array();
 			}
-			$class = 'array';
+			$class = 'set';
 		}
 
 		if ($options['wrap']) {

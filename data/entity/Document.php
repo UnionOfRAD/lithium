@@ -126,7 +126,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			}
 			if (isset($field['array']) && $field['array'] && ($model = $this->_model)) {
 				$this->_updated[$name] = $model::connection()->item($model, array(), array(
-					'class' => 'array',
+					'class' => 'set',
 					'schema' => $this->schema(),
 					'pathKey' => $this->_pathKey ? $this->_pathKey . '.' . $name : $name,
 					'model' => $this->_model

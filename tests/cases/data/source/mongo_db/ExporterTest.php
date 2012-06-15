@@ -12,9 +12,10 @@ use MongoId;
 use MongoDate;
 use lithium\data\source\MongoDb;
 use lithium\data\entity\Document;
-use lithium\data\collection\DocumentArray;
+use lithium\data\collection\DocumentSet;
 use lithium\data\source\mongo_db\Exporter;
 use lithium\data\source\mongo_db\Schema;
+use lithium\tests\mocks\data\source\mongo_db\MockResult;
 
 class ExporterTest extends \lithium\test\Unit {
 
@@ -78,8 +79,8 @@ class ExporterTest extends \lithium\test\Unit {
 		$doc = new Document(array('exists' => false, 'data' => array(
 			'_id' => new MongoId(),
 			'created' => new MongoDate(),
-			'numbers' => new DocumentArray(array('data' => array(7, 8, 9))),
-			'objects' => new DocumentArray(array('data' => array(
+			'numbers' => new DocumentSet(array('data' => array(7, 8, 9))),
+			'objects' => new DocumentSet(array('data' => array(
 				new Document(array('data' => array('foo' => 'bar'))),
 				new Document(array('data' => array('baz' => 'dib')))
 			))),
@@ -101,8 +102,8 @@ class ExporterTest extends \lithium\test\Unit {
 
 	public function testCreateWithChangedData() {
 		$doc = new Document(array('exists' => false, 'data' => array(
-			'numbers' => new DocumentArray(array('data' => array(7, 8, 9))),
-			'objects' => new DocumentArray(array('data' => array(
+			'numbers' => new DocumentSet(array('data' => array(7, 8, 9))),
+			'objects' => new DocumentSet(array('data' => array(
 				new Document(array('data' => array('foo' => 'bar'))),
 				new Document(array('data' => array('baz' => 'dib')))
 			))),
@@ -124,14 +125,33 @@ class ExporterTest extends \lithium\test\Unit {
 
 	public function testUpdateWithNoChanges() {
 		$doc = new Document(array('exists' => true, 'data' => array(
-			'numbers' => new DocumentArray(array('exists' => true, 'data' => array(7, 8, 9))),
-			'objects' => new DocumentArray(array('exists' => true, 'data' => array(
+			'numbers' => new DocumentSet(array('exists' => true, 'data' => array(7, 8, 9))),
+			'objects' => new DocumentSet(array('exists' => true, 'data' => array(
 				new Document(array('exists' => true, 'data' => array('foo' => 'bar'))),
 				new Document(array('exists' => true, 'data' => array('baz' => 'dib')))
 			))),
 			'deeply' => new Document(array('exists' => true, 'data' => array('nested' => 'object')))
 		)));
 		$this->assertFalse(Exporter::get('update', $doc->export()));
+	}
+
+	public function testUpdateFromResourceLoading() {
+		$resource = new MockResult();
+		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
+		$this->assertFalse(Exporter::get('update', $doc->export()));
+		$this->assertEqual('dib', $doc[2]->title);
+
+		$doc[2]->title = 'bob';
+		$this->assertEqual('6c8f86167675abfabdbf0302', $doc[2]->_id);
+		$this->assertEqual('bob', $doc[2]->title);
+
+		$doc[0]->title = 'bill';
+		$this->assertEqual('4c8f86167675abfabdbf0300', $doc[0]->_id);
+		$this->assertEqual('bill', $doc[0]->title);
+
+		$expected = Exporter::get('update', $doc->export());
+		$this->assertTrue(Exporter::get('update', $doc->export()));
+		$this->assertEqual(2, count($expected['update']));
 	}
 
 	public function testUpdateWithSubObjects() {
@@ -150,10 +170,10 @@ class ExporterTest extends \lithium\test\Unit {
 		$config = compact('model', 'schema', 'exists');
 
 		$doc = new Document($config + array('data' => array(
-			'numbers' => new DocumentArray($config + array(
+			'numbers' => new DocumentSet($config + array(
 				'data' => array(7, 8, 9), 'pathKey' => 'numbers'
 			)),
-			'objects' => new DocumentArray($config + array('pathKey' => 'objects', 'data' => array(
+			'objects' => new DocumentSet($config + array('pathKey' => 'objects', 'data' => array(
 				new Document($config + array('data' => array('foo' => 'bar'))),
 				new Document($config + array('data' => array('foo' => 'baz')))
 			))),
@@ -218,7 +238,7 @@ class ExporterTest extends \lithium\test\Unit {
 
 	public function testFieldRemoval() {
 		$doc = new Document(array('exists' => true, 'data' => array(
-			'numbers' => new DocumentArray(array('data' => array(7, 8, 9))),
+			'numbers' => new DocumentSet(array('data' => array(7, 8, 9))),
 			'deeply' => new Document(array(
 				'pathKey' => 'deeply', 'exists' => true, 'data' => array('nested' => 'object')
 			)),
@@ -317,7 +337,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertTrue($result['_id'] instanceof MongoId);
 		$this->assertEqual('4c8f86167675abfabd970300', (string) $result['_id']);
 
-		$this->assertTrue($result['comments'] instanceof DocumentArray);
+		$this->assertTrue($result['comments'] instanceof DocumentSet);
 		$this->assertEqual(3, count($result['comments']));
 
 		$this->assertTrue($result['comments'][0] instanceof MongoId);
@@ -336,7 +356,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertTrue($result['created'] instanceof MongoDate);
 		$this->assertTrue($result['created']->sec > 0);
 
-		$this->assertTrue($result['empty_array'] instanceof DocumentArray);
+		$this->assertTrue($result['empty_array'] instanceof DocumentSet);
 
 		$this->assertEqual($time, $result['modified']->sec);
 		$this->assertEqual($time, $result['created']->sec);
@@ -374,7 +394,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertTrue($result['_id'] instanceof MongoId);
 		$this->assertEqual('4c8f86167675abfabd970300', (string) $result['_id']);
 
-		$this->assertTrue($result['accounts'] instanceof DocumentArray);
+		$this->assertTrue($result['accounts'] instanceof DocumentSet);
 		$this->assertEqual(2, count($result['accounts']));
 
 		$this->assertTrue($result['accounts'][0]['_id'] instanceof MongoId);
@@ -471,7 +491,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$result = $new->data();
 		$this->assertEqual($expected, $result);
 
-		$new->foo = new DocumentArray(array('data' => array('bar')));
+		$new->foo = new DocumentSet(array('data' => array('bar')));
 		$expected = array('name' => 'Acme, Inc.', 'active' => true, 'foo' => array('bar'));
 		$result = $new->data();
 		$this->assertEqual($expected, $result);

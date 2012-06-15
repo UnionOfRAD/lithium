@@ -10,6 +10,7 @@ namespace lithium\data\source\database\adapter\pdo;
 
 use PDO;
 use PDOStatement;
+use PDOException;
 
 /**
  * This class is a wrapper around the MySQL result returned and can be used to iterate over it.
@@ -24,141 +25,32 @@ use PDOStatement;
  * @link http://php.net/manual/de/class.pdostatement.php The PDOStatement class.
  * @link http://php.net/manual/de/class.iterator.php The Iterator interface.
  */
-class Result extends \lithium\core\Object implements \Iterator {
+class Result extends \lithium\data\source\Result {
 
-	/**
-	 * Contains the cached result set.
-	 */
-	protected $_cache = null;
-
-	/**
-	 * The current position of the iterator.
-	 */
-	protected $_iterator = 0;
-
-	/**
-	 * Contains the current element of the result set.
-	 */
-	protected $_current = null;
-
-	/**
-	 * The bound resource.
-	 */
-	protected $_resource = null;
-
-	/**
-	 * Autoconfig.
-	 */
-	protected $_autoConfig = array('resource');
-
-	/**
-	 * Returns the used resource.
-	 */
-	public function resource() {
-		return $this->_resource;
-	}
-
-	/**
-	 * Rewinds the result set to the first position.
-	 */
-	public function rewind() {
-		$this->_iterator = 0;
-		$this->_current = isset($this->_cache[1]) ? $this->_cache[1] : null;
-	}
-
-	/**
-	 * Checks wheter the result is valid or not.
-	 *
-	 * @return boolean Returns whether the result is valid or not.
-	 */
-	public function valid() {
-		if ($this->_resource) {
-			$rowCount = $this->_resource->rowCount();
-			return $rowCount > 0 && $this->_iterator <= $rowCount;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Contains the current result.
-	 *
-	 * @return array The current result (or `null` if there is none).
-	 */
-	public function current() {
-
-		if (!$this->_current) {
-			$this->next();
-		}
-
-		return $this->_current;
-	}
-
-	/**
-	 * Returns the current key position on the result.
-	 *
-	 * @return integer The current iterator position.
-	 */
-	public function key() {
-		return $this->_iterator;
-	}
-
-	/**
-	 * Fetches the previous element from the cache.
-	 *
-	 * @return array The previous result (or `null` if there is none).
-	 */
-	public function prev() {
-		if (!$this->_cache) {
-			return;
-		}
-		if (isset($this->_cache[--$this->_iterator])) {
-			return $this->_current = $this->_cache[$this->_iterator];
-		}
-	}
-
-	/**
-	 * Fetches the next element from the resource.
-	 */
-	public function next() {
-		if ($this->valid()) {
-			if (($result = $this->_fetchFromCache()) || ($result = $this->_fetchFromResource())) {
-				return $this->_current = $result;
-			}
-
-			$this->_resource = null;
-		}
-	}
-
-	/**
-	 * Returns the result from the primed cache.
-	 *
-	 * @return array The cached result (or `false` if it has not been cached yet).
-	 */
-	protected function _fetchFromCache() {
-		if ($this->_iterator < count($this->_cache)) {
-			return $this->_cache[++$this->_iterator];
-		}
-
-		return false;
-	}
+	public $named = false;
 
 	/**
 	 * Fetches the result from the resource and caches it.
 	 *
-	 * @return array the fetched result (or `false` if it is not valid).
+	 * @return boolean Return `true` on success or `false` if it is not valid.
 	 */
 	protected function _fetchFromResource() {
-		$isValidResource = (
-			$this->_resource instanceof PDOStatement &&
-			$this->_iterator < $this->_resource->rowCount() &&
-			$result = $this->_resource->fetch(PDO::FETCH_NUM)
-		);
-
-		if ($isValidResource) {
-			return $this->_cache[++$this->_iterator] = $result;
+		if ($this->_resource instanceof PDOStatement) {
+			try {
+				$mode = $this->named ? PDO::FETCH_NAMED : PDO::FETCH_NUM;
+				if ($result = $this->_resource->fetch($mode)) {
+					$this->_key = $this->_iterator;
+					$this->_current = $this->_cache[$this->_iterator++] = $result;
+					return true;
+				}
+			} catch (PDOException $e) {}
 		}
+		$this->_resource = null;
 		return false;
+	}
+
+	public function __destruct() {
+		$this->close();
 	}
 }
 

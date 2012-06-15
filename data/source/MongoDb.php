@@ -14,7 +14,6 @@ use MongoRegex;
 use lithium\util\Inflector;
 use lithium\core\NetworkException;
 use Exception;
-use lithium\data\source\mongo_db\Schema;
 
 /**
  * A data source adapter which allows you to connect to the MongoDB database engine. MongoDB is an
@@ -62,7 +61,6 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	protected $_classes = array(
 		'entity'       => 'lithium\data\entity\Document',
-		'array'        => 'lithium\data\collection\DocumentArray',
 		'set'          => 'lithium\data\collection\DocumentSet',
 		'result'       => 'lithium\data\source\mongo_db\Result',
 		'schema'       => 'lithium\data\source\mongo_db\Schema',

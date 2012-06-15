@@ -1177,6 +1177,20 @@ abstract class Database extends \lithium\data\Source {
 	protected function _toNativeBoolean($value) {
 		return $value ? 1 : 0;
 	}
+
+	/**
+	 * Throw a `QueryException` error
+	 *
+	 * @param string The offending SQL string
+	 */
+	protected function _error($sql){
+		$params = compact('sql');
+		return $this->_filter(__METHOD__, $params, function($self, $params) {
+			$sql = $params['sql'];
+			list($code, $error) = $self->error();
+			throw new QueryException("{$sql}: {$error}", $code);
+		});
+	}
 }
 
 ?>

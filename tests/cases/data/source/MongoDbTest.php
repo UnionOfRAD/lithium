@@ -10,8 +10,6 @@ namespace lithium\tests\cases\data\source;
 
 use lithium\data\source\mongo_db\Schema;
 use lithium\data\source\MongoDb;
-use Exception;
-use stdClass;
 use MongoId;
 use MongoCode;
 use MongoDate;
@@ -379,7 +377,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		array_push($this->db->connection->results, new MockResult(array(
 			'data' => array()
 		)));
-		$this->assertNull($this->db->read($this->query)->first());
+		$this->assertFalse($this->db->read($this->query)->first());
 
 		$result = array_pop($this->db->connection->queries);
 		$conditions = array('_id' => $this->query->entity()->_id);
@@ -406,7 +404,6 @@ class MongoDbTest extends \lithium\test\Unit {
 		$model = $this->_model;
 		$data = array('title' => 'New Item');
 		$result = $this->db->item($model, $data);
-
 		$this->assertTrue($result instanceof Document);
 
 		$expected = $data;
@@ -621,7 +618,7 @@ class MongoDbTest extends \lithium\test\Unit {
 			'options' => array(
 				'validate' => true, 'events' => 'update', 'whitelist' => null,
 				'callbacks' => true, 'locked' => false, 'upsert' => false, 'multiple' => true,
-				'safe' => false, 'fsync' => false,
+				'safe' => false, 'fsync' => false
 			)
 		);
 		$this->assertEqual($expected, $result);
