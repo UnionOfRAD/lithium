@@ -48,7 +48,7 @@ class MySqlTest extends \lithium\test\Unit {
 		$expected = array(
 			'autoConnect' => false, 'encoding' => null,'persistent' => true,
 			'host' => 'localhost:3306', 'login' => 'root', 'password' => '',
-			'database' => null, 'init' => true
+			'database' => null, 'dsn' => null, 'options' => array(), 'init' => true
 		);
 		$this->assertEqual($expected, $result);
 	}

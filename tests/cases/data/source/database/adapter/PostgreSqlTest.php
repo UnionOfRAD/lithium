@@ -51,7 +51,8 @@ class PostgreSqlTest extends \lithium\test\Unit {
 		$expected = array(
 			'autoConnect' => false, 'encoding' => null,'persistent' => true,
 			'host' => 'localhost:5432', 'login' => 'root', 'password' => '',
-			'database' => null, 'init' => true, 'schema' => 'public'
+			'database' => null, 'dsn' => null, 'options' => array(),
+			'init' => true, 'schema' => 'public'
 		);
 		$this->assertEqual($expected, $result);
 	}
