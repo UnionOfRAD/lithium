@@ -408,26 +408,21 @@ class RecordSetTest extends \lithium\test\Unit {
 
 	public function testToInternal() {
 		Collection::formats('lithium\net\http\Media');
+
 		$expected = array(
 			array('id' => 1, 'data' => 'data1'),
 			array('id' => 2, 'data' => 'data2'),
 			array('id' => 3, 'data' => 'data3'),
 			array('id' => 4, 'data' => 'data4')
 		);
-
 		$this->assertEqual($expected, $this->_recordSet->to('array', array('indexed' => false)));
 
 		$expected = '{"1":{"id":1,"data":"data1"},"2":{"id":2,"data":"data2"},';
 		$expected .= '"3":{"id":3,"data":"data3"},"4":{"id":4,"data":"data4"}}';
-
 		$this->assertEqual($expected, $this->_recordSet->to('json'));
-
-		$result = $this->_recordSet->to('json');
-		$this->assertEqual($expected, $result);
 
 		$expected = '[{"id":1,"data":"data1"},{"id":2,"data":"data2"},';
 		$expected .= '{"id":3,"data":"data3"},{"id":4,"data":"data4"}]';
-
 		$result = $this->_recordSet->to('json', array('indexed' => false));
 		$this->assertEqual($expected, $result);
 	}
