@@ -1182,6 +1182,7 @@ abstract class Database extends \lithium\data\Source {
 	 * Throw a `QueryException` error
 	 *
 	 * @param string The offending SQL string
+	 * @filter
 	 */
 	protected function _error($sql){
 		$params = compact('sql');

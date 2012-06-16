@@ -9,10 +9,7 @@
 namespace lithium\data\source\database\adapter;
 
 use PDO;
-use PDOStatement;
 use PDOException;
-use lithium\data\model\QueryException;
-use lithium\core\ConfigException;
 
 /**
  * Extends the `Database` class to implement the necessary SQL-formatting and resultset-fetching
@@ -84,14 +81,14 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @see lithium\data\Source::__construct()
 	 * @see lithium\data\Connections::add()
 	 * @param array $config Configuration options for this class. For additional configuration,
-	 *		  see `lithium\data\source\Database` and `lithium\data\Source`. Available options
-	 *		  defined by this class:
-	 *		  - `'database'`: The name of the database to connect to. Defaults to 'lithium'.
-	 *		  - `'host'`: The IP or machine name where PostgreSQL is running, followed by a colon,
-	 *			followed by a port number or socket. Defaults to `'localhost:5432'`.
-	 *		  - `'persistent'`: If a persistent connection (if available) should be made.
-	 *			Defaults to true.
-	 *		  - `'schema'`: The name of the database schema to use. Defaults to 'public'
+	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options
+	 *        defined by this class:
+	 *        - `'database'`: The name of the database to connect to. Defaults to 'lithium'.
+	 *        - `'host'`: The IP or machine name where PostgreSQL is running, followed by a colon,
+	 *        followed by a port number or socket. Defaults to `'localhost:5432'`.
+	 *        - `'persistent'`: If a persistent connection (if available) should be made.
+	 *        Defaults to true.
+	 *        - `'schema'`: The name of the database schema to use. Defaults to 'public'
 	 *
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
@@ -105,9 +102,9 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * Check for required PHP extension, or supported database feature.
 	 *
 	 * @param string $feature Test for support for a specific feature, i.e. `"transactions"` or
-	 *				 `"arrays"`.
+	 *        `"arrays"`.
 	 * @return boolean Returns `true` if the particular feature (or if PostgreSQL) support is
-	 *		   enabled, otherwise `false`.
+	 *         enabled, otherwise `false`.
 	 */
 	public static function enabled($feature = null) {
 		if (!$feature) {
@@ -126,43 +123,24 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * Connects to the database using the options provided to the class constructor.
 	 *
 	 * @return boolean Returns `true` if a database connection could be established, otherwise
-	 *		   `false`.
+	 *         `false`.
 	 */
 	public function connect() {
-		$config = $this->_config;
-		$this->_isConnected = false;
-		$host = $config['host'];
+		if (!$this->_config['dsn']) {
+			$host = $this->_config['host'];
+			list($host, $port) = explode(':', $host) + array(1 => "5432");
+			$dsn = "pgsql:host=%s;port=%s;dbname=%s";
+			$this->_config['dsn'] = sprintf($dsn, $host, $port, $this->_config['database']);
+		}
 
-		if (!$config['database']) {
+		if (!parent::connect()) {
 			return false;
 		}
 
-		$options = array(
-			PDO::ATTR_PERSISTENT => $config['persistent'],
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-		);
-
-		try {
-			list($host, $port) = explode(':', $host) + array(1 => "5432");
-			$dsn = sprintf("pgsql:host=%s;port=%s;dbname=%s", $host, $port, $config['database']);
-			$this->connection = new PDO($dsn, $config['login'], $config['password'], $options);
-		} catch (PDOException $e) {
-			throw new ConfigException($e->getMessage());
+		if ($this->_config['schema']) {
+			$this->search_path($this->_config['schema']);
 		}
-
-		$this->_isConnected = true;
-
-		if ($config['encoding']) {
-			$this->encoding($config['encoding']);
-		}
-
-		if ($config['schema']) {
-			$this->search_path($config['schema']);
-		}
-
-		$info = $this->connection->getAttribute(PDO::ATTR_SERVER_VERSION);
-
-		return $this->_isConnected;
+		return true;
 	}
 
 	/**
@@ -198,13 +176,14 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * Gets the column schema for a given PostgreSQL table.
 	 *
 	 * @param mixed $entity Specifies the table name for which the schema should be returned, or
-	 *		  the class name of the model object requesting the schema, in which case the model
-	 *		  class will be queried for the correct table name.
+	 *        the class name of the model object requesting the schema, in which case the model
+	 *        class will be queried for the correct table name.
+	 * @param array $schema Any schema data pre-defined by the model.
 	 * @param array $meta
 	 * @return array Returns an associative array describing the given table's schema, where the
-	 *		   array keys are the available fields, and the values are arrays describing each
-	 *		   field, containing the following keys:
-	 *		   - `'type'`: The field type name
+	 *         array keys are the available fields, and the values are arrays describing each
+	 *         field, containing the following keys:
+	 *         - `'type'`: The field type name
 	 * @filter This method can be filtered.
 	 */
 	public function describe($entity, $schema = array(), array $meta = array()) {
@@ -250,7 +229,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * Gets or sets the search path for the connection
 	 * @param $search_path
 	 * @return mixed If setting the search_path; returns ture on success, else false
-	 *		   When getting, returns the search_path
+	 *         When getting, returns the search_path
 	 */
 	public function search_path($search_path) {
 		if (empty($search_path)) {
@@ -271,7 +250,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *
 	 * @param $encoding
 	 * @return mixed If setting the encoding; returns true on success, else false.
-	 *		   When getting, returns the encoding.
+	 *         When getting, returns the encoding.
 	 */
 	public function encoding($encoding = null) {
 		$encodingMap = array('UTF-8' => 'UTF8');
@@ -350,7 +329,7 @@ class PostgreSql extends \lithium\data\source\Database {
 
 	/**
 	 * @todo Eventually, this will need to rewrite aliases for DELETE and UPDATE queries, same with
-	 *		 order().
+	 *       order().
 	 * @param string $conditions
 	 * @param string $context
 	 * @param array $options
@@ -378,26 +357,14 @@ class PostgreSql extends \lithium\data\source\Database {
 			$sql = $params['sql'];
 			$options = $params['options'];
 
-			if (!($resource = $conn->query($sql)) instanceof PDOStatement) {
-				list($code, $error) = $self->error();
-				throw new QueryException("{$sql}: {$error}", $code);
-			}
+			try {
+				$resource = $conn->query($sql);
+			} catch(PDOException $e) {
+				$self->invokeMethod('_error', array($sql));
+			};
+
 			return $self->invokeMethod('_instance', array('result', compact('resource')));
 		});
-	}
-
-	protected function _results($results) {
-		/* @var $results PDOStatement */
-		$numFields = $results->columnCount();
-		$index = $j = 0;
-
-		while ($j < $numFields) {
-			$column = $results->getColumnMeta($j);
-			$name = $column['name'];
-			$table = $column['table'];
-			$this->map[$index++] = empty($table) ? array(0, $name) : array($table, $name);
-			$j++;
-		}
 	}
 
 	/**
@@ -405,7 +372,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *
 	 * @param object $query The `Query` object associated with the query which generated
 	 * @return mixed Returns the last inserted ID key for an auto-increment column or a column
-	 *		   bound to a sequence.
+	 *         bound to a sequence.
 	 */
 	protected function _insertId($query) {
 		$model = $query->model();
@@ -469,6 +436,7 @@ class PostgreSql extends \lithium\data\source\Database {
 		}
 		return $column;
 	}
+
 	protected function _toNativeBoolean($value) {
 		return $this->connection->quote($value ? 't' : 'f');
 	}

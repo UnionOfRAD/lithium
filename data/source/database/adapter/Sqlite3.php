@@ -9,7 +9,6 @@
 
 namespace lithium\data\source\database\adapter;
 
-use PDO;
 use PDOException;
 use lithium\core\ConfigException;
 
@@ -125,10 +124,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 			$this->_config['dsn'] = sprintf("sqlite:%s", $this->_config['database']);
 		}
 
-		if (parent::connect()) {
-			$info = $this->connection->getAttribute(PDO::ATTR_SERVER_VERSION);
-		}
-		return $this->_isConnected;
+		return parent::connect();
 	}
 
 	/**
@@ -299,8 +295,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 			$options = $params['options'];
 			try {
 				$resource = $conn->query($sql);
-			}
-			catch(PDOException $e){
+			} catch(PDOException $e) {
 				$self->invokeMethod('_error', array($sql));
 			};
 			return $self->invokeMethod('_instance', array('result', compact('resource')));

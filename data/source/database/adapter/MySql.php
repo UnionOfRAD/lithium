@@ -9,9 +9,7 @@
 namespace lithium\data\source\database\adapter;
 
 use PDO;
-use PDOStatement;
 use PDOException;
-use lithium\data\model\QueryException;
 
 /**
  * Extends the `Database` class to implement the necessary SQL-formatting and resultset-fetching
@@ -94,7 +92,7 @@ class MySql extends \lithium\data\source\Database {
 	 * Check for required PHP extension, or supported database feature.
 	 *
 	 * @param string $feature Test for support for a specific feature, i.e. `"transactions"` or
-	 *               `"arrays"`.
+	 *        `"arrays"`.
 	 * @return boolean Returns `true` if the particular feature (or if MySQL) support is enabled,
 	 *         otherwise `false`.
 	 */
@@ -115,7 +113,7 @@ class MySql extends \lithium\data\source\Database {
 	 * Connects to the database using the options provided to the class constructor.
 	 *
 	 * @return boolean Returns `true` if a database connection could be established, otherwise
-	 *     `false`.
+	 *         `false`.
 	 */
 	public function connect() {
 		if (!$this->_config['dsn']) {
@@ -166,6 +164,7 @@ class MySql extends \lithium\data\source\Database {
 	 * @param mixed $entity Specifies the table name for which the schema should be returned, or
 	 *        the class name of the model object requesting the schema, in which case the model
 	 *        class will be queried for the correct table name.
+	 * @param array $schema Any schema data pre-defined by the model.
 	 * @param array $meta
 	 * @return array Returns an associative array describing the given table's schema, where the
 	 *         array keys are the available fields, and the values are arrays describing each
@@ -316,26 +315,14 @@ class MySql extends \lithium\data\source\Database {
 			$options = $params['options'];
 			$conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, $options['buffered']);
 
-			if (!($resource = $conn->query($sql)) instanceof PDOStatement) {
-				list($code, $error) = $self->error();
-				throw new QueryException("{$sql}: {$error}", $code);
-			}
+			try {
+				$resource = $conn->query($sql);
+			} catch(PDOException $e) {
+				$self->invokeMethod('_error', array($sql));
+			};
+
 			return $self->invokeMethod('_instance', array('result', compact('resource')));
 		});
-	}
-
-	protected function _results($results) {
-		/* @var $results PDOStatement */
-		$numFields = $results->columnCount();
-		$index = $j = 0;
-
-		while ($j < $numFields) {
-			$column = $results->getColumnMeta($j);
-			$name = $column['name'];
-			$table = $column['table'];
-			$this->map[$index++] = empty($table) ? array(0, $name) : array($table, $name);
-			$j++;
-		}
 	}
 
 	/**
