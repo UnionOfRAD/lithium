@@ -408,26 +408,21 @@ class RecordSetTest extends \lithium\test\Unit {
 
 	public function testToInternal() {
 		Collection::formats('lithium\net\http\Media');
+
 		$expected = array(
 			array('id' => 1, 'data' => 'data1'),
 			array('id' => 2, 'data' => 'data2'),
 			array('id' => 3, 'data' => 'data3'),
 			array('id' => 4, 'data' => 'data4')
 		);
-
 		$this->assertEqual($expected, $this->_recordSet->to('array', array('indexed' => false)));
 
 		$expected = '{"1":{"id":1,"data":"data1"},"2":{"id":2,"data":"data2"},';
 		$expected .= '"3":{"id":3,"data":"data3"},"4":{"id":4,"data":"data4"}}';
-
 		$this->assertEqual($expected, $this->_recordSet->to('json'));
-
-		$result = $this->_recordSet->to('json');
-		$this->assertEqual($expected, $result);
 
 		$expected = '[{"id":1,"data":"data1"},{"id":2,"data":"data2"},';
 		$expected .= '{"id":3,"data":"data3"},{"id":4,"data":"data4"}]';
-
 		$result = $this->_recordSet->to('json', array('indexed' => false));
 		$this->assertEqual($expected, $result);
 	}
@@ -761,6 +756,24 @@ class RecordSetTest extends \lithium\test\Unit {
 
 		Collection::formats('lithium\net\http\Media');
 		$this->assertEqual($expected, $payments->to('json'));
+	}
+
+	public function testValid() {
+		$collection = new RecordSet();
+		$this->assertFalse($collection->valid());
+
+		$collection = new RecordSet(array('data' => array('value' => 42)));
+		$this->assertTrue($collection->valid());
+
+		$resource = new MockResult(array('records' => array()));
+		$collection = new RecordSet(array('model' => $this->_model, 'result' => $resource));
+		$this->assertFalse($collection->valid());
+
+		$resource = new MockResult(array(
+			'records' => array(array('id' => 1, 'data' => 'data1'))
+		));
+		$collection = new RecordSet(array('model' => $this->_model, 'result' => $resource));
+		$this->assertTrue($collection->valid());
 	}
 }
 

@@ -228,9 +228,9 @@ class RecordSet extends \lithium\data\Collection {
 			return;
 		}
 		if (!$this->_result->valid()) {
-			return $this->close();
+			$this->close();
+			return;
 		}
-
 		$data = $this->_result->current();
 		if ($this->_query) {
 			$data = $this->_mapRecord($data);

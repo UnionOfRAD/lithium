@@ -96,14 +96,6 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	protected $_data = array();
 
 	/**
-	 * Indicates whether the current position is valid or not.
-	 *
-	 * @var boolean
-	 * @see lithium\util\Collection::valid()
-	 */
-	protected $_valid = false;
-
-	/**
 	 * Allows a collection's items to be automatically assigned from class construction options.
 	 *
 	 * @var array
@@ -426,7 +418,6 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 */
 	public function rewind() {
 		reset($this->_data);
-		$this->_valid = !(key($this->_data) === null);
 		return current($this->_data);
 	}
 
@@ -437,7 +428,6 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 */
 	public function end() {
 		end($this->_data);
-		$this->_valid = !(key($this->_data) === null);
 		return current($this->_data);
 	}
 
@@ -447,7 +437,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return boolean `true` if valid, `false` otherwise.
 	 */
 	public function valid() {
-		return $this->_valid;
+		return key($this->_data) !== null;
 	}
 
 	/**
@@ -477,7 +467,6 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	public function prev() {
 		if (!prev($this->_data)) {
 			end($this->_data);
-			$this->_valid = !(key($this->_data) === null);
 		}
 		return current($this->_data);
 	}
@@ -489,7 +478,6 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 */
 	public function next() {
 		next($this->_data);
-		$this->_valid = !(key($this->_data) === null);
 		return current($this->_data);
 	}
 
