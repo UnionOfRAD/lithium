@@ -167,6 +167,24 @@ class DocumentSetTest extends \lithium\test\Unit {
 		$this->assertEqual($model, $doc->model());
 		$this->assertEqual($model, $mapped->model());
 	}
+
+	public function testValid() {
+		$collection = new DocumentSet();
+		$this->assertFalse($collection->valid());
+
+		$collection = new DocumentSet(array('data' => array('value' => 42)));
+		$this->assertTrue($collection->valid());
+
+		$resource = new MockResult(array('data' => array()));
+		$collection = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
+		$this->assertFalse($collection->valid());
+
+		$resource = new MockResult(array(
+			'data' => array(array('id' => 1, 'data' => 'data1'))
+		));
+		$collection = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
+		$this->assertTrue($collection->valid());
+	}
 }
 
 ?>

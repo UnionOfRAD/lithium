@@ -93,7 +93,8 @@ class DocumentSet extends \lithium\data\Collection {
 
 		do {
 			if (!$this->_result->valid()) {
-				return $this->close();
+				$this->close();
+				return;
 			}
 			$data = $this->_result->current();
 			$result = $this->_set($data, null, array('exists' => true));

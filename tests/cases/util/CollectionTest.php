@@ -432,6 +432,14 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertTrue(is_object($doc[2]));
 		$this->assertEqual(3, count($doc));
 	}
+
+	public function testValid() {
+		$collection = new Collection();
+		$this->assertFalse($collection->valid());
+
+		$collection = new Collection(array('data' => array(1, 5)));
+		$this->assertTrue($collection->valid());
+	}
 }
 
 ?>
