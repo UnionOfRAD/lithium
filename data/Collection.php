@@ -300,8 +300,8 @@ abstract class Collection extends \lithium\util\Collection {
 	 *         available.
 	 */
 	public function next() {
-		if ($this->_started === false) {
-			$this->current();
+		if (!$this->_started) {
+			$this->rewind();
 		}
 		next($this->_data);
 		$this->_valid = !(key($this->_data) === null);
@@ -309,6 +309,18 @@ abstract class Collection extends \lithium\util\Collection {
 			$this->_valid = !is_null($this->_populate());
 		}
 		return current($this->_data);
+	}
+
+	/**
+	 * Checks if current position is valid.
+	 *
+	 * @return boolean `true` if valid, `false` otherwise.
+	 */
+	public function valid() {
+		if (!$this->_started) {
+			$this->rewind();
+		}
+		return $this->_valid;
 	}
 
 	/**

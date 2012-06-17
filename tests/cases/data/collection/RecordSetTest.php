@@ -757,6 +757,24 @@ class RecordSetTest extends \lithium\test\Unit {
 		Collection::formats('lithium\net\http\Media');
 		$this->assertEqual($expected, $payments->to('json'));
 	}
+
+	public function testValid() {
+		$collection = new RecordSet();
+		$this->assertFalse($collection->valid());
+
+		$collection = new RecordSet(array('data' => array('value' => 42)));
+		$this->assertTrue($collection->valid());
+
+		$resource = new MockResult(array('records' => array()));
+		$collection = new RecordSet(array('model' => $this->_model, 'result' => $resource));
+		$this->assertFalse($collection->valid());
+
+		$resource = new MockResult(array(
+			'records' => array(array('id' => 1, 'data' => 'data1'))
+		));
+		$collection = new RecordSet(array('model' => $this->_model, 'result' => $resource));
+		$this->assertTrue($collection->valid());
+	}
 }
 
 ?>
