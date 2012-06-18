@@ -116,7 +116,6 @@ class Message extends \lithium\net\Message {
 				$this->headers[$header] = $value;
 			}
 		}
-
 		$headers = array();
 
 		foreach ($this->headers as $key => $value) {
