@@ -109,7 +109,7 @@ class Message extends \lithium\net\Message {
 
 		foreach (($value ? array($key => $value) : (array) $key) as $header => $value) {
 			if (!is_string($header)) {
-				if (preg_match('/(.*?):(.+)/i', $value, $match)) {
+				if (preg_match('/(.*?):(.+)/', $value, $match)) {
 					$this->headers[$match[1]] = trim($match[2]);
 				}
 			} else {
