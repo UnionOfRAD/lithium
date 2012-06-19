@@ -28,7 +28,7 @@ class LoggerTest extends \lithium\test\Unit {
 			}
 		}
 		$this->_testPath = "{$path}/tmp/tests";
-		$this->skipIf(!is_writable($this->_testPath), "Path `{$this->_testPath}` is not readable.");
+		$this->skipIf(!is_writable($this->_testPath), "Path `{$this->_testPath}` is not writable.");
 	}
 
 	public function setUp() {
