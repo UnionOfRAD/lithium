@@ -1,0 +1,6 @@
+{
+	"name": "UnionOfRAD/lithium",
+	"require": {
+		"php": ">=5.3.6",
+	}
+}
