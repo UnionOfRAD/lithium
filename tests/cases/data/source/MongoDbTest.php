@@ -651,9 +651,9 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests that the MongoDB adapter will not attempt to overwrite an MongoID in an
+	 * Tests that the MongoDB adapter will not attempt to overwrite a MongoID in an
 	 * embedded array during update.
-	 * Note: AssertEqual is returns false positive between MongoId and string.
+	 * Note: AssertEqual returns false positive between MongoId and string.
 	 */
 	public function testPreserveEmbeddedId() {
 		$model = $this->_model;
