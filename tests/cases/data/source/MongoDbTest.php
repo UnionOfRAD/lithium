@@ -649,6 +649,26 @@ class MongoDbTest extends \lithium\test\Unit {
 		}));
 		$this->assertEqual($schema, $db->describe(null));
 	}
+
+	/**
+	 * Tests that the MongoDB adapter will not attempt to overwrite a MongoID in an
+	 * embedded array during update.
+	 * Note: AssertEqual returns false positive between MongoId and string.
+	 */
+	public function testPreserveEmbeddedId() {
+		$model = $this->_model;
+		$model::config(array('connection' => 'lithium_mongo_test', 'source' => 'posts'));
+
+		$document = $model::create(array('initial' => 'post'));
+		$document->save();
+
+		$conditions = array('_id' => $document->_id);
+		$document = $model::find('first', $conditions);
+		$data['ids'][] = new MongoId();
+		$document->save($data);
+		$document = $model::find('first', $conditions);
+		$this->assertTrue($document->ids[0] instanceof MongoId);
+	}
 }
 
 ?>
