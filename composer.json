@@ -4,7 +4,7 @@
 	"description": "The core library of the Lithium PHP framework",
 	"keywords": ["lithium", "framework"],
 	"homepage": "http://lithify.me",
-	"license": "BSD",
+	"license": "BSD-3-Clause",
 	"authors": [
 		{
 			"name": "Union of RAD",
