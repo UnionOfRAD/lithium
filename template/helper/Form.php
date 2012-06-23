@@ -540,7 +540,7 @@ class Form extends \lithium\template\Helper {
 	 *
 	 * For example: {{{
 	 * $this->form->select('colors', array(1 => 'red', 2 => 'green', 3 => 'blue'), array(
-	 * 	'id' => 'Colors', 'value' => 2
+	 * 	'id' => 'Colors', 'value' => '2'
 	 * ));
 	 * // Renders a '<select />' list with options 'red', 'green' and 'blue', with the 'green'
 	 * // option as the selection
@@ -551,7 +551,8 @@ class Form extends \lithium\template\Helper {
 	 *              list of options.
 	 * @param array $options Any HTML attributes that should be associated with the `<select />`
 	 *             element. If the `'value'` key is set, this will be the value of the option
-	 *             that is selected by default.
+	 *             that is selected by default. (Note: the value of the `'value'` key must be of
+	 *             type string - in the example above the {{{ 2 => 'green' }}} but {{{ value => '2' }}}).
 	 * @return string Returns an HTML `<select />` element.
 	 */
 	public function select($name, $list = array(), array $options = array()) {
