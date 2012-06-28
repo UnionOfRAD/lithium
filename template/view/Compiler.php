@@ -46,14 +46,11 @@ class Compiler extends \lithium\core\StaticObject {
 	 * @param string $file The full path to the template that will be compiled.
 	 * @param array $options Options for compilation include:
 	 *        - `path`: Path where the compiled template should be written.
-	 *        - `fallback`: Boolean indicating that if the compilation failed for some
-	 *                      reason (e.g. `path` is not writable), that the compiled template
-	 *                      should still be returned and no exception be thrown.
 	 * @return string The compiled template.
 	 */
 	public static function template($file, array $options = array()) {
 		$cachePath = Libraries::get(true, 'resources') . '/tmp/cache/templates';
-		$defaults = array('path' => $cachePath, 'fallback' => true);
+		$defaults = array('path' => $cachePath);
 		$options += $defaults;
 
 		$stats = stat($file);
@@ -75,9 +72,7 @@ class Compiler extends \lithium\core\StaticObject {
 			}
 			return $template;
 		}
-		if ($options['fallback']) {
-			return $file;
-		}
+
 		throw new TemplateException("Could not write compiled template `{$template}` to cache.");
 	}
 

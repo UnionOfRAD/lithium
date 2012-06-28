@@ -79,19 +79,11 @@ class CompilerTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testFallbackWithNonWritableDirectory() {
-		$this->expectException('/failed to open stream/');
-		$result = Compiler::template("{$this->_path}/{$this->_file}", array(
-			'path' => LITHIUM_APP_PATH . '/foo',
-			'fallback' => true
-		));
-		$this->assertEqual("{$this->_path}/{$this->_file}", $result);
-
+	public function testNonWritableDirectory() {
 		$this->expectException('/Could not write compiled template/');
 		$this->expectException('/failed to open stream/');
 		$result = Compiler::template("{$this->_path}/{$this->_file}", array(
-			'path' => LITHIUM_APP_PATH . '/foo',
-			'fallback' => false
+			'path' => LITHIUM_APP_PATH . '/foo'
 		));
 	}
 
