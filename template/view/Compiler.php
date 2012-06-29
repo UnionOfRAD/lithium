@@ -53,7 +53,7 @@ class Compiler extends \lithium\core\StaticObject {
 	 */
 	public static function template($file, array $options = array()) {
 		$cachePath = Libraries::get(true, 'resources') . '/tmp/cache/templates';
-		$defaults = array('path' => $cachePath, 'fallback' => true);
+		$defaults = array('path' => $cachePath, 'fallback' => false);
 		$options += $defaults;
 
 		$stats = stat($file);
