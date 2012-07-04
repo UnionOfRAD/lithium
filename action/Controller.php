@@ -132,6 +132,12 @@ class Controller extends \lithium\core\Object {
 		parent::__construct($config + $defaults);
 	}
 
+	/**
+	 * Populates the `$response` property with a new instance of the `Response` class passing it
+	 * configuration, and sets some rendering options, depending on the incoming request.
+	 *
+	 * @return void
+	 */
 	protected function _init() {
 		parent::_init();
 		$this->request = $this->request ?: $this->_config['request'];
@@ -195,7 +201,7 @@ class Controller extends \lithium\core\Object {
 	/**
 	 * This method is used to pass along any data from the controller to the view and layout
 	 *
-	 * @param array $data sets of <variable name> => <variable value> to pass to view layer.
+	 * @param array $data sets of `<variable name> => <variable value>` to pass to view layer.
 	 * @return void
 	 */
 	public function set($data = array()) {

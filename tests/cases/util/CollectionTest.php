@@ -152,6 +152,15 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertEqual(array(2, 3, 4, 5, 6), $result);
 	}
 
+	public function testCollectionReduceFilter() {
+		$collection = new Collection(array('data' => array(1, 2, 3)));
+		$filter = function($memo, $item) { return $memo + $item; };
+		$result = $collection->reduce($filter, 0);
+
+		$this->assertEqual(6, $collection->reduce($filter, 0));
+		$this->assertEqual(7, $collection->reduce($filter, 1));
+	}
+
 	/**
 	 * Tests the `ArrayAccess` interface implementation for manipulating values by direct offsets.
 	 *

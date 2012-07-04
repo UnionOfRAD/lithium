@@ -124,7 +124,7 @@ class CollectionTest extends \lithium\test\Unit {
 			'value test',
 			'bar test'
 		);
-		$this->assertEqual($collection->to('array'), $expected);
+		$this->assertEqual($expected, $collection->to('array'));
 	}
 
 	/**
@@ -147,6 +147,23 @@ class CollectionTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($results->to('array'), $expected);
 		$this->assertNotEqual($results->to('array'), $collection->to('array'));
+	}
+
+	/**
+	 * Tests `Collection::reduce`.
+	 */
+	public function testReduce() {
+		$collection = new DocumentSet();
+		$collection->set(array(
+			'title' => 'Lorem Ipsum',
+			'key'   => 'value',
+			'foo'   => 'bar'
+		));
+		$result = $collection->reduce(function($memo, $value) {
+			return trim($memo . ' ' . $value);
+		}, '');
+		$expected = 'Lorem Ipsum value bar';
+		$this->assertEqual($expected, $result);
 	}
 
 	/**

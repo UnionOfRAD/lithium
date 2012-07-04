@@ -32,10 +32,10 @@ use lithium\core\ClassNotFoundException;
  *
  * $report->run();
  *
- * //Get the test stats:
+ * // Get the test stats:
  * $report->stats();
  *
- * //Get test results:
+ * // Get test results:
  * $report->results
  * }}}
  *
@@ -51,7 +51,7 @@ use lithium\core\ClassNotFoundException;
  *
  * $report->run();
  *
- * //Get test results, including filter results:
+ * // Get test results, including filter results:
  * $report->results
  * }}}
  *
@@ -65,26 +65,27 @@ class Report extends \lithium\core\Object {
 	 * Contains an instance of `lithium\test\Group`, which contains all unit tests to be executed
 	 * this test run.
 	 *
+	 * @see lithium\test\Group
 	 * @var object
 	 */
 	public $group = null;
 
 	/**
-	 * Title of the group being run
+	 * Title of the group being run.
 	 *
 	 * @var string
 	 */
-	public $title = null;
+	public $title;
 
 	/**
-	 * group and filter results
+	 * Group and filter results.
 	 *
 	 * @var array
 	 */
 	public $results = array('group' => array(), 'filters' => array());
 
 	/**
-	 * start and end timers
+	 * Start and end timers.
 	 *
 	 * @var array
 	 */
@@ -99,7 +100,7 @@ class Report extends \lithium\core\Object {
 	protected $_filters = array();
 
 	/**
-	 * Construct Report Object
+	 * Constructor.
 	 *
 	 * @param array $config Options array for the test run. Valid options are:
 	 *        - `'group'`: The test group with items to be run.
@@ -119,7 +120,7 @@ class Report extends \lithium\core\Object {
 	}
 
 	/**
-	 * undocumented function
+	 * Initializer.
 	 *
 	 * @return void
 	 */
@@ -129,7 +130,7 @@ class Report extends \lithium\core\Object {
 	}
 
 	/**
-	 * undocumented function
+	 * Runs tests.
 	 *
 	 * @return void
 	 */
@@ -154,7 +155,7 @@ class Report extends \lithium\core\Object {
 	 *
 	 * @param string $class Classname of the filter for which to aggregate results.
 	 * @param array $results Array of the filter results for
-	 *				later analysis by the filter itself.
+	 *              later analysis by the filter itself.
 	 * @return void
 	 */
 	public function collect($class, $results) {
@@ -162,9 +163,9 @@ class Report extends \lithium\core\Object {
 	}
 
 	/**
-	 * undocumented function
+	 * Return statistics from the test runs.
 	 *
-	 * @return void
+	 * @return array
 	 */
 	public function stats() {
 		$results = (array) $this->results['group'];
@@ -207,14 +208,14 @@ class Report extends \lithium\core\Object {
 			function($value) { return is_array($value) ? count($value) : $value; }, $stats
 		);
 		$success = $count['passes'] == $count['asserts'] && $count['errors'] === 0;
-		return compact("stats", "count", "success");
+		return compact('stats', 'count', 'success');
 	}
 
 	/**
-	 * Renders the test output (e.g. layouts and filter templates)
+	 * Renders the test output (e.g. layouts and filter templates).
 	 *
-	 * @param string $template name of the template (eg: layout)
-	 * @param string|array $data array from `_data()` method
+	 * @param string $template name of the template (i.e. `'layout'`).
+	 * @param string|array $data array from `_data()` method.
 	 * @return string
 	 * @filter
 	 */

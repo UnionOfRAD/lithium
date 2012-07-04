@@ -196,14 +196,6 @@ abstract class Database extends \lithium\data\Source {
 				return floatval($value);
 			case 'integer':
 				return intval($value);
-			case 'timestamp':
-				if ($value === 'CURRENT_TIMESTAMP') {
-					return 'NULL';
-				} else if (is_numeric($value)) {
-					return date('Y-m-d H:i:s', $value);
-				} else {
-					return strtotime($value);
-				}
 		}
 	}
 
