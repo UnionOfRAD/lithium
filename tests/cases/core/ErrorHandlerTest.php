@@ -12,6 +12,7 @@ use Closure;
 use Exception;
 use UnexpectedValueException;
 use lithium\core\ErrorHandler;
+use lithium\tests\mocks\core\MockErrorHandler;
 
 class ErrorHandlerTest extends \lithium\test\Unit {
 
@@ -95,19 +96,6 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 		$this->assertEqual(2, count($this->errors));
 	}
 
-	public function testReset() {
-		ErrorHandler::reset();
-		$this->assertEqual(array(), ErrorHandler::handlers());
-
-		$result = ErrorHandler::handlers(array('test' => function($error) { /* Do something */ }));
-		$this->assertEqual(array('test'), array_keys($result));
-		$this->assertTrue($result['test'] instanceof Closure);
-		$this->assertEqual($result, ErrorHandler::handlers());
-
-		ErrorHandler::reset();
-		$this->assertEqual(array(), ErrorHandler::handlers());
-	}
-
 	public function testApply() {
 		$subject = new ErrorHandlerTest();
 		ErrorHandler::apply(array($subject, 'throwException'), array(), function($details) {
@@ -135,16 +123,44 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 		$this->assertEqual(ErrorHandler::isRunning(), false);
 		ErrorHandler::run();
 		$this->assertEqual(ErrorHandler::isRunning(), true);
+		$result = ErrorHandler::run();
+		$this->assertEqual(ErrorHandler::isRunning(), true);
+		$this->assertNull($result);
 		ErrorHandler::stop();
 		$this->assertEqual(ErrorHandler::isRunning(), false);
 	}
 
+	public function testReset() {
+		$checks = MockErrorHandler::checks();
+
+		$defaultChecks = 4;
+		$this->assertEqual($defaultChecks, count($checks));
+		$this->assertTrue($checks['type'] instanceof Closure);
+
+		$checks = MockErrorHandler::checks(array('foo' => 'bar'));
+		$this->assertEqual(1, count($checks));
+		$this->assertFalse(isset($checks['type']));
+
+		MockErrorHandler::reset();
+
+		$checks = MockErrorHandler::checks();
+		$this->assertEqual($defaultChecks, count($checks));
+		$this->assertTrue($checks['type'] instanceof Closure);
+	}
+
 	public function testErrorTrapping() {
 		ErrorHandler::stop();
+		$self = $this;
+		ErrorHandler::config(array(array(
+			'handler' => function($info) use ($self) {
+				$self->errors[] = $info;
+			})
+		));
 		ErrorHandler::run(array('trapErrors' => true));
 
-		// Undefined offset error shouldn't surface.
+		$this->assertEqual(0, count($this->errors));
 		list($foo, $bar) = array('baz');
+		$this->assertEqual(1, count($this->errors));
 	}
 
 	public function testRenderedOutput() {
