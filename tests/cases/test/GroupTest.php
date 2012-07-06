@@ -18,6 +18,8 @@ use lithium\tests\mocks\test\MockUnitTest;
 use lithium\tests\mocks\test\cases\MockTest;
 use lithium\tests\mocks\test\cases\MockTestErrorHandling;
 use lithium\tests\mocks\test\cases\MockSkipThrowsException;
+use lithium\tests\mocks\test\cases\MockSetUpThrowsException;
+use lithium\tests\mocks\test\cases\MockTearDownThrowsException;
 
 class GroupTest extends \lithium\test\Unit {
 
@@ -34,9 +36,14 @@ class GroupTest extends \lithium\test\Unit {
 		$group = new Group(compact('data'));
 
 		$expected = new Collection(array('data' => array(
-			new MockSkipThrowsException(), new MockTest(), new MockTestErrorHandling()
+			new MockSetUpThrowsException(),
+			new MockSkipThrowsException(),
+			new MockTearDownThrowsException(),
+			new MockTest(),
+			new MockTestErrorHandling()
 		)));
 		$result = $group->tests();
+
 		$this->assertEqual($expected, $result);
 	}
 

@@ -183,7 +183,7 @@ class UnitTest extends \lithium\test\Unit {
 			'data' => array('expected' => true, 'result' => true),
 			'file' => realpath($file),
 			'line' => 14,
-			'assertion' => 'assertTrue',
+			'assertion' => 'assertTrue'
 		);
 		$result = $this->test->run();
 		$this->assertEqual($expected, $result[0]);
@@ -566,7 +566,7 @@ class UnitTest extends \lithium\test\Unit {
 		$test->run();
 		$expected = 'tearDown throws exception';
 		$results = $test->results();
-		$this->assertEqual($expected, $results[0]['message']);
+		$this->assertEqual($expected, $results[1]['message']);
 	}
 
 	public function testErrorHandling() {
