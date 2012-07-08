@@ -145,7 +145,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testRemoteAddrFromHttpPcRemoteAddr() {
 		$request = new MockIisRequest();
-		$this->assertEqual('123.456.789.000', $request->env('REMOTE_ADDR'));
+		$this->assertEqual('123.456.789.000', $request->env('HTTP_PC_REMOTE_ADDR'));
 	}
 
 	public function testBase() {
