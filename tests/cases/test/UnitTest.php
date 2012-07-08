@@ -13,6 +13,8 @@ use lithium\core\Libraries;
 use lithium\tests\mocks\test\MockUnitTest;
 use lithium\tests\mocks\test\cases\MockSkipThrowsException;
 use lithium\tests\mocks\test\cases\MockTestErrorHandling;
+use lithium\tests\mocks\test\cases\MockSetUpThrowsException;
+use lithium\tests\mocks\test\cases\MockTearDownThrowsException;
 
 class UnitTest extends \lithium\test\Unit {
 
@@ -175,13 +177,13 @@ class UnitTest extends \lithium\test\Unit {
 		$file = realpath(LITHIUM_LIBRARY_PATH) . '/lithium/tests/mocks/test/MockUnitTest.php';
 		$expected = array(
 			'result' => 'pass',
+			'class' => 'lithium\\tests\\mocks\\test\\MockUnitTest',
+			'method' => 'testNothing',
+			'message' => "expected: true\nresult: true\n",
+			'data' => array('expected' => true, 'result' => true),
 			'file' => realpath($file),
 			'line' => 14,
-			'method' => 'testNothing',
-			'assertion' => 'assertTrue',
-			'class' => 'lithium\\tests\\mocks\\test\\MockUnitTest',
-			'message' => "expected: true\nresult: true\n",
-			'data' => array('expected' => true, 'result' => true)
+			'assertion' => 'assertTrue'
 		);
 		$result = $this->test->run();
 		$this->assertEqual($expected, $result[0]);
@@ -491,6 +493,12 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	/**
+	 * With a fresh PHP environment this might throw an exception:
+	 * `strtotime(): It is not safe to rely on the system's timezone settings. You are
+	 * *required* to use the date.timezone setting or the date_default_timezone_set() function.`
+	 * See also http://www.php.net/manual/en/function.date-default-timezone-get.php
+	 */
 	public function testAssertCookie() {
 		$expected = array(
 			'key' => 'key2.nested', 'value' => 'value1', 'expires' => 'May 04 2010 14:02:36 EST'
@@ -543,12 +551,22 @@ class UnitTest extends \lithium\test\Unit {
 
 	public function testExceptionCatching() {
 		$test = new MockSkipThrowsException();
-
 		$test->run();
-
 		$expected = 'skip throws exception';
 		$results = $test->results();
 		$this->assertEqual($expected, $results[0]['message']);
+
+		$test = new MockSetUpThrowsException();
+		$test->run();
+		$expected = 'setUp throws exception';
+		$results = $test->results();
+		$this->assertEqual($expected, $results[0]['message']);
+
+		$test = new MockTearDownThrowsException();
+		$test->run();
+		$expected = 'tearDown throws exception';
+		$results = $test->results();
+		$this->assertEqual($expected, $results[1]['message']);
 	}
 
 	public function testErrorHandling() {

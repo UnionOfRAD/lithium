@@ -148,7 +148,7 @@ class TestTest extends \lithium\test\Unit {
 		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases';
 		$command->run($path);
 
-		$expected = "1 / 1 pass\n0 fails and 2 exceptions\n";
+		$expected = "4 exceptions";
 		$expected = preg_quote($expected, '/');
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);

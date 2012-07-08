@@ -53,7 +53,7 @@ class TestTest extends \lithium\test\Unit {
 		));
 		$test->path = $this->_testPath;
 		$test->run('test');
-		$expected = "PostsTest created in create_test\\tests\\cases\\models.\n";
+		$expected = "PostsTest created in tests/cases/models/PostsTest.php.\n";
 		$result = $test->response->output;
 		$this->assertEqual($expected, $result);
 
@@ -102,7 +102,7 @@ class Post{$id}s {
 		$test = new Test(array('request' => $this->request, 'classes' => $this->classes));
 		$test->path = $this->_testPath;
 		$test->run('test');
-		$expected = "Post{$id}sTest created in create_test\\tests\\cases\\models.\n";
+		$expected = "Post{$id}sTest created in tests/cases/models/Post{$id}sTest.php.\n";
 		$result = $test->response->output;
 		$this->assertEqual($expected, $result);
 

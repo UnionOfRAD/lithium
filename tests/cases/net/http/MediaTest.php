@@ -665,6 +665,17 @@ class MediaTest extends \lithium\test\Unit {
 		)));
 		$this->assertEqual('iphone', Media::negotiate($request));
 	}
+
+	/**
+	 * Tests that empty asset paths correctly return the base path for the asset type, and don't
+	 * generate notices or errors.
+	 */
+	public function testEmptyAssetPaths() {
+		$this->assertEqual('/img/', Media::asset('', 'image'));
+		$this->assertEqual('/css/.css', Media::asset('', 'css'));
+		$this->assertEqual('/js/.js', Media::asset('', 'js'));
+		$this->assertEqual('/', Media::asset('', 'generic'));
+	}
 }
 
 ?>

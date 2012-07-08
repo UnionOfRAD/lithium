@@ -24,6 +24,22 @@ use lithium\core\ConfigException;
  * the data returned from the credential check is written to the session, which is automatically
  * accessed on subsequent checks (though manual re-checking can be forced on a per-instance basis).
  *
+ * To be secure by default (and if you don't override it), a `password` field is never stored in
+ * the session adapter. This prevents a possible password hash to be leaked in a cookie (for
+ * example). You can also be very specific on what you want to store in the session:
+ *
+ * {{{
+ * Auth::config(array(
+ *   'default' => array(
+ *      'session' => array(
+ *        'persist' => array('username', 'email')
+ *      )
+ *   )
+ * ));
+ * }}}
+ *
+ * You can also pass an optional `persist` param to the `check` method to override this default.
+ *
  * For additional information on configuring and working with `Auth`, see the `Form` adapter.
  *
  * @see lithium\security\auth\adapter\Form
@@ -69,7 +85,8 @@ class Auth extends \lithium\core\Adaptable {
 		$defaults = array('session' => array(
 			'key' => $name,
 			'class' => static::$_classes['session'],
-			'options' => array()
+			'options' => array(),
+			'persist' => array()
 		));
 		$config = parent::_initConfig($name, $config) + $defaults;
 		$config['session'] += $defaults['session'];
@@ -99,19 +116,27 @@ class Auth extends \lithium\core\Adaptable {
 	 *              - `'writeSession'` _boolean_: Upon a successful credentials check, the returned
 	 *                user information is, by default, written to the session. Set this to `false`
 	 *                to disable session writing for this authentication check.
+	 *              - `'persist'` _array_: A list of fields that should be stored in the session.
 	 * @return array After a successful credential check against the adapter (or a successful
 	 *         lookup against the current session), returns an array of user information from the
 	 *         storage backend used by the configured adapter.
 	 * @filter
 	 */
 	public static function check($name, $credentials = null, array $options = array()) {
-		$defaults = array('checkSession' => true, 'writeSession' => true);
+		$config = static::config($name);
+		$defaults = array(
+			'checkSession' => true,
+			'writeSession' => true,
+			'persist' => $config['session']['persist'] ?: static::_config('persist')
+		);
+
 		$options += $defaults;
 		$params = compact('name', 'credentials', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
 			extract($params);
 			$config = $self::invokeMethod('_config', array($name));
+			$persist = $options['persist'];
 
 			if ($config === null) {
 				throw new ConfigException("Configuration `{$name}` has not been defined.");
@@ -125,6 +150,16 @@ class Auth extends \lithium\core\Adaptable {
 			}
 
 			if (($credentials) && $data = $self::adapter($name)->check($credentials, $options)) {
+				if ($options['persist']) {
+					foreach ($data as $key => $value) {
+						if (!in_array($key, $options['persist'])) {
+							unset($data[$key]);
+						}
+					}
+				} else {
+					unset($data['password']);
+				}
+
 				return ($options['writeSession']) ? $self::set($name, $data) : $data;
 			}
 			return false;

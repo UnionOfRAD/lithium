@@ -178,6 +178,7 @@ class Curl extends \lithium\net\Socket {
 	 * @param string $charset
 	 */
 	public function encoding($charset) {}
+
 	/**
 	 * Sets the options to be used in subsequent curl requests.
 	 *

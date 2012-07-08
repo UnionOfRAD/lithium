@@ -110,7 +110,9 @@ class Html extends \lithium\template\Helper {
 	 * @return string A meta tag containing the specified encoding (literally).
 	 */
 	public function charset($encoding = null) {
-		$encoding = $encoding ?: $this->_context->response()->encoding;
+		if ($response = $this->_context->response()) {
+			$encoding = $encoding ?: $response->encoding;
+		}
 		return $this->_render(__METHOD__, 'charset', compact('encoding'));
 	}
 

@@ -20,8 +20,7 @@ class GettextTest extends \lithium\test\Unit {
 
 	public function skip() {
 		$path = Libraries::get(true, 'resources') . '/tmp/tests';
-		$message = "Path {$path} is not writable.";
-		$this->skipIf(!is_writable($path), $message);
+		$this->skipIf(!is_writable($path), "Path `{$path}` is not writable.");
 	}
 
 	public function setUp() {
