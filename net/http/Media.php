@@ -453,7 +453,7 @@ class Media extends \lithium\core\StaticObject {
 				$file = $self::path($path, $type, $options);
 			}
 
-			if ($path[0] === '/') {
+			if (strlen($path) > 0 && $path[0] === '/') {
 				if ($options['base'] && strpos($path, $options['base']) !== 0) {
 					$path = "{$options['base']}{$path}";
 				}
