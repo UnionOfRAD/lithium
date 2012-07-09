@@ -30,13 +30,13 @@ class SchemaTest extends \lithium\test\Unit {
 			'users' => array('type' => 'id', 'array' => true)
 		)));
 
-		$result = $schema->cast(null, array('users' => new MongoId()), array(
+		$result = $schema->cast(null, null, array('users' => new MongoId()), array(
 			'database' => $this->db
 		));
 
-		$this->assertEqual(array('users'), array_keys($result));
-		$this->assertEqual(1, count($result['users']));
-		$this->assertTrue($result['users'][0] instanceof MongoId);
+		$this->assertEqual(array('users'), array_keys($result->data()));
+		$this->assertEqual(1, count($result->users));
+		$this->assertTrue($result->users[0] instanceof MongoId);
 	}
 
 	public function testCastingEmptyValues() {
@@ -44,7 +44,7 @@ class SchemaTest extends \lithium\test\Unit {
 			'_id' => array('type' => 'id'),
 			'foo' => array('type' => 'string', 'array' => true)
 		)));
-		$result = $schema->cast(null, null, array('database' => $this->db));
+		$result = $schema->cast(null, null, null, array('database' => $this->db));
 	}
 }
 

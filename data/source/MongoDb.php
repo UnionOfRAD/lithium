@@ -666,8 +666,8 @@ class MongoDb extends \lithium\data\Source {
 		$ops = $this->_operators;
 		$castOpts = array('first' => true, 'database' => $this, 'wrap' => false);
 
-		$cast = function($value) use (&$schema, &$castOpts) {
-			return $schema ? $schema->cast(null, $value, $castOpts) : $value;
+		$cast = function($key, $value) use (&$schema, &$castOpts) {
+			return $schema ? $schema->cast(null, $key, $value, $castOpts) : $value;
 		};
 
 		foreach ($conditions as $key => $value) {
@@ -688,15 +688,13 @@ class MongoDb extends \lithium\data\Source {
 				continue;
 			}
 			if (!is_array($value)) {
-				$value = $cast(array($key => $value));
-				$conditions[$key] = reset($value);
+				$conditions[$key] = $cast($key, $value);
 				continue;
 			}
 			$current = key($value);
 
 			if (!isset($ops[$current]) && $current[0] !== '$') {
-				$value = $cast(array($key => $value));
-				$conditions[$key] = array('$in' => reset($value));
+				$conditions[$key] = array('$in' => $cast($key, $value));
 				continue;
 			}
 			$conditions[$key] = $this->_operators($key, $value, $schema);
@@ -717,14 +715,13 @@ class MongoDb extends \lithium\data\Source {
 		$castOpts = compact('schema');
 		$castOpts += array('first' => true, 'database' => $this, 'wrap' => false);
 
-		$cast = function($value) use (&$schema, &$castOpts) {
-			return $schema ? $schema->cast(null, $value, $castOpts) : $value;
+		$cast = function($key, $value) use (&$schema, &$castOpts) {
+			return $schema ? $schema->cast(null, $key, $value, $castOpts) : $value;
 		};
 
 		foreach ($operators as $key => $value) {
 			if (!isset($this->_operators[$key])) {
-				$value = $cast(array($field => $value));
-				$operators[$key] = reset($value);
+				$operators[$key] = $cast($field, $value);
 				continue;
 			}
 			$operator = $this->_operators[$key];
@@ -736,8 +733,7 @@ class MongoDb extends \lithium\data\Source {
 				return $operator($key, $value, $schema);
 			}
 			unset($operators[$key]);
-			$value = $cast(array($field => $value));
-			$operators[$operator] = reset($value);
+			$operators[$operator] = $cast($field, $value);
 		}
 		return $operators;
 	}

@@ -146,6 +146,10 @@ class DocumentTest extends \lithium\test\Unit {
 
 		$doc->forceArray = false;
 		$result = $doc->export();
+		$this->assertIdentical(array(false), $result['update']['forceArray']->data());
+
+		$doc->forceArray = array();
+		$result = $doc->export();
 		$this->assertIdentical(array(), $result['update']['forceArray']->data());
 	}
 
@@ -657,7 +661,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$modified = $doc->export();
 		$this->assertTrue($modified['exists']);
 		$this->assertEqual(array('foo' => 'bar', 'baz' => 'dib'), $modified['data']);
-		$this->assertEqual(array('nested', 'foo', 'baz'), array_keys($modified['update']));
+		$this->assertEqual(array('foo', 'baz', 'nested'), array_keys($modified['update']));
 		$this->assertNull($modified['key']);
 
 		$nested = $modified['update']['nested']->export();
@@ -675,7 +679,7 @@ class DocumentTest extends \lithium\test\Unit {
 
 		$expected = array('more' => 'cowbell') + $modified['data'];
 		$this->assertEqual($expected, $modified['update']);
-		$this->assertEqual(array('nested', 'foo', 'baz'), array_keys($modified['data']));
+		$this->assertEqual(array('foo', 'baz', 'nested'), array_keys($modified['data']));
 		$this->assertEqual('bar', $modified['data']['foo']);
 		$this->assertEqual('dib', $modified['data']['baz']);
 		$this->assertTrue($modified['exists']);
