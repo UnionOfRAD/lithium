@@ -217,35 +217,28 @@ class RecordSet extends \lithium\data\Collection {
 	}
 
 	/**
-	 * Lazy-loads records from a query using a reference to a database adapter and a query
-	 * result resource.
+	 * Extract the next item from the result ressource and wraps it into a `Record` object.
 	 *
-	 * @param mixed $key
-	 * @return array
+	 * @return mixed Returns the next `Record` if exists. Returns `null` otherwise
 	 */
-	protected function _populate($key = null) {
-		if ($this->closed() || !($model = $this->_model)) {
+	protected function _populate() {
+		if ($this->closed() || !$this->_result->valid()) {
 			return;
 		}
-		if (!$this->_result->valid()) {
-			$this->close();
-			return;
-		}
+
 		$data = $this->_result->current();
 		if ($this->_query) {
 			$data = $this->_mapRecord($data);
 		}
-
-		$result = $this->_set($data, $key);
+		$result = $this->_set($data, null, array('exists' => true));
 		$this->_result->next();
 
 		return $result;
 	}
 
 	protected function _set($data = null, $offset = null, $options = array()) {
-		if ($model = $this->_model) {
-			$conn = $model::connection();
-			$data = is_object($data) ? $data : $conn->item($model, $data);
+		if (($model = $this->_model) && is_array($data)) {
+			$data = $model::connection()->item($model, $data, $options);
 			$key = $model::key($data);
 		} else {
 			$key = $offset;

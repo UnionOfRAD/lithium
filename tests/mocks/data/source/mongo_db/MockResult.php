@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\data\source\mongo_db;
 
-class MockResult extends \lithium\data\source\mongo_db\Result {
+class MockResult extends \lithium\data\source\Result {
 
 	protected $_data = array(
 		array('_id' => '4c8f86167675abfabdbf0300', 'title' => 'bar'),

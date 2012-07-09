@@ -123,11 +123,6 @@ abstract class Collection extends \lithium\util\Collection {
 		foreach (array('data', 'classes', 'model', 'result', 'query') as $key) {
 			unset($this->_config[$key]);
 		}
-		if ($schema = $this->schema()) {
-			$exists = isset($this->_config['exists']) ? $this->_config['exists'] : null;
-			$pathKey = $this->_pathKey;
-			$this->_data = $schema->cast($this, $this->_data, compact('exists', 'pathKey'));
-		}
 	}
 
 	/**
@@ -218,20 +213,14 @@ abstract class Collection extends \lithium\util\Collection {
 	}
 
 	/**
-	 * Gets a record from the record set using PHP's array syntax, i.e. `$documents[5]`. Using loose
-	 * typing, integer keys can be accessed using strings and vice-versa.
+	 * Gets an `Entity` object using PHP's array syntax, i.e. `$documents[3]` or `$records[5]`.
 	 *
-	 * @param mixed $offset String or integer indicating the offset or index of a document in the set
-	 * @return object Returns an object in the document set.
+	 * @param mixed $offset The offset.
+	 * @return mixed Returns an `Entity` object if exists otherwise returns `null`.
 	 */
 	public function offsetGet($offset) {
-		$data = null;
-		if (!array_key_exists($offset, $this->_data) && !$data = $this->_populate($offset)) {
-			return null;
-		}
-		if ($data && $this->_model) {
-			$this->_data[$offset] = $this->schema()->cast($this, $this->_data[$offset]);
-		}
+		while (!array_key_exists($offset, $this->_data) && $this->_populate()) {}
+
 		if (array_key_exists($offset, $this->_data)) {
 			return $this->_data[$offset];
 		}
@@ -249,21 +238,6 @@ abstract class Collection extends \lithium\util\Collection {
 	public function offsetSet($offset, $data) {
 		$this->offsetGet($offset);
 		return $this->_set($data, $offset);
-	}
-
-	protected function _set($data = null, $offset = null, $options = array()) {
-		if ($schema = $this->schema()) {
-			$model = $this->_model;
-			$pathKey = $this->_pathKey;
-			$options =  compact('model', 'pathKey' ) + $options;
-			$result = $schema->cast($this, array($offset => $data), $options);
-			$data = reset($result);
-		}
-		($offset === null) ? $this->_data[] = $data : $this->_data[$offset] = $data;
-		if (is_object($data)) {
-			$data->assignTo($this);
-		}
-		return $data;
 	}
 
 	/**
@@ -389,9 +363,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return object This collection instance.
 	 */
 	public function each($filter) {
-		if (!$this->closed()) {
-			while ($this->next()) {}
-		}
+		$this->offsetGet(null);
 		return parent::each($filter);
 	}
 
@@ -411,9 +383,7 @@ abstract class Collection extends \lithium\util\Collection {
 		$defaults = array('collect' => true);
 		$options += $defaults;
 
-		if (!$this->closed()) {
-			while ($this->next()) {}
-		}
+		$this->offsetGet(null);
 		$data = parent::map($filter, $options);
 
 		if ($options['collect']) {
@@ -531,12 +501,24 @@ abstract class Collection extends \lithium\util\Collection {
 	 * data and wraps it in the appropriate object type, which is added into the `Collection` and
 	 * returned.
 	 *
-	 * @param mixed $key String, integer or array key representing the unique key of the data
-	 *              object. If `null`, the key will be extracted from the data passed or fetched,
-	 *              using the associated `Model` class.
-	 * @return object Returns a `Record` or `Document` object, or other `Entity` object.
+	 * @return mixed Returns the next `Record`, `Document` object or other `Entity` object if
+	 *         exists. Returns `null` otherwise.
 	 */
-	abstract protected function _populate($key = null);
+	abstract protected function _populate();
+
+	/**
+	 * A method to be implemented by concrete `Collection` classes which sets data to a specified
+	 * offset and wraps all data array in its appropriate object type.
+	 *
+	 * @see lithium\data\Collection::_populate()
+	 * @see lithium\data\Collection::_offsetSet()
+	 *
+	 * @param mixed $data An array or an `Entity` object to set.
+	 * @param mixed $offset The offset. If offset is `null` data is simply appended to the set.
+	 * @param array $options Any additional options to pass to the `Entity`'s constructor.
+	 * @return object Returns the inserted `Record`, `Document` object or other `Entity` object.
+	 */
+	abstract protected function _set($data = null, $offset = null, $options = array());
 }
 
 ?>

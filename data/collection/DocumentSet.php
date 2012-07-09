@@ -25,7 +25,10 @@ class DocumentSet extends \lithium\data\Collection {
 		$pathKey = $this->_pathKey;
 		$model = $this->_model;
 
-		if (is_object($schema = $this->schema())) {
+		if (($model = $this->_model) && ($schema = $this->schema())) {
+			$exists = $this->_exists;
+			$pathKey = $this->_pathKey;
+			$this->_data = $schema->cast($this, $this->_data, compact('exists', 'pathKey'));
 			foreach ($this->_data as &$data) {
 				$data = $schema->cast($this, $data, compact('pathKey', 'model'));
 			}
@@ -41,9 +44,7 @@ class DocumentSet extends \lithium\data\Collection {
 			$this->_exists = true;
 		}
 
-		while (!$this->closed()) {
-			$this->_populate();
-		}
+		$this->offsetGet(null);
 		$this->_original = $this->_data;
 	}
 
@@ -60,6 +61,7 @@ class DocumentSet extends \lithium\data\Collection {
 			'MongoDate' => function($value) { return $value->sec; }
 		));
 
+		$this->offsetGet(null);
 		if ($format == 'array') {
 			$options += $defaults;
 			return Collection::toArray($this->_data, $options);
@@ -68,9 +70,7 @@ class DocumentSet extends \lithium\data\Collection {
 	}
 
 	public function export(array $options = array()) {
-		while (!$this->closed()) {
-			$this->_populate();
-		}
+		$this->offsetGet(null);
 		return array(
 			'exists' => $this->_exists,
 			'key'  => $this->_pathKey,
@@ -80,29 +80,35 @@ class DocumentSet extends \lithium\data\Collection {
 	}
 
 	/**
-	 * Lazy-loads a document from a query using a reference to a database adapter and a query
-	 * result resource.
+	 * Extract the next item from the result ressource and wraps it into a `Document` object.
 	 *
-	 * @param mixed $offset
-	 * @return array
+	 * @return mixed Returns the next `Document` if exists. Returns `null` otherwise
 	 */
-	protected function _populate($offset = null) {
-		if ($this->closed() || !($model = $this->_model)) {
+	protected function _populate() {
+		if ($this->closed() || !$this->_result->valid()) {
 			return;
 		}
-
-		do {
-			if (!$this->_result->valid()) {
-				$this->close();
-				return;
-			}
-			$data = $this->_result->current();
-			$result = $this->_set($data, null, array('exists' => true));
-			$this->_original[] = $result;
-			$this->_result->next();
-		} while ($offset !== null && !array_key_exists($offset, $this->_original));
+		$data = $this->_result->current();
+		$result = $this->_set($data, null, array('exists' => true));
+		$this->_original[] = $result;
+		$this->_result->next();
 
 		return $result;
+	}
+
+	protected function _set($data = null, $offset = null, $options = array()) {
+		if ($schema = $this->schema()) {
+			$model = $this->_model;
+			$pathKey = $this->_pathKey;
+			$options =  compact('model', 'pathKey') + $options;
+			$result = $schema->cast($this, array($offset => $data), $options);
+			$data = reset($result);
+		}
+		($offset === null) ? $this->_data[] = $data : $this->_data[$offset] = $data;
+		if (is_object($data)) {
+			$data->assignTo($this);
+		}
+		return $data;
 	}
 }
 
