@@ -35,6 +35,13 @@ use lithium\core\Libraries;
 class Multibyte extends \lithium\core\Adaptable {
 
 	/**
+	 * Contains adapter configurations for `Multibyte` adapters.
+	 *
+	 * @var array
+	 */
+	protected static $_configurations = array();
+
+	/**
 	 * `Libraries::locate()`-compatible path to adapters for this class.
 	 *
 	 * @see lithium\core\Libraries::locate()
