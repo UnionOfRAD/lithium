@@ -177,6 +177,23 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual('pages/test_app', $request->url);
 	}
 
+	public function testRequestWithColon() {
+		unset($_GET['url']);
+		$request = new Request(array('env' => array(
+			'PHP_SELF' => '/test_app/app/webroot/index.php',
+			'REQUEST_URI' => '/test_app/pages/test_app/test:a'
+		)));
+		$this->assertEqual('/test_app', $request->env('base'));
+		$this->assertEqual('pages/test_app/test:a', $request->url);
+
+		$request = new Request(array('env' => array(
+			'PHP_SELF' => '/test_app/app/webroot/index.php',
+			'REQUEST_URI' => '/test_app/pages/test_app/test:1'
+		)));
+		$this->assertEqual('/test_app', $request->env('base'));
+		$this->assertEqual('pages/test_app/test:1', $request->url);
+	}
+
 	public function testRequestWithoutUrlQueryParamAndNoApp() {
 		unset($_GET['url']);
 		$request = new Request(array('env' => array(
