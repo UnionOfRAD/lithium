@@ -380,7 +380,9 @@ class RouteTest extends \lithium\test\Unit {
 	 * Tests creating a route with a custom sub-pattern and trailing route
 	 */
 	public function testCustomSubPatternWithTrailing() {
-		$route = new Route(array('template' => '/{:controller}/{:action}/{:id:[0-9]+}/abcdefghijklm'));
+		$route = new Route(array(
+			'template' => '/{:controller}/{:action}/{:id:[0-9]+}/abcdefghijklm'
+		));
 
 		$request = new Request();
 		$request->url = '/users/view/10/abcdefghijklm';

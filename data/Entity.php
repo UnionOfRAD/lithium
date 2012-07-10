@@ -369,17 +369,25 @@ class Entity extends \lithium\core\Object {
 	 */
 	public function modified() {
 		$fields = array_fill_keys(array_keys($this->_data), false);
+
 		foreach ($this->_updated as $field => $value) {
-			if (is_object($value) && method_exists($value, 'modified')) {
-				if (!isset($this->_data[$field])) {
-					$fields[$field] = true;
-					continue;
-				}
-				$modified = $value->modified();
-				$fields[$field] = $modified === true || is_array($modified) && in_array(true, $modified, true);
-			} else {
-				$fields[$field] = !isset($fields[$field]) || $this->_data[$field] !== $this->_updated[$field];
+			if (!is_object($value) || !method_exists($value, 'modified')) {
+				$fields[$field] = (
+					!isset($fields[$field]) ||
+					$this->_data[$field] !== $this->_updated[$field]
+				);
+				continue;
 			}
+			if (!isset($this->_data[$field])) {
+				$fields[$field] = true;
+				continue;
+			}
+			$modified = $value->modified();
+
+			$fields[$field] = (
+				$modified === true ||
+				is_array($modified) && in_array(true, $modified, true)
+			);
 		}
 		return $fields;
 	}

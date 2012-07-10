@@ -17,3 +17,5 @@ class MockErrorHandler extends \lithium\core\ErrorHandler {
 		return static::$_checks;
 	}
 }
+
+?>

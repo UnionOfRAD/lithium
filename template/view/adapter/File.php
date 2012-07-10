@@ -79,7 +79,11 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'classes' => array(), 'compile' => true, 'compiler' => array(), 'extract' => true, 'paths' => array()
+			'classes' => array(),
+			'compile' => true,
+			'compiler' => array(),
+			'extract' => true,
+			'paths' => array()
 		);
 		parent::__construct($config + $defaults);
 	}
