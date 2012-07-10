@@ -10,14 +10,8 @@ namespace lithium\tests\mocks\data\collection;
 
 class MockRecordSet extends \lithium\data\collection\RecordSet {
 
-	protected $_closed = false;
-
 	public function close() {
 		$this->_closed = true;
-	}
-
-	public function closed() {
-		return $this->_closed;
 	}
 	/**
 	 * Convenience method for lazy loading testing
@@ -25,8 +19,8 @@ class MockRecordSet extends \lithium\data\collection\RecordSet {
 	 *
 	 */
 	public function reset() {
-		$this->_closed = false;
 		if (is_object($this->_result) && method_exists($this->_result, 'rewind')) {
+			$this->_closed = false;
 			$this->_init = false;
 			$this->_started = false;
 			$this->_valid = false;
