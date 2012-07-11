@@ -298,7 +298,7 @@ class ExporterTest extends \lithium\test\Unit {
 	public function testNestedObjectCasting() {
 		$model = $this->_model;
 		$data = array('notifications' => array('foo' => '', 'bar' => '1', 'baz' => 0, 'dib' => 42));
-		$result = $model::schema()->cast(null, $data, compact('model'));
+		$result = $model::schema()->cast(null, null, $data, compact('model'));
 
 		$this->assertIdentical(false, $result['notifications']->foo);
 		$this->assertIdentical(true, $result['notifications']->bar);
@@ -331,38 +331,37 @@ class ExporterTest extends \lithium\test\Unit {
 		$handlers = $this->_handlers;
 		$options = compact('model', 'handlers');
 		$schema = new Schema(array('fields' => $this->_schema));
-		$result = $schema->cast(null, $data, $options);
+		$result = $schema->cast(null, null, $data, $options);
+		$this->assertEqual(array_keys($data), array_keys($result->data()));
+		$this->assertTrue($result->_id instanceof MongoId);
+		$this->assertEqual('4c8f86167675abfabd970300', (string) $result->_id);
 
-		$this->assertEqual(array_keys($data), array_keys($result));
-		$this->assertTrue($result['_id'] instanceof MongoId);
-		$this->assertEqual('4c8f86167675abfabd970300', (string) $result['_id']);
-
-		$this->assertTrue($result['comments'] instanceof DocumentSet);
+		$this->assertTrue($result->comments instanceof DocumentSet);
 		$this->assertEqual(3, count($result['comments']));
 
-		$this->assertTrue($result['comments'][0] instanceof MongoId);
-		$this->assertTrue($result['comments'][1] instanceof MongoId);
-		$this->assertTrue($result['comments'][2] instanceof MongoId);
-		$this->assertEqual('4c8f86167675abfabdbe0300', (string) $result['comments'][0]);
-		$this->assertEqual('4c8f86167675abfabdbf0300', (string) $result['comments'][1]);
-		$this->assertEqual('4c8f86167675abfabdc00300', (string) $result['comments'][2]);
+		$this->assertTrue($result->comments[0] instanceof MongoId);
+		$this->assertTrue($result->comments[1] instanceof MongoId);
+		$this->assertTrue($result->comments[2] instanceof MongoId);
+		$this->assertEqual('4c8f86167675abfabdbe0300', (string) $result->comments[0]);
+		$this->assertEqual('4c8f86167675abfabdbf0300', (string) $result->comments[1]);
+		$this->assertEqual('4c8f86167675abfabdc00300', (string) $result->comments[2]);
 
-		$this->assertEqual($data['comments'], $result['comments']->data());
-		$this->assertEqual(array('test'), $result['tags']->data());
-		$this->assertEqual(array('4c8f86167675abfabdb00300'), $result['authors']->data());
-		$this->assertTrue($result['authors'][0] instanceof MongoId);
+		$this->assertEqual($data['comments'], $result->comments->data());
+		$this->assertEqual(array('test'), $result->tags->data());
+		$this->assertEqual(array('4c8f86167675abfabdb00300'), $result->authors->data());
+		$this->assertTrue($result->authors[0] instanceof MongoId);
 
-		$this->assertTrue($result['modified'] instanceof MongoDate);
-		$this->assertTrue($result['created'] instanceof MongoDate);
-		$this->assertTrue($result['created']->sec > 0);
+		$this->assertTrue($result->modified instanceof MongoDate);
+		$this->assertTrue($result->created instanceof MongoDate);
+		$this->assertTrue($result->created->sec > 0);
 
-		$this->assertTrue($result['empty_array'] instanceof DocumentSet);
+		$this->assertTrue($result->empty_array instanceof DocumentSet);
 
-		$this->assertEqual($time, $result['modified']->sec);
-		$this->assertEqual($time, $result['created']->sec);
+		$this->assertEqual($time, $result->modified->sec);
+		$this->assertEqual($time, $result->created->sec);
 
-		$this->assertIdentical(45, $result['rank_count']);
-		$this->assertIdentical(3.45688, $result['rank']);
+		$this->assertIdentical(45, $result->rank_count);
+		$this->assertIdentical(3.45688, $result->rank);
 	}
 
 	/**
@@ -388,24 +387,24 @@ class ExporterTest extends \lithium\test\Unit {
 		$handlers = $this->_handlers;
 		$options = compact('model', 'handlers');
 		$schema = new Schema(array('fields' => $this->_schema));
-		$result = $schema->cast(null, $data, $options);
+		$result = $schema->cast(null, null, $data, $options);
 
-		$this->assertEqual(array_keys($data), array_keys($result));
-		$this->assertTrue($result['_id'] instanceof MongoId);
-		$this->assertEqual('4c8f86167675abfabd970300', (string) $result['_id']);
+		$this->assertEqual(array_keys($data), array_keys($result->data()));
+		$this->assertTrue($result->_id instanceof MongoId);
+		$this->assertEqual('4c8f86167675abfabd970300', (string) $result->_id);
 
-		$this->assertTrue($result['accounts'] instanceof DocumentSet);
-		$this->assertEqual(2, count($result['accounts']));
+		$this->assertTrue($result->accounts instanceof DocumentSet);
+		$this->assertEqual(2, count($result->accounts));
 
-		$this->assertTrue($result['accounts'][0]['_id'] instanceof MongoId);
-		$this->assertEqual('4fb6e2dd3e91581fe6e75736', (string) $result['accounts'][0]['_id']);
-		$this->assertTrue($result['accounts'][1]['_id'] instanceof MongoId);
-		$this->assertEqual('4fb6e2df3e91581fe6e75737', (string) $result['accounts'][1]['_id']);
+		$this->assertTrue($result->accounts[0]['_id'] instanceof MongoId);
+		$this->assertEqual('4fb6e2dd3e91581fe6e75736', (string) $result->accounts[0]['_id']);
+		$this->assertTrue($result->accounts[1]['_id'] instanceof MongoId);
+		$this->assertEqual('4fb6e2df3e91581fe6e75737', (string) $result->accounts[1]['_id']);
 
-		$this->assertTrue($result['accounts'][0]['created'] instanceof MongoDate);
-		$this->assertTrue($result['accounts'][0]['created']->sec > 0);
-		$this->assertTrue($result['accounts'][1]['created'] instanceof MongoDate);
-		$this->assertTrue($result['accounts'][1]['created']->sec > 0);
+		$this->assertTrue($result->accounts[0]['created'] instanceof MongoDate);
+		$this->assertTrue($result->accounts[0]['created']->sec > 0);
+		$this->assertTrue($result->accounts[1]['created'] instanceof MongoDate);
+		$this->assertTrue($result->accounts[1]['created']->sec > 0);
 	}
 
 	public function testWithArraySchema() {

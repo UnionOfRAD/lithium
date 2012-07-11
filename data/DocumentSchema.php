@@ -22,7 +22,7 @@ class DocumentSchema extends \lithium\data\Schema {
 		parent::_init();
 	}
 
-	public function cast($object, $data, array $options = array()) {
+	public function cast($object, $key, $data, array $options = array()) {
 		$defaults = array('pathKey' => null, 'model' => null, 'wrap' => true, 'first' => false);
 		$options += $defaults;
 
@@ -30,28 +30,21 @@ class DocumentSchema extends \lithium\data\Schema {
 		$model = (!$options['model'] && $object) ? $object->model() : $options['model'];
 		$classes = $this->_classes;
 
-		if (is_scalar($data) || !$data) {
-			return $this->_castType($data, $basePathKey);
+		$fieldName = is_int($key) ? null : $key;
+
+		if ($fieldName) {
+			$pathKey = $basePathKey ? "{$basePathKey}.{$fieldName}" : $fieldName;
+		} else {
+			$pathKey = $basePathKey;
 		}
 
-		foreach ($data as $key => $val) {
-			$fieldName = is_int($key) ? null : $key;
-
-			if ($fieldName) {
-				$pathKey = $basePathKey ? "{$basePathKey}.{$fieldName}" : $fieldName;
-			} else {
-				$pathKey = $basePathKey;
-			}
-
-			if ($val instanceof $classes['set'] || $val instanceof $classes['entity']) {
-				continue;
-			}
-			if ((is_object($val) || is_object($data)) && !$this->is('array', $pathKey)) {
-				continue;
-			}
-			$data[$key] = $this->_castArray($object, $val, $pathKey, $options, $defaults);
+		if ($data instanceof $classes['set'] || $data instanceof $classes['entity']) {
+			return $data;
 		}
-		return $data;
+		if (is_object($data) && !$this->is('array', $pathKey)) {
+			return $data;
+		}
+		return $this->_castArray($object, $data, $pathKey, $options, $defaults);
 	}
 
 	protected function _castArray($object, $val, $pathKey, $options, $defaults) {
@@ -70,13 +63,7 @@ class DocumentSchema extends \lithium\data\Schema {
 		}
 
 		if (($isArray && !$isObject) || $numericArray) {
-			if ($val) {
-				$val = $valIsArray ? $val : array($val);
-				$keys = array_fill(0, count($val), $pathKey);
-				$val = array_map(array(&$this, '_castType'), $val, $keys);
-			} else {
-				$val = array();
-			}
+			$val = $valIsArray ? $val : array($val);
 			$class = 'set';
 		}
 
@@ -84,6 +71,11 @@ class DocumentSchema extends \lithium\data\Schema {
 			$config = array('data' => $val, 'model' => $options['model'], 'schema' => $this);
 			$config += compact('pathKey') + array_diff_key($options, $defaults);
 			$val = $this->_instance($class, $config);
+		} elseif ($class == 'set') {
+			$val = $val ?: array();
+			foreach ($val as &$value) {
+				$value = $this->_castType($value, $pathKey);
+			}
 		}
 		return $val;
 	}

@@ -22,17 +22,7 @@ class DocumentSet extends \lithium\data\Collection {
 
 	protected function _init() {
 		parent::_init();
-		$pathKey = $this->_pathKey;
-		$model = $this->_model;
-
-		if (($model = $this->_model) && ($schema = $this->schema())) {
-			$exists = $this->_exists;
-			$pathKey = $this->_pathKey;
-			$this->_data = $schema->cast($this, $this->_data, compact('exists', 'pathKey'));
-			foreach ($this->_data as &$data) {
-				$data = $schema->cast($this, $data, compact('pathKey', 'model'));
-			}
-		}
+		$this->set($this->_data);
 		$this->_original = $this->_data;
 	}
 
@@ -100,12 +90,11 @@ class DocumentSet extends \lithium\data\Collection {
 		if ($schema = $this->schema()) {
 			$model = $this->_model;
 			$pathKey = $this->_pathKey;
-			$options =  compact('model', 'pathKey') + $options;
-			$result = $schema->cast($this, array($offset => $data), $options);
-			$data = reset($result);
+			$options =  compact('model', 'pathKey' ) + $options;
+			$data = $schema->cast($this, $offset, $data, $options);
 		}
 		($offset === null) ? $this->_data[] = $data : $this->_data[$offset] = $data;
-		if (is_object($data)) {
+		if (method_exists($data, 'assignTo')) {
 			$data->assignTo($this);
 		}
 		return $data;

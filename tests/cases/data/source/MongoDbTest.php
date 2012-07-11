@@ -740,7 +740,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$query = new Query(array('type' => 'update') + compact('entity'));
 		$result = $query->export($this->db);
-		$expected = array('updated', '_id', 'created', 'list');
+		$expected = array('_id', 'created', 'list', 'updated');
 		$this->assertEqual($expected, array_keys($result['data']['update']));
 		$this->assertTrue($result['data']['update']['updated'] instanceof MongoDate);
 	}
