@@ -291,29 +291,27 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		$defaults = array('init' => false);
 		$options += $defaults;
 
+		$cast = ($schema = $this->schema());
+
 		foreach ($data as $key => $val) {
+			unset($this->_increment[$key]);
 			if (strpos($key, '.')) {
 				$this->_setNested($key, $val);
-				unset($data[$key]);
+				continue;
 			}
-			unset($this->_increment[$key]);
-		}
-
-		if ($data && ($schema = $this->schema())) {
-			$pathKey = $this->_pathKey;
-			$model = $this->_model;
-			$data = $schema->cast($this, $data, compact('pathKey', 'model'));
-		}
-
-		foreach ($data as $key => $value) {
-			if ($value instanceof self) {
-				$value->_exists = $options['init'] && $this->_exists;
-				$value->_pathKey = ($this->_pathKey ? "{$this->_pathKey}." : '') . $key;
-				$value->_model = $value->_model ?: $this->_model;
-				$value->_schema = $value->_schema ?: $this->_schema;
+			if ($cast) {
+				$pathKey = $this->_pathKey;
+				$model = $this->_model;
+				$val = $schema->cast($this, $key, $val, compact('pathKey', 'model'));
 			}
+			if ($val instanceof self) {
+				$val->_exists = $options['init'] && $this->_exists;
+				$val->_pathKey = ($this->_pathKey ? "{$this->_pathKey}." : '') . $key;
+				$val->_model = $val->_model ?: $this->_model;
+				$val->_schema = $val->_schema ?: $this->_schema;
+			}
+			$this->_updated[$key] = $val;
 		}
-		$this->_updated = $data + $this->_updated;
 	}
 
 	/**

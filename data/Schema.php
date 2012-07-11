@@ -117,7 +117,7 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 		return isset($this->_types[$type]) ? $this->_types[$type] : $type;
 	}
 
-	public function cast($object, $data, array $options = array()) {
+	public function cast($object, $key, $data, array $options = array()) {
 		return $data;
 	}
 
