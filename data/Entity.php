@@ -364,10 +364,13 @@ class Entity extends \lithium\core\Object {
 	/**
 	 * Gets the array of fields modified on this entity.
 	 *
+	 * @param array $options Any options. Currently used:
+	 *              - 'all', defaults to True. Return all fields (true), or only the modified (false)
 	 * @return array Returns an array where the keys are entity field names, and the values are
 	 *         `true` for changed fields.
 	 */
-	public function modified() {
+	public function modified(array $options=array()) {
+		$options += array('all' => true);
 		$fields = array_fill_keys(array_keys($this->_data), false);
 		foreach ($this->_updated as $field => $value) {
 			if (is_object($value) && method_exists($value, 'modified')) {
@@ -380,6 +383,9 @@ class Entity extends \lithium\core\Object {
 			} else {
 				$fields[$field] = !isset($fields[$field]) || $this->_data[$field] !== $this->_updated[$field];
 			}
+		}
+		if (!$options['all']) {
+			$fields = array_filter($fields);
 		}
 		return $fields;
 	}

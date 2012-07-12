@@ -118,6 +118,12 @@ class EntityTest extends \lithium\test\Unit {
 		$data = array('foo' => 'bar', 'baz' => 'dib');
 		$entity->set($data);
 		$this->assertEqual(array('foo' => true, 'baz' => true), $entity->modified());
+		
+		$entity->sync();
+		$this->assertEqual(array('foo' => false, 'baz' => false), $entity->modified());
+		$entity->foo = 'barbar';
+		$this->assertEqual(array('foo' => true, 'baz' => false), $entity->modified());
+		$this->assertEqual(array('foo' => true), $entity->modified(array('all' => false)));
 	}
 }
 
