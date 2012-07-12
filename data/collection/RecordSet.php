@@ -318,12 +318,12 @@ class RecordSet extends \lithium\data\Collection {
 					$data = $conn->item($relModel, $data, $options);
 				}
 				$opts = array('class' => 'set');
-				$relationships[$field] = $conn->item($relModel, $rel, $options + $opts);
+				$main[$field] = $conn->item($relModel, $rel, $options + $opts);
 				continue;
 			}
-			$relationships[$field] = $conn->item($relModel, $rel, $options);
+			$main[$field] = $conn->item($relModel, $rel, $options);
 		}
-		return $conn->item($primary, $main, $options + compact('relationships'));
+		return $conn->item($primary, $main, $options);
 	}
 
 	protected function _columnMap() {
