@@ -165,6 +165,13 @@ class Model extends \lithium\core\StaticObject {
 	protected $_relations = array();
 
 	/**
+	 * An array containing the match between fieldname and their corresponding relation name.
+	 *
+	 * @var array
+	 */
+	protected $_relationships = array();
+
+	/**
 	 * List of relation types.
 	 *
 	 * Valid relation types are:
@@ -642,6 +649,22 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Returns the relation name associated to a field name, or a list of field name associated
+	 * to their to corresponding relation name if `$fieldname` is null.
+	 *
+	 * @param string $fieldname A fieldname.
+	 * @return mixed A relation name or an array of associations.
+	 */
+	public static function relationships($fieldname = null) {
+		$self = static::_object();
+
+		if (!$fieldname) {
+			return $self->_relationships;
+		}
+		return isset($self->_relationships[$fieldname]) ? $self->_relationships[$fieldname] : null;
+	}
+
+	/**
 	 * Creates a relationship binding between this model and another.
 	 *
 	 * @see lithium\data\model\Relationship
@@ -661,6 +684,7 @@ class Model extends \lithium\core\StaticObject {
 			throw new ConfigException("Invalid relationship type `{$type}` specified.");
 		}
 		$rel = static::connection()->relationship(get_called_class(), $type, $name, $config);
+		$self->_relationships[$rel->fieldName()] = $name;
 		return $self->_relations[$name] = $rel;
 	}
 

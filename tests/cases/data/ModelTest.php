@@ -790,6 +790,19 @@ class ModelTest extends \lithium\test\Unit {
 		$result = MockBadConnection::meta('connection');
 		$this->assertFalse($result);
 	}
+
+	public function testRelationships() {
+		MockPost::bind('hasMany', 'MockTag');
+		$relationships = MockPost::relationships();
+		$this->assertEqual(array(
+			'mock_comments' => 'MockComment',
+			'mock_tags' => 'MockTag'
+		), $relationships);
+
+		$this->assertEqual('MockComment', MockPost::relationships('mock_comments'));
+		$this->assertEqual('MockTag', MockPost::relationships('mock_tags'));
+		$this->assertNull(MockPost::relationships('undefined'));
+	}
 }
 
 ?>
