@@ -240,7 +240,10 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 		$defaults = array('internal' => false);
 		$options += $defaults;
 		$data = $options['internal'] ? $this->_data : $this;
+		return $this->_to($format, $data, $options);
+	}
 
+	protected function _to($format, &$data, &$options) {
 		if (is_object($format) && is_callable($format)) {
 			return $format($data, $options);
 		}

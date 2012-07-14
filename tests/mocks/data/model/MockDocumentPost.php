@@ -47,7 +47,7 @@ class MockDocumentPost extends \lithium\tests\mocks\data\MockBase {
 		switch ($type) {
 			case 'first':
 				return new Document(array(
-					'data' => array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
+					'data' => array('_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
 					'model' => __CLASS__
 				));
 			break;
@@ -55,9 +55,9 @@ class MockDocumentPost extends \lithium\tests\mocks\data\MockBase {
 			default :
 				return new DocumentSet(array(
 					'data' => array(
-						array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
-						array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
-						array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
+						array('_id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
+						array('_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
+						array('_id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
 					),
 					'model' => __CLASS__
 				));

@@ -32,15 +32,15 @@ class DocumentTest extends \lithium\test\Unit {
 	public function testFindAllAndIterate() {
 		$set = MockDocumentPost::all();
 
-		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
+		$expected = array('_id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
 		$result = $set->current()->data();
 		$this->assertEqual($expected, $result);
 
-		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
+		$expected = array('_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
 		$result = $set->next()->data();
 		$this->assertEqual($expected, $result);
 
-		$expected = array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three');
+		$expected = array('_id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three');
 		$set->next();
 		$result = $set->current()->data();
 		$this->assertEqual($expected, $result);
@@ -48,7 +48,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $set->next();
 		$this->assertTrue(empty($result));
 
-		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
+		$expected = array('_id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
 		$result = $set->rewind()->data();
 		$this->assertEqual($expected, $result);
 	}
@@ -56,7 +56,7 @@ class DocumentTest extends \lithium\test\Unit {
 	public function testFindOne() {
 		$document = MockDocumentPost::find('first');
 
-		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
+		$expected = array('_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
 		$result = $document->data();
 		$this->assertEqual($expected, $result);
 	}
@@ -65,7 +65,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$document = MockDocumentPost::find('first');
 
 		$expected = 2;
-		$result = $document->id;
+		$result = $document->_id;
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Two';
@@ -79,12 +79,12 @@ class DocumentTest extends \lithium\test\Unit {
 
 	public function testSetField() {
 		$doc = new Document();
-		$doc->id = 4;
+		$doc->_id = 4;
 		$doc->name = 'Four';
 		$doc->content = 'Lorem ipsum four';
 
 		$expected = array(
-			'id' => 4,
+			'_id' => 4,
 			'name' => 'Four',
 			'content' => 'Lorem ipsum four'
 		);
@@ -94,12 +94,12 @@ class DocumentTest extends \lithium\test\Unit {
 
 	public function testSyncModified() {
 		$doc = new Document();
-		$doc->id = 4;
+		$doc->_id = 4;
 		$doc->name = 'Four';
 		$doc->content = 'Lorem ipsum four';
 
 		$expected = array(
-			'id' => true,
+			'_id' => true,
 			'name' => true,
 			'content' => true
 		);
@@ -110,11 +110,11 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual(array_fill_keys(array_keys($expected), false), $doc->modified());
 
 
-		$doc->id = 5;
+		$doc->_id = 5;
 		$doc->content = null;
 		$doc->new = null;
 		$expected = array(
-			'id' => true,
+			'_id' => true,
 			'name' => false,
 			'content' => true,
 			'new' => true
@@ -188,33 +188,33 @@ class DocumentTest extends \lithium\test\Unit {
 
 	public function testNoItems() {
 		$doc = new Document(array('model' => $this->_model, 'data' => array()));
-		$result = $doc->id;
+		$result = $doc->_id;
 		$this->assertFalse($result);
 	}
 
 	public function testWithData() {
 		$doc = new DocumentSet(array('model' => $this->_model, 'data' => array(
-			array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
-			array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
-			array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
+			array('_id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
+			array('_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
+			array('_id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
 		)));
 
-		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
+		$expected = array('_id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
 		$result = $doc->current()->data();
 		$this->assertEqual($expected, $result);
 
-		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
+		$expected = array('_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
 		$result = $doc->next()->data();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testExplicitSet() {
 		$doc = new Document();
-		$doc->set(array('id' => 4));
+		$doc->set(array('_id' => 4));
 		$doc->set(array('name' => 'Four'));
 		$doc->set(array('content' => 'Lorem ipsum four'));
 
-		$expected = array('id' => 4, 'name' => 'Four', 'content' => 'Lorem ipsum four');
+		$expected = array('_id' => 4, 'name' => 'Four', 'content' => 'Lorem ipsum four');
 		$result = $doc->data();
 		$this->assertEqual($expected, $result);
 	}
@@ -222,48 +222,48 @@ class DocumentTest extends \lithium\test\Unit {
 	public function testSetMultiple() {
 		$doc = new DocumentSet(array('model' => $this->_model));
 		$doc->set(array(
-			array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
-			array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
-			array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
+			array('_id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
+			array('_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
+			array('_id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
 		));
-		$expected = array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
+		$expected = array('_id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
 		return;
 		$result = $doc->current()->data();
 		$this->assertEqual($expected, $result);
 
-		$expected = array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
+		$expected = array('_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two');
 		$result = $doc->next()->data();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testSetMultipleNested() {
 		$doc = new Document(array('model' => $this->_model));
-		$doc->id = 123;
+		$doc->_id = 123;
 		$doc->type = 'father';
 
 		$doc->set(array('children' => array(
-			array('id' => 124, 'type' => 'child', 'children' => null),
-			array('id' => 125, 'type' => 'child', 'children' => null)
+			array('_id' => 124, 'type' => 'child', 'children' => null),
+			array('_id' => 125, 'type' => 'child', 'children' => null)
 		)));
 
 		$this->assertEqual('father', $doc->type);
 		$this->assertTrue($doc->children instanceof DocumentSet);
 
-		$expected = array('id' => 124, 'type' => 'child', 'children' => null);
-		$result = $doc->children[0]->data();
+		$expected = array('_id' => 124, 'type' => 'child', 'children' => null);
+		$result = $doc->children[124]->data();
 		$this->assertEqual($expected, $result);
 
-		$expected = array('id' => 125, 'type' => 'child', 'children' => null);
-		$result = $doc->children[1]->data();
+		$expected = array('_id' => 125, 'type' => 'child', 'children' => null);
+		$result = $doc->children[125]->data();
 		// @todo Make $result = $doc->children->{1}->data(); work as well (and ...->{'1'}->...)
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testSetNested() {
 		$doc = new Document(array('model' => $this->_model));
-		$doc->id = 123;
+		$doc->_id = 123;
 		$doc->name = 'father';
-		$doc->set(array('child' => array('id' => 124, 'name' => 'child')));
+		$doc->set(array('child' => array('_id' => 124, 'name' => 'child')));
 
 		$this->assertEqual('father', $doc->name);
 
@@ -272,7 +272,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->skipIf(!$doc->child instanceof Document, 'Child is not of the type Document');
 
 		$expected = 124;
-		$result = $doc->child->id;
+		$result = $doc->child->_id;
 		$this->assertEqual($expected, $result);
 
 		$expected = 'child';
@@ -298,12 +298,12 @@ class DocumentTest extends \lithium\test\Unit {
 
 	public function testRewindData() {
 		$doc = new DocumentSet(array('model' => $this->_model, 'data' => array(
-			array('id' => 1, 'name' => 'One'),
-			array('id' => 2, 'name' => 'Two'),
-			array('id' => 3, 'name' => 'Three')
+			array('_id' => 1, 'name' => 'One'),
+			array('_id' => 2, 'name' => 'Two'),
+			array('_id' => 3, 'name' => 'Three')
 		)));
 
-		$expected = array('id' => 1, 'name' => 'One');
+		$expected = array('_id' => 1, 'name' => 'One');
 		$result = $doc->rewind()->data();
 		$this->assertEqual($expected, $result);
 	}
@@ -323,18 +323,18 @@ class DocumentTest extends \lithium\test\Unit {
 
 	public function testUpdateWithMultipleKeys() {
 		$model = 'lithium\tests\mocks\data\model\MockDocumentMultipleKey';
-		$model::config(array('meta' => array('key' => array('id', 'rev'), 'foo' => true)));
+		$model::config(array('meta' => array('key' => array('_id', 'rev'), 'foo' => true)));
 		$doc = new Document(compact('model'));
 
 		$result = $model::meta('key');
-		$this->assertEqual(array('id', 'rev'), $result);
+		$this->assertEqual(array('_id', 'rev'), $result);
 
-		$doc->id = 3;
+		$doc->_id = 3;
 		$this->assertFalse($doc->exists());
 
 		$doc->sync(array(12, '1-2'));
 		$this->assertTrue($doc->exists());
-		$this->assertEqual(12, $doc->id);
+		$this->assertEqual(12, $doc->_id);
 		$this->assertEqual('1-2', $doc->rev);
 	}
 
@@ -342,28 +342,28 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc = new Document(array(
 			'model' => 'lithium\tests\mocks\data\model\MockDocumentPost',
 			'data' => array(
-				'id' => 12, 'arr' => array('id' => 33, 'name' => 'stone'), 'name' => 'bird'
+				'_id' => 12, 'arr' => array('_id' => 33, 'name' => 'stone'), 'name' => 'bird'
 			)
 		));
 
-		$this->assertEqual(12, $doc->id);
+		$this->assertEqual(12, $doc->_id);
 		$this->assertEqual('bird', $doc->name);
 
 		$this->assertTrue(is_object($doc->arr), 'arr is not an object');
 		$this->assertTrue($doc->arr instanceof Document, 'arr is not of the type Document');
 		$this->skipIf(!$doc->arr instanceof Document, 'arr is not of the type Document');
 
-		$this->assertEqual(33, $doc->arr->id);
+		$this->assertEqual(33, $doc->arr->_id);
 		$this->assertEqual('stone', $doc->arr->name);
 	}
 
 	public function testArrayValueGet() {
 		$doc = new Document(array(
 			'model' => $this->_model,
-			'data' => array('id' => 12, 'name' => 'Joe', 'sons' => array('Moe', 'Greg'))
+			'data' => array('_id' => 12, 'name' => 'Joe', 'sons' => array('Moe', 'Greg'))
 		));
 
-		$this->assertEqual(12, $doc->id);
+		$this->assertEqual(12, $doc->_id);
 		$this->assertEqual('Joe', $doc->name);
 
 		$this->assertTrue($doc->sons instanceof DocumentSet, 'arr is not an array');
@@ -373,13 +373,13 @@ class DocumentTest extends \lithium\test\Unit {
 	public function testArrayValueSet() {
 		$doc = new Document(array('model' => $this->_model));
 
-		$doc->id = 12;
+		$doc->_id = 12;
 		$doc->name = 'Joe';
 		$doc->sons = array('Moe', 'Greg', 12, 0.3);
 		$doc->set(array('daughters' => array('Susan', 'Tinkerbell')));
 
 		$expected = array(
-			'id' => 12,
+			'_id' => 12,
 			'name' => 'Joe',
 			'sons' => array('Moe', 'Greg', 12, 0.3),
 			'daughters' => array('Susan', 'Tinkerbell')
@@ -703,11 +703,11 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->skipIf(!MongoDb::enabled(), "MongoDB not enabled, skipping conversion tests.");
 
 		$doc = new Document(array('data' => array(
-			'id' => new MongoId(),
+			'_id' => new MongoId(),
 			'date' => new MongoDate()
 		)));
 		$result = $doc->data();
-		$this->assertPattern('/^[a-f0-9]{24}$/', $result['id']);
+		$this->assertPattern('/^[a-f0-9]{24}$/', $result['_id']);
 		$this->assertEqual(time(), $result['date']);
 	}
 

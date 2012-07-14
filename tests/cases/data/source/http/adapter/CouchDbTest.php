@@ -168,7 +168,7 @@ class CouchDbTest extends \lithium\test\Unit {
 			'id' => 'a1', 'rev' => '1-1', 'author' => 'author 1', 'body' => 'body 1'
 		);
 		$result = $result->data();
-		$this->assertEqual($expected, $result[0]);
+		$this->assertEqual($expected, $result['a1']);
 
 		$expected = '/lithium-test/_design/latest/_view/all/';
 		$result = $couchdb->last->request->path;
