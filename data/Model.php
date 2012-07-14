@@ -685,7 +685,7 @@ class Model extends \lithium\core\StaticObject {
 				$class = get_called_class();
 				throw new ConfigException("Could not load schema object for model `{$class}`.");
 			}
-			$key = (array) self::meta('key');
+			$key = (array) static::meta('key');
 
 			if ($self->_schema && $self->_schema->fields() && !$self->_schema->has($key)) {
 				$key = implode('`, `', $key);
