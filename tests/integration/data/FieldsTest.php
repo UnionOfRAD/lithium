@@ -133,7 +133,7 @@ class FieldsTest extends \lithium\test\Integration {
 			'name' => 'Acme, Inc.',
 			'employees' =>
 			array (
-				0 => array (
+				$eId => array (
 					'id' => $eId,
 					'name' => 'John Doe'
 				)

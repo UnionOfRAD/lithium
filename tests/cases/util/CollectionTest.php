@@ -20,7 +20,7 @@ class CollectionTest extends \lithium\test\Unit {
 		Collection::formats('lithium\net\http\Media');
 	}
 
-    public function tearDown() {
+	public function tearDown() {
 		Collection::formats(false);
 	}
 

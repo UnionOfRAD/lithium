@@ -139,15 +139,15 @@ class ExporterTest extends \lithium\test\Unit {
 		$resource = new MockResult();
 		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
 		$this->assertFalse(Exporter::get('update', $doc->export()));
-		$this->assertEqual('dib', $doc[2]->title);
+		$this->assertEqual('dib', $doc['6c8f86167675abfabdbf0302']->title);
 
-		$doc[2]->title = 'bob';
-		$this->assertEqual('6c8f86167675abfabdbf0302', $doc[2]->_id);
-		$this->assertEqual('bob', $doc[2]->title);
+		$doc['6c8f86167675abfabdbf0302']->title = 'bob';
+		$this->assertEqual('6c8f86167675abfabdbf0302', $doc['6c8f86167675abfabdbf0302']->_id);
+		$this->assertEqual('bob', $doc['6c8f86167675abfabdbf0302']->title);
 
-		$doc[0]->title = 'bill';
-		$this->assertEqual('4c8f86167675abfabdbf0300', $doc[0]->_id);
-		$this->assertEqual('bill', $doc[0]->title);
+		$doc['4c8f86167675abfabdbf0300']->title = 'bill';
+		$this->assertEqual('4c8f86167675abfabdbf0300', $doc['4c8f86167675abfabdbf0300']->_id);
+		$this->assertEqual('bill', $doc['4c8f86167675abfabdbf0300']->title);
 
 		$expected = Exporter::get('update', $doc->export());
 		$this->assertTrue(Exporter::get('update', $doc->export()));
@@ -396,15 +396,17 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertTrue($result->accounts instanceof DocumentSet);
 		$this->assertEqual(2, count($result->accounts));
 
-		$this->assertTrue($result->accounts[0]['_id'] instanceof MongoId);
-		$this->assertEqual('4fb6e2dd3e91581fe6e75736', (string) $result->accounts[0]['_id']);
-		$this->assertTrue($result->accounts[1]['_id'] instanceof MongoId);
-		$this->assertEqual('4fb6e2df3e91581fe6e75737', (string) $result->accounts[1]['_id']);
+		$id1 = '4fb6e2dd3e91581fe6e75736';
+		$id2 = '4fb6e2df3e91581fe6e75737';
+		$this->assertTrue($result->accounts[$id1]['_id'] instanceof MongoId);
+		$this->assertEqual($id1, (string) $result->accounts[$id1]['_id']);
+		$this->assertTrue($result->accounts[$id2]['_id'] instanceof MongoId);
+		$this->assertEqual($id2, (string) $result->accounts[$id2]['_id']);
 
-		$this->assertTrue($result->accounts[0]['created'] instanceof MongoDate);
-		$this->assertTrue($result->accounts[0]['created']->sec > 0);
-		$this->assertTrue($result->accounts[1]['created'] instanceof MongoDate);
-		$this->assertTrue($result->accounts[1]['created']->sec > 0);
+		$this->assertTrue($result->accounts[$id1]['created'] instanceof MongoDate);
+		$this->assertTrue($result->accounts[$id1]['created']->sec > 0);
+		$this->assertTrue($result->accounts[$id2]['created'] instanceof MongoDate);
+		$this->assertTrue($result->accounts[$id2]['created']->sec > 0);
 	}
 
 	public function testWithArraySchema() {

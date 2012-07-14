@@ -112,7 +112,7 @@ class DatabaseTest extends \lithium\test\Integration {
 		$config['host'] = 'unknown.host.nowhere';
 		$connection = 'wrong_host';
 		Connections::add($connection, $config);
-        $this->expectException('/Unable to connect to host `unknown.host.nowhere`/');
+		$this->expectException('/Unable to connect to host `unknown.host.nowhere`/');
 		Connections::get($connection)->connect();
 	}
 
@@ -122,7 +122,7 @@ class DatabaseTest extends \lithium\test\Integration {
 		$config['password'] = 'wrong_pass';
 		$connection = 'wrong_passord';
 		Connections::add($connection, $config);
-        $this->expectException('/Host connected, but could not access database/');
+		$this->expectException('/Host connected, but could not access database/');
 		Connections::get($connection)->connect();
 	}
 
@@ -192,8 +192,7 @@ class DatabaseTest extends \lithium\test\Integration {
 			'with' => array('Images')
 		));
 		$galleries = $this->db->read($query)->data();
-
-		$images = array($this->images[1], $this->images[2], $this->images[3]);
+		$images = array(1 => $this->images[1], 2 => $this->images[2], 3 => $this->images[3]);
 
 		$this->assertEqual(1, count($galleries));
 		foreach ($galleries as $key => $gallery) {
@@ -261,13 +260,13 @@ class DatabaseTest extends \lithium\test\Integration {
 			'fields' => array(array('count(Images.id) AS count')),
 			'with' => 'Images',
 			'group' => array('Galleries.id'),
-			'order' => array('Galleries.id' => 'ASC'),
+			'order' => array('Galleries.id' => 'ASC')
 		));
 
 		$this->assertEqual(2, count($galleries));
 		$expected = array(3, 2);
 
-		foreach($galleries as $gallery) {
+		foreach ($galleries as $gallery) {
 			$this->assertEqual(current($expected), $gallery->count);
 			next($expected);
 		}
