@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\data\collection;
 
+use MongoId;
 use lithium\data\source\MongoDb;
 use lithium\data\source\mongo_db\Schema;
 use lithium\data\entity\Document;
@@ -46,6 +47,70 @@ class DocumentSetTest extends \lithium\test\Unit {
 		foreach ($array as $value) {
 			$this->assertTrue(is_int($value));
 		}
+	}
+
+	public function testInitialCastingOnSubObject() {
+		$model = $this->_model;
+
+		$schema = new Schema(array('fields' => array(
+			'_id' => array('type' => 'id'),
+			'body' => array('type' => 'string'),
+			'foo' => array('type' => 'object'),
+			'foo.bar' => array('type' => 'int')
+		)));
+
+		$array = new DocumentSet(compact('model', 'schema') + array(
+			'data' => array(
+				array(
+					'_id' => '4cb4ab6d7addf98506010002',
+					'body' => 'body1',
+					'foo' => (object) array('bar' => '1')
+				),
+				array(
+					'_id' => '4cb4ab6d7addf98506010003',
+					'body' => 'body2',
+					'foo' =>  (object) array('bar' => '2')
+				),
+				array(
+					'_id' => '4cb4ab6d7addf98506010004',
+					'body' => 'body3',
+					'foo' => (object) array('bar' => '3')
+				)
+		)));
+
+		foreach ($array as $document) {
+			$this->assertTrue($document->_id instanceof MongoId);
+			$this->assertTrue(is_string($document->body));
+			$this->assertTrue(is_object($document->foo));
+			$this->assertTrue(is_string($document->foo->bar));
+		}
+
+		$array = new DocumentSet(compact('model', 'schema') + array(
+			'data' => array(
+				array(
+					'_id' => '4cb4ab6d7addf98506010002',
+					'body' => 'body1',
+					'foo' => array('bar' => '1')
+				),
+				array(
+					'_id' => '4cb4ab6d7addf98506010003',
+					'body' => 'body2',
+					'foo' => array('bar' => '2')
+				),
+				array(
+					'_id' => '4cb4ab6d7addf98506010004',
+					'body' => 'body3',
+					'foo' => array('bar' => '3')
+				)
+		)));
+
+		foreach ($array as $document) {
+			$this->assertTrue($document->_id instanceof MongoId);
+			$this->assertTrue(is_string($document->body));
+			$this->assertTrue(is_object($document->foo));
+			$this->assertTrue(is_int($document->foo->bar));
+		}
+
 	}
 
 	public function testAddValueAndExport() {
@@ -148,13 +213,13 @@ class DocumentSetTest extends \lithium\test\Unit {
 		$model = $this->_model;
 
 		$expected = array('_id' => '6c8f86167675abfabdbf0302', 'title' => 'dib');
-		$this->assertEqual($expected, $doc[2]->data());
+		$this->assertEqual($expected, $doc['6c8f86167675abfabdbf0302']->data());
 
 		$expected = array('_id' => '5c8f86167675abfabdbf0301', 'title' => 'foo');
-		$this->assertEqual($expected, $doc[1]->data());
+		$this->assertEqual($expected, $doc['5c8f86167675abfabdbf0301']->data());
 
 		$expected = array('_id' => '4c8f86167675abfabdbf0300', 'title' => 'bar');
-		$this->assertEqual($expected, $doc[0]->data());
+		$this->assertEqual($expected, $doc['4c8f86167675abfabdbf0300']->data());
 	}
 
 	public function testMappingToNewDocumentSet() {
@@ -184,6 +249,18 @@ class DocumentSetTest extends \lithium\test\Unit {
 		));
 		$collection = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
 		$this->assertTrue($collection->valid());
+	}
+
+	public function testInternalKeys() {
+		$resource = new MockResult();
+		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
+		$this->assertEqual(array(
+				0 => '4c8f86167675abfabdbf0300',
+				1 => '5c8f86167675abfabdbf0301',
+				2 => '6c8f86167675abfabdbf0302'
+			),
+			$doc->keys()
+		);
 	}
 }
 

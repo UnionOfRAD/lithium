@@ -8,12 +8,11 @@
 
 namespace lithium\tests\mocks\data\source;
 
-use lithium\data\source\MongoDb;
 use lithium\data\source\mongo_db\Schema;
 
 class MockMongoPost extends \lithium\tests\mocks\data\MockBase {
 
-	protected $_meta = array('source' => 'posts', 'connection' => false);
+	protected $_meta = array('source' => 'posts', 'connection' => false, 'key' => '_id');
 
 	public static $connection;
 

@@ -9,6 +9,7 @@
 namespace lithium\data\collection;
 
 use lithium\util\Collection;
+use lithium\data\entity\Document;
 
 class DocumentSet extends \lithium\data\Collection {
 
@@ -22,7 +23,6 @@ class DocumentSet extends \lithium\data\Collection {
 
 	protected function _init() {
 		parent::_init();
-		$this->set($this->_data);
 		$this->_original = $this->_data;
 	}
 
@@ -79,8 +79,7 @@ class DocumentSet extends \lithium\data\Collection {
 			return;
 		}
 		$data = $this->_result->current();
-		$result = $this->_set($data, null, array('exists' => true));
-		$this->_original[] = $result;
+		$result = $this->_set($data, null, array('exists' => true, 'original' => true));
 		$this->_result->next();
 
 		return $result;
@@ -90,12 +89,24 @@ class DocumentSet extends \lithium\data\Collection {
 		if ($schema = $this->schema()) {
 			$model = $this->_model;
 			$pathKey = $this->_pathKey;
-			$options =  compact('model', 'pathKey' ) + $options;
-			$data = $schema->cast($this, $offset, $data, $options);
+			$options =  compact('model', 'pathKey') + $options;
+			$data = !is_object($data) ? $schema->cast($this, $offset, $data, $options) : $data;
+			$key = $model && $data instanceof Document ? $model::key($data) : $offset;
+		} else {
+			$key = $offset;
 		}
-		($offset === null) ? $this->_data[] = $data : $this->_data[$offset] = $data;
+		if (is_array($key)) {
+			$key = count($key) === 1 ? current($key) : null;
+		}
+		if (is_object($key)) {
+			$key = (string) $key;
+		}
 		if (method_exists($data, 'assignTo')) {
 			$data->assignTo($this);
+		}
+		$key !== null ? $this->_data[$key] = $data : $this->_data[] = $data;
+		if (isset($options['original']) && $options['original']) {
+			$key !== null ? $this->_original[$key] = $data : $this->_original[] = $data;
 		}
 		return $data;
 	}

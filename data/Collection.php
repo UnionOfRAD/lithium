@@ -104,7 +104,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'data', 'model', 'result', 'query', 'parent', 'stats', 'pathKey', 'exists', 'schema'
+		'model', 'result', 'query', 'parent', 'stats', 'pathKey', 'exists', 'schema'
 	);
 
 	/**
@@ -118,9 +118,10 @@ abstract class Collection extends \lithium\util\Collection {
 	}
 
 	protected function _init() {
+		$data = $this->_config['data'];
 		parent::_init();
-
-		foreach (array('data', 'classes', 'model', 'result', 'query') as $key) {
+		$this->set($data);
+		foreach (array('classes', 'model', 'result', 'query') as $key) {
 			unset($this->_config[$key]);
 		}
 	}
@@ -241,6 +242,20 @@ abstract class Collection extends \lithium\util\Collection {
 	}
 
 	/**
+	 * Unsets an offset.
+	 *
+	 * @param integer $offset The offset to unset.
+	 */
+	public function offsetUnset($offset) {
+		$this->offsetGet($offset);
+		prev($this->_data);
+		if (key($this->_data) === null) {
+			$this->rewind();
+		}
+		unset($this->_data[$offset]);
+	}
+
+	/**
 	 * Rewinds the collection to the beginning.
 	 */
 	public function rewind() {
@@ -248,6 +263,33 @@ abstract class Collection extends \lithium\util\Collection {
 		reset($this->_data);
 		$this->_valid = !empty($this->_data) || !is_null($this->_populate());
 		return current($this->_data);
+	}
+
+	/**
+	 * Returns the currently pointed to record's unique key.
+	 *
+	 * @param boolean $full If true, returns the complete key.
+	 * @return mixed
+	 */
+	public function key($full = false) {
+		if ($this->_started === false) {
+			$this->current();
+		}
+		if ($this->_valid) {
+			$key = key($this->_data);
+			return (is_array($key) && !$full) ? reset($key) : $key;
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the item keys.
+	 *
+	 * @return array The keys of the items.
+	 */
+	public function keys() {
+		$this->offsetGet(null);
+		return parent::keys();
 	}
 
 	/**
@@ -309,6 +351,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * `$options` argument, then an instance of this class will be returned.
 	 */
 	public function find($filter, array $options = array()) {
+		$this->offsetGet(null);
 		if (is_array($filter)) {
 			$filter = $this->_filterFromArray($filter);
 		}
@@ -435,6 +478,47 @@ abstract class Collection extends \lithium\util\Collection {
 	 */
 	public function data() {
 		return $this->to('array');
+	}
+
+	/**
+	 * Converts a `Collection` object to another type of object, or a simple type such as an array.
+	 * The supported values of `$format` depend on the format handlers registered in the static
+	 * property `Collection::$_formats`. The `Collection` class comes with built-in support for
+	 * array conversion, but other formats may be registered.
+	 *
+	 * Once the appropriate handlers are registered, a `Collection` instance can be converted into
+	 * any handler-supported format, i.e.: {{{
+	 * $collection->to('json'); // returns a JSON string
+	 * $collection->to('xml'); // returns an XML string
+	 * }}}
+	 *
+	 *  _Please note that Lithium does not ship with a default XML handler, but one can be
+	 * configured easily._
+	 *
+	 * @see lithium\util\Collection::formats()
+	 * @see lithium\util\Collection::$_formats
+	 * @param string $format By default the only supported value is `'array'`. However, additional
+	 *               format handlers can be registered using the `formats()` method.
+	 * @param array $options Options for converting this collection:
+	 *        - `'internal'` _boolean_: Indicates whether the current internal representation of the
+	 *          collection should be exported. Defaults to `false`, which uses the standard iterator
+	 *          interfaces. This is useful for exporting record sets, where records are lazy-loaded,
+	 *          and the collection must be iterated in order to fetch all objects.
+	 * @return mixed The object converted to the value specified in `$format`; usually an array or
+	 *         string.
+	 */
+	public function to($format, array $options = array()) {
+		$defaults = array('internal' => false, 'indexed' => true);
+		$options += $defaults;
+
+		$this->offsetGet(null);
+
+		if (!$options['indexed']) {
+			$data = array_values($this->_data);
+		} else {
+			$data = $options['internal'] ? $this->_data : $this;
+		}
+		return $this->_to($format, $data, $options);
 	}
 
 	/**

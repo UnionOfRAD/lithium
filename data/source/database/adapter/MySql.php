@@ -320,7 +320,6 @@ class MySql extends \lithium\data\source\Database {
 			} catch(PDOException $e) {
 				$self->invokeMethod('_error', array($sql));
 			};
-
 			return $self->invokeMethod('_instance', array('result', compact('resource')));
 		});
 	}
