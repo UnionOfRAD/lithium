@@ -23,7 +23,7 @@ class MockModelCompositePk extends \lithium\data\Model {
 			),
 			'autoConnect' => false
 		));
-		self::meta(array(
+		static::meta(array(
 			'key' => array('client_id', 'invoice_id'),
 			'locked' => true
 		));
