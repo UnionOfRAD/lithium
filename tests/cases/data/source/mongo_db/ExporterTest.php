@@ -540,6 +540,52 @@ class ExporterTest extends \lithium\test\Unit {
 	 */
 	public function testCreateWithWhitelist() {
 	}
+
+	/**
+	 * Tests the casting of MongoIds in nested arrays.
+	 */
+	public function testNestedArrayMongoIdCasting() {
+
+		$articleOneId = new MongoId();
+		$bookOneId = new MongoId();
+		$bookTwoId = new MongoId();
+		$data = array(
+			'_id' => '4c8f86167675abfabd970300',
+			'title' => 'Foo',
+			'similar_text' => array(
+				'articles' => array(
+					$articleOneId
+				),
+				'books' => array(
+					$bookOneId,
+					$bookTwoId
+				),
+				'magazines' => array(
+					"4fdfb4327a959c4f76000006",
+					"4e95f6e098ef47722d000001"
+				))
+		);
+
+		$model = $this->_model;
+		$handlers = $this->_handlers;
+		$options = compact('model', 'handlers');
+
+		$schema = new Schema(array(
+			'fields' =>array(
+				'_id' => array('type' => 'MongoId'),
+				'title' => array('type' => 'text'),
+				'similar_text' => array('type' => 'array'),
+				'similar_text.articles' => array('type' => 'MongoId', 'array' => true),
+				'similar_text.books' => array('type' => 'MongoId', 'array' => true),
+				'similar_text.magazines' => array('type' => 'MongoId', 'array' => true)
+		)));
+		$result = $schema->cast(null, $data, $options);
+		$this->assertTrue($result['similar_text']['articles'][0] instanceof MongoId);
+		$this->assertTrue($result['similar_text']['books'][0] instanceof MongoId);
+		$this->assertTrue($result['similar_text']['books'][1] instanceof MongoId);
+		$this->assertTrue($result['similar_text']['magazines'][0] instanceof MongoId);
+		$this->assertTrue($result['similar_text']['magazines'][1] instanceof MongoId);
+	}
 }
 
 ?>
