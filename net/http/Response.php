@@ -198,13 +198,19 @@ class Response extends \lithium\net\http\Message {
 		if (array_filter($headers) == array()) {
 			return trim($body);
 		}
-		preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)\s+(.*)/i', array_shift($headers), $match);
+		preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)(?:\s+(.*))?/i', array_shift($headers), $match);
 		$this->headers($headers);
 
 		if (!$match) {
 			return trim($body);
 		}
-		list($line, $this->version, $code, $message) = $match;
+		list($line, $this->version, $code) = $match;
+		if (isset($this->_statuses[$code])) {
+			$message = $this->_statuses[$code];
+		}
+		if (isset($match[3])) {
+			$message = $match[3];
+		}
 		$this->status = compact('code', 'message') + $this->status;
 		$this->protocol = "HTTP/{$this->version}";
 		return $body;
