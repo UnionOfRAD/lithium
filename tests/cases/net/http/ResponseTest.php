@@ -106,7 +106,7 @@ class ResponseTest extends \lithium\test\Unit {
 
 	public function testParseMessage() {
 		$message = join("\r\n", array(
-			'HTTP/1.1 200 OK',
+			'HTTP/1.1 404 Not Found',
 			'Header: Value',
 			'Connection: close',
 			'Content-Type: application/json;charset=iso-8859-1',
@@ -118,6 +118,9 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual($message, (string) $response);
 		$this->assertEqual('application/json', $response->type);
 		$this->assertEqual('ISO-8859-1', $response->encoding);
+		$this->assertEqual('404', $response->status['code']);
+		$this->assertEqual('Not Found', $response->status['message']);
+		$this->assertEqual('HTTP/1.1 404 Not Found', $response->status());
 
 		$body = 'Not a Message';
 		$expected = join("\r\n", array('HTTP/1.1 200 OK', '', '', 'Not a Message'));
@@ -305,6 +308,38 @@ class ResponseTest extends \lithium\test\Unit {
 			'opaque' => 'dd7bcee161192cb8fba765eb595eba87'
 		);
 		$result = array_filter($response->digest());
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testMalformedStatus() {
+		$expected = "HTTP/1.1 304 Not Modified";
+
+		$message = join("\r\n", array(
+			'HTTP/1.1 304',
+			'Header: Value',
+			'Connection: close',
+			'Content-Type: application/json;charset=iso-8859-1',
+			'',
+			'Test!'
+		));
+
+		$response = new Response(compact('message'));
+		$result = $response->status();
+		$this->assertEqual($expected, $result);
+
+		$expected = "HTTP/1.1 500 Internal Server Error";
+
+		$message = join("\r\n", array(
+			'HTTP/1.1 500',
+			'Header: Value',
+			'Connection: close',
+			'Content-Type: application/json;charset=iso-8859-1',
+			'',
+			'Test!'
+		));
+
+		$response = new Response(compact('message'));
+		$result = $response->status();
 		$this->assertEqual($expected, $result);
 	}
 }
