@@ -9,7 +9,6 @@
 namespace lithium\tests\cases\data\source\http\adapter;
 
 use lithium\data\model\Query;
-use lithium\data\Connections;
 use lithium\data\entity\Document;
 use lithium\data\source\http\adapter\CouchDb;
 
@@ -40,7 +39,8 @@ class CouchDbTest extends \lithium\test\Unit {
 		$model::$connection = $this->db;
 
 		$entity = new Document(compact('model'));
-		$this->query = new Query(compact('model', 'entity'));
+		$type = 'create';
+		$this->query = new Query(compact('model', 'entity', 'type'));
 	}
 
 	public function testAllMethodsNoConnection() {

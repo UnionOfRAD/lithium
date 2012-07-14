@@ -154,7 +154,8 @@ class Model extends \lithium\core\StaticObject {
 	protected static $_classes = array(
 		'connections' => 'lithium\data\Connections',
 		'query'       => 'lithium\data\model\Query',
-		'validator'   => 'lithium\util\Validator'
+		'validator'   => 'lithium\util\Validator',
+		'entity'      => 'lithium\data\Entity'
 	);
 
 	/**
@@ -649,26 +650,54 @@ class Model extends \lithium\core\StaticObject {
 	 * If no values supplied, returns the name of the `Model` key. If values
 	 * are supplied, returns the key value.
 	 *
-	 * @param array $values An array of values.
+	 * @param mixed $values An array of values or object with values. If `$values` is `null`,
+	 *              the meta `'key'` of the model is returned.
 	 * @return mixed Key value.
 	 */
-	public static function key($values = array()) {
+	public static function key($values = null) {
 		$key = static::meta('key');
 
-		if (is_object($values) && method_exists($values, 'to')) {
-			$values = $values->to('array');
-		} elseif (is_object($values) && is_string($key) && isset($values->{$key})) {
-			return $values->{$key};
-		}
-
-		if (!$values) {
+		if ($values === null) {
 			return $key;
 		}
+
+		if (is_object($values) && is_string($key)) {
+			return static::_key($key, $values);
+		} elseif ($values instanceof static::$_classes['entity']) {
+			$values = $values->to('array');
+		}
+
 		if (!is_array($values) && !is_array($key)) {
 			return array($key => $values);
 		}
+
 		$key = (array) $key;
-		return array_intersect_key($values, array_combine($key, $key));
+		$result = array();
+		foreach ($key as $value) {
+			if (!isset($values[$value])) {
+				return null;
+			}
+			$result[$value] = $values[$value];
+		}
+		return $result;
+	}
+
+	/**
+	 * Helper for the `Model::key()` function
+	 *
+	 * @see lithium\data\Model::key()
+	 * @param object $values Object with attributes.
+	 * @param string $key The key
+	 * @return mixed The key value array or `null` if the `$values` object has no attribute
+	 *         named `$key`
+	 */
+	protected static function _key($key, $values) {
+		if (isset($values->$key)) {
+			return array($key => $values->$key);
+		} elseif (!$values instanceof static::$_classes['entity']) {
+			return array($key => $values);
+		}
+		return null;
 	}
 
 	/**
