@@ -504,7 +504,9 @@ class Form extends \lithium\template\Helper {
 		$defaults = array('escape' => true);
 		list($scope, $options) = $this->_options($defaults, $options);
 		list($title, $options, $template) = $this->_defaults(__METHOD__, $title, $options);
-		return $this->_render(__METHOD__, 'button', compact('type', 'title', 'options', 'value'), $scope);
+
+		$arguments = compact('type', 'title', 'options', 'value');
+		return $this->_render(__METHOD__, 'button', $arguments, $scope);
 	}
 
 	/**
