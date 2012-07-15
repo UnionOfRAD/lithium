@@ -579,7 +579,7 @@ class ExporterTest extends \lithium\test\Unit {
 				'similar_text.books' => array('type' => 'MongoId', 'array' => true),
 				'similar_text.magazines' => array('type' => 'MongoId', 'array' => true)
 		)));
-		$result = $schema->cast(null, $data, $options);
+		$result = $schema->cast(null, null, $data, $options);
 		$this->assertTrue($result['similar_text']['articles'][0] instanceof MongoId);
 		$this->assertTrue($result['similar_text']['books'][0] instanceof MongoId);
 		$this->assertTrue($result['similar_text']['books'][1] instanceof MongoId);
