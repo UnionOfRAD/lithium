@@ -115,7 +115,9 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		}
 		$result = parent::__get($name);
 
-		if ($result !== null || array_key_exists($name, $this->_updated)) {
+		if ($result !== null || array_key_exists($name, $this->_updated) 
+			|| array_key_exists($name, $this->_virtual['get'])
+		) {
 			return $result;
 		}
 
@@ -135,14 +137,14 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		return $null;
 	}
 
-	public function export() {
+	public function export(array $options=array()) {
 		foreach ($this->_updated as $key => $val) {
 			if ($val instanceof self) {
 				$path = $this->_pathKey ? "{$this->_pathKey}." : '';
 				$this->_updated[$key]->_pathKey = "{$path}{$key}";
 			}
 		}
-		return parent::export() + array('key' => $this->_pathKey);
+		return parent::export($options) + array('key' => $this->_pathKey);
 	}
 
 	/**
@@ -243,17 +245,6 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		if (is_object($current)) {
 			$current->set(array(end($path) => $value));
 		}
-	}
-
-	/**
-	 * PHP magic method used to check the presence of a field as document properties, i.e.
-	 * `$document->_id`.
-	 *
-	 * @param $name The field name, as specified with an object property.
-	 * @return boolean True if the field specified in `$name` exists, false otherwise.
-	 */
-	public function __isset($name) {
-		return isset($this->_updated[$name]);
 	}
 
 	/**

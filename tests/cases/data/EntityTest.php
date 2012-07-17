@@ -119,6 +119,54 @@ class EntityTest extends \lithium\test\Unit {
 		$entity->set($data);
 		$this->assertEqual(array('foo' => true, 'baz' => true), $entity->modified());
 	}
+	
+	public function testVirtual() {
+		$model = 'lithium\tests\mocks\data\MockModelVirtual';
+		$entity = new Entity(array('model' => $model, 'data' => array('foo' => true)));
+		$this->assertTrue($entity->validates());
+		
+		$this->assertEqual(true, $entity->foo);
+		$this->assertTrue(isset($entity->foo));
+		$this->assertFalse(isset($entity->bar));
+		
+		$this->assertFalse(isset($entity->fielda));
+		$entity->fielda = 'a';
+		$this->assertTrue(isset($entity->fielda));
+		$this->assertTrue(isset($entity->bar));
+		$this->assertEqual('a', $entity->fielda);
+		$this->assertEqual('a', $entity->bar);
+		$entity->bar = null;
+		
+		$this->assertFalse(isset($entity->fieldb));
+		$entity->fieldb = 'b';
+		$this->assertTrue(isset($entity->fieldb));
+		$this->assertFalse(isset($entity->bar));
+		$this->assertEqual('b', $entity->fieldb);
+		$this->assertEqual(null, $entity->bar);
+		$entity->bar = null;
+		
+		$this->assertFalse(isset($entity->field_c));
+		$entity->bar = 'c';
+		$this->assertTrue(isset($entity->field_c));
+		$this->assertTrue(isset($entity->bar));
+		$this->assertEqual('c', $entity->field_c);
+		$this->assertEqual('c', $entity->bar);
+
+		$export = $entity->export();
+		$expected = array('exists', 'data', 'update', 'increment');
+		$this->assertEqual($expected, array_keys($export));
+		$expected = array('foo' => true, 'bar' => 'c', 'fieldb' => 'b');
+		$this->assertEqual($expected, $export['update']);
+		
+		$export = $entity->export(array('virtual' => true));
+		$expected = array('exists', 'data', 'update', 'increment', 'virtual');
+		$this->assertEqual($expected, array_keys($export));
+		$expected = array('fielda' => 'c', 'fieldb' => 'c', 'field_c' => 'c');
+		$this->assertEqual($expected, $export['virtual']);
+
+		$this->expectException('No model bound or unhandled method call `setfield_c`.');
+		$this->assertTrue($entity->field_c = 'd');
+	}
 }
 
 ?>

@@ -75,6 +75,16 @@ class Entity extends \lithium\core\Object {
 	protected $_updated = array();
 
 	/**
+	 * Contains the callables for recognized virtual fields. These values will not be persisted.
+	 * Virtual fields are derived fields that are made available via functions in the model.
+	 *
+	 * @see lithium\data\Entity::_initVirtual();
+	 * @var mixed - array when holding data
+	 *            - null when not yet initialized
+	 */
+	protected $_virtual = null;
+
+	/**
 	 * An array of key/value pairs corresponding to fields that should be updated using atomic
 	 * incrementing / decrementing operations. Keys match field names, and values indicate the value
 	 * each field should be incremented or decremented by.
@@ -130,6 +140,67 @@ class Entity extends \lithium\core\Object {
 		parent::__construct($config + $defaults);
 	}
 
+	/**
+	 * Initializes the virtual field access.
+	 *
+	 * Only called when fields are accessed that are not yet in _updated or 
+	 * _relationships.
+	 * Information is retrieved the static property `_properties` defined in the model
+	 * where the Entity is bound too.
+	 * {{{
+	 * class Examples extends \lithium\data\Model {
+	 *
+	 *    public static $_properties = array(
+	 *       'field_x' => 'MyFieldX',
+	 *       'field_y' => array('SomeOtherField', 'set' => false),
+	 *       'field_z' => array('get' => 'mySpecialFunction')
+	 *    );
+	 *
+	 * // rest of the class ...
+	 * }}}
+	 *
+	 * The example above will introduce the fields 'field_x', 'field_z' that can be used
+	 * like normal fields, eg `echo $entity->field_x;`.
+	 * When a field is read, set, or isset, methods defined in the Model will be called.
+	 * For 'field_x', those will be 'getMyFieldX()', 'setMyFieldX()', 'issetMyFieldX()'; 
+	 * the value given prefixed with 'get', 'set' and 'isset'. As first paramater they
+	 * should accept $entity, and only 'set' needs a second parameter for the $value to 
+	 * be set.
+	 * For 'field_y', no setter method is called as indicated by setting 'set' to false. 
+	 * The entity will set the value just to _updated[] like any other set action.
+	 * For 'field_z', the getter method is named 'mySpecialFunction', for 'set' and 'isset'
+	 * the method base name will be 'field_z'.
+	 */
+	protected function _initVirtual() {
+		$this->_virtual = array('get' => array(), 'set' => array(), 'isset' => array());
+		if (!$model = $this->_model) {
+			return;
+		}
+		if (!class_exists($model) || !isset($model::$_properties) || !is_array($model::$_properties)) {
+			return;
+		}
+		foreach ($model::$_properties as $property => $options) {
+			if (!is_string($property)) {
+				continue;
+			}
+			$defaults = array(
+				0 => $property, 'get' => true, 'set' => true, 'isset' => true
+			);
+			$options = (array)$options + $defaults;
+			$baseName = $options[0];
+			foreach (array('get', 'set', 'isset') as $key) {
+				$name = $options[$key];
+					if (!$name) {
+						continue;
+					}
+					if ($name === true) {
+						$name = $key . $baseName;
+					}
+					$this->_virtual[$key][$property] = $name;
+			}                                    
+		}
+	}
+
 	protected function _init() {
 		parent::_init();
 		$this->_updated = $this->_data;
@@ -137,6 +208,11 @@ class Entity extends \lithium\core\Object {
 
 	/**
 	 * Overloading for reading inaccessible properties.
+	 *
+	 * Check '_relationships' and '_updated' first. When
+	 * not found, make sure that '_virtual' is initialized and
+	 * try to access it as a virtual property.
+	 * If nothing is found, null will be returned.
 	 *
 	 * @param string $name Property name.
 	 * @return mixed Result.
@@ -148,12 +224,26 @@ class Entity extends \lithium\core\Object {
 		if (isset($this->_updated[$name])) {
 			return $this->_updated[$name];
 		}
+		if (!isset($this->_virtual)) {
+			$this->_initVirtual();
+		}
+		if (isset($this->_virtual['get'][$name])) {
+			$getter = $this->_virtual['get'][$name];
+			$result =  $this->$getter();
+			return $result;
+		}
 		$null = null;
 		return $null;
 	}
 
 	/**
 	 * Overloading for writing to inaccessible properties.
+	 *
+	 * If called with only an array as first parameter, call __set
+	 * on the individual entries.
+	 *
+	 * First checks if the property is already known. Otherwise try it via
+	 * the virtual setter. Else treat is a new normal property.
 	 *
 	 * @param string $name Property name.
 	 * @param string $value Property value.
@@ -163,17 +253,39 @@ class Entity extends \lithium\core\Object {
 		if (is_array($name) && !$value) {
 			return array_map(array(&$this, '__set'), array_keys($name), array_values($name));
 		}
-		$this->_updated[$name] = $value;
+		if (isset($this->_updated[$name])) {
+			return $this->_updated[$name] = $value;
+		}
+		if (!isset($this->_virtual)) {
+			$this->_initVirtual();
+		}
+		if (isset($this->_virtual['set'][$name])) {
+			$setter = $this->_virtual['set'][$name];
+			return $this->$setter($value);
+		}
+		return $this->_updated[$name] = $value;
 	}
 
 	/**
 	 * Overloading for calling `isset()` or `empty()` on inaccessible properties.
 	 *
+	 * Will check existing properties first before going virtual.
+	 *
 	 * @param string $name Property name.
 	 * @return mixed Result.
 	 */
 	public function __isset($name) {
-		return isset($this->_updated[$name]) || isset($this->_relationships[$name]);
+		if (isset($this->_updated[$name]) || isset($this->_relationships[$name])) {
+			return true;
+		}
+		if (!isset($this->_virtual)) {
+			$this->_initVirtual();
+		}
+		if (isset($this->_virtual['isset'][$name])) {
+			$issetter = $this->_virtual['isset'][$name];
+			return $this->$issetter();
+		}
+		return false;
 	}
 
 	/**
@@ -384,28 +496,51 @@ class Entity extends \lithium\core\Object {
 		return $fields;
 	}
 
-	public function export() {
-		return array(
+	public function export(array $options=array()) {
+		$options += array('virtual' => false);
+		$export = array(
 			'exists'    => $this->_exists,
 			'data'      => $this->_data,
 			'update'    => $this->_updated,
 			'increment' => $this->_increment
 		);
+		if ($options['virtual']) {
+			$export['virtual'] = $this->_exportVirtual();
+		}
+		return $export;
+	}
+
+	protected function _exportVirtual() {                
+		if (!isset($this->_virtual)) {
+			$this->_initVirtual();
+		}
+		$export = array();
+		foreach ($this->_virtual['get'] as $name => $getter) {
+			$export[$name] = $this->$getter();
+		}
+		return $export;
 	}
 
 	/**
 	 * Converts the data in the record set to a different format, i.e. an array.
 	 *
+	 * Optionally exports virtual fields.
+	 *
 	 * @param string $format currently only `array`
-	 * @param array $options
+	 * @param array $options 'virtual' true will export virtual fields. Default false
 	 * @return mixed
 	 */
 	public function to($format, array $options = array()) {
+		$options += array('virtual' => false);
 		switch ($format) {
 			case 'array':
 				$data = $this->_updated;
 				$rel = array_map(function($obj) { return $obj->data(); }, $this->_relationships);
-				$data = $rel + $data;
+				$extra = array();
+				if ($options['virtual']) {
+					$extra = $this->_exportVirtual();
+				}
+				$data = $rel + $data + $extra;
 				$result = Collection::toArray($data, $options);
 			break;
 			default:
