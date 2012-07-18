@@ -178,6 +178,13 @@ class Model extends \lithium\core\StaticObject {
 	protected $_relationTypes = array('belongsTo', 'hasOne', 'hasMany');
 
 	/**
+	 * Store available relation names for this model which still unloaded.
+	 *
+	 * @var array This array use the following notation : `relation_name => relation_type`.
+	 */
+	protected $_relationsToLoad = array();
+
+	/**
 	 * Specifies all meta-information for this model class, including the name of the data source it
 	 * connects to, how it interacts with that class, and how its data structure is defined.
 	 *
@@ -390,7 +397,7 @@ class Model extends \lithium\core\StaticObject {
 
 		$self->_finders += $source['finders'] + $self->_findFilters();
 
-		static::_relations();
+		static::_relationsToLoad();
 		return $self;
 	}
 
@@ -624,22 +631,69 @@ class Model extends \lithium\core\StaticObject {
 	 * to this model, but of a certain type.
 	 *
 	 * @param string $name A type of model relation.
-	 * @return array An array of relation types.
+	 * @return mixed An array of relation instances or an instance of relation.
+	 *
 	 */
 	public static function relations($name = null) {
 		$self = static::_object();
 
-		if (!$name) {
-			return $self->_relations;
+		if ($name === null) {
+			return static::_relations();
 		}
 
-		if (in_array($name, $self->_relationTypes)) {
-			return array_keys(array_filter($self->_relations, function($i) use ($name) {
-				return $i->data('type') == $name;
-			}));
+		if (isset($self->_relations[$name])) {
+			return $self->_relations[$name];
 		}
-		return isset($self->_relations[$name]) ? $self->_relations[$name] : null;
+
+		if (isset($self->_relationsToLoad[$name])) {
+			return static::_relations(null, $name);
+		}
+
+		if (in_array($name, $self->_relationTypes, true)) {
+			return array_keys(static::_relations($name));
+		}
+		return null;
 	}
+
+	/**
+	 * This method automagically bind in the fly unloaded relations.
+	 *
+	 * @see lithium\data\model::relations()
+	 * @param $type A type of model relation.
+	 * @param $name A relation name.
+	 * @return An array of relation instances or an instance of relation.
+	 */
+	protected static function _relations($type = null, $name = null) {
+		$self = static::_object();
+
+		if ($name) {
+			if (isset($self->_relationsToLoad[$name])) {
+				$t = $self->_relationsToLoad[$name];
+				unset($self->_relationsToLoad[$name]);
+				return static::bind($t, $name, (array) $self->{$t}[$name]);
+			}
+			return isset($self->_relations[$name]) ? $self->_relations[$name] : null;
+		}
+
+		if (!$type) {
+			foreach ($self->_relationsToLoad as $name => $t) {
+				static::bind($t, $name, (array) $self->{$t}[$name]);
+			}
+			$self->_relationsToLoad = array();
+			return $self->_relations;
+		} else {
+			foreach ($self->_relationsToLoad as $name => $t) {
+				if ($type == $t) {
+					static::bind($t, $name, (array) $self->{$t}[$name]);
+					unset($self->_relationsToLoad[$name]);
+				}
+			}
+			return array_filter($self->_relations, function($i) use ($type) {
+				return $i->data('type') == $type;
+			});
+		}
+	}
+
 
 	/**
 	 * Creates a relationship binding between this model and another.
@@ -1129,7 +1183,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return void
 	 * @todo See if this can be rewritten to be lazy.
 	 */
-	protected static function _relations() {
+	protected static function _relationsToLoad() {
 		try {
 			if (!static::connection()) {
 				return;
@@ -1140,8 +1194,9 @@ class Model extends \lithium\core\StaticObject {
 		$self = static::_object();
 
 		foreach ($self->_relationTypes as $type) {
-			foreach (Set::normalize($self->{$type}) as $name => $config) {
-				static::bind($type, $name, (array) $config);
+			$self->$type = Set::normalize($self->$type);
+			foreach ($self->$type as $name => $config) {
+				$self->_relationsToLoad[$name] = $type;
 			}
 		}
 	}
