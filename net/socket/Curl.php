@@ -60,11 +60,11 @@ class Curl extends \lithium\net\Socket {
 		parent::open($options);
 		$config = $this->_config;
 
-		if (!empty($config['options'])){
-			$this->set($config['options']);
-		}
 		if (empty($config['scheme']) || empty($config['host'])) {
 			return false;
+		}
+		if (!empty($config['options'])){
+			$this->set($config['options']);
 		}
 
 		$url = "{$config['scheme']}://{$config['host']}";
