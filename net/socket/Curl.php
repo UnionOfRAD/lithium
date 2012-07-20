@@ -63,7 +63,7 @@ class Curl extends \lithium\net\Socket {
 		if (empty($config['scheme']) || empty($config['host'])) {
 			return false;
 		}
-		if (!empty($config['options'])){
+		if (!empty($config['options'])) {
 			$this->set($config['options']);
 		}
 
