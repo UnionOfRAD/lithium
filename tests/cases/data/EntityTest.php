@@ -40,21 +40,31 @@ class EntityTest extends \lithium\test\Unit {
 		$entity = new Entity(array(
 			'model' => 'Foo',
 			'exists' => true,
-			'data' => array('test_field' => 'foo'),
-			'relationships' => array('test_relationship' => array('test_me' => 'bar'))
+			'data' => array('test_field' => 'foo')
 		));
 
 		$this->assertEqual('foo', $entity->test_field);
-		$this->assertEqual(array('test_me' => 'bar'), $entity->test_relationship);
 
 		$this->assertTrue(isset($entity->test_field));
-		$this->assertTrue(isset($entity->test_relationship));
 
 		$this->assertFalse(empty($entity->test_field));
-		$this->assertFalse(empty($entity->test_relationship));
 
 		$this->assertTrue(empty($entity->test_invisible_field));
-		$this->assertTrue(empty($entity->test_invisible_relationship));
+	}
+
+	public function testPropertyUnset() {
+		$entity = new Entity(array(
+			'model' => 'Foo',
+			'exists' => true,
+			'data' => array('test_field' => 'foo')
+		));
+
+		$this->assertEqual('foo', $entity->test_field);
+		unset($entity->test_field);
+
+		$this->assertFalse(isset($entity->test_field));
+
+		$this->assertTrue(empty($entity->test_field));
 	}
 
 	public function testIncrement() {

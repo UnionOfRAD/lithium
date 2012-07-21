@@ -43,14 +43,6 @@ class Entity extends \lithium\core\Object {
 	protected $_data = array();
 
 	/**
-	 * An array containing all related records and recordsets, keyed by relationship name, as
-	 * defined in the bound model class.
-	 *
-	 * @var array
-	 */
-	protected $_relationships = array();
-
-	/**
 	 * If this record is chained off of another, contains the origin object.
 	 *
 	 * @var object
@@ -111,7 +103,7 @@ class Entity extends \lithium\core\Object {
 	 */
 	protected $_autoConfig = array(
 		'classes' => 'merge', 'parent', 'schema', 'data',
-		'model', 'exists', 'pathKey', 'relationships'
+		'model', 'exists', 'pathKey'
 	);
 
 	/**
@@ -126,7 +118,7 @@ class Entity extends \lithium\core\Object {
 	 * @return object Record object.
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('model' => null, 'data' => array(), 'relationships' => array());
+		$defaults = array('model' => null, 'data' => array());
 		parent::__construct($config + $defaults);
 	}
 
@@ -173,7 +165,22 @@ class Entity extends \lithium\core\Object {
 	 * @return mixed Result.
 	 */
 	public function __isset($name) {
-		return isset($this->_updated[$name]) || isset($this->_relationships[$name]);
+		return isset($this->_updated[$name]);
+	}
+
+	/**
+	 * PHP magic method used when unset() is called on an `Entity` instance.
+	 * {{{
+	 * $doc = Post::find($id);
+	 * unset($doc->fieldName);
+	 * $doc->save();
+	 * }}}
+	 *
+	 * @param string $name The name of the field to unset.
+	 * @return void
+	 */
+	public function __unset($name) {
+		unset($this->_updated[$name]);
 	}
 
 	/**
@@ -414,8 +421,6 @@ class Entity extends \lithium\core\Object {
 		switch ($format) {
 			case 'array':
 				$data = $this->_updated;
-				$rel = array_map(function($obj) { return $obj->data(); }, $this->_relationships);
-				$data = $rel + $data;
 				$result = Collection::toArray($data, $options);
 			break;
 			case 'string':

@@ -110,7 +110,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			return $this->_getNested($name);
 		}
 
-		if (isset($this->_embedded[$name]) && !isset($this->_relationships[$name])) {
+		if (isset($this->_embedded[$name])) {
 			throw new RuntimeException("Not implemented.");
 		}
 		$result = parent::__get($name);
@@ -246,33 +246,6 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		if (is_object($current)) {
 			$current->set(array(end($path) => $value));
 		}
-	}
-
-	/**
-	 * PHP magic method used to check the presence of a field as document properties, i.e.
-	 * `$document->_id`.
-	 *
-	 * @param $name The field name, as specified with an object property.
-	 * @return boolean True if the field specified in `$name` exists, false otherwise.
-	 */
-	public function __isset($name) {
-		return isset($this->_updated[$name]);
-	}
-
-	/**
-	 * PHP magic method used when unset() is called on a `Document` instance.
-	 * Use case for this would be when you wish to edit a document and remove a field, ie.:
-	 * {{{
-	 * $doc = Post::find($id);
-	 * unset($doc->fieldName);
-	 * $doc->save();
-	 * }}}
-	 *
-	 * @param string $name The name of the field to remove.
-	 * @return void
-	 */
-	public function __unset($name) {
-		unset($this->_updated[$name]);
 	}
 
 	/**
