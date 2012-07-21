@@ -247,7 +247,7 @@ class Command extends \lithium\core\Object {
 	 *
 	 * {{{
 	 * -------
-	 * Lihtium
+	 * Lithium
 	 * -------
 	 * }}}
 	 *

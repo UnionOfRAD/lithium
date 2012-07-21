@@ -124,7 +124,8 @@ class Response extends \lithium\core\Object {
 			'option'  => "\033[0;35m",
 			'command' => "\033[0;35m",
 			'error'   => "\033[0;31m",
-			'success' => "\033[0;32m"
+			'success' => "\033[0;32m",
+			'bold'    => "\033[1m",
 		);
 		if ($styles === false) {
 			return array_combine(array_keys($defaults), array_pad(array(), count($defaults), null));
