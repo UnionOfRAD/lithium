@@ -113,9 +113,9 @@ class Media extends \lithium\core\StaticObject {
 	 * Examples:
 	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(1-2) }}}
 	 *
-	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(19-20) }}}
+	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(19-23) }}}
 	 *
-	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(40-41) }}}
+	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(43-44) }}}
 	 *
 	 * Alternatively, can be used to detect the type name of a registered content type:
 	 * {{{
