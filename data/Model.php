@@ -789,6 +789,8 @@ class Model extends \lithium\core\StaticObject {
 	 *          method if `'validate'` is not `false`.
 	 *        - `'whitelist'` _array_: An array of fields that are allowed to be saved to this
 	 *          record.
+	 *        - `'validationOptions'` _array_: Options to pass through to `validates()`,
+	 *          in addition to `'validate'` and `'events'`.
 	 *
 	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
 	 * @filter
@@ -803,7 +805,8 @@ class Model extends \lithium\core\StaticObject {
 			'events' => $entity->exists() ? 'update' : 'create',
 			'whitelist' => null,
 			'callbacks' => true,
-			'locked' => $self->_meta['locked']
+			'locked' => $self->_meta['locked'],
+			'validationOptions' => array()
 		);
 		$options += $defaults;
 		$params = compact('entity', 'data', 'options');
@@ -817,7 +820,9 @@ class Model extends \lithium\core\StaticObject {
 			}
 			if ($rules = $options['validate']) {
 				$events = $options['events'];
-				$validateOpts = is_array($rules) ? compact('rules','events') : compact('events');
+				$validateOpts = is_array($rules) ? compact('rules') : array();
+				$validateOpts += $events ? compact('events') : array();
+				$validateOpts += $options['validationOptions'];
 				if (!$entity->validates($validateOpts)) {
 					return false;
 				}
