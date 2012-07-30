@@ -76,7 +76,8 @@ class Request extends \lithium\net\http\Message {
 			'headers' => array(),
 			'body' => null,
 			'auth' => null,
-			'method' => 'GET'
+			'method' => 'GET',
+			'proxy' => null
 		);
 		$config += $defaults;
 		parent::__construct($config);
@@ -211,12 +212,14 @@ class Request extends \lithium\net\http\Message {
 			'username' => $this->username,
 			'password' => $this->password,
 			'headers' => array(),
+			'proxy' => $this->proxy,
 			'body' => null,
 			'version' => $this->version,
 			'ignore_errors' => isset($this->_config['ignore_errors'])
 				? $this->_config['ignore_errors'] : true,
 			'follow_location' => isset($this->_config['follow_location'])
-				? $this->_config['follow_location'] : true
+				? $this->_config['follow_location'] : true,
+			'request_fulluri' => isset($this->proxy)
 		);
 		$options += $defaults;
 
