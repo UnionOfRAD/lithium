@@ -178,15 +178,15 @@ class ServiceTest extends \lithium\test\Unit {
 
 	public function testJsonPost() {
 		$http = new Service($this->_testConfig);
-		$http->post('update.xml', array('status' => 'cool'), array('type' => 'json'));
+		$http->post('update.xml', array('status' => array('cool', 'awesome')), array('type' => 'json'));
 		$expected = join("\r\n", array(
 			'POST /update.xml HTTP/1.1',
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Content-Type: application/json',
-			'Content-Length: 17',
-			'', '{"status":"cool"}'
+			'Content-Length: 29',
+			'', '{"status":["cool","awesome"]}'
 		));
 		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
@@ -197,8 +197,8 @@ class ServiceTest extends \lithium\test\Unit {
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Content-Type: application/json',
-			'Content-Length: 17',
-			'', '{"status":"cool"}'
+			'Content-Length: 29',
+			'', '{"status":["cool","awesome"]}'
 		));
 		$result = (string) $http->last->response;
 		$this->assertEqual($expected, $result);
