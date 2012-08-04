@@ -383,15 +383,10 @@ class Entity extends \lithium\core\Object {
 				);
 			} else {
 				$fields[$field] = (
-					!isset($fields[$field]) || $this->_data[$field] !== $this->_updated[$field]
+					!isset($fields[$field]) ||
+					$this->_data[$field] !== $this->_updated[$field]
 				);
 			}
-			$modified = $value->modified();
-
-			$fields[$field] = (
-				$modified === true ||
-				is_array($modified) && in_array(true, $modified, true)
-			);
 		}
 		return $fields;
 	}
