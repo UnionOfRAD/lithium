@@ -128,6 +128,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 	}
 
 	protected function _canConnect($host, $port) {
+		$expectedExceptions = count($this->_expected);
 		$this->expectException();
 		$this->expectException();
 
@@ -137,6 +138,9 @@ class ConnectionsTest extends \lithium\test\Unit {
 			fclose($conn);
 
 			return true;
+		}
+		while (count($this->_expected) > $expectedExceptions) {
+			array_pop($this->_expected);
 		}
 		return false;
 	}
