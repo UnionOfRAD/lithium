@@ -140,6 +140,19 @@ class CurlTest extends \lithium\test\Unit {
 		$this->assertEqual('Changed Dummy Value', $stream->options['DummyFlag']);
 	}
 
+	public function testSettingOfOptionsInConfig() {
+		$config = $this->_testConfig + array('options' => array('DummyFlag' => 'Dummy Value'));
+		$stream = new Curl($config);
+		$stream->open();
+		$this->assertEqual('Dummy Value', $stream->options['DummyFlag']);
+	}
+
+	public function testSettingOfOptionsInOpen() {
+		$stream = new Curl($this->_testConfig);
+		$stream->open(array('options' => array('DummyFlag' => 'Dummy Value')));
+		$this->assertEqual('Dummy Value', $stream->options['DummyFlag']);
+	}
+
 	public function testSendPostThenGet() {
 		$postConfig = array('method' => 'POST', 'body' => '{"body"}');
 		$stream = new Curl($this->_testConfig);

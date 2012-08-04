@@ -216,8 +216,8 @@ class Service extends \lithium\core\Object {
 		$request->method = $method = strtoupper($method);
 
 		$hasBody = in_array($method, array('POST', 'PUT'));
-		$hasBody ? $request->body($data) : $request->query = $data;
 		$hasBody ? $request->type($options['type']) : null;
+		$hasBody ? $request->body($data) : $request->query = $data;
 		return $request;
 	}
 }

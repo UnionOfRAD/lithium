@@ -37,7 +37,7 @@ class Form extends \lithium\template\Helper {
 	 * @var array
 	 */
 	protected $_strings = array(
-		'button'         => '<button{:options}>{:name}</button>',
+		'button'         => '<button{:options}>{:title}</button>',
 		'checkbox'       => '<input type="checkbox" name="{:name}"{:options} />',
 		'checkbox-multi' => '<input type="checkbox" name="{:name}[]"{:options} />',
 		'checkbox-multi-group' => '{:raw}',
@@ -490,6 +490,23 @@ class Form extends \lithium\template\Helper {
 			$result[] = $this->field($field, compact('label') + $options);
 		}
 		return join("\n", $result);
+	}
+
+	/**
+	 * Generates an HTML button `<button></button>`.
+	 *
+	 * @param string $title The title of the button.
+	 * @param array $options Any options passed are converted to HTML attributes within the
+	 *              `<button></button>` tag.
+	 * @return string Returns a `<button></button>` tag with the given title and HTML attributes.
+	 */
+	public function button($title = null, array $options = array()) {
+		$defaults = array('escape' => true);
+		list($scope, $options) = $this->_options($defaults, $options);
+		list($title, $options, $template) = $this->_defaults(__METHOD__, $title, $options);
+
+		$arguments = compact('type', 'title', 'options', 'value');
+		return $this->_render(__METHOD__, 'button', $arguments, $scope);
 	}
 
 	/**
