@@ -8,6 +8,7 @@
 
 namespace lithium\data;
 
+use lithium\core\Libraries;
 use lithium\util\Set;
 use lithium\util\Inflector;
 use lithium\core\ConfigException;
@@ -132,9 +133,17 @@ class Model extends \lithium\core\StaticObject {
 	protected static $_instances = array();
 
 	/**
-	 * List of initialized instances.
+	 * If true, the initializer method `_init()` will be called
 	 *
 	 * @see lithium\data\Model::_init();
+	 * @var array
+	 */
+	protected $_init = true;
+
+	/**
+	 * List of initialized instances.
+	 *
+	 * @see lithium\data\Model::_initialize();
 	 * @var array
 	 */
 	protected static $_initialized = array();
@@ -151,7 +160,7 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * @var array
 	 */
-	protected static $_classes = array(
+	protected $_classes = array(
 		'connections' => 'lithium\data\Connections',
 		'query'       => 'lithium\data\model\Query',
 		'validator'   => 'lithium\util\Validator'
@@ -210,6 +219,13 @@ class Model extends \lithium\core\StaticObject {
 		'connection' => 'default',
 		'initialized' => false
 	);
+
+	/**
+	 * Array of closures used to lazily initialize metadata.
+	 *
+	 * @var array
+	 */
+	protected $_initializers = array();
 
 	/**
 	 * Stores the data schema.
@@ -303,7 +319,15 @@ class Model extends \lithium\core\StaticObject {
 	 * @see lithium\data\Model::config()
 	 * @var array
 	 */
-	protected static $_autoConfig = array('meta', 'finders', 'query', 'schema', 'classes');
+	protected static $_autoConfig = array(
+		'init',
+		'initializers',
+		'meta',
+		'finders',
+		'query',
+		'schema',
+		'classes'
+	);
 
 	/**
 	 * Configures the model for use. This method will set the `Model::$_schema`, `Model::$_meta`,
@@ -339,6 +363,18 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Initializer function called just after the model instanciation.
+	 *
+	 * Example to disable the `_init()` call :
+	 * {{{
+	 * Posts::config(array('init' => false));
+	 * }}}
+
+	 * @return void
+	 */
+	protected function _init() {}
+
+	/**
 	 * Init default connection options and connects default finders.
 	 *
 	 * This method will set the `Model::$_schema`, `Model::$_meta`, `Model::$_finders` class
@@ -347,7 +383,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @param string $class The fully-namespaced class name to initialize.
 	 * @return object Returns the initialized model instance.
 	 */
-	protected static function _init($class) {
+	protected static function _initialize($class) {
 		$self = static::$_instances[$class];
 
 		if (isset(static::$_initialized[$class]) && static::$_initialized[$class]) {
@@ -360,7 +396,8 @@ class Model extends \lithium\core\StaticObject {
 		$meta    = array();
 		$schema  = array();
 		$source  = array();
-		$classes = static::$_classes;
+		$classes = $self->_classes;
+		$initializers = array();
 
 		foreach (static::_parents() as $parent) {
 			$parentConfig = get_class_vars($parent);
@@ -383,7 +420,7 @@ class Model extends \lithium\core\StaticObject {
 			$conn = $classes['connections']::get($tmp['connection']);
 			$source = (($conn) ? $conn->configureClass($class) : array()) + $source;
 		}
-		static::$_classes = $classes;
+		$self->_classes = $classes;
 		$name = static::_name();
 
 		$local = compact('class', 'name') + $self->_meta;
@@ -393,13 +430,56 @@ class Model extends \lithium\core\StaticObject {
 		if (is_object($schema)) {
 			$schema = $schema->fields();
 		}
-		$self->schema()->append($schema + $source['schema']);
+
+		$meta = &$self->_meta;
+
+		$self->_initializers += array(
+			'source' => function(&$meta) {
+				if ($meta['source'] === null) {
+					$meta['source'] = Inflector::tableize($meta['name']);
+				}
+			},
+			'title' => function(&$meta) use ($class) {
+				if (!$meta['title']) {
+					$titleKeys = array('title', 'name');
+
+					if (isset($meta['key'])) {
+						$titleKeys = array_merge($titleKeys, (array) $meta['key']);
+					}
+					$meta['title'] = $class::hasField($titleKeys);
+				}
+			}
+		);
+
+		$self::schema()->append($schema + $source['schema']);
 
 		$self->_finders += $source['finders'] + $self->_findFilters();
 
 		static::_relationsToLoad();
+
+		if ($self->_init) {
+			$self->_init();
+		}
 		return $self;
 	}
+
+	/**
+	 * Returns an instance of a class with given `config`. The `name` could be a key from the
+	 * `classes` array, a fully-namespaced class name, or an object. Typically this method is used
+	 * in `_init` to create the dependencies used in the current class.
+	 *
+	 * @param string|object $name A `classes` alias or fully-namespaced class name.
+	 * @param array $options The configuration passed to the constructor.
+	 * @return object
+	 */
+	protected static function _instance($name, array $options = array()) {
+		$self = static::_object();
+		if (is_string($name) && isset($self->_classes[$name])) {
+			$name = $self->_classes[$name];
+		}
+		return Libraries::instance(null, $name, $options);
+	}
+
 
 	/**
 	 * Allows the use of syntactic-sugar like `Model::all()` instead of `Model::find('all')`.
@@ -566,15 +646,9 @@ class Model extends \lithium\core\StaticObject {
 		if (!$self->_meta['initialized']) {
 			$self->_meta['initialized'] = true;
 
-			if ($self->_meta['source'] === null) {
-				$self->_meta['source'] = Inflector::tableize($self->_meta['name']);
+			foreach($self->_initializers as $key => $closure) {
+				$closure($self->_meta);
 			}
-			$titleKeys = array('title', 'name');
-
-			if (isset($self->_meta['key'])) {
-				$titleKeys = array_merge($titleKeys, (array) $self->_meta['key']);
-			}
-			$self->_meta['title'] = $self->_meta['title'] ?: static::hasField($titleKeys);
 		}
 		if (is_array($key) || !$key || $value) {
 			return $self->_meta;
@@ -1006,7 +1080,7 @@ class Model extends \lithium\core\StaticObject {
 		);
 		$options += $defaults;
 		$self = static::_object();
-		$validator = static::$_classes['validator'];
+		$validator = $self->_classes['validator'];
 		$params = compact('entity', 'options');
 
 		$filter = function($parent, $params) use (&$self, $validator) {
@@ -1105,7 +1179,7 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function &connection() {
 		$self = static::_object();
-		$connections = static::$_classes['connections'];
+		$connections = $self->_classes['connections'];
 		$name = isset($self->_meta['connection']) ? $self->_meta['connection'] : null;
 
 		if ($conn = $connections::get($name)) {
@@ -1170,10 +1244,9 @@ class Model extends \lithium\core\StaticObject {
 		$class = get_called_class();
 
 		if (!isset(static::$_instances[$class])) {
-			static::$_instances[$class] = new $class();
 			static::config();
 		}
-		$object = static::_init($class);
+		$object = static::_initialize($class);
 		return $object;
 	}
 

@@ -16,6 +16,7 @@ use lithium\data\model\Query;
 use lithium\data\entity\Record;
 use lithium\tests\mocks\data\MockTag;
 use lithium\tests\mocks\data\MockPost;
+use lithium\tests\mocks\data\MockPostFiltered;
 use lithium\tests\mocks\data\MockComment;
 use lithium\tests\mocks\data\MockTagging;
 use lithium\tests\mocks\data\MockCreator;
@@ -64,6 +65,7 @@ class ModelTest extends \lithium\test\Unit {
 		MockComment::reset();
 		MockPostForValidates::reset();
 		MockCreator::reset();
+		MockPostFiltered::reset();
 	}
 
 	public function testOverrideMeta() {
@@ -795,10 +797,75 @@ class ModelTest extends \lithium\test\Unit {
 		$object = MockPost::invokeMethod('_object');
 		$object->belongsTo = array('Unexisting');
 		MockPost::config();
-		MockPost::invokeMethod('_init', array('lithium\tests\mocks\data\MockPost'));
+		MockPost::invokeMethod('_initialize', array('lithium\tests\mocks\data\MockPost'));
 		$exception = 'Related model class \'lithium\tests\mocks\data\Unexisting\' not found.';
 		$this->expectException($exception);
 		MockPost::relations('Unexisting');
+	}
+
+	public function testInit() {
+		MockPostFiltered::config();
+		$this->assertFalse(MockPostFiltered::$initCalled);
+		MockPostFiltered::invokeMethod('_object');
+		$this->assertTrue(MockPostFiltered::$initCalled);
+	}
+
+	public function testFilterInInit() {
+		$this->assertEqual('bob filtered static', MockPostFiltered::filteredStatic('bob'));
+		$entity = MockPostFiltered::create();
+		$this->assertEqual('bill filtered dynamic', $entity->filteredDynamic('bill'));
+
+		MockPostFiltered::reset();
+		MockPostFiltered::config(array('init' => false));
+		$this->assertEqual('bob', MockPostFiltered::filteredStatic('bob'));
+		$entity = MockPostFiltered::create();
+		$this->assertEqual('bill', $entity->filteredDynamic('bill'));
+	}
+
+	public function testlazilyMetadataInit() {
+		MockPostFiltered::config(array(
+			'schema' => new Schema(array(
+				'fields' => array(
+					'id' => array('type' => 'integer'),
+					'name' => array('type' => 'string'),
+					'label' => array('type' => 'string')
+				)
+			)),
+		));
+
+		$this->assertEqual('mock_post_filtereds', MockPostFiltered::meta('source'));
+		$this->assertEqual('name', MockPostFiltered::meta('title'));
+
+		MockPostFiltered::reset();
+
+		MockPostFiltered::config(array(
+			'schema' => new Schema(array(
+				'fields' => array(
+					'id' => array('type' => 'integer'),
+					'name' => array('type' => 'string'),
+					'label' => array('type' => 'string')
+				)
+			)),
+			'initializers' => array(
+				'source' => function(&$meta) {
+					if ($meta['source'] === null) {
+						$meta['source'] = 'post_filtereds';
+					}
+				},
+				'title' => function(&$meta) {
+					if (!$meta['title']) {
+						$meta['title'] = 'label';
+					}
+				},
+				'custom' => function(&$meta) {
+					$meta['custom'] = 'customData';
+				}
+			)
+		));
+
+		$this->assertEqual('post_filtereds', MockPostFiltered::meta('source'));
+		$this->assertEqual('label', MockPostFiltered::meta('title'));
+		$this->assertEqual('customData', MockPostFiltered::meta('custom'));
 	}
 }
 
