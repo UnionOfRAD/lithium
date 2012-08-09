@@ -1,6 +1,6 @@
 {
 	"name": "UnionOfRAD/lithium",
-	"type": "library",
+	"type": "lithium-library",
 	"description": "The core library of the Lithium PHP framework",
 	"keywords": ["lithium", "framework"],
 	"homepage": "http://lithify.me",
@@ -16,6 +16,7 @@
 		}
 	],
 	"require": {
-		"php": ">=5.3.6"
+		"php": ">=5.3.6",
+		"composer/installers": "dev-master"
 	}
 }
