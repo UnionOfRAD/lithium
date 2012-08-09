@@ -676,6 +676,26 @@ class RouteTest extends \lithium\test\Unit {
 
 		$this->assertEqual($expected, $actual);
 	}
+
+	/**
+	 * Tests that a single route with default values matches its default parameters, as well as
+	 * non-default parameters.
+	 */
+	public function testSingleRouteWithDefaultValues() {
+		$defaults = array('controller' => 'Admin', 'action' => 'index');
+
+		$route = new Route(compact('defaults') + array(
+			'template' => '/{:controller}/{:action}',
+			'pattern' => '@^(?:/(?P[^\\/]+)?)?(?:/(?P[^\\/]+)?)?$@u',
+			'params' => array('controller' => 'Admin', 'action' => 'index'),
+			'keys' => array('controller' => 'controller', 'action' => 'action'),
+			'match' => array()
+		));
+		$this->assertIdentical('/', $route->match($defaults));
+
+		$nonDefault = array('controller' => 'Admin', 'action' => 'view');
+		$this->assertIdentical('/Admin/view', $route->match($nonDefault));
+	}
 }
 
 ?>

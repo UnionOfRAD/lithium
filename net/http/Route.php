@@ -373,7 +373,7 @@ class Route extends \lithium\core\Object {
 			}
 			$template = str_replace($rpl, $value, $template);
 		}
-		return $template;
+		return $template ?: '/';
 	}
 
 	/**
