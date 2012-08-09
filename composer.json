@@ -17,6 +17,6 @@
 	],
 	"require": {
 		"php": ">=5.3.6",
-		"composer/installers": "*"
+		"composer/installers": "dev-master"
 	}
 }
