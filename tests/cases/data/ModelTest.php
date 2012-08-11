@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\data;
 
 use stdClass;
+use lithium\util\Inflector;
 use lithium\data\Model;
 use lithium\data\Entity;
 use lithium\data\Schema;
@@ -16,6 +17,7 @@ use lithium\data\model\Query;
 use lithium\data\entity\Record;
 use lithium\tests\mocks\data\MockTag;
 use lithium\tests\mocks\data\MockPost;
+use lithium\tests\mocks\data\MockPostFiltered;
 use lithium\tests\mocks\data\MockComment;
 use lithium\tests\mocks\data\MockTagging;
 use lithium\tests\mocks\data\MockCreator;
@@ -64,6 +66,7 @@ class ModelTest extends \lithium\test\Unit {
 		MockComment::reset();
 		MockPostForValidates::reset();
 		MockCreator::reset();
+		MockPostFiltered::reset();
 	}
 
 	public function testOverrideMeta() {
@@ -142,7 +145,9 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertTrue(empty($methods));
 
 		MockPost::instanceMethods(array(
-			'first' => array('lithium\tests\mocks\data\source\MockMongoPost', 'testInstanceMethods'),
+			'first' => array(
+				'lithium\tests\mocks\data\source\MockMongoPost',
+				'testInstanceMethods'),
 			'second' => function($entity) {}
 		));
 
@@ -166,7 +171,6 @@ class ModelTest extends \lithium\test\Unit {
 			'title'       => 'title',
 			'source'      => 'mock_posts',
 			'connection'  => true,
-			'initialized' => true,
 			'locked'      => true
 		);
 
@@ -181,7 +185,6 @@ class ModelTest extends \lithium\test\Unit {
 			'title'       => 'comment_id',
 			'source'      => 'mock_comments',
 			'connection'  => true,
-			'initialized' => true,
 			'locked'      => true
 		);
 		unset($config['meta']['key']);
@@ -652,7 +655,9 @@ class ModelTest extends \lithium\test\Unit {
 	public function testSaveWithFailedValidation() {
 		$data = array('title' => '', 'author_id' => 13);
 		$record = MockPost::create($data);
-		$result = $record->save(null, array('validate' => array('title' => 'A title must be present')));
+		$result = $record->save(null, array(
+			'validate' => array('title' => 'A title must be present'))
+		);
 		$this->assertIdentical(false, $result);
 	}
 
@@ -795,10 +800,95 @@ class ModelTest extends \lithium\test\Unit {
 		$object = MockPost::invokeMethod('_object');
 		$object->belongsTo = array('Unexisting');
 		MockPost::config();
-		MockPost::invokeMethod('_init', array('lithium\tests\mocks\data\MockPost'));
+		MockPost::invokeMethod('_initialize', array('lithium\tests\mocks\data\MockPost'));
 		$exception = 'Related model class \'lithium\tests\mocks\data\Unexisting\' not found.';
 		$this->expectException($exception);
 		MockPost::relations('Unexisting');
+	}
+
+	public function testInit() {
+		MockPostFiltered::config(array('init' => false));
+		$this->assertIdentical(0, MockPostFiltered::$initCalled);
+		MockPostFiltered::reset();
+		MockPostFiltered::invokeMethod('_object');
+		MockPostFiltered::invokeMethod('_object');
+		$this->assertIdentical(1, MockPostFiltered::$initCalled);
+	}
+
+	public function testFilterInInit() {
+		$this->assertIdentical('bob filtered static', MockPostFiltered::filteredStatic('bob'));
+		$entity = MockPostFiltered::create();
+		$this->assertIdentical('bill filtered dynamic', $entity->filteredDynamic('bill'));
+
+		MockPostFiltered::reset();
+		MockPostFiltered::config(array('init' => false));
+		$this->assertIdentical('bob', MockPostFiltered::filteredStatic('bob'));
+		$entity = MockPostFiltered::create();
+		$this->assertIdentical('bill', $entity->filteredDynamic('bill'));
+	}
+
+	public function testlazilyMetadataInit() {
+		MockPostFiltered::config(array(
+			'schema' => new Schema(array(
+				'fields' => array(
+					'id' => array('type' => 'integer'),
+					'name' => array('type' => 'string'),
+					'label' => array('type' => 'string')
+				)
+			))
+		));
+
+		$this->assertIdentical('mock_post_filtereds', MockPostFiltered::meta('source'));
+		$this->assertIdentical('name', MockPostFiltered::meta('title'));
+
+		$config = array(
+			'schema' => new Schema(array(
+					'fields' => array(
+						'id' => array('type' => 'integer'),
+						'name' => array('type' => 'string'),
+						'label' => array('type' => 'string')
+					)
+				)
+			),
+			'initializers' => array(
+				'source' => function($self) {
+					return Inflector::tableize($self::meta('name'));
+				},
+				'name' => function($self) {
+					return Inflector::singularize('CoolPosts');
+				},
+				'title' => function($self) {
+					return 'label';
+				}
+			)
+		);
+		MockPostFiltered::reset();
+		MockPostFiltered::config($config);
+		$this->assertIdentical('cool_posts', MockPostFiltered::meta('source'));
+		$this->assertIdentical('label', MockPostFiltered::meta('title'));
+		$this->assertIdentical('CoolPost', MockPostFiltered::meta('name'));
+
+		MockPostFiltered::reset();
+		unset($config['initializers']['source']);
+		$config['initializers']['source'] = function($self) {
+			return Inflector::underscore($self::meta('name'));
+		};
+		MockPostFiltered::config($config);
+		$this->assertIdentical('cool_post', MockPostFiltered::meta('source'));
+		$this->assertIdentical('label', MockPostFiltered::meta('title'));
+		$this->assertIdentical('CoolPost', MockPostFiltered::meta('name'));
+
+		MockPostFiltered::reset();
+		MockPostFiltered::config($config);
+		$expected = array (
+			'class' => 'lithium\\tests\\mocks\\data\\MockPostFiltered',
+			'connection' => false,
+			'key' => 'id',
+			'name' => 'CoolPost',
+			'title' => 'label',
+			'source' => 'cool_post'
+		);
+		$this->assertEqual($expected, MockPostFiltered::meta());
 	}
 }
 
