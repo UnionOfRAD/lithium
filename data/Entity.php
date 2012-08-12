@@ -406,17 +406,14 @@ class Entity extends \lithium\core\Object {
 	 * @param string $name Optionally included field name.
 	 * @return mixed Entire stored data array if $name is empty, otherwise the value from the named field.
          */
-        public function stored($name = null)
-        {
-            if($this->exists())
-            {
-                if($name)
-                {
+        public function stored($name = null){
+            if($this->exists()) {
+                if($name) {
                     return isset($this->_data[$name]) ? $this->_data[$name] : null;
                 }
                 return $this->_data;
             }
-            return false;
+            return $this->data($name);
         }
 
 	/**
