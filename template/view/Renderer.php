@@ -202,6 +202,7 @@ abstract class Renderer extends \lithium\core\Object {
 			},
 			'options' => '_attributes',
 			'title'   => 'escape',
+			'value'   => 'escape',
 			'scripts' => function($scripts) use (&$context) {
 				return "\n\t" . join("\n\t", $context['scripts']) . "\n";
 			},
