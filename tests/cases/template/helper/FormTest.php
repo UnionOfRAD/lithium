@@ -350,10 +350,10 @@ class FormTest extends \lithium\test\Unit {
 	}
 
 	public function testTextareaGeneration() {
-		$result = $this->form->textarea('foo', array('value' => 'some content'));
+		$result = $this->form->textarea('foo', array('value' => 'some content >'));
 		$this->assertTags($result, array(
 			'textarea' => array('name' => 'foo', 'id' => 'Foo'),
-			'some content',
+			'some content &gt;',
 			'/textarea'
 		));
 	}
