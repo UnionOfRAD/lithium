@@ -37,14 +37,20 @@ class Set {
 	 *         first.
 	 */
 	public static function append(array $array, array $array2) {
-		if (!$array && $array2) {
-			return $array2;
-		}
-		foreach ($array2 as $key => $value) {
-			if (!isset($array[$key])) {
-				$array[$key] = $value;
-			} elseif (is_array($value)) {
-				$array[$key] = static::append($array[$key], $array2[$key]);
+		$arrays = func_get_args();
+		$array = array_shift($arrays);
+		foreach ($arrays as $array2) {
+			if (! $array && $array2) {
+				$array = $array2;
+				continue;
+			}
+			foreach ($array2 as $key => $value) {
+				if (! array_key_exists($key, $array)) {
+					$array[$key] = $value;
+				}
+				elseif (is_array($value)) {
+					$array[$key] = static::append($array[$key], $array2[$key]);
+				}
 			}
 		}
 		return $array;
