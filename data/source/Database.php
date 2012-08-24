@@ -241,6 +241,22 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
+	 * Return the field name from a conditions key.
+	 *
+	 * @param string $field Field or identifier name.
+	 * @return string Returns the field name without the table alias, if applicable.
+	 */
+	public function fieldName($field) {
+		if (is_string($field)) {
+			if (preg_match('/^[a-z0-9_-]+\.[a-z0-9_-]+$/i', $field)) {
+				list($first, $second) = explode('.', $field, 2);
+				return $second;
+			}
+		}
+		return $field;
+	}
+
+	/**
 	 * Converts a given value into the proper type based on a given schema definition.
 	 *
 	 * @see lithium\data\source\Database::schema()
@@ -707,7 +723,7 @@ abstract class Database extends \lithium\data\Source {
 
 	public function _processConditions($key, $value, $context, $schema, $glue = 'AND') {
 		$constraintTypes =& $this->_constraintTypes;
-		$fieldMeta = $schema->fields($key) ?: array();
+		$fieldMeta = $schema->fields($this->fieldName($key)) ?: array();
 
 		switch (true) {
 			case (is_numeric($key) && is_string($value)):

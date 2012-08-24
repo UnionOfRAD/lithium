@@ -303,6 +303,20 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
 
+	public function testCastingQueryConditionsWithSchemaWithAlias() {
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $this->_model,
+			'conditions' => array(
+				'MockDatabasePost.title' => '007'
+			)
+		));
+		$result = $this->db->renderCommand($query);
+
+		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE {MockDatabasePost}.{title} = '007';";
+		$this->assertEqual($sql, $result);
+	}
+
 	public function testJoin() {
 		$query = new Query(array(
 			'type' => 'read',
@@ -657,7 +671,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'type' => 'read', 'model' => $this->_model,
 			'conditions' => array('lower(title)' => 'test')
 		));
-		
+
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 
 		$query = new Query(array(
