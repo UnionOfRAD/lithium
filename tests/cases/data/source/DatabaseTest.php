@@ -369,6 +369,30 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testCreateWithValueBySchema() {
+		$entity = new Record(array(
+			'model' => $this->_model,
+			'data' => array('title' => '007', 'body' => 'the body')
+		));
+		$query = new Query(compact('entity') + array(
+			'type' => 'create',
+			'model' => $this->_model
+		));
+		$hash = $query->export($this->db);
+		ksort($hash);
+		$expected = sha1(serialize($hash));
+
+		$result = $this->db->create($query);
+		$this->assertTrue($result);
+		$result = $query->entity()->id;
+		$this->assertEqual($expected, $result);
+
+		$expected = "INSERT INTO {mock_database_posts} ({title}, {body})";
+		$expected .= " VALUES ('007', 'the body');";
+		$result = $this->db->sql;
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testCreateWithKey() {
 		$entity = new Record(array(
 			'model' => $this->_model,
@@ -473,6 +497,23 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$sql = "UPDATE {mock_database_posts} SET {modified} = NOW();";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
+	}
+
+	public function testUpdateWithValueBySchema() {
+		$entity = new Record(array(
+			'model' => $this->_model,
+			'data' => array('id' => 1, 'title' => '007', 'body' => 'the body'),
+			'exists' => true
+		));
+		$query = new Query(compact('entity') + array('type' => 'update'));
+		$result = $this->db->update($query);
+
+		$this->assertTrue($result);
+		$this->assertEqual(1, $query->entity()->id);
+
+		$expected = "UPDATE {mock_database_posts} SET";
+		$expected .= " {id} = 1, {title} = '007', {body} = 'the body' WHERE {id} = 1;";
+		$this->assertEqual($expected, $this->db->sql);
 	}
 
 	public function testDelete() {

@@ -782,7 +782,7 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function fields($fields, $context) {
 		$type = $context->type();
-		$schema = (array) $context->schema();
+		$schema = (array) $context->schema()->fields();
 		$modelNames = (array) $context->name();
 		$modelNames = array_merge($modelNames, array_keys((array) $context->relationships()));
 
