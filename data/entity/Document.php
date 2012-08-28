@@ -86,12 +86,20 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 */
 	protected $_valid = false;
 
+	/**
+	 * Removed keys list. Contains names of the fields will be removed from the backend data store
+	 *
+	 * @var array
+	 */
+	protected $_removed = array ();
+
 	protected function _init() {
 		parent::_init();
 
 		$data = (array) $this->_data;
 		$this->_data = array();
 		$this->_updated = array();
+		$this->_removed = array ();
 
 		$this->set($data, array('init' => true));
 		$this->sync(null, array(), array('materialize' => false));
@@ -142,7 +150,9 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 				$this->_updated[$key]->_pathKey = "{$path}{$key}";
 			}
 		}
-		return parent::export() + array('key' => $this->_pathKey);
+		return parent::export()
+			+ array('key' => $this->_pathKey)
+			+ array ('remove' => $this->_removed);
 	}
 
 	/**
@@ -269,7 +279,14 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @return void
 	 */
 	public function __unset($name) {
-		unset($this->_updated[$name]);
+		$parts = explode('.', $name, 2);
+		if (isset ($parts[1])) {
+			unset ($this->{$parts[0]}[$parts[1]]);
+		}
+		else {
+			unset ($this->_updated[$name]);
+			$this->_removed[$name] = true;
+		}
 	}
 
 	/**
