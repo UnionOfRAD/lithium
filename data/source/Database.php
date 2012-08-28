@@ -241,6 +241,26 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
+	 * Return the field name from a conditions key.
+	 *
+	 * @param string $field Field or identifier name.
+	 * @return string Returns the field name without the table alias, if applicable.
+	 * @todo Eventually, this should be refactored and moved to the Query or Schema
+	 *       class. Also, by handling field resolution in this way we are not handling
+	 *       cases where query conditions use the same field name in multiple tables.
+	 *       e.g. Foos.bar and Bars.bar will both return bar.
+	 */
+	protected function _fieldName($field) {
+		if (is_string($field)) {
+			if (preg_match('/^[a-z0-9_-]+\.[a-z0-9_-]+$/i', $field)) {
+				list($first, $second) = explode('.', $field, 2);
+				return $second;
+			}
+		}
+		return $field;
+	}
+
+	/**
 	 * Converts a given value into the proper type based on a given schema definition.
 	 *
 	 * @see lithium\data\source\Database::schema()
@@ -707,7 +727,7 @@ abstract class Database extends \lithium\data\Source {
 
 	public function _processConditions($key, $value, $context, $schema, $glue = 'AND') {
 		$constraintTypes =& $this->_constraintTypes;
-		$fieldMeta = $schema->fields($key) ?: array();
+		$fieldMeta = $schema->fields($this->_fieldName($key)) ?: array();
 
 		switch (true) {
 			case (is_numeric($key) && is_string($value)):
@@ -766,7 +786,7 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function fields($fields, $context) {
 		$type = $context->type();
-		$schema = (array) $context->schema();
+		$schema = (array) $context->schema()->fields();
 		$modelNames = (array) $context->name();
 		$modelNames = array_merge($modelNames, array_keys((array) $context->relationships()));
 
