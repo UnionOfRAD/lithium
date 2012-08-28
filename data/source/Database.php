@@ -245,8 +245,12 @@ abstract class Database extends \lithium\data\Source {
 	 *
 	 * @param string $field Field or identifier name.
 	 * @return string Returns the field name without the table alias, if applicable.
+	 * @todo Eventually, this should be refactored and moved to the Query or Schema
+	 *       class. Also, by handling field resolution in this way we are not handling
+	 *       cases where query conditions use the same field name in multiple tables.
+	 *       e.g. Foos.bar and Bars.bar will both return bar.
 	 */
-	public function fieldName($field) {
+	protected function _fieldName($field) {
 		if (is_string($field)) {
 			if (preg_match('/^[a-z0-9_-]+\.[a-z0-9_-]+$/i', $field)) {
 				list($first, $second) = explode('.', $field, 2);
@@ -723,7 +727,7 @@ abstract class Database extends \lithium\data\Source {
 
 	public function _processConditions($key, $value, $context, $schema, $glue = 'AND') {
 		$constraintTypes =& $this->_constraintTypes;
-		$fieldMeta = $schema->fields($this->fieldName($key)) ?: array();
+		$fieldMeta = $schema->fields($this->_fieldName($key)) ?: array();
 
 		switch (true) {
 			case (is_numeric($key) && is_string($value)):
