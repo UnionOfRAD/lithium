@@ -76,6 +76,9 @@ class Exporter extends \lithium\core\StaticObject {
 		$isArray = (is_array($value) && $def['array'] !== false && !$isObject);
 		$isArray = $def['array'] || $isArray;
 
+		if (!empty($def['null']) && ($value === null || $value === "")) {
+			return null;
+		}
 		if (isset($options['handlers'][$type]) && $handler = $options['handlers'][$type]) {
 			$value = $isArray ? array_map($handler, (array) $value) : $handler($value);
 		}
@@ -173,12 +176,21 @@ class Exporter extends \lithium\core\StaticObject {
 		foreach ($data as $key => $value) {
 			$original = $export['data'];
 			$isArray = is_object($value) && get_class($value) == static::$_classes['array'];
-			if ($isArray && isset($original[$key]) && $value->data() != $original[$key]->data()) {
-				$value = $value->data();
+			$options = array('handlers' => array(
+				'MongoDate' => function($value) { return $value; },
+				'MongoId' => function($value) { return $value; }
+			));
+			if ($isArray) {
+				$newValue = $value->to('array', $options);
+				$originalValue = null;
+				if (isset($original[$key])) {
+					$originalValue = $original[$key]->to('array', $options);
+				}
+				if ($newValue !== $originalValue) {
+					$value = $value->to('array', $options);
+				}
 			}
-			if ($isArray && !isset($original[$key])) {
-				 $value = $value->data();
-			}
+
 			$result = static::_append($result, "{$path}{$key}", $value, 'update');
 		}
 		return array_filter($result);

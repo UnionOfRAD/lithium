@@ -275,6 +275,33 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testCollectionHandlers() {
+		$obj = new StdClass();
+		$obj->a = "b";
+		$handlers = array(
+			'stdClass' => function($v) { return (array) $v; }
+		);
+		$data = array(
+			'test' => new Collection(array('data' => compact('obj'))),
+			'obj' => $obj
+		);
+
+		$collection = new Collection(compact('data'));
+		$expected = array(
+			'test' => array(
+				'obj' => array('a' => 'b')
+			),
+			'obj' => array('a' => 'b')
+		);
+		$this->assertIdentical($expected, $collection->to('array', compact('handlers')));
+
+		$handlers = array(
+			'stdClass' => function($v) { return $v; }
+		);
+		$expected = array('test' => compact('obj')) + compact('obj');
+		$this->assertIdentical($expected, $collection->to('array', compact('handlers')));
+	}
+
 	/**
 	 * Tests that the Collection::sort method works appropriately.
 	 *
