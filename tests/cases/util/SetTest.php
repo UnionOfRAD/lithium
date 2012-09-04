@@ -1387,14 +1387,10 @@ class SetTest extends \lithium\test\Unit {
 
 		$array1 = array(
 			'ModelOne' => array(
-				'id' => 1001,
-				'field_one' => 's1.0.m1.f1',
-				'field_two' => 's1.0.m1.f2'
+				'id' => 1001, 'field_one' => 's1.0.m1.f1', 'field_two' => 's1.0.m1.f2'
 			),
 			'ModelTwo' => array(
-				'id' => 1002,
-				'field_one' => 's1.0.m2.f1',
-				'field_two' => 's1.0.m2.f2'
+				'id' => 1002, 'field_one' => 's1.0.m2.f1', 'field_two' => 's1.0.m2.f2'
 			)
 		);
 		$array2 = array(
@@ -1412,16 +1408,10 @@ class SetTest extends \lithium\test\Unit {
 
 		$expected = array(
 			'ModelOne' => array(
-				'id' => 1001,
-				'field_one' => 's1.0.m1.f1',
-				'field_two' => 's1.0.m1.f2',
-				'field_three' => 's1.0.m1.f3'
+				'id' => 1001, 'field_one' => 's1.0.m1.f1', 'field_two' => 's1.0.m1.f2', 'field_three' => 's1.0.m1.f3'
 			),
 			'ModelTwo' => array(
-				'id' => 1002,
-				'field_one' => 's1.0.m2.f1',
-				'field_two' => 's1.0.m2.f2',
-				'field_three' => 's1.0.m2.f3'
+				'id' => 1002, 'field_one' => 's1.0.m2.f1', 'field_two' => 's1.0.m2.f2', 'field_three' => 's1.0.m2.f3'
 			)
 		);
 		$this->assertIdentical($expected, $result);
