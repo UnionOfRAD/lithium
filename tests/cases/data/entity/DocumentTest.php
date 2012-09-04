@@ -526,6 +526,61 @@ class DocumentTest extends \lithium\test\Unit {
 		unset($doc->none);
 	}
 
+	public function testUnsetNested() {
+		$data = array(
+			'a' => 1,
+			'b' => array(
+				'ba' => 21,
+				'bb' => 22
+			),
+			'c' => array(
+				'ca' => 31,
+				'cb' => array(
+					'cba' => 321,
+					'cbb' => 322
+				)
+			),
+			'd' => array(
+				'da' => 41
+			)
+		);
+		$model = $this->_model;
+
+		$doc = new Document(compact('model', 'data'));
+		$expected = $data;
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+
+		unset($doc->c->cb->cba);
+		unset($expected['c']['cb']['cba']);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+
+		unset($doc->b->bb);
+		unset($expected['b']['bb']);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+
+		unset($doc->a);
+		unset($expected['a']);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+
+		unset($doc->d);
+		unset($expected['d']);
+		$result = $doc->data();
+		$this->assertEqual($expected, $result);
+
+		$exportedRoot = $doc->export();
+		$this->assertEqual(array('a' => true, 'd' => true), $exportedRoot['remove']);
+
+		$exportedB = $doc->b->export();
+		$this->assertEqual(array('bb' => true), $exportedB['remove']);
+
+		$exportedCCB = $doc->c->cb->export();
+		$this->assertEqual(array('cba' => true), $exportedCCB['remove']);
+	}
+
 	public function testErrors() {
 		$doc = new Document(array('data' => array(
 			'title' => 'Post',
@@ -588,6 +643,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$expected = array(
 			'data' => array('foo' => 'bar', 'baz' => 'dib'),
 			'update' => array('foo' => 'bar', 'baz' => 'dib'),
+			'remove' => array(),
 			'increment' => array(),
 			'key' => '',
 			'exists' => false
