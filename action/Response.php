@@ -146,7 +146,7 @@ class Response extends \lithium\net\http\Response {
 			array_map(function($h) { header($h, false); }, $header);
 			return;
 		}
-		$code ? header($header, true) : header($header, true, $code);
+		$code ? header($header, true, $code) : header($header, true);
 	}
 }
 
