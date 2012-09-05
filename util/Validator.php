@@ -263,7 +263,7 @@ class Validator extends \lithium\core\StaticObject {
 			},
 			'decimal' => function($value, $format = null, array $options = array()) {
 				if (isset($options['precision'])) {
-					$precision = strlen($value) - strrpos($value, '.') - 1;
+					$precision = mb_strlen($value) - strrpos($value, '.') - 1;
 
 					if ($precision !== (int) $options['precision']) {
 						return false;
@@ -276,7 +276,7 @@ class Validator extends \lithium\core\StaticObject {
 				return in_array($value, $options['list']);
 			},
 			'lengthBetween' => function($value, $format, $options) {
-				$length = strlen($value);
+				$length = mb_strlen($value);
 				$options += array('min' => 1, 'max' => 255);
 				return ($length >= $options['min'] && $length <= $options['max']);
 			},
@@ -285,7 +285,7 @@ class Validator extends \lithium\core\StaticObject {
 					return false;
 				}
 				$sum = 0;
-				$length = strlen($value);
+				$length = mb_strlen($value);
 
 				for ($position = 1 - ($length % 2); $position < $length; $position += 2) {
 					$sum += $value[$position];
@@ -338,7 +338,7 @@ class Validator extends \lithium\core\StaticObject {
 			extract($params);
 			$options += array('deep' => false);
 
-			if (strlen($value = str_replace(array('-', ' '), '', $value)) < 13) {
+			if (mb_strlen($value = str_replace(array('-', ' '), '', $value)) < 13) {
 				return false;
 			}
 			if (!$chain->next($self, compact('value') + $params, $chain)) {
