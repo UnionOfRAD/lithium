@@ -122,6 +122,19 @@ class EntityTest extends \lithium\test\Unit {
 		$data = array('foo' => 'bar', 'baz' => 'dib');
 		$entity->set($data);
 		$this->assertEqual(array('foo' => true, 'baz' => true), $entity->modified());
+
+		$this->assertTrue($entity->modified('foo'));
+		$this->assertTrue($entity->modified('baz'));
+		$this->assertFalse($entity->modified('ole'));
+
+		$subentity = new Entity();
+		$subentity->set($data);
+		$entity->set(array('ble' => $subentity));
+		$this->assertEqual(array('foo' => true, 'baz' => true, 'ble' => true), $entity->modified());
+
+		$this->assertTrue($entity->ble->modified('foo'));
+		$this->assertFalse($entity->ble->modified('iak'));
+		$this->assertEqual($entity->ble->modified(), array('foo' => true, 'baz' => true));
 	}
 
 	/**

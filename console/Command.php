@@ -295,10 +295,10 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Add newlines ("\n") to the output stream.
+	 * Constructs a string of new lines (`\n`)  and returns it.
 	 *
-	 * @param integer $number The number of new lines to print.
-	 * @return integer
+	 * @param integer $number How many new lines to print, defaults to 1.
+	 * @return string with the number of new lines given.
 	 */
 	public function nl($number = 1) {
 		return str_repeat("\n", $number);
