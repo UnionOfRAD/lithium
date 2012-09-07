@@ -362,13 +362,29 @@ class Entity extends \lithium\core\Object {
 	}
 
 	/**
-	 * Gets the array of fields modified on this entity.
+	 * Gets the status of an entity field or an array of fields modified on this entity.
 	 *
-	 * @return array Returns an array where the keys are entity field names, and the values are
+	 * @param string $field the field name if given
+	 * @return mixed Returns a boolean `true` if $field is given and it exists and was updated, `false` other wise,
+				and an array where the keys are entity field names, and the values are
 	 *         `true` for changed fields.
 	 */
-	public function modified() {
+	public function modified($field = null) {
 		$fields = array_fill_keys(array_keys($this->_data), false);
+
+		if ($field) {
+			if (!isset($fields[$field]) && !isset($this->_updated[$field])) {
+				return false;
+			}
+
+			$check = isset($this->_updated[$field]);
+			if ($check && is_object($this->_updated[$field]) && method_exists($this->_updated[$field], 'modified')) {
+				$modified = $this->_updated[$field]->modified();
+				return $modified === true || is_array($modified) && in_array(true, $modified, true);
+			}
+			return !isset($fields[$field]) || $this->_data[$field] !== $this->_updated[$field];
+		}
+
 		foreach ($this->_updated as $field => $value) {
 			if (is_object($value) && method_exists($value, 'modified')) {
 				$modified = $value->modified();
