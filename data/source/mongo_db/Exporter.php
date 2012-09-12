@@ -134,7 +134,7 @@ class Exporter extends \lithium\core\StaticObject {
 		$result = array();
 
 		foreach ($left as $key => $value) {
-			if (!isset($right[$key]) || $left[$key] !== $right[$key]) {
+			if (!array_key_exists($key, $right) || $left[$key] !== $right[$key]) {
 				$result[$key] = $value;
 			}
 		}
