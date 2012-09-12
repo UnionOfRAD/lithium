@@ -556,7 +556,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 					$result[$key] = $options['handlers'][$class]($item);
 				break;
 				case (method_exists($item, 'to')):
-					$result[$key] = $item->to('array');
+					$result[$key] = $item->to('array', $options);
 				break;
 				case ($vars = get_object_vars($item)):
 					$result[$key] = static::toArray($vars, $options);
