@@ -20,8 +20,6 @@ class EnvironmentTest extends \lithium\test\Unit {
 	/**
 	 * Tests setting and getting current environment, and that invalid environments cannot be
 	 * selected.
-	 *
-	 * @return void
 	 */
 	public function testSetAndGetCurrentEnvironment() {
 		Environment::set('production',  array('foo' => 'bar'));
@@ -45,8 +43,6 @@ class EnvironmentTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests creating a custom environment, and verifies that settings are properly retrieved.
-	 *
-	 * @return void
 	 */
 	public function testCreateNonStandardEnvironment() {
 		Environment::set('custom', array('host' => 'server.local'));
@@ -63,8 +59,6 @@ class EnvironmentTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests modifying environment configuration.
-	 *
-	 * @return void
 	 */
 	public function testModifyEnvironmentConfig() {
 		Environment::set('test', array('foo' => 'bar'));
@@ -79,8 +73,6 @@ class EnvironmentTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests auto-detecting environment settings through a series of mock request classes.
-	 *
-	 * @return void
 	 */
 	public function testEnvironmentDetection() {
 		Environment::set(new MockRequest(array('SERVER_ADDR' => '::1')));
@@ -121,9 +113,36 @@ class EnvironmentTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that environment names can be mapped to lists of host names, or a hostname-matching
+	 * regular expression.
+	 */
+	public function testDetectionWithArrayMap() {
+		Environment::is(array(
+			'development' => '/^local|^\.console/',
+			'test' => array('test1.myapp.com', 'test2.myapp.com'),
+			'staging' => array('staging.myapp.com')
+		));
+
+		Environment::set(new MockRequest(array('http:host' => 'localhost')));
+		$this->assertTrue(Environment::is('development'));
+
+		Environment::set(new MockRequest(array('http:host' => 'test1.myapp.com')));
+		$this->assertTrue(Environment::is('test'));
+
+		Environment::set(new MockRequest(array('http:host' => 'test3.myapp.com')));
+		$this->assertTrue(Environment::is('production'));
+
+		Environment::set(new MockRequest(array('http:host' => 'localhost:3030')));
+		$this->assertTrue(Environment::is('development'));
+
+		$request = new MockRequest();
+		$request->params = array('env' => 'whatever');
+		Environment::set($request);
+		$this->assertTrue(Environment::is('whatever'));
+	}
+
+	/**
 	 * Tests resetting the `Environment` class to its default state.
-	 *
-	 * @return void
 	 */
 	public function testReset() {
 		Environment::set('test', array('foo' => 'bar'));
@@ -138,8 +157,6 @@ class EnvironmentTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests using a custom detector to get the current environment.
-	 *
-	 * @return void
 	 */
 	public function testCustomDetector() {
 		Environment::is(function($request) {
@@ -171,14 +188,8 @@ class EnvironmentTest extends \lithium\test\Unit {
 
 	public function testDotPath() {
 		$data = array(
-			'foo' => array(
-				'bar' => array(
-					'baz' => 123
-				)
-			),
-			'some' => array(
-				'path' => true
-			)
+			'foo' => array('bar' => array('baz' => 123)),
+			'some' => array('path' => true)
 		);
 		Environment::set('dotPathIndex', $data);
 
@@ -190,8 +201,6 @@ class EnvironmentTest extends \lithium\test\Unit {
 	/**
 	 * Tests calling `get()` and `set()` with `true` as the envrionment name, to automatically
 	 * select the current environment.
-	 *
-	 * @return void
 	 */
 	public function testReadWriteWithDefaultEnvironment() {
 		Environment::set('development');
