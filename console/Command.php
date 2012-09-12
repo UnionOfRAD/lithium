@@ -331,10 +331,10 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Add newlines ("\n") to the output stream.
+	 * Add newlines ("\n") a given number of times and returned them in a single string.
 	 *
-	 * @param integer $number The number of new lines to print.
-	 * @return integer
+	 * @param integer $number The number of new lines to fill the string.
+	 * @return string
 	 */
 	public function nl($number = 1) {
 		return str_repeat("\n", $number);
