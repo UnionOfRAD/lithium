@@ -319,7 +319,12 @@ class CouchDb extends \lithium\data\source\Http {
 				$conditions['rev'] = $data['rev'];
 			}
 			$result = json_decode($conn->delete("{$config['database']}/{$_path}", $conditions));
-			return (isset($result->ok) && $result->ok === true);
+			$result = (isset($result->ok) && $result->ok === true);
+
+			if ($query->entity()) {
+				$query->entity()->sync(null, array(), array('dematerialize' => true));
+			}
+			return $result;
 		});
 	}
 

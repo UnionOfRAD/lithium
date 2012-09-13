@@ -153,9 +153,10 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 				$this->_updated[$key]->_pathKey = "{$path}{$key}";
 			}
 		}
-		return parent::export($options)
-			+ array('key' => $this->_pathKey)
-			+ array('remove' => $this->_removed);
+		return parent::export($options) + array(
+			'key' => $this->_pathKey,
+			'remove' => $this->_removed
+		);
 	}
 
 	/**

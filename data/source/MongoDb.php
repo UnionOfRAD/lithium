@@ -546,11 +546,17 @@ class MongoDb extends \lithium\data\Source {
 			$options = $params['options'];
 			$args = $query->export($self, array('keys' => array('source', 'conditions')));
 			$source = $args['source'];
+			$conditions = $args['conditions'];
 
 			if ($source == "{$_config['gridPrefix']}.files") {
-				return $self->invokeMethod('_deleteFile', array($args['conditions']));
+				$result = $self->invokeMethod('_deleteFile', array($conditions));
+			} else {
+				$result = $self->connection->{$args['source']}->remove($conditions, $options);
 			}
-			return $self->connection->{$args['source']}->remove($args['conditions'], $options);
+			if ($result && $query->entity()) {
+				$query->entity()->sync(null, array(), array('dematerialize' => true));
+			}
+			return $result;
 		});
 	}
 

@@ -523,11 +523,13 @@ class DatabaseTest extends \lithium\test\Unit {
 			'exists' => true
 		));
 		$query = new Query(compact('entity') + array('type' => 'delete'));
+		$this->assertTrue($entity->exists());
 		$this->assertTrue($this->db->delete($query));
 		$this->assertEqual(1, $query->entity()->id);
 
 		$expected = "DELETE FROM {mock_database_posts} WHERE {id} = 1;";
 		$this->assertEqual($expected, $this->db->sql);
+		$this->assertFalse($entity->exists());
 	}
 
 	public function testOrder() {

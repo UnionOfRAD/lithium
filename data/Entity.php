@@ -306,16 +306,21 @@ class Entity extends \lithium\core\Object {
 	 * @param array $options Method options:
 	 *              - `'materialize'` _boolean_: Determines whether or not the flag should be set
 	 *                that indicates that this entity exists in the data store. Defaults to `true`.
+	 *              - `'dematerialize'` _boolean_: If set to `true`, indicates that this entity has
+	 *                been deleted from the data store and no longer exists. Defaults to `false`.
 	 * @return void
 	 */
 	public function sync($id = null, array $data = array(), array $options = array()) {
-		$defaults = array('materialize' => true);
+		$defaults = array('materialize' => true, 'dematerialize' => false);
 		$options += $defaults;
 		$model = $this->_model;
 		$key = array();
 
 		if ($options['materialize']) {
 			$this->_exists = true;
+		}
+		if ($options['dematerialize']) {
+			$this->_exists = false;
 		}
 		if ($id && $model) {
 			$key = $model::meta('key');

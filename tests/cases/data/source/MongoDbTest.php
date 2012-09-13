@@ -374,6 +374,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$result = array_pop($this->db->connection->queries);
 		$conditions = array('_id' => $this->query->entity()->_id);
 		$this->assertEqual($conditions, $result['conditions']);
+		$this->assertTrue($this->query->entity()->exists());
 
 		$model = $this->_model;
 		$this->query = new Query(compact('model') + array(
@@ -383,6 +384,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		array_push($this->db->connection->results, true);
 		$this->query->conditions($conditions);
 		$this->assertTrue($this->db->delete($this->query));
+		$this->assertFalse($this->query->entity()->exists());
 
 		$expected = compact('conditions') + array(
 			'type' => 'remove',

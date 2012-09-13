@@ -432,14 +432,12 @@ abstract class Database extends \lithium\data\Source {
 			$query = $params['query'];
 			$params = $query->export($self);
 			$sql = $self->renderCommand('update', $params, $query);
+			$result = (boolean) $self->invokeMethod('_execute', array($sql));
 
-			if ($self->invokeMethod('_execute', array($sql))) {
-				if ($query->entity()) {
-					$query->entity()->sync();
-				}
-				return true;
+			if ($result && is_object($query) && $query->entity()) {
+				$query->entity()->sync();
 			}
-			return false;
+			return $result;
 		});
 	}
 
@@ -456,14 +454,19 @@ abstract class Database extends \lithium\data\Source {
 	public function delete($query, array $options = array()) {
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
 			$query = $params['query'];
+			$isObject = is_object($query);
 
-			if (is_object($query)) {
-				$data = $query->export($self);
-				$sql = $self->renderCommand('delete', $data, $query);
+			if ($isObject) {
+				$sql = $self->renderCommand('delete', $query->export($self), $query);
 			} else {
 				$sql = String::insert($query, $self->value($params['options']));
 			}
-			return (boolean) $self->invokeMethod('_execute', array($sql));
+			$result = (boolean) $self->invokeMethod('_execute', array($sql));
+
+			if ($result && $isObject && $query->entity()) {
+				$query->entity()->sync(null, array(), array('dematerialize' => true));
+			}
+			return $result;
 		});
 	}
 
