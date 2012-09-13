@@ -101,11 +101,9 @@ class LibrariesTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests accessing library configurations.
-	 *
-	 * @return void
 	 */
 	public function testLibraryConfigAccess() {
-		$result = Libraries::get('lithium');
+		$config = Libraries::get('lithium'); // => ['path' => '/path/to/lithium', ...]
 		$expected = array(
 			'path' => str_replace('\\', '/', realpath(realpath(LITHIUM_LIBRARY_PATH) . '/lithium')),
 			'prefix' => 'lithium\\',
@@ -123,22 +121,39 @@ class LibrariesTest extends \lithium\test\Unit {
 			$expected['default'] = true;
 		}
 
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $config);
 		$this->assertNull(Libraries::get('foo'));
 
-		$result = Libraries::get();
-		$this->assertTrue(isset($result['lithium']));
-		$this->assertEqual($expected, $result['lithium']);
+		$configs = Libraries::get(); // => ['lithium' => ['path' => ...], 'myapp' => [...], ...]
+		$this->assertTrue(isset($configs['lithium']));
+		$this->assertEqual($expected, $configs['lithium']);
 
 		if ($this->hasApp) {
-			$this->assertTrue(isset($result['app']));
+			$this->assertTrue(isset($configs['app']));
 		}
+
+		$configs = Libraries::get(array('lithium')); // => ['lithium' => ['path' => '...', ...]]
+		$this->assertEqual(array('lithium'), array_keys($configs));
+		$this->assertEqual($expected, $configs['lithium']);
+
+		$prefixes = Libraries::get(array('lithium'), 'prefix'); // => ['lithium' => 'lithium\\']
+		$this->assertEqual(array('lithium' => 'lithium\\'), $prefixes);
+
+		$allPre = Libraries::get(null, 'prefix'); // => ['my' => 'my\\', 'lithium' => 'lithium\\']
+		$this->assertTrue($allPre);
+		$this->assertEqual(array_keys(Libraries::get()), array_keys($allPre));
+
+		foreach ($allPre as $prefix) {
+			$this->assertTrue(is_string($prefix) || is_bool($prefix));
+		}
+
+		$library = Libraries::get('lithium\core\Libraries'); // 'lithium'
+		$this->assertEqual('lithium', $library);
+		$this->assertNull(Libraries::get('foo\bar\baz'));
 	}
 
 	/**
 	 * Tests the addition and removal of default libraries.
-	 *
-	 * @return void
 	 */
 	public function testLibraryAddRemove() {
 		$lithium = Libraries::get('lithium');
@@ -164,8 +179,6 @@ class LibrariesTest extends \lithium\test\Unit {
 
 	/**
 	* Tests that an exception is thrown when a library is added which could not be found.
-	*
-	* @return void
 	*/
 	public function testAddInvalidLibrary() {
 		$this->expectException("Library `invalid_foo` not found.");
@@ -174,8 +187,6 @@ class LibrariesTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that non-prefixed (poorly named or structured) libraries can still be added.
-	 *
-	 * @return void
 	 */
 	public function testAddNonPrefixedLibrary() {
 		$tmpDir = realpath(Libraries::get(true, 'resources') . '/tmp');
@@ -212,8 +223,6 @@ class LibrariesTest extends \lithium\test\Unit {
 	/**
 	 * Tests that non-class files are always filtered out of `find()` results unless an alternate
 	 * filter is specified.
-	 *
-	 * @return void
 	 */
 	public function testExcludeNonClassFiles() {
 		$result = Libraries::find('lithium');
@@ -241,8 +250,6 @@ class LibrariesTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests the loading of libraries
-	 *
-	 * @return void
 	 */
 	public function testLibraryLoad() {
 		$this->expectException('Failed to load class `SomeInvalidLibrary` from path ``.');
@@ -251,8 +258,6 @@ class LibrariesTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests path caching by calling `path()` twice.
-	 *
-	 * @return void
 	 */
 	public function testPathCaching() {
 		$this->assertFalse(Libraries::cache(false));
@@ -275,8 +280,6 @@ class LibrariesTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests recursive and non-recursive searching through libraries with paths.
-	 *
-	 * @return void
 	 */
 	public function testFindingClasses() {
 		$result = Libraries::find('lithium', array(
@@ -372,8 +375,6 @@ class LibrariesTest extends \lithium\test\Unit {
 	/**
 	 * Tests locating service objects.  These tests may fail if not run on a stock install, as other
 	 * objects may preceed the core objects in load order.
-	 *
-	 * @return void
 	 */
 	public function testServiceLocation() {
 		$this->assertNull(Libraries::locate('adapter', 'File'));
@@ -586,8 +587,6 @@ class LibrariesTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that `Libraries::realPath()` correctly resolves paths to files inside Phar archives.
-	 *
-	 * @return void
 	 */
 	public function testPathsInPharArchives() {
 		$base = Libraries::get('lithium', 'path');
