@@ -163,7 +163,7 @@ class Help extends \lithium\console\Command {
 			$comment = Docblock::comment($method['docComment']);
 
 			$name = $method['name'];
-			$description = $comment['description'];
+			$description = trim($comment['description'] . PHP_EOL . $comment['text']);
 			$args = $method['args'];
 			$return = null;
 
