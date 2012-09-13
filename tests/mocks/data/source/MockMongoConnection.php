@@ -27,6 +27,10 @@ class MockMongoConnection {
 		return $this;
 	}
 
+	public function listDBs() {
+		return array();
+	}
+
 	public function insert(array &$data, array $options = array()) {
 		$data['_id'] = new MongoId();
 		return $this->_record(__FUNCTION__, compact('data', 'options'));

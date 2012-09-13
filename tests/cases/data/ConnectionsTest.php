@@ -141,17 +141,15 @@ class ConnectionsTest extends \lithium\test\Unit {
 	}
 
 	protected function _canConnect($host, $port) {
-		$this->expectException();
-		$this->expectException();
+		$success = false;
+		set_error_handler(function() {});
 
 		if ($conn = fsockopen($host, $port)) {
-			array_pop($this->_expected);
-			array_pop($this->_expected);
 			fclose($conn);
-
-			return true;
+			$success = true;
 		}
-		return false;
+		restore_error_handler();
+		return $success;
 	}
 }
 

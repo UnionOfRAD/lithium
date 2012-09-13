@@ -57,22 +57,21 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function skip() {
 		$this->skipIf(!MongoDb::enabled(), 'The `MongoDb` class is not enabled.');
-
-		$db = new MongoDb($this->_testConfig);
-		$message = "`{$this->_testConfig['database']}` database or connection unavailable";
-		$this->skipIf(!$db->isConnected(array('autoConnect' => true)), $message);
 	}
 
 	public function setUp() {
 		$model = $this->_model;
 		$this->db = new MongoDb($this->_testConfig);
-		$this->db->server = (object) array('connected' => true);
+		$this->db->server = new MockMongoConnection();
 		$this->db->connection = new MockMongoConnection();
+		$this->db->server->connected = true;
 
 		$model::config(array('meta' => array('key' => '_id')));
 		$model::$connection = $this->db;
 
-		$this->query = new Query(compact('model') + array('entity' => new Document(compact('model'))));
+		$this->query = new Query(compact('model') + array(
+			'entity' => new Document(compact('model'))
+		));
 	}
 
 	public function tearDown() {
@@ -91,13 +90,6 @@ class MongoDbTest extends \lithium\test\Unit {
 	public function testGoodConnectionBadDatabase() {
 		$this->expectException('Could not connect to the database.');
 		$db = new MongoDb(array('database' => null, 'autoConnnect' => false));
-	}
-
-	public function testGoodConnectionGoodDatabase() {
-		$db = new MongoDb(array('autoConnect' => false) + $this->_testConfig);
-		$this->assertFalse($db->isConnected());
-		$this->assertTrue($db->connect());
-		$this->assertTrue($db->isConnected());
 	}
 
 	public function testSources() {
@@ -424,11 +416,7 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testArbitraryMethodCalls() {
-		$db = new MongoDb($config = $this->_testConfig);
-		$result = $db->__toString();
-		$this->assertTrue(strpos($result, $config['host']) !== false);
-		$this->assertTrue(strpos($result, $config['port']) !== false);
-		$this->assertTrue(is_array($db->listDBs()));
+		$this->assertTrue(is_array($this->db->listDBs()));
 	}
 
 	public function testDocumentSorting() {
