@@ -53,10 +53,10 @@ class Exporter extends \lithium\core\StaticObject {
 	protected static function _create($export, array $options) {
 		$export += array('data' => array(), 'update' => array(), 'key' => '');
 		$data = Set::merge($export['data'], $export['update']);
+
 		if (array_keys($data) == range(0, count($data) - 1)) {
 			$data = $export['update'];
 		}
-
 		$localOpts = array('finalize' => false) + $options;
 
 		foreach ($data as $key => $val) {
@@ -110,16 +110,25 @@ class Exporter extends \lithium\core\StaticObject {
 			$original = $export['data'];
 			$isArray = is_object($value) && get_class($value) == static::$_classes['set'];
 
-			if ($isArray && isset($original[$key]) && $value->data() != $original[$key]->data()) {
-				$value = $value->data();
-			}
-			if ($isArray && !isset($original[$key])) {
-				 $value = $value->data();
+			$options = array('handlers' => array(
+				'MongoDate' => function($value) { return $value; },
+				'MongoId' => function($value) { return $value; }
+			));
+
+			if ($isArray) {
+				$newValue = $value->to('array', $options);
+				$originalValue = null;
+
+				if (isset($original[$key])) {
+					$originalValue = $original[$key]->to('array', $options);
+				}
+				if ($newValue !== $originalValue) {
+					$value = $value->to('array', $options);
+				}
 			}
 			$result = static::_append($result, "{$path}{$key}", $value, 'update');
 		}
 		return array_filter($result);
-
 	}
 
 	/**

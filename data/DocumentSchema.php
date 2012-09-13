@@ -31,11 +31,10 @@ class DocumentSchema extends \lithium\data\Schema {
 		$classes = $this->_classes;
 
 		$fieldName = is_int($key) ? null : $key;
+		$pathKey = $basePathKey;
 
 		if ($fieldName) {
 			$pathKey = $basePathKey ? "{$basePathKey}.{$fieldName}" : $fieldName;
-		} else {
-			$pathKey = $basePathKey;
 		}
 
 		if ($data instanceof $classes['set'] || $data instanceof $classes['entity']) {
@@ -92,6 +91,9 @@ class DocumentSchema extends \lithium\data\Schema {
 	 *               handler, if available.
 	 */
 	protected function _castType($value, $field) {
+		if ($this->is('null', $field) && ($value === null || $value === "")) {
+			return null;
+		}
 		if (!is_scalar($value)) {
 			return $value;
 		}

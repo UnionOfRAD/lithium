@@ -13,8 +13,8 @@ use MongoDate;
 use lithium\data\source\MongoDb;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
-use lithium\data\source\mongo_db\Exporter;
 use lithium\data\source\mongo_db\Schema;
+use lithium\data\source\mongo_db\Exporter;
 use lithium\tests\mocks\data\source\mongo_db\MockResult;
 
 class ExporterTest extends \lithium\test\Unit {
@@ -570,14 +570,13 @@ class ExporterTest extends \lithium\test\Unit {
 		$handlers = $this->_handlers;
 		$options = compact('model', 'handlers');
 
-		$schema = new Schema(array(
-			'fields' =>array(
-				'_id' => array('type' => 'MongoId'),
-				'title' => array('type' => 'text'),
-				'similar_text' => array('type' => 'array'),
-				'similar_text.articles' => array('type' => 'MongoId', 'array' => true),
-				'similar_text.books' => array('type' => 'MongoId', 'array' => true),
-				'similar_text.magazines' => array('type' => 'MongoId', 'array' => true)
+		$schema = new Schema(array('fields' => array(
+			'_id' => array('type' => 'MongoId'),
+			'title' => array('type' => 'text'),
+			'similar_text' => array('type' => 'array'),
+			'similar_text.articles' => array('type' => 'MongoId', 'array' => true),
+			'similar_text.books' => array('type' => 'MongoId', 'array' => true),
+			'similar_text.magazines' => array('type' => 'MongoId', 'array' => true)
 		)));
 		$result = $schema->cast(null, null, $data, $options);
 		$this->assertTrue($result['similar_text']['articles'][0] instanceof MongoId);
@@ -585,6 +584,46 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertTrue($result['similar_text']['books'][1] instanceof MongoId);
 		$this->assertTrue($result['similar_text']['magazines'][0] instanceof MongoId);
 		$this->assertTrue($result['similar_text']['magazines'][1] instanceof MongoId);
+	}
+
+	/**
+	 * Tests that updating arrays of `MongoId`s correctly preserves their type.
+	 */
+	public function testUpdatingMongoIdArray() {
+		$schema = new Schema(array('fields' => array(
+			'list' => array('type' => 'id', 'array' => true)
+		)));
+
+		$doc = new Document(array('exists' => true, 'data' => array(
+			'list' => array(new MongoId(), new MongoId(), new MongoId())
+		)));
+		$this->assertEqual(array(), Exporter::get('update', $doc->export()));
+
+		$doc->list[] = new MongoId();
+		$doc->list[] = new MongoId();
+		$result = Exporter::get('update', $doc->export());
+
+		$this->assertEqual(1, count($result));
+		$this->assertEqual(1, count($result['update']));
+		$this->assertEqual(5, count($result['update']['list']));
+
+		for ($i = 0; $i < 5; $i++) {
+			$this->assertTrue($result['update']['list'][$i] instanceof MongoId);
+		}
+
+		$doc = new Document(array('exists' => true, 'data' => array(
+			'list' => array(new MongoId(), new MongoId(), new MongoId())
+		)));
+		$doc->list = array(new MongoId(), new MongoId(), new MongoId());
+		$result = Exporter::get('update', $doc->export());
+
+		$this->assertEqual(1, count($result));
+		$this->assertEqual(1, count($result['update']));
+		$this->assertEqual(3, count($result['update']['list']));
+
+		for ($i = 0; $i < 3; $i++) {
+			$this->assertTrue($result['update']['list'][$i] instanceof MongoId);
+		}
 	}
 }
 

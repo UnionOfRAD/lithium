@@ -299,31 +299,42 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testCollectionHandlers() {
+		$obj = new stdClass();
+		$obj->a = "b";
+		$handlers = array('stdClass' => function($v) { return (array) $v; });
+		$data = array('test' => new Collection(array('data' => compact('obj')))) + compact('obj');
+
+		$collection = new Collection(compact('data'));
+		$expected = array(
+			'test' => array('obj' => array('a' => 'b')),
+			'obj' => array('a' => 'b')
+		);
+		$this->assertIdentical($expected, $collection->to('array', compact('handlers')));
+
+		$handlers = array('stdClass' => function($v) { return $v; });
+		$expected = array('test' => compact('obj')) + compact('obj');
+		$this->assertIdentical($expected, $collection->to('array', compact('handlers')));
+	}
+
 	/**
 	 * Tests that the Collection::sort method works appropriately.
-	 *
-	 * @return void
 	 */
 	public function testCollectionSort() {
-		// Typical numeric sort using the default "sort" PHP function
+
 		$collection = new Collection(array('data' => array(5,3,4,1,2)));
 		$collection->sort();
 		$expected = array(1,2,3,4,5);
 		$this->assertEqual($expected, $collection->to('array'));
 
-		// String sort using "sort"
-		$collection = new Collection(array('data' => array('alan','dave','betsy','carl')));
-		$collection->sort();
+		$collection = new Collection(array('data' => array('alan', 'dave', 'betsy', 'carl')));
 		$expected = array('alan','betsy','carl','dave');
-		$this->assertEqual($expected, $collection->to('array'));
+		$this->assertEqual($expected, $collection->sort()->to('array'));
 
-		// String sort using strcasecmp
-		$collection = new Collection(array('data' => array('Alan','Dave','betsy','carl')));
-		$collection->sort('strcasecmp');
-		$expected = array('Alan','betsy','carl','Dave');
-		$this->assertEqual($expected, $collection->to('array'));
+		$collection = new Collection(array('data' => array('Alan', 'Dave', 'betsy', 'carl')));
+		$expected = array('Alan', 'betsy', 'carl', 'Dave');
+		$this->assertEqual($expected, $collection->sort('strcasecmp')->to('array'));
 
-		// Numeric sort using custom function
 		$collection = new Collection(array('data' => array(5,3,4,1,2)));
 		$collection->sort(function ($a,$b) {
 			if ($a == $b) {
@@ -334,7 +345,6 @@ class CollectionTest extends \lithium\test\Unit {
 		$expected = array(5,4,3,2,1);
 		$this->assertEqual($expected, $collection->to('array'));
 
-		// Test fail
 		$collection = new Collection(array('data' => array(5,3,4,1,2)));
 		$result = $collection->sort('blahgah');
 		$this->assertEqual($collection->to('array'), $result->to('array'));

@@ -121,7 +121,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		if (isset($this->_embedded[$name]) && !isset($this->_relationships[$name])) {
 			throw new RuntimeException("Not implemented.");
 		}
-		$result = parent::__get($name);
+		$result =& parent::__get($name);
 
 		if ($result !== null || array_key_exists($name, $this->_updated)) {
 			return $result;
