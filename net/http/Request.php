@@ -77,7 +77,9 @@ class Request extends \lithium\net\http\Message {
 			'body' => null,
 			'auth' => null,
 			'method' => 'GET',
-			'proxy' => null
+			'proxy' => null,
+			'ignoreErrors' => true,
+			'followLocation' => true
 		);
 		$config += $defaults;
 		parent::__construct($config);
@@ -99,13 +101,11 @@ class Request extends \lithium\net\http\Message {
 	 */
 	protected function _encode($body) {
 		$media = $this->_classes['media'];
+
 		if ($type = $media::type($this->_type)) {
 			$body = $media::encode($this->_type, $body) ?: $body;
 		}
-		if (is_array($body)) {
-			$body = join("\r\n", $body);
-		}
-		return $body;
+		return is_array($body) ? join("\r\n", $body) : $body;
 	}
 
 	/**
@@ -145,31 +145,29 @@ class Request extends \lithium\net\http\Message {
 
 			if (!$format) {
 				$result[] = http_build_query($query);
+				continue;
 			}
-			if ($format) {
-				$q = null;
+			$q = null;
 
-				foreach ($params as $key => $value) {
-					if (is_array($value)) {
-						foreach ($value as $val) {
-							$q .= String::insert($format, array(
-								'key' => urlencode("{$key}[]"),
-								'value' => urlencode($val)
-							));
-						}
-						continue;
-					}
+			foreach ($params as $key => $value) {
+				if (!is_array($value)) {
 					$q .= String::insert($format, array(
 						'key' => urlencode($key),
 						'value' => urlencode($value)
 					));
+					continue;
 				}
-				$result[] = substr($q, 0, -1);
+				foreach ($value as $val) {
+					$q .= String::insert($format, array(
+						'key' => urlencode("{$key}[]"),
+						'value' => urlencode($val)
+					));
+				}
 			}
-
+			$result[] = substr($q, 0, -1);
 		}
 		$result = array_filter($result);
-		return (!empty($result)) ? "?" . join("&", $result) : null;
+		return $result ? "?" . join("&", $result) : null;
 	}
 
 	/**
@@ -212,18 +210,16 @@ class Request extends \lithium\net\http\Message {
 			'username' => $this->username,
 			'password' => $this->password,
 			'headers' => array(),
-			'proxy' => $this->proxy,
+			'proxy' => $this->_config['proxy'],
 			'body' => null,
 			'version' => $this->version,
-			'ignore_errors' => isset($this->_config['ignore_errors'])
-				? $this->_config['ignore_errors'] : true,
-			'follow_location' => isset($this->_config['follow_location'])
-				? $this->_config['follow_location'] : true,
-			'request_fulluri' => isset($this->proxy)
+			'ignore_errors' => $this->_config['ignoreErrors'],
+			'follow_location' => $this->_config['followLocation'],
+			'request_fulluri' => (boolean) $this->_config['proxy']
 		);
 		$options += $defaults;
 
-		if (!empty($options['auth'])) {
+		if ($options['auth']) {
 			$data = array();
 
 			if (is_array($options['auth']) && !empty($options['auth']['nonce'])) {
@@ -256,7 +252,9 @@ class Request extends \lithium\net\http\Message {
 					'header' => $this->headers($options['headers']),
 					'protocol_version' => $options['version'],
 					'ignore_errors' => $options['ignore_errors'],
-					'follow_location' => $options['follow_location']
+					'follow_location' => $options['follow_location'],
+					'request_fulluri' => $options['request_fulluri'],
+					'proxy' => $options['proxy']
 				);
 				return array('http' => array_diff_key($options, $defaults) + $base);
 			case 'string':

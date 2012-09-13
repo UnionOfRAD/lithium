@@ -166,7 +166,9 @@ class RequestTest extends \lithium\test\Unit {
 			'content' => '',
 			'protocol_version' => '1.1',
 			'ignore_errors' => true,
-			'follow_location' => true
+			'follow_location' => true,
+			'request_fulluri' => false,
+			'proxy' => null
 		));
 		$this->assertEqual($expected, $request->to('context'));
 	}
@@ -210,6 +212,25 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	/**
+	 * Tests that creating a `Request` with a proxy configuration correctly modifies the results
+	 * of exporting the `Request` to a stream context configuration.
+	 */
+	public function testWithProxy() {
+		$request = new Request(array('proxy' => 'tcp://proxy.example.com:5100'));
+		$expected = array('http' => array(
+			'content' => '',
+			'method' => 'GET',
+			'header' => array('Host: localhost', 'Connection: Close', 'User-Agent: Mozilla/5.0'),
+			'protocol_version' => '1.1',
+			'ignore_errors' => true,
+			'follow_location' => true,
+			'request_fulluri' => true,
+			'proxy' => 'tcp://proxy.example.com:5100'
+		));
+		$this->assertEqual($expected, $request->to('context'));
+	}
+
 	public function testToUrl() {
 		$expected = 'http://localhost/';
 		$result = $this->request->to('url');
@@ -232,7 +253,9 @@ class RequestTest extends \lithium\test\Unit {
 			),
 			'protocol_version' => '1.1',
 			'ignore_errors' => true,
-			'follow_location' => true
+			'follow_location' => true,
+			'request_fulluri' => false,
+			'proxy' => null
 		));
 		$result = $this->request->to('context');
 		$this->assertEqual($expected, $result);
