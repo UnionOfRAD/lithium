@@ -36,7 +36,14 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('classes' => 'merge');
+	protected $_autoConfig = array('classes' => 'merge', 'responseTypes');
+
+	/**
+	 * Array of closures that return various pieces of information about an HTTP response.
+	 * 
+	 * @var array
+	 */
+	protected $_responseTypes = array();
 
 	/**
 	 * Indicates whether `Service` can connect to the HTTP endpoint for which it is configured.
@@ -90,6 +97,11 @@ class Service extends \lithium\core\Object {
 		} catch(ClassNotFoundException $e) {
 			$this->connection = null;
 		}
+		$this->_responseTypes += array(
+			'headers' => function($response) { return $response->headers; },
+			'body' => function($response) { return $response->body(); },
+			'code' => function($response) { return $response->status['code']; }
+		);
 	}
 
 	/**
@@ -111,8 +123,9 @@ class Service extends \lithium\core\Object {
 	 * @param array $options
 	 * @return string
 	 */
-	public function head(array $options = array()) {
-		return $this->send(__FUNCTION__, null, array(), $options);
+	public function head($path = null, $data = array(), array $options = array()) {
+		$defaults = array('return' => 'headers');
+		return $this->send(__FUNCTION__, $path, $data, $options + $defaults);
 	}
 
 	/**
@@ -192,7 +205,11 @@ class Service extends \lithium\core\Object {
 			$this->connection->close();
 		}
 		$this->last = (object) compact('request', 'response');
-		return ($options['return'] == 'body' && $response) ? $response->body() : $response;
+
+		$handlers = $this->_responseTypes;
+		$handler = isset($handlers[$options['return']]) ? $handlers[$options['return']] : null;
+
+		return $handler ? $handler($response) : $response;
 	}
 
 	/**
