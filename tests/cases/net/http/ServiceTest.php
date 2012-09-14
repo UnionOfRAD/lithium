@@ -65,15 +65,42 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testReturnHandlers() {
+		$http = new Service($this->_testConfig);
+		$result = $http->get(null, null, array('return' => 'headers'));
+		$this->assertEqual('localhost:80', $result['Host']);
+
+		$result = $http->get(null, null, array('return' => 'response'));
+		$this->assertEqual($result, $http->last->response);
+
+		$result = $http->get(null, null, array('return' => 'body'));
+		$this->assertEqual($result, $http->last->response->body());
+	}
+
 	public function testHead() {
 		$http = new Service($this->_testConfig);
-		$this->assertEqual('', $http->head());
+		$result = $http->head();
+		$this->assertEqual('localhost:80', $result['Host']);
 		$this->assertEqual('HTTP/1.1', $http->last->response->protocol);
 		$this->assertEqual('200', $http->last->response->status['code']);
 		$this->assertEqual('OK', $http->last->response->status['message']);
 		$this->assertEqual('text/html', $http->last->response->type);
 		$this->assertEqual('UTF-8', $http->last->response->encoding);
 		$this->assertEqual('', $http->last->response->body());
+	}
+
+	public function testHeadPath() {
+		$http = new Service($this->_testConfig);
+		$expected = '/somewhere';
+		$result = $http->head('/somewhere');
+		$this->assertEqual($expected, $http->last->request->path);
+	}
+
+	public function testHeadQueryString() {
+		$http = new Service($this->_testConfig);
+		$expected = array('foo' => 'bar');
+		$result = $http->head('/', $expected);
+		$this->assertEqual($expected, $http->last->request->query);
 	}
 
 	public function testGet() {
