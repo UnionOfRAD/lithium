@@ -175,6 +175,38 @@ class ViewTest extends \lithium\test\Unit {
 		unset($renderData[0]['data']['h']);
 		$this->assertEqual($expected, $renderData);
 	}
+
+	public function testElementRendering() {
+		$view = new View(array(
+			'loader' => 'lithium\tests\mocks\template\view\adapters\TestRenderer',
+			'paths' => array(
+				'template' => '{:library}/tests/mocks/template/view/adapters/{:template}.html.php',
+				'element' => array(
+					'{:library}/tests/mocks/template/view/adapters/{:controller}/_{:template}.html.php',
+					'{:library}/tests/mocks/template/view/adapters/{:template}.html.php'
+
+				),
+				'layout' => false
+			)
+		));
+
+		$options = array(
+			'template' => 'testElement',
+			'library' => LITHIUM_LIBRARY_PATH . '/lithium'
+		);
+		$result = $view->render('all', array(), $options);
+		$expected = 'This is a rendered element';
+		$this->assertEqual($expected, $result);
+
+		$options = array(
+			'template' => 'testElement',
+			'library' => LITHIUM_LIBRARY_PATH . '/lithium',
+			'controller' => 'posts'
+		);
+		$result = $view->render('all', array(), $options);
+		$expected = 'This is a rendered _element';
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
