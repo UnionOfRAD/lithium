@@ -222,7 +222,7 @@ class Service extends \lithium\core\Object {
 	 * @param string $data
 	 * @param string $options
 	 * @return object Returns an instance of `http\Request`, configured with an HTTP method, query
-	 *         string or POST/PUT data, and URL.
+	 *         string or POST/PUT/PATCH data, and URL.
 	 */
 	protected function _request($method, $path, $data, $options) {
 		$defaults = array('type' => 'form');
@@ -232,7 +232,7 @@ class Service extends \lithium\core\Object {
 		$request->path = str_replace('//', '/', "{$request->path}{$path}");
 		$request->method = $method = strtoupper($method);
 
-		$hasBody = in_array($method, array('POST', 'PUT'));
+		$hasBody = in_array($method, array('POST', 'PUT', 'PATCH'));
 		$hasBody ? $request->type($options['type']) : null;
 		$hasBody ? $request->body($data) : $request->query = $data;
 		return $request;
