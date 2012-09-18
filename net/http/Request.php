@@ -230,7 +230,7 @@ class Request extends \lithium\net\http\Message {
 			$data = $auth::encode($options['username'], $options['password'], $data);
 			$this->headers('Authorization', $auth::header($data));
 		}
-		if (in_array($options['method'], array('POST', 'PUT'))) {
+		if (in_array($options['method'], array('POST', 'PUT', 'PATCH'))) {
 			$media = $this->_classes['media'];
 			if ($type = $media::type($this->_type)) {
 				$this->headers('Content-Type', $type['content'][0]);
