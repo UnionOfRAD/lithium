@@ -207,9 +207,15 @@ class Model extends \lithium\core\StaticObject {
 		'title' => null,
 		'class' => null,
 		'source' => null,
-		'connection' => 'default',
-		'initialized' => false
+		'connection' => 'default'
 	);
+
+	/**
+	 * Array of closures used to lazily initialize metadata.
+	 *
+	 * @var array
+	 */
+	protected $_initializers = array();
 
 	/**
 	 * Stores the data schema.
@@ -388,13 +394,25 @@ class Model extends \lithium\core\StaticObject {
 
 		$local = compact('class', 'name') + $self->_meta;
 		$self->_meta = ($local + $source['meta'] + $meta);
-		$self->_meta['initialized'] = false;
 
 		if (is_object($schema)) {
 			$schema = $schema->fields();
 		}
-		$self->schema()->append($schema + $source['schema']);
+		$self->_initializers += array(
+			'source' => function() use (&$self) {
+				return Inflector::tableize($self->_meta['name']);
+			},
+			'title' => function() use (&$self, $class) {
+				$titleKeys = array('title', 'name');
 
+				if (isset($self->_meta['key'])) {
+					$titleKeys = array_merge($titleKeys, (array) $self->_meta['key']);
+				}
+				return $class::hasField($titleKeys);
+			}
+		);
+
+		$self->schema()->append($schema + $source['schema']);
 		$self->_finders += $source['finders'] + $self->_findFilters();
 
 		static::_relationsToLoad();
@@ -555,31 +573,35 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function meta($key = null, $value = null) {
 		$self = static::_object();
+		$isArray = is_array($key);
 
-		if ($value) {
-			$self->_meta[$key] = $value;
+		if ($value || $isArray) {
+			$value ? $self->_meta[$key] = $value : $self->_meta = $key + $self->_meta;
+			return;
 		}
-		if (is_array($key)) {
-			$self->_meta = $key + $self->_meta;
+		return $self->_getMetaKey($isArray ? null : $key);
+	}
+
+	/**
+	 * Helper method used by `meta()` to generate and cache metadata values.
+	 *
+	 * @param string $key The name of the meta value to return, or `null`, to return all values.
+	 * @return mixed Returns the value of the meta key specified by `$key`, or an array of all meta
+	 *         values if `$key` is `null`.
+	 */
+	protected function _getMetaKey($key = null) {
+		if (!$key) {
+			$all = array_keys($this->_initializers);
+			$call = array(&$this, '_getMetaKey');
+			return array_combine($all, array_map($call, $all)) + $this->_meta;
 		}
 
-		if (!$self->_meta['initialized']) {
-			$self->_meta['initialized'] = true;
-
-			if ($self->_meta['source'] === null) {
-				$self->_meta['source'] = Inflector::tableize($self->_meta['name']);
-			}
-			$titleKeys = array('title', 'name');
-
-			if (isset($self->_meta['key'])) {
-				$titleKeys = array_merge($titleKeys, (array) $self->_meta['key']);
-			}
-			$self->_meta['title'] = $self->_meta['title'] ?: static::hasField($titleKeys);
+		if (isset($this->_meta[$key])) {
+			return $this->_meta[$key];
 		}
-		if (is_array($key) || !$key || $value) {
-			return $self->_meta;
+		if (isset($this->_initializers[$key]) && $initializer = $this->_initializers[$key]) {
+			return ($this->_meta[$key] = $initializer($this->_meta, $this->_schema));
 		}
-		return isset($self->_meta[$key]) ? $self->_meta[$key] : null;
 	}
 
 	/**
@@ -766,16 +788,16 @@ class Model extends \lithium\core\StaticObject {
 	 *         the fields in the list are found.
 	 */
 	public static function hasField($field) {
-		if (is_array($field)) {
-			foreach ($field as $f) {
-				if (static::hasField($f)) {
-					return $f;
-				}
-			}
-			return false;
+		if (!is_array($field)) {
+			return static::schema()->fields($field);
 		}
-		$schema = static::schema();
-		return ($schema && isset($schema[$field]));
+
+		foreach ($field as $f) {
+			if (static::hasField($f)) {
+				return $f;
+			}
+		}
+		return false;
 	}
 
 	/**

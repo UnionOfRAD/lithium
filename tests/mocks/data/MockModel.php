@@ -21,10 +21,7 @@ class MockModel extends \lithium\data\Model {
 			),
 			'autoConnect' => false
 		));
-		static::meta(array(
-			'key' => 'id',
-			'locked' => true
-		));
+		static::meta(array('key' => 'id', 'locked' => true));
 		return $mock;
 	}
 }

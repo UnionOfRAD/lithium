@@ -68,7 +68,8 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testOverrideMeta() {
 		MockTag::reset();
-		$meta = MockTag::meta(array('id' => 'key'));
+		MockTag::meta(array('id' => 'key'));
+		$meta = MockTag::meta();
 		$this->assertFalse($meta['connection']);
 		$this->assertEqual('mock_tags', $meta['source']);
 		$this->assertEqual('key', $meta['id']);
@@ -166,7 +167,6 @@ class ModelTest extends \lithium\test\Unit {
 			'title'       => 'title',
 			'source'      => 'mock_posts',
 			'connection'  => true,
-			'initialized' => true,
 			'locked'      => true
 		);
 
@@ -181,7 +181,6 @@ class ModelTest extends \lithium\test\Unit {
 			'title'       => 'comment_id',
 			'source'      => 'mock_comments',
 			'connection'  => true,
-			'initialized' => true,
 			'locked'      => true
 		);
 		unset($config['meta']['key']);
@@ -190,10 +189,12 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, MockComment::meta());
 
 		$expected += array('foo' => 'bar');
-		$this->assertEqual($expected, MockComment::meta('foo', 'bar'));
+		MockComment::meta('foo', 'bar');
+		$this->assertEqual($expected, MockComment::meta());
 
 		$expected += array('bar' => true, 'baz' => false);
-		$this->assertEqual($expected, MockComment::meta(array('bar' => true, 'baz' => false)));
+		MockComment::meta(array('bar' => true, 'baz' => false));
+		$this->assertEqual($expected, MockComment::meta());
 	}
 
 	public function testSchemaLoading() {
