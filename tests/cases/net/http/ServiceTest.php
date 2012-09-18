@@ -261,6 +261,18 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual('someData=someValue', $result->body());
 	}
 
+	public function testPatchWithJson() {
+		$http = new Service($this->_testConfig);
+		$response = $http->patch(
+			'some-path/stuff',
+			array('someData' => 'someValue'),
+			array('return' => 'response', 'type' => 'json')
+		);
+		$result = $http->last->request;
+		$this->assertEqual('{"someData":"someValue"}', $result->body());
+		$this->assertEqual('application/json', $result->headers['Content-Type']);
+	}
+
 	public function testMagicMethod() {
 		$http = new Service($this->_testConfig);
 		$response = $http->magic('some-path/stuff');
