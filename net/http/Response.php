@@ -21,13 +21,6 @@ class Response extends \lithium\net\http\Message {
 	public $status = array('code' => 200, 'message' => 'OK');
 
 	/**
-	 * Content Type.
-	 *
-	 * @var string
-	 */
-	public $type = 'text/html';
-
-	/**
 	 * Character encoding.
 	 *
 	 * @var string
@@ -95,7 +88,7 @@ class Response extends \lithium\net\http\Message {
 	 * @param array $config
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('message' => null);
+		$defaults = array('message' => null, 'type' => null);
 		$config += $defaults;
 		parent::__construct($config);
 	}
@@ -114,17 +107,21 @@ class Response extends \lithium\net\http\Message {
 		if (isset($this->headers['Transfer-Encoding'])) {
 			$this->body = $this->_httpChunkedDecode($this->body);
 		}
-		if (isset($this->headers['Content-Type'])) {
-			$pattern = '/([-\w\/\.+]+)(;\s*?charset=(.+))?/i';
-			preg_match($pattern, $this->headers['Content-Type'], $match);
+		if ($type = $this->_config['type']) {
+			$this->type($type);
+		}
+		if (!isset($this->headers['Content-Type'])) {
+			return;
+		}
+		$pattern = '/([-\w\/\.+]+)(;\s*?charset=(.+))?/i';
+		preg_match($pattern, $this->headers['Content-Type'], $match);
 
-			if (isset($match[1])) {
-				$this->type = trim($match[1]);
-				$this->body = $this->_decode($this->body);
-			}
-			if (isset($match[3])) {
-				$this->encoding = strtoupper(trim($match[3]));
-			}
+		if (isset($match[1])) {
+			$this->type(trim($match[1]));
+			$this->body = $this->_decode($this->body);
+		}
+		if (isset($match[3])) {
+			$this->encoding = strtoupper(trim($match[3]));
 		}
 	}
 
@@ -136,10 +133,11 @@ class Response extends \lithium\net\http\Message {
 	 */
 	protected function _decode($body) {
 		$media = $this->_classes['media'];
-		if ($type = $media::type($this->_type)) {
-			$body = $media::decode($this->_type, $body) ?: $body;
+
+		if (!$type = $media::type($this->_type)) {
+			return $body;
 		}
-		return $body;
+		return $media::decode($this->_type, $body) ?: $body;
 	}
 
 	/**
@@ -248,8 +246,8 @@ class Response extends \lithium\net\http\Message {
 	* @return string
 	*/
 	public function __toString() {
-		if ($this->type != 'text/html' && !isset($this->headers['Content-Type'])) {
-			$this->headers['Content-Type'] = $this->type;
+		if ($this->_type != 'text/html' && !isset($this->headers['Content-Type'])) {
+			$this->headers['Content-Type'] = $this->type();
 		}
 		$first = "{$this->protocol} {$this->status['code']} {$this->status['message']}";
 		$response = array($first, join("\r\n", $this->headers()), "", $this->body());

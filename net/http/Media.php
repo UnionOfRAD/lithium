@@ -551,7 +551,7 @@ class Media extends \lithium\core\StaticObject {
 	 *
 	 * @param object $response A Response object into which the operation will be
 	 *        rendered. The content of the render operation will be assigned to the `$body`
-	 *        property of the object, the `'Content-type'` header will be set accordingly, and it
+	 *        property of the object, the `'Content-Type'` header will be set accordingly, and it
 	 *        will be returned.
 	 * @param mixed $data The data (usually an associative array) to be rendered in the response.
 	 * @param array $options Any options specific to the response being rendered, such as type

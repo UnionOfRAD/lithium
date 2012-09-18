@@ -431,7 +431,7 @@ class MediaTest extends \lithium\test\Unit {
 	public function testManualContentHandling() {
 		Media::type('custom', 'text/x-custom');
 		$response = new Response();
-		$response->type = 'custom';
+		$response->type('custom');
 
 		Media::render($response, 'Hello, world!', array(
 			'layout' => false,
@@ -463,7 +463,7 @@ class MediaTest extends \lithium\test\Unit {
 		$request->params['foo'] = 'bar';
 
 		$response = new Response();
-		$response->type = 'custom';
+		$response->type('custom');
 
 		Media::render($response, null, compact('request') + array(
 			'layout' => false,
@@ -494,7 +494,7 @@ class MediaTest extends \lithium\test\Unit {
 		$request->params['controller'] = 'pages';
 
 		$response = new Response();
-		$response->type = 'html';
+		$response->type('html');
 
 		$this->expectException('/Template not found/');
 		Media::render($response, null, compact('request'));

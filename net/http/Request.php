@@ -233,7 +233,8 @@ class Request extends \lithium\net\http\Message {
 		if (in_array($options['method'], array('POST', 'PUT', 'PATCH'))) {
 			$media = $this->_classes['media'];
 			if ($type = $media::type($this->_type)) {
-				$this->headers('Content-Type', $type['content'][0]);
+				$type = is_array($type['content']) ? reset($type['content']) : $type['content'];
+				$this->headers('Content-Type', $type);
 			}
 		}
 

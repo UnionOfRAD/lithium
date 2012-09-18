@@ -40,7 +40,7 @@ class Message extends \lithium\net\Message {
 	 *
 	 * @var string
 	 */
-	protected $_type = 'html';
+	protected $_type = null;
 
 	/**
 	 * Classes used by `Request`.
@@ -85,6 +85,7 @@ class Message extends \lithium\net\Message {
 		if (strpos($this->host, '/') !== false) {
 			list($this->host, $this->path) = explode('/', $this->host, 2);
 		}
+		if ($this->headers);
 		$this->path = str_replace('//', '/', "/{$this->path}");
 		$this->protocol = $this->protocol ?: "HTTP/{$this->version}";
 	}
@@ -131,25 +132,39 @@ class Message extends \lithium\net\Message {
 	}
 
 	/**
-	 * Sets/Gets the content type
+	 * Sets/gets the content type.
 	 *
-	 * @param string $type a full content type i.e. `'application/json'` or simple name `'json'`
+	 * @param string $type A full content type i.e. `'application/json'` or simple name `'json'`
 	 * @return string A simple content type name, i.e. `'html'`, `'xml'`, `'json'`, etc., depending
 	 *         on the content type of the request.
 	 */
 	public function type($type = null) {
-		if ($type == null && $type !== false) {
+		if ($type === false) {
+			unset($this->headers['Content-Type']);
+			$this->_type = null;
+			return;
+		}
+		$media = $this->_classes['media'];
+
+		if (!$type && $this->_type) {
 			return $this->_type;
 		}
-		if (strpos($type, '/')) {
-			$media = $this->_classes['media'];
+		$headers = $this->headers + array('Content-Type' => null);
+		$type = $type ?: $headers['Content-Type'];
 
-			if (!$data = $media::type($type)) {
-				return $this->_type;
-			}
-			$type = is_array($data) ? reset($data) : $data;
+		if (!$type) {
+			return;
 		}
-		return $this->_type = $type;
+		$header = $type;
+
+		if (!strpos($type, '/')) {
+			if (!$data = $media::type($type)) {
+				return false;
+			}
+			$header = is_array($data['content']) ? reset($data['content']) : $data['content'];
+		}
+		$this->headers['Content-Type'] = $header;
+		return ($this->_type = $type);
 	}
 }
 
