@@ -263,6 +263,7 @@ class ServiceTest extends \lithium\test\Unit {
 		$result = $http->last->request;
 		$this->assertEqual('PATCH', $result->method);
 		$this->assertEqual('lithium\net\http\Response', get_class($response));
+		$this->assertEqual('someData=someValue', $result->body());
 	}
 
 	public function testDigestAuth() {
