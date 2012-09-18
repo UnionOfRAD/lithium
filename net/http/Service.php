@@ -165,6 +165,18 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
+	 * Send PATCH request.
+	 *
+	 * @param string $path
+	 * @param array $data
+	 * @param array $options
+	 * @return string
+	 */
+	public function patch($path = null, $data = array(), array $options = array()) {
+		return $this->send(__FUNCTION__, $path, $data, $options);
+	}
+
+	/**
 	 * Send DELETE request.
 	 *
 	 * @param string $path

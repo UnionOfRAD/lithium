@@ -248,13 +248,8 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual('someValue', $config['someKey']);
 	}
 
-	public function testMagicMethod() {
+	public function testPatchMethod() {
 		$http = new Service($this->_testConfig);
-		$response = $http->patch('some-path/stuff');
-		$expected = "http://localhost:80/some-path/stuff";
-		$result = $http->last->request->to('url');
-		$this->assertEqual($expected, $result);
-
 		$response = $http->patch(
 			'some-path/stuff',
 			array('someData' => 'someValue'),
@@ -264,6 +259,15 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual('PATCH', $result->method);
 		$this->assertEqual('lithium\net\http\Response', get_class($response));
 		$this->assertEqual('someData=someValue', $result->body());
+	}
+
+	public function testMagicMethod() {
+		$http = new Service($this->_testConfig);
+		$response = $http->magic('some-path/stuff');
+		$expected = "http://localhost:80/some-path/stuff";
+		$result = $http->last->request;
+		$this->assertEqual($expected, $result->to('url'));
+		$this->assertEqual('MAGIC', $result->method);
 	}
 
 	public function testDigestAuth() {
