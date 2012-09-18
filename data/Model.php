@@ -394,21 +394,22 @@ class Model extends \lithium\core\StaticObject {
 
 		$local = compact('class', 'name') + $self->_meta;
 		$self->_meta = ($local + $source['meta'] + $meta);
+		$meta =& $self->_meta;
 
 		if (is_object($schema)) {
 			$schema = $schema->fields();
 		}
 		$self->_initializers += array(
-			'source' => function() use (&$self) {
-				return Inflector::tableize($self->_meta['name']);
+			'source' => function() use (&$meta) {
+				return Inflector::tableize($meta['name']);
 			},
-			'title' => function() use (&$self, $class) {
+			'title' => function() use (&$meta) {
 				$titleKeys = array('title', 'name');
 
-				if (isset($self->_meta['key'])) {
-					$titleKeys = array_merge($titleKeys, (array) $self->_meta['key']);
+				if (isset($meta['key'])) {
+					$titleKeys = array_merge($titleKeys, (array) $meta['key']);
 				}
-				return $class::hasField($titleKeys);
+				return $meta['class']::hasField($titleKeys);
 			}
 		);
 
