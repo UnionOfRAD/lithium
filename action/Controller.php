@@ -10,6 +10,7 @@ namespace lithium\action;
 
 use lithium\util\Inflector;
 use lithium\action\DispatchException;
+use lithium\core\Libraries;
 
 /**
  * The `Controller` class is the fundamental building block of your application's request/response
@@ -243,8 +244,10 @@ class Controller extends \lithium\core\Object {
 			'location'   => false,
 			'data'       => null,
 			'head'       => false,
-			'controller' => Inflector::underscore($name)
+			'controller' => Inflector::underscore($name),
+			'library'    => Libraries::get($class)
 		);
+
 		$options += $this->_render + $defaults;
 
 		if ($key && $media::type($key)) {
