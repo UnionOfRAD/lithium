@@ -231,6 +231,7 @@ class Controller extends \lithium\core\Object {
 	public function render(array $options = array()) {
 		$media = $this->_classes['media'];
 		$class = get_class($this);
+		$library = preg_replace('/\\\\.*/', '', $class);
 		$name = preg_replace('/Controller$/', '', substr($class, strrpos($class, '\\') + 1));
 		$key = key($options);
 
@@ -243,8 +244,10 @@ class Controller extends \lithium\core\Object {
 			'location'   => false,
 			'data'       => null,
 			'head'       => false,
-			'controller' => Inflector::underscore($name)
+			'controller' => Inflector::underscore($name),
+			'library'    => $library
 		);
+
 		$options += $this->_render + $defaults;
 
 		if ($key && $media::type($key)) {
