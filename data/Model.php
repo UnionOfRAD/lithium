@@ -309,7 +309,14 @@ class Model extends \lithium\core\StaticObject {
 	 * @see lithium\data\Model::config()
 	 * @var array
 	 */
-	protected static $_autoConfig = array('meta', 'finders', 'query', 'schema', 'classes');
+	protected static $_autoConfig = array(
+		'meta',
+		'finders',
+		'query',
+		'schema',
+		'classes',
+		'initializers'
+	);
 
 	/**
 	 * Configures the model for use. This method will set the `Model::$_schema`, `Model::$_meta`,
@@ -367,6 +374,7 @@ class Model extends \lithium\core\StaticObject {
 		$schema  = array();
 		$source  = array();
 		$classes = static::$_classes;
+		$initializers = array();
 
 		foreach (static::_parents() as $parent) {
 			$parentConfig = get_class_vars($parent);
@@ -390,9 +398,8 @@ class Model extends \lithium\core\StaticObject {
 			$source = (($conn) ? $conn->configureClass($class) : array()) + $source;
 		}
 		static::$_classes = $classes;
-		$name = static::_name();
 
-		$local = compact('class', 'name') + $self->_meta;
+		$local = compact('class') + $self->_meta;
 		$self->_meta = ($local + $source['meta'] + $meta);
 		$meta =& $self->_meta;
 
@@ -400,16 +407,16 @@ class Model extends \lithium\core\StaticObject {
 			$schema = $schema->fields();
 		}
 		$self->_initializers += array(
-			'source' => function() use (&$meta) {
-				return Inflector::tableize($meta['name']);
+			'name' => function($self) {
+				return basename(str_replace('\\', '/', $self));
 			},
-			'title' => function() use (&$meta) {
+			'source' => function($self) {
+				return Inflector::tableize($self::meta('name'));
+			},
+			'title' => function($self) {
 				$titleKeys = array('title', 'name');
-
-				if (isset($meta['key'])) {
-					$titleKeys = array_merge($titleKeys, (array) $meta['key']);
-				}
-				return $meta['class']::hasField($titleKeys);
+				$titleKeys = array_merge($titleKeys, (array) $self::meta('key'));
+				return $self::hasField($titleKeys);
 			}
 		);
 
@@ -594,14 +601,15 @@ class Model extends \lithium\core\StaticObject {
 		if (!$key) {
 			$all = array_keys($this->_initializers);
 			$call = array(&$this, '_getMetaKey');
-			return array_combine($all, array_map($call, $all)) + $this->_meta;
+			return $all ? array_combine($all, array_map($call, $all)) + $this->_meta : $this->_meta;
 		}
 
 		if (isset($this->_meta[$key])) {
 			return $this->_meta[$key];
 		}
 		if (isset($this->_initializers[$key]) && $initializer = $this->_initializers[$key]) {
-			return ($this->_meta[$key] = $initializer($this->_meta, $this->_schema));
+			unset($this->_initializers[$key]);
+			return ($this->_meta[$key] = $initializer(get_called_class()));
 		}
 	}
 
@@ -753,10 +761,10 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function schema($field = null) {
 		$self = static::_object();
-		$source = $self::meta('source');
 
 		if (!is_object($self->_schema)) {
-			$self->_schema = static::connection()->describe($source, $self->_schema, $self->_meta);
+			$source = $self::meta('source');
+			$self->_schema = static::connection()->describe($source, $self->_schema, static::meta());
 
 			if (!is_object($self->_schema)) {
 				$class = get_called_class();
@@ -1135,16 +1143,6 @@ class Model extends \lithium\core\StaticObject {
 			return $conn;
 		}
 		throw new ConfigException("The data connection `{$name}` is not configured.");
-	}
-
-	/**
-	 * Gets just the class name portion of a fully-name-spaced class name, i.e.
-	 * `app\models\Posts::_name()` returns `'Posts'`.
-	 *
-	 * @return string
-	 */
-	protected static function _name() {
-		return basename(str_replace('\\', '/', get_called_class()));
 	}
 
 	/**

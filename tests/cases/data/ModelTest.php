@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\data;
 
 use stdClass;
+use lithium\util\Inflector;
 use lithium\data\Model;
 use lithium\data\Entity;
 use lithium\data\Schema;
@@ -800,6 +801,76 @@ class ModelTest extends \lithium\test\Unit {
 		$exception = 'Related model class \'lithium\tests\mocks\data\Unexisting\' not found.';
 		$this->expectException($exception);
 		MockPost::relations('Unexisting');
+	}
+
+	public function testLazyMetadataInit() {
+		MockPost::config(array(
+			'schema' => new Schema(array(
+				'fields' => array(
+					'id' => array('type' => 'integer'),
+					'name' => array('type' => 'string'),
+					'label' => array('type' => 'string')
+				)
+			))
+		));
+
+		$this->assertIdentical('mock_posts', MockPost::meta('source'));
+		$this->assertIdentical('name', MockPost::meta('title'));
+		$this->assertIdentical(null, MockPost::meta('unexisting'));
+
+		$config = array(
+			'schema' => new Schema(array(
+					'fields' => array(
+						'id' => array('type' => 'integer'),
+						'name' => array('type' => 'string'),
+						'label' => array('type' => 'string')
+					)
+				)
+			),
+			'initializers' => array(
+				'source' => function($self) {
+					return Inflector::tableize($self::meta('name'));
+				},
+				'name' => function($self) {
+					return Inflector::singularize('CoolPosts');
+				},
+				'title' => function($self) {
+					static $i = 1;
+					return 'label' . $i++;
+				}
+			)
+		);
+		MockPost::reset();
+		MockPost::config($config);
+		$this->assertIdentical('cool_posts', MockPost::meta('source'));
+		$this->assertIdentical('label1', MockPost::meta('title'));
+		$this->assertFalse('label2' == MockPost::meta('title'));
+		$this->assertIdentical('label1', MockPost::meta('title'));
+		$meta = MockPost::meta();
+		$this->assertIdentical('label1', $meta['title']);
+		$this->assertIdentical('CoolPost', MockPost::meta('name'));
+
+		MockPost::reset();
+		unset($config['initializers']['title']);
+		$config['initializers']['source'] = function($self) {
+			return Inflector::underscore($self::meta('name'));
+		};
+		MockPost::config($config);
+		$this->assertIdentical('cool_post', MockPost::meta('source'));
+		$this->assertIdentical('name', MockPost::meta('title'));
+		$this->assertIdentical('CoolPost', MockPost::meta('name'));
+
+		MockPost::reset();
+		MockPost::config($config);
+		$expected = array (
+			'class' => 'lithium\\tests\\mocks\\data\\MockPost',
+			'connection' => false,
+			'key' => 'id',
+			'name' => 'CoolPost',
+			'title' => 'name',
+			'source' => 'cool_post'
+		);
+		$this->assertEqual($expected, MockPost::meta());
 	}
 }
 
