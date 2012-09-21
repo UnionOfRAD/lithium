@@ -246,7 +246,7 @@ class Media extends \lithium\core\StaticObject {
 			if (is_array($content) && isset($content['alias'])) {
 				return static::type($content['alias']);
 			}
-			return compact('content') + array('options' => static::_handlers($type));
+			return compact('content') + array('options' => static::handlers($type));
 		}
 		if ($content) {
 			static::$_types[$type] = (array) $content;
@@ -563,7 +563,7 @@ class Media extends \lithium\core\StaticObject {
 	public static function render($response, $data = null, array $options = array()) {
 		$params   = compact('response', 'data', 'options');
 		$types    = static::_types();
-		$handlers = static::_handlers();
+		$handlers = static::handlers();
 		$func     = __FUNCTION__;
 
 		return static::_filter($func, $params, function($self, $params) use ($types, $handlers) {
@@ -619,9 +619,7 @@ class Media extends \lithium\core\StaticObject {
 			$handler = $params['handler'];
 			$response =& $params['response'];
 
-			if (!is_array($handler)) {
-				$handler = $self::invokeMethod('_handlers', array($handler));
-			}
+			$handler = is_array($handler) ? $handler : $self::handlers($handler);
 			$class = $handler['view'];
 			unset($handler['view']);
 
@@ -654,10 +652,7 @@ class Media extends \lithium\core\StaticObject {
 			$data = $params['data'];
 			$handler = $params['handler'];
 			$response =& $params['response'];
-
-			if (!is_array($handler)) {
-				$handler = $self::invokeMethod('_handlers', array($handler));
-			}
+			$handler = is_array($handler) ? $handler : $self::handlers($handler);
 
 			if (!$handler || empty($handler['encode'])) {
 				return null;
@@ -691,7 +686,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @return mixed
 	 */
 	public static function decode($type, $data, array $options = array()) {
-		if ((!$handler = static::_handlers($type)) || empty($handler['decode'])) {
+		if ((!$handler = static::handlers($type)) || empty($handler['decode'])) {
 			return null;
 		}
 		$method = $handler['decode'];
@@ -801,7 +796,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @param string $type The type of handler to return.
 	 * @return mixed Array of all handlers, or the handler for a specific type.
 	 */
-	protected static function _handlers($type = null) {
+	public static function handlers($type = null) {
 		$handlers = static::$_handlers + array(
 			'default' => array(
 				'view'     => 'lithium\template\View',
