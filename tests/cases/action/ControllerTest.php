@@ -372,6 +372,22 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->expectException("Action `foo` not found.");
 		$postsController(new Request(), array('action' => 'foo'));
 	}
+
+	/**
+	 * Tests that the library of the controller is automatically added to the default rendering
+	 * options.
+	 */
+	public function testLibraryScoping() {
+		$request = new Request();
+		$request->params['controller'] = 'lithium\tests\mocks\action\MockPostsController';
+
+		$controller = new MockPostsController(compact('request') + array('classes' => array(
+			'media' => 'lithium\tests\mocks\action\MockMediaClass'
+		)));
+
+		$controller->render();
+		$this->assertEqual('lithium', $controller->response->options['library']);
+	}
 }
 
 ?>
