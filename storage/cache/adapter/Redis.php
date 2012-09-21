@@ -117,22 +117,7 @@ class Redis extends \lithium\core\Object {
 	 * @return mixed Returns the result of the method call
 	 */
 	public function __call($method, $params = array()) {
-		switch (count($params)) {
-			case 0:
-				return $this->connection->{$method}();
-			case 1:
-				return $this->connection->{$method}($params[0]);
-			case 2:
-				return $this->connection->{$method}($params[0], $params[1]);
-			case 3:
-				return $this->connection->{$method}($params[0], $params[1], $params[2]);
-			case 4:
-				return $this->connection->{$method}($params[0], $params[1], $params[2], $params[3]);
-			case 5:
-				return $this->connection->{$method}($params[0], $params[1], $params[2], $params[3], $params[4]);
-			default:
-				return call_user_func_array(array(&$this->connection, $method), $params);
-		}
+		return call_user_func_array(array(&$this->connection, $method), $params);
 	}
 
 	/**
