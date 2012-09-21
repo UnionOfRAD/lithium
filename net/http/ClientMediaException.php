@@ -9,14 +9,14 @@
 namespace lithium\net\http;
 
 /**
- * The `MediaException` is thrown when a request is made to render content in a format not
- * supported.
+ * The `ClientMediaException` is thrown when a request body could not be understood or decoded by
+ * the server.
  *
  * @see lithium\net\http\Media
  */
-class MediaException extends \RuntimeException {
+class ClientMediaException extends \lithium\net\http\MediaException {
 
-	protected $code = 406;
+	protected $code = 415;
 }
 
 ?>

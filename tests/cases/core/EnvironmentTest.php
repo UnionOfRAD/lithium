@@ -42,6 +42,23 @@ class EnvironmentTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that a set of configuration keys can be assigned to multiple environments.
+	 */
+	public function testSetMultipleEnvironments() {
+		foreach (array('foo', 'bar', 'baz') as $key) {
+			$this->assertNull(Environment::get($key));
+		}
+
+		Environment::set(array('foo', 'bar', 'baz'), array(
+			'key' => array('subkey' => 'value')
+		));
+
+		foreach (array('foo', 'bar', 'baz') as $key) {
+			$this->assertEqual(array('key' => array('subkey' => 'value')), Environment::get($key));
+		}
+	}
+
+	/**
 	 * Tests creating a custom environment, and verifies that settings are properly retrieved.
 	 */
 	public function testCreateNonStandardEnvironment() {

@@ -42,6 +42,7 @@ class Response extends \lithium\net\http\Message {
 	protected $_statuses = array(
 		100 => 'Continue',
 		101 => 'Switching Protocols',
+		102 => 'Processing',
 		200 => 'OK',
 		201 => 'Created',
 		202 => 'Accepted',
@@ -56,6 +57,7 @@ class Response extends \lithium\net\http\Message {
 		304 => 'Not Modified',
 		305 => 'Use Proxy',
 		307 => 'Temporary Redirect',
+		308 => 'Permanent Redirect',
 		400 => 'Bad Request',
 		401 => 'Unauthorized',
 		402 => 'Payment Required',
@@ -72,13 +74,19 @@ class Response extends \lithium\net\http\Message {
 		413 => 'Request Entity Too Large',
 		414 => 'Request-URI Too Large',
 		415 => 'Unsupported Media Type',
-		416 => 'Requested range not satisfiable',
+		416 => 'Requested Range Not Satisfiable',
 		417 => 'Expectation Failed',
+		422 => 'Unprocessable Entity',
+		423 => 'Locked',
+		424 => 'Method Failure',
+		428 => 'Precondition Required',
+		451 => 'Unavailable For Legal Reasons',
 		500 => 'Internal Server Error',
 		501 => 'Not Implemented',
 		502 => 'Bad Gateway',
 		503 => 'Service Unavailable',
-		504 => 'Gateway Time-out'
+		504 => 'Gateway Time-out',
+		507 => 'Insufficient Storage'
 	);
 
 	/**
