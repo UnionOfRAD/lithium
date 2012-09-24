@@ -390,6 +390,18 @@ class RedisTest extends \lithium\test\Unit {
 		$result = $this->_redis->delete($key);
 		$this->assertTrue($result);
 	}
+
+	public function testMethodDispatch() {
+
+		$this->_redis->flushdb();
+		$this->_redis->set('some_key', 'somevalue');
+
+		$result = $this->redis->keys('*');
+		$this->assertEqual($result, array('some_key'), 'redis method dispatch failed');
+
+		$result = $this->redis->info();
+		$this->assertTrue(is_array($result), 'redis method dispatch failed');
+	}
 }
 
 ?>
