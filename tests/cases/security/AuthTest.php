@@ -125,6 +125,28 @@ class AuthTest extends \lithium\test\Unit {
 		$result = Auth::check('test', $user, array('success' => true, 'checkSession' => false));
 		$this->assertEqual($expected, $result);
 		$this->assertEqual($expected, Session::read('test'));
+
+		Auth::reset();
+
+		Auth::config(array(
+			'test' => array(
+				'adapter' => $this->_classes['mockAuthAdapter'],
+			)
+		));
+
+		$user = array(
+			'id' => '123',
+			'username' => 'foobar',
+			'password' => 'not!important',
+			'email' => 'foo@bar.com',
+			'insuranceNumer' => 1234567
+		);
+
+		$expected = 123;
+
+		$result = Auth::check('test', $user, array('keyOnly' => true, 'checkSession' => false));
+		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, Session::read('test'));
 	}
 }
 

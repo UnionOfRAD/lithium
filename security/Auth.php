@@ -150,16 +150,11 @@ class Auth extends \lithium\core\Adaptable {
 			}
 
 			if (($credentials) && $data = $self::adapter($name)->check($credentials, $options)) {
-				if ($options['persist']) {
-					foreach ($data as $key => $value) {
-						if (!in_array($key, $options['persist'])) {
-							unset($data[$key]);
-						}
-					}
-				} else {
+				if ($options['persist'] && is_array($data)) {
+					$data = array_intersect_key($data, array_fill_keys($options['persist'], true));
+				} elseif (is_array($data)) {
 					unset($data['password']);
 				}
-
 				return ($options['writeSession']) ? $self::set($name, $data) : $data;
 			}
 			return false;
