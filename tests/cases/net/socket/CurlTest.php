@@ -166,6 +166,23 @@ class CurlTest extends \lithium\test\Unit {
 		$this->assertFalse(isset($stream->options[CURLOPT_POST]));
 		$this->assertTrue($stream->close());
 	}
+
+	public function testSendPutThenGet() {
+		$postConfig = array('method' => 'PUT', 'body' => '{"body"}');
+		$stream = new Curl($this->_testConfig);
+		$this->assertTrue(is_resource($stream->open()));
+		$this->assertTrue($stream->write(new Request($postConfig + $this->_testConfig)));
+		$this->assertTrue(isset($stream->options[CURLOPT_CUSTOMREQUEST]));
+		$this->assertEqual($stream->options[CURLOPT_CUSTOMREQUEST],'PUT');
+		$this->assertTrue(isset($stream->options[CURLOPT_POSTFIELDS]));
+		$this->assertEqual($stream->options[CURLOPT_POSTFIELDS],$postConfig['body']);
+		$this->assertTrue($stream->close());
+
+		$this->assertTrue(is_resource($stream->open()));
+		$this->assertTrue($stream->write(new Request($this->_testConfig)));
+		$this->assertFalse(isset($stream->options[CURLOPT_CUSTOMREQUEST]));
+		$this->assertTrue($stream->close());
+	}
 }
 
 ?>
