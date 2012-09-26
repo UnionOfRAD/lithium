@@ -302,9 +302,9 @@ class String {
 	}
 
 	/**
-	 * Cleans up a `Set::insert()` formatted string with given `$options` depending
+	 * Cleans up a `String::insert()` formatted string with given `$options` depending
 	 * on the `'clean'` option. The goal of this function is to replace all whitespace
-	 * and unneeded mark-up around place-holders that did not get replaced by `Set::insert()`.
+	 * and unneeded mark-up around place-holders that did not get replaced by `String::insert()`.
 	 *
 	 * @param string $str The string to clean.
 	 * @param array $options Available options are:
