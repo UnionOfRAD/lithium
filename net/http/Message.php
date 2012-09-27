@@ -74,18 +74,22 @@ class Message extends \lithium\net\Message {
 			'username' => null,
 			'password' => null,
 			'path' => null,
+			'query' => array(),
+			'fragment' => null,
 			'protocol' => null,
 			'version' => '1.1',
 			'headers' => array(),
-			'body' => null
+			'body' => null,
+			'auth' => null
 		);
 		$config += $defaults;
 		parent::__construct($config);
-
+		foreach (array_intersect_key(array_filter($config), $defaults) as $key => $value) {
+			$this->{$key} = $value;
+		}
 		if (strpos($this->host, '/') !== false) {
 			list($this->host, $this->path) = explode('/', $this->host, 2);
 		}
-		if ($this->headers);
 		$this->path = str_replace('//', '/', "/{$this->path}");
 		$this->protocol = $this->protocol ?: "HTTP/{$this->version}";
 	}
@@ -107,7 +111,6 @@ class Message extends \lithium\net\Message {
 				return $this->headers;
 			}
 		}
-
 		foreach (($value ? array($key => $value) : (array) $key) as $header => $value) {
 			if (!is_string($header)) {
 				if (preg_match('/(.*?):(.+)/', $value, $match)) {
@@ -141,7 +144,7 @@ class Message extends \lithium\net\Message {
 	public function type($type = null) {
 		if ($type === false) {
 			unset($this->headers['Content-Type']);
-			$this->_type = null;
+			$this->_type = false;
 			return;
 		}
 		$media = $this->_classes['media'];
@@ -157,14 +160,72 @@ class Message extends \lithium\net\Message {
 		}
 		$header = $type;
 
-		if (!strpos($type, '/')) {
-			if (!$data = $media::type($type)) {
-				return false;
-			}
+		if (!$data = $media::type($type)) {
+			$this->headers('Content-Type', $type);
+			return ($this->_type = $type);
+		}
+		if (is_string($data)) {
+			$type = $data;
+		} else if (!empty($data['content'])) {
 			$header = is_array($data['content']) ? reset($data['content']) : $data['content'];
 		}
-		$this->headers['Content-Type'] = $header;
+		$this->headers('Content-Type', $header);
 		return ($this->_type = $type);
+	}
+
+	/**
+	 * Add body parts.
+	 *
+	 * @param mixed $data
+	 * @param array $options
+	 *        - `'buffer'`: split the body string
+	 * @return array
+	 */
+	public function body($data = null, $options = array()) {
+		$default = array('buffer' => null, 'encode' => false, 'decode' => false);
+		$options += $default;
+		$body = $this->body = array_filter(array_merge((array) $this->body, (array) $data));
+
+		if ($options['encode']) {
+			$body = $this->_encode($body);
+		}
+		$body = is_array($body) ? join("\r\n", $body) : $body;
+
+		if ($options['decode']) {
+			$body = $this->_decode($body);
+		}
+		return ($options['buffer']) ? str_split($body, $options['buffer']) : $body;
+	}
+
+	/**
+	 * Encodes the body based on the type
+	 *
+	 * @see lithium\net\http\Message::type()
+	 * @param mixed $body
+	 * @return string
+	 */
+	protected function _encode($body) {
+		$media = $this->_classes['media'];
+
+		if ($type = $media::type($this->_type)) {
+			$body = $media::encode($this->_type, $body) ?: $body;
+		}
+		return $body;
+	}
+
+	/**
+	 * Decodes the body based on the type
+	 *
+	 * @param string $body
+	 * @return mixed
+	 */
+	protected function _decode($body) {
+		$media = $this->_classes['media'];
+
+		if (!$type = $media::type($this->_type)) {
+			return $body;
+		}
+		return $media::decode($this->_type, $body) ?: $body;
 	}
 }
 

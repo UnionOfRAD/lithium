@@ -84,7 +84,7 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual('HTTP/1.1', $http->last->response->protocol);
 		$this->assertEqual('200', $http->last->response->status['code']);
 		$this->assertEqual('OK', $http->last->response->status['message']);
-		$this->assertEqual('text/html', $http->last->response->type);
+		$this->assertEqual('html', $http->last->response->type());
 		$this->assertEqual('UTF-8', $http->last->response->encoding);
 		$this->assertEqual('', $http->last->response->body());
 	}
@@ -109,7 +109,7 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual('HTTP/1.1', $http->last->response->protocol);
 		$this->assertEqual('200', $http->last->response->status['code']);
 		$this->assertEqual('OK', $http->last->response->status['message']);
-		$this->assertEqual('text/html', $http->last->response->type);
+		$this->assertEqual('html', $http->last->response->type());
 		$this->assertEqual('UTF-8', $http->last->response->encoding);
 	}
 
@@ -119,7 +119,7 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual('HTTP/1.1', $http->last->response->protocol);
 		$this->assertEqual('200', $http->last->response->status['code']);
 		$this->assertEqual('OK', $http->last->response->status['message']);
-		$this->assertEqual('text/html', $http->last->response->type);
+		$this->assertEqual('html', $http->last->response->type());
 		$this->assertEqual('UTF-8', $http->last->response->encoding);
 	}
 
@@ -143,7 +143,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
-			'Content-Type: application/x-www-form-urlencoded',
+			'Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
 			'Content-Length: 11',
 			'', 'status=cool'
 		));
@@ -171,7 +171,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
-			'Content-Type: application/x-www-form-urlencoded',
+			'Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
 			'Content-Length: 11',
 			'', 'status=cool'
 		));
@@ -205,7 +205,8 @@ class ServiceTest extends \lithium\test\Unit {
 
 	public function testJsonPost() {
 		$http = new Service($this->_testConfig);
-		$http->post('update.xml', array('status' => array('cool', 'awesome')), array('type' => 'json'));
+		$data = array('status' => array('cool', 'awesome'));
+		$http->post('update.xml', $data, array('type' => 'json'));
 		$expected = join("\r\n", array(
 			'POST /update.xml HTTP/1.1',
 			'Host: localhost:80',
@@ -223,7 +224,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
-			'Content-Type: application/json',
+			'Content-Type: application/json;charset=UTF-8',
 			'Content-Length: 29',
 			'', '{"status":["cool","awesome"]}'
 		));

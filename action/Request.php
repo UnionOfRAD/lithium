@@ -182,7 +182,7 @@ class Request extends \lithium\net\http\Request {
 		if (!empty($this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
 			$this->_env['REQUEST_METHOD'] = $this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'];
 		}
-		$type = $this->type($this->_env['CONTENT_TYPE']);
+		$type = $this->type($this->_config['type'] ?: $this->env('CONTENT_TYPE'));
 		$this->method = $method = strtoupper($this->_env['REQUEST_METHOD']);
 
 		if (!$this->data && ($method == 'POST' || $method == 'PUT')) {
@@ -461,8 +461,8 @@ class Request extends \lithium\net\http\Request {
 	 *         on the content type of the request.
 	 */
 	public function type($type = null) {
-		if ($type === null) {
-			$type = $this->type ?: $this->env('CONTENT_TYPE');
+		if (!$type && !empty($this->params['type'])) {
+			$type = $this->params['type'];
 		}
 		return parent::type($type);
 	}
