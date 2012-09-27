@@ -38,7 +38,8 @@ class Response extends \lithium\net\http\Response {
 			'buffer' => 8192,
 			'location' => null,
 			'status' => 0,
-			'request' => null
+			'request' => null,
+			'decode' => false
 		);
 		parent::__construct($config + $defaults);
 	}
