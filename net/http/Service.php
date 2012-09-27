@@ -186,7 +186,7 @@ class Service extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function delete($path = null, $data = array(), array $options = array()) {
-		$defaults = array('return' => 'response', 'type' => false);
+		$defaults = array('type' => false);
 		return $this->send(__FUNCTION__, $path, $data, $options + $defaults);
 	}
 
