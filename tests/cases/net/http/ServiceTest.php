@@ -84,7 +84,7 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual('HTTP/1.1', $http->last->response->protocol);
 		$this->assertEqual('200', $http->last->response->status['code']);
 		$this->assertEqual('OK', $http->last->response->status['message']);
-		$this->assertEqual('html', $http->last->response->type());
+		$this->assertEqual(null, $http->last->response->type());
 		$this->assertEqual('UTF-8', $http->last->response->encoding);
 		$this->assertEqual('', $http->last->response->body());
 	}
@@ -109,7 +109,7 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual('HTTP/1.1', $http->last->response->protocol);
 		$this->assertEqual('200', $http->last->response->status['code']);
 		$this->assertEqual('OK', $http->last->response->status['message']);
-		$this->assertEqual('html', $http->last->response->type());
+		$this->assertEqual(null, $http->last->response->type());
 		$this->assertEqual('UTF-8', $http->last->response->encoding);
 	}
 
@@ -119,7 +119,7 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual('HTTP/1.1', $http->last->response->protocol);
 		$this->assertEqual('200', $http->last->response->status['code']);
 		$this->assertEqual('OK', $http->last->response->status['message']);
-		$this->assertEqual('html', $http->last->response->type());
+		$this->assertEqual(null, $http->last->response->type());
 		$this->assertEqual('UTF-8', $http->last->response->encoding);
 	}
 

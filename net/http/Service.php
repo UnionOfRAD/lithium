@@ -124,7 +124,7 @@ class Service extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function head($path = null, $data = array(), array $options = array()) {
-		$defaults = array('return' => 'headers', 'type' => 'html');
+		$defaults = array('return' => 'headers', 'type' => false);
 		return $this->send(__FUNCTION__, $path, $data, $options + $defaults);
 	}
 
@@ -137,7 +137,7 @@ class Service extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function get($path = null, $data = array(), array $options = array()) {
-		$defaults = array('type' => 'html');
+		$defaults = array('type' => false);
 		return $this->send(__FUNCTION__, $path, $data, $options + $defaults);
 	}
 

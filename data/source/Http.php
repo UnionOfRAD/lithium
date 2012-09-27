@@ -112,17 +112,14 @@ class Http extends \lithium\data\Source {
 	 */
 	public function __call($method, $params) {
 		$params += array(array(), array());
+		$string = array('method' => 'GET');
 
 		if (isset($this->_methods[$method])) {
 			$string = $this->_methods[$method];
-		} else {
-			$string = array('method' => 'GET');
 		}
-
 		if (!isset($string['path'])) {
 			$string['path'] = '/' . $method;
 		}
-
 		$conn =& $this->connection;
 		$filter = function($self, $params) use (&$conn, $string) {
 			list($query, $options) = $params;
