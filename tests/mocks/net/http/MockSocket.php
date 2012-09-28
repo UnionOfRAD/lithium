@@ -58,7 +58,7 @@ class MockSocket extends \lithium\net\Socket {
 			$response = array($status, join("\r\n", $this->data->headers()), "", "not authorized");
 			return join("\r\n", $response);
 		}
-		return $this->data;
+		return (string) $this->data;
 	}
 
 	public function write($data) {

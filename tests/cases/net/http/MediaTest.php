@@ -291,7 +291,7 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual(array('Content-Type: application/json; charset=UTF-8'), $result);
 
 		$result = $response->body();
-		$this->assertEqual(json_encode($data), $result);
+		$this->assertEqual($data, $result);
 	}
 
 	/**
@@ -327,23 +327,24 @@ class MediaTest extends \lithium\test\Unit {
 
 	public function testCustomEncodeHandler() {
 		$response = new Response();
-		$response->type('csv');
 
-		Media::type('csv', 'application/csv', array('encode' => function($data) {
-			ob_start();
-			$out = fopen('php://output', 'w');
-			foreach ($data as $record) {
-				fputcsv($out, $record);
+		Media::type('csv', 'application/csv', array(
+			'encode' => function($data) {
+				ob_start();
+				$out = fopen('php://output', 'w');
+				foreach ($data as $record) {
+					fputcsv($out, $record);
+				}
+				fclose($out);
+				return ob_get_clean();
 			}
-			fclose($out);
-			return ob_get_clean();
-		}));
+		));
 
 		$data = array(
 			array('John', 'Doe', '123 Main St.', 'Anytown, CA', '91724'),
 			array('Jane', 'Doe', '124 Main St.', 'Anytown, CA', '91724')
 		);
-
+		$response->type('csv');
 		Media::render($response, $data);
 		$result = $response->body;
 		$expected = 'John,Doe,"123 Main St.","Anytown, CA",91724' . "\n";
@@ -401,7 +402,7 @@ class MediaTest extends \lithium\test\Unit {
 		$this->expectException("Unhandled media type `bad`.");
 		Media::render($response, array('foo' => 'bar'));
 
-		$result = $response->body;
+		$result = $response->body();
 		$this->assertNull($result);
 	}
 
@@ -431,7 +432,7 @@ class MediaTest extends \lithium\test\Unit {
 	public function testManualContentHandling() {
 		Media::type('custom', 'text/x-custom');
 		$response = new Response();
-		$response->type = 'custom';
+		$response->type('custom');
 
 		Media::render($response, 'Hello, world!', array(
 			'layout' => false,
@@ -463,7 +464,7 @@ class MediaTest extends \lithium\test\Unit {
 		$request->params['foo'] = 'bar';
 
 		$response = new Response();
-		$response->type = 'custom';
+		$response->type('custom');
 
 		Media::render($response, null, compact('request') + array(
 			'layout' => false,
@@ -494,7 +495,7 @@ class MediaTest extends \lithium\test\Unit {
 		$request->params['controller'] = 'pages';
 
 		$response = new Response();
-		$response->type = 'html';
+		$response->type('html');
 
 		$this->expectException('/Template not found/');
 		Media::render($response, null, compact('request'));
