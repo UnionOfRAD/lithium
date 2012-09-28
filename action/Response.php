@@ -34,7 +34,13 @@ class Response extends \lithium\net\http\Response {
 	protected $_autoConfig = array('classes' => 'merge');
 
 	public function __construct(array $config = array()) {
-		$defaults = array('buffer' => 8192, 'location' => null, 'status' => 0, 'request' => null);
+		$defaults = array(
+			'buffer' => 8192,
+			'location' => null,
+			'status' => 0,
+			'request' => null,
+			'decode' => false
+		);
 		parent::__construct($config + $defaults);
 	}
 
@@ -79,6 +85,21 @@ class Response extends \lithium\net\http\Response {
 			'Cache-Control' => 'max-age=' . ($expires - time()),
 			'Pragma' => 'cache'
 		));
+	}
+
+	/**
+	 * Sets/Gets the content type. If `'type'` is null, the method will attempt to determine the
+	 * type from the params, then from the environment setting
+	 *
+	 * @param string $type a full content type i.e. `'application/json'` or simple name `'json'`
+	 * @return string A simple content type name, i.e. `'html'`, `'xml'`, `'json'`, etc., depending
+	 *         on the content type of the request.
+	 */
+	public function type($type = null) {
+		if ($type === null && $this->_type === null) {
+			$type = 'html';
+		}
+		return parent::type($type);
 	}
 
 	/**

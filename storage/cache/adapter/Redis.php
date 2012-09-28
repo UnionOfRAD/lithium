@@ -100,6 +100,27 @@ class Redis extends \lithium\core\Object {
 	}
 
 	/**
+	 * Dispatches a not-found method to the Redis connection object.
+	 *
+	 * That way, one can easily use a custom method on that redis adapter like that:
+	 *
+	 * {{{Cache::adapter('named-of-redis-config')->methodName($argument);}}}
+	 *
+	 * If you want to know, what methods are available, have a look at the readme of phprdis.
+	 * One use-case might be to query possible keys, e.g.
+	 *
+	 * {{{Cache::adapter('redis')->keys('*');}}}
+	 *
+	 * @link https://github.com/nicolasff/phpredis GitHub: PhpRedis Extension
+	 * @param string $method Name of the method to call
+	 * @param array $params Parameter list to use when calling $method
+	 * @return mixed Returns the result of the method call
+	 */
+	public function __call($method, $params = array()) {
+		return call_user_func_array(array(&$this->connection, $method), $params);
+	}
+
+	/**
 	 * Sets expiration time for cache keys
 	 *
 	 * @param string $key The key to uniquely identify the cached item
