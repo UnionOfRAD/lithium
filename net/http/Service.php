@@ -40,7 +40,7 @@ class Service extends \lithium\core\Object {
 
 	/**
 	 * Array of closures that return various pieces of information about an HTTP response.
-	 * 
+	 *
 	 * @var array
 	 */
 	protected $_responseTypes = array();
@@ -109,8 +109,6 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @param string $method
 	 * @param string $params
-	 * @return void
-	 * @author gwoo
 	 */
 	public function __call($method, $params = array()) {
 		array_unshift($params, $method);
@@ -120,11 +118,13 @@ class Service extends \lithium\core\Object {
 	/**
 	 * Send HEAD request.
 	 *
+	 * @param string $path
+	 * @param array $data
 	 * @param array $options
 	 * @return string
 	 */
 	public function head($path = null, $data = array(), array $options = array()) {
-		$defaults = array('return' => 'headers');
+		$defaults = array('return' => 'headers', 'type' => false);
 		return $this->send(__FUNCTION__, $path, $data, $options + $defaults);
 	}
 
@@ -137,7 +137,8 @@ class Service extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function get($path = null, $data = array(), array $options = array()) {
-		return $this->send(__FUNCTION__, $path, $data, $options);
+		$defaults = array('type' => false);
+		return $this->send(__FUNCTION__, $path, $data, $options + $defaults);
 	}
 
 	/**
@@ -185,7 +186,8 @@ class Service extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function delete($path = null, $data = array(), array $options = array()) {
-		return $this->send(__FUNCTION__, $path, $data, $options);
+		$defaults = array('type' => false);
+		return $this->send(__FUNCTION__, $path, $data, $options + $defaults);
 	}
 
 	/**
@@ -243,9 +245,7 @@ class Service extends \lithium\core\Object {
 		$request = $this->_instance('request', $options);
 		$request->path = str_replace('//', '/', "{$request->path}{$path}");
 		$request->method = $method = strtoupper($method);
-
 		$hasBody = in_array($method, array('POST', 'PUT', 'PATCH'));
-		$hasBody ? $request->type($options['type']) : null;
 		$hasBody ? $request->body($data) : $request->query = $data;
 		return $request;
 	}

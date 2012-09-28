@@ -23,8 +23,7 @@ class RequestTest extends \lithium\test\Unit {
 			'host' => 'localhost',
 			'port' => 443,
 			'headers' => array('Header' => 'Value'),
-			'body' => array('Part 1'),
-			'params' => array('param' => 'value')
+			'body' => array('Part 1')
 		));
 
 		$expected = 'localhost';
@@ -49,10 +48,6 @@ class RequestTest extends \lithium\test\Unit {
 
 		$expected = '/';
 		$result = $request->path;
-		$this->assertEqual($expected, $result);
-
-		$expected = array('param' => 'value');
-		$result = $request->params;
 		$this->assertEqual($expected, $result);
 
 		$expected = array(
@@ -278,7 +273,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testDigest() {
 		$request = new Request(array(
-			'path' => 'http_auth',
+			'path' => '/http_auth',
 			'auth' => array(
 				'realm' => 'app',
 				'qop' => 'auth',
@@ -325,6 +320,21 @@ class RequestTest extends \lithium\test\Unit {
 		$expected = "?param=1&param=2&param3=3";
 		$result = $request->queryString(array('param3' => 3));
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testKeepDefinedContentTypeHeaderOnPost() {
+		$request = new Request(array(
+			'method' => 'POST',
+			'headers' => array('Content-Type' => 'text/x-test')
+		));
+		$expected = 'Content-Type: text/x-test';
+		$result = $request->headers();
+		$message = "Expected value `{$expected}` not found in result.";
+		$this->assertTrue(in_array($expected, $result), $message);
+
+		$expected = '#Content-Type: text/x-test#';
+		$result = $request->to('string');
+		$this->assertPattern($expected, $result);
 	}
 }
 
