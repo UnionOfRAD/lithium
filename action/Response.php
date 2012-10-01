@@ -53,7 +53,7 @@ class Response extends \lithium\net\http\Response {
 		if ($config['location']) {
 			$classes = $this->_classes;
 			$location = $classes['router']::match($config['location'], $config['request']);
-			$this->headers('location', $location);
+			$this->headers('Location', $location);
 		}
 	}
 

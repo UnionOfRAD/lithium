@@ -198,7 +198,7 @@ class DispatcherTest extends \lithium\test\Unit {
 
 	public function testAutoHandler() {
 		$result = MockDispatcher::run(new Request(array('url' => '/auto')));
-		$this->assertEqual(array('location: /redirect'), $result->headers());
+		$this->assertEqual(array('Location: /redirect'), $result->headers());
 	}
 
 	public static function process($request) {

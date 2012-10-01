@@ -188,7 +188,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'classes' => array('router' => __CLASS__),
 			'location' => array('controller' => 'foo_bar', 'action' => 'index')
 		));
-		$this->assertEqual(array('location: /foo_bar'), $this->response->headers());
+		$this->assertEqual(array('Location: /foo_bar'), $this->response->headers());
 	}
 
 	public static function match($url) {
