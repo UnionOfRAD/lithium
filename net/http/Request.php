@@ -36,7 +36,7 @@ class Request extends \lithium\net\http\Message {
 	 *
 	 * @var string
 	 */
-	public $method = 'GET';
+	public $method;
 
 	/**
 	 * Cookies.
@@ -84,7 +84,8 @@ class Request extends \lithium\net\http\Message {
 			'followLocation' => true
 		);
 		parent::__construct($config + $defaults);
-		$this->method = $this->_config['method'];
+		$this->method = $this->method ?: $this->_config['method'];
+
 		$this->headers = array(
 			'Host' => $this->port ? "{$this->host}:{$this->port}" : $this->host,
 			'Connection' => 'Close',
