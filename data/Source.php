@@ -279,6 +279,14 @@ abstract class Source extends \lithium\core\Object {
 		unset($options['class']);
 		return $this->_instance($class, compact('model', 'data') + $options);
 	}
+
+	/**
+	 * Applying a strategy to a `lithium\data\model\Query` object
+	 *
+	 * @param array $options The option array
+	 * @param object $context A query object to configure
+	 */
+	public function finalizeQuery($options, $context) {}
 }
 
 ?>

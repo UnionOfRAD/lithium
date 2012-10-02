@@ -19,8 +19,9 @@ class SourceTest extends \lithium\test\Unit {
 		$expected = array(
 			'connect', 'disconnect', 'sources', 'describe', 'create', 'read', 'update', 'delete',
 			'schema', 'result', 'cast', 'relationship', 'calculation', '__construct', '__destruct',
-			'_init', 'isConnected', 'name', 'methods', 'configureClass', 'item', 'applyFilter',
-			'invokeMethod', '__set_state', '_instance', '_filter', '_parents', '_stop'
+			'_init', 'isConnected', 'name', 'methods', 'configureClass', 'item', 'finalizeQuery',
+			'applyFilter', 'invokeMethod', '__set_state', '_instance', '_filter', '_parents',
+			'_stop'
 		);
 		$this->assertEqual($expected, $methods);
 	}
