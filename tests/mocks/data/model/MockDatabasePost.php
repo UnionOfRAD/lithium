@@ -15,7 +15,7 @@ class MockDatabasePost extends \lithium\tests\mocks\data\MockBase {
 	public $hasMany = array(
 		'MockDatabaseComment',
 		'MockDatabasePostRevision' => array(
-			'constraint' => array('MockDatabasePostRevision.deleted' => null)
+			'constraints' => array('MockDatabasePostRevision.deleted' => null)
 		)
 	);
 

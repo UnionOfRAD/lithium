@@ -313,7 +313,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$result = $this->db->renderCommand($query);
 
-		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE {MockDatabasePost}.{title} = '007';";
+		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ";
+		$sql .= "{MockDatabasePost}.{title} = '007';";
 		$this->assertEqual($sql, $result);
 	}
 
@@ -325,7 +326,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'conditions' => array('MockDatabaseTag.tag' => array('foo', 'bar', 'baz')),
 			'joins' => array(new Query(array(
 				'model' => 'lithium\tests\mocks\data\model\MockDatabaseTag',
-				'constraint' => '{MockDatabaseTagging}.{tag_id} = {MockDatabaseTag}.{id}'
+				'constraints' => '{MockDatabaseTagging}.{tag_id} = {MockDatabaseTag}.{id}'
 			)))
 		));
 		$result = $this->db->renderCommand($query);
@@ -826,21 +827,21 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected .= ' {MockDatabaseComment}.{created}';
 		$this->assertEqual($expected, $result);
 
-		$fields = array('MockDatabasePost as Post', 'MockDatabaseComment AS Comment');
+		$fields = array('MockDatabasePost.id as idPost', 'MockDatabaseComment.id AS idComment');
 		$result = $this->db->fields($fields, $query);
-		$expected = 'MockDatabasePost as Post, MockDatabaseComment AS Comment';
+		$expected = '{MockDatabasePost}.{id} as idPost, {MockDatabaseComment}.{id} as idComment';
 		$this->assertEqual($expected, $result);
 
-		$expected = array('MockDatabasePost' => array('Post', 'Comment'));
+		$expected = array('MockDatabasePost' => array('idPost'), 'MockDatabasePost.MockDatabaseComment' => array('idComment'));
 		$this->assertEqual($expected, $query->map());
 
 		$fields = array(array('count(MockDatabasePost.id)'));
-		$expected = 'count(MockDatabasePost.id)';
+		$expected = 'count(MockDatabasePost.id), {MockDatabasePost}.{id}';
 		$result = $this->db->fields($fields, $query);
 		$this->assertEqual($expected, $result);
 
 		$fields = array((object) 'count(MockDatabasePost.id)');
-		$expected = 'count(MockDatabasePost.id)';
+		$expected = 'count(MockDatabasePost.id), {MockDatabasePost}.{id}';
 		$result = $this->db->fields($fields, $query);
 		$this->assertEqual($expected, $result);
 	}
@@ -880,16 +881,17 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$hasMany = $this->db->relationship($this->_model, 'hasMany', 'PostRevisions', array(
 			'to' => $postRevision,
-			'constraint' => array('MockDatabasePostRevision.deleted' => null)
+			'constraints' => array('MockDatabasePostRevision.deleted' => null)
 		));
 		$this->assertEqual(array('id' => 'mock_database_post_id'), $hasMany->key());
 		$this->assertEqual('post_revisions', $hasMany->fieldName());
 
 		$expected = array(
-			'MockDatabasePost.id' => 'PostRevisions.mock_database_post_id',
-			'MockDatabasePostRevision.deleted' => null
+			'MockDatabasePostRevision.deleted' => null,
+			'MockDatabasePost.id' => (object) '{PostRevisions}.{mock_database_post_id}'
 		);
-		$this->assertEqual($expected, $hasMany->constraints());
+		$result = $this->db->on($hasMany);
+		$this->assertEqual($expected, $result);
 
 		$belongsTo = $this->db->relationship($postRevision, 'belongsTo', 'Posts', array(
 			'to' => $this->_model
@@ -925,8 +927,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->read(new Query($options), $options);
 		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ';
 		$expected .= '{mock_database_post_revisions} AS {MockDatabasePostRevision} ON ';
-		$expected .= '{MockDatabasePost}.{id} = {MockDatabasePostRevision}.{mock_database_post_id}';
-		$expected .= ' AND {MockDatabasePostRevision}.{deleted} IS NULL;';
+		$expected .= '{MockDatabasePostRevision}.{deleted} IS NULL AND ';
+		$expected .= '{MockDatabasePost}.{id} = {MockDatabasePostRevision}.{mock_database_post_id};';
 		$this->assertEqual($expected, $this->db->sql);
 	}
 
@@ -938,7 +940,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'limit' => 1
 		);
 		$result = $this->db->read(new Query($options), $options);
-		$this->assertTrue($result instanceof RecordSet);
+		$this->assertFalse($result instanceof RecordSet);
 	}
 
 	public function testGroup() {
@@ -975,12 +977,12 @@ class DatabaseTest extends \lithium\test\Unit {
 				'type' => 'INNER',
 				'source' => 'posts',
 				'alias' => 'Post',
-				'constraint' => array("Comment.post_id" => array('<=' => "Post.id"))
+				'constraints' => array("Comment.post_id" => array('<=' => (object) "{Post}.{id}"))
 			))
 		));
 
 		$expected = "SELECT * FROM {comments} AS {Comments} INNER JOIN {posts} AS {Post} ON ";
-		$expected .= "{Comment}.{post_id} <= {Post}.{id} WHERE {Comment}.{id} = 1;";
+		$expected .= "({Comment}.{post_id} <= {Post}.{id}) WHERE {Comment}.{id} = 1;";
 		$result = $this->db->renderCommand($query);
 		$this->assertEqual($expected, $result);
 	}
@@ -1000,17 +1002,14 @@ class DatabaseTest extends \lithium\test\Unit {
 				'type' => 'LEFT',
 				'source' => 'posts',
 				'alias' => 'Post',
-				'constraint' => array(
+				'constraints' => array(
 					"Comment.post_id" => array(
-						'<=' => "Post.id",
-						'>=' => "Post.id"
-					)
-				)
-			))
-		));
+						'<=' => (object) "{Post}.{id}",
+						'>=' => (object) "{Post}.{id}"
+		))))));
 
 		$expected = "SELECT * FROM {comments} AS {Comments} LEFT JOIN {posts} AS {Post} ON ";
-		$expected .= "{Comment}.{post_id} <= {Post}.{id} AND {Comment}.{post_id} >= {Post}.{id} ";
+		$expected .= "({Comment}.{post_id} <= {Post}.{id} AND {Comment}.{post_id} >= {Post}.{id}) ";
 		$expected .= "WHERE {Comment}.{id} = 1;";
 		$result = $this->db->renderCommand($query);
 		$this->assertEqual($expected, $result);
@@ -1023,12 +1022,12 @@ class DatabaseTest extends \lithium\test\Unit {
 				'type' => 'LEFT',
 				'source' => 'posts',
 				'alias' => 'Post',
-				'constraint' => array(
-					"Comment.post_id" => array('=>' => "Post.id")
+				'constraints' => array(
+					"Comment.post_id" => array('=>' => (object) "{Post}.{id}")
 				)
 			))
 		));
-		$this->expectException("Unsupported operator `=>` used in constraint.");
+		$this->expectException("Unsupported operator `=>` used in constraints.");
 		$this->db->renderCommand($query);
 	}
 
@@ -1044,7 +1043,7 @@ class DatabaseTest extends \lithium\test\Unit {
 				'type' => 'INNER',
 				'source' => 'posts',
 				'alias' => 'Post',
-				'constraint' => array('Comment.post_id' => 'Post.id')
+				'constraints' => array('Comment.post_id' => (object) "{Post}.{id}")
 			))
 		));
 
@@ -1060,20 +1059,79 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->db->log = false;
 
 		$result = MockDatabasePost::$connection->logs[0];
-		$expected = "SELECT {MockDatabasePost}.{id} FROM {mock_database_posts} AS ";
+		$expected = "SELECT DISTINCT({MockDatabasePost}.{id}) AS _ID_ FROM {mock_database_posts} AS ";
 		$expected .= "{MockDatabasePost} LEFT JOIN {mock_database_comments} AS ";
 		$expected .= "{MockDatabaseComment} ON {MockDatabasePost}.{id} = ";
 		$expected .= "{MockDatabaseComment}.{mock_database_post_id} WHERE ";
-		$expected .= "{MockDatabasePost}.{id} = 5 GROUP BY {MockDatabasePost}.{id} LIMIT 1;";
-		$this->assertEqual($expected, $result);
-
-		$result = MockDatabasePost::$connection->logs[1];
-		$expected = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} ";
-		$expected .= "LEFT JOIN {mock_database_comments} AS {MockDatabaseComment} ON ";
-		$expected .= "{MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id} ";
-		$expected .= "WHERE {MockDatabasePost}.{id} = 5 LIMIT 1;";
+		$expected .= "{MockDatabasePost}.{id} = 5 LIMIT 1;";
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testOn() {
+		$conn = MockDatabasePost::connection();
+		$expected = array(
+			'MockDatabasePost.id' => (object) '{MockDatabaseComment}.{mock_database_post_id}'
+		);
+		$this->assertEqual($expected, $conn->on(MockDatabasePost::relations('MockDatabaseComment')));
+
+		$expected = array(
+			'MockDatabaseComment.mock_database_post_id' => (object) '{MockDatabasePost}.{id}'
+		);
+		$this->assertEqual($expected, $conn->on(MockDatabaseComment::relations('MockDatabasePost')));
+
+		$expected = array(
+			'MockDatabasePost.id' => (object) '{MockDatabaseComment}.{mock_database_post_id}',
+			'MockDatabaseComment.published' => 'yes'
+		);
+
+		$rel = MockDatabasePost::relations('MockDatabaseComment');
+		$result = $conn->on($rel, array('published' => 'yes'));
+		$this->assertEqual($expected, $result);
+
+		$expected = array(
+			'CustomPost.id' => (object) '{CustomComment}.{mock_database_post_id}',
+			'CustomComment.published' => 'no'
+		);
+
+		$result = $conn->on($rel, array('published' => 'no'), 'CustomPost', 'CustomComment');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testReadWithRelationshipAndCustomConstraint() {
+		$model = 'lithium\tests\mocks\data\model\MockDatabasePost';
+
+		$model::bind('hasMany', 'MockDatabaseTagging', array(
+			'to' => 'lithium\tests\mocks\data\model\MockDatabaseTagging'
+		));
+
+		$options = array(
+			'type' => 'read',
+			'model' => $model,
+			'with' => array(
+				'MockDatabaseTagging',
+				'MockDatabaseTagging.MockDatabaseTag' =>
+					array('conditions' =>
+						array('MockDatabaseTag.name' => 'MyTag')
+				),
+				'MockDatabasePostRevision'
+			)
+		);
+		$result = $this->db->read(new Query($options));
+		$query = new Query($options);
+		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} ';
+		$expected .= 'LEFT JOIN {mock_database_taggings} AS {MockDatabaseTagging} ';
+		$expected .= 'ON {MockDatabasePost}.{id} = {MockDatabaseTagging}.{mock_database_post_id} ';
+		$expected .= 'LEFT JOIN {mock_database_tags} AS {MockDatabaseTag} ';
+		$expected .= 'ON {MockDatabaseTag}.{name} = \'MyTag\' ';
+		$expected .= 'AND {MockDatabaseTagging}.{mock_database_tag_id} = {MockDatabaseTag}.{id} ';
+		$expected .= 'LEFT JOIN {mock_database_post_revisions} AS {MockDatabasePostRevision} ';
+		$expected .= 'ON {MockDatabasePostRevision}.{deleted} IS NULL AND {MockDatabasePost}.{id} ';
+		$expected .= '= {MockDatabasePostRevision}.{mock_database_post_id};';
+
+		$this->assertEqual($expected, $this->db->sql);
+		$model::reset();
+	}
+
 }
 
 ?>
