@@ -12,6 +12,8 @@ class MockQueryComment extends \lithium\tests\mocks\data\MockBase {
 
 	public static $connection = null;
 
+	public $belongsTo = array('MockQueryPost');
+
 	protected $_meta = array('source' => false, 'connection' => false);
 
 	protected $_schema = array(

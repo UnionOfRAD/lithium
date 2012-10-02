@@ -8,7 +8,6 @@
 
 namespace lithium\tests\cases\data\model;
 
-use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\data\entity\Record;
 use lithium\tests\mocks\data\MockPostObject;
@@ -275,6 +274,7 @@ class QueryTest extends \lithium\test\Unit {
 			'source',
 			'type',
 			'whitelist',
+			'with',
 			'relationships'
 		);
 		$result = array_keys($export);
@@ -324,30 +324,34 @@ class QueryTest extends \lithium\test\Unit {
 
 	public function testJoin() {
 		$query = new Query(array('joins' => array(array('foo' => 'bar'))));
-		$query->join(array('bar' => 'baz'));
+		$query->joins(array('bar' => 'baz'));
 		$expected = array(array('foo' => 'bar'), array('bar' => 'baz'));
-		$joins = $query->join();
+		$joins = $query->joins();
+		$this->assertEqual($expected, $joins);
 
-		$this->assertEqual('bar', $joins[0]->foo());
-		$this->assertNull($joins[0]->bar());
+		$this->assertEqual('bar', $joins[0]['foo']);
+		$this->assertFalse(isset($joins[0]['bar']));
 
-		$this->assertEqual('baz', $joins[1]->bar());
-		$this->assertNull($joins[1]->foo());
+		$this->assertEqual('baz', $joins[1]['bar']);
+		$this->assertFalse(isset($joins[1]['foo']));
 
-		$query->join('zim', array('dib' => 'gir'));
-		$this->assertEqual(3, count($query->join()));
+		$query->joins('zim', array('dib' => 'gir'));
+		$joins = $query->joins();
+		$this->assertEqual(3, count($joins));
+
+		$this->assertEqual('gir', $joins['zim']['dib']);
 
 		$expected = array(
 			array('foo' => 'bar'),
 			array('bar' => 'baz'),
 			'zim' => array('dib' => 'gir')
 		);
-		$this->assertEqual(3, count($query->join()));
-		$this->assertEqual('gir', $query->join('zim')->dib());
+		$this->assertEqual($expected, $joins);
 	}
 
 	public function testWithAssociation() {
 		$model = $this->_model;
+		$model::meta('source', 'foo');
 		$model::bind('hasMany', 'MockQueryComment', array(
 			'class' => 'lithium\tests\mocks\data\model\MockQueryComment'
 		));
@@ -358,7 +362,9 @@ class QueryTest extends \lithium\test\Unit {
 		$expected = array('MockQueryComment' => array(
 			'type' => 'hasMany',
 			'model' => 'lithium\tests\mocks\data\model\MockQueryComment',
-			'fieldName' => 'mock_query_comments'
+			'fieldName' => 'mock_query_comments',
+			'fromAlias' => 'MockQueryPost',
+			'toAlias' => 'MockQueryComment'
 		));
 		$keyExists = isset($export['relationships']);
 		$this->assertTrue($keyExists);
@@ -480,6 +486,112 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $query->export($this->db);
 		$this->assertEqual('{my_custom_table}', $result['source']);
 		$this->assertEqual('AS {MyCustomAlias}', $result['alias']);
+	}
+
+	public function testRelationships() {
+		$query = new Query(array('relationships' => array('Model1' => array('foo' => 'bar'))));
+		$query->relationships('Model1.Model2', array('bar' => 'baz'));
+		$expected = array(
+			'Model1' => array('foo' => 'bar'),
+			'Model1.Model2' => array('bar' => 'baz')
+		);
+		$relationships = $query->relationships();
+		$this->assertEqual($expected, $relationships);
+
+		$query = new Query();
+		$query->relationships('Model1', array('foo' => 'bar'));
+		$query->relationships('Model1.Model2', array('bar' => 'baz'));
+		$relationships = $query->relationships();
+		$this->assertEqual($expected, $relationships);
+	}
+
+	public function testPaths() {
+		$model = 'lithium\tests\mocks\data\model\MockQueryComment';
+		$query = new Query(compact('model'));
+
+		$this->assertIdentical('MockQueryComment', $query->alias());
+		$this->assertIdentical('MockQueryComment', $query->alias(true));
+		$this->assertIdentical('MockQueryComment2', $query->alias('MockQueryComment2'));
+		$this->assertIdentical('MockQueryComment2', $query->alias());
+		$this->assertIdentical('MockQueryComment2', $query->alias(true));
+
+		$this->assertIdentical('MockQueryComment__2', $query->alias('MockQueryComment', 'Model1'));
+		$this->assertIdentical('MockQueryComment2__2', $query->alias('MockQueryComment2', 'Model2'));
+
+		$this->assertIdentical('MockQueryComment__2', $query->alias(true, 'Model1'));
+		$this->assertIdentical('MockQueryComment2__2', $query->alias(true, 'Model2'));
+
+		$query = new Query(compact('model') + array(
+			'source' => 'my_custom_table',
+			'alias' => 'MyCustomAlias'
+		));
+		$result = $query->export($this->db);
+		$this->assertIdentical('{my_custom_table}', $result['source']);
+		$this->assertIdentical('AS {MyCustomAlias}', $result['alias']);
+
+		$this->assertIdentical('MyCustomAlias__2', $query->alias('MyCustomAlias', 'Relation1'));
+		$this->assertIdentical('MyCustomAlias__3', $query->alias('MyCustomAlias', 'Other.Relation2'));
+		$this->assertIdentical('MyCustomAlias2', $query->alias('MyCustomAlias2', 'Other.Other.Relation3'));
+
+		$this->assertIdentical('MyCustomAlias', $query->alias());
+		$this->assertIdentical('MyCustomAlias__2', $query->alias(true, 'Relation1'));
+		$this->assertIdentical('MyCustomAlias__3', $query->alias(true, 'Other.Relation2'));
+		$this->assertIdentical('MyCustomAlias2', $query->alias(true, 'Other.Other.Relation3'));
+
+		$this->assertIdentical('Relation4', $query->alias(null, 'Relation4'));
+		$this->assertIdentical('Relation5', $query->alias(null, 'Other.Relation5'));
+		$this->assertIdentical('Relation5__2', $query->alias(null, 'Other.Other.Relation5'));
+
+		$this->assertIdentical('Relation4', $query->alias(true, 'Relation4'));
+		$this->assertIdentical('Relation5', $query->alias(true, 'Other.Relation5'));
+		$this->assertIdentical('Relation5__2', $query->alias(true, 'Other.Other.Relation5'));
+
+		$expected = array (
+			'MyCustomAlias' => null,
+			'MyCustomAlias__2' => 'Relation1',
+			'MyCustomAlias__3' => 'Other.Relation2',
+			'MyCustomAlias2' => 'Other.Other.Relation3',
+			'Relation4' => 'Relation4',
+			'Relation5' => 'Other.Relation5',
+			'Relation5__2' => 'Other.Other.Relation5'
+		);
+
+		$this->assertEqual($expected, $query->paths($this->db));
+
+		$model = 'lithium\tests\mocks\data\model\MockQueryPost';
+		$query = new Query(compact('model'));
+		$query->alias(null, 'MockQueryComment');
+		$query->alias('MockQueryPost2', 'MockQueryComment.MockQueryPost');
+
+		$expected = array(
+			'MockQueryPost' => null,
+			'MockQueryComment' => 'MockQueryComment',
+			'MockQueryPost2' => 'MockQueryComment.MockQueryPost'
+		);
+		$this->assertEqual($expected, $query->paths($this->db));
+	}
+
+	public function testModels() {
+		$model = 'lithium\tests\mocks\data\model\MockQueryPost';
+		$query = new Query(compact('model'));
+		$query->alias(null, 'MockQueryComment');
+
+		$expected = array(
+			'MockQueryPost' => 'lithium\tests\mocks\data\model\MockQueryPost',
+			'MockQueryComment' => 'lithium\tests\mocks\data\model\MockQueryComment'
+		);
+		$this->assertEqual($expected, $query->models($this->db));
+
+		$query->alias('Post');
+		$query->alias('Comment', 'MockQueryComment');
+		$query->alias('Post2', 'MockQueryComment.MockQueryPost');
+
+		$expected = array(
+			'Post' => 'lithium\tests\mocks\data\model\MockQueryPost',
+			'Comment' => 'lithium\tests\mocks\data\model\MockQueryComment',
+			'Post2' => 'lithium\tests\mocks\data\model\MockQueryPost'
+		);
+		$this->assertEqual($expected, $query->models($this->db));
 	}
 }
 

@@ -21,14 +21,6 @@ use PDOException;
  */
 class MySql extends \lithium\data\source\Database {
 
-	protected $_classes = array(
-		'entity' => 'lithium\data\entity\Record',
-		'set'    => 'lithium\data\collection\RecordSet',
-		'relationship' => 'lithium\data\model\Relationship',
-		'result' => 'lithium\data\source\database\adapter\pdo\Result',
-		'schema' => 'lithium\data\Schema'
-	);
-
 	/**
 	 * MySQL column type definitions.
 	 *

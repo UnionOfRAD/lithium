@@ -19,14 +19,6 @@ use lithium\core\ConfigException;
  */
 class Sqlite3 extends \lithium\data\source\Database {
 
-	protected $_classes = array(
-		'entity' => 'lithium\data\entity\Record',
-		'set' => 'lithium\data\collection\RecordSet',
-		'relationship' => 'lithium\data\model\Relationship',
-		'result' => 'lithium\data\source\database\adapter\pdo\Result',
-		'schema' => 'lithium\data\Schema'
-	);
-
 	/**
 	 * Pair of opening and closing quote characters used for quoting identifiers in queries.
 	 *
