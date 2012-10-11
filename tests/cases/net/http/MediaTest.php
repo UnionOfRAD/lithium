@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\net\http;
 
+use lithium\core\Environment;
 use lithium\net\http\Media;
 use lithium\action\Request;
 use lithium\action\Response;
@@ -145,6 +146,37 @@ class MediaTest extends \lithium\test\Unit {
 		$result = Media::asset('subpath/file', 'js');
 		$expected = '/js/subpath/file.js';
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testCustomAssetUrls() {
+		$env = Environment::get();
+
+		Libraries::add('cdn_js_test', array(
+			'path' => Libraries::get(true, 'path'),
+			'assets' => array(
+				'js' => 'http://static.cdn.com'
+			)
+		));
+
+		Libraries::add('cdn_env_test', array(
+			'path' => Libraries::get(true, 'path'),
+			'assets' => array(
+				'js' => 'wrong',
+				$env => array('js' => 'http://static.cdn.com/myapp')
+			)
+		));
+
+		$result = Media::asset('foo', 'js', array('library' => 'cdn_js_test'));
+		$this->assertEqual("http://static.cdn.com/lithium/js/foo.js", $result);
+
+		$result = Media::asset('foo', 'css', array('library' => 'cdn_js_test'));
+		$this->assertEqual("/lithium/css/foo.css", $result);
+
+		$result = Media::asset('foo', 'js', array('library' => 'cdn_env_test'));
+		$this->assertEqual("http://static.cdn.com/myapp/lithium/js/foo.js", $result);
+
+		Libraries::remove('cdn_env_test');
+		Libraries::remove('cdn_js_test');
 	}
 
 	public function testAssetPathGeneration() {

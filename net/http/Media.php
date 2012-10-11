@@ -11,6 +11,7 @@ namespace lithium\net\http;
 use lithium\util\Set;
 use lithium\util\String;
 use lithium\core\Libraries;
+use lithium\core\Environment;
 use lithium\net\http\MediaException;
 
 /**
@@ -441,42 +442,68 @@ class Media extends \lithium\core\StaticObject {
 			}
 			$config = Libraries::get($library);
 			$paths = $options['path'];
-
 			$config['default'] ? end($paths) : reset($paths);
 			$options['library'] = basename($config['path']);
 
 			if ($options['suffix'] && strpos($path, $options['suffix']) === false) {
 				$path .= $options['suffix'];
 			}
-
-			if ($options['check'] || $options['timestamp']) {
-				$file = $self::path($path, $type, $options);
-			}
-
-			if (strlen($path) > 0 && $path[0] === '/') {
-				if ($options['base'] && strpos($path, $options['base']) !== 0) {
-					$path = "{$options['base']}{$path}";
-				}
-			} else {
-				$path = String::insert(key($paths), compact('path') + $options);
-			}
-
-			if ($options['check'] && !is_file($file)) {
-				return false;
-			}
-
-			if (is_array($options['filter']) && !empty($options['filter'])) {
-				$keys = array_keys($options['filter']);
-				$values = array_values($options['filter']);
-				$path = str_replace($keys, $values, $path);
-			}
-
-			if ($options['timestamp'] && is_file($file)) {
-				$separator = (strpos($path, '?') !== false) ? '&' : '?';
-				$path .= $separator . filemtime($file);
-			}
-			return $path;
+			return $self::filterAssetPath($path, $paths, $config, compact('type') + $options);
 		});
+	}
+
+	/**
+	 * Performs checks and applies transformations to asset paths, including verifying that the
+	 * virtual path exists on the filesystem, appending a timestamp, prepending an asset host, or
+	 * applying a user-defined filter.
+	 *
+	 * @see lithium\net\http\Media::asset()
+	 * @param string $asset A full asset path, relative to the public web path of the application.
+	 * @param mixed $path Path information for the asset type.
+	 * @param array $config The configuration array of the library from which the asset is being
+	 *              loaded.
+	 * @param array $options The array of options passed to `asset()` (see the `$options` parameter
+	 *              of `Media::asset()`).
+	 * @return mixed Returns a modified path to a web asset, or `false`, if the path fails a check.
+	 */
+	public static function filterAssetPath($asset, $path, array $config, array $options = array()) {
+		$config += array('assets' => null);
+
+		if ($options['check'] || $options['timestamp']) {
+			$file = static::path($asset, $options['type'], $options);
+		}
+		if ($options['check'] && !is_file($file)) {
+			return false;
+		}
+		$isAbsolute = ($asset && $asset[0] === '/');
+
+		if ($isAbsolute && $options['base'] && strpos($asset, $options['base']) !== 0) {
+			$asset = "{$options['base']}{$asset}";
+		} elseif (!$isAbsolute) {
+			$asset = String::insert(key($path), array('path' => $asset) + $options);
+		}
+
+		if (is_array($options['filter']) && !empty($options['filter'])) {
+			$filter = $options['filter'];
+			$asset = str_replace(array_keys($filter), array_values($filter), $asset);
+		}
+
+		if ($options['timestamp'] && is_file($file)) {
+			$separator = (strpos($asset, '?') !== false) ? '&' : '?';
+			$asset .= $separator . filemtime($file);
+		}
+
+		if ($host = $config['assets']) {
+			$type = $options['type'];
+			$env  = Environment::get();
+			$base = isset($host[$env][$type]) ? $host[$env][$type] : null;
+			$base = (isset($host[$type]) && !$base) ? $host[$type] : $base;
+
+			if ($base) {
+				return "{$base}{$asset}";
+			}
+		}
+		return $asset;
 	}
 
 	/**
