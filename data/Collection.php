@@ -76,16 +76,27 @@ abstract class Collection extends \lithium\util\Collection {
 	protected $_stats = array();
 
 	/**
-	 * By default, query results are not fetched until the collection is iterated. Set to `true`
-	 * when the collection has begun iterating and fetching entities.
+	 * Setted to `true` when the collection has begun iterating.
+	 * @var integer
+	 */
+	protected $_started = false;
+
+	/**
+	 * Indicates whether this array was part of a document loaded from a data source, or is part of
+	 * a new document, or is in newly-added field of an existing document.
 	 *
-	 * @see lithium\data\Collection::rewind()
-	 * @see lithium\data\Collection::_populate()
 	 * @var boolean
 	 */
-	protected $_hasInitialized = false;
+	protected $_exists = false;
 
-	protected $_schema = array();
+	/**
+	 * If the `Collection` has a schema object assigned (rather than loading one from a model), it
+	 * will be assigned here.
+	 *
+	 * @see lithium\data\Schema
+	 * @var lithium\data\Schema
+	 */
+	protected $_schema = null;
 
 	/**
 	 * Holds an array of values that should be processed on initialization.
@@ -93,7 +104,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'data', 'model', 'result', 'query', 'parent', 'stats', 'pathKey', 'schema'
+		'model', 'result', 'query', 'parent', 'stats', 'pathKey', 'exists', 'schema'
 	);
 
 	/**
@@ -107,18 +118,11 @@ abstract class Collection extends \lithium\util\Collection {
 	}
 
 	protected function _init() {
+		$data = $this->_config['data'];
 		parent::_init();
-
-		foreach (array('data', 'classes', 'model', 'result', 'query') as $key) {
+		$this->set($data);
+		foreach (array('classes', 'model', 'result', 'query') as $key) {
 			unset($this->_config[$key]);
-		}
-		if ($model = $this->_model) {
-			$options = array(
-				'pathKey' => $this->_pathKey,
-				'schema' => $model::schema(),
-				'exists' => isset($this->_config['exists']) ? $this->_config['exists'] : null
-			);
-			$this->_data = $model::connection()->cast($this, $this->_data, $options);
 		}
 	}
 
@@ -154,8 +158,17 @@ abstract class Collection extends \lithium\util\Collection {
 		return $this->_parent;
 	}
 
+	/**
+	 * A flag indicating whether or not the items of this collection exists.
+	 *
+	 * @return boolean `True` if exists, `false` otherwise.
+	 */
+	public function exists() {
+		return $this->_exists;
+	}
+
 	public function schema($field = null) {
-		$schema = array();
+		$schema = null;
 
 		switch (true) {
 			case ($this->_schema):
@@ -165,10 +178,26 @@ abstract class Collection extends \lithium\util\Collection {
 				$schema = $model::schema();
 			break;
 		}
-		if ($field) {
-			return isset($self->_schema[$field]) ? $self->_schema[$field] : null;
+		if ($schema) {
+			return $field ? $schema->fields($field) : $schema;
 		}
-		return $schema;
+	}
+
+	/**
+	 * Allows several properties to be assigned at once.
+	 *
+	 * For example:
+	 * {{{
+	 * $doc->set(array('title' => 'Lorem Ipsum', 'value' => 42));
+	 * }}}
+	 *
+	 * @param $values An associative array of fields and values to assign to the `Document`.
+	 * @return void
+	 */
+	public function set($values) {
+		foreach ($values as $key => $val) {
+			$this[$key] = $val;
+		}
 	}
 
 	/**
@@ -180,27 +209,183 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return boolean Result.
 	 */
 	public function offsetExists($offset) {
-		return ($this->offsetGet($offset) !== null);
+		$this->offsetGet($offset);
+		return array_key_exists($offset, $this->_data);
 	}
 
 	/**
-	 * Reset the set's iterator and return the first entity in the set.
-	 * The next call of `current()` will get the first entity in the set.
+	 * Gets an `Entity` object using PHP's array syntax, i.e. `$documents[3]` or `$records[5]`.
 	 *
-	 * @return object Returns the first `Entity` instance in the set.
+	 * @param mixed $offset The offset.
+	 * @return mixed Returns an `Entity` object if exists otherwise returns `null`.
+	 */
+	public function offsetGet($offset) {
+		while (!array_key_exists($offset, $this->_data) && $this->_populate()) {}
+
+		if (array_key_exists($offset, $this->_data)) {
+			return $this->_data[$offset];
+		}
+		return null;
+	}
+
+	/**
+	 * Adds the specified object to the `Collection` instance, and assigns associated metadata to
+	 * the added object.
+	 *
+	 * @param string $offset The offset to assign the value to.
+	 * @param mixed $data The entity object to add.
+	 * @return mixed Returns the set `Entity` object.
+	 */
+	public function offsetSet($offset, $data) {
+		$this->offsetGet($offset);
+		return $this->_set($data, $offset);
+	}
+
+	/**
+	 * Unsets an offset.
+	 *
+	 * @param integer $offset The offset to unset.
+	 */
+	public function offsetUnset($offset) {
+		$this->offsetGet($offset);
+		prev($this->_data);
+		if (key($this->_data) === null) {
+			$this->rewind();
+		}
+		unset($this->_data[$offset]);
+	}
+
+	/**
+	 * Rewinds the collection to the beginning.
 	 */
 	public function rewind() {
-		$this->_valid = (reset($this->_data) || count($this->_data));
+		$this->_started = true;
+		reset($this->_data);
+		$this->_valid = !empty($this->_data) || !is_null($this->_populate());
+		return current($this->_data);
+	}
 
-		if (!$this->_valid && !$this->_hasInitialized) {
-			$this->_hasInitialized = true;
+	/**
+	 * Returns the currently pointed to record's unique key.
+	 *
+	 * @param boolean $full If true, returns the complete key.
+	 * @return mixed
+	 */
+	public function key($full = false) {
+		if ($this->_started === false) {
+			$this->current();
+		}
+		if ($this->_valid) {
+			$key = key($this->_data);
+			return (is_array($key) && !$full) ? reset($key) : $key;
+		}
+		return null;
+	}
 
-			if ($entity = $this->_populate()) {
-				$this->_valid = true;
-				return $entity;
-			}
+	/**
+	 * Returns the item keys.
+	 *
+	 * @return array The keys of the items.
+	 */
+	public function keys() {
+		$this->offsetGet(null);
+		return parent::keys();
+	}
+
+	/**
+	 * Returns the currently pointed to record in the set.
+	 *
+	 * @return object `Record`
+	 */
+	public function current() {
+		if (!$this->_started) {
+			$this->rewind();
+		}
+		if (!$this->_valid) {
+			return false;
 		}
 		return current($this->_data);
+	}
+
+	/**
+	 * Returns the next document in the set, and advances the object's internal pointer. If the end
+	 * of the set is reached, a new document will be fetched from the data source connection handle
+	 * If no more documents can be fetched, returns `null`.
+	 *
+	 * @return mixed Returns the next document in the set, or `false`, if no more documents are
+	 *         available.
+	 */
+	public function next() {
+		if (!$this->_started) {
+			$this->rewind();
+		}
+		next($this->_data);
+		$this->_valid = !(key($this->_data) === null);
+		if (!$this->_valid) {
+			$this->_valid = !is_null($this->_populate());
+		}
+		return current($this->_data);
+	}
+
+	/**
+	 * Checks if current position is valid.
+	 *
+	 * @return boolean `true` if valid, `false` otherwise.
+	 */
+	public function valid() {
+		if (!$this->_started) {
+			$this->rewind();
+		}
+		return $this->_valid;
+	}
+
+	/**
+	 * Overrides parent `find()` implementation to enable key/value-based filtering of entity
+	 * objects contained in this collection.
+	 *
+	 * @param mixed $filter Callback to use for filtering, or array of key/value pairs which entity
+	 *              properties will be matched against.
+	 * @param array $options Options to modify the behavior of this method. See the documentation
+	 *              for the `$options` parameter of `lithium\util\Collection::find()`.
+	 * @return mixed The filtered items. Will be an array unless `'collect'` is defined in the
+	 * `$options` argument, then an instance of this class will be returned.
+	 */
+	public function find($filter, array $options = array()) {
+		$this->offsetGet(null);
+		if (is_array($filter)) {
+			$filter = $this->_filterFromArray($filter);
+		}
+		return parent::find($filter, $options);
+	}
+
+	/**
+	 * Overrides parent `first()` implementation to enable key/value-based filtering.
+	 *
+	 * @param mixed $filter In addition to a callback (see parent), can also be an array where the
+	 *              keys and values must match the property values of the objects being inspected.
+	 * @return object Returns the first object found matching the filter criteria.
+	 */
+	public function first($filter = null) {
+		return parent::first(is_array($filter) ? $this->_filterFromArray($filter) : $filter);
+	}
+
+	/**
+	 * Creates a filter based on an array of key/value pairs that must match the items in a
+	 * `Collection`.
+	 *
+	 * @param array $filter An array of key/value pairs used to filter `Collection` items.
+	 * @return closure Returns a closure that wraps the array and attempts to match each value
+	 *         against `Collection` item properties.
+	 */
+	protected function _filterFromArray(array $filter) {
+		return function($item) use ($filter) {
+			foreach ($filter as $key => $val) {
+				if ($item->{$key} != $val) {
+					return false;
+				}
+			}
+			return true;
+		};
 	}
 
 	/**
@@ -221,9 +406,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return object This collection instance.
 	 */
 	public function each($filter) {
-		if (!$this->closed()) {
-			while ($this->next()) {}
-		}
+		$this->offsetGet(null);
 		return parent::each($filter);
 	}
 
@@ -243,9 +426,7 @@ abstract class Collection extends \lithium\util\Collection {
 		$defaults = array('collect' => true);
 		$options += $defaults;
 
-		if (!$this->closed()) {
-			while ($this->next()) {}
-		}
+		$this->offsetGet(null);
 		$data = parent::map($filter, $options);
 
 		if ($options['collect']) {
@@ -316,20 +497,44 @@ abstract class Collection extends \lithium\util\Collection {
 	}
 
 	/**
-	 * Adds the specified object to the `Collection` instance, and assigns associated metadata to
-	 * the added object.
+	 * Converts a `Collection` object to another type of object, or a simple type such as an array.
+	 * The supported values of `$format` depend on the format handlers registered in the static
+	 * property `Collection::$_formats`. The `Collection` class comes with built-in support for
+	 * array conversion, but other formats may be registered.
 	 *
-	 * @param string $offset The offset to assign the value to.
-	 * @param mixed $data The entity object to add.
-	 * @return mixed Returns the set `Entity` object.
+	 * Once the appropriate handlers are registered, a `Collection` instance can be converted into
+	 * any handler-supported format, i.e.: {{{
+	 * $collection->to('json'); // returns a JSON string
+	 * $collection->to('xml'); // returns an XML string
+	 * }}}
+	 *
+	 *  _Please note that Lithium does not ship with a default XML handler, but one can be
+	 * configured easily._
+	 *
+	 * @see lithium\util\Collection::formats()
+	 * @see lithium\util\Collection::$_formats
+	 * @param string $format By default the only supported value is `'array'`. However, additional
+	 *               format handlers can be registered using the `formats()` method.
+	 * @param array $options Options for converting this collection:
+	 *        - `'internal'` _boolean_: Indicates whether the current internal representation of the
+	 *          collection should be exported. Defaults to `false`, which uses the standard iterator
+	 *          interfaces. This is useful for exporting record sets, where records are lazy-loaded,
+	 *          and the collection must be iterated in order to fetch all objects.
+	 * @return mixed The object converted to the value specified in `$format`; usually an array or
+	 *         string.
 	 */
-	public function offsetSet($offset, $data) {
-		if (is_array($data) && ($model = $this->_model)) {
-			$data = $model::connection()->cast($this, $data);
-		} elseif (is_object($data)) {
-			$data->assignTo($this);
+	public function to($format, array $options = array()) {
+		$defaults = array('internal' => false, 'indexed' => true);
+		$options += $defaults;
+
+		$this->offsetGet(null);
+
+		if (!$options['indexed']) {
+			$data = array_values($this->_data);
+		} else {
+			$data = $options['internal'] ? $this->_data : $this;
 		}
-		return $this->_data[] = $data;
+		return $this->_to($format, $data, $options);
 	}
 
 	/**
@@ -338,7 +543,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * additional methods related to debugging queries.
 	 *
 	 * @return object The pointer or resource from the data source
-	*/
+	 */
 	public function result() {
 		return $this->_result;
 	}
@@ -365,6 +570,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 */
 	public function close() {
 		if (!empty($this->_result)) {
+			unset($this->_result);
 			$this->_result = null;
 		}
 	}
@@ -395,15 +601,24 @@ abstract class Collection extends \lithium\util\Collection {
 	 * data and wraps it in the appropriate object type, which is added into the `Collection` and
 	 * returned.
 	 *
-	 * @param mixed $data Data (in an array or object) that is manually added to the data
-	 *              collection. If `null`, data is automatically fetched from the associated backend
-	 *              data source, if available.
-	 * @param mixed $key String, integer or array key representing the unique key of the data
-	 *              object. If `null`, the key will be extracted from the data passed or fetched,
-	 *              using the associated `Model` class.
-	 * @return object Returns a `Record` or `Document` object, or other `Entity` object.
+	 * @return mixed Returns the next `Record`, `Document` object or other `Entity` object if
+	 *         exists. Returns `null` otherwise.
 	 */
-	abstract protected function _populate($data = null, $key = null);
+	abstract protected function _populate();
+
+	/**
+	 * A method to be implemented by concrete `Collection` classes which sets data to a specified
+	 * offset and wraps all data array in its appropriate object type.
+	 *
+	 * @see lithium\data\Collection::_populate()
+	 * @see lithium\data\Collection::_offsetSet()
+	 *
+	 * @param mixed $data An array or an `Entity` object to set.
+	 * @param mixed $offset The offset. If offset is `null` data is simply appended to the set.
+	 * @param array $options Any additional options to pass to the `Entity`'s constructor.
+	 * @return object Returns the inserted `Record`, `Document` object or other `Entity` object.
+	 */
+	abstract protected function _set($data = null, $offset = null, $options = array());
 }
 
 ?>

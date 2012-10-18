@@ -48,7 +48,7 @@ class MySqlTest extends \lithium\test\Unit {
 		$expected = array(
 			'autoConnect' => false, 'encoding' => null,'persistent' => true,
 			'host' => 'localhost:3306', 'login' => 'root', 'password' => '',
-			'database' => null, 'init' => true
+			'database' => null, 'dsn' => null, 'options' => array(), 'init' => true
 		);
 		$this->assertEqual($expected, $result);
 	}
@@ -243,7 +243,7 @@ class MySqlTest extends \lithium\test\Unit {
 	 * Tests that describing a table's schema returns the correct column meta-information.
 	 */
 	public function testDescribe() {
-		$result = $this->db->describe('companies');
+		$result = $this->db->describe('companies')->fields();
 		$expected = array(
 			'id' => array('type' => 'integer', 'length' => 11, 'null' => false, 'default' => null),
 			'name' => array('type' => 'string', 'length' => 255, 'null' => true, 'default' => null),

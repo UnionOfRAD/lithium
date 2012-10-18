@@ -42,9 +42,9 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	protected $_classes = array(
 		'service' => 'lithium\net\http\Service',
-		'entity' => 'lithium\data\entity\Document',
-		'set' => 'lithium\data\collection\DocumentSet',
-		'array' => 'lithium\data\collection\DocumentArray'
+		'entity'  => 'lithium\data\entity\Document',
+		'set'     => 'lithium\data\collection\DocumentSet',
+		'schema'  => 'lithium\data\DocumentSchema'
 	);
 
 	protected $_handlers = array();
@@ -54,7 +54,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param array $config
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('port' => 5984, 'version' => 1);
+		$defaults = array('port' => 5984, 'version' => 1, 'database' => null);
 		parent::__construct($config + $defaults);
 	}
 
@@ -128,10 +128,11 @@ class CouchDb extends \lithium\data\source\Http {
 	 *
 	 * @throws ConfigException
 	 * @param string $entity
+	 * @param array $schema Any schema data pre-defined by the model.
 	 * @param array $meta
 	 * @return void
 	 */
-	public function describe($entity, array $meta = array()) {
+	public function describe($entity, $schema = array(), array $meta = array()) {
 		$database = $this->_config['database'];
 
 		if (!$this->_db) {
@@ -154,6 +155,7 @@ class CouchDb extends \lithium\data\source\Http {
 		if (!$this->_db) {
 			throw new ConfigException("Database `{$entity}` is not available.");
 		}
+		return $this->_instance('schema', array(array('fields' => $schema)));
 	}
 
 	/**
@@ -226,6 +228,7 @@ class CouchDb extends \lithium\data\source\Http {
 			$params = $query->export($self);
 			extract($params, EXTR_OVERWRITE);
 			list($_path, $conditions) = (array) $conditions;
+			$model = $query->model();
 
 			if (empty($_path)) {
 				$_path = '_all_docs';
@@ -243,7 +246,9 @@ class CouchDb extends \lithium\data\source\Http {
 				unset($result['rows']);
 				$stats = $result;
 			}
-
+			foreach ($data as $key => $val) {
+				$data[$key] = $self->item($model, $val, array('exists' => true));
+			}
 			$stats += array('total_rows' => null, 'offset' => null);
 			$opts = compact('stats') + array('class' => 'set', 'exists' => true);
 			return $self->item($query->model(), $data, $opts);
@@ -314,7 +319,12 @@ class CouchDb extends \lithium\data\source\Http {
 				$conditions['rev'] = $data['rev'];
 			}
 			$result = json_decode($conn->delete("{$config['database']}/{$_path}", $conditions));
-			return (isset($result->ok) && $result->ok === true);
+			$result = (isset($result->ok) && $result->ok === true);
+
+			if ($query->entity()) {
+				$query->entity()->sync(null, array(), array('dematerialize' => true));
+			}
+			return $result;
 		});
 	}
 
@@ -352,7 +362,7 @@ class CouchDb extends \lithium\data\source\Http {
 			return parent::item($model, $this->_format($data['doc']), $options);
 		}
 		if (isset($data['value'])) {
-			return parent::item($model, $this->_format($data['value']), $options);
+			$data = $data['value'];
 		}
 		return parent::item($model, $this->_format($data), $options);
 	}
@@ -381,7 +391,7 @@ class CouchDb extends \lithium\data\source\Http {
 				continue;
 			}
 			$pathKey = $options['pathKey'] ? "{$options['pathKey']}.{$key}" : $key;
-			$class = (range(0, count($val) - 1) === array_keys($val)) ? 'array' : 'entity';
+			$class = (range(0, count($val) - 1) === array_keys($val)) ? 'set' : 'entity';
 			$data[$key] = $this->item($model, $val, compact('class', 'pathKey') + $options);
 		}
 		return parent::cast($entity, $data, $options);

@@ -15,7 +15,8 @@ class MockSource extends \lithium\data\Source {
 	protected $_classes = array(
 		'entity' => 'lithium\data\entity\Record',
 		'set' => 'lithium\data\collection\RecordSet',
-		'relationship' => 'lithium\data\model\Relationship'
+		'relationship' => 'lithium\data\model\Relationship',
+		'schema' => 'lithium\data\Schema'
 	);
 
 	protected $_mockPosts = array(
@@ -85,6 +86,31 @@ class MockSource extends \lithium\data\Source {
 		)
 	);
 
+	protected $_postsTags = array(
+		'id' => array('type' => 'int'),
+		'post_id' => array('type' => 'int'),
+		'tag_id' => array('type' => 'int'),
+	);
+
+	protected $_mockCreators = array(
+		'id' => array('type' => 'int'),
+		'name' => array(
+			'default' => 'Moe',
+			'type' => 'string',
+			'null' => false
+		),
+		'sign' => array(
+			'default' => 'bar',
+			'type' => 'string',
+			'null' => false
+		),
+		'age' => array(
+			'default' => 0,
+			'type' => 'number',
+			'null' => false
+		)
+	);
+
 	public function connect() {
 		return ($this->_isConnected = true);
 	}
@@ -97,12 +123,10 @@ class MockSource extends \lithium\data\Source {
 		return array('mock_posts', 'mock_comments', 'mock_tags', 'posts_tags');
 	}
 
-	public function describe($entity, array $meta = array()) {
-		$var = "_" . Inflector::camelize($entity, false);
-		if ($this->{$var}) {
-			return $this->{$var};
-		}
-		return array();
+	public function describe($entity, $schema = array(), array $meta = array()) {
+		$source = '_' . Inflector::camelize($entity, false);
+		$fields = isset($this->$source) ? $this->$source : array();
+		return $this->_instance('schema', compact('fields'));
 	}
 
 	public function create($query, array $options = array()) {

@@ -20,6 +20,10 @@ class CollectionTest extends \lithium\test\Unit {
 		Collection::formats('lithium\net\http\Media');
 	}
 
+	public function tearDown() {
+		Collection::formats(false);
+	}
+
 	public function testArrayLike() {
 		$collection = new Collection();
 		$collection[] = 'foo';
@@ -182,6 +186,16 @@ class CollectionTest extends \lithium\test\Unit {
 
 		$this->assertNull($collection->offsetUnset('bar'));
 		$this->assertFalse($collection->offsetExists('bar'));
+
+		$data = array('Hello', 2, 3, null, 6, false, true, 0);
+		$collection = new Collection(array('data' => $data));
+
+		$cpt = 0;
+		foreach ($collection as $i => $word) {
+			$this->assertTrue(isset($collection[$cpt]));
+			$cpt++;
+		}
+		$this->assertIdentical(8, $cpt);
 	}
 
 	/**
@@ -207,6 +221,25 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertEqual('bar', $collection->prev());
 		$this->assertTrue($collection->valid());
 		$this->assertEqual('dib', $collection->end());
+		$this->assertTrue($collection->valid());
+
+		$collection = new Collection(array('data' => array(0, 1, 2, 3, 4)));
+		$this->assertIdentical(0, $collection->first());
+		$this->assertIdentical(0, $collection->rewind());
+		$this->assertIdentical(1, $collection->next());
+		$this->assertIdentical(2, $collection->next());
+		$this->assertIdentical(3, $collection->next());
+		$this->assertIdentical(2, $collection->prev());
+		$this->assertIdentical(2, $collection->current());
+		$this->assertIdentical(3, $collection->next());
+		$this->assertIdentical(4, $collection->next());
+		$this->assertIdentical(3, $collection->prev());
+		$this->assertIdentical(4, $collection->next());
+		$this->assertTrue($collection->valid());
+		$this->assertFalse($collection->next());
+		$this->assertFalse($collection->valid());
+		$this->assertFalse($collection->current());
+		$this->assertIdentical(4, $collection->prev());
 		$this->assertTrue($collection->valid());
 	}
 
@@ -275,31 +308,42 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testCollectionHandlers() {
+		$obj = new stdClass();
+		$obj->a = "b";
+		$handlers = array('stdClass' => function($v) { return (array) $v; });
+		$data = array('test' => new Collection(array('data' => compact('obj')))) + compact('obj');
+
+		$collection = new Collection(compact('data'));
+		$expected = array(
+			'test' => array('obj' => array('a' => 'b')),
+			'obj' => array('a' => 'b')
+		);
+		$this->assertIdentical($expected, $collection->to('array', compact('handlers')));
+
+		$handlers = array('stdClass' => function($v) { return $v; });
+		$expected = array('test' => compact('obj')) + compact('obj');
+		$this->assertIdentical($expected, $collection->to('array', compact('handlers')));
+	}
+
 	/**
 	 * Tests that the Collection::sort method works appropriately.
-	 *
-	 * @return void
 	 */
 	public function testCollectionSort() {
-		// Typical numeric sort using the default "sort" PHP function
+
 		$collection = new Collection(array('data' => array(5,3,4,1,2)));
 		$collection->sort();
 		$expected = array(1,2,3,4,5);
 		$this->assertEqual($expected, $collection->to('array'));
 
-		// String sort using "sort"
-		$collection = new Collection(array('data' => array('alan','dave','betsy','carl')));
-		$collection->sort();
+		$collection = new Collection(array('data' => array('alan', 'dave', 'betsy', 'carl')));
 		$expected = array('alan','betsy','carl','dave');
-		$this->assertEqual($expected, $collection->to('array'));
+		$this->assertEqual($expected, $collection->sort()->to('array'));
 
-		// String sort using strcasecmp
-		$collection = new Collection(array('data' => array('Alan','Dave','betsy','carl')));
-		$collection->sort('strcasecmp');
-		$expected = array('Alan','betsy','carl','Dave');
-		$this->assertEqual($expected, $collection->to('array'));
+		$collection = new Collection(array('data' => array('Alan', 'Dave', 'betsy', 'carl')));
+		$expected = array('Alan', 'betsy', 'carl', 'Dave');
+		$this->assertEqual($expected, $collection->sort('strcasecmp')->to('array'));
 
-		// Numeric sort using custom function
 		$collection = new Collection(array('data' => array(5,3,4,1,2)));
 		$collection->sort(function ($a,$b) {
 			if ($a == $b) {
@@ -310,13 +354,27 @@ class CollectionTest extends \lithium\test\Unit {
 		$expected = array(5,4,3,2,1);
 		$this->assertEqual($expected, $collection->to('array'));
 
-		// Test fail
 		$collection = new Collection(array('data' => array(5,3,4,1,2)));
 		$result = $collection->sort('blahgah');
 		$this->assertEqual($collection->to('array'), $result->to('array'));
 	}
 
 	public function testUnsetInForeach() {
+		$data = array('Delete me');
+		$collection = new Collection(array('data' => $data));
+
+		$this->assertIdentical($data, $collection->to('array'));
+
+		$cpt = 0;
+		foreach ($collection as $i => $word) {
+			if ($word == 'Delete me') {
+				unset($collection[$i]);
+			}
+			$cpt++;
+		}
+		$this->assertEqual(1, $cpt);
+		$this->assertIdentical(array(), $collection->to('array'));
+
 		$data = array(
 			'Hello',
 			'Delete me',
@@ -336,10 +394,70 @@ class CollectionTest extends \lithium\test\Unit {
 				unset($collection[$i]);
 			}
 		}
-
 		$expected = array(0 => 'Hello', 6 => 'Hello again!');
 		$results = $collection->to('array');
 		$this->assertIdentical($expected, $results);
+
+		$data = array(
+			'Delete me',
+			'Hello',
+			'Delete me',
+			'Delete me',
+			'Delete me',
+			'Delete me',
+			'Hello again!',
+			'Delete me'
+		);
+		$collection = new Collection(array('data' => $data));
+
+		$this->assertIdentical($data, $collection->to('array'));
+
+		foreach ($collection as $i => $word) {
+			if ($word == 'Delete me') {
+				unset($collection[$i]);
+			}
+		}
+
+		$expected = array(1 => 'Hello', 6 => 'Hello again!');
+		$results = $collection->to('array');
+		$this->assertIdentical($expected, $results);
+	}
+
+	public function testCount() {
+		$collection = new Collection(array('data' => array(5, 3, 4, 1, 2)));
+		$this->assertIdentical(5, count($collection));
+
+		$collection = new Collection(array('data' => array()));
+		$this->assertIdentical(0, count($collection));
+
+		$collection = new Collection(array('data' => array(5 ,null, 4, true, false, 'bob')));
+		$this->assertIdentical(6, count($collection));
+
+		unset($collection[1]);
+		unset($collection[2]);
+
+		$this->assertIdentical(4, count($collection));
+
+		$first  = (object) array('name' => 'First');
+		$second = (object) array('name' => 'Second');
+		$third  = (object) array('name' => 'Third');
+
+		$doc = new Collection(array(
+			'data' => array($first, $second, $third)
+		));
+
+		$this->assertTrue(is_object($doc[0]));
+		$this->assertTrue(is_object($doc[1]));
+		$this->assertTrue(is_object($doc[2]));
+		$this->assertEqual(3, count($doc));
+	}
+
+	public function testValid() {
+		$collection = new Collection();
+		$this->assertFalse($collection->valid());
+
+		$collection = new Collection(array('data' => array(1, 5)));
+		$this->assertTrue($collection->valid());
 	}
 }
 

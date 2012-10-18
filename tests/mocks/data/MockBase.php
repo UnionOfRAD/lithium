@@ -8,13 +8,21 @@
 
 namespace lithium\tests\mocks\data;
 
+use lithium\data\Schema;
+use lithium\tests\mocks\data\model\MockDatabase;
+
 class MockBase extends \lithium\data\Model {
 
-	protected $_meta = array('connection' => 'mock-source');
+	protected $_meta = array('connection' => null);
 
-	public static function __init() {
-		static::_isBase(__CLASS__, true);
-		parent::__init();
+	public static $connection = null;
+
+	public static function &connection() {
+		if (!static::$connection) {
+			$connection = new MockDatabase();
+			return $connection;
+		}
+		return static::$connection;
 	}
 }
 

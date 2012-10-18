@@ -8,9 +8,14 @@
 
 namespace lithium\data\source;
 
+use PDO;
+use PDOException;
 use lithium\util\String;
 use lithium\util\Inflector;
 use InvalidArgumentException;
+use lithium\core\ConfigException;
+use lithium\core\NetworkException;
+use lithium\data\model\QueryException;
 
 /**
  * The `Database` class provides the base-level abstraction for SQL-oriented relational databases.
@@ -21,6 +26,11 @@ use InvalidArgumentException;
  * @see lithium\data\model\Query
  */
 abstract class Database extends \lithium\data\Source {
+
+	/**
+	 * @var PDO
+	 */
+	public $connection;
 
 	/**
 	 * The supported column types and their default values
@@ -53,7 +63,8 @@ abstract class Database extends \lithium\data\Source {
 	protected $_classes = array(
 		'entity' => 'lithium\data\entity\Record',
 		'set' => 'lithium\data\collection\RecordSet',
-		'relationship' => 'lithium\data\model\Relationship'
+		'relationship' => 'lithium\data\model\Relationship',
+		'schema' => 'lithium\data\Schema'
 	);
 
 	/**
@@ -146,29 +157,107 @@ abstract class Database extends \lithium\data\Source {
 			'host'       => 'localhost',
 			'login'      => 'root',
 			'password'   => '',
-			'database'   => null
+			'database'   => null,
+			'encoding'   => null,
+			'dsn'        => null,
+			'options'    => array()
 		);
 		$this->_strings += array(
 			'read' => 'SELECT {:fields} FROM {:source} {:alias} {:joins} {:conditions} {:group} ' .
-			          '{:order} {:limit};{:comment}'
+			          '{:having} {:order} {:limit};{:comment}'
 		);
 		parent::__construct($config + $defaults);
+	}
+
+	public function connect() {
+		$this->_isConnected = false;
+		$config = $this->_config;
+
+		if (!$config['database']) {
+			throw new ConfigException('No Database configured');
+		}
+		if (!$config['dsn']) {
+			throw new ConfigException('No DSN setup for DB Connection');
+		}
+		$dsn = $config['dsn'];
+
+		$options = $config['options'] + array(
+			PDO::ATTR_PERSISTENT => $config['persistent'],
+			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+		);
+
+		try {
+			$this->connection = new PDO($dsn, $config['login'], $config['password'], $options);
+		} catch (PDOException $e) {
+			preg_match('/SQLSTATE\[(.+?)\]/', $e->getMessage(), $code);
+			$code = $code[1] ?: 0;
+			switch (true) {
+			case $code == 'HY000' || substr($code, 0, 2) == '08':
+				$msg = "Unable to connect to host `{$config['host']}`.";
+				throw new NetworkException($msg, null, $e);
+			case in_array($code, array('28000', '42000')):
+				$msg = "Host connected, but could not access database `{$config['database']}`.";
+				throw new ConfigException($msg, null, $e);
+			}
+			throw new ConfigException("An unknown configuration error has occured.", null, $e);
+		}
+		$this->_isConnected = true;
+
+		if ($this->_config['encoding']) {
+			$this->encoding($this->_config['encoding']);
+	   	}
+		return $this->_isConnected;
+	}
+
+	/**
+	 * Disconnects the adapter from the database.
+	 *
+	 * @return boolean Returns `true` on success, else `false`.
+	 */
+	public function disconnect() {
+		if ($this->_isConnected) {
+			unset($this->connection);
+			$this->_isConnected = false;
+		}
+		return true;
 	}
 
 	/**
 	 * Field name handler to ensure proper escaping.
 	 *
-	 * @param string $name
-	 * @return string
+	 * @param string $name Field or identifier name.
+	 * @return string Returns `$name` quoted according to the rules and quote characters of the
+	 *         database adapter subclass.
 	 */
 	public function name($name) {
 		$open  = reset($this->_quotes);
 		$close = next($this->_quotes);
+
 		if (preg_match('/^[a-z0-9_-]+\.[a-z0-9_-]+$/i', $name)) {
 			list($first, $second) = explode('.', $name, 2);
 			return "{$open}{$first}{$close}.{$open}{$second}{$close}";
 		}
 		return preg_match('/^[a-z0-9_-]+$/i', $name) ? "{$open}{$name}{$close}" : $name;
+	}
+
+	/**
+	 * Return the field name from a conditions key.
+	 *
+	 * @param string $field Field or identifier name.
+	 * @return string Returns the field name without the table alias, if applicable.
+	 * @todo Eventually, this should be refactored and moved to the Query or Schema
+	 *       class. Also, by handling field resolution in this way we are not handling
+	 *       cases where query conditions use the same field name in multiple tables.
+	 *       e.g. Foos.bar and Bars.bar will both return bar.
+	 */
+	protected function _fieldName($field) {
+		if (is_string($field)) {
+			if (preg_match('/^[a-z0-9_-]+\.[a-z0-9_-]+$/i', $field)) {
+				list($first, $second) = explode('.', $field, 2);
+				return $second;
+			}
+		}
+		return $field;
 	}
 
 	/**
@@ -186,16 +275,22 @@ abstract class Database extends \lithium\data\Source {
 			}
 			return $value;
 		}
+
+		if (is_object($value) && isset($value->scalar)) {
+			return $value->scalar;
+		}
+
 		if ($value === null) {
 			return 'NULL';
 		}
+
 		switch ($type = isset($schema['type']) ? $schema['type'] : $this->_introspectType($value)) {
 			case 'boolean':
-				return $this->_toNativeBoolean($value);
 			case 'float':
-				return floatval($value);
 			case 'integer':
-				return intval($value);
+				return $this->_cast($type, $value);
+			default:
+				return $this->connection->quote($this->_cast($type, $value));
 		}
 	}
 
@@ -252,7 +347,9 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function read($query, array $options = array()) {
 		$defaults = array(
-			'return' => is_string($query) ? 'array' : 'item', 'schema' => array()
+			'return' => is_string($query) ? 'array' : 'item',
+			'schema' => null,
+			'quotes' => $this->_quotes
 		);
 		$options += $defaults;
 
@@ -268,32 +365,30 @@ abstract class Database extends \lithium\data\Source {
 				$sql = String::insert($query, $self->value($args));
 			} else {
 				$limit = $query->limit();
+
 				if ($model && $limit && !isset($args['subquery']) && $model::relations('hasMany')) {
 					$name = $model::meta('name');
 					$key = $model::key();
 
-					$subQuery = $self->invokeMethod('_instance', array(
-							get_class($query), array(
-								'type' => 'read',
-								'model' => $model,
-								'group' => "{$name}.{$key}",
-								'fields' => array("{$name}.{$key}"),
-								'joins' => $query->joins(),
-								'conditions' => $query->conditions(),
-								'limit' => $query->limit(),
-								'page' => $query->page(),
-								'order' => $query->order()
-							)
-						));
+					$subQuery = $self->invokeMethod('_instance', array(get_class($query), array(
+						'type' => 'read',
+						'model' => $model,
+						'group' => $self->name("{$name}.{$key}"),
+						'fields' => array("{$name}.{$key}"),
+						'joins' => $query->joins(),
+						'conditions' => $query->conditions(),
+						'limit' => $query->limit(),
+						'page' => $query->page(),
+						'order' => $query->order()
+					)));
 					$ids = $self->read($subQuery, array('subquery' => true));
-					if (!$ids->count()) {
-						return false;
+
+					if ($ids->count()) {
+						$query->limit(false)->conditions(array("{$name}.{$key}" => array_map(
+							function($index) use ($key) { return $index[$key]; },
+							$ids->data()
+						)));
 					}
-					$idData = $ids->data();
-					$ids = array_map(function($index) use ($key) {
-							return $index[$key];
-						}, $idData);
-					$query->limit(false)->conditions(array("{$name}.{$key}" => $ids));
 				}
 				$sql = $self->renderCommand($query);
 			}
@@ -337,14 +432,12 @@ abstract class Database extends \lithium\data\Source {
 			$query = $params['query'];
 			$params = $query->export($self);
 			$sql = $self->renderCommand('update', $params, $query);
+			$result = (boolean) $self->invokeMethod('_execute', array($sql));
 
-			if ($self->invokeMethod('_execute', array($sql))) {
-				if ($query->entity()) {
-					$query->entity()->sync();
-				}
-				return true;
+			if ($result && is_object($query) && $query->entity()) {
+				$query->entity()->sync();
 			}
-			return false;
+			return $result;
 		});
 	}
 
@@ -361,14 +454,19 @@ abstract class Database extends \lithium\data\Source {
 	public function delete($query, array $options = array()) {
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
 			$query = $params['query'];
+			$isObject = is_object($query);
 
-			if (is_object($query)) {
-				$data = $query->export($self);
-				$sql = $self->renderCommand('delete', $data, $query);
+			if ($isObject) {
+				$sql = $self->renderCommand('delete', $query->export($self), $query);
 			} else {
 				$sql = String::insert($query, $self->value($params['options']));
 			}
-			return (boolean) $self->invokeMethod('_execute', array($sql));
+			$result = (boolean) $self->invokeMethod('_execute', array($sql));
+
+			if ($result && $isObject && $query->entity()) {
+				$query->entity()->sync(null, array(), array('dematerialize' => true));
+			}
+			return $result;
 		});
 	}
 
@@ -428,6 +526,18 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
+	 * Determines the set of methods to be used when exporting query values.
+	 *
+	 * @return array
+	 */
+	public function methods() {
+		$result = parent::methods();
+		$key = array_search('schema', $result);
+		unset($result[$key]);
+		return $result;
+	}
+
+	/**
 	 * Returns a given `type` statement for the given data, rendered from `Database::$_strings`.
 	 *
 	 * @param string $type One of `'create'`, `'read'`, `'update'`, `'delete'` or `'join'`.
@@ -444,8 +554,9 @@ abstract class Database extends \lithium\data\Source {
 		if (!isset($this->_strings[$type])) {
 			throw new InvalidArgumentException("Invalid query type `{$type}`.");
 		}
+		$template = $this->_strings[$type];
 		$data = array_filter($data);
-		return trim(String::insert($this->_strings[$type], $data, array('clean' => true)));
+		return trim(String::insert($template, $data, array('clean' => true)));
 	}
 
 	/**
@@ -469,16 +580,17 @@ abstract class Database extends \lithium\data\Source {
 		}
 
 		if (!$fields && !$joins) {
-			return array($modelName => array_keys($model::schema()));
+			return array($modelName => $model::schema()->names());
 		}
 
 		if (!$fields && $joins) {
-			$return = array($modelName => array_keys($model::schema()));
+			$result = array($modelName => $model::schema()->names());
+
 			foreach ($joins as $join) {
 				$model = $join->model();
-				$return[$join->alias()] = array_keys($model::schema());
+				$result[$join->alias()] = $model::schema()->names();
 			}
-			return $return;
+			return $result;
 		}
 
 		$relations = array_keys((array) $query->relationships());
@@ -489,7 +601,7 @@ abstract class Database extends \lithium\data\Source {
 		foreach ($fields as $scope => $field) {
 			switch (true) {
 				case (is_numeric($scope) && ($field == '*' || $field == $modelName)):
-					$result[$modelName] = array_keys($model::schema());
+					$result[$modelName] = $model::schema()->names();
 				break;
 				case (is_numeric($scope) && isset($schema[$field])):
 					$result[$modelName][] = $field;
@@ -516,7 +628,7 @@ abstract class Database extends \lithium\data\Source {
 						continue;
 					}
 					$scope = $join->model();
-					$result[$field] = array_keys($scope::schema());
+					$result[$field] = $scope::schema()->names();
 				break;
 			}
 		}
@@ -546,7 +658,50 @@ abstract class Database extends \lithium\data\Source {
 	 * @return string Returns the `WHERE` clause of an SQL query.
 	 */
 	public function conditions($conditions, $context, array $options = array()) {
-		$defaults = array('prepend' => true);
+		$defaults = array('prepend' => 'WHERE');
+		$options += $defaults;
+		return $this->_conditions($conditions, $context, $options);
+	}
+
+	/**
+	 * Returns a string of formatted havings to be inserted into the query statement. If the
+	 * query havings are defined as an array, key pairs are converted to SQL strings.
+	 *
+	 * Conversion rules are as follows:
+	 *
+	 * - If `$key` is numeric and `$value` is a string, `$value` is treated as a literal SQL
+	 *   fragment and returned.
+	 *
+	 * @param string|array $having The havings for this query.
+	 * @param object $context The current `lithium\data\model\Query` instance.
+	 * @param array $options
+	 *               - `prepend` _boolean_: Whether the return string should be prepended with the
+	 *                 `HAVING` keyword.
+	 * @return string Returns the `HAVING` clause of an SQL query.
+	 */
+	public function having($conditions, $context, array $options = array()) {
+		$defaults = array('prepend' => 'HAVING');
+		$options += $defaults;
+		return $this->_conditions($conditions, $context, $options);
+	}
+
+	/**
+	 * Returns a string of formatted conditions to be inserted into the query statement. If the
+	 * query conditions are defined as an array, key pairs are converted to SQL strings.
+	 *
+	 * Conversion rules are as follows:
+	 *
+	 * - If `$key` is numeric and `$value` is a string, `$value` is treated as a literal SQL
+	 *   fragment and returned.
+	 *
+	 * @param string|array $conditions The conditions for this query.
+	 * @param object $context The current `lithium\data\model\Query` instance.
+	 * @param array $options
+	 *               - `prepend` mixed: The string to prepend or false for no prepending
+	 * @return string Returns an SQL conditions clause.
+	 */
+	protected function _conditions($conditions, $context, array $options = array()) {
+		$defaults = array('prepend' => false);
 		$ops = $this->_operators;
 		$options += $defaults;
 		$model = $context->model();
@@ -556,48 +711,59 @@ abstract class Database extends \lithium\data\Source {
 			case empty($conditions):
 				return '';
 			case is_string($conditions):
-				return ($options['prepend']) ? "WHERE {$conditions}" : $conditions;
+				return $options['prepend'] ? $options['prepend'] . " {$conditions}" : $conditions;
 			case !is_array($conditions):
 				return '';
 		}
 		$result = array();
 
 		foreach ($conditions as $key => $value) {
-			$schema[$key] = isset($schema[$key]) ? $schema[$key] : array();
-			$return = $this->_processConditions($key,$value, $schema);
+			$return = $this->_processConditions($key, $value, $context, $schema);
 
 			if ($return) {
 				$result[] = $return;
 			}
 		}
 		$result = join(" AND ", $result);
-		return ($options['prepend'] && $result) ? "WHERE {$result}" : $result;
+		return ($options['prepend'] && $result) ? $options['prepend'] . " {$result}" : $result;
 	}
 
-	public function _processConditions($key, $value, $schema, $glue = 'AND') {
+	public function _processConditions($key, $value, $context, $schema, $glue = 'AND') {
 		$constraintTypes =& $this->_constraintTypes;
-		$fieldMeta = !empty($schema[$key]) ? $schema[$key] : array();
+		$fieldMeta = $schema->fields($this->_fieldName($key)) ?: array();
 
 		switch (true) {
 			case (is_numeric($key) && is_string($value)):
 				return $value;
-			case is_string($value):
-				return $this->name($key) . ' = ' . $this->value($value, $fieldMeta);
+			case is_object($value) && isset($value->scalar):
+				if (is_numeric($key)) {
+					return $this->value($value);
+				}
+			case is_scalar($value) || is_null($value):
+				if ($context->type() == 'read' && ($alias = $context->alias())) {
+					if (preg_match('/^[a-z0-9_-]+$/i', $key)) {
+						$key = $alias . "." . $key;
+					}
+				}
+				if (isset($value)) {
+					return $this->name($key) . ' = ' . $this->value($value, $fieldMeta);
+				}
+				return $this->name($key) . " IS NULL";
 			case is_numeric($key) && is_array($value):
 				$result = array();
 				foreach ($value as $cField => $cValue) {
-					$result[] = $this->_processConditions($cField, $cValue, $schema, $glue);
+					$result[] = $this->_processConditions($cField, $cValue, $context, $schema, $glue);
 				}
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
 			case (is_string($key) && is_object($value)):
 				$value = trim(rtrim($this->renderCommand($value), ';'));
-				return "{$key} IN ({$value})";
+				return "{$this->name($key)} IN ({$value})";
 			case is_array($value) && isset($constraintTypes[strtoupper($key)]):
 				$result = array();
 				$glue = strtoupper($key);
 
 				foreach ($value as $cField => $cValue) {
-					$result[] = $this->_processConditions($cField, $cValue, $schema, $glue);
+					$result[] = $this->_processConditions($cField, $cValue, $context, $schema, $glue);
 				}
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
 			case (is_string($key) && is_array($value) && isset($this->_operators[key($value)])):
@@ -607,15 +773,7 @@ abstract class Database extends \lithium\data\Source {
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
 			case is_array($value):
 				$value = join(', ', $this->value($value, $fieldMeta));
-				return "{$key} IN ({$value})";
-			default:
-				if (isset($value)) {
-					$value = $this->value($value, $fieldMeta);
-					return "{$key} = {$value}";
-				}
-				if ($value === null) {
-					return "{$key} IS NULL";
-				}
+				return "{$this->name($key)} IN ({$value})";
 		}
 	}
 
@@ -631,7 +789,7 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function fields($fields, $context) {
 		$type = $context->type();
-		$schema = (array) $context->schema();
+		$schema = (array) $context->schema()->fields();
 		$modelNames = (array) $context->name();
 		$modelNames = array_merge($modelNames, array_keys((array) $context->relationships()));
 
@@ -640,13 +798,15 @@ abstract class Database extends \lithium\data\Source {
 		}
 		$toMerge = array();
 		$keys = array_keys($fields);
-
 		$groupFields = function($item, $key) use (&$toMerge, &$keys, $modelNames, &$context) {
 			$name = current($keys);
 			next($keys);
 			switch (true) {
 				case is_array($item):
 					$toMerge[$name] = $item;
+					continue;
+				case is_object($item) && isset($item->scalar):
+					$toMerge[$name] = array($item->scalar);
 					continue;
 				case in_array($item, $modelNames):
 					if ($item == reset($modelNames)) {
@@ -655,14 +815,15 @@ abstract class Database extends \lithium\data\Source {
 						$joins = $context->joins();
 						$schema = $joins[$item]->schema();
 					}
-					$toMerge[$item] = array_keys($schema);
+					$toMerge[$item] = $schema->names();
 					continue;
 				case strpos($item, '.') !== false:
 					list($name, $field) = explode('.', $item);
 					$toMerge[$name][] = $field;
 					continue;
 				default:
-					$mainSchema = array_keys((array)$context->schema());
+					$mainSchema = $context->schema()->names();
+
 					if (in_array($item, $mainSchema)) {
 						$toMerge[reset($modelNames)][] = $item;
 						continue;
@@ -708,7 +869,9 @@ abstract class Database extends \lithium\data\Source {
 		foreach ($fields as $scope => $items) {
 			foreach ($items as $field) {
 				if (!is_numeric($scope)) {
-					$toMerge[] = $scope . '.' . $field;
+					$open  = reset($this->_quotes);
+					$close = next($this->_quotes);
+					$toMerge[] = $open . $scope . $close . '.' . $open . $field . $close;
 					continue;
 				}
 				$toMerge[] = $field;
@@ -778,19 +941,23 @@ abstract class Database extends \lithium\data\Source {
 
 		foreach ($constraint as $field => $value) {
 			$field = $this->name($field);
-
 			if (is_string($value)) {
 				$result[] = $field . ' = ' . $this->name($value);
+				continue;
+			}
+			if ($value === null) {
+				$result[] = "{$field} IS NULL";
 				continue;
 			}
 			if (!is_array($value)) {
 				continue;
 			}
-			foreach ($value as $operator => $val) {
-				if (isset($this->_operators[$operator])) {
-					$val = $this->name($val);
-					$result[] = "{$field} {$operator} {$val}";
+			foreach ($value as $op => $val) {
+				if (!isset($this->_operators[$op])) {
+					throw new QueryException("Unsupported operator `{$op}` used in constraint.");
 				}
+				$val = $this->name($val);
+				$result[] = "{$field} {$op} {$val}";
 			}
 		}
 		return 'ON ' . join(' AND ', $result);
@@ -870,6 +1037,36 @@ abstract class Database extends \lithium\data\Source {
 		return $data;
 	}
 
+	/**
+	 * Cast a value according to a column type.
+	 *
+	 * @param string $type Name of the column type
+	 * @param string $value Value to cast
+	 *
+	 * @return mixed Casted value
+	 *
+	 */
+	protected function _cast($type, $value) {
+		if (is_object($value) || $value === null) {
+			return $value;
+		}
+		if ($type == 'boolean') {
+			return $this->_toNativeBoolean($value);
+		}
+		if (!isset($this->_columns[$type]) || !isset($this->_columns[$type]['formatter'])) {
+			return $value;
+		}
+
+		$column = $this->_columns[$type];
+
+		switch ($column['formatter']) {
+			case 'date':
+				return $column['formatter']($column['format'], strtotime($value));
+			default:
+				return $column['formatter']($value);
+		}
+	}
+
 	protected function _createFields($data, $schema, $context) {
 		$fields = $values = array();
 
@@ -938,9 +1135,10 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Returns a fully-qualified table name (i.e. with prefix), quoted.
 	 *
-	 * @param string $entity
-	 * @param array $options
-	 * @return string
+	 * @param string $entity A table name or fully-namespaced model class name.
+	 * @param array $options Available options:
+	 *              - `'quoted'` _boolean_: Indicates whether the name should be quoted.
+	 * @return string Returns a quoted table name.
 	 */
 	protected function _entityName($entity, array $options = array()) {
 		$defaults = array('quoted' => false);
@@ -1001,6 +1199,21 @@ abstract class Database extends \lithium\data\Source {
 
 	protected function _toNativeBoolean($value) {
 		return $value ? 1 : 0;
+	}
+
+	/**
+	 * Throw a `QueryException` error
+	 *
+	 * @param string The offending SQL string
+	 * @filter
+	 */
+	protected function _error($sql){
+		$params = compact('sql');
+		return $this->_filter(__METHOD__, $params, function($self, $params) {
+			$sql = $params['sql'];
+			list($code, $error) = $self->error();
+			throw new QueryException("{$sql}: {$error}", $code);
+		});
 	}
 }
 

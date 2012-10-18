@@ -11,19 +11,22 @@ namespace lithium\tests\mocks\data\model;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
 
-class MockDocumentPost extends \lithium\data\Model {
+class MockDocumentPost extends \lithium\tests\mocks\data\MockBase {
 
-	protected $_meta = array('connection' => 'mongo');
+	protected $_meta = array('connection' => false, 'initialized' => true, 'key' => '_id');
 
 	protected static $_connection;
 
 	public static function __init() {}
 
 	public static function schema($field = null) {
-		return array(
+		$schema = parent::schema();
+		$schema->append(array(
 			'_id' => array('type' => 'id'),
+			'foo' => array('type' => 'object'),
 			'foo.bar' => array('type' => 'int')
-		);
+		));
+		return $schema;
 	}
 
 	public function ret($record, $param1 = null, $param2 = null) {
@@ -40,18 +43,11 @@ class MockDocumentPost extends \lithium\data\Model {
 		return 'lithium';
 	}
 
-	public static function &connection() {
-		if (!static::$_connection) {
-			static::$_connection = new MockDocumentSource();
-		}
-		return static::$_connection;
-	}
-
 	public static function find($type = 'all', array $options = array()) {
 		switch ($type) {
 			case 'first':
 				return new Document(array(
-					'data' => array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
+					'data' => array('_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
 					'model' => __CLASS__
 				));
 			break;
@@ -59,9 +55,9 @@ class MockDocumentPost extends \lithium\data\Model {
 			default :
 				return new DocumentSet(array(
 					'data' => array(
-						array('id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
-						array('id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
-						array('id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
+						array('_id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
+						array('_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
+						array('_id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
 					),
 					'model' => __CLASS__
 				));

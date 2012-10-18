@@ -8,9 +8,12 @@
 
 namespace lithium\tests\cases\data\source\database\adapter;
 
+use lithium\core\Libraries;
 use lithium\data\Connections;
 use lithium\data\source\database\adapter\Sqlite3;
 use lithium\tests\mocks\data\source\database\adapter\MockSqlite3;
+use lithium\tests\mocks\data\Employees;
+use lithium\tests\mocks\data\Companies;
 
 class Sqlite3Test extends \lithium\test\Unit {
 
@@ -31,14 +34,15 @@ class Sqlite3Test extends \lithium\test\Unit {
 		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'Sqlite3');
 		$message = 'Test database is either unavailable, or not using a Sqlite3 adapter';
 		$this->skipIf(!$hasDb, $message);
-
-		$isMemory = $this->_dbConfig['database'] == ':memory:';
-		$message = "Test database is not an in-memory database.";
-		$this->skipIf(!$isMemory, $message);
 	}
 
 	public function setUp() {
 		$this->db = new Sqlite3($this->_dbConfig);
+	}
+
+	public function teadDown() {
+		Employees::reset();
+		Companies::reset();
 	}
 
 	/**
@@ -51,13 +55,14 @@ class Sqlite3Test extends \lithium\test\Unit {
 		$result = $db->get('_config');
 		$expected = array(
 		  'autoConnect' => false,
-		  'database' => '',
-		  'flags' => SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE,
-		  'key' => null,
+		  'database' => ':memory:',
+		  'encoding' => null,
 		  'persistent' => true,
 		  'host' => 'localhost',
 		  'login' => 'root',
 		  'password' => '',
+		  'dsn' => null,
+		  'options' => array(),
 		  'init' => true
 		);
 		$this->assertEqual($expected, $result);
@@ -95,7 +100,7 @@ class Sqlite3Test extends \lithium\test\Unit {
 		$this->assertEqual(array('type' => 'boolean'), $result);
 
 		$result = $this->db->invokeMethod('_column', array('varchar(255)'));
-		$this->assertEqual(array('type' => 'string', 'length' => '255'), $result);
+		$this->assertEqual(array('type' => 'string', 'length' => 255), $result);
 
 		$result = $this->db->invokeMethod('_column', array('text'));
 		$this->assertEqual(array('type' => 'text'), $result);
@@ -104,10 +109,10 @@ class Sqlite3Test extends \lithium\test\Unit {
 		$this->assertEqual(array('type' => 'text'), $result);
 
 		$result = $this->db->invokeMethod('_column', array('decimal(12,2)'));
-		$this->assertEqual(array('type' => 'float', 'length' => '12,2'), $result);
+		$this->assertEqual(array('type' => 'float', 'length' => 12, 'precision' => 2), $result);
 
 		$result = $this->db->invokeMethod('_column', array('int(11)'));
-		$this->assertEqual(array('type' => 'integer', 'length' => '11'), $result);
+		$this->assertEqual(array('type' => 'integer', 'length' => 11), $result);
 	}
 
 	public function testAbstractColumnResolution() {
@@ -115,6 +120,7 @@ class Sqlite3Test extends \lithium\test\Unit {
 	}
 
 	public function testDescribe() {
+		$this->db->read('DROP TABLE IF EXISTS [foo];');
 		$sql = 'CREATE TABLE [foo] ([bar] VARCHAR(20) NOT NULL DEFAULT baz);';
 		$this->db->read($sql, array('return' => 'resource'));
 		$result = $this->db->describe('foo');
@@ -126,11 +132,11 @@ class Sqlite3Test extends \lithium\test\Unit {
 				'default' => 'baz'
 			)
 		);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result->fields());
+		$this->db->read('DROP TABLE [foo];');
 	}
 
 	public function testExecuteException() {
-		$this->expectException();
 		$this->expectException();
 		$this->db->read('SELECT deliberate syntax error');
 	}
@@ -152,6 +158,68 @@ class Sqlite3Test extends \lithium\test\Unit {
 		$result = $db->name('title');
 		$expected = '"title"';
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testResultSet() {
+		Employees::config(array('meta' => array('connection' => 'test')));
+		Companies::config(array('meta' => array('connection' => 'test')));
+		Connections::get('test')->read('DROP TABLE IF EXISTS employees;');
+
+		$sql = "CREATE TABLE employees (id int,title varchar(100))";
+		Connections::get('test')->read($sql);
+		for ($i = 1; $i < 9; $i++) {
+			$sql = "INSERT INTO employees (id, title) VALUES ($i, 'Title $i')";
+			Connections::get('test')->read($sql);
+		}
+
+		$employees = Employees::all();
+
+		$cpt = 0;
+		foreach ($employees as $employee) {
+			$cpt++;
+			$this->assertEqual($cpt, $employee->id);
+		}
+		$this->assertEqual(8, $cpt);
+		$this->assertEqual(8, count($employees));
+
+		Employees::reset();
+		Companies::reset();
+
+		$base = Libraries::get(true, 'resources') . '/tmp/tests';
+		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
+		Connections::add('sqlite_file', array(
+			'type' => 'database',
+			'adapter' => 'Sqlite3',
+			'database' => "{$base}/sqlite_file.sq3",
+			'database' => ':memory:',
+			'encoding' => 'UTF-8'
+		));
+
+		Employees::config(array('meta' => array('connection' => 'sqlite_file')));
+		Companies::config(array('meta' => array('connection' => 'sqlite_file')));
+
+		Connections::get('sqlite_file')->read('DROP TABLE IF EXISTS employees;');
+		$sql = "CREATE TABLE employees (id int,title varchar(100))";
+		Connections::get('sqlite_file')->read($sql);
+
+		for ($i = 1; $i < 9; $i++) {
+			$sql = "INSERT INTO employees (id, title) VALUES ($i, 'Title $i')";
+			Connections::get('sqlite_file')->read($sql);
+		}
+
+		$employees = Employees::all();
+
+		$cpt = 0;
+		foreach ($employees as $employee) {
+			$cpt++;
+			$this->assertEqual($cpt, $employee->id);
+		}
+		$this->assertEqual(8, $cpt);
+		$this->assertEqual(8, count($employees));
+
+		$this->_cleanUp();
+		Connections::get('test')->read('DROP TABLE employees;');
+		Connections::get('sqlite_file')->read('DROP TABLE employees;');
 	}
 }
 

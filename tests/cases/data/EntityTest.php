@@ -9,13 +9,15 @@
 namespace lithium\tests\cases\data;
 
 use lithium\data\Entity;
+use lithium\data\Schema;
 
 class EntityTest extends \lithium\test\Unit {
 
-	protected $_model = 'lithium\tests\mocks\data\source\MockMongoPost';
+	protected $_model = 'lithium\tests\mocks\data\MockPost';
 
 	public function testSchemaAccess() {
-		$schema = array('foo' => array('type' => 'string'));
+		$fields = array('foo' => array('type' => 'string'));
+		$schema = new Schema(compact('fields'));
 		$entity = new Entity(compact('schema'));
 		$this->assertEqual($schema, $entity->schema());
 	}
@@ -79,12 +81,14 @@ class EntityTest extends \lithium\test\Unit {
 
 	public function testMethodDispatch() {
 		$model = $this->_model;
-		$entity = new Entity(array('model' => $model, 'data' => array('foo' => true)));
+		$data = array('foo' => true);
+
+		$entity = new Entity(compact('model', 'data'));
 		$this->assertTrue($entity->validates());
 
-		$model::instanceMethods(array(
-			'testInstanceMethod' => function($entity) { return 'testInstanceMethod'; }
-		));
+		$model::instanceMethods(array('testInstanceMethod' => function($entity) {
+			return 'testInstanceMethod';
+		}));
 		$this->assertEqual('testInstanceMethod', $entity->testInstanceMethod($entity));
 
 		$this->expectException("/^No model bound or unhandled method call `foo`.$/");
@@ -118,6 +122,39 @@ class EntityTest extends \lithium\test\Unit {
 		$data = array('foo' => 'bar', 'baz' => 'dib');
 		$entity->set($data);
 		$this->assertEqual(array('foo' => true, 'baz' => true), $entity->modified());
+
+		$this->assertTrue($entity->modified('foo'));
+		$this->assertTrue($entity->modified('baz'));
+
+		$this->assertNull($entity->modified('ole'));
+
+		$subentity = new Entity();
+		$subentity->set($data);
+		$entity->set(array('ble' => $subentity));
+		$this->assertEqual(array('foo' => true, 'baz' => true, 'ble' => true), $entity->modified());
+
+		$this->assertTrue($entity->ble->modified('foo'));
+		$this->assertFalse($entity->ble->modified('iak'));
+		$this->assertEqual($entity->ble->modified(), array('foo' => true, 'baz' => true));
+	}
+
+	/**
+	 * Tests that an entity can be cast to a string based on its bound model's meta data.
+	 */
+	public function testStringCasting() {
+		$model = $this->_model;
+		$old = $model::meta('title') ?: 'title';
+
+		$model::meta('title', 'firstName');
+		$object = new Entity(compact('model'));
+
+		$object->firstName = 'Bob';
+		$this->assertEqual('Bob', (string) $object);
+
+		$object->firstName = 'Rob';
+		$this->assertEqual('Rob', (string) $object);
+
+		$model::meta('title', $old);
 	}
 }
 

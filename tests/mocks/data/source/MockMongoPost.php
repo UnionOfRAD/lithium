@@ -8,42 +8,21 @@
 
 namespace lithium\tests\mocks\data\source;
 
-use lithium\data\source\MongoDb;
+use lithium\data\source\mongo_db\Schema;
 
-class MockMongoPost extends \lithium\data\Model {
+class MockMongoPost extends \lithium\tests\mocks\data\MockBase {
 
-	protected $_meta = array(
-		'connection' => 'lithium_mongo_test',
-		'source' => 'posts'
-	);
+	protected $_meta = array('source' => 'posts', 'connection' => false, 'key' => '_id');
 
-	protected $_connection;
-
-	protected $_useRealConnection = true;
+	public static $connection;
 
 	public static function schema($field = null) {
-		if (is_array($field)) {
-			return static::_object()->_schema = $field;
-		}
-		return parent::schema($field);
-	}
+		$result = parent::schema($field);
 
-	public static function &connection() {
-		$self = static::_object();
-
-		if ($self->_useRealConnection) {
-			return parent::connection();
+		if (is_object($result) && get_class($result) == 'lithium\data\Schema') {
+			return new Schema(array('fields' => $result->fields(), 'meta'   => $result->meta()));
 		}
-		if (!$self->_connection) {
-			$self->_connection = new MongoDb(array('autoConnect' => false));
-		}
-		return $self->_connection;
-	}
-
-	public static function resetConnection($mock) {
-		$self = static::_object();
-		$self->_connection = null;
-		$self->_useRealConnection = !$mock;
+		return $result;
 	}
 }
 

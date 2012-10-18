@@ -8,52 +8,185 @@
 
 namespace lithium\tests\cases\data\collection;
 
-use lithium\data\Connections;
+use MongoId;
 use lithium\data\source\MongoDb;
-use lithium\data\source\http\adapter\CouchDb;
+use lithium\data\source\mongo_db\Schema;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
 use lithium\tests\mocks\data\model\MockDocumentPost;
 use lithium\tests\mocks\data\source\mongo_db\MockResult;
-use lithium\tests\mocks\data\model\MockDocumentMultipleKey;
+use lithium\tests\mocks\data\source\MockMongoConnection;
 
-/**
- * DocumentSet tests
- */
 class DocumentSetTest extends \lithium\test\Unit {
 
 	protected $_model = 'lithium\tests\mocks\data\model\MockDocumentPost';
 
-	protected $_backup = array();
-
-	public function skip() {
-		$this->skipIf(!MongoDb::enabled(), 'MongoDb is not enabled');
-		$this->skipIf(!CouchDb::enabled(), 'CouchDb is not enabled');
-	}
-
 	public function setUp() {
-		if (empty($this->_backup)) {
-			foreach (Connections::get() as $conn) {
-				$this->_backup[$conn] = Connections::get($conn, array('config' => true));
-			}
-		}
-		Connections::reset();
-
-		Connections::add('mongo', array('type' => 'MongoDb', 'autoConnect' => false));
-		Connections::add('couch', array('type' => 'http', 'adapter' => 'CouchDb'));
-
 		MockDocumentPost::config(array('connection' => 'mongo'));
-		MockDocumentMultipleKey::config(array('connection' => 'couch'));
+		MockDocumentPost::$connection = new MongoDb(array('autoConnect' => false));
+		MockDocumentPost::$connection->connection = new MockMongoConnection();
 	}
 
 	public function tearDown() {
-		foreach ($this->_backup as $name => $config) {
-			Connections::add($name, $config);
+		MockDocumentPost::$connection = null;
+	}
+
+	public function testInitialCasting() {
+		$model = $this->_model;
+		$schema = new Schema(array('fields' => array(
+			'_id' => array('type' => 'id'),
+			'foo' => array('type' => 'object'),
+			'foo.bar' => array('type' => 'int')
+		)));
+
+		$array = new DocumentSet(compact('model', 'schema') + array(
+			'pathKey' => 'foo.bar',
+			'data' => array('5', '6', '7')
+		));
+
+		foreach ($array as $value) {
+			$this->assertTrue(is_int($value));
 		}
+	}
+
+	public function testInitialCastingOnSubObject() {
+		$model = $this->_model;
+
+		$schema = new Schema(array('fields' => array(
+			'_id' => array('type' => 'id'),
+			'body' => array('type' => 'string'),
+			'foo' => array('type' => 'object'),
+			'foo.bar' => array('type' => 'int')
+		)));
+
+		$array = new DocumentSet(compact('model', 'schema') + array(
+			'data' => array(
+				array(
+					'_id' => '4cb4ab6d7addf98506010002',
+					'body' => 'body1',
+					'foo' => (object) array('bar' => '1')
+				),
+				array(
+					'_id' => '4cb4ab6d7addf98506010003',
+					'body' => 'body2',
+					'foo' =>  (object) array('bar' => '2')
+				),
+				array(
+					'_id' => '4cb4ab6d7addf98506010004',
+					'body' => 'body3',
+					'foo' => (object) array('bar' => '3')
+				)
+		)));
+
+		foreach ($array as $document) {
+			$this->assertTrue($document->_id instanceof MongoId);
+			$this->assertTrue(is_string($document->body));
+			$this->assertTrue(is_object($document->foo));
+			$this->assertTrue(is_string($document->foo->bar));
+		}
+
+		$array = new DocumentSet(compact('model', 'schema') + array(
+			'data' => array(
+				array(
+					'_id' => '4cb4ab6d7addf98506010002',
+					'body' => 'body1',
+					'foo' => array('bar' => '1')
+				),
+				array(
+					'_id' => '4cb4ab6d7addf98506010003',
+					'body' => 'body2',
+					'foo' => array('bar' => '2')
+				),
+				array(
+					'_id' => '4cb4ab6d7addf98506010004',
+					'body' => 'body3',
+					'foo' => array('bar' => '3')
+				)
+		)));
+
+		foreach ($array as $document) {
+			$this->assertTrue($document->_id instanceof MongoId);
+			$this->assertTrue(is_string($document->body));
+			$this->assertTrue(is_object($document->foo));
+			$this->assertTrue(is_int($document->foo->bar));
+		}
+
+	}
+
+	public function testAddValueAndExport() {
+		$array = new DocumentSet(array(
+			'model' => $this->_model,
+			'pathKey' => 'foo',
+			'data' => array('bar')
+		));
+		$array[] = 'baz';
+
+		$expected = array('bar', 'baz');
+		$result = $array->data();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testUnsetInForeach() {
+		$data = array(
+			'Hello',
+			'Delete me',
+			'Delete me',
+			'Delete me',
+			'Delete me',
+			'Delete me',
+			'Hello again!',
+			'Delete me'
+		);
+		$doc = new DocumentSet(compact('data'));
+		$this->assertIdentical($data, $doc->data());
+
+		foreach ($doc as $i => $word) {
+			if ($word == 'Delete me') {
+				unset($doc[$i]);
+			}
+		}
+
+		$expected = array(0 => 'Hello', 6 => 'Hello again!');
+		$this->assertIdentical($expected, $doc->data());
+
+		$doc = new DocumentSet(compact('data'));
+
+		foreach ($doc as $i => $word) {
+			if ($word == 'Delete me') {
+				unset($doc[$i]);
+			}
+		}
+		$expected = array(0 => 'Hello', 6 => 'Hello again!');
+		$this->assertIdentical($expected, $doc->data());
+	}
+
+	public function testArrayOfObjects() {
+		$schema = new Schema();
+		$first  = (object) array('name' => 'First');
+		$second = (object) array('name' => 'Second');
+		$third  = (object) array('name' => 'Third');
+		$doc = new DocumentSet(compact('schema') + array(
+			'data' => array($first, $second, $third)
+		));
+
+		$this->assertTrue(is_object($doc[0]));
+		$this->assertTrue(is_object($doc[1]));
+		$this->assertTrue(is_object($doc[2]));
+		$this->assertEqual(3, count($doc));
+	}
+
+	public function testOffsetSet() {
+		$data   = array('change me', 'foo', 'bar');
+		$doc    = new DocumentSet(compact('data'));
+		$doc[0] = 'new me';
+
+		$expected = array(0 => 'new me', 1 => 'foo', 2 => 'bar');
+		$this->assertIdentical($expected, $doc->data());
 	}
 
 	public function testPopulateResourceClose() {
 		$resource = new MockResult();
+
 		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
 		$model = $this->_model;
 
@@ -71,7 +204,22 @@ class DocumentSetTest extends \lithium\test\Unit {
 		$result = $doc->next()->data();
 		$this->assertEqual($expected, $result);
 
-		$this->assertNull($doc->next());
+		$this->assertFalse($doc->next());
+	}
+
+	public function testOffsetGetBackwards() {
+		$resource = new MockResult();
+		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
+		$model = $this->_model;
+
+		$expected = array('_id' => '6c8f86167675abfabdbf0302', 'title' => 'dib');
+		$this->assertEqual($expected, $doc['6c8f86167675abfabdbf0302']->data());
+
+		$expected = array('_id' => '5c8f86167675abfabdbf0301', 'title' => 'foo');
+		$this->assertEqual($expected, $doc['5c8f86167675abfabdbf0301']->data());
+
+		$expected = array('_id' => '4c8f86167675abfabdbf0300', 'title' => 'bar');
+		$this->assertEqual($expected, $doc['4c8f86167675abfabdbf0300']->data());
 	}
 
 	public function testMappingToNewDocumentSet() {
@@ -83,6 +231,36 @@ class DocumentSetTest extends \lithium\test\Unit {
 		$this->assertEqual($doc->data(), $mapped->data());
 		$this->assertEqual($model, $doc->model());
 		$this->assertEqual($model, $mapped->model());
+	}
+
+	public function testValid() {
+		$collection = new DocumentSet();
+		$this->assertFalse($collection->valid());
+
+		$collection = new DocumentSet(array('data' => array('value' => 42)));
+		$this->assertTrue($collection->valid());
+
+		$resource = new MockResult(array('data' => array()));
+		$collection = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
+		$this->assertFalse($collection->valid());
+
+		$resource = new MockResult(array(
+			'data' => array(array('id' => 1, 'data' => 'data1'))
+		));
+		$collection = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
+		$this->assertTrue($collection->valid());
+	}
+
+	public function testInternalKeys() {
+		$resource = new MockResult();
+		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
+		$this->assertEqual(array(
+				0 => '4c8f86167675abfabdbf0300',
+				1 => '5c8f86167675abfabdbf0301',
+				2 => '6c8f86167675abfabdbf0302'
+			),
+			$doc->keys()
+		);
 	}
 }
 

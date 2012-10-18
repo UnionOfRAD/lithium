@@ -243,20 +243,20 @@ class Entity extends \lithium\core\Object {
 	}
 
 	public function schema($field = null) {
-		$schema = array();
+		$schema = null;
 
 		switch (true) {
-			case ($this->_schema):
+			case (is_object($this->_schema)):
 				$schema = $this->_schema;
 			break;
 			case ($model = $this->_model):
 				$schema = $model::schema();
 			break;
 		}
-		if ($field) {
-			return isset($schema[$field]) ? $schema[$field] : null;
+		if ($schema) {
+			return $field ? $schema->fields($field) : $schema;
 		}
-		return $schema;
+		return array();
 	}
 
 	/**
@@ -306,16 +306,21 @@ class Entity extends \lithium\core\Object {
 	 * @param array $options Method options:
 	 *              - `'materialize'` _boolean_: Determines whether or not the flag should be set
 	 *                that indicates that this entity exists in the data store. Defaults to `true`.
+	 *              - `'dematerialize'` _boolean_: If set to `true`, indicates that this entity has
+	 *                been deleted from the data store and no longer exists. Defaults to `false`.
 	 * @return void
 	 */
 	public function sync($id = null, array $data = array(), array $options = array()) {
-		$defaults = array('materialize' => true);
+		$defaults = array('materialize' => true, 'dematerialize' => false);
 		$options += $defaults;
 		$model = $this->_model;
 		$key = array();
 
 		if ($options['materialize']) {
 			$this->_exists = true;
+		}
+		if ($options['dematerialize']) {
+			$this->_exists = false;
 		}
 		if ($id && $model) {
 			$key = $model::meta('key');
@@ -362,12 +367,30 @@ class Entity extends \lithium\core\Object {
 	}
 
 	/**
-	 * Gets the array of fields modified on this entity.
+	 * Gets the current state for a given field or, if no field is given, gets the array of
+	 * fields modified on this entity.
 	 *
-	 * @return array Returns an array where the keys are entity field names, and the values are
-	 *         `true` for changed fields.
+	 * @param string The field name to check its state.
+	 * @return mixed Returns `true` if a field is given and was updated, `false` otherwise and
+	 *		   `null` if the field was not set at all. If no field is given returns an arra
+	 *		   where the keys are entity field names, and the values are `true` for changed fields.
 	 */
-	public function modified() {
+	public function modified($field = null) {
+		if ($field) {
+			if (!isset($this->_updated[$field]) && !isset($this->_data[$field])) {
+				return null;
+			}
+
+			$value = !($value = isset($this->_updated[$field])) ?: $this->_updated[$field];
+			if (!$value) {
+				return false;
+			} elseif (is_object($value) && method_exists($value, 'modified')) {
+				$modified = $value->modified();
+				return $modified === true || is_array($modified) && in_array(true, $modified, true);
+			}
+			return !isset($this->_data[$field]) || $this->_data[$field] !== $this->_updated[$field];
+		}
+
 		$fields = array_fill_keys(array_keys($this->_data), false);
 
 		foreach ($this->_updated as $field => $value) {
@@ -391,13 +414,27 @@ class Entity extends \lithium\core\Object {
 		return $fields;
 	}
 
-	public function export() {
+	public function export(array $options = array()) {
 		return array(
 			'exists'    => $this->_exists,
 			'data'      => $this->_data,
 			'update'    => $this->_updated,
 			'increment' => $this->_increment
 		);
+	}
+
+	/**
+	 * Configures protected properties of an `Entity` so that it is parented to `$parent`.
+	 *
+	 * @param object $parent
+	 * @param array $config
+	 * @return void
+	 */
+	public function assignTo($parent, array $config = array()) {
+		foreach ($config as $key => $val) {
+			$this->{'_' . $key} = $val;
+		}
+		$this->_parent =& $parent;
 	}
 
 	/**
@@ -415,11 +452,24 @@ class Entity extends \lithium\core\Object {
 				$data = $rel + $data;
 				$result = Collection::toArray($data, $options);
 			break;
+			case 'string':
+				$result = $this->__toString();
+			break;
 			default:
 				$result = $this;
 			break;
 		}
 		return $result;
+	}
+
+	/**
+	 * Returns a string representation of the `Entity` instance, based on the result of the
+	 * `'title'` meta value of the bound model class.
+	 *
+	 * @return string Returns the generated title of the object.
+	 */
+	public function __toString() {
+		return (string) $this->__call('title', array());
 	}
 }
 

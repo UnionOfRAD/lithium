@@ -35,21 +35,8 @@ class QueryTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->db = new MockDatabase();
-		$this->_configs = Connections::config();
-
-		Connections::reset();
-		Connections::config(array('mock-database-connection' => array(
-			'object' => &$this->db,
-			'adapter' => 'MockDatabase'
-		)));
-
-		MockQueryPost::config();
-		MockQueryComment::config();
-	}
-
-	public function tearDown() {
-		Connections::reset();
-		Connections::config($this->_configs);
+		MockQueryPost::$connection = $this->db;
+		MockQueryComment::$connection = $this->db;
 	}
 
 	/**
@@ -223,12 +210,24 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testHaving() {
+		$query = new Query($this->_queryArr);
+
+		$expected = array();
+		$result = $query->having();
+		$this->assertEqual($expected, $result);
+
+		$query->having(array('count' => 5));
+
+		$expected = array('count' => 5);
+		$result = $query->having();
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testConditionFromRecord() {
 		$entity = new Record();
 		$entity->id = 12;
-		$query = new Query(compact('entity') + array(
-			'model' => $this->_model
-		));
+		$query = new Query(compact('entity') + array('model' => $this->_model));
 
 		$expected = array('id' => 12);
 		$result = $query->conditions();
@@ -260,6 +259,7 @@ class QueryTest extends \lithium\test\Unit {
 			'calculate',
 			'comment',
 			'conditions',
+			'having',
 			'data',
 			'fields',
 			'group',
@@ -271,6 +271,7 @@ class QueryTest extends \lithium\test\Unit {
 			'offset',
 			'order',
 			'page',
+			'schema',
 			'source',
 			'type',
 			'whitelist',
@@ -282,7 +283,7 @@ class QueryTest extends \lithium\test\Unit {
 		sort($result);
 		$this->assertEqual($expected, $result);
 
-		$expected = 'MockQueryPost.id, MockQueryPost.author_id, MockQueryPost.title';
+		$expected = '{MockQueryPost}.{id}, {MockQueryPost}.{author_id}, {MockQueryPost}.{title}';
 		$result = $export['fields'];
 		$this->assertEqual($expected, $result);
 
@@ -299,7 +300,7 @@ class QueryTest extends \lithium\test\Unit {
 		);
 		$query = new Query($options);
 
-		$result = $query->export(Connections::get('mock-database-connection'), array(
+		$result = $query->export($this->db, array(
 			'keys' => array('data', 'conditions')
 		));
 		$expected = array(
@@ -427,7 +428,7 @@ class QueryTest extends \lithium\test\Unit {
 			'model' => 'lithium\tests\mocks\data\model\MockQueryPost'
 		);
 		$query = new Query($options);
-		$result = $query->export(Connections::get('mock-database-connection'));
+		$result = $query->export($this->db);
 
 		$this->assertEqual(array('title' => '..'), $result['data']);
 		$this->assertEqual("WHERE {title} = 'FML'", $result['conditions']);
@@ -476,7 +477,7 @@ class QueryTest extends \lithium\test\Unit {
 			'source' => 'my_custom_table',
 			'alias' => 'MyCustomAlias'
 		));
-		$result = $query->export(Connections::get('mock-database-connection'));
+		$result = $query->export($this->db);
 		$this->assertEqual('{my_custom_table}', $result['source']);
 		$this->assertEqual('AS {MyCustomAlias}', $result['alias']);
 	}

@@ -13,7 +13,7 @@ use lithium\util\Set;
 class Exporter extends \lithium\core\StaticObject {
 
 	protected static $_classes = array(
-		'array' => 'lithium\data\collection\DocumentArray'
+		'set' => 'lithium\data\collection\DocumentSet'
 	);
 
 	protected static $_commands = array(
@@ -24,16 +24,6 @@ class Exporter extends \lithium\core\StaticObject {
 		'rename'    => '$rename'
 	);
 
-	protected static $_types = array(
-		'MongoId'      => 'id',
-		'MongoDate'    => 'date',
-		'MongoCode'    => 'code',
-		'MongoBinData' => 'binary',
-		'datetime'     => 'date',
-		'timestamp'    => 'date',
-		'int'          => 'integer'
-	);
-
 	public static function get($type, $export, array $options = array()) {
 		$defaults = array('whitelist' => array());
 		$options += $defaults;
@@ -42,62 +32,6 @@ class Exporter extends \lithium\core\StaticObject {
 			return;
 		}
 		return static::$method($export, array('finalize' => true) + $options);
-	}
-
-	public static function cast($data, $schema, $database, array $options = array()) {
-		$defaults = array(
-			'handlers' => array(),
-			'model' => null,
-			'arrays' => true,
-			'pathKey' => null
-		);
-		$options += $defaults;
-
-		foreach ($data as $key => $value) {
-			$pathKey = $options['pathKey'] ? "{$options['pathKey']}.{$key}" : $key;
-
-			$field = isset($schema[$pathKey]) ? $schema[$pathKey] : array();
-			$field += array('type' => null, 'array' => null);
-			$data[$key] = static::_cast($value, $field, $database, compact('pathKey') + $options);
-		}
-		return $data;
-	}
-
-	protected static function _cast($value, $def, $database, $options) {
-		if (is_object($value)) {
-			return $value;
-		}
-		$pathKey = $options['pathKey'];
-
-		$typeMap = static::$_types;
-		$type = isset($typeMap[$def['type']]) ? $typeMap[$def['type']] : $def['type'];
-
-		$isObject = ($type == 'object');
-		$isArray = (is_array($value) && $def['array'] !== false && !$isObject);
-		$isArray = $def['array'] || $isArray;
-
-		if (isset($options['handlers'][$type]) && $handler = $options['handlers'][$type]) {
-			$value = $isArray ? array_map($handler, (array) $value) : $handler($value);
-		}
-		if (!$options['arrays']) {
-			return $value;
-		}
-
-		if (!is_array($value) && !$def['array']) {
-			return $value;
-		}
-
-		if ($def['array']) {
-			$opts = array('class' => 'array') + $options;
-			$value = ($value === null) ? array() : $value;
-			$value = is_array($value) ? $value : array($value);
-		} elseif (is_array($value)) {
-			$arrayType = !$isObject && (array_keys($value) === range(0, count($value) - 1));
-			$opts = $arrayType ? array('class' => 'array') + $options : $options;
-		}
-
-		unset($opts['handlers'], $opts['first']);
-		return $database->item($options['model'], $value, compact('pathKey') + $opts);
 	}
 
 	public static function toCommand($changes) {
@@ -118,9 +52,11 @@ class Exporter extends \lithium\core\StaticObject {
 
 	protected static function _create($export, array $options) {
 		$export += array('data' => array(), 'update' => array(), 'key' => '');
-		$data = $export['update'];
+		$data = Set::merge($export['data'], $export['update']);
 
-		$result = array('create' => array());
+		if (array_keys($data) == range(0, count($data) - 1)) {
+			$data = $export['update'];
+		}
 		$localOpts = array('finalize' => false) + $options;
 
 		foreach ($data as $key => $val) {
@@ -163,21 +99,32 @@ class Exporter extends \lithium\core\StaticObject {
 		$objects = array_filter($export['update'], function($value) {
 			return (is_object($value) && method_exists($value, 'export'));
 		});
-
 		array_map(function($key) use (&$left) { unset($left[$key]); }, array_keys($right));
+
 		foreach ($left as $key => $value) {
 			$result = static::_append($result, "{$path}{$key}", $value, 'remove');
 		}
-		$data = (array) $right + (array) $objects;
+		$update = $right + $objects;
 
-		foreach ($data as $key => $value) {
+		foreach ($update as $key => $value) {
 			$original = $export['data'];
-			$isArray = is_object($value) && get_class($value) == static::$_classes['array'];
-			if ($isArray && isset($original[$key]) && $value->data() != $original[$key]->data()) {
-				$value = $value->data();
-			}
-			if ($isArray && !isset($original[$key])) {
-				 $value = $value->data();
+			$isArray = is_object($value) && get_class($value) == static::$_classes['set'];
+
+			$options = array('handlers' => array(
+				'MongoDate' => function($value) { return $value; },
+				'MongoId' => function($value) { return $value; }
+			));
+
+			if ($isArray) {
+				$newValue = $value->to('array', $options);
+				$originalValue = null;
+
+				if (isset($original[$key])) {
+					$originalValue = $original[$key]->to('array', $options);
+				}
+				if ($newValue !== $originalValue) {
+					$value = $value->to('array', $options);
+				}
 			}
 			$result = static::_append($result, "{$path}{$key}", $value, 'update');
 		}
@@ -196,7 +143,7 @@ class Exporter extends \lithium\core\StaticObject {
 		$result = array();
 
 		foreach ($left as $key => $value) {
-			if (!isset($right[$key]) || $left[$key] !== $right[$key]) {
+			if (!array_key_exists($key, $right) || $left[$key] !== $right[$key]) {
 				$result[$key] = $value;
 			}
 		}
@@ -221,21 +168,18 @@ class Exporter extends \lithium\core\StaticObject {
 			$changes[$change][$key] = ($change == 'update') ? $value : true;
 			return $changes;
 		}
-		if ($value->exists()) {
-			if ($change == 'update') {
-				$export = $value->export();
-				$export['key'] = $key;
-				return Set::merge($changes, static::_update($export));
-			}
-
-			$children = static::_update($value->export());
-			if (!empty($children)) {
-				return Set::merge($changes, $children);
-			}
-			$changes[$change][$key] = true;
+		if (!$value->exists()) {
+			$changes[$change][$key] = static::_create($value->export(), $options);
 			return $changes;
 		}
-		$changes['update'][$key] = static::_create($value->export(), $options);
+		if ($change == 'update') {
+			$export = compact('key') + $value->export();
+			return Set::merge($changes, static::_update($export));
+		}
+		if ($children = static::_update($value->export())) {
+			return Set::merge($changes, $children);
+		}
+		$changes[$change][$key] = true;
 		return $changes;
 	}
 }

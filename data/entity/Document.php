@@ -86,12 +86,20 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 */
 	protected $_valid = false;
 
+	/**
+	 * Removed keys list. Contains names of the fields will be removed from the backend data store
+	 *
+	 * @var array
+	 */
+	protected $_removed = array();
+
 	protected function _init() {
 		parent::_init();
 
 		$data = (array) $this->_data;
 		$this->_data = array();
 		$this->_updated = array();
+		$this->_removed = array();
 
 		$this->set($data, array('init' => true));
 		$this->sync(null, array(), array('materialize' => false));
@@ -113,7 +121,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		if (isset($this->_embedded[$name]) && !isset($this->_relationships[$name])) {
 			throw new RuntimeException("Not implemented.");
 		}
-		$result = parent::__get($name);
+		$result =& parent::__get($name);
 
 		if ($result !== null || array_key_exists($name, $this->_updated)) {
 			return $result;
@@ -126,7 +134,10 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			}
 			if (isset($field['array']) && $field['array'] && ($model = $this->_model)) {
 				$this->_updated[$name] = $model::connection()->item($model, array(), array(
-					'class' => 'array'
+					'class' => 'set',
+					'schema' => $this->schema(),
+					'pathKey' => $this->_pathKey ? $this->_pathKey . '.' . $name : $name,
+					'model' => $this->_model
 				));
 				return $this->_updated[$name];
 			}
@@ -135,14 +146,17 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		return $null;
 	}
 
-	public function export() {
+	public function export(array $options = array()) {
 		foreach ($this->_updated as $key => $val) {
 			if ($val instanceof self) {
 				$path = $this->_pathKey ? "{$this->_pathKey}." : '';
 				$this->_updated[$key]->_pathKey = "{$path}{$key}";
 			}
 		}
-		return parent::export() + array('key' => $this->_pathKey);
+		return parent::export($options) + array(
+			'key' => $this->_pathKey,
+			'remove' => $this->_removed
+		);
 	}
 
 	/**
@@ -269,7 +283,13 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @return void
 	 */
 	public function __unset($name) {
-		unset($this->_updated[$name]);
+		$parts = explode('.', $name, 2);
+		if (isset($parts[1])) {
+			unset($this->{$parts[0]}[$parts[1]]);
+		} else {
+			unset($this->_updated[$name]);
+			$this->_removed[$name] = true;
+		}
 	}
 
 	/**
@@ -288,30 +308,27 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		$defaults = array('init' => false);
 		$options += $defaults;
 
+		$cast = ($schema = $this->schema());
+
 		foreach ($data as $key => $val) {
+			unset($this->_increment[$key]);
 			if (strpos($key, '.')) {
 				$this->_setNested($key, $val);
-				unset($data[$key]);
+				continue;
 			}
-			unset($this->_increment[$key]);
-		}
-
-		if ($data && $model = $this->_model) {
-			$pathKey = $this->_pathKey;
-			$data = $model::connection()->cast($this, $data, compact('pathKey'));
-		}
-
-		foreach ($data as $key => $value) {
-			if ($value instanceof self) {
-				if (!$options['init']) {
-					$value->_exists = false;
-				}
-				$value->_pathKey = ($this->_pathKey ? "{$this->_pathKey}." : '') . $key;
-				$value->_model = $value->_model ?: $this->_model;
-				$value->_schema = $value->_schema ?: $this->_schema;
+			if ($cast) {
+				$pathKey = $this->_pathKey;
+				$model = $this->_model;
+				$val = $schema->cast($this, $key, $val, compact('pathKey', 'model'));
 			}
+			if ($val instanceof self) {
+				$val->_exists = $options['init'] && $this->_exists;
+				$val->_pathKey = ($this->_pathKey ? "{$this->_pathKey}." : '') . $key;
+				$val->_model = $val->_model ?: $this->_model;
+				$val->_schema = $val->_schema ?: $this->_schema;
+			}
+			$this->_updated[$key] = $val;
 		}
-		$this->_updated = $data + $this->_updated;
 	}
 
 	/**
@@ -364,6 +381,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @return mixed The current item after rewinding.
 	 */
 	public function rewind() {
+		reset($this->_data);
 		reset($this->_updated);
 		$this->_valid = (count($this->_updated) > 0);
 		return current($this->_updated);

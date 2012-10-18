@@ -61,6 +61,24 @@ class Query extends \lithium\core\Object {
 	protected $_data = array();
 
 	/**
+	 * A query can be assigned its own custom schema object, using the `schema()` method. If this
+	 * is not assigned, then the model associated with the query will be used to get the schema
+	 * information.
+	 *
+	 * @var object
+	 */
+	protected $_schema = null;
+
+	/**
+	 * Classes used by `Query`.
+	 *
+	 * @var array
+	 */
+	protected $_classes = array(
+		'schema' => 'lithium\data\Schema'
+	);
+
+	/**
 	 * Auto configuration properties.
 	 *
 	 * @var array
@@ -81,7 +99,9 @@ class Query extends \lithium\core\Object {
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'calculate'  => null,
+			'schema'     => null,
 			'conditions' => array(),
+			'having'     => array(),
 			'fields'     => array(),
 			'data'       => array(),
 			'model'      => null,
@@ -177,14 +197,14 @@ class Query extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function model($model = null) {
-		if ($model) {
-			$this->_config['model'] = $model;
-			$this->_config['source'] = $this->_config['source'] ?: $model::meta('source');
-			$this->_config['alias'] = $this->_config['alias'] ?: $model::meta('name');
-			$this->_config['name'] = $this->_config['name'] ?: $this->_config['alias'];
-			return $this;
+		if (!$model) {
+			return $this->_config['model'];
 		}
-		return $this->_config['model'];
+		$this->_config['model'] = $model;
+		$this->_config['source'] = $this->_config['source'] ?: $model::meta('source');
+		$this->_config['alias'] = $this->_config['alias'] ?: $model::meta('name');
+		$this->_config['name'] = $this->_config['name'] ?: $this->_config['alias'];
+		return $this;
 	}
 
 	/**
@@ -196,13 +216,29 @@ class Query extends \lithium\core\Object {
 	 * @return array Returns an array of all conditions applied to this query.
 	 */
 	public function conditions($conditions = null) {
-		if ($conditions) {
-			$conditions = (array) $conditions;
-			$this->_config['conditions'] = (array) $this->_config['conditions'];
-			$this->_config['conditions'] = array_merge($this->_config['conditions'], $conditions);
-			return $this;
+		if (!$conditions) {
+			return $this->_config['conditions'] ?: $this->_entityConditions();
 		}
-		return $this->_config['conditions'] ?: $this->_entityConditions();
+		$conditions = (array) $conditions;
+		$this->_config['conditions'] = (array) $this->_config['conditions'];
+		$this->_config['conditions'] = array_merge($this->_config['conditions'], $conditions);
+		return $this;
+	}
+
+	/**
+	 * Set and get method for havings.
+	 *
+	 * @param mixed $having String or array to append to existing having.
+	 * @return array Returns an array of all having applied to this query.
+	 */
+	public function having($having = null) {
+		if (!$having) {
+			return $this->_config['having'];
+		}
+		$having = (array) $having;
+		$this->_config['having'] = (array) $this->_config['having'];
+		$this->_config['having'] = array_merge($this->_config['having'], $having);
+		return $this;
 	}
 
 	/**
@@ -397,7 +433,8 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Convert the query's properties to the data sources' syntax and return it as an array.
 	 *
-	 * @param object $dataSource Instance of `lithium\data\Source` to use for conversion.
+	 * @param object $dataSource Instance of the data source (`lithium\data\Source`) to use for
+	 *               conversion.
 	 * @param array $options Options to use when exporting the data.
 	 * @return array Returns an array containing a data source-specific representation of a query.
 	 */
@@ -464,22 +501,17 @@ class Query extends \lithium\core\Object {
 	}
 
 	public function schema($field = null) {
-		if (is_array($field)) {
-			$this->_config['schema'] = $field;
-			return $this;
+		if (is_object($field)) {
+			$this->_schema = $field;
+			return;
 		}
-
-		if (isset($this->_config['schema'])) {
-			$schema = $this->_config['schema'];
-
-			if ($field) {
-				return isset($schema[$field]) ? $schema[$field] : null;
-			}
-			return $schema;
+		if ($schema = $this->_schema) {
+			return $field ? $schema[$field] : $schema;
 		}
-
 		if ($model = $this->model()) {
 			return $model::schema($field);
+		} else {
+			return $this->_instance('schema');
 		}
 	}
 

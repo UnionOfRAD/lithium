@@ -8,13 +8,18 @@
 
 namespace lithium\tests\mocks\data\model;
 
-class MockDatabasePost extends \lithium\data\Model {
+class MockDatabasePost extends \lithium\tests\mocks\data\MockBase {
 
-	public $hasMany = array('MockDatabaseComment');
+	public static $connection = null;
 
-	protected $_meta = array(
-		'connection' => 'mock-database-connection'
+	public $hasMany = array(
+		'MockDatabaseComment',
+		'MockDatabasePostRevision' => array(
+			'constraint' => array('MockDatabasePostRevision.deleted' => null)
+		)
 	);
+
+	protected $_meta = array('connection' => false, 'key' => 'id');
 
 	protected $_schema = array(
 		'id' => array('type' => 'integer'),

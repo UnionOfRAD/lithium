@@ -2,20 +2,22 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2011, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\data\source\database\adapter\my_sql;
+namespace lithium\tests\cases\data\source\database\adapter\pdo;
 
 use PDOStatement;
 use lithium\data\Connections;
 use lithium\data\source\database\adapter\MySql;
-use lithium\data\source\database\adapter\my_sql\Result;
+use lithium\data\source\database\adapter\PostgreSql;
+use lithium\data\source\database\adapter\pdo\Result;
 
 class ResultTest extends \lithium\test\Unit {
 
 	public $db = null;
+	public $mock_prefix = '';
 
 	protected $_mockData = array(
 		1 => array(1, 'Foo Company'),
@@ -23,22 +25,35 @@ class ResultTest extends \lithium\test\Unit {
 	);
 
 	/**
-	 * Skip the test if a MySQL adapter configuration is unavailable and preload test data.
+	 * Skip the test if a MySQL or PostgreSQL adapter configuration is unavailable and
+	 * preload test data.
 	 */
 	public function skip() {
-		$this->skipIf(!MySql::enabled(), 'MySQL Extension is not loaded');
+		$enabled = (MySql::enabled() || PostgreSql::enabled());
+		$this->skipIf(!$enabled, 'MySQL or PostgreSQL Extension is not loaded');
 
 		$dbConfig = Connections::get('test', array('config' => true));
-		$hasDb = (isset($dbConfig['adapter']) && $dbConfig['adapter'] == 'MySql');
-		$message = 'Test database is either unavailable, or not using a MySQL adapter';
+		$valid_adapter = in_array($dbConfig['adapter'], array('MySql', 'PostgreSql'));
+		$hasDb = (isset($dbConfig['adapter']) && $valid_adapter);
+		$message = 'Test database is either unavailable, or not using a MySQL/PostgreSQL adapter';
 		$this->skipIf(!$hasDb, $message);
 
-		$this->db = new MySql($dbConfig);
+		switch ($dbConfig['adapter']) {
+			case "MySql":
+				$this->db = new MySql($dbConfig);
+				$this->mock_prefix = 'mysql';
+			break;
+			case "PostgreSql":
+				$this->db = new PostgreSql($dbConfig);
+				$this->mock_prefix = 'postgresql';
+			break;
+		}
 	}
 
 	public function setUp() {
 		$lithium = LITHIUM_LIBRARY_PATH . '/lithium';
-		$sqlFile = $lithium . '/tests/mocks/data/source/database/adapter/mysql_companies.sql';
+		$prefix = $this->mock_prefix;
+		$sqlFile = $lithium . "/tests/mocks/data/source/database/adapter/{$prefix}_companies.sql";
 		$sql = file_get_contents($sqlFile);
 		$this->db->read($sql, array('return' => 'resource'));
 
@@ -67,7 +82,7 @@ class ResultTest extends \lithium\test\Unit {
 
 		$this->assertEqual($this->_mockData[1], $result->next());
 		$this->assertEqual($this->_mockData[2], $result->next());
-		$this->assertNull($result->next());
+		$this->assertFalse($result->next());
 	}
 
 	public function testPrev() {
@@ -80,7 +95,7 @@ class ResultTest extends \lithium\test\Unit {
 		$this->assertEqual($this->_mockData[1], $result->prev());
 		$this->assertEqual($this->_mockData[2], $result->next());
 		$this->assertEqual($this->_mockData[1], $result->prev());
-		$this->assertNull($result->prev());
+		$this->assertFalse($result->prev());
 	}
 
 	public function testValid() {
@@ -118,13 +133,17 @@ class ResultTest extends \lithium\test\Unit {
 		$resource = $this->db->connection->query("SELECT id, name FROM companies;");
 		$result = new Result(compact('resource'));
 
-		$this->assertEqual(0, $result->key());
+		$this->assertIdentical(0, $result->key());
 		$result->next();
-		$this->assertEqual(1, $result->key());
+		$this->assertIdentical(1, $result->key());
+		$result->prev();
+		$this->assertIdentical(0, $result->key());
 		$result->next();
-		$this->assertEqual(2, $result->key());
+		$this->assertIdentical(1, $result->key());
+		$result->next();
+		$this->assertIdentical(null, $result->key());
 		$result->rewind();
-		$this->assertEqual(0, $result->key());
+		$this->assertIdentical(0, $result->key());
 	}
 
 	/**

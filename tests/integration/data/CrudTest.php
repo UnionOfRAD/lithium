@@ -50,7 +50,6 @@ class CrudTest extends \lithium\test\Integration {
 		);
 		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
 
-		Companies::config();
 		$this->_key = Companies::key();
 		$this->_database = $config['database'];
 		$this->_connection = Connections::get($connection);

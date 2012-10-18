@@ -8,27 +8,29 @@
 
 namespace lithium\tests\cases\data\entity;
 
-use lithium\data\Connections;
 use lithium\data\entity\Record;
+use lithium\data\Schema;
 
 class RecordTest extends \lithium\test\Unit {
 
-	protected $_configs = array();
+	protected $_database = 'lithium\tests\mocks\data\MockSource';
+
+	protected $_model = 'lithium\tests\mocks\data\MockPost';
 
 	public function setUp() {
-		$this->_configs = Connections::config();
+		$database = $this->_database;
+		$model = $this->_model;
 
-		Connections::config(array('mock-source' => array(
-			'type' => 'lithium\tests\mocks\data\MockSource'
+		$schema = new Schema(array(
+			'fields' => array(
+				'id' => 'int', 'title' => 'string', 'body' => 'text'
 		)));
-		$model = 'lithium\tests\mocks\data\MockPost';
-		$model::config(array('connection' => 'mock-source', 'key' => 'id'));
+		$model::config(array(
+			'meta' => array('connection' => false, 'key' => 'id', 'locked' => true),
+			'schema' => $schema
+		));
+		$model::$connection = new $database();
 		$this->record = new Record(compact('model'));
-	}
-
-	public function tearDown() {
-		Connections::reset();
-		Connections::config($this->_configs);
 	}
 
 	/**
@@ -37,21 +39,13 @@ class RecordTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testDataPropertyAccess() {
-		$data = array(
-			'title' => 'Test record',
-			'body' => 'Some test record data'
-		);
-
+		$data = array('title' => 'Test record', 'body' => 'Some test record data');
 		$this->record = new Record(compact('data'));
 
-		$expected = 'Test record';
-		$result = $this->record->title;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('Test record', $this->record->title);
 		$this->assertTrue(isset($this->record->title));
 
-		$expected = 'Some test record data';
-		$result = $this->record->body;
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('Some test record data', $this->record->body);
 		$this->assertTrue(isset($this->record->body));
 
 		$this->assertNull($this->record->foo);
@@ -67,12 +61,8 @@ class RecordTest extends \lithium\test\Unit {
 		$data = array('foo' => 'bar');
 		$this->record = new Record(compact('data'));
 
-		$result = $this->record->to('array');
-		$expected = $data;
-		$this->assertEqual($expected, $result);
-
-		$result = $this->record->to('foo');
-		$this->assertEqual($this->record, $result);
+		$this->assertEqual($data, $this->record->to('array'));
+		$this->assertEqual($this->record, $this->record->to('foo'));
 	}
 
 	public function testErrorsPropertyAccess() {

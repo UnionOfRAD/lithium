@@ -64,6 +64,7 @@ class Connections extends \lithium\core\Adaptable {
 	 * 	'type' => 'http', 'adapter' => 'CouchDb', 'host' => '127.0.0.1', 'port' => 5984
 	 * ));
 	 * }}}
+	 *
 	 * or
 	 *
 	 * {{{
@@ -162,10 +163,8 @@ class Connections extends \lithium\core\Adaptable {
 		}
 		$settings = static::$_configurations[$name];
 
-		if (!isset($settings[0]['object'])) {
-			if (!$options['autoCreate']) {
-				return null;
-			}
+		if (!isset($settings[0]['object']) && !$options['autoCreate']) {
+			return null;
 		}
 		return static::adapter($name);
 	}
