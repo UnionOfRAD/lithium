@@ -93,6 +93,34 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 
 	public function testSyncModified() {
+		$doc = new Document();
+		$doc->_id = 4;
+		$doc->name = 'Four';
+		$doc->content = 'Lorem ipsum four';
+
+		$expected = array(
+			'_id' => true,
+			'name' => true,
+			'content' => true
+		);
+
+		$this->assertEqual($expected, $doc->modified());
+		$doc->sync();
+
+		$this->assertEqual(array_fill_keys(array_keys($expected), false), $doc->modified());
+
+		$doc->_id = 5;
+		$doc->content = null;
+		$doc->new = null;
+		$expected = array(
+			'_id' => true,
+			'name' => false,
+			'content' => true,
+			'new' => true
+		);
+
+		$this->assertEqual($expected, $doc->modified());
+
 		$doc = new Document(array('model' => $this->_model));
 		$doc->id = 4;
 		$doc->name = 'Four';
@@ -101,24 +129,17 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc->subdoc = array(
 			'setting' => 'something',
 			'foo' => 'bar',
-			'sub' => array(
-				'name' => 'A sub sub doc'
-			)
+			'sub' => array('name' => 'A sub sub doc')
 		);
 		$doc->subdocs = array(
-			array(
-				'id' => 1
-			),
-			array(
-				'id' => 2
-			),
-			array(
-				'id' => 3
-			),
-			array(
-				'id' => 4
-			)
+			array('id' => 1),
+			array('id' => 2),
+			array('id' => 3),
+			array('id' => 4)
 		);
+
+		$fields = array('id', 'name', 'content', 'array', 'subdoc', 'subdocs');
+		$expected = array_fill_keys($fields, true);
 
 		$this->assertEqual($expected, $doc->modified());
 		$doc->sync();
@@ -149,11 +170,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $doc->modified());
 		$doc->sync();
 
-		$expected = array_fill_keys($fields, false);
-
-		$doc->array[1] = array(
-			'foo' => 'bar'
-		);
+		$doc->array[1] = array('foo' => 'bar');
 		$expected['array'] = true;
 
 		$this->assertEqual($expected, $doc->modified());
