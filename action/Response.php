@@ -110,8 +110,9 @@ class Response extends \lithium\net\http\Response {
 	 */
 	public function render() {
 		$code = null;
+		$hasLocation = (isset($this->headers['location']) || isset($this->headers['Location']));
 
-		if (isset($this->headers['location']) && $this->status['code'] === 200) {
+		if ($hasLocation && $this->status['code'] === 200) {
 			$code = 302;
 		}
 		$this->_writeHeader($this->status($code) ?: $this->status(500));

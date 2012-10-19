@@ -191,6 +191,18 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual(array('Location: /foo_bar'), $this->response->headers());
 	}
 
+	/**
+	 * Tests that, when a location is assigned without a status code being set, that the status code
+	 * will be automatically set to 302 when the response is rendered.
+	 */
+	public function testBrowserRedirection() {
+		$this->response = new MockResponse(array('location' => '/'));
+		ob_start();
+		$this->response->render();
+		ob_get_clean();
+		$this->assertEqual('HTTP/1.1 302 Found', $this->response->status());
+	}
+
 	public static function match($url) {
 		if ($url == array('controller' => 'foo_bar', 'action' => 'index')) {
 			return '/foo_bar';
