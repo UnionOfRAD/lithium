@@ -239,7 +239,6 @@ class MongoDb extends \lithium\data\Source {
 		$connection = "mongodb://{$login}{$host}" . ($login ? "/{$cfg['database']}" : '');
 
 		$options = array(
-			'connect' => true,
 			'timeout' => $cfg['timeout'],
 			'replicaSet' => $cfg['replicaSet']
 		);
@@ -249,7 +248,12 @@ class MongoDb extends \lithium\data\Source {
 				$options['persist'] = $persist === true ? 'default' : $persist;
 			}
 			$this->server = new Mongo($connection, $options);
-
+			$this->server->connect();
+			
+			if (isset($cfg['readPreference'])) {
+				$this->server->setReadPreference($cfg['readPreference']);
+			}
+			
 			if ($this->connection = $this->server->{$cfg['database']}) {
 				$this->_isConnected = true;
 			}
