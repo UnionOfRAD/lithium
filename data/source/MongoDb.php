@@ -137,8 +137,12 @@ class MongoDb extends \lithium\data\Source {
 	 *          information for a model class. See the `$_schema` property for more information.
 	 *        - `'gridPrefix'` _string_: The default prefix for MongoDB's `chunks` and `files`
 	 *          collections. Defaults to `'fs'`.
-	 *        - `'replicaSet'` _boolean_: See the documentation for `Mongo::__construct()`. Defaults
+	 *        - `'replicaSet'` _string_: See the documentation for `Mongo::__construct()`. Defaults
 	 *          to `false`.
+	 *        - `'readPreference'` _mixed_: May either be a single value such as Mongo::RP_NEAREST, 
+	 *          or an array containing a read preference and a tag set such as: 
+	 *          array(Mongo::RP_SECONDARY_PREFERRED, array('dc' => 'east) See the documentation for 
+	 *          `Mongo::setReadPreference()`. Defaults to null.	 
 	 *
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
@@ -157,7 +161,8 @@ class MongoDb extends \lithium\data\Source {
 			'timeout'    => 100,
 			'replicaSet' => false,
 			'schema'     => null,
-			'gridPrefix' => 'fs'
+			'gridPrefix' => 'fs',
+			'readPreference' => null
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -239,24 +244,30 @@ class MongoDb extends \lithium\data\Source {
 		$connection = "mongodb://{$login}{$host}" . ($login ? "/{$cfg['database']}" : '');
 
 		$options = array(
-			'timeout' => $cfg['timeout'],
-			'replicaSet' => $cfg['replicaSet']
+			'timeout' => $cfg['timeout'], 
+			'replicaSet' => $cfg['replicaSet'],
+			'connect' => true
 		);
 
 		try {
 			if ($persist = $cfg['persistent']) {
 				$options['persist'] = $persist === true ? 'default' : $persist;
 			}
-			$this->server = new Mongo($connection, $options);
-			$this->server->connect();
 			
-			if (isset($cfg['readPreference'])) {
-				$this->server->setReadPreference($cfg['readPreference']);
-			}
+			$this->server = new Mongo($connection, $options);
 			
 			if ($this->connection = $this->server->{$cfg['database']}) {
 				$this->_isConnected = true;
 			}
+			
+			if ($prefs = $cfg['readPreference']) {
+				//If $prefs is an array use as is, otherwise (as is the case when only a read preference
+				// has been specified) set prefs to an array containing itself, and an empty array for
+				// tags.
+				$prefs = !is_array($prefs) ? array($prefs, array()) : $prefs;
+				$this->server->setReadPreference($prefs[0], $prefs[1]);
+			}
+			
 		} catch (Exception $e) {
 			throw new NetworkException("Could not connect to the database.", 503, $e);
 		}
