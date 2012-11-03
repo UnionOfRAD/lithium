@@ -162,6 +162,7 @@ class MongoDb extends \lithium\data\Source {
 			'replicaSet' => false,
 			'schema'     => null,
 			'gridPrefix' => 'fs',
+			'safe'       => false,
 			'readPreference' => null
 		);
 		parent::__construct($config + $defaults);
@@ -376,12 +377,12 @@ class MongoDb extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function create($query, array $options = array()) {
-		$defaults = array('safe' => false, 'fsync' => false);
+		$_config = $this->_config;
+		$defaults = array('safe' => $_config['safe'], 'fsync' => false);
 		$options += $defaults;
 		$this->_checkConnection();
 
 		$params = compact('query', 'options');
-		$_config = $this->_config;
 		$_exp = $this->_classes['exporter'];
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config, $_exp) {
@@ -506,12 +507,12 @@ class MongoDb extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function update($query, array $options = array()) {
-		$defaults = array('upsert' => false, 'multiple' => true, 'safe' => false, 'fsync' => false);
+		$_config = $this->_config;
+		$defaults = array('upsert' => false, 'multiple' => true, 'safe' => $_config['safe'], 'fsync' => false);
 		$options += $defaults;
 		$this->_checkConnection();
 
 		$params = compact('query', 'options');
-		$_config = $this->_config;
 		$_exp = $this->_classes['exporter'];
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config, $_exp) {
@@ -550,12 +551,12 @@ class MongoDb extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function delete($query, array $options = array()) {
-		$this->_checkConnection();
-		$defaults = array('justOne' => false, 'safe' => false, 'fsync' => false);
-		$options = array_intersect_key($options + $defaults, $defaults);
 		$_config = $this->_config;
-		$params = compact('query', 'options');
+		$this->_checkConnection();
+		$defaults = array('justOne' => false, 'safe' => $_config['safe'], 'fsync' => false);
+		$options = array_intersect_key($options + $defaults, $defaults);
 
+		$params = compact('query', 'options');
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
 			$query = $params['query'];
 			$options = $params['options'];
