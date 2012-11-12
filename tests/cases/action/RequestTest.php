@@ -137,6 +137,12 @@ class RequestTest extends \lithium\test\Unit {
 
 		$request = new Request(array('env' => array(
 			'REMOTE_ADDR' => '123.456.789.000',
+			'HTTP_X_REAL_IP' => '111.222.333.444'
+		)));
+		$this->assertEqual('111.222.333.444', $request->env('REMOTE_ADDR'));
+
+		$request = new Request(array('env' => array(
+			'REMOTE_ADDR' => '123.456.789.000',
 			'HTTP_X_FORWARDED_FOR' => '111.222.333.444',
 			'HTTP_PC_REMOTE_ADDR' => '222.333.444.555'
 		)));
