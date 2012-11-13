@@ -151,29 +151,33 @@ class MediaTest extends \lithium\test\Unit {
 	public function testCustomAssetUrls() {
 		$env = Environment::get();
 
+		$path = Libraries::get(true, 'path');
 		Libraries::add('cdn_js_test', array(
-			'path' => Libraries::get(true, 'path'),
+			'path' => $path,
 			'assets' => array(
 				'js' => 'http://static.cdn.com'
-			)
+			),
+			'bootstrap' => false
 		));
 
 		Libraries::add('cdn_env_test', array(
-			'path' => Libraries::get(true, 'path'),
+			'path' => $path,
 			'assets' => array(
 				'js' => 'wrong',
 				$env => array('js' => 'http://static.cdn.com/myapp')
-			)
+			),
+			'bootstrap' => false
 		));
+		$library = basename($path);
 
 		$result = Media::asset('foo', 'js', array('library' => 'cdn_js_test'));
-		$this->assertEqual("http://static.cdn.com/lithium/js/foo.js", $result);
+		$this->assertEqual("http://static.cdn.com/{$library}/js/foo.js", $result);
 
 		$result = Media::asset('foo', 'css', array('library' => 'cdn_js_test'));
-		$this->assertEqual("/lithium/css/foo.css", $result);
+		$this->assertEqual("/{$library}/css/foo.css", $result);
 
 		$result = Media::asset('foo', 'js', array('library' => 'cdn_env_test'));
-		$this->assertEqual("http://static.cdn.com/myapp/lithium/js/foo.js", $result);
+		$this->assertEqual("http://static.cdn.com/myapp/{$library}/js/foo.js", $result);
 
 		Libraries::remove('cdn_env_test');
 		Libraries::remove('cdn_js_test');
