@@ -17,6 +17,8 @@ use lithium\data\model\Query;
 use lithium\data\entity\Record;
 use lithium\tests\mocks\data\MockTag;
 use lithium\tests\mocks\data\MockPost;
+use lithium\tests\mocks\data\MockPostFiltered;
+use lithium\tests\mocks\data\MockPostFilteredSubClass;
 use lithium\tests\mocks\data\MockComment;
 use lithium\tests\mocks\data\MockTagging;
 use lithium\tests\mocks\data\MockCreator;
@@ -797,7 +799,7 @@ class ModelTest extends \lithium\test\Unit {
 		$object = MockPost::invokeMethod('_object');
 		$object->belongsTo = array('Unexisting');
 		MockPost::config();
-		MockPost::invokeMethod('_init', array('lithium\tests\mocks\data\MockPost'));
+		MockPost::invokeMethod('_initialize', array('lithium\tests\mocks\data\MockPost'));
 		$exception = 'Related model class \'lithium\tests\mocks\data\Unexisting\' not found.';
 		$this->expectException($exception);
 		MockPost::relations('Unexisting');
@@ -871,6 +873,53 @@ class ModelTest extends \lithium\test\Unit {
 			'source' => 'cool_post'
 		);
 		$this->assertEqual($expected, MockPost::meta());
+	}
+
+	public function testInit() {
+		MockPostFiltered::config(array('init' => false));
+		MockPostFiltered::config(array('init' => true));
+		MockPostFiltered::config(array('init' => false));
+		MockPostFiltered::reset();
+
+		MockPostFiltered::config(array('init' => false));
+		$this->assertIdentical(0, MockPostFiltered::$initCalled);
+		MockPostFiltered::invokeMethod('_object');
+		$this->assertIdentical(0, MockPostFiltered::$initCalled);
+		MockPostFiltered::reset();
+
+		MockPostFiltered::config(array('init' => true));
+		$this->assertIdentical(0, MockPostFiltered::$initCalled);
+		MockPostFiltered::invokeMethod('_object');
+		$this->assertIdentical(1, MockPostFiltered::$initCalled);
+		MockPostFiltered::invokeMethod('_object');
+		$this->assertIdentical(1, MockPostFiltered::$initCalled);
+
+		$exception = 'Invalid `init` option, `lithium\tests\mocks\data\MockPostFiltered::_init()` ';
+		$exception .= 'has already been called.';
+		$this->expectException($exception);
+		MockPostFiltered::config(array('init' => false));
+	}
+
+	public function testFilterInInit() {
+		$this->assertIdentical('bob filtered static', MockPostFiltered::filteredStatic('bob'));
+		$entity = MockPostFiltered::create();
+		$this->assertIdentical('bill filtered dynamic', $entity->filteredDynamic('bill'));
+
+		MockPostFiltered::reset();
+		MockPostFiltered::config(array('init' => false));
+		$this->assertIdentical('bob', MockPostFiltered::filteredStatic('bob'));
+		$entity = MockPostFiltered::create();
+		$this->assertIdentical('bill', $entity->filteredDynamic('bill'));
+
+		MockPostFiltered::reset();
+		$this->assertIdentical('bob filtered static', MockPostFiltered::filteredStatic('bob'));
+		$entity = MockPostFiltered::create();
+		$this->assertIdentical('bill filtered dynamic', $entity->filteredDynamic('bill'));
+
+		$result = MockPostFilteredSubClass::filteredStatic('bob');
+		$this->assertIdentical('bob sub class filtered static', $result);
+		$entity = MockPostFilteredSubClass::create();
+		$this->assertIdentical('bill sub class filtered dynamic', $entity->filteredDynamic('bill'));
 	}
 }
 

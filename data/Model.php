@@ -329,8 +329,19 @@ class Model extends \lithium\core\StaticObject {
 		'query',
 		'schema',
 		'classes',
-		'initializers'
+		'initializers',
+		'init'
 	);
+
+	/**
+	 * The init config option
+	 */
+	protected $_init = null;
+
+	/**
+	 * Boolean indicates if the `Model::_init()` has been launched at the initialization step.
+	 */
+	protected $_inited = false;
 
 	/**
 	 * Configures the model for use. This method will set the `Model::$_schema`, `Model::$_meta`,
@@ -349,8 +360,12 @@ class Model extends \lithium\core\StaticObject {
 			return;
 		}
 
+		$config += array('init' => true);
 		if (!isset(static::$_instances[$class])) {
 			static::$_instances[$class] = new $class();
+		} else if (!$config['init'] && static::$_instances[$class]->_inited) {
+			$msg = "Invalid `init` option, `{$class}::_init()` has already been called.";
+			throw new ConfigException($msg);
 		}
 		$self = static::$_instances[$class];
 
@@ -366,6 +381,16 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Initializer function called just after the model instanciation.
+	 *
+	 * Example to disable the `_init()` call use the following before any access to the model:
+	 * {{{
+	 * Posts::config(array('init' => false));
+	 * }}}
+	 */
+	protected function _init() {}
+
+	/**
 	 * Init default connection options and connects default finders.
 	 *
 	 * This method will set the `Model::$_schema`, `Model::$_meta`, `Model::$_finders` class
@@ -374,7 +399,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @param string $class The fully-namespaced class name to initialize.
 	 * @return object Returns the initialized model instance.
 	 */
-	protected static function _init($class) {
+	protected static function _initialize($class) {
 		$self = static::$_instances[$class];
 
 		if (isset(static::$_initialized[$class]) && static::$_initialized[$class]) {
@@ -438,6 +463,12 @@ class Model extends \lithium\core\StaticObject {
 		$self->_finders += $source['finders'] + $self->_findFilters();
 
 		static::_relationsToLoad();
+
+		if (!$self->_inited && $self->_init) {
+			$self->_init();
+			$self->_inited = true;
+		}
+
 		return $self;
 	}
 
@@ -1208,7 +1239,7 @@ class Model extends \lithium\core\StaticObject {
 			static::$_instances[$class] = new $class();
 			static::config();
 		}
-		$object = static::_init($class);
+		$object = static::_initialize($class);
 		return $object;
 	}
 
