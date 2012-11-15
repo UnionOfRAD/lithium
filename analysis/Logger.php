@@ -103,7 +103,8 @@ class Logger extends \lithium\core\Adaptable {
 		$options += $defaults;
 		$result = true;
 
-		if ($name = $options['name']) {
+		if (isset(self::$_configurations[$options['name']])) {
+			$name = $options['name'];
 			$methods = array($name => static::adapter($name)->write($priority, $message, $options));
 		} elseif (!isset(static::$_priorities[$priority])) {
 			$message = "Attempted to write log message with invalid priority `{$priority}`.";
