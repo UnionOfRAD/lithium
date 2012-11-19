@@ -269,6 +269,11 @@ class LocaleTest extends \lithium\test\Unit {
 			'HTTP_ACCEPT_LANGUAGE' => 'fr;q=1, en-gb;q=0.8, en;q=0.7'
 		)));
 		$result = Locale::preferred($request);
+
+		$request = new ActionRequest(array('env' => array(
+			'HTTP_ACCEPT_LANGUAGE' => 'fr,en,it,es;q=0.7'
+		)));
+		$result = Locale::preferred($request, array('en', 'fr', 'it'));
 		$this->assertEqual('fr', $result);
 
 		$request = new ActionRequest(array(
