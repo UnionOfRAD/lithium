@@ -258,11 +258,17 @@ class Locale extends \lithium\core\StaticObject {
 			if (preg_match($regex, $part, $matches)) {
 				$locale = static::canonicalize($matches['locale']);
 				$quality = isset($matches['quality']) ? $matches['quality'] : 1;
-				$result[$locale] = (float) $quality;
+				$result[$quality][] = $locale;
 			}
 		}
-		arsort($result);
-		return array_keys($result);
+
+		krsort($result);
+		$return = array();
+
+		foreach ($result as $locales) {
+			$return = array_merge($return, array_values($locales));
+		}
+		return $return;
 	}
 
 	/**
