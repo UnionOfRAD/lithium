@@ -906,7 +906,7 @@ abstract class Database extends \lithium\data\Source {
 			return;
 		}
 		if ($offset = $context->offset() ?: '') {
-			$offset .= ', ';
+			$offset = ' OFFSET '. $offset;
 		}
 		return "LIMIT {$offset}{$limit}";
 	}
