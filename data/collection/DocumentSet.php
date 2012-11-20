@@ -39,6 +39,35 @@ class DocumentSet extends \lithium\data\Collection {
 	}
 
 	/**
+	 * Determines if the `DocumentSet` has been modified since it was last saved
+	 *
+	 * @return boolean
+	 */
+	public function modified() {
+		if (count($this->_original) !== count($this->_data)) {
+			return true;
+		}
+		foreach ($this->_original as $key => $doc) {
+			$updated = $this->_data[$key];
+			if (!isset($updated)) {
+				return true;
+			}
+			if ($doc !== $updated) {
+				return true;
+			}
+			if (!is_object($updated) || !method_exists($updated, 'modified')) {
+				continue;
+			}
+			$modified = $this->_data[$key]->modified();
+
+			if (in_array(true, $modified)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Adds conversions checks to ensure certain class types and embedded values are properly cast.
 	 *
 	 * @param string $format Currently only `array` is supported.

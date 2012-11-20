@@ -19,7 +19,7 @@ class MockSource extends \lithium\data\Source {
 		'schema' => 'lithium\data\Schema'
 	);
 
-	private $_mockPosts = array(
+	protected $_mockPosts = array(
 		'id' => array('type' => 'int', 'length' => '10', 'null' => false, 'default' => null),
 		'user_id' => array(
 			'type' => 'int', 'length' => '10', 'null' => true, 'default' => null
@@ -41,7 +41,7 @@ class MockSource extends \lithium\data\Source {
 		)
 	);
 
-	private $_mockComments = array(
+	protected $_mockComments = array(
 		'id' => array(
 			'type' => 'int', 'length' => '10', 'null' => false, 'default' => null
 		),
@@ -71,7 +71,7 @@ class MockSource extends \lithium\data\Source {
 		)
 	);
 
-	private $_mockTags = array(
+	protected $_mockTags = array(
 		'id' => array(
 			'type' => 'int', 'length' => '10', 'null' => false, 'default' => null
 		),

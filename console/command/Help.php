@@ -88,7 +88,7 @@ class Help extends \lithium\console\Command {
 	}
 
 	/**
-	 * Get the api for the class.
+	 * Gets the API for the class.
 	 *
 	 * @param string $class fully namespaced class in dot notation.
 	 * @param string $type method|property
@@ -102,8 +102,8 @@ class Help extends \lithium\console\Command {
 			default:
 				$info = Inspector::info($class);
 				$result = array('class' => array(
-					'name' => Inflector::classify($info['shortName']),
-					'description' => $info['description']
+					'name' => $info['shortName'],
+					'description' => trim($info['description'] . PHP_EOL . PHP_EOL . $info['text'])
 				));
 			break;
 			case 'method':
@@ -163,7 +163,7 @@ class Help extends \lithium\console\Command {
 			$comment = Docblock::comment($method['docComment']);
 
 			$name = $method['name'];
-			$description = $comment['description'];
+			$description = trim($comment['description'] . PHP_EOL . $comment['text']);
 			$args = $method['args'];
 			$return = null;
 
@@ -288,13 +288,9 @@ class Help extends \lithium\console\Command {
 		$args = array_reduce($method['args'], function($a, $b) {
 			return "{$a} {$b['usage']}";
 		});
-		$this->out($this->_pad(sprintf(
-			"{:command}li3 %s%s{:end}{:command}%s{:end}{:option}%s{:end}",
-			$command ?: 'COMMAND',
-			$method['name'] == 'run' ? '' : " {$method['name']}",
-			$params,
-			$args
-		)));
+		$format = "{:command}li3 %s%s{:end}{:command}%s{:end}{:option}%s{:end}";
+		$name = $method['name'] == 'run' ? '' : " {$method['name']}";
+		$this->out($this->_pad(sprintf($format, $command ?: 'COMMAND', $name, $params, $args)));
 	}
 
 	/**
@@ -305,7 +301,9 @@ class Help extends \lithium\console\Command {
 	 */
 	protected function _renderDescription($info) {
 		$this->out('DESCRIPTION', 'heading');
-		$this->out($this->_pad(strtok($info['description'], "\n"), 1));
+		$break = PHP_EOL . PHP_EOL;
+		$description = trim("{$info['description']}{$break}{$info['text']}");
+		$this->out($this->_pad($description, PHP_EOL));
 	}
 
 	/**

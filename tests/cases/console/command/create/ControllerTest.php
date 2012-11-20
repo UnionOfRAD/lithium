@@ -78,7 +78,7 @@ class ControllerTest extends \lithium\test\Unit {
 		));
 		$controller->path = $this->_testPath;
 		$controller->run('controller');
-		$expected = "PostsController created in create_test\\controllers.\n";
+		$expected = "PostsController created in controllers/PostsController.php.\n";
 		$result = $controller->response->output;
 		$this->assertEqual($expected, $result);
 

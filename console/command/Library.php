@@ -13,6 +13,7 @@ use Exception;
 use RuntimeException;
 use lithium\core\Libraries;
 use lithium\util\String;
+use lithium\util\Inflector;
 
 /**
  * The Library command is used to archive and extract Phar::GZ archives. Requires zlib extension.
@@ -237,7 +238,7 @@ class Library extends \lithium\console\Command {
 				$this->out(basename($to) . " created in " . dirname($to) . " from {$from}");
 
 				if (empty($this->namespace)) {
-					$this->namespace = basename($to);
+					$this->namespace = Inflector::underscore(basename($to));
 				}
 
 				$replacements = $this->_findReplacements($to);

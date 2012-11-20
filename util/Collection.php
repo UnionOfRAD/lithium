@@ -349,6 +349,17 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	}
 
 	/**
+	 * Reduce, or fold, a collection down to a single value
+	 *
+	 * @param callback $filter The filter to apply.
+	 * @param mixed $initial Initial value
+	 * @return mixed A single reduced value
+	 */
+	public function reduce($filter, $initial = false) {
+		return array_reduce($this->_data, $filter, $initial);
+	}
+
+	/**
 	 * Sorts the objects in the collection.
 	 *
 	 * @param callable $sorter The sorter for the data, can either be a sort function like

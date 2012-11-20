@@ -147,16 +147,17 @@ class Session extends \lithium\core\Adaptable {
 			}
 		}
 		$result = false;
-		$settings = static::_config($name);
 
-		if ($options['strategies']) {
-			$options += array('key' => $key, 'class' => __CLASS__);
-			$value = static::applyStrategies(__FUNCTION__, $name, $value, $options);
-		}
-		$params = compact('key', 'value', 'options');
+		$original = $value;
 
 		foreach ($methods as $name => $method) {
+			$settings = static::_config($name);
 			$filters = $settings['filters'];
+			if ($options['strategies']) {
+				$options += array('key' => $key, 'class' => __CLASS__);
+				$value = static::applyStrategies(__FUNCTION__, $name, $original, $options);
+			}
+			$params = compact('key', 'value', 'options');
 			$result = static::_filter(__FUNCTION__, $params, $method, $filters) || $result;
 		}
 		return $result;
@@ -192,15 +193,15 @@ class Session extends \lithium\core\Adaptable {
 		}
 		$result = false;
 		$options += array('key' => $key, 'class' => __CLASS__);
-
-		if ($options['strategies']) {
-			$options += array('key' => $key, 'class' => __CLASS__);
-			$key = static::applyStrategies(__FUNCTION__, $name, $key, $options);
-		}
-		$params = compact('key', 'options');
+		$original = $key;
 
 		foreach ($methods as $name => $method) {
 			$settings = static::_config($name);
+			if ($options['strategies']) {
+				$options += array('key' => $key, 'class' => __CLASS__);
+				$key = static::applyStrategies(__FUNCTION__, $name, $original, $options);
+			}
+			$params = compact('key', 'options');
 			$filters = $settings['filters'];
 			$result = static::_filter(__FUNCTION__, $params, $method, $filters) || $result;
 		}

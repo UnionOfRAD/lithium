@@ -29,6 +29,10 @@ class MockRequest extends \lithium\core\Object {
 		}
 		return null;
 	}
+
+	public function get($key) {
+		return $this->env($key);
+	}
 }
 
 ?>

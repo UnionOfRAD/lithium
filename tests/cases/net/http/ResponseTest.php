@@ -51,33 +51,33 @@ class ResponseTest extends \lithium\test\Unit {
 		$response = new Response(array('headers' => array(
 			'Content-Type' => 'text/xml;charset=UTF-8'
 		)));
-		$this->assertEqual('text/xml', $response->type);
+		$this->assertEqual('xml', $response->type());
 		$this->assertEqual('UTF-8', $response->encoding);
 
 		$response = new Response(array('headers' => array(
 			'Content-Type' => 'application/soap+xml; charset=iso-8859-1'
 		)));
-		$this->assertEqual('application/soap+xml', $response->type);
+		$this->assertEqual('xml', $response->type());
 		$this->assertEqual('ISO-8859-1', $response->encoding);
 
 		// Content type WITHOUT space between type and charset
 		$response = new Response(array('headers' => array(
 			'Content-Type' => 'application/json;charset=iso-8859-1'
 		)));
-		$this->assertEqual('application/json', $response->type);
+		$this->assertEqual('json', $response->type());
 		$this->assertEqual('ISO-8859-1', $response->encoding);
 
 		// Content type WITH ONE space between type and charset
 		$response = new Response(array('headers' => array(
 			'Content-Type' => 'application/json; charset=iso-8859-1'
 		)));
-		$this->assertEqual('application/json', $response->type);
+		$this->assertEqual('json', $response->type());
 		$this->assertEqual('ISO-8859-1', $response->encoding);
 
 		$response = new Response(array('headers' => array(
 			'Content-Type' => 'application/json;     charset=iso-8859-1'
 		)));
-		$this->assertEqual('application/json', $response->type);
+		$this->assertEqual('json', $response->type());
 		$this->assertEqual('ISO-8859-1', $response->encoding);
 	}
 
@@ -85,8 +85,15 @@ class ResponseTest extends \lithium\test\Unit {
 		$response = new Response(array('headers' => array(
 			'Content-Type' => 'application/json'
 		)));
-		$this->assertEqual('application/json', $response->type);
+		$this->assertEqual('json', $response->type());
 		$this->assertEqual('UTF-8', $response->encoding); //default
+	}
+
+	public function testParsingContentTypeWithVersionNumber() {
+		$response = new Response(array('headers' => array(
+			'Content-Type' => 'application/x-amz-json-1.0'
+		)));
+		$this->assertEqual('application/x-amz-json-1.0', $response->type());
 	}
 
 	public function testConstructionWithBody() {
@@ -99,23 +106,71 @@ class ResponseTest extends \lithium\test\Unit {
 
 	public function testParseMessage() {
 		$message = join("\r\n", array(
-			'HTTP/1.1 200 OK',
+			'HTTP/1.1 404 Not Found',
 			'Header: Value',
 			'Connection: close',
-			'Content-Type: application/json;charset=iso-8859-1',
+			'Content-Type: text/plain;charset=ISO-8859-1',
 			'',
 			'Test!'
 		));
 
 		$response = new Response(compact('message'));
 		$this->assertEqual($message, (string) $response);
-		$this->assertEqual('application/json', $response->type);
+		$this->assertEqual('text', $response->type());
 		$this->assertEqual('ISO-8859-1', $response->encoding);
+		$this->assertEqual('404', $response->status['code']);
+		$this->assertEqual('Not Found', $response->status['message']);
+		$this->assertEqual('HTTP/1.1 404 Not Found', $response->status());
 
 		$body = 'Not a Message';
 		$expected = join("\r\n", array('HTTP/1.1 200 OK', '', '', 'Not a Message'));
 		$response = new Response(compact('body'));
 		$this->assertEqual($expected, (string) $response);
+	}
+
+	public function testParseMessageWithContentTypeHeaderSetsType() {
+		$response = new Response(array(
+			'message' => join("\r\n", array(
+				'HTTP/1.1 200 OK',
+				'Content-Type: text/x-test-a',
+				'',
+				'foo!'
+			))
+		));
+		$this->assertEqual('text/x-test-a', $response->headers('Content-Type'));
+	}
+
+	public function testContentTypeHeaderAndTypePropertyAreSynchronized() {
+		$response = new Response(array(
+			'message' => "Content-type: text/x-test-a\r\n\r\nfoo"
+		));
+		$this->assertEqual($response->type(), $response->headers('Content-Type'));
+
+		$response = new Response(array(
+			'headers' => array('Content-Type' => 'text/x-test-a')
+		));
+		$this->assertEqual($response->type(), $response->headers('Content-Type'));
+
+		$response = new Response(array(
+			'type' => 'text/x-test-a'
+		));
+		$this->assertEqual($response->type(), $response->headers('Content-Type'));
+	}
+
+	public function testParseMessageHeadersMerging() {
+		$response = new Response(array(
+			'message' => "Content-type: text/x-test-a\r\nX-Test-A: foo\r\n\r\nfoo",
+			'headers' => array(
+				'Content-Type' => 'text/x-test-b',
+				'X-Test-B' => 'bar'
+			)
+		));
+		$expected = array(
+			'Content-Type: text/x-test-b',
+			'X-Test-B: bar',
+			'X-Test-A: foo'
+		);
+		$this->assertEqual($expected, $response->headers());
 	}
 
 	public function testEmptyResponse() {
@@ -149,6 +204,61 @@ class ResponseTest extends \lithium\test\Unit {
 		);
 		$response = new Response($config);
 		$this->assertEqual($expected, (string) $response);
+	}
+
+	public function testToStringDoesNotAddContentTypeHeaderOnTextHtml() {
+		$response = new Response();
+
+		$expected = "HTTP/1.1 200 OK\r\n\r\n\r\n";
+		$result = (string) $response;
+		$this->assertEqual($expected, $result);
+
+		/* Decide what to do with this */
+		return "Is this test correct?";
+
+		$response = new Response();
+		$response->type('text/html');
+
+		$expected = "HTTP/1.1 200 OK\r\n\r\n\r\n";
+		$result = (string) $response;
+		$this->assertEqual($expected, $result);
+
+		$response = new Response();
+		$response->type('text/plain');
+
+		$expected = "HTTP/1.1 200 OK\r\nContent-Type: text/plain;charset=UTF-8\r\n\r\n";
+		$result = (string) $response;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testToStringTypeAlwaysUsesContentTypeHeader() {
+		$response = new Response();
+		$response->headers('Content-Type', 'text/html');
+
+		$expected = "HTTP/1.1 200 OK\r\nContent-Type: text/html;charset=UTF-8\r\n\r\n";
+		$result = (string) $response;
+		$this->assertEqual($expected, $result);
+
+		$response = new Response();
+		$response->headers('Content-Type', 'text/plain');
+
+		$expected = "HTTP/1.1 200 OK\r\nContent-Type: text/plain;charset=UTF-8\r\n\r\n";
+		$result = (string) $response;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testToStringPrefersHeadersContentTypeOverType() {
+
+		/* Decide what to do with this */
+		return "Is this test correct?";
+
+		$response = new Response();
+		$response->headers('Content-Type', 'text/plain');
+		$response->type('text/html');
+
+		$expected = "HTTP/1.1 200 OK\r\nContent-Type: text/plain;charset=UTF-8\r\n\r\n";
+		$result = (string) $response;
+		$this->assertEqual($expected, $result);
 	}
 
 	function testTransferEncodingChunkedDecode()  {
@@ -211,11 +321,30 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testTypePriority() {
+
+		/* Decide what to do with this */
+		return "Is this test correct?";
+
+		$response = new Response(array(
+			'message' => "Content-type: text/x-test-a\r\n\r\nfoo",
+			'type' => 'text/x-test-b',
+			'headers' => array('Content-Type' => 'text/x-test-c')
+		));
+		$this->assertEqual('text/x-test-c', $response->type());
+
+		$response = new Response(array(
+			'message' => "Content-type: text/x-test-a\r\n\r\nfoo",
+			'type' => 'text/x-test-b'
+		));
+		$this->assertEqual('text/x-test-b', $response->type());
+	}
+
 	public function testTypeHeader() {
 		$response = new Response(array('type' => 'application/json'));
 		$result = (string) $response;
 		$this->assertPattern('/^HTTP\/1\.1 200 OK/', $result);
-		$this->assertPattern('/Content-Type: application\/json\s+$/ms', $result);
+		$this->assertPattern('/Content-Type: application\/json(.*)$/ms', $result);
 	}
 
 	/**
@@ -298,6 +427,38 @@ class ResponseTest extends \lithium\test\Unit {
 			'opaque' => 'dd7bcee161192cb8fba765eb595eba87'
 		);
 		$result = array_filter($response->digest());
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testMalformedStatus() {
+		$expected = "HTTP/1.1 304 Not Modified";
+
+		$message = join("\r\n", array(
+			'HTTP/1.1 304',
+			'Header: Value',
+			'Connection: close',
+			'Content-Type: application/json;charset=iso-8859-1',
+			'',
+			'Test!'
+		));
+
+		$response = new Response(compact('message'));
+		$result = $response->status();
+		$this->assertEqual($expected, $result);
+
+		$expected = "HTTP/1.1 500 Internal Server Error";
+
+		$message = join("\r\n", array(
+			'HTTP/1.1 500',
+			'Header: Value',
+			'Connection: close',
+			'Content-Type: application/json;charset=iso-8859-1',
+			'',
+			'Test!'
+		));
+
+		$response = new Response(compact('message'));
+		$result = $response->status();
 		$this->assertEqual($expected, $result);
 	}
 }

@@ -173,7 +173,9 @@ class FormTest extends \lithium\test\Unit {
 			'id' => '5',
 			'author_id' => '2',
 			'title' => 'This is a saved post',
-			'body' => 'This is the body of the saved post'
+			'body' => 'This is the body of the saved post',
+			'zeroInt' => 0,
+			'zeroString' => "0"
 		)));
 
 		$result = $this->form->create($record);
@@ -185,6 +187,18 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array('input' => array(
 			'type' => 'text', 'name' => 'title',
 			'value' => 'This is a saved post', 'id' => 'MockFormPostTitle'
+		)));
+
+
+		$result = $this->form->text('zeroInt');
+		$this->assertTags($result, array('input' => array(
+			'type' => 'text', 'name' => 'zeroInt',
+			'value' => '0', 'id' => 'MockFormPostZeroInt'
+		)));
+		$result = $this->form->text('zeroString');
+		$this->assertTags($result, array('input' => array(
+			'type' => 'text', 'name' => 'zeroString',
+			'value' => '0', 'id' => 'MockFormPostZeroString'
 		)));
 
 		$this->assertEqual('</form>', $this->form->end());
@@ -384,6 +398,22 @@ class FormTest extends \lithium\test\Unit {
 			array('input' => array(
 				'type' => 'checkbox', 'value' => '1', 'name' => 'foo',
 				'checked' => 'checked', 'id' => 'MockFormPostFoo'
+			))
+		));
+
+		$document = new Document(array('model' => $this->_model, 'data' =>
+			array('subdocument' => array('foo' => true))
+		));
+		$this->form->create($document);
+
+		$result = $this->form->checkbox('subdocument.foo');
+		$this->assertTags($result, array(
+			array('input' => array(
+				'type' => 'hidden', 'value' => '', 'name' => 'subdocument[foo]')
+			),
+			array('input' => array(
+				'type' => 'checkbox', 'value' => '1', 'name' => 'subdocument[foo]',
+				'checked' => 'checked', 'id' => 'MockFormPostSubdocumentFoo'
 			))
 		));
 	}
@@ -603,6 +633,43 @@ class FormTest extends \lithium\test\Unit {
 			'/option',
 			'/select'
 		));
+	}
+
+	/**
+	 * When trying to determine which option of a select box should be selected, we should be
+	 * integer/string agnostic because it all looks the same in HTML.
+	 *
+	 */
+	public function testSelectTypeAgnosticism() {
+		$taglist = array(
+			'select' => array('name' => 'numbers', 'id' => 'Numbers'),
+			array('option' => array('value' => '0')),
+			'Zero',
+			'/option',
+			array('option' => array('value' => '1', 'selected' => 'selected')),
+			'One',
+			'/option',
+			array('option' => array('value' => '2')),
+			'Two',
+			'/option',
+			'/select'
+		);
+
+		$result = $this->form->select(
+			'numbers',
+			array(0 => 'Zero', 1 => 'One', 2 => 'Two'),
+			array('id' => 'Numbers', 'value' => '1')
+		);
+
+		$this->assertTags($result, $taglist);
+
+		$result = $this->form->select(
+			'numbers',
+			array('0' => 'Zero', '1' => 'One', '2' => 'Two'),
+			array('id' => 'Numbers', 'value' => 1)
+		);
+
+		$this->assertTags($result, $taglist);
 	}
 
 	public function testSelectWithEmptyOption() {
@@ -1179,9 +1246,16 @@ class FormTest extends \lithium\test\Unit {
 	 * Tests that magic method support can be used to automatically generate a `<button />` tag
 	 * based on the default string template.
 	 */
-	public function testAutoMagicButton() {
+	public function testButton() {
 		$result = $this->form->button('Foo!', array('id' => 'bar'));
 		$this->assertTags($result, array('button' => array('id' => 'bar'), 'Foo!', '/button'));
+
+		$result = $this->form->button('Continue >', array('type' => 'submit'));
+		$this->assertTags($result, array(
+			'button' => array('type' => 'submit', 'id' => 'Continue'),
+			'Continue &gt;',
+			'/button'
+		));
 	}
 
 	/**

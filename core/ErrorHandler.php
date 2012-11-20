@@ -32,13 +32,6 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	protected static $_config = array();
 
 	/**
-	 * Error/exception handlers.
-	 *
-	 * @var array An array of closures that represent all invokable error/exception handlers.
-	 */
-	protected static $_handlers = array();
-
-	/**
 	 * Types of checks available for sorting & parsing errors/exceptions.
 	 * Default checks are for `code`, `stack` and `message`.
 	 *
@@ -107,17 +100,6 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Getter & setter of error/exception handlers.
-	 *
-	 * @param array $handlers If set, the passed `$handlers` array will be merged with
-	 *        the already defined handlers in the `ErrorHandler` static class.
-	 * @return array Current set of handlers.
-	 */
-	public static function handlers($handlers = array()) {
-		return (static::$_handlers = $handlers + static::$_handlers);
-	}
-
-	/**
 	 * Configure the `ErrorHandler`.
 	 *
 	 * @param array $config Configuration directives.
@@ -125,10 +107,6 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	 */
 	public static function config($config = array()) {
 		return (static::$_config = array_merge($config, static::$_config));
-	}
-
-	public static function handler($name, $info) {
-		return static::$_handlers[$name]($info);
 	}
 
 	/**
@@ -209,7 +187,6 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	public static function reset() {
 		static::$_config = array();
 		static::$_checks = array();
-		static::$_handlers = array();
 		static::$_exceptionHandler = null;
 		static::__init();
 	}

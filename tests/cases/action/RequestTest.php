@@ -137,6 +137,12 @@ class RequestTest extends \lithium\test\Unit {
 
 		$request = new Request(array('env' => array(
 			'REMOTE_ADDR' => '123.456.789.000',
+			'HTTP_X_REAL_IP' => '111.222.333.444'
+		)));
+		$this->assertEqual('111.222.333.444', $request->env('REMOTE_ADDR'));
+
+		$request = new Request(array('env' => array(
+			'REMOTE_ADDR' => '123.456.789.000',
 			'HTTP_X_FORWARDED_FOR' => '111.222.333.444',
 			'HTTP_PC_REMOTE_ADDR' => '222.333.444.555'
 		)));
@@ -175,6 +181,23 @@ class RequestTest extends \lithium\test\Unit {
 		)));
 		$this->assertEqual('/test_app', $request->env('base'));
 		$this->assertEqual('pages/test_app', $request->url);
+	}
+
+	public function testRequestWithColon() {
+		unset($_GET['url']);
+		$request = new Request(array('env' => array(
+			'PHP_SELF' => '/test_app/app/webroot/index.php',
+			'REQUEST_URI' => '/test_app/pages/test_app/test:a'
+		)));
+		$this->assertEqual('/test_app', $request->env('base'));
+		$this->assertEqual('pages/test_app/test:a', $request->url);
+
+		$request = new Request(array('env' => array(
+			'PHP_SELF' => '/test_app/app/webroot/index.php',
+			'REQUEST_URI' => '/test_app/pages/test_app/test:1'
+		)));
+		$this->assertEqual('/test_app', $request->env('base'));
+		$this->assertEqual('pages/test_app/test:1', $request->url);
 	}
 
 	public function testRequestWithoutUrlQueryParamAndNoApp() {
@@ -1058,6 +1081,18 @@ class RequestTest extends \lithium\test\Unit {
 		));
 		$expected = 'https://foo.com/the/base/path/posts?some=query&parameter=values';
 		$this->assertEqual($expected, $request->to('url'));
+	}
+
+	/**
+	 * Tests that the HTTP request method set by `Request` from the server information is not
+	 * overwritten in a parent class.
+	 */
+	public function testRequesMethodConfiguration() {
+		$request = new Request(array('env' => array('REQUEST_METHOD' => 'POST')));
+		$this->assertEqual('POST', $request->method);
+
+		$request = new Request(array('env' => array('REQUEST_METHOD' => 'PATCH')));
+		$this->assertEqual('PATCH', $request->method);
 	}
 }
 

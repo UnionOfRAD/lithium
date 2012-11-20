@@ -487,6 +487,15 @@ class RecordSetTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result->get('_data'));
 	}
 
+	public function testReduce() {
+		$filter = function($memo, $rec) {
+			return $memo + $rec->id;
+		};
+		$expected = 10;
+		$result = $this->_recordSet->reduce($filter, 0);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testRecordSet() {
 		$expected = array(
 			'post1' => array(

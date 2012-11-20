@@ -37,7 +37,7 @@ class Form extends \lithium\template\Helper {
 	 * @var array
 	 */
 	protected $_strings = array(
-		'button'         => '<button{:options}>{:name}</button>',
+		'button'         => '<button{:options}>{:title}</button>',
 		'checkbox'       => '<input type="checkbox" name="{:name}"{:options} />',
 		'checkbox-multi' => '<input type="checkbox" name="{:name}[]"{:options} />',
 		'checkbox-multi-group' => '{:raw}',
@@ -344,9 +344,9 @@ class Form extends \lithium\template\Helper {
 	/**
 	 * Returns the entity that the `Form` helper is currently bound to.
 	 *
+	 * @see lithium\template\helper\Form::$_binding
 	 * @param string $name If specified, match this field name against the list of bindings
 	 * @param string $key If $name specified, where to store relevant $_binding key
-	 * @see lithium\template\helper\Form::$_binding
 	 * @return object Returns an object, usually an instance of `lithium\data\Entity`.
 	 */
 	public function binding($name = null) {
@@ -418,7 +418,7 @@ class Form extends \lithium\template\Helper {
 	 *                parameters. By default, the label text is a human-friendly version of `$name`.
 	 *                However, you can specify the label manually as a string, or both the label
 	 *                text and options as an array, i.e.:
-	 *                `array('label text' => array('class' => 'foo', 'any' => 'other options'))`.
+	 *                `array('Your Label Title' => array('class' => 'foo', 'other' => 'options'))`.
 	 *              - `'type'` _string_: The type of form field to render. Available default options
 	 *                are: `'text'`, `'textarea'`, `'select'`, `'checkbox'`, `'password'` or
 	 *                `'hidden'`, as well as any arbitrary type (i.e. HTML5 form fields).
@@ -490,6 +490,23 @@ class Form extends \lithium\template\Helper {
 			$result[] = $this->field($field, compact('label') + $options);
 		}
 		return join("\n", $result);
+	}
+
+	/**
+	 * Generates an HTML button `<button></button>`.
+	 *
+	 * @param string $title The title of the button.
+	 * @param array $options Any options passed are converted to HTML attributes within the
+	 *              `<button></button>` tag.
+	 * @return string Returns a `<button></button>` tag with the given title and HTML attributes.
+	 */
+	public function button($title = null, array $options = array()) {
+		$defaults = array('escape' => true);
+		list($scope, $options) = $this->_options($defaults, $options);
+		list($title, $options, $template) = $this->_defaults(__METHOD__, $title, $options);
+
+		$arguments = compact('type', 'title', 'options', 'value');
+		return $this->_render(__METHOD__, 'button', $arguments, $scope);
 	}
 
 	/**
@@ -598,7 +615,7 @@ class Form extends \lithium\template\Helper {
 			$selected = (
 				(is_array($scope['value']) && in_array($value, $scope['value'])) ||
 				($scope['empty'] && empty($scope['value']) && $value === '') ||
-				($scope['value'] === (is_integer($value) ? (string) $value : $value) )
+				(is_scalar($scope['value']) && ((string) $scope['value'] === (string) $value))
 			);
 			$options = $selected ? array('selected' => true) : array();
 			$params = compact('value', 'title', 'options');
@@ -622,12 +639,13 @@ class Form extends \lithium\template\Helper {
 		$defaults = array('value' => '1', 'hidden' => true);
 		$options += $defaults;
 		$default = $options['value'];
+		$key = $name;
 		$out = '';
 
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		list($scope, $options) = $this->_options($defaults, $options);
 
-		if (!isset($options['checked']) && ($bound = $this->binding($name)->data)) {
+		if (!isset($options['checked']) && ($bound = $this->binding($key)->data)) {
 			$options['checked'] = ($bound == $default);
 		}
 		if ($scope['hidden']) {
@@ -785,10 +803,14 @@ class Form extends \lithium\template\Helper {
 			(!isset($options['value']) || $options['value'] === null) &&
 			$name && $value = $this->binding($name)->data
 		);
-		if ($hasValue) {
+		$isZero = (isset($value) && ($value === 0 || $value === "0"));
+		if ($hasValue || $isZero) {
 			$options['value'] = $value;
 		}
-		if (isset($options['default']) && empty($options['value'])) {
+		if (isset($options['value']) && !$isZero) {
+			$isZero = ($options['value'] === 0 || $options['value'] === "0");
+		}
+		if (isset($options['default']) && empty($options['value']) && !$isZero) {
 			$options['value'] = $options['default'];
 		}
 		unset($options['default']);

@@ -79,7 +79,11 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'classes' => array(), 'compile' => true, 'extract' => true, 'paths' => array()
+			'classes' => array(),
+			'compile' => true,
+			'compiler' => array(),
+			'extract' => true,
+			'paths' => array()
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -126,7 +130,7 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 
 		if ($this->_compile) {
 			$compiler = $this->_classes['compiler'];
-			$path = $compiler::template($path);
+			$path = $compiler::template($path, $this->_config['compiler']);
 		}
 		return $path;
 	}

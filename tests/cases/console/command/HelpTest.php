@@ -53,7 +53,8 @@ class HelpTest extends \lithium\test\Unit {
 		$result = $command->run('test');
 		$this->assertTrue($result);
 
-		$expected = "li3 test [--filters=<string>] [--format=<string>] [<path>]";
+		$expected  = 'li3 test [--filters=<string>]';
+		$expected .= ' [--format=<string>] [--verbose] [--plain] [<path>]';
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
@@ -83,10 +84,23 @@ class HelpTest extends \lithium\test\Unit {
 		$this->assertPattern("/{$expected}/", $result);
 	}
 
+	/**
+	 * Tests that class and method help includes detailed descriptions as well as summary text.
+	 */
+	public function testDocsIncludeDescription() {
+		$command = new Help(array('request' => $this->request, 'classes' => $this->classes));
+
+		$this->assertNull($command->api('lithium.core.Libraries'));
+		$this->assertPattern('/Auto-loading classes/', $command->response->output);
+
+		$command = new Help(array('request' => $this->request, 'classes' => $this->classes));
+
+		$this->assertNull($command->api('lithium.core.Libraries::add'));
+		$this->assertPattern('/Adding libraries/', $command->response->output);
+	}
+
 	public function testApiClass() {
-		$command = new Help(array(
-			'request' => $this->request, 'classes' => $this->classes
-		));
+		$command = new Help(array('request' => $this->request, 'classes' => $this->classes));
 		$result = $command->api('lithium.util.Inflector');
 		$this->assertNull($result);
 
@@ -97,9 +111,7 @@ class HelpTest extends \lithium\test\Unit {
 	}
 
 	public function testApiMethod() {
-		$command = new Help(array(
-			'request' => $this->request, 'classes' => $this->classes
-		));
+		$command = new Help(array('request' => $this->request, 'classes' => $this->classes));
 		$result = $command->api('lithium.util.Inflector', 'method');
 		$this->assertNull($result);
 

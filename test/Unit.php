@@ -22,21 +22,15 @@ use RecursiveIteratorIterator;
  * assertion is correct, the test passes, otherwise it fails. Most assertions take an expected
  * result, a received result, and a message (to describe the failure) as parameters.
  *
+ * Unit tests are used to check a small unit of functionality, such as if a
+ * method returns an expected result for a known input, or whether an adapter
+ * can successfully open a connection.
+ *
  * Available assertions are (see `assert<assertion-name>` methods for details): Equal, False,
  * Identical, NoPattern, NotEqual, Null, Pattern, Tags, True.
  *
  * If an assertion is expected to produce an exception, the `expectException` method should be
  * called before it.
- *
- * Both _case_ (unit) and _integration_ tests extend this class. These two test types can loosely
- * be defined as follows:
- *  - Case: These tests are used to check a small unit of functionality, such as if a method
- *    returns an expected result for a known input, or whether an adapter can successfully open a
- *    connection.
- *  - Integration: These are tests for determining that different parts of the framework will work
- *    together (integrate) as expected. For example, a model has CRUD functionality with its
- *    underlying data source.
- *
  */
 class Unit extends \lithium\core\Object {
 
@@ -72,7 +66,7 @@ class Unit extends \lithium\core\Object {
 
 		$library = array_shift($parts);
 		$name = array_pop($parts);
-		$type = "tests.cases." . implode('.', $parts);
+		$type = 'tests.cases.' . implode('.', $parts);
 
 		return Libraries::locate($type, $name, compact('library'));
 	}
@@ -244,6 +238,28 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
+	 * Fixes some issues regarding the used EOL character(s).
+	 *
+	 * On linux EOL is LF, on Windows it is normally CRLF, but the latter may depend also
+	 * on the git config core.autocrlf setting. As some tests use heredoc style (<<<) to
+	 * specify multiline expectations, this EOL issue may cause tests to fail only because
+	 * of a difference in EOL's used.
+	 *
+	 * in assertEqual, assertNotEqual, assertPattern and assertNotPattern this function is
+	 * called to get rid of any EOL differences.
+	 *
+	 * @param mixed $expected
+	 * @param mixed $result
+	 */
+	protected function _normalizeLineEndings($expected, $result) {
+		if (is_string($expected) && is_string($result)) {
+			$expected = preg_replace('/\r\n/', "\n", $expected);
+			$result = preg_replace('/\r\n/', "\n", $result);
+		}
+		return array($expected, $result);
+	}
+
+	/**
 	 * Checks that the actual result is equal, but not neccessarily identical, to the expected
 	 * result.
 	 *
@@ -252,6 +268,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string|boolean $message
 	 */
 	public function assertEqual($expected, $result, $message = false) {
+		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$data = ($expected != $result) ? $this->_compare('equal', $expected, $result) : null;
 		$this->assert($expected == $result, $message, $data);
 	}
@@ -264,6 +281,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string|boolean $message
 	 */
 	public function assertNotEqual($expected, $result, $message = false) {
+		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$this->assert($result != $expected, $message, compact('expected', 'result'));
 	}
 
@@ -346,6 +364,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string $message
 	 */
 	public function assertNoPattern($expected, $result, $message = '{:message}') {
+		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$this->assert(!preg_match($expected, $result), $message, compact('expected', 'result'));
 	}
 
@@ -357,6 +376,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string $message
 	 */
 	public function assertPattern($expected, $result, $message = '{:message}') {
+		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$this->assert(!!preg_match($expected, $result), $message, compact('expected', 'result'));
 	}
 
@@ -724,8 +744,12 @@ class Unit extends \lithium\core\Object {
 			));
 		}
 		$this->_expected = array();
-		$this->tearDown();
 
+		try {
+			$this->tearDown();
+		} catch (Exception $e) {
+			$this->_handleException($e, __LINE__ - 2);
+		}
 		return $passed;
 	}
 
@@ -988,11 +1012,20 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Removes everything from `resources/tmp/tests` directory.
-	 * Call from inside of your test method or `tearDown()`.
+	 * Removes everything from `resources/tmp/tests` directory. Call from inside of your test
+	 * method or `tearDown()`.
 	 *
-	 * @param string $path path to directory of contents to remove
-	 *               if first character is NOT `/` prepend `LITHIUM_APP_PATH/resources/tmp/`
+	 * Uses `DIRECTORY_SEPARATOR` as `getPathname()` is used in a a direct string comparison.
+	 * The method may contain slashes and backslashes.
+	 *
+	 * If the file to unlink is readonly, it throws a exception (Permission denied) on Windows.
+	 * So, the file is checked before an unlink is tried. (this will make the tests run slower
+	 * but is prefered over a if (!unlink { chmod; unlink }.
+	 * http://stringoftheseus.com/blog/2010/12/22/php-unlink-permisssion-denied-error-on-windows/
+	 *
+	 * @param string $path Path to directory with contents to remove. If first
+	 *        character is NOT a slash (`/`) or a Windows drive letter (`C:`)
+	 *        prepends `LITHIUM_APP_PATH/resources/tmp/`.
 	 * @return void
 	 */
 	protected function _cleanUp($path = null) {
@@ -1007,10 +1040,19 @@ class Unit extends \lithium\core\Object {
 		$iterator = new RecursiveIteratorIterator($dirs, RecursiveIteratorIterator::CHILD_FIRST);
 
 		foreach ($iterator as $item) {
-			if ($item->getPathname() === "{$path}/empty" || $iterator->isDot()) {
+			$empty = $item->getPathname() === $path . DIRECTORY_SEPARATOR . 'empty';
+
+			if ($empty || $iterator->isDot()) {
 				continue;
 			}
-			($item->isDir()) ? rmdir($item->getPathname()) : unlink($item->getPathname());
+			if ($item->isDir()) {
+				rmdir($item->getPathname());
+				continue;
+			}
+			if (!$item->isWritable()) {
+				chmod($item->getPathname(), 0777);
+			}
+			unlink($item->getPathname());
 		}
 	}
 
@@ -1027,9 +1069,9 @@ class Unit extends \lithium\core\Object {
 	 * Checks for a working internet connection.
 	 *
 	 * This method is used to check for a working connection to google.com, both
-	 * testing for proper dns resolution and reading the actual URL.
+	 * testing for proper DNS resolution and reading the actual URL.
 	 *
-	 * @param array $config Override the default URI to check.
+	 * @param array $config Override the default URL to check.
 	 * @return boolean True if a network connection is established, false otherwise.
 	 */
 	protected function _hasNetwork($config = array()) {
@@ -1046,8 +1088,11 @@ class Unit extends \lithium\core\Object {
 			$failed = true;
 		});
 
-		$dnsCheck = dns_check_record($config['host'], "ANY");
-		$fileCheck = fopen($url, "r");
+		dns_check_record($config['host'], 'A');
+
+		if ($handle = fopen($url, 'r')) {
+			fclose($handle);
+		}
 
 		restore_error_handler();
 		return !$failed;

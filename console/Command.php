@@ -50,6 +50,20 @@ class Command extends \lithium\core\Object {
 	public $response;
 
 	/**
+	 * Only shows only text output without styles.
+	 *
+	 * @var boolean
+	 */
+	public $plain = false;
+
+	/**
+	 * Only shows error output.
+	 *
+	 * @var boolean
+	 */
+	public $silent = false;
+
+	/**
 	 * Dynamic dependencies.
 	 *
 	 * @var array
@@ -88,11 +102,14 @@ class Command extends \lithium\core\Object {
 	protected function _init() {
 		parent::_init();
 		$this->request = $this->_config['request'];
-		$resp = $this->_config['response'];
-		$this->response = is_object($resp) ? $resp : $this->_instance('response', $resp);
 
 		if (!is_object($this->request) || !$this->request->params) {
 			return;
+		}
+		$this->response = $this->_config['response'];
+
+		if (!is_object($this->response)) {
+			$this->response = $this->_instance('response', $this->response);
 		}
 		$default = array('command' => null, 'action' => null, 'args' => null);
 		$params = array_diff_key((array) $this->request->params, $default);
@@ -160,6 +177,9 @@ class Command extends \lithium\core\Object {
 	 * @return integer
 	 */
 	public function out($output = null, $options = array('nl' => 1)) {
+		if ($this->silent) {
+			return;
+		}
 		return $this->_response('output', $output, $options);
 	}
 
@@ -218,15 +238,27 @@ class Command extends \lithium\core\Object {
 	}
 
 	/**
-	 * Writes a header to the output stream.
+	 * Writes a header to the output stream. In addition to the actual text,
+	 * horizontal lines before and afterwards are written. The lines will have
+	 * the same length as the text. This behavior can be modified by providing
+	 * the length of lines as a second paramerter.
 	 *
-	 * In addition to the actual text, horizontal lines before and afterwards are written.
+	 * Given the text `'Lithium'` this generates following output:
+	 *
+	 * {{{
+	 * -------
+	 * Lithium
+	 * -------
+	 * }}}
 	 *
 	 * @param string $text The heading text.
-	 * @param integer $line The length of the line. Defaults to 80.
+	 * @param integer $line The length of the line. Defaults to the length of text.
 	 * @return void
 	 */
-	public function header($text, $line = 80) {
+	public function header($text, $line = null) {
+		if (!$line) {
+			$line = strlen($text);
+		}
 		$this->hr($line);
 		$this->out($text, 1, 'heading');
 		$this->hr($line);
@@ -273,8 +305,8 @@ class Command extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function columns($rows, $options = array()) {
-		$defaults = array('separator' => "\t");
-		$config = $options + $defaults;
+		$defaults = array('separator' => "\t", "error" => false);
+		$options += $defaults;
 		$lengths = array_reduce($rows, function($columns, $row) {
 			foreach ((array) $row as $key => $val) {
 				if (!isset($columns[$key]) || strlen($val) > $columns[$key]) {
@@ -283,22 +315,26 @@ class Command extends \lithium\core\Object {
 			}
 			return $columns;
 		});
-		$rows = array_reduce($rows, function($rows, $row) use ($lengths, $config) {
+		$rows = array_reduce($rows, function($rows, $row) use ($lengths, $options) {
 			$text = '';
 			foreach ((array) $row as $key => $val) {
-				$text = $text . str_pad($val, $lengths[$key]) . $config['separator'];
+				$text = $text . str_pad($val, $lengths[$key]) . $options['separator'];
 			}
 			$rows[] = $text;
 			return $rows;
 		});
-		$this->out($rows, $config);
+		if ($options['error']) {
+			$this->error($rows, $options);
+			return;
+		}
+		$this->out($rows, $options);
 	}
 
 	/**
-	 * Add newlines ("\n") to the output stream.
+	 * Add newlines ("\n") a given number of times and return them in a single string.
 	 *
-	 * @param integer $number The number of new lines to print.
-	 * @return integer
+	 * @param integer $number The number of new lines to fill into a string.
+	 * @return string
 	 */
 	public function nl($number = 1) {
 		return str_repeat("\n", $number);
@@ -374,7 +410,7 @@ class Command extends \lithium\core\Object {
 		}
 		extract($options);
 
-		if ($style !== null) {
+		if ($style !== null && !$this->plain) {
 			$string = "{:{$style}}{$string}{:end}";
 		}
 		if ($nl) {

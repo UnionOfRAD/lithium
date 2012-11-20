@@ -84,7 +84,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = $postsController(null, array('action' => 'delete'));
 		$this->assertEqual($result->body(), '');
 
-		$headers = array('Location' => '/posts');
+		$headers = array('Location' => '/posts', 'Content-Type' => 'text/html');
 		$this->assertEqual($result->headers, $headers);
 
 		$postsController = new MockPostsController();
@@ -107,7 +107,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertEqual($postsController->response->body(), null);
 		$this->assertEqual(
 			$postsController->response->headers,
-			array('Location' => '/posts')
+			array('Location' => '/posts', 'Content-Type' => 'text/html')
 		);
 	}
 
@@ -228,7 +228,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$expected = array('code' => 404, 'message' => 'Not Found');
 		$result = $postsController->response->status;
 		$this->assertEqual($expected, $result);
-		$result = json_decode($postsController->response->body(), true);
+		$result = $postsController->response->body();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -256,7 +256,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = $postsController->response->headers('Content-Type');
 		$this->assertEqual('application/json; charset=UTF-8', $result);
 
-		$result = json_decode($postsController->response->body(), true);
+		$result = $postsController->response->body();
 		$this->assertEqual(array('data' => 'test'), $result);
 	}
 
@@ -285,7 +285,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertEqual('application/json; charset=UTF-8', $result);
 
 		$expected = array('data' => 'test');
-		$result = json_decode($postsController->response->body(), true);
+		$result = $postsController->response->body();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -346,7 +346,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$result = $postsController->response->headers('Content-Type');
 		$this->assertEqual('application/json; charset=UTF-8', $result);
 
-		$result = json_decode($postsController->response->body(), true);
+		$result = $postsController->response->body();
 		$this->assertEqual(array('data' => 'test'), $result);
 	}
 
@@ -371,6 +371,22 @@ class ControllerTest extends \lithium\test\Unit {
 		$postsController = new MockPostsController();
 		$this->expectException("Action `foo` not found.");
 		$postsController(new Request(), array('action' => 'foo'));
+	}
+
+	/**
+	 * Tests that the library of the controller is automatically added to the default rendering
+	 * options.
+	 */
+	public function testLibraryScoping() {
+		$request = new Request();
+		$request->params['controller'] = 'lithium\tests\mocks\action\MockPostsController';
+
+		$controller = new MockPostsController(compact('request') + array('classes' => array(
+			'media' => 'lithium\tests\mocks\action\MockMediaClass'
+		)));
+
+		$controller->render();
+		$this->assertEqual('lithium', $controller->response->options['library']);
 	}
 }
 

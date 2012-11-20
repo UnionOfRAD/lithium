@@ -21,13 +21,6 @@ class Response extends \lithium\net\http\Message {
 	public $status = array('code' => 200, 'message' => 'OK');
 
 	/**
-	 * Content Type.
-	 *
-	 * @var string
-	 */
-	public $type = 'text/html';
-
-	/**
 	 * Character encoding.
 	 *
 	 * @var string
@@ -42,6 +35,7 @@ class Response extends \lithium\net\http\Message {
 	protected $_statuses = array(
 		100 => 'Continue',
 		101 => 'Switching Protocols',
+		102 => 'Processing',
 		200 => 'OK',
 		201 => 'Created',
 		202 => 'Accepted',
@@ -56,6 +50,7 @@ class Response extends \lithium\net\http\Message {
 		304 => 'Not Modified',
 		305 => 'Use Proxy',
 		307 => 'Temporary Redirect',
+		308 => 'Permanent Redirect',
 		400 => 'Bad Request',
 		401 => 'Unauthorized',
 		402 => 'Payment Required',
@@ -72,13 +67,19 @@ class Response extends \lithium\net\http\Message {
 		413 => 'Request Entity Too Large',
 		414 => 'Request-URI Too Large',
 		415 => 'Unsupported Media Type',
-		416 => 'Requested range not satisfiable',
+		416 => 'Requested Range Not Satisfiable',
 		417 => 'Expectation Failed',
+		422 => 'Unprocessable Entity',
+		423 => 'Locked',
+		424 => 'Method Failure',
+		428 => 'Precondition Required',
+		451 => 'Unavailable For Legal Reasons',
 		500 => 'Internal Server Error',
 		501 => 'Not Implemented',
 		502 => 'Bad Gateway',
 		503 => 'Service Unavailable',
-		504 => 'Gateway Time-out'
+		504 => 'Gateway Time-out',
+		507 => 'Insufficient Storage'
 	);
 
 	/**
@@ -87,18 +88,8 @@ class Response extends \lithium\net\http\Message {
 	 * @param array $config
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('message' => null);
-		$config += $defaults;
-		parent::__construct($config);
-	}
-
-	/**
-	 * Initialize the Response
-	 *
-	 * @return void
-	 */
-	protected function _init() {
-		parent::_init();
+		$defaults = array('message' => null, 'type' => null);
+		parent::__construct($config + $defaults);
 
 		if ($this->_config['message']) {
 			$this->body = $this->_parseMessage($this->_config['message']);
@@ -106,34 +97,36 @@ class Response extends \lithium\net\http\Message {
 		if (isset($this->headers['Transfer-Encoding'])) {
 			$this->body = $this->_httpChunkedDecode($this->body);
 		}
-		if (isset($this->headers['Content-Type'])) {
-			$pattern = '/([-\w\/+]+)(;\s*?charset=(.+))?/i';
-			preg_match($pattern, $this->headers['Content-Type'], $match);
+		if ($type = $this->_config['type']) {
+			$this->type($type);
+		}
+		if (!isset($this->headers['Content-Type'])) {
+			return;
+		}
+		$pattern = '/([-\w\/\.+]+)(;\s*?charset=(.+))?/i';
+		preg_match($pattern, $this->headers['Content-Type'], $match);
 
-			if (isset($match[1])) {
-				$this->type = trim($match[1]);
-				$this->body = $this->_decode($this->body);
-			}
-			if (isset($match[3])) {
-				$this->encoding = strtoupper(trim($match[3]));
-			}
+		if (isset($match[1])) {
+			$this->type(trim($match[1]));
+		}
+		if (isset($match[3])) {
+			$this->encoding = strtoupper(trim($match[3]));
 		}
 	}
 
 	/**
-	 * Decodes the body based on the type
+	 * Return body parts and decode it into formatted type.
 	 *
-	 * @param string $body
-	 * @return mixed
+	 * @see lithium\net\Message::body()
+	 * @see lithium\net\http\Message::_decode()
+	 * @param mixed $data
+	 * @param array $options
+	 * @return array
 	 */
-	protected function _decode($body) {
-		$media = $this->_classes['media'];
-		if ($type = $media::type($this->_type)) {
-			$body = $media::decode($this->_type, $body) ?: $body;
-		}
-		return $body;
+	public function body($data = null, $options = array()) {
+		$defaults = array('decode' => true);
+		return parent::body($data, $options + $defaults);
 	}
-
 	/**
 	 * Set and get the status for the response.
 	 *
@@ -198,13 +191,19 @@ class Response extends \lithium\net\http\Message {
 		if (array_filter($headers) == array()) {
 			return trim($body);
 		}
-		preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)\s+(.*)/i', array_shift($headers), $match);
+		preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)(?:\s+(.*))?/i', array_shift($headers), $match);
 		$this->headers($headers);
 
 		if (!$match) {
 			return trim($body);
 		}
-		list($line, $this->version, $code, $message) = $match;
+		list($line, $this->version, $code) = $match;
+		if (isset($this->_statuses[$code])) {
+			$message = $this->_statuses[$code];
+		}
+		if (isset($match[3])) {
+			$message = $match[3];
+		}
 		$this->status = compact('code', 'message') + $this->status;
 		$this->protocol = "HTTP/{$this->version}";
 		return $body;
@@ -234,11 +233,12 @@ class Response extends \lithium\net\http\Message {
 	* @return string
 	*/
 	public function __toString() {
-		if ($this->type != 'text/html' && !isset($this->headers['Content-Type'])) {
-			$this->headers['Content-Type'] = $this->type;
-		}
 		$first = "{$this->protocol} {$this->status['code']} {$this->status['message']}";
-		$response = array($first, join("\r\n", $this->headers()), "", $this->body());
+		if ($type = $this->headers('Content-Type')) {
+			$this->headers('Content-Type', "{$type};charset={$this->encoding}");
+		}
+		$body = join("\r\n", (array) $this->body);
+		$response = array($first, join("\r\n", $this->headers()), "", $body);
 		return join("\r\n", $response);
 	}
 }

@@ -238,7 +238,8 @@ class LibraryTest extends \lithium\test\Unit {
 
 		$path = realpath($this->_testPath);
 		$tplPath = realpath(LITHIUM_LIBRARY_PATH . '/lithium/console/command/create/template');
-		$expected = "new created in {$path} from {$tplPath}" . DIRECTORY_SEPARATOR . "app.phar.gz\n";
+		$filePath = $tplPath . DIRECTORY_SEPARATOR . "app.phar.gz";
+		$expected = "new created in {$path} from {$filePath}\n";
 		$result = $app->response->output;
 		$this->assertEqual($expected, $result);
 

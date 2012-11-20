@@ -65,15 +65,42 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testReturnHandlers() {
+		$http = new Service($this->_testConfig);
+		$result = $http->get(null, null, array('return' => 'headers'));
+		$this->assertEqual('localhost:80', $result['Host']);
+
+		$result = $http->get(null, null, array('return' => 'response'));
+		$this->assertEqual($result, $http->last->response);
+
+		$result = $http->get(null, null, array('return' => 'body'));
+		$this->assertEqual($result, $http->last->response->body());
+	}
+
 	public function testHead() {
 		$http = new Service($this->_testConfig);
-		$this->assertEqual('', $http->head());
+		$result = $http->head();
+		$this->assertEqual('localhost:80', $result['Host']);
 		$this->assertEqual('HTTP/1.1', $http->last->response->protocol);
 		$this->assertEqual('200', $http->last->response->status['code']);
 		$this->assertEqual('OK', $http->last->response->status['message']);
-		$this->assertEqual('text/html', $http->last->response->type);
+		$this->assertEqual(null, $http->last->response->type());
 		$this->assertEqual('UTF-8', $http->last->response->encoding);
 		$this->assertEqual('', $http->last->response->body());
+	}
+
+	public function testHeadPath() {
+		$http = new Service($this->_testConfig);
+		$expected = '/somewhere';
+		$result = $http->head('/somewhere');
+		$this->assertEqual($expected, $http->last->request->path);
+	}
+
+	public function testHeadQueryString() {
+		$http = new Service($this->_testConfig);
+		$expected = array('foo' => 'bar');
+		$result = $http->head('/', $expected);
+		$this->assertEqual($expected, $http->last->request->query);
 	}
 
 	public function testGet() {
@@ -82,7 +109,7 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual('HTTP/1.1', $http->last->response->protocol);
 		$this->assertEqual('200', $http->last->response->status['code']);
 		$this->assertEqual('OK', $http->last->response->status['message']);
-		$this->assertEqual('text/html', $http->last->response->type);
+		$this->assertEqual(null, $http->last->response->type());
 		$this->assertEqual('UTF-8', $http->last->response->encoding);
 	}
 
@@ -92,7 +119,7 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual('HTTP/1.1', $http->last->response->protocol);
 		$this->assertEqual('200', $http->last->response->status['code']);
 		$this->assertEqual('OK', $http->last->response->status['message']);
-		$this->assertEqual('text/html', $http->last->response->type);
+		$this->assertEqual(null, $http->last->response->type());
 		$this->assertEqual('UTF-8', $http->last->response->encoding);
 	}
 
@@ -116,7 +143,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
-			'Content-Type: application/x-www-form-urlencoded',
+			'Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
 			'Content-Length: 11',
 			'', 'status=cool'
 		));
@@ -144,7 +171,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
-			'Content-Type: application/x-www-form-urlencoded',
+			'Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
 			'Content-Length: 11',
 			'', 'status=cool'
 		));
@@ -178,15 +205,16 @@ class ServiceTest extends \lithium\test\Unit {
 
 	public function testJsonPost() {
 		$http = new Service($this->_testConfig);
-		$http->post('update.xml', array('status' => 'cool'), array('type' => 'json'));
+		$data = array('status' => array('cool', 'awesome'));
+		$http->post('update.xml', $data, array('type' => 'json'));
 		$expected = join("\r\n", array(
 			'POST /update.xml HTTP/1.1',
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Content-Type: application/json',
-			'Content-Length: 17',
-			'', '{"status":"cool"}'
+			'Content-Length: 29',
+			'', '{"status":["cool","awesome"]}'
 		));
 		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
@@ -196,9 +224,9 @@ class ServiceTest extends \lithium\test\Unit {
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
-			'Content-Type: application/json',
-			'Content-Length: 17',
-			'', '{"status":"cool"}'
+			'Content-Type: application/json;charset=UTF-8',
+			'Content-Length: 29',
+			'', '{"status":["cool","awesome"]}'
 		));
 		$result = (string) $http->last->response;
 		$this->assertEqual($expected, $result);
@@ -221,13 +249,8 @@ class ServiceTest extends \lithium\test\Unit {
 		$this->assertEqual('someValue', $config['someKey']);
 	}
 
-	public function testMagicMethod() {
+	public function testPatchMethod() {
 		$http = new Service($this->_testConfig);
-		$response = $http->patch('some-path/stuff');
-		$expected = "http://localhost:80/some-path/stuff";
-		$result = $http->last->request->to('url');
-		$this->assertEqual($expected, $result);
-
 		$response = $http->patch(
 			'some-path/stuff',
 			array('someData' => 'someValue'),
@@ -236,6 +259,28 @@ class ServiceTest extends \lithium\test\Unit {
 		$result = $http->last->request;
 		$this->assertEqual('PATCH', $result->method);
 		$this->assertEqual('lithium\net\http\Response', get_class($response));
+		$this->assertEqual('someData=someValue', $result->body());
+	}
+
+	public function testPatchWithJson() {
+		$http = new Service($this->_testConfig);
+		$response = $http->patch(
+			'some-path/stuff',
+			array('someData' => 'someValue'),
+			array('return' => 'response', 'type' => 'json')
+		);
+		$result = $http->last->request;
+		$this->assertEqual('{"someData":"someValue"}', $result->body());
+		$this->assertEqual('application/json', $result->headers['Content-Type']);
+	}
+
+	public function testMagicMethod() {
+		$http = new Service($this->_testConfig);
+		$response = $http->magic('some-path/stuff');
+		$expected = "http://localhost:80/some-path/stuff";
+		$result = $http->last->request;
+		$this->assertEqual($expected, $result->to('url'));
+		$this->assertEqual('MAGIC', $result->method);
 	}
 
 	public function testDigestAuth() {

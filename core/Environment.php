@@ -135,20 +135,42 @@ class Environment {
 	 * `'development'` is, in fact, the current environment.
 	 *
 	 * This method also handles how the environment is detected at the beginning of the request.
+	 *
+	 * #### Custom Detection
+	 *
 	 * While the default detection rules are very simple (if the `'SERVER_ADDR'` variable is set to
 	 * `127.0.0.1`, the environment is assumed to be `'development'`, or if the string `'test'` is
 	 * found anywhere in the host name, it is assumed to be `'test'`, and in all other cases it
 	 * is assumed to be `'production'`), you can define your own detection rule set easily using a
 	 * closure that accepts an instance of the `Request` object, and returns the name of the correct
 	 * environment, as in the following example:
-	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testCustomDetector(1-9)}}}
+	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testCustomDetector(1-9) }}}
 	 *
 	 * In the above example, the user-specified closure takes in a `Request` object, and using the
 	 * server data which it encapsulates, returns the correct environment name as a string.
 	 *
+	 * #### Host Mapping
+	 *
+	 * The most common use case is to set the environment depending on host name. For convenience,
+	 * the `is()` method also accepts an array that matches host names to environment names, where
+	 * each key is an environment, and each value is either an array of valid host names, or a
+	 * regular expression used to match a valid host name.
+	 *
+	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testDetectionWithArrayMap(1-5) }}}
+	 *
+	 * In this example, a regular expression is being used to match local domains
+	 * (i.e. `localhost`), as well as the built-in `.console` domain, for console requests. Note
+	 * that in the console, the environment can always be overridden by specifying the `--env`
+	 * option.
+	 *
+	 * Then, one or more host names are matched up to `'test'` and `'staging'`, respectively. Note
+	 * that no rule is present for production: this is because `'production'` is the default value
+	 * if no other environment matches.
+	 *
 	 * @param mixed $detect Either the name of an environment to check against the current, i.e.
 	 *              `'development'` or `'production'`, or a closure which `Environment` will use
-	 *              to determine the current environment name.
+	 *              to determine the current environment name, or an array mapping environment names
+	 *              to host names.
 	 * @return boolean If `$detect` is a string, returns `true` if the current environment matches
 	 *         the value of `$detect`, or `false` if no match. If used to set a custom detector,
 	 *         returns `null`.
@@ -157,7 +179,25 @@ class Environment {
 		if (is_callable($detect)) {
 			static::$_detector = $detect;
 		}
-		return (static::$_current == $detect);
+		if (!is_array($detect)) {
+			return (static::$_current == $detect);
+		}
+		static::$_detector = function($request) use ($detect) {
+			if ($request->env || $request->command == 'test') {
+				return ($request->env) ? $request->env : 'test';
+			}
+			$host = method_exists($request, 'get') ? $request->get('http:host') : '.console';
+
+			foreach ($detect as $environment => $hosts) {
+				if (is_string($hosts) && preg_match($hosts, $host)) {
+					return $environment;
+				}
+				if (is_array($hosts) && in_array($host, $hosts)) {
+					return $environment;
+				}
+			}
+			return "production";
+		};
 	}
 
 	/**
@@ -220,22 +260,26 @@ class Environment {
 	 * The settings for the environment will then be the aggregate of all `set()` calls:
 	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testModifyEnvironmentConfig(7-7) }}}
 	 *
+	 * By passing an array to `$env`, you can assign the same configuration to multiple
+	 * environments:
+	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testSetMultipleEnvironments(5-7) }}}
+	 *
 	 * The `set()` method can also be called to manually set which environment to operate in:
 	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testSetAndGetCurrentEnvironment(5-5) }}}
 	 *
-	 * Finally, `set()` can accept a `Request` object, or the `$_SERVER` or `$_ENV` superglobals, to
-	 * automatically detect the correct environment.
+	 * Finally, `set()` can accept a `Request` object, to automatically detect the correct
+	 * environment.
 	 *
 	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testEnvironmentDetection(9-10) }}}
 	 *
 	 * For more information on defining custom rules to automatically detect your application's
 	 * environment, see the documentation for `Environment::is()`.
 	 *
-	 * @see lithium\http\Request
+	 * @see lithium\action\Request
 	 * @see lithium\core\Environment::is()
-	 * @param mixed $env The name of the environment you wish to create, update or switch to
-	 *              (string), or a `Request` object or `$_SERVER` / `$_ENV` array used to detect
-	 *              (and switch to) the application's current environment.
+	 * @param mixed $env The name(s) of the environment(s) you wish to create, update or switch to
+	 *              (string/array), or a `Request` object or `$_SERVER` / `$_ENV` array used to
+	 *              detect (and switch to) the application's current environment.
 	 * @param array $config If creating or updating a configuration, accepts an array of settings.
 	 *              If the environment name specified in `$env` already exists, the values in
 	 *              `$config` will be recursively merged with any pre-existing settings.
@@ -245,14 +289,17 @@ class Environment {
 	 *               itself (i.e. `$config` is unspecified), returns `null`.
 	 */
 	public static function set($env, $config = null) {
-		if (is_null($config)) {
-			switch (true) {
-				case is_object($env) || is_array($env):
-					static::$_current = static::_detector()->__invoke($env);
-				break;
-				case isset(static::$_configurations[$env]):
-					static::$_current = $env;
-				break;
+		if ($config === null) {
+			if (is_object($env) || is_array($env)) {
+				static::$_current = static::_detector()->__invoke($env);
+			} elseif (isset(static::$_configurations[$env])) {
+				static::$_current = $env;
+			}
+			return;
+		}
+		if (is_array($env)) {
+			foreach ($env as $name) {
+				static::set($name, $config);
 			}
 			return;
 		}

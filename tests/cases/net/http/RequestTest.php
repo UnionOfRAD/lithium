@@ -23,8 +23,7 @@ class RequestTest extends \lithium\test\Unit {
 			'host' => 'localhost',
 			'port' => 443,
 			'headers' => array('Header' => 'Value'),
-			'body' => array('Part 1'),
-			'params' => array('param' => 'value')
+			'body' => array('Part 1')
 		));
 
 		$expected = 'localhost';
@@ -49,10 +48,6 @@ class RequestTest extends \lithium\test\Unit {
 
 		$expected = '/';
 		$result = $request->path;
-		$this->assertEqual($expected, $result);
-
-		$expected = array('param' => 'value');
-		$result = $request->params;
 		$this->assertEqual($expected, $result);
 
 		$expected = array(
@@ -166,7 +161,9 @@ class RequestTest extends \lithium\test\Unit {
 			'content' => '',
 			'protocol_version' => '1.1',
 			'ignore_errors' => true,
-			'follow_location' => true
+			'follow_location' => true,
+			'request_fulluri' => false,
+			'proxy' => null
 		));
 		$this->assertEqual($expected, $request->to('context'));
 	}
@@ -210,6 +207,25 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	/**
+	 * Tests that creating a `Request` with a proxy configuration correctly modifies the results
+	 * of exporting the `Request` to a stream context configuration.
+	 */
+	public function testWithProxy() {
+		$request = new Request(array('proxy' => 'tcp://proxy.example.com:5100'));
+		$expected = array('http' => array(
+			'content' => '',
+			'method' => 'GET',
+			'header' => array('Host: localhost', 'Connection: Close', 'User-Agent: Mozilla/5.0'),
+			'protocol_version' => '1.1',
+			'ignore_errors' => true,
+			'follow_location' => true,
+			'request_fulluri' => true,
+			'proxy' => 'tcp://proxy.example.com:5100'
+		));
+		$this->assertEqual($expected, $request->to('context'));
+	}
+
 	public function testToUrl() {
 		$expected = 'http://localhost/';
 		$result = $this->request->to('url');
@@ -232,7 +248,9 @@ class RequestTest extends \lithium\test\Unit {
 			),
 			'protocol_version' => '1.1',
 			'ignore_errors' => true,
-			'follow_location' => true
+			'follow_location' => true,
+			'request_fulluri' => false,
+			'proxy' => null
 		));
 		$result = $this->request->to('context');
 		$this->assertEqual($expected, $result);
@@ -255,7 +273,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testDigest() {
 		$request = new Request(array(
-			'path' => 'http_auth',
+			'path' => '/http_auth',
 			'auth' => array(
 				'realm' => 'app',
 				'qop' => 'auth',
@@ -302,6 +320,21 @@ class RequestTest extends \lithium\test\Unit {
 		$expected = "?param=1&param=2&param3=3";
 		$result = $request->queryString(array('param3' => 3));
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testKeepDefinedContentTypeHeaderOnPost() {
+		$request = new Request(array(
+			'method' => 'POST',
+			'headers' => array('Content-Type' => 'text/x-test')
+		));
+		$expected = 'Content-Type: text/x-test';
+		$result = $request->headers();
+		$message = "Expected value `{$expected}` not found in result.";
+		$this->assertTrue(in_array($expected, $result), $message);
+
+		$expected = '#Content-Type: text/x-test#';
+		$result = $request->to('string');
+		$this->assertPattern($expected, $result);
 	}
 }
 

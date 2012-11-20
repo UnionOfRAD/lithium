@@ -36,7 +36,14 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('classes' => 'merge');
+	protected $_autoConfig = array('classes' => 'merge', 'responseTypes');
+
+	/**
+	 * Array of closures that return various pieces of information about an HTTP response.
+	 *
+	 * @var array
+	 */
+	protected $_responseTypes = array();
 
 	/**
 	 * Indicates whether `Service` can connect to the HTTP endpoint for which it is configured.
@@ -90,6 +97,11 @@ class Service extends \lithium\core\Object {
 		} catch(ClassNotFoundException $e) {
 			$this->connection = null;
 		}
+		$this->_responseTypes += array(
+			'headers' => function($response) { return $response->headers; },
+			'body' => function($response) { return $response->body(); },
+			'code' => function($response) { return $response->status['code']; }
+		);
 	}
 
 	/**
@@ -97,8 +109,6 @@ class Service extends \lithium\core\Object {
 	 *
 	 * @param string $method
 	 * @param string $params
-	 * @return void
-	 * @author gwoo
 	 */
 	public function __call($method, $params = array()) {
 		array_unshift($params, $method);
@@ -108,11 +118,14 @@ class Service extends \lithium\core\Object {
 	/**
 	 * Send HEAD request.
 	 *
+	 * @param string $path
+	 * @param array $data
 	 * @param array $options
 	 * @return string
 	 */
-	public function head(array $options = array()) {
-		return $this->send(__FUNCTION__, null, array(), $options);
+	public function head($path = null, $data = array(), array $options = array()) {
+		$defaults = array('return' => 'headers', 'type' => false);
+		return $this->send(__FUNCTION__, $path, $data, $options + $defaults);
 	}
 
 	/**
@@ -124,7 +137,8 @@ class Service extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function get($path = null, $data = array(), array $options = array()) {
-		return $this->send(__FUNCTION__, $path, $data, $options);
+		$defaults = array('type' => false);
+		return $this->send(__FUNCTION__, $path, $data, $options + $defaults);
 	}
 
 	/**
@@ -152,6 +166,18 @@ class Service extends \lithium\core\Object {
 	}
 
 	/**
+	 * Send PATCH request.
+	 *
+	 * @param string $path
+	 * @param array $data
+	 * @param array $options
+	 * @return string
+	 */
+	public function patch($path = null, $data = array(), array $options = array()) {
+		return $this->send(__FUNCTION__, $path, $data, $options);
+	}
+
+	/**
 	 * Send DELETE request.
 	 *
 	 * @param string $path
@@ -160,7 +186,8 @@ class Service extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function delete($path = null, $data = array(), array $options = array()) {
-		return $this->send(__FUNCTION__, $path, $data, $options);
+		$defaults = array('type' => false);
+		return $this->send(__FUNCTION__, $path, $data, $options + $defaults);
 	}
 
 	/**
@@ -192,7 +219,11 @@ class Service extends \lithium\core\Object {
 			$this->connection->close();
 		}
 		$this->last = (object) compact('request', 'response');
-		return ($options['return'] == 'body' && $response) ? $response->body() : $response;
+
+		$handlers = $this->_responseTypes;
+		$handler = isset($handlers[$options['return']]) ? $handlers[$options['return']] : null;
+
+		return $handler ? $handler($response) : $response;
 	}
 
 	/**
@@ -205,7 +236,7 @@ class Service extends \lithium\core\Object {
 	 * @param string $data
 	 * @param string $options
 	 * @return object Returns an instance of `http\Request`, configured with an HTTP method, query
-	 *         string or POST/PUT data, and URL.
+	 *         string or POST/PUT/PATCH data, and URL.
 	 */
 	protected function _request($method, $path, $data, $options) {
 		$defaults = array('type' => 'form');
@@ -214,10 +245,8 @@ class Service extends \lithium\core\Object {
 		$request = $this->_instance('request', $options);
 		$request->path = str_replace('//', '/', "{$request->path}{$path}");
 		$request->method = $method = strtoupper($method);
-
-		$hasBody = in_array($method, array('POST', 'PUT'));
+		$hasBody = in_array($method, array('POST', 'PUT', 'PATCH'));
 		$hasBody ? $request->body($data) : $request->query = $data;
-		$hasBody ? $request->type($options['type']) : null;
 		return $request;
 	}
 }

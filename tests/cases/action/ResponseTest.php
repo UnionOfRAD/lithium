@@ -28,20 +28,40 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual(false, $this->response->type());
 	}
 
-	public function testResponseRendering() {
+	public function testResponseRenderString() {
 		$this->response->body = 'Document body';
 
 		ob_start();
 		$this->response->render();
 		$result = ob_get_clean();
-		$this->assertEqual('Document body', $result);
-		$this->assertEqual(array('HTTP/1.1 200 OK'), $this->response->testHeaders);
+		$this->assertIdentical('Document body', $result);
+		$this->assertIdentical(array('HTTP/1.1 200 OK'), $this->response->testHeaders);
+	}
+
+	public function testResponseRenderJson() {
+		$this->response->type('json');
+		$this->response->body[] = '{"message": "Hello World"}';
+
+		ob_start();
+		$this->response->render();
+		$result = ob_get_clean();
+		$this->assertIdentical('{"message": "Hello World"}', $result);
+		$this->assertIdentical('HTTP/1.1 200 OK', $this->response->testHeaders[0]);
+	}
+
+	public function testResponseToString() {
+		$this->response->type(false);
+		$this->response->body = 'Document body';
 
 		ob_start();
 		echo $this->response;
 		$result = ob_get_clean();
-		$this->assertEqual('Document body', $result);
-		$this->assertEqual(array('HTTP/1.1 200 OK'), $this->response->testHeaders);
+		$this->assertIdentical('Document body', $result);
+		$this->assertIdentical(array('HTTP/1.1 200 OK'), $this->response->testHeaders);
+	}
+
+	public function testResponseCaching() {
+		$this->response->body = 'Document body';
 
 		$expires = strtotime('+1 hour');
 		$this->response->cache($expires);
@@ -54,7 +74,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'Cache-Control: max-age=' . ($expires - time()),
 			'Pragma: cache'
 		);
-		$this->assertEqual($headers, $this->response->testHeaders);
+		$this->assertIdentical($headers, $this->response->testHeaders);
 
 		$expires = '+2 hours';
 		$this->response->cache($expires);
@@ -67,7 +87,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'Cache-Control: max-age=' . (strtotime($expires) - time()),
 			'Pragma: cache'
 		);
-		$this->assertEqual($headers, $this->response->testHeaders);
+		$this->assertIdentical($headers, $this->response->testHeaders);
 
 		$this->response->body = 'Created';
 		$this->response->status(201);
@@ -80,12 +100,12 @@ class ResponseTest extends \lithium\test\Unit {
 			'Cache-Control: max-age=0',
 			'Pragma: no-cache'
 		);
-		$this->assertEqual($expected, $result);
+		$this->assertIdentical($expected, $result);
 
 		ob_start();
 		$this->response->render();
 		$result = ob_get_clean();
-		$this->assertEqual('Created', $result);
+		$this->assertIdentical('Created', $result);
 
 		$headers = array (
 			'HTTP/1.1 201 Created',
@@ -97,7 +117,7 @@ class ResponseTest extends \lithium\test\Unit {
 			),
 			'Pragma: no-cache'
 		);
-		$this->assertEqual($headers, $this->response->testHeaders);
+		$this->assertIdentical($headers, $this->response->testHeaders);
 	}
 
 	/**
@@ -135,7 +155,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->response->headers('download', 'report.csv');
 		ob_start();
 		$this->response->render();
-		ob_end_clean();
+		ob_get_clean();
 
 		$headers = array(
 			'HTTP/1.1 200 OK',
@@ -147,7 +167,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->response->headers('location', '/');
 		ob_start();
 		$this->response->render();
-		ob_end_clean();
+		ob_get_clean();
 
 		$headers = array('HTTP/1.1 302 Found', 'Location: /');
 		$this->assertEqual($headers, $this->response->testHeaders);
@@ -159,7 +179,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->response->headers('location', '/');
 		ob_start();
 		$this->response->render();
-		ob_end_clean();
+		ob_get_clean();
 
 		$headers = array('HTTP/1.1 301 Moved Permanently', 'Location: /');
 		$this->assertEqual($headers, $this->response->testHeaders);
@@ -168,7 +188,19 @@ class ResponseTest extends \lithium\test\Unit {
 			'classes' => array('router' => __CLASS__),
 			'location' => array('controller' => 'foo_bar', 'action' => 'index')
 		));
-		$this->assertEqual(array('location: /foo_bar'), $this->response->headers());
+		$this->assertEqual(array('Location: /foo_bar'), $this->response->headers());
+	}
+
+	/**
+	 * Tests that, when a location is assigned without a status code being set, that the status code
+	 * will be automatically set to 302 when the response is rendered.
+	 */
+	public function testBrowserRedirection() {
+		$this->response = new MockResponse(array('location' => '/'));
+		ob_start();
+		$this->response->render();
+		ob_get_clean();
+		$this->assertEqual('HTTP/1.1 302 Found', $this->response->status());
 	}
 
 	public static function match($url) {

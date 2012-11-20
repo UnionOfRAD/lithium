@@ -18,6 +18,8 @@ use lithium\tests\mocks\test\MockUnitTest;
 use lithium\tests\mocks\test\cases\MockTest;
 use lithium\tests\mocks\test\cases\MockTestErrorHandling;
 use lithium\tests\mocks\test\cases\MockSkipThrowsException;
+use lithium\tests\mocks\test\cases\MockSetUpThrowsException;
+use lithium\tests\mocks\test\cases\MockTearDownThrowsException;
 
 class GroupTest extends \lithium\test\Unit {
 
@@ -34,9 +36,14 @@ class GroupTest extends \lithium\test\Unit {
 		$group = new Group(compact('data'));
 
 		$expected = new Collection(array('data' => array(
-			new MockSkipThrowsException(), new MockTest(), new MockTestErrorHandling()
+			new MockSetUpThrowsException(),
+			new MockSkipThrowsException(),
+			new MockTearDownThrowsException(),
+			new MockTest(),
+			new MockTestErrorHandling()
 		)));
 		$result = $group->tests();
+
 		$this->assertEqual($expected, $result);
 	}
 
@@ -55,6 +62,10 @@ class GroupTest extends \lithium\test\Unit {
 			'lithium\tests\cases\g11n\CatalogTest',
 			'lithium\tests\cases\g11n\LocaleTest',
 			'lithium\tests\cases\g11n\MessageTest',
+			'lithium\tests\cases\g11n\MultibyteTest',
+			'lithium\tests\cases\g11n\multibyte\adapter\IconvTest',
+			'lithium\tests\cases\g11n\multibyte\adapter\IntlTest',
+			'lithium\tests\cases\g11n\multibyte\adapter\MbstringTest',
 			'lithium\tests\cases\g11n\catalog\AdapterTest',
 			'lithium\tests\cases\g11n\catalog\adapter\CodeTest',
 			'lithium\tests\cases\g11n\catalog\adapter\GettextTest',
@@ -68,6 +79,10 @@ class GroupTest extends \lithium\test\Unit {
 			'lithium\tests\cases\g11n\CatalogTest',
 			'lithium\tests\cases\g11n\LocaleTest',
 			'lithium\tests\cases\g11n\MessageTest',
+			'lithium\tests\cases\g11n\MultibyteTest',
+			'lithium\tests\cases\g11n\multibyte\adapter\IconvTest',
+			'lithium\tests\cases\g11n\multibyte\adapter\IntlTest',
+			'lithium\tests\cases\g11n\multibyte\adapter\MbstringTest',
 			'lithium\tests\cases\g11n\catalog\AdapterTest',
 			'lithium\tests\cases\g11n\catalog\adapter\CodeTest',
 			'lithium\tests\cases\g11n\catalog\adapter\GettextTest',

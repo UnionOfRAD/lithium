@@ -16,7 +16,7 @@ namespace lithium\net\http;
  */
 class MediaException extends \RuntimeException {
 
-	protected $code = 415;
+	protected $code = 406;
 }
 
 ?>

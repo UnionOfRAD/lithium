@@ -337,37 +337,60 @@ class Libraries {
 	}
 
 	/**
-	 * Returns configuration for given name.
+	 * Allows library information to be retrieved in various ways, including:
 	 *
-	 * @param string $name Registered library to retrieve configuration for.
-	 * @param string $key Optional key name. If `$name` is set and is the name of a valid library,
-	 *               returns the given named configuration key, i.e. `'path'`, `'webroot'` or
-	 *               `'resources'`.
+	 * By name:
+	 * {{{ embed:lithium\tests\cases\core\LibrariesTest::testLibraryConfigAccess(1-1) }}}
+	 *
+	 * With no parameters, to return all configuration for all libraries:
+	 * {{{ embed:lithium\tests\cases\core\LibrariesTest::testLibraryConfigAccess(22-22) }}}
+	 *
+	 * By list of names with a key to extract:
+	 * {{{ embed:lithium\tests\cases\core\LibrariesTest::testLibraryConfigAccess(34-34) }}}
+	 *
+	 * With no name, and a key to extract, to return a key/value array, where the library name is
+	 * the key, and the `$key` value is the value:
+	 * {{{ embed:lithium\tests\cases\core\LibrariesTest::testLibraryConfigAccess(37-37) }}}
+	 *
+	 * By containing class name:
+	 * {{{ embed:lithium\tests\cases\core\LibrariesTest::testLibraryConfigAccess(45-45) }}}
+	 *
+	 * @param mixed $name Either the name of a library added in `Libraries::add()`, an array of
+	 *              library names, or a fully-namespaced class name (see usage examples above).
+	 * @param string $key Optional key name. If `$name` is set and is the name of a valid library
+	 *               (or an array of valid libraries), returns the given named configuration key,
+	 *               i.e. `'path'`, `'webroot'` or `'resources'`.
 	 * @return mixed A configuation array for one or more libraries, or a string value if `$key` is
-	 *               specified.
+	 *               specified and `$name` is a string, or a library name (string) if `$name` is a
+	 *               fully-namespaced class name.
 	 */
 	public static function get($name = null, $key = null) {
 		$configs = static::$_configurations;
 
-		if (!$name) {
+		if (!$name && !$key) {
 			return $configs;
 		}
 		if ($name === true) {
 			$name = static::$_default;
 		}
-		if (is_array($name)) {
-			foreach ($name as $i => $key) {
-				unset($name[$i]);
-				$name[$key] = isset($configs[$key]) ? $configs[$key] : null;
-			}
-			return $name;
+		if (is_array($name) || (!$name && $key)) {
+			$name = $name ?: array_keys(static::$_configurations);
+			$call = array(get_called_class(), 'get');
+			return array_combine($name, array_map($call, $name, array_fill(0, count($name), $key)));
 		}
 		$config = isset($configs[$name]) ? $configs[$name] : null;
 
-		if (!$key) {
+		if ($key) {
+			return isset($config[$key]) ? $config[$key] : null;
+		}
+		if (strpos($name, '\\') === false) {
 			return $config;
 		}
-		return isset($config[$key]) ? $config[$key] : null;
+		foreach (static::$_configurations as $library => $config) {
+			if ($config['prefix'] && strpos($name, $config['prefix']) === 0) {
+				return $library;
+			}
+		}
 	}
 
 	/**

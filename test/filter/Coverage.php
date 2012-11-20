@@ -8,6 +8,7 @@
 
 namespace lithium\test\filter;
 
+use RuntimeException;
 use lithium\core\Libraries;
 use lithium\analysis\Inspector;
 
@@ -34,7 +35,12 @@ class Coverage extends \lithium\test\Filter {
 	public static function apply($report, $tests, array $options = array()) {
 		$defaults = array('method' => 'run');
 		$options += $defaults;
-		$m = $options['method'];
+
+		if (!function_exists('xdebug_start_code_coverage')) {
+			$msg = "Xdebug not installed. Please install Xdebug before running code coverage.";
+			throw new RuntimeException($msg);
+		}
+
 		$filter = function($self, $params, $chain) use ($report, $options) {
 			xdebug_start_code_coverage(XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE);
 			$chain->next($self, $params, $chain);
@@ -42,7 +48,7 @@ class Coverage extends \lithium\test\Filter {
 			xdebug_stop_code_coverage();
 			$report->collect(__CLASS__, array($self->subject() => $results));
 		};
-		$tests->invoke('applyFilter', array($m, $filter));
+		$tests->invoke('applyFilter', array($options['method'], $filter));
 		return $tests;
 	}
 
@@ -100,7 +106,7 @@ class Coverage extends \lithium\test\Filter {
 	 * @param array $result The raw line number results
 	 * @return array
 	 */
-	protected static function collectLines($result) {
+	public static function collectLines($result) {
 		$output = null;
 		$aggregate = array('covered' => 0, 'executable' => 0);
 

@@ -541,7 +541,7 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::process(new Request(array('url' => '/users/login')));
 		$this->assertTrue($result instanceof Response);
 
-		$headers = array('location' => '/login');
+		$headers = array('Location' => '/login');
 		$this->assertEqual($headers, $result->headers);
 	}
 

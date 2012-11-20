@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\net\http;
 
+use lithium\core\Environment;
 use lithium\net\http\Media;
 use lithium\action\Request;
 use lithium\action\Response;
@@ -145,6 +146,41 @@ class MediaTest extends \lithium\test\Unit {
 		$result = Media::asset('subpath/file', 'js');
 		$expected = '/js/subpath/file.js';
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testCustomAssetUrls() {
+		$env = Environment::get();
+
+		$path = Libraries::get(true, 'path');
+		Libraries::add('cdn_js_test', array(
+			'path' => $path,
+			'assets' => array(
+				'js' => 'http://static.cdn.com'
+			),
+			'bootstrap' => false
+		));
+
+		Libraries::add('cdn_env_test', array(
+			'path' => $path,
+			'assets' => array(
+				'js' => 'wrong',
+				$env => array('js' => 'http://static.cdn.com/myapp')
+			),
+			'bootstrap' => false
+		));
+		$library = basename($path);
+
+		$result = Media::asset('foo', 'js', array('library' => 'cdn_js_test'));
+		$this->assertEqual("http://static.cdn.com/{$library}/js/foo.js", $result);
+
+		$result = Media::asset('foo', 'css', array('library' => 'cdn_js_test'));
+		$this->assertEqual("/{$library}/css/foo.css", $result);
+
+		$result = Media::asset('foo', 'js', array('library' => 'cdn_env_test'));
+		$this->assertEqual("http://static.cdn.com/myapp/{$library}/js/foo.js", $result);
+
+		Libraries::remove('cdn_env_test');
+		Libraries::remove('cdn_js_test');
 	}
 
 	public function testAssetPathGeneration() {
@@ -291,7 +327,7 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual(array('Content-Type: application/json; charset=UTF-8'), $result);
 
 		$result = $response->body();
-		$this->assertEqual(json_encode($data), $result);
+		$this->assertEqual($data, $result);
 	}
 
 	/**
@@ -327,23 +363,24 @@ class MediaTest extends \lithium\test\Unit {
 
 	public function testCustomEncodeHandler() {
 		$response = new Response();
-		$response->type('csv');
 
-		Media::type('csv', 'application/csv', array('encode' => function($data) {
-			ob_start();
-			$out = fopen('php://output', 'w');
-			foreach ($data as $record) {
-				fputcsv($out, $record);
+		Media::type('csv', 'application/csv', array(
+			'encode' => function($data) {
+				ob_start();
+				$out = fopen('php://output', 'w');
+				foreach ($data as $record) {
+					fputcsv($out, $record);
+				}
+				fclose($out);
+				return ob_get_clean();
 			}
-			fclose($out);
-			return ob_get_clean();
-		}));
+		));
 
 		$data = array(
 			array('John', 'Doe', '123 Main St.', 'Anytown, CA', '91724'),
 			array('Jane', 'Doe', '124 Main St.', 'Anytown, CA', '91724')
 		);
-
+		$response->type('csv');
 		Media::render($response, $data);
 		$result = $response->body;
 		$expected = 'John,Doe,"123 Main St.","Anytown, CA",91724' . "\n";
@@ -401,7 +438,7 @@ class MediaTest extends \lithium\test\Unit {
 		$this->expectException("Unhandled media type `bad`.");
 		Media::render($response, array('foo' => 'bar'));
 
-		$result = $response->body;
+		$result = $response->body();
 		$this->assertNull($result);
 	}
 
@@ -431,7 +468,7 @@ class MediaTest extends \lithium\test\Unit {
 	public function testManualContentHandling() {
 		Media::type('custom', 'text/x-custom');
 		$response = new Response();
-		$response->type = 'custom';
+		$response->type('custom');
 
 		Media::render($response, 'Hello, world!', array(
 			'layout' => false,
@@ -463,7 +500,7 @@ class MediaTest extends \lithium\test\Unit {
 		$request->params['foo'] = 'bar';
 
 		$response = new Response();
-		$response->type = 'custom';
+		$response->type('custom');
 
 		Media::render($response, null, compact('request') + array(
 			'layout' => false,
@@ -494,7 +531,7 @@ class MediaTest extends \lithium\test\Unit {
 		$request->params['controller'] = 'pages';
 
 		$response = new Response();
-		$response->type = 'html';
+		$response->type('html');
 
 		$this->expectException('/Template not found/');
 		Media::render($response, null, compact('request'));
@@ -664,6 +701,17 @@ class MediaTest extends \lithium\test\Unit {
 			'HTTP_ACCEPT' => 'application/xhtml+xml,text/html'
 		)));
 		$this->assertEqual('iphone', Media::negotiate($request));
+	}
+
+	/**
+	 * Tests that empty asset paths correctly return the base path for the asset type, and don't
+	 * generate notices or errors.
+	 */
+	public function testEmptyAssetPaths() {
+		$this->assertEqual('/img/', Media::asset('', 'image'));
+		$this->assertEqual('/css/.css', Media::asset('', 'css'));
+		$this->assertEqual('/js/.js', Media::asset('', 'js'));
+		$this->assertEqual('/', Media::asset('', 'generic'));
 	}
 }
 

@@ -60,9 +60,9 @@ class TestTest extends \lithium\test\Unit {
 		));
 		$path = 'Foobar/lithium/tests/mocks/test/cases/MockTest.php';
 		$command->run($path);
-		$expected = "Library `Foobar` does not exist.\n";
+		$expected = "Path `.*` not found.\n";
 		$result = $command->response->error;
-		$this->assertEqual($expected, $result);
+		$this->assertPattern("/{$expected}/", $result);
 	}
 
 	public function testRunWithInvalidLibrary() {
@@ -73,7 +73,7 @@ class TestTest extends \lithium\test\Unit {
 		$command->format = 'foobar';
 		$path = LITHIUM_LIBRARY_PATH . '/bob/tests/mocks/test/cases/MockTest.php';
 		$command->run($path);
-		$expected = "No library found in `";
+		$expected = "No library found in path `";
 		$expected .= LITHIUM_LIBRARY_PATH . "/bob/tests/mocks/test/cases/MockTest.php`.\n";
 		$result = $command->response->error;
 		$this->assertEqual($expected, $result);
@@ -99,7 +99,7 @@ class TestTest extends \lithium\test\Unit {
 		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTest.php';
 		$command->run($path);
 
-		$expected = "1 passes\n0 fails and 0 exceptions\n";
+		$expected = "1 pass\n0 fails and 0 exceptions\n";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
@@ -113,7 +113,7 @@ class TestTest extends \lithium\test\Unit {
 		$path = 'tests/mocks/test/cases/MockTest.php';
 		$command->run($path);
 
-		$expected = "1 passes\n0 fails and 0 exceptions\n";
+		$expected = "1 pass\n0 fails and 0 exceptions\n";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
@@ -126,7 +126,7 @@ class TestTest extends \lithium\test\Unit {
 		$path = "../{$current}/tests/mocks/test/cases/MockTest.php";
 		$command->run($path);
 
-		$expected = "1 passes\n0 fails and 0 exceptions\n";
+		$expected = "1 pass\n0 fails and 0 exceptions\n";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
@@ -135,7 +135,7 @@ class TestTest extends \lithium\test\Unit {
 		$path = "{$current}/tests/mocks/test/cases/MockTest.php";
 		$command->run($path);
 
-		$expected = "1 passes\n0 fails and 0 exceptions\n";
+		$expected = "1 pass\n0 fails and 0 exceptions\n";
 		$expected = preg_quote($expected);
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
@@ -148,7 +148,7 @@ class TestTest extends \lithium\test\Unit {
 		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases';
 		$command->run($path);
 
-		$expected = "1 / 1 passes\n0 fails and 2 exceptions\n";
+		$expected = "4 exceptions";
 		$expected = preg_quote($expected, '/');
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);

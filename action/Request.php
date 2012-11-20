@@ -182,7 +182,7 @@ class Request extends \lithium\net\http\Request {
 		if (!empty($this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
 			$this->_env['REQUEST_METHOD'] = $this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'];
 		}
-		$type = $this->type($this->_env['CONTENT_TYPE']);
+		$type = $this->type($this->_config['type'] ?: $this->env('CONTENT_TYPE'));
 		$this->method = $method = strtoupper($this->_env['REQUEST_METHOD']);
 
 		if (!$this->data && ($method == 'POST' || $method == 'PUT')) {
@@ -246,7 +246,7 @@ class Request extends \lithium\net\http\Request {
 		$this->_env[$key] = $val;
 
 		if ($key == 'REMOTE_ADDR') {
-			foreach(array('HTTP_X_FORWARDED_FOR', 'HTTP_PC_REMOTE_ADDR') as $altKey) {
+			foreach (array('HTTP_X_FORWARDED_FOR', 'HTTP_PC_REMOTE_ADDR', 'HTTP_X_REAL_IP') as $altKey) {
 				if ($addr = $this->env($altKey)) {
 					$val = $addr;
 					break;
@@ -461,8 +461,8 @@ class Request extends \lithium\net\http\Request {
 	 *         on the content type of the request.
 	 */
 	public function type($type = null) {
-		if ($type === null) {
-			$type = $this->type ?: $this->env('CONTENT_TYPE');
+		if (!$type && !empty($this->params['type'])) {
+			$type = $this->params['type'];
 		}
 		return parent::type($type);
 	}
@@ -586,9 +586,9 @@ class Request extends \lithium\net\http\Request {
 			return rtrim($_GET['url'], '/');
 		}
 		if ($uri = $this->env('REQUEST_URI')) {
-			return trim(preg_replace(
-				'/^' . preg_quote($this->env('base'), '/') . '/', '', parse_url($uri, PHP_URL_PATH)
-			), '/') ?: '/';
+			list($uri) = explode('?', $uri, 2);
+			$base = '/^' . preg_quote($this->env('base'), '/') . '/';
+			return trim(preg_replace($base, '', $uri), '/') ?: '/';
 		}
 		return '/';
 	}

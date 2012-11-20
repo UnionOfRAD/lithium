@@ -118,7 +118,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testConstructWithEnv() {
 		$base = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_readable($base), "Path `{$base}` is not writable.");
+		$this->skipIf(!is_readable($base), "Path `{$base}` is not readable.");
 
 		chdir(Libraries::get(true, 'resources') . '/tmp');
 		$request = new Request(array('env' => array('working' => '/some/other/path')));

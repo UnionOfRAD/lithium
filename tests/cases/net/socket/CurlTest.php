@@ -140,6 +140,19 @@ class CurlTest extends \lithium\test\Unit {
 		$this->assertEqual('Changed Dummy Value', $stream->options['DummyFlag']);
 	}
 
+	public function testSettingOfOptionsInConfig() {
+		$config = $this->_testConfig + array('options' => array('DummyFlag' => 'Dummy Value'));
+		$stream = new Curl($config);
+		$stream->open();
+		$this->assertEqual('Dummy Value', $stream->options['DummyFlag']);
+	}
+
+	public function testSettingOfOptionsInOpen() {
+		$stream = new Curl($this->_testConfig);
+		$stream->open(array('options' => array('DummyFlag' => 'Dummy Value')));
+		$this->assertEqual('Dummy Value', $stream->options['DummyFlag']);
+	}
+
 	public function testSendPostThenGet() {
 		$postConfig = array('method' => 'POST', 'body' => '{"body"}');
 		$stream = new Curl($this->_testConfig);
@@ -151,6 +164,23 @@ class CurlTest extends \lithium\test\Unit {
 		$this->assertTrue(is_resource($stream->open()));
 		$this->assertTrue($stream->write(new Request($this->_testConfig)));
 		$this->assertFalse(isset($stream->options[CURLOPT_POST]));
+		$this->assertTrue($stream->close());
+	}
+
+	public function testSendPutThenGet() {
+		$postConfig = array('method' => 'PUT', 'body' => '{"body"}');
+		$stream = new Curl($this->_testConfig);
+		$this->assertTrue(is_resource($stream->open()));
+		$this->assertTrue($stream->write(new Request($postConfig + $this->_testConfig)));
+		$this->assertTrue(isset($stream->options[CURLOPT_CUSTOMREQUEST]));
+		$this->assertEqual($stream->options[CURLOPT_CUSTOMREQUEST],'PUT');
+		$this->assertTrue(isset($stream->options[CURLOPT_POSTFIELDS]));
+		$this->assertEqual($stream->options[CURLOPT_POSTFIELDS],$postConfig['body']);
+		$this->assertTrue($stream->close());
+
+		$this->assertTrue(is_resource($stream->open()));
+		$this->assertTrue($stream->write(new Request($this->_testConfig)));
+		$this->assertFalse(isset($stream->options[CURLOPT_CUSTOMREQUEST]));
 		$this->assertTrue($stream->close());
 	}
 }

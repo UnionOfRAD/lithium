@@ -109,7 +109,6 @@ class DocumentTest extends \lithium\test\Unit {
 
 		$this->assertEqual(array_fill_keys(array_keys($expected), false), $doc->modified());
 
-
 		$doc->_id = 5;
 		$doc->content = null;
 		$doc->new = null;
@@ -121,6 +120,61 @@ class DocumentTest extends \lithium\test\Unit {
 		);
 
 		$this->assertEqual($expected, $doc->modified());
+
+		$doc = new Document(array('model' => $this->_model));
+		$doc->id = 4;
+		$doc->name = 'Four';
+		$doc->content = 'Lorem ipsum four';
+		$doc->array = array(1, 2, 3, 4);
+		$doc->subdoc = array(
+			'setting' => 'something',
+			'foo' => 'bar',
+			'sub' => array('name' => 'A sub sub doc')
+		);
+		$doc->subdocs = array(
+			array('id' => 1),
+			array('id' => 2),
+			array('id' => 3),
+			array('id' => 4)
+		);
+
+		$fields = array('id', 'name', 'content', 'array', 'subdoc', 'subdocs');
+		$expected = array_fill_keys($fields, true);
+
+		$this->assertEqual($expected, $doc->modified());
+		$doc->sync();
+
+		$this->assertEqual(array_fill_keys($fields, false), $doc->modified());
+
+		$doc->id = 5;
+		$doc->content = null;
+		$doc->new = null;
+		$doc->subdoc->foo = 'baz';
+		$doc->array[] = 5;
+		$doc->subdocs[] = array('id' => 5);
+		$expected['name'] = false;
+		$expected['new'] = true;
+		$fields[] = 'new';
+
+		$this->assertEqual($expected, $doc->modified());
+		$doc->sync();
+
+		$expected = array_fill_keys($fields, false);
+
+		$this->assertEqual($expected, $doc->modified());
+		$doc->sync();
+
+		$doc->subdocs[1]->updated = true;
+		$expected['subdocs'] = true;
+
+		$this->assertEqual($expected, $doc->modified());
+		$doc->sync();
+
+		$doc->array[1] = array('foo' => 'bar');
+		$expected['array'] = true;
+
+		$this->assertEqual($expected, $doc->modified());
+		$doc->sync();
 	}
 
 	public function testSetAndCoerceArray() {

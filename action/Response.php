@@ -34,7 +34,13 @@ class Response extends \lithium\net\http\Response {
 	protected $_autoConfig = array('classes' => 'merge');
 
 	public function __construct(array $config = array()) {
-		$defaults = array('buffer' => 8192, 'location' => null, 'status' => 0, 'request' => null);
+		$defaults = array(
+			'buffer' => 8192,
+			'location' => null,
+			'status' => 0,
+			'request' => null,
+			'decode' => false
+		);
 		parent::__construct($config + $defaults);
 	}
 
@@ -47,7 +53,7 @@ class Response extends \lithium\net\http\Response {
 		if ($config['location']) {
 			$classes = $this->_classes;
 			$location = $classes['router']::match($config['location'], $config['request']);
-			$this->headers('location', $location);
+			$this->headers('Location', $location);
 		}
 	}
 
@@ -82,6 +88,21 @@ class Response extends \lithium\net\http\Response {
 	}
 
 	/**
+	 * Sets/Gets the content type. If `'type'` is null, the method will attempt to determine the
+	 * type from the params, then from the environment setting
+	 *
+	 * @param string $type a full content type i.e. `'application/json'` or simple name `'json'`
+	 * @return string A simple content type name, i.e. `'html'`, `'xml'`, `'json'`, etc., depending
+	 *         on the content type of the request.
+	 */
+	public function type($type = null) {
+		if ($type === null && $this->_type === null) {
+			$type = 'html';
+		}
+		return parent::type($type);
+	}
+
+	/**
 	 * Render a response by writing headers and output. Output is echoed in chunks because of an
 	 * issue where `echo` time increases exponentially on long message bodies.
 	 *
@@ -89,8 +110,9 @@ class Response extends \lithium\net\http\Response {
 	 */
 	public function render() {
 		$code = null;
+		$hasLocation = (isset($this->headers['location']) || isset($this->headers['Location']));
 
-		if (isset($this->headers['location']) && $this->status['code'] === 200) {
+		if ($hasLocation && $this->status['code'] === 200) {
 			$code = 302;
 		}
 		$this->_writeHeader($this->status($code) ?: $this->status(500));
@@ -146,7 +168,7 @@ class Response extends \lithium\net\http\Response {
 			array_map(function($h) { header($h, false); }, $header);
 			return;
 		}
-		$code ? header($header, true) : header($header, true, $code);
+		$code ? header($header, true, $code) : header($header, true);
 	}
 }
 

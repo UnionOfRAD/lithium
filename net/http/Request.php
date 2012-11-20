@@ -36,7 +36,7 @@ class Request extends \lithium\net\http\Message {
 	 *
 	 * @var string
 	 */
-	public $method = 'GET';
+	public $method;
 
 	/**
 	 * Cookies.
@@ -59,6 +59,7 @@ class Request extends \lithium\net\http\Message {
 	 * - `fragment`: null - after the hashmark #
 	 * - `auth` - the Authorization method (Basic|Digest)
 	 * - `method` - GET
+	 * - `type`: null
 	 * - `version`: 1.1
 	 * - `headers`: array
 	 * - `body`: null
@@ -76,53 +77,40 @@ class Request extends \lithium\net\http\Message {
 			'headers' => array(),
 			'body' => null,
 			'auth' => null,
-			'method' => 'GET'
+			'method' => 'GET',
+			'type' => null,
+			'proxy' => null,
+			'ignoreErrors' => true,
+			'followLocation' => true
 		);
-		$config += $defaults;
-		parent::__construct($config);
+		parent::__construct($config + $defaults);
+		$this->method = $this->method ?: $this->_config['method'];
 
 		$this->headers = array(
 			'Host' => $this->port ? "{$this->host}:{$this->port}" : $this->host,
 			'Connection' => 'Close',
 			'User-Agent' => 'Mozilla/5.0'
 		);
-		$this->headers($config['headers']);
+		$this->headers($this->_config['headers']);
+
+		if ($type = $this->_config['type']) {
+			$this->type($type);
+		}
 	}
 
 	/**
-	 * Encodes the body based on the type
-	 *
-	 * @see lithium\net\http\Message::type()
-	 * @param mixed $body
-	 * @return string
-	 */
-	protected function _encode($body) {
-		$media = $this->_classes['media'];
-		if ($type = $media::type($this->_type)) {
-			$body = $media::encode($this->_type, $body) ?: $body;
-		}
-		if (is_array($body)) {
-			$body = join("\r\n", $body);
-		}
-		return $body;
-	}
-
-	/**
-	 * Add body parts and encodes it into formated string
+	 * Add body parts and encodes it into formatted string
 	 *
 	 * @see lithium\net\Message::body()
+	 * @see lithium\net\http\Message::_encode()
 	 * @param mixed $data
 	 * @param array $options
 	 *        - `'buffer'`: split the body string
 	 * @return array
 	 */
 	public function body($data = null, $options = array()) {
-		$default = array('buffer' => null);
-		$options += $default;
-		$this->body = array_merge((array) $this->body, (array) $data);
-
-		$body = $this->_encode($this->body);
-		return ($options['buffer']) ? str_split($body, $options['buffer']) : $body;
+		$defaults = array('encode' => true);
+		return parent::body($data, $options + $defaults);
 	}
 
 	/**
@@ -144,31 +132,29 @@ class Request extends \lithium\net\http\Message {
 
 			if (!$format) {
 				$result[] = http_build_query($query);
+				continue;
 			}
-			if ($format) {
-				$q = null;
+			$q = null;
 
-				foreach ($params as $key => $value) {
-					if (is_array($value)) {
-						foreach ($value as $val) {
-							$q .= String::insert($format, array(
-								'key' => urlencode("{$key}[]"),
-								'value' => urlencode($val)
-							));
-						}
-						continue;
-					}
+			foreach ($params as $key => $value) {
+				if (!is_array($value)) {
 					$q .= String::insert($format, array(
 						'key' => urlencode($key),
 						'value' => urlencode($value)
 					));
+					continue;
 				}
-				$result[] = substr($q, 0, -1);
+				foreach ($value as $val) {
+					$q .= String::insert($format, array(
+						'key' => urlencode("{$key}[]"),
+						'value' => urlencode($val)
+					));
+				}
 			}
-
+			$result[] = substr($q, 0, -1);
 		}
 		$result = array_filter($result);
-		return (!empty($result)) ? "?" . join("&", $result) : null;
+		return $result ? "?" . join("&", $result) : null;
 	}
 
 	/**
@@ -211,16 +197,16 @@ class Request extends \lithium\net\http\Message {
 			'username' => $this->username,
 			'password' => $this->password,
 			'headers' => array(),
+			'proxy' => $this->_config['proxy'],
 			'body' => null,
 			'version' => $this->version,
-			'ignore_errors' => isset($this->_config['ignore_errors'])
-				? $this->_config['ignore_errors'] : true,
-			'follow_location' => isset($this->_config['follow_location'])
-				? $this->_config['follow_location'] : true
+			'ignore_errors' => $this->_config['ignoreErrors'],
+			'follow_location' => $this->_config['followLocation'],
+			'request_fulluri' => (boolean) $this->_config['proxy']
 		);
 		$options += $defaults;
 
-		if (!empty($options['auth'])) {
+		if ($options['auth']) {
 			$data = array();
 
 			if (is_array($options['auth']) && !empty($options['auth']['nonce'])) {
@@ -231,13 +217,6 @@ class Request extends \lithium\net\http\Message {
 			$data = $auth::encode($options['username'], $options['password'], $data);
 			$this->headers('Authorization', $auth::header($data));
 		}
-		if (in_array($options['method'], array('POST', 'PUT'))) {
-			$media = $this->_classes['media'];
-			if ($type = $media::type($this->_type)) {
-				$this->headers('Content-Type', $type['content'][0]);
-			}
-		}
-
 		$body = $this->body($options['body']);
 		$this->headers('Content-Length', strlen($body));
 
@@ -253,7 +232,9 @@ class Request extends \lithium\net\http\Message {
 					'header' => $this->headers($options['headers']),
 					'protocol_version' => $options['version'],
 					'ignore_errors' => $options['ignore_errors'],
-					'follow_location' => $options['follow_location']
+					'follow_location' => $options['follow_location'],
+					'request_fulluri' => $options['request_fulluri'],
+					'proxy' => $options['proxy']
 				);
 				return array('http' => array_diff_key($options, $defaults) + $base);
 			case 'string':

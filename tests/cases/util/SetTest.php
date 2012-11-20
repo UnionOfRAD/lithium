@@ -1384,6 +1384,37 @@ class SetTest extends \lithium\test\Unit {
 
 		$result = Set::append(array(), array('2'));
 		$this->assertIdentical(array('2'), $result);
+
+		$array1 = array(
+			'ModelOne' => array(
+				'id' => 1001, 'field_one' => 's1.0.m1.f1', 'field_two' => 's1.0.m1.f2'
+			),
+			'ModelTwo' => array(
+				'id' => 1002, 'field_one' => 's1.0.m2.f1', 'field_two' => 's1.0.m2.f2'
+			)
+		);
+		$array2 = array(
+			'ModelTwo' => array(
+				'field_three' => 's1.0.m2.f3'
+			)
+		);
+		$array3 = array(
+			'ModelOne' => array(
+				'field_three' => 's1.0.m1.f3'
+			)
+		);
+
+		$result = Set::append($array1, $array2, $array3);
+
+		$expected = array(
+			'ModelOne' => array(
+				'id' => 1001, 'field_one' => 's1.0.m1.f1', 'field_two' => 's1.0.m1.f2', 'field_three' => 's1.0.m1.f3'
+			),
+			'ModelTwo' => array(
+				'id' => 1002, 'field_one' => 's1.0.m2.f1', 'field_two' => 's1.0.m2.f2', 'field_three' => 's1.0.m2.f3'
+			)
+		);
+		$this->assertIdentical($expected, $result);
 	}
 
 	public function testStrictKeyCheck() {

@@ -52,7 +52,7 @@ class MockTest extends \lithium\test\Unit {
 		));
 		$mock->path = $this->_testPath;
 		$mock->run('mock');
-		$expected = "MockPosts created in create_test\\tests\\mocks\\models.\n";
+		$expected = "MockPosts created in tests/mocks/models/MockPosts.php.\n";
 		$result = $mock->response->output;
 		$this->assertEqual($expected, $result);
 

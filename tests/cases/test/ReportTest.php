@@ -40,8 +40,7 @@ class ReportTest extends \lithium\test\Unit {
 				array('data' => array('lithium\tests\mocks\test\MockFilterClassTest'))
 			),
 			'filters' => array("Complexity" => ""),
-			'format' => 'html',
-			'reporter' => 'html'
+			'format' => 'html'
 		));
 
 		$expected = array('lithium\test\filter\Complexity' => array(
@@ -58,7 +57,7 @@ class ReportTest extends \lithium\test\Unit {
 		));
 		$report->run();
 
-		$expected = 1;
+		$expected = 2;
 		$result = $report->stats();
 		$this->assertEqual($expected, $result['count']['asserts']);
 		$this->assertEqual($expected, $result['count']['passes']);
@@ -67,15 +66,14 @@ class ReportTest extends \lithium\test\Unit {
 
 	public function testRender() {
 		$report = new Report(array(
-			'title' => 'lithium\tests\mocks\test\MockUnitTest',
-			'group' => new Group(array('data' => array('lithium\tests\mocks\test\MockUnitTest'))),
-			'format' => 'html',
-			'reporter' => 'html'
+			'title' => '\lithium\tests\mocks\test\MockUnitTest',
+			'group' => new Group(array('data' => array('\lithium\tests\mocks\test\MockUnitTest'))),
+			'format' => 'txt'
 		));
 		$report->run();
 
-		$result = $report->render("stats");
-		$this->assertPattern("#1.*1.*passes,.*0.*fails.*0.*exceptions#s", $result);
+		$result = $report->render('result', $report->stats());
+		$this->assertPattern('#2.*2.*passes.*0.*fails.*0.*exceptions#s', $result);
 	}
 
 	public function testSingleFilter() {

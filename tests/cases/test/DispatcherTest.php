@@ -15,6 +15,8 @@ use lithium\util\Collection;
 use lithium\tests\mocks\test\cases\MockTest;
 use lithium\tests\mocks\test\cases\MockTestErrorHandling;
 use lithium\tests\mocks\test\cases\MockSkipThrowsException;
+use lithium\tests\mocks\test\cases\MockSetUpThrowsException;
+use lithium\tests\mocks\test\cases\MockTearDownThrowsException;
 
 class DispatcherTest extends \lithium\test\Unit {
 
@@ -27,7 +29,11 @@ class DispatcherTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithReporter() {
-		$report = Dispatcher::run(null, array('reporter' => 'html'));
+		$report = Dispatcher::run(null, array(
+			'reporter' => function($info) {
+				return $info;
+			}
+		));
 		$this->assertTrue($report instanceof Report);
 
 		$result = $report->group;
@@ -58,17 +64,20 @@ class DispatcherTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = new Collection(array('data' => array(
-			new MockSkipThrowsException(), new MockTest(), new MockTestErrorHandling()
+			new MockSetUpThrowsException(),
+			new MockSkipThrowsException(),
+			new MockTearDownThrowsException(),
+			new MockTest(),
+			new MockTestErrorHandling()
 		)));
 		$result = $report->group->tests();
 		$this->assertEqual($expected, $result);
-
 		$expected = 'testNothing';
-		$result = $report->results['group'][1][0]['method'];
+		$result = $report->results['group'][3][0]['method'];
 		$this->assertEqual($expected, $result);
 
 		$expected = 'pass';
-		$result = $report->results['group'][1][0]['result'];
+		$result = $report->results['group'][3][0]['result'];
 		$this->assertEqual($expected, $result);
 	}
 }
