@@ -25,6 +25,8 @@ use lithium\tests\mocks\data\MockBadConnection;
 
 class ModelTest extends \lithium\test\Unit {
 
+	protected $_model = 'lithium\tests\mocks\data\MockModelCompositePk';
+
 	protected $_database = 'lithium\tests\mocks\data\MockSource';
 
 	protected $_altSchema = null;
@@ -404,6 +406,21 @@ class ModelTest extends \lithium\test\Unit {
 		$key->foo = 'bar';
 
 		$this->assertEqual(array('id' => $key), MockPost::key($key));
+
+		$this->assertNull(MockPost::key(array()));
+
+		$model = $this->_model;
+		$this->assertNull($model::key(array('client_id' => 3)));
+
+		$result = $model::key(array('invoice_id' => 5, 'payment' => '100'));
+		$this->assertNull($result);
+
+		$expected = array('client_id' => 3, 'invoice_id' => 5);
+		$result = $model::key(array(
+			'client_id' => 3,
+			'invoice_id' => 5,
+			'payment' => '100'));
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testValidatesFalse() {
