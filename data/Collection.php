@@ -188,10 +188,10 @@ abstract class Collection extends \lithium\util\Collection {
 	 *
 	 * For example:
 	 * {{{
-	 * $doc->set(array('title' => 'Lorem Ipsum', 'value' => 42));
+	 * $collection->set(array('title' => 'Lorem Ipsum', 'value' => 42));
 	 * }}}
 	 *
-	 * @param $values An associative array of fields and values to assign to the `Document`.
+	 * @param $values An associative array of fields and values to assign to the `Collection`.
 	 * @return void
 	 */
 	public function set($values) {
