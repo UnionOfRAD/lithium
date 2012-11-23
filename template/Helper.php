@@ -132,7 +132,15 @@ abstract class Helper extends \lithium\core\Object {
 	 * @param string $method name of method that is calling the render (for context filters)
 	 * @param string $string template key (in Helper::_strings) to render
 	 * @param array $params associated array of template inserts {:key} will be replaced by value
-	 * @param array $options
+	 * @param array $options Available options:
+	 *              - `'handlers'` _array_: Before inserting `$params` inside the string template,
+	 *              `$this->_context`'s handlers are applied to each value of `$params` according
+	 *              to the key (e.g `$params['url']`, which is processed by the `'url'` handler
+	 *              via `$this->_context->applyHandler()`).
+	 *              The `'handlers'` option allow to set custom mapping beetween `$params`'s key and
+	 *              `$this->_context`'s handlers. e.g. the following handler:
+	 *              `'handlers' => array('url' => 'path')` will make `$params['url']` to be
+	 *              processed by the `'path'` handler instead of the `'url'` one.
 	 * @return string Rendered HTML
 	 */
 	protected function _render($method, $string, $params, array $options = array()) {
@@ -140,8 +148,9 @@ abstract class Helper extends \lithium\core\Object {
 
 		if ($this->_context) {
 			foreach ($params as $key => $value) {
+				$handler = isset($options['handlers'][$key]) ? $options['handlers'][$key] : $key;
 				$params[$key] = $this->_context->applyHandler(
-					$this, $method, $key, $value, $options
+					$this, $method, $handler, $value, $options
 				);
 			}
 			$strings = $this->_context->strings();
