@@ -416,7 +416,6 @@ class Model extends \lithium\core\StaticObject {
 
 		$local = compact('class') + $self->_meta;
 		$self->_meta = ($local + $source['meta'] + $meta);
-		$meta =& $self->_meta;
 
 		if (is_object($schema)) {
 			$schema = $schema->fields();
