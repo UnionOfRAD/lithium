@@ -312,6 +312,7 @@ class ExporterTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testTypeCasting() {
+		$time = time();
 		$data = array(
 			'_id' => '4c8f86167675abfabd970300',
 			'title' => 'Foo',
@@ -321,12 +322,11 @@ class ExporterTest extends \lithium\test\Unit {
 			),
 			'empty_array' => array(),
 			'authors' => '4c8f86167675abfabdb00300',
-			'created' => time(),
-			'modified' => date('Y-m-d H:i:s'),
+			'created' => $time,
+			'modified' => date('Y-m-d H:i:s', $time),
 			'rank_count' => '45',
 			'rank' => '3.45688'
 		);
-		$time = time();
 		$model = $this->_model;
 		$handlers = $this->_handlers;
 		$options = compact('model', 'handlers');
