@@ -685,8 +685,8 @@ class Model extends \lithium\core\StaticObject {
 	 * Helper for the `Model::key()` function
 	 *
 	 * @see lithium\data\Model::key()
-	 * @param object $values Object with attributes.
 	 * @param string $key The key
+	 * @param object $values Object with attributes.
 	 * @return mixed The key value array or `null` if the `$values` object has no attribute
 	 *         named `$key`
 	 */
@@ -703,27 +703,27 @@ class Model extends \lithium\core\StaticObject {
 	 * Returns a list of models related to `Model`, or a list of models related
 	 * to this model, but of a certain type.
 	 *
-	 * @param string $name A type of model relation.
+	 * @param string $type A type of model relation.
 	 * @return mixed An array of relation instances or an instance of relation.
 	 *
 	 */
-	public static function relations($name = null) {
+	public static function relations($type = null) {
 		$self = static::_object();
 
-		if ($name === null) {
+		if ($type === null) {
 			return static::_relations();
 		}
 
-		if (isset($self->_relations[$name])) {
-			return $self->_relations[$name];
+		if (isset($self->_relations[$type])) {
+			return $self->_relations[$type];
 		}
 
-		if (isset($self->_relationsToLoad[$name])) {
-			return static::_relations(null, $name);
+		if (isset($self->_relationsToLoad[$type])) {
+			return static::_relations(null, $type);
 		}
 
-		if (in_array($name, $self->_relationTypes, true)) {
-			return array_keys(static::_relations($name));
+		if (in_array($type, $self->_relationTypes, true)) {
+			return array_keys(static::_relations($type));
 		}
 		return null;
 	}
@@ -747,24 +747,22 @@ class Model extends \lithium\core\StaticObject {
 			}
 			return isset($self->_relations[$name]) ? $self->_relations[$name] : null;
 		}
-
 		if (!$type) {
 			foreach ($self->_relationsToLoad as $name => $t) {
 				static::bind($t, $name, (array) $self->{$t}[$name]);
 			}
 			$self->_relationsToLoad = array();
 			return $self->_relations;
-		} else {
-			foreach ($self->_relationsToLoad as $name => $t) {
-				if ($type == $t) {
-					static::bind($t, $name, (array) $self->{$t}[$name]);
-					unset($self->_relationsToLoad[$name]);
-				}
-			}
-			return array_filter($self->_relations, function($i) use ($type) {
-				return $i->data('type') == $type;
-			});
 		}
+		foreach ($self->_relationsToLoad as $name => $t) {
+			if ($type == $t) {
+				static::bind($t, $name, (array) $self->{$t}[$name]);
+				unset($self->_relationsToLoad[$name]);
+			}
+		}
+		return array_filter($self->_relations, function($i) use ($type) {
+			return $i->data('type') == $type;
+		});
 	}
 
 
@@ -805,14 +803,14 @@ class Model extends \lithium\core\StaticObject {
 		$self = static::_object();
 
 		if (!is_object($self->_schema)) {
-			$source = $self::meta('source');
-			$self->_schema = static::connection()->describe($source, $self->_schema, static::meta());
-
+			$self->_schema = static::connection()->describe(
+				$self::meta('source'), $self->_schema, $self::meta()
+			);
 			if (!is_object($self->_schema)) {
 				$class = get_called_class();
 				throw new ConfigException("Could not load schema object for model `{$class}`.");
 			}
-			$key = (array) static::meta('key');
+			$key = (array) $self::meta('key');
 
 			if ($self->_schema && $self->_schema->fields() && !$self->_schema->has($key)) {
 				$key = implode('`, `', $key);
@@ -842,7 +840,6 @@ class Model extends \lithium\core\StaticObject {
 		if (!is_array($field)) {
 			return static::schema()->fields($field);
 		}
-
 		foreach ($field as $f) {
 			if (static::hasField($f)) {
 				return $f;
