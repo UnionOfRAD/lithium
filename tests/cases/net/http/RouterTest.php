@@ -142,6 +142,77 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertNull(Router::parse($this->request));
 	}
 
+	public function testRouteMatchingWithRegExAction() {
+		Router::connect(
+			'/products/{:action:add|edit|remove}/{:category}',
+			array('controller' => 'Products')
+		);
+		Router::connect('/products/{:category}', array('Products::category'));
+
+		$this->request = new Request();
+		$this->request->url = '/products/add/computer';
+		$result = Router::parse($this->request);
+		$expected = array(
+			'controller' => 'Products',
+			'action' => 'add',
+			'category' => 'computer'
+		);
+		$this->assertEqual($expected, $result->params);
+
+		$this->request = new Request();
+		$this->request->url = '/products/add';
+		$result = Router::parse($this->request);
+		$expected = array(
+			'controller' => 'Products',
+			'action' => 'category',
+			'category' => 'add'
+		);
+		$this->assertEqual($expected, $result->params);
+
+		$this->request = new Request();
+		$this->request->url = '/products/computer';
+		$result = Router::parse($this->request);
+		$expected = array(
+			'controller' => 'Products',
+			'action' => 'category',
+			'category' => 'computer'
+		);
+		$this->assertEqual($expected, $result->params);
+
+		Router::reset();
+		Router::connect(
+			'/products/{:action:add|edit|remove}/{:category:.*}',
+			array('controller' => 'Products')
+		);
+		Router::connect('/products/{:category}', array('Products::category'));
+
+		$this->request = new Request();
+		$this->request->url = '/products/add';
+		$result = Router::parse($this->request);
+		$expected = array(
+			'controller' => 'Products',
+			'action' => 'add'
+		);
+		$this->assertEqual($expected, $result->params);
+
+		Router::reset();
+		Router::connect(
+			'/products/{:action:add|edit|remove}/{:category:.*}',
+			array('controller' => 'Products', 'category' => 'default')
+		);
+		Router::connect('/products/{:category}', array('Products::category'));
+
+		$this->request = new Request();
+		$this->request->url = '/products/add';
+		$result = Router::parse($this->request);
+		$expected = array(
+			'controller' => 'Products',
+			'action' => 'add',
+			'category' => 'default'
+		);
+		$this->assertEqual($expected, $result->params);
+	}
+
 	/**
 	 * Tests that URLs specified as "Controller::action" are interpreted properly.
 	 */

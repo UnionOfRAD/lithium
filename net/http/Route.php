@@ -464,7 +464,14 @@ class Route extends \lithium\core\Object {
 		} else {
 			$regex = '[^\/]+';
 		}
-		$req = $param === 'args' || array_key_exists($param, $this->_params) ? '?' : '';
+
+		$optionnal = false;
+		if (isset($this->_params[$param])) {
+			$optionnal = preg_match("@{$regex}@", $this->_params[$param]);
+		} elseif (array_key_exists($param, $this->_params)) {
+			$optionnal = true;
+		}
+		$req = $regex === '.*' || $optionnal ? '?' : '';
 
 		if ($prefix === '/') {
 			$pattern = "(?:/(?P<{$param}>{$regex}){$req}){$req}";
