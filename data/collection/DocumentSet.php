@@ -8,7 +8,6 @@
 
 namespace lithium\data\collection;
 
-use lithium\util\Collection;
 use lithium\data\entity\Document;
 
 class DocumentSet extends \lithium\data\Collection {
@@ -75,16 +74,12 @@ class DocumentSet extends \lithium\data\Collection {
 	 * @return mixed
 	 */
 	public function to($format, array $options = array()) {
-		$defaults = array('handlers' => array(
+		$options += array('handlers' => array(
 			'MongoId' => function($value) { return (string) $value; },
 			'MongoDate' => function($value) { return $value->sec; }
 		));
 
 		$this->offsetGet(null);
-		if ($format == 'array') {
-			$options += $defaults;
-			return Collection::toArray($this->_data, $options);
-		}
 		return parent::to($format, $options);
 	}
 
