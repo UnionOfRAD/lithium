@@ -315,6 +315,28 @@ class HttpTest extends \lithium\test\Unit {
 		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testSendWithQueryObject() {
+		$http = new Http($this->_testConfig);
+		$query = new Query(array(
+			'model' => $this->_model,
+			'data' => array('title' => 'sup'),
+			'method' => 'post',
+			'path' => '/some/resource/path'
+		));
+		$result = $http->send($query);
+		$expected = join("\r\n", array(
+			'POST /some/resource/path HTTP/1.1',
+			'Host: localhost:80',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'Content-Type: application/x-www-form-urlencoded',
+			'Content-Length: 9',
+			'', 'title=sup'
+		));
+		$result = (string) $http->last->request;
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

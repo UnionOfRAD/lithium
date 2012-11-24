@@ -9,6 +9,7 @@
 namespace lithium\data\source;
 
 use lithium\util\String;
+use lithium\data\model\Query;
 
 /**
  * Http class to access data sources using `lithium\net\http\Service`.
@@ -77,7 +78,8 @@ class Http extends \lithium\data\Source {
 			'password'   => '',
 			'port'       => 80,
 			'timeout'    => 30,
-			'encoding'   => 'UTF-8'
+			'encoding'   => 'UTF-8',
+			'methods'    => array()
 		);
 		$config = $config + $defaults;
 		$config['username'] = $config['login'];
@@ -116,41 +118,47 @@ class Http extends \lithium\data\Source {
 			if (method_exists($this->connection, $method)) {
 				return $this->connection->invokeMethod($method, $params);
 			}
-			$this->_methods[$method] = array('method' => 'get', 'path' => "/{$method}");
+			$this->_methods[$method] = array('path' => "/{$method}");
 		}
-		return $this->send($this->_methods[$method], $params);
+		$params += array(array(), array());
+
+		if (!is_object($params[0])) {
+			$config = (array) $params[0];
+
+			if (count($config) == count($config, COUNT_RECURSIVE)) {
+				$config = array('data' => $config);
+			}
+			$params[0] = new Query($this->_methods[$method] + $config);
+		}
+		$params[0] = new Query($params[0]->export($this) + $this->_methods[$method]);
+
+		return $this->_filter(__CLASS__ . "::" . $method, $params, function($self, $params) {
+			list($query, $options) = $params;
+			return $this->send($query, $options);
+		});
 	}
 
 	/**
 	 * Method to send to a specific resource.
 	 *
-	 * @param array $resource an array with an Http method and path.
-	 * @param array $params numeric array.
-	 *              first value is a query object or data array.
-	 *              second value is an options array.
+	 * @param array $query a query object
+	 * @param array $options array.
 	 * @return result
 	 */
-	public function send($resource, $params) {
-		$conn =& $this->connection;
-		$filter = function($self, $params) use (&$conn, $resource) {
-			list($query, $options) = $params + array(array(), array());
-			$data = (array) $query;
+	public function send($query = null, array $options = array()) {
+		$query = !is_object($query) ? new Query((array) $query) : $query;
+		$method = $query->method() ?: "get";
+		$path = $query->path();
+		$data = $query->data();
+		$insert = (array) $options + $data + $query->export($this);
 
-			if (is_object($query)) {
-				$options += array_filter($query->export($self), function($v) {
-					return $v !== null;
-				});
-				$data = $query->data();
-			}
-			preg_match_all('/\{:(\w+)\}/', $resource['path'], $matches);
+		if (preg_match_all('/\{:(\w+)\}/', $path, $matches)) {
 			$keys = array_flip($matches[1]);
-			$path = String::insert($resource['path'], $options + $data, array('clean' => true));
-			$options += array('conditions' => null, 'limit' => null);
-			$data = array_diff_assoc($data, $keys);
-			$data += (array) $options['conditions'] + (array) $options['limit'];
-			return $conn->{$resource['method']}($path, $data, $options);
-		};
-		return $this->_filter(__METHOD__, $params, $filter);
+			$data = array_diff_key($data,  array_flip($matches[1]));
+		}
+		$path = String::insert($path, $insert, array('clean' => true));
+		$data += (array) $query->conditions() + array('limit' => $query->limit());
+		return $this->connection->{$method}($path, $data, (array) $options);
 	}
 
 	/**
@@ -208,9 +216,13 @@ class Http extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function create($query, array $options = array()) {
-		$resource = array('method' => 'post', 'path' => "/{:source}");
-		$params = compact('query', 'options');
-		return $this->send($resource, array_values($params));
+		$query = !is_object($query) ? new Query() : $query;
+		$query->method() ?: $query->method("post");
+		$query->path() ?: $query->path("/{:source}");
+		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
+			list($query, $options) = $params;
+			return $this->send($query, $options);
+		});
 	}
 
 	/**
@@ -222,9 +234,13 @@ class Http extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function read($query, array $options = array()) {
-		$resource = array('method' => 'get', 'path' => "/{:source}");
-		$params = compact('query', 'options');
-		return $this->send($resource, array_values($params));
+		$query = !is_object($query) ? new Query() : $query;
+		$query->method() ?: $query->method("get");
+		$query->path() ?: $query->path("/{:source}");
+		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
+			list($query, $options) = $params;
+			return $this->send($query, $options);
+		});
 	}
 
 	/**
@@ -236,9 +252,13 @@ class Http extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function update($query, array $options = array()) {
-		$resource = array('method' => 'put', 'path' => "/{:source}/{:id}");
-		$params = compact('query', 'options');
-		return $this->send($resource, array_values($params));
+		$query = !is_object($query) ? new Query() : $query;
+		$query->method() ?: $query->method("put");
+		$query->path() ?: $query->path("/{:source}/{:id}");
+		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
+			list($query, $options) = $params;
+			return $this->send($query, $options);
+		});
 	}
 
 	/**
@@ -250,9 +270,14 @@ class Http extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function delete($query, array $options = array()) {
-		$resource = array('method' => 'delete', 'path' => "/{:source}/{:id}");
-		$params = compact('query', 'options');
-		return $this->send($resource, array_values($params));
+		$query = !is_object($query) ? new Query() : $query;
+		$query->method() ?: $query->method("delete");
+		$query->path() ?: $query->path("/{:source}/{:id}");
+		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
+			list($query, $options) = $params;
+			return $this->send($query, $options);
+		});
+
 	}
 
 	/**
