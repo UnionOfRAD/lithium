@@ -16,6 +16,7 @@ use lithium\data\collection\DocumentSet;
 use lithium\tests\mocks\data\model\MockDocumentPost;
 use lithium\tests\mocks\data\source\mongo_db\MockResult;
 use lithium\tests\mocks\data\source\MockMongoConnection;
+use lithium\util\Collection;
 
 class DocumentSetTest extends \lithium\test\Unit {
 
@@ -261,6 +262,43 @@ class DocumentSetTest extends \lithium\test\Unit {
 			),
 			$doc->keys()
 		);
+	}
+
+	public function testTo() {
+		Collection::formats('lithium\net\http\Media');
+		$resource = new MockResult();
+		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
+		$expected = array(
+			'4c8f86167675abfabdbf0300' => array(
+				'_id' => '4c8f86167675abfabdbf0300',
+				'title' => 'bar'
+			),
+			'5c8f86167675abfabdbf0301' => array(
+				'_id' => '5c8f86167675abfabdbf0301',
+				'title' => 'foo'
+			),
+			'6c8f86167675abfabdbf0302' => array(
+				'_id' => '6c8f86167675abfabdbf0302',
+				'title' => 'dib'
+			)
+		);
+		$this->assertEqual($expected, $doc->to('array'));
+
+		$expected = array(
+			array(
+				'_id' => '4c8f86167675abfabdbf0300',
+				'title' => 'bar'
+			),
+			array(
+				'_id' => '5c8f86167675abfabdbf0301',
+				'title' => 'foo'
+			),
+			array(
+				'_id' => '6c8f86167675abfabdbf0302',
+				'title' => 'dib'
+			)
+		);
+		$this->assertEqual($expected, $doc->to('array', array('indexed' => false)));
 	}
 }
 
