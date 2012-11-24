@@ -188,7 +188,7 @@ class InflectorTest extends \lithium\test\Unit {
 		$expected = 'Casa-casa';
 		$this->assertEqual($expected, $result);
 
-		$result = Inflector::slug('Život žiot');
+		$result = Inflector::slug('Život život');
 		$expected = 'Zivot-zivot';
 		$this->assertEqual($expected, $result);
 
