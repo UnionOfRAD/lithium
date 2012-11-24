@@ -336,6 +336,22 @@ class RequestTest extends \lithium\test\Unit {
 		$result = $request->to('string');
 		$this->assertPattern($expected, $result);
 	}
+
+	public function testKeepDefinedContentTypeHeaderWhenTypeIsSet() {
+		$request = new Request(array(
+			'method' => 'POST',
+			'type' => 'json',
+			'headers' => array('Content-Type' => 'text/x-test')
+		));
+		$expected = 'Content-Type: text/x-test';
+		$result = $request->headers();
+		$message = "Expected value `{$expected}` not found in result.";
+		$this->assertTrue(in_array($expected, $result), $message);
+
+		$expected = '#Content-Type: text/x-test#';
+		$result = $request->to('string');
+		$this->assertPattern($expected, $result);
+	}
 }
 
 ?>
