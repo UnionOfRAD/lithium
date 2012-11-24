@@ -134,7 +134,7 @@ class Http extends \lithium\data\Source {
 
 		return $this->_filter(__CLASS__ . "::" . $method, $params, function($self, $params) {
 			list($query, $options) = $params;
-			return $this->send($query, $options);
+			return $self->send($query, $options);
 		});
 	}
 
@@ -221,7 +221,7 @@ class Http extends \lithium\data\Source {
 		$query->path() ?: $query->path("/{:source}");
 		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
 			list($query, $options) = $params;
-			return $this->send($query, $options);
+			return $self->send($query, $options);
 		});
 	}
 
@@ -239,7 +239,7 @@ class Http extends \lithium\data\Source {
 		$query->path() ?: $query->path("/{:source}");
 		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
 			list($query, $options) = $params;
-			return $this->send($query, $options);
+			return $self->send($query, $options);
 		});
 	}
 
@@ -257,7 +257,7 @@ class Http extends \lithium\data\Source {
 		$query->path() ?: $query->path("/{:source}/{:id}");
 		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
 			list($query, $options) = $params;
-			return $this->send($query, $options);
+			return $self->send($query, $options);
 		});
 	}
 
@@ -275,7 +275,7 @@ class Http extends \lithium\data\Source {
 		$query->path() ?: $query->path("/{:source}/{:id}");
 		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
 			list($query, $options) = $params;
-			return $this->send($query, $options);
+			return $self->send($query, $options);
 		});
 
 	}
