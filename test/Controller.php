@@ -11,6 +11,7 @@ namespace lithium\test;
 use lithium\test\Dispatcher;
 use lithium\core\Libraries;
 use lithium\test\Group;
+use lithium\util\Set;
 
 /**
  * The Test Controller for running the html version of the test suite
@@ -53,7 +54,7 @@ class Controller extends \lithium\core\Object {
 				'exclude' => '/mocks/'
 			));
 			sort($menu);
-
+			$menu = Set::expand(array_combine($menu, $menu), array('separator' => "\\"));
 			$result = compact('request', 'report', 'filters', 'menu');
 			return $report->render('layout', $result);
 		});
