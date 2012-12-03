@@ -63,6 +63,7 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertEqual(Inflector::singularize('knives'), 'knife');
 		$this->assertEqual(Inflector::singularize('wolves'), 'wolf');
 		$this->assertEqual(Inflector::singularize('shelves'), 'shelf');
+		$this->assertEqual(Inflector::singularize('causes'), 'cause');
 		$this->assertEqual(Inflector::singularize(''), '');
 	}
 
