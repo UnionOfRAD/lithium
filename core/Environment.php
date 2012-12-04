@@ -239,7 +239,7 @@ class Environment {
 		}
 		$pathKeys = explode('.', $path);
 		foreach ($pathKeys as $pathKey) {
-			if (!isset($arrayPointer[$pathKey])) {
+			if (! is_array($arrayPointer) || ! isset ($arrayPointer[$pathKey])) {
 				return false;
 			}
 			$arrayPointer = &$arrayPointer[$pathKey];
