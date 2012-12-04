@@ -8,7 +8,6 @@
 
 namespace lithium\tests\mocks\data;
 
-use lithium\data\Schema;
 use lithium\tests\mocks\data\model\MockDatabase;
 
 class MockBase extends \lithium\data\Model {
