@@ -206,13 +206,15 @@ class EnvironmentTest extends \lithium\test\Unit {
 	public function testDotPath() {
 		$data = array(
 			'foo' => array('bar' => array('baz' => 123)),
-			'some' => array('path' => true)
+			'some' => array('path' => true),
+			'string' => 'lorem ipsum'
 		);
 		Environment::set('dotPathIndex', $data);
 
 		$this->assertEqual(123, Environment::get('dotPathIndex.foo.bar.baz'));
 		$this->assertEqual($data['foo'], Environment::get('dotPathIndex.foo'));
 		$this->assertTrue(Environment::get('dotPathIndex.some.path'));
+		$this->assertFalse(Environment::get('dotPathIndex.string.b'));
 	}
 
 	/**
