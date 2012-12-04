@@ -955,7 +955,7 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * @see lithium\data\Model::$validates
 	 * @see lithium\data\Model::validates()
-	 * @see lithium\data\Model::errors()
+	 * @see lithium\data\Entity::errors()
 	 * @param object $entity The record or document object to be saved in the database. This
 	 *               parameter is implicit and should not be passed under normal circumstances.
 	 *               In the above example, the call to `save()` on the `$post` object is
