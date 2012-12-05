@@ -444,7 +444,9 @@ class Set {
 
 		foreach ($data as $key => $val) {
 			if (strpos($key, $options['separator']) === false) {
-				$result[$key] = $val;
+				if (!isset($result[$key])) {
+					$result[$key] = $val;
+				}
 				continue;
 			}
 			list($path, $key) = explode($options['separator'], $key, 2);
