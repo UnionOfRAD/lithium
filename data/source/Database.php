@@ -1218,7 +1218,7 @@ abstract class Database extends \lithium\data\Source {
 	protected function _createFields($data, $schema, $context) {
 		$fields = $values = array();
 
-		while (list($field, $value) = each($data)) {
+		foreach ($data as $field => $value) {
 			$fields[] = $this->name($field);
 			$values[] = $this->value($value, isset($schema[$field]) ? $schema[$field] : array());
 		}
@@ -1230,7 +1230,7 @@ abstract class Database extends \lithium\data\Source {
 	protected function _updateFields($data, $schema, $context) {
 		$fields = array();
 
-		while (list($field, $value) = each($data)) {
+		foreach ($data as $field => $value) {
 			$schema += array($field => array('default' => null));
 			$fields[] = $this->name($field) . ' = ' . $this->value($value, $schema[$field]);
 		}
