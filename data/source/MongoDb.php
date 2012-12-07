@@ -9,6 +9,7 @@
 namespace lithium\data\source;
 
 use Mongo;
+use MongoClient;
 use MongoCode;
 use MongoRegex;
 use lithium\util\Inflector;
@@ -146,9 +147,12 @@ class MongoDb extends \lithium\data\Source {
 	public function __construct(array $config = array()) {
 		$host = 'localhost:27017';
 
-		if (class_exists('Mongo', false)) {
-			$host = Mongo::DEFAULT_HOST . ':' . Mongo::DEFAULT_PORT;
+		if (class_exists('MongoClient', false)) {
+			$mongoClass = 'MongoClient';
+		} elseif(class_exists('Mongo', false)) {
+			$mongoClass = 'Mongo';
 		}
+		$host = $mongoClass::DEFAULT_HOST . ':' . $mongoClass::DEFAULT_PORT;
 		$defaults = compact('host') + array(
 			'persistent' => false,
 			'login'      => null,
