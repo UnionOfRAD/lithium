@@ -79,6 +79,15 @@ class Query extends \lithium\core\Object {
 	);
 
 	/**
+	 * The query's fields
+	 *
+	 * @see lithium\data\model\Query::fields()
+	 *
+	 * @var array
+	 */
+	protected $_fields = array();
+
+	/**
 	 * Count the number of identical models in a query for building
 	 * unique aliases
 	 *
@@ -119,7 +128,7 @@ class Query extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_importMethods = array(
-		'model', 'entity', 'fields', 'conditions', 'having', 'group', 'order',
+		'model', 'entity', 'conditions', 'having', 'group', 'order',
 		'limit', 'offset', 'page', 'data', 'calculate', 'schema', 'comment'
 	);
 
@@ -227,6 +236,8 @@ class Query extends \lithium\core\Object {
 		if ($model = $this->model()) {
 			$this->alias($this->_config['alias'] ?: $model::meta('name'));
 		}
+
+		$this->fields($this->_config['fields']);
 
 		unset($this->_config['entity'], $this->_config['init']);
 	}
@@ -344,19 +355,37 @@ class Query extends \lithium\core\Object {
 	 */
 	public function fields($fields = null, $overwrite = false) {
 		if ($fields === false || $overwrite) {
-			$this->_config['fields'] = array();
+			$this->_fields = array();
 		}
-		$this->_config['fields'] = (array) $this->_config['fields'];
-
-		if (is_array($fields)) {
-			$this->_config['fields'] = array_merge($this->_config['fields'], $fields);
-		} elseif ($fields && !isset($this->_config['fields'][$fields])) {
-			$this->_config['fields'][] = $fields;
+		if ($fields === null) {
+			return $this->_fields;
 		}
-		if ($fields !== null) {
+		if (!$fields) {
 			return $this;
 		}
-		return $this->_config['fields'];
+		$fields = is_array($fields) ? $fields : array($fields);
+		foreach ($fields as $key => $field) {
+			if (is_object($field)) {
+				$this->_fields[0][] = $field;
+			} elseif (is_array($field)) {
+				if ($key === 0) {
+					$this->_fields[0][] = $field[0];
+				} else {
+					$this->_fields[$key] = array_fill_keys($field, true);
+				}
+			} elseif (preg_match('/^([a-z0-9_-]+)\.(.*)$/i', $field, $matches)) {
+				if ($matches[1] !== $this->_config['alias']) {
+					$this->_fields[$matches[1]][$matches[2]] = true;
+				} else {
+					$this->_fields[$matches[2]] = true;
+				}
+			} elseif (preg_match('/^([a-z0-9_-]+|\*)$/i', $field)) {
+				$this->_fields[$field] = true;
+			} else {
+				$this->_fields[0][] = $field;
+			}
+		}
+		return $this;
 	}
 
 	/**
@@ -685,7 +714,7 @@ class Query extends \lithium\core\Object {
 		if (!$relpath) {
 			$this->_alias[$alias] = 1;
 			$this->_models[$alias] = $model;
-			$this->_paths[$alias] = null;
+			$this->_paths[$alias] = '';
 			return $this->_config['alias'] = $alias;
 		}
 

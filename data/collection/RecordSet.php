@@ -124,7 +124,7 @@ class RecordSet extends \lithium\data\Collection {
 				$offset += $fieldCount;
 			}
 			$i++;
-		} while ($data = $this->_result->next());
+		} while ($main && $data = $this->_result->next());
 
 		$relMap = $this->_query->relationships();
 		return $this->_hydrateRecord($this->_dependencies, $primary, $record, 0, $i, '', $relMap, $conn);
