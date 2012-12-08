@@ -3,8 +3,8 @@ language: php
 env:
   - OPCODE_CACHE=apc
  #- OPCODE_CACHE=xcache
- - DB=mongo_legacy
- - DB=mongo_latest
+  - DB=mongo_legacy
+  - DB=mongo_latest
 
 php:
   - 5.3
