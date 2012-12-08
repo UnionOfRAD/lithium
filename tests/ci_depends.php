@@ -13,7 +13,12 @@ if (isset($argv[1]) && 'APC' === strtoupper($argv[1])) {
 }
 
 $installer->install('memcached');
-$installer->install('mongo');
+
+if (isset($argv[1]) && substr($argv[1], 0, 5) === 'mongo') {
+	$installer->install($argv[1]);
+} else {
+	$installer->install('mongo_legacy');
+}
 
 class PhpExtensions {
 	protected $extensions;
@@ -55,8 +60,16 @@ class PhpExtensions {
 					'xcache.var_size=1M'
 				)
 			),
-			'mongo' => array(
+			'mongo_legacy' => array(
 				'url' => 'http://pecl.php.net/get/mongo-1.2.7.tgz',
+				'require' => array(),
+				'configure' => array(),
+				'ini' => array(
+					'extension=mongo.so'
+				)
+			),
+			'mongo_latest' => array(
+				'url' => 'http://pecl.php.net/get/mongo-1.3.1.tgz',
 				'require' => array(),
 				'configure' => array(),
 				'ini' => array(
