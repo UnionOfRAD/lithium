@@ -246,7 +246,7 @@ class Request extends \lithium\net\http\Request {
 		$this->_env[$key] = $val;
 
 		if ($key == 'REMOTE_ADDR') {
-			foreach (array('HTTP_X_FORWARDED_FOR', 'HTTP_PC_REMOTE_ADDR') as $altKey) {
+			foreach (array('HTTP_X_FORWARDED_FOR', 'HTTP_PC_REMOTE_ADDR', 'HTTP_X_REAL_IP') as $altKey) {
 				if ($addr = $this->env($altKey)) {
 					$val = $addr;
 					break;

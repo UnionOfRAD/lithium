@@ -103,6 +103,42 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 		$this->assertTrue($this->_objectRecordSet->offsetExists(3));
 		$this->assertTrue($this->_objectRecordSet->offsetExists(4));
 		$this->assertTrue(isset($this->_objectRecordSet[3]));
+
+		$data = array(array(
+				'client_id' => 1,
+				'invoice_id' => 4,
+				'title' => 'Payment1'
+			), array(
+				'client_id' => 2,
+				'invoice_id' => 5,
+				'title' => 'Payment2'
+			), array(
+				'client_id' => 3,
+				'invoice_id' => 6,
+				'title' => 'Payment3'
+		));
+
+		$payments = new MockMultiKeyRecordSet(array('data' => $data, 'model' => $this->_model2));
+		$this->assertTrue(isset($payments[array('client_id' => 1,'invoice_id' => 4)]));
+		$this->assertTrue(isset($payments[array('invoice_id' => 4, 'client_id' => 1)]));
+		$this->assertFalse(isset($payments[0]));
+		$this->assertFalse(isset($payments[true]));
+		$this->assertFalse(isset($payments[false]));
+		$this->assertFalse(isset($payments[null]));
+		$this->assertFalse(isset($payments['string']));
+
+		$records = new MockMultiKeyRecordSet();
+		$records[0] = array('title' => 'Record0');
+		$records[1] = array('title' => 'Record1');
+		$this->assertTrue(isset($records[true]));
+		$this->assertTrue(isset($records[null]));
+		$this->assertTrue(isset($records[false]));
+		$this->assertTrue(isset($records[array()]));
+		$this->assertTrue(isset($records[0]));
+		$this->assertTrue(isset($records['0']));
+		$this->assertTrue(isset($records[1]));
+		$this->assertTrue(isset($records['1']));
+		$this->assertFalse(isset($records[2]));
 	}
 
 	public function testOffsetGet() {
@@ -278,6 +314,51 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 		$result = $this->_objectRecordSet[4];
 		$this->assertEqual(4, $result->id);
 		$this->assertEqual('data4', $result->data);
+
+		$data = array(array(
+				'client_id' => 1,
+				'invoice_id' => 4,
+				'title' => 'Payment1'
+			), array(
+				'client_id' => 2,
+				'invoice_id' => 5,
+				'title' => 'Payment2'
+			), array(
+				'client_id' => 3,
+				'invoice_id' => 6,
+				'title' => 'Payment3'
+		));
+
+		$payments = new MockMultiKeyRecordSet(array('data' => $data, 'model' => $this->_model2));
+
+		$expected = array(array(
+				'client_id' => 2,
+				'invoice_id' => 5,
+				'title' => 'Payment2'
+			), array(
+				'client_id' => 3,
+				'invoice_id' => 6,
+				'title' => 'Payment3'
+		));
+
+		unset($payments[array('client_id' => 1,'invoice_id' => 4)]);
+		$this->assertEqual($expected, array_values($payments->data()));
+
+		$payments = new MockMultiKeyRecordSet(array('data' => $data, 'model' => $this->_model2));
+		unset($payments[array('invoice_id' => 4, 'client_id' => 1)]);
+		$this->assertEqual($expected, array_values($payments->data()));
+
+		unset($payments[true]);
+		$this->assertEqual($expected, array_values($payments->data()));
+
+		unset($payments[false]);
+		$this->assertEqual($expected, array_values($payments->data()));
+
+		unset($payments[null]);
+		$this->assertEqual($expected, array_values($payments->data()));
+
+		unset($payments['string']);
+		$this->assertEqual($expected, array_values($payments->data()));
 	}
 
 	public function testRewind() {
@@ -730,6 +811,32 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 		$this->assertNull($payments[array('invoice_id' => 6)]);
 
 		$this->assertEqual($data[1], $payments[array('client_id' => 2, 'invoice_id' => 5)]->data());
+	}
+
+	public function testKeyCastingManagment() {
+		$payments = new MockMultiKeyRecordSet();
+		$payments[true] = array('title' => 'Payment1');
+		$payments[null] = array('title' => 'Payment2');
+		$payments[false] = array('title' => 'Payment3');
+		$payments[array()] = array('title' => 'Payment4');
+
+		$expected = array(
+			0 => array('title' => 'Payment1'),
+			1 => array('title' => 'Payment2'),
+			2 => array('title' => 'Payment3'),
+			3 => array('title' => 'Payment4')
+		);
+
+		$this->assertEqual($expected, $payments->data());
+
+		$expected = array('title' => 'Payment1 updated');
+		$payments[0] = $expected;
+		$this->assertEqual($expected, $payments[0]);
+
+		$expected = array('title' => 'Payment1 updated 2');
+		$payments['0'] = $expected;
+		$this->assertEqual($expected, $payments['0']);
+		$this->assertEqual($expected, $payments[0]);
 	}
 
 	public function testRecordWithCombinedPkAndLazyLoading() {

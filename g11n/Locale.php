@@ -251,18 +251,24 @@ class Locale extends \lithium\core\StaticObject {
 	 * @return array Preferred locales in their canonical form (i.e. `'fr_CA'`).
 	 */
 	protected static function _preferredAction($request) {
-		$regex  = '/^\s*(?P<locale>\w\w(?:[-]\w\w)?)(?:;q=(?P<quality>[0-9]+\.[0-9]+))?\s*$/';
 		$result = array();
+		$regex  = "/^\s*(?P<locale>\w\w(?:[-]\w\w)?)(?:;q=(?P<quality>(0|1|0\.\d+)))?\s*$/";
 
 		foreach (explode(',', $request->env('HTTP_ACCEPT_LANGUAGE')) as $part) {
 			if (preg_match($regex, $part, $matches)) {
 				$locale = static::canonicalize($matches['locale']);
 				$quality = isset($matches['quality']) ? $matches['quality'] : 1;
-				$result[$locale] = $quality;
+				$result[$quality][] = $locale;
 			}
 		}
-		arsort($result);
-		return array_keys($result);
+
+		krsort($result);
+		$return = array();
+
+		foreach ($result as $locales) {
+			$return = array_merge($return, array_values($locales));
+		}
+		return $return;
 	}
 
 	/**

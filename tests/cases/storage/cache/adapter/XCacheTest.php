@@ -21,6 +21,8 @@ class XCacheTest extends \lithium\test\Unit {
 		$extensionExists = (extension_loaded('xcache') && (ini_get('xcache.var_size') !== 0));
 		$message = 'The XCache extension is not installed or not configured for userspace caching.';
 		$this->skipIf(!$extensionExists, $message);
+
+		$this->skipIf(PHP_SAPI === 'cli', 'The XCache extension is not available from the CLI.');
 	}
 
 	/**

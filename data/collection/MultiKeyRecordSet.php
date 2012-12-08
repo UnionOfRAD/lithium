@@ -8,7 +8,7 @@
 
 namespace lithium\data\collection;
 
-class MultiKeyRecordSet extends \lithium\data\Collection {
+class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 
 	/**
 	 * An array containing each record's unique key. This allows, for example, lookups of records
@@ -57,8 +57,9 @@ class MultiKeyRecordSet extends \lithium\data\Collection {
 	 * @return boolean Returns true if the record's ID is found in the set, otherwise false.
 	 */
 	public function offsetExists($offset) {
+		$offset = (!$offset || $offset === true) ? 0 : $offset;
 		$this->offsetGet($offset);
-		if (in_array($offset, $this->_index, true)) {
+		if (in_array($offset, $this->_index)) {
 			return true;
 		}
 		return false;
@@ -81,7 +82,8 @@ class MultiKeyRecordSet extends \lithium\data\Collection {
 	 *                value of `$offset`, otheriwse returns `null`.
 	 */
 	public function offsetGet($offset) {
-		if ($offset !== null && in_array($offset, $this->_index, true)) {
+		$offset = (!$offset || $offset === true) ? 0 : $offset;
+		if (in_array($offset, $this->_index)) {
 			return $this->_data[array_search($offset, $this->_index)];
 		}
 		if ($this->closed()) {
@@ -108,6 +110,7 @@ class MultiKeyRecordSet extends \lithium\data\Collection {
 	 * @return mixed The value which was set.
 	 */
 	public function offsetUnset($offset) {
+		$offset = (!$offset || $offset === true) ? 0 : $offset;
 		$this->offsetGet($offset);
 		unset($this->_index[$index = array_search($offset, $this->_index)]);
 		prev($this->_data);
@@ -239,13 +242,14 @@ class MultiKeyRecordSet extends \lithium\data\Collection {
 			$key = $offset;
 		}
 
-		if (!$key) {
+		if ($key === array() || $key === null || is_bool($key)) {
 			$key = count($this->_data);
 		}
 
 		if (is_array($key)) {
 			$key = count($key) === 1 ? reset($key) : $key;
 		}
+
 		if (in_array($key, $this->_index)) {
 			$index = array_search($key, $this->_index);
 			$this->_data[$index] = $data;
@@ -254,97 +258,6 @@ class MultiKeyRecordSet extends \lithium\data\Collection {
 		$this->_data[] = $data;
 		$this->_index[] = $key;
 		return $data;
-	}
-
-	protected function _mapRecord($data) {
-		$options = array('exists' => true);
-		$relationships = array();
-		$primary = $this->_model;
-		$conn = $primary::connection();
-
-		if (!$this->_query) {
-			return $conn->item($primary, $data, $options + compact('relationships'));
-		}
-
-		$dataMap = array();
-		$relMap = $this->_query->relationships();
-		$main = null;
-
-		do {
-			$offset = 0;
-
-			foreach ($this->_columns as $name => $fields) {
-				$fieldCount = count($fields);
-				$record = array_combine($fields, array_slice($data, $offset, $fieldCount));
-				$offset += $fieldCount;
-
-				if ($name === 0) {
-					if ($main && $main != $record) {
-						$this->_result->prev();
-						break 2;
-					}
-					$main = $record;
-					continue;
-				}
-
-				if ($relMap[$name]['type'] != 'hasMany') {
-					$dataMap[$name] = $record;
-					continue;
-				}
-
-				if (array_filter($record)) {
-					$dataMap[$name][] = $record;
-				}
-			}
-		} while ($data = $this->_result->next());
-
-		foreach (array_filter(array_keys($this->_columns)) as $name) {
-			if (!array_key_exists($name, $dataMap)) {
-				$dataMap[$name] = array();
-			}
-		}
-
-		foreach ($dataMap as $name => $rel) {
-			$field = $relMap[$name]['fieldName'];
-			$relModel = $relMap[$name]['model'];
-
-			if ($relMap[$name]['type'] == 'hasMany') {
-				foreach ($rel as &$data) {
-					$data = $conn->item($relModel, $data, $options);
-				}
-				$opts = array('class' => 'set');
-				$relationships[$field] = $conn->item($relModel, $rel, $options + $opts);
-				continue;
-			}
-			$relationships[$field] = $conn->item($relModel, $rel, $options);
-		}
-		return $conn->item($primary, $main, $options + compact('relationships'));
-	}
-
-	protected function _columnMap() {
-		if ($this->_query && $map = $this->_query->map()) {
-			if (isset($map[$this->_query->alias()])) {
-				$map = array($map[$this->_query->alias()]) + $map;
-				unset($map[$this->_query->alias()]);
-			} else {
-				$map = array(array_shift($map)) + $map;
-			}
-			return $map;
-		}
-		if (!($model = $this->_model)) {
-			return array();
-		}
-		if (!is_object($this->_query) || !$this->_query->join()) {
-			$map = $model::connection()->schema($this->_query, $this->_result, $this);
-			return array_values($map);
-		}
-
-		$model = $this->_model;
-		$map = $model::connection()->schema($this->_query, $this->_result, $this);
-		$map = array($map[$this->_query->alias()]) + $map;
-		unset($map[$this->_query->alias()]);
-
-		return $map;
 	}
 }
 
