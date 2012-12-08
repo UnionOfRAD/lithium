@@ -12,7 +12,7 @@ php:
 
 before_script: php tests/ci_depends.php $OPCODE_CACHE $DB
 
-script: console/li3 test tests/cases
+script: script: console/li3 test --filters=Profiler tests/cases
 
 notifications:
     irc: "irc.freenode.org#li3-core"
