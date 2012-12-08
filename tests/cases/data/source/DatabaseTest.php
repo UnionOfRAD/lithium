@@ -215,7 +215,7 @@ class DatabaseTest extends \lithium\test\Unit {
 	public function testSchemaFromManualFieldList() {
 		$fields = array('id', 'name', 'created');
 		$result = $this->db->schema(new Query(compact('fields')));
-		$this->assertEqual(array($fields), $result);
+		$this->assertEqual(array('' => $fields), $result);
 	}
 
 	public function testSimpleQueryRender() {
@@ -833,14 +833,14 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('MockDatabaseComment')
 		));
 
-		$fields = array('id', 'title');
+		$fields = array('id' => true, 'title' => true);
 		$result = $this->db->fields($fields, $query);
 		$expected = '{MockDatabasePost}.{id}, {MockDatabasePost}.{title}';
 		$this->assertEqual($expected,$result);
 
 		$fields = array(
-			'MockDatabasePost' => array('id', 'title', 'created'),
-			'MockDatabaseComment' => array('body')
+			'MockDatabasePost' => array('id' => true, 'title' => true, 'created' => true),
+			'MockDatabaseComment' => array('body' => true)
 		);
 		$result = $this->db->fields($fields, $query);
 		$expected = '{MockDatabasePost}.{id}, {MockDatabasePost}.{title},';
@@ -848,8 +848,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected,$result);
 
 		$fields = array(
-			'MockDatabasePost',
-			'MockDatabaseComment'
+			'MockDatabasePost' => true,
+			'MockDatabaseComment' => true
 		);
 		$result = $this->db->fields($fields, $query);
 		$expected = '{MockDatabasePost}.{id}, {MockDatabasePost}.{author_id},';
@@ -859,7 +859,10 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected .= ' {MockDatabaseComment}.{created}';
 		$this->assertEqual($expected, $result);
 
-		$fields = array('MockDatabasePost.id as idPost', 'MockDatabaseComment.id AS idComment');
+		$fields = array(
+			'MockDatabasePost' => array('id as idPost' => true),
+			'MockDatabaseComment' => array('id AS idComment' => true)
+		);
 		$result = $this->db->fields($fields, $query);
 		$expected = '{MockDatabasePost}.{id} as idPost, {MockDatabaseComment}.{id} as idComment';
 		$this->assertEqual($expected, $result);
@@ -867,13 +870,13 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected = array('' => array('idPost'), 'MockDatabaseComment' => array('idComment'));
 		$this->assertEqual($expected, $query->map());
 
-		$fields = array(array('count(MockDatabasePost.id)'));
-		$expected = 'count(MockDatabasePost.id), {MockDatabasePost}.{id}';
+		$fields = array('0' => array('count(MockDatabasePost.id)'));
+		$expected = 'count(MockDatabasePost.id)';
 		$result = $this->db->fields($fields, $query);
 		$this->assertEqual($expected, $result);
 
-		$fields = array((object) 'count(MockDatabasePost.id)');
-		$expected = 'count(MockDatabasePost.id), {MockDatabasePost}.{id}';
+		$fields = array('0' => array((object) 'count(MockDatabasePost.id)'));
+		$expected = 'count(MockDatabasePost.id)';
 		$result = $this->db->fields($fields, $query);
 		$this->assertEqual($expected, $result);
 	}

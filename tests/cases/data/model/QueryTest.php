@@ -65,26 +65,27 @@ class QueryTest extends \lithium\test\Unit {
 	public function testFields() {
 		$query = new Query($this->_queryArr);
 
-		$expected = array('id','author_id','title');
+		$expected = array_fill_keys(array('id','author_id','title'), true);
 		$result = $query->fields();
 		$this->assertEqual($expected, $result);
 
 		$query->fields('content');
 
-		$expected = array('id','author_id','title','content');
+		$expected = array_fill_keys(array('id','author_id','title','content'), true);
 		$result = $query->fields();
 		$this->assertEqual($expected, $result);
 
 		$query->fields(array('updated','created'));
 
 		$expected = array('id','author_id','title','content','updated','created');
+		$expected = array_fill_keys($expected, true);
 		$result = $query->fields();
 		$this->assertEqual($expected, $result);
 
 		$query->fields(false);
 		$query->fields(array('id', 'title'));
 
-		$expected = array('id','title');
+		$expected = array_fill_keys(array('id','title'), true);
 		$result = $query->fields();
 		$this->assertEqual($expected, $result);
 	}
@@ -469,7 +470,7 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $query->conditions($conditions)->fields($fields)->order($order);
 		$this->assertEqual($result, $query);
 		$this->assertEqual($conditions, $query->conditions());
-		$this->assertEqual($fields, $query->fields());
+		$this->assertEqual(array_fill_keys($fields, true), $query->fields());
 		$this->assertEqual($order, $query->order());
 	}
 

@@ -648,86 +648,77 @@ abstract class Database extends \lithium\data\Source {
 	 * Builds an array of keyed on the fully-namespaced `Model` with array of fields as values
 	 * for the given `Query`
 	 *
-	 * @param object $query A `lithium\data\model\Query` object
-	 * @param string $resource
-	 * @param string $alias
-	 * @return void
+	 * @param data\model\Query $query A Query instance.
 	 */
-	public function schema($query, $resource = null, $alias = null) {
-		$model = is_scalar($resource) ? $resource : $query->model();
-		$alias = $alias ? $alias : $query->alias();
-		$paths = $query->paths($this);
-		$fields = $query->fields();
+	public function schema($query, $resource = null, $context = null) {
+		return $this->_schema($query);
+	}
 
+	/**
+	 * Helper method for `data\model\Database::shema()`
+	 *
+	 * @param data\model\Query $query A Query instance.
+	 * @param array $fields Array of formatted fields. If set, it will be used instead
+	 *        of `$query->fields()`.
+	 */
+	public function _schema($query, $fields = null) {
+		$model = $query->model();
+		$paths = $query->paths($this);
+		$models = $query->models($this);
+		$fields = $fields ? : $query->fields();
 		$result = array();
 
-		if (!$model && is_array($fields)) {
-			foreach ($fields as $key => $field) {
-				if (preg_match('/^.*?\.(.*)/', $field, $match)) {
-					$fields[$key] = $match[1];
+		if (!$model) {
+			foreach ($fields as $field => $value) {
+				if (is_array($value)) {
+					$result[$field] = array_keys($value);
+				} else {
+					$result[''][] = $field;
 				}
 			}
-			return array($fields);
+			return $result;
 		}
 
 		if (!$fields) {
-			$result = array('' => $model::schema()->names());
-
-			foreach ($query->relationships() as $key => $relation) {
-				$model = $relation['model'];
-				$result[$key] = $model::schema()->names();
+			foreach ($paths as $alias => $relation) {
+				$model = $models[$alias];
+				$result[$relation] = $model::schema()->names();
 			}
 			return $result;
 		}
 
-		if (!$fields && $joins) {
-			$result = array($modelName => $model::schema()->names());
-
-			foreach ($joins as $join) {
-				$model = $join->model();
-				$result[$join->alias()] = $model::schema()->names();
+		$unalias = function ($value) {
+			if (!is_string($value)) {
+				return $value;
 			}
-			return $result;
+			$aliasing = preg_split("/\s+as\s+/i", $value);
+			return isset($aliasing[1]) ? $aliasing[1] : $value;
+		};
+
+		if (isset($fields[0])) {
+			$result[''] = array_map($unalias, $fields[0]);
+			unset($fields[0]);
 		}
 
-		$relations = $query->relationships();
-		$schema = $model::schema();
-		$pregDotMatch = '/^(' . implode('|', array_merge(array_keys($paths))) . ')\./';
-
-		foreach ($fields as $scope => $field) {
-			switch (true) {
-				case (is_numeric($scope) && ($field == '*' || $field == $alias)):
-					$result[''] = $model::schema()->names();
-					break;
-				case (is_numeric($scope) && isset($schema[$field])):
-					$result[''][] = $field;
-					break;
-				case is_numeric($scope) && preg_match($pregDotMatch, $field):
-					list($dotModelName, $field) = explode('.', $field);
-					$dotModelName = $dotModelName === $alias ? '' : $dotModelName;
-					$result[$dotModelName][] = $field;
-					break;
-				case is_array($field) && $scope === $alias:
-					$result[''] = $field;
-					break;
-				case is_array($field) && array_key_exists($scope, $paths):
-					$name = $paths[$scope];
-					if (isset($relations[$name]['model'])) {
-						$relSchema = $this->schema($query, $relations[$name]['model'], $scope);
-						$result[$scope] = reset($relSchema);
-					}
-					break;
-				case is_numeric($scope) && array_key_exists($field, $paths):
-					$name = $paths[$field];
-					if (isset($relations[$name]['model'])) {
-						$scope = $relations[$name]['model'];
-						$result[$field] = $scope::schema()->names();
-					} else {
-						$result[''] = $model::schema()->names();
-					}
-					break;
+		foreach ($fields as $field => $value) {
+			if (is_array($value) && isset($paths[$field])) {
+				if (isset($value['*'])) {
+					$relModel = $models[$field];
+					$result[$paths[$field]] = $relModel::schema()->names();
+				} else {
+					$result[$paths[$field]] = array_map($unalias, array_keys($value));
+				}
+			} elseif (isset($paths[$field])) {
+				$relModel = $models[$field];
+				$result[$paths[$field]] = $relModel::schema()->names();
+			} else {
+				$result[''][] = $unalias($field);
 			}
 		}
+		if (isset($fields['*'])) {
+			$result[''] = $model::schema()->names();
+		}
+
 		return $result;
 	}
 
@@ -878,144 +869,53 @@ abstract class Database extends \lithium\data\Source {
 
 	public function fields($fields, $context) {
 		$type = $context->type();
-		$schema = $schema = $context->schema()->fields();
-		$models = $context->models($this);
-		$alias = $context->alias();
+		$schema = $context->schema()->fields();
 
 		if (!is_array($fields)) {
 			return $this->_fieldsReturn($type, $context, $fields, $schema);
 		}
 
+		$models = $context->models($this);
+		$alias = $context->alias();
+		$fields = $fields ? : $context->fields();
+		$context->map($this->_schema($context, $fields));
 		$toMerge = array();
-		$keys = array_keys($fields);
 
-		/**
-		 * Group fields list by alias name.
-		 * keys of the result array are alias and values are list of fields.
-		 */
-		$groupFields = function($item, $key) use (&$toMerge, &$keys, $alias, $models, &$context) {
-				$name = current($keys);
-				next($keys);
-				switch (true) {
-					case is_array($item):
-						$toMerge[$name] = $item;
-						continue;
-					case is_object($item) && isset($item->scalar):
-						$toMerge[$name] = array($item->scalar);
-						continue;
-					case isset($models[$item]):
-						if ($model = $models[$item]) {
-							$schema = $model::schema();
-							$toMerge[$item] = $schema->names();
-						}
-						continue;
-					case strpos($item, '.') !== false:
-						list($name, $field) = explode('.', $item);
-						$toMerge[$name][] = $field;
-						continue;
-					default:
-						$mainSchema = $context->schema()->names();
-						if ($alias && !preg_match('/[\(\)]/', $item)) {
-							$toMerge[$alias][] = $item;
-							continue;
-						}
-						$toMerge[0][] = $item;
-						continue;
-				}
-			};
-
-		array_walk($fields, $groupFields);
-		$fields = $toMerge;
-
-		if ($fields && $context->with() && !isset($fields[$alias]) && ($model = $context->model())) {
-			$keys = $model::meta('key');
-			$keys = is_array($keys) ? $keys : array($keys);
-			$fields[$alias] = $keys;
+		if (isset($fields[0])) {
+			foreach ($fields[0] as $val) {
+				$toMerge[] = (is_object($val) && isset($val->scalar)) ? $val->scalar : $val;
+			}
+			unset($fields[0]);
 		}
 
-		$map = $this->_mapFields($fields, $context->paths($this));
-		$context->map($map);
-
-		$toMerge = array();
-
-		/**
-		 * Format fields in a SQL format.
-		 */
-		foreach ($fields as $scope => $items) {
-			foreach ($items as $field) {
-				if (!is_numeric($scope)) {
-					$open = $this->_quotes[0];
-					$close = $this->_quotes[1];
-					if (stripos($field, ' as ') !== false) {
-						list($real, $as) = explode(' as ', str_replace(' AS ', ' as ', $field));
-						$toMerge[] = $open . $scope . $close . '.' . $open . $real . $close . ' as ' . $as;
-					} else {
-						$toMerge[] = $open . $scope . $close . '.' . $open . $field . $close;
-					}
-					continue;
+		foreach ($fields as $field => $value) {
+			if (is_array($value)) {
+				foreach ($value as $fieldname => $mode) {
+					$toMerge[] = $this->_fieldsQuote($field, $fieldname);
 				}
-				$toMerge[] = $field;
+			} elseif (isset($models[$field])) {
+				$model = $models[$field];
+				foreach ($model::schema()->names() as $fieldname) {
+					$toMerge[] = $this->_fieldsQuote($field, $fieldname);
+				}
+			} else {
+				$toMerge[] = $this->_fieldsQuote($alias, $field);
 			}
 		}
-		$fields = $toMerge;
-		return $this->_fieldsReturn($type, $context, $fields, $schema);
+		return $this->_fieldsReturn($type, $context, $toMerge, $schema);
 	}
 
-	/**
-	 * Group fields list by relation name.
-	 *
-	 * Example :
-	 * {{{
-	 * $this->_mapFields(
-	 *               array('id', 'title', 'Comment'),
-	 *               array('Post' => 'Post', 'Comment' => 'Post.Comment')
-	 * }}}
-	 *
-	 * will return the following array :
-	 *
-	 * {{{
-	 * array(
-	 *    'Post' => array(
-	 * 		              0 => id,
-	 *                    1 => title
-	 *              ),
-	 *    'Post.Comment' => array(
-	 * 		              0 => id,
-	 *                    1 => post_id
-	 *                    2 => email
-	 *                    3 => body
-	 *                    4 => created
-	 *              )
-	 * )
-	 * }}}
-	 *
-	 * @param array $fields List of fields
-	 * @param array $aliases The mapping between query alias name and relation name (see
-	 *        the `'with'` options of `Model::find()`)
-	 * @return array The fields array grouped by relations
-	 */
-	protected function _mapFields($fields, $aliases) {
-		$return = array();
-		foreach ($fields as $key => $items) {
-			$key = isset($aliases[$key]) ? $aliases[$key] : '';
-			if (!is_array($items)) {
-				$return[$key] = $items;
-				continue;
-			}
-			if (is_numeric($key)) {
-				$key = reset($aliases);
-			}
-			$pointer = &$return[$key];
-			foreach ($items as $field) {
-				if (stripos($field, ' as ') !== false) {
-					list($real, $as) = explode(' as ', str_replace(' AS ', ' as ', $field));
-					$pointer[] = trim($as);
-					continue;
-				}
-				$pointer[] = $field;
-			}
+	protected function _fieldsQuote($alias, $field) {
+		$open = $this->_quotes[0];
+		$close = $this->_quotes[1];
+		$aliasing = preg_split("/\s+as\s+/i", $field);
+		if (isset($aliasing[1])) {
+			list($aliasname, $fieldname) = $this->_splitFieldname($aliasing[0]);
+			$alias = $aliasname ? : $alias;
+			return "{$open}{$alias}{$close}.{$open}{$fieldname}{$close} as {$aliasing[1]}";
+		} else {
+			return "{$open}{$alias}{$close}.{$open}{$field}{$close}";
 		}
-		return $return;
 	}
 
 	protected function _fieldsReturn($type, $context, $fields, $schema) {
