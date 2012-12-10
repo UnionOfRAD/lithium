@@ -687,6 +687,62 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertEqual('Foo2', $accounts['4fb6e2dd3e91581fe6e75738']['name']);
 		$this->assertEqual('Bar2', $accounts['4fb6e2df3e91581fe6e75739']['name']);
 	}
+
+	public function testIndexesOnExport() {
+		$schema = new Schema(array('fields' => array(
+			'_id' => array('type' => 'id'),
+			'accounts' => array('type' => 'object', 'array' => true),
+			'accounts._id' => array('type' => 'id'),
+			'accounts.name' => array('type' => 'string')
+		)));
+
+		$data = array(
+			array(
+			'_id' => '4c8f86167675abfabd970300',
+			'accounts' => array(array(
+				'_id' => "4fb6e2dd3e91581fe6e75736",
+				'name' => 'Foo1'
+			),array(
+				'_id' => "4fb6e2df3e91581fe6e75737",
+				'name' => 'Bar1'
+			))),
+			array(
+			'_id' => '4c8f86167675abfabd970301',
+			'accounts' => array(array(
+				'_id' => "4fb6e2dd3e91581fe6e75738",
+				'name' => 'Foo2'
+			),array(
+				'_id' => "4fb6e2df3e91581fe6e75739",
+				'name' => 'Bar2'
+			)))
+		);
+
+		$model = $this->_model;
+
+		$array = new DocumentSet(compact('model', 'schema', 'data'));
+		$this->assertTrue($array['4c8f86167675abfabd970300']->accounts instanceof DocumentSet);
+		$this->assertTrue($array['4c8f86167675abfabd970301']->accounts instanceof DocumentSet);
+
+		$result = Exporter::get('create', $array->export());
+		$this->assertTrue(isset($result['create'][0]));
+		$this->assertTrue(isset($result['create'][1]));
+		$this->assertFalse(isset($result['create']['4c8f86167675abfabd970300']));
+		$this->assertFalse(isset($result['create']['4c8f86167675abfabd970301']));
+		$this->assertTrue(isset($result['create'][0]['accounts'][0]));
+		$this->assertTrue(isset($result['create'][0]['accounts'][1]));
+		$this->assertTrue(isset($result['create'][1]['accounts'][0]));
+		$this->assertTrue(isset($result['create'][1]['accounts'][1]));
+
+		$result = Exporter::get('update', $array->export());
+		$this->assertTrue(isset($result['update'][0]));
+		$this->assertTrue(isset($result['update'][1]));
+		$this->assertFalse(isset($result['update']['4c8f86167675abfabd970300']));
+		$this->assertFalse(isset($result['update']['4c8f86167675abfabd970301']));
+		$this->assertTrue(isset($result['update'][0]['accounts'][0]));
+		$this->assertTrue(isset($result['update'][0]['accounts'][1]));
+		$this->assertTrue(isset($result['update'][1]['accounts'][0]));
+		$this->assertTrue(isset($result['update'][1]['accounts'][1]));
+	}
 }
 
 ?>
