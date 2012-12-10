@@ -625,6 +625,67 @@ class ExporterTest extends \lithium\test\Unit {
 			$this->assertTrue($result['update']['list'][$i] instanceof MongoId);
 		}
 	}
+
+	public function testToData() {
+		$data = array(
+			array(
+			'_id' => '4c8f86167675abfabd970300',
+			'accounts' => array(array(
+				'_id' => "4fb6e2dd3e91581fe6e75736",
+				'name' => 'Foo1'
+			),array(
+				'_id' => "4fb6e2df3e91581fe6e75737",
+				'name' => 'Bar1'
+			))),
+			array(
+			'_id' => '4c8f86167675abfabd970301',
+			'accounts' => array(array(
+				'_id' => "4fb6e2dd3e91581fe6e75738",
+				'name' => 'Foo2'
+			),array(
+				'_id' => "4fb6e2df3e91581fe6e75739",
+				'name' => 'Bar2'
+			)))
+		);
+
+		$model = $this->_model;
+		$handlers = $this->_handlers;
+		$options = compact('model', 'handlers');
+		$schema = new Schema(array('fields' => $this->_schema));
+		$set = $schema->cast(null, null, $data, $options);
+
+		$result = $set->data();
+		$accounts = $result['4c8f86167675abfabd970300']['accounts'];
+		$this->assertEqual('Foo1', $accounts[0]['name']);
+		$this->assertEqual('Bar1', $accounts[1]['name']);
+		$accounts = $result['4c8f86167675abfabd970301']['accounts'];
+		$this->assertEqual('Foo2', $accounts[0]['name']);
+		$this->assertEqual('Bar2', $accounts[1]['name']);
+
+		$result = $set->to('array', array('indexed' => false));
+		$accounts = $result[0]['accounts'];
+		$this->assertEqual('Foo1', $accounts[0]['name']);
+		$this->assertEqual('Bar1', $accounts[1]['name']);
+		$accounts = $result[1]['accounts'];
+		$this->assertEqual('Foo2', $accounts[0]['name']);
+		$this->assertEqual('Bar2', $accounts[1]['name']);
+
+		$result = $set->to('array', array('indexed' => true));
+		$accounts = $result['4c8f86167675abfabd970300']['accounts'];
+		$this->assertEqual('Foo1', $accounts['4fb6e2dd3e91581fe6e75736']['name']);
+		$this->assertEqual('Bar1', $accounts['4fb6e2df3e91581fe6e75737']['name']);
+		$accounts = $result['4c8f86167675abfabd970301']['accounts'];
+		$this->assertEqual('Foo2', $accounts['4fb6e2dd3e91581fe6e75738']['name']);
+		$this->assertEqual('Bar2', $accounts['4fb6e2df3e91581fe6e75739']['name']);
+
+		$result = $set->to('array');
+		$accounts = $result['4c8f86167675abfabd970300']['accounts'];
+		$this->assertEqual('Foo1', $accounts['4fb6e2dd3e91581fe6e75736']['name']);
+		$this->assertEqual('Bar1', $accounts['4fb6e2df3e91581fe6e75737']['name']);
+		$accounts = $result['4c8f86167675abfabd970301']['accounts'];
+		$this->assertEqual('Foo2', $accounts['4fb6e2dd3e91581fe6e75738']['name']);
+		$this->assertEqual('Bar2', $accounts['4fb6e2df3e91581fe6e75739']['name']);
+	}
 }
 
 ?>
