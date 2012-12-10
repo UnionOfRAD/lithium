@@ -55,7 +55,7 @@ class ExporterTest extends \lithium\test\Unit {
 			},
 			'date' => function($v) {
 				$v = is_numeric($v) ? intval($v) : strtotime($v);
-				return (time() == $v) ? new MongoDate() : new MongoDate($v);
+				return !$v ? new MongoDate() : new MongoDate($v);
 			},
 			'regex'   => function($v) { return new MongoRegex($v); },
 			'integer' => function($v) { return (integer) $v; },
@@ -76,9 +76,10 @@ class ExporterTest extends \lithium\test\Unit {
 	}
 
 	public function testCreateWithFixedData() {
+		$time = time();
 		$doc = new Document(array('exists' => false, 'data' => array(
 			'_id' => new MongoId(),
-			'created' => new MongoDate(),
+			'created' => new MongoDate($time),
 			'numbers' => new DocumentSet(array('data' => array(7, 8, 9))),
 			'objects' => new DocumentSet(array('data' => array(
 				new Document(array('data' => array('foo' => 'bar'))),
@@ -92,7 +93,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$result = Exporter::get('create', $doc->export());
 		$this->assertTrue($result['create']['_id'] instanceof MongoId);
 		$this->assertTrue($result['create']['created'] instanceof MongoDate);
-		$this->assertIdentical(time(), $result['create']['created']->sec);
+		$this->assertIdentical($time, $result['create']['created']->sec);
 
 		$this->assertIdentical(array(7, 8, 9), $result['create']['numbers']);
 		$expected = array(array('foo' => 'bar'), array('baz' => 'dib'));
@@ -370,19 +371,19 @@ class ExporterTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testTypeCastingSubObjectArrays() {
+		$time = time();
 		$data = array(
 			'_id' => '4c8f86167675abfabd970300',
 			'accounts' => array(array(
 				'_id' => "4fb6e2dd3e91581fe6e75736",
 				'name' => 'Foo',
-				'created' => time()
+				'created' => $time
 			),array(
 				'_id' => "4fb6e2df3e91581fe6e75737",
 				'name' => 'Bar',
-				'created' => time()
+				'created' => $time
 			))
 		);
-		$time = time();
 		$model = $this->_model;
 		$handlers = $this->_handlers;
 		$options = compact('model', 'handlers');
