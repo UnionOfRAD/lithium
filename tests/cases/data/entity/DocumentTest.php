@@ -812,13 +812,14 @@ class DocumentTest extends \lithium\test\Unit {
 	public function testArrayConversion() {
 		$this->skipIf(!MongoDb::enabled(), "MongoDB not enabled, skipping conversion tests.");
 
+		$time = time();
 		$doc = new Document(array('data' => array(
 			'_id' => new MongoId(),
-			'date' => new MongoDate()
+			'date' => new MongoDate($time)
 		)));
 		$result = $doc->data();
 		$this->assertPattern('/^[a-f0-9]{24}$/', $result['_id']);
-		$this->assertEqual(time(), $result['date']);
+		$this->assertEqual($time, $result['date']);
 	}
 
 	public function testArrayInterface() {
