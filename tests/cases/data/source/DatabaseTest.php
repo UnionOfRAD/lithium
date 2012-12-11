@@ -978,6 +978,18 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testLimit() {
+		MockDatabasePost::find('all', array('limit' => 15));
+		$result = $this->db->sql;
+		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LIMIT 15;';
+		$this->assertEqual($expected, $result);
+
+		MockDatabasePost::find('all', array('limit' => 10, 'page' => 3));
+		$result = $this->db->sql;
+		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LIMIT 10 OFFSET 20;';
+		$this->assertEqual($expected, $result);
+	}
+
 	/**
 	 * Tests that various syntaxes for the `'order'` key of the query object produce the correct
 	 * SQL.
