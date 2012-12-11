@@ -190,7 +190,7 @@ class Route extends \lithium\core\Object {
 	protected function _init() {
 		parent::_init();
 
-		if (!$this->_config['continue']) {
+		if (!$this->_config['continue'] && !preg_match('@{:action:.*?}@', $this->_template)) {
 			$this->_params += array('action' => 'index');
 		}
 		if (!$this->_config['pattern']) {
@@ -229,18 +229,14 @@ class Route extends \lithium\core\Object {
 				return false;
 			}
 		}
-
 		if (isset($match['args'])) {
 			$match['args'] = explode('/', $match['args']);
 		}
+		$result = array_filter(array_intersect_key($match, $this->_keys));
 		if (isset($this->_keys['args'])) {
-			$match += array('args' => array());
+			$result += array('args' => array());
 		}
-		$result = array_intersect_key($match, $this->_keys) + $this->_params + $this->_defaults;
-
-		if (isset($result['action']) && !$result['action']) {
-			$result['action'] = 'index';
-		}
+		$result += $this->_params + $this->_defaults;
 		$request->params = $result + (array) $request->params;
 		$request->persist = array_unique(array_merge($request->persist, $this->_persist));
 
@@ -464,6 +460,7 @@ class Route extends \lithium\core\Object {
 		} else {
 			$regex = '[^\/]+';
 		}
+
 		$req = $param === 'args' || array_key_exists($param, $this->_params) ? '?' : '';
 
 		if ($prefix === '/') {

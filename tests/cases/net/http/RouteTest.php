@@ -62,7 +62,6 @@ class RouteTest extends \lithium\test\Unit {
 	 */
 	public function testSimpleRouteMatching() {
 		$route = new Route(array('template' => '/{:controller}'));
-
 		$result = $route->match(array('controller' => 'posts', 'action' => 'index'));
 		$this->assertEqual('/posts', $result);
 
@@ -695,6 +694,59 @@ class RouteTest extends \lithium\test\Unit {
 
 		$nonDefault = array('controller' => 'Admin', 'action' => 'view');
 		$this->assertIdentical('/Admin/view', $route->match($nonDefault));
+	}
+
+	public function testRouteParsingWithRegexAction() {
+		$route = new Route(array(
+			'template' => '/products/{:action:add|edit|remove}/{:category}',
+			'params' => array('controller' => 'Products')
+		));
+		$request = new Request();
+		$request->url = '/products/add/computer';
+		$result = $route->parse($request);
+		$expected = array(
+			'controller' => 'Products',
+			'action' => 'add',
+			'category' => 'computer'
+		);
+		$this->assertEqual($expected, $result->params);
+
+		$request = new Request();
+		$request->url = '/products/index/computer';
+		$result = $route->parse($request);
+		$this->assertEqual(false, $result);
+	}
+
+	public function testRouteParsingWithRegexActionAndParamWithAction() {
+		$route = new Route(array(
+			'template' => '/products/{:action:add|edit|remove}/{:category}',
+			'params' => array('controller' => 'Products', 'action' => 'index')
+		));
+		$request = new Request();
+		$request->url = '/products/hello';
+		$result = $route->parse($request);
+		$expected = array(
+			'controller' => 'Products',
+			'action' => 'index',
+			'category' => 'hello'
+		);
+		$this->assertEqual($expected, $result->params);
+	}
+
+	public function testRouteParsingWithRegexActionAndParamWithoutAction() {
+		$route = new Route(array(
+			'template' => '/products/{:action:add|edit|remove}/{:category}',
+			'params' => array('controller' => 'Products')
+		));
+		$request = new Request();
+		$request->url = '/products/hello';
+		$result = $route->parse($request);
+		$this->assertEqual(false, $result);
+
+		$request = new Request();
+		$request->url = '/products';
+		$result = $route->parse($request);
+		$this->assertEqual(false, $result);
 	}
 }
 

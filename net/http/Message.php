@@ -186,6 +186,9 @@ class Message extends \lithium\net\Message {
 		$options += $default;
 		$body = $this->body = array_filter(array_merge((array) $this->body, (array) $data));
 
+		if (empty($options['buffer']) && empty($body)) {
+			return "";
+		}
 		if ($options['encode']) {
 			$body = $this->_encode($body);
 		}

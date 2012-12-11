@@ -144,12 +144,21 @@ class HelperTest extends \lithium\test\Unit {
 			'handlers' => array('content' => function($value) { return "\n{$value}\n"; })
 		);
 		$helper = new MockHelper($params);
-		$title = 'cool';
-		$url = '/here';
-		$options = array('value' => 1, 'title' => 'one');
-
+		$config = array(
+			'title' => 'cool',
+			'url' => '/here',
+			'options' => array('value' => 1, 'title' => 'one')
+		);
 		$expected = '<a href="/here" value="1" title="one">cool</a>';
-		$result = $helper->testRender('link', 'link', compact('title', 'url', 'options'));
+		$result = $helper->testRender('link', 'link', $config);
+		$this->assertEqual($expected, $result);
+
+		$handlers = array('path' => function($path) { return "/webroot{$path}"; });
+		$params = array('context' => new MockRenderer(compact('handlers')));
+		$helper = new MockHelper($params);
+		$handlers = array('url' => 'path');
+		$expected = '<a href="/webroot/here" value="1" title="one">cool</a>';
+		$result = $helper->testRender('link', 'link', $config, compact('handlers'));
 		$this->assertEqual($expected, $result);
 	}
 }

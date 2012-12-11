@@ -889,14 +889,27 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testAutomaticContentDecoding() {
-		$stream = fopen('php://temp', 'r+');
-		fwrite($stream, '{ "foo": "bar" }');
-		rewind($stream);
-		$request = new Request(compact('stream') + array('env' => array(
-			'CONTENT_TYPE' => 'application/json; charset=UTF-8',
-			'REQUEST_METHOD' => 'POST'
-		)));
-		$this->assertEqual(array('foo' => 'bar'), $request->data);
+		foreach (array('POST', 'PUT', 'PATCH') as $method) {
+			$stream = fopen('php://temp', 'r+');
+			fwrite($stream, '{ "foo": "bar" }');
+			rewind($stream);
+			$request = new Request(compact('stream') + array('env' => array(
+				'CONTENT_TYPE' => 'application/json; charset=UTF-8',
+				'REQUEST_METHOD' => $method
+			)));
+			$this->assertEqual(array('foo' => 'bar'), $request->data);
+		}
+
+		foreach (array('GET', 'HEAD', 'OPTIONS', 'DELETE') as $method) {
+			$stream = fopen('php://temp', 'r+');
+			fwrite($stream, '{ "foo": "bar" }');
+			rewind($stream);
+			$request = new Request(compact('stream') + array('env' => array(
+				'CONTENT_TYPE' => 'application/json; charset=UTF-8',
+				'REQUEST_METHOD' => $method
+			)));
+			$this->assertFalse($request->data);
+		}
 	}
 
 	public function testRequestTypeFromHeader() {

@@ -73,6 +73,12 @@ class MessageTest extends \lithium\test\Unit {
 		$result = $this->message->type("application/json; charset=UTF-8");
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testReturnStringIfNoBufferAndEmptyBody() {
+		$this->message->type("json");
+		$result = $this->message->body(array(""), array('encode' => true));
+		$this->assertIdentical("", $result);
+	}
 }
 
 ?>

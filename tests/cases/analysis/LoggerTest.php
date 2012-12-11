@@ -127,6 +127,72 @@ class LoggerTest extends \lithium\test\Unit {
 
 		unlink($base . '/.log');
 	}
+
+	public function testMultipleAdaptersWriteByNameDefault() {
+		$base = Libraries::get(true, 'resources') . '/tmp/logs';
+		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
+
+		Logger::config(array(
+			'default' => array(
+				'adapter' => 'File',
+				'file' => function($data, $config) { return "{$data['priority']}_default.log"; },
+				'timestamp' => false,
+				'format' => "{:message}\n"
+			),
+			'secondary' => array(
+				'adapter' => 'File',
+				'file' => function($data, $config) { return "{$data['priority']}_secondary.log"; },
+				'timestamp' => false,
+				'format' => "{:message}\n"
+			),
+		));
+
+		$this->assertFalse(file_exists($base . '/info_default.log'));
+
+		$this->assertTrue(Logger::write('info', 'Default Message line 1', array('name' => 'default')));
+
+		$this->assertTrue(file_exists($base . '/info_default.log'));
+
+		$expected = "Default Message line 1\n";
+		$result = file_get_contents($base . '/info_default.log');
+		$this->assertEqual($expected, $result);
+
+		unlink($base . '/info_default.log');
+
+	}
+
+	public function testMultipleAdaptersWriteByNameSecondary() {
+		$base = Libraries::get(true, 'resources') . '/tmp/logs';
+		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
+
+		Logger::config(array(
+			'default' => array(
+				'adapter' => 'File',
+				'file' => function($data, $config) { return "{$data['priority']}_default.log"; },
+				'timestamp' => false,
+				'format' => "{:message}\n"
+			),
+			'secondary' => array(
+				'adapter' => 'File',
+				'file' => function($data, $config) { return "{$data['priority']}_secondary.log"; },
+				'timestamp' => false,
+				'format' => "{:message}\n"
+			),
+		));
+
+		$this->assertFalse(file_exists($base . '/info_secondary.log'));
+
+		$this->assertTrue(Logger::write('info', 'Secondary Message line 1', array('name' => 'secondary')));
+
+		$this->assertTrue(file_exists($base . '/info_secondary.log'));
+
+		$expected = "Secondary Message line 1\n";
+		$result = file_get_contents($base . '/info_secondary.log');
+		$this->assertEqual($expected, $result);
+
+		unlink($base . '/info_secondary.log');
+
+	}
 }
 
 ?>

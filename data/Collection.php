@@ -188,10 +188,10 @@ abstract class Collection extends \lithium\util\Collection {
 	 *
 	 * For example:
 	 * {{{
-	 * $doc->set(array('title' => 'Lorem Ipsum', 'value' => 42));
+	 * $collection->set(array('title' => 'Lorem Ipsum', 'value' => 42));
 	 * }}}
 	 *
-	 * @param $values An associative array of fields and values to assign to the `Document`.
+	 * @param $values An associative array of fields and values to assign to the `Collection`.
 	 * @return void
 	 */
 	public function set($values) {
@@ -493,7 +493,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return array Returns the array value of the data in this `Collection`.
 	 */
 	public function data() {
-		return $this->to('array');
+		return $this->to('array', array('indexed' => null));
 	}
 
 	/**
@@ -529,7 +529,8 @@ abstract class Collection extends \lithium\util\Collection {
 
 		$this->offsetGet(null);
 
-		if (!$options['indexed']) {
+		$index = $options['indexed'] || ($options['indexed'] === null && $this->_parent === null);
+		if (!$index) {
 			$data = array_values($this->_data);
 		} else {
 			$data = $options['internal'] ? $this->_data : $this;

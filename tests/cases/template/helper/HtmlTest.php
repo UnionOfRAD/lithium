@@ -12,7 +12,7 @@ use lithium\net\http\Router;
 use lithium\template\helper\Html;
 use lithium\action\Request;
 use lithium\action\Response;
-use lithium\tests\mocks\template\helper\MockHtmlRenderer;
+use lithium\tests\mocks\template\MockRenderer;
 
 class HtmlTest extends \lithium\test\Unit {
 
@@ -36,7 +36,7 @@ class HtmlTest extends \lithium\test\Unit {
 		Router::connect('/{:controller}/{:action}/{:id}.{:type}');
 		Router::connect('/{:controller}/{:action}.{:type}');
 
-		$this->context = new MockHtmlRenderer(array(
+		$this->context = new MockRenderer(array(
 			'request' => new Request(array(
 				'base' => '', 'env' => array('HTTP_HOST' => 'foo.local')
 			)),

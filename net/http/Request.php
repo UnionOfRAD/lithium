@@ -91,11 +91,10 @@ class Request extends \lithium\net\http\Message {
 			'Connection' => 'Close',
 			'User-Agent' => 'Mozilla/5.0'
 		);
-		$this->headers($this->_config['headers']);
-
 		if ($type = $this->_config['type']) {
 			$this->type($type);
 		}
+		$this->headers($this->_config['headers']);
 	}
 
 	/**

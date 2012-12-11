@@ -154,7 +154,8 @@ class Model extends \lithium\core\StaticObject {
 	protected static $_classes = array(
 		'connections' => 'lithium\data\Connections',
 		'query'       => 'lithium\data\model\Query',
-		'validator'   => 'lithium\util\Validator'
+		'validator'   => 'lithium\util\Validator',
+		'entity'      => 'lithium\data\Entity'
 	);
 
 	/**
@@ -415,7 +416,6 @@ class Model extends \lithium\core\StaticObject {
 
 		$local = compact('class') + $self->_meta;
 		$self->_meta = ($local + $source['meta'] + $meta);
-		$meta =& $self->_meta;
 
 		if (is_object($schema)) {
 			$schema = $schema->fields();
@@ -649,53 +649,81 @@ class Model extends \lithium\core\StaticObject {
 	 * If no values supplied, returns the name of the `Model` key. If values
 	 * are supplied, returns the key value.
 	 *
-	 * @param array $values An array of values.
+	 * @param mixed $values An array of values or object with values. If `$values` is `null`,
+	 *              the meta `'key'` of the model is returned.
 	 * @return mixed Key value.
 	 */
-	public static function key($values = array()) {
+	public static function key($values = null) {
 		$key = static::meta('key');
 
-		if (is_object($values) && method_exists($values, 'to')) {
-			$values = $values->to('array');
-		} elseif (is_object($values) && is_string($key) && isset($values->{$key})) {
-			return $values->{$key};
-		}
-
-		if (!$values) {
+		if ($values === null) {
 			return $key;
 		}
+
+		if (is_object($values) && is_string($key)) {
+			return static::_key($key, $values);
+		} elseif ($values instanceof static::$_classes['entity']) {
+			$values = $values->to('array');
+		}
+
 		if (!is_array($values) && !is_array($key)) {
 			return array($key => $values);
 		}
+
 		$key = (array) $key;
-		return array_intersect_key($values, array_combine($key, $key));
+		$result = array();
+		foreach ($key as $value) {
+			if (!isset($values[$value])) {
+				return null;
+			}
+			$result[$value] = $values[$value];
+		}
+		return $result;
+	}
+
+	/**
+	 * Helper for the `Model::key()` function
+	 *
+	 * @see lithium\data\Model::key()
+	 * @param string $key The key
+	 * @param object $values Object with attributes.
+	 * @return mixed The key value array or `null` if the `$values` object has no attribute
+	 *         named `$key`
+	 */
+	protected static function _key($key, $values) {
+		if (isset($values->$key)) {
+			return array($key => $values->$key);
+		} elseif (!$values instanceof static::$_classes['entity']) {
+			return array($key => $values);
+		}
+		return null;
 	}
 
 	/**
 	 * Returns a list of models related to `Model`, or a list of models related
 	 * to this model, but of a certain type.
 	 *
-	 * @param string $name A type of model relation.
+	 * @param string $type A type of model relation.
 	 * @return mixed An array of relation instances or an instance of relation.
 	 *
 	 */
-	public static function relations($name = null) {
+	public static function relations($type = null) {
 		$self = static::_object();
 
-		if ($name === null) {
+		if ($type === null) {
 			return static::_relations();
 		}
 
-		if (isset($self->_relations[$name])) {
-			return $self->_relations[$name];
+		if (isset($self->_relations[$type])) {
+			return $self->_relations[$type];
 		}
 
-		if (isset($self->_relationsToLoad[$name])) {
-			return static::_relations(null, $name);
+		if (isset($self->_relationsToLoad[$type])) {
+			return static::_relations(null, $type);
 		}
 
-		if (in_array($name, $self->_relationTypes, true)) {
-			return array_keys(static::_relations($name));
+		if (in_array($type, $self->_relationTypes, true)) {
+			return array_keys(static::_relations($type));
 		}
 		return null;
 	}
@@ -719,24 +747,22 @@ class Model extends \lithium\core\StaticObject {
 			}
 			return isset($self->_relations[$name]) ? $self->_relations[$name] : null;
 		}
-
 		if (!$type) {
 			foreach ($self->_relationsToLoad as $name => $t) {
 				static::bind($t, $name, (array) $self->{$t}[$name]);
 			}
 			$self->_relationsToLoad = array();
 			return $self->_relations;
-		} else {
-			foreach ($self->_relationsToLoad as $name => $t) {
-				if ($type == $t) {
-					static::bind($t, $name, (array) $self->{$t}[$name]);
-					unset($self->_relationsToLoad[$name]);
-				}
-			}
-			return array_filter($self->_relations, function($i) use ($type) {
-				return $i->data('type') == $type;
-			});
 		}
+		foreach ($self->_relationsToLoad as $name => $t) {
+			if ($type == $t) {
+				static::bind($t, $name, (array) $self->{$t}[$name]);
+				unset($self->_relationsToLoad[$name]);
+			}
+		}
+		return array_filter($self->_relations, function($i) use ($type) {
+			return $i->data('type') == $type;
+		});
 	}
 
 
@@ -777,14 +803,14 @@ class Model extends \lithium\core\StaticObject {
 		$self = static::_object();
 
 		if (!is_object($self->_schema)) {
-			$source = $self::meta('source');
-			$self->_schema = static::connection()->describe($source, $self->_schema, static::meta());
-
+			$self->_schema = static::connection()->describe(
+				$self::meta('source'), $self->_schema, $self::meta()
+			);
 			if (!is_object($self->_schema)) {
 				$class = get_called_class();
 				throw new ConfigException("Could not load schema object for model `{$class}`.");
 			}
-			$key = (array) static::meta('key');
+			$key = (array) $self::meta('key');
 
 			if ($self->_schema && $self->_schema->fields() && !$self->_schema->has($key)) {
 				$key = implode('`, `', $key);
@@ -814,7 +840,6 @@ class Model extends \lithium\core\StaticObject {
 		if (!is_array($field)) {
 			return static::schema()->fields($field);
 		}
-
 		foreach ($field as $f) {
 			if (static::hasField($f)) {
 				return $f;
@@ -930,7 +955,7 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * @see lithium\data\Model::$validates
 	 * @see lithium\data\Model::validates()
-	 * @see lithium\data\Model::errors()
+	 * @see lithium\data\Entity::errors()
 	 * @param object $entity The record or document object to be saved in the database. This
 	 *               parameter is implicit and should not be passed under normal circumstances.
 	 *               In the above example, the call to `save()` on the `$post` object is

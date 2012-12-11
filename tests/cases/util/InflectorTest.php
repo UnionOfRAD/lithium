@@ -63,6 +63,7 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertEqual(Inflector::singularize('knives'), 'knife');
 		$this->assertEqual(Inflector::singularize('wolves'), 'wolf');
 		$this->assertEqual(Inflector::singularize('shelves'), 'shelf');
+		$this->assertEqual(Inflector::singularize('causes'), 'cause');
 		$this->assertEqual(Inflector::singularize(''), '');
 	}
 
@@ -170,6 +171,30 @@ class InflectorTest extends \lithium\test\Unit {
 
 		$result = Inflector::slug('ThisMeltsYourFace');
 		$expected = 'This-Melts-Your-Face';
+		$this->assertEqual($expected, $result);
+
+		$result = Inflector::slug('DŽip Džip džip');
+		$expected = 'Dzip-Dzip-dzip';
+		$this->assertEqual($expected, $result);
+
+		$result = Inflector::slug('Šuma šuma');
+		$expected = 'Suma-suma';
+		$this->assertEqual($expected, $result);
+
+		$result = Inflector::slug('Čamac čamac');
+		$expected = 'Camac-camac';
+		$this->assertEqual($expected, $result);
+
+		$result = Inflector::slug('Ćasa ćasa');
+		$expected = 'Casa-casa';
+		$this->assertEqual($expected, $result);
+
+		$result = Inflector::slug('Život život');
+		$expected = 'Zivot-zivot';
+		$this->assertEqual($expected, $result);
+
+		$result = Inflector::slug('Đorđe đorđe');
+		$expected = 'Djordje-djordje';
 		$this->assertEqual($expected, $result);
 	}
 

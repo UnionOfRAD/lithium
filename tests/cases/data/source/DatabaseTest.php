@@ -25,6 +25,8 @@ class DatabaseTest extends \lithium\test\Unit {
 
 	protected $_model = 'lithium\tests\mocks\data\model\MockDatabasePost';
 
+	protected $_gallery = 'lithium\tests\mocks\data\model\MockGallery';
+
 	public function setUp() {
 		MockDatabasePost::config();
 		MockDatabaseComment::config();
@@ -149,7 +151,7 @@ class DatabaseTest extends \lithium\test\Unit {
 	public function testSchema() {
 		$model = $this->_model;
 		$model::config();
-		$modelName = $model::meta('name');
+		$modelName = '';
 		$expected = array($modelName => array('id', 'author_id', 'title', 'created'));
 		$result = $this->db->schema(new Query(compact('model')));
 		$this->assertEqual($expected, $result);
@@ -164,6 +166,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('MockDatabaseComment')
 		));
 		$expected = array(
+			'' => array('id'),
 			'MockDatabaseComment' => array(
 				'id', 'post_id', 'author_id', 'body', 'created'
 			)
@@ -177,7 +180,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		);
 		$options['fields'] = array('id', 'title');
 		$result = $this->db->schema(new Query($options));
-		$expected = array($modelName => $options['fields']);
+
+		$expected = array($modelName => $options['fields'], 'MockDatabaseComment' => array('id'));
 		$this->assertEqual($expected, $result);
 
 		$options['fields'] = array(
@@ -188,7 +192,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
 			$modelName => array('id', 'title'),
-			'MockDatabaseComment' => array('body')
+			'MockDatabaseComment' => array('body', 'id')
 		);
 		$this->assertEqual($expected, $result);
 
@@ -199,7 +203,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
 			$modelName => array('id', 'title'),
-			'MockDatabaseComment' => array('body', 'created')
+			'MockDatabaseComment' => array('body', 'created', 'id')
 		);
 		$this->assertEqual($expected, $result);
 
@@ -215,7 +219,7 @@ class DatabaseTest extends \lithium\test\Unit {
 	public function testSchemaFromManualFieldList() {
 		$fields = array('id', 'name', 'created');
 		$result = $this->db->schema(new Query(compact('fields')));
-		$this->assertEqual(array($fields), $result);
+		$this->assertEqual(array('' => $fields), $result);
 	}
 
 	public function testSimpleQueryRender() {
@@ -313,11 +317,12 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$result = $this->db->renderCommand($query);
 
-		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE {MockDatabasePost}.{title} = '007';";
+		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ";
+		$sql .= "{MockDatabasePost}.{title} = '007';";
 		$this->assertEqual($sql, $result);
 	}
 
-	public function testJoin() {
+	public function testQueryJoin() {
 		$query = new Query(array(
 			'type' => 'read',
 			'model' => $this->_model,
@@ -325,7 +330,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'conditions' => array('MockDatabaseTag.tag' => array('foo', 'bar', 'baz')),
 			'joins' => array(new Query(array(
 				'model' => 'lithium\tests\mocks\data\model\MockDatabaseTag',
-				'constraint' => '{MockDatabaseTagging}.{tag_id} = {MockDatabaseTag}.{id}'
+				'constraints' => '{MockDatabaseTagging}.{tag_id} = {MockDatabaseTag}.{id}'
 			)))
 		));
 		$result = $this->db->renderCommand($query);
@@ -778,6 +783,38 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
 
+	public function testConstraints() {
+		$model = $this->_model;
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $this->_model,
+			'with' => array(
+				'MockDatabaseComment' => array(
+					'constraints' => array(
+						'or' => array(
+							array('custom_id' => 'MockDatabasePost.value_id'),
+							array('custom_id' => 'id'),
+							'and' => array(
+								'id' => 'MockDatabasePost.id',
+								'title' => 'MockDatabasePost.title'
+							),
+							array('title' => (object) $this->db->value('value2')),
+							array('title' => null)
+						),
+						'id' => 5
+		)))));
+
+		$sql = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ';
+		$sql .= '{mock_database_comments} AS {MockDatabaseComment} ON ';
+		$sql .= '(({MockDatabasePost}.{custom_id} = {MockDatabasePost}.{value_id}) OR ';
+		$sql .= '({MockDatabasePost}.{custom_id} = {MockDatabaseComment}.{id}) OR ';
+		$sql .= '({MockDatabasePost}.{id} = {MockDatabasePost}.{id} AND {MockDatabasePost}.{title} ';
+		$sql .= '= {MockDatabasePost}.{title}) OR ({MockDatabasePost}.{title} = \'value2\') ';
+		$sql .= 'OR ({MockDatabasePost}.{title} IS NULL)) AND {MockDatabasePost}.{id} = 5;';
+
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+	}
+
 	public function testReadConditionsWithModel() {
 		$model = $this->_model;
 		$options = array(
@@ -814,24 +851,17 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected .= ' {MockDatabasePost}.{created}, {MockDatabaseComment}.{body}';
 		$this->assertEqual($expected,$result);
 
-		$fields = array(
-			'MockDatabasePost',
-			'MockDatabaseComment'
-		);
+		$fields = array('MockDatabasePost', 'MockDatabaseComment');
 		$result = $this->db->fields($fields, $query);
-		$expected = '{MockDatabasePost}.{id}, {MockDatabasePost}.{author_id},';
-		$expected .= ' {MockDatabasePost}.{title}, {MockDatabasePost}.{created},';
-		$expected .= ' {MockDatabaseComment}.{id}, {MockDatabaseComment}.{post_id},';
-		$expected .= ' {MockDatabaseComment}.{author_id}, {MockDatabaseComment}.{body},';
-		$expected .= ' {MockDatabaseComment}.{created}';
+		$expected = '{MockDatabasePost}.*, {MockDatabaseComment}.*';
 		$this->assertEqual($expected, $result);
 
-		$fields = array('MockDatabasePost as Post', 'MockDatabaseComment AS Comment');
+		$fields = array('MockDatabasePost.id as idPost', 'MockDatabaseComment.id AS idComment');
 		$result = $this->db->fields($fields, $query);
-		$expected = 'MockDatabasePost as Post, MockDatabaseComment AS Comment';
+		$expected = '{MockDatabasePost}.{id} as idPost, {MockDatabaseComment}.{id} as idComment';
 		$this->assertEqual($expected, $result);
 
-		$expected = array('MockDatabasePost' => array('Post', 'Comment'));
+		$expected = array('' => array('idPost'), 'MockDatabaseComment' => array('idComment'));
 		$this->assertEqual($expected, $query->map());
 
 		$fields = array(array('count(MockDatabasePost.id)'));
@@ -839,7 +869,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->fields($fields, $query);
 		$this->assertEqual($expected, $result);
 
-		$fields = array((object) 'count(MockDatabasePost.id)');
+		$fields = array(array((object) 'count(MockDatabasePost.id)'));
 		$expected = 'count(MockDatabasePost.id)';
 		$result = $this->db->fields($fields, $query);
 		$this->assertEqual($expected, $result);
@@ -880,16 +910,17 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$hasMany = $this->db->relationship($this->_model, 'hasMany', 'PostRevisions', array(
 			'to' => $postRevision,
-			'constraint' => array('MockDatabasePostRevision.deleted' => null)
+			'constraints' => array('MockDatabasePostRevision.deleted' => null)
 		));
 		$this->assertEqual(array('id' => 'mock_database_post_id'), $hasMany->key());
 		$this->assertEqual('post_revisions', $hasMany->fieldName());
 
 		$expected = array(
-			'MockDatabasePost.id' => 'PostRevisions.mock_database_post_id',
-			'MockDatabasePostRevision.deleted' => null
+			'MockDatabasePostRevision.deleted' => null,
+			'MockDatabasePost.id' => 'PostRevisions.mock_database_post_id'
 		);
-		$this->assertEqual($expected, $hasMany->constraints());
+		$result = $this->db->on($hasMany);
+		$this->assertEqual($expected, $result);
 
 		$belongsTo = $this->db->relationship($postRevision, 'belongsTo', 'Posts', array(
 			'to' => $this->_model
@@ -925,8 +956,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->read(new Query($options), $options);
 		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ';
 		$expected .= '{mock_database_post_revisions} AS {MockDatabasePostRevision} ON ';
-		$expected .= '{MockDatabasePost}.{id} = {MockDatabasePostRevision}.{mock_database_post_id}';
-		$expected .= ' AND {MockDatabasePostRevision}.{deleted} IS NULL;';
+		$expected .= '{MockDatabasePostRevision}.{deleted} IS NULL AND ';
+		$expected .= '{MockDatabasePost}.{id} = {MockDatabasePostRevision}.{mock_database_post_id};';
 		$this->assertEqual($expected, $this->db->sql);
 	}
 
@@ -938,7 +969,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'limit' => 1
 		);
 		$result = $this->db->read(new Query($options), $options);
-		$this->assertTrue($result instanceof RecordSet);
+		$this->assertFalse($result instanceof RecordSet);
 	}
 
 	public function testGroup() {
@@ -975,12 +1006,12 @@ class DatabaseTest extends \lithium\test\Unit {
 				'type' => 'INNER',
 				'source' => 'posts',
 				'alias' => 'Post',
-				'constraint' => array("Comment.post_id" => array('<=' => "Post.id"))
+				'constraints' => array('Comment.post_id' => array('<=' => 'Post.id'))
 			))
 		));
 
 		$expected = "SELECT * FROM {comments} AS {Comments} INNER JOIN {posts} AS {Post} ON ";
-		$expected .= "{Comment}.{post_id} <= {Post}.{id} WHERE {Comment}.{id} = 1;";
+		$expected .= "({Comment}.{post_id} <= {Post}.{id}) WHERE {Comment}.{id} = 1;";
 		$result = $this->db->renderCommand($query);
 		$this->assertEqual($expected, $result);
 	}
@@ -1000,17 +1031,17 @@ class DatabaseTest extends \lithium\test\Unit {
 				'type' => 'LEFT',
 				'source' => 'posts',
 				'alias' => 'Post',
-				'constraint' => array(
+				'constraints' => array(
 					"Comment.post_id" => array(
-						'<=' => "Post.id",
-						'>=' => "Post.id"
+						'<=' => 'Post.id',
+						'>=' => 'Post.id'
 					)
 				)
-			))
-		));
+			)
+		)));
 
 		$expected = "SELECT * FROM {comments} AS {Comments} LEFT JOIN {posts} AS {Post} ON ";
-		$expected .= "{Comment}.{post_id} <= {Post}.{id} AND {Comment}.{post_id} >= {Post}.{id} ";
+		$expected .= "({Comment}.{post_id} <= {Post}.{id} AND {Comment}.{post_id} >= {Post}.{id}) ";
 		$expected .= "WHERE {Comment}.{id} = 1;";
 		$result = $this->db->renderCommand($query);
 		$this->assertEqual($expected, $result);
@@ -1023,12 +1054,12 @@ class DatabaseTest extends \lithium\test\Unit {
 				'type' => 'LEFT',
 				'source' => 'posts',
 				'alias' => 'Post',
-				'constraint' => array(
-					"Comment.post_id" => array('=>' => "Post.id")
+				'constraints' => array(
+					'Comment.post_id' => array('=>' => 'Post.id')
 				)
 			))
 		));
-		$this->expectException("Unsupported operator `=>` used in constraint.");
+		$this->expectException("Unsupported operator `=>`.");
 		$this->db->renderCommand($query);
 	}
 
@@ -1044,7 +1075,7 @@ class DatabaseTest extends \lithium\test\Unit {
 				'type' => 'INNER',
 				'source' => 'posts',
 				'alias' => 'Post',
-				'constraint' => array('Comment.post_id' => 'Post.id')
+				'constraints' => array('Comment.post_id' => 'Post.id')
 			))
 		));
 
@@ -1060,19 +1091,307 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->db->log = false;
 
 		$result = MockDatabasePost::$connection->logs[0];
-		$expected = "SELECT {MockDatabasePost}.{id} FROM {mock_database_posts} AS ";
+		$expected = "SELECT DISTINCT({MockDatabasePost}.{id}) AS _ID_ FROM {mock_database_posts} AS ";
 		$expected .= "{MockDatabasePost} LEFT JOIN {mock_database_comments} AS ";
 		$expected .= "{MockDatabaseComment} ON {MockDatabasePost}.{id} = ";
 		$expected .= "{MockDatabaseComment}.{mock_database_post_id} WHERE ";
-		$expected .= "{MockDatabasePost}.{id} = 5 GROUP BY {MockDatabasePost}.{id} LIMIT 1;";
+		$expected .= "{MockDatabasePost}.{id} = 5 LIMIT 1;";
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testsplitFieldname() {
+		$result = $this->db->invokeMethod('_splitFieldname', array('Alias.fieldname'));
+		$this->assertEqual(array('Alias', 'fieldname'), $result);
+
+		$result = $this->db->invokeMethod('_splitFieldname', array('fieldname'));
+		$this->assertEqual(array(null, 'fieldname'), $result);
+
+		$result = $this->db->invokeMethod('_splitFieldname', array('fieldname'));
+		$this->assertEqual(array(null, 'fieldname'), $result);
+
+		$result = $this->db->invokeMethod('_splitFieldname', array('lower(Alias.fieldname)'));
+		$this->assertEqual(array(null, 'lower(Alias.fieldname)'), $result);
+	}
+
+	public function testOn() {
+		$conn = MockDatabasePost::connection();
+		$expected = array(
+			'MockDatabasePost.id' => 'MockDatabaseComment.mock_database_post_id'
+		);
+		$this->assertEqual($expected, $conn->on(MockDatabasePost::relations('MockDatabaseComment')));
+
+		$expected = array(
+			'MockDatabaseComment.mock_database_post_id' => 'MockDatabasePost.id'
+		);
+		$this->assertEqual($expected, $conn->on(MockDatabaseComment::relations('MockDatabasePost')));
+
+		$expected = array(
+			'MockDatabasePost.id' => 'MockDatabaseComment.mock_database_post_id',
+			'MockDatabasePost.published' => (object) "'yes'"
+		);
+
+		$rel = MockDatabasePost::relations('MockDatabaseComment');
+		$result = $conn->on($rel, null, null, array('published' => (object) "'yes'"));
+
 		$this->assertEqual($expected, $result);
 
-		$result = MockDatabasePost::$connection->logs[1];
-		$expected = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} ";
-		$expected .= "LEFT JOIN {mock_database_comments} AS {MockDatabaseComment} ON ";
-		$expected .= "{MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id} ";
-		$expected .= "WHERE {MockDatabasePost}.{id} = 5 LIMIT 1;";
+		$expected = array(
+			'CustomPost.id' => 'CustomComment.mock_database_post_id',
+			'CustomPost.published' => (object) "'no'"
+		);
+
+		$constraints = array('published' => (object) "'no'");
+		$result = $conn->on($rel, 'CustomPost', 'CustomComment', $constraints);
 		$this->assertEqual($expected, $result);
+
+		$expected = array(
+			'CustomPost.id' => 'CustomComment.post_id'
+		);
+
+		$constraints = array('CustomPost.id' => 'CustomComment.post_id');
+		$result = $conn->on($rel, 'CustomPost', 'CustomComment', $constraints);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testWithOptionAndInlineConstraint() {
+		$model = $this->_gallery;
+
+		$options = array(
+			'type' => 'read',
+			'model' => $model,
+			'with' => array(
+				'Image' => array(
+					'constraints' => array(
+						'Image.title' => (object) "'MyImage'"
+				)),
+				'Image.ImageTag.Tag' => array(
+					'constraints' => array(
+						'Tag.name' => (object) "'MyTag'"
+					)
+				)
+			)
+		);
+		$result = $this->db->read(new Query($options));
+		$expected = 'SELECT * FROM {mock_gallery} AS {Gallery} ';
+		$expected .= 'LEFT JOIN {mock_image} AS {Image} ON {Image}.{title} = \'MyImage\' ';
+		$expected .= 'AND {Gallery}.{id} = {Image}.{gallery_id} LEFT JOIN {mock_image_tag} AS {ImageTag} ON ';
+		$expected .= '{Image}.{id} = {ImageTag}.{image_id} LEFT JOIN {mock_tag} AS {Tag} ON ';
+		$expected .= '{Tag}.{name} = \'MyTag\' AND {ImageTag}.{tag_id} = {Tag}.{id};';
+		$this->assertEqual($expected, $this->db->sql);
+
+		$to = 'lithium\tests\mocks\data\model\MockImage';
+		$model::bind('hasMany', 'Image', array('to' => $to));
+		$to::bind('belongsTo', 'Gallery', array('to' => $model));
+
+		$result = $this->db->read(new Query(array(
+			'type' => 'read',
+			'model' => $model,
+			'with' => array(
+				'Image.Gallery' => array(
+					'alias' => 'Gallery2',
+					'constraints' => array(
+						'Gallery.custom_id' => 'Gallery2.id'
+					)
+				)
+			)
+		)));
+		$expected = 'SELECT * FROM {mock_gallery} AS {Gallery} LEFT JOIN {mock_image} AS {Image} ';
+		$expected .= 'ON {Gallery}.{id} = {Image}.{gallery_id} LEFT JOIN {mock_gallery} AS ';
+		$expected .= '{Gallery2} ON {Gallery}.{custom_id} = {Gallery2}.{id} AND ';
+		$expected .= '{Image}.{gallery_id} = {Gallery2}.{id};';
+		$this->assertEqual($expected, $this->db->sql);
+		$model::reset();
+	}
+
+	public function testWithOptionAndConstraintInRelation() {
+		$model = 'lithium\tests\mocks\data\model\MockGallery';
+		$to = 'lithium\tests\mocks\data\model\MockImage';
+		$model::bind('hasMany', 'Image', array(
+			'to' => $to,
+			'constraints' => array(
+				'Image.title' => (object) "'MyImage'"
+		)));
+		$result = $this->db->read(new Query(array(
+			'type' => 'read',
+			'model' => $model,
+			'with' => array(
+				'Image.ImageTag.Tag' => array(
+					'constraints' => array(
+						'Tag.name' => (object) "'MyTag'"
+					)
+				)
+			)
+		)));
+
+		$expected = 'SELECT * FROM {mock_gallery} AS {Gallery} ';
+		$expected .= 'LEFT JOIN {mock_image} AS {Image} ON {Image}.{title} = \'MyImage\' AND ';
+		$expected .= '{Gallery}.{id} = {Image}.{gallery_id} LEFT JOIN {mock_image_tag} AS ';
+		$expected .= '{ImageTag} ON {Image}.{id} = {ImageTag}.{image_id} LEFT JOIN {mock_tag} AS ';
+		$expected .= '{Tag} ON {Tag}.{name} = \'MyTag\' AND {ImageTag}.{tag_id} = {Tag}.{id};';
+		$this->assertEqual($expected, $this->db->sql);
+
+		$model::reset();
+	}
+
+	public function testWithOptionWithNullConstraint() {
+		$options = array(
+			'type' => 'read',
+			'model' => $this->_model,
+			'with' => array('MockDatabasePostRevision')
+		);
+		$result = $this->db->read(new Query($options));
+		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ';
+		$expected .= '{mock_database_post_revisions} AS {MockDatabasePostRevision} ON ';
+		$expected .= '{MockDatabasePostRevision}.{deleted} IS NULL AND ';
+		$expected .= '{MockDatabasePost}.{id} = {MockDatabasePostRevision}.{mock_database_post_id};';
+		$this->assertEqual($expected, $this->db->sql);
+	}
+
+	public function testWithOptionAndCustomAlias() {
+		$model = 'lithium\tests\mocks\data\model\MockGallery';
+
+		$model::bind('hasMany', 'Image', array(
+			'to' => 'lithium\tests\mocks\data\model\MockImage',
+			'constraints' => array(
+				'Image.title' => (object) "'MyImage'"
+			)
+		));
+
+		$options = array(
+			'type' => 'read',
+			'model' => $model,
+			'alias' => 'MyGallery',
+			'with' => array(
+				'Image' => array('alias' => 'MyImage')
+			)
+		);
+
+		$result = $this->db->read(new Query($options));
+		$query = new Query($options);
+		$expected = 'SELECT * FROM {mock_gallery} AS {MyGallery} LEFT JOIN ';
+		$expected .= '{mock_image} AS {MyImage} ON {MyImage}.{title} = \'MyImage\' ';
+		$expected .= 'AND {MyGallery}.{id} = {MyImage}.{gallery_id};';
+		$this->assertEqual($expected, $this->db->sql);
+		$model::reset();
+	}
+
+	public function testJoin() {
+		$model =  $this->_model;
+		$conn = $model::connection();
+		$query = new Query(array('type' => 'read', 'model' => $model));
+
+		$rel = $model::relations('MockDatabaseComment');
+
+		$conn->join($query, $rel, null, null, array('published' => (object) "'yes'"));
+
+		$joins = $query->joins();
+		$expected = array(
+			'MockDatabaseComment' => array(
+				'constraints' => array(
+					'MockDatabasePost.id' => 'MockDatabaseComment.mock_database_post_id',
+					'MockDatabasePost.published' => (object) "'yes'"
+				),
+				'model' => 'lithium\tests\mocks\data\model\MockDatabaseComment',
+				'type' => 'LEFT',
+				'alias' => 'MockDatabaseComment'
+			)
+		);
+
+		$this->assertEqual($expected, $joins);
+
+		$query = new Query(array('type' => 'read', 'model' => $model));
+
+		$rel = $model::relations('MockDatabaseComment');
+
+		$conn->join($query, $rel, null, null, (object) array('published' => (object) "'yes'"));
+
+		$joins = $query->joins();
+		$expected = array(
+			'MockDatabaseComment' => array(
+				'constraints' => array(
+					'published' => (object) "'yes'"
+				),
+				'model' => 'lithium\tests\mocks\data\model\MockDatabaseComment',
+				'type' => 'LEFT',
+				'alias' => 'MockDatabaseComment'
+			)
+		);
+
+		$this->assertEqual($expected, $joins);
+	}
+
+	public function testExportedFieldsWithJoinedStrategy () {
+		$query = new Query(array(
+			'model' => $this->_gallery,
+			'with' => array('Image.ImageTag.Tag')
+		));
+		$result = $query->export($this->db);
+		$this->assertEqual('*', $result['fields']);
+
+		$query = new Query(array(
+			'model' => $this->_gallery,
+			'fields' => 'id',
+			'with' => array('Image.ImageTag.Tag')
+		));
+		$result = $query->export($this->db);
+		$expected = '{Gallery}.{id}, {Image}.{id}, {ImageTag}.{id}, {Tag}.{id}';
+		$this->assertEqual($expected, $result['fields']);
+
+		$query = new Query(array(
+			'model' => $this->_gallery,
+			'fields' => 'Tag.id',
+			'with' => array('Image.ImageTag.Tag')
+		));
+		$result = $query->export($this->db);
+		$expected = '{Tag}.{id}, {Gallery}.{id}, {Image}.{id}, {ImageTag}.{id}';
+		$this->assertEqual($expected, $result['fields']);
+
+		$query = new Query(array(
+			'model' => $this->_gallery,
+			'fields' => 'Tag',
+			'with' => array('Image.ImageTag.Tag')
+		));
+		$result = $query->export($this->db);
+		$expected = '{Tag}.*, {Gallery}.{id}, {Image}.{id}, {ImageTag}.{id}';
+		$this->assertEqual($expected, $result['fields']);
+
+		$query = new Query(array(
+			'model' => $this->_gallery,
+			'fields' => 'Tag.*',
+			'with' => array('Image.ImageTag.Tag')
+		));
+		$result = $query->export($this->db);
+		$expected = '{Tag}.*, {Gallery}.{id}, {Image}.{id}, {ImageTag}.{id}';
+		$this->assertEqual($expected, $result['fields']);
+	}
+
+	public function testExportedFieldsWithJoinedStrategyAndRecursiveRelation () {
+
+		$query = new Query(array(
+			'model' => $this->_gallery,
+			'with' => array('Parent.Parent')
+		));
+		$result = $query->export($this->db);
+		$expected = '*';
+		$this->assertEqual($expected, $result['fields']);
+
+		$query = new Query(array(
+			'model' => $this->_gallery,
+			'fields' => 'Parent.name',
+			'with' => array('Parent.Parent')
+		));
+		$result = $query->export($this->db);
+		$expected = '{Parent}.{name}, {Parent}.{id}, {Gallery}.{id}, {Parent__2}.{id}';
+		$this->assertEqual($expected, $result['fields']);
+
+		$query = new Query(array(
+			'model' => $this->_gallery,
+			'fields' => 'ParentOfParent.name',
+			'with' => array('Parent.Parent' => array('alias' => 'ParentOfParent'))
+		));
+		$result = $query->export($this->db);
+		$expected = '{ParentOfParent}.{name}, {ParentOfParent}.{id}, {Gallery}.{id}, {Parent}.{id}';
+		$this->assertEqual($expected, $result['fields']);
 	}
 }
 

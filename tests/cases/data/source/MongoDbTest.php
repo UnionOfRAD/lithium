@@ -68,8 +68,9 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$model::config(array('meta' => array('key' => '_id')));
 		$model::$connection = $this->db;
+		$type = 'create';
 
-		$this->query = new Query(compact('model') + array(
+		$this->query = new Query(compact('model', 'type') + array(
 			'entity' => new Document(compact('model'))
 		));
 	}
@@ -377,8 +378,9 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertTrue($this->query->entity()->exists());
 
 		$model = $this->_model;
+		$id = new MongoId();
 		$this->query = new Query(compact('model') + array(
-			'entity' => new Document(compact('model'))
+			'entity' => new Document(compact('model') + array('data' => array('_id' => $id)))
 		));
 
 		array_push($this->db->connection->results, true);
@@ -536,7 +538,7 @@ class MongoDbTest extends \lithium\test\Unit {
 			'to'   => $to,
 			'fields' => true,
 			'fieldName' => 'mockPost',
-			'constraint' => null,
+			'constraints' => null,
 			'init' => true
 		);
 		$this->assertEqual($expected, $result->data());

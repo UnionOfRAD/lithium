@@ -184,14 +184,13 @@ class Request extends \lithium\net\http\Request {
 		}
 		$type = $this->type($this->_config['type'] ?: $this->env('CONTENT_TYPE'));
 		$this->method = $method = strtoupper($this->_env['REQUEST_METHOD']);
+		$hasBody = in_array($method, array('POST', 'PUT', 'PATCH'));
 
-		if (!$this->data && ($method == 'POST' || $method == 'PUT')) {
-			if ($type !== 'html') {
-				$this->_stream = $this->_stream ?: fopen('php://input', 'r');
-				$media = $this->_classes['media'];
-				$this->data = (array) $media::decode($type, stream_get_contents($this->_stream));
-				fclose($this->_stream);
-			}
+		if (!$this->data && $hasBody && $type !== 'html') {
+			$this->_stream = $this->_stream ?: fopen('php://input', 'r');
+			$media = $this->_classes['media'];
+			$this->data = (array) $media::decode($type, stream_get_contents($this->_stream));
+			fclose($this->_stream);
 		}
 		$this->data = Set::merge((array) $this->data, $this->_parseFiles());
 	}

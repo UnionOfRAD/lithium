@@ -55,7 +55,7 @@ class ExporterTest extends \lithium\test\Unit {
 			},
 			'date' => function($v) {
 				$v = is_numeric($v) ? intval($v) : strtotime($v);
-				return (time() == $v) ? new MongoDate() : new MongoDate($v);
+				return !$v ? new MongoDate() : new MongoDate($v);
 			},
 			'regex'   => function($v) { return new MongoRegex($v); },
 			'integer' => function($v) { return (integer) $v; },
@@ -76,9 +76,10 @@ class ExporterTest extends \lithium\test\Unit {
 	}
 
 	public function testCreateWithFixedData() {
+		$time = time();
 		$doc = new Document(array('exists' => false, 'data' => array(
 			'_id' => new MongoId(),
-			'created' => new MongoDate(),
+			'created' => new MongoDate($time),
 			'numbers' => new DocumentSet(array('data' => array(7, 8, 9))),
 			'objects' => new DocumentSet(array('data' => array(
 				new Document(array('data' => array('foo' => 'bar'))),
@@ -92,7 +93,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$result = Exporter::get('create', $doc->export());
 		$this->assertTrue($result['create']['_id'] instanceof MongoId);
 		$this->assertTrue($result['create']['created'] instanceof MongoDate);
-		$this->assertIdentical(time(), $result['create']['created']->sec);
+		$this->assertIdentical($time, $result['create']['created']->sec);
 
 		$this->assertIdentical(array(7, 8, 9), $result['create']['numbers']);
 		$expected = array(array('foo' => 'bar'), array('baz' => 'dib'));
@@ -312,6 +313,7 @@ class ExporterTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testTypeCasting() {
+		$time = time();
 		$data = array(
 			'_id' => '4c8f86167675abfabd970300',
 			'title' => 'Foo',
@@ -321,12 +323,11 @@ class ExporterTest extends \lithium\test\Unit {
 			),
 			'empty_array' => array(),
 			'authors' => '4c8f86167675abfabdb00300',
-			'created' => time(),
-			'modified' => date('Y-m-d H:i:s'),
+			'created' => $time,
+			'modified' => date('Y-m-d H:i:s', $time),
 			'rank_count' => '45',
 			'rank' => '3.45688'
 		);
-		$time = time();
 		$model = $this->_model;
 		$handlers = $this->_handlers;
 		$options = compact('model', 'handlers');
@@ -370,19 +371,19 @@ class ExporterTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testTypeCastingSubObjectArrays() {
+		$time = time();
 		$data = array(
 			'_id' => '4c8f86167675abfabd970300',
 			'accounts' => array(array(
 				'_id' => "4fb6e2dd3e91581fe6e75736",
 				'name' => 'Foo',
-				'created' => time()
+				'created' => $time
 			),array(
 				'_id' => "4fb6e2df3e91581fe6e75737",
 				'name' => 'Bar',
-				'created' => time()
+				'created' => $time
 			))
 		);
-		$time = time();
 		$model = $this->_model;
 		$handlers = $this->_handlers;
 		$options = compact('model', 'handlers');
@@ -624,6 +625,123 @@ class ExporterTest extends \lithium\test\Unit {
 		for ($i = 0; $i < 3; $i++) {
 			$this->assertTrue($result['update']['list'][$i] instanceof MongoId);
 		}
+	}
+
+	public function testToData() {
+		$data = array(
+			array(
+			'_id' => '4c8f86167675abfabd970300',
+			'accounts' => array(array(
+				'_id' => "4fb6e2dd3e91581fe6e75736",
+				'name' => 'Foo1'
+			),array(
+				'_id' => "4fb6e2df3e91581fe6e75737",
+				'name' => 'Bar1'
+			))),
+			array(
+			'_id' => '4c8f86167675abfabd970301',
+			'accounts' => array(array(
+				'_id' => "4fb6e2dd3e91581fe6e75738",
+				'name' => 'Foo2'
+			),array(
+				'_id' => "4fb6e2df3e91581fe6e75739",
+				'name' => 'Bar2'
+			)))
+		);
+
+		$model = $this->_model;
+		$handlers = $this->_handlers;
+		$options = compact('model', 'handlers');
+		$schema = new Schema(array('fields' => $this->_schema));
+		$set = $schema->cast(null, null, $data, $options);
+
+		$result = $set->data();
+		$accounts = $result['4c8f86167675abfabd970300']['accounts'];
+		$this->assertEqual('Foo1', $accounts[0]['name']);
+		$this->assertEqual('Bar1', $accounts[1]['name']);
+		$accounts = $result['4c8f86167675abfabd970301']['accounts'];
+		$this->assertEqual('Foo2', $accounts[0]['name']);
+		$this->assertEqual('Bar2', $accounts[1]['name']);
+
+		$result = $set->to('array', array('indexed' => false));
+		$accounts = $result[0]['accounts'];
+		$this->assertEqual('Foo1', $accounts[0]['name']);
+		$this->assertEqual('Bar1', $accounts[1]['name']);
+		$accounts = $result[1]['accounts'];
+		$this->assertEqual('Foo2', $accounts[0]['name']);
+		$this->assertEqual('Bar2', $accounts[1]['name']);
+
+		$result = $set->to('array', array('indexed' => true));
+		$accounts = $result['4c8f86167675abfabd970300']['accounts'];
+		$this->assertEqual('Foo1', $accounts['4fb6e2dd3e91581fe6e75736']['name']);
+		$this->assertEqual('Bar1', $accounts['4fb6e2df3e91581fe6e75737']['name']);
+		$accounts = $result['4c8f86167675abfabd970301']['accounts'];
+		$this->assertEqual('Foo2', $accounts['4fb6e2dd3e91581fe6e75738']['name']);
+		$this->assertEqual('Bar2', $accounts['4fb6e2df3e91581fe6e75739']['name']);
+
+		$result = $set->to('array');
+		$accounts = $result['4c8f86167675abfabd970300']['accounts'];
+		$this->assertEqual('Foo1', $accounts['4fb6e2dd3e91581fe6e75736']['name']);
+		$this->assertEqual('Bar1', $accounts['4fb6e2df3e91581fe6e75737']['name']);
+		$accounts = $result['4c8f86167675abfabd970301']['accounts'];
+		$this->assertEqual('Foo2', $accounts['4fb6e2dd3e91581fe6e75738']['name']);
+		$this->assertEqual('Bar2', $accounts['4fb6e2df3e91581fe6e75739']['name']);
+	}
+
+	public function testIndexesOnExport() {
+		$schema = new Schema(array('fields' => array(
+			'_id' => array('type' => 'id'),
+			'accounts' => array('type' => 'object', 'array' => true),
+			'accounts._id' => array('type' => 'id'),
+			'accounts.name' => array('type' => 'string')
+		)));
+
+		$data = array(
+			array(
+			'_id' => '4c8f86167675abfabd970300',
+			'accounts' => array(array(
+				'_id' => "4fb6e2dd3e91581fe6e75736",
+				'name' => 'Foo1'
+			),array(
+				'_id' => "4fb6e2df3e91581fe6e75737",
+				'name' => 'Bar1'
+			))),
+			array(
+			'_id' => '4c8f86167675abfabd970301',
+			'accounts' => array(array(
+				'_id' => "4fb6e2dd3e91581fe6e75738",
+				'name' => 'Foo2'
+			),array(
+				'_id' => "4fb6e2df3e91581fe6e75739",
+				'name' => 'Bar2'
+			)))
+		);
+
+		$model = $this->_model;
+
+		$array = new DocumentSet(compact('model', 'schema', 'data'));
+		$this->assertTrue($array['4c8f86167675abfabd970300']->accounts instanceof DocumentSet);
+		$this->assertTrue($array['4c8f86167675abfabd970301']->accounts instanceof DocumentSet);
+
+		$result = Exporter::get('create', $array->export());
+		$this->assertTrue(isset($result['create'][0]));
+		$this->assertTrue(isset($result['create'][1]));
+		$this->assertFalse(isset($result['create']['4c8f86167675abfabd970300']));
+		$this->assertFalse(isset($result['create']['4c8f86167675abfabd970301']));
+		$this->assertTrue(isset($result['create'][0]['accounts'][0]));
+		$this->assertTrue(isset($result['create'][0]['accounts'][1]));
+		$this->assertTrue(isset($result['create'][1]['accounts'][0]));
+		$this->assertTrue(isset($result['create'][1]['accounts'][1]));
+
+		$result = Exporter::get('update', $array->export());
+		$this->assertTrue(isset($result['update'][0]));
+		$this->assertTrue(isset($result['update'][1]));
+		$this->assertFalse(isset($result['update']['4c8f86167675abfabd970300']));
+		$this->assertFalse(isset($result['update']['4c8f86167675abfabd970301']));
+		$this->assertTrue(isset($result['update'][0]['accounts'][0]));
+		$this->assertTrue(isset($result['update'][0]['accounts'][1]));
+		$this->assertTrue(isset($result['update'][1]['accounts'][0]));
+		$this->assertTrue(isset($result['update'][1]['accounts'][1]));
 	}
 }
 

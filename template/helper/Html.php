@@ -103,10 +103,10 @@ class Html extends \lithium\template\Helper {
 	 * @see lithium\net\http\Response::$encoding
 	 * @link http://www.iana.org/assignments/character-sets
 	 * @param string $encoding The character encoding to be used in the meta tag.
-	 *        Defaults to the encoding of the `Response` object attached to the
-	 *        current context. The default encoding of that object is `UTF-8`.
-	 *        The string given here is not manipulated in any way, so that
-	 *        values are rendered literally. Also see above note about casing.
+	 *               Defaults to the encoding of the `Response` object attached to the
+	 *               current context. The default encoding of that object is `UTF-8`.
+	 *               The string given here is not manipulated in any way, so that
+	 *               values are rendered literally. Also see above note about casing.
 	 * @return string A meta tag containing the specified encoding (literally).
 	 */
 	public function charset($encoding = null) {
@@ -133,13 +133,13 @@ class Html extends \lithium\template\Helper {
 	 *              anchor name starting with `'#'` (i.e. `'#top'`), or an array defining a set
 	 *              of request parameters that should be matched against a route in `Router`.
 	 * @param array $options The available options are:
-	 *     - `'escape'` _boolean_: Whether or not the title content should be escaped.
-	 *     Defaults to `true`.
-	 *     - `'type'` _string_: The meta-link type, which is looked up in `Html::$_metaLinks`.
-	 *       By default it accepts `atom`, `rss` and `icon`.
-	 *       If a `type` is specified, this method will render a document meta-link (`<link />`),
-	 *       instead of an HTML link (`<a />`).
-	 *     - any other options specified are rendered as HTML attributes of the element.
+	 *              - `'escape'` _boolean_: Whether or not the title content should be escaped.
+	 *              Defaults to `true`.
+	 *              - `'type'` _string_: The meta-link type, which is looked up in
+	 *              `Html::$_metaLinks`. By default it accepts `atom`, `rss` and `icon`. If a `type`
+	 *              is specified, this method will render a document meta-link (`<link />`),
+	 *              instead of an HTML link (`<a />`).
+	 *              - any other options specified are rendered as HTML attributes of the element.
 	 * @return string Returns an `<a />` or `<link />` element.
 	 */
 	public function link($title, $url = null, array $options = array()) {
@@ -163,12 +163,12 @@ class Html extends \lithium\template\Helper {
 	 * @link http://lithify.me/docs/manual/handling-http-requests/views.wiki
 	 * @param mixed $path String The name of a JavaScript file, or an array of names.
 	 * @param array $options Available options are:
-	 *     - `'inline'` _boolean_: Whether or not the `<script />` element should be output inline.
-	 *       When set to false, the `scripts()` handler prints out the script, and other specified
-	 *       scripts to be included in the layout. Defaults to `true`. This is useful when
-	 *       page-specific scripts are created inline in the page, and you'd like to place them
-	 *       in the `<head />` along with your other scripts.
-	 *     - any other options specified are rendered as HTML attributes of the element.
+	 *              - `'inline'` _boolean_: Whether or not the `<script />` element should be output
+	 *              inline. When set to false, the `scripts()` handler prints out the script, and
+	 *              other specified scripts to be included in the layout. Defaults to `true`.
+	 *              This is useful when page-specific scripts are created inline in the page, and
+	 *              you'd like to place them in the `<head />` along with your other scripts.
+	 *              - any other options specified are rendered as HTML attributes of the element.
 	 * @return string
 	 * @filter This method can be filtered.
 	 */
@@ -204,15 +204,16 @@ class Html extends \lithium\template\Helper {
 	 * @param mixed $path The name of a CSS stylesheet in `/app/webroot/css`, or an array
 	 *              containing names of CSS stylesheets in that directory.
 	 * @param array $options Available options are:
-	 *     - `'inline'` _boolean_: Whether or not the `<style />` element should be output inline.
-	 *        When set to `false`, the `styles()` handler prints out the styles, and other specified
-	 *        styles to be included in the layout. Defaults to `true`. This is useful when
-	 *        page-specific styles are created inline in the page, and you'd like to place them in
-	 *        the `<head />` along with your other styles.
-	 *     - `'type'` _string_: By default, accepts `stylesheet` or `import`,
-	 *       which respectively correspond to `style-link` and `style-import` strings templates
-	 *       defined in `Html::$_strings`.
-	 *     - any other options specified are rendered as HTML attributes of the element.
+	 *              - `'inline'` _boolean_: Whether or not the `<style />` element should be output
+	 *              inline. When set to `false`, the `styles()` handler prints out the styles,
+	 *              and other specified styles to be included in the layout. Defaults to `true`.
+	 *              This is useful when page-specific styles are created inline in the page, and
+	 *              you'd like to place them in
+	 *              the `<head />` along with your other styles.
+	 *              - `'type'` _string_: By default, accepts `stylesheet` or `import`, which
+	 *              respectively correspond to `style-link` and `style-import` strings templates
+	 *              defined in `Html::$_strings`.
+	 *              - any other options specified are rendered as HTML attributes of the element.
 	 * @return string CSS <link /> or <style /> tag, depending on the type of link.
 	 * @filter This method can be filtered.
 	 */
@@ -275,10 +276,10 @@ class Html extends \lithium\template\Helper {
 	 * Creates a formatted `<img />` element.
 	 *
 	 * @param string $path Path to the image file. If the filename is prefixed with
-	 *     `'/'`, the path will be relative to the base path of your application.
-	 *     Otherwise the path will be relative to the images directory, usually `app/webroot/img/`.
-	 *     If the name starts with `'http://'`, this is treated as an external url used as the `src`
-	 *     attribute.
+	 *               `'/'`, the path will be relative to the base path of your application.
+	 *               Otherwise the path will be relative to the images directory, usually `app/webroot/img/`.
+	 *               If the name starts with `'http://'`, this is treated as an external url used as the `src`
+	 *               attribute.
 	 * @param array $options Array of HTML attributes.
 	 * @return string Returns a formatted `<img />` tag.
 	 * @filter This method can be filtered.
@@ -301,7 +302,7 @@ class Html extends \lithium\template\Helper {
 	 * @param string $type The title of the external resource
 	 * @param mixed $url The address of the external resource or string for content attribute
 	 * @param array $options Other attributes for the generated tag. If the type attribute
-	 *     4          is 'html', 'rss', 'atom', or 'icon', the mime-type is returned.
+	 *              is 'html', 'rss', 'atom', or 'icon', the mime-type is returned.
 	 * @return string
 	 */
 	protected function _metaLink($type, $url = null, array $options = array()) {

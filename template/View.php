@@ -351,12 +351,14 @@ class View extends \lithium\core\Object {
 		if (!$conditions = $step['conditions']) {
 			return true;
 		}
-		if (is_callable($conditions) && !$conditions($params, $data, $options)) {
+		$isCallable = is_callable($conditions) && !is_string($conditions);
+		if ($isCallable && !$conditions($params, $data, $options)) {
 			return false;
 		}
 		if (is_string($conditions) && !(isset($options[$conditions]) && $options[$conditions])) {
 			return false;
 		}
+
 		return true;
 	}
 

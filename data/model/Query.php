@@ -8,9 +8,9 @@
 
 namespace lithium\data\model;
 
+use lithium\util\Set;
 use lithium\data\Source;
 use lithium\core\ConfigException;
-use lithium\data\model\QueryException;
 
 /**
  * The `Query` class acts as a container for all information necessary to perform a particular
@@ -79,6 +79,43 @@ class Query extends \lithium\core\Object {
 	);
 
 	/**
+	 * The query's fields
+	 *
+	 * @see lithium\data\model\Query::fields()
+	 *
+	 * @var array
+	 */
+	protected $_fields = array(0 => array(), 1 => array());
+
+	/**
+	 * Count the number of identical models in a query for building
+	 * unique aliases
+	 *
+	 * @see lithium\data\model\Query::alias()
+	 *
+	 * @var array
+	 */
+	protected $_alias = array();
+
+	/**
+	 * Map the generated aliases to their corresponding relation path
+	 *
+	 * @see lithium\data\model\Query::alias()
+	 *
+	 * @var array
+	 */
+	protected $_paths = array();
+
+	/**
+	 * Map the generated aliases to their corresponding model
+	 *
+	 * @see lithium\data\model\Query::alias()
+	 *
+	 * @var array
+	 */
+	protected $_models = array();
+
+	/**
 	 * Auto configuration properties.
 	 *
 	 * @var array
@@ -86,38 +123,82 @@ class Query extends \lithium\core\Object {
 	protected $_autoConfig = array('type', 'map');
 
 	/**
-	 * Class constructor, which initializes the default values this object supports. Even though
-	 * only a specific list of configuration parameters is available by default, the `Query` object
-	 * uses the `__call()` method to implement automatic getters and setters for any arbitrary piece
-	 * of data.
+	 * Initialization methods on construct
 	 *
-	 * This means that any information may be passed into the constructor may be used by the backend
-	 * data source executing the query (or ignored, if support is not implemented). This is useful
-	 * if, for example, you wish to extend a core data source and implement custom fucntionality.
-	 * @param array $config
+	 * @var array
+	 */
+
+	protected $_initializers = array(
+		'model', 'entity', 'conditions', 'having', 'group', 'order',
+		'limit', 'offset', 'page', 'data', 'calculate', 'schema', 'comment'
+	);
+
+	/**
+	 * Boolean indicate if the query is built or not
+	 *
+	 * @var string
+	 */
+	protected $_built = false;
+
+	/**
+	 * Class constructor, which initializes the default values this object supports.
+	 * Even though only a specific list of configuration parameters is available
+	 * by default, the `Query` object uses the `__call()` method to implement
+	 * automatic getters and setters for any arbitrary piece of data.
+	 *
+	 * This means that any information may be passed into the constructor may be
+	 * used by the backend data source executing the query (or ignored, if support
+	 * is not implemented). This is useful if, for example, you wish to extend a
+	 * core data source and implement custom fucntionality.
+	 *
+	 * @param array $config Config options:
+	 *        - `'type'` _string_: The type of the query (`read`, `insert`, `update`, `delete`).
+	 *        - `'entity'` _object_: The base entity to query on. If set `'model'` is optionnal.
+	 *        - `'model'` _string_: The base model to query on.
+	 *        - `'source'` _string_: The name of the table/collection. Unnecessary
+	 *          if `model` is set.
+	 *        - `'alias'` _string_: Alias for the source. Unnecessary if `model` is set.
+	 *        - `'schema'` _object_: A schema model. Unnecessary if `model` is set.
+	 *        - `'fields'` _array_: The fields to retreive.
+	 *        - `'conditions'` _array_: The conditions of the queries
+	 *        - `'having'` _array_: The having conditions of the queries
+	 *        - `'group'` _string_: The group by parameter.
+	 *        - `'order'` _string_: The order by parameter.
+	 *        - `'limit'` _string_: The limit parameter.
+	 *        - `'offset'` _string_: The offset of the `limit` options.
+	 *        - `'page'` _string_: Convenience parameter for setting the `offset`:
+	 *          `offset` = `page` * `limit`.
+	 *        - `'with'` _array_: Contain dependencies. Works only if `model` is set.
+	 *        - `'joins'` _array_: Contain manual join dependencies.
+	 *        - `'data'` _array_: Datas for update queries.
+	 *        - `'whitelist'` _array_: Allowed fields for updating queries.
+	 *        - `'calculate'` _string_: Alias name of the count.
+	 *        - `'comment'` _string_: Comment for the query.
+	 *        - `'map'` _object_: Unnecessary if `model` is set.
+	 *        - `'relationships'` _array_: Unnecessary if `model` is set.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'calculate'  => null,
-			'schema'     => null,
+			'model' => null,
+			'entity' => null,
+			'source' => null,
+			'alias' => null,
+			'fields' => array(),
 			'conditions' => array(),
-			'having'     => array(),
-			'fields'     => array(),
-			'data'       => array(),
-			'model'      => null,
-			'alias'      => null,
-			'source'     => null,
-			'order'      => null,
-			'offset'     => null,
-			'name'       => null,
-			'limit'      => null,
-			'page'       => null,
-			'group'      => null,
-			'comment'    => null,
-			'joins'      => array(),
-			'with'       => array(),
-			'map'        => array(),
-			'whitelist'  => array(),
+			'having' => array(),
+			'group' => null,
+			'order' => null,
+			'limit' => null,
+			'offset' => null,
+			'page' => null,
+			'with' => array(),
+			'joins' => array(),
+			'data' => array(),
+			'whitelist' => array(),
+			'calculate' => null,
+			'schema' => null,
+			'comment' => null,
+			'map' => array(),
 			'relationships' => array()
 		);
 		parent::__construct($config + $defaults);
@@ -127,28 +208,36 @@ class Query extends \lithium\core\Object {
 		parent::_init();
 		unset($this->_config['type']);
 
-		foreach ($this->_config as $key => $val) {
-			if (method_exists($this, $key) && $val !== null) {
-				$this->_config[$key] = is_array($this->_config[$key]) ? array() : null;
+		$keys = array_keys($this->_config);
+		foreach ($this->_initializers as $key) {
+			$val = $this->_config[$key];
+			if ($val !== null) {
+				$this->_config[$key] = is_array($val) ? array() : null;
 				$this->{$key}($val);
 			}
 		}
 		if ($list = $this->_config['whitelist']) {
 			$this->_config['whitelist'] = array_combine($list, $list);
 		}
-		if ($this->_config['with']) {
-			$this->_associate($this->_config['with']);
-		}
-		$joins = $this->_config['joins'];
-		$this->_config['joins'] = array();
 
-		foreach ($joins as $i => $join) {
-			$this->join($i, $join);
-		}
 		if ($this->_entity && !$this->_config['model']) {
 			$this->model($this->_entity->model());
 		}
-		unset($this->_config['entity'], $this->_config['init'], $this->_config['with']);
+
+		if ($this->_config['with']) {
+			if (!$model = $this->model()) {
+				throw new ConfigException("The `'with'` option needs a valid binded model.");
+			}
+			$this->_config['with'] = Set::normalize($this->_config['with']);
+		}
+
+		if ($model = $this->model()) {
+			$this->alias($this->_config['alias'] ?: $model::meta('name'));
+		}
+
+		$this->fields($this->_config['fields']);
+
+		unset($this->_config['entity'], $this->_config['init']);
 	}
 
 	/**
@@ -161,8 +250,8 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	 * Generates a schema map of the query's result set, where the keys are fully-namespaced model
-	 * class names, and the values are arrays of field names.
+	 * Generates a schema map of the query's result set, where the keys are aliases, and the values
+	 * are arrays of field names.
 	 *
 	 * @param array $map
 	 * @return array
@@ -202,8 +291,6 @@ class Query extends \lithium\core\Object {
 		}
 		$this->_config['model'] = $model;
 		$this->_config['source'] = $this->_config['source'] ?: $model::meta('source');
-		$this->_config['alias'] = $this->_config['alias'] ?: $model::meta('name');
-		$this->_config['name'] = $this->_config['name'] ?: $this->_config['alias'];
 		return $this;
 	}
 
@@ -265,19 +352,28 @@ class Query extends \lithium\core\Object {
 	 */
 	public function fields($fields = null, $overwrite = false) {
 		if ($fields === false || $overwrite) {
-			$this->_config['fields'] = array();
+			$this->_fields = array(0 => array(), 1 => array());
 		}
-		$this->_config['fields'] = (array) $this->_config['fields'];
-
-		if (is_array($fields)) {
-			$this->_config['fields'] = array_merge($this->_config['fields'], $fields);
-		} elseif ($fields && !isset($this->_config['fields'][$fields])) {
-			$this->_config['fields'][] = $fields;
+		if ($fields === null) {
+			return array_merge(array_keys($this->_fields[1]), $this->_fields[0]);
 		}
-		if ($fields !== null) {
+		if (!$fields) {
 			return $this;
 		}
-		return $this->_config['fields'];
+		$fields = is_array($fields) ? $fields : array($fields);
+		foreach ($fields as $key => $field) {
+			if (is_string($field)) {
+				$this->_fields[1][$field] = true;
+			} elseif (is_array($field) && !is_numeric($key)) {
+				foreach ($field as &$val) {
+					$val = $key . '.' . $val;
+				}
+				$this->fields($field);
+			} else {
+				$this->_fields[0][] = $field;
+			}
+		}
+		return $this;
 	}
 
 	/**
@@ -407,71 +503,133 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	 * Set and get the join queries
+	 * Set and get the relationships.
+	 *
+	 * @param string $relpath A dotted path.
+	 * @param array $config the config array to set.
+	 * @return mixed The relationships array or a relationship array if `$relpath` is set. Returns
+	 *         `null` if a join doesn't exist.
+	 */
+	public function relationships($relpath = null, $config = null) {
+		if ($config) {
+			if (!$relpath) {
+				throw new ConfigException("The relation dotted path is empty.");
+			}
+			$this->_config['relationships'][$relpath] = $config;
+			return $this;
+		}
+		if (!$relpath) {
+			return $this->_config['relationships'];
+		}
+		if (isset($this->_config['relationships'][$relpath])) {
+			return $this->_config['relationships'][$relpath];
+		}
+	}
+
+	/**
+	 * Set and get the joins
 	 *
 	 * @param string $name Optional name of join. Unless two parameters are passed, this parameter
 	 *               is regonized as `$join`.
 	 * @param object|string $join A single query object or an array of query objects
-	 * @return array of query objects
+	 * @return mixed The joins array or a join array if `$name` is set. Returns `null` if a join
+	 *         doesn't exist.
 	 */
-	public function join($name = null, $join = null) {
-		if (is_scalar($name) && !$join && isset($this->_config['joins'][$name])) {
-			return $this->_config['joins'][$name];
-		}
-		if ($name && !$join) {
+	public function joins($name = null, $join = null) {
+		if (is_array($name)) {
 			$join = $name;
 			$name = null;
 		}
 		if ($join) {
-			$join = is_array($join) ? $this->_instance(get_class($this), $join) : $join;
-			$name ? $this->_config['joins'][$name] = $join : $this->_config['joins'][] = $join;
+			if (!$name) {
+				$this->_config['joins'][] = $join;
+			} else {
+				$this->_config['joins'][$name] = $join;
+			}
 			return $this;
 		}
-		return $this->_config['joins'];
+		if (!$name) {
+			return $this->_config['joins'];
+		}
+		if (isset($this->_config['joins'][$name])) {
+			return $this->_config['joins'][$name];
+		}
 	}
 
 	/**
 	 * Convert the query's properties to the data sources' syntax and return it as an array.
 	 *
-	 * @param object $dataSource Instance of the data source (`lithium\data\Source`) to use for
-	 *               conversion.
+	 * @param object $source Instance of the data source (`lithium\data\Source`) to use for
+	 *        conversion.
 	 * @param array $options Options to use when exporting the data.
 	 * @return array Returns an array containing a data source-specific representation of a query.
 	 */
-	public function export(Source $dataSource, array $options = array()) {
+	public function export(Source $source, array $options = array()) {
 		$defaults = array('keys' => array());
 		$options += $defaults;
 
-		$keys = $options['keys'] ?: array_keys($this->_config);
-		$methods = $dataSource->methods();
+		if ($options['keys']) {
+			$keys = array_flip($options['keys']);
+		} else {
+			$keys =& $this->_config;
+		}
+
 		$results = array('type' => $this->_type);
 
-		$apply = array_intersect($keys, $methods);
-		$copy = array_diff($keys, $apply);
+		$apply = array_intersect_key($keys, array_flip($source->methods()));
+		$copy = array_diff_key($keys, $apply);
 
-		foreach ($apply as $item) {
-			$results[$item] = $dataSource->{$item}($this->{$item}(), $this);
+		if (isset($keys['with'])) {
+			$this->applyStrategy($source);
 		}
-		foreach ($copy as $item) {
-			if (in_array($item, $keys)) {
-				$results[$item] = $this->_config[$item];
-			}
+
+		foreach ($apply as $item => $value) {
+			$results[$item] = $source->{$item}($this->{$item}(), $this);
 		}
-		if (in_array('data', $keys)) {
+
+		foreach ($copy as $item => $value) {
+			$results[$item] = $this->_config[$item];
+		}
+
+		if (array_key_exists('data', $keys)) {
 			$results['data'] = $this->_exportData();
 		}
-		if (isset($results['source'])) {
-			$results['source'] = $dataSource->name($results['source']);
+
+		if (array_key_exists('source', $keys)) {
+			$results['source'] = $source->name($results['source']);
 		}
+
 		if (!isset($results['fields'])) {
 			return $results;
 		}
+
 		$created = array('fields', 'values');
 
 		if (is_array($results['fields']) && array_keys($results['fields']) == $created) {
 			$results = $results['fields'] + $results;
 		}
 		return $results;
+	}
+
+	/**
+	 * Helper method used by `export()` which delegate the query generation to the datasource.
+	 *
+	 * @param object $source Instance of the data source (`lithium\data\Source`) to use for
+	 *        conversion.
+	 */
+	public function applyStrategy(Source $source) {
+		if ($this->_built) {
+			return;
+		}
+		$this->_built = true;
+		if (!$this->_config['with']) {
+			return;
+		}
+		$options = array();
+		if (isset($this->_config['strategy'])) {
+			$options['strategy'] = $this->_config['strategy'];
+		}
+		$source->applyStrategy($options, $this);
 	}
 
 	/**
@@ -482,7 +640,6 @@ class Query extends \lithium\core\Object {
 	 */
 	protected function _exportData() {
 		$data = $this->_entity ? $this->_entity->export() : $this->_data;
-
 		if (!$list = $this->_config['whitelist']) {
 			return $data;
 		}
@@ -491,6 +648,7 @@ class Query extends \lithium\core\Object {
 		if (!$this->_entity) {
 			return array_intersect_key($data, $list);
 		}
+
 		foreach ($data as $type => $values) {
 			if (!is_array($values)) {
 				continue;
@@ -515,15 +673,90 @@ class Query extends \lithium\core\Object {
 		}
 	}
 
-	public function alias($alias = null) {
-		if ($alias) {
-			$this->_config['alias'] = $alias;
-			return $this;
+	/**
+	 * Get or Set a unique alias for the query or a query's relation if `$relpath` is set.
+	 *
+	 * @param mixed $alias The value of the alias to set for the passed `$relpath`. For getting an
+	 *        alias value set alias to `true`.
+	 * @param string $relpath A dotted relation name or `null` for identifying the query's model.
+	 * @return string An alias value or `null` for an unexisting `$relpath` alias.
+	 */
+	public function alias($alias = true, $relpath = null) {
+		if ($alias === true) {
+			if (!$relpath) {
+				return $this->_config['alias'];
+			}
+			$return = array_search($relpath, $this->_paths);
+			return $return ?: null;
 		}
-		if (!$this->_config['alias'] && ($model = $this->_config['model'])) {
-			$this->_config['alias'] = $model::meta('name');
+
+		if ($relpath) {
+			$oldAlias = array_search($relpath, $this->_paths);
+		} else {
+			$oldAlias = array_search('', $this->_paths);
 		}
-		return $this->_config['alias'];
+		unset($this->_models[$oldAlias]);
+		unset($this->_paths[$oldAlias]);
+
+		$model = $this->_config['model'];
+
+		if (!$relpath) {
+			$this->_alias[$alias] = 1;
+			$this->_models[$alias] = $model;
+			$this->_paths[$alias] = '';
+			return $this->_config['alias'] = $alias;
+		}
+
+		$paths = explode('.', $relpath);
+		if (!$alias) {
+			$alias = end($paths);
+		}
+
+		if (isset($this->_alias[$alias])) {
+			$this->_alias[$alias]++;
+			$alias .= '__' . $this->_alias[$alias];
+		} else {
+			$this->_alias[$alias] = 1;
+		}
+
+		$this->_paths[$alias] = $relpath;
+		foreach ($paths as $path) {
+			if (!$relation = $model::relations($path)) {
+				$model = null;
+				break;
+			}
+			$model = $relation->to();
+		}
+		$this->_models[$alias] = $model;
+		return $alias;
+	}
+
+	/**
+	 * Return the generated aliases mapped to their relation path
+	 *
+	 * @param object $source Instance of the data source (`lithium\data\Source`) to use for
+	 *        conversion.
+	 * @return array Map between alias and their corresponding dotted relation
+	 */
+	public function paths(Source $source = null) {
+		if ($source) {
+			$this->applyStrategy($source);
+		}
+		return $this->_paths;
+	}
+
+	/**
+	 * Return the generated aliases mapped to their corresponding model
+	 *
+	 * @param object $source Instance of the data source (`lithium\data\Source`) to use for
+	 *        conversion.
+	 * @return array Map between alias and their corresponding model
+	 */
+	public function models(Source $source = null) {
+		if ($source) {
+			$this->applyStrategy($source);
+		}
+		return $this->_models;
 	}
 
 	/**
@@ -566,37 +799,27 @@ class Query extends \lithium\core\Object {
 		return $val ? array($key => $val) : array();
 	}
 
-	protected function _associate($related) {
+	/**
+	 * Get/set sub queries for the query.
+	 * The getter must be called after an export since the sub queries are built
+	 * during the export according the export's `mode` option and the query `with` option.
+	 *
+	 * @see lithium\data\model\Query::export()
+	 *
+	 * @param string $relpath a dotted relation path
+	 * @param string $query a query instance
+	 * @return mixed
+	 */
+
+	public function childs($relpath = null, $query = null) {
 		if (!$model = $this->model()) {
-			return;
+			throw new ConfigException("No binded model.");
 		}
-
-		foreach ((array) $related as $name => $config) {
-			if (is_int($name)) {
-				$name = $config;
-			}
-			if (!$relationship = $model::relations($name)) {
-				throw new QueryException("Model relationship `{$name}` not found.");
-			}
-			list($name, $query) = $this->_fromRelationship($relationship);
-			$this->join($name, $query);
+		if ($query) {
+			$this->_childs[$relpath] = $query;
+			return $this;
 		}
-	}
-
-	protected function _fromRelationship($rel) {
-		$model = $rel->to();
-		$name = $rel->name();
-		$type = $rel->type();
-		$fieldName = $rel->fieldName();
-		$this->_config['relationships'][$name] = compact('type', 'model', 'fieldName');
-
-		$constraint = $rel->constraints();
-		$class = get_class($this);
-
-		return array($name, $this->_instance($class, compact('constraint', 'model') + array(
-			'type' => 'LEFT',
-			'alias' => $rel->name()
-		)));
+		return $this->_childs;
 	}
 }
 
