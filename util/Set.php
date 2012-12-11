@@ -444,7 +444,9 @@ class Set {
 
 		foreach ($data as $key => $val) {
 			if (strpos($key, $options['separator']) === false) {
-				$result[$key] = $val;
+				if (!isset($result[$key])) {
+					$result[$key] = $val;
+				}
 				continue;
 			}
 			list($path, $key) = explode($options['separator'], $key, 2);
@@ -794,6 +796,25 @@ class Set {
 		}
 		return $sorted;
 	}
+
+	/**
+	 * Slices an array into two, separating them determined by an array of keys.
+	 *
+	 * Usage examples:
+	 *
+	 * {{{ embed:lithium\tests\cases\util\SetTest::testSetSlice(1-4) }}}
+	 *
+	 * @param array $subject Array that gets split apart
+	 * @param array|string $keys An array of keys or a single key as string
+	 * @return array An array containing both arrays, having the array with requested keys first and
+	 *         the remainder as second element
+	 */
+	public static function slice(array $data, $keys) {
+		$removed = array_intersect_key($data, array_fill_keys((array) $keys, true));
+		$data = array_diff_key($data, $removed);
+		return array($data, $removed);
+	}
+
 }
 
 ?>

@@ -53,44 +53,44 @@ class Relationship extends \lithium\core\Object {
 	 * Constructs an object that represents a relationship between two model classes.
 	 *
 	 * @param array $config The relationship's configuration, which defines how the two models in
-	 *              question are bound. The available options are:
+	 *        question are bound. The available options are:
 	 *
-	 *             - `'name'` _string_: The name of the relationship in the context of the
-	 *               originating model. For example, a `Posts` model might define a relationship to
-	 *               a `Users` model like so:
+	 *        - `'name'` _string_: The name of the relationship in the context of the
+	 *          originating model. For example, a `Posts` model might define a relationship to
+	 *          a `Users` model like so:
 	 * {{{ public $hasMany = array('Author' => array('to' => 'Users')); }}}
 	 * In this case, the relationship is bound to the `Users` model, but `'Author'` would be the
 	 * relationship name. This is the name with which the relationship is referenced in the
 	 * originating model.
-	 *             - `'key'` _mixed_: An array of fields that define the relationship, where the
-	 *               keys are fields in the originating model, and the values are fields in the
-	 *               target model. If the relationship is not deined by keys, this array should be
-	 *               empty.
-	 *             - `'type'` _string_: The type of relationship. Should be one of `'belongsTo'`,
-	 *               `'hasOne'` or `'hasMany'`.
-	 *             - `'from'` _string_: The fully namespaced class name of the model where this
-	 *                relationship originates.
-	 *             - `'to'` _string_: The fully namespaced class name of the model that this
-	 *               relationship targets.
-	 *             - `'link'` _string_: A constant specifying how the object bound to the
-	 *               originating model is linked to the object bound to the target model. For
-	 *               relational databases, the only valid value is `LINK_KEY`, which means a foreign
-	 *               key in one object matches another key (usually the primary key) in the other.
-	 *               For document-oriented and other non-relational databases, different types of
-	 *               linking, including key lists, database reference objects (such as MongoDB's
-	 *               `MongoDBRef`), or even embedding.
-	 *             - `'fields'` _mixed_: An array of the subset of fields that should be selected
-	 *               from the related object(s) by default. If set to `true` (the default), all
-	 *               fields are selected.
-	 *             - `'fieldName'` _string_: The name of the field used when accessing the related
-	 *               data in a result set. For example, in the case of `Posts hasMany Comments`, the
-	 *               field name defaults to `'comments'`, so comment data is accessed (assuming
-	 *               `$post = Posts::first()`) as `$post->comments`.
-	 *             - `'constraint'` _mixed_: A string or array containing additional constraints
-	 *               on the relationship query. If a string, can contain a literal SQL fragment or
-	 *               other database-native value. If an array, maps fields from the related object
-	 *               either to fields elsewhere, or to arbitrary expressions. In either case, _the
-	 *               values specified here will be literally interpreted by the database_.
+	 *        - `'key'` _mixed_: An array of fields that define the relationship, where the
+	 *          keys are fields in the originating model, and the values are fields in the
+	 *          target model. If the relationship is not deined by keys, this array should be
+	 *          empty.
+	 *        - `'type'` _string_: The type of relationship. Should be one of `'belongsTo'`,
+	 *          `'hasOne'` or `'hasMany'`.
+	 *        - `'from'` _string_: The fully namespaced class name of the model where this
+	 *          relationship originates.
+	 *        - `'to'` _string_: The fully namespaced class name of the model that this
+	 *          relationship targets.
+	 *        - `'link'` _string_: A constant specifying how the object bound to the
+	 *          originating model is linked to the object bound to the target model. For
+	 *          relational databases, the only valid value is `LINK_KEY`, which means a foreign
+	 *          key in one object matches another key (usually the primary key) in the other.
+	 *          For document-oriented and other non-relational databases, different types of
+	 *          linking, including key lists, database reference objects (such as MongoDB's
+	 *          `MongoDBRef`), or even embedding.
+	 *        - `'fields'` _mixed_: An array of the subset of fields that should be selected
+	 *          from the related object(s) by default. If set to `true` (the default), all
+	 *          fields are selected.
+	 *        - `'fieldName'` _string_: The name of the field used when accessing the related
+	 *          data in a result set. For example, in the case of `Posts hasMany Comments`, the
+	 *          field name defaults to `'comments'`, so comment data is accessed (assuming
+	 *          `$post = Posts::first()`) as `$post->comments`.
+	 *        - `'constraints'` _mixed_: A string or array containing additional constraints
+	 *          on the relationship query. If a string, can contain a literal SQL fragment or
+	 *          other database-native value. If an array, maps fields from the related object
+	 *          either to fields elsewhere, or to arbitrary expressions. In either case, _the
+	 *          values specified here will be literally interpreted by the database_.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -102,7 +102,7 @@ class Relationship extends \lithium\core\Object {
 			'link' => static::LINK_KEY,
 			'fields' => true,
 			'fieldName' => null,
-			'constraint' => array()
+			'constraints' => array()
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -129,18 +129,6 @@ class Relationship extends \lithium\core\Object {
 			return $this->_config;
 		}
 		return isset($this->_config[$key]) ? $this->_config[$key] : null;
-	}
-
-	public function constraints() {
-		$constraints = array();
-		$config  = $this->_config;
-		$relFrom = $config['from']::meta('name');
-		$relTo   = $config['name'];
-
-		foreach ($this->_config['key'] as $from => $to) {
-			$constraints["{$relFrom}.{$from}"] = "{$relTo}.{$to}";
-		}
-		return $constraints + (array) $this->_config['constraint'];
 	}
 
 	public function __call($name, $args = array()) {

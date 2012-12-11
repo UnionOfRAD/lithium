@@ -176,6 +176,32 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertEqual($data[0], $result);
 	}
 
+	public function testExpand() {
+		$data = array(
+			'Gallery.Image' => null,
+			'Gallery.Image.Tag' => null,
+			'Gallery.Image.Tag.Author' => null
+		);
+		$expected = array('Gallery' => array('Image' => array('Tag' => array('Author' => null))));
+		$this->assertEqual($expected, Set::expand($data));
+
+		$data = array(
+			'Gallery.Image.Tag' => null,
+			'Gallery.Image' => null,
+			'Gallery.Image.Tag.Author' => null
+		);
+		$expected = array('Gallery' => array('Image' => array('Tag' => array('Author' => null))));
+		$this->assertEqual($expected, Set::expand($data));
+
+		$data = array(
+			'Gallery.Image.Tag.Author' => null,
+			'Gallery.Image.Tag' => null,
+			'Gallery.Image' => null
+		);
+		$expected = array('Gallery' => array('Image' => array('Tag' => array('Author' => null))));
+		$this->assertEqual($expected, Set::expand($data));
+	}
+
 	public function testFormat() {
 		$data = array(
 			array('Person' => array(
@@ -1435,6 +1461,28 @@ class SetTest extends \lithium\test\Unit {
 		$input = array('baz' => 'foo', 'bar');
 		$result = Set::normalize($input, false);
 		$this->assertEqual(array('baz' => 'foo', 'bar' => null), $result);
+	}
+
+	public function testSetSlice() {
+		$data = array('key1' => 'val1', 'key2' => 'val2', 'key3' => 'val3');
+		list($kept, $removed) = Set::slice($data, array('key3'));
+		$this->assertEqual(array('key3' => 'val3'), $removed);
+		$this->assertEqual(array('key1' => 'val1', 'key2' => 'val2'), $kept);
+
+		$data = array('key1' => 'val1', 'key2' => 'val2', 'key3' => 'val3');
+		list($kept, $removed) = Set::slice($data, array('key1', 'key3'));
+		$this->assertEqual(array('key1' => 'val1', 'key3' => 'val3'), $removed);
+		$this->assertEqual(array('key2' => 'val2'), $kept);
+
+		$data = array('key1' => 'val1', 'key2' => 'val2', 'key3' => 'val3');
+		list($kept, $removed) = Set::slice($data, 'key2');
+		$this->assertEqual(array('key2' => 'val2'), $removed);
+		$this->assertEqual(array('key1' => 'val1', 'key3' => 'val3'), $kept);
+
+		$data = array('key1' => 'val1', 'key2' => 'val2', 'key3' => array('foo' => 'bar'));
+		list($kept, $removed) = Set::slice($data, array('key1', 'key3'));
+		$this->assertEqual(array('key1' => 'val1', 'key3' => array('foo' => 'bar')), $removed);
+		$this->assertEqual(array('key2' => 'val2'), $kept);
 	}
 }
 

@@ -43,7 +43,7 @@ class Schema extends \lithium\data\DocumentSchema {
 			},
 			'date' => function($v) {
 				$v = is_numeric($v) ? intval($v) : strtotime($v);
-				return (!$v || time() == $v) ? new MongoDate() : new MongoDate($v);
+				return !$v ? new MongoDate() : new MongoDate($v);
 			},
 			'regex'   => function($v) { return new MongoRegex($v); },
 			'integer' => function($v) { return (integer) $v; },

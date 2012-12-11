@@ -175,10 +175,19 @@ abstract class Source extends \lithium\core\Object {
 	abstract public function relationship($class, $type, $name, array $options = array());
 
 	/**
-	 * Abstract. Must be defined by child classes.
+	 * Create a record. This is the abstract method that is implemented by specific data sources.
+	 * This method should take a query object and use it to create a record in the data source.
 	 *
-	 * @param mixed $query
-	 * @param array $options
+	 * @param mixed $query An object which defines the update operation(s) that should be performed
+	 *        against the data store.  This can be a `Query`, a `RecordSet`, a `Record`, or a
+	 *        subclass of one of the three. Alternatively, `$query` can be an adapter-specific
+	 *        query string.
+	 * @param array $options The options from Model include,
+	 *              - `validate` _boolean_ default: true
+	 *              - `events` _string_ default: create
+	 *              - `whitelist` _array_ default: null
+	 *              - `callbacks` _boolean_ default: true
+	 *              - `locked` _boolean_ default: true
 	 * @return boolean Returns true if the operation was a success, otherwise false.
 	 */
 	abstract public function create($query, array $options = array());
@@ -279,6 +288,14 @@ abstract class Source extends \lithium\core\Object {
 		unset($options['class']);
 		return $this->_instance($class, compact('model', 'data') + $options);
 	}
+
+	/**
+	 * Applying a strategy to a `lithium\data\model\Query` object
+	 *
+	 * @param array $options The option array
+	 * @param object $context A query object to configure
+	 */
+	public function applyStrategy($options, $context) {}
 }
 
 ?>
