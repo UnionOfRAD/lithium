@@ -24,8 +24,8 @@ class DatabaseTest extends \lithium\test\Unit {
 	protected $_configs = array();
 
 	protected $_model = 'lithium\tests\mocks\data\model\MockDatabasePost';
-
 	protected $_gallery = 'lithium\tests\mocks\data\model\MockGallery';
+	protected $_imageTag = 'lithium\tests\mocks\data\model\MockImageTag';
 
 	public function setUp() {
 		MockDatabasePost::config();
@@ -1151,6 +1151,36 @@ class DatabaseTest extends \lithium\test\Unit {
 		$constraints = array('CustomPost.id' => 'CustomComment.post_id');
 		$result = $conn->on($rel, 'CustomPost', 'CustomComment', $constraints);
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testWithGeneration() {
+		$model = $this->_gallery;
+
+		$options = array(
+			'type' => 'read',
+			'model' => $model,
+			'with' => array('Image.ImageTag.Tag')
+		);
+
+		$result = $this->db->read(new Query($options));
+		$expected = 'SELECT * FROM {mock_gallery} AS {Gallery} LEFT JOIN {mock_image} AS {Image} ';
+		$expected .= 'ON {Gallery}.{id} = {Image}.{gallery_id} LEFT JOIN {mock_image_tag} AS ';
+		$expected .= '{ImageTag} ON {Image}.{id} = {ImageTag}.{image_id} LEFT JOIN {mock_tag} ';
+		$expected .= 'AS {Tag} ON {ImageTag}.{tag_id} = {Tag}.{id};';
+		$this->assertEqual($expected, $this->db->sql);
+
+		$model = $this->_imageTag;
+		$options = array(
+			'type' => 'read',
+			'model' => $model,
+			'with' => array('Image', 'Tag')
+		);
+
+		$result = $this->db->read(new Query($options));
+		$expected = 'SELECT * FROM {mock_image_tag} AS {ImageTag} LEFT JOIN {mock_image} AS ';
+		$expected .= '{Image} ON {ImageTag}.{image_id} = {Image}.{id} LEFT JOIN {mock_tag} AS ';
+		$expected .= '{Tag} ON {ImageTag}.{tag_id} = {Tag}.{id};';
+		$this->assertEqual($expected, $this->db->sql);
 	}
 
 	public function testWithOptionAndInlineConstraint() {
