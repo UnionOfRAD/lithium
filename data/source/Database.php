@@ -190,9 +190,9 @@ abstract class Database extends \lithium\data\Source {
 
 						$constraints = array();
 						$alias = $name;
-						if (isset($with[$path])) {
-
-							list($unallowed, $allowed) = Set::slice($with[$path], array(
+						$relPath = $path ? $path . '.' . $name : $name;
+						if (isset($with[$relPath])) {
+							list($unallowed, $allowed) = Set::slice($with[$relPath], array(
 								'alias',
 								'constraints'
 							));
@@ -201,16 +201,16 @@ abstract class Database extends \lithium\data\Source {
 								$message .= "`'with'` using the `'joined'` strategy.";
 								throw new QueryException($message);
 							}
-							extract($with[$path]);
+							extract($with[$relPath]);
 						}
-						$to = $context->alias($alias, $path);
+						$to = $context->alias($alias, $relPath);
 
 						if ($needPks) {
 							$context->fields(array($to => (array) $model::meta('key')));
 						}
 
-						if ($context->relationships($path) === null) {
-							$context->relationships($path, array(
+						if ($context->relationships($relPath) === null) {
+							$context->relationships($relPath, array(
 								'type' => $rel->type(),
 								'model' => $rel->to(),
 								'fieldName' => $rel->fieldName(),
@@ -221,7 +221,7 @@ abstract class Database extends \lithium\data\Source {
 						}
 
 						if (!empty($childs)) {
-							$me($me, $rel->to(), $childs, "{$path}." . key($childs), $to, $needPks);
+							$me($me, $rel->to(), $childs, $relPath, $to, $needPks);
 						}
 					}
 				};
@@ -233,7 +233,7 @@ abstract class Database extends \lithium\data\Source {
 					$needPks = true;
 					$context->fields(array($alias => (array) $model::meta('key')));
 				}
-				$strategy($strategy, $model, $tree, key($tree), $context->alias(), $needPks);
+				$strategy($strategy, $model, $tree, '', $context->alias(), $needPks);
 			},
 			'nested' => function($self, $model, $context) {
 				throw new QueryException("This strategy is not yet implemented.");
@@ -992,9 +992,9 @@ abstract class Database extends \lithium\data\Source {
 			return;
 		}
 		if ($offset = $context->offset() ?: '') {
-			$offset .= ', ';
+			$offset = ' OFFSET '. $offset;
 		}
-		return "LIMIT {$offset}{$limit}";
+		return "LIMIT {$limit}{$offset}";
 	}
 
 	/**

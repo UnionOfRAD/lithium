@@ -363,9 +363,11 @@ class PostgreSql extends \lithium\data\source\Database {
 	 */
 	protected function _insertId($query) {
 		$model = $query->model();
-		$field = $model::key();
-		$source = $model::meta('source');
-		$sequence = "{$source}_{$field}_seq";
+		if(!$sequence = $model::meta('sequence')){
+			$field = $model::key();
+			$source = $model::meta('source');
+			$sequence = "{$source}_{$field}_seq";
+		}
 		$id = $this->connection->lastInsertId($sequence);
 		return ($id && $id !== '0') ? $id : null;
 	}
