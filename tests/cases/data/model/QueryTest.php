@@ -40,15 +40,14 @@ class QueryTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that configuration settings are delegating to matching method names
-	 *
-	 * @return void
 	 */
 	public function testObjectConstruction() {
 		$query = new Query();
 		$this->assertFalse($query->conditions());
 
-		$query = new Query(array('conditions' => 'foo', 'fields' => array('id')));
-		$this->assertEqual($query->conditions(), array('foo'));
+		$query = new Query(array('conditions' => 'foo', 'limit' => '10'));
+		$this->assertEqual(array('foo'), $query->conditions());
+		$this->assertIdentical(10, $query->limit());
 	}
 
 	public function testModel() {
@@ -86,6 +85,47 @@ class QueryTest extends \lithium\test\Unit {
 
 		$expected = array('id','title');
 		$result = $query->fields();
+		$this->assertEqual($expected, $result);
+
+		$query->fields(false);
+		$expected = array(
+			array(array('count(MockDatabasePost.id)')),
+			array('count(MockDatabasePost.id)'),
+			array((object) 'count(MockDatabasePost.id)'),
+			(object) 'count(MockDatabasePost.id)'
+		);
+		$query->fields($expected);
+		$result = $query->fields();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testFieldsWithArray() {
+		$query = new Query(array(
+			'model' => 'lithium\tests\mocks\data\model\MockQueryPost',
+			'type' => 'read',
+			'with' => 'MockQueryComment'
+		));
+
+		$query->fields(array('MockQueryPost', 'MockQueryPost' => array('id')));
+		$result = $query->fields();
+		$expected = array('MockQueryPost', 'MockQueryPost.id');
+		$this->assertEqual($expected, $result);
+
+		$query->fields(false);
+		$query->fields(array(
+			'MockQueryPost' => array('id'),
+			'title',
+			'MockQueryComment' => array('comment', 'title'),
+			'MockQueryComment'
+		));
+		$result = $query->fields();
+		$expected = array(
+			'MockQueryPost.id',
+			'title',
+			'MockQueryComment.comment',
+			'MockQueryComment.title',
+			'MockQueryComment'
+		);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -266,7 +306,6 @@ class QueryTest extends \lithium\test\Unit {
 			'limit',
 			'map',
 			'model',
-			'name',
 			'offset',
 			'order',
 			'page',
@@ -322,7 +361,7 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual(0, $query->offset());
 	}
 
-	public function testJoin() {
+	public function testJoins() {
 		$query = new Query(array('joins' => array(array('foo' => 'bar'))));
 		$query->joins(array('bar' => 'baz'));
 		$expected = array(array('foo' => 'bar'), array('bar' => 'baz'));
@@ -505,7 +544,7 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $relationships);
 	}
 
-	public function testPaths() {
+	public function testAliasAndPaths() {
 		$model = 'lithium\tests\mocks\data\model\MockQueryComment';
 		$query = new Query(compact('model'));
 
@@ -592,6 +631,93 @@ class QueryTest extends \lithium\test\Unit {
 			'Post2' => 'lithium\tests\mocks\data\model\MockQueryPost'
 		);
 		$this->assertEqual($expected, $query->models($this->db));
+	}
+
+	public function testExportWithJoinedStrategy() {
+		$query = new Query(array(
+			'alias' => 'MyAlias',
+			'model' => 'lithium\tests\mocks\data\model\MockGallery',
+			'calculate' => 'MyCalculate',
+			'comment' => 'No comment',
+			'conditions' => array('id' => 2),
+			'fields' => array('Tag'),
+			'type' => 'read',
+			'with' => array('Image.ImageTag.Tag', 'Image', 'Image.ImageTag')
+		));
+		$export = $query->export($this->db);
+
+		$joins = 'LEFT JOIN {mock_image} AS {Image} ON {MyAlias}.{id} = {Image}.{gallery_id} ';
+		$joins .= 'LEFT JOIN {mock_image_tag} AS {ImageTag} ON {Image}.{id} = ';
+		$joins .= '{ImageTag}.{image_id} LEFT JOIN {mock_tag} AS {Tag} ON {ImageTag}.{tag_id} = ';
+		$joins .= '{Tag}.{id}';
+
+		$expected = array(
+			'type' => 'read',
+			'alias' => 'AS {MyAlias}',
+			'comment' => '/* No comment */',
+			'conditions' => 'WHERE {MyAlias}.{id} = 2',
+			'fields' => '{Tag}.*, {MyAlias}.{id}, {Image}.{id}, {ImageTag}.{id}',
+			'having' => '',
+			'group' => null,
+			'order' => null,
+			'limit' => null,
+			'joins' => $joins,
+			'model' => 'lithium\tests\mocks\data\model\MockGallery',
+			'calculate' => 'MyCalculate',
+			'with' => array(
+				'Image.ImageTag.Tag' => null,
+				'Image' => null,
+				'Image.ImageTag' => null
+			),
+			'source' => '{mock_gallery}',
+			'offset' => null,
+			'page' => null,
+			'data' => array(),
+			'whitelist' => array(),
+			'schema' => null,
+			'map' => array(),
+			'relationships' => array(
+				'Image' => array(
+					'type' => 'hasMany',
+					'model' => 'lithium\tests\mocks\data\model\MockImage',
+					'fieldName' => 'images',
+					'fromAlias' => 'MyAlias',
+					'toAlias' => 'Image'
+				),
+				'Image.ImageTag' => array(
+					'type' => 'hasMany',
+					'model' => 'lithium\tests\mocks\data\model\MockImageTag',
+					'fieldName' => 'image_tags',
+					'fromAlias' => 'Image',
+					'toAlias' => 'ImageTag'
+				),
+				'Image.ImageTag.Tag' => array(
+					'type' => 'belongsTo',
+					'model' => 'lithium\tests\mocks\data\model\MockTag',
+					'fieldName' => 'tag',
+					'fromAlias' => 'ImageTag',
+					'toAlias' => 'Tag'
+				)
+			)
+		);
+
+		$this->assertEqual($expected, $export);
+	}
+
+	public function testExportWithUndefinedStrategy() {
+		$query = new Query(array(
+			'alias' => 'MyAlias',
+			'model' => 'lithium\tests\mocks\data\model\MockGallery',
+			'calculate' => 'MyCalculate',
+			'comment' => 'No comment',
+			'conditions' => array('id' => 2),
+			'fields' => array('Image.ImageTag.Tag'),
+			'type' => 'read',
+			'with' => array('Image.ImageTag.Tag', 'Image', 'Image.ImageTag'),
+			'strategy' => 'custom'
+		));
+		$this->expectException('Undefined query strategy `custom`.');
+		$export = $query->export($this->db);
 	}
 }
 

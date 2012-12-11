@@ -124,7 +124,7 @@ class RecordSet extends \lithium\data\Collection {
 				$offset += $fieldCount;
 			}
 			$i++;
-		} while ($data = $this->_result->next());
+		} while ($main && $data = $this->_result->next());
 
 		$relMap = $this->_query->relationships();
 		return $this->_hydrateRecord($this->_dependencies, $primary, $record, 0, $i, '', $relMap, $conn);
@@ -152,15 +152,12 @@ class RecordSet extends \lithium\data\Collection {
 				$relName = $name ? $name . '.' . $relation : $relation;
 				$field = $relMap[$relName]['fieldName'];
 				$relModel = $relMap[$relName]['model'];
-				$relPk = $relModel::key();
-				$index = is_array($relPk) ? false: true;
 
 				if ($relMap[$relName]['type'] === 'hasMany') {
-					$main = null;
+					$rel = array();
+					$main = $relModel::key($record[$min][$relName]);
 					$i = $min;
 					$j = $i + 1;
-					$main = $relModel::key($record[$i][$relName]);
-					$rel = array();
 					while ($j < $max) {
 						$keys = $relModel::key($record[$j][$relName]);
 						if ($main != $keys) {
@@ -180,7 +177,7 @@ class RecordSet extends \lithium\data\Collection {
 				}
 			}
 		}
-		return $conn->item($primary, $record[$min][$name], $options);
+		return $conn->item($primary, isset($record[$min][$name]) ? $record[$min][$name] : array(), $options);
 	}
 
 	protected function _columnMap() {

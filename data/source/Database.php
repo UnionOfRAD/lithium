@@ -177,46 +177,65 @@ abstract class Database extends \lithium\data\Source {
 			'read' => 'SELECT {:fields} FROM {:source} {:alias} {:joins} {:conditions} {:group} ' .
 			          '{:having} {:order} {:limit};{:comment}'
 		);
-		$strategies = &$this->_strategies;
-		$strategies += array(
-			'joined' => function($self, $model, $relations, $relation, $fromAlias, &$with, $context) use (&$strategies){
+		$this->_strategies += array(
+			'joined' => function($self, $model, $context) {
 
-				$relationships = function ($context, $relname, $model, $type, $fieldName, $fromAlias, $toAlias) {
-					$context->relationships($relname, compact(
-						'type', 'model', 'fieldName','fromAlias', 'toAlias'
-					));
+				$with = $context->with();
+
+				$strategy = function($me, $model, $tree, $path, $from, $needPks) use ($self, $context, $with) {
+					foreach ($tree as $name => $childs) {
+						if (!$rel = $model::relations($name)) {
+							throw new QueryException("Model relationship `{$name}` not found.");
+						}
+
+						$constraints = array();
+						$alias = $name;
+						if (isset($with[$path])) {
+
+							list($unallowed, $allowed) = Set::slice($with[$path], array(
+								'alias',
+								'constraints'
+							));
+							if ($unallowed) {
+								$message = "Only `'alias'` and `'constraints'` are allowed in ";
+								$message .= "`'with'` using the `'joined'` strategy.";
+								throw new QueryException($message);
+							}
+							extract($with[$path]);
+						}
+						$to = $context->alias($alias, $path);
+
+						if ($needPks) {
+							$context->fields(array($to => (array) $model::meta('key')));
+						}
+
+						if ($context->relationships($path) === null) {
+							$context->relationships($path, array(
+								'type' => $rel->type(),
+								'model' => $rel->to(),
+								'fieldName' => $rel->fieldName(),
+								'fromAlias' => $from,
+								'toAlias' => $to
+							));
+							$self->join($context, $rel, $from, $to, $constraints);
+						}
+
+						if (!empty($childs)) {
+							$me($me, $rel->to(), $childs, "{$path}." . key($childs), $to, $needPks);
+						}
+					}
 				};
 
-				foreach ($relations as $name => $subrelations) {
-					if (!$rel = $model::relations($name)) {
-						throw new QueryException("Model relationship `{$name}` not found.");
-					}
-
-					$relPath = $relation ? $relation . '.' . $name : $name;
-
-					$constraints = array();
-					if (isset($with[$relPath]['constraints'])) {
-						$constraints = $with[$relPath]['constraints'];
-					}
-
-					$alias = isset($with[$relPath]['alias']) ? $with[$relPath]['alias'] : $name;
-					$toAlias = $context->alias($alias, $relPath);
-
-
-					if ($context->relationships($relPath) === null) {
-						$relationships(
-							$context, $relPath, $rel->to(), $rel->type(),
-							$rel->fieldName(), $fromAlias, $toAlias
-						);
-						$self->join($context, $rel, $fromAlias, $toAlias, $constraints);
-					}
-
-					if (!empty($subrelations)) {
-						$strategies['joined']($self, $rel->to(), $subrelations, $relPath, $toAlias, $with, $context);
-					}
+				$tree = Set::expand(Set::normalize(array_keys($with)));
+				$alias = $context->alias();
+				$needPks = false;
+				if ($context->fields()) {
+					$needPks = true;
+					$context->fields(array($alias => (array) $model::meta('key')));
 				}
+				$strategy($strategy, $model, $tree, key($tree), $context->alias(), $needPks);
 			},
-			'nested' => function($self, $model, $relations, $relation, $fromAlias, &$with, $context) {
+			'nested' => function($self, $model, $context) {
 				throw new QueryException("This strategy is not yet implemented.");
 			}
 		);
@@ -648,85 +667,71 @@ abstract class Database extends \lithium\data\Source {
 	 * Builds an array of keyed on the fully-namespaced `Model` with array of fields as values
 	 * for the given `Query`
 	 *
-	 * @param object $query A `lithium\data\model\Query` object
-	 * @param string $resource
-	 * @param string $alias
-	 * @return void
+	 * @param data\model\Query $query A Query instance.
+	 * @param object $resource
+	 * @param object $context
 	 */
-	public function schema($query, $resource = null, $alias = null) {
-		$model = is_scalar($resource) ? $resource : $query->model();
-		$alias = $alias ? $alias : $query->alias();
-		$paths = $query->paths($this);
-		$fields = $query->fields();
+	public function schema($query, $resource = null, $context = null) {
+		$query->applyStrategy($this);
+		return $this->_schema($query, $this->_fields($query->fields(), $query));
+	}
 
+	/**
+	 * Helper method for `data\model\Database::shema()`
+	 *
+	 * @param data\model\Query $query A Query instance.
+	 * @param array $fields Array of formatted fields.
+	 */
+	public function _schema($query, $fields = null) {
+		$model = $query->model();
+		$paths = $query->paths($this);
+		$models = $query->models($this);
 		$result = array();
 
-		if (!$model && is_array($fields)) {
-			foreach ($fields as $key => $field) {
-				if (preg_match('/^.*?\.(.*)/', $field, $match)) {
-					$fields[$key] = $match[1];
+		if (!$model) {
+			foreach ($fields as $field => $value) {
+				if (is_array($value)) {
+					$result[$field] = array_keys($value);
+				} else {
+					$result[''][] = $field;
 				}
 			}
-			return array($fields);
+			return $result;
 		}
-
 		if (!$fields) {
-			$result = array('' => $model::schema()->names());
-
-			foreach ($query->relationships() as $key => $relation) {
-				$model = $relation['model'];
-				$result[$key] = $model::schema()->names();
+			foreach ($paths as $alias => $relation) {
+				$model = $models[$alias];
+				$result[$relation] = $model::schema()->names();
 			}
 			return $result;
 		}
 
-		if (!$fields && $joins) {
-			$result = array($modelName => $model::schema()->names());
-
-			foreach ($joins as $join) {
-				$model = $join->model();
-				$result[$join->alias()] = $model::schema()->names();
+		$unalias = function ($value) {
+			if (!is_string($value)) {
+				return $value;
 			}
-			return $result;
+			$aliasing = preg_split("/\s+as\s+/i", $value);
+			return isset($aliasing[1]) ? $aliasing[1] : $value;
+		};
+
+		if (isset($fields[0])) {
+			$raw = array_map($unalias, $fields[0]);
+			unset($fields[0]);
 		}
 
-		$relations = $query->relationships();
-		$schema = $model::schema();
-		$pregDotMatch = '/^(' . implode('|', array_merge(array_keys($paths))) . ')\./';
-
-		foreach ($fields as $scope => $field) {
-			switch (true) {
-				case (is_numeric($scope) && ($field == '*' || $field == $alias)):
-					$result[''] = $model::schema()->names();
-					break;
-				case (is_numeric($scope) && isset($schema[$field])):
-					$result[''][] = $field;
-					break;
-				case is_numeric($scope) && preg_match($pregDotMatch, $field):
-					list($dotModelName, $field) = explode('.', $field);
-					$dotModelName = $dotModelName === $alias ? '' : $dotModelName;
-					$result[$dotModelName][] = $field;
-					break;
-				case is_array($field) && $scope === $alias:
-					$result[''] = $field;
-					break;
-				case is_array($field) && array_key_exists($scope, $paths):
-					$name = $paths[$scope];
-					if (isset($relations[$name]['model'])) {
-						$relSchema = $this->schema($query, $relations[$name]['model'], $scope);
-						$result[$scope] = reset($relSchema);
-					}
-					break;
-				case is_numeric($scope) && array_key_exists($field, $paths):
-					$name = $paths[$field];
-					if (isset($relations[$name]['model'])) {
-						$scope = $relations[$name]['model'];
-						$result[$field] = $scope::schema()->names();
-					} else {
-						$result[''] = $model::schema()->names();
-					}
-					break;
+		foreach ($fields as $field => $value) {
+			if (is_array($value)) {
+				if (isset($value['*'])) {
+					$relModel = $models[$field];
+					$result[$paths[$field]] = $relModel::schema()->names();
+				} else {
+					$result[$paths[$field]] = array_map($unalias, array_keys($value));
+				}
 			}
+		}
+
+		if (isset($raw)) {
+			$result[''] = isset($result['']) ? array_merge($raw, $result['']) : $raw;
 		}
 		return $result;
 	}
@@ -816,12 +821,11 @@ abstract class Database extends \lithium\data\Source {
 		return ($options['prepend'] && $result) ? $options['prepend'] . " {$result}" : $result;
 	}
 
-	public function _processConditions($key, $value, $context, $glue = 'AND') {
+	public function _processConditions($key, $value, $context, $schema = null, $glue = 'AND') {
 		$constraintTypes =& $this->_constraintTypes;
 		$model = $context->model();
 		$models = $context->models();
 
-		$schema = null;
 		list($first, $second) = $this->_splitFieldname($key);
 		if ($first && isset($models[$first]) && $class = $models[$first]) {
 			$schema = $class::schema();
@@ -847,8 +851,8 @@ abstract class Database extends \lithium\data\Source {
 				return $this->name($key) . " IS NULL";
 			case is_numeric($key) && is_array($value):
 				$result = array();
-				foreach ($value as $cField => $cValue) {
-					$result[] = $this->_processConditions($cField, $cValue, $context, $glue);
+				foreach ($value as $cKey => $cValue) {
+					$result[] = $this->_processConditions($cKey, $cValue, $context, $schema, $glue);
 				}
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
 			case (is_string($key) && is_object($value)):
@@ -858,8 +862,8 @@ abstract class Database extends \lithium\data\Source {
 				$result = array();
 				$glue = strtoupper($key);
 
-				foreach ($value as $cField => $cValue) {
-					$result[] = $this->_processConditions($cField, $cValue, $context, $glue);
+				foreach ($value as $cKey => $cValue) {
+					$result[] = $this->_processConditions($cKey, $cValue, $context, $schema, $glue);
 				}
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
 			case (is_string($key) && is_array($value) && isset($this->_operators[key($value)])):
@@ -876,146 +880,91 @@ abstract class Database extends \lithium\data\Source {
 		}
 	}
 
+	/**
+	 * Returns a string of formatted fields to be inserted into the query statement.
+	 *
+	 * @param array $fields Array of fields.
+	 * @param object $context Generally a `data\model\Query` instance.
+	 * @return string A SQL formatted string
+	 */
 	public function fields($fields, $context) {
 		$type = $context->type();
-		$schema = $schema = $context->schema()->fields();
-		$models = $context->models($this);
-		$alias = $context->alias();
+		$schema = $context->schema()->fields();
 
 		if (!is_array($fields)) {
 			return $this->_fieldsReturn($type, $context, $fields, $schema);
 		}
 
+		$context->applyStrategy($this);
+		$fields = $this->_fields($fields ? : $context->fields(), $context);
+		$context->map($this->_schema($context, $fields));
 		$toMerge = array();
-		$keys = array_keys($fields);
 
-		/**
-		 * Group fields list by alias name.
-		 * keys of the result array are alias and values are list of fields.
-		 */
-		$groupFields = function($item, $key) use (&$toMerge, &$keys, $alias, $models, &$context) {
-				$name = current($keys);
-				next($keys);
-				switch (true) {
-					case is_array($item):
-						$toMerge[$name] = $item;
-						continue;
-					case is_object($item) && isset($item->scalar):
-						$toMerge[$name] = array($item->scalar);
-						continue;
-					case isset($models[$item]):
-						if ($model = $models[$item]) {
-							$schema = $model::schema();
-							$toMerge[$item] = $schema->names();
-						}
-						continue;
-					case strpos($item, '.') !== false:
-						list($name, $field) = explode('.', $item);
-						$toMerge[$name][] = $field;
-						continue;
-					default:
-						$mainSchema = $context->schema()->names();
-						if ($alias && !preg_match('/[\(\)]/', $item)) {
-							$toMerge[$alias][] = $item;
-							continue;
-						}
-						$toMerge[0][] = $item;
-						continue;
-				}
-			};
-
-		array_walk($fields, $groupFields);
-		$fields = $toMerge;
-
-		if ($fields && $context->with() && !isset($fields[$alias]) && ($model = $context->model())) {
-			$keys = $model::meta('key');
-			$keys = is_array($keys) ? $keys : array($keys);
-			$fields[$alias] = $keys;
+		if (isset($fields[0])) {
+			foreach ($fields[0] as $val) {
+				$toMerge[] = (is_object($val) && isset($val->scalar)) ? $val->scalar : $val;
+			}
+			unset($fields[0]);
 		}
 
-		$map = $this->_mapFields($fields, $context->paths($this));
-		$context->map($map);
-
-		$toMerge = array();
-
-		/**
-		 * Format fields in a SQL format.
-		 */
-		foreach ($fields as $scope => $items) {
-			foreach ($items as $field) {
-				if (!is_numeric($scope)) {
-					$open = $this->_quotes[0];
-					$close = $this->_quotes[1];
-					if (stripos($field, ' as ') !== false) {
-						list($real, $as) = explode(' as ', str_replace(' AS ', ' as ', $field));
-						$toMerge[] = $open . $scope . $close . '.' . $open . $real . $close . ' as ' . $as;
-					} else {
-						$toMerge[] = $open . $scope . $close . '.' . $open . $field . $close;
-					}
+		foreach ($fields as $field => $value) {
+			if (is_array($value)) {
+				if (isset($value['*'])) {
+					$toMerge[] = $this->name($field) . '.*';
 					continue;
 				}
-				$toMerge[] = $field;
+				foreach ($value as $fieldname => $mode) {
+					$toMerge[] = $this->_fieldsQuote($field, $fieldname);
+				}
 			}
 		}
-		$fields = $toMerge;
-		return $this->_fieldsReturn($type, $context, $fields, $schema);
+
+		return $this->_fieldsReturn($type, $context, $toMerge, $schema);
 	}
 
 	/**
-	 * Group fields list by relation name.
+	 * Helper for `Database::fields()` && `Database::schema()`.
+	 * Reformat fields to be alias based.
 	 *
-	 * Example :
-	 * {{{
-	 * $this->_mapFields(
-	 *               array('id', 'title', 'Comment'),
-	 *               array('Post' => 'Post', 'Comment' => 'Post.Comment')
-	 * }}}
-	 *
-	 * will return the following array :
-	 *
-	 * {{{
-	 * array(
-	 *    'Post' => array(
-	 * 		              0 => id,
-	 *                    1 => title
-	 *              ),
-	 *    'Post.Comment' => array(
-	 * 		              0 => id,
-	 *                    1 => post_id
-	 *                    2 => email
-	 *                    3 => body
-	 *                    4 => created
-	 *              )
-	 * )
-	 * }}}
-	 *
-	 * @param array $fields List of fields
-	 * @param array $aliases The mapping between query alias name and relation name (see
-	 *        the `'with'` options of `Model::find()`)
-	 * @return array The fields array grouped by relations
+	 * @param array $fields Array of fields.
+	 * @param object $context Generally a `data\model\Query` instance.
+	 * @return array Reformatted fields
 	 */
-	protected function _mapFields($fields, $aliases) {
-		$return = array();
-		foreach ($fields as $key => $items) {
-			$key = isset($aliases[$key]) ? $aliases[$key] : '';
-			if (!is_array($items)) {
-				$return[$key] = $items;
+	protected function _fields($fields, $context) {
+		$alias = $context->alias();
+		$models = $context->models($this);
+		$list = array();
+		foreach ($fields as $key => $field) {
+			if (!is_string($field)) {
+				if (isset($models[$key])) {
+					$field = array_fill_keys($field, true);
+					$list[$key] = isset($list[$key]) ? array_merge($list[$key], $field) : $field;
+				} else {
+					$list[0][] = is_array($field) ? reset($field) : $field;
+				}
 				continue;
 			}
-			if (is_numeric($key)) {
-				$key = reset($aliases);
-			}
-			$pointer = &$return[$key];
-			foreach ($items as $field) {
-				if (stripos($field, ' as ') !== false) {
-					list($real, $as) = explode(' as ', str_replace(' AS ', ' as ', $field));
-					$pointer[] = trim($as);
-					continue;
-				}
-				$pointer[] = $field;
+			if (preg_match('/^([a-z0-9_-]+|\*)$/i', $field)) {
+				isset($models[$field]) ? $list[$field]['*'] = true : $list[$alias][$field] = true;
+			} elseif (preg_match('/^([a-z0-9_-]+)\.(.*)$/i', $field, $matches)) {
+				$list[$matches[1]][$matches[2]] = true;
+			} else {
+				$list[0][] = $field;
 			}
 		}
-		return $return;
+		return $list;
+	}
+	protected function _fieldsQuote($alias, $field) {
+		$open = $this->_quotes[0];
+		$close = $this->_quotes[1];
+		$aliasing = preg_split("/\s+as\s+/i", $field);
+		if (isset($aliasing[1])) {
+			list($aliasname, $fieldname) = $this->_splitFieldname($aliasing[0]);
+			$alias = $aliasname ? : $alias;
+			return "{$open}{$alias}{$close}.{$open}{$fieldname}{$close} as {$aliasing[1]}";
+		} else {
+			return "{$open}{$alias}{$close}.{$open}{$field}{$close}";
+		}
 	}
 
 	protected function _fieldsReturn($type, $context, $fields, $schema) {
@@ -1373,19 +1322,17 @@ abstract class Database extends \lithium\data\Source {
 	 * @param object $context A query object to configure
 	 */
 	public function applyStrategy($options, $context) {
-		$options += array('mode' => 'joined');
+		$options += array('strategy' => 'joined');
 		if (!$model = $context->model()) {
 			throw new ConfigException('The `\'with\'` option need a valid `\'model\'` option.');
 		}
-		$with = $context->with();
-		$relations = Set::expand(Set::normalize(array_keys($context->with())));
 
-		$mode = $options['mode'];
-		if (isset($this->_strategies[$mode])) {
-			$strategy = $this->_strategies[$mode];
-			$strategy($this, $model, $relations, '', $context->alias(), $with, $context);
+		$strategy = $options['strategy'];
+		if (isset($this->_strategies[$strategy])) {
+			$strategy = $this->_strategies[$strategy];
+			$strategy($this, $model, $context);
 		} else {
-			throw new QueryException("Undefined query strategy `{$mode}`.");
+			throw new QueryException("Undefined query strategy `{$strategy}`.");
 		}
 	}
 

@@ -22,6 +22,11 @@ class MockTag extends \lithium\tests\mocks\data\MockBase {
 		'source' => 'mock_tag',
 		'connection' => false
 	);
+
+	protected $_schema = array(
+		'id' => array('type' => 'integer'),
+		'name' => array('type' => 'string')
+	);
 }
 
 ?>
