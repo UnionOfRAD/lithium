@@ -8,7 +8,6 @@
 
 namespace lithium\tests\cases\core;
 
-use lithium\core\Object;
 use lithium\tests\mocks\core\MockRequest;
 use lithium\tests\mocks\core\MockMethodFiltering;
 use lithium\tests\mocks\core\MockExposed;
@@ -70,8 +69,6 @@ class ObjectTest extends \lithium\test\Unit {
 
 	/**
 	 * Verifies workaround for accessing protected properties in filtered methods.
-	 *
-	 * @return void
 	 */
 	function testFilteringWithProtectedAccess() {
 		$object = new MockExposed();
@@ -82,8 +79,6 @@ class ObjectTest extends \lithium\test\Unit {
 
 	/**
 	 * Attaches a single filter to multiple methods.
-	 *
-	 * @return void
 	 */
 	function testMultipleMethodFiltering() {
 		$object = new MockMethodFiltering();
@@ -98,55 +93,70 @@ class ObjectTest extends \lithium\test\Unit {
 	/**
 	 * Tests that the correct parameters are always passed in Object::invokeMethod(), regardless of
 	 * the number.
-	 *
-	 * @return void
 	 */
 	public function testMethodInvocationWithParameters() {
 		$callable = new MockCallable();
 
-		$this->assertEqual($callable->invokeMethod('foo'), array());
-		$this->assertEqual($callable->invokeMethod('foo', array('bar')), array('bar'));
+		$result = $callable->invokeMethod('foo');
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], array());
 
-		$params = array('one', 'two');
-		$this->assertEqual($callable->invokeMethod('foo', $params), $params);
+		$expected = array('bar');
+		$result = $callable->invokeMethod('foo', $expected);
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], $expected);
 
-		$params = array('short', 'parameter', 'list');
-		$this->assertEqual($callable->invokeMethod('foo', $params), $params);
+		$expected = array('one', 'two');
+		$result = $callable->invokeMethod('foo', $expected);
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], $expected);
 
-		$params = array('a', 'longer', 'parameter', 'list');
-		$this->assertEqual($callable->invokeMethod('foo', $params), $params);
+		$expected = array('short', 'parameter', 'list');
+		$result = $callable->invokeMethod('foo', $expected);
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], $expected);
 
-		$params = array('a', 'much', 'longer', 'parameter', 'list');
-		$this->assertEqual($callable->invokeMethod('foo', $params), $params);
+		$expected = array('a', 'longer', 'parameter', 'list');
+		$result = $callable->invokeMethod('foo', $expected);
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], $expected);
 
-		$params = array('an', 'extremely', 'long', 'list', 'of', 'parameters');
-		$this->assertEqual($callable->invokeMethod('foo', $params), $params);
+		$expected = array('a', 'much', 'longer', 'parameter', 'list');
+		$result = $callable->invokeMethod('foo', $expected);
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], $expected);
 
-		$params = array('an', 'extremely', 'long', 'list', 'of', 'parameters');
-		$this->assertEqual($callable->invokeMethod('foo', $params), $params);
+		$expected = array('an', 'extremely', 'long', 'list', 'of', 'parameters');
+		$result = $callable->invokeMethod('foo', $expected);
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], $expected);
 
-		$params = array(
+		$expected = array('an', 'extremely', 'long', 'list', 'of', 'parameters');
+		$result = $callable->invokeMethod('bar', $expected);
+		$this->assertEqual($result['method'], 'bar');
+		$this->assertEqual($result['params'], $expected);
+
+		$expected = array(
 			'if', 'you', 'have', 'a', 'parameter', 'list', 'this',
 			'long', 'then', 'UR', 'DOIN', 'IT', 'RONG'
 		);
-		$this->assertEqual($callable->invokeMethod('foo', $params), $params);
+		$result = $callable->invokeMethod('foo', $expected);
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], $expected);
 	}
 
 	public function testParents() {
-		$expected = array('lithium\\core\\Object' => 'lithium\\core\\Object');
+		$expected = array('lithium\core\Object' => 'lithium\core\Object');
 
 		$result = MockObjectForParents::parents();
 		$this->assertEqual($expected, $result);
 
-		// For caching
 		$result = MockObjectForParents::parents();
 		$this->assertEqual($expected, $result);
 	}
 
 	/**
 	 * Test configuration handling
-	 *
-	 * @return void
 	 */
 	public function testObjectConfiguration() {
 		$expected = array('testScalar' => 'default', 'testArray' => array('default'));
@@ -165,8 +175,6 @@ class ObjectTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that an object can be instantiated using the magic `__set_state()` method.
-	 *
-	 * @return void
 	 */
 	public function testStateBasedInstantiation() {
 		$result = MockObjectConfiguration::__set_state(array(
