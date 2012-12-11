@@ -741,7 +741,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual(array('published' => false), $query->conditions());
 
 		$keys = array_keys(array_filter($query->export(MockPost::$connection)));
-		$this->assertEqual(array('type', 'name', 'conditions', 'model', 'source', 'alias'), $keys);
+		$this->assertEqual(array('type', 'conditions', 'model', 'source', 'alias'), $keys);
 	}
 
 	public function testFindFirst() {

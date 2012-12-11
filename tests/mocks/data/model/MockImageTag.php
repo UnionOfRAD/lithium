@@ -22,6 +22,12 @@ class MockImageTag extends \lithium\tests\mocks\data\MockBase {
 		'source' => 'mock_image_tag',
 		'connection' => false
 	);
+
+	protected $_schema = array(
+		'id' => array('type' => 'integer'),
+		'image_id' => array('type' => 'integer'),
+		'tag_id' => array('type' => 'integer')
+	);
 }
 
 ?>

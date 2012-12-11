@@ -25,6 +25,11 @@ class MockGallery extends \lithium\tests\mocks\data\MockBase {
 		'source' => 'mock_gallery',
 		'connection' => false
 	);
+
+	protected $_schema = array(
+		'id' => array('type' => 'integer'),
+		'title' => array('type' => 'name')
+	);
 }
 
 ?>

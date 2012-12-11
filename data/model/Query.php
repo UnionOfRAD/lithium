@@ -79,6 +79,15 @@ class Query extends \lithium\core\Object {
 	);
 
 	/**
+	 * The query's fields
+	 *
+	 * @see lithium\data\model\Query::fields()
+	 *
+	 * @var array
+	 */
+	protected $_fields = array(0 => array(), 1 => array());
+
+	/**
 	 * Count the number of identical models in a query for building
 	 * unique aliases
 	 *
@@ -114,12 +123,13 @@ class Query extends \lithium\core\Object {
 	protected $_autoConfig = array('type', 'map');
 
 	/**
-	 * Importing methods
+	 * Initialization methods on construct
 	 *
 	 * @var array
 	 */
-	protected $_importMethods = array(
-		'model', 'entity', 'fields', 'conditions', 'having', 'group', 'order',
+
+	protected $_initializers = array(
+		'model', 'entity', 'conditions', 'having', 'group', 'order',
 		'limit', 'offset', 'page', 'data', 'calculate', 'schema', 'comment'
 	);
 
@@ -199,7 +209,7 @@ class Query extends \lithium\core\Object {
 		unset($this->_config['type']);
 
 		$keys = array_keys($this->_config);
-		foreach ($this->_importMethods as $key) {
+		foreach ($this->_initializers as $key) {
 			$val = $this->_config[$key];
 			if ($val !== null) {
 				$this->_config[$key] = is_array($val) ? array() : null;
@@ -208,9 +218,6 @@ class Query extends \lithium\core\Object {
 		}
 		if ($list = $this->_config['whitelist']) {
 			$this->_config['whitelist'] = array_combine($list, $list);
-		}
-		if ($this->_config['with']) {
-			$this->_associate($this->_config['with']);
 		}
 
 		if ($this->_entity && !$this->_config['model']) {
@@ -227,6 +234,8 @@ class Query extends \lithium\core\Object {
 		if ($model = $this->model()) {
 			$this->alias($this->_config['alias'] ?: $model::meta('name'));
 		}
+
+		$this->fields($this->_config['fields']);
 
 		unset($this->_config['entity'], $this->_config['init']);
 	}
@@ -282,7 +291,6 @@ class Query extends \lithium\core\Object {
 		}
 		$this->_config['model'] = $model;
 		$this->_config['source'] = $this->_config['source'] ?: $model::meta('source');
-		$this->_config['name'] = $model::meta('name');
 		return $this;
 	}
 
@@ -344,19 +352,28 @@ class Query extends \lithium\core\Object {
 	 */
 	public function fields($fields = null, $overwrite = false) {
 		if ($fields === false || $overwrite) {
-			$this->_config['fields'] = array();
+			$this->_fields = array(0 => array(), 1 => array());
 		}
-		$this->_config['fields'] = (array) $this->_config['fields'];
-
-		if (is_array($fields)) {
-			$this->_config['fields'] = array_merge($this->_config['fields'], $fields);
-		} elseif ($fields && !isset($this->_config['fields'][$fields])) {
-			$this->_config['fields'][] = $fields;
+		if ($fields === null) {
+			return array_merge(array_keys($this->_fields[1]), $this->_fields[0]);
 		}
-		if ($fields !== null) {
+		if (!$fields) {
 			return $this;
 		}
-		return $this->_config['fields'];
+		$fields = is_array($fields) ? $fields : array($fields);
+		foreach ($fields as $key => $field) {
+			if (is_string($field)) {
+				$this->_fields[1][$field] = true;
+			} elseif (is_array($field) && !is_numeric($key)) {
+				foreach ($field as &$val) {
+					$val = $key . '.' . $val;
+				}
+				$this->fields($field);
+			} else {
+				$this->_fields[0][] = $field;
+			}
+		}
+		return $this;
 	}
 
 	/**
@@ -551,32 +568,34 @@ class Query extends \lithium\core\Object {
 		$defaults = array('keys' => array());
 		$options += $defaults;
 
-		$keys = $options['keys'] ?: array_keys($this->_config);
+		if ($options['keys']) {
+			$keys = array_flip($options['keys']);
+		} else {
+			$keys =& $this->_config;
+		}
 
 		$results = array('type' => $this->_type);
 
-		$apply = array_intersect($keys, $source->methods());
-		$copy = array_diff($keys, $apply);
+		$apply = array_intersect_key($keys, array_flip($source->methods()));
+		$copy = array_diff_key($keys, $apply);
 
-		if (in_array('with', $keys)) {
-			$this->_applyStrategy($source);
+		if (isset($keys['with'])) {
+			$this->applyStrategy($source);
 		}
 
-		foreach ($apply as $item) {
+		foreach ($apply as $item => $value) {
 			$results[$item] = $source->{$item}($this->{$item}(), $this);
 		}
 
-		foreach ($copy as $item) {
-			if (in_array($item, $keys)) {
-				$results[$item] = $this->_config[$item];
-			}
+		foreach ($copy as $item => $value) {
+			$results[$item] = $this->_config[$item];
 		}
 
-		if (in_array('data', $keys)) {
+		if (array_key_exists('data', $keys)) {
 			$results['data'] = $this->_exportData();
 		}
 
-		if (isset($results['source'])) {
+		if (array_key_exists('source', $keys)) {
 			$results['source'] = $source->name($results['source']);
 		}
 
@@ -598,7 +617,7 @@ class Query extends \lithium\core\Object {
 	 * @param object $source Instance of the data source (`lithium\data\Source`) to use for
 	 *        conversion.
 	 */
-	protected function _applyStrategy(Source $source) {
+	public function applyStrategy(Source $source) {
 		if ($this->_built) {
 			return;
 		}
@@ -607,8 +626,8 @@ class Query extends \lithium\core\Object {
 			return;
 		}
 		$options = array();
-		if (isset($this->_config['mode'])) {
-			$options = array('mode' => $this->_config['mode']);
+		if (isset($this->_config['strategy'])) {
+			$options['strategy'] = $this->_config['strategy'];
 		}
 		$source->applyStrategy($options, $this);
 	}
@@ -663,7 +682,6 @@ class Query extends \lithium\core\Object {
 	 * @return string An alias value or `null` for an unexisting `$relpath` alias.
 	 */
 	public function alias($alias = true, $relpath = null) {
-
 		if ($alias === true) {
 			if (!$relpath) {
 				return $this->_config['alias'];
@@ -685,7 +703,7 @@ class Query extends \lithium\core\Object {
 		if (!$relpath) {
 			$this->_alias[$alias] = 1;
 			$this->_models[$alias] = $model;
-			$this->_paths[$alias] = null;
+			$this->_paths[$alias] = '';
 			return $this->_config['alias'] = $alias;
 		}
 
@@ -722,7 +740,7 @@ class Query extends \lithium\core\Object {
 	 */
 	public function paths(Source $source = null) {
 		if ($source) {
-			$this->_applyStrategy($source);
+			$this->applyStrategy($source);
 		}
 		return $this->_paths;
 	}
@@ -736,7 +754,7 @@ class Query extends \lithium\core\Object {
 	 */
 	public function models(Source $source = null) {
 		if ($source) {
-			$this->_applyStrategy($source);
+			$this->applyStrategy($source);
 		}
 		return $this->_models;
 	}
