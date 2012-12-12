@@ -12,14 +12,22 @@ class MockCallable extends \lithium\core\Object {
 
 	public $call = array();
 
-	public static $statiCall = array();
+	public $get = '';
+
+	public static $staticCall = array();
+
+	public function __construct() {}
 
 	public function __call($method, $params = array()) {
 		return $this->call = compact('method', 'params');
 	}
 
 	public static function __callStatic($method, $params) {
-		return static::$statiCall = compact('method', 'params');
+		return static::$staticCall = compact('method', 'params');
+	}
+
+	public function __get($value) {
+		return $this->get = $value;
 	}
 }
 
