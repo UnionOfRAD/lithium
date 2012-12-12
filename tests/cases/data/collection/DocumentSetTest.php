@@ -300,6 +300,35 @@ class DocumentSetTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $doc->to('array', array('indexed' => false)));
 	}
+
+	public function testParent() {
+		$model = $this->_model;
+		$schema = new Schema(array('fields' => array(
+			'_id' => array('type' => 'id'),
+			'bar' => array('array' => true),
+			'foo' => array('type' => 'object', 'array' => true),
+			'foo.foo' => array('type' => 'integer'),
+			'foo.bar' => array('type' => 'integer')
+		)));
+		$doc = new Document(compact('model', 'schema'));
+
+		$expected = array(
+			'foo' => 1,
+			'bar' => 2
+		);
+		$doc->foo[] = $expected;
+		$this->assertEqual($doc, $doc->foo->parent());
+		$this->assertEqual($expected, $doc->foo[0]->data());
+
+		$data = array(
+			'_id' => '4fb6e2df3e91581fe6e75737',
+			'foo' => array($expected)
+		);
+
+		$doc = new Document(compact('model', 'schema', 'data'));
+		$this->assertEqual($doc, $doc->foo->parent());
+		$this->assertEqual($expected, $doc->foo[0]->data());
+	}
 }
 
 ?>

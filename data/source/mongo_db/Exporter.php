@@ -110,15 +110,17 @@ class Exporter extends \lithium\core\StaticObject {
 			$original = $export['data'];
 			$isArray = is_object($value) && get_class($value) == static::$_classes['set'];
 
-			$options = array('handlers' => array(
-				'MongoDate' => function($value) { return $value; },
-				'MongoId' => function($value) { return $value; }
-			));
+			$options = array(
+				'indexed' => null,
+				'handlers' => array(
+					'MongoDate' => function($value) { return $value; },
+					'MongoId' => function($value) { return $value; }
+				)
+			);
 
 			if ($isArray) {
 				$newValue = $value->to('array', $options);
 				$originalValue = null;
-
 				if (isset($original[$key])) {
 					$originalValue = $original[$key]->to('array', $options);
 				}
