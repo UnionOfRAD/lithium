@@ -10,8 +10,8 @@ namespace lithium\tests\cases\data\source\database\adapter;
 
 use lithium\data\Connections;
 use lithium\data\model\Query;
-use lithium\data\source\database\adapter\PostgreSQL;
-use lithium\tests\mocks\data\source\database\adapter\MockPostgreSQL;
+use lithium\data\source\database\adapter\PostgreSql;
+use lithium\tests\mocks\data\source\database\adapter\MockPostgreSql;
 
 class PostgreSqlTest extends \lithium\test\Unit {
 
@@ -34,7 +34,7 @@ class PostgreSqlTest extends \lithium\test\Unit {
 		$message = 'Test database is either unavailable, or not using a PostgreSQL adapter';
 		$this->skipIf(!$hasDb, $message);
 
-		$this->db = new PostgreSQL($this->_dbConfig);
+		$this->db = new PostgreSql($this->_dbConfig);
 
 		$lithium = LITHIUM_LIBRARY_PATH . '/lithium';
 		$sqlFile = $lithium . '/tests/mocks/data/source/database/adapter/postgresql_companies.sql';
@@ -46,7 +46,7 @@ class PostgreSqlTest extends \lithium\test\Unit {
 	 * Tests that the object is initialized with the correct default values.
 	 */
 	public function testConstructorDefaults() {
-		$db = new MockPostgreSQL(array('autoConnect' => false));
+		$db = new MockPostgreSql(array('autoConnect' => false));
 		$result = $db->get('_config');
 		$expected = array(
 			'autoConnect' => false, 'encoding' => null,'persistent' => true,
@@ -62,7 +62,7 @@ class PostgreSqlTest extends \lithium\test\Unit {
 	 * persisted.
 	 */
 	public function testDatabaseConnection() {
-		$db = new PostgreSQL(array('autoConnect' => false) + $this->_dbConfig);
+		$db = new PostgreSql(array('autoConnect' => false) + $this->_dbConfig);
 
 		$this->assertTrue($db->connect());
 		$this->assertTrue($db->isConnected());
@@ -70,7 +70,7 @@ class PostgreSqlTest extends \lithium\test\Unit {
 		$this->assertTrue($db->disconnect());
 		$this->assertFalse($db->isConnected());
 
-		$db = new PostgreSQL(array(
+		$db = new PostgreSql(array(
 			'autoConnect' => false, 'encoding' => null,'persistent' => false,
 			'host' => 'localhost:5432', 'login' => 'garbage', 'password' => '',
 			'database' => 'garbage', 'init' => true, 'schema'=>'garbage'
@@ -235,8 +235,8 @@ class PostgreSqlTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Ensures that DELETE queries are not generated with table aliases, as PostgreSQL does not support
-	 * this.
+	 * Ensures that DELETE queries are not generated with table aliases, as PostgreSQL does not
+	 * support this.
 	 */
 	public function testDeletesWithoutAliases() {
 		$delete = new Query(array('type' => 'delete', 'source' => 'companies'));
