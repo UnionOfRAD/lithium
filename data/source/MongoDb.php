@@ -137,8 +137,12 @@ class MongoDb extends \lithium\data\Source {
 	 *          information for a model class. See the `$_schema` property for more information.
 	 *        - `'gridPrefix'` _string_: The default prefix for MongoDB's `chunks` and `files`
 	 *          collections. Defaults to `'fs'`.
-	 *        - `'replicaSet'` _boolean_: See the documentation for `Mongo::__construct()`. Defaults
+	 *        - `'replicaSet'` _string_: See the documentation for `Mongo::__construct()`. Defaults
 	 *          to `false`.
+	 *        - `'readPreference'` _mixed_: May either be a single value such as Mongo::RP_NEAREST, 
+	 *          or an array containing a read preference and a tag set such as: 
+	 *          array(Mongo::RP_SECONDARY_PREFERRED, array('dc' => 'east) See the documentation for 
+	 *          `Mongo::setReadPreference()`. Defaults to null.	 
 	 *
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
@@ -157,7 +161,9 @@ class MongoDb extends \lithium\data\Source {
 			'timeout'    => 100,
 			'replicaSet' => false,
 			'schema'     => null,
-			'gridPrefix' => 'fs'
+			'gridPrefix' => 'fs',
+			'safe'       => false,
+			'readPreference' => null
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -239,20 +245,30 @@ class MongoDb extends \lithium\data\Source {
 		$connection = "mongodb://{$login}{$host}" . ($login ? "/{$cfg['database']}" : '');
 
 		$options = array(
-			'connect' => true,
-			'timeout' => $cfg['timeout'],
-			'replicaSet' => $cfg['replicaSet']
+			'timeout' => $cfg['timeout'], 
+			'replicaSet' => $cfg['replicaSet'],
+			'connect' => true
 		);
 
 		try {
 			if ($persist = $cfg['persistent']) {
 				$options['persist'] = $persist === true ? 'default' : $persist;
 			}
+			
 			$this->server = new Mongo($connection, $options);
-
+			
 			if ($this->connection = $this->server->{$cfg['database']}) {
 				$this->_isConnected = true;
 			}
+			
+			if ($prefs = $cfg['readPreference']) {
+				//If $prefs is an array use as is, otherwise (as is the case when only a read preference
+				// has been specified) set prefs to an array containing itself, and an empty array for
+				// tags.
+				$prefs = !is_array($prefs) ? array($prefs, array()) : $prefs;
+				$this->server->setReadPreference($prefs[0], $prefs[1]);
+			}
+			
 		} catch (Exception $e) {
 			throw new NetworkException("Could not connect to the database.", 503, $e);
 		}
@@ -361,12 +377,12 @@ class MongoDb extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function create($query, array $options = array()) {
-		$defaults = array('safe' => false, 'fsync' => false);
+		$_config = $this->_config;
+		$defaults = array('safe' => $_config['safe'], 'fsync' => false);
 		$options += $defaults;
 		$this->_checkConnection();
 
 		$params = compact('query', 'options');
-		$_config = $this->_config;
 		$_exp = $this->_classes['exporter'];
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config, $_exp) {
@@ -491,12 +507,12 @@ class MongoDb extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function update($query, array $options = array()) {
-		$defaults = array('upsert' => false, 'multiple' => true, 'safe' => false, 'fsync' => false);
+		$_config = $this->_config;
+		$defaults = array('upsert' => false, 'multiple' => true, 'safe' => $_config['safe'], 'fsync' => false);
 		$options += $defaults;
 		$this->_checkConnection();
 
 		$params = compact('query', 'options');
-		$_config = $this->_config;
 		$_exp = $this->_classes['exporter'];
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config, $_exp) {
@@ -535,12 +551,12 @@ class MongoDb extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function delete($query, array $options = array()) {
-		$this->_checkConnection();
-		$defaults = array('justOne' => false, 'safe' => false, 'fsync' => false);
-		$options = array_intersect_key($options + $defaults, $defaults);
 		$_config = $this->_config;
-		$params = compact('query', 'options');
+		$this->_checkConnection();
+		$defaults = array('justOne' => false, 'safe' => $_config['safe'], 'fsync' => false);
+		$options = array_intersect_key($options + $defaults, $defaults);
 
+		$params = compact('query', 'options');
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
 			$query = $params['query'];
 			$options = $params['options'];
