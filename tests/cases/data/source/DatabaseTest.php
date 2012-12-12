@@ -875,6 +875,13 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testFieldsWithEmptyAlias() {
+		$query = new Query();
+		$result = $this->db->fields(array('id', 'name', 'created'), $query);
+		$expected = '{id}, {name}, {created}';
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testRawConditions() {
 		$query = new Query(array('type' => 'read', 'model' => $this->_model, 'conditions' => null));
 		$this->assertFalse($this->db->conditions(5, $query));
