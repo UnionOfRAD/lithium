@@ -962,8 +962,10 @@ abstract class Database extends \lithium\data\Source {
 			list($aliasname, $fieldname) = $this->_splitFieldname($aliasing[0]);
 			$alias = $aliasname ? : $alias;
 			return "{$open}{$alias}{$close}.{$open}{$fieldname}{$close} as {$aliasing[1]}";
-		} else {
+		} elseif ($alias) {
 			return "{$open}{$alias}{$close}.{$open}{$field}{$close}";
+		} else {
+			return "{$open}{$field}{$close}";
 		}
 	}
 
