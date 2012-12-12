@@ -23,7 +23,13 @@ class DocumentSchema extends \lithium\data\Schema {
 	}
 
 	public function cast($object, $key, $data, array $options = array()) {
-		$defaults = array('pathKey' => null, 'model' => null, 'wrap' => true, 'first' => false);
+		$defaults = array(
+			'parent' => null,
+			'pathKey' => null,
+			'model' => null,
+			'wrap' => true,
+			'first' => false
+		);
 		$options += $defaults;
 
 		$basePathKey = $options['pathKey'];
@@ -69,7 +75,7 @@ class DocumentSchema extends \lithium\data\Schema {
 		if ($options['wrap']) {
 			$config = array(
 				'data' => $val,
-				'parent' => $object,
+				'parent' => $options['parent'],
 				'model' => $options['model'],
 				'schema' => $this
 			);
