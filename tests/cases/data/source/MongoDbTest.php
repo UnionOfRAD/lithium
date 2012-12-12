@@ -19,6 +19,7 @@ use lithium\data\entity\Document;
 use lithium\tests\mocks\data\MockPost;
 use lithium\tests\mocks\data\MockComment;
 use lithium\data\collection\DocumentSet;
+use lithium\tests\mocks\core\MockCallable;
 use lithium\tests\mocks\data\source\MockMongoSource;
 use lithium\tests\mocks\data\source\MockMongoConnection;
 use lithium\tests\mocks\data\source\mongo_db\MockResult;
@@ -763,6 +764,79 @@ class MongoDbTest extends \lithium\test\Unit {
 			return $schema;
 		}));
 		$this->assertEqual($schema, $db->describe(null)->fields());
+	}
+
+	public function testSetReadPreference() {
+		$prefs = array(
+			"SECONDARY",
+			array('dc' => 'east', 'use' => 'reporting')
+		);
+		$db = new MongoDb(array(
+			'readPreference' => $prefs,
+			'classes' => array(
+				'server' => 'lithium\tests\mocks\core\MockCallable'
+			)
+		));
+
+		$result = $db->server->call;
+		$this->assertEqual('setReadPreference', $result['method']);
+		$this->assertEqual($prefs, $result['params']);
+	}
+
+	public function testDefaultSafeOptions() {
+		$this->db = new MongoDb($this->_testConfig + array('safe' => true));
+		$this->db->server = new MockMongoConnection();
+		$this->db->connection = new MockCallable();
+		$this->db->connection->custom = new MockCallable();
+		$this->db->server->connected = true;
+
+		$query = new Query(array('type' => 'read', 'source' => 'custom'));
+		$this->db->create($query);
+		$result = $this->db->connection->custom->call;
+		$expected = array(null, array('safe' => true, 'fsync' => false));
+		$this->assertEqual('insert', $result['method']);
+		$this->assertEqual($expected, $result['params']);
+
+		$query = new Query(array('type' => 'read', 'source' => 'custom'));
+		$this->db->update($query);
+		$result = $this->db->connection->custom->call;
+		$expected = array('upsert' => false, 'multiple' => true, 'safe' => true, 'fsync' => false);
+		$this->assertEqual('update', $result['method']);
+		$this->assertEqual($expected, $result['params'][2]);
+
+		$query = new Query(array('type' => 'read', 'source' => 'custom'));
+		$this->db->delete($query);
+		$result = $this->db->connection->custom->call;
+		$expected = array('justOne' => false, 'safe' => true, 'fsync' => false);
+		$this->assertEqual('remove', $result['method']);
+		$this->assertEqual($expected, $result['params'][1]);
+
+		$this->db = new MongoDb($this->_testConfig + array('safe' => false));
+		$this->db->server = new MockMongoConnection();
+		$this->db->connection = new MockCallable();
+		$this->db->connection->custom = new MockCallable();
+		$this->db->server->connected = true;
+
+		$query = new Query(array('type' => 'read', 'source' => 'custom'));
+		$this->db->create($query);
+		$result = $this->db->connection->custom->call;
+		$expected = array(null, array('safe' => false, 'fsync' => false));
+		$this->assertEqual('insert', $result['method']);
+		$this->assertEqual($expected, $result['params']);
+
+		$query = new Query(array('type' => 'read', 'source' => 'custom'));
+		$this->db->update($query);
+		$result = $this->db->connection->custom->call;
+		$expected = array('upsert' => false, 'multiple' => true, 'safe' => false, 'fsync' => false);
+		$this->assertEqual('update', $result['method']);
+		$this->assertEqual($expected, $result['params'][2]);
+
+		$query = new Query(array('type' => 'read', 'source' => 'custom'));
+		$this->db->delete($query);
+		$result = $this->db->connection->custom->call;
+		$expected = array('justOne' => false, 'safe' => false, 'fsync' => false);
+		$this->assertEqual('remove', $result['method']);
+		$this->assertEqual($expected, $result['params'][1]);
 	}
 }
 
