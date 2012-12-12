@@ -804,7 +804,7 @@ class Model extends \lithium\core\StaticObject {
 
 		if (!is_object($self->_schema)) {
 			$self->_schema = static::connection()->describe(
-				$self::meta('source'), $self->_schema, $self::meta()
+				$self::meta('source'), $self->_schema, $self->_meta
 			);
 			if (!is_object($self->_schema)) {
 				$class = get_called_class();
