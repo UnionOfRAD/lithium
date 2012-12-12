@@ -10,20 +10,24 @@ namespace lithium\tests\mocks\core;
 
 class MockCallable extends \lithium\core\Object {
 
+	public $construct = array();
+
 	public $call = array();
 
 	public $get = '';
 
-	public static $staticCall = array();
+	public static $callStatic = array();
 
-	public function __construct() {}
+	public function __construct() {
+		$this->construct = func_get_args();
+	}
 
 	public function __call($method, $params = array()) {
 		return $this->call = compact('method', 'params');
 	}
 
 	public static function __callStatic($method, $params) {
-		return static::$staticCall = compact('method', 'params');
+		return static::$callStatic = compact('method', 'params');
 	}
 
 	public function __get($value) {
