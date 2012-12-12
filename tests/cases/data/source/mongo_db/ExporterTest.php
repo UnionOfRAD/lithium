@@ -688,7 +688,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertEqual('Bar2', $accounts['4fb6e2df3e91581fe6e75739']['name']);
 	}
 
-	public function testIndexesOnExport() {
+	public function testIndexesOnExportingDocumentSet() {
 		$schema = new Schema(array('fields' => array(
 			'_id' => array('type' => 'id'),
 			'accounts' => array('type' => 'object', 'array' => true),
@@ -742,6 +742,42 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertTrue(isset($result['update'][0]['accounts'][1]));
 		$this->assertTrue(isset($result['update'][1]['accounts'][0]));
 		$this->assertTrue(isset($result['update'][1]['accounts'][1]));
+	}
+
+	public function testIndexesOnExportingDocument() {
+		$schema = new Schema(array('fields' => array(
+			'_id' => array('type' => 'id'),
+			'accounts' => array('type' => 'object', 'array' => true),
+			'accounts._id' => array('type' => 'id'),
+			'accounts.name' => array('type' => 'string')
+		)));
+
+		$data = array(
+			'_id' => '4c8f86167675abfabd970300',
+			'accounts' => array(array(
+				'_id' => "4fb6e2dd3e91581fe6e75736",
+				'name' => 'Foo1'
+			),array(
+				'_id' => "4fb6e2df3e91581fe6e75737",
+				'name' => 'Bar1'
+			))
+		);
+
+		$model = $this->_model;
+
+		$document = new Document(compact('model', 'schema', 'data'));
+		$this->assertTrue($document->accounts instanceof DocumentSet);
+		$this->assertTrue($document->accounts instanceof DocumentSet);
+
+		$export = $document->export();
+		$result = Exporter::get('create', $document->export());
+		$this->assertTrue(isset($result['create']['accounts'][0]));
+		$this->assertTrue(isset($result['create']['accounts'][1]));
+
+		$export['data'] = array();
+		$result = Exporter::get('update', $export);
+		$this->assertTrue(isset($result['update']['accounts'][0]));
+		$this->assertTrue(isset($result['update']['accounts'][1]));
 	}
 }
 
