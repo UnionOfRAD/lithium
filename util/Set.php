@@ -296,16 +296,12 @@ class Set {
 					if (count($context['trace']) == 1) {
 						$context['trace'][] = $context['key'];
 					}
-					$parent = join('/', $context['trace']) . '/.';
+
+					array_pop($context['trace']);
+					$parent = join('/', $context['trace']);
 					$context['item'] = static::extract($data, $parent);
-					$context['key'] = array_pop($context['trace']);
-					if (isset($context['trace'][1]) && $context['trace'][1] > 0) {
-						$context['item'] = $context['item'][0];
-					} elseif (!empty($context['item'][$key])) {
-						$context['item'] = $context['item'][$key];
-					} else {
-						$context['item'] = array_shift($context['item']);
-					}
+					array_pop($context['trace']);
+					$context['item'] = array_shift($context['item']);
 					$matches[] = $context;
 					continue;
 				}
@@ -345,7 +341,7 @@ class Set {
 								array_unshift($tokens, $token);
 							}
 						} else {
-							$key = $token;
+							$ctext[] = $token;
 						}
 
 						$matches[] = array(
@@ -388,8 +384,10 @@ class Set {
 		$r = array();
 
 		foreach ($matches as $match) {
-			if ((!$options['flatten'] || is_array($match['item'])) && !is_int($match['key'])) {
-				$r[] = array($match['key'] => $match['item']);
+			$key = array_pop($match['trace']);
+			$condition = (!is_int($key) && $key !== null);
+			if ((!$options['flatten'] || is_array($match['item'])) && $condition) {
+				$r[] = array($key => $match['item']);
 			} else {
 				$r[] = $match['item'];
 			}
