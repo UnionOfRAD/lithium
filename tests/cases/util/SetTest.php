@@ -682,14 +682,14 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertEqual($result[0]['Comment']['User']['name'], 'bob');
 		$this->assertEqual($result[1]['Comment']['User']['name'], 'tod');
 		$this->assertEqual($result[2]['Comment']['User']['name'], 'dan');
-		$this->assertEqual($result[3]['Comment']['User']['name'], 'dan');
+		$this->assertEqual($result[3]['Comment']['User']['name'], 'jim');
 
 		$result = Set::extract($habtm, '/Comment/User[name=/[a-z]+/]/..');
 		$this->assertEqual(count($result), 4);
 		$this->assertEqual($result[0]['Comment']['User']['name'], 'bob');
 		$this->assertEqual($result[1]['Comment']['User']['name'], 'tod');
 		$this->assertEqual($result[2]['Comment']['User']['name'], 'dan');
-		$this->assertEqual($result[3]['Comment']['User']['name'], 'dan');
+		$this->assertEqual($result[3]['Comment']['User']['name'], 'jim');
 
 		$result = Set::extract($habtm, '/Comment/User[name=/bob|dan/]/..');
 		$this->assertEqual(count($result), 2);
