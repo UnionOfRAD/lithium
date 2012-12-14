@@ -414,6 +414,28 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isInList('one', null, array('list' => array('one', 'two'))));
 		$this->assertTrue(Validator::isInList('two', null, array('list' => array('one', 'two'))));
 		$this->assertFalse(Validator::isInList('3', null, array('list' => array('one', 'two'))));
+
+		$this->assertFalse(Validator::isInList('', null, array('list' => array('0', '1'))));
+		$this->assertFalse(Validator::isInList(null, null, array('list' => array('0', '1'))));
+		$this->assertFalse(Validator::isInList(false, null, array('list' => array('0', '1'))));
+		$this->assertFalse(Validator::isInList(true, null, array('list' => array('0', '1'))));
+
+		$this->assertFalse(Validator::isInList('', null, array('list' => array(0, 1))));
+		$this->assertFalse(Validator::isInList(null, null, array('list' => array(0, 1))));
+		$this->assertFalse(Validator::isInList(false, null, array('list' => array(0, 1))));
+		$this->assertFalse(Validator::isInList(true, null, array('list' => array(0, 1))));
+		$this->assertTrue(Validator::isInList(0, null, array('list' => array(0, 1))));
+		$this->assertTrue(Validator::isInList(1, null, array('list' => array(0, 1))));
+		$this->assertFalse(Validator::isInList(2, null, array('list' => array(0, 1))));
+
+		$this->assertTrue(Validator::isInList(0, null, array('list' => array('0', '1'))));
+		$this->assertTrue(Validator::isInList('1', null, array('list' => array('0', '1'))));
+
+		$this->assertTrue(Validator::isInList(1, null, array('list' => array('0', '1'))));
+		$this->assertTrue(Validator::isInList('1', null, array('list' => array('0', '1'))));
+
+		$this->assertFalse(Validator::isInList(2, null, array('list' => array('0', '1'))));
+		$this->assertFalse(Validator::isInList('2', null, array('list' => array('0', '1'))));
 	}
 
 
