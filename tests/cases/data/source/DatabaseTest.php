@@ -1393,7 +1393,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $joins);
 	}
 
-	public function testExportedFieldsWithJoinedStrategy () {
+	public function testExportedFieldsWithJoinedStrategy() {
 		$query = new Query(array(
 			'model' => $this->_gallery,
 			'with' => array('Image.ImageTag.Tag')
@@ -1438,8 +1438,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['fields']);
 	}
 
-	public function testExportedFieldsWithJoinedStrategyAndRecursiveRelation () {
-
+	public function testExportedFieldsWithJoinedStrategyAndRecursiveRelation() {
 		$query = new Query(array(
 			'model' => $this->_gallery,
 			'with' => array('Parent.Parent')
@@ -1465,6 +1464,39 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $query->export($this->db);
 		$expected = '{ParentOfParent}.{name}, {ParentOfParent}.{id}, {Gallery}.{id}, {Parent}.{id}';
 		$this->assertEqual($expected, $result['fields']);
+	}
+
+	public function testCustomField() {
+		$field = "(CASE `title` WHEN 'Lotus Flower' THEN 'Found' ELSE 'Not Found' END) as extra";
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $this->_gallery,
+			'fields' => array('*', $field)
+		));
+		$result = $this->db->read($query);
+		$expected = 'SELECT (CASE `title` WHEN \'Lotus Flower\' THEN \'Found\' ELSE \'Not Found\' ';
+		$expected .= 'END) as extra, {Gallery}.* FROM {mock_gallery} AS {Gallery};';
+		$this->assertEqual($expected, $this->db->sql);
+		$map = array('' => array('extra', 'id', 'title'));
+		$this->assertEqual($map, $query->map());
+
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $this->_gallery,
+			'fields' => array('*', (object) $field)
+		));
+		$result = $this->db->read($query);
+		$this->assertEqual($expected, $this->db->sql);
+		$this->assertEqual($map, $query->map());
+
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $this->_gallery,
+			'fields' => array('*', array($field))
+		));
+		$result = $this->db->read($query);
+		$this->assertEqual($expected, $this->db->sql);
+		$this->assertEqual($map, $query->map());
 	}
 }
 
