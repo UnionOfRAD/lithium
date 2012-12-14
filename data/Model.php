@@ -417,9 +417,6 @@ class Model extends \lithium\core\StaticObject {
 		$local = compact('class') + $self->_meta;
 		$self->_meta = ($local + $source['meta'] + $meta);
 
-		if (is_object($schema)) {
-			$schema = $schema->fields();
-		}
 		$self->_initializers += array(
 			'name' => function($self) {
 				return basename(str_replace('\\', '/', $self));
@@ -434,7 +431,14 @@ class Model extends \lithium\core\StaticObject {
 			}
 		);
 
-		$self->schema()->append($schema + $source['schema']);
+		if (is_object($self->_schema)) {
+			$self->_schema->append($source['schema']);
+		} elseif (is_array($self->_schema)) {
+			$self->_schema = $self->_schema + $source['schema'];
+		} else {
+			$self->_schema = $source['schema'];
+		}
+
 		$self->_finders += $source['finders'] + $self->_findFilters();
 
 		static::_relationsToLoad();
@@ -982,7 +986,7 @@ class Model extends \lithium\core\StaticObject {
 	public function save($entity, $data = null, array $options = array()) {
 		$self = static::_object();
 		$_meta = array('model' => get_called_class()) + $self->_meta;
-		$_schema = $self->_schema;
+		$_schema = $self->schema();
 
 		$defaults = array(
 			'validate' => true,
