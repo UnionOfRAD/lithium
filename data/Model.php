@@ -134,7 +134,7 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * List of initialized instances.
 	 *
-	 * @see lithium\data\Model::_init();
+	 * @see lithium\data\Model::_initialize();
 	 * @var array
 	 */
 	protected static $_initialized = array();
@@ -375,7 +375,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @param string $class The fully-namespaced class name to initialize.
 	 * @return object Returns the initialized model instance.
 	 */
-	protected static function _init($class) {
+	protected static function _initialize($class) {
 		$self = static::$_instances[$class];
 
 		if (isset(static::$_initialized[$class]) && static::$_initialized[$class]) {
@@ -1237,7 +1237,7 @@ class Model extends \lithium\core\StaticObject {
 			static::$_instances[$class] = new $class();
 			static::config();
 		}
-		$object = static::_init($class);
+		$object = static::_initialize($class);
 		return $object;
 	}
 
