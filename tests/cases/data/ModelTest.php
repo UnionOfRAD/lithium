@@ -808,7 +808,7 @@ class ModelTest extends \lithium\test\Unit {
 		$object = MockPost::invokeMethod('_object');
 		$object->belongsTo = array('Unexisting');
 		MockPost::config();
-		MockPost::invokeMethod('_init', array('lithium\tests\mocks\data\MockPost'));
+		MockPost::invokeMethod('_initialize', array('lithium\tests\mocks\data\MockPost'));
 		$exception = 'Related model class \'lithium\tests\mocks\data\Unexisting\' not found.';
 		$this->expectException($exception);
 		MockPost::relations('Unexisting');
