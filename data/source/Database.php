@@ -972,6 +972,9 @@ abstract class Database extends \lithium\data\Source {
 	protected function _fieldsReturn($type, $context, $fields, $schema) {
 		if ($type == 'create' || $type == 'update') {
 			$data = $context->data();
+			if (isset($data['data']) && is_array($data['data']) && count($data) == 1){
+				$data = $data['data'];
+			}
 
 			if ($fields && is_array($fields) && is_int(key($fields))) {
 				$data = array_intersect_key($data, array_combine($fields, $fields));
