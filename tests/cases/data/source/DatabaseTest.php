@@ -374,6 +374,30 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testCreateGenericSyntax() {
+		$entity = new Record(array(
+			'model' => $this->_model,
+			'data' => array('data' => array('title' => 'new post', 'body' => 'the body'))
+		));
+		$query = new Query(compact('entity') + array(
+			'type' => 'create',
+			'model' => $this->_model
+		));
+		$hash = $query->export($this->db);
+		ksort($hash);
+		$expected = sha1(serialize($hash));
+
+		$result = $this->db->create($query);
+		$this->assertTrue($result);
+		$result = $query->entity()->id;
+		$this->assertEqual($expected, $result);
+
+		$expected = "INSERT INTO {mock_database_posts} ({title}, {body})";
+		$expected .= " VALUES ('new post', 'the body');";
+		$result = $this->db->sql;
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testCreateWithValueBySchema() {
 		$entity = new Record(array(
 			'model' => $this->_model,
