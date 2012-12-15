@@ -355,10 +355,10 @@ class FormTest extends \lithium\test\Unit {
 	}
 
 	public function testTextareaGeneration() {
-		$result = $this->form->textarea('foo', array('value' => 'some content'));
+		$result = $this->form->textarea('foo', array('value' => 'some content >'));
 		$this->assertTags($result, array(
 			'textarea' => array('name' => 'foo', 'id' => 'Foo'),
-			'some content',
+			'some content &gt;',
 			'/textarea'
 		));
 	}
@@ -616,8 +616,8 @@ class FormTest extends \lithium\test\Unit {
 
 		$result = $this->form->select(
 			'colors',
-			array('r' => 'red', 'g' => 'green', 'b' => 'blue'),
-			array('id' => 'Colors', 'value' => 'g')
+			array('r' => 'red', 'g "' => 'green', 'b' => 'blue'),
+			array('id' => 'Colors', 'value' => 'g "')
 		);
 
 		$this->assertTags($result, array(
@@ -625,7 +625,7 @@ class FormTest extends \lithium\test\Unit {
 			array('option' => array('value' => 'r')),
 			'red',
 			'/option',
-			array('option' => array('value' => 'g', 'selected' => 'selected')),
+			array('option' => array('value' => 'g &quot;', 'selected' => 'selected')),
 			'green',
 			'/option',
 			array('option' => array('value' => 'b')),
