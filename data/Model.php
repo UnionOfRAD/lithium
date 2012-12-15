@@ -488,6 +488,24 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Magic method that allows calling `Model::_instanceMethods`'s closure like normal methods
+	 * on the model instance.
+	 *
+	 * @see lithium\data\Model::instanceMethods
+	 * @param string $method Method name caught by `__call()`.
+	 * @param array $params Arguments given to the above `$method` call.
+	 * @return mixed
+	 */
+	public function __call($method, $params) {
+		$methods = static::instanceMethods();
+		if (isset($methods[$method]) && is_callable($methods[$method])) {
+			return call_user_func_array($methods[$method], $params);
+		}
+		$message = "Unhandled method call `{$method}`.";
+		throw new BadMethodCallException($message);
+	}
+
+	/**
 	 * The `find` method allows you to retrieve data from the connected data source.
 	 *
 	 * Examples:

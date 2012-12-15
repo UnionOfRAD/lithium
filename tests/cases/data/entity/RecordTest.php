@@ -120,7 +120,7 @@ class RecordTest extends \lithium\test\Unit {
 		$this->assertEqual('create', $result['query']->type());
 		$this->assertEqual(array('title' => 'foo'), $result['query']->data());
 
-		$this->expectException("No model bound or unhandled method call `invalid`.");
+		$this->expectException("Unhandled method call `invalid`.");
 		$this->assertNull($this->record->invalid());
 	}
 }

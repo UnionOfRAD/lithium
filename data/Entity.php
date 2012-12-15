@@ -182,25 +182,17 @@ class Entity extends \lithium\core\Object {
 	 * $record->validates();
 	 * }}}
 	 *
-	 * @see lithium\data\Model::instanceMethods
-	 * @param string $method
-	 * @param array $params
+	 * @param string $method Method name caught by `__call()`.
+	 * @param array $params Arguments given to the above `$method` call.
 	 * @return mixed
 	 */
 	public function __call($method, $params) {
 		if ($model = $this->_model) {
-			$methods = $model::instanceMethods();
 			array_unshift($params, $this);
-
-			if (method_exists($model, $method)) {
-				$class = $model::invokeMethod('_object');
-				return call_user_func_array(array(&$class, $method), $params);
-			}
-			if (isset($methods[$method]) && is_callable($methods[$method])) {
-				return call_user_func_array($methods[$method], $params);
-			}
+			$class = $model::invokeMethod('_object');
+			return call_user_func_array(array(&$class, $method), $params);
 		}
-		$message = "No model bound or unhandled method call `{$method}`.";
+		$message = "No model bound to call `{$method}`.";
 		throw new BadMethodCallException($message);
 	}
 
