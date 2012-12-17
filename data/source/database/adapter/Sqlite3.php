@@ -238,30 +238,6 @@ class Sqlite3 extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * In cases where the query is a raw string (as opposed to a `Query` object), to database must
-	 * determine the correct column names from the result resource.
-	 *
-	 * @param mixed $query
-	 * @param resource $resource
-	 * @param object $context
-	 * @return object
-	 */
-	public function schema($query, $resource = null, $context = null) {
-		if (is_object($query)) {
-			return parent::schema($query, $resource, $context);
-		}
-
-		$result = array();
-		$count = $resource->resource()->columnCount();
-
-		for ($i = 0; $i < $count; $i++) {
-			$meta = $resource->resource()->getColumnMeta($i);
-			$result[] = $meta['name'];
-		}
-		return $result;
-	}
-
-	/**
 	 * Retrieves database error message and error code.
 	 *
 	 * @return array

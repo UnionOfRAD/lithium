@@ -672,8 +672,19 @@ abstract class Database extends \lithium\data\Source {
 	 * @param object $context
 	 */
 	public function schema($query, $resource = null, $context = null) {
-		$query->applyStrategy($this);
-		return $this->_schema($query, $this->_fields($query->fields(), $query));
+		if (is_object($query)) {
+			$query->applyStrategy($this);
+			return $this->_schema($query, $this->_fields($query->fields(), $query));
+		}
+
+		$result = array();
+		$count = $resource->resource()->columnCount();
+
+		for ($i = 0; $i < $count; $i++) {
+			$meta = $resource->resource()->getColumnMeta($i);
+			$result[] = $meta['name'];
+		}
+		return $result;
 	}
 
 	/**
