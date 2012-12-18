@@ -91,7 +91,14 @@ class EntityTest extends \lithium\test\Unit {
 		}));
 		$this->assertEqual('testInstanceMethod', $entity->testInstanceMethod($entity));
 
-		$this->expectException("/^No model bound or unhandled method call `foo`.$/");
+		$this->expectException("/^Unhandled method call `foo`.$/");
+		$entity->foo();
+	}
+
+	public function testMethodDispatchWithNoModel() {
+		$data = array('foo' => true);
+		$entity = new Entity(compact('data'));
+		$this->expectException("/^No model bound to call `foo`.$/");
 		$entity->foo();
 	}
 
