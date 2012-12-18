@@ -463,18 +463,30 @@ abstract class Database extends \lithium\data\Source {
 			switch ($return) {
 				case 'resource':
 					return $result;
+				case 'root':
 				case 'array':
 					$columns = $args['schema'] ?: $self->schema($query, $result);
-					$records = array();
-					if (is_array(reset($columns))) {
-						$columns = reset($columns);
+
+					if (!isset($columns['']) || !is_array($columns[''])) {
+						$columns = array('' => $columns);
 					}
-					while ($data = $result->next()) {
-						// @hack: Fix this to support relationships
-						if (count($columns) != count($data) && is_array(current($columns))) {
-							$columns = current($columns);
+
+					if ($return == 'root') {
+						$columns = array('' => $columns['']);
+					}
+
+					$i = 0;
+					$records = array();
+					foreach ($result as $data) {
+						$offset = 0;
+						$records[$i] = array();
+						foreach ($columns as $path => $cols) {
+							$len = count($cols);
+							$values = array_combine($cols, array_slice($data, $offset, $len));
+							$records[$i] += $path ? array($path => $values) : $values;
+							$offset += $len;
 						}
-						$records[] = array_combine($columns, $data);
+						$i++;
 					}
 					return $records;
 				case 'item':

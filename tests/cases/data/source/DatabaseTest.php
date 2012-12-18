@@ -16,6 +16,7 @@ use lithium\tests\mocks\data\model\MockDatabasePost;
 use lithium\tests\mocks\data\model\MockDatabaseComment;
 use lithium\tests\mocks\data\model\MockDatabaseTagging;
 use lithium\tests\mocks\data\model\MockDatabasePostRevision;
+use lithium\tests\mocks\data\model\mock_database\MockResult;
 
 class DatabaseTest extends \lithium\test\Unit {
 
@@ -42,6 +43,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		$this->db->logs = array();
+		$this->db->return = array();
 	}
 
 	public function testDefaultConfig() {
@@ -1465,6 +1467,83 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $query->export($this->db);
 		$expected = '{ParentOfParent}.{name}, {ParentOfParent}.{id}, {Gallery}.{id}, {Parent}.{id}';
 		$this->assertEqual($expected, $result['fields']);
+	}
+
+	public function testReturnArrayOnReadWithString() {
+		$data = new MockResult(array('records' => array(
+			array ('id', 'int(11)', 'NO', 'PRI', null, 'auto_increment'),
+			array ('name', 'varchar(256)', 'YES', '', null, '')
+		)));
+		$this->db->return = array(
+			'schema' => array('field', 'type', 'null', 'key', 'default', 'extra'),
+			'_execute' => $data
+		);
+		$result = $this->db->read('DESCRIBE {table};', array('return' => 'array'));
+		$expected = array(
+			array(
+				'field' => 'id',
+				'type' => 'int(11)',
+				'null' => 'NO',
+				'key' => 'PRI',
+				'default' => null,
+				'extra' => 'auto_increment',
+			),
+			array(
+				'field' => 'name',
+				'type' => 'varchar(256)',
+				'null' => 'YES',
+				'key' => '',
+				'default' => null,
+				'extra' => '',
+			)
+		);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testReturnArrayOnReadWithQuery() {
+		$data = new MockResult(array('records' => array(array(
+			'1',
+			'2',
+			'Post title',
+			'2012-12-17 17:04:00',
+			'3',
+			'1',
+			'2',
+			'Very good post',
+			'2012-12-17 17:05:00'
+		))));
+		$this->db->return = array(
+			'_execute' => $data
+		);
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $this->_model,
+			'with' => array('MockDatabaseComment')
+		));
+		$result = $this->db->read($query, array('return' => 'array'));
+		$expected = array(array(
+			'id' => '1',
+			'author_id' => '2',
+			'title' => 'Post title',
+			'created' => '2012-12-17 17:04:00',
+			'MockDatabaseComment' => array(
+				'id' => '3',
+				'post_id' => '1',
+				'author_id' => '2',
+				'body' => 'Very good post',
+				'created' => '2012-12-17 17:05:00'
+			)
+		));
+		$this->assertEqual($expected, $result);
+
+		$result = $this->db->read($query, array('return' => 'root'));
+		$expected = array(array(
+			'id' => '1',
+			'author_id' => '2',
+			'title' => 'Post title',
+			'created' => '2012-12-17 17:04:00'
+		));
+		$this->assertEqual($expected, $result);
 	}
 }
 
