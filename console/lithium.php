@@ -34,11 +34,17 @@ $bootstrap = function() use ($working) {
 		throw new ErrorException($message);
 	}
 
+	$resources = sys_get_temp_dir();
+	$templates = $resources . '/tmp/cache/templates/';
+	if (!is_dir($templates)) {
+		mkdir($resources . '/tmp/cache/templates/', 0777, true);
+	}
+
 	lithium\core\Libraries::add('lithium');
 	lithium\core\Libraries::add(basename($working), array(
 		'default' => true,
 		'path' => $working,
-		'resources' => sys_get_temp_dir()
+		'resources' => $resources
 	));
 };
 
