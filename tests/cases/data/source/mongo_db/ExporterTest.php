@@ -757,7 +757,7 @@ class ExporterTest extends \lithium\test\Unit {
 			'accounts' => array(array(
 				'_id' => "4fb6e2dd3e91581fe6e75736",
 				'name' => 'Foo1'
-			),array(
+			), array(
 				'_id' => "4fb6e2df3e91581fe6e75737",
 				'name' => 'Bar1'
 			))
@@ -778,6 +778,24 @@ class ExporterTest extends \lithium\test\Unit {
 		$result = Exporter::get('update', $export);
 		$this->assertTrue(isset($result['update']['accounts'][0]));
 		$this->assertTrue(isset($result['update']['accounts'][1]));
+	}
+
+	public function testEmptyArrayAsDocument() {
+		$schema = new Schema(array('fields' => array(
+			'_id' => array('type' => 'id'),
+			'accounts' => array('type' => 'object', 'array' => true),
+			'accounts.name' => array('type' => 'string')
+		)));
+
+		$data = array(
+			'_id' => '4c8f86167675abfabd970300',
+			'accounts' => array(array())
+		);
+
+		$model = $this->_model;
+
+		$document = new Document(compact('model', 'schema', 'data'));
+		$this->assertTrue($document->accounts[0] instanceof Document);
 	}
 }
 
