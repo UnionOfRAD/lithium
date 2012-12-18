@@ -718,8 +718,8 @@ abstract class Database extends \lithium\data\Source {
 		}
 
 		$unalias = function ($value) {
-			if (!is_string($value)) {
-				return $value;
+			if (is_object($value) && isset($value->scalar)) {
+				$value = $value->scalar;
 			}
 			$aliasing = preg_split("/\s+as\s+/i", $value);
 			return isset($aliasing[1]) ? $aliasing[1] : $value;
