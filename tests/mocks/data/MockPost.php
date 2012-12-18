@@ -8,8 +8,6 @@
 
 namespace lithium\tests\mocks\data;
 
-use lithium\data\Schema;
-
 class MockPost extends \lithium\tests\mocks\data\MockBase {
 
 	public $hasMany = array('MockComment');
