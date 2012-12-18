@@ -67,7 +67,7 @@ class DocumentSchema extends \lithium\data\Schema {
 			$numericArray = !$val || array_keys($val) === range(0, count($val) - 1);
 		}
 
-		if (($isArray && !$isObject) || $numericArray) {
+		if ($isArray || ($numericArray && !$isObject)) {
 			$val = $valIsArray ? $val : array($val);
 			$class = 'set';
 		}
