@@ -98,7 +98,7 @@ class Query extends \lithium\core\Object {
 	protected $_alias = array();
 
 	/**
-	 * Map the generated aliases to their corresponding relation path
+	 * Map beetween generated aliases and corresponding relation paths
 	 *
 	 * @see lithium\data\model\Query::alias()
 	 *
@@ -107,7 +107,16 @@ class Query extends \lithium\core\Object {
 	protected $_paths = array();
 
 	/**
-	 * Map the generated aliases to their corresponding model
+	 * Map beetween relation paths and their corresponding fieldname paths
+	 *
+	 * @see lithium\data\model\Query::alias()
+	 *
+	 * @var array
+	 */
+	protected $_relationNames = array();
+
+	/**
+	 * Map beetween generated aliases and corresponding models.
 	 *
 	 * @see lithium\data\model\Query::alias()
 	 *
@@ -720,15 +729,32 @@ class Query extends \lithium\core\Object {
 		}
 
 		$this->_paths[$alias] = $relpath;
+		$fieldname = array();
 		foreach ($paths as $path) {
 			if (!$relation = $model::relations($path)) {
 				$model = null;
 				break;
 			}
+			$fieldname[] = $relation->fieldName();
 			$model = $relation->to();
 		}
 		$this->_models[$alias] = $model;
+		$this->_relationNames[$relpath] = join('.', $fieldname);
 		return $alias;
+	}
+
+	/**
+	 * Return the relation paths mapped to their corredponding fieldname paths.
+	 *
+	 * @param object $source Instance of the data source (`lithium\data\Source`) to use for
+	 *        conversion.
+	 * @return array Map between relation paths and their corresponding fieldname paths.
+	 */
+	public function relationNames(Source $source = null) {
+		if ($source) {
+			$this->applyStrategy($source);
+		}
+		return $this->_relationNames;
 	}
 
 	/**
@@ -736,7 +762,7 @@ class Query extends \lithium\core\Object {
 	 *
 	 * @param object $source Instance of the data source (`lithium\data\Source`) to use for
 	 *        conversion.
-	 * @return array Map between alias and their corresponding dotted relation
+	 * @return array Map between aliases and their corresponding dotted relation paths.
 	 */
 	public function paths(Source $source = null) {
 		if ($source) {
@@ -750,7 +776,7 @@ class Query extends \lithium\core\Object {
 	 *
 	 * @param object $source Instance of the data source (`lithium\data\Source`) to use for
 	 *        conversion.
-	 * @return array Map between alias and their corresponding model
+	 * @return array Map between aliases and their corresponding fully-namespaced model names.
 	 */
 	public function models(Source $source = null) {
 		if ($source) {
