@@ -183,7 +183,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$options['fields'] = array('id', 'title');
 		$result = $this->db->schema(new Query($options));
 
-		$expected = array($modelName => $options['fields'], 'MockDatabaseComment' => array('id'));
+		$expected = array($modelName => $options['fields']);
 		$this->assertEqual($expected, $result);
 
 		$options['fields'] = array(
@@ -194,7 +194,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
 			$modelName => array('id', 'title'),
-			'MockDatabaseComment' => array('body', 'id')
+			'MockDatabaseComment' => array('body')
 		);
 		$this->assertEqual($expected, $result);
 
@@ -205,7 +205,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
 			$modelName => array('id', 'title'),
-			'MockDatabaseComment' => array('body', 'created', 'id')
+			'MockDatabaseComment' => array('body', 'created')
 		);
 		$this->assertEqual($expected, $result);
 
@@ -1156,6 +1156,9 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$result = $this->db->invokeMethod('_splitFieldname', array('lower(Alias.fieldname)'));
 		$this->assertEqual(array(null, 'lower(Alias.fieldname)'), $result);
+
+		$result = $this->db->invokeMethod('_splitFieldname', array('Alias.*'));
+		$this->assertEqual(array('Alias', '*'), $result);
 	}
 
 	public function testOn() {
@@ -1409,7 +1412,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('Image.ImageTag.Tag')
 		));
 		$result = $query->export($this->db);
-		$expected = '{Gallery}.{id}, {Image}.{id}, {ImageTag}.{id}, {Tag}.{id}';
+		$expected = '{Gallery}.{id}';
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
@@ -1455,7 +1458,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('Parent.Parent')
 		));
 		$result = $query->export($this->db);
-		$expected = '{Parent}.{name}, {Parent}.{id}, {Gallery}.{id}, {Parent__2}.{id}';
+		$expected = '{Parent}.{name}, {Gallery}.{id}';
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
@@ -1464,7 +1467,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('Parent.Parent' => array('alias' => 'ParentOfParent'))
 		));
 		$result = $query->export($this->db);
-		$expected = '{ParentOfParent}.{name}, {ParentOfParent}.{id}, {Gallery}.{id}, {Parent}.{id}';
+		$expected = '{ParentOfParent}.{name}, {Gallery}.{id}, {Parent}.{id}';
 		$this->assertEqual($expected, $result['fields']);
 	}
 
