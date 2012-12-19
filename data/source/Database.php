@@ -716,6 +716,7 @@ abstract class Database extends \lithium\data\Source {
 		$model = $query->model();
 		$paths = $query->paths($this);
 		$models = $query->models($this);
+		$alias = $query->alias();
 		$result = array();
 
 		if (!$model) {
@@ -748,6 +749,8 @@ abstract class Database extends \lithium\data\Source {
 			$raw = array_map($unalias, $fields[0]);
 			unset($fields[0]);
 		}
+
+		$fields = isset($fields[$alias]) ? array($alias => $fields[$alias]) + $fields : $fields;
 
 		foreach ($fields as $field => $value) {
 			if (is_array($value)) {
@@ -920,6 +923,7 @@ abstract class Database extends \lithium\data\Source {
 	public function fields($fields, $context) {
 		$type = $context->type();
 		$schema = $context->schema()->fields();
+		$alias = $context->alias();
 
 		if (!is_array($fields)) {
 			return $this->_fieldsReturn($type, $context, $fields, $schema);
@@ -936,6 +940,8 @@ abstract class Database extends \lithium\data\Source {
 			}
 			unset($fields[0]);
 		}
+
+		$fields = isset($fields[$alias]) ? array($alias => $fields[$alias]) + $fields : $fields;
 
 		foreach ($fields as $field => $value) {
 			if (is_array($value)) {
@@ -984,6 +990,7 @@ abstract class Database extends \lithium\data\Source {
 		}
 		return $list;
 	}
+
 	protected function _fieldsQuote($alias, $field) {
 		$open = $this->_quotes[0];
 		$close = $this->_quotes[1];

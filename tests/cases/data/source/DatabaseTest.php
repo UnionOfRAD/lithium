@@ -1421,7 +1421,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('Image.ImageTag.Tag')
 		));
 		$result = $query->export($this->db);
-		$expected = '{Tag}.{id}, {Gallery}.{id}, {Image}.{id}, {ImageTag}.{id}';
+		$expected = '{Gallery}.{id}, {Tag}.{id}, {Image}.{id}, {ImageTag}.{id}';
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
@@ -1430,7 +1430,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('Image.ImageTag.Tag')
 		));
 		$result = $query->export($this->db);
-		$expected = '{Tag}.*, {Gallery}.{id}, {Image}.{id}, {ImageTag}.{id}';
+		$expected = '{Gallery}.{id}, {Tag}.*, {Image}.{id}, {ImageTag}.{id}';
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
@@ -1439,7 +1439,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('Image.ImageTag.Tag')
 		));
 		$result = $query->export($this->db);
-		$expected = '{Tag}.*, {Gallery}.{id}, {Image}.{id}, {ImageTag}.{id}';
+		$expected = '{Gallery}.{id}, {Tag}.*, {Image}.{id}, {ImageTag}.{id}';
 		$this->assertEqual($expected, $result['fields']);
 	}
 
@@ -1458,7 +1458,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('Parent.Parent')
 		));
 		$result = $query->export($this->db);
-		$expected = '{Parent}.{name}, {Gallery}.{id}';
+		$expected = '{Gallery}.{id}, {Parent}.{name}';
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
@@ -1467,7 +1467,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('Parent.Parent' => array('alias' => 'ParentOfParent'))
 		));
 		$result = $query->export($this->db);
-		$expected = '{ParentOfParent}.{name}, {Gallery}.{id}, {Parent}.{id}';
+		$expected = '{Gallery}.{id}, {ParentOfParent}.{name}, {Parent}.{id}';
 		$this->assertEqual($expected, $result['fields']);
 	}
 
@@ -1501,6 +1501,25 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$result = $this->db->read($query);
 		$this->assertEqual($expected, $this->db->sql);
+		$this->assertEqual($map, $query->map());
+
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $this->_gallery,
+			'fields' => array('count(Image.id) as count', 'Image'),
+			'group' => 'Gallery.id',
+			'with' => array('Image')
+		));
+		$result = $this->db->read($query);
+		$expected = 'SELECT count(Image.id) as count, {Gallery}.{id}, {Image}.* FROM ';
+		$expected .= '{mock_gallery} AS {Gallery} LEFT JOIN {mock_image} AS {Image} ON ';
+		$expected .= '{Gallery}.{id} = {Image}.{gallery_id} GROUP BY Gallery.id;';
+
+		$this->assertEqual($expected, $this->db->sql);
+		$map = array(
+			'' => array('count', 'id'),
+			'Image' => array('id', 'title', 'image', 'gallery_id')
+		);
 		$this->assertEqual($map, $query->map());
 	}
 

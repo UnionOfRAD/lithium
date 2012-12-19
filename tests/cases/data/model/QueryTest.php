@@ -677,7 +677,7 @@ class QueryTest extends \lithium\test\Unit {
 			'alias' => 'AS {MyAlias}',
 			'comment' => '/* No comment */',
 			'conditions' => 'WHERE {MyAlias}.{id} = 2',
-			'fields' => '{Tag}.*, {MyAlias}.{id}, {Image}.{id}, {ImageTag}.{id}',
+			'fields' => '{MyAlias}.{id}, {Tag}.*, {Image}.{id}, {ImageTag}.{id}',
 			'having' => '',
 			'group' => null,
 			'order' => null,
