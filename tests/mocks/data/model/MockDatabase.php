@@ -41,6 +41,8 @@ class MockDatabase extends \lithium\data\source\Database {
 
 	public $log = false;
 
+	public $return = array();
+
 	protected $_quotes = array('{', '}');
 
 	public function __construct(array $config = array()) {
@@ -94,7 +96,17 @@ class MockDatabase extends \lithium\data\source\Database {
 		if ($this->log) {
 			$this->logs[] = $sql;
 		}
+		if (isset($this->return['_execute'])) {
+			return $this->return['_execute'];
+		}
 		return new MockResult();
+	}
+
+	public function schema($query, $resource = null, $context = null) {
+		if (isset($this->return['schema'])) {
+			return $this->return['schema'];
+		}
+		return parent::schema($query, $resource = null, $context = null);
 	}
 
 	protected function _insertId($query) {
