@@ -465,18 +465,30 @@ abstract class Database extends \lithium\data\Source {
 					return $result;
 				case 'array':
 					$columns = $args['schema'] ?: $self->schema($query, $result);
+
+					if (!isset($columns['']) || !is_array($columns[''])) {
+						$columns = array('' => $columns);
+					}
+
+					$relationNames = is_object($query) ? $query->relationNames($self) : array();
+					$i = 0;
 					$records = array();
-					if (is_array(reset($columns))) {
-						$columns = reset($columns);
-					}
-					while ($data = $result->next()) {
-						// @hack: Fix this to support relationships
-						if (count($columns) != count($data) && is_array(current($columns))) {
-							$columns = current($columns);
+					foreach ($result as $data) {
+						$offset = 0;
+						$records[$i] = array();
+						foreach ($columns as $path => $cols) {
+							$len = count($cols);
+							$values = array_combine($cols, array_slice($data, $offset, $len));
+							if ($path) {
+								$records[$i][$relationNames[$path]] = $values;
+							} else {
+								$records[$i] += $values;
+							}
+							$offset += $len;
 						}
-						$records[] = array_combine($columns, $data);
+						$i++;
 					}
-					return $records;
+					return Set::expand($records);
 				case 'item':
 					return $self->item($query->model(), array(), compact('query', 'result') + array(
 						'class' => 'set'
