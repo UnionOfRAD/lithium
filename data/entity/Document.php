@@ -137,6 +137,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 					'class' => 'set',
 					'schema' => $this->schema(),
 					'pathKey' => $this->_pathKey ? $this->_pathKey . '.' . $name : $name,
+					'parent' => $this,
 					'model' => $this->_model
 				));
 				return $this->_updated[$name];
@@ -319,7 +320,8 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			if ($cast) {
 				$pathKey = $this->_pathKey;
 				$model = $this->_model;
-				$val = $schema->cast($this, $key, $val, compact('pathKey', 'model'));
+				$parent = $this;
+				$val = $schema->cast($this, $key, $val, compact('pathKey', 'model', 'parent'));
 			}
 			if ($val instanceof self) {
 				$val->_exists = $options['init'] && $this->_exists;

@@ -252,6 +252,11 @@ class MySqlTest extends \lithium\test\Unit {
 			'modified' => array('type' => 'datetime', 'null' => true, 'default' => null)
 		);
 		$this->assertEqual($expected, $result);
+
+		unset($expected['name']);
+		unset($expected['modified']);
+		$result = $this->db->describe('companies', $expected)->fields();
+		$this->assertEqual($expected, $result);
 	}
 }
 

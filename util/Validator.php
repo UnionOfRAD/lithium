@@ -273,7 +273,8 @@ class Validator extends \lithium\core\StaticObject {
 			},
 			'inList' => function($value, $format, $options) {
 				$options += array('list' => array());
-				return in_array($value, $options['list']);
+				$strict = is_bool($value) || $value === '';
+				return in_array($value, $options['list'], $strict);
 			},
 			'lengthBetween' => function($value, $format, $options) {
 				$length = strlen($value);
@@ -308,11 +309,11 @@ class Validator extends \lithium\core\StaticObject {
 				}
 				switch (true) {
 					case (!is_null($options['upper']) && !is_null($options['lower'])):
-						return ($value > $options['lower'] && $value < $options['upper']);
+						return ($value >= $options['lower'] && $value <= $options['upper']);
 					case (!is_null($options['upper'])):
-						return ($value < $options['upper']);
+						return ($value <= $options['upper']);
 					case (!is_null($options['lower'])):
-						return ($value > $options['lower']);
+						return ($value >= $options['lower']);
 				}
 				return is_finite($value);
 			},

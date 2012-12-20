@@ -414,6 +414,28 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isInList('one', null, array('list' => array('one', 'two'))));
 		$this->assertTrue(Validator::isInList('two', null, array('list' => array('one', 'two'))));
 		$this->assertFalse(Validator::isInList('3', null, array('list' => array('one', 'two'))));
+
+		$this->assertFalse(Validator::isInList('', null, array('list' => array('0', '1'))));
+		$this->assertFalse(Validator::isInList(null, null, array('list' => array('0', '1'))));
+		$this->assertFalse(Validator::isInList(false, null, array('list' => array('0', '1'))));
+		$this->assertFalse(Validator::isInList(true, null, array('list' => array('0', '1'))));
+
+		$this->assertFalse(Validator::isInList('', null, array('list' => array(0, 1))));
+		$this->assertFalse(Validator::isInList(null, null, array('list' => array(0, 1))));
+		$this->assertFalse(Validator::isInList(false, null, array('list' => array(0, 1))));
+		$this->assertFalse(Validator::isInList(true, null, array('list' => array(0, 1))));
+		$this->assertTrue(Validator::isInList(0, null, array('list' => array(0, 1))));
+		$this->assertTrue(Validator::isInList(1, null, array('list' => array(0, 1))));
+		$this->assertFalse(Validator::isInList(2, null, array('list' => array(0, 1))));
+
+		$this->assertTrue(Validator::isInList(0, null, array('list' => array('0', '1'))));
+		$this->assertTrue(Validator::isInList('1', null, array('list' => array('0', '1'))));
+
+		$this->assertTrue(Validator::isInList(1, null, array('list' => array('0', '1'))));
+		$this->assertTrue(Validator::isInList('1', null, array('list' => array('0', '1'))));
+
+		$this->assertFalse(Validator::isInList(2, null, array('list' => array('0', '1'))));
+		$this->assertFalse(Validator::isInList('2', null, array('list' => array('0', '1'))));
 	}
 
 
@@ -1069,21 +1091,33 @@ class ValidatorTest extends \lithium\test\Unit {
 	}
 
 	public function testIsInRange() {
-		$value = 5;
 		$lower = 1;
 		$upper = 10;
-		$result = Validator::isInRange($value, null, compact('lower', 'upper'));
-		$this->assertTrue($result);
 
 		$value = 0;
 		$result = Validator::isInRange($value, null, compact('lower', 'upper'));
 		$this->assertFalse($result);
+
+		$value = 1;
+		$result = Validator::isInRange($value, null, compact('lower', 'upper'));
+		$this->assertTrue($result);
+
+		$value = 5;
+		$result = Validator::isInRange($value, null, compact('lower', 'upper'));
+		$this->assertTrue($result);
+
+		$value = 10;
+		$result = Validator::isInRange($value, null, compact('lower', 'upper'));
+		$this->assertTrue($result);
 
 		$value = 11;
 		$result = Validator::isInRange($value, null, compact('lower', 'upper'));
 		$this->assertFalse($result);
 
 		$result = Validator::isInRange(-1, null, array('upper' => 1));
+		$this->assertTrue($result);
+
+		$result = Validator::isInRange(1, null, array('upper' => 1));
 		$this->assertTrue($result);
 
 		$result = Validator::isInRange(2, null, array('upper' => 1));
@@ -1093,6 +1127,9 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$result = Validator::isInRange(1, null, array('lower' => 1));
+		$this->assertTrue($result);
+
+		$result = Validator::isInRange(0, null, array('lower' => 1));
 		$this->assertFalse($result);
 
 		$this->assertTrue(Validator::isInRange(0));

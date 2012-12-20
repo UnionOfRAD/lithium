@@ -165,7 +165,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @param mixed $entity Specifies the table name for which the schema should be returned, or
 	 *        the class name of the model object requesting the schema, in which case the model
 	 *        class will be queried for the correct table name.
-	 * @param array $schema Any schema data pre-defined by the model.
+	 * @param array $fields Any schema data pre-defined by the model.
 	 * @param array $meta
 	 * @return array Returns an associative array describing the given table's schema, where the
 	 *         array keys are the available fields, and the values are arrays describing each
@@ -173,12 +173,15 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *         - `'type'`: The field type name
 	 * @filter This method can be filtered.
 	 */
-	public function describe($entity, $schema = array(), array $meta = array()) {
+	public function describe($entity, $fields = array(), array $meta = array()) {
 		$schema = $this->_config['schema'];
-		$params = compact('entity', 'meta', 'schema');
+		$params = compact('entity', 'meta', 'fields', 'schema');
 		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			extract($params);
 
+			if ($fields) {
+				return $self->invokeMethod('_instance', array('schema', compact('fields')));
+			}
 			$name = $self->connection->quote($self->invokeMethod('_entityName', array($entity)));
 			$schema = $self->connection->quote($schema);
 
@@ -269,30 +272,6 @@ class PostgreSql extends \lithium\data\source\Database {
 			return $result;
 		}
 		return $this->connection->quote((string) $value);
-	}
-
-	/**
-	 * In cases where the query is a raw string (as opposed to a `Query` object), to database must
-	 * determine the correct column names from the result resource.
-	 *
-	 * @param mixed $query
-	 * @param resource $resource
-	 * @param object $context
-	 * @return array
-	 */
-	public function schema($query, $resource = null, $context = null) {
-		if (is_object($query)) {
-			return parent::schema($query, $resource, $context);
-		}
-
-		$result = array();
-		$count = $resource->resource()->columnCount();
-
-		for ($i = 0; $i < $count; $i++) {
-			$meta = $resource->resource()->getColumnMeta($i);
-			$result[] = $meta['name'];
-		}
-		return $result;
 	}
 
 	/**

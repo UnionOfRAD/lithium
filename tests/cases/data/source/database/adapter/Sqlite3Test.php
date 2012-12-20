@@ -133,6 +133,18 @@ class Sqlite3Test extends \lithium\test\Unit {
 			)
 		);
 		$this->assertEqual($expected, $result->fields());
+
+		$expected = array(
+			'bar' => array(
+				'type' => 'string',
+				'length' => '20',
+				'null' => true,
+				'default' => 'foo'
+			)
+		);
+		$result = $this->db->describe('companies', $expected)->fields();
+		$this->assertEqual($expected, $result);
+
 		$this->db->read('DROP TABLE [foo];');
 	}
 

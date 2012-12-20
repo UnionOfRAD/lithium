@@ -8,6 +8,7 @@
 
 namespace lithium\data;
 
+use lithium\core\Libraries;
 use lithium\util\Set;
 use lithium\util\Inflector;
 use lithium\core\ConfigException;
@@ -134,7 +135,7 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * List of initialized instances.
 	 *
-	 * @see lithium\data\Model::_init();
+	 * @see lithium\data\Model::_initialize();
 	 * @var array
 	 */
 	protected static $_initialized = array();
@@ -151,7 +152,7 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * @var array
 	 */
-	protected static $_classes = array(
+	protected $_classes = array(
 		'connections' => 'lithium\data\Connections',
 		'query'       => 'lithium\data\model\Query',
 		'validator'   => 'lithium\util\Validator',
@@ -324,7 +325,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @see lithium\data\Model::config()
 	 * @var array
 	 */
-	protected static $_autoConfig = array(
+	protected $_autoConfig = array(
 		'meta',
 		'finders',
 		'query',
@@ -355,7 +356,7 @@ class Model extends \lithium\core\StaticObject {
 		}
 		$self = static::$_instances[$class];
 
-		foreach (static::$_autoConfig as $key) {
+		foreach ($self->_autoConfig as $key) {
 			if (isset($config[$key])) {
 				$_key = "_{$key}";
 				$val = $config[$key];
@@ -375,7 +376,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @param string $class The fully-namespaced class name to initialize.
 	 * @return object Returns the initialized model instance.
 	 */
-	protected static function _init($class) {
+	protected static function _initialize($class) {
 		$self = static::$_instances[$class];
 
 		if (isset(static::$_initialized[$class]) && static::$_initialized[$class]) {
@@ -388,13 +389,13 @@ class Model extends \lithium\core\StaticObject {
 		$meta    = array();
 		$schema  = array();
 		$source  = array();
-		$classes = static::$_classes;
+		$classes = $self->_classes;
 		$initializers = array();
 
 		foreach (static::_parents() as $parent) {
 			$parentConfig = get_class_vars($parent);
 
-			foreach (static::$_autoConfig as $key) {
+			foreach ($self->_autoConfig as $key) {
 				if (isset($parentConfig["_{$key}"])) {
 					$val = $parentConfig["_{$key}"];
 					${$key} = is_array($val) ? ${$key} + $val : $val;
@@ -412,14 +413,11 @@ class Model extends \lithium\core\StaticObject {
 			$conn = $classes['connections']::get($tmp['connection']);
 			$source = (($conn) ? $conn->configureClass($class) : array()) + $source;
 		}
-		static::$_classes = $classes;
+		$self->_classes = $classes;
 
 		$local = compact('class') + $self->_meta;
 		$self->_meta = ($local + $source['meta'] + $meta);
 
-		if (is_object($schema)) {
-			$schema = $schema->fields();
-		}
 		$self->_initializers += array(
 			'name' => function($self) {
 				return basename(str_replace('\\', '/', $self));
@@ -434,11 +432,35 @@ class Model extends \lithium\core\StaticObject {
 			}
 		);
 
-		$self->schema()->append($schema + $source['schema']);
+		if (is_object($self->_schema)) {
+			$self->_schema->append($source['schema']);
+		} elseif (is_array($self->_schema)) {
+			$self->_schema = $self->_schema + $source['schema'];
+		} else {
+			$self->_schema = $source['schema'];
+		}
+
 		$self->_finders += $source['finders'] + $self->_findFilters();
 
 		static::_relationsToLoad();
 		return $self;
+	}
+
+	/**
+	 * Returns an instance of a class with given `config`. The `name` could be a key from the
+	 * `classes` array, a fully-namespaced class name, or an object. Typically this method is used
+	 * in `_init` to create the dependencies used in the current class.
+	 *
+	 * @param string|object $name A `classes` alias or fully-namespaced class name.
+	 * @param array $options The configuration passed to the constructor.
+	 * @return object
+	 */
+	protected static function _instance($name, array $options = array()) {
+		$self = static::_object();
+		if (is_string($name) && isset($self->_classes[$name])) {
+			$name = $self->_classes[$name];
+		}
+		return Libraries::instance(null, $name, $options);
 	}
 
 	/**
@@ -481,6 +503,24 @@ class Model extends \lithium\core\StaticObject {
 		$conditions = array($field => array_shift($params));
 		$params = (isset($params[0]) && count($params) == 1) ? $params[0] : $params;
 		return $self::find($type, compact('conditions') + $params);
+	}
+
+	/**
+	 * Magic method that allows calling `Model::_instanceMethods`'s closure like normal methods
+	 * on the model instance.
+	 *
+	 * @see lithium\data\Model::instanceMethods
+	 * @param string $method Method name caught by `__call()`.
+	 * @param array $params Arguments given to the above `$method` call.
+	 * @return mixed
+	 */
+	public function __call($method, $params) {
+		$methods = static::instanceMethods();
+		if (isset($methods[$method]) && is_callable($methods[$method])) {
+			return call_user_func_array($methods[$method], $params);
+		}
+		$message = "Unhandled method call `{$method}`.";
+		throw new BadMethodCallException($message);
 	}
 
 	/**
@@ -660,9 +700,11 @@ class Model extends \lithium\core\StaticObject {
 			return $key;
 		}
 
+		$self = static::_object();
+		$entity = $self->_classes['entity'];
 		if (is_object($values) && is_string($key)) {
-			return static::_key($key, $values);
-		} elseif ($values instanceof static::$_classes['entity']) {
+			return static::_key($key, $values, $entity);
+		} elseif ($values instanceof $entity) {
 			$values = $values->to('array');
 		}
 
@@ -687,13 +729,14 @@ class Model extends \lithium\core\StaticObject {
 	 * @see lithium\data\Model::key()
 	 * @param string $key The key
 	 * @param object $values Object with attributes.
+	 * @param string $entity The fully-namespaced entity class name.
 	 * @return mixed The key value array or `null` if the `$values` object has no attribute
 	 *         named `$key`
 	 */
-	protected static function _key($key, $values) {
+	protected static function _key($key, $values, $entity) {
 		if (isset($values->$key)) {
 			return array($key => $values->$key);
-		} elseif (!$values instanceof static::$_classes['entity']) {
+		} elseif (!$values instanceof $entity) {
 			return array($key => $values);
 		}
 		return null;
@@ -804,7 +847,7 @@ class Model extends \lithium\core\StaticObject {
 
 		if (!is_object($self->_schema)) {
 			$self->_schema = static::connection()->describe(
-				$self::meta('source'), $self->_schema, $self::meta()
+				$self::meta('source'), $self->_schema, $self->_meta
 			);
 			if (!is_object($self->_schema)) {
 				$class = get_called_class();
@@ -982,7 +1025,7 @@ class Model extends \lithium\core\StaticObject {
 	public function save($entity, $data = null, array $options = array()) {
 		$self = static::_object();
 		$_meta = array('model' => get_called_class()) + $self->_meta;
-		$_schema = $self->_schema;
+		$_schema = $self->schema();
 
 		$defaults = array(
 			'validate' => true,
@@ -1076,7 +1119,7 @@ class Model extends \lithium\core\StaticObject {
 		);
 		$options += $defaults;
 		$self = static::_object();
-		$validator = static::$_classes['validator'];
+		$validator = $self->_classes['validator'];
 		$params = compact('entity', 'options');
 
 		$filter = function($parent, $params) use (&$self, $validator) {
@@ -1175,7 +1218,7 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function &connection() {
 		$self = static::_object();
-		$connections = static::$_classes['connections'];
+		$connections = $self->_classes['connections'];
 		$name = isset($self->_meta['connection']) ? $self->_meta['connection'] : null;
 
 		if ($conn = $connections::get($name)) {
@@ -1233,7 +1276,7 @@ class Model extends \lithium\core\StaticObject {
 			static::$_instances[$class] = new $class();
 			static::config();
 		}
-		$object = static::_init($class);
+		$object = static::_initialize($class);
 		return $object;
 	}
 

@@ -633,6 +633,27 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $query->models($this->db));
 	}
 
+	public function testRelationNames() {
+		$model = 'lithium\tests\mocks\data\model\MockQueryPost';
+		$query = new Query(compact('model'));
+		$query->alias(null, 'MockQueryComment');
+
+		$expected = array(
+			'MockQueryComment' => 'mock_query_comments'
+		);
+		$this->assertEqual($expected, $query->relationNames($this->db));
+
+		$query->alias('Post');
+		$query->alias('Comment', 'MockQueryComment');
+		$query->alias('Post2', 'MockQueryComment.MockQueryPost');
+
+		$expected = array(
+			'MockQueryComment' => 'mock_query_comments',
+			'MockQueryComment.MockQueryPost' => 'mock_query_comments.mock_query_post'
+		);
+		$this->assertEqual($expected, $query->relationNames($this->db));
+	}
+
 	public function testExportWithJoinedStrategy() {
 		$query = new Query(array(
 			'alias' => 'MyAlias',
@@ -656,7 +677,7 @@ class QueryTest extends \lithium\test\Unit {
 			'alias' => 'AS {MyAlias}',
 			'comment' => '/* No comment */',
 			'conditions' => 'WHERE {MyAlias}.{id} = 2',
-			'fields' => '{Tag}.*, {MyAlias}.{id}, {Image}.{id}, {ImageTag}.{id}',
+			'fields' => '{MyAlias}.{id}, {Tag}.*, {Image}.{id}, {ImageTag}.{id}',
 			'having' => '',
 			'group' => null,
 			'order' => null,

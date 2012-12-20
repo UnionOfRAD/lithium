@@ -175,6 +175,12 @@ class RequestTest extends \lithium\test\Unit {
 		$result = $request->params;
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testTemporaryFileStructureExists() {
+		$resources = Libraries::get(true, 'resources');
+		$template = $resources . '/tmp/cache/templates/';
+		$this->assert(is_dir($template));
+	}
 }
 
 ?>
