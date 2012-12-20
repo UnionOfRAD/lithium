@@ -62,34 +62,119 @@ use Reflection;
 class Mocker {
 
 	/**
-	 * A list of code to be generated based on the type.
+	 * A list of code to be generated for the delegator.
+	 * 
+	 * The MockDelgate directly extends the mocker and makes all methods
+	 * publically available to other classes but should not be accessed directly
+	 * by any other application. This should be called only by the mocker and
+	 * the mockee and never by the consumer.
 	 *
 	 * @var array
 	 */
-	protected static $_dynamicCode = array(
+	protected static $_mockDelegateIngredients = array(
 		'startClass' => array(
 			'namespace {:namespace};',
-			'class {:mockee} extends \{:mocker} {'
+			'class MockDelegate extends \{:mocker} {'
+		),
+		'constructor' => array(
+			'{:modifiers} function __construct({:args}) {',
+			'    $args = func_get_args();',
+			'    $this->parent = array_pop($args);',
+			'    $this->parent->mocker = $this;',
+			'    call_user_func_array("parent::__construct", $args);',
+			'}',
+		),
+		'method' => array(
+			'{:modifiers} function {:method}({:args}) {',
+			'    $args = func_get_args();',
+			'    $token = spl_object_hash($this);',
+			'    $id = count($args) - 1;',
+			'    if (!isset($args[$id]) || $args[$id] !== $token) {',
+			'        $method = array($this->parent, "{:method}");',
+			'        return call_user_func_array($method, $args);',
+			'    }',
+			'    array_pop($args);',
+			'    return call_user_func_array("parent::{:method}", $args);',
+			'}',
 		),
 		'staticMethod' => array(
-			'{:modifiers} function {:name}({:params}) {',
-			'    $params = func_get_args();',
-			'    list($class, $method) = explode(\'::\', __METHOD__, 2);',
-			'    $parent = \'parent::\' . $method;',
-			'    $result = call_user_func_array($parent, $params);',
-			'    return self::_filter($method, $params, function($self, $params) use(&$result) {',
-			'       return $result;',
+			'{:modifiers} function {:method}({:args}) {',
+			'    $args = func_get_args();',
+			'    $token = "1f3870be274f6c49b3e31a0c6728957f";',
+			'    $id = count($args) - 1;',
+			'    if (!isset($args[$id]) || $args[$id] !== $token) {',
+			'        $method = \'{:namespace}\Mock::{:method}\';',
+			'        return call_user_func_array($method, $args);',
+			'    }',
+			'    array_pop($args);',
+			'    return call_user_func_array("parent::{:method}", $args);',
+			'}',
+		),
+		'endClass' => array(
+			'}',
+		),
+	);
+
+	/**
+	 * A list of code to be generated for the mocker.
+	 *
+	 * The Mock class directly extends the mock class but only directly
+	 * interacts with the MockDelegate directly. This class is the actual
+	 * interface for consumers, instantiation or static method calls, and can
+	 * have most of its methods filtered.
+	 *
+	 * @var array
+	 */
+	protected static $_mockIngredients = array(
+		'startClass' => array(
+			'namespace {:namespace};',
+			'class Mock extends \{:mocker} {',
+			'    public $mocker;',
+			'    protected $_safeVars = array(',
+			'        "_classes",',
+			'        "_methodFilters",',
+			'        "mocker",',
+			'        "_safeVars"',
+			'    );',
+		),
+		'get' => array(
+			'public function __get($key) {',
+			'    return $this->mocker->$key;',
+			'}',
+		),
+		'constructor' => array(
+			'{:modifiers} function __construct({:args}) {',
+			'    $args = array_values(get_defined_vars());',
+			'    array_push($args, $this);',
+			'    foreach ($this as $key => $value) {',
+			'        if (!in_array($key, $this->_safeVars)) {',
+			'            unset($this->$key);',
+			'        }',
+			'    }',
+			'    $class = new \ReflectionClass(\'{:namespace}\MockDelegate\');',
+			'    $class->newInstanceArgs($args);',
+			'}',
+		),
+		'destructor' => array(
+			'public function __destruct() {}',
+		),
+		'staticMethod' => array(
+			'{:modifiers} function {:method}({:args}) {',
+			'    $args = func_get_args();',
+			'    array_push($args, "1f3870be274f6c49b3e31a0c6728957f");',
+			'    $method = \'{:namespace}\MockDelegate::{:method}\';',
+			'    return self::_filter("{:method}", $args, function($self, $args) use(&$method) {',
+			'        return call_user_func_array($method, $args);',
 			'    });',
 			'}',
 		),
 		'method' => array(
-			'{:modifiers} function {:name}({:params}) {',
-			'    $params = func_get_args();',
-			'    list($class, $method) = explode(\'::\', __METHOD__, 2);',
-			'    $parent = \'parent::\' . $method;',
-			'    $result = call_user_func_array($parent, $params);',
-			'    return $this->_filter($parent, $params, function($self, $params) use(&$result) {',
-			'        return $result;',
+			'{:modifiers} function {:method}({:args}) {',
+			'    $args = func_get_args();',
+			'    array_push($args, spl_object_hash($this->mocker));',
+			'    $method = array($this->mocker, "{:method}");',
+			'    return $this->_filter(__METHOD__, $args, function($self, $args) use(&$method) {',
+			'        return call_user_func_array($method, $args);',
 			'    });',
 			'}',
 		),
@@ -104,12 +189,11 @@ class Mocker {
 	 * @var array
 	 */
 	protected static $_blackList = array(
-		'__construct', '__destruct', '__call', '__callStatic',
+		'__destruct', '__call', '__callStatic', '_parents',
 		'__get', '__set', '__isset', '__unset', '__sleep',
 		'__wakeup', '__toString', '__clone', '__invoke',
-		'__construct', '_init', 'applyFilter', 'invokeMethod',
-		'__set_state', '_instance', '_filter', '_parents',
-		'_stop',
+		'_stop', '_init', 'applyFilter', 'invokeMethod',
+		'__set_state', '_instance', '_filter',
 	);
 
 	/**
@@ -134,29 +218,38 @@ class Mocker {
 
 		$mocker = self::_mocker($mockee);
 
-		$code = self::_dynamicCode('startClass', array(
+		$tokens = array(
 			'namespace' => self::_namespace($mockee),
 			'mocker' => $mocker,
-			'mockee' => 'Mock',
-		));
+			'mockee' => 'MockDelegate',
+		);
+		$mockDelegate = self::_dynamicCode('mockDelegate', 'startClass', $tokens);
+		$mock = self::_dynamicCode('mock', 'startClass', $tokens);
 
 		$reflectedClass = new ReflectionClass($mocker);
 		$reflecedMethods = $reflectedClass->getMethods();
 		foreach ($reflecedMethods as $method) {
 			if (!in_array($method->name, self::$_blackList)) {
 				$key = $method->isStatic() ? 'staticMethod' : 'method';
-				$code .= self::_dynamicCode($key, array(
-					'name' => $method->name,
+				$key = $method->name === '__construct' ? 'constructor' : $key;
+				$tokens = array(
+					'namespace' => self::_namespace($mockee),
+					'method' => $method->name,
 					'modifiers' => self::_methodModifiers($method),
-					'params' => self::_methodParams($method),
-					'visibility' => 'public',
-				));
+					'args' => self::_methodParams($method),
+					'mocker' => $mocker,
+				);
+				$mockDelegate .= self::_dynamicCode('mockDelegate', $key, $tokens);
+				$mock .= self::_dynamicCode('mock', $key, $tokens);
 			}
 		}
 
-		$code .= self::_dynamicCode('endClass');
+		$mockDelegate .= self::_dynamicCode('mockDelegate', 'endClass');
+		$mock .= self::_dynamicCode('mock', 'get');
+		$mock .= self::_dynamicCode('mock', 'destructor');
+		$mock .= self::_dynamicCode('mock', 'endClass');
 
-		eval($code);
+		eval($mockDelegate . $mock);
 	}
 
 	/**
@@ -170,7 +263,8 @@ class Mocker {
 	protected static function _methodModifiers(ReflectionMethod $method) {
 		$modifierKey = $method->getModifiers();
 		$modifierArray = Reflection::getModifierNames($modifierKey);
-		return implode(' ', $modifierArray);
+		$modifiers = implode(' ', $modifierArray);
+		return str_replace(array('private', 'protected'), 'public', $modifiers);
 	}
 
 	/**
@@ -195,12 +289,16 @@ class Mocker {
 	/**
 	 * Will generate the code you are wanting.
 	 *
-	 * @param  string $key    The key from self::$_dynamicCode
+	 * This pulls from $_mockDelegateIngredients and $_mockIngredients.
+	 *
+	 * @param  string $type   The name of the array of ingredients to use
+	 * @param  string $key    The key from the array of ingredients
 	 * @param  array  $tokens Tokens, if any, that should be inserted
 	 * @return string
 	 */
-	protected static function _dynamicCode($key, $tokens = array()) {
-		$code = implode("\n", self::$_dynamicCode[$key]);
+	protected static function _dynamicCode($type, $key, $tokens = array()) {
+		$name = '_' . $type . 'Ingredients';
+		$code = implode("\n", self::${$name}[$key]);
 		return String::insert($code, $tokens) . "\n";
 	}
 
