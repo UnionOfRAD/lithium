@@ -14,7 +14,50 @@ use ReflectionMethod;
 use Reflection;
 
 /**
- * The Mocker class aids in the creation of Mocks on the fly.
+ * The Mocker class aids in the creation of Mocks on the fly, allowing you to
+ * use Lithium filters on most methods in the class.
+ * 
+ * To enable the autoloading of mocks you simply need to make a simple method
+ * call.
+ * {{{
+ * use lithium\core\Environment;
+ * use lithium\test\Mocker;
+ * if(!Environment::is('production')) {
+ * 	Mocker::register();
+ * }
+ * }}}
+ * 
+ * You can also enable autoloading inside the setup of a unit test class. This
+ * method can be called redundantly.
+ * {{{
+ * use lithium\test\Mocker;
+ * class MockerTest extends \lithium\test\Unit {
+ * 	public function setUp() {
+ * 		Mocker::register();
+ * 	}
+ * }
+ * }}}
+ * 
+ * Using Mocker is the fun magical part, it's autoloaded so simply call the
+ * class you want to mock with the '\Mock' at the end. The autoloader will
+ * detect you want to autoload it, and create it for you. Now you can filter
+ * any method.
+ * {{{
+ * use lithium\console\dispatcher\Mock as DispatcherMock;
+ * $dispatcher = new DispatcherMock();
+ * $dispatcher->applyFilter('config', function($self, $params, $chain) {
+ * 	return array();
+ * });
+ * $results = $dispatcher->config();
+ * }}}
+ * {{{
+ * use lithium\analysis\parser\Mock as ParserMock;
+ * $code = 'echo "foobar";';
+ * ParserMock::applyFilter('config', function($self, $params, $chain) {
+ * 	return array();
+ * });
+ * $tokens = ParserMock::tokenize($code, array('wrap' => true));
+ * }}}
  */
 class Mocker {
 
