@@ -1506,7 +1506,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$query = new Query(array(
 			'type' => 'read',
 			'model' => $this->_gallery,
-			'fields' => array('count(Image.id) as count', 'Image'),
+			'fields' => array((object) 'count(Image.id) as count', 'Image'),
 			'group' => 'Gallery.id',
 			'with' => array('Image')
 		));
