@@ -8,7 +8,6 @@
 
 namespace lithium\data\source;
 
-use Mongo;
 use MongoCode;
 use MongoRegex;
 use lithium\util\Inflector;
@@ -65,7 +64,8 @@ class MongoDb extends \lithium\data\Source {
 		'result'       => 'lithium\data\source\mongo_db\Result',
 		'schema'       => 'lithium\data\source\mongo_db\Schema',
 		'exporter'     => 'lithium\data\source\mongo_db\Exporter',
-		'relationship' => 'lithium\data\model\Relationship'
+		'relationship' => 'lithium\data\model\Relationship',
+		'server'       => 'Mongo'
 	);
 
 	/**
@@ -137,8 +137,12 @@ class MongoDb extends \lithium\data\Source {
 	 *          information for a model class. See the `$_schema` property for more information.
 	 *        - `'gridPrefix'` _string_: The default prefix for MongoDB's `chunks` and `files`
 	 *          collections. Defaults to `'fs'`.
-	 *        - `'replicaSet'` _boolean_: See the documentation for `Mongo::__construct()`. Defaults
+	 *        - `'replicaSet'` _string_: See the documentation for `Mongo::__construct()`. Defaults
 	 *          to `false`.
+	 *        - `'readPreference'` _mixed_: May either be a single value such as Mongo::RP_NEAREST,
+	 *          or an array containing a read preference and a tag set such as:
+	 *          array(Mongo::RP_SECONDARY_PREFERRED, array('dc' => 'east) See the documentation for
+	 *          `Mongo::setReadPreference()`. Defaults to null.
 	 *
 	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
 	 * list of active connections.
@@ -146,8 +150,9 @@ class MongoDb extends \lithium\data\Source {
 	public function __construct(array $config = array()) {
 		$host = 'localhost:27017';
 
-		if (class_exists('Mongo', false)) {
-			$host = Mongo::DEFAULT_HOST . ':' . Mongo::DEFAULT_PORT;
+		$server = $this->_classes['server'];
+		if (class_exists($server, false)) {
+			$host = $server::DEFAULT_HOST . ':' . $server::DEFAULT_PORT;
 		}
 		$defaults = compact('host') + array(
 			'persistent' => false,
@@ -157,7 +162,9 @@ class MongoDb extends \lithium\data\Source {
 			'timeout'    => 100,
 			'replicaSet' => false,
 			'schema'     => null,
-			'gridPrefix' => 'fs'
+			'gridPrefix' => 'fs',
+			'safe'       => false,
+			'readPreference' => null
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -248,10 +255,16 @@ class MongoDb extends \lithium\data\Source {
 			if ($persist = $cfg['persistent']) {
 				$options['persist'] = $persist === true ? 'default' : $persist;
 			}
-			$this->server = new Mongo($connection, $options);
+			$server = $this->_classes['server'];
+			$this->server = new $server($connection, $options);
 
 			if ($this->connection = $this->server->{$cfg['database']}) {
 				$this->_isConnected = true;
+			}
+
+			if ($prefs = $cfg['readPreference']) {
+				$prefs = !is_array($prefs) ? array($prefs, array()) : $prefs;
+				$this->server->setReadPreference($prefs[0], $prefs[1]);
 			}
 		} catch (Exception $e) {
 			throw new NetworkException("Could not connect to the database.", 503, $e);
@@ -361,12 +374,12 @@ class MongoDb extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function create($query, array $options = array()) {
-		$defaults = array('safe' => false, 'fsync' => false);
+		$_config = $this->_config;
+		$defaults = array('safe' => $_config['safe'], 'fsync' => false);
 		$options += $defaults;
 		$this->_checkConnection();
 
 		$params = compact('query', 'options');
-		$_config = $this->_config;
 		$_exp = $this->_classes['exporter'];
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config, $_exp) {
@@ -396,7 +409,7 @@ class MongoDb extends \lithium\data\Source {
 
 	protected function _saveFile($data) {
 		$uploadKeys = array('name', 'type', 'tmp_name', 'error', 'size');
-		$grid = $this->connection->getGridFS();
+		$grid = $this->connection->getGridFS($this->_config['gridPrefix']);
 		$file = null;
 		$method = null;
 
@@ -454,9 +467,8 @@ class MongoDb extends \lithium\data\Source {
 				return $self->item($query->model(), $config['data'], $config);
 			}
 			$collection = $self->connection->{$source};
-
 			if ($source == "{$_config['gridPrefix']}.files") {
-				$collection = $self->connection->getGridFS();
+				$collection = $self->connection->getGridFS($_config['gridPrefix']);
 			}
 			$result = $collection->find($args['conditions'], $args['fields']);
 
@@ -491,12 +503,17 @@ class MongoDb extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function update($query, array $options = array()) {
-		$defaults = array('upsert' => false, 'multiple' => true, 'safe' => false, 'fsync' => false);
+		$_config = $this->_config;
+		$defaults = array(
+			'upsert' => false,
+			'multiple' => true,
+			'safe' => $_config['safe'],
+			'fsync' => false
+		);
 		$options += $defaults;
 		$this->_checkConnection();
 
 		$params = compact('query', 'options');
-		$_config = $this->_config;
 		$_exp = $this->_classes['exporter'];
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config, $_exp) {
@@ -536,9 +553,9 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function delete($query, array $options = array()) {
 		$this->_checkConnection();
-		$defaults = array('justOne' => false, 'safe' => false, 'fsync' => false);
-		$options = array_intersect_key($options + $defaults, $defaults);
 		$_config = $this->_config;
+		$defaults = array('justOne' => false, 'safe' => $_config['safe'], 'fsync' => false);
+		$options = array_intersect_key($options + $defaults, $defaults);
 		$params = compact('query', 'options');
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
@@ -563,7 +580,7 @@ class MongoDb extends \lithium\data\Source {
 	protected function _deleteFile($conditions, $options = array()) {
 		$defaults = array('safe' => true);
 		$options += $defaults;
-		return $this->connection->getGridFS()->remove($conditions, $options);
+		return $this->connection->getGridFS($this->_config['gridPrefix'])->remove($conditions, $options);
 	}
 
 	/**
