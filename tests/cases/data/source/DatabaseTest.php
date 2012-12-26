@@ -1584,13 +1584,13 @@ class DatabaseTest extends \lithium\test\Unit {
 			'author_id' => '2',
 			'title' => 'Post title',
 			'created' => '2012-12-17 17:04:00',
-			'mock_database_comments' => array(
+			'MockDatabaseComment' => array(
 				'id' => '3',
 				'post_id' => '1',
 				'author_id' => '2',
 				'body' => 'Very good post',
 				'created' => '2012-12-17 17:05:00',
-				'mock_database_post' => array(
+				'MockDatabasePost' => array(
 					'id' => '1',
 					'author_id' => '2',
 					'title' => 'Post title',

@@ -213,8 +213,7 @@ abstract class Database extends \lithium\data\Source {
 								'type' => $rel->type(),
 								'model' => $rel->to(),
 								'fieldName' => $rel->fieldName(),
-								'fromAlias' => $from,
-								'toAlias' => $to
+								'alias' => $to
 							));
 							$self->join($context, $rel, $from, $to, $constraints);
 						}
@@ -473,11 +472,10 @@ abstract class Database extends \lithium\data\Source {
 				case 'array':
 					$columns = $args['schema'] ?: $self->schema($query, $result);
 
-					if (!isset($columns['']) || !is_array($columns[''])) {
+					if (!is_array(reset($columns))) {
 						$columns = array('' => $columns);
 					}
 
-					$relationNames = is_object($query) ? $query->relationNames($self) : array();
 					$i = 0;
 					$records = array();
 					foreach ($result as $data) {
@@ -487,7 +485,7 @@ abstract class Database extends \lithium\data\Source {
 							$len = count($cols);
 							$values = array_combine($cols, array_slice($data, $offset, $len));
 							if ($path) {
-								$records[$i][$relationNames[$path]] = $values;
+								$records[$i][$path] = $values;
 							} else {
 								$records[$i] += $values;
 							}
