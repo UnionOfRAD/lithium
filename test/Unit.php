@@ -270,7 +270,7 @@ class Unit extends \lithium\core\Object {
 	public function assertEqual($expected, $result, $message = false) {
 		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$data = ($expected != $result) ? $this->_compare('equal', $expected, $result) : null;
-		$this->assert($expected == $result, $message, $data);
+		return $this->assert($expected == $result, $message, $data);
 	}
 
 	/**
@@ -282,7 +282,7 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertNotEqual($expected, $result, $message = false) {
 		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
-		$this->assert($result != $expected, $message, compact('expected', 'result'));
+		return $this->assert($result != $expected, $message, compact('expected', 'result'));
 	}
 
 	/**
@@ -294,7 +294,7 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertIdentical($expected, $result, $message = false) {
 		$data = ($expected !== $result) ? $this->_compare('identical', $expected, $result) : null;
-		$this->assert($expected === $result, $message, $data);
+		return $this->assert($expected === $result, $message, $data);
 	}
 
 	/**
@@ -317,7 +317,7 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertTrue($result, $message = '{:message}') {
 		$expected = true;
-		$this->assert(!empty($result), $message, compact('expected', 'result'));
+		return $this->assert(!empty($result), $message, compact('expected', 'result'));
 	}
 
 	/**
@@ -342,7 +342,7 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertFalse($result, $message = '{:message}') {
 		$expected = false;
-		$this->assert(empty($result), $message, compact('expected', 'result'));
+		return $this->assert(empty($result), $message, compact('expected', 'result'));
 	}
 
 	/**
@@ -353,7 +353,7 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertNull($result, $message = '{:message}') {
 		$expected = null;
-		$this->assert($result === null, $message, compact('expected', 'result'));
+		return $this->assert($result === null, $message, compact('expected', 'result'));
 	}
 
 	/**
@@ -365,7 +365,7 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertNoPattern($expected, $result, $message = '{:message}') {
 		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
-		$this->assert(!preg_match($expected, $result), $message, compact('expected', 'result'));
+		return $this->assert(!preg_match($expected, $result), $message, compact('expected', 'result'));
 	}
 
 	/**
@@ -377,7 +377,7 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertPattern($expected, $result, $message = '{:message}') {
 		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
-		$this->assert(!!preg_match($expected, $result), $message, compact('expected', 'result'));
+		return $this->assert(!!preg_match($expected, $result), $message, compact('expected', 'result'));
 	}
 
 	/**
@@ -600,8 +600,7 @@ class Unit extends \lithium\core\Object {
 		$matched = $this->_cookieMatch($expected, $headers);
 		if (!$matched['match']) {
 			$message = sprintf('%s - Cookie not found in headers.', $matched['pattern']);
-			$this->assert(false, $message, compact('expected', 'result'));
-			return false;
+			return $this->assert(false, $message, compact('expected', 'result'));
 		}
 		return $this->assert(true, '%s');
 	}
@@ -625,8 +624,7 @@ class Unit extends \lithium\core\Object {
 		$matched = $this->_cookieMatch($expected, $headers);
 		if ($matched['match']) {
 			$message = sprintf('%s - Cookie found in headers.', $matched['pattern']);
-			$this->assert(false, $message, compact('expected', 'result'));
-			return false;
+			return $this->assert(false, $message, compact('expected', 'result'));
 		}
 		return $this->assert(true, '%s');
 	}
