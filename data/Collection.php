@@ -492,13 +492,8 @@ abstract class Collection extends \lithium\util\Collection {
 	 *
 	 * @return array Returns the array value of the data in this `Collection`.
 	 */
-	public function data(array $options = array()) {
-		$defaults = array(
-			'indexed' => null		
-		);
-		
-		$options += $defaults;
-		return $this->to('array', $options);
+	public function data() {
+		return $this->to('array', array('indexed' => null));
 	}
 
 	/**
