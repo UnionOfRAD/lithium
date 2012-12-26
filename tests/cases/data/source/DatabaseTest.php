@@ -16,6 +16,7 @@ use lithium\tests\mocks\data\model\MockDatabasePost;
 use lithium\tests\mocks\data\model\MockDatabaseComment;
 use lithium\tests\mocks\data\model\MockDatabaseTagging;
 use lithium\tests\mocks\data\model\MockDatabasePostRevision;
+use lithium\tests\mocks\data\model\mock_database\MockResult;
 
 class DatabaseTest extends \lithium\test\Unit {
 
@@ -42,6 +43,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		$this->db->logs = array();
+		$this->db->return = array();
 	}
 
 	public function testDefaultConfig() {
@@ -181,7 +183,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$options['fields'] = array('id', 'title');
 		$result = $this->db->schema(new Query($options));
 
-		$expected = array($modelName => $options['fields'], 'MockDatabaseComment' => array('id'));
+		$expected = array($modelName => $options['fields']);
 		$this->assertEqual($expected, $result);
 
 		$options['fields'] = array(
@@ -192,7 +194,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
 			$modelName => array('id', 'title'),
-			'MockDatabaseComment' => array('body', 'id')
+			'MockDatabaseComment' => array('body')
 		);
 		$this->assertEqual($expected, $result);
 
@@ -203,7 +205,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->schema(new Query($options));
 		$expected = array(
 			$modelName => array('id', 'title'),
-			'MockDatabaseComment' => array('body', 'created', 'id')
+			'MockDatabaseComment' => array('body', 'created')
 		);
 		$this->assertEqual($expected, $result);
 
@@ -1154,6 +1156,9 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$result = $this->db->invokeMethod('_splitFieldname', array('lower(Alias.fieldname)'));
 		$this->assertEqual(array(null, 'lower(Alias.fieldname)'), $result);
+
+		$result = $this->db->invokeMethod('_splitFieldname', array('Alias.*'));
+		$this->assertEqual(array('Alias', '*'), $result);
 	}
 
 	public function testOn() {
@@ -1407,7 +1412,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('Image.ImageTag.Tag')
 		));
 		$result = $query->export($this->db);
-		$expected = '{Gallery}.{id}, {Image}.{id}, {ImageTag}.{id}, {Tag}.{id}';
+		$expected = '{Gallery}.{id}';
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
@@ -1416,7 +1421,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('Image.ImageTag.Tag')
 		));
 		$result = $query->export($this->db);
-		$expected = '{Tag}.{id}, {Gallery}.{id}, {Image}.{id}, {ImageTag}.{id}';
+		$expected = '{Gallery}.{id}, {Tag}.{id}, {Image}.{id}, {ImageTag}.{id}';
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
@@ -1425,7 +1430,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('Image.ImageTag.Tag')
 		));
 		$result = $query->export($this->db);
-		$expected = '{Tag}.*, {Gallery}.{id}, {Image}.{id}, {ImageTag}.{id}';
+		$expected = '{Gallery}.{id}, {Tag}.*, {Image}.{id}, {ImageTag}.{id}';
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
@@ -1434,7 +1439,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('Image.ImageTag.Tag')
 		));
 		$result = $query->export($this->db);
-		$expected = '{Tag}.*, {Gallery}.{id}, {Image}.{id}, {ImageTag}.{id}';
+		$expected = '{Gallery}.{id}, {Tag}.*, {Image}.{id}, {ImageTag}.{id}';
 		$this->assertEqual($expected, $result['fields']);
 	}
 
@@ -1453,7 +1458,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('Parent.Parent')
 		));
 		$result = $query->export($this->db);
-		$expected = '{Parent}.{name}, {Parent}.{id}, {Gallery}.{id}, {Parent__2}.{id}';
+		$expected = '{Gallery}.{id}, {Parent}.{name}';
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
@@ -1462,7 +1467,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'with' => array('Parent.Parent' => array('alias' => 'ParentOfParent'))
 		));
 		$result = $query->export($this->db);
-		$expected = '{ParentOfParent}.{name}, {ParentOfParent}.{id}, {Gallery}.{id}, {Parent}.{id}';
+		$expected = '{Gallery}.{id}, {ParentOfParent}.{name}, {Parent}.{id}';
 		$this->assertEqual($expected, $result['fields']);
 	}
 
@@ -1497,6 +1502,103 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->read($query);
 		$this->assertEqual($expected, $this->db->sql);
 		$this->assertEqual($map, $query->map());
+
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $this->_gallery,
+			'fields' => array('count(Image.id) as count', 'Image'),
+			'group' => 'Gallery.id',
+			'with' => array('Image')
+		));
+		$result = $this->db->read($query);
+		$expected = 'SELECT count(Image.id) as count, {Gallery}.{id}, {Image}.* FROM ';
+		$expected .= '{mock_gallery} AS {Gallery} LEFT JOIN {mock_image} AS {Image} ON ';
+		$expected .= '{Gallery}.{id} = {Image}.{gallery_id} GROUP BY Gallery.id;';
+
+		$this->assertEqual($expected, $this->db->sql);
+		$map = array(
+			'' => array('count', 'id'),
+			'Image' => array('id', 'title', 'image', 'gallery_id')
+		);
+		$this->assertEqual($map, $query->map());
+	}
+
+	public function testReturnArrayOnReadWithString() {
+		$data = new MockResult(array('records' => array(
+			array ('id', 'int(11)', 'NO', 'PRI', null, 'auto_increment'),
+			array ('name', 'varchar(256)', 'YES', '', null, '')
+		)));
+		$this->db->return = array(
+			'schema' => array('field', 'type', 'null', 'key', 'default', 'extra'),
+			'_execute' => $data
+		);
+		$result = $this->db->read('DESCRIBE {table};', array('return' => 'array'));
+		$expected = array(
+			array(
+				'field' => 'id',
+				'type' => 'int(11)',
+				'null' => 'NO',
+				'key' => 'PRI',
+				'default' => null,
+				'extra' => 'auto_increment',
+			),
+			array(
+				'field' => 'name',
+				'type' => 'varchar(256)',
+				'null' => 'YES',
+				'key' => '',
+				'default' => null,
+				'extra' => '',
+			)
+		);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testReturnArrayOnReadWithQuery() {
+		$data = new MockResult(array('records' => array(array(
+			'1',
+			'2',
+			'Post title',
+			'2012-12-17 17:04:00',
+			'3',
+			'1',
+			'2',
+			'Very good post',
+			'2012-12-17 17:05:00',
+			'1',
+			'2',
+			'Post title',
+			'2012-12-17 17:04:00',
+		))));
+		$this->db->return = array(
+			'_execute' => $data
+		);
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $this->_model,
+			'with' => array('MockDatabaseComment.MockDatabasePost')
+		));
+		$result = $this->db->read($query, array('return' => 'array'));
+		$expected = array(array(
+			'id' => '1',
+			'author_id' => '2',
+			'title' => 'Post title',
+			'created' => '2012-12-17 17:04:00',
+			'mock_database_comments' => array(
+				'id' => '3',
+				'post_id' => '1',
+				'author_id' => '2',
+				'body' => 'Very good post',
+				'created' => '2012-12-17 17:05:00',
+				'mock_database_post' => array(
+					'id' => '1',
+					'author_id' => '2',
+					'title' => 'Post title',
+					'created' => '2012-12-17 17:04:00',
+				)
+			)
+		));
+		$this->assertEqual($expected, $result);
 	}
 }
 

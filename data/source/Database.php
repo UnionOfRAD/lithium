@@ -182,7 +182,7 @@ abstract class Database extends \lithium\data\Source {
 
 				$with = $context->with();
 
-				$strategy = function($me, $model, $tree, $path, $from, $needPks) use ($self, $context, $with) {
+				$strategy = function($me, $model, $tree, $path, $from, &$deps) use ($self, $context, $with) {
 					foreach ($tree as $name => $childs) {
 						if (!$rel = $model::relations($name)) {
 							throw new QueryException("Model relationship `{$name}` not found.");
@@ -205,9 +205,8 @@ abstract class Database extends \lithium\data\Source {
 						}
 						$to = $context->alias($alias, $relPath);
 
-						if ($needPks) {
-							$context->fields(array($to => (array) $model::meta('key')));
-						}
+						$deps[$to] = $deps[$from];
+						$deps[$to][] = $from;
 
 						if ($context->relationships($relPath) === null) {
 							$context->relationships($relPath, array(
@@ -221,19 +220,27 @@ abstract class Database extends \lithium\data\Source {
 						}
 
 						if (!empty($childs)) {
-							$me($me, $rel->to(), $childs, $relPath, $to, $needPks);
+							$me($me, $rel->to(), $childs, $relPath, $to, $deps);
 						}
 					}
 				};
 
 				$tree = Set::expand(Set::normalize(array_keys($with)));
 				$alias = $context->alias();
-				$needPks = false;
-				if ($context->fields()) {
-					$needPks = true;
-					$context->fields(array($alias => (array) $model::meta('key')));
+				$deps = array($alias => array());
+				$strategy($strategy, $model, $tree, '', $alias, $deps);
+
+				$models = $context->models();
+				foreach ($context->fields() as $field) {
+					list($alias, $field) = $self->invokeMethod('_splitFieldname', array($field));
+					$alias = $alias ?: $field;
+					if ($alias && isset($models[$alias])) {
+						foreach ($deps[$alias] as $depAlias) {
+							$depModel = $models[$depAlias];
+							$context->fields(array($depAlias => (array) $depModel::meta('key')));
+						}
+					}
 				}
-				$strategy($strategy, $model, $tree, '', $context->alias(), $needPks);
 			},
 			'nested' => function($self, $model, $context) {
 				throw new QueryException("This strategy is not yet implemented.");
@@ -322,7 +329,7 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	protected function _splitFieldname($field) {
 		if (is_string($field)) {
-			if (preg_match('/^[a-z0-9_-]+\.[a-z0-9_-]+$/i', $field)) {
+			if (preg_match('/^[a-z0-9_-]+\.([a-z0-9_-]+|\*)$/i', $field)) {
 				return explode('.', $field, 2);
 			}
 		}
@@ -465,18 +472,30 @@ abstract class Database extends \lithium\data\Source {
 					return $result;
 				case 'array':
 					$columns = $args['schema'] ?: $self->schema($query, $result);
+
+					if (!isset($columns['']) || !is_array($columns[''])) {
+						$columns = array('' => $columns);
+					}
+
+					$relationNames = is_object($query) ? $query->relationNames($self) : array();
+					$i = 0;
 					$records = array();
-					if (is_array(reset($columns))) {
-						$columns = reset($columns);
-					}
-					while ($data = $result->next()) {
-						// @hack: Fix this to support relationships
-						if (count($columns) != count($data) && is_array(current($columns))) {
-							$columns = current($columns);
+					foreach ($result as $data) {
+						$offset = 0;
+						$records[$i] = array();
+						foreach ($columns as $path => $cols) {
+							$len = count($cols);
+							$values = array_combine($cols, array_slice($data, $offset, $len));
+							if ($path) {
+								$records[$i][$relationNames[$path]] = $values;
+							} else {
+								$records[$i] += $values;
+							}
+							$offset += $len;
 						}
-						$records[] = array_combine($columns, $data);
+						$i++;
 					}
-					return $records;
+					return Set::expand($records);
 				case 'item':
 					return $self->item($query->model(), array(), compact('query', 'result') + array(
 						'class' => 'set'
@@ -697,6 +716,7 @@ abstract class Database extends \lithium\data\Source {
 		$model = $query->model();
 		$paths = $query->paths($this);
 		$models = $query->models($this);
+		$alias = $query->alias();
 		$result = array();
 
 		if (!$model) {
@@ -729,6 +749,8 @@ abstract class Database extends \lithium\data\Source {
 			$raw = array_map($unalias, $fields[0]);
 			unset($fields[0]);
 		}
+
+		$fields = isset($fields[$alias]) ? array($alias => $fields[$alias]) + $fields : $fields;
 
 		foreach ($fields as $field => $value) {
 			if (is_array($value)) {
@@ -901,6 +923,7 @@ abstract class Database extends \lithium\data\Source {
 	public function fields($fields, $context) {
 		$type = $context->type();
 		$schema = $context->schema()->fields();
+		$alias = $context->alias();
 
 		if (!is_array($fields)) {
 			return $this->_fieldsReturn($type, $context, $fields, $schema);
@@ -917,6 +940,8 @@ abstract class Database extends \lithium\data\Source {
 			}
 			unset($fields[0]);
 		}
+
+		$fields = isset($fields[$alias]) ? array($alias => $fields[$alias]) + $fields : $fields;
 
 		foreach ($fields as $field => $value) {
 			if (is_array($value)) {
@@ -965,6 +990,7 @@ abstract class Database extends \lithium\data\Source {
 		}
 		return $list;
 	}
+
 	protected function _fieldsQuote($alias, $field) {
 		$open = $this->_quotes[0];
 		$close = $this->_quotes[1];
