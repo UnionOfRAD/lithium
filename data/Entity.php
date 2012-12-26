@@ -218,11 +218,11 @@ class Entity extends \lithium\core\Object {
 	 * @param string $name Optionally included field name.
 	 * @return mixed Entire data array if $name is empty, otherwise the value from the named field.
 	 */
-	public function data($name = null, array $options = array()) {
+	public function data($name = null) {
 		if ($name) {
 			return $this->__get($name);
 		}
-		return $this->to('array', $options);
+		return $this->to('array');
 	}
 
 	/**
