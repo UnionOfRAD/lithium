@@ -56,7 +56,12 @@ class ParserTest extends \lithium\test\Unit {
 		$result = Parser::tokenize('$foo = function() {};');
 		$this->assertEqual(11, count($result));
 
-		$expected = array('id' => 309, 'name' => 'T_VARIABLE', 'content' => '$foo', 'line' => 1);
+		$expected = array(
+			'id' => T_VARIABLE,
+			'name' => 'T_VARIABLE',
+			'content' => '$foo',
+			'line' => 1
+		);
 		$this->assertEqual($expected, $result[0]);
 
 		$expected = array('id' => null, 'name' => ';', 'content' => ';', 'line' => 1);
@@ -99,9 +104,9 @@ class ParserTest extends \lithium\test\Unit {
 
 		$result = Parser::tokenize($code, array('include' => array('T_IF', 'T_WHILE', 'T_CATCH')));
 		$expected = array(
-			array('id' => 318, 'name' => 'T_WHILE', 'content' => 'while', 'line' => 1),
-			array('id' => 301, 'name' => 'T_IF', 'content' => 'if', 'line' => 1),
-			array('id' => 338, 'name' => 'T_CATCH', 'content' => 'catch', 'line' => 3)
+			array('id' => T_WHILE, 'name' => 'T_WHILE', 'content' => 'while', 'line' => 1),
+			array('id' => T_IF, 'name' => 'T_IF', 'content' => 'if', 'line' => 1),
+			array('id' => T_CATCH, 'name' => 'T_CATCH', 'content' => 'catch', 'line' => 3)
 		);
 		$this->assertEqual($expected, $result);
 	}
@@ -136,6 +141,18 @@ class ParserTest extends \lithium\test\Unit {
 		$expected = array('ClassName', 'method');
 		$this->assertEqual($expected, $results);
 	}
+
+	public function testParserGuessesLineBleed() {
+		$code = <<<EOD
+if (false) {
+	return true;
+}
+EOD;
+		$tokens = Parser::tokenize($code);
+		$this->assertIdentical('}', $tokens[13]['content']);
+		$this->assertIdentical(3, $tokens[13]['line']);
+	}
+
 }
 
 ?>
