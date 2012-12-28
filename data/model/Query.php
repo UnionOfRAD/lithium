@@ -11,6 +11,7 @@ namespace lithium\data\model;
 use lithium\util\Set;
 use lithium\data\Source;
 use lithium\core\ConfigException;
+use InvalidArgumentException;
 
 /**
  * The `Query` class acts as a container for all information necessary to perform a particular
@@ -105,15 +106,6 @@ class Query extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_paths = array();
-
-	/**
-	 * Map beetween relation paths and their corresponding fieldname paths
-	 *
-	 * @see lithium\data\model\Query::alias()
-	 *
-	 * @var array
-	 */
-	protected $_relationNames = array();
 
 	/**
 	 * Map beetween generated aliases and corresponding models.
@@ -518,11 +510,15 @@ class Query extends \lithium\core\Object {
 	 * @param array $config the config array to set.
 	 * @return mixed The relationships array or a relationship array if `$relpath` is set. Returns
 	 *         `null` if a join doesn't exist.
+	 * @throws InvalidArgumentException
 	 */
 	public function relationships($relpath = null, $config = null) {
 		if ($config) {
 			if (!$relpath) {
-				throw new ConfigException("The relation dotted path is empty.");
+				throw new InvalidArgumentException("The relation dotted path is empty.");
+			}
+			if (isset($config['model']) && isset($config['alias'])) {
+				$this->_models[$config['alias']] = $config['model'];
 			}
 			$this->_config['relationships'][$relpath] = $config;
 			return $this;
@@ -699,26 +695,20 @@ class Query extends \lithium\core\Object {
 			return $return ?: null;
 		}
 
-		if ($relpath) {
-			$oldAlias = array_search($relpath, $this->_paths);
-		} else {
-			$oldAlias = array_search('', $this->_paths);
+		if ($relpath === null) {
+			$this->_config['alias'] = $alias;
 		}
-		unset($this->_models[$oldAlias]);
-		unset($this->_paths[$oldAlias]);
 
-		$model = $this->_config['model'];
-
-		if (!$relpath) {
-			$this->_alias[$alias] = 1;
+		if ($relpath === null && ($model = $this->_config['model'])) {
 			$this->_models[$alias] = $model;
-			$this->_paths[$alias] = '';
-			return $this->_config['alias'] = $alias;
 		}
 
-		$paths = explode('.', $relpath);
-		if (!$alias) {
-			$alias = end($paths);
+		$relpath = (string) $relpath;
+		unset($this->_paths[array_search($relpath, $this->_paths)]);
+
+		if (!$alias && $relpath) {
+			$last = strrpos($relpath, '.');
+			$alias = $last ? substr($relpath, $last + 1) : $relpath;
 		}
 
 		if (isset($this->_alias[$alias])) {
@@ -729,32 +719,7 @@ class Query extends \lithium\core\Object {
 		}
 
 		$this->_paths[$alias] = $relpath;
-		$fieldname = array();
-		foreach ($paths as $path) {
-			if (!$relation = $model::relations($path)) {
-				$model = null;
-				break;
-			}
-			$fieldname[] = $relation->fieldName();
-			$model = $relation->to();
-		}
-		$this->_models[$alias] = $model;
-		$this->_relationNames[$relpath] = join('.', $fieldname);
 		return $alias;
-	}
-
-	/**
-	 * Return the relation paths mapped to their corredponding fieldname paths.
-	 *
-	 * @param object $source Instance of the data source (`lithium\data\Source`) to use for
-	 *        conversion.
-	 * @return array Map between relation paths and their corresponding fieldname paths.
-	 */
-	public function relationNames(Source $source = null) {
-		if ($source) {
-			$this->applyStrategy($source);
-		}
-		return $this->_relationNames;
 	}
 
 	/**

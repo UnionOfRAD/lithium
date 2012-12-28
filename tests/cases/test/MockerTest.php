@@ -113,6 +113,32 @@ class MockerTest extends \lithium\test\Unit {
 		$this->assertEqual($filteredResult, $originalResult);
 	}
 
+	public function testOriginalMethodNotCalled() {
+		$http = new \lithium\tests\mocks\security\auth\adapter\mockHttp\Mock;
+
+		$this->assertEqual(0, count($http->headers));
+
+		$http->_writeHeader('Content-type: text/html');
+
+		$this->assertEqual(1, count($http->headers));
+
+		$http->applyFilter('_writeHeader', function($self, $params, $chain) {
+			return false;
+		});
+
+		$http->_writeHeader('Content-type: application/pdf');
+
+		$this->assertEqual(1, count($http->headers));
+	}
+
+	public function testFilteringAFilteredMethod() {
+		$adapt = 'lithium\core\adaptable\Mock';
+		$adapt::applyFilter('_initAdapter', function($self, $params, $chain) {
+			return false;
+		});
+		$this->assertFalse($adapt::_initAdapter('foo', array()));
+	}
+
 }
 
 ?>
