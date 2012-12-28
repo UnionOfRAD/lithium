@@ -74,6 +74,10 @@ class Parser extends \lithium\core\StaticObject {
 				}
 			}
 			$tokens[] = array('id' => $id, 'name' => $name, 'content' => $content, 'line' => $line);
+
+			if ($id === T_WHITESPACE) {
+				$line += count(preg_split('/\r\n|\r|\n/', $content)) - 1;
+			}
 		}
 
 		if ($options['wrap'] && empty($options['include'])) {
