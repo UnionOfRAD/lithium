@@ -645,8 +645,8 @@ class Form extends \lithium\template\Helper {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		list($scope, $options) = $this->_options($defaults, $options);
 
-		if (!isset($options['checked']) && ($bound = $this->binding($key)->data)) {
-			$options['checked'] = ($bound == $default);
+		if (!isset($options['checked'])) {
+			$options['checked'] = ($this->binding($key)->data == $default);
 		}
 		if ($scope['hidden']) {
 			$out = $this->hidden($name, array('value' => '', 'id' => false));
@@ -674,8 +674,8 @@ class Form extends \lithium\template\Helper {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		list($scope, $options) = $this->_options($defaults, $options);
 
-		if (!isset($options['checked']) && ($bound = $this->binding($name)->data)) {
-			$options['checked'] = ($bound == $default);
+		if (!isset($options['checked'])) {
+			$options['checked'] = ($this->binding($name)->data == $default);
 		}
 
 		$options['value'] = $scope['value'];
