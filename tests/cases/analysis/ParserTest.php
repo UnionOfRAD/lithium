@@ -153,6 +153,17 @@ EOD;
 		$this->assertIdentical(3, $tokens[13]['line']);
 	}
 
+	public function testParserGuessesLineBleedWithNonWhitespace() {
+		$code = <<<EOD
+if (false) {
+	// hello world
+}
+EOD;
+		$tokens = Parser::tokenize($code);
+		$this->assertIdentical('}', $tokens[9]['content']);
+		$this->assertIdentical(3, $tokens[9]['line']);
+	}
+
 }
 
 ?>
