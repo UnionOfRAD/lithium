@@ -231,6 +231,9 @@ abstract class Database extends \lithium\data\Source {
 
 				$models = $context->models();
 				foreach ($context->fields() as $field) {
+					if (!is_string($field)) {
+						continue;
+					}
 					list($alias, $field) = $self->invokeMethod('_splitFieldname', array($field));
 					$alias = $alias ?: $field;
 					if ($alias && isset($models[$alias])) {
