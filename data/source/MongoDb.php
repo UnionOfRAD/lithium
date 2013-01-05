@@ -409,7 +409,7 @@ class MongoDb extends \lithium\data\Source {
 
 	protected function _saveFile($data) {
 		$uploadKeys = array('name', 'type', 'tmp_name', 'error', 'size');
-		$grid = $this->connection->getGridFS();
+		$grid = $this->connection->getGridFS($this->_config['gridPrefix']);
 		$file = null;
 		$method = null;
 
@@ -469,7 +469,7 @@ class MongoDb extends \lithium\data\Source {
 			$collection = $self->connection->{$source};
 
 			if ($source == "{$_config['gridPrefix']}.files") {
-				$collection = $self->connection->getGridFS();
+				$collection = $self->connection->getGridFS($_config['gridPrefix']);
 			}
 			$result = $collection->find($args['conditions'], $args['fields']);
 
@@ -581,7 +581,7 @@ class MongoDb extends \lithium\data\Source {
 	protected function _deleteFile($conditions, $options = array()) {
 		$defaults = array('safe' => true);
 		$options += $defaults;
-		return $this->connection->getGridFS()->remove($conditions, $options);
+		return $this->connection->getGridFS($this->_config['gridPrefix'])->remove($conditions, $options);
 	}
 
 	/**
