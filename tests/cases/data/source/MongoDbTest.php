@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -837,6 +837,60 @@ class MongoDbTest extends \lithium\test\Unit {
 		$expected = array('justOne' => false, 'safe' => false, 'fsync' => false);
 		$this->assertEqual('remove', $result['method']);
 		$this->assertEqual($expected, $result['params'][1]);
+	}
+
+	public function testCreateGridfsDefaultName() {
+		$source = 'fs.files';
+
+		$model = $this->_model;
+		$model::config(array('meta' => array('source' => $source, 'connection' => 'default', 'locked' => false)));
+
+		$data = array('file' => 'xxx', 'filename' => 'xxx');
+
+		$model::create()->save($data);
+		$result = $this->db->connection->gridFSinstance;
+
+		$this->assertTrue(is_object($result));
+		$this->assertEqual($source, $result->filesName);
+	}
+
+	/**
+	 * This test fails in current conditions.
+	 */
+	public function testCreateGridfsWrongPrefix() {
+		$source = 'somename.files';
+
+		$model = $this->_model;
+		$model::config(array('meta' => array('source' => $source, 'connection' => 'default', 'locked' => false)));
+
+		$data = array('file' => 'xxx', 'filename' => 'xxx');
+
+		$model::create()->save($data);
+		$result = $this->db->connection->gridFSinstance;
+
+		// Expected this will fail.
+		$this->assertTrue(is_object($result));
+	}
+
+	/**
+	 * This test fails in current conditions.
+	 */
+	public function testCreateGridfsAlternativeName() {
+		$source = 'somename.files';
+
+		$this->_testConfig['gridPrefix'] = 'somename';
+		$this->setUp();
+
+		$model = $this->_model;
+		$model::config(array('meta' => array('source' => $source, 'connection' => 'default', 'locked' => false)));
+
+		$data = array('file' => 'xxx', 'filename' => 'xxx');
+
+		$model::create()->save($data);
+		$result = $this->db->connection->gridFSinstance;
+
+		$this->assertTrue(is_object($result));
+		$this->assertEqual($source, $result->filesName);
 	}
 }
 
