@@ -838,6 +838,62 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual('remove', $result['method']);
 		$this->assertEqual($expected, $result['params'][1]);
 	}
+
+	public function testCreateGridfsDefaultName() {
+		$source = 'fs.files';
+
+		$model = $this->_model;
+		$model::config(array('meta' => array('source' => $source, 'connection' => 'default', 'locked' => false)));
+
+		$data = array('file' => 'xxx', 'filename' => 'xxx');
+
+		$model::create()->save($data);
+		$result = $this->db->connection->gridFSinstance;
+
+		$this->assertTrue(is_object($result));
+		$this->assertEqual($source, $result->filesName);
+	}
+
+	/**
+	 * This test fails in current conditions.
+	 */
+	public function testCreateGridfsWrongPrefix() {
+		$source = 'somename.files';
+
+		$model = $this->_model;
+		$model::config(array('meta' => array('source' => $source, 'connection' => 'default', 'locked' => false)));
+
+		$data = array('file' => 'xxx', 'filename' => 'xxx');
+
+		$model::create()->save($data);
+		$result = $this->db->connection->gridFSinstance;
+
+		// Expected this will fail, because $result is not object.
+		$this->expectException('Trying to get property of non-object');
+
+		$result->fileNames;
+	}
+
+	/**
+	 * This test fails in current conditions.
+	 */
+	public function testCreateGridfsAlternativeName() {
+		$source = 'somename.files';
+
+		$this->_testConfig['gridPrefix'] = 'somename';
+		$this->setUp();
+
+		$model = $this->_model;
+		$model::config(array('meta' => array('source' => $source, 'connection' => 'default', 'locked' => false)));
+
+		$data = array('file' => 'xxx', 'filename' => 'xxx');
+
+		$model::create()->save($data);
+		$result = $this->db->connection->gridFSinstance;
+
+		$this->assertTrue(is_object($result));
+		$this->assertEqual($source, $result->filesName);
+	}
 }
 
 ?>
