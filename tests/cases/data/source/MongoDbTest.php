@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -868,8 +868,10 @@ class MongoDbTest extends \lithium\test\Unit {
 		$model::create()->save($data);
 		$result = $this->db->connection->gridFSinstance;
 
-		// Expected this will fail.
-		$this->assertTrue(is_object($result));
+		// Expected this will fail, because $result is not object.
+		$this->expectException('Trying to get property of non-object');
+
+		$result->fileNames;
 	}
 
 	/**
