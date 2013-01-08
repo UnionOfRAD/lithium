@@ -60,8 +60,8 @@ class MockMongoConnection {
 		return $this->_record(__FUNCTION__);
 	}
 
-	public function getGridFS() {
-		$this->gridFSinstance = new MockMongoGridFS();
+	public function getGridFS($prefix = "fs") {
+		$this->gridFSinstance = new MockMongoGridFS(null, $prefix, $prefix);
 		return $this->gridFSinstance;
 	}
 }
