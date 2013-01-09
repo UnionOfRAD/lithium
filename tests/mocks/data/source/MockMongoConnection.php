@@ -18,6 +18,8 @@ class MockMongoConnection {
 
 	protected $_collection = null;
 
+	public $gridFsPrefix = null;
+
 	public function connect() {
 		return false;
 	}
@@ -56,6 +58,15 @@ class MockMongoConnection {
 
 	public function listCollections() {
 		return $this->_record(__FUNCTION__);
+	}
+
+	public function getGridFS($prefix = "fs") {
+		$this->gridFsPrefix = $prefix;
+		return $this;
+	}
+
+	public function storeBytes($bytes = null, array $extra = array(), array $options = array()) {
+		return;
 	}
 }
 

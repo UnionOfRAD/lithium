@@ -838,6 +838,90 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual('remove', $result['method']);
 		$this->assertEqual($expected, $result['params'][1]);
 	}
+
+	public function testGridFsCRUDWithDefaultPrefix() {
+		$model = $this->_model;
+		$source = 'fs.files';
+		$data = array('filename' => 'lithium', 'file' => 'some_datas');
+
+		$model::config(array('meta' => array('source' => $source, 'locked' => false)));
+		$this->assertIdentical(true, $model::create()->save($data));
+		$this->assertIdentical('fs', $this->db->connection->gridFsPrefix);
+		$this->db->connection->gridFsPrefix = null;
+
+		$model::config(array('meta' => array('source' => $source, 'locked' => false)));
+		$this->db->connection->results = array(new MockResult(array('data' => $data)));
+		$this->assertTrue($model::find('all'));
+		$this->assertIdentical('fs', $this->db->connection->gridFsPrefix);
+		$this->db->connection->gridFsPrefix = null;
+
+		$model::create($data + array('_id' => new MongoId), array('exists' => true))->delete();
+		$this->assertIdentical('fs', $this->db->connection->gridFsPrefix);
+		$this->db->connection->gridFsPrefix = null;
+
+	}
+
+	public function testGridFsCreateWithCustomPrefix() {
+		$model = $this->_model;
+		$data = array('filename' => 'lithium', 'file' => 'some_datas');
+
+		$db = new MongoDb($this->_testConfig + array('gridPrefix' => 'custom'));
+		$db->server = new MockMongoConnection();
+		$db->connection = new MockMongoConnection();
+		$db->server->connected = true;
+		$model::$connection = $db;
+
+		$model::config(array('meta' => array('source' => 'fs.files', 'locked' => false)));
+		$this->assertIdentical(false, $model::create()->save($data));
+		$this->assertIdentical(null, $db->connection->gridFsPrefix);
+
+		$model::config(array('meta' => array('source' => 'custom.files', 'locked' => false)));
+		$this->assertIdentical(true, $model::create()->save($data));
+		$this->assertIdentical('custom', $db->connection->gridFsPrefix);
+	}
+
+	public function testGridFsReadWithCustomPrefix() {
+		$model = $this->_model;
+		$data = array('filename' => 'lithium', 'file' => 'some_datas');
+		$result = new MockResult(array('data' => array(
+			array('filename' => 'lithium', 'file' => 'some_datas')
+		)));
+
+		$db = new MongoDb($this->_testConfig + array('gridPrefix' => 'custom'));
+		$db->server = new MockMongoConnection();
+		$db->connection = new MockMongoConnection();
+		$db->server->connected = true;
+		$model::$connection = $db;
+
+		$model::config(array('meta' => array('source' => 'fs.files', 'locked' => false)));
+		$db->connection->results = array($result);
+		$this->assertTrue($model::find('all'));
+		$this->assertIdentical(null, $db->connection->gridFsPrefix);
+
+		$model::config(array('meta' => array('source' => 'custom.files', 'locked' => false)));
+		$db->connection->results = array($result);
+		$this->assertTrue($model::find('all'));
+		$this->assertIdentical('custom', $db->connection->gridFsPrefix);
+	}
+
+	public function testGridFsDeleteWithCustomPrefix() {
+		$model = $this->_model;
+		$data = array('_id' => new MongoId);
+
+		$db = new MongoDb($this->_testConfig + array('gridPrefix' => 'custom'));
+		$db->server = new MockMongoConnection();
+		$db->connection = new MockMongoConnection();
+		$db->server->connected = true;
+		$model::$connection = $db;
+
+		$model::config(array('meta' => array('source' => 'fs.files', 'locked' => false)));
+		$model::create($data, array('exists' => true))->delete();
+		$this->assertIdentical(null, $db->connection->gridFsPrefix);
+
+		$model::config(array('meta' => array('source' => 'custom.files', 'locked' => false)));
+		$model::create($data, array('exists' => true))->delete();
+		$this->assertIdentical('custom', $db->connection->gridFsPrefix);
+	}
 }
 
 ?>
