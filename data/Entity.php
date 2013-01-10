@@ -187,7 +187,7 @@ class Entity extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function __call($method, $params) {
-		if ($model = $this->_model) {
+		if (($model = $this->_model) && method_exists($model, '_object')) {
 			array_unshift($params, $this);
 			$class = $model::invokeMethod('_object');
 			return call_user_func_array(array(&$class, $method), $params);
