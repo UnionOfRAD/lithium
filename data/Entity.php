@@ -373,14 +373,16 @@ class Entity extends \lithium\core\Object {
 				return null;
 			}
 
-			$value = !($value = isset($this->_updated[$field])) ?: $this->_updated[$field];
-			if (!$value) {
+			if (!array_key_exists($field, $this->_updated)) {
 				return false;
-			} elseif (is_object($value) && method_exists($value, 'modified')) {
+			}
+
+			$value = $this->_updated[$field];
+			if (is_object($value) && method_exists($value, 'modified')) {
 				$modified = $value->modified();
 				return $modified === true || is_array($modified) && in_array(true, $modified, true);
 			}
-			return !isset($this->_data[$field]) || $this->_data[$field] !== $this->_updated[$field];
+			return !isset($this->_data[$field]) || ($this->_data[$field] !== $this->_updated[$field]);
 		}
 
 		$fields = array_fill_keys(array_keys($this->_data), false);
