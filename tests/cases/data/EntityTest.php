@@ -102,6 +102,14 @@ class EntityTest extends \lithium\test\Unit {
 		$entity->foo();
 	}
 
+	public function testMethodDispatchWithEntityAsModel() {
+		$data = array('foo' => true);
+		$model = 'lithium\data\Entity';
+		$entity = new Entity(compact('model', 'data'));
+		$this->expectException("/^No model bound to call `foo`.$/");
+		$entity->foo();
+	}
+
 	public function testErrors() {
 		$entity = new Entity();
 		$errors = array('foo' => 'Something bad happened.');
