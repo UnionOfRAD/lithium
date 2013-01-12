@@ -29,4 +29,5 @@ class Record extends \lithium\data\Entity {
 		return parent::to($format, $options);
 	}
 }
+
 ?>
