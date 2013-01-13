@@ -213,6 +213,53 @@ class ObjectTest extends \lithium\test\Unit {
 		$this->expectException('/^Invalid class lookup/');
 		$object->instance(false);
 	}
+
+	public function testResetMethodFilter() {
+		$obj = new MockMethodFiltering();
+		$obj->applyFilter(false);
+		$obj->applyFilter('method2', function($self, $params, $chain) {
+			return false;
+		});
+
+		$this->assertIdentical(false, $obj->method2());
+
+		$obj->applyFilter('method2', false);
+
+		$this->assertTrue($obj->method2() !== false);
+	}
+
+	public function testResetMultipleFilters() {
+		$obj = new MockMethodFiltering();
+		$obj->applyFilter(false);
+		$obj->applyFilter(array('method2', 'manual'), function($self, $params, $chain) {
+			return false;
+		});
+
+		$this->assertIdentical(false, $obj->method2());
+		$this->assertIdentical(false, $obj->manual(array()));
+
+		$obj->applyFilter('method2', false);
+
+		$this->assertTrue($obj->method2() !== false);
+		$this->assertIdentical(false, $obj->manual(array()));
+	}
+
+	public function testResetClass() {
+		$obj = new MockMethodFiltering();
+		$obj->applyFilter(false);
+		$obj->applyFilter(array('method2', 'manual'), function($self, $params, $chain) {
+			return false;
+		});
+
+		$this->assertIdentical(false, $obj->method2());
+		$this->assertIdentical(false, $obj->manual(array()));
+
+		$obj->applyFilter(false);
+
+		$this->assertTrue($obj->method2() !== false);
+		$this->assertTrue($obj->manual(array()) !== false);
+	}
+
 }
 
 ?>
