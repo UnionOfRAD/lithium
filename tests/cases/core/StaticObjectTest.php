@@ -162,6 +162,53 @@ class StaticObjectTest extends \lithium\test\Unit {
 		$this->expectException('/^Invalid class lookup/');
 		MockStaticInstantiator::instance(false);
 	}
+
+	public function testResetMethodFilter() {
+		$class = 'lithium\tests\mocks\core\MockStaticMethodFiltering';
+		$class::applyFilter(false);
+		$class::applyFilter('method2', function($self, $params, $chain) {
+			return false;
+		});
+
+		$this->assertIdentical(false, $class::method2());
+
+		$class::applyFilter('method2', false);
+
+		$this->assertTrue($class::method2() !== false);
+	}
+
+	public function testResetMultipleFilters() {
+		$class = 'lithium\tests\mocks\core\MockStaticMethodFiltering';
+		$class::applyFilter(false);
+		$class::applyFilter(array('method2', 'manual'), function($self, $params, $chain) {
+			return false;
+		});
+
+		$this->assertIdentical(false, $class::method2());
+		$this->assertIdentical(false, $class::manual(array()));
+
+		$class::applyFilter('method2', false);
+
+		$this->assertTrue($class::method2() !== false);
+		$this->assertIdentical(false, $class::manual(array()));
+	}
+
+	public function testResetClass() {
+		$class = 'lithium\tests\mocks\core\MockStaticMethodFiltering';
+		$class::applyFilter(false);
+		$class::applyFilter(array('method2', 'manual'), function($self, $params, $chain) {
+			return false;
+		});
+
+		$this->assertIdentical(false, $class::method2());
+		$this->assertIdentical(false, $class::manual(array()));
+
+		$class::applyFilter(false);
+
+		$this->assertTrue($class::method2() !== false);
+		$this->assertTrue($class::manual(array()) !== false);
+	}
+
 }
 
 ?>

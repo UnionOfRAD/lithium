@@ -36,7 +36,7 @@ class ComplexityTest extends \lithium\test\Unit {
 	protected $_metrics = array(
 		'invokeMethod' => 8,
 		'_filter' => 3,
-		'applyFilter' => 3,
+		'applyFilter' => 5,
 		'_parents' => 2,
 		'_instance' => 2,
 		'_stop' => 1
@@ -86,12 +86,12 @@ class ComplexityTest extends \lithium\test\Unit {
 		Complexity::apply($this->report, $group->tests());
 
 		$results = Complexity::analyze($this->report);
-		$expected = array('class' => array($testClass => 3));
+		$expected = array('class' => array($testClass => 3.5));
 		foreach ($this->_metrics as $method => $metric) {
 			$expected['max'][$testClass . '::' . $method . '()'] = $metric;
 		}
 		$this->assertEqual($expected['max'], $results['max']);
-		$this->assertEqual($expected['class'][$testClass], round($results['class'][$testClass]));
+		$this->assertIdentical($expected['class'][$testClass], $results['class'][$testClass]);
 	}
 
 	/**
