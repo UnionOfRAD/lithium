@@ -1247,6 +1247,32 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Retrieves all method filters for the current class.
+	 *
+	 * @see lithium\core\StaticObject::$_methodFilters
+	 * @return array List of all applied filters.
+	 */
+	public static function getAppliedFilters() {
+		$instance = static::_object();
+		if (!isset($instance->_instanceFilters)) {
+			return array();
+		}
+		return $instance->_instanceFilters;
+	}
+
+	/**
+	 * Replaces all method filters for the current class.
+	 *
+	 * @see lithium\core\StaticObject::$_methodFilters
+	 * @param array $methodFilters Replacement. 
+	 * @return void
+	 */
+	public static function replaceAppliedFilters($methodFilters = null) {
+		$instance = static::_object();
+		return $instance->_instanceFilters = $methodFilters;
+	}
+
+	/**
 	 * Wraps `StaticObject::_filter()` to account for object instances.
 	 *
 	 * @see lithium\core\StaticObject::_filter()

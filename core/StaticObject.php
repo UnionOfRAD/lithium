@@ -63,6 +63,32 @@ class StaticObject {
 	}
 
 	/**
+	 * Retrieves all method filters for the current class.
+	 *
+	 * @see lithium\core\StaticObject::$_methodFilters
+	 * @return array List of all applied filters.
+	 */
+	public static function getAppliedFilters() {
+		$class = get_called_class();
+		if (!isset(static::$_methodFilters[$class])) {
+			return array();
+		}
+		return static::$_methodFilters[$class];
+	}
+
+	/**
+	 * Replaces all method filters for the current class.
+	 *
+	 * @see lithium\core\StaticObject::$_methodFilters
+	 * @param array $methodFilters Replacement. 
+	 * @return void
+	 */
+	public static function replaceAppliedFilters($methodFilters = null) {
+		$class = get_called_class();
+		return static::$_methodFilters[$class] = $methodFilters;
+	}
+
+	/**
 	 * Calls a method on this object with the given parameters. Provides an OO wrapper for
 	 * `forward_static_call_array()`, and improves performance by using straight method calls
 	 * in most cases.

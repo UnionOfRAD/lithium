@@ -159,6 +159,27 @@ class Object {
 	}
 
 	/**
+	 * Retrieves all method filters for the current class.
+	 *
+	 * @see lithium\core\StaticObject::$_methodFilters
+	 * @return array List of all applied filters.
+	 */
+	public static function getAppliedFilters() {
+		return $this->_methodFilters;
+	}
+
+	/**
+	 * Replaces all method filters for the current class.
+	 *
+	 * @see lithium\core\StaticObject::$_methodFilters
+	 * @param array $methodFilters Replacement. 
+	 * @return void
+	 */
+	public static function replaceAppliedFilters($methodFilters = null) {
+		return $this->_methodFilters = $methodFilters;
+	}
+
+	/**
 	 * Calls a method on this object with the given parameters. Provides an OO wrapper
 	 * for call_user_func_array, and improves performance by using straight method calls
 	 * in most cases.
