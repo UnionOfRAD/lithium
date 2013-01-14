@@ -776,7 +776,7 @@ class Query extends \lithium\core\Object {
 		if (!$this->_entity || !($model = $this->_config['model'])) {
 			return;
 		}
-		$key = $model::key($this->_entity->data());
+		$key = $model::key($this->_entity->stored());
 
 		if (!$key && $this->_type != "create") {
 			throw new ConfigException('No matching primary key found.');
