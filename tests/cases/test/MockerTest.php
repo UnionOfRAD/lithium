@@ -12,7 +12,7 @@ use lithium\test\Mocker;
 
 /**
  * WARNING:
- * No unit test should mock the same test as another
+ * No unit test should mock the same test as another to avoid conflicting filters.
  */
 class MockerTest extends \lithium\test\Unit {
 
@@ -56,13 +56,13 @@ class MockerTest extends \lithium\test\Unit {
 	public function testFilteringNonStaticClass() {
 		$dispatcher = new \lithium\console\dispatcher\Mock();
 		
-		$originalResult = $dispatcher->config();
+		$originalResult = $dispatcher->config(array());
 
 		$dispatcher->applyFilter('config', function($self, $params, $chain) {
 			return array();
 		});
 
-		$filteredResult = $dispatcher->config();
+		$filteredResult = $dispatcher->config(array());
 
 		$this->assertEqual(0, count($filteredResult));
 		$this->assertNotEqual($filteredResult, $originalResult);
@@ -136,7 +136,7 @@ class MockerTest extends \lithium\test\Unit {
 		$adapt::applyFilter('_initAdapter', function($self, $params, $chain) {
 			return false;
 		});
-		$this->assertFalse($adapt::_initAdapter('foo', array()));
+		$this->assertIdentical(false, $adapt::_initAdapter('foo', array()));
 	}
 
 	public function testStaticResults() {
@@ -177,6 +177,25 @@ class MockerTest extends \lithium\test\Unit {
 		$this->assertIdentical(1, count($debugger->results['meta']));
 		$this->assertIdentical(array('baz'), $debugger->results['meta'][0]['args']);
 		$this->assertIdentical(false, $debugger->results['meta'][0]['result']);
+	}
+
+	public function testSkipByReference() {
+		$stdObj = new \lithium\tests\mocks\test\mockStdClass\Mock();
+		$stdObj->foo = 'foo';
+		$originalData = $stdObj->data();
+		$stdObj->applyFilter('data', function($self, $params, $chain) {
+			return array();
+		});
+		$nonfilteredData = $stdObj->data();
+		$this->assertIdentical($originalData, $nonfilteredData);
+	}
+
+	public function testGetByReference() {
+		$stdObj = new \lithium\tests\mocks\test\mockStdClass\Mock();
+		$stdObj->foo = 'foo';
+		$foo =& $stdObj->foo;
+		$foo = 'bar';
+		$this->assertIdentical('bar', $stdObj->foo);
 	}
 
 }

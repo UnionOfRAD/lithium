@@ -22,7 +22,7 @@ use Reflection;
  * {{{
  * use lithium\core\Environment;
  * use lithium\test\Mocker;
- * if(!Environment::is('production')) {
+ * if (!Environment::is('production')) {
  * 	Mocker::register();
  * }
  * }}}
@@ -93,8 +93,7 @@ class Mocker {
 			'        $method = array($this->parent, "{:method}");',
 			'        return call_user_func_array($method, $args);',
 			'    }',
-			'    array_pop($args);',
-			'    return call_user_func_array("parent::{:method}", $args);',
+			'    return call_user_func_array("parent::{:method}", compact({:stringArgs}));',
 			'}',
 		),
 		'staticMethod' => array(
@@ -106,8 +105,7 @@ class Mocker {
 			'        $method = \'{:namespace}\Mock::{:method}\';',
 			'        return call_user_func_array($method, $args);',
 			'    }',
-			'    array_pop($args);',
-			'    return call_user_func_array("parent::{:method}", $args);',
+			'    return call_user_func_array("parent::{:method}", compact({:stringArgs}));',
 			'}',
 		),
 		'endClass' => array(
@@ -143,8 +141,14 @@ class Mocker {
 			'    );',
 		),
 		'get' => array(
-			'public function __get($key) {',
-			'    return $this->mocker->$key;',
+			'public function {:reference}__get($name) {',
+			'    $data ={:reference} $this->mocker->$name;',
+			'    return $data;',
+			'}',
+		),
+		'set' => array(
+			'public function __set($name, $value = null) {',
+			'    return $this->mocker->$name = $value;',
 			'}',
 		),
 		'constructor' => array(
@@ -165,8 +169,8 @@ class Mocker {
 		),
 		'staticMethod' => array(
 			'{:modifiers} function {:method}({:args}) {',
-			'    $args = func_get_args();',
-			'    array_push($args, "1f3870be274f6c49b3e31a0c6728957f");',
+			'    $args = compact({:stringArgs});',
+			'    $args["hash"] = "1f3870be274f6c49b3e31a0c6728957f";',
 			'    $method = \'{:namespace}\MockDelegate::{:method}\';',
 			'    $result = self::_filter("{:method}", $args, function($self, $args) use(&$method) {',
 			'        return call_user_func_array($method, $args);',
@@ -184,8 +188,8 @@ class Mocker {
 		),
 		'method' => array(
 			'{:modifiers} function {:method}({:args}) {',
-			'    $args = func_get_args();',
-			'    array_push($args, spl_object_hash($this->mocker));',
+			'    $args = compact({:stringArgs});',
+			'    $args["hash"] = spl_object_hash($this->mocker);',
 			'    $method = array($this->mocker, "{:method}");',
 			'    $result = $this->_filter(__METHOD__, $args, function($self, $args) use(&$method) {',
 			'        return call_user_func_array($method, $args);',
@@ -215,8 +219,9 @@ class Mocker {
 		'__destruct', '__call', '__callStatic', '_parents',
 		'__get', '__set', '__isset', '__unset', '__sleep',
 		'__wakeup', '__toString', '__clone', '__invoke',
-		'_stop', '_init', 'applyFilter', 'invokeMethod',
-		'__set_state', '_instance', '_filter',
+		'_stop', '_init', 'invokeMethod', '__set_state',
+		'_instance', '_filter', '_object', '_initialize',
+		'applyFilter',
 	);
 
 	/**
@@ -240,35 +245,49 @@ class Mocker {
 		}
 
 		$mocker = self::_mocker($mockee);
+		$isStatic = is_subclass_of($mocker, 'lithium\core\StaticObject');
 
 		$tokens = array(
 			'namespace' => self::_namespace($mockee),
 			'mocker' => $mocker,
 			'mockee' => 'MockDelegate',
+			'static' => $isStatic ? 'static' : '',
 		);
 		$mockDelegate = self::_dynamicCode('mockDelegate', 'startClass', $tokens);
 		$mock = self::_dynamicCode('mock', 'startClass', $tokens);
 
 		$reflectedClass = new ReflectionClass($mocker);
 		$reflecedMethods = $reflectedClass->getMethods();
-		foreach ($reflecedMethods as $method) {
+		$getByReference = false;
+		foreach ($reflecedMethods as $methodId => $method) {
 			if (!in_array($method->name, self::$_blackList)) {
 				$key = $method->isStatic() ? 'staticMethod' : 'method';
 				$key = $method->name === '__construct' ? 'constructor' : $key;
+				$docs = ReflectionMethod::export($mocker, $method->name, true);
+				if (preg_match('/&' . $method->name . '/', $docs) === 1) {
+					continue;
+				}
 				$tokens = array(
 					'namespace' => self::_namespace($mockee),
 					'method' => $method->name,
 					'modifiers' => self::_methodModifiers($method),
 					'args' => self::_methodParams($method),
+					'stringArgs' => self::_stringMethodParams($method),
 					'mocker' => $mocker,
 				);
 				$mockDelegate .= self::_dynamicCode('mockDelegate', $key, $tokens);
 				$mock .= self::_dynamicCode('mock', $key, $tokens);
+			} elseif ($method->name === '__get') {
+				$docs = ReflectionMethod::export($mocker, '__get', true);
+				$getByReference = preg_match('/&__get/', $docs) === 1;
 			}
 		}
 
 		$mockDelegate .= self::_dynamicCode('mockDelegate', 'endClass');
-		$mock .= self::_dynamicCode('mock', 'get');
+		$mock .= self::_dynamicCode('mock', 'get', array(
+			'reference' => $getByReference ? '&' : '',
+		));
+		$mock .= self::_dynamicCode('mock', 'set');
 		$mock .= self::_dynamicCode('mock', 'destructor');
 		$mock .= self::_dynamicCode('mock', 'endClass');
 
@@ -307,6 +326,19 @@ class Mocker {
 		preg_match_all($pattern, $method, $matches);
 		$params = implode(', ', $matches[1]);
 		return str_replace($replace['from'], $replace['to'], $params);
+	}
+
+	/**
+	 * Will return the params in a way that can be placed into `compact()`
+	 *
+	 * @param  ReflectionMethod $method
+	 * @return string
+	 */
+	protected static function _stringMethodParams(ReflectionMethod $method) {
+		$pattern = '/Parameter [^$]+\$([^ ]+)/';
+		preg_match_all($pattern, $method, $matches);
+		$params = implode("', '", $matches[1]);
+		return strlen($params) > 0 ? "'{$params}'" : 'array()';
 	}
 
 	/**
