@@ -123,6 +123,9 @@ class Mocker {
 	 * interface for consumers, instantiation or static method calls, and can
 	 * have most of its methods filtered.
 	 *
+	 * The `$results` variable holds all method calls allowing you for you
+	 * make your own custom assertions on them.
+	 *
 	 * @var array
 	 */
 	protected static $_mockIngredients = array(
@@ -130,11 +133,13 @@ class Mocker {
 			'namespace {:namespace};',
 			'class Mock extends \{:mocker} {',
 			'    public $mocker;',
+			'    public {:static} $results = array();',
 			'    protected $_safeVars = array(',
 			'        "_classes",',
 			'        "_methodFilters",',
 			'        "mocker",',
-			'        "_safeVars"',
+			'        "_safeVars",',
+			'        "results",',
 			'    );',
 		),
 		'get' => array(
@@ -163,9 +168,18 @@ class Mocker {
 			'    $args = func_get_args();',
 			'    array_push($args, "1f3870be274f6c49b3e31a0c6728957f");',
 			'    $method = \'{:namespace}\MockDelegate::{:method}\';',
-			'    return self::_filter("{:method}", $args, function($self, $args) use(&$method) {',
+			'    $result = self::_filter("{:method}", $args, function($self, $args) use(&$method) {',
 			'        return call_user_func_array($method, $args);',
 			'    });',
+			'    if (!isset(self::$results["{:method}"])) {',
+			'        self::$results["{:method}"] = array();',
+			'    }',
+			'    self::$results["{:method}"][] = array(',
+			'        "args" => func_get_args(),',
+			'        "result" => $result,',
+			'        "time" => microtime(true),',
+			'    );',
+			'    return $result;',
 			'}',
 		),
 		'method' => array(
@@ -173,9 +187,18 @@ class Mocker {
 			'    $args = func_get_args();',
 			'    array_push($args, spl_object_hash($this->mocker));',
 			'    $method = array($this->mocker, "{:method}");',
-			'    return $this->_filter(__METHOD__, $args, function($self, $args) use(&$method) {',
+			'    $result = $this->_filter(__METHOD__, $args, function($self, $args) use(&$method) {',
 			'        return call_user_func_array($method, $args);',
 			'    });',
+			'    if (!isset($this->results["{:method}"])) {',
+			'        $this->results["{:method}"] = array();',
+			'    }',
+			'    $this->results["{:method}"][] = array(',
+			'        "args" => func_get_args(),',
+			'        "result" => $result,',
+			'        "time" => microtime(true),',
+			'    );',
+			'    return $result;',
 			'}',
 		),
 		'endClass' => array(

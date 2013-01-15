@@ -139,6 +139,46 @@ class MockerTest extends \lithium\test\Unit {
 		$this->assertFalse($adapt::_initAdapter('foo', array()));
 	}
 
+	public function testStaticResults() {
+		$docblock = 'lithium\analysis\docblock\Mock';
+		$docblock::applyFilter(array('comment', 'tags'), function($self, $params, $chain) {
+			return false;
+		});
+		$docblock::comment('foo', 'foobar');
+		$docblock::comment('bar');
+		$docblock::tags('baz');
+
+		$this->assertIdentical(2, count($docblock::$results['comment']));
+		$this->assertIdentical(array('foo', 'foobar'), $docblock::$results['comment'][0]['args']);
+		$this->assertIdentical(false, $docblock::$results['comment'][0]['result']);
+		$this->assertIdentical(array('bar'), $docblock::$results['comment'][1]['args']);
+		$this->assertIdentical(false, $docblock::$results['comment'][1]['result']);
+
+		$this->assertIdentical(1, count($docblock::$results['tags']));
+		$this->assertIdentical(array('baz'), $docblock::$results['tags'][0]['args']);
+		$this->assertIdentical(false, $docblock::$results['tags'][0]['result']);
+	}
+
+	public function testInstanceResults() {
+		$debugger = new \lithium\data\schema\Mock;
+		$debugger->applyFilter(array('names', 'meta'), function($self, $params, $chain) {
+			return false;
+		});
+		$debugger->names('foo', 'foobar');
+		$debugger->names('bar');
+		$debugger->meta('baz');
+
+		$this->assertIdentical(2, count($debugger->results['names']));
+		$this->assertIdentical(array('foo', 'foobar'), $debugger->results['names'][0]['args']);
+		$this->assertIdentical(false, $debugger->results['names'][0]['result']);
+		$this->assertIdentical(array('bar'), $debugger->results['names'][1]['args']);
+		$this->assertIdentical(false, $debugger->results['names'][1]['result']);
+
+		$this->assertIdentical(1, count($debugger->results['meta']));
+		$this->assertIdentical(array('baz'), $debugger->results['meta'][0]['args']);
+		$this->assertIdentical(false, $debugger->results['meta'][0]['result']);
+	}
+
 }
 
 ?>
