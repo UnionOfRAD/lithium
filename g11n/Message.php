@@ -125,7 +125,7 @@ class Message extends \lithium\core\StaticObject {
 	 * Usage:
 	 * {{{
 	 * 	$t('bike');
-	 * 	$tn('bike', 'bikes', array('count' => 3));
+	 * 	$tn('bike', 'bikes', 3);
 	 * }}}
 	 *
 	 * Using in a method:
