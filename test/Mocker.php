@@ -403,6 +403,22 @@ class Mocker {
 		return true;
 	}
 
+	/**
+	 * Generate a chain class with the current rules of the mock.
+	 *
+	 * @param  object $mock Mock to chain
+	 * @return object       MockerChain instance
+	 */
+	public static function chain($mock) {
+		$results = array();
+		if (is_object($mock) && isset($mock->results)) {
+			$results = $mock->results;
+		} elseif (is_string($mock) && class_exists($mock) && isset($mock::$results)) {
+			$results = $mock::$results;
+		}
+		return new MockerChain($results);
+	}
+
 }
 
 ?>

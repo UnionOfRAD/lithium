@@ -28,6 +28,14 @@ class MockStdClass extends \lithium\core\Object {
 		return $this->_data;
 	}
 
+	public function method1() {
+		return true;
+	}
+
+	public function method2() {
+		return false;
+	}
+
 }
 
 ?>

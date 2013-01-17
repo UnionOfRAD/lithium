@@ -198,6 +198,10 @@ class MockerTest extends \lithium\test\Unit {
 		$this->assertIdentical('bar', $stdObj->foo);
 	}
 
+	public function testChainReturnsMockerChain() {
+		$this->assertTrue(Mocker::chain(new \stdClass) instanceof \lithium\test\MockerChain);
+	}
+
 }
 
 ?>
